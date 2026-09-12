@@ -1,0 +1,545 @@
+{
+  "source": "Anonymized event sizes and timing from GLM retry on 2026-09-11; no prompts, file content or commands retained. Journal replay is not a capture of the lost stdout stream.",
+  "events": [
+    {
+      "kind": "call",
+      "id": "tool-1",
+      "name": "Read",
+      "elapsed_ms": 0
+    },
+    {
+      "kind": "call",
+      "id": "tool-2",
+      "name": "Read",
+      "elapsed_ms": 98
+    },
+    {
+      "kind": "result",
+      "id": "tool-1",
+      "elapsed_ms": 183,
+      "failed": false,
+      "content_bytes": 21131,
+      "extra_bytes": 19935
+    },
+    {
+      "kind": "result",
+      "id": "tool-2",
+      "elapsed_ms": 266,
+      "failed": false,
+      "content_bytes": 1991,
+      "extra_bytes": 2106
+    },
+    {
+      "kind": "call",
+      "id": "tool-3",
+      "name": "Read",
+      "elapsed_ms": 5722
+    },
+    {
+      "kind": "result",
+      "id": "tool-3",
+      "elapsed_ms": 5874,
+      "failed": false,
+      "content_bytes": 1976,
+      "extra_bytes": 2056
+    },
+    {
+      "kind": "call",
+      "id": "tool-4",
+      "name": "Bash",
+      "elapsed_ms": 5972
+    },
+    {
+      "kind": "result",
+      "id": "tool-4",
+      "elapsed_ms": 6286,
+      "failed": false,
+      "content_bytes": 879,
+      "extra_bytes": 972
+    },
+    {
+      "kind": "call",
+      "id": "tool-5",
+      "name": "Bash",
+      "elapsed_ms": 11718
+    },
+    {
+      "kind": "result",
+      "id": "tool-5",
+      "elapsed_ms": 18179,
+      "failed": false,
+      "content_bytes": 830,
+      "extra_bytes": 923
+    },
+    {
+      "kind": "call",
+      "id": "tool-6",
+      "name": "Read",
+      "elapsed_ms": 19696
+    },
+    {
+      "kind": "result",
+      "id": "tool-6",
+      "elapsed_ms": 19841,
+      "failed": false,
+      "content_bytes": 7890,
+      "extra_bytes": 7629
+    },
+    {
+      "kind": "call",
+      "id": "tool-7",
+      "name": "Bash",
+      "elapsed_ms": 24468
+    },
+    {
+      "kind": "result",
+      "id": "tool-7",
+      "elapsed_ms": 31033,
+      "failed": false,
+      "content_bytes": 1086,
+      "extra_bytes": 1179
+    },
+    {
+      "kind": "call",
+      "id": "tool-8",
+      "name": "Bash",
+      "elapsed_ms": 35226
+    },
+    {
+      "kind": "result",
+      "id": "tool-8",
+      "elapsed_ms": 38585,
+      "failed": false,
+      "content_bytes": 240,
+      "extra_bytes": 333
+    },
+    {
+      "kind": "call",
+      "id": "tool-9",
+      "name": "Bash",
+      "elapsed_ms": 39979
+    },
+    {
+      "kind": "result",
+      "id": "tool-9",
+      "elapsed_ms": 45552,
+      "failed": false,
+      "content_bytes": 725,
+      "extra_bytes": 818
+    },
+    {
+      "kind": "call",
+      "id": "tool-10",
+      "name": "Bash",
+      "elapsed_ms": 46827
+    },
+    {
+      "kind": "result",
+      "id": "tool-10",
+      "elapsed_ms": 47104,
+      "failed": false,
+      "content_bytes": 107,
+      "extra_bytes": 200
+    },
+    {
+      "kind": "call",
+      "id": "tool-11",
+      "name": "Write",
+      "elapsed_ms": 52965
+    },
+    {
+      "kind": "result",
+      "id": "tool-11",
+      "elapsed_ms": 53756,
+      "failed": false,
+      "content_bytes": 217,
+      "extra_bytes": 2395
+    },
+    {
+      "kind": "call",
+      "id": "tool-12",
+      "name": "Bash",
+      "elapsed_ms": 55574
+    },
+    {
+      "kind": "result",
+      "id": "tool-12",
+      "elapsed_ms": 55809,
+      "failed": false,
+      "content_bytes": 51,
+      "extra_bytes": 144
+    },
+    {
+      "kind": "call",
+      "id": "tool-13",
+      "name": "Bash",
+      "elapsed_ms": 57452
+    },
+    {
+      "kind": "result",
+      "id": "tool-13",
+      "elapsed_ms": 57681,
+      "failed": false,
+      "content_bytes": 51,
+      "extra_bytes": 144
+    },
+    {
+      "kind": "call",
+      "id": "tool-14",
+      "name": "Bash",
+      "elapsed_ms": 59393
+    },
+    {
+      "kind": "result",
+      "id": "tool-14",
+      "elapsed_ms": 62192,
+      "failed": false,
+      "content_bytes": 150,
+      "extra_bytes": 243
+    },
+    {
+      "kind": "call",
+      "id": "tool-15",
+      "name": "Bash",
+      "elapsed_ms": 63814
+    },
+    {
+      "kind": "result",
+      "id": "tool-15",
+      "elapsed_ms": 64016,
+      "failed": false,
+      "content_bytes": 364,
+      "extra_bytes": 457
+    },
+    {
+      "kind": "call",
+      "id": "tool-16",
+      "name": "Bash",
+      "elapsed_ms": 65709
+    },
+    {
+      "kind": "result",
+      "id": "tool-16",
+      "elapsed_ms": 65933,
+      "failed": false,
+      "content_bytes": 425,
+      "extra_bytes": 518
+    },
+    {
+      "kind": "call",
+      "id": "tool-17",
+      "name": "Bash",
+      "elapsed_ms": 67581
+    },
+    {
+      "kind": "result",
+      "id": "tool-17",
+      "elapsed_ms": 70918,
+      "failed": false,
+      "content_bytes": 5076,
+      "extra_bytes": 5169
+    },
+    {
+      "kind": "call",
+      "id": "tool-18",
+      "name": "Bash",
+      "elapsed_ms": 72702
+    },
+    {
+      "kind": "result",
+      "id": "tool-18",
+      "elapsed_ms": 79010,
+      "failed": false,
+      "content_bytes": 840,
+      "extra_bytes": 933
+    },
+    {
+      "kind": "call",
+      "id": "tool-19",
+      "name": "Bash",
+      "elapsed_ms": 80646
+    },
+    {
+      "kind": "result",
+      "id": "tool-19",
+      "elapsed_ms": 84237,
+      "failed": false,
+      "content_bytes": 2418,
+      "extra_bytes": 2511
+    },
+    {
+      "kind": "call",
+      "id": "tool-20",
+      "name": "Bash",
+      "elapsed_ms": 85936
+    },
+    {
+      "kind": "result",
+      "id": "tool-20",
+      "elapsed_ms": 89305,
+      "failed": false,
+      "content_bytes": 591,
+      "extra_bytes": 684
+    },
+    {
+      "kind": "call",
+      "id": "tool-21",
+      "name": "Bash",
+      "elapsed_ms": 90947
+    },
+    {
+      "kind": "result",
+      "id": "tool-21",
+      "elapsed_ms": 99998,
+      "failed": false,
+      "content_bytes": 1389,
+      "extra_bytes": 1482
+    },
+    {
+      "kind": "call",
+      "id": "tool-22",
+      "name": "Bash",
+      "elapsed_ms": 102088
+    },
+    {
+      "kind": "result",
+      "id": "tool-22",
+      "elapsed_ms": 105411,
+      "failed": false,
+      "content_bytes": 2600,
+      "extra_bytes": 2693
+    },
+    {
+      "kind": "call",
+      "id": "tool-23",
+      "name": "Write",
+      "elapsed_ms": 110996
+    },
+    {
+      "kind": "result",
+      "id": "tool-23",
+      "elapsed_ms": 111621,
+      "failed": false,
+      "content_bytes": 218,
+      "extra_bytes": 3332
+    },
+    {
+      "kind": "call",
+      "id": "tool-24",
+      "name": "Write",
+      "elapsed_ms": 122741
+    },
+    {
+      "kind": "result",
+      "id": "tool-24",
+      "elapsed_ms": 123367,
+      "failed": false,
+      "content_bytes": 228,
+      "extra_bytes": 21727
+    },
+    {
+      "kind": "call",
+      "id": "tool-25",
+      "name": "Bash",
+      "elapsed_ms": 125547
+    },
+    {
+      "kind": "result",
+      "id": "tool-25",
+      "elapsed_ms": 129633,
+      "failed": false,
+      "content_bytes": 1343,
+      "extra_bytes": 1436
+    },
+    {
+      "kind": "call",
+      "id": "tool-26",
+      "name": "Bash",
+      "elapsed_ms": 131310
+    },
+    {
+      "kind": "result",
+      "id": "tool-26",
+      "elapsed_ms": 136887,
+      "failed": false,
+      "content_bytes": 1152,
+      "extra_bytes": 1245
+    },
+    {
+      "kind": "call",
+      "id": "tool-27",
+      "name": "Edit",
+      "elapsed_ms": 139148
+    },
+    {
+      "kind": "result",
+      "id": "tool-27",
+      "elapsed_ms": 139765,
+      "failed": false,
+      "content_bytes": 228,
+      "extra_bytes": 10522
+    },
+    {
+      "kind": "call",
+      "id": "tool-28",
+      "name": "Bash",
+      "elapsed_ms": 142117
+    },
+    {
+      "kind": "result",
+      "id": "tool-28",
+      "elapsed_ms": 153880,
+      "failed": false,
+      "content_bytes": 256,
+      "extra_bytes": 349
+    },
+    {
+      "kind": "call",
+      "id": "tool-29",
+      "name": "Bash",
+      "elapsed_ms": 155817
+    },
+    {
+      "kind": "result",
+      "id": "tool-29",
+      "elapsed_ms": 161616,
+      "failed": false,
+      "content_bytes": 1242,
+      "extra_bytes": 1335
+    },
+    {
+      "kind": "call",
+      "id": "tool-30",
+      "name": "Bash",
+      "elapsed_ms": 163649
+    },
+    {
+      "kind": "result",
+      "id": "tool-30",
+      "elapsed_ms": 168020,
+      "failed": false,
+      "content_bytes": 628,
+      "extra_bytes": 721
+    },
+    {
+      "kind": "call",
+      "id": "tool-31",
+      "name": "Bash",
+      "elapsed_ms": 169837
+    },
+    {
+      "kind": "result",
+      "id": "tool-31",
+      "elapsed_ms": 175980,
+      "failed": false,
+      "content_bytes": 263,
+      "extra_bytes": 400
+    },
+    {
+      "kind": "call",
+      "id": "tool-32",
+      "name": "Bash",
+      "elapsed_ms": 178613
+    },
+    {
+      "kind": "result",
+      "id": "tool-32",
+      "elapsed_ms": 206307,
+      "failed": false,
+      "content_bytes": 230,
+      "extra_bytes": 323
+    },
+    {
+      "kind": "call",
+      "id": "tool-33",
+      "name": "Bash",
+      "elapsed_ms": 208181
+    },
+    {
+      "kind": "result",
+      "id": "tool-33",
+      "elapsed_ms": 212778,
+      "failed": false,
+      "content_bytes": 246,
+      "extra_bytes": 383
+    },
+    {
+      "kind": "call",
+      "id": "tool-34",
+      "name": "Bash",
+      "elapsed_ms": 217443
+    },
+    {
+      "kind": "result",
+      "id": "tool-34",
+      "elapsed_ms": 234503,
+      "failed": false,
+      "content_bytes": 796,
+      "extra_bytes": 889
+    },
+    {
+      "kind": "call",
+      "id": "tool-35",
+      "name": "Bash",
+      "elapsed_ms": 237284
+    },
+    {
+      "kind": "result",
+      "id": "tool-35",
+      "elapsed_ms": 242737,
+      "failed": false,
+      "content_bytes": 85,
+      "extra_bytes": 178
+    },
+    {
+      "kind": "call",
+      "id": "tool-36",
+      "name": "Bash",
+      "elapsed_ms": 246790
+    },
+    {
+      "kind": "result",
+      "id": "tool-36",
+      "elapsed_ms": 252820,
+      "failed": false,
+      "content_bytes": 583,
+      "extra_bytes": 676
+    },
+    {
+      "kind": "call",
+      "id": "tool-37",
+      "name": "Bash",
+      "elapsed_ms": 255573
+    },
+    {
+      "kind": "result",
+      "id": "tool-37",
+      "elapsed_ms": 266605,
+      "failed": false,
+      "content_bytes": 311,
+      "extra_bytes": 448
+    },
+    {
+      "kind": "call",
+      "id": "tool-38",
+      "name": "Bash",
+      "elapsed_ms": 273236
+    },
+    {
+      "kind": "result",
+      "id": "tool-38",
+      "elapsed_ms": 292793,
+      "failed": true,
+      "content_bytes": 340,
+      "extra_bytes": 347
+    },
+    {
+      "kind": "call",
+      "id": "tool-39",
+      "name": "Bash",
+      "elapsed_ms": 294721
+    }
+  ],
+  "expected_calls": 39,
+  "expected_results": 38
+}

@@ -1,0 +1,397 @@
+//go:build linux
+
+package main
+
+import (
+	"crypto/subtle"
+	"embed"
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/fs"
+	"net"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
+)
+
+//go:embed web/*
+var cockpitWeb embed.FS
+
+type webRequest struct {
+	Capture     bool    `json:"capture_output"`
+	Kind        string  `json:"kind"`
+	Work        string  `json:"work"`
+	Task        string  `json:"task"`
+	Agent       string  `json:"agent"`
+	Event       string  `json:"event_id"`
+	Revision    int     `json:"expected_revision"`
+	Provider    string  `json:"provider"`
+	Role        string  `json:"role"`
+	Workspace   string  `json:"workspace"`
+	Instruction string  `json:"instruction"`
+	Path        string  `json:"path"`
+	Note        string  `json:"note"`
+	Author      string  `json:"author"`
+	Decision    string  `json:"decision"`
+	Request     Request `json:"request"`
+	Budget      Budget  `json:"budget"`
+}
+
+func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "task" {
+		r.Request.Schema = 1
+		r.Request.EventID = r.Event
+		r.Request.Revision = r.Revision
+		r.Request.ID = r.Task
+		return s.executeRequest(r.Work, "task.update", r.Request)
+	}
+	if r.Kind == "start" {
+		a, created, e := s.prepare(r.Work, Launch{Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+		if e != nil {
+			return nil, e
+		}
+		if created {
+			e = s.spawnAgent(a)
+		}
+		return a, e
+	}
+	w, e := s.get(r.Work)
+	if e != nil {
+		return nil, e
+	}
+	if r.Revision != w.Revision {
+		return nil, &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; actualiser puis confirmer.", Retryable: true}
+	}
+	switch r.Kind {
+	case "stop", "reconcile":
+		a, e := s.agent(r.Agent)
+		if e != nil {
+			return nil, e
+		}
+		if a.WorkID != r.Work {
+			return nil, fmt.Errorf("agent hors travail")
+		}
+		if r.Kind == "stop" {
+			e = s.stopAgent(a.ID)
+		} else {
+			e = s.reconcile(a.ID)
+		}
+		return map[string]string{"message": "Demande enregistrée ; vérifier l’état observé."}, e
+	case "retry":
+		a, e := s.agent(r.Agent)
+		if e != nil {
+			return nil, e
+		}
+		if a.WorkID != r.Work || activeAgent(a) {
+			return nil, fmt.Errorf("tentative incompatible")
+		}
+		next, created, e := s.prepare(r.Work, Launch{Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+		if e == nil && created {
+			e = s.spawnAgent(next)
+		}
+		return next, e
+	case "submit":
+		e = s.submitReportAt(r.Work, r.Task, r.Path, r.Revision)
+	case "gate-preview", "gate":
+		t, err := w.task(r.Task)
+		if err != nil {
+			return nil, err
+		}
+		d := &taskDialog{task: *t, reportPath: r.Path}
+		if e = s.previewGate(r.Work, d); e != nil {
+			return nil, e
+		}
+		if r.Kind == "gate-preview" {
+			return map[string]string{"preview": d.review}, nil
+		}
+		d.gateRevision = r.Revision
+		e = s.recordDialogGate(r.Work, d)
+	case "override":
+		e = s.overrideReviewedTaskAt(r.Work, r.Task, r.Note, r.Revision)
+	case "decision":
+		e = s.resolveDecision(r.Work, r.Decision, operatorIdentity(), r.Note)
+	case "budget":
+		e = s.setBudget(r.Work, r.Budget)
+	case "pause":
+		e = s.pause(r.Work, true)
+	case "unpause":
+		e = s.pause(r.Work, false)
+	case "ooda":
+		r.Request.Schema = 1
+		r.Request.EventID = r.Event
+		r.Request.Revision = r.Revision
+		r.Request.Owner = operatorIdentity()
+		return s.executeRequest(r.Work, "ooda", r.Request)
+	default:
+		return nil, fmt.Errorf("action inconnue")
+	}
+	return map[string]string{"message": "Action enregistrée."}, e
+}
+func newWebHandler(s *Store, host, token string) http.Handler {
+	mux := http.NewServeMux()
+	same := func(a, b string) bool { return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1 }
+	send := func(w http.ResponseWriter, value any) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		_ = json.NewEncoder(w).Encode(value)
+	}
+	fail := func(w http.ResponseWriter, e error) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		status := 400
+		if commandFailure(e).Code == "revision_conflict" {
+			status = 409
+		}
+		w.WriteHeader(status)
+		send(w, map[string]any{"error": e.Error(), "failure": commandFailure(e)})
+	}
+	mux.HandleFunc("/api/v1/works", func(w http.ResponseWriter, r *http.Request) {
+		v, e := s.list()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/snapshot", func(w http.ResponseWriter, r *http.Request) {
+		work := r.URL.Query().Get("work")
+		snapshot, e := s.cockpitSnapshot(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		ds, e := s.decisions(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		snapshot["decisions"] = ds
+		b, e := s.budget(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		snapshot["budget"] = b
+		snapshot["hierarchy"] = s.hierarchyText(work)
+		v, e := s.visit(work, operatorIdentity())
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		snapshot["resume"] = s.resumeSinceText(work, v)
+		providers, e := s.providers()
+		if e == nil {
+			snapshot["providers"] = providers
+		} else {
+			snapshot["providers_error"] = e.Error()
+		}
+		snapshot["root"] = s.root
+		send(w, snapshot)
+	})
+	mux.HandleFunc("/api/v1/task", func(w http.ResponseWriter, r *http.Request) {
+		work := r.URL.Query().Get("work")
+		id := r.URL.Query().Get("task")
+		ww, e := s.get(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		t, e := ww.task(id)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		d := &taskDialog{task: *t}
+		send(w, map[string]any{"task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d)})
+	})
+	mux.HandleFunc("/api/v1/report", func(w http.ResponseWriter, r *http.Request) {
+		p, e := safeReport(s.root, r.URL.Query().Get("path"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		// Only project documentation is readable through this endpoint.
+		rel, err := filepath.Rel(filepath.Join(s.root, "docs"), p)
+		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			http.Error(w, "Rapport hors documentation", 403)
+			return
+		}
+		f, e := os.Open(p)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		defer f.Close()
+		b, e := io.ReadAll(io.LimitReader(f, 262145))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if len(b) > 262144 {
+			b = b[:262144]
+			b = append(b, []byte("\n[Affichage limité à 256 Kio]")...)
+		}
+		send(w, map[string]string{"text": string(b)})
+	})
+	mux.HandleFunc("/api/v1/logs", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		after, _ := strconv.ParseInt(q.Get("after"), 10, 64)
+		p, e := s.queryLogs(q.Get("work"), q.Get("agent"), q.Get("q"), q.Get("kind"), after, 100)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, p)
+	})
+	mux.HandleFunc("/api/v1/action", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "POST requis", 405)
+			return
+		}
+		var request webRequest
+		raw, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 65536))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if e = strict(raw, &request); e != nil {
+			fail(w, e)
+			return
+		}
+		value, e := s.webAction(request)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, value)
+	})
+	mux.HandleFunc("/api/v1/visit", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "POST requis", 405)
+			return
+		}
+		ww, e := s.get(r.URL.Query().Get("work"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if e = s.markVisit(ww.ID, operatorIdentity(), ww.Revision); e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]bool{"saved": true})
+	})
+	mux.HandleFunc("/api/v1/events", func(w http.ResponseWriter, r *http.Request) {
+		work := r.URL.Query().Get("work")
+		after, _ := strconv.Atoi(r.Header.Get("Last-Event-ID"))
+		if after == 0 {
+			after, _ = strconv.Atoi(r.URL.Query().Get("after"))
+		}
+		if _, e := s.get(work); e != nil {
+			fail(w, e)
+			return
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			return
+		}
+		tick := time.NewTicker(time.Second)
+		defer tick.Stop()
+		for {
+			ww, e := s.get(work)
+			if e != nil {
+				return
+			}
+			if ww.Revision > after {
+				rows, e := s.db.Query("SELECT revision,kind FROM events WHERE work_id=? AND revision>? ORDER BY revision LIMIT 100", work, after)
+				if e != nil {
+					return
+				}
+				for rows.Next() {
+					var rev int
+					var kind string
+					if rows.Scan(&rev, &kind) != nil {
+						break
+					}
+					b, _ := json.Marshal(map[string]any{"revision": rev, "kind": kind})
+					fmt.Fprintf(w, "id: %d\nevent: change\ndata: %s\n\n", rev, b)
+					after = rev
+				}
+				rows.Close()
+			}
+			fmt.Fprintf(w, "event: refresh\ndata: {}\n\n")
+			flusher.Flush()
+			select {
+			case <-r.Context().Done():
+				return
+			case <-tick.C:
+			}
+		}
+	})
+	files, _ := fs.Sub(cockpitWeb, "web")
+	mux.Handle("/", http.FileServer(http.FS(files)))
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "no-referrer")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
+		if r.Host != host {
+			http.Error(w, "Hôte refusé", 403)
+			return
+		}
+		if strings.HasPrefix(r.URL.Path, "/session/") {
+			if r.Method != "GET" || !same(strings.TrimPrefix(r.URL.Path, "/session/"), token) {
+				http.Error(w, "Session refusée", 403)
+				return
+			}
+			http.SetCookie(w, &http.Cookie{Name: "swarm_session", Value: token, Path: "/", HttpOnly: true, SameSite: http.SameSiteStrictMode})
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		cookie, e := r.Cookie("swarm_session")
+		if e != nil || !same(cookie.Value, token) {
+			http.Error(w, "Ouvrir le lien de session affiché au lancement de swarm web.", 403)
+			return
+		}
+		if r.Method != "GET" && r.Method != "HEAD" {
+			if r.Header.Get("Origin") != "http://"+host || !same(r.Header.Get("X-Swarm-CSRF"), token) {
+				http.Error(w, "Origine ou confirmation de session refusée", 403)
+				return
+			}
+		}
+		if r.URL.Path == "/api/v1/session" {
+			send(w, map[string]string{"csrf": token})
+			return
+		}
+		mux.ServeHTTP(w, r)
+	})
+}
+func (s *Store) serveWeb(address string, out io.Writer) error {
+	if _, err := os.Stat(filepath.Join(s.root, ".swarm", "providers.json")); os.IsNotExist(err) {
+		if err = s.initProviders(); err != nil && !os.IsExist(err) {
+			return err
+		}
+	}
+	if address == "" {
+		address = "127.0.0.1:0"
+	}
+	host, _, e := net.SplitHostPort(address)
+	if e != nil {
+		return e
+	}
+	if host != "127.0.0.1" && host != "::1" {
+		return fmt.Errorf("écoute locale loopback uniquement")
+	}
+	listener, e := net.Listen("tcp", address)
+	if e != nil {
+		return e
+	}
+	defer listener.Close()
+	token := newID("session-")
+	fmt.Fprintf(out, "Cockpit local : http://%s/session/%s\nArrêter ce serveur ne coupe pas les agents.\n", listener.Addr(), token)
+	server := &http.Server{Handler: newWebHandler(s, listener.Addr().String(), token), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, IdleTimeout: 30 * time.Second}
+	return server.Serve(listener)
+}
