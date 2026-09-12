@@ -254,8 +254,8 @@ func (s *Store) renderDashboard(work string, c *consoleState, width, height int,
 	}
 
 	logHeight := height - len(lines) - 4
-	lines = append(lines, panel("SUIVI EN DIRECT / ACTIONS (?)", logRows, width, logHeight, c.focus == 2)...)
-	lines = append(lines, fmt.Sprintf("%d agents · %s · %s", len(agents), map[bool]string{true: "Départs suspendus", false: "Départs autorisés"}[s.paused(work)], map[bool]string{true: "Capture activée", false: "Capture désactivée"}[c.capture]), "↑↓ tâche · d détails · Entrée actions · Tab panneau · t thème · q", strings.ReplaceAll(c.message, "\n", " | "), "swarm> "+input)
+	lines = append(lines, panel("SUIVI EN DIRECT / ACTIVITÉ", logRows, width, logHeight, c.focus == 2)...)
+	lines = append(lines, fmt.Sprintf("%d agents · %s · %s", len(agents), map[bool]string{true: "Départs suspendus", false: "Départs autorisés"}[s.paused(work)], map[bool]string{true: "Capture activée", false: "Capture désactivée"}[c.capture]), "↑↓ tâche · Entrée actions · d détail · ? aide · t thème · q", strings.ReplaceAll(c.message, "\n", " | "), "swarm> "+input)
 	for i := range lines {
 		lines[i] = clip(lines[i], width-1)
 	}
@@ -276,6 +276,7 @@ func (s *Store) renderDashboard(work string, c *consoleState, width, height int,
 			}
 			c.dialog.history, _ = s.logs(c.dialog.agent.ID, 0)
 		}
+		s.refreshDialogModel(c.dialog)
 		return renderTaskDialog(frame, c.dialog, width, height)
 	}
 	return frame

@@ -49,7 +49,7 @@ func TestObservedClaudeTerminalUsagePreservesCacheFields(t *testing.T) {
 func TestVersionTwoBackupRestoresContextBeforeTrackingMigration(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
-	if _, err := s.db.Exec("DROP TABLE decisions; DROP TABLE session_visits; DROP TABLE budgets; DROP TABLE reservations; PRAGMA user_version=2;"); err != nil {
+	if _, err := s.db.Exec("DROP TABLE assist_previews; DROP TABLE assist_reservations; DROP TABLE assist_turns; DROP TABLE decisions; DROP TABLE session_visits; DROP TABLE budgets; DROP TABLE reservations; PRAGMA user_version=2;"); err != nil {
 		t.Fatal(err)
 	}
 	s.db.Close()

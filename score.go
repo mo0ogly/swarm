@@ -128,6 +128,9 @@ func round2(v float64) *float64 {
 	return &v
 }
 func evaluate(raw []byte, root, phase string) (Evaluation, error) {
+	return evaluateWithDigests(raw, root, phase, nil)
+}
+func evaluateWithDigests(raw []byte, root, phase string, digests map[string]string) (Evaluation, error) {
 	out := Evaluation{Method: "2", Phase: phase, Artifacts: map[string]string{}, Scores: map[string]float64{}, Blockers: []string{}, Severity: "none"}
 	fail := func(s string) (Evaluation, error) { return out, fmt.Errorf("évaluation invalide : %s", s) }
 	ranks := map[string]int{"entry": 0, "validation": 1, "delivery": 2, "audit": 2}
@@ -153,11 +156,18 @@ func evaluate(raw []byte, root, phase string) (Evaluation, error) {
 		if e != nil {
 			return out, e
 		}
-		b, e := os.ReadFile(p)
-		if e != nil {
-			return out, e
+		digest, known := digests[p]
+		if !known {
+			b, e := os.ReadFile(p)
+			if e != nil {
+				return out, e
+			}
+			digest = hash(b)
+			if digests != nil {
+				digests[p] = digest
+			}
 		}
-		if hash(b) != str(v) {
+		if digest != str(v) {
 			return fail("empreinte périmée : " + name)
 		}
 		out.Artifacts[name] = str(v)
@@ -375,11 +385,11 @@ func evaluate(raw []byte, root, phase string) (Evaluation, error) {
 	return out, nil
 }
 func (s *Store) validGate(t *Task) bool {
-	if t.Gate == nil || !t.Gate.Evaluation.Ship {
+	if t.Gate == nil || !t.Gate.Evaluation.Ship || requiredPlanChecks(t, t.Gate.Document) != nil {
 		return false
 	}
-	ev, e := evaluate(t.Gate.Document, s.root, "delivery")
-	return e == nil && ev.Ship && ev.Scope == t.ID
+	ev, e := evaluateWithDigests(t.Gate.Document, s.root, "delivery", s.readDigests)
+	return e == nil && ev.Ship && ev.Scope == t.ID && revalidationGate(t, ev) == nil
 }
 
 // A reopened or stale upstream task invalidates downstream acceptance as well.

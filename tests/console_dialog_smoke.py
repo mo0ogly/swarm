@@ -48,27 +48,33 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
  try:
   master,slave=pty.openpty();fcntl.ioctl(slave,termios.TIOCGWINSZ,bytes(8));fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0));before=termios.tcgetattr(slave)
   runtime=root/'swarm';shutil.copy2(binary,runtime)
-  proc=subprocess.Popen([str(runtime),'--root',temp,'console'],stdin=slave,stdout=slave,stderr=slave,env={**os.environ,'TERM':'xterm-256color'})
+  proc=subprocess.Popen([str(runtime),'--root',temp,'console'],stdin=slave,stdout=slave,stderr=slave,env={**{k:v for k,v in os.environ.items() if k not in ('NO_COLOR','SWARM_THEME')},'TERM':'xterm-256color','SWARM_THEME':'dark'})
   expect('VOS TRAVAUX');assert b'Choisir un num' not in current
   send(b'\x1b[B');expect('Objectif : Unrelated selection');send(b'\x1b[A');expect('Objectif : Operator path');send(b'\r')
   expect('Entrée actions')
   snapshots['terminal-theme-initial']=current.decode(errors='replace')
   send(b't');expect('Entrée actions');snapshots['terminal-theme-alternate']=current.decode(errors='replace')
   send(b't');expect('Entrée actions')
+  send(b'?');expect('AIDE · PARCOURS');expect('SE REPÉRER');snapshots['help-dark']=current.decode(errors='replace')
+  for _ in range(8):send(b'\x1b[B')
+  expect('TERMINÉ');send(b'\x1b');time.sleep(.15);drain();expect('Entrée actions')
+  send(b't');expect('Entrée actions');send(b'\x1bOP');expect('AIDE · PARCOURS');snapshots['help-light']=current.decode(errors='replace');send(b'\r');expect('Entrée actions');send(b't');expect('Entrée actions')
   fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',30,100,0,0));os.kill(proc.pid,signal.SIGWINCH);time.sleep(.15);drain();assert proc.poll() is None
   fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0));os.kill(proc.pid,signal.SIGWINCH)
   send(b'\x1bOB\r');expect('Actions — other');send(b'\x1b');time.sleep(.15);drain();send(b'\x1bOA')
   send(b'\x1b[200~pause\r\x1b[201~');expect('swarm> pause ');assert cli('console',wid)['paused'] is False
   send(b'\x15\x1b[3~\r');expect('Actions — demo')
   send(b'\r');expect('Fournisseur : claude');expect('Périmètre : Fixture only')
+  send(b'\t\t\t\x15Aide conserve ma consigne');expect('Aide conserve ma consigne');send(b'\x1bOP');expect('AIDE · PARCOURS');send(b'\x1b');time.sleep(.15);drain();expect('Aide conserve ma consigne');send(b'\x15\t\t\t');expect('Confirmer le lancement')
+  snapshots['launch-form']=current.decode(errors='replace')
   # Confirmation must produce a prominent result, including a rejected launch.
-  send(b'\t\t\x15/missing/workspace\t\t\t\r')
+  send(b'\t\t\x15/missing/workspace\t\t\t\t\r')
   expect('LANCEMENT REFUSÉ — demo');assert len(agents())==0
   snapshots['launch-refused']=current.decode(errors='replace')
   send(b'\r');expect('Lancer — demo')
-  send(b'\t\t\x15'+str(root).encode()+b'\t\t\t')
+  send(b'\t\t\x15'+str(root).encode()+b'\t\t\t\t')
   send(b'\t\x1b[C\x1b[C');expect('Fournisseur : skynet-glm')
-  send(b'\t\t');send(('\x1b[200~Résumé 日本 é\r\x1b[201~').encode());send(b'\t\t\r');expect('Agent lancé pour demo');first=await_agent('running',1);assert first['provider']=='skynet-glm';assert 'Résumé 日本 é' in first['prompt']
+  send(b'\t\t');send(('\x1b[200~Résumé 日本 é\r\x1b[201~').encode());send(b'\t\t\t\r');expect('Agent lancé pour demo');first=await_agent('running',1);assert first['provider']=='skynet-glm';assert 'Résumé 日本 é' in first['prompt']
   expect('Mesurer la consommation CPU')
   send(b'd');expect('Livrable : Fixture')
   for _ in range(12):send(b'\x1b[B')
@@ -78,7 +84,7 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
   send(b'\x1b');time.sleep(.15);drain();assert agents()[0]['status']=='running'
   send(b'\r\x1b[B\x1b[B\r');expect('Confirmer — demo');send(b'\r');expect('Demande enregistrée');stopped=await_agent('interrupted',1)
   time.sleep(.2)
-  send(b'\r\x1b[B\r');expect('Relancer — demo');send(b'\x15FINISH_QUICKLY\t\t\r');expect('Lancement enregistré');second=await_agent('completed',2)
+  send(b'\r\x1b[B\r');expect('Relancer — demo');send(b'\x15FINISH_QUICKLY\t\t\t\r');expect('Agent lancé');second=await_agent('completed',2)
   assert second['previous']==first['id'] and second['attempt_id']!=first['attempt_id']
   w=cli('work','show',wid)['work'];assert next(t for t in w['tasks'] if t['id']=='other')['status']=='todo'
   (root/'docs').mkdir();(root/'docs/demo-handoff.md').write_text('Rapport de recette')
@@ -117,7 +123,7 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
   send(b'\ri');expect('DÉCISIONS');snapshots['decisions']=current.decode(errors='replace');send(b'\x1b');time.sleep(.15);drain()
   replacement=root/'swarm.next';shutil.copy2(binary,replacement);replacement.replace(runtime)
   current.clear();expect('Mise à jour installée')
-  send(b'\rr');expect('Relancer — demo');send(b'\t\t\r');expect('Console ancienne');assert len(agents())==2
+  send(b'\rr');expect('Relancer — demo');send(b'\t\t\t\r');expect('Console ancienne');assert len(agents())==2
   send(b'\x1b');time.sleep(.15);drain()
   send(b'q\r');until=time.monotonic()+6
   while proc.poll() is None and time.monotonic()<until:drain(.1)
@@ -126,7 +132,7 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
   # Verify termination variants on fresh PTYs, without provider launch.
   for exit_key in [b'\x03',b'\x04']:
    mm,ss=pty.openpty();fcntl.ioctl(ss,termios.TIOCSWINSZ,struct.pack('HHHH',24,80,0,0));saved=termios.tcgetattr(ss)
-   pp=subprocess.Popen([binary,'--root',temp,'console',wid],stdin=ss,stdout=ss,stderr=ss,env={**os.environ,'TERM':'xterm-256color'})
+   pp=subprocess.Popen([binary,'--root',temp,'console',wid],stdin=ss,stdout=ss,stderr=ss,env={**{k:v for k,v in os.environ.items() if k not in ('NO_COLOR','SWARM_THEME')},'TERM':'xterm-256color','SWARM_THEME':'dark'})
    data=b'';deadline=time.monotonic()+5
    while b'swarm> ' not in data and time.monotonic()<deadline:
     if select.select([mm],[],[],.1)[0]:data+=os.read(mm,65536)

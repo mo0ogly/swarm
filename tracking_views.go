@@ -34,7 +34,7 @@ func (s *Store) resumeSinceText(work string, v Visit) string {
 	if e != nil {
 		return e.Error()
 	}
-	lines := []string{"REPRISE · " + v.Operator, "Visite précédente : " + value(v.At), fmt.Sprintf("Révision vue : %d · actuelle : %d", v.Revision, w.Revision), "Dernier résultat : " + value(w.Summary), "Prochaine action : " + value(w.Next), ""}
+	lines := []string{"REPRISE · " + v.Operator, "Visite précédente : " + value(v.At), fmt.Sprintf("Révision vue : %d · actuelle : %d", v.Revision, w.Revision), "Résumé historique (ne vaut pas validation actuelle) : " + value(w.Summary), "Prochaine action : " + value(w.Next), ""}
 	rows, e := s.db.Query("SELECT revision,kind,at,payload FROM events WHERE work_id=? AND revision>? ORDER BY revision LIMIT 200", work, v.Revision)
 	if e != nil {
 		return e.Error()
@@ -56,6 +56,13 @@ func (s *Store) resumeSinceText(work string, v Visit) string {
 		}
 	}
 	rows.Close()
+	validation := s.validationState(&w)
+	lines = append(lines, "VALIDATION ACTUELLE : "+validation.State)
+	for _, t := range w.Tasks {
+		if x := validation.Tasks[t.ID]; x.State == "stale" {
+			lines = append(lines, t.ID+" : acceptation historique, revalidation obligatoire", validationDetails(x))
+		}
+	}
 	memo := map[string]bool{}
 	lines = append(lines, "", "BLOCAGES ET DÉCISIONS EN ATTENTE")
 	for i := range w.Tasks {

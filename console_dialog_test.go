@@ -75,6 +75,7 @@ func TestDialogProvidersLimitsAndBounds(t *testing.T) {
 	s.dialogKey(w.ID, c, "tab")
 	s.dialogKey(w.ID, c, "tab")
 	s.dialogKey(w.ID, c, "tab")
+	s.dialogKey(w.ID, c, "tab")
 	s.dialogKey(w.ID, c, "enter")
 	if c.dialog == nil || c.dialog.message == "" {
 		t.Fatal("invalid workspace not explained")
@@ -95,7 +96,7 @@ func TestLaunchRefusalIsVisibleAndReopeningExplicit(t *testing.T) {
 	s.openTaskDialog(w.ID, c)
 	c.dialog.row = 0
 	s.dialogKey(w.ID, c, "enter")
-	if c.dialog.row != 4 {
+	if c.dialog.row != 5 {
 		t.Fatal("confirmation not initially selected")
 	}
 	s.dialogKey(w.ID, c, "enter")

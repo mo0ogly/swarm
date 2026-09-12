@@ -24,18 +24,24 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
-	Schema      int    `json:"schema_version"`
-	EventID     string `json:"event_id"`
-	Revision    int    `json:"expected_revision"`
-	TaskID      string `json:"task_id"`
-	Provider    string `json:"provider"`
-	Workspace   string `json:"workspace"`
-	Instruction string `json:"instruction"`
-	Role        string `json:"role"`
-	Parent      string `json:"parent,omitempty"`
-	Previous    string `json:"previous,omitempty"`
-	Timeout     int    `json:"timeout_seconds"`
-	Capture     bool   `json:"capture_output"`
+	Level           string        `json:"level,omitempty"`
+	ModelPolicyHash string        `json:"model_policy_hash,omitempty"`
+	PlanBriefHash   string        `json:"plan_brief_hash,omitempty"`
+	References      []DialogueRef `json:"references,omitempty"`
+	ContextHash     string        `json:"context_hash,omitempty"`
+	Brainstorm      bool          `json:"brainstorm,omitempty"`
+	Schema          int           `json:"schema_version"`
+	EventID         string        `json:"event_id"`
+	Revision        int           `json:"expected_revision"`
+	TaskID          string        `json:"task_id"`
+	Provider        string        `json:"provider"`
+	Workspace       string        `json:"workspace"`
+	Instruction     string        `json:"instruction"`
+	Role            string        `json:"role"`
+	Parent          string        `json:"parent,omitempty"`
+	Previous        string        `json:"previous,omitempty"`
+	Timeout         int           `json:"timeout_seconds"`
+	Capture         bool          `json:"capture_output"`
 }
 type AgentProgress struct {
 	Action       string `json:"action,omitempty"`
@@ -48,36 +54,40 @@ type AgentProgress struct {
 	Degraded     string `json:"degraded,omitempty"`
 }
 type Agent struct {
-	Usage           *Usage        `json:"usage,omitempty"`
-	Progress        AgentProgress `json:"progress"`
-	Limits          RunLimits     `json:"limits"`
-	ID              string        `json:"id"`
-	WorkID          string        `json:"work_id"`
-	TaskID          string        `json:"task_id"`
-	Attempt         string        `json:"attempt_id"`
-	Provider        string        `json:"provider"`
-	Role            string        `json:"role"`
-	Parent          string        `json:"parent,omitempty"`
-	Previous        string        `json:"previous,omitempty"`
-	CWD             string        `json:"workspace"`
-	Status          string        `json:"status"`
-	Desired         string        `json:"desired,omitempty"`
-	Activity        string        `json:"activity"`
-	Started         string        `json:"started"`
-	Heartbeat       string        `json:"heartbeat,omitempty"`
-	Ended           string        `json:"ended,omitempty"`
-	ExitCode        *int          `json:"exit_code,omitempty"`
-	Supervisor      int           `json:"supervisor_pid,omitempty"`
-	SupervisorStamp string        `json:"supervisor_identity,omitempty"`
-	Child           int           `json:"child_pid,omitempty"`
-	ChildStamp      string        `json:"child_identity,omitempty"`
-	Host            string        `json:"host"`
-	Timeout         int           `json:"timeout_seconds"`
-	Capture         bool          `json:"capture_output"`
-	Prompt          string        `json:"prompt"`
-	Command         string        `json:"command"`
-	Args            []string      `json:"args"`
-	Env             []string      `json:"env_allow"`
+	ModelRoute      *ModelRoute      `json:"model_route,omitempty"`
+	Context         *ContextManifest `json:"context,omitempty"`
+	Brainstorm      bool             `json:"brainstorm,omitempty"`
+	Reply           string           `json:"reply,omitempty"`
+	Usage           *Usage           `json:"usage,omitempty"`
+	Progress        AgentProgress    `json:"progress"`
+	Limits          RunLimits        `json:"limits"`
+	ID              string           `json:"id"`
+	WorkID          string           `json:"work_id"`
+	TaskID          string           `json:"task_id"`
+	Attempt         string           `json:"attempt_id"`
+	Provider        string           `json:"provider"`
+	Role            string           `json:"role"`
+	Parent          string           `json:"parent,omitempty"`
+	Previous        string           `json:"previous,omitempty"`
+	CWD             string           `json:"workspace"`
+	Status          string           `json:"status"`
+	Desired         string           `json:"desired,omitempty"`
+	Activity        string           `json:"activity"`
+	Started         string           `json:"started"`
+	Heartbeat       string           `json:"heartbeat,omitempty"`
+	Ended           string           `json:"ended,omitempty"`
+	ExitCode        *int             `json:"exit_code,omitempty"`
+	Supervisor      int              `json:"supervisor_pid,omitempty"`
+	SupervisorStamp string           `json:"supervisor_identity,omitempty"`
+	Child           int              `json:"child_pid,omitempty"`
+	ChildStamp      string           `json:"child_identity,omitempty"`
+	Host            string           `json:"host"`
+	Timeout         int              `json:"timeout_seconds"`
+	Capture         bool             `json:"capture_output"`
+	Prompt          string           `json:"prompt"`
+	Command         string           `json:"command"`
+	Args            []string         `json:"args"`
+	Env             []string         `json:"env_allow"`
 }
 type AgentLog struct {
 	Seq     int64  `json:"seq"`
@@ -87,10 +97,12 @@ type AgentLog struct {
 	Message string `json:"message"`
 }
 type Provider struct {
-	Limits  RunLimits `json:"limits,omitempty"`
-	Command string    `json:"command"`
-	Args    []string  `json:"args"`
-	Env     []string  `json:"env_allow"`
+	ModelPolicy      *ModelPolicy `json:"model_policy,omitempty"`
+	AssistantTimeout int          `json:"assistant_timeout_seconds,omitempty"`
+	Limits           RunLimits    `json:"limits,omitempty"`
+	Command          string       `json:"command"`
+	Args             []string     `json:"args"`
+	Env              []string     `json:"env_allow"`
 }
 type Providers struct {
 	Schema    int                 `json:"schema_version"`
@@ -255,7 +267,15 @@ func (s *Store) paused(work string) bool {
 }
 
 func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
+	return s.prepareLaunch(work, r, false)
+}
+
+func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, bool, error) {
 	var a Agent
+	if r.Brainstorm {
+		r.TaskID = "brain-" + hash([]byte(r.EventID))[:20]
+		r.Role = "planner"
+	}
 	if r.Schema != 1 || !safeName(r.EventID) || !safeName(r.TaskID) || !safeName(r.Provider) {
 		return a, false, fmt.Errorf("schema_version/event_id/task_id/provider invalide")
 	}
@@ -314,6 +334,17 @@ func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
 	if !ok {
 		return a, false, fmt.Errorf("fournisseur non configuré")
 	}
+	purpose := "work"
+	if r.Brainstorm {
+		purpose = "brainstorm"
+	}
+	p, route, e := resolveModel(p, r.Level, purpose)
+	if e != nil {
+		return a, false, e
+	}
+	if r.ModelPolicyHash != "" && (route == nil || r.ModelPolicyHash != route.PolicyHash) {
+		return a, false, fmt.Errorf("Politique de modèle modifiée ; examiner à nouveau le choix.")
+	}
 	limits, e := p.Limits.normalized()
 	if e != nil {
 		return a, false, e
@@ -349,9 +380,44 @@ func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
 	if w.Revision != r.Revision {
 		return a, false, fmt.Errorf("révision périmée ; relire le travail")
 	}
+	if r.Brainstorm {
+		if r.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != r.PlanBriefHash) {
+			return a, false, fmt.Errorf("Brief modifié : recommencer la préparation du plan.")
+		}
+		for _, prior := range w.Tasks {
+			if prior.Brainstorm && prior.Status == "running" {
+				return a, false, fmt.Errorf("Une réponse IA est déjà en préparation ; attendre sa fin ou l’arrêter.")
+			}
+		}
+		if !nonempty(r.Instruction) {
+			return a, false, fmt.Errorf("Décrivez la question à explorer avec l’IA.")
+		}
+		if e = s.apply(&w, "task.add", Request{ID: r.TaskID, Title: "Brainstorming IA · APEX", Deliverable: "Réponse conservée dans Dialogue IA", Criteria: []string{"Faits et hypothèses séparés", "Options comparées et recommandation motivée", "Plan des agents, gates et conditions d’arrêt proposés"}, Next: r.Instruction}); e != nil {
+			return a, false, e
+		}
+		w.Tasks[len(w.Tasks)-1].Brainstorm = true
+		w.Tasks[len(w.Tasks)-1].PlanBriefHash = r.PlanBriefHash
+		w.Tasks[len(w.Tasks)-1].Question = r.Instruction
+	}
 	t, e := w.task(r.TaskID)
 	if e != nil {
 		return a, false, e
+	}
+	if t.PlanMaxAttempts > 0 {
+		var attempts int
+		if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", work, t.ID).Scan(&attempts); e != nil {
+			return a, false, e
+		}
+		if attempts >= t.PlanMaxAttempts {
+			return a, false, fmt.Errorf("Plafond du plan atteint : %d tentatives. Consigner une OODA et revoir le plan avant toute nouvelle mission.", t.PlanMaxAttempts)
+		}
+		if t.PlanToolLimit > 0 && (limits.MaxToolCalls == 0 || t.PlanToolLimit < limits.MaxToolCalls) {
+			limits.MaxToolCalls = t.PlanToolLimit
+		}
+		r.Role = t.PlanRole
+	}
+	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
+		return a, false, fmt.Errorf("Brief modifié : préparer un nouveau plan.")
 	}
 	if t.Status == "running" {
 		return a, false, fmt.Errorf("tâche déjà running : réconcilier et rouvrir avant lancement")
@@ -389,6 +455,16 @@ func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
 	}
 	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
 	prompt += executionDirectives(s.root, cwd, limits)
+	if t.Brainstorm {
+		if t.PlanBriefHash != "" {
+			prompt += brainstormHistory(w, t.ID) + planDirectives()
+		} else {
+			prompt += brainstormDirectives(t.ID) + brainstormHistory(w, t.ID)
+		}
+	}
+	if w.PlanningBrief != nil {
+		prompt += "\nBRIEF COMMUN ADOPTÉ (contexte, pas une preuve de réussite) :\n" + w.PlanningBrief.Text + "\n"
+	}
 	prompt += "Pièces de reprise à consulter : " + strings.Join(w.Memory, ", ") + "\n"
 	prompt += "Respecter les instructions du projet et les permissions du fournisseur. Ne pas marquer accepté ni modifier la base Swarm. Produire un handoff factuel : changements, tests, preuves, risques, écarts et prochaine action.\n"
 	if r.Role != "worker" {
@@ -403,7 +479,25 @@ func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
 			prompt += "\nGuide de terrain (instructions de projet prioritaires):\n" + string(b)
 		}
 	}
-	a = Agent{Limits: limits, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	attachments, err := dialogueAttachments(w, r.References)
+	if err != nil {
+		return a, false, err
+	}
+	prompt += attachments
+	manifest := contextManifest(w, t.ID, r.References, prompt)
+	if len(prompt) > 128000 {
+		return a, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+	}
+	if r.ContextHash != "" && manifest.SHA256 != r.ContextHash {
+		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
+	}
+	a = Agent{ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	if previewOnly {
+		return a, false, nil
+	}
+	if t.Brainstorm {
+		t.Contexts = append(t.Contexts, SavedContext{a.ID, a.Started, prompt, manifest})
+	}
 	b, _ := json.Marshal(a)
 	if _, e = tx.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,?)", a.ID, work, t.ID, cwd, a.Status, b, raw); e != nil {
 		return a, false, fmt.Errorf("agent actif sur tâche/workspace ou conflit : %w", e)
@@ -495,7 +589,28 @@ func (s *Store) settleAgentTask(a Agent) error {
 	}
 	r := Request{Schema: 1, EventID: newID("finish-"), Revision: w.Revision, ID: t.ID, Status: "blocked", Outcome: outcome, Blocker: a.Activity + " ; handoff et validation requis", Next: "Examiner logs/diff, puis soumettre ou relancer explicitement"}
 	b, _ := json.Marshal(r)
-	_, e = s.mutate(w.ID, "task.update", r.EventID, r.Revision, b, func(w *Work) error { return s.apply(w, "task.update", r) })
+	_, e = s.mutate(w.ID, "task.update", r.EventID, r.Revision, b, func(w *Work) error {
+		if e := s.apply(w, "task.update", r); e != nil {
+			return e
+		}
+		task, _ := w.task(a.TaskID)
+		if task.Brainstorm {
+			body, e := readBrainstormReport(s.root, task.ID)
+			if nonempty(a.Reply) {
+				body = []byte(a.Reply)
+				e = nil
+			}
+			if e != nil {
+				task.ResponseError = "Réponse non disponible : " + e.Error() + ". Consulter les journaux ou relancer."
+			} else {
+				task.Response = string(body)
+				task.Answers = append(task.Answers, BrainstormAnswer{Attempt: a.ID, Text: string(body), At: now()})
+				task.ResponseError = ""
+				task.Next = "Lire la réponse dans Dialogue IA, répondre ou adopter le brief."
+			}
+		}
+		return nil
+	})
 	if e != nil {
 		_ = s.log(a.ID, "warning", "Réconciliation de tâche nécessaire : "+e.Error())
 	}

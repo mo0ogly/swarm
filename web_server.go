@@ -22,26 +22,40 @@ import (
 var cockpitWeb embed.FS
 
 type webRequest struct {
-	Capture     bool    `json:"capture_output"`
-	Kind        string  `json:"kind"`
-	Work        string  `json:"work"`
-	Task        string  `json:"task"`
-	Agent       string  `json:"agent"`
-	Event       string  `json:"event_id"`
-	Revision    int     `json:"expected_revision"`
-	Provider    string  `json:"provider"`
-	Role        string  `json:"role"`
-	Workspace   string  `json:"workspace"`
-	Instruction string  `json:"instruction"`
-	Path        string  `json:"path"`
-	Note        string  `json:"note"`
-	Author      string  `json:"author"`
-	Decision    string  `json:"decision"`
-	Request     Request `json:"request"`
-	Budget      Budget  `json:"budget"`
+	Level           string        `json:"level,omitempty"`
+	ModelPolicyHash string        `json:"model_policy_hash,omitempty"`
+	PlanBriefHash   string        `json:"plan_brief_hash,omitempty"`
+	Plan            PlanReview    `json:"plan,omitempty"`
+	References      []DialogueRef `json:"references,omitempty"`
+	ContextHash     string        `json:"context_hash,omitempty"`
+	Retex           Retex         `json:"retex,omitempty"`
+	Offset          int           `json:"offset,omitempty"`
+	Capture         bool          `json:"capture_output"`
+	Kind            string        `json:"kind"`
+	Work            string        `json:"work"`
+	Task            string        `json:"task"`
+	Agent           string        `json:"agent"`
+	Event           string        `json:"event_id"`
+	Revision        int           `json:"expected_revision"`
+	Provider        string        `json:"provider"`
+	Role            string        `json:"role"`
+	Workspace       string        `json:"workspace"`
+	Instruction     string        `json:"instruction"`
+	Path            string        `json:"path"`
+	Note            string        `json:"note"`
+	Author          string        `json:"author"`
+	Decision        string        `json:"decision"`
+	Request         Request       `json:"request"`
+	Budget          Budget        `json:"budget"`
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "plan-read" {
+		return s.readPlan(r.Work, r.Task)
+	}
+	if r.Kind == "plan-commit" {
+		return s.commitPlan(r.Work, r.Event, r.Revision, r.Plan)
+	}
 	if r.Kind == "task" {
 		r.Request.Schema = 1
 		r.Request.EventID = r.Event
@@ -49,8 +63,25 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		r.Request.ID = r.Task
 		return s.executeRequest(r.Work, "task.update", r.Request)
 	}
-	if r.Kind == "start" {
-		a, created, e := s.prepare(r.Work, Launch{Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+	if strings.HasPrefix(r.Kind, "retex-") {
+		return s.retexAction(r)
+	}
+	if r.Kind == "dialogue-search" {
+		w, e := s.get(r.Work)
+		if e != nil {
+			return nil, e
+		}
+		return searchDialogue(w, r.Note, r.Offset), nil
+	}
+	if r.Kind == "context-preview" {
+		a, _, e := s.prepareLaunch(r.Work, Launch{Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, Brainstorm: true, Schema: 1, EventID: r.Event, Revision: r.Revision, Provider: r.Provider, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture, References: r.References}, true)
+		return a, e
+	}
+	if r.Kind == "start" || r.Kind == "brainstorm" {
+		if r.Kind == "brainstorm" && r.ContextHash == "" {
+			return nil, fmt.Errorf("Examiner le contexte avant envoi.")
+		}
+		a, created, e := s.prepare(r.Work, Launch{Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
 		if e != nil {
 			return nil, e
 		}
@@ -89,11 +120,16 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if a.WorkID != r.Work || activeAgent(a) {
 			return nil, fmt.Errorf("tentative incompatible")
 		}
-		next, created, e := s.prepare(r.Work, Launch{Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+		if r.Level == "" && a.ModelRoute != nil {
+			r.Level = a.ModelRoute.Level
+		}
+		next, created, e := s.prepare(r.Work, Launch{Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
 		if e == nil && created {
 			e = s.spawnAgent(next)
 		}
 		return next, e
+	case "adopt-brief":
+		return s.adoptBrief(r.Work, r.Task, r.Path, r.Note, r.Event, r.Revision)
 	case "submit":
 		e = s.submitReportAt(r.Work, r.Task, r.Path, r.Revision)
 	case "gate-preview", "gate":
@@ -147,6 +183,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		w.WriteHeader(status)
 		send(w, map[string]any{"error": e.Error(), "failure": commandFailure(e)})
 	}
+	s.registerProviderAdmin(mux, send, fail)
 	mux.HandleFunc("/api/v1/works", func(w http.ResponseWriter, r *http.Request) {
 		v, e := s.list()
 		if e != nil {
@@ -204,7 +241,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		d := &taskDialog{task: *t}
-		send(w, map[string]any{"task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d)})
+		send(w, map[string]any{"revision": ww.Revision, "task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d)})
 	})
 	mux.HandleFunc("/api/v1/report", func(w http.ResponseWriter, r *http.Request) {
 		p, e := safeReport(s.root, r.URL.Query().Get("path"))
@@ -266,6 +303,156 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		send(w, value)
+	})
+	mux.HandleFunc("/api/v1/assist/meta", func(w http.ResponseWriter, r *http.Request) {
+		pages := []map[string]string{}
+		for _, p := range assistPages {
+			pages = append(pages, map[string]string{"id": p.ID, "title": p.Title, "purpose": p.Purpose})
+		}
+		templates := []map[string]string{}
+		for _, t := range assistTemplates {
+			templates = append(templates, map[string]string{"id": t.ID, "label": t.Label, "question": t.Question})
+		}
+		support := map[string]string{}
+		if ps, err := s.providers(); err == nil {
+			for name, p := range ps.Providers {
+				if _, err := assistantProvider(p); err != nil {
+					support[name] = err.Error()
+				} else {
+					support[name] = ""
+				}
+			}
+		}
+		send(w, map[string]any{"contract": pageContextContract, "answer_contract": assistAnswerName, "prompt_version": assistPromptVersion, "provider_support": support, "pages": pages, "templates": templates})
+	})
+	mux.HandleFunc("/api/v1/assist/turns", func(w http.ResponseWriter, r *http.Request) {
+		work := r.URL.Query().Get("work")
+		ww, e := s.get(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		turns, e := s.assistCurrentTurns(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]any{"revision": ww.Revision, "turns": turns})
+	})
+
+	mux.HandleFunc("/api/v1/assist/context", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		raw := r.URL.Query().Get("coordinates")
+		if len(raw) > 4096 {
+			http.Error(w, "Coordonnées trop longues", 413)
+			return
+		}
+		var c PageCoordinates
+		if e := strict([]byte(raw), &c); e != nil {
+			fail(w, e)
+			return
+		}
+		v, e := s.pageContext(r.URL.Query().Get("work"), c)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/assist/cancel", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "POST requis", 405)
+			return
+		}
+		raw, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 4096))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		var q struct {
+			Work string `json:"work"`
+			ID   string `json:"id"`
+		}
+		if e = strict(raw, &q); e != nil {
+			fail(w, e)
+			return
+		}
+		if e = s.cancelAssist(q.Work, q.ID); e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]bool{"cancelled": true})
+	})
+	mux.HandleFunc("/api/v1/assist/export", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		work := r.URL.Query().Get("work")
+		if _, e := s.get(work); e != nil {
+			fail(w, e)
+			return
+		}
+		turns, e := allAssistTurns(s.db, work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]any{"schema_version": 1, "work_id": work, "turns": turns, "exported_at": now()})
+	})
+	mux.HandleFunc("/api/v1/assist/ask", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			http.Error(w, "POST requis", 405)
+			return
+		}
+		raw, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 65536))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		var request struct {
+			Work    string        `json:"work"`
+			Preview bool          `json:"preview"`
+			Request AssistRequest `json:"request"`
+		}
+		if e = strict(raw, &request); e != nil {
+			fail(w, e)
+			return
+		}
+		if request.Preview {
+			preview, e := s.assistPreview(request.Work, request.Request)
+			if e != nil {
+				fail(w, e)
+				return
+			}
+			send(w, preview)
+			return
+		}
+
+		ps, e := s.providers()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if _, e = assistantProvider(ps.Providers[request.Request.Provider]); e != nil {
+			fail(w, e)
+			return
+		}
+		turn, e := s.assistAsk(request.Work, request.Request)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if turn.Status == "pending" {
+			if e = s.spawnAssistTurn(turn); e != nil {
+				fail(w, e)
+				return
+			}
+		}
+		send(w, turn)
 	})
 	mux.HandleFunc("/api/v1/visit", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
@@ -390,6 +577,9 @@ func (s *Store) serveWeb(address string, out io.Writer) error {
 		return e
 	}
 	defer listener.Close()
+	if err := s.assistReconcile(); err != nil {
+		return err
+	}
 	token := newID("session-")
 	fmt.Fprintf(out, "Cockpit local : http://%s/session/%s\nArrêter ce serveur ne coupe pas les agents.\n", listener.Addr(), token)
 	server := &http.Server{Handler: newWebHandler(s, listener.Addr().String(), token), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, IdleTimeout: 30 * time.Second}

@@ -13,8 +13,9 @@ import (
 )
 
 type Store struct {
-	db   *sql.DB
-	root string
+	db          *sql.DB
+	root        string
+	readDigests map[string]string // request-local clone only; never retained by the live store
 }
 
 func openStore(root string, init bool) (*Store, error) {
@@ -61,7 +62,7 @@ func openStore(root string, init bool) (*Store, error) {
 		return nil, e
 	}
 	db.SetMaxOpenConns(1)
-	s := &Store{db, root}
+	s := &Store{db: db, root: root}
 	fail := func(e error) (*Store, error) { db.Close(); return nil, e }
 	if _, e = db.Exec(`PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;`); e != nil {
 		return fail(e)
@@ -115,6 +116,23 @@ func openStore(root string, init bool) (*Store, error) {
 	}
 	if version < 3 {
 		if _, e = db.Exec(trackingMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version == 3 {
+		backup := filepath.Join(dir, newID("state-pre-v4-")+".db")
+		f, err := os.OpenFile(backup, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		if err != nil {
+			return fail(err)
+		}
+		f.Close()
+		if _, err = db.Exec("VACUUM INTO ?", backup); err != nil {
+			_ = os.Remove(backup)
+			return fail(err)
+		}
+	}
+	if version < 4 {
+		if _, e = db.Exec(assistMigration); e != nil {
 			return fail(e)
 		}
 	}
@@ -305,7 +323,18 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 			return e
 		}
 		if r.Status == "" {
-			r.Status = t.Status
+			// Metadata edits do not re-accept or relaunch a task, and must not
+			// erase a blocker or demand fresh gates merely to change its owner.
+			if r.Owner != "" {
+				t.Owner = r.Owner
+			}
+			if r.Next != "" {
+				t.Next = r.Next
+			}
+			if r.Blocker != "" {
+				t.Blocker = r.Blocker
+			}
+			return nil
 		}
 		if status(r.Status) == "" {
 			return fmt.Errorf("statut inconnu")
@@ -344,6 +373,9 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 			t.Gate = nil
 		}
 		if r.Status == "todo" && t.Status != r.Status {
+			if t.Status == "accepted" && !s.acceptedFresh(w, t, map[string]bool{}) && t.Gate != nil {
+				t.Revalidation = &Revalidation{PreviousArtifacts: t.Gate.Evaluation.Artifacts, Config: t.Gate.Evaluation.ConfigDigest}
+			}
 			t.Gate = nil
 			t.Override = nil
 		}
@@ -380,4 +412,15 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 		return fmt.Errorf("opération inconnue")
 	}
 	return nil
+}
+
+// Every top-level read gets new physical fingerprints. Nested reads share them,
+// so common proofs are read once even when many gates reference the same binary.
+func (s *Store) readScope() *Store {
+	if s.readDigests != nil {
+		return s
+	}
+	clone := *s
+	clone.readDigests = map[string]string{}
+	return &clone
 }

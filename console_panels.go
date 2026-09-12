@@ -58,7 +58,7 @@ func (s *Store) openPanel(work string, c *consoleState, mode string) {
 func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 	d := c.dialog
 	switch d.mode {
-	case "hierarchy", "resume":
+	case "help", "hierarchy", "resume":
 		if key == "up" {
 			d.row = max(0, d.row-1)
 		}
@@ -66,6 +66,11 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 			d.row++
 		}
 		if key == "enter" {
+			if d.mode == "help" {
+				c.dialog = c.helpParent
+				c.helpParent = nil
+				return true
+			}
 			d.mode = "actions"
 			d.row = 0
 		}
@@ -216,11 +221,24 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 func panelRows(d *taskDialog, inner, height int) (string, []string, bool) {
 	rows := []string{}
 	switch d.mode {
-	case "hierarchy", "resume":
+	case "help", "hierarchy", "resume":
 		parts := wrapDialog(d.review, inner)
+		if d.mode == "help" {
+			parts = nil
+			for _, line := range strings.Split(d.review, "\n") {
+				if line == "" {
+					parts = append(parts, "")
+				} else {
+					parts = append(parts, readableWrap(line, inner)...)
+				}
+			}
+		}
 		n := max(1, height-12)
 		d.row = min(d.row, max(0, len(parts)-n))
 		rows = append(rows, parts[d.row:min(len(parts), d.row+n)]...)
+		if d.mode == "help" {
+			return "AIDE · PARCOURS ET RACCOURCIS", rows, true
+		}
 		return strings.ToUpper(d.mode), rows, true
 	case "decisions":
 		rows = append(rows, "Acquitter une décision ne valide pas la tâche et n’arrête aucun agent.")

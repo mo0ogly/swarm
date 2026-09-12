@@ -14,12 +14,13 @@ import (
 const archiveLimit = 128 << 20
 
 type Bundle struct {
-	Cockpit *CockpitHistory   `json:"cockpit_history,omitempty"`
-	Schema  int               `json:"schema_version"`
-	Work    Work              `json:"work"`
-	Events  []Event           `json:"events"`
-	Files   map[string]string `json:"files"`
-	Missing []string          `json:"missing"`
+	Assistant []AssistTurn      `json:"assistant_history,omitempty"`
+	Cockpit   *CockpitHistory   `json:"cockpit_history,omitempty"`
+	Schema    int               `json:"schema_version"`
+	Work      Work              `json:"work"`
+	Events    []Event           `json:"events"`
+	Files     map[string]string `json:"files"`
+	Missing   []string          `json:"missing"`
 }
 
 func sortedArtifacts(m map[string]string) []string {
@@ -68,10 +69,14 @@ func (s *Store) export(id, dest string) error {
 	if e != nil {
 		return e
 	}
+	assistant, e := allAssistTurns(tx, id)
+	if e != nil {
+		return e
+	}
 	if e = tx.Commit(); e != nil {
 		return e
 	}
-	bundle := Bundle{Cockpit: history, Schema: 1, Work: w, Events: events, Files: map[string]string{}, Missing: []string{}}
+	bundle := Bundle{Assistant: assistant, Cockpit: history, Schema: 1, Work: w, Events: events, Files: map[string]string{}, Missing: []string{}}
 	data := map[string][]byte{}
 	total := 0
 	for _, t := range w.Tasks {
@@ -329,6 +334,33 @@ func (s *Store) importBundle(path string) (Work, error) {
 			if _, e = tx.Exec("INSERT INTO session_visits(work_id,operator,revision,at) VALUES(?,?,?,?)", w.ID, v.Operator, v.Revision, v.At); e != nil {
 				return zero, e
 			}
+		}
+	}
+	for _, turn := range bundle.Assistant {
+		if !safeName(turn.ID) || turn.WorkID != w.ID || turn.Context.WorkID != w.ID || turn.Context.Hash != turn.Context.digest() {
+			return zero, fmt.Errorf("Historique assistant invalide.")
+		}
+		if turn.Answer != nil {
+			if refusal := checkAnswer(turn.Answer, turn.Context, turn.TemplateID); refusal != nil {
+				return zero, fmt.Errorf("Réponse archivée invalide : %s", refusal.Code)
+			}
+		}
+		turn.Imported = true
+		turn.SupervisorPID = 0
+		turn.SupervisorStamp = ""
+		turn.PID = 0
+		turn.ProcessStamp = ""
+		turn.Host = ""
+		if turn.active() {
+			turn.Status = "interrupted"
+			turn.Refusal = refuse("imported", refusalService, "Question interrompue dans une archive ; aucune relance automatique.", "")
+		}
+		raw, err := json.Marshal(turn)
+		if err != nil {
+			return zero, err
+		}
+		if _, err = tx.Exec("INSERT INTO assist_turns(id,work_id,created_at,status,body) VALUES(?,?,?,?,?)", turn.ID, w.ID, turn.CreatedAt, turn.Status, raw); err != nil {
+			return zero, err
 		}
 	}
 	if e = tx.Commit(); e != nil {

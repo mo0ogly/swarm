@@ -5,6 +5,7 @@ package main
 import (
 	"github.com/rivo/uniseg"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -51,7 +52,12 @@ func styleTerminalFrame(frame string) string {
 	if light {
 		accent, muted, warning, success, selected = "38;5;24", "38;5;240", "38;5;130", "38;5;28", "48;5;153;38;5;17;1"
 	}
+	danger := "38;5;203"
+	if light {
+		danger = "38;5;124"
+	}
 	paint := func(s, code string) string { return "\x1b[" + code + "m" + s + "\x1b[0m" }
+	statusPattern := regexp.MustCompile(`Acceptée|acceptée|Terminé|Bloquée|bloquée|Échec|Erreur|En cours|Démarrage|En attente|À vérifier|Dérogation|Interrompu`)
 	style := func(line string) string {
 		t := strings.TrimSpace(line)
 		switch {
@@ -63,14 +69,27 @@ func styleTerminalFrame(frame string) string {
 			return paint(line, "1;"+accent)
 		case strings.Contains(t, "──") || strings.HasPrefix(t, "└"):
 			return paint(line, muted)
-		case strings.Contains(t, "Erreur") || (strings.Contains(strings.ToLower(t), "bloquée") && !strings.Contains(t, "0 bloquées")) || strings.Contains(t, "Mise à jour"):
+		case strings.Contains(t, "Erreur") || strings.Contains(t, "Échec"):
+			return paint(line, danger)
+		case strings.Contains(t, "Mise à jour"):
 			return paint(line, warning)
 		case strings.Contains(t, "acceptée") || strings.Contains(t, "Demande enregistrée"):
 			return paint(line, success)
 		case strings.HasPrefix(t, "↑") || strings.HasPrefix(t, "Tab ") || strings.HasPrefix(t, "Travail "):
 			return paint(line, muted)
 		default:
-			return line
+			return statusPattern.ReplaceAllStringFunc(line, func(word string) string {
+				code := accent
+				switch strings.ToLower(word) {
+				case "acceptée", "terminé":
+					code = success
+				case "bloquée", "en attente", "à vérifier", "dérogation", "interrompu":
+					code = warning
+				case "échec", "erreur":
+					code = danger
+				}
+				return paint(word, code)
+			})
 		}
 	}
 	lines := strings.Split(frame, "\r\n")

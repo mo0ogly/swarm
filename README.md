@@ -149,3 +149,52 @@ SWARM_BINARY=/tmp/swarm-companion python3 tests/parity.py
 
 Python intervient seulement dans les tests différentiels, comme oracle de la
 méthode existante. Le compagnon distribué n’en dépend pas.
+
+
+## Assistant IA de chaque page
+
+Le cockpit web propose un assistant sur Dialogue IA/APEX, Tâches, Agents,
+Décisions, Journaux, Reprise/OODA et Budget. Sélectionner un élément, puis
+« Poser une question sur cette page ». La modale montre le contexte et le prompt
+exacts avant confirmation. Le moteur reconstruit les faits côté serveur ; le
+navigateur transmet seulement les coordonnées de la vue.
+
+Les faits cités sont consultables et les actions proposées ouvrent les formulaires
+habituels. Une réponse périmée conserve ses références mais ne permet plus d’ouvrir
+une action. Le contrôle de structure et de références ne garantit pas la vérité
+d’une interprétation. L’assistant ne valide ni tâche ni gate.
+
+Claude et Codex disposent d’adaptateurs sans outils de réalisation, dans un
+répertoire isolé, avec délai maximal de 300 secondes et annulation explicite.
+`assistant_timeout_seconds` dans la configuration du fournisseur règle ce délai
+entre 1 et 300 secondes. Les fournisseurs inconnus, dont l’adaptateur GLM actuel,
+ne peuvent pas répondre à ces questions ; leur lancement comme agent de travail
+reste disponible. Un refus reste explicite, sans relance silencieuse.
+
+Questions, réponses/refus, contexte, prompt et usage déclaré sont conservés dans
+SQLite (schéma 4), par travail, avec export JSON complet et inclusion dans l’archive.
+Seuls les 40 derniers échanges apparaissent dans l’historique courant. Les budgets
+comptent aussi les réservations des questions ; ils ne constituent pas une facture.
+
+Conception et preuves : `docs/plans/swarm-page-assistant/` à la racine du projet.
+Procédure illustrée : `docs/procedures/procedure_complete_swarm_claude_codex.docx`
+(v7, 39 pages ; schémas Mermaid dans `docs/procedures/diagrams/`).
+
+## Fournisseurs et niveaux de modèles
+
+Le menu **Administration fournisseurs** règle trois niveaux par fournisseur,
+avec modèle et effort explicites. Le modèle résolu apparaît avant lancement et
+reste enregistré avec la tentative. Les questions de page utilisent par défaut
+le niveau simple, les travaux et le dialogue APEX le niveau standard. Le niveau
+exigeant est un choix explicite ; aucun repli automatique après un refus.
+La politique proposée pour Codex utilise Luna, Sol puis Astra. Skynet conserve
+son modèle configuré aux trois niveaux, avec sa facturation déclarée sur site.
+
+La même résolution sert les lancements JSON (`level`: `auto`, `simple`,
+`standard`, `exigeant`), le web et le terminal. `model_policy_hash` lie un lancement
+à la politique montrée dans l’aperçu. Le catalogue est local et l’accès se teste
+explicitement depuis une carte fournisseur ; ouvrir l’administration n’appelle
+aucune IA. Export/import ne transporte ni secrets ni commandes.
+
+Procédure, limites et relation avec l’administration ML :
+[Administration des modèles](../../docs/plans/swarm-provider-routing/ADMINISTRATION.md).

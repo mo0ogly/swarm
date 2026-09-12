@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 3
+const schemaVersion = 4
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -21,19 +21,44 @@ type ManualOverride struct {
 	Revision       int    `json:"revision"`
 }
 
+type BrainstormAnswer struct {
+	Attempt string `json:"attempt"`
+	Text    string `json:"text"`
+	At      string `json:"at"`
+}
+
+type Revalidation struct {
+	PreviousArtifacts map[string]string `json:"previous_artifacts"`
+	Config            string            `json:"config_digest"`
+	Report            string            `json:"report,omitempty"`
+	ReportHash        string            `json:"report_hash,omitempty"`
+}
+
 type Task struct {
-	Override    *ManualOverride `json:"manual_override,omitempty"`
-	ID          string          `json:"id"`
-	Title       string          `json:"title"`
-	Owner       string          `json:"owner"`
-	Deliverable string          `json:"deliverable"`
-	Criteria    []string        `json:"criteria"`
-	Depends     []string        `json:"depends"`
-	Status      string          `json:"status"`
-	Blocker     string          `json:"blocker"`
-	Next        string          `json:"next"`
-	Attempts    []Attempt       `json:"attempts"`
-	Gate        *GateRecord     `json:"gate,omitempty"`
+	Revalidation    *Revalidation      `json:"revalidation,omitempty"`
+	PlanChecks      map[string]string  `json:"plan_checks,omitempty"`
+	PlanBriefHash   string             `json:"plan_brief_hash,omitempty"`
+	PlanRole        string             `json:"plan_role,omitempty"`
+	PlanMaxAttempts int                `json:"plan_max_attempts,omitempty"`
+	PlanToolLimit   int                `json:"plan_tool_limit,omitempty"`
+	Contexts        []SavedContext     `json:"contexts,omitempty"`
+	Answers         []BrainstormAnswer `json:"answers,omitempty"`
+	Question        string             `json:"question,omitempty"`
+	Response        string             `json:"response,omitempty"`
+	ResponseError   string             `json:"response_error,omitempty"`
+	Brainstorm      bool               `json:"brainstorm,omitempty"`
+	Override        *ManualOverride    `json:"manual_override,omitempty"`
+	ID              string             `json:"id"`
+	Title           string             `json:"title"`
+	Owner           string             `json:"owner"`
+	Deliverable     string             `json:"deliverable"`
+	Criteria        []string           `json:"criteria"`
+	Depends         []string           `json:"depends"`
+	Status          string             `json:"status"`
+	Blocker         string             `json:"blocker"`
+	Next            string             `json:"next"`
+	Attempts        []Attempt          `json:"attempts"`
+	Gate            *GateRecord        `json:"gate,omitempty"`
 }
 type Attempt struct {
 	ID      string `json:"id"`
@@ -47,20 +72,23 @@ type GitState struct {
 	Changes string `json:"changes"`
 }
 type Work struct {
-	Schema    int      `json:"schema_version"`
-	ID        string   `json:"id"`
-	Revision  int      `json:"revision"`
-	Title     string   `json:"title"`
-	Objective string   `json:"objective"`
-	Scope     string   `json:"scope"`
-	Criteria  []string `json:"criteria"`
-	Next      string   `json:"next"`
-	Summary   string   `json:"summary"`
-	Memory    []string `json:"memory"`
-	Created   string   `json:"created"`
-	Updated   string   `json:"updated"`
-	Git       GitState `json:"git"`
-	Tasks     []Task   `json:"tasks"`
+	Plans         []ApprovedPlan `json:"plans,omitempty"`
+	Retex         []Retex        `json:"retex,omitempty"`
+	PlanningBrief *PlanningBrief `json:"planning_brief,omitempty"`
+	Schema        int            `json:"schema_version"`
+	ID            string         `json:"id"`
+	Revision      int            `json:"revision"`
+	Title         string         `json:"title"`
+	Objective     string         `json:"objective"`
+	Scope         string         `json:"scope"`
+	Criteria      []string       `json:"criteria"`
+	Next          string         `json:"next"`
+	Summary       string         `json:"summary"`
+	Memory        []string       `json:"memory"`
+	Created       string         `json:"created"`
+	Updated       string         `json:"updated"`
+	Git           GitState       `json:"git"`
+	Tasks         []Task         `json:"tasks"`
 }
 type Event struct {
 	ID       string          `json:"id"`

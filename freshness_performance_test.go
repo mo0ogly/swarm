@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -27,5 +29,31 @@ func TestFreshnessSharedDAGMemoIsLocalAndRejectsCycles(t *testing.T) {
 	w.Tasks[0].Depends = []string{"t23"}
 	if s.acceptedFresh(&w, &w.Tasks[23], map[string]bool{}) {
 		t.Fatal("cycle accepted")
+	}
+}
+
+func TestReadScopeFingerprintsNeverSurviveTheNextRead(t *testing.T) {
+	s := storeTest(t)
+	raw := fixture(t, s.root)
+	ev, e := evaluate(raw, s.root, "delivery")
+	if e != nil {
+		t.Fatal(e)
+	}
+	task := Task{ID: "t1", Status: "accepted", Gate: &GateRecord{Document: raw, Evaluation: ev}}
+	scope := s.readScope()
+	if !scope.validGate(&task) || len(scope.readDigests) == 0 {
+		t.Fatal("proofs not captured")
+	}
+	if s.readDigests != nil {
+		t.Fatal("cache retained by live store")
+	}
+	if e = os.WriteFile(filepath.Join(s.root, "proof.txt"), []byte("modified after observation"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	if !scope.validGate(&task) {
+		t.Fatal("same read did not reuse its observation")
+	}
+	if s.readScope().validGate(&task) || s.validGate(&task) {
+		t.Fatal("new read or mutation reused stale fingerprints")
 	}
 }

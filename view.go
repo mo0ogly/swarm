@@ -46,6 +46,7 @@ func status(s string) string {
 	return m[s]
 }
 func (s *Store) workStatus(w Work) (string, int, int) {
+	s = s.readScope()
 	accepted, total, abandoned := 0, len(w.Tasks), 0
 	blocked := false
 	memo := map[string]bool{}

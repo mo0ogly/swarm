@@ -23,6 +23,9 @@ type taskDialog struct {
 	logPage                LogPage
 	logFollow              bool
 	roleIndex              int
+	modelLevel             int
+	modelPolicyHash        string
+	modelDescription       string
 	gateRaw                json.RawMessage
 	gateRevision           int
 	returnMode             string
@@ -99,6 +102,42 @@ func (s *Store) openTaskDialog(work string, c *consoleState) {
 	}
 	c.dialog = d
 }
+func (s *Store) refreshDialogModel(d *taskDialog) {
+	if d.mode != "start" && d.mode != "retry" {
+		return
+	}
+	d.modelPolicyHash = ""
+	d.modelDescription = "Fournisseur indisponible"
+	provider := ""
+	if len(d.providers) > 0 {
+		provider = d.providers[d.provider]
+	}
+	if d.mode == "retry" && d.agent != nil {
+		provider = d.agent.Provider
+	}
+	ps, err := s.providers()
+	if err != nil {
+		d.modelDescription = err.Error()
+		return
+	}
+	p, ok := ps.Providers[provider]
+	if !ok {
+		return
+	}
+	_, r, err := resolveModel(p, []string{"auto", "simple", "standard", "exigeant"}[d.modelLevel], "work")
+	if err != nil {
+		d.modelDescription = err.Error()
+		return
+	}
+	d.modelDescription = "géré par l’exécutable"
+	if r != nil {
+		d.modelDescription = r.Model
+		if r.Effort != "" {
+			d.modelDescription += " / " + r.Effort
+		}
+		d.modelPolicyHash = r.PolicyHash
+	}
+}
 func (d *taskDialog) actions() []string {
 	return []string{"Lancer avec un fournisseur…", "Relancer cette tentative…", "Arrêter l'agent…", "Afficher les journaux", "Voir le détail complet", "Réconcilier l'état…", "Fermer", "[s] Soumettre le rapport…", "[v] Voir les gates et les preuves", "[a] Accepter la tâche…", "[l] Lire le rapport…", "[f] Forcer par dérogation…", "[o] Rouvrir cette tâche…", "[g] Charger une gate de validation…", "[h] Hiérarchie et dépendances", "[i] Décisions à traiter", "[j] Rechercher les journaux", "[u] Reprise depuis ma dernière visite", "[e] Consigner une boucle OODA", "[p] Changer le responsable", "[b] Budget et consommation"}
 }
@@ -107,7 +146,16 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 	if d == nil {
 		return
 	}
+	if key == "help" || (key == "text:?" && (d.mode == "actions" || d.mode == "help")) {
+		s.openTerminalHelp(work, c)
+		return
+	}
 	if key == "escape" {
+		if d.mode == "help" {
+			c.dialog = c.helpParent
+			c.helpParent = nil
+			return
+		}
 		c.dialog = nil
 		return
 	}
@@ -143,7 +191,7 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 				return
 			}
 			d.mode = "start"
-			d.row = 4
+			d.row = 5
 		case 1:
 			if d.agent == nil {
 				d.message = "Aucune tentative à relancer. Choisir Lancer."
@@ -154,6 +202,13 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 				return
 			}
 			d.mode = "retry"
+			if d.agent.ModelRoute != nil {
+				for i, l := range []string{"auto", "simple", "standard", "exigeant"} {
+					if l == d.agent.ModelRoute.Level {
+						d.modelLevel = i
+					}
+				}
+			}
 			d.row = 2
 		case 2, 5:
 			if d.agent == nil {
@@ -389,7 +444,7 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 	case "launch-error":
 		if key == "enter" {
 			d.mode = d.returnMode
-			d.row = 4
+			d.row = 5
 			d.message = ""
 			return
 		}
@@ -453,11 +508,11 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 		}
 	case "start", "retry":
 		if key == "tab" || key == "down" {
-			d.row = (d.row + 1) % 5
+			d.row = (d.row + 1) % 6
 			return
 		}
 		if key == "up" {
-			d.row = (d.row + 4) % 5
+			d.row = (d.row + 5) % 6
 			return
 		}
 		if d.row == 0 && d.mode == "start" && (key == "left" || key == "right") {
@@ -476,9 +531,17 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			d.roleIndex = (d.roleIndex + delta + 3) % 3
 			return
 		}
+		if d.row == 4 && (key == "left" || key == "right") {
+			delta := 1
+			if key == "left" {
+				delta = 3
+			}
+			d.modelLevel = (d.modelLevel + delta) % 4
+			return
+		}
 		if key == "enter" {
-			if d.row != 4 {
-				d.row = (d.row + 1) % 5
+			if d.row != 5 {
+				d.row = (d.row + 1) % 6
 				return
 			}
 			if e := s.launchDialog(work, c); e != nil {
@@ -534,11 +597,24 @@ func (s *Store) launchDialog(work string, c *consoleState) error {
 			return fmt.Errorf("Dépendance %s non validée ou preuves périmées. [v] Examiner ses gates ; accepter ou déroger avant de lancer %s.", id, t.ID)
 		}
 	}
+
+	r := Launch{Level: []string{"auto", "simple", "standard", "exigeant"}[d.modelLevel], ModelPolicyHash: d.modelPolicyHash, Schema: 1, EventID: newID("agent-"), Revision: w.Revision, TaskID: d.task.ID, Role: []string{"worker", "planner", "subplanner"}[d.roleIndex], Provider: d.providers[d.provider], Workspace: d.workspace, Instruction: d.instruction, Capture: c.capture}
 	if d.mode == "retry" {
-		_, e := s.consoleCommand(work, "retry "+d.agent.ID+" "+d.instruction, c)
-		return e
+		r.Provider = d.agent.Provider
+		r.Role = d.agent.Role
+		r.Previous = d.agent.ID
+		r.Parent = d.agent.Parent
+		r.Workspace = d.agent.CWD
+		logs, err := s.logs(d.agent.ID, 0)
+		if err != nil {
+			return err
+		}
+		for _, l := range logs {
+			if l.Kind == "operator-note" {
+				r.Instruction += "\nNote de reprise : " + l.Message
+			}
+		}
 	}
-	r := Launch{Schema: 1, EventID: newID("agent-"), Revision: w.Revision, TaskID: d.task.ID, Role: []string{"worker", "planner", "subplanner"}[d.roleIndex], Provider: d.providers[d.provider], Workspace: d.workspace, Instruction: d.instruction, Capture: c.capture}
 	a, created, e := s.prepare(work, r)
 	if e != nil {
 		return e
@@ -583,6 +659,9 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 		rows = append(rows, "Agent : aucune tentative")
 	} else {
 		rows = append(rows, "Agent : "+d.agent.Provider+" · "+uiStatus(observedAgent(*d.agent)))
+	}
+	if d.mode == "help" {
+		rows = []string{d.task.Title, ""}
 	}
 	if panelTitle, panelContent, ok := panelRows(d, inner, height); ok {
 		title = panelTitle
@@ -735,7 +814,9 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 			if d.mode == "retry" {
 				role = d.agent.Role
 			}
-			form := []string{"Fournisseur : " + provider, "Espace : " + d.workspace, "Consigne : " + d.instruction, "Rôle : " + role, "[ Confirmer le lancement ]"}
+			level := []string{"auto", "simple", "standard", "exigeant"}[d.modelLevel]
+			model := d.modelDescription
+			form := []string{"Fournisseur : " + provider, "Espace : " + d.workspace, "Consigne : " + d.instruction, "Rôle : " + role, "Niveau ◀ ▶ : " + level + " · " + model, "[ Confirmer le lancement ]"}
 			for i, line := range form {
 				m := "  "
 				if i == d.row {
@@ -752,7 +833,7 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 				}
 				rows = append(rows, m+line)
 			}
-			rows = append(rows, "Tab : champ · ←→ : fournisseur/rôle · Ctrl-U : effacer", "Entrée sur Confirmer lance réellement le fournisseur.")
+			rows = append(rows, "Tab : champ · ←→ : fournisseur/rôle/niveau · Ctrl-U : effacer", "Entrée sur Confirmer lance réellement le fournisseur.")
 		case "stop", "reconcile":
 			title = "Confirmer — " + d.task.ID
 			text := "Demander l'arrêt de l'agent sélectionné ?"
@@ -769,15 +850,27 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 			}
 		}
 	}
-	hint := "↑↓ choix · Entrée valider · Échap fermer"
+	hint := "↑↓ choisir · Entrée confirmer · Échap annuler"
+	if d.mode == "actions" {
+		hint = "↑↓ choisir · Entrée ouvrir · Échap fermer"
+	}
 	if d.mode == "detail" || d.mode == "review" || d.mode == "report" {
 		hint = "↑↓ défiler · ←→ rapports · Entrée actions · Échap retour"
 	}
 	if d.mode != "launch-error" {
 		rows = append(rows, wrapDialog(d.message, inner)...)
 	}
+	if d.mode == "help" {
+		hint = "↑↓ défiler · Entrée/Échap retour · F1 fermer l’aide"
+	} else {
+		hint += " · F1 aide"
+	}
 	rows = append(rows, hint)
-	box := []string{"┌" + pad(" "+title+" ", boxWidth-2) + "┐"}
+	if len(rows) > max(1, height-4) {
+		rows = append(rows[:max(0, height-5)], hint)
+	}
+	heading := truncateCells(" "+title+" ", boxWidth-2)
+	box := []string{"┌" + heading + strings.Repeat("─", max(0, boxWidth-2-textWidth(heading))) + "┐"}
 	for _, r := range rows {
 		box = append(box, "│ "+pad(r, inner)+" │")
 	}

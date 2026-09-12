@@ -291,7 +291,7 @@ func TestTerminalLogBoundsAndNonTTY(t *testing.T) {
 func TestMigrationOnePreservesWork(t *testing.T) {
 	s := storeTest(t)
 	w := createTest(t, s)
-	_, e := s.db.Exec("DROP TABLE decisions; DROP TABLE session_visits; DROP TABLE budgets; DROP TABLE reservations; DROP TABLE agent_logs; DROP TABLE agents; DROP TABLE cockpit_events; DROP TABLE cockpit_controls; DROP TABLE cockpit_tasks; PRAGMA user_version=1;")
+	_, e := s.db.Exec("DROP TABLE assist_previews; DROP TABLE assist_reservations; DROP TABLE assist_turns; DROP TABLE decisions; DROP TABLE session_visits; DROP TABLE budgets; DROP TABLE reservations; DROP TABLE agent_logs; DROP TABLE agents; DROP TABLE cockpit_events; DROP TABLE cockpit_controls; DROP TABLE cockpit_tasks; PRAGMA user_version=1;")
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -307,7 +307,7 @@ func TestMigrationOnePreservesWork(t *testing.T) {
 	}
 	var version int
 	_ = reopened.db.QueryRow("PRAGMA user_version").Scan(&version)
-	if version != 3 {
+	if version != 4 {
 		t.Fatal(version)
 	}
 }

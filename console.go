@@ -20,6 +20,7 @@ import (
 )
 
 func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
+	s = s.readScope()
 	w, e := s.get(work)
 	if e != nil {
 		return nil, e
@@ -33,7 +34,7 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 		d, _ := s.desired(a.ID)
 		views = append(views, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d, "cost": "not_available"})
 	}
-	return map[string]any{"work": w, "agents": views, "paused": s.paused(work), "priority": s.priorities(work)}, nil
+	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "priority": s.priorities(work)}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}
@@ -94,6 +95,7 @@ func (s *Store) priority(work, id string, n int) error {
 type consoleState struct {
 	visit                                     Visit
 	dialog                                    *taskDialog
+	helpParent                                *taskDialog
 	selected, filter, status, message         string
 	taskSelID, agentSelID                     string
 	capture                                   bool
@@ -127,6 +129,7 @@ func (s *Store) consoleCommand(work, line string, state *consoleState) (bool, er
 		return true, nil
 	case "help":
 		state.message = consoleHelp
+		s.openTerminalHelp(work, state)
 		return false, nil
 	case "freeze":
 		state.frozen = !state.frozen
@@ -199,6 +202,9 @@ func (s *Store) consoleCommand(work, line string, state *consoleState) (bool, er
 			r.Previous = old.ID
 			r.Role = old.Role
 			r.Parent = old.Parent
+			if old.ModelRoute != nil {
+				r.Level = old.ModelRoute.Level
+			}
 			r.Instruction = strings.Join(fields[2:], " ")
 			logs, e := s.logs(old.ID, 0)
 			if e != nil {
@@ -493,6 +499,8 @@ func (s *Store) console(work string, in *os.File, out io.Writer, asJSON bool) er
 				}
 				if state.dialog != nil {
 					s.dialogKey(work, state, name)
+				} else if name == "help" {
+					s.openTerminalHelp(work, state)
 				} else if name == "up" {
 					state.move(-1)
 				} else if name == "down" {
@@ -566,7 +574,12 @@ func (s *Store) console(work string, in *os.File, out io.Writer, asJSON bool) er
 				draw()
 				continue
 			}
-			if len(input) == 0 && (key == '?' || key == '\r' || key == '\n') {
+			if len(input) == 0 && key == '?' {
+				s.openTerminalHelp(work, state)
+				draw()
+				continue
+			}
+			if len(input) == 0 && (key == '\r' || key == '\n') {
 				s.openTaskDialog(work, state)
 				draw()
 				continue
@@ -689,6 +702,8 @@ func decodeSequence(seq []byte, paste bool) (bool, string) {
 			return true, "right"
 		case 'D':
 			return true, "left"
+		case 'P':
+			return true, "help"
 		case 'H':
 			return true, ""
 		case 'F':
@@ -722,6 +737,8 @@ func decodeSequence(seq []byte, paste bool) (bool, string) {
 	case '~':
 		// Edit keys and paste markers, identified by parameters.
 		switch params {
+		case "11":
+			return true, "help"
 		case "200":
 			return true, "paste-start"
 		case "201":
@@ -771,6 +788,16 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, map[string]any{"message": state.message, "selected_agent": state.selected})
 	case "web":
 		return s.serveWeb(arg(1), out)
+	case "_assist":
+		if len(pos) != 2 {
+			return fmt.Errorf("identifiant de question requis")
+		}
+		turn, e := s.assistTurn(pos[1])
+		if e != nil {
+			return e
+		}
+		s.runAssistTurn(turn)
+		return nil
 	case "_supervise":
 		return s.supervise(arg(1))
 	case "console":

@@ -3,3 +3,12 @@
 html[data-theme="etat"] body{background:var(--wattson-carte-appuyee)}
 
 .card>button+button{margin-inline-start:.5rem}
+.brain-turn{margin-block:16px}.brain-turn>p{white-space:pre-wrap;overflow-wrap:anywhere}.brain-turn h3{color:var(--wattson-titre)}#brain-form{padding:18px;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:8px}#brain-question{width:100%;background:var(--wattson-champ);color:var(--wattson-texte)}
+
+.memory-search{margin-block:1rem;padding:1rem;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:.6rem;color:var(--wattson-texte)}
+.memory-search summary{font-weight:650;cursor:pointer;color:var(--wattson-titre)}
+.memory-search .card{margin-block:.8rem;background:var(--wattson-carte)}
+.memory-search .card:nth-child(even){background:var(--wattson-carte-appuyee)}
+.memory-search button{margin:.3rem}
+#brain-attachments:not(:empty){padding:.8rem;background:var(--wattson-info-fond);color:var(--wattson-info-encre);border:1px solid var(--wattson-ligne)}
+#brain-search-results pre{max-height:10rem;overflow:auto;white-space:pre-wrap}

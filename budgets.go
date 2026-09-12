@@ -42,6 +42,13 @@ func (s *Store) budget(work string) (BudgetView, error) {
 	if e = s.db.QueryRow("SELECT coalesce(sum(CASE WHEN state='reserved' THEN amount ELSE 0 END),0),coalesce(sum(CASE WHEN state='estimated' THEN amount ELSE 0 END),0) FROM reservations WHERE work_id=?", work).Scan(&v.Reserved, &v.Estimated); e != nil {
 		return v, e
 	}
+	// Page-assistant questions consume the same estimate envelope as launches.
+	var assistReserved, assistEstimated float64
+	if e = s.db.QueryRow("SELECT coalesce(sum(CASE WHEN state='reserved' THEN amount ELSE 0 END),0),coalesce(sum(CASE WHEN state='estimated' THEN amount ELSE 0 END),0) FROM assist_reservations WHERE work_id=?", work).Scan(&assistReserved, &assistEstimated); e != nil {
+		return v, e
+	}
+	v.Reserved += assistReserved
+	v.Estimated += assistEstimated
 	v.Remaining = max(0, v.Budget.Limit-v.Reserved-v.Estimated)
 	v.Warning = v.Budget.Limit > 0 && (v.Reserved+v.Estimated) >= .8*v.Budget.Limit
 	return v, nil
@@ -94,6 +101,11 @@ func reserveBudget(tx *sql.Tx, work, agent string) error {
 	if e = tx.QueryRow("SELECT coalesce(sum(amount),0) FROM reservations WHERE work_id=? AND state IN ('reserved','estimated')", work).Scan(&committed); e != nil {
 		return e
 	}
+	var assist float64
+	if e = tx.QueryRow("SELECT coalesce(sum(amount),0) FROM assist_reservations WHERE work_id=? AND state IN ('reserved','estimated')", work).Scan(&assist); e != nil {
+		return e
+	}
+	committed += assist
 	if committed+b.Reserve > b.Limit {
 		return &CommandError{Code: "budget_exhausted", Message: "Budget estimatif insuffisant : nouveaux départs suspendus ; examiner le budget."}
 	}

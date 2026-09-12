@@ -31,3 +31,5 @@ func stringMapTerminal(s string) string {
 func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.Writer) error {
 	return fmt.Errorf("cockpit et superviseur disponibles sous Linux ; work/resume/export restent utilisables")
 }
+
+func stopVerifiedAssist(t AssistTurn) {}

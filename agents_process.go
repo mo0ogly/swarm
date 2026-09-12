@@ -96,6 +96,8 @@ func providerEnvironment(allow []string) []string {
 const maxProviderEventBytes = 1 << 20
 
 type outputSink struct {
+	collectReply     bool
+	reply            string
 	usage            *Usage
 	discarding       bool
 	visibilityLogged bool
@@ -151,6 +153,11 @@ func (w *outputSink) line(line []byte) {
 		w.visibilityLost("Événement JSON illisible ; chronométrage par outil suspendu")
 	}
 	if decodeErr == nil {
+		if w.collectReply {
+			if reply := providerReply(data); reply != "" {
+				w.reply = reply
+			}
+		}
 		if u := providerUsage(data); u != nil {
 			w.usage = u
 		}
@@ -283,7 +290,7 @@ func (s *Store) supervise(id string) error {
 	if e != nil {
 		return s.finishAgent(a, "failed", e.Error(), nil)
 	}
-	sink := &outputSink{guard: newLoopGuard(limits), s: s, id: id, capture: a.Capture, activity: "Processus actif ; aucune activité fournisseur reçue"}
+	sink := &outputSink{collectReply: a.Brainstorm, guard: newLoopGuard(limits), s: s, id: id, capture: a.Capture, activity: "Processus actif ; aucune activité fournisseur reçue"}
 	cmd.Stdout = sink
 	cmd.Stderr = sink
 	// Bound wait if an orphaned descendant keeps stdout/stderr open after parent exits.
@@ -343,6 +350,7 @@ func (s *Store) supervise(id string) error {
 			}
 			a.Progress = sink.progress()
 			a.Usage = sink.usageSnapshot()
+			a.Reply = sink.replySnapshot()
 			code := cmd.ProcessState.ExitCode()
 			state := "completed"
 			message := "Processus terminé ; résultat à examiner, tâche non acceptée"
@@ -382,6 +390,7 @@ func (s *Store) supervise(id string) error {
 			}
 			a.Progress = sink.progress()
 			a.Usage = sink.usageSnapshot()
+			a.Reply = sink.replySnapshot()
 			a.Heartbeat = now()
 			if e = s.saveAgent(a); e != nil {
 				requestStop("Échec de persistance")
@@ -476,3 +485,5 @@ func (w *outputSink) usageSnapshot() *Usage {
 	u := *w.usage
 	return &u
 }
+
+func (w *outputSink) replySnapshot() string { w.mu.Lock(); defer w.mu.Unlock(); return w.reply }

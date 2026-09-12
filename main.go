@@ -150,7 +150,7 @@ func run(args []string, out, errOut io.Writer) int {
 		return fail(e)
 	}
 	defer s.db.Close()
-	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || pos[0] == "_supervise" || pos[0] == "control" || pos[0] == "web" {
+	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist") || pos[0] == "control" || pos[0] == "web" {
 		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
 			return fail(e)
 		}

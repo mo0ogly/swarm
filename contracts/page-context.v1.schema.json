@@ -1,0 +1,252 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "contract": {
+      "const": "page-context.v1"
+    },
+    "work_id": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "work_title": {
+      "type": "string",
+      "maxLength": 220
+    },
+    "page_id": {
+      "enum": [
+        "brainstorm",
+        "tasks",
+        "agents",
+        "decisions",
+        "logs",
+        "resume",
+        "budget"
+      ]
+    },
+    "page_title": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "captured_at": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "context_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "selected_entities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "maxItems": 8,
+      "minItems": 0
+    },
+    "visible_slice": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "offset",
+        "count",
+        "total"
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "current_state": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "validated_now": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "accepted_historically": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "to_revalidate": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "current_state",
+        "validated_now",
+        "accepted_historically",
+        "to_revalidate"
+      ]
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 10
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 350
+          },
+          "kind": {
+            "type": "string",
+            "maxLength": 50
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "value",
+          "source",
+          "kind"
+        ]
+      },
+      "maxItems": 60,
+      "minItems": 1
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "operation": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "precondition": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "confirmation_required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "operation",
+          "label",
+          "available",
+          "confirmation_required"
+        ]
+      },
+      "maxItems": 100,
+      "minItems": 0
+    },
+    "omissions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 100,
+      "minItems": 0
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 100,
+      "minItems": 0
+    },
+    "limits": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 1000
+      },
+      "maxItems": 30,
+      "minItems": 0
+    },
+    "freshness": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "untrusted_data": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "version",
+    "contract",
+    "work_id",
+    "work_title",
+    "page_id",
+    "page_title",
+    "revision",
+    "captured_at",
+    "context_hash",
+    "selected_entities",
+    "visible_slice",
+    "validation",
+    "facts",
+    "actions",
+    "omissions",
+    "missing",
+    "limits",
+    "freshness",
+    "truncated",
+    "untrusted_data"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:page-context:v1",
+  "title": "Swarm PageContext v1",
+  "description": "Server-reconstructed observed facts. Limits include byte ceilings and announced omissions. Hash excludes captured_at and context_hash itself. Action IDs are unique across targets."
+}

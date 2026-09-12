@@ -36,6 +36,7 @@ func operatorIdentity() string {
 	return fmt.Sprintf("%s/uid:%d", host, os.Getuid())
 }
 func (s *Store) decisions(work string) ([]Decision, error) {
+	s = s.readScope()
 	w, e := s.get(work)
 	if e != nil {
 		return nil, e
@@ -50,14 +51,15 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 		_, e := s.db.Exec("INSERT OR IGNORE INTO decisions(id,work_id,body) VALUES(?,?,?)", d.ID, work, raw)
 		return e
 	}
+	validation := s.validationState(&w)
 	for _, t := range w.Tasks {
 		if t.Status == "submitted" {
 			if e = add(t, Agent{}, "handoff", "Rapport à examiner", t.Next, fmt.Sprint(len(t.Attempts))); e != nil {
 				return nil, e
 			}
 		}
-		if t.Gate != nil && !s.validGate(&t) {
-			if e = add(t, Agent{}, "gate", "Gate bloquée ou preuves périmées", t.ID+" : consulter gates et preuves", t.Gate.At); e != nil {
+		if (t.Gate != nil && !s.validGate(&t)) || validation.Tasks[t.ID].State == "stale" {
+			if e = add(t, Agent{}, "gate", "Gate bloquée ou preuves périmées", validationDetails(validation.Tasks[t.ID]), gateDecisionVersion(t)); e != nil {
 				return nil, e
 			}
 		}
@@ -108,11 +110,50 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 		}
 		out = append(out, d)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	rows.Close()
+	for i := range out {
+		d := &out[i]
+		if d.Kind != "gate" && d.Kind != "handoff" {
+			continue
+		}
+		state, exists := validation.Tasks[d.TaskID]
+		if d.Kind == "gate" && exists && len(state.Blockers) > 0 {
+			d.Evidence = validationDetails(state)
+			d.ResolvedAt = ""
+		} else if exists && state.Fresh && d.ResolvedAt == "" {
+			if err := s.resolveDecision(work, d.ID, "moteur", "Revalidation constatée : acceptation et dépendances actuellement valides."); err != nil {
+				return nil, err
+			}
+			d.Author = "moteur"
+			d.ResolvedAt = now()
+			d.Resolution = "Revalidation constatée : acceptation et dépendances actuellement valides."
+		}
+	}
 	return out, rows.Err()
 }
 func (s *Store) resolveDecision(work, id, author, note string) error {
 	if strings.TrimSpace(author) == "" || len(strings.TrimSpace(note)) < 5 {
 		return fmt.Errorf("auteur et décision motivée requis")
+	}
+	var body []byte
+	if err := s.db.QueryRow("SELECT body FROM decisions WHERE work_id=? AND id=?", work, id).Scan(&body); err != nil {
+		return err
+	}
+	var current Decision
+	if err := json.Unmarshal(body, &current); err != nil {
+		return err
+	}
+	if current.Kind == "gate" {
+		w, err := s.get(work)
+		if err != nil {
+			return err
+		}
+		if state, ok := s.validationState(&w).Tasks[current.TaskID]; ok && !state.Fresh {
+			return fmt.Errorf("Revalidation obligatoire : un acquittement ne résout pas ce blocage. %s", validationDetails(state))
+		}
 	}
 	tx, e := s.db.Begin()
 	if e != nil {
@@ -163,4 +204,11 @@ func (s *Store) visit(work, operator string) (Visit, error) {
 func (s *Store) markVisit(work, operator string, revision int) error {
 	_, e := s.db.Exec("INSERT INTO session_visits(work_id,operator,revision,at) VALUES(?,?,?,?) ON CONFLICT(work_id,operator) DO UPDATE SET revision=excluded.revision,at=excluded.at", work, operator, revision, now())
 	return e
+}
+
+func gateDecisionVersion(t Task) string {
+	if t.Gate != nil {
+		return t.Gate.At
+	}
+	return "missing"
 }

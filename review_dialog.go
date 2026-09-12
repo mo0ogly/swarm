@@ -181,6 +181,20 @@ func (s *Store) submitReportAt(work, id, report string, expected int) error {
 		if t.Status != "blocked" && t.Status != "todo" {
 			return fmt.Errorf("soumettre depuis une tâche bloquée ou à faire, après contrôle du handoff")
 		}
+		if t.Revalidation != nil {
+			b, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			digest := hash(b)
+			for _, old := range t.Revalidation.PreviousArtifacts {
+				if digest == old {
+					return fmt.Errorf("Revalidation : nouveau rapport de contrôles requis ; ce contenu appartient aux anciennes preuves")
+				}
+			}
+			t.Revalidation.Report = report
+			t.Revalidation.ReportHash = digest
+		}
 		if e = s.apply(w, "task.update", Request{ID: id, Status: "running", Next: "Handoff examiné : " + report}); e != nil {
 			return e
 		}
