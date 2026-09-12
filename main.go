@@ -243,6 +243,7 @@ func run(args []string, out, errOut io.Writer) int {
 			Revision int             `json:"expected_revision"`
 			TaskID   string          `json:"task_id"`
 			Phase    string          `json:"phase"`
+			Name     string          `json:"name"`
 			Document json.RawMessage `json:"document"`
 		}
 		b, e := readInput(input)
@@ -257,7 +258,7 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		normalized, _ := json.Marshal(r)
 		w, e := s.mutate(id, kind, r.Event, r.Revision, normalized, func(w *Work) error {
-			return s.applyGateDocument(w, r.TaskID, r.Phase, r.Document)
+			return s.applyGateDocument(w, r.TaskID, r.Phase, r.Name, r.Document)
 		})
 		if e != nil {
 			return fail(e)

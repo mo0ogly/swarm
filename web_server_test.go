@@ -58,6 +58,76 @@ func TestWebAuthenticationOriginAndSharedGuard(t *testing.T) {
 		t.Fatal("missing CSP")
 	}
 }
+func TestWebTaskExposesOracleActions(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	h := newWebHandler(s, "local.test", "secret-test-capability")
+	req := httptest.NewRequest("GET", "http://local.test/api/v1/task?work="+w.ID+"&task=t1", nil)
+	req.Host = "local.test"
+	req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "secret-test-capability"})
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+	if rr.Code != 200 {
+		t.Fatal(rr.Code, rr.Body.String())
+	}
+	var out struct {
+		Actions []TaskAction `json:"actions"`
+		Task    Task         `json:"task"`
+	}
+	if e := json.Unmarshal(rr.Body.Bytes(), &out); e != nil {
+		t.Fatal(e)
+	}
+	if len(out.Actions) == 0 {
+		t.Fatal("aucune action exposée par /api/v1/task")
+	}
+	byKind := map[string]TaskAction{}
+	for _, a := range out.Actions {
+		byKind[a.Kind] = a
+		if a.Label == "" {
+			t.Fatalf("action %s sans libellé", a.Kind)
+		}
+		if !a.Disponible && a.Raison == "" {
+			t.Fatalf("action %s indisponible sans motif", a.Kind)
+		}
+	}
+	advised := 0
+	for _, a := range out.Actions {
+		if a.Conseillee && a.Disponible {
+			advised++
+		}
+	}
+	if advised != 1 {
+		t.Fatalf("attendu exactement une conseillée disponible, %d", advised)
+	}
+	start := byKind["start"]
+	if len(start.Champs) == 0 {
+		t.Fatal("start sans champs explicites")
+	}
+	for _, c := range start.Champs {
+		if c.Label == "" || c.Aide == "" {
+			t.Fatalf("champ %s sans libellé ou aide", c.Name)
+		}
+	}
+	// Snapshot : la carte task_actions expose le même oracle par tâche.
+	req2 := httptest.NewRequest("GET", "http://local.test/api/v1/snapshot?work="+w.ID, nil)
+	req2.Host = "local.test"
+	req2.AddCookie(&http.Cookie{Name: "swarm_session", Value: "secret-test-capability"})
+	rr2 := httptest.NewRecorder()
+	h.ServeHTTP(rr2, req2)
+	if rr2.Code != 200 {
+		t.Fatal(rr2.Code, rr2.Body.String())
+	}
+	var snap struct {
+		TaskActions map[string][]TaskAction `json:"task_actions"`
+	}
+	if e := json.Unmarshal(rr2.Body.Bytes(), &snap); e != nil {
+		t.Fatal(e)
+	}
+	if len(snap.TaskActions["t1"]) != len(out.Actions) {
+		t.Fatalf("snapshot %d actions contre %d en détail de tâche", len(snap.TaskActions["t1"]), len(out.Actions))
+	}
+}
+
 func TestWebReportCannotEscapeDocumentation(t *testing.T) {
 	s := storeTest(t)
 	os.Mkdir(filepath.Join(s.root, "docs"), 0700)

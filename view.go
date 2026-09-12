@@ -177,7 +177,7 @@ func (s *Store) view(w Work) (string, error) {
 		if ev.Progress.Percent != nil {
 			pct = fmt.Sprintf("%.2f%%", *ev.Progress.Percent)
 		}
-		fmt.Fprintf(&b, "- %s [%s] : qualité %s ; provisoire=%t\n  Critères PASS : %d/%d (%s) ; livraison permise par gate=%t\n  Blocages : %s\n", t.ID, ev.Phase, quality, ev.Provisional, ev.Progress.Passed, ev.Progress.Applicable, pct, ev.Ship, value(strings.Join(ev.Blockers, ", ")))
+		fmt.Fprintf(&b, "- %s [%s] : gate « %s », qualité %s ; provisoire=%t\n  Critères PASS : %d/%d (%s) ; livraison permise par gate=%t\n  Blocages : %s\n", t.ID, ev.Phase, gateLabel(&t), quality, ev.Provisional, ev.Progress.Passed, ev.Progress.Applicable, pct, ev.Ship, value(strings.Join(ev.Blockers, ", ")))
 	}
 	next := w.Next
 	if next == "" {

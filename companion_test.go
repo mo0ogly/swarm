@@ -55,7 +55,10 @@ func gateTest(t *testing.T, s *Store, w Work, raw []byte) Work {
 	}
 	r := Request{Schema: 1, EventID: newID("e-"), Revision: w.Revision}
 	b, _ := json.Marshal(r)
-	w, e = s.mutate(w.ID, "gate", r.EventID, r.Revision, b, func(w *Work) error { w.Tasks[0].Gate = &GateRecord{raw, ev, now()}; return nil })
+	w, e = s.mutate(w.ID, "gate", r.EventID, r.Revision, b, func(w *Work) error {
+		w.Tasks[0].Gate = &GateRecord{Document: raw, Evaluation: ev, At: now()}
+		return nil
+	})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -347,10 +350,10 @@ func TestReopenedDependencyInvalidatesAcceptance(t *testing.T) {
 		t.Fatal(e)
 	}
 	w.Tasks[0].Status = "accepted"
-	w.Tasks[0].Gate = &GateRecord{raw, ev, now()}
+	w.Tasks[0].Gate = &GateRecord{Document: raw, Evaluation: ev, At: now()}
 	childRaw := bytes.Replace(raw, []byte(`"scope_id":"t1"`), []byte(`"scope_id":"t2"`), 1)
 	childEval, _ := evaluate(childRaw, s.root, "delivery")
-	w.Tasks = append(w.Tasks, Task{ID: "t2", Status: "accepted", Depends: []string{"t1"}, Gate: &GateRecord{childRaw, childEval, now()}})
+	w.Tasks = append(w.Tasks, Task{ID: "t2", Status: "accepted", Depends: []string{"t1"}, Gate: &GateRecord{Document: childRaw, Evaluation: childEval, At: now()}})
 	if !s.acceptedFresh(&w, &w.Tasks[1], map[string]bool{}) {
 		t.Fatal("valid dependency rejected")
 	}

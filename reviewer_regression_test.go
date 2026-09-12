@@ -22,7 +22,7 @@ func TestWebGateWriteFailureIsNotReportedAsSuccess(t *testing.T) {
 	if _, err := s.db.Exec("CREATE TRIGGER reject_gate BEFORE UPDATE ON works BEGIN SELECT RAISE(ABORT, 'write refused by regression fixture'); END"); err != nil {
 		t.Fatal(err)
 	}
-	_, err := s.webAction(webRequest{Kind: "gate", Work: w.ID, Task: "t1", Path: "docs/t1.evidence.json", Revision: w.Revision, Event: newID("test-")})
+	_, err := s.webAction(webRequest{Kind: "gate", Work: w.ID, Task: "t1", Path: "docs/t1.evidence.json", Name: "Gate de recette", Revision: w.Revision, Event: newID("test-")})
 	if err == nil || !strings.Contains(err.Error(), "write refused") {
 		t.Fatal("gate write error swallowed", err)
 	}

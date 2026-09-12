@@ -149,3 +149,65 @@ func TestLaunchRefusalLinksToBlockingDependency(t *testing.T) {
 		t.Fatal("cannot inspect dependency")
 	}
 }
+
+func TestConsoleDialogAdvisedActionPreselected(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	current, e := s.get(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	agents, _ := s.agents(w.ID)
+	actions := s.taskActions(&current, &current.Tasks[0], agents)
+	c := &consoleState{}
+	s.openTaskDialog(w.ID, c)
+	if c.dialog == nil {
+		t.Fatal("dialog not opened")
+	}
+	if want := advisedActionRow(actions, false); c.dialog.row != want {
+		t.Fatalf("curseur sur la ligne %d, conseillée attendue %d", c.dialog.row, want)
+	}
+	// En todo, l'action conseillée est le départ : ligne 0 du menu.
+	if advisedActionRow(actions, false) != 0 {
+		t.Fatal("conseillée attendue en ligne 0 (start) en todo")
+	}
+}
+
+func TestConsoleDialogUnavailableOptionsNotSelectable(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "running"})
+	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "submitted", Outcome: "completed"})
+	w = gateTest(t, s, w, fixture(t, s.root))
+	accepted := applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "accepted"})
+	current, e := s.get(accepted.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	agents, _ := s.agents(accepted.ID)
+	d := &taskDialog{task: current.Tasks[0], actionsCache: s.taskActions(&current, &current.Tasks[0], agents)}
+	items := menuActions(d)
+	// En accepted, start et submit sont indisponibles avec un motif.
+	for _, want := range []int{0, 7} {
+		if items[want].enabled {
+			t.Fatalf("ligne %d (%s) devrait être indisponible en accepted", want, items[want].label)
+		}
+		if items[want].raison == "" {
+			t.Fatalf("ligne %d (%s) sans motif", want, items[want].label)
+		}
+	}
+	// Un raccourci sur une option indisponible est refusé, avec le motif.
+	c := &consoleState{dialog: d}
+	d.row = 0
+	d.mode = "actions"
+	s.dialogKey(accepted.ID, c, "text:s")
+	if d.row != 0 || d.message == "" {
+		t.Fatalf("raccourci accepté sur option indisponible : row=%d message=%q", d.row, d.message)
+	}
+	// La navigation saute les options indisponibles.
+	d.row = 1
+	s.dialogKey(accepted.ID, c, "down")
+	if !items[d.row].enabled {
+		t.Fatalf("navigation arrêtée sur une option indisponible : row=%d (%s)", d.row, items[d.row].label)
+	}
+}

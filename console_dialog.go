@@ -28,6 +28,7 @@ type taskDialog struct {
 	modelDescription       string
 	gateRaw                json.RawMessage
 	gateRevision           int
+	gateName               string
 	returnMode             string
 	blockedTask            string
 	reason                 string
@@ -44,6 +45,15 @@ type taskDialog struct {
 	provider               int
 	workspace, instruction string
 	message                string
+	actionsCache           []TaskAction
+}
+
+// actionItem est une entrée du menu d'actions de la console : libellé,
+// disponibilité selon l'oracle et motif d'indisponibilité.
+type actionItem struct {
+	label   string
+	enabled bool
+	raison  string
 }
 
 func (s *Store) openTaskDialog(work string, c *consoleState) {
@@ -76,6 +86,8 @@ func (s *Store) openTaskDialog(work string, c *consoleState) {
 	d := &taskDialog{task: t, agent: selected, mode: "actions", workspace: s.root, instruction: t.Next}
 	if w, err := s.get(work); err == nil {
 		d.scope = w.Scope
+		agents, _ := s.agents(work)
+		d.actionsCache = s.taskActions(&w, &t, agents)
 	}
 	if selected != nil {
 		d.workspace = selected.CWD
@@ -95,11 +107,7 @@ func (s *Store) openTaskDialog(work string, c *consoleState) {
 			}
 		}
 	}
-	if t.Status == "submitted" || t.Status == "accepted" || t.Status == "waived" {
-		d.row = 8
-	} else if selected != nil && selected.Status == "completed" {
-		d.row = 7
-	}
+	d.row = advisedActionRow(d.actionsCache, selected != nil && selected.Status == "completed")
 	c.dialog = d
 }
 func (s *Store) refreshDialogModel(d *taskDialog) {
@@ -138,8 +146,55 @@ func (s *Store) refreshDialogModel(d *taskDialog) {
 		d.modelPolicyHash = r.PolicyHash
 	}
 }
-func (d *taskDialog) actions() []string {
-	return []string{"Lancer avec un fournisseur…", "Relancer cette tentative…", "Arrêter l'agent…", "Afficher les journaux", "Voir le détail complet", "Réconcilier l'état…", "Fermer", "[s] Soumettre le rapport…", "[v] Voir les gates et les preuves", "[a] Accepter la tâche…", "[l] Lire le rapport…", "[f] Forcer par dérogation…", "[o] Rouvrir cette tâche…", "[g] Charger une gate de validation…", "[h] Hiérarchie et dépendances", "[i] Décisions à traiter", "[j] Rechercher les journaux", "[u] Reprise depuis ma dernière visite", "[e] Consigner une boucle OODA", "[p] Changer le responsable", "[b] Budget et consommation"}
+
+// actionsOracle fait correspondre les indices du menu aux kinds de l'oracle.
+// Les entrées sans kind (journaux, détail, fermeture, panneaux) restent
+// toujours disponibles.
+var actionsOracle = []string{
+	"start", "retry", "stop", "", "", "reconcile", "",
+	"submit", "", "accepted", "report", "override", "reopen", "gate",
+	"", "", "", "", "", "", "",
+}
+
+// menuActions assemble le menu complet : libellés statiques, disponibilité
+// et motif issus de l'oracle.
+func menuActions(d *taskDialog) []actionItem {
+	oracle := map[string]TaskAction{}
+	for _, ta := range d.actionsCache {
+		oracle[ta.Kind] = ta
+	}
+	static := []string{"Lancer avec un fournisseur…", "Relancer cette tentative…", "Arrêter l'agent…", "Afficher les journaux", "Voir le détail complet", "Réconcilier l'état…", "Fermer", "[s] Soumettre le rapport…", "[v] Voir les gates et les preuves", "[a] Accepter la tâche…", "[l] Lire le rapport…", "[f] Forcer par dérogation…", "[o] Rouvrir cette tâche…", "[g] Charger une gate de validation…", "[h] Hiérarchie et dépendances", "[i] Décisions à traiter", "[j] Rechercher les journaux", "[u] Reprise depuis ma dernière visite", "[e] Consigner une boucle OODA", "[p] Changer le responsable", "[b] Budget et consommation"}
+	items := make([]actionItem, len(static))
+	for i, label := range static {
+		it := actionItem{label: label, enabled: true}
+		if kind := actionsOracle[i]; kind != "" {
+			if ta, ok := oracle[kind]; ok {
+				it.enabled = ta.Disponible
+				it.raison = ta.Raison
+			}
+		}
+		items[i] = it
+	}
+	return items
+}
+
+// advisedActionRow choisit la ligne présélectionnée : l'action conseillée par
+// l'oracle, sinon la revue pour une tentative terminée, sinon le début.
+func advisedActionRow(oracle []TaskAction, completed bool) int {
+	for i, kind := range actionsOracle {
+		if kind == "" {
+			continue
+		}
+		for _, ta := range oracle {
+			if ta.Kind == kind && ta.Conseillee {
+				return i
+			}
+		}
+	}
+	if completed {
+		return 7
+	}
+	return 0
 }
 func (s *Store) dialogKey(work string, c *consoleState, key string) {
 	d := c.dialog
@@ -164,17 +219,29 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 	}
 	switch d.mode {
 	case "actions":
+		items := menuActions(d)
 		if strings.HasPrefix(key, "text:") {
 			if row, ok := map[string]int{"s": 7, "v": 8, "a": 9, "l": 10, "r": 1, "f": 11, "o": 12, "g": 13, "h": 14, "i": 15, "j": 16, "u": 17, "e": 18, "p": 19, "b": 20}[strings.ToLower(strings.TrimPrefix(key, "text:"))]; ok {
-				d.row = row
-				key = "enter"
+				if items[row].enabled {
+					d.row = row
+					key = "enter"
+				} else {
+					d.message = items[row].raison
+					return
+				}
 			}
 		}
-		if key == "up" {
-			d.row = (d.row + len(d.actions()) - 1) % len(d.actions())
-		}
-		if key == "down" || key == "tab" {
-			d.row = (d.row + 1) % len(d.actions())
+		if key == "up" || key == "down" || key == "tab" {
+			delta := -1
+			if key == "up" {
+				delta = 1
+			}
+			for step := 0; step < len(items); step++ {
+				d.row = (d.row + delta + len(items)) % len(items)
+				if items[d.row].enabled {
+					break
+				}
+			}
 		}
 		if key != "enter" {
 			return
@@ -273,6 +340,7 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			d.reports = s.gateFiles(d.task.ID)
 			d.reportIndex = 0
 			d.reportPath = ""
+			d.gateName = ""
 			if len(d.reports) > 0 {
 				d.reportPath = d.reports[0]
 			}
@@ -312,8 +380,18 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			d.row = 0
 		}
 	case "submit", "gate-load":
+		// gate-load : ligne 0 = document, ligne 1 = nom de la gate, ligne 2 = bouton.
+		// submit : ligne 0 = rapport, ligne 1 = bouton.
+		derniere := 1
+		if d.mode == "gate-load" {
+			derniere = 2
+		}
 		if key == "tab" || key == "up" || key == "down" {
-			d.row = 1 - d.row
+			delta := -1
+			if key == "down" || key == "tab" {
+				delta = 1
+			}
+			d.row = (d.row + delta + derniere + 1) % (derniere + 1)
 			return
 		}
 		if d.row == 0 && (key == "left" || key == "right") && len(d.reports) > 0 {
@@ -326,11 +404,16 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			return
 		}
 		if key == "enter" {
-			if d.row == 0 {
-				d.row = 1
+			if d.row != derniere {
+				d.row = derniere
 				return
 			}
 			if d.mode == "gate-load" {
+				if strings.TrimSpace(d.gateName) == "" {
+					d.message = "Nom de la gate requis : nom humain de cette évaluation."
+					d.row = 1
+					return
+				}
 				if e := s.previewGate(work, d); e != nil {
 					d.message = e.Error()
 					return
@@ -349,14 +432,30 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			c.dialog = nil
 			return
 		}
-		if d.row == 0 {
-			if key == "clear" {
+		if key == "clear" {
+			if d.mode == "gate-load" && d.row == 1 {
+				d.gateName = ""
+			} else {
 				d.reportPath = ""
-			} else if key == "backspace" && len(d.reportPath) > 0 {
+			}
+		} else if key == "backspace" {
+			if d.mode == "gate-load" && d.row == 1 {
+				if len(d.gateName) > 0 {
+					_, n := utf8.DecodeLastRuneInString(d.gateName)
+					d.gateName = d.gateName[:len(d.gateName)-n]
+				}
+			} else if len(d.reportPath) > 0 {
 				_, n := utf8.DecodeLastRuneInString(d.reportPath)
 				d.reportPath = d.reportPath[:len(d.reportPath)-n]
-			} else if strings.HasPrefix(key, "text:") && len(d.reportPath) < 8000 {
-				d.reportPath += strings.TrimPrefix(key, "text:")
+			}
+		} else if strings.HasPrefix(key, "text:") {
+			t := strings.TrimPrefix(key, "text:")
+			if d.mode == "gate-load" && d.row == 1 {
+				if len(d.gateName) < 200 {
+					d.gateName += t
+				}
+			} else if d.row == 0 && len(d.reportPath) < 8000 {
+				d.reportPath += t
 			}
 		}
 	case "gate-confirm":
@@ -628,267 +727,15 @@ func (s *Store) launchDialog(work string, c *consoleState) error {
 	c.message = "Agent lancé pour " + d.task.ID + " avec " + r.Provider + " ; sélectionner Journaux pour le suivi."
 	return nil
 }
-func wrapDialog(text string, width int) []string {
-	out := []string{}
-	for _, line := range strings.Split(text, "\n") {
-		clean := terminalText(line)
-		if textWidth(clean) == 0 {
-			out = append(out, "")
-			continue
-		}
-		for textWidth(clean) > 0 {
-			n := truncateCells(clean, max(1, width))
-			if n == "" {
-				out = append(out, "…")
-				clean = clean[len(firstCluster(clean)):]
-				continue
-			}
-			out = append(out, n)
-			clean = clean[len(n):]
-		}
+
+// agentLabel présente une tentative sous une forme lisible : fournisseur,
+// état observé et identifiant court, pour remplacer l'identifiant brut a-…
+// dans les écrans opérateur.
+func agentLabel(a *Agent) string {
+	if a == nil {
+		return "aucune tentative"
 	}
-	return out
-}
-func renderTaskDialog(base string, d *taskDialog, width, height int) string {
-	lines := strings.Split(base, "\r\n")
-	boxWidth := min(width-4, 110)
-	inner := max(1, boxWidth-4)
-	title := "Actions — " + d.task.ID
-	rows := []string{d.task.Title, "État tâche : " + uiStatus(d.task.Status)}
-	if d.agent == nil {
-		rows = append(rows, "Agent : aucune tentative")
-	} else {
-		rows = append(rows, "Agent : "+d.agent.Provider+" · "+uiStatus(observedAgent(*d.agent)))
-	}
-	if d.mode == "help" {
-		rows = []string{d.task.Title, ""}
-	}
-	if panelTitle, panelContent, ok := panelRows(d, inner, height); ok {
-		title = panelTitle
-		rows = append(rows, panelContent...)
-	} else {
-		switch d.mode {
-		case "actions":
-			if d.agent != nil && !activeAgent(*d.agent) {
-				cause := readableWrap("MOTIF : "+d.agent.Activity, inner)
-				if len(cause) > 2 {
-					cause = cause[:2]
-				}
-				rows = append(rows, cause...)
-				if d.agent.Progress.ToolCalls > 0 {
-					rows = append(rows, fmt.Sprintf("Budget outils : %d / %d · résultats reçus : %d", d.agent.Progress.ToolCalls, d.agent.Limits.MaxToolCalls, d.agent.Progress.ToolResults))
-				}
-			}
-			visible := max(1, height-len(rows)-6)
-			first := max(0, d.row-visible+1)
-			for i := first; i < min(len(d.actions()), first+visible); i++ {
-				a := d.actions()[i]
-				m := "  "
-				if i == d.row {
-					m = "> "
-				}
-				rows = append(rows, m+a)
-			}
-		case "detail":
-			title = "Détails — " + d.task.ID
-			prefix := ""
-			if d.agent != nil && !activeAgent(*d.agent) {
-				prefix = "MOTIF DE FIN : " + d.agent.Activity + "\n"
-			}
-			detail := prefix + "Tâche : " + d.task.Title + "\nLivrable : " + d.task.Deliverable + "\nPérimètre : " + d.scope + "\nCritères : " + strings.Join(d.task.Criteria, " ; ") + "\nBlocage : " + d.task.Blocker + "\nProchaine action : " + d.task.Next + "\nEspace : " + d.workspace
-			if d.agent != nil {
-				detail += "\nAction observée : " + d.agent.Progress.Action + "\nCommande / fichier : " + d.agent.Progress.Detail
-				detail += fmt.Sprintf("\nOutils : %d appels / %d résultats\nDernier résultat reçu il y a : %s\nSurveillance : %s", d.agent.Progress.ToolCalls, d.agent.Progress.ToolResults, activityAge(d.agent.Progress.LastResult), monitoringLabel(d.agent.Progress.Degraded))
-				detail += "\nAgent : " + d.agent.ID + "\nActivité : " + d.agent.Activity + "\nSignal : " + d.agent.Heartbeat
-			}
-			if len(d.history) > 0 {
-				detail += "\n\nHISTORIQUE — du plus récent au plus ancien"
-				for i := len(d.history) - 1; i >= 0; i-- {
-					l := d.history[i]
-					if l.Kind != "output" {
-						detail += "\n" + eventClock(l.At) + "  " + l.Message
-					}
-				}
-			}
-			parts := wrapDialog(detail, inner)
-			n := max(1, height-11)
-			d.row = min(d.row, max(0, len(parts)-n))
-			rows = append(rows, parts[d.row:min(len(parts), d.row+n)]...)
-		case "review", "report":
-			title = "Gates et preuves — " + d.task.ID
-			if d.mode == "report" {
-				title = "Rapport — " + d.task.ID
-			}
-			parts := wrapDialog(d.review, inner)
-			n := max(1, height-11)
-			d.row = min(d.row, max(0, len(parts)-n))
-			rows = append(rows, parts[d.row:min(len(parts), d.row+n)]...)
-		case "submit", "gate-load":
-			title = "Soumettre le rapport — " + d.task.ID
-			label, button := "Rapport : ", "[ Soumettre pour revue ]"
-			if d.mode == "gate-load" {
-				title = "Charger une gate — " + d.task.ID
-				label = "Gate : "
-				button = "[ Examiner cette évaluation ]"
-			}
-			for i, line := range []string{label + d.reportPath, button} {
-				mark := "  "
-				if d.row == i {
-					mark = "> "
-				}
-				rows = append(rows, mark+line)
-			}
-			if d.mode == "gate-load" {
-				rows = append(rows, "←→ choisir une gate détectée · Tab champ · Ctrl-U effacer", "Document méthode 2 ; l’enregistrement n’accepte pas la tâche.")
-			} else {
-				rows = append(rows, "←→ choisir un rapport détecté · Tab champ · Ctrl-U effacer", "La soumission ne valide pas le travail ; aucun agent n’est lancé.")
-			}
-		case "gate-confirm":
-			title = "Enregistrer la gate — " + d.task.ID
-			parts := wrapDialog(d.review, inner)
-			parts = parts[:min(len(parts), max(1, height-14))]
-			rows = append(rows, parts...)
-			for i, line := range []string{"Confirmer l’enregistrement", "Annuler"} {
-				mark := "  "
-				if i == d.row {
-					mark = "> "
-				}
-				rows = append(rows, mark+line)
-			}
-		case "override":
-			title = "Forcer par dérogation — " + d.task.ID
-			rows = append(rows, "Acceptation manuelle sans déclarer les contrôles réussis.", "Motif conservé avec date, opérateur local et état précédent.", "Les dépendances doivent être acceptées ; agent arrêté.")
-			for i, line := range []string{"Motif : " + d.reason, "[ Confirmer la dérogation ]", "Annuler"} {
-				mark := "  "
-				if d.row == i {
-					mark = "> "
-				}
-				rows = append(rows, mark+line)
-			}
-			rows = append(rows, "Saisir le motif · Entrée puis Entrée confirmer · Échap annuler")
-		case "accept":
-			title = "Accepter la tâche — " + d.task.ID
-			rows = append(rows, "Confirmer que le rapport et ses preuves ont été examinés.", "La gate et les dépendances sont revérifiées à la confirmation.", "[f] Forcer par dérogation avec un motif")
-			if d.task.Status != "submitted" {
-				rows = append(rows, "INDISPONIBLE : soumettre le rapport pour revue d’abord.")
-			} else if d.task.Gate == nil {
-				rows = append(rows, "INDISPONIBLE : aucune gate enregistrée.")
-			} else if !d.task.Gate.Evaluation.Allowed {
-				rows = append(rows, "INDISPONIBLE : gate échouée ; voir les contrôles et preuves.")
-			}
-			for i, line := range []string{"Confirmer l’acceptation", "Annuler"} {
-				mark := "  "
-				if d.row == i {
-					mark = "> "
-				}
-				rows = append(rows, mark+line)
-			}
-		case "launch-error":
-			title = "LANCEMENT REFUSÉ — " + d.task.ID
-			rows = append(rows, wrapDialog(d.message, inner)...)
-			rows = append(rows, "", "[ Entrée : revenir au formulaire ]", "[v] Voir les gates de la tâche ou dépendance bloquante", "[o] Rouvrir la tâche sélectionnée", "Échap : retourner au tableau")
-		case "reopen":
-			title = "Rouvrir — " + d.task.ID
-			rows = append(rows, "La validation courante sera retirée ; l’historique reste conservé.")
-			for i, line := range []string{"Confirmer la réouverture", "Annuler"} {
-				mark := "  "
-				if i == d.row {
-					mark = "> "
-				}
-				rows = append(rows, mark+line)
-			}
-		case "start", "retry":
-			rows = append(rows, "Périmètre : "+d.scope)
-			title = "Lancer — " + d.task.ID
-			if d.mode == "retry" {
-				title = "Relancer — " + d.task.ID
-			}
-			provider := ""
-			if len(d.providers) > 0 {
-				provider = d.providers[d.provider]
-			}
-			if d.mode == "retry" {
-				provider = d.agent.Provider
-			}
-			role := []string{"worker", "planner", "subplanner"}[d.roleIndex]
-			if d.mode == "retry" {
-				role = d.agent.Role
-			}
-			level := []string{"auto", "simple", "standard", "exigeant"}[d.modelLevel]
-			model := d.modelDescription
-			form := []string{"Fournisseur : " + provider, "Espace : " + d.workspace, "Consigne : " + d.instruction, "Rôle : " + role, "Niveau ◀ ▶ : " + level + " · " + model, "[ Confirmer le lancement ]"}
-			for i, line := range form {
-				m := "  "
-				if i == d.row {
-					m = "> "
-				}
-				if i == d.row && len([]rune(line)) > inner-2 && (i == 1 || i == 2) {
-					prefix := "Espace : "
-					if i == 2 {
-						prefix = "Consigne : "
-					}
-					r := []rune(line)
-					n := max(1, inner-len([]rune(prefix))-4)
-					line = prefix + "…" + string(r[max(0, len(r)-n):])
-				}
-				rows = append(rows, m+line)
-			}
-			rows = append(rows, "Tab : champ · ←→ : fournisseur/rôle/niveau · Ctrl-U : effacer", "Entrée sur Confirmer lance réellement le fournisseur.")
-		case "stop", "reconcile":
-			title = "Confirmer — " + d.task.ID
-			text := "Demander l'arrêt de l'agent sélectionné ?"
-			if d.mode == "reconcile" {
-				text = "Vérifier les processus et réconcilier l'état ?"
-			}
-			rows = append(rows, text)
-			for i, a := range []string{"Confirmer", "Annuler"} {
-				m := "  "
-				if i == d.row {
-					m = "> "
-				}
-				rows = append(rows, m+a)
-			}
-		}
-	}
-	hint := "↑↓ choisir · Entrée confirmer · Échap annuler"
-	if d.mode == "actions" {
-		hint = "↑↓ choisir · Entrée ouvrir · Échap fermer"
-	}
-	if d.mode == "detail" || d.mode == "review" || d.mode == "report" {
-		hint = "↑↓ défiler · ←→ rapports · Entrée actions · Échap retour"
-	}
-	if d.mode != "launch-error" {
-		rows = append(rows, wrapDialog(d.message, inner)...)
-	}
-	if d.mode == "help" {
-		hint = "↑↓ défiler · Entrée/Échap retour · F1 fermer l’aide"
-	} else {
-		hint += " · F1 aide"
-	}
-	rows = append(rows, hint)
-	if len(rows) > max(1, height-4) {
-		rows = append(rows[:max(0, height-5)], hint)
-	}
-	heading := truncateCells(" "+title+" ", boxWidth-2)
-	box := []string{"┌" + heading + strings.Repeat("─", max(0, boxWidth-2-textWidth(heading))) + "┐"}
-	for _, r := range rows {
-		box = append(box, "│ "+pad(r, inner)+" │")
-	}
-	box = append(box, "└"+strings.Repeat("─", boxWidth-2)+"┘")
-	if len(box) > height-2 {
-		box = box[:height-2]
-	}
-	top := max(0, (height-len(box))/2)
-	left := max(0, (width-boxWidth)/2)
-	for i, row := range box {
-		if top+i >= len(lines) {
-			break
-		}
-		under := []rune(pad(lines[top+i], width-1))
-		end := min(len(under), left+boxWidth)
-		lines[top+i] = strings.Repeat(" ", left) + row + strings.Repeat(" ", len(under)-end)
-	}
-	return strings.Join(lines, "\r\n")
+	return a.Provider + " · " + uiStatus(observedAgent(*a)) + " · " + shortID(a.ID)
 }
 
 func consoleBinaryReplaced() bool {
@@ -901,4 +748,13 @@ func monitoringLabel(degraded string) string {
 		return "aucune perte de flux détectée"
 	}
 	return degraded
+}
+
+// shortID abrège un identifiant long (a-, t-, w-) en gardant un suffixe
+// reconnaissable, pour les écrans où l'identifiant complet reste nécessaire.
+func shortID(id string) string {
+	if len(id) <= 14 {
+		return id
+	}
+	return id[:12] + "…"
 }

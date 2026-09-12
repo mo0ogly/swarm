@@ -152,7 +152,7 @@ func TestRetexTaskExportAndVerifiedGuide(t *testing.T) {
 	w, e = s.mutate(w.ID, "fixture-gate", newID("e-"), w.Revision, []byte(`{}`), func(w *Work) error {
 		task, _ := w.task(id)
 		task.Status = "accepted"
-		task.Gate = &GateRecord{raw, ev, now()}
+		task.Gate = &GateRecord{Document: raw, Evaluation: ev, At: now()}
 		return nil
 	})
 	if e != nil {

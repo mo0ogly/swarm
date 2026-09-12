@@ -167,9 +167,9 @@ func (s *Store) renderDashboard(work string, c *consoleState, width, height int,
 		t := tasks[c.taskCursor]
 		gate := "en attente"
 		if t.Gate != nil {
-			gate = "bloquée/périmée"
+			gate = gateLabel(&t) + " — bloquée/périmée"
 			if s.validGate(&t) {
-				gate = "delivery valide"
+				gate = gateLabel(&t) + " — delivery valide"
 				if t.Gate.Evaluation.Quality != nil {
 					gate += fmt.Sprintf(" · score %.1f/100", *t.Gate.Evaluation.Quality)
 				}

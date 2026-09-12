@@ -62,7 +62,7 @@ func (s *Store) previewGate(work string, d *taskDialog) error {
 	if e != nil {
 		return e
 	}
-	if e = s.applyGateDocument(&w, d.task.ID, "delivery", raw); e != nil {
+	if e = s.applyGateDocument(&w, d.task.ID, "delivery", d.gateName, raw); e != nil {
 		return e
 	}
 	t, _ := w.task(d.task.ID)
@@ -86,11 +86,12 @@ func (s *Store) recordDialogGate(work string, d *taskDialog) error {
 		Revision int             `json:"expected_revision"`
 		TaskID   string          `json:"task_id"`
 		Phase    string          `json:"phase"`
+		Name     string          `json:"name"`
 		Document json.RawMessage `json:"document"`
-	}{1, newID("operator-"), d.gateRevision, d.task.ID, "delivery", d.gateRaw}
+	}{1, newID("operator-"), d.gateRevision, d.task.ID, "delivery", d.gateName, d.gateRaw}
 	raw, _ := json.Marshal(request)
 	_, e := s.mutate(work, "gate", request.Event, request.Revision, raw, func(w *Work) error {
-		return s.applyGateDocument(w, request.TaskID, request.Phase, request.Document)
+		return s.applyGateDocument(w, request.TaskID, request.Phase, request.Name, request.Document)
 	})
 	return e
 }

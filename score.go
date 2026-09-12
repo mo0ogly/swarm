@@ -37,6 +37,7 @@ type Progress struct {
 	Percent    *float64 `json:"percent"`
 }
 type GateRecord struct {
+	Name       string          `json:"name,omitempty"`
 	Document   json.RawMessage `json:"document"`
 	Evaluation Evaluation      `json:"evaluation"`
 	At         string          `json:"at"`

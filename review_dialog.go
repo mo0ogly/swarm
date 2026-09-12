@@ -86,7 +86,7 @@ func (s *Store) reviewText(work string, d *taskDialog) string {
 	if t.Gate == nil {
 		return text + "\n\nACCEPTATION INDISPONIBLE : aucune gate de validation enregistrée.\nLe conducteur doit examiner le rapport et enregistrer son évaluation."
 	}
-	text += "\n\nGate : " + t.Gate.Evaluation.Phase
+	text += "\n\nGate : " + gateLabel(t) + " · phase " + t.Gate.Evaluation.Phase
 	if current, err := evaluate(t.Gate.Document, s.root, "delivery"); err != nil {
 		text += "\nContrôle des preuves : " + err.Error()
 	} else {
@@ -179,7 +179,10 @@ func (s *Store) submitReportAt(work, id, report string, expected int) error {
 			return e
 		}
 		if t.Status != "blocked" && t.Status != "todo" {
-			return fmt.Errorf("soumettre depuis une tâche bloquée ou à faire, après contrôle du handoff")
+			return fmt.Errorf(
+				"Soumission refusée : la tâche est « %s ». Un rapport se soumet depuis une tâche « À faire » ou « Bloquée » qui vient de produire son livrable. Pour un nouveau rapport de contrôle, rouvrir explicitement la tâche (action « Rouvrir la tâche » ou [o] dans la console) ; cela retire sa validation courante.",
+				uiStatus(t.Status),
+			)
 		}
 		if t.Revalidation != nil {
 			b, err := os.ReadFile(path)

@@ -21,6 +21,13 @@ func TestGatePreviewNoMutationCancelAndFreshness(t *testing.T) {
 	s.openTaskDialog(w.ID, c)
 	s.dialogKey(w.ID, c, "text:g")
 	s.dialogKey(w.ID, c, "enter")
+	if c.dialog.mode != "gate-load" {
+		t.Fatal(c.dialog.mode)
+	}
+	s.dialogKey(w.ID, c, "down")
+	s.dialogKey(w.ID, c, "down")
+	s.dialogKey(w.ID, c, "text:Gate de recette")
+	s.dialogKey(w.ID, c, "down")
 	s.dialogKey(w.ID, c, "enter")
 	if c.dialog.mode != "gate-confirm" || !strings.Contains(c.dialog.review, "PASS") {
 		t.Fatal(c.dialog)
@@ -35,6 +42,10 @@ func TestGatePreviewNoMutationCancelAndFreshness(t *testing.T) {
 		t.Fatal("cannot cancel")
 	}
 	s.dialogKey(w.ID, c, "enter")
+	s.dialogKey(w.ID, c, "down")
+	s.dialogKey(w.ID, c, "down")
+	s.dialogKey(w.ID, c, "text:Gate de recette")
+	s.dialogKey(w.ID, c, "down")
 	s.dialogKey(w.ID, c, "enter")
 	os.WriteFile(filepath.Join(s.root, "proof.txt"), []byte("changed"), 0600)
 	s.dialogKey(w.ID, c, "enter")
@@ -51,7 +62,7 @@ func TestGatePreviewRevisionConflictVisible(t *testing.T) {
 	w := taskTest(t, s, createTest(t, s))
 	raw := fixture(t, s.root)
 	os.WriteFile(filepath.Join(s.root, "gate.json"), raw, 0600)
-	d := &taskDialog{task: w.Tasks[0], reportPath: "gate.json"}
+	d := &taskDialog{task: w.Tasks[0], reportPath: "gate.json", gateName: "Gate de recette"}
 	if e := s.previewGate(w.ID, d); e != nil {
 		t.Fatal(e)
 	}

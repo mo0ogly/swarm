@@ -42,6 +42,7 @@ type webRequest struct {
 	Workspace       string        `json:"workspace"`
 	Instruction     string        `json:"instruction"`
 	Path            string        `json:"path"`
+	Name            string        `json:"name"`
 	Note            string        `json:"note"`
 	Author          string        `json:"author"`
 	Decision        string        `json:"decision"`
@@ -137,7 +138,10 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		d := &taskDialog{task: *t, reportPath: r.Path}
+		if r.Kind == "gate" && strings.TrimSpace(r.Name) == "" {
+			return nil, fmt.Errorf("Nom de la gate requis : nom humain de cette évaluation.")
+		}
+		d := &taskDialog{task: *t, reportPath: r.Path, gateName: strings.TrimSpace(r.Name)}
 		if e = s.previewGate(r.Work, d); e != nil {
 			return nil, e
 		}
@@ -241,7 +245,12 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		d := &taskDialog{task: *t}
-		send(w, map[string]any{"revision": ww.Revision, "task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d)})
+		agents, e := s.agents(work)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]any{"revision": ww.Revision, "task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
 	})
 	mux.HandleFunc("/api/v1/report", func(w http.ResponseWriter, r *http.Request) {
 		p, e := safeReport(s.root, r.URL.Query().Get("path"))

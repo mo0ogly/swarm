@@ -34,7 +34,11 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 		d, _ := s.desired(a.ID)
 		views = append(views, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d, "cost": "not_available"})
 	}
-	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "priority": s.priorities(work)}, nil
+	actions := map[string][]TaskAction{}
+	for i := range w.Tasks {
+		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
+	}
+	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "priority": s.priorities(work), "task_actions": actions}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}

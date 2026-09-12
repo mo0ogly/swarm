@@ -159,7 +159,25 @@ func (s *Store) tasksContext(b *contextBuilder, w *Work, v WorkValidation, c Pag
 	b.ctx.Slice = VisibleSlice{Offset: c.Offset, Count: len(shown), Total: total}
 	b.fact("etat_travail", "derive", factRef("work", w.ID), "%s", v.State)
 	b.fact("suspension_departs", "etat", factRef("work", w.ID), "%t", s.paused(w.ID))
+	agents, agentErr := s.agents(w.ID)
 	for _, t := range shown {
+		// Actions dérivées de l'oracle unique (task_actions.go) : aucune
+		// condition dupliquée avec le web ou la console.
+		oracle := map[string]TaskAction{}
+		if agentErr == nil {
+			for _, ta := range s.taskActions(w, t, agents) {
+				oracle[ta.Kind] = ta
+			}
+		}
+		raison := func(kind string) string {
+			if ta, ok := oracle[kind]; ok && ta.Raison != "" {
+				return ta.Raison
+			}
+			if ta, ok := oracle[kind]; ok && ta.Disponible {
+				return "Disponible ; vérification finale par le moteur à la confirmation."
+			}
+			return "Conditions non réunies ; voir le cockpit web pour le motif."
+		}
 		ref := factRef("task", t.ID)
 		b.fact("statut_historique", "etat", ref, "%s : %s", t.ID, value(t.Status))
 		tv := v.Tasks[t.ID]
@@ -178,7 +196,7 @@ func (s *Store) tasksContext(b *contextBuilder, w *Work, v WorkValidation, c Pag
 			b.fact("blocage", "texte_non_fiable", factRef("validation", t.ID)+"/blockers/"+strconv.Itoa(i), "%s : %s", t.ID, blocker)
 		}
 		if t.Gate != nil {
-			b.fact("gate_enregistree", "etat", factRef("gate", t.ID), "%s : méthode %s, phase %s, empreinte de barème %s", t.ID, t.Gate.Evaluation.Method, t.Gate.Evaluation.Phase, shortText(t.Gate.Evaluation.ConfigDigest, 16))
+			b.fact("gate_enregistree", "etat", factRef("gate", t.ID), "%s : gate « %s », méthode %s, phase %s, empreinte de barème %s", t.ID, gateLabel(t), t.Gate.Evaluation.Method, t.Gate.Evaluation.Phase, shortText(t.Gate.Evaluation.ConfigDigest, 16))
 			if t.Gate.Evaluation.Quality != nil {
 				b.fact("score_historique", "etat", factRef("gate", t.ID), "%s : %.2f/100 enregistré le %s ; état actuel %s", t.ID, *t.Gate.Evaluation.Quality, t.Gate.At, tv.State)
 			}
@@ -196,11 +214,10 @@ func (s *Store) tasksContext(b *contextBuilder, w *Work, v WorkValidation, c Pag
 			b.fact("dependances", "etat", ref, "%s : %s", t.ID, strings.Join(t.Depends, ", "))
 		}
 		b.action("task.review", "Examiner la tâche et ses preuves", t.ID, true, "Lecture et choix manuel du formulaire ; aucune acceptation automatique.")
-		reopen := t.Status == "accepted" || t.Status == "waived"
-		b.action("task.reopen", "Rouvrir la tâche", t.ID, reopen, "La tâche doit être acceptée pour être rouverte.")
-		b.action("task.submit", "Soumettre un rapport", t.ID, t.Status != "accepted" && t.Status != "waived" && t.Status != "abandoned" && !s.assistTaskActive(w.ID, t.ID), "Tâche ouverte sans tentative active ; un rapport existant est requis au formulaire.")
-		b.action("task.gate", "Examiner et enregistrer une gate", t.ID, t.Status == "submitted", "Un rapport doit être soumis.")
-		b.action("task.start", "Lancer une tentative", t.ID, s.assistCanStart(w, t), "Départs autorisés, dépendances fraîches, budget estimatif et workspace disponibles ; fournisseur vérifié à la confirmation.")
+		b.action("task.reopen", "Rouvrir la tâche", t.ID, oracle["reopen"].Disponible, raison("reopen"))
+		b.action("task.submit", "Soumettre un rapport", t.ID, oracle["submit"].Disponible, raison("submit"))
+		b.action("task.gate", "Examiner et enregistrer une gate", t.ID, oracle["gate"].Disponible, raison("gate"))
+		b.action("task.start", "Lancer une tentative", t.ID, oracle["start"].Disponible, raison("start"))
 	}
 	if total > len(shown) {
 		b.omit("%d tâche(s) hors de la tranche affichée ne sont pas transmises.", total-len(shown))
@@ -245,6 +262,15 @@ func (s *Store) agentsContext(b *contextBuilder, w *Work, c PageCoordinates) {
 		}
 	}
 	b.fact("tentatives_enregistrees", "derive", factRef("work", w.ID), "%d dont %d actives", len(agents), active)
+	// Oracle des actions par tâche : les dispositions de départ/arrêt d'une
+	// tentative reprennent la même source de vérité que web et console.
+	oracle := map[string]map[string]TaskAction{}
+	for i := range w.Tasks {
+		oracle[w.Tasks[i].ID] = map[string]TaskAction{}
+		for _, ta := range s.taskActions(w, &w.Tasks[i], agents) {
+			oracle[w.Tasks[i].ID][ta.Kind] = ta
+		}
+	}
 	for _, a := range shown {
 		ref := factRef("agent", a.ID)
 		b.fact("tentative", "etat", ref, "%s · tâche %s · fournisseur %s · rôle %s", a.ID, a.TaskID, guardLabel(a.Provider, 60), guardLabel(a.Role, 40))
@@ -259,9 +285,10 @@ func (s *Store) agentsContext(b *contextBuilder, w *Work, c PageCoordinates) {
 		if t, err := w.task(a.TaskID); err == nil {
 			b.fact("statut_tache_liee", "etat", factRef("task", a.TaskID), "%s : %s", a.TaskID, value(t.Status))
 		}
-		b.action("agent.stop", "Arrêter cette tentative", a.ID, activeAgent(a), "La tentative doit être active.")
-		b.action("agent.reconcile", "Réconcilier l’état observé", a.ID, activeAgent(a), "La tentative doit être active.")
-		b.action("agent.retry", "Relancer une tentative", a.ID, !activeAgent(a) && s.assistTaskCanStart(w, a.TaskID), "Tentative terminée ; dépendances, budget et workspace disponibles.")
+		ta := oracle[a.TaskID]
+		b.action("agent.stop", "Arrêter cette tentative", a.ID, ta["stop"].Disponible, raisonAction(ta, "stop", "La tentative doit être active."))
+		b.action("agent.reconcile", "Réconcilier l’état observé", a.ID, ta["reconcile"].Disponible, raisonAction(ta, "reconcile", "La tentative doit être active."))
+		b.action("agent.retry", "Relancer une tentative", a.ID, ta["retry"].Disponible, raisonAction(ta, "retry", "Tentative terminée ; dépendances, budget et workspace disponibles."))
 	}
 	if len(agents) > len(shown) {
 		b.omit("%d tentative(s) plus anciennes ne sont pas transmises.", len(agents)-len(shown))
@@ -524,60 +551,6 @@ func (s *Store) validatePageSelection(w *Work, c PageCoordinates) error {
 		return fmt.Errorf("Un seul journal à la fois.")
 	}
 	return nil
-}
-func (s *Store) assistTaskActive(work, task string) bool {
-	as, e := s.agents(work)
-	if e != nil {
-		return true
-	}
-	for _, a := range as {
-		if a.TaskID == task && activeAgent(a) {
-			return true
-		}
-	}
-	return false
-}
-func (s *Store) assistTaskCanStart(w *Work, id string) bool {
-	t, e := w.task(id)
-	return e == nil && s.assistCanStart(w, t)
-}
-func (s *Store) assistCanStart(w *Work, t *Task) bool {
-	if s.paused(w.ID) || (t.Status != "todo" && t.Status != "blocked" && t.Status != "submitted") {
-		return false
-	}
-	for _, id := range t.Depends {
-		d, e := w.task(id)
-		if e != nil || !s.acceptedFresh(w, d, map[string]bool{}) {
-			return false
-		}
-	}
-	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
-		return false
-	}
-	if t.PlanMaxAttempts > 0 {
-		var count int
-		if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", w.ID, t.ID).Scan(&count); e != nil || count >= t.PlanMaxAttempts {
-			return false
-		}
-	}
-	var overlaps int
-	if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1)", s.root, s.root, s.root).Scan(&overlaps); e != nil || overlaps > 0 {
-		return false
-	}
-	as, e := s.agents(w.ID)
-	if e != nil {
-		return false
-	}
-	for _, a := range as {
-		if activeAgent(a) {
-			return false
-		}
-	}
-	b, e := s.budget(w.ID)
-	if e != nil {
-		return false
-	}
-	return b.Budget.Limit == 0 || b.Remaining >= b.Budget.Reserve
 }
 
 // Extract public provider text before applying the small per-fact budget. Large

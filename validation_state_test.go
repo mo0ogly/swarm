@@ -42,7 +42,7 @@ func TestValidationDriftBlocksAckAndDependencies(t *testing.T) {
 		t.Fatal("missing revalidation guard")
 	}
 	raw := fixture(t, s.root)
-	if err = s.applyGateDocument(&w, "t1", "delivery", raw); err == nil {
+	if err = s.applyGateDocument(&w, "t1", "delivery", "Gate de recette", raw); err == nil {
 		t.Fatal("new gate bypasses report")
 	}
 	// Merely restoring a file does not close the task after explicit reopening.
