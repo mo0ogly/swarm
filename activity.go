@@ -49,7 +49,14 @@ type ActivityPage struct {
 	Entries []ActivityEntry `json:"entries"`
 	Next    string          `json:"next_cursor"`
 	More    bool            `json:"more"`
+	// Vrai quand une source a atteint le plafond de lecture : l'historique
+	// remonte moins loin qu'il n'existe, et le fil doit le dire plutôt que de
+	// s'arrêter en laissant croire qu'il n'y a plus rien.
+	Truncated bool `json:"history_truncated"`
 }
+
+// Plafond de lecture par source, aligné sur l'export d'archive.
+const activitySourceLimit = 500
 
 // Origine par type d'événement. Le défaut « moteur » SURESTIME l'autonomie :
 // une décision humaine mal classée fait croire que le système a agi seul, ce
@@ -124,8 +131,9 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 	q.Limit = min(200, max(1, q.Limit))
 	page := ActivityPage{Entries: []ActivityEntry{}}
 	entries := []ActivityEntry{}
+	lues := map[string]int{}
 
-	rows, e := s.db.Query("SELECT seq,at,kind,message FROM cockpit_events WHERE work_id=? ORDER BY seq DESC LIMIT 500", work)
+	rows, e := s.db.Query("SELECT seq,at,kind,message FROM cockpit_events WHERE work_id=? ORDER BY seq DESC LIMIT ?", work, activitySourceLimit+1)
 	if e != nil {
 		return page, e
 	}
@@ -136,6 +144,11 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 			rows.Close()
 			return page, e
 		}
+		lues["controls"]++
+		if lues["controls"] > activitySourceLimit {
+			page.Truncated = true
+			continue
+		}
 		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("c", seq), Origin: activityOrigin(kind),
 			Kind: kind, Label: activityLabel(kind), Message: message})
 	}
@@ -144,7 +157,7 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 		return page, e
 	}
 
-	rows, e = s.db.Query("SELECT revision,kind,at,payload FROM events WHERE work_id=? ORDER BY revision DESC LIMIT 500", work)
+	rows, e = s.db.Query("SELECT revision,kind,at,payload FROM events WHERE work_id=? ORDER BY revision DESC LIMIT ?", work, activitySourceLimit+1)
 	if e != nil {
 		return page, e
 	}
@@ -158,6 +171,11 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 		}
 		var p activityPayload
 		_ = json.Unmarshal(raw, &p)
+		lues["events"]++
+		if lues["events"] > activitySourceLimit {
+			page.Truncated = true
+			continue
+		}
 		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("e", revision), Origin: activityOrigin(kind),
 			Kind: kind, Label: activityLabel(kind), TaskID: p.task(), Message: activityMessage(kind, p)})
 	}
@@ -185,7 +203,9 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 		}
 		page.Entries = append(page.Entries, x)
 	}
-	if n := len(page.Entries); n > 0 {
+	// Le curseur ne vaut que s'il reste quelque chose à lire : le rendre sans
+	// suite ferait paginer un appelant vers une page vide.
+	if n := len(page.Entries); n > 0 && page.More {
 		page.Next = page.Entries[n-1].cursor()
 	}
 	return page, nil
@@ -214,7 +234,7 @@ func activityMessage(kind string, p activityPayload) string {
 		}
 		return message
 	case "gate":
-		return "évaluation enregistrée"
+		return prefixTask(p.task(), "évaluation enregistrée")
 	case "agent.start":
 		return prefixTask(task, "tentative lancée")
 	case "ooda":

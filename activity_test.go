@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -222,4 +223,106 @@ func TestActivityCursorKeepsSimultaneousEntries(t *testing.T) {
 	if rendues != attendues {
 		t.Fatalf("entrées simultanées perdues par la pagination : %d rendues sur %d", rendues, attendues)
 	}
+}
+
+// Un curseur rendu en fin de liste ferait demander une page qui n'existe pas.
+func TestActivityCursorEmptyWhenNothingFollows(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	if e := s.controlEvent(w.ID, "dispatch", "t1 : départ automatique"); e != nil {
+		t.Fatal(e)
+	}
+	page, e := s.activity(w.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if page.More {
+		t.Fatalf("préalable : tout doit tenir en une page, %+v", page)
+	}
+	if page.Next != "" {
+		t.Fatalf("aucune suite : le curseur doit rester vide, obtenu %q", page.Next)
+	}
+
+	// Avec une suite, le curseur est rendu et mène à des entrées.
+	tronque, e := s.activity(w.ID, activityQuery{Limit: 2})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if !tronque.More || tronque.Next == "" {
+		t.Fatalf("une suite existe : curseur attendu, %+v", tronque)
+	}
+	suite, e := s.activity(w.ID, activityQuery{Limit: 2, Before: tronque.Next})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if len(suite.Entries) == 0 {
+		t.Fatal("le curseur rendu doit mener à des entrées")
+	}
+}
+
+// Le fil lit un nombre borné de lignes par source. Au-delà, il s'arrêtait sans
+// le dire, ce qui laissait croire que l'historique s'arrêtait là.
+func TestActivityDeclaresTruncatedHistory(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	for i := 0; i <= activitySourceLimit; i++ {
+		if _, e := s.db.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)",
+			w.ID, now(), "dispatch", fmt.Sprintf("départ %d", i)); e != nil {
+			t.Fatal(e)
+		}
+	}
+	page, e := s.activity(w.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if !page.Truncated {
+		t.Fatal("au-delà du plafond de lecture, le fil doit annoncer un historique tronqué")
+	}
+
+	// Sous le plafond, rien à signaler : ne pas alarmer sans raison.
+	petit := storeTest(t)
+	w2 := taskTest(t, petit, createTest(t, petit))
+	if e := petit.controlEvent(w2.ID, "dispatch", "un seul départ"); e != nil {
+		t.Fatal(e)
+	}
+	page2, e := petit.activity(w2.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if page2.Truncated {
+		t.Fatal("sous le plafond, l'historique est complet et ne doit pas se dire tronqué")
+	}
+}
+
+// Chaque entrée du fil doit nommer la tâche concernée quand la charge utile la
+// porte. La gate était la seule à ne pas le faire, alors que sa charge utile
+// réelle (gate_dialog.go) contient bien task_id.
+func TestActivityNamesTaskOfGate(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	// Charge utile identique à celle qu'écrit recordDialogGate.
+	raw, _ := json.Marshal(map[string]any{
+		"schema_version": 1, "event_id": newID("operator-"), "expected_revision": w.Revision,
+		"task_id": "t1", "phase": "delivery", "name": "Gate de recette",
+	})
+	if _, e := s.mutate(w.ID, "gate", newID("operator-"), w.Revision, raw, func(*Work) error { return nil }); e != nil {
+		t.Fatal(e)
+	}
+	page, e := s.activity(w.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, x := range page.Entries {
+		if x.Kind != "gate" {
+			continue
+		}
+		if x.TaskID != "t1" {
+			t.Fatalf("gate non rattachée à sa tâche : %+v", x)
+		}
+		if !strings.HasPrefix(x.Message, "t1") {
+			t.Fatalf("le message de gate doit nommer sa tâche : %q", x.Message)
+		}
+		return
+	}
+	t.Fatal("aucune entrée de gate au fil")
 }

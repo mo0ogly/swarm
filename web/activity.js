@@ -14,6 +14,7 @@ let filCurseur = '';
 let filSuite = false;
 let filTravail = '';
 let filEnCours = false;
+let filTronque = false;
 
 function filMarqueur(origine) {
   // Le symbole double le mot, il ne le remplace pas : une couleur seule ne se
@@ -82,7 +83,11 @@ function filRendre() {
   $('fil-plus').hidden = !filSuite;
   const etat = $('fil-etat');
   if (filEntrees.length) {
-    etat.textContent = filSuite ? '' : 'Début du fil.';
+    // « Début du fil » affirme qu'il n'y a rien avant ; ne le dire que si c'est
+    // vrai, sinon annoncer que l'historique remonte moins loin qu'il n'existe.
+    etat.textContent = filSuite ? '' : (filTronque
+      ? "Début de l'historique consultable ; les événements plus anciens ne sont pas chargés."
+      : 'Début du fil.');
   } else {
     etat.textContent = 'Aucune activité enregistrée pour ce travail. Les départs, relais et décisions apparaîtront ici.';
   }
@@ -103,6 +108,7 @@ async function filCharger({ suite = false } = {}) {
     filEntrees = suite ? filEntrees.concat(page.entries) : page.entries;
     filCurseur = page.next_cursor || '';
     filSuite = !!page.more;
+    filTronque = !!page.history_truncated;
     filRendre();
   } catch (e) {
     $('fil-etat').textContent = 'Fil indisponible : ' + e.message;
