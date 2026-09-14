@@ -80,6 +80,7 @@ function renderConduite() {
   const state = $('conduite-state');
   state.textContent = lines.join(' · ');
   state.className = 'notice ' + (snapshot.paused ? 'attention' : 'info');
+  renderAccueil(open, budget);
 
   const inbox = $('conduite-inbox');
   inbox.replaceChildren();
@@ -92,6 +93,53 @@ function renderConduite() {
   plan.replaceChildren();
   for (const t of snapshot.work.tasks) plan.append(planRow(t));
   if (!snapshot.work.tasks.length) plan.append(node('p', 'Aucune tâche dans ce travail. Ouvrez le mode expert pour en ajouter.'));
+}
+
+// Bandeau d'accueil : une phrase qui dit ce qui a changé et ce qui attend, à la
+// même place à chaque visite. Chaque segment mène à la zone concernée.
+function segment(texte, cible) {
+  const b = button(texte, () => {
+    const n = $(cible);
+    if (n) n.scrollIntoView({ block: 'center', behavior: 'auto' });
+  });
+  b.className = 'accueil-segment';
+  return b;
+}
+
+function renderAccueil(ouvertes, budget) {
+  const hote = $('conduite-accueil');
+  hote.replaceChildren();
+  const parts = [];
+
+  const change = typeof filChangementsDepuisVisite === 'function' ? filChangementsDepuisVisite() : null;
+  if (change && change.entrees > 0) {
+    const quoi = change.taches > 0
+      ? change.taches + (change.taches > 1 ? ' tâches ont avancé' : ' tâche a avancé')
+      : change.entrees + (change.entrees > 1 ? ' événements' : ' événement');
+    // « au moins » tant que le trait de visite n'est pas dans la page chargée :
+    // le total réel peut être plus grand.
+    parts.push(segment((change.complet ? '' : 'au moins ') + quoi + ' depuis votre visite', 'fil-titre'));
+  }
+
+  if (ouvertes.length) {
+    parts.push(segment(ouvertes.length + (ouvertes.length > 1 ? ' décisions vous attendent' : ' décision vous attend'), 'conduite-inbox-title'));
+  }
+
+  if (!parts.length) {
+    // Ni zéro ni tableau vide : une phrase qui dit franchement qu'il n'y a rien.
+    hote.append(node('span', change ? 'Rien de neuf depuis votre visite · aucune décision en attente'
+                                    : 'Aucune décision en attente'));
+  } else {
+    parts.forEach((p, i) => {
+      if (i) hote.append(node('span', ' · ', 'accueil-separateur'));
+      hote.append(p);
+    });
+  }
+
+  if (budget && budget.budget.limit_usd > 0) {
+    hote.append(node('span', ' · ', 'accueil-separateur'));
+    hote.append(node('span', budget.reserved_usd + ' USD réservés sur ' + budget.budget.limit_usd, 'accueil-budget'));
+  }
 }
 
 $('mode').onclick = () => applyMode(cockpitMode === 'conduite' ? 'expert' : 'conduite');

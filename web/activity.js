@@ -133,3 +133,22 @@ $('fil-decisions').onchange = () => {
   filCurseur = '';
   filCharger();
 };
+
+// Ce qui a changé depuis la visite de référence, d'après les entrées chargées.
+// La réponse est bornée par la page en mémoire : si aucune entrée n'est
+// antérieure à la visite, on ne peut pas affirmer un total, seulement un
+// minimum. Mieux vaut le dire que compter faux.
+function filChangementsDepuisVisite() {
+  if (!filVisiteReference) return null;
+  const taches = new Set();
+  let depuis = 0, avant = 0;
+  for (const e of filEntrees) {
+    if (e.at >= filVisiteReference) {
+      depuis++;
+      if (e.task_id) taches.add(e.task_id);
+    } else {
+      avant++;
+    }
+  }
+  return { taches: taches.size, entrees: depuis, complet: avant > 0 || !filSuite };
+}

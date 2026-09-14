@@ -138,6 +138,23 @@ const lignes=page=>page.$$eval('.fil-entree',ns=>ns.map(n=>({
  assert.ok(visiteAvant.length>0,'lecture de reprise disponible');
  checks.push('visite enregistrée à la sortie, repère présent au retour');
 
+ // 9. Le bandeau dit franchement qu'il n'y a rien, plutôt que d'aligner des zéros.
+ const accueil=async()=>page.$eval('#conduite-accueil',e=>e.textContent.trim());
+ await page.waitForFunction(()=>document.getElementById('conduite-accueil').textContent.trim().length>0);
+ const repos=await accueil();
+ assert.match(repos,/Rien de neuf|Aucune décision/,'bandeau au repos illisible : '+repos);
+ assert.ok(!/\b0\b/.test(repos),'le bandeau ne doit pas afficher de zéros : '+repos);
+ checks.push('bandeau : absence dite en toutes lettres, sans zéros');
+
+ // 10. Une décision arrive : le bandeau la compte et mène à la zone concernée.
+ execFileSync(binary,['--root',root,'--json','autonomy',actif.id,'autonome'],{encoding:'utf8'});
+ await sleep(2500);
+ const apresChangement=await accueil();
+ assert.match(apresChangement,/depuis votre visite/,'le bandeau doit compter ce qui a changé : '+apresChangement);
+ const segments=await page.$$eval('#conduite-accueil .accueil-segment',bs=>bs.map(b=>b.textContent));
+ assert.ok(segments.length>0,'les segments du bandeau doivent être cliquables : '+apresChangement);
+ checks.push('bandeau : compte ce qui a changé depuis la visite');
+
  await browser.close();
  const bilan={status:errors.length||external.length?'FAIL':'PASS',checks,errors,external};
  fs.writeFileSync(path.join(outDir,'activity.json'),JSON.stringify(bilan,null,1));

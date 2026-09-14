@@ -50,3 +50,12 @@ body[data-mode=conduite] .rail-label{opacity:.9}
 /* Repère de visite : une ligne de partage, pas une entrée du fil. */
 .fil-visite{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--wattson-info-encre)}
 .fil-visite::before,.fil-visite::after{content:"";flex:1;height:2px;background:var(--wattson-info-encre);opacity:.5}
+
+/* Bandeau d'accueil : la phrase qui dit ce qui a changé, toujours au même
+   endroit. Les segments sont des liens vers la zone concernée, pas des boutons
+   d'action — d'où l'apparence de texte souligné plutôt que de commande. */
+.conduite-accueil{margin:0 0 14px;font-size:15px;color:var(--wattson-titre);display:flex;flex-wrap:wrap;align-items:baseline;gap:2px}
+.accueil-segment{background:none;border:none;padding:0;font:inherit;color:var(--wattson-lien);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.accueil-segment:hover{color:var(--wattson-lien-encre)}
+.accueil-separateur{color:var(--wattson-libelle)}
+.accueil-budget{color:var(--wattson-libelle)}
