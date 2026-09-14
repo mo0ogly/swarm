@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 )
 
 // Fil d'activité : ce que le moteur a fait seul et ce qu'un humain a décidé,
@@ -37,14 +38,29 @@ type ActivityPage struct {
 	More    bool            `json:"more"`
 }
 
-// Origine par type d'événement. Ce qui n'est pas listé comme humain vient du
-// moteur : mieux vaut attribuer au moteur une décision humaine mal classée que
-// l'inverse, qui laisserait croire à une autonomie qui n'a pas eu lieu.
+// Origine par type d'événement. Le défaut « moteur » SURESTIME l'autonomie :
+// une décision humaine mal classée fait croire que le système a agi seul, ce
+// que ce fil existe précisément pour démentir. Cette liste doit donc rester
+// exhaustive : tout nouveau type d'événement produit par un geste d'opérateur
+// s'ajoute ici, faute de quoi il sera attribué au moteur.
+//
+// Limite connue : le type seul ne portera pas l'origine indéfiniment.
+// `task.update` est déjà écrit par les deux voies — l'ordonnanceur
+// (dispatcher.go) et l'opérateur (cockpit_service.go). La donnée discriminante
+// existe pourtant en base et n'est pas lue ici : `Launch.Origin` vaut
+// « conducteur » quand c'est l'ordonnanceur qui lance.
 var activityHumanKinds = map[string]bool{
 	"pause": true, "autonomy": true, "priority": true, "budget": true,
 	"decision": true, "assistant": true, "ooda": true, "checkpoint": true,
 	"gate": true, "work.create": true, "task.add": true,
+	"task.submit": true, "task.override": true,
+	"plan.adopt": true, "brief.adopt": true,
 }
+
+// Les retours d'expérience sont saisis depuis le cockpit ; leurs types sont
+// construits dynamiquement à partir du préfixe (web_server.go), donc aucune
+// liste ne peut les énumérer.
+const activityRetexPrefix = "retex-"
 
 var activityLabels = map[string]string{
 	"dispatch": "Ordonnancement", "conductor": "Conduite", "pause": "Départs",
@@ -53,11 +69,18 @@ var activityLabels = map[string]string{
 	"assistant": "Assistant", "task.update": "Tâche", "gate": "Gate",
 	"agent.start": "Tentative", "ooda": "Boucle OODA", "checkpoint": "Point d'étape",
 	"work.create": "Travail", "task.add": "Tâche ajoutée",
+	"task.submit": "Rapport soumis", "task.override": "Dérogation",
+	"plan.adopt": "Plan adopté", "brief.adopt": "Brief adopté",
+	"retex-save": "Retour d'expérience", "retex-qualify": "Retour d'expérience",
+	"retex-status": "Retour d'expérience", "retex-task": "Retour d'expérience",
 }
 
 func activityLabel(kind string) string {
 	if l, ok := activityLabels[kind]; ok {
 		return l
+	}
+	if strings.HasPrefix(kind, activityRetexPrefix) {
+		return "Retour d'expérience"
 	}
 	return kind
 }
@@ -80,9 +103,12 @@ func (p activityPayload) task() string {
 }
 
 func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
-	if q.Limit <= 0 || q.Limit > 200 {
+	// Même politique que queryLogs (log_query.go) : une demande excessive est
+	// ramenée au plafond, pas à la plus petite page.
+	if q.Limit <= 0 {
 		q.Limit = 50
 	}
+	q.Limit = min(200, max(1, q.Limit))
 	page := ActivityPage{Entries: []ActivityEntry{}}
 	entries := []ActivityEntry{}
 
@@ -154,7 +180,7 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 }
 
 func activityOrigin(kind string) string {
-	if activityHumanKinds[kind] {
+	if activityHumanKinds[kind] || strings.HasPrefix(kind, activityRetexPrefix) {
 		return activityHuman
 	}
 	return activityEngine
