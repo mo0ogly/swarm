@@ -1,4 +1,5 @@
 const fs=require('fs'),path=require('path'),{spawn,execFileSync}=require('child_process'),pup=require('puppeteer');
+const assert=require('node:assert/strict');
 const binary=process.argv[2],dir=path.resolve(process.argv[3]);fs.mkdirSync(dir,{recursive:true});
 (async()=>{
  const root=execFileSync('python3',['tools/swarm-companion/tests/web_fixture.py',binary],{encoding:'utf8'}).trim();
@@ -45,9 +46,18 @@ print(json.dumps({'type':'result','result':'# RETEX de recette\\nConstat : une a
  await click('Exporter le RETEX en Markdown','#retex-list');await p.click('#confirm');await closed();await p.waitForFunction(()=>document.querySelector('#retex-list').textContent.includes('enregistré'));const exportFiles=fs.readdirSync(root+'/docs/retex/swarm');if(exportFiles.length!==1)throw Error('export missing');
  // Use the existing operator workflow from the browser for every task transition.
  await click('Piloter la tâche APEX','#retex-list');await p.waitForSelector('#modal[open] #field-provider');const title=await p.$eval('#modal-title',e=>e.textContent);const task=title.split(' — ')[0];await p.click('#confirm');await closed();await p.waitForFunction(()=>document.querySelector('#active-count').textContent==='0');await new Promise(r=>setTimeout(r,1500));
- async function taskAction(action){await click('Piloter la tâche APEX','#retex-list');await p.waitForSelector('#field-action');await p.select('#field-action',action)}
- await taskAction('submit');await fill('#field-path','docs/'+task+'-handoff.md');await p.click('#confirm');await closed();
- await taskAction('gate');await fill('#field-path','docs/'+task+'.json');await p.click('#confirm');await p.waitForFunction(()=>document.querySelector('#confirm').textContent==='Confirmer l’enregistrement');await p.click('#confirm');await closed();
+ // La liste des actions vient d'un appel réseau : sélectionner avant qu'elle
+// soit peuplée laisse l'action conseillée en place, sans erreur visible.
+async function taskAction(action){await click('Piloter la tâche APEX','#retex-list');await p.waitForSelector('#field-action');await p.waitForFunction(a=>[...document.querySelectorAll('#field-action option')].some(o=>o.value===a),{},action);await p.select('#field-action',action);await p.waitForFunction(a=>document.querySelector('#field-action').value===a,{},action)}
+ // Le conducteur a relayé le handoff dès la fin de la tentative : la tâche
+ // est déjà soumise, donc « soumettre » n'est plus proposé. La recette le
+ // constate au lieu de refaire le geste.
+ {await click('Piloter la tâche APEX','#retex-list');await p.waitForSelector('#field-action');
+  const offertes=await p.$$eval('#field-action option',es=>es.map(e=>e.value));
+  assert.ok(!offertes.includes('submit'),'le rapport relayé ne doit plus demander de soumission : '+offertes.join(', '));
+  assert.ok(offertes.includes('gate'),'après relais, la gate doit être proposée : '+offertes.join(', '));
+  await p.click('#cancel');await closed();}
+ await taskAction('gate');await fill('#field-path','docs/'+task+'.json');await fill('#field-name','Recette memoire');await p.click('#confirm');await p.waitForFunction(()=>document.querySelector('#confirm').textContent==='Confirmer l’enregistrement');await p.click('#confirm');await closed();
  await taskAction('accepted');await p.click('#confirm');await closed();
  await click('Changer l’état du RETEX','#retex-list');await p.select('#field-note','verifie');await p.click('#confirm');await closed();await p.waitForFunction(()=>document.querySelector('#retex-list').textContent.includes('Proposer une leçon'));
  await click('Proposer une leçon au Guide','#retex-list');await p.click('#confirm');await p.waitForFunction(()=>document.querySelector('#confirm').textContent==='Publier la leçon vérifiée');await shot('guide-review');await p.click('#confirm');await closed();await p.waitForFunction(()=>document.querySelector('#retex-list').textContent.includes('Leçon publiée'));checks.push('task launch, submit, gate preview, acceptance, RETEX verification and reviewed guide publication through UI');

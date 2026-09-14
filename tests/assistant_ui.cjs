@@ -220,10 +220,10 @@ const fail = m => { throw new Error(m); };
     // Accept the fixture evidence by the normal review flow, then change the
     // underlying file without a work event. Hash freshness must still react.
     await p.click('[data-view="tasks"]');
-    const taskForm=async action=>{await p.click('[data-task="AS-01"] button');await p.waitForSelector('#modal[open] #field-action',{visible:true});await p.waitForFunction(()=>document.querySelector('#modal-title').textContent.startsWith('AS-01'));await p.select('#field-action',action)};
+    const taskForm=async action=>{await p.click('[data-task="AS-01"] button');await p.waitForSelector('#modal[open] #field-action',{visible:true});await p.waitForFunction(()=>document.querySelector('#modal-title').textContent.startsWith('AS-01'));await p.waitForFunction(x=>[...document.querySelectorAll('#field-action option')].some(o=>o.value===x),{},action);await p.select('#field-action',action);await p.waitForFunction(x=>document.querySelector('#field-action').value===x,{},action)};
     const finishForm=async()=>{await p.click('#confirm');await p.waitForFunction(()=>!document.querySelector('#modal').open||!document.querySelector('#modal-error').hidden);if(await p.$eval('#modal',e=>e.open))fail(await p.$eval('#modal-error',e=>e.textContent))};
     await taskForm('submit');await p.select('#field-path','docs/AS-01-handoff.md');await finishForm();
-    await taskForm('gate');await p.select('#field-path','docs/AS-01.evidence.json');await p.click('#confirm');await p.waitForFunction(()=>document.querySelector('#confirm').textContent==='Confirmer l’enregistrement');await finishForm();
+    await taskForm('gate');await p.select('#field-path','docs/AS-01.evidence.json');await p.type('#field-name','Recette assistant');await p.click('#confirm');await p.waitForFunction(()=>document.querySelector('#confirm').textContent==='Confirmer l’enregistrement');await finishForm();
     await taskForm('accepted');await finishForm();
     await p.select('#assist-target','AS-01');await ask('fixture-ok','tasks');
     fs.appendFileSync(fixture.root+'/docs/AS-01-handoff.md','\nModification externe de recette.\n');

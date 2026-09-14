@@ -100,9 +100,16 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  checks.push('graphe rendu dans les deux thèmes');
 
  // Clavier : un nœud est atteignable et ouvre le dialogue de sa tâche.
- await page.$eval('.graph-noeud',n=>n.focus());
- await page.keyboard.press('Enter');
- await page.waitForSelector('#modal[open] #field-action',{visible:true});
+ // Le graphe est reconstruit à chaque rafraîchissement du cockpit : le focus
+ // posé peut disparaître avant la frappe, et la touche part alors dans le vide.
+ // On réessaie jusqu'à ce que le dialogue s'ouvre, plutôt que de supposer que
+ // les deux gestes tombent dans la même fenêtre de rendu.
+ for(let essai=0;essai<20;essai++){
+   await page.$eval('.graph-noeud',n=>n.focus());
+   await page.keyboard.press('Enter');
+   try{await page.waitForSelector('#modal[open] #field-action',{visible:true,timeout:1500});break}
+   catch(e){if(essai===19)throw e}
+ }
  const titre=await page.$eval('#modal-title',e=>e.textContent);
  assert.match(titre,/^g\d/,'le nœud doit ouvrir sa propre tâche : '+titre);
  await page.click('#cancel');
