@@ -84,6 +84,13 @@ func TestLoopProvider(t *testing.T) {
 	}
 	prompt, _ := io.ReadAll(os.Stdin)
 	switch {
+	case strings.Contains(string(prompt), "GUARD_INTERLEAVED"):
+		for i := 0; i < 3; i++ {
+			fmt.Printf(`{"type":"item.started","item":{"id":"f%d","type":"command_execution","command":"build"}}`+"\n", i)
+			fmt.Printf(`{"type":"item.completed","item":{"id":"f%d","type":"command_execution","exit_code":1}}`+"\n", i)
+			fmt.Printf(`{"type":"item.started","item":{"id":"r%d","type":"command_execution","command":"read %d"}}`+"\n", i, i)
+			fmt.Printf(`{"type":"item.completed","item":{"id":"r%d","type":"command_execution","exit_code":0}}`+"\n", i)
+		}
 	case strings.Contains(string(prompt), "GUARD_REPEAT"):
 		for i := 0; i < 3; i++ {
 			fmt.Printf("{\"type\":\"assistant\",\"message\":{\"content\":[{\"type\":\"tool_use\",\"id\":\"%d\",\"name\":\"Bash\",\"input\":{\"command\":\"pwd\"}}]}}\n", i)
@@ -102,7 +109,7 @@ func TestLoopProvider(t *testing.T) {
 	os.Exit(0)
 }
 func TestSupervisorGuardStopsAndBlocksTask(t *testing.T) {
-	for _, mode := range []string{"GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_SILENCE", "GUARD_TOOL"} {
+	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_SILENCE", "GUARD_TOOL"} {
 		t.Run(mode, func(t *testing.T) {
 			s := storeTest(t)
 			w, r := setupAgent(t, s)

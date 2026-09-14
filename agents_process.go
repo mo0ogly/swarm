@@ -319,13 +319,14 @@ func (s *Store) supervise(id string) error {
 	forced := false
 	var stopAt time.Time
 	reason := ""
-	requestStop := func(message string) {
+	requestStop := func(message, cause string) {
 		if stopping {
 			return
 		}
 		stopping = true
 		stopAt = time.Now()
 		reason = message
+		a.StopKind = cause
 		a.Status = "stopping"
 		a.Activity = message + " ; arrêt en attente"
 		_ = syscall.Kill(-a.Child, syscall.SIGTERM)
@@ -335,7 +336,7 @@ func (s *Store) supervise(id string) error {
 	for {
 		select {
 		case <-signals:
-			requestStop("Interruption du superviseur")
+			requestStop("Interruption du superviseur", "superviseur")
 		case e = <-done:
 			// Clean any descendants of this owned process group before releasing workspace.
 			_ = syscall.Kill(-a.Child, syscall.SIGKILL)
@@ -346,6 +347,7 @@ func (s *Store) supervise(id string) error {
 				if limitReason := sink.guardReason(); limitReason != "" {
 					stopping = true
 					reason = limitReason
+					a.StopKind = "garde"
 				}
 			}
 			a.Progress = sink.progress()
@@ -365,20 +367,20 @@ func (s *Store) supervise(id string) error {
 			return s.finishAgent(a, state, message, &code)
 		case <-tick.C:
 			if err := sink.persist(); err != nil {
-				requestStop("Échec de persistance des journaux")
+				requestStop("Échec de persistance des journaux", "superviseur")
 			}
 			desired, e = s.desired(id)
 			if e != nil {
-				requestStop("Stockage du superviseur indisponible")
+				requestStop("Stockage du superviseur indisponible", "superviseur")
 			}
 			if desired == "stop" {
-				requestStop("Arrêt demandé par opérateur")
+				requestStop("Arrêt demandé par opérateur", "operateur")
 			}
 			if reason := sink.guardReason(); reason != "" {
-				requestStop(reason)
+				requestStop(reason, "garde")
 			}
 			if time.Now().After(deadline) {
-				requestStop("Budget de temps atteint")
+				requestStop("Budget de temps atteint", "delai")
 			}
 			if stopping && time.Since(stopAt) > 3*time.Second && !forced {
 				forced = true
@@ -393,7 +395,7 @@ func (s *Store) supervise(id string) error {
 			a.Reply = sink.replySnapshot()
 			a.Heartbeat = now()
 			if e = s.saveAgent(a); e != nil {
-				requestStop("Échec de persistance")
+				requestStop("Échec de persistance", "superviseur")
 			}
 		}
 	}

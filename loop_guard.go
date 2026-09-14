@@ -9,7 +9,14 @@ import (
 	"time"
 )
 
+type failedCall struct {
+	signature [32]byte
+	completed int
+}
+
 type loopGuard struct {
+	signatures              map[string][32]byte
+	failures                []failedCall
 	limits                  RunLimits
 	lastOutput              time.Time
 	calls, repeated, errors int
@@ -26,7 +33,7 @@ type loopGuard struct {
 }
 
 func newLoopGuard(l RunLimits) *loopGuard {
-	return &loopGuard{limits: l, lastOutput: time.Now(), seen: map[string]bool{}, pending: map[string]time.Time{}}
+	return &loopGuard{signatures: map[string][32]byte{}, limits: l, lastOutput: time.Now(), seen: map[string]bool{}, pending: map[string]time.Time{}}
 }
 func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	if id != "" && g.seen[id] {
@@ -38,6 +45,9 @@ func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	}
 	b, _ := json.Marshal([]any{name, input})
 	sig := sha256.Sum256(b)
+	if id != "" {
+		g.signatures[id] = sig
+	}
 	if g.calls > 0 && sig == g.lastSignature {
 		g.repeated++
 	} else {
@@ -61,6 +71,27 @@ func (g *loopGuard) result(id string, failed bool) {
 	delete(g.pending, id)
 	g.completed++
 	g.lastResult = now()
+	sig, tracked := g.signatures[id]
+	delete(g.signatures, id)
+	recent := g.failures[:0]
+	count := 0
+	for _, f := range g.failures {
+		if g.completed-f.completed >= 4*g.limits.MaxRepeatedCalls || (tracked && !failed && f.signature == sig) {
+			continue
+		}
+		recent = append(recent, f)
+		if tracked && f.signature == sig {
+			count++
+		}
+	}
+	g.failures = recent
+	if tracked && failed {
+		g.failures = append(g.failures, failedCall{sig, g.completed})
+		if count+1 >= g.limits.MaxRepeatedCalls {
+			g.reason = "Limite d'échecs identiques entrelacés atteinte"
+		}
+	}
+
 	if failed {
 		g.errors++
 	} else {
@@ -149,6 +180,8 @@ func (g *loopGuard) loseVisibility(reason string) {
 	// Missing messages invalidate consecutive-error/repetition assumptions.
 	g.errors = 0
 	g.repeated = 0
+	g.failures = nil
+	g.signatures = map[string][32]byte{}
 }
 func (g *loopGuard) summary() AgentProgress {
 	return AgentProgress{Action: g.lastAction, Detail: g.actionDetail, ToolCalls: g.calls, ToolResults: g.completed, PendingTools: len(g.pending), LastTool: g.lastTool, LastResult: g.lastResult, Degraded: g.degraded}
