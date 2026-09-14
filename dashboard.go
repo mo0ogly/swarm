@@ -72,6 +72,9 @@ func (s *Store) renderDashboard(work string, c *consoleState, width, height int,
 	if e != nil {
 		return clip(e.Error(), width)
 	}
+	if c.conduite && c.dialog == nil && width >= 64 && height >= 20 {
+		return s.renderConduite(work, c, width, height, input)
+	}
 	if width < 64 || height < 20 {
 		return strings.Join([]string{clip("SWARM — terminal trop petit (minimum 64 × 20)", width), clip("Agrandir ou relancer avec --plain. q puis Entrée quitte.", width), clip("swarm> "+input, width)}, "\r\n")
 	}

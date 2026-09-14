@@ -254,7 +254,7 @@ func panelRows(d *taskDialog, inner, height int) (string, []string, bool) {
 			if v.ResolvedAt != "" {
 				state = "Acquittée"
 			}
-			rows = append(rows, mark+state+" · "+v.TaskID+" · "+v.Kind+" · "+v.Summary)
+			rows = append(rows, mark+state+" · "+escalationSubject(v.TaskID)+" · "+escalationLabel(v.Kind)+" · "+v.Summary)
 		}
 		if len(d.decisions) == 0 {
 			rows = append(rows, "Aucune décision en attente détectée.")

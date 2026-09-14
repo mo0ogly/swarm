@@ -15,6 +15,9 @@ Options globales : --root <projet> --json
 swarm init
 swarm providers init|show
 swarm console [travail] [--plain]
+swarm dispatch <travail>
+swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
+swarm profile <travail> [tâche] [--input profil.json]
 swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
 swarm agent list <travail>
@@ -150,7 +153,7 @@ func run(args []string, out, errOut io.Writer) int {
 		return fail(e)
 	}
 	defer s.db.Close()
-	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist") || pos[0] == "control" || pos[0] == "web" {
+	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
 		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
 			return fail(e)
 		}

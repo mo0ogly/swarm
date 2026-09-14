@@ -4,7 +4,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -38,7 +37,7 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	for i := range w.Tasks {
 		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
 	}
-	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "priority": s.priorities(work), "task_actions": actions}, nil
+	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}
@@ -104,6 +103,7 @@ type consoleState struct {
 	taskSelID, agentSelID                     string
 	capture                                   bool
 	frozen                                    bool
+	conduite                                  bool
 	focus, taskCursor, agentCursor, logOffset int
 }
 
@@ -113,6 +113,7 @@ select AGENT | filter TEXTE | status ETAT | logs AGENT | note AGENT TEXTE
 pause | unpause | reconcile AGENT | assign TACHE RESPONSABLE | priority TACHE 0..9
 new ID | titre | livrable | critère 1 ; critère 2
 ready TACHE | submit TACHE chemin/du/handoff.md | capture on/off | freeze | help | q
+mode | autonomie manuel|assiste|autonome [créneaux] | dispatch
 start/retry créent un processus. Capture désactivée par défaut (sorties sensibles).
 ready rouvre une tâche bloquée ; submit enregistre le handoff, jamais une acceptation.
 `
@@ -160,10 +161,51 @@ func (s *Store) consoleCommand(work, line string, state *consoleState) (bool, er
 		}
 		state.selected = a.ID
 		return false, nil
+	case "mode":
+		state.conduite = !state.conduite
+		if state.conduite {
+			state.message = "Mode conduite : état, décisions à traiter et plan. « mode » revient à l'affichage expert."
+		} else {
+			state.message = "Mode expert : tableau de bord complet, journaux et outils."
+		}
+		return false, nil
+	case "autonomie":
+		if arg(1) == "" {
+			state.message = fmt.Sprintf("%s · %d créneau(x)", autonomyLabel(s.autonomy(work)), s.slots(work))
+			return false, nil
+		}
+		slots := s.slots(work)
+		if arg(2) != "" {
+			n, e := strconv.Atoi(arg(2))
+			if e != nil {
+				return false, fmt.Errorf("créneaux : nombre entier attendu")
+			}
+			slots = n
+		}
+		if e := s.setAutonomy(work, arg(1), slots); e != nil {
+			return false, e
+		}
+		state.message = fmt.Sprintf("%s · %d créneau(x) ; sans effet sur les tentatives déjà lancées", autonomyLabel(s.autonomy(work)), s.slots(work))
+		return false, nil
+	case "dispatch":
+		launched, e := s.dispatch(work)
+		if e != nil {
+			return false, e
+		}
+		if len(launched) == 0 {
+			state.message = "Aucun départ automatique ; le motif est journalisé dans le travail."
+		} else {
+			state.message = fmt.Sprintf("%d départ(s) automatique(s) : %s", len(launched), strings.Join(dispatchedIDs(launched), ", "))
+		}
+		return false, nil
 	case "pause":
 		return false, s.pause(work, true)
 	case "unpause":
-		return false, s.pause(work, false)
+		if e := s.pause(work, false); e != nil {
+			return false, e
+		}
+		_, e := s.dispatch(work)
+		return false, e
 	case "stop", "reconcile", "note":
 		a, e := s.agent(arg(1))
 		if e != nil {
@@ -564,6 +606,9 @@ func (s *Store) console(work string, in *os.File, out io.Writer, asJSON bool) er
 				s.openTaskDialog(work, state)
 				if state.dialog != nil {
 					state.dialog.mode = "detail"
+					// d.row porte le curseur d'action à l'ouverture ; en détail
+					// il devient un défilement et doit repartir du début.
+					state.dialog.row = 0
 				}
 				draw()
 				continue
@@ -618,297 +663,4 @@ func (s *Store) console(work string, in *os.File, out io.Writer, asJSON bool) er
 			}
 		}
 	}
-}
-
-func dialogTypeText(d *taskDialog, target *string, key byte) {
-	if len(*target) >= 8000 {
-		return
-	}
-	switch key {
-	case '\r', '\n', '\t':
-		*target += " "
-	case 127, 8:
-		if len(*target) > 0 {
-			_, n := utf8.DecodeLastRuneInString(*target)
-			*target = (*target)[:len(*target)-n]
-		}
-	default:
-		if key >= 32 {
-			*target += string([]byte{key})
-		}
-	}
-}
-
-// appendInput appends a byte as text, flattening line and tab controls so a
-// paste can not execute an intermediate command or switch panel focus.
-func appendInput(input *[]byte, key byte) {
-	if len(*input) >= 16000 {
-		return
-	}
-	if key == '\r' || key == '\n' {
-		*input = append(*input, ' ')
-		return
-	}
-	if key == '\t' {
-		*input = append(*input, ' ')
-		return
-	}
-	if key >= 32 {
-		*input = append(*input, key)
-	}
-}
-
-func appendRune(input *[]byte, r rune) {
-	if len(*input) >= 16000 {
-		return
-	}
-	*input = utf8.AppendRune(*input, r)
-}
-
-// dialogName maps a single control byte to the dialog key vocabulary.
-func dialogName(key byte) string {
-	switch key {
-	case '\t':
-		return "tab"
-	case '\r', '\n':
-		return "enter"
-	case 127, 8:
-		return "backspace"
-	case 21:
-		return "clear"
-	}
-	if key >= 32 {
-		return "text:" + string([]byte{key})
-	}
-	return ""
-}
-
-// decodeSequence classifies a completed or partial escape sequence.
-// It returns terminal=true when the sequence is complete, and a key name:
-// arrows, tab/enter/backspace/clear, paste markers, or "text:" payload.
-// Unknown sequences (mouse reports, edit keys) return terminal=true with an
-// empty name so they are ignored rather than typed into the command line.
-func decodeSequence(seq []byte, paste bool) (bool, string) {
-	if len(seq) < 2 {
-		return false, ""
-	}
-	if seq[0] == 'O' {
-		// SS3: complete on the single following byte.
-		if len(seq) < 2 {
-			return false, ""
-		}
-		switch seq[1] {
-		case 'A':
-			return true, "up"
-		case 'B':
-			return true, "down"
-		case 'C':
-			return true, "right"
-		case 'D':
-			return true, "left"
-		case 'P':
-			return true, "help"
-		case 'H':
-			return true, ""
-		case 'F':
-			return true, ""
-		}
-		return true, ""
-	}
-	if len(seq) >= 2 && seq[0] == '[' && seq[1] == 'M' {
-		return len(seq) >= 5, ""
-	}
-	if seq[0] != '[' {
-		return true, ""
-	}
-	final := seq[len(seq)-1]
-	if final < 0x40 || final > 0x7E {
-		if len(seq) > 32 {
-			return true, "" // runaway sequence: drop it
-		}
-		return false, ""
-	}
-	params := string(seq[1 : len(seq)-1])
-	switch final {
-	case 'A':
-		return true, "up"
-	case 'B':
-		return true, "down"
-	case 'C':
-		return true, "right"
-	case 'D':
-		return true, "left"
-	case '~':
-		// Edit keys and paste markers, identified by parameters.
-		switch params {
-		case "11":
-			return true, "help"
-		case "200":
-			return true, "paste-start"
-		case "201":
-			return true, "paste-end"
-		}
-		return true, ""
-	}
-	// Mouse reports (<0;…M/m) and other CSI finals: ignore.
-	return true, ""
-}
-
-func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.Writer) error {
-	plain := false
-	filtered := []string{}
-	for _, part := range pos {
-		if part == "--plain" {
-			plain = true
-		} else {
-			filtered = append(filtered, part)
-		}
-	}
-	pos = filtered
-	arg := func(n int) string {
-		if len(pos) > n {
-			return pos[n]
-		}
-		return ""
-	}
-	switch pos[0] {
-	case "control":
-		b, e := readInput(input)
-		if e != nil {
-			return e
-		}
-		var request struct {
-			Command string `json:"command"`
-			Capture bool   `json:"capture_output"`
-		}
-		if e = strict(b, &request); e != nil {
-			return e
-		}
-		state := &consoleState{capture: request.Capture}
-		_, e = s.consoleCommand(arg(1), request.Command, state)
-		if e != nil {
-			return e
-		}
-		return printJSON(out, map[string]any{"message": state.message, "selected_agent": state.selected})
-	case "web":
-		return s.serveWeb(arg(1), out)
-	case "_assist":
-		if len(pos) != 2 {
-			return fmt.Errorf("identifiant de question requis")
-		}
-		turn, e := s.assistTurn(pos[1])
-		if e != nil {
-			return e
-		}
-		s.runAssistTurn(turn)
-		return nil
-	case "_supervise":
-		return s.supervise(arg(1))
-	case "console":
-		if plain {
-			return s.plainConsole(arg(1), os.Stdin, out, asJSON)
-		}
-		return s.console(arg(1), os.Stdin, out, asJSON)
-	case "providers":
-		if arg(1) == "init" {
-			if e := s.initProviders(); e != nil {
-				return e
-			}
-			fmt.Fprintln(out, "Configuration créée : .swarm/providers.json (aucun fournisseur lancé)")
-			return nil
-		}
-		p, e := s.providers()
-		if e != nil {
-			return e
-		}
-		return printJSON(out, p)
-	case "agent":
-		switch arg(1) {
-		case "list":
-			a, e := s.cockpitSnapshot(arg(2))
-			if e != nil {
-				return e
-			}
-			return printJSON(out, a)
-		case "history":
-			path, e := localFile(s.root, ".swarm/imports/"+arg(2)+"/manifest.json")
-			if e != nil {
-				return e
-			}
-			b, e := os.ReadFile(path)
-			if e != nil {
-				return e
-			}
-			var bundle Bundle
-			if e = json.Unmarshal(b, &bundle); e != nil {
-				return e
-			}
-			return printJSON(out, map[string]any{"historical_only": true, "history": bundle.Cockpit})
-		case "show":
-			a, e := s.agent(arg(2))
-			if e != nil {
-				return e
-			}
-			d, _ := s.desired(a.ID)
-			return printJSON(out, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d})
-		case "start":
-			b, e := readInput(input)
-			if e != nil {
-				return e
-			}
-			var r Launch
-			if e = strict(b, &r); e != nil {
-				return e
-			}
-			a, created, e := s.prepare(arg(2), r)
-			if e != nil {
-				return e
-			}
-			if created {
-				if e = s.spawnAgent(a); e != nil {
-					return e
-				}
-			}
-			return printJSON(out, map[string]any{"agent": a, "created": created})
-		case "stop":
-			if e := s.stopAgent(arg(2)); e != nil {
-				return e
-			}
-			fmt.Fprintln(out, "Arrêt demandé ; vérifier agent show pour la confirmation.")
-			return nil
-		case "reconcile":
-			return s.reconcile(arg(2))
-		case "logs":
-			after := int64(0)
-			if arg(3) != "" {
-				var e error
-				after, e = strconv.ParseInt(arg(3), 10, 64)
-				if e != nil {
-					return e
-				}
-			}
-			if _, e := s.agent(arg(2)); e != nil {
-				return e
-			}
-			logs, e := s.logs(arg(2), after)
-			if e != nil {
-				return e
-			}
-			if output != "" {
-				f, e := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-				if e != nil {
-					return e
-				}
-				defer f.Close()
-				for _, l := range logs {
-					if e = json.NewEncoder(f).Encode(l); e != nil {
-						return e
-					}
-				}
-				return nil
-			}
-			return printJSON(out, logs)
-		}
-	}
-	return fmt.Errorf("commande cockpit inconnue")
 }

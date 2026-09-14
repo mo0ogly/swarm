@@ -1,0 +1,19 @@
+/* Graphe du travail : lecture avant décoration. Aucune couleur brute, aucune
+   animation — une alerte ne doit jamais être masquée par un mouvement. */
+.graph-cadre-defilant{overflow:auto;max-width:100%;border:1px solid var(--wattson-ligne);border-radius:14px;background:var(--wattson-carte-appuyee);padding:8px}
+.graph-svg{display:block;min-width:100%}
+.graph-arete{fill:none;stroke:var(--wattson-libelle);stroke-width:1.5}
+.graph-fleche{fill:var(--wattson-libelle)}
+.graph-noeud{cursor:pointer}
+.graph-noeud .graph-cadre{fill:var(--wattson-carte);stroke:var(--wattson-ligne);stroke-width:1.5}
+.graph-noeud:focus{outline:none}
+.graph-noeud:focus .graph-cadre,.graph-noeud:hover .graph-cadre{stroke:var(--wattson-lien);stroke-width:3}
+.graph-noeud[data-etat=active] .graph-cadre{stroke:var(--wattson-info-encre);stroke-width:2.5}
+.graph-noeud[data-etat=alerte] .graph-cadre{stroke:var(--wattson-alerte);stroke-width:2.5}
+.graph-noeud[data-etat=attention] .graph-cadre{stroke:var(--wattson-attention);stroke-width:2.5}
+.graph-noeud[data-etat=validee] .graph-cadre{stroke:var(--wattson-accent);stroke-width:2.5}
+.graph-titre{font-size:13px;font-weight:700;fill:var(--wattson-titre)}
+.graph-sous-titre{font-size:12px;fill:var(--wattson-texte)}
+.graph-agent{font-size:11px;fill:var(--wattson-libelle)}
+.graph-alerte{font-size:11px;font-weight:700;fill:var(--wattson-alerte)}
+.graph-legende{margin-top:10px;font-size:13px;color:var(--wattson-libelle)}
