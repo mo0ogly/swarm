@@ -61,8 +61,17 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 		in.gateValid[w.Tasks[i].ID] = s.validGate(&w.Tasks[i])
 	}
 	// L'identifiant reste stable par sujet : une même demande ne réapparaît pas.
+	// Les identifiants construits ici sont ceux des sujets actuels ; toute carte
+	// enregistrée qui n'en fait plus partie décrit un sujet disparu.
+	courants := map[string]bool{}
+	// Sujet = tâche + catégorie. Sert à distinguer « une évaluation plus récente
+	// a pris la suite » de « la condition a disparu » : dans le second cas la
+	// carte reste ouverte, car un garde-fou de revalidation peut subsister.
+	sujetsCourants := map[string]bool{}
 	for _, x := range buildEscalations(in) {
 		d := Decision{ID: hash([]byte(work + "|" + x.TaskID + "|" + x.AgentID + "|" + x.Kind + "|" + x.Version)), TaskID: x.TaskID, AgentID: x.AgentID, Kind: x.Kind, Summary: x.Summary, Evidence: x.Proof, Created: now()}
+		courants[d.ID] = true
+		sujetsCourants[d.TaskID+"|"+d.Kind] = true
 		raw, _ := json.Marshal(d)
 		if _, e := s.db.Exec("INSERT OR IGNORE INTO decisions(id,work_id,body) VALUES(?,?,?)", d.ID, work, raw); e != nil {
 			return nil, e
@@ -95,16 +104,30 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 			continue
 		}
 		state, exists := in.validation.Tasks[d.TaskID]
-		if d.Kind == "gate" && exists && len(state.Blockers) > 0 {
+		// Une gate réenregistrée crée une carte par version. Sans cette
+		// distinction, la version précédente était rouverte de force à chaque
+		// lecture et ne se refermait jamais : le même sujet s'empilait à
+		// l'écran, une fois par évaluation passée.
+		courant := courants[d.ID]
+		switch {
+		case courant && d.Kind == "gate" && exists && len(state.Blockers) > 0:
 			d.Evidence = validationDetails(state)
 			d.ResolvedAt = ""
-		} else if exists && state.Fresh && d.ResolvedAt == "" {
+		case exists && state.Fresh && d.ResolvedAt == "":
 			if err := s.resolveDecision(work, d.ID, "moteur", "Revalidation constatée : acceptation et dépendances actuellement valides."); err != nil {
 				return nil, err
 			}
 			d.Author = "moteur"
 			d.ResolvedAt = now()
 			d.Resolution = "Revalidation constatée : acceptation et dépendances actuellement valides."
+		case !courant && sujetsCourants[d.TaskID+"|"+d.Kind] && d.ResolvedAt == "":
+			const motif = "Sujet remplacé : une évaluation plus récente de la même tâche a pris la suite."
+			if err := s.supersedeDecision(work, d.ID, motif); err != nil {
+				return nil, err
+			}
+			d.Author = "moteur"
+			d.ResolvedAt = now()
+			d.Resolution = motif
 		}
 	}
 	return out, rows.Err()
@@ -157,6 +180,41 @@ func (s *Store) resolveDecision(work, id, author, note string) error {
 		return e
 	}
 	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, d.ResolvedAt, "decision", d.TaskID+" : "+author+" : "+note); e != nil {
+		return e
+	}
+	return tx.Commit()
+}
+
+// supersedeDecision clôt une carte dont le sujet a été repris par une version
+// plus récente. Ce n'est pas un acquittement : le blocage reste porté par la
+// carte courante, donc le garde-fou de revalidation de resolveDecision — qui
+// empêche un humain de faire taire un blocage actif — ne s'applique pas ici et
+// n'est pas affaibli. Seul le moteur emprunte ce chemin.
+func (s *Store) supersedeDecision(work, id, note string) error {
+	tx, e := s.db.Begin()
+	if e != nil {
+		return e
+	}
+	defer tx.Rollback()
+	var raw []byte
+	if e = tx.QueryRow("SELECT body FROM decisions WHERE work_id=? AND id=?", work, id).Scan(&raw); e != nil {
+		return e
+	}
+	var d Decision
+	if e = json.Unmarshal(raw, &d); e != nil {
+		return e
+	}
+	if d.ResolvedAt != "" {
+		return nil
+	}
+	d.Author = "moteur"
+	d.Resolution = note
+	d.ResolvedAt = now()
+	raw, _ = json.Marshal(d)
+	if _, e = tx.Exec("UPDATE decisions SET body=? WHERE id=? AND work_id=?", raw, id, work); e != nil {
+		return e
+	}
+	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, d.ResolvedAt, "decision", d.TaskID+" : moteur : "+note); e != nil {
 		return e
 	}
 	return tx.Commit()
