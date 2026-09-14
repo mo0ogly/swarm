@@ -24,6 +24,9 @@ const fail = m => { throw new Error(m); };
     p.setDefaultTimeout(30000);
     p.on('pageerror', e => fail('erreur JS de la page : ' + e.message));
     await p.goto(url);
+    // Les vues de cette recette sont rangees par le mode Conduite (defaut
+    // depuis SC-20) : demander le mode expert plutot que cliquer a l'aveugle.
+    await p.waitForSelector('#mode');if(await p.evaluate(()=>document.body.dataset.mode)==='conduite'){await p.click('#mode');await p.waitForFunction(()=>document.body.dataset.mode==='expert')}
     await p.waitForFunction(() => document.querySelectorAll('#work option').length > 1);
     await p.select('#work', fixture.work);
     await p.waitForSelector('[data-task="AS-01"]');

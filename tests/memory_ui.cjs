@@ -20,7 +20,7 @@ print(json.dumps({'type':'result','result':'# RETEX de recette\\nConstat : une a
  const server=spawn(binary,['--root',root,'web']);let output='';server.stdout.on('data',d=>output+=d);let deadline=Date.now()+10000;while(!output.includes('/session/')){if(Date.now()>deadline)throw Error('Server timeout');await new Promise(r=>setTimeout(r,100))}const url=output.match(/http:\/\/\S+/)[0];
  const browser=await pup.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const errors=[],checks=[];
  try{
- const p=await browser.newPage();p.on('pageerror',e=>errors.push(e.message));await p.setViewport({width:1440,height:1100});await p.goto(url);await p.waitForSelector('[data-task="UI-01"]');await p.click('[data-view="brainstorm"]');
+ const p=await browser.newPage();p.on('pageerror',e=>errors.push(e.message));await p.setViewport({width:1440,height:1100});await p.goto(url);await p.waitForSelector('[data-task="UI-01"]');await p.waitForSelector('#mode');if(await p.evaluate(()=>document.body.dataset.mode)==='conduite'){await p.click('#mode');await p.waitForFunction(()=>document.body.dataset.mode==='expert')};await p.click('[data-view="brainstorm"]');
  async function click(text,scope='body'){await p.locator(scope+' button::-p-text('+text+')').click()}
  async function fill(sel,v){await p.click(sel,{clickCount:3});await p.type(sel,v)}
  async function closed(){await p.waitForFunction(()=>!document.querySelector('#modal').open)}
