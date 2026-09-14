@@ -200,13 +200,20 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 		autonomy: s.autonomy(work), slots: s.slots(work), paused: s.paused(work),
 		depsReady: map[string]bool{}, priority: s.priorities(work)}
 	// Le seuil s'appuie sur ce que les fournisseurs ont réellement rapporté ;
-	// sans réserve configurée, aucun plafond n'est déduit.
-	if summary, err := s.costSummary(work); err == nil {
-		in.taskCost = summary.ByTask
+	// sans réserve configurée, aucun plafond n'est déduit. Une lecture qui
+	// échoue n'est pas une absence de dépassement : elle désactiverait le
+	// plafond en silence, donc elle arrête l'ordonnancement comme les autres
+	// lectures de cette fonction.
+	summary, e := s.costSummary(work)
+	if e != nil {
+		return nil, e
 	}
-	if v, err := s.budget(work); err == nil {
-		in.reserve = v.Budget.Reserve
+	in.taskCost = summary.ByTask
+	v, e := s.budget(work)
+	if e != nil {
+		return nil, e
 	}
+	in.reserve = v.Budget.Reserve
 	for i := range w.Tasks {
 		in.depsReady[w.Tasks[i].ID] = s.dependenciesReady(&w, &w.Tasks[i])
 	}

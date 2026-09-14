@@ -49,9 +49,13 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 		return nil, e
 	}
 	in := escalationInputs{work: &w, agents: agents, budget: budget, validation: s.validationState(&w), gateValid: map[string]bool{}}
-	if summary, err := s.costSummary(work); err == nil {
-		in.taskCost = summary.ByTask
+	// Même règle qu'à l'ordonnancement : une lecture de coût qui échoue ferait
+	// disparaître le dépassement de l'écran, pas le dépassement lui-même.
+	summary, e := s.costSummary(work)
+	if e != nil {
+		return nil, e
 	}
+	in.taskCost = summary.ByTask
 	in.reserve = budget.Budget.Reserve
 	for i := range w.Tasks {
 		in.gateValid[w.Tasks[i].ID] = s.validGate(&w.Tasks[i])

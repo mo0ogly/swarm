@@ -414,3 +414,23 @@ func TestDispatchHoldsTaskOverCostThreshold(t *testing.T) {
 		t.Fatal("des tentatives muettes ne doivent pas retenir un départ")
 	}
 }
+
+// Une lecture de coût qui échoue n'est pas une absence de dépassement. Tant
+// qu'elle était avalée, le plafond disparaissait en silence et l'ordonnanceur
+// repartait sans borne ; l'écran des décisions perdait le sujet de la même
+// façon. Les deux doivent s'arrêter, comme ils le font déjà pour les autres
+// lectures de leur fonction.
+func TestCostReadFailureStopsDispatchAndDecisions(t *testing.T) {
+	s := storeTest(t)
+	w, _ := setupAgent(t, s)
+	// La table des réservations n'est lue, dans dispatch, que par la lecture du
+	// budget : la faire disparaître isole ce chemin, alors que supprimer la
+	// table des agents ferait échouer une lecture antérieure et ne prouverait
+	// rien du repli choisi ici.
+	if _, e := s.db.Exec("DROP TABLE reservations"); e != nil {
+		t.Fatal(e)
+	}
+	if _, e := s.dispatch(w.ID); e == nil {
+		t.Fatal("réserve illisible : l'ordonnancement doit s'arrêter, pas repartir sans plafond")
+	}
+}
