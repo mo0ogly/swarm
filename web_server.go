@@ -241,6 +241,9 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		snapshot["resume"] = s.resumeSinceText(work, v)
+		// Le cockpit doit pouvoir situer ce qui a changé depuis la visite
+		// précédente ; jusqu'ici cette date ne sortait que sous forme de texte.
+		snapshot["visit"] = v
 		providers, e := s.providers()
 		if e == nil {
 			snapshot["providers"] = providers

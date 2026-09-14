@@ -3,6 +3,12 @@
 // le moteur ou vous — parce que c'est la seule chose que l'autonomie rend
 // difficile à savoir après coup.
 
+// Référence de visite figée à l'ouverture du travail. Si on la relisait à
+// chaque rafraîchissement, le repère glisserait sous les yeux du lecteur — une
+// visite écrite ailleurs (cockpit terminal, second onglet) le ferait sauter en
+// tête et lui ferait perdre ce qu'il était en train de parcourir.
+let filVisiteReference = null;
+
 let filEntrees = [];
 let filCurseur = '';
 let filSuite = false;
@@ -40,11 +46,35 @@ function filLigne(entree, jourPrecedent) {
   return { li, jour };
 }
 
+// Âge lisible : « il y a 2 h » situe mieux qu'une date absolue au moment de
+// reprendre un travail.
+function filDepuis(iso) {
+  const minutes = Math.round((Date.now() - Date.parse(iso)) / 60000);
+  if (!Number.isFinite(minutes) || minutes < 1) return "à l'instant";
+  if (minutes < 60) return 'il y a ' + minutes + ' min';
+  const heures = Math.round(minutes / 60);
+  if (heures < 24) return 'il y a ' + heures + ' h';
+  return 'il y a ' + Math.round(heures / 24) + ' j';
+}
+
+function filSeparateurVisite() {
+  const li = node('li', undefined, 'fil-visite');
+  li.append(node('span', 'votre dernière visite · ' + filDepuis(filVisiteReference)));
+  return li;
+}
+
 function filRendre() {
   const liste = $('fil-entrees');
   liste.replaceChildren();
   let jour = '';
+  let separateurPose = false;
   for (const entree of filEntrees) {
+    // Le trait se pose devant la première entrée antérieure à la visite de
+    // référence : tout ce qui est au-dessus est arrivé depuis.
+    if (!separateurPose && filVisiteReference && entree.at < filVisiteReference) {
+      liste.append(filSeparateurVisite());
+      separateurPose = true;
+    }
     const { li, jour: j } = filLigne(entree, jour);
     jour = j;
     liste.append(li);
@@ -89,6 +119,8 @@ function filRafraichir() {
     filEntrees = [];
     filCurseur = '';
     filSuite = false;
+    // La référence est prise une fois, à l'ouverture du travail.
+    filVisiteReference = snapshot?.visit?.at || null;
     filCharger();
     return;
   }
