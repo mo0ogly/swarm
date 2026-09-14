@@ -378,3 +378,27 @@ func TestTaskActionsDependanceNonValidee(t *testing.T) {
 		t.Errorf("motif sans identifiant de dépendance : %q", byKind["start"].Raison)
 	}
 }
+
+// Le cockpit propose une action au nom de l'oracle : un nom qui n'existe plus
+// laisse la liste déroulante vide et le dialogue inutilisable, sans message.
+// C'est arrivé après S28, où « todo » est devenu « reopen » côté oracle alors
+// que l'écran choisissait encore l'ancien nom. Ce test fige les noms d'actions
+// sur lesquels le cockpit s'appuie, hors recette navigateur.
+func TestTaskActionKindsUsedByCockpitExist(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	connus := map[string]bool{}
+	for _, a := range s.taskActions(&w, &w.Tasks[0], nil) {
+		connus[a.Kind] = true
+	}
+	// Noms écrits en dur dans web/cockpit.js et web/conduite.js.
+	for _, kind := range []string{"start", "retry", "stop", "reconcile", "report",
+		"submit", "gate", "accepted", "override", "reopen", "assign"} {
+		if !connus[kind] {
+			t.Errorf("le cockpit référence l'action %q, absente de l'oracle : le dialogue resterait vide", kind)
+		}
+	}
+	if connus["todo"] {
+		t.Error("« todo » est un statut, pas une action : le cockpit doit employer « reopen »")
+	}
+}
