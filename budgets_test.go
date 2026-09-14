@@ -3,6 +3,7 @@
 package main
 
 import (
+	"strings"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -95,5 +96,13 @@ func TestBudgetExposesReportedCostOnlyWhenKnown(t *testing.T) {
 	}
 	if v.ActualCost == nil || *v.ActualCost != 2.50 {
 		t.Fatalf("le coût rapporté doit remonter au budget : %+v", v.ActualCost)
+	}
+	// L'écran du budget est le seul consacré à la dépense. Tant qu'il affirmait
+	// « Coût réel indisponible », il démentait le montant qu'il portait lui-même.
+	if strings.Contains(v.Policy, "indisponible") {
+		t.Fatalf("la politique nie un coût que la vue renseigne : %q", v.Policy)
+	}
+	if !strings.Contains(v.Policy, "réservé") && !strings.Contains(v.Policy, "Réservations") {
+		t.Fatalf("la politique doit distinguer le réservé de la dépense : %q", v.Policy)
 	}
 }

@@ -114,7 +114,12 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  // rafraîchissement du cockpit peut reconstruire les champs : saisir, vérifier.
  await apercuGate('Gate de recette UI-01');await confirm();await openTask('UI-01','accepted');await has('#preview','PASS');await confirm();await has('[data-task="UI-01"]','Acceptée');checks.push('Gate preview/record then acceptance with live row refresh');
  await page.click('[data-view="resume"]');await page.click('#ooda');for(const [k,v]of Object.entries({observation:'Parcours UI observé.',orientation:'Les états sont distincts.',decision:'Examiner la suite.',result:'Première tâche acceptée.',next:'Vérifier le budget de UI-02.'}))await fill('#field-'+k,v);await confirm();await has('#resume-text','Vérifier le budget');await shot('etat-ooda');await page.click('#visit');await has('#message','marquée comme vue');checks.push('OODA and per-operator visit retained');
- await page.click('[data-view="budget"]');await has('#usage-list','12 entrée / 8 sortie');await has('#usage-list','Cache lu : 19');await page.click('#budget-edit');for(const [k,v]of Object.entries({limit:'0.1',reserve:'1',source:'Estimation de fixture en USD par lancement',date:'2026-09-12'}))await fill('#field-'+k,v);await confirm();// Budget insuffisant : depuis S28 le lancement n'est plus proposé, et le motif
+ await page.click('[data-view="budget"]');await has('#usage-list','12 entrée / 8 sortie');await has('#usage-list','Cache lu : 19');
+ // L'ecran du budget affirmait « Cout reel indisponible » alors qu'il portait
+ // le montant. Il doit dire l'un des deux etats, jamais nier ce qu'il sait.
+ await has('#budget-info','Coût rapporté par les fournisseurs');
+ const politique=await page.$eval('#budget-info',e=>e.textContent);
+ assert.ok(!/indisponible/.test(politique),'l’écran du budget nie encore connaître le coût : '+politique);await page.click('#budget-edit');for(const [k,v]of Object.entries({limit:'0.1',reserve:'1',source:'Estimation de fixture en USD par lancement',date:'2026-09-12'}))await fill('#field-'+k,v);await confirm();// Budget insuffisant : depuis S28 le lancement n'est plus proposé, et le motif
  // est lisible avant toute tentative.
  await page.click('[data-view="tasks"]');
  await page.waitForFunction(()=>/[Bb]udget/.test(document.querySelector('#tasks-body [data-task="UI-02"] button').title));

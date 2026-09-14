@@ -28,7 +28,7 @@ type BudgetView struct {
 }
 
 func (s *Store) budget(work string) (BudgetView, error) {
-	v := BudgetView{Policy: "Budget estimatif non garanti. Réservations atomiques avant départ ; les agents actifs continuent. Coût réel indisponible."}
+	v := BudgetView{Policy: "Budget estimatif non garanti. Réservations atomiques avant départ ; les agents actifs continuent. Le réservé n'est pas une dépense : le coût rapporté est indiqué à part."}
 	var raw []byte
 	e := s.db.QueryRow("SELECT body FROM budgets WHERE work_id=?", work).Scan(&raw)
 	if e != nil && e != sql.ErrNoRows {
