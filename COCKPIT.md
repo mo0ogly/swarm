@@ -97,12 +97,105 @@ puis SIGKILL après trois secondes si nécessaire. Le budget de temps vaut 30 mi
 par défaut ; le JSON permet de le régler de 1 seconde à 24 heures. Ce budget
 n'est pas un plafond financier. Les modifications déjà réalisées restent sur disque.
 
-Après la fin d'un processus, la tâche reste **bloquée en attente d'examen du
-handoff**, même avec un code de sortie nul. `submit` nécessite un fichier de
-handoff non vide puis place la tâche en `submitted`. L'acceptation passe toujours
-par les gates existantes et leurs preuves courantes. Aucun bouton ne force SHIP.
+Après la fin d'un processus, la tâche est **soumise à examen**, jamais acceptée.
+Un code de sortie nul ne suffit pas : le conducteur relaie le handoff seulement
+si la tentative s'est terminée normalement et qu'elle a produit **un seul**
+rapport lisible et non vide, `docs/<tâche>.md` ou `docs/<tâche>-*handoff*.md`,
+modifié après son départ. La tâche passe alors en `submitted` et le journal de
+la tentative nomme le fichier relayé. Sans rapport, avec un rapport vide,
+plusieurs rapports candidats, un rapport antérieur à la tentative, ou après un
+échec ou une interruption, la tâche reste **bloquée avec son motif** et le
+refus est journalisé. `submit` reste disponible pour soumettre un handoff à la
+main. L'acceptation passe toujours par les gates existantes et leurs preuves
+courantes. Aucun bouton ne force SHIP.
 Si une écriture métier rencontre une révision concurrente, le journal demande une
 réconciliation ; `reconcile` peut terminer cette mise à jour après relecture.
+
+## Graphe du travail
+
+Le mode Conduite affiche le plan sous forme de graphe : un nœud par tâche, une
+arête par dépendance, orientés de gauche à droite. Un nœud porte l'état de la
+tâche et, pour chaque tentative vivante, le fournisseur, l'action courante en
+français, les appels d'outils, le coût estimé et l'âge du dernier résultat.
+
+« Signal perdu » et « terminé » restent distincts : un nœud « en cours » ne
+prouve pas qu'un processus tourne encore. Au-delà du délai de surveillance, le
+nœud le dit en clair.
+
+Un nœud s'atteint au clavier et ouvre les actions de sa tâche. La liste sous le
+graphe porte la même information en texte. La disposition vient de dagre,
+embarqué dans le binaire : le graphe fonctionne sur un poste sans réseau.
+
+## Deux niveaux d'interface
+
+Le cockpit ouvre en **mode Conduite** : un seul écran — barre de conduite,
+« À traiter », plan avec l'action courante de chaque agent. Les journaux bruts,
+l'administration des fournisseurs, l'OODA, la hiérarchie et l'assistant sont
+rangés, pas retirés.
+
+« Passer en mode expert » rend toutes les vues ; la bascule est conservée d'une
+session à l'autre et peut être imposée par l'URL (`?mode=expert`, `?mode=conduite`).
+
+En terminal, la commande `mode` fait la même bascule : écran de conduite compact
+ou tableau de bord complet. `--plain`, `NO_COLOR` et `TERM=dumb` restent
+respectés dans les deux cas.
+
+## Niveaux d'autonomie et départs automatiques
+
+Chaque travail porte un niveau, réglé localement comme la suspension des départs.
+Le niveau décide de ce que le moteur fait sans demander, jamais de ce qu'il
+accepte : aucun niveau n'accepte une tâche, n'accorde une dérogation ni ne fait
+passer une gate.
+
+| Niveau | Départs | Relais du handoff | Gate et acceptation |
+|---|---|---|---|
+| `manuel` | humain | humain | humain |
+| `assiste` | humain | automatique si preuve lisible | humain |
+| `autonome` (défaut) | automatiques dans les créneaux | automatique | humain |
+
+```sh
+./tools/swarm-companion/swarm autonomy TRAVAIL            # lire le réglage courant
+./tools/swarm-companion/swarm autonomy TRAVAIL assiste    # changer de niveau
+./tools/swarm-companion/swarm autonomy TRAVAIL autonome 3 # niveau et créneaux
+./tools/swarm-companion/swarm dispatch TRAVAIL            # ordonnancer maintenant
+```
+
+Le premier lancement humain enregistre un **profil de lancement** — fournisseur,
+rôle, espace de travail, consigne, limites — sur la tâche et sur le travail.
+L'ordonnanceur rejoue ce profil : le formulaire n'est plus à remplir tâche après
+tâche. Le profil d'une tâche prime sur celui du travail.
+
+Une tâche part automatiquement si, dans cet ordre : le niveau est `autonome`, les
+départs ne sont pas suspendus, un créneau est libre, ses dépendances sont
+acceptées et fraîches, un profil existe, elle n'a pas épuisé ses deux tentatives
+automatiques, et son espace de travail n'est pas déjà occupé. Deux départs
+simultanés supposent deux espaces de travail distincts.
+
+Ne repartent jamais d'elles-mêmes : une tâche dont le handoff a été refusé, une
+tâche arrêtée à la demande de l'opérateur, une tâche après deux tentatives
+automatiques infructueuses. Chaque refus d'ordonnancement est journalisé dans le
+travail avec son motif.
+
+## Ce qui réclame un humain
+
+Le cockpit distingue ce qui s'affiche de ce qui se décide. Une information
+visible n'est pas une demande ; seules ces catégories réclament un opérateur,
+et chacune n'apparaît qu'une fois par sujet :
+
+| Catégorie | Déclencheur |
+|---|---|
+| Rapport à examiner | une tâche est soumise |
+| Gate à revalider | gate échouée, refusée, ou preuves périmées |
+| Handoff non relayé | tentative terminée dont le rapport manque, est vide, périmé ou ambigu |
+| Tentative infructueuse | échec ou interruption, avec le nombre de tentatives |
+| Garde-fou déclenché | tentative arrêtée par une limite d'exécution |
+| Signal perdu | tentative déclarée vivante sans signal depuis le délai de surveillance |
+| Budget estimé | seuil atteint ou enveloppe épuisée ; estimation, jamais une dépense facturée |
+
+Si la tâche porte déjà la demande, la tentative qui l'a produite n'en ajoute pas
+une seconde. Une tentative vivante n'est pas une décision. Une tâche acceptée et
+fraîche n'interrompt personne. Un acquittement n'accepte pas la tâche et
+n'arrête aucun processus.
 
 ## Automatiser les mêmes actions
 
