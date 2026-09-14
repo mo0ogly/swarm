@@ -182,3 +182,44 @@ func TestActivityLimitClampsToCeiling(t *testing.T) {
 		t.Fatalf("une demande de 500 doit être ramenée au plafond, %d entrées rendues", len(page.Entries))
 	}
 }
+
+// Plusieurs entrées peuvent partager un horodatage. Un curseur qui ne connaît
+// que le temps les saute ensemble : la pagination perdait alors des entrées
+// sans le dire, ce qu'aucun affichage ne peut rattraper.
+func TestActivityCursorKeepsSimultaneousEntries(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	const simultane = "2026-09-14T10:00:00.000000000Z"
+	const attendues = 6
+	for i := 0; i < attendues; i++ {
+		if _, e := s.db.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)",
+			w.ID, simultane, "dispatch", "départ simultané"); e != nil {
+			t.Fatal(e)
+		}
+	}
+	page, e := s.activity(w.ID, activityQuery{Limit: 3})
+	if e != nil {
+		t.Fatal(e)
+	}
+	rendues, curseurs := 0, map[string]bool{}
+	for tours := 0; tours < 12; tours++ {
+		for _, x := range page.Entries {
+			if x.At == simultane {
+				rendues++
+			}
+			if curseurs[x.cursor()] {
+				t.Fatalf("curseur non unique, entrée rendue deux fois : %s", x.cursor())
+			}
+			curseurs[x.cursor()] = true
+		}
+		if !page.More {
+			break
+		}
+		if page, e = s.activity(w.ID, activityQuery{Limit: 3, Before: page.Next}); e != nil {
+			t.Fatal(e)
+		}
+	}
+	if rendues != attendues {
+		t.Fatalf("entrées simultanées perdues par la pagination : %d rendues sur %d", rendues, attendues)
+	}
+}

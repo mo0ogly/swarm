@@ -18,12 +18,25 @@ const (
 )
 
 type ActivityEntry struct {
-	At      string `json:"at"`
+	At string `json:"at"`
+	// Rang d'écriture dans sa table, préfixé par la source. Deux entrées peuvent
+	// partager un horodatage ; sans ce discriminant, le curseur de pagination
+	// les saute ensemble et les perd en silence.
+	Rank    string `json:"rank"`
 	Origin  string `json:"origin"`
 	Kind    string `json:"kind"`
 	Label   string `json:"label"`
 	TaskID  string `json:"task_id,omitempty"`
 	Message string `json:"message"`
+}
+
+// Clé de pagination : l'horodatage seul ne suffit pas à désigner une entrée.
+func (x ActivityEntry) cursor() string { return x.At + "|" + x.Rank }
+
+// Le rang est comparé comme une chaîne : le remplissage par des zéros conserve
+// l'ordre numérique, sans quoi 10 se classerait avant 9.
+func activityRank(source string, n int64) string {
+	return fmt.Sprintf("%s%012d", source, n)
 }
 
 type activityQuery struct {
@@ -112,17 +125,18 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 	page := ActivityPage{Entries: []ActivityEntry{}}
 	entries := []ActivityEntry{}
 
-	rows, e := s.db.Query("SELECT at,kind,message FROM cockpit_events WHERE work_id=? ORDER BY seq DESC LIMIT 500", work)
+	rows, e := s.db.Query("SELECT seq,at,kind,message FROM cockpit_events WHERE work_id=? ORDER BY seq DESC LIMIT 500", work)
 	if e != nil {
 		return page, e
 	}
 	for rows.Next() {
+		var seq int64
 		var at, kind, message string
-		if e = rows.Scan(&at, &kind, &message); e != nil {
+		if e = rows.Scan(&seq, &at, &kind, &message); e != nil {
 			rows.Close()
 			return page, e
 		}
-		entries = append(entries, ActivityEntry{At: at, Origin: activityOrigin(kind),
+		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("c", seq), Origin: activityOrigin(kind),
 			Kind: kind, Label: activityLabel(kind), Message: message})
 	}
 	rows.Close()
@@ -130,20 +144,21 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 		return page, e
 	}
 
-	rows, e = s.db.Query("SELECT kind,at,payload FROM events WHERE work_id=? ORDER BY revision DESC LIMIT 500", work)
+	rows, e = s.db.Query("SELECT revision,kind,at,payload FROM events WHERE work_id=? ORDER BY revision DESC LIMIT 500", work)
 	if e != nil {
 		return page, e
 	}
 	for rows.Next() {
+		var revision int64
 		var kind, at string
 		var raw []byte
-		if e = rows.Scan(&kind, &at, &raw); e != nil {
+		if e = rows.Scan(&revision, &kind, &at, &raw); e != nil {
 			rows.Close()
 			return page, e
 		}
 		var p activityPayload
 		_ = json.Unmarshal(raw, &p)
-		entries = append(entries, ActivityEntry{At: at, Origin: activityOrigin(kind),
+		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("e", revision), Origin: activityOrigin(kind),
 			Kind: kind, Label: activityLabel(kind), TaskID: p.task(), Message: activityMessage(kind, p)})
 	}
 	rows.Close()
@@ -151,20 +166,17 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 		return page, e
 	}
 
-	// Une entrée sans horodatage exploitable part en fin plutôt que de prendre
-	// une place qu'elle ne mérite pas.
-	sort.SliceStable(entries, func(i, j int) bool {
-		if entries[i].At == entries[j].At {
-			return entries[i].Kind < entries[j].Kind
-		}
-		return entries[i].At > entries[j].At
+	// Ordre total sur (horodatage, rang) : deux entrées simultanées restent
+	// départageables, ce qu'un tri sur le seul horodatage ne garantit pas.
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].cursor() > entries[j].cursor()
 	})
 
 	for _, x := range entries {
 		if q.DecisionsOnly && x.Origin != activityHuman {
 			continue
 		}
-		if q.Before != "" && x.At >= q.Before {
+		if q.Before != "" && x.cursor() >= q.Before {
 			continue
 		}
 		if len(page.Entries) == q.Limit {
@@ -174,7 +186,7 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 		page.Entries = append(page.Entries, x)
 	}
 	if n := len(page.Entries); n > 0 {
-		page.Next = page.Entries[n-1].At
+		page.Next = page.Entries[n-1].cursor()
 	}
 	return page, nil
 }
