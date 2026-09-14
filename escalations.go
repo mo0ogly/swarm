@@ -20,6 +20,7 @@ import (
 //	garde     — tentative arrêtée par un garde-fou d'exécution
 //	silence   — tentative déclarée vivante mais sans signal
 //	budget    — seuil de budget estimé atteint ; jamais un montant facturé
+//	cout      — une tâche a dépassé son enveloppe de départ ; départs retenus
 type escalation struct {
 	TaskID  string
 	AgentID string
@@ -35,6 +36,8 @@ type escalationInputs struct {
 	budget     BudgetView
 	validation WorkValidation
 	gateValid  map[string]bool
+	taskCost   map[string]CostTotal
+	reserve    float64
 }
 
 func buildEscalations(in escalationInputs) []escalation {
@@ -61,6 +64,7 @@ func buildEscalations(in escalationInputs) []escalation {
 	if e, ok := budgetEscalation(in.budget); ok {
 		out = append(out, e)
 	}
+	out = append(out, costEscalations(in)...)
 	return out
 }
 
@@ -160,6 +164,8 @@ func escalationLabel(kind string) string {
 		return "Signal perdu"
 	case "budget":
 		return "Budget estimé"
+	case "cout":
+		return "Coût dépassé"
 	}
 	return kind
 }
@@ -170,4 +176,30 @@ func escalationSubject(task string) string {
 		return task
 	}
 	return "Travail"
+}
+
+// Une tâche qui a dépassé son enveloppe cesse de partir seule ; l'opérateur doit
+// pouvoir en décider, donc le savoir. Le montant est celui rapporté par les
+// fournisseurs, jamais une facture, et le retenir ne rend rien de ce qui est
+// déjà engagé.
+func costEscalations(in escalationInputs) []escalation {
+	out := []escalation{}
+	if in.reserve <= 0 {
+		return out
+	}
+	for _, t := range in.work.Tasks {
+		if t.Status == "accepted" || t.Status == "waived" || t.Status == "abandoned" {
+			continue
+		}
+		c := in.taskCost[t.ID]
+		if c.Reported <= costThresholdFactor*in.reserve {
+			continue
+		}
+		out = append(out, escalation{TaskID: t.ID, Kind: "cout",
+			Summary: fmt.Sprintf("%.2f USD rapportés sur %d tentative(s) pour une réserve de %.2f par départ ; départs automatiques retenus, la dépense engagée subsiste",
+				c.Reported, c.WithCost, in.reserve),
+			Proof:   "Coût rapporté par le fournisseur ; jamais une facture vérifiée",
+			Version: fmt.Sprintf("%.2f", c.Reported)})
+	}
+	return out
 }

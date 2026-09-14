@@ -155,3 +155,36 @@ func TestDecisionsFollowEscalationTaxonomy(t *testing.T) {
 		t.Fatalf("entrée inattendue : %+v", open[0])
 	}
 }
+
+func TestEscalationRaisesTaskCostOverrun(t *testing.T) {
+	in := escalationInput([]Task{{ID: "t1", Status: "todo"}}, nil)
+	in.reserve = 3.0
+	in.taskCost = map[string]CostTotal{"t1": {Reported: 6.40, WithCost: 2}}
+	kinds := escalationKinds(buildEscalations(in))
+	got, ok := kinds["cout"]
+	if !ok {
+		t.Fatalf("dépassement de coût non escaladé : %+v", kinds)
+	}
+	if !strings.Contains(got.Summary, "rapportés") {
+		t.Fatalf("le montant doit se dire rapporté, jamais facturé : %q", got.Summary)
+	}
+	if !strings.Contains(got.Summary, "subsiste") {
+		t.Fatalf("l'entrée doit dire que la dépense engagée subsiste : %q", got.Summary)
+	}
+
+	// Sous le seuil, rien à décider.
+	sous := escalationInput([]Task{{ID: "t1", Status: "todo"}}, nil)
+	sous.reserve = 3.0
+	sous.taskCost = map[string]CostTotal{"t1": {Reported: 4.00, WithCost: 2}}
+	if _, ok := escalationKinds(buildEscalations(sous))["cout"]; ok {
+		t.Fatal("sous le seuil, aucune demande ne doit être adressée à l'humain")
+	}
+
+	// Une tâche déjà acceptée n'a plus de départ à retenir.
+	acceptee := escalationInput([]Task{{ID: "t1", Status: "accepted", Gate: &GateRecord{}}}, nil)
+	acceptee.reserve = 3.0
+	acceptee.taskCost = map[string]CostTotal{"t1": {Reported: 99.0, WithCost: 4}}
+	if _, ok := escalationKinds(buildEscalations(acceptee))["cout"]; ok {
+		t.Fatal("une tâche acceptée ne doit pas réclamer une décision de coût")
+	}
+}

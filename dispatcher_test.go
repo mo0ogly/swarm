@@ -368,3 +368,49 @@ func TestSetProfileRefusesUnusableValues(t *testing.T) {
 		t.Fatalf("un profil refusé ne doit rien enregistrer : %+v", current.Profile)
 	}
 }
+
+// Le seuil de coût est la seule borne qui change le comportement du moteur :
+// elle empêche une dépense à venir. Elle n'annule rien et n'accepte rien.
+func TestDispatchHoldsTaskOverCostThreshold(t *testing.T) {
+	base := func() dispatchInputs {
+		in := dispatchTest([]Task{{ID: "t1", Status: "todo"}}, nil)
+		in.reserve = 3.0
+		return in
+	}
+
+	sous := base()
+	sous.taskCost = map[string]CostTotal{"t1": {Reported: 4.00, WithCost: 2}}
+	if list, _ := planDispatch(sous); len(list) != 1 {
+		t.Fatalf("sous le seuil, le départ reste permis : %v", dispatchedTasks(list))
+	}
+
+	au := base()
+	au.taskCost = map[string]CostTotal{"t1": {Reported: 6.40, WithCost: 2}}
+	list, raison := planDispatch(au)
+	if len(list) != 0 {
+		t.Fatalf("au-delà du seuil, le départ suivant est retenu : %v", dispatchedTasks(list))
+	}
+	if !strings.Contains(raison, "6.40") || !strings.Contains(raison, "3.00") {
+		t.Fatalf("le motif doit chiffrer le dépassement : %q", raison)
+	}
+	// Le libellé ne doit pas laisser croire à une annulation de ce qui est engagé.
+	if !strings.Contains(raison, "n'est pas annulée") {
+		t.Fatalf("le motif doit dire que la dépense engagée subsiste : %q", raison)
+	}
+
+	// Sans réserve configurée, aucun seuil : ne pas déduire de plafond.
+	sansReserve := base()
+	sansReserve.reserve = 0
+	sansReserve.taskCost = map[string]CostTotal{"t1": {Reported: 99.0, WithCost: 3}}
+	if list, _ := planDispatch(sansReserve); len(list) != 1 {
+		t.Fatal("aucune réserve configurée : aucun seuil applicable")
+	}
+
+	// Un coût non rapporté ne vaut pas un coût nul : il ne déclenche pas le seuil
+	// mais ne l'écarte pas non plus pour les tentatives qui, elles, rapportent.
+	muet := base()
+	muet.taskCost = map[string]CostTotal{"t1": {Silent: 5}}
+	if list, _ := planDispatch(muet); len(list) != 1 {
+		t.Fatal("des tentatives muettes ne doivent pas retenir un départ")
+	}
+}

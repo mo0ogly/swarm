@@ -18,12 +18,20 @@ import (
 // par le moteur au moment du départ, dans la même transaction que la tentative.
 const maxAutomaticAttempts = 2
 
+// Multiple de la réserve par départ au-delà duquel une tâche cesse de partir
+// seule. Cette borne empêche une dépense à venir ; elle n'annule rien de ce qui
+// est déjà engagé et n'accepte ni ne refuse aucune tâche. Valeur de départ à
+// vérifier à l'usage.
+const costThresholdFactor = 2.0
+
 type dispatchInputs struct {
 	work      *Work
 	agents    []Agent
 	profile   *LaunchProfile
 	depsReady map[string]bool
 	priority  map[string]int
+	taskCost  map[string]CostTotal
+	reserve   float64
 	autonomy  string
 	slots     int
 	paused    bool
@@ -87,6 +95,11 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 			continue
 		case held[t.ID]:
 			reasons = append(reasons, t.ID+" : arrêt demandé par l'opérateur, reprise à la main")
+			continue
+		case in.reserve > 0 && in.taskCost[t.ID].Reported > costThresholdFactor*in.reserve:
+			reasons = append(reasons, fmt.Sprintf(
+				"%s : %.2f USD rapportés pour une réserve de %.2f par départ ; prochain départ suspendu, la dépense engagée n'est pas annulée",
+				t.ID, in.taskCost[t.ID].Reported, in.reserve))
 			continue
 		case !in.depsReady[t.ID]:
 			continue
@@ -186,6 +199,14 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 	in := dispatchInputs{work: &w, agents: agents, profile: w.Profile,
 		autonomy: s.autonomy(work), slots: s.slots(work), paused: s.paused(work),
 		depsReady: map[string]bool{}, priority: s.priorities(work)}
+	// Le seuil s'appuie sur ce que les fournisseurs ont réellement rapporté ;
+	// sans réserve configurée, aucun plafond n'est déduit.
+	if summary, err := s.costSummary(work); err == nil {
+		in.taskCost = summary.ByTask
+	}
+	if v, err := s.budget(work); err == nil {
+		in.reserve = v.Budget.Reserve
+	}
 	for i := range w.Tasks {
 		in.depsReady[w.Tasks[i].ID] = s.dependenciesReady(&w, &w.Tasks[i])
 	}

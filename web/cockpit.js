@@ -7,7 +7,7 @@ const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefi
 function notice(text,error=false){$('message').hidden=!text;$('message').textContent=text;$('message').className='notice '+(error?'alert':'info')}
 async function api(path,data){const opts={headers:{},signal:AbortSignal.timeout(15000)};if(data!==undefined){opts.method='POST';opts.headers={'Content-Type':'application/json','X-Swarm-CSRF':csrf};opts.body=JSON.stringify(data)}const r=await fetch(path,opts);const text=await r.text();let value;try{value=JSON.parse(text)}catch{throw new Error(text||r.statusText)}if(!r.ok)throw new Error(value.error||r.statusText);return value}
 async function act(kind,fields={}){return api('/api/v1/action',{kind,work,expected_revision:modalContext?.revision??snapshot.work.revision,event_id:crypto.randomUUID(),...fields})}
-const escalationLabels={handoff:'Rapport à examiner',gate:'Gate à revalider',conduite:'Handoff non relayé',execution:'Tentative infructueuse',garde:'Garde-fou déclenché',silence:'Signal perdu',budget:'Budget estimé'};
+const escalationLabels={handoff:'Rapport à examiner',gate:'Gate à revalider',conduite:'Handoff non relayé',execution:'Tentative infructueuse',garde:'Garde-fou déclenché',silence:'Signal perdu',budget:'Budget estimé',cout:'Coût dépassé'};
 function badge(status){
  const names={propose:'Proposé',retenu:'Retenu',en_cours:'En cours',verifie:'Vérifié',ecarte:'Écarté',remplace:'Remplacé',...labels};
  const tone=['accepted','completed','acknowledged','verifie'].includes(status)?'success':['failed'].includes(status)?'alert':['stale','blocked','interrupted','waived','submitted','propose'].includes(status)?'attention':['abandoned','ecarte','remplace','todo'].includes(status)?'neutral':'info';
