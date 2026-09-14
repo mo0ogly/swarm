@@ -115,11 +115,21 @@ function marquerVisiteSortie(){
  if(!quitte) return;
  api('/api/v1/visit?work='+encodeURIComponent(quitte),{}).catch(()=>{ /* sortie : ne pas gêner le départ */ });
 }
-// `pagehide` couvre la fermeture et la navigation ; `sendBeacon` part même si la
-// page disparaît avant la fin de la requête.
+// `pagehide` couvre la fermeture et la navigation. `sendBeacon` conviendrait
+// pour survivre à la disparition de la page, mais il ne peut poser aucun
+// en-tête : le garde de session exige `X-Swarm-CSRF` sur tout non-GET, et
+// l'enregistrement repartait en 403 avalé en silence — le repère de visite
+// n'était donc jamais posé à la fermeture. `fetch` avec `keepalive` survit de
+// la même façon et porte l'en-tête.
 addEventListener('pagehide',()=>{
- if(!visiteTravail) return;
- try{ navigator.sendBeacon('/api/v1/visit?work='+encodeURIComponent(visiteTravail)) }catch{ /* rien à rattraper à la fermeture */ }
+ const quitte = visiteTravail;
+ visiteTravail = '';
+ if(!quitte) return;
+ try{
+  fetch('/api/v1/visit?work='+encodeURIComponent(quitte),
+   {method:'POST',keepalive:true,headers:{'Content-Type':'application/json','X-Swarm-CSRF':csrf},body:'{}'})
+   .catch(()=>{ /* rien à rattraper à la fermeture */ });
+ }catch{ /* rien à rattraper à la fermeture */ }
 });
 
 function setTheme(theme){document.documentElement.dataset.theme=theme;localStorage.setItem('swarm-theme',theme);$('theme').textContent=theme==='etat'?'Passer au thème sombre':'Passer au thème clair'}

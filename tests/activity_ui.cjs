@@ -138,6 +138,32 @@ const lignes=page=>page.$$eval('.fil-entree',ns=>ns.map(n=>({
  assert.ok(visiteAvant.length>0,'lecture de reprise disponible');
  checks.push('visite enregistrée à la sortie, repère présent au retour');
 
+ // 8bis. Fermeture de l'onglet. L'enregistrement partait par sendBeacon, qui ne
+ // peut poser aucun en-tête : le garde de session le refusait en 403, avalé en
+ // silence, et le repère n'était jamais posé en quittant. On mesure la date
+ // stockée avant et après la fermeture, pas la présence d'un trait à l'écran.
+ const dateVisite=async p=>{
+   const v=await p.evaluate(async id=>(await (await fetch('/api/v1/snapshot?work='+encodeURIComponent(id))).json()).visit?.at||'',actif.id);
+   return v;
+ };
+ const onglet=await browser.newPage();
+ await onglet.goto(url);
+ await onglet.waitForFunction(()=>document.querySelectorAll('#work option').length>1);
+ await onglet.select('#work',actif.id);
+ await onglet.waitForFunction(t=>document.getElementById('title').textContent===t,{},'Travail suivi');
+ await sleep(500);
+ // Mesure juste avant de fermer : le seul changement de travail écrit déjà une
+ // visite par la voie ordinaire, et la mesurer plus tôt attribuerait son effet
+ // à la fermeture.
+ const avantFermeture=await dateVisite(page);
+ await sleep(1100);
+ await onglet.close();
+ await sleep(800);
+ const apresFermeture=await dateVisite(page);
+ assert.ok(apresFermeture>avantFermeture,
+   'la fermeture de l’onglet n’a rien enregistré : '+avantFermeture+' puis '+apresFermeture);
+ checks.push('visite enregistrée aussi à la fermeture de l’onglet');
+
  // 9. Le bandeau dit franchement qu'il n'y a rien, plutôt que d'aligner des zéros.
  const accueil=async()=>page.$eval('#conduite-accueil',e=>e.textContent.trim());
  await page.waitForFunction(()=>document.getElementById('conduite-accueil').textContent.trim().length>0);
