@@ -127,25 +127,28 @@ const lignes=page=>page.$$eval('.fil-entree',ns=>ns.map(n=>({
  assert.equal(apres,avant+1,'le repère a bougé : figé à l’ouverture, il ne doit pas suivre une visite écrite ailleurs pendant la lecture');
  checks.push('repère figé : une visite écrite ailleurs ne le déplace pas');
 
+ // Date de visite stockée côté serveur, lue par la page ouverte.
+ const dateVisite=async p=>p.evaluate(async id=>(await (await fetch('/api/v1/snapshot?work='+encodeURIComponent(id))).json()).visit?.at||'',actif.id);
+
  // 8. La visite s'enregistre en quittant le travail, jamais en l'ouvrant.
- const visiteAvant=execFileSync(binary,['--root',root,'--json','resume',actif.id],{encoding:'utf8'});
+ // La date stockée doit avancer : un trait « dernière visite » à l'écran
+ // apparaîtrait aussi bien pour une visite bien plus ancienne.
+ const visiteAvant=await dateVisite(page);
  await page.select('#work',vide.id);
  await page.waitForFunction(t=>document.getElementById('title').textContent===t,{},'Travail sans activité');
  await sleep(800);
  await ouvrir(actif.id,'Travail suivi');
  const marque=await page.evaluate(()=>document.querySelector('.fil-visite')?.textContent||'');
  assert.match(marque,/dernière visite/,'le repère doit apparaître après être sorti puis revenu : '+marque);
- assert.ok(visiteAvant.length>0,'lecture de reprise disponible');
+ const visiteApres=await dateVisite(page);
+ assert.ok(visiteApres>visiteAvant,
+   'quitter le travail n’a rien enregistré : '+visiteAvant+' puis '+visiteApres);
  checks.push('visite enregistrée à la sortie, repère présent au retour');
 
  // 8bis. Fermeture de l'onglet. L'enregistrement partait par sendBeacon, qui ne
  // peut poser aucun en-tête : le garde de session le refusait en 403, avalé en
  // silence, et le repère n'était jamais posé en quittant. On mesure la date
  // stockée avant et après la fermeture, pas la présence d'un trait à l'écran.
- const dateVisite=async p=>{
-   const v=await p.evaluate(async id=>(await (await fetch('/api/v1/snapshot?work='+encodeURIComponent(id))).json()).visit?.at||'',actif.id);
-   return v;
- };
  const onglet=await browser.newPage();
  await onglet.goto(url);
  await onglet.waitForFunction(()=>document.querySelectorAll('#work option').length>1);
