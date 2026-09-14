@@ -67,3 +67,33 @@ func TestUsageIsExplicitAndNotInvented(t *testing.T) {
 		t.Fatal("invented missing usage")
 	}
 }
+
+// Le budget affichait des réservations forfaitaires et laissait le coût réel à
+// nil, alors que les fournisseurs le rapportent par tentative.
+func TestBudgetExposesReportedCostOnlyWhenKnown(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	a, _, e := s.prepare(w.ID, r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	v, e := s.budget(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if v.ActualCost != nil {
+		t.Fatalf("aucune tentative n'a rapporté : le coût réel doit rester inconnu, obtenu %v", *v.ActualCost)
+	}
+
+	cout := 2.50
+	a.Usage = &Usage{ReportedCost: &cout, Source: "test"}
+	if e = s.saveAgent(a); e != nil {
+		t.Fatal(e)
+	}
+	if v, e = s.budget(w.ID); e != nil {
+		t.Fatal(e)
+	}
+	if v.ActualCost == nil || *v.ActualCost != 2.50 {
+		t.Fatalf("le coût rapporté doit remonter au budget : %+v", v.ActualCost)
+	}
+}

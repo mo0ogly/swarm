@@ -49,6 +49,13 @@ func (s *Store) budget(work string) (BudgetView, error) {
 	}
 	v.Reserved += assistReserved
 	v.Estimated += assistEstimated
+	// Le coût réel vient des fournisseurs, pas des réservations. Il reste nil
+	// tant qu'aucune tentative n'a rapporté : un zéro passerait pour une mesure
+	// et laisserait croire que rien n'a été dépensé.
+	if summary, err := s.costSummary(work); err == nil && summary.WithCost > 0 {
+		reported := summary.Reported
+		v.ActualCost = &reported
+	}
 	v.Remaining = max(0, v.Budget.Limit-v.Reserved-v.Estimated)
 	v.Warning = v.Budget.Limit > 0 && (v.Reserved+v.Estimated) >= .8*v.Budget.Limit
 	return v, nil
