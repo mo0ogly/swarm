@@ -67,6 +67,7 @@ func (s *Store) operatorTask(work string, r Request) error {
 	r.Schema = 1
 	r.Revision = w.Revision
 	r.EventID = newID("operator-")
+	r.Origin = ""
 	kind := "task.update"
 	if r.Title != "" {
 		kind = "task.add"

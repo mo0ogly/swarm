@@ -64,11 +64,11 @@ const activitySourceLimit = 500
 // exhaustive : tout nouveau type d'événement produit par un geste d'opérateur
 // s'ajoute ici, faute de quoi il sera attribué au moteur.
 //
-// Limite connue : le type seul ne portera pas l'origine indéfiniment.
-// `task.update` est déjà écrit par les deux voies — l'ordonnanceur
-// (dispatcher.go) et l'opérateur (cockpit_service.go). La donnée discriminante
-// existe pourtant en base et n'est pas lue ici : `Launch.Origin` vaut
-// « conducteur » quand c'est l'ordonnanceur qui lance.
+// `task.update` échappe à cette liste : les deux voies l'écrivent — l'opérateur
+// depuis le cockpit, la CLI ou le terminal, et le moteur au départ, au relais
+// et à la fin d'une tentative. Son origine se lit donc dans la charge utile,
+// où `Request.Origin` nomme le moteur ; l'absence se lit « humain », et les
+// points d'entrée externes effacent ce champ.
 var activityHumanKinds = map[string]bool{
 	"pause": true, "autonomy": true, "priority": true, "budget": true,
 	"decision": true, "assistant": true, "ooda": true, "checkpoint": true,
@@ -149,7 +149,7 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 			page.Truncated = true
 			continue
 		}
-		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("c", seq), Origin: activityOrigin(kind),
+		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("c", seq), Origin: activityOrigin(kind, activityPayload{}),
 			Kind: kind, Label: activityLabel(kind), Message: message})
 	}
 	rows.Close()
@@ -176,7 +176,7 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 			page.Truncated = true
 			continue
 		}
-		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("e", revision), Origin: activityOrigin(kind),
+		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("e", revision), Origin: activityOrigin(kind, p),
 			Kind: kind, Label: activityLabel(kind), TaskID: p.task(), Message: activityMessage(kind, p)})
 	}
 	rows.Close()
@@ -211,7 +211,13 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 	return page, nil
 }
 
-func activityOrigin(kind string) string {
+func activityOrigin(kind string, p activityPayload) string {
+	if kind == "task.update" {
+		if p.Origin == conductorAuthor {
+			return activityEngine
+		}
+		return activityHuman
+	}
 	if activityHumanKinds[kind] || strings.HasPrefix(kind, activityRetexPrefix) {
 		return activityHuman
 	}

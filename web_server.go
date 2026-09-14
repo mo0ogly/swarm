@@ -64,6 +64,9 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		r.Request.EventID = r.Event
 		r.Request.Revision = r.Revision
 		r.Request.ID = r.Task
+		// Personne ne se declare moteur depuis l'exterieur : ce qui arrive par
+		// le reseau est un geste humain, quel que soit le champ envoye.
+		r.Request.Origin = ""
 		return s.executeRequest(r.Work, "task.update", r.Request)
 	}
 	if strings.HasPrefix(r.Kind, "retex-") {
@@ -134,7 +137,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 	case "adopt-brief":
 		return s.adoptBrief(r.Work, r.Task, r.Path, r.Note, r.Event, r.Revision)
 	case "submit":
-		e = s.submitReportAt(r.Work, r.Task, r.Path, r.Revision)
+		e = s.submitReportAt(r.Work, r.Task, r.Path, r.Revision, "")
 	case "gate-preview", "gate":
 		t, err := w.task(r.Task)
 		if err != nil {

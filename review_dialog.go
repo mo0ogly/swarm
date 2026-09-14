@@ -153,9 +153,10 @@ func jsonReview(raw json.RawMessage) (string, error) {
 }
 
 func (s *Store) submitReport(work, id, report string) error {
-	return s.submitReportAt(work, id, report, -1)
+	return s.submitReportAt(work, id, report, -1, "")
 }
-func (s *Store) submitReportAt(work, id, report string, expected int) error {
+// origin nomme le moteur quand le conducteur relaie ; vide pour un geste humain.
+func (s *Store) submitReportAt(work, id, report string, expected int, origin string) error {
 	path, e := safeReport(s.root, report)
 	if e != nil {
 		return e
@@ -171,7 +172,7 @@ func (s *Store) submitReportAt(work, id, report string, expected int) error {
 	if expected >= 0 && w.Revision != expected {
 		return &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; relire avant soumission.", Retryable: true}
 	}
-	r := Request{Schema: 1, EventID: newID("operator-"), Revision: w.Revision, ID: id, Status: "submitted", Next: "Évaluer les preuves et la gate delivery ; handoff : " + report}
+	r := Request{Schema: 1, EventID: newID("operator-"), Revision: w.Revision, ID: id, Status: "submitted", Origin: origin, Next: "Évaluer les preuves et la gate delivery ; handoff : " + report}
 	raw, _ := json.Marshal(r)
 	_, e = s.mutate(work, "task.submit", r.EventID, r.Revision, raw, func(w *Work) error {
 		t, e := w.task(id)
@@ -198,10 +199,10 @@ func (s *Store) submitReportAt(work, id, report string, expected int) error {
 			t.Revalidation.Report = report
 			t.Revalidation.ReportHash = digest
 		}
-		if e = s.apply(w, "task.update", Request{ID: id, Status: "running", Next: "Handoff examiné : " + report}); e != nil {
+		if e = s.apply(w, "task.update", Request{ID: id, Status: "running", Origin: origin, Next: "Handoff examiné : " + report}); e != nil {
 			return e
 		}
-		return s.apply(w, "task.update", Request{ID: id, Status: "submitted", Outcome: "completed", Next: r.Next})
+		return s.apply(w, "task.update", Request{ID: id, Status: "submitted", Origin: origin, Outcome: "completed", Next: r.Next})
 	})
 	return e
 }

@@ -291,6 +291,9 @@ func run(args []string, out, errOut io.Writer) int {
 	if r.Schema != 1 {
 		return fail(fmt.Errorf("schema_version doit valoir 1"))
 	}
+	// Une entree fournie par un appelant reste un geste humain : le moteur
+	// ecrit ses mutations en interne, jamais par cette porte.
+	r.Origin = ""
 	w, e := s.executeRequest(id, kind, r)
 	if e != nil {
 		return fail(e)

@@ -3,8 +3,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -87,7 +90,7 @@ func TestActivityNamesTaskOfAgentStart(t *testing.T) {
 // ce que ce fil doit montrer.
 func TestActivityAttributesOperatorDecisionsToHuman(t *testing.T) {
 	for _, kind := range []string{"task.override", "task.submit", "plan.adopt", "brief.adopt", "retex-save"} {
-		if got := activityOrigin(kind); got != activityHuman {
+		if got := activityOrigin(kind, activityPayload{}); got != activityHuman {
 			t.Errorf("%s est un geste d'opérateur, classé %q", kind, got)
 		}
 		if activityLabel(kind) == kind {
@@ -96,7 +99,7 @@ func TestActivityAttributesOperatorDecisionsToHuman(t *testing.T) {
 	}
 	// Les départs et relais restent au moteur : c'est ce que le fil doit rendre visible.
 	for _, kind := range []string{"dispatch", "conductor"} {
-		if got := activityOrigin(kind); got != activityEngine {
+		if got := activityOrigin(kind, activityPayload{}); got != activityEngine {
 			t.Errorf("%s est une action du moteur, classée %q", kind, got)
 		}
 	}
@@ -325,4 +328,162 @@ func TestActivityNamesTaskOfGate(t *testing.T) {
 		return
 	}
 	t.Fatal("aucune entrée de gate au fil")
+}
+
+// « task.update » est écrit par l'opérateur et par le moteur. Tant que le fil
+// se fiait au seul type d'événement, tout geste d'opérateur sur une tâche —
+// blocage, reprise, acceptation — s'affichait « moteur », c'est-à-dire une
+// autonomie qui n'a pas eu lieu. Ce test emprunte les deux vrais chemins, et
+// non la fonction de classement, parce que c'est le câblage qui manquait.
+func TestActivitySeparatesOperatorFromEngineOnTaskUpdate(t *testing.T) {
+	s := storeTest(t)
+	w, a := conductorAgent(t, s)
+
+	// Chemin moteur : fin de tentative relayée par le conducteur.
+	writeReport(t, s, "t1.md", "handoff relayé")
+	finishCompleted(t, s, a)
+
+	// Chemin opérateur : après le relais, l'humain reprend la main sur la
+	// tâche — exactement ce que fait le cockpit web.
+	if _, e := s.webAction(webRequest{Kind: "task", Work: w.ID, Task: "t1", Event: newID("op-"),
+		Revision: currentRevision(t, s, w.ID),
+		Request:  Request{Status: "blocked", Blocker: "dépendance externe"}}); e != nil {
+		t.Fatal(e)
+	}
+
+	// Un appelant qui se déclare moteur reste un humain : le point d'entrée
+	// efface le champ. Sans cela, n'importe quel client masquerait ses gestes
+	// derrière l'autonomie du produit.
+	if _, e := s.webAction(webRequest{Kind: "task", Work: w.ID, Task: "t1", Event: newID("op2-"),
+		Revision: currentRevision(t, s, w.ID),
+		Request:  Request{Status: "running", Origin: conductorAuthor, Next: "reprise manuelle"}}); e != nil {
+		t.Fatal(e)
+	}
+
+	page, e := s.activity(w.ID, activityQuery{Limit: 100})
+	if e != nil {
+		t.Fatal(e)
+	}
+	var humain, moteur int
+	for _, x := range page.Entries {
+		if x.Kind != "task.update" {
+			continue
+		}
+		switch x.Origin {
+		case activityHuman:
+			humain++
+		case activityEngine:
+			moteur++
+		}
+	}
+	var menteur bool
+	for _, x := range page.Entries {
+		if x.Kind == "task.update" && strings.Contains(x.Message, "En cours") {
+			menteur = true
+			if x.Origin != activityHuman {
+				t.Fatalf("un appelant s'est déclaré moteur et a été cru : %+v", x)
+			}
+		}
+	}
+	if !menteur {
+		t.Fatal("la reprise envoyée par le réseau est absente du fil")
+	}
+	if humain == 0 {
+		t.Fatalf("la reprise décidée par l'opérateur doit lui être attribuée : %+v", page.Entries)
+	}
+	if moteur == 0 {
+		t.Fatalf("la fin de tentative relayée par le moteur doit lui être attribuée : %+v", page.Entries)
+	}
+
+	// Le filtre « décisions seulement » sert à retrouver ce qu'un humain a
+	// tranché : il doit garder le blocage et écarter les écritures du moteur.
+	seules, e := s.activity(w.ID, activityQuery{Limit: 100, DecisionsOnly: true})
+	if e != nil {
+		t.Fatal(e)
+	}
+	var garde bool
+	for _, x := range seules.Entries {
+		if x.Origin != activityHuman {
+			t.Fatalf("le filtre laisse passer une écriture du moteur : %+v", x)
+		}
+		if x.Kind == "task.update" && strings.Contains(x.Message, "dépendance externe") {
+			garde = true
+		}
+	}
+	if !garde {
+		t.Fatalf("la décision humaine est absente du filtre des décisions : %+v", seules.Entries)
+	}
+}
+
+func currentRevision(t *testing.T, s *Store, work string) int {
+	t.Helper()
+	w, e := s.get(work)
+	if e != nil {
+		t.Fatal(e)
+	}
+	return w.Revision
+}
+
+// La même règle vaut pour la ligne de commande : un script qui se déclare
+// moteur écrirait une autonomie qui n'a pas eu lieu, et le fil existe pour
+// démentir cela, pas pour le relayer.
+func TestActivityCommandLineCannotClaimEngineOrigin(t *testing.T) {
+	s := storeTest(t)
+	w, _ := setupAgent(t, s)
+	current, e := s.get(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	r := Request{Schema: 1, EventID: newID("cli-"), Revision: current.Revision, ID: "t1",
+		Status: "blocked", Blocker: "attente de décision", Origin: conductorAuthor}
+	raw, _ := json.Marshal(r)
+	path := filepath.Join(s.root, "demande.json")
+	if e := os.WriteFile(path, raw, 0600); e != nil {
+		t.Fatal(e)
+	}
+	var out, errs bytes.Buffer
+	if code := run([]string{"--root", s.root, "--json", "task", "update", w.ID, "--input", path}, &out, &errs); code != 0 {
+		t.Fatal(code, errs.String())
+	}
+	page, e := s.activity(w.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	var vu bool
+	for _, x := range page.Entries {
+		if x.Kind == "task.update" && strings.Contains(x.Message, "attente de décision") {
+			vu = true
+			if x.Origin != activityHuman {
+				t.Fatalf("la ligne de commande s'est déclarée moteur et a été crue : %+v", x)
+			}
+		}
+	}
+	if !vu {
+		t.Fatal("la mutation envoyée par la ligne de commande est absente du fil")
+	}
+}
+
+// Troisième porte : le terminal. Aucun écran ne permet aujourd'hui de saisir
+// une origine, mais le geste passe par une fonction qui accepte une requête
+// entière ; le jour où un appelant la remplit, elle doit rester humaine.
+func TestActivityConsoleCannotClaimEngineOrigin(t *testing.T) {
+	s := storeTest(t)
+	w, _ := setupAgent(t, s)
+	if e := s.operatorTask(w.ID, Request{ID: "t1", Status: "blocked",
+		Blocker: "saisie au terminal", Origin: conductorAuthor}); e != nil {
+		t.Fatal(e)
+	}
+	page, e := s.activity(w.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, x := range page.Entries {
+		if x.Kind == "task.update" && strings.Contains(x.Message, "saisie au terminal") {
+			if x.Origin != activityHuman {
+				t.Fatalf("le terminal s'est déclaré moteur et a été cru : %+v", x)
+			}
+			return
+		}
+	}
+	t.Fatalf("la saisie au terminal est absente du fil : %+v", page.Entries)
 }

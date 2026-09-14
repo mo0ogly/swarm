@@ -60,7 +60,7 @@ func (s *Store) relayHandoff(a Agent, outcome string) (string, string) {
 	if report == "" {
 		return "", "Relais refusé par le " + conductorAuthor + " : " + reason + ". La tâche reste bloquée pour examen."
 	}
-	if e := s.submitReportAt(a.WorkID, t.ID, report, w.Revision); e != nil {
+	if e := s.submitReportAt(a.WorkID, t.ID, report, w.Revision, conductorAuthor); e != nil {
 		return "", "Relais refusé par le " + conductorAuthor + " : " + e.Error() + ". La tâche reste bloquée pour examen."
 	}
 	return report, "Relais automatique du handoff par le " + conductorAuthor + " : " + report +

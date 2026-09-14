@@ -162,6 +162,14 @@ type Request struct {
 	Orientation string   `json:"orientation,omitempty"`
 	Decision    string   `json:"decision,omitempty"`
 	Result      string   `json:"result,omitempty"`
+	// Auteur de la mutation, quand ce n'est pas un humain. « task.update » est
+	// écrit par les deux voies : l'opérateur depuis le cockpit, la CLI ou le
+	// terminal, et le moteur au départ, au relais et à la fin d'une tentative.
+	// Le type d'événement seul ne les distingue donc pas, et le fil d'activité
+	// attribuait au moteur des gestes humains — y compris l'acceptation.
+	// Les points d'entrée externes effacent ce champ : personne ne peut se
+	// déclarer moteur depuis l'extérieur, et l'absence se lit « humain ».
+	Origin      string   `json:"origin,omitempty"`
 }
 
 func now() string { return time.Now().UTC().Format(time.RFC3339Nano) }

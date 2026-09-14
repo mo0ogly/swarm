@@ -451,7 +451,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	originalNext := t.Next
 	// Same transaction as the session intent: no orphan running task on launch conflict.
-	if e = s.apply(&w, "task.update", Request{ID: r.TaskID, Status: "running", Owner: r.Provider, Next: "Examiner le handoff et les preuves après exécution"}); e != nil {
+	if e = s.apply(&w, "task.update", Request{ID: r.TaskID, Status: "running", Owner: r.Provider, Origin: conductorAuthor, Next: "Examiner le handoff et les preuves après exécution"}); e != nil {
 		return a, false, e
 	}
 	// Le choix fait une fois devient réutilisable : profil de la tâche, et
@@ -601,7 +601,7 @@ func (s *Store) settleAgentTask(a Agent) error {
 	if state == "interrupted" {
 		outcome = "interrupted"
 	}
-	r := Request{Schema: 1, EventID: newID("finish-"), Revision: w.Revision, ID: t.ID, Status: "blocked", Outcome: outcome, Blocker: a.Activity + " ; handoff et validation requis", Next: "Examiner logs/diff, puis soumettre ou relancer explicitement"}
+	r := Request{Schema: 1, EventID: newID("finish-"), Revision: w.Revision, ID: t.ID, Status: "blocked", Origin: conductorAuthor, Outcome: outcome, Blocker: a.Activity + " ; handoff et validation requis", Next: "Examiner logs/diff, puis soumettre ou relancer explicitement"}
 	b, _ := json.Marshal(r)
 	_, e = s.mutate(w.ID, "task.update", r.EventID, r.Revision, b, func(w *Work) error {
 		if e := s.apply(w, "task.update", r); e != nil {
