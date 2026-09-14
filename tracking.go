@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 const trackingMigration = `BEGIN;
@@ -45,52 +44,20 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 	if e != nil {
 		return nil, e
 	}
-	add := func(t Task, a Agent, kind, summary, proof, version string) error {
-		d := Decision{ID: hash([]byte(work + "|" + t.ID + "|" + a.ID + "|" + kind + "|" + version)), TaskID: t.ID, AgentID: a.ID, Kind: kind, Summary: summary, Evidence: proof, Created: now()}
+	budget, e := s.budget(work)
+	if e != nil {
+		return nil, e
+	}
+	in := escalationInputs{work: &w, agents: agents, budget: budget, validation: s.validationState(&w), gateValid: map[string]bool{}}
+	for i := range w.Tasks {
+		in.gateValid[w.Tasks[i].ID] = s.validGate(&w.Tasks[i])
+	}
+	// L'identifiant reste stable par sujet : une même demande ne réapparaît pas.
+	for _, x := range buildEscalations(in) {
+		d := Decision{ID: hash([]byte(work + "|" + x.TaskID + "|" + x.AgentID + "|" + x.Kind + "|" + x.Version)), TaskID: x.TaskID, AgentID: x.AgentID, Kind: x.Kind, Summary: x.Summary, Evidence: x.Proof, Created: now()}
 		raw, _ := json.Marshal(d)
-		_, e := s.db.Exec("INSERT OR IGNORE INTO decisions(id,work_id,body) VALUES(?,?,?)", d.ID, work, raw)
-		return e
-	}
-	validation := s.validationState(&w)
-	for _, t := range w.Tasks {
-		if t.Status == "submitted" {
-			if e = add(t, Agent{}, "handoff", "Rapport à examiner", t.Next, fmt.Sprint(len(t.Attempts))); e != nil {
-				return nil, e
-			}
-		}
-		if (t.Gate != nil && !s.validGate(&t)) || validation.Tasks[t.ID].State == "stale" {
-			if e = add(t, Agent{}, "gate", "Gate bloquée ou preuves périmées", validationDetails(validation.Tasks[t.ID]), gateDecisionVersion(t)); e != nil {
-				return nil, e
-			}
-		}
-	}
-	for _, a := range agents {
-		t, e := w.task(a.TaskID)
-		if e != nil {
-			continue
-		}
-		if t.Status == "accepted" || t.Status == "waived" {
-			continue
-		}
-		kind := ""
-		if a.Status == "completed" {
-			kind = "handoff"
-		}
-		if a.Status == "failed" || a.Status == "interrupted" {
-			kind = "execution"
-		}
-		last, e := time.Parse(time.RFC3339Nano, a.Heartbeat)
-		if activeAgent(a) && e == nil && time.Since(last) > time.Duration(max(30, a.Limits.SilenceSeconds))*time.Second {
-			kind = "silence"
-		}
-		if kind != "" {
-			version := ""
-			if kind == "silence" {
-				version = a.Heartbeat
-			}
-			if e = add(*t, a, kind, a.Activity, "Journaux de "+a.ID, version); e != nil {
-				return nil, e
-			}
+		if _, e := s.db.Exec("INSERT OR IGNORE INTO decisions(id,work_id,body) VALUES(?,?,?)", d.ID, work, raw); e != nil {
+			return nil, e
 		}
 	}
 	rows, e := s.db.Query("SELECT body FROM decisions WHERE work_id=? ORDER BY rowid", work)
@@ -119,7 +86,7 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 		if d.Kind != "gate" && d.Kind != "handoff" {
 			continue
 		}
-		state, exists := validation.Tasks[d.TaskID]
+		state, exists := in.validation.Tasks[d.TaskID]
 		if d.Kind == "gate" && exists && len(state.Blockers) > 0 {
 			d.Evidence = validationDetails(state)
 			d.ResolvedAt = ""
