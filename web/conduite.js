@@ -34,10 +34,15 @@ function inboxCard(d) {
   return c;
 }
 
-function agentLine(a) {
+function agentLine(item) {
+  const a = item.agent || item;
   const parts = [a.provider + ' · ' + a.role];
   if (a.progress && (a.progress.detail || a.progress.action)) parts.push(a.progress.detail || a.progress.action);
   parts.push((a.progress?.tool_calls || 0) + ' appels');
+  // Même règle que sur le nœud du graphe : une tentative muette ne doit pas
+  // avoir l'air normale parce qu'elle est affichée ailleurs que sur le graphe.
+  const perdu = typeof graphSignal === 'function' ? graphSignal({ agent: a }) : '';
+  if (perdu) parts.push(perdu);
   if (a.progress?.degraded) parts.push('flux dégradé : ' + a.progress.degraded);
   return parts.join(' · ');
 }
@@ -50,7 +55,7 @@ function planRow(t) {
   head.append(node('strong', t.id + ' · ' + t.title), badge(t.status));
   row.append(head);
   const running = snapshot.agents.filter(x => x.agent.task_id === t.id && active(x.agent));
-  if (running.length) for (const x of running) row.append(node('p', agentLine(x.agent), 'plan-agent'));
+  if (running.length) for (const x of running) row.append(node('p', agentLine(x), 'plan-agent'));
   else if (t.status === 'todo' && (t.depends || []).length) row.append(node('p', 'En attente de : ' + t.depends.join(', '), 'plan-wait'));
   else if (t.blocker) row.append(node('p', t.blocker, 'plan-wait'));
   const actions = (snapshot.task_actions || {})[t.id] || [];

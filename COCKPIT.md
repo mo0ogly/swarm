@@ -176,7 +176,9 @@ déclenchent pas, leur coût étant inconnu et non nul.
 Le mode Conduite affiche le plan sous forme de graphe : un nœud par tâche, une
 arête par dépendance, orientés de gauche à droite. Un nœud porte l'état de la
 tâche et, pour chaque tentative vivante, le fournisseur, l'action courante en
-français, les appels d'outils, le coût estimé et l'âge du dernier résultat.
+français, les appels d'outils, le coût rapporté par le fournisseur et l'âge du
+dernier résultat. Ce coût n'est jamais une estimation ni une facture : quand
+aucune tentative ne l'a déclaré, le nœud écrit « non rapporté », jamais 0,00.
 
 « Signal perdu » et « terminé » restent distincts : un nœud « en cours » ne
 prouve pas qu'un processus tourne encore. Au-delà du délai de surveillance, le
