@@ -35,6 +35,16 @@ func applyTest(t *testing.T, s *Store, w Work, kind string, r Request) Work {
 	return v
 }
 func createTest(t *testing.T, s *Store) Work {
+	w := createdWork(t, s)
+	// Un travail réel démarre au niveau autonome ; les tests qui n'exercent pas
+	// l'ordonnanceur déclarent le niveau manuel pour observer les états
+	// intermédiaires (voir TestAutonomyLevelIsStoredAndFrozen).
+	if e := s.setAutonomy(w.ID, autonomyManual, slotsDefault); e != nil {
+		t.Fatal(e)
+	}
+	return w
+}
+func createdWork(t *testing.T, s *Store) Work {
 	return applyTest(t, s, Work{}, "work.create", Request{Title: "Reprise claire", Objective: "Préserver le travail", Scope: "projet local", Criteria: []string{"preuves courantes"}, Next: "Ajouter une tâche"})
 }
 func taskTest(t *testing.T, s *Store, w Work) Work {

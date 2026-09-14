@@ -24,6 +24,7 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
+	Limits          *RunLimits    `json:"limits,omitempty"`
 	Level           string        `json:"level,omitempty"`
 	ModelPolicyHash string        `json:"model_policy_hash,omitempty"`
 	PlanBriefHash   string        `json:"plan_brief_hash,omitempty"`
@@ -34,6 +35,7 @@ type Launch struct {
 	EventID         string        `json:"event_id"`
 	Revision        int           `json:"expected_revision"`
 	TaskID          string        `json:"task_id"`
+	Origin          string        `json:"origin,omitempty"`
 	Provider        string        `json:"provider"`
 	Workspace       string        `json:"workspace"`
 	Instruction     string        `json:"instruction"`
@@ -65,6 +67,9 @@ type Agent struct {
 	WorkID          string           `json:"work_id"`
 	TaskID          string           `json:"task_id"`
 	Attempt         string           `json:"attempt_id"`
+	Origin          string           `json:"origin,omitempty"`
+	Relay           string           `json:"relay,omitempty"`
+	StopKind        string           `json:"stop_kind,omitempty"`
 	Provider        string           `json:"provider"`
 	Role            string           `json:"role"`
 	Parent          string           `json:"parent,omitempty"`
@@ -309,22 +314,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.Workspace == "" {
 		r.Workspace = "."
 	}
-	cwd := r.Workspace
-	if !filepath.IsAbs(cwd) {
-		cwd = filepath.Join(s.root, cwd)
-	}
-	cwd, e := filepath.EvalSymlinks(cwd)
+	cwd, e := resolveWorkspace(s.root, r.Workspace)
 	if e != nil {
 		return a, false, e
-	}
-	// A workspace is an explicit directory inside the selected project. No arbitrary cwd.
-	rel, e := filepath.Rel(s.root, cwd)
-	if e != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-		return a, false, fmt.Errorf("workspace hors projet")
-	}
-	info, e := os.Stat(cwd)
-	if e != nil || !info.IsDir() {
-		return a, false, fmt.Errorf("workspace non répertoire")
 	}
 	providers, e := s.providers()
 	if e != nil {
@@ -345,14 +337,18 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.ModelPolicyHash != "" && (route == nil || r.ModelPolicyHash != route.PolicyHash) {
 		return a, false, fmt.Errorf("Politique de modèle modifiée ; examiner à nouveau le choix.")
 	}
-	limits, e := p.Limits.normalized()
+	missionLimits := RunLimits{}
+	if r.Limits != nil {
+		missionLimits = *r.Limits
+	}
+	limits, e := p.Limits.tightened(missionLimits)
 	if e != nil {
 		return a, false, e
 	}
 	if !filepath.IsAbs(p.Command) {
 		return a, false, fmt.Errorf("exécutable configuré : chemin absolu requis")
 	}
-	info, e = os.Stat(p.Command)
+	info, e := os.Stat(p.Command)
 	if e != nil || !info.Mode().IsRegular() || info.Mode()&0111 == 0 {
 		return a, false, fmt.Errorf("exécutable fournisseur indisponible")
 	}
@@ -440,6 +436,11 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if previous.WorkID != work || previous.TaskID != r.TaskID || activeAgent(previous) {
 			return a, false, fmt.Errorf("précédent incompatible ou encore actif")
 		}
+		// A retry from any interface keeps the tighter previous ceilings.
+		limits = limits.cappedBy(previous.Limits)
+		if previous.Timeout > 0 && previous.Timeout < r.Timeout {
+			r.Timeout = previous.Timeout
+		}
 	}
 	var overlaps int
 	if e = tx.QueryRow("SELECT count(*) FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1)", cwd, cwd, cwd).Scan(&overlaps); e != nil {
@@ -453,8 +454,21 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e = s.apply(&w, "task.update", Request{ID: r.TaskID, Status: "running", Owner: r.Provider, Next: "Examiner le handoff et les preuves après exécution"}); e != nil {
 		return a, false, e
 	}
+	// Le choix fait une fois devient réutilisable : profil de la tâche, et
+	// profil du travail quand il vient d'un opérateur.
+	if !previewOnly {
+		profile := launchProfile(r, cwd)
+		for i := range w.Tasks {
+			if w.Tasks[i].ID == r.TaskID {
+				w.Tasks[i].Profile = &profile
+			}
+		}
+		if r.Origin != originConductor {
+			w.Profile = &profile
+		}
+	}
 	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
-	prompt += executionDirectives(s.root, cwd, limits)
+	prompt += executionDirectives(s.root, cwd, t.ID, limits)
 	if t.Brainstorm {
 		if t.PlanBriefHash != "" {
 			prompt += brainstormHistory(w, t.ID) + planDirectives()
@@ -491,7 +505,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.ContextHash != "" && manifest.SHA256 != r.ContextHash {
 		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
 	}
-	a = Agent{ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	a = Agent{ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
 	if previewOnly {
 		return a, false, nil
 	}
@@ -613,8 +627,14 @@ func (s *Store) settleAgentTask(a Agent) error {
 	})
 	if e != nil {
 		_ = s.log(a.ID, "warning", "Réconciliation de tâche nécessaire : "+e.Error())
+		return e
 	}
-	return e
+	// Le règlement a eu lieu : le conducteur peut relayer un handoff prouvé.
+	// Un rejeu de fin de tentative sort plus haut et ne relaie donc jamais deux fois.
+	s.conduct(a, outcome)
+	// Le créneau libéré doit servir sans attendre une action humaine.
+	s.dispatchAfterSettle(a.WorkID)
+	return nil
 }
 
 func (s *Store) controlEvent(work, kind, message string) error {
@@ -729,4 +749,28 @@ func cockpitHistory(tx *sql.Tx, work string) (*CockpitHistory, error) {
 	e = rows.Err()
 	rows.Close()
 	return h, e
+}
+
+// A workspace is an explicit directory inside the selected project. No arbitrary cwd.
+func resolveWorkspace(root, workspace string) (string, error) {
+	cwd := workspace
+	if cwd == "" {
+		cwd = "."
+	}
+	if !filepath.IsAbs(cwd) {
+		cwd = filepath.Join(root, cwd)
+	}
+	cwd, e := filepath.EvalSymlinks(cwd)
+	if e != nil {
+		return "", e
+	}
+	rel, e := filepath.Rel(root, cwd)
+	if e != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return "", fmt.Errorf("workspace hors projet")
+	}
+	info, e := os.Stat(cwd)
+	if e != nil || !info.IsDir() {
+		return "", fmt.Errorf("workspace non répertoire")
+	}
+	return cwd, nil
 }

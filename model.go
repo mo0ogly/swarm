@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 4
+const schemaVersion = 5
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -35,6 +35,7 @@ type Revalidation struct {
 }
 
 type Task struct {
+	Profile         *LaunchProfile     `json:"launch_profile,omitempty"`
 	Revalidation    *Revalidation      `json:"revalidation,omitempty"`
 	PlanChecks      map[string]string  `json:"plan_checks,omitempty"`
 	PlanBriefHash   string             `json:"plan_brief_hash,omitempty"`
@@ -60,6 +61,46 @@ type Task struct {
 	Attempts        []Attempt          `json:"attempts"`
 	Gate            *GateRecord        `json:"gate,omitempty"`
 }
+
+// Origine d'une tentative : lancée à la main ou par l'ordonnanceur.
+const (
+	originOperator  = "operateur"
+	originConductor = "conducteur"
+)
+
+// launchProfile fige ce que l'opérateur a choisi, workspace résolu compris.
+func launchProfile(r Launch, cwd string) LaunchProfile {
+	p := LaunchProfile{Provider: r.Provider, Role: r.Role, Workspace: cwd, Instruction: r.Instruction,
+		Level: r.Level, Timeout: r.Timeout, Capture: r.Capture, Limits: r.Limits,
+		Updated: now(), Actor: launchOrigin(r)}
+	if p.Role == "" {
+		p.Role = "worker"
+	}
+	return p
+}
+
+func launchOrigin(r Launch) string {
+	if r.Origin == originConductor {
+		return originConductor
+	}
+	return originOperator
+}
+
+// Profil de lancement réutilisable : ce que l'opérateur a choisi une fois et
+// que l'ordonnanceur rejoue, au lieu de redemander le même formulaire.
+// Le profil d'une tâche prime sur celui du travail.
+type LaunchProfile struct {
+	Limits      *RunLimits `json:"limits,omitempty"`
+	Provider    string     `json:"provider"`
+	Role        string     `json:"role"`
+	Workspace   string     `json:"workspace"`
+	Instruction string     `json:"instruction,omitempty"`
+	Level       string     `json:"level,omitempty"`
+	Timeout     int        `json:"timeout_seconds,omitempty"`
+	Capture     bool       `json:"capture_output,omitempty"`
+	Updated     string     `json:"updated"`
+	Actor       string     `json:"actor"`
+}
 type Attempt struct {
 	ID      string `json:"id"`
 	Status  string `json:"status"`
@@ -72,6 +113,7 @@ type GitState struct {
 	Changes string `json:"changes"`
 }
 type Work struct {
+	Profile       *LaunchProfile `json:"launch_profile,omitempty"`
 	Plans         []ApprovedPlan `json:"plans,omitempty"`
 	Retex         []Retex        `json:"retex,omitempty"`
 	PlanningBrief *PlanningBrief `json:"planning_brief,omitempty"`

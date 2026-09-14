@@ -136,11 +136,69 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	if version == 4 {
+		backup := filepath.Join(dir, newID("state-pre-v5-")+".db")
+		f, err := os.OpenFile(backup, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		if err != nil {
+			return fail(err)
+		}
+		f.Close()
+		if _, err = db.Exec("VACUUM INTO ?", backup); err != nil {
+			_ = os.Remove(backup)
+			return fail(err)
+		}
+	}
+	if version < 5 {
+		if e = migrateAutonomy(db); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
 	return s, nil
 }
+
+// Les réglages d'autonomie s'ajoutent à une table existante : selon la version
+// d'origine, les colonnes peuvent déjà être présentes. Vérifier avant d'ajouter,
+// plutôt que de supposer un chemin de migration unique.
+func migrateAutonomy(db *sql.DB) error {
+	existing := map[string]bool{}
+	rows, e := db.Query("PRAGMA table_info(cockpit_controls)")
+	if e != nil {
+		return e
+	}
+	for rows.Next() {
+		var cid int
+		var name, kind string
+		var notnull, primary int
+		var def any
+		if e = rows.Scan(&cid, &name, &kind, &notnull, &def, &primary); e != nil {
+			rows.Close()
+			return e
+		}
+		existing[name] = true
+	}
+	rows.Close()
+	if e = rows.Err(); e != nil {
+		return e
+	}
+	statements := []string{}
+	if !existing["autonomy"] {
+		statements = append(statements, "ALTER TABLE cockpit_controls ADD COLUMN autonomy TEXT NOT NULL DEFAULT 'autonome'")
+	}
+	if !existing["slots"] {
+		statements = append(statements, "ALTER TABLE cockpit_controls ADD COLUMN slots INTEGER NOT NULL DEFAULT 2")
+	}
+	for _, statement := range statements {
+		if _, e = db.Exec(statement); e != nil {
+			return e
+		}
+	}
+	_, e = db.Exec("PRAGMA user_version=5")
+	return e
+}
+
 func (s *Store) get(id string) (Work, error) {
 	var b []byte
 	var w Work

@@ -307,7 +307,7 @@ func TestMigrationOnePreservesWork(t *testing.T) {
 	}
 	var version int
 	_ = reopened.db.QueryRow("PRAGMA user_version").Scan(&version)
-	if version != 4 {
+	if version != schemaVersion {
 		t.Fatal(version)
 	}
 }
