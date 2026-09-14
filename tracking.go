@@ -128,6 +128,19 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 			d.Author = "moteur"
 			d.ResolvedAt = now()
 			d.Resolution = motif
+		// Le sujet a disparu des demandes alors que la tâche reste acceptée :
+		// sa dérive est devenue un état, visible sur la tâche, dont personne
+		// n'attend d'arbitrage. Sans ce cas, les cartes déjà enregistrées
+		// resteraient ouvertes indéfiniment et la règle ne vaudrait que pour
+		// les travaux à venir.
+		case !courant && !sujetsCourants[d.TaskID+"|"+d.Kind] && d.ResolvedAt == "" && settledDecisionTask(in.work, d.TaskID):
+			const repos = "Acceptation en place et aucune tâche non terminée n'en dépend : la dérive des preuves reste visible sur la tâche."
+			if err := s.supersedeDecision(work, d.ID, repos); err != nil {
+				return nil, err
+			}
+			d.Author = "moteur"
+			d.ResolvedAt = now()
+			d.Resolution = repos
 		}
 	}
 	return out, rows.Err()
@@ -244,4 +257,15 @@ func gateDecisionVersion(t Task) string {
 		return t.Gate.At
 	}
 	return "missing"
+}
+
+// settledDecisionTask : la tâche que vise cette carte a-t-elle reçu une
+// décision humaine qui la clôt ? Une tâche rouverte ne compte pas : son
+// garde-fou de revalidation doit rester visible dans les demandes.
+func settledDecisionTask(w *Work, id string) bool {
+	t, e := w.task(id)
+	if e != nil {
+		return false
+	}
+	return settledTask(t.Status)
 }

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -201,4 +202,80 @@ func TestDecisionsKeepOneCardPerGateSubject(t *testing.T) {
 			}
 		}
 	}
+
+	// Une dérogation motivée clôt la tâche côté humain. La demande de gate
+	// n'a alors plus d'objet tant que rien n'en dépend : la carte déjà
+	// enregistrée doit se refermer, sinon la règle ne vaudrait que pour les
+	// travaux à venir et les anciennes resteraient ouvertes indéfiniment.
+	current, e := s.get(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e := s.overrideReviewedTaskAt(w.ID, "t1", "Dérogation motivée pour la recette de supersession", current.Revision); e != nil {
+		t.Fatal(e)
+	}
+	apres, e := s.decisions(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, d := range apres {
+		if d.Kind == "gate" && d.ResolvedAt == "" {
+			t.Fatalf("une tâche close dont rien ne dépend garde une demande de gate : %+v", d)
+		}
+	}
+	// Toute fermeture doit dire pourquoi. Le motif exact dépend de la voie
+	// empruntée — dérive devenue état, ou revalidation constatée — mais une
+	// carte close sans raison rendrait l'historique inutilisable.
+	for _, d := range apres {
+		if d.ResolvedAt != "" && strings.TrimSpace(d.Resolution) == "" {
+			t.Fatalf("carte close sans motif : %+v", d)
+		}
+	}
+}
+
+// Cas mesuré sur le travail réel : des cartes de gate enregistrées avant que
+// la tâche ne soit close restaient ouvertes indéfiniment, alors que la dérive
+// de leurs preuves n'appelle plus d'arbitrage. On reproduit l'état de la base,
+// puisqu'un enchaînement neuf ne peut plus créer une telle carte.
+func TestDecisionsCloseLegacyCardOnSettledTask(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "running"})
+	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "submitted", Outcome: "completed"})
+	w = gateTest(t, s, w, fixture(t, s.root))
+	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "accepted"})
+
+	// Carte héritée : même forme que celles trouvées en base, sujet obsolète.
+	ancienne := Decision{ID: hash([]byte("heritee|t1|gate")), TaskID: "t1", Kind: "gate",
+		Summary: "Gate bloquée ou preuves périmées", Evidence: "preuve d'époque", Created: now()}
+	raw, _ := json.Marshal(ancienne)
+	if _, e := s.db.Exec("INSERT INTO decisions(id,work_id,body) VALUES(?,?,?)", ancienne.ID, w.ID, raw); e != nil {
+		t.Fatal(e)
+	}
+	// La preuve dérive après l'acceptation : l'état n'est plus frais, donc la
+	// revalidation ne peut pas fermer la carte à notre place.
+	if e := os.WriteFile(filepath.Join(s.root, "proof.txt"), []byte("modifié"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	if etat := s.validationState(&w).Tasks["t1"]; etat.Fresh {
+		t.Fatal("la dérive doit rendre l'état non frais, sinon ce test ne prouve rien")
+	}
+
+	list, e := s.decisions(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for _, d := range list {
+		if d.ID != ancienne.ID {
+			continue
+		}
+		if d.ResolvedAt == "" {
+			t.Fatalf("une carte héritée sur une tâche close reste ouverte : %+v", d)
+		}
+		if strings.TrimSpace(d.Resolution) == "" {
+			t.Fatalf("fermée sans motif : %+v", d)
+		}
+		return
+	}
+	t.Fatal("la carte héritée a disparu de la liste au lieu d'être close")
 }
