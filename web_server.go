@@ -48,6 +48,8 @@ type webRequest struct {
 	Decision        string        `json:"decision"`
 	Request         Request       `json:"request"`
 	Budget          Budget        `json:"budget"`
+	Autonomy        string        `json:"autonomy,omitempty"`
+	Slots           int           `json:"slots,omitempty"`
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
@@ -159,7 +161,24 @@ func (s *Store) webAction(r webRequest) (any, error) {
 	case "pause":
 		e = s.pause(r.Work, true)
 	case "unpause":
-		e = s.pause(r.Work, false)
+		if e = s.pause(r.Work, false); e == nil {
+			// Reprendre les départs relance immédiatement l'ordonnanceur.
+			_, e = s.dispatch(r.Work)
+		}
+	case "profile":
+		e = s.setProfile(r.Work, r.Task, LaunchProfile{Provider: r.Provider, Role: r.Role, Workspace: r.Workspace,
+			Instruction: r.Instruction, Level: r.Level, Capture: r.Capture}, r.Revision)
+	case "autonomy":
+		if e = s.setAutonomy(r.Work, r.Autonomy, r.Slots); e == nil {
+			_, e = s.dispatch(r.Work)
+		}
+	case "dispatch":
+		launched, err := s.dispatch(r.Work)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"launched": dispatchedIDs(launched),
+			"message": fmt.Sprintf("%d départ(s) automatique(s) ; consulter le journal du travail pour les refus.", len(launched))}, nil
 	case "ooda":
 		r.Request.Schema = 1
 		r.Request.EventID = r.Event
@@ -285,6 +304,20 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		q := r.URL.Query()
 		after, _ := strconv.ParseInt(q.Get("after"), 10, 64)
 		p, e := s.queryLogs(q.Get("work"), q.Get("agent"), q.Get("q"), q.Get("kind"), after, 100)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, p)
+	})
+	mux.HandleFunc("/api/v1/activity", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		limit, _ := strconv.Atoi(q.Get("limit"))
+		p, e := s.activity(q.Get("work"), activityQuery{
+			Before:        q.Get("before"),
+			Limit:         limit,
+			DecisionsOnly: q.Get("decisions") == "1",
+		})
 		if e != nil {
 			fail(w, e)
 			return

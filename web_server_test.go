@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -166,5 +167,85 @@ func TestWebEventCursorReconnect(t *testing.T) {
 	}
 	if strings.Contains(string(buf[:n]), "id: 1\n") || !strings.Contains(string(buf[:n]), "id: 2\n") {
 		t.Fatal("cursor replay", string(buf[:n]))
+	}
+}
+
+// Le fil passe par le transport HTTP comme le reste du cockpit : mêmes gardes
+// d'authentification, et les paramètres de requête doivent réellement atteindre
+// l'oracle — un endpoint qui ignore « decisions » rendrait un fil complet là où
+// l'opérateur a demandé les seuls arbitrages.
+func TestActivityEndpointAppliesQueryAndGuards(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	if e := s.controlEvent(w.ID, "dispatch", "t1 : départ automatique"); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.pause(w.ID, true); e != nil {
+		t.Fatal(e)
+	}
+	h := newWebHandler(s, "local.test", "secret-test-capability")
+	get := func(query string, auth bool) *httptest.ResponseRecorder {
+		req := httptest.NewRequest("GET", "http://local.test/api/v1/activity?work="+w.ID+query, nil)
+		req.Host = "local.test"
+		if auth {
+			req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "secret-test-capability"})
+		}
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, req)
+		return rr
+	}
+	if rr := get("", false); rr.Code != 403 {
+		t.Fatalf("le fil doit rester derrière l'authentification, code %d", rr.Code)
+	}
+
+	decode := func(rr *httptest.ResponseRecorder) ActivityPage {
+		t.Helper()
+		if rr.Code != 200 {
+			t.Fatalf("code %d : %s", rr.Code, rr.Body.String())
+		}
+		var page ActivityPage
+		if e := json.Unmarshal(rr.Body.Bytes(), &page); e != nil {
+			t.Fatalf("réponse illisible : %v — %s", e, rr.Body.String())
+		}
+		return page
+	}
+
+	complet := decode(get("", true))
+	moteur := false
+	for _, x := range complet.Entries {
+		if x.Origin == activityEngine {
+			moteur = true
+		}
+	}
+	if !moteur {
+		t.Fatalf("le fil complet doit contenir les actions du moteur : %+v", complet.Entries)
+	}
+
+	// Le filtre doit être transmis, pas seulement accepté.
+	filtre := decode(get("&decisions=1", true))
+	for _, x := range filtre.Entries {
+		if x.Origin != activityHuman {
+			t.Fatalf("decisions=1 ignoré : entrée %q rendue", x.Kind)
+		}
+	}
+	if len(filtre.Entries) >= len(complet.Entries) {
+		t.Fatalf("le filtre n'a rien retiré : %d entrées filtrées pour %d au total",
+			len(filtre.Entries), len(complet.Entries))
+	}
+
+	// La limite aussi, sans quoi la pagination du cockpit serait inopérante.
+	borne := decode(get("&limit=1", true))
+	if len(borne.Entries) != 1 {
+		t.Fatalf("limit=1 ignoré : %d entrées rendues", len(borne.Entries))
+	}
+	if !borne.More || borne.Next == "" {
+		t.Fatalf("une suite existe : More et Next attendus, obtenu %+v", borne)
+	}
+	suivante := decode(get("&limit=1&before="+url.QueryEscape(borne.Next), true))
+	if len(suivante.Entries) != 1 {
+		t.Fatalf("page suivante vide : le curseur before n'a pas été transmis")
+	}
+	if suivante.Entries[0].cursor() == borne.Entries[0].cursor() {
+		t.Fatal("la page suivante rend la même entrée : curseur ignoré")
 	}
 }
