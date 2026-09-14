@@ -111,6 +111,66 @@ courantes. Aucun bouton ne force SHIP.
 Si une écriture métier rencontre une révision concurrente, le journal demande une
 réconciliation ; `reconcile` peut terminer cette mise à jour après relecture.
 
+## Fil d'activité et repère de visite
+
+Le mode Conduite affiche, à côté du graphe, la ligne de vie du travail : chaque
+départ automatique, chaque relais, chaque refus motivé, chaque décision
+d'opérateur, dans l'ordre du temps. Deux sources y sont fusionnées — les
+décisions locales et les mutations du travail — et rien n'y est reconstruit :
+un motif absent s'affiche « motif non renseigné » plutôt que de recevoir une
+explication plausible.
+
+Chaque ligne porte son origine, en toutes lettres autant qu'en couleur :
+
+| Marqueur | Signification |
+|---|---|
+| `▸ moteur` | le système a agi seul : départ automatique, relais de handoff, refus |
+| `● vous` | un opérateur a décidé : suspension, réglage, gate, acceptation, dérogation |
+
+Le classement par défaut est « moteur », ce qui **surestime** l'autonomie : un
+geste humain mal classé ferait croire à une autonomie qui n'a pas eu lieu. La
+liste des types humains doit donc rester exhaustive — tout nouveau type
+d'événement produit par un geste d'opérateur s'y ajoute.
+
+Un trait marque votre dernière visite. Il est figé à l'ouverture du travail :
+relu à chaque rafraîchissement, il glisserait sous vos yeux dès qu'une autre
+session — cockpit terminal, second onglet — enregistre une visite. La visite
+s'enregistre en **quittant** le travail, jamais en l'ouvrant, sans quoi elle
+effacerait le repère que vous venez d'ouvrir pour le consulter.
+
+Le filtre « décisions seulement » ne garde que ce qui a demandé ou reçu un
+arbitrage humain. Le fil se lit par pages ; « Voir plus » remonte le temps.
+
+Un bandeau résume l'état en une phrase, toujours au même endroit : ce qui a
+avancé depuis votre visite, ce qui attend une décision, le coût. Quand rien n'a
+changé, il le dit en toutes lettres plutôt que d'aligner des zéros.
+
+## Coût : ce qui est rapporté, ce qui ne l'est pas
+
+Le budget réserve un forfait à chaque départ ; les fournisseurs, eux, rapportent
+ce qu'une tentative a réellement coûté — quand ils le rapportent. Les deux ne se
+confondent jamais.
+
+**Règle qui commande tout affichage : un total partiel se déclare partiel.**
+Les tentatives qui ne rapportent rien sont comptées à part, jamais estimées :
+les compter pour zéro reviendrait à affirmer qu'elles n'ont rien coûté.
+
+| Situation | Affichage |
+|---|---|
+| Aucune tentative | « aucune tentative » |
+| Tentatives sans coût déclaré | « coût réel non rapporté » |
+| Coût connu, partiellement | « 4,20 USD rapportés sur 3 tentative(s) · 2 sans coût rapporté » |
+
+Un coût inconnu ne s'écrit jamais « 0,00 ». Le nœud du graphe porte le cumul de
+sa tâche sous la même règle.
+
+Une tâche dont le coût rapporté dépasse **deux fois la réserve par départ**
+cesse de partir seule, et une demande est adressée à l'opérateur avec le
+montant. Cette borne empêche une dépense à venir : elle n'annule rien de ce qui
+est déjà engagé, et n'accepte ni ne refuse aucune tâche. Sans réserve
+configurée, aucun plafond n'est déduit ; des tentatives muettes ne la
+déclenchent pas, leur coût étant inconnu et non nul.
+
 ## Graphe du travail
 
 Le mode Conduite affiche le plan sous forme de graphe : un nœud par tâche, une
