@@ -188,3 +188,27 @@ func TestEscalationRaisesTaskCostOverrun(t *testing.T) {
 		t.Fatal("une tâche acceptée ne doit pas réclamer une décision de coût")
 	}
 }
+
+// Un sujet, une carte. Versionner le dépassement par le montant faisait
+// apparaître une demande de plus à chaque centime rapporté, sur l'écran que le
+// produit réserve à ce qui attend un arbitrage.
+func TestEscalationCostRaisesOneSubjectPerAttempt(t *testing.T) {
+	version := func(reported float64, avecCout int) string {
+		in := escalationInput([]Task{{ID: "t1", Status: "todo"}}, nil)
+		in.reserve = 3.0
+		in.taskCost = map[string]CostTotal{"t1": {Reported: reported, WithCost: avecCout}}
+		for _, e := range buildEscalations(in) {
+			if e.Kind == "cout" {
+				return e.Version
+			}
+		}
+		t.Fatalf("dépassement non escaladé pour %.2f USD", reported)
+		return ""
+	}
+	if a, b := version(6.40, 2), version(7.15, 2); a != b {
+		t.Fatalf("le montant qui monte sur les mêmes tentatives crée une carte de plus : %q puis %q", a, b)
+	}
+	if a, b := version(7.15, 2), version(9.00, 3); a == b {
+		t.Fatalf("une nouvelle tentative coûteuse doit se distinguer : %q", a)
+	}
+}

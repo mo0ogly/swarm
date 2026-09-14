@@ -198,8 +198,12 @@ func costEscalations(in escalationInputs) []escalation {
 		out = append(out, escalation{TaskID: t.ID, Kind: "cout",
 			Summary: fmt.Sprintf("%.2f USD rapportés sur %d tentative(s) pour une réserve de %.2f par départ ; départs automatiques retenus, la dépense engagée subsiste",
 				c.Reported, c.WithCost, in.reserve),
-			Proof:   "Coût rapporté par le fournisseur ; jamais une facture vérifiée",
-			Version: fmt.Sprintf("%.2f", c.Reported)})
+			Proof: "Coût rapporté par le fournisseur ; jamais une facture vérifiée",
+			// Version discrète, comme les autres sujets du fichier : le nombre de
+			// tentatives ayant rapporté un coût. Versionner par le montant créait
+			// une carte de plus à chaque centime, sur un écran qui ne doit porter
+			// que ce qui attend une décision.
+			Version: fmt.Sprint(c.WithCost)})
 	}
 	return out
 }
