@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Full operator path: select task, modal, provider, start/stop/retry. No model calls."""
-import argparse, hashlib, signal, json, os, subprocess, tempfile, uuid, pty, termios, fcntl, struct, select, time, shutil
+import re, argparse, hashlib, signal, json, os, subprocess, tempfile, uuid, pty, termios, fcntl, struct, select, time, shutil
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--binary',required=True);p.add_argument('--report',required=True);args=p.parse_args()
 binary=str(Path(args.binary).resolve())
@@ -24,6 +24,28 @@ with tempfile.TemporaryDirectory(prefix='swarm-dialog-') as temp:
   raise AssertionError(('missing',text,current[-3500:].decode(errors='replace')))
  def send(data):
   drain();current.clear();os.write(master,data)
+ def selected_action(label):
+  # Le rendu porte des couleurs : comparer sur le texte nu, ligne par ligne.
+  frames=current.decode(errors='replace').split('\x1b[H\x1b[2J')
+  plain=re.sub(r'\x1b\[[0-9;]*[A-Za-z]','',frames[-1])
+  # Le cadre préfixe chaque ligne ; seul le marqueur « > » désigne la sélection.
+  return any('> ' in line and label in line for line in plain.splitlines())
+ def settle():
+  # Attendre que le rendu se taise : comparer une image en vol fausse la lecture.
+  for _ in range(20):
+   before=len(current);drain(.12)
+   if len(current)==before:return
+ def choose(label):
+  # L'action conseillée place le curseur, dont le rang change selon l'état :
+  # on remonte en tête de liste, puis on descend jusqu'au libellé cherché.
+  for _ in range(24):
+   os.write(master,b'\x1b[A');time.sleep(.02)
+  settle()
+  for _ in range(24):
+   if selected_action(label):
+    send(b'\r');return
+   current.clear();os.write(master,b'\x1b[B');settle()
+  raise AssertionError(('action introuvable',label,current[-3000:].decode(errors='replace')))
  def agents():return [a['agent'] for a in cli('agent','list',wid)['agents']]
  def await_agent(status,count):
   until=time.monotonic()+10
@@ -36,6 +58,10 @@ with tempfile.TemporaryDirectory(prefix='swarm-dialog-') as temp:
  cli('init');mutate('work','create',title='Autre travail',objective='Unrelated selection',scope='Fixture only',criteria=['no effect'],next='Leave unchanged');w=mutate('work','create',title='Modal test',objective='Operator path',scope='Fixture only',criteria=['modal'],next='Select task');wid=w['id']
  w=mutate('task','add',wid,revision=w['revision'],id='demo',title='Tâche utilisateur 日本 é',deliverable='Fixture',criteria=['proof'],owner='test')
  w=mutate('task','add',wid,revision=w['revision'],id='other',title='Do not touch',deliverable='None',criteria=['unchanged'],owner='test')
+ # Recette du parcours opérateur : l'ordonnanceur est hors sujet ici, sinon il
+ # lancerait la tâche suivante pendant que l'opérateur agit (niveau par défaut
+ # d'un travail réel : autonome).
+ cli('autonomy',wid,'manuel')
  provider=root/'fixture.py';provider.write_text('''#!/usr/bin/python3
 import sys,time,json
 s=sys.stdin.read()
@@ -80,23 +106,27 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
   for _ in range(12):send(b'\x1b[B')
   expect('HISTORIQUE')
   send(b'\x1b');time.sleep(.15);drain()
-  send(b'\r');expect('Actions — demo');send(b'\x1b[B\x1b[B\r');expect('Demander l’arrêt' if False else "Demander l'arrêt")
+  send(b'\r');expect('Actions — demo');choose("Arrêter l'agent");expect('Confirmer — demo');expect("Demander l'arrêt")
   send(b'\x1b');time.sleep(.15);drain();assert agents()[0]['status']=='running'
-  send(b'\r\x1b[B\x1b[B\r');expect('Confirmer — demo');send(b'\r');expect('Demande enregistrée');stopped=await_agent('interrupted',1)
+  send(b'\r');expect('Actions — demo');choose("Arrêter l'agent");expect('Confirmer — demo');send(b'\r');expect('Demande enregistrée');stopped=await_agent('interrupted',1)
   time.sleep(.2)
-  send(b'\r\x1b[B\r');expect('Relancer — demo');send(b'\x15FINISH_QUICKLY\t\t\t\r');expect('Agent lancé');second=await_agent('completed',2)
+  send(b'\r');expect('Actions — demo');choose('Relancer cette tentative');expect('Relancer — demo');send(b'\x15FINISH_QUICKLY\t\t\t\r');expect('Agent lancé');second=await_agent('completed',2)
   assert second['previous']==first['id'] and second['attempt_id']!=first['attempt_id']
   w=cli('work','show',wid)['work'];assert next(t for t in w['tasks'] if t['id']=='other')['status']=='todo'
   (root/'docs').mkdir();(root/'docs/demo-handoff.md').write_text('Rapport de recette')
   send(b'\rl');expect('Rapport — demo');expect('Rapport de recette');snapshots['report']=current.decode(errors='replace');send(b'\x1b');time.sleep(.15);drain()
   send(b'\rs');expect('Soumettre le rapport — demo');expect('docs/demo-handoff.md')
   send(b'\r\r');expect('Rapport soumis');w=cli('work','show',wid)['work'];assert next(t for t in w['tasks'] if t['id']=='demo')['status']=='submitted'
-  send(b'\ra');expect('Accepter la tâche — demo');send(b'\r');expect('Acceptation refusée');snapshots['accept-blocked']=current.decode(errors='replace')
+  # Sans gate, l'acceptation n'est plus proposée : l'oracle affiche son motif
+  # dans le menu au lieu d'ouvrir un panneau qui refuse (contrat S28).
+  send(b'\r');expect('Actions — demo');expect('[a] Accepter la tâche… — indisponible');snapshots['accept-blocked']=current.decode(errors='replace')
   send(b'\x1b');time.sleep(.15);drain()
   doc={'method_version':'2','scope_id':'demo','artifacts':{'docs/demo-handoff.md':hashlib.sha256((root/'docs/demo-handoff.md').read_bytes()).hexdigest()},'domains':{'quality':1},'checks':[{'id':'review','domain':'quality','mandatory':True,'gate':'delivery','penalty':100,'max_penalty':100,'severity':'major'}],'results':[{'id':'review','status':'PASS','count':0,'evidence':['docs/demo-handoff.md']}]}
   (root/'docs/demo.evidence.json').write_text(json.dumps(doc))
   send(b'\rg');expect('Charger une gate — demo');expect('docs/demo.evidence.json')
-  send(b'\r\r');expect('Enregistrer la gate — demo');expect('Verdict : PASS')
+  # Depuis S28 la gate porte un nom : descendre sur le champ, saisir, puis valider.
+  send(b'\x1b[B');expect('Nom de la gate')
+  send('Gate de recette demo'.encode());send(b'\r\r');expect('Enregistrer la gate — demo');expect('Verdict : PASS')
   snapshots['gate-preview']=current.decode(errors='replace')
   send(b'\r');expect('Gate enregistrée');send(b'\x1b');time.sleep(.15);drain()
   send(b'\rv');expect('Gates et preuves — demo');expect('Avancement vérifié');send(b'\x1b[B'*6);expect('review : PASS');snapshots['gate']=current.decode(errors='replace');send(b'\x1b');time.sleep(.15);drain()
@@ -118,12 +148,17 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
   send(b'\re');expect('OODA');send(b'Observation UI\tOrientation UI\tDecision UI\tResultat UI\tSuite UI\t\r');expect('Enregistré : ooda')
   assert cli('work','show',wid)['work']['next']=='Suite UI'
   send(b'\ru');expect('RESUME');expect('Suite UI');snapshots['resume']=current.decode(errors='replace');send(b'\x1b');time.sleep(.15);drain()
-  send(b'\rb');expect('BUDGET');expect('Enregistrer');send(b'\x150.1\t\x151\tEstimation de recette\t2026-09-12\t\r');expect('Enregistré : budget')
+  send(b'\rb');expect('BUDGET');expect('Enregistrer');send(b'\x1550\t\x151\tEstimation de recette\t2026-09-12\t\r');expect('Enregistré : budget')
   send(b'\rj');expect('JOURNAUX');send(b'Processus\r');expect('Processus');send(b'f');expect('f direct');send(b'f');expect('f pause');send(b'e');expect('Export borné');snapshots['logs']=current.decode(errors='replace');assert list((root/'.swarm').glob('logs-*.json'));send(b'\x1b');time.sleep(.15);drain()
   send(b'\ri');expect('DÉCISIONS');snapshots['decisions']=current.decode(errors='replace');send(b'\x1b');time.sleep(.15);drain()
   replacement=root/'swarm.next';shutil.copy2(binary,replacement);replacement.replace(runtime)
   current.clear();expect('Mise à jour installée')
-  send(b'\rr');expect('Relancer — demo');send(b'\t\t\t\r');expect('Console ancienne');assert len(agents())==2
+  # La tâche est acceptée : depuis S28, relancer exige de rouvrir d'abord.
+  send(b'\ro');expect('Rouvrir');send(b'\r');time.sleep(.3);drain()
+  etat=next(x for x in cli('work','show',wid)['work']['tasks'] if x['id']=='demo')['status']
+  assert etat=='todo',('réouverture non effectuée',etat)
+  # Tâche rouverte : c'est un lancement, pas une reprise de tentative.
+  send(b'\r');expect('Actions — demo');choose('Lancer avec un fournisseur');expect('Lancer — demo');send(b'\r\r');expect('Console ancienne');assert len(agents())==2
   send(b'\x1b');time.sleep(.15);drain()
   send(b'q\r');until=time.monotonic()+6
   while proc.poll() is None and time.monotonic()<until:drain(.1)

@@ -103,6 +103,41 @@ const lignes=page=>page.$$eval('.fil-entree',ns=>ns.map(n=>({
  assert.ok(cible.ecart<40,'case détachée de son libellé, écart de '+cible.ecart+' px');
  checks.push('case et libellé du filtre forment une seule cible');
 
+ // 7. Le repère de visite ne bouge pas pendant la consultation : figé à
+ // l'ouverture, il ne doit pas glisser sous les yeux du lecteur au gré des
+ // rafraîchissements.
+ await ouvrir(actif.id,'Travail suivi');
+ const repere=async()=>page.evaluate(()=>{
+  const n=document.querySelector('.fil-visite');
+  return n?[...document.querySelectorAll('#fil-entrees > *')].indexOf(n):-1;
+ });
+ const avant=await repere();
+ assert.ok(avant>=0,'une visite antérieure doit exister pour ce contrôle');
+ // Une autre session — le cockpit terminal, un second onglet — enregistre une
+ // visite pendant qu'on lit. Si la référence était relue à chaque
+ // rafraîchissement, le repère sauterait en tête et le lecteur perdrait le fil
+ // de ce qu'il était en train de parcourir.
+ execFileSync('python3',['-c',
+   "import sqlite3,sys;c=sqlite3.connect(sys.argv[1]);c.execute(\"UPDATE session_visits SET at=?\",(sys.argv[2],));c.commit()",
+   path.join(root,'.swarm','state.db'), new Date().toISOString().replace('Z','000Z')],{encoding:'utf8'});
+ execFileSync(binary,['--root',root,'--json','autonomy',actif.id,'assiste'],{encoding:'utf8'});
+ await sleep(2500);
+ const apres=await repere();
+ assert.ok((await lignes(page)).length>0,'le fil doit rester peuplé');
+ assert.equal(apres,avant+1,'le repère a bougé : figé à l’ouverture, il ne doit pas suivre une visite écrite ailleurs pendant la lecture');
+ checks.push('repère figé : une visite écrite ailleurs ne le déplace pas');
+
+ // 8. La visite s'enregistre en quittant le travail, jamais en l'ouvrant.
+ const visiteAvant=execFileSync(binary,['--root',root,'--json','resume',actif.id],{encoding:'utf8'});
+ await page.select('#work',vide.id);
+ await page.waitForFunction(t=>document.getElementById('title').textContent===t,{},'Travail sans activité');
+ await sleep(800);
+ await ouvrir(actif.id,'Travail suivi');
+ const marque=await page.evaluate(()=>document.querySelector('.fil-visite')?.textContent||'');
+ assert.match(marque,/dernière visite/,'le repère doit apparaître après être sorti puis revenu : '+marque);
+ assert.ok(visiteAvant.length>0,'lecture de reprise disponible');
+ checks.push('visite enregistrée à la sortie, repère présent au retour');
+
  await browser.close();
  const bilan={status:errors.length||external.length?'FAIL':'PASS',checks,errors,external};
  fs.writeFileSync(path.join(outDir,'activity.json'),JSON.stringify(bilan,null,1));
