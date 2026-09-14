@@ -249,3 +249,80 @@ func TestActivityEndpointAppliesQueryAndGuards(t *testing.T) {
 		t.Fatal("la page suivante rend la même entrée : curseur ignoré")
 	}
 }
+
+// Trois actions d'écriture du cockpit — profil, autonomie, ordonnancement —
+// sont arrivées par la porte web sans test ni mention dans l'inventaire. La
+// dernière lance des agents : c'est la seule du lot qui engage une dépense.
+// Ce test emprunte la porte réelle et vérifie les bornes, pas les libellés.
+func TestWebConduiteActionsRespectTheirLimits(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+
+	// Profil : enregistré et relu, sans départ.
+	if _, e := s.webAction(webRequest{Kind: "profile", Work: w.ID, Task: "t1",
+		Provider: r.Provider, Role: "worker", Workspace: r.Workspace,
+		Revision: currentRevision(t, s, w.ID)}); e != nil {
+		t.Fatal(e)
+	}
+	current, e := s.get(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	task, e := current.task("t1")
+	if e != nil {
+		t.Fatal(e)
+	}
+	if task.Profile == nil || task.Profile.Provider != r.Provider {
+		t.Fatalf("le profil de lancement n'a pas été retenu : %+v", task.Profile)
+	}
+
+	// Autonomie : appliquée et relisible.
+	if _, e := s.webAction(webRequest{Kind: "autonomy", Work: w.ID, Autonomy: autonomyManual, Slots: 3, Revision: currentRevision(t, s, w.ID)}); e != nil {
+		t.Fatal(e)
+	}
+	if got := s.autonomy(w.ID); got != autonomyManual {
+		t.Fatalf("niveau d'autonomie non appliqué : %q", got)
+	}
+	if got := s.slots(w.ID); got != 3 {
+		t.Fatalf("nombre de créneaux non appliqué : %d", got)
+	}
+
+	// Ordonnancement en manuel : la porte répond, mais ne lance rien.
+	out, e := s.webAction(webRequest{Kind: "dispatch", Work: w.ID, Revision: currentRevision(t, s, w.ID)})
+	if e != nil {
+		t.Fatal(e)
+	}
+	lances, _ := out.(map[string]any)["launched"].([]string)
+	if len(lances) != 0 {
+		t.Fatalf("le niveau manuel interdit tout départ automatique : %v", lances)
+	}
+
+	// Départs suspendus d'abord : le passage en autonome ordonnance lui-même,
+	// et le mesurer après un départ déjà consommé ne prouverait rien.
+	if _, e := s.webAction(webRequest{Kind: "pause", Work: w.ID, Revision: currentRevision(t, s, w.ID)}); e != nil {
+		t.Fatal(e)
+	}
+	if _, e := s.webAction(webRequest{Kind: "autonomy", Work: w.ID, Autonomy: autonomyAuto, Slots: 2, Revision: currentRevision(t, s, w.ID)}); e != nil {
+		t.Fatal(e)
+	}
+	out, e = s.webAction(webRequest{Kind: "dispatch", Work: w.ID, Revision: currentRevision(t, s, w.ID)})
+	if e != nil {
+		t.Fatal(e)
+	}
+	lances, _ = out.(map[string]any)["launched"].([]string)
+	if len(lances) != 0 {
+		t.Fatalf("la suspension prime sur l'ordonnancement : %v", lances)
+	}
+	if got := taskStatus(t, s, w.ID).Status; got != "todo" {
+		t.Fatalf("aucune tentative ne doit être partie pendant la suspension : t1 est %q", got)
+	}
+
+	// Reprise : le même ordonnancement part, ce qui prouve que c'est bien la
+	// suspension qui le retenait et non une tâche inéligible.
+	if _, e := s.webAction(webRequest{Kind: "unpause", Work: w.ID, Revision: currentRevision(t, s, w.ID)}); e != nil {
+		t.Fatal(e)
+	}
+	if got := taskStatus(t, s, w.ID).Status; got != "running" {
+		t.Fatalf("la reprise doit relancer l'ordonnancement : t1 est %q", got)
+	}
+}
