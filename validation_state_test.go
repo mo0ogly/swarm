@@ -70,8 +70,38 @@ func TestHandoffClosesAfterFreshAcceptance(t *testing.T) {
 	if err = os.WriteFile(filepath.Join(s.root, "proof.txt"), []byte("changed"), 0600); err != nil {
 		t.Fatal(err)
 	}
+	// Une acceptation dont la preuve a dérivé après coup reste visible comme
+	// état de la tâche, mais ne réclame pas d'arbitrage tant que personne ne
+	// s'appuie dessus : sinon travailler sur le produit rouvrirait d'un coup
+	// toutes les acceptations passées.
+	etat := s.validationState(&w).Tasks["t1"]
+	if etat.State != "stale" || len(etat.Blockers) == 0 {
+		t.Fatalf("la dérive doit rester visible sur la tâche : %+v", etat)
+	}
 	ds, err = s.decisions(w.ID)
-	if err != nil || len(ds) != 2 || ds[1].ResolvedAt != "" {
-		t.Fatal("drift hidden", ds, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, d := range ds {
+		if d.ResolvedAt == "" {
+			t.Fatalf("une acceptation dérivée dont rien ne dépend ne doit pas réclamer de décision : %+v", d)
+		}
+	}
+
+	// Dès qu'une tâche non terminée en dépend, la demande revient : on ne peut
+	// pas la faire avancer en s'appuyant sur une preuve qui n'est plus vérifiée.
+	w = applyTest(t, s, w, "task.add", Request{ID: "t2", Title: "Suite", Deliverable: "livrable", Criteria: []string{"c"}, Owner: "session", Next: "attendre t1", Depends: []string{"t1"}})
+	ds, err = s.decisions(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ouverte bool
+	for _, d := range ds {
+		if d.Kind == "gate" && d.TaskID == "t1" && d.ResolvedAt == "" {
+			ouverte = true
+		}
+	}
+	if !ouverte {
+		t.Fatalf("une tâche dépendante non terminée doit ramener la demande : %+v", ds)
 	}
 }

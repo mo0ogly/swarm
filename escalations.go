@@ -52,6 +52,20 @@ func buildEscalations(in escalationInputs) []escalation {
 				Proof:   t.Next, Version: fmt.Sprint(len(t.Attempts))})
 		}
 		if (t.Gate != nil && !in.gateValid[t.ID]) || state.State == "stale" {
+			// Une acceptation dont les preuves ont dérivé après coup n'exige
+			// aucun arbitrage tant que personne ne s'appuie dessus. L'état
+			// reste visible sur la ligne de la tâche et dans le graphe ; il ne
+			// prend une place dans la boîte à traiter que si une tâche non
+			// terminée en dépend, car la faire avancer supposerait une preuve
+			// qui n'est plus vérifiée.
+			//
+			// Sans cette distinction, travailler sur le produit périmait d'un
+			// coup toutes les acceptations passées — les gates signent des
+			// fichiers source partagés — et un travail terminé réclamait une
+			// décision par tâche, indéfiniment.
+			if settledTask(t.Status) && !blocksUnfinished(in.work, t.ID) {
+				continue
+			}
 			claimed[t.ID] = true
 			out = append(out, escalation{TaskID: t.ID, Kind: "gate",
 				Summary: "Gate bloquée ou preuves périmées",
@@ -206,4 +220,26 @@ func costEscalations(in escalationInputs) []escalation {
 			Version: fmt.Sprint(c.WithCost)})
 	}
 	return out
+}
+
+// settledTask : la tâche a reçu une décision humaine qui la clôt.
+func settledTask(status string) bool {
+	return status == "accepted" || status == "waived"
+}
+
+// blocksUnfinished : une tâche encore à faire dépend-elle de celle-ci ? Si oui,
+// la dérive de ses preuves redevient une demande, parce qu'on ne peut pas
+// avancer sur la suite en s'appuyant sur une preuve qui n'est plus vérifiée.
+func blocksUnfinished(w *Work, id string) bool {
+	for _, t := range w.Tasks {
+		if settledTask(t.Status) || t.Status == "abandoned" {
+			continue
+		}
+		for _, d := range t.Depends {
+			if d == id {
+				return true
+			}
+		}
+	}
+	return false
 }
