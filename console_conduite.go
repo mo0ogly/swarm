@@ -27,10 +27,11 @@ func (s *Store) renderConduite(work string, c *consoleState, width, height int, 
 		departs = "DÉPARTS SUSPENDUS"
 	}
 	view, _ := s.budget(work)
+	costs, _ := s.costSummary(work)
 	lines := []string{
 		fmt.Sprintf("SWARM  │ %s  │ conduite", w.Title), "",
 		fmt.Sprintf("%s · %d créneau(x) occupé(s) sur %d · %s", autonomyLabel(s.autonomy(work)), busy, s.slots(work), departs),
-		fmt.Sprintf("Budget estimé : %.2f réservé + %.2f imputé sur %.2f USD ; estimation, jamais une dépense facturée", view.Reserved, view.Estimated, view.Budget.Limit),
+		costs.Text() + fmt.Sprintf(" · réservé %.2f + %.2f imputé sur %.2f USD estimés", view.Reserved, view.Estimated, view.Budget.Limit),
 		"",
 	}
 

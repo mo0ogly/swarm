@@ -37,6 +37,17 @@ function graphLignesAgent(item) {
   // Coût rapporté par le fournisseur pour cette tentative ; jamais une facture.
   const cout = a.usage?.provider_reported_cost_usd;
   lignes.push(typeof cout === 'number' ? 'coût rapporté : ' + cout.toFixed(2) + ' USD' : 'coût : non rapporté');
+  return lignes;
+}
+
+// Cumul de la tâche, toutes tentatives confondues. « non rapporté » quand
+// aucune n'a déclaré son coût : un 0,00 ferait passer l'inconnu pour une mesure.
+function graphCoutTache(id) {
+  const c = (snapshot.cost?.by_task || {})[id];
+  if (!c || !c.attempts_with_cost) return c && c.attempts_without_cost ? 'coût de la tâche : non rapporté' : '';
+  let texte = 'coût de la tâche : ' + c.reported_usd.toFixed(2) + ' USD';
+  if (c.attempts_without_cost) texte += ' (+' + c.attempts_without_cost + ' sans coût)';
+  return texte;
   const perdu = graphSignal(item);
   if (perdu) lignes.push(perdu);
   else if (a.progress?.last_result_at) lignes.push('dernier résultat : ' + new Date(a.progress.last_result_at).toLocaleTimeString('fr-FR'));
@@ -52,7 +63,8 @@ function svgNode(nom, attributs, texte) {
 }
 
 function graphMesures(tache, agents) {
-  const lignes = 2 + agents.reduce((n, item) => n + graphLignesAgent(item).length, 0) + (agents.length ? 1 : 0);
+  const cumul = graphCoutTache(tache.id) ? 1 : 0;
+  const lignes = 2 + cumul + agents.reduce((n, item) => n + graphLignesAgent(item).length, 0) + (agents.length ? 1 : 0);
   return { width: 260, height: 30 + lignes * 17 };
 }
 
@@ -108,6 +120,11 @@ function renderGraph() {
     groupe.append(svgNode('text', { x: x + 12, y: y + 22, class: 'graph-titre' }, t.id + ' · ' + (labels[t.status] || t.status)));
     groupe.append(svgNode('text', { x: x + 12, y: y + 40, class: 'graph-sous-titre' }, t.title.length > 30 ? t.title.slice(0, 29) + '…' : t.title));
     let ligne = y + 60;
+    const cumul = graphCoutTache(t.id);
+    if (cumul) {
+      groupe.append(svgNode('text', { x: x + 12, y: ligne, class: 'graph-agent' }, cumul));
+      ligne += 17;
+    }
     for (const item of parTache[t.id] || []) {
       for (const texte of graphLignesAgent(item)) {
         const classe = /signal perdu|jamais reçu|dégradé/.test(texte) ? 'graph-alerte' : 'graph-agent';

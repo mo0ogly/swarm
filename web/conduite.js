@@ -75,7 +75,8 @@ function renderConduite() {
   const budget = snapshot.budget;
   const lines = [snapshot.autonomy_label || snapshot.autonomy,
     busy + ' créneau(x) occupé(s) sur ' + (snapshot.slots || 2),
-    'budget estimé : ' + budget.reserved_usd + ' + ' + budget.committed_estimate_usd + ' USD sur ' + budget.budget.limit_usd];
+    (snapshot.cost_text || 'coût réel non rapporté'),
+    'réservé : ' + budget.reserved_usd + ' + ' + budget.committed_estimate_usd + ' USD estimés sur ' + budget.budget.limit_usd];
   if (snapshot.paused) lines.push('départs suspendus');
   const state = $('conduite-state');
   state.textContent = lines.join(' · ');
@@ -136,9 +137,21 @@ function renderAccueil(ouvertes, budget) {
     });
   }
 
+  // Le coût est un fait sur ce qui s'est passé : il s'affiche dès qu'une
+  // tentative existe, qu'un plafond soit réglé ou non. Le réservé, lui, n'a de
+  // sens que si un budget a été fixé. Les deux ne se confondent pas : l'un
+  // mesure ce que les fournisseurs ont déclaré, l'autre ce que le moteur a mis
+  // de côté.
+  const c = snapshot.cost;
+  const tentatives = c ? c.attempts_with_cost + c.attempts_without_cost : 0;
+  const morceaux = [];
+  if (tentatives > 0) morceaux.push(snapshot.cost_text || 'coût réel non rapporté');
   if (budget && budget.budget.limit_usd > 0) {
+    morceaux.push(budget.reserved_usd + ' USD réservés sur ' + budget.budget.limit_usd);
+  }
+  if (morceaux.length) {
     hote.append(node('span', ' · ', 'accueil-separateur'));
-    hote.append(node('span', budget.reserved_usd + ' USD réservés sur ' + budget.budget.limit_usd, 'accueil-budget'));
+    hote.append(node('span', morceaux.join(' · '), 'accueil-budget'));
   }
 }
 

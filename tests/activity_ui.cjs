@@ -155,6 +155,17 @@ const lignes=page=>page.$$eval('.fil-entree',ns=>ns.map(n=>({
  assert.ok(segments.length>0,'les segments du bandeau doivent être cliquables : '+apresChangement);
  checks.push('bandeau : compte ce qui a changé depuis la visite');
 
+ // 11. Aucune tentative n'a été lancée sur ce travail : le bandeau ne doit
+ // annoncer aucun coût, et surtout pas un zéro qui passerait pour une mesure.
+ const phrase=await page.$eval('#conduite-accueil',e=>e.textContent);
+ assert.ok(!/USD/.test(phrase),'aucune tentative : le bandeau ne doit pas parler de coût : '+phrase);
+ const etat=await page.$eval('#conduite-state',e=>e.textContent);
+ // Trois états distincts, jamais confondus : aucune tentative, des tentatives
+ // sans coût déclaré, un montant rapporté.
+ assert.match(etat,/aucune tentative|coût réel non rapporté/,'la ligne d’état doit déclarer ce qu’elle sait du coût : '+etat);
+ assert.ok(!/0\.00 USD rapport/.test(etat),'un coût inconnu ne s’affiche pas 0,00 : '+etat);
+ checks.push('coût : absence déclarée, jamais un zéro inventé');
+
  await browser.close();
  const bilan={status:errors.length||external.length?'FAIL':'PASS',checks,errors,external};
  fs.writeFileSync(path.join(outDir,'activity.json'),JSON.stringify(bilan,null,1));

@@ -104,6 +104,16 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  await page.screenshot({path:path.join(outDir,'graphe-echec.png'),fullPage:true});
  checks.push('tâche bloquée distinguée dans le graphe');
 
+ // Le cumul de coût de la tâche doit être une valeur ou une absence déclarée.
+ // Un libellé constant qui dit toujours « non rapporté » parce qu'il lit un
+ // champ inexistant passerait un test portant sur le seul mot « coût ».
+ await ouvrir(dense.id,'Plan dense');
+ await page.waitForFunction(()=>document.querySelectorAll('.graph-noeud').length===6);
+ const textes=(await noeuds(page)).join(' | ');
+ assert.match(textes,/coût de la tâche : (\d+\.\d{2} USD|non rapporté)/,'cumul de coût illisible : '+textes);
+ assert.ok(!/coût de la tâche : 0\.00/.test(textes),'un coût inconnu ne doit pas s’afficher 0,00 : '+textes);
+ checks.push('cumul de coût par tâche : valeur ou absence déclarée, jamais 0,00');
+
  const anime=await page.evaluate(()=>[...document.querySelectorAll('#graph *')].some(e=>{const s=getComputedStyle(e);return s.animationName!=='none'||s.transitionDuration!=='0s'}));
  assert.equal(anime,false,'aucune animation ne doit masquer une alerte');
  checks.push('aucune animation dans le graphe');

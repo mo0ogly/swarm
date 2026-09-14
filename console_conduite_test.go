@@ -24,10 +24,15 @@ func TestConduiteScreenShowsStateInboxAndPlan(t *testing.T) {
 	c := &consoleState{conduite: true}
 	frame := s.renderDashboard(w.ID, c, 100, 32, "")
 
-	for _, want := range []string{"conduite", "créneau(x) occupé(s)", "Budget estimé", "À TRAITER", "PLAN ET AGENTS", "t1", "conductor.go", "3 appels"} {
+	for _, want := range []string{"conduite", "créneau(x) occupé(s)", "réservé", "À TRAITER", "PLAN ET AGENTS", "t1", "conductor.go", "3 appels"} {
 		if !strings.Contains(frame, want) {
 			t.Fatalf("écran de conduite sans %q :\n%s", want, frame)
 		}
+	}
+	// Aucune tentative ne rapporte de coût ici : l'écran doit le dire, et surtout
+	// ne pas afficher un zéro qui passerait pour une mesure.
+	if !strings.Contains(frame, "coût réel non rapporté") {
+		t.Fatalf("coût inconnu non déclaré :\n%s", frame)
 	}
 	for _, unwanted := range []string{"SUIVI EN DIRECT", "Tab vers AGENTS"} {
 		if strings.Contains(frame, unwanted) {

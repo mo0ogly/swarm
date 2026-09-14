@@ -31,13 +31,17 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	views := []map[string]any{}
 	for _, a := range agents {
 		d, _ := s.desired(a.ID)
-		views = append(views, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d, "cost": "not_available"})
+		views = append(views, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d})
+	}
+	costs, e := s.costSummary(work)
+	if e != nil {
+		return nil, e
 	}
 	actions := map[string][]TaskAction{}
 	for i := range w.Tasks {
 		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
 	}
-	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions}, nil
+	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}
