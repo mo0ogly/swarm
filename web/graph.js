@@ -37,6 +37,10 @@ function graphLignesAgent(item) {
   // Coût rapporté par le fournisseur pour cette tentative ; jamais une facture.
   const cout = a.usage?.provider_reported_cost_usd;
   lignes.push(typeof cout === 'number' ? 'coût rapporté : ' + cout.toFixed(2) + ' USD' : 'coût : non rapporté');
+  const perdu = graphSignal(item);
+  if (perdu) lignes.push(perdu);
+  else if (a.progress?.last_result_at) lignes.push('dernier résultat : ' + new Date(a.progress.last_result_at).toLocaleTimeString('fr-FR'));
+  if (a.progress?.degraded) lignes.push('flux dégradé : ' + a.progress.degraded);
   return lignes;
 }
 
@@ -48,11 +52,6 @@ function graphCoutTache(id) {
   let texte = 'coût de la tâche : ' + c.reported_usd.toFixed(2) + ' USD';
   if (c.attempts_without_cost) texte += ' (+' + c.attempts_without_cost + ' sans coût)';
   return texte;
-  const perdu = graphSignal(item);
-  if (perdu) lignes.push(perdu);
-  else if (a.progress?.last_result_at) lignes.push('dernier résultat : ' + new Date(a.progress.last_result_at).toLocaleTimeString('fr-FR'));
-  if (a.progress?.degraded) lignes.push('flux dégradé : ' + a.progress.degraded);
-  return lignes;
 }
 
 function svgNode(nom, attributs, texte) {

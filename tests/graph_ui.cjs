@@ -21,6 +21,7 @@ const provider=path.join(root,'provider.py');
 fs.writeFileSync(provider,`import json,sys,time
 sys.stdin.read()
 print(json.dumps({"type":"assistant","message":{"content":[{"type":"tool_use","id":"probe","name":"Bash","input":{"description":"Mesurer la consommation CPU","command":"python3 probe.py"}}]}}),flush=True)
+print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"probe","content":"charge 12%"}]}}),flush=True)
 time.sleep(120)
 `);
 fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{recette:{command:process.env.PYTHON_BIN||'/usr/bin/python3',args:[provider],env_allow:[]}}}));
@@ -77,6 +78,21 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  // qu'il lit un champ inexistant passerait un test sur le seul mot.
  assert.match(g1,/coût rapporté : \d+\.\d{2} USD|coût : non rapporté/,'coût illisible : '+g1);
  checks.push('tentative vivante : action en français, appels et coût');
+
+ // Fraîcheur du signal. Ce bloc de graph.js est devenu inatteignable une fois,
+ // sans qu'aucun contrôle ne s'en aperçoive : un nœud muet avait l'air normal.
+ // Sur une tentative vivante, la ligne attendue est « dernier résultat » ; les
+ // deux autres formes viennent du même bloc, donc l'assertion les couvre toutes
+ // en portée. Ce qu'elle ne couvre pas : le calcul du délai de silence
+ // lui-même, qui demanderait d'attendre l'expiration de la limite.
+ // Tant qu'aucun résultat d'outil n'est revenu, le nœud n'a rien à dire de sa
+ // fraîcheur et se tait à juste titre : attendre le premier résultat.
+ await page.waitForFunction(()=>[...document.querySelectorAll('.graph-noeud')]
+   .some(n=>/· [1-9]\d* résultats/.test(n.textContent)),{timeout:25000});
+ const g1frais=(await noeuds(page)).find(t=>t.startsWith('g1'));
+ assert.match(g1frais,/dernier résultat : \d{2}:\d{2}|signal perdu depuis \d+ s|signal jamais reçu/,
+   'fraîcheur du signal absente du nœud : '+g1frais);
+ checks.push('fraîcheur du signal portée par le nœud');
  await page.screenshot({path:path.join(outDir,'graphe-dense-etat.png'),fullPage:true});
  await page.click('#theme');await new Promise(r=>setTimeout(r,150));
  await page.screenshot({path:path.join(outDir,'graphe-dense-sombre.png'),fullPage:true});
