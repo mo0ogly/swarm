@@ -93,6 +93,36 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  assert.match(g1frais,/dernier résultat : \d{2}:\d{2}|signal perdu depuis \d+ s|signal jamais reçu/,
    'fraîcheur du signal absente du nœud : '+g1frais);
  checks.push('fraîcheur du signal portée par le nœud');
+
+ // Lecture par la couleur. Trois exigences : la teinte remplit le nœud et ne
+ // se limite pas au contour, deux états ne partagent pas la même teinte, et
+ // l'état reste écrit — la couleur le redouble, elle ne le remplace pas.
+ const teintes=await page.$$eval('.graph-noeud',ns=>ns.map(n=>({
+   etat:n.dataset.etat||'',
+   fond:getComputedStyle(n.querySelector('.graph-cadre')).fill,
+   texte:n.textContent})));
+ const etats=new Set(teintes.map(n=>n.etat));
+ assert.ok(etats.size>=2,'le plan doit montrer plusieurs états pour ce contrôle : '+[...etats].join(', '));
+ const parEtat={};
+ for(const n of teintes){
+   assert.ok(n.fond&&n.fond!=='none','nœud sans aplat : la teinte reste un liseré : '+JSON.stringify(n));
+   (parEtat[n.etat]=parEtat[n.etat]||new Set()).add(n.fond);
+ }
+ const fonds=Object.entries(parEtat).map(([e,f])=>e+'|'+[...f][0]);
+ assert.equal(new Set(fonds.map(f=>f.split('|')[1])).size,Object.keys(parEtat).length,
+   'deux états partagent la même teinte : '+fonds.join(' , '));
+ // Légende : une teinte qui signifie quelque chose doit dire quoi.
+ const legende=await page.$$eval('.graph-teinte',es=>es.map(e=>e.dataset.etat+':'+e.textContent.trim()));
+ for(const etat of etats){
+   assert.ok(legende.some(l=>l.startsWith(etat+':')),'état absent de la légende : '+etat+' — '+legende.join(', '));
+ }
+ checks.push('teintes pleines, distinctes par état, expliquées par une légende');
+
+ // Les dépendances satisfaites et en attente ne se lisent pas pareil.
+ const aretesEtat=await page.$$eval('.graph-arete',es=>es.map(e=>e.dataset.lien||''));
+ assert.ok(aretesEtat.every(x=>x==='satisfait'||x==='attente'),'arête sans état de dépendance : '+aretesEtat.join(', '));
+ checks.push('dépendance satisfaite distinguée d’une dépendance en attente');
+
  await page.screenshot({path:path.join(outDir,'graphe-dense-etat.png'),fullPage:true});
  await page.click('#theme');await new Promise(r=>setTimeout(r,150));
  await page.screenshot({path:path.join(outDir,'graphe-dense-sombre.png'),fullPage:true});
@@ -126,7 +156,6 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  assert.equal(etat,'alerte','une tâche bloquée doit se distinguer : '+etat);
  await page.screenshot({path:path.join(outDir,'graphe-echec.png'),fullPage:true});
  checks.push('tâche bloquée distinguée dans le graphe');
-
  // Le cumul de coût de la tâche doit être une valeur ou une absence déclarée.
  // Un libellé constant qui dit toujours « non rapporté » parce qu'il lit un
  // champ inexistant passerait un test portant sur le seul mot « coût ».

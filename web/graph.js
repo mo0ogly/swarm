@@ -100,11 +100,21 @@ function renderGraph() {
   const marker = svgNode('marker', { id: 'graph-fleche', viewBox: '0 0 8 8', refX: '7', refY: '4', markerWidth: '7', markerHeight: '7', orient: 'auto' });
   marker.append(svgNode('path', { d: 'M0,0 L8,4 L0,8 z', class: 'graph-fleche' }));
   defs.append(marker);
+  const markerOk = svgNode('marker', { id: 'graph-fleche-ok', viewBox: '0 0 8 8', refX: '7', refY: '4', markerWidth: '7', markerHeight: '7', orient: 'auto' });
+  markerOk.append(svgNode('path', { d: 'M0,0 L8,4 L0,8 z', class: 'graph-fleche-ok' }));
+  defs.append(markerOk);
   svg.append(defs);
 
+  // Une dépendance satisfaite et une dépendance en attente ne se lisent pas de
+  // la même façon : la première autorise le départ, la seconde le retient. Le
+  // graphe le montre, la ligne de la tâche continue de l'écrire en clair.
+  const acceptees = new Set(taches.filter(t => t.status === 'accepted' || t.status === 'waived').map(t => t.id));
   for (const e of g.edges()) {
     const points = g.edge(e).points.map(p => `${p.x},${p.y}`).join(' ');
-    svg.append(svgNode('polyline', { points, class: 'graph-arete', 'marker-end': 'url(#graph-fleche)' }));
+    const satisfaite = acceptees.has(e.v);
+    svg.append(svgNode('polyline', { points, class: 'graph-arete',
+      'data-lien': satisfaite ? 'satisfait' : 'attente',
+      'marker-end': 'url(#graph-fleche' + (satisfaite ? '-ok' : '') + ')' }));
   }
 
   for (const t of taches) {
@@ -141,5 +151,22 @@ function renderGraph() {
   conteneur.append(svg);
   hote.append(conteneur);
   const liens = snapshot.agents.filter(x => x.agent.parent && active(x.agent));
+  hote.append(graphLegendeEtats());
   if (liens.length) hote.append(node('p', 'Tentatives issues d’un parent : ' + liens.map(x => x.agent.task_id + ' ← ' + x.agent.parent).join(' · '), 'graph-legende'));
+}
+
+// La couleur d'un nœud ne s'invente pas : cette légende dit ce que chaque
+// teinte signifie, pour qui la découvre ou ne la distingue pas.
+function graphLegendeEtats() {
+  const p = node('p', undefined, 'graph-legende');
+  p.append(node('span', 'Teintes : '));
+  const etats = [['attente', 'à faire'], ['active', 'en cours'], ['attention', 'à vérifier'],
+    ['alerte', 'bloquée'], ['validee', 'acceptée'], ['neutre', 'abandonnée']];
+  etats.forEach(([etat, mot], i) => {
+    if (i) p.append(node('span', ' · '));
+    const e = node('span', mot, 'graph-teinte');
+    e.dataset.etat = etat;
+    p.append(e);
+  });
+  return p;
 }
