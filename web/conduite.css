@@ -23,21 +23,31 @@ body[data-mode=conduite] .rail-label{opacity:.9}
 
 /* Le fil occupe une colonne propre : le graphe répond à « où en est le
    travail », le fil à « que s'est-il passé ». Deux questions, deux zones. */
-.conduite-colonnes{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:20px;align-items:start}
+/* Le fil occupait une colonne latérale et rognait le graphe en permanence,
+   même replié. Il passe en bandeau pleine largeur au-dessus : replié il coûte
+   une ligne, et le graphe dispose de toute la largeur dans les deux cas. */
 .conduite-principal{min-width:0}
-.conduite-fil{border:1px solid var(--wattson-ligne);border-radius:14px;background:var(--wattson-carte-appuyee);padding:14px 16px}
+.conduite-fil{margin-bottom:20px}
 .conduite-fil h3{margin-top:0}
 /* Accordéon natif : replier le fil est un choix de lecture, pas une option
    cachée. Le sommaire reste lisible replié et porte ce qu'il masque. */
 .fil-bloc{border:1px solid var(--wattson-ligne);border-radius:var(--wattson-rayon-carte);background:var(--wattson-carte);overflow:hidden}
-.fil-sommaire{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;cursor:pointer;background:var(--wattson-carte-appuyee);border-bottom:1px solid var(--wattson-ligne);list-style:none}
+/* Le sommaire doit se lire comme une commande, pas comme un titre : un chevron
+   qui tourne, un survol marqué, et le libellé de l'action à droite. Sans cela
+   l'accordéon existe sans que rien ne le montre. */
+.fil-sommaire{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;background:var(--wattson-carte-appuyee);border-bottom:1px solid var(--wattson-ligne);list-style:none}
 .fil-sommaire::-webkit-details-marker{display:none}
-.fil-sommaire::after{content:"Replier";font-size:12px;color:var(--wattson-libelle)}
+.fil-sommaire::before{content:"";width:0;height:0;border-left:7px solid var(--wattson-titre);border-top:5px solid transparent;border-bottom:5px solid transparent;transform:rotate(90deg);transition:none}
+.fil-bloc:not([open]) .fil-sommaire::before{transform:none}
+.fil-sommaire::after{content:"Replier";font-size:12px;font-weight:600;color:var(--wattson-action-encre);background:var(--wattson-action-fond);border:1px solid var(--wattson-action-bordure);border-radius:var(--wattson-rayon-controle);padding:3px 10px;white-space:nowrap}
 .fil-bloc:not([open]) .fil-sommaire{border-bottom:none}
 .fil-bloc:not([open]) .fil-sommaire::after{content:"Déplier"}
-.fil-sommaire h3{margin:0}
+.fil-sommaire:hover{background:var(--wattson-carte-creuse)}
+.fil-sommaire h3{margin:0;font-size:15px}
+.fil-sommaire .fil-resume{grid-column:2;justify-self:start}
+@media(max-width:520px){.fil-sommaire{grid-template-columns:auto 1fr}.fil-sommaire::after{grid-column:2;justify-self:end}}
 .fil-sommaire:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:-2px}
-.fil-resume{font-size:12px;color:var(--wattson-libelle)}
+.fil-resume{font-size:12px;color:var(--wattson-libelle);text-align:right}
 /* Le mot reste : la pastille double « depuis votre visite », elle ne le remplace pas. */
 .fil-resume[data-neuf=oui]{color:var(--wattson-accent-encre);font-weight:600}
 .fil-resume[data-neuf=oui]::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--wattson-accent)}
@@ -57,7 +67,7 @@ body[data-mode=conduite] .rail-label{opacity:.9}
    `justify-content` est nécessaire car la feuille du cockpit étire les labels. */
 .fil-filtre{display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:13px;color:var(--wattson-texte);margin-bottom:12px;cursor:pointer}
 .fil-filtre input{width:auto;flex:0 0 auto;margin:0}
-.fil-entrees{list-style:none;margin:0;padding:0;max-height:60vh;overflow-y:auto}
+.fil-entrees{list-style:none;margin:0;padding:0;max-height:38vh;overflow-y:auto}
 .fil-entree{padding:8px 0;border-top:1px solid var(--wattson-ligne)}
 .fil-entree:first-child{border-top:none}
 .fil-jour{margin:6px 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--wattson-libelle)}
@@ -71,7 +81,7 @@ body[data-mode=conduite] .rail-label{opacity:.9}
 .fil-label{font-size:13px;font-weight:600;color:var(--wattson-titre)}
 .fil-message{margin:4px 0 0;font-size:13px;color:var(--wattson-texte);overflow-wrap:anywhere}
 .fil-etat{margin:10px 0 0;font-size:13px;color:var(--wattson-libelle)}
-@media(max-width:1100px){.conduite-colonnes{grid-template-columns:minmax(0,1fr)}.fil-entrees{max-height:none}}
+@media(max-width:1100px){.fil-entrees{max-height:none}}
 /* Repère de visite : une ligne de partage, pas une entrée du fil. */
 .fil-visite{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--wattson-info-encre)}
 .fil-visite::before,.fil-visite::after{content:"";flex:1;height:2px;background:var(--wattson-info-encre);opacity:.5}
