@@ -26,6 +26,14 @@ let out='';server.stdout.on('data',d=>out+=d);
  const b=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});
  const p=await b.newPage();p.setDefaultTimeout(20000);
  p.on('pageerror',e=>errors.push(e.message));
+ // Les erreurs de console comptent aussi : une ressource absente n'interrompt
+ // rien mais salit chaque chargement, et masque les vraies erreurs quand on
+ // vient chercher un incident.
+ p.on('console',m=>{if(m.type()==='error')errors.push('console: '+m.text())});
+ // Le flux d'evenements est une connexion longue : le navigateur l'interrompt
+ // en se fermant, ce qui n'est pas une panne. Tout le reste compte.
+ p.on('requestfailed',r=>{if(!r.url().includes('/api/v1/events'))errors.push('requete echouee : '+r.url())});
+ p.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' sur '+r.url())});
  p.on('request',r=>{const u=r.url();if(!u.startsWith(url.split('/session/')[0])&&!u.startsWith('data:')&&!u.startsWith('blob:'))external.push(u)});
  await p.setViewport({width:1500,height:1100});
  await p.goto(url);
@@ -82,6 +90,11 @@ let out='';server.stdout.on('data',d=>out+=d);
  await p.waitForFunction(()=>!document.querySelector('#modal').open);
  assert.equal(await p.$eval(':focus',e=>e.id),'help','le focus ne revient pas sur le declencheur');
  checks.push('Echap ferme l aide et rend le focus');
+
+ // 6. Aucune ressource manquante : l'icone d'onglet est servie par le binaire.
+ const icone=await p.evaluate(async()=>{const r=await fetch('/favicon.svg');return r.status});
+ assert.equal(icone,200,'icone d onglet absente : le navigateur retombe sur /favicon.ico et journalise un 404');
+ checks.push('aucune ressource manquante au chargement');
 
  await b.close();
  console.log(JSON.stringify({status:errors.length||external.length?'FAIL':'PASS',checks,errors,external:[...new Set(external)]},null,1));
