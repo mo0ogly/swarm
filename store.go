@@ -153,6 +153,11 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	if version < 6 {
+		if e = migrateDecisionAuthorKind(db); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
@@ -196,6 +201,21 @@ func migrateAutonomy(db *sql.DB) error {
 		}
 	}
 	_, e = db.Exec("PRAGMA user_version=5")
+	return e
+}
+
+// Les fermetures écrites par le moteur partageaient le type « decision » avec
+// les acquittements humains, donc le fil d'activité les attribuait à
+// l'opérateur. Le type est désormais distinct à l'écriture ; les lignes déjà
+// enregistrées sont reclassées à partir de leur propre message, qui contient
+// l'auteur — ce n'est pas une supposition, c'est relire ce qui a été écrit.
+func migrateDecisionAuthorKind(db *sql.DB) error {
+	if _, e := db.Exec(`UPDATE cockpit_events SET kind='decision.moteur'
+		WHERE kind='decision' AND instr(message, ' : ') > 0
+		AND substr(message, instr(message, ' : ') + 3, length('moteur : ')) = 'moteur : '`); e != nil {
+		return e
+	}
+	_, e := db.Exec("PRAGMA user_version=6")
 	return e
 }
 

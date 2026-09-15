@@ -85,7 +85,8 @@ const activityRetexPrefix = "retex-"
 var activityLabels = map[string]string{
 	"dispatch": "Ordonnancement", "conductor": "Conduite", "pause": "Départs",
 	"autonomy": "Niveau d'autonomie", "budget": "Budget", "priority": "Priorité",
-	"decision": "Décision", "launch.refused": "Lancement refusé",
+	"decision": "Décision", "decision.moteur": "Décision du moteur",
+	"launch.refused": "Lancement refusé",
 	"assistant": "Assistant", "task.update": "Tâche", "gate": "Gate",
 	"agent.start": "Tentative", "ooda": "Boucle OODA", "checkpoint": "Point d'étape",
 	"work.create": "Travail", "task.add": "Tâche ajoutée",

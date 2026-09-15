@@ -487,3 +487,22 @@ func TestActivityConsoleCannotClaimEngineOrigin(t *testing.T) {
 	}
 	t.Fatalf("la saisie au terminal est absente du fil : %+v", page.Entries)
 }
+
+// Le moteur ferme lui-même des demandes : revalidation constatée, sujet
+// remplacé, dérive devenue un état. Classées « vous », ces fermetures
+// prêtaient à l'opérateur des décisions qu'il n'avait pas prises — le fil
+// affichait « ● vous » sur un message disant « moteur ». Mesuré à l'écran.
+func TestActivityAttributesEngineClosuresToEngine(t *testing.T) {
+	if got := activityOrigin("decision.moteur", activityPayload{}); got != activityEngine {
+		t.Errorf("une fermeture écrite par le moteur doit lui être attribuée, obtenu %q", got)
+	}
+	if got := activityOrigin("decision", activityPayload{}); got != activityHuman {
+		t.Errorf("un acquittement humain reste humain, obtenu %q", got)
+	}
+	if activityLabel("decision.moteur") == "decision.moteur" {
+		t.Error("libellé technique brut affiché tel quel")
+	}
+	if decisionEventKind("moteur") == decisionEventKind("fpizzi") {
+		t.Error("le moteur et un opérateur écrivent le même type : le fil ne peut plus les distinguer")
+	}
+}

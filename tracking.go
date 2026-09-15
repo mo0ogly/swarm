@@ -192,7 +192,7 @@ func (s *Store) resolveDecision(work, id, author, note string) error {
 	if _, e = tx.Exec("UPDATE decisions SET body=? WHERE id=? AND work_id=?", raw, id, work); e != nil {
 		return e
 	}
-	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, d.ResolvedAt, "decision", d.TaskID+" : "+author+" : "+note); e != nil {
+	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, d.ResolvedAt, decisionEventKind(author), d.TaskID+" : "+author+" : "+note); e != nil {
 		return e
 	}
 	return tx.Commit()
@@ -227,7 +227,7 @@ func (s *Store) supersedeDecision(work, id, note string) error {
 	if _, e = tx.Exec("UPDATE decisions SET body=? WHERE id=? AND work_id=?", raw, id, work); e != nil {
 		return e
 	}
-	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, d.ResolvedAt, "decision", d.TaskID+" : moteur : "+note); e != nil {
+	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, d.ResolvedAt, decisionEventKind(engineAuthor), d.TaskID+" : "+engineAuthor+" : "+note); e != nil {
 		return e
 	}
 	return tx.Commit()
@@ -268,4 +268,18 @@ func settledDecisionTask(w *Work, id string) bool {
 		return false
 	}
 	return settledTask(t.Status)
+}
+
+// Le moteur ferme lui-même certaines demandes : revalidation constatée, sujet
+// remplacé, dérive devenue un simple état. Le fil d'activité classe par type
+// d'événement ; sans type distinct, ces fermetures s'affichaient « vous » et
+// prêtaient à l'opérateur des décisions qu'il n'a pas prises — exactement ce
+// que ce fil existe pour démentir.
+const engineAuthor = "moteur"
+
+func decisionEventKind(author string) string {
+	if author == engineAuthor {
+		return "decision.moteur"
+	}
+	return "decision"
 }

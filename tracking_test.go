@@ -279,3 +279,55 @@ func TestDecisionsCloseLegacyCardOnSettledTask(t *testing.T) {
 	}
 	t.Fatal("la carte héritée a disparu de la liste au lieu d'être close")
 }
+
+// Les fermetures écrites par le moteur avant la séparation des types portent
+// encore « decision » en base et s'affichaient « vous ». Leur propre message
+// nomme l'auteur : la migration relit ce qui a été écrit, elle ne devine pas.
+func TestMigrationReclassesEngineDecisions(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	for _, ligne := range []struct{ kind, message string }{
+		{"decision", "t1 : moteur : Revalidation constatée"},
+		{"decision", "t1 : fpizzi/uid:1001 : acquittée après revue"},
+		{"decision", "t1 : fpizzi/uid:1001 : acquittée après revue : moteur : cité dans la note"},
+	} {
+		if _, e := s.db.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)",
+			w.ID, now(), ligne.kind, ligne.message); e != nil {
+			t.Fatal(e)
+		}
+	}
+	// Remettre la base à la version précédente pour que la migration s'exécute.
+	if _, e := s.db.Exec("PRAGMA user_version=5"); e != nil {
+		t.Fatal(e)
+	}
+	racine := s.root
+	s.db.Close()
+
+	relu, e := openStore(racine, false)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer relu.db.Close()
+	page, e := relu.activity(w.ID, activityQuery{Limit: 50})
+	if e != nil {
+		t.Fatal(e)
+	}
+	var vuMoteur, vuHumain bool
+	for _, x := range page.Entries {
+		if strings.Contains(x.Message, "Revalidation constatée") {
+			vuMoteur = true
+			if x.Origin != activityEngine {
+				t.Fatalf("fermeture du moteur toujours attribuée à l'opérateur : %+v", x)
+			}
+		}
+		if strings.Contains(x.Message, "acquittée après revue") {
+			vuHumain = true
+			if x.Origin != activityHuman {
+				t.Fatalf("un acquittement humain ne doit pas devenir une action du moteur : %+v", x)
+			}
+		}
+	}
+	if !vuMoteur || !vuHumain {
+		t.Fatalf("les deux lignes doivent figurer au fil : moteur=%t humain=%t", vuMoteur, vuHumain)
+	}
+}
