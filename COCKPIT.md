@@ -113,7 +113,8 @@ réconciliation ; `reconcile` peut terminer cette mise à jour après relecture.
 
 ## Fil d'activité et repère de visite
 
-Le mode Conduite affiche, à côté du graphe, la ligne de vie du travail : chaque
+Le mode Conduite affiche, en bandeau au-dessus du graphe, la ligne de vie du
+travail : chaque
 départ automatique, chaque relais, chaque refus motivé, chaque décision
 d'opérateur, dans l'ordre du temps. Deux sources y sont fusionnées — les
 décisions locales et les mutations du travail — et rien n'y est reconstruit :
@@ -126,11 +127,28 @@ Chaque ligne porte son origine, en toutes lettres autant qu'en couleur :
 |---|---|
 | `▸ moteur` | le système a agi seul : départ automatique, relais de handoff, refus |
 | `● vous` | un opérateur a décidé : suspension, réglage, gate, acceptation, dérogation |
+| `▸ moteur` sur une décision | le moteur a fermé une demande : revalidation constatée, sujet remplacé, dérive devenue un état |
 
-Le classement par défaut est « moteur », ce qui **surestime** l'autonomie : un
-geste humain mal classé ferait croire à une autonomie qui n'a pas eu lieu. La
-liste des types humains doit donc rester exhaustive — tout nouveau type
-d'événement produit par un geste d'opérateur s'y ajoute.
+L'origine se lit d'abord dans le type d'événement. Deux types sont écrits par
+les deux voies et ne peuvent pas être classés ainsi :
+
+- `task.update` — l'opérateur depuis le cockpit, la CLI ou le terminal, et le
+  moteur au départ, au relais et à la fin d'une tentative. L'origine est écrite
+  dans la mutation elle-même ; les trois portes extérieures effacent ce champ,
+  donc personne ne peut se déclarer moteur depuis l'extérieur.
+- la fermeture d'une demande — un acquittement humain et une fermeture décidée
+  par le moteur portent des types distincts depuis qu'une fermeture automatique
+  s'est affichée « vous » sur un message disant « moteur ».
+
+Quand rien ne tranche, l'absence d'origine se lit « humain » : le fil
+**sous-déclare** l'autonomie plutôt que de l'exagérer. Attribuer au moteur un
+geste humain ferait croire à une autonomie qui n'a pas eu lieu, ce que ce fil
+existe précisément pour démentir.
+
+Le fil se replie sur son titre, qui continue d'annoncer ce qu'il masque, et
+l'état plié ou déplié est conservé d'une visite à l'autre. Un liseré reprend
+l'origine de chaque entrée et les entrées arrivées depuis votre visite sont
+surlignées : la couleur redouble le mot, elle ne le remplace jamais.
 
 Un trait marque votre dernière visite. Il est figé à l'ouverture du travail :
 relu à chaque rafraîchissement, il glisserait sous vos yeux dès qu'une autre
@@ -183,6 +201,13 @@ aucune tentative ne l'a déclaré, le nœud écrit « non rapporté », jamais 0
 « Signal perdu » et « terminé » restent distincts : un nœud « en cours » ne
 prouve pas qu'un processus tourne encore. Au-delà du délai de surveillance, le
 nœud le dit en clair.
+
+Chaque nœud porte la teinte de son état en aplat, et une légende dit ce que
+chaque teinte signifie. Une arête pleine marque une dépendance acceptée, une
+arête pointillée une dépendance encore en attente — la différence entre un
+départ autorisé et un départ retenu. L'état reste écrit en toutes lettres dans
+le nœud : la couleur permet de balayer le graphe, elle ne porte jamais seule
+l'information.
 
 Un nœud s'atteint au clavier et ouvre les actions de sa tâche. La liste sous le
 graphe porte la même information en texte. La disposition vient de dagre,
@@ -668,3 +693,29 @@ Le schéma courant est 3. Avant migration 2→3, `state-pre-v3-*.db` est créé 
 les clients avant restauration. Conserver aussi une sauvegarde cohérente de l'état
 le plus récent pour réconcilier ses écritures. Vérifier l'ancien couple binaire/base
 dans un dossier séparé ; ne pas écraser silencieusement les écritures postérieures.
+
+## Ce qui n'interrompt pas
+
+Le produit tient une promesse simple : n'interrompre que pour ce qui demande un
+arbitrage maintenant. Trois cas ont été retirés de l'écran « À traiter » après
+mesure sur un travail réel, où 86 demandes s'affichaient pour 16 tâches toutes
+acceptées, avec un seul et même texte.
+
+**Une demande déjà close ne revient pas.** La demande courante d'une tâche
+bloquée est rouverte à l'affichage ; les versions précédentes du même sujet ne
+le sont pas. Sans cette distinction, des décisions closes en base — dont
+certaines acquittées par un opérateur — réapparaissaient à chaque lecture, et
+l'écran défaisait en silence des décisions prises.
+
+**Un sujet ne donne qu'une carte.** Une évaluation plus récente remplace la
+précédente, close avec son motif plutôt qu'empilée.
+
+**Une acceptation dont les preuves ont dérivé n'est pas une demande.** Les gates
+signent des fichiers source partagés : travailler sur le produit périme d'un
+coup toutes les acceptations passées. La dérive reste visible sur la tâche et
+dans le graphe ; elle ne réclame un arbitrage que si une tâche non terminée en
+dépend, parce que la faire avancer supposerait une preuve qui n'est plus
+vérifiée. Une tâche rouverte fait exception : son garde-fou de revalidation
+reste dans les demandes.
+
+Toute fermeture porte son motif. Aucune carte ne disparaît sans raison lisible.

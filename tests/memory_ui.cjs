@@ -1,4 +1,4 @@
-const fs=require('fs'),path=require('path'),{spawn,execFileSync}=require('child_process'),pup=require('puppeteer');
+const fs=require('fs'),path=require('path'),{spawn,execFileSync}=require('child_process'),pup=require(process.env.PUPPETEER_MODULE||'puppeteer');
 const assert=require('node:assert/strict');
 const binary=process.argv[2],dir=path.resolve(process.argv[3]);fs.mkdirSync(dir,{recursive:true});
 (async()=>{
