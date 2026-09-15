@@ -27,6 +27,31 @@ body[data-mode=conduite] .rail-label{opacity:.9}
 .conduite-principal{min-width:0}
 .conduite-fil{border:1px solid var(--wattson-ligne);border-radius:14px;background:var(--wattson-carte-appuyee);padding:14px 16px}
 .conduite-fil h3{margin-top:0}
+/* Accordéon natif : replier le fil est un choix de lecture, pas une option
+   cachée. Le sommaire reste lisible replié et porte ce qu'il masque. */
+.fil-bloc{border:1px solid var(--wattson-ligne);border-radius:var(--wattson-rayon-carte);background:var(--wattson-carte);overflow:hidden}
+.fil-sommaire{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;cursor:pointer;background:var(--wattson-carte-appuyee);border-bottom:1px solid var(--wattson-ligne);list-style:none}
+.fil-sommaire::-webkit-details-marker{display:none}
+.fil-sommaire::after{content:"Replier";font-size:12px;color:var(--wattson-libelle)}
+.fil-bloc:not([open]) .fil-sommaire{border-bottom:none}
+.fil-bloc:not([open]) .fil-sommaire::after{content:"Déplier"}
+.fil-sommaire h3{margin:0}
+.fil-sommaire:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:-2px}
+.fil-resume{font-size:12px;color:var(--wattson-libelle)}
+/* Le mot reste : la pastille double « depuis votre visite », elle ne le remplace pas. */
+.fil-resume[data-neuf=oui]{color:var(--wattson-accent-encre);font-weight:600}
+.fil-resume[data-neuf=oui]::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--wattson-accent)}
+.fil-corps{padding:12px 14px 14px}
+/* Surbrillance par origine. Le libellé « ▸ moteur » ou « ● vous » reste écrit
+   dans chaque entrée : la couleur le redouble pour permettre de balayer la
+   colonne, elle ne porte aucune information à elle seule. */
+.fil-entree{border-left:3px solid transparent;padding-left:10px}
+.fil-entree[data-origine=moteur]{border-left-color:var(--wattson-info-encre)}
+.fil-entree[data-origine=vous]{border-left-color:var(--wattson-accent)}
+/* Arrivé depuis votre dernière visite : doublé par le trait « votre dernière
+   visite » qui sépare déjà les deux périodes. */
+.fil-entree[data-depuis=visite]{background:var(--wattson-info-fond)}
+.fil-entree[data-depuis=visite] .fil-label{color:var(--wattson-info-encre)}
 .fil-aide{margin:0 0 10px;font-size:13px;color:var(--wattson-libelle)}
 /* La case et son libellé forment une seule cible : séparés, on clique à côté.
    `justify-content` est nécessaire car la feuille du cockpit étire les labels. */

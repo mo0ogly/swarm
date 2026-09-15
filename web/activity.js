@@ -37,6 +37,11 @@ function filJour(iso) {
 
 function filLigne(entree, jourPrecedent) {
   const li = node('li', undefined, 'fil-entree');
+  // La couleur ne porte jamais seule : l'origine reste écrite dans la ligne et
+  // le trait de visite reste posé. Ces attributs ne font que reprendre ce qui
+  // est déjà lisible, pour le rendre repérable d'un coup d'œil.
+  li.dataset.origine = entree.origin === 'moteur' ? 'moteur' : 'vous';
+  if (filVisiteReference && entree.at >= filVisiteReference) li.dataset.depuis = 'visite';
   const jour = filJour(entree.at);
   if (jour && jour !== jourPrecedent) li.append(node('p', jour, 'fil-jour'));
   const tete = node('div', undefined, 'fil-tete');
@@ -81,6 +86,7 @@ function filRendre() {
     liste.append(li);
   }
   $('fil-plus').hidden = !filSuite;
+  filRendreResume();
   const etat = $('fil-etat');
   if (filEntrees.length) {
     // « Début du fil » affirme qu'il n'y a rien avant ; ne le dire que si c'est
@@ -157,4 +163,34 @@ function filChangementsDepuisVisite() {
     }
   }
   return { taches: taches.size, entrees: depuis, complet: avant > 0 || !filSuite };
+}
+
+// Résumé porté par le sommaire : replié, l'accordéon doit dire ce qu'il cache.
+// Il ne compte que les entrées chargées, comme le bandeau, et l'annonce comme
+// un minimum tant que le trait de visite n'est pas dans la page.
+function filRendreResume() {
+  const hote = $('fil-resume');
+  if (!hote) return;
+  const change = filChangementsDepuisVisite();
+  if (!filEntrees.length) { hote.textContent = 'aucune activité'; hote.dataset.neuf = 'non'; return; }
+  if (!change || change.entrees === 0) {
+    hote.textContent = 'rien de neuf depuis votre visite';
+    hote.dataset.neuf = 'non';
+    return;
+  }
+  hote.textContent = (change.complet ? '' : 'au moins ') + change.entrees +
+    (change.entrees > 1 ? ' événements' : ' événement') + ' depuis votre visite';
+  hote.dataset.neuf = 'oui';
+}
+
+// L'état plié ou déplié est un choix de lecture : il se conserve d'une visite
+// à l'autre, comme le mode et le thème.
+{
+  const bloc = $('fil-bloc');
+  if (bloc) {
+    if (localStorage.getItem('swarm-fil') === 'replie') bloc.open = false;
+    bloc.addEventListener('toggle', () => {
+      localStorage.setItem('swarm-fil', bloc.open ? 'deplie' : 'replie');
+    });
+  }
 }

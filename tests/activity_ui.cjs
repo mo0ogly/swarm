@@ -167,6 +167,54 @@ const lignes=page=>page.$$eval('.fil-entree',ns=>ns.map(n=>({
    'la fermeture de l’onglet n’a rien enregistré : '+avantFermeture+' puis '+apresFermeture);
  checks.push('visite enregistrée aussi à la fermeture de l’onglet');
 
+ // 8ter. Accordéon : replier le fil, le retrouver replié, et lire quand même
+ // ce qu'il cache. Un panneau qui se replie sans rien dire oblige à le rouvrir
+ // pour savoir s'il s'est passé quelque chose.
+ assert.equal(await page.$eval('#fil-bloc',e=>e.open),true,'le fil doit être déplié par défaut');
+ const resumePlie=await page.$eval('#fil-resume',e=>e.textContent.trim());
+ assert.ok(resumePlie.length>0,'le sommaire ne dit rien de ce qu’il masque');
+ await page.$eval('#fil-bloc > summary',e=>e.click());
+ await page.waitForFunction(()=>!document.querySelector('#fil-bloc').open);
+ assert.ok(!await page.$eval('#fil-entrees',e=>e.checkVisibility?.()??e.offsetParent!==null),
+   'les entrées restent visibles alors que le fil est replié');
+ assert.match(await page.$eval('#fil-bloc > summary',e=>getComputedStyle(e,'::after').content),/Déplier/,
+   'le sommaire replié doit proposer de déplier');
+ await page.reload();
+ await page.waitForFunction(()=>document.querySelector('#fil-bloc'));
+ assert.equal(await page.$eval('#fil-bloc',e=>e.open),false,'l’état replié doit survivre au rechargement');
+ await page.$eval('#fil-bloc > summary',e=>e.click());
+ await page.waitForFunction(()=>document.querySelector('#fil-bloc').open);
+ await page.waitForFunction(()=>document.querySelectorAll('#fil-entrees .fil-entree').length>0);
+ checks.push('fil repliable, état conservé, sommaire parlant');
+
+ // 8quater. Surbrillance : chaque entrée colorée reste lisible sans la couleur.
+ // Le moteur doit avoir agi, sinon le fil ne contient qu'une origine et
+ // comparer les teintes ne prouverait rien. Un ordonnancement refusé suffit :
+ // c'est bien le moteur qui l'écrit, et il est journalisé comme tel.
+ cli('dispatch',actif.id);
+ await page.reload();
+ await page.waitForFunction(t=>document.getElementById('title')?.textContent===t,{},'Travail suivi');
+ await page.waitForFunction(()=>[...document.querySelectorAll('#fil-entrees .fil-entree')].some(n=>n.dataset.origine==='moteur'));
+ const paires=await page.$$eval('#fil-entrees .fil-entree',ns=>ns.map(n=>({
+   origine:n.dataset.origine||'',
+   mot:(n.querySelector('.fil-origine')?.textContent||''),
+   bord:getComputedStyle(n).borderLeftColor})));
+ assert.ok(paires.length>0,'aucune entrée à contrôler');
+ for(const x of paires){
+   assert.ok(['moteur','vous'].includes(x.origine),'entrée sans origine : '+JSON.stringify(x));
+   assert.ok(x.mot.includes(x.origine),'la couleur n’est pas doublée par le mot : '+JSON.stringify(x));
+   assert.ok(x.bord&&x.bord!=='rgba(0, 0, 0, 0)','surbrillance d’origine absente : '+JSON.stringify(x));
+ }
+ // Sans les deux origines à l'écran, comparer leurs teintes ne prouve rien :
+ // l'assertion passerait quelles que soient les couleurs.
+ const origines=new Set(paires.map(x=>x.origine));
+ assert.equal(origines.size,2,'le fil doit montrer les deux origines pour que ce contrôle ait un sens : '+[...origines].join(', '));
+ const teintes=new Set(paires.map(x=>x.origine+'|'+x.bord));
+ assert.equal(new Set([...teintes].map(t=>t.split('|')[1])).size,
+   new Set(paires.map(x=>x.origine)).size,
+   'deux origines doivent se distinguer par la teinte : '+[...teintes].join(' , '));
+ checks.push('surbrillance par origine, toujours doublée par le mot');
+
  // 9. Le bandeau dit franchement qu'il n'y a rien, plutôt que d'aligner des zéros.
  const accueil=async()=>page.$eval('#conduite-accueil',e=>e.textContent.trim());
  await page.waitForFunction(()=>document.getElementById('conduite-accueil').textContent.trim().length>0);
