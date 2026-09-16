@@ -24,6 +24,7 @@ swarm agent list <travail>
 swarm agent show|stop|reconcile <agent>
 swarm agent logs <agent> [après_seq] [--output nouveau.jsonl]
 swarm work create --input fichier.json
+swarm work update <travail> --input fichier.json
 swarm work list
 swarm work show <travail>
 swarm task add|update <travail> --input fichier.json
@@ -276,7 +277,7 @@ func run(args []string, out, errOut io.Writer) int {
 		return code
 	}
 	switch kind {
-	case "work.create", "task.add", "task.update", "checkpoint", "ooda":
+	case "work.create", "work.update", "task.add", "task.update", "checkpoint", "ooda":
 	default:
 		return fail(fmt.Errorf("commande inconnue : %s", kind))
 	}

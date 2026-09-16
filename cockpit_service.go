@@ -25,7 +25,7 @@ func (s *Store) executeRequest(work, kind string, r Request) (Work, error) {
 		return Work{}, &CommandError{Code: "invalid_schema", Message: "schema_version doit valoir 1"}
 	}
 	switch kind {
-	case "work.create", "task.add", "task.update", "checkpoint", "ooda":
+	case "work.create", "work.update", "task.add", "task.update", "checkpoint", "ooda":
 	default:
 		return Work{}, &CommandError{Code: "unknown_command", Message: "opération inconnue"}
 	}

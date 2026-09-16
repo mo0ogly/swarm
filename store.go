@@ -323,19 +323,28 @@ func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn 
 			return w, &CommandError{Code: "revision_conflict", Message: fmt.Sprintf("révision périmée : attendue %d, courante %d ; relire le travail", expected, w.Revision), Retryable: true}
 		}
 	}
+	if kind == "work.update" {
+		var count int
+		if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND status IN ('queued','starting','running','stopping')", id).Scan(&count); e != nil {
+			return w, e
+		}
+		if count > 0 {
+			return w, fmt.Errorf("arrêter et réconcilier les agents avant de modifier le contrat du travail")
+		}
+	}
 	// The ownership guard uses this transaction, after replay and revision checks.
 	if kind == "task.update" || kind == "task.submit" {
 		var r Request
 		if e = json.Unmarshal(request, &r); e != nil {
 			return w, e
 		}
-		if r.Status != "" {
+		if r.Status != "" || r.editsDefinition() {
 			var count int
-			if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')", id, r.ID).Scan(&count); e != nil {
+			if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND (task_id=? OR ?) AND status IN ('queued','starting','running','stopping')", id, r.ID, r.editsDefinition()).Scan(&count); e != nil {
 				return w, e
 			}
 			if count > 0 {
-				return w, &CommandError{Code: "active_agent", Message: "arrêter et réconcilier l’agent avant modification de statut"}
+				return w, &CommandError{Code: "active_agent", Message: "arrêter et réconcilier les agents concernés avant modification du statut ou du contrat"}
 			}
 		}
 	}
@@ -372,6 +381,8 @@ func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn 
 }
 func (s *Store) apply(w *Work, kind string, r Request) error {
 	switch kind {
+	case "work.update":
+		return updateWorkDefinition(w, r)
 	case "work.create":
 		if !nonempty(r.Title) || !nonempty(r.Objective) || !nonempty(r.Scope) || len(r.Criteria) == 0 {
 			return fmt.Errorf("title, objective, scope et criteria requis")
@@ -398,6 +409,9 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 	case "task.update":
 		t, e := w.task(r.ID)
 		if e != nil {
+			return e
+		}
+		if e = updateTaskDefinition(w, t, r); e != nil {
 			return e
 		}
 		if r.Status == "" {

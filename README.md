@@ -58,7 +58,30 @@ Création (`work.json`) :
 
 `task add TRAVAIL` : ajouter `id`, `title`, `deliverable`, `criteria`,
 `owner`, `depends` (liste optionnelle de tâches existantes), `next`.
-`task update TRAVAIL` : `id`, `status`, éventuellement `owner`, `blocker`, `next`.
+`task update TRAVAIL` : `id`, puis les champs à modifier. `status` est facultatif.
+`owner`, `blocker`, `next` restent des métadonnées. Le contrat est également modifiable :
+`title`, `deliverable`, `criteria` (1 à 12 textes), `depends`, `max_attempts` (1–3),
+`max_tool_calls` (1–100). Une liste omise/null est inchangée ; `depends: []` retire
+les dépendances ; `criteria: []` est refusé. Les chaînes vides sont inchangées,
+les textes uniquement composés d'espaces sont refusés.
+
+Le contrat se modifie sur une tâche `todo` ou `blocked`, sans transition simultanée,
+et sans agent actif dans le travail ni tâche `running`. Les dépendances inconnues,
+répétées ou cycliques sont refusées atomiquement. Toute modification effective du
+contrat invalide gate, override et revalidation ; les checks du plan sont recalculés.
+Les tentatives et événements restent conservés. Les plans approuvés antérieurs restent
+historiques : le contrat courant est celui de la tâche, les pièces mémoire doivent
+être synchronisées par le conducteur.
+
+Exemple : `swarm task update TRAVAIL --input correction.json` :
+
+```json
+{"schema_version":1,"event_id":"correction-t4-1","expected_revision":9,"id":"t4","title":"Résolution exacte et provenance","criteria":["Aucune preuve d'une autre identité dans le score"],"depends":["t1","t3"],"max_attempts":2,"max_tool_calls":80}
+```
+
+`work update TRAVAIL` modifie `title`, `objective`, `scope`, `criteria` du travail
+avec la même enveloppe de révision. Toutes ses tâches doivent être `todo`/`blocked`,
+sans agent actif. Les validations sont invalidées, l'historique reste conservé.
 Quitter `running` exige `outcome`: `completed`, `failed` ou `interrupted`.
 `submitted` exige `completed`. `blocked` exige un motif. Une réouverture de
 `accepted` passe par `todo`, puis une nouvelle tentative et une nouvelle gate.
