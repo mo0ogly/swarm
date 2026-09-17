@@ -18,6 +18,11 @@ func commandFailure(err error) *CommandError {
 	if errors.As(err, &e) {
 		return e
 	}
+	var preparation *PreparationError
+	if errors.As(err, &preparation) {
+		retryable := preparation.Code == "conflict" || preparation.Code == "provider_unavailable" || preparation.Code == "interrupted"
+		return &CommandError{Code: preparation.Code, Message: preparation.Message, Retryable: retryable}
+	}
 	return &CommandError{Code: "command_failed", Message: err.Error()}
 }
 func (s *Store) executeRequest(work, kind string, r Request) (Work, error) {

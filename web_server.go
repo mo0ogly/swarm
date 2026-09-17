@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"crypto/subtle"
 	"embed"
 	"encoding/json"
@@ -22,6 +23,10 @@ import (
 var cockpitWeb embed.FS
 
 type webRequest struct {
+	Turn            string        `json:"turn,omitempty"`
+	Step            int           `json:"step,omitempty"`
+	PlanHash        string        `json:"plan_hash,omitempty"`
+	Mode            string        `json:"mode,omitempty"`
 	Level           string        `json:"level,omitempty"`
 	ModelPolicyHash string        `json:"model_policy_hash,omitempty"`
 	PlanBriefHash   string        `json:"plan_brief_hash,omitempty"`
@@ -53,6 +58,46 @@ type webRequest struct {
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "assist-action-preview" {
+		return s.assistActionPlan(r.Work, r.Turn, r.Step)
+	}
+	if r.Kind == "assist-action-apply" {
+		return s.applyAssistAction(r.Work, r.Turn, r.Step, r.PlanHash)
+	}
+	if r.Kind == "mission-start" {
+		ps, err := s.providers()
+		if err != nil {
+			return nil, err
+		}
+		_, route, err := resolveModel(ps.Providers[r.Provider], r.Level, "work")
+		if err != nil {
+			return nil, err
+		}
+		if r.ModelPolicyHash != "" && (route == nil || route.PolicyHash != r.ModelPolicyHash) {
+			return nil, fmt.Errorf("Politique de modèle modifiée : examiner le choix à nouveau")
+		}
+		w, err := s.get(r.Work)
+		if err != nil {
+			return nil, err
+		}
+		profile := LaunchProfile{Role: "worker"}
+		if w.Profile != nil {
+			profile = *w.Profile
+		}
+		profile.Provider = r.Provider
+		profile.Workspace = r.Workspace
+		profile.Level = r.Level
+		profile.Updated = ""
+		profile.Actor = ""
+		err = s.configureMission(r.Work, profile, r.Slots, r.Revision, r.Event)
+		if err != nil {
+			return nil, err
+		}
+		return s.missionStatus(r.Work)
+	}
+	if r.Kind == "launch-preview" {
+		return s.launchEligibility(r), nil
+	}
 	if r.Kind == "plan-read" {
 		return s.readPlan(r.Work, r.Task)
 	}
@@ -87,7 +132,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Kind == "brainstorm" && r.ContextHash == "" {
 			return nil, fmt.Errorf("Examiner le contexte avant envoi.")
 		}
-		a, created, e := s.prepare(r.Work, Launch{Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+		a, created, e := s.prepare(r.Work, Launch{Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
 		if e != nil {
 			return nil, e
 		}
@@ -95,6 +140,28 @@ func (s *Store) webAction(r webRequest) (any, error) {
 			e = s.spawnAgent(a)
 		}
 		return a, e
+	}
+	// prepare checks replay identity before the revision: a lost response must
+	// return the existing retry rather than create another attempt.
+	if r.Kind == "retry" {
+		a, e := s.agent(r.Agent)
+		if e != nil {
+			return nil, e
+		}
+		if a.WorkID != r.Work || (r.Task != "" && a.TaskID != r.Task) || activeAgent(a) {
+			return nil, fmt.Errorf("tentative incompatible")
+		}
+		if r.Level == "" && a.ModelRoute != nil {
+			r.Level = a.ModelRoute.Level
+		}
+		next, created, e := s.prepare(r.Work, Launch{Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+		if e == nil && created {
+			e = s.spawnAgent(next)
+		}
+		return next, e
+	}
+	if (r.Kind == "stop" || r.Kind == "reconcile") && r.Event != "" {
+		return s.agentCommandReceipt(r)
 	}
 	w, e := s.get(r.Work)
 	if e != nil {
@@ -109,7 +176,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if e != nil {
 			return nil, e
 		}
-		if a.WorkID != r.Work {
+		if a.WorkID != r.Work || (r.Task != "" && a.TaskID != r.Task) {
 			return nil, fmt.Errorf("agent hors travail")
 		}
 		if r.Kind == "stop" {
@@ -118,22 +185,6 @@ func (s *Store) webAction(r webRequest) (any, error) {
 			e = s.reconcile(a.ID)
 		}
 		return map[string]string{"message": "Demande enregistrée ; vérifier l’état observé."}, e
-	case "retry":
-		a, e := s.agent(r.Agent)
-		if e != nil {
-			return nil, e
-		}
-		if a.WorkID != r.Work || activeAgent(a) {
-			return nil, fmt.Errorf("tentative incompatible")
-		}
-		if r.Level == "" && a.ModelRoute != nil {
-			r.Level = a.ModelRoute.Level
-		}
-		next, created, e := s.prepare(r.Work, Launch{Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
-		if e == nil && created {
-			e = s.spawnAgent(next)
-		}
-		return next, e
 	case "adopt-brief":
 		return s.adoptBrief(r.Work, r.Task, r.Path, r.Note, r.Event, r.Revision)
 	case "submit":
@@ -175,6 +226,20 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if e = s.setAutonomy(r.Work, r.Autonomy, r.Slots); e == nil {
 			_, e = s.dispatch(r.Work)
 		}
+	case "mission-pause":
+		e = s.pause(r.Work, true)
+	case "mission-resume":
+		var p MissionPolicy
+		p, e = s.missionPolicy(r.Work)
+		if e == nil && !p.Enabled {
+			e = fmt.Errorf("Autorisez d’abord la mission continue")
+		}
+		if e == nil {
+			e = s.setAutonomy(r.Work, autonomyAuto, s.slots(r.Work))
+		}
+		if e == nil {
+			e = s.pause(r.Work, false)
+		}
 	case "dispatch":
 		launched, err := s.dispatch(r.Work)
 		if err != nil {
@@ -210,6 +275,8 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		send(w, map[string]any{"error": e.Error(), "failure": commandFailure(e)})
 	}
 	s.registerProviderAdmin(mux, send, fail)
+	s.registerPreparations(mux)
+	s.registerTerminals(mux, send, fail)
 	mux.HandleFunc("/api/v1/works", func(w http.ResponseWriter, r *http.Request) {
 		v, e := s.list()
 		if e != nil {
@@ -254,7 +321,26 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			snapshot["providers_error"] = e.Error()
 		}
 		snapshot["root"] = s.root
+		mission, err := s.missionStatus(work)
+		if err != nil {
+			fail(w, err)
+			return
+		}
+		snapshot["mission"] = mission
 		send(w, snapshot)
+	})
+	mux.HandleFunc("/api/v1/agent-detail", func(w http.ResponseWriter, r *http.Request) {
+		a, e := s.agent(r.URL.Query().Get("agent"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if a.WorkID != r.URL.Query().Get("work") {
+			http.Error(w, "Agent hors travail", 403)
+			return
+		}
+		desired, _ := s.desired(a.ID)
+		send(w, map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())})
 	})
 	mux.HandleFunc("/api/v1/task", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
@@ -270,7 +356,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		d := &taskDialog{task: *t}
-		agents, e := s.agents(work)
+		agents, e := s.pilotAgents(work)
 		if e != nil {
 			fail(w, e)
 			return
@@ -343,6 +429,10 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		}
 		if e = strict(raw, &request); e != nil {
 			fail(w, e)
+			return
+		}
+		if (request.Kind == "stop" || request.Kind == "reconcile" || request.Kind == "retry") && (request.Task == "" || request.Event == "") {
+			fail(w, fmt.Errorf("tâche et identifiant de commande requis ; actualisez le cockpit"))
 			return
 		}
 		value, e := s.webAction(request)
@@ -582,11 +672,27 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 				http.Error(w, "Session refusée", 403)
 				return
 			}
-			http.SetCookie(w, &http.Cookie{Name: "swarm_session", Value: token, Path: "/", HttpOnly: true, SameSite: http.SameSiteStrictMode})
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			http.SetCookie(w, &http.Cookie{Name: "swarm_session_" + hash([]byte(host))[:12], Value: token, Path: "/", HttpOnly: true, SameSite: http.SameSiteStrictMode})
+			target := "/"
+			if r.URL.Query().Get("view") == "prepare" {
+				target = "/prepare.html"
+				if id := r.URL.Query().Get("id"); preparationKey(id) {
+					target += "?id=" + id
+				}
+			} else if id := r.URL.Query().Get("work"); id != "" {
+				if !safeName(id) {
+					http.Error(w, "Travail invalide", 400)
+					return
+				}
+				target = "/?work=" + id
+			}
+			http.Redirect(w, r, target, http.StatusSeeOther)
 			return
 		}
-		cookie, e := r.Cookie("swarm_session")
+		cookie, e := r.Cookie("swarm_session_" + hash([]byte(host))[:12])
+		if e == http.ErrNoCookie {
+			cookie, e = r.Cookie("swarm_session")
+		} // accept existing clients until they reopen their session link
 		if e != nil || !same(cookie.Value, token) {
 			http.Error(w, "Ouvrir le lien de session affiché au lancement de swarm web.", 403)
 			return
@@ -600,6 +706,21 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		if r.URL.Path == "/api/v1/session" {
 			send(w, map[string]string{"csrf": token})
 			return
+		}
+		// Only embedded static assets may be cached. Authenticate first; keep all
+		// documents, API replies and session pages no-store. Content ETags prevent
+		// fixed entry files from staying stale after replacing the binary.
+		asset := strings.TrimPrefix(r.URL.Path, "/")
+		if (r.Method == "GET" || r.Method == "HEAD") && fs.ValidPath(asset) && (strings.HasSuffix(asset, ".js") || strings.HasSuffix(asset, ".css") || strings.HasSuffix(asset, ".woff2")) {
+			if content, err := cockpitWeb.ReadFile("web/" + asset); err == nil {
+				etag := `"` + hash(content) + `"`
+				w.Header().Set("ETag", etag)
+				w.Header().Set("Cache-Control", "private, no-cache")
+				if r.Header.Get("If-None-Match") == etag {
+					w.WriteHeader(http.StatusNotModified)
+					return
+				}
+			}
 		}
 		mux.ServeHTTP(w, r)
 	})
@@ -628,8 +749,14 @@ func (s *Store) serveWeb(address string, out io.Writer) error {
 	if err := s.assistReconcile(); err != nil {
 		return err
 	}
-	token := newID("session-")
+	token, e := s.webSessionToken(listener.Addr().String())
+	if e != nil {
+		return e
+	}
 	fmt.Fprintf(out, "Cockpit local : http://%s/session/%s\nArrêter ce serveur ne coupe pas les agents.\n", listener.Addr(), token)
 	server := &http.Server{Handler: newWebHandler(s, listener.Addr().String(), token), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, IdleTimeout: 30 * time.Second}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go s.missionLoop(ctx)
 	return server.Serve(listener)
 }

@@ -18,9 +18,9 @@ async function has(sel,word){await page.waitForFunction((s,w)=>document.querySel
 async function fill(sel,value){await page.click(sel,{clickCount:3});await page.keyboard.press('Backspace');await page.type(sel,value)}
 async function openTask(id,action='start'){
  await page.click('[data-view="tasks"]');
- await page.click('[data-task="'+id+'"] button');
+ await page.click('#tasks-body [data-task="'+id+'"] button');
  await page.waitForSelector('#modal[open] #field-action',{visible:true});
- await page.waitForFunction(id=>document.querySelector('#modal-title').textContent.startsWith(id+' —'),{},id);
+ await page.waitForFunction(id=>modalContext?.task===id&&document.querySelector('#modal-title').textContent.length>0,{},id);
  // Depuis S28 l'action présélectionnée est celle que l'oracle conseille pour
  // l'état de la tâche : supposer « start » revenait à mesurer l'oracle. La
  // recette choisit explicitement l'action qu'elle veut exercer.
@@ -34,7 +34,7 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  const url=await new Promise((resolve,reject)=>{let out='';const timer=setTimeout(()=>reject(new Error('Server did not start')),10000);server.stdout.on('data',d=>{out+=d;const m=out.match(/http:\/\/[^\s]+\/session\/[^\s]+/);if(m){clearTimeout(timer);resolve(m[0])}});server.on('exit',code=>reject(new Error('Server exited '+code)))});
  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox'],userDataDir:fs.mkdtempSync(path.join(os.tmpdir(),'swarm-ui-'))});
  page=await browser.newPage();page.setDefaultTimeout(15000);await page.setViewport({width:1440,height:1000});page.on('pageerror',e=>errors.push(e.message));
- await page.goto(url);await page.waitForSelector('[data-task="UI-01"]');await page.waitForSelector('#mode');if(await page.evaluate(()=>document.body.dataset.mode)==='conduite'){await page.click('#mode');await page.waitForFunction(()=>document.body.dataset.mode==='expert')};await shot('etat-tasks');
+ await page.goto(url);await page.waitForSelector('#tasks-body [data-task="UI-01"]');await page.waitForSelector('#mode');if(await page.evaluate(()=>document.body.dataset.mode)==='conduite'){await page.click('#mode');await page.waitForFunction(()=>document.body.dataset.mode==='expert')};await shot('etat-tasks');
  await openTask('UI-01');assert.match(await text('#preview'),/Périmètre/);await page.keyboard.press('Escape');assert.equal(await page.$eval('#modal',e=>e.open),false);// Ce qui compte est le retour du focus sur le bouton qui a ouvert le dialogue,
  // pas son libellé : depuis S28 celui-ci suit l'action conseillée par l'oracle
  // des actions, donc l'écrire en dur ne mesurait plus que l'oracle.
@@ -46,7 +46,7 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  // et non un message d'erreur de modale qui ne peut plus apparaître.
  await page.click('[data-view="tasks"]');
  await page.waitForFunction(()=>/[Dd]épendance/.test(document.querySelector('#tasks-body [data-task="UI-02"] button').title));
- await page.click('[data-task="UI-02"] button');
+ await page.click('#tasks-body [data-task="UI-02"] button');
  await page.waitForSelector('#modal[open] #field-action',{visible:true});
  const offertes=await page.$$eval('#field-action option',es=>es.map(e=>e.value));
  assert.ok(!offertes.includes('start'),'le départ reste proposé malgré une dépendance non satisfaite : '+offertes.join(', '));
@@ -59,8 +59,8 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  // La table porte l'état de validation, pas le statut brut : après relais la
  // tâche est à vérifier, et l'action conseillée est la gate — c'est-à-dire
  // le geste que le produit refuse d'automatiser.
- await has('[data-task="UI-01"]','À vérifier');
- await has('[data-task="UI-01"]','gate');
+ await has('#tasks-body [data-task="UI-01"]','À vérifier');
+ await has('#tasks-body [data-task="UI-01"]','gate');
  assert.equal(await page.$eval('#accepted-count',e=>e.textContent),'0','le relais automatique ne doit jamais valoir acceptation');
  checks.push('Task/provider/role/workspace/instruction launch; handoff relayed without acceptance');
  await page.click('[data-view="agents"]');await has('#agents-list','subplanner');await page.click('#agents-list button');
@@ -73,8 +73,8 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  await page.waitForFunction(()=>document.querySelector('#field-action').value==='retry');
  await confirm();await has('#active-count','1');await page.click('[data-view="tasks"]');await openTask('UI-01','stop');const options=await page.$$eval('#field-agent option',es=>es.map(e=>({value:e.value,text:e.textContent})));const running=options.find(x=>/En cours|Démarrage|En attente|queued\/unconfirmed/.test(x.text));assert.ok(running,JSON.stringify(options));await page.select('#field-agent',running.value);await page.click('#cancel');await has('#active-count','1');await openTask('UI-01','stop');await page.select('#field-agent',running.value);await confirm();await has('#active-count','0');checks.push('Retry preserves role; cancel stop has no effect; selected attempt stopped');
  await page.click('[data-view="logs"]');await has('#log-lines','#');await fill('#log-search','Processus');await page.click('#log-form button');await has('#log-lines','Processus');await page.click('#log-live');assert.equal(await text('#log-live'),'Mettre en pause');await page.click('#log-live');await shot('etat-logs');checks.push('Search / live / pause logs through controls');
- await page.click('[data-view="decisions"]');await page.waitForSelector('#decisions-list button');await page.click('#decisions-list button');await fill('#field-note','Résultat examiné ; la revue de la tâche reste distincte.');await confirm();await has('#decisions-list','Résultat examiné');await page.click('[data-view="tasks"]');await has('[data-task="UI-01"]','Bloquée');checks.push('Decision acknowledgement persisted without task acceptance');
- await openTask('UI-01','report');await page.click('#confirm');await has('#preview','Rapport de fixture');assert.equal(await page.$('#preview img'),null);assert.equal(await page.evaluate(()=>window.injected),undefined);await page.click('#cancel');await openTask('UI-01','submit');await confirm();await has('[data-task="UI-01"]','À vérifier');
+ await page.click('[data-view="decisions"]');await page.waitForSelector('#decisions-list button');await page.click('#decisions-list button');await fill('#field-note','Résultat examiné ; la revue de la tâche reste distincte.');await confirm();await has('#decisions-list','Résultat examiné');await page.click('[data-view="tasks"]');await has('#tasks-body [data-task="UI-01"]','Bloquée');checks.push('Decision acknowledgement persisted without task acceptance');
+ await openTask('UI-01','report');await page.click('#confirm');await has('#preview','Rapport de fixture');assert.equal(await page.$('#preview img'),null);assert.equal(await page.evaluate(()=>window.injected),undefined);await page.click('#cancel');await openTask('UI-01','submit');await confirm();await has('#tasks-body [data-task="UI-01"]','À vérifier');
  await openTask('UI-01','gate');await fill('#field-name','Recette du parcours');await page.click('#confirm');await has('#confirm','Confirmer l’enregistrement');await shot('etat-gate-preview');await page.click('#cancel');
  // Un aperçu annulé n'enregistre pas de gate, donc l'acceptation reste
  // interdite. Depuis S28 elle n'est plus offerte du tout : le dialogue ne
@@ -82,28 +82,28 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  // tâche. On vérifie donc l'absence de l'option et la lisibilité du motif,
  // et non un message d'erreur qui ne peut plus apparaître.
  await page.click('[data-view="tasks"]');
- const motif=await page.$eval('[data-task="UI-01"] button',e=>e.title);
+ const motif=await page.$eval('#tasks-body [data-task="UI-01"] button',e=>e.title);
  assert.match(motif,/gate/i,'le motif du refus d’acceptation doit être lisible sans ouvrir le dialogue : '+motif);
- await page.click('[data-task="UI-01"] button');
+ await page.click('#tasks-body [data-task="UI-01"] button');
  await page.waitForSelector('#modal[open] #field-action',{visible:true});
  const offertesGate=await page.$$eval('#field-action option',es=>es.map(e=>e.value));
  assert.ok(!offertesGate.includes('accepted'),'acceptation offerte sans gate enregistrée : '+offertesGate.join(', '));
  await page.click('#cancel');
  checks.push('Report read/submitted; cancelled preview records no gate and blocks acceptance');
- await openTask('UI-01','gate');await fill('#field-name','Recette du parcours');await page.click('#confirm');await has('#confirm','Confirmer l’enregistrement');await confirm();await openTask('UI-01','accepted');await has('#preview','PASS');await confirm();await has('[data-task="UI-01"]','Acceptée');checks.push('Gate preview/record then acceptance with live row refresh');
+ await openTask('UI-01','gate');await fill('#field-name','Recette du parcours');await page.click('#confirm');await has('#confirm','Confirmer l’enregistrement');await confirm();await openTask('UI-01','accepted');await has('#preview','PASS');await confirm();await has('#tasks-body [data-task="UI-01"]','Acceptée');checks.push('Gate preview/record then acceptance with live row refresh');
  // Filesystem drift must be detected without a database revision or manual refresh.
  fs.appendFileSync(path.join(root,'docs/UI-01-handoff.md'),'\nModification postérieure à la validation.\n');
- await has('[data-task="UI-01"]','à revalider');await has('#accepted-count','0');await has('#validation-status','BLOQUÉ');
- await page.click('[data-task="UI-01"] summary');await has('[data-task="UI-01"]','Preuve modifiée : docs/UI-01-handoff.md');
+ await has('#tasks-body [data-task="UI-01"]','à revalider');await has('#accepted-count','0');await has('#validation-status','validation finale reste à obtenir');
+ await page.click('#tasks-body [data-task="UI-01"] summary');await has('#tasks-body [data-task="UI-01"]','Preuve modifiée : docs/UI-01-handoff.md');
  for(const theme of ['etat','sombre']){await page.evaluate(t=>document.documentElement.dataset.theme=t,theme);await shot(theme+'-stale');}
  await page.evaluate(()=>document.documentElement.dataset.theme='etat');
  // La preuve modifiée périme l'acceptation de UI-01, donc la dépendance de
  // UI-02 n'est plus fraîche. Depuis S28 le départ n'est plus proposé : le
  // refus se lit sur le bouton de la tâche, avant toute tentative.
  await page.click('[data-view="tasks"]');
- const motifPerime=await page.$eval('[data-task="UI-02"] button',e=>e.title);
+ const motifPerime=await page.$eval('#tasks-body [data-task="UI-02"] button',e=>e.title);
  assert.match(motifPerime,/dépendance/i,'le motif de la dépendance périmée doit rester lisible : '+motifPerime);
- await page.click('[data-task="UI-02"] button');
+ await page.click('#tasks-body [data-task="UI-02"] button');
  await page.waitForSelector('#modal[open] #field-action',{visible:true});
  const offertesPerime=await page.$$eval('#field-action option',es=>es.map(e=>e.value));
  assert.ok(!offertesPerime.includes('start'),'départ proposé malgré une preuve périmée : '+offertesPerime.join(', '));
@@ -127,9 +127,9 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  // motif nomme le rapport manquant — une simple ré-empreinte ne peut donc même
  // pas être tentée depuis l'écran.
  await page.click('[data-view="tasks"]');
- const motifGate=await page.$eval('[data-task="UI-01"] button',e=>e.title);
+ const motifGate=await page.$eval('#tasks-body [data-task="UI-01"] button',e=>e.title);
  assert.match(motifGate,/rapport/i,'le motif du refus de gate doit nommer le rapport manquant : '+motifGate);
- await page.click('[data-task="UI-01"] button');
+ await page.click('#tasks-body [data-task="UI-01"] button');
  await page.waitForSelector('#modal[open] #field-action',{visible:true});
  const offertesRehash=await page.$$eval('#field-action option',es=>es.map(e=>e.value));
  assert.ok(!offertesRehash.includes('gate'),'gate proposée sur une tâche sans rapport soumis : '+offertesRehash.join(', '));
@@ -140,7 +140,7 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  gate.artifacts[report]=require('crypto').createHash('sha256').update(fs.readFileSync(path.join(root,report))).digest('hex');gate.results[0].evidence.push(report);fs.writeFileSync(gatePath,JSON.stringify(gate));
  await openTask('UI-01','submit');await page.select('#field-path',report);await confirm();
  await openTask('UI-01','gate');await fill('#field-name','Revalidation du parcours');await page.click('#confirm');await has('#confirm','Confirmer l’enregistrement');await confirm();
- await openTask('UI-01','accepted');await confirm();await has('#accepted-count','1');await has('[data-task="UI-01"]','Acceptée');
+ await openTask('UI-01','accepted');await confirm();await has('#accepted-count','1');await has('#tasks-body [data-task="UI-01"]','Acceptée');
  await page.click('[data-view="decisions"]');await has('#decisions-list','Revalidation constatée');await page.click('[data-view="tasks"]');
  checks.push('Drift visible live; stale dependency blocked; rehash alone refused; new executed control report and gate accepted; alert resolved');
 
@@ -150,18 +150,18 @@ async function shot(name){await page.screenshot({path:path.join(reportDir,name+'
  // est lisible avant toute tentative.
  await page.click('[data-view="tasks"]');
  await page.waitForFunction(()=>/[Bb]udget/.test(document.querySelector('#tasks-body [data-task="UI-02"] button').title));
- await page.click('[data-task="UI-02"] button');
+ await page.click('#tasks-body [data-task="UI-02"] button');
  await page.waitForSelector('#modal[open] #field-action',{visible:true});
  const offertesBudget=await page.$$eval('#field-action option',es=>es.map(e=>e.value));
  assert.ok(!offertesBudget.includes('start'),'lancement proposé malgré un budget insuffisant : '+offertesBudget.join(', '));
  await shot('etat-budget-refusal');await page.click('#cancel');checks.push('Declared tokens distinguished from estimated budget; exhausted budget blocks launch');
- await openTask('UI-02','override');await page.click('#confirm');await page.waitForFunction(()=>!document.querySelector('#modal-error').hidden);await fill('#field-note','Dérogation de recette uniquement ; aucun contrôle transformé en PASS.');await confirm();await has('[data-task="UI-02"]','Dérogation');checks.push('Forced validation requires reason and remains a derogation');
+ await openTask('UI-02','override');await page.click('#confirm');await page.waitForFunction(()=>!document.querySelector('#modal-error').hidden);await fill('#field-note','Dérogation de recette uniquement ; aucun contrôle transformé en PASS.');await confirm();await has('#tasks-body [data-task="UI-02"]','Dérogation');checks.push('Forced validation requires reason and remains a derogation');
  await page.click('#theme');assert.equal(await page.$eval('html',e=>e.dataset.theme),'sombre');await shot('sombre-tasks');// La capture porte sur le rendu du dialogue en thème sombre, pas sur une
  // action précise : « accepter » n'est pas proposée sur une tâche sans rapport,
  // et la lecture du rapport l'est toujours.
  await openTask('UI-02','report');await shot('sombre-modal');await page.keyboard.press('Escape');
  await page.setViewport({width:390,height:844});await shot('sombre-mobile');assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile page overflow');await page.setViewport({width:1440,height:1000});
- await page.reload();await page.waitForSelector('[data-task="UI-01"]');await has('[data-task="UI-01"]','Acceptée');await page.click('[data-view="decisions"]');await has('#decisions-list','Résultat examiné');checks.push('Reload preserves task state, decisions and theme');
+ await page.reload();await page.waitForSelector('#tasks-body [data-task="UI-01"]');await has('#tasks-body [data-task="UI-01"]','Acceptée');await page.click('[data-view="decisions"]');await has('#decisions-list','Résultat examiné');checks.push('Reload preserves task state, decisions and theme');
  for(const theme of ['etat','sombre']){if(await page.$eval('html',e=>e.dataset.theme)!==theme)await page.click('#theme');for(const name of ['tasks','agents','decisions','logs','resume','budget']){await page.click('[data-view="'+name+'"]');await shot(theme+'-'+name+'-final');}await page.click('#budget-edit');await page.focus('#field-limit');await shot(theme+'-budget-focus');await page.keyboard.press('Escape');}
  assert.deepEqual(errors,[]);fs.writeFileSync(path.join(reportDir,'result.json'),JSON.stringify({status:'PASS',fixture_root:root,checks,page_errors:errors,model_calls:0},null,2));
  console.log(JSON.stringify({status:'PASS',checks:checks.length,report:reportDir}));

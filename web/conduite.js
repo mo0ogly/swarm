@@ -8,25 +8,32 @@ let cockpitMode = 'conduite';
 function applyMode(mode) {
   cockpitMode = mode === 'expert' ? 'expert' : 'conduite';
   document.body.dataset.mode = cockpitMode;
-  localStorage.setItem('swarm-mode', cockpitMode);
+  cockpitStorage.setItem('swarm-mode', cockpitMode);
   $('mode').textContent = cockpitMode === 'conduite' ? 'Passer en mode expert' : 'Revenir au mode conduite';
   for (const b of $('tabs').children) b.hidden = cockpitMode === 'conduite' && !conduiteOnly.includes(b.dataset.view);
-  $('assistant').hidden = cockpitMode === 'conduite';
+  $('assistant').hidden = false;
   if (cockpitMode === 'conduite' && !conduiteOnly.includes(view)) showView('conduite');
 }
 
 function openDecision(d) {
   openModal('Décision — ' + (d.task_id || 'Travail'),
     'L’acquittement ne valide pas la tâche et n’arrête pas l’agent.', { action: 'decision', decision: d.id });
-  preview(d.summary + '\n' + d.evidence);
+  preview(decisionObservation(d).summary + '\n' + d.evidence);
   field('note', 'Décision motivée', '', null, true, 'Journalisée avec votre compte local et la date.');
+}
+
+function decisionObservation(d) {
+  const restored=d.kind==='silence'&&snapshot.pilotage?.health[d.agent_id]?.process_state==='running';
+  return {label:restored?'Signal rétabli — incident à examiner':(escalationLabels[d.kind]||d.kind),
+    summary:restored?'Un signal récent est de nouveau reçu. L’incident enregistré reste à examiner ; aucun acquittement automatique.':d.summary};
 }
 
 function inboxCard(d) {
   const c = node('article', undefined, 'card');
   c.dataset.decision = d.id;
-  c.append(node('h4', (d.task_id || 'Travail') + ' · ' + (escalationLabels[d.kind] || d.kind)),
-    node('p', d.summary), node('p', d.evidence, 'inbox-proof'));
+  const observation=decisionObservation(d);
+  c.append(node('h4', (d.task_id || 'Travail') + ' · ' + observation.label),
+    node('p', observation.summary), node('p', d.evidence, 'inbox-proof'));
   if (d.kind === 'gate' || d.kind === 'handoff') {
     c.append(button(d.kind === 'gate' ? 'Revalider cette tâche' : 'Examiner le rapport', () => taskDialog(d.task_id)));
   }
@@ -91,11 +98,12 @@ function renderConduite() {
   const inbox = $('conduite-inbox');
   inbox.replaceChildren();
   for (const d of open) inbox.append(inboxCard(d));
-  if (!open.length) inbox.append(node('p', 'Rien à traiter. Les agents avancent ; vous serez sollicité pour une décision, pas pour un relais.'));
+  if (!open.length) inbox.append(node('p', 'Aucune demande de décision ouverte. Les tâches bloquées et résultats à examiner restent accessibles par « Prochaine intervention ».'));
 
   if (typeof renderGraph === 'function') renderGraph();
   if (typeof filRafraichir === 'function') filRafraichir();
   const plan = $('conduite-plan');
+  if(plan.hidden){if(plan.childElementCount)plan.replaceChildren();return}
   plan.replaceChildren();
   for (const t of snapshot.work.tasks) plan.append(planRow(t));
   if (!snapshot.work.tasks.length) plan.append(node('p', 'Aucune tâche dans ce travail. Ouvrez le mode expert pour en ajouter.'));
@@ -114,6 +122,7 @@ function segment(texte, cible) {
 
 function renderAccueil(ouvertes, budget) {
   const hote = $('conduite-accueil');
+  if (typeof Pilot !== "undefined" && snapshot.pilotage) { Pilot.summary(hote); return; }
   hote.replaceChildren();
   const parts = [];
 
@@ -180,5 +189,5 @@ $('conduite-dispatch').onclick = async () => {
 };
 {
   const asked = new URLSearchParams(location.search).get('mode');
-  applyMode(asked || localStorage.getItem('swarm-mode') || 'conduite');
+  applyMode(asked || cockpitStorage.getItem('swarm-mode') || 'conduite');
 }

@@ -255,8 +255,16 @@ func (s *Store) supervise(id string) error {
 	if e != nil {
 		return e
 	}
-	// Exactly one supervisor can claim a queued intent. No blind restart after crash.
-	result, e := s.db.Exec("UPDATE agents SET status='starting' WHERE id=? AND status='queued'", id)
+	// Claim and registration are one write: no SQL starting / JSON queued window.
+	a.Status = "starting"
+	a.Supervisor = os.Getpid()
+	a.SupervisorStamp = processStamp(a.Supervisor)
+	a.Heartbeat = now()
+	body, e := json.Marshal(a)
+	if e != nil {
+		return e
+	}
+	result, e := s.db.Exec("UPDATE agents SET status='starting',body=? WHERE id=? AND status='queued'", body, id)
 	if e != nil {
 		return e
 	}
@@ -264,19 +272,15 @@ func (s *Store) supervise(id string) error {
 	if n != 1 {
 		return fmt.Errorf("session déjà prise en charge")
 	}
-	a.Status = "starting"
-	a.Supervisor = os.Getpid()
-	a.SupervisorStamp = processStamp(a.Supervisor)
-	a.Heartbeat = now()
-	if e = s.saveAgent(a); e != nil {
-		return e
-	}
 	desired, e := s.desired(id)
 	if e != nil {
 		return e
 	}
 	if desired == "stop" {
 		return s.finishAgent(a, "interrupted", "Lancement annulé avant démarrage", nil)
+	}
+	if interactiveMode(a.Mode) {
+		return s.superviseTerminal(a)
 	}
 	signals := make(chan os.Signal, 2)
 	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
@@ -408,6 +412,9 @@ func (s *Store) reconcile(id string) error {
 	}
 	if !activeAgent(a) {
 		return s.settleAgentTask(a)
+	}
+	if cancellableQueuedAgent(a) {
+		return s.cancelQueuedAgent(a)
 	}
 	if a.Host != hostIdentity() {
 		return fmt.Errorf("hôte/redémarrage différent : vérifier les processus sur l'hôte d'origine ; aucune libération automatique")

@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 6
+const schemaVersion = 11
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -35,6 +35,7 @@ type Revalidation struct {
 }
 
 type Task struct {
+	LaunchHeld      bool               `json:"launch_held,omitempty"`
 	Profile         *LaunchProfile     `json:"launch_profile,omitempty"`
 	Revalidation    *Revalidation      `json:"revalidation,omitempty"`
 	PlanChecks      map[string]string  `json:"plan_checks,omitempty"`

@@ -141,6 +141,23 @@ func checkAnswer(a *AssistantAnswer, ctx PageContext, templateID string) *Assist
 		}
 	}
 	a.Interpretation = strings.TrimSpace(a.Interpretation)
+	if templateID == "mission_advice.v1" {
+		lines := strings.Split(a.Interpretation, "\n")
+		if len(lines) < 2 || len(lines) > 3 {
+			return refuse("contract_violation", refusalContract, "Résumé attendu en deux ou trois phrases courtes.", "")
+		}
+		for _, line := range lines {
+			if strings.TrimSpace(line) == "" || len([]rune(line)) > 220 {
+				return refuse("contract_violation", refusalContract, "Une phrase courte par ligne, 220 caractères maximum.", "")
+			}
+		}
+	}
+	if templateID == "report_summary.v1" {
+		lines := strings.Split(a.Interpretation, "\n")
+		if len(lines) != 2 || strings.TrimSpace(lines[0]) == "" || strings.TrimSpace(lines[1]) == "" || len([]rune(lines[0])) > 320 || len([]rune(lines[1])) > 320 {
+			return refuse("contract_violation", refusalContract, "Synthèse attendue en deux lignes non vides, de 320 caractères maximum chacune.", "")
+		}
+	}
 	if len(a.Interpretation) > 2000 || htmlShape.MatchString(a.Interpretation) {
 		return refuse("contract_violation", refusalContract, "Interprétation trop longue ou balisée.", "")
 	}

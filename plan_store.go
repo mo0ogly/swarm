@@ -64,37 +64,42 @@ func (s *Store) commitPlan(work, event string, revision int, review PlanReview) 
 				return fmt.Errorf("Question source modifiée : préparer un nouveau plan si elle n’est plus applicable.")
 			}
 		}
-		ordered, e := validateActionPlan(review.Spec, true)
-		if e != nil {
+		return s.materializePlan(w, review)
+	})
+}
+
+// Shared mission contract for legacy review and preparation conversion.
+func (s *Store) materializePlan(w *Work, review PlanReview) error {
+	ordered, e := validateActionPlan(review.Spec, true)
+	if e != nil {
+		return e
+	}
+	prefix := "plan-" + hash([]byte(review.Source))[:10] + "-"
+	ids := []string{}
+	for _, m := range ordered {
+		deps := []string{}
+		for _, id := range m.Depends {
+			deps = append(deps, prefix+id)
+		}
+		next := fmt.Sprintf("Périmètre : %s\nPreuves : %s\nGate entry : %s\nGate validation : %s\nGate delivery : %s\nConditions d’arrêt : %s\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : %s\nHypothèses : %s", m.Scope, m.Proof, m.Entry, m.Validation, m.Delivery, m.Stop, review.Spec.Objective, strings.Join(review.Spec.Assumptions, " ; "))
+		for _, q := range review.Spec.Questions {
+			next += "\nDécision : " + q.Question + " → " + q.Answer
+		}
+		id := prefix + m.ID
+		if e = s.apply(w, "task.add", Request{ID: id, Title: m.Title, Deliverable: m.Deliverable, Criteria: m.Criteria, Depends: deps, Owner: m.Role, Next: next}); e != nil {
 			return e
 		}
-		prefix := "plan-" + hash([]byte(review.Source))[:10] + "-"
-		ids := []string{}
-		for _, m := range ordered {
-			deps := []string{}
-			for _, id := range m.Depends {
-				deps = append(deps, prefix+id)
-			}
-			next := fmt.Sprintf("Périmètre : %s\nPreuves : %s\nGate entry : %s\nGate validation : %s\nGate delivery : %s\nConditions d’arrêt : %s\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : %s\nHypothèses : %s", m.Scope, m.Proof, m.Entry, m.Validation, m.Delivery, m.Stop, review.Spec.Objective, strings.Join(review.Spec.Assumptions, " ; "))
-			for _, q := range review.Spec.Questions {
-				next += "\nDécision : " + q.Question + " → " + q.Answer
-			}
-			id := prefix + m.ID
-			if e = s.apply(w, "task.add", Request{ID: id, Title: m.Title, Deliverable: m.Deliverable, Criteria: m.Criteria, Depends: deps, Owner: m.Role, Next: next}); e != nil {
-				return e
-			}
-			task := &w.Tasks[len(w.Tasks)-1]
-			task.PlanChecks = map[string]string{"plan-entry": "entry", "plan-validation": "validation", "plan-delivery": "delivery"}
-			for i := range m.Criteria {
-				task.PlanChecks[fmt.Sprintf("plan-criterion-%d", i+1)] = "validation"
-			}
-			task.Next += "\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n"
-			task.PlanRole = m.Role
-			task.PlanMaxAttempts = m.MaxAttempts
-			task.PlanToolLimit = m.MaxToolCalls
-			ids = append(ids, id)
+		task := &w.Tasks[len(w.Tasks)-1]
+		task.PlanChecks = map[string]string{"plan-entry": "entry", "plan-validation": "validation", "plan-delivery": "delivery"}
+		for i := range m.Criteria {
+			task.PlanChecks[fmt.Sprintf("plan-criterion-%d", i+1)] = "validation"
 		}
-		w.Plans = append(w.Plans, ApprovedPlan{Source: review.Source, BriefHash: review.BriefHash, ResponseHash: review.ResponseHash, Spec: review.Spec, TaskIDs: ids, At: now()})
-		return nil
-	})
+		task.Next += "\nCadre de gate obligatoire : checks plan-entry (entry), plan-validation (validation), plan-delivery (delivery) et plan-criterion-N pour chaque critère (validation). Tous mandatory=true, avec résultats et preuves réelles. Aucun PASS avant exécution.\n"
+		task.PlanRole = m.Role
+		task.PlanMaxAttempts = m.MaxAttempts
+		task.PlanToolLimit = m.MaxToolCalls
+		ids = append(ids, id)
+	}
+	w.Plans = append(w.Plans, ApprovedPlan{Source: review.Source, BriefHash: review.BriefHash, ResponseHash: review.ResponseHash, Spec: review.Spec, TaskIDs: ids, At: now()})
+	return nil
 }

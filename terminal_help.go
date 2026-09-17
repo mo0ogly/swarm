@@ -2,7 +2,11 @@
 
 package main
 
-const terminalGuide = `SE REPÉRER
+const terminalGuide = `AIDE PAR SUJET
+help mission | help taches | help agents | help journaux | help decisions
+help budget | help preparation | help contexte | help parite
+
+SE REPÉRER
 Flèches : choisir une tâche. Entrée : ouvrir ses actions.
 Tab : passer des tâches aux agents et au suivi. d : détails.
 t : couleurs claires/sombres. F1 ou ? : aide. q : quitter.
@@ -50,7 +54,12 @@ func (s *Store) openTerminalHelp(work string, c *consoleState) {
 		return
 	}
 	c.helpParent = c.dialog
-	d := &taskDialog{mode: "help", review: terminalGuide, task: Task{Title: "Guide du cockpit terminal"}}
+	mode := ""
+	if c.dialog != nil {
+		mode = c.dialog.mode
+	}
+	context, _ := cliTopicHelp(terminalHelpTopic(mode))
+	d := &taskDialog{mode: "help", review: context + "\n" + terminalGuide, task: Task{Title: "Guide du cockpit terminal"}}
 	if c.dialog != nil {
 		d.task = c.dialog.task
 		d.agent = c.dialog.agent

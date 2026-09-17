@@ -13,10 +13,13 @@ const help = `swarm — compagnon local de reprise (schema_version: 1)
 
 Options globales : --root <projet> --json
 swarm init
+swarm aide [sujet]
 swarm providers init|show
 swarm console [travail] [--plain]
+swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
 swarm dispatch <travail>
 swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
+swarm mission status|start|pause|resume|stop|watch <travail> [--input profil.json]
 swarm profile <travail> [tâche] [--input profil.json]
 swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
@@ -39,7 +42,8 @@ swarm evaluate --input evidence.json [--phase delivery]
 Les mutations exigent schema_version, event_id et expected_revision.
 Une gate attend aussi task_id, phase, document (méthode d’évaluation 2).
 Les requêtes sont décrites dans README.md. --input - lit stdin.
-Codes : 0 succès ; 1 gate bloquée ; 2 erreur/conflit.
+Codes généraux : 0 succès ; 1 gate bloquée ; 2 erreur.
+Préparer : 2 contrat ; 3 conflit ; 4 autorisation ; 5 fournisseur ou méthode indisponible ; 6 arrêt non confirmé.
 `
 
 func readInput(path string) ([]byte, error) {
@@ -120,10 +124,40 @@ func run(args []string, out, errOut io.Writer) int {
 		} else {
 			fmt.Fprintln(errOut, "Erreur :", e)
 		}
-		return 2
+		switch commandFailure(e).Code {
+		case "conflict":
+			return 3
+		case "source_refused", "preparation_disabled":
+			return 4
+		case "provider_unavailable", "method_unavailable":
+			return 5
+		case "interrupted":
+			return 6
+		default:
+			return 2
+		}
 	}
 	if len(pos) == 0 {
 		fmt.Fprint(out, help)
+		return 0
+	}
+	if pos[0] == "aide" || pos[0] == "help" {
+		topic := ""
+		if len(pos) > 2 {
+			return fail(fmt.Errorf("swarm aide [sujet]"))
+		}
+		if len(pos) == 2 {
+			topic = pos[1]
+		}
+		text, err := cliTopicHelp(topic)
+		if err != nil {
+			return fail(err)
+		}
+		if asJSON {
+			_ = printJSON(out, map[string]string{"topic": topic, "help": text})
+		} else {
+			fmt.Fprint(out, text)
+		}
 		return 0
 	}
 	root, e := filepath.Abs(root)
@@ -154,7 +188,20 @@ func run(args []string, out, errOut io.Writer) int {
 		return fail(e)
 	}
 	defer s.db.Close()
-	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
+	if pos[0] == "prepare" {
+		if e := s.preparationEntry(pos[1:], input, output, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "mission" {
+		returnErr := missionCLI(s, pos, input, asJSON, out)
+		if returnErr != nil {
+			return fail(returnErr)
+		}
+		return 0
+	}
+	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
 		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
 			return fail(e)
 		}

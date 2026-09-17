@@ -24,6 +24,7 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
+	ProviderDigest  string        `json:"provider_digest,omitempty"`
 	Mode            string        `json:"mode,omitempty"`
 	Limits          *RunLimits    `json:"limits,omitempty"`
 	Level           string        `json:"level,omitempty"`
@@ -348,6 +349,12 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if !ok {
 		return a, false, fmt.Errorf("fournisseur non configuré")
 	}
+	if r.ProviderDigest != "" {
+		raw, _ := json.Marshal(p)
+		if hash(raw) != r.ProviderDigest {
+			return a, false, fmt.Errorf("La configuration a changé : demandez une nouvelle proposition")
+		}
+	}
 	if r.Mode == "terminal" {
 		p, e = terminalProvider(p)
 		if e != nil {
@@ -435,6 +442,11 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e != nil {
 		return a, false, e
 	}
+	if r.Origin == originConductor {
+		if e = automaticLaunchGuard(tx, work); e != nil {
+			return a, false, e
+		}
+	}
 	if e = preparationLaunchGuard(tx, work, t.ID); e != nil {
 		return a, false, e
 	}
@@ -487,13 +499,13 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 			r.Timeout = previous.Timeout
 		}
 	}
-	var blockerID, blockerWork, blockerTask string
-	var overlaps int
-	if e = tx.QueryRow("SELECT count(*), coalesce(min(id),''), coalesce(min(work_id),''), coalesce(min(task_id),'') FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1)", cwd, cwd, cwd).Scan(&overlaps, &blockerID, &blockerWork, &blockerTask); e != nil {
-		return a, false, e
+	var busy WorkspaceBusyError
+	e = tx.QueryRow("SELECT id,work_id,task_id FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1) ORDER BY rowid LIMIT 1", cwd, cwd, cwd).Scan(&busy.AgentID, &busy.WorkID, &busy.TaskID)
+	if e == nil {
+		return a, false, &busy
 	}
-	if overlaps > 0 {
-		return a, false, fmt.Errorf("workspace occupé ou recouvrant un workspace actif : agent %s (tâche %s, travail %s) ; voir la page de ce travail pour l'arrêter ou attendre sa fin", blockerID, blockerTask, blockerWork)
+	if e != sql.ErrNoRows {
+		return a, false, e
 	}
 	originalNext := t.Next
 	// Same transaction as the session intent: no orphan running task on launch conflict.

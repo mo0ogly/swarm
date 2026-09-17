@@ -91,6 +91,9 @@ func (s *Store) assistPreview(work string, r AssistRequest) (AssistPreview, erro
 	if !ok {
 		return p, fmt.Errorf("Gabarit inconnu : choisir un gabarit proposé.")
 	}
+	if r.TemplateID == "report_summary.v1" && r.Coordinates.Report == "" {
+		return p, fmt.Errorf("Ouvrir un rapport pour demander sa synthèse.")
+	}
 	question := strings.TrimSpace(r.Question)
 	if question == "" {
 		question = tpl.Question
@@ -264,7 +267,11 @@ func reserveAssistBudget(tx *sql.Tx, work, turn string) error {
 	if e = tx.QueryRow("SELECT coalesce(sum(amount),0) FROM assist_reservations WHERE work_id=? AND state IN ('reserved','estimated')", work).Scan(&assist); e != nil {
 		return e
 	}
-	if committed+assist+b.Reserve > b.Limit {
+	prep, e := preparationWorkCommitted(tx, work)
+	if e != nil {
+		return e
+	}
+	if committed+assist+prep+b.Reserve > b.Limit {
 		return &CommandError{Code: "budget_exhausted", Message: "Budget estimatif insuffisant : la question d’assistance n’est pas envoyée ; examiner le budget.", Retryable: false}
 	}
 	_, e = tx.Exec("INSERT INTO assist_reservations(turn_id,work_id,amount,state) VALUES(?,?,?,'reserved')", turn, work, b.Reserve)

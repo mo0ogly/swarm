@@ -158,6 +158,42 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	if version < 7 {
+		if e = migratePreparations(db, root, version != 0); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 8 {
+		if version != 0 {
+			backup := filepath.Join(dir, newID("state-pre-v8-")+".db")
+			f, err := os.OpenFile(backup, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+			if err != nil {
+				return fail(err)
+			}
+			f.Close()
+			if _, err = db.Exec("VACUUM INTO ?", backup); err != nil {
+				return fail(err)
+			}
+		}
+		if _, e = db.Exec(preparationTurnMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 9 {
+		if e = migratePreparationLocks(db, root, version != 0); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 10 {
+		if e = migrateTerminals(db, root, version != 0); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 11 {
+		if e = migratePreparationBudget(db, root, version != 0); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
@@ -279,6 +315,10 @@ func gitState(root string) GitState {
 
 // The event key is an idempotency key, checked before optimistic concurrency.
 func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn func(*Work) error) (Work, error) {
+	return s.mutateWithHook(id, kind, event, expected, request, fn, nil)
+}
+
+func (s *Store) mutateWithHook(id, kind, event string, expected int, request []byte, fn func(*Work) error, hook func(*sql.Tx, *Work) error) (Work, error) {
 	var w Work
 	if !safeName(event) {
 		return w, fmt.Errorf("event_id obligatoire (lettres, chiffres, tirets)")
@@ -338,6 +378,11 @@ func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn 
 		if e = json.Unmarshal(request, &r); e != nil {
 			return w, e
 		}
+		if r.Status == "running" {
+			if e = preparationLaunchGuard(tx, id, r.ID); e != nil {
+				return w, e
+			}
+		}
 		if r.Status != "" || r.editsDefinition() {
 			var count int
 			if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND (task_id=? OR ?) AND status IN ('queued','starting','running','stopping')", id, r.ID, r.editsDefinition()).Scan(&count); e != nil {
@@ -371,6 +416,11 @@ func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn 
 	}
 	if e != nil {
 		return w, e
+	}
+	if hook != nil {
+		if e = hook(tx, &w); e != nil {
+			return w, e
+		}
 	}
 	_, e = tx.Exec("INSERT INTO events VALUES(?,?,?,?,?,?,?)", event, w.ID, w.Revision, kind, w.Updated, request, request)
 	if e != nil {

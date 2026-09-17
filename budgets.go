@@ -18,17 +18,18 @@ type Budget struct {
 	Actor     string  `json:"actor"`
 }
 type BudgetView struct {
-	Budget     Budget   `json:"budget"`
-	Reserved   float64  `json:"reserved_usd"`
-	Estimated  float64  `json:"committed_estimate_usd"`
-	Remaining  float64  `json:"remaining_usd"`
-	Warning    bool     `json:"warning"`
-	ActualCost *float64 `json:"actual_cost_usd"`
-	Policy     string   `json:"policy"`
+	ActualCostScope string   `json:"actual_cost_scope"`
+	Budget          Budget   `json:"budget"`
+	Reserved        float64  `json:"reserved_usd"`
+	Estimated       float64  `json:"committed_estimate_usd"`
+	Remaining       float64  `json:"remaining_usd"`
+	Warning         bool     `json:"warning"`
+	ActualCost      *float64 `json:"actual_cost_usd"`
+	Policy          string   `json:"policy"`
 }
 
 func (s *Store) budget(work string) (BudgetView, error) {
-	v := BudgetView{Policy: "Budget estimatif non garanti. Réservations atomiques avant départ ; les agents actifs continuent. Le réservé n'est pas une dépense : le coût rapporté est indiqué à part."}
+	v := BudgetView{ActualCostScope: "Coûts rapportés par les agents seulement ; assistance et préparation exclues. Les estimations couvrent les trois activités.", Policy: "Budget estimatif non garanti. Réservations atomiques avant départ ; les agents actifs continuent. Le réservé n'est pas une dépense : le coût rapporté est indiqué à part."}
 	var raw []byte
 	e := s.db.QueryRow("SELECT body FROM budgets WHERE work_id=?", work).Scan(&raw)
 	if e != nil && e != sql.ErrNoRows {
@@ -47,6 +48,12 @@ func (s *Store) budget(work string) (BudgetView, error) {
 	if e = s.db.QueryRow("SELECT coalesce(sum(CASE WHEN state='reserved' THEN amount ELSE 0 END),0),coalesce(sum(CASE WHEN state='estimated' THEN amount ELSE 0 END),0) FROM assist_reservations WHERE work_id=?", work).Scan(&assistReserved, &assistEstimated); e != nil {
 		return v, e
 	}
+	var prepReserved, prepEstimated float64
+	if e = s.db.QueryRow("SELECT coalesce(sum(CASE WHEN state='reserved' THEN work_amount ELSE 0 END),0),coalesce(sum(CASE WHEN state='estimated' THEN work_amount ELSE 0 END),0) FROM preparation_reservations WHERE work_id=?", work).Scan(&prepReserved, &prepEstimated); e != nil {
+		return v, e
+	}
+	v.Reserved += prepReserved
+	v.Estimated += prepEstimated
 	v.Reserved += assistReserved
 	v.Estimated += assistEstimated
 	// Le coût réel vient des fournisseurs, pas des réservations. Il reste nil
@@ -60,7 +67,7 @@ func (s *Store) budget(work string) (BudgetView, error) {
 	v.Warning = v.Budget.Limit > 0 && (v.Reserved+v.Estimated) >= .8*v.Budget.Limit
 	return v, nil
 }
-func (s *Store) setBudget(work string, b Budget) error {
+func validateBudget(b Budget) error {
 	if math.IsNaN(b.Limit) || math.IsInf(b.Limit, 0) || math.IsNaN(b.Reserve) || math.IsInf(b.Reserve, 0) || b.Limit < 0 || b.Reserve < 0 {
 		return fmt.Errorf("montants finis et positifs requis")
 	}
@@ -71,6 +78,12 @@ func (s *Store) setBudget(work string, b Budget) error {
 		if _, e := time.Parse("2006-01-02", b.PriceDate); e != nil {
 			return fmt.Errorf("date de référence : AAAA-MM-JJ")
 		}
+	}
+	return nil
+}
+func (s *Store) setBudget(work string, b Budget) error {
+	if e := validateBudget(b); e != nil {
+		return e
 	}
 	b.Updated = now()
 	b.Actor = operatorIdentity()
@@ -112,7 +125,11 @@ func reserveBudget(tx *sql.Tx, work, agent string) error {
 	if e = tx.QueryRow("SELECT coalesce(sum(amount),0) FROM assist_reservations WHERE work_id=? AND state IN ('reserved','estimated')", work).Scan(&assist); e != nil {
 		return e
 	}
-	committed += assist
+	prep, e := preparationWorkCommitted(tx, work)
+	if e != nil {
+		return e
+	}
+	committed += assist + prep
 	if committed+b.Reserve > b.Limit {
 		return &CommandError{Code: "budget_exhausted", Message: "Budget estimatif insuffisant : nouveaux départs suspendus ; examiner le budget."}
 	}

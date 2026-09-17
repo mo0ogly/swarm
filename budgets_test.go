@@ -3,10 +3,10 @@
 package main
 
 import (
-	"strings"
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 

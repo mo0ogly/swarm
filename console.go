@@ -24,7 +24,7 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	if e != nil {
 		return nil, e
 	}
-	agents, e := s.agents(work)
+	agents, e := s.pilotAgents(work)
 	if e != nil {
 		return nil, e
 	}
@@ -41,7 +41,8 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	for i := range w.Tasks {
 		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
 	}
-	return map[string]any{"work": w, "validation": s.validationState(&w), "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
+	validation := s.validationState(&w)
+	return map[string]any{"pilotage": s.pilotage(&w, agents, validation), "work": w, "validation": validation, "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}
@@ -137,7 +138,19 @@ func (s *Store) consoleCommand(work, line string, state *consoleState) (bool, er
 	switch fields[0] {
 	case "q", "quit":
 		return true, nil
-	case "help":
+	case "help", "aide":
+		if arg(1) != "" {
+			text, err := cliTopicHelp(arg(1))
+			if err != nil {
+				return false, err
+			}
+			state.message = text
+			if state.dialog == nil || state.dialog.mode != "help" {
+				s.openTerminalHelp(work, state)
+			}
+			state.dialog.review = text
+			return false, nil
+		}
 		state.message = consoleHelp
 		s.openTerminalHelp(work, state)
 		return false, nil

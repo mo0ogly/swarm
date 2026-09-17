@@ -1,0 +1,131 @@
+/* Agent pilotage: existing Wattson surfaces and semantic pairs in both themes. */
+.pilot-toolbar{display:flex;flex-wrap:wrap;gap:12px;padding:16px;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:12px 12px 0 0}
+.pilot-toolbar label{display:flex;flex:1 1 130px;flex-direction:column;align-items:stretch;gap:6px;color:var(--wattson-libelle);font-size:12px;font-weight:600}
+.pilot-toolbar label:last-child{flex-grow:2}
+.pilot-toolbar input,.pilot-toolbar select{background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);min-height:40px}
+.pilot-toolbar select:disabled{background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret);opacity:.7}
+.pilot-toolbar input:focus-visible,.pilot-toolbar select:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:2px}
+.pilot-actions{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border:1px solid var(--wattson-ligne);border-top:0;background:var(--wattson-carte)}
+.pilot-actions button{font-size:12px;min-height:36px}
+.pilot-status,.pilot-muted{font-size:13px;color:var(--wattson-texte-discret)}
+.pilot-canvas{overflow:auto;max-width:100%;max-height:65vh;min-height:220px;border:1px solid var(--wattson-ligne);border-radius:12px;background:var(--wattson-carte-appuyee);overscroll-behavior:contain}
+.pilot-canvas:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:3px}
+.pilot-canvas .graph-svg{min-width:0;touch-action:pan-x pan-y}
+.pilot-canvas .graph-legende{position:sticky;left:0;padding:12px;background:var(--wattson-carte-appuyee);margin:0}
+.graph-fold{cursor:pointer}
+.graph-fold-surface{fill:var(--wattson-carte-appuyee);stroke:var(--wattson-ligne)}
+.graph-fold-label{fill:var(--wattson-texte);font-size:11px;font-weight:600}
+.graph-fold:focus{outline:none}
+.graph-fold:focus .graph-fold-surface,.graph-fold:hover .graph-fold-surface{stroke:var(--wattson-lien);stroke-width:2}
+.graph-noeud[data-selected=true] .graph-cadre{stroke:var(--wattson-lien);stroke-width:4;stroke-dasharray:6 3}
+.pilot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:14px;align-items:start}
+.pilot-card{padding:16px;border:1px solid var(--wattson-ligne);border-radius:12px;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);min-width:0}
+.pilot-card[data-state=running]{background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.pilot-card[data-state=blocked]{background:var(--wattson-alerte-fond);color:var(--wattson-alerte-encre)}
+.pilot-card[data-state=submitted],.pilot-card[data-state=stale]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre)}
+.pilot-card[data-state=accepted]{background:var(--wattson-succes-fond);color:var(--wattson-succes-encre)}
+.pilot-card p{color:inherit;margin:8px 0;overflow-wrap:anywhere}
+.pilot-card .pilot-card-title{display:block;padding:0;text-align:left;border:0;background:none;color:inherit;font-size:16px;font-weight:700;line-height:1.45;white-space:normal}
+.pilot-card-title:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:4px}
+.pilot-eyebrow{font-size:11px;font-weight:600;letter-spacing:.04em}
+.pilot-card-state{font-size:13px;font-weight:600}
+.pilot-card-activity{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pilot-group{grid-column:1/-1;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);padding:14px;border-radius:12px}
+.pilot-group summary{cursor:pointer;font-weight:700;color:var(--wattson-titre)}
+.pilot-group .pilot-card{margin-top:12px}
+.pilot-summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pilot-summary button{background:var(--wattson-carte-appuyee);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);font-weight:600;font-size:13px}
+.pilot-summary-note{display:block;margin-top:7px;color:var(--wattson-texte-discret);font-size:12px}
+.pilot-inspector{position:fixed;inset:20px 20px 20px auto;margin:0;width:min(440px,calc(100vw - 40px));max-width:calc(100vw - 40px);height:calc(100dvh - 40px);max-height:calc(100dvh - 40px);padding:0;overflow:auto;border:1px solid var(--wattson-ligne);border-radius:14px;background:var(--wattson-carte);color:var(--wattson-texte);box-shadow:0 12px 40px color-mix(in srgb,var(--wattson-titre) 22%,transparent);z-index:20}
+.pilot-inspector-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;background:var(--wattson-carte-appuyee);border-bottom:1px solid var(--wattson-ligne);z-index:1}
+.pilot-inspector-head h2{font-size:18px;margin:0;color:var(--wattson-titre)}
+.pilot-inspector-head button{font-size:12px;flex-shrink:0}
+.pilot-inspector-body{padding:18px}
+.pilot-inspector-body h3{font-size:17px;line-height:1.5;color:var(--wattson-titre)}
+.pilot-inspector-body h4{font-size:14px;margin:0 0 10px;color:var(--wattson-titre)}
+.pilot-inspector-body p,.pilot-inspector-body li{font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.pilot-inspector-body button{margin:4px 6px 4px 0;font-size:13px;white-space:normal}
+.pilot-section{background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:10px;padding:14px;margin:14px 0}
+.pilot-section summary{cursor:pointer;color:var(--wattson-titre)}
+.pilot-inspector::backdrop{background:color-mix(in srgb,var(--wattson-fond) 75%,transparent)}
+@media(max-width:760px){.pilot-inspector{inset:10px;width:calc(100vw - 20px);max-width:calc(100vw - 20px);height:calc(100dvh - 20px);max-height:calc(100dvh - 20px)}.pilot-toolbar label{flex-basis:40%}.pilot-canvas{max-height:55vh}.pilot-actions{padding:10px}.pilot-summary button{flex:1 1 45%}}
+@media(prefers-reduced-motion:reduce){.pilot-inspector,.pilot-canvas{scroll-behavior:auto}}
+
+#conduite-accueil{gap:10px;align-items:center}
+#conduite-accueil .pilot-summary-note{margin:0}
+
+.pilot-relations-graph{display:block;width:100%;height:auto;overflow:visible}
+.pilot-relations-graph text{fill:var(--wattson-texte);font-size:12px}
+.pilot-relation-line,.pilot-relation-arrow{fill:none;stroke:var(--wattson-texte);stroke-width:1.5}
+.pilot-relation-line.previous{stroke-dasharray:2 4;stroke-linecap:round}
+
+/* The grid display must never override the inactive view’s hidden state. */
+#pilot-list[hidden],#pilot-canvas[hidden]{display:none}
+
+.cockpit-accordion{margin:12px 0;border:1px solid var(--wattson-ligne);border-radius:12px;background:var(--wattson-carte);overflow:hidden}
+.cockpit-accordion>summary{padding:14px 16px;cursor:pointer;background:var(--wattson-carte-appuyee);color:var(--wattson-titre);font-weight:600}
+.cockpit-accordion>summary:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:-3px}
+.cockpit-accordion[open]>summary{border-bottom:1px solid var(--wattson-ligne)}
+.cockpit-accordion .accordion-body{padding:16px}
+#assistant.cockpit-accordion{padding:0}
+#assistant>summary>span+span{margin-left:14px;font-weight:400;color:var(--wattson-texte-discret)}
+#conduite .conduite-fil{margin:12px 0}
+#conduite .fil-sommaire h3{margin:0}
+
+/* Color identifies a purpose or a real state; neutral surfaces keep the DAG clear. */
+#conduite #conduite-graph-title{padding:16px 20px;margin-bottom:0;border-radius:14px 14px 0 0;border-left:5px solid var(--wattson-info-encre);background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.pilot-toolbar{border-top:0;border-radius:0;background:var(--wattson-carte-appuyee)}
+.pilot-toolbar label:first-child{color:var(--wattson-info-encre)}
+.pilot-toolbar label:first-child select{border-color:var(--wattson-info-encre)}
+#pilot-all-links,#pilot-fit{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-info-encre)}
+.pilot-summary button[data-summary-key=active]{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-info-encre)}
+.pilot-summary button[data-summary-key=review],.pilot-summary button[data-summary-key=unknown],.pilot-summary button[data-summary-key=interventions]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-color:var(--wattson-attention-encre)}
+#assistant.cockpit-accordion>summary{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-left:4px solid var(--wattson-info-encre)}
+#assistant>summary>span+span{color:inherit}
+#conduite-inbox-section>summary{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-left:4px solid var(--wattson-attention-encre)}
+#conduite-overview>summary,#fil-bloc>summary{border-left:4px solid var(--wattson-lien)}
+.pilot-inspector-head{background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.pilot-inspector-head h2{color:inherit}
+.report-summary{grid-column:1/-1;padding:16px;border-radius:12px;border:1px solid var(--wattson-info-encre);background:var(--wattson-info-fond);color:var(--wattson-info-encre);margin-bottom:16px}
+.report-summary h3,.report-summary p,.report-summary label{color:inherit}
+.report-summary h3{margin-top:0}
+.report-summary-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.report-summary select{background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne)}
+.report-summary select:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:2px}
+.report-summary select:disabled{background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret)}
+
+/* Mission and current validation remain distinct inside the agent inspector. */
+#pilot-inspector .pilot-mission{padding:16px;border-radius:12px;border-left:4px solid var(--wattson-info-encre);background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+#pilot-inspector .pilot-mission h3,#pilot-inspector .pilot-mission .pilot-eyebrow{color:inherit}
+#pilot-inspector .pilot-mission h3{margin:8px 0 14px}
+#pilot-inspector .pilot-validation{display:inline-block;padding:6px 10px;border-radius:8px;font-weight:600;background:var(--wattson-carte);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);margin:0}
+#pilot-inspector .pilot-validation[data-state=running]{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-info-encre)}
+#pilot-inspector .pilot-validation[data-state=blocked]{background:var(--wattson-alerte-fond);color:var(--wattson-alerte-encre);border-color:var(--wattson-alerte-encre)}
+#pilot-inspector .pilot-validation[data-state=submitted],#pilot-inspector .pilot-validation[data-state=stale]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-color:var(--wattson-attention-encre)}
+#pilot-inspector .pilot-validation[data-state=accepted]{background:var(--wattson-succes-fond);color:var(--wattson-succes-encre);border-color:var(--wattson-succes-encre)}
+#pilot-inspector .pilot-purpose{border-left:4px solid var(--wattson-info-encre)}
+#pilot-inspector #pilot-reports[data-review=true]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-color:var(--wattson-attention-encre)}
+#pilot-inspector #pilot-reports[data-review=true] h4{color:inherit}
+
+#pilot-status.notice.info{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-info-encre)}
+
+.pilot-review-controls{grid-column:1/-1;border-left:4px solid var(--wattson-attention-encre)}
+.pilot-review-controls button{display:block;width:100%;white-space:normal;margin:8px 0;min-height:40px}
+.pilot-review-controls .pilot-review-override{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-color:var(--wattson-attention-encre)}
+.pilot-review-reason{color:var(--wattson-texte-discret);font-size:13px;line-height:1.5}
+
+.pilot-inspector a[data-preparation] { color:inherit; font-weight:600; text-decoration:underline; }
+
+/* Actions de lancement, distinctes du statut métier. */
+.graph-go{cursor:pointer}
+.graph-go rect{fill:var(--wattson-info-fond);stroke:var(--wattson-info-encre)}
+.graph-go text{fill:var(--wattson-info-encre);font-size:12px;font-weight:700}
+.graph-go[data-ready=false] rect{fill:var(--wattson-attention-fond);stroke:var(--wattson-attention-encre)}
+.graph-go[data-ready=false] text{fill:var(--wattson-attention-encre)}
+.graph-go:focus{outline:none}
+.graph-go:focus rect,.graph-go:hover rect{stroke:var(--wattson-lien);stroke-width:3}
+.pilot-go{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-info-encre)}
+.pilot-go[data-ready=false]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-color:var(--wattson-attention-encre)}
+.pilot-go-reason{color:var(--wattson-texte-discret);font-size:13px}
+
+#batch-results{grid-column:1 / -1}

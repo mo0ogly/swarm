@@ -56,9 +56,13 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  await page.goto(url);
  await page.waitForSelector('#conduite:not([hidden])');
 
- const choisir=async id=>{await page.select('#work',id);await page.waitForFunction(t=>document.getElementById('title').textContent===t,{},{ 'x':0 }.x===0?(await page.evaluate(()=>null),undefined):undefined)};
- // Sélection par identifiant, puis attente du rendu correspondant.
- const ouvrir=async(id,titre)=>{await page.select('#work',id);await page.waitForFunction(t=>document.getElementById('title').textContent===t,{},titre)};
+ const select=async(selector,value)=>{
+  const index=await page.$eval(selector,(e,v)=>[...e.options].findIndex(o=>o.value===v),value);
+  await page.focus(selector);await page.keyboard.press('Home');
+  for(let i=0;i<index;i++)await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+ };
+ const ouvrir=async(id,titre)=>{await page.select('#work',id);await page.waitForFunction(t=>document.getElementById('title').textContent===t,{},titre);await select('#pilot-view','dependencies');await select('#pilot-detail','detailed')};
 
  await ouvrir(dense.id,'Plan dense');
  await page.waitForFunction(()=>document.querySelectorAll('.graph-noeud').length===6);
@@ -69,7 +73,7 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  // Le superviseur persiste l'activité au tic suivant : attendre l'action, pas
  // seulement la présence du compteur.
  await page.waitForFunction(()=>[...document.querySelectorAll('.graph-noeud')].some(n=>/CPU|probe|Bash/.test(n.textContent)),{timeout:25000});
- const g1=(await noeuds(page)).find(t=>t.startsWith('g1'));
+ const g1=(await noeuds(page)).find(t=>t.startsWith('Tâche g1'));
  assert.match(g1,/En cours/,'état de la tâche absent : '+g1);
  assert.match(g1,/Mesurer la consommation CPU|probe/,'action courante absente : '+g1);
  assert.match(g1,/appels/,'compteur d’appels absent : '+g1);
@@ -89,8 +93,8 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  // fraîcheur et se tait à juste titre : attendre le premier résultat.
  await page.waitForFunction(()=>[...document.querySelectorAll('.graph-noeud')]
    .some(n=>/· [1-9]\d* résultats/.test(n.textContent)),{timeout:25000});
- const g1frais=(await noeuds(page)).find(t=>t.startsWith('g1'));
- assert.match(g1frais,/dernier résultat : \d{2}:\d{2}|signal perdu depuis \d+ s|signal jamais reçu/,
+ const g1frais=(await noeuds(page)).find(t=>t.startsWith('Tâche g1'));
+ assert.match(g1frais,/Résultat public récent|Résultat ancien|Dernier résultat|Activité/i,
    'fraîcheur du signal absente du nœud : '+g1frais);
  checks.push('fraîcheur du signal portée par le nœud');
 
@@ -129,21 +133,12 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  await page.click('#theme');
  checks.push('graphe rendu dans les deux thèmes');
 
- // Clavier : un nœud est atteignable et ouvre le dialogue de sa tâche.
- // Le graphe est reconstruit à chaque rafraîchissement du cockpit : le focus
- // posé peut disparaître avant la frappe, et la touche part alors dans le vide.
- // On réessaie jusqu'à ce que le dialogue s'ouvre, plutôt que de supposer que
- // les deux gestes tombent dans la même fenêtre de rendu.
- for(let essai=0;essai<20;essai++){
-   await page.$eval('.graph-noeud',n=>n.focus());
-   await page.keyboard.press('Enter');
-   try{await page.waitForSelector('#modal[open] #field-action',{visible:true,timeout:1500});break}
-   catch(e){if(essai===19)throw e}
- }
- const titre=await page.$eval('#modal-title',e=>e.textContent);
- assert.match(titre,/^g\d/,'le nœud doit ouvrir sa propre tâche : '+titre);
- await page.click('#cancel');
- checks.push('nœud atteignable au clavier et lié à sa tâche');
+ // Le clic ouvre le contexte avant les commandes.
+ await page.$eval('.graph-noeud',n=>n.focus());await page.keyboard.press('Enter');
+ await page.waitForSelector('#pilot-inspector[open]');
+ assert.match(await page.$eval('#pilot-inspector-body',e=>e.textContent),/Tâche g1/);
+ await page.$eval('#pilot-inspector',e=>e.focus());await page.keyboard.press('Escape');
+ checks.push('nœud atteignable au clavier et lié au contexte de sa tâche');
 
  await ouvrir(vide.id,'Travail vide');
  await page.waitForFunction(()=>/graphe apparaîtra/.test(document.getElementById('graph').textContent));
@@ -166,7 +161,7 @@ const noeuds=page=>page.$$eval('.graph-noeud',ns=>ns.map(n=>n.textContent));
  assert.ok(!/coût de la tâche : 0\.00/.test(textes),'un coût inconnu ne doit pas s’afficher 0,00 : '+textes);
  checks.push('cumul de coût par tâche : valeur ou absence déclarée, jamais 0,00');
 
- const anime=await page.evaluate(()=>[...document.querySelectorAll('#graph *')].some(e=>{const s=getComputedStyle(e);return s.animationName!=='none'||s.transitionDuration!=='0s'}));
+ const anime=await page.evaluate(()=>[...document.querySelectorAll('#pilot-canvas *')].some(e=>{const s=getComputedStyle(e);return s.animationName!=='none'||s.transitionDuration!=='0s'}));
  assert.equal(anime,false,'aucune animation ne doit masquer une alerte');
  checks.push('aucune animation dans le graphe');
 

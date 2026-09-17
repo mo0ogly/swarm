@@ -188,9 +188,9 @@ function filRendreResume() {
 {
   const bloc = $('fil-bloc');
   if (bloc) {
-    if (localStorage.getItem('swarm-fil') === 'replie') bloc.open = false;
+    if (cockpitStorage.getItem('swarm-fil') === 'replie') bloc.open = false;
     bloc.addEventListener('toggle', () => {
-      localStorage.setItem('swarm-fil', bloc.open ? 'deplie' : 'replie');
+      cockpitStorage.setItem('swarm-fil', bloc.open ? 'deplie' : 'replie');
     });
   }
 }

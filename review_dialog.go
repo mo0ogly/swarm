@@ -155,8 +155,13 @@ func jsonReview(raw json.RawMessage) (string, error) {
 func (s *Store) submitReport(work, id, report string) error {
 	return s.submitReportAt(work, id, report, -1, "")
 }
+
 // origin nomme le moteur quand le conducteur relaie ; vide pour un geste humain.
 func (s *Store) submitReportAt(work, id, report string, expected int, origin string) error {
+	return s.submitReportVerified(work, id, report, expected, origin, newID("operator-"), "")
+}
+
+func (s *Store) submitReportVerified(work, id, report string, expected int, origin, event, digest string) error {
 	path, e := safeReport(s.root, report)
 	if e != nil {
 		return e
@@ -172,7 +177,7 @@ func (s *Store) submitReportAt(work, id, report string, expected int, origin str
 	if expected >= 0 && w.Revision != expected {
 		return &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; relire avant soumission.", Retryable: true}
 	}
-	r := Request{Schema: 1, EventID: newID("operator-"), Revision: w.Revision, ID: id, Status: "submitted", Origin: origin, Next: "Évaluer les preuves et la gate delivery ; handoff : " + report}
+	r := Request{Schema: 1, EventID: event, Revision: w.Revision, ID: id, Status: "submitted", Origin: origin, Next: "Évaluer les preuves et la gate delivery ; handoff : " + report}
 	raw, _ := json.Marshal(r)
 	_, e = s.mutate(work, "task.submit", r.EventID, r.Revision, raw, func(w *Work) error {
 		t, e := w.task(id)
@@ -185,12 +190,19 @@ func (s *Store) submitReportAt(work, id, report string, expected int, origin str
 				uiStatus(t.Status),
 			)
 		}
-		if t.Revalidation != nil {
-			b, err := os.ReadFile(path)
+		var reportBytes []byte
+		if digest != "" || t.Revalidation != nil {
+			bytes, err := os.ReadFile(path)
 			if err != nil {
 				return err
 			}
-			digest := hash(b)
+			reportBytes = bytes
+			if digest != "" && hash(bytes) != digest {
+				return fmt.Errorf("Rapport modifié : examiner une nouvelle proposition avant soumission")
+			}
+		}
+		if t.Revalidation != nil {
+			digest := hash(reportBytes)
 			for _, old := range t.Revalidation.PreviousArtifacts {
 				if digest == old {
 					return fmt.Errorf("Revalidation : nouveau rapport de contrôles requis ; ce contenu appartient aux anciennes preuves")

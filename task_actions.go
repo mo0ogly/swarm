@@ -47,10 +47,14 @@ func raisonAction(oracle map[string]TaskAction, kind, repli string) string {
 // transitions de store.go et les vérifications de launch/override/report.
 func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	taskActive := false
+	stopAvailable := false
 	for _, a := range agents {
 		if a.TaskID == t.ID && activeAgent(a) {
 			taskActive = true
-			break
+			desired, _ := s.desired(a.ID)
+			if desired != "stop" {
+				stopAvailable = true
+			}
 		}
 	}
 	gates := s.gateFiles(t.ID)
@@ -80,7 +84,9 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	// repasse la tâche en running via task.update.
 	stopRaison := ""
 	retryDispo, retryRaison := false, ""
-	if taskActive {
+	if t.LaunchHeld {
+		retryRaison = s.startBlockReason(w, t)
+	} else if taskActive {
 		retryRaison = "Une tentative est en cours : attendez sa fin ou arrêtez-la."
 	} else if !hasFinishedAttempt(t, agents) {
 		retryRaison = "Aucune tentative à relancer : choisir Lancer un agent."
@@ -91,6 +97,12 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	}
 	if !taskActive {
 		stopRaison = "Aucune tentative active sur cette tâche."
+	} else if !stopAvailable {
+		stopRaison = "Arrêt déjà demandé ; confirmation du superviseur attendue."
+	}
+	reconcileRaison := ""
+	if !taskActive {
+		reconcileRaison = "Aucune tentative active sur cette tâche."
 	}
 
 	submitRaison := ""
@@ -139,8 +151,8 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	actions := []TaskAction{
 		action("start", "Lancer un agent", canStart, startRaison),
 		action("retry", "Relancer une tentative", retryDispo, retryRaison),
-		action("stop", "Arrêter la tentative", taskActive, stopRaison),
-		action("reconcile", "Réconcilier l'état observé", taskActive, stopRaison),
+		action("stop", "Arrêter la tentative", stopAvailable, stopRaison),
+		action("reconcile", "Réconcilier l'état observé", taskActive, reconcileRaison),
 		action("report", "Lire le rapport", true, ""),
 		action("submit", "Soumettre le rapport", submitRaison == "", submitRaison),
 		action("gate", "Examiner et enregistrer une gate", gateRaison == "", gateRaison),
@@ -232,6 +244,9 @@ func hasFinishedAttempt(t *Task, agents []Agent) bool {
 // startBlockReason explique pourquoi un départ est refusé alors que l'état de
 // la tâche l'autoriserait (conditions assistCanStart, miroir du moteur).
 func (s *Store) startBlockReason(w *Work, t *Task) string {
+	if t.LaunchHeld {
+		return "Démarrage non autorisé : ouvrir la préparation puis autoriser les missions de ce plan."
+	}
 	if s.paused(w.ID) {
 		return "Départs suspendus : réautoriez les départs depuis l'en-tête du cockpit."
 	}
@@ -265,6 +280,9 @@ func (s *Store) startBlockReason(w *Work, t *Task) string {
 // (dépendances fraîches, brief du plan, plafond de tentatives, espace de
 // travail, budget). Conservée comme condition de l'oracle.
 func (s *Store) assistCanStart(w *Work, t *Task) bool {
+	if t.LaunchHeld {
+		return false
+	}
 	if s.paused(w.ID) || (t.Status != "todo" && t.Status != "blocked" && t.Status != "submitted") {
 		return false
 	}
@@ -283,18 +301,11 @@ func (s *Store) assistCanStart(w *Work, t *Task) bool {
 			return false
 		}
 	}
-	var overlaps int
-	if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1)", s.root, s.root, s.root).Scan(&overlaps); e != nil || overlaps > 0 {
+	// Sans fournisseur/workspace choisi, ceci est une préparation de départ.
+	// Le formulaire vérifie la proposition complète via prepareLaunch en aperçu.
+	var occupied int
+	if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')", w.ID, t.ID).Scan(&occupied); e != nil || occupied > 0 {
 		return false
-	}
-	as, e := s.agents(w.ID)
-	if e != nil {
-		return false
-	}
-	for _, a := range as {
-		if activeAgent(a) {
-			return false
-		}
 	}
 	b, e := s.budget(w.ID)
 	if e != nil {

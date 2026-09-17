@@ -102,6 +102,16 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, map[string]any{"autonomy": s.autonomy(arg(1)), "label": autonomyLabel(s.autonomy(arg(1))), "slots": s.slots(arg(1))})
 	case "web":
 		return s.serveWeb(arg(1), out)
+	case "_prepare_turn":
+		if len(pos) != 2 {
+			return fmt.Errorf("identifiant d’échange requis")
+		}
+		t, e := s.preparationTurn(pos[1])
+		if e != nil {
+			return e
+		}
+		s.runPreparationTurn(t)
+		return nil
 	case "_assist":
 		if len(pos) != 2 {
 			return fmt.Errorf("identifiant de question requis")
@@ -112,6 +122,8 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		}
 		s.runAssistTurn(turn)
 		return nil
+	case "_dialogue_agent":
+		return s.runAgentDialogue(arg(1))
 	case "_supervise":
 		return s.supervise(arg(1))
 	case "console":
@@ -134,6 +146,11 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, p)
 	case "agent":
 		switch arg(1) {
+		case "attach":
+			if asJSON {
+				return fmt.Errorf("agent attach est interactif ; retirer --json")
+			}
+			return s.attachTerminal(arg(2), os.Stdin, out)
 		case "list":
 			a, e := s.cockpitSnapshot(arg(2))
 			if e != nil {

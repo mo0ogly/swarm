@@ -11,6 +11,13 @@ func validateTaskGraph(tasks []Task) error {
 			return fmt.Errorf("tâche dupliquée : %s", task.ID)
 		}
 		graph[task.ID] = task.Depends
+		seen := map[string]bool{}
+		for _, parent := range task.Depends {
+			if seen[parent] {
+				return fmt.Errorf("dépendance dupliquée : %s → %s", parent, task.ID)
+			}
+			seen[parent] = true
+		}
 	}
 	state := map[string]int{}
 	var visit func(string) error

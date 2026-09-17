@@ -5,6 +5,42 @@ Linux. La console est un affichage interactif ; un superviseur détaché suit ch
 processus. Fermer la console ne coupe pas les agents. `resume` reste une commande de
 lecture et de reprise documentaire : elle ne lance aucun modèle.
 
+## Pilotage web : retrouver le sens du travail
+
+Dans **Conduite → Pilotage des agents**, choisir **Agents** pour les tentatives
+et tâches à préparer, ou **Dépendances** pour voir les liens entre tâches.
+L’orientation **Horizontale / Verticale** et les informations
+**Simplifiées / Détaillées** sont deux réglages indépendants.
+
+- Les flèches vont du prérequis vers la tâche qui en dépend. Une dépendance
+  satisfaite reprend le verdict du moteur, y compris la fraîcheur des preuves.
+- **− Replier la branche** masque les descendants qui ne restent pas accessibles
+  par une autre branche. **+ Déplier** les retrouve. Les alertes masquées restent
+  comptées ; les liens parent/reprise des agents ne changent pas ce repli.
+- Un clic sur une carte ouvre sa mission, ses critères et son état dans un
+  panneau. La lecture seule ne lance aucun agent et ne valide aucun rapport.
+- Le panneau distingue **exécution observée**, **activité reçue** et
+  **validation actuelle de la tâche**. Une intention sans signal ne signifie
+  pas qu’un agent est terminé. Un code de sortie 0 ne valide pas le livrable.
+- **Origine de cette tentative** distingue la filiation (double trait) de la
+  reprise (pointillés). Les boutons ouvrent l’identité exacte, même ancienne.
+- **Prochaine intervention** parcourt les demandes les plus anciennes d’abord,
+  avec un ordre figé pendant la lecture. Les nouvelles arrivées sont annoncées.
+  **Revenir à ma vue** retrouve les filtres, replis et la sélection de départ.
+- **Ouvrir les conclusions du rapport** sert à lire le résultat. Les commandes
+  de validation restent explicites et soumises aux contrôles courants du moteur.
+
+Les préférences sont mémorisées par travail. Deux onglets gardent leur propre
+sélection pendant l’utilisation. Les éléments supprimés sont retirés des
+préférences ; si le stockage du navigateur est interdit, le cockpit reste
+utilisable. Une panne conserve la dernière situation avec sa date et indique
+qu’elle n’est plus actualisée. Après une réponse de commande perdue, relire
+l’état confirmé avant de décider d’un nouvel envoi.
+
+Sur mobile ou à fort zoom navigateur, le panneau devient un dialogue ; **Échap**
+ou **Fermer le détail** rendent le focus au déclencheur. Les commandes de repli
+sont séparées du zoom et utilisables au clavier.
+
 ## Démarrage dans Wattson
 
 Depuis `/home/fpizzi/wattson_devcontainer/flaskProject` :
@@ -189,29 +225,21 @@ est déjà engagé, et n'accepte ni ne refuse aucune tâche. Sans réserve
 configurée, aucun plafond n'est déduit ; des tentatives muettes ne la
 déclenchent pas, leur coût étant inconnu et non nul.
 
-## Graphe du travail
+## Graphe des dépendances
 
-Le mode Conduite affiche le plan sous forme de graphe : un nœud par tâche, une
-arête par dépendance, orientés de gauche à droite. Un nœud porte l'état de la
-tâche et, pour chaque tentative vivante, le fournisseur, l'action courante en
-français, les appels d'outils, le coût rapporté par le fournisseur et l'âge du
-dernier résultat. Ce coût n'est jamais une estimation ni une facture : quand
-aucune tentative ne l'a déclaré, le nœud écrit « non rapporté », jamais 0,00.
+La vue Dépendances dessine un nœud par tâche et une flèche par prérequis visible.
+L’orientation est choisie par l’utilisateur. Le niveau détaillé affiche l’action
+publique et les coûts disponibles ; une valeur absente reste « non rapportée ».
 
-« Signal perdu » et « terminé » restent distincts : un nœud « en cours » ne
-prouve pas qu'un processus tourne encore. Au-delà du délai de surveillance, le
-nœud le dit en clair.
+Une arête pleine correspond à un prérequis satisfait selon les preuves courantes
+du moteur ; une arête pointillée indique un prérequis en attente. Le statut
+`accepted` seul ne suffit pas : une preuve périmée retire ce verdict. Les états
+sont aussi écrits dans les nœuds et expliqués par la légende.
 
-Chaque nœud porte la teinte de son état en aplat, et une légende dit ce que
-chaque teinte signifie. Une arête pleine marque une dépendance acceptée, une
-arête pointillée une dépendance encore en attente — la différence entre un
-départ autorisé et un départ retenu. L'état reste écrit en toutes lettres dans
-le nœud : la couleur permet de balayer le graphe, elle ne porte jamais seule
-l'information.
-
-Un nœud s'atteint au clavier et ouvre les actions de sa tâche. La liste sous le
-graphe porte la même information en texte. La disposition vient de dagre,
-embarqué dans le binaire : le graphe fonctionne sur un poste sans réseau.
+Le clic ou le clavier ouvre le panneau d’inspection. Les actions restent
+explicites dans ce panneau. La vue Agents constitue l’alternative en cartes ;
+elle ne dépend pas du repli du graphe. Dagre et les ressources sont embarqués
+localement : aucun CDN n’est nécessaire pour dessiner le graphe.
 
 ## Deux niveaux d'interface
 
@@ -719,3 +747,216 @@ vérifiée. Une tâche rouverte fait exception : son garde-fou de revalidation
 reste dans les demandes.
 
 Toute fermeture porte son motif. Aucune carte ne disparaît sans raison lisible.
+
+### Synthèse des conclusions
+
+Depuis le pilotage, ouvrir un rapport affiche automatiquement une analyse IA
+en deux lignes : le constat et la suite utile. Le fournisseur est visible et
+modifiable. Une réponse est réutilisée si le rapport, le contexte et le
+fournisseur sont identiques. Le contenu est relu côté moteur et limité à un
+extrait de 12 000 octets, avec indication lorsque le rapport est tronqué.
+Une analyse ne valide pas la tâche ; le texte du rapport reste consultable
+en cas de panne de l’IA.
+
+### Résoudre une tentative bloquée
+
+Le panneau « Agir sur cette tâche » est placé sous la mission.
+
+| État observé | Action visible | Résultat |
+| --- | --- | --- |
+| Démarrage en attente, non pris en charge | Annuler ce démarrage en attente | Intention annulée, réservation libérée, tâche à reprendre |
+| Tentative active, arrêt non demandé | Demander l’arrêt de la tentative | Demande envoyée, attente de confirmation |
+| Arrêt demandé sur cette session | Vérifier la fin et libérer la tâche | Libération seulement après contrôle des processus |
+| Exécution prise en charge dans une autre session | Actualiser l’état et explication de la vérification à l’origine | Pas de libération sans preuve de fin |
+| Tentative arrêtée, conditions remplies | Relancer cette tâche | Formulaire prérempli, lancement après décision explicite |
+
+L’annulation d’une intention queued se dispute atomiquement la ligne avec le
+superviseur qui veut passer à starting. Si le superviseur gagne, l’annulation
+est refusée. Une autre session peut annuler une intention jamais prise en
+charge ; elle ne peut pas déclarer terminé un processus étranger démarré.
+La tâche revient bloquée pour une reprise explicite, jamais validée par l’arrêt.
+
+Recette : `node tests/pilot_recovery_ui.cjs BINAIRE SORTIE` utilise une base
+isolée, confirme réellement l’annulation, contrôle la réservation en base,
+recharge l’écran et ouvre la relance. Aucun fournisseur n’est lancé.
+
+Compatibilité des anciens démarrages : un verrou starting dont le corps est
+encore queued, sans superviseur ni PID ni heartbeat, peut être annulé avec
+une demande d’arrêt déjà persistée. Un démarrage nouvellement pris en charge
+enregistre maintenant ses métadonnées et son statut en une seule opération.
+Toute annulation humaine porte stop_kind=operateur : le mode autonome ne doit
+pas la relancer. La recette de résolution couvre désormais ce mode autonome.
+
+## Préparation documentaire — candidat du 15 septembre 2026
+
+Le candidat `/tmp/swarm-prephase-web` ajoute « Préparer un projet » au cockpit.
+La page `/prepare.html` partage les documents avec `prepare` côté CLI : besoin,
+brief, plan JSON, versions, sauvegarde et résolution de conflits. Monaco est
+embarqué localement et dispose d’un éditeur texte de secours. La méthode APEX,
+KS ou audit-PDCA sélectionnée référence les fichiers du projet ; son dialogue IA
+reste à raccorder. Aucun agent n’est lancé depuis cette page.
+
+Recette de l’éditeur et non-régression du pilotage :
+[suivi de réalisation](../../docs/plans/swarm-prephase-apex/IMPLEMENTATION.md).
+Le serveur installé n’est pas remplacé par ce candidat (schéma SQLite v7).
+
+### Dialogue de préparation — candidat suivant
+
+`/tmp/swarm-prephase-dialogue` (SQLite v8) ajoute une conversation avec Claude ou
+Codex à côté de Monaco : réponse persistante, proposition de brief à comparer,
+utilisation explicite puis adoption séparée. Les appels sont sans outils, limités
+à 120 secondes et 20 échanges par préparation. Arrêter affiche la confirmation
+moteur ; les réponses anciennes ne remplacent pas les documents courants.
+Le CLI expose `prepare providers|dialogue|send|stop|use-proposal` en JSON.
+Le mode interactif CLI, la génération du plan et sa conversion restent à réaliser.
+Voir [ADR-002](../../docs/plans/swarm-prephase-apex/ADR-002.md).
+
+### Plans IA et dialogue terminal — candidat suivant
+
+`/tmp/swarm-prephase-plan` propose le plan à partir d’un brief adopté. Le moteur
+contrôle structure et dépendances ; comparer, enregistrer et vérifier restent
+séparés. Les questions ouvertes bloquent la vérification jusqu’à leur résolution.
+`prepare` en terminal ouvre le dialogue ; `prepare chat ID` / `prepare resume ID`
+reprennent une préparation. `/aide` liste les commandes, `/plan` appelle l’IA,
+`/voir plan` consulte sans appel, `/edit plan` utilise VISUAL/EDITOR avec protection
+contre l’écrasement d’une version concurrente. Modes JSON et --plain disponibles.
+Aucune mission n’est créée par ce lot. Voir
+[ADR-003](../../docs/plans/swarm-prephase-apex/ADR-003.md).
+
+## Session interactive dans le graphe
+
+Au lancement manuel d’une tâche, choisir **Mode de session → Interactif — terminal
+natif**. Le clic sur sa case ouvre le terminal en modale ; **Prendre la saisie**
+donne le clavier à cette vue. Les sorties ANSI restent colorées. **Détails et
+validation** ramène aux rapports, preuves et commandes métier.
+
+**Fermer la vue** ou Échap ne coupe pas le fournisseur. **Arrêter l’agent…** puis
+**Confirmer l’arrêt** demande une interruption au superviseur. Un arrêt demandé
+reste distinct d’un arrêt confirmé. La fin du processus ne valide jamais la tâche.
+Les anciennes tentatives automatisées proposent leurs journaux en lecture seule :
+on ne transforme pas une entrée déjà fermée en session interactive.
+
+La même session est accessible dans le terminal local :
+
+```sh
+swarm --root /chemin/projet agent attach ID_AGENT
+```
+
+`Ctrl+]` détache cette vue ; `Ctrl+C` est transmis au fournisseur. Le lancement
+JSON `agent start` accepte `"mode": "terminal"`. Le mode automatisé reste le défaut.
+Une seule vue web ou CLI peut écrire à la fois ; le bail expire après 20 secondes
+sans renouvellement. Une réponse réseau perdue suspend la saisie : vérifier
+l’écran, puis reprendre explicitement. Aucune saisie incertaine n’est rejouée.
+
+Les commandes standard de `providers init` sont reconnues pour Codex et Claude.
+Pour une commande personnalisée, ajouter `interactive_args` dans le fournisseur :
+arguments natifs, sans le prompt, qui est ajouté comme dernier argument. Les
+permissions et le sandbox restent ceux de la commande ; aucun drapeau de
+contournement n’est ajouté. Un fournisseur personnalisé doit donc accepter un
+prompt positionnel final. Le choix de modèle continue de passer par la politique.
+
+### Limites du mode natif
+
+- Durée totale par défaut : 1 800 secondes ; configurable via `timeout_seconds`.
+- Historique de sortie persistant : 4 Mio par tentative, puis arrêt supervisé.
+  Le terminal conserve ses couleurs et ses dimensions de rendu ; aucun rejeu des
+  commandes n’est nécessaire pour le rouvrir. La capture est obligatoire dans ce mode.
+- Appels d’outils, temps par outil, répétitions, progression métier et coût ne
+  sont **pas mesurés**. Les plafonds de plan et les limites explicites de
+  fournisseur/mission incompatibles font refuser le lancement natif. Aucun
+  assouplissement implicite des contrats existants. La réservation de budget
+  et la durée maximale restent contrôlées ; le coût n’est pas inventé.
+- Réouverture après fermeture du navigateur ou redémarrage du serveur web : même
+  superviseur, même tentative. Après fin du processus : consultation seule ; une
+  relance explicite crée une nouvelle tentative. Un redémarrage de la machine ou
+  une perte du superviseur ne restaure pas automatiquement le processus natif.
+- Le profil d’ordonnancement automatique n’est pas remplacé par un lancement natif.
+
+Stockage v10, sauvegarde SQLite avant migration d’une base existante. Le terminal
+utilise un socket Unix local contrôlé par UID et identité de superviseur. Son cadre
+web possède la seule exception de styles nécessaire à xterm ; le cockpit conserve
+sa CSP précédente. Bibliothèques embarquées, aucune dépendance CDN à l’exécution.
+
+## Extraits et budget de préparation (stockage v11)
+
+Dans **Préparer avec l’IA**, **Joindre des fichiers** recherche les chemins du
+projet, affiche une plage de lignes et demande un ajout explicite. Huit extraits
+au maximum, 12 000 octets par extrait et 24 000 au total ; seuls les fichiers
+texte réguliers de 256 Kio au maximum sont consultables. Liens symboliques,
+chemins exclus, binaires et secrets reconnaissables sont refusés. Le détecteur
+est heuristique : relire le contenu avant de le transmettre. L’IA reçoit
+l’instantané enregistré avec son empreinte, sans accès autonome au dépôt.
+Changer ces sources demande de relire et réadopter le brief.
+
+**Budget et consommation** configure une enveloppe estimative et une réserve
+par appel en USD, avec source et date de référence. Un appel réserve atomiquement
+les budgets de la préparation et, si elle est liée à un travail plafonné, du
+travail. Une annulation avant appel libère la réserve. Dès qu’un appel peut avoir
+démarré, son estimation reste engagée, même si la mesure du fournisseur manque.
+Les coûts et jetons rapportés affichent leur couverture ; l’absence de mesure
+n’est pas un coût nul. Les appels historiques ne sont pas réévalués après coup.
+
+Équivalents dans `prepare chat` : `/fichiers [recherche]`, `/fichiers-dans DOSSIER`, `/lire CHEMIN DEBUT FIN`,
+`/joindre CHEMIN DEBUT FIN`, `/retirer CHEMIN`, `/sources`, `/budget` et
+`/budget LIMITE RESERVE AAAA-MM-JJ SOURCE`. Les ajouts et changements demandent
+`/confirmer`. Les commandes JSON `prepare files`, `source`, `source-add`,
+`source-remove` et `budget` utilisent les mêmes contrats de révision et de reçu.
+
+## Dialogue avec contrôles d’outils
+
+Le choix **Dialogue — contrôles d’outils** (`mode: "dialogue"`) permet des échanges
+successifs dans la modale du graphe ou avec `agent attach ID`. Il accepte les
+plafonds de mission et conserve les compteurs entre échanges. Chaque lancement
+est autorisé par le superviseur ; les messages déjà saisis ne contournent pas un
+plafond atteint. Les identifiants de session reçus du fournisseur sont contrôlés
+à chaque échange ; aucune reprise de « dernière session » implicite.
+
+Le dialogue utilise les commandes standard Claude/Codex de `providers init` et
+la politique de modèle habituelle. Les permissions restent celles du fournisseur.
+Un outil soumis à une autorisation native peut être refusé dans ce protocole non
+interactif ; le dialogue n’accorde aucune permission supplémentaire.
+
+Les limites réagissent aux événements observables, comme le mode automatisé :
+elles ne garantissent pas de bloquer un effet avant sa réalisation. Une activité
+non prise en charge arrête le dialogue. Les identifiants d’outils réutilisés par
+le fournisseur sont distingués par échange. L’attente de votre réponse n’est pas
+un silence fournisseur ; la durée totale de tentative continue de courir.
+
+`/fin` termine la session, 20 échanges au maximum. Une réponse ne valide pas la
+tâche et ne libère pas la tentative. Une perte de supervision impose une revue
+et une nouvelle tentative explicite. Le terminal natif reste disponible avec
+ses limites de mesure précédemment décrites.
+
+### Repli local
+
+`SWARM_PREPARATION_DISABLED=1 swarm --root PROJET web 127.0.0.1:18787` désactive
+l’écran et les nouvelles mutations/appels de préparation. Le graphe, la lecture,
+l’export CLI et l’arrêt des appels actifs restent disponibles. Retirer la variable
+réactive les documents conservés. Ce repli ne rétrograde pas la base.
+
+Avant migration, arrêter tous les anciens écrivains de cette racine (serveur,
+superviseurs, assistants). Les sauvegardes `state-pre-vN-*.db` sont créées avant
+chaque migration. Un ancien binaire refuse v11 : pour un retour complet, conserver
+la base courante séparément et restaurer la sauvegarde compatible dans une racine
+de reprise, puis vérifier son contenu avec l’ancien binaire. Ne jamais remettre
+un ancien binaire sur la base migrée.
+
+La recherche de fichiers est bornée à 20 000 entrées parcourues. Si elle annonce
+une limite, choisir un dossier plus précis avec les boutons « Dossier » ou le
+champ Dossier, par exemple `tools/swarm-companion`. Le CLI accepte
+`prepare files ID [recherche] [dossier]`. Chaque source jointe permet de lire
+l’instantané effectivement transmis, indépendamment du fichier courant.
+
+### Retrouver le même travail
+
+Le lien « Lien permanent vers ce travail », en haut du pilotage, ouvre directement
+le travail sélectionné. La clé locale reste identique après redémarrage sur la
+même adresse et le même port. Elle est conservée dans un fichier privé
+`.swarm/web-session-*` (permissions 0600). Pour révoquer les anciens liens,
+arrêter le serveur, supprimer sa clé puis le relancer. Un port choisi
+aléatoirement change l’adresse ; utiliser un port fixe pour conserver un favori.
+
+Le résumé du pilotage présente les validations, l’activité et les décisions
+attendues. Son bouton principal ouvre la décision la plus bloquante, le suivi,
+la reprise ou les résultats selon l’état réel. Les dérogations ne sont pas
+comptées comme des validations.

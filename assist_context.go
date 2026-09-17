@@ -113,6 +113,11 @@ func (s *Store) pageContext(work string, c PageCoordinates) (PageContext, error)
 	case "brainstorm":
 		s.brainstormContext(b, &w, c)
 	}
+	if c.Report != "" {
+		if err := s.reportContext(b, c); err != nil {
+			return PageContext{}, err
+		}
+	}
 	if b.full {
 		b.ctx.Truncated = true
 		b.omit("Nombre de faits plafonné : la page contient davantage d’éléments que ceux transmis.")
@@ -178,7 +183,11 @@ func (s *Store) tasksContext(b *contextBuilder, w *Work, v WorkValidation, c Pag
 			}
 			return "Conditions non réunies ; voir le cockpit web pour le motif."
 		}
+		if len(c.Selected) == 1 {
+			s.taskAttemptContext(b, w.ID, t.ID)
+		}
 		ref := factRef("task", t.ID)
+		b.fact("titre_tache", "texte_non_fiable", ref, "%s", t.Title)
 		b.fact("statut_historique", "etat", ref, "%s : %s", t.ID, value(t.Status))
 		tv := v.Tasks[t.ID]
 		b.fact("validation_actuelle", "derive", factRef("validation", t.ID), "%s : %s", t.ID, tv.State)

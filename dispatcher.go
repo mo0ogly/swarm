@@ -93,6 +93,9 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 			// Tentative terminée dont le handoff n'a pas pu être relayé :
 			// relancer ne produirait pas la preuve manquante.
 			continue
+		case t.LaunchHeld:
+			reasons = append(reasons, t.ID+" : missions créées, démarrage à autoriser depuis la préparation")
+			continue
 		case held[t.ID]:
 			reasons = append(reasons, t.ID+" : arrêt demandé par l'opérateur, reprise à la main")
 			continue
@@ -220,7 +223,7 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 	plan, reason := planDispatch(in)
 	if len(plan) == 0 {
 		if nonempty(reason) {
-			_ = s.controlEvent(work, "dispatch", reason)
+			_ = s.dispatchEvent(work, reason)
 		}
 		return nil, nil
 	}
@@ -231,22 +234,25 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 			return done, e
 		}
 		p := d.Profile
+		if task, err := current.task(d.TaskID); err == nil && task.Profile == nil {
+			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next + "\nConsignes communes : " + p.Instruction
+		}
 		r := Launch{Schema: 1, EventID: automaticEventID(work, d.TaskID, len(agents)), Revision: current.Revision,
 			TaskID: d.TaskID, Provider: p.Provider, Role: p.Role, Workspace: p.Workspace,
 			Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor}
 		a, created, e := s.prepare(work, r)
 		if e != nil {
-			_ = s.controlEvent(work, "dispatch", d.TaskID+" : départ automatique refusé — "+e.Error())
+			_ = s.dispatchEvent(work, d.TaskID+" : départ automatique refusé — "+e.Error())
 			return done, nil
 		}
 		if !created {
 			continue
 		}
 		if e = s.spawnAgent(a); e != nil {
-			_ = s.controlEvent(work, "dispatch", d.TaskID+" : superviseur non démarré — "+e.Error())
+			_ = s.dispatchEvent(work, d.TaskID+" : superviseur non démarré — "+e.Error())
 			return done, nil
 		}
-		_ = s.controlEvent(work, "dispatch", fmt.Sprintf("%s : départ automatique · %s · rôle %s · espace %s", d.TaskID, p.Provider, p.Role, p.Workspace))
+		_ = s.dispatchEvent(work, fmt.Sprintf("%s : départ automatique · %s · rôle %s · espace %s", d.TaskID, p.Provider, p.Role, p.Workspace))
 		_ = s.log(a.ID, "lifecycle", fmt.Sprintf("Départ automatique par le %s ; profil : %s · rôle %s · espace %s", conductorAuthor, p.Provider, p.Role, p.Workspace))
 		done = append(done, d)
 	}
@@ -341,4 +347,13 @@ func (s *Store) setProfile(work, task string, p LaunchProfile, expected int) err
 		return fmt.Errorf("tâche inconnue : %s", task)
 	})
 	return e
+}
+
+// Keep a stable waiting reason visible without emitting the same event each tick.
+func (s *Store) dispatchEvent(work, message string) error {
+	var prior string
+	if e := s.db.QueryRow("SELECT message FROM cockpit_events WHERE work_id=? AND kind='dispatch' ORDER BY rowid DESC LIMIT 1", work).Scan(&prior); e == nil && prior == message {
+		return nil
+	}
+	return s.controlEvent(work, "dispatch", message)
 }

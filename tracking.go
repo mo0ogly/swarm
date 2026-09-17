@@ -40,7 +40,7 @@ func (s *Store) decisions(work string) ([]Decision, error) {
 	if e != nil {
 		return nil, e
 	}
-	agents, e := s.agents(work)
+	agents, e := s.pilotAgents(work)
 	if e != nil {
 		return nil, e
 	}

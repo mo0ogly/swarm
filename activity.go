@@ -70,6 +70,8 @@ const activitySourceLimit = 500
 // où `Request.Origin` nomme le moteur ; l'absence se lit « humain », et les
 // points d'entrée externes effacent ce champ.
 var activityHumanKinds = map[string]bool{
+	"assist-action": true,
+	"mission.start": true, "mission-policy": true,
 	"pause": true, "autonomy": true, "priority": true, "budget": true,
 	"decision": true, "assistant": true, "ooda": true, "checkpoint": true,
 	"gate": true, "work.create": true, "task.add": true,
@@ -83,11 +85,13 @@ var activityHumanKinds = map[string]bool{
 const activityRetexPrefix = "retex-"
 
 var activityLabels = map[string]string{
+	"assist-action": "Action conseillée par l’IA",
+	"mission.start": "Configuration de la mission", "mission-policy": "Autorisation de la mission",
 	"dispatch": "Ordonnancement", "conductor": "Conduite", "pause": "Départs",
 	"autonomy": "Niveau d'autonomie", "budget": "Budget", "priority": "Priorité",
 	"decision": "Décision", "decision.moteur": "Décision du moteur",
 	"launch.refused": "Lancement refusé",
-	"assistant": "Assistant", "task.update": "Tâche", "gate": "Gate",
+	"assistant":      "Assistant", "task.update": "Tâche", "gate": "Gate",
 	"agent.start": "Tentative", "ooda": "Boucle OODA", "checkpoint": "Point d'étape",
 	"work.create": "Travail", "task.add": "Tâche ajoutée",
 	"task.submit": "Rapport soumis", "task.override": "Dérogation",
@@ -151,7 +155,7 @@ func (s *Store) activity(work string, q activityQuery) (ActivityPage, error) {
 			continue
 		}
 		entries = append(entries, ActivityEntry{At: at, Rank: activityRank("c", seq), Origin: activityOrigin(kind, activityPayload{}),
-			Kind: kind, Label: activityLabel(kind), Message: message})
+			Kind: kind, Label: activityLabel(kind), Message: missionActivityMessage(kind, message)})
 	}
 	rows.Close()
 	if e = rows.Err(); e != nil {
@@ -260,4 +264,25 @@ func prefixTask(task, message string) string {
 		return message
 	}
 	return fmt.Sprintf("%s : %s", task, message)
+}
+
+func missionActivityMessage(kind, message string) string {
+	if kind == "assist-action" {
+		var r AssistActionReceipt
+		if json.Unmarshal([]byte(message), &r) == nil {
+			return r.Message
+		}
+		return "Résultat de l’action à vérifier"
+	}
+	if kind != "mission-policy" {
+		return message
+	}
+	var p MissionPolicy
+	if json.Unmarshal([]byte(message), &p) != nil {
+		return "Autorisation de mission illisible : vérifier les réglages"
+	}
+	if p.Enabled {
+		return "Mission continue autorisée ; les tâches prêtes seront enchaînées"
+	}
+	return "Mission continue arrêtée ; aucun nouveau départ autorisé"
 }

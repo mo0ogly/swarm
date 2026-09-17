@@ -135,6 +135,15 @@ func (g *loopGuard) observe(d map[string]any, now time.Time) {
 		typ, _ := item["type"].(string)
 		id, _ := item["id"].(string)
 		switch typ {
+		case "file_change", "web_search":
+			input := item["changes"]
+			if typ == "web_search" {
+				input = item["query"]
+			}
+			g.call(id, typ, input, now)
+			if kind == "item.completed" {
+				g.result(id, item["status"] == "failed")
+			}
 		case "command_execution", "mcp_tool_call":
 			if kind == "item.started" {
 				input := item["command"]

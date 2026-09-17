@@ -2,7 +2,7 @@
    animation — une alerte ne doit jamais être masquée par un mouvement. */
 .graph-cadre-defilant{overflow:auto;max-width:100%;border:1px solid var(--wattson-ligne);border-radius:14px;background:var(--wattson-carte-appuyee);padding:8px}
 .graph-svg{display:block;min-width:100%}
-.graph-arete{fill:none;stroke:var(--wattson-libelle);stroke-width:1.5}
+.graph-arete{fill:none;stroke:var(--wattson-libelle);stroke-width:1.5;vector-effect:non-scaling-stroke}
 .graph-fleche{fill:var(--wattson-libelle)}
 .graph-noeud{cursor:pointer}
 .graph-noeud .graph-cadre{fill:var(--wattson-carte);stroke:var(--wattson-ligne);stroke-width:1.5}
