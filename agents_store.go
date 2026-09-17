@@ -24,6 +24,7 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
+	Mode            string        `json:"mode,omitempty"`
 	Limits          *RunLimits    `json:"limits,omitempty"`
 	Level           string        `json:"level,omitempty"`
 	ModelPolicyHash string        `json:"model_policy_hash,omitempty"`
@@ -56,43 +57,45 @@ type AgentProgress struct {
 	Degraded     string `json:"degraded,omitempty"`
 }
 type Agent struct {
-	ModelRoute      *ModelRoute      `json:"model_route,omitempty"`
-	Context         *ContextManifest `json:"context,omitempty"`
-	Brainstorm      bool             `json:"brainstorm,omitempty"`
-	Reply           string           `json:"reply,omitempty"`
-	Usage           *Usage           `json:"usage,omitempty"`
-	Progress        AgentProgress    `json:"progress"`
-	Limits          RunLimits        `json:"limits"`
-	ID              string           `json:"id"`
-	WorkID          string           `json:"work_id"`
-	TaskID          string           `json:"task_id"`
-	Attempt         string           `json:"attempt_id"`
-	Origin          string           `json:"origin,omitempty"`
-	Relay           string           `json:"relay,omitempty"`
-	StopKind        string           `json:"stop_kind,omitempty"`
-	Provider        string           `json:"provider"`
-	Role            string           `json:"role"`
-	Parent          string           `json:"parent,omitempty"`
-	Previous        string           `json:"previous,omitempty"`
-	CWD             string           `json:"workspace"`
-	Status          string           `json:"status"`
-	Desired         string           `json:"desired,omitempty"`
-	Activity        string           `json:"activity"`
-	Started         string           `json:"started"`
-	Heartbeat       string           `json:"heartbeat,omitempty"`
-	Ended           string           `json:"ended,omitempty"`
-	ExitCode        *int             `json:"exit_code,omitempty"`
-	Supervisor      int              `json:"supervisor_pid,omitempty"`
-	SupervisorStamp string           `json:"supervisor_identity,omitempty"`
-	Child           int              `json:"child_pid,omitempty"`
-	ChildStamp      string           `json:"child_identity,omitempty"`
-	Host            string           `json:"host"`
-	Timeout         int              `json:"timeout_seconds"`
-	Capture         bool             `json:"capture_output"`
-	Prompt          string           `json:"prompt"`
-	Command         string           `json:"command"`
-	Args            []string         `json:"args"`
-	Env             []string         `json:"env_allow"`
+	Mode              string           `json:"mode,omitempty"`
+	UnregisteredClaim bool             `json:"-"`
+	ModelRoute        *ModelRoute      `json:"model_route,omitempty"`
+	Context           *ContextManifest `json:"context,omitempty"`
+	Brainstorm        bool             `json:"brainstorm,omitempty"`
+	Reply             string           `json:"reply,omitempty"`
+	Usage             *Usage           `json:"usage,omitempty"`
+	Progress          AgentProgress    `json:"progress"`
+	Limits            RunLimits        `json:"limits"`
+	ID                string           `json:"id"`
+	WorkID            string           `json:"work_id"`
+	TaskID            string           `json:"task_id"`
+	Attempt           string           `json:"attempt_id"`
+	Origin            string           `json:"origin,omitempty"`
+	Relay             string           `json:"relay,omitempty"`
+	StopKind          string           `json:"stop_kind,omitempty"`
+	Provider          string           `json:"provider"`
+	Role              string           `json:"role"`
+	Parent            string           `json:"parent,omitempty"`
+	Previous          string           `json:"previous,omitempty"`
+	CWD               string           `json:"workspace"`
+	Status            string           `json:"status"`
+	Desired           string           `json:"desired,omitempty"`
+	Activity          string           `json:"activity"`
+	Started           string           `json:"started"`
+	Heartbeat         string           `json:"heartbeat,omitempty"`
+	Ended             string           `json:"ended,omitempty"`
+	ExitCode          *int             `json:"exit_code,omitempty"`
+	Supervisor        int              `json:"supervisor_pid,omitempty"`
+	SupervisorStamp   string           `json:"supervisor_identity,omitempty"`
+	Child             int              `json:"child_pid,omitempty"`
+	ChildStamp        string           `json:"child_identity,omitempty"`
+	Host              string           `json:"host"`
+	Timeout           int              `json:"timeout_seconds"`
+	Capture           bool             `json:"capture_output"`
+	Prompt            string           `json:"prompt"`
+	Command           string           `json:"command"`
+	Args              []string         `json:"args"`
+	Env               []string         `json:"env_allow"`
 }
 type AgentLog struct {
 	Seq     int64  `json:"seq"`
@@ -102,6 +105,7 @@ type AgentLog struct {
 	Message string `json:"message"`
 }
 type Provider struct {
+	InteractiveArgs  []string     `json:"interactive_args,omitempty"`
 	ModelPolicy      *ModelPolicy `json:"model_policy,omitempty"`
 	AssistantTimeout int          `json:"assistant_timeout_seconds,omitempty"`
 	Limits           RunLimits    `json:"limits,omitempty"`
@@ -136,29 +140,41 @@ func (s *Store) providers() (Providers, error) {
 	}
 	return p, nil
 }
-func (s *Store) agent(id string) (Agent, error) {
+
+// The SQL claim is authoritative; legacy bodies may still say queued.
+func decodeAgentRow(body []byte, status, desired string) (Agent, error) {
 	var a Agent
-	var b []byte
-	e := s.db.QueryRow("SELECT body FROM agents WHERE id=?", id).Scan(&b)
-	if e == nil {
-		e = json.Unmarshal(b, &a)
+	if err := json.Unmarshal(body, &a); err != nil {
+		return a, err
 	}
-	return a, e
+	a.UnregisteredClaim = status == "starting" && a.Status == "queued" && a.Supervisor == 0 && a.Child == 0 && a.Heartbeat == ""
+	a.Status = status
+	a.Desired = desired
+	return a, nil
+}
+func (s *Store) agent(id string) (Agent, error) {
+	var body []byte
+	var status, desired string
+	if err := s.db.QueryRow("SELECT body,status,desired FROM agents WHERE id=?", id).Scan(&body, &status, &desired); err != nil {
+		return Agent{}, err
+	}
+	return decodeAgentRow(body, status, desired)
 }
 func (s *Store) agents(work string) ([]Agent, error) {
-	rows, e := s.db.Query("SELECT body FROM agents WHERE work_id=? ORDER BY rowid DESC LIMIT 200", work)
-	if e != nil {
-		return nil, e
+	rows, err := s.db.Query("SELECT body,status,desired FROM agents WHERE work_id=? ORDER BY rowid DESC LIMIT 200", work)
+	if err != nil {
+		return nil, err
 	}
 	defer rows.Close()
 	out := []Agent{}
 	for rows.Next() {
-		var b []byte
-		var a Agent
-		if e = rows.Scan(&b); e != nil {
-			return nil, e
+		var body []byte
+		var status, desired string
+		if err = rows.Scan(&body, &status, &desired); err != nil {
+			return nil, err
 		}
-		if e = json.Unmarshal(b, &a); e != nil {
+		a, e := decodeAgentRow(body, status, desired)
+		if e != nil {
 			return nil, e
 		}
 		out = append(out, a)
@@ -277,6 +293,12 @@ func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
 
 func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, bool, error) {
 	var a Agent
+	if r.Mode != "" && !interactiveMode(r.Mode) {
+		return a, false, fmt.Errorf("mode inconnu")
+	}
+	if interactiveMode(r.Mode) && (r.Brainstorm || r.Origin == originConductor) {
+		return a, false, fmt.Errorf("Le terminal nécessite un lancement manuel de tâche.")
+	}
 	if r.Brainstorm {
 		r.TaskID = "brain-" + hash([]byte(r.EventID))[:20]
 		r.Role = "planner"
@@ -325,6 +347,20 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	p, ok := providers.Providers[r.Provider]
 	if !ok {
 		return a, false, fmt.Errorf("fournisseur non configuré")
+	}
+	if r.Mode == "terminal" {
+		p, e = terminalProvider(p)
+		if e != nil {
+			return a, false, e
+		}
+		if r.Limits != nil && terminalStructuredLimits(*r.Limits) {
+			return a, false, fmt.Errorf("Limites d’outils incompatibles avec le terminal natif ; utiliser le mode automatisé.")
+		}
+	}
+	if r.Mode == "dialogue" {
+		if e = dialogueProvider(p); e != nil {
+			return a, false, e
+		}
 	}
 	purpose := "work"
 	if r.Brainstorm {
@@ -399,6 +435,12 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e != nil {
 		return a, false, e
 	}
+	if e = preparationLaunchGuard(tx, work, t.ID); e != nil {
+		return a, false, e
+	}
+	if r.Mode == "terminal" && t.PlanToolLimit > 0 {
+		return a, false, fmt.Errorf("Ce plan impose un plafond d’appels d’outils. Le terminal natif ne peut pas le mesurer ; conserver le mode automatisé.")
+	}
 	if t.PlanMaxAttempts > 0 {
 		var attempts int
 		if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", work, t.ID).Scan(&attempts); e != nil {
@@ -436,18 +478,22 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if previous.WorkID != work || previous.TaskID != r.TaskID || activeAgent(previous) {
 			return a, false, fmt.Errorf("précédent incompatible ou encore actif")
 		}
+		if r.Mode != previous.Mode {
+			return a, false, fmt.Errorf("Une reprise conserve le mode de la tentative précédente.")
+		}
 		// A retry from any interface keeps the tighter previous ceilings.
 		limits = limits.cappedBy(previous.Limits)
 		if previous.Timeout > 0 && previous.Timeout < r.Timeout {
 			r.Timeout = previous.Timeout
 		}
 	}
+	var blockerID, blockerWork, blockerTask string
 	var overlaps int
-	if e = tx.QueryRow("SELECT count(*) FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1)", cwd, cwd, cwd).Scan(&overlaps); e != nil {
+	if e = tx.QueryRow("SELECT count(*), coalesce(min(id),''), coalesce(min(work_id),''), coalesce(min(task_id),'') FROM agents WHERE status IN ('queued','starting','running','stopping') AND (cwd=? OR instr(cwd, ? || '/')=1 OR instr(?, cwd || '/')=1)", cwd, cwd, cwd).Scan(&overlaps, &blockerID, &blockerWork, &blockerTask); e != nil {
 		return a, false, e
 	}
 	if overlaps > 0 {
-		return a, false, fmt.Errorf("workspace occupé ou recouvrant un workspace actif")
+		return a, false, fmt.Errorf("workspace occupé ou recouvrant un workspace actif : agent %s (tâche %s, travail %s) ; voir la page de ce travail pour l'arrêter ou attendre sa fin", blockerID, blockerTask, blockerWork)
 	}
 	originalNext := t.Next
 	// Same transaction as the session intent: no orphan running task on launch conflict.
@@ -456,7 +502,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	// Le choix fait une fois devient réutilisable : profil de la tâche, et
 	// profil du travail quand il vient d'un opérateur.
-	if !previewOnly {
+	if !previewOnly && !interactiveMode(r.Mode) {
 		profile := launchProfile(r, cwd)
 		for i := range w.Tasks {
 			if w.Tasks[i].ID == r.TaskID {
@@ -468,7 +514,11 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		}
 	}
 	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
-	prompt += executionDirectives(s.root, cwd, t.ID, limits)
+	if r.Mode == "terminal" {
+		prompt += fmt.Sprintf("\nSession interactive supervisée, durée maximale %d secondes. Les appels d’outils et le coût ne sont pas mesurables dans ce mode ; ne pas prétendre qu’ils sont contrôlés. Respecter les permissions natives du fournisseur. Attendre les instructions de l’opérateur en cas de doute.\n", r.Timeout)
+	} else {
+		prompt += executionDirectives(s.root, cwd, t.ID, limits)
+	}
 	if t.Brainstorm {
 		if t.PlanBriefHash != "" {
 			prompt += brainstormHistory(w, t.ID) + planDirectives()
@@ -505,8 +555,24 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.ContextHash != "" && manifest.SHA256 != r.ContextHash {
 		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
 	}
-	a = Agent{ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	a = Agent{Mode: r.Mode, ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	if r.Mode == "terminal" {
+		if len(s.terminalSocket(a.ID)) >= 108 {
+			return a, false, fmt.Errorf("Chemin du terminal trop long ; utiliser une racine de projet plus courte.")
+		}
+		a.Args = append(append([]string{}, a.Args...), a.Prompt)
+		a.Limits = RunLimits{}
+		a.Capture = true
+		a.Progress.Degraded = terminalMonitoring
+	}
+	if r.Mode == "dialogue" && len(s.terminalSocket(a.ID)) >= 108 {
+		return a, false, fmt.Errorf("Chemin du dialogue trop long")
+	}
 	if previewOnly {
+		// Vérifier le budget dans la même transaction, annulée par le defer.
+		if e = reserveBudget(tx, work, a.ID); e != nil {
+			return a, false, e
+		}
 		return a, false, nil
 	}
 	if t.Brainstorm {
@@ -548,8 +614,25 @@ func (s *Store) stopAgent(id string) error {
 		return e
 	}
 	defer tx.Rollback()
-	if _, e = tx.Exec("UPDATE agents SET desired='stop' WHERE id=?", id); e != nil {
+	result, e := tx.Exec("UPDATE agents SET desired='stop' WHERE id=? AND desired!='stop' AND status IN ('queued','starting','running','stopping')", id)
+	if e != nil {
 		return e
+	}
+	changed, e := result.RowsAffected()
+	if e != nil {
+		return e
+	}
+	if changed == 0 {
+		// Repeated stop requests share the persisted intention and do not add
+		// duplicate command events, including simultaneous requests from tabs.
+		var desired string
+		if e = tx.QueryRow("SELECT desired FROM agents WHERE id=?", id).Scan(&desired); e != nil {
+			return e
+		}
+		if desired != "stop" {
+			return fmt.Errorf("agent déjà terminé")
+		}
+		return tx.Commit()
 	}
 	if _, e = tx.Exec("INSERT INTO agent_logs(agent_id,at,kind,message) VALUES(?,?,?,?)", id, now(), "command", "Arrêt demandé ; attendre confirmation du superviseur"); e != nil {
 		return e
@@ -563,6 +646,11 @@ func (s *Store) finishAgent(a Agent, state, message string, code *int) error {
 	a.Ended = now()
 	a.Heartbeat = now()
 	a.ExitCode = code
+	if a.Mode == "dialogue" {
+		if _, e := s.db.Exec("UPDATE agent_dialogue_turns SET status='interrupted' WHERE agent_id=? AND status='running'", a.ID); e != nil {
+			return e
+		}
+	}
 	if e := s.saveAgent(a); e != nil {
 		return e
 	}
