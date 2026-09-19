@@ -268,6 +268,18 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	// v22 retains typed provider cooldown evidence and recovery state on agents.
+	// A v21 process must not erase these fields by rewriting an agent body.
+	if version < 22 {
+		if version != 0 {
+			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v22-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=22"); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}

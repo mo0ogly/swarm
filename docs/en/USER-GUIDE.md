@@ -19,6 +19,8 @@ For the CLI, use `swarm --lang en …`, or set `SWARM_LANG=en` for the command.
 paths and preparation slash commands do not change. User documents, task titles,
 reports and raw provider output stay in their original language.
 
+If a provider refuses calls: [understand and handle an AI quota hold](PROVIDER-QUOTAS.md).
+
 ## 1. Open the cockpit
 
 Follow the [installation instructions](INSTALL.md). Select the directory of the

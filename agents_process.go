@@ -96,6 +96,9 @@ func providerEnvironment(allow []string) []string {
 const maxProviderEventBytes = 1 << 20
 
 type outputSink struct {
+	provider         string
+	cooldown         *ProviderCooldown
+	cooldownError    error
 	publicBytes      int
 	publicLimited    bool
 	collectReply     bool
@@ -155,6 +158,15 @@ func (w *outputSink) line(line []byte) {
 		w.visibilityLost("Événement JSON illisible ; chronométrage par outil suspendu")
 	}
 	if decodeErr == nil {
+		if c := observedProviderCooldown(data, time.Now()); c != nil {
+			if w.s != nil && w.provider != "" {
+				if e := w.s.recordProviderCooldown(w.provider, w.id, c); e != nil {
+					w.cooldownError = e
+				}
+			}
+			w.cooldown = c
+			w.logs = append(w.logs, AgentLog{AgentID: w.id, At: now(), Kind: "provider-cooldown", Message: c.message()})
+		}
 		for _, message := range publicAgentMessages(data) {
 			message = boundedLogMessage(message)
 			if w.publicBytes+len(message) > 1<<20 {
@@ -211,6 +223,12 @@ func (w *outputSink) line(line []byte) {
 func (w *outputSink) guardReason() string {
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	if w.cooldownError != nil {
+		return "Impossible de conserver l’attente fournisseur : " + w.cooldownError.Error()
+	}
+	if w.cooldown != nil {
+		return w.cooldown.message()
+	}
 	if w.guard == nil {
 		return ""
 	}
@@ -219,6 +237,9 @@ func (w *outputSink) guardReason() string {
 func (w *outputSink) current() string {
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	if w.cooldown != nil {
+		return w.cooldown.message()
+	}
 	if w.guard != nil && w.guard.calls > 0 {
 		return fmt.Sprintf("%d appels · %d résultats · dernier outil : %s", w.guard.calls, w.guard.completed, w.guard.lastTool)
 	}
@@ -305,6 +326,11 @@ func (s *Store) supervise(id string) error {
 	if desired == "stop" {
 		return s.finishAgent(a, "interrupted", "Lancement annulé avant démarrage", nil)
 	}
+	if e = s.providerCooldownGuard(a.Provider); e != nil {
+		a.ProviderCooldown, _, _ = s.providerCooldown(a.Provider)
+		a.StopKind = "provider_quota"
+		return s.finishAgent(a, "failed", e.Error(), nil)
+	}
 	if interactiveMode(a.Mode) {
 		return s.superviseTerminal(a)
 	}
@@ -320,7 +346,7 @@ func (s *Store) supervise(id string) error {
 	if e != nil {
 		return s.finishAgent(a, "failed", e.Error(), nil)
 	}
-	sink := &outputSink{collectReply: a.Brainstorm, guard: newLoopGuard(limits), s: s, id: id, capture: a.Capture, activity: "Processus actif ; aucune activité fournisseur reçue"}
+	sink := &outputSink{collectReply: a.Brainstorm, guard: newLoopGuard(limits), s: s, id: id, provider: a.Provider, capture: a.Capture, activity: "Processus actif ; aucune activité fournisseur reçue"}
 	cmd.Stdout = sink
 	cmd.Stderr = sink
 	// Bound wait if an orphaned descendant keeps stdout/stderr open after parent exits.
@@ -379,6 +405,12 @@ func (s *Store) supervise(id string) error {
 					reason = limitReason
 					a.StopKind = "garde"
 				}
+			}
+			a.ProviderCooldown = sink.cooldownSnapshot()
+			if a.ProviderCooldown != nil {
+				a.StopKind = "provider_quota"
+				reason = a.ProviderCooldown.message()
+				stopping = true
 			}
 			a.Progress = sink.progress()
 			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt, reason)
@@ -439,6 +471,9 @@ func (s *Store) reconcile(id string) error {
 		return e
 	}
 	if !activeAgent(a) {
+		if e = s.reconcileProviderCooldown(&a); e != nil {
+			return e
+		}
 		return s.settleAgentTask(a)
 	}
 	if cancellableQueuedAgent(a) {
@@ -527,3 +562,13 @@ func (w *outputSink) usageSnapshot() *Usage {
 }
 
 func (w *outputSink) replySnapshot() string { w.mu.Lock(); defer w.mu.Unlock(); return w.reply }
+
+func (w *outputSink) cooldownSnapshot() *ProviderCooldown {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.cooldown == nil {
+		return nil
+	}
+	c := *w.cooldown
+	return &c
+}

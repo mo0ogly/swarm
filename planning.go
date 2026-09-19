@@ -139,6 +139,11 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 		}
 	}
 	return s.mutateWithHook(work, "planning."+action, r.EventID, r.Revision, raw, func(w *Work) error {
+		if action == "claim" && w.Planning != nil && w.Planning.Provider != "" {
+			if e := s.providerCooldownGuard(w.Planning.Provider); e != nil {
+				return e
+			}
+		}
 		if err := s.applyPlanning(w, action, r, time.Now().UTC()); err != nil {
 			return err
 		}

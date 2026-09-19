@@ -142,12 +142,14 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 }
 
 type assistOutput struct {
-	reply string
-	usage *Usage
-	err   error
+	cooldown      *ProviderCooldown
+	cooldownError error
+	reply         string
+	usage         *Usage
+	err           error
 }
 
-func readAssistOutput(r io.Reader) assistOutput {
+func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) assistOutput {
 	out := assistOutput{}
 	limited := &io.LimitedReader{R: r, N: assistReplyLimit + 1}
 	scanner := bufio.NewScanner(limited)
@@ -160,6 +162,19 @@ func readAssistOutput(r io.Reader) assistOutput {
 		var data map[string]any
 		if json.Unmarshal([]byte(line), &data) != nil {
 			continue
+		}
+		if c := observedProviderCooldown(data, time.Now()); c != nil {
+			if out.cooldown != nil && c.ResetAt == 0 {
+				c.ResetAt = out.cooldown.ResetAt
+			}
+			for _, observe := range observers {
+				if observe != nil {
+					if e := observe(c); e != nil {
+						out.cooldownError = e
+					}
+				}
+			}
+			out.cooldown = c
 		}
 		if data["is_error"] == true || data["type"] == "error" {
 			out.err = fmt.Errorf("%s", guardBlock(fmt.Sprint(data["result"], " ", data["error"]), 600))

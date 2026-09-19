@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"time"
 )
 
 func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.Writer) error {
@@ -201,6 +202,39 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		}
 		return s.console(arg(1), os.Stdin, out, asJSON)
 	case "providers":
+		if arg(1) == "cooldown" {
+			if len(pos) != 4 {
+				return fmt.Errorf("providers cooldown show|clear <fournisseur> [--input demande.json]")
+			}
+			switch arg(2) {
+			case "show":
+				c, d, e := s.providerCooldown(arg(3))
+				if e != nil {
+					return e
+				}
+				active := false
+				if c != nil {
+					active = c.active(time.Now())
+				}
+				return printJSON(out, map[string]any{"provider": arg(3), "cooldown": c, "digest": d, "active": active})
+			case "clear":
+				b, e := readInput(input)
+				if e != nil {
+					return e
+				}
+				var r ProviderCooldownClear
+				if e = strict(b, &r); e != nil {
+					return e
+				}
+				c, e := s.clearProviderCooldown(arg(3), r)
+				if e != nil {
+					return e
+				}
+				return printJSON(out, map[string]any{"cooldown": c, "message": "Attente levée explicitement. Disponibilité du fournisseur non démontrée ; aucune exécution lancée et aucun budget remboursé."})
+			default:
+				return fmt.Errorf("providers cooldown show|clear <fournisseur>")
+			}
+		}
 		if arg(1) == "init" {
 			if e := s.initProviders(); e != nil {
 				return e

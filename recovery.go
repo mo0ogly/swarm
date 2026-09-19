@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	recoveryTransient   = "transient"
-	recoveryEnvironment = "environment"
-	recoveryConflict    = "conflict"
-	recoveryBusiness    = "business"
-	recoveryUnknown     = "unknown"
+	recoveryProviderLimit = "provider_limit"
+	recoveryTransient     = "transient"
+	recoveryEnvironment   = "environment"
+	recoveryConflict      = "conflict"
+	recoveryBusiness      = "business"
+	recoveryUnknown       = "unknown"
 
 	recoveryDispositionRetry        = "retry"
 	recoveryDispositionWait         = "wait"
@@ -67,13 +68,16 @@ func recoveryForLaunch(r Launch, previous Agent) RecoveryState {
 		state.Disposition = recoveryDispositionCorrection
 	case recoveryTransient, recoveryConflict:
 		state.Disposition = recoveryDispositionRetry
-	case recoveryEnvironment:
+	case recoveryEnvironment, recoveryProviderLimit:
 		state.Disposition = recoveryDispositionWait
 	}
 	return state
 }
 
 func recoveryCategoryFor(a Agent) string {
+	if a.ProviderCooldown != nil {
+		return recoveryProviderLimit
+	}
 	diagnostic := fallbackAttemptDiagnostic(a)
 	hasCheck := false
 	for _, item := range diagnostic.Items {
@@ -90,7 +94,7 @@ func recoveryCategoryFor(a Agent) string {
 			return recoveryConflict
 		}
 	}
-	for _, marker := range []string{"temporarily unavailable", "temporary failure", "temporaire", "connection reset", "connexion réinitialisée", "connection refused", "rate limit", "too many requests", "timeout", "timed out", "délai dépassé", "code 429", "code 502", "code 503", "code 504", "unexpected eof"} {
+	for _, marker := range []string{"temporarily unavailable", "temporary failure", "temporaire", "connection reset", "connexion réinitialisée", "connection refused", "timeout", "timed out", "délai dépassé", "code 502", "code 503", "code 504", "unexpected eof"} {
 		if strings.Contains(text, marker) {
 			return recoveryTransient
 		}
@@ -138,6 +142,14 @@ func assessRecovery(a Agent, task Task, at time.Time) recoveryAssessment {
 		operation = a.ID
 	}
 	result := recoveryAssessment{Category: category, CauseFingerprint: cause, OperationID: operation, Disposition: recoveryDispositionIntervention}
+	if category == recoveryProviderLimit && a.ProviderCooldown != nil && a.ProviderCooldown.active(at) {
+		result.Disposition = recoveryDispositionWait
+		result.Reason = a.ProviderCooldown.message()
+		if a.ProviderCooldown.ResetAt > 0 {
+			result.NextEligibleAt = time.Unix(a.ProviderCooldown.ResetAt, 0)
+		}
+		return result
+	}
 	if category == recoveryEnvironment {
 		result.Disposition = recoveryDispositionWait
 		result.Reason = "défaut d’environnement : relance automatique retenue ; aucune relance automatique sans nouvelle vérification technique"
@@ -202,7 +214,7 @@ func finalizeRecoveryState(a *Agent) {
 	switch category {
 	case recoveryTransient, recoveryConflict:
 		a.Recovery.Disposition = recoveryDispositionRetry
-	case recoveryEnvironment:
+	case recoveryEnvironment, recoveryProviderLimit:
 		a.Recovery.Disposition = recoveryDispositionWait
 	default:
 		a.Recovery.Disposition = recoveryDispositionIntervention
@@ -210,6 +222,12 @@ func finalizeRecoveryState(a *Agent) {
 }
 
 func recoveryEligibleAt(a Agent, category string) time.Time {
+	if category == recoveryProviderLimit && a.ProviderCooldown != nil {
+		if a.ProviderCooldown.ResetAt > 0 {
+			return time.Unix(a.ProviderCooldown.ResetAt, 0)
+		}
+		return time.Time{}
+	}
 	ended, err := time.Parse(time.RFC3339Nano, a.Ended)
 	if err != nil {
 		return time.Time{}

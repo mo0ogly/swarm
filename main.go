@@ -16,6 +16,7 @@ Options globales : --root <projet> --json --lang fr|en
 swarm init
 swarm aide [sujet]
 swarm providers init|show
+swarm providers cooldown show|clear <fournisseur> [--input demande.json]
 swarm connections list|save --input connexion.json
 swarm console [travail] [--plain]
 swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export

@@ -35,6 +35,9 @@ func (s *Store) planningStep(work string) error {
 	if p == nil || p.Paused || p.Provider == "" || p.Failure != "" || p.Activations >= p.MaxActivations || p.Decisions >= p.MaxDecisions {
 		return nil
 	}
+	if err = s.providerCooldownGuard(p.Provider); err != nil {
+		return err
+	}
 	selected := ""
 	for _, scope := range p.Scopes {
 		until, _ := time.Parse(time.RFC3339Nano, scope.Until)
@@ -117,14 +120,20 @@ Pour un retour périmé ou sans action utile : operations vide et justification 
 		return s.planningFailure(work, selected, generation, "Politique de modèles modifiée ; réexaminer la configuration.")
 	}
 	reply, err := runPlanningProviderRouted(provider, route, prompt, 90*time.Second, func() bool {
+		if e := s.providerCooldownGuard(p.Provider); e != nil {
+			return false
+		}
 		current, e := s.get(work)
 		if e != nil || current.Planning == nil || current.Planning.Paused || s.paused(work) {
 			return false
 		}
 		currentScope, e := current.Planning.scope(selected)
 		return e == nil && currentScope.Generation == generation && currentScope.Holder == claim.Holder
-	}, func(u *Usage) { _ = s.savePlanningUsage(claim.EventID, u) })
+	}, func(u *Usage) { _ = s.savePlanningUsage(claim.EventID, u) }, s.providerCooldownObserver(p.Provider, claim.EventID))
 	if err != nil {
+		if quota := s.providerCooldownGuard(p.Provider); quota != nil {
+			err = quota
+		}
 		return s.planningFailure(work, selected, generation, err.Error())
 	}
 	var proposal PlanningProposal
@@ -202,10 +211,10 @@ func runPlanningProvider(provider Provider, prompt string, deadline time.Duratio
 func runPlanningProviderObserved(provider Provider, prompt string, deadline time.Duration, valid func() bool, record func(*Usage)) (string, error) {
 	return runPlanningProviderRouted(provider, nil, prompt, deadline, valid, record)
 }
-func runPlanningProviderRouted(provider Provider, route *ModelRoute, prompt string, deadline time.Duration, valid func() bool, record func(*Usage)) (string, error) {
-	return runStructuredProvider(provider, route, prompt, planningProposalSchema, deadline, valid, record)
+func runPlanningProviderRouted(provider Provider, route *ModelRoute, prompt string, deadline time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+	return runStructuredProvider(provider, route, prompt, planningProposalSchema, deadline, valid, record, observers...)
 }
-func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage)) (string, error) {
+func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
 	p, err := assistantProvider(provider)
 	if err != nil {
 		return "", err
@@ -238,7 +247,7 @@ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema 
 	diagnostic := &assistDiagnostic{}
 	cmd.Stderr = diagnostic
 	output := make(chan assistOutput, 1)
-	go func() { output <- readAssistOutput(reader) }()
+	go func() { output <- readAssistOutput(reader, observers...) }()
 	if !valid() {
 		writer.Close()
 		<-output
@@ -282,6 +291,12 @@ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema 
 		record(result.usage)
 	}
 	reader.Close()
+	if result.cooldownError != nil {
+		return "", fmt.Errorf("attente fournisseur non persistée : %w", result.cooldownError)
+	}
+	if result.cooldown != nil {
+		return "", result.cooldown.failure()
+	}
 	if err != nil {
 		return "", fmt.Errorf("%w : %s", err, guardBlock(diagnostic.String(), 600))
 	}

@@ -22,6 +22,8 @@ sorties des agents conservent leur langue d’origine.
 
 [Read the English user guide](docs/en/USER-GUIDE.md).
 
+En cas de refus du fournisseur : [comprendre et traiter une attente de quota IA](docs/PROVIDER-QUOTAS.md).
+
 ## Sommaire
 
 1. [Ouvrir Swarm](#1-ouvrir-swarm)

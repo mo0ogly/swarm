@@ -102,6 +102,7 @@ type DiagnosticItem struct {
 	Traces      []string `json:"traces"`
 }
 type Agent struct {
+	ProviderCooldown     *ProviderCooldown `json:"provider_cooldown,omitempty"`
 	Preflight            *PreflightResult  `json:"preflight,omitempty"`
 	PreconditionEvidence string            `json:"precondition_evidence,omitempty"`
 	Mode                 string            `json:"mode,omitempty"`
@@ -432,6 +433,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if err != nil {
 		return a, false, err
 	}
+	if err = s.providerCooldownGuard(r.Provider); err != nil {
+		return a, false, err
+	}
 	if err = s.reviewerAvailable(launchWork); err != nil {
 		return a, false, err
 	}
@@ -546,6 +550,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	if w.Revision != r.Revision {
 		return a, false, fmt.Errorf("révision périmée ; relire le travail")
+	}
+	if e = s.providerCooldownGuard(r.Provider); e != nil {
+		return a, false, e
 	}
 	if e = s.reviewerAvailable(w); e != nil {
 		return a, false, e

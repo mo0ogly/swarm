@@ -34,6 +34,9 @@ func (s *Store) reviewerAvailable(w Work) error {
 		return nil
 	}
 	cfg := w.Planning.Reviewer
+	if e := s.providerCooldownGuard(cfg.Provider); e != nil {
+		return e
+	}
 	ps, e := s.providers()
 	if e != nil {
 		return e

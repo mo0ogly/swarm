@@ -125,6 +125,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		return err
 	}
 	if err = s.reviewManagedCandidate(w, a, candidate, filepath.ToSlash(relReceipt), raw); err != nil {
+		if commandFailure(err).Code == "provider_cooldown" {
+			return err
+		}
 		return s.managedFailure(a, err.Error())
 	}
 	artifacts := map[string]string{filepath.ToSlash(relReceipt): hash(raw), filepath.ToSlash(relReport): hash(report)}

@@ -30,7 +30,7 @@ func (s *Store) conduct(a Agent, outcome string) {
 		if outcome == "completed" {
 			if err := s.integrateManagedAttempt(a); err != nil {
 				_ = s.log(a.ID, "validation", err.Error())
-				if allowed, _ := s.automaticValidationAuthorized(a.WorkID); allowed && commandFailure(err).Code != "revision_conflict" && !strings.Contains(err.Error(), "déjà en cours") && !strings.Contains(err.Error(), "SQLITE_BUSY") {
+				if allowed, _ := s.automaticValidationAuthorized(a.WorkID); allowed && commandFailure(err).Code != "revision_conflict" && commandFailure(err).Code != "provider_cooldown" && !strings.Contains(err.Error(), "déjà en cours") && !strings.Contains(err.Error(), "SQLITE_BUSY") {
 					_ = s.managedFailure(a, "Intégration interrompue : "+err.Error())
 				}
 			}

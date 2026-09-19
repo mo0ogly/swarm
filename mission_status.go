@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 )
@@ -68,23 +69,24 @@ type MissionCoordinationPhase struct {
 	Relative string `json:"relative,omitempty"`
 }
 type MissionStatus struct {
-	EvidenceStage   string                     `json:"evidence_stage"`
-	Organization    Organization               `json:"organization"`
-	Authorized      bool                       `json:"authorized"`
-	Enabled         bool                       `json:"enabled"`
-	Paused          bool                       `json:"paused"`
-	Summary         string                     `json:"summary"`
-	Next            string                     `json:"next"`
-	Validated       int                        `json:"validated"`
-	Review          int                        `json:"review"`
-	Running         int                        `json:"running"`
-	ActiveAgents    int                        `json:"active_agents"`
-	UncertainAgents int                        `json:"uncertain_agents"`
-	Total           int                        `json:"total"`
-	Supervision     MissionSupervision         `json:"supervision"`
-	Understanding   MissionUnderstanding       `json:"understanding"`
-	Coordination    []MissionCoordinationPhase `json:"coordination"`
-	Tasks           []MissionTask              `json:"tasks"`
+	ProviderCooldowns []ProviderCooldown         `json:"provider_cooldowns,omitempty"`
+	EvidenceStage     string                     `json:"evidence_stage"`
+	Organization      Organization               `json:"organization"`
+	Authorized        bool                       `json:"authorized"`
+	Enabled           bool                       `json:"enabled"`
+	Paused            bool                       `json:"paused"`
+	Summary           string                     `json:"summary"`
+	Next              string                     `json:"next"`
+	Validated         int                        `json:"validated"`
+	Review            int                        `json:"review"`
+	Running           int                        `json:"running"`
+	ActiveAgents      int                        `json:"active_agents"`
+	UncertainAgents   int                        `json:"uncertain_agents"`
+	Total             int                        `json:"total"`
+	Supervision       MissionSupervision         `json:"supervision"`
+	Understanding     MissionUnderstanding       `json:"understanding"`
+	Coordination      []MissionCoordinationPhase `json:"coordination"`
+	Tasks             []MissionTask              `json:"tasks"`
 }
 
 func missionLaunchContract(w Work, profile LaunchProfile, budget BudgetView) MissionLaunchContract {
@@ -530,8 +532,77 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 		d.Understanding = understanding(d.Organization.Label, d.Organization.Next, "Vous", "user", "decision_humaine")
 		d.Next = d.Organization.Next
 	}
+	d.ProviderCooldowns, e = s.missionProviderCooldowns(w, time.Now())
+	if e != nil {
+		return d, e
+	}
+	if d.Organization.Ready && d.Understanding.Situation != "termine" && len(d.ProviderCooldowns) > 0 {
+		messages := []string{}
+		unknown := false
+		for _, c := range d.ProviderCooldowns {
+			messages = append(messages, c.message())
+			unknown = unknown || c.ResetAt == 0
+		}
+		next := "Attendre l’échéance ; les plafonds de tentatives et les autres blocages restent applicables."
+		actor, kind, situation := "Le fournisseur IA", "none", "attente_normale"
+		if unknown {
+			next = "Vérifier la disponibilité du compte puis lever explicitement l’attente fournisseur sans heure de reprise."
+			actor, kind, situation = "Vous", "user", "decision_humaine"
+		}
+		if d.Paused {
+			next += " La mission reste en pause ; aucun redémarrage automatique n’est autorisé."
+		}
+		exhausted := []string{}
+		for _, task := range w.Tasks {
+			if task.Status == "blocked" && task.PlanMaxAttempts > 0 && len(task.Attempts) >= task.PlanMaxAttempts {
+				exhausted = append(exhausted, task.Title)
+			}
+		}
+		if len(exhausted) > 0 {
+			messages = append(messages, "Plafond de tentatives atteint : "+strings.Join(exhausted, ", ")+". La fin du quota ne débloquera pas ces tâches.")
+			next += " Examiner les tâches ayant épuisé leurs tentatives ; aucun nouveau départ n’est autorisé pour elles."
+			actor, kind, situation = "Vous", "user", "decision_humaine"
+		}
+		d.Understanding = understanding(strings.Join(messages, "\n"), next, actor, kind, situation)
+		d.Next = next
+	}
 	d.Coordination = missionCoordinationPhases(&w, d, exchanges, time.Now())
 	return d, nil
+}
+
+func (s *Store) missionProviderCooldowns(w Work, at time.Time) ([]ProviderCooldown, error) {
+	names := map[string]bool{}
+	if w.Planning != nil {
+		names[w.Planning.Provider] = true
+		if w.Planning.Reviewer != nil {
+			names[w.Planning.Reviewer.Provider] = true
+		}
+	}
+	if w.Profile != nil {
+		names[w.Profile.Provider] = true
+	}
+	for _, task := range w.Tasks {
+		if task.Profile != nil && task.Status != "accepted" && task.Status != "abandoned" && task.Status != "waived" {
+			names[task.Profile.Provider] = true
+		}
+	}
+	delete(names, "")
+	ordered := make([]string, 0, len(names))
+	for name := range names {
+		ordered = append(ordered, name)
+	}
+	sort.Strings(ordered)
+	var active []ProviderCooldown
+	for _, name := range ordered {
+		c, _, err := s.providerCooldown(name)
+		if err != nil {
+			return nil, err
+		}
+		if c != nil && c.active(at) {
+			active = append(active, *c)
+		}
+	}
+	return active, nil
 }
 
 func missionCoordinationPhases(w *Work, d MissionStatus, exchanges []AgentExchange, at time.Time) []MissionCoordinationPhase {
