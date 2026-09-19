@@ -12,3 +12,7 @@ node_modules/
 /test-results/
 *.log
 /frontend/bundle-meta.json
+
+# Generated installer configuration (local paths).
+/deploy/install.env
+/deploy/.install-env.*

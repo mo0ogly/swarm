@@ -1,0 +1,38 @@
+name: swarm-local
+services:
+  swarm:
+    image: swarm-local:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Swarm refuses public listeners. Linux host networking preserves loopback.
+    network_mode: host
+    init: true
+    user: "${SWARM_UID:-1000}:${SWARM_GID:-1000}"
+    environment:
+      SWARM_ROOT: /workspace
+      SWARM_PORT: "${SWARM_PORT:-18787}"
+      HOME: /home/swarm
+    volumes:
+      - type: bind
+        source: ${SWARM_PROJECT:?Run ./install.sh --project /absolute/project first}
+        target: /workspace
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${SWARM_AGENT_HOME:?Run ./install.sh first}
+        target: /home/swarm
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --output /dev/null --max-time 3 http://127.0.0.1:$${SWARM_PORT}/"]
+      interval: 5s
+      timeout: 4s
+      retries: 6
+      start_period: 10s
+    restart: "no"
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

@@ -1,0 +1,14 @@
+**
+!go.mod
+!go.sum
+!*.go
+!contracts/
+!contracts/**
+!web/
+!web/**
+!deploy/
+!deploy/entrypoint.sh
+!LICENSE
+!THIRD_PARTY_NOTICES.md
+!Dockerfile
+*_test.go

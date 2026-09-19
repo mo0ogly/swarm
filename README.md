@@ -161,6 +161,21 @@ Swarm vise à réduire les interventions répétitives en conservant des règles
 
 La mission peut reprendre les tâches devenues prêtes lorsqu’elle est active et autorisée. Elle peut aussi se mettre en attente : droits insuffisants, outil indisponible, contrôle en échec ou décision humaine nécessaire. Swarm ne garantit ni une autonomie sans intervention ni la justesse de toute réponse IA.
 
+## Installation rapide avec Docker
+
+Sur Linux, avec Docker Engine et Docker Compose v2 installés :
+
+```sh
+git clone https://github.com/mo0ogly/swarm.git
+cd swarm
+mkdir -p "$HOME/projets/mon-projet"
+./install.sh --project "$HOME/projets/mon-projet"
+```
+
+Ouvrez le lien de session affiché. Le projet et les missions persistent sur votre machine. L’image contient Swarm et les outils de base ; les fournisseurs IA s’installent et s’authentifient séparément.
+
+**[Guide d’installation complet](INSTALL.md)** : Docker, agents, CLI, sauvegarde, mise à jour et installation native avec `install.sh --mode native`.
+
 ## Démarrer en local
 
 **Périmètre actuellement testé : Linux, Go 1.24 ou plus récent.** Git et Make sont utilisés ci-dessous. Les ressources web sont embarquées dans le binaire ; Node.js n’est pas requis pour simplement le construire et le lancer.
@@ -215,6 +230,8 @@ Les missions et leur historique sont conservés dans le dossier `.swarm/` du pro
 Les clés des connexions API sont enregistrées localement dans `.swarm/ai-connections.json`, avec des permissions de fichier `0600`. Elles ne sont pas chiffrées au repos. Le dossier `.swarm/` et les secrets ne doivent pas être publiés dans Git.
 
 ## Documentation
+
+- [Installation Docker et native](INSTALL.md)
 
 - [Référence technique complète et contrats CLI](REFERENCE.md)
 - [Cockpit : lancement, pilotage et supervision](COCKPIT.md)
