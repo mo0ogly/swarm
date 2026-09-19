@@ -279,15 +279,8 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		if prior.State != "ready" {
 			return "", fmt.Errorf("copie non disponible : %s", prior.State)
 		}
-		if filepath.Dir(prior.Path) != filepath.Join(repo.Storage, "copies") {
-			return "", fmt.Errorf("copie hors dépôt géré")
-		}
-		actual, e := filepath.EvalSymlinks(prior.Path)
-		if e != nil || actual != prior.Path {
-			return "", fmt.Errorf("copie absente ou redirigée")
-		}
-		if st, e := os.Lstat(filepath.Join(prior.Path, ".git")); e != nil || !st.IsDir() {
-			return "", fmt.Errorf("métadonnées Git non isolées")
+		if e := verifyManagedCopy(repo, prior.Path); e != nil {
+			return "", e
 		}
 		return filepath.Join(prior.Path, repo.Subdir), nil
 	} else if e != sql.ErrNoRows {
@@ -308,6 +301,9 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		if e = json.Unmarshal(raw, &prior); e != nil || prior.Agent != r.EventID || prior.Work != w.ID || prior.Task != task.ID || prior.Path != path {
 			return "", fmt.Errorf("attribution de copie incohérente")
 		}
+		if e := verifyManagedCopy(repo, path); e != nil {
+			return "", e
+		}
 		_, e = s.db.Exec("INSERT INTO managed_attempts(agent_id,work_id,task_id,base_commit,path,state) VALUES(?,?,?,?,?,'ready')", prior.Agent, prior.Work, prior.Task, prior.Base, prior.Path)
 		if e != nil {
 			return "", e
@@ -327,6 +323,9 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		return "", err
 	}
 	if _, err = managedGit(clone, "checkout", "--detach", repo.Candidate); err != nil {
+		return "", err
+	}
+	if err = verifyManagedWorkspace(clone, repo.Subdir); err != nil {
 		return "", err
 	}
 	record, _ := json.Marshal(ManagedAttempt{Agent: r.EventID, Work: w.ID, Task: task.ID, Base: repo.Candidate, Path: path, State: "ready"})
@@ -369,4 +368,50 @@ func (s *Store) managedFailure(a Agent, reason string) error {
 		return nil
 	})
 	return err
+}
+
+// Both ordinary replay and recovery of rename-before-DB must enforce the same
+// physical copy identity before persisting an attribution.
+func verifyManagedCopy(repo *ManagedRepository, path string) error {
+	if filepath.Dir(path) != filepath.Join(repo.Storage, "copies") {
+		return fmt.Errorf("copie hors dépôt géré")
+	}
+	actual, e := filepath.EvalSymlinks(path)
+	if e != nil || actual != path {
+		return fmt.Errorf("copie absente ou redirigée")
+	}
+	gitDir := filepath.Join(path, ".git")
+	if st, e := os.Lstat(gitDir); e != nil || !st.IsDir() {
+		return fmt.Errorf("métadonnées Git non isolées")
+	}
+	common, e := managedGit(path, "rev-parse", "--git-common-dir")
+	if e != nil {
+		return e
+	}
+	if !filepath.IsAbs(common) {
+		common = filepath.Join(path, common)
+	}
+	actual, e = filepath.EvalSymlinks(common)
+	if e != nil || actual != gitDir {
+		return fmt.Errorf("métadonnées Git partagées ou redirigées")
+	}
+	return verifyManagedWorkspace(path, repo.Subdir)
+}
+
+// A project may use a subdirectory of its Git root. Its effective working
+// directory must remain in the attributed copy, including after recovery.
+func verifyManagedWorkspace(root, subdir string) error {
+	workspace := filepath.Join(root, subdir)
+	rel, e := filepath.Rel(root, workspace)
+	if e != nil || filepath.IsAbs(subdir) || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return fmt.Errorf("espace de travail hors copie attribuée")
+	}
+	actual, e := filepath.EvalSymlinks(workspace)
+	if e != nil || actual != workspace {
+		return fmt.Errorf("espace de travail absent ou redirigé")
+	}
+	if st, e := os.Stat(workspace); e != nil || !st.IsDir() {
+		return fmt.Errorf("répertoire de travail absent")
+	}
+	return nil
 }

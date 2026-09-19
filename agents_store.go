@@ -433,6 +433,12 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if err != nil {
 		return a, false, err
 	}
+	if launchWork.Planning != nil && r.Role != "worker" {
+		return a, false, fmt.Errorf("mission hiérarchique : un responsable ne peut pas lancer une tâche de codage ; rôle worker requis")
+	}
+	if launchWork.Planning != nil && r.Parent != "" {
+		return a, false, fmt.Errorf("mission hiérarchique : communication directe entre exécutants interdite ; remise au responsable requise")
+	}
 	if err = s.providerCooldownGuard(r.Provider); err != nil {
 		return a, false, err
 	}
@@ -584,13 +590,15 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		// Scope owners are activated by planningStep in a separate tool-free
 		// context. They are never executable task agents, and workers cannot form
 		// a side-channel hierarchy through Agent.Parent.
+		if r.Role != "worker" {
+			return a, false, fmt.Errorf("mission hiérarchique : un responsable ne peut pas lancer une tâche de codage ; rôle worker requis")
+		}
 		if t.PlanRole != "" && t.PlanRole != "worker" {
 			return a, false, fmt.Errorf("mission hiérarchique : seuls les exécutants peuvent lancer une tâche")
 		}
 		if r.Parent != "" {
 			return a, false, fmt.Errorf("mission hiérarchique : communication directe entre exécutants interdite ; remise au responsable requise")
 		}
-		r.Role = "worker"
 	}
 	var latestAttempt Agent
 	var latestBody []byte

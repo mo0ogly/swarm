@@ -24,6 +24,8 @@ sorties des agents conservent leur langue d’origine.
 
 En cas de refus du fournisseur : [comprendre et traiter une attente de quota IA](docs/PROVIDER-QUOTAS.md).
 
+Pour les garanties et leurs limites : [contrat du moteur et design Cursor](docs/architecture/CURSOR-ENGINE-CONTRACT.md).
+
 ## Sommaire
 
 1. [Ouvrir Swarm](#1-ouvrir-swarm)

@@ -222,6 +222,9 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 			if agent.TaskID != r.Task || agent.Attempt != r.Attempt || agent.Role != "worker" {
 				return fmt.Errorf("origine de remise non attribuable à cette tentative")
 			}
+			if e := s.verifyPlanningHandoffArtifacts(agent, r.Artifacts); e != nil {
+				return e
+			}
 		}
 		for _, op := range r.Operations {
 			if op.Kind == "retry" {
@@ -324,6 +327,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		task, e := w.task(r.Task)
 		if e != nil {
 			return e
+		}
+		if r.Scope != "" && r.Scope != task.ScopeID {
+			return fmt.Errorf("remise hors périmètre : seul le responsable propriétaire %s peut la recevoir", task.ScopeID)
 		}
 		if !currentTaskAttempt(task, r.Attempt) || task.ScopeID == "" || !nonempty(r.Reason) || len(r.Reason) > 4000 || len(r.Artifacts) == 0 || len(r.Artifacts) > 32 {
 			return fmt.Errorf("remise : tentative actuelle, constats et artefacts requis")

@@ -21,6 +21,8 @@ reports and raw provider output stay in their original language.
 
 If a provider refuses calls: [understand and handle an AI quota hold](PROVIDER-QUOTAS.md).
 
+For guarantees and their limits: [engine contract and Cursor's design](CURSOR-ENGINE-CONTRACT.md).
+
 ## 1. Open the cockpit
 
 Follow the [installation instructions](INSTALL.md). Select the directory of the

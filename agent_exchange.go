@@ -526,3 +526,27 @@ func (s *Store) expireAgentExchanges(work, conductor string, at time.Time) (int6
 	}
 	return count, nil
 }
+
+// A hierarchy handoff is attributed to the producer's current workspace, not
+// merely to any readable file under the mission root. This is a routing and
+// evidence provenance guard; it is not an operating-system sandbox.
+func (s *Store) verifyPlanningHandoffArtifacts(a Agent, artifacts []ExchangeArtifact) error {
+	if a.CWD == "" || !filepath.IsAbs(a.CWD) {
+		return fmt.Errorf("espace du producteur absent")
+	}
+	workspace, e := filepath.EvalSymlinks(a.CWD)
+	if e != nil || workspace != filepath.Clean(a.CWD) {
+		return fmt.Errorf("espace du producteur absent ou redirigé")
+	}
+	for _, artifact := range artifacts {
+		path, e := filepath.EvalSymlinks(filepath.Join(s.root, artifact.Path))
+		if e != nil {
+			return e
+		}
+		rel, e := filepath.Rel(workspace, path)
+		if e != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+			return fmt.Errorf("artefact hors espace de la tentative productrice : %s", artifact.Path)
+		}
+	}
+	return s.verifyExchangeArtifacts(artifacts)
+}
