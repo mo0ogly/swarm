@@ -132,6 +132,7 @@ func (s *Store) changePolicies(change PolicyChange) (map[string]any, error) {
 	return result, nil
 }
 func (s *Store) registerProviderAdmin(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
+	s.registerAIConnections(mux, send, fail)
 	mux.HandleFunc("/api/v1/providers/admin", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "GET requis", 405)
@@ -160,7 +161,7 @@ func (s *Store) registerProviderAdmin(mux *http.ServeMux, send func(http.Respons
 			return
 		}
 		purpose := r.URL.Query().Get("purpose")
-		if purpose != "page" && purpose != "work" && purpose != "brainstorm" {
+		if purpose != "page" && purpose != "work" && purpose != "brainstorm" && purpose != "preparation" && purpose != "planning" {
 			fail(w, fmt.Errorf("Usage inconnu."))
 			return
 		}

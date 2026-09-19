@@ -12,10 +12,10 @@ function addModelFields(purpose,fixedProvider='',initial='auto'){
   try{const provider=typeof fixedProvider==='function'?fixedProvider():fixedProvider||$('field-provider')?.value;if(!provider)throw Error('Choisir un fournisseur.');const data=await api('/api/v1/providers/resolve?'+new URLSearchParams({provider,level:level.value,purpose}));if(modalContext!==c||n!==generation||!level.isConnected)return;hidden.value=data.route?.policy_hash||'';c.modelReady=true;info.textContent=routeText(data.route);$('confirm').disabled=false;
   }catch(e){if(modalContext!==c||n!==generation||!level.isConnected)return;info.className='notice alert';info.textContent=e.message;$('confirm').disabled=true}
  };
- if(typeof fixedProvider==='function'&&$('field-agent'))$('field-agent').addEventListener('change',update);level.onchange=update;if(!fixedProvider&&$('field-provider'))$('field-provider').addEventListener('change',update);update();
+ if(typeof fixedProvider==='function'&&$('field-agent'))$('field-agent').addEventListener('change',update);if(purpose==='planning'&&$('field-planning-provider'))$('field-planning-provider').addEventListener('change',update);level.onchange=update;if(!fixedProvider&&$('field-provider'))$('field-provider').addEventListener('change',update);update();
 }
 async function loadProviderAdmin(){
- if(providerLoading)return;providerLoading=true;$('providers-state').textContent='Chargement des fournisseurs et des modèles…';
+ if(providerLoading)return;providerLoading=true;void AIConnections.load();$('providers-state').textContent='Chargement des fournisseurs et des modèles…';
  try{providerAdmin=await api('/api/v1/providers/admin');renderProviderAdmin();$('providers-state').className='notice info';$('providers-state').textContent='Politique locale : aucun appel IA au chargement. Un modèle exigeant demande un choix explicite ; aucun repli automatique.'}
  catch(e){$('providers-state').className='notice alert';$('providers-state').textContent=e.message}
  finally{providerLoading=false}

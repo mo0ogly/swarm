@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -25,7 +26,23 @@ const reportClockSkew = 2 * time.Second
 // impossible n'est pas une erreur de fin d'agent : il est journalisé et la
 // tâche reste à la main de l'opérateur.
 func (s *Store) conduct(a Agent, outcome string) {
+	if w, e := s.get(a.WorkID); e == nil && w.Planning != nil && w.Planning.Repository != nil {
+		if outcome == "completed" {
+			if err := s.integrateManagedAttempt(a); err != nil {
+				_ = s.log(a.ID, "validation", err.Error())
+				if allowed, _ := s.automaticValidationAuthorized(a.WorkID); allowed && commandFailure(err).Code != "revision_conflict" && !strings.Contains(err.Error(), "déjà en cours") && !strings.Contains(err.Error(), "SQLITE_BUSY") {
+					_ = s.managedFailure(a, "Intégration interrompue : "+err.Error())
+				}
+			}
+		}
+		return
+	}
+
 	relayed, reason := s.relayHandoff(a, outcome)
+	for retry := 0; retry < 4 && (strings.Contains(reason, "SQLITE_BUSY") || strings.Contains(reason, "Le travail a changé") || strings.Contains(reason, "révision périmée")); retry++ {
+		time.Sleep(time.Duration(retry+1) * 25 * time.Millisecond)
+		relayed, reason = s.relayHandoff(a, outcome)
+	}
 	if reason == "" {
 		return
 	}
@@ -34,6 +51,13 @@ func (s *Store) conduct(a Agent, outcome string) {
 	_ = s.saveAgent(a)
 	if relayed != "" {
 		_ = s.controlEvent(a.WorkID, "conductor", a.TaskID+" : "+reason)
+		accepted, validationReason := s.runAutomaticValidation(a, relayed)
+		kind := "validation-retained"
+		if accepted {
+			kind = "validation-accepted"
+		}
+		_ = s.log(a.ID, "validation", validationReason)
+		_ = s.controlEvent(a.WorkID, kind, a.TaskID+" · tentative "+a.Attempt+" : "+validationReason)
 	}
 }
 
@@ -56,15 +80,26 @@ func (s *Store) relayHandoff(a Agent, outcome string) (string, string) {
 	if t.Brainstorm || t.Status != "blocked" {
 		return "", ""
 	}
-	report, reason := s.provenReport(t.ID, a.Started)
+	if len(t.Attempts) == 0 || t.Attempts[len(t.Attempts)-1].ID != a.Attempt {
+		return "", "Relais refusé : tentative remplacée"
+	}
+	report, reason := s.provenAttemptReport(a)
 	if report == "" {
 		return "", "Relais refusé par le " + conductorAuthor + " : " + reason + ". La tâche reste bloquée pour examen."
 	}
-	if e := s.submitReportAt(a.WorkID, t.ID, report, w.Revision, conductorAuthor); e != nil {
+	path, e := safeReport(s.root, report)
+	if e != nil {
+		return "", "Relais refusé : " + e.Error()
+	}
+	bytes, e := os.ReadFile(path)
+	if e != nil {
+		return "", "Relais refusé : " + e.Error()
+	}
+	if e := s.submitReportVerified(a.WorkID, t.ID, report, w.Revision, conductorAuthor, planningEventID("relay", a.ID, a.Attempt, hash(bytes)), hash(bytes)); e != nil {
 		return "", "Relais refusé par le " + conductorAuthor + " : " + e.Error() + ". La tâche reste bloquée pour examen."
 	}
 	return report, "Relais automatique du handoff par le " + conductorAuthor + " : " + report +
-		". Tâche soumise pour évaluation ; ni gate ni acceptation automatique."
+		". Tâche soumise ; la politique enregistrée décide entre contrôles automatiques et revue humaine."
 }
 
 // provenReport retient le rapport produit par cette tentative : lisible, non
@@ -107,4 +142,30 @@ func (s *Store) provenReport(task, started string) (string, string) {
 		return "", fmt.Sprintf("aucun rapport produit par cette tentative ; %d rapport(s) antérieur(s) ignoré(s)", stale)
 	}
 	return "", "aucun rapport lisible et non vide sous docs/ pour cette tâche"
+}
+
+// Search only the attempt's workspace. Translate back to the canonical root for evidence.
+func (s *Store) provenAttemptReport(a Agent) (string, string) {
+	cwd := a.CWD
+	if cwd == "" {
+		cwd = s.root
+	}
+	resolved, e := resolveWorkspace(s.root, cwd)
+	if e != nil {
+		return "", "espace de tentative invalide : " + e.Error()
+	}
+	scoped := *s
+	scoped.root = resolved
+	report, reason := scoped.provenReport(a.TaskID, a.Started)
+	if report == "" {
+		return "", reason
+	}
+	relative, e := filepath.Rel(s.root, filepath.Join(resolved, report))
+	if e != nil {
+		return "", e.Error()
+	}
+	if _, e = safeReport(s.root, relative); e != nil {
+		return "", e.Error()
+	}
+	return filepath.ToSlash(relative), ""
 }

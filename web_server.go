@@ -23,48 +23,90 @@ import (
 var cockpitWeb embed.FS
 
 type webRequest struct {
-	Turn            string        `json:"turn,omitempty"`
-	Step            int           `json:"step,omitempty"`
-	PlanHash        string        `json:"plan_hash,omitempty"`
-	Mode            string        `json:"mode,omitempty"`
-	Level           string        `json:"level,omitempty"`
-	ModelPolicyHash string        `json:"model_policy_hash,omitempty"`
-	PlanBriefHash   string        `json:"plan_brief_hash,omitempty"`
-	Plan            PlanReview    `json:"plan,omitempty"`
-	References      []DialogueRef `json:"references,omitempty"`
-	ContextHash     string        `json:"context_hash,omitempty"`
-	Retex           Retex         `json:"retex,omitempty"`
-	Offset          int           `json:"offset,omitempty"`
-	Capture         bool          `json:"capture_output"`
-	Kind            string        `json:"kind"`
-	Work            string        `json:"work"`
-	Task            string        `json:"task"`
-	Agent           string        `json:"agent"`
-	Event           string        `json:"event_id"`
-	Revision        int           `json:"expected_revision"`
-	Provider        string        `json:"provider"`
-	Role            string        `json:"role"`
-	Workspace       string        `json:"workspace"`
-	Instruction     string        `json:"instruction"`
-	Path            string        `json:"path"`
-	Name            string        `json:"name"`
-	Note            string        `json:"note"`
-	Author          string        `json:"author"`
-	Decision        string        `json:"decision"`
-	Request         Request       `json:"request"`
-	Budget          Budget        `json:"budget"`
-	Autonomy        string        `json:"autonomy,omitempty"`
-	Slots           int           `json:"slots,omitempty"`
+	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
+	Turn                 string                 `json:"turn,omitempty"`
+	Step                 int                    `json:"step,omitempty"`
+	PlanHash             string                 `json:"plan_hash,omitempty"`
+	Mode                 string                 `json:"mode,omitempty"`
+	Level                string                 `json:"level,omitempty"`
+	ModelPolicyHash      string                 `json:"model_policy_hash,omitempty"`
+	PreviewToken         string                 `json:"preview_token,omitempty"`
+	PlanBriefHash        string                 `json:"plan_brief_hash,omitempty"`
+	Plan                 PlanReview             `json:"plan,omitempty"`
+	References           []DialogueRef          `json:"references,omitempty"`
+	ContextHash          string                 `json:"context_hash,omitempty"`
+	Retex                Retex                  `json:"retex,omitempty"`
+	Offset               int                    `json:"offset,omitempty"`
+	Capture              bool                   `json:"capture_output"`
+	Kind                 string                 `json:"kind"`
+	Work                 string                 `json:"work"`
+	Task                 string                 `json:"task"`
+	Agent                string                 `json:"agent"`
+	Event                string                 `json:"event_id"`
+	Revision             int                    `json:"expected_revision"`
+	Provider             string                 `json:"provider"`
+	Role                 string                 `json:"role"`
+	Workspace            string                 `json:"workspace"`
+	Instruction          string                 `json:"instruction"`
+	Path                 string                 `json:"path"`
+	Name                 string                 `json:"name"`
+	Note                 string                 `json:"note"`
+	Author               string                 `json:"author"`
+	Decision             string                 `json:"decision"`
+	Request              Request                `json:"request"`
+	Budget               Budget                 `json:"budget"`
+	ValidationPolicy     ValidationPolicyChange `json:"validation_policy,omitempty"`
+	Autonomy             string                 `json:"autonomy,omitempty"`
+	Slots                int                    `json:"slots,omitempty"`
+	LifecycleAction      string                 `json:"lifecycle_action,omitempty"`
+	RetentionDays        int                    `json:"retention_days,omitempty"`
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "lifecycle-preview" || r.Kind == "lifecycle-apply" {
+		request := LifecycleRequest{Schema: 1, EventID: r.Event, Revision: r.Revision, Action: r.LifecycleAction, RetentionDays: r.RetentionDays, PreviewToken: r.PreviewToken}
+		if r.Kind == "lifecycle-preview" {
+			return s.lifecyclePreview(r.Work, request)
+		}
+		return s.lifecycleApply(r.Work, request)
+	}
+	if r.Kind == "validation-policy-preview" || r.Kind == "validation-policy-apply" {
+		change := r.ValidationPolicy
+		change.Schema, change.TaskID, change.Revision = 1, r.Task, r.Revision
+		if r.Kind == "validation-policy-preview" {
+			return s.previewValidationPolicy(r.Work, change)
+		}
+		change.EventID = r.Event
+		return s.applyValidationPolicy(r.Work, change)
+	}
 	if r.Kind == "assist-action-preview" {
 		return s.assistActionPlan(r.Work, r.Turn, r.Step)
 	}
 	if r.Kind == "assist-action-apply" {
 		return s.applyAssistAction(r.Work, r.Turn, r.Step, r.PlanHash)
 	}
-	if r.Kind == "mission-start" {
+	if r.Kind == "mission-start" || r.Kind == "mission-preview" {
+		if r.Kind == "mission-start" && r.Event != "" {
+			var existing int
+			if err := s.db.QueryRow("SELECT count(*) FROM events WHERE id=?", r.Event).Scan(&existing); err != nil {
+				return nil, err
+			} else if existing > 0 {
+				w, err := s.get(r.Work)
+				if err != nil {
+					return nil, err
+				}
+				profile := LaunchProfile{Role: "worker"}
+				if w.Profile != nil {
+					profile = *w.Profile
+				}
+				profile.Provider, profile.Workspace, profile.Level = r.Provider, r.Workspace, r.Level
+				profile.Updated, profile.Actor = "", ""
+				if err = s.configureMission(r.Work, profile, r.Slots, r.Revision, r.Event, r.PreviewToken); err != nil {
+					return nil, err
+				}
+				return s.missionStatus(r.Work)
+			}
+		}
 		ps, err := s.providers()
 		if err != nil {
 			return nil, err
@@ -89,7 +131,20 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		profile.Level = r.Level
 		profile.Updated = ""
 		profile.Actor = ""
-		err = s.configureMission(r.Work, profile, r.Slots, r.Revision, r.Event)
+		launchPreview, err := s.missionLaunchPreview(r.Work, profile, r.Slots)
+		if err != nil {
+			return nil, err
+		}
+		if r.Kind == "mission-preview" && launchPreview.Revision != r.Revision {
+			return nil, fmt.Errorf("Travail modifié : examiner le nouvel aperçu avant de confirmer")
+		}
+		if r.Kind == "mission-preview" {
+			return launchPreview, nil
+		}
+		if r.PreviewToken == "" || r.PreviewToken != launchPreview.Token {
+			return nil, fmt.Errorf("L’aperçu confirmé n’est plus courant : examiner le nouvel aperçu avant de confirmer")
+		}
+		err = s.configureMission(r.Work, profile, r.Slots, r.Revision, r.Event, r.PreviewToken)
 		if err != nil {
 			return nil, err
 		}
@@ -97,6 +152,10 @@ func (s *Store) webAction(r webRequest) (any, error) {
 	}
 	if r.Kind == "launch-preview" {
 		return s.launchEligibility(r), nil
+	}
+	if r.Kind == "preflight" {
+		result, _ := s.preflightLaunch(r.Work, Launch{Mode: r.Mode, Level: r.Level, Provider: r.Provider, Workspace: r.Workspace})
+		return result, nil
 	}
 	if r.Kind == "plan-read" {
 		return s.readPlan(r.Work, r.Task)
@@ -154,7 +213,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Level == "" && a.ModelRoute != nil {
 			r.Level = a.ModelRoute.Level
 		}
-		next, created, e := s.prepare(r.Work, Launch{Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+		next, created, e := s.prepare(r.Work, Launch{PreconditionEvidence: r.PreconditionEvidence, Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
 		if e == nil && created {
 			e = s.spawnAgent(next)
 		}
@@ -274,6 +333,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		w.WriteHeader(status)
 		send(w, map[string]any{"error": e.Error(), "failure": commandFailure(e)})
 	}
+	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
@@ -284,6 +344,18 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/lifecycle/missions", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		missions, e := s.lifecycleMissions()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, missions)
 	})
 	mux.HandleFunc("/api/v1/snapshot", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
@@ -327,7 +399,25 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		snapshot["mission"] = mission
+		exchanges, err := s.agentExchanges(work)
+		if err != nil {
+			fail(w, err)
+			return
+		}
+		snapshot["exchanges"] = exchanges
 		send(w, snapshot)
+	})
+	mux.HandleFunc("/api/v1/exchanges", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		exchanges, e := s.agentExchanges(r.URL.Query().Get("work"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, exchanges)
 	})
 	mux.HandleFunc("/api/v1/agent-detail", func(w http.ResponseWriter, r *http.Request) {
 		a, e := s.agent(r.URL.Query().Get("agent"))
@@ -623,9 +713,10 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		if !ok {
 			return
 		}
-		tick := time.NewTicker(time.Second)
-		defer tick.Stop()
-		for {
+		// Release HTTP/1 connections between batches, including for older tabs.
+		// EventSource reconnects with its last event cursor after this delay.
+		fmt.Fprint(w, "retry: 2000\n\n")
+		{
 			ww, e := s.get(work)
 			if e != nil {
 				return
@@ -649,11 +740,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			}
 			fmt.Fprintf(w, "event: refresh\ndata: {}\n\n")
 			flusher.Flush()
-			select {
-			case <-r.Context().Done():
-				return
-			case <-tick.C:
-			}
+			return
 		}
 	})
 	files, _ := fs.Sub(cockpitWeb, "web")

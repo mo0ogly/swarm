@@ -137,6 +137,12 @@ func TestSupervisorGuardStopsAndBlocksTask(t *testing.T) {
 			if a.Status != "interrupted" || a.ExitCode == nil {
 				t.Fatalf("not interrupted: %+v", a)
 			}
+			if len(a.Diagnostic.Items) == 0 || !a.Diagnostic.LimitReached {
+				t.Fatalf("diagnostic de garde absent : %+v", a.Diagnostic)
+			}
+			if mode == "GUARD_INTERLEAVED" && (a.Diagnostic.ObservedErrors != 2 || !strings.Contains(a.Diagnostic.Summary, "plafond configuré")) {
+				t.Fatalf("erreurs observées et plafond confondus : %+v", a.Diagnostic)
+			}
 			w, _ = s.get(w.ID)
 			task, _ := w.task(r.TaskID)
 			if task.Status != "blocked" {

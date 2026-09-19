@@ -23,6 +23,8 @@ type loopGuard struct {
 	lastSignature           [32]byte
 	seen                    map[string]bool
 	pending                 map[string]time.Time
+	contexts                map[string]toolFailure
+	toolFailures            []toolFailure
 	reason                  string
 	degraded                string
 	completed               int
@@ -33,7 +35,7 @@ type loopGuard struct {
 }
 
 func newLoopGuard(l RunLimits) *loopGuard {
-	return &loopGuard{signatures: map[string][32]byte{}, limits: l, lastOutput: time.Now(), seen: map[string]bool{}, pending: map[string]time.Time{}}
+	return &loopGuard{signatures: map[string][32]byte{}, limits: l, lastOutput: time.Now(), seen: map[string]bool{}, pending: map[string]time.Time{}, contexts: map[string]toolFailure{}}
 }
 func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	if id != "" && g.seen[id] {
@@ -55,6 +57,9 @@ func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	}
 	g.lastTool = terminalText(name)
 	g.lastAction, g.actionDetail = describeOperation(name, input)
+	if id != "" {
+		g.contexts[id] = toolFailure{name: terminalText(name), action: g.lastAction, detail: g.actionDetail}
+	}
 	g.lastSignature = sig
 	g.calls++
 	if g.calls >= g.limits.MaxToolCalls {
@@ -64,11 +69,13 @@ func (g *loopGuard) call(id, name string, input any, now time.Time) {
 		g.reason = "Limite de répétitions identiques atteinte"
 	}
 }
-func (g *loopGuard) result(id string, failed bool) {
+func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	if _, ok := g.pending[id]; !ok {
 		return
 	}
 	delete(g.pending, id)
+	context := g.contexts[id]
+	delete(g.contexts, id)
 	g.completed++
 	g.lastResult = now()
 	sig, tracked := g.signatures[id]
@@ -93,6 +100,12 @@ func (g *loopGuard) result(id string, failed bool) {
 	}
 
 	if failed {
+		detail := ""
+		if len(technical) > 0 {
+			detail = technical[0]
+		}
+		context.technical = operationText(detail, 600)
+		g.toolFailures = append(g.toolFailures, context)
 		g.errors++
 	} else {
 		g.errors = 0
@@ -123,7 +136,8 @@ func (g *loopGuard) observe(d map[string]any, now time.Time) {
 			if typ == "tool_result" {
 				id, _ := b["tool_use_id"].(string)
 				failed, _ := b["is_error"].(bool)
-				g.result(id, failed)
+				technical, _ := json.Marshal(b["content"])
+				g.result(id, failed, string(technical))
 			}
 			if g.reason != "" {
 				return
@@ -142,7 +156,7 @@ func (g *loopGuard) observe(d map[string]any, now time.Time) {
 			}
 			g.call(id, typ, input, now)
 			if kind == "item.completed" {
-				g.result(id, item["status"] == "failed")
+				g.result(id, item["status"] == "failed", fmt.Sprint(item["error"]))
 			}
 		case "command_execution", "mcp_tool_call":
 			if kind == "item.started" {
@@ -159,7 +173,11 @@ func (g *loopGuard) observe(d map[string]any, now time.Time) {
 				if item["error"] != nil {
 					failed = true
 				}
-				g.result(id, failed)
+				technical := fmt.Sprint(item["error"])
+				if technical == "<nil>" {
+					technical = fmt.Sprint(item["aggregated_output"])
+				}
+				g.result(id, failed, technical)
 			}
 		}
 	}
@@ -191,7 +209,14 @@ func (g *loopGuard) loseVisibility(reason string) {
 	g.repeated = 0
 	g.failures = nil
 	g.signatures = map[string][32]byte{}
+	g.contexts = map[string]toolFailure{}
 }
 func (g *loopGuard) summary() AgentProgress {
 	return AgentProgress{Action: g.lastAction, Detail: g.actionDetail, ToolCalls: g.calls, ToolResults: g.completed, PendingTools: len(g.pending), LastTool: g.lastTool, LastResult: g.lastResult, Degraded: g.degraded}
+}
+func (g *loopGuard) diagnostic(agent, attempt, stopReason string) AttemptDiagnostic {
+	if stopReason == "" {
+		stopReason = g.reason
+	}
+	return buildAttemptDiagnostic(agent, attempt, g.toolFailures, stopReason, g.limits.MaxConsecutiveErrors)
 }

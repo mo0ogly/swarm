@@ -108,11 +108,13 @@ func TestDispatchPrefersTaskProfile(t *testing.T) {
 
 func TestDispatchStopsAfterTwoAutomaticFailures(t *testing.T) {
 	task := Task{ID: "t1", Status: "blocked", Blocker: "échec"}
-	one := []Agent{{ID: "a1", TaskID: "t1", Status: "failed", Origin: originConductor}}
+	one := []Agent{{ID: "a1", TaskID: "t1", Status: "failed", Origin: originConductor, Activity: "temporary failure",
+		Recovery: RecoveryState{OperationID: "op-t1", AutomaticUsed: 1, AutomaticMax: maxAutomaticAttempts, BudgetRemaining: 1}}}
 	if list, _ := planDispatch(dispatchTest([]Task{task}, one)); len(list) != 1 {
 		t.Fatalf("une seule tentative automatique échouée : la reprise reste permise, %v", dispatchedTasks(list))
 	}
-	two := append(one, Agent{ID: "a2", TaskID: "t1", Status: "interrupted", Origin: originConductor})
+	two := []Agent{{ID: "a2", TaskID: "t1", Status: "interrupted", Origin: originConductor, Activity: "temporary failure",
+		Recovery: RecoveryState{OperationID: "op-t1", AutomaticUsed: 2, AutomaticMax: maxAutomaticAttempts, BudgetRemaining: 0}}, one[0]}
 	list, reason := planDispatch(dispatchTest([]Task{task}, two))
 	if len(list) != 0 {
 		t.Fatalf("deux tentatives automatiques infructueuses : plus de départ, %v", dispatchedTasks(list))
@@ -127,8 +129,8 @@ func TestDispatchIgnoresOperatorFailures(t *testing.T) {
 	// automatique : l'opérateur reste libre de confier la reprise au moteur.
 	task := Task{ID: "t1", Status: "blocked", Blocker: "échec"}
 	agents := []Agent{
-		{ID: "a1", TaskID: "t1", Status: "failed", Origin: originOperator},
-		{ID: "a2", TaskID: "t1", Status: "failed", Origin: originOperator},
+		{ID: "a1", TaskID: "t1", Status: "failed", Origin: originOperator, Activity: "temporary failure"},
+		{ID: "a2", TaskID: "t1", Status: "failed", Origin: originOperator, Activity: "temporary failure"},
 	}
 	if list, _ := planDispatch(dispatchTest([]Task{task}, agents)); len(list) != 1 {
 		t.Fatalf("reprise attendue après des échecs opérateur : %v", dispatchedTasks(list))
@@ -201,7 +203,7 @@ func TestAutonomyLevelIsStoredAndFrozen(t *testing.T) {
 	if level := s.autonomy(w.ID); level != autonomyAuto {
 		t.Fatalf("niveau par défaut attendu autonome, obtenu %q", level)
 	}
-	if e := s.setAutonomy(w.ID, autonomyAssisted, 3); e != nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAssisted, 3); e != nil {
 		t.Fatal(e)
 	}
 	if level := s.autonomy(w.ID); level != autonomyAssisted {
@@ -210,7 +212,7 @@ func TestAutonomyLevelIsStoredAndFrozen(t *testing.T) {
 	if slots := s.slots(w.ID); slots != 3 {
 		t.Fatalf("créneaux non conservés : %d", slots)
 	}
-	if e := s.setAutonomy(w.ID, "inconnu", 1); e == nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, "inconnu", 1); e == nil {
 		t.Fatal("un niveau inconnu doit être refusé")
 	}
 }
@@ -218,7 +220,7 @@ func TestAutonomyLevelIsStoredAndFrozen(t *testing.T) {
 func TestDispatchLaunchesFromCapturedProfile(t *testing.T) {
 	s := storeTest(t)
 	w, r := setupAgent(t, s)
-	if e := s.setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
 		t.Fatal(e)
 	}
 	w = applyTest(t, s, w, "task.add", Request{ID: "t2", Title: "Suite", Deliverable: "rapport", Criteria: []string{"preuves"}, Owner: "fixture", Next: "lancer"})
@@ -281,7 +283,7 @@ func TestDispatchLaunchesFromCapturedProfile(t *testing.T) {
 func TestDispatchStaysIdleWhenPaused(t *testing.T) {
 	s := storeTest(t)
 	w, r := setupAgent(t, s)
-	if e := s.setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
 		t.Fatal(e)
 	}
 	r.Workspace = filepath.Join(s.root, "ws-t1")
@@ -317,6 +319,7 @@ func TestDispatchHoldsAfterOperatorStop(t *testing.T) {
 	}
 	// Un arrêt technique reste repris automatiquement.
 	agents[0].StopKind = "delai"
+	agents[0].Activity = "timeout du fournisseur"
 	if list, _ := planDispatch(dispatchTest([]Task{task}, agents)); len(list) != 1 {
 		t.Fatalf("un dépassement de délai se reprend : %v", dispatchedTasks(list))
 	}
@@ -325,7 +328,7 @@ func TestDispatchHoldsAfterOperatorStop(t *testing.T) {
 func TestSetProfileAllowsDispatchWithoutFirstManualLaunch(t *testing.T) {
 	s := storeTest(t)
 	w, r := setupAgent(t, s)
-	if e := s.setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
 		t.Fatal(e)
 	}
 	// Aucun lancement manuel : le profil est enregistré directement.

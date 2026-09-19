@@ -97,3 +97,7 @@ dialog::backdrop{background:color-mix(in srgb,var(--wattson-fond) 78%,transparen
  #preview{max-height:38vh}#brain-form{padding:14px}
 }
 @media(prefers-reduced-motion:reduce){button,nav button{transition:none}button:active:not(:disabled){transform:none}}
+/* Preparation is a first-class navigation entry in both themes. */
+.rail nav>a{display:block;text-align:left;padding:11px 13px;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-carte);color:var(--wattson-texte);text-decoration:none;font-weight:550}
+.rail nav>a:hover{background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.mission-controls a{color:var(--wattson-lien)}

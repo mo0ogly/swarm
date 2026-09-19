@@ -65,6 +65,68 @@ Création (`work.json`) :
 les dépendances ; `criteria: []` est refusé. Les chaînes vides sont inchangées,
 les textes uniquement composés d'espaces sont refusés.
 
+Le parcours conseillé est **Configurer les validations** dans la vue Tâches :
+il présente chaque critère, les contrôles structurés qui le couvrent, la portée,
+les limites et l'effet exact. Le premier clic demande un aperçu au moteur ; le
+second confirme cet aperçu. Modifier un champ rend l'aperçu caduc. Le retrait est
+une action distincte. Aucune suggestion de l'assistant IA n'alimente ce formulaire.
+
+La CLI utilise le même contrat et le même jeton d'aperçu :
+
+```sh
+swarm validation preview TRAVAIL --task t4 --input politique.json --json
+# recopier preview_token dans le même document, ajouter un event_id stable
+swarm validation apply TRAVAIL --task t4 --input politique-confirmee.json --json
+swarm aide validations
+```
+
+Le document porte `schema_version`, `expected_revision`, `task_id`, `intent`
+(`replace` ou `remove`) et, pour `replace`, `policy`. `apply` exige en plus
+`event_id` et le `preview_token` rendu. Une révision ou une politique modifiée
+impose un nouvel aperçu. Pour retirer la politique, omettre `policy` :
+`{"schema_version":1,"expected_revision":12,"task_id":"t4","intent":"remove"}`.
+
+`validation_policy` fixe ce que le conducteur peut vérifier après le handoff.
+`mode: "human"` conserve toujours la revue humaine et n'accepte aucun
+contrôle. `mode: "automatic"` exige de 1 à 8 contrôles structurés. Chaque contrôle
+nomme la commande exacte, les indices de critères couverts, une justification
+objective de cette couverture, un répertoire relatif optionnel et un délai de
+1 à 300 secondes ; le budget cumulé reste inférieur ou
+égal à 300 secondes. Seuls `go`, `git`, `node`, `npm`, `python`, `python3` et
+`pytest` sont exécutables, directement et sans shell. Le texte du plan, du
+handoff, des journaux ou d'une réponse IA n'est jamais interprété comme commande.
+Tous les critères doivent être couverts ; pour une tâche issue d'un plan, chaque
+check obligatoire du plan doit porter le même identifiant qu'un contrôle.
+
+Exemple de document d'aperçu opérateur :
+
+```json
+{
+  "schema_version": 1,
+  "expected_revision": 9,
+  "task_id": "t4",
+  "intent": "replace",
+  "policy": {
+    "mode": "automatic",
+    "controls": [
+      {
+        "id": "contrat-api",
+        "command": ["go", "test", "./api", "-run", "TestContract", "-count=1"],
+        "criteria": [1],
+        "justification": "Le test échoue si le contrat API attendu par le critère 1 régresse.",
+        "dir": "tools/swarm-companion",
+        "timeout_seconds": 120
+      }
+    ]
+  }
+}
+```
+
+Le document de confirmation est identique avec `event_id` et `preview_token`.
+Une politique humaine est le choix sûr dès qu'un critère demande d'apprécier la
+lisibilité, la pertinence, la qualité ou tout autre jugement non démontré par un
+contrôle objectif. Une politique automatique doit couvrir tous les critères.
+
 Le contrat se modifie sur une tâche `todo` ou `blocked`, sans transition simultanée,
 et sans agent actif dans le travail ni tâche `running`. Les dépendances inconnues,
 répétées ou cycliques sont refusées atomiquement. Toute modification effective du
@@ -72,6 +134,66 @@ contrat invalide gate, override et revalidation ; les checks du plan sont recalc
 Les tentatives et événements restent conservés. Les plans approuvés antérieurs restent
 historiques : le contrat courant est celui de la tâche, les pièces mémoire doivent
 être synchronisées par le conducteur.
+
+La mission continue distingue trois faits. `mission start` enregistre l’autorisation ;
+le conducteur n’est actif que tant que `swarm web` ou `swarm mission watch TRAVAIL`
+renouvelle sa vérification ; les agents déjà lancés publient leur activité séparément.
+`swarm mission status TRAVAIL` et le cockpit affichent le même verdict, avec dernière
+vérification, erreur éventuelle, prochaine vérification relative et dernière action
+persistée du **Conducteur Swarm**. Une autorisation seule n’est jamais présentée comme
+une supervision active, et ce conducteur local est distinct d’une supervision externe
+Codex. Si le service tombe, l’autorisation reste conservée mais aucun nouveau départ
+automatique n’est promis. Au redémarrage,
+le conducteur relit les tentatives actives avant de décider un départ ; les gardes
+transactionnelles empêchent deux conducteurs de réserver deux fois la même place.
+Après le relais d'un handoff, le conducteur n'accepte automatiquement que si la
+mission est encore autorisée, non pausée et autonome, si la politique automatique
+est explicite et complète, et si tous ses contrôles objectifs réussissent sur les
+fichiers courants. Il crée sous `.swarm/validation/` un reçu lié à la tentative,
+à l'empreinte de politique, au livrable et aux résultats. Une preuve modifiée
+invalide ensuite la gate. Un échec bloque la tâche et ses dépendants, pas les
+branches indépendantes. Si `max_attempts` autorise une correction, le conducteur
+renvoie au producteur l'identifiant, le code de sortie, l'empreinte de sortie et
+le reçu de chaque contrôle échoué. La nouvelle tentative invalide la décision
+courante, rejoue tous les contrôles, puis publie un nouveau reçu ; la borne de
+tentatives du plan interdit toute boucle ouverte. Une pause retient les contrôles ; la boucle les reprend
+depuis la tentative terminée et le handoff encore attribuable après reprise.
+
+### Échanges agent à agent
+
+`swarm exchange send TRAVAIL --input échange.json` enregistre une `handoff`,
+`help_request` ou `help_answer`. Chaque message porte `agent_id`, `task_id`,
+`attempt_id`, `recipient_task_id` et `recipient_role`. Le rôle doit être celui
+du plan courant et la tâche destinataire doit déjà exister : un message ne peut
+donc ni accorder un rôle ni étendre le plan. Une remise exige un `result_state`
+et au moins un artefact `{path, sha256}` ; les empreintes sont vérifiées à
+l'envoi et à la consommation. Une tâche consommatrice doit dépendre de la tâche
+productrice.
+
+`swarm exchange consume TRAVAIL --input accusé.json` lie l'accusé à la tentative
+destinataire. La transition est atomique et un rejeu exact reste sans effet.
+Une tentative source remplacée ou un artefact modifié rend la remise obsolète.
+Une `help_request` impose `timeout_seconds` entre 1 et 3600 ; le conducteur la
+fait passer à `escalated` si aucune réponse n'arrive avant l'échéance, y compris
+si elle avait seulement été accusée. `swarm exchange list TRAVAIL --json` et
+`GET /api/v1/exchanges?work=TRAVAIL` exposent les mêmes états persistés.
+
+`mission preview` annonce la première vague réellement calculée, pas le nombre
+de créneaux demandé comme une promesse. Le profil commun cible un même dossier :
+ce mode reste séquentiel, avec un seul écrivain dans tout arbre de chemins qui se
+recouvre. Des profils de tâche pointant vers des dossiers déjà préparés, distincts
+et non imbriqués peuvent partir en parallèle. Une file FIFO persistée départage
+les missions qui attendent le même arbre ; une fin confirmée libère le tour.
+Cette capacité experte ne crée ni ne supprime les copies. L'intégration est une
+commande séparée, sérialisée et liée à une remise SHA-256 :
+`swarm workspace integrate TRAVAIL --input manifeste.json`. Chaque cible indique
+`source`, `target`, `base_sha256` (vide si elle doit être absente) et
+`result_sha256`. Toute base différente produit un reçu `conflict`, un code 3 et
+zéro écriture. `swarm workspace status TRAVAIL` expose les tours et reçus.
+Swarm ne crée toujours aucun worktree, ne fusionne pas Git et ne rejoue pas les
+contrôles de validation après intégration ; ce n'est donc pas un gestionnaire de
+branches de bout en bout. Voir
+`docs/plans/swarm-autonomie-coordination/a7-espaces.md`.
 
 Exemple : `swarm task update TRAVAIL --input correction.json` :
 
@@ -113,6 +235,29 @@ Codes de sortie : 0 succès ; 1 évaluation calculée mais bloquée ; 2 erreur,
 entrée invalide ou conflit. Une gate bloquée est persistée si son entrée est valide.
 
 ## Reprise et fiabilité
+
+Un échec classé « environnement » (droits, sandbox, montage ou ressource
+indisponible) retient la tâche concernée : le conducteur ne la relance pas à
+vide et continue d'examiner les branches indépendantes. La reprise est
+explicite et cible la dernière tentative avec `previous`. Elle exige alors
+`precondition_evidence`, une courte observation nouvelle de la vérification
+effectuée. La même observation ne peut pas être rejouée après un nouvel échec
+d'environnement. Cette preuve de précondition ne valide pas le livrable et ne
+permet pas d'assouplir les limites : la reprise conserve les plafonds les plus
+stricts de la tentative précédente. Exemple de champs dans l'entrée de
+`swarm agent start` :
+
+```json
+{
+  "previous": "agent-identifiant",
+  "precondition_evidence": "Lecture et écriture de la ressource vérifiées sur l'hôte",
+  "instruction": "Reprendre au contrôle interrompu"
+}
+```
+
+Le cockpit web et la console interactive demandent cette vérification quand le
+diagnostic structuré de la tentative contient la catégorie `environment`. Ils
+ne proposent jamais de désactiver le sandbox ni de modifier les montages.
 
 `work list` et `work show ID` sont des lectures. `resume` sans identifiant
 présente la liste ; avec identifiant il régénère `.swarm/views/ID.md`.
@@ -157,6 +302,42 @@ chemins d’archive arbitraires et pièces altérées. Les pièces sont archivé
 Les gates sont revérifiées contre ce projet : absence ou différence = non valide.
 Aucune fusion d’historiques divergents et aucune synchronisation Git automatique.
 
+## Cycle de vie des missions
+
+Les quatre actions ont des contrats distincts et passent toutes par un aperçu
+lié à la révision et à la génération de cycle de vie :
+
+```sh
+./tools/swarm-companion/swarm lifecycle list
+./tools/swarm-companion/swarm lifecycle preview ID archive --input /tmp/requete.json --json
+./tools/swarm-companion/swarm lifecycle apply ID archive --input /tmp/confirmation.json --json
+```
+
+Le document d’aperçu contient `schema_version`, `expected_revision`, `action` et,
+pour `purge`, `retention_days` (1 à 36 500). La confirmation reprend ces champs,
+ajoute un `event_id` unique et le `preview_token` reçu. `archive` crée un ZIP dans
+`.swarm/lifecycle/archives/` et marque la mission sans retirer ses données ;
+`restore` enlève ce marquage. `purge` retire uniquement les journaux d’agents,
+sorties terminal et échanges assistant plus anciens que la rétention. Les
+événements métier, reçus, verdicts et preuves en sont exclus.
+
+`delete` déplace atomiquement les lignes SQLite de la mission et de ses objets
+liés dans `mission_trash`; `restore` les réinsère atomiquement. Les sources,
+rapports, preuves et autres fichiers du projet ne sont jamais supprimés, même
+s’ils sont référencés par une mission. Les opérations refusent les agents,
+intentions, réservations, dialogues de préparation, conducteur ou contrôles
+actifs et refont ces contrôles sous verrou lors de l’exécution. Les reçus rendent
+un double envoi idempotent ; une collision pendant restauration laisse toute la
+mission en corbeille. Le web utilise exactement le même moteur via les actions
+`lifecycle-preview` et `lifecycle-apply`.
+
+Dans le cockpit, **Gérer les missions** regroupe recherche, filtres Active,
+Archivée et Corbeille récupérable, puis les actions **Archiver**, **Restaurer**,
+**Purger l’historique** et **Supprimer**. Chaque action ouvre d’abord l’aperçu du
+moteur. Supprimer exige en plus la saisie du nom exact de la mission ; fermer la
+modale ou consulter l’aperçu ne modifie rien. La sélection reste sur la même
+mission lorsqu’elle passe en corbeille ou revient dans la liste active.
+
 ## Workflows et tests
 
 Lire [WORKFLOWS.md](WORKFLOWS.md) pour les points d’enregistrement APEX/PDCA/KS.
@@ -185,7 +366,10 @@ navigateur transmet seulement les coordonnées de la vue.
 Les faits cités sont consultables et les actions proposées ouvrent les formulaires
 habituels. Une réponse périmée conserve ses références mais ne permet plus d’ouvrir
 une action. Le contrôle de structure et de références ne garantit pas la vérité
-d’une interprétation. L’assistant ne valide ni tâche ni gate.
+d’une interprétation. L’assistant ne valide ni tâche ni gate. Une réponse IA seule
+ne constitue jamais une preuve et ne peut ni créer une politique de validation,
+ni alimenter un résultat PASS. Une revue IA peut préparer une décision qualitative,
+qui reste humaine (`mode: "human"`).
 
 Claude et Codex disposent d’adaptateurs sans outils de réalisation, dans un
 répertoire isolé, avec délai maximal de 300 secondes et annulation explicite.
@@ -221,3 +405,37 @@ aucune IA. Export/import ne transporte ni secrets ni commandes.
 
 Procédure, limites et relation avec l’administration ML :
 [Administration des modèles](../../docs/plans/swarm-provider-routing/ADMINISTRATION.md).
+
+### Lire la session d’un agent automatisé
+
+Dans les détails de la tâche, **Voir la session de l’agent** ouvre le journal
+actualisé en direct. Les nouvelles tentatives conservent les messages publics
+explicites de Codex et Claude, indépendamment de la capture brute. Le dernier
+message apparaît aussi au-dessus du journal. Les raisonnements internes ne sont
+pas collectés dans ce canal. Les messages sont bornés à 2 048 octets chacun et
+1 Mio par tentative ; une limite atteinte est signalée.
+
+La **Capture détaillée des sorties** reste nécessaire pour conserver le contenu
+des réponses d’outils. Le journal extrait les réponses lisibles des événements
+capturés ; la sortie originale reste accessible. Les anciennes tentatives sans
+capture ne peuvent pas restituer rétroactivement ces détails. La fin de la
+session ne vaut pas validation du résultat de la tâche.
+
+### Planification hiérarchique et livraison Git (v19)
+
+Sur une mission neuve, `swarm planning enable WORK --input activation.json`
+active des responsables de périmètre, une boîte de réception durable et des
+décisions atomiques. `planning step WORK` exécute au plus une décision IA ;
+`planning show WORK` affiche son état. Une mission autorisée et surveillée peut
+ensuite réactiver son responsable automatiquement après un retour d'agent.
+
+Contrats, exemples, preuves et limites :
+[`IMPLEMENTATION.md`](../../docs/plans/swarm-architecture-implementation/IMPLEMENTATION.md).
+Le web propose l’activation sur une mission vide, la lecture des décisions, les
+copies Git gérées, la validation héritée et le téléchargement du résultat.
+`planning history`, `bundle`, `cleanup-preview` et `cleanup` exposent les mêmes
+fonctions au CLI. Les limites et les preuves de recette sont dans la note liée.
+
+## Préparation, révision et modèles IA
+
+Voir [le parcours web et les contrats CLI](PREPARATION-UX.md) : formulaire de missions, responsable durable, validation explicite, révision avec historique et menu **IA et connexions**.

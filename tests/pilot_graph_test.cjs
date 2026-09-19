@@ -26,6 +26,8 @@ console.log('PASS: multiple roots, topology growth and removed node identity');
 assert.deepEqual(G.preferences({groups:{'En activité':false,'Historique':'evil'}}).groups,{'En activité':false});
 
 assert.equal(G.preferences().view,'dependencies');
+assert.equal(G.preferences({orientation:'TB'}).orientation,'TB');
+assert.deepEqual(G.preferences({orientation:'TB',collapsed:['A','B']}).collapsed,['A','B']);
 
 // Revealing a shared node is independent of input order and preserves unrelated folds.
 for(const graph of [tasks,[...tasks].reverse()]) assert.deepEqual(G.reveal(graph,'D',['A','B','C']),['C']);
@@ -33,3 +35,21 @@ const unequal=[{id:'A',depends:[]},{id:'B',depends:['A']},{id:'X',depends:[]},{i
 assert.deepEqual(G.reveal(unequal,'D',['A','B','X']),['A','B']);
 assert.deepEqual(G.reveal(unequal,'removed',['A','B','X']),['A','B','X']);
 console.log('PASS: deterministic reveal, shorter path and removed target');
+
+assert.equal(G.role({title:'Revue sans rôle'},null).label,'Rôle à préciser');
+assert.equal(G.role({plan_role:'worker'},null).label,'Exécutant');
+assert.equal(G.role({plan_role:'worker'},{role:'planner'}).label,'Planificateur');
+assert.match(G.guidance({status:'todo'},{}),/livrable, critère de réussite, consigne/);
+assert.equal(G.guidance({status:'accepted'},null,{state:'stale'}),'À vérifier : preuves périmées');
+assert.equal(G.guidance({status:'blocked',blocker:'test en échec'},{}),'À résoudre : test en échec');
+
+const organizationWork={planning:{provider:'claude',scopes:[{id:'root',requirements:['r1']},{id:'branch',parent:'root',requirements:['r1']}],reviewer:{provider:'codex',calls:0,max_calls:4}}};
+const org=G.organization(organizationWork,[{id:'t1',scope_id:'branch'}],true);
+assert.equal(org.nodes.length,3);
+assert.deepEqual(org.edges,[{from:'@scope/root',to:'@scope/branch'},{from:'@scope/branch',to:'t1'},{from:'t1',to:'@reviewer'}]);
+assert.ok(org.nodes.every(n=>n.description==='En pause'));
+assert.equal(G.organization({},[]).nodes.length,0);
+const absent=G.organization({planning:{provider:'claude',scopes:[{id:'root'}]}},[]);
+assert.match(absent.nodes.find(n=>n.kind==='reviewer').title,/absent/);
+assert.equal(absent.nodes.find(n=>n.kind==='reviewer').tone,'attention');
+console.log('PASS: orchestrator, delegated responsibility, independent reviewer and honest missing-role state');

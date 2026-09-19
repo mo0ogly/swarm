@@ -2,7 +2,7 @@
 // Mode Conduite : un seul écran, ce qui attend une décision, et rien d'autre.
 // Mode Expert : les mêmes données plus tous les outils. Aucune fonction n'est
 // retirée par le mode Conduite ; elle est rangée.
-const conduiteOnly = ['conduite'];
+const conduiteOnly = ['conduite', 'manage', 'providers'];
 let cockpitMode = 'conduite';
 
 function applyMode(mode) {
@@ -10,7 +10,7 @@ function applyMode(mode) {
   document.body.dataset.mode = cockpitMode;
   cockpitStorage.setItem('swarm-mode', cockpitMode);
   $('mode').textContent = cockpitMode === 'conduite' ? 'Passer en mode expert' : 'Revenir au mode conduite';
-  for (const b of $('tabs').children) b.hidden = cockpitMode === 'conduite' && !conduiteOnly.includes(b.dataset.view);
+  for (const b of $('tabs').children) b.hidden = cockpitMode === 'conduite' && !conduiteOnly.includes(b.dataset.view) && b.getAttribute('href') !== '/prepare.html';
   $('assistant').hidden = false;
   if (cockpitMode === 'conduite' && !conduiteOnly.includes(view)) showView('conduite');
 }

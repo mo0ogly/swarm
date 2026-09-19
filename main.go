@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const help = `swarm — compagnon local de reprise (schema_version: 1)
@@ -15,17 +16,27 @@ Options globales : --root <projet> --json
 swarm init
 swarm aide [sujet]
 swarm providers init|show
+swarm connections list|save --input connexion.json
 swarm console [travail] [--plain]
 swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
 swarm dispatch <travail>
 swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
-swarm mission status|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission status|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm lifecycle list
+swarm lifecycle preview|apply <travail> archive|restore|purge|delete --input requete.json
+swarm validation preview|apply <travail> --task <tâche> --input politique.json
 swarm profile <travail> [tâche] [--input profil.json]
 swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
+swarm agent preflight <travail> --input lancement.json
 swarm agent list <travail>
 swarm agent show|stop|reconcile <agent>
 swarm agent logs <agent> [après_seq] [--output nouveau.jsonl]
+swarm exchange list <travail>
+swarm exchange send|consume <travail> --input requête.json
+swarm workspace status <travail>
+swarm workspace integrate <travail> --input manifeste.json
+swarm planning show|enable|claim|decide|handoff|step|pause|resume <travail> [--input requête.json]
 swarm work create --input fichier.json
 swarm work update <travail> --input fichier.json
 swarm work list
@@ -81,6 +92,9 @@ func printJSON(w io.Writer, v any) error {
 	return e.Encode(v)
 }
 func run(args []string, out, errOut io.Writer) int {
+	if len(args) > 0 && args[0] == "_api_chat" {
+		return runAPIChat(args, out, errOut)
+	}
 	root := "."
 	input := ""
 	output := ""
@@ -188,6 +202,38 @@ func run(args []string, out, errOut io.Writer) int {
 		return fail(e)
 	}
 	defer s.db.Close()
+	if pos[0] == "connections" {
+		if len(pos) != 2 {
+			return fail(fmt.Errorf("swarm connections list|save --input connexion.json"))
+		}
+		if pos[1] == "save" {
+			raw, e := readInput(input)
+			if e != nil {
+				return fail(e)
+			}
+			var c AIConnectionChange
+			if e = strict(raw, &c); e != nil {
+				return fail(e)
+			}
+			if e = s.saveAIConnection(c); e != nil {
+				return fail(e)
+			}
+		} else if pos[1] != "list" {
+			return fail(fmt.Errorf("Action inconnue."))
+		}
+		v, e := s.aiConnectionsPublic()
+		if e != nil {
+			return fail(e)
+		}
+		_ = printJSON(out, v)
+		return 0
+	}
+	if pos[0] == "planning" {
+		if e := s.planningCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
 	if pos[0] == "prepare" {
 		if e := s.preparationEntry(pos[1:], input, output, asJSON, out); e != nil {
 			return fail(e)
@@ -201,7 +247,63 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		return 0
 	}
-	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
+	if pos[0] == "lifecycle" {
+		if e := lifecycleCLI(s, pos, input, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "validation" {
+		if len(pos) != 3 || (pos[1] != "preview" && pos[1] != "apply") || task == "" || input == "" {
+			return fail(fmt.Errorf("usage : validation preview|apply WORK --task TASK --input politique.json"))
+		}
+		b, readErr := readInput(input)
+		if readErr != nil {
+			return fail(readErr)
+		}
+		var change ValidationPolicyChange
+		if readErr = strict(b, &change); readErr != nil {
+			return fail(readErr)
+		}
+		if change.TaskID == "" {
+			change.TaskID = task
+		}
+		if change.TaskID != task {
+			return fail(fmt.Errorf("task_id ne correspond pas à --task"))
+		}
+		if pos[1] == "preview" {
+			preview, previewErr := s.previewValidationPolicy(pos[2], change)
+			if previewErr != nil {
+				return fail(previewErr)
+			}
+			if asJSON {
+				_ = printJSON(out, preview)
+			} else {
+				fmt.Fprintf(out, "Aperçu — %s · %s\n%s\n", preview.TaskID, preview.TaskTitle, preview.Scope)
+				for _, criterion := range preview.Criteria {
+					fmt.Fprintf(out, "- Critère %d : %s — %s", criterion.Index, criterion.Text, criterion.Review)
+					if len(criterion.ControlIDs) > 0 {
+						fmt.Fprintf(out, " (%s)", strings.Join(criterion.ControlIDs, ", "))
+					}
+					fmt.Fprintln(out)
+				}
+				fmt.Fprintln(out, "Effet : "+preview.Confirmation)
+				fmt.Fprintln(out, "Jeton à confirmer : "+preview.Token)
+			}
+			return 0
+		}
+		updated, applyErr := s.applyValidationPolicy(pos[2], change)
+		if applyErr != nil {
+			return fail(applyErr)
+		}
+		if asJSON {
+			_ = printJSON(out, map[string]any{"work": updated, "applied": true, "task_id": task})
+		} else {
+			fmt.Fprintf(out, "Politique enregistrée pour %s à la révision %d.\n", task, updated.Revision)
+		}
+		return 0
+	}
+	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "exchange" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
 		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
 			return fail(e)
 		}

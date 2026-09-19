@@ -154,8 +154,8 @@ func TestLaunchBindsPolicyAndPersistsSelectedModel(t *testing.T) {
 	w, r := setupAgent(t, s)
 	dir := t.TempDir()
 	command := filepath.Join(dir, "claude")
-	os.WriteFile(command, []byte("#!/bin/sh\nexit 0\n"), 0700)
-	ps := Providers{Schema: 1, Providers: map[string]Provider{"claude": {Command: command}}}
+	os.WriteFile(command, []byte("#!/bin/sh\nif [ \"$1\" = \"--swarm-preflight\" ]; then printf '%s\\n' '"+verifiedPreflightJSON+"'; fi\nexit 0\n"), 0700)
+	ps := Providers{Schema: 1, Providers: map[string]Provider{"claude": verifiedPreflightProvider(command, "--swarm-preflight")}}
 	path := filepath.Join(s.root, ".swarm/providers.json")
 	raw, _ := json.Marshal(ps)
 	os.WriteFile(path, raw, 0600)

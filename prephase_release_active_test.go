@@ -11,7 +11,7 @@ import (
 func TestPreparationReleasePreservesUnrelatedLiveAttempt(t *testing.T) {
 	s := storeTest(t)
 	w, launch := setupAgent(t, s)
-	if err := s.setAutonomy(w.ID, autonomyAuto, 2); err != nil {
+	if err := s.setAutonomy(w.ID, autonomyAssisted, 2); err != nil {
 		t.Fatal(err)
 	}
 	launch.Instruction = "TEST_SLEEP"
@@ -53,7 +53,7 @@ func TestPreparationReleasePreservesUnrelatedLiveAttempt(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p.Conversion.ReleasedAt == "" || s.autonomy(w.ID) != autonomyAuto {
+	if p.Conversion.ReleasedAt == "" || s.autonomy(w.ID) != autonomyAssisted {
 		t.Fatal("release changed autonomy or failed")
 	}
 	agents, err := s.agents(w.ID)

@@ -37,6 +37,20 @@ leurs preuves courantes. Chaque tâche porte un identifiant choisi, stable.
 - Acceptation : passer `submitted` à `accepted` seulement après une gate
   `delivery` permise et des preuves courantes. Une gate `audit` complète peut
   contenir des findings : elle ne clôture pas une tâche comme livrable accepté.
+- Validation préautorisée : avant le lancement, l'opérateur peut enregistrer sur
+  une tâche une `validation_policy` automatique qui couvre explicitement chaque
+  critère. Après un handoff attribuable à la tentative, le conducteur exécute
+  uniquement ces commandes structurées, sans shell, conserve un reçu et accepte
+  seulement une gate delivery verte sur les empreintes courantes. Échec, preuve
+  périmée, pause, ambiguïté ou couverture incomplète retiennent la branche. Une
+  contrôle justifie explicitement sa couverture ; une politique `human` reste
+  obligatoire pour les critères qualitatifs sans justification objective
+  explicitement autorisée. Aucun texte
+  IA, journal ou handoff ne vaut autorisation ou preuve.
+  Dans le web, utiliser **Configurer les validations**, examiner l'aperçu puis
+  confirmer son effet. En CLI, utiliser `validation preview`, reporter son
+  `preview_token`, puis `validation apply`; `swarm aide validations` donne un
+  exemple complet. Un changement de révision ou de réglage annule l'aperçu.
 - Fin de session : `checkpoint` avec situation exacte, prochaine action et
   références au Guide de terrain. Ne pas attendre cette étape pour enregistrer
   les changements : chaque commande mutante persiste immédiatement.
@@ -64,3 +78,7 @@ Hors Wattson : copier le module ou son binaire et cette procédure ; ajouter la
 consigne de démarrage aux instructions du projet. Aucun chemin Wattson n’est
 requis par l’exécutable. Conserver une racine logique par projet et ne pas
 partager une base SQLite via un système de fichiers réseau.
+
+## Préparation, révision et modèles IA
+
+Voir [le parcours web et les contrats CLI](PREPARATION-UX.md) : formulaire de missions, responsable durable, validation explicite, révision avec historique et menu **IA et connexions**.

@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestWebAuthenticationOriginAndSharedGuard(t *testing.T) {
@@ -155,15 +156,19 @@ func TestWebEventCursorReconnect(t *testing.T) {
 	req, _ := http.NewRequest("GET", server.URL+"/api/v1/events?work="+w.ID, nil)
 	req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "token"})
 	req.Header.Set("Last-Event-ID", "1")
+	server.Client().Timeout = 3 * time.Second
 	resp, e := server.Client().Do(req)
 	if e != nil {
 		t.Fatal(e)
 	}
 	defer resp.Body.Close()
-	buf := make([]byte, 4096)
-	n, e := resp.Body.Read(buf)
+	buf, e := io.ReadAll(resp.Body)
+	n := len(buf)
 	if e != nil && e != io.EOF {
 		t.Fatal(e)
+	}
+	if !strings.Contains(string(buf), "retry: 2000\n") {
+		t.Fatal("missing reconnect backoff")
 	}
 	if strings.Contains(string(buf[:n]), "id: 1\n") || !strings.Contains(string(buf[:n]), "id: 2\n") {
 		t.Fatal("cursor replay", string(buf[:n]))
@@ -302,6 +307,7 @@ func TestWebConduiteActionsRespectTheirLimits(t *testing.T) {
 	if _, e := s.webAction(webRequest{Kind: "pause", Work: w.ID, Revision: currentRevision(t, s, w.ID)}); e != nil {
 		t.Fatal(e)
 	}
+	organizedFixtureStore(t, s)
 	if _, e := s.webAction(webRequest{Kind: "autonomy", Work: w.ID, Autonomy: autonomyAuto, Slots: 2, Revision: currentRevision(t, s, w.ID)}); e != nil {
 		t.Fatal(e)
 	}

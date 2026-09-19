@@ -126,6 +126,7 @@ const Pilot = {
   $('pilot-status').textContent=this.storageWarning||(this.state.search.trim()?'Recherche dans toutes les tâches, y compris les branches repliées.':!snapshot.work.tasks.length?'Aucune tâche : le graphe apparaîtra dès qu’un plan existe.':graph&&!edges.length?'Tâches indépendantes : aucune dépendance déclarée, donc aucune flèche.':graph?'Les flèches vont du prérequis vers la tâche qui en dépend. Zoom '+Math.round(this.state.zoom*100)+' %.':'Sélectionnez un agent ou une tâche pour comprendre son état et examiner ses résultats.');
   $('pilot-status').classList.toggle('notice',graph&&!edges.length&&snapshot.work.tasks.length>0);$('pilot-status').classList.toggle('info',graph&&!edges.length&&snapshot.work.tasks.length>0);
   if(graph&&edges.length){const visible=$('pilot-canvas').querySelectorAll('.graph-arete').length;$('pilot-status').append(' '+visible+' dépendances affichées sur '+edges.length+'.');if(visible<edges.length)$('pilot-status').append(' Des branches sont repliées ou filtrées : utilisez « Toutes les dépendances ».')}
+  if(graph&&snapshot.work.planning)$('pilot-status').append(' Pointillés : responsabilités et remise au vérificateur. Traits pleins : dépendances entre tâches.');
   if(graph&&(this.state.filter!=='all'||this.state.search.trim()))$('pilot-status').append(' Les liens dont une extrémité est filtrée restent masqués.');
   if(this.state.selection)PilotInspector.render();
  },
@@ -135,9 +136,11 @@ const Pilot = {
    const agents=snapshot.agents.filter(x=>x.agent.task_id===t.id).map(x=>x.agent);
    for(const a of agents.length?agents:[null])if(this.matches(t,a))entries.push({t,a});
   }
-  const sig=JSON.stringify([this.state.detail,this.state.grouped,entries.map(({t,a})=>[t.id,t.title,t.status,this.goState(t),a?.id,a?.progress,snapshot.validation?.tasks[t.id]?.state,snapshot.pilotage?.health[a?.id]?.activity_label,graphCoutTache(t.id),snapshot.pilotage?.health[a?.id]?.process_label])]);
+  const organization=PilotGraph.organization(snapshot.work,snapshot.work.tasks,snapshot.paused);
+  const sig=JSON.stringify([organization.nodes,this.state.detail,this.state.grouped,entries.map(({t,a})=>[t.id,t.title,t.status,t.plan_role,t.launch_profile,t.deliverable,t.criteria,t.next,t.blocker,a?.role,this.goState(t),a?.id,a?.progress,snapshot.validation?.tasks[t.id]?.state,snapshot.pilotage?.health[a?.id]?.activity_label,graphCoutTache(t.id),snapshot.pilotage?.health[a?.id]?.process_label])]);
   if(sig===this.listKey)return;this.listKey=sig;
   const focused=document.activeElement?.dataset.pilotIdentity,host=$('pilot-list');host.replaceChildren();
+  for(const n of organization.nodes){const card=node('article',undefined,'team-role-card');card.dataset.tone=n.tone;card.dataset.responsibility=n.id;const open=this.command(n.title,()=>Planning.inspectRole(n.kind));open.id='list-role-'+encodeURIComponent(n.id);open.dataset.pilotIdentity=n.id;card.append(open,node('p',n.description),node('p',n.detail));host.append(card)}
   const groups=this.state.grouped?['En activité','À examiner','Historique','À préparer']:[''];
   for(const group of groups){
    const set=entries.filter(({t,a})=>!group||(a&&active(a)?'En activité':t.status==='submitted'||t.status==='blocked'?'À examiner':a?'Historique':'À préparer')===group);
@@ -146,12 +149,14 @@ const Pilot = {
    for(const {t,a}of set){
     const card=node('article',undefined,'pilot-card');card.dataset.state=this.uncertainExecution(t,a)?'stale':snapshot.validation?.tasks[t.id]?.state||t.status;
     const select=this.command(this.taskTitle(t),()=>this.inspect(a?'agent':'task',a?.id||t.id),'pilot-card-title');select.dataset.pilotIdentity=a?.id||t.id;
-    card.append(node('p',a?a.provider+' · '+a.role:'Tâche à préparer','pilot-eyebrow'),select);
+    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);
+    card.append(node('p',PilotGraph.guidance(t,this.goState(t),snapshot.validation?.tasks[t.id]),'pilot-guidance'));
     const h=snapshot.pilotage?.health[a?.id];
     card.append(node('p',a?this.uncertainExecution(t,a)||h?.process_label||'Observation indisponible':labels[t.status]||t.status,'pilot-card-state'));
     if(a)card.append(node('p',a.progress?.detail||a.progress?.action||h?.activity_label||'Aucune activité publique reçue','pilot-card-activity'));
     else if(t.depends?.length)card.append(node('p','Prérequis : '+t.depends.join(', ')));
     if(this.state.detail==='detailed')card.append(node('p',a?(h?.activity_label||'Activité inconnue')+' · '+(a.mode==='terminal'?'Appels non mesurés':(a.progress?.tool_calls||0)+' appels')+' · '+graphCoutTache(t.id):t.deliverable));
+    if(a){const session=taskSessionButton(t.id,'pilot-'+a.id);if(session)card.append(session)}
     const go=this.goState(t);if(go.visible){const b=this.command(go.ready?'Go — lancer':'Voir le blocage',()=>this.go(t.id),'pilot-go');b.dataset.pilotIdentity='go:'+t.id+':'+(a?.id||'');b.dataset.goTask=t.id;b.dataset.ready=String(go.ready);b.title=go.ready?'Configurer puis confirmer le lancement de '+t.title:go.reason;card.append(b);if(!go.ready)card.append(node('p',go.reason,'pilot-go-reason'));}
     target.append(card);
    }
@@ -194,6 +199,6 @@ const Pilot = {
  returnToView(){const saved=this.returnView;PilotInspector.close();this.queue=null;this.returnView=null;if(saved){this.state=PilotGraph.preferences(saved);this.restorePosition=true}this.changed()},
  help(){
   openModal('Piloter les agents','Comprendre, inspecter puis agir sur une tentative précise.',{action:'help'});$('confirm').hidden=true;$('cancel').textContent='Fermer l’aide';
-  preview('Agents : liste des tentatives et tâches à préparer. Dépendances : flèches du prérequis vers la suite.\nHorizontal / Vertical règle le sens des flèches ; Simplifié / Détaillé règle le contenu des cartes.\n+ / − replie une branche sans changer le travail. Une tâche partagée reste visible par un autre chemin ouvert. Les badges comptent les éléments réellement masqués.\nProchaine intervention : décisions les plus anciennes d’abord (date puis identifiant), puis tâches bloquées ou résultats à examiner. L’ordre reste figé pendant la visite. Aucune commande n’est exécutée.\nUn arrêt demandé n’est pas un arrêt confirmé. Une exécution terminée n’est pas un livrable validé.\nRetrouver ma sélection révèle la branche et retire les filtres masquants. Réinitialiser l’affichage ne modifie aucune tâche.');
+  preview('Les icônes indiquent le rôle déclaré : ◇ Planificateur, ⑂ Responsable de branche, ⚙ Exécutant, ✓ Vérificateur. Un rôle absent reste « Rôle à préciser ». La couleur du contour décrit l’état, pas le rôle.\n« À compléter » signale une information absente ; « En attente » reprend le motif du moteur ; « À résoudre » signale une tâche bloquée. Ouvrez la carte pour lire le texte complet.\nAgents : liste des tentatives et tâches à préparer. Dépendances : flèches du prérequis vers la suite.\nHorizontal / Vertical règle le sens des flèches ; Simplifié / Détaillé règle le contenu des cartes.\n+ / − replie une branche sans changer le travail. Une tâche partagée reste visible par un autre chemin ouvert. Les badges comptent les éléments réellement masqués.\nProchaine intervention : décisions les plus anciennes d’abord (date puis identifiant), puis tâches bloquées ou résultats à examiner. L’ordre reste figé pendant la visite. Aucune commande n’est exécutée.\nUn arrêt demandé n’est pas un arrêt confirmé. Une exécution terminée n’est pas un livrable validé.\nRetrouver ma sélection révèle la branche et retire les filtres masquants. Réinitialiser l’affichage ne modifie aucune tâche.');
  }
 };

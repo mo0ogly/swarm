@@ -7,7 +7,14 @@ const AgentTerminal={
   const header=node('header'),title=node('h2','Session '+a.provider+' — '+(snapshot.work.tasks.find(t=>t.id===a.task_id)?.title||a.task_id));title.id='agent-terminal-title';
   const frame=node('iframe');frame.title='Session interactive de '+a.provider;
   frame.src='/terminal.html?'+new URLSearchParams({agent:a.id,work:a.work_id,theme:document.documentElement.dataset.theme});
-  const close=()=>{observer.disconnect();window.removeEventListener('message',message);dialog.close();dialog.remove();if(opener?.isConnected)opener.focus();else $('pilot-view')?.focus()};
+  const close=()=>{
+   observer.disconnect();window.removeEventListener('message',message);dialog.close();dialog.remove();
+   let target=opener;
+   if(!target?.isConnected&&opener?.dataset.taskSession){
+    target=[...document.querySelectorAll('[data-task-session]')].find(e=>e.dataset.taskSession===opener.dataset.taskSession&&e.dataset.sessionLocation===opener.dataset.sessionLocation);
+   }
+   (target?.isConnected?target:$('pilot-view'))?.focus();
+  };
   const message=e=>{if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.kind==='swarm-terminal-close')close()};
   const observer=new MutationObserver(()=>frame.contentWindow?.postMessage({kind:'swarm-terminal-theme',theme:document.documentElement.dataset.theme},location.origin));
   const button=node('button','Fermer la vue');button.type='button';button.addEventListener('click',e=>{if(e.isTrusted)close()});

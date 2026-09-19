@@ -67,6 +67,7 @@ async function poll(){
   $('terminal-claim').hidden=!['terminal','dialogue'].includes(mode);
   if(!viewChosen){viewChosen=true;showConsole(true)}
   const p=r.progress||{},h=r.health||{};
+  $('session-history-note').textContent=['terminal','dialogue'].includes(mode)?'Historique de la session conservé dans la limite disponible.':r.capture?'Messages, actions et résultats capturés. Les sorties longues peuvent être abrégées.':'Messages et actions disponibles selon la version de lancement. Le contenu détaillé des réponses d’outils n’a pas été enregistré : activez « Capture détaillée des sorties » au prochain lancement pour le conserver.';
   $('session-current').textContent=p.action?'Dernière action : '+p.action:'Aucune action détaillée reçue pour le moment.';
   if(/hashlib|sha256/.test(p.detail||'')&&/source-snapshot|stable|diff/.test(p.detail||''))$('session-current').textContent='Dernière action : vérifier si les fichiers ont changé pendant les contrôles.';
   else if(/swarm.*work show/.test(p.detail||''))$('session-current').textContent='Dernière action : consulter les tâches et leurs validations dans Swarm.';
@@ -74,7 +75,10 @@ async function poll(){
   $('session-cost').textContent=typeof r.usage?.provider_reported_cost_usd==='number'?'Coût transmis : '+r.usage.provider_reported_cost_usd.toFixed(2)+' USD':'Coût inconnu : aucun montant transmis par le fournisseur';
   $('session-progress').textContent=sessionProgress(r);
   for(const event of r.events){if(event.cols)terminal.resize(event.cols,event.rows);if(event.data){const bytes=Uint8Array.from(atob(event.data),c=>c.charCodeAt(0));consoleView.append(decoder.decode(bytes,{stream:true}).replace(/\r\n/g,'\n').replace(/\x1b\[[0-?]*[ -/]*[@-~]/g,''));await new Promise(resolve=>terminal.write(bytes,resolve))}cursor=event.seq}
-  if(r.events.length<16){const first=replaying;replaying=false;if(first)message(['terminal','dialogue'].includes(mode)?'Historique chargé. Prenez la saisie pour répondre à l’agent.':'Suivi des actions de cette tentative en lecture seule. La fin de l’agent ne vaut pas validation de son résultat.');}
+  const publicMessages=consoleView.text.split('\n').filter(line=>/^\[[^\]]+\] MESSAGE · /.test(line));
+  $('session-message').hidden=!publicMessages.length;
+  if(publicMessages.length){const latest=publicMessages.at(-1).replace(/^\[[^\]]+\] MESSAGE · /,'');$('session-message').textContent='L’agent explique : '+latest.slice(0,500)+(latest.length>500?'… (suite dans le journal)':'')}
+  if(r.events.length<16){const first=replaying;replaying=false;if(first)message(['terminal','dialogue'].includes(mode)?'Historique chargé. Prenez la saisie pour répondre à l’agent.':'Messages et actions de cette tentative en lecture seule. La fin de l’agent ne vaut pas validation de son résultat.');}
   if(r.desired==='stop'&&['queued','starting','running','stopping'].includes(status))status='stopping';state();
   if(lease&&Date.now()-lastClaim>5000&&!writing){const renewal=await control('claim');lastClaim=Date.now();if(renewal.lease!==lease){lock();message('Votre saisie a expiré. Reprenez-la explicitement avant de continuer.',true)}}
  }catch(e){lock();message('Connexion interrompue : saisie suspendue. '+e.message,true)}

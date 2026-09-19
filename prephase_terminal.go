@@ -12,7 +12,8 @@ import (
 
 const preparationTerminalHelp = `PRÉPARER — conversation et documents partagés avec le web
 Texte libre : envoyer à l’IA sélectionnée. Sans préparation : enregistrer le besoin.
-/ia [nom] : lister ou choisir l’IA ; /plan [consigne] : proposer le plan
+/ia [nom] : lister ou choisir l’IA ; /niveau auto|simple|standard|exigeant
+/plan [consigne] : proposer le plan
 /voir besoin|brief|plan ; /besoin TEXTE ; /brief TEXTE
 /multiligne [message|besoin|brief] ; terminer par /envoyer ou /annuler
 /edit besoin|brief|plan : ouvrir VISUAL ou EDITOR, sans shell
@@ -30,6 +31,7 @@ Ctrl-C abandonne la saisie ou demande l’arrêt. EOF ferme la vue, pas la gén�
 
 type preparationTerminal struct {
 	contextMode  string
+	level        string
 	s            *Store
 	p            Preparation
 	provider     *PreparationCapability
@@ -144,7 +146,7 @@ func (t *preparationTerminal) send(message, target string) error {
 	if t.provider == nil {
 		return fmt.Errorf("Choisissez une IA avec /ia NOM avant l’envoi.")
 	}
-	t.pending = &PreparationSend{ContextMode: t.contextMode, Version: 1, ID: t.p.ID, Event: newID("terminal-send-"), Revision: t.p.Revision, Provider: t.provider.Provider, Capability: t.provider.Hash, Message: message, Target: target}
+	t.pending = &PreparationSend{Level: t.level, ContextMode: t.contextMode, Version: 1, ID: t.p.ID, Event: newID("terminal-send-"), Revision: t.p.Revision, Provider: t.provider.Provider, Capability: t.provider.Hash, Message: message, Target: target}
 	return t.resend()
 }
 func (t *preparationTerminal) resend() error {
@@ -163,6 +165,9 @@ func (t *preparationTerminal) resend() error {
 	}
 	t.pending = nil
 	t.say("Envoi enregistré : " + turn.ID + ". /arreter reste disponible.")
+	if turn.ModelRoute != nil {
+		t.say("IA : " + turn.Provider + " · modèle " + turn.ModelRoute.Model + " · niveau " + turn.ModelRoute.Level)
+	}
 	return nil
 }
 func (t *preparationTerminal) history(all bool) error {
@@ -353,6 +358,30 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		}
 		if arg != "" {
 			return false, fmt.Errorf("IA inconnue : /ia liste les choix.")
+		}
+	case "/niveau":
+		if t.pending != nil {
+			return false, fmt.Errorf("Vérifiez l’envoi en attente avant de changer de niveau.")
+		}
+		if arg != "auto" && !containsString(modelLevels, arg) {
+			return false, fmt.Errorf("Choisir /niveau auto|simple|standard|exigeant")
+		}
+		if t.provider == nil {
+			return false, fmt.Errorf("Choisissez d’abord /ia NOM")
+		}
+		providers, e := t.s.providers()
+		if e != nil {
+			return false, e
+		}
+		_, route, e := resolveModel(providers.Providers[t.provider.Provider], arg, "preparation")
+		if e != nil {
+			return false, e
+		}
+		t.level = arg
+		if route != nil {
+			t.say("Modèle sélectionné : " + route.Model + " · niveau " + route.Level + " · effort " + route.Effort)
+		} else {
+			t.say("Modèle géré par l’exécutable")
 		}
 	case "/contexte":
 		if t.pending != nil {

@@ -19,10 +19,14 @@ type PreparationConversion struct {
 	ReleasedAt string     `json:"released_at,omitempty"`
 }
 type PreparationConversionReview struct {
-	Preparation  Preparation `json:"preparation"`
-	WorkTitle    string      `json:"work_title"`
-	WorkRevision int         `json:"work_revision"`
-	Spec         ActionPlan  `json:"spec"`
+	Action       string                  `json:"action"`
+	Changes      []PreparationPlanChange `json:"changes,omitempty"`
+	Warning      string                  `json:"warning,omitempty"`
+	Organization *Organization           `json:"organization,omitempty"`
+	Preparation  Preparation             `json:"preparation"`
+	WorkTitle    string                  `json:"work_title"`
+	WorkRevision int                     `json:"work_revision"`
+	Spec         ActionPlan              `json:"spec"`
 }
 
 func migratePreparationLocks(db *sql.DB, root string, backup bool) error {
@@ -62,7 +66,7 @@ func (s *Store) preparationConversionReview(id string) (PreparationConversionRev
 	if e != nil {
 		return PreparationConversionReview{}, e
 	}
-	r := PreparationConversionReview{Preparation: p, WorkTitle: p.Title}
+	r := PreparationConversionReview{Preparation: p, WorkTitle: p.Title, Action: "create-missions"}
 	if p.WorkID != "" {
 		w, err := s.get(p.WorkID)
 		if err != nil {
@@ -70,9 +74,22 @@ func (s *Store) preparationConversionReview(id string) (PreparationConversionRev
 		}
 		r.WorkTitle = w.Title
 		r.WorkRevision = w.Revision
+		o := organization(w)
+		r.Organization = &o
 	}
 	if p.Conversion != nil {
 		r.Spec = p.Conversion.Spec
+		r.Action = "release-plan"
+		if p.PlanReady && p.Documents["plan"].Hash != p.Conversion.PlanHash {
+			var revised ActionPlan
+			if e := strict([]byte(p.Documents["plan"].Text), &revised); e != nil {
+				return r, e
+			}
+			r.Spec = revised
+			r.Action = "revise-missions"
+			r.Changes = preparationPlanChanges(p.Conversion.Spec, r.Spec)
+			r.Warning = "Les résultats modifiés et leurs dépendants seront à revérifier. Les tentatives et versions restent conservées. La mission sera mise en pause, avec une nouvelle autorisation de départ nécessaire. Une tentative ou décision active bloque l’application."
+		}
 		return r, nil
 	}
 	if !p.PlanReady {
@@ -90,6 +107,9 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 			return preparationError("already_created", "Cette préparation a déjà créé ses missions. Ouvrir leur pilotage ; un autre plan exige une nouvelle préparation.")
 		}
 		return nil // Semantic replay with a new event also keeps the same missions.
+	}
+	if r.Action == "revise-missions" && p.Conversion != nil && r.Hash == p.Conversion.PlanHash {
+		return nil
 	}
 	if r.Action == "release-plan" {
 		if p.Conversion == nil || r.Hash != p.Conversion.PlanHash {
@@ -118,7 +138,11 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 			return preparationError("conflict", "Le travail cible a changé. Rouvrir la revue avant de confirmer.")
 		}
 	}
-	if r.Action == "create-missions" {
+	if r.Action == "revise-missions" {
+		if e := s.revisePreparedMissions(tx, &w, p, r); e != nil {
+			return e
+		}
+	} else if r.Action == "create-missions" {
 		s.preparationFreshness(p)
 		if !p.PlanReady || r.Hash != p.Documents["plan"].Hash {
 			return preparationError("stale_plan", "Le verdict du plan n’est plus courant. Vérifier le plan avant de créer les missions.")
@@ -137,6 +161,11 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 		}
 		if e := s.materializePlan(&w, PlanReview{Source: p.ID, BriefHash: p.Brief.Hash, ResponseHash: r.Hash, Spec: spec}); e != nil {
 			return e
+		}
+		if r.Organization != nil {
+			if e := s.configurePreparedOrganization(&w, *p, *r.Organization); e != nil {
+				return e
+			}
 		}
 		approved := w.Plans[len(w.Plans)-1]
 		p.Conversion = &PreparationConversion{WorkID: w.ID, PlanHash: r.Hash, BriefHash: p.Brief.Hash, MethodHash: p.MethodHash, TaskIDs: approved.TaskIDs, Spec: spec, CreatedAt: now()}
@@ -166,6 +195,9 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 			t.LaunchHeld = false
 		}
 		p.Conversion.ReleasedAt = now()
+		if w.Planning != nil {
+			w.Planning.Paused = false
+		}
 	}
 	before := w.Revision
 	w.Revision++
@@ -190,9 +222,9 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 	if e != nil {
 		return e
 	}
-	if r.Action == "create-missions" {
+	if r.Action == "create-missions" || r.Action == "revise-missions" {
 		for _, id := range p.Conversion.TaskIDs {
-			if _, e = tx.Exec("INSERT INTO preparation_launch_locks(work_id,task_id,preparation_id) VALUES(?,?,?)", w.ID, id, p.ID); e != nil {
+			if _, e = tx.Exec("INSERT INTO preparation_launch_locks(work_id,task_id,preparation_id) VALUES(?,?,?) ON CONFLICT(work_id,task_id) DO UPDATE SET released=0", w.ID, id, p.ID); e != nil {
 				return e
 			}
 		}

@@ -118,7 +118,7 @@ func uiStatus(status string) string {
 	case "waived":
 		return "Dérogation"
 	case "accepted":
-		return "Acceptée"
+		return "Terminée et validée"
 	case "completed":
 		return "Terminé"
 	case "interrupted":

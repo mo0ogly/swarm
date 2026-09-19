@@ -37,12 +37,21 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	if e != nil {
 		return nil, e
 	}
+	reviews := map[string]any{}
 	actions := map[string][]TaskAction{}
 	for i := range w.Tasks {
 		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
+		if w.Tasks[i].IndependentReview != nil {
+			err := s.independentReviewGuard(&w, &w.Tasks[i])
+			reason := ""
+			if err != nil {
+				reason = err.Error()
+			}
+			reviews[w.Tasks[i].ID] = map[string]any{"current": err == nil, "reason": reason}
+		}
 	}
 	validation := s.validationState(&w)
-	return map[string]any{"pilotage": s.pilotage(&w, agents, validation), "work": w, "validation": validation, "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
+	return map[string]any{"independent_reviews": reviews, "pilotage": s.pilotage(&w, agents, validation), "work": w, "validation": validation, "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}
@@ -120,7 +129,7 @@ pause | unpause | reconcile AGENT | assign TACHE RESPONSABLE | priority TACHE 0.
 new ID | titre | livrable | critère 1 ; critère 2
 ready TACHE | submit TACHE chemin/du/handoff.md | capture on/off | freeze | help | q
 mode | autonomie manuel|assiste|autonome [créneaux] | dispatch
-start/retry créent un processus. Capture désactivée par défaut (sorties sensibles).
+start/retry créent un processus. Après un échec d'environnement, utiliser le formulaire interactif ou agent start avec previous et precondition_evidence. Capture désactivée par défaut (sorties sensibles).
 ready rouvre une tâche bloquée ; submit enregistre le handoff, jamais une acceptation.
 `
 

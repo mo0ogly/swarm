@@ -56,6 +56,39 @@ PATH. Il refuse d'écraser un fichier existant. Aucun modèle n'est appelé par 
 commande. Les chemins et arguments sont configurables dans ce fichier local.
 Les fournisseurs absents de PATH n'y sont pas ajoutés.
 
+La migration du précontrôle est progressive. Un profil existant qui ne contient
+pas `preflight_required` conserve son droit de départ après les contrôles
+historiques de l'exécutable, du workspace et des ressources. Son précontrôle est
+enregistré `compatible` / `unverified`, jamais `ready` / `verified` : `--version`
+ne prouve ni l'exécution dans le sandbox effectif du fournisseur, ni ses droits
+sur le workspace. Une sonde configurée reste bloquante si elle échoue, même dans
+ce mode compatible.
+
+Pour rendre la preuve obligatoire avant toute réservation, ajouter
+`preflight_required: true`, puis configurer un adaptateur déterministe avec
+`preflight_kind: "provider-context"`, ses arguments dédiés dans `preflight_args`
+et les capacités `process`, `workspace_read` et `workspace_write` dans
+`preflight_capabilities`. Il doit retourner sur stdout un reçu JSON de schéma 1
+marquant chacune de ces capacités `verified`. Une capacité inconnue ou refusée,
+un reçu invalide et une commande historique ou `operator-command` bloquent alors
+le départ. Activer cette politique fournisseur par fournisseur seulement après
+avoir qualifié l'adaptateur dans le contexte réel de la commande métier.
+
+Exemple de politique stricte, à compléter avec un adaptateur réellement fourni :
+
+```json
+{
+  "preflight_required": true,
+  "preflight_kind": "provider-context",
+  "preflight_args": ["--swarm-preflight"],
+  "preflight_capabilities": ["process", "workspace_read", "workspace_write"]
+}
+```
+
+Swarm ne fournit actuellement aucun adaptateur Codex ou Claude qualifié. Ne pas
+activer la politique stricte avec une fixture ou un JSON déclaratif qui ne sonde
+pas le même contexte fournisseur que la commande métier.
+
 Adaptateurs initiaux vérifiés sur l'aide des CLI installées le 11 septembre 2026 :
 
 - Claude : `claude -p --output-format stream-json --verbose` ; prompt sur stdin.
@@ -101,11 +134,18 @@ validées par Entrée. `help` rappelle les commandes. Ctrl-C ou `q` ferme l'affi
 | `ready audit` | Rouvre une tâche sans agent actif avant un nouveau départ |
 
 Un agent doit être terminé avant `retry`. Lancer plusieurs agents exige des
-répertoires de travail distincts **et non imbriqués** dans le même projet. Le
+répertoires de travail distincts **et non imbriqués** dans la racine du projet. Le
 cockpit refuse deux agents sur une même tâche ou sur des espaces qui se recouvrent.
-Il ne fabrique pas les copies/worktrees et ne fusionne pas leur code. Préparer des
-copies dédiées lorsqu'un travail nécessite de la concurrence. Les règles projet
-et le guide de terrain doivent être présents/pertinents dans ces copies.
+Il ne fabrique ni ne nettoie les copies. Le profil commun reste donc un mode
+séquentiel honnête ; les créneaux sont un plafond. Une file FIFO persistée ordonne
+les missions qui attendent le même arbre. Des profils par tâche peuvent cibler
+des copies préparées séparément. Leur remise peut ensuite être intégrée par la
+commande explicite `workspace integrate`, sérialisée et en échec fermé si une
+empreinte de base a changé. Ce mécanisme copie les artefacts déclarés ; il ne
+crée pas de worktree, ne fusionne pas Git et ne valide pas le résultat intégré.
+Les règles projet et le guide de terrain doivent être présents et pertinents dans
+chaque copie. Le contrat exact est dans
+`docs/plans/swarm-autonomie-coordination/a7-espaces.md`.
 
 Les priorités ordonnent l'affichage. Il n'existe pas encore d'ordonnanceur qui
 prélève automatiquement les tâches. Les rôles planner/subplanner/worker et la
@@ -284,7 +324,9 @@ Une tâche part automatiquement si, dans cet ordre : le niveau est `autonome`, l
 départs ne sont pas suspendus, un créneau est libre, ses dépendances sont
 acceptées et fraîches, un profil existe, elle n'a pas épuisé ses deux tentatives
 automatiques, et son espace de travail n'est pas déjà occupé. Deux départs
-simultanés supposent deux espaces de travail distincts.
+simultanés supposent deux espaces de travail distincts. Pour un arbre commun, le
+premier tour FIFO encore éligible passe ; pause, dépendance redevenue invalide ou
+tâche non candidate libèrent un tour en attente sans annoncer la tâche terminée.
 
 Ne repartent jamais d'elles-mêmes : une tâche dont le handoff a été refusé, une
 tâche arrêtée à la demande de l'opérateur, une tâche après deux tentatives
@@ -373,6 +415,11 @@ transactionnelle ; un crash brutal peut perdre ce dernier intervalle. Les comman
 et changements de cycle de vie sont persistés immédiatement.
 Les contrôles terminal et caractères directionnels sont retirés. Ce nettoyage
 n'est **pas** une anonymisation ni une détection exhaustive des secrets.
+
+La vue **Gérer les missions** affiche aussi les archives et la corbeille
+récupérable. Elle sépare clairement rangement, restauration, purge des vieux
+journaux et mise en corbeille. L’aperçu est obligatoire avant confirmation ; la
+mise en corbeille demande le nom exact et ne touche jamais aux fichiers du projet.
 
 `agent logs ID` renvoie les 200 dernières entrées. `agent logs ID -1` commence au
 premier événement conservé ; fournir ensuite le dernier `seq` pour parcourir
@@ -960,3 +1007,44 @@ Le résumé du pilotage présente les validations, l’activité et les décisio
 attendues. Son bouton principal ouvre la décision la plus bloquante, le suivi,
 la reprise ou les résultats selon l’état réel. Les dérogations ne sont pas
 comptées comme des validations.
+
+
+### Lire les rôles et les éléments manquants
+
+Les cartes du graphe et de la liste affichent le rôle déclaré : ◇ Planificateur,
+⑂ Responsable de branche, ⚙ Exécutant, ✓ Vérificateur lorsqu’un tel rôle est
+explicitement fourni. Un rôle absent apparaît comme « Rôle à préciser » ; le
+titre d’une tâche de revue ne suffit pas à lui attribuer un rôle.
+Le badge de rôle possède sa propre paire de couleurs. Le contour de la carte
+exprime l’état de la tâche ; une sélection utilise un contour discontinu.
+
+La ligne opérationnelle distingue « À compléter » (livrable, critère ou consigne),
+« En attente » (motif du moteur), « À résoudre » (blocage) et résultat validé.
+Les textes longs restent accessibles dans le titre SVG et en ouvrant la carte.
+Les flèches conservent le verdict du moteur, y compris la fraîcheur des preuves.
+L’aide du pilotage explique cette lecture, sans dépendre de la couleur.
+
+CLI : `swarm help pilotage`, `swarm mission status TRAVAIL` et
+`swarm console TRAVAIL` exposent l’aide, les motifs et les actions existantes.
+Cette amélioration ne fournit pas encore d’éditeur de dépendances avec simulation.
+
+
+### Rectification : vérificateur indisponible
+
+Le badge Vérificateur décrit une possibilité du rendu, mais le lancement ne
+reconnaît pas `reviewer`. Il ne constitue donc pas une fonction livrée. Les
+planificateurs du protocole hiérarchique sont des périmètres distincts du graphe
+des tâches ; ce protocole doit être activé explicitement. Consulter
+[le contrat détaillé](../../docs/architecture/swarm/ROLES-RESPONSABILITES-ET-LIMITES.md).
+
+
+### Organisation obligatoire avant les départs autonomes
+
+Une mission sans responsable et sans politique de validation explicite ne peut
+plus être autorisée en autonome. Le web et `mission status` exposent les manques.
+Les recettes isolées et l’installation ne valident pas une mission utilisateur.
+Voir le [contrat et la recette visible](../../docs/architecture/swarm/GARDE-ORGANISATION.md).
+
+## Préparation, révision et modèles IA
+
+Voir [le parcours web et les contrats CLI](PREPARATION-UX.md) : formulaire de missions, responsable durable, validation explicite, révision avec historique et menu **IA et connexions**.

@@ -28,7 +28,7 @@
 .graph-noeud[data-etat=validee] .graph-sous-titre,.graph-noeud[data-etat=validee] .graph-agent{fill:var(--wattson-succes-encre)}
 /* Dépendance satisfaite ou en attente : deux lectures, deux traits. */
 .graph-arete[data-lien=satisfait]{stroke:var(--wattson-accent);stroke-width:2}
-.graph-arete[data-lien=attente]{stroke:var(--wattson-libelle);stroke-dasharray:5 4}
+.graph-arete[data-lien=attente]{stroke:var(--wattson-libelle)}
 .graph-fleche-ok{fill:var(--wattson-accent)}
 /* Légende des teintes : la couleur gagne un sens, il est écrit. */
 .graph-teinte{display:inline-flex;align-items:center;gap:5px}
@@ -44,3 +44,17 @@
 .graph-agent{font-size:11px;fill:var(--wattson-libelle)}
 .graph-alerte{font-size:11px;font-weight:700;fill:var(--wattson-alerte)}
 .graph-legende{margin-top:10px;font-size:13px;color:var(--wattson-libelle)}
+
+.graph-organisation-link{fill:none;stroke:var(--wattson-info-encre);stroke-width:1.5;stroke-dasharray:2 6;vector-effect:non-scaling-stroke}
+.graph-responsibility{cursor:pointer}
+.graph-responsibility rect{fill:var(--wattson-info-fond);stroke:var(--wattson-info-encre);stroke-width:2;vector-effect:non-scaling-stroke}
+.graph-responsibility text{fill:var(--wattson-info-encre);font-size:13px}
+.graph-responsibility text[data-role-line="0"]{font-weight:700}
+.graph-responsibility[data-tone="succes"] rect{fill:var(--wattson-succes-fond);stroke:var(--wattson-succes-encre)}
+.graph-responsibility[data-tone="succes"] text{fill:var(--wattson-succes-encre)}
+.graph-responsibility[data-tone="attention"] rect{fill:var(--wattson-attention-fond);stroke:var(--wattson-attention-encre)}
+.graph-responsibility[data-tone="attention"] text{fill:var(--wattson-attention-encre)}
+.graph-responsibility:focus{outline:none}
+.graph-responsibility:focus rect,.graph-responsibility:hover rect{stroke:var(--wattson-lien);stroke-width:4}
+
+.graph-fleche-role{fill:var(--wattson-info-encre)}

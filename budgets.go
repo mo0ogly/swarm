@@ -63,6 +63,23 @@ func (s *Store) budget(work string) (BudgetView, error) {
 		reported := summary.Reported
 		v.ActualCost = &reported
 	}
+	var planEstimate float64
+	if e = s.db.QueryRow("SELECT coalesce(sum(estimate),0) FROM planning_calls WHERE work_id=? AND state!='released'", work).Scan(&planEstimate); e != nil {
+		return v, e
+	}
+	v.Estimated += planEstimate
+	var planActual sql.NullFloat64
+	if e = s.db.QueryRow("SELECT sum(json_extract(usage,'$.provider_reported_cost_usd')) FROM planning_calls WHERE work_id=?", work).Scan(&planActual); e != nil {
+		return v, e
+	}
+	if planActual.Valid {
+		value := planActual.Float64
+		if v.ActualCost != nil {
+			value += *v.ActualCost
+		}
+		v.ActualCost = &value
+	}
+	v.ActualCostScope = "Coûts rapportés par les agents et planificateurs ; les valeurs absentes restent inconnues. Estimations partagées entre exécution, planification, assistance et préparation."
 	v.Remaining = max(0, v.Budget.Limit-v.Reserved-v.Estimated)
 	v.Warning = v.Budget.Limit > 0 && (v.Reserved+v.Estimated) >= .8*v.Budget.Limit
 	return v, nil
@@ -102,6 +119,10 @@ func (s *Store) setBudget(work string, b Budget) error {
 	return tx.Commit()
 }
 func reserveBudget(tx *sql.Tx, work, agent string) error {
+	return checkLaunchBudget(tx, work, agent, true)
+}
+
+func checkLaunchBudget(tx *sql.Tx, work, agent string, reserve bool) error {
 	var raw []byte
 	e := tx.QueryRow("SELECT body FROM budgets WHERE work_id=?", work).Scan(&raw)
 	if e == sql.ErrNoRows {
@@ -125,13 +146,20 @@ func reserveBudget(tx *sql.Tx, work, agent string) error {
 	if e = tx.QueryRow("SELECT coalesce(sum(amount),0) FROM assist_reservations WHERE work_id=? AND state IN ('reserved','estimated')", work).Scan(&assist); e != nil {
 		return e
 	}
+	planning, e := planningCommitted(tx, work)
+	if e != nil {
+		return e
+	}
 	prep, e := preparationWorkCommitted(tx, work)
 	if e != nil {
 		return e
 	}
-	committed += assist + prep
+	committed += assist + prep + planning
 	if committed+b.Reserve > b.Limit {
 		return &CommandError{Code: "budget_exhausted", Message: "Budget estimatif insuffisant : nouveaux départs suspendus ; examiner le budget."}
+	}
+	if !reserve {
+		return nil
 	}
 	_, e = tx.Exec("INSERT INTO reservations(agent_id,work_id,amount,state) VALUES(?,?,?,'reserved')", agent, work, b.Reserve)
 	return e

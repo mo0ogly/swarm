@@ -28,7 +28,28 @@ func applyTest(t *testing.T, s *Store, w Work, kind string, r Request) Work {
 	r.Revision = w.Revision
 	r.EventID = newID("e-")
 	b, _ := json.Marshal(r)
-	v, e := s.mutate(w.ID, kind, r.EventID, r.Revision, b, func(w *Work) error { return s.apply(w, kind, r) })
+	eventKind := kind
+	if current, err := s.get(w.ID); err == nil && kind == "task.add" && current.Planning != nil && current.Planning.Provider == "organization-fixture" {
+		eventKind = "planning.fixture-task"
+	}
+	v, e := s.mutate(w.ID, eventKind, r.EventID, r.Revision, b, func(w *Work) error {
+		// Explicitly delegated additions for scheduler fixtures (no planner process).
+		if kind == "task.add" && w.Planning != nil && w.Planning.Provider == "organization-fixture" {
+			plan := w.Planning
+			w.Planning = nil
+			err := s.apply(w, kind, r)
+			w.Planning = plan
+			if err != nil {
+				return err
+			}
+			task, _ := w.task(r.ID)
+			task.ScopeID = "root"
+			task.Requirements = []string{"req-1"}
+			task.ValidationPolicy = &ValidationPolicy{Mode: "human", Authorized: now(), Actor: "explicit test fixture"}
+			return nil
+		}
+		return s.apply(w, kind, r)
+	})
 	if e != nil {
 		t.Fatal(e)
 	}

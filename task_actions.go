@@ -67,6 +67,16 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 		"waived":    "Tâche acceptée par dérogation : rouvrez-la avant de relancer un agent.",
 		"abandoned": "Tâche abandonnée : rouvrez-la avant de relancer un agent.",
 	}[t.Status]
+	var lastFinished *Agent
+	for i := range agents {
+		if agents[i].TaskID == t.ID && !activeAgent(agents[i]) {
+			lastFinished = &agents[i]
+			break
+		}
+	}
+	if lastFinished != nil && requiresEnvironmentVerification(*lastFinished) {
+		startRaison = "Échec d’environnement identifié : utilisez la reprise et décrivez une vérification nouvelle des préconditions."
+	}
 	if t.Status == "running" {
 		if taskActive {
 			startRaison = "Un agent est actif sur cette tâche : attendre sa fin ou l'arrêter avant de relancer."
@@ -126,6 +136,9 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 		acceptRaison = "Examinez puis enregistrez une gate delivery avant d'accepter."
 	}
 
+	if e := s.independentReviewGuard(w, t); e != nil && t.Status == "submitted" {
+		acceptRaison = e.Error()
+	}
 	overrideRaison := ""
 	if taskActive || t.Status == "running" {
 		overrideRaison = "Arrêtez et réconciliez la tentative avant dérogation."
@@ -149,7 +162,7 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	}
 
 	actions := []TaskAction{
-		action("start", "Lancer un agent", canStart, startRaison),
+		action("start", "Lancer un agent", canStart && startRaison == "", startRaison),
 		action("retry", "Relancer une tentative", retryDispo, retryRaison),
 		action("stop", "Arrêter la tentative", stopAvailable, stopRaison),
 		action("reconcile", "Réconcilier l'état observé", taskActive, reconcileRaison),
@@ -172,6 +185,7 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 		},
 		"retry": {
 			champ("agent", "Tentative à relancer", "Reprend le fournisseur et l'espace de travail de cette tentative.", true),
+			champ("precondition_evidence", "Vérification nouvelle des préconditions", "Obligatoire après un échec d’environnement : contrôle observé des droits, du montage ou de la ressource. Ne désactivez aucune protection.", false),
 			champ("instruction", "Consigne pour l'agent", "Ajoutée au handoff de la tentative précédente.", false),
 			champ("capture", "Capture détaillée des sorties", "Désactivée par défaut : activité structurée seulement.", false),
 		},

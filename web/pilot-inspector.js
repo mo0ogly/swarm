@@ -74,7 +74,7 @@ const PilotInspector={
   }
   if(masked){body.append(node('p','Cette sélection est masquée dans le graphe ou par un filtre.','notice info'),this.action('Révéler et retirer les filtres masquants',()=>Pilot.revealSelection(),'reveal'))}
   if(a){
-   body.append(this.action(['terminal','dialogue'].includes(a.mode)?'Ouvrir la session interactive':'Ouvrir les journaux de cette session',()=>AgentTerminal.open(a),'terminal'));
+   body.append(this.action(['terminal','dialogue'].includes(a.mode)?'Ouvrir la session interactive':'Voir la session de l’agent',()=>AgentTerminal.open(a),'terminal'));
    const health=node('section',undefined,'pilot-section');health.id='pilot-current-activity';
    health.append(node('h4','Ce que fait cet agent'));
    const explanation=this.activityExplanation(a,h,uncertain);

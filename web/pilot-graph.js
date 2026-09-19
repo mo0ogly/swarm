@@ -41,6 +41,45 @@ const PilotGraph = (() => {
    x:Number.isFinite(v.x)?Math.max(0,v.x):0,y:Number.isFinite(v.y)?Math.max(0,v.y):0,
    selection:v.selection&&['task','agent','decision'].includes(v.selection.kind)&&typeof v.selection.id==='string'?v.selection:null};
  }
- return {children,visible,descendants,hiddenBelow,reveal,preferences};
+ // pilotAgents is newest-first. Keep that server contract here so every task
+ // entry opens the same, exact attempt instead of whichever card was rendered.
+ function taskSession(agents,taskID) {
+  const item=agents.find(x=>x.agent?.task_id===taskID);
+  if(!item)return null;
+  const running=['queued','starting','running','stopping'].includes(item.agent.status);
+  return {agent:item.agent,label:running?'Voir l’agent travailler':'Voir la session'};
+ }
+ function role(task,agent) {
+  const key=agent?.role||task.launch_profile?.role||task.plan_role||'';
+  const roles={planner:['◇','Planificateur','info'],subplanner:['⑂','Responsable de branche','attention'],worker:['⚙','Exécutant','info'],reviewer:['✓','Vérificateur','succes']};
+  const [icon,label,tone]=roles[key]||['?','Rôle à préciser','attention'];
+  return {icon,label,tone};
+ }
+ function guidance(task,go,validation) {
+  if(validation?.state==='accepted')return '✓ Résultat validé';
+  if(task.status==='abandoned')return 'Tâche abandonnée';
+  if(task.status==='submitted')return 'À examiner : le résultat reçu';
+  if(task.status==='blocked')return 'À résoudre : '+(task.blocker||go?.reason||'examiner la tentative');
+  if(task.status==='running')return 'Suivi : ouvrir le journal de l’agent';
+  if(validation?.state==='stale')return 'À vérifier : preuves périmées';
+  const missing=[];
+  if(!task.deliverable?.trim())missing.push('livrable');
+  if(!task.criteria?.length)missing.push('critère de réussite');
+  if(!task.next?.trim()&&!task.launch_profile?.instruction?.trim())missing.push('consigne');
+  if(missing.length)return 'À compléter : '+missing.join(', ');
+  if(go?.visible&&!go.ready)return 'En attente : '+go.reason;
+  return go?.ready?'Prête à démarrer':'Voir les conditions de la tâche';
+ }
+ function organization(work,tasks,paused=false){
+  const p=work.planning;if(!p)return {nodes:[],edges:[]};
+  const nodes=(p.scopes||[]).map(s=>({id:'@scope/'+s.id,kind:'planner',scope:s.id,tone:s.parent?'attention':'info',title:s.parent?'⑂ Sous-responsable · '+s.id:'◇ Orchestrateur · '+p.provider,description:paused||p.paused?'En pause':s.holder?'Décision en cours':s.state==='closed'?'Périmètre terminé':'Attend les retours',detail:(s.requirements||[]).length+' exigences · décide sans coder'}));
+  nodes.push({id:'@reviewer',kind:'reviewer',tone:p.reviewer?'succes':'attention',title:p.reviewer?'✓ Vérificateur IA · '+p.reviewer.provider:p.repository?'✓ Contrôleur du moteur':'! Vérificateur IA absent',description:p.reviewer?(paused?'En pause':p.reviewer.failure?'Vérification interrompue':tasks.some(t=>t.independent_review?.state==='running')?'Examen en cours':'Attend les résultats'):p.repository?'Tests et intégration Git':'À configurer',detail:p.reviewer?p.reviewer.calls+'/'+p.reviewer.max_calls+' appels · session indépendante':p.repository?'Aucune revue IA indépendante':'Aucun avis IA ne sera inventé'});
+  const ids=new Set(nodes.map(n=>n.id)),edges=[];
+  for(const s of p.scopes||[])if(s.parent&&ids.has('@scope/'+s.parent))edges.push({from:'@scope/'+s.parent,to:'@scope/'+s.id});
+  for(const t of tasks){if(ids.has('@scope/'+t.scope_id))edges.push({from:'@scope/'+t.scope_id,to:t.id});edges.push({from:t.id,to:'@reviewer'})}
+  if(!tasks.length&&ids.has('@scope/root'))edges.push({from:'@scope/root',to:'@reviewer'});
+  return {nodes,edges};
+ }
+ return {organization,role,guidance,children,visible,descendants,hiddenBelow,reveal,preferences,taskSession};
 })();
 if(typeof module!=='undefined')module.exports=PilotGraph;

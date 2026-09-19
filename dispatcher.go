@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 )
 
 // Ordonnanceur des départs. Il choisit quelles tâches prêtes partent dans les
@@ -25,21 +26,53 @@ const maxAutomaticAttempts = 2
 const costThresholdFactor = 2.0
 
 type dispatchInputs struct {
-	work      *Work
-	agents    []Agent
-	profile   *LaunchProfile
-	depsReady map[string]bool
-	priority  map[string]int
-	taskCost  map[string]CostTotal
-	reserve   float64
-	autonomy  string
-	slots     int
-	paused    bool
+	work               *Work
+	agents             []Agent
+	profile            *LaunchProfile
+	depsReady          map[string]bool
+	priority           map[string]int
+	taskCost           map[string]CostTotal
+	reserve            float64
+	autonomy           string
+	slots              int
+	paused             bool
+	occupiedWorkspaces []string
+	launchBlocked      map[string]string
+	at                 time.Time
 }
 
 type dispatchDecision struct {
-	TaskID  string
-	Profile LaunchProfile
+	TaskID             string
+	Profile            LaunchProfile
+	Previous           string
+	RecoveryCategory   string
+	CauseFingerprint   string
+	OperationID        string
+	NextEligibleAt     string
+	CorrectionFindings string
+}
+
+func automaticCorrection(t Task, a Agent) (string, string, bool) {
+	validation := t.AutoValidation
+	if a.Status != "completed" || t.Status != "blocked" || validation == nil ||
+		validation.Attempt != a.Attempt || validation.State != "blocked" ||
+		t.PlanMaxAttempts <= 0 || len(t.Attempts) >= t.PlanMaxAttempts {
+		return "", "", false
+	}
+	findings := []string{"Reçu de contrôle : " + validation.Receipt + "."}
+	fingerprintParts := []string{validation.PolicyDigest, validation.Receipt}
+	for _, control := range validation.Controls {
+		if control.Passed {
+			continue
+		}
+		finding := fmt.Sprintf("Contrôle %s en échec (code %d, sortie sha256 %s) : %s.", control.ID, control.ExitCode, control.OutputHash, control.Summary)
+		findings = append(findings, finding)
+		fingerprintParts = append(fingerprintParts, control.ID, fmt.Sprint(control.ExitCode), control.OutputHash, control.Summary)
+	}
+	if len(findings) == 1 {
+		return "", "", false
+	}
+	return strings.Join(findings, " "), hash([]byte(strings.Join(fingerprintParts, "|"))), true
 }
 
 // planDispatch rend les départs à effectuer et, quand il n'en rend aucun, le
@@ -52,11 +85,11 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 	if in.paused {
 		return nil, "Aucun départ automatique : départs suspendus par l'opérateur"
 	}
-	busy, workspaces := 0, map[string]bool{}
+	busy, workspaces := 0, append([]string{}, in.occupiedWorkspaces...)
 	for _, a := range in.agents {
 		if activeAgent(a) {
 			busy++
-			workspaces[a.CWD] = true
+			workspaces = append(workspaces, a.CWD)
 		}
 	}
 	free := in.slots - busy
@@ -64,15 +97,17 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 		return nil, fmt.Sprintf("Aucun départ automatique : %d créneau(x) occupé(s) sur %d", busy, in.slots)
 	}
 
-	failures := map[string]int{}
-	for _, a := range in.agents {
-		if a.Origin == originConductor && (a.Status == "failed" || a.Status == "interrupted") {
-			failures[a.TaskID]++
-		}
+	decisionAt := in.at
+	if decisionAt.IsZero() {
+		decisionAt = time.Now()
 	}
 	refused := map[string]bool{}
 	held := map[string]bool{}
+	latest := map[string]Agent{}
 	for _, a := range in.agents {
+		if _, seen := latest[a.TaskID]; !seen {
+			latest[a.TaskID] = a
+		}
 		if a.Status == "completed" {
 			refused[a.TaskID] = true
 		}
@@ -86,10 +121,12 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 	reasons := []string{}
 	candidates := []Task{}
 	for _, t := range in.work.Tasks {
+		last := latest[t.ID]
+		_, _, correction := automaticCorrection(t, last)
 		switch {
 		case t.Status != "todo" && t.Status != "blocked":
 			continue
-		case t.Status == "blocked" && refused[t.ID]:
+		case t.Status == "blocked" && refused[t.ID] && !correction && !t.PlanningRetry:
 			// Tentative terminée dont le handoff n'a pas pu être relayé :
 			// relancer ne produirait pas la preuve manquante.
 			continue
@@ -106,9 +143,16 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 			continue
 		case !in.depsReady[t.ID]:
 			continue
-		case failures[t.ID] >= maxAutomaticAttempts:
-			reasons = append(reasons, fmt.Sprintf("%s : %d tentatives automatiques infructueuses, décision humaine attendue", t.ID, failures[t.ID]))
+		case in.launchBlocked[t.ID] != "":
+			reasons = append(reasons, t.ID+" : "+in.launchBlocked[t.ID])
 			continue
+		}
+		if last, ok := latest[t.ID]; ok && (last.Status == "failed" || last.Status == "interrupted") {
+			recovery := assessRecovery(last, t, decisionAt)
+			if recovery.Disposition != recoveryDispositionRetry && recovery.Disposition != recoveryDispositionCorrection && !(t.PlanningRetry && !requiresEnvironmentVerification(last)) {
+				reasons = append(reasons, t.ID+" : "+recovery.Reason)
+				continue
+			}
 		}
 		if profileFor(in, t) == nil {
 			reasons = append(reasons, t.ID+" : aucun profil de lancement enregistré")
@@ -135,12 +179,41 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 			break
 		}
 		p := *profileFor(in, t)
-		if workspaces[p.Workspace] {
+		occupied := false
+		for _, workspace := range workspaces {
+			if workspaceOverlap(workspace, p.Workspace) {
+				occupied = true
+				break
+			}
+		}
+		if occupied {
 			reasons = append(reasons, t.ID+" : espace de travail déjà occupé par une tentative active")
 			continue
 		}
-		workspaces[p.Workspace] = true
-		out = append(out, dispatchDecision{TaskID: t.ID, Profile: p})
+		workspaces = append(workspaces, p.Workspace)
+		decision := dispatchDecision{TaskID: t.ID, Profile: p}
+		if last, ok := latest[t.ID]; ok && (last.Status == "failed" || last.Status == "interrupted") {
+			recovery := assessRecovery(last, t, decisionAt)
+			decision.Previous = last.ID
+			decision.RecoveryCategory = recovery.Category
+			decision.CauseFingerprint = recovery.CauseFingerprint
+			decision.OperationID = recovery.OperationID
+			if !recovery.NextEligibleAt.IsZero() {
+				decision.NextEligibleAt = recovery.NextEligibleAt.UTC().Format(time.RFC3339Nano)
+			}
+		} else if last, ok := latest[t.ID]; ok {
+			if findings, cause, correction := automaticCorrection(t, last); correction {
+				decision.Previous = last.ID
+				decision.RecoveryCategory = recoveryBusiness
+				decision.CauseFingerprint = cause
+				decision.OperationID = last.Recovery.OperationID
+				if decision.OperationID == "" {
+					decision.OperationID = last.ID
+				}
+				decision.CorrectionFindings = findings
+			}
+		}
+		out = append(out, decision)
 	}
 	if len(out) == 0 && len(reasons) == 0 {
 		reasons = append(reasons, "aucune tâche candidate")
@@ -148,12 +221,43 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 	return out, strings.Join(reasons, " ; ")
 }
 
+func workspaceOverlap(a, b string) bool {
+	a, b = strings.TrimSuffix(a, "/"), strings.TrimSuffix(b, "/")
+	return a == b || strings.HasPrefix(a, b+"/") || strings.HasPrefix(b, a+"/")
+}
+
+func (s *Store) activeWorkspaces() ([]string, error) {
+	rows, err := s.db.Query("SELECT cwd FROM agents WHERE status IN ('queued','starting','running','stopping') ORDER BY rowid")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	workspaces := []string{}
+	for rows.Next() {
+		var workspace string
+		if err := rows.Scan(&workspace); err != nil {
+			return nil, err
+		}
+		workspaces = append(workspaces, workspace)
+	}
+	return workspaces, rows.Err()
+}
+
 // Le profil de la tâche prime ; celui du travail sert de repli.
 func profileFor(in dispatchInputs, t Task) *LaunchProfile {
+	p := in.profile
 	if t.Profile != nil {
-		return t.Profile
+		p = t.Profile
 	}
-	return in.profile
+	if p == nil {
+		return nil
+	}
+	if in.work.Planning != nil && in.work.Planning.Repository != nil {
+		copy := *p
+		copy.Workspace = managedCopyPath(in.work.Planning.Repository, t.ID, len(t.Attempts)+1)
+		return &copy
+	}
+	return p
 }
 
 // Profondeur dans le graphe : une racine part avant ce qui en dépend.
@@ -190,7 +294,12 @@ func graphDepth(tasks []Task) map[string]int {
 // dispatch applique le plan : chaque départ est enregistré puis lancé. Un refus
 // du moteur (budget, workspace, révision) interrompt la série sans annuler les
 // départs déjà effectués ; il est journalisé et laissé à l'escalade.
-func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
+func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision, error) {
+	if archived, err := s.archived(work); err != nil {
+		return nil, err
+	} else if archived {
+		return nil, &CommandError{Code: "mission_archived", Message: "mission archivée ; restaurer avant de lancer le conducteur"}
+	}
 	w, e := s.get(work)
 	if e != nil {
 		return nil, e
@@ -199,9 +308,14 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 	if e != nil {
 		return nil, e
 	}
+	occupiedWorkspaces, e := s.activeWorkspaces()
+	if e != nil {
+		return nil, e
+	}
 	in := dispatchInputs{work: &w, agents: agents, profile: w.Profile,
 		autonomy: s.autonomy(work), slots: s.slots(work), paused: s.paused(work),
-		depsReady: map[string]bool{}, priority: s.priorities(work)}
+		depsReady: map[string]bool{}, priority: s.priorities(work), occupiedWorkspaces: occupiedWorkspaces,
+		launchBlocked: map[string]string{}}
 	// Le seuil s'appuie sur ce que les fournisseurs ont réellement rapporté ;
 	// sans réserve configurée, aucun plafond n'est déduit. Une lecture qui
 	// échoue n'est pas une absence de dépassement : elle désactiverait le
@@ -220,6 +334,29 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 	for i := range w.Tasks {
 		in.depsReady[w.Tasks[i].ID] = s.dependenciesReady(&w, &w.Tasks[i])
 	}
+	// Register the mission's next runnable contenders before applying global
+	// occupancy. Their AUTOINCREMENT order is the durable, cross-mission FIFO;
+	// disjoint path trees never block one another.
+	probe := in
+	probe.occupiedWorkspaces = nil
+	probe.launchBlocked = map[string]string{}
+	probe.slots = len(w.Tasks) + len(agents) + 1
+	contenders, _ := planDispatch(probe)
+	retainedTurns := map[string]bool{}
+	for _, contender := range contenders {
+		retainedTurns[contender.TaskID] = true
+		if e = s.enqueueWorkspaceTurn(work, contender.TaskID, contender.Profile.Workspace); e != nil {
+			return nil, e
+		}
+	}
+	if e = s.releaseObsoleteWorkspaceTurns(work, retainedTurns); e != nil {
+		return nil, e
+	}
+	turns, e := s.workspaceTurns()
+	if e != nil {
+		return nil, e
+	}
+	in.launchBlocked = workspaceTurnBlockers(turns, work)
 	plan, reason := planDispatch(in)
 	if len(plan) == 0 {
 		if nonempty(reason) {
@@ -237,9 +374,21 @@ func (s *Store) dispatch(work string) ([]dispatchDecision, error) {
 		if task, err := current.task(d.TaskID); err == nil && task.Profile == nil {
 			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next + "\nConsignes communes : " + p.Instruction
 		}
-		r := Launch{Schema: 1, EventID: automaticEventID(work, d.TaskID, len(agents)), Revision: current.Revision,
+		conductor := ""
+		if len(conductors) > 0 {
+			conductor = conductors[0]
+		}
+		r := Launch{Schema: 1, EventID: automaticEventID(work, d.TaskID, len(agents)), Revision: current.Revision, ConductorID: conductor,
 			TaskID: d.TaskID, Provider: p.Provider, Role: p.Role, Workspace: p.Workspace,
-			Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor}
+			Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor,
+			Previous: d.Previous, recoveryCategory: d.RecoveryCategory, recoveryCause: d.CauseFingerprint,
+			recoveryOperation: d.OperationID, recoveryNext: d.NextEligibleAt}
+		if d.Previous != "" {
+			r.Instruction += "\n" + recoveryInstruction(d.RecoveryCategory, d.OperationID, d.CauseFingerprint)
+			if d.CorrectionFindings != "" {
+				r.Instruction += " Constats objectifs à corriger : " + d.CorrectionFindings
+			}
+		}
 		a, created, e := s.prepare(work, r)
 		if e != nil {
 			_ = s.dispatchEvent(work, d.TaskID+" : départ automatique refusé — "+e.Error())
@@ -283,11 +432,21 @@ func dispatchedIDs(list []dispatchDecision) []string {
 	return out
 }
 
-// dispatchAfterSettle relance l'ordonnanceur après la fin d'une tentative : le
-// créneau libéré doit servir sans attendre une action humaine. Un échec
-// d'ordonnancement n'échoue jamais la fin de la tentative.
+// dispatchAfterSettle persists the wake-up, then tries a short-lived ownership
+// claim for backward-compatible immediate chaining. If a durable conductor is
+// already active, it alone observes the occupancy change on its next bounded
+// poll. Thus the supervisor never bypasses lease ownership.
 func (s *Store) dispatchAfterSettle(work string) {
-	_, _ = s.dispatch(work)
+	_ = s.controlEvent(work, "resource-released", "Une tentative a libéré ses ressources ; réévaluation automatique par le conducteur")
+	conductor := newID("release-conductor-")
+	owned, err := s.claimMissionSupervision(work, conductor, "libération de ressource", time.Now())
+	if err != nil || !owned {
+		return
+	}
+	defer s.stopMissionSupervision(work, conductor, time.Now())
+	_ = s.recordCoordinationEvent("lease:"+work+":"+conductor, work, "", conductor,
+		"lease-acquired", "Possession éphémère acquise après libération d’une ressource")
+	_, _ = s.dispatch(work, conductor)
 }
 
 // setProfile enregistre un profil de lancement sans lancer : un plan complet

@@ -127,6 +127,41 @@ func (s *Store) export(id, dest string) error {
 		}
 	}
 
+	// Structured handoffs retain their exact evidence, even without a gate.
+	if w.Planning != nil {
+		for _, event := range w.Planning.Inbox {
+			for _, artifact := range event.Artifacts {
+				if prior, ok := data[artifact.Path]; ok {
+					if hash(prior) != artifact.SHA256 {
+						return fmt.Errorf("preuve de remise incompatible : %s", artifact.Path)
+					}
+					continue
+				}
+				path, err := localFile(s.root, artifact.Path)
+				if err != nil {
+					bundle.Missing = append(bundle.Missing, artifact.Path)
+					continue
+				}
+				st, err := os.Stat(path)
+				if err != nil {
+					return err
+				}
+				if st.Size() > archiveLimit-int64(total) {
+					return fmt.Errorf("export supérieur à 128 Mio")
+				}
+				b, err := os.ReadFile(path)
+				if err != nil {
+					return err
+				}
+				if hash(b) != artifact.SHA256 {
+					return fmt.Errorf("preuve de remise modifiée : %s", artifact.Path)
+				}
+				total += len(b)
+				data[artifact.Path] = b
+				bundle.Files[artifact.Path] = hash(b)
+			}
+		}
+	}
 	// Explicit memory references are portable archival pieces too.
 	for _, name := range w.Memory {
 		if _, ok := data[name]; ok {
@@ -261,6 +296,9 @@ func (s *Store) importBundle(path string) (Work, error) {
 		if t.Status == "running" && len(t.Attempts) == 0 {
 			return zero, fmt.Errorf("tentative absente")
 		}
+	}
+	if e = validatePlanningState(&w); e != nil {
+		return zero, e
 	}
 	if e = validateTaskGraph(w.Tasks); e != nil {
 		return zero, e

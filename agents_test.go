@@ -29,6 +29,7 @@ func TestProviderHelper(t *testing.T) {
 	fmt.Println("HANDOFF: observed fixture only")
 	os.Exit(0)
 }
+
 func setupAgent(t *testing.T, s *Store) (Work, Launch) {
 	t.Helper()
 	w := taskTest(t, s, createTest(t, s))

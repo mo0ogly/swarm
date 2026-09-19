@@ -81,8 +81,10 @@ print(json.dumps({"type":"user","message":{"content":[{"type":"tool_result","too
   snapshots['terminal-theme-initial']=current.decode(errors='replace')
   send(b't');expect('Entrée actions');snapshots['terminal-theme-alternate']=current.decode(errors='replace')
   send(b't');expect('Entrée actions')
-  send(b'?');expect('AIDE · PARCOURS');expect('SE REPÉRER');snapshots['help-dark']=current.decode(errors='replace')
-  for _ in range(8):send(b'\x1b[B')
+  send(b'?');expect('AIDE · PARCOURS');expect('PILOTER LE TRAVAIL');snapshots['help-dark']=current.decode(errors='replace')
+  for _ in range(50):
+   if 'TERMINÉ'.encode() in current:break
+   send(b'\x1b[B');drain(.15)
   expect('TERMINÉ');send(b'\x1b');time.sleep(.15);drain();expect('Entrée actions')
   send(b't');expect('Entrée actions');send(b'\x1bOP');expect('AIDE · PARCOURS');snapshots['help-light']=current.decode(errors='replace');send(b'\r');expect('Entrée actions');send(b't');expect('Entrée actions')
   fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',30,100,0,0));os.kill(proc.pid,signal.SIGWINCH);time.sleep(.15);drain();assert proc.poll() is None

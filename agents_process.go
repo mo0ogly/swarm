@@ -96,6 +96,8 @@ func providerEnvironment(allow []string) []string {
 const maxProviderEventBytes = 1 << 20
 
 type outputSink struct {
+	publicBytes      int
+	publicLimited    bool
 	collectReply     bool
 	reply            string
 	usage            *Usage
@@ -153,6 +155,18 @@ func (w *outputSink) line(line []byte) {
 		w.visibilityLost("Événement JSON illisible ; chronométrage par outil suspendu")
 	}
 	if decodeErr == nil {
+		for _, message := range publicAgentMessages(data) {
+			message = boundedLogMessage(message)
+			if w.publicBytes+len(message) > 1<<20 {
+				if !w.publicLimited {
+					w.logs = append(w.logs, AgentLog{AgentID: w.id, At: now(), Kind: "output-limit", Message: "Messages limités à 1 Mio ; le suivi des actions continue"})
+					w.publicLimited = true
+				}
+				continue
+			}
+			w.publicBytes += len(message)
+			w.logs = append(w.logs, AgentLog{AgentID: w.id, At: now(), Kind: "message", Message: message})
+		}
 		if w.collectReply {
 			if reply := providerReply(data); reply != "" {
 				w.reply = reply
@@ -217,6 +231,18 @@ func (w *outputSink) progress() AgentProgress {
 		return AgentProgress{}
 	}
 	return w.guard.summary()
+}
+func (w *outputSink) diagnostic(agent, attempt string, stopReason ...string) AttemptDiagnostic {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.guard == nil {
+		return AttemptDiagnostic{}
+	}
+	reason := ""
+	if len(stopReason) > 0 {
+		reason = stopReason[0]
+	}
+	return w.guard.diagnostic(agent, attempt, reason)
 }
 func (w *outputSink) visibilityLost(reason string) {
 	if w.guard != nil {
@@ -355,6 +381,7 @@ func (s *Store) supervise(id string) error {
 				}
 			}
 			a.Progress = sink.progress()
+			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt, reason)
 			a.Usage = sink.usageSnapshot()
 			a.Reply = sink.replySnapshot()
 			code := cmd.ProcessState.ExitCode()
@@ -395,6 +422,7 @@ func (s *Store) supervise(id string) error {
 				a.Activity = sink.current()
 			}
 			a.Progress = sink.progress()
+			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt)
 			a.Usage = sink.usageSnapshot()
 			a.Reply = sink.replySnapshot()
 			a.Heartbeat = now()
@@ -470,6 +498,9 @@ func (s *Store) initProviders() error {
 		if e != nil {
 			return e
 		}
+		// Les CLI connues n'offrent pas actuellement de sonde déterministe de
+		// leur sandbox effectif. Le profil reste compatible mais explicitement
+		// non vérifié jusqu'à configuration d'un adaptateur provider-context.
 		p.Providers[name] = Provider{Command: command, Args: args, Env: []string{}}
 	}
 	b, _ := json.MarshalIndent(p, "", "  ")

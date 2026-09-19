@@ -19,7 +19,7 @@ func (r Request) MarshalJSON() ([]byte, error) {
 
 // Definition edits change the contract that gates validate, unlike owner/next edits.
 func (r Request) editsDefinition() bool {
-	return r.Title != "" || r.Deliverable != "" || r.Criteria != nil || r.Depends != nil || r.MaxAttempts != 0 || r.MaxToolCalls != 0
+	return r.Title != "" || r.Deliverable != "" || r.Criteria != nil || r.Depends != nil || r.MaxAttempts != 0 || r.MaxToolCalls != 0 || r.ValidationPolicy != nil
 }
 
 func updateTaskDefinition(w *Work, t *Task, r Request) error {
@@ -35,6 +35,15 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 		}
 	}
 	next := *t
+	if r.ValidationPolicy != nil {
+		policy, err := normalizeValidationPolicy(*r.ValidationPolicy)
+		if err != nil {
+			return err
+		}
+		policy.Authorized = now()
+		policy.Actor = operatorIdentity()
+		next.ValidationPolicy = &policy
+	}
 	if r.MaxAttempts != 0 {
 		if r.MaxAttempts < 1 || r.MaxAttempts > 3 {
 			return fmt.Errorf("max_attempts : 1 à 3 requis")
@@ -73,6 +82,11 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 	if r.Depends != nil {
 		next.Depends = append([]string{}, r.Depends...)
 	}
+	if next.ValidationPolicy != nil {
+		if err := validationPolicyCoversTask(*next.ValidationPolicy, &next); err != nil {
+			return fmt.Errorf("validation_policy : %w", err)
+		}
+	}
 	// Validate the entire resulting graph before touching the task.
 	state := map[string]int{}
 	var visit func(string) error
@@ -109,10 +123,11 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 			return e
 		}
 	}
-	if next.Title == t.Title && next.Deliverable == t.Deliverable && reflect.DeepEqual(next.Criteria, t.Criteria) && reflect.DeepEqual(next.Depends, t.Depends) && next.PlanMaxAttempts == t.PlanMaxAttempts && next.PlanToolLimit == t.PlanToolLimit {
+	if next.Title == t.Title && next.Deliverable == t.Deliverable && reflect.DeepEqual(next.Criteria, t.Criteria) && reflect.DeepEqual(next.Depends, t.Depends) && next.PlanMaxAttempts == t.PlanMaxAttempts && next.PlanToolLimit == t.PlanToolLimit && reflect.DeepEqual(next.ValidationPolicy, t.ValidationPolicy) {
 		return nil
 	}
 	next.Gate = nil
+	next.AutoValidation = nil
 	next.Override = nil
 	next.Revalidation = nil
 	if next.PlanChecks != nil || r.Criteria != nil {

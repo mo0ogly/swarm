@@ -40,6 +40,9 @@ var modelLevels = []string{"simple", "standard", "exigeant"}
 var modelName = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._:/-]{0,159}$`)
 
 func providerAdapter(p Provider) string {
+	if p.APIConnectionID != "" {
+		return "api"
+	}
 	switch filepath.Base(p.Command) {
 	case "codex":
 		return "codex"
@@ -122,6 +125,10 @@ func effectiveModelPolicy(p Provider) *ModelPolicy {
 		policy.Levels = map[string]ModelChoice{"simple": {Model: "gpt-5.6-luna", Effort: "low"}, "standard": {Model: "gpt-5.6-sol", Effort: "medium"}, "exigeant": {Model: "gpt-6-astra", Effort: "high"}}
 	case "claude":
 		policy.Levels = map[string]ModelChoice{"simple": {Model: "haiku"}, "standard": {Model: "sonnet"}, "exigeant": {Model: "opus"}}
+	case "api":
+		for _, level := range modelLevels {
+			policy.Levels[level] = ModelChoice{Model: configuredModel(p)}
+		}
 	case "skynet":
 		policy.Billing = "on_premise"
 		for _, level := range modelLevels {

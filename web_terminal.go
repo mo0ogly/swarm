@@ -66,7 +66,7 @@ func (s *Store) registerTerminals(mux *http.ServeMux, send func(http.ResponseWri
 			fail(w, e)
 			return
 		}
-		send(w, map[string]any{"agent": a.ID, "mode": a.Mode, "status": a.Status, "desired": a.Desired, "events": events, "monitoring": agentMonitoring(a), "progress": a.Progress, "health": pilotAgentHealth(a, a.Desired, now()), "usage": a.Usage})
+		send(w, map[string]any{"agent": a.ID, "mode": a.Mode, "status": a.Status, "desired": a.Desired, "events": events, "monitoring": agentMonitoring(a), "progress": a.Progress, "health": pilotAgentHealth(a, a.Desired, now()), "usage": a.Usage, "capture": a.Capture})
 	})
 	mux.HandleFunc("/api/v1/terminal/control", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {

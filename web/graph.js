@@ -79,8 +79,9 @@ function drawPilotGraph(){
  const kept=tasks.filter(t=>(state.search.trim()||shown.has(t.id))&&(Pilot.matches(t,null)||snapshot.agents.some(x=>x.agent.task_id===t.id&&Pilot.matches(t,x.agent))));
  const ids=new Set(kept.map(t=>t.id));
  const links=(snapshot.pilotage?.edges||[]).filter(e=>ids.has(e.from_task_id)&&ids.has(e.to_task_id)&&!state.collapsed.includes(e.from_task_id));
- const shape=JSON.stringify([work,kept.map(t=>[t.id,t.depends]),links.map(e=>[e.from_task_id,e.to_task_id]),state.orientation,state.detail,state.collapsed]);
- const height=state.detail==='detailed'?262:148,width=280;
+ const organization=PilotGraph.organization(snapshot.work,kept,snapshot.paused);
+ const shape=JSON.stringify([work,organization.nodes.map(n=>[n.id,n.title,n.tone]),organization.edges,kept.map(t=>[t.id,t.depends]),links.map(e=>[e.from_task_id,e.to_task_id]),state.orientation,state.detail,state.collapsed]);
+ const height=state.detail==='detailed'?300:186,width=310;
  if(shape!==Pilot.graphKey){
   Pilot.graphKey=shape;
   const focus=document.activeElement?.dataset.task,foldFocus=document.activeElement?.classList.contains('graph-fold'),goFocus=document.activeElement?.classList.contains('graph-go');
@@ -88,15 +89,17 @@ function drawPilotGraph(){
   const g=new dagre.graphlib.Graph();g.setGraph({rankdir:state.orientation,nodesep:28,ranksep:70,marginx:20,marginy:20});g.setDefaultEdgeLabel(()=>({}));
   for(const t of kept)g.setNode(t.id,{width,height});
   for(const e of links)g.setEdge(e.from_task_id,e.to_task_id);
+  for(const n of organization.nodes)g.setNode(n.id,{width,height:130});
+  for(const e of organization.edges)g.setEdge(e.from,e.to);
   dagre.layout(g);
   // Independent tasks have no ranks: respect the explicitly chosen orientation.
-  if(!links.length)kept.forEach((t,i)=>g.setNode(t.id,{width,height,x:20+width/2+(state.orientation==='LR'?i*(width+28):0),y:20+height/2+(state.orientation==='TB'?i*(height+28):0)}));
-  const totalWidth=links.length?g.graph().width:state.orientation==='LR'?kept.length*(width+28)+12:width+40;
-  const totalHeight=links.length?g.graph().height:state.orientation==='TB'?kept.length*(height+28)+12:height+40;
+  if(!links.length&&!organization.nodes.length)kept.forEach((t,i)=>g.setNode(t.id,{width,height,x:20+width/2+(state.orientation==='LR'?i*(width+28):0),y:20+height/2+(state.orientation==='TB'?i*(height+28):0)}));
+  const totalWidth=links.length||organization.nodes.length?g.graph().width:state.orientation==='LR'?kept.length*(width+28)+12:width+40;
+  const totalHeight=links.length||organization.nodes.length?g.graph().height:state.orientation==='TB'?kept.length*(height+28)+12:height+40;
   const svg=svgNode('svg',{viewBox:'0 0 '+Math.max(1,totalWidth)+' '+Math.max(1,totalHeight),class:'graph-svg',role:'group','aria-label':'Dépendances : du prérequis vers la tâche'});
   svg.dataset.width=Math.max(1,totalWidth);svg.dataset.height=Math.max(1,totalHeight);
   const defs=svgNode('defs',{});
-  for(const [id,cls]of [['pilot-arrow','graph-fleche'],['pilot-arrow-ok','graph-fleche-ok']]){
+  for(const [id,cls]of [['pilot-arrow','graph-fleche'],['pilot-arrow-ok','graph-fleche-ok'],['pilot-arrow-role','graph-fleche-role']]){
    const marker=svgNode('marker',{id,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:7,markerHeight:7,orient:'auto'});
    marker.append(svgNode('path',{d:'M0,0 L8,4 L0,8 z',class:cls}));defs.append(marker);
   }
@@ -106,21 +109,30 @@ function drawPilotGraph(){
    const edge=svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-arete'});
    edge.dataset.from=e.from_task_id;edge.dataset.to=e.to_task_id;svg.append(edge);
   }
+  for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
+  for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-65;
+   const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;
+   group.append(svgNode('rect',{x:left,y:top,width,height:130,rx:12}));
+   for(let i=0;i<4;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
+   const open=()=>Planning.inspectRole(n.kind);group.addEventListener('click',e=>{if(e.isTrusted)open()});group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});svg.append(group);
+  }
   const children=PilotGraph.children(tasks);
   for(const t of kept){
    const n=g.node(t.id),left=n.x-width/2,top=n.y-height/2;
    const group=svgNode('g',{class:'graph-noeud',tabindex:0,role:'button','aria-label':t.title+' — examiner la tâche'});
    group.dataset.task=t.id;
    group.append(svgNode('rect',{x:left,y:top,width,height,rx:12,class:'graph-cadre'}));
-   for(let line=0;line<(state.detail==='detailed'?8:3);line++)group.append(svgNode('text',{x:left+14,y:top+24+line*19,class:line===0?'graph-titre':line===1?'graph-sous-titre':'graph-agent','data-line':line}));
+   group.append(svgNode('rect',{x:left+10,y:top+48,width:width-20,height:20,rx:4,class:'graph-role-surface'}));
+   for(let line=0;line<(state.detail==='detailed'?10:5);line++)group.append(svgNode('text',{x:left+14,y:top+24+line*19,class:line===0?'graph-titre':line===1?'graph-sous-titre':'graph-agent','data-line':line}));
    const open=()=>Pilot.inspect('task',t.id);
    group.addEventListener('click',e=>{if(e.isTrusted)open()});
    group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});
    svg.append(group);
    const go=svgNode('g',{class:'graph-go',tabindex:0,role:'button'});go.dataset.task=t.id;
    go.append(svgNode('rect',{x:left+12,y:top+height-62,width:width-24,height:26,rx:5}),svgNode('text',{x:left+20,y:top+height-44}),svgNode('title',{}));
-   go.addEventListener('click',e=>{if(e.isTrusted)Pilot.go(t.id)});
-   go.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();Pilot.go(t.id)}});svg.append(go);
+   const openSessionOrLaunch=()=>{const session=PilotGraph.taskSession(snapshot.agents,t.id);if(session)AgentTerminal.open(session.agent);else Pilot.go(t.id)};
+   go.addEventListener('click',e=>{if(e.isTrusted)openSessionOrLaunch()});
+   go.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();openSessionOrLaunch()}});svg.append(go);
 
    if(children.get(t.id)?.length){
     const closed=state.collapsed.includes(t.id),fold=svgNode('g',{class:'graph-fold',tabindex:0,role:'button','aria-expanded':String(!closed),'aria-label':(closed?'Déplier':'Replier')+' la branche '+t.title});
@@ -138,6 +150,7 @@ function drawPilotGraph(){
  }
  const svg=canvas.querySelector('svg');if(!svg)return;
  scalePilotGraph(svg,state.zoom);
+ for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=[n.title,n.description,n.detail,'Ouvrir les décisions et avis'];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
  const byTask=graphAgentsParTache();
  for(const group of canvas.querySelectorAll('.graph-noeud')){
   const t=tasks.find(t=>t.id===group.dataset.task),v=snapshot.validation?.tasks[t.id],agent=byTask[t.id]?.[0]?.agent;
@@ -145,6 +158,11 @@ function drawPilotGraph(){
   group.dataset.etat=uncertain?'attention':graphTonalites[v?.state||t.status]||'neutre';
   group.dataset.selected=String(Pilot.selectedTask()===t.id);
   const lines=[t.title,uncertain||labels[v?.state||t.status]||t.status,agent?agent.provider+' · '+(uncertain?(snapshot.pilotage?.health[agent.id]?.stop_requested?'Arrêt demandé':'Activité non confirmée'):agent.progress?.detail||agent.progress?.action||'Activité non reçue'):t.id];
+  const role=PilotGraph.role(t,agent);
+  group.querySelector('.graph-role-surface').dataset.tone=role.tone;
+  lines.splice(2,0,role.icon+' '+role.label);
+  lines.push(PilotGraph.guidance(t,Pilot.goState(t),v));
+  group.setAttribute('aria-label',lines.join('. ')+' — examiner la tâche');
   if(state.detail==='detailed'){
    lines.push(agent?(agent.progress?.tool_calls||0)+' appels · '+(agent.progress?.tool_results||0)+' résultats':(t.depends||[]).length+' prérequis');
    lines.push(agent?snapshot.pilotage?.health[agent.id]?.process_label||'Observation inconnue':t.blocker||'');
@@ -152,10 +170,13 @@ function drawPilotGraph(){
    lines.push(agent&&typeof agent.usage?.provider_reported_cost_usd==='number'?'coût rapporté : '+agent.usage.provider_reported_cost_usd.toFixed(2)+' USD':agent?'coût : non rapporté':'');
    lines.push(graphCoutTache(t.id));
   }
-  for(const text of group.querySelectorAll('[data-line]')){const value=lines[Number(text.dataset.line)]||'';text.setAttribute('aria-label',value);const shortened=value.length>37?value.slice(0,36)+'…':value;if(text.textContent!==shortened)text.textContent=shortened}
+  for(const text of group.querySelectorAll('[data-line]')){const value=lines[Number(text.dataset.line)]||'';text.setAttribute('aria-label',value);text.classList.toggle('graph-role',text.dataset.line==='2');if(text.dataset.line==='2')text.dataset.tone=role.tone;const shortened=value.length>41?value.slice(0,40)+'…':value;if(text.firstChild?.nodeValue!==shortened){text.replaceChildren(document.createTextNode(shortened),svgNode('title',{},value))}}
  }
  for(const button of canvas.querySelectorAll('.graph-go')){
-  const t=tasks.find(t=>t.id===button.dataset.task),go=Pilot.goState(t),label=go.ready?'Go — lancer':'Voir le blocage';button.style.display=go.visible?'':'none';button.dataset.ready=String(go.ready);button.setAttribute('aria-label',label+' : '+t.title+(go.ready?'':'. '+go.reason));if(button.querySelector('text').textContent!==label)button.querySelector('text').textContent=label;button.querySelector('title').textContent=go.ready?'Configurer et confirmer le lancement':go.reason;
+  const t=tasks.find(t=>t.id===button.dataset.task),go=Pilot.goState(t),session=PilotGraph.taskSession(snapshot.agents,t.id);
+  if(session){button.style.display='';button.dataset.ready='true';button.dataset.taskSession=t.id;button.dataset.sessionLocation='graph';button.dataset.agentSession=session.agent.id;button.setAttribute('aria-label',session.label+' : '+t.title);button.querySelector('text').textContent=session.label;button.querySelector('title').textContent='Ouvrir la dernière tentative de cette tâche';continue}
+  delete button.dataset.taskSession;delete button.dataset.agentSession;delete button.dataset.sessionLocation;
+  const label=go.ready?'Go — lancer':'Voir le blocage';button.style.display=go.visible?'':'none';button.dataset.ready=String(go.ready);button.setAttribute('aria-label',label+' : '+t.title+(go.ready?'':'. '+go.reason));if(button.querySelector('text').textContent!==label)button.querySelector('text').textContent=label;button.querySelector('title').textContent=go.ready?'Configurer et confirmer le lancement':go.reason;
  }
  for(const fold of canvas.querySelectorAll('.graph-fold')){
   const id=fold.dataset.task,closed=state.collapsed.includes(id),hidden=PilotGraph.hiddenBelow(tasks,id,state.collapsed);

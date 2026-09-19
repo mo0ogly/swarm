@@ -129,3 +129,25 @@
 .pilot-go-reason{color:var(--wattson-texte-discret);font-size:13px}
 
 #batch-results{grid-column:1 / -1}
+
+/* Roles retain labels: color is never the only signal. */
+.pilot-card{border-inline-start-width:4px}
+.pilot-card[data-state=running]{border-color:var(--wattson-info-encre)}
+.pilot-card[data-state=blocked]{border-color:var(--wattson-alerte-encre)}
+.pilot-card[data-state=submitted],.pilot-card[data-state=stale]{border-color:var(--wattson-attention-encre)}
+.pilot-card[data-state=accepted]{border-color:var(--wattson-succes-encre)}
+.pilot-card .pilot-role{display:inline-block;padding:4px 8px;border-radius:6px;font-weight:700;font-size:12px}
+.pilot-role[data-tone=info]{background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.pilot-role[data-tone=attention]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre)}
+.pilot-role[data-tone=succes]{background:var(--wattson-succes-fond);color:var(--wattson-succes-encre)}
+.pilot-guidance{font-weight:600}
+.graph-role{font-weight:700}
+
+.graph-role-surface[data-tone=info]{fill:var(--wattson-info-fond)}
+.graph-noeud .graph-role[data-tone=info]{fill:var(--wattson-info-encre)}
+
+.graph-role-surface[data-tone=attention]{fill:var(--wattson-attention-fond)}
+.graph-noeud .graph-role[data-tone=attention]{fill:var(--wattson-attention-encre)}
+
+.graph-role-surface[data-tone=succes]{fill:var(--wattson-succes-fond)}
+.graph-noeud .graph-role[data-tone=succes]{fill:var(--wattson-succes-encre)}

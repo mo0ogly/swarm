@@ -5,8 +5,9 @@ package main
 import "fmt"
 
 // Niveau d'autonomie d'un travail. Il décide de ce que le moteur fait sans
-// demander, jamais de ce qu'il accepte : aucun niveau n'accepte une tâche,
-// n'accorde une dérogation ni ne fait passer une gate.
+// demander. Une acceptation automatique exige en plus une politique de
+// validation propre à la tâche, explicitement enregistrée par l'opérateur ;
+// aucun niveau d'autonomie ne suffit à lui seul.
 //
 //	manuel   — l'opérateur lance et relaie
 //	assisté  — le handoff prouvé est relayé, les départs restent humains
@@ -59,6 +60,11 @@ func (s *Store) setAutonomy(work, level string, slots int) error {
 		return e
 	}
 	defer tx.Rollback()
+	if level == autonomyAuto {
+		if e := organizationGuardTx(tx, work); e != nil {
+			return e
+		}
+	}
 	if _, e = tx.Exec("INSERT INTO cockpit_controls(work_id,autonomy,slots) VALUES(?,?,?) ON CONFLICT(work_id) DO UPDATE SET autonomy=excluded.autonomy, slots=excluded.slots", work, level, slots); e != nil {
 		return e
 	}

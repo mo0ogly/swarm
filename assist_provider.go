@@ -19,6 +19,9 @@ func assistantProvider(p Provider) (Provider, error) {
 	if e != nil || !info.Mode().IsRegular() || info.Mode()&0111 == 0 {
 		return p, fmt.Errorf("Exécutable du fournisseur indisponible.")
 	}
+	if p.APIConnectionID != "" {
+		return p, nil
+	}
 	model := ""
 	for i := 0; i < len(p.Args)-1; i++ {
 		if p.Args[i] == "--model" || p.Args[i] == "-m" {

@@ -94,3 +94,7 @@ dialog { width:min(760px,calc(100% - 2rem)); max-height:90vh; padding:0; backgro
 #budget-form > header,#budget-form > footer { flex-shrink:0; }
 html[data-theme="sombre"] { color-scheme:dark; }
 html[data-theme="etat"] { color-scheme:light; }
+
+.mission-edit{background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);padding:1rem;margin-block:1rem;border-radius:.5rem}.mission-edit fieldset{border:1px solid var(--wattson-ligne)}.mission-edit input[type="checkbox"]{width:auto;margin-inline-end:.5rem}
+
+#missions-dialog[open]{display:flex;flex-direction:column}#missions-form{display:flex;flex-direction:column;min-height:0}#missions-form>section{overflow:auto;min-height:0}#missions-form>header,#missions-form>footer{flex-shrink:0}#missions-error:empty{display:none}

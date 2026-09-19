@@ -82,6 +82,16 @@ func (s *Store) runPreparationTurnWithin(t PreparationTurn, deadline time.Durati
 		fail(e.Error())
 		return
 	}
+	// Apply the persisted route after stripping tool/permission arguments.
+	if t.ModelRoute != nil {
+		p = applyModelRoute(p, t.ModelRoute)
+	} else {
+		p, _, e = resolveModel(p, "auto", "preparation")
+		if e != nil {
+			fail(e.Error())
+			return
+		}
+	}
 	dir, e := os.MkdirTemp("", "swarm-preparation-")
 	if e != nil {
 		fail("Répertoire isolé indisponible.")

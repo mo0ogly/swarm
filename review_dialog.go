@@ -191,7 +191,7 @@ func (s *Store) submitReportVerified(work, id, report string, expected int, orig
 			)
 		}
 		var reportBytes []byte
-		if digest != "" || t.Revalidation != nil {
+		if digest != "" || t.Revalidation != nil || origin == conductorAuthor {
 			bytes, err := os.ReadFile(path)
 			if err != nil {
 				return err
@@ -210,6 +210,32 @@ func (s *Store) submitReportVerified(work, id, report string, expected int, orig
 			}
 			t.Revalidation.Report = report
 			t.Revalidation.ReportHash = digest
+		}
+		// A conductor relays the completed production attempt; it does not
+		// create a synthetic attempt merely to submit its report.
+		if origin == conductorAuthor {
+			if t.Status != "blocked" || len(t.Attempts) == 0 || t.Attempts[len(t.Attempts)-1].Status != "completed" {
+				return fmt.Errorf("relais sans tentative terminée courante")
+			}
+			if w.Planning != nil && w.Planning.Repository == nil {
+				attempt := t.Attempts[len(t.Attempts)-1].ID
+				exists := false
+				for _, event := range w.Planning.Inbox {
+					if event.Kind == "handoff" && event.Attempt == attempt {
+						exists = true
+					}
+				}
+				if !exists {
+					scope, err := w.Planning.scope(t.ScopeID)
+					if err != nil {
+						return err
+					}
+					scope.State = "ready"
+					w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: planningEventID("report", id, attempt), Scope: scope.ID, Kind: "handoff", Task: id, Attempt: attempt, Message: "Rapport remis automatiquement après fin normale. Examiner les preuves et limites ; résultat non validé.", Artifacts: []ExchangeArtifact{{Path: report, SHA256: hash(reportBytes)}}, At: now()})
+				}
+			}
+			t.Status, t.Blocker, t.Next = "submitted", "", r.Next
+			return nil
 		}
 		if e = s.apply(w, "task.update", Request{ID: id, Status: "running", Origin: origin, Next: "Handoff examiné : " + report}); e != nil {
 			return e

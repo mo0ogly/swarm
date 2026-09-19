@@ -28,6 +28,75 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return ""
 	}
 	switch pos[0] {
+	case "workspace":
+		switch arg(1) {
+		case "status":
+			turns, e := s.workspaceTurns()
+			if e != nil {
+				return e
+			}
+			integrations, e := s.workspaceIntegrationReceipts(arg(2))
+			if e != nil {
+				return e
+			}
+			return printJSON(out, map[string]any{"turns": turns, "integrations": integrations,
+				"managed_worktrees": false, "integration_mode": "serialized_explicit"})
+		case "integrate":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var request IntegrationRequest
+			if e = strict(b, &request); e != nil {
+				return e
+			}
+			receipt, created, e := s.integrateWorkspace(arg(2), request)
+			if e != nil {
+				return e
+			}
+			return printJSON(out, map[string]any{"receipt": receipt, "created": created})
+		default:
+			return fmt.Errorf("usage : workspace status WORK | workspace integrate WORK --input manifeste.json")
+		}
+	case "exchange":
+		switch arg(1) {
+		case "list":
+			exchanges, e := s.agentExchanges(arg(2))
+			if e != nil {
+				return e
+			}
+			return printJSON(out, exchanges)
+		case "send":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var request ExchangeSend
+			if e = strict(b, &request); e != nil {
+				return e
+			}
+			exchange, created, e := s.sendExchange(arg(2), request)
+			if e != nil {
+				return e
+			}
+			return printJSON(out, map[string]any{"exchange": exchange, "created": created})
+		case "consume":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var request ExchangeConsume
+			if e = strict(b, &request); e != nil {
+				return e
+			}
+			exchange, consumed, e := s.consumeExchange(arg(2), request)
+			if e != nil {
+				return e
+			}
+			return printJSON(out, map[string]any{"exchange": exchange, "consumed": consumed})
+		default:
+			return fmt.Errorf("usage : exchange list|send|consume WORK [--input requête.json]")
+		}
 	case "control":
 		b, e := readInput(input)
 		if e != nil {
@@ -146,6 +215,17 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, p)
 	case "agent":
 		switch arg(1) {
+		case "preflight":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var r Launch
+			if e = strict(b, &r); e != nil {
+				return e
+			}
+			result, _ := s.preflightLaunch(arg(2), r)
+			return printJSON(out, result)
 		case "attach":
 			if asJSON {
 				return fmt.Errorf("agent attach est interactif ; retirer --json")

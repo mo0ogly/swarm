@@ -400,6 +400,9 @@ func (s *Store) acceptedFresh(w *Work, t *Task, seen map[string]bool) bool {
 
 // Memoization is local to one traversal: never retained across filesystem checks.
 func (s *Store) acceptedFreshMemo(w *Work, t *Task, seen, memo map[string]bool) bool {
+	if t != nil && s.independentReviewGuard(w, t) != nil {
+		return false
+	}
 	if t == nil || seen[t.ID] {
 		return false
 	}

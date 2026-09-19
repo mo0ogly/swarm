@@ -214,14 +214,29 @@ func (s *Store) preparationCommand(r PreparationRequest) (p Preparation, err err
 			if !preparationBriefCurrent(p) {
 				return p, preparationError("stale_brief", "Brief à réadopter avant utilisation du plan.")
 			}
-			if _, err := parseActionPlan(t.Answer.Plan); err != nil {
+			proposal, err := parseActionPlan(t.Answer.Plan)
+			if err != nil {
 				return p, preparationError("invalid_plan", err.Error())
 			}
+			var prior ActionPlan
+			if strict([]byte(p.Documents["plan"].Text), &prior) == nil {
+				for i := range proposal.Questions {
+					for _, known := range prior.Questions {
+						if known.Question == proposal.Questions[i].Question && nonempty(known.Answer) {
+							proposal.Questions[i].Answer = known.Answer
+						}
+					}
+				}
+			}
+			saved, err := json.Marshal(proposal)
+			if err != nil {
+				return p, err
+			}
 			edit.Document = "plan"
-			edit.Text = t.Answer.Plan
+			edit.Text = string(saved)
 		}
 	}
-	if r.Action == "create-missions" || r.Action == "release-plan" {
+	if r.Action == "create-missions" || r.Action == "revise-missions" || r.Action == "release-plan" {
 		if e = s.convertPreparation(tx, &p, r); e != nil {
 			return p, e
 		}

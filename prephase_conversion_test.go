@@ -54,7 +54,7 @@ func TestPreparationConversionAtomicLocksRelease(t *testing.T) {
 	if e := s.setProfile(existing.ID, "", LaunchProfile{Provider: "fixture", Role: "worker", Workspace: s.root}, existing.Revision); e != nil {
 		t.Fatal(e)
 	}
-	if e := s.setAutonomy(existing.ID, autonomyAuto, 2); e != nil {
+	if e := s.setAutonomy(existing.ID, autonomyAssisted, 2); e != nil {
 		t.Fatal(e)
 	}
 	p := readyPreparation(t, s, existing.ID)

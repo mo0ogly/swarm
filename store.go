@@ -194,6 +194,66 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	if version < 12 {
+		if e = migrateMissionSupervision(db); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 13 {
+		if e = migrateLifecycle(db); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 14 {
+		if e = migrateDurableCoordinator(db); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 15 {
+		if e = migrateAgentExchanges(db); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 16 {
+		if e = migrateWorkspaceCoordination(db); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 17 {
+		if e = migrateExchangeAcknowledgements(db); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 18 {
+		if version != 0 {
+			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v18-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=18"); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 19 {
+		if version != 0 {
+			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v19-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(planningRuntimeMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 20 {
+		if version != 0 {
+			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v20-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=20"); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
@@ -363,6 +423,9 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 			return w, &CommandError{Code: "revision_conflict", Message: fmt.Sprintf("révision périmée : attendue %d, courante %d ; relire le travail", expected, w.Revision), Retryable: true}
 		}
 	}
+	if w.Planning != nil && (kind == "work.update" || kind == "task.add") {
+		return w, fmt.Errorf("mission hiérarchique : modifier le plan via une décision versionnée")
+	}
 	if kind == "work.update" {
 		var count int
 		if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND status IN ('queued','starting','running','stopping')", id).Scan(&count); e != nil {
@@ -377,6 +440,9 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 		var r Request
 		if e = json.Unmarshal(request, &r); e != nil {
 			return w, e
+		}
+		if w.Planning != nil && r.editsDefinition() {
+			return w, fmt.Errorf("contrat hiérarchique immuable ; créer une tâche de correction via le responsable")
 		}
 		if r.Status == "running" {
 			if e = preparationLaunchGuard(tx, id, r.ID); e != nil {
@@ -393,7 +459,17 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 			}
 		}
 	}
+	beforePlanning := map[string]string{}
+	if w.Planning != nil {
+		for _, task := range w.Tasks {
+			beforePlanning[task.ID] = task.Status
+		}
+	}
 	if e = fn(&w); e != nil {
+		return w, e
+	}
+	planningValidationSignals(&w, beforePlanning, event)
+	if e = validatePlanningState(&w); e != nil {
 		return w, e
 	}
 	w.Revision++
@@ -493,6 +569,11 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 				}
 			}
 		}
+		if r.Status == "accepted" {
+			if e := s.independentReviewGuard(w, t); e != nil {
+				return e
+			}
+		}
 		if r.Status == "accepted" && !s.validGate(t) {
 			return fmt.Errorf("acceptation refusée : gate delivery courante requise")
 		}
@@ -513,6 +594,10 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 		if r.Status == "running" && t.Status != "running" {
 			t.Attempts = append(t.Attempts, Attempt{ID: newID("a-"), Status: "recorded", Started: now()})
 			t.Gate = nil
+			// Une correction est une nouvelle production : la décision et la
+			// preuve de la tentative précédente restent dans leur reçu, mais ne
+			// doivent plus apparaître comme la validation courante de la tâche.
+			t.AutoValidation = nil
 		}
 		if r.Status == "todo" && t.Status != r.Status {
 			if t.Status == "accepted" && !s.acceptedFresh(w, t, map[string]bool{}) && t.Gate != nil {

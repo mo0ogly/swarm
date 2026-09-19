@@ -44,6 +44,7 @@ type taskDialog struct {
 	providers              []string
 	provider               int
 	workspace, instruction string
+	preconditionEvidence   string
 	message                string
 	actionsCache           []TaskAction
 }
@@ -544,6 +545,9 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 		if key == "enter" {
 			d.mode = d.returnMode
 			d.row = 5
+			if d.mode == "retry" && d.agent != nil && requiresEnvironmentVerification(*d.agent) {
+				d.row = 6
+			}
 			d.message = ""
 			return
 		}
@@ -606,12 +610,18 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			c.dialog = nil
 		}
 	case "start", "retry":
+		rows := 6
+		confirmRow := 5
+		evidenceRow := -1
+		if d.mode == "retry" && d.agent != nil && requiresEnvironmentVerification(*d.agent) {
+			rows, confirmRow, evidenceRow = 7, 6, 5
+		}
 		if key == "tab" || key == "down" {
-			d.row = (d.row + 1) % 6
+			d.row = (d.row + 1) % rows
 			return
 		}
 		if key == "up" {
-			d.row = (d.row + 5) % 6
+			d.row = (d.row + rows - 1) % rows
 			return
 		}
 		if d.row == 0 && d.mode == "start" && (key == "left" || key == "right") {
@@ -639,8 +649,8 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			return
 		}
 		if key == "enter" {
-			if d.row != 5 {
-				d.row = (d.row + 1) % 6
+			if d.row != confirmRow {
+				d.row = (d.row + 1) % rows
 				return
 			}
 			if e := s.launchDialog(work, c); e != nil {
@@ -654,10 +664,12 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			c.dialog = nil
 			return
 		}
-		if d.row == 2 || (d.row == 1 && d.mode == "start") {
+		if d.row == 2 || d.row == evidenceRow || (d.row == 1 && d.mode == "start") {
 			target := &d.instruction
 			if d.row == 1 {
 				target = &d.workspace
+			} else if d.row == evidenceRow {
+				target = &d.preconditionEvidence
 			}
 			if key == "clear" {
 				*target = ""
@@ -704,6 +716,7 @@ func (s *Store) launchDialog(work string, c *consoleState) error {
 		r.Previous = d.agent.ID
 		r.Parent = d.agent.Parent
 		r.Workspace = d.agent.CWD
+		r.PreconditionEvidence = d.preconditionEvidence
 		logs, err := s.logs(d.agent.ID, 0)
 		if err != nil {
 			return err

@@ -69,7 +69,11 @@ func reservePreparationBudget(tx *sql.Tx, p Preparation, turn string) error {
 				if e = tx.QueryRow("SELECT coalesce(sum(amount),0) FROM (SELECT amount FROM reservations WHERE work_id=? AND state IN ('reserved','estimated') UNION ALL SELECT amount FROM assist_reservations WHERE work_id=? AND state IN ('reserved','estimated'))", p.WorkID, p.WorkID).Scan(&used); e != nil {
 					return e
 				}
-				if used+prep+b.Reserve > b.Limit {
+				plan, e := planningCommitted(tx, p.WorkID)
+				if e != nil {
+					return e
+				}
+				if used+prep+plan+b.Reserve > b.Limit {
 					return preparationError("budget_exhausted", "Budget du travail insuffisant : la préparation partage l’enveloppe avec ses agents et son assistant.")
 				}
 				workAmount = b.Reserve

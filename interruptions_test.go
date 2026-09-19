@@ -37,11 +37,15 @@ func parcoursProvider(t *testing.T, s *Store, writeReport bool) Providers {
 	t.Helper()
 	script := filepath.Join(s.root, "provider.sh")
 	body := `#!/bin/sh
+if [ "$1" = "--swarm-preflight" ]; then
+  printf '%s\n' '{"schema_version":1,"capabilities":{"process":"verified","workspace_read":"verified","workspace_write":"verified"}}'
+  exit 0
+fi
 prompt=$(cat)
 cible=$(printf '%s' "$prompt" | grep -o 'docs/[A-Za-z0-9_-]*\.md' | head -n 1)
 if [ -n "$SWARM_ECRIT_RAPPORT" ] && [ -n "$cible" ]; then
-  mkdir -p "$SWARM_RACINE/docs"
-  printf 'Handoff : tests exécutés, preuves listées, prochaine action.\n' > "$SWARM_RACINE/$cible"
+  mkdir -p docs
+  printf 'Handoff : tests exécutés, preuves listées, prochaine action.\n' > "$cible"
 fi
 echo "tentative terminée"
 `
@@ -54,9 +58,10 @@ echo "tentative terminée"
 	} else {
 		os.Unsetenv("SWARM_ECRIT_RAPPORT")
 	}
-	p := Providers{Schema: 1, Providers: map[string]Provider{
-		"fixture": {Command: script, Env: []string{"SWARM_RACINE", "SWARM_ECRIT_RAPPORT"}},
-	}}
+	fixtureProvider := verifiedPreflightProvider(script, "--swarm-preflight")
+	fixtureProvider.Command = script
+	fixtureProvider.Env = []string{"SWARM_RACINE", "SWARM_ECRIT_RAPPORT"}
+	p := Providers{Schema: 1, Providers: map[string]Provider{"fixture": fixtureProvider}}
 	raw, _ := json.Marshal(p)
 	if e := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); e != nil {
 		t.Fatal(e)
@@ -98,7 +103,7 @@ func parcours(t *testing.T, regime string) int {
 
 	w := createTest(t, s)
 	if regime == "autonome" {
-		if e := s.setAutonomy(w.ID, autonomyAuto, 1); e != nil {
+		if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, 1); e != nil {
 			t.Fatal(e)
 		}
 	}

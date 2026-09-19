@@ -1,9 +1,43 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"strings"
 	"testing"
 )
+
+func TestMissionCLIPreviewUsesSharedVerdictWithoutMutation(t *testing.T) {
+	s := storeTest(t)
+	w, _ := setupAgent(t, s)
+	if err := s.setProfile(w.ID, "", LaunchProfile{Provider: "fixture", Workspace: s.root, Role: "worker"}, w.Revision); err != nil {
+		t.Fatal(err)
+	}
+	organizedFixtureStore(t, s)
+	w, _ = s.get(w.ID)
+	var out bytes.Buffer
+	if err := missionCLI(s, []string{"mission", "preview", w.ID}, "", true, &out); err != nil {
+		t.Fatal(err)
+	}
+	var preview MissionLaunchPreview
+	if err := json.Unmarshal(out.Bytes(), &preview); err != nil {
+		t.Fatal(err)
+	}
+	if preview.Revision != w.Revision || preview.Immediate != 1 || preview.EffectiveConcurrency != 1 {
+		t.Fatalf("unexpected preview: %+v", preview)
+	}
+	out.Reset()
+	if err := missionCLI(s, []string{"mission", "preview", w.ID}, "", false, &out); err != nil {
+		t.Fatal(err)
+	}
+	if text := out.String(); !strings.Contains(text, "concurrence réelle 1/2") || !strings.Contains(text, preview.ConcurrencyDetail) {
+		t.Fatalf("plain CLI diverges from shared verdict: %q", text)
+	}
+	current, _ := s.get(w.ID)
+	if current.Revision != w.Revision || s.autonomy(w.ID) == autonomyAuto {
+		t.Fatalf("preview mutated mission: %+v", current)
+	}
+}
 
 func TestMissionRequiresExplicitLocalAuthorization(t *testing.T) {
 	s := storeTest(t)
@@ -62,7 +96,7 @@ func TestConductorTransactionHonorsPause(t *testing.T) {
 func TestConductorTransactionHonorsOccupiedSlots(t *testing.T) {
 	s := storeTest(t)
 	w, r := setupAgent(t, s)
-	if e := s.setAutonomy(w.ID, autonomyAuto, 1); e != nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, 1); e != nil {
 		t.Fatal(e)
 	}
 	r.Origin = originConductor
@@ -83,11 +117,11 @@ func TestMissionConfigurationAtomicReplayAndConflict(t *testing.T) {
 	s := storeTest(t)
 	w, _ := setupAgent(t, s)
 	p := LaunchProfile{Provider: "fixture", Workspace: s.root, Role: "worker"}
-	if e := s.configureMission(w.ID, p, 1, w.Revision, "mission-config"); e != nil {
+	if e := organizedFixtureStore(t, s).configureMission(w.ID, p, 1, w.Revision, "mission-config"); e != nil {
 		t.Fatal(e)
 	}
 	current, _ := s.get(w.ID)
-	if e := s.configureMission(w.ID, p, 1, w.Revision, "mission-config"); e != nil {
+	if e := organizedFixtureStore(t, s).configureMission(w.ID, p, 1, w.Revision, "mission-config"); e != nil {
 		t.Fatal("replay", e)
 	}
 	again, _ := s.get(w.ID)
@@ -97,7 +131,7 @@ func TestMissionConfigurationAtomicReplayAndConflict(t *testing.T) {
 	if e := s.pause(w.ID, true); e != nil {
 		t.Fatal(e)
 	}
-	if e := s.configureMission(w.ID, p, 2, w.Revision, "mission-stale"); e == nil {
+	if e := organizedFixtureStore(t, s).configureMission(w.ID, p, 2, w.Revision, "mission-stale"); e == nil {
 		t.Fatal("stale configuration accepted")
 	}
 	if !s.paused(w.ID) || s.slots(w.ID) != 1 {
@@ -127,7 +161,11 @@ func TestMissionWebPreservesExistingLimits(t *testing.T) {
 		t.Fatal(e)
 	}
 	w, _ = s.get(w.ID)
-	r := webRequest{Kind: "mission-start", Work: w.ID, Event: "web-mission-limits", Revision: w.Revision, Provider: "fixture", Workspace: s.root, Slots: 1, Level: "auto"}
+	preview, e := organizedFixtureStore(t, s).missionLaunchPreview(w.ID, p, 1)
+	if e != nil {
+		t.Fatal(e)
+	}
+	r := webRequest{Kind: "mission-start", Work: w.ID, Event: "web-mission-limits", Revision: w.Revision, Provider: "fixture", Workspace: s.root, Slots: 1, Level: "auto", PreviewToken: preview.Token}
 	if _, e := s.webAction(r); e != nil {
 		t.Fatal(e)
 	}
@@ -145,7 +183,7 @@ func TestMissionWatchScopeAndWaitingLogDedup(t *testing.T) {
 	a, _ := setupAgent(t, s)
 	b, _ := setupAgent(t, s)
 	for _, w := range []Work{a, b} {
-		if e := s.setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
+		if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, slotsDefault); e != nil {
 			t.Fatal(e)
 		}
 		if e := s.setMission(w.ID, true); e != nil {
@@ -173,7 +211,7 @@ func TestMissionActivityDoesNotExposePolicyJSON(t *testing.T) {
 func TestMissionConcurrentConductorDoesNotDoubleReserve(t *testing.T) {
 	s := storeTest(t)
 	w, r := setupAgent(t, s)
-	if e := s.setAutonomy(w.ID, autonomyAuto, 1); e != nil {
+	if e := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, 1); e != nil {
 		t.Fatal(e)
 	}
 	r.Origin = originConductor

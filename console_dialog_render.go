@@ -208,16 +208,22 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 			}
 			level := []string{"auto", "simple", "standard", "exigeant"}[d.modelLevel]
 			model := d.modelDescription
-			form := []string{"Fournisseur : " + provider, "Espace : " + d.workspace, "Consigne : " + d.instruction, "Rôle : " + role, "Niveau ◀ ▶ : " + level + " · " + model, "[ Confirmer le lancement ]"}
+			form := []string{"Fournisseur : " + provider, "Espace : " + d.workspace, "Consigne : " + d.instruction, "Rôle : " + role, "Niveau ◀ ▶ : " + level + " · " + model}
+			if d.mode == "retry" && d.agent != nil && requiresEnvironmentVerification(*d.agent) {
+				form = append(form, "Vérification nouvelle : "+d.preconditionEvidence)
+			}
+			form = append(form, "[ Confirmer le lancement ]")
 			for i, line := range form {
 				m := "  "
 				if i == d.row {
 					m = "> "
 				}
-				if i == d.row && len([]rune(line)) > inner-2 && (i == 1 || i == 2) {
+				if i == d.row && len([]rune(line)) > inner-2 && (i == 1 || i == 2 || strings.HasPrefix(line, "Vérification nouvelle : ")) {
 					prefix := "Espace : "
 					if i == 2 {
 						prefix = "Consigne : "
+					} else if strings.HasPrefix(line, "Vérification nouvelle : ") {
+						prefix = "Vérification nouvelle : "
 					}
 					r := []rune(line)
 					n := max(1, inner-len([]rune(prefix))-4)
@@ -225,7 +231,7 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 				}
 				rows = append(rows, m+line)
 			}
-			rows = append(rows, "Tab : champ · ←→ : fournisseur/rôle/niveau · Ctrl-U : effacer", "Entrée sur Confirmer lance réellement le fournisseur.")
+			rows = append(rows, "Tab : champ · ←→ : fournisseur/rôle/niveau · Ctrl-U : effacer", "Après un échec d’environnement, décrire une vérification observée est obligatoire. Entrée sur Confirmer lance réellement le fournisseur.")
 		case "stop", "reconcile":
 			title = "Confirmer — " + d.task.ID
 			text := "Demander l'arrêt de l'agent sélectionné ?"

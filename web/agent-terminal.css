@@ -47,3 +47,19 @@
 .console-ink-lifecycle {color:var(--wattson-titre)!important}
 .console-ink-warning {color:var(--wattson-attention-encre)!important}
 .console-ink-error {color:var(--wattson-alerte-encre)!important}
+
+/* Separate the timestamp, event type and useful content in the live journal. */
+.console-time {color:var(--wattson-texte-discret)!important;background:var(--wattson-champ)}
+.console-type-action {color:var(--wattson-info-encre)!important;background:var(--wattson-info-fond);font-weight:700}
+.console-type-lifecycle {color:var(--wattson-libelle)!important;background:var(--wattson-carte-appuyee);font-weight:650}
+.console-type-warning,.console-message.console-message-warning {color:var(--wattson-attention-encre)!important;background:var(--wattson-attention-fond);font-weight:650}
+.console-type-error,.console-message.console-message-error {color:var(--wattson-alerte-encre)!important;background:var(--wattson-alerte-fond);font-weight:700}
+.console-message {color:var(--wattson-texte)!important;background:var(--wattson-champ)}
+.console-message-current {color:var(--wattson-titre)!important;background:var(--wattson-carte-appuyee);font-weight:700}
+.console-current-line {border-left:3px solid var(--wattson-lien);background:var(--wattson-carte-appuyee)}
+#session-current {padding:10px 12px;border-left:4px solid var(--wattson-lien);background:var(--wattson-info-fond);color:var(--wattson-info-encre);font-size:1.05rem}
+
+.console-type-message {color:var(--wattson-info-encre)!important;background:var(--wattson-info-fond);font-weight:700}
+.console-type-result {color:var(--wattson-libelle)!important;background:var(--wattson-carte-appuyee);font-weight:650}
+#session-history-note {color:var(--wattson-texte-discret);background:var(--wattson-carte-appuyee);padding:8px 12px}
+#session-message {padding:10px 12px;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);border-left:3px solid var(--wattson-ligne)}
