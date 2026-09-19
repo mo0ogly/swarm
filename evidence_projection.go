@@ -106,6 +106,13 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 		if r.Finished == "" {
 			e.ReportReview.At = valueOrUnknown(r.Started)
 		}
+	} else if w.Planning != nil && w.Planning.Reviewer != nil {
+		// A reviewer is configured for this work but has not produced a
+		// verdict for this attempt yet (not started, or waiting on its
+		// producer). That is not the same fact as no reviewer configured
+		// at all, so it must not be reported as not_configured.
+		e.ReportReview = EvidenceReportReview{State: "pending", Attempt: attempt, Reviewer: "reviewer://" + w.Planning.Reviewer.Provider, At: "unknown",
+			Limits: []string{"Vérificateur indépendant configuré pour ce travail ; aucune revue n’a encore produit de verdict pour cette tentative."}}
 	}
 
 	gateFresh := t.Gate != nil && s.validGate(t)
@@ -121,19 +128,29 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 	if a := t.AutoValidation; a != nil {
 		e.Attempt = valueOrUnknown(a.Attempt)
 		e.ObservedAt = valueOrUnknown(a.At)
-		e.Controls.State = "passed"
+		hasFailed, hasUnknown, hasPassed := false, false, false
 		for _, r := range a.Controls {
-			exit := r.ExitCode
 			result, execution := "failed", "not_executed"
-			if r.Executed && r.Passed {
+			var exitCode *int
+			switch {
+			case r.Executed && r.Passed:
 				result, execution = "passed", "executed"
-			} else if r.Executed {
+			case r.Executed:
 				execution = "executed"
-				e.Controls.State = "failed"
-			} else if r.Started == "" {
-				result, execution, e.Controls.State = "unknown", "unknown", "unknown"
-			} else {
-				e.Controls.State = "failed"
+			case r.Started == "":
+				result, execution = "unknown", "unknown"
+			}
+			if execution == "executed" || execution == "not_executed" {
+				exit := r.ExitCode
+				exitCode = &exit
+			}
+			switch result {
+			case "failed":
+				hasFailed = true
+			case "unknown":
+				hasUnknown = true
+			case "passed":
+				hasPassed = true
 			}
 			freshness := "stale"
 			if gateFresh && (attempt == "unknown" || a.Attempt == attempt) {
@@ -153,8 +170,21 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 				testedRevision = strconv.Itoa(a.Revision)
 			}
 			e.Controls.Items = append(e.Controls.Items, EvidenceControl{ID: r.ID, Attempt: valueOrUnknown(a.Attempt), Execution: execution, Revision: testedRevision, Command: command,
-				ExitCode: &exit, Started: valueOrUnknown(r.Started), Finished: valueOrUnknown(r.Finished), Freshness: freshness, Result: result,
+				ExitCode: exitCode, Started: valueOrUnknown(r.Started), Finished: valueOrUnknown(r.Finished), Freshness: freshness, Result: result,
 				Limits: []string{fmt.Sprintf("Sortie non exposée ; seule son empreinte SHA-256 est conservée. Plafond %d octets.", maxValidationOutput)}})
+		}
+		// Aggregate independently of item order: a failure is never masked by a
+		// later unknown item, and passed requires at least one executed,
+		// passing control — never the default for an empty or all-unknown list.
+		switch {
+		case hasFailed:
+			e.Controls.State = "failed"
+		case hasUnknown:
+			e.Controls.State = "unknown"
+		case hasPassed:
+			e.Controls.State = "passed"
+		default:
+			e.Controls.State = "unknown"
 		}
 		if a.Revision > 0 {
 			e.Limits = append(e.Limits, "Contrôles exécutés sur la révision "+strconv.Itoa(a.Revision)+" ; révision de lecture "+strconv.Itoa(w.Revision)+".")

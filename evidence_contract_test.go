@@ -84,6 +84,76 @@ func TestEvidenceContractDoesNotCallAnUnstartedCommandExecuted(t *testing.T) {
 	}
 }
 
+// TestEvidenceContractControlAggregationIsOrderIndependent covers the review
+// finding that a later "unknown" historical control silently overwrote an
+// earlier "failed" one, and that an empty Controls list defaulted to
+// "passed" even though nothing was ever executed. failed must always win,
+// unknown must never be masked, and passed requires at least one executed,
+// passing control regardless of slice order.
+func TestEvidenceContractControlAggregationIsOrderIndependent(t *testing.T) {
+	s := storeTest(t)
+	failed := ValidationControlResult{ID: "a", Executed: true, Passed: false, ExitCode: 1, Started: now(), Finished: now()}
+	unknown := ValidationControlResult{ID: "b", Executed: false, Started: ""}
+	passed := ValidationControlResult{ID: "c", Executed: true, Passed: true, ExitCode: 0, Started: now(), Finished: now()}
+
+	for _, order := range [][]ValidationControlResult{{failed, unknown}, {unknown, failed}, {passed, unknown, failed}, {failed, passed}} {
+		task := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}},
+			AutoValidation: &AutomaticValidation{Attempt: "attempt-x", Revision: 1, At: now(), Controls: order}}
+		work := Work{Revision: 1, Tasks: []Task{task}}
+		e := s.taskEvidence(&work, &work.Tasks[0], false)
+		if e.Controls.State != "failed" {
+			t.Fatalf("failed control masked by order %+v: got state %s", order, e.Controls.State)
+		}
+	}
+
+	onlyUnknown := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}},
+		AutoValidation: &AutomaticValidation{Attempt: "attempt-x", Revision: 1, At: now(), Controls: []ValidationControlResult{unknown}}}
+	work := Work{Revision: 1, Tasks: []Task{onlyUnknown}}
+	if e := s.taskEvidence(&work, &work.Tasks[0], false); e.Controls.State != "unknown" {
+		t.Fatalf("unknown-only controls must stay unknown, got %s", e.Controls.State)
+	}
+	if e := s.taskEvidence(&work, &work.Tasks[0], false); e.Controls.Items[0].ExitCode != nil {
+		t.Fatalf("historical unknown execution must not report exit code 0 by default : %+v", e.Controls.Items[0])
+	}
+
+	empty := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}},
+		AutoValidation: &AutomaticValidation{Attempt: "attempt-x", Revision: 1, At: now(), Controls: nil}}
+	work2 := Work{Revision: 1, Tasks: []Task{empty}}
+	if e := s.taskEvidence(&work2, &work2.Tasks[0], false); e.Controls.State != "unknown" {
+		t.Fatalf("an empty control list must never report passed, got %s", e.Controls.State)
+	}
+
+	onlyPassed := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}},
+		AutoValidation: &AutomaticValidation{Attempt: "attempt-x", Revision: 1, At: now(), Controls: []ValidationControlResult{passed}}}
+	work3 := Work{Revision: 1, Tasks: []Task{onlyPassed}}
+	if e := s.taskEvidence(&work3, &work3.Tasks[0], false); e.Controls.State != "passed" {
+		t.Fatalf("all-passed controls must report passed, got %s", e.Controls.State)
+	}
+}
+
+// TestEvidenceContractReviewerConfiguredWithoutVerdictIsNotNotConfigured
+// covers the review finding that a reviewer configured for the work, but
+// which has not produced any verdict yet for this attempt, was reported as
+// not_configured — indistinguishable from no reviewer at all.
+func TestEvidenceContractReviewerConfiguredWithoutVerdictIsNotNotConfigured(t *testing.T) {
+	s := storeTest(t)
+	task := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}}}
+	work := Work{Revision: 1, Tasks: []Task{task}, Planning: &PlanningState{Reviewer: &ReviewerConfig{Provider: "fixture", MaxCalls: 3}}}
+	e := s.taskEvidence(&work, &work.Tasks[0], false)
+	if e.ReportReview.State == "not_configured" {
+		t.Fatalf("a work-level reviewer configuration must not be reported as not_configured : %+v", e.ReportReview)
+	}
+	if e.ReportReview.State != "pending" {
+		t.Fatalf("unexpected report review state for a configured, not-yet-run reviewer : %+v", e.ReportReview)
+	}
+
+	noReviewer := Work{Revision: 1, Tasks: []Task{task}}
+	e2 := s.taskEvidence(&noReviewer, &noReviewer.Tasks[0], false)
+	if e2.ReportReview.State != "not_configured" {
+		t.Fatalf("a work with no reviewer configuration must still report not_configured : %+v", e2.ReportReview)
+	}
+}
+
 func TestEvidenceContractSameTruthCLIAndWeb(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
