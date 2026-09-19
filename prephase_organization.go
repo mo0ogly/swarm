@@ -72,6 +72,9 @@ func (s *Store) configurePreparedOrganization(w *Work, p Preparation, config Pre
 		if !strings.HasPrefix(t.ID, prefix) {
 			return fmt.Errorf("organisation : le travail contient des tâches extérieures à cette préparation")
 		}
+		if t.PlanRole != "worker" {
+			return fmt.Errorf("%s : une mission organisée réserve planner/subplanner aux responsables de périmètre ; la tâche exécutable doit avoir le rôle worker", t.Title)
+		}
 		t.ScopeID = "root"
 		t.Requirements = nil
 		policy := ValidationPolicy{Mode: config.Validation, Controls: config.Controls[strings.TrimPrefix(t.ID, prefix)]}

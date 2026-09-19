@@ -42,6 +42,11 @@ func TestPlanStrictContract(t *testing.T) {
 			t.Fatal("invalid plan accepted")
 		}
 	}
+	wrongRole := fixturePlan()
+	wrongRole.Tasks[0].Role = "planner"
+	if _, e := validateActionPlan(wrongRole, true); e == nil || !strings.Contains(e.Error(), "responsables sont des périmètres") {
+		t.Fatal("executable planner task accepted", e)
+	}
 }
 func TestPlanAtomicReviewedCommitAndBudgets(t *testing.T) {
 	s := storeTest(t)

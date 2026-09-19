@@ -770,6 +770,13 @@ func validatePlanningState(w *Work) error {
 		if e != nil {
 			return e
 		}
+		// In a hierarchical mission, planners are represented by scopes and run
+		// through the tool-free planning path. Executable tasks are workers only.
+		// Failing closed here also prevents an imported or historical payload from
+		// turning a planner label into a coding-agent launch.
+		if task.PlanRole != "" && task.PlanRole != "worker" {
+			return fmt.Errorf("tâche hiérarchique non exécutante : %s", task.ID)
+		}
 		if len(task.Requirements) == 0 {
 			return fmt.Errorf("tâche sans exigence")
 		}
