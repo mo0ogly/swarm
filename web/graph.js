@@ -1,4 +1,6 @@
 'use strict';
+const tr_web_graph_js = source => globalThis.SwarmI18n?.t(source) ?? source;
+
 // Graphe vivant : les tâches et leurs dépendances, avec la tentative en cours
 // rattachée à sa tâche. Ce que le graphe montre est observé, pas déduit :
 // un nœud « en cours » ne prouve pas qu'un processus tourne encore.
@@ -23,8 +25,8 @@ function graphSignal(item) {
   const a = item.agent;
   const limite = Math.max(30, a.limits?.silence_seconds || 0) * 1000;
   const dernier = Date.parse(a.heartbeat || a.started || '');
-  if (!Number.isFinite(dernier)) return 'signal jamais reçu';
-  if (Date.now() - dernier > limite) return 'signal perdu depuis ' + Math.round((Date.now() - dernier) / 1000) + ' s';
+  if (!Number.isFinite(dernier)) return tr_web_graph_js('signal jamais reçu');
+  if (Date.now() - dernier > limite) return tr_web_graph_js('signal perdu depuis ') + Math.round((Date.now() - dernier) / 1000) + ' s';
   return '';
 }
 
@@ -33,14 +35,14 @@ function graphLignesAgent(item) {
   const lignes = [a.provider + ' · ' + a.role];
   const action = a.progress?.detail || a.progress?.action;
   if (action) lignes.push(action);
-  lignes.push((a.progress?.tool_calls || 0) + ' appels · ' + (a.progress?.tool_results || 0) + ' résultats');
+  lignes.push((a.progress?.tool_calls || 0) + tr_web_graph_js(' appels · ') + (a.progress?.tool_results || 0) + tr_web_graph_js(' résultats'));
   // Coût rapporté par le fournisseur pour cette tentative ; jamais une facture.
   const cout = a.usage?.provider_reported_cost_usd;
-  lignes.push(typeof cout === 'number' ? 'coût rapporté : ' + cout.toFixed(2) + ' USD' : 'coût : non rapporté');
+  lignes.push(typeof cout === 'number' ? tr_web_graph_js('coût rapporté : ') + cout.toFixed(2) + ' USD' : tr_web_graph_js('coût : non rapporté'));
   const perdu = graphSignal(item);
   if (perdu) lignes.push(perdu);
-  else if (a.progress?.last_result_at) lignes.push('dernier résultat : ' + new Date(a.progress.last_result_at).toLocaleTimeString('fr-FR'));
-  if (a.progress?.degraded) lignes.push('flux dégradé : ' + a.progress.degraded);
+  else if (a.progress?.last_result_at) lignes.push(tr_web_graph_js('dernier résultat : ') + new Date(a.progress.last_result_at).toLocaleTimeString((globalThis.SwarmI18n?.locale || 'fr-FR')));
+  if (a.progress?.degraded) lignes.push(tr_web_graph_js('flux dégradé : ') + a.progress.degraded);
   return lignes;
 }
 
@@ -48,9 +50,9 @@ function graphLignesAgent(item) {
 // aucune n'a déclaré son coût : un 0,00 ferait passer l'inconnu pour une mesure.
 function graphCoutTache(id) {
   const c = (snapshot.cost?.by_task || {})[id];
-  if (!c || !c.attempts_with_cost) return c && c.attempts_without_cost ? 'coût de la tâche : non rapporté' : '';
-  let texte = 'coût de la tâche : ' + c.reported_usd.toFixed(2) + ' USD';
-  if (c.attempts_without_cost) texte += ' (+' + c.attempts_without_cost + ' sans coût)';
+  if (!c || !c.attempts_with_cost) return c && c.attempts_without_cost ? tr_web_graph_js('coût de la tâche : non rapporté') : '';
+  let texte = tr_web_graph_js('coût de la tâche : ') + c.reported_usd.toFixed(2) + ' USD';
+  if (c.attempts_without_cost) texte += ' (+' + c.attempts_without_cost + tr_web_graph_js(' sans coût)');
   return texte;
 }
 
@@ -96,7 +98,7 @@ function drawPilotGraph(){
   if(!links.length&&!organization.nodes.length)kept.forEach((t,i)=>g.setNode(t.id,{width,height,x:20+width/2+(state.orientation==='LR'?i*(width+28):0),y:20+height/2+(state.orientation==='TB'?i*(height+28):0)}));
   const totalWidth=links.length||organization.nodes.length?g.graph().width:state.orientation==='LR'?kept.length*(width+28)+12:width+40;
   const totalHeight=links.length||organization.nodes.length?g.graph().height:state.orientation==='TB'?kept.length*(height+28)+12:height+40;
-  const svg=svgNode('svg',{viewBox:'0 0 '+Math.max(1,totalWidth)+' '+Math.max(1,totalHeight),class:'graph-svg',role:'group','aria-label':'Dépendances : du prérequis vers la tâche'});
+  const svg=svgNode('svg',{viewBox:'0 0 '+Math.max(1,totalWidth)+' '+Math.max(1,totalHeight),class:'graph-svg',role:'group','aria-label':tr_web_graph_js('Dépendances : du prérequis vers la tâche')});
   svg.dataset.width=Math.max(1,totalWidth);svg.dataset.height=Math.max(1,totalHeight);
   const defs=svgNode('defs',{});
   for(const [id,cls]of [['pilot-arrow','graph-fleche'],['pilot-arrow-ok','graph-fleche-ok'],['pilot-arrow-role','graph-fleche-role']]){
@@ -119,7 +121,7 @@ function drawPilotGraph(){
   const children=PilotGraph.children(tasks);
   for(const t of kept){
    const n=g.node(t.id),left=n.x-width/2,top=n.y-height/2;
-   const group=svgNode('g',{class:'graph-noeud',tabindex:0,role:'button','aria-label':t.title+' — examiner la tâche'});
+   const group=svgNode('g',{class:'graph-noeud',tabindex:0,role:'button','aria-label':t.title+tr_web_graph_js(' — examiner la tâche')});
    group.dataset.task=t.id;
    group.append(svgNode('rect',{x:left,y:top,width,height,rx:12,class:'graph-cadre'}));
    group.append(svgNode('rect',{x:left+10,y:top+48,width:width-20,height:20,rx:4,class:'graph-role-surface'}));
@@ -135,7 +137,7 @@ function drawPilotGraph(){
    go.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();openSessionOrLaunch()}});svg.append(go);
 
    if(children.get(t.id)?.length){
-    const closed=state.collapsed.includes(t.id),fold=svgNode('g',{class:'graph-fold',tabindex:0,role:'button','aria-expanded':String(!closed),'aria-label':(closed?'Déplier':'Replier')+' la branche '+t.title});
+    const closed=state.collapsed.includes(t.id),fold=svgNode('g',{class:'graph-fold',tabindex:0,role:'button','aria-expanded':String(!closed),'aria-label':(closed?tr_web_graph_js('Déplier'):'Replier')+tr_web_graph_js(' la branche ')+t.title});
     fold.dataset.task=t.id;
     fold.append(svgNode('rect',{x:left+12,y:top+height-30,width:width-24,height:24,rx:5,class:'graph-fold-surface'}),svgNode('text',{x:left+20,y:top+height-13,class:'graph-fold-label'}));
     fold.addEventListener('click',e=>{if(e.isTrusted)Pilot.toggle(t.id)});
@@ -144,47 +146,47 @@ function drawPilotGraph(){
    }
   }
   canvas.replaceChildren(svg,graphLegendeEtats());
-  if(!kept.length)canvas.append(node('p',tasks.length?'Aucun nœud pour ces filtres. Affichez tout le travail.':'Aucune tâche : le graphe apparaîtra dès qu’un plan existe.'));
+  if(!kept.length)canvas.append(node('p',tasks.length?tr_web_graph_js('Aucun nœud pour ces filtres. Affichez tout le travail.'):tr_web_graph_js('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.')));
   canvas.scrollLeft=x||state.x;canvas.scrollTop=y||state.y;
   if(focus)[...canvas.querySelectorAll(goFocus?'.graph-go':foldFocus?'.graph-fold':'.graph-noeud')].find(n=>n.dataset.task===focus)?.focus();
  }
  const svg=canvas.querySelector('svg');if(!svg)return;
  scalePilotGraph(svg,state.zoom);
- for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=[n.title,n.description,n.detail,'Ouvrir les décisions et avis'];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
+ for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
  const byTask=graphAgentsParTache();
  for(const group of canvas.querySelectorAll('.graph-noeud')){
   const t=tasks.find(t=>t.id===group.dataset.task),v=snapshot.validation?.tasks[t.id],agent=byTask[t.id]?.[0]?.agent;
   const uncertain=Pilot.uncertainExecution(t,agent);
   group.dataset.etat=uncertain?'attention':graphTonalites[v?.state||t.status]||'neutre';
   group.dataset.selected=String(Pilot.selectedTask()===t.id);
-  const lines=[t.title,uncertain||labels[v?.state||t.status]||t.status,agent?agent.provider+' · '+(uncertain?(snapshot.pilotage?.health[agent.id]?.stop_requested?'Arrêt demandé':'Activité non confirmée'):agent.progress?.detail||agent.progress?.action||'Activité non reçue'):t.id];
+  const lines=[t.title,uncertain||labels[v?.state||t.status]||t.status,agent?agent.provider+' · '+(uncertain?(snapshot.pilotage?.health[agent.id]?.stop_requested?tr_web_graph_js('Arrêt demandé'):tr_web_graph_js('Activité non confirmée')):agent.progress?.detail||agent.progress?.action||tr_web_graph_js('Activité non reçue')):t.id];
   const role=PilotGraph.role(t,agent);
   group.querySelector('.graph-role-surface').dataset.tone=role.tone;
   lines.splice(2,0,role.icon+' '+role.label);
   lines.push(PilotGraph.guidance(t,Pilot.goState(t),v));
-  group.setAttribute('aria-label',lines.join('. ')+' — examiner la tâche');
+  group.setAttribute('aria-label',lines.join('. ')+tr_web_graph_js(' — examiner la tâche'));
   if(state.detail==='detailed'){
-   lines.push(agent?(agent.progress?.tool_calls||0)+' appels · '+(agent.progress?.tool_results||0)+' résultats':(t.depends||[]).length+' prérequis');
-   lines.push(agent?snapshot.pilotage?.health[agent.id]?.process_label||'Observation inconnue':t.blocker||'');
-   lines.push(agent?snapshot.pilotage?.health[agent.id]?.activity_label||'Activité inconnue':'');
-   lines.push(agent&&typeof agent.usage?.provider_reported_cost_usd==='number'?'coût rapporté : '+agent.usage.provider_reported_cost_usd.toFixed(2)+' USD':agent?'coût : non rapporté':'');
+   lines.push(agent?(agent.progress?.tool_calls||0)+tr_web_graph_js(' appels · ')+(agent.progress?.tool_results||0)+tr_web_graph_js(' résultats'):(t.depends||[]).length+tr_web_graph_js(' prérequis'));
+   lines.push(agent?snapshot.pilotage?.health[agent.id]?.process_label||tr_web_graph_js('Observation inconnue'):t.blocker||'');
+   lines.push(agent?snapshot.pilotage?.health[agent.id]?.activity_label||tr_web_graph_js('Activité inconnue'):'');
+   lines.push(agent&&typeof agent.usage?.provider_reported_cost_usd==='number'?tr_web_graph_js('coût rapporté : ')+agent.usage.provider_reported_cost_usd.toFixed(2)+' USD':agent?tr_web_graph_js('coût : non rapporté'):'');
    lines.push(graphCoutTache(t.id));
   }
   for(const text of group.querySelectorAll('[data-line]')){const value=lines[Number(text.dataset.line)]||'';text.setAttribute('aria-label',value);text.classList.toggle('graph-role',text.dataset.line==='2');if(text.dataset.line==='2')text.dataset.tone=role.tone;const shortened=value.length>41?value.slice(0,40)+'…':value;if(text.firstChild?.nodeValue!==shortened){text.replaceChildren(document.createTextNode(shortened),svgNode('title',{},value))}}
  }
  for(const button of canvas.querySelectorAll('.graph-go')){
   const t=tasks.find(t=>t.id===button.dataset.task),go=Pilot.goState(t),session=PilotGraph.taskSession(snapshot.agents,t.id);
-  if(session){button.style.display='';button.dataset.ready='true';button.dataset.taskSession=t.id;button.dataset.sessionLocation='graph';button.dataset.agentSession=session.agent.id;button.setAttribute('aria-label',session.label+' : '+t.title);button.querySelector('text').textContent=session.label;button.querySelector('title').textContent='Ouvrir la dernière tentative de cette tâche';continue}
+  if(session){button.style.display='';button.dataset.ready='true';button.dataset.taskSession=t.id;button.dataset.sessionLocation='graph';button.dataset.agentSession=session.agent.id;button.setAttribute('aria-label',session.label+' : '+t.title);button.querySelector('text').textContent=session.label;button.querySelector('title').textContent=tr_web_graph_js('Ouvrir la dernière tentative de cette tâche');continue}
   delete button.dataset.taskSession;delete button.dataset.agentSession;delete button.dataset.sessionLocation;
-  const label=go.ready?'Go — lancer':'Voir le blocage';button.style.display=go.visible?'':'none';button.dataset.ready=String(go.ready);button.setAttribute('aria-label',label+' : '+t.title+(go.ready?'':'. '+go.reason));if(button.querySelector('text').textContent!==label)button.querySelector('text').textContent=label;button.querySelector('title').textContent=go.ready?'Configurer et confirmer le lancement':go.reason;
+  const label=go.ready?tr_web_graph_js('Go — lancer'):tr_web_graph_js('Voir le blocage');button.style.display=go.visible?'':'none';button.dataset.ready=String(go.ready);button.setAttribute('aria-label',label+' : '+t.title+(go.ready?'':'. '+go.reason));if(button.querySelector('text').textContent!==label)button.querySelector('text').textContent=label;button.querySelector('title').textContent=go.ready?tr_web_graph_js('Configurer et confirmer le lancement'):go.reason;
  }
  for(const fold of canvas.querySelectorAll('.graph-fold')){
   const id=fold.dataset.task,closed=state.collapsed.includes(id),hidden=PilotGraph.hiddenBelow(tasks,id,state.collapsed);
   const agents=snapshot.agents.filter(x=>hidden.includes(x.agent.task_id)&&active(x.agent)).length;
   const alerts=Pilot.interventions().filter(item=>hidden.includes(item.kind==='task'?item.id:snapshot.decisions.find(d=>d.id===item.id)?.task_id)).length;
-  const value=closed?'+ '+(hidden.length?hidden.length+' tâches · '+agents+' agents · '+alerts+' alertes':'Descendants visibles ailleurs'):'− Replier la branche';
+  const value=closed?'+ '+(hidden.length?hidden.length+tr_web_graph_js(' tâches · ')+agents+tr_web_graph_js(' agents · ')+alerts+tr_web_graph_js(' alertes'):tr_web_graph_js('Descendants visibles ailleurs')):tr_web_graph_js('− Replier la branche');
   const label=fold.querySelector('text');if(label.textContent!==value)label.textContent=value;
-  fold.setAttribute('aria-label',(closed?'Déplier':'Replier')+' la branche '+id+(closed?' : '+hidden.length+' tâches masquées, '+agents+' agents, '+alerts+' alertes':''));
+  fold.setAttribute('aria-label',(closed?tr_web_graph_js('Déplier'):'Replier')+tr_web_graph_js(' la branche ')+id+(closed?' : '+hidden.length+tr_web_graph_js(' tâches masquées, ')+agents+tr_web_graph_js(' agents, ')+alerts+tr_web_graph_js(' alertes'):''));
  }
  for(const edge of canvas.querySelectorAll('.graph-arete')){
   const e=links.find(e=>e.from_task_id===edge.dataset.from&&e.to_task_id===edge.dataset.to);
@@ -197,9 +199,9 @@ function drawPilotGraph(){
 // teinte signifie, pour qui la découvre ou ne la distingue pas.
 function graphLegendeEtats() {
   const p = node('p', undefined, 'graph-legende');
-  p.append(node('span', 'Teintes : '));
-  const etats = [['attente', 'à faire'], ['active', 'en cours'], ['attention', 'à vérifier'],
-    ['alerte', 'bloquée'], ['validee', 'acceptée'], ['neutre', 'abandonnée']];
+  p.append(node('span', tr_web_graph_js('Teintes : ')));
+  const etats = [['attente', tr_web_graph_js('à faire')], ['active', tr_web_graph_js('en cours')], ['attention', tr_web_graph_js('à vérifier')],
+    ['alerte', tr_web_graph_js('bloquée')], ['validee', tr_web_graph_js('acceptée')], ['neutre', tr_web_graph_js('abandonnée')]];
   etats.forEach(([etat, mot], i) => {
     if (i) p.append(node('span', ' · '));
     const e = node('span', mot, 'graph-teinte');

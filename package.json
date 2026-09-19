@@ -2,8 +2,11 @@
   "name": "swarm-local-tests",
   "private": true,
   "scripts": {
-    "test": "node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs",
-    "test:connections": "node tests/ai_connections_ui.cjs bin/swarm test-results/connections"
+    "test": "node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && npm run test:i18n",
+    "test:connections": "node tests/ai_connections_ui.cjs bin/swarm test-results/connections",
+    "i18n:build": "node scripts/i18n/build.cjs",
+    "test:i18n": "node tests/i18n_test.cjs",
+    "test:i18n-ui": "node tests/i18n_ui.cjs bin/swarm test-results/i18n"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

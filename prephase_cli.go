@@ -85,7 +85,7 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 		if e != nil {
 			return e
 		}
-		result := map[string]any{"history_turns": len(ts), "limit_bytes": preparationContextLimit, "message": "Diagnostic sans appel IA ; le prochain message s’ajoute à ce contexte."}
+		result := map[string]any{"history_turns": len(ts), "limit_bytes": preparationContextLimit, "message": uiText("Diagnostic sans appel IA ; le prochain message s’ajoute à ce contexte.")}
 		for _, mode := range []string{"full", "recent"} {
 			prompt, err := s.preparationPromptForMode(p, m, ts, "Continuer.", "brief", mode)
 			entry := map[string]any{"fits": err == nil, "bytes": len(prompt)}
@@ -161,7 +161,7 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 	}
 	if kind == "list" || kind == "methods" {
 		if len(args) != 1 {
-			return preparationError("invalid_request", "Cette commande ne prend pas d’identifiant.")
+			return preparationError("invalid_request", uiText("Cette commande ne prend pas d’identifiant."))
 		}
 		if kind == "methods" {
 			return printJSON(out, s.preparationMethods())
@@ -174,7 +174,7 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 	}
 	if kind == "show" || kind == "resume" || kind == "export" || kind == "history" {
 		if len(args) < 2 {
-			return preparationError("invalid_request", "Identifiant de préparation requis.")
+			return preparationError("invalid_request", uiText("Identifiant de préparation requis."))
 		}
 		if kind == "history" {
 			if len(args) < 3 || len(args) > 4 {
@@ -184,7 +184,7 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 			if len(args) == 4 {
 				n, e := strconv.Atoi(args[3])
 				if e != nil || n < 1 {
-					return preparationError("invalid_request", "Révision positive requise.")
+					return preparationError("invalid_request", uiText("Révision positive requise."))
 				}
 				before = n
 			}
@@ -195,7 +195,7 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 			return printJSON(out, d)
 		}
 		if len(args) != 2 {
-			return preparationError("invalid_request", "Un seul identifiant attendu.")
+			return preparationError("invalid_request", uiText("Un seul identifiant attendu."))
 		}
 		p, e := s.preparation(args[1])
 		if e != nil {
@@ -210,29 +210,29 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 		return printJSON(out, p)
 	}
 	if input == "" {
-		return preparationError("invalid_request", "--input requis ; chaque mutation exige version, action, event_id et expected_revision.")
+		return preparationError("invalid_request", uiText("--input requis ; chaque mutation exige version, action, event_id et expected_revision."))
 	}
 	b, e := readInput(input)
 	if e != nil {
 		return e
 	}
 	if len(b) > 65536 {
-		return preparationError("invalid_request", "Requête limitée à 64 Kio.")
+		return preparationError("invalid_request", uiText("Requête limitée à 64 Kio."))
 	}
 	var r PreparationRequest
 	if e = strict(b, &r); e != nil {
 		return e
 	}
 	if r.Action != kind {
-		return preparationError("invalid_request", "L’action du document doit correspondre à la sous-commande.")
+		return preparationError("invalid_request", uiText("L’action du document doit correspondre à la sous-commande."))
 	}
 	if kind == "create" {
 		if len(args) != 1 {
-			return preparationError("invalid_request", "Création sans identifiant.")
+			return preparationError("invalid_request", uiText("Création sans identifiant."))
 		}
 	} else {
 		if len(args) != 2 || r.ID != args[1] {
-			return preparationError("invalid_request", "L’identifiant du document doit correspondre à la cible.")
+			return preparationError("invalid_request", uiText("L’identifiant du document doit correspondre à la cible."))
 		}
 	}
 	p, e := s.preparationCommand(r)
@@ -245,7 +245,7 @@ func (s *Store) preparationCLI(args []string, input, output string, out io.Write
 // A new directory, never an overwrite. No transcript or credentials are exported.
 func exportPreparation(p Preparation, path string) error {
 	if path == "" {
-		return preparationError("invalid_request", "--output nouveau_dossier requis.")
+		return preparationError("invalid_request", uiText("--output nouveau_dossier requis."))
 	}
 	parent, e := filepath.Abs(filepath.Dir(path))
 	if e != nil {
@@ -256,7 +256,7 @@ func exportPreparation(p Preparation, path string) error {
 		return e
 	}
 	if parent != real {
-		return preparationError("invalid_request", "Parent symbolique refusé pour l’export.")
+		return preparationError("invalid_request", uiText("Parent symbolique refusé pour l’export."))
 	}
 	if e = os.Mkdir(path, 0700); e != nil {
 		return e

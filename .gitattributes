@@ -1,0 +1,4 @@
+# Keep published documents and archives byte-for-byte intact.
+*.pdf binary
+*.pptx binary
+*.zip binary

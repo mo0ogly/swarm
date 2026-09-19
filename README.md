@@ -1,5 +1,7 @@
 # Swarm
 
+[English](README.en.md) · Français
+
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
 
 Swarm est un outil local de coordination d’agents de développement, avec une **interface web en français** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
@@ -239,7 +241,6 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 - [Cockpit : lancement, pilotage et supervision](COCKPIT.md)
 - [Préparation et révision des missions](PREPARATION-UX.md)
 - [Workflows et points de reprise](WORKFLOWS.md)
-- [Validation](VALIDATION.md)
 - [Extraction vers le dépôt autonome et limites connues](docs/migration/README.md)
 - [Licence et historique de licence](docs/LICENSING.md)
 

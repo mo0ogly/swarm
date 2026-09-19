@@ -12,7 +12,7 @@ import (
 
 const help = `swarm — compagnon local de reprise (schema_version: 1)
 
-Options globales : --root <projet> --json
+Options globales : --root <projet> --json --lang fr|en
 swarm init
 swarm aide [sujet]
 swarm providers init|show
@@ -108,11 +108,11 @@ func run(args []string, out, errOut io.Writer) int {
 		case "--json":
 			asJSON = true
 		case "--help", "-h":
-			fmt.Fprint(out, help)
+			fmt.Fprint(out, uiText(help))
 			return 0
 		case "--root", "--input", "--output", "--task", "--phase":
 			if i+1 == len(args) {
-				fmt.Fprintln(errOut, "valeur manquante :", a)
+				fmt.Fprintln(errOut, uiText("valeur manquante :"), a)
 				return 2
 			}
 			i++
@@ -132,11 +132,24 @@ func run(args []string, out, errOut io.Writer) int {
 			pos = append(pos, a)
 		}
 	}
+	// Machine-readable responses and server projections keep their canonical
+	// language. Browser localization happens only at the display boundary.
+	if asJSON || len(pos) > 0 && pos[0] == "web" {
+		previous, present := os.LookupEnv("SWARM_LANG")
+		_ = os.Setenv("SWARM_LANG", "fr")
+		defer func() {
+			if present {
+				_ = os.Setenv("SWARM_LANG", previous)
+			} else {
+				_ = os.Unsetenv("SWARM_LANG")
+			}
+		}()
+	}
 	fail := func(e error) int {
 		if asJSON {
 			_ = printJSON(errOut, map[string]any{"schema_version": 1, "error": e.Error(), "failure": commandFailure(e)})
 		} else {
-			fmt.Fprintln(errOut, "Erreur :", e)
+			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(e.Error()))
 		}
 		switch commandFailure(e).Code {
 		case "conflict":
@@ -152,7 +165,7 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 	}
 	if len(pos) == 0 {
-		fmt.Fprint(out, help)
+		fmt.Fprint(out, uiText(help))
 		return 0
 	}
 	if pos[0] == "aide" || pos[0] == "help" {
@@ -279,16 +292,16 @@ func run(args []string, out, errOut io.Writer) int {
 			if asJSON {
 				_ = printJSON(out, preview)
 			} else {
-				fmt.Fprintf(out, "Aperçu — %s · %s\n%s\n", preview.TaskID, preview.TaskTitle, preview.Scope)
+				fmt.Fprintf(out, uiText("Aperçu — %s · %s\n%s\n"), preview.TaskID, preview.TaskTitle, preview.Scope)
 				for _, criterion := range preview.Criteria {
-					fmt.Fprintf(out, "- Critère %d : %s — %s", criterion.Index, criterion.Text, criterion.Review)
+					fmt.Fprintf(out, uiText("- Critère %d : %s — %s"), criterion.Index, criterion.Text, criterion.Review)
 					if len(criterion.ControlIDs) > 0 {
 						fmt.Fprintf(out, " (%s)", strings.Join(criterion.ControlIDs, ", "))
 					}
 					fmt.Fprintln(out)
 				}
-				fmt.Fprintln(out, "Effet : "+preview.Confirmation)
-				fmt.Fprintln(out, "Jeton à confirmer : "+preview.Token)
+				fmt.Fprintln(out, uiText("Effet : ")+preview.Confirmation)
+				fmt.Fprintln(out, uiText("Jeton à confirmer : ")+preview.Token)
 			}
 			return 0
 		}
@@ -299,7 +312,7 @@ func run(args []string, out, errOut io.Writer) int {
 		if asJSON {
 			_ = printJSON(out, map[string]any{"work": updated, "applied": true, "task_id": task})
 		} else {
-			fmt.Fprintf(out, "Politique enregistrée pour %s à la révision %d.\n", task, updated.Revision)
+			fmt.Fprintf(out, uiText("Politique enregistrée pour %s à la révision %d.\n"), task, updated.Revision)
 		}
 		return 0
 	}
@@ -450,4 +463,12 @@ func run(args []string, out, errOut io.Writer) int {
 	}
 	return emit(w)
 }
-func main() { os.Exit(run(os.Args[1:], os.Stdout, os.Stderr)) }
+func main() {
+	args, language, err := languageArgs(os.Args[1:])
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
+	}
+	_ = os.Setenv("SWARM_LANG", language)
+	os.Exit(run(args, os.Stdout, os.Stderr))
+}

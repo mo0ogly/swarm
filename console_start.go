@@ -22,7 +22,7 @@ func (s *Store) chooseConsoleWork(in *os.File, out io.Writer, asJSON bool, plain
 		return "", printJSON(out, map[string]any{"works": works, "selection_required": true})
 	}
 	if len(works) == 0 {
-		fmt.Fprintln(out, "Aucun travail. Créer un travail avec swarm work create --input fichier.json.")
+		fmt.Fprintln(out, uiText("Aucun travail. Créer un travail avec swarm work create --input fichier.json."))
 		return "", nil
 	}
 	if _, err := unix.IoctlGetTermios(int(in.Fd()), unix.TCGETS); err == nil && !plain && os.Getenv("TERM") != "dumb" {
@@ -32,11 +32,11 @@ func (s *Store) chooseConsoleWork(in *os.File, out io.Writer, asJSON bool, plain
 		fmt.Fprintf(out, "%d. %s | %s\n", i+1, terminalText(w.ID), terminalText(w.Title))
 	}
 	if _, e = unix.IoctlGetTermios(int(in.Fd()), unix.TCGETS); e != nil {
-		fmt.Fprintln(out, "Sans terminal interactif : swarm console IDENTIFIANT --json")
+		fmt.Fprintln(out, uiText("Sans terminal interactif : swarm console IDENTIFIANT --json"))
 		return "", nil
 	}
 	for {
-		fmt.Fprint(out, "Choisir un numéro ou un identifiant (q pour quitter) : ")
+		fmt.Fprint(out, uiText("Choisir un numéro ou un identifiant (q pour quitter) : "))
 		// No buffered read-ahead: the console must receive subsequent keyboard input.
 		var line strings.Builder
 		one := make([]byte, 1)
@@ -67,7 +67,7 @@ func (s *Store) chooseConsoleWork(in *os.File, out io.Writer, asJSON bool, plain
 				return w.ID, nil
 			}
 		}
-		fmt.Fprintln(out, "Choix invalide. Utiliser un numéro ou l’identifiant affiché.")
+		fmt.Fprintln(out, uiText("Choix invalide. Utiliser un numéro ou l’identifiant affiché."))
 	}
 }
 func (s *Store) plainConsole(work string, in *os.File, out io.Writer, asJSON bool) error {
@@ -88,7 +88,7 @@ func (s *Store) plainConsole(work string, in *os.File, out io.Writer, asJSON boo
 	if _, e := s.get(work); e != nil {
 		return e
 	}
-	state := &consoleState{message: "Mode texte : Entrée actualise ; help affiche les commandes ; q quitte."}
+	state := &consoleState{message: uiText("Mode texte : Entrée actualise ; help affiche les commandes ; q quitte.")}
 	scanner := bufio.NewScanner(in)
 	scanner.Buffer(make([]byte, 1024), 16000)
 	for {
@@ -99,7 +99,7 @@ func (s *Store) plainConsole(work string, in *os.File, out io.Writer, asJSON boo
 		state.message = ""
 		quit, e := s.consoleCommand(work, scanner.Text(), state)
 		if e != nil {
-			state.message = "Erreur : " + e.Error()
+			state.message = uiText("Erreur : ") + e.Error()
 		}
 		if quit {
 			return nil

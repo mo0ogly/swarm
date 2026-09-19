@@ -1,3 +1,4 @@
+const tr_web_prephase_decisions_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 // Human answers are bound to the exact plan and revision reviewed in this dialog.
 export class PreparationDecisions {
  constructor(api,current,committed){
@@ -15,20 +16,20 @@ export class PreparationDecisions {
   const valid=qs.every(q=>q&&typeof q.question==='string'&&typeof q.answer==='string');
   const count=valid?qs.filter(q=>!q.answer.trim()).length:0;
   document.getElementById('decisions-open').hidden=!valid||!qs.length;
-  document.getElementById('decisions-open').textContent=count?'Répondre aux '+count+' décisions en attente':'Relire les '+qs.length+' décisions';
+  document.getElementById('decisions-open').textContent=count?tr_web_prephase_decisions_js('Répondre aux ')+count+tr_web_prephase_decisions_js(' décisions en attente'):tr_web_prephase_decisions_js('Relire les ')+qs.length+tr_web_prephase_decisions_js(' décisions');
  }
  build(p){
   const plan=JSON.parse(p.documents.plan.text);
-  if(!Array.isArray(plan.questions)||!plan.questions.length)throw new Error('Aucune question dans ce plan.');
+  if(!Array.isArray(plan.questions)||!plan.questions.length)throw new Error(tr_web_prephase_decisions_js('Aucune question dans ce plan.'));
   this.draft={id:p.id,revision:p.revision,hash:p.documents.plan.sha256,decisions:structuredClone(plan.questions),original:plan.questions.map(q=>q.answer)};
   this.render();
  }
  render(){
   this.fields.replaceChildren();this.error.textContent='';
-  this.draft.decisions.forEach((q,i)=>{const box=document.createElement('div'),label=document.createElement('label'),input=document.createElement('textarea');box.className='decision-row';input.id='decision-'+i;input.rows=3;input.maxLength=4000;input.value=q.answer;input.placeholder='Votre décision…';label.htmlFor=input.id;label.textContent=(i+1)+'. '+q.question;input.addEventListener('input',e=>{if(e.isTrusted)this.draft.decisions[i].answer=input.value});box.append(label,input);this.fields.append(box)});
+  this.draft.decisions.forEach((q,i)=>{const box=document.createElement('div'),label=document.createElement('label'),input=document.createElement('textarea');box.className='decision-row';input.id='decision-'+i;input.rows=3;input.maxLength=4000;input.value=q.answer;input.placeholder=tr_web_prephase_decisions_js('Votre décision…');label.htmlFor=input.id;label.textContent=(i+1)+'. '+q.question;input.addEventListener('input',e=>{if(e.isTrusted)this.draft.decisions[i].answer=input.value});box.append(label,input);this.fields.append(box)});
   this.lock();
  }
- lock(){this.save.disabled=this.busy;this.save.textContent=this.pending?'Vérifier l’enregistrement':'Enregistrer mes décisions';document.getElementById('decisions-reset').disabled=this.busy||!!this.pending;for(const input of this.fields.querySelectorAll('textarea'))input.readOnly=this.busy||!!this.pending;}
+ lock(){this.save.disabled=this.busy;this.save.textContent=this.pending?tr_web_prephase_decisions_js('Vérifier l’enregistrement'):tr_web_prephase_decisions_js('Enregistrer mes décisions');document.getElementById('decisions-reset').disabled=this.busy||!!this.pending;for(const input of this.fields.querySelectorAll('textarea'))input.readOnly=this.busy||!!this.pending;}
  async open(){
   const p=await this.current();if(!p)return;
   if(!this.draft||this.draft.id!==p.id||!this.hasDraft())this.build(p);else this.render();
@@ -41,7 +42,7 @@ export class PreparationDecisions {
   this.busy=true;this.lock();
   try{
    const p=await this.api('preparations/command',this.pending);this.pending=null;
-   if(p.receipt_historical)throw new Error('Réponses enregistrées, puis préparation modifiée ailleurs. Rechargez le plan pour examiner sa version courante.');
+   if(p.receipt_historical)throw new Error(tr_web_prephase_decisions_js('Réponses enregistrées, puis préparation modifiée ailleurs. Rechargez le plan pour examiner sa version courante.'));
    this.committed(p);this.draft=null;this.dialog.close();document.getElementById('decisions-open').focus();
   }catch(e){if(e.status&&e.status<500)this.pending=null;this.fail(e)}finally{this.busy=false;this.lock()}
  }

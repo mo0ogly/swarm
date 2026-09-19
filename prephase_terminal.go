@@ -72,14 +72,14 @@ func (t *preparationTerminal) say(text string) {
 }
 func (t *preparationTerminal) prompt() {
 	if t.confirmation != nil {
-		fmt.Fprint(t.out, "/confirmer ou /annuler > ")
+		fmt.Fprint(t.out, uiText("/confirmer ou /annuler > "))
 		return
 	}
 	if t.multi != "" {
 		fmt.Fprint(t.out, "... ")
 		return
 	}
-	fmt.Fprint(t.out, "préparer> ")
+	fmt.Fprint(t.out, uiText("préparer> "))
 }
 func (t *preparationTerminal) load(id string) error {
 	p, e := t.s.preparation(id)
@@ -88,7 +88,7 @@ func (t *preparationTerminal) load(id string) error {
 	}
 	t.p = p
 	t.seen = map[string]string{}
-	t.say(fmt.Sprintf("%s · %s · révision %d enregistrée · méthode %s · document %s", p.Title, p.ID, p.Revision, p.Method, preparationCurrentDocument(p)))
+	t.say(fmt.Sprintf(uiText("%s · %s · révision %d enregistrée · méthode %s · document %s"), p.Title, p.ID, p.Revision, p.Method, preparationCurrentDocument(p)))
 	return nil
 }
 func (t *preparationTerminal) mutate(r PreparationRequest) error {
@@ -97,14 +97,14 @@ func (t *preparationTerminal) mutate(r PreparationRequest) error {
 		return e
 	}
 	if p.ReceiptHistorical {
-		t.say("Commande déjà enregistrée ; chargement de l’état courant.")
+		t.say(uiText("Commande déjà enregistrée ; chargement de l’état courant."))
 		return t.load(p.ID)
 	}
 	t.p = p
 	if p.Conversion != nil {
-		t.say(fmt.Sprintf("Missions : %s — travail %s. Départs autorisés : %t.", strings.Join(p.Conversion.TaskIDs, ", "), p.Conversion.WorkID, p.Conversion.ReleasedAt != ""))
+		t.say(fmt.Sprintf(uiText("Missions : %s — travail %s. Départs autorisés : %t."), strings.Join(p.Conversion.TaskIDs, ", "), p.Conversion.WorkID, p.Conversion.ReleasedAt != ""))
 	}
-	t.say(fmt.Sprintf("Enregistré · révision %d · méthode %s · document %s.", p.Revision, p.Method, preparationCurrentDocument(p)))
+	t.say(fmt.Sprintf(uiText("Enregistré · révision %d · méthode %s · document %s."), p.Revision, p.Method, preparationCurrentDocument(p)))
 	return nil
 }
 
@@ -130,7 +130,7 @@ func (t *preparationTerminal) create(title, text string) error {
 	if e := t.mutate(r); e != nil {
 		return e
 	}
-	t.say("Préparation : " + t.p.ID + ". Choisissez /ia NOM pour dialoguer.")
+	t.say(uiText("Préparation : ") + t.p.ID + uiText(". Choisissez /ia NOM pour dialoguer."))
 	return nil
 }
 func (t *preparationTerminal) send(message, target string) error {
@@ -164,9 +164,9 @@ func (t *preparationTerminal) resend() error {
 		return fmt.Errorf("Envoi non confirmé : /renvoyer. %w", e)
 	}
 	t.pending = nil
-	t.say("Envoi enregistré : " + turn.ID + ". /arreter reste disponible.")
+	t.say(uiText("Envoi enregistré : ") + turn.ID + uiText(". /arreter reste disponible."))
 	if turn.ModelRoute != nil {
-		t.say("IA : " + turn.Provider + " · modèle " + turn.ModelRoute.Model + " · niveau " + turn.ModelRoute.Level)
+		t.say(uiText("IA : ") + turn.Provider + uiText(" · modèle ") + turn.ModelRoute.Model + uiText(" · niveau ") + turn.ModelRoute.Level)
 	}
 	return nil
 }
@@ -188,21 +188,21 @@ func (t *preparationTerminal) history(all bool) error {
 		t.seen[turn.ID] = turn.Status
 		t.say(turn.ID + " · " + turn.Provider + " · " + turn.Status)
 		if all {
-			t.say("Vous : " + turn.Question)
+			t.say(uiText("Vous : ") + turn.Question)
 		}
 		if turn.Answer != nil {
-			t.say("IA : " + turn.Answer.Message)
+			t.say(uiText("IA : ") + turn.Answer.Message)
 			kind, text := turn.proposalDocument()
 			if text != "" {
-				t.say("Proposition de " + kind + " : /appliquer " + turn.ID)
+				t.say(uiText("Proposition de ") + kind + " : /appliquer " + turn.ID)
 			}
 		}
 		if turn.PlanSummary != nil {
 			c := turn.PlanSummary
-			t.say(fmt.Sprintf("%d missions · %d dépendances · %d questions ouvertes dans la proposition IA.", c.Missions, c.Dependencies, c.OpenQuestions))
+			t.say(fmt.Sprintf(uiText("%d missions · %d dépendances · %d questions ouvertes dans la proposition IA."), c.Missions, c.Dependencies, c.OpenQuestions))
 		}
 		if turn.Stale && !turn.Used && !turn.UsedInPlan {
-			t.say("Contexte ancien : demandez une proposition actualisée.")
+			t.say(uiText("Contexte ancien : demandez une proposition actualisée."))
 		}
 		if turn.Error != "" {
 			t.say(turn.Error)
@@ -221,11 +221,11 @@ func (t *preparationTerminal) stop() error {
 			if e != nil {
 				return e
 			}
-			t.say("Arrêt : " + current.Status + ". Aucune relance automatique.")
+			t.say(uiText("Arrêt : ") + current.Status + uiText(". Aucune relance automatique."))
 			return nil
 		}
 	}
-	t.say("Aucun échange actif.")
+	t.say(uiText("Aucun échange actif."))
 	return nil
 }
 
@@ -262,7 +262,7 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		if !literal && line == "/annuler" {
 			t.multi = ""
 			t.lines = nil
-			t.say("Saisie abandonnée.")
+			t.say(uiText("Saisie abandonnée."))
 			return false, nil
 		}
 		if !literal && line == "/envoyer" {
@@ -287,7 +287,7 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		}
 		if line == "/annuler" {
 			t.confirmation = nil
-			t.say("Action abandonnée.")
+			t.say(uiText("Action abandonnée."))
 			return false, nil
 		}
 		if line != "/confirmer" {
@@ -316,7 +316,7 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 			}
 			t.say(text)
 		} else {
-			t.say(preparationTerminalHelp + "\nAide par sujet : /aide preparation | /aide contexte | /aide budget | /aide parite")
+			t.say(uiText(preparationTerminalHelp) + uiText("\nAide par sujet : /aide preparation | /aide contexte | /aide budget | /aide parite"))
 		}
 	case "/sessions":
 		ps, e := t.s.preparations()
@@ -345,14 +345,14 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		}
 		for _, c := range capabilities {
 			if arg == "" {
-				t.say(fmt.Sprintf("%s · disponible %t · délai %d s · %s", c.Provider, c.Available, c.Timeout, c.Reason))
+				t.say(fmt.Sprintf(uiText("%s · disponible %t · délai %d s · %s"), c.Provider, c.Available, c.Timeout, c.Reason))
 			}
 			if c.Provider == arg {
 				if !c.Available {
 					return false, fmt.Errorf("%s", c.Reason)
 				}
 				t.provider = &c
-				t.say("IA sélectionnée : " + c.Provider + ". Documents, méthode et conversation transmis ; aucun outil.")
+				t.say(uiText("IA sélectionnée : ") + c.Provider + uiText(". Documents, méthode et conversation transmis ; aucun outil."))
 				return false, nil
 			}
 		}
@@ -379,9 +379,9 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		}
 		t.level = arg
 		if route != nil {
-			t.say("Modèle sélectionné : " + route.Model + " · niveau " + route.Level + " · effort " + route.Effort)
+			t.say(uiText("Modèle sélectionné : ") + route.Model + uiText(" · niveau ") + route.Level + uiText(" · effort ") + route.Effort)
 		} else {
-			t.say("Modèle géré par l’exécutable")
+			t.say(uiText("Modèle géré par l’exécutable"))
 		}
 	case "/contexte":
 		if t.pending != nil {
@@ -392,9 +392,9 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		}
 		t.contextMode = arg
 		if arg == "recent" {
-			t.say("Le prochain appel recevra les documents, la méthode et le dernier échange complet. Les échanges antérieurs restent dans l’historique, sans être renvoyés.")
+			t.say(uiText("Le prochain appel recevra les documents, la méthode et le dernier échange complet. Les échanges antérieurs restent dans l’historique, sans être renvoyés."))
 		} else {
-			t.say("Le prochain appel recevra la conversation complète.")
+			t.say(uiText("Le prochain appel recevra la conversation complète."))
 		}
 	case "/fichiers", "/fichiers-dans":
 		scope, query := "", arg
@@ -406,13 +406,13 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 			return false, e
 		}
 		for _, dir := range v.Directories {
-			t.say("Dossier : " + dir + " — /fichiers-dans " + dir)
+			t.say(uiText("Dossier : ") + dir + " — /fichiers-dans " + dir)
 		}
 		for _, path := range v.Paths {
 			t.say(path)
 		}
 		if v.Limited {
-			t.say("Liste limitée : précisez la recherche.")
+			t.say(uiText("Liste limitée : précisez la recherche."))
 		}
 	case "/lire", "/joindre":
 		parts := strings.Fields(arg)
@@ -432,18 +432,18 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		t.say(fmt.Sprintf("%s · lignes %d–%d · %s\n%s", v.Path, v.Start, v.End, v.Hash, v.Text))
+		t.say(fmt.Sprintf(uiText("%s · lignes %d–%d · %s\n%s"), v.Path, v.Start, v.End, v.Hash, v.Text))
 		if cmd == "/joindre" {
 			r := t.request("source-add")
 			r.Source = &v.PreparationSourceRef
 			t.confirmation = &r
-			t.say("/confirmer joint cet instantané aux prochains appels et demande de réadopter le brief ; /annuler abandonne.")
+			t.say(uiText("/confirmer joint cet instantané aux prochains appels et demande de réadopter le brief ; /annuler abandonne."))
 		}
 	case "/retirer":
 		r := t.request("source-remove")
 		r.Source = &PreparationSourceRef{Path: arg}
 		t.confirmation = &r
-		t.say("Retirer " + arg + " des prochains appels : /confirmer ou /annuler.")
+		t.say(uiText("Retirer ") + arg + uiText(" des prochains appels : /confirmer ou /annuler."))
 	case "/budget":
 		if arg == "" {
 			v, e := t.s.preparationBudget(t.p.ID)
@@ -472,14 +472,14 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 			r := t.request("budget")
 			r.Budget = &b
 			t.confirmation = &r
-			t.say(fmt.Sprintf("Enveloppe estimative %.2f USD ; %.2f USD par appel. /confirmer ou /annuler.", limit, reserve))
+			t.say(fmt.Sprintf(uiText("Enveloppe estimative %.2f USD ; %.2f USD par appel. /confirmer ou /annuler."), limit, reserve))
 		}
 	case "/sources":
 		for _, source := range t.p.Sources {
-			t.say(fmt.Sprintf("%s · lignes %d–%d · instantané %s", source.Path, source.Start, source.End, source.At))
+			t.say(fmt.Sprintf(uiText("%s · lignes %d–%d · instantané %s"), source.Path, source.Start, source.End, source.At))
 		}
 
-		t.say("Documents enregistrés, extraits joints, brief adopté, conversation et fichiers de la méthode. Aucun accès autonome au dépôt.")
+		t.say(uiText("Documents enregistrés, extraits joints, brief adopté, conversation et fichiers de la méthode. Aucun accès autonome au dépôt."))
 		m, e := t.s.preparationMethod(t.p.Method)
 		if e != nil {
 			return false, e
@@ -490,7 +490,7 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 	case "/methode":
 		if arg == "" {
 			for _, m := range t.s.preparationMethods() {
-				t.say(fmt.Sprintf("%s · disponible %t · %s", m.ID, m.Available, m.Reason))
+				t.say(fmt.Sprintf(uiText("%s · disponible %t · %s"), m.ID, m.Available, m.Reason))
 			}
 		} else {
 			r := t.request("method")
@@ -515,10 +515,10 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		}
 		t.multi = arg
 		t.lines = nil
-		t.say("Saisie multiligne ; /envoyer termine, /annuler abandonne.")
+		t.say(uiText("Saisie multiligne ; /envoyer termine, /annuler abandonne."))
 	case "/plan":
 		if arg == "" {
-			arg = "Propose le plan JSON à partir du brief adopté."
+			arg = uiText("Propose le plan JSON à partir du brief adopté.")
 		}
 		return false, t.send(arg, "plan")
 	case "/historique":
@@ -538,14 +538,14 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		if turn.PreparationID != t.p.ID || turn.Status != "answered" || turn.Revision != t.p.Revision || text == "" {
 			return false, fmt.Errorf("Proposition absente, ancienne ou hors préparation.")
 		}
-		t.say("DOCUMENT ENREGISTRÉ — " + kind)
+		t.say(uiText("DOCUMENT ENREGISTRÉ — ") + kind)
 		t.say(preparationDisplayDocument(kind, t.p.Documents[kind].Text))
-		t.say("PROPOSITION — " + kind)
+		t.say(uiText("PROPOSITION — ") + kind)
 		t.say(preparationDisplayDocument(kind, text))
 		r := t.request("use-proposal")
 		r.Turn = turn.ID
 		t.confirmation = &r
-		t.say("/confirmer remplace ce document ; sa vérification ou adoption reste distincte.")
+		t.say(uiText("/confirmer remplace ce document ; sa vérification ou adoption reste distincte."))
 	case "/adopter":
 		if t.p.Documents["brief"].Text == "" {
 			return false, fmt.Errorf("Rédigez d’abord un brief.")
@@ -554,7 +554,7 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		r := t.request("adopt-brief")
 		r.Hash = t.p.Documents["brief"].Hash
 		t.confirmation = &r
-		t.say("/confirmer adopte ce brief.")
+		t.say(uiText("/confirmer adopte ce brief."))
 	case "/creer-missions", "/autoriser-missions":
 		review, e := t.s.preparationConversionReview(t.p.ID)
 		if e != nil {
@@ -572,18 +572,18 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 			}
 			planHash = t.p.Conversion.PlanHash
 		}
-		t.say("Travail cible : " + review.WorkTitle)
+		t.say(uiText("Travail cible : ") + review.WorkTitle)
 		for _, m := range review.Spec.Tasks {
-			t.say(fmt.Sprintf("%s — %s ; dépendances : %s ; livrable : %s", m.ID, m.Title, strings.Join(m.Depends, ", "), m.Deliverable))
+			t.say(fmt.Sprintf(uiText("%s — %s ; dépendances : %s ; livrable : %s"), m.ID, m.Title, strings.Join(m.Depends, ", "), m.Deliverable))
 		}
 		r := t.request(action)
 		r.Hash = planHash
 		r.WorkRevision = &review.WorkRevision
 		t.confirmation = &r
 		if action == "create-missions" {
-			t.say("/confirmer crée ces missions avec leur démarrage verrouillé.")
+			t.say(uiText("/confirmer crée ces missions avec leur démarrage verrouillé."))
 		} else {
-			t.say("/confirmer autorise ces seules missions. Le moteur conserve profils, dépendances, budget, pause et autonomie ; en mode automatique, les missions éligibles pourront démarrer.")
+			t.say(uiText("/confirmer autorise ces seules missions. Le moteur conserve profils, dépendances, budget, pause et autonomie ; en mode automatique, les missions éligibles pourront démarrer."))
 		}
 	case "/decisions", "/repondre":
 		var plan ActionPlan
@@ -606,15 +606,15 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 			if e := t.mutate(r); e != nil {
 				return false, e
 			}
-			t.say("Réponse enregistrée. /verifier contrôle le plan une fois toutes les décisions résolues.")
+			t.say(uiText("Réponse enregistrée. /verifier contrôle le plan une fois toutes les décisions résolues."))
 		}
 		if len(plan.Questions) == 0 {
-			t.say("Aucune décision ouverte dans ce plan. /verifier pour le contrôler.")
+			t.say(uiText("Aucune décision ouverte dans ce plan. /verifier pour le contrôler."))
 		}
 		for i, q := range plan.Questions {
 			answer := q.Answer
 			if !nonempty(answer) {
-				answer = "À RÉSOUDRE"
+				answer = uiText("À RÉSOUDRE")
 			}
 			t.say(fmt.Sprintf("%d. %s\n   %s", i+1, q.Question, answer))
 		}
@@ -624,12 +624,12 @@ func (t *preparationTerminal) line(line string, literal bool) (bool, error) {
 		if e := t.mutate(r); e != nil {
 			return false, e
 		}
-		t.say("Plan vérifié pour cette version. Aucune mission créée.")
+		t.say(uiText("Plan vérifié pour cette version. Aucune mission créée."))
 	case "/export":
 		if e := exportPreparation(t.p, arg); e != nil {
 			return false, e
 		}
-		t.say("Documents exportés : " + arg)
+		t.say(uiText("Documents exportés : ") + arg)
 	case "/edit":
 		if !preparationDocumentKind(arg) {
 			return false, fmt.Errorf("/edit besoin|brief|plan")

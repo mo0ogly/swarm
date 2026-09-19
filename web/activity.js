@@ -1,4 +1,6 @@
 'use strict';
+const tr_web_activity_js = source => globalThis.SwarmI18n?.t(source) ?? source;
+
 // Fil d'activité : la ligne de vie du travail. Chaque entrée dit qui a agi —
 // le moteur ou vous — parce que c'est la seule chose que l'autonomie rend
 // difficile à savoir après coup.
@@ -19,7 +21,7 @@ let filTronque = false;
 function filMarqueur(origine) {
   // Le symbole double le mot, il ne le remplace pas : une couleur seule ne se
   // lit pas de la même façon par tout le monde.
-  const e = node('span', origine === 'moteur' ? '▸ moteur' : '● vous', 'fil-origine');
+  const e = node('span', origine === 'moteur' ? tr_web_activity_js('▸ moteur') : tr_web_activity_js('● vous'), 'fil-origine');
   e.dataset.origine = origine;
   return e;
 }
@@ -27,12 +29,12 @@ function filMarqueur(origine) {
 function filHeure(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleTimeString((globalThis.SwarmI18n?.locale || 'fr-FR'), { hour: '2-digit', minute: '2-digit' });
 }
 
 function filJour(iso) {
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('fr-FR');
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString((globalThis.SwarmI18n?.locale || 'fr-FR'));
 }
 
 function filLigne(entree, jourPrecedent) {
@@ -48,7 +50,7 @@ function filLigne(entree, jourPrecedent) {
   const heure = node('time', filHeure(entree.at), 'fil-heure');
   heure.dateTime = entree.at;
   tete.append(heure, filMarqueur(entree.origin), node('span', entree.label, 'fil-label'));
-  li.append(tete, node('p', entree.message || 'Motif non renseigné', 'fil-message'));
+  li.append(tete, node('p', entree.message || tr_web_activity_js('Motif non renseigné'), 'fil-message'));
   return { li, jour };
 }
 
@@ -56,16 +58,17 @@ function filLigne(entree, jourPrecedent) {
 // reprendre un travail.
 function filDepuis(iso) {
   const minutes = Math.round((Date.now() - Date.parse(iso)) / 60000);
-  if (!Number.isFinite(minutes) || minutes < 1) return "à l'instant";
-  if (minutes < 60) return 'il y a ' + minutes + ' min';
+  if (!Number.isFinite(minutes) || minutes < 1) return tr_web_activity_js("à l'instant");
+  if(globalThis.SwarmI18n?.language==='en'){const f=new Intl.RelativeTimeFormat('en',{numeric:'auto'});return minutes<60?f.format(-minutes,'minute'):minutes<1440?f.format(-Math.round(minutes/60),'hour'):f.format(-Math.round(minutes/1440),'day')}
+  if (minutes < 60) return tr_web_activity_js('il y a ') + minutes + ' min';
   const heures = Math.round(minutes / 60);
-  if (heures < 24) return 'il y a ' + heures + ' h';
-  return 'il y a ' + Math.round(heures / 24) + ' j';
+  if (heures < 24) return tr_web_activity_js('il y a ') + heures + ' h';
+  return tr_web_activity_js('il y a ') + Math.round(heures / 24) + tr_web_activity_js(' j');
 }
 
 function filSeparateurVisite() {
   const li = node('li', undefined, 'fil-visite');
-  li.append(node('span', 'votre dernière visite · ' + filDepuis(filVisiteReference)));
+  li.append(node('span', tr_web_activity_js('votre dernière visite · ') + filDepuis(filVisiteReference)));
   return li;
 }
 
@@ -92,10 +95,10 @@ function filRendre() {
     // « Début du fil » affirme qu'il n'y a rien avant ; ne le dire que si c'est
     // vrai, sinon annoncer que l'historique remonte moins loin qu'il n'existe.
     etat.textContent = filSuite ? '' : (filTronque
-      ? "Début de l'historique consultable ; les événements plus anciens ne sont pas chargés."
-      : 'Début du fil.');
+      ? tr_web_activity_js("Début de l'historique consultable ; les événements plus anciens ne sont pas chargés.")
+      : tr_web_activity_js('Début du fil.'));
   } else {
-    etat.textContent = 'Aucune activité enregistrée pour ce travail. Les départs, relais et décisions apparaîtront ici.';
+    etat.textContent = tr_web_activity_js('Aucune activité enregistrée pour ce travail. Les départs, relais et décisions apparaîtront ici.');
   }
 }
 
@@ -117,7 +120,7 @@ async function filCharger({ suite = false } = {}) {
     filTronque = !!page.history_truncated;
     filRendre();
   } catch (e) {
-    $('fil-etat').textContent = 'Fil indisponible : ' + e.message;
+    $('fil-etat').textContent = tr_web_activity_js('Fil indisponible : ') + e.message;
   } finally {
     filEnCours = false;
   }
@@ -172,14 +175,14 @@ function filRendreResume() {
   const hote = $('fil-resume');
   if (!hote) return;
   const change = filChangementsDepuisVisite();
-  if (!filEntrees.length) { hote.textContent = 'aucune activité'; hote.dataset.neuf = 'non'; return; }
+  if (!filEntrees.length) { hote.textContent = tr_web_activity_js('aucune activité'); hote.dataset.neuf = 'non'; return; }
   if (!change || change.entrees === 0) {
-    hote.textContent = 'rien de neuf depuis votre visite';
+    hote.textContent = tr_web_activity_js('rien de neuf depuis votre visite');
     hote.dataset.neuf = 'non';
     return;
   }
-  hote.textContent = (change.complet ? '' : 'au moins ') + change.entrees +
-    (change.entrees > 1 ? ' événements' : ' événement') + ' depuis votre visite';
+  hote.textContent = (change.complet ? '' : tr_web_activity_js('au moins ')) + change.entrees +
+    (change.entrees > 1 ? tr_web_activity_js(' événements') : tr_web_activity_js(' événement')) + tr_web_activity_js(' depuis votre visite');
   hote.dataset.neuf = 'oui';
 }
 

@@ -133,19 +133,23 @@ Le terminal propose ses propres dialogues et raccourcis : la parité UX n’est 
 
 func cliTopicHelp(topic string) (string, error) {
 	topic = strings.ToLower(strings.TrimSpace(topic))
+	aliases := map[string]string{"planning": "planification", "management": "pilotage", "tasks": "taches", "validation": "validations", "lifecycle": "cycle-vie", "logs": "journaux", "context": "contexte", "parity": "parite"}
+	if target, ok := aliases[topic]; ok {
+		topic = target
+	}
 	if topic == "" {
 		keys := make([]string, 0, len(cliHelpTopics))
 		for k := range cliHelpTopics {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
-		return "AIDE SWARM — choisissez un sujet\n\nswarm aide SUJET\nSujets : " + strings.Join(keys, ", ") + "\n\nConsole : help SUJET ; F1 ouvre l’aide de la fenêtre courante.\nPréparation : /aide SUJET ; /aide affiche les commandes.\nL’aide ne lance aucune action.\n", nil
+		return uiText("AIDE SWARM — choisissez un sujet\n\nswarm aide SUJET\nSujets : ") + strings.Join(keys, ", ") + uiText("\n\nConsole : help SUJET ; F1 ouvre l’aide de la fenêtre courante.\nPréparation : /aide SUJET ; /aide affiche les commandes.\nL’aide ne lance aucune action.\n"), nil
 	}
 	text, ok := cliHelpTopics[topic]
 	if !ok {
 		return "", fmt.Errorf("sujet d’aide inconnu : %s ; swarm aide liste les sujets", topic)
 	}
-	return text + "\n", nil
+	return uiText(text) + "\n", nil
 }
 
 func terminalHelpTopic(mode string) string {

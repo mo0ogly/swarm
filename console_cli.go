@@ -152,7 +152,7 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		}
 		return printJSON(out, map[string]any{"launched": dispatchedIDs(launched),
 			"autonomy": s.autonomy(arg(1)), "slots": s.slots(arg(1)), "paused": s.paused(arg(1)),
-			"message": "Départs automatiques effectués ; les refus sont journalisés dans le travail."})
+			"message": uiText("Départs automatiques effectués ; les refus sont journalisés dans le travail.")})
 	case "autonomy":
 		if arg(2) == "" {
 			return printJSON(out, map[string]any{"autonomy": s.autonomy(arg(1)), "label": autonomyLabel(s.autonomy(arg(1))), "slots": s.slots(arg(1))})
@@ -205,7 +205,7 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 			if e := s.initProviders(); e != nil {
 				return e
 			}
-			fmt.Fprintln(out, "Configuration créée : .swarm/providers.json (aucun fournisseur lancé)")
+			fmt.Fprintln(out, uiText("Configuration créée : .swarm/providers.json (aucun fournisseur lancé)"))
 			return nil
 		}
 		p, e := s.providers()
@@ -281,7 +281,7 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 			if e := s.stopAgent(arg(2)); e != nil {
 				return e
 			}
-			fmt.Fprintln(out, "Arrêt demandé ; vérifier agent show pour la confirmation.")
+			fmt.Fprintln(out, uiText("Arrêt demandé ; vérifier agent show pour la confirmation."))
 			return nil
 		case "reconcile":
 			return s.reconcile(arg(2))

@@ -94,3 +94,6 @@ body[data-mode=conduite] .rail-label{opacity:.9}
 .accueil-segment:hover{color:var(--wattson-lien-encre)}
 .accueil-separateur{color:var(--wattson-libelle)}
 .accueil-budget{color:var(--wattson-libelle)}
+
+html[lang="en"] .fil-sommaire::after{content:"Collapse"}
+html[lang="en"] .fil-bloc:not([open]) .fil-sommaire::after{content:"Expand"}

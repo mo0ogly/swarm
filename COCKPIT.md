@@ -147,8 +147,7 @@ commande explicite `workspace integrate`, sérialisée et en échec fermé si un
 empreinte de base a changé. Ce mécanisme copie les artefacts déclarés ; il ne
 crée pas de worktree, ne fusionne pas Git et ne valide pas le résultat intégré.
 Les règles projet et le guide de terrain doivent être présents et pertinents dans
-chaque copie. Le contrat exact est dans
-`docs/plans/swarm-autonomie-coordination/a7-espaces.md`.
+chaque copie. Voir la [référence technique](REFERENCE.md).
 
 Les priorités ordonnent l'affichage. Il n'existe pas encore d'ordonnanceur qui
 prélève automatiquement les tâches. Les rôles planner/subplanner/worker et la
@@ -837,46 +836,6 @@ enregistre maintenant ses métadonnées et son statut en une seule opération.
 Toute annulation humaine porte stop_kind=operateur : le mode autonome ne doit
 pas la relancer. La recette de résolution couvre désormais ce mode autonome.
 
-## Préparation documentaire — candidat du 15 septembre 2026
-
-> Historique de conception : les trois sous-sections suivantes décrivent des
-> candidats successifs, pas l’installation actuelle. Pour préparer et lancer
-> une mission aujourd’hui, suivre [le guide utilisateur](GUIDE-UTILISATEUR.md).
-
-Le candidat `/tmp/swarm-prephase-web` ajoute « Préparer un projet » au cockpit.
-La page `/prepare.html` partage les documents avec `prepare` côté CLI : besoin,
-brief, plan JSON, versions, sauvegarde et résolution de conflits. Monaco est
-embarqué localement et dispose d’un éditeur texte de secours. La méthode APEX,
-KS ou audit-PDCA sélectionnée référence les fichiers du projet ; son dialogue IA
-reste à raccorder. Aucun agent n’est lancé depuis cette page.
-
-Recette de l’éditeur et non-régression du pilotage :
-`docs/plans/swarm-prephase-apex/IMPLEMENTATION.md` du dépôt d’origine (non distribué ici).
-Le serveur installé n’est pas remplacé par ce candidat (schéma SQLite v7).
-
-### Dialogue de préparation — candidat suivant
-
-`/tmp/swarm-prephase-dialogue` (SQLite v8) ajoute une conversation avec Claude ou
-Codex à côté de Monaco : réponse persistante, proposition de brief à comparer,
-utilisation explicite puis adoption séparée. Les appels sont sans outils, limités
-à 120 secondes et 20 échanges par préparation. Arrêter affiche la confirmation
-moteur ; les réponses anciennes ne remplacent pas les documents courants.
-Le CLI expose `prepare providers|dialogue|send|stop|use-proposal` en JSON.
-Le mode interactif CLI, la génération du plan et sa conversion restent à réaliser.
-Voir `ADR-002` du plan de préparation dans le dépôt d’origine (non distribué ici).
-
-### Plans IA et dialogue terminal — candidat suivant
-
-`/tmp/swarm-prephase-plan` propose le plan à partir d’un brief adopté. Le moteur
-contrôle structure et dépendances ; comparer, enregistrer et vérifier restent
-séparés. Les questions ouvertes bloquent la vérification jusqu’à leur résolution.
-`prepare` en terminal ouvre le dialogue ; `prepare chat ID` / `prepare resume ID`
-reprennent une préparation. `/aide` liste les commandes, `/plan` appelle l’IA,
-`/voir plan` consulte sans appel, `/edit plan` utilise VISUAL/EDITOR avec protection
-contre l’écrasement d’une version concurrente. Modes JSON et --plain disponibles.
-Aucune mission n’est créée par ce lot. Voir
-`ADR-003` du plan de préparation dans le dépôt d’origine (non distribué ici).
-
 ## Session interactive dans le graphe
 
 Au lancement manuel d’une tâche, choisir **Mode de session → Interactif — terminal
@@ -1043,8 +1002,6 @@ session distincte. Ce service n’est pas un agent exécutant lancé avec un rô
 `reviewer`. Son avis ne remplace pas les tests autorisés ni la revue humaine
 choisie. Les missions historiques peuvent ne pas l’avoir configuré.
 Voir [le parcours actuel et ses limites](PREPARATION-UX.md#vérificateur-indépendant-des-missions-préparées).
-L’[audit historique des responsabilités](docs/architecture/ROLES-RESPONSABILITES-ET-LIMITES.md)
-conserve les constats antérieurs, sans décrire à lui seul les fonctions actuelles.
 
 
 ### Organisation obligatoire avant les départs autonomes
@@ -1052,7 +1009,7 @@ conserve les constats antérieurs, sans décrire à lui seul les fonctions actue
 Une mission sans responsable et sans politique de validation explicite ne peut
 plus être autorisée en autonome. Le web et `mission status` exposent les manques.
 Les recettes isolées et l’installation ne valident pas une mission utilisateur.
-Voir le [contrat et la recette visible](docs/architecture/GARDE-ORGANISATION.md).
+Voir le [contrat de contrôle de l’organisation](docs/architecture/GARDE-ORGANISATION.md).
 
 ## Préparation, révision et modèles IA
 

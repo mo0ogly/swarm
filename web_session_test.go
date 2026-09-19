@@ -37,6 +37,10 @@ func TestWebSessionStablePrivateAndScoped(t *testing.T) {
 	}{
 		{"/session/" + first + "?work=w-example", 303, "/?work=w-example"},
 		{"/session/wrong?work=w-example", 403, ""},
+		{"/session/" + first + "?lang=en", 303, "/?lang=en"},
+		{"/session/" + first + "?work=w-example&lang=en", 303, "/?work=w-example&lang=en"},
+		{"/session/" + first + "?view=prepare&id=prep-demo&lang=fr", 303, "/prepare.html?id=prep-demo&lang=fr"},
+		{"/session/" + first + "?lang=https://outside.invalid", 303, "/"},
 		{"/session/" + first + "?work=../bad", 400, ""},
 	} {
 		rr := httptest.NewRecorder()

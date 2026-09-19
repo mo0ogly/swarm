@@ -2,6 +2,8 @@
 !go.mod
 !go.sum
 !*.go
+!locales/
+!locales/en.json
 !contracts/
 !contracts/**
 !web/

@@ -118,7 +118,7 @@ func (s *Store) preparationREPL(id string, in *os.File, out io.Writer, plain boo
 				err = t.history(false)
 				t.out = save
 				if err != nil {
-					t.say(err.Error())
+					t.say(uiEngineText(err.Error()))
 				}
 				if log.Len() > 0 {
 					fmt.Fprintln(out)
@@ -177,7 +177,7 @@ func (s *Store) preparationREPL(id string, in *os.File, out io.Writer, plain boo
 			t.say("Saisie abandonnée.")
 			if t.p.ID != "" {
 				if e = t.stop(); e != nil {
-					t.say(e.Error())
+					t.say(uiEngineText(e.Error()))
 				}
 			}
 			t.prompt()
@@ -194,7 +194,7 @@ func (s *Store) preparationREPL(id string, in *os.File, out io.Writer, plain boo
 			} else {
 				quit, err := t.line(string(buffer), literal)
 				if err != nil {
-					t.say("Action refusée : " + err.Error())
+					t.say(uiText("Action refusée : ") + uiEngineText(err.Error()))
 				}
 				if quit {
 					return nil

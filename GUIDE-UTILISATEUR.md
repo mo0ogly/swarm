@@ -7,6 +7,21 @@ installés et authentifiés dans l’environnement où Swarm les exécute.
 
 Les captures illustrent des données de démonstration, sans agents réels en cours.
 
+## Choisir la langue
+
+Le sélecteur **Langue** propose Français et English dans le cockpit, la préparation
+et la session d’agent. Le choix est mémorisé dans le navigateur. `?lang=en` ou
+`?lang=fr` permet un choix explicite dans le lien. Le changement recharge la vue :
+enregistrez les brouillons avant de basculer. Une préparation avec saisie ou
+opération en attente refuse cette navigation pour préserver votre travail.
+
+Dans le CLI : `swarm --lang en …`, ou `SWARM_LANG=en swarm …`.
+L’option explicite prime sur la variable ; le français reste la valeur par défaut.
+Les commandes, codes et clés JSON restent identiques. Les titres, rapports et
+sorties des agents conservent leur langue d’origine.
+
+[Read the English user guide](docs/en/USER-GUIDE.md).
+
 ## Sommaire
 
 1. [Ouvrir Swarm](#1-ouvrir-swarm)
@@ -318,9 +333,8 @@ elles ne sont pas toutes incluses. La préparation standard ne crée pas
 implicitement des copies Git isolées : ne confondez pas ce parcours avec le mode
 avancé de dépôt Git géré, décrit dans la référence.
 
-La [recette du dépôt autonome](docs/validation/standalone-docker-20260919.md)
-a validé l’installation et l’enchaînement avec des processus agents simulés.
-Elle ne constitue pas une recette de votre fournisseur réel ou de votre projet.
+Les tests avec des agents simulés ne remplacent pas une recette de votre
+fournisseur réel et de votre projet.
 
 Pour approfondir : [préparation](PREPARATION-UX.md), [cockpit technique](COCKPIT.md),
 [référence CLI](REFERENCE.md), [installation](INSTALL.md).

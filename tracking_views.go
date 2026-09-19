@@ -17,16 +17,16 @@ func (s *Store) hierarchyText(work string) string {
 	if e != nil {
 		return e.Error()
 	}
-	lines := []string{"OBJECTIF : " + w.Title, w.Objective, ""}
+	lines := []string{uiText("OBJECTIF : ") + w.Title, w.Objective, ""}
 	for _, t := range w.Tasks {
-		lines = append(lines, "├─ "+t.ID+" · "+t.Title+" · "+uiStatus(t.Status), "│  Responsable : "+t.Owner, "│  Dépendances : "+value(strings.Join(t.Depends, ", ")))
+		lines = append(lines, "├─ "+t.ID+" · "+t.Title+" · "+uiStatus(t.Status), uiText("│  Responsable : ")+t.Owner, uiText("│  Dépendances : ")+value(strings.Join(t.Depends, ", ")))
 		for _, a := range aa {
 			if a.TaskID == t.ID {
-				lines = append(lines, "│  └─ "+a.ID, "│     Fournisseur : "+a.Provider+" · rôle : "+a.Role+" · processus : "+uiStatus(observedAgent(a)), "│     Tentative : "+a.Attempt+" · parent : "+value(a.Parent))
+				lines = append(lines, "│  └─ "+a.ID, uiText("│     Fournisseur : ")+a.Provider+uiText(" · rôle : ")+a.Role+uiText(" · processus : ")+uiStatus(observedAgent(a)), uiText("│     Tentative : ")+a.Attempt+" · parent : "+value(a.Parent))
 			}
 		}
 	}
-	lines = append(lines, "", "Un état de tâche ne prouve pas qu’un processus est vivant.")
+	lines = append(lines, "", uiText("Un état de tâche ne prouve pas qu’un processus est vivant."))
 	return strings.Join(lines, "\n")
 }
 func (s *Store) resumeSinceText(work string, v Visit) string {
@@ -34,7 +34,7 @@ func (s *Store) resumeSinceText(work string, v Visit) string {
 	if e != nil {
 		return e.Error()
 	}
-	lines := []string{"REPRISE · " + v.Operator, "Visite précédente : " + value(v.At), fmt.Sprintf("Révision vue : %d · actuelle : %d", v.Revision, w.Revision), "Résumé historique (ne vaut pas validation actuelle) : " + value(w.Summary), "Prochaine action : " + value(w.Next), ""}
+	lines := []string{uiText("REPRISE · ") + v.Operator, uiText("Visite précédente : ") + value(v.At), fmt.Sprintf(uiText("Révision vue : %d · actuelle : %d"), v.Revision, w.Revision), uiText("Résumé historique (ne vaut pas validation actuelle) : ") + value(w.Summary), uiText("Prochaine action : ") + value(w.Next), ""}
 	rows, e := s.db.Query("SELECT revision,kind,at,payload FROM events WHERE work_id=? AND revision>? ORDER BY revision LIMIT 200", work, v.Revision)
 	if e != nil {
 		return e.Error()
@@ -51,20 +51,20 @@ func (s *Store) resumeSinceText(work string, v Visit) string {
 		if kind == "ooda" || kind == "checkpoint" {
 			var r Request
 			if json.Unmarshal(raw, &r) == nil {
-				lines = append(lines, "  "+r.Summary+r.Observation, "  Décision : "+r.Decision, "  Suite : "+r.Next)
+				lines = append(lines, "  "+r.Summary+r.Observation, uiText("  Décision : ")+r.Decision, uiText("  Suite : ")+r.Next)
 			}
 		}
 	}
 	rows.Close()
 	validation := s.validationState(&w)
-	lines = append(lines, "VALIDATION ACTUELLE : "+validation.State)
+	lines = append(lines, uiText("VALIDATION ACTUELLE : ")+validation.State)
 	for _, t := range w.Tasks {
 		if x := validation.Tasks[t.ID]; x.State == "stale" {
-			lines = append(lines, t.ID+" : acceptation historique, revalidation obligatoire", validationDetails(x))
+			lines = append(lines, t.ID+uiText(" : acceptation historique, revalidation obligatoire"), validationDetails(x))
 		}
 	}
 	memo := map[string]bool{}
-	lines = append(lines, "", "BLOCAGES ET DÉCISIONS EN ATTENTE")
+	lines = append(lines, "", uiText("BLOCAGES ET DÉCISIONS EN ATTENTE"))
 	for i := range w.Tasks {
 		t := &w.Tasks[i]
 		if t.Status == "blocked" || t.Status == "submitted" {
@@ -73,11 +73,11 @@ func (s *Store) resumeSinceText(work string, v Visit) string {
 		for _, id := range t.Depends {
 			d, _ := w.task(id)
 			if !s.acceptedFreshMemo(&w, d, map[string]bool{}, memo) {
-				lines = append(lines, t.ID+" : dépendance "+id+" non acceptée ou preuves périmées")
+				lines = append(lines, t.ID+uiText(" : dépendance ")+id+uiText(" non acceptée ou preuves périmées"))
 			}
 		}
 	}
-	lines = append(lines, "", "PROCHAINES TÂCHES ACCESSIBLES")
+	lines = append(lines, "", uiText("PROCHAINES TÂCHES ACCESSIBLES"))
 	for i := range w.Tasks {
 		t := &w.Tasks[i]
 		if t.Status != "todo" && t.Status != "blocked" {
@@ -94,7 +94,7 @@ func (s *Store) resumeSinceText(work string, v Visit) string {
 			lines = append(lines, t.ID+" · "+t.Title+" · "+t.Next)
 		}
 	}
-	lines = append(lines, "", "200 événements au maximum ; l’historique complet reste dans la base.")
+	lines = append(lines, "", uiText("200 événements au maximum ; l’historique complet reste dans la base."))
 	return strings.Join(lines, "\n")
 }
 func (s *Store) gateSummary(work, id string) string {
@@ -107,29 +107,29 @@ func (s *Store) gateSummary(work, id string) string {
 		return e.Error()
 	}
 	if t.Gate == nil {
-		return "Avancement vérifié : indisponible\nQualité : indisponible\nVerdict : aucune gate\nUne fin de processus n’est pas une validation."
+		return uiText("Avancement vérifié : indisponible\nQualité : indisponible\nVerdict : aucune gate\nUne fin de processus n’est pas une validation.")
 	}
 	ev, e := evaluate(t.Gate.Document, s.root, "delivery")
 	if e != nil {
-		return "Fraîcheur : preuves invalides\nVerdict : REFUSÉ\n" + e.Error()
+		return uiText("Fraîcheur : preuves invalides\nVerdict : REFUSÉ\n") + e.Error()
 	}
 	quality := "indisponible"
 	if ev.Quality != nil {
 		quality = fmt.Sprintf("%.1f/100", *ev.Quality)
 	}
 	if ev.Provisional {
-		quality += " (provisoire)"
+		quality += uiText(" (provisoire)")
 	}
-	verdict := "REFUSÉ"
+	verdict := uiText("REFUSÉ")
 	if ev.Ship {
 		verdict = "PASS"
 	}
 	for _, id := range t.Depends {
 		dependency, err := w.task(id)
 		if err != nil || !s.acceptedFresh(&w, dependency, map[string]bool{}) {
-			verdict = "REFUSÉ — dépendance non acceptée ou preuves périmées : " + id
+			verdict = uiText("REFUSÉ — dépendance non acceptée ou preuves périmées : ") + id
 			break
 		}
 	}
-	return fmt.Sprintf("Avancement vérifié : %d/%d contrôles\nQualité : %s\nFraîcheur : contrôlée sur les fichiers actuels\nVerdict delivery : %s", ev.Progress.Passed, ev.Progress.Applicable, quality, verdict)
+	return fmt.Sprintf(uiText("Avancement vérifié : %d/%d contrôles\nQualité : %s\nFraîcheur : contrôlée sur les fichiers actuels\nVerdict delivery : %s"), ev.Progress.Passed, ev.Progress.Applicable, quality, verdict)
 }

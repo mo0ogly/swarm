@@ -773,6 +773,13 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 				}
 				target = "/?work=" + id
 			}
+			if language := r.URL.Query().Get("lang"); language == "fr" || language == "en" {
+				separator := "?"
+				if strings.Contains(target, "?") {
+					separator = "&"
+				}
+				target += separator + "lang=" + language
+			}
 			http.Redirect(w, r, target, http.StatusSeeOther)
 			return
 		}

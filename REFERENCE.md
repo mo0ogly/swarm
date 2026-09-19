@@ -1,11 +1,11 @@
 # Swarm — référence technique
 
+[English](docs/en/REFERENCE.md) · Français
+
 Pour la présentation du produit et le démarrage rapide, voir [le README](README.md) et le [guide utilisateur](GUIDE-UTILISATEUR.md).
 
-Les références aux ressources du dépôt d’origine sont historiques ; elles ne sont pas toutes embarquées dans ce dépôt autonome.
-
 Compagnon Go pour conserver des travaux entre sessions Claude/Codex.
-Interface française, terminal 80 colonnes et Markdown ; sortie JSON pour outils.
+Interface française ou anglaise, terminal 80 colonnes et Markdown ; sortie JSON pour outils.
 Le cockpit peut lancer explicitement des agents Claude/Codex et suivre leurs processus.
 `work list` et `resume` ne lancent aucun agent et ne choisissent pas le travail.
 Voir [la procédure du cockpit](COCKPIT.md) pour le lancement et le pilotage.
@@ -225,8 +225,7 @@ commande séparée, sérialisée et liée à une remise SHA-256 :
 zéro écriture. `swarm workspace status TRAVAIL` expose les tours et reçus.
 Swarm ne crée toujours aucun worktree, ne fusionne pas Git et ne rejoue pas les
 contrôles de validation après intégration ; ce n'est donc pas un gestionnaire de
-branches de bout en bout. Voir
-`docs/plans/swarm-autonomie-coordination/a7-espaces.md`.
+branches de bout en bout.
 
 Exemple : `swarm task update TRAVAIL --input correction.json` :
 
@@ -375,7 +374,7 @@ mission lorsqu’elle passe en corbeille ou revient dans la liste active.
 
 Lire [WORKFLOWS.md](WORKFLOWS.md) pour les points d’enregistrement APEX/PDCA/KS.
 Les hooks propres à un projet ne sont pas installés par Swarm. Leur présence
-ne prouve pas leur exécution par un fournisseur : voir `VALIDATION.md`.
+ne prouve pas leur exécution par un fournisseur.
 
 ```sh
 go test -race ./...
@@ -416,9 +415,7 @@ SQLite (schéma 4), par travail, avec export JSON complet et inclusion dans l’
 Seuls les 40 derniers échanges apparaissent dans l’historique courant. Les budgets
 comptent aussi les réservations des questions ; ils ne constituent pas une facture.
 
-Conception et preuves : `docs/plans/swarm-page-assistant/` à la racine du projet.
-Procédure illustrée : `docs/procedures/procedure_complete_swarm_claude_codex.docx`
-(v7, 39 pages ; schémas Mermaid dans `docs/procedures/diagrams/`).
+Voir le [guide utilisateur](GUIDE-UTILISATEUR.md) pour le parcours de l’assistant.
 
 ## Fournisseurs et niveaux de modèles
 
@@ -436,8 +433,7 @@ La même résolution sert les lancements JSON (`level`: `auto`, `simple`,
 explicitement depuis une carte fournisseur ; ouvrir l’administration n’appelle
 aucune IA. Export/import ne transporte ni secrets ni commandes.
 
-Procédure, limites et relation avec l’administration ML :
-`docs/plans/swarm-provider-routing/ADMINISTRATION.md` (document du projet d’origine).
+Voir [IA et connexions](PREPARATION-UX.md#ia-et-connexions).
 
 ### Lire la session d’un agent automatisé
 
@@ -462,12 +458,10 @@ décisions atomiques. `planning step WORK` exécute au plus une décision IA ;
 `planning show WORK` affiche son état. Une mission autorisée et surveillée peut
 ensuite réactiver son responsable automatiquement après un retour d'agent.
 
-Contrats, exemples, preuves et limites :
-`docs/plans/swarm-architecture-implementation/IMPLEMENTATION.md` (document du projet d’origine).
 Le web propose l’activation sur une mission vide, la lecture des décisions, les
 copies Git gérées, la validation héritée et le téléchargement du résultat.
 `planning history`, `bundle`, `cleanup-preview` et `cleanup` exposent les mêmes
-fonctions au CLI. Les limites et les preuves de recette sont dans la note liée.
+fonctions au CLI. Voir les [contrats de préparation](PREPARATION-UX.md).
 
 ## Préparation, révision et modèles IA
 

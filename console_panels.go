@@ -50,7 +50,7 @@ func (s *Store) openPanel(work string, c *consoleState, mode string) {
 			d.message = e.Error()
 		}
 		d.fields = []string{fmt.Sprint(v.Budget.Limit), fmt.Sprint(v.Budget.Reserve), v.Budget.Source, v.Budget.PriceDate}
-		d.review = fmt.Sprintf("Réservé %.2f USD · imputé estimé %.2f USD · restant %.2f USD\n%s", v.Reserved, v.Estimated, v.Remaining, v.Policy)
+		d.review = fmt.Sprintf(uiText("Réservé %.2f USD · imputé estimé %.2f USD · restant %.2f USD\n%s"), v.Reserved, v.Estimated, v.Remaining, v.Policy)
 	case "assign":
 		d.fields = []string{d.task.Owner}
 	}
@@ -117,7 +117,7 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 				return true
 			}
 			s.openPanel(work, c, "decisions")
-			d.message = "Décision enregistrée ; aucune acceptation ni commande d’arrêt implicite."
+			d.message = uiText("Décision enregistrée ; aucune acceptation ni commande d’arrêt implicite.")
 			return true
 		}
 		if d.row == 0 {
@@ -144,7 +144,7 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 				limit, err := strconv.ParseFloat(d.fields[0], 64)
 				reserve, err2 := strconv.ParseFloat(d.fields[1], 64)
 				if err != nil || err2 != nil {
-					d.message = "Montants numériques requis."
+					d.message = uiText("Montants numériques requis.")
 					return true
 				}
 				e = s.setBudget(work, Budget{Limit: limit, Reserve: reserve, Source: d.fields[2], PriceDate: d.fields[3]})
@@ -162,7 +162,7 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 				d.message = e.Error()
 				return true
 			}
-			c.message = "Enregistré : " + d.mode
+			c.message = uiText("Enregistré : ") + d.mode
 			c.dialog = nil
 			return true
 		}
@@ -172,7 +172,7 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 		return true
 	case "log-query":
 		if d.agent == nil {
-			d.message = "Aucune tentative à consulter."
+			d.message = uiText("Aucune tentative à consulter.")
 			return true
 		}
 		if key == "enter" {
@@ -204,7 +204,7 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 			if e := s.exportLogPage(work, d.agent.ID, d.search, path); e != nil {
 				d.message = e.Error()
 			} else {
-				d.message = "Export borné (200 lignes) : " + path
+				d.message = uiText("Export borné (200 lignes) : ") + path
 			}
 			return true
 		}
@@ -237,11 +237,11 @@ func panelRows(d *taskDialog, inner, height int) (string, []string, bool) {
 		d.row = min(d.row, max(0, len(parts)-n))
 		rows = append(rows, parts[d.row:min(len(parts), d.row+n)]...)
 		if d.mode == "help" {
-			return "AIDE · PARCOURS ET RACCOURCIS", rows, true
+			return uiText("AIDE · PARCOURS ET RACCOURCIS"), rows, true
 		}
 		return strings.ToUpper(d.mode), rows, true
 	case "decisions":
-		rows = append(rows, "Acquitter une décision ne valide pas la tâche et n’arrête aucun agent.")
+		rows = append(rows, uiText("Acquitter une décision ne valide pas la tâche et n’arrête aucun agent."))
 		n := max(1, height-13)
 		first := max(0, d.row-n+1)
 		for i := first; i < min(len(d.decisions), first+n); i++ {
@@ -250,35 +250,35 @@ func panelRows(d *taskDialog, inner, height int) (string, []string, bool) {
 			if i == d.row {
 				mark = "> "
 			}
-			state := "À traiter"
+			state := uiText("À traiter")
 			if v.ResolvedAt != "" {
-				state = "Acquittée"
+				state = uiText("Acquittée")
 			}
 			rows = append(rows, mark+state+" · "+escalationSubject(v.TaskID)+" · "+escalationLabel(v.Kind)+" · "+v.Summary)
 		}
 		if len(d.decisions) == 0 {
-			rows = append(rows, "Aucune décision en attente détectée.")
+			rows = append(rows, uiText("Aucune décision en attente détectée."))
 		}
-		return "DÉCISIONS", rows, true
+		return uiText("DÉCISIONS"), rows, true
 	case "decision":
-		rows = append(rows, wrapDialog(d.decision.Summary+"\nPreuves : "+d.decision.Evidence+"\nAuteur précédent : "+d.decision.Author+"\nRésolution : "+d.decision.Resolution, inner)...)
-		for i, line := range []string{"Décision motivée : " + d.fields[0], "[ Acquitter sans modifier la tâche ]"} {
+		rows = append(rows, wrapDialog(d.decision.Summary+uiText("\nPreuves : ")+d.decision.Evidence+uiText("\nAuteur précédent : ")+d.decision.Author+uiText("\nRésolution : ")+d.decision.Resolution, inner)...)
+		for i, line := range []string{uiText("Décision motivée : ") + d.fields[0], uiText("[ Acquitter sans modifier la tâche ]")} {
 			mark := "  "
 			if d.row == i {
 				mark = "> "
 			}
 			rows = append(rows, mark+line)
 		}
-		rows = append(rows, "Tab champ · [v] sur le bouton : examiner la tâche")
-		return "EXAMINER LA DÉCISION", rows, true
+		rows = append(rows, uiText("Tab champ · [v] sur le bouton : examiner la tâche"))
+		return uiText("EXAMINER LA DÉCISION"), rows, true
 	case "assign", "ooda", "budget":
-		labels := []string{"Responsable"}
+		labels := []string{uiText("Responsable")}
 		if d.mode == "budget" {
-			labels = []string{"Plafond USD (0 désactive)", "Réservation USD par départ", "Source estimation", "Date de référence AAAA-MM-JJ"}
+			labels = []string{uiText("Plafond USD (0 désactive)"), uiText("Réservation USD par départ"), uiText("Source estimation"), uiText("Date de référence AAAA-MM-JJ")}
 			rows = append(rows, wrapDialog(d.review, inner)...)
 		}
 		if d.mode == "ooda" {
-			labels = []string{"Observation", "Orientation", "Décision", "Résultat", "Prochaine action"}
+			labels = []string{"Observation", "Orientation", uiText("Décision"), uiText("Résultat"), uiText("Prochaine action")}
 		}
 		for i, label := range labels {
 			mark := "  "
@@ -291,13 +291,13 @@ func panelRows(d *taskDialog, inner, height int) (string, []string, bool) {
 		if d.row == len(labels) {
 			mark = "> "
 		}
-		rows = append(rows, mark+"[ Enregistrer ]", "Tab champ · Ctrl-U effacer · Échap annuler")
+		rows = append(rows, mark+uiText("[ Enregistrer ]"), uiText("Tab champ · Ctrl-U effacer · Échap annuler"))
 		return strings.ToUpper(d.mode), rows, true
 	case "log-query":
 		d.logLimit = max(1, height-17)
-		rows = append(rows, "Recherche : "+d.search, fmt.Sprintf("Curseur %d → %d · début conservé %d · suite %t", d.logCursor, d.logPage.Next, d.logPage.RetainedFrom, d.logPage.More))
+		rows = append(rows, uiText("Recherche : ")+d.search, fmt.Sprintf(uiText("Curseur %d → %d · début conservé %d · suite %t"), d.logCursor, d.logPage.Next, d.logPage.RetainedFrom, d.logPage.More))
 		if d.logPage.Gap {
-			rows = append(rows, "RÉTENTION : une partie de l’historique n’est plus disponible.")
+			rows = append(rows, uiText("RÉTENTION : une partie de l’historique n’est plus disponible."))
 		}
 		for _, l := range d.logPage.Entries {
 			rows = append(rows, clip(fmt.Sprintf("#%d %s %s · %s", l.Seq, l.At, l.Kind, l.Message), inner))
@@ -307,7 +307,7 @@ func panelRows(d *taskDialog, inner, height int) (string, []string, bool) {
 		if d.logFollow {
 			follow = "direct"
 		}
-		rows = append(rows, "Entrée rechercher · / modifier · ←→ pages · f "+follow+" · e exporter")
+		rows = append(rows, uiText("Entrée rechercher · / modifier · ←→ pages · f ")+follow+uiText(" · e exporter"))
 		return "JOURNAUX", rows, true
 	}
 	return "", nil, false

@@ -1,5 +1,7 @@
 # Préparer et réviser un Swarm depuis le web
 
+[English](docs/en/PREPARATION-UX.md) · Français
+
 Pour le parcours complet avec captures et dépannage, voir le [guide utilisateur](GUIDE-UTILISATEUR.md).
 
 ## Du besoin à une équipe
