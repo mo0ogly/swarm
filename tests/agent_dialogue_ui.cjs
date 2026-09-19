@@ -22,7 +22,7 @@ let server,browser,url;
 async function startServer(){server=spawn(binary,['--root',root,'web'],{stdio:['ignore','pipe','pipe']});return await new Promise((resolve,reject)=>{let text='';const timer=setTimeout(()=>reject(Error(text)),10000);server.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}});server.stderr.on('data',d=>text+=d)})}
 const checks=[],errors=[],csp=[],external=[];
 (async()=>{
- url=await startServer();browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();page.setDefaultTimeout(10000);await page.setViewport({width:1450,height:1050});
+ url=await startServer();browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();page.setDefaultTimeout(10000);await page.setViewport({width:1450,height:1050});
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(/Content Security Policy|Refused to/.test(m.text()))csp.push(m.text())});page.on('request',r=>{if(!['127.0.0.1','localhost','data:'].includes(new URL(r.url()).hostname)&&!r.url().startsWith('data:'))external.push(r.url())});
  await page.goto(url);await page.waitForSelector('.graph-noeud');await page.click('.graph-noeud');await page.waitForSelector('#pilot-inspector[open]');
  const all=await page.$('[data-inspector-action="actions"]');await all.click();await page.waitForSelector('#field-mode');await page.focus('#field-mode');await page.keyboard.press('Home');await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');await page.click('#confirm');

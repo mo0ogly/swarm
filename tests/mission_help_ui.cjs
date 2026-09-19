@@ -5,7 +5,7 @@ const fixture=JSON.parse(execFileSync('python3',[path.join(__dirname,'pilotage_f
 let browser;const server=spawn(binary,['--root',fixture.root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});
 (async()=>{
  const url=await new Promise(resolve=>{let s='';server.stdout.on('data',d=>{s+=d;const m=s.match(/http:\/\/\S+\/session\/\S+/);if(m)resolve(m[0])})});
- browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1100});await page.goto(url);await page.waitForSelector('#pilot-view');await page.select('#work',fixture.works['12']);await page.waitForFunction(w=>snapshot?.work.id===w,{},fixture.works['12']);
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1100});await page.goto(url);await page.waitForSelector('#pilot-view');await page.select('#work',fixture.works['12']);await page.waitForFunction(w=>snapshot?.work.id===w,{},fixture.works['12']);
 
  let asks=0,applies=0,mode='success';
  await page.setRequestInterception(true);page.on('request',req=>{

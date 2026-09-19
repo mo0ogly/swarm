@@ -31,7 +31,7 @@ const fold=async id=>{await page.$eval('.graph-fold[data-task="'+id+'"]',e=>e.fo
 const counts=()=>page.$eval('#conduite-accueil .pilot-summary',e=>e.textContent);
 (async()=>{
  const url=await new Promise((resolve,reject)=>{let s='';const timer=setTimeout(()=>reject(Error('No URL')),15000);server.stdout.on('data',d=>{s+=d;const m=s.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}})});
- browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
  // Every operational summary segment has a tested destination.
  assert.match(await counts(),/1 agent démarré/);assert.match(await counts(),/1 tentatives sans signal confirmé/);assert.match(await counts(),/1 résultats à examiner/);
  for(const [key,expected]of [['active',['live-S']],['unknown',['lost-U']],['review',['L']]]){

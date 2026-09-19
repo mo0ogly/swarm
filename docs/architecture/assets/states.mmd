@@ -1,0 +1,14 @@
+stateDiagram-v2
+ [*] --> Aplanifier
+ Aplanifier --> Decision : activation autorisee
+ Decision --> Enattente : taches creees
+ Enattente --> Aplanifier : remise pertinente
+ Decision --> Bloque : decision hors autorisation
+ Bloque --> Aplanifier : precondition corrigee
+ Decision --> AVerifier : couverture proposee
+ AVerifier --> Termine : controles et preuves actuels
+ AVerifier --> Aplanifier : lacune constatee
+ Termine --> Aplanifier : nouveau besoin ou preuve perimee
+ Aplanifier --> Pause : pause demandee
+ Enattente --> Pause : pause demandee
+ Pause --> Aplanifier : reprise autorisee

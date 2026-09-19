@@ -1,0 +1,18 @@
+flowchart TB
+ U[Utilisateur et intention] --> API[API commune CLI et web]
+ API --> S[(Etat durable SQLite)]
+ P[Planificateur racine] --> D[Propositions de decision]
+ SP[Sous planificateurs] --> D
+ S --> P
+ S --> SP
+ D --> V[Validation du contrat et de la version]
+ V --> S
+ S --> C[Conducteur de processus]
+ C --> W1[Executant copie A]
+ C --> W2[Executant copie B]
+ W1 --> R[Remises attribuees]
+ W2 --> R
+ R --> I[Boites de reception des responsables]
+ I --> S
+ R --> G[Integration et controles de livraison]
+ G --> S

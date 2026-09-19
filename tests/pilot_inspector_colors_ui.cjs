@@ -6,7 +6,7 @@ const [binary,root,work,out]=process.argv.slice(2);fs.mkdirSync(out,{recursive:t
 let browser;const server=spawn(binary,['--root',root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});
 (async()=>{
  const url=await new Promise((resolve,reject)=>{let s='';server.stdout.on('data',d=>{s+=d;const m=s.match(/http:\/\/\S+\/session\/\S+/);if(m)resolve(m[0])});server.once('exit',c=>reject(Error('Server '+c)))});
- browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
  await page.select('#work',work);await page.waitForFunction(id=>snapshot?.work.id===id,{},work);
 
  await page.evaluate(()=>{Pilot.state.view='dependencies';Pilot.state.search='';Pilot.state.filter='all';Pilot.changed();Pilot.inspect('task','review-codex')});

@@ -1,0 +1,10 @@
+flowchart TB
+ M[Mission et exigences] --> A[Perimetre API]
+ M --> B[Perimetre interface]
+ A --> A1[Contrat de donnees]
+ A --> A2[Implementation API]
+ A1 -. prerequis .-> A2
+ A2 -. prerequis .-> B1[Consommation du contrat]
+ B --> B1
+ A2 --> T1[Tentative dans copie A]
+ B1 --> T2[Tentative dans copie B]

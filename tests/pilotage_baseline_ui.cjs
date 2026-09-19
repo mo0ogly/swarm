@@ -15,7 +15,7 @@ async function measure(binary,label,modern){
  const server=spawn(binary,['--root',fixture.root,'web'],{stdio:['ignore','pipe','pipe']});let browser;
  try{
   const url=await new Promise((resolve,reject)=>{let text='';const timer=setTimeout(()=>reject(Error('No web URL: '+text)),15000);server.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}});server.once('exit',code=>{clearTimeout(timer);reject(Error('Server exited '+code))})});
-  browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});
+  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});
   const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(20000);await page.setViewport({width:1440,height:1000});
   await page.goto(url);await page.waitForSelector('#work option');
   const choose=async id=>{await page.select('#work',id);await page.waitForFunction(id=>snapshot?.work.id===id,{},id)};

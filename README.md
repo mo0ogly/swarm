@@ -6,6 +6,35 @@ Le cockpit peut lancer explicitement des agents Claude/Codex et suivre leurs pro
 `work list` et `resume` ne lancent aucun agent et ne choisissent pas le travail.
 Voir [la procédure du cockpit](COCKPIT.md) pour le lancement et le pilotage.
 
+## Dépôt autonome
+
+Swarm se développe dans ce dépôt et pilote des projets distincts via `--root`.
+Linux et Go 1.24+ sont le périmètre actuellement testé. Les ressources web sont
+embarquées dans le binaire. Node 22 et npm sont nécessaires pour les reconstruire.
+
+```sh
+make build
+./bin/swarm --root /chemin/du/projet init
+./bin/swarm --root /chemin/du/projet providers init
+./bin/swarm --root /chemin/du/projet web 127.0.0.1:18787
+```
+
+Ouvrir le lien de session imprimé par le serveur, puis utiliser le sélecteur des
+missions dans le même onglet. Les agents installés s’authentifient séparément ;
+les connexions API se configurent dans « IA et connexions ».
+
+```sh
+make test          # Go et tests Node déterministes
+make frontend     # npm ci + reconstruction Monaco/xterm
+make smoke        # reprise/export/import dans un projet temporaire
+PUPPETEER_SKIP_DOWNLOAD=true npm ci
+CHROME_BIN=/chemin/vers/chrome npm run test:connections
+```
+
+Les méthodes APEX, KS et PDCA restent des ressources du **projet piloté** :
+voir [les limites de migration](docs/migration/README.md). Les clés, bases et
+missions `.swarm/` ne sont pas livrées avec le code.
+
 ## Construire et commencer
 
 Go 1.24+ ; SQLite embarqué via `modernc.org/sqlite` (sans cgo), versions figées
@@ -19,13 +48,13 @@ mkdir -p bin
 CGO_ENABLED=0 go build -trimpath -o bin/swarm .
 ```
 
-Depuis la racine du projet :
+Depuis le dépôt Swarm, ou avec le binaire installé dans le PATH :
 
 ```sh
-./tools/swarm-companion/swarm init
-./tools/swarm-companion/swarm work list
-./tools/swarm-companion/swarm work create --input work.json
-./tools/swarm-companion/swarm resume IDENTIFIANT
+./swarm init
+./swarm work list
+./swarm work create --input work.json
+./swarm resume IDENTIFIANT
 ```
 
 `--root CHEMIN` cible une autre racine ; il ne fait pas de recherche implicite
@@ -285,9 +314,9 @@ pas un service partagé ; chaque worktree a son propre espace dans cette version
 ## Transport et sauvegarde
 
 ```sh
-./tools/swarm-companion/swarm export ID --output /tmp/travail.zip
-./tools/swarm-companion/swarm --root /autre/projet init
-./tools/swarm-companion/swarm --root /autre/projet import --input /tmp/travail.zip
+./swarm export ID --output /tmp/travail.zip
+./swarm --root /autre/projet init
+./swarm --root /autre/projet import --input /tmp/travail.zip
 ```
 
 L’export logique lit état et événements dans une transaction SQLite cohérente.
@@ -308,9 +337,9 @@ Les quatre actions ont des contrats distincts et passent toutes par un aperçu
 lié à la révision et à la génération de cycle de vie :
 
 ```sh
-./tools/swarm-companion/swarm lifecycle list
-./tools/swarm-companion/swarm lifecycle preview ID archive --input /tmp/requete.json --json
-./tools/swarm-companion/swarm lifecycle apply ID archive --input /tmp/confirmation.json --json
+./swarm lifecycle list
+./swarm lifecycle preview ID archive --input /tmp/requete.json --json
+./swarm lifecycle apply ID archive --input /tmp/confirmation.json --json
 ```
 
 Le document d’aperçu contient `schema_version`, `expected_revision`, `action` et,

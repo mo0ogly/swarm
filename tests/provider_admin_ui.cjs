@@ -1,12 +1,12 @@
 // End-to-end provider policy administration via rendered controls, in an isolated store.
-const fs=require('fs'),cp=require('child_process'),assert=require('assert'),pup=require('/home/fpizzi/node_modules/puppeteer');
+const fs=require('fs'),cp=require('child_process'),assert=require('assert'),pup=require('puppeteer');
 const binary=process.argv[2]||'/tmp/swarm-model-routing',outdir=process.argv[3]||'docs/plans/swarm-provider-routing/evidence';
 (async()=>{
  fs.mkdirSync(outdir,{recursive:true});
  const fixture=JSON.parse(cp.execFileSync('python3',['tools/swarm-companion/tests/assist_fixture.py',binary,'tools/swarm-companion/tests/assist_provider.py'],{encoding:'utf8'}));
  const server=cp.spawn(binary,['--root',fixture.root,'web']);let log='';server.stdout.on('data',d=>log+=d);server.stderr.on('data',d=>log+=d);
  const wait=ms=>new Promise(r=>setTimeout(r,ms));for(let i=0;i<200&&!log.includes('/session/');i++)await wait(100);assert(log.includes('/session/'),log);
- const browser=await pup.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const checks=[],errors=[];
+ const browser=await pup.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const checks=[],errors=[];
  try{
  const p=await browser.newPage();p.setDefaultTimeout(30000);p.on('pageerror',e=>errors.push(e.message));await p.setViewport({width:1500,height:1100});await p.goto(log.match(/http:\/\/\S+/)[0]);await p.waitForSelector('#work option');await p.waitForSelector('#mode');if(await p.evaluate(()=>document.body.dataset.mode)==='conduite'){await p.click('#mode');await p.waitForFunction(()=>document.body.dataset.mode==='expert')};await p.select('#work',fixture.work);await p.waitForSelector('[data-task="AS-01"]');
  await p.click('[data-view="providers"]');await p.waitForSelector('[data-provider="fixture-ok"]');

@@ -1,0 +1,11 @@
+{
+  "name": "swarm-local-tests",
+  "private": true,
+  "scripts": {
+    "test": "node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs",
+    "test:connections": "node tests/ai_connections_ui.cjs bin/swarm test-results/connections"
+  },
+  "devDependencies": {
+    "puppeteer": "24.37.1"
+  }
+}

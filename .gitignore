@@ -1,3 +1,14 @@
 /bin/
 __pycache__/
 /companion
+
+# Per-project runtime data and credentials never belong in this repository.
+.swarm/
+.env
+.env.*
+!.env.example
+node_modules/
+/coverage/
+/test-results/
+*.log
+/frontend/bundle-meta.json

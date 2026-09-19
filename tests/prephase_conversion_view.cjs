@@ -2,7 +2,7 @@
 // Read-only visual recipe against an isolated preparation with created missions.
 const fs=require('fs'),path=require('path'),assert=require('assert/strict'),puppeteer=require('puppeteer');
 const url=process.argv[2],out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-(async()=>{const browser=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox']});try{
+(async()=>{const browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox']});try{
  const page=await browser.newPage(),errors=[],themes=[];page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#conversion-state:not([hidden])');
  for(const theme of ['etat','sombre']){
   if(await page.$eval('html',e=>e.dataset.theme)!==theme)await page.click('#theme');await page.click('#conversion-open');await page.waitForSelector('#conversion-dialog[open]');themes.push(await require('./prephase_theme.cjs')(page));await page.screenshot({path:path.join(out,'release-'+theme+'.png'),fullPage:true});

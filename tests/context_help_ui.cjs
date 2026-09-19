@@ -2,7 +2,7 @@
 const fs=require('fs'),os=require('os'),path=require('path'),assert=require('assert/strict'),{spawn,execFileSync}=require('child_process'),p=require('puppeteer');
 const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]),root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-help-'));fs.mkdirSync(out,{recursive:true});execFileSync(binary,['--root',root,'init']);
 const server=spawn(binary,['--root',root,'web'],{stdio:['ignore','pipe','pipe']});let browser;
-(async()=>{const url=await new Promise((resolve,reject)=>{let text='';server.stdout.on('data',d=>{text+=d;const match=text.match(/http:\/\/\S+\/session\/\S+/);if(match)resolve(match[0])});server.on('exit',()=>reject(Error('server stopped')))});browser=await p.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage(),errors=[],checks=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url);
+(async()=>{const url=await new Promise((resolve,reject)=>{let text='';server.stdout.on('data',d=>{text+=d;const match=text.match(/http:\/\/\S+\/session\/\S+/);if(match)resolve(match[0])});server.on('exit',()=>reject(Error('server stopped')))});browser=await p.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage(),errors=[],checks=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url);
 for(const route of ['/','/prepare.html','/terminal.html']){
  await page.goto(new URL(route,url).href);await page.waitForSelector('[data-context-help]');
  // Expose each static surface in this empty fixture; no business action is run.

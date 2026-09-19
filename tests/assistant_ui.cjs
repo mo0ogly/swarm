@@ -1,7 +1,7 @@
 // Reusable browser recette for the page assistant.
 // Real buttons, real modals, fixture provider only: no billed model call.
 // Usage: node tools/swarm-companion/tests/assistant_ui.cjs [binaire] [rapport.json]
-const fs = require('fs'), cp = require('child_process'), pup = require('/home/fpizzi/node_modules/puppeteer');
+const fs = require('fs'), cp = require('child_process'), pup = require('puppeteer');
 const binary = process.argv[2] || '/tmp/swarm-sc15-worker';
 const report = process.argv[3] || 'docs/plans/swarm-page-assistant/SC-15-recette-navigateur.json';
 const PAGES = ['brainstorm', 'tasks', 'agents', 'decisions', 'logs', 'resume', 'budget'];
@@ -18,7 +18,7 @@ const fail = m => { throw new Error(m); };
   const started = Date.now();
   while (!out.includes('/session/')) { if (Date.now() - started > 20000) fail('serveur non démarré : ' + out); await new Promise(r => setTimeout(r, 100)); }
   const url = out.match(/http:\/\/\S+/)[0];
-  const b = await pup.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
+  const b = await pup.launch({ executablePath: process.env.CHROME_BIN||'/usr/bin/google-chrome', args: ['--no-sandbox'] });
   try {
     const p = await b.newPage();
     p.setDefaultTimeout(30000);

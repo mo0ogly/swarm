@@ -16,6 +16,6 @@ const nonce={name:'swarm-style-nonce',setup(b){b.onLoad({filter:/\/(domStyleshee
 await build({entryPoints:{editor:'monaco.js',worker:'node_modules/monaco-editor/esm/vs/editor/editor.worker.js','json-worker':'node_modules/monaco-editor/esm/vs/language/json/json.worker.js'},bundle:true,format:'esm',splitting:true,outdir:out,minify:true,loader:{'.ttf':'file'},plugins:[nonce],metafile:true}).then(async r=>{await writeFile('bundle-meta.json',JSON.stringify(r.metafile,null,2)+'\n')});
 if(patched!==2)throw new Error('Expected two nonce patches, got '+patched);
 await copyFile('node_modules/monaco-editor/LICENSE',out+'/LICENSE.txt').catch(()=>copyFile('node_modules/monaco-editor/LICENSE.txt',out+'/LICENSE.txt'));
-await copyFile('../../../static/js/security.js','../web/lib/preparation-security.js');
+await copyFile('preparation-security.js','../web/lib/preparation-security.js');
 
 await copyFile('node_modules/monaco-editor/ThirdPartyNotices.txt',out+'/ThirdPartyNotices.txt');

@@ -13,7 +13,7 @@ async function capture(name){for(const theme of ['etat','sombre']){await page.ev
 async function close(p){await p.click('.pilot-inspector-head button');await p.waitForFunction(()=>!document.getElementById('pilot-inspector').open)}
 (async()=>{
  const url=await new Promise((resolve,reject)=>{let text='';server.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m)resolve(m[0])});server.once('exit',c=>reject(Error('server '+c)))});
- browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});
  page=await browser.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
  for(const size of ['0','1','12','50','200']){
   console.log('Corpus '+size);

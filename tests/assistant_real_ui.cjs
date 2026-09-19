@@ -1,6 +1,6 @@
 // Recette authentifiée : sept questions explicites facturables ; exige le travail de recette indiqué.
 // Pour des tests sans fournisseur réel, employer assistant_ui.cjs.
-const fs=require('fs'),pup=require('/home/fpizzi/node_modules/puppeteer');
+const fs=require('fs'),pup=require('puppeteer');
 const url=process.env.SWARM_URL;if(!url)throw Error('SWARM_URL doit être le lien de session affiché par wattson.sh swarm web');
 const wid='w-9aed29c86212f8f3c1e6ac8c',agent='717b896e-aa59-4b57-b819-4460b5bcb920';
 const dir='docs/plans/swarm-page-assistant/evidence';const cases=[
@@ -12,7 +12,7 @@ const dir='docs/plans/swarm-page-assistant/evidence';const cases=[
  ['budget','', 'understand_page.v1','Combien ce travail a-t-il réellement coûté ? Distingue plafond estimatif, jetons déclarés, coût déclaré par le fournisseur et facture réelle.'],
  ['brainstorm','', 'understand_page.v1','Quel brief est actuellement adopté ? Peut-on considérer les tâches comme exécutées à partir d’un brief ? Signale les informations absentes.']
 ];
-(async()=>{const b=await pup.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});try{
+(async()=>{const b=await pup.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});try{
  const p=await b.newPage();await p.setViewport({width:1480,height:1100});p.setDefaultTimeout(45000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
  await p.goto(url);await p.waitForSelector('#work option');await p.select('#work',wid);await p.waitForSelector('[data-task="SC-15"]');await p.waitForFunction(()=>assistWork===work&&!assistBusy);
  // The failed Claude attempt stays failed; only its task owner is transferred.

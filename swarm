@@ -4,7 +4,7 @@ set -eu
 COMPANION_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 COMPANION_BINARY="$COMPANION_DIR/bin/swarm"
 if [ ! -x "$COMPANION_BINARY" ]; then
-    echo 'Compagnon non construit. Voir tools/swarm-companion/README.md.' >&2
+    echo 'Compagnon non construit. Voir README.md du dépôt Swarm.' >&2
     exit 2
 fi
 exec "$COMPANION_BINARY" "$@"

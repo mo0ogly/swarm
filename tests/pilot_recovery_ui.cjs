@@ -25,7 +25,7 @@ w['revision']+=1;c.execute('UPDATE works SET revision=?,body=? WHERE id=?',(w['r
 let browser;const errors=[];const server=spawn(binary,['--root',root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});
 (async()=>{
  const url=await new Promise((resolve,reject)=>{let s='';server.stdout.on('data',d=>{s+=d;const m=s.match(/http:\/\/\S+\/session\/\S+/);if(m)resolve(m[0])});server.once('exit',c=>reject(Error('Server '+c)))});
- browser=await puppeteer.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();page.on('pageerror',e=>errors.push(e.message));await page.setViewport({width:1440,height:1000});await page.goto(url);await page.waitForSelector('#pilot-view');
  await page.evaluate(()=>Pilot.inspect('task','pending'));await page.waitForSelector('[data-recovery-action=reconcile]');
  for(const theme of ['etat','sombre']){await page.evaluate(t=>setTheme(t),theme);await page.$eval('#pilot-inspector',e=>e.scrollTop=0);await page.screenshot({path:path.join(out,'annulation-'+theme+'.png')});
   await page.click('[data-recovery-action=reconcile]');await page.waitForFunction(()=>modalContext?.cancelPending);assert.equal(await page.$eval('#confirm',e=>e.textContent),'Confirmer l’annulation du démarrage');await page.screenshot({path:path.join(out,'confirmation-'+theme+'.png')});await page.keyboard.press('Escape');

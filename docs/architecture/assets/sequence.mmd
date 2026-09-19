@@ -1,0 +1,14 @@
+sequenceDiagram
+ participant W as Executant
+ participant E as Etat durable
+ participant C as Conducteur
+ participant P as Planificateur
+ W->>E: Remise avec tentative et empreintes
+ E->>E: Transaction remise et evenement
+ C->>E: Reclamer evenement avec bail
+ C->>P: Activer avec vue versionnee
+ P->>E: Proposer decision et version attendue
+ E->>E: Verifier limites et appliquer atomiquement
+ E-->>C: Taches pretes et decision persistante
+ C->>W: Nouvelle tentative si autorisee
+ Note over E,P: Une version obsolete impose une nouvelle lecture
