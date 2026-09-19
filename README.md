@@ -93,7 +93,42 @@ Commencez avec vos mots : le besoin, les contraintes et les critères de réussi
 
 ![Préparation d’une recherche accessible : nom, besoin et critères](docs/screenshots/preparation.png)
 
-### 2. Lire les tâches et leurs dépendances
+### 2. Visualiser l’équipe et ses flèches
+
+Cette seconde démonstration utilise une **organisation simulée en pause** : un orchestrateur, un sous-responsable, trois tâches d’exécutants et un vérificateur indépendant. Aucun fournisseur n’est lancé, aucun résultat n’est présenté comme validé.
+
+- **Bleu : orchestrateur**, chargé de coordonner la mission.
+- **Orange : sous-responsable**, chargé ici du périmètre accessibilité.
+- **Cartes de tâches : exécutants**, chargés de produire les livrables.
+- **Vert : vérificateur indépendant**, chargé d’examiner les rapports.
+- **Flèches pleines : dépendances entre tâches.**
+- **Flèches pointillées : responsabilités et remise au vérificateur.**
+
+![Équipe en vue horizontale : orchestrateur, sous-responsable, exécutants et vérificateur reliés par des flèches](docs/screenshots/agents-horizontal.png)
+
+[Ouvrir le graphe horizontal en grand](docs/screenshots/agents-horizontal.png)
+
+#### La même organisation en vue verticale
+
+L’orientation peut être adaptée à la forme du plan. Le thème sombre conserve les couleurs des rôles et les deux types de flèches.
+
+![Équipe en vue verticale et thème sombre, avec liens de responsabilité et dépendances](docs/screenshots/agents-vertical.png)
+
+[Ouvrir le graphe vertical en grand](docs/screenshots/agents-vertical.png)
+
+#### Retrouver les rôles et les livrables en liste
+
+La vue liste complète le graphe : elle expose les responsabilités, les tâches et leurs livrables sans suivre chaque flèche. Dans cet exemple, les tâches attendent leur autorisation de démarrage.
+
+![Liste détaillée des responsables, du vérificateur et des tâches des exécutants](docs/screenshots/agents-liste.png)
+
+#### Examiner une tâche sans quitter le pilotage
+
+Le panneau de détail rassemble le résultat attendu, les critères et les actions disponibles. Cette capture montre une tâche avant lancement ; un journal d’exécution nécessite une tentative effectivement démarrée.
+
+![Détail de la tâche Créer la recherche, avec livrable, critères et état](docs/screenshots/agent-detail.png)
+
+### 3. Lire un graphe simple avant de configurer l’équipe
 
 Les flèches relient un prérequis à la tâche qui en dépend. Le graphe peut être orienté, filtré et replié pour retrouver une partie du travail. Cette mission de démonstration est manuelle et ses tâches restent à préparer.
 
@@ -106,7 +141,7 @@ Les flèches relient un prérequis à la tâche qui en dépend. Le graphe peut �
 
 </details>
 
-### 3. Choisir un modèle et sa connexion
+### 4. Choisir un modèle et sa connexion
 
 Ajoutez une connexion API avec un nom, une adresse et un modèle, puis testez-la explicitement. L’exemple ci-dessous montre un formulaire de démonstration, sans clé ni connexion validée.
 
@@ -205,7 +240,7 @@ CHROME_BIN=/usr/bin/google-chrome npm run test:connections
 CHROME_BIN=/usr/bin/google-chrome node scripts/readme-screenshots.cjs
 ```
 
-Les captures nécessitent Chrome ou Chromium installé. Les tests ciblés ne constituent pas une certification de tous les fournisseurs ni de toutes les situations d’exécution.
+Les captures nécessitent Chrome ou Chromium installé et Python 3 pour le scénario d’organisation simulée. Les tests ciblés ne constituent pas une certification de tous les fournisseurs ni de toutes les situations d’exécution.
 
 ## Licence
 

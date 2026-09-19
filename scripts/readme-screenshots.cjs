@@ -38,6 +38,36 @@ function change(args, work, fields) {
     const clip=await page.evaluate(()=>{const a=document.getElementById('pilot-toolbar').getBoundingClientRect(),b=document.getElementById('pilot-canvas').getBoundingClientRect();return {x:a.x+scrollX,y:a.y+scrollY,width:a.width,height:b.bottom-a.top};});
     await page.screenshot({path:path.join(output,'pilotage-'+theme+'.png'),clip});
   }
+  // Second scénario : données d'organisation simulées, sans aucun fournisseur actif.
+  execFileSync('python3',[path.join(__dirname,'readme-team-fixture.py'),root]);
+  await page.reload();await page.waitForSelector('#pilot-canvas svg');
+  await page.waitForFunction(()=>document.querySelector('#pilot-canvas').textContent.includes('Orchestrateur'));
+  await page.setViewport({width:1800,height:1200,deviceScaleFactor:1});
+  await page.evaluate(()=>setTheme('etat'));
+  async function captureGraph(name){
+    await page.click('#pilot-fit');
+    await page.$eval('#pilot-toolbar',e=>e.scrollIntoView({block:'start'}));
+    await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));
+    const clip=await page.evaluate(()=>{const a=document.getElementById('pilot-toolbar').getBoundingClientRect(),b=document.getElementById('pilot-canvas').getBoundingClientRect();return {x:a.x+scrollX,y:a.y+scrollY,width:a.width,height:b.bottom-a.top};});
+    await page.screenshot({path:path.join(output,name+'.png'),clip});
+  }
+  await captureGraph('agents-horizontal');
+  const arrows=await page.$$eval('#pilot-canvas [marker-end]',els=>els.filter(e=>e.hasAttribute('marker-end')).length);
+  if(arrows<3)throw new Error('Flèches de coordination absentes');
+  await page.setViewport({width:1120,height:1900,deviceScaleFactor:1});
+  await page.focus('#pilot-orientation');await page.keyboard.press('End');await page.keyboard.press('Enter');
+  await page.evaluate(()=>setTheme('sombre'));
+  await captureGraph('agents-vertical');
+  await page.setViewport({width:1380,height:1200,deviceScaleFactor:1});
+  await page.focus('#pilot-view');await page.keyboard.press('End');await page.keyboard.press('Enter');
+  await page.focus('#pilot-detail');await page.keyboard.press('End');await page.keyboard.press('Enter');
+  await page.evaluate(()=>setTheme('etat'));
+  await (await page.$('#pilot-list')).screenshot({path:path.join(output,'agents-liste.png')});
+  await page.click('[data-pilot-identity="interface"]');
+  await page.waitForSelector('#pilot-inspector[open]');
+  await (await page.$('#pilot-inspector')).screenshot({path:path.join(output,'agent-detail.png')});
+  await page.click('.pilot-inspector-head button');
+  await page.setViewport({width:1600,height:1200,deviceScaleFactor:1});
   await page.click('[data-view="providers"]');await page.waitForSelector('#connections-add');await page.click('#connections-add');await page.waitForSelector('#modal[open]');
   for(const [id,value] of Object.entries({connection_id:'modele-local',connection_label:'Mon modèle local',connection_url:'http://localhost:11434/v1',connection_model:'mon-modele'}))await page.type('#field-'+id,value);
   await page.evaluate(()=>setTheme('etat'));
@@ -51,7 +81,7 @@ function change(args, work, fields) {
   await page.evaluate(()=>document.documentElement.dataset.theme='etat');
   await page.screenshot({path:path.join(output,'preparation.png')});
   if(errors.length)throw new Error(errors.join('\n'));
-  console.log('4 captures générées ; aucun appel IA, aucune erreur JavaScript.');
+  console.log('8 captures générées ; aucun appel IA, aucune erreur JavaScript.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{
   if(browser)await browser.close();
   if(server){server.kill();await new Promise(r=>server.exitCode!==null?r():server.once('exit',r));}
