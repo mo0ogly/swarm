@@ -20,6 +20,17 @@ const cases={
   pattern:'^(TestEvidenceContract.*|TestManagedIntegrationRecordsRealCandidateSHA|TestManagedIntegrationAtomicAndConflict|TestManagedFailedControlNeverPublishes)$',
   required:['TestEvidenceContractCandidateSHADistinctFromRevisionAndUnknownForLegacy','TestManagedIntegrationRecordsRealCandidateSHA'],
   message:'git acceptance: managed integration receipt carries the real tested candidate commit, distinct from the business revision and timestamps, unknown for legacy receipts, verified end to end\n'},
+ // "diagnostic" covers R3 — Expliquer la cause réelle du blocage: only
+ // managed_integration.go and managed_git_test.go. Once a report is already
+ // committed into the managed copy (state left "integrating" after a crash
+ // mid-integration), task.blocker must reflect the real cause — a failed
+ // control, a missing provider/quota, a ceiling suspension or a workspace
+ // lock — and never a stale "rapport absent" re-derived from the emptied
+ // ephemeral workspace.
+ diagnostic:{dependencies:['go.mod','managed_integration.go','managed_git_test.go'],
+  pattern:'^(TestManagedIntegrationTrustsReportAlreadyInManagedCopy|TestManagedIntegrationFailedControlOutranksMissingReport|TestManagedIntegrationMissingProviderOutranksMissingReport|TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport|TestManagedIntegrationWorkspaceLockOutranksMissingReport|TestManagedIntegrationAtomicAndConflict|TestManagedFailedControlNeverPublishes)$',
+  required:['TestManagedIntegrationTrustsReportAlreadyInManagedCopy','TestManagedIntegrationFailedControlOutranksMissingReport','TestManagedIntegrationMissingProviderOutranksMissingReport','TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport','TestManagedIntegrationWorkspaceLockOutranksMissingReport'],
+  message:'diagnostic acceptance: task.blocker priority fixed so intégration échouée outranks rapport absent once the report already exists in the managed copy, verified for a failed control, a missing provider/quota, a ceiling suspension and a workspace lock, without regressing the atomic/conflict and failed-control paths\n'},
 };
 function runAcceptance(selected,options={}){
  const spec=cases[selected],projectRoot=options.root||root,exists=options.exists||fs.existsSync,out=options.stdout||process.stdout,err=options.stderr||process.stderr,spawn=options.spawnSync||spawnSync;
@@ -37,5 +48,5 @@ function runAcceptance(selected,options={}){
  out.write(spec.message);
  return 0;
 }
-function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs|git');return 2}return runAcceptance(argv[index+1])}
+function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs|git|diagnostic');return 2}return runAcceptance(argv[index+1])}
 module.exports={runAcceptance,main};if(require.main===module)process.exitCode=main();

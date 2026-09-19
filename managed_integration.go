@@ -56,18 +56,19 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	}
 	bare := filepath.Join(repo.Storage, "repository.git")
 	reportName := filepath.ToSlash(filepath.Join(repo.Subdir, "docs", t.ID+".md"))
-	reportPath, err := localFile(item.Path, reportName)
-	if err != nil {
-		return s.managedFailure(a, "Rapport de tentative absent : "+err.Error())
-	}
-	report, err := os.ReadFile(reportPath)
-	if err != nil || len(report) == 0 || len(report) > 1<<20 {
-		return s.managedFailure(a, "Rapport de tentative vide, illisible ou trop grand")
-	}
-	if old, e := managedGit(item.Path, "show", item.Base+":"+reportName); e == nil && hash([]byte(old)) == hash([]byte(strings.TrimSpace(string(report)))) {
-		return s.managedFailure(a, "Rapport identique à la base ; nouvelle preuve de tentative requise")
-	}
+	var report []byte
 	if item.Result == "" {
+		reportPath, err := localFile(item.Path, reportName)
+		if err != nil {
+			return s.managedFailure(a, "Rapport de tentative absent : "+err.Error())
+		}
+		report, err = os.ReadFile(reportPath)
+		if err != nil || len(report) == 0 || len(report) > 1<<20 {
+			return s.managedFailure(a, "Rapport de tentative vide, illisible ou trop grand")
+		}
+		if old, e := managedGit(item.Path, "show", item.Base+":"+reportName); e == nil && hash([]byte(old)) == hash([]byte(strings.TrimSpace(string(report)))) {
+			return s.managedFailure(a, "Rapport identique à la base ; nouvelle preuve de tentative requise")
+		}
 		if _, err = managedGit(item.Path, "add", "-A", "--", "."); err != nil {
 			return err
 		}
@@ -92,6 +93,18 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		if committed, e := managedGit(bare, "show", result+":"+reportName); e != nil || committed != strings.TrimSpace(string(report)) {
 			return s.managedFailure(a, "Rapport absent de la révision Git ; vérifier les fichiers ignorés")
 		}
+	} else {
+		// A prior pass already committed and verified this report into the bare
+		// repository (state left "integrating", e.g. after a crash before the
+		// merge/checks completed). Trust that managed copy instead of
+		// re-deriving from the ephemeral attempt workspace, which can churn
+		// between retries: past this point, any failure is a real integration
+		// failure, never a spurious "report missing".
+		committed, e := managedGit(bare, "show", item.Result+":"+reportName)
+		if e != nil {
+			return s.managedFailure(a, "Intégration échouée : révision "+item.Result+" absente de la copie gérée ("+e.Error()+")")
+		}
+		report = []byte(committed)
 	}
 	temp, err := os.MkdirTemp(repo.Storage, "integration-")
 	if err != nil {

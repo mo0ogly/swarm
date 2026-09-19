@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -162,6 +163,162 @@ func TestManagedFailedControlNeverPublishes(t *testing.T) {
 		t.Fatal("failed check published")
 	}
 }
+// managedSimulateCrashAfterReportCommit reproduces a process crash right
+// after the attempt's report reached the managed copy (state left
+// "integrating", result_commit set) but before the merge and checks
+// completed, then empties the ephemeral attempt workspace of that report.
+// R3: any diagnostic produced by a later call must be the real cause, never
+// a "rapport absent" re-derived from the now-empty workspace, since the
+// report already exists in the managed copy.
+func managedSimulateCrashAfterReportCommit(t *testing.T, s *Store, w Work, a Agent) {
+	t.Helper()
+	repo, e := s.managedRepository(w)
+	if e != nil {
+		t.Fatal(e)
+	}
+	bare := filepath.Join(repo.Storage, "repository.git")
+	item, e := s.managedAttempt(a.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	reportName := filepath.ToSlash(filepath.Join(repo.Subdir, "docs", a.TaskID+".md"))
+	gitTest(t, item.Path, "add", "-A", "--", ".")
+	tree := gitTest(t, item.Path, "write-tree")
+	result := gitTest(t, item.Path, "commit-tree", tree, "-p", item.Base, "-m", "Résultat "+a.ID)
+	gitTest(t, bare, "fetch", "--no-tags", item.Path, result)
+	gitTest(t, bare, "update-ref", "refs/swarm/attempts/"+a.ID, result)
+	if _, e = s.db.Exec("UPDATE managed_attempts SET state='integrating',result_commit=? WHERE agent_id=?", result, a.ID); e != nil {
+		t.Fatal(e)
+	}
+	if committed := gitTest(t, bare, "show", result+":"+reportName); committed == "" {
+		t.Fatal("report not actually committed to the managed copy")
+	}
+	if e = os.Remove(filepath.Join(item.Path, "docs", a.TaskID+".md")); e != nil {
+		t.Fatal(e)
+	}
+}
+
+// TestManagedIntegrationTrustsReportAlreadyInManagedCopy is the direct R3
+// regression: once the report is already in the managed copy, a workspace
+// that no longer has it must not block integration.
+func TestManagedIntegrationTrustsReportAlreadyInManagedCopy(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "first\n")
+	managedSimulateCrashAfterReportCommit(t, s, w, a)
+	if e := s.integrateManagedAttempt(a); e != nil {
+		t.Fatal(e)
+	}
+	w2, _ := s.get(w.ID)
+	task, _ := w2.task("first")
+	if task.Status != "accepted" {
+		t.Fatalf("report already in managed copy must let integration complete : %+v", task)
+	}
+}
+
+// TestManagedIntegrationFailedControlOutranksMissingReport covers "contrôle
+// échoué" : the real failure must be reported, not a stale "rapport absent".
+func TestManagedIntegrationFailedControlOutranksMissingReport(t *testing.T) {
+	s, w := managedFixture(t)
+	w, e := s.mutate(w.ID, "test.policy", "policy", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Tasks[0].ValidationPolicy = automaticPolicy("git", "diff", "--exit-code", "--no-index", "value.txt", "missing.txt")
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	a := managedCompleted(t, s, w, "first", "first\n")
+	managedSimulateCrashAfterReportCommit(t, s, w, a)
+	if e = s.integrateManagedAttempt(a); e != nil {
+		t.Fatal(e)
+	}
+	w2, _ := s.get(w.ID)
+	task, _ := w2.task("first")
+	if task.Status != "blocked" || !strings.Contains(task.Blocker, "Contrôle") {
+		t.Fatalf("expected control-failure blocker, got %+v", task)
+	}
+	if strings.Contains(task.Blocker, "Rapport de tentative absent") {
+		t.Fatalf("diagnostic priority wrong : intégration échouée must outrank rapport absent when report exists in managed copy : %q", task.Blocker)
+	}
+}
+
+// TestManagedIntegrationMissingProviderOutranksMissingReport covers
+// "fournisseur absent/quota" : a control that shells out to a provider tool
+// which is not installed must surface as a control/execution failure, not a
+// stale "rapport absent".
+func TestManagedIntegrationMissingProviderOutranksMissingReport(t *testing.T) {
+	s, w := managedFixture(t)
+	w, e := s.mutate(w.ID, "test.policy", "policy", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Tasks[0].ValidationPolicy = automaticPolicy("fournisseur-ia-introuvable", "--verifier-quota")
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	a := managedCompleted(t, s, w, "first", "first\n")
+	managedSimulateCrashAfterReportCommit(t, s, w, a)
+	if e = s.integrateManagedAttempt(a); e != nil {
+		t.Fatal(e)
+	}
+	w2, _ := s.get(w.ID)
+	task, _ := w2.task("first")
+	if task.Status != "blocked" || !strings.Contains(task.Blocker, "exécution impossible") {
+		t.Fatalf("expected missing-provider execution failure, got %+v", task)
+	}
+	if strings.Contains(task.Blocker, "Rapport de tentative absent") {
+		t.Fatalf("diagnostic priority wrong : intégration échouée must outrank rapport absent when report exists in managed copy : %q", task.Blocker)
+	}
+}
+
+// TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport covers
+// "plafond" : a mission paused between passes must surface a suspension,
+// never a "rapport absent", and must never silently retry.
+func TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "first\n")
+	managedSimulateCrashAfterReportCommit(t, s, w, a)
+	if e := s.setMission(w.ID, false); e != nil {
+		t.Fatal(e)
+	}
+	e := s.integrateManagedAttempt(a)
+	if e == nil || !strings.Contains(e.Error(), "intégration suspendue") {
+		t.Fatalf("expected suspended integration, got %v", e)
+	}
+	w2, _ := s.get(w.ID)
+	task, _ := w2.task("first")
+	if strings.Contains(task.Blocker, "Rapport de tentative absent") {
+		t.Fatalf("ceiling suspension must never surface as a missing report : %q", task.Blocker)
+	}
+	if task.Blocker != "integration" {
+		t.Fatalf("suspension is not a verdict : blocker must stay untouched pending an explicit decision, got %q", task.Blocker)
+	}
+}
+
+// TestManagedIntegrationWorkspaceLockOutranksMissingReport covers "espace
+// occupé" : a concurrent integration holding the mission lock must surface
+// as such and never overwrite the blocker with a stale "rapport absent".
+func TestManagedIntegrationWorkspaceLockOutranksMissingReport(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "first\n")
+	managedSimulateCrashAfterReportCommit(t, s, w, a)
+	unlock, e := managedLock(s.root, w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer unlock()
+	e = s.integrateManagedAttempt(a)
+	if e == nil || !strings.Contains(e.Error(), "déjà en cours") {
+		t.Fatalf("expected lock contention, got %v", e)
+	}
+	w2, _ := s.get(w.ID)
+	task, _ := w2.task("first")
+	if strings.Contains(task.Blocker, "Rapport de tentative absent") {
+		t.Fatalf("espace occupé must never surface as a missing report : %q", task.Blocker)
+	}
+	if task.Blocker != "integration" {
+		t.Fatalf("lock contention is transient : blocker must stay untouched, got %q", task.Blocker)
+	}
+}
+
 func TestPlanningSharedBudgetAndInheritedChecks(t *testing.T) {
 	s, w := managedFixture(t)
 	if w.Tasks[0].ValidationPolicy == nil || w.Tasks[0].Criteria[0] != w.Criteria[0] {
