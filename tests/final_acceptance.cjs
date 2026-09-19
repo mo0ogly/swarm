@@ -6,8 +6,20 @@ const root=path.resolve(__dirname,'..');
 // "proofs" covers R1 — Fiabiliser les états des preuves: only evidence_projection.go
 // and evidence_contract_test.go. It must refuse to report success on zero executed
 // Go tests (a JSON test log with no run/pass record is not evidence of anything).
+// "git" covers R2 — Attribuer les preuves à la révision Git: the managed
+// integration receipt must carry the Git commit actually merged and tested
+// (managed_integration.go's commit-tree result), never a value equal to the
+// business revision counter, and it must stay "unknown" for a legacy receipt
+// recorded before this field existed. Required tests span the unit-level
+// evidence projection and the end-to-end managed integration path.
 const cases={
- proofs:{dependencies:['go.mod','evidence_projection.go','evidence_contract_test.go'],pattern:'^TestEvidenceContract'},
+ proofs:{dependencies:['go.mod','evidence_projection.go','evidence_contract_test.go'],pattern:'^TestEvidenceContract',
+  required:['TestEvidenceContractControlAggregationIsOrderIndependent','TestEvidenceContractReviewerConfiguredWithoutVerdictIsNotNotConfigured'],
+  message:'proofs acceptance: order-independent failed-priority aggregation, empty-list unknown, null exit_code on unknown history, and configured-reviewer-pending states verified\n'},
+ git:{dependencies:['go.mod','model.go','managed_integration.go','evidence_projection.go','evidence_contract_test.go','managed_git_test.go'],
+  pattern:'^(TestEvidenceContract.*|TestManagedIntegrationRecordsRealCandidateSHA|TestManagedIntegrationAtomicAndConflict|TestManagedFailedControlNeverPublishes)$',
+  required:['TestEvidenceContractCandidateSHADistinctFromRevisionAndUnknownForLegacy','TestManagedIntegrationRecordsRealCandidateSHA'],
+  message:'git acceptance: managed integration receipt carries the real tested candidate commit, distinct from the business revision and timestamps, unknown for legacy receipts, verified end to end\n'},
 };
 function runAcceptance(selected,options={}){
  const spec=cases[selected],projectRoot=options.root||root,exists=options.exists||fs.existsSync,out=options.stdout||process.stdout,err=options.stderr||process.stderr,spawn=options.spawnSync||spawnSync;
@@ -20,10 +32,10 @@ function runAcceptance(selected,options={}){
  const records=(go.stdout||'').split('\n').filter(Boolean).map(line=>{try{return JSON.parse(line)}catch{return null}}).filter(Boolean);
  if(!records.some(record=>record.Action==='run'&&record.Test)||!records.some(record=>record.Action==='pass'&&!record.Test)){err.write(`${selected} acceptance produced no executed Go test success record\n`);return 5}
  const passedTests=records.filter(record=>record.Action==='pass'&&record.Test).map(record=>record.Test);
- for(const required of ['TestEvidenceContractControlAggregationIsOrderIndependent','TestEvidenceContractReviewerConfiguredWithoutVerdictIsNotNotConfigured'])
+ for(const required of spec.required)
   if(!passedTests.includes(required)){err.write(`${selected} acceptance missing required passing test: ${required}\n`);return 6}
- out.write('proofs acceptance: order-independent failed-priority aggregation, empty-list unknown, null exit_code on unknown history, and configured-reviewer-pending states verified\n');
+ out.write(spec.message);
  return 0;
 }
-function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs');return 2}return runAcceptance(argv[index+1])}
+function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs|git');return 2}return runAcceptance(argv[index+1])}
 module.exports={runAcceptance,main};if(require.main===module)process.exitCode=main();

@@ -212,7 +212,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 			if id != a.TaskID && target.AutoValidation != nil {
 				producer = target.AutoValidation.Producer
 			}
-			target.AutoValidation = &AutomaticValidation{Attempt: attempt, Producer: producer, Controller: validationController, PolicyDigest: validationPolicyDigest(*target.ValidationPolicy), Policy: *target.ValidationPolicy, Artifacts: artifacts, Controls: controls, Receipt: filepath.ToSlash(relReceipt), State: "accepted", Reason: "Révision intégrée vérifiée : " + candidate, At: now()}
+			target.AutoValidation = &AutomaticValidation{Attempt: attempt, CandidateSHA: candidate, Producer: producer, Controller: validationController, PolicyDigest: validationPolicyDigest(*target.ValidationPolicy), Policy: *target.ValidationPolicy, Artifacts: artifacts, Controls: controls, Receipt: filepath.ToSlash(relReceipt), State: "accepted", Reason: "Révision intégrée vérifiée : " + candidate, At: now()}
 			target.Status = "accepted"
 			target.Blocker = ""
 			target.Next = "Résultat intégré et vérifié : " + candidate

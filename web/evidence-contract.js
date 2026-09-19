@@ -12,7 +12,7 @@ const SwarmEvidenceContract=(()=>{
   const lines=[tr('Tentative')+' : '+(e.attempt_id||'unknown'),tr('Révision lue')+' : '+String(e.revision??'unknown'),tr('Fraîcheur')+' : '+e.freshness,
    tr('Revue du rapport')+' : '+e.report_review.state+' · '+tr('date')+' '+(e.report_review.at||'unknown'),
    tr('Acceptation')+' : '+e.acceptance.state+' · '+tr('révision')+' '+(e.acceptance.revision||'unknown')+' · '+tr('date')+' '+(e.acceptance.at||'unknown')];
-  for(const c of e.controls.items||[]){const command=(c.command||[]).length?c.command.join(' '):'unknown';lines.push(tr('Contrôle')+' '+c.id+' : '+tr('tentative')+' '+(c.attempt_id||'unknown')+' · '+c.execution+' · '+tr('révision')+' '+(c.revision||'unknown')+' · '+tr('commande')+' '+command+' · '+tr('code de sortie')+' '+(c.exit_code??'unknown')+' · '+tr('début')+' '+(c.started_at||'unknown')+' · '+tr('fin')+' '+(c.finished_at||'unknown')+' · '+tr('fraîcheur')+' '+c.freshness)}
+  for(const c of e.controls.items||[]){const command=(c.command||[]).length?c.command.join(' '):'unknown';lines.push(tr('Contrôle')+' '+c.id+' : '+tr('tentative')+' '+(c.attempt_id||'unknown')+' · '+c.execution+' · '+tr('révision')+' '+(c.revision||'unknown')+' · '+tr('SHA candidat')+' '+(c.candidate_sha||'unknown')+' · '+tr('commande')+' '+command+' · '+tr('code de sortie')+' '+(c.exit_code??'unknown')+' · '+tr('début')+' '+(c.started_at||'unknown')+' · '+tr('fin')+' '+(c.finished_at||'unknown')+' · '+tr('fraîcheur')+' '+c.freshness)}
   for(const limit of [...(e.report_review.limits||[]),...(e.limits||[])])lines.push(tr('Limite')+' : '+limit);
   return lines.join('\n');
  };

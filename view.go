@@ -190,7 +190,7 @@ func (s *Store) view(w Work) (string, error) {
 			if control.ExitCode != nil {
 				exit = fmt.Sprint(*control.ExitCode)
 			}
-			fmt.Fprintf(&b, uiText("  Contrôle %s : tentative=%s ; exécution=%s ; révision=%s ; commande=%s ; code=%s ; début=%s ; fin=%s ; fraîcheur=%s\n"), control.ID, control.Attempt, control.Execution, control.Revision, command, exit, control.Started, control.Finished, control.Freshness)
+			fmt.Fprintf(&b, uiText("  Contrôle %s : tentative=%s ; exécution=%s ; révision=%s ; sha_candidat=%s ; commande=%s ; code=%s ; début=%s ; fin=%s ; fraîcheur=%s\n"), control.ID, control.Attempt, control.Execution, control.Revision, control.CandidateSHA, command, exit, control.Started, control.Finished, control.Freshness)
 		}
 		if t.Gate == nil {
 			fmt.Fprintf(&b, uiText("- %s : gate non renseignée.\n"), t.ID)

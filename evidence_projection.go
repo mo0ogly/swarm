@@ -35,17 +35,18 @@ type EvidenceControls struct {
 }
 
 type EvidenceControl struct {
-	ID        string   `json:"id"`
-	Attempt   string   `json:"attempt_id"`
-	Execution string   `json:"execution"`
-	Revision  string   `json:"revision"`
-	Command   []string `json:"command"`
-	ExitCode  *int     `json:"exit_code"`
-	Started   string   `json:"started_at"`
-	Finished  string   `json:"finished_at"`
-	Freshness string   `json:"freshness"`
-	Result    string   `json:"result"`
-	Limits    []string `json:"limits"`
+	ID           string   `json:"id"`
+	Attempt      string   `json:"attempt_id"`
+	Execution    string   `json:"execution"`
+	Revision     string   `json:"revision"`
+	CandidateSHA string   `json:"candidate_sha"`
+	Command      []string `json:"command"`
+	ExitCode     *int     `json:"exit_code"`
+	Started      string   `json:"started_at"`
+	Finished     string   `json:"finished_at"`
+	Freshness    string   `json:"freshness"`
+	Result       string   `json:"result"`
+	Limits       []string `json:"limits"`
 }
 
 type EvidenceAcceptance struct {
@@ -58,7 +59,7 @@ func unknownEvidenceControl(id, freshness string) EvidenceControl {
 	if strings.TrimSpace(id) == "" {
 		id = "unknown"
 	}
-	return EvidenceControl{ID: id, Attempt: "unknown", Execution: "unknown", Revision: "unknown", Command: []string{}, ExitCode: nil,
+	return EvidenceControl{ID: id, Attempt: "unknown", Execution: "unknown", Revision: "unknown", CandidateSHA: "unknown", Command: []string{}, ExitCode: nil,
 		Started: "unknown", Finished: "unknown", Freshness: freshness, Result: "unknown",
 		Limits: []string{"Aucun reçu d’exécution moteur : une citation du rapport ou un statut de gate ne démontre ni la commande ni son code de sortie."}}
 }
@@ -169,7 +170,7 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 			if a.Revision > 0 {
 				testedRevision = strconv.Itoa(a.Revision)
 			}
-			e.Controls.Items = append(e.Controls.Items, EvidenceControl{ID: r.ID, Attempt: valueOrUnknown(a.Attempt), Execution: execution, Revision: testedRevision, Command: command,
+			e.Controls.Items = append(e.Controls.Items, EvidenceControl{ID: r.ID, Attempt: valueOrUnknown(a.Attempt), Execution: execution, Revision: testedRevision, CandidateSHA: valueOrUnknown(a.CandidateSHA), Command: command,
 				ExitCode: exitCode, Started: valueOrUnknown(r.Started), Finished: valueOrUnknown(r.Finished), Freshness: freshness, Result: result,
 				Limits: []string{fmt.Sprintf("Sortie non exposée ; seule son empreinte SHA-256 est conservée. Plafond %d octets.", maxValidationOutput)}})
 		}
@@ -238,7 +239,7 @@ func evidenceText(e TaskEvidence) string {
 		if c.ExitCode != nil {
 			exit = strconv.Itoa(*c.ExitCode)
 		}
-		fmt.Fprintf(&b, "Contrôle %s : tentative=%s · exécution=%s · révision=%s · commande=%s · code de sortie=%s · début=%s · fin=%s · fraîcheur=%s\n", c.ID, c.Attempt, c.Execution, c.Revision, command, exit, c.Started, c.Finished, c.Freshness)
+		fmt.Fprintf(&b, "Contrôle %s : tentative=%s · exécution=%s · révision=%s · sha_candidat=%s · commande=%s · code de sortie=%s · début=%s · fin=%s · fraîcheur=%s\n", c.ID, c.Attempt, c.Execution, c.Revision, c.CandidateSHA, command, exit, c.Started, c.Finished, c.Freshness)
 	}
 	fmt.Fprintf(&b, "Acceptation : %s · révision : %s · date : %s\n", e.Acceptance.State, e.Acceptance.Revision, e.Acceptance.At)
 	for _, limit := range append(append([]string{}, e.ReportReview.Limits...), e.Limits...) {

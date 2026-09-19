@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 )
 
@@ -103,6 +104,44 @@ func TestManagedIntegrationAtomicAndConflict(t *testing.T) {
 		t.Fatal("lost durable candidate")
 	}
 }
+
+// TestManagedIntegrationRecordsRealCandidateSHA covers R2: the receipt must
+// carry the Git commit actually merged, checked out and validated by the
+// managed integration path (the "candidate" this file computes via
+// commit-tree), never a value derived from the business revision counter or
+// parsed out of the human-readable Reason text.
+func TestManagedIntegrationRecordsRealCandidateSHA(t *testing.T) {
+	s, w := managedFixture(t)
+	first := managedCompleted(t, s, w, "first", "first\n")
+	if e := s.integrateManagedAttempt(first); e != nil {
+		t.Fatal(e)
+	}
+	w, _ = s.get(w.ID)
+	published := w.Planning.Repository.Candidate
+	av := w.Tasks[0].AutoValidation
+	if av == nil {
+		t.Fatal("aucune validation automatique enregistrée")
+	}
+	if av.CandidateSHA == "" || av.CandidateSHA == "unknown" {
+		t.Fatalf("SHA candidat absent du reçu : %+v", av)
+	}
+	if av.CandidateSHA != published {
+		t.Fatalf("SHA candidat du reçu (%s) différent du pointeur publié (%s)", av.CandidateSHA, published)
+	}
+	bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
+	onDisk := gitTest(t, bare, "rev-parse", "refs/swarm/candidates/"+first.ID)
+	if av.CandidateSHA != onDisk {
+		t.Fatalf("SHA candidat du reçu (%s) différent de la révision Git réelle (%s)", av.CandidateSHA, onDisk)
+	}
+	if av.CandidateSHA == strconv.Itoa(av.Revision) {
+		t.Fatalf("SHA candidat confondu avec la révision métier %d", av.Revision)
+	}
+	e := s.taskEvidence(&w, &w.Tasks[0], true)
+	if e.Controls.Items[0].CandidateSHA != published {
+		t.Fatalf("projection CLI/web n’expose pas le SHA candidat réel : %+v", e.Controls.Items[0])
+	}
+}
+
 func TestManagedFailedControlNeverPublishes(t *testing.T) {
 	s, w := managedFixture(t)
 	// A check failure must leave the Git publication and source unchanged.

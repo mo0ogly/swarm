@@ -61,6 +61,12 @@ func TestEvidenceContractExecutedControlAndStaleness(t *testing.T) {
 	if c.Execution != "executed" || strings.Join(c.Command, " ") != "go version" || c.ExitCode == nil || *c.ExitCode != 0 || c.Started == "unknown" || c.Finished == "unknown" || c.Revision == "unknown" {
 		t.Fatalf("métadonnées d’exécution absentes : %+v", c)
 	}
+	// The shared-workspace automatic validation path never merges nor commits
+	// a Git candidate: it must report candidate_sha as unknown, not fabricate
+	// one from the business revision or from any other field.
+	if c.CandidateSHA != "unknown" {
+		t.Fatalf("SHA candidat inventé hors dépôt Git géré : %+v", c)
+	}
 	if err := os.WriteFile(filepath.Join(s.root, report), []byte("preuve remplacée"), 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -151,6 +157,38 @@ func TestEvidenceContractReviewerConfiguredWithoutVerdictIsNotNotConfigured(t *t
 	e2 := s.taskEvidence(&noReviewer, &noReviewer.Tasks[0], false)
 	if e2.ReportReview.State != "not_configured" {
 		t.Fatalf("a work with no reviewer configuration must still report not_configured : %+v", e2.ReportReview)
+	}
+}
+
+// TestEvidenceContractCandidateSHADistinctFromRevisionAndUnknownForLegacy
+// covers R2: the Git commit actually tested must be readable on its own
+// field, never collide with the business revision counter or the receipt
+// timestamp, and stay "unknown" — not a fabricated or prose-parsed value —
+// for a receipt recorded before this field existed.
+func TestEvidenceContractCandidateSHADistinctFromRevisionAndUnknownForLegacy(t *testing.T) {
+	s := storeTest(t)
+	sha := "a1b2c3d4e5f60718293a4b5c6d7e8f901234567"
+	executed := ValidationControlResult{ID: "a", Executed: true, Passed: true, ExitCode: 0, Started: now(), Finished: now()}
+	task := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}},
+		AutoValidation: &AutomaticValidation{Attempt: "attempt-x", Revision: 7, CandidateSHA: sha, At: now(), Controls: []ValidationControlResult{executed}}}
+	work := Work{Revision: 7, Tasks: []Task{task}}
+	e := s.taskEvidence(&work, &work.Tasks[0], false)
+	if e.Controls.Items[0].CandidateSHA != sha {
+		t.Fatalf("SHA candidat non exposé : %+v", e.Controls.Items[0])
+	}
+	if e.Controls.Items[0].CandidateSHA == e.Controls.Items[0].Revision {
+		t.Fatalf("SHA candidat confondu avec la révision métier : %+v", e.Controls.Items[0])
+	}
+	if e.Controls.Items[0].CandidateSHA == e.ObservedAt || e.Controls.Items[0].CandidateSHA == work.Tasks[0].AutoValidation.At {
+		t.Fatalf("SHA candidat confondu avec un horodatage : %+v", e.Controls.Items[0])
+	}
+
+	legacy := Task{ID: "t1", Status: "submitted", Attempts: []Attempt{{ID: "attempt-x"}},
+		AutoValidation: &AutomaticValidation{Attempt: "attempt-x", Revision: 7, At: now(), Controls: []ValidationControlResult{executed}}}
+	legacyWork := Work{Revision: 7, Tasks: []Task{legacy}}
+	le := s.taskEvidence(&legacyWork, &legacyWork.Tasks[0], false)
+	if le.Controls.Items[0].CandidateSHA != "unknown" {
+		t.Fatalf("ancien reçu sans SHA candidat n’est pas resté unknown : %+v", le.Controls.Items[0])
 	}
 }
 

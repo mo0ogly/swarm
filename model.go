@@ -65,8 +65,13 @@ type ValidationControlResult struct {
 }
 
 type AutomaticValidation struct {
-	Attempt      string                    `json:"attempt_id"`
-	Revision     int                       `json:"revision"`
+	Attempt  string `json:"attempt_id"`
+	Revision int    `json:"revision"`
+	// CandidateSHA is the Git commit actually merged, committed and checked
+	// out when the controls below ran (managed_integration.go's commit-tree
+	// result), never derived from Reason text. Distinct from Revision, the
+	// business work revision counter, and from At, the receipt timestamp.
+	CandidateSHA string                    `json:"candidate_sha"`
 	Producer     string                    `json:"producer_agent_id"`
 	Controller   string                    `json:"controller"`
 	PolicyDigest string                    `json:"policy_digest"`
