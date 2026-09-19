@@ -102,7 +102,7 @@ func (s *Store) preparationConversionReview(id string) (PreparationConversionRev
 // Called inside the preparation command transaction: work, edges, lock, receipt
 // and provenance commit together. Never calls dispatch or changes autonomy.
 func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequest) error {
-	if r.Action == "create-missions" && p.Conversion != nil {
+	if (r.Action == "create-missions" || r.Action == "authorize-plan") && p.Conversion != nil {
 		if r.Hash != p.Conversion.PlanHash {
 			return preparationError("already_created", "Cette préparation a déjà créé ses missions. Ouvrir leur pilotage ; un autre plan exige une nouvelle préparation.")
 		}
@@ -122,7 +122,7 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 	var w Work
 	create := p.WorkID == ""
 	if create {
-		if r.Action != "create-missions" || *r.WorkRevision != 0 {
+		if (r.Action != "create-missions" && r.Action != "authorize-plan") || *r.WorkRevision != 0 {
 			return preparationError("conflict", "Nouveau travail : révision cible 0 requise.")
 		}
 		w = Work{Schema: 1, ID: "w-" + hash([]byte(p.ID))[:24], Created: now(), Tasks: []Task{}}
@@ -142,7 +142,7 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 		if e := s.revisePreparedMissions(tx, &w, p, r); e != nil {
 			return e
 		}
-	} else if r.Action == "create-missions" {
+	} else if r.Action == "create-missions" || r.Action == "authorize-plan" {
 		s.preparationFreshness(p)
 		if !p.PlanReady || r.Hash != p.Documents["plan"].Hash {
 			return preparationError("stale_plan", "Le verdict du plan n’est plus courant. Vérifier le plan avant de créer les missions.")
@@ -172,7 +172,13 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 		p.WorkID = w.ID
 		for _, id := range approved.TaskIDs {
 			t, _ := w.task(id)
-			t.LaunchHeld = true
+			t.LaunchHeld = r.Action != "authorize-plan"
+		}
+		if r.Action == "authorize-plan" {
+			p.Conversion.ReleasedAt = now()
+			if w.Planning != nil {
+				w.Planning.Paused = false
+			}
 		}
 	} else {
 		// Release is scoped to the immutable materialized snapshot, not a later draft.
@@ -222,9 +228,13 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 	if e != nil {
 		return e
 	}
-	if r.Action == "create-missions" || r.Action == "revise-missions" {
+	if r.Action == "create-missions" || r.Action == "authorize-plan" || r.Action == "revise-missions" {
 		for _, id := range p.Conversion.TaskIDs {
-			if _, e = tx.Exec("INSERT INTO preparation_launch_locks(work_id,task_id,preparation_id) VALUES(?,?,?) ON CONFLICT(work_id,task_id) DO UPDATE SET released=0", w.ID, id, p.ID); e != nil {
+			released := 0
+			if r.Action == "authorize-plan" {
+				released = 1
+			}
+			if _, e = tx.Exec("INSERT INTO preparation_launch_locks(work_id,task_id,preparation_id,released) VALUES(?,?,?,?) ON CONFLICT(work_id,task_id) DO UPDATE SET released=excluded.released", w.ID, id, p.ID, released); e != nil {
 				return e
 			}
 		}

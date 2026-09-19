@@ -10,8 +10,8 @@ Pour le parcours complet avec captures et dépannage, voir le [guide utilisateur
 2. Rédiger le besoin. Choisir un fournisseur IA et un niveau ; le modèle résolu est affiché avant l’envoi. Les appels de préparation n’ont aucun outil de modification du dépôt.
 3. Relire et adopter le brief. Demander un plan, répondre aux décisions ouvertes, puis utiliser **Modifier les missions** pour éditer titre, rôle, périmètre, livrable, critères, dépendances et limites sans écrire de JSON.
 4. **Vérifier le plan** contrôle le contrat, les décisions et l’absence de cycle ; cela ne prouve pas encore les livrables.
-5. **Créer les missions** demande l’IA, le dossier de travail, les plafonds et le mode de validation. La création enregistre ensemble le responsable de mission, les responsabilités, les politiques de validation, le profil par défaut et les tâches. Aucun agent ne démarre à cette étape.
-6. **Relire et autoriser le démarrage**, puis ouvrir le pilotage et lancer la mission avec ses réglages. La création et l’autorisation ne contournent pas les contrôles de dépendances, de budget ou d’espace occupé.
+5. **Relire l’équipe proposée** récapitule le responsable, les exécutants, le vérificateur réel, les modèles IA, le dossier, les plafonds et le mode d’acceptation. Le prévol vérifie l’exécutant et le dossier sans créer de mission ni démarrer d’agent.
+6. **Autoriser cette équipe et ses missions** est l’unique confirmation : elle crée atomiquement l’organisation et autorise ensuite les seuls départs éligibles. Elle ne contourne pas les contrôles de dépendances, de budget, de pause ou d’espace occupé.
 
 Le responsable IA est enregistré dans l’arbre des responsabilités, séparément du graphe des tâches. Il traite les retours des agents. Une tâche portant le rôle « planificateur » n’est pas à elle seule un responsable durable. Les nouvelles missions préparées configurent aussi un vérificateur IA distinct. Les missions historiques ne reçoivent pas ce rôle rétroactivement ; voir la section dédiée ci-dessous.
 

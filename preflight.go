@@ -393,3 +393,39 @@ func (s *Store) preflightLaunch(work string, r Launch) (PreflightResult, error) 
 	}
 	return s.runProviderPreflight(r.Provider, p, cwd, r)
 }
+
+// preparationPreflight checks the proposed worker before any Work or task is
+// created. The receipt is informative only: launch performs its own fresh check.
+func (s *Store) preparationPreflight(provider, workspace, level string) (PreflightResult, error) {
+	started := time.Now()
+	failure := func(name, detail string) (PreflightResult, error) {
+		result := PreflightResult{Schema: 1, Verdict: "intervention", CheckedAt: started.UTC().Format(time.RFC3339Nano), Provider: provider, Workspace: workspace}
+		return preflightFailure(result, "intervention", name, detail, started)
+	}
+	if !safeName(provider) {
+		return failure("configuration", "fournisseur invalide")
+	}
+	if workspace == "" {
+		workspace = "."
+	}
+	cwd, err := resolveWorkspace(s.root, workspace)
+	if err != nil {
+		return failure("workspace", err.Error())
+	}
+	providers, err := s.providers()
+	if err != nil {
+		return failure("configuration", err.Error())
+	}
+	p, ok := providers.Providers[provider]
+	if !ok {
+		return failure("configuration", "fournisseur non configuré")
+	}
+	if p.APIConnectionID != "" {
+		return failure("configuration", "connexion API sans outils : choisir un agent installé pour les exécutants")
+	}
+	p, _, err = resolveModel(p, level, "work")
+	if err != nil {
+		return failure("configuration", err.Error())
+	}
+	return s.runProviderPreflight(provider, p, cwd, Launch{Provider: provider, Workspace: cwd, Level: level})
+}

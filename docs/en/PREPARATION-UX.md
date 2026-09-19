@@ -13,11 +13,12 @@
    The web form does not require you to write JSON.
 4. Check the plan. This checks its contract, decisions and absence of cycles;
    it does not prove that deliverables have been produced.
-5. Create missions. Choose the AI, workspace, limits and validation mode.
-   The transaction records the mission owner, responsibilities, validation
-   policies, default launch profile and tasks. No agent starts at this stage.
-6. Review and authorize starts, then open management and start the mission with
-   its settings. Dependency, budget and occupied-workspace guards still apply.
+5. Review the proposed team: owner, workers, actual reviewer, AI models,
+   workspace, limits and acceptance mode. Run preflight; it checks the worker
+   and workspace without creating a mission or starting an agent.
+6. **Authorize this team and its missions** is the single confirmation. It
+   atomically creates the organization and then permits only eligible starts.
+   Dependency, budget, pause and occupied-workspace guards still apply.
 
 The AI owner is recorded in the responsibility tree, separately from task
 relationships. It handles agent feedback. A task whose role is `planner` alone

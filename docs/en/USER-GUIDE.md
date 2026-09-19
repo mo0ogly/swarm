@@ -92,7 +92,9 @@ and success criteria. For example:
 4. Use **Edit missions** to refine titles, scopes, deliverables, success criteria
    and dependencies.
 5. **Check plan** and address reported issues.
-6. Choose **Create missions**, providers, workspace, limits and validation mode.
+6. Choose **Review proposed team**, verify owner, workers, actual review, AI,
+   workspace, limits and validation mode, run preflight, then give the single
+   summarized authorization.
 
 Checking a plan proves structural consistency, not completion of its work.
 Creating missions does not start agents.
@@ -122,9 +124,9 @@ A visible planner card does not mean an AI call is running continuously. Naming
 a task “review” does not configure an independent reviewer. Legacy missions may
 have missing roles; inspect the organization instead of bypassing launch refusal.
 
-After **Review and authorize start**, open management and choose **Start mission**.
-Review provider, directory, concurrency and limits before confirming. Plan
-release and mission launch are separate steps.
+After the single team authorization, open management. Only eligible missions may
+start; dependency, budget, pause and workspace checks still apply. Review the
+provider, directory, concurrency and limits before any manual start.
 
 Slots set an upper bound on concurrent attempts. Unvalidated dependencies or an
 occupied directory can reduce actual concurrency. **Start all** starts tasks ready

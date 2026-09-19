@@ -98,11 +98,11 @@ func (r PreparationRequest) validate() error {
 	if (r.Action == "budget") != (r.Budget != nil) || (r.Action == "source-add" || r.Action == "source-remove") != (r.Source != nil) {
 		return preparationError("invalid_request", "Budget ou source incompatible avec cette action.")
 	}
-	if r.Organization != nil && r.Action != "create-missions" {
+	if r.Organization != nil && r.Action != "create-missions" && r.Action != "authorize-plan" {
 		return preparationError("invalid_request", "Organisation autorisée uniquement lors de la création.")
 	}
 	switch r.Action {
-	case "source-add", "source-remove", "budget", "create", "method", "save", "adopt-brief", "validate-plan", "use-proposal", "answer-questions", "create-missions", "revise-missions", "release-plan":
+	case "source-add", "source-remove", "budget", "create", "method", "save", "adopt-brief", "validate-plan", "use-proposal", "answer-questions", "create-missions", "authorize-plan", "revise-missions", "release-plan":
 	default:
 		return preparationError("invalid_action", fmt.Sprintf("Action de préparation indisponible : %s", r.Action))
 	}
@@ -110,7 +110,7 @@ func (r PreparationRequest) validate() error {
 		r.Action != "create" && r.Action != "method" && r.Method != "" ||
 		r.Action != "create" && r.Action != "save" && r.Text != "" ||
 		r.Action != "save" && r.Document != "" ||
-		r.Action != "adopt-brief" && r.Action != "validate-plan" && r.Action != "answer-questions" && r.Action != "create-missions" && r.Action != "revise-missions" && r.Action != "release-plan" && r.Hash != "" {
+		r.Action != "adopt-brief" && r.Action != "validate-plan" && r.Action != "answer-questions" && r.Action != "create-missions" && r.Action != "authorize-plan" && r.Action != "revise-missions" && r.Action != "release-plan" && r.Hash != "" {
 		return preparationError("invalid_request", "Champ incompatible avec cette action ; aucune modification enregistrée.")
 	}
 	if r.Action != "answer-questions" && r.Decisions != nil || r.Action == "answer-questions" && (r.Hash == "" || len(r.Decisions) == 0 || len(r.Decisions) > 16) {
@@ -121,10 +121,10 @@ func (r PreparationRequest) validate() error {
 			return preparationError("invalid_request", "Chaque réponse doit être en UTF-8 et limitée à 4 000 octets.")
 		}
 	}
-	if r.Action != "create-missions" && r.Action != "revise-missions" && r.Action != "release-plan" && r.WorkRevision != nil {
+	if r.Action != "create-missions" && r.Action != "authorize-plan" && r.Action != "revise-missions" && r.Action != "release-plan" && r.WorkRevision != nil {
 		return preparationError("invalid_request", "Révision du travail incompatible avec cette action.")
 	}
-	if (r.Action == "create-missions" || r.Action == "revise-missions" || r.Action == "release-plan") && (r.Hash == "" || r.WorkRevision == nil || *r.WorkRevision < 0) {
+	if (r.Action == "create-missions" || r.Action == "authorize-plan" || r.Action == "revise-missions" || r.Action == "release-plan") && (r.Hash == "" || r.WorkRevision == nil || *r.WorkRevision < 0) {
 		return preparationError("invalid_request", "Empreinte du plan et expected_work_revision requis.")
 	}
 	if r.Action == "use-proposal" && !preparationKey(r.Turn) || r.Action != "use-proposal" && r.Turn != "" {

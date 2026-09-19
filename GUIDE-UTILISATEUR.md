@@ -115,11 +115,14 @@ vérifier la réussite. Exemple à adapter :
 4. Avec **Modifier les missions**, précisez chaque titre, périmètre, livrable,
    critère de réussite et dépendance.
 5. Utilisez **Vérifier le plan** et corrigez les problèmes signalés.
-6. Choisissez **Créer les missions**, puis les fournisseurs, l’espace de travail,
-   les limites et le mode de validation.
+6. Choisissez **Relire l’équipe proposée**, puis vérifiez le responsable, les
+   exécutants, la revue, les IA, l’espace de travail, les limites et le mode de
+   validation. Exécutez le prévol, puis donnez l’autorisation unique récapitulative.
 
 La vérification du plan contrôle sa cohérence ; elle ne prouve pas que le travail
-est réalisé. Créer les missions ne démarre pas les agents.
+est réalisé. Aucun travail ni agent n’est créé avant l’autorisation. Après celle-ci,
+seules les missions éligibles peuvent partir ; dépendances, budget, pause et espace
+occupé restent contrôlés.
 
 ![Préparation d’une mission](docs/screenshots/preparation.png)
 

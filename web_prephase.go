@@ -73,6 +73,27 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 		}
 		send(w, review)
 	})
+	mux.HandleFunc("/api/v1/preparations/preflight", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var req struct {
+			Provider  string `json:"provider"`
+			Workspace string `json:"workspace"`
+			Level     string `json:"level"`
+		}
+		b, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 4096))
+		if e == nil {
+			e = strict(b, &req)
+		}
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		result, _ := s.preparationPreflight(req.Provider, req.Workspace, req.Level)
+		send(w, result)
+	})
 	s.registerPreparationDialogue(mux, send, fail)
 	s.registerPreparationResources(mux, send, fail)
 	mux.HandleFunc("/api/v1/preparations", func(w http.ResponseWriter, r *http.Request) {
