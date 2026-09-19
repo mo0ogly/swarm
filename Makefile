@@ -13,3 +13,11 @@ smoke: build
 # Requires a local Docker Engine and a checkout without deploy/install.env.
 test-install:
 	python3 tests/install_smoke.py
+
+# Deterministic agent processes: no paid model or API calls.
+.PHONY: test-process
+test-process: build
+	python3 tests/automatic_validation_process.py bin/swarm test-results/process-validation
+	python3 tests/organized_coordination_process.py bin/swarm test-results/process-team nominal
+	python3 tests/organized_coordination_process.py bin/swarm test-results/process-shared shared
+	python3 tests/organized_coordination_process.py bin/swarm test-results/process-restart restart

@@ -81,6 +81,8 @@ Avec le réseau hôte Linux, une API locale peut être joignable par exemple à 
 
 ### Agents capables de modifier le projet
 
+Le dépôt GitHub contient les adaptateurs de Swarm, pas les programmes Claude Code, Codex ou Skynet, ni les poids des modèles. La commande `skynet_harness` est reconnue par le routage des modèles lorsqu’elle est installée et déclarée comme fournisseur ; cette reconnaissance ne constitue pas une installation ni une recette de bout en bout.
+
 Les commandes installées sur l’hôte ne deviennent pas automatiquement disponibles dans le conteneur. Installez les agents **dans le conteneur**, selon la documentation de leur éditeur, puis authentifiez-les dans cet environnement.
 
 Ouvrir un terminal dans le service :

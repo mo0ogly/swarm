@@ -1,5 +1,6 @@
 """Public CLI recipe: two real fake-provider processes, no human approval between tasks."""
 import json, pathlib, subprocess, sys, tempfile, time, uuid
+from organized_fixture import enable_organization, add_owned_tasks
 binary=str(pathlib.Path(sys.argv[1]).resolve())
 out=pathlib.Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
 root=pathlib.Path(tempfile.mkdtemp(prefix='swarm-auto-validation-'))
@@ -18,10 +19,13 @@ p=pathlib.Path(report);p.parent.mkdir(exist_ok=True);p.write_text("preuve locale
 print(json.dumps({"type":"item.completed","item":{"type":"agent_message","text":"Rapport de recette produit."}}),flush=True)
 ''')
 (root/'.swarm/providers.json').write_text(json.dumps({'schema_version':1,'providers':{'recette':{'command':sys.executable,'args':[str(provider)],'env_allow':[]}}}))
-w=mutate(['work','create'],{},title='Chaîne automatique isolée',objective='Deux tâches sans clic intermédiaire',scope='recette locale',criteria=['deux rapports validés'],next='lancer')
-for tid,deps in [('t1',[]),('t2',['t1'])]:
- w=mutate(['task','add',w['id']],w,id=tid,title=tid,owner='recette',deliverable='docs/'+tid+'.md',criteria=['rapport local exact'],depends=deps,next='Produire uniquement le livrable demandé')
- w=mutate(['task','update',w['id']],w,id=tid,validation_policy={'mode':'automatic','controls':[{'id':'report-check','command':['python3','-c',"from pathlib import Path; assert Path('docs/"+tid+".md').read_text() == 'preuve locale\\n'"],'criteria':[1],'justification':'Le contrôle compare le rapport complet au contenu exact attendu.','timeout_seconds':5}]})
+w=mutate(['work','create'],{},title='Chaîne automatique isolée',objective='Deux tâches sans clic intermédiaire',scope='recette locale',criteria=['Rapport t1 exact','Rapport t2 exact'],next='lancer')
+specs=[('t1',[]),('t2',['t1'])]
+checks={}
+for i,(tid,deps) in enumerate(specs,1):
+ checks['req-'+str(i)]=[{'id':'report-check','command':['python3','-c',"from pathlib import Path; assert Path('docs/"+tid+".md').read_text() == 'preuve locale\\n'"],'criteria':[1],'justification':'Le contrôle compare le rapport complet au contenu exact attendu.','timeout_seconds':5}]
+w=enable_organization(root,cli,w,checks)
+w=add_owned_tasks(cli,w,[dict(id=tid,title=tid,requirements=['req-'+str(i)],deliverable='docs/'+tid+'.md',criteria=['rapport local exact'],depends=deps,next='Produire uniquement le livrable demandé') for i,(tid,deps) in enumerate(specs,1)])
 cli(['mission','start',w['id']],{'provider':'recette','role':'worker','workspace':str(root),'capture_output':True,'timeout_seconds':30})
 log=open(out/'server.log','w');server=subprocess.Popen([binary,'--root',str(root),'web'],stdout=log,stderr=log)
 try:
