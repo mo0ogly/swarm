@@ -1,0 +1,46 @@
+/* Graphe du travail : lecture avant décoration. Aucune couleur brute, aucune
+   animation — une alerte ne doit jamais être masquée par un mouvement. */
+.graph-cadre-defilant{overflow:auto;max-width:100%;border:1px solid var(--wattson-ligne);border-radius:14px;background:var(--wattson-carte-appuyee);padding:8px}
+.graph-svg{display:block;min-width:100%}
+.graph-arete{fill:none;stroke:var(--wattson-libelle);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.graph-fleche{fill:var(--wattson-libelle)}
+.graph-noeud{cursor:pointer}
+.graph-noeud .graph-cadre{fill:var(--wattson-carte);stroke:var(--wattson-ligne);stroke-width:1.5}
+.graph-noeud:focus{outline:none}
+.graph-noeud:focus .graph-cadre,.graph-noeud:hover .graph-cadre{stroke:var(--wattson-lien);stroke-width:3}
+/* La teinte remplit le nœud, elle ne se limite pas à son contour : un aplat se
+   repère d'un balayage, un liseré demande de chercher. Les paires fond/encre du
+   thème sont conçues ensemble, donc le texte reste lisible sur son aplat.
+   L'état reste écrit dans le titre du nœud : la couleur le redouble. */
+.graph-noeud[data-etat=active] .graph-cadre{fill:var(--wattson-info-fond);stroke:var(--wattson-info-encre);stroke-width:2.5}
+.graph-noeud[data-etat=active] .graph-titre{fill:var(--wattson-info-encre)}
+.graph-noeud[data-etat=alerte] .graph-cadre{fill:var(--wattson-alerte-fond);stroke:var(--wattson-alerte);stroke-width:2.5}
+.graph-noeud[data-etat=alerte] .graph-titre{fill:var(--wattson-alerte-encre)}
+.graph-noeud[data-etat=attention] .graph-cadre{fill:var(--wattson-attention-fond);stroke:var(--wattson-attention);stroke-width:2.5}
+.graph-noeud[data-etat=attention] .graph-titre{fill:var(--wattson-attention-encre)}
+.graph-noeud[data-etat=validee] .graph-cadre{fill:var(--wattson-succes-fond);stroke:var(--wattson-accent);stroke-width:2.5}
+.graph-noeud[data-etat=validee] .graph-titre{fill:var(--wattson-succes-encre)}
+.graph-noeud[data-etat=neutre] .graph-cadre{fill:var(--wattson-carte-creuse)}
+/* Sur un aplat teinté, le texte secondaire reprend l'encre de la paire. */
+.graph-noeud[data-etat=active] .graph-sous-titre,.graph-noeud[data-etat=active] .graph-agent{fill:var(--wattson-info-encre)}
+.graph-noeud[data-etat=alerte] .graph-sous-titre,.graph-noeud[data-etat=alerte] .graph-agent{fill:var(--wattson-alerte-encre)}
+.graph-noeud[data-etat=attention] .graph-sous-titre,.graph-noeud[data-etat=attention] .graph-agent{fill:var(--wattson-attention-encre)}
+.graph-noeud[data-etat=validee] .graph-sous-titre,.graph-noeud[data-etat=validee] .graph-agent{fill:var(--wattson-succes-encre)}
+/* Dépendance satisfaite ou en attente : deux lectures, deux traits. */
+.graph-arete[data-lien=satisfait]{stroke:var(--wattson-accent);stroke-width:2}
+.graph-arete[data-lien=attente]{stroke:var(--wattson-libelle);stroke-dasharray:5 4}
+.graph-fleche-ok{fill:var(--wattson-accent)}
+/* Légende des teintes : la couleur gagne un sens, il est écrit. */
+.graph-teinte{display:inline-flex;align-items:center;gap:5px}
+.graph-teinte::before{content:"";width:10px;height:10px;border-radius:3px;border:1px solid var(--wattson-ligne)}
+.graph-teinte[data-etat=attente]::before{background:var(--wattson-carte)}
+.graph-teinte[data-etat=active]::before{background:var(--wattson-info-fond);border-color:var(--wattson-info-encre)}
+.graph-teinte[data-etat=attention]::before{background:var(--wattson-attention-fond);border-color:var(--wattson-attention)}
+.graph-teinte[data-etat=alerte]::before{background:var(--wattson-alerte-fond);border-color:var(--wattson-alerte)}
+.graph-teinte[data-etat=validee]::before{background:var(--wattson-succes-fond);border-color:var(--wattson-accent)}
+.graph-teinte[data-etat=neutre]::before{background:var(--wattson-carte-creuse)}
+.graph-titre{font-size:13px;font-weight:700;fill:var(--wattson-titre)}
+.graph-sous-titre{font-size:12px;fill:var(--wattson-texte)}
+.graph-agent{font-size:11px;fill:var(--wattson-libelle)}
+.graph-alerte{font-size:11px;font-weight:700;fill:var(--wattson-alerte)}
+.graph-legende{margin-top:10px;font-size:13px;color:var(--wattson-libelle)}

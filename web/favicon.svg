@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Cockpit Swarm">
+  <title>Cockpit Swarm</title>
+  <!-- Le sujet du produit, pas un logo : trois tâches et leurs dépendances,
+       orientées de gauche à droite comme dans le graphe du cockpit. Le fond
+       reprend celui de l'application pour rester lisible sur une barre
+       d'onglets claire comme sombre. -->
+  <rect width="32" height="32" rx="7" fill="#111b26"/>
+  <g stroke="#9cd2f7" stroke-width="1.8" stroke-linecap="round" opacity=".85">
+    <path d="M10 10 L22 16"/>
+    <path d="M10 22 L22 16"/>
+  </g>
+  <circle cx="10" cy="10" r="3.4" fill="#a9e9c9"/>
+  <circle cx="10" cy="22" r="3.4" fill="#a9e9c9"/>
+  <circle cx="22" cy="16" r="4" fill="#9ff5ea"/>
+</svg>

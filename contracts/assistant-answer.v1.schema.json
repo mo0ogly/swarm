@@ -1,0 +1,131 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "template_id": {
+      "enum": [
+        "understand_page.v1",
+        "explain_blocker.v1",
+        "next_action.v1",
+        "resume_session.v1",
+        "examine_gate.v1"
+      ]
+    },
+    "context_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 800,
+            "minLength": 1
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^f[1-9][0-9]*$"
+            },
+            "maxItems": 8,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "text",
+          "source_ids"
+        ]
+      },
+      "maxItems": 12,
+      "minItems": 1
+    },
+    "interpretation": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "missing_information": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 800
+      },
+      "maxItems": 8,
+      "minItems": 0
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "why": {
+            "type": "string",
+            "maxLength": 600,
+            "minLength": 1
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^f[1-9][0-9]*$"
+            },
+            "maxItems": 8,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "action_id",
+          "why",
+          "source_ids"
+        ]
+      },
+      "maxItems": 3,
+      "minItems": 0
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 800
+      },
+      "maxItems": 8,
+      "minItems": 0
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 800
+      },
+      "maxItems": 5,
+      "minItems": 0
+    }
+  },
+  "required": [
+    "version",
+    "template_id",
+    "context_hash",
+    "facts",
+    "interpretation",
+    "missing_information",
+    "next_steps",
+    "limitations",
+    "questions"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:assistant-answer:v1",
+  "title": "Swarm AssistantAnswer v1",
+  "description": "Runtime additionally enforces UTF-8 byte limits, known fact/action references, availability, context hash, and no executable markup. Total answer at most 24576 UTF-8 bytes."
+}

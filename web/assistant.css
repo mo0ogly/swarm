@@ -1,0 +1,25 @@
+.assist{margin:18px 0;padding:18px 20px;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:12px}
+.assist .section-heading{margin-bottom:10px}
+.assist-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px}
+.assist-toolbar label{display:grid;gap:4px;font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--wattson-libelle)}
+.assist-toolbar select{min-width:16rem;padding:.5rem .6rem;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-champ);color:var(--wattson-texte)}
+.assist-block{margin:12px 0;padding:12px 14px;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:10px}
+.assist-block h4{margin:0 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--wattson-titre)}
+.assist-block ul{margin:0;padding-left:1.1rem}
+.assist-block li{margin:.3rem 0}
+.assist-refs{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:.4rem;vertical-align:baseline}
+.assist-ref{padding:.1rem .45rem;font-size:12px;border-radius:999px;border:1px solid var(--wattson-lien);background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.assist-ref:hover{background:var(--wattson-action-fond);color:var(--wattson-action-encre)}
+.assist-steps{display:grid;gap:8px}
+.assist-step{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:8px}
+.assist-step p{margin:0;flex:1 1 20rem}
+.assist-entry{margin-left:auto}
+.assist-meta{font-size:12px;color:var(--wattson-texte-discret)}
+.assist-history pre{white-space:pre-wrap;word-break:break-word;max-height:22rem;overflow:auto}
+@media (max-width:720px){.assist-toolbar select{min-width:100%}.assist-toolbar label{flex:1 1 100%}}
+
+#assist-answer{max-height:38rem;overflow:auto;scrollbar-gutter:stable}
+.assist-toolbar select{max-width:100%;width:100%}
+.assist-toolbar label{max-width:100%;min-width:0;flex:1 1 18rem}
+.assist .section-heading>div{min-width:0}
+.assist button:disabled{background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret);border-color:var(--wattson-ligne);cursor:not-allowed}

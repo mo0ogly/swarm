@@ -1,0 +1,5 @@
+.plan-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:18px;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:12px}
+.plan-editor h3,.plan-editor .field-wide{grid-column:1/-1}
+.plan-missions,.plan-mission{grid-column:1/-1;min-width:0}.plan-missions{display:grid;gap:16px}.plan-mission{background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:12px;padding:12px}.plan-mission summary{color:var(--wattson-titre);font-weight:700}
+#modal-fields>.plan-editor,#modal-fields>.plan-missions{grid-column:1/-1}.plan-task-line{display:flex;gap:12px;align-items:center;padding:12px;border-bottom:1px solid var(--wattson-ligne)}.plan-task-line>span:first-child{flex:1}.plan-task-line:nth-child(even){background:var(--wattson-carte)}#action-plans{display:grid;gap:16px;margin-bottom:20px}#action-plans:empty{display:none}
+@media(max-width:650px){.plan-editor{grid-template-columns:1fr;padding:12px}.plan-task-line{flex-wrap:wrap}.plan-task-line>span:first-child{flex-basis:100%}}

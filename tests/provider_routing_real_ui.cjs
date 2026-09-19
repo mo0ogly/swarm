@@ -1,0 +1,17 @@
+// Explicit real provider tests through the browser; isolated work, no coding tools.
+const fs=require('fs'),cp=require('child_process'),assert=require('assert'),pup=require('/home/fpizzi/node_modules/puppeteer');
+const binary=process.argv[2]||'/tmp/swarm-model-routing',dir='docs/plans/swarm-provider-routing/evidence';
+(async()=>{
+ const fixture=JSON.parse(cp.execFileSync('python3',['tools/swarm-companion/tests/assist_fixture.py',binary,'tools/swarm-companion/tests/assist_provider.py'],{encoding:'utf8'}));
+ const configured=JSON.parse(fs.readFileSync('.swarm/providers.json'));fs.writeFileSync(fixture.root+'/.swarm/providers.json',JSON.stringify(configured));
+ const server=cp.spawn(binary,['--root',fixture.root,'web']);let output='';server.stdout.on('data',d=>output+=d);for(let i=0;i<200&&!output.includes('/session/');i++)await new Promise(r=>setTimeout(r,100));assert(output.includes('/session/'));
+ const b=await pup.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});const results=[];
+ try{const p=await b.newPage();p.setDefaultTimeout(45000);await p.setViewport({width:1500,height:1100});await p.goto(output.match(/http:\/\/\S+/)[0]);await p.waitForSelector('#work option');await p.select('#work',fixture.work);await p.waitForSelector('[data-task="AS-01"]');await p.waitForFunction(()=>assistHistoryReady);
+ for(const [provider,level,model]of [['codex','simple','gpt-5.6-luna'],['codex','standard','gpt-5.6-sol'],['claude','simple','haiku'],['skynet-glm','simple','glm-5.3-flash']]){
+  await p.click('[data-view="providers"]');await p.waitForSelector('[data-provider="'+provider+'"] .provider-actions');await p.click('[data-provider="'+provider+'"] .provider-actions button:nth-child(2)');await p.waitForSelector('#field-level');await p.select('#field-level',level);await p.waitForFunction(m=>document.querySelector('#model-selection').textContent.includes(m)&&!document.querySelector('#confirm').disabled,{},model);
+  await p.click('#field-question',{clickCount:3});await p.keyboard.press('Backspace');await p.type('#field-question','Que reste-t-il à faire dans ce travail de recette ? Cite uniquement les faits transmis. Réponse courte dans le gabarit imposé.');await p.click('#confirm');await p.waitForFunction(()=>!document.querySelector('#preview').hidden||!document.querySelector('#modal-error').hidden);if(!await p.$eval('#modal-error',e=>e.hidden))throw Error(await p.$eval('#modal-error',e=>e.textContent));assert((await p.$eval('#preview',e=>e.textContent)).includes(model));
+  const response=p.waitForResponse(r=>r.url().endsWith('/api/v1/assist/ask')&&r.request().method()==='POST'&&JSON.parse(r.request().postData()).preview===false);await p.click('#confirm');const sent=await (await response).json();assert(sent.id,JSON.stringify(sent));console.log('Appel réel confirmé : '+provider+' / '+model+' / '+sent.id);
+  await p.waitForFunction(id=>assistTurns.some(t=>t.id===id&&!['pending','running'].includes(t.status)),{timeout:330000},sent.id);const turn=await p.evaluate(id=>assistTurns.find(t=>t.id===id),sent.id);results.push(turn);fs.writeFileSync(dir+'/real-turns.json',JSON.stringify({fixture:fixture.root,results},null,2));await (await p.$('#assistant')).screenshot({path:dir+'/real-'+provider+'-'+level+'.png'});console.log(provider+' / '+model+' : '+turn.status+(turn.refusal?' — '+turn.refusal.message:''));
+ }
+ }finally{await b.close();server.kill('SIGTERM')}
+})().catch(e=>{console.error(e);process.exitCode=1});

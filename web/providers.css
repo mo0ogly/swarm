@@ -1,0 +1,12 @@
+.provider-card { margin-block: 1rem; background: var(--wattson-carte); border: 1px solid var(--wattson-ligne); }
+.provider-card table { margin-block: 1rem; width: 100%; }
+.provider-card tbody tr:nth-child(even) { background: var(--wattson-carte-appuyee); }
+.provider-card tbody tr:hover { background: var(--wattson-info-fond); color: var(--wattson-info-encre); }
+.provider-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-block: 1rem; }
+.provider-card details { background: var(--wattson-carte-appuyee); border: 1px solid var(--wattson-ligne); padding: .75rem; }
+.provider-card .assist-meta { overflow-wrap: anywhere; }
+#model-selection { grid-column: 1 / -1; }
+
+.provider-level { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; padding: 1rem; background: var(--wattson-carte-appuyee); border: 1px solid var(--wattson-ligne); border-radius: .75rem; }
+.provider-level h3 { grid-column: 1 / -1; margin: 0; color: var(--wattson-titre); }
+@media (max-width: 650px) { .provider-level { grid-template-columns: 1fr; } }
