@@ -16,7 +16,10 @@ type TaskValidation struct {
 	Next     string   `json:"next"`
 }
 type WorkValidation struct {
+	// State is a stable business code. Label is presentation text and may be
+	// localized by a CLI client; consumers must never branch on Label.
 	State      string                    `json:"state"`
+	Label      string                    `json:"label"`
 	Validated  int                       `json:"validated"`
 	Historical int                       `json:"historical"`
 	Stale      int                       `json:"stale"`
@@ -26,7 +29,8 @@ type WorkValidation struct {
 func (s *Store) validationState(w *Work) WorkValidation {
 	s = s.readScope()
 	v := WorkValidation{Tasks: map[string]TaskValidation{}}
-	v.State, _, _ = s.workStatus(*w)
+	v.State, _, _ = s.workStatusCode(*w)
+	v.Label = workStatusLabel(v.State)
 	memo := map[string]bool{}
 	digests := map[string]string{}
 	for i := range w.Tasks {

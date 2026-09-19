@@ -4,6 +4,7 @@
   "scripts": {
     "test": "node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && npm run test:i18n",
     "test:audit:cursor": "node tests/audit_acceptance.cjs --case cursor",
+    "test:audit:states": "node tests/audit_acceptance.cjs --case states",
     "test:connections": "node tests/ai_connections_ui.cjs bin/swarm test-results/connections",
     "i18n:build": "node scripts/i18n/build.cjs",
     "test:i18n": "node tests/i18n_test.cjs",

@@ -64,7 +64,7 @@ function render(){
  renderBrainstorm();
  if(typeof renderConduite==='function')renderConduite();
  if(typeof renderAssistant==='function')renderAssistant();
- const validation=snapshot.validation;const summary=$('validation-status');summary.className='notice '+(validation.state===tr_web_cockpit_js('VALIDÉ')?'success':'attention');summary.dataset.validationState=validation.state;summary.textContent=(validation.state===tr_web_cockpit_js('VALIDÉ')?tr_web_cockpit_js('Tous les résultats sont validés.'):tr_web_cockpit_js('La validation finale reste à obtenir.'))+' '+validation.validated+'/'+snapshot.work.tasks.length+tr_web_cockpit_js(' tâches validées.')+(validation.stale?' '+validation.stale+tr_web_cockpit_js(' résultat(s) doivent être vérifiés à nouveau.'):'')+(snapshot.mission?.running?tr_web_cockpit_js(' Des agents travaillent actuellement.'):'');
+ const validation=snapshot.validation;SwarmStatusContract.renderValidation($('validation-status'),validation,snapshot.work.tasks.length,!!snapshot.mission?.running,tr_web_cockpit_js);
  $('title').textContent=snapshot.work.title;$('objective').textContent=snapshot.work.objective;
  $('task-count').textContent=snapshot.work.tasks.length;$('accepted-count').textContent=snapshot.validation.validated;$('active-count').textContent=snapshot.agents.filter(x=>active(x.agent)).length;$('decision-count').textContent=snapshot.decisions.filter(d=>!d.resolved_at).length;$('pause').textContent=snapshot.paused?tr_web_cockpit_js('Autoriser les départs'):tr_web_cockpit_js('Suspendre les départs');
  if(tasksKey!==work){$('tasks-body').replaceChildren();tasksKey=work}

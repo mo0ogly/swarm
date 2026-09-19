@@ -372,7 +372,7 @@ func run(args []string, out, errOut io.Writer) int {
 					}
 				}
 			}
-			_ = printJSON(out, map[string]any{"work": w, "events": ev, "current_gates": current, "current_git": gitState(s.root), "resume_markdown": v})
+			_ = printJSON(out, map[string]any{"work": w, "validation": s.validationState(&w), "events": ev, "current_gates": current, "current_git": gitState(s.root), "resume_markdown": v})
 		} else {
 			fmt.Fprintln(out, v)
 		}

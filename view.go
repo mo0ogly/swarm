@@ -45,7 +45,21 @@ func status(s string) string {
 	m := map[string]string{"todo": uiText("À FAIRE"), "running": uiText("EN COURS (activité non confirmée)"), "blocked": uiText("BLOQUÉE"), "submitted": uiText("SOUMISE — À VALIDER"), "accepted": uiText("ACCEPTÉE"), "waived": uiText("ACCEPTÉE PAR DÉROGATION"), "abandoned": uiText("ABANDONNÉE")}
 	return m[s]
 }
-func (s *Store) workStatus(w Work) (string, int, int) {
+func workStatusLabel(code string) string {
+	labels := map[string]string{
+		"validated": uiText("VALIDÉ"),
+		"waived":    uiText("ACCEPTÉ AVEC DÉROGATION"),
+		"blocked":   uiText("BLOQUÉ"),
+		"abandoned": uiText("ABANDONNÉ"),
+		"partial":   uiText("PARTIEL"),
+		"open":      uiText("OUVERT"),
+	}
+	return labels[code]
+}
+
+// workStatusCode is the single language-independent work verdict used by JSON
+// clients. workStatus remains the text boundary for the human CLI.
+func (s *Store) workStatusCode(w Work) (string, int, int) {
 	s = s.readScope()
 	accepted, total, abandoned := 0, len(w.Tasks), 0
 	blocked := false
@@ -65,21 +79,25 @@ func (s *Store) workStatus(w Work) (string, int, int) {
 	if total > 0 && accepted == total {
 		for _, t := range w.Tasks {
 			if t.Status == "waived" {
-				return uiText("ACCEPTÉ AVEC DÉROGATION"), accepted, total
+				return "waived", accepted, total
 			}
 		}
-		return uiText("VALIDÉ"), accepted, total
+		return "validated", accepted, total
 	}
 	if blocked {
-		return uiText("BLOQUÉ"), accepted, total
+		return "blocked", accepted, total
 	}
 	if total > 0 && abandoned == total {
-		return uiText("ABANDONNÉ"), accepted, total
+		return "abandoned", accepted, total
 	}
 	if abandoned > 0 && accepted+abandoned == total {
-		return uiText("PARTIEL"), accepted, total
+		return "partial", accepted, total
 	}
-	return uiText("OUVERT"), accepted, total
+	return "open", accepted, total
+}
+func (s *Store) workStatus(w Work) (string, int, int) {
+	code, accepted, total := s.workStatusCode(w)
+	return workStatusLabel(code), accepted, total
 }
 func (s *Store) listView(ws []Work) string {
 	var b strings.Builder
