@@ -166,8 +166,9 @@ func validationDir(root, rel string) (string, error) {
 	return resolved, nil
 }
 
-func runValidationControl(root string, c ValidationControl) ValidationControlResult {
-	r := ValidationControlResult{ID: c.ID, ExitCode: -1}
+func runValidationControl(root string, c ValidationControl) (r ValidationControlResult) {
+	r = ValidationControlResult{ID: c.ID, Command: append([]string(nil), c.Command...), ExitCode: -1, Started: now()}
+	defer func() { r.Finished = now() }()
 	dir, err := validationDir(root, c.Dir)
 	if err != nil {
 		r.Summary = err.Error()
@@ -187,7 +188,11 @@ func runValidationControl(root string, c ValidationControl) ValidationControlRes
 	}()
 	var output limitedValidationOutput
 	cmd.Stdout, cmd.Stderr = &output, &output
-	err = cmd.Run()
+	err = cmd.Start()
+	if err == nil {
+		r.Executed = true
+		err = cmd.Wait()
+	}
 	r.OutputHash = hash(output.b.Bytes())
 	if err == nil {
 		r.Passed, r.ExitCode, r.Summary = true, 0, "contrôle réussi"
@@ -314,7 +319,7 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	if err = os.MkdirAll(filepath.Dir(absReceipt), 0700); err != nil {
 		return false, "création du reçu impossible : " + err.Error()
 	}
-	record := AutomaticValidation{Attempt: a.Attempt, Producer: a.ID, Controller: validationController, PolicyDigest: digest, Policy: policy,
+	record := AutomaticValidation{Attempt: a.Attempt, Revision: w.Revision, Producer: a.ID, Controller: validationController, PolicyDigest: digest, Policy: policy,
 		Artifacts: map[string]string{report: hash(reportBytes)}, Controls: results,
 		Receipt: relReceipt, State: "blocked", At: now()}
 	if passed {

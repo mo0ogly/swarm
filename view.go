@@ -177,7 +177,21 @@ func (s *Store) view(w Work) (string, error) {
 		}
 	}
 	b.WriteString(uiText("\n## Gates, qualité et progression vérifiée\n"))
+	validation := s.validationState(&w)
 	for _, t := range w.Tasks {
+		evidence := validation.Tasks[t.ID].Evidence
+		fmt.Fprintf(&b, uiText("- %s · preuve structurée : tentative=%s ; révision=%d ; fraîcheur=%s\n  Revue du rapport=%s ; contrôles exécutés=%s ; acceptation=%s\n"), t.ID, evidence.Attempt, evidence.Revision, evidence.Freshness, evidence.ReportReview.State, evidence.Controls.State, evidence.Acceptance.State)
+		for _, control := range evidence.Controls.Items {
+			command := "unknown"
+			if len(control.Command) > 0 {
+				command = strings.Join(control.Command, " ")
+			}
+			exit := "unknown"
+			if control.ExitCode != nil {
+				exit = fmt.Sprint(*control.ExitCode)
+			}
+			fmt.Fprintf(&b, uiText("  Contrôle %s : tentative=%s ; exécution=%s ; révision=%s ; commande=%s ; code=%s ; début=%s ; fin=%s ; fraîcheur=%s\n"), control.ID, control.Attempt, control.Execution, control.Revision, command, exit, control.Started, control.Finished, control.Freshness)
+		}
 		if t.Gate == nil {
 			fmt.Fprintf(&b, uiText("- %s : gate non renseignée.\n"), t.ID)
 			continue

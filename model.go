@@ -53,15 +53,20 @@ type ValidationControl struct {
 }
 
 type ValidationControlResult struct {
-	ID         string `json:"id"`
-	Passed     bool   `json:"passed"`
-	ExitCode   int    `json:"exit_code"`
-	OutputHash string `json:"output_sha256"`
-	Summary    string `json:"summary"`
+	ID         string   `json:"id"`
+	Command    []string `json:"command,omitempty"`
+	Executed   bool     `json:"executed"`
+	Passed     bool     `json:"passed"`
+	ExitCode   int      `json:"exit_code"`
+	OutputHash string   `json:"output_sha256"`
+	Summary    string   `json:"summary"`
+	Started    string   `json:"started_at,omitempty"`
+	Finished   string   `json:"finished_at,omitempty"`
 }
 
 type AutomaticValidation struct {
 	Attempt      string                    `json:"attempt_id"`
+	Revision     int                       `json:"revision"`
 	Producer     string                    `json:"producer_agent_id"`
 	Controller   string                    `json:"controller"`
 	PolicyDigest string                    `json:"policy_digest"`

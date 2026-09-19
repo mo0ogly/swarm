@@ -80,6 +80,7 @@ func (s *Store) reviewText(work string, d *taskDialog) string {
 		return e.Error()
 	}
 	text := s.gateSummary(work, d.task.ID) + "\n\nTâche : " + t.Title + "\nÉtat : " + uiStatus(t.Status) + "\nLivrable : " + t.Deliverable + "\nCritères : " + strings.Join(t.Criteria, " ; ") + "\nProchaine action : " + t.Next
+	text += "\n\n" + evidenceText(s.validationState(&w).Tasks[t.ID].Evidence)
 	if t.Override != nil {
 		text += "\n\nDÉROGATION MANUELLE : " + t.Override.Reason + "\nOpérateur local : " + t.Override.Actor + " · " + t.Override.At + "\nLes contrôles ne sont pas transformés en PASS."
 	}

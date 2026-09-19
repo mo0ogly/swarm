@@ -451,7 +451,8 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			fail(w, e)
 			return
 		}
-		send(w, map[string]any{"revision": ww.Revision, "task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
+		validation := s.validationState(&ww).Tasks[id]
+		send(w, map[string]any{"revision": ww.Revision, "task": t, "evidence": validation.Evidence, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
 	})
 	mux.HandleFunc("/api/v1/report", func(w http.ResponseWriter, r *http.Request) {
 		p, e := safeReport(s.root, r.URL.Query().Get("path"))
