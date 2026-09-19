@@ -428,7 +428,14 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if len(r.Instruction) > 16000 {
 		return a, false, fmt.Errorf("instruction limitée à 16000 octets")
 	}
-	if managedWork, err := s.get(work); err == nil && managedWork.Planning != nil && managedWork.Planning.Repository != nil {
+	launchWork, err := s.get(work)
+	if err != nil {
+		return a, false, err
+	}
+	if err = s.reviewerAvailable(launchWork); err != nil {
+		return a, false, err
+	}
+	if managedWork := launchWork; managedWork.Planning != nil && managedWork.Planning.Repository != nil {
 		if previewOnly {
 			r.Workspace = managedWork.Planning.Repository.Source
 		} else {
@@ -539,6 +546,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	if w.Revision != r.Revision {
 		return a, false, fmt.Errorf("révision périmée ; relire le travail")
+	}
+	if e = s.reviewerAvailable(w); e != nil {
+		return a, false, e
 	}
 	if r.Brainstorm {
 		if r.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != r.PlanBriefHash) {

@@ -43,6 +43,7 @@ func managedFixture(t *testing.T) (*Store, Work) {
 	if e = s.setMission(w.ID, true); e != nil {
 		t.Fatal(e)
 	}
+	w = managedReviewFixture(t, s, w)
 	return s, w
 }
 func managedCompleted(t *testing.T, s *Store, w Work, id, value string) Agent {
@@ -163,6 +164,7 @@ func TestManagedFailedControlNeverPublishes(t *testing.T) {
 		t.Fatal("failed check published")
 	}
 }
+
 // managedSimulateCrashAfterReportCommit reproduces a process crash right
 // after the attempt's report reached the managed copy (state left
 // "integrating", result_commit set) but before the merge and checks
@@ -458,6 +460,7 @@ func TestManagedRepositorySupportsProjectBelowGitRoot(t *testing.T) {
 	}
 	organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, 1)
 	s.setMission(w.ID, true)
+	w = managedReviewFixture(t, s, w)
 	a := managedCompleted(t, s, w, "first", "nested result\n")
 	if filepath.Base(a.CWD) != "nested" {
 		t.Fatal(a.CWD)
@@ -522,8 +525,8 @@ func TestManagedLifecycleRestoresLedgers(t *testing.T) {
 	}
 	var calls int
 	s.db.QueryRow("SELECT count(*) FROM planning_calls WHERE work_id=?", w.ID).Scan(&calls)
-	if calls != 1 {
-		t.Fatal("financial ledger lost", calls)
+	if calls != 2 {
+		t.Fatal("planner or independent reviewer financial ledger lost", calls)
 	}
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -18,19 +19,27 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
-	ID       string            `json:"id"`
-	Attempt  string            `json:"attempt"`
-	Producer string            `json:"producer"`
-	Reviewer string            `json:"reviewer"`
-	Report   string            `json:"report"`
-	Digest   string            `json:"sha256"`
-	Contract string            `json:"contract"`
-	State    string            `json:"state"`
-	Reason   string            `json:"reason"`
-	Criteria []ReviewCriterion `json:"criteria,omitempty"`
-	Started  string            `json:"started"`
-	Finished string            `json:"finished,omitempty"`
-	Usage    *Usage            `json:"usage,omitempty"`
+	GitReport         string              `json:"git_report,omitempty"`
+	CandidateSHA      string              `json:"candidate_commit,omitempty"`
+	PreviousCandidate string              `json:"previous_candidate,omitempty"`
+	Receipt           string              `json:"receipt,omitempty"`
+	ReceiptDigest     string              `json:"receipt_sha256,omitempty"`
+	Context           string              `json:"context,omitempty"`
+	ContextDigest     string              `json:"context_sha256,omitempty"`
+	ManagedTasks      []ManagedTaskReview `json:"managed_tasks,omitempty"`
+	ID                string              `json:"id"`
+	Attempt           string              `json:"attempt"`
+	Producer          string              `json:"producer"`
+	Reviewer          string              `json:"reviewer"`
+	Report            string              `json:"report"`
+	Digest            string              `json:"sha256"`
+	Contract          string              `json:"contract"`
+	State             string              `json:"state"`
+	Reason            string              `json:"reason"`
+	Criteria          []ReviewCriterion   `json:"criteria,omitempty"`
+	Started           string              `json:"started"`
+	Finished          string              `json:"finished,omitempty"`
+	Usage             *Usage              `json:"usage,omitempty"`
 }
 type ReviewCriterion struct {
 	Index    int    `json:"index"`
@@ -43,7 +52,7 @@ func reviewContract(t *Task) string {
 	return hash(b)
 }
 func (s *Store) independentReviewGuard(w *Work, t *Task) error {
-	if w.Planning != nil && w.Planning.ReviewerRequired && w.Planning.Reviewer == nil {
+	if w.Planning != nil && w.Planning.Reviewer == nil {
 		return fmt.Errorf("vérificateur indépendant manquant")
 	}
 	if w.Planning == nil || w.Planning.Reviewer == nil {
@@ -55,6 +64,9 @@ func (s *Store) independentReviewGuard(w *Work, t *Task) error {
 	}
 	if len(t.Attempts) == 0 || r.Attempt != t.Attempts[len(t.Attempts)-1].ID || r.Contract != reviewContract(t) {
 		return fmt.Errorf("vérification IA périmée : tentative ou consigne modifiée")
+	}
+	if w.Planning.Repository != nil {
+		return s.managedIndependentReviewGuard(w, t)
 	}
 	p, e := safeReport(s.root, r.Report)
 	if e != nil {
@@ -98,9 +110,6 @@ func (s *Store) configureReviewer(work string, r PlanningRequest) (Work, error) 
 		if w.Planning == nil {
 			return fmt.Errorf("responsable de mission requis")
 		}
-		if w.Planning.Repository != nil {
-			return fmt.Errorf("revue IA de dépôt géré non disponible ; les contrôles déterministes existants restent requis")
-		}
 		if w.Planning.Reviewer != nil {
 			return fmt.Errorf("vérificateur déjà configuré ; sa configuration est conservée")
 		}
@@ -136,7 +145,8 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		return Work{}, fmt.Errorf("décrire la correction avant une nouvelle vérification (8 à 2000 caractères)")
 	}
 	raw, _ := json.Marshal(r)
-	return s.mutate(work, "review.retry", r.EventID, r.Revision, raw, func(w *Work) error {
+	managedProducer := ""
+	return s.mutateWithHook(work, "review.retry", r.EventID, r.Revision, raw, func(w *Work) error {
 		if w.Planning == nil || w.Planning.Reviewer == nil {
 			return fmt.Errorf("vérificateur absent")
 		}
@@ -149,12 +159,35 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			return e
 		}
 		v := t.IndependentReview
-		if t.Status != "submitted" || v == nil || (v.State != "error" && v.State != "stale") {
+		managed := w.Planning.Repository != nil
+		if (t.Status != "submitted" && !(managed && t.Status == "blocked")) || v == nil || (v.State != "error" && v.State != "stale") {
 			return fmt.Errorf("seule une vérification interrompue ou périmée d’un résultat soumis peut être reprise")
+		}
+		if managed {
+			if len(t.Attempts) == 0 || v.Attempt != t.Attempts[len(t.Attempts)-1].ID || v.CandidateSHA == "" {
+				return fmt.Errorf("tentative gérée remplacée ou candidat absent")
+			}
+			managedProducer = v.Producer
 		}
 		// The former record remains in the event history. Call reservations are never refunded.
 		t.IndependentReview = nil
 		cfg.Failure = ""
+		return nil
+	}, func(tx *sql.Tx, _ *Work) error {
+		if managedProducer == "" {
+			return nil
+		}
+		result, e := tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND state IN ('conflict','integrating') AND result_commit!=''", managedProducer)
+		if e != nil {
+			return e
+		}
+		n, e := result.RowsAffected()
+		if e != nil {
+			return e
+		}
+		if n != 1 {
+			return fmt.Errorf("candidat de reprise introuvable")
+		}
 		return nil
 	})
 }

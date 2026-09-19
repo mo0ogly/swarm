@@ -365,10 +365,17 @@ func TestPlanningClosureRequiresFreshEvidenceAndReopens(t *testing.T) {
 	}
 	raw := fixture(t, s.root)
 	w = gateTest(t, s, w, raw)
-	w, err = s.mutate(w.ID, "test.accept", "accept-proven", w.Revision, []byte(`{}`), func(w *Work) error { w.Tasks[0].Status = "accepted"; return nil })
+	organizedFixtureStore(t, s)
+	w, err = s.mutate(w.ID, "test.accept", "accept-proven", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Tasks[0].Status = "accepted"
+		w.Tasks[0].Attempts = []Attempt{{ID: "fixture-production", Status: "completed"}}
+		return nil
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
+	approveReportFixture(t, s, w.ID, "t1", "fixture-producer", "proof.txt")
+	w, _ = s.get(w.ID)
 	w, r = planningClaim(t, s, w, "root")
 	r.Operations = []PlanningOperation{{Kind: "close"}}
 	w, err = s.planningChange(w.ID, "decide", r)

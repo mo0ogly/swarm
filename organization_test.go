@@ -35,6 +35,7 @@ func TestOrganizationRejectsHistoricalAutonomy(t *testing.T) {
 }
 func TestOrganizationChecksRolesAndValidation(t *testing.T) {
 	w := Work{Criteria: []string{"test"}, Planning: &PlanningState{Version: 1, MaxTasks: 10, MaxDecisions: 10, MaxActivations: 10, Provider: "fixture", Scopes: []PlanningScope{{ID: "root", Revision: 1, Requirements: []string{"req-1"}}}, Checks: map[string][]ValidationControl{"req-1": automaticPolicy("git", "diff", "--exit-code").Controls}}}
+	w.Planning.Reviewer = &ReviewerConfig{Provider: "fixture-reviewer", Authorized: now(), MaxCalls: 10}
 	if !organization(w).Ready {
 		t.Fatal(organization(w))
 	}

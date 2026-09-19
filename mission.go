@@ -91,6 +91,9 @@ func (s *Store) configureMission(work string, p LaunchProfile, slots, revision i
 		if err := organizationGuard(*w); err != nil {
 			return err
 		}
+		if err := s.reviewerAvailable(*w); err != nil {
+			return err
+		}
 		w.Profile = &p
 		return nil
 	}, func(tx *sql.Tx, w *Work) error {

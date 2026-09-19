@@ -66,7 +66,7 @@ func (s *Store) independentReviewStep(work string) error {
 	if e != nil {
 		return e
 	}
-	if w.Planning == nil || w.Planning.Reviewer == nil || s.paused(work) {
+	if w.Planning == nil || w.Planning.Reviewer == nil || w.Planning.Repository != nil || s.paused(work) {
 		return nil
 	}
 	cfg := w.Planning.Reviewer

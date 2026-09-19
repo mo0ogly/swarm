@@ -16,13 +16,49 @@ type Organization struct {
 	Verification string   `json:"verification"`
 }
 
+func reviewerLaunchGuard(w Work) error {
+	if p := w.Planning; p != nil && (p.Reviewer == nil || p.Reviewer.Provider == "" || p.Reviewer.Authorized == "" || p.Reviewer.MaxCalls < 1) {
+		return &CommandError{Code: "reviewer_required", Message: "Vérificateur IA indépendant absent : configurer la revue avant le lancement autonome."}
+	}
+	if p := w.Planning; p != nil && (p.Reviewer.Calls >= p.Reviewer.MaxCalls || p.Reviewer.Failure != "") {
+		return &CommandError{Code: "reviewer_unavailable", Message: "Vérificateur IA indisponible ou budget épuisé : aucun nouveau départ autorisé."}
+	}
+	return nil
+}
+
+func (s *Store) reviewerAvailable(w Work) error {
+	if e := reviewerLaunchGuard(w); e != nil {
+		return e
+	}
+	if w.Planning == nil {
+		return nil
+	}
+	cfg := w.Planning.Reviewer
+	ps, e := s.providers()
+	if e != nil {
+		return e
+	}
+	p, ok := ps.Providers[cfg.Provider]
+	raw, _ := json.Marshal(p)
+	if !ok || cfg.ProviderDigest == "" || hash(raw) != cfg.ProviderDigest {
+		return &CommandError{Code: "reviewer_unavailable", Message: "Configuration du vérificateur absente ou modifiée ; départ refusé."}
+	}
+	_, e = assistantProvider(p)
+	return e
+}
+
 func organization(w Work) Organization {
 	o := Organization{Ready: true, Label: "Organisation autonome configurée", Issues: []string{}, Next: "Consulter les responsables et les contrôles autorisés.", Verification: "Contrôles configurés ; aucune revue IA indépendante implicite."}
 	p := w.Planning
 	if p == nil {
 		o.Issues = append(o.Issues, "Responsable de mission absent : planification hiérarchique non configurée.")
 	} else {
-		if p.ReviewerRequired && (p.Reviewer == nil || p.Reviewer.Provider == "" || p.Reviewer.Authorized == "" || p.Reviewer.MaxCalls < 1) {
+		// Autonomous work never inherits permission to skip independent review
+		// from a missing legacy flag or from the repository execution mode.
+		// This is structural readiness. Runtime capacity belongs to launch
+		// preview/reservation, not to the conductor's ability to finish an
+		// already reviewed result or let its planner close the scope.
+		if p.Reviewer == nil || p.Reviewer.Provider == "" || p.Reviewer.Authorized == "" || p.Reviewer.MaxCalls < 1 {
 			o.Issues = append(o.Issues, "Vérificateur IA indépendant absent : configurer la revue avant le lancement autonome.")
 		}
 		if err := validatePlanningState(&w); err != nil {

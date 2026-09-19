@@ -254,6 +254,20 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	// v21 binds managed independent reviews to a Git candidate and immutable
+	// receipts. Older binaries must refuse this store rather than silently
+	// dropping those fields while rewriting a Work. Preserve historical data;
+	// freshness guards, not migration, decide whether an old verdict applies.
+	if version < 21 {
+		if version != 0 {
+			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v21-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=21"); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}

@@ -144,6 +144,13 @@ func (s *Store) missionLaunchPreview(work string, profile LaunchProfile, slots i
 	}
 	preview.Revision = w.Revision
 	preview.Organization = organization(w)
+	if preview.Organization.Ready {
+		if e := s.reviewerAvailable(w); e != nil {
+			preview.Organization.Ready = false
+			preview.Organization.Issues = append(preview.Organization.Issues, e.Error())
+			preview.Organization.Next = "Rétablir le vérificateur avant le lancement."
+		}
+	}
 	agents, err := s.agents(work)
 	if err != nil {
 		return preview, err

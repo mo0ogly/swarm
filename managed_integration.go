@@ -106,63 +106,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		}
 		report = []byte(committed)
 	}
-	temp, err := os.MkdirTemp(repo.Storage, "integration-")
+	candidate, results, err := s.preparedManagedCandidate(w, t, a, item, repo)
 	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(temp)
-	candidateDir := filepath.Join(temp, "candidate")
-	if _, err = managedGit(repo.Storage, "clone", "--no-local", bare, candidateDir); err != nil {
-		return err
-	}
-	if _, err = managedGit(candidateDir, "checkout", "--detach", repo.Candidate); err != nil {
-		return err
-	}
-	if _, err = managedGit(candidateDir, "fetch", "--no-tags", bare, item.Result); err != nil {
-		return err
-	}
-	if _, err = managedGit(candidateDir, "merge", "--no-commit", "--no-ff", item.Result); err != nil {
-		return s.managedFailure(a, "Conflit Git à résoudre sur la révision courante : "+err.Error())
-	}
-	tree, err := managedGit(candidateDir, "write-tree")
-	if err != nil {
-		return err
-	}
-	// Commit before checks, so any tracked mutation by a control is detected.
-	candidate, err := managedGit(candidateDir, "commit-tree", tree, "-p", repo.Candidate, "-m", "Candidat vérifié "+a.ID)
-	if err != nil {
-		return err
-	}
-	if _, err = managedGit(candidateDir, "reset", "--hard", candidate); err != nil {
-		return err
-	}
-	results := map[string][]ValidationControlResult{}
-	for _, task := range w.Tasks {
-		if task.ID != t.ID && task.Status != "accepted" {
-			continue
-		}
-		if task.ValidationPolicy == nil || task.ValidationPolicy.Mode != "automatic" {
-			return s.managedFailure(a, "Un résultat antérieur exige une revue humaine avant nouvelle intégration")
-		}
-		for _, control := range task.ValidationPolicy.Controls {
-			if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
-				return fmt.Errorf("contrôles suspendus : %s", reason)
-			}
-			result := runValidationControl(filepath.Join(candidateDir, repo.Subdir), control)
-			results[task.ID] = append(results[task.ID], result)
-			if !result.Passed {
-				return s.managedFailure(a, fmt.Sprintf("Contrôle %s de %s en échec : %s (empreinte %s)", control.ID, task.ID, result.Summary, result.OutputHash))
-			}
-		}
-	}
-	if _, err = managedGit(candidateDir, "diff", "--exit-code", "HEAD", "--"); err != nil {
-		return s.managedFailure(a, "Un contrôle a modifié les sources suivies ; résultat non publié")
-	}
-	if _, err = managedGit(bare, "fetch", "--no-tags", candidateDir, candidate); err != nil {
-		return err
-	}
-	if _, err = managedGit(bare, "update-ref", "refs/swarm/candidates/"+a.ID, candidate); err != nil {
-		return err
+		return s.managedFailure(a, err.Error())
 	}
 	proofDir := filepath.Join(repo.Storage, "proofs", a.ID)
 	if err = os.MkdirAll(proofDir, 0700); err != nil {
@@ -178,6 +124,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err = atomicWrite(filepath.Join(s.root, relReceipt), raw); err != nil {
 		return err
 	}
+	if err = s.reviewManagedCandidate(w, a, candidate, filepath.ToSlash(relReceipt), raw); err != nil {
+		return s.managedFailure(a, err.Error())
+	}
 	artifacts := map[string]string{filepath.ToSlash(relReceipt): hash(raw), filepath.ToSlash(relReport): hash(report)}
 	// Fetch current revision to tolerate unrelated planning activity. The candidate
 	// and exact attempt are still compared inside the transaction.
@@ -192,6 +141,10 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		}
 		if !currentTaskAttempt(task, a.Attempt) || current.Planning.Repository.Candidate != repo.Candidate {
 			return fmt.Errorf("révision candidate ou tentative remplacée")
+		}
+		reviews, e := s.managedReviewsForPublication(current, a, candidate, filepath.ToSlash(relReceipt), raw)
+		if e != nil {
+			return e
 		}
 		for id, controls := range results {
 			target, e := current.task(id)
@@ -226,6 +179,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 				producer = target.AutoValidation.Producer
 			}
 			target.AutoValidation = &AutomaticValidation{Attempt: attempt, CandidateSHA: candidate, Producer: producer, Controller: validationController, PolicyDigest: validationPolicyDigest(*target.ValidationPolicy), Policy: *target.ValidationPolicy, Artifacts: artifacts, Controls: controls, Receipt: filepath.ToSlash(relReceipt), State: "accepted", Reason: "Révision intégrée vérifiée : " + candidate, At: now()}
+			if review, ok := reviews[id]; ok {
+				target.IndependentReview = &review
+			}
 			target.Status = "accepted"
 			target.Blocker = ""
 			target.Next = "Résultat intégré et vérifié : " + candidate
@@ -275,4 +231,67 @@ func (s *Store) managedIntegrationPending(w Work, scope string) (bool, error) {
 		}
 	}
 	return false, rows.Err()
+}
+
+func (s *Store) prepareManagedCandidate(w Work, t *Task, a Agent, item ManagedAttempt, repo *ManagedRepository) (string, map[string][]ValidationControlResult, error) {
+	bare := filepath.Join(repo.Storage, "repository.git")
+	temp, err := os.MkdirTemp(repo.Storage, "integration-")
+	if err != nil {
+		return "", nil, err
+	}
+	defer os.RemoveAll(temp)
+	candidateDir := filepath.Join(temp, "candidate")
+	if _, err = managedGit(repo.Storage, "clone", "--no-local", bare, candidateDir); err != nil {
+		return "", nil, err
+	}
+	if _, err = managedGit(candidateDir, "checkout", "--detach", repo.Candidate); err != nil {
+		return "", nil, err
+	}
+	if _, err = managedGit(candidateDir, "fetch", "--no-tags", bare, item.Result); err != nil {
+		return "", nil, err
+	}
+	if _, err = managedGit(candidateDir, "merge", "--no-commit", "--no-ff", item.Result); err != nil {
+		return "", nil, fmt.Errorf("%s", "Conflit Git à résoudre sur la révision courante : "+err.Error())
+	}
+	tree, err := managedGit(candidateDir, "write-tree")
+	if err != nil {
+		return "", nil, err
+	}
+	// Commit before checks, so any tracked mutation by a control is detected.
+	candidate, err := managedGit(candidateDir, "commit-tree", tree, "-p", repo.Candidate, "-m", "Candidat vérifié "+a.ID)
+	if err != nil {
+		return "", nil, err
+	}
+	if _, err = managedGit(candidateDir, "reset", "--hard", candidate); err != nil {
+		return "", nil, err
+	}
+	results := map[string][]ValidationControlResult{}
+	for _, task := range w.Tasks {
+		if task.ID != t.ID && task.Status != "accepted" {
+			continue
+		}
+		if task.ValidationPolicy == nil || task.ValidationPolicy.Mode != "automatic" {
+			return "", nil, fmt.Errorf("%s", "Un résultat antérieur exige une revue humaine avant nouvelle intégration")
+		}
+		for _, control := range task.ValidationPolicy.Controls {
+			if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
+				return "", nil, fmt.Errorf("contrôles suspendus : %s", reason)
+			}
+			result := runValidationControl(filepath.Join(candidateDir, repo.Subdir), control)
+			results[task.ID] = append(results[task.ID], result)
+			if !result.Passed {
+				return "", nil, fmt.Errorf("%s", fmt.Sprintf("Contrôle %s de %s en échec : %s (empreinte %s)", control.ID, task.ID, result.Summary, result.OutputHash))
+			}
+		}
+	}
+	if _, err = managedGit(candidateDir, "diff", "--exit-code", "HEAD", "--"); err != nil {
+		return "", nil, fmt.Errorf("%s", "Un contrôle a modifié les sources suivies ; résultat non publié")
+	}
+	if _, err = managedGit(bare, "fetch", "--no-tags", candidateDir, candidate); err != nil {
+		return "", nil, err
+	}
+	if _, err = managedGit(bare, "update-ref", "refs/swarm/candidates/"+a.ID, candidate); err != nil {
+		return "", nil, err
+	}
+	return candidate, results, nil
 }

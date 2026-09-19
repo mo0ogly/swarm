@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 20
+const schemaVersion = 21
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`

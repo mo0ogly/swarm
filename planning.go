@@ -170,7 +170,7 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 		if action == "enable" {
 			w.Planning.ProviderDigest = providerDigest
 			w.Planning.Repository = repository
-			if r.Provider != "" && repository == nil {
+			if r.Provider != "" {
 				config, e := s.reviewerConfig(r.Provider, r.Level, min(w.Planning.MaxActivations, 100))
 				if e != nil {
 					return e

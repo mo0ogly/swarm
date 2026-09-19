@@ -1,0 +1,113 @@
+{
+  "title": "Swarm moteur — contrat Cursor et vérification obligatoire",
+  "source": "https://cursor.com/blog/self-driving-codebases#the-final-system-design",
+  "base_commit": "6eb65b9aef3375cac7615e4ce3ade1e8033e1970",
+  "prior_work": "w-fff7368010d114f6e2578985",
+  "status": "prepared_not_started",
+  "requirements": [
+    "C1",
+    "C2",
+    "C3",
+    "V1",
+    "V2",
+    "V3",
+    "V4",
+    "V5",
+    "R1",
+    "U1",
+    "P1"
+  ],
+  "tasks": [
+    {
+      "id": "e1-verrous",
+      "title": "E1 — Aucun départ ou succès sans vérificateur",
+      "scope": "gouvernance",
+      "depends": [],
+      "criterion": "Réviser les corrections préalables du moteur et démontrer les refus web/CLI/départ direct sans reviewer, flag ancien faux/absent, budget épuisé, fournisseur retiré ou modifié. Tester absence de réservation et de consentement résiduel. Vérifier aussi task.update accepted, gates, acceptedFresh et import historique. Ne pas changer les protections pour faire passer une fixture.",
+      "case": "launch"
+    },
+    {
+      "id": "e2-responsables",
+      "title": "E2 — Responsables, délégation et copies isolées",
+      "scope": "gouvernance",
+      "depends": [
+        "e1-verrous"
+      ],
+      "criterion": "Démontrer responsable sans outils de code, propriété unique des exigences, délégation racine/enfant/petit-enfant, exécutants dans copies différentes, handoff au demandeur et réactivation. Interdire Parent et communication latérale. Refuser clôture parent avant enfants validés. Expliquer et tester les limites de profondeur et concurrence. La simple présence de badges ne suffit pas.",
+      "case": "ownership"
+    },
+    {
+      "id": "e3-revue",
+      "title": "E3 — Revue indépendante du candidat réellement testé",
+      "scope": "validation",
+      "depends": [],
+      "criterion": "Auditer et durcir le correctif managed_review.go. Tests et avis favorable requis sur même SHA/tentative/contrat/politique avant publication. Refus/unknown/mauvais SHA/rapport mensonger restent non acceptés. Tester mutation du contrat ou reçu pendant inférence, réouverture et révocation des anciennes acceptations sans avis. Vérifier la fidélité des commandes/dates/codes transmis au reviewer. Traiter limites du contexte cumulatif explicitement : aucun envoi tronqué ni résumé considéré preuve ; budget et refus actionnables, architecture bornée documentée.",
+      "case": "revision"
+    },
+    {
+      "id": "e4-reprises",
+      "title": "E4 — Reprendre après erreur sans boucle ni perte",
+      "scope": "validation",
+      "depends": [
+        "e3-revue"
+      ],
+      "criterion": "Démontrer arrêt après tests, après réservation de revue et avant publication, redémarrage, double conducteur, quota, conflit Git et budget épuisé. Reprendre la revue après correction vérifiée sans refaire producteur ni changer SHA, sans double dépense. Mesurer durée verrou intégration pendant inférence et réduire blocage long si possible sans perdre CAS. Retours périmés acquittés sans accepter une autre tentative. Retry nouveau motif et budgets conservés.",
+      "case": "recovery"
+    },
+    {
+      "id": "e5-verite",
+      "title": "E5 — Même vérité dans le web et le CLI",
+      "scope": "preuve-livraison",
+      "depends": [],
+      "criterion": "Exposer responsable, exécutants et reviewer réel, état de revue par tâche, SHA, commandes, dates, codes, décision et limites. Terminé par agent distinct de accepté. Corriger toute prose de revue absente incompatible avec configuration. FR/EN avec codes invariants, aides et modalités de reprise claires, rapports inconnus explicites. Vérifier navigateur sombre/etat et mobile si UI touchée, tokens wattson uniquement. Préserver travail R5 de mission précédente sans écraser sa copie.",
+      "case": "truth"
+    },
+    {
+      "id": "e6-reel",
+      "title": "E6 — Prouver un parcours réel avec refus puis correction",
+      "scope": "preuve-livraison",
+      "depends": [
+        "e5-verite"
+      ],
+      "criterion": "Sur dépôt et Store jetables, recette déterministe puis essai Claude réel distinct : besoin, délégation, changement de code utile, tests, revue indépendante, défaut vérifiable injecté/refus, correction bornée, nouvel avis même SHA que contrôles, acceptation, fermeture des périmètres. Piloter API/CLI publiques, aucune DB directe. Les tests peuvent peupler fixtures DB seulement en tests unitaires. Mesurer appels, reprises, délais et interventions externes. Pas autonomie démontrée si Codex doit accepter ou débloquer.",
+      "case": "real"
+    },
+    {
+      "id": "e7-historique",
+      "title": "E7 — Requalifier les anciennes acceptations",
+      "scope": "preuve-livraison",
+      "depends": [
+        "e6-reel"
+      ],
+      "criterion": "Tester rétroactivité sur copie de mission ancienne acceptée sans reviewer : doit devenir non validée au regard contrat strict, sans falsifier ni effacer historique. Fournir procédure publique de revue de candidat conservé avec contrôles relancés et verdict même SHA. Utiliser snapshot/copie isolée des missions anciennes, ne jamais modifier DB de production ni annuler preuves historiques. Rapporter verdict ancien/actuel séparément.",
+      "case": "history"
+    },
+    {
+      "id": "e8-livraison",
+      "title": "E8 — Livrer les preuves et le RETEX du moteur",
+      "scope": "preuve-livraison",
+      "depends": [
+        "e7-historique"
+      ],
+      "criterion": "Recette cumulative go test ./..., frontend et scenarios moteur sur candidat final; revue indépendante fraîche. Documentation FR/EN détaillée avec séquence, rôles, limites, états et preuve de refus. Matrice C1-C3,V1-V5,R1,U1,P1, huit preuves, coût connu/inconnu, interventions préalables et hôte comptées. Export bundle local, aucun push ni déploiement. Aucune clôture si essai réel absent ou réserve critique non levée. Le responsable racine ne clôt que lorsque les trois périmètres sont clos et tous les contrôles cumulatifs et avis portent sur le candidat final ; une clôture locale ne vaut pas clôture globale.",
+      "case": "delivery"
+    }
+  ],
+  "budgets": {
+    "max_tasks": 12,
+    "max_activations": 30,
+    "max_decisions": 30,
+    "worker_attempts": 2,
+    "worker_tool_calls": 100,
+    "worker_timeout_seconds": 1800
+  },
+  "execution": {
+    "provider": "claude",
+    "reviewer_required": true,
+    "managed_repository": true,
+    "push": false,
+    "deploy": false
+  },
+  "bootstrap": "Correctifs préalables supervisés et revue séparée. Ce travail externe est compté, ne démontre pas autonomie Swarm.",
+  "coordination": "Dépendances internes à chaque périmètre, conformément au moteur. Trois branches indépendantes; le responsable racine reçoit leurs retours et ne clôt qu après fermeture de tous les enfants. Chaque intégration rejoue les contrôles cumulatifs et renouvelle leur revue sur le candidat. Toute adaptation des branches est décidée par leur propriétaire."
+}

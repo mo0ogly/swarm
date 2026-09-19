@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -33,6 +35,32 @@ func organizedFixtureStore(t *testing.T, s *Store) *Store {
 			w.Planning = &PlanningState{Version: 1, Provider: "organization-fixture", Paused: true, MaxTasks: 100, MaxDecisions: 100, MaxActivations: 100, Scopes: []PlanningScope{{ID: "root", State: "waiting", Revision: 1}}, Checks: map[string][]ValidationControl{}}
 		}
 		p := w.Planning
+		if p.Reviewer == nil {
+			// Declared process fixture for launch-readiness tests. It intentionally
+			// does not produce a favorable opinion; review tests supply their own.
+			dir := filepath.Join(s.root, ".swarm", "review-launch-fixture")
+			if e := os.MkdirAll(dir, 0700); e != nil {
+				t.Fatal(e)
+			}
+			command := filepath.Join(dir, "claude")
+			if e := os.WriteFile(command, []byte("#!/bin/sh\nexit 1\n"), 0700); e != nil {
+				t.Fatal(e)
+			}
+			ps, e := s.providers()
+			if e != nil {
+				ps = Providers{Schema: 1, Providers: map[string]Provider{}}
+			}
+			ps.Providers["organization-review-fixture"] = Provider{Command: command}
+			raw, _ := json.Marshal(ps)
+			if e = os.WriteFile(filepath.Join(s.root, ".swarm", "providers.json"), raw, 0600); e != nil {
+				t.Fatal(e)
+			}
+			p.Reviewer, e = s.reviewerConfig("organization-review-fixture", "auto", 100)
+			if e != nil {
+				t.Fatal(e)
+			}
+			p.ReviewerRequired = true
+		}
 		if p.Provider == "" {
 			p.Provider = "organization-fixture"
 		}
@@ -75,4 +103,33 @@ func organizedFixtureStore(t *testing.T, s *Store) *Store {
 		}
 	}
 	return s
+}
+
+// approveReportFixture establishes an explicit precondition for legacy tests
+// isolating controls or handoff interactions. It does not demonstrate AI review.
+// The managed-review and independent-review suites exercise actual subprocesses.
+func approveReportFixture(t *testing.T, s *Store, work, taskID, producer, report string) {
+	t.Helper()
+	w, e := s.get(work)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if w.Planning == nil {
+		return
+	}
+	task, e := w.task(taskID)
+	if e != nil || len(task.Attempts) == 0 {
+		t.Fatal("review fixture requires a production attempt", e)
+	}
+	b, e := os.ReadFile(filepath.Join(s.root, report))
+	if e != nil {
+		t.Fatal(e)
+	}
+	task.IndependentReview = &IndependentReview{ID: newID("fixture-review-"), Attempt: task.Attempts[len(task.Attempts)-1].ID,
+		Producer: producer, Reviewer: "reviewer://organization-review-fixture", Report: report, Digest: hash(b), Contract: reviewContract(task), State: "passed",
+		Reason: "Précondition explicite de fixture ; aucune revue IA observée", Started: now(), Finished: now()}
+	raw, _ := json.Marshal(w)
+	if _, e = s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); e != nil {
+		t.Fatal(e)
+	}
 }

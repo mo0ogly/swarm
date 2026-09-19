@@ -45,6 +45,18 @@ func automaticValidationFixture(t *testing.T, policy *ValidationPolicy, dependen
 	if err := organizedFixtureStore(t, s).setAutonomy(w.ID, autonomyAuto, 2); err != nil {
 		t.Fatal(err)
 	}
+	// These tests isolate deterministic control execution after a reviewer has
+	// approved the unchanged report. Real review invocation is covered in the
+	// independent-review suite; this explicit fixture is not an AI observation.
+	current, _ := s.get(w.ID)
+	task, _ := current.task("t1")
+	task.IndependentReview = &IndependentReview{ID: "review-control-fixture", Attempt: attempt, Producer: a.ID,
+		Reviewer: "reviewer://organization-review-fixture", Report: report, Digest: hash([]byte("résultat mesuré\n")),
+		Contract: reviewContract(task), State: "passed", Reason: "Fixture de précondition pour tester les contrôles", Started: now(), Finished: now()}
+	body, _ = json.Marshal(current)
+	if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", body, w.ID); err != nil {
+		t.Fatal(err)
+	}
 	if err := s.setMission(w.ID, true); err != nil {
 		t.Fatal(err)
 	}
@@ -251,6 +263,7 @@ func TestAutomaticValidationCorrectionReplacesOldEvidenceWithinLaunchBound(t *te
 	if err := s.setMission(w.ID, true); err != nil {
 		t.Fatal(err)
 	}
+	approveReportFixture(t, s, w.ID, "t1", first.ID, report)
 	s.conduct(first, "completed")
 
 	failed, err := s.get(w.ID)
@@ -288,6 +301,7 @@ func TestAutomaticValidationCorrectionReplacesOldEvidenceWithinLaunchBound(t *te
 	if _, err = s.db.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,desired,body,request) VALUES(?,?,?,?,?,'',?,?)", second.ID, second.WorkID, second.TaskID, second.CWD, second.Status, body, []byte(`{}`)); err != nil {
 		t.Fatal(err)
 	}
+	approveReportFixture(t, s, w.ID, "t1", second.ID, report)
 	s.conduct(second, "completed")
 
 	corrected, err := s.get(w.ID)
