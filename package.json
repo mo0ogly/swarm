@@ -7,5 +7,6 @@
   },
   "devDependencies": {
     "puppeteer": "24.37.1"
-  }
+  },
+  "license": "PolyForm-Noncommercial-1.0.0"
 }
