@@ -1,5 +1,7 @@
 # Cockpit : lancer, observer et piloter les agents
 
+Pour apprendre le parcours actuel, commencer par le [guide utilisateur](GUIDE-UTILISATEUR.md). Cette référence conserve aussi des notes de conception datées ; elles ne remplacent pas ce parcours.
+
 Le compagnon peut désormais lancer de vrais processus Claude Code/Codex CLI sous
 Linux. La console est un affichage interactif ; un superviseur détaché suit chaque
 processus. Fermer la console ne coupe pas les agents. `resume` reste une commande de
@@ -41,14 +43,15 @@ Sur mobile ou à fort zoom navigateur, le panneau devient un dialogue ; **Échap
 ou **Fermer le détail** rendent le focus au déclencheur. Les commandes de repli
 sont séparées du zoom et utilisables au clavier.
 
-## Démarrage dans Wattson
+## Démarrage dans votre projet
 
-Depuis `/home/fpizzi/wattson_devcontainer/flaskProject` :
+Après installation du binaire `swarm` dans le PATH, placez-vous dans le dossier
+du projet piloté (ou précisez `--root /chemin/du/projet`) :
 
 ```sh
-./tools/swarm-companion/swarm providers init
-./tools/swarm-companion/swarm work list
-./tools/swarm-companion/swarm console IDENTIFIANT_DU_TRAVAIL
+swarm providers init
+swarm work list
+swarm console IDENTIFIANT_DU_TRAVAIL
 ```
 
 `providers init` crée `.swarm/providers.json` à partir des exécutables trouvés dans
@@ -309,10 +312,10 @@ passer une gate.
 | `autonome` (défaut) | automatiques dans les créneaux | automatique | humain |
 
 ```sh
-./tools/swarm-companion/swarm autonomy TRAVAIL            # lire le réglage courant
-./tools/swarm-companion/swarm autonomy TRAVAIL assiste    # changer de niveau
-./tools/swarm-companion/swarm autonomy TRAVAIL autonome 3 # niveau et créneaux
-./tools/swarm-companion/swarm dispatch TRAVAIL            # ordonnancer maintenant
+swarm autonomy TRAVAIL            # lire le réglage courant
+swarm autonomy TRAVAIL assiste    # changer de niveau
+swarm autonomy TRAVAIL autonome 3 # niveau et créneaux
+swarm dispatch TRAVAIL            # ordonnancer maintenant
 ```
 
 Le premier lancement humain enregistre un **profil de lancement** — fournisseur,
@@ -357,13 +360,13 @@ n'arrête aucun processus.
 ## Automatiser les mêmes actions
 
 ```sh
-./tools/swarm-companion/swarm work show IDENTIFIANT_DU_TRAVAIL
-./tools/swarm-companion/swarm agent start IDENTIFIANT_DU_TRAVAIL --input lancement.json
-./tools/swarm-companion/swarm agent list IDENTIFIANT_DU_TRAVAIL
-./tools/swarm-companion/swarm agent show IDENTIFIANT_AGENT
-./tools/swarm-companion/swarm agent stop IDENTIFIANT_AGENT
-./tools/swarm-companion/swarm agent logs IDENTIFIANT_AGENT
-./tools/swarm-companion/swarm control IDENTIFIANT_DU_TRAVAIL --input commande.json
+swarm work show IDENTIFIANT_DU_TRAVAIL
+swarm agent start IDENTIFIANT_DU_TRAVAIL --input lancement.json
+swarm agent list IDENTIFIANT_DU_TRAVAIL
+swarm agent show IDENTIFIANT_AGENT
+swarm agent stop IDENTIFIANT_AGENT
+swarm agent logs IDENTIFIANT_AGENT
+swarm control IDENTIFIANT_DU_TRAVAIL --input commande.json
 ```
 
 `lancement.json`, avec la **révision courante lue** et un nouvel `event_id` :
@@ -431,7 +434,7 @@ par session, 500 contrôles). `import` le conserve dans le manifeste de reprise 
 l'injecter dans les sessions actives. Consultation :
 
 ```sh
-./tools/swarm-companion/swarm agent history IDENTIFIANT_DU_TRAVAIL_IMPORTE
+swarm agent history IDENTIFIANT_DU_TRAVAIL_IMPORTE
 ```
 
 Le superviseur de processus et le terminal interactif sont implémentés pour Linux.
@@ -442,7 +445,7 @@ est disponible ; aucune écoute distante n'est autorisée.
 ## Vérification reproductible
 
 ```sh
-cd tools/swarm-companion
+# Depuis la racine du dépôt Swarm
 go test -race ./...
 go vet ./...
 go build -o /tmp/swarm-cockpit .
@@ -836,6 +839,10 @@ pas la relancer. La recette de résolution couvre désormais ce mode autonome.
 
 ## Préparation documentaire — candidat du 15 septembre 2026
 
+> Historique de conception : les trois sous-sections suivantes décrivent des
+> candidats successifs, pas l’installation actuelle. Pour préparer et lancer
+> une mission aujourd’hui, suivre [le guide utilisateur](GUIDE-UTILISATEUR.md).
+
 Le candidat `/tmp/swarm-prephase-web` ajoute « Préparer un projet » au cockpit.
 La page `/prepare.html` partage les documents avec `prepare` côté CLI : besoin,
 brief, plan JSON, versions, sauvegarde et résolution de conflits. Monaco est
@@ -844,7 +851,7 @@ KS ou audit-PDCA sélectionnée référence les fichiers du projet ; son dialogu
 reste à raccorder. Aucun agent n’est lancé depuis cette page.
 
 Recette de l’éditeur et non-régression du pilotage :
-[suivi de réalisation](../../docs/plans/swarm-prephase-apex/IMPLEMENTATION.md).
+`docs/plans/swarm-prephase-apex/IMPLEMENTATION.md` du dépôt d’origine (non distribué ici).
 Le serveur installé n’est pas remplacé par ce candidat (schéma SQLite v7).
 
 ### Dialogue de préparation — candidat suivant
@@ -856,7 +863,7 @@ utilisation explicite puis adoption séparée. Les appels sont sans outils, limi
 moteur ; les réponses anciennes ne remplacent pas les documents courants.
 Le CLI expose `prepare providers|dialogue|send|stop|use-proposal` en JSON.
 Le mode interactif CLI, la génération du plan et sa conversion restent à réaliser.
-Voir [ADR-002](../../docs/plans/swarm-prephase-apex/ADR-002.md).
+Voir `ADR-002` du plan de préparation dans le dépôt d’origine (non distribué ici).
 
 ### Plans IA et dialogue terminal — candidat suivant
 
@@ -868,7 +875,7 @@ reprennent une préparation. `/aide` liste les commandes, `/plan` appelle l’IA
 `/voir plan` consulte sans appel, `/edit plan` utilise VISUAL/EDITOR avec protection
 contre l’écrasement d’une version concurrente. Modes JSON et --plain disponibles.
 Aucune mission n’est créée par ce lot. Voir
-[ADR-003](../../docs/plans/swarm-prephase-apex/ADR-003.md).
+`ADR-003` du plan de préparation dans le dépôt d’origine (non distribué ici).
 
 ## Session interactive dans le graphe
 
@@ -990,7 +997,7 @@ un ancien binaire sur la base migrée.
 
 La recherche de fichiers est bornée à 20 000 entrées parcourues. Si elle annonce
 une limite, choisir un dossier plus précis avec les boutons « Dossier » ou le
-champ Dossier, par exemple `tools/swarm-companion`. Le CLI accepte
+champ Dossier, par exemple `src`. Le CLI accepte
 `prepare files ID [recherche] [dossier]`. Chaque source jointe permet de lire
 l’instantané effectivement transmis, indépendamment du fichier courant.
 
@@ -1029,13 +1036,15 @@ CLI : `swarm help pilotage`, `swarm mission status TRAVAIL` et
 Cette amélioration ne fournit pas encore d’éditeur de dépendances avec simulation.
 
 
-### Rectification : vérificateur indisponible
+### Vérificateur indépendant et rôle de lancement
 
-Le badge Vérificateur décrit une possibilité du rendu, mais le lancement ne
-reconnaît pas `reviewer`. Il ne constitue donc pas une fonction livrée. Les
-planificateurs du protocole hiérarchique sont des périmètres distincts du graphe
-des tâches ; ce protocole doit être activé explicitement. Consulter
-[le contrat détaillé](../../docs/architecture/swarm/ROLES-RESPONSABILITES-ET-LIMITES.md).
+Les nouvelles préparations configurent un vérificateur IA documentaire dans une
+session distincte. Ce service n’est pas un agent exécutant lancé avec un rôle
+`reviewer`. Son avis ne remplace pas les tests autorisés ni la revue humaine
+choisie. Les missions historiques peuvent ne pas l’avoir configuré.
+Voir [le parcours actuel et ses limites](PREPARATION-UX.md#vérificateur-indépendant-des-missions-préparées).
+L’[audit historique des responsabilités](docs/architecture/ROLES-RESPONSABILITES-ET-LIMITES.md)
+conserve les constats antérieurs, sans décrire à lui seul les fonctions actuelles.
 
 
 ### Organisation obligatoire avant les départs autonomes
@@ -1043,7 +1052,7 @@ des tâches ; ce protocole doit être activé explicitement. Consulter
 Une mission sans responsable et sans politique de validation explicite ne peut
 plus être autorisée en autonome. Le web et `mission status` exposent les manques.
 Les recettes isolées et l’installation ne valident pas une mission utilisateur.
-Voir le [contrat et la recette visible](../../docs/architecture/swarm/GARDE-ORGANISATION.md).
+Voir le [contrat et la recette visible](docs/architecture/GARDE-ORGANISATION.md).
 
 ## Préparation, révision et modèles IA
 

@@ -45,7 +45,7 @@ flowchart LR
 
 L’enchaînement dépend des autorisations, des prérequis et des preuves disponibles. Une correction n’est pas une boucle infinie : les limites configurées peuvent arrêter la tentative et demander une intervention.
 
-## Qui fait quoi ?
+## Qui fait quoi
 
 **Un Swarm organisé ne se résume pas à plusieurs exécutants.** La planification, la réalisation et la vérification sont des responsabilités distinctes.
 
@@ -230,6 +230,8 @@ Les missions et leur historique sont conservés dans le dossier `.swarm/` du pro
 Les clés des connexions API sont enregistrées localement dans `.swarm/ai-connections.json`, avec des permissions de fichier `0600`. Elles ne sont pas chiffrées au repos. Le dossier `.swarm/` et les secrets ne doivent pas être publiés dans Git.
 
 ## Documentation
+
+**Commencer ici : [Guide utilisateur — du besoin au résultat](GUIDE-UTILISATEUR.md)**
 
 - [Installation Docker et native](INSTALL.md)
 

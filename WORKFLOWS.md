@@ -2,8 +2,10 @@
 
 ## Démarrage
 
-Depuis la racine **applicative** du projet (Wattson : `flaskProject/`), employer
-`./tools/swarm-companion/swarm`. Les commandes de reprise ne démarrent aucun worker et ne publient
+Depuis le dossier du projet piloté, employer `swarm` après installation du binaire
+dans le PATH, ou passer `--root /chemin/du/projet` au binaire du dépôt autonome.
+Voir le [guide utilisateur](GUIDE-UTILISATEUR.md) pour le parcours courant.
+Les commandes de reprise ne démarrent aucun worker et ne publient
 rien. Le cockpit peut lancer des agents sur commande explicite ; voir `COCKPIT.md`. Si l’espace manque, l’initialiser lorsque la persistance est demandée.
 En mode plan, consulter seulement les travaux déjà présents.
 
@@ -66,18 +68,15 @@ métier et autorisations restent dans les workflows existants.
 
 ## Connexion aux fournisseurs
 
-Claude : le hook SessionStart existant affiche la liste lorsque le compagnon
-est installé et initialisé. Le hook n’attend pas de saisie terminal : c’est
-l’agent qui présente le choix à l’utilisateur dans la conversation.
+Les hooks et instructions de démarrage d’un outil externe sont optionnels et
+propres au projet piloté. Le dépôt autonome n’installe pas automatiquement de
+hook Claude ou d’instructions Codex dans ce projet. La commande explicite
+`swarm work list` fonctionne sans hook et n’appelle aucun modèle.
 
-Codex : `AGENTS.md` demande la liste et la sélection au démarrage. C’est une
-instruction de workflow, pas une injection automatique garantie par un service.
-La commande explicite fonctionne sans hook spécifique au fournisseur.
-
-Hors Wattson : copier le module ou son binaire et cette procédure ; ajouter la
-consigne de démarrage aux instructions du projet. Aucun chemin Wattson n’est
-requis par l’exécutable. Conserver une racine logique par projet et ne pas
-partager une base SQLite via un système de fichiers réseau.
+Conserver une racine logique par projet et ne pas partager une base SQLite via
+un système de fichiers réseau. Les mutations décrites plus haut concernent les
+workflows manuels ; une mission hiérarchique applique en plus ses responsabilités
+et contrats hérités. Ne pas modifier ses statuts pour contourner le conducteur.
 
 ## Préparation, révision et modèles IA
 

@@ -85,6 +85,8 @@ un JSON alors que la commande d’export n’émet pas de contenu. L’export ex
 Le clonage, le contrôle et la collecte ont été achevés séparément, sans relancer
 la mission ni modifier son résultat ; cette erreur de collecte est conservée.
 
-[Preuve de la mission](../../plans/swarm-architecture-implementation/evidence/organization/visible.json)
-· [État rendu dans le navigateur](../../plans/swarm-architecture-implementation/evidence/organization/live-ui.json)
-· [Installation](../../plans/swarm-architecture-implementation/evidence/organization/installation.json).
+Les fichiers historiques `visible.json`, `live-ui.json` et `installation.json`
+étaient conservés sous `docs/plans/swarm-architecture-implementation/evidence/organization/`
+dans le dépôt d’origine. Ils ne sont pas distribués ici et ne constituent donc pas
+une preuve consultable dans ce dépôt. Voir la [recette autonome publiée](../validation/standalone-docker-20260919.md)
+pour les vérifications reproductibles et leurs limites actuelles.

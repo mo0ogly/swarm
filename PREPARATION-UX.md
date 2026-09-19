@@ -1,5 +1,7 @@
 # Préparer et réviser un Swarm depuis le web
 
+Pour le parcours complet avec captures et dépannage, voir le [guide utilisateur](GUIDE-UTILISATEUR.md).
+
 ## Du besoin à une équipe
 
 1. Depuis le cockpit, choisir **Préparer un projet**, également visible en mode simple.
@@ -9,7 +11,7 @@
 5. **Créer les missions** demande l’IA, le dossier de travail, les plafonds et le mode de validation. La création enregistre ensemble le responsable de mission, les responsabilités, les politiques de validation, le profil par défaut et les tâches. Aucun agent ne démarre à cette étape.
 6. **Relire et autoriser le démarrage**, puis ouvrir le pilotage et lancer la mission avec ses réglages. La création et l’autorisation ne contournent pas les contrôles de dépendances, de budget ou d’espace occupé.
 
-Le responsable IA est enregistré dans l’arbre des responsabilités, séparément du graphe des tâches. Il traite les retours des agents. Une tâche portant le rôle « planificateur » n’est pas à elle seule un responsable durable. Aucun vérificateur IA indépendant n’est créé implicitement.
+Le responsable IA est enregistré dans l’arbre des responsabilités, séparément du graphe des tâches. Il traite les retours des agents. Une tâche portant le rôle « planificateur » n’est pas à elle seule un responsable durable. Les nouvelles missions préparées configurent aussi un vérificateur IA distinct. Les missions historiques ne reçoivent pas ce rôle rétroactivement ; voir la section dédiée ci-dessous.
 
 ### Validation explicite
 
@@ -32,7 +34,7 @@ Le menu **IA et connexions** est visible en mode simple et depuis la préparatio
 
 Le niveau par défaut suit la politique du fournisseur ; il ne signifie pas que Swarm choisit librement n’importe quel modèle. Le niveau exigeant reste un choix explicite. La préparation et le responsable utilisent désormais le même résolveur que les agents : modèle et effort sont transmis à l’exécutable, et la route est conservée avec l’appel ou l’organisation. Une configuration périmée est refusée au lieu de provoquer une montée en gamme silencieuse.
 
-Cette page n’installe pas de fournisseur et n’ajoute pas de stockage de clés API. Les commandes, environnements et connexions restent ceux configurés dans `.swarm/providers.json` et dans les CLI locaux.
+Cette page n’installe pas les programmes agents. Elle permet toutefois d’ajouter des connexions API et leurs clés locales avec **Ajouter une IA** ; voir la section correspondante ci-dessous. Les programmes agents restent déclarés dans `.swarm/providers.json` et authentifiés dans leur environnement.
 
 ## CLI : mêmes mutations, mêmes garanties
 
@@ -50,7 +52,7 @@ Pour une organisation sans dépôt Git géré, l’exécutant écrit `docs/<iden
 
 Le passage à « À vérifier » et le message au responsable sont enregistrés dans la même transaction, avec l’identité de la tentative et l’empreinte du rapport. Une remise répétée ne crée pas de doublon. Un conflit de révision ou d’écriture déclenche une reprise bornée avec relecture ; il ne permet jamais de sauter les contrôles. Une tentative interrompue, un rapport ancien, vide, ambigu ou modifié avant la soumission restent à examiner.
 
-Cette remise n’accepte pas le résultat. La politique de validation enregistrée continue de s’appliquer. Une mission en revue humaine n’a pas de contrôleur IA indépendant implicite. Les anciens essais interrompus restent interrompus après installation du correctif ; ils ne sont pas transformés rétroactivement en réussites.
+Cette remise n’accepte pas le résultat. La politique de validation enregistrée continue de s’appliquer. Dans une nouvelle préparation, la revue IA indépendante ne remplace pas l’acceptation humaine choisie. Les missions historiques sans vérificateur conservent leur configuration. Les anciens essais interrompus restent interrompus après installation du correctif ; ils ne sont pas transformés rétroactivement en réussites.
 
 ## Vérificateur indépendant des missions préparées
 
@@ -90,4 +92,4 @@ Les clés sont enregistrées dans `.swarm/ai-connections.json`, fichier local en
 
 CLI : `swarm connections list` retourne les connexions sans secrets et leur empreinte. `swarm connections save --input connexion.json` utilise le même moteur que le web : `version: 1`, `expected_digest`, `connection` (`id`, `label`, `base_url`, `model`, `disabled`, éventuellement `key`) et `replace_key`. Le test interactif de connexion est disponible dans le web ; cette commande CLI ne déclenche aucun appel.
 
-Référence de parcours : `machine_learning_generator/frontend/src/components/AiBackendForm.jsx` et `AiBackendsPanel.jsx`. Adaptation au moteur Swarm, sans copie de ses catalogues de modèles ni activation globale implicite.
+Les connexions personnalisées n’activent pas implicitement un fournisseur pour toutes les missions.

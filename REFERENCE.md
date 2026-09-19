@@ -1,6 +1,6 @@
 # Swarm — référence technique
 
-Pour la présentation du produit et le démarrage rapide, voir [le README](README.md).
+Pour la présentation du produit et le démarrage rapide, voir [le README](README.md) et le [guide utilisateur](GUIDE-UTILISATEUR.md).
 
 Les références aux ressources du dépôt d’origine sont historiques ; elles ne sont pas toutes embarquées dans ce dépôt autonome.
 
@@ -147,7 +147,7 @@ Exemple de document d'aperçu opérateur :
         "command": ["go", "test", "./api", "-run", "TestContract", "-count=1"],
         "criteria": [1],
         "justification": "Le test échoue si le contrat API attendu par le critère 1 régresse.",
-        "dir": "tools/swarm-companion",
+        "dir": ".",
         "timeout_seconds": 120
       }
     ]
@@ -374,8 +374,8 @@ mission lorsqu’elle passe en corbeille ou revient dans la liste active.
 ## Workflows et tests
 
 Lire [WORKFLOWS.md](WORKFLOWS.md) pour les points d’enregistrement APEX/PDCA/KS.
-La racine Wattson possède un hook Claude et des instructions Codex. Leur présence
-ne prouve pas que chaque fournisseur les a exécutés : voir `VALIDATION.md`.
+Les hooks propres à un projet ne sont pas installés par Swarm. Leur présence
+ne prouve pas leur exécution par un fournisseur : voir `VALIDATION.md`.
 
 ```sh
 go test -race ./...

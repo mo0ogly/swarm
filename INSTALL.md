@@ -2,6 +2,8 @@
 
 Swarm propose deux installations **sous Linux** : Docker pour un environnement dédié, ou un binaire natif pour utiliser les outils déjà installés sur votre machine. Le script ne demande pas `sudo`, ne modifie pas votre profil shell et n’installe pas Docker à votre place.
 
+Après installation, suivre le [guide utilisateur](GUIDE-UTILISATEUR.md) pour connecter une IA, préparer une mission et lire ses résultats.
+
 ## 1. Installation Docker
 
 Prérequis : Git, Bash, Docker Engine démarré et accessible à votre utilisateur, Docker Compose v2 avec `up --wait`. Les téléchargements des images et dépendances nécessitent Internet. Vérifiez :
