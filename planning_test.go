@@ -459,3 +459,109 @@ func TestPlanningOldFailureCannotUndoAppliedDecision(t *testing.T) {
 		t.Fatal("old failure changed committed decision")
 	}
 }
+
+// R4: after a managed integration failure blocks a task ("intégration échouée"),
+// the responsable must resume it through the existing "retry" operation, never
+// by spawning a second "task" op for the same already-confided requirement —
+// that would pay for a fresh activation instead of converging.
+func TestPlanningTaskForConfidedRequirementRefusedGuidingRetry(t *testing.T) {
+	s, w := planningFixture(t)
+	w, r := planningClaim(t, s, w, "root")
+	r.Operations = []PlanningOperation{planningTask("first")}
+	w, e := s.planningChange(w.ID, "decide", r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	w, e = s.mutate(w.ID, "test.integration-failed", "int-fail-1", w.Revision, []byte(`{}`), func(cur *Work) error {
+		cur.Tasks[0].Attempts = append(cur.Tasks[0].Attempts, Attempt{ID: "attempt-1", Status: "failed", Started: now(), Ended: now()})
+		cur.Tasks[0].Status = "blocked"
+		cur.Tasks[0].Blocker = "Intégration échouée : contrôle X en échec"
+		planningAttemptEnded(cur, Agent{ID: "a", TaskID: "first", Attempt: "attempt-1", Activity: "contrôle X"}, "Intégration échouée")
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	w, r = planningClaim(t, s, w, "root")
+	if len(r.Inputs) != 1 {
+		t.Fatal("expected exactly one pending return", r.Inputs)
+	}
+	dup := r
+	dup.Operations = []PlanningOperation{planningTask("second")}
+	if _, e := s.planningChange(w.ID, "decide", dup); e == nil {
+		t.Fatal("second task for an already-confided requirement was accepted instead of guiding retry")
+	}
+	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle X puis relancer"}}
+	w, e = s.planningChange(w.ID, "decide", r)
+	if e != nil {
+		t.Fatal("existing retry was not usable after the guided refusal", e)
+	}
+	if len(w.Tasks) != 1 || !w.Tasks[0].PlanningRetry || w.Tasks[0].Next != "Corriger le contrôle X puis relancer" {
+		t.Fatal(w)
+	}
+}
+
+// R4: an old attempt event superseded by a later attempt (stale, per
+// currentTaskAttempt) must be acknowledged with a no-operation decision before
+// the current return is decided on, and a task that has exhausted
+// plan_max_attempts stays refused instead of retrying forever.
+func TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn(t *testing.T) {
+	s, w := planningFixture(t)
+	w, r := planningClaim(t, s, w, "root")
+	r.Operations = []PlanningOperation{planningTask("first")}
+	w, e := s.planningChange(w.ID, "decide", r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	w, e = s.mutate(w.ID, "test.attempt-one", "attempt-one", w.Revision, []byte(`{}`), func(cur *Work) error {
+		cur.Tasks[0].Attempts = append(cur.Tasks[0].Attempts, Attempt{ID: "attempt-1", Status: "failed", Started: now(), Ended: now()})
+		cur.Tasks[0].Status = "blocked"
+		cur.Tasks[0].Blocker = "Intégration échouée : contrôle X en échec"
+		planningAttemptEnded(cur, Agent{ID: "a", TaskID: "first", Attempt: "attempt-1", Activity: "contrôle X"}, "Intégration échouée")
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	staleID := w.Planning.Inbox[len(w.Planning.Inbox)-1].ID
+	// A second attempt supersedes the first before the responsable processed its return.
+	w, e = s.mutate(w.ID, "test.attempt-two", "attempt-two", w.Revision, []byte(`{}`), func(cur *Work) error {
+		cur.Tasks[0].Attempts = append(cur.Tasks[0].Attempts, Attempt{ID: "attempt-2", Status: "failed", Started: now(), Ended: now()})
+		cur.Tasks[0].Blocker = "Intégration échouée : contrôle Y en échec"
+		planningAttemptEnded(cur, Agent{ID: "a", TaskID: "first", Attempt: "attempt-2", Activity: "contrôle Y"}, "Intégration échouée")
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	w, r = planningClaim(t, s, w, "root")
+	if len(r.Inputs) != 2 {
+		t.Fatal("expected both the stale and the current return pending", r.Inputs)
+	}
+	decisionsBefore := w.Planning.Decisions
+
+	staleOnly := r
+	staleOnly.Inputs = []string{staleID}
+	staleOnly.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle X"}}
+	if _, e := s.planningChange(w.ID, "decide", staleOnly); e == nil {
+		t.Fatal("stale attempt return accepted an operation instead of being refused")
+	}
+
+	staleOnly.Operations = nil
+	w, e = s.planningChange(w.ID, "decide", staleOnly)
+	if e != nil {
+		t.Fatal("stale attempt return was not acknowledged by a no-operation decision", e)
+	}
+	if w.Planning.Decisions != decisionsBefore+1 {
+		t.Fatal("acknowledgement must count as exactly one bounded decision, no more", w.Planning)
+	}
+
+	w, r = planningClaim(t, s, w, "root")
+	if len(r.Inputs) != 1 || r.Inputs[0] == staleID {
+		t.Fatal("only the current return should remain pending", r.Inputs)
+	}
+	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle Y"}}
+	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
+		t.Fatal("retry beyond plan_max_attempts must stay bounded, never loop indefinitely")
+	}
+}

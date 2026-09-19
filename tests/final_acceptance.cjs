@@ -31,6 +31,18 @@ const cases={
   pattern:'^(TestManagedIntegrationTrustsReportAlreadyInManagedCopy|TestManagedIntegrationFailedControlOutranksMissingReport|TestManagedIntegrationMissingProviderOutranksMissingReport|TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport|TestManagedIntegrationWorkspaceLockOutranksMissingReport|TestManagedIntegrationAtomicAndConflict|TestManagedFailedControlNeverPublishes)$',
   required:['TestManagedIntegrationTrustsReportAlreadyInManagedCopy','TestManagedIntegrationFailedControlOutranksMissingReport','TestManagedIntegrationMissingProviderOutranksMissingReport','TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport','TestManagedIntegrationWorkspaceLockOutranksMissingReport'],
   message:'diagnostic acceptance: task.blocker priority fixed so intégration échouée outranks rapport absent once the report already exists in the managed copy, verified for a failed control, a missing provider/quota, a ceiling suspension and a workspace lock, without regressing the atomic/conflict and failed-control paths\n'},
+ // "planner" covers R4 — Reprendre le responsable sans boucle: only
+ // planning.go and planning_test.go. A requirement already confided to a
+ // blocked task must be resumed through "retry" on that task, never by
+ // spawning a fresh "task" op for the same requirement (unbounded new
+ // activations instead of converging). A stale attempt event (superseded by
+ // a later attempt) must be acknowledged by a no-operation decision before
+ // the current return is decided on, and a task that exhausted
+ // plan_max_attempts must stay refused, never loop indefinitely.
+ planner:{dependencies:['go.mod','planning.go','planning_test.go'],
+  pattern:'^(TestPlanningTaskForConfidedRequirementRefusedGuidingRetry|TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn)$',
+  required:['TestPlanningTaskForConfidedRequirementRefusedGuidingRetry','TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn'],
+  message:'planner acceptance: the responsable is guided to retry a blocked task instead of spawning a new one for the same requirement, stale attempt returns are acknowledged with a no-operation decision before current returns are decided, and retries stay bounded by plan_max_attempts, verified without regressing the existing hierarchical planning suite\n'},
 };
 function runAcceptance(selected,options={}){
  const spec=cases[selected],projectRoot=options.root||root,exists=options.exists||fs.existsSync,out=options.stdout||process.stdout,err=options.stderr||process.stderr,spawn=options.spawnSync||spawnSync;
@@ -48,5 +60,5 @@ function runAcceptance(selected,options={}){
  out.write(spec.message);
  return 0;
 }
-function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs|git|diagnostic');return 2}return runAcceptance(argv[index+1])}
+function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs|git|diagnostic|planner');return 2}return runAcceptance(argv[index+1])}
 module.exports={runAcceptance,main};if(require.main===module)process.exitCode=main();

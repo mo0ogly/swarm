@@ -531,6 +531,21 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 			p.Inbox = append(p.Inbox, PlanningEvent{ID: planningEventID(r.EventID, op.ID), Scope: op.ID, Kind: "delegation", Message: op.Title, At: at.Format(time.RFC3339Nano)})
 			return nil
 		}
+		// A requirement already confided to a task that is now blocked must be
+		// resumed via "retry" on that task, never re-delegated to a fresh "task"
+		// op: otherwise unbounded new tasks pay for fresh activations on the same
+		// requirement instead of correcting and retrying the one already stuck.
+		// Tasks that are not blocked may still legitimately share a requirement
+		// (e.g. an initial batch, or a discovery handoff from a running task).
+		for _, task := range w.Tasks {
+			if task.ScopeID == id && task.Status == "blocked" {
+				for _, req := range task.Requirements {
+					if seen[req] {
+						return fmt.Errorf("exigence déjà confiée à la tâche bloquée %s ; utiliser retry", task.ID)
+					}
+				}
+			}
+		}
 		if err := checkScopeTask(w, id); err != nil {
 			return err
 		}
