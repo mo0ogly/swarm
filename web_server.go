@@ -337,13 +337,23 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		if commandFailure(e).Code == "revision_conflict" {
 			status = 409
 		}
+		if commandFailure(e).Code == "storage_unavailable" {
+			status = http.StatusInsufficientStorage
+		}
 		w.WriteHeader(status)
-		send(w, map[string]any{"error": e.Error(), "failure": commandFailure(e)})
+		send(w, map[string]any{"error": commandFailure(e).Message, "failure": commandFailure(e)})
 	}
 	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
+	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		send(w, s.runtimeHealth())
+	})
 	mux.HandleFunc("/api/v1/works", func(w http.ResponseWriter, r *http.Request) {
 		v, e := s.list()
 		if e != nil {

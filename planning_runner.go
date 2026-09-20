@@ -23,6 +23,9 @@ type PlanningProposal struct {
 // One bounded activation. The claim is durable before starting a possibly
 // billable process. Expired claims consume their budget even after a crash.
 func (s *Store) planningStep(work string) error {
+	if err := s.storageGuard(); err != nil {
+		return err
+	}
 	w, err := s.get(work)
 	if err != nil {
 		return err

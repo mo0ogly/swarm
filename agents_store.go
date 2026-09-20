@@ -421,6 +421,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	} else if e != sql.ErrNoRows {
 		return a, false, e
 	}
+	if err := s.storageGuard(); err != nil {
+		return a, false, err
+	}
 	if archived, archiveErr := s.archived(work); archiveErr != nil {
 		return a, false, archiveErr
 	} else if archived {

@@ -29,6 +29,9 @@ func (s *Store) conduct(a Agent, outcome string) {
 	if w, e := s.get(a.WorkID); e == nil && w.Planning != nil && w.Planning.Repository != nil {
 		if outcome == "completed" {
 			if err := s.integrateManagedAttempt(a); err != nil {
+				if commandFailure(err).Code == "storage_unavailable" {
+					return
+				}
 				// Another bounded integration already owns the cross-process
 				// lock. A polling pass must not emit a new failure every time.
 				if strings.Contains(err.Error(), "déjà en cours") {

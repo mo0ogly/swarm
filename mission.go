@@ -143,6 +143,11 @@ func (s *Store) missionLoop(ctx context.Context, scope ...string) {
 // launch transactions remain the final CAS for budget, dependency freshness,
 // workspace reservation and task revision.
 func (s *Store) missionOwnedCycle(previous map[string]string, registered map[string]bool, conductor, source string, scope ...string) {
+	// Do not spin on failed writes or spend calls while durable tracking is at risk.
+	// Keep polling the filesystem; normal lease reconciliation resumes on recovery.
+	if s.storageGuard() != nil {
+		return
+	}
 	works, err := s.list()
 	if err != nil {
 		return
@@ -238,6 +243,9 @@ func (s *Store) missionCycleObserved(previous map[string]string, observed func(s
 }
 
 func (s *Store) missionCycleWork(w Work, occupancy string, previous map[string]string, conductors ...string) error {
+	if err := s.storageGuard(); err != nil {
+		return err
+	}
 	p, e := s.missionPolicy(w.ID)
 	if e != nil {
 		return e

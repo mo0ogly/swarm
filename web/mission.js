@@ -52,6 +52,7 @@ const Mission={
  openJournal(){const journal=$('fil-bloc');if(journal){journal.open=true;journal.querySelector('summary')?.focus();journal.scrollIntoView({block:'nearest'})}},
  organizationHelp(){const o=snapshot.mission.organization;openModal(tr_web_mission_js('Organisation de la mission'),missionText(o.next),{action:'help'});$('confirm').hidden=true;$('cancel').textContent=tr_web_mission_js('Fermer');preview(o.issues.map(missionText).join('\n')+'\n'+missionText(o.verification)+tr_web_mission_js('\nCréez un travail vide depuis Gérer les missions, puis utilisez Confier ce besoin à une équipe autonome. Les anciennes missions ne sont pas converties automatiquement.'))},
  overview(d){
+  if(d.runtime?.state==='blocked')return {summary:missionText(d.runtime.message),next:missionText(d.runtime.next_step),label:tr_web_mission_js('Diagnostic du stockage'),kind:'runtime',tone:'attention'};
   if(d.organization&&!d.organization.ready)return {summary:missionText(d.organization.label),next:missionText(d.organization.next),label:tr_web_mission_js('Préparer l’organisation'),kind:'organization',tone:'attention'};
   const p=typeof snapshot!=='undefined'?snapshot?.work?.planning:null;
   if(p?.paused)return {summary:tr_web_mission_js('La planification est suspendue.'),next:tr_web_mission_js('Reprenez les décisions avant de lancer la suite.'),label:tr_web_mission_js('Reprendre la planification'),kind:'planning-resume',tone:'attention'};
@@ -61,7 +62,7 @@ const Mission={
   const counts=d.validated+'/'+d.total+tr_web_mission_js(' résultats validés · ')+d.running+tr_web_mission_js(' en cours · ')+needs.length+tr_web_mission_js(' décision(s) attendue(s).');
   if(!d.total)return {summary:tr_web_mission_js('Ce travail ne contient encore aucune tâche.'),next:tr_web_mission_js('Préparez le besoin avec l’IA pour construire un plan.'),label:tr_web_mission_js('Préparer les tâches'),kind:'prepare',tone:'info'};
   if(configurations.length)return {summary:counts,next:configurations.length+' '+(configurations.length>1?tr_web_mission_js('tâches utiliseront'):tr_web_mission_js('tâche utilisera'))+tr_web_mission_js(' la même configuration de lancement.'),label:tr_web_mission_js('Préparer le lancement'),kind:'configure',task:configurations[0],tone:'info'};
-  if(needs.length){const t=needs[0];return {summary:counts,next:t.title+' : '+missionText(t.reason),label:t.state==='review'?tr_web_mission_js('Examiner le résultat'):tr_web_mission_js('Résoudre le blocage'),kind:'decision',task:t,tone:'attention'}}
+  if(needs.length){const t=needs[0];return {summary:counts,next:t.title+' : '+missionText(t.reason),label:t.attempt_limit_reached?tr_web_mission_js('Examiner les tentatives et les refus'):t.state==='review'?tr_web_mission_js('Examiner le résultat'):tr_web_mission_js('Résoudre le blocage'),kind:'decision',task:t,tone:'attention'}}
   const running=d.tasks.find(t=>t.state==='running');
   if(running){const supervision=d.authorized&&!d.enabled?tr_web_mission_js(' Le conducteur des prochains départs est ')+(d.supervision.state==='error'?tr_web_mission_js('en erreur.'):'absent.'):tr_web_mission_js(' Ouvrez le journal pour voir la dernière activité reçue.');return {summary:counts,next:tr_web_mission_js('En cours : ')+running.title+(d.paused?'. Les départs suivants sont en pause.':'.'+supervision),label:tr_web_mission_js('Suivre cette tâche'),kind:'follow',task:running,tone:d.authorized&&!d.enabled?'attention':'info'}}
   if(d.tasks.every(t=>['validated','waived','abandoned'].includes(t.state)))return {summary:counts,next:d.validated===d.total?tr_web_mission_js('Tous les résultats sont validés sur les preuves actuelles.'):tr_web_mission_js('Travail clôturé avec des étapes non validées : consultez les décisions.'),label:tr_web_mission_js('Voir les résultats'),kind:'results',tone:d.validated===d.total?'succes':'attention'};
@@ -71,6 +72,8 @@ const Mission={
   return {summary:counts,next:tr_web_mission_js('Swarm attend les conditions de départ et réessaie automatiquement. Vous pouvez consulter le détail.'),label:tr_web_mission_js('Voir ce qui attend'),kind:'results',tone:'info'};
  },
  primary(o){
+  if(o.kind==='runtime'){RuntimeHealthPanel.open();return}
+  if(o.kind==='decision'&&o.task.attempt_limit_reached){this.recovery(o.task.id);return}
   if(o.kind==='organization'){this.organizationHelp();return}
   if(o.kind==='planning-resume'){Planning.resume('resume');return}
   if(o.kind==='planning'){Planning.details();return}
@@ -197,12 +200,28 @@ const Mission={
   }catch(e){notice(e.message,true);return false}
  },
  action(t){
+  if(t.action==='recovery'){this.recovery(t.id);return}
   if(t.action==='configure'){this.open(true);return}
   if(t.action==='prepare'){const plan=snapshot.work.plans?.find(p=>p.task_ids?.includes(t.id));if(plan?.source){location.href='/prepare.html?id='+encodeURIComponent(plan.source);return}}
   if(t.action==='supervise'){this.open();return}
   if(t.action==='inspect'||t.action==='prepare'){Pilot.inspect('task',t.target||t.id);return}
   if(t.action==='start'){Pilot.go(t.target||t.id);return}
   PilotInspector.taskAction(t.target||t.id,null,t.action).catch(e=>notice(e.message,true));
+ },
+ recovery(id){
+  const t=snapshot.work.tasks.find(t=>t.id===id),state=snapshot.mission.tasks.find(t=>t.id===id);if(!t||!state)return;
+  const evidence={work:snapshot.work.id,revision:snapshot.work.revision,task:t.id,criteria:t.criteria,attempts:t.attempts,independent_review:t.independent_review,diagnostic:state.diagnostic,understanding:state.understanding};
+  openModal(tr_web_mission_js('Reprise de la tâche')+' — '+t.title,tr_web_mission_js('Les tentatives autorisées sont utilisées. Voici les refus et les preuves à examiner avant une décision sur la suite.'),{action:'help'});
+  $('confirm').hidden=true;$('cancel').textContent=tr_web_mission_js('Fermer');$('modal-help-toggle').hidden=true;const host=node('section',undefined,'mission-help');$('modal-fields').append(host);
+  host.append(this.understandingView(state.understanding));
+  const r=t.independent_review;if(r){const box=node('section',undefined,'mission-task');box.append(node('h3',tr_web_mission_js('Dernier avis indépendant')),node('p',r.reason));for(const c of r.criteria||[])box.append(node('p',tr_web_mission_js('Critère ')+c.index+' — '+c.verdict+' : '+c.evidence));host.append(box)}
+  const diagnostic=this.diagnosticView(state.diagnostic);if(diagnostic)host.append(diagnostic);
+  const extension=PilotActions.extensionButton(id,'recovery');if(extension?.disabled===false)host.append(extension);
+  if(state.attempts_used>=3)host.append(node('p',tr_web_mission_js('Le plafond de trois tentatives est atteint. Swarm ne dispose pas de reprise automatique autorisée pour cette tâche. Le diagnostic peut être enregistré ; aucune tentative ni preuve ne sera effacée.'),'notice attention'));
+  host.append(Pilot.command(tr_web_mission_js('Voir les rapports et les actions'),()=>{closeModal();Pilot.inspect('task',id)}));
+  host.append(Pilot.command(tr_web_mission_js('Enregistrer le diagnostic'),()=>{
+   const url=URL.createObjectURL(new Blob([JSON.stringify(evidence,null,2)],{type:'application/json'})),a=node('a');a.href=url;a.download='swarm-reprise-'+t.id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }));
  },
  helpButton(t){const b=Pilot.command(tr_web_mission_js('Expliquer avec l’IA'),()=>MissionHelp.open(t.id));b.dataset.missionAction='help-'+t.id;b.dataset.missionHelp=t.id;return b},
  validation(id){
@@ -247,7 +266,7 @@ const Mission={
   const focus=document.activeElement?.dataset.missionAction,detailFocus=document.activeElement?.parentElement?.dataset.missionDetail,expanded=host.querySelector('#mission-results')?.open===true;
   const openDetails=new Set([...host.querySelectorAll('details[data-mission-detail][open]')].map(e=>e.dataset.missionDetail));
   const launch=$('pilot-mission');if(launch){launch.textContent=tr_web_mission_js('Réglages de la mission');launch.hidden=!d.authorized;launch.classList.remove('primary')}
-  const state=d.organization&&!d.organization.ready?missionText(d.organization.label):d.paused?tr_web_mission_js('Mission en pause'):d.enabled?tr_web_mission_js('Mission supervisée'):d.authorized?tr_web_mission_js('Mission autorisée, conducteur absent'):tr_web_mission_js('Mission à poursuivre');
+  const state=d.runtime?.state==='blocked'?tr_web_mission_js('Mission suspendue — stockage indisponible'):!d.running&&!d.active_agents&&!d.review&&d.tasks.some(t=>t.attempt_limit_reached)?tr_web_mission_js('Mission bloquée — tentatives épuisées'):d.organization&&!d.organization.ready?missionText(d.organization.label):d.paused?tr_web_mission_js('Mission en pause'):d.enabled?tr_web_mission_js('Mission supervisée'):d.authorized?tr_web_mission_js('Mission autorisée, conducteur absent'):tr_web_mission_js('Mission à poursuivre');
   const overview=this.overview(d);
 
   const heading=node('h3',(!snapshot.work.planning||snapshot.work.planning.scopes.every(s=>s.state==='closed'))&&d.total>0&&overview.kind==='results'&&d.tasks.every(t=>['validated','waived','abandoned'].includes(t.state))?tr_web_mission_js('Travail terminé'):state),summary=node('section');this.status(summary,d);

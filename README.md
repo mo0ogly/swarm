@@ -237,6 +237,7 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 
 - [Installation Docker et native](INSTALL.md)
 - [Autoriser une reprise et transmettre les sources au vérificateur](docs/ATTEMPT-RECOVERY.md)
+- [Diagnostic du stockage et tentatives épuisées](docs/RUNTIME-RECOVERY.md)
 - [Méthodes Codex et Claude : APEX, audit PDCA, revue et recette](docs/AGENT-METHODS.md)
 
 - [Référence technique complète et contrats CLI](REFERENCE.md)

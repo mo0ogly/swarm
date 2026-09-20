@@ -14,6 +14,7 @@ const help = `swarm — compagnon local de reprise (schema_version: 1)
 
 Options globales : --root <projet> --json --lang fr|en
 swarm init
+swarm doctor
 swarm aide [sujet]
 swarm providers init|show
 swarm providers cooldown show|clear <fournisseur> [--input demande.json]
@@ -152,7 +153,7 @@ func run(args []string, out, errOut io.Writer) int {
 		if asJSON {
 			_ = printJSON(errOut, map[string]any{"schema_version": 1, "error": e.Error(), "failure": commandFailure(e)})
 		} else {
-			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(e.Error()))
+			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(commandFailure(e).Message))
 		}
 		switch commandFailure(e).Code {
 		case "conflict":
@@ -210,6 +211,22 @@ func run(args []string, out, errOut io.Writer) int {
 		_ = printJSON(out, ev)
 		if !ev.Allowed {
 			return 1
+		}
+		return 0
+	}
+	if pos[0] == "doctor" {
+		h := (&Store{root: root}).runtimeHealth()
+		if asJSON {
+			_ = printJSON(out, h)
+		} else {
+			fmt.Fprintln(out, uiText(h.Message))
+			fmt.Fprintln(out, uiText(h.Next))
+			for _, v := range h.Volumes {
+				fmt.Fprintf(out, "%s: %s · %d MiB · %s\n", v.Kind, v.Path, v.Available/(1024*1024), v.State)
+			}
+		}
+		if !h.LaunchAllowed {
+			return 2
 		}
 		return 0
 	}

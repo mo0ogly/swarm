@@ -112,6 +112,7 @@ resources in the controlled project; not all are distributed in this repository.
 - [English user guide](docs/en/USER-GUIDE.md)
 - [English installation guide](docs/en/INSTALL.md)
 - [Authorize recovery and supply candidate sources to the reviewer](docs/en/ATTEMPT-RECOVERY.md)
+- [Storage diagnosis and exhausted attempts](docs/en/RUNTIME-RECOVERY.md)
 - [Codex and Claude methods: APEX, PDCA, review and verification](docs/en/AGENT-METHODS.md)
 - [Agent reports, evidence delivery and linked decisions](docs/en/AGENT-COMMUNICATION.md)
 - [English interface validation](docs/en/I18N-VALIDATION.md)

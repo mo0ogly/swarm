@@ -53,6 +53,9 @@ func processStamp(pid int) string {
 	return f[19]
 }
 func (s *Store) spawnAgent(a Agent) error {
+	if err := s.storageGuard(); err != nil {
+		return err
+	}
 	exe, e := os.Executable()
 	if e != nil {
 		return e

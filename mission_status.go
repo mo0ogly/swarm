@@ -9,20 +9,23 @@ import (
 )
 
 type MissionTask struct {
-	ID                string               `json:"id"`
-	Title             string               `json:"title"`
-	State             string               `json:"state"`
-	Reason            string               `json:"reason"`
-	Action            string               `json:"action"`
-	Label             string               `json:"label"`
-	Target            string               `json:"target,omitempty"`
-	Impact            int                  `json:"impact"`
-	Deliverable       string               `json:"deliverable"`
-	ValidationMode    string               `json:"validation_mode"`
-	ValidationReceipt string               `json:"validation_receipt,omitempty"`
-	Result            ResultPresentation   `json:"result"`
-	Understanding     MissionUnderstanding `json:"understanding"`
-	Diagnostic        *AttemptDiagnostic   `json:"diagnostic,omitempty"`
+	AttemptsUsed        int                  `json:"attempts_used"`
+	AttemptsAllowed     int                  `json:"attempts_allowed"`
+	AttemptLimitReached bool                 `json:"attempt_limit_reached"`
+	ID                  string               `json:"id"`
+	Title               string               `json:"title"`
+	State               string               `json:"state"`
+	Reason              string               `json:"reason"`
+	Action              string               `json:"action"`
+	Label               string               `json:"label"`
+	Target              string               `json:"target,omitempty"`
+	Impact              int                  `json:"impact"`
+	Deliverable         string               `json:"deliverable"`
+	ValidationMode      string               `json:"validation_mode"`
+	ValidationReceipt   string               `json:"validation_receipt,omitempty"`
+	Result              ResultPresentation   `json:"result"`
+	Understanding       MissionUnderstanding `json:"understanding"`
+	Diagnostic          *AttemptDiagnostic   `json:"diagnostic,omitempty"`
 }
 type MissionUnderstanding struct {
 	What      string `json:"what"`
@@ -69,6 +72,7 @@ type MissionCoordinationPhase struct {
 	Relative string `json:"relative,omitempty"`
 }
 type MissionStatus struct {
+	Runtime           RuntimeHealth              `json:"runtime"`
 	ProviderCooldowns []ProviderCooldown         `json:"provider_cooldowns,omitempty"`
 	EvidenceStage     string                     `json:"evidence_stage"`
 	Organization      Organization               `json:"organization"`
@@ -291,7 +295,7 @@ func descendantCount(w *Work, id string) int {
 	return len(seen) - 1
 }
 func (s *Store) missionStatus(work string) (MissionStatus, error) {
-	d := MissionStatus{Tasks: []MissionTask{}}
+	d := MissionStatus{Tasks: []MissionTask{}, Runtime: s.runtimeHealth()}
 	w, e := s.get(work)
 	if e != nil {
 		return d, e
@@ -306,7 +310,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 	if e != nil {
 		return d, e
 	}
-	d.Enabled = d.Authorized && !d.Paused && d.Supervision.State == "active"
+	d.Enabled = d.Authorized && !d.Paused && d.Supervision.State == "active" && d.Runtime.LaunchAllowed
 	d.Total = len(w.Tasks)
 	agents, e := s.agents(work)
 	if e != nil {
@@ -346,6 +350,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 		t := &w.Tasks[i]
 		v := validation.Tasks[t.ID]
 		x := MissionTask{ID: t.ID, Title: t.Title, State: t.Status, Deliverable: t.Deliverable, Target: t.ID, Impact: descendantCount(&w, t.ID), ValidationMode: "human"}
+		x.AttemptsUsed, x.AttemptsAllowed = len(t.Attempts), t.PlanMaxAttempts
 		if t.ValidationPolicy != nil {
 			x.ValidationMode = t.ValidationPolicy.Mode
 		}
@@ -460,6 +465,21 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 			x.Reason = pending.Reason
 			if x.Reason == "" {
 				x.Reason = "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche."
+			}
+		}
+		x.AttemptLimitReached = t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
+		if t.IndependentReview != nil && t.IndependentReview.State == "running" {
+			x.AttemptLimitReached = false
+		}
+		for _, agent := range agents {
+			if agent.TaskID == t.ID && activeAgent(agent) {
+				x.AttemptLimitReached = false
+			}
+		}
+		if x.AttemptLimitReached {
+			x.State, x.Action, x.Label = "intervention", "recovery", "Examiner les tentatives et les refus"
+			if t.IndependentReview != nil && t.IndependentReview.State == "changes_requested" {
+				x.Reason = t.IndependentReview.Reason
 			}
 		}
 		x.Understanding = taskUnderstanding(x, d, agents)
@@ -579,6 +599,10 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 		}
 		d.Understanding = understanding(strings.Join(messages, "\n"), next, actor, kind, situation)
 		d.Next = next
+	}
+	if d.Runtime.State == "blocked" {
+		d.Understanding = missionUnderstanding(d)
+		d.Next = d.Runtime.Next
 	}
 	d.Coordination = missionCoordinationPhases(&w, d, exchanges, time.Now())
 	return d, nil
@@ -740,6 +764,9 @@ func taskUnderstanding(t MissionTask, mission MissionStatus, agents []Agent) Mis
 		}
 		return understanding(t.Reason, t.Label+".", "Vous", "user", "decision_humaine")
 	case "intervention", "configure":
+		if t.AttemptLimitReached {
+			return understanding(fmt.Sprintf("%d/%d tentatives utilisées. %s", t.AttemptsUsed, t.AttemptsAllowed, t.Reason), "Examinez les refus et les preuves conservées. Aucun redémarrage automatique n’est autorisé ; une décision motivée sur la suite est nécessaire.", "Responsable de la mission", "user", "limite_tentatives")
+		}
 		if t.State == "intervention" {
 			for _, agent := range agents {
 				if agent.TaskID != t.ID {
@@ -794,6 +821,9 @@ func taskUnderstanding(t MissionTask, mission MissionStatus, agents []Agent) Mis
 }
 
 func missionUnderstanding(d MissionStatus) MissionUnderstanding {
+	if d.Runtime.State == "blocked" {
+		return understanding(d.Runtime.Message, d.Runtime.Next, "Responsable de la machine", "user", "incident_stockage")
+	}
 	if d.Total == 0 {
 		return understanding("Cette mission ne contient aucune tâche.", "Préparez les tâches à réaliser.", "Vous", "user", "decision_humaine")
 	}
@@ -819,14 +849,21 @@ func missionUnderstanding(d MissionStatus) MissionUnderstanding {
 		return understanding(fmt.Sprintf("%d résultat(s) attendent une décision de validation.", human), "Examinez les résultats signalés.", "Vous", "user", "decision_humaine")
 	}
 	blocked := 0
+	exhausted := 0
 	configured := 0
 	for _, task := range d.Tasks {
+		if task.AttemptLimitReached {
+			exhausted++
+		}
 		if task.State == "intervention" {
 			blocked++
 		}
 		if task.State == "configure" {
 			configured++
 		}
+	}
+	if exhausted > 0 && d.Running == 0 && d.ActiveAgents == 0 {
+		return understanding(fmt.Sprintf("%d tâche(s) ont épuisé leurs tentatives autorisées. Le conducteur ne peut pas les relancer.", exhausted), "Examinez les tentatives et les refus pour décider de la suite. Attendre ou actualiser ne lève pas cette limite.", "Responsable de la mission", "user", "limite_tentatives")
 	}
 	if blocked == 1 {
 		for _, task := range d.Tasks {

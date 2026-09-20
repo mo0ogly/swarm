@@ -229,6 +229,9 @@ func parseManagedReview(reply string, c managedReviewContext) (string, []Managed
 }
 
 func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath string, receipt []byte) error {
+	if err := s.storageGuard(); err != nil {
+		return err
+	}
 	if w.Planning.Reviewer == nil {
 		return fmt.Errorf("vérificateur indépendant requis pour publier un candidat Git")
 	}

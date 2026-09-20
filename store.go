@@ -13,9 +13,10 @@ import (
 )
 
 type Store struct {
-	db          *sql.DB
-	root        string
-	readDigests map[string]string // request-local clone only; never retained by the live store
+	db           *sql.DB
+	root         string
+	readDigests  map[string]string                    // request-local clone only; never retained by the live store
+	storageProbe func(string) (uint64, uint64, error) // immutable per store; nil uses the filesystem
 }
 
 func openStore(root string, init bool) (*Store, error) {

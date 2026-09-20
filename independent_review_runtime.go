@@ -50,6 +50,9 @@ func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCr
 // One call per production attempt, durably reserved before inference. A crash
 // leaves an explicit failed review, never an automatic repeated paid call.
 func (s *Store) independentReviewStep(work string) error {
+	if err := s.storageGuard(); err != nil {
+		return err
+	}
 	if !safeName(work) {
 		return fmt.Errorf("identifiant de travail invalide")
 	}
@@ -256,7 +259,7 @@ func (s *Store) saveIndependentReview(work, task string, r IndependentReview) er
 }
 
 func (s *Store) reviewFailure(work string, err error) {
-	if err == nil || commandFailure(err).Code == "revision_conflict" || commandFailure(err).Code == "provider_cooldown" {
+	if err == nil || commandFailure(err).Code == "revision_conflict" || commandFailure(err).Code == "provider_cooldown" || commandFailure(err).Code == "storage_unavailable" {
 		return
 	}
 	w, e := s.get(work)
