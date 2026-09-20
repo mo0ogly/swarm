@@ -88,6 +88,11 @@ action. For internal files, the web reader requires attribution to the selected
 work and task; it cannot read arbitrary engine files. A reviewed report changed
 since recording is not presented as current evidence.
 
+The AI summary also receives the current review state and consumed attempts.
+These engine facts take precedence over historical statements in the report.
+Its schema requires two short lines; a nonconforming answer remains rejected
+without hiding the report or granting acceptance.
+
 A complete manifest allows authorized checks and independent review to proceed.
 It never accepts a task. The reviewer receives the candidate, engine receipts,
 report, available sources and declaration. Review instructions distinguish a

@@ -191,6 +191,14 @@ func (s *Store) tasksContext(b *contextBuilder, w *Work, v WorkValidation, c Pag
 		b.fact("statut_historique", "etat", ref, "%s : %s", t.ID, value(t.Status))
 		tv := v.Tasks[t.ID]
 		b.fact("validation_actuelle", "derive", factRef("validation", t.ID), "%s : %s", t.ID, tv.State)
+		if t.PlanMaxAttempts > 0 {
+			b.fact("tentatives_du_plan", "etat", ref+"/attempts", "%s : %d tentative(s) consommée(s), plafond autorisé %d ; atteindre le plafond interdit un nouveau départ dans ce plan.", t.ID, len(t.Attempts), t.PlanMaxAttempts)
+		}
+		if review := t.IndependentReview; review != nil && currentTaskAttempt(t, review.Attempt) {
+			b.fact("revue_independante_enregistree", "etat", ref+"/independent_review", "%s : état %s (%s), début %s, fin %s, candidat %s. Cet avis enregistré est postérieur au rapport du producteur.", t.ID, review.State, reviewStateLabel(review.State), review.Started, value(review.Finished), review.CandidateSHA)
+			result := s.resultPresentation(w, t, agents, tv)
+			b.fact("verdict_actuel_du_resultat", "derive", ref+"/result", "%s : %s ; validation %s ; suite : %s", t.ID, result.Label, result.ValidationState, result.NextStep)
+		}
 		b.fact("responsable", "etat", ref, "%s : %s", t.ID, guardLabel(tv.Owner, 120))
 		if t.Deliverable != "" {
 			b.fact("livrable", "texte_non_fiable", ref, "%s : %s", t.ID, t.Deliverable)

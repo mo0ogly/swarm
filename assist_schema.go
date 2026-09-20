@@ -26,6 +26,12 @@ func assistantStructuredProvider(p Provider, t AssistTurn, dir string) (Provider
 	props["version"] = map[string]any{"type": "integer", "enum": []int{1}}
 	props["template_id"] = map[string]any{"type": "string", "enum": []string{t.TemplateID}}
 	props["context_hash"] = map[string]any{"type": "string", "enum": []string{t.Context.Hash}}
+	if t.TemplateID == "report_summary.v1" {
+		props["interpretation"] = map[string]any{
+			"type": "string", "pattern": `^[^\r\n]{1,320}\n[^\r\n]{1,320}$`,
+			"description": "Exactly two short non-empty lines separated by one newline. First: the report's finding. Second: the next action or remaining limit. Aim for fewer than 180 characters per line.",
+		}
+	}
 	facts := []string{}
 	for _, f := range t.Context.Facts {
 		facts = append(facts, f.ID)

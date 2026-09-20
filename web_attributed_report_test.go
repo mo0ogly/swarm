@@ -59,6 +59,16 @@ func TestWebAttributedReportRead(t *testing.T) {
 			if err != nil || !strings.Contains(context.Facts[len(context.Facts)-1].Value, "Rapport nouveau first") {
 				t.Fatal("assistant cannot read the attributed report", err)
 			}
+			if mode == "review_rejected" {
+				reviewFact, verdictFact := false, false
+				for _, fact := range context.Facts {
+					reviewFact = reviewFact || fact.Name == "revue_independante_enregistree" && strings.Contains(fact.Value, "changes_requested")
+					verdictFact = verdictFact || fact.Name == "verdict_actuel_du_resultat" && strings.Contains(fact.Value, "Corrections ou preuves demandées")
+				}
+				if !reviewFact || !verdictFact {
+					t.Fatal("assistant did not receive the engine's current review verdict", context.Facts)
+				}
+			}
 			if _, err := s.pageContext(w.ID, PageCoordinates{PageID: "tasks", Selected: []string{"second"}, Report: reports[0]}); err == nil {
 				t.Fatal("assistant read another task's report")
 			}

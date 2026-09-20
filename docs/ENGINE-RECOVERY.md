@@ -104,6 +104,11 @@ travail et à la tâche pour les fichiers internes ; il ne donne pas accès aux 
 fichiers du moteur. Un rapport de revue modifié depuis son enregistrement n’est
 pas présenté comme la preuve courante.
 
+La synthèse IA reçoit aussi l’état actuel de la revue et le nombre de tentatives
+consommées. Ces faits du moteur priment sur les annonces historiques du rapport.
+Son schéma impose deux lignes courtes ; une réponse non conforme reste refusée,
+sans masquer le rapport ni produire une validation.
+
 Un bilan complet autorise la suite des contrôles ; il n’accepte jamais la tâche.
 Le moteur exécute les commandes autorisées, puis transmet au vérificateur le
 candidat, les reçus, le rapport, les sources disponibles et le bilan. Le vérificateur
