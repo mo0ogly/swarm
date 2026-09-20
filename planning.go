@@ -71,6 +71,8 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	ConfirmRecovery      bool                           `json:"confirm_recovery,omitempty"`
+	ReviewID             string                         `json:"review_id,omitempty"`
 	RecoveryInstruction  string                         `json:"recovery_instruction,omitempty"`
 	ReviewTimeoutSeconds int                            `json:"review_timeout_seconds,omitempty"`
 	Level                string                         `json:"level,omitempty"`
@@ -125,6 +127,9 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	}
 	if action == "extend-attempt" {
 		return s.extendAttempt(work, r)
+	}
+	if action == "authorize-recovery" {
+		return s.authorizeCorrectiveRecovery(work, r)
 	}
 	raw, err := json.Marshal(r)
 	if err != nil {

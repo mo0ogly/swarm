@@ -108,6 +108,10 @@ func uiEngineText(source string) string {
 	if len(source) > 10000 {
 		return source
 	}
+	const correctivePrefix = "Essai correctif autorisé. "
+	if strings.HasPrefix(source, correctivePrefix) {
+		return uiText(correctivePrefix) + uiEngineText(strings.TrimPrefix(source, correctivePrefix))
+	}
 	const deliveryStart = "Livraison incomplète : "
 	const deliveryEnd = ". Aucun appel de revue lancé ; le responsable doit examiner les éléments manquants avant une reprise autorisée."
 	if strings.HasPrefix(source, deliveryStart) && strings.HasSuffix(source, deliveryEnd) {

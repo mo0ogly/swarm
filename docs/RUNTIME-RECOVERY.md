@@ -55,13 +55,12 @@ avec révision, tâche, tentatives et avis. Aucun appel IA n’est lancé par ce
 Le CLI expose les mêmes faits via `swarm mission status TRAVAIL`, ou en JSON avec
 `attempts_used`, `attempts_allowed` et `attempt_limit_reached` pour chaque tâche.
 
-Une autorisation supplémentaire reste possible uniquement dans les conditions de
-[la reprise bornée](ATTEMPT-RECOVERY.md). Au plafond de trois tentatives, le produit
-ne propose actuellement aucune nouvelle exécution. Le diagnostic l’indique
-explicitement : attendre, actualiser ou rouvrir un écran ne changera pas ce fait.
-Il ne faut pas renommer une tâche, effacer une tentative, créer une autre mission
-ou valider sans preuve pour contourner cette limite.
+Après trois tentatives, **Préparer un essai correctif** ouvre la proposition
+fondée sur le dernier refus indépendant. Une confirmation explicite autorise un
+seul essai supplémentaire, avec historique et revue conservés. Les conditions,
+limites et commande CLI sont décrites dans [la reprise bornée](ATTEMPT-RECOVERY.md).
+Si l’action est indisponible, son motif reste affiché : une autorisation antérieure,
+une revue absente ou en cours, ou un budget de revue épuisé ne sont pas contournés.
 
-Cette visibilité corrige un parcours trompeur ; elle ne démontre pas la résolution
-autonome d’un livrable refusé. Une évolution du contrat de reprise nécessite une
-décision explicite sur la portée, le coût et la nouvelle condition vérifiable.
+Cette possibilité de reprise ne démontre pas, à elle seule, qu’une mission réelle
+aboutira. La clôture dépend de la correction effective et de ses preuves.

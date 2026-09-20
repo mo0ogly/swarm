@@ -190,6 +190,10 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	if t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts {
 		reason := attemptExtensionReason(t, agents)
 		actions = append(actions, action("extend-attempt", "Autoriser une tentative supplémentaire", reason == "", reason))
+		if t.PlanMaxAttempts >= 3 {
+			reason = correctiveRecoveryReason(w, t, agents)
+			actions = append(actions, action("authorize-recovery", "Préparer un essai correctif", reason == "", reason))
+		}
 	}
 
 	champs := map[string][]TaskField{
@@ -243,6 +247,9 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	}
 	if t.Status == "blocked" && attemptExtensionReason(t, agents) == "" {
 		conseillee = "extend-attempt"
+	}
+	if correctiveRecoveryReason(w, t, agents) == "" {
+		conseillee = "authorize-recovery"
 	}
 	for i := range actions {
 		actions[i].Conseillee = actions[i].Kind == conseillee && actions[i].Disponible

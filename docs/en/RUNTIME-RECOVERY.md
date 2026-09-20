@@ -48,11 +48,12 @@ review. This flow does not call an AI provider.
 `swarm mission status WORK` shows the same facts. JSON task fields include
 `attempts_used`, `attempts_allowed` and `attempt_limit_reached`.
 
-An extra attempt remains subject to [bounded recovery](ATTEMPT-RECOVERY.md).
-At three attempts, the current product offers no further execution. Waiting or
-refreshing will not change that limit. Do not rename tasks, erase attempts,
-create replacement missions or accept unproven results to evade it.
+After three attempts, **Prepare one corrective attempt** opens a proposal based
+on the latest independent rejection. Explicit confirmation authorizes one extra
+attempt with history and independent review preserved. See
+[bounded recovery](ATTEMPT-RECOVERY.md) for requirements, limits and the CLI.
+If unavailable, the action explains the reason; an earlier exceptional grant,
+a missing or running review, or an exhausted reviewer budget cannot be bypassed.
 
-This fixes a misleading recovery flow; it does not demonstrate autonomous
-resolution of a rejected deliverable. Changing the recovery contract requires
-an explicit decision about scope, cost and a verifiable changed precondition.
+This recovery capability alone does not prove a real mission will succeed.
+Completion requires an effective correction and its evidence.

@@ -55,6 +55,7 @@ function taskFields(action){if(!modalContext?.data||!$('modal').open)return;cons
  if(['start','retry'].includes(action)&&typeof addModelFields==='function'){const previous=action==='retry'?snapshot.agents.find(x=>x.agent.id===$('field-agent')?.value)?.agent:null;addModelFields('work',action==='retry'?()=>snapshot.agents.find(x=>x.agent.id===$('field-agent')?.value)?.agent.provider||'':'',previous?.model_route?.level||'auto')}
  if(action==='start'){PilotActions.addPreview();const mode=$('field-mode');mode.addEventListener('change',e=>{if(!e.isTrusted)return;$('field-capture').parentElement.hidden=mode.value==='terminal';if($('launch-eligibility'))$('launch-eligibility').textContent=tr_web_cockpit_js('Mode changé : vérifiez les conditions de lancement.')})}
  if(action==='extend-attempt')PilotActions.extensionFields(d);
+ if(action==='authorize-recovery')PilotActions.recoveryFields(d);
  if(action==='resume-launch')PilotActions.preparedFields(d);
  if(action==='accepted')preview(d.review+tr_web_cockpit_js('\n\nConfirmer après examen du rapport et des preuves.'));
  if(action==='accepted')$('confirm').textContent=tr_web_cockpit_js('Confirmer la validation');
@@ -117,6 +118,7 @@ $('action-form').addEventListener('submit',async event=>{event.preventDefault();
  if(a==='planning-enable'){await Planning.submit();return}
  if(a==='planning-control'){await Planning.submitControl();return}
  if(a==='extend-attempt'){await PilotActions.extendAttempt(c,f);return}
+ if(a==='authorize-recovery'){await PilotActions.authorizeRecovery(c,f);return}
  if(a==='resume-launch'){await act('resume-launch',{task:c.task,agent:c.prepared.id});if(!current())return;closeModal();notice(PilotActions.outcome(a));await refresh(true);return}
  if(a==='mission-start'){if(!await Mission.confirmPreview(c))return;await act('mission-start',Mission.launchFields());if(!current())return;closeModal();notice(tr_web_cockpit_js('Mission continue autorisée. Swarm enchaîne les tâches prêtes ; les décisions nécessaires restent visibles.'));await refresh(true);return}
  if(a==='validation-policy'){if(!c.validationPreview){const change=Mission.validationFields();const result=await act('validation-policy-preview',{task:c.task,validation_policy:change});if(!current())return;c.validationPreview=result;c.validationSignature=JSON.stringify(change);Mission.validationPreview(result);$('confirm').textContent=tr_web_cockpit_js('Confirmer cet effet');return}const change=Mission.validationFields();if(JSON.stringify(change)!==c.validationSignature){c.validationPreview=null;$('modal-error').textContent=tr_web_cockpit_js('Les réglages ont changé. Examinez le nouvel aperçu avant de confirmer.');$('modal-error').hidden=false;return}change.preview_token=c.validationPreview.preview_token;await act('validation-policy-apply',{task:c.task,event_id:crypto.randomUUID(),validation_policy:change});if(!current())return;closeModal();notice(tr_web_cockpit_js('Politique de validation enregistrée après confirmation de son aperçu.'));await refresh(true);return}

@@ -217,7 +217,7 @@ const Mission={
   const r=t.independent_review;if(r){const box=node('section',undefined,'mission-task');box.append(node('h3',tr_web_mission_js('Dernier avis indépendant')),node('p',r.reason));for(const c of r.criteria||[])box.append(node('p',tr_web_mission_js('Critère ')+c.index+' — '+c.verdict+' : '+c.evidence));host.append(box)}
   const diagnostic=this.diagnosticView(state.diagnostic);if(diagnostic)host.append(diagnostic);
   const extension=PilotActions.extensionButton(id,'recovery');if(extension?.disabled===false)host.append(extension);
-  if(state.attempts_used>=3)host.append(node('p',tr_web_mission_js('Le plafond de trois tentatives est atteint. Swarm ne dispose pas de reprise automatique autorisée pour cette tâche. Le diagnostic peut être enregistré ; aucune tentative ni preuve ne sera effacée.'),'notice attention'));
+  if(state.attempts_used>=3){const recovery=snapshot.task_actions?.[id]?.find(a=>a.kind==='authorize-recovery');host.append(node('p',recovery?.disponible?tr_web_mission_js('Trois tentatives consommées. Préparez une correction puis autorisez explicitement un seul essai supplémentaire.'):missionText(recovery?.raison||tr_web_mission_js('Aucune reprise supplémentaire autorisée. Examinez les refus et les preuves conservées.')),'notice attention'))}
   host.append(Pilot.command(tr_web_mission_js('Voir les rapports et les actions'),()=>{closeModal();Pilot.inspect('task',id)}));
   host.append(Pilot.command(tr_web_mission_js('Enregistrer le diagnostic'),()=>{
    const url=URL.createObjectURL(new Blob([JSON.stringify(evidence,null,2)],{type:'application/json'})),a=node('a');a.href=url;a.download='swarm-reprise-'+t.id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);

@@ -13,6 +13,7 @@ assert.equal(api.engine('Fournisseur inconnu : my-provider'),'Unknown provider: 
 assert.equal(api.engine('Le serveur a répondu HTTP 401. Vérifiez la clé, le modèle et l’adresse.'),'The server returned HTTP 401. Check the key, model and URL.');
 assert.equal(api.engine('Envoi non confirmé : /renvoyer. error: $& /my/path'),'Send not confirmed: /renvoyer. error: $& /my/path');
 assert.equal(api.engine('Enregistrez d’abord un plan JSON valide : détail conservé'),'Save a valid JSON plan first: détail conservé');
+assert.equal(api.engine('Essai correctif autorisé. Mission en pause : reprendre la mission pour autoriser les départs'),'Corrective attempt authorized. Mission paused: resume it to authorize starts');
 for(const [source,target]of Object.entries(catalog)){
  assert.equal(typeof target,'string',source);
  const verbs=s=>(s.match(/%(?:\[\d+\])?[+\-#0]*(?:\d+)?(?:\.\d+)?[sdqvftxT]/g)||[]);

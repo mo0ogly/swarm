@@ -32,7 +32,7 @@ const before=read();let browser,server,page,mode='blocked',snapshotFails=false;c
    await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#modal').open);
    await page.click('[data-mission-action="first"]');await page.waitForFunction(()=>document.querySelector('#modal').open);
    assert.equal(await page.$eval('#confirm',e=>e.hidden),true);assert.match(await page.$eval('#modal',e=>e.innerText),/Missing evidence/);
-   assert.match(await page.$eval('#modal',e=>e.innerText),lang==='fr'?/trois tentatives/:/three-attempt/);
+   assert.match(await page.$eval('#modal',e=>e.innerText),lang==='fr'?/Trois tentatives/:/Three attempts/);
    await page.screenshot({path:path.join(out,`attempts-${lang}-${theme}.png`)});await page.keyboard.press('Escape');
   }
  }

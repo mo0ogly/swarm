@@ -482,6 +482,11 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 				x.Reason = t.IndependentReview.Reason
 			}
 		}
+		if t.CorrectiveRecovery != nil && t.PlanningRetry && t.Status == "blocked" && len(t.Attempts) < t.PlanMaxAttempts {
+			x.State, x.Reason = missionDispatchState(in, *t)
+			x.Reason = "Essai correctif autorisé. " + x.Reason
+			x.Action, x.Label = "supervise", "Suivre la reprise"
+		}
 		x.Understanding = taskUnderstanding(x, d, agents)
 		for _, agent := range agents {
 			if agent.TaskID != t.ID {
@@ -936,14 +941,14 @@ func missionDispatchState(in dispatchInputs, t Task) (string, string) {
 			return "intervention", recovery.Reason
 		}
 	}
-	if !recoveryAllowed && t.Status == "blocked" && strings.TrimSpace(t.Blocker) != "" {
+	if !recoveryAllowed && !t.PlanningRetry && t.Status == "blocked" && strings.TrimSpace(t.Blocker) != "" {
 		return "intervention", t.Blocker
 	}
 	for _, a := range in.agents {
 		if a.TaskID != t.ID {
 			continue
 		}
-		if t.Status == "blocked" && a.Status == "completed" {
+		if t.Status == "blocked" && a.Status == "completed" && !t.PlanningRetry {
 			return "intervention", "Tentative terminée sans rapport relayé : examiner le rapport avant toute reprise"
 		}
 		if a.Status == "interrupted" && a.StopKind == originOperator {

@@ -12,8 +12,8 @@ conditions. Authorization itself never starts a provider. Escape or Close cancel
 without changing the work. A stale form is rejected; close and reopen it.
 
 The engine refuses this operation while an agent or review is running, while an
-attempt remains available, or once three have been authorized. Further recovery
-requires revisiting the scope with its owner, rather than an unlimited retry loop.
+attempt remains available, or once three have been authorized. After three attempts, use the separate exceptional flow below. There is no
+automatic increase in the attempt allowance.
 
 ## CLI equivalent
 
@@ -57,3 +57,49 @@ Limits: 8 KiB manifest; 24 distinct files; 96 KiB per file; 128 KiB combined sou
 content and oversized input are rejected without truncation or a review call.
 Without a manifest, the existing diff/report/control-receipt flow remains available.
 This is explicit context delivery, not general file watching or direct worker messaging.
+
+## After three attempts: one explicit corrective authorization
+
+**Prepare one corrective attempt** is available on the task card, recovery
+diagnosis and task inspector. The editable proposal repeats the latest independent
+rejection. Reading or cancelling it changes nothing and calls no AI. The proposal
+does not establish that the review diagnosis is complete or accurate.
+
+**Authorize this corrective attempt** grants exactly one fourth attempt. The
+active conductor handles it when launch conditions permit. Pauses, dependencies,
+workspace reservations, storage checks, budgets and reviewer availability still
+apply. Acceptance requires checks and a new independent review of the corrected
+candidate. History, criteria and previous verdicts remain intact.
+
+The engine requires a blocked task with three used attempts, an independent
+rejection of the latest attempt, an available reviewer budget, a new instruction,
+a reason and explicit confirmation. Active task agents prevent authorization.
+The atomic operation is idempotent; double clicks cannot add two attempts, and
+stale forms are rejected. The `task.corrective-recovery` event and the task's
+`corrective_recovery` record retain the actor, timestamp, revision, review,
+attempt, reason and instruction. A fifth attempt cannot be granted through this
+flow, including after task edits. Planners and page-assistant proposals cannot
+authorize it; the local operator must do so. The local API/CLI remains within the
+operator's trust boundary.
+
+```json
+{
+  "schema_version": 1,
+  "event_id": "unique-corrective-recovery",
+  "expected_revision": 42,
+  "task_id": "my-task",
+  "review_id": "latest-review-id",
+  "attempt_id": "latest-attempt-id",
+  "confirm_recovery": true,
+  "reason": "Targeted correction after reading the independent rejection",
+  "recovery_instruction": "Correct the missing evidence identified in this review and rerun every check against the corrected candidate."
+}
+```
+
+```sh
+swarm planning authorize-recovery WORK --input corrective-recovery.json
+```
+
+Review this JSON before sending it: an active conductor may start the authorized
+attempt. Tool, cost and reviewer budgets remain unchanged. Other tasks retain
+their own allowances. Environment failures still require verified preconditions.
