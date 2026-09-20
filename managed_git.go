@@ -31,14 +31,16 @@ type ManagedRepository struct {
 	RequestDigest string   `json:"request_digest"`
 }
 type ManagedAttempt struct {
-	Agent  string `json:"agent_id"`
-	Work   string `json:"work_id"`
-	Task   string `json:"task_id"`
-	Base   string `json:"base_commit"`
-	Path   string `json:"path"`
-	State  string `json:"state"`
-	Result string `json:"result_commit"`
-	Detail string `json:"detail"`
+	Request             *Launch `json:"launch_request,omitempty"`
+	PreparationContract string  `json:"preparation_contract,omitempty"`
+	Agent               string  `json:"agent_id"`
+	Work                string  `json:"work_id"`
+	Task                string  `json:"task_id"`
+	Base                string  `json:"base_commit"`
+	Path                string  `json:"path"`
+	State               string  `json:"state"`
+	Result              string  `json:"result_commit"`
+	Detail              string  `json:"detail"`
 }
 
 func managedGit(dir string, args ...string) (string, error) {
@@ -279,6 +281,13 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		if prior.State != "ready" {
 			return "", fmt.Errorf("copie non disponible : %s", prior.State)
 		}
+		if record, e := s.readPreparedLaunch(w, r.EventID); e == nil && record.Request != nil {
+			if record.PreparationContract != managedPreparationContract(w, taskForPreparation(w, r.TaskID)) || preparedRequestDigest(*record.Request) != preparedRequestDigest(r) {
+				return "", &CommandError{Code: "prepared_launch_changed", Message: "Le contrat ou les paramètres du lancement préparé ont changé ; sa copie est conservée. Examiner la préparation avant reprise."}
+			}
+		} else if e != nil && !os.IsNotExist(e) {
+			return "", e
+		}
 		if e := verifyManagedCopy(repo, prior.Path); e != nil {
 			return "", e
 		}
@@ -293,13 +302,27 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 	path := managedCopyRoot(repo, task.ID, len(task.Attempts)+1)
 	manifest := filepath.Join(repo.Storage, "copy-"+r.EventID+".json")
 	if _, err = os.Lstat(path); err == nil {
-		raw, e := os.ReadFile(manifest)
+		prior, e := s.readPreparedLaunch(w, r.EventID)
 		if e != nil {
+			var owner string
+			if lookupErr := s.db.QueryRow("SELECT agent_id FROM managed_attempts WHERE work_id=? AND task_id=? AND path=?", w.ID, task.ID, path).Scan(&owner); lookupErr == nil {
+				return "", &CommandError{Code: "prepared_launch_exists", Message: "Un lancement est déjà préparé pour cette tâche (" + owner + "). Choisissez « Reprendre le lancement préparé » ; la copie est conservée.", Retryable: true}
+			}
+			if owner, lookupErr := s.preparedManifestForTask(w, task); lookupErr == nil && owner != "" {
+				return "", &CommandError{Code: "prepared_launch_exists", Message: "Un lancement est déjà préparé pour cette tâche (" + owner + "). Choisissez « Reprendre le lancement préparé » ; la copie est conservée.", Retryable: true}
+			}
 			return "", fmt.Errorf("copie existante sans attribution ; ne pas écraser")
 		}
-		var prior ManagedAttempt
-		if e = json.Unmarshal(raw, &prior); e != nil || prior.Agent != r.EventID || prior.Work != w.ID || prior.Task != task.ID || prior.Path != path {
+		if prior.Agent != r.EventID || prior.Work != w.ID || prior.Task != task.ID || prior.Path != path {
 			return "", fmt.Errorf("attribution de copie incohérente")
+		}
+		if prior.Request != nil {
+			if e := s.preparedLaunchGuard(w, task, prior); e != nil {
+				return "", e
+			}
+			if preparedRequestDigest(*prior.Request) != preparedRequestDigest(r) {
+				return "", fmt.Errorf("paramètres de lancement préparé modifiés")
+			}
 		}
 		if e := verifyManagedCopy(repo, path); e != nil {
 			return "", e
@@ -328,7 +351,26 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 	if err = verifyManagedWorkspace(clone, repo.Subdir); err != nil {
 		return "", err
 	}
-	record, _ := json.Marshal(ManagedAttempt{Agent: r.EventID, Work: w.ID, Task: task.ID, Base: repo.Candidate, Path: path, State: "ready"})
+	attribution := ManagedAttempt{Agent: r.EventID, Work: w.ID, Task: task.ID, Base: repo.Candidate, Path: path, State: "ready"}
+	if r.Schema == 1 {
+		request := r
+		providers, e := s.providers()
+		if e != nil {
+			return "", e
+		}
+		provider, ok := providers.Providers[r.Provider]
+		if !ok {
+			return "", fmt.Errorf("fournisseur inconnu")
+		}
+		providerBytes, _ := json.Marshal(provider)
+		if request.ProviderDigest != "" && request.ProviderDigest != hash(providerBytes) {
+			return "", fmt.Errorf("La configuration a changé : demandez une nouvelle proposition")
+		}
+		request.ProviderDigest = hash(providerBytes)
+		attribution.Request = &request
+		attribution.PreparationContract = managedPreparationContract(w, task)
+	}
+	record, _ := json.Marshal(attribution)
 	if err = atomicWrite(manifest, record); err != nil {
 		return "", err
 	}

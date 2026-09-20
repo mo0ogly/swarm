@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -102,6 +103,7 @@ type DiagnosticItem struct {
 	Traces      []string `json:"traces"`
 }
 type Agent struct {
+	DeliveryVersion      int               `json:"delivery_version,omitempty"`
 	Workflow             *AgentWorkflow    `json:"workflow,omitempty"`
 	ProviderCooldown     *ProviderCooldown `json:"provider_cooldown,omitempty"`
 	Preflight            *PreflightResult  `json:"preflight,omitempty"`
@@ -380,7 +382,16 @@ func (s *Store) paused(work string) bool {
 }
 
 func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
-	return s.prepareLaunch(work, r, false)
+	for attempt := 0; ; attempt++ {
+		a, created, e := s.prepareLaunch(work, r, false)
+		var coded interface{ Code() int }
+		if e == nil || attempt >= 2 || !errors.As(e, &coded) || (coded.Code()&255 != 5 && coded.Code()&255 != 6) {
+			return a, created, e
+		}
+		// A bounded storage retry reuses the same request and prepared copy.
+		// No provider has been launched by prepareLaunch.
+		time.Sleep(time.Duration(attempt+1) * 25 * time.Millisecond)
+	}
 }
 
 func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, bool, error) {
@@ -807,6 +818,13 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	recovery := recoveryForLaunch(r, previous)
 	a = Agent{Preflight: &preflight, PreconditionEvidence: r.PreconditionEvidence, Mode: r.Mode, ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, Recovery: recovery, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
 	a.Workflow = &workflow
+	if w.Planning != nil && w.Planning.Repository != nil && r.Role == "worker" && r.Mode == "" {
+		a.DeliveryVersion = 1
+		a.Prompt += managedDeliveryInstructions(t, a.Attempt)
+		if len(a.Prompt) > 128000 {
+			return Agent{}, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+		}
+	}
 	if r.Mode == "terminal" {
 		if len(s.terminalSocket(a.ID)) >= 108 {
 			return a, false, fmt.Errorf("Chemin du terminal trop long ; utiliser une racine de projet plus courte.")

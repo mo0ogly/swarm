@@ -56,6 +56,60 @@ func (s *Store) taskReports(id string) []string {
 	}
 	return out
 }
+
+// Include the preserved report of an incomplete managed result. It is exposed
+// for examination, never promoted to proof of acceptance.
+func (s *Store) taskReportsForWork(work, id string) []string {
+	reports := s.taskReports(id)
+	w, e := s.get(work)
+	if e != nil {
+		return reports
+	}
+	t, e := w.task(id)
+	if e != nil {
+		return reports
+	}
+	if review := t.IndependentReview; review != nil && currentTaskAttempt(t, review.Attempt) && review.Report != "" {
+		if _, e := s.artifactDigest(ExchangeArtifact{Path: review.Report, SHA256: review.Digest}); e == nil {
+			exists := false
+			for _, path := range reports {
+				if path == review.Report {
+					exists = true
+				}
+			}
+			if !exists {
+				reports = append([]string{review.Report}, reports...)
+			}
+		}
+	}
+	agents, e := s.agents(work)
+	if e != nil {
+		return reports
+	}
+	if path := s.incompleteDeliveryReport(&w, t, latestTaskAgent(agents, id)); path != "" {
+		for _, prior := range reports {
+			if prior == path {
+				return reports
+			}
+		}
+		reports = append([]string{path}, reports...)
+	}
+	return reports
+}
+func (s *Store) incompleteDeliveryReport(w *Work, t *Task, a *Agent) string {
+	if a == nil || a.Status != "completed" || !currentTaskAttempt(t, a.Attempt) || t.Status != "blocked" || !strings.HasPrefix(t.Blocker, "Livraison incomplète :") || w.Planning == nil || w.Planning.Repository == nil {
+		return ""
+	}
+	rel, e := filepath.Rel(s.root, filepath.Join(w.Planning.Repository.Storage, "proofs", a.ID, "report.md"))
+	if e != nil {
+		return ""
+	}
+	if _, e = safeReport(s.root, rel); e != nil {
+		return ""
+	}
+	return filepath.ToSlash(rel)
+}
+
 func safeReport(root, path string) (string, error) {
 	p, e := localFile(root, path)
 	if e != nil {

@@ -153,6 +153,13 @@ func (s *Store) webAction(r webRequest) (any, error) {
 	if r.Kind == "launch-preview" {
 		return s.launchEligibility(r), nil
 	}
+	if r.Kind == "resume-launch" {
+		a, created, e := s.resumePreparedLaunch(r.Work, r.Agent, r.Revision)
+		if e == nil && (created || a.Status == "queued") {
+			e = s.spawnAgent(a)
+		}
+		return a, e
+	}
 	if r.Kind == "preflight" {
 		result, _ := s.preflightLaunch(r.Work, Launch{Mode: r.Mode, Level: r.Level, Provider: r.Provider, Workspace: r.Workspace})
 		return result, nil
@@ -452,7 +459,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		validation := s.validationState(&ww).Tasks[id]
-		send(w, map[string]any{"revision": ww.Revision, "task": t, "evidence": validation.Evidence, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
+		send(w, map[string]any{"revision": ww.Revision, "task": t, "evidence": validation.Evidence, "reports": s.taskReportsForWork(work, id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
 	})
 	mux.HandleFunc("/api/v1/report", func(w http.ResponseWriter, r *http.Request) {
 		p, e := safeReport(s.root, r.URL.Query().Get("path"))

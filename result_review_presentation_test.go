@@ -29,6 +29,10 @@ func TestManagedReviewFailurePresentationCLIAndHTTP(t *testing.T) {
 			if r == nil || r.Report == "" {
 				t.Fatal("fixture has no review evidence")
 			}
+			reports := s.taskReportsForWork(w.ID, task.ID)
+			if len(reports) == 0 || reports[0] != r.Report {
+				t.Fatal("reviewed report missing from task actions", reports)
+			}
 			if task.Status != "blocked" || w.Planning.Repository.Candidate != base {
 				t.Fatal("rejected review published")
 			}

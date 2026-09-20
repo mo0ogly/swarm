@@ -249,6 +249,46 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, p)
 	case "agent":
 		switch arg(1) {
+		case "prepared":
+			w, e := s.get(arg(2))
+			if e != nil {
+				return e
+			}
+			pending := []*PreparedLaunch{}
+			for i := range w.Tasks {
+				p, e := s.preparedLaunchForTask(w, &w.Tasks[i])
+				if e != nil {
+					return e
+				}
+				if p != nil {
+					pending = append(pending, p)
+				}
+			}
+			return printJSON(out, map[string]any{"revision": w.Revision, "preparations": pending})
+		case "resume-launch":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var r struct {
+				Schema   int    `json:"schema_version"`
+				ID       string `json:"prepared_id"`
+				Revision int    `json:"expected_revision"`
+			}
+			if e = strict(b, &r); e != nil {
+				return e
+			}
+			if r.Schema != 1 {
+				return fmt.Errorf("schema_version doit valoir 1")
+			}
+			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision)
+			if e == nil && (created || a.Status == "queued") {
+				e = s.spawnAgent(a)
+			}
+			if e != nil {
+				return e
+			}
+			return printJSON(out, map[string]any{"agent": a, "created": created})
 		case "preflight":
 			b, e := readInput(input)
 			if e != nil {

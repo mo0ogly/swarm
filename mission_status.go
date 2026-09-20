@@ -369,7 +369,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 			x.State, x.Reason, x.Action, x.Label = "waived", x.Result.Reason, "inspect", "Voir la dérogation"
 		case x.Result.State == "abandoned":
 			x.State, x.Reason, x.Action, x.Label = "abandoned", x.Result.Reason, "inspect", "Voir la décision"
-		case x.Result.State == "review_blocked":
+		case x.Result.State == "review_blocked" || x.Result.State == "delivery_incomplete":
 			x.State, x.Reason, x.Action, x.Label = "intervention", x.Result.Reason, "inspect", "Examiner le résultat"
 		case x.Result.State == "review_in_progress" || x.Result.State == "review_awaiting_publication":
 			d.Review++
@@ -451,6 +451,15 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 					x.State, x.Action, x.Label = "intervention", "prepare", "Autoriser le plan dans Préparer"
 				}
 
+			}
+		}
+		if pending, err := s.preparedLaunchForTask(w, t); err != nil {
+			return d, err
+		} else if pending != nil {
+			x.State, x.Action, x.Label = "intervention", "inspect", "Reprendre le lancement préparé"
+			x.Reason = pending.Reason
+			if x.Reason == "" {
+				x.Reason = "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche."
 			}
 		}
 		x.Understanding = taskUnderstanding(x, d, agents)

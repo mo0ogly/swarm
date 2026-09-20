@@ -12,6 +12,8 @@ import (
 )
 
 type taskDialog struct {
+	prepared               *PreparedLaunch
+	preparedRevision       int
 	scope                  string
 	fields                 []string
 	decisions              []Decision
@@ -176,12 +178,20 @@ func menuActions(d *taskDialog) []actionItem {
 		}
 		items[i] = it
 	}
+	if resume, ok := oracle["resume-launch"]; ok {
+		items[0] = actionItem{label: resume.Label, enabled: resume.Disponible, raison: resume.Raison}
+	}
 	return items
 }
 
 // advisedActionRow choisit la ligne présélectionnée : l'action conseillée par
 // l'oracle, sinon la revue pour une tentative terminée, sinon le début.
 func advisedActionRow(oracle []TaskAction, completed bool) int {
+	for _, a := range oracle {
+		if a.Kind == "resume-launch" && a.Conseillee {
+			return 0
+		}
+	}
 	for i, kind := range actionsOracle {
 		if kind == "" {
 			continue
@@ -250,6 +260,21 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 		d.message = ""
 		switch d.row {
 		case 0:
+			for _, option := range d.actionsCache {
+				if option.Kind == "resume-launch" {
+					if !option.Disponible {
+						d.message = option.Raison
+						return
+					}
+					w, e := s.get(work)
+					if e != nil {
+						d.message = e.Error()
+						return
+					}
+					d.prepared, d.preparedRevision, d.mode, d.row = option.Prepared, w.Revision, "resume-launch", 0
+					return
+				}
+			}
 			if d.agent != nil && activeAgent(*d.agent) {
 				d.message = "Agent actif : arrêter puis attendre sa fin avant un nouveau départ."
 				return
@@ -311,7 +336,7 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 				d.message = "Attendre la fin de l’agent avant de soumettre."
 				return
 			}
-			d.reports = s.taskReports(d.task.ID)
+			d.reports = s.taskReportsForWork(work, d.task.ID)
 			d.reportIndex = 0
 			if len(d.reports) > 0 {
 				d.reportPath = d.reports[0]
@@ -323,7 +348,7 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			d.row = 0
 			d.review = s.reviewText(work, d)
 		case 10:
-			d.reports = s.taskReports(d.task.ID)
+			d.reports = s.taskReportsForWork(work, d.task.ID)
 			d.reportIndex = 0
 			d.row = 0
 			d.mode = "report"
@@ -590,6 +615,31 @@ func (s *Store) dialogKey(work string, c *consoleState, key string) {
 			}
 			c.dialog = nil
 			c.message = "Tâche rouverte : Entrée puis Lancer pour une nouvelle tentative."
+		}
+	case "resume-launch":
+		if key == "tab" || key == "up" || key == "down" {
+			d.row = 1 - d.row
+		}
+		if key == "enter" {
+			if d.row == 1 {
+				c.dialog = nil
+				c.message = "Action annulée : aucun changement."
+				return
+			}
+			if d.prepared == nil {
+				d.message = "Préparation inconnue : actualiser la tâche."
+				return
+			}
+			a, created, e := s.resumePreparedLaunch(work, d.prepared.ID, d.preparedRevision)
+			if e == nil && (created || a.Status == "queued") {
+				e = s.spawnAgent(a)
+			}
+			if e != nil {
+				d.message = e.Error()
+				return
+			}
+			c.dialog = nil
+			c.message = "Lancement repris avec la copie conservée ; démarrage du fournisseur à confirmer."
 		}
 	case "stop", "reconcile":
 		if key == "tab" || key == "up" || key == "down" {

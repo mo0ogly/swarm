@@ -29,6 +29,8 @@ swarm validation preview|apply <travail> --task <tâche> --input politique.json
 swarm profile <travail> [tâche] [--input profil.json]
 swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
+swarm agent prepared <travail>
+swarm agent resume-launch <travail> --input reprise.json
 swarm agent preflight <travail> --input lancement.json
 swarm agent list <travail>
 swarm agent show|stop|reconcile <agent>

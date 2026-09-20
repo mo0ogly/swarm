@@ -195,8 +195,8 @@ const PilotInspector={
    }
   }else{
    section.append(node('p',t.status==='blocked'?(t.blocker||tr_web_pilot_inspector_js('La tentative est arrêtée. Vous pouvez préparer une nouvelle exécution.')):tr_web_pilot_inspector_js('Choisissez une exécution pour cette tâche.')));
-   if(!add('extend-attempt',tr_web_pilot_inspector_js('Autoriser une tentative supplémentaire'),true)&&!add('retry',tr_web_pilot_inspector_js('Relancer cette tâche'),true))add('start',tr_web_pilot_inspector_js('Lancer cette tâche'),true);
-   const refusal=options.find(x=>x.kind==='retry'&&!x.disponible)||options.find(x=>x.kind==='start'&&!x.disponible);
+   if(!add('resume-launch',tr_web_pilot_inspector_js('Reprendre le lancement préparé'),true)&&!add('extend-attempt',tr_web_pilot_inspector_js('Autoriser une tentative supplémentaire'),true)&&!add('retry',tr_web_pilot_inspector_js('Relancer cette tâche'),true))add('start',tr_web_pilot_inspector_js('Lancer cette tâche'),true);
+   const refusal=options.find(x=>x.kind==='resume-launch'&&!x.disponible)||options.find(x=>x.kind==='retry'&&!x.disponible)||options.find(x=>x.kind==='start'&&!x.disponible);
    if(!section.querySelector('button')&&refusal?.raison)section.append(node('p',refusal.raison,'notice attention'));
   }
   const refreshButton=this.action(tr_web_pilot_inspector_js('Actualiser l’état'),async()=>{refreshButton.disabled=true;try{await refresh(true)}catch(e){notice(e.message,true)}finally{if(refreshButton.isConnected)refreshButton.disabled=false}},'recovery:refresh');section.append(refreshButton);

@@ -7,6 +7,8 @@ installés et authentifiés dans l’environnement où Swarm les exécute.
 
 Les captures illustrent des données de démonstration, sans agents réels en cours.
 
+Pour une copie déjà préparée ou une livraison incomplète : [reprise et contrôles du moteur](docs/ENGINE-RECOVERY.md).
+
 ## Choisir la langue
 
 Le sélecteur **Langue** propose Français et English dans le cockpit, la préparation

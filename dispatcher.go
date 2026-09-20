@@ -370,6 +370,16 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 		if e != nil {
 			return done, e
 		}
+		if task, err := current.task(d.TaskID); err == nil {
+			pending, err := s.preparedLaunchForTask(current, task)
+			if err != nil {
+				return done, err
+			}
+			if pending != nil {
+				_ = s.dispatchEvent(work, "Lancements préparés conservés ; confirmer leur reprise depuis les tâches signalées.")
+				continue
+			}
+		}
 		p := d.Profile
 		if task, err := current.task(d.TaskID); err == nil && task.Profile == nil {
 			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next + "\nConsignes communes : " + p.Instruction

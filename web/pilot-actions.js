@@ -3,6 +3,16 @@ const tr_web_pilot_actions_js = source => globalThis.SwarmI18n?.t(source) ?? sou
 
 const PilotActions={
  requests:new Map(),inflight:new Map(),
+ preparedFields(d){
+  const p=(d.actions||[]).find(a=>a.kind==='resume-launch')?.prepared_launch;
+  if(!p){$('confirm').disabled=true;return}
+  modalContext.prepared=p;
+  $('modal-description').textContent=tr_web_pilot_actions_js('Le lancement a été préparé, puis interrompu avant la création de l’agent. Reprendre conserve la copie et les réglages ; les conditions seront vérifiées à nouveau.');
+  const box=node('section',undefined,'notice info field-wide');box.id='prepared-launch-summary';
+  box.append(node('p',tr_web_pilot_actions_js('Fournisseur')+' : '+p.provider),node('p',tr_web_pilot_actions_js('Espace de travail')+' : '+p.workspace),node('p',tr_web_pilot_actions_js('Consigne pour l’agent')+' : '+p.instruction));
+  box.append(node('p',tr_web_pilot_actions_js('Durée maximale : ')+(p.timeout_seconds||1800)+' s'),node('p',tr_web_pilot_actions_js('Les plafonds de tentatives et d’outils sont conservés. Aucun résultat n’est validé par cette reprise.')));
+  $('modal-fields').append(box);$('confirm').textContent=tr_web_pilot_actions_js('Reprendre le lancement préparé');
+ },
  extensionFields(d){
   const t=d.task,limit=t.plan_max_attempts,toolCaps=[t.plan_tool_limit,t.launch_profile?.limits?.max_tool_calls||snapshot.work.launch_profile?.limits?.max_tool_calls].filter(n=>n>0),tools=toolCaps.length?Math.min(...toolCaps):0;
   $('modal-title').textContent=tr_web_pilot_actions_js('Autoriser une tentative supplémentaire')+' — '+t.title;
@@ -39,7 +49,7 @@ const PilotActions={
   this.inflight.set(signature,request);return request;
  },
  outcome(action){
-  return {stop:tr_web_pilot_actions_js('Arrêt demandé — confirmation du superviseur attendue.'),start:tr_web_pilot_actions_js('Tentative créée — démarrage du fournisseur à confirmer.'),retry:tr_web_pilot_actions_js('Nouvelle tentative créée — démarrage à confirmer.'),submit:tr_web_pilot_actions_js('Rapport soumis pour examen ; tâche non acceptée.'),accepted:tr_web_pilot_actions_js('Acceptation enregistrée après revue.'),decision:tr_web_pilot_actions_js('Décision enregistrée ; l’état du processus reste distinct.'),reconcile:tr_web_pilot_actions_js('Réconciliation effectuée ; consulter le nouvel état.')}[action]||tr_web_pilot_actions_js('Action enregistrée. Le nouvel état est consultable dans le détail.');
+  return {'resume-launch':tr_web_pilot_actions_js('Lancement repris avec la copie conservée ; démarrage du fournisseur à confirmer.'),stop:tr_web_pilot_actions_js('Arrêt demandé — confirmation du superviseur attendue.'),start:tr_web_pilot_actions_js('Tentative créée — démarrage du fournisseur à confirmer.'),retry:tr_web_pilot_actions_js('Nouvelle tentative créée — démarrage à confirmer.'),submit:tr_web_pilot_actions_js('Rapport soumis pour examen ; tâche non acceptée.'),accepted:tr_web_pilot_actions_js('Acceptation enregistrée après revue.'),decision:tr_web_pilot_actions_js('Décision enregistrée ; l’état du processus reste distinct.'),reconcile:tr_web_pilot_actions_js('Réconciliation effectuée ; consulter le nouvel état.')}[action]||tr_web_pilot_actions_js('Action enregistrée. Le nouvel état est consultable dans le détail.');
  },
  addPreview(){
   if(modalContext?.action!=='start')return;

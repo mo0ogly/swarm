@@ -150,6 +150,15 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 		p.NextStep = "Examiner le motif, les traces et le rapport éventuel avant de décider d’une reprise."
 		return p
 	}
+	if a != nil && a.Status == "completed" && t.Status == "blocked" && strings.HasPrefix(t.Blocker, "Livraison incomplète :") {
+		p.State, p.Label, p.ValidationState = "delivery_incomplete", "Résultat à compléter", "not_validated"
+		p.Reason = t.Blocker
+		p.NextStep = "Le responsable doit examiner les critères manquants et préparer une correction dans les limites autorisées."
+		if report := s.incompleteDeliveryReport(w, t, a); report != "" {
+			p.ReportID, p.ReportState = report, "partial_possible"
+		}
+		return p
+	}
 	if a != nil && a.Status == "completed" && s.managedReviewPresentation(w, t, a, &p) {
 		return p
 	}

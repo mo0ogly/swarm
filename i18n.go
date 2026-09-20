@@ -64,32 +64,39 @@ var uiFormat = regexp.MustCompile(`%(?:\.\d+)?[dsfqwv]`)
 var uiMessages = func() []struct {
 	pattern *regexp.Regexp
 	target  string
-} { keys := make([]string, 0); for source, target := range englishUI {
-	if source != target && uiFormat.MatchString(source) {
-		keys = append(keys, source)
+} {
+	keys := make([]string, 0)
+	for source, target := range englishUI {
+		if source != target && uiFormat.MatchString(source) {
+			keys = append(keys, source)
+		}
 	}
-}; sort.Slice(keys, func(i, j int) bool {
-	if len(keys[i]) == len(keys[j]) {
-		return keys[i] < keys[j]
-	}
-	return len(keys[i]) > len(keys[j])
-}); result := []struct {
-	pattern *regexp.Regexp
-	target  string
-}{}; for _, source := range keys {
-	positions := uiFormat.FindAllStringIndex(source, -1)
-	expression := "(?s)^"
-	last := 0
-	for _, pos := range positions {
-		expression += regexp.QuoteMeta(source[last:pos[0]]) + "(.*?)"
-		last = pos[1]
-	}
-	expression += regexp.QuoteMeta(source[last:]) + "$"
-	result = append(result, struct {
+	sort.Slice(keys, func(i, j int) bool {
+		if len(keys[i]) == len(keys[j]) {
+			return keys[i] < keys[j]
+		}
+		return len(keys[i]) > len(keys[j])
+	})
+	result := []struct {
 		pattern *regexp.Regexp
 		target  string
-	}{regexp.MustCompile(expression), englishUI[source]})
-}; return result }()
+	}{}
+	for _, source := range keys {
+		positions := uiFormat.FindAllStringIndex(source, -1)
+		expression := "(?s)^"
+		last := 0
+		for _, pos := range positions {
+			expression += regexp.QuoteMeta(source[last:pos[0]]) + "(.*?)"
+			last = pos[1]
+		}
+		expression += regexp.QuoteMeta(source[last:]) + "$"
+		result = append(result, struct {
+			pattern *regexp.Regexp
+			target  string
+		}{regexp.MustCompile(expression), englishUI[source]})
+	}
+	return result
+}()
 
 func uiEngineText(source string) string {
 	if os.Getenv("SWARM_LANG") != "en" {
@@ -100,6 +107,12 @@ func uiEngineText(source string) string {
 	}
 	if len(source) > 10000 {
 		return source
+	}
+	const deliveryStart = "Livraison incomplète : "
+	const deliveryEnd = ". Aucun appel de revue lancé ; le responsable doit examiner les éléments manquants avant une reprise autorisée."
+	if strings.HasPrefix(source, deliveryStart) && strings.HasSuffix(source, deliveryEnd) {
+		reason := strings.TrimSuffix(strings.TrimPrefix(source, deliveryStart), deliveryEnd)
+		return uiText(deliveryStart) + uiEngineText(reason) + uiText(deliveryEnd)
 	}
 	for _, message := range uiMessages {
 		if captures := message.pattern.FindStringSubmatch(source); captures != nil {

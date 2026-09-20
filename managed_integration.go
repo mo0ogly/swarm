@@ -106,10 +106,6 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		}
 		report = []byte(committed)
 	}
-	candidate, results, err := s.preparedManagedCandidate(w, t, a, item, repo)
-	if err != nil {
-		return s.managedFailure(a, err.Error())
-	}
 	proofDir := filepath.Join(repo.Storage, "proofs", a.ID)
 	if err = os.MkdirAll(proofDir, 0700); err != nil {
 		return err
@@ -117,6 +113,13 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	relReport, _ := filepath.Rel(s.root, filepath.Join(proofDir, "report.md"))
 	if err = atomicWrite(filepath.Join(s.root, relReport), report); err != nil {
 		return err
+	}
+	if _, e := s.managedDelivery(w, t, a, item.Result); e != nil {
+		return s.managedFailure(a, e.Error())
+	}
+	candidate, results, err := s.preparedManagedCandidate(w, t, a, item, repo)
+	if err != nil {
+		return s.managedFailure(a, err.Error())
 	}
 	receipt := map[string]any{"agent_id": a.ID, "attempt_id": a.Attempt, "base_commit": item.Base, "previous_candidate": repo.Candidate, "candidate_commit": candidate, "controls": results, "controller": validationController}
 	raw, _ := json.MarshalIndent(receipt, "", "  ")
@@ -178,10 +181,12 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 				attempt = target.Attempts[len(target.Attempts)-1].ID
 			}
 			producer := a.ID
+			deliveryVersion := a.DeliveryVersion
 			if id != a.TaskID && target.AutoValidation != nil {
 				producer = target.AutoValidation.Producer
+				deliveryVersion = target.AutoValidation.DeliveryVersion
 			}
-			target.AutoValidation = &AutomaticValidation{Attempt: attempt, CandidateSHA: candidate, Producer: producer, Controller: validationController, PolicyDigest: validationPolicyDigest(*target.ValidationPolicy), Policy: *target.ValidationPolicy, Artifacts: artifacts, Controls: controls, Receipt: filepath.ToSlash(relReceipt), State: "accepted", Reason: "Révision intégrée vérifiée : " + candidate, At: now()}
+			target.AutoValidation = &AutomaticValidation{DeliveryVersion: deliveryVersion, Attempt: attempt, CandidateSHA: candidate, Producer: producer, Controller: validationController, PolicyDigest: validationPolicyDigest(*target.ValidationPolicy), Policy: *target.ValidationPolicy, Artifacts: artifacts, Controls: controls, Receipt: filepath.ToSlash(relReceipt), State: "accepted", Reason: "Révision intégrée vérifiée : " + candidate, At: now()}
 			if review, ok := reviews[id]; ok {
 				target.IndependentReview = &review
 			}

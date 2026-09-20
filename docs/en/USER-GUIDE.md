@@ -6,6 +6,8 @@ Swarm lets you prepare, organize and follow an agent team without using an
 external Codex conversation to manage it. Agent programs must still be installed,
 authenticated and configured in the environment where Swarm runs them.
 
+For a prepared copy or incomplete delivery: [engine recovery and completeness checks](ENGINE-RECOVERY.md).
+
 ## Language
 
 Choose **English** in the **Language** selector in the cockpit, preparation page

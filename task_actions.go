@@ -17,12 +17,25 @@ type TaskField struct {
 // TaskAction décrit une action proposée sur une tâche : disponibilité, motif
 // d'indisponibilité, statut conseillé pour l'état courant et champs attendus.
 type TaskAction struct {
-	Kind       string      `json:"kind"`
-	Label      string      `json:"label"`
-	Disponible bool        `json:"disponible"`
-	Raison     string      `json:"raison,omitempty"`
-	Conseillee bool        `json:"conseillee,omitempty"`
-	Champs     []TaskField `json:"champs,omitempty"`
+	Prepared   *PreparedLaunch `json:"prepared_launch,omitempty"`
+	Kind       string          `json:"kind"`
+	Label      string          `json:"label"`
+	Disponible bool            `json:"disponible"`
+	Raison     string          `json:"raison,omitempty"`
+	Conseillee bool            `json:"conseillee,omitempty"`
+	Champs     []TaskField     `json:"champs,omitempty"`
+}
+
+type PreparedLaunch struct {
+	ID          string     `json:"id"`
+	Task        string     `json:"task"`
+	Ready       bool       `json:"ready"`
+	Reason      string     `json:"reason,omitempty"`
+	Provider    string     `json:"provider,omitempty"`
+	Workspace   string     `json:"workspace,omitempty"`
+	Instruction string     `json:"instruction,omitempty"`
+	Timeout     int        `json:"timeout_seconds,omitempty"`
+	Limits      *RunLimits `json:"limits,omitempty"`
 }
 
 func champ(name, label, aide string, requis bool) TaskField {
@@ -211,6 +224,23 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	}
 
 	conseillee := conseilleePour(t.Status, acceptedFresh, taskActive, len(gates) > 0)
+	if !taskActive {
+		if pending, e := s.preparedLaunchForTask(*w, t); e == nil && pending != nil {
+			resume := action("resume-launch", "Reprendre le lancement préparé", pending.Ready && canStart, pending.Reason)
+			resume.Prepared = pending
+			if resume.Raison == "" && !canStart {
+				resume.Raison = s.startBlockReason(w, t)
+			}
+			actions = append(actions, resume)
+			for i := range actions {
+				if actions[i].Kind == "start" || actions[i].Kind == "retry" {
+					actions[i].Disponible = false
+					actions[i].Raison = "Un lancement est déjà préparé. Reprendre cette opération conserve sa copie et évite un doublon."
+				}
+			}
+			conseillee = "resume-launch"
+		}
+	}
 	if t.Status == "blocked" && attemptExtensionReason(t, agents) == "" {
 		conseillee = "extend-attempt"
 	}
