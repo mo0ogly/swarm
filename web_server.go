@@ -467,9 +467,9 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			fail(w, e)
 			return
 		}
-		// Only project documentation is readable through this endpoint.
-		rel, err := filepath.Rel(filepath.Join(s.root, "docs"), p)
-		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		// Managed reports live outside docs. Read only the report attributed to
+		// the selected task, never arbitrary files from the private runtime.
+		if !s.readableTaskReport(r.URL.Query().Get("work"), r.URL.Query().Get("task"), p) {
 			http.Error(w, "Rapport hors documentation", 403)
 			return
 		}

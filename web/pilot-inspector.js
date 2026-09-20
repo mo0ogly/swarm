@@ -130,7 +130,8 @@ const PilotInspector={
   const technical=node('details',undefined,'pilot-section');technical.append(node('summary',tr_web_pilot_inspector_js('Identifiants et détails techniques')));
   for(const [name,value]of [[tr_web_pilot_inspector_js('Tâche'),t?.id],[tr_web_pilot_inspector_js('Session agent'),a?.id],[tr_web_pilot_inspector_js('Tentative métier'),a?.attempt_id],[tr_web_pilot_inspector_js('Espace de travail'),a?.workspace],[tr_web_pilot_inspector_js('Livrable attendu'),t?.deliverable]])if(value)technical.append(node('p',name+' : '+value));
   body.append(technical);
-  if(focusKey)[...body.querySelectorAll('[data-inspector-action]')].find(n=>n.dataset.inspectorAction===focusKey)?.focus();
+  if(open)panel.scrollTop=0;
+  else if(focusKey)[...body.querySelectorAll('[data-inspector-action]')].find(n=>n.dataset.inspectorAction===focusKey)?.focus({preventScroll:true});
  },
  activityExplanation(a,h,uncertain=''){
   const progress=a.progress||{},detail=progress.detail||'',action=progress.action||'';
@@ -249,13 +250,13 @@ const PilotInspector={
  },
  async readReport(path,taskID){
   const selected=JSON.stringify(Pilot.state.selection),requested=work;
+  const selection=Pilot.state.selection;
+  taskID=taskID||(selection?.kind==='task'?selection.id:selection?.kind==='agent'?snapshot.agents.find(x=>x.agent.id===selection.id)?.agent.task_id:snapshot.decisions.find(x=>x.id===selection?.id)?.task_id);
   try{
-   const data=await api('/api/v1/report?'+new URLSearchParams({path}));
+   const data=await api('/api/v1/report?'+new URLSearchParams({path,work:requested,task:taskID||''}));
    if(work!==requested||JSON.stringify(Pilot.state.selection)!==selected)return;
    openModal(tr_web_pilot_inspector_js('Conclusions du rapport'),tr_web_pilot_inspector_js('Lisez les constats, les preuves et les limites avant de décider.'),{action:'help'});
    $('confirm').hidden=true;$('cancel').textContent=tr_web_pilot_inspector_js('Fermer le rapport');preview(data.text);
-   const selection=Pilot.state.selection;
-   taskID=taskID||(selection?.kind==='task'?selection.id:selection?.kind==='agent'?snapshot.agents.find(x=>x.agent.id===selection.id)?.agent.task_id:snapshot.decisions.find(x=>x.id===selection?.id)?.task_id);
    if(taskID){mountReportSummary(path,taskID);const task=snapshot.work.tasks.find(t=>t.id===taskID);if(task?.status==='submitted')$('modal-fields').append(this.reviewControls(task,null,false))}
   }catch(e){if(work!==requested||JSON.stringify(Pilot.state.selection)!==selected)return;const host=$('pilot-reports');host?.querySelector('.pilot-report-error')?.remove();const error=node('p',tr_web_pilot_inspector_js('Rapport inaccessible. Le fichier a pu être déplacé, supprimé ou son accès interrompu. Vérifiez sa disponibilité puis réessayez.'),'notice alert pilot-report-error');error.setAttribute('role','alert');host?.append(error);notice(error.textContent,true)}
  }

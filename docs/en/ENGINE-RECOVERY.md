@@ -82,6 +82,12 @@ The copy and report remain available, the published candidate stays unchanged,
 and no reviewer call is charged. The responsible planner receives an integration
 failure event with the reason. Corrections remain within authorized attempt limits.
 
+The task inspector's reports section opens the retained report, including after
+a rejected review. The interactive CLI exposes the same report through its read
+action. For internal files, the web reader requires attribution to the selected
+work and task; it cannot read arbitrary engine files. A reviewed report changed
+since recording is not presented as current evidence.
+
 A complete manifest allows authorized checks and independent review to proceed.
 It never accepts a task. The reviewer receives the candidate, engine receipts,
 report, available sources and declaration. Review instructions distinguish a

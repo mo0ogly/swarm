@@ -97,6 +97,13 @@ La copie et le rapport sont conservés, le candidat publié reste inchangé, et 
 appel de revue n’est consommé. Le responsable reçoit un événement d’intégration
 refusée avec son motif. Toute correction reste soumise aux tentatives autorisées.
 
+Dans le détail de la tâche, **Rapports et preuves de la tâche** permet d’ouvrir
+le rapport conservé, y compris après une revue refusée. Le CLI interactif propose
+le même rapport par l’action de lecture. Le lecteur web exige l’attribution au
+travail et à la tâche pour les fichiers internes ; il ne donne pas accès aux autres
+fichiers du moteur. Un rapport de revue modifié depuis son enregistrement n’est
+pas présenté comme la preuve courante.
+
 Un bilan complet autorise la suite des contrôles ; il n’accepte jamais la tâche.
 Le moteur exécute les commandes autorisées, puis transmet au vérificateur le
 candidat, les reçus, le rapport, les sources disponibles et le bilan. Le vérificateur

@@ -40,7 +40,15 @@ func TestManagedRecoveryBrowserRecipe(t *testing.T) {
 import os,sys,json
 if '--version' in sys.argv:
  print('fixture 1.0');sys.exit(0)
-sys.stdin.read()
+text=sys.stdin.read()
+if '--json-schema' in sys.argv:
+ schema=json.loads(sys.argv[sys.argv.index('--json-schema')+1])['properties']
+ assert 'Rapport nouveau second' in text
+ reply={'version':1,'template_id':schema['template_id']['enum'][0],'context_hash':schema['context_hash']['enum'][0],
+        'facts':[{'text':'Rapport de recette conservé','source_ids':[schema['facts']['items']['properties']['source_ids']['items']['enum'][-1]]}],
+        'interpretation':'Le rapport de recette est conservé.\nLe résultat reste à compléter et non validé.',
+        'missing_information':[],'next_steps':[],'limitations':['Réponse déterministe de recette.'],'questions':[]}
+ print(json.dumps({'type':'result','result':json.dumps(reply)}));sys.exit(0)
 with open(os.path.join(os.path.dirname(__file__),'worker-starts'),'a') as f:f.write('start\n')
 print(json.dumps({'type':'result','result':'Fixture run finished without a delivery; not accepted.'}))
 `

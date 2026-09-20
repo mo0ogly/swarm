@@ -61,6 +61,24 @@ func (s *Store) taskReports(id string) []string {
 // for examination, never promoted to proof of acceptance.
 func (s *Store) taskReportsForWork(work, id string) []string {
 	reports := s.taskReports(id)
+	for _, report := range s.attributedTaskReports(work, id) {
+		found := false
+		for _, path := range reports {
+			if path == report {
+				found = true
+			}
+		}
+		if !found {
+			reports = append([]string{report}, reports...)
+		}
+	}
+	return reports
+}
+
+// Only engine-attributed artifacts can extend the HTTP documentation boundary.
+// Filename discovery under docs must never authorize a symlink into runtime data.
+func (s *Store) attributedTaskReports(work, id string) []string {
+	reports := []string{}
 	w, e := s.get(work)
 	if e != nil {
 		return reports
@@ -96,6 +114,20 @@ func (s *Store) taskReportsForWork(work, id string) []string {
 	}
 	return reports
 }
+
+func (s *Store) readableTaskReport(work, id, path string) bool {
+	rel, err := filepath.Rel(filepath.Join(s.root, "docs"), path)
+	if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return true
+	}
+	for _, report := range s.attributedTaskReports(work, id) {
+		if attributed, err := safeReport(s.root, report); err == nil && attributed == path {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *Store) incompleteDeliveryReport(w *Work, t *Task, a *Agent) string {
 	if a == nil || a.Status != "completed" || !currentTaskAttempt(t, a.Attempt) || t.Status != "blocked" || !strings.HasPrefix(t.Blocker, "Livraison incomplète :") || w.Planning == nil || w.Planning.Repository == nil {
 		return ""
