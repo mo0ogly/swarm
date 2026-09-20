@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify a fix"
+  short_description: "Verify the actual web, CLI or API behavior"
+  default_prompt: "Use $verify-fix to reproduce the reported scenario and verify the repaired behavior."

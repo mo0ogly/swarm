@@ -6,6 +6,14 @@
 !locales/en.json
 !contracts/
 !contracts/**
+!.claude/
+!.claude/skills/
+!.claude/skills/**
+!tools/
+!tools/agent-workflows/
+!tools/agent-workflows/CONTRACT.md
+!tools/agent-workflows/templates/
+!tools/agent-workflows/templates/*.md
 !web/
 !web/**
 !deploy/

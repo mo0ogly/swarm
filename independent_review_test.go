@@ -43,7 +43,7 @@ func TestIndependentReviewProcessPersistsAndBlocksStaleEvidence(t *testing.T) {
 	provider := ps.Providers[w.Planning.Reviewer.Provider]
 	response := `{"reason":"La preuve textuelle attendue est présente","criteria":[{"index":1,"verdict":"pass","evidence":"preuve observée"}]}`
 	env, _ := json.Marshal(map[string]any{"type": "result", "result": response})
-	if e := os.WriteFile(provider.Command, []byte("#!/bin/sh\ncat >/dev/null\nprintf '%s\\n' '"+string(env)+"'\n"), 0700); e != nil {
+	if e := os.WriteFile(provider.Command, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf '%s\\n' '"+string(env)+"'\n"), 0700); e != nil {
 		t.Fatal(e)
 	}
 	if real := os.Getenv("SWARM_TEST_REVIEW_REAL"); real != "" {
@@ -76,6 +76,13 @@ func TestIndependentReviewProcessPersistsAndBlocksStaleEvidence(t *testing.T) {
 	gt, _ := got.task(task.ID)
 	if gt.IndependentReview == nil || gt.IndependentReview.State != "passed" || gt.Status != "submitted" || gt.IndependentReview.Reviewer == a.ID {
 		t.Fatalf("review not independent or accepted implicitly: %+v", gt.IndependentReview)
+	}
+	if os.Getenv("SWARM_TEST_REVIEW_REAL") == "" {
+		observed, err := os.ReadFile(provider.Command + ".prompt")
+		if err != nil {
+			t.Fatal(err)
+		}
+		assertWorkflowDelivery(t, string(observed), "reviewer", gt.IndependentReview.Workflow)
 	}
 	if e := s.independentReviewGuard(&got, gt); e != nil {
 		t.Fatal(e)

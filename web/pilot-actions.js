@@ -3,6 +3,31 @@ const tr_web_pilot_actions_js = source => globalThis.SwarmI18n?.t(source) ?? sou
 
 const PilotActions={
  requests:new Map(),inflight:new Map(),
+ extensionFields(d){
+  const t=d.task,limit=t.plan_max_attempts,toolCaps=[t.plan_tool_limit,t.launch_profile?.limits?.max_tool_calls||snapshot.work.launch_profile?.limits?.max_tool_calls].filter(n=>n>0),tools=toolCaps.length?Math.min(...toolCaps):0;
+  $('modal-title').textContent=tr_web_pilot_actions_js('Autoriser une tentative supplémentaire')+' — '+t.title;
+  $('modal-description').textContent=tr_web_pilot_actions_js('Le plafond est atteint. Vous pouvez ajouter une seule tentative après avoir précisé ce qui sera corrigé.');
+  const summary=node('section',undefined,'notice attention field-wide');summary.id='attempt-extension-summary';
+  summary.append(node('p',tr_web_pilot_actions_js('Tentatives consommées : ')+t.attempts.length+' / '+limit+' → '+(limit+1)),node('p',tr_web_pilot_actions_js('Limite d’outils conservée : ')+(tools||tr_web_pilot_actions_js('voir les limites du profil au lancement'))),node('p',tr_web_pilot_actions_js('Historique, rapports et avis conservés. La tâche reste non validée. Les contrôles et la revue indépendante restent obligatoires selon sa politique.')));
+  $('modal-fields').append(summary);
+  const reason=field('reason',tr_web_pilot_actions_js('Pourquoi autoriser cette reprise ?'),'',null,true);reason.required=true;reason.minLength=8;reason.maxLength=2000;
+  const correction=field('recovery_instruction',tr_web_pilot_actions_js('Ce que l’agent doit corriger avant de refaire les contrôles'),'',null,true,tr_web_pilot_actions_js('Décrivez la correction ou la précondition vérifiée. Cette consigne remplace la prochaine action ; les critères de réussite restent inchangés.'));correction.required=true;correction.minLength=20;correction.maxLength=16000;
+  $('confirm').textContent=tr_web_pilot_actions_js('Autoriser et préparer la reprise');
+  preview(tr_web_pilot_actions_js('Cette confirmation ajoute une tentative au plafond. Elle ne lance aucun agent. Le formulaire de lancement s’ouvrira ensuite pour vérifier les conditions.'));
+ },
+ async extensionDialog(task){await taskDialog(task);if(modalContext?.task===task&&(modalContext.data.actions||[]).some(a=>a.kind==='extend-attempt'&&a.disponible))taskFields('extend-attempt')},
+ extensionButton(task,scope='priority'){
+  const option=snapshot.task_actions?.[task]?.find(a=>a.kind==='extend-attempt');if(!option)return null;
+  const b=Pilot.command(tr_web_pilot_actions_js('Autoriser une tentative supplémentaire'),()=>this.extensionDialog(task));b.id='attempt-extension-'+scope+'-'+encodeURIComponent(task);b.dataset.missionAction='extend-'+scope+'-'+task;b.dataset.extendAttempt=task;b.disabled=!option.disponible;if(option.raison)b.title=globalThis.SwarmI18n?.engine(option.raison)||option.raison;return b;
+ },
+ async extendAttempt(c,f){
+  c.extensionEvent ||= crypto.randomUUID();
+  await api('/api/v1/planning?'+new URLSearchParams({work:c.workID,action:'extend-attempt'}),{schema_version:1,event_id:c.extensionEvent,expected_revision:c.revision,task_id:c.task,reason:f.reason,recovery_instruction:f.recovery_instruction});
+  if(modalContext!==c||work!==c.workID)return;
+  closeModal();await refresh(true);
+  notice(tr_web_pilot_actions_js('Tentative supplémentaire autorisée. Préparez son lancement ; aucun agent n’a encore été lancé.'));
+  if(work===c.workID)await Pilot.go(c.task);
+ },
  async send(kind,fields){
   const data={kind,work,expected_revision:modalContext?.revision??snapshot.work.revision,...fields};
   const signature=JSON.stringify(data);let event=this.requests.get(signature);

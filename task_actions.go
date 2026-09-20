@@ -174,6 +174,10 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 		action("reopen", "Rouvrir la tâche", reopenRaison == "", reopenRaison),
 		action("assign", "Changer le responsable", true, ""),
 	}
+	if t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts {
+		reason := attemptExtensionReason(t, agents)
+		actions = append(actions, action("extend-attempt", "Autoriser une tentative supplémentaire", reason == "", reason))
+	}
 
 	champs := map[string][]TaskField{
 		"start": {
@@ -207,6 +211,9 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	}
 
 	conseillee := conseilleePour(t.Status, acceptedFresh, taskActive, len(gates) > 0)
+	if t.Status == "blocked" && attemptExtensionReason(t, agents) == "" {
+		conseillee = "extend-attempt"
+	}
 	for i := range actions {
 		actions[i].Conseillee = actions[i].Kind == conseillee && actions[i].Disponible
 		if actions[i].Conseillee {

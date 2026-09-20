@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // ResultPresentation is the single read-time projection used by the CLI and
 // the web UI. It deliberately keeps process exit, report presence and delivery
@@ -147,6 +150,9 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 		p.NextStep = "Examiner le motif, les traces et le rapport éventuel avant de décider d’une reprise."
 		return p
 	}
+	if a != nil && a.Status == "completed" && s.managedReviewPresentation(w, t, a, &p) {
+		return p
+	}
 
 	if t.Status == "submitted" {
 		if a == nil {
@@ -201,8 +207,56 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 	return p
 }
 
+// Managed reports live beside the candidate receipt, not in the host's docs/.
+// Present the current review without authorizing a retry or an acceptance.
+func (s *Store) managedReviewPresentation(w *Work, t *Task, a *Agent, p *ResultPresentation) bool {
+	r := t.IndependentReview
+	if w.Planning == nil || w.Planning.Repository == nil || r == nil || r.CandidateSHA == "" ||
+		!currentTaskAttempt(t, r.Attempt) || r.Attempt != a.Attempt || r.Producer != a.ID {
+		return false
+	}
+	p.ReportID, p.ReceiptID = r.Report, r.Receipt
+	p.ReportState = "submitted"
+	p.State, p.Label, p.ValidationState = "review_blocked", reviewStateLabel(r.State), "review_unvalidated"
+	p.Reason = fmt.Sprintf("Revue indépendante : %s", r.Reason)
+	if r.State == "error" && strings.HasPrefix(r.Reason, "délai du planificateur dépassé") {
+		p.Reason = "Le vérificateur indépendant n’a pas répondu dans le délai imparti."
+	}
+	p.NextStep = "Examiner le rapport et le motif de la revue avant de choisir une correction ou une reprise autorisée."
+	if _, err := s.artifactDigest(ExchangeArtifact{Path: r.Report, SHA256: r.Digest}); err != nil {
+		p.ReportState = "stale"
+		p.ValidationState = "failed_or_stale"
+		p.Label = "Preuves à renouveler"
+		p.Reason = "Le rapport transmis au vérificateur est indisponible ou modifié ; ses preuves doivent être réexaminées."
+		return true
+	}
+	if r.Contract != reviewContract(t) || r.PreviousCandidate != w.Planning.Repository.Candidate {
+		p.ValidationState = "failed_or_stale"
+		p.Label = "Avis périmé"
+		p.Reason = "Le contrat ou la révision de base a changé depuis cette revue."
+		return true
+	}
+	switch r.State {
+	case "stale":
+		p.ValidationState = "failed_or_stale"
+	case "changes_requested":
+		p.ValidationState = "review_changes_requested"
+	case "running":
+		p.State, p.ValidationState = "review_in_progress", "pending_review"
+		p.Reason = "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé."
+		p.NextStep = "Attendre l’avis indépendant ; le résultat n’est pas encore accepté."
+	case "passed":
+		p.State, p.ValidationState = "review_awaiting_publication", "pending_publication"
+		p.Reason = "Un avis favorable est enregistré ; la publication du candidat reste à confirmer par le moteur."
+		p.NextStep = "Attendre la décision du moteur sur les preuves actuelles."
+	}
+	return true
+}
+
 func resultFactLabel(state string) string {
 	labels := map[string]string{
+		"pending_review": "Revue indépendante en cours", "pending_publication": "Publication non confirmée",
+		"review_unvalidated": "Avis indépendant non obtenu", "review_changes_requested": "Avis indépendant défavorable ou incomplet",
 		"not_started": "Pas encore commencé", "absent": "Aucun rapport soumis", "unknown": "Exécution non documentée", "running": "Agent actif", "completed": "Processus terminé", "failed": "Processus en échec", "interrupted": "Processus interrompu", "queued": "Démarrage en attente", "starting": "Démarrage en cours", "stopping": "Arrêt en cours", "submitted": "Rapport soumis, contenu à vérifier", "fresh": "Preuves actuelles", "stale": "Preuves à renouveler", "waived": "Dérogation, contrôles non validés", "abandoned": "Abandonné", "early_unverified": "Rapport détecté, peut-être incomplet", "pending_process": "En attente de la fin du processus", "not_validated": "Non validé", "partial_possible": "Rapport présent, peut-être partiel", "missing_gate": "Contrôles de validation non enregistrés", "failed_or_stale": "Contrôles en échec ou preuves périmées", "ready_for_decision": "Contrôles actuels, décision à enregistrer", "attributable_unsubmitted": "Rapport détecté, à soumettre et vérifier", "absent_or_unattributed": "Rapport absent ou non attribuable",
 	}
 	if label, ok := labels[state]; ok {

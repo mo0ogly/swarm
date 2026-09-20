@@ -232,7 +232,8 @@ func (s *Store) submitReportVerified(work, id, report string, expected int, orig
 						return err
 					}
 					scope.State = "ready"
-					w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: planningEventID("report", id, attempt), Scope: scope.ID, Kind: "handoff", Task: id, Attempt: attempt, Message: "Rapport remis automatiquement après fin normale. Examiner les preuves et limites ; résultat non validé.", Artifacts: []ExchangeArtifact{{Path: report, SHA256: hash(reportBytes)}}, At: now()})
+					ref := ExchangeArtifact{Path: report, SHA256: hash(reportBytes)}
+					w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{Handoff: &ref, ID: planningEventID("report", id, attempt), Scope: scope.ID, Kind: "handoff", Task: id, Attempt: attempt, Message: "Rapport remis automatiquement après fin normale. Examiner les preuves et limites ; résultat non validé.", Artifacts: []ExchangeArtifact{ref}, At: now()})
 				}
 			}
 			t.Status, t.Blocker, t.Next = "submitted", "", r.Next

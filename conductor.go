@@ -29,6 +29,11 @@ func (s *Store) conduct(a Agent, outcome string) {
 	if w, e := s.get(a.WorkID); e == nil && w.Planning != nil && w.Planning.Repository != nil {
 		if outcome == "completed" {
 			if err := s.integrateManagedAttempt(a); err != nil {
+				// Another bounded integration already owns the cross-process
+				// lock. A polling pass must not emit a new failure every time.
+				if strings.Contains(err.Error(), "déjà en cours") {
+					return
+				}
 				_ = s.log(a.ID, "validation", err.Error())
 				if allowed, _ := s.automaticValidationAuthorized(a.WorkID); allowed && commandFailure(err).Code != "revision_conflict" && commandFailure(err).Code != "provider_cooldown" && !strings.Contains(err.Error(), "déjà en cours") && !strings.Contains(err.Error(), "SQLITE_BUSY") {
 					_ = s.managedFailure(a, "Intégration interrompue : "+err.Error())

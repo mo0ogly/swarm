@@ -31,20 +31,23 @@ type PlanningState struct {
 	Inbox                 []PlanningEvent                `json:"inbox"`
 }
 type PlanningScope struct {
-	TaskLimit       int      `json:"max_tasks,omitempty"`
-	ActivationLimit int      `json:"max_activations,omitempty"`
-	Activations     int      `json:"activations"`
-	ID              string   `json:"id"`
-	Parent          string   `json:"parent,omitempty"`
-	Objective       string   `json:"objective"`
-	Requirements    []string `json:"requirements"`
-	Revision        int      `json:"revision"`
-	Generation      int      `json:"generation"`
-	Holder          string   `json:"holder,omitempty"`
-	Until           string   `json:"lease_until,omitempty"`
-	State           string   `json:"state"`
+	Delivery        *PlanningDelivery `json:"delivery,omitempty"`
+	Workflow        *AgentWorkflow    `json:"workflow,omitempty"`
+	TaskLimit       int               `json:"max_tasks,omitempty"`
+	ActivationLimit int               `json:"max_activations,omitempty"`
+	Activations     int               `json:"activations"`
+	ID              string            `json:"id"`
+	Parent          string            `json:"parent,omitempty"`
+	Objective       string            `json:"objective"`
+	Requirements    []string          `json:"requirements"`
+	Revision        int               `json:"revision"`
+	Generation      int               `json:"generation"`
+	Holder          string            `json:"holder,omitempty"`
+	Until           string            `json:"lease_until,omitempty"`
+	State           string            `json:"state"`
 }
 type PlanningEvent struct {
+	Handoff   *ExchangeArtifact  `json:"handoff,omitempty"`
 	ID        string             `json:"id"`
 	Scope     string             `json:"scope"`
 	Kind      string             `json:"kind"`
@@ -68,29 +71,31 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
-	Level          string                         `json:"level,omitempty"`
-	PolicyHash     string                         `json:"model_policy_hash,omitempty"`
-	Checks         map[string][]ValidationControl `json:"checks,omitempty"`
-	Repository     *ManagedRepositoryRequest      `json:"repository,omitempty"`
-	Provider       string                         `json:"provider,omitempty"`
-	MaxActivations int                            `json:"max_activations,omitempty"`
-	Agent          string                         `json:"agent_id,omitempty"`
-	Task           string                         `json:"task_id,omitempty"`
-	Attempt        string                         `json:"attempt_id,omitempty"`
-	Artifacts      []ExchangeArtifact             `json:"artifacts,omitempty"`
-	Schema         int                            `json:"schema_version"`
-	EventID        string                         `json:"event_id"`
-	Revision       int                            `json:"expected_revision"`
-	Scope          string                         `json:"scope,omitempty"`
-	ScopeRevision  int                            `json:"scope_revision,omitempty"`
-	Holder         string                         `json:"holder,omitempty"`
-	Generation     int                            `json:"generation,omitempty"`
-	LeaseSeconds   int                            `json:"lease_seconds,omitempty"`
-	MaxTasks       int                            `json:"max_tasks,omitempty"`
-	MaxDecisions   int                            `json:"max_decisions,omitempty"`
-	Inputs         []string                       `json:"input_events,omitempty"`
-	Operations     []PlanningOperation            `json:"operations,omitempty"`
-	Reason         string                         `json:"reason,omitempty"`
+	RecoveryInstruction  string                         `json:"recovery_instruction,omitempty"`
+	ReviewTimeoutSeconds int                            `json:"review_timeout_seconds,omitempty"`
+	Level                string                         `json:"level,omitempty"`
+	PolicyHash           string                         `json:"model_policy_hash,omitempty"`
+	Checks               map[string][]ValidationControl `json:"checks,omitempty"`
+	Repository           *ManagedRepositoryRequest      `json:"repository,omitempty"`
+	Provider             string                         `json:"provider,omitempty"`
+	MaxActivations       int                            `json:"max_activations,omitempty"`
+	Agent                string                         `json:"agent_id,omitempty"`
+	Task                 string                         `json:"task_id,omitempty"`
+	Attempt              string                         `json:"attempt_id,omitempty"`
+	Artifacts            []ExchangeArtifact             `json:"artifacts,omitempty"`
+	Schema               int                            `json:"schema_version"`
+	EventID              string                         `json:"event_id"`
+	Revision             int                            `json:"expected_revision"`
+	Scope                string                         `json:"scope,omitempty"`
+	ScopeRevision        int                            `json:"scope_revision,omitempty"`
+	Holder               string                         `json:"holder,omitempty"`
+	Generation           int                            `json:"generation,omitempty"`
+	LeaseSeconds         int                            `json:"lease_seconds,omitempty"`
+	MaxTasks             int                            `json:"max_tasks,omitempty"`
+	MaxDecisions         int                            `json:"max_decisions,omitempty"`
+	Inputs               []string                       `json:"input_events,omitempty"`
+	Operations           []PlanningOperation            `json:"operations,omitempty"`
+	Reason               string                         `json:"reason,omitempty"`
 }
 
 func (p *PlanningState) scope(id string) (*PlanningScope, error) {
@@ -114,6 +119,12 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	}
 	if action == "configure-reviewer" {
 		return s.configureReviewer(work, r)
+	}
+	if action == "review-timeout" {
+		return s.setReviewTimeout(work, r)
+	}
+	if action == "extend-attempt" {
+		return s.extendAttempt(work, r)
 	}
 	raw, err := json.Marshal(r)
 	if err != nil {
@@ -390,6 +401,16 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		if err := checkScopeActivation(p, scope.ID); err != nil {
 			return err
 		}
+		workflow, workflowPrompt, err := agentWorkflow(planningWorkflowRole(scope))
+		if err != nil {
+			return err
+		}
+		_, delivery, err := s.planningDeliveryContext(*w, scope.ID, 64000-len(workflowPrompt)-3000)
+		if err != nil {
+			return err
+		}
+		scope.Delivery = &delivery
+		scope.Workflow = &workflow
 		for _, owner := range planningAncestors(p, scope.ID) {
 			owner.Activations++
 		}
@@ -433,6 +454,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 			if !found {
 				return fmt.Errorf("événement absent, déjà traité ou hors périmètre : %s", id)
 			}
+			if scope.Delivery != nil && !containsString(scope.Delivery.Events, id) {
+				return fmt.Errorf("événement non fourni dans cette activation : %s", id)
+			}
 		}
 		scopeID := scope.ID
 		for _, op := range r.Operations {
@@ -441,6 +465,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 			}
 		}
 		scope, _ = p.scope(scopeID) // delegation can reallocate the slice
+		if scope.Delivery != nil {
+			scope.Delivery.Decision = r.EventID
+		}
 		for i := range p.Inbox {
 			if seen[p.Inbox[i].ID] {
 				p.Inbox[i].Decision = r.EventID

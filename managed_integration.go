@@ -191,7 +191,8 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		}
 		current.Planning.Repository.Candidate = candidate
 		scope, _ := current.Planning.scope(task.ScopeID)
-		current.Planning.Inbox = append(current.Planning.Inbox, PlanningEvent{ID: planningEventID(a.ID, "integrated"), Scope: scope.ID, Kind: "integrated", Task: task.ID, Attempt: a.Attempt, Message: guardBlock(string(report), 4000), Artifacts: []ExchangeArtifact{{Path: filepath.ToSlash(relReceipt), SHA256: hash(raw)}}, At: now()})
+		ref := ExchangeArtifact{Path: filepath.ToSlash(relReport), SHA256: hash(report)}
+		current.Planning.Inbox = append(current.Planning.Inbox, PlanningEvent{Handoff: &ref, ID: planningEventID(a.ID, "integrated"), Scope: scope.ID, Kind: "integrated", Task: task.ID, Attempt: a.Attempt, Message: "Résultat intégré ; consulter la remise complète, ses constats, écarts et limites.", Artifacts: []ExchangeArtifact{{Path: filepath.ToSlash(relReceipt), SHA256: hash(raw)}, ref}, At: now()})
 		scope.State = "ready"
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error {

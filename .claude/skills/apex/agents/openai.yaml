@@ -1,0 +1,4 @@
+interface:
+  display_name: "APEX"
+  short_description: "Plan, implement and verify a bounded change"
+  default_prompt: "Use $apex to harden a bounded Swarm behavior and demonstrate its acceptance criteria."

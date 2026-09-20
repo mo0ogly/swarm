@@ -236,6 +236,8 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 **Commencer ici : [Guide utilisateur — du besoin au résultat](GUIDE-UTILISATEUR.md)**
 
 - [Installation Docker et native](INSTALL.md)
+- [Autoriser une reprise et transmettre les sources au vérificateur](docs/ATTEMPT-RECOVERY.md)
+- [Méthodes Codex et Claude : APEX, audit PDCA, revue et recette](docs/AGENT-METHODS.md)
 
 - [Référence technique complète et contrats CLI](REFERENCE.md)
 - [Cockpit : lancement, pilotage et supervision](COCKPIT.md)
@@ -269,3 +271,7 @@ Les captures nécessitent Chrome ou Chromium installé et Python 3 pour le scén
 La restriction commerciale signifie que ce projet n’est pas présenté comme « open source » au sens de la [définition de l’Open Source Initiative](https://opensource.org/osd). Pour un usage commercial non couvert, une autorisation distincte des titulaires des droits est nécessaire.
 
 **Les versions déjà publiées sous Apache 2.0 conservent cette licence.** Le changement ne retire pas les droits accordés sur ces versions. Les bibliothèques tierces conservent également leurs propres licences : voir [les notices](THIRD_PARTY_NOTICES.md) et [les précisions de licence](docs/LICENSING.md).
+## Communication et méthodes
+
+Voir le [cadrage APEX et PDCA des agents](docs/AGENT-METHODS.md) et le
+[circuit des rapports, preuves et décisions](docs/AGENT-COMMUNICATION.md).

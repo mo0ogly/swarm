@@ -369,6 +369,11 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 			x.State, x.Reason, x.Action, x.Label = "waived", x.Result.Reason, "inspect", "Voir la dérogation"
 		case x.Result.State == "abandoned":
 			x.State, x.Reason, x.Action, x.Label = "abandoned", x.Result.Reason, "inspect", "Voir la décision"
+		case x.Result.State == "review_blocked":
+			x.State, x.Reason, x.Action, x.Label = "intervention", x.Result.Reason, "inspect", "Examiner le résultat"
+		case x.Result.State == "review_in_progress" || x.Result.State == "review_awaiting_publication":
+			d.Review++
+			x.State, x.Reason, x.Action, x.Label = "review", x.Result.Reason, "report", "Examiner le résultat"
 		case x.Result.State == "result_to_review" || x.Result.State == "validation_withheld":
 			d.Review++
 			x.State = "review"
@@ -703,6 +708,12 @@ func understanding(what, next, actor, actorKind, situation string) MissionUnders
 }
 
 func taskUnderstanding(t MissionTask, mission MissionStatus, agents []Agent) MissionUnderstanding {
+	if strings.HasPrefix(t.Result.State, "review_") {
+		if t.Result.State == "review_blocked" {
+			return understanding(t.Result.Reason, t.Result.NextStep, "Vous", "user", "blocage")
+		}
+		return understanding(t.Result.Reason, t.Result.NextStep, "Le superviseur", "supervisor", "attente_normale")
+	}
 	switch t.State {
 	case "validated":
 		return understanding(t.Reason, "Aucune action requise ; le résultat reste consultable.", "Personne pour le moment", "none", "termine")
@@ -725,7 +736,10 @@ func taskUnderstanding(t MissionTask, mission MissionStatus, agents []Agent) Mis
 				if agent.TaskID != t.ID {
 					continue
 				}
-				if recoveryCategoryFor(agent) == recoveryEnvironment {
+				// Earlier exploratory tool errors do not replace a completed
+				// process's result or the terminal execution limit.
+				if (agent.Status == "failed" || agent.Status == "interrupted") &&
+					!fallbackAttemptDiagnostic(agent).LimitReached && recoveryCategoryFor(agent) == recoveryEnvironment {
 					return understanding("L’environnement de l’agent refuse l’accès à une ressource. Cette tâche ne sera pas relancée automatiquement.", "Faire vérifier l’accès signalé dans le diagnostic, puis enregistrer une nouvelle vérification avant de reprendre.", "Vous", "user", "blocage")
 				}
 				break

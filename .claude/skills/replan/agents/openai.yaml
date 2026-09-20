@@ -1,0 +1,4 @@
+interface:
+  display_name: "Recover the plan"
+  short_description: "Revise a blocked plan without losing history"
+  default_prompt: "Use $replan to diagnose this blocker and propose a bounded recovery preserving attempts."

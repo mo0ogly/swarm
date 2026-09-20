@@ -205,7 +205,7 @@ func TestPlanningProviderCreatesTaskWithoutHostDecision(t *testing.T) {
 	script := filepath.Join(t.TempDir(), "claude")
 	response := `{"input_events":["enable-test"],"reason":"Le brief demande une preuve","operations":[{"kind":"task","id":"generated","title":"Vérifier","requirements":["req-1"],"deliverable":"proof.txt","criteria":["preuve"],"next":"Vérifier"}]}`
 	envelope, _ := json.Marshal(map[string]any{"type": "result", "result": response})
-	if e := os.WriteFile(script, []byte("#!/bin/sh\ncat >/dev/null\nprintf '%s\\n' '"+string(envelope)+"'\n"), 0700); e != nil {
+	if e := os.WriteFile(script, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf '%s\\n' '"+string(envelope)+"'\n"), 0700); e != nil {
 		t.Fatal(e)
 	}
 	ps := Providers{Schema: 1, Providers: map[string]Provider{"test": {Command: script}}}
@@ -222,6 +222,11 @@ func TestPlanningProviderCreatesTaskWithoutHostDecision(t *testing.T) {
 	if len(got.Tasks) != 1 || got.Tasks[0].ID != "generated" || got.Planning.Activations != 1 || got.Planning.Decisions != 1 {
 		t.Fatal(got)
 	}
+	observed, err := os.ReadFile(script + ".prompt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertWorkflowDelivery(t, string(observed), "planner", got.Planning.Scopes[0].Workflow)
 	if e = s.planningStep(w.ID); e != nil {
 		t.Fatal(e)
 	}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specification"
+  short_description: "Turn a need into a testable task plan"
+  default_prompt: "Use $spec-builder to define requirements, roles and acceptance checks for this change."

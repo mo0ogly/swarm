@@ -9,6 +9,10 @@ import (
 // into each activation. Pending events are batched, never marked consumed by
 // compression. The remainder will cause another activation after this one.
 func planningContext(w Work, id string) ([]byte, error) {
+	return planningContextLimit(w, id, 8)
+}
+
+func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
 	p := w.Planning
 	scope, e := p.scope(id)
 	if e != nil {
@@ -20,7 +24,7 @@ func planningContext(w Work, id string) ([]byte, error) {
 	for _, event := range p.Inbox {
 		if event.Scope == id && event.Decision == "" {
 			pending++
-			if len(events) < 8 {
+			if len(events) < eventLimit {
 				events = append(events, event)
 				relevant[event.Task] = true
 			}

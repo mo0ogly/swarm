@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 // The reviewer is a separate, tool-free process. Its opinion never replaces
 // deterministic controls or an explicitly required human acceptance.
 type ReviewerConfig struct {
+	TimeoutSeconds int         `json:"timeout_seconds,omitempty"`
 	Failure        string      `json:"failure,omitempty"`
 	Provider       string      `json:"provider"`
 	ProviderDigest string      `json:"provider_digest"`
@@ -19,6 +21,8 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
+	TimeoutSeconds    int                 `json:"timeout_seconds,omitempty"`
+	Workflow          *AgentWorkflow      `json:"workflow,omitempty"`
 	GitReport         string              `json:"git_report,omitempty"`
 	CandidateSHA      string              `json:"candidate_commit,omitempty"`
 	PreviousCandidate string              `json:"previous_candidate,omitempty"`
@@ -41,6 +45,40 @@ type IndependentReview struct {
 	Finished          string              `json:"finished,omitempty"`
 	Usage             *Usage              `json:"usage,omitempty"`
 }
+
+// Zero keeps historical configurations at their original 90-second deadline.
+func reviewTimeoutSeconds(cfg *ReviewerConfig) (int, error) {
+	if cfg == nil {
+		return 0, fmt.Errorf("vérificateur absent")
+	}
+	if cfg.TimeoutSeconds == 0 {
+		return 90, nil
+	}
+	if cfg.TimeoutSeconds < 1 || cfg.TimeoutSeconds > 900 {
+		return 0, fmt.Errorf("délai de revue : 1 à 900 secondes requis")
+	}
+	return cfg.TimeoutSeconds, nil
+}
+
+func (s *Store) setReviewTimeout(work string, r PlanningRequest) (Work, error) {
+	if r.ReviewTimeoutSeconds < 1 || r.ReviewTimeoutSeconds > 900 || len(strings.TrimSpace(r.Reason)) < 8 || len(r.Reason) > 2000 {
+		return Work{}, fmt.Errorf("délai de revue : 1 à 900 secondes et motif explicite de 8 à 2000 caractères requis")
+	}
+	raw, _ := json.Marshal(r)
+	return s.mutate(work, "review.timeout", r.EventID, r.Revision, raw, func(w *Work) error {
+		if w.Planning == nil || w.Planning.Reviewer == nil {
+			return fmt.Errorf("vérificateur absent")
+		}
+		for _, task := range w.Tasks {
+			if task.IndependentReview != nil && task.IndependentReview.State == "running" {
+				return fmt.Errorf("attendre la fin de la revue avant de modifier son délai")
+			}
+		}
+		w.Planning.Reviewer.TimeoutSeconds = r.ReviewTimeoutSeconds
+		return nil
+	})
+}
+
 type ReviewCriterion struct {
 	Index    int    `json:"index"`
 	Verdict  string `json:"verdict"`

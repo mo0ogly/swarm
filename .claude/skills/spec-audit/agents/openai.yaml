@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specification audit"
+  short_description: "Find gaps before executing a Swarm plan"
+  default_prompt: "Use $spec-audit to find missing contracts and contradictions in the current plan."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Retrospective"
+  short_description: "Explain results and prioritize improvements"
+  default_prompt: "Use $retex-analyzer to review this mission and distinguish proven outcomes from gaps."

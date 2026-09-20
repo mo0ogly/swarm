@@ -102,6 +102,7 @@ type DiagnosticItem struct {
 	Traces      []string `json:"traces"`
 }
 type Agent struct {
+	Workflow             *AgentWorkflow    `json:"workflow,omitempty"`
 	ProviderCooldown     *ProviderCooldown `json:"provider_cooldown,omitempty"`
 	Preflight            *PreflightResult  `json:"preflight,omitempty"`
 	PreconditionEvidence string            `json:"precondition_evidence,omitempty"`
@@ -638,7 +639,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if t.PlanToolLimit > 0 && (limits.MaxToolCalls == 0 || t.PlanToolLimit < limits.MaxToolCalls) {
 			limits.MaxToolCalls = t.PlanToolLimit
 		}
-		r.Role = t.PlanRole
+		if t.PlanRole != "" {
+			r.Role = t.PlanRole
+		}
 	}
 	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
 		return a, false, fmt.Errorf("Brief modifié : préparer un nouveau plan.")
@@ -709,6 +712,10 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e = s.recheckPreflight(preflight, r.Provider, p, cwd, r); e != nil {
 		return a, false, e
 	}
+	workflow, workflowPrompt, e := agentWorkflow(r.Role)
+	if e != nil {
+		return a, false, e
+	}
 	originalNext := t.Next
 	// Same transaction as the session intent: no orphan running task on launch conflict.
 	if e = s.apply(&w, "task.update", Request{ID: r.TaskID, Status: "running", Owner: r.Provider, Origin: conductorAuthor, Next: "Examiner le handoff et les preuves après exécution"}); e != nil {
@@ -738,6 +745,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		}
 		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, r.Instruction)
 	}
+	prompt = workflowPrompt + prompt
 	if r.Mode == "terminal" {
 		prompt += fmt.Sprintf("\nSession interactive supervisée, durée maximale %d secondes. Les appels d’outils et le coût ne sont pas mesurables dans ce mode ; ne pas prétendre qu’ils sont contrôlés. Respecter les permissions natives du fournisseur. Attendre les instructions de l’opérateur en cas de doute.\n", r.Timeout)
 	} else {
@@ -798,6 +806,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	recovery := recoveryForLaunch(r, previous)
 	a = Agent{Preflight: &preflight, PreconditionEvidence: r.PreconditionEvidence, Mode: r.Mode, ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, Recovery: recovery, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	a.Workflow = &workflow
 	if r.Mode == "terminal" {
 		if len(s.terminalSocket(a.ID)) >= 108 {
 			return a, false, fmt.Errorf("Chemin du terminal trop long ; utiliser une racine de projet plus courte.")

@@ -51,14 +51,27 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 	if err != nil {
 		return err
 	}
+	w, err := s.get(work)
+	if err != nil {
+		return err
+	}
 	for _, agent := range agents {
 		switch {
 		case !activeAgent(agent):
-			if err = s.settleAgentTask(agent); err != nil {
-				return err
+			if agent.Status == "completed" && w.Planning != nil && w.Planning.Repository != nil {
+				// Managed settlement can run controls and an independent provider
+				// review. Keep that bounded operation off the conductor loop so
+				// its lease and other missions continue to be checked. The
+				// existing cross-process managed lock and review claim deduplicate
+				// polling/restarts; no new production attempt is created here.
+				go func(a Agent) {
+					if e := s.reconcileKnownMissionResult(a, conductor); e != nil {
+						_ = s.recordCoordinationEvent("settle-error:"+a.ID, a.WorkID, a.ID, conductor, "settle-error", e.Error())
+					}
+				}(agent)
+				continue
 			}
-			if err = s.recordCoordinationEvent("known-result:"+agent.ID, work, agent.ID, conductor,
-				"known-result", "Résultat terminal connu et réconcilié sans nouvelle tentative"); err != nil {
+			if err = s.reconcileKnownMissionResult(agent, conductor); err != nil {
 				return err
 			}
 		case agent.Status == "queued" && agent.Supervisor == 0 && agent.Child == 0 && agent.Heartbeat == "":
@@ -90,6 +103,14 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 		}
 	}
 	return nil
+}
+
+func (s *Store) reconcileKnownMissionResult(agent Agent, conductor string) error {
+	if err := s.settleAgentTask(agent); err != nil {
+		return err
+	}
+	return s.recordCoordinationEvent("known-result:"+agent.ID, agent.WorkID, agent.ID, conductor,
+		"known-result", "Résultat terminal connu et réconcilié sans nouvelle tentative")
 }
 
 func (s *Store) signalResourceReleased(agent Agent) {

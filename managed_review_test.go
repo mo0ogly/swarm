@@ -18,7 +18,7 @@ text=sys.stdin.read()
 ctx=json.loads(text.split('\nSWARM_MANAGED_REVIEW_CONTEXT\n',1)[1])
 folder=os.path.dirname(__file__)
 with open(os.path.join(folder,'calls'),'a') as f: f.write('call\n')
-with open(os.path.join(folder,'observed.json'),'w') as f: json.dump({'context':ctx,'args':sys.argv[1:],'cwd':os.getcwd(),'pid':os.getpid()},f)
+with open(os.path.join(folder,'observed.json'),'w') as f: json.dump({'context':ctx,'prompt':text,'args':sys.argv[1:],'cwd':os.getcwd(),'pid':os.getpid()},f)
 mode='pass'
 try:
  with open(os.path.join(folder,'mode')) as f: mode=f.read().strip()
@@ -103,6 +103,7 @@ func TestManagedIndependentReviewPublishesSameSHAAndSeparateProcess(t *testing.T
 	}
 	var observed struct {
 		Context managedReviewContext `json:"context"`
+		Prompt  string               `json:"prompt"`
 		Args    []string             `json:"args"`
 		CWD     string               `json:"cwd"`
 		PID     int                  `json:"pid"`
@@ -110,6 +111,7 @@ func TestManagedIndependentReviewPublishesSameSHAAndSeparateProcess(t *testing.T
 	if e = json.Unmarshal(data, &observed); e != nil {
 		t.Fatal(e)
 	}
+	assertWorkflowDelivery(t, observed.Prompt, "reviewer", r.Workflow)
 	if observed.PID == os.Getpid() || observed.CWD == a.CWD || !strings.Contains(observed.Context.Diff, "reviewed") || len(observed.Context.Tasks) != 1 || !strings.Contains(strings.Join(observed.Args, " "), "--tools  --safe-mode") {
 		t.Fatalf("review not isolated or missing content: %+v", observed)
 	}
