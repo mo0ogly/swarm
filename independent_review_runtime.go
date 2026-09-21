@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const independentReviewSchema = `{"type":"object","additionalProperties":false,"properties":{"reason":{"type":"string"},"criteria":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"index":{"type":"integer"},"verdict":{"type":"string","enum":["pass","fail","unknown"]},"evidence":{"type":"string"}},"required":["index","verdict","evidence"]}}},"required":["reason","criteria"]}`
+const independentReviewSchema = `{"type":"object","additionalProperties":false,"properties":{"reason":{"type":"string","minLength":8,"maxLength":1000,"description":"Concise rationale, at most 1000 characters; discuss coverage and material defects, not a transcript of every source."},"criteria":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"index":{"type":"integer"},"verdict":{"type":"string","enum":["pass","fail","unknown"]},"evidence":{"type":"string"}},"required":["index","verdict","evidence"]}}},"required":["reason","criteria"]}`
 
 func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCriterion, error) {
 	var reply struct {

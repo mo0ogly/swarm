@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,5 +36,27 @@ func TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt(t *testing.T) {
 	again, err := os.ReadFile(filepath.Join(s.root, r.ReplyPath))
 	if err != nil || string(again) != string(raw) || managedReviewCalls(t, s) != 1 {
 		t.Fatal("replayed or changed rejected review", err)
+	}
+}
+
+func TestManagedReviewSchemaBoundsRationaleBeforeProviderCall(t *testing.T) {
+	var schema map[string]any
+	if err := json.Unmarshal([]byte(managedReviewSchema), &schema); err != nil {
+		t.Fatal(err)
+	}
+	properties := schema["properties"].(map[string]any)
+	taskProperties := properties["tasks"].(map[string]any)["items"].(map[string]any)["properties"].(map[string]any)
+	reason := taskProperties["reason"].(map[string]any)
+	if reason["maxLength"] != float64(1000) || reason["minLength"] != float64(8) {
+		t.Fatal(reason)
+	}
+	evidence := taskProperties["criteria"].(map[string]any)["items"].(map[string]any)["properties"].(map[string]any)["evidence"].(map[string]any)
+	if evidence["maxLength"] != float64(1000) {
+		t.Fatal(evidence)
+	}
+	task := Task{Criteria: []string{"coverage"}}
+	raw, _ := json.Marshal(map[string]any{"reason": strings.Repeat("x", 4001), "criteria": []ReviewCriterion{{Index: 1, Verdict: "pass", Evidence: "exact valid evidence"}}})
+	if _, _, _, err := reviewReply(string(raw), &task, "exact valid evidence"); err == nil {
+		t.Fatal("oversized response accepted")
 	}
 }
