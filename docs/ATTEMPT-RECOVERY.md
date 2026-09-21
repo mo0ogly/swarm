@@ -211,3 +211,8 @@ Après une correction démontrée du format ou de la précondition, `planning
 retry-review` permet une reprise explicite dans le budget existant. Aucun rejeu
 payant automatique n’est déclenché. Les reçus, contextes et rapports sont relus
 pendant l’inférence et avant publication ; une modification rend l’avis périmé.
+
+Après `retry-review`, le conducteur reprend aussi une réparation externe dont
+le producteur reste interrompu : seul le résultat explicitement remis et en
+attente d’intégration est repris. Le processus historique et ses tentatives
+restent inchangés. Une remise refusée non réarmée ne déclenche aucun nouvel avis.

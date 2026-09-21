@@ -58,7 +58,7 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 	for _, agent := range agents {
 		switch {
 		case !activeAgent(agent):
-			if agent.Status == "completed" && w.Planning != nil && w.Planning.Repository != nil {
+			if w.Planning != nil && w.Planning.Repository != nil {
 				// Managed settlement can run controls and an independent provider
 				// review. Keep that bounded operation off the conductor loop so
 				// its lease and other missions continue to be checked. The
@@ -106,6 +106,16 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 }
 
 func (s *Store) reconcileKnownMissionResult(agent Agent, conductor string) error {
+	// Explicitly authorized external repairs keep their original stopped status.
+	// A retry-review queues integration without changing that process history.
+	if w, err := s.get(agent.WorkID); err == nil && w.Planning != nil && w.Planning.Repository != nil {
+		if task, err := w.task(agent.TaskID); err == nil {
+			if item, err := s.managedAttempt(agent.ID); err == nil && item.State == "integrating" && recoveredResultMatches(task, agent, item) {
+				return s.integrateManagedAttempt(agent)
+			}
+		}
+	}
+
 	if err := s.settleAgentTask(agent); err != nil {
 		return err
 	}

@@ -261,3 +261,33 @@ func TestRecoveredResultRevisionOfCompletedProducer(t *testing.T) {
 		t.Fatal(task.Status, saved.Status)
 	}
 }
+
+func TestRecoveredResultReviewRetryIsDrivenWithoutNewProducer(t *testing.T) {
+	s, w, a, req := recoveredResultFixture(t)
+	managedReviewMode(t, s, "exit")
+	first, err := s.submitRecoveredResult(w.ID, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := first.task(a.TaskID)
+	if task.IndependentReview.State != "error" {
+		t.Fatal(task.IndependentReview.State)
+	}
+	candidate := task.IndependentReview.CandidateSHA
+	managedReviewMode(t, s, "pass")
+	_, err = s.planningChange(w.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "retry-fixed-provider", Revision: first.Revision, Task: a.TaskID, Reason: "Provider failure corrected; same candidate and no new producer"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = s.reconcileKnownMissionResult(a, "test-conductor"); err != nil {
+		t.Fatal(err)
+	}
+	after, _ := s.get(w.ID)
+	task, _ = after.task(a.TaskID)
+	if task.Status != "accepted" || task.IndependentReview.CandidateSHA != candidate || len(task.Attempts) != 1 || task.Attempts[0].Status != "interrupted" || managedReviewCalls(t, s) != 2 {
+		t.Fatal(task.Status, task.Blocker)
+	}
+	if err = s.reconcileKnownMissionResult(a, "test-conductor"); err != nil || managedReviewCalls(t, s) != 2 {
+		t.Fatal("duplicate review", err)
+	}
+}

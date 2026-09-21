@@ -193,3 +193,8 @@ After a demonstrated correction to the format or precondition, `planning
 retry-review` allows an explicit retry within the existing budget. There is no
 automatic paid retry. Receipts, contexts and reports are reread during inference
 and before publication; changed evidence makes the opinion stale.
+
+After `retry-review`, the conductor also resumes an external repair whose
+producer remains interrupted. Only the explicitly submitted result awaiting
+integration is resumed. Historical process state and attempts stay unchanged.
+A rejected submission without an explicit retry triggers no new opinion.
