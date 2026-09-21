@@ -36,7 +36,7 @@ func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCr
 		switch c.Verdict {
 		case "pass":
 			if !strings.Contains(report, c.Evidence) {
-				return "", "", nil, fmt.Errorf("citation de preuve absente du rapport")
+				return "", "", nil, fmt.Errorf("critère %d : citation exacte introuvable dans les preuves fournies ; reprendre après correction du format de citation", c.Index)
 			}
 		case "fail", "unknown":
 			state = "changes_requested"

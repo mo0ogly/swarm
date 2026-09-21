@@ -180,3 +180,16 @@ candidate undergoes checks and review within the existing budget. No production
 attempt or counter is reset. Replaying the same request does not consume another
 review. This operation cannot replace an accepted task. External repair remains
 recorded as an intervention, not autonomous production.
+
+### Independent opinion format errors
+
+A `pass` citation must be one exact contiguous excerpt from the supplied evidence.
+Paraphrases and concatenated excerpts are rejected. The engine now preserves the
+reviewer response, including rejected responses, in a private file bound to the
+opinion (`reply_path`, `reply_sha256`) and identifies the offending task/criterion.
+This file is not approval. Older opinions may have no preserved raw response.
+
+After a demonstrated correction to the format or precondition, `planning
+retry-review` allows an explicit retry within the existing budget. There is no
+automatic paid retry. Receipts, contexts and reports are reread during inference
+and before publication; changed evidence makes the opinion stale.

@@ -197,3 +197,17 @@ Aucune tentative de production ni aucun compteur n’est réinitialisé. Un reje
 de la même demande ne consomme pas une seconde revue. Une tâche déjà acceptée
 ne peut pas être remplacée par cette opération. Cette réparation est une
 intervention externe tracée, pas une production autonome.
+
+### Erreur de format de l’avis indépendant
+
+Une citation `pass` doit être un extrait exact et contigu des preuves fournies.
+Une paraphrase ou plusieurs extraits assemblés ne sont pas acceptés. Le moteur
+conserve désormais la réponse du vérificateur, même rejetée, dans un fichier
+privé lié à l’avis (`reply_path`, `reply_sha256`) et précise la tâche/le critère
+fautif. Ce fichier n’est pas une approbation. Les anciens avis produits avant
+ce correctif peuvent ne pas disposer de cette réponse brute.
+
+Après une correction démontrée du format ou de la précondition, `planning
+retry-review` permet une reprise explicite dans le budget existant. Aucun rejeu
+payant automatique n’est déclenché. Les reçus, contextes et rapports sont relus
+pendant l’inférence et avant publication ; une modification rend l’avis périmé.

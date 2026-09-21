@@ -21,6 +21,8 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
+	ReplyPath         string              `json:"reply_path,omitempty"`
+	ReplyDigest       string              `json:"reply_sha256,omitempty"`
 	TimeoutSeconds    int                 `json:"timeout_seconds,omitempty"`
 	Workflow          *AgentWorkflow      `json:"workflow,omitempty"`
 	GitReport         string              `json:"git_report,omitempty"`
