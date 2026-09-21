@@ -110,3 +110,33 @@ func TestEngineContractTruthConfiguredReviewerIsPending(t *testing.T) {
 		}
 	}
 }
+
+func TestEngineContractTruthBrowser(t *testing.T) {
+	if os.Getenv("SWARM_ENGINE_TRUTH_BROWSER") != "1" {
+		t.Skip("mandatory via engine_acceptance.cjs --case truth")
+	}
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "verified value\n")
+	managedReviewMode(t, s, "fail")
+	if e := s.integrateManagedAttempt(a); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.pause(w.ID, true); e != nil {
+		t.Fatal(e)
+	}
+	w, _ = s.get(w.ID)
+	task, _ := w.task("first")
+	binary := filepath.Join(t.TempDir(), "swarm-browser-check")
+	if b, e := exec.Command("go", "build", "-o", binary, ".").CombinedOutput(); e != nil {
+		t.Fatal(e, string(b))
+	}
+	b, e := exec.Command("node", "tests/engine_truth_browser.cjs", binary, s.root, w.ID, task.IndependentReview.CandidateSHA).CombinedOutput()
+	t.Log(string(b))
+	if e != nil {
+		t.Fatal(e)
+	}
+	after, _ := s.get(w.ID)
+	if after.Revision != w.Revision || after.Tasks[0].Status == "accepted" {
+		t.Fatal("browser reading changed mission")
+	}
+}

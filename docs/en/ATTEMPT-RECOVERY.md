@@ -168,3 +168,15 @@ Every changed line, complete source file and receipt is retained. The final
 192 KiB limit remains mandatory. Explicit replay of the same external submission
 can resume this preflight failure only if no review of that attempt has started;
 an existing review never triggers an implicit additional call.
+
+### Correct a rejected result without restarting its producer
+
+`planning revise-recovered-result` submits an explicitly examined external
+correction tied to the latest `review_id` in `changes_requested`. Supply the
+same fields as `submit-recovered-result`, plus that ID and the current revision.
+The tree must differ from the rejected result and match the examined files.
+The engine preserves the previous opinion, receipt and Git references. The new
+candidate undergoes checks and review within the existing budget. No production
+attempt or counter is reset. Replaying the same request does not consume another
+review. This operation cannot replace an accepted task. External repair remains
+recorded as an intervention, not autonomous production.

@@ -59,7 +59,7 @@ func managedReviewContract(w Work, id string) string {
 // restart. Rebuilding a commit would invalidate the prior review even if its
 // tree were identical. Never issue another paid call implicitly after a crash.
 func (s *Store) preparedManagedCandidate(w Work, t *Task, a Agent, item ManagedAttempt, repo *ManagedRepository) (string, map[string][]ValidationControlResult, error) {
-	path := filepath.Join(repo.Storage, "proofs", a.ID, "candidate.json")
+	path := filepath.Join(repo.Storage, "proofs", managedProofKey(t, a), "candidate.json")
 	contract := managedReviewContract(w, t.ID)
 	var cp managedReviewCheckpoint
 	if b, e := os.ReadFile(path); e == nil {

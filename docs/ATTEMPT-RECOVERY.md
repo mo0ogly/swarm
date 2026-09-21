@@ -184,3 +184,16 @@ sources complets et les reçus. La limite finale de 192 Kio reste obligatoire.
 Le rejeu explicite de la même remise externe peut reprendre cet échec préalable
 si aucune revue de cette tentative n’a commencé ; un avis déjà rendu reste lié
 à son candidat et ne déclenche aucun nouvel appel implicite.
+
+### Corriger un résultat refusé sans relancer le producteur
+
+`planning revise-recovered-result` remet une correction externe explicitement
+examinée, liée au dernier `review_id` en `changes_requested`. Fournir les mêmes
+champs que `submit-recovered-result`, plus cet identifiant et la révision courante.
+L’arbre doit différer du résultat refusé et correspondre aux fichiers examinés.
+Le moteur conserve l’ancien avis, son reçu et ses références Git ; le nouveau
+candidat repasse les contrôles et une revue dans le budget existant.
+Aucune tentative de production ni aucun compteur n’est réinitialisé. Un rejeu
+de la même demande ne consomme pas une seconde revue. Une tâche déjà acceptée
+ne peut pas être remplacée par cette opération. Cette réparation est une
+intervention externe tracée, pas une production autonome.

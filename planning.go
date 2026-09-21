@@ -132,6 +132,9 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	if action == "authorize-recovery" {
 		return s.authorizeCorrectiveRecovery(work, r)
 	}
+	if action == "revise-recovered-result" {
+		return s.recoverResult(work, r, true)
+	}
 	if action == "submit-recovered-result" {
 		return s.submitRecoveredResult(work, r)
 	}

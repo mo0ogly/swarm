@@ -13,24 +13,36 @@ import (
 // External repair is explicit and is never reported as autonomous production.
 // The stopped process, consumed attempt and tool budget stay unchanged.
 type RecoveredResult struct {
-	Event         string `json:"event_id"`
-	RequestDigest string `json:"request_sha256"`
-	Agent         string `json:"agent_id"`
-	Attempt       string `json:"attempt_id"`
-	Result        string `json:"result_commit"`
-	Tree          string `json:"tree"`
-	Actor         string `json:"actor"`
-	At            string `json:"at"`
-	Reason        string `json:"reason"`
-	ProcessStatus string `json:"original_process_status"`
+	ProofKey       string `json:"proof_key,omitempty"`
+	ReplacesResult string `json:"replaces_result,omitempty"`
+	PriorReview    string `json:"prior_review_id,omitempty"`
+	Event          string `json:"event_id"`
+	RequestDigest  string `json:"request_sha256"`
+	Agent          string `json:"agent_id"`
+	Attempt        string `json:"attempt_id"`
+	Result         string `json:"result_commit"`
+	Tree           string `json:"tree"`
+	Actor          string `json:"actor"`
+	At             string `json:"at"`
+	Reason         string `json:"reason"`
+	ProcessStatus  string `json:"original_process_status"`
 }
 
 func recoveredResultMatches(t *Task, a Agent, item ManagedAttempt) bool {
 	r := t.RecoveredResult
-	return r != nil && r.Agent == a.ID && r.Attempt == a.Attempt && r.Result != "" && r.Result == item.Result && r.ProcessStatus == a.Status && (a.Status == "interrupted" || a.Status == "failed")
+	return r != nil && r.Agent == a.ID && r.Attempt == a.Attempt && r.Result != "" && r.Result == item.Result && r.ProcessStatus == a.Status && (a.Status == "interrupted" || a.Status == "failed" || a.Status == "completed")
 }
 
 func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, error) {
+	return s.recoverResult(work, r, false)
+}
+func managedProofKey(t *Task, a Agent) string {
+	if t.RecoveredResult != nil && t.RecoveredResult.Agent == a.ID && t.RecoveredResult.Attempt == a.Attempt && t.RecoveredResult.ProofKey != "" {
+		return t.RecoveredResult.ProofKey
+	}
+	return a.ID
+}
+func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work, error) {
 	if !r.ConfirmRecovery || r.Agent == "" || r.Attempt == "" || (len(r.ResultTree) != 40 && len(r.ResultTree) != 64) || len(strings.TrimSpace(r.Reason)) < 8 || len(r.Reason) > 2000 {
 		return Work{}, fmt.Errorf("confirmation, agent, tentative, arbre Git examiné et motif de réparation requis")
 	}
@@ -68,7 +80,12 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 			}
 			return s.get(work)
 		}
-		return Work{}, fmt.Errorf("un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite")
+		if !revise {
+			return Work{}, fmt.Errorf("un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite")
+		}
+	}
+	if revise && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || t.IndependentReview.State != "changes_requested") {
+		return Work{}, fmt.Errorf("révision corrective liée au dernier refus indépendant requise")
 	}
 	if w.Revision != r.Revision || t.Status != "blocked" || !currentTaskAttempt(t, r.Attempt) {
 		return Work{}, fmt.Errorf("révision ou tentative modifiée ; relire le résultat à soumettre")
@@ -77,7 +94,7 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 	if err != nil {
 		return Work{}, err
 	}
-	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "interrupted" && a.Status != "failed") || a.Ended == "" {
+	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "interrupted" && a.Status != "failed" && !(revise && a.Status == "completed")) || a.Ended == "" {
 		return Work{}, fmt.Errorf("une tentative arrêtée et attribuable est requise")
 	}
 	if a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp) {
@@ -97,7 +114,7 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 	if err != nil {
 		return Work{}, err
 	}
-	if item.Work != work || item.Task != t.ID || item.Agent != a.ID || item.Result != "" || a.CWD != filepath.Join(item.Path, repo.Subdir) {
+	if item.Work != work || item.Task != t.ID || item.Agent != a.ID || (!revise && item.Result != "") || (revise && (item.Result == "" || item.State != "conflict")) || a.CWD != filepath.Join(item.Path, repo.Subdir) {
 		return Work{}, fmt.Errorf("copie ou résultat déjà remis incompatible avec cette réparation")
 	}
 	if err = verifyManagedCopy(repo, item.Path); err != nil {
@@ -112,6 +129,15 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 	}
 	if tree != r.ResultTree {
 		return Work{}, fmt.Errorf("les fichiers ont changé depuis l’examen de la réparation")
+	}
+	if revise {
+		oldTree, e := managedGit(filepath.Join(repo.Storage, "repository.git"), "rev-parse", item.Result+"^{tree}")
+		if e != nil {
+			return Work{}, e
+		}
+		if oldTree == tree {
+			return Work{}, fmt.Errorf("aucune correction depuis le résultat refusé")
+		}
 	}
 	result, err := managedGit(item.Path, "commit-tree", tree, "-p", item.Base, "-m", "Réparation externe de "+a.ID)
 	if err != nil {
@@ -132,18 +158,34 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 	if err != nil || strings.TrimSpace(report.Content) == "" {
 		return Work{}, fmt.Errorf("rapport de réparation absent ou illisible")
 	}
-	if _, err = managedGit(bare, "update-ref", "refs/swarm/attempts/"+a.ID, result); err != nil {
+	proofKey := a.ID
+	ref := "refs/swarm/attempts/" + a.ID
+	if revise {
+		proofKey = a.ID + "-repair-" + hash(raw)[:16]
+		ref = "refs/swarm/repairs/" + proofKey
+	}
+	if _, err = managedGit(bare, "update-ref", ref, result); err != nil {
 		return Work{}, err
 	}
-	_, err = s.mutateWithHook(work, "managed.recovered-result", r.EventID, r.Revision, raw, func(current *Work) error {
+	eventRaw := raw
+	if revise {
+		eventRaw, _ = json.Marshal(map[string]any{"request": r, "previous_review": t.IndependentReview, "previous_repair": t.RecoveredResult, "previous_result": item.Result})
+	}
+	_, err = s.mutateWithHook(work, "managed.recovered-result", r.EventID, r.Revision, eventRaw, func(current *Work) error {
 		task, e := current.task(t.ID)
 		if e != nil {
 			return e
 		}
-		if task.RecoveredResult != nil || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
+		if (!revise && task.RecoveredResult != nil) || (revise && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || task.IndependentReview.State != "changes_requested")) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
 			return fmt.Errorf("tentative remplacée ou réparation déjà soumise")
 		}
 		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: tree, Actor: operatorIdentity(), At: now(), Reason: r.Reason, ProcessStatus: a.Status}
+		if revise {
+			task.RecoveredResult.ProofKey = proofKey
+			task.RecoveredResult.ReplacesResult = item.Result
+			task.RecoveredResult.PriorReview = r.ReviewID
+			task.IndependentReview = nil
+		}
 		task.Next = "Réparation externe remise ; contrôles et revue indépendante requis."
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error {
@@ -154,7 +196,7 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 		if active != 0 {
 			return fmt.Errorf("agent encore actif sur cette tâche")
 		}
-		res, e := tx.Exec("UPDATE managed_attempts SET result_commit=?,state='integrating' WHERE agent_id=? AND result_commit=''", result, a.ID)
+		res, e := tx.Exec("UPDATE managed_attempts SET result_commit=?,state='integrating',detail='' WHERE agent_id=? AND result_commit=?", result, a.ID, item.Result)
 		if e != nil {
 			return e
 		}

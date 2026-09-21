@@ -147,3 +147,117 @@ func TestRecoveredResultReplayResumesContextPreflightOnly(t *testing.T) {
 		t.Fatal("replay paid twice", e)
 	}
 }
+
+func TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate(t *testing.T) {
+	s, w, a, r := recoveredResultFixture(t)
+	managedReviewMode(t, s, "fail")
+	first, e := s.submitRecoveredResult(w.ID, r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	prior, _ := first.task(a.TaskID)
+	old := *prior.IndependentReview
+	oldReceipt, e := os.ReadFile(filepath.Join(s.root, old.Receipt))
+	if e != nil {
+		t.Fatal(e)
+	}
+	oldResult := prior.RecoveredResult.Result
+	repo, err := s.managedRepository(first)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bare := filepath.Join(repo.Storage, "repository.git")
+	unchangedRequest := r
+	unchangedRequest.EventID = "unchanged-repair"
+	unchangedRequest.Revision = first.Revision
+	unchangedRequest.ReviewID = old.ID
+	if _, err = s.planningChange(w.ID, "revise-recovered-result", unchangedRequest); err == nil {
+		t.Fatal("unchanged result re-reviewed")
+	}
+	if managedReviewCalls(t, s) != 1 {
+		t.Fatal("unchanged result consumed review")
+	}
+	os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Corrected external report with complete evidence"), 0600)
+	gitTest(t, a.CWD, "add", "-A")
+	next := r
+	next.EventID = "revised-repair"
+	next.Revision = first.Revision
+	next.ReviewID = old.ID
+	next.ResultTree = gitTest(t, a.CWD, "write-tree")
+	bad := next
+	bad.ReviewID = "wrong"
+	if _, e = s.planningChange(w.ID, "revise-recovered-result", bad); e == nil {
+		t.Fatal("wrong review accepted")
+	}
+	unchanged := next
+	unchanged.ResultTree = r.ResultTree
+	// Restore the original tree in the index alone: the write-tree guard must still
+	// examine actual current files and refuse this stale approval.
+	if _, e = s.planningChange(w.ID, "revise-recovered-result", unchanged); e == nil {
+		t.Fatal("stale tree accepted")
+	}
+	managedReviewMode(t, s, "pass")
+	after, e := s.planningChange(w.ID, "revise-recovered-result", next)
+	if e != nil {
+		t.Fatal(e)
+	}
+	task, _ := after.task(a.TaskID)
+	if task.Status != "accepted" || task.RecoveredResult.ReplacesResult != oldResult || task.RecoveredResult.PriorReview != old.ID || task.IndependentReview.CandidateSHA == old.CandidateSHA {
+		t.Fatal(task.Status, task.Blocker)
+	}
+	if got := gitTest(t, bare, "rev-parse", "refs/swarm/candidates/"+a.ID); got != old.CandidateSHA {
+		t.Fatal("old candidate ref overwritten", got)
+	}
+	if got := gitTest(t, bare, "rev-parse", "refs/swarm/candidates/"+task.RecoveredResult.ProofKey); got != task.IndependentReview.CandidateSHA {
+		t.Fatal("new candidate missing", got)
+	}
+	preserved, e := os.ReadFile(filepath.Join(s.root, old.Receipt))
+	if e != nil || string(preserved) != string(oldReceipt) {
+		t.Fatal("old receipt overwritten")
+	}
+	if len(task.Attempts) != 1 || task.Attempts[0].Status != "interrupted" || managedReviewCalls(t, s) != 2 {
+		t.Fatal("history or calls changed")
+	}
+	if _, e = s.planningChange(w.ID, "revise-recovered-result", next); e != nil || managedReviewCalls(t, s) != 2 {
+		t.Fatal("replay called review", e)
+	}
+	// An accepted repair cannot silently be replaced.
+	next.EventID = "another"
+	next.Revision = after.Revision
+	next.ReviewID = task.IndependentReview.ID
+	if _, e = s.planningChange(w.ID, "revise-recovered-result", next); e == nil {
+		t.Fatal("accepted repair replaced")
+	}
+}
+
+func TestRecoveredResultRevisionOfCompletedProducer(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "initial\n")
+	managedReviewMode(t, s, "fail")
+	if err := s.finishAgent(a, "completed", "", nil); err != nil {
+		t.Fatal(err)
+	}
+	a, _ = s.agent(a.ID)
+	managedReviewMode(t, s, "fail")
+	if err := s.integrateManagedAttempt(a); err != nil {
+		t.Fatal(err)
+	}
+	w, _ = s.get(w.ID)
+	task, _ := w.task(a.TaskID)
+	prior := task.IndependentReview.ID
+	os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Corrected proof for completed producer"), 0600)
+	body, _ := json.Marshal(completeDelivery(task, a))
+	os.WriteFile(filepath.Join(a.CWD, "docs/first.delivery.json"), body, 0600)
+	gitTest(t, a.CWD, "add", "-A")
+	req := PlanningRequest{Schema: 1, EventID: "completed-correction", Revision: w.Revision, Task: a.TaskID, Agent: a.ID, Attempt: a.Attempt, ConfirmRecovery: true, ReviewID: prior, ResultTree: gitTest(t, a.CWD, "write-tree"), Reason: "Correct rejected result with complete evidence"}
+	managedReviewMode(t, s, "pass")
+	after, err := s.planningChange(w.ID, "revise-recovered-result", req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ = after.task(a.TaskID)
+	saved, _ := s.agent(a.ID)
+	if task.Status != "accepted" || saved.Status != "completed" || task.RecoveredResult.PriorReview != prior || managedReviewCalls(t, s) != 2 {
+		t.Fatal(task.Status, saved.Status)
+	}
+}

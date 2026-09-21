@@ -11,6 +11,7 @@ if(!args.includes('--case')||!names[selected]){console.error('usage: node tests/
 const root=path.resolve(__dirname,'..');
 if(!fs.existsSync(path.join(root,'go.mod'))){console.error('Go module missing');process.exit(3)}
 const env={...process.env,TMPDIR:process.env.TMPDIR||'/dev/shm',GOTMPDIR:process.env.GOTMPDIR||'/dev/shm'};
+if(selected==='truth')env.SWARM_ENGINE_TRUTH_BROWSER='1';
 const prefix='TestEngineContract'+names[selected];
 const result=spawnSync('go',['test','-json','-count=1','-run','^'+prefix,'.'],{cwd:root,env,encoding:'utf8',timeout:180000,maxBuffer:8*1024*1024});
 process.stdout.write(result.stdout||'');process.stderr.write(result.stderr||'');

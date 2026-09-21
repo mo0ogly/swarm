@@ -111,7 +111,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		}
 		report = []byte(committed)
 	}
-	proofDir := filepath.Join(repo.Storage, "proofs", a.ID)
+	proofDir := filepath.Join(repo.Storage, "proofs", managedProofKey(t, a))
 	if err = os.MkdirAll(proofDir, 0700); err != nil {
 		return err
 	}
@@ -307,7 +307,7 @@ func (s *Store) prepareManagedCandidate(w Work, t *Task, a Agent, item ManagedAt
 	if _, err = managedGit(bare, "fetch", "--no-tags", candidateDir, candidate); err != nil {
 		return "", nil, err
 	}
-	if _, err = managedGit(bare, "update-ref", "refs/swarm/candidates/"+a.ID, candidate); err != nil {
+	if _, err = managedGit(bare, "update-ref", "refs/swarm/candidates/"+managedProofKey(t, a), candidate); err != nil {
 		return "", nil, err
 	}
 	return candidate, results, nil
