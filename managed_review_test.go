@@ -15,7 +15,23 @@ import (
 const managedReviewerFixture = `#!/usr/bin/env python3
 import json, os, sys
 text=sys.stdin.read()
-ctx=json.loads(text.split('\nSWARM_MANAGED_REVIEW_CONTEXT\n',1)[1])
+if '\nSWARM_MANAGED_REVIEW_TEXT_CONTEXT\n' in text:
+ import hashlib, io, re
+ stream=io.BytesIO(text.split('\nSWARM_MANAGED_REVIEW_TEXT_CONTEXT\n',1)[1].encode())
+ stream.readline()
+ ctx=json.loads(stream.readline())
+ while True:
+  line=stream.readline()
+  if not line: break
+  h=json.loads(line); raw=stream.read(h['bytes'])
+  assert len(raw)==h['bytes'] and hashlib.sha256(raw).hexdigest()==h['sha256']
+  assert stream.read(1)==b'\n'
+  if h['field']=='diff': ctx['diff']=raw.decode()
+  else:
+   m=re.fullmatch(r'(sources|tasks)\[(\d+)\]\.(content|report)',h['field']); assert m
+   ctx[m[1]][int(m[2])][m[3]]=raw.decode()
+else:
+ ctx=json.loads(text.split('\nSWARM_MANAGED_REVIEW_CONTEXT\n',1)[1])
 folder=os.path.dirname(__file__)
 with open(os.path.join(folder,'calls'),'a') as f: f.write('call\n')
 with open(os.path.join(folder,'observed.json'),'w') as f: json.dump({'context':ctx,'prompt':text,'args':sys.argv[1:],'cwd':os.getcwd(),'pid':os.getpid()},f)

@@ -70,3 +70,18 @@ revision, actual commands with timestamps and exit codes, report, independent
 opinion, decision, freshness, deliverables and external intervention count.
 A host-written fix can strengthen Swarm; it must not become fabricated autonomous
 success inside the mission evaluating it.
+
+## Evidence size and review transport
+
+The review prompt remains capped at 192 KiB, including instructions. The engine
+preserves the diff from the repository base, reports, receipts and sources from
+the same candidate. It first reduces unchanged patch context and removes only
+new source files already present in full in the patch, after exact comparison.
+
+If JSON escaping still exceeds the cap, long texts use complete UTF-8 blocks
+identified by field, byte length and SHA-256. Other metadata remains JSON. The
+canonical stored context and its digest stay unchanged. No summary replaces
+proof and no earlier change is removed from the diff. A packet that still exceeds
+the cap is rejected before calling the provider. Process tests reconstruct the
+whole packet and compare every field with stored evidence; genuinely oversized
+packets remain rejected.

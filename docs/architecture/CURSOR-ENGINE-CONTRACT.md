@@ -73,3 +73,20 @@ sortie, le rapport, l'avis indépendant, la décision, la fraîcheur des preuves
 livrables et le nombre d'interventions externes. Un correctif écrit par l'hôte peut
 renforcer Swarm ; il ne doit pas devenir une réussite autonome inventée dans la
 mission qui l'évalue.
+
+## Taille des preuves et transport du dossier
+
+La limite du prompt de revue reste de 192 Kio, consignes comprises. Le moteur
+conserve le diff depuis la base, les rapports, les reçus et les sources du même
+candidat. Il réduit d'abord les lignes inchangées autour des modifications et
+retire uniquement les sources nouvelles déjà reproduites intégralement dans le
+diff, après comparaison exacte.
+
+Si l'échappement JSON dépasse encore la limite, les textes sont transportés en
+blocs UTF-8 intégraux, identifiés par champ, nombre d'octets et SHA-256. Les autres
+métadonnées restent en JSON. Le contexte canonique conservé sur disque et son
+empreinte ne changent pas. Aucun résumé ne remplace une preuve, aucun changement
+antérieur n'est retiré du diff. Si ce transport dépasse encore le plafond, la
+revue reste bloquée avant tout appel fournisseur. Les tests reconstruisent le
+dossier dans un processus distinct et comparent tous ses champs au contexte
+conservé ; ils vérifient aussi le refus d'un dossier réellement trop grand.
