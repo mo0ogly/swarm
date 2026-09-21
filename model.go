@@ -86,6 +86,7 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
+	BatchReviewResume  *IndependentReview   `json:"batch_review_resume,omitempty"`
 	RecoveredResult    *RecoveredResult     `json:"recovered_result,omitempty"`
 	CorrectiveRecovery *CorrectiveRecovery  `json:"corrective_recovery,omitempty"`
 	IndependentReview  *IndependentReview   `json:"independent_review,omitempty"`

@@ -57,3 +57,32 @@ An `unknown` opinion means that evidence is insufficient. The resulting
 failure: complete the deliverable or its evidence within authorized limits, then
 review the new candidate. More time cannot supply missing source context or test
 receipts.
+
+## Cumulative evidence and review batches
+
+The engine first attempts a single call. When the losslessly encoded request
+exceeds 192 KiB, it prepares deterministic task batches. Every batch retains the
+same Git candidate, check receipt, full diff, and all cumulative reports and
+criteria. Supplemental sources are assigned using their manifests; each source
+remains whole. The cumulative limits of 24 files, 128 KiB of sources and 96 KiB
+per file still apply. If one task cannot fit in a batch, the engine refuses before
+any call, without truncating evidence.
+
+The engine checks the budget for all remaining batches before the first call,
+then reserves and counts each call separately. Each batch preserves its ID,
+assigned tasks, context and digest, raw reply and digest, and state. An unknown
+or unfavorable verdict prevents publication. Acceptance requires exact coverage
+of all criteria and revalidation of the same candidate's evidence; passing one
+batch does not accept the task.
+
+An interruption requires the existing explicit `planning retry-review` action.
+Only durably recorded favorable batches may be reused, after checking the
+candidate, contract, provider, model policy, method and every evidence digest.
+A paid call without a durable verdict stays consumed; its batch requires another
+review within the remaining budget. If all favorable replies are already durable,
+finishing their aggregation needs no additional call, even at the budget limit.
+This recovery refunds no call and creates no new producer attempt.
+
+These guarantees have isolated subprocess-provider tests in
+`managed_review_batch_runtime_test.go`. Those deterministic tests do not establish
+real model review quality or the completion of a running mission.

@@ -21,31 +21,46 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
-	ReplyPath         string              `json:"reply_path,omitempty"`
-	ReplyDigest       string              `json:"reply_sha256,omitempty"`
-	TimeoutSeconds    int                 `json:"timeout_seconds,omitempty"`
-	Workflow          *AgentWorkflow      `json:"workflow,omitempty"`
-	GitReport         string              `json:"git_report,omitempty"`
-	CandidateSHA      string              `json:"candidate_commit,omitempty"`
-	PreviousCandidate string              `json:"previous_candidate,omitempty"`
-	Receipt           string              `json:"receipt,omitempty"`
-	ReceiptDigest     string              `json:"receipt_sha256,omitempty"`
-	Context           string              `json:"context,omitempty"`
-	ContextDigest     string              `json:"context_sha256,omitempty"`
-	ManagedTasks      []ManagedTaskReview `json:"managed_tasks,omitempty"`
-	ID                string              `json:"id"`
-	Attempt           string              `json:"attempt"`
-	Producer          string              `json:"producer"`
-	Reviewer          string              `json:"reviewer"`
-	Report            string              `json:"report"`
-	Digest            string              `json:"sha256"`
-	Contract          string              `json:"contract"`
-	State             string              `json:"state"`
-	Reason            string              `json:"reason"`
-	Criteria          []ReviewCriterion   `json:"criteria,omitempty"`
-	Started           string              `json:"started"`
-	Finished          string              `json:"finished,omitempty"`
-	Usage             *Usage              `json:"usage,omitempty"`
+	BatchPlanDigest     string                      `json:"batch_plan_sha256,omitempty"`
+	BatchProviderDigest string                      `json:"batch_provider_sha256,omitempty"`
+	Batches             []ManagedReviewBatchVerdict `json:"batches,omitempty"`
+	ReplyPath           string                      `json:"reply_path,omitempty"`
+	ReplyDigest         string                      `json:"reply_sha256,omitempty"`
+	TimeoutSeconds      int                         `json:"timeout_seconds,omitempty"`
+	Workflow            *AgentWorkflow              `json:"workflow,omitempty"`
+	GitReport           string                      `json:"git_report,omitempty"`
+	CandidateSHA        string                      `json:"candidate_commit,omitempty"`
+	PreviousCandidate   string                      `json:"previous_candidate,omitempty"`
+	Receipt             string                      `json:"receipt,omitempty"`
+	ReceiptDigest       string                      `json:"receipt_sha256,omitempty"`
+	Context             string                      `json:"context,omitempty"`
+	ContextDigest       string                      `json:"context_sha256,omitempty"`
+	ManagedTasks        []ManagedTaskReview         `json:"managed_tasks,omitempty"`
+	ID                  string                      `json:"id"`
+	Attempt             string                      `json:"attempt"`
+	Producer            string                      `json:"producer"`
+	Reviewer            string                      `json:"reviewer"`
+	Report              string                      `json:"report"`
+	Digest              string                      `json:"sha256"`
+	Contract            string                      `json:"contract"`
+	State               string                      `json:"state"`
+	Reason              string                      `json:"reason"`
+	Criteria            []ReviewCriterion           `json:"criteria,omitempty"`
+	Started             string                      `json:"started"`
+	Finished            string                      `json:"finished,omitempty"`
+	Usage               *Usage                      `json:"usage,omitempty"`
+}
+
+type ManagedReviewBatchVerdict struct {
+	ID            string   `json:"id"`
+	Tasks         []string `json:"tasks"`
+	Context       string   `json:"context"`
+	ContextDigest string   `json:"context_sha256"`
+	ReplyPath     string   `json:"reply_path,omitempty"`
+	ReplyDigest   string   `json:"reply_sha256,omitempty"`
+	State         string   `json:"state"`
+	Started       string   `json:"started,omitempty"`
+	Finished      string   `json:"finished,omitempty"`
 }
 
 // Zero keeps historical configurations at their original 90-second deadline.
@@ -191,14 +206,14 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			return fmt.Errorf("vérificateur absent")
 		}
 		cfg := w.Planning.Reviewer
-		if cfg.Calls >= cfg.MaxCalls {
-			return fmt.Errorf("budget du vérificateur atteint ; aucun appel supplémentaire autorisé")
-		}
 		t, e := w.task(r.Task)
 		if e != nil {
 			return e
 		}
 		v := t.IndependentReview
+		if cfg.Calls >= cfg.MaxCalls && !managedBatchesAllPassed(v) {
+			return fmt.Errorf("budget du vérificateur atteint ; aucun appel supplémentaire autorisé")
+		}
 		managed := w.Planning.Repository != nil
 		if (t.Status != "submitted" && !(managed && t.Status == "blocked")) || v == nil || (v.State != "error" && v.State != "stale") {
 			return fmt.Errorf("seule une vérification interrompue ou périmée d’un résultat soumis peut être reprise")
@@ -210,6 +225,9 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			managedProducer = v.Producer
 		}
 		// The former record remains in the event history. Call reservations are never refunded.
+		if len(v.Batches) > 0 {
+			t.BatchReviewResume = v
+		}
 		t.IndependentReview = nil
 		cfg.Failure = ""
 		return nil
@@ -230,4 +248,16 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		}
 		return nil
 	})
+}
+
+func managedBatchesAllPassed(r *IndependentReview) bool {
+	if r == nil || len(r.Batches) == 0 {
+		return false
+	}
+	for _, b := range r.Batches {
+		if b.State != "passed" {
+			return false
+		}
+	}
+	return true
 }

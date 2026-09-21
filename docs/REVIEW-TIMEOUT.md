@@ -62,3 +62,33 @@ Un avis `unknown` correspond à des preuves insuffisantes. L'état
 compléter le livrable ou ses preuves dans les limites autorisées, puis faire
 vérifier le nouveau candidat. Un délai supplémentaire ne suffit pas à résoudre
 un manque de contexte ou de reçus de tests.
+
+## Dossiers cumulatifs et revues par lots
+
+Le moteur essaie d'abord un appel unique. Si le dossier dépasse 192 Kio après
+encodage sans perte, il prépare des lots déterministes de tâches. Chaque lot
+conserve le même candidat Git, le reçu des contrôles, le diff complet et tous les
+rapports et critères cumulatifs. Les sources annexes sont réparties selon leurs
+manifestes ; chaque source reste entière. Les limites cumulées de 24 fichiers,
+128 Kio de sources et 96 Kio par fichier restent applicables. Si une tâche ne
+tient pas dans un lot, le moteur refuse avant tout appel, sans tronquer le dossier.
+
+Le moteur vérifie le budget nécessaire à tous les lots restants avant le premier
+appel, puis réserve et compte chaque appel séparément. Il conserve par lot son
+identifiant, les tâches examinées, le contexte et son empreinte, la réponse brute,
+son empreinte et son état. Un avis inconnu ou défavorable empêche la publication.
+L'acceptation exige une couverture exacte de tous les critères et la relecture
+des preuves du même candidat ; réussir le premier lot ne valide pas la tâche.
+
+Une interruption exige la reprise explicite existante `planning retry-review`.
+Seuls les lots favorables enregistrés durablement peuvent être réutilisés, après
+vérification du candidat, du contrat, du fournisseur, de la politique du modèle,
+de la méthode et de toutes les empreintes. Un appel payé sans verdict durable
+reste consommé et son lot doit être examiné de nouveau dans le budget restant.
+Si tous les avis favorables sont déjà durables, terminer leur agrégation ne
+consomme pas d'appel supplémentaire, même au plafond. Aucun remboursement ni
+nouvelle tentative de production n'est créé par cette reprise.
+
+Ces garanties sont couvertes par des tests isolés avec processus fournisseur
+simulé (`managed_review_batch_runtime_test.go`). Ces tests ne démontrent ni la
+qualité d'une revue par un modèle réel, ni la réussite d'une mission en cours.
