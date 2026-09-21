@@ -216,3 +216,13 @@ Après `retry-review`, le conducteur reprend aussi une réparation externe dont
 le producteur reste interrompu : seul le résultat explicitement remis et en
 attente d’intégration est repris. Le processus historique et ses tentatives
 restent inchangés. Une remise refusée non réarmée ne déclenche aucun nouvel avis.
+
+### Dossier cumulé trop volumineux
+
+Le moteur garde la limite de contexte. Après réduction des seules lignes de
+contexte inchangées du diff, il peut retirer une source complémentaire dupliquée
+si le fichier est entièrement nouveau et si son contenu complet correspond
+exactement au diff intégral, avec le même objet Git. Le diff, les rapports, les
+reçus et toutes les lignes modifiées restent transmis. Aucun fichier modifié
+préexistant n’est raccourci. Un contexte encore trop grand reste refusé avant
+appel fournisseur ; cette déduplication n’autorise aucune troncature.

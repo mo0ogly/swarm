@@ -198,3 +198,12 @@ After `retry-review`, the conductor also resumes an external repair whose
 producer remains interrupted. Only the explicitly submitted result awaiting
 integration is resumed. Historical process state and attempts stay unchanged.
 A rejected submission without an explicit retry triggers no new opinion.
+
+### Oversized cumulative evidence
+
+The context limit remains unchanged. After reducing only unchanged diff context,
+the engine may omit a duplicate supplemental source when its entire newly added
+file is already present byte-for-byte in the full diff with the same Git blob.
+The diff, reports, receipts and every changed line remain present. Existing
+modified files are never shortened. Context that still exceeds the limit is
+rejected before a provider call; deduplication does not permit truncation.
