@@ -86,3 +86,34 @@ This recovery refunds no call and creates no new producer attempt.
 These guarantees have isolated subprocess-provider tests in
 `managed_review_batch_runtime_test.go`. Those deterministic tests do not establish
 real model review quality or the completion of a running mission.
+
+### Exact duplicates between the diff and source files
+
+If even an individual batch exceeds the limit, sources may be transported as
+segments. Portions already present in a diff hunk refer to its file and hunk
+number; remaining portions stay literal. Each segment and the reconstructed file
+carry a byte count and digest. The complete diff, deletions, reports, criteria
+and receipts remain present. This is lossless reconstruction, not a summary:
+concatenation yields the exact candidate file. Partial or ambiguous matches and
+unsupported patches retain their literal source. A packet that still exceeds
+the limit is refused before any call.
+
+This transport is attempted only after the entire previous batching preflight
+fails. Already valid plans keep exactly the same batches and prompts, preserving
+paid reviews. Stored canonical context stays unchanged. Tests reconstruct all
+bytes in a separate process and reject tampered content using the digests.
+
+### Retry a refusal before the first call
+
+`planning retry-review WORK --input request.json` also supports a completed result
+held by the size preflight with no independent review recorded. The request uses
+the existing `schema_version`, `event_id`, `expected_revision`, `task_id` and `reason`
+fields. Keep the same `event_id` when replaying the same request.
+
+Before rearming integration, the engine verifies the latest attempt, producer
+termination, retained Git result, candidate and contract, receipts, all batch
+sizes and the required budget. The original failure must be a size refusal;
+failed checks and unfavorable reviews cannot use this path. If the precondition
+is still unmet, no retry is recorded. The conductor then examines the same
+result. No new producer, refunded calls or increased limits are introduced;
+acceptance still requires the actual independent review.

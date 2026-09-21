@@ -24,7 +24,22 @@ if '\nSWARM_MANAGED_REVIEW_TEXT_CONTEXT\n' in text:
   line=stream.readline()
   if not line: break
   h=json.loads(line)
-  if h.get('content_from_added_diff'):
+  if h.get('parts'):
+   chunks=[]
+   for _ in range(h['parts']):
+    part=json.loads(stream.readline())
+    if part.get('from_diff_hunk'):
+     ref=part['from_diff_hunk']; path=ref['path']
+     section=next(s for s in ('\n'+ctx['diff']).split('\ndiff --git ') if s.startswith('a/'+path+' b/'+path+'\n'))
+     hunks=re.split(r'(?m)^@@ .*? @@[^\n]*\n',section)[1:]
+     lines=hunks[ref['number']-1].split('\n')
+     chunk=''.join(line[1:]+'\n' for line in lines if line.startswith((' ','+'))).encode()
+    else:
+     chunk=stream.read(part['bytes']); assert stream.read(1)==b'\n'
+    assert len(chunk)==part['bytes'] and hashlib.sha256(chunk).hexdigest()==part['sha256']
+    chunks.append(chunk)
+   raw=b''.join(chunks)
+  elif h.get('content_from_added_diff'):
    path=h['content_from_added_diff']
    section=next(s for s in ('\n'+ctx['diff']).split('\ndiff --git ') if s.startswith('a/'+path+' b/'+path+'\nnew file mode '))
    body=section.split('@@',2)[2].split('\n',1)[1]

@@ -4,10 +4,13 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
 const managedReviewPromptLimit = 192 * 1024
+
+var errManagedReviewBatchSize = errors.New(managedReviewContextTooLarge)
 
 // This is a preflight plan, never a review verdict. All global evidence remains
 // in every batch; only supplemental sources are assigned by task. Runtime must
@@ -30,6 +33,27 @@ func boundedManagedReviewPrompt(prefix string, c managedReviewContext) string {
 // sourceOwners comes from the immutable per-task context manifests, not a model
 // response. Missing or foreign assignments are rejected instead of guessing.
 func planManagedReviewBatches(prefix string, c managedReviewContext, sourceOwners map[string][]string) ([]managedReviewBatch, error) {
+	// Preserve every previously valid plan byte for byte, including paid lots.
+	// The lossless hunk transport is a fallback only after the whole legacy
+	// preflight fails. It cannot reshuffle an existing valid review plan.
+	batches, err := planManagedReviewBatchesTransport(prefix, c, sourceOwners, false)
+	if !errors.Is(err, errManagedReviewBatchSize) {
+		return batches, err
+	}
+	return planManagedReviewBatchesTransport(prefix, c, sourceOwners, true)
+}
+
+func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, sourceOwners map[string][]string, reuseHunks bool) ([]managedReviewBatch, error) {
+	bounded := func(prefix string, c managedReviewContext) string {
+		prompt := boundedManagedReviewPrompt(prefix, c)
+		if reuseHunks && len(prompt) > managedReviewPromptLimit {
+			alternative := prefix + managedReviewPacket(c, true)
+			if len(alternative) < len(prompt) {
+				return alternative
+			}
+		}
+		return prompt
+	}
 	if len(c.Tasks) == 0 {
 		return nil, fmt.Errorf("revue sans tâche")
 	}
@@ -75,7 +99,7 @@ func planManagedReviewBatches(prefix string, c managedReviewContext, sourceOwner
 		}
 	}
 	// Preserve the ordinary single-context transport and instructions exactly.
-	if prompt := boundedManagedReviewPrompt(prefix, c); len(prompt) <= managedReviewPromptLimit {
+	if prompt := bounded(prefix, c); len(prompt) <= managedReviewPromptLimit {
 		ids := []string{}
 		for _, t := range c.Tasks {
 			ids = append(ids, t.Task)
@@ -98,7 +122,7 @@ func planManagedReviewBatches(prefix string, c managedReviewContext, sourceOwner
 		}
 		names, _ := json.Marshal(ids)
 		instruction := prefix + "\nLOT DE REVUE : examine uniquement les tâches de cette liste JSON et retourne uniquement leurs verdicts : " + string(names) + ". Tous les rapports, critères, contrôles et le diff cumulatif restent présents pour le contexte global. Les autres tâches seront examinées séparément ; ne présume pas leur validation. Les sources annexes jointes sont celles déclarées pour les tâches affectées. Si une source absente est nécessaire, retourne unknown, jamais pass par défaut.\n"
-		return managedReviewBatch{Tasks: append([]string(nil), ids...), Context: subset, Prompt: boundedManagedReviewPrompt(instruction, subset)}
+		return managedReviewBatch{Tasks: append([]string(nil), ids...), Context: subset, Prompt: bounded(instruction, subset)}
 	}
 	batches := []managedReviewBatch{}
 	ids := []string{}
@@ -107,12 +131,12 @@ func planManagedReviewBatches(prefix string, c managedReviewContext, sourceOwner
 		b := makeBatch(next)
 		if len(b.Prompt) > managedReviewPromptLimit {
 			if len(ids) == 0 {
-				return nil, fmt.Errorf("%s : tâche %s", managedReviewContextTooLarge, t.Task)
+				return nil, fmt.Errorf("%w : tâche %s", errManagedReviewBatchSize, t.Task)
 			}
 			batches = append(batches, makeBatch(ids))
 			ids = []string{t.Task}
 			if len(makeBatch(ids).Prompt) > managedReviewPromptLimit {
-				return nil, fmt.Errorf("%s : tâche %s", managedReviewContextTooLarge, t.Task)
+				return nil, fmt.Errorf("%w : tâche %s", errManagedReviewBatchSize, t.Task)
 			}
 		} else {
 			ids = next

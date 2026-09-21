@@ -92,3 +92,36 @@ nouvelle tentative de production n'est créé par cette reprise.
 Ces garanties sont couvertes par des tests isolés avec processus fournisseur
 simulé (`managed_review_batch_runtime_test.go`). Ces tests ne démontrent ni la
 qualité d'une revue par un modèle réel, ni la réussite d'une mission en cours.
+
+### Doublons exacts entre diff et sources
+
+Si même un lot individuel dépasse la limite, le moteur peut transmettre les
+sources par segments. Les portions déjà présentes dans un hunk du diff sont
+référencées par fichier et numéro de hunk ; les autres portions restent littérales.
+Chaque segment porte sa taille et son empreinte, ainsi que le fichier reconstitué.
+Le diff complet, les suppressions, rapports, critères et reçus restent présents.
+Il ne s'agit ni d'un résumé ni d'une réduction des preuves : la concaténation
+restitue exactement le fichier candidat. Une correspondance partielle, ambiguë
+ou un patch non pris en charge conserve le texte littéral. Un dossier encore
+trop grand reste refusé avant tout appel.
+
+Ce transport est essayé seulement après l'échec du découpage antérieur complet.
+Les plans de revue déjà valides conservent donc exactement leurs lots et prompts ;
+les avis acquis ne sont pas invalidés par une optimisation de transport inutile.
+Le contexte canonique enregistré reste inchangé. Les tests reconstruisent les
+octets dans un processus distinct et rejettent une altération de leur empreinte.
+
+### Reprendre un refus avant tout appel
+
+`planning retry-review WORK --input requête.json` couvre aussi un résultat terminé
+retenu par le précontrôle de taille, sans avis indépendant enregistré. La requête
+contient les champs habituels `schema_version`, `event_id`, `expected_revision`,
+`task_id` et `reason`. Conserver le même `event_id` pour rejouer la même demande.
+
+Avant de réarmer l'intégration, le moteur vérifie la dernière tentative, la fin
+du producteur, le résultat Git conservé, le candidat et le contrat, les reçus,
+la taille de tous les lots et le budget nécessaire. Le motif initial doit être
+un refus de taille ; un contrôle échoué ou un avis défavorable ne passe pas par
+cette reprise. Si la précondition n'est pas corrigée, aucune reprise n'est inscrite.
+Le conducteur réexamine ensuite le même résultat. Aucun nouveau producteur,
+remboursement ou hausse de plafond ; l'acceptation attend toujours la revue réelle.

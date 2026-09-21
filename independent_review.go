@@ -201,6 +201,8 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 	}
 	raw, _ := json.Marshal(r)
 	managedProducer := ""
+	preflight, preflightErr := s.prepareManagedPreflightRetry(work, r.Task)
+	unpaid := false
 	return s.mutateWithHook(work, "review.retry", r.EventID, r.Revision, raw, func(w *Work) error {
 		if w.Planning == nil || w.Planning.Reviewer == nil {
 			return fmt.Errorf("vérificateur absent")
@@ -215,6 +217,18 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			return fmt.Errorf("budget du vérificateur atteint ; aucun appel supplémentaire autorisé")
 		}
 		managed := w.Planning.Repository != nil
+		if managed && v == nil && t.Status == "blocked" {
+			if preflightErr != nil {
+				return preflightErr
+			}
+			if preflight == nil || preflight.Revision != w.Revision || !currentTaskAttempt(t, preflight.Agent.Attempt) {
+				return fmt.Errorf("précontrôle remplacé ; relire le travail")
+			}
+			managedProducer = preflight.Agent.ID
+			unpaid = true
+			t.Next = "Dossier de revue prêt ; reprise du résultat existant sans nouvelle production."
+			return nil
+		}
 		if (t.Status != "submitted" && !(managed && t.Status == "blocked")) || v == nil || (v.State != "error" && v.State != "stale") {
 			return fmt.Errorf("seule une vérification interrompue ou périmée d’un résultat soumis peut être reprise")
 		}
@@ -235,7 +249,13 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		if managedProducer == "" {
 			return nil
 		}
-		result, e := tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND state IN ('conflict','integrating') AND result_commit!=''", managedProducer)
+		var result sql.Result
+		var e error
+		if unpaid {
+			result, e = tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND work_id=? AND task_id=? AND state='conflict' AND result_commit=? AND detail=?", managedProducer, work, r.Task, preflight.Item.Result, preflight.Item.Detail)
+		} else {
+			result, e = tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND state IN ('conflict','integrating') AND result_commit!=''", managedProducer)
+		}
 		if e != nil {
 			return e
 		}
