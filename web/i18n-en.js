@@ -2896,5 +2896,15 @@ globalThis.SwarmEnglish = {
   "Un essai correctif après trois tentatives": "One corrective attempt after three attempts",
   "Relisez le refus indépendant et adaptez la correction proposée. Fermer conserve le plafond actuel et ne lance rien.": "Read the independent rejection and adapt the proposed correction. Closing keeps the current limit and starts nothing.",
   "La confirmation autorise exactement un quatrième essai. Swarm le prend en charge si la mission est active et si les conditions de lancement sont réunies.": "Confirmation authorizes exactly one fourth attempt. Swarm handles it if the mission is active and launch conditions are met.",
-  "La pause, les budgets, les contrôles et la revue indépendante sont conservés. Aucun cinquième essai dans ce parcours.": "Pauses, budgets, checks and independent review are preserved. This flow provides no fifth attempt."
+  "La pause, les budgets, les contrôles et la revue indépendante sont conservés. Aucun cinquième essai dans ce parcours.": "Pauses, budgets, checks and independent review are preserved. This flow provides no fifth attempt.",
+  "reprise : tentative précédente non attribuable ou encore active": "Recovery: the previous attempt cannot be attributed or is still active",
+  "reprise : résultat attribué à une autre tâche": "Recovery: result belongs to a different task",
+  "reprise : résultat Git absent ou attribution modifiée": "Recovery: Git result is missing or its attribution changed",
+  "reprise : base du résultat incohérente": "Recovery: inconsistent result base",
+  "reprise : reçu de revue indisponible : %w": "Recovery: review receipt unavailable: %w",
+  "reprise : reçu de revue modifié ou invalide": "Recovery: review receipt changed or invalid",
+  "dossier de reprise supérieur à 512 Kio ; aucune troncature": "Recovery packet exceeds 512 KiB; no truncation",
+  "dossier de reprise redirigé ; copie conservée": "Recovery packet redirected; copy preserved",
+  "dossier de reprise modifié ; copie conservée pour examen": "Recovery packet changed; copy preserved for examination",
+  "référence de reprise modifiée ; copie conservée": "Recovery reference changed; copy preserved"
 };

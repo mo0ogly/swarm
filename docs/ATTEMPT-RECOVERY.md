@@ -91,6 +91,36 @@ actif. Examiner le JSON avant de l’envoyer. Elle ne relève aucun budget d’o
 de coût ou de revue et n’efface aucun essai. Les étapes non concernées gardent
 leur propre plafond. Un environnement en erreur exige toujours ses vérifications.
 
+## Ce que l’exécutant reçoit lors d’une reprise
+
+Le moteur prépare automatiquement un dossier dans `.git/swarm-recovery.json`
+de la **nouvelle copie isolée**. La consigne de l’agent indique son emplacement
+et son empreinte SHA-256. Le CLI, le web et le conducteur passent par cette même
+préparation ; aucun transfert manuel de correctif n’est nécessaire lorsqu’un
+résultat Git a déjà été enregistré par le moteur.
+
+Le dossier lie la mission, la tâche, l’agent et la tentative précédents à la
+correction du responsable, au motif d’arrêt et, s’ils existent, à l’avis indépendant
+complet et au reçu correspondant. Le reçu est relu et son empreinte vérifiée.
+Le résultat Git attribué à cette tentative est importé dans la nouvelle copie
+sous `refs/swarm/recovery/previous`. Son rapport et ses changements sont donc
+consultables localement avec `git show` et `git diff`, sans lire ni modifier les
+fichiers de l’ancien agent. Les identifiants de base et de résultat sont dans le JSON.
+
+La nouvelle copie démarre toujours sur le candidat validé courant. L’exécutant
+examine, réutilise et corrige les changements nécessaires dans sa propre copie ;
+il doit résoudre les éventuels conflits. Le résultat refusé n’est pas publié ni
+appliqué automatiquement. Le dossier reste dans les métadonnées Git : il ne
+pollue pas les fichiers du livrable. Les nouveaux contrôles, le bilan par critère
+et la revue indépendante restent obligatoires sur le nouveau candidat.
+
+Si aucun résultat Git immuable n’a été enregistré, le dossier l’indique : il ne
+prétend pas récupérer les fichiers non remis. Une attribution incohérente, un reçu
+altéré ou un dossier préparé modifié empêche le départ et conserve les copies.
+Le dossier est limité à 512 Kio, sans troncature. Cette passation ne consomme aucun
+appel IA et n’accorde aucune tentative supplémentaire. Elle facilite une reprise
+déjà autorisée ; elle ne remplace pas la décision sur un plafond épuisé.
+
 ## Donner au vérificateur les sources du candidat
 
 Pour une intégration Git gérée, le producteur peut ajouter

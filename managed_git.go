@@ -274,6 +274,10 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		return "", err
 	}
 	defer unlock()
+	recovery, err := s.managedRecoveryHandoff(w, taskForPreparation(w, r.TaskID))
+	if err != nil {
+		return "", err
+	}
 	if prior, e := s.managedAttempt(r.EventID); e == nil {
 		if prior.Work != w.ID || prior.Task != r.TaskID {
 			return "", fmt.Errorf("copie attribuée à une autre tâche")
@@ -289,6 +293,9 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 			return "", e
 		}
 		if e := verifyManagedCopy(repo, prior.Path); e != nil {
+			return "", e
+		}
+		if e := installManagedRecovery(repo, prior.Path, recovery); e != nil {
 			return "", e
 		}
 		return filepath.Join(prior.Path, repo.Subdir), nil
@@ -327,6 +334,9 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		if e := verifyManagedCopy(repo, path); e != nil {
 			return "", e
 		}
+		if e := installManagedRecovery(repo, path, recovery); e != nil {
+			return "", e
+		}
 		_, e = s.db.Exec("INSERT INTO managed_attempts(agent_id,work_id,task_id,base_commit,path,state) VALUES(?,?,?,?,?,'ready')", prior.Agent, prior.Work, prior.Task, prior.Base, prior.Path)
 		if e != nil {
 			return "", e
@@ -349,6 +359,9 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		return "", err
 	}
 	if err = verifyManagedWorkspace(clone, repo.Subdir); err != nil {
+		return "", err
+	}
+	if err = installManagedRecovery(repo, clone, recovery); err != nil {
 		return "", err
 	}
 	attribution := ManagedAttempt{Agent: r.EventID, Work: w.ID, Task: task.ID, Base: repo.Candidate, Path: path, State: "ready"}

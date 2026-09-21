@@ -460,6 +460,14 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if err = s.reviewerAvailable(launchWork); err != nil {
 		return a, false, err
 	}
+	recoveryHandoff, err := s.managedRecoveryHandoff(launchWork, taskForPreparation(launchWork, r.TaskID))
+	if err != nil {
+		return a, false, err
+	}
+	recoveryInstructions, err := managedRecoveryInstructions(recoveryHandoff)
+	if err != nil {
+		return a, false, err
+	}
 	if managedWork := launchWork; managedWork.Planning != nil && managedWork.Planning.Repository != nil {
 		if previewOnly {
 			r.Workspace = managedWork.Planning.Repository.Source
@@ -760,6 +768,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, r.Instruction)
 	}
 	prompt = workflowPrompt + prompt
+	prompt += recoveryInstructions
 	if r.Mode == "terminal" {
 		prompt += fmt.Sprintf("\nSession interactive supervisée, durée maximale %d secondes. Les appels d’outils et le coût ne sont pas mesurables dans ce mode ; ne pas prétendre qu’ils sont contrôlés. Respecter les permissions natives du fournisseur. Attendre les instructions de l’opérateur en cas de doute.\n", r.Timeout)
 	} else {

@@ -38,6 +38,34 @@ This operator allowance does not modify the hierarchical requirements, dependenc
 or owner. Replaying an `event_id` cannot grant another attempt. A stale revision is
 rejected. The `task.attempt-extension` event records the reason and instructions.
 
+## What a worker receives when retrying
+
+The engine automatically prepares `.git/swarm-recovery.json` in the **new isolated
+copy**. The worker prompt provides its location and SHA-256. CLI, web and conductor
+launches use the same preparation. When the engine has recorded an immutable Git
+result, an operator no longer needs to transfer its patch manually.
+
+The packet binds the work, task, previous agent and attempt to the planner's
+correction, failure reason and, when available, the full independent review and
+its receipt. The receipt is read again and checked against its recorded digest.
+The attributed Git result is fetched into the new copy under
+`refs/swarm/recovery/previous`. The worker can inspect its report and changes with
+`git show` and `git diff`, using the base and result commits in the JSON, without
+reading or modifying the previous worker's files.
+
+HEAD still starts at the current accepted candidate. The worker examines, reuses
+and corrects relevant changes in its own copy and resolves any conflicts. The
+rejected result is neither published nor applied automatically. The packet stays
+in Git metadata, outside deliverable files. New checks, a delivery manifest and
+independent review remain required against the new candidate.
+
+If no immutable Git result was recorded, the packet explicitly says so; unsubmitted
+working files are not imported. Inconsistent attribution, a changed receipt or a
+modified prepared packet prevents launch and preserves the copies. Packets are
+limited to 512 KiB without truncation. Handoff preparation makes no AI call and
+grants no additional attempt. It supports an authorized retry; it does not replace
+the operator's decision when the attempt limit has been reached.
+
 ## Supply candidate sources to the independent reviewer
 
 For managed Git integration, the producer may add
