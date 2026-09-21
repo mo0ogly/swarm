@@ -90,3 +90,9 @@ antérieur n'est retiré du diff. Si ce transport dépasse encore le plafond, la
 revue reste bloquée avant tout appel fournisseur. Les tests reconstruisent le
 dossier dans un processus distinct et comparent tous ses champs au contexte
 conservé ; ils vérifient aussi le refus d'un dossier réellement trop grand.
+
+Un rapport nouveau déjà reproduit intégralement dans le diff peut aussi être
+référencé à cet endroit : le moteur exige une identité exacte du texte, et le
+transport conserve sa taille et son empreinte. Un rapport modifié ou partiellement
+présent reste joint en entier. En cas de refus, le journal indique la taille
+réelle et la part occupée par les consignes, sans exposer le contenu.

@@ -18,7 +18,7 @@ func TestManagedReviewPacketPreservesAllEvidenceThroughProcess(t *testing.T) {
 		t.Fatal(err)
 	}
 	// JSON escaping alone pushes this under-limit evidence beyond the cap.
-	content := strings.Repeat("\t<é>\"\\\n", 7000) + "SWARM_MANAGED_REVIEW_TEXT_CONTEXT\n{\"field\":\"diff\",\"bytes\":0}\n"
+	content := "Report\n" + strings.Repeat("\t<é>\"\\\n", 7000) + "SWARM_MANAGED_REVIEW_TEXT_CONTEXT\n{\"field\":\"diff\",\"bytes\":0}\n"
 	if err := os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte(content), 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -43,6 +43,9 @@ func TestManagedReviewPacketPreservesAllEvidenceThroughProcess(t *testing.T) {
 	}
 	if !strings.Contains(observed.Prompt, "\nSWARM_MANAGED_REVIEW_TEXT_CONTEXT\n") || len(observed.Prompt) > 192*1024 {
 		t.Fatal("not testing bounded text transport")
+	}
+	if !strings.Contains(observed.Prompt, `"content_from_added_diff":"docs/first.md"`) {
+		t.Fatal("duplicate report not reused")
 	}
 	stored, err := os.ReadFile(filepath.Join(s.root, task.IndependentReview.Context))
 	if err != nil {
@@ -73,5 +76,21 @@ func TestManagedReviewPacketDoesNotMutateCanonicalContext(t *testing.T) {
 	after, _ := json.Marshal(c)
 	if string(before) != string(after) || !strings.Contains(packet, "source\n") || !strings.Contains(packet, "report\n") {
 		t.Fatal("canonical evidence mutated or absent")
+	}
+}
+
+func TestReportDiffReferenceRequiresExactCompleteNewFile(t *testing.T) {
+	blob := strings.Repeat("a", 40)
+	diff := "diff --git a/docs/t.md b/docs/t.md\nnew file mode 100644\nindex " + strings.Repeat("0", 40) + ".." + blob + "\n--- /dev/null\n+++ b/docs/t.md\n@@ -0,0 +1,2 @@\n+rapport é\n+preuve"
+	if !reportInAddedDiff(diff, "docs/t.md", "rapport é\npreuve") {
+		t.Fatal("full new report not recognized")
+	}
+	for _, changed := range []string{strings.Replace(diff, "+preuve", "+autre", 1), strings.Replace(diff, "new file mode", "old file mode", 1), diff + "\n\\ No newline at end of file"} {
+		if reportInAddedDiff(changed, "docs/t.md", "rapport é\npreuve") {
+			t.Fatal("nonidentical report reference")
+		}
+	}
+	if reportInAddedDiff(diff, "docs/other.md", "rapport é\npreuve") || reportInAddedDiff(diff, "docs/t.md", "rapport é") {
+		t.Fatal("partial or wrong report reference")
 	}
 }

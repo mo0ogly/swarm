@@ -320,6 +320,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		prompt = prefix + managedReviewTextPacket(context)
 	}
 	if len(prompt) > 192*1024 {
+		fmt.Fprintf(os.Stderr, "Revue retenue avant appel : %d octets (plafond %d), dont %d de consignes et %d de contexte JSON canonique.\n", len(prompt), 192*1024, len(prefix), len(data))
 		return fmt.Errorf("%s", managedReviewContextTooLarge)
 	}
 	ps, e := s.providers()

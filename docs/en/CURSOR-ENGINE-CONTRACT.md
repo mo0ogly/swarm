@@ -85,3 +85,8 @@ proof and no earlier change is removed from the diff. A packet that still exceed
 the cap is rejected before calling the provider. Process tests reconstruct the
 whole packet and compare every field with stored evidence; genuinely oversized
 packets remain rejected.
+
+A newly added report already reproduced in full in the diff may reference that
+copy after exact text comparison. Its length and digest remain explicit. Modified
+or partially present reports stay attached in full. On rejection, diagnostics
+record actual prompt and instruction sizes without exposing content.

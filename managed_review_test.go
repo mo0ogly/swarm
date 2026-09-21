@@ -23,9 +23,17 @@ if '\nSWARM_MANAGED_REVIEW_TEXT_CONTEXT\n' in text:
  while True:
   line=stream.readline()
   if not line: break
-  h=json.loads(line); raw=stream.read(h['bytes'])
+  h=json.loads(line)
+  if h.get('content_from_added_diff'):
+   path=h['content_from_added_diff']
+   section=next(s for s in ('\n'+ctx['diff']).split('\ndiff --git ') if s.startswith('a/'+path+' b/'+path+'\nnew file mode '))
+   body=section.split('@@',2)[2].split('\n',1)[1]
+   lines=body.splitlines()
+   assert all(not line or line.startswith('+') for line in lines)
+   raw='\n'.join(line[1:] for line in lines if line).encode()
+  else:
+   raw=stream.read(h['bytes']); assert stream.read(1)==b'\n'
   assert len(raw)==h['bytes'] and hashlib.sha256(raw).hexdigest()==h['sha256']
-  assert stream.read(1)==b'\n'
   if h['field']=='diff': ctx['diff']=raw.decode()
   else:
    m=re.fullmatch(r'(sources|tasks)\[(\d+)\]\.(content|report)',h['field']); assert m
