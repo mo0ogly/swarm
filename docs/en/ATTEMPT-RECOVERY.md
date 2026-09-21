@@ -131,3 +131,33 @@ swarm planning authorize-recovery WORK --input corrective-recovery.json
 Review this JSON before sending it: an active conductor may start the authorized
 attempt. Tool, cost and reviewer budgets remain unchanged. Other tasks retain
 their own allowances. Environment failures still require verified preconditions.
+
+## Recovering an interrupted result without rewriting history
+
+An execution limit takes precedence over earlier incidental tool errors. The engine
+sends the owner a JSON interruption record under `.swarm/interruptions/`, including
+the attempt identity, workspace, stop reason, counters and last observed action.
+It is an engine observation, not a worker report or acceptance evidence, and does
+not snapshot workspace files. Storage failures remain explicit.
+
+Worker instructions identify one code workspace and require an early, regularly
+updated report. These instructions are guidance, not an OS sandbox or a guarantee
+that a provider will follow them.
+
+For explicitly requested external repairs, an operator may finish the stopped
+copy and submit one examined revision through `planning submit-recovered-result`.
+The operation launches no worker and preserves the interrupted process, attempt
+and budgets. The reviewer receipt identifies `external_repair` and its actor;
+such a repair does not demonstrate autonomous completion.
+
+After reviewing the diff and evidence, run `git add -A` and `git write-tree` in the
+copy. Supply JSON with `schema_version: 1`, `event_id`, `expected_revision`,
+`task_id`, `agent_id`, `attempt_id`, `confirm_recovery: true`, `result_tree` and
+a meaningful `reason`. Changed files, active or replaced attempts, missing reports
+and incomplete delivery declarations are rejected. `docs/TASK.delivery.json` is
+mandatory even for legacy attempts.
+
+Normal checks and independent review still cover the same candidate. A rejection
+stays blocked; no fifth attempt is created. Replaying the same event uses the
+recorded revision and does not repeat a rejected review. A second repair submission
+for the task is refused. Review incidents use the existing explicit retry path.

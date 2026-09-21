@@ -9,12 +9,13 @@ import (
 )
 
 const (
-	recoveryProviderLimit = "provider_limit"
-	recoveryTransient     = "transient"
-	recoveryEnvironment   = "environment"
-	recoveryConflict      = "conflict"
-	recoveryBusiness      = "business"
-	recoveryUnknown       = "unknown"
+	recoveryProviderLimit  = "provider_limit"
+	recoveryTransient      = "transient"
+	recoveryEnvironment    = "environment"
+	recoveryConflict       = "conflict"
+	recoveryBusiness       = "business"
+	recoveryUnknown        = "unknown"
+	recoveryExecutionLimit = "execution_limit"
 
 	recoveryDispositionRetry        = "retry"
 	recoveryDispositionWait         = "wait"
@@ -79,6 +80,11 @@ func recoveryCategoryFor(a Agent) string {
 		return recoveryProviderLimit
 	}
 	diagnostic := fallbackAttemptDiagnostic(a)
+	// The terminal stop cause takes priority over earlier incidental tool errors.
+	// A missing file during exploration is not why a 100-call run was stopped.
+	if a.StopKind == "garde" && diagnostic.LimitReached {
+		return recoveryExecutionLimit
+	}
 	hasCheck := false
 	for _, item := range diagnostic.Items {
 		switch item.Category {
@@ -142,6 +148,10 @@ func assessRecovery(a Agent, task Task, at time.Time) recoveryAssessment {
 		operation = a.ID
 	}
 	result := recoveryAssessment{Category: category, CauseFingerprint: cause, OperationID: operation, Disposition: recoveryDispositionIntervention}
+	if category == recoveryExecutionLimit {
+		result.Reason = "limite d’exécution atteinte : examiner le travail conservé et les preuves manquantes avant une reprise autorisée"
+		return result
+	}
 	if category == recoveryProviderLimit && a.ProviderCooldown != nil && a.ProviderCooldown.active(at) {
 		result.Disposition = recoveryDispositionWait
 		result.Reason = a.ProviderCooldown.message()
@@ -222,6 +232,9 @@ func finalizeRecoveryState(a *Agent) {
 }
 
 func recoveryEligibleAt(a Agent, category string) time.Time {
+	if category == recoveryExecutionLimit {
+		return time.Time{}
+	}
 	if category == recoveryProviderLimit && a.ProviderCooldown != nil {
 		if a.ProviderCooldown.ResetAt > 0 {
 			return time.Unix(a.ProviderCooldown.ResetAt, 0)

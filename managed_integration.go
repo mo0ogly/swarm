@@ -38,7 +38,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
-	if !currentTaskAttempt(t, a.Attempt) || a.Status != "completed" {
+	if !currentTaskAttempt(t, a.Attempt) || (a.Status != "completed" && !recoveredResultMatches(t, a, item)) {
 		return fmt.Errorf("tentative non intégrable")
 	}
 	if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
@@ -122,6 +122,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		return s.managedFailure(a, err.Error())
 	}
 	receipt := map[string]any{"agent_id": a.ID, "attempt_id": a.Attempt, "base_commit": item.Base, "previous_candidate": repo.Candidate, "candidate_commit": candidate, "controls": results, "controller": validationController}
+	if recoveredResultMatches(t, a, item) {
+		receipt["external_repair"] = t.RecoveredResult
+	}
 	raw, _ := json.MarshalIndent(receipt, "", "  ")
 	relReceipt, _ := filepath.Rel(s.root, filepath.Join(proofDir, "receipt.json"))
 	if err = atomicWrite(filepath.Join(s.root, relReceipt), raw); err != nil {

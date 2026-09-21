@@ -994,6 +994,14 @@ func (s *Store) settleAgentTask(a Agent) error {
 	if state == "interrupted" {
 		outcome = "interrupted"
 	}
+	var stopArtifacts []ExchangeArtifact
+	if w.Planning != nil && (state == "failed" || state == "interrupted") {
+		if record, err := s.interruptionRecord(a); err != nil {
+			_ = s.log(a.ID, "warning", "Bilan d’arrêt non conservé : "+err.Error())
+		} else if record != nil {
+			stopArtifacts = append(stopArtifacts, *record)
+		}
+	}
 	// A crash after task.update(blocked) but before conduct leaves the exact
 	// attempt outcome durable. Resume that attributable handoff once. Relay on
 	// the agent is persisted before validation, so later polling does not relay
@@ -1014,7 +1022,7 @@ func (s *Store) settleAgentTask(a Agent) error {
 		if e := s.apply(w, "task.update", r); e != nil {
 			return e
 		}
-		planningAttemptEnded(w, a, outcome)
+		planningAttemptEnded(w, a, outcome, stopArtifacts...)
 		task, _ := w.task(a.TaskID)
 		if task.Brainstorm {
 			body, e := readBrainstormReport(s.root, task.ID)

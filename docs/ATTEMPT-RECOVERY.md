@@ -142,3 +142,37 @@ absents, liens symboliques, contenu binaire et dépassements sont refusés sans
 troncature ni appel de revue. Un manifeste absent conserve le parcours existant
 (diff, rapports et reçus des contrôles). Cette livraison est un contexte explicite,
 pas une surveillance générale des fichiers ni un message direct entre agents.
+
+## Réparer un résultat interrompu sans réécrire son historique
+
+Une limite d’exécution domine les erreurs d’outils antérieures dans le diagnostic.
+Le moteur transmet au responsable un bilan JSON d’arrêt dans `.swarm/interruptions/`,
+avec l’identité, la copie, la cause, les compteurs et la dernière action observée.
+Ce bilan est un constat du moteur, pas un rapport produit par l’agent ni une preuve
+de réussite. Il ne fige pas les fichiers de la copie. En cas d’échec de stockage,
+une alerte est conservée si le journal reste accessible ; aucun bilan n’est inventé.
+
+Les consignes du nouvel exécutant désignent une seule racine de code et demandent
+un rapport dès le début, actualisé régulièrement. C’est un cadrage explicite, pas
+un confinement système du fournisseur ni une garantie qu’il suivra ces consignes.
+
+Pour une réparation externe expressément demandée, un opérateur peut compléter
+la copie arrêtée, vérifier toutes les obligations et remettre **une seule** révision
+par `planning submit-recovered-result`. Cette opération ne lance aucun exécutant,
+ne change aucun plafond et conserve le processus et la tentative interrompus.
+Le reçu transmis au vérificateur identifie `external_repair` et son auteur.
+Elle ne constitue donc pas une démonstration d’autonomie.
+
+Après examen du diff et des preuves, indexer la copie avec `git add -A`, relever
+`git write-tree`, puis fournir à la commande un JSON contenant `schema_version: 1`,
+`event_id`, `expected_revision`, `task_id`, `agent_id`, `attempt_id`,
+`confirm_recovery: true`, `result_tree` et un `reason` explicite. Une modification
+des fichiers depuis cet examen, une tentative active ou remplacée, une déclaration
+de livraison incomplète ou un rapport absent refuse la remise. La déclaration
+`docs/TACHE.delivery.json` est obligatoire, y compris pour une ancienne tentative.
+
+Les contrôles et la revue indépendante portent ensuite sur le même candidat.
+Un refus reste un refus ; aucun cinquième essai n’est créé. Le rejeu du même
+événement reprend la révision enregistrée sans nouvelle production ni nouvelle
+revue implicite après refus. Une autre soumission de réparation pour cette tâche
+est refusée ; les incidents de revue utilisent le parcours explicite déjà existant.

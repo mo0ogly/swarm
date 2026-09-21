@@ -71,6 +71,7 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	ResultTree           string                         `json:"result_tree,omitempty"`
 	ConfirmRecovery      bool                           `json:"confirm_recovery,omitempty"`
 	ReviewID             string                         `json:"review_id,omitempty"`
 	RecoveryInstruction  string                         `json:"recovery_instruction,omitempty"`
@@ -130,6 +131,9 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	}
 	if action == "authorize-recovery" {
 		return s.authorizeCorrectiveRecovery(work, r)
+	}
+	if action == "submit-recovered-result" {
+		return s.submitRecoveredResult(work, r)
 	}
 	raw, err := json.Marshal(r)
 	if err != nil {
@@ -690,7 +694,7 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 
 // A process ending wakes the owner, but is deliberately not a validation.
 // Called in the same transaction as task settlement; recovery cannot lose it.
-func planningAttemptEnded(w *Work, a Agent, outcome string) {
+func planningAttemptEnded(w *Work, a Agent, outcome string, artifacts ...ExchangeArtifact) {
 	if w.Planning == nil {
 		return
 	}
@@ -709,7 +713,11 @@ func planningAttemptEnded(w *Work, a Agent, outcome string) {
 		return
 	}
 	scope.State = "ready"
-	w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: id, Scope: scope.ID, Kind: "attempt_ended", Task: task.ID, Attempt: a.Attempt, Message: outcome + " : " + a.Activity, At: now()})
+	message := outcome + " : " + a.Activity
+	if len(artifacts) > 0 {
+		message += fmt.Sprintf(" · Bilan moteur conservé : %d/%d appels d’outils, %d résultats reçus. Ce bilan ne valide aucun critère et ne remplace pas le rapport du producteur.", a.Progress.ToolCalls, a.Limits.MaxToolCalls, a.Progress.ToolResults)
+	}
+	w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: id, Scope: scope.ID, Kind: "attempt_ended", Task: task.ID, Attempt: a.Attempt, Message: message, Artifacts: artifacts, At: now()})
 }
 
 // Validation is a distinct input. A planner that has already read a process
