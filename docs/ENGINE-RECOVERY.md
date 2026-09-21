@@ -193,3 +193,14 @@ vérificateur. Le candidat est conservé sous une référence Git privée
 `refs/swarm/failed-controls/<SHA>`. Il ne remplace jamais le candidat accepté.
 Ces artefacts facilitent l’examen ; ils ne justifient ni une acceptation, ni un
 nouvel essai automatique. Une conservation impossible reste un refus explicite.
+
+### Exploration avant un livrable
+
+Le moteur injecte des exemples de commandes bornées dans chaque nouvelle
+consigne d'exécution : vérifier l'existence d'un rapport facultatif avant `cat`,
+passer les motifs de fichiers entre guillemets à `rg --files`, distinguer le code
+1 de recherche vide du code 2 d'erreur. Les contrôles de validation conservent
+leur code de sortie réel ; aucun `|| true` généralisé n'est recommandé.
+Ce cadrage aide l'agent, mais ne garantit pas qu'il suivra la consigne. Le moteur
+ne transforme pas une commande échouée en succès et conserve tous les plafonds.
+Une reprise après arrêt requiert une correction explicite et une tentative disponible.

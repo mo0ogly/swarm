@@ -172,3 +172,13 @@ not automatically sent to the reviewer. A private Git reference
 `refs/swarm/failed-controls/<SHA>` retains the rejected candidate without replacing
 the accepted one. These artifacts authorize neither acceptance nor automatic
 retry. Failure to preserve them is an explicit refusal.
+
+### Exploration before producing a deliverable
+
+The engine injects bounded shell examples into each new execution prompt: check
+whether an optional report exists before `cat`, pass quoted file patterns to
+`rg --files`, and distinguish empty-search exit code 1 from error exit code 2.
+Validation checks keep their real exit codes; blanket `|| true` masking is not
+recommended. These instructions help the agent but do not guarantee compliance.
+The engine does not turn failed commands into successes and preserves all limits.
+Recovery after interruption requires an explicit correction and an available attempt.
