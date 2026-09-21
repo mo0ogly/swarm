@@ -163,3 +163,10 @@ candidat, du contrat, du contexte et des reçus. Aucun nouvel appel IA ni produc
 n'est créé. Un avis défavorable, une preuve modifiée ou une autre tentative ne
 bénéficie pas de cette reprise. Un avis favorable seul reste distinct d'une tâche
 acceptée ; vérifier l'état public après l'opération.
+
+La transaction finale réserve l'écriture SQLite avant de relire ses preuves.
+Cela évite qu'une écriture concurrente empêche ensuite de promouvoir une
+transaction de lecture en écriture. La réservation ne modifie aucune révision
+et est annulée si une garde échoue. Les commandes de contrôle et la revue IA
+restent hors de cette transaction. Un test avec deux connexions reproduit
+SQLITE_BUSY avant le correctif, puis vérifie la publication unique après.

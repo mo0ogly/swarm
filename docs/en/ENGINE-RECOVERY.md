@@ -144,3 +144,9 @@ rechecking the candidate, contract, context and receipts. It creates no new mode
 call or producer attempt. Rejected reviews, altered evidence and different
 attempts cannot use this route. A favorable review alone is not acceptance;
 verify the public task state after the operation.
+
+The final transaction reserves SQLite's writer before rechecking its evidence.
+This prevents another writer from invalidating a deferred read-to-write upgrade.
+The reservation changes no revision and rolls back on any failed guard. Test
+commands and model review still run outside this transaction. A two-connection
+test reproduces SQLITE_BUSY before the fix and verifies one publication after it.
