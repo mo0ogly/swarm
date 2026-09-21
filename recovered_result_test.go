@@ -107,3 +107,43 @@ func TestRecoveredResultRefusesUnexaminedOrIncompleteInput(t *testing.T) {
 		})
 	}
 }
+
+// Simulate a stopped host after immutable submission but before a review call.
+// Only the context-size preflight may resume; the candidate and request stay bound.
+func TestRecoveredResultReplayResumesContextPreflightOnly(t *testing.T) {
+	s, w, a, r := recoveredResultFixture(t)
+	item, e := s.managedAttempt(a.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	result := gitTest(t, item.Path, "commit-tree", r.ResultTree, "-p", item.Base, "-m", "external fixture")
+	bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
+	gitTest(t, bare, "fetch", "--no-tags", item.Path, result)
+	raw, _ := json.Marshal(r)
+	_, e = s.mutate(w.ID, "fixture.preflight", "fixture-preflight", w.Revision, raw, func(w *Work) error {
+		task, _ := w.task(a.TaskID)
+		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: r.ResultTree, Actor: "fixture", At: now(), Reason: r.Reason, ProcessStatus: a.Status}
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	_, e = s.db.Exec("UPDATE managed_attempts SET result_commit=?,state='conflict',detail=? WHERE agent_id=?", result, managedReviewContextTooLarge, a.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if managedReviewCalls(t, s) != 0 {
+		t.Fatal("preflight consumed review")
+	}
+	after, e := s.submitRecoveredResult(w.ID, r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	task, _ := after.task(a.TaskID)
+	if task.Status != "accepted" || managedReviewCalls(t, s) != 1 {
+		t.Fatal(task.Status, task.Blocker)
+	}
+	if _, e = s.submitRecoveredResult(w.ID, r); e != nil || managedReviewCalls(t, s) != 1 {
+		t.Fatal("replay paid twice", e)
+	}
+}

@@ -161,3 +161,10 @@ Normal checks and independent review still cover the same candidate. A rejection
 stays blocked; no fifth attempt is created. Replaying the same event uses the
 recorded revision and does not repeat a rejected review. A second repair submission
 for the task is refused. Review incidents use the existing explicit retry path.
+
+Oversized review context can come from unchanged diff lines. Above 160 KiB of
+serialized context, the engine uses three Git context lines instead of forty.
+Every changed line, complete source file and receipt is retained. The final
+192 KiB limit remains mandatory. Explicit replay of the same external submission
+can resume this preflight failure only if no review of that attempt has started;
+an existing review never triggers an implicit additional call.

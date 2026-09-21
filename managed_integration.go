@@ -24,7 +24,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
-	if item.State == "conflict" {
+	if item.State == "conflict" && item.Detail != managedReviewContextTooLarge {
 		return s.managedFailure(a, item.Detail)
 	}
 	if item.State == "integrated" {
@@ -37,6 +37,11 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	t, err := w.task(a.TaskID)
 	if err != nil {
 		return err
+	}
+	// An explicitly replayed external submission may resume a context-size
+	// preflight after engine repair, only if no review of this attempt began.
+	if item.State == "conflict" && (!recoveredResultMatches(t, a, item) || (t.IndependentReview != nil && t.IndependentReview.Attempt == a.Attempt)) {
+		return s.managedFailure(a, item.Detail)
 	}
 	if !currentTaskAttempt(t, a.Attempt) || (a.Status != "completed" && !recoveredResultMatches(t, a, item)) {
 		return fmt.Errorf("tentative non intégrable")

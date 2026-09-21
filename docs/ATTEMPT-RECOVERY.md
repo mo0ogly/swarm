@@ -176,3 +176,11 @@ Un refus reste un refus ; aucun cinquième essai n’est créé. Le rejeu du mê
 événement reprend la révision enregistrée sans nouvelle production ni nouvelle
 revue implicite après refus. Une autre soumission de réparation pour cette tâche
 est refusée ; les incidents de revue utilisent le parcours explicite déjà existant.
+
+Un contexte de revue trop volumineux peut provenir des lignes inchangées du diff.
+Au-delà de 160 Kio de contexte sérialisé, le moteur emploie trois lignes de contexte
+Git au lieu de quarante. Il conserve toutes les lignes modifiées, les fichiers de
+sources complets et les reçus. La limite finale de 192 Kio reste obligatoire.
+Le rejeu explicite de la même remise externe peut reprendre cet échec préalable
+si aucune revue de cette tentative n’a commencé ; un avis déjà rendu reste lié
+à son candidat et ne déclenche aucun nouvel appel implicite.
