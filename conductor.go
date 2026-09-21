@@ -28,6 +28,12 @@ const reportClockSkew = 2 * time.Second
 func (s *Store) conduct(a Agent, outcome string) {
 	if w, e := s.get(a.WorkID); e == nil && w.Planning != nil && w.Planning.Repository != nil {
 		if outcome == "completed" {
+			// A retained refusal is not queued work. Reopening Git on every
+			// polling pass can starve new launches and overwrite the original
+			// diagnosis. Explicit recovery rearms integration separately.
+			if item, err := s.managedAttempt(a.ID); err == nil && (item.State == "conflict" || item.State == "integrated") {
+				return
+			}
 			if err := s.integrateManagedAttempt(a); err != nil {
 				if commandFailure(err).Code == "storage_unavailable" {
 					return

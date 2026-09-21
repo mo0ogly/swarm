@@ -170,3 +170,12 @@ transaction de lecture en écriture. La réservation ne modifie aucune révision
 et est annulée si une garde échoue. Les commandes de contrôle et la revue IA
 restent hors de cette transaction. Un test avec deux connexions reproduit
 SQLITE_BUSY avant le correctif, puis vérifie la publication unique après.
+
+### Refus conservé et surveillance du conducteur
+
+Une intégration en état `conflict` conserve son diagnostic et ses preuves. Le
+conducteur ne la remet pas en traitement à chaque vérification : cela reprendrait
+inutilement le verrou Git partagé avec les nouveaux départs. Une intégration déjà
+publiée est également ignorée. Les opérations publiques de reprise explicite
+restent disponibles et conservent les vérifications, identités et budgets. Une
+réparation réarmée en état `integrating` reste reprise par le conducteur.

@@ -150,3 +150,12 @@ This prevents another writer from invalidating a deferred read-to-write upgrade.
 The reservation changes no revision and rolls back on any failed guard. Test
 commands and model review still run outside this transaction. A two-connection
 test reproduces SQLITE_BUSY before the fix and verifies one publication after it.
+
+### Retained refusals and conductor polling
+
+An integration in `conflict` retains its diagnosis and evidence. The conductor
+does not retry it on every poll: doing so would repeatedly acquire the Git lock
+shared with new launches. Already integrated results are also skipped. Public
+explicit recovery operations remain available with the same identity, evidence
+and budget checks. An explicitly rearmed repair in `integrating` state is still
+resumed by the conductor.
