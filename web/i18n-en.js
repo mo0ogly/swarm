@@ -2940,5 +2940,9 @@ globalThis.SwarmEnglish = {
   "Limite": "Limit",
   "Les valeurs unknown ne constituent pas un succès.": "Unknown values do not constitute success.",
   "Révision d’exécution inconnue pour cet ancien reçu.": "Execution revision is unknown for this legacy receipt.",
-  "SHA candidat": "Candidate SHA"
+  "SHA candidat": "Candidate SHA",
+  "Sous-planificateur": "Subplanner",
+  "⑂ Sous-planificateur": "⑂ Subplanner",
+  "⑂ Sous-planificateur · IA": "⑂ Subplanner · AI",
+  "Voir les sous-planificateurs": "Find subplanners"
 };

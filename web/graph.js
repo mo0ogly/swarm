@@ -113,7 +113,7 @@ function drawPilotGraph(){
   }
   for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
   for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-65;
-   const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;
+   const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;group.dataset.agentRole=n.role||n.kind;
    group.append(svgNode('rect',{x:left,y:top,width,height:130,rx:12}));
    for(let i=0;i<4;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
    const open=()=>Planning.inspectRole(n.kind);group.addEventListener('click',e=>{if(e.isTrusted)open()});group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});svg.append(group);
@@ -152,7 +152,7 @@ function drawPilotGraph(){
  }
  const svg=canvas.querySelector('svg');if(!svg)return;
  scalePilotGraph(svg,state.zoom);
- for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
+ for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=n.role==='subplanner'?[n.title,n.scopeLabel,n.description,n.detail]:[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
  const byTask=graphAgentsParTache();
  for(const group of canvas.querySelectorAll('.graph-noeud')){
   const t=tasks.find(t=>t.id===group.dataset.task),v=snapshot.validation?.tasks[t.id],agent=byTask[t.id]?.[0]?.agent;

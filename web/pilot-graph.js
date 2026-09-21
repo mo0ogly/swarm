@@ -53,7 +53,7 @@ const PilotGraph = (() => {
  }
  function role(task,agent) {
   const key=agent?.role||task.launch_profile?.role||task.plan_role||'';
-  const roles={planner:['◇',tr_web_pilot_graph_js('Planificateur'),'info'],subplanner:['⑂',tr_web_pilot_graph_js('Responsable de branche'),'attention'],worker:['⚙',tr_web_pilot_graph_js('Exécutant'),'info'],reviewer:['✓',tr_web_pilot_graph_js('Vérificateur'),'info']};
+  const roles={planner:['◇',tr_web_pilot_graph_js('Planificateur'),'info'],subplanner:['⑂',tr_web_pilot_graph_js('Sous-planificateur'),'attention'],worker:['⚙',tr_web_pilot_graph_js('Exécutant'),'info'],reviewer:['✓',tr_web_pilot_graph_js('Vérificateur'),'info']};
   const [icon,label,tone]=roles[key]||['?',tr_web_pilot_graph_js('Rôle à préciser'),'attention'];
   return {icon,label,tone};
  }
@@ -74,7 +74,7 @@ const PilotGraph = (() => {
  }
  function organization(work,tasks,paused=false){
   const p=work.planning;if(!p)return {nodes:[],edges:[]};
-  const nodes=(p.scopes||[]).map(s=>({id:'@scope/'+s.id,kind:'planner',scope:s.id,tone:s.parent?'attention':'info',title:s.parent?tr_web_pilot_graph_js('⑂ Sous-responsable · ')+s.id:tr_web_pilot_graph_js('◇ Orchestrateur · ')+p.provider,description:paused||p.paused?tr_web_pilot_graph_js('En pause'):s.holder?tr_web_pilot_graph_js('Décision en cours'):s.state==='closed'?tr_web_pilot_graph_js('Périmètre terminé'):tr_web_pilot_graph_js('Attend les retours'),detail:(s.requirements||[]).length+tr_web_pilot_graph_js(' exigences · décide sans coder')}));
+  const nodes=(p.scopes||[]).map(s=>({id:'@scope/'+s.id,kind:'planner',role:s.parent?'subplanner':'planner',scope:s.id,tone:s.parent?'attention':'info',title:s.parent?tr_web_pilot_graph_js('⑂ Sous-planificateur'):tr_web_pilot_graph_js('◇ Orchestrateur · ')+p.provider,scopeLabel:s.parent?(s.objective||s.id).split('\n')[0].replace(/^Responsable — /,''):'',description:paused||p.paused?tr_web_pilot_graph_js('En pause'):s.holder?tr_web_pilot_graph_js('Décision en cours'):s.state==='closed'?tr_web_pilot_graph_js('Périmètre terminé'):tr_web_pilot_graph_js('Attend les retours'),detail:(s.requirements||[]).length+tr_web_pilot_graph_js(' exigences · décide sans coder')}));
   nodes.push({id:'@reviewer',kind:'reviewer',tone:p.reviewer&&!p.reviewer.failure?'info':'attention',title:p.reviewer?tr_web_pilot_graph_js('✓ Vérificateur IA · ')+p.reviewer.provider:p.repository?tr_web_pilot_graph_js('✓ Contrôleur du moteur'):tr_web_pilot_graph_js('! Vérificateur IA absent'),description:p.reviewer?(paused?tr_web_pilot_graph_js('En pause'):p.reviewer.failure?tr_web_pilot_graph_js('Vérification interrompue'):tasks.some(t=>t.independent_review?.state==='running')?tr_web_pilot_graph_js('Examen en cours'):tr_web_pilot_graph_js('Attend les résultats')):p.repository?tr_web_pilot_graph_js('Tests et intégration Git'):tr_web_pilot_graph_js('À configurer'),detail:p.reviewer?p.reviewer.calls+'/'+p.reviewer.max_calls+tr_web_pilot_graph_js(' appels · session indépendante'):p.repository?tr_web_pilot_graph_js('Aucune revue IA indépendante'):tr_web_pilot_graph_js('Aucun avis IA ne sera inventé')});
   const ids=new Set(nodes.map(n=>n.id)),edges=[];
   for(const s of p.scopes||[])if(s.parent&&ids.has('@scope/'+s.parent))edges.push({from:'@scope/'+s.parent,to:'@scope/'+s.id});

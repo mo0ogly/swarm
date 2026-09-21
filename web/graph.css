@@ -58,3 +58,8 @@
 .graph-responsibility:focus rect,.graph-responsibility:hover rect{stroke:var(--wattson-lien);stroke-width:4}
 
 .graph-fleche-role{fill:var(--wattson-info-encre)}
+
+/* The branch role is explicit even when status uses the same semantic tone. */
+.graph-responsibility[data-agent-role="subplanner"] rect{stroke-width:4}
+.graph-responsibility[data-agent-role="subplanner"] text[data-role-line="0"]{font-size:15px}
+.graph-responsibility[data-agent-role="subplanner"] text[data-role-line="1"]{font-weight:700}

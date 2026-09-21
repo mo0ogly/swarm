@@ -47,6 +47,7 @@ const Pilot = {
    ['pilot-expand',tr_web_pilotage_js('Tout déplier'),()=>{this.state.collapsed=[];this.changed()}],
    ['pilot-zoom-out',tr_web_pilotage_js('Réduire le zoom'),()=>this.zoom(-.15)],
    ['pilot-zoom-in',tr_web_pilotage_js('Agrandir le zoom'),()=>this.zoom(.15)],
+   ['pilot-planners',tr_web_pilotage_js('Voir les sous-planificateurs'),()=>{this.state.view='dependencies';this.state.zoom=1;this.changed();const n=document.querySelector('.graph-responsibility[data-agent-role="subplanner"]');n?.focus();n?.scrollIntoView({block:'center',inline:'center'})}],
    ['pilot-fit',tr_web_pilotage_js('Vue d’ensemble'),()=>{this.fitPending=true;this.changed()}],
    ['pilot-reveal',tr_web_pilotage_js('Retrouver ma sélection'),()=>this.revealSelection()],
    ['pilot-reset',tr_web_pilotage_js('Réinitialiser l’affichage'),()=>{this.state=PilotGraph.preferences();this.fitPending=true;this.changed();$('pilot-canvas').scrollTo(0,0)}],
