@@ -295,10 +295,22 @@ func (s *Store) prepareManagedCandidate(w Work, t *Task, a Agent, item ManagedAt
 			if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
 				return "", nil, fmt.Errorf("contrôles suspendus : %s", reason)
 			}
-			result := runValidationControl(filepath.Join(candidateDir, repo.Subdir), control)
+			result, output, outputBytes := runValidationControlCaptured(filepath.Join(candidateDir, repo.Subdir), control)
 			results[task.ID] = append(results[task.ID], result)
 			if !result.Passed {
-				return "", nil, fmt.Errorf("%s", fmt.Sprintf("Contrôle %s de %s en échec : %s (empreinte %s)", control.ID, task.ID, result.Summary, result.OutputHash))
+				// Keep the exact rejected commit reachable after the temporary
+				// checkout is removed. This private ref never publishes it.
+				if _, err = managedGit(bare, "fetch", "--no-tags", candidateDir, candidate); err != nil {
+					return "", nil, fmt.Errorf("contrôle refusé ; conservation du candidat impossible : %w", err)
+				}
+				if _, err = managedGit(bare, "update-ref", "refs/swarm/failed-controls/"+candidate, candidate); err != nil {
+					return "", nil, err
+				}
+				diagnostic, err := s.preserveManagedControlFailure(w, a, task.ID, candidate, control, result, output, outputBytes)
+				if err != nil {
+					return "", nil, fmt.Errorf("contrôle %s de %s refusé ; conservation du diagnostic impossible : %w", control.ID, task.ID, err)
+				}
+				return "", nil, fmt.Errorf("Contrôle %s de %s en échec : %s (empreinte %s) ; diagnostic : %s", control.ID, task.ID, result.Summary, result.OutputHash, diagnostic)
 			}
 		}
 	}

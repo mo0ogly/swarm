@@ -159,3 +159,16 @@ shared with new launches. Already integrated results are also skipped. Public
 explicit recovery operations remain available with the same identity, evidence
 and budget checks. An explicitly rearmed repair in `integrating` state is still
 resumed by the conductor.
+
+### Failed Git control diagnostics
+
+A failed cumulative control now reports a local artifact under
+`.swarm/managed/<mission>/diagnostics/control-failure-*.json`. It records the
+command, exit code, identities, tested candidate and exact captured output bytes
+(`output_base64`, JSON base64), with their digest. Capture remains bounded to
+64 KiB; `output_bytes` records the total and `truncated` explicitly marks a
+partial capture. Project information may appear in this local diagnostic; it is
+not automatically sent to the reviewer. A private Git reference
+`refs/swarm/failed-controls/<SHA>` retains the rejected candidate without replacing
+the accepted one. These artifacts authorize neither acceptance nor automatic
+retry. Failure to preserve them is an explicit refusal.

@@ -167,12 +167,20 @@ func validationDir(root, rel string) (string, error) {
 }
 
 func runValidationControl(root string, c ValidationControl) (r ValidationControlResult) {
+	r, _, _ = runValidationControlCaptured(root, c)
+	return r
+}
+
+// Capture is bounded exactly like the existing output digest. Callers may keep
+// diagnostic bytes separately without inflating successful review contexts.
+func runValidationControlCaptured(root string, c ValidationControl) (r ValidationControlResult, captured []byte, total int) {
+	var output limitedValidationOutput
 	r = ValidationControlResult{ID: c.ID, Command: append([]string(nil), c.Command...), ExitCode: -1, Started: now()}
-	defer func() { r.Finished = now() }()
+	defer func() { r.Finished = now(); captured = append([]byte(nil), output.b.Bytes()...); total = output.n }()
 	dir, err := validationDir(root, c.Dir)
 	if err != nil {
 		r.Summary = err.Error()
-		return r
+		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(c.Timeout)*time.Second)
 	defer cancel()
@@ -186,7 +194,6 @@ func runValidationControl(root string, c ValidationControl) (r ValidationControl
 			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 		}
 	}()
-	var output limitedValidationOutput
 	cmd.Stdout, cmd.Stderr = &output, &output
 	err = cmd.Start()
 	if err == nil {
@@ -207,7 +214,7 @@ func runValidationControl(root string, c ValidationControl) (r ValidationControl
 	if output.n > maxValidationOutput {
 		r.Summary += fmt.Sprintf(" ; sortie tronquée à %d octets", maxValidationOutput)
 	}
-	return r
+	return
 }
 
 func (s *Store) automaticValidationAuthorized(work string) (bool, string) {

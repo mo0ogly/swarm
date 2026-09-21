@@ -179,3 +179,17 @@ inutilement le verrou Git partagé avec les nouveaux départs. Une intégration 
 publiée est également ignorée. Les opérations publiques de reprise explicite
 restent disponibles et conservent les vérifications, identités et budgets. Une
 réparation réarmée en état `integrating` reste reprise par le conducteur.
+
+### Diagnostic d’un contrôle Git refusé
+
+Lorsqu’un contrôle cumulatif échoue, le motif indique désormais un fichier local
+`.swarm/managed/<mission>/diagnostics/control-failure-*.json`. Il contient la
+commande, le code de sortie, les identités, le candidat testé et les octets de
+sortie (`output_base64`, encodage base64 JSON), avec leur empreinte. La sortie
+est bornée à 64 Kio ; `output_bytes` indique sa taille totale et `truncated`
+signale explicitement une capture partielle. Ce diagnostic peut contenir des
+informations du projet : il reste local et n’est pas envoyé automatiquement au
+vérificateur. Le candidat est conservé sous une référence Git privée
+`refs/swarm/failed-controls/<SHA>`. Il ne remplace jamais le candidat accepté.
+Ces artefacts facilitent l’examen ; ils ne justifient ni une acceptation, ni un
+nouvel essai automatique. Une conservation impossible reste un refus explicite.
