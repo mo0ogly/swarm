@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -104,6 +106,9 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 	if r := t.IndependentReview; r != nil {
 		e.ReportReview = EvidenceReportReview{State: r.State, Attempt: valueOrUnknown(r.Attempt), Reviewer: valueOrUnknown(r.Reviewer), At: valueOrUnknown(r.Finished),
 			Limits: []string{"La revue porte sur le rapport et ses citations ; elle n’exécute aucun contrôle et ne vaut pas acceptation."}}
+		if w.Planning != nil && w.Planning.Repository != nil {
+			e.ReportReview.Limits = []string{"La revue examine le candidat, les sources fournies et les reçus de contrôles ; elle n’exécute pas elle-même les commandes et ne vaut pas acceptation."}
+		}
 		if r.Finished == "" {
 			e.ReportReview.At = valueOrUnknown(r.Started)
 		}
@@ -126,7 +131,11 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 		}
 	}
 
-	if a := t.AutoValidation; a != nil {
+	a := t.AutoValidation
+	if a == nil && w.Planning != nil && w.Planning.Repository != nil {
+		a = s.reviewReceiptEvidence(t)
+	}
+	if a != nil {
 		e.Attempt = valueOrUnknown(a.Attempt)
 		e.ObservedAt = valueOrUnknown(a.At)
 		hasFailed, hasUnknown, hasPassed := false, false, false
@@ -229,8 +238,8 @@ func valueOrUnknown(value string) string {
 
 func evidenceText(e TaskEvidence) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "PREUVES STRUCTURÉES — tentative : %s · révision lue : %d · fraîcheur : %s\n", e.Attempt, e.Revision, e.Freshness)
-	fmt.Fprintf(&b, "Revue du rapport : %s · date : %s (ne vaut ni exécution de contrôle ni acceptation)\n", e.ReportReview.State, e.ReportReview.At)
+	fmt.Fprintf(&b, uiText("PREUVES STRUCTURÉES — tentative : %s · révision lue : %d · fraîcheur : %s\n"), e.Attempt, e.Revision, e.Freshness)
+	fmt.Fprintf(&b, uiText("Revue du rapport : %s · date : %s (ne vaut ni exécution de contrôle ni acceptation)\n"), e.ReportReview.State, e.ReportReview.At)
 	for _, c := range e.Controls.Items {
 		command, exit := "unknown", "unknown"
 		if len(c.Command) > 0 {
@@ -239,11 +248,47 @@ func evidenceText(e TaskEvidence) string {
 		if c.ExitCode != nil {
 			exit = strconv.Itoa(*c.ExitCode)
 		}
-		fmt.Fprintf(&b, "Contrôle %s : tentative=%s · exécution=%s · révision=%s · sha_candidat=%s · commande=%s · code de sortie=%s · début=%s · fin=%s · fraîcheur=%s\n", c.ID, c.Attempt, c.Execution, c.Revision, c.CandidateSHA, command, exit, c.Started, c.Finished, c.Freshness)
+		fmt.Fprintf(&b, uiText("Contrôle %s : tentative=%s · exécution=%s · révision=%s · sha_candidat=%s · commande=%s · code de sortie=%s · début=%s · fin=%s · fraîcheur=%s\n"), c.ID, c.Attempt, c.Execution, c.Revision, c.CandidateSHA, command, exit, c.Started, c.Finished, c.Freshness)
 	}
-	fmt.Fprintf(&b, "Acceptation : %s · révision : %s · date : %s\n", e.Acceptance.State, e.Acceptance.Revision, e.Acceptance.At)
+	fmt.Fprintf(&b, uiText("Acceptation : %s · révision : %s · date : %s\n"), e.Acceptance.State, e.Acceptance.Revision, e.Acceptance.At)
 	for _, limit := range append(append([]string{}, e.ReportReview.Limits...), e.Limits...) {
-		fmt.Fprintf(&b, "Limite : %s\n", limit)
+		fmt.Fprintf(&b, uiText("Limite : %s\n"), uiEngineText(limit))
 	}
 	return strings.TrimSpace(b.String())
+}
+
+// Surface verified receipts even when the independent opinion rejected the result.
+// This read-only projection never creates a gate or an acceptance.
+func (s *Store) reviewReceiptEvidence(t *Task) *AutomaticValidation {
+	r := t.IndependentReview
+	if r == nil || r.Receipt == "" || r.ReceiptDigest == "" || r.CandidateSHA == "" {
+		return nil
+	}
+	path, e := localFile(s.root, r.Receipt)
+	if e != nil {
+		return nil
+	}
+	f, e := os.Open(path)
+	if e != nil {
+		return nil
+	}
+	defer f.Close()
+	raw, e := io.ReadAll(io.LimitReader(f, 1<<20+1))
+	if e != nil || len(raw) > 1<<20 || hash(raw) != r.ReceiptDigest {
+		return nil
+	}
+	var receipt struct {
+		Candidate string                               `json:"candidate_commit"`
+		Attempt   string                               `json:"attempt_id"`
+		Producer  string                               `json:"agent_id"`
+		Controls  map[string][]ValidationControlResult `json:"controls"`
+	}
+	if json.Unmarshal(raw, &receipt) != nil || receipt.Candidate != r.CandidateSHA || receipt.Attempt != r.Attempt || receipt.Producer != r.Producer {
+		return nil
+	}
+	controls := receipt.Controls[t.ID]
+	if len(controls) == 0 {
+		return nil
+	}
+	return &AutomaticValidation{Attempt: r.Attempt, CandidateSHA: r.CandidateSHA, Producer: r.Producer, Controls: controls, At: r.Started}
 }

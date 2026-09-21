@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-21",
+  "kind": "manual CUA browser QA against isolated paused managed-review fixture, not live autonomy",
+  "work": "w-5c70734594567053de70edb7",
+  "candidate_in_fixture": "4cc4318060c5c1930ca2a665d2dccd063d38eaf2",
+  "viewports": [
+    "default desktop",
+    "390x844"
+  ],
+  "themes": [
+    "etat",
+    "sombre"
+  ],
+  "languages": [
+    "fr",
+    "en"
+  ],
+  "observations": [
+    "Read review opens independent review modal with producer/reviewer/SHA, commands, exit code, timestamps, unknown revisions and non-acceptance",
+    "Escape closes modal and restores focus to review-read-first",
+    "Tab reaches help button inside modal",
+    "Final mobile modal clientWidth=337 scrollWidth=337; evidence clientWidth=288 scrollWidth=288",
+    "No browser console errors observed",
+    "Review prose and task names remain original user/provider content; business codes unchanged",
+    "Responsive checks found and fixed paragraph SHA overflow, nested pre scroll and two-column evidence layout"
+  ],
+  "screenshots_external_directory": "/home/fpizzi/workspace/swarm-engine-contract/e5-resolution-20260921",
+  "screenshots_sha256": {
+    "en-dark-mobile-final.png": "084877bf0e60ffc015f5cfa0d9eef0b5ed5b2447ff0c08b2d762b3e31972800c",
+    "fr-dark-mobile-final.png": "21146c0ab632171ee4acb07c5030993c9115c11b4fdf81deca58b6e33514c60e",
+    "en-light-mobile-final.png": "a3ea23c426b84795fa28b2cabfcba83c56a2ec2bf58ac61c49a9d313818b713a",
+    "fr-light-mobile-final.png": "e2df8eaee27a673fa47f6c274dbf9071bafe0936df8b8f0379ef4b3baae64333"
+  }
+}
