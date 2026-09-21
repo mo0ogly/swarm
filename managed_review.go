@@ -197,7 +197,7 @@ func compactManagedReviewContext(c *managedReviewContext, bare, base string) err
 	if err != nil {
 		return err
 	}
-	if len(raw) > 192*1024 {
+	if len(raw) > 160*1024 {
 		deduplicateAddedReviewSources(c)
 	}
 	return nil

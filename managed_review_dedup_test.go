@@ -3,6 +3,9 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -27,5 +30,31 @@ func TestAddedReviewSourceDedupIsLosslessAndConservative(t *testing.T) {
 		if addedSourceInDiff(bad, source) {
 			t.Fatal("non-equivalent source removed")
 		}
+	}
+}
+
+func TestAddedReviewDedupReservesInstructionBudget(t *testing.T) {
+	dir := t.TempDir()
+	gitTest(t, dir, "init")
+	gitTest(t, dir, "config", "user.email", "fixture@example.invalid")
+	gitTest(t, dir, "config", "user.name", "Fixture")
+	gitTest(t, dir, "commit", "--allow-empty", "-m", "base")
+	base := gitTest(t, dir, "rev-parse", "HEAD")
+	content := strings.Repeat("x", 85*1024) + "\n"
+	os.WriteFile(filepath.Join(dir, "new.txt"), []byte(content), 0600)
+	gitTest(t, dir, "add", ".")
+	gitTest(t, dir, "commit", "-m", "candidate")
+	candidate := gitTest(t, dir, "rev-parse", "HEAD")
+	diff := gitTest(t, dir, "diff", "--full-index", "--unified=3", base, candidate)
+	c := managedReviewContext{Candidate: candidate, Diff: diff, Sources: []ReviewSource{{Path: "new.txt", Blob: gitTest(t, dir, "rev-parse", "HEAD:new.txt"), Content: content}}}
+	raw, _ := json.Marshal(c)
+	if len(raw) <= 160*1024 || len(raw) >= 192*1024 {
+		t.Fatal("fixture outside instruction-reserve window", len(raw))
+	}
+	if err := compactManagedReviewContext(&c, dir, base); err != nil {
+		t.Fatal(err)
+	}
+	if len(c.Sources) != 0 || c.Diff != diff {
+		t.Fatal("duplicate left no room for instructions or diff changed")
 	}
 }
