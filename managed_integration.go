@@ -38,9 +38,10 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
-	// An explicitly replayed external submission may resume a context-size
-	// preflight after engine repair, only if no review of this attempt began.
-	if item.State == "conflict" && (!recoveredResultMatches(t, a, item) || (t.IndependentReview != nil && t.IndependentReview.Attempt == a.Attempt)) {
+	// An explicit replay may resume an unpaid preflight, or finish publication
+	// after a persisted pass. reviewManagedCandidate rechecks every binding and
+	// proof before reusing a pass; it never makes a second paid call in that case.
+	if item.State == "conflict" && (!recoveredResultMatches(t, a, item) || (t.IndependentReview != nil && t.IndependentReview.Attempt == a.Attempt && t.IndependentReview.State != "passed")) {
 		return s.managedFailure(a, item.Detail)
 	}
 	if !currentTaskAttempt(t, a.Attempt) || (a.Status != "completed" && !recoveredResultMatches(t, a, item)) {

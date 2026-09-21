@@ -134,3 +134,13 @@ SWARM_RECOVERY_UI_BINARY=/absolute/path/swarm \
 SWARM_RECOVERY_UI_OUT=/absolute/path/recipe \
 go test -run '^TestManagedRecoveryBrowserRecipe$' -count=1 -v .
 ```
+
+### Persisted approval with interrupted publication
+
+An explicitly submitted external repair may pass review after an earlier context
+size refusal, then encounter a storage error during publication. Replaying the
+exact same repair request can finish publication using the saved approval, after
+rechecking the candidate, contract, context and receipts. It creates no new model
+call or producer attempt. Rejected reviews, altered evidence and different
+attempts cannot use this route. A favorable review alone is not acceptance;
+verify the public task state after the operation.

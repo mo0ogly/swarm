@@ -152,3 +152,14 @@ SWARM_RECOVERY_UI_BINARY=/chemin/absolu/swarm \
 SWARM_RECOVERY_UI_OUT=/chemin/absolu/recette \
 go test -run '^TestManagedRecoveryBrowserRecipe$' -count=1 -v .
 ```
+
+### Avis favorable enregistré, publication interrompue
+
+Une réparation externe explicitement soumise peut avoir passé la revue après un
+ancien refus de taille, puis rencontrer une erreur de stockage lors de la
+publication. Rejouer exactement la même demande de réparation permet de reprendre
+cette publication : le moteur réutilise l'avis enregistré après revalidation du
+candidat, du contrat, du contexte et des reçus. Aucun nouvel appel IA ni producteur
+n'est créé. Un avis défavorable, une preuve modifiée ou une autre tentative ne
+bénéficie pas de cette reprise. Un avis favorable seul reste distinct d'une tâche
+acceptée ; vérifier l'état public après l'opération.

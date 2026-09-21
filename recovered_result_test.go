@@ -291,3 +291,58 @@ func TestRecoveredResultReviewRetryIsDrivenWithoutNewProducer(t *testing.T) {
 		t.Fatal("duplicate review", err)
 	}
 }
+
+// Fixture-only reconstruction of the durable boundary after review was saved
+// but the publication transaction failed. No real mission database is used.
+func TestRecoveredResultResumesPersistedPassWithoutNewReview(t *testing.T) {
+	for _, altered := range []bool{false, true} {
+		t.Run(map[bool]string{false: "fresh", true: "changed_context"}[altered], func(t *testing.T) {
+			s, w, a, r := recoveredResultFixture(t)
+			after, err := s.submitRecoveredResult(w.ID, r)
+			if err != nil {
+				t.Fatal(err)
+			}
+			task, _ := after.task(a.TaskID)
+			reviewed := task.IndependentReview.CandidateSHA
+			after.Planning.Repository.Candidate = w.Planning.Repository.Candidate
+			after.Planning.Inbox = w.Planning.Inbox
+			task.Status = "blocked"
+			task.Blocker = managedReviewContextTooLarge
+			task.AutoValidation = nil
+			task.Gate = nil
+			data, _ := json.Marshal(after)
+			if _, err = s.db.Exec("UPDATE works SET body=? WHERE id=?", data, w.ID); err != nil {
+				t.Fatal(err)
+			}
+			if _, err = s.db.Exec("DELETE FROM events WHERE id=?", "integrated-"+a.ID); err != nil {
+				t.Fatal(err)
+			}
+			if _, err = s.db.Exec("UPDATE managed_attempts SET state='conflict',detail=? WHERE agent_id=?", managedReviewContextTooLarge, a.ID); err != nil {
+				t.Fatal(err)
+			}
+			if altered {
+				if err = os.WriteFile(filepath.Join(s.root, task.IndependentReview.Context), []byte("changed evidence"), 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			_, err = s.submitRecoveredResult(w.ID, r)
+			current, _ := s.get(w.ID)
+			got, _ := current.task(a.TaskID)
+			if managedReviewCalls(t, s) != 1 {
+				t.Fatal("paid review duplicated")
+			}
+			if altered {
+				if got.Status == "accepted" || current.Planning.Repository.Candidate != w.Planning.Repository.Candidate {
+					t.Fatal("changed proof published")
+				}
+			} else {
+				if err != nil || got.Status != "accepted" || current.Planning.Repository.Candidate != reviewed {
+					t.Fatalf("publication did not resume: %v %s %s", err, got.Status, got.Blocker)
+				}
+				if _, err = s.submitRecoveredResult(w.ID, r); err != nil || managedReviewCalls(t, s) != 1 {
+					t.Fatal("publication replay not idempotent", err)
+				}
+			}
+		})
+	}
+}
