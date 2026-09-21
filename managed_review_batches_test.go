@@ -15,7 +15,7 @@ func batchFixture() (managedReviewContext, map[string][]string) {
 	c := managedReviewContext{Candidate: strings.Repeat("a", 40), Previous: strings.Repeat("b", 40), Diff: strings.Repeat("diff evidence\n", 8000), Receipt: json.RawMessage(`{"controls":"global receipt"}`)}
 	owners := map[string][]string{}
 	for _, id := range []string{"first", "second", "third"} {
-		c.Tasks = append(c.Tasks, managedReviewTaskContext{Task: id, Criteria: []string{"criterion one", "criterion two"}, Report: strings.Repeat(id+" report\n", 180)})
+		c.Tasks = append(c.Tasks, managedReviewTaskContext{Task: id, Binding: ManagedTaskReview{Task: id, Attempt: "attempt-" + id, Producer: "producer-" + id}, Criteria: []string{"criterion one", "criterion two"}, Report: strings.Repeat(id+" report\n", 180)})
 		content := strings.Repeat(id+" source\n", 2600)
 		c.Sources = append(c.Sources, ReviewSource{Path: id + ".go", Blob: strings.Repeat("c", 40), Content: content, Bytes: len(content), Digest: hash([]byte(content))})
 		owners[id] = []string{id + ".go"}
@@ -143,5 +143,104 @@ func TestManagedBatchSourceOwnershipUsesImmutableManifests(t *testing.T) {
 	c.Sources = c.Sources[1:]
 	if _, err = managedReviewSourceOwners(w, c); err == nil {
 		t.Fatal("missing shared source silently dropped")
+	}
+}
+
+func batchReplies(t *testing.T, batches []managedReviewBatch, verdict string) []string {
+	t.Helper()
+	replies := []string{}
+	for _, b := range batches {
+		tasks := []any{}
+		for _, id := range b.Tasks {
+			for _, tc := range b.Context.Tasks {
+				if tc.Task != id {
+					continue
+				}
+				criteria := []ReviewCriterion{}
+				for i := range tc.Criteria {
+					criteria = append(criteria, ReviewCriterion{Index: i + 1, Verdict: verdict, Evidence: tc.Report[:40]})
+				}
+				tasks = append(tasks, map[string]any{"task": id, "reason": "Independent fixture assessment", "criteria": criteria})
+			}
+		}
+		raw, _ := json.Marshal(map[string]any{"candidate_commit": b.Context.Candidate, "tasks": tasks})
+		replies = append(replies, string(raw))
+	}
+	return replies
+}
+
+func TestManagedBatchVerdictsRequireCompleteExactCoverage(t *testing.T) {
+	c, owners := batchFixture()
+	batches, err := planManagedReviewBatches("review", c, owners)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state, records, err := parseManagedReviewBatchReplies(c, batches, batchReplies(t, batches, "pass"))
+	if err != nil || state != "passed" || len(records) != len(c.Tasks) {
+		t.Fatal(state, len(records), err)
+	}
+	for i, r := range records {
+		if r.Task != c.Tasks[i].Task || len(r.Criteria) != len(c.Tasks[i].Criteria) {
+			t.Fatal("lost binding or criterion")
+		}
+	}
+	for _, verdict := range []string{"fail", "unknown"} {
+		replies := batchReplies(t, batches, "pass")
+		replies[len(replies)-1] = batchReplies(t, batches, verdict)[len(replies)-1]
+		state, _, err = parseManagedReviewBatchReplies(c, batches, replies)
+		if err != nil || state != "changes_requested" {
+			t.Fatal(verdict, state, err)
+		}
+	}
+}
+
+func TestManagedBatchVerdictsRejectMissingAndTamperedEvidence(t *testing.T) {
+	for _, kind := range []string{"missing-reply", "missing-batch", "duplicate-task", "foreign-sha", "changed-diff", "changed-report", "changed-source", "missing-criteria", "extra-task"} {
+		t.Run(kind, func(t *testing.T) {
+			c, owners := batchFixture()
+			batches, err := planManagedReviewBatches("review", c, owners)
+			if err != nil {
+				t.Fatal(err)
+			}
+			// Independent copy: mutations must not alter the canonical evidence too.
+			raw, _ := json.Marshal(batches)
+			batches = nil
+			json.Unmarshal(raw, &batches)
+			replies := batchReplies(t, batches, "pass")
+			switch kind {
+			case "missing-reply":
+				replies = replies[:len(replies)-1]
+			case "missing-batch":
+				batches = batches[:len(batches)-1]
+				replies = replies[:len(replies)-1]
+			case "duplicate-task":
+				batches[len(batches)-1].Tasks = []string{batches[0].Tasks[0]}
+			case "foreign-sha":
+				replies[0] = strings.ReplaceAll(replies[0], c.Candidate, strings.Repeat("d", 40))
+			case "changed-diff":
+				batches[0].Context.Diff += "tampered"
+			case "changed-report":
+				batches[0].Context.Tasks[0].Report += "tampered"
+			case "changed-source":
+				batches[0].Context.Sources[0].Content += "tampered"
+			case "missing-criteria":
+				var response map[string]any
+				json.Unmarshal([]byte(replies[0]), &response)
+				response["tasks"].([]any)[0].(map[string]any)["criteria"] = []any{}
+				r, _ := json.Marshal(response)
+				replies[0] = string(r)
+			case "extra-task":
+				var response map[string]any
+				json.Unmarshal([]byte(replies[0]), &response)
+				ts := response["tasks"].([]any)
+				response["tasks"] = append(ts, ts[0])
+				r, _ := json.Marshal(response)
+				replies[0] = string(r)
+			}
+			state, records, err := parseManagedReviewBatchReplies(c, batches, replies)
+			if err == nil || state == "passed" || records != nil {
+				t.Fatal("invalid bundle produced usable aggregate", kind, state, err)
+			}
+		})
 	}
 }

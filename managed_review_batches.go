@@ -154,3 +154,77 @@ func managedReviewSourceOwners(w Work, c managedReviewContext) (map[string][]str
 	}
 	return owners, nil
 }
+
+// Parse original independent replies, never summaries or caller-supplied pass
+// flags. Return no partial aggregate: every task and criterion must be covered
+// exactly once on the same candidate before publication can even be considered.
+func parseManagedReviewBatchReplies(c managedReviewContext, batches []managedReviewBatch, replies []string) (string, []ManagedTaskReview, error) {
+	if len(batches) == 0 || len(batches) != len(replies) {
+		return "", nil, fmt.Errorf("réponses de lots incomplètes")
+	}
+	canonical, _ := json.Marshal(c.Tasks)
+	sources := map[string]ReviewSource{}
+	for _, s := range c.Sources {
+		sources[s.Path] = s
+	}
+	expected := map[string]managedReviewTaskContext{}
+	for _, t := range c.Tasks {
+		if _, dup := expected[t.Task]; dup {
+			return "", nil, fmt.Errorf("tâche canonique dupliquée")
+		}
+		expected[t.Task] = t
+	}
+	seen := map[string]bool{}
+	seenSources := map[string]bool{}
+	records := map[string]ManagedTaskReview{}
+	state := "passed"
+	for i, b := range batches {
+		actual, _ := json.Marshal(b.Context.Tasks)
+		if b.Context.Candidate != c.Candidate || b.Context.Previous != c.Previous || b.Context.Diff != c.Diff || string(b.Context.Receipt) != string(c.Receipt) || string(actual) != string(canonical) {
+			return "", nil, fmt.Errorf("preuves globales différentes dans un lot")
+		}
+		subset := b.Context
+		subset.Tasks = nil
+		for _, id := range b.Tasks {
+			t, ok := expected[id]
+			if !ok || seen[id] {
+				return "", nil, fmt.Errorf("affectation de lot inconnue ou dupliquée")
+			}
+			seen[id] = true
+			subset.Tasks = append(subset.Tasks, t)
+		}
+		if len(subset.Tasks) == 0 {
+			return "", nil, fmt.Errorf("lot sans tâche")
+		}
+		supplied := map[string]bool{}
+		for _, s := range b.Context.Sources {
+			original, ok := sources[s.Path]
+			if !ok || supplied[s.Path] || s != original {
+				return "", nil, fmt.Errorf("source de lot différente du contexte canonique")
+			}
+			supplied[s.Path] = true
+			seenSources[s.Path] = true
+		}
+		verdict, entries, err := parseManagedReview(replies[i], subset)
+		if err != nil {
+			return "", nil, fmt.Errorf("lot %d : %w", i+1, err)
+		}
+		if verdict != "passed" {
+			state = "changes_requested"
+		}
+		for _, entry := range entries {
+			records[entry.Task] = entry
+		}
+	}
+	if len(seen) != len(expected) {
+		return "", nil, fmt.Errorf("couverture cumulative incomplète")
+	}
+	if len(seenSources) != len(sources) {
+		return "", nil, fmt.Errorf("source canonique absente des lots")
+	}
+	result := []ManagedTaskReview{}
+	for _, t := range c.Tasks {
+		result = append(result, records[t.Task])
+	}
+	return state, result, nil
+}
