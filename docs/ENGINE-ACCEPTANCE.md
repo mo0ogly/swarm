@@ -26,3 +26,5 @@ Pour un essai avec de vrais agents, figer aussi l’empreinte du moteur et le sc
 Stockage. Garder le même moteur pendant l’essai, enregistrer les appels par rôle
 et toute intervention externe. Une réparation manuelle reste une intervention ;
 aucun succès déterministe ne permet d’accepter automatiquement une mission réelle.
+
+Préparation distincte : [essai avec défaut métier contrôlé](CONTROLLED-AUTONOMY-TRIAL.md).

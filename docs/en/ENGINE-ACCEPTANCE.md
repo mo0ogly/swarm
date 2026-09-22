@@ -26,3 +26,5 @@ For live-agent trials, also freeze the engine binary hash and storage schema.
 Keep the same engine throughout, record calls per role and every external
 intervention. A manual repair remains an intervention; deterministic success
 cannot automatically accept a live mission.
+
+Separate preparation: [controlled business-fault trial](CONTROLLED-AUTONOMY-TRIAL.md).
