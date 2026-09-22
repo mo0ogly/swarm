@@ -216,3 +216,7 @@ invalide ou fournie pour une autre action est refusée avant modification.
 L’omission (ou zéro) conserve le comportement historique : le plafond de revue
 est celui des activations, limité à 100. Aucun appel IA ne part à la configuration.
 Cela ne modifie pas les budgets des missions existantes et ne rembourse aucun appel.
+
+## Recette du moteur
+
+Voir [les six recettes E1–E6](ENGINE-ACCEPTANCE.md), leurs prérequis et la distinction entre fixtures déterministes, contrôle navigateur et essai avec des agents réels.

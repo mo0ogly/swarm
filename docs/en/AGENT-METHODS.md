@@ -202,3 +202,7 @@ or use with another action are rejected before mutation. Omitting it (or using
 zero) retains the legacy default: the activation limit, capped at 100.
 Configuration does not invoke an AI provider. This does not change existing
 mission budgets or refund calls.
+
+## Engine acceptance
+
+See [the six E1–E6 recipes](ENGINE-ACCEPTANCE.md), their requirements and the distinction between deterministic fixtures, browser checks and live-agent trials.
