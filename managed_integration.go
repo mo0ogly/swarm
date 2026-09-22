@@ -19,7 +19,18 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
-	defer unlock()
+	defer func() {
+		if unlock != nil {
+			unlock()
+		}
+	}()
+	// Keep ownership of this attempt while releasing the mission Git lock for
+	// inference. Another conductor must not rewrite its proofs or orphan it.
+	releaseAttempt, err := managedReviewOwnershipLock(s.root, a.WorkID, a.ID)
+	if err != nil {
+		return err
+	}
+	defer releaseAttempt()
 	item, err := s.managedAttempt(a.ID)
 	if err != nil {
 		return err
@@ -139,7 +150,16 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err = atomicWrite(filepath.Join(s.root, relReceipt), raw); err != nil {
 		return err
 	}
-	if err = s.reviewManagedCandidate(w, a, candidate, filepath.ToSlash(relReceipt), raw); err != nil {
+	// All reviewed Git objects are immutable. Publication still requires the
+	// Git lock and rechecks the candidate/attempt and all review bindings.
+	unlock()
+	unlock = nil
+	reviewErr := s.reviewManagedCandidate(w, a, candidate, filepath.ToSlash(relReceipt), raw)
+	unlock, err = managedLock(s.root, a.WorkID)
+	if err != nil {
+		return err
+	} // Durable verdict remains reusable; no failure mutation.
+	if err = reviewErr; err != nil {
 		if commandFailure(err).Code == "provider_cooldown" {
 			return err
 		}

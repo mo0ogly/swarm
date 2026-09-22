@@ -63,6 +63,12 @@ func managedGit(dir string, args ...string) (string, error) {
 	}
 	return strings.TrimSpace(string(out)), nil
 }
+
+// Review ownership is separate from mission Git serialization. Hash the pair
+// so valid long work/agent identifiers cannot exceed the lock-name limit.
+func managedReviewOwnershipLock(root, work, agent string) (func(), error) {
+	return managedLock(root, "review-"+hash([]byte(work+"\x00"+agent)))
+}
 func managedLock(root, work string) (func(), error) {
 	if !safeName(work) {
 		return nil, fmt.Errorf("identifiant de mission invalide")

@@ -209,6 +209,8 @@ une nouvelle production. La détection seule ne réserve aucun nouvel appel IA.
 
 ### Propriété d’une revue active
 
-Le verrou d’intégration protège aussi la propriété de la revue en cours, pas seulement les commandes Git. Le libérer pendant l’inférence permet à un autre conducteur de prendre cette revue pour une opération orpheline et d’enregistrer un résultat concurrent. Tant qu’aucun mécanisme distinct de propriété durable ne remplace cette garantie, conserver le verrou jusqu’au verdict durable. Une optimisation de parallélisme doit démontrer la survie de la revue à un deuxième conducteur, la reprise après crash et l’unicité des appels payants.
+La tentative conserve un verrou interprocessus distinct pendant toute la revue. Le verrou Git de la mission est libéré avant la revue puis repris avant publication. Un autre conducteur ne peut ni réécrire les preuves de cette tentative ni déclarer sa revue orpheline tant que son verrou de propriété est détenu. Après arrêt du processus, le système libère ce verrou ; la détection d’interruption contrôle les deux verrous avant de modifier le verdict.
 
-`TestManagedLiveReviewSurvivesConcurrentConductor` bloque un vrai sous-processus de test pendant qu’un deuxième Store tente le relais, puis exige un seul verdict favorable et une publication idempotente. Ce test utilise un fournisseur simulé et ne prouve pas la qualité d’une revue IA réelle.
+Si le verrou Git est occupé au retour de la revue, le verdict durable est conservé et la publication attend un prochain passage. La reprise vérifie les mêmes preuves et ne repaie pas un avis favorable déjà acquis. Le candidat et la tentative sont revérifiés avant publication.
+
+Les tests `TestManagedLiveReviewSurvivesConcurrentConductor` et `TestManagedLiveReviewKeepsVerdictWhenGitLockIsRetaken` utilisent un sous-processus simulé bloqué sur une barrière : ils prouvent la fenêtre Git libre, la propriété de revue et la conservation du verdict. Ils ne démontrent pas l’autonomie avec un modèle réel.

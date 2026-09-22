@@ -194,6 +194,8 @@ production. Detection alone never reserves another provider call.
 
 ### Ownership of a live review
 
-The integration lock also protects ownership of an in-flight review, not only Git commands. Releasing it during inference lets another conductor misclassify the live review as orphaned and persist a competing result. Until a separate durable ownership mechanism replaces that guarantee, retain the lock through verdict persistence. Concurrency optimizations must prove survival of a second conductor, crash recovery and paid-call uniqueness.
+Each attempt retains a separate interprocess ownership lock throughout review. The mission Git lock is released before review and reacquired before publication. A second conductor cannot rewrite that attempt’s evidence or mark its review orphaned while ownership is held. Process exit releases ownership; orphan reconciliation checks both locks before changing the verdict.
 
-`TestManagedLiveReviewSurvivesConcurrentConductor` blocks a real test subprocess while a second Store attempts reconciliation, then requires a single passing verdict and idempotent publication. It uses a simulated provider and does not establish the quality of real AI reviews.
+If the Git lock is busy when review returns, the durable verdict is retained and publication awaits another pass. Replay checks the same evidence and does not pay again for an acquired passing verdict. Candidate and attempt identity are rechecked before publication.
+
+`TestManagedLiveReviewSurvivesConcurrentConductor` and `TestManagedLiveReviewKeepsVerdictWhenGitLockIsRetaken` use a barrier-controlled simulated subprocess to prove the free Git window, review ownership and verdict preservation. They do not demonstrate autonomy with a real model.

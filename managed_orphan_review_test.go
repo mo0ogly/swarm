@@ -59,6 +59,17 @@ func TestConductorReconcilesOrphanedReviewWithoutNewCall(t *testing.T) {
 		t.Fatal("live review disturbed")
 	}
 	unlock()
+	releaseReview, err := managedReviewOwnershipLock(s.root, w.ID, a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s.conduct(a, "completed")
+	held, _ := s.get(w.ID)
+	if held.Tasks[0].IndependentReview.State != "running" {
+		releaseReview()
+		t.Fatal("review ownership ignored with free Git lock")
+	}
+	releaseReview()
 	s.conduct(a, "completed")
 	after, err := s.get(w.ID)
 	if err != nil {

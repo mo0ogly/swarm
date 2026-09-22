@@ -92,6 +92,11 @@ func (s *Store) reconcileOrphanedManagedReview(w Work, a Agent) error {
 		return err
 	}
 	defer unlock()
+	releaseReview, err := managedReviewOwnershipLock(s.root, w.ID, a.ID)
+	if err != nil {
+		return err
+	}
+	defer releaseReview()
 	w, err = s.get(w.ID)
 	if err != nil {
 		return err

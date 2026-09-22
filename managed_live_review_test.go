@@ -13,6 +13,12 @@ import (
 // The real reviewer subprocess waits at a barrier while a second Store polls.
 // A free Git lock must never let that poll overwrite a still-live verdict.
 func TestManagedLiveReviewSurvivesConcurrentConductor(t *testing.T) {
+	testManagedReviewWindow(t, false)
+}
+func TestManagedLiveReviewKeepsVerdictWhenGitLockIsRetaken(t *testing.T) {
+	testManagedReviewWindow(t, true)
+}
+func testManagedReviewWindow(t *testing.T, retainGitLock bool) {
 	s, w := managedFixture(t)
 	a := managedCompleted(t, s, w, "first", "result\n")
 	folder := filepath.Join(s.root, "review-fixture")
@@ -57,6 +63,21 @@ if mode=='exit':`, 1)
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
+	// The subprocess has entered inference: this must be a real unlocked window.
+	releaseGit, lockErr := managedLock(s.root, w.ID)
+	if lockErr != nil {
+		t.Fatalf("Git lock held during reviewer inference: %v", lockErr)
+	}
+	gitHeld := true
+	defer func() {
+		if gitHeld {
+			releaseGit()
+		}
+	}()
+	if !retainGitLock {
+		releaseGit()
+		gitHeld = false
+	}
 	other.conduct(a, "completed")
 	mid, err := other.get(w.ID)
 	if err != nil {
@@ -72,7 +93,24 @@ if mode=='exit':`, 1)
 	select {
 	case err = <-done:
 		released = true
-		if err != nil {
+		if retainGitLock {
+			if err == nil || !strings.Contains(err.Error(), "déjà en cours") {
+				t.Fatalf("missing transient Git contention: %v", err)
+			}
+			retained, e := other.get(w.ID)
+			if e != nil {
+				t.Fatal(e)
+			}
+			task, _ := retained.task(a.TaskID)
+			if task.Status == "accepted" || task.IndependentReview == nil || task.IndependentReview.State != "passed" || managedReviewCalls(t, s) != 1 {
+				t.Fatalf("verdict not retained: %+v", task)
+			}
+			releaseGit()
+			gitHeld = false
+			if e = other.integrateManagedAttempt(a); e != nil {
+				t.Fatal(e)
+			}
+		} else if err != nil {
 			t.Fatal(err)
 		}
 	case <-time.After(20 * time.Second):
