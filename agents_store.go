@@ -555,6 +555,14 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	defer tx.Rollback()
 	var archivedCount int
+	// Reserve the writer before reading launch guards. Otherwise another
+	// connection's heartbeat can make the read snapshot impossible to upgrade,
+	// producing SQLITE_BUSY instead of waiting for that short write to finish.
+	// Preflight has already completed outside this transaction. Preview and
+	// rejected launches roll back this no-op with all their other reservations.
+	if _, e = tx.Exec("UPDATE works SET revision=revision WHERE id=?", work); e != nil {
+		return a, false, e
+	}
 	if e = tx.QueryRow("SELECT count(*) FROM mission_lifecycle WHERE work_id=?", work).Scan(&archivedCount); e != nil {
 		return a, false, e
 	}

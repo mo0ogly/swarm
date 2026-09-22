@@ -185,3 +185,14 @@ avis de base ne suffisent pas. Le plafond reste 192 Kio par appel, les budgets e
 l'exigence d'un avis indépendant sur le même candidat sont inchangés. Un changement
 individuel ou un ensemble de sources encore trop grand reste refusé avant tout
 appel : cette limite n'autorise jamais une troncature ou une validation partielle.
+
+### Collision d’écriture pendant une reprise
+
+Une autorisation de tentative supplémentaire et la réservation d’un lancement
+prennent le verrou d’écriture SQLite avant de lire leurs conditions. Une écriture
+concurrente courte (par exemple un signal d’agent) doit être attendue dans le délai
+SQLite existant, sans demander à l’humain de relancer la même action. La sonde du
+fournisseur reste exécutée avant la transaction. Une prévisualisation ou un refus
+annule la réservation ; une même requête rejouée ne crée pas deux agents. Les
+révisions périmées, les limites atteintes et une indisponibilité durable du stockage
+restent des erreurs : ce traitement ne constitue pas une relance illimitée.

@@ -172,3 +172,13 @@ of changes and their effects against a verified baseline. The reviewer must retu
 per-call limit, budgets and same-candidate independent verdict requirement remain.
 A single change or source set that still exceeds the limit is refused before any
 call; this never authorizes truncation or partial acceptance.
+
+### Concurrent writes during recovery
+
+An additional-attempt authorization and a launch reservation acquire SQLite's
+write lock before reading their guards. A short concurrent write, such as an agent
+heartbeat, is awaited within the existing SQLite timeout instead of requiring a
+human to repeat the action. Provider preflight remains outside the transaction.
+Previews and rejected launches roll back reservations; replaying the same request
+does not create duplicate agents. Stale revisions, exhausted limits and persistent
+storage failures remain errors; this is not an unlimited retry policy.
