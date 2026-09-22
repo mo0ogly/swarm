@@ -41,6 +41,20 @@ func preparedRequestDigest(r Launch) string {
 	return hash(b)
 }
 
+// Resumption may lower an explicit tool budget; all other frozen settings stay exact.
+func preparedRequestCompatible(saved, requested Launch) bool {
+	if preparedRequestDigest(saved) == preparedRequestDigest(requested) {
+		return true
+	}
+	if saved.Limits == nil || requested.Limits == nil || requested.Limits.MaxToolCalls < 1 || requested.Limits.MaxToolCalls >= saved.Limits.MaxToolCalls {
+		return false
+	}
+	limits := *saved.Limits
+	limits.MaxToolCalls = requested.Limits.MaxToolCalls
+	saved.Limits = &limits
+	return preparedRequestDigest(saved) == preparedRequestDigest(requested)
+}
+
 func (s *Store) readPreparedLaunch(w Work, id string) (ManagedAttempt, error) {
 	var record ManagedAttempt
 	if !safeName(id) || w.Planning == nil || w.Planning.Repository == nil {
@@ -157,6 +171,27 @@ func (s *Store) resumePreparedLaunch(work, id string, revision int) (Agent, bool
 	}
 	r := *record.Request
 	r.Revision, r.Origin, r.ConductorID = revision, originOperator, ""
+	// An explicit resume retains the reservation while respecting the provider ceiling.
+	// Never change the saved manifest or the task profile, nor raise a smaller budget.
+	if r.Limits != nil {
+		providers, err := s.providers()
+		if err != nil {
+			return Agent{}, false, err
+		}
+		provider, ok := providers.Providers[r.Provider]
+		if !ok {
+			return Agent{}, false, fmt.Errorf("fournisseur inconnu : %s", r.Provider)
+		}
+		ceiling, err := provider.Limits.normalized()
+		if err != nil {
+			return Agent{}, false, err
+		}
+		if r.Limits.MaxToolCalls > ceiling.MaxToolCalls {
+			limits := *r.Limits
+			limits.MaxToolCalls = ceiling.MaxToolCalls
+			r.Limits = &limits
+		}
+	}
 	// All provider, dependency, review, budget and concurrency guards run again.
 	return s.prepare(work, r)
 }

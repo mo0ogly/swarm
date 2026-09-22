@@ -197,3 +197,7 @@ n’accorde aucune validation. Les contrôles et la revue du résultat corrigé 
 obligatoires. Une seconde dérogation, un résultat remplacé ou une revue déjà rendue
 sur ce résultat sont refusés par cette voie. L’opération est disponible par le CLI
 et l’API publique ; le formulaire existant de refus de revue reste inchangé.
+
+### Budget d’un lancement préparé
+
+La reprise explicite par `agent resume-launch` conserve l’identité et la copie préparées. Si le nombre d’appels d’outils demandé dépasse le plafond du fournisseur inchangé, le moteur réduit ce nombre au plafond autorisé. Un budget plus petit reste inchangé. Le manifeste initial conserve le budget demandé ; la tentative enregistre le budget réellement appliqué. Les autres paramètres, la révision du travail, les preuves et l’identité du fournisseur restent contrôlés. Une double reprise retourne la même tentative.

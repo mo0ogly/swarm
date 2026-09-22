@@ -183,3 +183,7 @@ Authorization starts no agent and grants no acceptance; checks and independent
 review remain required. Repeated grants, replaced results and already-reviewed
 results are refused by this route. Available through the CLI and public API; the
 existing review-rejection form is unchanged.
+
+### Prepared launch budget
+
+Explicit `agent resume-launch` retains the prepared identity and workspace. When the requested tool-call budget exceeds the unchanged provider ceiling, the engine lowers that budget to the allowed ceiling. Smaller budgets remain unchanged. The original manifest retains the requested budget; the attempt records the effective budget. All other settings, work revision, evidence and provider identity remain checked. Replaying a resume returns the same attempt.

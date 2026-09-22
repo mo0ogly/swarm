@@ -235,3 +235,61 @@ func TestManagedPreparedLaunchStopsAutomaticRepeat(t *testing.T) {
 		t.Fatal("repeated recovery notices", count, e)
 	}
 }
+
+func TestManagedPreparedLaunchCapsProviderBudget(t *testing.T) {
+	s, w := managedFixture(t)
+	r := Launch{Schema: 1, EventID: "prepared-budget", Revision: w.Revision, TaskID: "first", Provider: "managed-review-fixture", Role: "worker", Instruction: "Complete the assigned task", Timeout: 60, Limits: &RunLimits{MaxToolCalls: 120}}
+	path, e := s.ensureManagedAttempt(w, r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	a, created, e := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision)
+	if e != nil || !created {
+		t.Fatalf("resume: created=%v error=%v", created, e)
+	}
+	if a.ID != r.EventID || a.CWD != path || a.Limits.MaxToolCalls != 100 {
+		t.Fatalf("wrong identity or budget: %+v", a)
+	}
+	record, e := s.readPreparedLaunch(w, r.EventID)
+	if e != nil || record.Request.Limits.MaxToolCalls != 120 {
+		t.Fatal("original budget was rewritten", e)
+	}
+	again, created, e := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision)
+	if e != nil || created || again.ID != a.ID {
+		t.Fatal("replay duplicated launch", e)
+	}
+	after, _ := s.get(w.ID)
+	if len(after.Tasks[0].Attempts) != 1 {
+		t.Fatal("duplicate attempt")
+	}
+}
+
+func TestPreparedBudgetCompatibilityRejectsOtherChanges(t *testing.T) {
+	saved := Launch{Instruction: "original", Provider: "fixture", Limits: &RunLimits{MaxToolCalls: 120, ToolSeconds: 300}}
+	for _, tc := range []struct {
+		name        string
+		calls       int
+		instruction string
+		seconds     int
+		ok          bool
+	}{
+		{"lower", 100, "original", 300, true}, {"same", 120, "original", 300, true},
+		{"raise", 121, "original", 300, false}, {"inherit", 0, "original", 300, false},
+		{"negative", -1, "original", 300, false}, {"instruction", 100, "changed", 300, false},
+		{"other limit", 100, "original", 600, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			request := saved
+			request.Instruction = tc.instruction
+			request.Limits = &RunLimits{MaxToolCalls: tc.calls, ToolSeconds: tc.seconds}
+			if got := preparedRequestCompatible(saved, request); got != tc.ok {
+				t.Fatalf("compatible=%v", got)
+			}
+		})
+	}
+	request := saved
+	request.Limits = nil
+	if preparedRequestCompatible(saved, request) {
+		t.Fatal("removed limits accepted")
+	}
+}
