@@ -47,6 +47,12 @@ func (s *Store) planningStep(work string) error {
 		if scope.State == "closed" || (scope.Holder != "" && time.Now().Before(until)) {
 			continue
 		}
+		// A local ceiling must not suspend unrelated scopes. Keep its inbox
+		// pending and its counters intact; claim still rechecks all budgets
+		// atomically before reserving a provider call.
+		if checkScopeActivation(p, scope.ID) != nil {
+			continue
+		}
 		for _, event := range p.Inbox {
 			if event.Scope == scope.ID && event.Decision == "" {
 				selected = scope.ID

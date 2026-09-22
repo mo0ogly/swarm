@@ -150,3 +150,15 @@ ce pack ne constitue pas une certification Cursor.
 - [Documentation Codex : découverte des skills](https://learn.chatgpt.com/docs/build-skills).
 - [Documentation Claude : skills de projet et commandes](https://code.claude.com/docs/en/skills).
 - [Contrat partagé de Swarm](../tools/agent-workflows/CONTRACT.md).
+
+### Budget local et poursuite des autres périmètres
+
+Un sous-planificateur qui atteint son plafond d'activations conserve ses retours
+non traités et son historique. Le conducteur ne le rappelle plus et poursuit les
+périmètres dont le budget, ainsi que celui de leurs parents, reste disponible.
+Ce plafond local ne doit pas créer une panne globale de planification. La
+réservation transactionnelle vérifie de nouveau les limites avant chaque appel.
+Si aucun périmètre ne peut agir, les sondages ne consomment aucun appel et ne
+modifient pas la mission. Un budget global épuisé, un fournisseur indisponible ou
+une véritable panne de planification restent des conditions distinctes ; cette
+règle ne les efface pas et n'ajoute aucune tentative.

@@ -141,3 +141,13 @@ acceptance conditions are Swarm's own contract; this pack is not Cursor certific
 - [Codex skill discovery documentation](https://learn.chatgpt.com/docs/build-skills).
 - [Claude project skills and commands documentation](https://code.claude.com/docs/en/skills).
 - [Swarm shared contract](../../tools/agent-workflows/CONTRACT.md).
+
+### Local budgets and progress in other scopes
+
+When a subplanner reaches its activation ceiling, its pending input and history
+are preserved. The conductor skips it and continues scopes with capacity in both
+their own budget and their ancestors' budgets. A local ceiling must not create a
+global planning failure. The transactional claim rechecks limits before each call.
+When no scope can act, polling consumes no calls and does not mutate the mission.
+An exhausted global budget, an unavailable provider and an actual planning failure
+remain separate conditions; this rule does not clear them or grant extra attempts.
