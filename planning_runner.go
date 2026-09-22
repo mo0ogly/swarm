@@ -42,36 +42,38 @@ func (s *Store) planningStep(work string) error {
 		return err
 	}
 	selected := ""
-	for _, scope := range p.Scopes {
+	// The inbox is appended transactionally. Schedule the oldest unhandled
+	// event's eligible owner, not the first role in the scope list: a fresh
+	// root resume must not overtake a child's existing results.
+	seen := map[string]bool{}
+	for _, event := range p.Inbox {
+		if event.Decision != "" || seen[event.Scope] {
+			continue
+		}
+		seen[event.Scope] = true
+		scope, scopeErr := p.scope(event.Scope)
+		if scopeErr != nil {
+			return scopeErr
+		}
 		until, _ := time.Parse(time.RFC3339Nano, scope.Until)
 		if scope.State == "closed" || (scope.Holder != "" && time.Now().Before(until)) {
 			continue
 		}
-		// A local ceiling must not suspend unrelated scopes. Keep its inbox
-		// pending and its counters intact; claim still rechecks all budgets
-		// atomically before reserving a provider call.
+		// Keep exhausted scopes pending; claim rechecks budgets atomically.
 		if checkScopeActivation(p, scope.ID) != nil {
 			continue
 		}
-		for _, event := range p.Inbox {
-			if event.Scope == scope.ID && event.Decision == "" {
-				selected = scope.ID
-				break
+		if p.Repository != nil {
+			pending, e := s.managedIntegrationPending(w, scope.ID)
+			if e != nil {
+				return e
+			}
+			if pending {
+				continue
 			}
 		}
-		if selected != "" {
-			if p.Repository != nil {
-				pending, e := s.managedIntegrationPending(w, selected)
-				if e != nil {
-					return e
-				}
-				if pending {
-					selected = ""
-					continue
-				}
-			}
-			break
-		}
+		selected = scope.ID
+		break
 	}
 	if selected == "" {
 		return nil

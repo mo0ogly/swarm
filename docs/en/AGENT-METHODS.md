@@ -151,3 +151,12 @@ global planning failure. The transactional claim rechecks limits before each cal
 When no scope can act, polling consumes no calls and does not mutate the mission.
 An exhausted global budget, an unavailable provider and an actual planning failure
 remain separate conditions; this rule does not clear them or grant extra attempts.
+
+### Pending handoff order
+
+The conductor selects the owner of the oldest unhandled event in durable inbox
+order. A recent coordinator resume message no longer overtakes results already
+received by a subplanner. Closed, leased, exhausted or integration-pending scopes
+remain ineligible; their events are retained. The claim rechecks limits before
+inference. Scheduling does not close scopes on the planner’s behalf or refund
+previous attempts.

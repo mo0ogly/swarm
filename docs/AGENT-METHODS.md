@@ -162,3 +162,13 @@ Si aucun périmètre ne peut agir, les sondages ne consomment aucun appel et ne
 modifient pas la mission. Un budget global épuisé, un fournisseur indisponible ou
 une véritable panne de planification restent des conditions distinctes ; cette
 règle ne les efface pas et n'ajoute aucune tentative.
+
+### Ordre des retours en attente
+
+Le conducteur choisit le propriétaire du plus ancien événement non traité dans
+l’ordre durable de la boîte de réception. Un message de reprise récent au
+coordinateur ne dépasse donc plus les résultats déjà reçus par un sous-planificateur.
+Les périmètres fermés, réservés, au plafond ou en attente d’intégration restent
+exclus du départ ; leurs événements sont conservés. La réservation revérifie les
+limites avant l’appel. Cet ordre ne clôture aucun périmètre à la place du
+planificateur et ne rend pas de budget aux tentatives précédentes.
