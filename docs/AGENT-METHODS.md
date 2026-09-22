@@ -205,3 +205,14 @@ La reprise explicite par `agent resume-launch` conserve l’identité et la copi
 ### Consulter un stockage créé par un ancien moteur
 
 Les commandes courantes de consultation (`work show/list`, `planning show`, `mission status/preview`, `agent show/list/logs/prepared`, listes et historiques de préparation, état des espaces et des échanges) refusent désormais de migrer implicitement un stockage plus ancien. Elles retournent `storage_upgrade_required`, sans changer sa version. Utiliser le CLI correspondant au serveur actif pour consulter cette mission. Pour une mise à niveau explicite, arrêter d’abord les anciens processus, puis lancer `swarm init` avec le nouveau CLI. Les commandes de mutation et le démarrage du serveur conservent leur mécanisme de migration existant : ne pas mélanger leurs versions sur un même stockage.
+
+## Plafonds de planification et de vérification
+
+Lors de `planning enable`, le JSON accepte `max_activations` pour les
+planificateurs et `max_review_calls` pour le vérificateur indépendant. Par exemple,
+`"max_activations": 12, "max_review_calls": 4` fixe deux plafonds distincts.
+`max_review_calls` exige un fournisseur et une valeur entre 1 et 100. Une valeur
+invalide ou fournie pour une autre action est refusée avant modification.
+L’omission (ou zéro) conserve le comportement historique : le plafond de revue
+est celui des activations, limité à 100. Aucun appel IA ne part à la configuration.
+Cela ne modifie pas les budgets des missions existantes et ne rembourse aucun appel.

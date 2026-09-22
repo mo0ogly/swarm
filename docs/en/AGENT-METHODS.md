@@ -191,3 +191,14 @@ Explicit `agent resume-launch` retains the prepared identity and workspace. When
 ### Inspecting storage created by an older engine
 
 Common inspection commands (`work show/list`, `planning show`, `mission status/preview`, `agent show/list/logs/prepared`, preparation lists/history, workspace and exchange status) refuse to implicitly upgrade older storage. They return `storage_upgrade_required` without changing its version. Use the CLI matching the active server to inspect that mission. For an explicit upgrade, stop older processes first, then run `swarm init` with the newer CLI. Mutating commands and server startup retain their existing migration behavior: do not mix their versions against the same storage.
+
+## Separate planning and review limits
+
+The `planning enable` JSON accepts `max_activations` for planners and
+`max_review_calls` for the independent reviewer. For example,
+`"max_activations": 12, "max_review_calls": 4` sets separate limits.
+`max_review_calls` requires a provider and a value from 1 to 100. Invalid values
+or use with another action are rejected before mutation. Omitting it (or using
+zero) retains the legacy default: the activation limit, capped at 100.
+Configuration does not invoke an AI provider. This does not change existing
+mission budgets or refund calls.

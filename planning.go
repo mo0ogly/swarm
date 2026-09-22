@@ -71,6 +71,7 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	MaxReviewCalls       int                            `json:"max_review_calls,omitempty"`
 	ResultCommit         string                         `json:"result_commit,omitempty"`
 	ExpectedCandidate    string                         `json:"expected_candidate,omitempty"`
 	ResultTree           string                         `json:"result_tree,omitempty"`
@@ -118,6 +119,9 @@ func planningError(code, message string) error { return &CommandError{Code: code
 func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, error) {
 	if r.Schema != 1 {
 		return Work{}, fmt.Errorf("schema_version doit valoir 1")
+	}
+	if r.MaxReviewCalls != 0 && (action != "enable" || r.Provider == "" || r.MaxReviewCalls < 1 || r.MaxReviewCalls > 100) {
+		return Work{}, planningError("invalid_review_budget", "max_review_calls doit être compris entre 1 et 100, uniquement lors de enable avec un fournisseur")
 	}
 	if action == "retry-integration" {
 		return s.retryManagedIntegration(work, r)
@@ -204,7 +208,11 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 			w.Planning.ProviderDigest = providerDigest
 			w.Planning.Repository = repository
 			if r.Provider != "" {
-				config, e := s.reviewerConfig(r.Provider, r.Level, min(w.Planning.MaxActivations, 100))
+				maxReviews := r.MaxReviewCalls
+				if maxReviews == 0 {
+					maxReviews = min(w.Planning.MaxActivations, 100)
+				}
+				config, e := s.reviewerConfig(r.Provider, r.Level, maxReviews)
 				if e != nil {
 					return e
 				}
