@@ -170,3 +170,16 @@ freshness checked by the engine, and available review identity and candidate
 revision. An accepted label without current evidence yields `accepted_fresh: false`.
 This summary does not replace independent review. It lets the coordinator propose
 closure, while the engine checks all evidence again before applying it.
+
+### Exceptional recovery after incomplete delivery
+
+After three consumed attempts, `planning authorize-recovery` supports one explicit
+operator-confirmed recovery. For a result rejected before paid review, supply
+`result_commit` (immutable result SHA) instead of `review_id`, plus `attempt_id`,
+`confirm_recovery: true`, a reason and a new corrective instruction. The engine
+checks Git attribution, the stopped latest attempt, actual delivery rejection and
+reviewer availability. It retains all three attempts and grants at most one more.
+Authorization starts no agent and grants no acceptance; checks and independent
+review remain required. Repeated grants, replaced results and already-reviewed
+results are refused by this route. Available through the CLI and public API; the
+existing review-rejection form is unchanged.

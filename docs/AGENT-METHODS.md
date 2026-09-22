@@ -183,3 +183,17 @@ le moteur et l’identité/révision de leur revue éventuelle. Un statut « acc
 sans preuves actuelles produit `accepted_fresh: false`. Ce résumé ne remplace pas
 une revue indépendante : il permet au coordinateur de proposer la clôture ; le
 moteur contrôle de nouveau toutes les preuves avant de l’appliquer.
+
+### Reprise exceptionnelle après livraison incomplète
+
+Après trois tentatives consommées, `planning authorize-recovery` permet une seule
+reprise explicitement confirmée par l’opérateur. Pour un résultat refusé avant la
+revue payante, fournir `result_commit` (SHA du résultat immuable) à la place de
+`review_id`, avec `attempt_id`, `confirm_recovery: true`, motif et nouvelle consigne.
+Le moteur vérifie l’attribution Git, la dernière tentative arrêtée, le refus de
+complétude réel et la disponibilité du vérificateur. Il conserve les trois essais,
+ajoute au plus une tentative, ne lance aucun agent lors de l’autorisation et
+n’accorde aucune validation. Les contrôles et la revue du résultat corrigé restent
+obligatoires. Une seconde dérogation, un résultat remplacé ou une revue déjà rendue
+sur ce résultat sont refusés par cette voie. L’opération est disponible par le CLI
+et l’API publique ; le formulaire existant de refus de revue reste inchangé.
