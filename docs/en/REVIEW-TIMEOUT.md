@@ -182,3 +182,12 @@ human to repeat the action. Provider preflight remains outside the transaction.
 Previews and rejected launches roll back reservations; replaying the same request
 does not create duplicate agents. Stale revisions, exhausted limits and persistent
 storage failures remain errors; this is not an unlimited retry policy.
+
+### Orphaned review after server shutdown
+
+A retained conflict may still show a running review after its controller stops.
+The conductor checks the interprocess lock held throughout review execution. It
+leaves a held lock alone; with a free lock, it rechecks the attempt identity and
+records interruption. Candidate, receipts and consumed calls remain unchanged.
+The public `planning retry-review` operation then becomes available without new
+production. Detection alone never reserves another provider call.

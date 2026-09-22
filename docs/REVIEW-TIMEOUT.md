@@ -196,3 +196,13 @@ fournisseur reste exécutée avant la transaction. Une prévisualisation ou un r
 annule la réservation ; une même requête rejouée ne crée pas deux agents. Les
 révisions périmées, les limites atteintes et une indisponibilité durable du stockage
 restent des erreurs : ce traitement ne constitue pas une relance illimitée.
+
+### Revue orpheline après arrêt du serveur
+
+Un résultat conservé en conflit peut encore porter une revue « en cours » alors
+que son contrôleur s'est arrêté. Le conducteur vérifie le verrou interprocessus
+qui couvre toute la revue : s'il est détenu, il n'intervient pas. S'il est libre,
+il relit l'identité de la tentative et conserve un verdict d'interruption. Le
+candidat, les reçus et les appels déjà consommés restent inchangés. La reprise
+publique `planning retry-review` devient alors disponible ; elle ne démarre pas
+une nouvelle production. La détection seule ne réserve aucun nouvel appel IA.
