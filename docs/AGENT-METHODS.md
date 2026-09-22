@@ -172,3 +172,14 @@ Les périmètres fermés, réservés, au plafond ou en attente d’intégration 
 exclus du départ ; leurs événements sont conservés. La réservation revérifie les
 limites avant l’appel. Cet ordre ne clôture aucun périmètre à la place du
 planificateur et ne rend pas de budget aux tentatives précédentes.
+
+### Retour au coordinateur après clôture d’un enfant
+
+Le contexte du coordinateur distingue les exigences encore possédées des exigences
+déléguées. `task_capacity_remaining` indique des places de création disponibles,
+pas des tâches restant à terminer. `descendant_validation` transmet les identités
+des tâches descendantes, leur état, la fraîcheur de leur acceptation calculée par
+le moteur et l’identité/révision de leur revue éventuelle. Un statut « accepted »
+sans preuves actuelles produit `accepted_fresh: false`. Ce résumé ne remplace pas
+une revue indépendante : il permet au coordinateur de proposer la clôture ; le
+moteur contrôle de nouveau toutes les preuves avant de l’appliquer.

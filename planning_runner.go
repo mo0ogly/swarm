@@ -112,6 +112,7 @@ Chaque titre doit rester court (500 caractères au maximum) ; placer les instruc
 max_tasks et max_activations valent 0 pour hériter du budget parent ; un enfant peut seulement les réduire.
 requirements, criteria et depends sont toujours des tableaux de chaînes. Pour close, remplir les champs inutilisés par une chaîne vide ou un tableau vide.
 Les exigences sont les identifiants req-N possédés par le périmètre. Les tâches créées restent worker et ne sont jamais validées par ta réponse.
+task_capacity_remaining est une capacité de création, jamais un nombre de tâches à terminer. requirements liste les exigences encore possédées ; les exigences déléguées peuvent quitter cette liste. children et descendant_validation décrivent l’état contrôlé par le moteur des descendants, avec accepted_fresh pour la fraîcheur actuelle. Quand les enfants sont closed et les résultats descendants accepted_fresh, propose close si rien ne reste dans ton périmètre ; le moteur revérifie les preuves. Une liste requirements vide après délégation n’interdit pas cette proposition.
 N'invente aucun résultat. Une fin de processus n'est pas une validation. Aucun prérequis hors périmètre.
 Pour un retour périmé ou sans action utile : operations vide et justification explicite. Pour une tâche ratée, utilise retry avec une correction explicite si la limite de tentatives le permet ; sinon explique le blocage.
 ` + string(context)

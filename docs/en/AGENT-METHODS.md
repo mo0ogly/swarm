@@ -160,3 +160,13 @@ received by a subplanner. Closed, leased, exhausted or integration-pending scope
 remain ineligible; their events are retained. The claim rechecks limits before
 inference. Scheduling does not close scopes on the planner’s behalf or refund
 previous attempts.
+
+### Returning a closed child scope to its coordinator
+
+The coordinator context distinguishes owned and delegated requirements.
+`task_capacity_remaining` means available creation slots, not unfinished tasks.
+`descendant_validation` carries descendant task identities, status, acceptance
+freshness checked by the engine, and available review identity and candidate
+revision. An accepted label without current evidence yields `accepted_fresh: false`.
+This summary does not replace independent review. It lets the coordinator propose
+closure, while the engine checks all evidence again before applying it.
