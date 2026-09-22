@@ -206,3 +206,9 @@ il relit l'identité de la tentative et conserve un verdict d'interruption. Le
 candidat, les reçus et les appels déjà consommés restent inchangés. La reprise
 publique `planning retry-review` devient alors disponible ; elle ne démarre pas
 une nouvelle production. La détection seule ne réserve aucun nouvel appel IA.
+
+### Propriété d’une revue active
+
+Le verrou d’intégration protège aussi la propriété de la revue en cours, pas seulement les commandes Git. Le libérer pendant l’inférence permet à un autre conducteur de prendre cette revue pour une opération orpheline et d’enregistrer un résultat concurrent. Tant qu’aucun mécanisme distinct de propriété durable ne remplace cette garantie, conserver le verrou jusqu’au verdict durable. Une optimisation de parallélisme doit démontrer la survie de la revue à un deuxième conducteur, la reprise après crash et l’unicité des appels payants.
+
+`TestManagedLiveReviewSurvivesConcurrentConductor` bloque un vrai sous-processus de test pendant qu’un deuxième Store tente le relais, puis exige un seul verdict favorable et une publication idempotente. Ce test utilise un fournisseur simulé et ne prouve pas la qualité d’une revue IA réelle.

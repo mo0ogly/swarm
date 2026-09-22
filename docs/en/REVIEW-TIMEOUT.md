@@ -191,3 +191,9 @@ leaves a held lock alone; with a free lock, it rechecks the attempt identity and
 records interruption. Candidate, receipts and consumed calls remain unchanged.
 The public `planning retry-review` operation then becomes available without new
 production. Detection alone never reserves another provider call.
+
+### Ownership of a live review
+
+The integration lock also protects ownership of an in-flight review, not only Git commands. Releasing it during inference lets another conductor misclassify the live review as orphaned and persist a competing result. Until a separate durable ownership mechanism replaces that guarantee, retain the lock through verdict persistence. Concurrency optimizations must prove survival of a second conductor, crash recovery and paid-call uniqueness.
+
+`TestManagedLiveReviewSurvivesConcurrentConductor` blocks a real test subprocess while a second Store attempts reconciliation, then requires a single passing verdict and idempotent publication. It uses a simulated provider and does not establish the quality of real AI reviews.
