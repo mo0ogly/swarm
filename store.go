@@ -20,6 +20,11 @@ type Store struct {
 }
 
 func openStore(root string, init bool) (*Store, error) {
+	return openStoreWithMigration(root, init, true)
+}
+
+// Inspection commands must not upgrade storage behind an older running server.
+func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	root, e := filepath.Abs(root)
 	if e != nil {
 		return nil, e
@@ -74,6 +79,9 @@ func openStore(root string, init bool) (*Store, error) {
 	}
 	if version < 0 || version > schemaVersion {
 		return fail(fmt.Errorf("version de stockage non supportée : %d", version))
+	}
+	if !migrate && version > 0 && version < schemaVersion {
+		return fail(&CommandError{Code: "storage_upgrade_required", Message: fmt.Sprintf("Stockage version %d, CLI version %d : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.", version, schemaVersion)})
 	}
 	if version == 0 {
 		if !init {

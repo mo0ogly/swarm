@@ -201,3 +201,7 @@ et l’API publique ; le formulaire existant de refus de revue reste inchangé.
 ### Budget d’un lancement préparé
 
 La reprise explicite par `agent resume-launch` conserve l’identité et la copie préparées. Si le nombre d’appels d’outils demandé dépasse le plafond du fournisseur inchangé, le moteur réduit ce nombre au plafond autorisé. Un budget plus petit reste inchangé. Le manifeste initial conserve le budget demandé ; la tentative enregistre le budget réellement appliqué. Les autres paramètres, la révision du travail, les preuves et l’identité du fournisseur restent contrôlés. Une double reprise retourne la même tentative.
+
+### Consulter un stockage créé par un ancien moteur
+
+Les commandes courantes de consultation (`work show/list`, `planning show`, `mission status/preview`, `agent show/list/logs/prepared`, listes et historiques de préparation, état des espaces et des échanges) refusent désormais de migrer implicitement un stockage plus ancien. Elles retournent `storage_upgrade_required`, sans changer sa version. Utiliser le CLI correspondant au serveur actif pour consulter cette mission. Pour une mise à niveau explicite, arrêter d’abord les anciens processus, puis lancer `swarm init` avec le nouveau CLI. Les commandes de mutation et le démarrage du serveur conservent leur mécanisme de migration existant : ne pas mélanger leurs versions sur un même stockage.

@@ -230,7 +230,7 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		return 0
 	}
-	s, e := openStore(root, pos[0] == "init")
+	s, e := openStoreWithMigration(root, pos[0] == "init", !cliStorageInspection(pos))
 	if e != nil {
 		return fail(e)
 	}

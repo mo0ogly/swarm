@@ -187,3 +187,7 @@ existing review-rejection form is unchanged.
 ### Prepared launch budget
 
 Explicit `agent resume-launch` retains the prepared identity and workspace. When the requested tool-call budget exceeds the unchanged provider ceiling, the engine lowers that budget to the allowed ceiling. Smaller budgets remain unchanged. The original manifest retains the requested budget; the attempt records the effective budget. All other settings, work revision, evidence and provider identity remain checked. Replaying a resume returns the same attempt.
+
+### Inspecting storage created by an older engine
+
+Common inspection commands (`work show/list`, `planning show`, `mission status/preview`, `agent show/list/logs/prepared`, preparation lists/history, workspace and exchange status) refuse to implicitly upgrade older storage. They return `storage_upgrade_required` without changing its version. Use the CLI matching the active server to inspect that mission. For an explicit upgrade, stop older processes first, then run `swarm init` with the newer CLI. Mutating commands and server startup retain their existing migration behavior: do not mix their versions against the same storage.
