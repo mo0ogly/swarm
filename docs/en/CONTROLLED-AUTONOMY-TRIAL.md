@@ -78,6 +78,43 @@ python3 -m unittest discover -s tests -p test_autonomy_worker_adapter.py -v
 6. Observe after launch: the trial script must not manufacture `claim/decide/retry/close`
    decisions. Record external repairs; they prevent a claim of unaided autonomy.
 
-The public campaign launcher and observer still need assembly before real calls
-can be authorized. Ten local tests prove fixture components, not the ability of
-real agents to finish the mission.
+## Launcher and observer
+
+`tests/controlled_autonomy_campaign.py` has two separate commands:
+
+```sh
+python3 tests/controlled_autonomy_campaign.py prepare NEW_DIRECTORY --engine /path/swarm --providers /path/providers.json --provider claude
+python3 tests/controlled_autonomy_campaign.py run NEW_DIRECTORY
+```
+
+`prepare` initializes a disposable Store and repository through the public CLI,
+configures planning and providers, then stops without enabling the mission or
+calling a model. It requires a new directory and never resets existing counters.
+The engine copy, recipe files and configurations are bound by hashes. Custom
+provider preflights are rejected instead of being bypassed or implicitly run.
+
+**`run` starts model calls and requires prior authorization.** Limits: 12 planning
+activations, one task with at most 2 productions, 4 reviews, 300 seconds per
+production, at most 100 tool calls per production (less when required by the
+provider), and 20 minutes of observation. A durable marker prevents silent reruns.
+Exhausted limits, missing evidence or errors never produce success or unlimited
+retries.
+
+The observer reads work state, history and agents through the public CLI. It checks
+injection attribution, the engine's failed business control and Git content,
+correction, scope closure, freshness, matching check/review/publication SHAs and
+evidence hashes. Detected external recovery is rejected. The launcher exposes no
+planner-decision or acceptance mutation. It stops the mission on exit; if agent or
+review shutdown cannot be confirmed, it reports failure and retains the server
+for diagnosis.
+
+This integration test uses the actual engine with a deterministic provider, not
+Claude:
+
+```sh
+SWARM_CAMPAIGN_TEST_ENGINE=/path/swarm python3 -m unittest discover -s tests -p test_controlled_autonomy_campaign.py -v
+```
+
+It proves the mechanical trajectory. Running Claude and observing its decisions is
+a separate, budget-authorized experiment. A PASS here never accepts E6 on behalf
+of the main mission engine.

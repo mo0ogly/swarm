@@ -82,6 +82,46 @@ python3 -m unittest discover -s tests -p test_autonomy_worker_adapter.py -v
    fabriquée par le script de recette. Toute réparation extérieure doit apparaître
    comme telle et interdit de conclure à une autonomie sans intervention.
 
-Il reste à assembler le lancement public et l’observateur de cette campagne, puis
-à autoriser les appels réels. Les dix tests locaux prouvent les composants du banc,
-ils ne prouvent pas que des agents réels sauront terminer la mission.
+## Lanceur et observateur
+
+`tests/controlled_autonomy_campaign.py` expose deux commandes séparées :
+
+```sh
+python3 tests/controlled_autonomy_campaign.py prepare DOSSIER_NEUF --engine /chemin/swarm --providers /chemin/providers.json --provider claude
+python3 tests/controlled_autonomy_campaign.py run DOSSIER_NEUF
+```
+
+`prepare` initialise un Store et un dépôt jetables par le CLI public, configure
+la planification et les fournisseurs, puis s’arrête sans activer la mission ni
+appeler un modèle. Le dossier doit être neuf. Aucun ancien compteur n’est remis
+à zéro. Le moteur est copié ; son empreinte, les fichiers de recette et les
+configurations sont figés. Les configurations de précontrôle personnalisé sont
+refusées plutôt que désactivées ou exécutées implicitement.
+
+**`run` démarre des appels de modèle et exige leur autorisation préalable.**
+Plafonds : 12 activations de planification, une tâche avec 2 productions maximum,
+4 revues, 300 secondes par production, 100 appels d’outils au plus par production
+(ou moins si le fournisseur l’impose), observation limitée à 20 minutes. Un marqueur
+empêche de relancer silencieusement une campagne déjà commencée. Un dépassement,
+un manque de preuve ou une panne rend le résultat non favorable ; aucune relance
+illimitée n’est prévue.
+
+L’observateur lit les états, l’historique et les agents par le CLI public. Il
+contrôle l’attribution de l’injection, le diagnostic métier du moteur et son
+contenu Git, la correction, la fermeture des périmètres, la fraîcheur et l’identité
+SHA contrôles/revue/publication, ainsi que les empreintes des preuves. Il refuse
+les reprises externes détectées. Le lanceur n’expose aucune commande pour fabriquer
+une décision de planificateur ou une acceptation. Il arrête la mission à la fin ;
+si l’arrêt des agents/revues ne peut être confirmé, il signale un échec et conserve
+le serveur pour diagnostic.
+
+Le test intégré suivant utilise le vrai moteur mais un fournisseur déterministe,
+pas Claude :
+
+```sh
+SWARM_CAMPAIGN_TEST_ENGINE=/chemin/swarm python3 -m unittest discover -s tests -p test_controlled_autonomy_campaign.py -v
+```
+
+Le test prouve la chaîne mécanique. Lancer Claude et observer ses décisions reste
+une expérience distincte, avec budget autorisé. Une sortie PASS du banc n’accepte
+pas E6 à la place du moteur de la mission principale.
