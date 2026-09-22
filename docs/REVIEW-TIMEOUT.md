@@ -125,3 +125,30 @@ un refus de taille ; un contrôle échoué ou un avis défavorable ne passe pas 
 cette reprise. Si la précondition n'est pas corrigée, aucune reprise n'est inscrite.
 Le conducteur réexamine ensuite le même résultat. Aucun nouveau producteur,
 remboursement ou hausse de plafond ; l'acceptation attend toujours la revue réelle.
+
+## Reprendre une intégration après un contrôle en échec
+
+`planning retry-integration WORK --input request.json` reprend le **résultat Git
+conservé**, sans nouvel exécutant. Cette opération est distincte de `retry-review` :
+elle rejoue les contrôles cumulés avant de demander une nouvelle revue indépendante.
+Elle exige une base validée différente, descendante de la base du contrôle échoué,
+et un producteur terminé dont la fin du processus est confirmée.
+
+La demande JSON contient `schema_version: 1`, `event_id`, `expected_revision`,
+`task_id`, `agent_id`, `attempt_id`, `result_commit`, `expected_candidate` et
+`reason` (8 à 2000 caractères). Les identités proviennent de l’état public ; elles
+ne doivent pas être devinées. CLI et API planning appliquent le même contrat.
+
+Une seule reprise est permise par résultat et base. Réenvoyer le même événement
+est sans effet supplémentaire. La réservation, le motif, l’échec et sa provenance
+restent dans `integration_retries`. Les tentatives, budgets et preuves ne sont pas
+remis à zéro. Un dossier de revue déjà constitué doit suivre sa propre récupération :
+il n’est jamais supprimé par cette opération. Une modification de base ou de contrat
+après réservation arrête la reprise.
+
+Pour les anciens échecs sans diagnostic, le moteur exige l’événement d’échec exact
+et une publication antérieure démontrant la base. `legacy_missing_output: true`
+signale que la sortie initiale manque ; aucune sortie ni cause n’est reconstruite.
+Sans cette provenance, la reprise est refusée. Une réservation réussie ne valide
+pas la tâche : seuls les nouveaux contrôles et l’avis indépendant permettent
+la publication du nouveau candidat.

@@ -38,6 +38,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
+	if err = integrationRetryGuard(w, t, a, item); err != nil {
+		return s.managedFailure(a, err.Error())
+	}
 	// An explicit replay may resume an unpaid preflight, or finish publication
 	// after a persisted pass. reviewManagedCandidate rechecks every binding and
 	// proof before reusing a pass; it never makes a second paid call in that case.

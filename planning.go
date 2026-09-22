@@ -71,6 +71,8 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	ResultCommit         string                         `json:"result_commit,omitempty"`
+	ExpectedCandidate    string                         `json:"expected_candidate,omitempty"`
 	ResultTree           string                         `json:"result_tree,omitempty"`
 	ConfirmRecovery      bool                           `json:"confirm_recovery,omitempty"`
 	ReviewID             string                         `json:"review_id,omitempty"`
@@ -116,6 +118,9 @@ func planningError(code, message string) error { return &CommandError{Code: code
 func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, error) {
 	if r.Schema != 1 {
 		return Work{}, fmt.Errorf("schema_version doit valoir 1")
+	}
+	if action == "retry-integration" {
+		return s.retryManagedIntegration(work, r)
 	}
 	if action == "retry-review" {
 		return s.retryIndependentReview(work, r)

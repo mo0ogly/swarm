@@ -117,3 +117,28 @@ failed checks and unfavorable reviews cannot use this path. If the precondition
 is still unmet, no retry is recorded. The conductor then examines the same
 result. No new producer, refunded calls or increased limits are introduced;
 acceptance still requires the actual independent review.
+
+## Retry integration after a failed control
+
+`planning retry-integration WORK --input request.json` retries the **retained Git
+result**, without another worker. Unlike `retry-review`, it reruns cumulative
+controls before requesting a new independent review. The accepted base must have
+changed and descend from the failed control's base. The producer must be completed
+with its process confirmed stopped.
+
+The JSON request requires `schema_version: 1`, `event_id`, `expected_revision`,
+`task_id`, `agent_id`, `attempt_id`, `result_commit`, `expected_candidate`, and
+`reason` (8–2000 characters). Obtain identities from public state. CLI and planning
+API enforce the same contract.
+
+Only one retry is allowed per result/base pair. Replaying the same event has no
+additional effect. `integration_retries` retains the reservation, original failure
+and provenance. Attempts, budgets and evidence are preserved. Existing review
+packets cannot be overwritten through this operation. A base or contract change
+after reservation stops integration.
+
+For historical failures without a diagnostic, the engine requires the exact failure
+event and an earlier publication establishing the base. `legacy_missing_output: true`
+explicitly records the missing original output; no output or cause is invented.
+Missing provenance prevents retry. A successful reservation is not acceptance:
+new cumulative controls and independent review must pass before publication.
