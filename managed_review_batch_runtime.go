@@ -321,7 +321,7 @@ func (s *Store) managedBatchProofsIntact(r IndependentReview) error {
 		}
 		expectedTasks, _ := json.Marshal(canonical.Tasks)
 		actualTasks, _ := json.Marshal(ctx.Tasks)
-		if ctx.Candidate != canonical.Candidate || ctx.Previous != canonical.Previous || ctx.Diff != canonical.Diff || string(ctx.Receipt) != string(canonical.Receipt) || string(expectedTasks) != string(actualTasks) {
+		if !sameManagedBaseline(ctx.Baseline, canonical.Baseline) || ctx.Candidate != canonical.Candidate || ctx.Previous != canonical.Previous || ctx.Diff != canonical.Diff || string(ctx.Receipt) != string(canonical.Receipt) || string(expectedTasks) != string(actualTasks) {
 			return fmt.Errorf("preuves globales du lot modifiées")
 		}
 		b := managedReviewBatch{Tasks: v.Tasks, Context: ctx}

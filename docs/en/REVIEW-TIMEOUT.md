@@ -142,3 +142,33 @@ event and an earlier publication establishing the base. `legacy_missing_output: 
 explicitly records the missing original output; no output or cause is invented.
 Missing provenance prevents retry. A successful reservation is not acceptance:
 new cumulative controls and independent review must pass before publication.
+
+## Cumulative dossiers: accepted baseline and incremental review
+
+Repeatedly sending the entire diff since mission start makes review input grow
+with history, even for a small new change. Existing bounded review plans remain
+unchanged. If even individual task batches overflow, the engine can use an
+incremental review:
+
+1. Verify passing reviews, attempts, contracts and policies for every accepted
+   task on the published baseline. An accepted status alone is insufficient.
+2. Supply those opinions explicitly as **evidence about the previous baseline**,
+   retaining original contexts, replies, references and hashes.
+3. Supply the full baseline-to-candidate diff, every current report and criterion,
+   and all cumulative controls executed on the new candidate.
+4. Reload declared sources from the new candidate, including files no longer
+   present in the incremental diff.
+5. Obtain NEW independent opinions on every criterion and possible regressions.
+   An old opinion never accepts the new candidate.
+
+`accepted_baseline` identifies this protocol in the stored context and reviewer
+instructions. Historical evidence hashes are checked recursively during review
+and before publication. Missing or changed evidence invalidates the chain. Previous
+review packets and already admissible batch plans retain their original transport.
+
+This replaces a fresh inspection of the entire history with independent inspection
+of changes and their effects against a verified baseline. The reviewer must return
+`unknown` if current sources and baseline opinions are insufficient. The 192 KiB
+per-call limit, budgets and same-candidate independent verdict requirement remain.
+A single change or source set that still exceeds the limit is refused before any
+call; this never authorizes truncation or partial acceptance.

@@ -94,6 +94,7 @@ func (s *Store) preparedManagedCandidate(w Work, t *Task, a Agent, item ManagedA
 const managedReviewSchema = `{"type":"object","additionalProperties":false,"properties":{"candidate_commit":{"type":"string"},"tasks":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"task":{"type":"string"},"reason":{"type":"string","minLength":8,"maxLength":1000,"description":"Concise rationale, at most 1000 characters; discuss coverage and material defects, not a transcript of every source."},"criteria":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"index":{"type":"integer"},"verdict":{"type":"string","enum":["pass","fail","unknown"]},"evidence":{"type":"string","minLength":8,"maxLength":1000,"description":"For pass: one short contiguous verbatim excerpt copied exactly from supplied evidence. No paraphrase, ellipsis, concatenation or added quotes. Put analysis in reason. For fail or unknown: describe the defect or missing evidence."}},"required":["index","verdict","evidence"]}}},"required":["task","reason","criteria"]}}},"required":["candidate_commit","tasks"]}`
 
 type managedReviewContext struct {
+	Baseline  *ManagedReviewBaseline     `json:"accepted_baseline,omitempty"`
 	Sources   []ReviewSource             `json:"sources,omitempty"`
 	Candidate string                     `json:"candidate_commit"`
 	Previous  string                     `json:"previous_candidate"`
@@ -177,6 +178,9 @@ func (s *Store) managedReviewContext(w Work, a Agent, candidate string, receipt 
 	c.Sources, e = managedReviewSources(w, c.Tasks, candidate)
 	if e == nil {
 		e = compactManagedReviewContext(&c, bare, repo.Base)
+	}
+	if e == nil {
+		return s.incrementalManagedReviewFallback(w, a, c)
 	}
 	return c, e
 }
@@ -314,10 +318,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		return e
 	}
 	prefix := managedReviewPrefix(workflowPrompt)
-	prompt := prefix + "\nSWARM_MANAGED_REVIEW_CONTEXT\n" + string(data)
-	if len(prompt) > 192*1024 {
-		prompt = prefix + managedReviewTextPacket(context)
-	}
+	prompt := boundedManagedReviewPrompt(prefix, context)
 	if len(prompt) > 192*1024 {
 		owners, err := managedReviewSourceOwners(current, context)
 		if err != nil {
@@ -575,10 +576,10 @@ func (s *Store) managedIndependentReviewGuard(w *Work, t *Task) error {
 	if r == nil || r.CandidateSHA == "" || r.CandidateSHA != w.Planning.Repository.Candidate || t.AutoValidation == nil || t.AutoValidation.CandidateSHA != r.CandidateSHA {
 		return fmt.Errorf("vérification IA périmée : révision Git différente")
 	}
+	if err := s.managedReviewFilesIntact(*r); err != nil {
+		return err
+	}
 	if len(r.Batches) > 0 {
-		if err := s.managedReviewFilesIntact(*r); err != nil {
-			return err
-		}
 		if err := s.managedBatchPlanIntact(*w, *r); err != nil {
 			return err
 		}
@@ -606,6 +607,18 @@ func managedReviewReportPath(receipt, task string) string {
 
 // Check the persisted evidence, not only the in-memory copy received before inference.
 func (s *Store) managedReviewFilesIntact(r IndependentReview) error {
+	return s.managedReviewFilesIntactSeen(r, map[string]bool{}, 0)
+}
+
+func (s *Store) managedReviewFilesIntactSeen(r IndependentReview, seen map[string]bool, depth int) error {
+	if depth > 128 {
+		return fmt.Errorf("chaîne de revues trop profonde")
+	}
+	key := r.Context + ":" + r.ContextDigest
+	if seen[key] {
+		return nil
+	}
+	seen[key] = true
 	for path, digest := range map[string]string{r.Receipt: r.ReceiptDigest, r.Context: r.ContextDigest, r.Report: r.Digest} {
 		p, err := safeReport(s.root, path)
 		if err != nil {
@@ -616,7 +629,35 @@ func (s *Store) managedReviewFilesIntact(r IndependentReview) error {
 			return fmt.Errorf("reçu, contexte ou rapport modifié pendant la revue")
 		}
 	}
-	return s.managedBatchProofsIntact(r)
+	if e := s.managedBatchProofsIntact(r); e != nil {
+		return e
+	}
+	path, e := safeReport(s.root, r.Context)
+	if e != nil {
+		return e
+	}
+	raw, e := os.ReadFile(path)
+	if e != nil {
+		return e
+	}
+	var c managedReviewContext
+	if e = json.Unmarshal(raw, &c); e != nil {
+		return e
+	}
+	if c.Baseline != nil {
+		if c.Baseline.Candidate != c.Previous || c.Previous == c.Candidate || len(c.Baseline.Reviews) == 0 {
+			return fmt.Errorf("chaîne de base incohérente")
+		}
+		for _, previous := range c.Baseline.Reviews {
+			if previous.State != "passed" || previous.CandidateSHA != c.Previous || previous.Context == r.Context || previous.ContextDigest == r.ContextDigest {
+				return fmt.Errorf("avis de base invalide ou cyclique")
+			}
+			if e = s.managedReviewFilesIntactSeen(previous, seen, depth+1); e != nil {
+				return fmt.Errorf("preuve de base périmée : %w", e)
+			}
+		}
+	}
+	return nil
 }
 
 // A newly added file already appears in full in the Git diff. Remove only a

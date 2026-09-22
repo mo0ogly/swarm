@@ -22,6 +22,7 @@ type managedReviewBatch struct {
 }
 
 func boundedManagedReviewPrompt(prefix string, c managedReviewContext) string {
+	prefix = incrementalReviewPrefix(prefix, c)
 	data, _ := json.Marshal(c)
 	prompt := prefix + "\nSWARM_MANAGED_REVIEW_CONTEXT\n" + string(data)
 	if len(prompt) > managedReviewPromptLimit {
@@ -47,7 +48,7 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 	bounded := func(prefix string, c managedReviewContext) string {
 		prompt := boundedManagedReviewPrompt(prefix, c)
 		if reuseHunks && len(prompt) > managedReviewPromptLimit {
-			alternative := prefix + managedReviewPacket(c, true)
+			alternative := incrementalReviewPrefix(prefix, c) + managedReviewPacket(c, true)
 			if len(alternative) < len(prompt) {
 				return alternative
 			}
@@ -204,7 +205,7 @@ func parseManagedReviewBatchReplies(c managedReviewContext, batches []managedRev
 	state := "passed"
 	for i, b := range batches {
 		actual, _ := json.Marshal(b.Context.Tasks)
-		if b.Context.Candidate != c.Candidate || b.Context.Previous != c.Previous || b.Context.Diff != c.Diff || string(b.Context.Receipt) != string(c.Receipt) || string(actual) != string(canonical) {
+		if !sameManagedBaseline(b.Context.Baseline, c.Baseline) || b.Context.Candidate != c.Candidate || b.Context.Previous != c.Previous || b.Context.Diff != c.Diff || string(b.Context.Receipt) != string(c.Receipt) || string(actual) != string(canonical) {
 			return "", nil, fmt.Errorf("preuves globales différentes dans un lot")
 		}
 		subset := b.Context

@@ -152,3 +152,36 @@ signale que la sortie initiale manque ; aucune sortie ni cause n’est reconstru
 Sans cette provenance, la reprise est refusée. Une réservation réussie ne valide
 pas la tâche : seuls les nouveaux contrôles et l’avis indépendant permettent
 la publication du nouveau candidat.
+
+## Dossiers cumulatifs : base acceptée et revue incrémentale
+
+Renvoyer tout le diff depuis le début de la mission à chaque nouvelle revue fait
+croître le dossier avec l'historique, même si le nouveau changement est petit.
+Le moteur conserve d'abord le parcours historique lorsqu'il tient dans la limite.
+Si même les lots unitaires débordent, il peut construire une revue incrémentale :
+
+1. vérifier les avis favorables, tentatives, contrats et politiques de chaque
+   tâche déjà acceptée sur la base publiée ; une étiquette « acceptée » ne suffit pas ;
+2. joindre ces avis comme **preuves de la base précédente**, avec leurs références
+   et empreintes, et conserver leurs contextes et réponses originaux ;
+3. fournir tout le diff entre cette base et le nouveau candidat, tous les rapports,
+   tous les critères et tous les contrôles cumulés exécutés sur le nouveau candidat ;
+4. relire les sources déclarées depuis le nouveau candidat, y compris celles qui
+   n'apparaissent plus dans le diff incrémental ;
+5. obtenir de nouveaux avis sur chaque critère et les régressions possibles. Un avis
+   antérieur ne constitue jamais une acceptation du nouveau candidat.
+
+`accepted_baseline` rend ce protocole explicite dans le contexte conservé et les
+consignes du vérificateur. Le moteur contrôle récursivement les empreintes des
+preuves historiques utilisées, pendant la revue et avant publication. Une preuve
+manquante ou modifiée invalide la chaîne. Une reprise ne modifie pas les dossiers
+antérieurs ni leurs plans de lots. Les dossiers historiques déjà admissibles
+conservent exactement leur transport.
+
+Ce protocole remplace la réinspection intégrale de tout l'historique par un examen
+indépendant des changements et de leurs effets à partir d'une base vérifiée. Le
+vérificateur doit demander une preuve (`unknown`) si les sources actuelles et les
+avis de base ne suffisent pas. Le plafond reste 192 Kio par appel, les budgets et
+l'exigence d'un avis indépendant sur le même candidat sont inchangés. Un changement
+individuel ou un ensemble de sources encore trop grand reste refusé avant tout
+appel : cette limite n'autorise jamais une troncature ou une validation partielle.
