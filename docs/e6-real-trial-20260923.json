@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "engine_commit": "1a93811e81739a392be727780639eadeded97bf1",
+  "engine_sha256": "c52bcce0648d6d51516e8e29524af67c4dcf22a0fcd423ae1194efe42d3d457b",
+  "trial_work": "w-8b821fb542b4a765d0031644",
+  "result": {
+    "result": {
+      "status": "PASS",
+      "missing": []
+    },
+    "work": "w-8b821fb542b4a765d0031644",
+    "engine_sha256": "c52bcce0648d6d51516e8e29524af67c4dcf22a0fcd423ae1194efe42d3d457b",
+    "planning_activations": 5,
+    "productions": 2,
+    "reviews": 1,
+    "scopes_closed": true,
+    "accepted": "accepted",
+    "candidate_sha": "3f9ccc56e97ee73851c4703c8eb328d96479b7af",
+    "no_active_agents": true,
+    "main_mission_unchanged": true
+  },
+  "artifacts": {
+    "campaign.json": "4b6982f775442df20b983db2eb6e636eb6004e86739fadc5899b4527a0cce600",
+    "observed.json": "41fce34d067198a2c4cd545669aa535b48239a85ad31bcf6ac05a57479b0fa4c",
+    "result.json": "1821d6ef69e0bd4adda406580e94418f114185495ed784f6597feedf102242ad",
+    "completion-summary.json": "77a31a233c3d2f7cf3d862846d35a8b358d6cb948404a569ec43727439d56b95",
+    "cli.jsonl": "9c59af7e88349285cc8f556f1364c06231f019cc444c762fab19af421dae27f3",
+    "run-started.json": "47f55509c21025d9c276b46ad3048414faf05bfea7ce36e76cfd4bceba40b39c"
+  },
+  "artifact_location": "controlled-trial-20260923-1850 outside Git; raw configurations and logs are not published",
+  "monetary_cost": null,
+  "main_mission_acceptance": false
+}
