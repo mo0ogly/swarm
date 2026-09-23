@@ -54,3 +54,6 @@ redémarrage, nouveaux contrôles/revue, publication, ancien reçu inchangé et 
 Les cas de refus couvrent révision, candidat, résultat, tentative, vérificateur,
 budget et avis déjà présent. Fournisseur déterministe : ce test ne vaut pas une
 revue IA indépendante de la livraison. La mission principale reste inchangée.
+
+## Depuis le web
+Dans **Conduite**, une ancienne acceptation Git sans avis affiche **Faire vérifier ce résultat**. La fenêtre récupère le candidat et les identités auprès du moteur, demande un motif et explique le budget utilisé. **Demander la vérification** soumet au même contrat que le CLI. Une erreur laisse la fenêtre ouverte ; aucune validité n’est accordée par le seul clic.

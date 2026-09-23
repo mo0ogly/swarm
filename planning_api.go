@@ -80,6 +80,15 @@ func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWrit
 	})
 	mux.HandleFunc("/api/v1/planning", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
+		if r.Method == "GET" && r.URL.Query().Get("action") == "requalify-preview" {
+			v, err := s.historicalRequalificationRequest(work, r.URL.Query().Get("task"))
+			if err != nil {
+				fail(w, err)
+				return
+			}
+			send(w, v)
+			return
+		}
 		if r.Method == "GET" {
 			v, err := s.get(work)
 			if err != nil {

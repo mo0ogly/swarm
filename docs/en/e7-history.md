@@ -31,3 +31,6 @@ exhausted budgets are rejected. Unmanaged repositories are outside this command.
 
 Behavioral tests use deterministic providers; independent assessment of this
 change remains distinct. No live mission was requalified by these tests.
+
+## Web access
+In the mission control view, historical managed acceptances without review show **Request review of this result**. The dialog fetches retained identities from the engine and asks for a reason. Submission uses the same contract as the CLI; requesting verification does not grant acceptance.

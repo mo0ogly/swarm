@@ -3041,5 +3041,11 @@
   "Choisissez explicitement le modèle du vérificateur.": "Select the reviewer model explicitly.",
   "Choisissez un responsable ou le vérificateur.": "Select a planner or the reviewer.",
   "Une décision est en cours ; attendez sa fin avant de changer le modèle.": "A decision is in progress; wait for it to finish before changing the model.",
-  "Modèle de planification par défaut : ": "Default planning model: "
+  "Modèle de planification par défaut : ": "Default planning model: ",
+  "Ancienne acceptation sans revue indépendante. Une nouvelle vérification est nécessaire.": "Historical acceptance without independent review. A new verification is required.",
+  "Faire vérifier ce résultat": "Request review of this result",
+  "Les anciens résultats restent conservés. Swarm rejouera les contrôles et demandera une revue avec le budget restant, sans nouvel exécutant.": "Previous results are preserved. Swarm will rerun checks and request a review within the remaining budget, without a new worker.",
+  "Motif de la vérification": "Reason for verification",
+  "Demander la vérification": "Request verification",
+  "Candidat conservé : ": "Retained candidate: "
 }

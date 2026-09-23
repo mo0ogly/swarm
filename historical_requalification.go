@@ -158,3 +158,36 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 		return nil
 	})
 }
+
+// Read-only identity resolution; all eligibility checks run again on submission.
+func (s *Store) historicalRequalificationRequest(work, task string) (PlanningRequest, error) {
+	w, e := s.get(work)
+	if e != nil {
+		return PlanningRequest{}, e
+	}
+	t, e := w.task(task)
+	if e != nil {
+		return PlanningRequest{}, e
+	}
+	if w.Planning == nil || w.Planning.Repository == nil || t.Status != "accepted" || t.IndependentReview != nil || len(t.Attempts) == 0 {
+		return PlanningRequest{}, fmt.Errorf("ancienne acceptation Git sans avis indépendant requise")
+	}
+	agents, e := s.agents(work)
+	if e != nil {
+		return PlanningRequest{}, e
+	}
+	for _, a := range agents {
+		if a.TaskID != task || !currentTaskAttempt(t, a.Attempt) {
+			continue
+		}
+		item, e := s.managedAttempt(a.ID)
+		if e != nil {
+			return PlanningRequest{}, e
+		}
+		if item.State != "integrated" || item.Result == "" {
+			continue
+		}
+		return PlanningRequest{Schema: 1, Revision: w.Revision, Task: task, Agent: a.ID, Attempt: a.Attempt, ResultCommit: item.Result, ExpectedCandidate: w.Planning.Repository.Candidate}, nil
+	}
+	return PlanningRequest{}, fmt.Errorf("résultat intégré attribuable introuvable ; aucune preuve inventée")
+}
