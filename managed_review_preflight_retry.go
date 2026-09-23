@@ -45,15 +45,18 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 			a = candidate
 		}
 	}
-	if a.ID == "" || a.Status != "completed" || a.Ended == "" || (a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp)) {
+	if a.ID == "" || !recoveryProcessEnded(a, hostIdentity(), processStamp(a.Child)) {
 		return nil, fmt.Errorf("production terminée et fin du processus confirmée requises")
 	}
 	item, e := s.managedAttempt(a.ID)
 	if e != nil {
 		return nil, e
 	}
+	if a.Status != "completed" && !recoveredResultMatches(t, a, item) {
+		return nil, fmt.Errorf("résultat réparé attribuable requis pour une tentative interrompue")
+	}
 	sizeRefusal := item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ")
-	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !sizeRefusal || t.Blocker != item.Detail {
+	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !(sizeRefusal || item.Detail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != item.Detail {
 		return nil, fmt.Errorf("aucun refus de taille attribuable au résultat courant")
 	}
 	repo := w.Planning.Repository

@@ -410,3 +410,16 @@ func TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation(t *
 		})
 	}
 }
+
+func TestManagedBinaryDiffMetadataOnly(t *testing.T) {
+	for _, diff := range []string{"+if strings.Contains(diff, \"Binary files \") {", " // Binary files a/x and b/x differ", "-Binary files a/x and b/x differ", "+GIT binary patch"} {
+		if managedDiffHasBinary(diff) {
+			t.Fatal("source text rejected", diff)
+		}
+	}
+	for _, diff := range []string{"diff --git a/x b/x\nBinary files a/x and b/x differ\n", "GIT binary patch\nliteral 8"} {
+		if !managedDiffHasBinary(diff) {
+			t.Fatal("binary diff admitted")
+		}
+	}
+}

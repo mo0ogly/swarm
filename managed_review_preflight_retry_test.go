@@ -174,3 +174,28 @@ func TestManagedPreflightRetryRejectsMissingOrStaleProofs(t *testing.T) {
 		})
 	}
 }
+
+func TestManagedPreflightRetryRecoveredFalseBinary(t *testing.T) {
+	s, w, a := unpaidReviewFixture(t)
+	item, _ := s.managedAttempt(a.ID)
+	a.Status = "interrupted"
+	raw, _ := json.Marshal(a)
+	if _, e := s.db.Exec("UPDATE agents SET status=?,body=? WHERE id=?", a.Status, raw, a.ID); e != nil {
+		t.Fatal(e)
+	}
+	w.Tasks[0].RecoveredResult = &RecoveredResult{Agent: a.ID, Attempt: a.Attempt, Result: item.Result, ProcessStatus: a.Status}
+	raw, _ = json.Marshal(w)
+	if _, e := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.managedFailure(a, "revue retenue : modification binaire non examinable par ce vérificateur"); e != nil {
+		t.Fatal(e)
+	}
+	prepared, e := s.prepareManagedPreflightRetry(w.ID, a.TaskID)
+	if e != nil || prepared == nil || prepared.Item.Result != item.Result {
+		t.Fatal("retained recovered preflight unavailable", e)
+	}
+	if managedReviewCalls(t, s) != 0 {
+		t.Fatal("preview consumed review")
+	}
+}
