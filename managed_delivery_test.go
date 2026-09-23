@@ -124,3 +124,74 @@ func TestManagedCompleteDeliveryStillRequiresIndependentReview(t *testing.T) {
 		})
 	}
 }
+
+func TestManagedLocalDeliveryCannotBypassFailingEngineControl(t *testing.T) {
+	s, w := managedFixture(t)
+	w, e := s.mutate(w.ID, "test.policy", "local-proof-policy", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Tasks[0].ValidationPolicy = automaticPolicy("git", "diff", "--exit-code", "--no-index", "value.txt", "missing.txt")
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
+	a := managedCompleted(t, s, w, "first", "local result\n")
+	a.DeliveryVersion = 1
+	if e = s.saveAgent(a); e != nil {
+		t.Fatal(e)
+	}
+	w, _ = s.get(w.ID)
+	task, _ := w.task(a.TaskID)
+	d := completeDelivery(task, a)
+	d.Criteria[0].Reason = "Local check passed; engine validation and independent review are still pending"
+	raw, _ := json.Marshal(d)
+	if e = os.WriteFile(filepath.Join(a.CWD, "docs/first.delivery.json"), raw, 0600); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.integrateManagedAttempt(a); e != nil {
+		t.Fatal(e)
+	}
+	after, _ := s.get(w.ID)
+	if after.Tasks[0].Status == "accepted" || after.Planning.Repository.Candidate != w.Planning.Repository.Candidate {
+		t.Fatal("local declaration bypassed failing engine check")
+	}
+	if managedReviewCalls(t, s) != 0 {
+		t.Fatal("failed engine check consumed paid review")
+	}
+	files, e := filepath.Glob(filepath.Join(w.Planning.Repository.Storage, "diagnostics", "control-failure-*.json"))
+	if e != nil || len(files) == 0 {
+		t.Fatal("engine control did not execute", e)
+	}
+}
+
+func TestManagedDeliveryPromptSeparatesLocalAndIndependentEvidence(t *testing.T) {
+	_, w := managedFixture(t)
+	task := &w.Tasks[0]
+	prompt := managedDeliveryInstructions(task, "attempt-test")
+	if !strings.Contains(prompt, deliveryEvidenceBoundary) {
+		t.Fatal("worker evidence responsibilities absent")
+	}
+	encoded, _ := json.MarshalIndent(task.ValidationPolicy.Controls, "", "  ")
+	if !strings.Contains(prompt, string(encoded)) {
+		t.Fatal("local check options absent")
+	}
+	marker := "BILAN DE LIVRAISON REQUIS"
+	suffix := prompt[strings.Index(prompt, marker):]
+	var d ManagedDelivery
+	if e := json.Unmarshal([]byte(suffix[strings.Index(suffix, "\n{")+1:]), &d); e != nil {
+		t.Fatal(e)
+	}
+	if d.Outcome != "partial" || d.Criteria[0].Status != "not_tested" {
+		t.Fatal("template must not claim an unexecuted success")
+	}
+	context, e := planningContext(w, "root")
+	if e != nil {
+		t.Fatal(e)
+	}
+	var value map[string]any
+	if e = json.Unmarshal(context, &value); e != nil {
+		t.Fatal(e)
+	}
+	if value["delivery_evidence_contract"] != deliveryEvidenceBoundary {
+		t.Fatal("planner evidence responsibilities absent")
+	}
+}

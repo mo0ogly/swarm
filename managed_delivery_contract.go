@@ -30,6 +30,8 @@ type DeliveryCriterion struct {
 	Evidence []string `json:"evidence"`
 }
 
+const deliveryEvidenceBoundary = "Le bilan décrit les vérifications locales du producteur, pas une validation future du moteur. Le producteur exécute les vérifications autorisées dans sa copie et consigne commande, résultat observé et fichiers de preuve. status=pass signifie uniquement que ses vérifications locales couvrent réellement ce critère ; outcome=complete signifie que sa livraison locale est complète, jamais que la tâche est acceptée. Ne pas attendre la revue indépendante pour rendre ce bilan. Si une vérification locale manque ou échoue, conserver not_tested ou fail et expliquer la limite. Le moteur exécutera ensuite ses propres contrôles sur la révision candidate, puis demandera une revue indépendante ; lui seul peut accepter la tâche. Le planificateur ne doit pas demander au producteur de certifier un contrôle du moteur qui n'a pas encore eu lieu."
+
 func managedDeliveryInstructions(t *Task, attempt string) string {
 	manifest := ManagedDelivery{Version: 1, Task: t.ID, Attempt: attempt, Contract: reviewContract(t), Outcome: "partial"}
 	for i := range t.Criteria {
@@ -44,10 +46,15 @@ func managedDeliveryInstructions(t *Task, attempt string) string {
 				}
 			}
 		}
-		manifest.Criteria = append(manifest.Criteria, DeliveryCriterion{Index: i + 1, Status: "not_tested", Reason: "À compléter avec le résultat observé", Controls: ids, Evidence: []string{}})
+		manifest.Criteria = append(manifest.Criteria, DeliveryCriterion{Index: i + 1, Status: "not_tested", Reason: "À compléter avec la commande et le résultat de la vérification locale réellement effectuée", Controls: ids, Evidence: []string{}})
 	}
 	data, _ := json.MarshalIndent(manifest, "", "  ")
-	return "\nBILAN DE LIVRAISON REQUIS : écrire docs/" + t.ID + ".delivery.json dans cette copie, en plus du rapport Markdown. Le moteur contrôle ce bilan avant la revue payante. Garder task/attempt/contract et un élément par critère. outcome=complete seulement si TOUS les critères sont démontrés ; sinon partial ou blocked. status=pass, fail, not_tested ou not_applicable ; expliquer chaque résultat dans reason. controls référence uniquement les identifiants de contrôles autorisés pour ce critère, jamais une commande libre ; evidence référence des fichiers suivis de cette copie (chemins relatifs à la racine Git). Le moteur exécutera ces contrôles : votre déclaration ne prouve pas leur succès. Une preuve absente ou une non-applicabilité conserve un résultat incomplet à examiner. Ne pas réduire un critère au test le plus facile : traiter toutes ses obligations, y compris les interactions navigateur demandées. Ne pas inventer de preuve ni transformer un non-testé en pass. Ce bilan n’est pas une acceptation.\n" + string(data) + "\n"
+	controls := ""
+	if t.ValidationPolicy != nil {
+		checks, _ := json.MarshalIndent(t.ValidationPolicy.Controls, "", "  ")
+		controls = "\nContrôles configurés à reproduire localement avec leurs options, dans les permissions de la copie. Ne pas modifier leur définition pour obtenir un succès. Leur exécution locale ne remplace pas celle du moteur :\n" + string(checks) + "\n"
+	}
+	return "\n" + deliveryEvidenceBoundary + controls + "\nBILAN DE LIVRAISON REQUIS : écrire docs/" + t.ID + ".delivery.json dans cette copie, en plus du rapport Markdown. Le moteur contrôle ce bilan avant la revue payante. Garder task/attempt/contract et un élément par critère. outcome=complete seulement si TOUS les critères sont démontrés localement ; sinon partial ou blocked. status=pass, fail, not_tested ou not_applicable ; expliquer chaque résultat dans reason. controls référence uniquement les identifiants de contrôles autorisés pour ce critère, jamais une commande libre ; evidence référence des fichiers suivis de cette copie (chemins relatifs à la racine Git). Une preuve absente ou une non-applicabilité conserve un résultat incomplet à examiner. Ne pas réduire un critère au test le plus facile : traiter toutes ses obligations, y compris les interactions navigateur demandées. Ne pas inventer de preuve ni transformer un non-testé en pass. Ce bilan n’est pas une acceptation.\n" + string(data) + "\n"
 }
 
 func deliveryIncomplete(reason string) error {
@@ -88,7 +95,7 @@ func (s *Store) managedDelivery(w Work, t *Task, a Agent, candidate string) (*Ma
 		}
 		seen[c.Index] = true
 		if c.Status != "pass" || strings.TrimSpace(c.Reason) == "" {
-			return nil, deliveryIncomplete(fmt.Sprintf("critère %d non démontré (%s) : %s", c.Index, c.Status, guardBlock(c.Reason, 300)))
+			return nil, deliveryIncomplete(fmt.Sprintf("critère %d non démontré (%s) : %s. %s", c.Index, c.Status, guardBlock(c.Reason, 300), deliveryEvidenceBoundary))
 		}
 		if len(c.Controls) == 0 || len(c.Evidence) == 0 || len(c.Evidence) > 24 {
 			return nil, deliveryIncomplete(fmt.Sprintf("contrôles ou fichiers de preuve manquants pour le critère %d", c.Index))

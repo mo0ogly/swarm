@@ -28,3 +28,12 @@ intervention. A manual repair remains an intervention; deterministic success
 cannot automatically accept a live mission.
 
 Separate preparation: [controlled business-fault trial](CONTROLLED-AUTONOMY-TRIAL.md).
+
+
+## Local evidence and independent acceptance
+
+The producer fills `docs/<task>.delivery.json` with its own observations: executed command, result and tracked evidence files. `pass` means its local checks cover the criterion; `complete` means its local delivery is complete. Neither value accepts the task. Configured control commands and their options are supplied in the prompt, without additional permission to change their definitions. A check that could not run remains `not_tested`.
+
+The engine validates delivery attribution and completeness, executes its controls against the candidate revision, then requests an independent review. Producers and planners must not wait for these future steps before reporting actual local observations. A local `pass` cannot bypass a failed engine control or a rejecting review.
+
+The real trial on September 23, 2026 exposed this confusion: two `not_tested` deliveries stopped the pipeline before engine controls. Instructions and diagnostics were clarified; this does not yet demonstrate a successful new real-model trial.

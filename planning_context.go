@@ -68,7 +68,7 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
 			children = append(children, map[string]any{"id": child.ID, "state": child.State, "requirements": child.Requirements})
 		}
 	}
-	return json.Marshal(map[string]any{"scope": scope, "requirements": requirements, "events": events, "pending_events_total": pending, "tasks": tasks, "task_counts": counts, "tasks_not_in_projection": omitted, "children": children, "task_capacity_remaining": p.MaxTasks - len(w.Tasks), "delegated_requirements": delegated, "projection_note": "Historique et documents de preuve exclus. Les événements restants seront remis au prochain tour ; next est un extrait d’affichage limité à 1000 caractères. La clôture est contrôlée sur l’état complet."})
+	return json.Marshal(map[string]any{"delivery_evidence_contract": deliveryEvidenceBoundary, "scope": scope, "requirements": requirements, "events": events, "pending_events_total": pending, "tasks": tasks, "task_counts": counts, "tasks_not_in_projection": omitted, "children": children, "task_capacity_remaining": p.MaxTasks - len(w.Tasks), "delegated_requirements": delegated, "projection_note": "Historique et documents de preuve exclus. Les événements restants seront remis au prochain tour ; next est un extrait d’affichage limité à 1000 caractères. La clôture est contrôlée sur l’état complet."})
 }
 
 func planningScopeWithin(p *PlanningState, ownerID, ancestor string) bool {
