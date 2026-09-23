@@ -27,10 +27,30 @@ ne constitue pas un avis IA indépendant sur cette livraison.
    [reprise](REVIEW-TIMEOUT.md#reprendre-une-intégration-après-un-contrôle-en-échec).
    Cette opération relance contrôles et revue sur le nouveau candidat ; une
    réservation ne vaut jamais acceptation.
-4. Une ancienne acceptation sans reviewer n'est **pas automatiquement** un cas
-   admissible à `retry-integration`. Il manque encore une procédure générale de
-   requalification de ce cas, avec conservation du candidat et revue explicite.
+4. Pour une ancienne acceptation **Git gérée**, sans avis indépendant, utiliser
+   `planning requalify WORK --input request.json`. La demande contient
+   `schema_version`, `event_id`, `expected_revision`, `task_id`, `agent_id`,
+   `attempt_id`, `result_commit`, `expected_candidate` et un `reason` explicite.
+   Relever ces identités dans l'état public ; ne pas les deviner.
 
-**E7 reste partielle** : refus rétrospectif et conservation prouvés ; procédure
-universelle de remise en revue des anciennes acceptations et avis indépendant
-sur cette livraison encore absents. Ne pas afficher cette étape comme terminée.
+La requalification exige un producteur terminé, un résultat intégré conservé,
+un vérificateur configuré avec budget disponible, des contrôles complets et
+aucun agent, décision ou avis en cours. Elle retire la validité courante et
+archive l'ancien statut, gate et reçu dans `requalifications`. Le conducteur
+reprend ensuite le résultat sans nouvelle production, relance les contrôles
+cumulatifs et demande une revue indépendante. Le dossier de preuves et
+l'événement de publication sont distincts des anciens ; aucune pièce n'est
+écrasée. La même demande est idempotente, y compris après publication.
+
+Une dérive de candidat ou de contrat empêche la reprise. Une revue existante,
+un résultat réparé, un budget épuisé ou une provenance absente est refusé :
+les parcours de récupération spécialisés restent nécessaires. Les missions
+sans dépôt Git géré ne sont pas couvertes par cette commande.
+
+## Portée de la qualification
+
+Le scénario `TestEngineContractHistoryPublicRequalification` couvre réservation,
+redémarrage, nouveaux contrôles/revue, publication, ancien reçu inchangé et rejeu.
+Les cas de refus couvrent révision, candidat, résultat, tentative, vérificateur,
+budget et avis déjà présent. Fournisseur déterministe : ce test ne vaut pas une
+revue IA indépendante de la livraison. La mission principale reste inchangée.

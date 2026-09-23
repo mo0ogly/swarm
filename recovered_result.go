@@ -37,6 +37,12 @@ func (s *Store) submitRecoveredResult(work string, r PlanningRequest) (Work, err
 	return s.recoverResult(work, r, false)
 }
 func managedProofKey(t *Task, a Agent) string {
+	if len(t.Requalifications) > 0 {
+		r := t.Requalifications[len(t.Requalifications)-1]
+		if r.Agent == a.ID && r.Attempt == a.Attempt {
+			return r.ProofKey
+		}
+	}
 	if t.RecoveredResult != nil && t.RecoveredResult.Agent == a.ID && t.RecoveredResult.Attempt == a.Attempt && t.RecoveredResult.ProofKey != "" {
 		return t.RecoveredResult.ProofKey
 	}

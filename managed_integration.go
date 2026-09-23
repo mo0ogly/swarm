@@ -49,6 +49,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
+	if err = historicalRequalificationGuard(w, t, a); err != nil {
+		return s.managedFailure(a, err.Error())
+	}
 	if err = integrationRetryGuard(w, t, a, item); err != nil {
 		return s.managedFailure(a, err.Error())
 	}
@@ -172,7 +175,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
-	_, err = s.mutateWithHook(w.ID, "managed.integrated", "integrated-"+a.ID, current.Revision, raw, func(current *Work) error {
+	_, err = s.mutateWithHook(w.ID, "managed.integrated", "integrated-"+managedProofKey(t, a), current.Revision, raw, func(current *Work) error {
 		task, e := current.task(a.TaskID)
 		if e != nil {
 			return e
@@ -229,7 +232,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		current.Planning.Repository.Candidate = candidate
 		scope, _ := current.Planning.scope(task.ScopeID)
 		ref := ExchangeArtifact{Path: filepath.ToSlash(relReport), SHA256: hash(report)}
-		current.Planning.Inbox = append(current.Planning.Inbox, PlanningEvent{Handoff: &ref, ID: planningEventID(a.ID, "integrated"), Scope: scope.ID, Kind: "integrated", Task: task.ID, Attempt: a.Attempt, Message: "Résultat intégré ; consulter la remise complète, ses constats, écarts et limites.", Artifacts: []ExchangeArtifact{{Path: filepath.ToSlash(relReceipt), SHA256: hash(raw)}, ref}, At: now()})
+		current.Planning.Inbox = append(current.Planning.Inbox, PlanningEvent{Handoff: &ref, ID: planningEventID(managedProofKey(t, a), "integrated"), Scope: scope.ID, Kind: "integrated", Task: task.ID, Attempt: a.Attempt, Message: "Résultat intégré ; consulter la remise complète, ses constats, écarts et limites.", Artifacts: []ExchangeArtifact{{Path: filepath.ToSlash(relReceipt), SHA256: hash(raw)}, ref}, At: now()})
 		scope.State = "ready"
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error {

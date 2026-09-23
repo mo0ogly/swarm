@@ -45,7 +45,7 @@ swarm exchange list <travail>
 swarm exchange send|consume <travail> --input requête.json
 swarm workspace status <travail>
 swarm workspace integrate <travail> --input manifeste.json
-swarm planning show|enable|claim|decide|handoff|step|authorize-recovery|submit-recovered-result|revise-recovered-result|pause|resume <travail> [--input requête.json]
+swarm planning show|enable|claim|decide|handoff|step|authorize-recovery|requalify|submit-recovered-result|revise-recovered-result|pause|resume <travail> [--input requête.json]
 swarm work create --input fichier.json
 swarm work update <travail> --input fichier.json
 swarm work list

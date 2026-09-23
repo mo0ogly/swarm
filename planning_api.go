@@ -13,7 +13,7 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 		return s.managedBundle(pos[2], pos[3])
 	}
 	if len(pos) != 3 {
-		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|authorize-recovery|submit-recovered-result|retry-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
+		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|authorize-recovery|requalify|submit-recovered-result|retry-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
 	}
 	if pos[1] == "review-step" {
 		return s.independentReviewStep(pos[2])
