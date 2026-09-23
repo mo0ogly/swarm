@@ -52,6 +52,51 @@ coûts monétaires ne sont pas inclus dans cette enveloppe.** Les coûts rapport
 par les fournisseurs sont distincts des estimations ; absence de coût ne veut
 pas dire zéro. Ce contrôle n’est pas une garantie de plafond de facturation.
 
-Cette livraison n’ajoute pas encore de catalogue de tarifs par modèle, de
-politique par défaut pour les nouvelles missions ni d’éditeur unifié des quotas
-de planification/revue/tentatives. Les autorisations existantes restent inchangées.
+Les défauts pour les nouvelles missions et l’éditeur unifié des quotas de
+planification/revue/tentatives restent à réaliser. Les autorisations existantes
+restent inchangées.
+
+## Catalogue de tarifs par fournisseur et modèle
+
+Ouvrir **Tarifs des modèles** dans **Budgets et coûts IA**. Le catalogue appartient
+au projet, pas à une mission. Ajouter fournisseur, modèle, devise (code à trois
+lettres), source et date, puis les montants par million de jetons. Aucun tarif
+n’est prérempli : vide signifie inconnu, zéro signifie explicitement gratuit.
+Entrée hors cache, sortie, cache lu et cache écrit sont des catégories distinctes.
+
+**Créer une nouvelle version** conserve l’ancienne. L’auteur et la date sont
+enregistrés par le moteur. Une modification concurrente refuse l’ancien formulaire.
+**Estimer avec ce tarif** calcule une simulation en conservant l’identifiant de
+version. Si une catégorie utilisée n’a pas de tarif, le montant reste inconnu.
+Le calcul n’ajoute pas les jetons en cache à un total d’entrée qui les comprend
+déjà : saisir uniquement les jetons hors cache dans « Entrée hors cache ».
+
+```sh
+swarm pricing list --json
+swarm pricing save --input tarif.json --json
+swarm pricing estimate --input volumes.json --json
+```
+
+Exemple de tarif (valeurs fictives) :
+
+```json
+{"schema_version":1,"expected_digest":"DIGEST_RENVOYE_PAR_LIST","rate":{"provider":"mon-fournisseur","model":"mon-modele","currency":"USD","input_per_million":2,"output_per_million":5,"cache_read_per_million":null,"cache_write_per_million":null,"source":"Estimation locale documentée","reference_date":"2026-09-23"}}
+```
+
+Exemple de volumes :
+
+```json
+{"rate_version":"VERSION_RENVOYEE_PAR_SAVE","non_cached_input_tokens":1000000,"output_tokens":1000000,"cache_read_tokens":0,"cache_write_tokens":0}
+```
+
+Résultat attendu : estimation de 7 USD avec la version, les tarifs et les volumes
+utilisés dans la sortie JSON. Une nouvelle version ne change pas cette simulation.
+Conserver cette sortie si elle sert de preuve : les simulations ne sont pas
+enregistrées comme dépenses de mission. Aucun taux de change n’est appliqué.
+
+**Limites :** ce catalogue ne transforme pas automatiquement les événements des
+fournisseurs en coûts historiques et ne change pas la réserve forfaitaire par
+départ. Les tarifs doivent être vérifiés par la personne qui les saisit. Les prix
+d’abonnement, paliers, durées de cache et remises nécessitent un tarif adapté au
+cas étudié ; le calculateur ne les devine pas. Les versions ne sont pas supprimées
+par l’interface ; le catalogue refuse d’en ajouter au-delà de 1 000 versions.
