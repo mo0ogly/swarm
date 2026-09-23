@@ -346,3 +346,31 @@ func TestRecoveredResultResumesPersistedPassWithoutNewReview(t *testing.T) {
 		})
 	}
 }
+
+func TestRecoveredResultTerminalAcrossReboot(t *testing.T) {
+	a := Agent{Status: "interrupted", Ended: now(), Child: 123, ChildStamp: "old", Host: "host:oldboot:pid:[1]"}
+	if !recoveryProcessEnded(a, "host:newboot:pid:[1]", "old") {
+		t.Fatal("terminal old boot blocked by reused PID")
+	}
+	for _, host := range []string{"other:newboot:pid:[1]", "host:newboot:pid:[2]", "host::pid:[1]", "malformed"} {
+		if recoveryProcessEnded(a, host, "") {
+			t.Fatal("uncertain host admitted", host)
+		}
+	}
+	a.Status = "running"
+	if recoveryProcessEnded(a, "host:newboot:pid:[1]", "") {
+		t.Fatal("active process admitted")
+	}
+	a.Status = "interrupted"
+	a.Ended = ""
+	if recoveryProcessEnded(a, "host:newboot:pid:[1]", "") {
+		t.Fatal("missing terminal record admitted")
+	}
+	a.Ended = now()
+	if recoveryProcessEnded(a, a.Host, "old") {
+		t.Fatal("live same-boot process admitted")
+	}
+	if !recoveryProcessEnded(a, a.Host, "") {
+		t.Fatal("gone same-boot process rejected")
+	}
+}

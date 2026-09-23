@@ -214,3 +214,7 @@ La tentative conserve un verrou interprocessus distinct pendant toute la revue. 
 Si le verrou Git est occupé au retour de la revue, le verdict durable est conservé et la publication attend un prochain passage. La reprise vérifie les mêmes preuves et ne repaie pas un avis favorable déjà acquis. Le candidat et la tentative sont revérifiés avant publication.
 
 Les tests `TestManagedLiveReviewSurvivesConcurrentConductor` et `TestManagedLiveReviewKeepsVerdictWhenGitLockIsRetaken` utilisent un sous-processus simulé bloqué sur une barrière : ils prouvent la fenêtre Git libre, la propriété de revue et la conservation du verdict. Ils ne démontrent pas l’autonomie avec un modèle réel.
+
+## Remise après redémarrage de la machine
+
+Une tentative déjà enregistrée comme terminée (interrompue, échouée ou achevée) peut être remise après un redémarrage du même hôte et du même espace de PID. Le constat de fin et l’identité du démarrage d’origine sont conservés. Un autre hôte/espace de PID, un état actif ou une fin absente restent refusés. Sur le même démarrage, un processus portant encore l’identité enregistrée interdit toujours la récupération. Cette règle ne valide aucun livrable : les contrôles et la revue restent requis.

@@ -199,3 +199,7 @@ Each attempt retains a separate interprocess ownership lock throughout review. T
 If the Git lock is busy when review returns, the durable verdict is retained and publication awaits another pass. Replay checks the same evidence and does not pay again for an acquired passing verdict. Candidate and attempt identity are rechecked before publication.
 
 `TestManagedLiveReviewSurvivesConcurrentConductor` and `TestManagedLiveReviewKeepsVerdictWhenGitLockIsRetaken` use a barrier-controlled simulated subprocess to prove the free Git window, review ownership and verdict preservation. They do not demonstrate autonomy with a real model.
+
+## Delivery after a host reboot
+
+An already terminal attempt may be recovered after a reboot of the same host and PID namespace. Its original terminal record and boot identity remain unchanged. Active states, missing terminal records and different hosts/namespaces remain rejected. On the same boot, a matching live process still prevents recovery. This does not accept the deliverable: controls and independent review remain required.

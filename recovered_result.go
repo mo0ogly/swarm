@@ -103,7 +103,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "interrupted" && a.Status != "failed" && !(revise && a.Status == "completed")) || a.Ended == "" {
 		return Work{}, fmt.Errorf("une tentative arrêtée et attribuable est requise")
 	}
-	if a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp) {
+	if !recoveryProcessEnded(a, hostIdentity(), processStamp(a.Child)) {
 		return Work{}, fmt.Errorf("fin du processus non confirmée")
 	}
 	if err = reviewerLaunchGuard(w); err != nil {
@@ -224,4 +224,21 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		return Work{}, err
 	}
 	return s.get(work)
+}
+
+// A durable terminal record predating a reboot cannot refer to a live process
+// from that old boot. Keep different hosts/namespaces and active states closed.
+func recoveryProcessEnded(a Agent, currentHost, stamp string) bool {
+	if a.Ended == "" || (a.Status != "completed" && a.Status != "interrupted" && a.Status != "failed") {
+		return false
+	}
+	if a.Child == 0 {
+		return true
+	}
+	if a.Host == currentHost {
+		return a.ChildStamp != "" && stamp != a.ChildStamp
+	}
+	old := strings.SplitN(a.Host, ":", 3)
+	current := strings.SplitN(currentHost, ":", 3)
+	return len(old) == 3 && len(current) == 3 && old[0] != "" && old[0] == current[0] && old[1] != "" && current[1] != "" && old[1] != current[1] && old[2] != "" && old[2] == current[2]
 }
