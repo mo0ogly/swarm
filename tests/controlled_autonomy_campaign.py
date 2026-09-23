@@ -120,7 +120,8 @@ def assess(m, snapshot, history, agents, injection, failures):
     need(all(a.get('status')=='completed' and a.get('role')=='worker' for a in agents),'producer not completed')
     scopes=p.get('scopes',[])
     need(len(scopes)>=2 and all(s.get('state')=='closed' for s in scopes),'responsibility scopes not closed')
-    ops=[op for h in history for op in h.get('operations',[])]
+    # A valid no-action decision is encoded as JSON null by the engine.
+    ops=[op for h in history for op in (h.get('operations') or [])]
     need({'delegate','task','retry','close'} <= {op.get('kind') for op in ops},'real decision trajectory incomplete')
     need(bool(history) and all(h.get('id','').startswith('planning-claim-') and h['id'].endswith('-decision') for h in history),'non-engine planning decision')
     need(any(a.get('id')==injection.get('agent') and a.get('attempt_id')==injection.get('attempt') for a in agents),'injection producer identity missing')

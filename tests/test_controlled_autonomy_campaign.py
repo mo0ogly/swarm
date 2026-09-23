@@ -30,6 +30,15 @@ class OracleTests(unittest.TestCase):
     def test_complete_fixture_is_eligible_for_artifact_verification(self):
         self.assertEqual(assess(*self.evidence())['status'],'PASS')
 
+    def test_exhausted_planner_null_operations_remain_an_incomplete_result(self):
+        data=self.evidence()
+        data[2]=[{'id':'planning-claim-exhausted-decision','operations':None}]
+        data[1]['work']['tasks'][0]['status']='blocked'
+        result=assess(*data)
+        self.assertEqual(result['status'],'INCOMPLETE')
+        self.assertIn('real decision trajectory incomplete',result['missing'])
+        self.assertIn('fresh engine acceptance missing',result['missing'])
+
     def test_false_green_states_are_rejected(self):
         for scenario in ['missing-injection','no-refusal','old-sha','stale','manual-retry','fake-decision','budget-raised','unfinished-child','wrong-attempt','third-producer','missing-identities','missing-controls','wrong-reviewer']:
             with self.subTest(scenario=scenario):
