@@ -86,6 +86,7 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
+	ModelSelection     *TaskModel           `json:"model_selection,omitempty"`
 	IntegrationRetries []IntegrationRetry   `json:"integration_retries,omitempty"`
 	BatchReviewResume  *IndependentReview   `json:"batch_review_resume,omitempty"`
 	RecoveredResult    *RecoveredResult     `json:"recovered_result,omitempty"`

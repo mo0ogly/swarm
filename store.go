@@ -423,7 +423,7 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 		return w, e
 	}
 	defer tx.Rollback()
-	if kind == "quotas.configure" || kind == "budget.configure" || kind == "managed.integrated" || kind == "task.attempt-extension" || kind == "task.corrective-recovery" {
+	if kind == "task.model" || kind == "quotas.configure" || kind == "budget.configure" || kind == "managed.integrated" || kind == "task.attempt-extension" || kind == "task.corrective-recovery" {
 		// Reserve SQLite's writer before reading and checking immutable evidence.
 		// A deferred read transaction cannot upgrade after another connection
 		// writes (BUSY_SNAPSHOT); busy_timeout cannot repair that stale snapshot.

@@ -13,7 +13,8 @@
     "test:i18n-ui": "node tests/i18n_ui.cjs bin/swarm test-results/i18n",
     "test:budgets": "node tests/budget_ui.cjs bin/swarm test-results/budgets",
     "test:pricing": "node tests/pricing_ui.cjs bin/swarm test-results/pricing",
-    "test:quotas": "node tests/quotas_ui.cjs bin/swarm test-results/quotas"
+    "test:quotas": "node tests/quotas_ui.cjs bin/swarm test-results/quotas",
+    "test:task-models": "node tests/task_models_ui.cjs bin/swarm test-results/task-models"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

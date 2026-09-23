@@ -52,7 +52,7 @@ const PilotInspector={
   const activityExpanded=body.querySelector('#pilot-activity-details')?.open===true;
   body.replaceChildren();
   $('pilot-inspector-title').textContent=decision?tr_web_pilot_inspector_js('Intervention à examiner'):t?.status==='submitted'?tr_web_pilot_inspector_js('Résultat à examiner')+(a?' — '+a.provider:''):a?'Agent '+a.provider:Pilot.taskTitle(t);
-  const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);
+  const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);if(t&&typeof TaskModels!=='undefined')mission.append(node('p',TaskModels.text(t,a)),Pilot.command(tr_web_pilot_inspector_js('Modèle de la tâche'),()=>TaskModels.open(t.id)));
   if(!t&&!decision){body.append(node('p',tr_web_pilot_inspector_js('Élément supprimé ou indisponible. Aucune commande ne sera exécutée.'),'notice attention'));this.queueFooter(body);return}
   if(t){
    mission.append(node('h3',Pilot.taskTitle(t)));

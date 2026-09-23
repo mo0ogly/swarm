@@ -3,18 +3,18 @@ const tr_web_providers_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 
 let providerAdmin=null,providerLoading=false;
 const levelOptions=[['auto',tr_web_providers_js('Automatique — politique du fournisseur')],['simple',tr_web_providers_js('Simple — opération ciblée, reformulation, aide')],['standard',tr_web_providers_js('Standard — développement et tests usuels')],['exigeant',tr_web_providers_js('Exigeant — architecture ou analyse difficile, choix explicite')]];
-function routeText(r){return r?`${r.level} · ${r.model}${r.effort?tr_web_providers_js(' · effort ')+r.effort:''} · ${r.billing==='on_premise'?tr_web_providers_js('sur site, sans facture API déclarée'):tr_web_providers_js('fournisseur externe')}`:tr_web_providers_js('Modèle géré par cet exécutable ; adaptateur de sélection indisponible.')}
+function routeText(r){return r?`${tr_web_providers_js(({simple:'Simple',standard:'Standard',exigeant:'Exigeant'})[r.level]||r.level)} · ${r.model}${r.effort?tr_web_providers_js(' · effort ')+r.effort:''} · ${r.billing==='on_premise'?tr_web_providers_js('sur site, sans facture API déclarée'):tr_web_providers_js('fournisseur externe')}`:tr_web_providers_js('Modèle géré par cet exécutable ; adaptateur de sélection indisponible.')}
 function addModelFields(purpose,fixedProvider='',initial='auto'){
  const c=modalContext;if(!c)return;
  const level=field('level',tr_web_providers_js('Niveau de l’agent'),initial,levelOptions);
  const hidden=field('model_policy_hash',tr_web_providers_js('Empreinte de la politique'),'');hidden.type='hidden';hidden.parentElement.hidden=true;
  const info=node('p',tr_web_providers_js('Résolution du modèle…'),'notice info');info.id='model-selection';$('modal-fields').append(info);
  let generation=0;
- const update=async()=>{const n=++generation;hidden.value='';c.modelReady=false;$('confirm').disabled=true;info.className='notice info';info.textContent=tr_web_providers_js('Résolution du modèle…');
+ const update=async()=>{const n=++generation;if(c.action==='task-model'&&$('field-inherit')?.value==='true'){c.modelReady=true;$('confirm').disabled=false;info.textContent=tr_web_providers_js('Hériter du profil de lancement');return}hidden.value='';c.modelReady=false;$('confirm').disabled=true;info.className='notice info';info.textContent=tr_web_providers_js('Résolution du modèle…');
   try{const provider=typeof fixedProvider==='function'?fixedProvider():fixedProvider||$('field-provider')?.value;if(!provider)throw Error(tr_web_providers_js('Choisir un fournisseur.'));const data=await api('/api/v1/providers/resolve?'+new URLSearchParams({provider,level:level.value,purpose}));if(modalContext!==c||n!==generation||!level.isConnected)return;hidden.value=data.route?.policy_hash||'';c.modelReady=true;info.textContent=routeText(data.route);$('confirm').disabled=false;
   }catch(e){if(modalContext!==c||n!==generation||!level.isConnected)return;info.className='notice alert';info.textContent=e.message;$('confirm').disabled=true}
  };
- if(typeof fixedProvider==='function'&&$('field-agent'))$('field-agent').addEventListener('change',update);if(purpose==='planning'&&$('field-planning-provider'))$('field-planning-provider').addEventListener('change',update);level.onchange=update;if(!fixedProvider&&$('field-provider'))$('field-provider').addEventListener('change',update);update();
+ if(typeof fixedProvider==='function'&&$('field-agent'))$('field-agent').addEventListener('change',update);if(purpose==='planning'&&$('field-planning-provider'))$('field-planning-provider').addEventListener('change',update);if(c.action==='task-model')$('field-inherit').addEventListener('change',update);level.onchange=update;if(!fixedProvider&&$('field-provider'))$('field-provider').addEventListener('change',update);update();
 }
 async function loadProviderAdmin(){
  if(providerLoading)return;providerLoading=true;void AIConnections.load();$('providers-state').textContent=tr_web_providers_js('Chargement des fournisseurs et des modèles…');

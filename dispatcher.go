@@ -252,6 +252,12 @@ func profileFor(in dispatchInputs, t Task) *LaunchProfile {
 	if p == nil {
 		return nil
 	}
+	if t.ModelSelection != nil {
+		copy := *p
+		copy.Provider = t.ModelSelection.Provider
+		copy.Level = t.ModelSelection.Route.Level
+		p = &copy
+	}
 	if in.work.Planning != nil && in.work.Planning.Repository != nil {
 		copy := *p
 		copy.Workspace = managedCopyPath(in.work.Planning.Repository, t.ID, len(t.Attempts)+1)

@@ -162,7 +162,7 @@ function drawPilotGraph(){
   const lines=[t.title,uncertain||labels[v?.state||t.status]||t.status,agent?agent.provider+' · '+(uncertain?(snapshot.pilotage?.health[agent.id]?.stop_requested?tr_web_graph_js('Arrêt demandé'):tr_web_graph_js('Activité non confirmée')):agent.progress?.detail||agent.progress?.action||tr_web_graph_js('Activité non reçue')):t.id];
   const role=PilotGraph.role(t,agent);
   group.querySelector('.graph-role-surface').dataset.tone=role.tone;
-  lines.splice(2,0,role.icon+' '+role.label);
+  lines.splice(2,0,role.icon+' '+role.label);if(typeof TaskModels!=='undefined')lines[2]+=' · '+TaskModels.text(t,agent);
   lines.push(PilotGraph.guidance(t,Pilot.goState(t),v));
   group.setAttribute('aria-label',lines.join('. ')+tr_web_graph_js(' — examiner la tâche'));
   if(state.detail==='detailed'){

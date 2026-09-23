@@ -3014,5 +3014,22 @@ globalThis.SwarmEnglish = {
   "Plafond de vérification requis entre la consommation actuelle (au moins 1) et 100.": "Review limit must be between current usage (at least 1) and 100.",
   "Un planificateur détient encore une session ; attendez sa libération avant de modifier les plafonds.": "A planner still holds a session; wait for its release before changing limits.",
   "Une vérification est en cours ; attendez sa fin avant de modifier les plafonds.": "A review is running; wait until it finishes before changing limits.",
-  "Action de plafonds inconnue.": "Unknown limits action."
+  "Action de plafonds inconnue.": "Unknown limits action.",
+  "Modèle de la tâche": "Task model",
+  "Utilisé : ": "Used: ",
+  "Prévu : ": "Planned: ",
+  "Hérité : ": "Inherited: ",
+  "Origine du choix": "Selection source",
+  "Hériter du profil de lancement": "Inherit the launch profile",
+  "Choisir pour cette tâche": "Choose for this task",
+  "Prévisualiser le modèle": "Preview model",
+  "Enregistrer le modèle": "Save model",
+  "Modèle enregistré pour les prochains départs.": "Model saved for future launches.",
+  "Ce choix vaut pour les prochains départs. Il ne change ni les anciennes tentatives, ni les responsables, ni le vérificateur. Les budgets restent appliqués.": "This choice applies to future launches. Past attempts, planners and the reviewer are unchanged. Budget controls still apply.",
+  "Attendez la fin de la tentative ou de la revue avant de changer le modèle.": "Wait for the attempt or review to finish before changing the model.",
+  "Le lancement ne correspond pas au modèle configuré pour cette tâche.": "The launch does not match the model configured for this task.",
+  "Choisissez un fournisseur avec outils pour cette tâche.": "Choose a tool-enabled provider for this task.",
+  "Simple": "Simple",
+  "Standard": "Standard",
+  "Exigeant": "Demanding"
 };

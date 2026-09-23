@@ -152,7 +152,7 @@ const Pilot = {
    for(const {t,a}of set){
     const card=node('article',undefined,'pilot-card');card.dataset.state=this.uncertainExecution(t,a)?'stale':snapshot.validation?.tasks[t.id]?.state||t.status;
     const select=this.command(this.taskTitle(t),()=>this.inspect(a?'agent':'task',a?.id||t.id),'pilot-card-title');select.dataset.pilotIdentity=a?.id||t.id;
-    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);
+    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);if(typeof TaskModels!=='undefined'){card.append(node('p',TaskModels.text(t,a)),this.command(tr_web_pilotage_js('Modèle de la tâche'),()=>TaskModels.open(t.id)))}
     card.append(node('p',PilotGraph.guidance(t,this.goState(t),snapshot.validation?.tasks[t.id]),'pilot-guidance'));
     const h=snapshot.pilotage?.health[a?.id];
     card.append(node('p',a?this.uncertainExecution(t,a)||(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label)||tr_web_pilotage_js('Observation indisponible'):labels[t.status]||t.status,'pilot-card-state'));

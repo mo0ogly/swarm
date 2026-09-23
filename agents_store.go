@@ -448,6 +448,14 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if err != nil {
 		return a, false, err
 	}
+	if task, taskErr := launchWork.task(r.TaskID); taskErr == nil && task.ModelSelection != nil {
+		selected := task.ModelSelection
+		if r.Provider != selected.Provider || (r.Level != "" && r.Level != "auto" && r.Level != selected.Route.Level) {
+			return a, false, fmt.Errorf("Le lancement ne correspond pas au modèle configuré pour cette tâche.")
+		}
+		r.Level = selected.Route.Level
+		r.ModelPolicyHash = selected.Route.PolicyHash
+	}
 	if launchWork.Planning != nil && r.Role != "worker" {
 		return a, false, fmt.Errorf("mission hiérarchique : un responsable ne peut pas lancer une tâche de codage ; rôle worker requis")
 	}
