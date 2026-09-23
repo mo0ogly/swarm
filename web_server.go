@@ -63,6 +63,13 @@ type webRequest struct {
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "budget" || r.Kind == "budget-preview" {
+		change := BudgetChange{Schema: 1, EventID: r.Event, Revision: r.Revision, Budget: r.Budget}
+		if r.Kind == "budget-preview" {
+			return s.previewBudget(r.Work, change)
+		}
+		return s.configureBudget(r.Work, change)
+	}
 	if r.Kind == "lifecycle-preview" || r.Kind == "lifecycle-apply" {
 		request := LifecycleRequest{Schema: 1, EventID: r.Event, Revision: r.Revision, Action: r.LifecycleAction, RetentionDays: r.RetentionDays, PreviewToken: r.PreviewToken}
 		if r.Kind == "lifecycle-preview" {
@@ -276,8 +283,6 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		e = s.overrideReviewedTaskAt(r.Work, r.Task, r.Note, r.Revision)
 	case "decision":
 		e = s.resolveDecision(r.Work, r.Decision, operatorIdentity(), r.Note)
-	case "budget":
-		e = s.setBudget(r.Work, r.Budget)
 	case "pause":
 		e = s.pause(r.Work, true)
 	case "unpause":

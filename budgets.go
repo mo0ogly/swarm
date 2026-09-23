@@ -102,22 +102,31 @@ func (s *Store) setBudget(work string, b Budget) error {
 	if e := validateBudget(b); e != nil {
 		return e
 	}
-	b.Updated = now()
-	b.Actor = operatorIdentity()
-	raw, _ := json.Marshal(b)
 	tx, e := s.db.Begin()
 	if e != nil {
 		return e
 	}
 	defer tx.Rollback()
-	if _, e = tx.Exec("INSERT INTO budgets(work_id,body) VALUES(?,?) ON CONFLICT(work_id) DO UPDATE SET body=excluded.body", work, raw); e != nil {
-		return e
-	}
-	if _, e = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, b.Updated, "budget", fmt.Sprintf("%s : limite estimative %.2f USD ; réservation %.2f USD", b.Actor, b.Limit, b.Reserve)); e != nil {
+	if e = writeBudget(tx, work, b); e != nil {
 		return e
 	}
 	return tx.Commit()
 }
+
+func writeBudget(tx *sql.Tx, work string, b Budget) error {
+	b.Updated = now()
+	b.Actor = operatorIdentity()
+	raw, err := json.Marshal(b)
+	if err != nil {
+		return err
+	}
+	if _, err = tx.Exec("INSERT INTO budgets(work_id,body) VALUES(?,?) ON CONFLICT(work_id) DO UPDATE SET body=excluded.body", work, raw); err != nil {
+		return err
+	}
+	_, err = tx.Exec("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,?,?)", work, b.Updated, "budget", fmt.Sprintf("%s : limite estimative %.2f USD ; réservation %.2f USD", b.Actor, b.Limit, b.Reserve))
+	return err
+}
+
 func reserveBudget(tx *sql.Tx, work, agent string) error {
 	return checkLaunchBudget(tx, work, agent, true)
 }

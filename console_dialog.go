@@ -12,6 +12,7 @@ import (
 )
 
 type taskDialog struct {
+	budgetRevision         int
 	prepared               *PreparedLaunch
 	preparedRevision       int
 	scope                  string

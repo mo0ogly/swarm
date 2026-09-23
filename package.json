@@ -10,7 +10,8 @@
     "test:connections": "node tests/ai_connections_ui.cjs bin/swarm test-results/connections",
     "i18n:build": "node scripts/i18n/build.cjs",
     "test:i18n": "node tests/i18n_test.cjs",
-    "test:i18n-ui": "node tests/i18n_ui.cjs bin/swarm test-results/i18n"
+    "test:i18n-ui": "node tests/i18n_ui.cjs bin/swarm test-results/i18n",
+    "test:budgets": "node tests/budget_ui.cjs bin/swarm test-results/budgets"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

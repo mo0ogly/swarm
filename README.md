@@ -276,3 +276,7 @@ La restriction commerciale signifie que ce projet n’est pas présenté comme �
 
 Voir le [cadrage APEX et PDCA des agents](docs/AGENT-METHODS.md) et le
 [circuit des rapports, preuves et décisions](docs/AGENT-COMMUNICATION.md).
+
+### Budgets
+
+[Budgets et coûts IA — web et CLI](docs/BUDGETS.md) · [English guide](docs/en/BUDGETS.md).

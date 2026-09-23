@@ -45,6 +45,12 @@ func (s *Store) openPanel(work string, c *consoleState, mode string) {
 	case "ooda":
 		d.fields = []string{"", "", "", "", ""}
 	case "budget":
+		w, err := s.get(work)
+		if err != nil {
+			d.message = err.Error()
+			return
+		}
+		d.budgetRevision = w.Revision
 		v, e := s.budget(work)
 		if e != nil {
 			d.message = e.Error()
@@ -147,7 +153,7 @@ func (s *Store) panelKey(work string, c *consoleState, key string) bool {
 					d.message = uiText("Montants numériques requis.")
 					return true
 				}
-				e = s.setBudget(work, Budget{Limit: limit, Reserve: reserve, Source: d.fields[2], PriceDate: d.fields[3]})
+				_, e = s.configureBudget(work, BudgetChange{Schema: 1, EventID: newID("budget-"), Revision: d.budgetRevision, Budget: Budget{Limit: limit, Reserve: reserve, Source: d.fields[2], PriceDate: d.fields[3]}})
 			} else if d.mode == "assign" {
 				e = s.operatorTask(work, Request{ID: d.task.ID, Owner: d.fields[0]})
 			} else {

@@ -2942,5 +2942,14 @@
   "Sous-planificateur": "Subplanner",
   "⑂ Sous-planificateur": "⑂ Subplanner",
   "⑂ Sous-planificateur · IA": "⑂ Subplanner · AI",
-  "Voir les sous-planificateurs": "Find subplanners"
+  "Voir les sous-planificateurs": "Find subplanners",
+  "Budgets et coûts IA": "AI budgets and costs",
+  "Plafond actuel / proposé : ": "Current / proposed ceiling: ",
+  "Engagements conservés : ": "Preserved commitments: ",
+  "Disponible après modification : ": "Available after change: ",
+  "Sans plafond": "No ceiling",
+  "Les agents actifs continuent. Les autres conditions de lancement restent applicables.": "Active agents continue. Other launch conditions still apply.",
+  "Enregistrer ce budget": "Save this budget",
+  "Prévisualiser le budget": "Preview budget",
+  "Les revues indépendantes ont un plafond d’appels distinct. Leur coût monétaire est exclu de cette enveloppe.": "Independent reviews have a separate call limit. Their monetary cost is excluded from this envelope."
 }

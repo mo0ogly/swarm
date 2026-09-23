@@ -15,6 +15,7 @@ const help = `swarm — compagnon local de reprise (schema_version: 1)
 Options globales : --root <projet> --json --lang fr|en
 swarm init
 swarm doctor
+swarm budget show|preview|apply <travail> [--input budget.json]
 swarm aide [sujet]
 swarm providers init|show
 swarm providers cooldown show|clear <fournisseur> [--input demande.json]
@@ -235,6 +236,12 @@ func run(args []string, out, errOut io.Writer) int {
 		return fail(e)
 	}
 	defer s.db.Close()
+	if pos[0] == "budget" {
+		if e := s.budgetCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
 	if pos[0] == "connections" {
 		if len(pos) != 2 {
 			return fail(fmt.Errorf("swarm connections list|save --input connexion.json"))
