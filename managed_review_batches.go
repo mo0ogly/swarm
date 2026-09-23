@@ -66,7 +66,6 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 		tasks[t.Task] = true
 	}
 	sources := map[string]ReviewSource{}
-	total := 0
 	for _, s := range c.Sources {
 		if s.Path == "" || s.Bytes != len(s.Content) || s.Digest != hash([]byte(s.Content)) || s.Bytes > 96*1024 {
 			return nil, fmt.Errorf("source de revue incohérente")
@@ -75,9 +74,8 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 			return nil, fmt.Errorf("source de revue dupliquée")
 		}
 		sources[s.Path] = s
-		total += s.Bytes
 	}
-	if len(sources) > 24 || total > 128*1024 {
+	if len(sources) > 24 {
 		return nil, fmt.Errorf("plafond global de sources dépassé")
 	}
 	assigned := map[string]bool{}
@@ -86,12 +84,17 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 			return nil, fmt.Errorf("affectation de tâche inconnue")
 		}
 		seen := map[string]bool{}
+		taskBytes := 0
 		for _, p := range paths {
 			if _, ok := sources[p]; !ok || seen[p] {
 				return nil, fmt.Errorf("affectation de source inconnue ou dupliquée")
 			}
 			seen[p] = true
 			assigned[p] = true
+			taskBytes += sources[p].Bytes
+		}
+		if taskBytes > 128*1024 {
+			return nil, fmt.Errorf("plafond de sources dépassé pour la tâche %s", id)
 		}
 	}
 	for p := range sources {

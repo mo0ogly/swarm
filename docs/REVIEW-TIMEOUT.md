@@ -220,3 +220,9 @@ Les tests `TestManagedLiveReviewSurvivesConcurrentConductor` et `TestManagedLive
 ## Remise après redémarrage de la machine
 
 Une tentative déjà enregistrée comme terminée (interrompue, échouée ou achevée) peut être remise après un redémarrage du même hôte et du même espace de PID. Le constat de fin et l’identité du démarrage d’origine sont conservés. Un autre hôte/espace de PID, un état actif ou une fin absente restent refusés. Sur le même démarrage, un processus portant encore l’identité enregistrée interdit toujours la récupération. Cette règle ne valide aucun livrable : les contrôles et la revue restent requis.
+
+## Limite du découpage par tâche
+
+La limite de sources annexes de 128 Kio est contrôlée par tâche, à la lecture des manifestes et à la construction des lots. Plusieurs tâches peuvent donc fournir davantage au total ; chaque source reste limitée à 96 Kio, le dossier à 24 fichiers et chaque appel à 192 Kio. Les sources partagées comptent dans chacune des tâches qui les réclament.
+
+Ce découpage conserve le diff cumulatif intégral dans chaque lot. Il ne découpe pas le diff lui-même : si celui-ci dépasse déjà 192 Kio, multiplier les lots ou relancer ne résout pas le refus. Il faut des livrables plus petits, ou un protocole de revue de fragments avec preuve de couverture et synthèse indépendante, qui n’est pas fourni par ce découpage. Une source omise ou un simple résumé ne remplace pas cette couverture.

@@ -203,3 +203,9 @@ If the Git lock is busy when review returns, the durable verdict is retained and
 ## Delivery after a host reboot
 
 An already terminal attempt may be recovered after a reboot of the same host and PID namespace. Its original terminal record and boot identity remain unchanged. Active states, missing terminal records and different hosts/namespaces remain rejected. On the same boot, a matching live process still prevents recovery. This does not accept the deliverable: controls and independent review remain required.
+
+## Limits of task-based batching
+
+The 128 KiB supplemental-source allowance is checked per task, both when reading manifests and when planning batches. Aggregate sources may exceed that amount; each source remains limited to 96 KiB, the context to 24 files, and each prompt to 192 KiB. Shared sources count against every task that requests them.
+
+This batching retains the entire cumulative diff in every batch. It does not split the diff itself: if that diff already exceeds 192 KiB, more batches or retries cannot resolve the refusal. Smaller deliverables or a fragment-review protocol with complete coverage evidence and independent synthesis are required. Task-based batching does not implement that protocol. Omitted sources or summaries cannot substitute for coverage.

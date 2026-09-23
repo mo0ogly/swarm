@@ -72,7 +72,7 @@ func TestManagedBatchPreflightPreservesGlobalEvidenceAndCoverage(t *testing.T) {
 }
 
 func TestManagedBatchPreflightFailsBeforeAnyUsablePlan(t *testing.T) {
-	for _, kind := range []string{"global-too-large", "single-too-large", "unassigned", "unknown-task", "unknown-source", "changed-source", "duplicate-source", "global-source-limit", "empty-criteria"} {
+	for _, kind := range []string{"global-too-large", "single-too-large", "unassigned", "unknown-task", "unknown-source", "changed-source", "duplicate-source", "task-source-limit", "empty-criteria"} {
 		t.Run(kind, func(t *testing.T) {
 			c, owners := batchFixture()
 			switch kind {
@@ -90,7 +90,8 @@ func TestManagedBatchPreflightFailsBeforeAnyUsablePlan(t *testing.T) {
 				c.Sources[0].Content += "changed"
 			case "duplicate-source":
 				c.Sources = append(c.Sources, c.Sources[0])
-			case "global-source-limit":
+			case "task-source-limit":
+				owners["first"] = []string{"first.go", "second.go", "third.go"}
 				for i := range c.Sources {
 					c.Sources[i].Content = strings.Repeat("x", 50*1024)
 					c.Sources[i].Bytes = len(c.Sources[i].Content)
@@ -242,5 +243,40 @@ func TestManagedBatchVerdictsRejectMissingAndTamperedEvidence(t *testing.T) {
 				t.Fatal("invalid bundle produced usable aggregate", kind, state, err)
 			}
 		})
+	}
+}
+
+// Cumulative sources can exceed one task's allowance, but each immutable task
+// manifest and each actual provider prompt remain bounded independently.
+func TestManagedBatchSourcesBoundPerTask(t *testing.T) {
+	c, owners := batchFixture()
+	c.Diff = strings.Repeat("diff evidence\n", 4000)
+	for i := range c.Sources {
+		c.Sources[i].Content = strings.Repeat("s", 80*1024)
+		c.Sources[i].Bytes = len(c.Sources[i].Content)
+		c.Sources[i].Digest = hash([]byte(c.Sources[i].Content))
+	}
+	batches, err := planManagedReviewBatches("review", c, owners)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(batches) != 3 {
+		t.Fatalf("expected three bounded batches, got %d", len(batches))
+	}
+	seen := map[string]bool{}
+	for _, b := range batches {
+		if len(b.Prompt) > managedReviewPromptLimit {
+			t.Fatal("oversized prompt")
+		}
+		for _, source := range b.Context.Sources {
+			seen[source.Path] = true
+		}
+	}
+	if len(seen) != len(c.Sources) {
+		t.Fatal("source lost")
+	}
+	owners["first"] = []string{"first.go", "second.go"}
+	if _, err := planManagedReviewBatches("review", c, owners); err == nil {
+		t.Fatal("oversized task accepted")
 	}
 }
