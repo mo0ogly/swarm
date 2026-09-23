@@ -98,3 +98,33 @@ func TestManagedReviewSourcesRejectsCumulativeOverflowWithoutTruncation(t *testi
 		t.Fatalf("oversized context not rejected: %d %v", len(sources), err)
 	}
 }
+
+func TestManagedReviewSourcesPerTaskBound(t *testing.T) {
+	dir := t.TempDir()
+	gitTest(t, dir, "init")
+	os.MkdirAll(filepath.Join(dir, "docs"), 0700)
+	for _, name := range []string{"one", "two"} {
+		os.WriteFile(filepath.Join(dir, name), []byte(strings.Repeat(name+"\n", 20000)), 0600)
+	}
+	os.WriteFile(filepath.Join(dir, "docs/first.review-context.json"), []byte(`{"version":1,"files":["one"]}`), 0600)
+	os.WriteFile(filepath.Join(dir, "docs/second.review-context.json"), []byte(`{"version":1,"files":["two"]}`), 0600)
+	gitTest(t, dir, "add", ".")
+	gitTest(t, dir, "commit", "-m", "separate bounded task sources")
+	storage := t.TempDir()
+	gitTest(t, storage, "clone", "--bare", dir, "repository.git")
+	w := Work{Planning: &PlanningState{Repository: &ManagedRepository{Storage: storage}}}
+	sha := gitTest(t, dir, "rev-parse", "HEAD")
+	sources, e := managedReviewSourcesByTask(w, []managedReviewTaskContext{{Task: "first"}, {Task: "second"}}, sha)
+	if e != nil || len(sources) != 2 || len(sources[0].Content)+len(sources[1].Content) != 160000 {
+		t.Fatal("lost bounded sources", e)
+	}
+	// The original bound still rejects the same data assigned to a single task.
+	os.WriteFile(filepath.Join(dir, "docs/first.review-context.json"), []byte(`{"version":1,"files":["one","two"]}`), 0600)
+	gitTest(t, dir, "add", ".")
+	gitTest(t, dir, "commit", "-m", "single oversized task")
+	sha = gitTest(t, dir, "rev-parse", "HEAD")
+	gitTest(t, filepath.Join(storage, "repository.git"), "fetch", dir, sha)
+	if _, e = managedReviewSourcesByTask(w, []managedReviewTaskContext{{Task: "first"}}, sha); e == nil || !strings.Contains(e.Error(), "128") {
+		t.Fatal("single-task bound weakened", e)
+	}
+}

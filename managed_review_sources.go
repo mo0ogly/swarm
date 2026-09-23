@@ -105,3 +105,28 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 	}
 	return sources, nil
 }
+
+// Each task keeps the original 128 KiB source bound. Cumulative reviews are
+// partitioned later into bounded prompts; do not sum unrelated task packets
+// against the single-task limit. The global 24-file bound still applies.
+func managedReviewSourcesByTask(w Work, tasks []managedReviewTaskContext, candidate string) ([]ReviewSource, error) {
+	sources := []ReviewSource{}
+	seen := map[string]bool{}
+	for _, task := range tasks {
+		packet, e := managedReviewSources(w, []managedReviewTaskContext{task}, candidate)
+		if e != nil {
+			return nil, e
+		}
+		for _, source := range packet {
+			if seen[source.Path] {
+				continue
+			}
+			if len(sources) >= 24 {
+				return nil, fmt.Errorf("contexte de revue : 24 fichiers maximum, aucun contenu tronqué")
+			}
+			seen[source.Path] = true
+			sources = append(sources, source)
+		}
+	}
+	return sources, nil
+}

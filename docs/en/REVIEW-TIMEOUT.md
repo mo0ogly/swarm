@@ -64,7 +64,7 @@ The engine first attempts a single call. When the losslessly encoded request
 exceeds 192 KiB, it prepares deterministic task batches. Every batch retains the
 same Git candidate, check receipt, full diff, and all cumulative reports and
 criteria. Supplemental sources are assigned using their manifests; each source
-remains whole. The cumulative limits of 24 files, 128 KiB of sources and 96 KiB
+remains whole. The limits of 24 distinct files overall, 128 KiB of sources per task and 96 KiB
 per file still apply. If one task cannot fit in a batch, the engine refuses before
 any call, without truncating evidence.
 

@@ -69,8 +69,10 @@ Le moteur essaie d'abord un appel unique. Si le dossier dépasse 192 Kio après
 encodage sans perte, il prépare des lots déterministes de tâches. Chaque lot
 conserve le même candidat Git, le reçu des contrôles, le diff complet et tous les
 rapports et critères cumulatifs. Les sources annexes sont réparties selon leurs
-manifestes ; chaque source reste entière. Les limites cumulées de 24 fichiers,
-128 Kio de sources et 96 Kio par fichier restent applicables. Si une tâche ne
+manifestes ; chaque source reste entière. Les limites de 24 fichiers distincts au total, 128 Kio de sources par tâche
+et 96 Kio par fichier restent applicables. Les dossiers de tâches distinctes
+sont ensuite répartis en prompts bornés ; le total cumulé n’est pas envoyé
+comme un seul appel. Si une tâche ne
 tient pas dans un lot, le moteur refuse avant tout appel, sans tronquer le dossier.
 
 Le moteur vérifie le budget nécessaire à tous les lots restants avant le premier

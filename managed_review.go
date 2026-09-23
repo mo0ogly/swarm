@@ -175,7 +175,7 @@ func (s *Store) managedReviewContext(w Work, a Agent, candidate string, receipt 
 		}
 		c.Tasks = append(c.Tasks, managedReviewTaskContext{Delivery: delivery, Task: t.ID, Title: t.Title, Deliverable: t.Deliverable, Criteria: t.Criteria, Report: report, Controls: controls, Binding: binding})
 	}
-	c.Sources, e = managedReviewSources(w, c.Tasks, candidate)
+	c.Sources, e = managedReviewSourcesByTask(w, c.Tasks, candidate)
 	if e == nil {
 		e = compactManagedReviewContext(&c, bare, repo.Base)
 	}

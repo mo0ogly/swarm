@@ -80,7 +80,7 @@ func (s *Store) incrementalManagedReviewFallback(w Work, a Agent, c managedRevie
 	next.Baseline = baseline
 	// Re-read all declared sources: files previously omitted as full added-file
 	// duplicates may no longer occur in an incremental diff.
-	next.Sources, e = managedReviewSources(w, next.Tasks, next.Candidate)
+	next.Sources, e = managedReviewSourcesByTask(w, next.Tasks, next.Candidate)
 	if e != nil {
 		return c, e
 	}
