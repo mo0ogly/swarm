@@ -11,6 +11,7 @@ import (
 // No parallel persistence path: exports, rollback and optimistic locking retain
 // the same boundary as tasks. Absence means legacy, never inferred adoption.
 type PlanningState struct {
+	QuotaAuthorization    *QuotaAuthorization            `json:"quota_authorization,omitempty"`
 	ReviewerRequired      bool                           `json:"reviewer_required,omitempty"`
 	Reviewer              *ReviewerConfig                `json:"reviewer,omitempty"`
 	ModelRoute            *ModelRoute                    `json:"model_route,omitempty"`

@@ -52,9 +52,8 @@ coûts monétaires ne sont pas inclus dans cette enveloppe.** Les coûts rapport
 par les fournisseurs sont distincts des estimations ; absence de coût ne veut
 pas dire zéro. Ce contrôle n’est pas une garantie de plafond de facturation.
 
-Les défauts pour les nouvelles missions et l’éditeur unifié des quotas de
-planification/revue/tentatives restent à réaliser. Les autorisations existantes
-restent inchangées.
+Les défauts pour les nouvelles missions restent à réaliser. Les autorisations
+existantes ne changent pas lors de l’installation.
 
 ## Catalogue de tarifs par fournisseur et modèle
 
@@ -100,3 +99,49 @@ départ. Les tarifs doivent être vérifiés par la personne qui les saisit. Les
 d’abonnement, paliers, durées de cache et remises nécessitent un tarif adapté au
 cas étudié ; le calculateur ne les devine pas. Les versions ne sont pas supprimées
 par l’interface ; le catalogue refuse d’en ajouter au-delà de 1 000 versions.
+
+## Plafonds de planification et de vérification
+
+Dans **Budgets et coûts IA**, ouvrir **Plafonds de planification et de vérification**.
+Le formulaire affiche les consommations, les allocations locales et la dernière
+autorisation. Saisir les plafonds et un motif, prévisualiser puis autoriser.
+Une modification des champs invalide la prévisualisation. Une révision périmée
+est refusée. Aucun compteur consommé, historique, échec ou état de pause n’est effacé.
+
+Ces plafonds sont globaux : 1–200 activations, 1–100 décisions et 1–100 appels du
+vérificateur déjà configuré. Un plafond ne peut pas être inférieur au consommé.
+Les allocations des sous-planificateurs restent inchangées et continuent de
+s’appliquer. Si un planificateur détient une session ou une vérification est en
+cours, attendre sa libération ou sa fin avant modification.
+
+```sh
+swarm quotas show WORK --json
+swarm quotas preview WORK --input quotas.json --json
+swarm quotas apply WORK --input quotas.json --json
+```
+
+Exemple de `quotas.json` : adapter la révision et les valeurs à `show`.
+
+```json
+{"schema_version":1,"event_id":"quota-authorization-001","expected_revision":12,"limits":{"planning_activations":30,"planning_decisions":20,"review_calls":10},"reason":"Autorisation explicite après examen du travail restant"}
+```
+
+Sans vérificateur configuré, `review_calls` doit être `null`. Le réglage n’en crée
+pas un. L’auteur et la date sont enregistrés par le moteur ; le même événement
+rejoué à l’identique est idempotent. Les modifications concurrentes sont refusées.
+
+**Effet :** le réglage ne lance pas directement d’agent. Une mission active peut
+utiliser la nouvelle autorisation au prochain passage du conducteur. Un échec ne
+se transforme pas en réussite et une pause n’est pas levée. Les tentatives de
+production restent réautorisées depuis leur tâche, avec une consigne corrective ;
+ce formulaire ne contourne pas cette protection.
+
+```mermaid
+flowchart LR
+  A[Web ou CLI : plafonds et motif] --> B[Prévisualisation sans écriture]
+  B --> C[Autorisation explicite]
+  C --> D{Révision et consommation compatibles ?}
+  D -->|Non| E[Refus et état conservé]
+  D -->|Oui| F[Plafonds et événement enregistrés]
+  F --> G[Conducteur : autres conditions toujours vérifiées]
+```

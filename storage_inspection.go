@@ -7,7 +7,7 @@ func cliStorageInspection(pos []string) bool {
 		return false
 	}
 	switch pos[0] + " " + pos[1] {
-	case "pricing list", "pricing estimate", "budget show", "budget preview", "work show", "work list", "planning show", "mission status", "mission preview", "agent show", "agent list", "agent logs", "agent prepared", "providers show", "connections list", "prepare list", "prepare show", "prepare history", "prepare methods", "workspace status", "exchange list", "lifecycle list":
+	case "quotas show", "quotas preview", "pricing list", "pricing estimate", "budget show", "budget preview", "work show", "work list", "planning show", "mission status", "mission preview", "agent show", "agent list", "agent logs", "agent prepared", "providers show", "connections list", "prepare list", "prepare show", "prepare history", "prepare methods", "workspace status", "exchange list", "lifecycle list":
 		return true
 	}
 	return len(pos) > 2 && pos[0] == "providers" && pos[1] == "cooldown" && pos[2] == "show"

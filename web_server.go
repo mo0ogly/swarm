@@ -54,6 +54,7 @@ type webRequest struct {
 	Author               string                 `json:"author"`
 	Decision             string                 `json:"decision"`
 	Request              Request                `json:"request"`
+	Quotas               QuotaChange            `json:"quotas"`
 	Budget               Budget                 `json:"budget"`
 	ValidationPolicy     ValidationPolicyChange `json:"validation_policy,omitempty"`
 	Autonomy             string                 `json:"autonomy,omitempty"`
@@ -63,6 +64,16 @@ type webRequest struct {
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "quotas-preview" || r.Kind == "quotas" {
+		q := r.Quotas
+		q.Schema = 1
+		q.EventID = r.Event
+		q.Revision = r.Revision
+		if r.Kind == "quotas-preview" {
+			return s.previewQuotas(r.Work, q)
+		}
+		return s.configureQuotas(r.Work, q)
+	}
 	if r.Kind == "budget" || r.Kind == "budget-preview" {
 		change := BudgetChange{Schema: 1, EventID: r.Event, Revision: r.Revision, Budget: r.Budget}
 		if r.Kind == "budget-preview" {

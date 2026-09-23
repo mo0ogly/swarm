@@ -46,8 +46,8 @@ The estimate envelope covers execution, planning, page assistance and preparatio
 included in this envelope.** Provider-reported costs remain separate from estimates.
 Missing cost is unknown, not zero. This is not a guaranteed external billing cap.
 
-Defaults for future missions and a unified planning/review/attempt quota editor
-are not included yet. Existing authorizations remain unchanged.
+Defaults for future missions are not included yet. Installation does not change
+existing authorizations.
 
 ## Versioned model pricing
 
@@ -90,3 +90,46 @@ per-launch reservations. Verify the rates you enter. Subscriptions, tiers, cache
 retention durations and discounts require appropriately selected rates; they are
 not inferred. Prior versions cannot be deleted through this interface; further
 writes are refused after 1,000 versions.
+
+## Planning and review limits
+
+In **AI budgets and costs**, open the planning and review limits form. Inspect
+consumption and local allocations, enter new limits and a reason, preview, then
+authorize. Editing invalidates the preview; stale revisions are rejected.
+Consumption, history, failures and pauses are preserved.
+
+Global ranges: 1–200 planning activations, 1–100 decisions, 1–100 review calls.
+Limits cannot fall below consumption. Subplanner allocations remain unchanged
+and continue to apply. Wait until planner sessions are released and running
+reviews finish before changing these limits.
+
+```sh
+swarm quotas show WORK --json
+swarm quotas preview WORK --input quotas.json --json
+swarm quotas apply WORK --input quotas.json --json
+```
+
+Example request; use the revision and consumption returned by `show`:
+
+```json
+{"schema_version":1,"event_id":"quota-authorization-001","expected_revision":12,"limits":{"planning_activations":30,"planning_decisions":20,"review_calls":10},"reason":"Explicit authorization after reviewing remaining work"}
+```
+
+Without a configured reviewer, `review_calls` must be `null`. This operation does
+not create a reviewer. The engine records the operator and time. Exact event
+replays are idempotent; concurrent stale changes are rejected.
+
+Saving does not directly launch an agent. An active mission may use the new
+allowance on its next conductor pass. Failures remain failures and pauses remain
+in effect. Production retries still require task-level reauthorization with
+corrective instructions; this form does not bypass that protection.
+
+```mermaid
+flowchart LR
+  A[Web or CLI: limits and reason] --> B[Read-only preview]
+  B --> C[Explicit authorization]
+  C --> D{Revision and consumption compatible?}
+  D -->|No| E[Reject and preserve state]
+  D -->|Yes| F[Record limits and event]
+  F --> G[Conductor still checks all other conditions]
+```
