@@ -161,7 +161,7 @@ func (s *Store) independentReviewStep(work string) error {
 		if e != nil {
 			return e
 		}
-		record := IndependentReview{Workflow: &workflow, ID: newID("review-"), Attempt: attempt.ID, Producer: producer.ID, Reviewer: "reviewer://" + cfg.Provider, Report: report, Digest: hash(data), Contract: reviewContract(t), State: "running", Reason: "Examen indépendant du rapport et des critères en cours.", Started: now()}
+		record := IndependentReview{ModelRoute: route, Workflow: &workflow, ID: newID("review-"), Attempt: attempt.ID, Producer: producer.ID, Reviewer: "reviewer://" + cfg.Provider, Report: report, Digest: hash(data), Contract: reviewContract(t), State: "running", Reason: "Examen indépendant du rapport et des critères en cours.", Started: now()}
 		record.TimeoutSeconds = timeoutSeconds
 		raw, _ := json.Marshal(record)
 		_, e = s.mutateWithHook(work, "review.claim", record.ID, w.Revision, raw, func(current *Work) error {

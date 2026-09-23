@@ -69,7 +69,7 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 	}
 	data, _ := json.Marshal(c)
 	digest := batchPlanDigest(c, prefix, batches, cfg, workflow)
-	record := IndependentReview{ID: newID("review-"), Attempt: a.Attempt, Producer: a.ID, Reviewer: "reviewer://" + cfg.Provider, Contract: reviewContract(task), CandidateSHA: c.Candidate, PreviousCandidate: c.Previous, Receipt: receiptPath, ReceiptDigest: hash(receipt), ContextDigest: hash(data), State: "running", Reason: "Examen indépendant cumulatif en plusieurs lots.", Started: now(), Workflow: &workflow, TimeoutSeconds: timeout, BatchPlanDigest: digest, BatchProviderDigest: cfg.ProviderDigest}
+	record := IndependentReview{ModelRoute: route, ID: newID("review-"), Attempt: a.Attempt, Producer: a.ID, Reviewer: "reviewer://" + cfg.Provider, Contract: reviewContract(task), CandidateSHA: c.Candidate, PreviousCandidate: c.Previous, Receipt: receiptPath, ReceiptDigest: hash(receipt), ContextDigest: hash(data), State: "running", Reason: "Examen indépendant cumulatif en plusieurs lots.", Started: now(), Workflow: &workflow, TimeoutSeconds: timeout, BatchPlanDigest: digest, BatchProviderDigest: cfg.ProviderDigest}
 	for _, tc := range c.Tasks {
 		if tc.Task == a.TaskID {
 			record.Report = managedReviewReportPath(receiptPath, tc.Task)

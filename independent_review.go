@@ -11,6 +11,7 @@ import (
 // The reviewer is a separate, tool-free process. Its opinion never replaces
 // deterministic controls or an explicitly required human acceptance.
 type ReviewerConfig struct {
+	ModelSelection *RoleModel  `json:"model_selection,omitempty"`
 	TimeoutSeconds int         `json:"timeout_seconds,omitempty"`
 	Failure        string      `json:"failure,omitempty"`
 	Provider       string      `json:"provider"`
@@ -21,6 +22,7 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
+	ModelRoute          *ModelRoute                 `json:"model_route,omitempty"`
 	BatchPlanDigest     string                      `json:"batch_plan_sha256,omitempty"`
 	BatchProviderDigest string                      `json:"batch_provider_sha256,omitempty"`
 	Batches             []ManagedReviewBatchVerdict `json:"batches,omitempty"`

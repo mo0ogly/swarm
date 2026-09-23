@@ -1,8 +1,8 @@
 # MOD-01 — Choisir et voir le modèle de chaque tâche
 
 État : choix persistant par tâche de production implémenté et recetté (tests Go et navigateur, sans appel IA payant).
-Voir ../TASK-MODELS.md pour la portée livrée. Restent l’édition par responsable
-et les propositions automatiques du planificateur. Demande utilisateur du 23 septembre 2026.
+Voir ../TASK-MODELS.md pour la portée livrée. Édition individuelle des responsables et du vérificateur ajoutée ;
+restent les propositions automatiques du planificateur. Demande utilisateur du 23 septembre 2026.
 Rattachement : mission w-f923632399eea4d404bc94ac, évolution après qualification E6.
 Cette fiche ne constitue ni une tâche adoptée dans le graphe ni une autorisation
 supplémentaire d’appels IA. Ne pas retarder la preuve E6 pour cette évolution.

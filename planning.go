@@ -32,6 +32,8 @@ type PlanningState struct {
 	Inbox                 []PlanningEvent                `json:"inbox"`
 }
 type PlanningScope struct {
+	ModelSelection  *RoleModel        `json:"model_selection,omitempty"`
+	LastModel       *RoleModel        `json:"last_model,omitempty"`
 	Delivery        *PlanningDelivery `json:"delivery,omitempty"`
 	Workflow        *AgentWorkflow    `json:"workflow,omitempty"`
 	TaskLimit       int               `json:"max_tasks,omitempty"`
@@ -437,6 +439,8 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		}
 		scope.Delivery = &delivery
 		scope.Workflow = &workflow
+		selectedModel := effectivePlanningScope(p, scope)
+		scope.LastModel = &RoleModel{Provider: selectedModel.Provider, ProviderDigest: selectedModel.ProviderDigest, Route: selectedModel.ModelRoute, At: now()}
 		for _, owner := range planningAncestors(p, scope.ID) {
 			owner.Activations++
 		}

@@ -114,6 +114,7 @@ async function loadLogs(){const agent=$('log-agent').value;if(!agent){$('log-lin
 $('action-form').addEventListener('submit',async event=>{event.preventDefault();if(!modalContext||modalContext.sending)return;const c=modalContext,a=c.action;c.sending=true;const current=()=>modalContext===c&&(a==='lifecycle'||work===c.workID);const f=Object.fromEntries(new FormData(event.target));const oldLabel=$('confirm').textContent,pendingLabel=['report','gate'].includes(a)?tr_web_cockpit_js('Lecture des preuves…'):tr_web_cockpit_js('Envoi de la demande…');$('confirm').textContent=pendingLabel;$('confirm').setAttribute('aria-live','polite');$('confirm').disabled=true;$('modal-error').hidden=true;try{
  if(c.modelReady===false)throw Error(tr_web_cockpit_js('Attendre la résolution du modèle ou corriger le fournisseur sélectionné.'));
  if(a==='lifecycle'){await LifecycleManager.submit(c);return}
+ if(a==='role-model'){await RoleModels.submit(c,f);return}
  if(a==='task-model'){await TaskModels.submit(c,f);return}
  if(a==='quotas'){await Quotas.submit(c,f);return}
  if(a==='pricing-save'||a==='pricing-estimate'){await Pricing.submit(c,f);return}

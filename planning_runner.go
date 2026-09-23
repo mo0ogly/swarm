@@ -38,9 +38,6 @@ func (s *Store) planningStep(work string) error {
 	if p == nil || p.Paused || p.Provider == "" || p.Failure != "" || p.Activations >= p.MaxActivations || p.Decisions >= p.MaxDecisions {
 		return nil
 	}
-	if err = s.providerCooldownGuard(p.Provider); err != nil {
-		return err
-	}
 	selected := ""
 	// The inbox is appended transactionally. Schedule the oldest unhandled
 	// event's eligible owner, not the first role in the scope list: a fresh
@@ -79,6 +76,10 @@ func (s *Store) planningStep(work string) error {
 		return nil
 	}
 	scope, _ := p.scope(selected)
+	p = effectivePlanningScope(p, scope)
+	if err = s.providerCooldownGuard(p.Provider); err != nil {
+		return err
+	}
 	workflow, workflowPrompt, err := agentWorkflow(planningWorkflowRole(scope))
 	if err != nil {
 		return err

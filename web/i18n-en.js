@@ -3031,5 +3031,17 @@ globalThis.SwarmEnglish = {
   "Choisissez un fournisseur avec outils pour cette tâche.": "Choose a tool-enabled provider for this task.",
   "Simple": "Simple",
   "Standard": "Standard",
-  "Exigeant": "Demanding"
+  "Exigeant": "Demanding",
+  "Modèle du responsable ou du vérificateur": "Planner or reviewer model",
+  "La mission doit être en pause. Le choix change les prochains appels de ce rôle uniquement. Consommations, échecs et avis précédents restent conservés.": "Pause the mission first. This choice affects only future calls for this role. Consumption, failures and previous reviews are preserved.",
+  "Hériter du modèle de planification": "Inherit the planning model",
+  "Choisir pour ce responsable": "Choose for this planner",
+  "Modèle du responsable": "Planner model",
+  "Modèle du vérificateur": "Reviewer model",
+  "Mettez la mission en pause avant de modifier le modèle d’un responsable ou du vérificateur.": "Pause the mission before changing a planner or reviewer model.",
+  "Une revue est active ou reprend des lots ; terminez-la avant de changer le modèle.": "A review is active or resuming batches; finish it before changing the model.",
+  "Choisissez explicitement le modèle du vérificateur.": "Select the reviewer model explicitly.",
+  "Choisissez un responsable ou le vérificateur.": "Select a planner or the reviewer.",
+  "Une décision est en cours ; attendez sa fin avant de changer le modèle.": "A decision is in progress; wait for it to finish before changing the model.",
+  "Modèle de planification par défaut : ": "Default planning model: "
 };

@@ -15,6 +15,7 @@ const help = `swarm — compagnon local de reprise (schema_version: 1)
 Options globales : --root <projet> --json --lang fr|en
 swarm init
 swarm doctor
+swarm role-model show|preview|apply <travail> [--input request.json]
 swarm task-model show|preview|apply <travail> [--input request.json]
 swarm quotas show|preview|apply <travail> [--input quotas.json]
 swarm pricing list|save|estimate [--input request.json]
@@ -239,6 +240,12 @@ func run(args []string, out, errOut io.Writer) int {
 		return fail(e)
 	}
 	defer s.db.Close()
+	if pos[0] == "role-model" {
+		if err := s.roleModelCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
 	if pos[0] == "task-model" {
 		if err := s.taskModelCLI(pos, input, out); err != nil {
 			return fail(err)

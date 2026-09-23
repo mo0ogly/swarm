@@ -54,6 +54,7 @@ type webRequest struct {
 	Author               string                 `json:"author"`
 	Decision             string                 `json:"decision"`
 	Request              Request                `json:"request"`
+	RoleModel            RoleModelRequest       `json:"role_model"`
 	TaskModel            TaskModelRequest       `json:"task_model"`
 	Quotas               QuotaChange            `json:"quotas"`
 	Budget               Budget                 `json:"budget"`
@@ -65,6 +66,16 @@ type webRequest struct {
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "role-model-preview" || r.Kind == "role-model" {
+		q := r.RoleModel
+		q.Schema = 1
+		q.Revision = r.Revision
+		q.EventID = r.Event
+		if r.Kind == "role-model-preview" {
+			return s.previewRoleModel(r.Work, q)
+		}
+		return s.configureRoleModel(r.Work, q)
+	}
 	if r.Kind == "task-model-preview" || r.Kind == "task-model" {
 		q := r.TaskModel
 		q.Schema = 1

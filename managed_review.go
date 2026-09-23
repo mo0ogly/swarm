@@ -364,7 +364,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		return e
 	}
 	relContext, _ := filepath.Rel(s.root, contextPath)
-	record := IndependentReview{ID: newID("review-"), Attempt: a.Attempt, Producer: a.ID, Reviewer: "reviewer://" + cfg.Provider, Contract: reviewContract(task), CandidateSHA: candidate, PreviousCandidate: current.Planning.Repository.Candidate, Receipt: receiptPath, ReceiptDigest: hash(receipt), Context: filepath.ToSlash(relContext), ContextDigest: hash(data), State: "running", Reason: "Examen indépendant du diff Git, des rapports et des contrôles exécutés.", Started: now()}
+	record := IndependentReview{ModelRoute: route, ID: newID("review-"), Attempt: a.Attempt, Producer: a.ID, Reviewer: "reviewer://" + cfg.Provider, Contract: reviewContract(task), CandidateSHA: candidate, PreviousCandidate: current.Planning.Repository.Candidate, Receipt: receiptPath, ReceiptDigest: hash(receipt), Context: filepath.ToSlash(relContext), ContextDigest: hash(data), State: "running", Reason: "Examen indépendant du diff Git, des rapports et des contrôles exécutés.", Started: now()}
 	record.Workflow = &workflow
 	record.TimeoutSeconds = timeoutSeconds
 	for _, tc := range context.Tasks {
