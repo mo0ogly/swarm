@@ -89,3 +89,7 @@ Les nouveaux lots doivent aussi permettre une réponse complète : le moteur mes
 ### Reprise d’un lot ancien trop chargé
 
 `planning retry-review` recalcule le découpage lorsque la capacité de réponse de l’ancien plan est dépassée, uniquement pour une revue en erreur dont toutes les réservations sont interrompues et qui ne possède aucun résultat ni décision finale. L’ancien plan et le journal restent ancrés sous `replanned_from` et sont vérifiés à chaque lecture. Les compteurs restent inchangés ; le budget doit couvrir le nouveau plan avant son enregistrement. Une seule replanification est prise en charge ; les reprises avec résultats existants conservent leur plan. `planning fragment-preview` examine aussi cette revue interrompue sans appel ni mutation.
+
+### Diagnostic des appels interrompus
+
+Une erreur de processus indique désormais les octets reçus, le nombre d’événements JSON analysés, le dernier type reconnu et la présence d’un événement final. Ces compteurs ne prouvent ni progression utile ni validation. Les événements sont analysés dans la limite de lecture existante ; les octets supplémentaires sont drainés et comptés. Aucun contenu de message ni identifiant n’est ajouté à ces compteurs. Un délai peut ainsi être distingué d’une absence totale de sortie, sans attribuer arbitrairement sa cause au fournisseur. Les délais, budgets et règles de reprise restent inchangés.

@@ -142,6 +142,11 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 }
 
 type assistOutput struct {
+	streamBytes int64
+	events      int
+	lastEvent   string
+	finalSeen   bool
+
 	cooldown      *ProviderCooldown
 	cooldownError error
 	reply         string
@@ -151,7 +156,8 @@ type assistOutput struct {
 
 func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) assistOutput {
 	out := assistOutput{}
-	limited := &io.LimitedReader{R: r, N: assistReplyLimit + 1}
+	counted := &assistCountingReader{Reader: r}
+	limited := &io.LimitedReader{R: counted, N: assistReplyLimit + 1}
 	scanner := bufio.NewScanner(limited)
 	scanner.Buffer(make([]byte, 0, 64*1024), assistReplyLimit)
 	for scanner.Scan() {
@@ -162,6 +168,11 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 		var data map[string]any
 		if json.Unmarshal([]byte(line), &data) != nil {
 			continue
+		}
+		out.events++
+		out.lastEvent = assistEventKind(data["type"])
+		if data["type"] == "result" || data["type"] == "turn.completed" {
+			out.finalSeen = true
 		}
 		if c := observedProviderCooldown(data, time.Now()); c != nil {
 			if out.cooldown != nil && c.ResetAt == 0 {
@@ -198,7 +209,8 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 	if limited.N == 0 {
 		out.err = io.ErrShortBuffer
 	}
-	_, _ = io.Copy(io.Discard, r)
+	_, _ = io.Copy(io.Discard, counted)
+	out.streamBytes = counted.bytes
 	return out
 }
 
@@ -245,4 +257,31 @@ func stopVerifiedAssist(t AssistTurn) {
 	if t.PID > 0 && t.Host == hostIdentity() && t.ProcessStamp != "" && processStamp(t.PID) == t.ProcessStamp {
 		_ = syscall.Kill(-t.PID, syscall.SIGKILL)
 	}
+}
+
+// Counters only: never retain provider text, identifiers or arbitrary event types.
+type assistCountingReader struct {
+	io.Reader
+	bytes int64
+}
+
+func (r *assistCountingReader) Read(p []byte) (int, error) {
+	n, e := r.Reader.Read(p)
+	r.bytes += int64(n)
+	return n, e
+}
+func assistEventKind(v any) string {
+	switch v {
+	case "system", "assistant", "user", "result", "error", "stream_event", "thread.started", "turn.started", "turn.completed", "turn.failed", "item.started", "item.updated", "item.completed":
+		return v.(string)
+	default:
+		return "other"
+	}
+}
+func (o assistOutput) progressDiagnostic() string {
+	last := o.lastEvent
+	if last == "" {
+		last = "none"
+	}
+	return fmt.Sprintf("sortie fournisseur : %d octets, %d événements JSON, dernier type=%s, événement final=%t ; ceci ne vaut pas validation", o.streamBytes, o.events, last, o.finalSeen)
 }

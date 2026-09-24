@@ -321,7 +321,7 @@ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema 
 		return "", result.cooldown.failure()
 	}
 	if err != nil {
-		return "", fmt.Errorf("%w : %s", err, guardBlock(diagnostic.String(), 600))
+		return "", fmt.Errorf("%w ; %s ; diagnostic : %s", err, result.progressDiagnostic(), guardBlock(diagnostic.String(), 600))
 	}
 	if result.err != nil {
 		return "", result.err

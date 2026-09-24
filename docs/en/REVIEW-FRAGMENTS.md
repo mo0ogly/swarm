@@ -71,3 +71,7 @@ New packets must also accommodate a complete response: the engine measures one `
 ### Resuming an oversized existing packet
 
 `planning retry-review` repartitions an existing plan that exceeds response capacity only when the review is in error, all reservations are interrupted, and no finding or final decision exists. The original plan and journal remain anchored under `replanned_from` and are checked on every read. Counters remain unchanged; the current budget must cover the new plan before it is stored. Only one repartition is supported; recovery with existing findings retains its plan. `planning fragment-preview` also examines this interrupted review without calls or mutations.
+
+### Interrupted call diagnostics
+
+Process errors include received bytes, parsed JSON event count, the last recognized event type, and whether a final event was observed. These counters prove neither useful progress nor acceptance. Events are parsed within the existing input limit; additional bytes are drained and counted. Counters contain no message content or identifiers. They distinguish a silent call from output without completion, without claiming a provider root cause. Deadlines, budgets and recovery rules remain unchanged.
