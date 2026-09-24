@@ -69,3 +69,9 @@ Le parseur reçoit uniquement les preuves originales effectivement incluses dans
 Chaque raison et extrait d'inspection est limité à 96 octets JSON sérialisés hors guillemets, échappements et UTF-8 compris. Le plafond total de réponse reste 16 Kio. Une réponse trop longue est refusée, jamais raccourcie. Cette limite permet de calculer une borne supérieure de l'entrée finale avec les identités, noms, contrats et consignes réels avant tout appel.
 
 La capacité restante concerne le JSON complet des pièces supplémentaires, pas seulement leur texte. Elle ne garantit pas qu'une demande future de preuve pourra tenir. Le moteur doit vérifier cette demande exacte et refuser sans troncature si nécessaire ; un précontrôle de taille ne prouve ni la suffisance des pièces ni un verdict favorable. Ce calcul n'est pas encore raccordé à l'exécution.
+
+## Sélection indépendante avant décision
+
+Un premier appel final propose les pièces originales nécessaires, avec les index et empreintes de l'inventaire. Son état `ready` autorise seulement l'examen de cette sélection ; `unknown` conserve une insuffisance de preuves et n'autorise pas la décision. Les coûts JSON par pièce, les références et l'enveloppe restante sont indiqués. Le moteur remesure le message complet et refuse toute sélection dupliquée, périmée ou trop grande.
+
+Le précontrôle vérifie les consignes et schémas des inspections ainsi que les messages maximaux de sélection et de décision avant la première dépense. Le transport tabulaire conserve intégralement les extraits et opinions ; seule la répétition des clés JSON disparaît. Ces fonctions ne lancent pas encore le fournisseur et ne publient aucun résultat.

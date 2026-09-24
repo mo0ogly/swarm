@@ -16,14 +16,7 @@ func managedFragmentDecisionCapacity(prefix string, c managedReviewContext, p ma
 	if err := validateManagedReviewFragments(c, p); err != nil {
 		return 0, err
 	}
-	raw, _ := json.Marshal(p)
-	bundle := managedFragmentFinalEvidence{Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
-	for i, packet := range p.Packets {
-		bundle.ReplyDigests = append(bundle.ReplyDigests, strings.Repeat("f", 64))
-		for j, a := range packet.Artifacts {
-			bundle.Evidence = append(bundle.Evidence, managedFragmentOriginalEvidence{Packet: i, Artifact: j, Kind: a.Kind, Name: a.Name, Digest: a.Digest, Excerpt: strings.Repeat("x", managedFragmentFindingTextLimit), Opinion: strings.Repeat("x", managedFragmentFindingTextLimit)})
-		}
-	}
+	bundle := maximalManagedFragmentBundle(c, p)
 	prompt, _, err := renderManagedFragmentDecision(prefix, c, bundle, nil)
 	if err != nil {
 		return 0, err
@@ -35,4 +28,17 @@ func managedFragmentDecisionCapacity(prefix string, c managedReviewContext, p ma
 		return 0, fmt.Errorf("aucune capacité restante pour les preuves finales")
 	}
 	return remaining, nil
+}
+
+// Synthetic size model only; never use as inspection evidence.
+func maximalManagedFragmentBundle(c managedReviewContext, p managedReviewFragmentPlan) managedFragmentFinalEvidence {
+	raw, _ := json.Marshal(p)
+	bundle := managedFragmentFinalEvidence{Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
+	for i, packet := range p.Packets {
+		bundle.ReplyDigests = append(bundle.ReplyDigests, strings.Repeat("f", 64))
+		for j, a := range packet.Artifacts {
+			bundle.Evidence = append(bundle.Evidence, managedFragmentOriginalEvidence{Packet: i, Artifact: j, Kind: a.Kind, Name: a.Name, Digest: a.Digest, Excerpt: strings.Repeat("x", managedFragmentFindingTextLimit), Opinion: strings.Repeat("x", managedFragmentFindingTextLimit)})
+		}
+	}
+	return bundle
 }

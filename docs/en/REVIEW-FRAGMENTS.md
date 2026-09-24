@@ -53,3 +53,9 @@ The parser receives only original evidence actually included in that call: a quo
 Each inspection rationale and excerpt is limited to 96 serialized JSON bytes excluding surrounding quotes, counting escapes and UTF-8. The total reply cap remains 16 KiB. Oversized replies are rejected, never shortened. This allows a conservative final-input bound using the actual identities, names, contracts and instructions before any call.
 
 Remaining capacity applies to the complete supplementary evidence JSON, not just its text. It does not guarantee a future evidence request will fit. The engine must check that exact request and reject overflow without truncation; a size check proves neither evidence sufficiency nor a favorable verdict. This calculation is not yet connected to execution.
+
+## Independent selection before decision
+
+A first final call requests necessary original artifacts by inventory index and digest. Its `ready` state only permits examining that selection; `unknown` preserves insufficient evidence and does not authorize the decision. Per-artifact JSON costs, references and remaining capacity are supplied. The engine measures the complete message and rejects duplicate, stale or oversized selections.
+
+Preflight checks inspection instructions and schemas plus maximum selection and decision messages before the first charge. Table transport preserves all excerpts and opinions; only repeated JSON keys are removed. These functions do not yet run a provider or publish results.
