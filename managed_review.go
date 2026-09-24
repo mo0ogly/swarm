@@ -280,6 +280,14 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		if old.CandidateSHA != candidate || old.ReceiptDigest != hash(receipt) {
 			return fmt.Errorf("avis de candidat périmé ; aucune nouvelle revue implicite")
 		}
+		if old.State == "queued" && old.FragmentJournal != nil {
+			resumed, record, err := s.activateManagedFragmentResume(w.ID, a, old.ID)
+			if err != nil {
+				return err
+			}
+			_, _, runErr := s.runManagedFragmentReview(resumed, a, record)
+			return s.finishManagedFragmentReview(w.ID, a, record.ID, runErr)
+		}
 		if old.State == "running" {
 			record := *old
 			record.State = "error"
@@ -476,7 +484,11 @@ func (s *Store) saveManagedReview(work string, a Agent, r IndependentReview) err
 			return e
 		}
 		raw, _ := json.Marshal(r)
-		_, e = s.mutate(work, "review.managed.result", r.ID+"-result", w.Revision, raw, func(c *Work) error {
+		event := r.ID + "-result"
+		if r.FragmentJournal != nil {
+			event += "-" + hash(raw)[:16]
+		}
+		_, e = s.mutate(work, "review.managed.result", event, w.Revision, raw, func(c *Work) error {
 			t, e := c.task(a.TaskID)
 			if e != nil {
 				return e
@@ -500,7 +512,11 @@ func (s *Store) saveManagedReview(work string, a Agent, r IndependentReview) err
 				r.Reason = err.Error()
 			}
 			t.IndependentReview = &r
-			c.Planning.Inbox = append(c.Planning.Inbox, PlanningEvent{ID: r.ID, Scope: t.ScopeID, Kind: "independent_review", Task: t.ID, Attempt: a.Attempt, Message: r.State + " : " + r.Reason, At: now()})
+			inboxID := r.ID
+			if r.FragmentJournal != nil {
+				inboxID = event
+			}
+			c.Planning.Inbox = append(c.Planning.Inbox, PlanningEvent{ID: inboxID, Scope: t.ScopeID, Kind: "independent_review", Task: t.ID, Attempt: a.Attempt, Message: r.State + " : " + r.Reason, At: now()})
 			return nil
 		})
 		if e == nil || commandFailure(e).Code != "revision_conflict" {

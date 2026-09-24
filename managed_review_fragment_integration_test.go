@@ -11,7 +11,7 @@ import (
 )
 
 func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
-	for _, mode := range []string{"pass", "decision-fail", "retry", "exit"} {
+	for _, mode := range []string{"pass", "decision-fail", "retry", "exit", "exit-second"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w := managedFixture(t)
 			a := managedCompleted(t, s, w, "first", "candidate\n")
@@ -51,7 +51,8 @@ func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
 				current, _ = s.get(w.ID)
 				request := PlanningRequest{Schema: 1, EventID: "fragment-retry", Revision: current.Revision, Task: a.TaskID, Reason: "Complete fragment transport now available"}
 				if _, e := s.planningChange(w.ID, "retry-review", request); e != nil {
-					t.Fatal(e)
+					diagnostic, _ := current.task(a.TaskID)
+					t.Fatal(e, diagnostic.Status, diagnostic.IndependentReview.State, diagnostic.Blocker)
 				}
 				if managedReviewCalls(t, s) != 0 {
 					t.Fatal("preflight spent calls")
@@ -76,7 +77,7 @@ func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
 				t.Fatal("failed review published")
 			}
 			calls := managedReviewCalls(t, s)
-			if calls < 3 && mode != "exit" {
+			if calls < 3 && !strings.HasPrefix(mode, "exit") {
 				t.Fatal("missing inspection/final calls")
 			}
 			if e = s.integrateManagedAttempt(a); e != nil {
@@ -114,17 +115,38 @@ func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
 				}
 
 			}
-			if mode == "exit" {
+			if strings.HasPrefix(mode, "exit") {
 				current, _ := s.get(w.ID)
 				request := PlanningRequest{Schema: 1, EventID: "interrupted-fragments", Revision: current.Revision, Task: a.TaskID, Reason: "Retry must preserve the spent inspection journal"}
-				if _, e := s.planningChange(w.ID, "retry-review", request); e == nil {
-					t.Fatal("discarded fragment journal")
+				if _, e := s.planningChange(w.ID, "retry-review", request); e != nil {
+					diagnostic, _ := current.task(a.TaskID)
+					t.Fatal(e, diagnostic.Status, diagnostic.IndependentReview.State, diagnostic.Blocker)
 				}
 				current, _ = s.get(w.ID)
 				saved, _ := current.task(a.TaskID)
 				if saved.IndependentReview == nil || saved.IndependentReview.ID != task.IndependentReview.ID || managedReviewCalls(t, s) != calls {
 					t.Fatal("interrupted proof lost")
 				}
+				managedReviewMode(t, s, "pass")
+				if e := s.integrateManagedAttempt(a); e != nil {
+					t.Fatal(e)
+				}
+				resumed, _ := s.get(w.ID)
+				rt, _ := resumed.task(a.TaskID)
+				if rt.Status != "accepted" || rt.IndependentReview.ID != task.IndependentReview.ID {
+					t.Fatal("resume failed", rt.Blocker)
+				}
+				plan, _, e := s.readFragmentJournalAnchor(*rt.IndependentReview)
+				if e != nil {
+					t.Fatal(e)
+				}
+				if resumed.Planning.Reviewer.Calls-w.Planning.Reviewer.Calls != len(plan.Packets)+3 {
+					t.Fatal("retry replayed inspected packets or refunded spent call")
+				}
+				if _, e := s.planningChange(w.ID, "retry-review", request); e != nil {
+					t.Fatal("retry event replay", e)
+				}
+
 			}
 
 		})

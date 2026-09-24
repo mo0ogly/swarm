@@ -242,7 +242,11 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			managedProducer = v.Producer
 		}
 		if v.FragmentJournal != nil {
-			return fmt.Errorf("revue par fragments conservée : reprise du journal requise ; aucun redémarrage complet ni nouvelle dépense implicite")
+			if err := s.queueManagedFragmentResume(*w, t, r.EventID); err != nil {
+				return err
+			}
+			cfg.Failure = ""
+			return nil
 		}
 		// The former record remains in the event history. Call reservations are never refunded.
 		if len(v.Batches) > 0 {

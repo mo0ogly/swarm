@@ -12,17 +12,18 @@ import (
 )
 
 type ManagedFragmentJournalAnchor struct {
-	InspectionTask     string `json:"inspection_task,omitempty"`
-	InspectionAttempt  string `json:"inspection_attempt,omitempty"`
-	InspectionProducer string `json:"inspection_producer,omitempty"`
-	FinalJournal       string `json:"final_journal,omitempty"`
-	FinalJournalDigest string `json:"final_journal_sha256,omitempty"`
-	WorkflowDigest     string `json:"workflow_sha256"`
-	ModelConfigDigest  string `json:"model_config_sha256"`
-	Plan               string `json:"plan"`
-	PlanDigest         string `json:"plan_sha256"`
-	Journal            string `json:"journal"`
-	JournalDigest      string `json:"journal_sha256"`
+	ResumeCalls        []string `json:"resume_calls,omitempty"`
+	InspectionTask     string   `json:"inspection_task,omitempty"`
+	InspectionAttempt  string   `json:"inspection_attempt,omitempty"`
+	InspectionProducer string   `json:"inspection_producer,omitempty"`
+	FinalJournal       string   `json:"final_journal,omitempty"`
+	FinalJournalDigest string   `json:"final_journal_sha256,omitempty"`
+	WorkflowDigest     string   `json:"workflow_sha256"`
+	ModelConfigDigest  string   `json:"model_config_sha256"`
+	Plan               string   `json:"plan"`
+	PlanDigest         string   `json:"plan_sha256"`
+	Journal            string   `json:"journal"`
+	JournalDigest      string   `json:"journal_sha256"`
 }
 
 func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFragmentPlan, managedFragmentJournal, error) {
@@ -93,7 +94,26 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 		attempt = anchor.InspectionAttempt
 	}
 	j, _, e = readManagedFragmentJournal(path, anchor.JournalDigest, p, attempt, r.BatchProviderDigest)
-	return p, j, e
+	if e != nil {
+		return p, j, e
+	}
+	authorized := map[string]bool{}
+	for _, id := range anchor.ResumeCalls {
+		if id == "" || authorized[id] {
+			return p, j, fmt.Errorf("autorisation de reprise dupliquée")
+		}
+		found := false
+		for _, entry := range j.Entries {
+			if entry.CallID == id && entry.State == "interrupted" {
+				found = true
+			}
+		}
+		if !found {
+			return p, j, fmt.Errorf("autorisation sans appel interrompu")
+		}
+		authorized[id] = true
+	}
+	return p, j, nil
 }
 
 // Allowed transitions: append exactly one reservation, or finish the last

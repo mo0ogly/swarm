@@ -107,7 +107,13 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 			continue
 		}
 		for _, entry := range j.Entries {
-			if entry.State == "reserved" || entry.State == "interrupted" || entry.State == "unknown" || entry.State == "changes_requested" {
+			authorized := false
+			for _, id := range r.FragmentJournal.ResumeCalls {
+				if id == entry.CallID {
+					authorized = true
+				}
+			}
+			if entry.State == "reserved" || (entry.State == "interrupted" && !authorized) || entry.State == "unknown" || entry.State == "changes_requested" {
 				return entry.State, nil, fmt.Errorf("inspection inachevée ; reprise explicite requise")
 			}
 		}
