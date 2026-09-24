@@ -11,7 +11,7 @@ import (
 )
 
 func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
-	for _, mode := range []string{"pass", "decision-fail", "retry", "exit", "exit-second"} {
+	for _, mode := range []string{"pass", "decision-fail", "retry", "exit", "exit-second", "exit-selection", "exit-decision"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w := managedFixture(t)
 			a := managedCompleted(t, s, w, "first", "candidate\n")

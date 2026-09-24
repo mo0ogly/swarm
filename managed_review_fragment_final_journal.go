@@ -16,6 +16,7 @@ type managedFragmentFinalCall struct {
 	ReplyDigest  string `json:"reply_sha256,omitempty"`
 }
 type managedFragmentFinalJournal struct {
+	ResumeCalls      []string                   `json:"resume_calls,omitempty"`
 	Version          int                        `json:"version"`
 	InspectionDigest string                     `json:"inspection_journal_sha256"`
 	Calls            []managedFragmentFinalCall `json:"calls"`
@@ -25,8 +26,24 @@ type managedFragmentFinalJournal struct {
 // review evidence only: publication still needs Store identities and controls.
 func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j managedFragmentJournal, c managedReviewContext, p managedReviewFragmentPlan, prefix string) (string, []ManagedTaskReview, error) {
 	raw, _ := json.Marshal(j)
-	if f.Version != 1 || f.InspectionDigest != hash(raw) || len(f.Calls) > p.ReservedFinalCalls {
+	if f.Version != 1 || f.InspectionDigest != hash(raw) || len(f.Calls) > p.ReservedFinalCalls+len(f.ResumeCalls) {
 		return "", nil, fmt.Errorf("journal final périmé ou budget dépassé")
+	}
+	authorized := map[string]bool{}
+	for _, id := range f.ResumeCalls {
+		if id == "" || authorized[id] {
+			return "", nil, fmt.Errorf("reprise finale dupliquée")
+		}
+		found := false
+		for _, call := range f.Calls {
+			if call.CallID == id && call.State == "interrupted" {
+				found = true
+			}
+		}
+		if !found {
+			return "", nil, fmt.Errorf("reprise finale sans interruption")
+		}
+		authorized[id] = true
 	}
 	reusable, err := validateManagedFragmentJournal(j, p, j.Attempt, j.ProviderDigest)
 	if err != nil {
@@ -51,7 +68,12 @@ func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j manage
 	phase := "selection"
 	state := "pending"
 	var records []ManagedTaskReview
+	previousCall := ""
 	for _, call := range f.Calls {
+		if state == "interrupted" && !authorized[previousCall] {
+			return "", nil, fmt.Errorf("reprise finale non autorisée")
+		}
+		previousCall = call.CallID
 		if call.CallID == "" || seen[call.CallID] || call.Phase != phase || (state != "pending" && state != "interrupted" && state != "ready") {
 			return "", nil, fmt.Errorf("appel final dupliqué ou hors séquence")
 		}

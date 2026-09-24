@@ -26,7 +26,7 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 		return err
 	}
 	if r.FragmentJournal.FinalJournalDigest != "" {
-		return fmt.Errorf("appel final déjà réservé : conserver le journal et examiner la reprise finale")
+		return s.queueManagedFragmentFinalResume(w, task, r, p, j)
 	}
 	anchor := *r.FragmentJournal
 	anchor.ResumeCalls = nil
@@ -103,4 +103,79 @@ func (s *Store) activateManagedFragmentResume(work string, a Agent, reviewID str
 		return w, IndependentReview{}, err
 	}
 	return updated, *task.IndependentReview, nil
+}
+
+func (s *Store) queueManagedFragmentFinalResume(w Work, task *Task, r IndependentReview, p managedReviewFragmentPlan, j managedFragmentJournal) error {
+	f, c, prefix, err := s.readManagedFragmentFinal(r, p, j)
+	if err != nil {
+		return err
+	}
+	for i := range f.Calls {
+		if f.Calls[i].State == "reserved" {
+			f.Calls[i].State = "interrupted"
+		}
+	}
+	state, _, err := validateManagedFragmentFinalJournal(f, j, c, p, prefix)
+	if err != nil {
+		return err
+	}
+	required := 0
+	if state == "interrupted" {
+		last := f.Calls[len(f.Calls)-1]
+		found := false
+		for _, id := range f.ResumeCalls {
+			if id == last.CallID {
+				found = true
+			}
+		}
+		if !found {
+			f.ResumeCalls = append(f.ResumeCalls, last.CallID)
+		}
+		required = 1
+		if last.Phase == "selection" {
+			required = 2
+		}
+	} else if state == "ready" {
+		required = 1
+	} else if state != "passed" {
+		return fmt.Errorf("verdict final défavorable ou inconnu ; aucune reprise implicite")
+	}
+	if w.Planning.Reviewer.MaxCalls-w.Planning.Reviewer.Calls < required {
+		return fmt.Errorf("budget final insuffisant sans remboursement")
+	}
+	if _, _, err = validateManagedFragmentFinalJournal(f, j, c, p, prefix); err != nil {
+		return err
+	}
+	raw, err := json.Marshal(f)
+	if err != nil {
+		return err
+	}
+	anchor := *r.FragmentJournal
+	anchor.FinalJournalDigest = hash(raw)
+	anchor.FinalJournal = filepath.ToSlash(filepath.Join(filepath.Dir(r.Context), "fragment-final-"+hash(raw)+".json"))
+	if err = atomicWrite(filepath.Join(s.root, anchor.FinalJournal), raw); err != nil {
+		return err
+	}
+	r.FragmentJournal = &anchor
+	r.State = "queued"
+	r.Finished = ""
+	r.Reason = "Reprise finale explicite ; inspections et dépenses conservées."
+	task.IndependentReview = &r
+	return nil
+}
+
+func (s *Store) managedFragmentVerdictDurable(r *IndependentReview) bool {
+	if r == nil || r.FragmentJournal == nil {
+		return false
+	}
+	p, j, err := s.readFragmentJournalAnchor(*r)
+	if err != nil {
+		return false
+	}
+	f, c, prefix, err := s.readManagedFragmentFinal(*r, p, j)
+	if err != nil {
+		return false
+	}
+	state, _, err := validateManagedFragmentFinalJournal(f, j, c, p, prefix)
+	return err == nil && state == "passed"
 }

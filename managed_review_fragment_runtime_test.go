@@ -18,6 +18,8 @@ try:
  with open(os.path.join(folder,'mode')) as f: mode=f.read().strip()
 except FileNotFoundError: mode='pass'
 if mode=='exit' or (mode=='exit-second' and len(open(os.path.join(folder,'calls')).readlines())==2): sys.exit(9)
+if mode=='exit-selection' and '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text: sys.exit(9)
+if mode=='exit-decision' and '\nSWARM_FRAGMENT_FINAL_EVIDENCE\n' in text: sys.exit(9)
 if '\nSWARM_FRAGMENT_PACKET\n' in text:
  packet=json.loads(text.split('\nSWARM_FRAGMENT_PACKET\n',1)[1])
  reply={'candidate_commit':packet['candidate_commit'],'context_sha256':packet['context_sha256'],'packet_sha256':re.search(r'packet_sha256=([a-f0-9]+)',text).group(1),'findings':[]}

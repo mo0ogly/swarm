@@ -216,7 +216,7 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			return e
 		}
 		v := t.IndependentReview
-		if cfg.Calls >= cfg.MaxCalls && !managedBatchesAllPassed(v) {
+		if cfg.Calls >= cfg.MaxCalls && !managedBatchesAllPassed(v) && !s.managedFragmentVerdictDurable(v) {
 			return fmt.Errorf("budget du vérificateur atteint ; aucun appel supplémentaire autorisé")
 		}
 		managed := w.Planning.Repository != nil

@@ -176,6 +176,18 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if state == "passed" || state == "changes_requested" || state == "unknown" {
 			return state, records, nil
 		}
+		if state == "interrupted" && len(f.Calls) > 0 {
+			last := f.Calls[len(f.Calls)-1]
+			for _, id := range f.ResumeCalls {
+				if id == last.CallID {
+					if last.Phase == "selection" {
+						state = "pending"
+					} else {
+						state = "ready"
+					}
+				}
+			}
+		}
 		if state != "pending" && state != "ready" {
 			return state, nil, fmt.Errorf("appel final inachevé ; reprise explicite requise")
 		}
@@ -186,7 +198,13 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 			prompt, e = managedFragmentRequestPrompt(prefix, c, p, replies)
 		} else {
 			phase, schema = "decision", managedReviewSchema
-			selection, parseErr := parseManagedFragmentFinalRequest(f.Calls[len(f.Calls)-1].Reply, prefix, c, p, replies)
+			selectionReply := ""
+			for _, prior := range f.Calls {
+				if prior.Phase == "selection" && prior.State == "ready" {
+					selectionReply = prior.Reply
+				}
+			}
+			selection, parseErr := parseManagedFragmentFinalRequest(selectionReply, prefix, c, p, replies)
 			if parseErr != nil {
 				return "", nil, parseErr
 			}

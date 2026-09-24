@@ -12,7 +12,7 @@ import (
 )
 
 func finalFragmentTransition(old, next managedFragmentFinalJournal) (string, error) {
-	if old.Version != next.Version || old.InspectionDigest != next.InspectionDigest {
+	if old.Version != next.Version || old.InspectionDigest != next.InspectionDigest || !reflect.DeepEqual(old.ResumeCalls, next.ResumeCalls) {
 		return "", fmt.Errorf("identité finale modifiée")
 	}
 	n := len(old.Calls)
