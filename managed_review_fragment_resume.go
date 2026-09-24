@@ -25,6 +25,12 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 	if err != nil {
 		return err
 	}
+	// An explicit retry adopts the operator-configured deadline, preserving proofs.
+	timeout, err := reviewTimeoutSeconds(w.Planning.Reviewer)
+	if err != nil {
+		return err
+	}
+	r.TimeoutSeconds = timeout
 	if r.FragmentJournal.FinalJournalDigest != "" {
 		return s.queueManagedFragmentFinalResume(w, task, r, p, j)
 	}

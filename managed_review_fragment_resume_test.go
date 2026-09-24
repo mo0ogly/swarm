@@ -34,6 +34,7 @@ func TestManagedFragmentFinalOrphanReservationResume(t *testing.T) {
 				if err != nil {
 					return err
 				}
+				current.Planning.Reviewer.TimeoutSeconds = 600
 				return s.queueManagedFragmentResume(*current, task, "orphan-resume")
 			})
 			if (e == nil) != budget {
@@ -49,6 +50,9 @@ func TestManagedFragmentFinalOrphanReservationResume(t *testing.T) {
 				t.Fatal(e)
 			}
 			if budget {
+				if task.IndependentReview.TimeoutSeconds != 600 {
+					t.Fatal("configured deadline ignored")
+				}
 				if got.Calls[0].State != "interrupted" || len(got.ResumeCalls) != 1 || got.ResumeCalls[0] != f.Calls[0].CallID || task.IndependentReview.State != "queued" {
 					t.Fatal("orphan authorization lost")
 				}
@@ -113,6 +117,7 @@ func TestManagedFragmentInspectionOrphanResume(t *testing.T) {
 		if err != nil {
 			return err
 		}
+		current.Planning.Reviewer.TimeoutSeconds = 600
 		return s.queueManagedFragmentResume(*current, task, "orphan-inspection-resume")
 	})
 	if e != nil {
@@ -120,11 +125,24 @@ func TestManagedFragmentInspectionOrphanResume(t *testing.T) {
 	}
 	after, _ := s.get(w.ID)
 	task, _ := after.task(a.TaskID)
+	if task.IndependentReview.TimeoutSeconds != 600 {
+		t.Fatal("configured deadline ignored")
+	}
 	_, got, e := s.readFragmentJournalAnchor(*task.IndependentReview)
 	if e != nil {
 		t.Fatal(e)
 	}
 	if got.Entries[0].State != "interrupted" || len(task.IndependentReview.FragmentJournal.ResumeCalls) != 1 || after.Planning.Reviewer.Calls != before.Planning.Reviewer.Calls {
 		t.Fatal("orphan inspection not retained")
+	}
+}
+
+func TestManagedFragmentResumeRejectsInvalidDeadline(t *testing.T) {
+	s, w, a, r, _, _ := fragmentStoreFixture(t)
+	task, _ := w.task(a.TaskID)
+	task.IndependentReview = &r
+	w.Planning.Reviewer.TimeoutSeconds = 901
+	if err := s.queueManagedFragmentResume(w, task, "invalid-deadline"); err == nil {
+		t.Fatal("invalid deadline accepted")
 	}
 }

@@ -93,3 +93,5 @@ Les nouveaux lots doivent aussi permettre une réponse complète : le moteur mes
 ### Diagnostic des appels interrompus
 
 Une erreur de processus indique désormais les octets reçus, le nombre d’événements JSON analysés, le dernier type reconnu et la présence d’un événement final. Ces compteurs ne prouvent ni progression utile ni validation. Les événements sont analysés dans la limite de lecture existante ; les octets supplémentaires sont drainés et comptés. Aucun contenu de message ni identifiant n’est ajouté à ces compteurs. Un délai peut ainsi être distingué d’une absence totale de sortie, sans attribuer arbitrairement sa cause au fournisseur. Les délais, budgets et règles de reprise restent inchangés.
+
+Lors d’une reprise explicite, le délai est relu dans la configuration actuelle du vérificateur et enregistré sur la revue reprise. Les preuves, réservations et appels consommés sont conservés. Modifier ce délai ne relance rien et ne garantit pas que le fournisseur terminera.

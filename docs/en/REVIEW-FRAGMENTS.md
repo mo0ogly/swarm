@@ -75,3 +75,5 @@ New packets must also accommodate a complete response: the engine measures one `
 ### Interrupted call diagnostics
 
 Process errors include received bytes, parsed JSON event count, the last recognized event type, and whether a final event was observed. These counters prove neither useful progress nor acceptance. Events are parsed within the existing input limit; additional bytes are drained and counted. Counters contain no message content or identifiers. They distinguish a silent call from output without completion, without claiming a provider root cause. Deadlines, budgets and recovery rules remain unchanged.
+
+An explicit retry reads the current reviewer deadline and records it on the resumed review. Evidence, reservations and consumed calls are preserved. Changing the deadline neither triggers a retry nor guarantees provider completion.
