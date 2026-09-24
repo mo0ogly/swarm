@@ -4,7 +4,7 @@
 
 The engine now falls back to fragments when per-task batches exceed the transport limit. Public retry of an unpaid size refusal preflights complete evidence while preserving the candidate and attempt. Each inspection, evidence selection and final decision has a separate durable reservation. Finalization replays original replies; only the existing publication transaction accepts a result after rechecking evidence, criteria, provider and model.
 
-Tests use a deterministic local provider: passing verdict, final refusal, unpaid preflight retry without another producer, and replay without duplicate calls. **Recovery after an interrupted inspection is explicitly held to preserve its journal; evidence and spent calls are not discarded.** Recovery must be connected before deployment. The read-only preflight retains `executable:false`: it is not an execution permit.
+Tests use a deterministic local provider: passing verdict, final refusal, unpaid preflight retry without another producer, and replay without duplicate calls, a second publication on the accepted baseline, and invalidation when that baseline’s final journal is corrupted. **Recovery after an interrupted inspection is explicitly held to preserve its journal; evidence and spent calls are not discarded.** Recovery must be connected before deployment. The read-only preflight retains `executable:false`: it is not an execution permit.
 
 The following sections describe implementation stages, not proof of deployment or a successful real AI review.
 

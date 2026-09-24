@@ -85,6 +85,35 @@ func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
 			if managedReviewCalls(t, s) != calls {
 				t.Fatal("replay spent twice")
 			}
+			if mode == "pass" {
+				current, _ := s.get(w.ID)
+				second := managedCompleted(t, s, current, "second", "second candidate\n")
+				for _, name := range []string{"additional-one.txt", "additional-two.txt", "additional-three.txt", "additional-four.txt"} {
+					if e := os.WriteFile(filepath.Join(second.CWD, name), []byte(strings.Repeat("additional original evidence\n", 2300)), 0600); e != nil {
+						t.Fatal(e)
+					}
+				}
+				if e := s.integrateManagedAttempt(second); e != nil {
+					t.Fatal(e)
+				}
+				current, _ = s.get(w.ID)
+				secondTask, _ := current.task(second.TaskID)
+				firstTask, _ := current.task(a.TaskID)
+				if secondTask.Status != "accepted" || !s.acceptedFresh(&current, secondTask, map[string]bool{}) || !s.acceptedFresh(&current, firstTask, map[string]bool{}) {
+					t.Fatal("cumulative acceptance failed", secondTask.Blocker)
+				}
+				if e := s.managedReviewFilesIntact(*firstTask.IndependentReview); e != nil {
+					t.Fatal(e)
+				}
+				originalFinal := filepath.Join(s.root, task.IndependentReview.FragmentJournal.FinalJournal)
+				if e := os.WriteFile(originalFinal, []byte("{}"), 0600); e != nil {
+					t.Fatal(e)
+				}
+				if s.acceptedFresh(&current, secondTask, map[string]bool{}) {
+					t.Fatal("corrupted baseline review remained fresh")
+				}
+
+			}
 			if mode == "exit" {
 				current, _ := s.get(w.ID)
 				request := PlanningRequest{Schema: 1, EventID: "interrupted-fragments", Revision: current.Revision, Task: a.TaskID, Reason: "Retry must preserve the spent inspection journal"}
