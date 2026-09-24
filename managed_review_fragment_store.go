@@ -12,12 +12,14 @@ import (
 )
 
 type ManagedFragmentJournalAnchor struct {
-	WorkflowDigest    string `json:"workflow_sha256"`
-	ModelConfigDigest string `json:"model_config_sha256"`
-	Plan              string `json:"plan"`
-	PlanDigest        string `json:"plan_sha256"`
-	Journal           string `json:"journal"`
-	JournalDigest     string `json:"journal_sha256"`
+	FinalJournal       string `json:"final_journal,omitempty"`
+	FinalJournalDigest string `json:"final_journal_sha256,omitempty"`
+	WorkflowDigest     string `json:"workflow_sha256"`
+	ModelConfigDigest  string `json:"model_config_sha256"`
+	Plan               string `json:"plan"`
+	PlanDigest         string `json:"plan_sha256"`
+	Journal            string `json:"journal"`
+	JournalDigest      string `json:"journal_sha256"`
 }
 
 func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFragmentPlan, managedFragmentJournal, error) {
@@ -116,7 +118,7 @@ func (s *Store) commitFragmentJournal(work string, a Agent, reviewID, expectedDi
 		return e
 	}
 	r := t.IndependentReview
-	if r == nil || r.ID != reviewID || r.State != "running" || r.FragmentJournal == nil || r.FragmentJournal.JournalDigest != expectedDigest {
+	if r == nil || r.ID != reviewID || r.State != "running" || r.FragmentJournal == nil || r.FragmentJournal.JournalDigest != expectedDigest || r.FragmentJournal.FinalJournalDigest != "" {
 		return fmt.Errorf("revue des fragments remplacée")
 	}
 	p, old, e := s.readFragmentJournalAnchor(*r)
@@ -150,7 +152,7 @@ func (s *Store) commitFragmentJournal(work string, a Agent, reviewID, expectedDi
 			return err
 		}
 		cr := ct.IndependentReview
-		if cr == nil || cr.ID != reviewID || cr.State != "running" || cr.FragmentJournal == nil || cr.FragmentJournal.JournalDigest != expectedDigest || !currentTaskAttempt(ct, a.Attempt) || cr.Attempt != a.Attempt || cr.Producer != a.ID || cw.Planning == nil || cw.Planning.Repository == nil || cw.Planning.Repository.Candidate != cr.PreviousCandidate || managedReviewContract(*cw, a.TaskID) != managedReviewContract(w, a.TaskID) {
+		if cr == nil || cr.ID != reviewID || cr.State != "running" || cr.FragmentJournal == nil || cr.FragmentJournal.JournalDigest != expectedDigest || cr.FragmentJournal.FinalJournalDigest != "" || !currentTaskAttempt(ct, a.Attempt) || cr.Attempt != a.Attempt || cr.Producer != a.ID || cw.Planning == nil || cw.Planning.Repository == nil || cw.Planning.Repository.Candidate != cr.PreviousCandidate || managedReviewContract(*cw, a.TaskID) != managedReviewContract(w, a.TaskID) {
 			return fmt.Errorf("réservation des fragments périmée")
 		}
 		if err = s.managedReviewFilesIntact(*cr); err != nil {

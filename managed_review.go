@@ -615,8 +615,14 @@ func (s *Store) managedReviewFilesIntactSeen(r IndependentReview, seen map[strin
 		if r.State == "passed" {
 			return fmt.Errorf("décision finale des fragments non raccordée ; publication interdite")
 		}
-		if _, _, e := s.readFragmentJournalAnchor(r); e != nil {
+		plan, journal, e := s.readFragmentJournalAnchor(r)
+		if e != nil {
 			return e
+		}
+		if r.FragmentJournal.FinalJournalDigest != "" || r.FragmentJournal.FinalJournal != "" {
+			if _, _, _, e = s.readManagedFragmentFinal(r, plan, journal); e != nil {
+				return e
+			}
 		}
 	}
 	if depth > 128 {
