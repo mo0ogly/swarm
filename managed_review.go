@@ -475,6 +475,9 @@ func (s *Store) saveManagedReview(work string, a Agent, r IndependentReview) err
 			if t.IndependentReview == nil || t.IndependentReview.ID != r.ID {
 				return fmt.Errorf("revue remplacée")
 			}
+			if r.FragmentJournal != nil && !reflect.DeepEqual(t.IndependentReview.FragmentJournal, r.FragmentJournal) {
+				return fmt.Errorf("journal de fragments modifié pendant la finalisation")
+			}
 			if !currentTaskAttempt(t, a.Attempt) || reviewContract(t) != r.Contract || c.Planning.Repository.Candidate != r.PreviousCandidate {
 				r.State = "stale"
 				r.Reason = "Tentative, contrat ou révision modifiée pendant la revue."

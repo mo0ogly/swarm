@@ -142,6 +142,25 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 			if managedReviewCalls(t, s)-before != wantCalls || again.Planning.Reviewer.Calls != after.Planning.Reviewer.Calls {
 				t.Fatal("reentry spent more calls")
 			}
+			finishErr := s.finishManagedFragmentReview(w.ID, a, r.ID, runErr)
+			if (mode == "pass") != (finishErr == nil) {
+				t.Fatal("unexpected finalization", mode, finishErr)
+			}
+			finished, e := s.get(w.ID)
+			if e != nil {
+				t.Fatal(e)
+			}
+			ft, _ := finished.task(a.TaskID)
+			if ft.Status == "accepted" || finished.Planning.Reviewer.Calls != again.Planning.Reviewer.Calls {
+				t.Fatal("finalization published or charged")
+			}
+			if mode == "pass" && (ft.IndependentReview.State != "passed" || ft.IndependentReview.FragmentJournal.FinalJournalDigest != task.IndependentReview.FragmentJournal.FinalJournalDigest) {
+				t.Fatal("lost final evidence")
+			}
+			if s.finishManagedFragmentReview(w.ID, a, r.ID, runErr) == nil {
+				t.Fatal("finished twice")
+			}
+
 		})
 	}
 }

@@ -4,7 +4,7 @@
 
 The internal protocol now persists reservations, executes inspections and both final calls, and replays original responses. Evidence checks reject a passing review unless its final journal, criteria and attempt identity match the recorded verdict. Cumulative review copies retain the original inspection identity and a separate report for each task. Provider and model configuration are checked again before saving or publishing.
 
-These components use a deterministic local provider in tests, without external AI calls. **Public launch and retry are not connected yet; the preflight remains `executable:false`.** Store finalization, retry integration and end-to-end publication checks remain. The sections below describe implementation stages, not an installed capability.
+These components use a deterministic local provider in tests, without external AI calls. **Public launch and retry are not connected yet; the preflight remains `executable:false`.** Internal finalization reloads the durable journal, derives criteria, saves the opinion and rechecks publication conditions without accepting the task. Stale anchors are rejected. Public launch, retry integration and end-to-end publication checks remain. The sections below describe implementation stages, not an installed capability.
 
 Status: **complete-evidence Go preflight available through CLI/API; the runtime protocol is not implemented**. This document does not authorize acceptance or modify the stored mission.
 
