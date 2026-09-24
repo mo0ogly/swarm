@@ -18,6 +18,9 @@ func managedFragmentInspectionPrompt(prefix string, p managedReviewFragmentPacke
 			return "", fmt.Errorf("pièce d’inspection altérée")
 		}
 	}
+	if !managedFragmentReplyFits(p) {
+		return "", fmt.Errorf("paquet trop chargé pour une réponse complète ; recalculer le découpage avant tout appel")
+	}
 	raw, e := json.Marshal(p)
 	if e != nil {
 		return "", e

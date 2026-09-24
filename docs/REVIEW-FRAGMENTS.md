@@ -81,3 +81,7 @@ La capacité restante concerne le JSON complet des pièces supplémentaires, pas
 Un premier appel final propose les pièces originales nécessaires, avec les index et empreintes de l'inventaire. Son état `ready` autorise seulement l'examen de cette sélection ; `unknown` conserve une insuffisance de preuves et n'autorise pas la décision. Les coûts JSON par pièce, les références et l'enveloppe restante sont indiqués. Le moteur remesure le message complet et refuse toute sélection dupliquée, périmée ou trop grande.
 
 Le précontrôle vérifie les consignes et schémas des inspections ainsi que les messages maximaux de sélection et de décision avant la première dépense. Le transport tabulaire conserve intégralement les extraits et opinions ; seule la répétition des clés JSON disparaît. Ces fonctions ne lancent pas encore le fournisseur et ne publient aucun résultat.
+
+### Capacité de réponse avant appel
+
+Les nouveaux lots doivent aussi permettre une réponse complète : le moteur mesure un résultat `inspected` par pièce avec raison et extrait de 96 octets chacun, identités comprises, et réserve 2 Kio pour le formatage dans la limite de 16 Kio. Le découpage conserve toutes les pièces et recalcule le nombre d’appels requis. Un ancien lot trop chargé est refusé avant appel ; ses journaux restent lisibles et ses consommations sont conservées. Ce contrôle ne garantit ni la durée de l’analyse réelle ni la place pour toutes les demandes de preuves possibles.

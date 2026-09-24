@@ -86,3 +86,15 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 	}
 	return state, result, nil
 }
+
+// Reserve room for a full inspected response and formatting. This bounds the
+// normal response, not latency or arbitrarily many requests for missing evidence.
+// Existing journals remain readable; only new calls/plans use this preflight.
+func managedFragmentReplyFits(p managedReviewFragmentPacket) bool {
+	r := managedFragmentInspection{Candidate: p.Candidate, ContextDigest: p.ContextDigest, PacketDigest: strings.Repeat("a", 64)}
+	for i, a := range p.Artifacts {
+		r.Findings = append(r.Findings, managedFragmentFinding{Artifact: i, Digest: a.Digest, Verdict: "inspected", Reason: strings.Repeat("r", managedFragmentFindingTextLimit), Evidence: strings.Repeat("e", managedFragmentFindingTextLimit), Needs: []string{}})
+	}
+	raw, err := json.Marshal(r)
+	return err == nil && len(raw)+2048 <= managedFragmentReplyLimit
+}

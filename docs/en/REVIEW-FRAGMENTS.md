@@ -63,3 +63,7 @@ Remaining capacity applies to the complete supplementary evidence JSON, not just
 A first final call requests necessary original artifacts by inventory index and digest. Its `ready` state only permits examining that selection; `unknown` preserves insufficient evidence and does not authorize the decision. Per-artifact JSON costs, references and remaining capacity are supplied. The engine measures the complete message and rejects duplicate, stale or oversized selections.
 
 Preflight checks inspection instructions and schemas plus maximum selection and decision messages before the first charge. Table transport preserves all excerpts and opinions; only repeated JSON keys are removed. These functions do not yet run a provider or publish results.
+
+### Response capacity before a call
+
+New packets must also accommodate a complete response: the engine measures one `inspected` finding per artifact, including identities and 96-byte reason and evidence fields, and reserves 2 KiB for formatting within the 16 KiB reply limit. Splitting preserves every artifact and recalculates required calls. An oversized existing packet is rejected before a call; its journals remain readable and consumed calls remain charged. This check guarantees neither real analysis latency nor room for every possible request for additional evidence.

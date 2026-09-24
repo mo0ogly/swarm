@@ -166,3 +166,40 @@ func TestManagedFragmentPreviewReadOnly(t *testing.T) {
 		t.Fatal("unknown task")
 	}
 }
+
+func TestManagedFragmentManySmallFilesReplyCapacity(t *testing.T) {
+	c := fragmentPlanFixture()
+	c.Diff = ""
+	for i := 0; i < 64; i++ {
+		c.Diff += fmt.Sprintf("diff --git a/f%d b/f%d\n+small original evidence\n", i, i)
+	}
+	artifacts, err := managedFragmentArtifacts(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	oversized := managedReviewFragmentPacket{Version: 1, Candidate: c.Candidate, ContextDigest: strings.Repeat("a", 64), Artifacts: artifacts}
+	if _, err := managedFragmentInspectionPrompt("", oversized); err == nil {
+		t.Fatal("oversized response accepted for provider call")
+	}
+	p, err := planManagedReviewFragments(c, 20, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(p.Packets) < 2 {
+		t.Fatal("64 pieces were not split")
+	}
+	if err = validateManagedReviewFragments(c, p); err != nil {
+		t.Fatal(err)
+	}
+	for _, packet := range p.Packets {
+		if !managedFragmentReplyFits(packet) {
+			t.Fatal("response exceeds capacity")
+		}
+		if _, err = managedFragmentInspectionPrompt("", packet); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err = planManagedReviewFragments(c, 3, 2); err == nil {
+		t.Fatal("split bypassed budget")
+	}
+}

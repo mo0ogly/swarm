@@ -107,7 +107,7 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 	packet := managedReviewFragmentPacket{Version: 1, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
 	fits := func(p managedReviewFragmentPacket) bool {
 		raw, e := json.Marshal(p)
-		return e == nil && len(raw)+managedFragmentPromptReserve <= managedReviewPromptLimit
+		return e == nil && len(raw)+managedFragmentPromptReserve <= managedReviewPromptLimit && managedFragmentReplyFits(p)
 	}
 	for _, artifact := range artifacts {
 		next := packet
