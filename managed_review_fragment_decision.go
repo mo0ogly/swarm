@@ -17,9 +17,6 @@ func managedFragmentDecisionPrompt(prefix string, c managedReviewContext, p mana
 	if err != nil {
 		return "", empty, err
 	}
-	metadata := c
-	metadata.Diff = ""
-	metadata.Sources = nil
 	var selection *managedFragmentEvidenceSelection
 	if len(refs) > 0 {
 		selected, e := selectManagedFragmentEvidence(c, p, refs, managedReviewPromptLimit)
@@ -28,6 +25,14 @@ func managedFragmentDecisionPrompt(prefix string, c managedReviewContext, p mana
 		}
 		selection = &selected
 	}
+	return renderManagedFragmentDecision(prefix, c, bundle, selection)
+}
+
+func renderManagedFragmentDecision(prefix string, c managedReviewContext, bundle managedFragmentFinalEvidence, selection *managedFragmentEvidenceSelection) (string, managedReviewContext, error) {
+	empty := managedReviewContext{}
+	metadata := c
+	metadata.Diff = ""
+	metadata.Sources = nil
 	payload := struct {
 		Context     managedReviewContext              `json:"task_contracts_reports_controls"`
 		Inspections managedFragmentFinalEvidence      `json:"partial_inspections"`

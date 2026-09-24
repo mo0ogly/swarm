@@ -47,3 +47,9 @@ After reopening the Store, a reply can be recorded without another charge only f
 The final decision builder preserves task contracts, reports and checks, separates original excerpts from inspection opinions, and can include whole artifacts requested by index and digest. Unknown references, duplicates, stale content and capacity overflow are rejected. Requested files are never truncated.
 
 The parser receives only original evidence actually included in that call: a quotation present in the complete diff but absent from the final message is rejected. The builder makes no provider call and does not remove the publication guard. Final call reservation, execution, recovery and durable anchoring are still required before activation.
+
+## Final capacity before spending
+
+Each inspection rationale and excerpt is limited to 96 serialized JSON bytes excluding surrounding quotes, counting escapes and UTF-8. The total reply cap remains 16 KiB. Oversized replies are rejected, never shortened. This allows a conservative final-input bound using the actual identities, names, contracts and instructions before any call.
+
+Remaining capacity applies to the complete supplementary evidence JSON, not just its text. It does not guarantee a future evidence request will fit. The engine must check that exact request and reject overflow without truncation; a size check proves neither evidence sufficiency nor a favorable verdict. This calculation is not yet connected to execution.

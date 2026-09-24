@@ -63,3 +63,9 @@ Une réponse peut être enregistrée après réouverture du Store, sans nouvelle
 Le constructeur de décision finale conserve les contrats, rapports et contrôles, distingue les extraits originaux des opinions d'inspection et peut joindre des pièces entières demandées par leur index et empreinte. Les références inconnues, doublons, contenus périmés et dépassements de capacité sont refusés. Aucun fichier demandé n'est tronqué.
 
 Le parseur reçoit uniquement les preuves originales effectivement incluses dans cet appel : une citation qui existe dans le diff complet mais pas dans le message final est refusée. Le constructeur ne déclenche aucun appel et ne lève pas l'interdiction de publication. La réservation des appels finaux, leur exécution, leur reprise et leur ancrage restent nécessaires avant activation.
+
+## Capacité de la décision avant dépense
+
+Chaque raison et extrait d'inspection est limité à 96 octets JSON sérialisés hors guillemets, échappements et UTF-8 compris. Le plafond total de réponse reste 16 Kio. Une réponse trop longue est refusée, jamais raccourcie. Cette limite permet de calculer une borne supérieure de l'entrée finale avec les identités, noms, contrats et consignes réels avant tout appel.
+
+La capacité restante concerne le JSON complet des pièces supplémentaires, pas seulement leur texte. Elle ne garantit pas qu'une demande future de preuve pourra tenir. Le moteur doit vérifier cette demande exacte et refuser sans troncature si nécessaire ; un précontrôle de taille ne prouve ni la suffisance des pièces ni un verdict favorable. Ce calcul n'est pas encore raccordé à l'exécution.

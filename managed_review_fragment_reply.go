@@ -27,6 +27,15 @@ type managedFragmentInspection struct {
 
 const managedFragmentReplyLimit = 16 * 1024
 
+// Bound the serialized fields, including JSON escapes, before reserving calls.
+// This keeps a worst-case final input calculable without truncating responses.
+const managedFragmentFindingTextLimit = 96
+
+func boundedFragmentFindingText(text string) bool {
+	raw, err := json.Marshal(text)
+	return err == nil && len(raw) <= managedFragmentFindingTextLimit+2
+}
+
 func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPacket) (string, managedFragmentInspection, error) {
 	var result managedFragmentInspection
 	fail := func(reason string) (string, managedFragmentInspection, error) {
@@ -50,7 +59,7 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 		}
 		seen[finding.Artifact] = true
 		artifact := packet.Artifacts[finding.Artifact]
-		if artifact.Digest != hash([]byte(artifact.Content)) || finding.Digest != artifact.Digest || len(strings.TrimSpace(finding.Reason)) < 8 || len(finding.Reason) > 1000 || len(finding.Evidence) > 1000 || len(finding.Needs) > 16 {
+		if artifact.Digest != hash([]byte(artifact.Content)) || finding.Digest != artifact.Digest || len(strings.TrimSpace(finding.Reason)) < 8 || !boundedFragmentFindingText(finding.Reason) || !boundedFragmentFindingText(finding.Evidence) || len(finding.Needs) > 16 {
 			return fail("preuve ou justification invalide")
 		}
 		needs := map[string]bool{}
