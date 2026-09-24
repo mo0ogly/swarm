@@ -1,6 +1,6 @@
 # Bounded review of large candidates
 
-Status: **diff transport feasibility only; the runtime protocol is not implemented**. This document does not authorize acceptance or modify the stored mission.
+Status: **complete-evidence Go preflight available through CLI/API; the runtime protocol is not implemented**. This document does not authorize acceptance or modify the stored mission.
 
 Existing task batches repeat the entire cumulative diff. They cannot accommodate a diff that already exceeds the 192 KiB prompt limit. Removing code from an already tested candidate instead requires fresh, matching evidence and an explicit revised delivery.
 
@@ -27,3 +27,11 @@ The estimate covers **only the diff**. Reports, supplemental sources, controls, 
 Tests must cover missing/duplicate/altered fragments, stale identities, insufficient budget, interruption and restart without double spending, incorrect reply attribution, cross-fragment defects and refusal of partial acceptance.
 
 E1–E5 retain their history. E6 retains its identity, attempts and candidate. E7–E8 retain their dependencies. No task is accepted by this feasibility tool.
+
+## Engine preview of the retained candidate
+
+Use `swarm planning fragment-preview WORK --input request.json` with `{"task_id":"TASK"}`, or authenticated GET `/api/v1/planning?work=WORK&task=TASK&action=fragment-preview`.
+
+The engine verifies the stopped attempt, recovered result, retained candidate, contract and receipts. Packets preserve the complete diff, supplemental sources, reports, deliveries, contracts, controls and accepted baseline. The remaining call budget is read from the mission; two final calls are reserved for a future final-review stage.
+
+The result always has `executable:false`. It neither reserves a call nor invokes a provider. Existing retry remains blocked until durable execution and final-review verification are implemented. The preflight does not prove that the future final-review inputs will fit.

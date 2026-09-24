@@ -1,6 +1,6 @@
 # Revue de gros candidats : reprise bornée
 
-État : faisabilité du transport du diff démontrée. Protocole d’exécution **non implémenté**. Cette page n’autorise pas une acceptation et ne modifie pas le plan enregistré.
+État : précontrôle Go du dossier complet disponible par CLI/API. Protocole d’exécution **non implémenté**. Cette page n’autorise pas une acceptation et ne modifie pas le plan enregistré.
 
 ## Pourquoi les lots actuels ne suffisent pas
 
@@ -43,3 +43,11 @@ Cette estimation couvre **le diff uniquement**. Les rapports, sources complémen
 ## Conservation du plan existant
 
 E1–E5 restent enregistrées avec leurs preuves historiques. E6 demeure la tâche de recette réelle, avec ses tentatives consommées et son candidat conservé. E7 et E8 gardent leurs identifiants et dépendances. Le travail sur le protocole relève de la correction du moteur ; ce document n’applique aucune modification de statut ou de budget dans la mission.
+
+## Précontrôle du candidat conservé dans le moteur
+
+`swarm planning fragment-preview WORK --input request.json`, avec `{"task_id":"TASK"}`, ou GET `/api/v1/planning?work=WORK&task=TASK&action=fragment-preview`. La route utilise l’authentification locale existante.
+
+Le moteur vérifie la tentative arrêtée, le résultat récupéré, le candidat conservé, le contrat et les reçus avant de construire les paquets. Ceux-ci couvrent tout le diff, les sources annexes, les rapports, livraisons, contrats, contrôles et la base de revue éventuelle. Les identités et empreintes permettent de refuser une couverture altérée. Le budget restant est lu dans la mission ; deux appels sont réservés pour une étape finale encore à implémenter.
+
+Le résultat porte toujours `executable:false`. Il ne réserve pas d’appel et ne déclenche pas de fournisseur. La reprise existante reste refusée tant que le protocole d’exécution durable et la décision finale ne sont pas implémentés. Le précontrôle ne certifie pas le volume futur de cette décision finale.

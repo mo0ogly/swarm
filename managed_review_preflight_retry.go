@@ -14,13 +14,15 @@ type managedPreflightRetry struct {
 	Revision int
 	Agent    Agent
 	Item     ManagedAttempt
+	Work     Work
+	Context  managedReviewContext
 }
 
 // Read-only preparation outside the write transaction. A no-call size refusal
 // has no IndependentReview record: it still needs a public, bounded recovery.
 // Never create a producer, rerun checks, replace a candidate or synthesize an
 // opinion here. The conductor revalidates the retained candidate afterward.
-func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflightRetry, error) {
+func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflightRetry, error) {
 	w, e := s.get(work)
 	if e != nil {
 		return nil, e
@@ -96,6 +98,15 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	if e != nil {
 		return nil, e
 	}
+	return &managedPreflightRetry{Revision: w.Revision, Agent: a, Item: item, Work: w, Context: c}, nil
+}
+
+func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflightRetry, error) {
+	prepared, e := s.readManagedPreflightEvidence(work, task)
+	if e != nil {
+		return nil, e
+	}
+	w, c := prepared.Work, prepared.Context
 	owners, e := managedReviewSourceOwners(w, c)
 	if e != nil {
 		return nil, e
@@ -117,5 +128,15 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	if w.Planning.Reviewer.Calls+len(batches) > w.Planning.Reviewer.MaxCalls {
 		return nil, fmt.Errorf("budget insuffisant pour les %d lots de revue", len(batches))
 	}
-	return &managedPreflightRetry{Revision: w.Revision, Agent: a, Item: item}, nil
+	return prepared, nil
+}
+
+// A read-only preview of complete evidence transport; never an execution permit.
+func (s *Store) previewManagedFragments(work, task string) (managedReviewFragmentPlan, error) {
+	p, e := s.readManagedPreflightEvidence(work, task)
+	if e != nil {
+		return managedReviewFragmentPlan{}, e
+	}
+	cfg := p.Work.Planning.Reviewer
+	return planManagedReviewFragments(p.Context, cfg.MaxCalls-cfg.Calls, 2)
 }
