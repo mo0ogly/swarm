@@ -2,13 +2,11 @@
 
 ## Integration status
 
-The internal protocol now persists reservations, executes inspections and both final calls, and replays original responses. Evidence checks reject a passing review unless its final journal, criteria and attempt identity match the recorded verdict. Cumulative review copies retain the original inspection identity and a separate report for each task. Provider and model configuration are checked again before saving or publishing.
+The engine now falls back to fragments when per-task batches exceed the transport limit. Public retry of an unpaid size refusal preflights complete evidence while preserving the candidate and attempt. Each inspection, evidence selection and final decision has a separate durable reservation. Finalization replays original replies; only the existing publication transaction accepts a result after rechecking evidence, criteria, provider and model.
 
-These components use a deterministic local provider in tests, without external AI calls. **Public launch and retry are not connected yet; the preflight remains `executable:false`.** Internal finalization reloads the durable journal, derives criteria, saves the opinion and rechecks publication conditions without accepting the task. Stale anchors are rejected. Public launch, retry integration and end-to-end publication checks remain. The sections below describe implementation stages, not an installed capability.
+Tests use a deterministic local provider: passing verdict, final refusal, unpaid preflight retry without another producer, and replay without duplicate calls. **Recovery after an interrupted inspection is explicitly held to preserve its journal; evidence and spent calls are not discarded.** Recovery must be connected before deployment. The read-only preflight retains `executable:false`: it is not an execution permit.
 
-Status: **complete-evidence Go preflight available through CLI/API; the runtime protocol is not implemented**. This document does not authorize acceptance or modify the stored mission.
-
-Existing task batches repeat the entire cumulative diff. They cannot accommodate a diff that already exceeds the 192 KiB prompt limit. Removing code from an already tested candidate instead requires fresh, matching evidence and an explicit revised delivery.
+The following sections describe implementation stages, not proof of deployment or a successful real AI review.
 
 ## Read-only check
 

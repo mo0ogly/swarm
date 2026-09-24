@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -326,6 +327,14 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 			return err
 		}
 		batches, err := planManagedReviewBatches(prefix, context, owners)
+		if errors.Is(err, errManagedReviewBatchSize) && task.BatchReviewResume == nil {
+			record, beginErr := s.beginManagedFragmentReview(current, a, context, receiptPath, receipt)
+			if beginErr != nil {
+				return fmt.Errorf("%w ; fragments : %v", err, beginErr)
+			}
+			_, _, runErr := s.runManagedFragmentReview(current, a, record)
+			return s.finishManagedFragmentReview(w.ID, a, record.ID, runErr)
+		}
 		if err != nil {
 			return err
 		}

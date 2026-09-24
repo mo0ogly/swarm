@@ -2,11 +2,11 @@
 
 ## État du raccordement
 
-Le protocole interne dispose maintenant des réservations persistantes, de l’exécution des inspections et des deux appels finaux, et de la relecture des réponses originales. Le contrôle des preuves refuse un état favorable si le journal final, les critères ou l’identité de la tentative ne correspondent pas exactement au verdict enregistré. Les copies de revue cumulatives conservent l’origine de l’inspection et un rapport propre à chaque tâche. La configuration du fournisseur et du modèle est revérifiée avant enregistrement et publication.
+Le parcours moteur utilise désormais les fragments lorsque les lots par tâche dépassent la limite de transport. La reprise publique d’un refus de taille sans appel préalable vérifie le dossier complet et conserve le candidat et la tentative. Chaque inspection, la sélection des pièces et la décision finale disposent d’une réservation durable distincte. La finalisation relit les réponses originales ; seule la transaction habituelle peut accepter le résultat après recontrôle des preuves, critères, fournisseur et modèle.
 
-Ces composants sont testés avec un fournisseur local déterministe, sans appel à une IA externe. **Le parcours public de lancement et de reprise n’est pas encore raccordé ; le précontrôle reste `executable:false`.** La finalisation interne recharge le journal durable, en dérive les critères, enregistre l’avis et revérifie les conditions de publication sans accepter la tâche. Les ancres périmées sont refusées. Restent le raccordement du lancement et de la reprise, puis la recette de publication de bout en bout. Les sections ci-dessous décrivent les étapes de construction, et non une capacité installée.
+La recette utilise un fournisseur local déterministe : verdict favorable, refus final, reprise du précontrôle sans producteur et rejeu sans double appel. **La reprise après interruption d’une inspection reste retenue explicitement pour préserver le journal ; elle n’efface ni preuves ni dépenses.** Elle doit être raccordée avant installation de ce protocole. Le précontrôle en lecture seule conserve `executable:false` : il ne constitue pas une autorisation d’exécution.
 
-État : précontrôle Go du dossier complet disponible par CLI/API. Protocole d’exécution **non implémenté**. Cette page n’autorise pas une acceptation et ne modifie pas le plan enregistré.
+Les sections suivantes retracent la construction des composants. Elles ne prouvent pas l’installation du protocole ni le succès d’une revue IA réelle.
 
 ## Pourquoi les lots actuels ne suffisent pas
 

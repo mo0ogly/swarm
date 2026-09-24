@@ -241,6 +241,9 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			}
 			managedProducer = v.Producer
 		}
+		if v.FragmentJournal != nil {
+			return fmt.Errorf("revue par fragments conservée : reprise du journal requise ; aucun redémarrage complet ni nouvelle dépense implicite")
+		}
 		// The former record remains in the event history. Call reservations are never refunded.
 		if len(v.Batches) > 0 {
 			t.BatchReviewResume = v

@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -116,7 +117,18 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 		return nil, e
 	}
 	batches, e := planManagedReviewBatches(managedReviewPrefix(workflow), c, owners)
-	if e != nil {
+	calls := len(batches)
+	if errors.Is(e, errManagedReviewBatchSize) {
+		cfg := w.Planning.Reviewer
+		plan, err := planManagedReviewFragments(c, cfg.MaxCalls-cfg.Calls, 2)
+		if err != nil {
+			return nil, err
+		}
+		if err = preflightManagedFragmentCalls(managedReviewPrefix(workflow), c, plan); err != nil {
+			return nil, err
+		}
+		calls = len(plan.Packets) + plan.ReservedFinalCalls
+	} else if e != nil {
 		return nil, e
 	}
 	if w.Planning.Reviewer.Failure != "" {
@@ -125,8 +137,8 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	if e = s.providerCooldownGuard(w.Planning.Reviewer.Provider); e != nil {
 		return nil, e
 	}
-	if w.Planning.Reviewer.Calls+len(batches) > w.Planning.Reviewer.MaxCalls {
-		return nil, fmt.Errorf("budget insuffisant pour les %d lots de revue", len(batches))
+	if w.Planning.Reviewer.Calls+calls > w.Planning.Reviewer.MaxCalls {
+		return nil, fmt.Errorf("budget insuffisant pour les %d lots de revue", calls)
 	}
 	return prepared, nil
 }
