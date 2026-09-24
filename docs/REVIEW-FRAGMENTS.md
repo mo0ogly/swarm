@@ -85,3 +85,7 @@ Le précontrôle vérifie les consignes et schémas des inspections ainsi que le
 ### Capacité de réponse avant appel
 
 Les nouveaux lots doivent aussi permettre une réponse complète : le moteur mesure un résultat `inspected` par pièce avec raison et extrait de 96 octets chacun, identités comprises, et réserve 2 Kio pour le formatage dans la limite de 16 Kio. Le découpage conserve toutes les pièces et recalcule le nombre d’appels requis. Un ancien lot trop chargé est refusé avant appel ; ses journaux restent lisibles et ses consommations sont conservées. Ce contrôle ne garantit ni la durée de l’analyse réelle ni la place pour toutes les demandes de preuves possibles.
+
+### Reprise d’un lot ancien trop chargé
+
+`planning retry-review` recalcule le découpage lorsque la capacité de réponse de l’ancien plan est dépassée, uniquement pour une revue en erreur dont toutes les réservations sont interrompues et qui ne possède aucun résultat ni décision finale. L’ancien plan et le journal restent ancrés sous `replanned_from` et sont vérifiés à chaque lecture. Les compteurs restent inchangés ; le budget doit couvrir le nouveau plan avant son enregistrement. Une seule replanification est prise en charge ; les reprises avec résultats existants conservent leur plan. `planning fragment-preview` examine aussi cette revue interrompue sans appel ni mutation.

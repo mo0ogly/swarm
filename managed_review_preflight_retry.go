@@ -145,6 +145,28 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 
 // A read-only preview of complete evidence transport; never an execution permit.
 func (s *Store) previewManagedFragments(work, task string) (managedReviewFragmentPlan, error) {
+	w, err := s.get(work)
+	if err != nil {
+		return managedReviewFragmentPlan{}, err
+	}
+	t, err := w.task(task)
+	if err != nil {
+		return managedReviewFragmentPlan{}, err
+	}
+	if r := t.IndependentReview; r != nil && r.FragmentJournal != nil {
+		if err = s.managedBatchPlanIntact(w, *r); err != nil {
+			return managedReviewFragmentPlan{}, err
+		}
+		if err = s.managedReviewFilesIntact(*r); err != nil {
+			return managedReviewFragmentPlan{}, err
+		}
+		old, j, err := s.readFragmentJournalAnchor(*r)
+		if err != nil {
+			return managedReviewFragmentPlan{}, err
+		}
+		return s.managedFragmentReplan(w, *r, old, j)
+	}
+
 	p, e := s.readManagedPreflightEvidence(work, task)
 	if e != nil {
 		return managedReviewFragmentPlan{}, e

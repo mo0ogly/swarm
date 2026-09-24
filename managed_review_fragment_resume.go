@@ -28,6 +28,11 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 	if r.FragmentJournal.FinalJournalDigest != "" {
 		return s.queueManagedFragmentFinalResume(w, task, r, p, j)
 	}
+	for _, packet := range p.Packets {
+		if !managedFragmentReplyFits(packet) {
+			return s.queueManagedFragmentReplan(w, task, r, p, j)
+		}
+	}
 	anchor := *r.FragmentJournal
 	anchor.ResumeCalls = nil
 	for i := range j.Entries {

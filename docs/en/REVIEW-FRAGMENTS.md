@@ -67,3 +67,7 @@ Preflight checks inspection instructions and schemas plus maximum selection and 
 ### Response capacity before a call
 
 New packets must also accommodate a complete response: the engine measures one `inspected` finding per artifact, including identities and 96-byte reason and evidence fields, and reserves 2 KiB for formatting within the 16 KiB reply limit. Splitting preserves every artifact and recalculates required calls. An oversized existing packet is rejected before a call; its journals remain readable and consumed calls remain charged. This check guarantees neither real analysis latency nor room for every possible request for additional evidence.
+
+### Resuming an oversized existing packet
+
+`planning retry-review` repartitions an existing plan that exceeds response capacity only when the review is in error, all reservations are interrupted, and no finding or final decision exists. The original plan and journal remain anchored under `replanned_from` and are checked on every read. Counters remain unchanged; the current budget must cover the new plan before it is stored. Only one repartition is supported; recovery with existing findings retains its plan. `planning fragment-preview` also examines this interrupted review without calls or mutations.
