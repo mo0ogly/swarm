@@ -88,7 +88,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	if err != nil {
 		return empty, err
 	}
-	anchor := &ManagedFragmentJournalAnchor{}
+	anchor := &ManagedFragmentJournalAnchor{InspectionTask: a.TaskID, InspectionAttempt: a.Attempt, InspectionProducer: a.ID}
 	anchor.Plan, anchor.PlanDigest, err = write("plan", p)
 	if err != nil {
 		return empty, err
@@ -104,16 +104,17 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	anchor.ModelConfigDigest = hash(raw)
 	r.FragmentJournal = anchor
 	for _, tc := range c.Tasks {
+		if hash([]byte(tc.Report)) != tc.Binding.ReportDigest {
+			return empty, fmt.Errorf("rapport du fragment différent du contrat")
+		}
+		path := managedFragmentReportPath(r, tc.Task)
+		if err = atomicWrite(filepath.Join(s.root, path), []byte(tc.Report)); err != nil {
+			return empty, err
+		}
 		if tc.Task == a.TaskID {
-			r.Report = filepath.ToSlash(filepath.Join(dir, r.ID+"-report.md"))
+			r.Report = path
 			r.GitReport = tc.Binding.Report
-			r.Digest = hash([]byte(tc.Report))
-			if r.Digest != tc.Binding.ReportDigest {
-				return empty, fmt.Errorf("rapport du fragment différent du contrat")
-			}
-			if err = atomicWrite(filepath.Join(s.root, r.Report), []byte(tc.Report)); err != nil {
-				return empty, err
-			}
+			r.Digest = tc.Binding.ReportDigest
 		}
 	}
 	raw, _ = json.Marshal(r)
@@ -152,4 +153,8 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 		return empty, err
 	}
 	return r, nil
+}
+
+func managedFragmentReportPath(r IndependentReview, task string) string {
+	return filepath.ToSlash(filepath.Join(filepath.Dir(r.Context), r.ID+"-report-"+hash([]byte(task))+".md"))
 }

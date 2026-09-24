@@ -12,6 +12,9 @@ import (
 )
 
 type ManagedFragmentJournalAnchor struct {
+	InspectionTask     string `json:"inspection_task,omitempty"`
+	InspectionAttempt  string `json:"inspection_attempt,omitempty"`
+	InspectionProducer string `json:"inspection_producer,omitempty"`
 	FinalJournal       string `json:"final_journal,omitempty"`
 	FinalJournalDigest string `json:"final_journal_sha256,omitempty"`
 	WorkflowDigest     string `json:"workflow_sha256"`
@@ -73,7 +76,23 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 	if e != nil {
 		return p, j, e
 	}
-	j, _, e = readManagedFragmentJournal(path, anchor.JournalDigest, p, r.Attempt, r.BatchProviderDigest)
+	attempt := r.Attempt
+	if anchor.InspectionAttempt != "" || anchor.InspectionTask != "" || anchor.InspectionProducer != "" {
+		owner, copyBinding := false, false
+		for _, tc := range c.Tasks {
+			if tc.Task == anchor.InspectionTask && tc.Binding.Attempt == anchor.InspectionAttempt && tc.Binding.Producer == anchor.InspectionProducer {
+				owner = true
+			}
+			if tc.Binding.Attempt == r.Attempt && tc.Binding.Producer == r.Producer && tc.Binding.Contract == r.Contract && tc.Binding.Report == r.GitReport && tc.Binding.ReportDigest == r.Digest {
+				copyBinding = true
+			}
+		}
+		if !owner || !copyBinding || anchor.InspectionAttempt == "" || anchor.InspectionProducer == "" {
+			return p, j, fmt.Errorf("provenance de revue cumulative invalide")
+		}
+		attempt = anchor.InspectionAttempt
+	}
+	j, _, e = readManagedFragmentJournal(path, anchor.JournalDigest, p, attempt, r.BatchProviderDigest)
 	return p, j, e
 }
 

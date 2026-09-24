@@ -558,6 +558,9 @@ func (s *Store) managedReviewsForPublication(w *Work, a Agent, candidate, receip
 		copy.Contract = v.Contract
 		copy.GitReport = v.Report
 		copy.Report = managedReviewReportPath(receiptPath, v.Task)
+		if r.FragmentJournal != nil {
+			copy.Report = managedFragmentReportPath(*r, v.Task)
+		}
 		copy.Digest = v.ReportDigest
 		copy.Criteria = v.Criteria
 		copy.Reason = v.Reason
