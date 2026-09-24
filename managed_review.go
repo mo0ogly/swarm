@@ -611,6 +611,14 @@ func (s *Store) managedReviewFilesIntact(r IndependentReview) error {
 }
 
 func (s *Store) managedReviewFilesIntactSeen(r IndependentReview, seen map[string]bool, depth int) error {
+	if r.FragmentJournal != nil {
+		if r.State == "passed" {
+			return fmt.Errorf("décision finale des fragments non raccordée ; publication interdite")
+		}
+		if _, _, e := s.readFragmentJournalAnchor(r); e != nil {
+			return e
+		}
+	}
 	if depth > 128 {
 		return fmt.Errorf("chaîne de revues trop profonde")
 	}

@@ -83,6 +83,20 @@ func TestManagedReviewDoesNotBlockConductorOrOtherMissions(t *testing.T) {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
+	// Acceptance is persisted before the integration goroutine finishes its Git
+	// housekeeping. Wait for ownership release before TempDir removes its files.
+	deadline = time.Now().Add(3 * time.Second)
+	for {
+		releaseReview, lockErr := managedReviewOwnershipLock(s.root, w.ID, a.ID)
+		if lockErr == nil {
+			releaseReview()
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("integration still owns its files after acceptance", lockErr)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 	if w.Planning.Reviewer.Calls != 1 || managedReviewCalls(t, s) != 1 {
 		t.Fatal("conductor polling duplicated paid review")
 	}

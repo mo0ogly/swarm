@@ -51,3 +51,9 @@ E1–E5 restent enregistrées avec leurs preuves historiques. E6 demeure la tâc
 Le moteur vérifie la tentative arrêtée, le résultat récupéré, le candidat conservé, le contrat et les reçus avant de construire les paquets. Ceux-ci couvrent tout le diff, les sources annexes, les rapports, livraisons, contrats, contrôles et la base de revue éventuelle. Les identités et empreintes permettent de refuser une couverture altérée. Le budget restant est lu dans la mission ; deux appels sont réservés pour une étape finale encore à implémenter.
 
 Le résultat porte toujours `executable:false`. Il ne réserve pas d’appel et ne déclenche pas de fournisseur. La reprise existante reste refusée tant que le protocole d’exécution durable et la décision finale ne sont pas implémentés. Le précontrôle ne certifie pas le volume futur de cette décision finale.
+
+## Journal transactionnel (non activé)
+
+Le Store lie le plan et chaque version du journal à leurs empreintes. Réserver un fragment consomme un appel dans la même transaction que l'enregistrement de la réservation ; deux connexions concurrentes ne peuvent pas réserver le même état. Un refus de budget ou une pause conserve les compteurs et le journal précédents.
+
+Une réponse peut être enregistrée après réouverture du Store, sans nouvelle dépense, uniquement pour sa réservation et les mêmes candidat, tentative, méthode, fournisseur et configuration de modèle. Les réponses antérieures restent immuables. Une inspection réussie ne permet pas de publier : la décision finale indépendante et son raccordement restent à implémenter.
