@@ -41,3 +41,9 @@ The result always has `executable:false`. It neither reserves a call nor invokes
 The Store anchors the plan and each journal version by digest. Reserving a fragment charges one call in the same transaction that records its reservation; competing database connections cannot reserve the same state. Budget refusals and paused missions preserve the previous counters and journal.
 
 After reopening the Store, a reply can be recorded without another charge only for its reservation and the same candidate, attempt, method, provider and model configuration. Earlier replies remain immutable. Successful inspection does not permit publication: the independent final decision and execution integration are still outstanding.
+
+## Final decision input (construction only)
+
+The final decision builder preserves task contracts, reports and checks, separates original excerpts from inspection opinions, and can include whole artifacts requested by index and digest. Unknown references, duplicates, stale content and capacity overflow are rejected. Requested files are never truncated.
+
+The parser receives only original evidence actually included in that call: a quotation present in the complete diff but absent from the final message is rejected. The builder makes no provider call and does not remove the publication guard. Final call reservation, execution, recovery and durable anchoring are still required before activation.

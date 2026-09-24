@@ -57,3 +57,9 @@ Le résultat porte toujours `executable:false`. Il ne réserve pas d’appel et 
 Le Store lie le plan et chaque version du journal à leurs empreintes. Réserver un fragment consomme un appel dans la même transaction que l'enregistrement de la réservation ; deux connexions concurrentes ne peuvent pas réserver le même état. Un refus de budget ou une pause conserve les compteurs et le journal précédents.
 
 Une réponse peut être enregistrée après réouverture du Store, sans nouvelle dépense, uniquement pour sa réservation et les mêmes candidat, tentative, méthode, fournisseur et configuration de modèle. Les réponses antérieures restent immuables. Une inspection réussie ne permet pas de publier : la décision finale indépendante et son raccordement restent à implémenter.
+
+## Entrée de décision finale (construction seulement)
+
+Le constructeur de décision finale conserve les contrats, rapports et contrôles, distingue les extraits originaux des opinions d'inspection et peut joindre des pièces entières demandées par leur index et empreinte. Les références inconnues, doublons, contenus périmés et dépassements de capacité sont refusés. Aucun fichier demandé n'est tronqué.
+
+Le parseur reçoit uniquement les preuves originales effectivement incluses dans cet appel : une citation qui existe dans le diff complet mais pas dans le message final est refusée. Le constructeur ne déclenche aucun appel et ne lève pas l'interdiction de publication. La réservation des appels finaux, leur exécution, leur reprise et leur ancrage restent nécessaires avant activation.
