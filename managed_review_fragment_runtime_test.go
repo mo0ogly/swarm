@@ -87,6 +87,55 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 			if task.Status == "accepted" {
 				t.Fatal("runner bypassed publication")
 			}
+			claimed := *task.IndependentReview
+			claimed.State = "passed"
+			claimed.ManagedTasks = records
+			for _, record := range records {
+				if record.Task == a.TaskID {
+					claimed.Criteria = record.Criteria
+				}
+			}
+			proofErr := s.managedReviewFilesIntact(claimed)
+			if mode == "pass" {
+				if proofErr != nil {
+					t.Fatal(proofErr)
+				}
+				if e = s.managedBatchPlanIntact(after, claimed); e != nil {
+					t.Fatal(e)
+				}
+				forged := claimed
+				forged.ManagedTasks = nil
+				if s.managedReviewFilesIntact(forged) == nil {
+					t.Fatal("invented final records accepted")
+				}
+				forged = claimed
+				forged.Criteria = nil
+				if s.managedReviewFilesIntact(forged) == nil {
+					t.Fatal("missing criteria accepted")
+				}
+				anchor := *claimed.FragmentJournal
+				anchor.FinalJournalDigest = "forged"
+				forged = claimed
+				forged.FragmentJournal = &anchor
+				if s.managedReviewFilesIntact(forged) == nil {
+					t.Fatal("corrupt final anchor accepted")
+				}
+				anchor = *claimed.FragmentJournal
+				anchor.ModelConfigDigest = "changed-model"
+				forged = claimed
+				forged.FragmentJournal = &anchor
+				if s.managedBatchPlanIntact(after, forged) == nil {
+					t.Fatal("changed model accepted")
+				}
+				anchor = *claimed.FragmentJournal
+				anchor.InspectionTask = ""
+				forged.FragmentJournal = &anchor
+				if s.managedReviewFilesIntact(forged) == nil {
+					t.Fatal("missing origin accepted")
+				}
+			} else if proofErr == nil {
+				t.Fatal("nonpassing provider reply published as passed")
+			}
 			// Existing durable evidence must not issue any second call on reentry.
 			_, _, _ = s.runManagedFragmentReview(w, a, *task.IndependentReview)
 			again, _ := s.get(w.ID)

@@ -1,5 +1,11 @@
 # Revue de gros candidats : reprise bornée
 
+## État du raccordement
+
+Le protocole interne dispose maintenant des réservations persistantes, de l’exécution des inspections et des deux appels finaux, et de la relecture des réponses originales. Le contrôle des preuves refuse un état favorable si le journal final, les critères ou l’identité de la tentative ne correspondent pas exactement au verdict enregistré. Les copies de revue cumulatives conservent l’origine de l’inspection et un rapport propre à chaque tâche. La configuration du fournisseur et du modèle est revérifiée avant enregistrement et publication.
+
+Ces composants sont testés avec un fournisseur local déterministe, sans appel à une IA externe. **Le parcours public de lancement et de reprise n’est pas encore raccordé ; le précontrôle reste `executable:false`.** Restent la finalisation du résultat dans le Store, le raccordement de la reprise et la recette de publication de bout en bout. Les sections ci-dessous décrivent les étapes de construction, et non une capacité installée.
+
 État : précontrôle Go du dossier complet disponible par CLI/API. Protocole d’exécution **non implémenté**. Cette page n’autorise pas une acceptation et ne modifie pas le plan enregistré.
 
 ## Pourquoi les lots actuels ne suffisent pas

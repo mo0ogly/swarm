@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -615,17 +616,41 @@ func (s *Store) managedReviewFilesIntact(r IndependentReview) error {
 
 func (s *Store) managedReviewFilesIntactSeen(r IndependentReview, seen map[string]bool, depth int) error {
 	if r.FragmentJournal != nil {
-		if r.State == "passed" {
-			return fmt.Errorf("décision finale des fragments non raccordée ; publication interdite")
+		if len(r.Batches) != 0 {
+			return fmt.Errorf("protocoles de revue mélangés")
+		}
+		if r.State == "passed" && (r.FragmentJournal.InspectionTask == "" || r.FragmentJournal.InspectionAttempt == "" || r.FragmentJournal.InspectionProducer == "") {
+			return fmt.Errorf("origine de l'inspection finale absente")
 		}
 		plan, journal, e := s.readFragmentJournalAnchor(r)
 		if e != nil {
 			return e
 		}
 		if r.FragmentJournal.FinalJournalDigest != "" || r.FragmentJournal.FinalJournal != "" {
-			if _, _, _, e = s.readManagedFragmentFinal(r, plan, journal); e != nil {
-				return e
+			final, context, prefix, err := s.readManagedFragmentFinal(r, plan, journal)
+			if err != nil {
+				return err
 			}
+			if r.State == "passed" {
+				state, records, err := validateManagedFragmentFinalJournal(final, journal, context, plan, prefix)
+				if err != nil {
+					return err
+				}
+				if state != "passed" || !reflect.DeepEqual(records, r.ManagedTasks) {
+					return fmt.Errorf("avis final des fragments absent ou différent des preuves")
+				}
+				bound := false
+				for _, record := range records {
+					if record.Attempt == r.Attempt && record.Producer == r.Producer && record.Contract == r.Contract && record.Report == r.GitReport && record.ReportDigest == r.Digest && reflect.DeepEqual(record.Criteria, r.Criteria) {
+						bound = true
+					}
+				}
+				if !bound {
+					return fmt.Errorf("critères finaux non attribués à cette tentative")
+				}
+			}
+		} else if r.State == "passed" {
+			return fmt.Errorf("journal du verdict final absent")
 		}
 	}
 	if depth > 128 {

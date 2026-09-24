@@ -349,6 +349,20 @@ func (s *Store) managedBatchProofsIntact(r IndependentReview) error {
 }
 
 func (s *Store) managedBatchPlanIntact(w Work, r IndependentReview) error {
+	if r.FragmentJournal != nil {
+		if w.Planning == nil || w.Planning.Reviewer == nil {
+			return fmt.Errorf("configuration de revue absente")
+		}
+		if err := s.managedBatchProviderIntact(w.Planning.Reviewer, r); err != nil {
+			return err
+		}
+		raw, _ := json.Marshal(w.Planning.Reviewer.ModelRoute)
+		if hash(raw) != r.FragmentJournal.ModelConfigDigest {
+			return fmt.Errorf("modèle des fragments modifié")
+		}
+		_, _, err := s.readFragmentJournalAnchor(r)
+		return err
+	}
 	if len(r.Batches) == 0 {
 		return nil
 	}
