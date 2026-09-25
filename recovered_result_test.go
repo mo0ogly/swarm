@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -372,5 +373,84 @@ func TestRecoveredResultTerminalAcrossReboot(t *testing.T) {
 	}
 	if !recoveryProcessEnded(a, a.Host, "") {
 		t.Fatal("gone same-boot process rejected")
+	}
+}
+
+func TestRecoveredResultRevisionAfterLegacyFragmentRefusal(t *testing.T) {
+	for _, mode := range []string{"valid", "transport", "tampered"} {
+		t.Run(mode, func(t *testing.T) {
+			s, w, a, r := recoveredResultFixture(t)
+			for _, name := range []string{"one.txt", "two.txt", "three.txt", "four.txt"} {
+				if err := os.WriteFile(filepath.Join(a.CWD, name), []byte(strings.Repeat("complete original evidence line\n", 2200)), 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			gitTest(t, a.CWD, "add", "-A")
+			r.ResultTree = gitTest(t, a.CWD, "write-tree")
+			if err := os.WriteFile(filepath.Join(s.root, "review-fixture/claude"), []byte(fragmentRuntimeProviderFixture), 0700); err != nil {
+				t.Fatal(err)
+			}
+			managedReviewMode(t, s, "fail")
+			if mode == "transport" {
+				managedReviewMode(t, s, "exit")
+			}
+			first, err := s.submitRecoveredResult(w.ID, r)
+			if err != nil {
+				t.Fatal(err)
+			}
+			task, _ := first.task(a.TaskID)
+			old := *task.IndependentReview
+			if old.FragmentJournal == nil {
+				t.Fatal("not a fragment review")
+			}
+			journalPath := filepath.Join(s.root, old.FragmentJournal.Journal)
+			original, err := os.ReadFile(journalPath)
+			if err != nil {
+				t.Fatal(err)
+			}
+			// Isolated fixture recreates the legacy state without changing live data.
+			task.IndependentReview.State = "error"
+			raw, _ := json.Marshal(first)
+			if _, err = s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+				t.Fatal(err)
+			}
+			if mode == "tampered" {
+				if err = os.WriteFile(journalPath, []byte("{}"), 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err = os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Explicitly corrected report with original evidence preserved"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			gitTest(t, a.CWD, "add", "-A")
+			next := r
+			next.EventID = "legacy-correction"
+			next.Revision = first.Revision
+			next.ReviewID = old.ID
+			next.ResultTree = gitTest(t, a.CWD, "write-tree")
+			calls := managedReviewCalls(t, s)
+			managedReviewMode(t, s, "pass")
+			after, err := s.planningChange(w.ID, "revise-recovered-result", next)
+			if mode != "valid" {
+				if err == nil || managedReviewCalls(t, s) != calls {
+					t.Fatal("invalid refusal allowed revision", err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			got, _ := after.task(a.TaskID)
+			if got.Status != "accepted" || got.RecoveredResult.PriorReview != old.ID || got.IndependentReview.CandidateSHA == old.CandidateSHA {
+				t.Fatal("correction missing fresh review", got.Status, got.Blocker)
+			}
+			preserved, err := os.ReadFile(journalPath)
+			if err != nil || string(preserved) != string(original) {
+				t.Fatal("original refusal altered")
+			}
+			if len(got.Attempts) != 1 || got.Attempts[0].Status != "interrupted" {
+				t.Fatal("production history altered")
+			}
+		})
 	}
 }

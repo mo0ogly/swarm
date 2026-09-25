@@ -90,7 +90,8 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			return Work{}, fmt.Errorf("un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite")
 		}
 	}
-	if revise && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || t.IndependentReview.State != "changes_requested") {
+	refused := s.recoveredReviewRefused(w, t.IndependentReview)
+	if revise && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || !refused) {
 		return Work{}, fmt.Errorf("révision corrective liée au dernier refus indépendant requise")
 	}
 	if w.Revision != r.Revision || t.Status != "blocked" || !currentTaskAttempt(t, r.Attempt) {
@@ -182,7 +183,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		if e != nil {
 			return e
 		}
-		if (!revise && task.RecoveredResult != nil) || (revise && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || task.IndependentReview.State != "changes_requested")) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
+		if (!revise && task.RecoveredResult != nil) || (revise && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewRefused(*current, task.IndependentReview))) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
 			return fmt.Errorf("tentative remplacée ou réparation déjà soumise")
 		}
 		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: tree, Actor: operatorIdentity(), At: now(), Reason: r.Reason, ProcessStatus: a.Status}
@@ -241,4 +242,19 @@ func recoveryProcessEnded(a Agent, currentHost, stamp string) bool {
 	old := strings.SplitN(a.Host, ":", 3)
 	current := strings.SplitN(currentHost, ":", 3)
 	return len(old) == 3 && len(current) == 3 && old[0] != "" && old[0] == current[0] && old[1] != "" && current[1] != "" && old[1] != current[1] && old[2] != "" && old[2] == current[2]
+}
+
+// Both preflight and commit check the legacy proof, not merely its state label.
+func (s *Store) recoveredReviewRefused(w Work, r *IndependentReview) bool {
+	if r == nil {
+		return false
+	}
+	if r.State == "changes_requested" {
+		return true
+	}
+	if r.State != "error" {
+		return false
+	}
+	reason, err := s.managedFragmentRefusal(*r)
+	return err == nil && reason != "" && s.managedReviewFilesIntact(*r) == nil && s.managedBatchPlanIntact(w, *r) == nil
 }

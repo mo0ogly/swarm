@@ -174,6 +174,12 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 				t.Fatal(e)
 			}
 			ft, _ := finished.task(a.TaskID)
+			if mode == "fail" && ft.IndependentReview.State != "changes_requested" {
+				t.Fatal("proved inspection refusal lost", ft.IndependentReview.State)
+			}
+			if mode == "exit" && ft.IndependentReview.State != "error" {
+				t.Fatal("transport failure became a refusal", ft.IndependentReview.State)
+			}
 			if ft.Status == "accepted" || finished.Planning.Reviewer.Calls != again.Planning.Reviewer.Calls {
 				t.Fatal("finalization published or charged")
 			}

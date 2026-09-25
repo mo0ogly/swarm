@@ -2,7 +2,11 @@
 
 package main
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestManagedFragmentFinishRequiresDurableDecision(t *testing.T) {
 	s, w, a, c, path, receipt := fragmentBeginFixture(t)
@@ -37,5 +41,48 @@ func TestManagedFragmentSaveRejectsStaleJournalAnchor(t *testing.T) {
 	task, _ := after.task(a.TaskID)
 	if task.IndependentReview.FragmentJournal.JournalDigest == "stale" || task.IndependentReview.State != "running" {
 		t.Fatal("journal mutated")
+	}
+}
+
+func TestManagedFragmentRefusalRequiresOriginalProof(t *testing.T) {
+	s, w, a, c, path, receipt := fragmentBeginFixture(t)
+	if err := os.WriteFile(filepath.Join(s.root, "review-fixture/claude"), []byte(fragmentRuntimeProviderFixture), 0700); err != nil {
+		t.Fatal(err)
+	}
+	managedReviewMode(t, s, "fail")
+	r, err := s.beginManagedFragmentReview(w, a, c, path, receipt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _, runErr := s.runManagedFragmentReview(w, a, r)
+	if runErr == nil {
+		t.Fatal("missing refusal")
+	}
+	w, err = s.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := w.task(a.TaskID)
+	r = *task.IndependentReview
+	reason, err := s.managedFragmentRefusal(r)
+	if err != nil || reason == "" {
+		t.Fatal(reason, err)
+	}
+	// The legacy error label is not authority; original proof remains necessary.
+	r.State = "error"
+	reason, err = s.managedFragmentRefusal(r)
+	if err != nil || reason == "" {
+		t.Fatal(reason, err)
+	}
+	before := managedReviewCalls(t, s)
+	journal := filepath.Join(s.root, r.FragmentJournal.Journal)
+	if err = os.WriteFile(journal, []byte("{}"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if reason, err = s.managedFragmentRefusal(r); err == nil || reason != "" {
+		t.Fatal("altered journal authorized correction")
+	}
+	if managedReviewCalls(t, s) != before {
+		t.Fatal("proof check spent a call")
 	}
 }

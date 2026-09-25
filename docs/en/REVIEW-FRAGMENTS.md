@@ -97,3 +97,18 @@ Original `unknown` inspections are never rewritten. Publication reconstructs pro
 ### Packet-bound provider contract
 
 The provider schema fixes the exact finding count, candidate and packet identities, index range and allowed artifact hashes. Its actual size is included in preflight before reservation. The engine still independently verifies uniqueness, index/hash associations, coverage, quotations and byte limits after receipt. A stricter schema does not prove analysis quality or provider reliability; incomplete output remains rejected and the actual call remains charged.
+
+### Early rejection and explicit correction
+
+An inspection can stop the review when it demonstrates a defect. This is stored
+as `changes_requested`, even when subsequent packets have not been read. It
+approves no criterion and cannot authorize publication. Transport failures stay
+`error`; their message is not evidence of a rejection.
+
+For legacy reviews stored as `error` despite a durable rejection,
+`planning revise-recovered-result` verifies the original journal, hashes,
+candidate, attempt, evidence files and current configuration before permitting
+an explicitly attributed correction. An altered journal or an interrupted call
+is insufficient. The old opinion remains unchanged, the external repair is
+identified as such, consumed budgets remain spent, and the new candidate must
+pass checks and independent review again.

@@ -115,3 +115,18 @@ La journalisation conserve les avis initiaux `unknown` sans les réécrire. À l
 ### Contrat fournisseur lié au paquet
 
 Le schéma envoyé à l’IA fixe le nombre exact de réponses attendues, les identités du candidat et du paquet, la plage des index et les empreintes autorisées. Sa taille réelle entre dans le précontrôle avant réservation. Le moteur conserve les vérifications indépendantes après réponse : unicité, association index/empreinte, couverture, citations et limites en octets. Un schéma plus contraignant ne démontre ni la qualité de l’analyse ni la fiabilité du fournisseur ; une réponse incomplète reste refusée et consomme l’appel effectivement lancé.
+
+### Refus partiel et correction explicite
+
+Une inspection peut arrêter la revue dès qu’elle démontre un défaut. Ce refus
+est enregistré comme `changes_requested`, même si les autres lots n’ont pas
+encore été lus. Il ne valide aucun critère et ne permet aucune publication.
+Une erreur de transport reste `error` ; son texte ne constitue pas un refus.
+
+Pour les anciennes revues enregistrées comme `error` malgré un refus durable,
+`planning revise-recovered-result` vérifie le journal original, ses empreintes,
+le candidat, la tentative, les fichiers de preuve et la configuration courante
+avant d’autoriser une correction explicitement déclarée. Un journal altéré ou
+une simple interruption ne suffit pas. L’ancien avis reste inchangé ; la
+réparation externe est attribuée comme telle, les compteurs restent consommés
+et le nouveau candidat doit repasser les contrôles et la revue indépendante.
