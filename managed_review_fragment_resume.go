@@ -54,14 +54,12 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 			return fmt.Errorf("avis de fragment défavorable ou inconnu : correction des preuves requise")
 		}
 	}
-	reusable, err := validateManagedFragmentJournal(j, p, j.Attempt, j.ProviderDigest)
+	budget, err := fragmentRecoveryBudget(p, j, w.Planning.Reviewer.Calls, w.Planning.Reviewer.MaxCalls)
 	if err != nil {
 		return err
 	}
-	required := len(p.Packets) - len(reusable) + p.ReservedFinalCalls
-	cfg := w.Planning.Reviewer
-	if cfg.MaxCalls-cfg.Calls < required {
-		return fmt.Errorf("budget insuffisant : %d appels restants nécessaires sans remboursement", required)
+	if budget.Missing > 0 {
+		return fmt.Errorf("budget insuffisant : %d appels nécessaires, %d disponibles ; plafond minimal %d à autoriser, sans remboursement", budget.Required, budget.Available, budget.MinimumLimit)
 	}
 	raw, err := json.Marshal(j)
 	if err != nil {

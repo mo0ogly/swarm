@@ -95,3 +95,9 @@ Les nouveaux lots doivent aussi permettre une réponse complète : le moteur mes
 Une erreur de processus indique désormais les octets reçus, le nombre d’événements JSON analysés, le dernier type reconnu et la présence d’un événement final. Ces compteurs ne prouvent ni progression utile ni validation. Les événements sont analysés dans la limite de lecture existante ; les octets supplémentaires sont drainés et comptés. Aucun contenu de message ni identifiant n’est ajouté à ces compteurs. Un délai peut ainsi être distingué d’une absence totale de sortie, sans attribuer arbitrairement sa cause au fournisseur. Les délais, budgets et règles de reprise restent inchangés.
 
 Lors d’une reprise explicite, le délai est relu dans la configuration actuelle du vérificateur et enregistré sur la revue reprise. Les preuves, réservations et appels consommés sont conservés. Modifier ce délai ne relance rien et ne garantit pas que le fournisseur terminera.
+
+### Préparer une reprise depuis le moteur
+
+`swarm planning recovery-preview WORK --input demande.json`, avec `{"task_id":"ID"}`, expose une décision en lecture seule. Même contrat HTTP : `GET /api/v1/planning?work=WORK&action=recovery-preview&task=ID`. Le moteur vérifie candidat, preuves et journal, compte les inspections réutilisables et calcule les appels encore requis (inspections et réserve finale), disponibles et manquants, ainsi que le plafond minimal. Le refus de `retry-review` utilise le même calcul. Aucun appel ni augmentation de plafond ne résulte du précontrôle.
+
+La décision distingue une autorisation budgétaire nécessaire et une correction de précondition nécessaire. Un budget suffisant ne démontre pas que la cause du dernier échec a disparu. Une revue finale déjà engagée, un ancien plan trop volumineux ou une preuve incohérente sont refusés explicitement : ce précontrôle couvre les inspections interrompues, pas toutes les reprises possibles.

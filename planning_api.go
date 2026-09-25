@@ -13,7 +13,7 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 		return s.managedBundle(pos[2], pos[3])
 	}
 	if len(pos) != 3 {
-		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|authorize-recovery|requalify|fragment-preview|submit-recovered-result|retry-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
+		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|authorize-recovery|requalify|recovery-preview|fragment-preview|submit-recovered-result|retry-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
 	}
 	if pos[1] == "review-step" {
 		return s.independentReviewStep(pos[2])
@@ -57,6 +57,13 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 	if err = strict(raw, &r); err != nil {
 		return err
 	}
+	if pos[1] == "recovery-preview" {
+		v, e := s.reviewRecoveryPreview(pos[2], r.Task)
+		if e != nil {
+			return e
+		}
+		return printJSON(out, v)
+	}
 	if pos[1] == "fragment-preview" {
 		p, e := s.previewManagedFragments(pos[2], r.Task)
 		if e != nil {
@@ -87,6 +94,15 @@ func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWrit
 	})
 	mux.HandleFunc("/api/v1/planning", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
+		if r.Method == "GET" && r.URL.Query().Get("action") == "recovery-preview" {
+			v, e := s.reviewRecoveryPreview(work, r.URL.Query().Get("task"))
+			if e != nil {
+				fail(w, e)
+				return
+			}
+			send(w, v)
+			return
+		}
 		if r.Method == "GET" && r.URL.Query().Get("action") == "fragment-preview" {
 			p, e := s.previewManagedFragments(work, r.URL.Query().Get("task"))
 			if e != nil {

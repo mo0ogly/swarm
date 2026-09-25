@@ -77,3 +77,9 @@ New packets must also accommodate a complete response: the engine measures one `
 Process errors include received bytes, parsed JSON event count, the last recognized event type, and whether a final event was observed. These counters prove neither useful progress nor acceptance. Events are parsed within the existing input limit; additional bytes are drained and counted. Counters contain no message content or identifiers. They distinguish a silent call from output without completion, without claiming a provider root cause. Deadlines, budgets and recovery rules remain unchanged.
 
 An explicit retry reads the current reviewer deadline and records it on the resumed review. Evidence, reservations and consumed calls are preserved. Changing the deadline neither triggers a retry nor guarantees provider completion.
+
+### Engine recovery preview
+
+Run `swarm planning recovery-preview WORK --input request.json` with `{"task_id":"ID"}`, or GET `/api/v1/planning?work=WORK&action=recovery-preview&task=ID`. The engine verifies candidate evidence and the durable journal, counts reusable inspections, and reports remaining calls, available calls, missing calls and minimum review limit. Retry refusal uses the same budget calculation. Preview never calls a provider or changes limits.
+
+Sufficient budget is not proof that the previous failure has been corrected. An existing final decision journal, an oversized historical plan or inconsistent evidence is explicitly refused. This preview covers interrupted inspections, not every recovery phase.
