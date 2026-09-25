@@ -64,6 +64,33 @@ For text APIs, open **AI and connections → Add an AI connection**, enter a com
 These connections can prepare, plan and review; they do not automatically gain
 file editing tools.
 
+### Skynet from the container, through the host proxy
+
+The Skynet harness installed **on the host** provides an OpenAI-compatible LiteLLM
+proxy on `127.0.0.1:4010`. With `network_mode: host`, the container reaches it at
+the same address: the image does not change and Skynet keys stay on the host.
+
+In **AI and connections**, add a connection with service URL
+`http://127.0.0.1:4010/v1`, a route name exposed by the proxy as model ID, and the
+proxy's local master key (`general_settings.master_key` in its LiteLLM
+configuration). List the routes from the container:
+
+```sh
+docker compose --env-file deploy/install.env exec swarm \
+  sh -c 'curl -s -H "Authorization: Bearer $PROXY_KEY" http://127.0.0.1:4010/v1/models'
+```
+
+Replace `$PROXY_KEY` with the proxy master key; do not store it in a tracked file.
+This connection prepares, plans and reviews; it does not edit files. Running a
+tool-enabled `skynet_harness` agent inside the container requires installing and
+configuring it there and is not covered by this recipe.
+
+Proxy routes follow the catalogue published by Skynet. An upstream `404` usually
+means stale routes: update the harness **on the host**, re-run its installer, then
+check with `skynet-doctor`. Swarm never falls back to another model automatically.
+
+### Tool-enabled agents
+
 For implementation, install a tool-enabled agent inside the container and
 follow its publisher's authentication instructions:
 

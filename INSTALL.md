@@ -83,6 +83,31 @@ Le protocole attendu est compatible avec `POST /chat/completions`. Une connexion
 
 Avec le réseau hôte Linux, une API locale peut être joignable par exemple à `http://127.0.0.1:11434/v1`, si vous avez effectivement lancé un service compatible à cette adresse.
 
+### Skynet depuis le conteneur, par le proxy de l’hôte
+
+Le harnais Skynet installé **sur l’hôte** fournit un proxy LiteLLM compatible OpenAI sur `127.0.0.1:4010`. Grâce à `network_mode: host`, le conteneur joint ce proxy à la même adresse : aucune modification de l’image n’est nécessaire, et les clés Skynet restent sur l’hôte.
+
+Dans **IA et connexions**, ajoutez une connexion :
+
+| Champ | Valeur |
+| --- | --- |
+| Adresse du service | `http://127.0.0.1:4010/v1` |
+| Modèle | Un nom de route exposé par le proxy |
+| Clé | La clé maîtresse locale du proxy (`general_settings.master_key` dans sa configuration LiteLLM) |
+
+Lister les routes disponibles depuis le conteneur :
+
+```sh
+docker compose --env-file deploy/install.env exec swarm \
+  sh -c 'curl -s -H "Authorization: Bearer $CLE_PROXY" http://127.0.0.1:4010/v1/models'
+```
+
+Remplacez `$CLE_PROXY` par la clé maîtresse du proxy, sans l’enregistrer dans un fichier suivi par Git.
+
+Cette connexion prépare, planifie et examine ; elle ne modifie pas les fichiers. Pour un agent Skynet disposant d’outils dans le conteneur, `skynet_harness` doit y être installé et configuré : ce parcours n’est pas couvert par cette recette.
+
+Les routes du proxy suivent le catalogue publié par Skynet. Une erreur `404` du service amont signale en général des routes périmées : mettez à jour le harnais **sur l’hôte**, relancez son installateur, puis vérifiez avec `skynet-doctor`. Swarm ne bascule jamais automatiquement vers un autre modèle.
+
 ### Agents capables de modifier le projet
 
 Le dépôt GitHub contient les adaptateurs de Swarm, pas les programmes Claude Code, Codex ou Skynet, ni les poids des modèles. La commande `skynet_harness` est reconnue par le routage des modèles lorsqu’elle est installée et déclarée comme fournisseur ; cette reconnaissance ne constitue pas une installation ni une recette de bout en bout.

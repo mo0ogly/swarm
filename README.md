@@ -225,6 +225,15 @@ Les commandes de mutation utilisent des contrats explicites décrits dans la [r�
 
 Les connexions personnalisées utilisent un service compatible avec **`POST /chat/completions`**. Elles ne donnent pas automatiquement au modèle des outils pour modifier le projet. La compatibilité avec un fournisseur doit être testée ; une adresse et un nom de modèle ne suffisent pas à la garantir.
 
+### Skynet par le proxy local
+
+Le harnais Skynet (`skynet_harness`) installe sur votre poste un proxy LiteLLM compatible OpenAI, joignable sur `127.0.0.1:4010`. Swarm peut l’utiliser de deux façons :
+
+- **Connexion API** : adresse `http://127.0.0.1:4010/v1`, un nom de route exposé par le proxy comme identifiant de modèle (liste : `GET /v1/models`), et la clé maîtresse locale du proxy (`general_settings.master_key` de sa configuration LiteLLM).
+- **Agent avec outils** : la commande `skynet_harness`, déclarée comme fournisseur, est reconnue par le routage des modèles.
+
+Les routes du proxy suivent le catalogue publié par Skynet. Si les appels échouent avec une erreur `404` du service amont, mettez à jour le harnais et relancez son installateur, puis vérifiez les routes avec `skynet-doctor`. Swarm ne bascule jamais automatiquement vers un autre modèle.
+
 ## Où vont les données ?
 
 Les missions et leur historique sont conservés dans le dossier `.swarm/` du projet, notamment dans une base SQLite. Les fournisseurs externes reçoivent le contexte nécessaire aux appels qui leur sont confiés : **local ne signifie pas que les modèles tournent tous sur votre machine**.

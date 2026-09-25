@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     # Swarm refuses public listeners. Linux host networking preserves loopback.
+    # It also lets the container reach host-local model proxies, such as the
+    # Skynet harness LiteLLM proxy on 127.0.0.1:4010, without extra mounts.
     network_mode: host
     init: true
     user: "${SWARM_UID:-1000}:${SWARM_GID:-1000}"

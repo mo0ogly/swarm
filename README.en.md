@@ -82,6 +82,13 @@ For native installation, configuration, authentication and remote access, see
 Claude Code, Codex, Skynet or your chosen compatible agent separately. A text API
 connection can plan and review; it cannot by itself edit project files.
 
+**Skynet:** the Skynet harness runs an OpenAI-compatible LiteLLM proxy on
+`127.0.0.1:4010`. Add it as an API connection (`http://127.0.0.1:4010/v1`, a route
+name from `GET /v1/models`, the proxy's local master key); the Docker install
+reaches it through host networking. If calls fail with an upstream `404`, update
+the harness, re-run its installer and check with `skynet-doctor`. See the
+[installation guide](docs/en/INSTALL.md).
+
 ## CLI
 
 Web and CLI share project state when they use the same `--root`.
