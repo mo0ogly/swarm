@@ -32,8 +32,42 @@ Pour inspected, evidence doit être un court extrait contigu exact de la pièce,
 Chaque reason et evidence doit tenir dans 96 octets JSON hors guillemets, échappements compris (privilégier une courte phrase et un court extrait). Garde chaque raison et extrait très concis : la réponse totale doit tenir dans 16 Kio. Les autres fragments et la décision finale seront traités séparément ; ne présume pas leurs résultats.
 `
 	prompt := prefix + "\n" + instructions + "\npacket_sha256=" + hash(raw) + "\nSWARM_FRAGMENT_PACKET\n" + string(raw)
-	if len(prompt)+len(managedFragmentInspectionSchema) > managedReviewPromptLimit {
+	if len(prompt)+len(managedFragmentPacketSchema(p)) > managedReviewPromptLimit {
 		return "", fmt.Errorf("consignes et paquet d’inspection dépassent la limite ; aucun envoi tronqué")
 	}
 	return prompt, nil
+}
+
+// Give the provider the same packet cardinality and identity constraints that the
+// engine enforces after transport. The parser remains authoritative for uniqueness,
+// index/digest association, quotations, byte limits and actual coverage.
+func managedFragmentPacketSchema(p managedReviewFragmentPacket) string {
+	var schema map[string]any
+	if err := json.Unmarshal([]byte(managedFragmentInspectionSchema), &schema); err != nil {
+		panic(err)
+	}
+	properties := schema["properties"].(map[string]any)
+	raw, _ := json.Marshal(p)
+	for name, value := range map[string]string{"candidate_commit": p.Candidate, "context_sha256": p.ContextDigest, "packet_sha256": hash(raw)} {
+		properties[name] = map[string]any{"type": "string", "enum": []string{value}}
+	}
+	findings := properties["findings"].(map[string]any)
+	findings["minItems"] = len(p.Artifacts)
+	findings["maxItems"] = len(p.Artifacts)
+	item := findings["items"].(map[string]any)["properties"].(map[string]any)
+	item["artifact"].(map[string]any)["maximum"] = len(p.Artifacts) - 1
+	digests := make([]string, 0, len(p.Artifacts))
+	seen := map[string]bool{}
+	for _, a := range p.Artifacts {
+		if !seen[a.Digest] {
+			digests = append(digests, a.Digest)
+			seen[a.Digest] = true
+		}
+	}
+	item["sha256"] = map[string]any{"type": "string", "enum": digests}
+	encoded, err := json.Marshal(schema)
+	if err != nil {
+		panic(err)
+	}
+	return string(encoded)
 }

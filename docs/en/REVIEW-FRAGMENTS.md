@@ -93,3 +93,7 @@ A completed `unknown` inspection is durable evidence of uncertainty, not approva
 When questions exist, the final response contains `review` and `resolutions`. Every question requires exactly one independent resolution with a rationale and, for `resolved`, a quotation from visible original evidence. Missing or duplicate resolutions and invented quotations invalidate the response. Any unresolved or failed question prevents acceptance even when all task criteria claim `pass`. Missing explicit questions, tampered evidence and oversized context remain blockers. Actual message sizes are rechecked without truncation.
 
 Original `unknown` inspections are never rewritten. Publication reconstructs prompts and revalidates all resolutions. Historical reviews without questions retain their format. The engine checks identity, coverage and quotations; semantic relevance remains the independent reviewer's responsibility.
+
+### Packet-bound provider contract
+
+The provider schema fixes the exact finding count, candidate and packet identities, index range and allowed artifact hashes. Its actual size is included in preflight before reservation. The engine still independently verifies uniqueness, index/hash associations, coverage, quotations and byte limits after receipt. A stricter schema does not prove analysis quality or provider reliability; incomplete output remains rejected and the actual call remains charged.

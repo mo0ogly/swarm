@@ -130,7 +130,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if e = refresh(); e != nil {
 			return "", nil, e
 		}
-		reply, callErr := call(id, prompt, managedFragmentInspectionSchema)
+		reply, callErr := call(id, prompt, managedFragmentPacketSchema(packet))
 		state := "interrupted"
 		if callErr == nil {
 			state, _, callErr = parseManagedFragmentInspection(reply, packet)
