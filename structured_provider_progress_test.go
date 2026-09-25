@@ -27,6 +27,7 @@ func TestStructuredProviderProgressCounters(t *testing.T) {
 func TestStructuredProviderTimeoutProgress(t *testing.T) {
 	for _, tc := range []struct{ name, line, expected string }{
 		{"silent", "", "0 octets, 0 événements JSON"},
+		{"retry", `printf '%s\n' '{"type":"system","subtype":"api_retry","error":"PRIVATE"}'`, "relances API signalées=1"},
 		{"active", `printf '%s\n' '{"type":"assistant","secret":"PRIVATE"}'`, "1 événements JSON, dernier type=assistant"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -39,5 +40,22 @@ func TestStructuredProviderTimeoutProgress(t *testing.T) {
 				t.Fatalf("unexpected diagnostic: %v", err)
 			}
 		})
+	}
+}
+
+func TestStructuredProviderDistinguishesSystemActivity(t *testing.T) {
+	input := `{"type":"system","subtype":"init"}
+{"type":"system","subtype":"api_retry","error":"PRIVATE"}
+{"type":"system","subtype":"api_retry"}
+{"type":"assistant","message":"PRIVATE"}
+{"type":"system","subtype":"PRIVATE"}
+`
+	out := readAssistOutput(strings.NewReader(input))
+	if out.systemEvents != 4 || out.apiRetries != 2 || out.assistantEvents != 1 || out.lastSystemSubtype != "other" || out.finalSeen {
+		t.Fatalf("incorrect activity classification: %+v", out)
+	}
+	diagnostic := out.progressDiagnostic()
+	if strings.Contains(diagnostic, "PRIVATE") || !strings.Contains(diagnostic, "relances API signalées=2") {
+		t.Fatal(diagnostic)
 	}
 }

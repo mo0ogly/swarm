@@ -142,10 +142,14 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 }
 
 type assistOutput struct {
-	streamBytes int64
-	events      int
-	lastEvent   string
-	finalSeen   bool
+	streamBytes       int64
+	events            int
+	lastEvent         string
+	finalSeen         bool
+	assistantEvents   int
+	systemEvents      int
+	apiRetries        int
+	lastSystemSubtype string
 
 	cooldown      *ProviderCooldown
 	cooldownError error
@@ -171,6 +175,16 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 		}
 		out.events++
 		out.lastEvent = assistEventKind(data["type"])
+		if data["type"] == "assistant" {
+			out.assistantEvents++
+		}
+		if data["type"] == "system" {
+			out.systemEvents++
+			out.lastSystemSubtype = assistSystemSubtype(data["subtype"])
+			if data["subtype"] == "api_retry" {
+				out.apiRetries++
+			}
+		}
 		if data["type"] == "result" || data["type"] == "turn.completed" {
 			out.finalSeen = true
 		}
@@ -278,10 +292,20 @@ func assistEventKind(v any) string {
 		return "other"
 	}
 }
+
+// Only protocol labels are retained; arbitrary provider values may contain secrets.
+func assistSystemSubtype(v any) string {
+	switch v {
+	case "init", "api_retry", "status", "compact_boundary", "hook_started", "hook_progress", "hook_response", "task_started", "task_progress", "task_notification":
+		return v.(string)
+	default:
+		return "other"
+	}
+}
 func (o assistOutput) progressDiagnostic() string {
 	last := o.lastEvent
 	if last == "" {
 		last = "none"
 	}
-	return fmt.Sprintf("sortie fournisseur : %d octets, %d événements JSON, dernier type=%s, événement final=%t ; ceci ne vaut pas validation", o.streamBytes, o.events, last, o.finalSeen)
+	return fmt.Sprintf("sortie fournisseur : %d octets, %d événements JSON, dernier type=%s, événement final=%t ; messages assistant=%d, événements système=%d, relances API signalées=%d, dernier sous-type système=%s ; ceci ne vaut pas validation", o.streamBytes, o.events, last, o.finalSeen, o.assistantEvents, o.systemEvents, o.apiRetries, o.lastSystemSubtype)
 }

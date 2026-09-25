@@ -83,3 +83,5 @@ An explicit retry reads the current reviewer deadline and records it on the resu
 Run `swarm planning recovery-preview WORK --input request.json` with `{"task_id":"ID"}`, or GET `/api/v1/planning?work=WORK&action=recovery-preview&task=ID`. The engine verifies candidate evidence and the durable journal, counts reusable inspections, and reports remaining calls, available calls, missing calls and minimum review limit. Retry refusal uses the same budget calculation. Preview never calls a provider or changes limits.
 
 Sufficient budget is not proof that the previous failure has been corrected. An existing final decision journal, an oversized historical plan or inconsistent evidence is explicitly refused. This preview covers interrupted inspections, not every recovery phase.
+
+Diagnostics also distinguish assistant messages, system events and provider-declared `system/api_retry` events. Only predefined subtypes are retained; unknown values become `other`. A system event does not demonstrate ongoing analysis. Historical failures lacking these counters cannot be retrospectively reclassified.
