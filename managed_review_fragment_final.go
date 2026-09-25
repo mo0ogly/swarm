@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // Only original quoted bytes become final-review evidence. Inspection rationale
@@ -16,6 +17,7 @@ type managedFragmentFinalEvidence struct {
 	PlanDigest    string                            `json:"plan_sha256"`
 	ReplyDigests  []string                          `json:"reply_sha256"`
 	Evidence      []managedFragmentOriginalEvidence `json:"original_evidence"`
+	Questions     []managedFragmentQuestion         `json:"unresolved_questions,omitempty"`
 }
 type managedFragmentOriginalEvidence struct {
 	Packet   int    `json:"packet"`
@@ -42,7 +44,7 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 		if e != nil {
 			return empty, e
 		}
-		if state != "inspected" {
+		if state != "inspected" && state != "unknown" {
 			return empty, fmt.Errorf("fragment %d : défaut ou preuve manquante, décision finale interdite", i)
 		}
 		byIndex := map[int]managedFragmentFinding{}
@@ -52,6 +54,17 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 		out.ReplyDigests = append(out.ReplyDigests, hash([]byte(replies[i])))
 		for j, a := range packet.Artifacts {
 			finding := byIndex[j]
+			if finding.Verdict == "unknown" {
+				if len(finding.Needs) == 0 {
+					return empty, fmt.Errorf("question sans demande de preuve explicite")
+				}
+				if finding.Evidence != "" && !strings.Contains(a.Content, finding.Evidence) {
+					return empty, fmt.Errorf("extrait de question non original")
+				}
+				for n, need := range finding.Needs {
+					out.Questions = append(out.Questions, managedFragmentQuestion{i, j, n, need})
+				}
+			}
 			out.Evidence = append(out.Evidence, managedFragmentOriginalEvidence{Packet: i, Artifact: j, Kind: a.Kind, Name: a.Name, Digest: a.Digest, Excerpt: finding.Evidence, Opinion: finding.Reason})
 		}
 	}

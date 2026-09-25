@@ -11,7 +11,7 @@ import (
 )
 
 func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
-	for _, mode := range []string{"pass", "decision-fail", "retry", "exit", "exit-second", "exit-selection", "exit-decision"} {
+	for _, mode := range []string{"pass", "decision-fail", "retry", "exit", "exit-second", "exit-selection", "exit-decision", "questions-resolved", "questions-open"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w := managedFixture(t)
 			a := managedCompleted(t, s, w, "first", "candidate\n")
@@ -69,7 +69,7 @@ func TestManagedFragmentIntegrationPublishesOnlyFinalVerdict(t *testing.T) {
 			if task.IndependentReview == nil || task.IndependentReview.FragmentJournal == nil {
 				t.Fatal("fragment path not used", task.Blocker)
 			}
-			if mode == "pass" || mode == "retry" {
+			if mode == "pass" || mode == "retry" || mode == "questions-resolved" {
 				if task.Status != "accepted" || after.Planning.Repository.Candidate == w.Planning.Repository.Candidate || !s.acceptedFresh(&after, task, map[string]bool{}) {
 					t.Fatal("candidate not accepted", task.Status, task.Blocker)
 				}

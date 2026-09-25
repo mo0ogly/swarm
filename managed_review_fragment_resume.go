@@ -49,7 +49,7 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 			anchor.ResumeCalls = append(anchor.ResumeCalls, entry.CallID)
 		case "interrupted":
 			anchor.ResumeCalls = append(anchor.ResumeCalls, entry.CallID)
-		case "inspected":
+		case "inspected", "unknown":
 		default:
 			return fmt.Errorf("avis de fragment défavorable ou inconnu : correction des preuves requise")
 		}

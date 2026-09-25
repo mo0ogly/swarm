@@ -103,3 +103,11 @@ Lors d’une reprise explicite, le délai est relu dans la configuration actuell
 La décision distingue une autorisation budgétaire nécessaire et une correction de précondition nécessaire. Un budget suffisant ne démontre pas que la cause du dernier échec a disparu. Une revue finale déjà engagée, un ancien plan trop volumineux ou une preuve incohérente sont refusés explicitement : ce précontrôle couvre les inspections interrompues, pas toutes les reprises possibles.
 
 Le diagnostic distingue également les messages assistant, les événements système et les événements `system/api_retry` déclarés par le fournisseur. Seuls des sous-types prédéfinis sont conservés ; les valeurs inconnues deviennent `other`. Un événement système ne démontre pas une analyse en cours. Les anciens incidents sans ces compteurs ne peuvent pas être requalifiés rétrospectivement.
+
+## Réserves de contexte entre fragments
+
+Une inspection `unknown` achevée reste un avis durable : elle ne vaut pas conformité. Elle est réutilisée sans refaire payer le même lot, et les lots suivants sont examinés. Un défaut `fail` reste un arrêt. La sélection finale reçoit toutes les demandes `needs`, identifiées par lot, pièce et index ; elle doit chercher les originaux nécessaires dans l’inventaire complet.
+
+En présence de réserves, la réponse finale contient `review` et `resolutions`. Chaque réserve exige exactement une résolution indépendante, avec justification et, pour `resolved`, une citation originale visible. Une réserve oubliée, dupliquée ou une citation inventée invalide la réponse. Une réserve `unknown` ou `fail` interdit l’acceptation même si tous les critères de tâche annoncent `pass`. Une inspection sans demande explicite, une preuve altérée ou un contexte trop grand reste bloquant. Les tailles réelles sont recontrôlées, sans troncature.
+
+La journalisation conserve les avis initiaux `unknown` sans les réécrire. À la publication, le moteur reconstruit les messages et vérifie à nouveau toutes les résolutions. Les anciens parcours sans réserve conservent leur format. Le moteur vérifie identités, couverture et citations ; la pertinence sémantique de la réponse appartient au vérificateur indépendant.

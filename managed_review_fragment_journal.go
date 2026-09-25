@@ -26,7 +26,7 @@ type managedFragmentJournalEntry struct {
 	ReplyDigest  string `json:"reply_sha256,omitempty"`
 }
 
-// Returns ONLY reusable inspected packets. Reserved/interrupted calls remain
+// Returns reusable completed inspections, including unresolved questions. Reserved/interrupted calls remain
 // spent but non-reusable; neither this result nor a complete journal is a verdict.
 func validateManagedFragmentJournal(j managedFragmentJournal, p managedReviewFragmentPlan, attempt, provider string) (map[int]string, error) {
 	raw, e := json.Marshal(p)
@@ -66,7 +66,7 @@ func validateManagedFragmentJournal(j managedFragmentJournal, p managedReviewFra
 			if err != nil || state != entry.State {
 				return nil, fmt.Errorf("verdict du journal différent de la réponse originale")
 			}
-			if state == "inspected" {
+			if state == "inspected" || state == "unknown" {
 				reusable[entry.Packet] = entry.Reply
 			}
 		default:

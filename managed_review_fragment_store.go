@@ -142,7 +142,7 @@ func fragmentJournalTransition(old, next managedFragmentJournal) (string, error)
 	}
 	if len(next.Entries) == len(old.Entries)+1 && (len(old.Entries) == 0 || reflect.DeepEqual(next.Entries[:len(old.Entries)], old.Entries)) {
 		for _, entry := range old.Entries {
-			if entry.State == "reserved" || entry.State == "unknown" || entry.State == "changes_requested" {
+			if entry.State == "reserved" || entry.State == "changes_requested" {
 				return "", fmt.Errorf("inspection précédente non résolue")
 			}
 		}

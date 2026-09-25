@@ -72,7 +72,7 @@ func (s *Store) reviewRecoveryPreview(work, id string) (ReviewRecovery, error) {
 		}
 	}
 	for _, entry := range j.Entries {
-		if entry.State != "interrupted" && entry.State != "inspected" {
+		if entry.State != "interrupted" && entry.State != "inspected" && entry.State != "unknown" {
 			return ReviewRecovery{}, fmt.Errorf("inspection non récupérable : %s", entry.State)
 		}
 	}

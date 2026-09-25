@@ -118,7 +118,7 @@ func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j manage
 				if len(call.Reply) > managedFragmentReplyLimit {
 					return "", nil, fmt.Errorf("avis final trop grand")
 				}
-				state, records, err = parseManagedReview(call.Reply, visible)
+				state, records, err = parseManagedFragmentDecision(call.Reply, visible, c, p, replies)
 				if err != nil {
 					return "", nil, err
 				}

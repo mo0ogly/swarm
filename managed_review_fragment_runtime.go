@@ -113,7 +113,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 					authorized = true
 				}
 			}
-			if entry.State == "reserved" || (entry.State == "interrupted" && !authorized) || entry.State == "unknown" || entry.State == "changes_requested" {
+			if entry.State == "reserved" || (entry.State == "interrupted" && !authorized) || entry.State == "changes_requested" {
 				return entry.State, nil, fmt.Errorf("inspection inachevée ; reprise explicite requise")
 			}
 		}
@@ -152,7 +152,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if callErr != nil {
 			return "error", nil, callErr
 		}
-		if state != "inspected" {
+		if state != "inspected" && state != "unknown" {
 			return state, nil, fmt.Errorf("inspection %d : %s", i+1, state)
 		}
 	}
@@ -197,7 +197,12 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if state == "pending" {
 			prompt, e = managedFragmentRequestPrompt(prefix, c, p, replies)
 		} else {
-			phase, schema = "decision", managedReviewSchema
+			phase = "decision"
+			bundle, bundleErr := managedFragmentFinalBundle(c, p, replies)
+			if bundleErr != nil {
+				return "", nil, bundleErr
+			}
+			schema = fragmentDecisionSchema(bundle)
 			selectionReply := ""
 			for _, prior := range f.Calls {
 				if prior.Phase == "selection" && prior.State == "ready" {
@@ -232,7 +237,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 				callErr = parseErr
 				returned = request.State
 			} else {
-				returned, _, callErr = parseManagedReview(reply, visible)
+				returned, _, callErr = parseManagedFragmentDecision(reply, visible, c, p, replies)
 			}
 		}
 		entry := &f.Calls[len(f.Calls)-1]

@@ -85,3 +85,11 @@ Run `swarm planning recovery-preview WORK --input request.json` with `{"task_id"
 Sufficient budget is not proof that the previous failure has been corrected. An existing final decision journal, an oversized historical plan or inconsistent evidence is explicitly refused. This preview covers interrupted inspections, not every recovery phase.
 
 Diagnostics also distinguish assistant messages, system events and provider-declared `system/api_retry` events. Only predefined subtypes are retained; unknown values become `other`. A system event does not demonstrate ongoing analysis. Historical failures lacking these counters cannot be retrospectively reclassified.
+
+## Cross-fragment context questions
+
+A completed `unknown` inspection is durable evidence of uncertainty, not approval. It can be reused without charging for the same packet again while remaining packets are inspected. A demonstrated `fail` still stops the review. Final evidence selection receives every `needs` question, identified by packet, artifact and index, and selects required originals from the complete inventory.
+
+When questions exist, the final response contains `review` and `resolutions`. Every question requires exactly one independent resolution with a rationale and, for `resolved`, a quotation from visible original evidence. Missing or duplicate resolutions and invented quotations invalidate the response. Any unresolved or failed question prevents acceptance even when all task criteria claim `pass`. Missing explicit questions, tampered evidence and oversized context remain blockers. Actual message sizes are rechecked without truncation.
+
+Original `unknown` inspections are never rewritten. Publication reconstructs prompts and revalidates all resolutions. Historical reviews without questions retain their format. The engine checks identity, coverage and quotations; semantic relevance remains the independent reviewer's responsibility.

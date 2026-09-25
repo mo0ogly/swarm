@@ -24,18 +24,22 @@ if '\nSWARM_FRAGMENT_PACKET\n' in text:
  packet=json.loads(text.split('\nSWARM_FRAGMENT_PACKET\n',1)[1])
  reply={'candidate_commit':packet['candidate_commit'],'context_sha256':packet['context_sha256'],'packet_sha256':re.search(r'packet_sha256=([a-f0-9]+)',text).group(1),'findings':[]}
  for i,a in enumerate(packet['artifacts']):
-  reply['findings'].append({'artifact':i,'sha256':a['sha256'],'verdict':mode if mode in ('fail','unknown') else 'inspected','reason':'Fixture inspection','evidence':a['content'][:16],'needs':[]})
+  reply['findings'].append({'artifact':i,'sha256':a['sha256'],'verdict':('unknown' if mode.startswith('questions-') and i==0 else mode if mode in ('fail','unknown') else 'inspected'),'reason':'Fixture inspection','evidence':a['content'][:16],'needs':['Confirm original content is present'] if mode.startswith('questions-') and i==0 else []})
 elif '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n',1)[1]);b=payload['partial_inspections']
  reply={'candidate_commit':b['candidate_commit'],'context_sha256':b['context_sha256'],'plan_sha256':b['plan_sha256'],'state':'unknown' if mode=='selection-unknown' else 'ready','reason':'Fixture selection of original evidence','references':[]}
 else:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_FINAL_EVIDENCE\n',1)[1]);c=payload['task_contracts_reports_controls']
  reply={'candidate_commit':c['candidate_commit'],'tasks':[{'task':t['task'],'reason':'Fixture original report and control evidence','criteria':[{'index':i+1,'verdict':'fail' if mode=='decision-fail' else 'pass','evidence':t['report'][:24]} for i,_ in enumerate(t['criteria'])]} for t in c['tasks']]}
+ if mode.startswith('questions-'):
+  qs=payload['partial_inspections']['unresolved_questions']
+  reply={'review':reply,'resolutions':[{'packet':q['packet'],'artifact':q['artifact'],'need_index':q['need_index'],'verdict':'unknown' if mode=='questions-open' else 'resolved','reason':'Fixture cites original visible report','evidence':c['tasks'][0]['report'][:24]} for q in qs]}
+  if mode=='questions-omitted': reply['resolutions']=[]
 print(json.dumps({'type':'result','result':json.dumps(reply)}))
 `
 
 func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
-	for _, mode := range []string{"pass", "fail", "unknown", "exit", "selection-unknown", "decision-fail"} {
+	for _, mode := range []string{"pass", "fail", "unknown", "exit", "selection-unknown", "decision-fail", "questions-resolved", "questions-open", "questions-omitted"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w, a, c, path, receipt := fragmentBeginFixture(t)
 			if e := os.WriteFile(filepath.Join(s.root, "review-fixture/claude"), []byte(fragmentRuntimeProviderFixture), 0700); e != nil {
@@ -54,11 +58,24 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 			state, records, runErr := s.runManagedFragmentReview(w, a, r)
 			wantCalls := len(p.Packets) + 2
 			switch mode {
-			case "pass":
+			case "pass", "questions-resolved":
 				if runErr != nil || state != "passed" || len(records) != len(c.Tasks) {
 					t.Fatal(state, runErr)
 				}
-			case "fail", "unknown":
+			case "questions-open":
+				if runErr != nil || state != "unknown" {
+					t.Fatal(state, runErr)
+				}
+			case "questions-omitted":
+				if runErr == nil || state == "passed" {
+					t.Fatal("omitted reservations accepted", state, runErr)
+				}
+			case "unknown":
+				wantCalls = len(p.Packets)
+				if runErr == nil || state == "passed" {
+					t.Fatal(state, runErr)
+				}
+			case "fail":
 				wantCalls = 1
 				if runErr == nil || state == "passed" {
 					t.Fatal(state, runErr)
@@ -98,7 +115,7 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 				}
 			}
 			proofErr := s.managedReviewFilesIntact(claimed)
-			if mode == "pass" {
+			if mode == "pass" || mode == "questions-resolved" {
 				if proofErr != nil {
 					t.Fatal(proofErr)
 				}
@@ -145,7 +162,7 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 				t.Fatal("reentry spent more calls")
 			}
 			finishErr := s.finishManagedFragmentReview(w.ID, a, r.ID, runErr)
-			if (mode == "pass") != (finishErr == nil) {
+			if (mode == "pass" || mode == "questions-resolved") != (finishErr == nil) {
 				t.Fatal("unexpected finalization", mode, finishErr)
 			}
 			finished, e := s.get(w.ID)
@@ -156,7 +173,7 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 			if ft.Status == "accepted" || finished.Planning.Reviewer.Calls != again.Planning.Reviewer.Calls {
 				t.Fatal("finalization published or charged")
 			}
-			if mode == "pass" && (ft.IndependentReview.State != "passed" || ft.IndependentReview.FragmentJournal.FinalJournalDigest != task.IndependentReview.FragmentJournal.FinalJournalDigest) {
+			if (mode == "pass" || mode == "questions-resolved") && (ft.IndependentReview.State != "passed" || ft.IndependentReview.FragmentJournal.FinalJournalDigest != task.IndependentReview.FragmentJournal.FinalJournalDigest) {
 				t.Fatal("lost final evidence")
 			}
 			if s.finishManagedFragmentReview(w.ID, a, r.ID, runErr) == nil {
