@@ -130,3 +130,16 @@ avant d’autoriser une correction explicitement déclarée. Un journal altéré
 une simple interruption ne suffit pas. L’ancien avis reste inchangé ; la
 réparation externe est attribuée comme telle, les compteurs restent consommés
 et le nouveau candidat doit repasser les contrôles et la revue indépendante.
+
+## Délai et veille de la machine
+
+Chaque appel de planification ou de revue conserve son délai autorisé. Sous Linux,
+le contrôle utilise aussi `CLOCK_BOOTTIME`, qui inclut la veille : au réveil,
+un appel dont l’échéance est dépassée est interrompu, au lieu de recevoir le
+reste de son temps actif. Le moteur ne peut pas agir pendant que la machine dort.
+L’arrêt consomme la réservation et ne produit aucune validation ; les inspections
+déjà enregistrées restent réutilisables sous leurs contrôles habituels.
+
+Un test avec horloge injectée simule une heure de veille et vérifie l’arrêt d’un
+fournisseur local encore vivant malgré un délai actif de dix minutes. Ce test
+ne constitue pas une revue indépendante du candidat de la mission.

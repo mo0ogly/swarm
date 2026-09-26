@@ -238,6 +238,10 @@ func runPlanningProviderRouted(provider Provider, route *ModelRoute, prompt stri
 	return runStructuredProvider(provider, route, prompt, planningProposalSchema, deadline, valid, record, observers...)
 }
 func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+	return runStructuredProviderClock(provider, route, prompt, schema, deadline, valid, record, suspendAwareNow, observers...)
+}
+
+func runStructuredProviderClock(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
 	p, err := assistantProvider(provider)
 	if err != nil {
 		return "", err
@@ -285,6 +289,7 @@ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema 
 	}
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait(); writer.Close() }()
+	expires := now() + deadline
 	timer := time.NewTimer(deadline)
 	defer timer.Stop()
 	tick := time.NewTicker(200 * time.Millisecond)
@@ -300,6 +305,15 @@ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema 
 			err = fmt.Errorf("délai du planificateur dépassé")
 			stopped = true
 		case <-tick.C:
+			// Go timers exclude Linux suspend time. Check boot time as well so
+			// waking the host cannot extend a billable provider's authorization.
+			if now() >= expires {
+				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+				<-done
+				err = fmt.Errorf("délai du planificateur dépassé (veille comprise)")
+				stopped = true
+				continue
+			}
 			if !valid() {
 				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 				<-done

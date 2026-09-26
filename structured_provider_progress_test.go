@@ -59,3 +59,26 @@ func TestStructuredProviderDistinguishesSystemActivity(t *testing.T) {
 		t.Fatal(diagnostic)
 	}
 }
+
+func TestStructuredProviderDeadlineIncludesSuspend(t *testing.T) {
+	script := filepath.Join(t.TempDir(), "claude")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\nsleep 30\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	reads := 0
+	clock := func() time.Duration {
+		reads++
+		if reads == 1 {
+			return time.Hour
+		}
+		return 2 * time.Hour // Simulated host suspend, without sleeping the test host.
+	}
+	started := time.Now()
+	_, err := runStructuredProviderClock(Provider{Command: script}, nil, "prompt", "{}", 10*time.Minute, func() bool { return true }, nil, clock)
+	if err == nil || !strings.Contains(err.Error(), "veille comprise") {
+		t.Fatalf("expected suspend deadline, got %v", err)
+	}
+	if time.Since(started) > 3*time.Second {
+		t.Fatal("provider survived the expired boot-time deadline")
+	}
+}

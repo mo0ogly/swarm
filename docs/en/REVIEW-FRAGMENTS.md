@@ -112,3 +112,16 @@ an explicitly attributed correction. An altered journal or an interrupted call
 is insufficient. The old opinion remains unchanged, the external repair is
 identified as such, consumed budgets remain spent, and the new candidate must
 pass checks and independent review again.
+
+## Deadline and host suspend
+
+Each planning or review call retains its authorized deadline. On Linux, the
+runner also checks `CLOCK_BOOTTIME`, which includes suspend: after wake-up, an
+expired call is interrupted instead of receiving its remaining active time.
+The engine cannot act while the host is asleep. The reservation remains consumed;
+interruption never constitutes acceptance. Previously recorded inspections remain
+reusable subject to their existing integrity checks.
+
+An injected-clock test simulates one hour of suspend and checks termination of
+a live local provider despite a ten-minute active-time allowance. This test does
+not constitute an independent review of the mission candidate.
