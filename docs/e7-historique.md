@@ -57,3 +57,11 @@ revue IA indépendante de la livraison. La mission principale reste inchangée.
 
 ## Depuis le web
 Dans **Conduite**, une ancienne acceptation Git sans avis affiche **Faire vérifier ce résultat**. La fenêtre récupère le candidat et les identités auprès du moteur, demande un motif et explique le budget utilisé. **Demander la vérification** soumet au même contrat que le CLI. Une erreur laisse la fenêtre ouverte ; aucune validité n’est accordée par le seul clic.
+
+## Reprise directe du 26 septembre 2026
+
+Le scénario public `node tests/engine_acceptance.cjs --case history` a été rejoué
+sur la source courante : code 0. Les preuves et durées sont conservées dans
+[e8-verification-20260926.json](e8-verification-20260926.json). Cette recette
+isolée ne modifie aucune ancienne mission et ne déclare pas E7 acceptée dans
+la mission principale, dont le prérequis E6 reste non validé.

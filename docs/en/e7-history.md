@@ -34,3 +34,10 @@ change remains distinct. No live mission was requalified by these tests.
 
 ## Web access
 In the mission control view, historical managed acceptances without review show **Request review of this result**. The dialog fetches retained identities from the engine and asks for a reason. Submission uses the same contract as the CLI; requesting verification does not grant acceptance.
+
+## Direct verification on 26 September 2026
+
+The public history scenario was rerun on the current source and exited 0. See
+[e8-verification-20260926.json](../e8-verification-20260926.json). These isolated
+tests do not change historical missions or mark E7 accepted in the main mission,
+where E6 remains an unvalidated prerequisite.
