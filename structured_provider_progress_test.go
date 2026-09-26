@@ -82,3 +82,20 @@ func TestStructuredProviderDeadlineIncludesSuspend(t *testing.T) {
 		t.Fatal("provider survived the expired boot-time deadline")
 	}
 }
+
+func TestStructuredProviderSystemSubtypeHistogramIsBoundedAndPrivate(t *testing.T) {
+	input := `{"type":"system","subtype":"thinking_tokens","text":"PRIVATE","tokens":123}
+{"type":"system","subtype":"thinking_tokens"}
+{"type":"system","subtype":"api_error","error":"PRIVATE"}
+{"type":"system","subtype":"PRIVATE"}
+{"type":"system","subtype":"ANOTHER_PRIVATE"}
+`
+	out := readAssistOutput(strings.NewReader(input))
+	if len(out.systemSubtypes) != 3 || out.systemSubtypes["thinking_tokens"] != 2 || out.systemSubtypes["api_error"] != 1 || out.systemSubtypes["other"] != 2 {
+		t.Fatalf("incorrect bounded histogram: %v", out.systemSubtypes)
+	}
+	diagnostic := out.progressDiagnostic()
+	if strings.Contains(diagnostic, "PRIVATE") || strings.Contains(diagnostic, "123") || !strings.Contains(diagnostic, `"thinking_tokens":2`) {
+		t.Fatalf("unsafe or incomplete diagnostic: %s", diagnostic)
+	}
+}

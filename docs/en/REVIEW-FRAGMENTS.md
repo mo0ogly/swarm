@@ -125,3 +125,12 @@ reusable subject to their existing integrity checks.
 An injected-clock test simulates one hour of suspend and checks termination of
 a live local provider despite a ten-minute active-time allowance. This test does
 not constitute an independent review of the mission candidate.
+
+## Diagnosing calls without a final result
+
+Diagnostics now count known system event types: thinking-token notifications,
+API errors, model fallback, initialization and permissions. Unknown types remain
+grouped as `other`; no message text, reasoning content or raw error detail is
+added. These counts describe received activity, not a verdict or a proven cause
+of a timeout. Older diagnostics cannot reconstruct previously discarded types.
+Better telemetry does not guarantee that the review will finish.

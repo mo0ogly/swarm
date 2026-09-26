@@ -148,6 +148,7 @@ type assistOutput struct {
 	finalSeen         bool
 	assistantEvents   int
 	systemEvents      int
+	systemSubtypes    map[string]int
 	apiRetries        int
 	lastSystemSubtype string
 
@@ -181,6 +182,10 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 		if data["type"] == "system" {
 			out.systemEvents++
 			out.lastSystemSubtype = assistSystemSubtype(data["subtype"])
+			if out.systemSubtypes == nil {
+				out.systemSubtypes = make(map[string]int)
+			}
+			out.systemSubtypes[out.lastSystemSubtype]++
 			if data["subtype"] == "api_retry" {
 				out.apiRetries++
 			}
@@ -296,7 +301,7 @@ func assistEventKind(v any) string {
 // Only protocol labels are retained; arbitrary provider values may contain secrets.
 func assistSystemSubtype(v any) string {
 	switch v {
-	case "init", "api_retry", "status", "compact_boundary", "hook_started", "hook_progress", "hook_response", "task_started", "task_progress", "task_notification":
+	case "init", "init_milestone", "thinking_tokens", "api_error", "informational", "notification", "turn_duration", "turn_starting", "model_fallback", "model_refusal_fallback", "model_refusal_no_fallback", "permission_denied", "permission_retry", "api_retry", "status", "compact_boundary", "hook_started", "hook_progress", "hook_response", "task_started", "task_progress", "task_notification":
 		return v.(string)
 	default:
 		return "other"
@@ -307,5 +312,6 @@ func (o assistOutput) progressDiagnostic() string {
 	if last == "" {
 		last = "none"
 	}
-	return fmt.Sprintf("sortie fournisseur : %d octets, %d événements JSON, dernier type=%s, événement final=%t ; messages assistant=%d, événements système=%d, relances API signalées=%d, dernier sous-type système=%s ; ceci ne vaut pas validation", o.streamBytes, o.events, last, o.finalSeen, o.assistantEvents, o.systemEvents, o.apiRetries, o.lastSystemSubtype)
+	subtypes, _ := json.Marshal(o.systemSubtypes)
+	return fmt.Sprintf("sortie fournisseur : %d octets, %d événements JSON, dernier type=%s, événement final=%t ; messages assistant=%d, événements système=%d, relances API signalées=%d, dernier sous-type système=%s ; types système=%s ; ceci ne vaut pas validation", o.streamBytes, o.events, last, o.finalSeen, o.assistantEvents, o.systemEvents, o.apiRetries, o.lastSystemSubtype, subtypes)
 }

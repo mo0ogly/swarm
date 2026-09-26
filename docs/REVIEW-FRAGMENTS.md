@@ -143,3 +143,13 @@ déjà enregistrées restent réutilisables sous leurs contrôles habituels.
 Un test avec horloge injectée simule une heure de veille et vérifie l’arrêt d’un
 fournisseur local encore vivant malgré un délai actif de dix minutes. Ce test
 ne constitue pas une revue indépendante du candidat de la mission.
+
+## Diagnostic des appels sans résultat final
+
+Le diagnostic compte désormais les types d’événements système connus : réflexion
+(`thinking_tokens`), erreur API, repli de modèle, initialisation ou permissions.
+Les types inconnus restent regroupés sous `other` ; aucun texte de message,
+contenu de raisonnement ou détail d’erreur brut n’est ajouté. Ces compteurs
+expliquent l’activité reçue, sans constituer un verdict ni prouver la cause
+d’un délai dépassé. Les anciens diagnostics ne permettent pas de reconstruire
+les types déjà perdus. Un décompte plus précis ne garantit pas la fin de la revue.
