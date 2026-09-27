@@ -85,7 +85,11 @@ func reportInAddedDiff(diff, path, report string) bool {
 			if len(parts) != 2 {
 				return false
 			}
-			return addedSourceInDiff(diff, ReviewSource{Path: path, Blob: parts[1], Content: report + "\n"})
+			content := report
+			if !strings.HasSuffix(content, "\n") {
+				content += "\n"
+			}
+			return addedSourceInDiff(diff, ReviewSource{Path: path, Blob: parts[1], Content: content})
 		}
 	}
 	return false

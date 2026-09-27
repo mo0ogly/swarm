@@ -82,7 +82,7 @@ func TestManagedReviewPacketDoesNotMutateCanonicalContext(t *testing.T) {
 func TestReportDiffReferenceRequiresExactCompleteNewFile(t *testing.T) {
 	blob := strings.Repeat("a", 40)
 	diff := "diff --git a/docs/t.md b/docs/t.md\nnew file mode 100644\nindex " + strings.Repeat("0", 40) + ".." + blob + "\n--- /dev/null\n+++ b/docs/t.md\n@@ -0,0 +1,2 @@\n+rapport é\n+preuve"
-	if !reportInAddedDiff(diff, "docs/t.md", "rapport é\npreuve") {
+	if !reportInAddedDiff(diff, "docs/t.md", "rapport é\npreuve\n") || !reportInAddedDiff(diff, "docs/t.md", "rapport é\npreuve") {
 		t.Fatal("full new report not recognized")
 	}
 	for _, changed := range []string{strings.Replace(diff, "+preuve", "+autre", 1), strings.Replace(diff, "new file mode", "old file mode", 1), diff + "\n\\ No newline at end of file"} {

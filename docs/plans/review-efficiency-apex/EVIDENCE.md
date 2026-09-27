@@ -182,3 +182,18 @@ Read-only code review found no bypass; existing source-corruption coverage remai
 while the new exit scenario specifically tests repeated public recovery and budget.
 
 Targeted public recovery tests PASS61.601s; full Go suite PASS364.603s; vet, contract and diff checks PASS. No new synchronization or shared-state mutation.
+
+### Two grounded findings from review-fff0b791b3e895a69b995904
+The real review stopped at its first packet with changes_requested (69/74 calls).
+1. Publication contention fixture configured busy_timeout via sql.DB, then used
+a potentially different pooled connection for UPDATE. Both statements now use
+one dedicated sql.Conn with a ten-second context.
+2. reportInAddedDiff appended a newline even when present; a full report was
+therefore not deduplicated. Regression test failed before correction. A missing
+final newline is added only once, preserving the existing trimmed-report contract.
+Targeted race tests PASS2.384s, vet/diff PASS. Three matching files applied to the
+attributed candidate. Current source-parity metadata recalculated together:
+624/636 identical, twelve explicit differences; no new claim of real autonomy.
+No model call during development. Full suites recorded separately.
+
+Host full suite PASS372.485s; attributed candidate full suite PASS157.277s.
