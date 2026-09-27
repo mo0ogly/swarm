@@ -199,3 +199,27 @@ func TestManagedPreflightRetryRecoveredFalseBinary(t *testing.T) {
 		t.Fatal("preview consumed review")
 	}
 }
+
+func TestManagedPreflightRetryRecoversHistoricalSourceCountRefusal(t *testing.T) {
+	s, w, a := unpaidReviewFixture(t)
+	if e := s.managedFailure(a, "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"); e != nil {
+		t.Fatal(e)
+	}
+	w, _ = s.get(w.ID)
+	before, _ := s.managedAttempt(a.ID)
+	after, e := s.planningChange(w.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "source-count-fixed", Revision: w.Revision, Task: a.TaskID, Reason: "Per-task source counts fixed, complete immutable context rechecked"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	item, _ := s.managedAttempt(a.ID)
+	if item.State != "integrating" || item.Result != before.Result || len(after.Tasks[0].Attempts) != 1 || managedReviewCalls(t, s) != 0 {
+		t.Fatal("historical source-count recovery changed production or spent a call")
+	}
+	if e = s.reconcileKnownMissionResult(a, "test-conductor"); e != nil {
+		t.Fatal(e)
+	}
+	after, _ = s.get(w.ID)
+	if after.Tasks[0].Status != "accepted" || managedReviewCalls(t, s) != 1 {
+		t.Fatal("source-count recovery failed", after.Tasks[0].Blocker)
+	}
+}
