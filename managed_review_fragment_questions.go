@@ -59,6 +59,17 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 	for _, q := range b.Questions {
 		expected[[3]int{q.Packet, q.Artifact, q.Need}] = true
 	}
+	impactKeys := map[[3]int]bool{}
+	for _, ref := range p.Reused {
+		_, inspection, e := parseManagedFragmentInspection(ref.Reply, ref.Original)
+		if e != nil {
+			return "", nil, e
+		}
+		var impact managedFragmentFinalEvidence
+		addHistoricalImpactQuestion(&impact, ref, inspection)
+		q := impact.Questions[0]
+		impactKeys[[3]int{q.Packet, q.Artifact, q.Need}] = true
+	}
 	originals := ""
 	for _, s := range visible.Sources {
 		originals += "\n" + s.Content
@@ -76,6 +87,9 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 		delete(expected, key)
 		switch r.Verdict {
 		case "resolved":
+			if impactKeys[key] && !fragmentCurrentChangeEvidence(b.ChangeDiff, r.Evidence) {
+				return "", nil, fmt.Errorf("impact historique sans citation d’un changement actuel")
+			}
 			if len(strings.TrimSpace(r.Evidence)) < 8 || !strings.Contains(originals, r.Evidence) {
 				return "", nil, fmt.Errorf("résolution sans preuve originale visible")
 			}
@@ -93,4 +107,31 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 		return "unknown", nil, nil
 	}
 	return state, records, nil
+}
+
+// A historical impact resolution must cite actual added/removed content in the
+// current delta, not just an old excerpt, a filename, a producer report or hash.
+// Semantic relevance remains the independent reviewer's responsibility.
+func fragmentCurrentChangeEvidence(delta, evidence string) bool {
+	if len(strings.TrimSpace(evidence)) < 8 || !strings.Contains(delta, evidence) {
+		return false
+	}
+	for _, line := range strings.Split(delta, "\n") {
+		if strings.HasPrefix(line, "rename from ") || strings.HasPrefix(line, "rename to ") || strings.HasPrefix(line, "old mode ") || strings.HasPrefix(line, "new mode ") || strings.HasPrefix(line, "new file mode ") || strings.HasPrefix(line, "deleted file mode ") {
+			if strings.Contains(evidence, line) {
+				return true
+			}
+		}
+		if len(line) < 1 || (line[0] != '+' && line[0] != '-') || strings.HasPrefix(line, "+++") || strings.HasPrefix(line, "---") {
+			continue
+		}
+		if strings.Contains("\n"+evidence+"\n", "\n"+line+"\n") {
+			return true
+		}
+		changed := strings.TrimSpace(line[1:])
+		if len(changed) >= 8 && (strings.Contains(changed, evidence) || strings.Contains(evidence, changed)) {
+			return true
+		}
+	}
+	return false
 }

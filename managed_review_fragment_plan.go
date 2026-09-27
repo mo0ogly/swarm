@@ -34,6 +34,8 @@ type managedReviewFragmentPlan struct {
 	ReservedFinalCalls int                           `json:"reserved_final_calls"`
 	AvailableCalls     int                           `json:"available_calls"`
 	Executable         bool                          `json:"executable"`
+	Reused             []managedFragmentReuse        `json:"historical_observations,omitempty"`
+	ChangeDiff         string                        `json:"changes_since_observations,omitempty"`
 }
 
 const managedFragmentPromptReserve = 24 * 1024
@@ -102,6 +104,18 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 	if err != nil {
 		return empty, err
 	}
+	plan, err := packManagedFragmentArtifacts(c, artifacts, available, finalCalls)
+	if err != nil {
+		return empty, err
+	}
+	if err = validateManagedReviewFragments(c, plan); err != nil {
+		return empty, err
+	}
+	return plan, nil
+}
+
+func packManagedFragmentArtifacts(c managedReviewContext, artifacts []managedReviewFragmentArtifact, available, finalCalls int) (managedReviewFragmentPlan, error) {
+	empty := managedReviewFragmentPlan{}
 	canonical, _ := json.Marshal(c)
 	plan := managedReviewFragmentPlan{Version: 2, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
 	packet := managedReviewFragmentPacket{Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
@@ -133,9 +147,6 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 	if len(plan.Packets)+finalCalls > available {
 		return empty, fmt.Errorf("budget insuffisant : %d inspections et %d appels finaux pour %d disponibles", len(plan.Packets), finalCalls, available)
 	}
-	if err = validateManagedReviewFragments(c, plan); err != nil {
-		return empty, err
-	}
 	return plan, nil
 }
 
@@ -144,7 +155,7 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	if err != nil {
 		return err
 	}
-	if (p.Version != 1 && p.Version != 2) || p.Executable || p.Candidate != c.Candidate || p.ContextDigest != hash(canonical) || p.ReservedFinalCalls < 1 || len(p.Packets) == 0 || len(p.Packets)+p.ReservedFinalCalls > p.AvailableCalls {
+	if (p.Version != 1 && p.Version != 2 && p.Version != 3) || p.Executable || p.Candidate != c.Candidate || p.ContextDigest != hash(canonical) || p.ReservedFinalCalls < 1 || len(p.Packets) == 0 || fragmentPaidInspections(p)+p.ReservedFinalCalls > p.AvailableCalls {
 		return fmt.Errorf("plan de fragments périmé ou incohérent")
 	}
 	expected, err := managedFragmentArtifacts(c)
@@ -158,6 +169,12 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 			return fmt.Errorf("paquet de revue modifié ou trop grand")
 		}
 		actual = append(actual, packet.Artifacts...)
+	}
+	if p.Version == 3 {
+		return validateFragmentReuseCoverage(c, p, actual, expected)
+	}
+	if len(p.Reused) > 0 || p.ChangeDiff != "" {
+		return fmt.Errorf("historical observations require protocol3")
 	}
 	if !reflect.DeepEqual(actual, expected) {
 		return fmt.Errorf("couverture des preuves incomplète ou modifiée")

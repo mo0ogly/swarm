@@ -91,6 +91,9 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 	if e = validateManagedReviewFragments(c, p); e != nil {
 		return p, j, e
 	}
+	if e = s.validateFragmentReuseSources(r, c, p); e != nil {
+		return p, j, e
+	}
 	path, e = safeReport(s.root, anchor.Journal)
 	if e != nil {
 		return p, j, e

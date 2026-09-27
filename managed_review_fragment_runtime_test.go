@@ -46,9 +46,13 @@ elif '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text:
 else:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_FINAL_EVIDENCE\n',1)[1]);c=payload['task_contracts_reports_controls']
  reply={'candidate_commit':c['candidate_commit'],'tasks':[{'task':t['task'],'reason':'Fixture original report and control evidence','criteria':[{'index':i+1,'verdict':'fail' if mode=='decision-fail' else 'pass','evidence':t['report'][:24]} for i,_ in enumerate(t['criteria'])]} for t in c['tasks']]}
- if mode.startswith('questions-'):
+ if mode.startswith('questions-') or payload['partial_inspections'].get('historical_observations'):
   qs=payload['partial_inspections']['unresolved_questions']
   reply={'review':reply,'resolutions':[{'packet':q['packet'],'artifact':q['artifact'],'need_index':q['need_index'],'verdict':'unknown' if mode=='questions-open' else 'resolved','reason':'Fixture cites original visible report','evidence':c['tasks'][0]['report'][:24]} for q in qs]}
+  if payload['partial_inspections'].get('historical_observations'):
+   delta=payload['partial_inspections']['changes_since_observations']
+   quote=next(line[1:] for line in delta.splitlines() if line.startswith('+') and not line.startswith('+++') and len(line)>8)
+   for resolution in reply['resolutions']: resolution['evidence']=quote[:120]
   if mode=='questions-omitted': reply['resolutions']=[]
 print(json.dumps({'type':'result','result':json.dumps(reply)}))
 `

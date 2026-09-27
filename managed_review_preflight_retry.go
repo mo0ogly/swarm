@@ -123,14 +123,14 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	calls := len(batches)
 	if errors.Is(e, errManagedReviewBatchSize) {
 		cfg := w.Planning.Reviewer
-		plan, err := planManagedReviewFragments(c, cfg.MaxCalls-cfg.Calls, 2)
+		plan, err := s.planCandidateFragments(w, prepared.Agent, c, cfg.MaxCalls-cfg.Calls)
 		if err != nil {
 			return nil, err
 		}
 		if err = preflightManagedFragmentCalls(managedReviewPrefix(workflow), c, plan); err != nil {
 			return nil, err
 		}
-		calls = len(plan.Packets) + plan.ReservedFinalCalls
+		calls = fragmentPaidInspections(plan) + plan.ReservedFinalCalls
 	} else if e != nil {
 		return nil, e
 	}
@@ -175,5 +175,5 @@ func (s *Store) previewManagedFragments(work, task string) (managedReviewFragmen
 		return managedReviewFragmentPlan{}, e
 	}
 	cfg := p.Work.Planning.Reviewer
-	return planManagedReviewFragments(p.Context, cfg.MaxCalls-cfg.Calls, 2)
+	return s.planCandidateFragments(p.Work, p.Agent, p.Context, cfg.MaxCalls-cfg.Calls)
 }

@@ -283,3 +283,25 @@ copies. The advanced managed Git workflow is separate.
 
 The standalone installation recipe used deterministic agent processes. It does
 not qualify your real AI provider, authentication or project.
+
+### Estimate a managed review before retrying
+
+Use `planning review-cost WORK --input request.json`, where the request contains
+`{"task_id":"TASK"}`. The same read-only estimate is available through
+`GET /api/v1/planning?work=WORK&task=TASK&action=review-cost`.
+
+The result separates new inspections, historical observations and two final review
+calls. Check both `fits_budget` and `transport_ready`; `transport_blocker` explains
+an oversized message. An estimate neither spends calls nor approves a result.
+
+After a corrective submission, Swarm may retain local observations only when all
+inputs seen together remain identical and the task contract, provider, model and
+method still match. Original replies keep their original candidate and provenance.
+Every unresolved question remains open. A new independent decision must explicitly
+examine the current changes and their effects on every historical group before
+acceptance. Changed groups are inspected again; no calls are refunded.
+
+This is not a complete static dependency analysis or a guarantee that an AI review
+will detect every defect. Reuse from a previous protocol-3 reuse plan is currently
+unsupported and falls back to a full review. Oversized evidence is rejected before
+calls, never silently truncated.

@@ -145,3 +145,21 @@ flowchart LR
   D -->|Oui| F[Plafonds et événement enregistrés]
   F --> G[Conducteur : autres conditions toujours vérifiées]
 ```
+
+## Connaître le coût d’une revue avant de la reprendre
+
+`planning review-cost WORK --input request.json`, avec
+`{"task_id":"TASK"}`, fournit une estimation sans réserver d’appel. Le même
+résultat est disponible par l’API de planification avec `action=review-cost`.
+
+Le résultat distingue nouvelles inspections, observations historiques conservées
+et deux appels finaux. Vérifier **les deux** champs `fits_budget` et
+`transport_ready` ; `transport_blocker` explique une capacité de message dépassée.
+Les appels précédents restent consommés. Une estimation favorable n’est ni une
+autorisation supplémentaire ni une validation du résultat.
+
+Une correction peut conserver les observations d’un ancien paquet seulement si
+toutes ses entrées sont identiques. Les réserves restent ouvertes ; un nouvel avis
+doit examiner les changements et leurs impacts avant toute acceptation. Les
+[conditions et limites du protocole](plans/review-efficiency-apex/DIFFERENTIAL.md)
+explicitent ce qui est effectivement vérifié.

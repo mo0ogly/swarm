@@ -74,7 +74,10 @@ func preflightManagedFragmentCalls(prefix string, c managedReviewContext, p mana
 	if p.ReservedFinalCalls < 2 {
 		return fmt.Errorf("deux appels finaux requis")
 	}
-	for _, packet := range p.Packets {
+	for i, packet := range p.Packets {
+		if fragmentReuseAt(p, i) != nil {
+			continue
+		}
 		if _, err := managedFragmentInspectionPrompt(prefix, packet); err != nil {
 			return err
 		}

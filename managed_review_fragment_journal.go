@@ -37,9 +37,15 @@ func validateManagedFragmentJournal(j managedFragmentJournal, p managedReviewFra
 		return nil, fmt.Errorf("journal de fragments périmé")
 	}
 	reusable := map[int]string{}
+	for _, ref := range p.Reused {
+		reusable[ref.Packet] = ref.Reply
+	}
 	seenCalls := map[string]bool{}
 	last := map[int]string{}
 	for _, entry := range j.Entries {
+		if fragmentReuseAt(p, entry.Packet) != nil {
+			return nil, fmt.Errorf("historical observation cannot consume a fresh reservation")
+		}
 		if entry.Packet < 0 || entry.Packet >= len(p.Packets) || entry.CallID == "" || seenCalls[entry.CallID] {
 			return nil, fmt.Errorf("réservation dupliquée ou paquet inconnu")
 		}

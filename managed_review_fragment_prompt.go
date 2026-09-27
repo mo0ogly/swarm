@@ -12,7 +12,7 @@ import (
 const managedFragmentInspectionSchema = `{"type":"object","additionalProperties":false,"properties":{"candidate_commit":{"type":"string"},"context_sha256":{"type":"string"},"packet_sha256":{"type":"string"},"findings":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"properties":{"artifact":{"type":"integer","minimum":0},"sha256":{"type":"string"},"verdict":{"type":"string","enum":["inspected","fail","unknown"]},"reason":{"type":"string","minLength":8,"maxLength":16},"evidence":{"type":"string","minLength":8,"maxLength":16,"pattern":"^\\S[\\s\\S]*\\S$"},"needs":{"type":"array","maxItems":16,"items":{"type":"string","minLength":3,"maxLength":240}}},"required":["artifact","sha256","verdict","reason","evidence","needs"]}}},"required":["candidate_commit","context_sha256","packet_sha256","findings"]}`
 
 func managedFragmentInspectionPrompt(prefix string, p managedReviewFragmentPacket) (string, error) {
-	if (p.Version != 1 && p.Version != 2) || p.Candidate == "" || p.ContextDigest == "" || len(p.Artifacts) == 0 || p.Index < 0 {
+	if (p.Version != 1 && p.Version != 2 && p.Version != 3) || p.Candidate == "" || p.ContextDigest == "" || len(p.Artifacts) == 0 || p.Index < 0 {
 		return "", fmt.Errorf("paquet d’inspection incomplet")
 	}
 	for _, a := range p.Artifacts {

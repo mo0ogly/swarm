@@ -24,3 +24,51 @@
 - `git diff --check` : PASS.
 
 Tous les tests fournisseur ci-dessus emploient des doubles déterministes. Ce ne sont pas des avis indépendants sur la mission ni des mesures de qualité d'un vrai modèle. Les logs complets et le prévol live en lecture seule sont conservés hors dépôt dans les artefacts de la session.
+
+## Deuxième lot — RD3 (remplace le statut « non terminé » ci-dessus)
+
+| Exigence | Résultat | Preuve / limite |
+|---|---|---|
+| Réduction avec couverture complète | PASS | `TestManagedFragmentHistoricalSavingsAndIdentity` : 8 → 4 appels prévus, aucune preuve renommée sous le nouveau SHA |
+| Entrée/dépendance modifiée | PASS | Groupe original entier invalidé ; contrat changé entraîne retour à la revue complète |
+| Réserves et impacts obligatoires | PASS | Omission, citation historique seule, rapport seul, fichier seul et preuve inventée rejetés ; `unknown` interdit l’acceptation |
+| Parcours public et persistance | PASS | `TestManagedFragmentHistoricalPublicRecovery/pass` : 6 → 4 appels réels au sous-processus simulé ; contrôles/revue même SHA, réouverture et rejeu sans dépense |
+| Nouveau défaut | PASS | Même parcours `/fail` : une inspection, refus conservé, aucune publication |
+| Corruption historique | PASS | Altération de l’ancien journal invalide la nouvelle preuve |
+| Taille et budget connus avant appel | PASS | Prévol lecture seule inclut capacité finale et volume restant à inspecter |
+| E6 débloquée | NON | 10 appels nécessaires, 7 disponibles, décision finale trop grande ; aucun appel réel lancé |
+
+Tests ciblés : `go test -run 'TestManagedFragmentHistorical|TestReviewCost' -count=1 -v`
+PASS 25.536s avant les derniers contrôles de petite modification/renommage et le
+calcul exact de taille des observations historiques. Les résultats globaux finaux
+seront consignés après leur exécution.
+
+### Pourquoi le dossier E6 contient du bruit
+
+Le contexte du dernier refus comporte 252 fichiers de diff : 107 moteur/autres,
+84 tests, 20 interface, 41 documents/preuves. Les deux exports
+`docs/e6-trial-originals/agents.json` et `snapshot.json` représentent environ
+174 Ko de patch. Le candidat corrigé comporte maintenant 256 fichiers de diff,
+mais seuls dix fichiers ont changé depuis ce refus.
+
+Le contrat E6 demande un parcours réel refus → correction → acceptation. Son
+dossier embarque également la revue des critères E1–E5 et les évolutions du moteur
+accumulées depuis la dernière base acceptée. Ce n’est donc pas seulement une
+répétition verbale du modèle : le moteur lui transmet effectivement un périmètre
+beaucoup plus large. Supprimer les exports ou exclure arbitrairement des fichiers
+ne démontrerait pas la conformité. La suite doit séparer revue des changements,
+preuves d’exécution consultables et bilan final, avec une couverture attribuée
+aux critères et des avis encore liés au candidat courant. Cette séparation n’est
+pas implémentée par le simple cache d’observations RD3.
+
+### Vérification finale du deuxième lot
+
+- `go test ./...` : PASS 296.292s sur le code final. Le passage intermédiaire
+  précédent était également réussi (303.268s).
+- `go test -race -run 'TestManagedFragmentHistorical|TestReviewCostAvailableWithoutBudgetAndWithoutMutation|TestManagedFragmentStoreConcurrentReservationOnce' -count=1` : PASS 182.519s.
+- `go test -run 'TestManagedFragmentHistoricalCapacity|TestManagedFragmentHistoricalTiny' -count=1` : PASS 0.539s ; petites modifications, renommages et conservation des questions dans le calcul de capacité.
+- `go vet ./...`, `python3 tools/agent-workflows/check.py`, `git diff --check` : PASS.
+- Aucune surface web modifiée ; aucun nouveau contrôle visuel revendiqué.
+- Relecture effectuée par l’auteur avec la méthode code-reviewer, pas un avis
+  indépendant de la mission. Recette verify-fix via l’entrée publique de reprise,
+  transport sous-processus simulé, état relu après réouverture.

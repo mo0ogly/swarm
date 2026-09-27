@@ -12,12 +12,14 @@ import (
 // remains a separate opinion. This bundle is not a task verdict or permission to
 // publish, and the original full packets must remain durably available.
 type managedFragmentFinalEvidence struct {
-	Candidate     string                            `json:"candidate_commit"`
-	ContextDigest string                            `json:"context_sha256"`
-	PlanDigest    string                            `json:"plan_sha256"`
-	ReplyDigests  []string                          `json:"reply_sha256"`
-	Evidence      []managedFragmentOriginalEvidence `json:"original_evidence"`
-	Questions     []managedFragmentQuestion         `json:"unresolved_questions,omitempty"`
+	Candidate     string                              `json:"candidate_commit"`
+	ContextDigest string                              `json:"context_sha256"`
+	PlanDigest    string                              `json:"plan_sha256"`
+	ReplyDigests  []string                            `json:"reply_sha256"`
+	Evidence      []managedFragmentOriginalEvidence   `json:"original_evidence"`
+	Questions     []managedFragmentQuestion           `json:"unresolved_questions,omitempty"`
+	Historical    []managedHistoricalObservationLabel `json:"historical_observations,omitempty"`
+	ChangeDiff    string                              `json:"changes_since_observations,omitempty"`
 }
 type managedFragmentOriginalEvidence struct {
 	Packet   int    `json:"packet"`
@@ -40,7 +42,7 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 	raw, _ := json.Marshal(p)
 	out := managedFragmentFinalEvidence{Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
 	for i, packet := range p.Packets {
-		state, inspection, e := parseManagedFragmentInspection(replies[i], packet)
+		state, inspection, e := parsePlannedFragment(replies[i], p, i)
 		if e != nil {
 			return empty, e
 		}
@@ -52,6 +54,9 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 			byIndex[finding.Artifact] = finding
 		}
 		out.ReplyDigests = append(out.ReplyDigests, hash([]byte(replies[i])))
+		if ref := fragmentReuseAt(p, i); ref != nil {
+			addHistoricalImpactQuestion(&out, *ref, inspection)
+		}
 		for j, a := range packet.Artifacts {
 			finding := byIndex[j]
 			if finding.Verdict == "unknown" {
@@ -68,5 +73,6 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 			out.Evidence = append(out.Evidence, managedFragmentOriginalEvidence{Packet: i, Artifact: j, Kind: a.Kind, Name: a.Name, Digest: a.Digest, Excerpt: finding.Evidence, Opinion: finding.Reason})
 		}
 	}
+	out.ChangeDiff = p.ChangeDiff
 	return out, nil
 }

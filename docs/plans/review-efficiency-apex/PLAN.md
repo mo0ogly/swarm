@@ -19,4 +19,15 @@ Deux options : (A) élargir les quotas et conserver le protocole global ; (B) ve
 Pas d'agent indépendant lancé sous couvert de cette méthode. L'avis indépendant de la mission reste celui du moteur ; les tests locaux et la relecture de l'auteur ne le remplacent pas.
 
 ## État
-RD1 terminé. RD2 implémenté et testé. RD3 non terminé : réutilisation différentielle volontairement inactive tant que la couverture des dépendances n’est pas démontrée. RD4 partiel : prévol CLI/HTTP et garde contre deux interruptions identiques implémentés. RD5 : tests du premier lot réussis, recette différentielle non réalisée. RD6 : livraison du premier lot en cours, clôture globale non terminée. Limite de revue live 71, consommé 64. Aucun passage à79 autorisé dans ce plan.
+RD1 et RD2 terminés. RD3 implémenté : observations historiques conservées sous leur
+identité originale, invalidation du groupe si une entrée change, nouvel examen
+obligatoire des impacts. La décision d’architecture révisée et ses limites sont
+expliquées dans DIFFERENTIAL.md. RD4 : prévol CLI/HTTP partagé, coûts et capacité de
+transport distincts, garde contre deux interruptions identiques. RD5 : recette
+isolée différentielle réussie, suite Go complète 296.292s, race ciblée 182.519s,
+vet et contrôle du contrat réussis. RD6 : documentation prête, installation
+contrôlée avec comparaison CLI/HTTP prévue après le commit. E6 reste bloquée : 10 appels requis pour 7 disponibles
+et décision finale trop grande. Aucun passage à 79 autorisé ; aucun appel live.
+
+La clôture de ce correctif du moteur et celle de la mission E6–E8 sont distinctes.
+La seconde exige toujours des avis indépendants et les preuves actuelles.

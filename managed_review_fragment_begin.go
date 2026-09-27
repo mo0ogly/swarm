@@ -33,7 +33,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 		return empty, fmt.Errorf("preuves de fragments différentes du candidat canonique")
 	}
 	cfg := w.Planning.Reviewer
-	p, err := planManagedReviewFragments(c, cfg.MaxCalls-cfg.Calls, 2)
+	p, err := s.planCandidateFragments(w, a, c, cfg.MaxCalls-cfg.Calls)
 	if err != nil {
 		return empty, err
 	}
@@ -128,7 +128,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 		}
 		current := cw.Planning.Reviewer
 		model, _ := json.Marshal(current.ModelRoute)
-		if current.Failure != "" || current.MaxCalls-current.Calls < len(p.Packets)+2 || hash(model) != anchor.ModelConfigDigest {
+		if current.Failure != "" || current.MaxCalls-current.Calls < fragmentPaidInspections(p)+2 || hash(model) != anchor.ModelConfigDigest {
 			return fmt.Errorf("budget ou modèle des fragments indisponible")
 		}
 		if e = s.managedBatchProviderIntact(current, r); e != nil {
