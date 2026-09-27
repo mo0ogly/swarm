@@ -29,6 +29,17 @@ if '\nSWARM_FRAGMENT_PACKET\n' in text:
  reply={'candidate_commit':packet['candidate_commit'],'context_sha256':packet['context_sha256'],'packet_sha256':re.search(r'packet_sha256=([a-f0-9]+)',text).group(1),'findings':{}}
  for i,a in enumerate(packet['artifacts']):
   reply['findings'][str(i)]={'v':('unknown' if mode.startswith('questions-') and i==0 else mode if mode in ('fail','unknown') else 'inspected'),'r':'Content examined','e':0,'n':['Confirm original content is present'] if mode.startswith('questions-') and i==0 else []}
+ if packet['version']>=2:
+  reply['defects']=[]
+  for i,a in enumerate(packet['artifacts']):
+   if reply['findings'][str(i)]['v']=='fail':
+    if i>0:
+     reply['findings'][str(i)]['v']='inspected'
+     continue
+    original=a['content']
+    if a['kind']=='source': original=json.loads(original)['content']
+    line=next(j for j,l in enumerate(original.splitlines()) if len(l.strip())>=8)
+    reply['defects'].append({'artifact':i,'line':line+1,'quote':original.splitlines()[line][:120],'explanation':'Fixture refusal identifies a reproducible defect in the supplied content.','reproduction':'Run the isolated fixture with its failing input.','expected':'The isolated fixture must reject this input.'})
 elif '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n',1)[1]);b=payload['partial_inspections']
  reply={'candidate_commit':b['candidate_commit'],'context_sha256':b['context_sha256'],'plan_sha256':b['plan_sha256'],'state':'unknown' if mode=='selection-unknown' else 'ready','reason':'Fixture selection of original evidence','references':[]}

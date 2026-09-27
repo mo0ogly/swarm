@@ -103,8 +103,8 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 		return empty, err
 	}
 	canonical, _ := json.Marshal(c)
-	plan := managedReviewFragmentPlan{Version: 1, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
-	packet := managedReviewFragmentPacket{Version: 1, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
+	plan := managedReviewFragmentPlan{Version: 2, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
+	packet := managedReviewFragmentPacket{Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
 	// New plans reserve workflow space in addition to the variable schema and
 	// anchor table. Historical packets keep their original validation contract.
 	fits := func(p managedReviewFragmentPacket) bool {
@@ -119,7 +119,7 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
 			}
 			plan.Packets = append(plan.Packets, packet)
-			packet = managedReviewFragmentPacket{Version: 1, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
+			packet = managedReviewFragmentPacket{Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
 			if !fits(packet) {
 				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
 			}
@@ -144,7 +144,7 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	if err != nil {
 		return err
 	}
-	if p.Version != 1 || p.Executable || p.Candidate != c.Candidate || p.ContextDigest != hash(canonical) || p.ReservedFinalCalls < 1 || len(p.Packets) == 0 || len(p.Packets)+p.ReservedFinalCalls > p.AvailableCalls {
+	if (p.Version != 1 && p.Version != 2) || p.Executable || p.Candidate != c.Candidate || p.ContextDigest != hash(canonical) || p.ReservedFinalCalls < 1 || len(p.Packets) == 0 || len(p.Packets)+p.ReservedFinalCalls > p.AvailableCalls {
 		return fmt.Errorf("plan de fragments périmé ou incohérent")
 	}
 	expected, err := managedFragmentArtifacts(c)
@@ -154,7 +154,7 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	actual := []managedReviewFragmentArtifact{}
 	for i, packet := range p.Packets {
 		raw, err := json.Marshal(packet)
-		if err != nil || packet.Version != 1 || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit {
+		if err != nil || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit {
 			return fmt.Errorf("paquet de revue modifié ou trop grand")
 		}
 		actual = append(actual, packet.Artifacts...)

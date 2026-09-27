@@ -30,6 +30,11 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 	if err != nil {
 		return err
 	}
+	if timeout == r.TimeoutSeconds {
+		if packet, repeated := repeatedFragmentInterruption(j); repeated {
+			return fmt.Errorf("inspection %d interrompue deux fois avec les mêmes preuves et paramètres : diagnostic requis avant une nouvelle dépense", packet+1)
+		}
+	}
 	r.TimeoutSeconds = timeout
 	if r.FragmentJournal.FinalJournalDigest != "" {
 		return s.queueManagedFragmentFinalResume(w, task, r, p, j)
@@ -187,4 +192,22 @@ func (s *Store) managedFragmentVerdictDurable(r *IndependentReview) bool {
 	}
 	state, _, err := validateManagedFragmentFinalJournal(f, j, c, p, prefix)
 	return err == nil && state == "passed"
+}
+
+// A manual retry alone is not new evidence after two identical interruptions.
+// Changing the deadline is explicit and bounded; provider changes use their
+// separate guarded replacement path. No reservation or refund occurs here.
+func repeatedFragmentInterruption(j managedFragmentJournal) (int, bool) {
+	counts := map[int]int{}
+	for _, e := range j.Entries {
+		if e.State == "interrupted" {
+			counts[e.Packet]++
+		} else if e.State == "inspected" || e.State == "unknown" {
+			counts[e.Packet] = 0
+		}
+		if counts[e.Packet] >= 2 {
+			return e.Packet, true
+		}
+	}
+	return 0, false
 }

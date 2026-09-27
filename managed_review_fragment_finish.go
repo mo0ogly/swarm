@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 // A proved negative inspection can stop early; it can never approve a task.
@@ -23,6 +24,17 @@ func (s *Store) managedFragmentRefusal(r IndependentReview) (string, error) {
 	e := j.Entries[len(j.Entries)-1]
 	if e.State != "changes_requested" {
 		return "", nil
+	}
+	if p.Packets[e.Packet].Version >= 2 {
+		_, reply, err := parseManagedFragmentInspection(e.Reply, p.Packets[e.Packet])
+		if err != nil {
+			return "", err
+		}
+		var details []string
+		for _, d := range reply.Defects {
+			details = append(details, fmt.Sprintf("%s, ligne de la pièce %d : %s Reproduction : %s Attendu : %s", p.Packets[e.Packet].Artifacts[d.Artifact].Name, d.Line, d.Explanation, d.Reproduction, d.Expected))
+		}
+		return "Correction demandée : " + strings.Join(details, "\n"), nil
 	}
 	return fmt.Sprintf("Correction demandée par l’inspection %d (%d pièces) ; refus conservé dans le journal. Les autres pièces ne sont pas toutes examinées.", e.Packet+1, len(p.Packets[e.Packet].Artifacts)), nil
 }

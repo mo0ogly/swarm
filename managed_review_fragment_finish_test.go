@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -67,6 +68,9 @@ func TestManagedFragmentRefusalRequiresOriginalProof(t *testing.T) {
 	reason, err := s.managedFragmentRefusal(r)
 	if err != nil || reason == "" {
 		t.Fatal(reason, err)
+	}
+	if !strings.Contains(reason, "Reproduction :") || !strings.Contains(reason, "Attendu :") || managedReviewCalls(t, s) != 1 {
+		t.Fatal("actionable refusal required an extra provider call", reason)
 	}
 	// The legacy error label is not authority; original proof remains necessary.
 	r.State = "error"

@@ -24,6 +24,7 @@ type managedFragmentInspection struct {
 	ContextDigest string                   `json:"context_sha256"`
 	PacketDigest  string                   `json:"packet_sha256"`
 	Findings      []managedFragmentFinding `json:"findings"`
+	Defects       []managedFragmentDefect  `json:"defects,omitempty"`
 }
 
 const managedFragmentReplyLimit = 16 * 1024
@@ -42,7 +43,11 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 	fail := func(reason string) (string, managedFragmentInspection, error) {
 		return "", managedFragmentInspection{}, fmt.Errorf("inspection de fragment : %s", reason)
 	}
-	if len(reply) > managedFragmentReplyLimit {
+	limit := managedFragmentReplyLimit
+	if packet.Version >= 2 {
+		limit += managedFragmentDefectReserve
+	}
+	if len(reply) > limit {
 		return fail("réponse trop grande")
 	}
 	if err := decodeManagedFragmentInspection([]byte(reply), packet, &result); err != nil {
@@ -85,6 +90,9 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 			return fail("verdict inconnu ; inspected ne signifie jamais accepted")
 		}
 	}
+	if err := validateManagedFragmentDefects(packet, result); err != nil {
+		return fail(err.Error())
+	}
 	return state, result, nil
 }
 
@@ -104,10 +112,11 @@ func managedFragmentReplyFits(p managedReviewFragmentPacket) bool {
 // to an explicit inventory key and the immutable whole-packet digest.
 func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPacket, result *managedFragmentInspection) error {
 	var envelope struct {
-		Candidate string          `json:"candidate_commit"`
-		Context   string          `json:"context_sha256"`
-		Packet    string          `json:"packet_sha256"`
-		Findings  json.RawMessage `json:"findings"`
+		Candidate string                  `json:"candidate_commit"`
+		Context   string                  `json:"context_sha256"`
+		Packet    string                  `json:"packet_sha256"`
+		Findings  json.RawMessage         `json:"findings"`
+		Defects   []managedFragmentDefect `json:"defects,omitempty"`
 	}
 	if err := strict(raw, &envelope); err != nil {
 		return err
@@ -122,7 +131,7 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 	if len(entries) != len(packet.Artifacts) {
 		return fmt.Errorf("incomplete inventory")
 	}
-	*result = managedFragmentInspection{Candidate: envelope.Candidate, ContextDigest: envelope.Context, PacketDigest: envelope.Packet}
+	*result = managedFragmentInspection{Candidate: envelope.Candidate, ContextDigest: envelope.Context, PacketDigest: envelope.Packet, Defects: envelope.Defects}
 	for i, a := range packet.Artifacts {
 		raw, ok := entries[strconv.Itoa(i)]
 		if !ok {

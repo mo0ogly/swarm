@@ -1,0 +1,31 @@
+# Revue : refus explicites et coût observable / Review protocol
+
+## Français
+
+Les nouveaux plans d'inspection utilisent le protocole 2. Un refus exige une pièce identifiée, une ligne, une citation exacte, une explication, une condition de reproduction et le comportement attendu. La ligne désigne le texte original pour une source, ou la ligne du patch pour un diff. Le moteur vérifie l'attribution et la structure ; cela ne prouve pas automatiquement que le diagnostic du modèle est juste.
+
+Les raisons synthétiques sont conservées pour le transport final. Les défauts détaillés sont fournis dans `defects` dès le premier appel, conservés dans le journal ancré et exposés dans le motif de refus. Jusqu'à quatre défauts par réponse, avec 8 Kio supplémentaires réservés ; les autres incertitudes restent `unknown`. Les journaux de protocole 1 restent lisibles, sans transformation en preuves nouvelles.
+
+Deux interruptions de la même inspection avec les mêmes preuves et le même délai empêchent une nouvelle reprise identique. Les dépenses restent enregistrées. Une modification explicite du délai suit la voie de reprise existante ; le remplacement de fournisseur conserve ses contrôles séparés. Cette règle ne prétend pas reconnaître toutes les boucles sémantiques.
+
+Prévol en lecture seule, disponible même avec budget insuffisant :
+
+```sh
+swarm --root /chemin/projet --json planning review-cost WORK --input request.json
+```
+
+`request.json` : `{"task_id":"TASK"}`.
+
+HTTP : `GET /api/v1/planning?work=WORK&task=TASK&action=review-cost` via la session authentifiée habituelle.
+
+Le résultat expose le candidat, le protocole, les pièces/octets, fichiers du diff, fichiers modifiés depuis le refus, inspections/appels finaux et budget disponible. Cette opération ne modifie aucun quota et ne lance aucun fournisseur. Les observations historiques ne sont pas réutilisées automatiquement : la correspondance des dépendances reste à établir dans RD3. Une estimation de 15 appels n'est pas une garantie de conclusion.
+
+## English
+
+New inspection plans use protocol 2. A refusal requires an artifact, original line, exact quote, causal explanation, reproduction condition and expected behavior. Source line numbers refer to decoded source contents; diff line numbers refer to the supplied patch. Structural validation does not prove that the model's diagnosis is correct.
+
+Detailed defects arrive in the first response, are retained in the anchored journal and appear in the refusal reason. The protocol allows four detailed defects with an additional 8 KiB response allowance. Additional uncertainties remain unknown. Version 1 journals remain readable as historical records.
+
+Two interruptions of the same inspection with unchanged evidence and timeout block another identical retry. Spent calls are never refunded. Explicit timeout changes and provider replacement retain their separate recovery checks. This does not detect every semantic loop.
+
+The read-only `planning review-cost` command and authenticated HTTP `action=review-cost` endpoint expose review size and required/available calls even when the budget is insufficient. They neither authorize spending nor start providers. Cross-candidate observation reuse is not implemented in this delivery: unchanged file content alone is insufficient evidence of unchanged dependencies. The final independent verdict must still cover the current candidate and its controls.
