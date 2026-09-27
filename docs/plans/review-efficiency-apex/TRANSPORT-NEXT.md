@@ -124,3 +124,41 @@ la comparaison corrigée conserve tous les champs et compare leur JSON canonique
 `go vet`, contrôle de contrat et `git diff --check` : réussis.
 Ce diagnostic est disponible dans les sources ; le serveur installé reste en
 révision `9da8a65`. E6 reste bloquée : cet export ne constitue pas une validation.
+
+## Comptage local de tokens — 27 septembre
+
+Le tokenizer publié `tiktoken==0.14.0` associe `gpt-5.6-sol` à `o200k_base`.
+Le diagnostic `tools/review-transport/token_probe.py` utilise cette association
+sans repli implicite, conserve exactement le texte UTF-8 et ne contacte aucun
+modèle. La version 0.12.0 initialement essayée ne connaît pas ce nom ; elle a
+refusé, plutôt que choisir un tokenizer arbitraire.
+
+| Contenu mesuré | Octets UTF-8 | Tokens du texte |
+| --- | ---: | ---: |
+| Pièces fraîches, JSON agrégé | 1 187 620 | 352 892 |
+| Pièces fraîches, prototype sans perte | 1 148 247 | 327 361 |
+| Contexte canonique intégral | 1 841 967 | 532 669 |
+
+Ces mesures ne contiennent ni les consignes et schémas de chaque paquet, ni
+l’enveloppe du client. Le contexte intégral dépasse à lui seul la fenêtre locale
+observée de 272 000 tokens. Les pièces fraîches exigent toujours un découpage ;
+en revanche, le nombre de tokens n’impose pas à lui seul huit inspections.
+Cela justifie d’examiner une admission par tokens, pas de relever silencieusement
+la constante de 192 Kio ni d’affirmer que sept appels suffisent déjà.
+
+### Correction à développer
+
+1. Figer dans une nouvelle version du plan la capacité effective, le tokenizer,
+   ses paramètres et les réserves ; conserver les anciens prompts identiques.
+2. Compter le **message complet et son schéma**, garder également un plafond
+   mémoire en octets et le plafond de réponse par pièce (`managedFragmentReplyFits`).
+3. Vérifier les paquets et les deux appels finaux, avec les réserves historiques
+   et preuves originales sélectionnables ; refuser avant réservation si un message
+   ne tient pas. Un petit nombre d’appels n’est pas une preuve de complétude.
+4. Recetter sur Store isolé : mauvaise identité/capacité, tokenizer absent,
+   corruption, réouverture, anciens journaux inchangés, budgets conservés et vrai
+   défaut rejeté par le fournisseur simulé. Ne lancer aucune revue réelle pour
+   développer cette étape.
+
+Les 12 tests des outils diagnostiques passent (1,006 s). Aucun code d’admission
+moteur ni réglage fournisseur modifié par ce lot ; aucune nouvelle acceptation.

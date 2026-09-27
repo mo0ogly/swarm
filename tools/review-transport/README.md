@@ -24,3 +24,21 @@ A blocked, unpaid review context can be exported through the read-only
 or the authenticated planning API's `action=review-dossier`. The response's
 `context` property is the canonical document to measure. Keep these exports local:
 they contain original source text and reports. The export is not a review verdict.
+
+## Token counts (optional diagnostic)
+
+Create a disposable virtual environment and install `token-requirements.txt`, then
+run `python token_probe.py input.txt --model gpt-5.6-sol`. Run all diagnostic tests
+with `python -m unittest discover -s tools/review-transport -p 'test_*.py'` from
+the repository root using that environment. The tokenizer may download its public
+vocabulary on first use; input text stays local. No AI request is made.
+
+The output contains sizes and a digest, never the evidence text. Unknown model
+mappings and invalid UTF-8 fail closed. Special-token-looking source text is
+counted as ordinary data. Version 0.12.0 lacks the requested model mapping;
+0.14.0 is pinned and maps it to `o200k_base`.
+
+These are text token counts, **not complete provider request counts**. Client
+instructions, message framing, output/reasoning reserves and effective model
+configuration still need to be accounted for. This tool never changes the
+engine's byte cap, authorizes admission, or reserves a review call.
