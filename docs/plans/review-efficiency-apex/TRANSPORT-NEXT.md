@@ -43,3 +43,26 @@ nouvelle validation ni un changement d’ancrage des preuves.
 Aucun changement du plafond de 71, aucun nouvel appel réel ni installation de
 protocole supplémentaire n’est autorisé par ce document seul. L’implémentation
 locale du correctif reste dans le périmètre APEX déjà demandé.
+
+## Prototype hors moteur — 27 septembre, 13:43 UTC
+
+`tools/review-transport/probe.py` implémente le transport expérimental des chaînes
+longues avec blocs UTF-8 encadrés par taille et empreinte, chemins de remplacement
+explicites et dictionnaire des duplications exactes. La reconstruction vérifie
+chaque bloc puis l’empreinte canonique du document complet. Six tests passent :
+UTF-8/échappement, duplications, faux marqueur dans le contenu, troncature,
+corruption, référence manquante/dupliquée et entrées scalaires. Les petits contenus
+peuvent coûter davantage ; ce cas est testé et n’est pas masqué.
+
+Sur le contexte historique du refus `review-db7a817c9acff024a689360c` :
+1 827 067 octets JSON canoniques deviennent 1 743 630 octets de transport,
+soit 83 437 octets économisés avec reconstruction exacte. Ce contexte historique
+n’est pas le sous-ensemble frais du candidat actuel : cette mesure ne prouve donc
+pas que les sept appels disponibles suffisent. Elle ne comprend pas les consignes
+IA et le schéma. Aucun fournisseur lancé, aucune preuve historique modifiée.
+
+Conclusion limitée : la suppression de l’échappement et des répétitions exactes
+est réalisable et testée, mais son gain seul ne démontre pas le déblocage E6.
+Avant toute intégration, mesurer le transport des paquets réellement restants et
+la décision finale, notamment les sources communes aux patches. Aucun changement
+du moteur installé n’est livré par ce prototype.
