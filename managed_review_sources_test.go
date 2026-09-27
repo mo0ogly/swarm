@@ -128,3 +128,42 @@ func TestManagedReviewSourcesPerTaskBound(t *testing.T) {
 		t.Fatal("single-task bound weakened", e)
 	}
 }
+
+func TestManagedReviewSourcesFileCountIsPerTask(t *testing.T) {
+	dir := t.TempDir()
+	gitTest(t, dir, "init")
+	os.MkdirAll(filepath.Join(dir, "docs"), 0700)
+	files := []string{}
+	for i := 0; i < 26; i++ {
+		name := string(rune('a'+i)) + ".txt"
+		files = append(files, name)
+		os.WriteFile(filepath.Join(dir, name), []byte(name+"\n"), 0600)
+	}
+	write := func(task string, names []string) {
+		data, _ := json.Marshal(map[string]any{"version": 1, "files": names})
+		if err := os.WriteFile(filepath.Join(dir, "docs", task+".review-context.json"), data, 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("first", files[:13])
+	write("second", files[13:])
+	write("oversized", files)
+	gitTest(t, dir, "add", ".")
+	gitTest(t, dir, "commit", "-m", "bounded per-task file counts")
+	storage := t.TempDir()
+	gitTest(t, storage, "clone", "--bare", dir, "repository.git")
+	w := Work{Planning: &PlanningState{Repository: &ManagedRepository{Storage: storage}}}
+	sha := gitTest(t, dir, "rev-parse", "HEAD")
+	sources, err := managedReviewSourcesByTask(w, []managedReviewTaskContext{{Task: "first"}, {Task: "second"}, {Task: "first"}}, sha)
+	if err != nil || len(sources) != 26 {
+		t.Fatalf("bounded sources lost or duplicated: %d %v", len(sources), err)
+	}
+	for i, s := range sources {
+		if s.Path != files[i] || s.Content != files[i]+"\n" || s.Digest != hash([]byte(s.Content)) {
+			t.Fatal("source changed", i)
+		}
+	}
+	if _, err = managedReviewSourcesByTask(w, []managedReviewTaskContext{{Task: "oversized"}}, sha); err == nil {
+		t.Fatal("per-task 24-file bound removed")
+	}
+}

@@ -243,3 +243,11 @@ Même une réponse « non reproduit » ne supprime pas le refus : ce diagnostic
 n’est jamais un avis favorable, une preuve d’acceptation ou une relance.
 Un rejeu du même événement ne consomme pas de nouvel appel. Une interruption
 conserve la réservation consommée ; elle ne déclenche aucune reprise automatique.
+
+### Sources de plusieurs tâches
+
+Chaque tâche peut déclarer jusqu’à 24 fichiers et 128 Kio de sources de contexte.
+La revue cumulative conserve l’union complète des sources, avec dédoublonnage :
+deux tâches de treize fichiers ne sont pas rejetées au motif que leur somme
+dépasse 24. Les limites restent contrôlées pour chaque tâche, puis pour chaque
+envoi du dossier fragmenté et pour son budget d’appels. Aucun fichier n’est omis.

@@ -218,3 +218,10 @@ The private artifact and digest are recorded by `review.diagnostic.result`.
 This diagnostic never replaces the verdict, accepts a task or restarts production.
 Replaying the same event spends no extra call; interruption keeps the reservation
 consumed and never triggers an automatic retry.
+
+### Sources across tasks
+
+Each task may declare up to 24 files and 128 KiB of context sources. Cumulative
+review retains the complete deduplicated union: two tasks with thirteen files
+each are not rejected merely because their union exceeds 24. Per-task limits,
+fragment request sizes and call budgets are still enforced. No file is omitted.
