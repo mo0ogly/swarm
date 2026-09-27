@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -24,21 +25,16 @@ func TestManagedFragmentPacketSchemaBoundToInventory(t *testing.T) {
 		}
 	}
 	findings := props["findings"].(map[string]any)
-	if findings["minItems"] != float64(len(packet.Artifacts)) || findings["maxItems"] != float64(len(packet.Artifacts)) {
-		t.Fatal("incomplete result still allowed")
+	if len(findings["required"].([]any)) != len(packet.Artifacts) {
+		t.Fatal("incomplete inventory")
 	}
-	item := findings["items"].(map[string]any)["properties"].(map[string]any)
-	if item["artifact"].(map[string]any)["maximum"] != float64(len(packet.Artifacts)-1) {
-		t.Fatal("unbounded index")
-	}
-	allowed := item["sha256"].(map[string]any)["enum"].([]any)
-	for _, a := range packet.Artifacts {
-		found := false
-		for _, v := range allowed {
-			found = found || v == a.Digest
-		}
-		if !found {
-			t.Fatal("missing identity")
+	entries := findings["properties"].(map[string]any)
+	for i, a := range packet.Artifacts {
+		item := entries[strconv.Itoa(i)].(map[string]any)["properties"].(map[string]any)
+		for _, quote := range item["e"].(map[string]any)["enum"].([]any) {
+			if !strings.Contains(a.Content, quote.(string)) {
+				t.Fatal("invented anchor")
+			}
 		}
 	}
 	if schema != managedFragmentPacketSchema(packet) {

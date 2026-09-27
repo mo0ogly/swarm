@@ -204,3 +204,19 @@ leur code de sortie réel ; aucun `|| true` généralisé n'est recommandé.
 Ce cadrage aide l'agent, mais ne garantit pas qu'il suivra la consigne. Le moteur
 ne transforme pas une commande échouée en succès et conserve tous les plafonds.
 Une reprise après arrêt requiert une correction explicite et une tentative disponible.
+
+### Citations ancrées dans les pièces de revue
+
+Pour une nouvelle inspection fragmentée, le moteur propose jusqu'à deux courts
+extraits exacts par pièce dans le schéma de réponse. Le vérificateur choisit une
+ancre et conserve son jugement : pièce examinée, défaut démontré ou preuve
+manquante. Une ancre situe la pièce ; elle ne prouve pas sa conformité. Le contenu
+complet reste transmis et la décision finale demeure une étape distincte.
+
+Chaque résultat est lié à un index obligatoire et à l'empreinte du paquet entier.
+Les anciennes réponses restent lisibles avec leurs contrôles historiques ; aucune
+réponse refusée n'est convertie en preuve. Sans extrait utilisable, « examinée »
+est interdit. Le moteur contrôle la taille du contenu et du schéma avant de
+réserver un appel. Une reprise conserve les inspections acquises et les dépenses.
+Les clés compactes `v`, `r`, `e`, `n` du transport signifient verdict, raison,
+extrait et preuves nécessaires ; elles ne changent pas le vocabulaire utilisateur.

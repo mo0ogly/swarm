@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -44,7 +45,7 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 	if len(reply) > managedFragmentReplyLimit {
 		return fail("réponse trop grande")
 	}
-	if err := strict([]byte(reply), &result); err != nil {
+	if err := decodeManagedFragmentInspection([]byte(reply), packet, &result); err != nil {
 		return fail("réponse structurée invalide")
 	}
 	raw, err := json.Marshal(packet)
@@ -97,4 +98,60 @@ func managedFragmentReplyFits(p managedReviewFragmentPacket) bool {
 	}
 	raw, err := json.Marshal(r)
 	return err == nil && len(raw)+2048 <= managedFragmentReplyLimit
+}
+
+// Historical array journals remain readable. New responses bind every finding
+// to an explicit inventory key and the immutable whole-packet digest.
+func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPacket, result *managedFragmentInspection) error {
+	var envelope struct {
+		Candidate string          `json:"candidate_commit"`
+		Context   string          `json:"context_sha256"`
+		Packet    string          `json:"packet_sha256"`
+		Findings  json.RawMessage `json:"findings"`
+	}
+	if err := strict(raw, &envelope); err != nil {
+		return err
+	}
+	if strings.HasPrefix(strings.TrimSpace(string(envelope.Findings)), "[") {
+		return strict(raw, result)
+	}
+	var entries map[string]json.RawMessage
+	if err := strict(envelope.Findings, &entries); err != nil {
+		return err
+	}
+	if len(entries) != len(packet.Artifacts) {
+		return fmt.Errorf("incomplete inventory")
+	}
+	*result = managedFragmentInspection{Candidate: envelope.Candidate, ContextDigest: envelope.Context, PacketDigest: envelope.Packet}
+	for i, a := range packet.Artifacts {
+		raw, ok := entries[strconv.Itoa(i)]
+		if !ok {
+			return fmt.Errorf("missing artifact")
+		}
+		var entry struct {
+			Verdict  string   `json:"v"`
+			Reason   string   `json:"r"`
+			Evidence string   `json:"e"`
+			Needs    []string `json:"n"`
+		}
+		if err := strict(raw, &entry); err != nil {
+			return err
+		}
+		allowed := fragmentQuoteChoices(a.Content)
+		if len(allowed) == 0 {
+			allowed = []string{"indisponible"}
+			if entry.Verdict == "inspected" {
+				return fmt.Errorf("no quote available")
+			}
+		}
+		found := false
+		for _, q := range allowed {
+			found = found || q == entry.Evidence
+		}
+		if !found {
+			return fmt.Errorf("unoffered quote")
+		}
+		result.Findings = append(result.Findings, managedFragmentFinding{Artifact: i, Digest: a.Digest, Verdict: entry.Verdict, Reason: entry.Reason, Evidence: entry.Evidence, Needs: entry.Needs})
+	}
+	return nil
 }

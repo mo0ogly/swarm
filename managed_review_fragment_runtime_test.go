@@ -23,12 +23,12 @@ if mode=='exit-decision' and '\nSWARM_FRAGMENT_FINAL_EVIDENCE\n' in text: sys.ex
 if '\nSWARM_FRAGMENT_PACKET\n' in text:
  packet=json.loads(text.split('\nSWARM_FRAGMENT_PACKET\n',1)[1])
  schema=json.loads(sys.argv[sys.argv.index('--json-schema')+1]);props=schema['properties']
- assert props['findings']['minItems']==len(packet['artifacts'])==props['findings']['maxItems']
+ assert len(props['findings']['required'])==len(packet['artifacts'])
  assert props['candidate_commit']['enum']==[packet['candidate_commit']]
  assert props['context_sha256']['enum']==[packet['context_sha256']]
- reply={'candidate_commit':packet['candidate_commit'],'context_sha256':packet['context_sha256'],'packet_sha256':re.search(r'packet_sha256=([a-f0-9]+)',text).group(1),'findings':[]}
+ reply={'candidate_commit':packet['candidate_commit'],'context_sha256':packet['context_sha256'],'packet_sha256':re.search(r'packet_sha256=([a-f0-9]+)',text).group(1),'findings':{}}
  for i,a in enumerate(packet['artifacts']):
-  reply['findings'].append({'artifact':i,'sha256':a['sha256'],'verdict':('unknown' if mode.startswith('questions-') and i==0 else mode if mode in ('fail','unknown') else 'inspected'),'reason':'Fixture inspection','evidence':a['content'][:16],'needs':['Confirm original content is present'] if mode.startswith('questions-') and i==0 else []})
+  reply['findings'][str(i)]={'v':('unknown' if mode.startswith('questions-') and i==0 else mode if mode in ('fail','unknown') else 'inspected'),'r':'Content examined','e':props['findings']['properties'][str(i)]['properties']['e']['enum'][0],'n':['Confirm original content is present'] if mode.startswith('questions-') and i==0 else []}
 elif '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n',1)[1]);b=payload['partial_inspections']
  reply={'candidate_commit':b['candidate_commit'],'context_sha256':b['context_sha256'],'plan_sha256':b['plan_sha256'],'state':'unknown' if mode=='selection-unknown' else 'ready','reason':'Fixture selection of original evidence','references':[]}

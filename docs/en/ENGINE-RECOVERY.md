@@ -182,3 +182,19 @@ Validation checks keep their real exit codes; blanket `|| true` masking is not
 recommended. These instructions help the agent but do not guarantee compliance.
 The engine does not turn failed commands into successes and preserves all limits.
 Recovery after interruption requires an explicit correction and an available attempt.
+
+### Grounded quotations in review artifacts
+
+For new fragment inspections, the response schema offers up to two exact short
+excerpts from each artifact. The reviewer selects a location anchor and retains
+its judgment: inspected, demonstrated defect or missing evidence. An anchor
+locates content; it does not prove correctness. Full content is still supplied,
+and the final decision remains a separate step.
+
+Every finding is bound to a required inventory key and the whole packet digest.
+Historical replies remain readable under their original checks; rejected replies
+are never promoted into evidence. Without a usable excerpt, inspected is not
+allowed. Content and schema size are checked before reserving a call. Recovery
+preserves completed inspections and consumed calls. Compact transport keys
+`v`, `r`, `e`, `n` mean verdict, reason, evidence and required evidence; user-facing
+labels remain unchanged.
