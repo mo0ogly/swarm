@@ -134,3 +134,19 @@ grouped as `other`; no message text, reasoning content or raw error detail is
 added. These counts describe received activity, not a verdict or a proven cause
 of a timeout. Older diagnostics cannot reconstruct previously discarded types.
 Better telemetry does not guarantee that the review will finish.
+
+## Replacing a reviewer after interruption
+
+Pause the mission, then explicitly select the provider and model through
+`swarm role-model preview|apply` (`reviewer: true`). Running reviews and queued
+resumptions prevent this change. `planning recovery-preview` then quotes a
+**new**, complete inspection: previous model opinions are not attributed to the
+replacement. `planning retry-review` permits this route only after validating
+the available budget and evidence integrity.
+
+The existing producer result is retained; no production attempt is created.
+Normal candidate checks and independent review remain mandatory. The old review
+is retained in `previous_reviews`, its files remain immutable, and spent calls
+are never refunded. A negative inspection, altered evidence or an already
+started final decision requires its own resolution; changing providers does not
+turn those situations into acceptance.

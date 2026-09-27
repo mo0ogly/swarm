@@ -241,6 +241,22 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			}
 			managedProducer = v.Producer
 		}
+		if v.FragmentJournal != nil && fragmentReviewerChanged(*w, *v) {
+			preview, err := s.fragmentReplacementPreview(*w, t)
+			if err != nil {
+				return err
+			}
+			if preview.Missing > 0 {
+				return fmt.Errorf("%s", preview.Next)
+			}
+			// Retain the previous review and immutable evidence in the task history.
+			// No old inspection is attributed to the newly selected reviewer.
+			t.PreviousReviews = append(t.PreviousReviews, *v)
+			t.IndependentReview = nil
+			cfg.Failure = ""
+			t.Next = preview.Next
+			return nil
+		}
 		if v.FragmentJournal != nil {
 			if err := s.queueManagedFragmentResume(*w, t, r.EventID); err != nil {
 				return err

@@ -52,6 +52,9 @@ func (s *Store) reviewRecoveryPreview(work, id string) (ReviewRecovery, error) {
 	if r.State != "error" {
 		return ReviewRecovery{}, fmt.Errorf("la revue doit être interrompue avant de préparer sa reprise")
 	}
+	if fragmentReviewerChanged(w, *r) {
+		return s.fragmentReplacementPreview(w, task)
+	}
 	if err = s.managedBatchPlanIntact(w, *r); err != nil {
 		return ReviewRecovery{}, err
 	}

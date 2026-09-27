@@ -53,7 +53,7 @@ func (s *Store) prepareRoleModel(w *Work, r RoleModelRequest) error {
 		}
 	}
 	for _, t := range w.Tasks {
-		if t.IndependentReview != nil && (t.IndependentReview.State == "running" || len(t.IndependentReview.Batches) > 0 && t.IndependentReview.State != "passed") || t.BatchReviewResume != nil {
+		if t.IndependentReview != nil && ((t.IndependentReview.State == "running" || t.IndependentReview.State == "queued") || len(t.IndependentReview.Batches) > 0 && t.IndependentReview.State != "passed") || t.BatchReviewResume != nil {
 			return fmt.Errorf("Une revue est active ou reprend des lots ; terminez-la avant de changer le modèle.")
 		}
 	}

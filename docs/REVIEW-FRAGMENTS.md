@@ -153,3 +153,19 @@ contenu de raisonnement ou détail d’erreur brut n’est ajouté. Ces compteur
 expliquent l’activité reçue, sans constituer un verdict ni prouver la cause
 d’un délai dépassé. Les anciens diagnostics ne permettent pas de reconstruire
 les types déjà perdus. Un décompte plus précis ne garantit pas la fin de la revue.
+
+## Remplacer un vérificateur après une interruption
+
+Mettre la mission en pause, puis sélectionner explicitement le fournisseur et le
+modèle par `swarm role-model preview|apply` (`reviewer: true`). Une revue active
+ou déjà en file de reprise interdit ce changement. `planning recovery-preview`
+calcule ensuite le coût d'une **nouvelle** inspection complète : les avis de
+l'ancien modèle ne sont pas attribués au nouveau. `planning retry-review` ouvre
+ce parcours seulement après vérification du budget et de l'intégrité du dossier.
+
+Le même résultat producteur est conservé ; aucune nouvelle tentative producteur
+n'est créée. Les contrôles habituels et la revue du candidat restent obligatoires.
+L'ancienne revue est conservée dans `previous_reviews`, ses fichiers restent
+immuables, et aucun appel n'est remboursé. Un refus d'inspection, des preuves
+altérées ou une décision finale déjà engagée nécessitent leur traitement propre ;
+changer de fournisseur ne les transforme pas en validation.
