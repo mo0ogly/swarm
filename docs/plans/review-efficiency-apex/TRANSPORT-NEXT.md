@@ -162,3 +162,40 @@ la constante de 192 Kio ni d’affirmer que sept appels suffisent déjà.
 
 Les 12 tests des outils diagnostiques passent (1,006 s). Aucun code d’admission
 moteur ni réglage fournisseur modifié par ce lot ; aucune nouvelle acceptation.
+
+## Primitive moteur d’admission — étape en cours
+
+Implémentation dans `managed_review_input_budget.go` : contrat de capacité
+versionné, comptage séparé du message complet et du schéma avec vocabulaire embarqué,
+plafond mémoire distinct, UTF-8 strict et réserves explicites. Aucun calcul ne
+réserve un appel, ne contacte un fournisseur ou ne modifie le Store.
+
+Choix : [tokenizer Go embarqué](https://github.com/tiktoken-go/tokenizer), épinglé
+à v0.6.2, plutôt qu’un sous-processus Python et un vocabulaire à télécharger sur
+la machine de production. v0.8.1 exige Go 1.26 ; v0.6.2 conserve notre contrat
+Go 1.24. Les deux dépendances ajoutées sont le tokenizer et regexp2. Aucun
+changement de version Go dans le dépôt.
+
+Le contrat expérimental est volontairement restreint à `gpt-5.6-sol`,
+`o200k_base/tiktoken-go-v0.6.2`, une fenêtre au plus de 272 000 tokens et 95 %
+effectifs, au moins 32 768 tokens réservés au client et 65 536 à la sortie et au
+raisonnement, et au plus 1 Mio de texte UTF-8. Ces réserves sont une politique
+conservatrice, pas une mesure des instructions cachées du fournisseur. Toute
+capacité inconnue, réserves insuffisantes, dépassement mémoire/tokens ou UTF-8
+invalide produit un refus. Les séquences sans séparation de plus de 8 Kio sont
+refusées avant le BPE pour borner son travail quadratique, sans texte amputé.
+
+**Pas encore branché sur les revues actives.** Il reste à lier cette capacité
+à la configuration effective du client, l’ancrer dans un nouveau plan de
+fragments, puis appliquer le même contrat aux inspections et aux deux appels
+finaux. Les versions historiques gardent leur limite et leurs empreintes.
+Ne pas annoncer E6 débloquée à partir de cette primitive seule.
+
+Les tests ciblés comparent le Go à six vecteurs produits indépendamment par
+`tiktoken==0.14.0`, y compris Unicode, chaînes ressemblant à des tokens spéciaux,
+diff et JSON. Ils vérifient qu’un message de 360 000 octets peut tenir en tokens,
+qu’un schéma trop grand bloque, que les deux plafonds sont distincts, que les
+contrats invalides sont rejetés et que plusieurs compteurs restent indépendants.
+Tests ciblés : PASS 1,049 s. Suite Go complète : PASS 292,158 s. Race ciblée :
+PASS 14,443 s ; initialisation concurrente seule : PASS 1,244 s. `go vet`,
+contrat agent et `git diff --check` : PASS. Pas de test fournisseur réel.

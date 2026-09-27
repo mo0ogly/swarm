@@ -4,11 +4,13 @@ go 1.24.0
 
 require (
 	github.com/rivo/uniseg v0.4.7
+	github.com/tiktoken-go/tokenizer v0.6.2
 	golang.org/x/sys v0.31.0
 	modernc.org/sqlite v1.36.3
 )
 
 require (
+	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
