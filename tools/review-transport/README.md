@@ -18,3 +18,9 @@ A positive byte saving does not prove fewer model calls: prompt instructions,
 schema, per-packet boundaries, reply limits and final evidence selection still
 have to fit. Small inputs may become larger. Existing journals and their prompt
 hashes must retain their original rendering if this idea is later integrated.
+
+A blocked, unpaid review context can be exported through the read-only
+`planning review-dossier WORK --input request.json` operation (`{"task_id":"TASK"}`)
+or the authenticated planning API's `action=review-dossier`. The response's
+`context` property is the canonical document to measure. Keep these exports local:
+they contain original source text and reports. The export is not a review verdict.

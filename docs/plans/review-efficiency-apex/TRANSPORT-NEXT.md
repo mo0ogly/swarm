@@ -66,3 +66,61 @@ est réalisable et testée, mais son gain seul ne démontre pas le déblocage E6
 Avant toute intégration, mesurer le transport des paquets réellement restants et
 la décision finale, notamment les sources communes aux patches. Aucun changement
 du moteur installé n’est livré par ce prototype.
+
+## Mesure sur les pièces réellement restantes — 13:51 UTC
+
+Une nouvelle entrée de diagnostic en lecture seule, `planning review-dossier`,
+exporte le contexte canonique de la tentative bloquée sans autoriser de revue.
+L’API de planification expose la même opération avec `action=review-dossier`.
+Le test CLI/HTTP couvre contenu canonique identique, budget nul, tâche absente,
+absence de dépense et conservation du travail/de la tentative. Le fichier exporté
+contient des sources et rapports privés : le conserver localement.
+
+Sur E6 actuel, export par le binaire de développement et comparaison avant/après :
+révision457 et état identiques, candidat01a7a591e86d088f190861bfe86b170d71fc98ea.
+La reconstruction diagnostique retrouve les cinq groupes historiques0,1,3,4,5,
+275pièces totales et exactement les1 101 354octets frais annoncés par le moteur.
+Les149pièces fraîches occupent1 187 620octets JSON ; le prototype produit
+1 148 247octets avec reconstruction exacte, soit39 373octets de gain.
+
+**Cette piste seule ne suffit pas :** même sans consignes ni schémas,1 148 247octets
+ne tiennent pas dans cinq inspections de196 608octets. Le minimum théorique est
+six inspections plus deux appels finaux, donc huit appels pour sept disponibles.
+Ce n’est pas une estimation opérationnelle à huit appels : le vrai découpage peut
+en nécessiter davantage. Aucun protocole expérimental envoyé à un fournisseur.
+
+Les prochaines options à examiner sont la représentation sans perte des sources
+communes aux patches et la capacité d’entrée réellement documentée du fournisseur.
+La constante192Kio est une limite actuelle du moteur ; ne pas l’assimiler sans
+preuve à la fenêtre de contexte du modèle, et ne pas la relever arbitrairement.
+Une décision décomposée reste une autre architecture, avec son coût et ses
+obligations de couverture explicites.
+
+## Capacités : distinguer octets, tokens et configuration du client
+
+La [fiche officielle GPT-5.6 Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol),
+consultée le27septembre2026, annonce une fenêtre API de1 050 000tokens et une sortie
+maximale de128 000tokens. Elle indique aussi un palier de prix au-delà de272 000tokens
+d’entrée. Cela ne démontre pas la configuration effective du client Codex utilisé
+par Swarm : son cache local du même jour annonce272 000tokens et95% de fenêtre
+effective pour `gpt-5.6-sol`, sans plafond de sortie explicite dans cet objet.
+
+La constante Swarm de192Kio porte sur les **octets du message**, pas sur les tokens.
+Elle ne peut donc pas être justifiée simplement en la présentant comme la limite
+du modèle. La piste suivante est un calcul d’admission adapté au fournisseur,
+avec comptage de tokens documenté, réserves de sortie/raisonnement et provenance
+figée dans le plan. Une nouvelle version doit préserver les anciens prompts et
+leurs empreintes. Ne pas changer la fenêtre du client, le budget ou un palier de
+coût pour faire passer le dossier sans conditions vérifiées. Aucun de ces réglages
+n’a été modifié pendant cette analyse.
+
+## Validation de l’export en lecture seule
+
+`planning review-dossier` et son équivalent HTTP exportent les preuves courantes
+sans appel fournisseur ni mutation, y compris lorsque le budget est épuisé.
+Test ciblé CLI/HTTP : réussi. Suite Go complète : réussie en 289,091 s.
+Le premier passage avait échoué sur une comparaison des espaces JSON dans le test ;
+la comparaison corrigée conserve tous les champs et compare leur JSON canonique.
+`go vet`, contrôle de contrat et `git diff --check` : réussis.
+Ce diagnostic est disponible dans les sources ; le serveur installé reste en
+révision `9da8a65`. E6 reste bloquée : cet export ne constitue pas une validation.

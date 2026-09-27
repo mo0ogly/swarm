@@ -13,7 +13,7 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 		return s.managedBundle(pos[2], pos[3])
 	}
 	if len(pos) != 3 {
-		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|authorize-recovery|requalify|recovery-preview|fragment-preview|review-cost|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
+		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|authorize-recovery|requalify|recovery-preview|fragment-preview|review-cost|review-dossier|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
 	}
 	if pos[1] == "review-step" {
 		return s.independentReviewStep(pos[2])
@@ -64,6 +64,13 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 		}
 		return printJSON(out, v)
 	}
+	if pos[1] == "review-dossier" {
+		v, e := s.managedReviewDossier(pos[2], r.Task)
+		if e != nil {
+			return e
+		}
+		return printJSON(out, v)
+	}
 	if pos[1] == "review-cost" {
 		v, e := s.managedReviewCostPreview(pos[2], r.Task)
 		if e != nil {
@@ -103,6 +110,15 @@ func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWrit
 		work := r.URL.Query().Get("work")
 		if r.Method == "GET" && r.URL.Query().Get("action") == "recovery-preview" {
 			v, e := s.reviewRecoveryPreview(work, r.URL.Query().Get("task"))
+			if e != nil {
+				fail(w, e)
+				return
+			}
+			send(w, v)
+			return
+		}
+		if r.Method == "GET" && r.URL.Query().Get("action") == "review-dossier" {
+			v, e := s.managedReviewDossier(r.URL.Query().Get("work"), r.URL.Query().Get("task"))
 			if e != nil {
 				fail(w, e)
 				return
