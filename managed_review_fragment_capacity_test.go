@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 )
@@ -33,6 +34,22 @@ func TestManagedFragmentFindingSerializedBudget(t *testing.T) {
 	for _, s := range []string{strings.Repeat("x", 97), strings.Repeat("\n", 49), strings.Repeat("é", 49), strings.Repeat("<", 17)} {
 		if boundedFragmentFindingText(s) {
 			t.Fatal("escaped or UTF8 budget bypass", s)
+		}
+	}
+}
+
+func TestFragmentSchemaTextFitsSerializedBudget(t *testing.T) {
+	var schema map[string]any
+	if err := json.Unmarshal([]byte(managedFragmentInspectionSchema), &schema); err != nil {
+		t.Fatal(err)
+	}
+	props := schema["properties"].(map[string]any)["findings"].(map[string]any)["items"].(map[string]any)["properties"].(map[string]any)
+	for _, field := range []string{"reason", "evidence"} {
+		n := int(props[field].(map[string]any)["maxLength"].(float64))
+		for _, r := range []rune{'a', 'é', '"', '\\', '\n', '\x00', '<', '>', '&', '😀'} {
+			if !boundedFragmentFindingText(strings.Repeat(string(r), n)) {
+				t.Fatalf("schema allows overflowing %s %U", field, r)
+			}
 		}
 	}
 }

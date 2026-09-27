@@ -167,3 +167,8 @@ within one paragraph. Words and punctuation are not rewritten. Diff additions,
 deletions, separate hunks and separate paragraphs are never joined together.
 Fenced code and non-Markdown files retain exact matching. This tolerance only
 applies to inspection evidence; the independent final verdict remains mandatory.
+
+New inspection schemas limit the short `reason` and `evidence` fields to 16
+Unicode characters. Even six JSON bytes per escaped character fit the internal
+96-byte bound. Missing evidence is described through `needs`; the final decision
+carries the full rationale. Previously valid responses remain readable.
