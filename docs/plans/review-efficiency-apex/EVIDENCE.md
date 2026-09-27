@@ -166,3 +166,19 @@ unchanged;4available is still insufficient. No model invocation or quota change.
 This does not validate E6 or demonstrate that the next model verdict will pass.
 
 Full Go suite PASS350.178s. Evidence: reuse-origin-checks.json and reuse-origin-full.log.
+
+### Original observations survive an intermediate review error
+The public recovery regression now includes a provider exit between the original
+review and the next operator correction. Before this fix it lost all historical
+observations (FAIL15.093s). The engine may now read a terminal error's anchored
+references to an original review, but never reuse that error's own replies.
+A differential plan, original references and no reserved call are mandatory.
+The original durable record, packet, journal, model/provider/method and current
+artifact identity are checked through the existing path. No error is reclassified
+as changes_requested. New delta/impact questions and final review remain required.
+Read-only current candidate8f1c0d2d:9→6calls,5historicalgroups,276pieces unchanged;
+5callsavailable,68/73spent. No model calls or quota increase.
+Read-only code review found no bypass; existing source-corruption coverage remains,
+while the new exit scenario specifically tests repeated public recovery and budget.
+
+Targeted public recovery tests PASS61.601s; full Go suite PASS364.603s; vet, contract and diff checks PASS. No new synchronization or shared-state mutation.

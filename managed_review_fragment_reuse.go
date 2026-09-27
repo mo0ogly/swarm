@@ -175,12 +175,24 @@ func (s *Store) planLegacyCandidateFragments(w Work, a Agent, c managedReviewCon
 		return planManagedReviewFragments(c, available, 2)
 	}
 	r, err := s.storedFragmentOrigin(w.ID, t.RecoveredResult.PriorReview)
-	if err != nil || r.FragmentJournal == nil || r.State != "changes_requested" || r.Contract != reviewContract(t) || r.Producer != a.ID || r.Attempt != a.Attempt || s.managedBatchProviderIntact(w.Planning.Reviewer, r) != nil {
+	if err != nil || r.FragmentJournal == nil || (r.State != "changes_requested" && r.State != "error") || r.Contract != reviewContract(t) || r.Producer != a.ID || r.Attempt != a.Attempt || s.managedBatchProviderIntact(w.Planning.Reviewer, r) != nil {
 		return planManagedReviewFragments(c, available, 2)
 	}
 	oldPlan, j, err := s.readFragmentJournalAnchor(r)
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
+	}
+	// A terminal error can carry references to earlier proved observations.
+	// None of its own replies or verdict are eligible for reuse.
+	if r.State == "error" {
+		if r.Finished == "" || oldPlan.Version < 3 || len(oldPlan.Reused) == 0 {
+			return planManagedReviewFragments(c, available, 2)
+		}
+		for _, entry := range j.Entries {
+			if entry.State == "reserved" {
+				return managedReviewFragmentPlan{}, fmt.Errorf("historical review still has a reserved call")
+			}
+		}
 	}
 	// A differential plan is not a new origin. Resolve its original durable
 	// record and recheck that proof directly. Never recursively promote a chain

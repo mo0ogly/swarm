@@ -205,7 +205,7 @@ func TestManagedFragmentHistoricalUnknownRemainsOpen(t *testing.T) {
 }
 
 func TestManagedFragmentHistoricalPublicRecovery(t *testing.T) {
-	for _, mode := range []string{"pass", "fail"} {
+	for _, mode := range []string{"pass", "fail", "exit"} {
 		t.Run(mode, func(t *testing.T) { fragmentHistoricalPublicRecovery(t, mode) })
 	}
 }
@@ -257,8 +257,12 @@ func fragmentHistoricalPublicRecovery(t *testing.T, mode string) {
 		t.Fatal(err)
 	}
 	current, _ := after.task(a.TaskID)
-	if mode == "fail" {
-		if current.Status != "blocked" || current.IndependentReview == nil || current.IndependentReview.State != "changes_requested" || managedReviewCalls(t, s) != initialCalls+1 {
+	if mode == "fail" || mode == "exit" {
+		expectedState := "changes_requested"
+		if mode == "exit" {
+			expectedState = "error"
+		}
+		if current.Status != "blocked" || current.IndependentReview == nil || current.IndependentReview.State != expectedState || managedReviewCalls(t, s) != initialCalls+1 {
 			t.Fatal("new defect bypassed", current.Status, current.Blocker)
 		}
 		if current.AutoValidation != nil && current.AutoValidation.CandidateSHA == current.IndependentReview.CandidateSHA {
@@ -271,6 +275,7 @@ func fragmentHistoricalPublicRecovery(t *testing.T, mode string) {
 		}
 		gitTest(t, a.CWD, "add", "-A")
 		third := next
+		third.ConfirmReviewErrorRepair = mode == "exit"
 		third.EventID, third.Revision, third.ReviewID = "second-differential-repair", after.Revision, current.IndependentReview.ID
 		third.ResultTree = gitTest(t, a.CWD, "write-tree")
 		managedReviewMode(t, s, "pass")
