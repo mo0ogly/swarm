@@ -332,3 +332,36 @@ func TestPreparedBudgetCompatibilityRejectsOtherChanges(t *testing.T) {
 		t.Fatal("removed limits accepted")
 	}
 }
+
+func TestManagedPreparedReplayRejectsUnboundIdentity(t *testing.T) {
+	for _, kind := range []string{"missing-record", "wrong-task", "wrong-attempt", "missing-manifest"} {
+		t.Run(kind, func(t *testing.T) {
+			s, w := managedFixture(t)
+			req := Launch{Schema: 1, EventID: "bound-preparation", Revision: w.Revision, TaskID: "first", Provider: "managed-review-fixture", Role: "worker", Instruction: "Complete task", Timeout: 60}
+			if _, err := s.ensureManagedAttempt(w, req); err != nil {
+				t.Fatal(err)
+			}
+			a, created, err := s.resumePreparedLaunch(w.ID, req.EventID, w.Revision)
+			if err != nil || !created {
+				t.Fatal(err)
+			}
+			switch kind {
+			case "missing-record":
+				_, err = s.db.Exec("DELETE FROM managed_attempts WHERE agent_id=?", a.ID)
+			case "wrong-task":
+				_, err = s.db.Exec("UPDATE managed_attempts SET task_id='other-task' WHERE agent_id=?", a.ID)
+			case "wrong-attempt":
+				a.Attempt = "unrelated-attempt"
+				err = s.saveAgent(a)
+			case "missing-manifest":
+				err = os.Remove(filepath.Join(w.Planning.Repository.Storage, "copy-"+a.ID+".json"))
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, created, err = s.resumePreparedLaunch(w.ID, a.ID, w.Revision); err == nil || created {
+				t.Fatal("unbound agent returned as resumed preparation", kind)
+			}
+		})
+	}
+}

@@ -197,3 +197,20 @@ attributed candidate. Current source-parity metadata recalculated together:
 No model call during development. Full suites recorded separately.
 
 Host full suite PASS372.485s; attributed candidate full suite PASS157.277s.
+
+### Prepared-launch replay identity
+Review8c514d4b4c6f4e8790d8f5bd returned changes_requested at70/75calls.
+The existing-agent shortcut only checked WorkID. Four isolated cases reproduced
+false success: missing SQL attribution, mismatched task, unbound attempt and
+missing preparation manifest. All failed before correction (0.737s).
+Replay now checks the ready manifest, saved request/schema, nonempty preparation
+contract, SQL attribution/base/path, agent workspace, derived attempt ID and
+its membership in the task history. It still returns the original agent without
+launching a duplicate, including concurrent retry. It does not demand a new work
+revision for an already completed idempotent response.
+Targeted preparation tests with race PASS14.518s; vet/diff PASS. The two modified
+files were byte-identical to the candidate baseline before applying the patch.
+Candidate metadata recomputed623/636,13differences; historical trial scope stays
+explicit. No model call during development; full suites recorded separately.
+
+Validation finale : suite source `go test ./...` PASS (519.633 s), suite copie PASS (233.115 s), tests ciblés race PASS (14.518 s), `go vet ./...` et `git diff --check` PASS. La validation indépendante E6 reste distincte et non acquise.

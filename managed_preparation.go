@@ -147,7 +147,31 @@ func (s *Store) resumePreparedLaunch(work, id string, revision int) (Agent, bool
 		if a.WorkID != work {
 			return Agent{}, false, fmt.Errorf("préparation hors mission")
 		}
-		return a, false, nil
+		w, err := s.get(work)
+		if err != nil {
+			return Agent{}, false, err
+		}
+		record, err := s.readPreparedLaunch(w, id)
+		if err != nil {
+			return Agent{}, false, err
+		}
+		bound, err := s.managedAttempt(id)
+		if err != nil {
+			return Agent{}, false, err
+		}
+		if record.Request == nil || record.Request.Schema != 1 || record.PreparationContract == "" || a.Attempt != "a-"+hash([]byte(work + "|" + id))[:24] || record.Request.EventID != id || record.Request.TaskID != a.TaskID || record.Task != a.TaskID || bound.Agent != a.ID || bound.Work != work || bound.Task != a.TaskID || bound.Path != record.Path || bound.Base != record.Base || a.CWD != filepath.Join(record.Path, w.Planning.Repository.Subdir) {
+			return Agent{}, false, fmt.Errorf("agent sans attribution à cette préparation")
+		}
+		task, err := w.task(a.TaskID)
+		if err != nil {
+			return Agent{}, false, err
+		}
+		for _, attempt := range task.Attempts {
+			if a.Attempt != "" && attempt.ID == a.Attempt {
+				return a, false, nil
+			}
+		}
+		return Agent{}, false, fmt.Errorf("tentative sans attribution à cette préparation")
 	} else if e != sql.ErrNoRows {
 		return Agent{}, false, e
 	}
