@@ -89,3 +89,17 @@ pas implémentée par le simple cache d’observations RD3.
   Aucun avis indépendant de la mission revendiqué pour cette relecture.
 - Pas de changement d’interface ni validation visuelle nouvelle revendiquée.
 - E6 n’est pas acceptée par ces tests : la revue indépendante doit encore aboutir.
+
+### Livraison et reprise effective — 2026-09-27T15:06:24.675156+00:00
+
+Commit moteur a0780d62f95e3e7c70e1be8e214d7b9bb214f447 installé, PID1649530,
+SHA256 f98c84adb1bd3fb8871d04ab00cbb0ba7ea8e641838698d457bae5859a2de3b2.
+Santé prête, état conservé pendant installation, huit assets web identiques.
+CLI et HTTP installés donnent le même prévol6/7 sans mutation. Mission reprise.
+Action publique retry-review enregistrée sous retry-e6-token-protocol4-20260927.
+Revue réelle E6 démarrée : review-60fafd58dc2f40ba6541fc97, état running,
+révision461, premier appel réservé, compteur65/71. Aucun nouveau producteur,
+même candidat et mêmes contrôles. Ce n’est PAS encore une acceptation.
+Le statut global de la tâche et son ancien motif restent blocked pendant cette
+revue ; lire independent_review.state pour l’activité réelle, ne pas relancer en
+parallèle à cause de cette ancienne étiquette. À suivre comme point de lisibilité.

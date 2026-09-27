@@ -35,6 +35,7 @@ La seconde exige toujours des avis indépendants et les preuves actuelles.
 ## Étape suivante
 Le protocole 4 est intégré et recetté : admission par tokens, capacité du client
 natif ancrée, réserves et preuves conservées. Prévol E6 : six appels pour sept
-disponibles, transport prêt. Installer le binaire vérifié puis reprendre la revue
-existante dans le budget autorisé ; aucune acceptation déduite du seul prévol.
+disponibles, transport prêt. Binaire a0780d6 installé et revue E6 relancée par l’action publique dans le
+budget autorisé. Premier appel réservé : 65/71 ; aucune acceptation déduite du
+seul prévol. Suivre la revue en cours puis E7/E8.
 Voir TRANSPORT-NEXT.md et EVIDENCE.md.
