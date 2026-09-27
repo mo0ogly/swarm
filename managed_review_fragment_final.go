@@ -12,6 +12,7 @@ import (
 // remains a separate opinion. This bundle is not a task verdict or permission to
 // publish, and the original full packets must remain durably available.
 type managedFragmentFinalEvidence struct {
+	InputBudget   *managedReviewInputBudget           `json:"input_budget,omitempty"`
 	Candidate     string                              `json:"candidate_commit"`
 	ContextDigest string                              `json:"context_sha256"`
 	PlanDigest    string                              `json:"plan_sha256"`
@@ -40,7 +41,7 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 		return empty, fmt.Errorf("inspections de fragments incomplètes")
 	}
 	raw, _ := json.Marshal(p)
-	out := managedFragmentFinalEvidence{Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
+	out := managedFragmentFinalEvidence{InputBudget: p.InputBudget, Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
 	for i, packet := range p.Packets {
 		state, inspection, e := parsePlannedFragment(replies[i], p, i)
 		if e != nil {

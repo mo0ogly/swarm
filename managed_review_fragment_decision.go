@@ -19,7 +19,7 @@ func managedFragmentDecisionPrompt(prefix string, c managedReviewContext, p mana
 	}
 	var selection *managedFragmentEvidenceSelection
 	if len(refs) > 0 {
-		selected, e := selectManagedFragmentEvidence(c, p, refs, managedReviewPromptLimit)
+		selected, e := selectManagedFragmentEvidence(c, p, refs, fragmentInputByteLimit(p.InputBudget))
 		if e != nil {
 			return "", empty, e
 		}
@@ -53,7 +53,7 @@ Pour pass, cite exactement une preuve originale visible dans ce message, jamais 
 		instructions += fragmentQuestionInstructions
 	}
 	prompt := incrementalReviewPrefix(prefix, c) + "\n" + instructions + "\nSWARM_FRAGMENT_FINAL_EVIDENCE\n" + string(raw)
-	if len(prompt)+len(fragmentDecisionSchema(bundle)) > managedReviewPromptLimit {
+	if err := fragmentInputFits(bundle.InputBudget, prompt, fragmentDecisionSchema(bundle)); err != nil {
 		return "", empty, fmt.Errorf("décision finale trop grande ; aucune preuve tronquée")
 	}
 	// Parser evidence is restricted to precisely the original bytes sent above.

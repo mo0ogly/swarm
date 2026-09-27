@@ -72,3 +72,20 @@ pas implémentée par le simple cache d’observations RD3.
 - Relecture effectuée par l’auteur avec la méthode code-reviewer, pas un avis
   indépendant de la mission. Recette verify-fix via l’entrée publique de reprise,
   transport sous-processus simulé, état relu après réouverture.
+
+## Protocole 4 — recette finale
+
+- Tests ciblés admission/protocole/Store : PASS 17,796 s.
+- `go test ./...` : PASS 322,856 s sur le code final.
+- `go test -race -run 'TestManagedFragmentToken|TestObservedReviewInput|TestReviewInputTokens' -count=1` : PASS 166,086 s.
+- `go vet ./...`, contrôle du contrat agent, `git diff --check` : PASS.
+- Prévol CLI du candidat E6 existant avec le client natif configuré : six appels
+  requis pour sept disponibles, transport prêt, état de mission identique avant
+  et après ; zéro appel IA. Les cinq groupes historiques et 275 pièces restent
+  présents. Résultat enregistré dans `v4-native-client-cost.json` des artefacts
+  de livraison, mesures/tests dans `v4-checks.json`.
+- Relecture par l’auteur : découverte et correction du cache provenant d’un autre
+  client, du faux refus sur JSON échappé et de la divergence prévol/exécution.
+  Aucun avis indépendant de la mission revendiqué pour cette relecture.
+- Pas de changement d’interface ni validation visuelle nouvelle revendiquée.
+- E6 n’est pas acceptée par ces tests : la revue indépendante doit encore aboutir.

@@ -15,14 +15,18 @@ import (
 // digests must remain unchanged. A caller must additionally establish the actual
 // provider/model/client configuration and anchor this object with the new plan.
 type managedReviewInputBudget struct {
-	Version       int    `json:"version"`
-	Model         string `json:"model"`
-	Tokenizer     string `json:"tokenizer"`
-	ContextTokens int    `json:"context_tokens"`
-	EffectivePct  int    `json:"effective_percent"`
-	ClientReserve int    `json:"client_reserve_tokens"`
-	OutputReserve int    `json:"output_reserve_tokens"`
-	MaxBytes      int    `json:"max_utf8_bytes"`
+	ClientStamp      string `json:"client_executable_stamp,omitempty"`
+	ProviderDigest   string `json:"provider_sha256,omitempty"`
+	ClientVersion    string `json:"client_version,omitempty"`
+	CapabilityDigest string `json:"capability_sha256,omitempty"`
+	Version          int    `json:"version"`
+	Model            string `json:"model"`
+	Tokenizer        string `json:"tokenizer"`
+	ContextTokens    int    `json:"context_tokens"`
+	EffectivePct     int    `json:"effective_percent"`
+	ClientReserve    int    `json:"client_reserve_tokens"`
+	OutputReserve    int    `json:"output_reserve_tokens"`
+	MaxBytes         int    `json:"max_utf8_bytes"`
 }
 
 const managedReviewTokenizer = "o200k_base/tiktoken-go-v0.6.2"
@@ -64,20 +68,29 @@ func (b managedReviewInputBudget) measure(prompt, schema string) (managedReviewI
 		return out, fmt.Errorf("plafond mémoire de revue dépassé")
 	}
 	// The embedded BPE implementation merges a piece quadratically. Reject an
-	// exceptionally long uninterrupted run before tokenizing untrusted evidence.
+	// exceptionally long lexical run before tokenizing untrusted evidence.
 	// No truncation or substitution is permitted to make such evidence fit.
 	for _, text := range []string{prompt, schema} {
 		if !utf8.ValidString(text) {
 			return out, fmt.Errorf("texte de revue UTF-8 invalide")
 		}
-		run := 0
+		run, previousClass := 0, 0
 		for _, r := range text {
-			if unicode.IsSpace(r) {
+			class := 2
+			if unicode.IsLetter(r) || unicode.IsMark(r) {
+				class = 1
+			}
+			if unicode.IsSpace(r) || unicode.IsNumber(r) {
+				class = 0
+			}
+			if class == 0 || class != previousClass {
 				run = 0
-			} else {
+			}
+			previousClass = class
+			if class != 0 {
 				run += utf8.RuneLen(r)
 				if run > 8192 {
-					return out, fmt.Errorf("séquence sans séparation trop longue pour le tokenizer de revue")
+					return out, fmt.Errorf("séquence lexicale trop longue pour le tokenizer de revue")
 				}
 			}
 		}

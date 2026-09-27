@@ -21,7 +21,19 @@ func managedFragmentDecisionCapacity(prefix string, c managedReviewContext, p ma
 	if err != nil {
 		return 0, err
 	}
-	remaining := managedReviewPromptLimit - len(prompt) - len(fragmentDecisionSchema(bundle))
+	remaining, err := fragmentInputRoom(p.InputBudget, prompt, fragmentDecisionSchema(bundle))
+	if err != nil {
+		return 0, err
+	}
+	if p.Version == 4 {
+		// Future excerpts/opinions may tokenize worse than synthetic x strings.
+		// Reserve one token per allowed byte in addition to their measured cost.
+		for i, packet := range p.Packets {
+			if fragmentReuseAt(p, i) == nil {
+				remaining -= len(packet.Artifacts) * 2 * managedFragmentFindingTextLimit
+			}
+		}
+	}
 	// Reserve the property name/comma in addition to the selection's encoded bytes.
 	remaining -= len(`,"requested_original_evidence":`)
 	if remaining <= 0 {
@@ -33,7 +45,7 @@ func managedFragmentDecisionCapacity(prefix string, c managedReviewContext, p ma
 // Synthetic size model only; never use as inspection evidence.
 func maximalManagedFragmentBundle(c managedReviewContext, p managedReviewFragmentPlan) managedFragmentFinalEvidence {
 	raw, _ := json.Marshal(p)
-	bundle := managedFragmentFinalEvidence{Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
+	bundle := managedFragmentFinalEvidence{InputBudget: p.InputBudget, Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw)}
 	bundle.ChangeDiff = p.ChangeDiff
 	for _, ref := range p.Reused {
 		_, inspection, _ := parseManagedFragmentInspection(ref.Reply, ref.Original)

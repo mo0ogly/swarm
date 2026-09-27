@@ -20,6 +20,7 @@ type managedReviewFragmentArtifact struct {
 	Content string `json:"content"`
 }
 type managedReviewFragmentPacket struct {
+	InputBudget   *managedReviewInputBudget       `json:"input_budget,omitempty"`
 	Version       int                             `json:"version"`
 	Candidate     string                          `json:"candidate_commit"`
 	ContextDigest string                          `json:"context_sha256"`
@@ -27,6 +28,7 @@ type managedReviewFragmentPacket struct {
 	Artifacts     []managedReviewFragmentArtifact `json:"artifacts"`
 }
 type managedReviewFragmentPlan struct {
+	InputBudget        *managedReviewInputBudget     `json:"input_budget,omitempty"`
 	Version            int                           `json:"version"`
 	ContextDigest      string                        `json:"context_sha256"`
 	Candidate          string                        `json:"candidate_commit"`
@@ -155,8 +157,11 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	if err != nil {
 		return err
 	}
-	if (p.Version != 1 && p.Version != 2 && p.Version != 3) || p.Executable || p.Candidate != c.Candidate || p.ContextDigest != hash(canonical) || p.ReservedFinalCalls < 1 || len(p.Packets) == 0 || fragmentPaidInspections(p)+p.ReservedFinalCalls > p.AvailableCalls {
+	if (p.Version != 1 && p.Version != 2 && p.Version != 3 && p.Version != 4) || p.Executable || p.Candidate != c.Candidate || p.ContextDigest != hash(canonical) || p.ReservedFinalCalls < 1 || len(p.Packets) == 0 || fragmentPaidInspections(p)+p.ReservedFinalCalls > p.AvailableCalls {
 		return fmt.Errorf("plan de fragments périmé ou incohérent")
+	}
+	if err := validateFragmentInputBudget(p.Version, p.InputBudget); err != nil {
+		return err
 	}
 	expected, err := managedFragmentArtifacts(c)
 	if err != nil {
@@ -165,12 +170,18 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	actual := []managedReviewFragmentArtifact{}
 	for i, packet := range p.Packets {
 		raw, err := json.Marshal(packet)
-		if err != nil || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit {
+		if err != nil || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
 			return fmt.Errorf("paquet de revue modifié ou trop grand")
+		}
+		// Structural rechecks run inside journal/cancellation checks. Count the
+		// complete prompt at preflight and immediately before each paid call,
+		// not on every immutable-journal poll (which would tokenize megabytes).
+		if p.Version == 4 && len(raw) > p.InputBudget.MaxBytes {
+			return fmt.Errorf("paquet dépasse le plafond mémoire ancré")
 		}
 		actual = append(actual, packet.Artifacts...)
 	}
-	if p.Version == 3 {
+	if p.Version == 3 || (p.Version == 4 && len(p.Reused) > 0) {
 		return validateFragmentReuseCoverage(c, p, actual, expected)
 	}
 	if len(p.Reused) > 0 || p.ChangeDiff != "" {

@@ -29,3 +29,22 @@ Detailed defects arrive in the first response, are retained in the anchored jour
 Two interruptions of the same inspection with unchanged evidence and timeout block another identical retry. Spent calls are never refunded. Explicit timeout changes and provider replacement retain their separate recovery checks. This does not detect every semantic loop.
 
 The read-only `planning review-cost` command and authenticated HTTP `action=review-cost` endpoint expose review size and required/available calls even when the budget is insufficient. They neither authorize spending nor start providers. Protocol 3 can retain local observations with unchanged complete input groups and original provenance. A fresh impact review is mandatory; this does not certify complete dependency closure. Check both fits_budget and transport_ready before retrying. The final independent verdict must still cover the current candidate and its controls.
+
+## Protocole 4 — admission en tokens
+
+Un nouveau plan peut utiliser le protocole 4 lorsque la capacité locale du client
+Codex configuré est établie et que le plan historique ne tient pas. Le plan ancre
+le modèle, le tokenizer, la capacité, les réserves et l’identité du client. Tous
+les messages complets et schémas sont comptés avant réservation ; les plafonds
+mémoire, réponse et appels restent applicables. Les observations historiques et
+leurs réserves restent sous leurs identités originales. Les anciens plans v1–v3
+ne sont ni réécrits ni implicitement convertis.
+
+### English
+
+Protocol 4 admits new review messages using an anchored token capacity from the
+configured Codex client's bundled model catalog. Complete prompts and schemas
+are counted before spending; memory, response and call limits remain enforced.
+Unknown capabilities fail closed. Historical observations retain their original
+identities and unresolved obligations. Existing v1–v3 plans are not rewritten.
+A successful size preflight does not mean the independent review will pass.

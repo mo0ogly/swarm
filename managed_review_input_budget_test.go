@@ -11,7 +11,7 @@ import (
 )
 
 func reviewTokenBudgetFixture() managedReviewInputBudget {
-	return managedReviewInputBudget{1, "gpt-5.6-sol", managedReviewTokenizer, 272000, 95, 32768, 65536, 1024 * 1024}
+	return managedReviewInputBudget{Version: 1, Model: "gpt-5.6-sol", Tokenizer: managedReviewTokenizer, ContextTokens: 272000, EffectivePct: 95, ClientReserve: 32768, OutputReserve: 65536, MaxBytes: 1024 * 1024}
 }
 
 func TestReviewInputTokensMatchIndependentPythonVectors(t *testing.T) {

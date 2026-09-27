@@ -182,10 +182,10 @@ effectifs, au moins 32 768 tokens réservés au client et 65 536 à la sortie et
 raisonnement, et au plus 1 Mio de texte UTF-8. Ces réserves sont une politique
 conservatrice, pas une mesure des instructions cachées du fournisseur. Toute
 capacité inconnue, réserves insuffisantes, dépassement mémoire/tokens ou UTF-8
-invalide produit un refus. Les séquences sans séparation de plus de 8 Kio sont
+invalide produit un refus. Les séquences lexicales de plus de 8 Kio sont
 refusées avant le BPE pour borner son travail quadratique, sans texte amputé.
 
-**Pas encore branché sur les revues actives.** Il reste à lier cette capacité
+**État de la primitive au commit 499ce81 : pas encore branchée.** Il restait à lier cette capacité
 à la configuration effective du client, l’ancrer dans un nouveau plan de
 fragments, puis appliquer le même contrat aux inspections et aux deux appels
 finaux. Les versions historiques gardent leur limite et leurs empreintes.
@@ -199,3 +199,43 @@ contrats invalides sont rejetés et que plusieurs compteurs restent indépendant
 Tests ciblés : PASS 1,049 s. Suite Go complète : PASS 292,158 s. Race ciblée :
 PASS 14,443 s ; initialisation concurrente seule : PASS 1,244 s. `go vet`,
 contrat agent et `git diff --check` : PASS. Pas de test fournisseur réel.
+
+## Intégration du protocole 4
+
+Le moteur utilise désormais cette capacité pour un nouveau plan lorsque le plan
+historique dépasse le budget d’appels disponible ou échoue au contrôle de taille.
+Les plans v1–v3 déjà valides restent inchangés. La capacité est ancrée dans les
+nouveaux plans et paquets, propagée à la sélection et à la décision, et le message
+complet avec schéma est recompté avant chaque appel. Le journal reste borné par
+le même budget de réservations ; aucune preuve ni réserve ancienne supprimée.
+
+Surprise vérifiée pendant l’intégration : le cache local annonçait un client
+0.153.0, alors que l’exécutable configuré répondait `codex-cli 0.154.0`.
+**Le cache a donc été écarté comme source de capacité.** Le moteur interroge
+l’exécutable configuré avec `--version` et `debug models --bundled` : métadonnées
+locales, sans appel au modèle. Le catalogue embarqué confirme 272 000 tokens et
+95 %. Version, empreinte des capacités, identité du fournisseur et signature du
+fichier exécutable sont ancrées. La signature utilise le chemin résolu, la taille,
+la date de modification et le mode ; ce n’est pas une attestation cryptographique
+du binaire et de ses dépendances. Les contrôles d’une revue en cours revérifient
+cette signature sans relancer un sous-processus à chaque sondage. Une mise à jour
+du client arrête les nouveaux appels, sans invalider les anciens rapports clos.
+
+Autre défaut corrigé : rechercher une longue séquence sans espace dans le JSON
+refusait les sources dont les sauts de ligne étaient échappés. La protection du
+BPE porte maintenant sur les séquences lexicales ; les limites de mémoire et de
+tokens restent indépendantes. Les tests reproduisent le problème avec de vrais
+paquets JSON. Le prévol et l’exécution choisissent le même protocole selon le
+budget réel, même lorsque l’estimation utilise un plafond de calcul plus grand.
+
+Prévol E6 de développement, sans modification de mission : **quatre inspections
+plus deux appels finaux, soit six appels pour sept disponibles**, contre dix
+avant intégration ; `transport_ready=true`. Les 275 pièces et cinq groupes
+historiques restent présents. Cette mesure n’est pas une acceptation E6 ni une
+garantie que le modèle n’émettra pas un refus ou une demande de preuve.
+
+Recette sur Store jetable : chemin réel de préparation de revue, transport via
+un exécutable de test utilisant l’adaptateur Codex, trois réservations pour une
+inspection et deux étapes finales ; défaut rejeté après un seul appel ; client
+modifié refusé sans appel ; réouverture et conservation des preuves historiques.
+Le fournisseur est simulé et ne prouve pas la qualité d’une revue IA réelle.

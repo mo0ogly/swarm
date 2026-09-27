@@ -122,7 +122,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 			return "", nil, e
 		}
 		prompt += s.fragmentRetryFeedback(r, j, packet)
-		if len(prompt)+len(managedFragmentPacketSchema(packet)) > managedReviewPromptLimit {
+		if err := fragmentInputFits(packet.InputBudget, prompt, managedFragmentPacketSchema(packet)); err != nil {
 			return "", nil, fmt.Errorf("paquet et diagnostic de reprise dépassent la limite ; aucun appel réservé")
 		}
 		raw, _ := json.Marshal(packet)

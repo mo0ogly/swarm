@@ -30,7 +30,7 @@ func selectManagedFragmentEvidence(c managedReviewContext, p managedReviewFragme
 	if err := validateManagedReviewFragments(c, p); err != nil {
 		return empty, err
 	}
-	if len(refs) == 0 || maxBytes <= 0 || maxBytes > managedReviewPromptLimit {
+	if len(refs) == 0 || maxBytes <= 0 || maxBytes > fragmentInputByteLimit(p.InputBudget) {
 		return empty, fmt.Errorf("sélection de preuves ou capacité invalide")
 	}
 	raw, _ := json.Marshal(p)

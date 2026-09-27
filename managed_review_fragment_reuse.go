@@ -90,7 +90,7 @@ func validateFragmentReuseCoverage(c managedReviewContext, p managedReviewFragme
 }
 
 func differentialFragmentPlan(c managedReviewContext, old managedReviewContext, origin IndependentReview, oldPlan managedReviewFragmentPlan, j managedFragmentJournal, delta string, available int) (managedReviewFragmentPlan, error) {
-	if fragmentScope(c) != fragmentScope(old) || oldPlan.Version == 3 || delta == "" {
+	if fragmentScope(c) != fragmentScope(old) || oldPlan.Version >= 3 || delta == "" {
 		return planManagedReviewFragments(c, available, 2)
 	}
 	artifacts, err := managedFragmentArtifacts(c)
@@ -166,7 +166,7 @@ func (s *Store) storedFragmentOrigin(work, id string) (IndependentReview, error)
 	err = strict(raw, &r)
 	return r, err
 }
-func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, available int) (managedReviewFragmentPlan, error) {
+func (s *Store) planLegacyCandidateFragments(w Work, a Agent, c managedReviewContext, available int) (managedReviewFragmentPlan, error) {
 	t, err := w.task(a.TaskID)
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
@@ -183,7 +183,7 @@ func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, 
 		return managedReviewFragmentPlan{}, err
 	}
 	model, _ := json.Marshal(w.Planning.Reviewer.ModelRoute)
-	if r.FragmentJournal.ModelConfigDigest != hash(model) || oldPlan.Version == 3 {
+	if r.FragmentJournal.ModelConfigDigest != hash(model) || oldPlan.Version >= 3 {
 		return planManagedReviewFragments(c, available, 2)
 	}
 	path, err := safeReport(s.root, r.Context)

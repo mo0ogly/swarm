@@ -24,7 +24,11 @@ func renderManagedFragmentRequest(prefix string, c managedReviewContext, p manag
 	if actualErr != nil {
 		return "", actualErr
 	}
-	actualRoom := managedReviewPromptLimit - len(actualPrompt) - len(fragmentDecisionSchema(b)) - len(`,"requested_original_evidence":`)
+	actualRoom, err := fragmentInputRoom(p.InputBudget, actualPrompt, fragmentDecisionSchema(b))
+	if err != nil {
+		return "", err
+	}
+	actualRoom -= len(`,"requested_original_evidence":`)
 	if actualRoom < room {
 		room = actualRoom
 	}
@@ -62,7 +66,7 @@ Examine les contrats, contrôles et inspections partielles. rows suit la légend
 		instructions += "Les unresolved_questions sont des obligations non résolues : sélectionner les pièces nécessaires pour répondre à chacune, ou retourner unknown. Aucune réserve ne peut être omise.\n"
 	}
 	prompt := prefix + "\n" + instructions + "\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n" + string(raw)
-	if len(prompt)+len(managedFragmentRequestSchema) > managedReviewPromptLimit {
+	if err := fragmentInputFits(p.InputBudget, prompt, managedFragmentRequestSchema); err != nil {
 		return "", fmt.Errorf("demande finale trop grande avant appel ; aucune preuve tronquée")
 	}
 	return prompt, nil

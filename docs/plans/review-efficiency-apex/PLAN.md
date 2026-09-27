@@ -33,5 +33,8 @@ La clôture de ce correctif du moteur et celle de la mission E6–E8 sont distin
 La seconde exige toujours des avis indépendants et les preuves actuelles.
 
 ## Étape suivante
-Mesurer la réduction sans perte du transport avant de modifier le protocole ;
-voir TRANSPORT-NEXT.md. Aucun dossier amputé pour passer sous un plafond.
+Le protocole 4 est intégré et recetté : admission par tokens, capacité du client
+natif ancrée, réserves et preuves conservées. Prévol E6 : six appels pour sept
+disponibles, transport prêt. Installer le binaire vérifié puis reprendre la revue
+existante dans le budget autorisé ; aucune acceptation déduite du seul prévol.
+Voir TRANSPORT-NEXT.md et EVIDENCE.md.

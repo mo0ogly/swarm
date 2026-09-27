@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 )
 
 type ManagedFragmentJournalAnchor struct {
@@ -72,6 +73,30 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 	}
 	if e = strict(raw, &p); e != nil {
 		return p, j, e
+	}
+	if p.Version == 4 {
+		if p.InputBudget == nil || p.InputBudget.ProviderDigest != r.BatchProviderDigest {
+			return p, j, fmt.Errorf("capacité et fournisseur différents")
+		}
+		if r.ModelRoute == nil || r.ModelRoute.Model != p.InputBudget.Model || p.InputBudget.ClientVersion == "" || len(p.InputBudget.CapabilityDigest) != 64 || len(p.InputBudget.ClientStamp) != 64 {
+			return p, j, fmt.Errorf("identité de capacité incomplète")
+		}
+		// Completed evidence survives a later client upgrade. Only a running
+		// review may spend more calls and must recheck the current executable.
+		if r.State == "running" {
+			ps, err := s.providers()
+			if err != nil {
+				return p, j, err
+			}
+			provider, ok := ps.Providers[strings.TrimPrefix(r.Reviewer, "reviewer://")]
+			if !ok {
+				return p, j, fmt.Errorf("fournisseur de capacité absent")
+			}
+			stamp, err := reviewClientStamp(provider.Command)
+			if err != nil || stamp != p.InputBudget.ClientStamp || providerAdapter(provider) != "codex" {
+				return p, j, fmt.Errorf("client de revue modifié ou inconnu")
+			}
+		}
 	}
 	contextPath, e := safeReport(s.root, r.Context)
 	if e != nil {
