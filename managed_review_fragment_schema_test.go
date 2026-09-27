@@ -31,10 +31,9 @@ func TestManagedFragmentPacketSchemaBoundToInventory(t *testing.T) {
 	entries := findings["properties"].(map[string]any)
 	for i, a := range packet.Artifacts {
 		item := entries[strconv.Itoa(i)].(map[string]any)["properties"].(map[string]any)
-		for _, quote := range item["e"].(map[string]any)["enum"].([]any) {
-			if !strings.Contains(a.Content, quote.(string)) {
-				t.Fatal("invented anchor")
-			}
+		evidence := item["e"].(map[string]any)
+		if evidence["type"] != "integer" || len(evidence["enum"].([]any)) != len(fragmentQuoteChoices(a.Content)) {
+			t.Fatal("unbounded anchor", evidence)
 		}
 	}
 	if schema != managedFragmentPacketSchema(packet) {

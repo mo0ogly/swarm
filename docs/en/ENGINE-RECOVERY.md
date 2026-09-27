@@ -186,7 +186,8 @@ Recovery after interruption requires an explicit correction and an available att
 ### Grounded quotations in review artifacts
 
 For new fragment inspections, the response schema offers up to two exact short
-excerpts from each artifact. The reviewer selects a location anchor and retains
+excerpts from each artifact. The schema constrains their numeric indexes, avoiding
+provider restrictions on quotation marks in string enum values. The reviewer selects a location anchor and retains
 its judgment: inspected, demonstrated defect or missing evidence. An anchor
 locates content; it does not prove correctness. Full content is still supplied,
 and the final decision remains a separate step.

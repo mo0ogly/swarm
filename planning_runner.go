@@ -335,6 +335,9 @@ func runStructuredProviderClock(provider Provider, route *ModelRoute, prompt, sc
 		return "", result.cooldown.failure()
 	}
 	if err != nil {
+		if result.err != nil && result.err.Error() == structuredSchemaRefusal {
+			return "", fmt.Errorf("%w ; %s", err, result.err)
+		}
 		return "", fmt.Errorf("%w ; %s ; diagnostic : %s", err, result.progressDiagnostic(), guardBlock(diagnostic.String(), 600))
 	}
 	if result.err != nil {

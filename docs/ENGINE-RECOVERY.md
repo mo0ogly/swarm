@@ -208,7 +208,8 @@ Une reprise après arrêt requiert une correction explicite et une tentative dis
 ### Citations ancrées dans les pièces de revue
 
 Pour une nouvelle inspection fragmentée, le moteur propose jusqu'à deux courts
-extraits exacts par pièce dans le schéma de réponse. Le vérificateur choisit une
+extraits exacts par pièce. Le schéma impose leurs numéros, pour éviter les
+restrictions du fournisseur sur les guillemets dans les valeurs textuelles. Le vérificateur choisit une
 ancre et conserve son jugement : pièce examinée, défaut démontré ou preuve
 manquante. Une ancre situe la pièce ; elle ne prouve pas sa conformité. Le contenu
 complet reste transmis et la décision finale demeure une étape distincte.

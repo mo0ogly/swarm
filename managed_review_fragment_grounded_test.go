@@ -9,12 +9,12 @@ import (
 )
 
 func TestGroundedFragmentReply(t *testing.T) {
-	for _, variant := range []string{"valid", "missing", "invented", "extra", "fail", "unknown", "n", "candidate"} {
+	for _, variant := range []string{"valid", "missing", "invented", "extra", "anchor", "fail", "unknown", "n", "candidate"} {
 		t.Run(variant, func(t *testing.T) {
 			p, r := inspectionReplyFixture()
 			entries := map[string]any{}
-			for i, a := range p.Artifacts {
-				entries[strconv.Itoa(i)] = map[string]any{"v": "inspected", "r": "Examined content", "e": fragmentQuoteChoices(a.Content)[0], "n": []string{}}
+			for i := range p.Artifacts {
+				entries[strconv.Itoa(i)] = map[string]any{"v": "inspected", "r": "Examined content", "e": 0, "n": []string{}}
 			}
 			first := entries["0"].(map[string]any)
 			switch variant {
@@ -22,6 +22,8 @@ func TestGroundedFragmentReply(t *testing.T) {
 				delete(entries, "1")
 			case "invented":
 				first["e"] = "invented content"
+			case "anchor":
+				first["e"] = 99
 			case "extra":
 				entries["2"] = first
 			case "fail", "unknown":

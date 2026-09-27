@@ -141,6 +141,8 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 	_ = s.settleAssistTurn(turn, out.reply, out.usage, failure)
 }
 
+const structuredSchemaRefusal = "Schéma de réponse refusé par le fournisseur (invalid_json_schema) ; aucune revue produite"
+
 type assistOutput struct {
 	streamBytes       int64
 	events            int
@@ -208,6 +210,13 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 		}
 		if data["is_error"] == true || data["type"] == "error" {
 			out.err = fmt.Errorf("%s", guardBlock(fmt.Sprint(data["result"], " ", data["error"]), 600))
+		}
+		// Keep a stable diagnostic without reflecting provider payloads or secrets.
+		if data["type"] == "error" || data["type"] == "turn.failed" {
+			encoded, _ := json.Marshal(data)
+			if strings.Contains(string(encoded), "invalid_json_schema") {
+				out.err = fmt.Errorf("%s", structuredSchemaRefusal)
+			}
 		}
 		if reply := providerReply(data); reply != "" {
 			out.reply = reply

@@ -129,10 +129,10 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 			return fmt.Errorf("missing artifact")
 		}
 		var entry struct {
-			Verdict  string   `json:"v"`
-			Reason   string   `json:"r"`
-			Evidence string   `json:"e"`
-			Needs    []string `json:"n"`
+			Verdict  string          `json:"v"`
+			Reason   string          `json:"r"`
+			Evidence json.RawMessage `json:"e"`
+			Needs    []string        `json:"n"`
 		}
 		if err := strict(raw, &entry); err != nil {
 			return err
@@ -144,14 +144,29 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 				return fmt.Errorf("no quote available")
 			}
 		}
+		var excerpt string
+		if strings.HasPrefix(strings.TrimSpace(string(entry.Evidence)), "\"") {
+			if err := json.Unmarshal(entry.Evidence, &excerpt); err != nil {
+				return err
+			}
+		} else {
+			var index int
+			if err := json.Unmarshal(entry.Evidence, &index); err != nil {
+				return err
+			}
+			if string(entry.Evidence) == "null" || len(entry.Evidence) == 0 || index < 0 || index >= len(allowed) {
+				return fmt.Errorf("unknown anchor")
+			}
+			excerpt = allowed[index]
+		}
 		found := false
 		for _, q := range allowed {
-			found = found || q == entry.Evidence
+			found = found || q == excerpt
 		}
 		if !found {
 			return fmt.Errorf("unoffered quote")
 		}
-		result.Findings = append(result.Findings, managedFragmentFinding{Artifact: i, Digest: a.Digest, Verdict: entry.Verdict, Reason: entry.Reason, Evidence: entry.Evidence, Needs: entry.Needs})
+		result.Findings = append(result.Findings, managedFragmentFinding{Artifact: i, Digest: a.Digest, Verdict: entry.Verdict, Reason: entry.Reason, Evidence: excerpt, Needs: entry.Needs})
 	}
 	return nil
 }
