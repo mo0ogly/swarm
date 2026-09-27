@@ -110,7 +110,7 @@ func incrementalReviewPrefix(prefix string, c managedReviewContext) string {
 func (s *Store) historicalReviewBaselineGuard(w Work, task *Task) error {
 	r := task.IndependentReview
 	if r == nil || w.Planning == nil || w.Planning.Reviewer == nil || w.Planning.Reviewer.ModelSelection == nil || len(r.Batches) == 0 {
-		return s.independentReviewGuard(&w, task)
+		return s.independentReviewGuardVersion(&w, task, true)
 	}
 	provider := strings.TrimPrefix(r.Reviewer, "reviewer://")
 	if provider == r.Reviewer || provider == "" {
@@ -138,5 +138,5 @@ func (s *Store) historicalReviewBaselineGuard(w Work, task *Task) error {
 	}
 	p.Reviewer = &cfg
 	w.Planning = &p
-	return s.independentReviewGuard(&w, task)
+	return s.independentReviewGuardVersion(&w, task, true)
 }

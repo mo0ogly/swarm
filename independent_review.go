@@ -110,6 +110,10 @@ func reviewContract(t *Task) string {
 	return hash(b)
 }
 func (s *Store) independentReviewGuard(w *Work, t *Task) error {
+	return s.independentReviewGuardVersion(w, t, false)
+}
+
+func (s *Store) independentReviewGuardVersion(w *Work, t *Task, historical bool) error {
 	if w.Planning != nil && w.Planning.Reviewer == nil {
 		return fmt.Errorf("vérificateur indépendant manquant")
 	}
@@ -124,7 +128,7 @@ func (s *Store) independentReviewGuard(w *Work, t *Task) error {
 		return fmt.Errorf("vérification IA périmée : tentative ou consigne modifiée")
 	}
 	if w.Planning.Repository != nil {
-		return s.managedIndependentReviewGuard(w, t)
+		return s.managedIndependentReviewGuardVersion(w, t, historical)
 	}
 	p, e := safeReport(s.root, r.Report)
 	if e != nil {

@@ -223,3 +223,27 @@ func TestManagedPreflightRetryRecoversHistoricalSourceCountRefusal(t *testing.T)
 		t.Fatal("source-count recovery failed", after.Tasks[0].Blocker)
 	}
 }
+
+func TestManagedPreflightRetryRecoversHistoricalProtocolRefusal(t *testing.T) {
+	s, w, a := unpaidReviewFixture(t)
+	if e := s.managedFailure(a, "base de revue non vérifiée : first : plan ou méthode des lots modifié"); e != nil {
+		t.Fatal(e)
+	}
+	w, _ = s.get(w.ID)
+	before, _ := s.managedAttempt(a.ID)
+	after, e := s.planningChange(w.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "historical-protocol-fixed", Revision: w.Revision, Task: a.TaskID, Reason: "Versioned historical protocol verified; complete immutable context rechecked"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	item, _ := s.managedAttempt(a.ID)
+	if item.State != "integrating" || item.Result != before.Result || len(after.Tasks[0].Attempts) != 1 || managedReviewCalls(t, s) != 0 {
+		t.Fatal("historical source-count recovery changed production or spent a call")
+	}
+	if e = s.reconcileKnownMissionResult(a, "test-conductor"); e != nil {
+		t.Fatal(e)
+	}
+	after, _ = s.get(w.ID)
+	if after.Tasks[0].Status != "accepted" || managedReviewCalls(t, s) != 1 {
+		t.Fatal("source-count recovery failed", after.Tasks[0].Blocker)
+	}
+}

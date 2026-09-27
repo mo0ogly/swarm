@@ -604,6 +604,10 @@ func (s *Store) managedReviewsForPublication(w *Work, a Agent, candidate, receip
 }
 
 func (s *Store) managedIndependentReviewGuard(w *Work, t *Task) error {
+	return s.managedIndependentReviewGuardVersion(w, t, false)
+}
+
+func (s *Store) managedIndependentReviewGuardVersion(w *Work, t *Task, historical bool) error {
 	r := t.IndependentReview
 	if r == nil || r.CandidateSHA == "" || r.CandidateSHA != w.Planning.Repository.Candidate || t.AutoValidation == nil || t.AutoValidation.CandidateSHA != r.CandidateSHA {
 		return fmt.Errorf("vérification IA périmée : révision Git différente")
@@ -612,7 +616,7 @@ func (s *Store) managedIndependentReviewGuard(w *Work, t *Task) error {
 		return err
 	}
 	if len(r.Batches) > 0 {
-		if err := s.managedBatchPlanIntact(*w, *r); err != nil {
+		if err := s.managedBatchPlanIntactVersion(*w, *r, historical); err != nil {
 			return err
 		}
 	}

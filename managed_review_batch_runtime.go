@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -349,6 +350,10 @@ func (s *Store) managedBatchProofsIntact(r IndependentReview) error {
 }
 
 func (s *Store) managedBatchPlanIntact(w Work, r IndependentReview) error {
+	return s.managedBatchPlanIntactVersion(w, r, false)
+}
+
+func (s *Store) managedBatchPlanIntactVersion(w Work, r IndependentReview, historical bool) error {
 	if r.FragmentJournal != nil {
 		if w.Planning == nil || w.Planning.Reviewer == nil {
 			return fmt.Errorf("configuration de revue absente")
@@ -397,6 +402,15 @@ func (s *Store) managedBatchPlanIntact(w Work, r IndependentReview) error {
 	if e != nil {
 		return e
 	}
+	// Only historical evidence can use the exact pre-source-citation protocol.
+	// The original digest must still match every byte, provider, model and workflow.
+	if historical && batchPlanDigest(c, prefix, batches, w.Planning.Reviewer, workflow) != r.BatchPlanDigest {
+		legacy := legacyManagedReviewPrefix(prefix)
+		oldBatches, oldErr := planManagedReviewBatches(legacy, c, owners)
+		if oldErr == nil && batchPlanDigest(c, legacy, oldBatches, w.Planning.Reviewer, workflow) == r.BatchPlanDigest {
+			prefix, batches = legacy, oldBatches
+		}
+	}
 	if len(batches) != len(r.Batches) || batchPlanDigest(c, prefix, batches, w.Planning.Reviewer, workflow) != r.BatchPlanDigest {
 		return fmt.Errorf("plan ou méthode des lots modifié")
 	}
@@ -436,4 +450,8 @@ func (s *Store) managedBatchProviderIntact(cfg *ReviewerConfig, r IndependentRev
 		return fmt.Errorf("politique du modèle des lots modifiée")
 	}
 	return nil
+}
+
+func legacyManagedReviewPrefix(prefix string) string {
+	return strings.Replace(prefix, "du rapport de cette tâche, de ses contrôles ou des sources complémentaires fournies pour ce candidat.", "du rapport de cette tâche ou de ses contrôles.", 1)
 }

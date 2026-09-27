@@ -60,8 +60,9 @@ func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflig
 	}
 	// Historical cumulative file-count failures spent no review call either.
 	// Rebuild the complete immutable context below; never bypass its bounds.
+	historicalPlanRefusal := strings.HasPrefix(item.Detail, "base de revue non vérifiée : ") && strings.HasSuffix(item.Detail, " : plan ou méthode des lots modifié")
 	sizeRefusal := item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ") || item.Detail == "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"
-	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !(sizeRefusal || item.Detail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != item.Detail {
+	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !(sizeRefusal || historicalPlanRefusal || item.Detail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != item.Detail {
 		return nil, fmt.Errorf("aucun refus de taille attribuable au résultat courant")
 	}
 	repo := w.Planning.Repository
