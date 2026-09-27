@@ -182,8 +182,35 @@ func (s *Store) planLegacyCandidateFragments(w Work, a Agent, c managedReviewCon
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
 	}
+	// A differential plan is not a new origin. Resolve its original durable
+	// record and recheck that proof directly. Never recursively promote a chain
+	// of observations, nor reuse the intermediate candidate's verdict.
+	if oldPlan.Version >= 3 {
+		found := false
+		for _, ref := range oldPlan.Reused {
+			original, e := s.storedFragmentOrigin(w.ID, ref.Review.ID)
+			if e != nil || !reflect.DeepEqual(original, ref.Review) {
+				return managedReviewFragmentPlan{}, fmt.Errorf("historical origin differs from durable review")
+			}
+			op, oj, e := s.readFragmentJournalAnchor(original)
+			if e != nil {
+				return managedReviewFragmentPlan{}, e
+			}
+			if op.Version >= 3 {
+				continue
+			}
+			// One original baseline supplies the complete delta used by the final
+			// impact questions. Other histories are not silently combined.
+			r, oldPlan, j = original, op, oj
+			found = true
+			break
+		}
+		if !found {
+			return planManagedReviewFragments(c, available, 2)
+		}
+	}
 	model, _ := json.Marshal(w.Planning.Reviewer.ModelRoute)
-	if r.FragmentJournal.ModelConfigDigest != hash(model) || oldPlan.Version >= 3 {
+	if r.FragmentJournal.ModelConfigDigest != hash(model) {
 		return planManagedReviewFragments(c, available, 2)
 	}
 	path, err := safeReport(s.root, r.Context)

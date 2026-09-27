@@ -120,3 +120,18 @@ func TestObservedReviewInputCapabilityIsLocalAndExact(t *testing.T) {
 		}
 	}
 }
+
+func TestManagedFragmentTokenBudgetReportsShortfall(t *testing.T) {
+	c := fragmentPlanFixture()
+	old, err := planManagedReviewFragments(c, 100, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := reviewTokenBudgetFixture()
+	// Force several complete packets without altering the original evidence.
+	b.MaxBytes = managedReviewPromptLimit
+	_, err = planTokenManagedFragments(c, old, b, "", 3)
+	if err == nil || !strings.Contains(err.Error(), "budget insuffisant") {
+		t.Fatalf("missing actionable budget diagnosis: %v", err)
+	}
+}

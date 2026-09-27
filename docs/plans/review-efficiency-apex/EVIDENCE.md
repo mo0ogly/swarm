@@ -142,3 +142,27 @@ No model call, quota change or production database edit was used for this fix.
 
 Full source suite PASS304.679s; attributed candidate suite PASS145.935s.
 Both Go vet invocations pass. No shared-state or synchronization change.
+
+### Repeated correction retains the original baseline (27 September)
+A second corrected result previously lost every historical observation because
+the prior plan used protocol3/4. Reproduced through the public Store recovery
+flow: the second correction returned zero reused observations.
+The planner now resolves one original baseline from the prior plan, requires
+equality with its durable review event, and rechecks the anchored original
+plan/journal/context. It does not promote the intermediate review, combine
+multiple baselines or rewrite original replies. Current coverage and the complete
+diff from that baseline are recalculated; original unknowns and impact questions
+remain mandatory. Unsupported baselines retain the full-review fallback.
+Alternative rejected: implicitly trust the intermediate plan or relabel its
+observations as current. That would obscure provenance and omit accumulated
+changes. Pure quota increase would leave repeated work unfixed.
+Public recovery regression: FAIL before, PASS after. Historical tests38.573sPASS;
+budget diagnostic test1.757sPASS; vet/contract/diffPASS. A token-plan shortfall
+now reports required inspections/final calls/available calls, not a stale-plan
+error.
+Read-only E6 preflight on the same candidate6bc38636:9calls before,6after,
+5original groups retained,275pieces preserved,transport ready.67/71 spent stays
+unchanged;4available is still insufficient. No model invocation or quota change.
+This does not validate E6 or demonstrate that the next model verdict will pass.
+
+Full Go suite PASS350.178s. Evidence: reuse-origin-checks.json and reuse-origin-full.log.

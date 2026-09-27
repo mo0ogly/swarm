@@ -99,6 +99,9 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
 		p.Reused = append(p.Reused, ref)
 		p.Packets = append(p.Packets, managedReviewFragmentPacket{Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: ref.Packet, Artifacts: ref.Original.Artifacts})
 	}
+	if required := fragmentPaidInspections(p) + p.ReservedFinalCalls; required > available {
+		return empty, fmt.Errorf("budget insuffisant : %d inspections et %d appels finaux pour %d disponibles", fragmentPaidInspections(p), p.ReservedFinalCalls, available)
+	}
 	if err := validateManagedReviewFragments(c, p); err != nil {
 		return empty, err
 	}

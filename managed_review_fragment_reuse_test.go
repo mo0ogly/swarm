@@ -264,6 +264,40 @@ func fragmentHistoricalPublicRecovery(t *testing.T, mode string) {
 		if current.AutoValidation != nil && current.AutoValidation.CandidateSHA == current.IndependentReview.CandidateSHA {
 			t.Fatal("failed current review validated")
 		}
+		// A second correction must return to the original evidence, not discard
+		// it merely because the previous plan already contained historical refs.
+		if err = os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Second corrected report; original observations remain historical"), 0600); err != nil {
+			t.Fatal(err)
+		}
+		gitTest(t, a.CWD, "add", "-A")
+		third := next
+		third.EventID, third.Revision, third.ReviewID = "second-differential-repair", after.Revision, current.IndependentReview.ID
+		third.ResultTree = gitTest(t, a.CWD, "write-tree")
+		managedReviewMode(t, s, "pass")
+		last, e := s.planningChange(w.ID, "revise-recovered-result", third)
+		if e != nil {
+			t.Fatal(e)
+		}
+		final, _ := last.task(a.TaskID)
+		if final.Status != "accepted" || final.IndependentReview == nil {
+			t.Fatal("second correction", final.Blocker)
+		}
+		plan, _, e := s.readFragmentJournalAnchor(*final.IndependentReview)
+		if e != nil || len(plan.Reused) == 0 {
+			t.Fatal("historical observations lost after second correction", e)
+		}
+		for _, ref := range plan.Reused {
+			if ref.Review.ID != origin.ID {
+				t.Fatal("intermediate identity substituted")
+			}
+		}
+		if managedReviewCalls(t, s)-initialCalls-1 != fragmentPaidInspections(plan)+2 {
+			t.Fatal("wrong cumulative budget")
+		}
+		kept, _ := os.ReadFile(filepath.Join(s.root, origin.FragmentJournal.Journal))
+		if string(kept) != string(oldJournal) {
+			t.Fatal("original journal changed")
+		}
 		return
 	}
 	if current.Status != "accepted" || current.IndependentReview == nil {
