@@ -127,6 +127,9 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	if r.MaxReviewCalls != 0 && (action != "enable" || r.Provider == "" || r.MaxReviewCalls < 1 || r.MaxReviewCalls > 100) {
 		return Work{}, planningError("invalid_review_budget", "max_review_calls doit être compris entre 1 et 100, uniquement lors de enable avec un fournisseur")
 	}
+	if action == "restart-task" {
+		return s.restartTask(work, r)
+	}
 	if action == "requalify" {
 		return s.requalifyHistorical(work, r)
 	}

@@ -86,6 +86,7 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
+	Restarts           []TaskRestart               `json:"restarts,omitempty"`
 	ModelSelection     *TaskModel                  `json:"model_selection,omitempty"`
 	Requalifications   []HistoricalRequalification `json:"requalifications,omitempty"`
 	IntegrationRetries []IntegrationRetry          `json:"integration_retries,omitempty"`

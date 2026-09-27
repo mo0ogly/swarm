@@ -261,3 +261,24 @@ dont les preuves et la configuration sont intactes et sans appel réservé.
 Elle ne transforme pas l’erreur en refus démontré ou en avis favorable.
 L’arbre doit avoir changé ; contrôles, nouvelle revue et budgets restent exigés.
 Sans cette option, la règle historique du refus démontré reste applicable.
+
+### Repartir sur une tâche bloquée
+
+`planning restart-task WORK --input request.json` (ou l'action HTTP
+`restart-task`) prépare une nouvelle production après une décision explicite de
+l'opérateur. Ce n'est pas une remise à zéro des coûts ni de l'historique.
+La requête contient `schema_version: 1`, `event_id`, `expected_revision`,
+`task_id`, `attempt_id` (la dernière tentative), `expected_candidate` (le SHA
+cumulatif de départ), `confirm_recovery: true`, `reason` et une nouvelle
+`recovery_instruction`.
+
+Le moteur exige une tâche bloquée ayant épuisé son nombre de tentatives, un
+profil, un vérificateur configuré, aucun agent actif dans la mission et aucune
+revue en cours. Il autorise exactement une tentative supplémentaire, remet la
+tâche à faire et conserve les tentatives, avis et preuves historiques. Le
+prochain lancement géré utilise une nouvelle copie numérotée, issue du candidat
+cumulatif accepté ; il ne recycle pas la copie refusée. La décision ne lance
+pas elle-même de fournisseur. Dépendances, budgets de revue et contrôles de
+lancement continuent de s'appliquer. E1–E5 ne sont pas revalidées implicitement.
+Une répétition du même événement est idempotente ; une deuxième décision avant
+consommation de la tentative préparée est refusée.

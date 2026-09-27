@@ -234,3 +234,22 @@ This authorizes a new submission after a terminal `error` with intact evidence
 and configuration and no reserved call. It does not turn the error into a
 proven refusal or approval. A changed tree, checks, fresh review and existing
 budgets remain mandatory. Without this flag the previous refusal rule applies.
+
+### Restarting a blocked task
+
+`planning restart-task WORK --input request.json` (also available as the HTTP
+`restart-task` action) prepares one fresh production after an explicit operator
+decision. It does not refund costs or erase history. Required fields are
+`schema_version: 1`, `event_id`, `expected_revision`, `task_id`, `attempt_id`
+(the latest attempt), `expected_candidate` (the cumulative starting SHA),
+`confirm_recovery: true`, `reason` and a new `recovery_instruction`.
+
+The task must be blocked with its attempt allowance exhausted, have a launch
+profile and a configured independent reviewer. No mission agent or independent
+review may be active. The engine grants exactly one additional attempt, sets
+the task to todo and retains old attempts, reviews and evidence. The next
+managed launch creates a fresh numbered copy from the cumulative candidate,
+not the rejected copy. This decision does not itself launch a provider.
+Dependencies, review budgets and launch checks still apply. Earlier tasks are
+not implicitly revalidated. Exact event replay is idempotent; a second grant
+before consumption is rejected.

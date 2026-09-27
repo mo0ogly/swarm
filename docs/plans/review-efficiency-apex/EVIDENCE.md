@@ -214,3 +214,15 @@ Candidate metadata recomputed623/636,13differences; historical trial scope stays
 explicit. No model call during development; full suites recorded separately.
 
 Validation finale : suite source `go test ./...` PASS (519.633 s), suite copie PASS (233.115 s), tests ciblés race PASS (14.518 s), `go vet ./...` et `git diff --check` PASS. La validation indépendante E6 reste distincte et non acquise.
+
+## Redémarrage explicite demandé par l'opérateur
+
+Demande : réinitialiser E6 de zéro. Choix : ajouter `planning restart-task`, une
+décision atomique liée à la dernière tentative et au candidat de départ, plutôt
+qu'effacer les données ou créer une mission de remplacement. Autorisation d'une
+seule nouvelle production, copie gérée neuve au prochain lancement ; anciens
+avis, tentatives et coûts conservés. Tests : parcours CLI, idempotence, double
+attribution, confirmation absente, révision/tentative/candidat périmés, revue et
+agent actifs. Aucun appel IA dans ces vérifications.
+
+Validation redémarrage : ok  	swarm.local/companion	542.768s ; tests ciblés avec race PASS8.424s ; vet, contrat et diff PASS.
