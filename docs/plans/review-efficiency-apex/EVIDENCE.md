@@ -126,3 +126,19 @@ normalisait les tabulations. Il est remplacé ici par une coupe en caractères q
 conserve exactement les opérateurs et les espaces d’origine. Tests ciblés :
 PASS 0,061 s ; suite Go complète PASS 301,478 s ; vet, contrat et diff réussis.
 Aucun appel IA pour cette correction.
+
+### Recovered producer review projection (27 September)
+A real independent review identified an early return in resultPresentation: a
+failed or interrupted producer hid the review of its externally repaired result.
+TestManagedReviewPresentationPreservesInterruptedProducer fails on the previous
+implementation and passes with the correction. The projection now checks the
+review before rendering the terminal process fallback. The process remains failed
+or interrupted; the review is not acceptance. Existing attempt/producer, report
+digest and contract checks remain mandatory. A foreign producer review is ignored.
+Targeted source tests: PASS (1.405s); attributed candidate: PASS (1.609s).
+Go vet, workflow contract and diff checks pass. Full suites are recorded separately
+in recovered-presentation-full.log and recovered-presentation-candidate-full.log.
+No model call, quota change or production database edit was used for this fix.
+
+Full source suite PASS304.679s; attributed candidate suite PASS145.935s.
+Both Go vet invocations pass. No shared-state or synchronization change.

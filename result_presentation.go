@@ -132,6 +132,12 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 		return p
 	}
 
+	// A recovered result can be reviewed without rewriting its producer exit.
+	// The review projection checks the current attempt and producer identities.
+	if a != nil && (a.Status == "failed" || a.Status == "interrupted") && s.managedReviewPresentation(w, t, a, &p) {
+		return p
+	}
+
 	if a != nil && (a.Status == "failed" || a.Status == "interrupted") {
 		p.State, p.Label = "stopped_early", "Arrêté avant la fin"
 		p.ValidationState = "not_validated"

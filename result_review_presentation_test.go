@@ -155,3 +155,39 @@ func TestTaskUnderstandingUsesTerminalCauseBeforeHistoricalToolErrors(t *testing
 		})
 	}
 }
+
+func TestManagedReviewPresentationPreservesInterruptedProducer(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "candidate\n")
+	managedReviewMode(t, s, "fail")
+	if err := s.integrateManagedAttempt(a); err != nil {
+		t.Fatal(err)
+	}
+	w, _ = s.get(w.ID)
+	task, _ := w.task("first")
+	r := task.IndependentReview
+	for _, process := range []string{"failed", "interrupted"} {
+		a.Status = process
+		for _, state := range []string{"running", "changes_requested", "error", "passed"} {
+			r.State = state
+			p := s.resultPresentation(&w, task, []Agent{a}, TaskValidation{})
+			expected := "review_blocked"
+			if state == "running" {
+				expected = "review_in_progress"
+			}
+			if state == "passed" {
+				expected = "review_awaiting_publication"
+			}
+			if p.State != expected || p.ProcessState != process || p.ReportID != r.Report || p.ReceiptID != r.Receipt || p.ValidationState == "fresh" {
+				t.Fatalf("%s/%s: review hidden or process rewritten: %+v", process, state, p)
+			}
+		}
+		producer := r.Producer
+		r.Producer = "different-producer"
+		p := s.resultPresentation(&w, task, []Agent{a}, TaskValidation{})
+		if p.State != "stopped_early" {
+			t.Fatalf("foreign review attributed: %+v", p)
+		}
+		r.Producer = producer
+	}
+}
