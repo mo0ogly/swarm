@@ -454,3 +454,72 @@ func TestRecoveredResultRevisionAfterLegacyFragmentRefusal(t *testing.T) {
 		})
 	}
 }
+
+func TestRecoveredResultExplicitCorrectionAfterReviewError(t *testing.T) {
+	s, w, a, req := recoveredResultFixture(t)
+	managedReviewMode(t, s, "exit")
+	first, err := s.submitRecoveredResult(w.ID, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := first.task(a.TaskID)
+	prior := *task.IndependentReview
+	if prior.State != "error" || s.recoveredReviewRefused(first, &prior) {
+		t.Fatal("fixture must retain an error, not a refusal")
+	}
+	raw, err := os.ReadFile(filepath.Join(s.root, prior.Context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Explicitly corrected factual report after reviewer transport failure"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	gitTest(t, a.CWD, "add", "-A")
+	next := req
+	next.EventID = "repair-after-error"
+	next.ConfirmReviewErrorRepair = true
+	next.Revision = first.Revision
+	next.ReviewID = prior.ID
+	next.ResultTree = gitTest(t, a.CWD, "write-tree")
+	unconfirmed := next
+	unconfirmed.ConfirmReviewErrorRepair = false
+	if _, e := s.planningChange(w.ID, "revise-recovered-result", unconfirmed); e == nil {
+		t.Fatal("implicit repair after error")
+	}
+	active := prior
+	active.State = "running"
+	if s.recoveredReviewAllowsCorrection(first, &active, true) {
+		t.Fatal("active review repair")
+	}
+	if err := os.WriteFile(filepath.Join(s.root, prior.Context), append(append([]byte{}, raw...), ' '), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if s.recoveredReviewAllowsCorrection(first, &prior, true) {
+		t.Fatal("tampered proof repair")
+	}
+	if err := os.WriteFile(filepath.Join(s.root, prior.Context), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if managedReviewCalls(t, s) != 1 {
+		t.Fatal("rejected repair charged a call")
+	}
+	managedReviewMode(t, s, "pass")
+	after, err := s.planningChange(w.ID, "revise-recovered-result", next)
+	if err != nil {
+		t.Fatal(err)
+	}
+	current, _ := after.task(a.TaskID)
+	if current.Status != "accepted" || current.IndependentReview.CandidateSHA == prior.CandidateSHA || current.RecoveredResult.PriorReview != prior.ID || managedReviewCalls(t, s) != 2 {
+		t.Fatal("repair bypassed fresh review", current.Status)
+	}
+	kept, err := os.ReadFile(filepath.Join(s.root, prior.Context))
+	if err != nil || string(kept) != string(raw) {
+		t.Fatal("original evidence rewritten")
+	}
+	if s.recoveredReviewRefused(first, &prior) {
+		t.Fatal("error became a refusal")
+	}
+	if len(current.Attempts) != 1 || current.Attempts[0].Status != "interrupted" {
+		t.Fatal("producer history rewritten")
+	}
+}

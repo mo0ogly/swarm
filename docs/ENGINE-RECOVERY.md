@@ -251,3 +251,13 @@ La revue cumulative conserve l’union complète des sources, avec dédoublonnag
 deux tâches de treize fichiers ne sont pas rejetées au motif que leur somme
 dépasse 24. Les limites restent contrôlées pour chaque tâche, puis pour chaque
 envoi du dossier fragmenté et pour son budget d’appels. Aucun fichier n’est omis.
+
+## Correction explicite après erreur du vérificateur
+`planning revise-recovered-result` accepte `confirm_review_error_repair: true`
+en plus de `confirm_recovery: true`, de la révision, du review_id courant, des
+identités agent/tentative, de l’arbre Git corrigé et du motif opérateur.
+Cette option autorise une nouvelle remise après une revue terminale `error`
+dont les preuves et la configuration sont intactes et sans appel réservé.
+Elle ne transforme pas l’erreur en refus démontré ou en avis favorable.
+L’arbre doit avoir changé ; contrôles, nouvelle revue et budgets restent exigés.
+Sans cette option, la règle historique du refus démontré reste applicable.

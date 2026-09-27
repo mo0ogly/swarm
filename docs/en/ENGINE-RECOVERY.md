@@ -225,3 +225,12 @@ Each task may declare up to 24 files and 128 KiB of context sources. Cumulative
 review retains the complete deduplicated union: two tasks with thirteen files
 each are not rejected merely because their union exceeds 24. Per-task limits,
 fragment request sizes and call budgets are still enforced. No file is omitted.
+
+## Explicit correction after a reviewer error
+`planning revise-recovered-result` accepts `confirm_review_error_repair: true`
+in addition to `confirm_recovery: true`, the current revision and review_id,
+agent/attempt identities, changed Git tree and operator reason.
+This authorizes a new submission after a terminal `error` with intact evidence
+and configuration and no reserved call. It does not turn the error into a
+proven refusal or approval. A changed tree, checks, fresh review and existing
+budgets remain mandatory. Without this flag the previous refusal rule applies.

@@ -90,7 +90,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			return Work{}, fmt.Errorf("un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite")
 		}
 	}
-	refused := s.recoveredReviewRefused(w, t.IndependentReview)
+	refused := s.recoveredReviewAllowsCorrection(w, t.IndependentReview, r.ConfirmReviewErrorRepair)
 	if revise && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || !refused) {
 		return Work{}, fmt.Errorf("révision corrective liée au dernier refus indépendant requise")
 	}
@@ -183,7 +183,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		if e != nil {
 			return e
 		}
-		if (!revise && task.RecoveredResult != nil) || (revise && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewRefused(*current, task.IndependentReview))) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
+		if (!revise && task.RecoveredResult != nil) || (revise && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewAllowsCorrection(*current, task.IndependentReview, r.ConfirmReviewErrorRepair))) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
 			return fmt.Errorf("tentative remplacée ou réparation déjà soumise")
 		}
 		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: tree, Actor: operatorIdentity(), At: now(), Reason: r.Reason, ProcessStatus: a.Status}
@@ -257,4 +257,30 @@ func (s *Store) recoveredReviewRefused(w Work, r *IndependentReview) bool {
 	}
 	reason, err := s.managedFragmentRefusal(*r)
 	return err == nil && reason != "" && s.managedReviewFilesIntact(*r) == nil && s.managedBatchPlanIntact(w, *r) == nil
+}
+
+// Explicit operator correction is distinct from a valid reviewer refusal.
+// The original error remains unvalidated; all new candidate checks still apply.
+func (s *Store) recoveredReviewAllowsCorrection(w Work, r *IndependentReview, confirmError bool) bool {
+	if s.recoveredReviewRefused(w, r) {
+		return true
+	}
+	if !confirmError || r == nil || r.State != "error" || r.Finished == "" || r.CandidateSHA == "" {
+		return false
+	}
+	if s.managedReviewFilesIntact(*r) != nil || s.managedBatchPlanIntact(w, *r) != nil {
+		return false
+	}
+	if r.FragmentJournal != nil {
+		_, j, err := s.readFragmentJournalAnchor(*r)
+		if err != nil {
+			return false
+		}
+		for _, e := range j.Entries {
+			if e.State == "reserved" {
+				return false
+			}
+		}
+	}
+	return true
 }
