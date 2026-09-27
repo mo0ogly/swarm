@@ -25,9 +25,13 @@ obligatoire des impacts. La décision d’architecture révisée et ses limites 
 expliquées dans DIFFERENTIAL.md. RD4 : prévol CLI/HTTP partagé, coûts et capacité de
 transport distincts, garde contre deux interruptions identiques. RD5 : recette
 isolée différentielle réussie, suite Go complète 296.292s, race ciblée 182.519s,
-vet et contrôle du contrat réussis. RD6 : documentation prête, installation
-contrôlée avec comparaison CLI/HTTP prévue après le commit. E6 reste bloquée : 10 appels requis pour 7 disponibles
+vet et contrôle du contrat réussis. RD6 : correctif 9da8a65 installé, CLI/HTTP identiques et sans mutation,
+assets et compteurs conservés ; preuves dans les artefacts de livraison. E6 reste bloquée : 10 appels requis pour 7 disponibles
 et décision finale trop grande. Aucun passage à 79 autorisé ; aucun appel live.
 
 La clôture de ce correctif du moteur et celle de la mission E6–E8 sont distinctes.
 La seconde exige toujours des avis indépendants et les preuves actuelles.
+
+## Étape suivante
+Mesurer la réduction sans perte du transport avant de modifier le protocole ;
+voir TRANSPORT-NEXT.md. Aucun dossier amputé pour passer sous un plafond.
