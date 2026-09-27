@@ -103,3 +103,26 @@ même candidat et mêmes contrôles. Ce n’est PAS encore une acceptation.
 Le statut global de la tâche et son ancien motif restent blocked pendant cette
 revue ; lire independent_review.state pour l’activité réelle, ne pas relancer en
 parallèle à cause de cette ancienne étiquette. À suivre comme point de lisibilité.
+
+## Revue réelle du 27 septembre : opérateur inventé dans un défaut
+
+La première inspection de `review-60fafd58dc2f40ba6541fc97` a été interrompue.
+Le modèle a cité `Calls + len(batches) >= MaxCalls`, alors que la pièce originale
+contient `Calls + len(batches) > MaxCalls`. La citation n’existe nulle part dans
+cette pièce et sa ligne annoncée était également erronée. Le moteur a correctement
+refusé cette réponse ; modifier le code pour satisfaire ce faux constat aurait
+été une régression. Un appel reste consommé : 65/71, sans restitution.
+
+Défaut moteur identifié dans l’aide à la reprise : elle ne décodait que les
+anciennes réponses à findings en tableau et ne traitait pas les défauts à citation
+invalide. Les réponses compactes actuelles ne recevaient donc aucun retour utile.
+Correction : même décodeur que le protocole courant, retour borné contenant la
+citation rejetée et les lignes originales voisines, avec obligation de réexaminer
+les pièces. Aucune réponse n’est réparée, promue ou acceptée automatiquement.
+Le JSON est désigné comme données non fiables et les journaux restent intacts.
+
+Le test de reproduction a aussi détecté que le formateur d’affichage `guardBlock`
+normalisait les tabulations. Il est remplacé ici par une coupe en caractères qui
+conserve exactement les opérateurs et les espaces d’origine. Tests ciblés :
+PASS 0,061 s ; suite Go complète PASS 301,478 s ; vet, contrat et diff réussis.
+Aucun appel IA pour cette correction.
