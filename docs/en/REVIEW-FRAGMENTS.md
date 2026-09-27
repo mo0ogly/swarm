@@ -159,3 +159,11 @@ record without a model route is usable only when the reconstructed route exactly
 reproduces the original plan digest. Recovery preparation rebuilds the canonical
 dossier before quoting its cost; an altered or unverifiable baseline blocks
 before any provider call.
+
+### Markdown prose citations
+
+A Markdown prose citation may omit inline-code backticks and join wrapped lines
+within one paragraph. Words and punctuation are not rewritten. Diff additions,
+deletions, separate hunks and separate paragraphs are never joined together.
+Fenced code and non-Markdown files retain exact matching. This tolerance only
+applies to inspection evidence; the independent final verdict remains mandatory.

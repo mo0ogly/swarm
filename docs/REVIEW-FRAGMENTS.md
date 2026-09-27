@@ -178,3 +178,12 @@ héritage. Un ancien enregistrement sans route de modèle n'est utilisable que s
 la route reconstruite reproduit exactement l'empreinte du plan d'origine.
 La préparation reconstruit le dossier canonique avant d'annoncer le coût ; une
 base altérée ou non démontrable bloque avant tout appel.
+
+### Citations de texte Markdown
+
+Une citation de prose Markdown peut omettre les accents graves de code en ligne
+et réunir les lignes d'un même paragraphe. Le moteur ne réécrit ni les mots ni la
+ponctuation. Dans un diff, il ne réunit jamais des ajouts et suppressions, des
+hunks différents ou des paragraphes séparés. Les blocs de code et les fichiers
+non Markdown conservent la comparaison exacte. Cette tolérance ne vaut que pour
+l'inspection : le verdict indépendant final reste obligatoire.

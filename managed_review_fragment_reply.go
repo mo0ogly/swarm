@@ -71,7 +71,7 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 		}
 		switch finding.Verdict {
 		case "inspected":
-			if len(strings.TrimSpace(finding.Evidence)) < 8 || !strings.Contains(artifact.Content, finding.Evidence) || len(finding.Needs) != 0 {
+			if len(strings.TrimSpace(finding.Evidence)) < 8 || !fragmentEvidencePresent(artifact, finding.Evidence) || len(finding.Needs) != 0 {
 				return fail("extrait original absent ou preuve encore demandée")
 			}
 		case "fail":
