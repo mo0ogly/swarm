@@ -189,7 +189,7 @@ non Markdown conservent la comparaison exacte. Cette tolérance ne vaut que pour
 l'inspection : le verdict indépendant final reste obligatoire.
 
 Le schéma des nouvelles inspections limite les deux champs courts `reason` et
-`evidence` à 16 caractères Unicode. Même avec six octets JSON par caractère
+`evidence` à 16 caractères Unicode. La citation impose aussi au moins huit caractères, sans espace aux extrémités. Même avec six octets JSON par caractère
 échappé, ils respectent ainsi le plafond interne de 96 octets. Les réserves et
 pièces à demander sont exprimées via `needs` ; la décision finale porte les
 justifications complètes. Les anciennes réponses compatibles restent lisibles.

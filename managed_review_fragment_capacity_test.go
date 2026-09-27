@@ -53,3 +53,15 @@ func TestFragmentSchemaTextFitsSerializedBudget(t *testing.T) {
 		}
 	}
 }
+
+func TestFragmentEvidenceSchemaHasMinimum(t *testing.T) {
+	var schema map[string]any
+	if err := json.Unmarshal([]byte(managedFragmentInspectionSchema), &schema); err != nil {
+		t.Fatal(err)
+	}
+	props := schema["properties"].(map[string]any)["findings"].(map[string]any)["items"].(map[string]any)["properties"].(map[string]any)
+	evidence := props["evidence"].(map[string]any)
+	if evidence["minLength"] != float64(8) || evidence["maxLength"] != float64(16) || evidence["pattern"] == nil {
+		t.Fatal(evidence)
+	}
+}
