@@ -221,3 +221,8 @@ est interdit. Le moteur contrôle la taille du contenu et du schéma avant de
 réserver un appel. Une reprise conserve les inspections acquises et les dépenses.
 Les clés compactes `v`, `r`, `e`, `n` du transport signifient verdict, raison,
 extrait et preuves nécessaires ; elles ne changent pas le vocabulaire utilisateur.
+
+Le découpage des nouveaux dossiers compte séparément le contenu, le schéma et
+la table des extraits, puis réserve l’espace des consignes. Le contrôle final
+de tous les envois précède toute dépense. Les anciens paquets restent lisibles ;
+une nouvelle règle de découpage ne réécrit pas leur journal.

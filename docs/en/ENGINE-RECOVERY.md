@@ -199,3 +199,7 @@ allowed. Content and schema size are checked before reserving a call. Recovery
 preserves completed inspections and consumed calls. Compact transport keys
 `v`, `r`, `e`, `n` mean verdict, reason, evidence and required evidence; user-facing
 labels remain unchanged.
+
+New dossier partitioning counts content, schema and anchor table separately,
+then reserves workflow space. Every actual request is checked before spending.
+Historical packets remain readable; new partitioning rules do not rewrite journals.

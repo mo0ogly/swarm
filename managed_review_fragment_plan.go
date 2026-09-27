@@ -105,9 +105,11 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 	canonical, _ := json.Marshal(c)
 	plan := managedReviewFragmentPlan{Version: 1, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
 	packet := managedReviewFragmentPacket{Version: 1, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
+	// New plans reserve workflow space in addition to the variable schema and
+	// anchor table. Historical packets keep their original validation contract.
 	fits := func(p managedReviewFragmentPacket) bool {
 		raw, e := json.Marshal(p)
-		return e == nil && len(raw)+managedFragmentPromptReserve <= managedReviewPromptLimit && managedFragmentReplyFits(p)
+		return e == nil && len(raw)+managedFragmentPromptReserve+len(managedFragmentPacketSchema(p))+len(managedFragmentAnchorsJSON(p)) <= managedReviewPromptLimit && managedFragmentReplyFits(p)
 	}
 	for _, artifact := range artifacts {
 		next := packet
