@@ -226,3 +226,16 @@ attribution, confirmation absente, révision/tentative/candidat périmés, revue
 agent actifs. Aucun appel IA dans ces vérifications.
 
 Validation redémarrage : ok  	swarm.local/companion	542.768s ; tests ciblés avec race PASS8.424s ; vet, contrat et diff PASS.
+
+### Correction du premier lancement après réinitialisation
+
+Le lancement public E6 a refusé avec « reprise : résultat Git absent ou
+attribution modifiée ». La remise à faire était effective, mais la préparation
+appelait encore le transfert du résultat historique. Pour une décision de
+redémarrage visant exactement la dernière tentative et encore non consommée,
+ce transfert est désormais absent. HEAD reste construit depuis le candidat
+cumulatif. Les reprises ordinaires et celles d'une tentative ultérieure
+conservent leur transfert. Le test couvre ces trois cas. L'échec public a été
+conservé ; aucune référence Git historique n'a été réécrite pour le masquer.
+
+Validation : ok  	swarm.local/companion	332.231s ; ciblés race3.952sPASS ; vet/diffPASS.

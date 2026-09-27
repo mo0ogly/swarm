@@ -40,6 +40,11 @@ func (s *Store) managedRecoveryHandoff(w Work, t *Task) (*ManagedRecoveryHandoff
 		return nil, nil
 	}
 	last := t.Attempts[len(t.Attempts)-1]
+	// A fresh operator restart deliberately carries no rejected-result handoff.
+	// The historical result remains stored; subsequent ordinary retries retain it.
+	if len(t.Restarts) > 0 && t.PlanningRetry && t.Restarts[len(t.Restarts)-1].Attempt == last.ID {
+		return nil, nil
+	}
 	h := &ManagedRecoveryHandoff{Version: 1, Work: w.ID, Task: t.ID, PreviousAttempt: last.ID, Status: last.Status, Failure: t.Blocker, Correction: t.Next}
 	var body []byte
 	var status, desired string

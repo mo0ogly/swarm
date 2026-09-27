@@ -84,3 +84,25 @@ func TestTaskRestartRejectsStaleOrUnsafeRequests(t *testing.T) {
 		})
 	}
 }
+
+func TestTaskRestartDoesNotRequirePriorResultHandoff(t *testing.T) {
+	s, w := exhaustedTaskFixture(t)
+	task := &w.Tasks[0]
+	task.Restarts = []TaskRestart{{Attempt: task.Attempts[len(task.Attempts)-1].ID}}
+	task.PlanningRetry = true
+	h, e := s.managedRecoveryHandoff(w, task)
+	if e != nil || h != nil {
+		t.Fatal("fresh restart imported historical handoff", h, e)
+	}
+	task.PlanningRetry = false
+	h, e = s.managedRecoveryHandoff(w, task)
+	if e != nil || h == nil {
+		t.Fatal("ordinary recovery lost its handoff", h, e)
+	}
+	task.PlanningRetry = true
+	task.Attempts = append(task.Attempts, Attempt{ID: "next-attempt", Status: "failed"})
+	h, e = s.managedRecoveryHandoff(w, task)
+	if e != nil || h == nil || h.PreviousAttempt != "next-attempt" {
+		t.Fatal("restart leaked into later recovery", h, e)
+	}
+}
