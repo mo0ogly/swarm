@@ -226,3 +226,20 @@ Le découpage des nouveaux dossiers compte séparément le contenu, le schéma e
 la table des extraits, puis réserve l’espace des consignes. Le contrôle final
 de tous les envois précède toute dépense. Les anciens paquets restent lisibles ;
 une nouvelle règle de découpage ne réécrit pas leur journal.
+
+### Demander un diagnostic détaillé d’un refus fragmenté
+
+`planning diagnose-review TRAVAIL --input demande.json` consomme **un appel de
+revue dans le plafond existant** et conserve le refus. La demande contient
+`schema_version: 1`, `event_id`, `expected_revision`, `task_id`, `review_id`,
+`reason` et, éventuellement, `input_events` (jusqu’à huit chemins de sources du
+candidat immuable à fournir comme contexte). Elle exige un refus fragmenté durable.
+
+Le même vérificateur explique chaque constat : défaut confirmé avec citation,
+contexte nécessaire, ou défaut non reproduit, avec explication et scénario.
+Le résultat et son empreinte sont référencés dans l’événement
+`review.diagnostic.result`. Le fichier privé est placé près du journal de revue.
+Même une réponse « non reproduit » ne supprime pas le refus : ce diagnostic
+n’est jamais un avis favorable, une preuve d’acceptation ou une relance.
+Un rejeu du même événement ne consomme pas de nouvel appel. Une interruption
+conserve la réservation consommée ; elle ne déclenche aucune reprise automatique.

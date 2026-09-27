@@ -203,3 +203,18 @@ labels remain unchanged.
 New dossier partitioning counts content, schema and anchor table separately,
 then reserves workflow space. Every actual request is checked before spending.
 Historical packets remain readable; new partitioning rules do not rewrite journals.
+
+### Explain a fragment review refusal
+
+`planning diagnose-review WORK --input request.json` spends **one review call
+within the existing limit**, preserving the refusal. Supply `schema_version: 1`,
+`event_id`, `expected_revision`, `task_id`, `review_id`, `reason`, and optionally
+`input_events` with up to eight source paths from the immutable candidate.
+A durable fragment refusal is required.
+
+The same reviewer explains each finding as confirmed with an exact quotation,
+requiring context, or not reproduced, with an explanation and reproduction steps.
+The private artifact and digest are recorded by `review.diagnostic.result`.
+This diagnostic never replaces the verdict, accepts a task or restarts production.
+Replaying the same event spends no extra call; interruption keeps the reservation
+consumed and never triggers an automatic retry.

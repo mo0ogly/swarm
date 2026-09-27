@@ -132,6 +132,9 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	if action == "retry-integration" {
 		return s.retryManagedIntegration(work, r)
 	}
+	if action == "diagnose-review" {
+		return s.diagnoseManagedFragmentReview(work, r)
+	}
 	if action == "retry-review" {
 		return s.retryIndependentReview(work, r)
 	}
