@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 )
 
 // This is an accepted baseline, not a verdict on the new candidate. Original
@@ -43,7 +44,7 @@ func (s *Store) incrementalManagedReviewFallback(w Work, a Agent, c managedRevie
 		if task.ID == a.TaskID || task.Status != "accepted" {
 			continue
 		}
-		if e = s.independentReviewGuard(&w, task); e != nil {
+		if e = s.historicalReviewBaselineGuard(w, task); e != nil {
 			return c, fmt.Errorf("base de revue non vérifiée : %s : %w", task.ID, e)
 		}
 		r := task.IndependentReview
@@ -101,4 +102,41 @@ func incrementalReviewPrefix(prefix string, c managedReviewContext) string {
 		return prefix
 	}
 	return prefix + "\nREVUE INCRÉMENTALE : accepted_baseline désigne uniquement la base précédente déjà acceptée. Le moteur a vérifié les empreintes des contextes, reçus et réponses conservés de ces avis. Le diff contient TOUS les changements de cette base vers candidate_commit ; les rapports, critères et contrôles joints concernent TOUS les résultats sur le nouveau candidat. Examiner les régressions et interactions du delta avec les tâches anciennes, avec les sources courantes jointes. Les avis antérieurs ne valent PAS avis sur le nouveau candidat. Réévaluer CHAQUE critère : pass seulement si les preuves actuelles et la base vérifiée suffisent, sinon unknown ou fail. Ne pas inventer le contenu des fichiers historiques non joints. Les citations doivent provenir du diff actuel, du rapport actuel ou des contrôles actuels, jamais d'un ancien avis seul.\n"
+}
+
+// Historical evidence may be checked against its original reviewer identity.
+// This is only used when constructing a new cumulative review, never by the
+// acceptance guard: every current criterion still requires a fresh verdict.
+func (s *Store) historicalReviewBaselineGuard(w Work, task *Task) error {
+	r := task.IndependentReview
+	if r == nil || w.Planning == nil || w.Planning.Reviewer == nil || w.Planning.Reviewer.ModelSelection == nil || len(r.Batches) == 0 {
+		return s.independentReviewGuard(&w, task)
+	}
+	provider := strings.TrimPrefix(r.Reviewer, "reviewer://")
+	if provider == r.Reviewer || provider == "" {
+		return fmt.Errorf("identité du vérificateur historique absente")
+	}
+	p := *w.Planning
+	cfg := *p.Reviewer
+	cfg.Provider, cfg.ProviderDigest, cfg.ModelRoute = provider, r.BatchProviderDigest, r.ModelRoute
+	if cfg.ModelRoute == nil {
+		// Older batch records omitted the model route. A reconstructed default
+		// is usable only if the original full batch-plan digest verifies below.
+		providers, err := s.providers()
+		if err != nil {
+			return err
+		}
+		original, ok := providers.Providers[provider]
+		if !ok {
+			return fmt.Errorf("fournisseur historique absent")
+		}
+		_, route, err := resolveModel(original, "auto", "planning")
+		if err != nil {
+			return err
+		}
+		cfg.ModelRoute = route
+	}
+	p.Reviewer = &cfg
+	w.Planning = &p
+	return s.independentReviewGuard(&w, task)
 }

@@ -150,3 +150,12 @@ is retained in `previous_reviews`, its files remain immutable, and spent calls
 are never refunded. A negative inspection, altered evidence or an already
 started final decision requires its own resolution; changing providers does not
 turn those situations into acceptance.
+
+After replacement, previous verdicts are not fresh approvals from the new
+reviewer. When building its cumulative dossier, the engine separately verifies
+the historical baseline against the original reviewer identity and plan digest.
+This permits reading historical evidence, never inheriting acceptance. An older
+record without a model route is usable only when the reconstructed route exactly
+reproduces the original plan digest. Recovery preparation rebuilds the canonical
+dossier before quoting its cost; an altered or unverifiable baseline blocks
+before any provider call.

@@ -205,6 +205,7 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 	raw, _ := json.Marshal(r)
 	managedProducer := ""
 	preflight, preflightErr := s.prepareManagedPreflightRetry(work, r.Task)
+	replacement, replacementErr := s.reviewRecoveryPreview(work, r.Task)
 	unpaid := false
 	return s.mutateWithHook(work, "review.retry", r.EventID, r.Revision, raw, func(w *Work) error {
 		if w.Planning == nil || w.Planning.Reviewer == nil {
@@ -242,9 +243,12 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			managedProducer = v.Producer
 		}
 		if v.FragmentJournal != nil && fragmentReviewerChanged(*w, *v) {
-			preview, err := s.fragmentReplacementPreview(*w, t)
-			if err != nil {
-				return err
+			if replacementErr != nil {
+				return replacementErr
+			}
+			preview := replacement
+			if preview.Revision != w.Revision || preview.Review != v.ID {
+				return fmt.Errorf("préparation du remplacement périmée")
 			}
 			if preview.Missing > 0 {
 				return fmt.Errorf("%s", preview.Next)

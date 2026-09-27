@@ -169,3 +169,12 @@ L'ancienne revue est conservée dans `previous_reviews`, ses fichiers restent
 immuables, et aucun appel n'est remboursé. Un refus d'inspection, des preuves
 altérées ou une décision finale déjà engagée nécessitent leur traitement propre ;
 changer de fournisseur ne les transforme pas en validation.
+
+Après remplacement, les avis antérieurs ne sont pas des validations fraîches du
+nouveau vérificateur. Pour construire son dossier cumulatif, le moteur vérifie
+séparément la base historique contre l'identité et l'empreinte de plan d'origine.
+Cela autorise sa lecture comme preuve historique, jamais une acceptation par
+héritage. Un ancien enregistrement sans route de modèle n'est utilisable que si
+la route reconstruite reproduit exactement l'empreinte du plan d'origine.
+La préparation reconstruit le dossier canonique avant d'annoncer le coût ; une
+base altérée ou non démontrable bloque avant tout appel.

@@ -124,3 +124,32 @@ func TestRoleModelRejectsQueuedFragmentReview(t *testing.T) {
 		t.Fatal("queued review model changed")
 	}
 }
+
+func TestReviewerReplacementHistoricalBaselineIsNotFreshAcceptance(t *testing.T) {
+	s, w, a := managedBatchRuntimeFixture(t)
+	if err := s.integrateManagedAttempt(a); err != nil {
+		t.Fatal(err)
+	}
+	w, _ = s.get(w.ID)
+	original := w.Planning.Reviewer.Provider
+	cfg := w.Planning.Reviewer
+	cfg.Provider = "replacement"
+	cfg.ProviderDigest = "replacement-digest"
+	cfg.ModelSelection = &RoleModel{Provider: cfg.Provider, ProviderDigest: cfg.ProviderDigest}
+	task := &w.Tasks[0]
+	if err := s.independentReviewGuard(&w, task); err == nil {
+		t.Fatal("old verdict accepted as current after reviewer replacement")
+	}
+	if err := s.historicalReviewBaselineGuard(w, task); err != nil {
+		t.Fatal("historical evidence lost", err)
+	}
+	if w.Planning.Reviewer.Provider == original {
+		t.Fatal("historical check changed current reviewer")
+	}
+	if err := os.WriteFile(filepath.Join(s.root, task.IndependentReview.Context), []byte("tampered"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.historicalReviewBaselineGuard(w, task); err == nil {
+		t.Fatal("tampered baseline accepted")
+	}
+}

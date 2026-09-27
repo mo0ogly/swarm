@@ -5,6 +5,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 )
 
 // A model change is an explicit operator decision, not permission to reuse the
@@ -43,6 +45,24 @@ func (s *Store) fragmentReplacementPreview(w Work, task *Task) (ReviewRecovery, 
 		if entry.State != "interrupted" && entry.State != "inspected" && entry.State != "unknown" {
 			return v, fmt.Errorf("avis défavorable ou réservation active : remplacement refusé")
 		}
+	}
+	// Rebuild the canonical dossier before quoting a restart: a provider switch
+	// must not hide an unusable historical baseline or changed contract.
+	a, err := s.agent(r.Producer)
+	if err != nil {
+		return v, err
+	}
+	receipt, err := os.ReadFile(filepath.Join(s.root, r.Receipt))
+	if err != nil {
+		return v, err
+	}
+	context, err := s.managedReviewContext(w, a, r.CandidateSHA, receipt)
+	if err != nil {
+		return v, err
+	}
+	contextRaw, _ := json.Marshal(context)
+	if hash(contextRaw) != r.ContextDigest {
+		return v, fmt.Errorf("dossier de revue modifié ; préparer les preuves actuelles avant remplacement")
 	}
 	// Validate the new provider configuration without assigning old evidence to it.
 	fresh := *r
