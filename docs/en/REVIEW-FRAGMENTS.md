@@ -172,3 +172,10 @@ New inspection schemas limit the short `reason` and `evidence` fields to 16
 Unicode characters. Evidence also requires at least eight characters and no leading or trailing whitespace. Even six JSON bytes per escaped character fit the internal
 96-byte bound. Missing evidence is described through `needs`; the final decision
 carries the full rationale. Previously valid responses remain readable.
+
+An explicit retry after a rejected citation may include bounded diagnostic
+feedback: affected artifact indexes and a reminder to quote only their supplied
+content. Feedback uses the latest raw response matching that packet and its
+reservation, with a file hash check. It never substitutes for a valid response,
+updates the proof journal, or supplies a verdict. The full prompt size is checked
+before reserving another call. Previously spent calls remain charged.

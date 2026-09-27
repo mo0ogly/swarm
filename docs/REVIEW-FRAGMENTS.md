@@ -193,3 +193,11 @@ Le schéma des nouvelles inspections limite les deux champs courts `reason` et
 échappé, ils respectent ainsi le plafond interne de 96 octets. Les réserves et
 pièces à demander sont exprimées via `needs` ; la décision finale porte les
 justifications complètes. Les anciennes réponses compatibles restent lisibles.
+
+Lors d'une reprise explicite après citation refusée, le moteur peut joindre un
+diagnostic borné : indices des pièces concernées et rappel de copier uniquement
+le texte présent dans leur contenu. Ce diagnostic vient de la dernière réponse
+brute correspondant au paquet et à sa réservation ; son empreinte est contrôlée.
+Il ne remplace jamais une réponse valide, ne remplit pas le journal des preuves,
+et ne vaut pas verdict. La taille du message complet est vérifiée avant toute
+nouvelle réservation d'appel. Les anciens appels restent consommés.

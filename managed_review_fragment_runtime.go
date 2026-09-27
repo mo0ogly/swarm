@@ -121,6 +121,10 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if e != nil {
 			return "", nil, e
 		}
+		prompt += s.fragmentRetryFeedback(r, j, packet)
+		if len(prompt)+len(managedFragmentPacketSchema(packet)) > managedReviewPromptLimit {
+			return "", nil, fmt.Errorf("paquet et diagnostic de reprise dépassent la limite ; aucun appel réservé")
+		}
 		raw, _ := json.Marshal(packet)
 		id := newID("fragment-call-")
 		j.Entries = append(j.Entries, managedFragmentJournalEntry{Packet: i, PacketDigest: hash(raw), CallID: id, State: "reserved"})
