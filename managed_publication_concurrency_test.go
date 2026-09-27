@@ -3,6 +3,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -36,29 +37,24 @@ func TestManagedPublicationReservesWriterBeforeEvidenceChecks(t *testing.T) {
 			case <-time.After(5 * time.Second):
 				t.Fatal("publication did not enter checks")
 			}
-			competing := make(chan error, 1)
-			started := make(chan struct{})
-			go func() {
-				close(started)
-				_, err := other.db.Exec("UPDATE works SET revision=revision WHERE id=?", w.ID)
-				competing <- err
-			}()
-			<-started
-			premature := false
-			select {
-			case <-competing:
-				premature = true
-			case <-time.After(100 * time.Millisecond):
+			// Fail immediately on a real competing write while the first callback
+			// remains blocked. No scheduler delay can stand in for contention.
+			if _, err = other.db.Exec("PRAGMA busy_timeout=0"); err != nil {
+				close(release)
+				<-published
+				t.Fatal(err)
 			}
+			_, writerErr := other.db.Exec("UPDATE works SET revision=revision WHERE id=?", w.ID)
 			close(release)
 			err = <-published
-			if !premature {
-				if writerErr := <-competing; writerErr != nil {
-					t.Fatal(writerErr)
-				}
+			if writerErr == nil {
+				t.Fatal("competing writer entered during evidence checks")
 			}
-			if premature {
-				t.Fatal("competing writer entered during evidence checks; publication can lose its snapshot", err)
+			if !strings.Contains(writerErr.Error(), "SQLITE_BUSY") && !strings.Contains(writerErr.Error(), "database is locked") {
+				t.Fatal("unexpected competing write error", writerErr)
+			}
+			if _, e := other.db.Exec("UPDATE works SET revision=revision WHERE id=?", w.ID); e != nil {
+				t.Fatal("writer still blocked after publication", e)
 			}
 			if err != nil {
 				t.Fatal(err)

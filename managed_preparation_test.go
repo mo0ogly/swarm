@@ -137,18 +137,57 @@ func TestManagedPreparedLaunchConcurrentResume(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer other.db.Close()
+	type result struct {
+		agent   Agent
+		created bool
+		err     error
+	}
+	results := make(chan result, 2)
 	var wg sync.WaitGroup
 	for _, store := range []*Store{s, other} {
 		wg.Add(1)
-		go func(s *Store) { defer wg.Done(); _, _, _ = s.resumePreparedLaunch(w.ID, r.EventID, w.Revision) }(store)
+		go func(s *Store) {
+			defer wg.Done()
+			a, created, err := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision)
+			results <- result{a, created, err}
+		}(store)
 	}
 	wg.Wait()
-	a, _, e := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision)
+	close(results)
+	createdCount := 0
+	for outcome := range results {
+		if outcome.err != nil {
+			conflict, ok := outcome.err.(*CommandError)
+			if outcome.created || outcome.agent.ID != "" || !(outcome.err.Error() == "une opération Git est déjà en cours pour cette mission" || (ok && conflict.Code == "revision_conflict")) {
+				t.Fatalf("unexpected concurrent resume failure: %v", outcome.err)
+			}
+			continue // Explicit contention is allowed, but another concurrent call must create.
+		}
+		if outcome.agent.ID != r.EventID {
+			t.Fatal("concurrent resume returned a different agent")
+		}
+		if outcome.created {
+			createdCount++
+		}
+	}
+	if createdCount != 1 {
+		t.Fatalf("concurrent calls created %d agents, want exactly one", createdCount)
+	}
+	a, created, e := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision)
+	if created {
+		t.Fatal("sequential replay created the agent instead of the concurrent calls")
+	}
 	if e != nil || a.ID != r.EventID {
 		t.Fatal(e)
 	}
-	after, _ := s.get(w.ID)
-	agents, _ := s.agents(w.ID)
+	after, e := s.get(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	agents, e := s.agents(w.ID)
+	if e != nil {
+		t.Fatal(e)
+	}
 	if len(after.Tasks[0].Attempts) != 1 || len(agents) != 1 {
 		t.Fatal("duplicate reservation", len(agents), after.Tasks[0].Attempts)
 	}
