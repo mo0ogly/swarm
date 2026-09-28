@@ -279,3 +279,28 @@ La cinquième production E6 a appelé ScheduleWakeup(delaySeconds=600), puis Sch
 Le lancement synchrone Claude ajoute maintenant ScheduleWakeup aux outils refusés, sans remplacer les interdictions déjà configurées ; les modes interactifs et les autres adaptateurs restent inchangés. La CLI locale expose --disallowedTools. Tests ciblés PASS0.015s ; suite complète en cours. Cette restriction ne garantit pas à elle seule la réussite d’une recette.
 
 Validation finale du refus ScheduleWakeup : ok  	swarm.local/companion	307.781s ; vet/diffPASS.
+
+## 28 septembre — priorité des événements nécessaires à E6
+
+Cause reproduite sur une exportation publique immuable : après l'acquittement
+explicite de 47 retours historiques, les événements de la dernière tentative
+acceptée d'E5 précédaient encore ceux d'E6 bloquée. Classer seulement les anciennes
+identités de tentative ne suffisait donc pas. Le contexte réduit pouvait livrer
+E5 sans E6 et consommer une activation supplémentaire sans traiter son blocage.
+
+Correction : événements des tentatives actuelles bloquées en premier, autres
+événements actuels ensuite, anciennes tentatives enfin. L'ordre dans chaque groupe
+est stable. Rien n'est supprimé ni acquitté par cette projection ; seule une
+décision explicite consomme les événements livrés. Le contrôle hors ligne du
+contexte réel livre maintenant E6 dans 37 239 octets, avec six événements et les
+entrées de découpage. Les tests unitaires couvrent la conservation de l'historique
+et le cas d'une tentative acceptée encore actuelle.
+
+Ce contrôle ne constitue pas l'acceptation d'E6. Au moment du diagnostic, le
+compteur reste à 5/8, les 40 activations sont consommées et la revue à 73/75.
+Le précontrôle du découpage demande 16 inspections et deux appels finaux.
+L'autorisation de plafonds 41/91 est demandée avant toute nouvelle exécution.
+
+Validation de cette correction : suite Go complète PASS (454,891 s), tests
+ciblés PASS (0,426 s), `go vet`, contrat de configuration et `git diff --check`
+PASS. La projection ne modifie pas les états partagés.

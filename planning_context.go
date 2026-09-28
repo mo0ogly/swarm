@@ -19,15 +19,34 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
 		return nil, e
 	}
 	events := []PlanningEvent{}
-	pending := 0
-	relevant := map[string]bool{}
+	actionable, current, historical := []PlanningEvent{}, []PlanningEvent{}, []PlanningEvent{}
 	for _, event := range p.Inbox {
-		if event.Scope == id && event.Decision == "" {
-			pending++
-			if len(events) < eventLimit {
-				events = append(events, event)
-				relevant[event.Task] = true
-			}
+		if event.Scope != id || event.Decision != "" {
+			continue
+		}
+		stale, needsAction := false, false
+		if event.Task != "" && event.Attempt != "" {
+			task, err := w.task(event.Task)
+			stale = err != nil || !currentTaskAttempt(task, event.Attempt)
+			needsAction = !stale && task.Status == "blocked"
+		}
+		if stale {
+			historical = append(historical, event)
+		} else if needsAction {
+			actionable = append(actionable, event)
+		} else {
+			current = append(current, event)
+		}
+	}
+	// Prioritize blocked current attempts, then other current events, then
+	// historical attempts. Preserve relative order within each group and keep
+	// every event pending until explicitly acknowledged by a decision.
+	pending := len(actionable) + len(current) + len(historical)
+	relevant := map[string]bool{}
+	for _, event := range append(append(actionable, current...), historical...) {
+		if len(events) < eventLimit {
+			events = append(events, event)
+			relevant[event.Task] = true
 		}
 	}
 	tasks := []map[string]any{}
