@@ -55,6 +55,7 @@ type IndependentReview struct {
 }
 
 type ManagedReviewBatchVerdict struct {
+	RetryFeedback string   `json:"retry_feedback,omitempty"`
 	ID            string   `json:"id"`
 	Tasks         []string `json:"tasks"`
 	Context       string   `json:"context"`

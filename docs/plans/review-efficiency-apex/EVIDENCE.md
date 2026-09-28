@@ -263,3 +263,8 @@ considéré arrêté. Le test de requalification ajoute un cas de redémarrage d
 machine avec conservation du résultat et nouvelle revue.
 
 Validation après redémarrage machine : ok  	swarm.local/companion	331.037s ; ciblésrace19.641sPASS ; vet/diffPASS.
+
+## Debug de citation par lots
+Le lot échoué ne recevait aucun diagnostic lors de sa reprise explicite. Le moteur transmet maintenant un diagnostic dérivé de la réponse immuable et du parseur, enregistré dans le nouveau claim compté. Le contexte, les lots acquis, leur empreinte de plan et le validateur exact restent inchangés. Le prompt réel, diagnostic compris, est contrôlé avant réservation. Les tests couvrent correction après réouverture, nouvelle citation fausse refusée et réponse antérieure altérée rejetée sans appel. Aucun test ne sollicite de fournisseur réel.
+
+Validation feedback : ok  	swarm.local/companion	347.719s ; ciblés8.374sPASS ; race27.125sPASS ; vet/diffPASS ; relecture séparée sans défaut identifié.

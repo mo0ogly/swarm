@@ -275,3 +275,74 @@ func TestManagedBatchRuntimeProviderChangeInvalidatesPublication(t *testing.T) {
 		t.Fatal("guard made a paid call")
 	}
 }
+
+func TestManagedBatchCitationRetryReceivesDiagnostic(t *testing.T) {
+	for _, mode := range []string{"correct", "repeat", "tamper"} {
+		t.Run(mode, func(t *testing.T) {
+			s, w, a := managedBatchRuntimeFixture(t)
+			path := filepath.Join(s.root, "review-fixture/claude")
+			raw, e := os.ReadFile(path)
+			if e != nil {
+				t.Fatal(e)
+			}
+			injected := strings.Replace(string(raw), "if mode=='wrong-sha':", "if len(open(os.path.join(folder,'calls')).readlines())>=3 and ('SWARM_BATCH_CITATION_DIAGNOSTIC' not in text or os.path.exists(os.path.join(folder,'repeat-bad'))): reply['tasks'][-1]['criteria'][0]['evidence']='invented citation not present'\nif mode=='wrong-sha':", 1)
+			if e = os.WriteFile(path, []byte(injected), 0700); e != nil {
+				t.Fatal(e)
+			}
+			_ = s.integrateManagedAttempt(a)
+			before, _ := s.get(w.ID)
+			task, _ := before.task(a.TaskID)
+			old := *task.IndependentReview
+			if old.State != "error" || managedReviewCalls(t, s) != 3 {
+				t.Fatal("citation failure missing", task.Blocker)
+			}
+			if mode == "repeat" {
+				os.WriteFile(filepath.Join(s.root, "review-fixture/repeat-bad"), []byte("yes"), 0600)
+			}
+			if mode == "tamper" {
+				os.WriteFile(filepath.Join(s.root, old.Batches[1].ReplyPath), []byte("{}"), 0600)
+			}
+			reopened, e := openStore(s.root, false)
+			if e != nil {
+				t.Fatal(e)
+			}
+			defer reopened.db.Close()
+			_, e = reopened.planningChange(w.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "citation-retry", Revision: before.Revision, Task: a.TaskID, Reason: "Explicit correction of invalid citation format with diagnostic"})
+			if e != nil {
+				t.Fatal(e)
+			}
+			_ = reopened.reconcileKnownMissionResult(a, "fixture-conductor")
+			after, _ := reopened.get(w.ID)
+			task, _ = after.task(a.TaskID)
+			if mode == "tamper" {
+				if managedReviewCalls(t, s) != 3 || task.Status == "accepted" {
+					t.Fatal("altered reply consumed a call")
+				}
+				return
+			}
+			if managedReviewCalls(t, s) != 4 || len(task.Attempts) != 1 || task.IndependentReview.Batches[0].ID != old.Batches[0].ID || task.IndependentReview.BatchPlanDigest != old.BatchPlanDigest {
+				t.Fatal("duplicated work or changed plan")
+			}
+			feedback := task.IndependentReview.Batches[1].RetryFeedback
+			observed, e := os.ReadFile(filepath.Join(s.root, "review-fixture/observed.json"))
+			if e != nil {
+				t.Fatal(e)
+			}
+			var got struct {
+				Prompt string `json:"prompt"`
+			}
+			if e = json.Unmarshal(observed, &got); e != nil {
+				t.Fatal(e)
+			}
+			if feedback == "" || !strings.HasPrefix(got.Prompt, feedback) {
+				t.Fatal("persisted diagnostic not transmitted")
+			}
+			if mode == "correct" && task.Status != "accepted" {
+				t.Fatal(task.Blocker)
+			}
+			if mode == "repeat" && task.IndependentReview.State != "error" {
+				t.Fatal("invalid citation promoted")
+			}
+		})
+	}
+}
