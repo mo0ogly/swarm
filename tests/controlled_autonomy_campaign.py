@@ -3,6 +3,9 @@
 No direct database access. No claim/decide/retry/accept mutation is provided.
 The observer is a qualification report, not a replacement for engine acceptance.
 """
+from contextlib import contextmanager
+import signal
+import tempfile
 import argparse
 import base64
 import hashlib
@@ -21,8 +24,18 @@ ACTIVE = {'queued', 'starting', 'running', 'stopping'}
 
 
 def write(path, value):
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n')
-    path.chmod(0o600)
+    # A killed observer must not leave a truncated result looking authoritative.
+    path = Path(path)
+    fd, temporary = tempfile.mkstemp(prefix='.'+path.name+'-', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            json.dump(value, stream, ensure_ascii=False, indent=2)
+            stream.write('\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
 
 
 def cli(manifest, args, data=None):
@@ -174,13 +187,42 @@ def observe(m):
     return result,dict(snapshot=snap,history=history,agents=agents,injection=injection,failures=failures)
 
 
+class CampaignInterrupted(Exception):
+    pass
+
+
+@contextmanager
+def termination_guard():
+    # Only the standalone observer owns process signals. Restore the caller's
+    # handlers after the run; a second signal must not interrupt cleanup.
+    prior = {}
+    interrupted = False
+    def stop(signum, frame):
+        nonlocal interrupted
+        if not interrupted:
+            interrupted = True
+            raise CampaignInterrupted('campaign interrupted by signal '+str(signum))
+    try:
+        for signum in (signal.SIGTERM, signal.SIGINT):
+            prior[signum] = signal.signal(signum, stop)
+        yield
+    finally:
+        for signum, handler in prior.items(): signal.signal(signum, handler)
+
+
 def run(directory, seconds=1200):
+    with termination_guard():
+        return run_owned(directory, seconds)
+
+
+def run_owned(directory, seconds=1200):
     dest=Path(directory).resolve();m=json.loads((dest/'campaign.json').read_text());frozen(m)
     # An interrupted campaign cannot silently start a new paid trajectory.
     with (dest/'run-started.json').open('x') as f: json.dump({'at':time.time(),'limits':LIMITS},f)
     log=(dest/'server.log').open('ab',buffering=0)
     server=None;result={'status':'FAIL','missing':['campaign did not complete']}
     try:
+        write(dest/'result.json', {'status':'RUNNING', 'missing':['evidence not complete']})
         cli(m,['mission','start',m['work']],m['profile'])
         server=subprocess.Popen([m['engine'],'--root',m['store'],'web','127.0.0.1:0'],stdout=log,stderr=log)
         deadline=time.monotonic()+seconds
@@ -198,8 +240,9 @@ def run(directory, seconds=1200):
                 break
             time.sleep(10)
         if result['status']!='PASS': result['status']='FAIL'
-    except Exception as exc:
-        result={'status':'FAIL','missing':[str(exc)]}
+    except (Exception, KeyboardInterrupt) as exc:
+        result={'status':'FAIL','missing':[str(exc) or 'campaign interrupted'],
+                'interrupted':isinstance(exc,(CampaignInterrupted,KeyboardInterrupt))}
     finally:
         # Stop is not a recovery decision. Preserve agents/processes for diagnosis
         # if shutdown cannot be confirmed; never abandon them silently.

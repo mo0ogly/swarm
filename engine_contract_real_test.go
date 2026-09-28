@@ -114,9 +114,9 @@ func managedCompletedAttempt(t *testing.T, s *Store, w Work, id, agentID, value 
 // corrected SHA the controls tested, acceptance, then closure of both scopes.
 //
 // This deterministic behavioral test complements, and does not replace, the
-// separate real-provider trial in tests/e6_real_trial_process.py, which runs
-// this same journey through two genuine "claude" worker subprocesses and the
-// engine's real (non-fixture) independent-review subprocess call.
+// separate real-provider trial in tests/controlled_autonomy_campaign.py, which runs
+// the journey through genuine planner and worker subprocesses, a controlled
+// business fault and the engine's independent-review subprocess call.
 func TestEngineContractRealNeedDelegationDefectCorrectionAcceptanceAndScopeClosure(t *testing.T) {
 	s, w := managedDelegatedFixture(t)
 	base := w.Planning.Repository.Candidate
