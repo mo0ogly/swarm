@@ -523,3 +523,68 @@ func TestRecoveredResultExplicitCorrectionAfterReviewError(t *testing.T) {
 		t.Fatal("producer history rewritten")
 	}
 }
+
+func TestRecoveredResultRevisionOfPartialCompletedDelivery(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "initial\n")
+	a.DeliveryVersion = 1
+	if e := s.saveAgent(a); e != nil {
+		t.Fatal(e)
+	}
+	os.WriteFile(filepath.Join(a.CWD, "docs/first.delivery.json"), []byte(`{"version":1,"outcome":"partial"}`), 0600)
+	if e := s.finishAgent(a, "completed", "", nil); e != nil {
+		t.Fatal(e)
+	}
+	a, _ = s.agent(a.ID)
+	if e := s.integrateManagedAttempt(a); e != nil {
+		t.Fatal(e)
+	}
+	w, _ = s.get(w.ID)
+	task, _ := w.task(a.TaskID)
+	if task.Status != "blocked" || task.IndependentReview != nil || managedReviewCalls(t, s) != 0 {
+		t.Fatal("incomplete result was reviewed")
+	}
+	old, _ := s.managedAttempt(a.ID)
+	oldReport, e := managedGit(filepath.Join(w.Planning.Repository.Storage, "repository.git"), "show", old.Result+":docs/first.md")
+	if e != nil {
+		t.Fatal(e)
+	}
+	os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte("Repaired complete proof"), 0600)
+	body, _ := json.Marshal(completeDelivery(task, a))
+	os.WriteFile(filepath.Join(a.CWD, "docs/first.delivery.json"), body, 0600)
+	gitTest(t, a.CWD, "add", "-A")
+	req := PlanningRequest{Schema: 1, EventID: "partial-completed-repair", Revision: w.Revision, Task: a.TaskID, Agent: a.ID, Attempt: a.Attempt, ConfirmRecovery: true, ResultTree: gitTest(t, a.CWD, "write-tree"), Reason: "Externally completed partial delivery with examined evidence"}
+	for _, mode := range []string{"confirmation", "revision", "review"} {
+		bad := req
+		bad.EventID += "-" + mode
+		switch mode {
+		case "confirmation":
+			bad.ConfirmRecovery = false
+		case "revision":
+			bad.Revision--
+		case "review":
+			bad.ReviewID = "unknown-review"
+		}
+		if _, err := s.planningChange(w.ID, "revise-recovered-result", bad); err == nil {
+			t.Fatalf("unsafe repair accepted: %s", mode)
+		}
+		if managedReviewCalls(t, s) != 0 {
+			t.Fatal("invalid repair consumed review")
+		}
+	}
+	after, e := s.planningChange(w.ID, "revise-recovered-result", req)
+	if e != nil {
+		t.Fatal(e)
+	}
+	task, _ = after.task(a.TaskID)
+	if task.Status != "accepted" || task.RecoveredResult.ReplacesResult != old.Result || managedReviewCalls(t, s) != 1 || len(task.Attempts) != 1 {
+		t.Fatal("repair bypassed provenance/review", task.Status)
+	}
+	preserved, e := managedGit(filepath.Join(w.Planning.Repository.Storage, "repository.git"), "show", old.Result+":docs/first.md")
+	if e != nil || preserved != oldReport {
+		t.Fatal("old report changed")
+	}
+	if _, e = s.planningChange(w.ID, "revise-recovered-result", req); e != nil || managedReviewCalls(t, s) != 1 {
+		t.Fatal("replay spent another review", e)
+	}
+}
