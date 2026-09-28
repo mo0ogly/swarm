@@ -137,6 +137,14 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 		if e = s.managedReviewFilesIntact(r); e != nil {
 			return e
 		}
+		if p.Coordination != nil {
+			currentPlan, _ := json.Marshal(ct.ReviewCoordination)
+			expectedPlan, _ := json.Marshal(task.ReviewCoordination)
+			if string(currentPlan) != string(expectedPlan) {
+				return fmt.Errorf("plan de coordination modifié")
+			}
+			ct.ReviewCoordination.State = "execution_started"
+		}
 		ct.IndependentReview = &r
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error {

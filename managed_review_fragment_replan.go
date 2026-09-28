@@ -32,6 +32,9 @@ func (s *Store) managedFragmentReplan(w Work, r IndependentReview, old managedRe
 	if err = strict(raw, &c); err != nil {
 		return managedReviewFragmentPlan{}, err
 	}
+	if old.Coordination != nil {
+		return managedReviewFragmentPlan{}, fmt.Errorf("plan sémantique à conserver ; reprendre les inspections existantes")
+	}
 	cfg := w.Planning.Reviewer
 	return planManagedReviewFragments(c, cfg.MaxCalls-cfg.Calls, old.ReservedFinalCalls)
 }

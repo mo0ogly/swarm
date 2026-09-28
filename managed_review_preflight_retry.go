@@ -115,7 +115,9 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	if err != nil {
 		return nil, err
 	}
-	if scope.RequiresReduction {
+	reviewTask, _ := w.task(task)
+	coordinated := reviewTask.ReviewCoordination != nil
+	if scope.RequiresReduction && !coordinated {
 		return nil, fmt.Errorf("%s : %d fichiers ; préparer une remise ciblée avec scope-preview et scope-patch", managedScopeRefusal, len(scope.Files))
 	}
 	owners, e := managedReviewSourceOwners(w, c)
@@ -128,7 +130,7 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	}
 	batches, e := planManagedReviewBatches(managedReviewPrefix(workflow), c, owners)
 	calls := len(batches)
-	if errors.Is(e, errManagedReviewBatchSize) {
+	if coordinated || errors.Is(e, errManagedReviewBatchSize) {
 		cfg := w.Planning.Reviewer
 		plan, err := s.planCandidateFragments(w, prepared.Agent, c, cfg.MaxCalls-cfg.Calls)
 		if err != nil {

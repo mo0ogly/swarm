@@ -309,7 +309,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 	if scopeErr != nil {
 		return scopeErr
 	}
-	if scope.RequiresReduction {
+	if scope.RequiresReduction && task.ReviewCoordination == nil {
 		return fmt.Errorf("%s : %d fichiers modifiés depuis la base acceptée, limite %d ; utiliser planning scope-preview pour organiser des revues coordonnées avec le sous-planificateur. Aucun appel de revue dépensé ; le candidat complet est conservé", managedScopeRefusal, len(scope.Files), scope.Limit)
 	}
 	cfg := current.Planning.Reviewer
@@ -328,6 +328,14 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 	context, e := s.managedReviewContext(current, a, candidate, receipt)
 	if e != nil {
 		return e
+	}
+	if task.ReviewCoordination != nil {
+		record, err := s.beginManagedFragmentReview(current, a, context, receiptPath, receipt)
+		if err != nil {
+			return err
+		}
+		_, _, runErr := s.runManagedFragmentReview(current, a, record)
+		return s.finishManagedFragmentReview(w.ID, a, record.ID, runErr)
 	}
 	data, _ := json.Marshal(context)
 	workflow, workflowPrompt, e := agentWorkflow("reviewer")

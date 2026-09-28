@@ -63,7 +63,7 @@ func validateReviewCoordination(p ReviewCoordinationProposal, candidate, evidenc
 	coveredCriteria := map[string]bool{}
 	lots := map[string]ReviewCoordinationLot{}
 	for _, lot := range p.Lots {
-		if !safeName(lot.ID) || lots[lot.ID].ID != "" || len(strings.TrimSpace(lot.Objective)) < 8 || len(lot.Objective) > 2000 {
+		if lot.ID == "__global_evidence" || !safeName(lot.ID) || lots[lot.ID].ID != "" || len(strings.TrimSpace(lot.Objective)) < 8 || len(lot.Objective) > 2000 {
 			return nil, fmt.Errorf("identité ou objectif de lot invalide")
 		}
 		switch lot.Kind {

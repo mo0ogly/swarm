@@ -20,6 +20,9 @@ type managedReviewFragmentArtifact struct {
 	Content string `json:"content"`
 }
 type managedReviewFragmentPacket struct {
+	LotContract   *ReviewCoordinationLot          `json:"lot_contract,omitempty"`
+	LotCriteria   map[string]string               `json:"lot_criteria,omitempty"`
+	Lot           string                          `json:"lot,omitempty"`
 	InputBudget   *managedReviewInputBudget       `json:"input_budget,omitempty"`
 	Version       int                             `json:"version"`
 	Candidate     string                          `json:"candidate_commit"`
@@ -28,6 +31,8 @@ type managedReviewFragmentPacket struct {
 	Artifacts     []managedReviewFragmentArtifact `json:"artifacts"`
 }
 type managedReviewFragmentPlan struct {
+	Coordination       *ReviewCoordinationProposal   `json:"coordination,omitempty"`
+	CoordinationFiles  []string                      `json:"coordination_files,omitempty"`
 	InputBudget        *managedReviewInputBudget     `json:"input_budget,omitempty"`
 	Version            int                           `json:"version"`
 	ContextDigest      string                        `json:"context_sha256"`
@@ -180,6 +185,17 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 			return fmt.Errorf("paquet dépasse le plafond mémoire ancré")
 		}
 		actual = append(actual, packet.Artifacts...)
+	}
+	if p.Coordination != nil {
+		return validateCoordinatedFragmentCoverage(c, p)
+	}
+	if len(p.CoordinationFiles) > 0 {
+		return fmt.Errorf("périmètre coordonné sans plan")
+	}
+	for _, packet := range p.Packets {
+		if packet.Lot != "" || packet.LotContract != nil || len(packet.LotCriteria) > 0 {
+			return fmt.Errorf("lot sans plan")
+		}
 	}
 	if p.Version == 3 || (p.Version == 4 && len(p.Reused) > 0) {
 		return validateFragmentReuseCoverage(c, p, actual, expected)

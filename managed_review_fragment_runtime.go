@@ -44,7 +44,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if e != nil {
 			return e
 		}
-		if task.IndependentReview == nil || task.IndependentReview.ID != reviewID || task.IndependentReview.State != "running" || !currentTaskAttempt(task, a.Attempt) || current.Planning == nil || current.Planning.Repository == nil || current.Planning.Repository.Candidate != r.PreviousCandidate || managedReviewContract(current, a.TaskID) != managedReviewContract(w, a.TaskID) {
+		if task.IndependentReview == nil || task.IndependentReview.ID != reviewID || task.IndependentReview.State != "running" || !currentTaskAttempt(task, a.Attempt) || current.Planning == nil || current.Planning.Repository == nil || current.Planning.Repository.Candidate != r.PreviousCandidate || managedReviewContract(current, a.TaskID) != managedReviewContract(w, a.TaskID) || !sameReviewCoordination(current, w, a.TaskID) {
 			return fmt.Errorf("revue active remplacée")
 		}
 		next := *task.IndependentReview
@@ -68,7 +68,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 			return false
 		}
 		current, e := s.get(w.ID)
-		if e != nil || current.Planning == nil || current.Planning.Paused || current.Planning.Repository == nil || current.Planning.Repository.Candidate != w.Planning.Repository.Candidate || managedReviewContract(current, a.TaskID) != managedReviewContract(w, a.TaskID) {
+		if e != nil || current.Planning == nil || current.Planning.Paused || current.Planning.Repository == nil || current.Planning.Repository.Candidate != w.Planning.Repository.Candidate || managedReviewContract(current, a.TaskID) != managedReviewContract(w, a.TaskID) || !sameReviewCoordination(current, w, a.TaskID) {
 			return false
 		}
 		task, e := current.task(a.TaskID)

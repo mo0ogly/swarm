@@ -40,7 +40,7 @@ de chaîne. Les autres champs de l’opération respectent le schéma habituel.
 
 Les valeurs sont illustratives : ne jamais les soumettre telles quelles.
 Types autorisés : `requirement`, `component`, `dependency`, `specialty`, `volume`.
-La limite actuelle est100 lots et100 fichiers par lot. Les recouvrements entre
+La limite actuelle est de 100 lots et 100 fichiers par lot. Les recouvrements entre
 lots sont autorisés, par exemple pour une revue de sécurité complémentaire.
 
 ## Contrôles du moteur
@@ -57,14 +57,37 @@ lots sont autorisés, par exemple pour une revue de sécurité complémentaire.
 Un plan déjà enregistré n’est pas remplacé implicitement. Une future procédure
 de révision devra préserver l’ancien plan et invalider les avis concernés.
 
-## État livré et limite
+## Exécution et reprise
 
-`task.review_coordination` conserve proposition, empreinte, responsable,
-décision et ordre. Son état est **`validated_not_executed`** : la couverture et
-la structure ont été vérifiées, pas la pertinence sémantique ni les résultats.
-La tâche reste bloquée. Aucun appel de revue ni acceptation ne découle du plan.
+`task.review_coordination` conserve la proposition, son empreinte, le responsable,
+la décision et l’ordre. `validated_not_executed` indique un plan enregistré.
+La reprise publique de la revue (`retry-review`) vérifie ce plan sur les preuves
+actuelles avant tout appel. Le démarrage passe son état à `execution_started` ;
+le verdict et les erreurs restent dans `independent_review` et son journal.
 
-L’exécuteur de ces lots sémantiques n’est pas encore raccordé. Les fragments
-techniques existants ne sont pas présentés comme cette exécution. Il reste à
-contrôler la capacité et le budget de chaque lot, exécuter les revues, traiter
-les corrections et faire la revue finale sur le même SHA avant acceptation.
+Le moteur exécute les lots dans l’ordre de leurs dépendances. Chaque paquet
+porte l’objectif du lot et le texte des critères. Un lot peut nécessiter plusieurs
+inspections bornées. Les rapports, contrôles, preuves historiques et autres
+pièces communes sont également inspectés ; aucune preuve ne disparaît parce
+qu’elle n’appartient pas à un lot. Les recouvrements volontaires sont examinés
+pour chaque lot concerné et peuvent donc augmenter le coût.
+
+Avant le départ, le moteur contrôle le transport complet et le budget de toutes
+les inspections **plus deux appels finaux**. `planning review-cost` fournit
+l’estimation. Un budget insuffisant refuse le départ sans appel facturé.
+Les observations et erreurs sont conservées dans le journal durable existant ;
+une reprise explicite conserve les inspections acquises du même plan. Le
+redécoupage technique qui effacerait les limites des lots est refusé.
+
+La revue finale reçoit le plan, les observations et les preuves originales.
+Une inspection ne valide jamais une tâche. La publication reste soumise au
+verdict global et aux contrôles sur le même candidat.
+
+## Limites explicites
+
+Cette version exécute séquentiellement les inspections via le vérificateur
+configuré. Elle ne crée pas un nouvel agent autonome par lot ni un échange direct
+entre vérificateurs : les interactions non prouvées remontent à la revue finale.
+Une pièce indivisible trop grande est refusée, sans troncature. Un changement de
+candidat ou de preuves invalide le plan ; sa substitution implicite est interdite.
+La validation structurelle ne garantit pas la pertinence du découpage proposé.

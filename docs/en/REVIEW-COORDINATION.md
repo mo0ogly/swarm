@@ -20,7 +20,22 @@ responsible scope, decision and dependency order. State `validated_not_executed`
 means structural validation only. No paid review, worker launch or task acceptance
 occurs. Replay is idempotent. Existing plans cannot be silently replaced.
 
-The semantic-lot executor is not connected yet. Capacity/budget admission,
-independent lot reviews, correction invalidation and final same-SHA review remain
-required before this planning record can drive acceptance. Existing technical
-fragment execution must not be misrepresented as semantic coordination.
+The executor now runs approved lots in dependency order through the existing
+independent reviewer. Each packet carries its lot objective and criterion text.
+Large lots may require multiple bounded inspections. Shared reports, controls,
+historical changes and supplemental evidence remain covered by global packets.
+Intentional overlap is inspected for each applicable lot and increases cost.
+
+Public `retry-review` checks candidate/evidence identity, complete transport and
+all inspection calls plus two final calls before starting. `planning review-cost`
+provides the estimate. Insufficient budget spends no call. Once started, the
+coordination state is `execution_started`; the independent review and its durable
+journal hold the outcome. Existing explicit resume preserves completed inspections.
+Technical repartition cannot silently discard semantic lot boundaries.
+
+Final review receives the proposal and original evidence. Partial inspection never
+accepts a task; publication still requires same-candidate checks and final verdict.
+This is sequential execution through the configured reviewer, not one autonomous
+agent per lot or direct inter-reviewer messaging. Oversized indivisible evidence
+is rejected, never truncated. Changed candidate/evidence invalidates the proposal;
+implicit proposal replacement remains forbidden.

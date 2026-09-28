@@ -89,6 +89,9 @@ func (s *Store) reviewInputBudget(cfg *ReviewerConfig) (*managedReviewInputBudge
 }
 
 func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, available int) (managedReviewFragmentPlan, error) {
+	if task, err := w.task(a.TaskID); err == nil && task.ReviewCoordination != nil {
+		return s.coordinatedFragments(w, a, c, available)
+	}
 	// Compute legacy inventory without relaxing the caller's execution budget.
 	p, err := s.planLegacyCandidateFragments(w, a, c, 100000)
 	if err != nil {

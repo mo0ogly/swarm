@@ -71,3 +71,22 @@ transaction de claim, avec une seule connexion SQLite. Lire le Store depuis ce
 contexte provoquerait un blocage. Les nouveaux précontrôles sont donc préparés
 avant la transaction puis liés à sa révision ; le rendu du contexte reste pur.
 L’exécution des lots demeure distincte et non livrée par cette étape.
+
+## Raccordement des lots — 28 septembre 2026
+
+Choix : conserver le journal d’inspections existant et lui ajouter les lots et
+contrats approuvés. Alternative écartée : créer une seconde machine de revue,
+qui dupliquerait réservations, erreurs, reprise et règles de publication.
+
+Le chemin `review-plan → retry-review → réconciliation → revue finale → publication`
+est couvert par une recette isolée avec fournisseur déterministe. Le candidat
+publié doit être celui du plan ; un rejeu ne dépense aucun appel supplémentaire.
+Tests supplémentaires : ordre des dépendances, omission/altération des preuves,
+critères inconnus, budget final insuffisant, échec du fournisseur et verdict négatif.
+La couverture des lots et les preuves communes sont intégralement conservées.
+
+RETEX : un inventaire ou une proposition validée ne suffit pas à rendre le
+moteur autonome. Il faut tester le raccordement par l’entrée publique, jusqu’à la
+publication, et distinguer cette preuve mécanique d’une revue par un vrai modèle.
+Le nouveau parcours reste séquentiel ; il ne prétend pas créer un agent par lot.
+E6 n’est pas acceptée par ces tests et les 73 appels déjà consommés restent comptés.
