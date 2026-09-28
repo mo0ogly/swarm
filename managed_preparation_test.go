@@ -365,3 +365,50 @@ func TestManagedPreparedReplayRejectsUnboundIdentity(t *testing.T) {
 		})
 	}
 }
+
+func TestManagedPreparedResumeAfterIdenticalTreeRequalification(t *testing.T) {
+	for _, mode := range []string{"identical-tree", "changed-task", "changed-tree"} {
+		t.Run(mode, func(t *testing.T) {
+			s, w := managedFixture(t)
+			r := Launch{Schema: 1, EventID: "prepared-before-requalification", Revision: w.Revision, TaskID: "first", Provider: "managed-review-fixture", Role: "worker", Instruction: "Complete the assigned task", Timeout: 60}
+			path, e := s.ensureManagedAttempt(w, r)
+			if e != nil {
+				t.Fatal(e)
+			}
+			bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
+			base := w.Planning.Repository.Candidate
+			tree, e := managedGit(bare, "rev-parse", base+"^{tree}")
+			if e != nil {
+				t.Fatal(e)
+			}
+			if mode == "changed-tree" {
+				tree, e = managedGit(bare, "mktree")
+				if e != nil {
+					t.Fatal(e)
+				}
+			}
+			candidate, e := managedGit(bare, "commit-tree", tree, "-p", base, "-m", "Requalification, unchanged tree")
+			if e != nil {
+				t.Fatal(e)
+			}
+			w.Planning.Repository.Candidate = candidate
+			if mode == "changed-task" {
+				w.Tasks[0].Next = "Different task contract"
+			}
+			raw, _ := json.Marshal(w)
+			if _, e = s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); e != nil {
+				t.Fatal(e)
+			}
+			a, created, e := s.resumePreparedLaunch(w.ID, r.EventID, w.Revision)
+			if mode != "identical-tree" {
+				if e == nil || created {
+					t.Fatal("changed task accepted")
+				}
+				return
+			}
+			if e != nil || !created || a.CWD != path {
+				t.Fatal("identical tree restart refused", created, e)
+			}
+		})
+	}
+}

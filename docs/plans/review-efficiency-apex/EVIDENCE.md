@@ -268,3 +268,8 @@ Validation après redémarrage machine : ok  	swarm.local/companion	331.037s ; c
 Le lot échoué ne recevait aucun diagnostic lors de sa reprise explicite. Le moteur transmet maintenant un diagnostic dérivé de la réponse immuable et du parseur, enregistré dans le nouveau claim compté. Le contexte, les lots acquis, leur empreinte de plan et le validateur exact restent inchangés. Le prompt réel, diagnostic compris, est contrôlé avant réservation. Les tests couvrent correction après réouverture, nouvelle citation fausse refusée et réponse antérieure altérée rejetée sans appel. Aucun test ne sollicite de fournisseur réel.
 
 Validation feedback : ok  	swarm.local/companion	347.719s ; ciblés8.374sPASS ; race27.125sPASS ; vet/diffPASS ; relecture séparée sans défaut identifié.
+
+## Recette réelle du diagnostic et reprise de préparation
+Revue E5 réellement reprise après installation04d2102 : deux lots passed, premier avec diagnostic enregistré, second sans ; compteur71→73/75, tâche E5accepted, révision526. La préparation E6 a ensuite refusé le nouveau SHA de requalification. Les deux commits8b1e1e4 et c4143b6a ont le même arbre Git c3887ecc48decbeff3c14e9c03838eebb769da2f. Correction bornée : accepter cette seule dérive de commit si tous les autres paramètres du contrat préparé restent identiques et les deux arbres sont exactement égaux. Manifeste, copie, identité de tentative et limites conservés. Tests de reprise publique, changement de consigne refusé et arbre différent refusé.
+
+Validation préparation à arbre identique : ok  	swarm.local/companion	345.583s ; ciblésrace8.128sPASS ; vet/diffPASS. Relecture séparée sans défaut concret identifié.

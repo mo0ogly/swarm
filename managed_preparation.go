@@ -132,7 +132,7 @@ func (s *Store) preparedLaunchGuard(w Work, t *Task, record ManagedAttempt) erro
 	if r.EventID != record.Agent || r.TaskID != t.ID || record.Task != t.ID || record.Work != w.ID || r.Schema != 1 {
 		return fmt.Errorf("paramètres de préparation incohérents")
 	}
-	if record.PreparationContract != managedPreparationContract(w, t) || record.Base != w.Planning.Repository.Candidate || record.Path != managedCopyRoot(w.Planning.Repository, t.ID, len(t.Attempts)+1) {
+	if !s.preparedContractMatches(w, t, record) || record.Path != managedCopyRoot(w.Planning.Repository, t.ID, len(t.Attempts)+1) {
 		return &CommandError{Code: "prepared_launch_changed", Message: "La tâche ou sa révision Git a changé depuis la préparation. Reprise refusée ; copie conservée pour examen."}
 	}
 	return verifyManagedCopy(w.Planning.Repository, record.Path)
@@ -247,4 +247,31 @@ func (s *Store) preparedManifestForTask(w Work, t *Task) (string, error) {
 		found = id
 	}
 	return found, nil
+}
+
+// Requalification can create a new commit with byte-identical content. Bind all
+// other preparation inputs exactly and verify both Git trees before reuse.
+func (s *Store) preparedContractMatches(w Work, t *Task, record ManagedAttempt) bool {
+	if t == nil || w.Planning == nil || w.Planning.Repository == nil {
+		return false
+	}
+	if record.Base == w.Planning.Repository.Candidate {
+		return record.PreparationContract == managedPreparationContract(w, t)
+	}
+	planning := *w.Planning
+	repo := *planning.Repository
+	current := repo.Candidate
+	repo.Candidate = record.Base
+	planning.Repository = &repo
+	w.Planning = &planning
+	if record.PreparationContract != managedPreparationContract(w, t) {
+		return false
+	}
+	bare := filepath.Join(repo.Storage, "repository.git")
+	oldTree, e := managedGit(bare, "rev-parse", "--verify", record.Base+"^{tree}")
+	if e != nil {
+		return false
+	}
+	currentTree, e := managedGit(bare, "rev-parse", "--verify", current+"^{tree}")
+	return e == nil && oldTree != "" && oldTree == currentTree
 }

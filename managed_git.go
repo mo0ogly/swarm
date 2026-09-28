@@ -292,7 +292,7 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 			return "", fmt.Errorf("copie non disponible : %s", prior.State)
 		}
 		if record, e := s.readPreparedLaunch(w, r.EventID); e == nil && record.Request != nil {
-			if record.PreparationContract != managedPreparationContract(w, taskForPreparation(w, r.TaskID)) || !preparedRequestCompatible(*record.Request, r) {
+			if !s.preparedContractMatches(w, taskForPreparation(w, r.TaskID), record) || !preparedRequestCompatible(*record.Request, r) {
 				return "", &CommandError{Code: "prepared_launch_changed", Message: "Le contrat ou les paramètres du lancement préparé ont changé ; sa copie est conservée. Examiner la préparation avant reprise."}
 			}
 		} else if e != nil && !os.IsNotExist(e) {
