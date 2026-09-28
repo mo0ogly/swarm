@@ -282,3 +282,14 @@ pas elle-même de fournisseur. Dépendances, budgets de revue et contrôles de
 lancement continuent de s'appliquer. E1–E5 ne sont pas revalidées implicitement.
 Une répétition du même événement est idempotente ; une deuxième décision avant
 consommation de la tentative préparée est refusée.
+
+### Avis favorable devenu périmé
+
+L'action `planning requalify` accepte aussi un ancien avis `passed` qui ne
+satisfait plus le contrat courant. Fournir son `review_id` et
+`confirm_recovery: true`, en plus des identités habituelles (tâche, agent,
+tentative, résultat, candidat et révision). Un avis encore valide, un autre
+avis ou une confirmation absente sont refusés. L'ancien avis est archivé ; la
+tâche reste bloquée jusqu'aux nouveaux contrôles et à un nouveau verdict.
+Une ancienne production réparée peut être réexaminée si son résultat, son
+agent arrêté et sa tentative concordent. Aucun compteur n'est remis à zéro.

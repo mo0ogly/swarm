@@ -239,3 +239,17 @@ conservent leur transfert. Le test couvre ces trois cas. L'échec public a été
 conservé ; aucune référence Git historique n'a été réécrite pour le masquer.
 
 Validation : ok  	swarm.local/companion	332.231s ; ciblés race3.952sPASS ; vet/diffPASS.
+
+## Requalification explicite d'un avis favorable périmé
+
+Le changement Claude vers Codex invalidait les avis cumulatifs E1–E5, alors que
+`requalify` n'acceptait que les tâches dépourvues d'avis. Extension bornée :
+confirmation explicite et identité de l'avis `passed` devenu périmé, identité
+courante de tentative/résultat/candidat, mêmes contrôles de disponibilité et
+transaction. Conservation de l'avis dans les historiques, aucune promotion
+implicite. Les résultats réparés restent attribués à leur processus arrêté.
+Tests : avis frais refusé, absence de confirmation, mauvais avis, ancien résultat
+réparé ; nouvelle revue réellement exécutée avec fournisseur déterministe dans
+un Store isolé. Aucune démonstration d'autonomie réelle n'en est déduite.
+
+Validation : ok  	swarm.local/companion	329.795s ; ciblés8.771sPASS ; race17.998sPASS ; vet/diffPASS.

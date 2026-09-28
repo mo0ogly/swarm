@@ -112,3 +112,63 @@ func TestEngineContractHistoryRequalificationRejectsDrift(t *testing.T) {
 		})
 	}
 }
+
+func TestRequalifyExplicitStalePassedReview(t *testing.T) {
+	for _, mode := range []string{"valid", "unconfirmed", "wrong-review", "fresh", "recovered"} {
+		t.Run(mode, func(t *testing.T) {
+			s, w := managedFixture(t)
+			a := managedCompleted(t, s, w, "first", "reviewed\n")
+			if e := s.integrateManagedAttempt(a); e != nil {
+				t.Fatal(e)
+			}
+			w, _ = s.get(w.ID)
+			task := &w.Tasks[0]
+			old := *task.IndependentReview
+			item, _ := s.managedAttempt(a.ID)
+			a.Ended = now()
+			if mode == "recovered" {
+				a.Status = "interrupted"
+				task.RecoveredResult = &RecoveredResult{Agent: a.ID, Attempt: a.Attempt, Result: item.Result, ProcessStatus: a.Status}
+			}
+			body, _ := json.Marshal(a)
+			if _, e := s.db.Exec("UPDATE agents SET body=?,status=? WHERE id=?", body, a.Status, a.ID); e != nil {
+				t.Fatal(e)
+			}
+			if mode != "fresh" {
+				task.IndependentReview.Contract = "stale-contract"
+				old = *task.IndependentReview
+			}
+			raw, _ := json.Marshal(w)
+			s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID)
+			r := PlanningRequest{Schema: 1, EventID: "refresh-stale", Revision: w.Revision, Task: task.ID, Agent: a.ID, Attempt: a.Attempt, ResultCommit: item.Result, ExpectedCandidate: w.Planning.Repository.Candidate, ReviewID: old.ID, ConfirmRecovery: true, Reason: "Explicitly reverify stale historical acceptance"}
+			if mode == "unconfirmed" {
+				r.ConfirmRecovery = false
+			}
+			if mode == "wrong-review" {
+				r.ReviewID = "other"
+			}
+			after, e := s.planningChange(w.ID, "requalify", r)
+			if mode != "valid" && mode != "recovered" {
+				if e == nil {
+					t.Fatal("unsafe requalification accepted")
+				}
+				return
+			}
+			if e != nil {
+				t.Fatal(e)
+			}
+			got := after.Tasks[0]
+			if got.IndependentReview != nil || got.Status != "blocked" || got.Requalifications[0].Review.ID != old.ID || after.Planning.Reviewer.Calls != w.Planning.Reviewer.Calls {
+				t.Fatal("old review lost or acceptance granted")
+			}
+			if e = s.integrateManagedAttempt(a); e != nil {
+				t.Fatal(e)
+			}
+			after, _ = s.get(w.ID)
+			got = after.Tasks[0]
+			if got.Status != "accepted" || got.IndependentReview == nil || got.IndependentReview.ID == old.ID || after.Planning.Reviewer.Calls != w.Planning.Reviewer.Calls+1 {
+				t.Fatal("fresh independent verdict missing", got.Blocker)
+			}
+		})
+	}
+}

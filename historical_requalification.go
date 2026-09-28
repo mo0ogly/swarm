@@ -68,7 +68,8 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 			return w, nil
 		}
 	}
-	if w.Revision != r.Revision || w.Planning == nil || w.Planning.Repository == nil || t.Status != "accepted" || t.IndependentReview != nil || t.BatchReviewResume != nil || t.RecoveredResult != nil || !currentTaskAttempt(t, r.Attempt) || len(t.Requalifications) > 0 {
+	staleReview := t.IndependentReview != nil && r.ConfirmRecovery && r.ReviewID != "" && r.ReviewID == t.IndependentReview.ID && t.IndependentReview.State == "passed" && t.IndependentReview.Attempt == r.Attempt && s.independentReviewGuard(&w, t) != nil
+	if w.Revision != r.Revision || w.Planning == nil || w.Planning.Repository == nil || t.Status != "accepted" || (t.IndependentReview != nil && !staleReview) || t.BatchReviewResume != nil || (t.RecoveredResult != nil && !staleReview) || !currentTaskAttempt(t, r.Attempt) || len(t.Requalifications) > 0 {
 		return Work{}, fmt.Errorf("ancienne acceptation sans avis indépendant et tentative inchangée requises")
 	}
 	for _, scope := range w.Planning.Scopes {
@@ -101,12 +102,15 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 	if e != nil {
 		return Work{}, e
 	}
-	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || a.Status != "completed" || a.Ended == "" || (a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp)) {
+	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "completed" && !(staleReview && t.RecoveredResult != nil)) || a.Ended == "" || (a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp)) {
 		return Work{}, fmt.Errorf("production terminée attribuable requise")
 	}
 	item, e := s.managedAttempt(a.ID)
 	if e != nil {
 		return Work{}, e
+	}
+	if a.Status != "completed" && !recoveredResultMatches(t, a, item) {
+		return Work{}, fmt.Errorf("réparation historique non attribuable")
 	}
 	repo := w.Planning.Repository
 	if item.Work != work || item.Task != t.ID || item.State != "integrated" || item.Result != r.ResultCommit || repo.Candidate != r.ExpectedCandidate {
@@ -128,6 +132,10 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 		task.Status = "blocked"
 		task.Blocker = "Requalification demandée : nouveaux contrôles et revue indépendante requis"
 		task.Next = "Le conducteur reprend le candidat conservé sans nouvel exécutant."
+		if task.IndependentReview != nil {
+			task.PreviousReviews = append(task.PreviousReviews, *task.IndependentReview)
+			task.IndependentReview = nil
+		}
 		task.Gate = nil
 		task.AutoValidation = nil
 		record.Contract = managedReviewContract(*current, task.ID)

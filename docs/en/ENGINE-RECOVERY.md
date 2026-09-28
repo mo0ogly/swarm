@@ -253,3 +253,13 @@ not the rejected copy. This decision does not itself launch a provider.
 Dependencies, review budgets and launch checks still apply. Earlier tasks are
 not implicitly revalidated. Exact event replay is idempotent; a second grant
 before consumption is rejected.
+
+### A previously passing review has become stale
+
+`planning requalify` also accepts a historical `passed` review that no longer
+satisfies the current contract. Supply its `review_id` and
+`confirm_recovery: true` alongside the task, agent, attempt, result, candidate
+and revision bindings. A still-valid review, a different review or missing
+confirmation is rejected. The old review is retained; new checks and a new
+independent verdict are required. A recovered historical result is eligible
+only when its stopped agent, attempt and result match. Counters are not reset.
