@@ -342,3 +342,22 @@ Validation finale : suite complète PASS (830,807 s), ciblés race PASS (8,065 s
 régression finale de séparation avant/après de l’aperçu PASS (0,145 s), test de
 concurrence dans la copie E6 PASS, vet/configuration/diff PASS. Le test de
 séparation de l’aperçu a été ajouté après le départ de la suite complète.
+
+## Nouvelle revue coordonnée — réponse invalide au sixième fragment
+
+Plafonds 42/21/93 autorisés et appliqués ; plan adopté à la révision579.
+Le candidat b65223f est inspecté par review-5b1ea86d4176df9e5d7d5354 : cinq
+fragments enregistrés unknown, sixième interrompu pour citation de défaut absente
+à la ligne originale. Compteur81/93. Aucun avis de succès n'est déduit de ces
+observations. Le diagnostic public réservé aux refus recevables rejette ce cas
+error avant tout appel ; la réponse brute est examinée localement.
+
+Deux constats sont confirmés séparément : limites documentaires contradictoires
+(globales/par tâche) et références de preuves E5 régressées dans le candidat E6.
+Correction FR/EN du premier point ; restauration byte pour byte des trois pièces
+E5 depuis c4143b6a pour le second. Les sources des contrôles et la preuve de
+préservation existent déjà et restent inchangées. Cela rétablit les limites
+historiques de la preuve, sans annoncer une nouvelle comparaison R5.
+La remise corrective publique conserve l'avis invalide et enregistre le résultat
+9e572b82 ; périmètre réduit de353 à350 fichiers. Le nouveau découpage doit être
+adopté avant revue. Aucun compteur remboursé, aucune acceptation forcée.
