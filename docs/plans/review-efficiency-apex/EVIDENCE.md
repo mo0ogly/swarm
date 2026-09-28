@@ -253,3 +253,13 @@ réparé ; nouvelle revue réellement exécutée avec fournisseur déterministe 
 un Store isolé. Aucune démonstration d'autonomie réelle n'en est déduite.
 
 Validation : ok  	swarm.local/companion	329.795s ; ciblés8.771sPASS ; race17.998sPASS ; vet/diffPASS.
+
+La première demande publique a été refusée avant mutation : l'agent historique
+appartenait au démarrage précédent de la même machine. La requalification
+utilise désormais `recoveryProcessEnded`, déjà employé par la remise de résultat
+réparé : identité de machine et espace PID concordants, identifiant de démarrage
+différent, état terminal enregistré. Aucun processus distant inconnu n'est
+considéré arrêté. Le test de requalification ajoute un cas de redémarrage de
+machine avec conservation du résultat et nouvelle revue.
+
+Validation après redémarrage machine : ok  	swarm.local/companion	331.037s ; ciblésrace19.641sPASS ; vet/diffPASS.

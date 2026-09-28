@@ -102,7 +102,7 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 	if e != nil {
 		return Work{}, e
 	}
-	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "completed" && !(staleReview && t.RecoveredResult != nil)) || a.Ended == "" || (a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp)) {
+	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "completed" && !(staleReview && t.RecoveredResult != nil)) || !recoveryProcessEnded(a, hostIdentity(), processStamp(a.Child)) {
 		return Work{}, fmt.Errorf("production terminée attribuable requise")
 	}
 	item, e := s.managedAttempt(a.ID)

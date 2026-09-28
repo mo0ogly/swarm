@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -114,7 +115,7 @@ func TestEngineContractHistoryRequalificationRejectsDrift(t *testing.T) {
 }
 
 func TestRequalifyExplicitStalePassedReview(t *testing.T) {
-	for _, mode := range []string{"valid", "unconfirmed", "wrong-review", "fresh", "recovered"} {
+	for _, mode := range []string{"valid", "unconfirmed", "wrong-review", "fresh", "recovered", "reboot"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w := managedFixture(t)
 			a := managedCompleted(t, s, w, "first", "reviewed\n")
@@ -126,9 +127,15 @@ func TestRequalifyExplicitStalePassedReview(t *testing.T) {
 			old := *task.IndependentReview
 			item, _ := s.managedAttempt(a.ID)
 			a.Ended = now()
-			if mode == "recovered" {
+			if mode == "recovered" || mode == "reboot" {
 				a.Status = "interrupted"
 				task.RecoveredResult = &RecoveredResult{Agent: a.ID, Attempt: a.Attempt, Result: item.Result, ProcessStatus: a.Status}
+			}
+			if mode == "reboot" {
+				parts := strings.SplitN(hostIdentity(), ":", 3)
+				a.Host = parts[0] + ":previous-boot:" + parts[2]
+				a.Child = 123
+				a.ChildStamp = "old-process"
 			}
 			body, _ := json.Marshal(a)
 			if _, e := s.db.Exec("UPDATE agents SET body=?,status=? WHERE id=?", body, a.Status, a.ID); e != nil {
@@ -148,7 +155,7 @@ func TestRequalifyExplicitStalePassedReview(t *testing.T) {
 				r.ReviewID = "other"
 			}
 			after, e := s.planningChange(w.ID, "requalify", r)
-			if mode != "valid" && mode != "recovered" {
+			if mode != "valid" && mode != "recovered" && mode != "reboot" {
 				if e == nil {
 					t.Fatal("unsafe requalification accepted")
 				}
