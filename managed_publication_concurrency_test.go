@@ -10,7 +10,7 @@ import (
 )
 
 func TestManagedPublicationReservesWriterBeforeEvidenceChecks(t *testing.T) {
-	for _, kind := range []string{"managed.integrated", "task.attempt-extension", "task.corrective-recovery"} {
+	for _, kind := range []string{"managed.integrated", "task.attempt-extension", "task.corrective-recovery", "review.managed.claim", "review.managed.result", "review.managed.batch.claim"} {
 		t.Run(kind, func(t *testing.T) {
 			s := storeTest(t)
 			w := createTest(t, s)
@@ -52,7 +52,10 @@ func TestManagedPublicationReservesWriterBeforeEvidenceChecks(t *testing.T) {
 				<-published
 				t.Fatal(err)
 			}
-			_, writerErr := conn.ExecContext(ctx, "UPDATE works SET revision=revision WHERE id=?", w.ID)
+			_, writerErr := conn.ExecContext(ctx, "BEGIN IMMEDIATE")
+			if writerErr == nil {
+				_, _ = conn.ExecContext(ctx, "ROLLBACK")
+			}
 			close(release)
 			err = <-published
 			if writerErr == nil {
