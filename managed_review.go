@@ -305,6 +305,13 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		_, e = s.managedReviewsForPublication(&current, a, candidate, receiptPath, receipt)
 		return e
 	}
+	scope, scopeErr := managedScope(filepath.Join(current.Planning.Repository.Storage, "repository.git"), current.Planning.Repository.Candidate, candidate)
+	if scopeErr != nil {
+		return scopeErr
+	}
+	if scope.RequiresReduction {
+		return fmt.Errorf("%s : %d fichiers modifiés depuis la base acceptée, limite %d ; utiliser planning scope-preview puis scope-patch pour préparer une remise ciblée. Aucun appel de revue dépensé ; le résultat original est conservé", managedScopeRefusal, len(scope.Files), scope.Limit)
+	}
 	cfg := current.Planning.Reviewer
 	if cfg != nil {
 		if e = s.providerCooldownGuard(cfg.Provider); e != nil {

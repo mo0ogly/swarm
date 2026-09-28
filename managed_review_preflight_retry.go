@@ -61,7 +61,7 @@ func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflig
 	// Historical cumulative file-count failures spent no review call either.
 	// Rebuild the complete immutable context below; never bypass its bounds.
 	historicalPlanRefusal := strings.HasPrefix(item.Detail, "base de revue non vérifiée : ") && strings.HasSuffix(item.Detail, " : plan ou méthode des lots modifié")
-	sizeRefusal := item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ") || item.Detail == "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"
+	sizeRefusal := strings.HasPrefix(item.Detail, managedScopeRefusal+" : ") || item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ") || item.Detail == "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"
 	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !(sizeRefusal || historicalPlanRefusal || item.Detail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != item.Detail {
 		return nil, fmt.Errorf("aucun refus de taille attribuable au résultat courant")
 	}
@@ -111,6 +111,13 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 		return nil, e
 	}
 	w, c := prepared.Work, prepared.Context
+	scope, err := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), c.Previous, c.Candidate)
+	if err != nil {
+		return nil, err
+	}
+	if scope.RequiresReduction {
+		return nil, fmt.Errorf("%s : %d fichiers ; préparer une remise ciblée avec scope-preview et scope-patch", managedScopeRefusal, len(scope.Files))
+	}
 	owners, e := managedReviewSourceOwners(w, c)
 	if e != nil {
 		return nil, e

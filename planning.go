@@ -74,6 +74,7 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	ScopeFiles               []string                       `json:"scope_files,omitempty"`
 	ConfirmReviewErrorRepair bool                           `json:"confirm_review_error_repair,omitempty"`
 	MaxReviewCalls           int                            `json:"max_review_calls,omitempty"`
 	ResultCommit             string                         `json:"result_commit,omitempty"`
@@ -123,6 +124,9 @@ func planningError(code, message string) error { return &CommandError{Code: code
 func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, error) {
 	if r.Schema != 1 {
 		return Work{}, fmt.Errorf("schema_version doit valoir 1")
+	}
+	if len(r.ScopeFiles) > 0 {
+		return Work{}, fmt.Errorf("scope_files est réservé à scope-patch ; aucune modification implicite du périmètre")
 	}
 	if r.MaxReviewCalls != 0 && (action != "enable" || r.Provider == "" || r.MaxReviewCalls < 1 || r.MaxReviewCalls > 100) {
 		return Work{}, planningError("invalid_review_budget", "max_review_calls doit être compris entre 1 et 100, uniquement lors de enable avec un fournisseur")

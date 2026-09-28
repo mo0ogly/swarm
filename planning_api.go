@@ -13,7 +13,7 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 		return s.managedBundle(pos[2], pos[3])
 	}
 	if len(pos) != 3 {
-		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|restart-task|authorize-recovery|requalify|recovery-preview|fragment-preview|review-cost|review-dossier|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
+		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|restart-task|authorize-recovery|requalify|recovery-preview|fragment-preview|scope-preview|scope-patch|review-cost|review-dossier|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
 	}
 	if pos[1] == "review-step" {
 		return s.independentReviewStep(pos[2])
@@ -56,6 +56,13 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 	var r PlanningRequest
 	if err = strict(raw, &r); err != nil {
 		return err
+	}
+	if pos[1] == "scope-preview" || pos[1] == "scope-patch" {
+		v, e := s.managedScopePreview(pos[2], r, pos[1] == "scope-patch")
+		if e != nil {
+			return e
+		}
+		return printJSON(out, v)
 	}
 	if pos[1] == "recovery-preview" {
 		v, e := s.reviewRecoveryPreview(pos[2], r.Task)
@@ -108,6 +115,15 @@ func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWrit
 	})
 	mux.HandleFunc("/api/v1/planning", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
+		if r.Method == "GET" && r.URL.Query().Get("action") == "scope-preview" {
+			v, e := s.managedScopePreview(work, PlanningRequest{Task: r.URL.Query().Get("task")}, false)
+			if e != nil {
+				fail(w, e)
+				return
+			}
+			send(w, v)
+			return
+		}
 		if r.Method == "GET" && r.URL.Query().Get("action") == "recovery-preview" {
 			v, e := s.reviewRecoveryPreview(work, r.URL.Query().Get("task"))
 			if e != nil {
@@ -174,6 +190,15 @@ func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWrit
 		var request PlanningRequest
 		if err = strict(raw, &request); err != nil {
 			fail(w, err)
+			return
+		}
+		if r.URL.Query().Get("action") == "scope-patch" {
+			v, e := s.managedScopePreview(work, request, true)
+			if e != nil {
+				fail(w, e)
+				return
+			}
+			send(w, v)
 			return
 		}
 		result, err := s.planningChange(work, r.URL.Query().Get("action"), request)

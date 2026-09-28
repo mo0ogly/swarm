@@ -91,8 +91,8 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		}
 	}
 	refused := s.recoveredReviewAllowsCorrection(w, t.IndependentReview, r.ConfirmReviewErrorRepair)
-	partialDelivery := revise && t.IndependentReview == nil && r.ReviewID == ""
-	if revise && !partialDelivery && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || !refused) {
+	unreviewedDelivery := revise && t.IndependentReview == nil && r.ReviewID == ""
+	if revise && !unreviewedDelivery && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || !refused) {
 		return Work{}, fmt.Errorf("révision corrective liée au dernier refus indépendant requise")
 	}
 	if w.Revision != r.Revision || t.Status != "blocked" || !currentTaskAttempt(t, r.Attempt) {
@@ -125,12 +125,18 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 	if item.Work != work || item.Task != t.ID || item.Agent != a.ID || (!revise && item.Result != "") || (revise && (item.Result == "" || item.State != "conflict")) || a.CWD != filepath.Join(item.Path, repo.Subdir) {
 		return Work{}, fmt.Errorf("copie ou résultat déjà remis incompatible avec cette réparation")
 	}
-	if partialDelivery {
+	if unreviewedDelivery {
 		if a.Status != "completed" || a.DeliveryVersion != 1 {
 			return Work{}, fmt.Errorf("livraison partielle terminée et attribuable requise")
 		}
 		if _, err := s.managedDelivery(w, t, a, item.Result); err == nil {
-			return Work{}, fmt.Errorf("la livraison initiale est complète ; utiliser la reprise de contrôle ou de revue")
+			scope, scopeErr := managedScope(filepath.Join(repo.Storage, "repository.git"), repo.Candidate, item.Result)
+			if scopeErr != nil {
+				return Work{}, scopeErr
+			}
+			if !scope.RequiresReduction {
+				return Work{}, fmt.Errorf("la livraison initiale est complète et bornée ; utiliser la reprise de contrôle ou de revue")
+			}
 		}
 	}
 	if err = verifyManagedCopy(repo, item.Path); err != nil {
@@ -192,7 +198,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		if e != nil {
 			return e
 		}
-		if (!revise && task.RecoveredResult != nil) || (revise && !partialDelivery && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewAllowsCorrection(*current, task.IndependentReview, r.ConfirmReviewErrorRepair))) || (partialDelivery && task.IndependentReview != nil) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
+		if (!revise && task.RecoveredResult != nil) || (revise && !unreviewedDelivery && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewAllowsCorrection(*current, task.IndependentReview, r.ConfirmReviewErrorRepair))) || (unreviewedDelivery && task.IndependentReview != nil) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
 			return fmt.Errorf("tentative remplacée ou réparation déjà soumise")
 		}
 		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: tree, Actor: operatorIdentity(), At: now(), Reason: r.Reason, ProcessStatus: a.Status}
