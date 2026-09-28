@@ -205,7 +205,7 @@ func TestPlanningProviderCreatesTaskWithoutHostDecision(t *testing.T) {
 	script := filepath.Join(t.TempDir(), "claude")
 	response := `{"input_events":["enable-test"],"reason":"Le brief demande une preuve","operations":[{"kind":"task","id":"generated","title":"Vérifier","requirements":["req-1"],"deliverable":"proof.txt","criteria":["preuve"],"next":"Vérifier"}]}`
 	envelope, _ := json.Marshal(map[string]any{"type": "result", "result": response})
-	if e := os.WriteFile(script, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf '%s\\n' '"+string(envelope)+"'\n"), 0700); e != nil {
+	if e := os.WriteFile(script, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf '%s\\n' \"$@\" >\"$0.args\"\nprintf '%s\\n' '"+string(envelope)+"'\n"), 0700); e != nil {
 		t.Fatal(e)
 	}
 	ps := Providers{Schema: 1, Providers: map[string]Provider{"test": {Command: script}}}
@@ -227,6 +227,21 @@ func TestPlanningProviderCreatesTaskWithoutHostDecision(t *testing.T) {
 		t.Fatal(err)
 	}
 	assertWorkflowDelivery(t, string(observed), "planner", got.Planning.Scopes[0].Workflow)
+	args, err := os.ReadFile(script + ".args")
+	if err != nil {
+		t.Fatal(err)
+	}
+	parts := strings.Split(strings.TrimSpace(string(args)), "\n")
+	var schema map[string]any
+	if err = json.Unmarshal([]byte(parts[len(parts)-1]), &schema); err != nil {
+		t.Fatal(err)
+	}
+	items := schema["properties"].(map[string]any)["input_events"].(map[string]any)["items"].(map[string]any)
+	allowed, ok := items["enum"].([]any)
+	if !ok || len(allowed) != 1 || allowed[0] != "enable-test" {
+		t.Fatalf("provider did not receive admitted event IDs: %s", args)
+	}
+
 	if e = s.planningStep(w.ID); e != nil {
 		t.Fatal(e)
 	}

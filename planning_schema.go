@@ -1,5 +1,7 @@
 package main
 
+import "encoding/json"
+
 // All fields are required for structured-output adapters; unused fields remain
 // empty. This is a wire format, not authority to execute an operation.
 const planningProposalSchema = `{
@@ -23,3 +25,24 @@ const planningProposalSchema = `{
   }}
  }
 }`
+
+// Restrict structured output to the exact event batch admitted by the claim.
+// Historical IDs appearing inside event payloads are context, not new inputs.
+func planningSchemaForEvents(events []string) string {
+	var schema map[string]any
+	if err := json.Unmarshal([]byte(planningProposalSchema), &schema); err != nil {
+		panic(err)
+	}
+	properties := schema["properties"].(map[string]any)
+	inputs := properties["input_events"].(map[string]any)
+	if len(events) == 0 {
+		inputs["maxItems"] = 0
+	} else {
+		inputs["items"] = map[string]any{"type": "string", "enum": events}
+	}
+	raw, err := json.Marshal(schema)
+	if err != nil {
+		panic(err)
+	}
+	return string(raw)
+}
