@@ -55,3 +55,19 @@ avec critères, lots, dépendances et budget ; le moteur doit le valider et le
 persister, exécuter les avis locaux, vérifier les interactions et invalider les
 avis affectés par une correction. L’inventaire heuristique ne peut pas autoriser
 cette exécution ni lever seul le garde-fou actuel.
+
+## Étape suivante — proposition versionnée
+
+Ajout de `review-plan` aux opérations du responsable. Les entrées exactes sont
+fournies dans `review_planning_inputs` et la proposition est ancrée au candidat
+et à l’empreinte du contexte. La validation vérifie couverture, références, DAG
+et revue finale ; le résultat persiste dans `task.review_coordination` sous
+`validated_not_executed`, sans revue payante. Le test public couvre la décision
+et son rejeu. Les tests négatifs couvrent omissions, références étrangères,
+cycles, identités dupliquées, preuve périmée et absence de revue finale.
+
+Surprise vérifiée : `planningDeliveryContext` est également appelée depuis la
+transaction de claim, avec une seule connexion SQLite. Lire le Store depuis ce
+contexte provoquerait un blocage. Les nouveaux précontrôles sont donc préparés
+avant la transaction puis liés à sa révision ; le rendu du contexte reste pur.
+L’exécution des lots demeure distincte et non livrée par cette étape.

@@ -74,6 +74,8 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	preparedReviewInputs     map[string]any
+	coordinationInputs       map[string]*preparedCoordination
 	ScopeFiles               []string                       `json:"scope_files,omitempty"`
 	ConfirmReviewErrorRepair bool                           `json:"confirm_review_error_repair,omitempty"`
 	MaxReviewCalls           int                            `json:"max_review_calls,omitempty"`
@@ -130,6 +132,29 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	}
 	if r.MaxReviewCalls != 0 && (action != "enable" || r.Provider == "" || r.MaxReviewCalls < 1 || r.MaxReviewCalls > 100) {
 		return Work{}, planningError("invalid_review_budget", "max_review_calls doit être compris entre 1 et 100, uniquement lors de enable avec un fournisseur")
+	}
+	if action == "claim" {
+		w, e := s.get(work)
+		if e != nil {
+			return Work{}, e
+		}
+		r.preparedReviewInputs = s.planningReviewInputs(w, r.Scope)
+	}
+	if action == "decide" {
+		r.coordinationInputs = map[string]*preparedCoordination{}
+		for _, op := range r.Operations {
+			if op.Kind == "review-plan" {
+				e, err := s.readManagedPreflightEvidence(work, op.ID)
+				if err != nil {
+					return Work{}, err
+				}
+				preview, err := s.managedScopePreview(work, PlanningRequest{Task: op.ID}, false)
+				if err != nil {
+					return Work{}, err
+				}
+				r.coordinationInputs[op.ID] = &preparedCoordination{Evidence: e, Files: preview.Files}
+			}
+		}
 	}
 	if action == "restart-task" {
 		return s.restartTask(work, r)
@@ -447,7 +472,7 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		if err != nil {
 			return err
 		}
-		_, delivery, err := s.planningDeliveryContext(*w, scope.ID, 64000-len(workflowPrompt)-3000)
+		_, delivery, err := s.planningDeliveryContext(*w, scope.ID, 64000-len(workflowPrompt)-3000, r.preparedReviewInputs)
 		if err != nil {
 			return err
 		}
@@ -543,6 +568,8 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 		return fmt.Errorf("périmètre déjà clos")
 	}
 	switch op.Kind {
+	case "review-plan":
+		return s.adoptReviewCoordination(w, id, op, r)
 	case "task", "delegate":
 		if !safeName(op.ID) {
 			return fmt.Errorf("identifiant de l’opération invalide : %q", op.ID)

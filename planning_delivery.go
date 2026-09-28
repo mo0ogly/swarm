@@ -59,7 +59,7 @@ func (s *Store) planningReport(event PlanningEvent) (*planningReportContent, err
 
 // Reduce the number of whole events rather than truncating reports. Events not
 // included remain pending and cannot be acknowledged by this activation.
-func (s *Store) planningDeliveryContext(w Work, scope string, limit int) ([]byte, PlanningDelivery, error) {
+func (s *Store) planningDeliveryContext(w Work, scope string, limit int, inputs ...map[string]any) ([]byte, PlanningDelivery, error) {
 	for count := 8; count >= 1; count-- {
 		base, err := planningContextLimit(w, scope, count)
 		if err != nil {
@@ -92,6 +92,17 @@ func (s *Store) planningDeliveryContext(w Work, scope string, limit int) ([]byte
 		}
 		if len(receipt.Events) != len(events) {
 			continue
+		}
+		if len(inputs) > 0 && len(inputs[0]) > 0 {
+			selected := map[string]any{}
+			for _, event := range events {
+				if input, ok := inputs[0][event.Task]; ok {
+					selected[event.Task] = input
+				}
+			}
+			if len(selected) > 0 {
+				context["review_planning_inputs"], _ = json.Marshal(selected)
+			}
 		}
 		context["handoff_contents"], _ = json.Marshal(reports)
 		context["descendant_validation"], _ = json.Marshal(s.planningDescendantValidation(w, scope))

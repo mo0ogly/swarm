@@ -14,7 +14,7 @@ const planningProposalSchema = `{
    "type":"object","additionalProperties":false,
    "required":["kind","id","title","requirements","deliverable","criteria","depends","next","max_tasks","max_activations"],
    "properties":{
-    "kind":{"type":"string","enum":["task","delegate","retry","close"]},
+    "kind":{"type":"string","enum":["task","delegate","retry","close","review-plan"]},
     "id":{"type":"string"},"title":{"type":"string","maxLength":500},
     "requirements":{"type":"array","items":{"type":"string"}},
     "deliverable":{"type":"string"},

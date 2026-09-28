@@ -17,6 +17,8 @@ const managedScopeFiles = 100
 const managedScopeRefusal = "remise trop large"
 
 type ManagedScopePlan struct {
+	Evidence          string               `json:"evidence_sha256,omitempty"`
+	Criteria          []string             `json:"criteria,omitempty"`
 	Decomposition     *ReviewDecomposition `json:"decomposition,omitempty"`
 	Revision          int                  `json:"revision"`
 	Base              string               `json:"accepted_base"`
@@ -73,6 +75,8 @@ func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) 
 		return p, err
 	}
 	p.Revision = e.Revision
+	p.Evidence = coordinationEvidence(e.Context)
+	p.Criteria = coordinationCriteria(e.Context)
 	if patch {
 		if r.Revision != e.Revision || r.ExpectedCandidate != p.Candidate {
 			return p, fmt.Errorf("candidat ou révision modifié ; relire scope-preview")

@@ -42,7 +42,7 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
 			omitted++
 			continue
 		}
-		tasks = append(tasks, map[string]any{"id": task.ID, "title": task.Title, "status": task.Status, "requirements": task.Requirements, "dependencies": task.Depends, "next": guardBlock(task.Next, 1000), "attempts_used": len(task.Attempts), "attempts_max": task.PlanMaxAttempts, "blocker": task.Blocker})
+		tasks = append(tasks, map[string]any{"id": task.ID, "title": task.Title, "status": task.Status, "requirements": task.Requirements, "dependencies": task.Depends, "next": guardBlock(task.Next, 1000), "review_coordination": task.ReviewCoordination, "attempts_used": len(task.Attempts), "attempts_max": task.PlanMaxAttempts, "blocker": task.Blocker})
 	}
 	requirements := map[string]string{}
 	for _, req := range scope.Requirements {
