@@ -361,3 +361,21 @@ historiques de la preuve, sans annoncer une nouvelle comparaison R5.
 La remise corrective publique conserve l'avis invalide et enregistre le résultat
 9e572b82 ; périmètre réduit de353 à350 fichiers. Le nouveau découpage doit être
 adopté avant revue. Aucun compteur remboursé, aucune acceptation forcée.
+
+## Revue 6ba6394 — neuf inspections conservées avant une citation invalide
+
+Plafonds43/22/99 autorisés ; adoption à la révision603 et reprise publique.
+review-733a298c9e5aaa338855184b conserve neuf observations unknown puis refuse
+la réponse du dixième fragment : citation absente à la ligne annoncée.
+Compteur91/99. La réponse allègue qu'une revue humaine dispense le dépôt géré
+ d'un avis indépendant. Vérification locale : independentReviewGuardVersion est
+identique dans la copie candidate et le moteur ; il exige l'avis et ne consulte
+pas cet ancien indicateur. Tests MissingOrBudgetExhaustedCannotPublish et
+LegacyFlagCannotBypassAcceptance PASS (1,521 s). Aucun changement du candidat
+sur cette seule allégation ; aucune substitution de verdict.
+
+Reprise préparée sur le même plan et candidat : neuf inspections conservées,
+sept restantes plus deux appels finaux, donc neuf appels nécessaires contre
+huit disponibles. Aperçu public de quota100 préparé, non appliqué sans accord.
+La reprise transmet le diagnostic de citation déjà implémenté ; elle ne
+transforme pas une réponse invalide en preuve favorable.
