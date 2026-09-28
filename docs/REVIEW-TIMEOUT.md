@@ -69,7 +69,7 @@ Le moteur essaie d'abord un appel unique. Si le dossier dépasse 192 Kio après
 encodage sans perte, il prépare des lots déterministes de tâches. Chaque lot
 conserve le même candidat Git, le reçu des contrôles, le diff complet et tous les
 rapports et critères cumulatifs. Les sources annexes sont réparties selon leurs
-manifestes ; chaque source reste entière. Les limites de 24 fichiers distincts au total, 128 Kio de sources par tâche
+manifestes ; chaque source reste entière. Les limites de 24 fichiers distincts par tâche, 128 Kio de sources par tâche
 et 96 Kio par fichier restent applicables. Les dossiers de tâches distinctes
 sont ensuite répartis en prompts bornés ; le total cumulé n’est pas envoyé
 comme un seul appel. Si une tâche ne
@@ -223,6 +223,6 @@ Une tentative déjà enregistrée comme terminée (interrompue, échouée ou ach
 
 ## Limite du découpage par tâche
 
-La limite de sources annexes de 128 Kio est contrôlée par tâche, à la lecture des manifestes et à la construction des lots. Plusieurs tâches peuvent donc fournir davantage au total ; chaque source reste limitée à 96 Kio, le dossier à 24 fichiers et chaque appel à 192 Kio. Les sources partagées comptent dans chacune des tâches qui les réclament.
+La limite de sources annexes de 128 Kio est contrôlée par tâche, à la lecture des manifestes et à la construction des lots. Plusieurs tâches peuvent donc fournir davantage au total ; chaque source reste limitée à 96 Kio, chaque tâche à 24 fichiers et chaque appel à 192 Kio. Les sources partagées comptent dans chacune des tâches qui les réclament.
 
 Ce découpage conserve le diff cumulatif intégral dans chaque lot. Il ne découpe pas le diff lui-même : si celui-ci dépasse déjà 192 Kio, multiplier les lots ou relancer ne résout pas le refus. Il faut des livrables plus petits, ou un protocole de revue de fragments avec preuve de couverture et synthèse indépendante, qui n’est pas fourni par ce découpage. Une source omise ou un simple résumé ne remplace pas cette couverture.

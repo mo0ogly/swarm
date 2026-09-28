@@ -64,7 +64,7 @@ The engine first attempts a single call. When the losslessly encoded request
 exceeds 192 KiB, it prepares deterministic task batches. Every batch retains the
 same Git candidate, check receipt, full diff, and all cumulative reports and
 criteria. Supplemental sources are assigned using their manifests; each source
-remains whole. The limits of 24 distinct files overall, 128 KiB of sources per task and 96 KiB
+remains whole. The limits of 24 distinct files per task, 128 KiB of sources per task and 96 KiB
 per file still apply. If one task cannot fit in a batch, the engine refuses before
 any call, without truncating evidence.
 
@@ -206,6 +206,6 @@ An already terminal attempt may be recovered after a reboot of the same host and
 
 ## Limits of task-based batching
 
-The 128 KiB supplemental-source allowance is checked per task, both when reading manifests and when planning batches. Aggregate sources may exceed that amount; each source remains limited to 96 KiB, the context to 24 files, and each prompt to 192 KiB. Shared sources count against every task that requests them.
+The 128 KiB supplemental-source allowance is checked per task, both when reading manifests and when planning batches. Aggregate sources may exceed that amount; each source remains limited to 96 KiB, each task to 24 files, and each prompt to 192 KiB. Shared sources count against every task that requests them.
 
 This batching retains the entire cumulative diff in every batch. It does not split the diff itself: if that diff already exceeds 192 KiB, more batches or retries cannot resolve the refusal. Smaller deliverables or a fragment-review protocol with complete coverage evidence and independent synthesis are required. Task-based batching does not implement that protocol. Omitted sources or summaries cannot substitute for coverage.
