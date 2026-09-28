@@ -91,3 +91,9 @@ entre vérificateurs : les interactions non prouvées remontent à la revue fina
 Une pièce indivisible trop grande est refusée, sans troncature. Un changement de
 candidat ou de preuves invalide le plan ; sa substitution implicite est interdite.
 La validation structurelle ne garantit pas la pertinence du découpage proposé.
+
+La capacité est calculée en incluant les consignes et critères de chaque lot.
+Quand la capacité locale du client/modèle est démontrée, le protocole de transport
+adapté aux jetons peut regrouper davantage de pièces **à l’intérieur d’un même
+lot**. Il ne fusionne pas les lots. Le précontrôle couvre aussi les deux appels
+finaux ; l’estimation et le départ utilisent le même choix de protocole.

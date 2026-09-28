@@ -90,3 +90,25 @@ moteur autonome. Il faut tester le raccordement par l’entrée publique, jusqu�
 publication, et distinguer cette preuve mécanique d’une revue par un vrai modèle.
 Le nouveau parcours reste séquentiel ; il ne prétend pas créer un agent par lot.
 E6 n’est pas acceptée par ces tests et les 73 appels déjà consommés restent comptés.
+
+### Précontrôle E6 sur preuves exportées — 28 septembre
+
+L’application au dossier réel a révélé deux écarts absents des petits scénarios :
+les consignes de lot étaient ajoutées après le calcul de taille, et la revue
+finale coordonnée dépassait la limite historique de message. Corrections :
+compter les contrats avant de remplir un paquet ; conserver les frontières de
+lots lors de l’adaptation à la capacité observée du client/modèle. Le coût affiché
+et l’exécution choisissent désormais le même protocole sous le même budget.
+
+Le dossier immuable exporté par `planning review-dossier` a été précontrôlé hors
+ligne, sans utiliser la base active comme fixture et sans appel au modèle.
+Candidat `5bf7197cd65dee3eb3868b7712b532f0ce0e09a1` : dix lots,
+16 inspections (preuves communes incluses), deux appels finaux, transport complet
+compatible avec la capacité locale observée de `gpt-5.6-sol`. Ce résultat est un
+précontrôle de capacité, pas un avis favorable sur le candidat.
+
+Autre cause de lenteur confirmée dans le code : plusieurs anciens événements
+pour une même tâche provoquaient des reconstructions identiques de l’inventaire.
+Le contexte réutilise maintenant cet inventaire pendant une même préparation.
+Les événements historiques restent conservés ; leurs acquittements passent par
+les décisions publiques du responsable et consomment le budget prévu.

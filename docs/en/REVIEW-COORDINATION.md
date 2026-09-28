@@ -39,3 +39,9 @@ This is sequential execution through the configured reviewer, not one autonomous
 agent per lot or direct inter-reviewer messaging. Oversized indivisible evidence
 is rejected, never truncated. Changed candidate/evidence invalidates the proposal;
 implicit proposal replacement remains forbidden.
+
+Capacity admission includes each lot's instructions and criterion text before
+packing. When local client/model capacity is established, token-aware transport
+may pack more evidence within a lot, while preserving lot boundaries. Preflight
+also checks both final calls; cost estimation and execution select the same
+protocol under the same remaining budget.

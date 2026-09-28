@@ -64,7 +64,7 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
 	if previous.Version == 4 || available <= 2 {
 		return empty, fmt.Errorf("plan source ou budget final invalide")
 	}
-	p := managedReviewFragmentPlan{Version: 4, InputBudget: &budget, Candidate: previous.Candidate, ContextDigest: previous.ContextDigest, AvailableCalls: available, ReservedFinalCalls: 2, ChangeDiff: previous.ChangeDiff}
+	p := managedReviewFragmentPlan{Coordination: previous.Coordination, CoordinationFiles: previous.CoordinationFiles, Version: 4, InputBudget: &budget, Candidate: previous.Candidate, ContextDigest: previous.ContextDigest, AvailableCalls: available, ReservedFinalCalls: 2, ChangeDiff: previous.ChangeDiff}
 	packet := func() managedReviewFragmentPacket {
 		return managedReviewFragmentPacket{Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets)}
 	}
@@ -73,6 +73,11 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
 		if fragmentReuseAt(previous, i) != nil {
 			continue
 		}
+		if previous.Coordination != nil && current.Lot != old.Lot && len(current.Artifacts) > 0 {
+			p.Packets = append(p.Packets, current)
+			current = packet()
+		}
+		current.Lot, current.LotContract, current.LotCriteria = old.Lot, old.LotContract, old.LotCriteria
 		for _, a := range old.Artifacts {
 			next := current
 			next.Artifacts = append(append([]managedReviewFragmentArtifact(nil), current.Artifacts...), a)
@@ -82,6 +87,7 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
 				}
 				p.Packets = append(p.Packets, current)
 				current = packet()
+				current.Lot, current.LotContract, current.LotCriteria = old.Lot, old.LotContract, old.LotCriteria
 				current.Artifacts = []managedReviewFragmentArtifact{a}
 				if _, err = managedFragmentInspectionPrompt(prefix, current); err != nil {
 					return empty, err

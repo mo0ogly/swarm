@@ -122,10 +122,13 @@ func planManagedReviewFragments(c managedReviewContext, available, finalCalls in
 }
 
 func packManagedFragmentArtifacts(c managedReviewContext, artifacts []managedReviewFragmentArtifact, available, finalCalls int) (managedReviewFragmentPlan, error) {
+	return packManagedFragmentArtifactsWithLot(c, artifacts, available, finalCalls, "", nil, nil)
+}
+func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []managedReviewFragmentArtifact, available, finalCalls int, lot string, contract *ReviewCoordinationLot, criteria map[string]string) (managedReviewFragmentPlan, error) {
 	empty := managedReviewFragmentPlan{}
 	canonical, _ := json.Marshal(c)
 	plan := managedReviewFragmentPlan{Version: 2, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
-	packet := managedReviewFragmentPacket{Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
+	packet := managedReviewFragmentPacket{Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
 	// New plans reserve workflow space in addition to the variable schema and
 	// anchor table. Historical packets keep their original validation contract.
 	fits := func(p managedReviewFragmentPacket) bool {
@@ -140,7 +143,7 @@ func packManagedFragmentArtifacts(c managedReviewContext, artifacts []managedRev
 				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
 			}
 			plan.Packets = append(plan.Packets, packet)
-			packet = managedReviewFragmentPacket{Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
+			packet = managedReviewFragmentPacket{Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
 			if !fits(packet) {
 				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
 			}

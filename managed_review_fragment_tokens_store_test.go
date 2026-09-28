@@ -18,7 +18,7 @@ if 'debug' in sys.argv and 'models' in sys.argv:
 `
 
 func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
-	for _, mode := range []string{"pass", "fail", "capacity-drift"} {
+	for _, mode := range []string{"pass", "fail", "capacity-drift", "coordinated"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w, a, c, path, receipt := fragmentBeginFixture(t)
 			catalog := filepath.Join(t.TempDir(), "models_cache.json")
@@ -43,7 +43,13 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 			if err = os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
 				t.Fatal(err)
 			}
-			cfg, err := s.reviewerConfig("managed-review-fixture", "standard", 3)
+			wantCalls := 3
+			wantPackets := 1
+			if mode == "coordinated" {
+				wantCalls = 4
+				wantPackets = 2
+			}
+			cfg, err := s.reviewerConfig("managed-review-fixture", "standard", wantCalls)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -55,8 +61,24 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			if mode == "coordinated" {
+				preview, e := s.managedScopePreview(w.ID, PlanningRequest{Task: a.TaskID}, false)
+				if e != nil {
+					t.Fatal(e)
+				}
+				proposal := ReviewCoordinationProposal{Candidate: c.Candidate, Evidence: coordinationEvidence(c), FinalReview: "Verify all interactions and original task criteria.", Lots: []ReviewCoordinationLot{{ID: "bounded", Kind: "component", Objective: "Inspect bounded candidate evidence", Files: preview.Files, Criteria: preview.Criteria}}}
+				raw, _ := json.Marshal(proposal)
+				w, err = s.mutate(w.ID, "test.coordination", "fixture-coordination", w.Revision, raw, func(current *Work) error {
+					task, _ := current.task(a.TaskID)
+					task.ReviewCoordination = &ReviewCoordinationRecord{Proposal: proposal, Digest: hash(raw), Order: []string{"bounded"}, State: "validated_not_executed"}
+					return nil
+				})
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
 			cost, err := s.managedReviewCostPreview(w.ID, a.TaskID)
-			if err != nil || cost.Protocol != 4 || cost.CallsRequired != 3 || !cost.FitsBudget || !cost.TransportReady {
+			if err != nil || cost.Protocol != 4 || cost.CallsRequired != wantCalls || !cost.FitsBudget || !cost.TransportReady {
 				t.Fatal("preflight differs from execution", cost, err)
 			}
 			managedReviewMode(t, s, mode)
@@ -65,7 +87,7 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 				t.Fatal(err)
 			}
 			p, _, err := s.readFragmentJournalAnchor(r)
-			if err != nil || p.Version != 4 || fragmentPaidInspections(p) != 1 {
+			if err != nil || p.Version != 4 || fragmentPaidInspections(p) != wantPackets {
 				t.Fatal("not a bounded token review", p.Version, err)
 			}
 			if managedReviewCalls(t, s) != 0 {
@@ -102,11 +124,11 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 				if state == "passed" || managedReviewCalls(t, s) != 1 {
 					t.Fatal("defect not stopped", state, err)
 				}
-			} else if err != nil || state != "passed" || len(records) != len(c.Tasks) || managedReviewCalls(t, s) != 3 {
+			} else if err != nil || state != "passed" || len(records) != len(c.Tasks) || managedReviewCalls(t, s) != wantCalls {
 				t.Fatal("protocol runtime", state, len(records), managedReviewCalls(t, s), err)
 			}
 			current, _ := s.get(w.ID)
-			if current.Planning.Reviewer.Calls > 3 {
+			if current.Planning.Reviewer.Calls > wantCalls {
 				t.Fatal("quota exceeded")
 			}
 		})

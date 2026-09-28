@@ -198,3 +198,64 @@ func TestCoordinatedReviewPublicRetryPublishesSameCandidate(t *testing.T) {
 		t.Fatal("duplicate spend", e)
 	}
 }
+
+func TestCoordinatedFragmentsCountsLotContractBeforePacking(t *testing.T) {
+	c := fragmentPlanFixture()
+	c.Tasks[0].Criteria[0] = strings.Repeat("Check this invariant with evidence. ", 900)
+	files := []string{}
+	for i := 0; i < 20; i++ {
+		files = append(files, "f"+strconvI(i))
+	}
+	proposal := ReviewCoordinationProposal{Candidate: c.Candidate, Evidence: coordinationEvidence(c), FinalReview: "Verify all interactions using the original evidence.", Lots: []ReviewCoordinationLot{{ID: "bounded", Kind: "component", Objective: "Review the bounded files and criteria", Files: files, Criteria: coordinationCriteria(c)}}}
+	p, err := planCoordinatedFragments(c, proposal, files, 100)
+	if err != nil {
+		t.Fatal("lot contract must participate in packing", err)
+	}
+	_, method, err := agentWorkflow("reviewer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = preflightManagedFragmentCalls(managedReviewPrefix(method), c, p); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCoordinatedTokenPackingKeepsLotBoundaries(t *testing.T) {
+	c := fragmentPlanFixture()
+	files := []string{}
+	for i := 0; i < 20; i++ {
+		files = append(files, "f"+strconvI(i))
+	}
+	proposal := ReviewCoordinationProposal{Candidate: c.Candidate, Evidence: coordinationEvidence(c), FinalReview: "Check interactions before the final decision.", Lots: []ReviewCoordinationLot{{ID: "first", Kind: "component", Objective: "Inspect first component", Files: files[:10], Criteria: coordinationCriteria(c)}, {ID: "second", Kind: "component", Objective: "Inspect dependent component", Files: files[10:], Criteria: coordinationCriteria(c), Depends: []string{"first"}}}}
+	old, e := planCoordinatedFragments(c, proposal, files, 100)
+	if e != nil {
+		t.Fatal(e)
+	}
+	p, e := planTokenManagedFragments(c, old, reviewTokenBudgetFixture(), "", 100)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if p.Version != 4 || p.Coordination == nil || len(p.Packets) >= len(old.Packets) {
+		t.Fatal("capacity adaptation lost semantic plan")
+	}
+	seen := map[string]bool{}
+	last := ""
+	for _, packet := range p.Packets {
+		if packet.Lot != last {
+			if seen[packet.Lot] {
+				t.Fatal("lot interleaved")
+			}
+			seen[packet.Lot] = true
+			last = packet.Lot
+		}
+		if packet.Lot != "__global_evidence" && packet.LotContract == nil {
+			t.Fatal("contract omitted")
+		}
+	}
+	if len(seen) != 3 {
+		t.Fatal("lot omitted")
+	}
+	if _, e = planTokenManagedFragments(c, old, reviewTokenBudgetFixture(), "", len(p.Packets)+1); e == nil {
+		t.Fatal("budget exceeded")
+	}
+}

@@ -179,6 +179,11 @@ func (s *Store) planningReviewInputs(w Work, scope string) map[string]any {
 		if event.Scope != scope || event.Decision != "" {
 			continue
 		}
+		// Many historical events can refer to the same task. Its immutable
+		// candidate inventory only needs to be reconstructed once per context.
+		if _, prepared := inputs[event.Task]; prepared {
+			continue
+		}
 		task, e := w.task(event.Task)
 		if e != nil || task.ScopeID != scope || task.Status != "blocked" || task.ReviewCoordination != nil {
 			continue

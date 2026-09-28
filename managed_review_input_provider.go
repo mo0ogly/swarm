@@ -90,7 +90,32 @@ func (s *Store) reviewInputBudget(cfg *ReviewerConfig) (*managedReviewInputBudge
 
 func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, available int) (managedReviewFragmentPlan, error) {
 	if task, err := w.task(a.TaskID); err == nil && task.ReviewCoordination != nil {
-		return s.coordinatedFragments(w, a, c, available)
+		p, err := s.coordinatedFragments(w, a, c, 100000)
+		if err != nil {
+			return p, err
+		}
+		_, method, err := agentWorkflow("reviewer")
+		if err != nil {
+			return managedReviewFragmentPlan{}, err
+		}
+		prefix := managedReviewPrefix(method)
+		transportErr := preflightManagedFragmentCalls(prefix, c, p)
+		remaining := available
+		if w.Planning != nil && w.Planning.Reviewer != nil {
+			remaining = min(remaining, max(0, w.Planning.Reviewer.MaxCalls-w.Planning.Reviewer.Calls))
+		}
+		if transportErr == nil && len(p.Packets)+2 <= remaining {
+			p.AvailableCalls = available
+			return p, nil
+		}
+		budget, capacityErr := s.reviewInputBudget(w.Planning.Reviewer)
+		if capacityErr == nil {
+			return planTokenManagedFragments(c, p, *budget, prefix, available)
+		}
+		if transportErr != nil {
+			return managedReviewFragmentPlan{}, transportErr
+		}
+		return managedReviewFragmentPlan{}, fmt.Errorf("revues coordonnées : %d appels requis, %d disponibles", len(p.Packets)+2, available)
 	}
 	// Compute legacy inventory without relaxing the caller's execution budget.
 	p, err := s.planLegacyCandidateFragments(w, a, c, 100000)

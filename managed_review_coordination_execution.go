@@ -208,7 +208,8 @@ func planCoordinatedFragments(c managedReviewContext, proposal ReviewCoordinatio
 	}
 	p := managedReviewFragmentPlan{Version: 2, Candidate: c.Candidate, ContextDigest: coordinationEvidence(c), AvailableCalls: available, ReservedFinalCalls: 2, Coordination: &proposal, CoordinationFiles: files}
 	for i, group := range groups {
-		part, e := packManagedFragmentArtifacts(c, group, 100000, 2)
+		contract, criteria := coordinatedLotContract(c, proposal, order[i])
+		part, e := packManagedFragmentArtifactsWithLot(c, group, 100000, 2, order[i], contract, criteria)
 		if e != nil {
 			return managedReviewFragmentPlan{}, fmt.Errorf("lot %s : %w", order[i], e)
 		}
@@ -253,7 +254,7 @@ func (s *Store) coordinatedFragments(w Work, a Agent, c managedReviewContext, av
 }
 
 func validateCoordinatedFragmentCoverage(c managedReviewContext, p managedReviewFragmentPlan) error {
-	if p.Version != 2 || p.ReservedFinalCalls != 2 || len(p.Reused) > 0 || p.ChangeDiff != "" {
+	if (p.Version != 2 && p.Version != 4) || p.ReservedFinalCalls != 2 || len(p.Reused) > 0 || p.ChangeDiff != "" {
 		return fmt.Errorf("protocole de revue coordonnée incompatible")
 	}
 	groups, order, e := coordinatedArtifactGroups(c, *p.Coordination, p.CoordinationFiles)
