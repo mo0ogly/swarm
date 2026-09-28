@@ -4,7 +4,11 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"syscall"
 	"time"
 )
 
@@ -64,11 +68,13 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 				// its lease and other missions continue to be checked. The
 				// existing cross-process managed lock and review claim deduplicate
 				// polling/restarts; no new production attempt is created here.
-				go func(a Agent) {
-					if e := s.reconcileKnownMissionResult(a, conductor); e != nil {
-						_ = s.recordCoordinationEvent("settle-error:"+a.ID, a.WorkID, a.ID, conductor, "settle-error", e.Error())
+				if _, e := s.startManagedSettlement(agent, func() {
+					if e := s.reconcileKnownMissionResult(agent, conductor); e != nil {
+						_ = s.recordCoordinationEvent("settle-error:"+agent.ID, agent.WorkID, agent.ID, conductor, "settle-error", e.Error())
 					}
-				}(agent)
+				}); e != nil {
+					return e
+				}
 				continue
 			}
 			if err = s.reconcileKnownMissionResult(agent, conductor); err != nil {
@@ -126,4 +132,29 @@ func (s *Store) reconcileKnownMissionResult(agent Agent, conductor string) error
 func (s *Store) signalResourceReleased(agent Agent) {
 	_ = s.recordCoordinationEvent("resource-released:"+agent.ID, agent.WorkID, agent.ID, conductorAuthor,
 		"resource-released", "Réservation libérée ; les conducteurs autorisés réévaluent leur file")
+}
+
+// Claim before launching asynchronous work, including before any database reads.
+// The nonblocking OS lock covers separate Store handles and processes, and is
+// released by the kernel after a crash. It does not replace the durable review
+// journal or the integration locks that fence publication.
+func (s *Store) startManagedSettlement(a Agent, settle func()) (bool, error) {
+	dir := filepath.Join(s.root, ".swarm", "settlement-locks")
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return false, err
+	}
+	name := hash([]byte(a.WorkID+"\x00"+a.ID+"\x00"+a.Attempt)) + ".lock"
+	f, err := os.OpenFile(filepath.Join(dir, name), os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		return false, err
+	}
+	if err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
+		f.Close()
+		if errors.Is(err, syscall.EWOULDBLOCK) || errors.Is(err, syscall.EAGAIN) {
+			return false, nil
+		}
+		return false, err
+	}
+	go func() { defer f.Close(); defer syscall.Flock(int(f.Fd()), syscall.LOCK_UN); settle() }()
+	return true, nil
 }

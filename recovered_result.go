@@ -191,7 +191,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 	}
 	eventRaw := raw
 	if revise {
-		eventRaw, _ = json.Marshal(map[string]any{"request": r, "previous_review": t.IndependentReview, "previous_repair": t.RecoveredResult, "previous_result": item.Result})
+		eventRaw, _ = json.Marshal(map[string]any{"request": r, "previous_review": t.IndependentReview, "previous_repair": t.RecoveredResult, "previous_result": item.Result, "previous_review_coordination": t.ReviewCoordination})
 	}
 	_, err = s.mutateWithHook(work, "managed.recovered-result", r.EventID, r.Revision, eventRaw, func(current *Work) error {
 		task, e := current.task(t.ID)
@@ -207,6 +207,9 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			task.RecoveredResult.ReplacesResult = item.Result
 			task.RecoveredResult.PriorReview = r.ReviewID
 			task.IndependentReview = nil
+			// The previous immutable plan remains in the recovery event. A new
+			// candidate requires a fresh, explicitly adopted coverage plan.
+			task.ReviewCoordination = nil
 		}
 		task.Next = "Réparation externe remise ; contrôles et revue indépendante requis."
 		return nil

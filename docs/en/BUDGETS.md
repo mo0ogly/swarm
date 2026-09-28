@@ -133,3 +133,13 @@ flowchart LR
   D -->|Yes| F[Record limits and event]
   F --> G[Conductor still checks all other conditions]
 ```
+
+### Adjusting a planning scope
+
+The `quotas preview/apply` request accepts optional
+`"scope_activations":{"preuve-livraison":21}` alongside `limits`.
+Only named scope limits change, following human authorization. Consumed counters
+are preserved, and before/after limits are recorded with the actor and reason.
+Unknown scopes, limits below consumption, and limits above the parent/global
+limit are rejected. Explicitly bounded parents must be raised in the same request
+when needed. Active planning leases and reviews still prevent quota changes.

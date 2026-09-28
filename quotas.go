@@ -13,18 +13,21 @@ type QuotaValues struct {
 	Reviews   *int `json:"review_calls"`
 }
 type QuotaAuthorization struct {
-	Before QuotaValues `json:"before"`
-	After  QuotaValues `json:"after"`
-	Actor  string      `json:"actor"`
-	At     string      `json:"at"`
-	Reason string      `json:"reason"`
+	BeforeScopes map[string]int `json:"before_scope_activations,omitempty"`
+	AfterScopes  map[string]int `json:"after_scope_activations,omitempty"`
+	Before       QuotaValues    `json:"before"`
+	After        QuotaValues    `json:"after"`
+	Actor        string         `json:"actor"`
+	At           string         `json:"at"`
+	Reason       string         `json:"reason"`
 }
 type QuotaChange struct {
-	Schema   int         `json:"schema_version"`
-	EventID  string      `json:"event_id"`
-	Revision int         `json:"expected_revision"`
-	Limits   QuotaValues `json:"limits"`
-	Reason   string      `json:"reason"`
+	ScopeActivations map[string]int `json:"scope_activations,omitempty"`
+	Schema           int            `json:"schema_version"`
+	EventID          string         `json:"event_id"`
+	Revision         int            `json:"expected_revision"`
+	Limits           QuotaValues    `json:"limits"`
+	Reason           string         `json:"reason"`
 }
 type QuotaView struct {
 	Revision      int                 `json:"revision"`
@@ -55,7 +58,7 @@ func quotaView(w Work) (QuotaView, error) {
 		n := max(0, *limits.Reviews-*used.Reviews)
 		remaining.Reviews = &n
 	}
-	return QuotaView{Revision: w.Revision, Limits: limits, Consumed: used, Remaining: remaining, Authorization: w.Planning.QuotaAuthorization, Scopes: w.Planning.Scopes}, nil
+	return QuotaView{Revision: w.Revision, Limits: limits, Consumed: used, Remaining: remaining, Authorization: w.Planning.QuotaAuthorization, Scopes: append([]PlanningScope(nil), w.Planning.Scopes...)}, nil
 }
 func applyQuotaChange(w *Work, r QuotaChange) error {
 	if r.Schema != 1 || r.Revision < 1 {
@@ -87,6 +90,40 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 			return fmt.Errorf("Une vérification est en cours ; attendez sa fin avant de modifier les plafonds.")
 		}
 	}
+	beforeScopes, afterScopes := map[string]int{}, map[string]int{}
+	for id, limit := range r.ScopeActivations {
+		scope, e := p.scope(id)
+		if e != nil {
+			return e
+		}
+		if limit < max(1, scope.Activations) || limit > r.Limits.Planning {
+			return fmt.Errorf("Plafond de périmètre incompatible avec sa consommation ou le plafond global : %s", id)
+		}
+		beforeScopes[id], afterScopes[id] = scope.ActivationLimit, limit
+	}
+	for _, scope := range p.Scopes {
+		limit, changed := r.ScopeActivations[scope.ID]
+		if !changed {
+			limit = scope.ActivationLimit
+		}
+		if scope.Parent == "" {
+			continue
+		}
+		parent, e := p.scope(scope.Parent)
+		if e != nil {
+			return e
+		}
+		parentLimit, parentChanged := r.ScopeActivations[parent.ID]
+		if !parentChanged {
+			parentLimit = parent.ActivationLimit
+		}
+		if parentLimit == 0 {
+			parentLimit = r.Limits.Planning
+		}
+		if (changed || parentChanged) && limit > parentLimit {
+			return fmt.Errorf("Le plafond enfant dépasse celui du parent : %s", scope.ID)
+		}
+	}
 	before, _ := quotaValues(p)
 	p.MaxActivations = r.Limits.Planning
 	p.MaxDecisions = r.Limits.Decisions
@@ -94,9 +131,13 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 		p.Reviewer.MaxCalls = *r.Limits.Reviews
 	}
 	after, _ := quotaValues(p)
-	p.QuotaAuthorization = &QuotaAuthorization{Before: before, After: after, Actor: operatorIdentity(), At: now(), Reason: strings.TrimSpace(r.Reason)}
-	// Existing leases, failures, pauses, sub-scope allocations and all attempt
-	// counters are intentionally preserved. Increasing a cap is not acceptance.
+	for id, limit := range r.ScopeActivations {
+		scope, _ := p.scope(id)
+		scope.ActivationLimit = limit
+	}
+	p.QuotaAuthorization = &QuotaAuthorization{BeforeScopes: beforeScopes, AfterScopes: afterScopes, Before: before, After: after, Actor: operatorIdentity(), At: now(), Reason: strings.TrimSpace(r.Reason)}
+	// Failures, pauses, counters and unlisted sub-scope allocations are preserved.
+	// Explicit per-scope changes are audited; increasing a cap is not acceptance.
 	return nil
 }
 func (s *Store) previewQuotas(work string, r QuotaChange) (any, error) {

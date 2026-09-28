@@ -163,3 +163,14 @@ toutes ses entrées sont identiques. Les réserves restent ouvertes ; un nouvel 
 doit examiner les changements et leurs impacts avant toute acceptation. Les
 [conditions et limites du protocole](plans/review-efficiency-apex/DIFFERENTIAL.md)
 explicitent ce qui est effectivement vérifié.
+
+### Ajuster un périmètre de planification
+
+La demande `quotas preview/apply` accepte le champ optionnel
+`"scope_activations":{"preuve-livraison":21}` à côté de `limits`.
+Il modifie uniquement les plafonds nommés, après autorisation humaine. Les
+compteurs consommés restent inchangés ; les valeurs avant/après sont conservées
+avec l'auteur et le motif. Un périmètre inconnu, un plafond inférieur à sa
+consommation ou supérieur au parent/global est refusé. Un parent explicitement
+borné doit être relevé dans la même demande si nécessaire. Une session de
+planification ou une revue active interdit toujours la modification.

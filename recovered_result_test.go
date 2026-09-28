@@ -158,6 +158,14 @@ func TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate(t *testing
 	}
 	prior, _ := first.task(a.TaskID)
 	old := *prior.IndependentReview
+	first, e = s.mutate(w.ID, "test.coordination", "old-coordination", first.Revision, []byte(`{}`), func(w *Work) error {
+		task, _ := w.task(a.TaskID)
+		task.ReviewCoordination = &ReviewCoordinationRecord{Digest: "old-plan", Proposal: ReviewCoordinationProposal{Candidate: old.CandidateSHA}}
+		return nil
+	})
+	if e != nil {
+		t.Fatal(e)
+	}
 	oldReceipt, e := os.ReadFile(filepath.Join(s.root, old.Receipt))
 	if e != nil {
 		t.Fatal(e)
@@ -203,6 +211,9 @@ func TestRecoveredResultRevisionPreservesRefusalAndChecksNewCandidate(t *testing
 		t.Fatal(e)
 	}
 	task, _ := after.task(a.TaskID)
+	if task.ReviewCoordination != nil {
+		t.Fatal("stale coordination survived corrected candidate")
+	}
 	if task.Status != "accepted" || task.RecoveredResult.ReplacesResult != oldResult || task.RecoveredResult.PriorReview != old.ID || task.IndependentReview.CandidateSHA == old.CandidateSHA {
 		t.Fatal(task.Status, task.Blocker)
 	}

@@ -161,3 +161,52 @@ func TestQuotasConcurrentAuthorization(t *testing.T) {
 		t.Fatal(success, conflict)
 	}
 }
+
+func TestQuotaScopeExtensionIsExplicitAuditedAndDoesNotRefund(t *testing.T) {
+	s, w := planningFixture(t)
+	var err error
+	w, err = s.mutate(w.ID, "test.scope", "scope-quota-fixture", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Planning.MaxActivations = 5
+		w.Planning.Activations = 5
+		root, _ := w.Planning.scope("root")
+		root.ActivationLimit = 5
+		root.Activations = 5
+		w.Planning.Scopes = append(w.Planning.Scopes, PlanningScope{ID: "child", Parent: "root", ActivationLimit: 2, Activations: 2, Revision: 1, State: "ready"})
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := QuotaChange{Schema: 1, EventID: "explicit-scope-quota", Revision: w.Revision, Limits: QuotaValues{Planning: 6, Decisions: 20}, ScopeActivations: map[string]int{"root": 6, "child": 3}, Reason: "Explicit fixture authorization"}
+	preview, previewErr := s.previewQuotas(w.ID, r)
+	if previewErr != nil {
+		t.Fatal(previewErr)
+	}
+	views := preview.(map[string]any)
+	beforeView, afterView := views["current"].(QuotaView), views["proposed"].(QuotaView)
+	if beforeView.Scopes[len(beforeView.Scopes)-1].ActivationLimit != 2 || afterView.Scopes[len(afterView.Scopes)-1].ActivationLimit != 3 {
+		t.Fatal("preview before/after aliased")
+	}
+
+	unchanged, _ := s.get(w.ID)
+	child, _ := unchanged.Planning.scope("child")
+	if child.ActivationLimit != 2 {
+		t.Fatal("preview changed scope")
+	}
+	saved, err := s.configureQuotas(w.ID, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	child, _ = saved.Planning.scope("child")
+	if child.ActivationLimit != 3 || child.Activations != 2 || saved.Planning.Activations != 5 || saved.Planning.QuotaAuthorization.BeforeScopes["child"] != 2 || saved.Planning.QuotaAuthorization.AfterScopes["child"] != 3 {
+		t.Fatal("lost audit or refunded counters")
+	}
+	for _, limits := range []map[string]int{{"missing": 3}, {"child": 1}, {"child": 7}, {"root": 5, "child": 6}} {
+		r.EventID = "invalid-quota"
+		r.Revision = saved.Revision
+		r.ScopeActivations = limits
+		if _, err = s.configureQuotas(w.ID, r); err == nil {
+			t.Fatal("invalid scope quota accepted", limits)
+		}
+	}
+}

@@ -304,3 +304,41 @@ L'autorisation de plafonds 41/91 est demandée avant toute nouvelle exécution.
 Validation de cette correction : suite Go complète PASS (454,891 s), tests
 ciblés PASS (0,426 s), `go vet`, contrat de configuration et `git diff --check`
 PASS. La projection ne modifie pas les états partagés.
+
+## 28 septembre — exécution du découpage et refus au deuxième fragment
+
+Accord utilisateur reçu pour les plafonds 41 activations et 91 appels. Le moteur
+adopte les dix lots à la révision 562, traite les trois événements E6 actuels et
+confirme 16 inspections plus deux appels finaux, soit 18 disponibles. La revue
+`review-abf29fac5a579c074f265971` démarre réellement sur le candidat
+`5bf7197cd65dee3eb3868b7712b532f0ce0e09a1` : un fragment reçoit des observations
+à compléter ; le suivant demande une correction de `durable_coordinator.go`.
+Compteur après arrêt : 75/91. Aucun des seize appels restants n'est dépensé.
+
+Le diagnostic alléguait une accumulation de goroutines derrière le verrou Git.
+Ce verrou utilise déjà LOCK_NB : cette explication ne démontre donc pas une file
+bloquée à cet endroit. La protection manquait néanmoins avant le démarrage
+asynchrone et avant ses lectures en base. Correction bornée : réservation par
+mission/agent/tentative via un verrou système non bloquant avant toute goroutine,
+libération après traitement ou arrêt du processus. Les journaux durables et
+verrous d'intégration restent les autorités pour les effets et la publication.
+
+Le test avec détection de courses vérifie 100 sollicitations via deux Store :
+un seul traitement admis, puis reprise après libération. La correction est aussi
+préparée dans la copie E6, sans remplacer le candidat refusé ni son verdict.
+La nouvelle livraison devra être testée et revue avant acceptation. Les anciens
+lots, liés à l'empreinte du candidat refusé, ne sont pas promus automatiquement.
+
+Reprise corrective : l'ancien plan de revue est conservé dans l'événement de
+réparation, puis retiré de la tâche au changement explicite de candidat. Le
+nouveau découpage exige une adoption et une couverture fraîches. L'API de quotas
+accepte désormais des plafonds de périmètre explicitement nommés et audités,
+sans remboursement des compteurs. Tests ciblés avec race PASS (8,065 s).
+Les premières suites complètes concurrentes ont expiré à 600 s sans assertion
+en échec ; elles ne constituent pas une validation et sont remplacées par une
+suite isolée avec un délai de 20 minutes.
+
+Validation finale : suite complète PASS (830,807 s), ciblés race PASS (8,065 s),
+régression finale de séparation avant/après de l’aperçu PASS (0,145 s), test de
+concurrence dans la copie E6 PASS, vet/configuration/diff PASS. Le test de
+séparation de l’aperçu a été ajouté après le départ de la suite complète.
