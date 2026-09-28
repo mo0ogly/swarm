@@ -17,16 +17,17 @@ const managedScopeFiles = 100
 const managedScopeRefusal = "remise trop large"
 
 type ManagedScopePlan struct {
-	Revision          int      `json:"revision"`
-	Base              string   `json:"accepted_base"`
-	Candidate         string   `json:"candidate_commit"`
-	Files             []string `json:"changed_files"`
-	Limit             int      `json:"file_limit"`
-	RequiresReduction bool     `json:"requires_reduction"`
-	Selected          []string `json:"selected_files,omitempty"`
-	Deferred          []string `json:"deferred_files,omitempty"`
-	Patch             string   `json:"patch,omitempty"`
-	Next              string   `json:"next_step"`
+	Decomposition     *ReviewDecomposition `json:"decomposition,omitempty"`
+	Revision          int                  `json:"revision"`
+	Base              string               `json:"accepted_base"`
+	Candidate         string               `json:"candidate_commit"`
+	Files             []string             `json:"changed_files"`
+	Limit             int                  `json:"file_limit"`
+	RequiresReduction bool                 `json:"requires_reduction"`
+	Selected          []string             `json:"selected_files,omitempty"`
+	Deferred          []string             `json:"deferred_files,omitempty"`
+	Patch             string               `json:"patch,omitempty"`
+	Next              string               `json:"next_step"`
 }
 
 // Exact bytes matter for binary patches and filenames ending in whitespace.
@@ -50,6 +51,15 @@ func managedScope(bare, base, candidate string) (ManagedScopePlan, error) {
 		p.Files = strings.Split(strings.TrimSuffix(raw, "\x00"), "\x00")
 	}
 	p.RequiresReduction = len(p.Files) > p.Limit
+	diff, err := scopeGit(bare, "diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--binary", base, candidate, "--")
+	if err != nil {
+		return p, err
+	}
+	decomposition := detectReviewDecomposition(candidate, p.Files, len(diff))
+	p.Decomposition = &decomposition
+	if decomposition.Required {
+		p.Next = "Faire examiner les types de découpage et les lots proposés par le sous-planificateur. Conserver le candidat complet. Vérifier couverture, dépendances, capacité, budget et revue finale avant exécution ; les suggestions ne sont pas un plan autorisé."
+	}
 	return p, nil
 }
 func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) (ManagedScopePlan, error) {

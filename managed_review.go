@@ -310,7 +310,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		return scopeErr
 	}
 	if scope.RequiresReduction {
-		return fmt.Errorf("%s : %d fichiers modifiés depuis la base acceptée, limite %d ; utiliser planning scope-preview puis scope-patch pour préparer une remise ciblée. Aucun appel de revue dépensé ; le résultat original est conservé", managedScopeRefusal, len(scope.Files), scope.Limit)
+		return fmt.Errorf("%s : %d fichiers modifiés depuis la base acceptée, limite %d ; utiliser planning scope-preview pour organiser des revues coordonnées avec le sous-planificateur. Aucun appel de revue dépensé ; le candidat complet est conservé", managedScopeRefusal, len(scope.Files), scope.Limit)
 	}
 	cfg := current.Planning.Reviewer
 	if cfg != nil {

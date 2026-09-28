@@ -29,3 +29,12 @@ review can be corrected this way; normal checks and fresh review still apply.
 Deferred changes need separate deliveries. Being under100 files does not prove
 correctness or transport/budget compatibility. Local controls may already have
 run before the review scope check. An exported patch is never an acceptance.
+
+## Decomposition diagnosis
+
+`scope-preview` now includes `decomposition`: signals, five possible split types
+(requirement, component, dependency, specialty, volume), and deterministic path
+inventories. A large single-file diff and mixed responsibilities are detected too.
+Suggestions have `state=proposal_only`; dependencies are explicitly unexamined.
+This does not launch a subplanner or authorize semantic review lots. The existing
+guard remains active; an executable semantic plan needs further runtime support.

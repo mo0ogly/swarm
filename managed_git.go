@@ -423,6 +423,9 @@ func (s *Store) managedFailure(a Agent, reason string) error {
 		task.Status = "blocked"
 		task.Blocker = reason
 		task.Next = "Le responsable doit proposer une correction sur la révision actuelle."
+		if strings.HasPrefix(reason, managedScopeRefusal+" : ") {
+			task.Next = "Le responsable doit organiser le découpage de revue avec un sous-planificateur : scope-preview expose les signaux et les types possibles ; ne pas retirer automatiquement des fichiers."
+		}
 		scope, _ := w.Planning.scope(task.ScopeID)
 		scope.State = "ready"
 		w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: planningEventID(a.ID, reason), Scope: scope.ID, Kind: "integration_failed", Task: task.ID, Attempt: a.Attempt, Message: guardBlock(reason, 4000), At: now()})

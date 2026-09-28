@@ -66,3 +66,13 @@ Les fichiers différés doivent devenir des remises séparées avec leurs propre
 contrôles. Un delta de 100 fichiers ou moins peut encore être trop volumineux ou
 incohérent : les contrôles de contenu, transport, budget et métier restent actifs.
 Les contrôles locaux peuvent avoir été exécutés avant ce précontrôle de revue.
+
+## Diagnostic de découpage
+
+`scope-preview` expose désormais `decomposition`. Il détecte aussi un diff unique
+trop volumineux et les remises mêlant plusieurs responsabilités. Il décrit cinq
+options : exigences, composants, dépendances, spécialités et volume. Les lots par
+chemin sont des suggestions : `state=proposal_only`, dépendances non examinées.
+Ce diagnostic ne lance pas un sous-planificateur et n’autorise aucune revue.
+La limite actuelle reste active jusqu’à une remise réduite ; un futur plan
+sémantique validé pourra offrir une autre voie que la réduction.
