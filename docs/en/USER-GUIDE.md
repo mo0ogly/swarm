@@ -25,6 +25,21 @@ If a provider refuses calls: [understand and handle an AI quota hold](PROVIDER-Q
 
 For guarantees and their limits: [engine contract and Cursor's design](CURSOR-ENGINE-CONTRACT.md).
 
+## Visual quick start
+
+| Goal | Where to go | What to check |
+|---|---|---|
+| Choose AI | AI and connections | Model, access and execution environment |
+| Describe the work | Prepare with AI | Objective, constraints and acceptance criteria |
+| Start | Agent cockpit, launch mission | Roles, workspaces, limits and authorization |
+| Understand a blocker | Task details and diagnosis | Cause, next action and who should act |
+| Read activity | Watch the agent work | Signal timestamp and actual output |
+| Confirm completion | Results and validation | Evidence, checks and review |
+
+Screenshots captured on 29 September 2026 using an isolated demonstration project. No agents were launched. The three manual tasks still need role configuration; their warnings are intentional.
+
+![Write the need and expected result](../screenshots/en/preparation.png)
+
 ## 1. Open the cockpit
 
 Follow the [installation instructions](INSTALL.md). Select the directory of the
@@ -82,6 +97,8 @@ connection uses its saved model for all three levels.
 When creating missions, select **AI for the planner and reviewer** separately
 from **Tool-enabled agent for workers**. The same installed provider can serve
 both purposes when its capabilities allow it.
+
+![Add an AI connection](../screenshots/en/connexion.png)
 
 ## 3. Prepare a mission
 
@@ -157,6 +174,21 @@ who acts. Then use the graph or list.
 In the session, read timestamps, event types and messages. Received output shows
 observable activity, not the model's private reasoning. Detailed capture is
 optional; without it, not all raw provider output is retained.
+
+### Read the graph and inspect a task
+
+Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
+
+![Tasks and dependency arrows](../screenshots/en/agents-horizontal.png)
+
+![Inspect a task and its criteria](../screenshots/en/agent-detail.png)
+
+<details>
+<summary>Vertical layout in the dark theme</summary>
+
+![Vertical dependency graph](../screenshots/en/agents-vertical.png)
+
+</details>
 
 ## 6. Understand states and validate
 

@@ -9,6 +9,16 @@ It makes responsibilities, dependencies, attempts, evidence and blockers visible
 so that several agents can collaborate without treating every completed process
 as a successful result.
 
+## First run
+
+1. Follow [installation](docs/en/INSTALL.md) and open the session link printed by the server.
+2. Open **AI and connections** to configure providers available in your environment.
+3. Prepare your objective, constraints and acceptance criteria; review the proposed plan.
+4. Check roles, workspaces and limits before authorizing and launching the mission.
+5. Follow tasks and examine their evidence. A finished process is not yet a validated result.
+
+See the [illustrated user guide](docs/en/USER-GUIDE.md). Swarm is experimental; read the [qualification evidence and limitations](docs/COMMUNITY-QUALIFICATION.md).
+
 ## What it does
 
 - Prepare requirements with AI, approve a brief and review a structured plan.
@@ -55,13 +65,13 @@ reproduces every part of Cursor's final architecture.
 
 ## See the interface
 
-These screenshots use simulated demonstration data, with no real agents running.
+These screenshots were captured on 29 September 2026 with demonstration data and no AI calls. The manual mission contains three unconfigured tasks; missing-role warnings are expected. This is not a completed autonomous run.
 They illustrate the French interface; choose English from the language selector.
 
-![Preparation](docs/screenshots/preparation.png)
-![Agent roles and dependency arrows](docs/screenshots/agents-horizontal.png)
-![Vertical graph](docs/screenshots/agents-vertical.png)
-![Detailed agent view](docs/screenshots/agent-detail.png)
+![Preparation](docs/screenshots/en/preparation.png)
+![Unconfigured tasks and dependency arrows](docs/screenshots/en/agents-horizontal.png)
+![Vertical graph](docs/screenshots/en/agents-vertical.png)
+![Detailed agent view](docs/screenshots/en/agent-detail.png)
 
 ## Install
 
