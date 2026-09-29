@@ -412,3 +412,29 @@ func TestManagedPreparedResumeAfterIdenticalTreeRequalification(t *testing.T) {
 		})
 	}
 }
+
+func TestManagedInvalidLimitsDoNotCreatePendingLaunch(t *testing.T) {
+	s, w := managedFixture(t)
+	ps, err := s.providers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := ps.Providers["managed-review-fixture"]
+	p.Limits.SilenceSeconds = 120
+	ps.Providers["limited-worker"] = p
+	raw, _ := json.Marshal(ps)
+	if err = os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	r := Launch{Schema: 1, EventID: "invalid-limits", Revision: w.Revision, TaskID: "first", Provider: "limited-worker", Role: "worker", Timeout: 60, Limits: &RunLimits{SilenceSeconds: 180}}
+	if _, created, err := s.prepare(w.ID, r); err == nil || created || !strings.Contains(err.Error(), "limite de mission") {
+		t.Fatalf("expected limits refusal: %v %v", created, err)
+	}
+	pending, err := s.preparedLaunchForTask(w, &w.Tasks[0])
+	if err != nil || pending != nil {
+		t.Fatalf("invalid launch left preparation: %+v %v", pending, err)
+	}
+	if _, err = os.Stat(managedCopyRoot(w.Planning.Repository, "first", 1)); !os.IsNotExist(err) {
+		t.Fatalf("invalid launch created a copy: %v", err)
+	}
+}
