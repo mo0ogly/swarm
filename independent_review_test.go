@@ -94,9 +94,21 @@ func TestIndependentReviewProcessPersistsAndBlocksStaleEvidence(t *testing.T) {
 	if again.Planning.Reviewer.Calls != 1 {
 		t.Fatal("duplicate paid call")
 	}
+	if _, err := s.planningChange(got.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "fresh-approval-retry", Revision: got.Revision, Task: gt.ID, Reason: "Ne pas relancer un avis encore valide"}); err == nil {
+		t.Fatal("fresh favorable review can be replaced")
+	}
 	os.WriteFile(filepath.Join(s.root, report), []byte("contenu modifié"), 0600)
 	if e := s.independentReviewGuard(&got, gt); e == nil {
 		t.Fatal("changed evidence accepted")
+	}
+	request := PlanningRequest{Schema: 1, EventID: "stale-evidence-retry", Revision: got.Revision, Task: gt.ID, Reason: "Rapport corrigé après avis favorable devenu périmé"}
+	next, err := s.planningChange(got.ID, "retry-review", request)
+	if err != nil {
+		t.Fatal("stale evidence cannot be retried", err)
+	}
+	nt, _ := next.task(gt.ID)
+	if nt.IndependentReview != nil || next.Planning.Reviewer.Calls != got.Planning.Reviewer.Calls || len(nt.PreviousReviews) != 1 || nt.PreviousReviews[0].ID != gt.IndependentReview.ID {
+		t.Fatal("retry lost prior verdict, refunded calls or retained stale approval")
 	}
 	got.Planning.Reviewer = nil
 	if organization(got).Ready {

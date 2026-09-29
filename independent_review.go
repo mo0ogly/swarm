@@ -238,7 +238,10 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			t.Next = "Dossier de revue prêt ; reprise du résultat existant sans nouvelle production."
 			return nil
 		}
-		if (t.Status != "submitted" && !(managed && t.Status == "blocked")) || v == nil || (v.State != "error" && v.State != "stale") {
+		// Use the same freshness check as the console. A completed favorable
+		// record can become stale without its persisted state changing.
+		derivedStale := v != nil && v.State == "passed" && v.Finished != "" && s.independentReviewGuard(w, t) != nil
+		if (t.Status != "submitted" && !(managed && t.Status == "blocked")) || v == nil || (v.State != "error" && v.State != "stale" && !derivedStale) {
 			return fmt.Errorf("seule une vérification interrompue ou périmée d’un résultat soumis peut être reprise")
 		}
 		if managed {
@@ -246,6 +249,15 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 				return fmt.Errorf("tentative gérée remplacée ou candidat absent")
 			}
 			managedProducer = v.Producer
+		}
+		if derivedStale {
+			// Changed evidence requires a fresh review, not continuation of the
+			// completed journal. Preserve the old verdict and spent calls.
+			t.PreviousReviews = append(t.PreviousReviews, *v)
+			t.IndependentReview = nil
+			t.BatchReviewResume = nil
+			cfg.Failure = ""
+			return nil
 		}
 		if v.FragmentJournal != nil && fragmentReviewerChanged(*w, *v) {
 			if replacementErr != nil {

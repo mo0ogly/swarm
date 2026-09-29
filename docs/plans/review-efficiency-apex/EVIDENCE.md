@@ -379,3 +379,25 @@ sept restantes plus deux appels finaux, donc neuf appels nécessaires contre
 huit disponibles. Aperçu public de quota100 préparé, non appliqué sans accord.
 La reprise transmet le diagnostic de citation déjà implémenté ; elle ne
 transforme pas une réponse invalide en preuve favorable.
+
+## 29 septembre — reprise d’un avis périmé et arrêt demandé
+
+La reprise autorisée à 100 appels a consommé un appel supplémentaire (92/100).
+La revue a demandé une correction réelle : le bouton de reprise utilisait le
+statut enregistré plutôt que la fraîcheur calculée. Correction de web/planning.js
+et du moteur : une revue favorable terminée, devenue périmée, peut être reprise ;
+l’ancien avis et les appels consommés sont conservés. Une revue encore valide
+reste non relançable. Aucun résultat n’est accepté par cette correction.
+
+Vérifications : tests Go ciblés ProcessPersistsAndBlocksStaleEvidence et
+RetryIsExplicitBoundedAndCannotReplaceApproval PASS ; planning_review_retry_ui.cjs
+PASS (régression reproduite avant correction, états périmé/courant/en cours,
+FR/EN, deux thèmes, clavier et modale dans une fixture navigateur isolée) ;
+planning_ui.cjs PASS sur serveur isolé ; test:i18n, go vet, contrôle des méthodes
+et git diff --check PASS. La suite Go complète a été interrompue sur demande
+d’abandon : elle ne constitue pas une validation complète. Correctif non installé
+sur le serveur de la mission et non accepté par une nouvelle revue indépendante.
+
+À la demande explicite de l’utilisateur, la mission et ses huit tâches ont été
+mises dans la corbeille par lifecycle preview/apply. Liste active vide, tests
+arrêtés. Le code, les documents et les preuves historiques restent conservés.
