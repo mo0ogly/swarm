@@ -9,6 +9,24 @@ import (
 	"time"
 )
 
+// These persistence and preview tests must not discover installed paid providers.
+func conductorFixtureProvider(t *testing.T, s *Store) string {
+	t.Helper()
+	command := filepath.Join(t.TempDir(), "claude")
+	if err := os.WriteFile(command, []byte("#!/bin/sh\nexit 0\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	providers := Providers{Schema: 1, Providers: map[string]Provider{"fixture": {Command: command}}}
+	raw, err := json.Marshal(providers)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	return "fixture"
+}
+
 func TestConductorContextUnknownSelection(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
@@ -80,15 +98,7 @@ func TestConductorExactPreviewAndIdempotencyIsolation(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
 	other := createTest(t, s)
-	if e := s.initProviders(); e != nil {
-		t.Fatal(e)
-	}
-	ps, _ := s.providers()
-	name := ""
-	for id := range ps.Providers {
-		name = id
-		break
-	}
+	name := conductorFixtureProvider(t, s)
 	r := AssistRequest{EventID: newID("question-"), Revision: w.Revision, Coordinates: PageCoordinates{PageID: "tasks"}, TemplateID: "understand_page.v1", Provider: name}
 	p, e := s.assistPreview(w.ID, r)
 	if e != nil {
@@ -183,15 +193,7 @@ func TestConductorProviderArgumentsCannotEnableCoding(t *testing.T) {
 func TestConductorArchivePreservesAssistantHistory(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
-	if e := s.initProviders(); e != nil {
-		t.Fatal(e)
-	}
-	ps, _ := s.providers()
-	name := ""
-	for id := range ps.Providers {
-		name = id
-		break
-	}
+	name := conductorFixtureProvider(t, s)
 	r := AssistRequest{EventID: newID("question-"), Revision: w.Revision, Coordinates: PageCoordinates{PageID: "tasks"}, TemplateID: "understand_page.v1", Provider: name}
 	p, e := s.assistPreview(w.ID, r)
 	if e != nil {
@@ -221,15 +223,7 @@ func TestConductorArchivePreservesAssistantHistory(t *testing.T) {
 func TestConductorAtomicActiveQuestion(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
-	if e := s.initProviders(); e != nil {
-		t.Fatal(e)
-	}
-	ps, _ := s.providers()
-	name := ""
-	for id := range ps.Providers {
-		name = id
-		break
-	}
+	name := conductorFixtureProvider(t, s)
 	rs := make([]AssistRequest, 2)
 	for i := range rs {
 		rs[i] = AssistRequest{EventID: newID("question-"), Revision: w.Revision, Coordinates: PageCoordinates{PageID: "tasks"}, TemplateID: "understand_page.v1", Provider: name}
@@ -259,15 +253,7 @@ func TestConductorAtomicActiveQuestion(t *testing.T) {
 func TestConductorDeadSupervisorDoesNotLeaveInfiniteWait(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))
-	if e := s.initProviders(); e != nil {
-		t.Fatal(e)
-	}
-	ps, _ := s.providers()
-	name := ""
-	for id := range ps.Providers {
-		name = id
-		break
-	}
+	name := conductorFixtureProvider(t, s)
 	r := AssistRequest{EventID: newID("question-"), Revision: w.Revision, Coordinates: PageCoordinates{PageID: "tasks"}, TemplateID: "understand_page.v1", Provider: name}
 	p, e := s.assistPreview(w.ID, r)
 	if e != nil {

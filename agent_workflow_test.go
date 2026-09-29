@@ -57,7 +57,8 @@ func TestAgentWorkflowReachesWorkerAndSurvivesReopen(t *testing.T) {
 	if err := os.WriteFile(local, []byte("UNTRUSTED_METHOD_OVERRIDE"), 0600); err != nil {
 		t.Fatal(err)
 	}
-	script := filepath.Join(t.TempDir(), "codex")
+	// This workflow test needs a deterministic adapter, not a local Codex model catalogue.
+	script := filepath.Join(t.TempDir(), "claude")
 	if err := os.WriteFile(script, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf '%s\\n' '{\"type\":\"result\",\"result\":\"fixture completed\"}'\n"), 0700); err != nil {
 		t.Fatal(err)
 	}
