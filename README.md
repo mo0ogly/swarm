@@ -10,6 +10,18 @@ Swarm est un outil local de coordination d’agents de développement, avec une 
 
 [Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
 
+## Première utilisation
+
+1. **Installer et ouvrir** : suivre [l’installation](INSTALL.md), puis ouvrir le lien de session affiché au lancement.
+2. **Connecter une IA** : ouvrir « IA et connexions » et choisir les fournisseurs disponibles dans votre environnement.
+3. **Préparer le besoin** : préciser le résultat attendu, le périmètre et les critères ; relire le plan proposé.
+4. **Autoriser et lancer** : vérifier les rôles, les espaces et les limites. L’adoption d’un plan ne lance pas à elle seule les agents.
+5. **Suivre et examiner** : ouvrir le graphe puis le détail d’une tâche. Un processus terminé n’est pas encore un résultat validé.
+
+→ [Guide illustré : les étapes, les boutons et les blocages](GUIDE-UTILISATEUR.md)
+
+Swarm reste expérimental. Consultez les [essais réalisés et leurs limites](docs/COMMUNITY-QUALIFICATION.md) avant de lui confier une mission importante.
+
 ## Ce que vous pouvez faire
 
 | Votre besoin | Ce que propose Swarm | Pourquoi c’est utile |
@@ -97,32 +109,31 @@ Commencez avec vos mots : le besoin, les contraintes et les critères de réussi
 
 ### 2. Visualiser l’équipe et ses flèches
 
-Cette seconde démonstration utilise une **organisation simulée en pause** : un orchestrateur, un sous-responsable, trois tâches d’exécutants et un vérificateur indépendant. Aucun fournisseur n’est lancé, aucun résultat n’est présenté comme validé.
+Cette mission manuelle montre **trois tâches à préparer**, reliées par leurs dépendances. Les rôles ne sont pas encore configurés : le bandeau « Rôle à préciser » le signale. Ce n’est pas une équipe autonome prête à démarrer.
 
-- **Bleu : orchestrateur**, chargé de coordonner la mission.
-- **Orange : sous-responsable**, chargé ici du périmètre accessibilité.
-- **Cartes de tâches : exécutants**, chargés de produire les livrables.
-- **Vert : vérificateur indépendant**, chargé d’examiner les rapports.
-- **Flèches pleines : dépendances entre tâches.**
-- **Flèches pointillées : responsabilités et remise au vérificateur.**
+![Trois tâches à préparer et leurs flèches de dépendance](docs/screenshots/agents-horizontal.png)
 
-![Équipe en vue horizontale : orchestrateur, sous-responsable, exécutants et vérificateur reliés par des flèches](docs/screenshots/agents-horizontal.png)
+[Ouvrir le graphe en grand](docs/screenshots/agents-horizontal.png)
 
-[Ouvrir le graphe horizontal en grand](docs/screenshots/agents-horizontal.png)
+**Comment lire cet écran :**
 
-#### La même organisation en vue verticale
+1. « Créer la recherche » est le prérequis du test clavier.
+2. Le test clavier est le prérequis de la livraison.
+3. « Voir le blocage » explique pourquoi une tâche ne peut pas encore partir.
+4. « À faire » indique que le travail n’a pas commencé ; cela ne prouve ni un résultat ni sa validation.
 
-L’orientation peut être adaptée à la forme du plan. Le thème sombre conserve les couleurs des rôles et les deux types de flèches.
+#### Changer de vue sans changer le plan
 
-![Équipe en vue verticale et thème sombre, avec liens de responsabilité et dépendances](docs/screenshots/agents-vertical.png)
+Choisissez **Verticale** pour un écran étroit, ou **Liste des agents** et **Détaillées** pour lire les livrables. Les boutons **+ / −** replient une branche sans supprimer ses tâches.
 
-[Ouvrir le graphe vertical en grand](docs/screenshots/agents-vertical.png)
+![Même plan en orientation verticale et thème sombre](docs/screenshots/agents-vertical.png)
 
-#### Retrouver les rôles et les livrables en liste
+<details>
+<summary>Voir la liste détaillée</summary>
 
-La vue liste complète le graphe : elle expose les responsabilités, les tâches et leurs livrables sans suivre chaque flèche. Dans cet exemple, les tâches attendent leur autorisation de démarrage.
+![Liste des tâches et de leurs livrables](docs/screenshots/agents-liste.png)
 
-![Liste détaillée des responsables, du vérificateur et des tâches des exécutants](docs/screenshots/agents-liste.png)
+</details>
 
 #### Examiner une tâche sans quitter le pilotage
 

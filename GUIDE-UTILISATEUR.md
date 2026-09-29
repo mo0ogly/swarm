@@ -28,6 +28,21 @@ En cas de refus du fournisseur : [comprendre et traiter une attente de quota IA]
 
 Pour les garanties et leurs limites : [contrat du moteur et design Cursor](docs/architecture/CURSOR-ENGINE-CONTRACT.md).
 
+## Le parcours en un coup d’œil
+
+| Vous voulez… | Ouvrez… | Vérifiez avant de continuer |
+|---|---|---|
+| Choisir l’IA | IA et connexions | Le modèle, son accès et l’environnement d’exécution |
+| Expliquer le besoin | Préparer avec l’IA | Objectif, contraintes et critères concrets |
+| Démarrer | Pilotage, puis Lancer la mission | Rôles, dossier, limites et autorisation |
+| Comprendre l’attente | La tâche, puis son diagnostic | Cause, personne ou agent qui doit agir, prochaine action |
+| Voir les sorties | Voir l’agent travailler, si une tentative existe | Heure du signal et résultat réellement reçu |
+| Confirmer la fin | Résultats et validations | Critères, contrôles et revue ; pas seulement la fin du processus |
+
+![Préparation : saisir un besoin et ses critères](docs/screenshots/preparation.png)
+
+Les écrans ci-dessous ont été recapturés le 29 septembre 2026 sur une instance isolée. La mission manuelle présente trois tâches **à préparer** ; les alertes de rôles manquants sont réelles. Elle ne démontre pas une exécution autonome.
+
 ## Sommaire
 
 1. [Ouvrir Swarm](#1-ouvrir-swarm)
@@ -187,7 +202,7 @@ action et qui doit agir. Consultez ensuite le graphe ou la liste.
 - Un clic ouvre les détails. **Voir l’agent travailler** ouvre sa session ;
   un double-clic sur une tâche ouvre sa session lorsqu’elle existe.
 
-![Rôles, tâches et flèches](docs/screenshots/agents-horizontal.png)
+![Tâches à préparer et flèches de dépendance](docs/screenshots/agents-horizontal.png)
 
 Dans la session, lisez l’heure, le type d’événement et le message. Les sorties
 reçues décrivent l’activité observable : elles ne donnent pas accès au raisonnement
@@ -198,6 +213,19 @@ brut du fournisseur n’est pas nécessairement conservé.
 
 **Ces captures utilisent des données de démonstration**, sans agents réels en
 cours. Les fournisseurs, missions et états de votre installation seront différents.
+
+### Adapter l’affichage
+
+![Orientation verticale en thème sombre](docs/screenshots/agents-vertical.png)
+
+Utilisez **Vue d’ensemble** pour retrouver les flèches après un zoom. Le repli masque une branche ; il ne change ni les dépendances ni l’ordre d’exécution.
+
+<details>
+<summary>Voir les livrables en liste détaillée</summary>
+
+![Liste détaillée des trois tâches de démonstration](docs/screenshots/agents-liste.png)
+
+</details>
 
 ## 6. Comprendre les états et valider
 
