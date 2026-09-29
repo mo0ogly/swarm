@@ -206,3 +206,22 @@ Le Dockerfile compile les sources présentes localement. Il n’existe pas ici d
 Dans une copie du dépôt sans `deploy/install.env`, `make test-install` exécute une recette isolée. Elle compile le binaire natif, construit l’image, ouvre une session web, crée une mission depuis le CLI et vérifie sa conservation après recréation du conteneur. Elle contrôle aussi la propriété des fichiers et le refus de réinstaller un service actif. Aucun modèle IA n’est appelé.
 
 Le test nécessite un moteur Docker local ayant accès aux mêmes chemins que le shell, ainsi que Go et Python 3. Il crée puis retire uniquement son projet, son conteneur et sa configuration temporaires. Les images construites restent disponibles dans Docker. Il ne vérifie pas les authentifications ni les sandboxes de tous les fournisseurs.
+
+### SQLite : initialisation et migration
+
+Aucune base n’est livrée dans Git ou l’image Docker. `swarm init` crée
+`PROJET/.swarm/state.db` avec des permissions `0600`. Le serveur applique les
+migrations prévues au démarrage ; les commandes de consultation refusent de
+migrer implicitement une ancienne base. Pour une utilisation CLI sans serveur,
+après arrêt des anciens processus et sauvegarde :
+
+```sh
+docker compose --env-file deploy/install.env run --rm --no-deps swarm init
+# Installation native :
+swarm --root /chemin/projet init
+```
+
+Ne modifiez jamais `PRAGMA user_version` pour forcer une ouverture. Sauvegardez
+l’ensemble de `.swarm/`, pas uniquement `state.db` : les rapports, copies de
+travail et configurations sont aussi nécessaires. Les sauvegardes automatiques
+de certaines migrations ne remplacent pas cette sauvegarde complète.

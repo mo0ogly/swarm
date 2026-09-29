@@ -133,3 +133,8 @@ noncommercial use under that license; commercial use requires separate permissio
 This is **not an OSI-approved open-source license**. Previous Apache-licensed
 versions and third-party components retain their respective rights and notices:
 see [licensing details](docs/LICENSING.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Contributing and reporting issues
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for checks and pull requests, and
+[SECURITY.md](SECURITY.md) for sensitive reports.

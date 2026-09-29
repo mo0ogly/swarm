@@ -4,7 +4,7 @@
 
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
 
-Swarm est un outil local de coordination d’agents de développement, avec une **interface web en français** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
+Swarm est un outil local de coordination d’agents de développement, avec une **interface web en français et en anglais** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
 
 **Pourquoi Swarm ?** Quand plusieurs agents travaillent sur un projet, quelqu’un doit encore transmettre les consignes, gérer les dépendances, retrouver les rapports et décider si le résultat est réellement utilisable. Swarm organise ces passages de relais pour réduire cette coordination manuelle et rendre les blocages visibles.
 
@@ -280,3 +280,8 @@ Voir le [cadrage APEX et PDCA des agents](docs/AGENT-METHODS.md) et le
 ### Budgets
 
 [Budgets et coûts IA — web et CLI](docs/BUDGETS.md) · [English guide](docs/en/BUDGETS.md).
+
+## Contribuer et signaler un problème
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les contrôles et les pull requests,
+[SECURITY.md](SECURITY.md) pour les signalements sensibles.

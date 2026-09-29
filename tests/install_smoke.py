@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import shutil
 import socket
+import sqlite3
 import subprocess
 import tempfile
 import urllib.request
@@ -20,7 +21,9 @@ repo = Path(__file__).resolve().parents[1]
 config = repo / 'deploy/install.env'
 assert not config.exists(), 'Existing install.env: use a clean checkout for this test'
 # Bind mounts must use a directory visible at the same path to the local daemon.
-temp = Path(tempfile.mkdtemp(prefix='swarm-install-', dir=Path.home() / '.cache'))
+cache = Path.home() / '.cache'
+cache.mkdir(parents=True, exist_ok=True)
+temp = Path(tempfile.mkdtemp(prefix='swarm-install-', dir=cache))
 project = temp / 'project with spaces'
 agent_home = temp / 'agent home'
 project.mkdir()
@@ -72,7 +75,15 @@ try:
     assert (agent_home / 'keep-agent.txt').read_text() == 'persisted'
     assert (project / 'keep.txt').read_text() == 'preserve me'
     assert (project / '.swarm/state.db').stat().st_uid == os.getuid()
-    print('PASS: native install, Docker build/start, browser session, CLI, running-service guard, persisted mission and agent home, file ownership')
+    run(compose + ['stop'])
+    # Inspect only this stopped, disposable fixture. Never a live mission DB.
+    database = project / '.swarm/state.db'
+    assert database.stat().st_mode & 0o777 == 0o600
+    with sqlite3.connect(database.as_uri() + '?mode=ro', uri=True) as db:
+        assert db.execute('PRAGMA integrity_check').fetchall() == [('ok',)]
+        assert db.execute('PRAGMA foreign_key_check').fetchall() == []
+        assert db.execute('PRAGMA user_version').fetchone()[0] > 0
+    print('PASS: native install, Docker build/start, browser session, CLI, running-service guard, persisted mission and agent home, file ownership, SQLite integrity and private permissions')
 finally:
     if config.exists():
         subprocess.run(compose + ['down'], cwd=repo, env=env, capture_output=True)

@@ -146,3 +146,20 @@ The installer recipe requires Docker and a checkout without an existing
 `deploy/install.env`. It uses isolated test projects. Process recipes use
 simulated deterministic agents without paid model calls. They do not validate
 your real provider or your project.
+
+### SQLite initialization and migrations
+
+No database is shipped in Git or the Docker image. `swarm init` creates
+`PROJECT/.swarm/state.db` with permissions `0600`. The server applies supported
+migrations at startup; inspection commands refuse to silently migrate an older
+database. For CLI-only use, after stopping old processes and taking a backup:
+
+```sh
+docker compose --env-file deploy/install.env run --rm --no-deps swarm init
+# Native installation:
+swarm --root /path/to/project init
+```
+
+Never change `PRAGMA user_version` to force a database to open. Back up all of
+`.swarm/`, not only `state.db`: reports, workspaces and configuration also matter.
+Automatic backups from some migrations do not replace a complete backup.
