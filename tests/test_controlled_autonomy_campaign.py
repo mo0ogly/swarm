@@ -111,9 +111,10 @@ else:
  print(json.dumps({'type':'result','result':'Fixture worker completed'}))
 ''')
             provider.chmod(0o700)
-            config=base/'providers.json';config.write_text(json.dumps({'providers':{'claude':{'command':str(provider),'args':['-p','--output-format','stream-json','--verbose']}}}))
+            config=base/'providers.json';config.write_text(json.dumps({'providers':{'claude':{'command':str(provider),'args':['-p','--output-format','stream-json','--verbose'],'limits':{'silence_seconds':120,'tool_seconds':120,'max_tool_calls':20,'max_repeated_calls':3,'max_consecutive_errors':3}}}}))
             dest=base/'campaign'
             m=prepare(dest,os.environ['SWARM_CAMPAIGN_TEST_ENGINE'],config,'claude')
+            self.assertEqual(m['profile']['limits'], json.loads(config.read_text())['providers']['claude']['limits'])
             before=cli(m,['work','show',m['work']])['work']
             self.assertEqual(before['planning']['activations'],0)
             self.assertEqual(before['planning']['reviewer']['calls'],0)

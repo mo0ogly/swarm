@@ -15,6 +15,14 @@ import (
 // Preparing files, merging and running checks happen before that transaction.
 // A crash can leave a retained candidate, never half of a canonical checkout.
 func (s *Store) integrateManagedAttempt(a Agent) error {
+	releasePublication, acquired, err := managedPublicationLane(s.root, a.WorkID)
+	if err != nil {
+		return err
+	}
+	if !acquired {
+		return nil
+	} // Retained result; conductor retries without another worker or paid call.
+	defer releasePublication()
 	unlock, err := managedLock(s.root, a.WorkID)
 	if err != nil {
 		return err

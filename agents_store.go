@@ -476,24 +476,6 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if err != nil {
 		return a, false, err
 	}
-	if managedWork := launchWork; managedWork.Planning != nil && managedWork.Planning.Repository != nil {
-		if previewOnly {
-			r.Workspace = managedWork.Planning.Repository.Source
-		} else {
-			path, err := s.ensureManagedAttempt(managedWork, r)
-			if err != nil {
-				return a, false, err
-			}
-			r.Workspace = path
-		}
-	}
-	if r.Workspace == "" {
-		r.Workspace = "."
-	}
-	cwd, e := resolveWorkspace(s.root, r.Workspace)
-	if e != nil {
-		return a, false, e
-	}
 	providers, e := s.providers()
 	if e != nil {
 		return a, false, e
@@ -550,6 +532,24 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	info, e := os.Stat(p.Command)
 	if e != nil || !info.Mode().IsRegular() || info.Mode()&0111 == 0 {
 		return a, false, fmt.Errorf("exécutable fournisseur indisponible")
+	}
+	if managedWork := launchWork; managedWork.Planning != nil && managedWork.Planning.Repository != nil {
+		if previewOnly {
+			r.Workspace = managedWork.Planning.Repository.Source
+		} else {
+			path, err := s.ensureManagedAttempt(managedWork, r)
+			if err != nil {
+				return a, false, err
+			}
+			r.Workspace = path
+		}
+	}
+	if r.Workspace == "" {
+		r.Workspace = "."
+	}
+	cwd, e := resolveWorkspace(s.root, r.Workspace)
+	if e != nil {
+		return a, false, e
 	}
 	// La sonde externe peut durer plusieurs secondes. Elle précède donc toute
 	// transaction ; son reçu court et son contexte seront revérifiés dedans.

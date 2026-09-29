@@ -113,7 +113,7 @@ def prepare(destination, engine, providers, provider_name):
         checks={'req-1':[{'id':'business-check','command':m['control_command'],'criteria':[1],
                          'justification':'Contrôle métier figé hors des fichiers de production','timeout_seconds':10}]})
     m['profile']={'provider':'trial-worker','role':'worker','workspace':str(project),
-                  'capture_output':True,'timeout_seconds':300,'limits':{'max_tool_calls':min(100,(configured.get('limits') or {}).get('max_tool_calls') or 100)}}
+                  'capture_output':True,'timeout_seconds':300,'limits':{**(configured.get('limits') or {}), 'max_tool_calls':min(100,(configured.get('limits') or {}).get('max_tool_calls') or 100)}}
     m['frozen_files']={str(p):digest(p.read_bytes()) for p in
         [binary,adapter,config,worker,tools/'controlled_business_fault.py',tools/'autonomy_worker_adapter.py',Path(__file__).resolve(),Path(__file__).with_name('controlled_business_fault.py').resolve()]}
     write(dest/'prepared-work.json',w);write(dest/'campaign.json',m)
