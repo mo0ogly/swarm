@@ -14,7 +14,7 @@ trajectory, not general reliability. The old abandoned E6 mission remains delete
 | Server crash/restart | Same recipe, `restart`: ownership and progress preserved | PASS, simulated providers |
 | Web preparation | `journey_ui.cjs`: browser need-to-departure authorization | PASS, simulated provider; does not prove completed production |
 | Error then correction | `controlled_autonomy_campaign.py`: real Claude planner, subplanner, two workers, independent review and engine controls | PASS, real provider |
-| Multiple real AIs in parallel | Not exercised by these recipes | NOT TESTED |
+| Multiple real AIs in parallel | Two real Claude workers, isolated Git copies, sequential candidate reviews and final bundle checked | PASS, real provider |
 | Outside-user usability | No external participant in this qualification | NOT TESTED |
 
 ## Real trajectory
@@ -66,10 +66,52 @@ The existing prepared-copy recovery guards remain in place.
 - Even this tiny task required 22 worker tool calls and roughly six minutes.
   Reports, evidence and coordination have measurable overhead; simple work may
   be faster with a single agent.
-- The real parallel scenario, a complete web-only real-provider journey and an
-  external-user trial are still required before claiming community-ready autonomy.
+- A complete web-only real-provider journey and an external-user trial are still
+  required before claiming community-ready autonomy. The parallel test below
+  preassigns its two tasks through the CLI; it does not test free-form planning.
 - One successful run does not cancel the previous failures or justify a stable
   product claim. Current positioning remains an experimental alpha.
 
 The public correction and qualification report are reviewed through PR #1.
 No branch-protection bypass or self-approval is used.
+
+## Real parallel qualification and a second engine correction
+
+The first parallel harness stopped too early on the transient blocked state used
+while a completed producer awaits review. That interrupted trial is not a success.
+After correcting the observer, another run exposed an engine race: both reviews
+used the same base; publication of the first revoked the second review. The
+planner eventually recovered, but used a third producer unnecessarily. That run
+fails the requirement of two productions without redundant work.
+
+Correction: one nonblocking publication lane per work covers candidate checks,
+independent review and publication. Workers still execute in parallel. The Git
+operation lock is released during inference, so unrelated Git operations remain
+possible. A sibling result waits for the lane, then builds and reviews its
+candidate from the latest accepted revision. Counters and prior evidence are
+preserved. The OS releases the lane on process exit.
+
+Validation: `TestManagedPublicationLaneRetainsSiblingWithoutPaidReview` passes
+with `-race` and checks two Store handles, no second paid call while the first
+review is pending, Git lock availability, then two accepted results with fresh
+review evidence and exactly two calls. `go test -run '^TestManaged' -count=1
+-timeout 5m ./...` passes in 224.359 seconds; go vet and diff checks pass.
+
+Final real run `w-a0b2c7c673fd590d6107437a`:
+
+- PASS in 142.2 seconds; two worker execution intervals overlap.
+- Distinct workspaces; exactly two producers, 9 and 6 tool calls.
+- Two planning activations including the initial operator task-assignment claim,
+  and two independent reviews. No operator recovery after launch.
+- Worker-reported cost USD 0.4995294; excludes planning and review costs.
+- Both tasks accepted, planner closed, source repository unchanged.
+- Exported Git bundle cloned and both Python modules executed successfully.
+- Candidate `44b039314d0bf9f97084377dc3bd194a567c7b74`.
+- The real trial used the corrected source before commit; this is not a
+  qualification of the previously published main binary.
+
+Reproduction helper: `tests/parallel_real_campaign.py BINARY NEW_OUTPUT
+PROVIDERS_JSON`. It deliberately invokes real Claude processes and is not run by
+default CI. It requires a new output directory and retains failed evidence.
+The preparatory harness errors and earlier paid trials remain separate and are
+not included in the final successful run's cost or duration.
