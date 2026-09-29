@@ -17,10 +17,10 @@ with sqlite3.connect(root / '.swarm/state.db') as db:
     work['title'] = 'Démo simulée — Équipe de recherche accessible'
     work['scope'] = 'Organisation fictive en pause. Aucun appel IA et aucun résultat revendiqué.'
     work['planning'] = {
-        'version': 1, 'paused': True, 'provider': 'IA de planification · démo',
+        'version': 1, 'paused': True, 'provider': 'demo-planner',
         'max_tasks': 8, 'max_decisions': 12, 'max_activations': 20,
         'activations': 0, 'decisions': 0, 'inbox': [], 'reviewer_required': True,
-        'reviewer': {'provider': 'IA de revue · démo', 'provider_digest': '',
+        'reviewer': {'provider': 'demo-reviewer', 'provider_digest': '',
                      'max_calls': 10, 'calls': 0, 'authorized': ''},
         'scopes': [
             {'id': 'root', 'objective': work['objective'], 'requirements': ['req-1', 'req-2'],
