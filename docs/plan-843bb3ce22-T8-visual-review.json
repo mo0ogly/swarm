@@ -1,0 +1,125 @@
+{
+  "date": "2026-09-30",
+  "method": "Ouverture et lecture visuelle des 17 images référencées par les deux guides ; observation des pixels, sans OCR. Attestation humaine assistée, pas un scanner automatique de secrets.",
+  "images": [
+    {
+      "path": "docs/screenshots/connexion.png",
+      "sha256": "8c3c35786d543231d0a3d1954f40e834f898bbfa74be1f935131ebf2c8a20e6f",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Formulaire Ajouter une IA / Add an AI connection ; modèle local d’exemple, http://localhost:11434/v1 ; champ clé vide ; connexion non testée.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/mission-lancee-fr.png",
+      "sha256": "cc00614be99096b57ef22f6ec712b995f96636026a5351fc73c7ac3ac322c819",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Mission supervisée ; 1 tâche en cours et 1 tentative active ; prochaine étape attendre les résultats ; capture FR, légende anglaise précise French UI.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-fr-etat.png",
+      "sha256": "c85eb915eb5d1f455947c282cdd2243d7d1bb809213c432ae468c3951ea213ef",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Formulaire de limites 30/120/50/3/2 ; motif ui recette ; bouton confirmer encore présent ; aucune clé ni URL.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-fr-sombre.png",
+      "sha256": "2dc8dd46ac4d3217f48d248aa2ca77c22e3fd6498642ab041835d4f6fd079e68",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Formulaire de limites 30/120/50/3/2 ; motif ui recette ; bouton confirmer encore présent ; aucune clé ni URL.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-saved-fr-etat.png",
+      "sha256": "3b4bac2055c3b2eef0ac75c20ffbc91a8a721ca2a94bce2dad7c644f2a0ee4db",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Historique avec révision 1 ; limites 30/120/50/3/2 ; auteur local fpizzi/uid:1001 et motif install guide ; aucun champ de clé ni URL de session.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-saved-fr-sombre.png",
+      "sha256": "ad6c543c90a0c347cfa0c86510fd9ab964f00c3fe17c0179a22d00d0faf2a376",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Historique avec révision 1 ; limites 30/120/50/3/2 ; auteur local fpizzi/uid:1001 et motif install guide ; aucun champ de clé ni URL de session.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/summary-fr-etat.png",
+      "sha256": "ea705fa6fbfea0bb2077bf05e7bb99e3914b4dc1adf6ca7ac4fdfb1ddc14616f",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Récapitulatif avant autorisation ; fournisseur recette/sonnet ; limites 15/25 ; conditions vérifiées ; bouton autoriser non activé ici.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/preflight-details-fr-sombre.png",
+      "sha256": "b3b141054d142e8463f246384827d544a5c21a5f2bb56e09137f8a09ee28c6a2",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Modale technique ready/verified, exécutable et limites valides, sonde/dossier/écriture temporaire ; quantité d’octets ; ni chemin précis, ni clé, ni URL.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/diagnostic-fr-etat.png",
+      "sha256": "379651de02625dda15ea517e449edec4112b9967ce0d2d3b6fe9a6bc1fe8868b",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Diagnostic de 3 erreurs provoquées ; catégories configuration/environnement/contrôle/limite ; traces repliées ; bouton copier et succès simulé ; aucune clé ni URL visible.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/en/connexion.png",
+      "sha256": "ab1649d8f983c4f6178d4c5853f7a6d2fa1a718f297327738ce413a4d24b9f5e",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Formulaire Ajouter une IA / Add an AI connection ; modèle local d’exemple, http://localhost:11434/v1 ; champ clé vide ; connexion non testée.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-en-etat.png",
+      "sha256": "c1d378f7577c037d3158ee76331988bd405a9afb1b70864242ef982283019797",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Formulaire de limites 30/120/50/3/2 ; motif ui recette ; bouton confirmer encore présent ; aucune clé ni URL.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-en-sombre.png",
+      "sha256": "3cc26331f3f1545489df6c95bdaccc62b6776cffdb9605bbc0b38110c4dff23e",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Formulaire de limites 30/120/50/3/2 ; motif ui recette ; bouton confirmer encore présent ; aucune clé ni URL.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-saved-en-etat.png",
+      "sha256": "6804f9f4f0f56cd0cecf710700c73440c4c6491de44b046687ab974bdd26d99e",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Historique avec révision 1 ; limites 30/120/50/3/2 ; auteur local fpizzi/uid:1001 et motif install guide ; aucun champ de clé ni URL de session.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/admin-saved-en-sombre.png",
+      "sha256": "10e19be2449a6aa46275a50e974808aa5f8c3adae47b25bfe8700396d513d5bd",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Historique avec révision 1 ; limites 30/120/50/3/2 ; auteur local fpizzi/uid:1001 et motif install guide ; aucun champ de clé ni URL de session.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/summary-en-etat.png",
+      "sha256": "30a54b451fc15dbaeff5de1c4e98f3dfc43433479ef172517e62779f5d78f042",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Summary before authorization ; provider Select ; limits 20/40 ; AI to choose, Validation to choose, Preflight not run ; aucun agent lancé.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/preflight-details-en-sombre.png",
+      "sha256": "42443f5a84284717665826710b4548f7b24bf59d45764744241cebe92feb027b",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Modale technique ready/verified, exécutable et limites valides, sonde/dossier/écriture temporaire ; quantité d’octets ; ni chemin précis, ni clé, ni URL.",
+      "secret_visible": false
+    },
+    {
+      "path": "docs/screenshots/installation/diagnostic-en-etat.png",
+      "sha256": "a3958e9f31a8c4ea5ff6fa78659b6b0309e63ba735de7529d08ba5e5aaa111ca",
+      "observer": "Codex — contexte distinct du producteur Claude de T8",
+      "observation": "Diagnostic de 3 erreurs provoquées ; catégories configuration/environnement/contrôle/limite ; traces repliées ; bouton copier et succès simulé ; aucune clé ni URL visible.",
+      "secret_visible": false
+    }
+  ]
+}

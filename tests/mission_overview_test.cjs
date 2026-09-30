@@ -41,3 +41,6 @@ assert.ok(supervision);assert.match(text(supervision),/vérification en retard/)
 const coordination=host.children.find(e=>e.className==='mission-coordination');assert.ok(coordination);assert.equal(coordination.attributes['aria-label'],'Coordination de la mission');assert.deepEqual(Array.from(coordination.children.slice(1),e=>e.children[0].textContent),['Travail','Attente','Échanges','Vérification']);assert.match(text(coordination),/Assembler attend Produire/);assert.match(text(coordination),/Acteur : Le superviseur/);assert.match(text(coordination),/18 sept\. 2026/);
 const noAction=new Element('section');m.status(noAction,{...base,total:0,authorized:true,enabled:false,supervision:{state:'absent'}},false);assert.match(text(noAction),/aucune action enregistrée/);assert.doesNotMatch(text(noAction),/Conducteur Swarm observé/);
 console.log('PASS: décisions de pilotage, coordination A8, triplet factuel, diagnostic Q3 et supervision Q5');
+
+const safeCopy=m.diagnosticText({attempt_id:'SECRET',observed_errors:3,summary:'Bearer SECRET',items:[{category:'check',label:'SECRET',cause:'SECRET',action:'https://private/session',traces:['SECRET']},{category:'__proto__',cause:'SECRET'}]});
+assert.doesNotMatch(safeCopy,/SECRET|https?:/);assert.match(safeCopy,/Examiner la trace/);assert.match(safeCopy,/Cause inconnue/);

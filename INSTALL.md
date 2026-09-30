@@ -81,6 +81,10 @@ Dans **IA et connexions**, ajoutez le nom, l’adresse du service, l’identifia
 
 Le protocole attendu est compatible avec `POST /chat/completions`. Une connexion API peut servir à préparer, planifier ou examiner un rapport. Elle ne donne pas automatiquement des outils d’accès aux fichiers.
 
+![Formulaire Ajouter une IA rempli, avant enregistrement](docs/screenshots/connexion.png)
+
+*Capture réelle du formulaire rempli (fournisseur local d’exemple, champ de clé vide) : ni testé ni enregistré, « Connexion non testée dans ce formulaire » est affiché. Aucune clé n’apparaît. Cliquez **Tester la connexion** puis **Enregistrer la connexion** ; l’enregistrement ne prouve pas que le service répond.*
+
 Avec le réseau hôte Linux, une API locale peut être joignable par exemple à `http://127.0.0.1:11434/v1`, si vous avez effectivement lancé un service compatible à cette adresse.
 
 ### Agents capables de modifier le projet
@@ -240,6 +244,14 @@ de certaines migrations ne remplacent pas cette sauvegarde complète.
 
 Capture réelle du parcours français : mission Administration lancée depuis les écrans, le 29 septembre 2026. Le lancement ne prouve pas la réussite des huit tâches ; les résultats restent à examiner.
 
+### Trois états à ne pas confondre
+
+| État | Ce que vous voyez | Ce que cela prouve | Capture |
+| --- | --- | --- | --- |
+| Formulaire rempli | Valeurs saisies, aperçu « valeurs actuelles » avant confirmation | Rien n’est écrit : la révision n’a pas changé | `admin-fr-etat.png`, `admin-fr-sombre.png` |
+| Configuration enregistrée | Révision 1 dans la portée et dans l’historique, auteur et motif | Les valeurs seront utilisées par les **prochains départs** | `admin-saved-fr-etat.png`, `admin-saved-fr-sombre.png` |
+| Lancement effectif | Tâche en cours, tentative active dans le pilotage | Un agent a démarré ; ni résultat, ni acceptation | `mission-lancee-fr.png` |
+
 **Point de vigilance :** le parcours actuel comporte une autorisation de l’équipe, puis un lancement dans le pilotage. Si aucune tâche ne démarre, consultez le motif affiché avant toute nouvelle tentative.
 
 
@@ -259,6 +271,12 @@ Ouvrez **Administration** dans le cockpit (passez en mode expert si cette rubriq
 
 ![Même formulaire en thème sombre](docs/screenshots/installation/admin-fr-sombre.png)
 
+![Administration en français, thème clair : configuration enregistrée en révision 1](docs/screenshots/installation/admin-saved-fr-etat.png)
+
+*Capture réelle, racine temporaire isolée, 30 septembre 2026 : après confirmation, la révision 1 est lue par le CLI (`run-limits show`) et apparaît dans l’historique. C’est une configuration enregistrée, pas un lancement. Le badge de version du serveur est visible dans la colonne de gauche.*
+
+![Configuration enregistrée, thème sombre](docs/screenshots/installation/admin-saved-fr-sombre.png)
+
 Le **mode observation**, lorsqu’il est explicitement autorisé pour une mission, conserve les compteurs mais retire les coupures d’exécution couvertes par ce mode. Il ne supprime ni les quotas du fournisseur, ni la revue, ni les conditions d’acceptation. Il n’est pas un moyen de contourner une erreur fournisseur 429. La rubrique **Budgets et coûts IA** distingue les coûts rapportés des coûts inconnus ; un coût inconnu ne vaut pas zéro.
 
 ### Retrouver les mêmes réglages dans le CLI
@@ -272,6 +290,10 @@ swarm --root /chemin/du/projet run-limits effective ID_MISSION worker ID_TACHE
 ```
 
 Le tiret représente une valeur vide. Les commandes `apply` et `rollback` utilisent un fichier JSON, une révision attendue et un identifiant d’événement ; voir le [guide d’utilisation](GUIDE-UTILISATEUR.md) pour le parcours général. Le CLI et le web appliquent les mêmes règles du moteur.
+
+## Version du serveur et liens vers une mission supprimée
+
+Le badge **Version** du rail gauche affiche la révision de build du serveur. Elle est comparée au dépôt Git local, sans requête réseau : si la révision est absente, l’état « inconnu » est affiché ; si la comparaison est impossible, elle est signalée comme dégradée. Un `*` indique un arbre de travail modifié au moment de la compilation. Un lien vers une mission supprimée affiche un message clair et l’action **Choisir une mission**, qui ouvre la gestion des missions.
 
 ## Lire le récapitulatif et partager un diagnostic
 
@@ -306,3 +328,18 @@ Les captures d’Administration proviennent de `tests/run_limits_admin_ui.cjs` ;
 ![Diagnostic d’une tentative de test interrompue](docs/screenshots/installation/diagnostic-fr-etat.png)
 
 *Erreurs provoquées par la recette pour démontrer le diagnostic. Le message « Diagnostic copié » provient d’un presse-papiers simulé dans ce test, pas d’un essai de partage externe.*
+
+## Erreurs rencontrées et résolution
+
+Observations réelles du 29 septembre 2026 (mission Administration pilotée depuis les écrans). Détail : [RETEX](docs/RETEX-ADMIN-PREPARATION.md).
+
+| Erreur ou friction | Résolution |
+| --- | --- |
+| L’autorisation de l’équipe ne démarre pas les agents | Cliquez ensuite **Lancer la mission** dans le pilotage ; vérifiez qu’une tentative est active. |
+| La validation automatique refuse le plan | Elle exige une commande de contrôle par critère, y compris documentaire : ajoutez de vraies commandes ou choisissez la revue humaine. Aucun contrôle factice. |
+| Une tâche déclare des exigences « non définies » | Le contexte transmis était incomplet : révisez le plan pour inclure les définitions, puis reprenez. Les tentatives consommées restent comptées. |
+| Revue indépendante interrompue (citation introuvable) | Ce n’est pas une validation. Relancer la revue depuis le cockpit sur le même rapport ; ne pas forcer l’acceptation. |
+| Responsable sans réponse finale après son délai | Consulter l’activité de la session ; la reprise n’augmente pas silencieusement les limites. |
+| Le bouton « Soumettre le rapport » bloquait la revue | Défaut du moteur corrigé ; la réparation passe par le même bouton, sans modifier la base à la main. |
+
+Ne modifiez jamais directement `.swarm/state.db` pour contourner une erreur.

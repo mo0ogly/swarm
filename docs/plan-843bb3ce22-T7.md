@@ -1,58 +1,165 @@
 # T7 — Résumé de lancement et diagnostic copiable
 
-## Résultat et limite actuelle
+## Reprise courante — revue rédactionnelle du 30 septembre 2026
 
-L’implémentation Claude a été récupérée après son interruption fournisseur 429 : 127 appels d’outils et 127 résultats sont conservés. Codex a repris directement les fichiers et corrigé la recette des thèmes ; cette intervention externe ne transforme pas la tentative Claude en exécution réussie et ne constitue pas une vérification indépendante.
+Ce rapport décrit le candidat courant. L’historique intégral est conservé dans
+`docs/history/T7-20260930-before-final-review.md` ; ses anciennes conclusions ne
+sont pas des observations du candidat actuel. Base Git :
+`7110a0b805caf4be1bb09a57b776176b8dc52a68`, avec modifications non commitées.
+Production initiale : `a-b7e759aea886550cc74b69fa`. Dernière tentative :
+`a-cde55af340e16467351f8d98`, décrite ci-dessous.
+La sécurisation de la copie et le test hostile sont des corrections externes
+Codex après cette tentative ; ils ne sont pas attribués au worker Claude.
+Le contrôle moteur de la dernière tentative est passé le 30 septembre 2026
+à 14:48:25 UTC (code 0, environ 21 secondes). Le nouvel examen de ce rapport
+exige un reçu renouvelé car son contenu a changé.
 
-Mission : `w-843bb3ce22cff2965c5e77b6`. Tâche : `plan-843bb3ce22-T7`.
-Tentative interrompue : `a-2274571f4df60c2ea5dbff23`, agent `auto-c4a11448f63053bb705e`.
-Base Git : `097e745a9b1404f16ed6fdf4ad32124a3f661e05`, modifications non commitées conservées.
-État : candidat à examiner, aucune acceptation déclarée.
+### req-22 / critère 3 — textes examinés et jugement motivé
 
-## Changements
+Relecture par Codex des captures réelles issues de la recette navigateur, et du
+code des assertions `tests/prelaunch_diagnostic_ui.cjs` (résumé et prévol lignes
+50–105, diagnostic lignes 150–175). Cette relecture est une intervention externe
+du superviseur, **pas un avis indépendant** et pas une acceptation de la tâche.
+Le contenu ci-dessous permet d'examiner la rédaction elle-même, au-delà d'une
+simple déclaration « traduction présente ».
 
-- `web/prephase-conversion.js`, `web/prepare.html` : récapitulatif des plafonds du plan et des rôles responsable/vérificateur, prérequis de fournisseur, résolution des modèles, dossier, validation et prévol.
-- `web/mission.js` : bouton copier le diagnostic (cause, tentative, version, action) ; les traces détaillées ne sont pas copiées. Le refus du presse-papiers donne un message explicite.
-- `web/prephase-editor.js` : état initial et bouton corrects en éditeur simple, messages distinguant les deux modes. Retrait de la mention sur les petits écrans de l’infobulle.
-- Traduction de la dépendance vide « aucune » dans la conversion anglaise.
-- `tests/prelaunch_diagnostic_ui.cjs` : deux thèmes réellement contrôlés dans le DOM, captures cadrées, assertion du refus de permission, clic robuste aux rafraîchissements du cockpit.
+| Situation | Texte français observé | Texte anglais observé | Analyse de compréhension |
+| --- | --- | --- | --- |
+| Récapitulatif | Récapitulatif avant autorisation | Summary before authorization | Le titre situe l'étape avant toute permission de départ. |
+| Responsabilités | Responsable ; Exécutants ; Revue et acceptation | Owner ; Workers ; Review and acceptance | Trois fonctions séparées, modèles affichés sous chacune ; la revue n'est pas confondue avec la production. |
+| Bornes | Tâches (plan) : 15 max · Appels par rôle (responsable/vérificateur) : 25 max | Tasks (plan): 20 max · Calls per role (owner/reviewer): 40 max | L'unité et la portée sont explicites. Les nombres diffèrent car les captures anglaises reprennent le formulaire initial, avant modification. Ce ne sont pas les plafonds détaillés de tous les exécutants. |
+| Avant contrôle | Vérifier avant le lancement | Check before launch | Verbe d'action et moment du contrôle explicites ; ce bouton ne prétend pas lancer un agent. |
+| Conditions remplies | Conditions vérifiées. Vous pouvez autoriser cette équipe. | Conditions checked. You can authorize this team. | Deux phrases : résultat du contrôle puis prochaine action permise. Ni « démarré », ni « terminé ». La phrase anglaise est aussi vérifiée exactement par la recette. |
+| Aide technique | Voir le détail des vérifications | Pre-launch check details (titre de la modale) | Les états ready/verified et mesures en octets figurent dans une modale, non dans le message principal. |
+| Effet de l'aide | Ces informations décrivent les contrôles effectués. Elles ne lancent aucun agent. | This information describes the checks performed. It does not start any agent. | Sépare clairement consultation et exécution. |
+| Fermeture | Fermer les détails | Close details | Bouton textuel ; Échap et retour du focus au déclencheur vérifiés. |
+| Copie | Copier le diagnostic ; Diagnostic copié. | Copy diagnostic ; Diagnostic copied. | Action et résultat distincts. Le refus de copie est également testé et ne donne pas de faux succès. |
+| Échec d'un contrôle | Cause : Un test ou contrôle observable a échoué. Conséquence : Le critère couvert par ce contrôle reste non validé. Action disponible : Examiner la trace, corriger la cause, puis rejouer le même contrôle avec les mêmes options avant toute validation. | Cause: An observable test or check failed. Consequence: The criterion covered by this check remains unvalidated. Available action: Inspect the trace, fix the cause, then rerun the same check with the same options before validation. | Cause, impact et prochaine action sont séparés ; aucune validation n'est annoncée prématurément. |
 
-## Contrôles reproductibles
+Captures réellement ouvertes pour cette relecture, dans `test-results/t7-engine/` :
+`summary-ready-etat.png`, `summary-ready-sombre.png`, `summary-en-etat.png`,
+`summary-en-sombre.png`, `diagnostic-copy-etat.png`, `diagnostic-copy-en-etat.png`,
+`preflight-details-fr-sombre.png`, `preflight-details-en-etat.png`.
 
-`python3 tools/verification/t7_prelaunch.py browser` construit un binaire temporaire et exécute la recette sur des racines et bases isolées. Le fichier `test-results/t7-engine/sources.json` lie les résultats aux empreintes des fichiers concernés. `python3 tools/verification/t7_prelaunch.py validation` refuse les preuves périmées.
+Résultat local de la relecture : **PASS sur les textes du parcours T7 examinés**.
+Motifs : verbes d'action explicites, séparation condition/autorisation/départ,
+libellés de rôles distincts, diagnostics cause/conséquence/action, explications
+techniques dans la modale ou les traces repliées. Les formulations observables et leur analyse figurent dans la table ci-dessus.
 
-| Exigence | Preuve contrôlée | Limite |
+Limites : « Preflight not run » reste un terme technique anglais dans la ligne
+synthétique des prérequis, mais le bouton adjacent « Check before launch » et
+« Run launch checks before authorizing this team. » donnent l'action concrète.
+Les diagnostics détaillés restent longs ; leurs traces sont repliées. Cette revue
+ne prétend ni tester la compréhension auprès d'utilisateurs, ni auditer tous les
+textes du produit. Les noms de fournisseur et de modèle ne sont pas traduits.
+Les fixtures et le presse-papiers simulé ne démontrent pas un fournisseur réel.
+L'avis indépendant et la décision finale restent à obtenir.
+
+## Tentative a-cde55af340e16467351f8d98 (départ 3/3, agent auto-5576386e98793d2abaa8, révision 227)
+
+Observation : le reçu `a-b7e759aea886550cc74b69fa.json` (révision 226) indique
+`t7-browser-evidence` en échec, code 1, sortie sha256 `bc781fba…`, 73 s
+(14:45:01–14:46:14). La sortie brute de cet échec n'est pas conservée dans le
+dépôt : **la cause de cet échec n'est pas établie**.
+
+Vérifications de cette tentative (base `7110a0b`, modifications non commitées,
+aucun fichier applicatif modifié) :
+
+| Contrôle | Commande / environnement | Résultat |
 | --- | --- | --- |
-| REQ-SUM-01 / req-20 | Plafonds 20/40 puis 15/25 reflétés, rôles et modèles résolus, prérequis avant/après prévol | Ces plafonds concernent le plan et les rôles de planification/revue, pas tous les paramètres détaillés des exécutants. |
-| REQ-DIAG-01 / req-21 | Cause/tentative/version/action FR/EN, absence d’URL et de chemin de travail dans le diagnostic copié, refus du presse-papiers | Frontière presse-papiers système simulée ; pas une preuve de permission du navigateur personnel. |
-| req-22 | Catalogue bilingue et captures réelles des deux thèmes ; correction des libellés concernés | La clarté de tous les textes reste un jugement de revue ; les détails de prévol sont désormais dans une modale, avec fermeture et retour du focus testés. Ne pas déclarer ce critère accepté par une simple assertion de traduction. |
+| Entrées identiques au reçu | `sha256sum` des 9 entrées du contrôle | PASS : les 9 empreintes sont identiques à celles du reçu (ex. `web/mission.js` 707c551c…, `tests/prelaunch_diagnostic_ui.cjs` 02ecc54d…). |
+| Rejeu 1 | `CHROME_BIN=/usr/bin/google-chrome python3 tools/verification/t7_prelaunch.py all` | PASS, code 0, onze constats, quatorze captures. |
+| Rejeu 2 | Même commande avec `env -u CHROME_BIN` (le test retombe sur `/usr/bin/google-chrome`) | PASS, code 0. |
+| `git diff --check` | racine du dépôt | PASS, code 0. |
 
-Les fournisseurs de la recette sont des fixtures locales. Aucun appel fournisseur réel ni aucune écriture dans la base de la mission réelle pendant ces tests.
+Jugement : mêmes entrées, même commande, deux exécutions réussies ; l'échec du
+reçu n'est **pas reproduit**. Hypothèses non vérifiées (aucune reproduction) :
+contention de ressources ou de navigateur pendant l'exécution du contrôleur, ou
+condition transitoire de l'environnement du contrôleur. Aucune correction de code
+n'est justifiée par une défaillance non reproduite ; aucune assertion n'a été
+affaiblie. Si le contrôleur échoue de nouveau, conserver sa sortie brute pour
+diagnostiquer, puis rejouer avec les mêmes options.
 
-## RETEX ciblé
+Limites : les deux rejeux sont des exécutions locales du worker, pas le contrôle
+du moteur ; le presse-papiers système reste simulé ; fixtures, pas de fournisseur
+réel ; ce n'est pas une revue indépendante ni une acceptation. Ce rapport modifié
+change l'empreinte d'artefact : un reçu renouvelé est nécessaire.
+Prochaine action : le responsable relance le contrôle moteur sur ce candidat.
 
-Le coût des 127 appels ne suffit pas à conclure à une boucle du moteur. Une partie correspond aux itérations de recette navigateur et au presse-papiers sans focus : il faut distinguer appels d’outils, requêtes de modèle et jetons avant toute analyse de coût. Le défaut observé dans la recette est précis : cliquer le bouton de thème derrière une modale ne changeait pas le thème, mais le nom du PNG annonçait malgré tout « sombre ».
+## REQ-DIAG-01 : copie sans texte libre, contrôle de non-divulgation
 
-Prochaine étape : examiner le candidat et les limites ci-dessus, compléter les écarts qualitatifs, puis remettre un rapport via le parcours public de Swarm. La revue Claude est indisponible jusqu’à l’échéance fournisseur annoncée, 2026-09-30 13:00 UTC ; aucun délai effacé et aucune consommation remise à zéro.
+Le diagnostic copié est désormais construit exclusivement à partir de formulations
+contrôlées. `summary`, `label`, `cause`, `action` et `traces` reçus ne sont jamais
+copiés. La catégorie choisit une formulation connue ; une catégorie inconnue
+revient à « Cause inconnue ». L'identifiant de tentative et la révision sont
+limités à leur format hexadécimal, le compteur à un entier positif. Ce choix
+empêche de copier une URL ou un secret arbitraire dans un champ libre, au prix
+de laisser les détails précis dans la console locale.
 
+Extrait exact de `web/mission.js`, implémentation complète de la copie :
 
-## Vérifications exécutées par Codex — 30 septembre 2026
+```javascript
+ diagnosticText(diagnostic){
+  // Copy only controlled wording and typed identifiers. Free provider text,
+  // summaries, causes, actions and traces never cross the clipboard boundary.
+  const version=globalThis.RuntimeHealthPanel?.value?.version;
+  const revision=String(version?.revision||'');
+  const versionLine=version?.available&&/^[a-f0-9]{12,64}$/i.test(revision)?revision.slice(0,12)+(version.modified?'*':''):tr_web_mission_js('état inconnu');
+  const attempt=/^a-[a-f0-9]{16,64}$/i.test(String(diagnostic.attempt_id||''))?diagnostic.attempt_id:tr_web_mission_js('état inconnu');
+  const count=Number.isSafeInteger(diagnostic.observed_errors)&&diagnostic.observed_errors>=0?diagnostic.observed_errors:0;
+  const summary=count===0?'Aucune erreur d’outil structurée n’a été observée.':count===1?'1 erreur d’outil observée pendant cette tentative.':count+' erreurs d’outil observées pendant cette tentative.';
+  const wording={
+   configuration:['Configuration','La configuration nécessaire au lancement ou à l’outil est absente, invalide ou indisponible.','Corriger la configuration indiquée, vérifier qu’elle est relue, puis demander explicitement une nouvelle tentative.'],
+   environment:['Environnement d’exécution','Les traces signalent un refus d’accès ou une ressource indisponible dans l’environnement.','Faire vérifier les droits et l’accès aux ressources sur la machine qui exécute l’agent ; reprendre après correction vérifiée.'],
+   check:['Contrôle en échec','Un test ou contrôle observable a échoué.','Examiner la trace, corriger la cause, puis rejouer le même contrôle avec les mêmes options avant toute validation.'],
+   tool:['Outil','Un outil appelé pendant la tentative a signalé un échec.','Examiner la trace et les paramètres de l’outil, corriger la cause, puis demander explicitement la reprise.'],
+   limit:['Limite atteinte','Limite d’exécution atteinte.','Examiner les erreurs précédentes et les préconditions ; reprendre explicitement sans relever arbitrairement les protections.'],
+   unknown:['Cause inconnue','La cause exacte n’est pas disponible dans les événements structurés de cette tentative.','Ouvrir les traces conservées et établir la cause avant de choisir une reprise.']
+  };
+  const lines=[tr_web_mission_js('Tentative : ')+attempt,tr_web_mission_js('Version : ')+versionLine,tr_web_mission_js('Cause : ')+missionText(summary),''];
+  for(const item of diagnostic.items||[]){const [label,cause,action]=wording[Object.hasOwn(wording,item.category)?item.category:'unknown'];lines.push(missionText(label)+' — '+missionText(cause),tr_web_mission_js('Action disponible : ')+missionText(action),'');}
+  return lines.join('\n').trim();
+ },
+```
 
-- `python3 tools/verification/t7_prelaunch.py browser` : code 0, dix assertions/parcours annoncés, quatorze captures ; diagnostic anglais vérifié jusque dans les causes/actions, permission de copie refusée également testée.
-- `python3 tools/verification/t7_prelaunch.py delivery` : code 0, empreintes actuelles et captures présentes.
-- `npm test` : code 0 (graphe, pilotage, rafraîchissement, runner d’audit, i18n).
-- `python3 tools/agent-workflows/check.py` et `git diff --check` : code 0.
-- Contrôle visuel : résumé clair/sombre et diagnostic anglais sombre examinés. Anciennes captures aux thèmes mal nommés non retenues.
-- Deux défauts de recette corrigés : clic thème ignoré derrière la modale ; poignée DOM périmée lors du rafraîchissement. Une dépendance `Pilot.command` manquante dans le double du test unitaire a également été ajoutée.
+La recette navigateur injecte des données hostiles à cette frontière. Extrait
+exact de `tests/prelaunch_diagnostic_ui.cjs` :
 
-Empreintes du candidat testé :
+```javascript
+  const hostile=await page.evaluate(()=>Mission.diagnosticText({attempt_id:'token=TOPSECRET',observed_errors:3,summary:'Bearer TOPSECRET https://private/session',items:[{category:'limit',label:'TOPSECRET',cause:'password=TOPSECRET',action:'https://private/session',traces:['TOPSECRET']},{category:'__proto__',cause:'TOPSECRET'}]}));
+  assert.doesNotMatch(hostile,/TOPSECRET|https?:|password=|Bearer/);
+  assert.match(hostile,/Execution limit reached/);assert.match(hostile,/Unknown cause/);
+  checks.push('Copie : champs libres hostiles, secret, URL et catégorie inconnue exclus ; texte issu du catalogue seulement');
+
+```
+
+Les tests de copie FR et EN et de refus du presse-papiers restent conservés.
+La frontière presse-papiers système est simulée : aucune permission du navigateur
+personnel n'est affirmée. Les assertions testent le texte réellement construit
+par Mission.diagnosticText ; elles échoueraient si les champs libres réintégraient
+la copie. Le programme de contrôle reste `python3 tools/verification/t7_prelaunch.py all`.
+
+## État de livraison
+
+REQ-SUM-01 : recette du récapitulatif ; REQ-DIAG-01 : copie contrôlée et test
+hostile explicite ; req-22 : formulations FR/EN fournies avec observations de
+rendu et séparation des détails. Candidat soumis à décision indépendante,
+pas d’acceptation déclarée. Aucun appel producteur supplémentaire.
+
+L'incident historique fournisseur (429, 127 appels) reste documenté dans l'archive.
+
+## Contrôles du candidat corrigé
+
+`npm test` : code 0. `python3 tools/verification/t7_prelaunch.py all` : code 0, onze constats, quatorze captures, aucune erreur JavaScript. Le refus de copie est activé au clavier après les captures pour éviter le déplacement du bouton lors du rafraîchissement. Le test hostile et son assertion sont inclus dans cette exécution. `git diff --check` : code 0.
+
+Empreintes du candidat actuel :
 
 ```json
 {
-  "locales/en.json": "c6fc5d5c470c7663468cdbb678aaae1902d83de66fc8ffa71ec048d5644ac830",
-  "tests/prelaunch_diagnostic_ui.cjs": "62a937fe397c40a55cba86bac677d0c8e680abccade234ae445c0147e89734f5",
-  "web/i18n-en.js": "19fe72e01d9a134e5adebfe1348ca972b4994f20dda9101b1282847bc8233381",
-  "web/mission.js": "59cae9bdcae6f118f11746e072fa5e38b51b8d0ed7631f50f9d3202385df6943",
+  "locales/en.json": "82a2b31b29ed26157b092919690919af29ea3660b08f8083996e5d40126e2a92",
+  "tests/prelaunch_diagnostic_ui.cjs": "02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2",
+  "web/i18n-en.js": "bd15d1fc3f47e31bf45f968fad0cd17e11a3e2cc4967e3f744d2afe7fbe08b97",
+  "web/mission.js": "707c551caf558a26ddc2fce7d824569fed57a87529c3aff7239bbf06a354865a",
   "web/prepare.html": "301246c624aa5994f9c042e1bffe21821b629263efe3a3b44875139fc876c593",
   "web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
   "web/prephase-editor.js": "859de925d60b31720a09d47f9d0ccf05b1b572a8f334d47812f54d4123c942d2",
@@ -60,75 +167,77 @@ Empreintes du candidat testé :
 }
 ```
 
-## Complément de reprise — 30 septembre
+## Assertions exécutées du résumé et des textes FR/EN
 
-Résumé court du prévol et détails dans une modale FR/EN, navigation clavier/focus testée et captures des deux thèmes examinées. Le récapitulatif signale les arguments de contrôles automatiques encore manquants. La documentation INSTALL FR/EN est enrichie en parallèle, avec provenance des captures et distinction entre saisie, enregistrement et lancement. Aucun statut de mission modifié.
+Extrait exact de `tests/prelaunch_diagnostic_ui.cjs`, entrée liée par empreinte
+au contrôle moteur. La navigation lors du changement de langue recrée le
+formulaire : les valeurs par défaut 20/40 sont donc testées en anglais, après
+les valeurs saisies 15/25 en français. La configuration n’est pas enregistrée
+et aucun agent réel n’est lancé dans ces fixtures. Les assertions vérifient
+les nombres, les rôles, les conditions manquantes, les textes exacts et le
+placement des détails dans la modale.
 
-## Historique de la tentative Claude (conservé)
+```javascript
+  // REQ-SUM-01 — before any choice: provider, validation and preflight missing.
+  let limits=await page.$eval('#summary-limits',e=>e.textContent);
+  assert.match(limits,/Tâches \(plan\) : 20 max/);assert.match(limits,/Appels par rôle \(responsable\/vérificateur\) : 40 max/);
+  let prereq=await page.$eval('#summary-prerequisites',e=>e.textContent);
+  assert.match(prereq,/IA à choisir/);assert.match(prereq,/Validation à choisir/);assert.match(prereq,/Prévol non exécuté/);
+  assert.doesNotMatch(prereq,/Dossier de travail à indiquer/,'default workspace "." must not be reported as missing');
+  checks.push('Résumé initial : limites par défaut et 3 prérequis manquants affichés (REQ-SUM-01)');
 
-# Suivi — T7 — Résumé de lancement, diagnostic copiable et textes utiles
+  // Effective limits reflect the live caps before any launch.
+  await fill(page,'#organization-tasks','15');await fill(page,'#organization-calls','25');
+  await page.waitForFunction(()=>document.getElementById('summary-limits').textContent.includes('15 max'));
+  limits=await page.$eval('#summary-limits',e=>e.textContent);assert.match(limits,/Tâches \(plan\) : 15 max · Appels par rôle \(responsable\/vérificateur\) : 25 max/);
+  checks.push('Limites effectives suivent les plafonds saisis sans relance manuelle (REQ-SUM-01)');
 
-Mission w-843bb3ce22cff2965c5e77b6, tâche plan-843bb3ce22-T7, agent
-auto-c4a11448f63053bb705e, tentative a-2274571f4df60c2ea5dbff23, départ 1/3.
-Racine de travail : `/home/fpizzi/workspace/swarm-engine-contract/source`
-(branche `codex/engine-review-contract`, arbre de travail avec modifications
-préexistantes non liées à cette tâche).
+  await page.select('#organization-provider','recette');await page.select('#organization-validation','human');await page.waitForFunction(()=>document.getElementById('organization-model').textContent.includes('Modèles résolus'));
+  assert.match(await page.$eval('#summary-owner',e=>e.textContent),/recette/);assert.match(await page.$eval('#summary-workers',e=>e.textContent),/1/);assert.match(await page.$eval('#summary-review',e=>e.textContent),/recette/);
+  prereq=await page.$eval('#summary-prerequisites',e=>e.textContent);assert.doesNotMatch(prereq,/IA à choisir/);assert.doesNotMatch(prereq,/Validation à choisir/);assert.match(prereq,/Prévol non exécuté/);
+  checks.push('Rôles et modèles effectifs résolus ; prérequis restant = prévol uniquement (REQ-SUM-01)');
+  for(const theme of ['etat','sombre'])await captureTheme(page,theme,'summary-missing-'+theme+'.png','#organization-summary');
 
-## Critères — état initial (non vérifiés)
+  await page.click('#organization-preflight');await page.waitForFunction(()=>document.getElementById('organization-preflight-status').classList.contains('success'));
+  prereq=await page.$eval('#summary-prerequisites',e=>e.textContent);assert.equal(prereq,'Aucun prérequis manquant — prêt à autoriser.');
+  checks.push('Prérequis manquants vides après prévol exploitable (REQ-SUM-01)');
+  assert.equal(await page.$eval('#organization-preflight-status',e=>e.textContent),'Conditions vérifiées. Vous pouvez autoriser cette équipe.');
+  assert.doesNotMatch(await page.$eval('#organization-preflight-status',e=>e.textContent),/ready|verified|octets/);
+  await page.click('#organization-preflight-details');
+  await page.waitForSelector('#preflight-details-dialog[open]');
+  assert.match(await page.$eval('#preflight-details-content',e=>e.textContent),/ready|compatible/);
+  for(const theme of ['etat','sombre'])await captureTheme(page,theme,'preflight-details-fr-'+theme+'.png','#preflight-details-dialog');
+  // Native Escape returns to the form and restores focus to the trigger.
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(()=>!document.getElementById('preflight-details-dialog').open&&document.activeElement.id==='organization-preflight-details');
+  await page.select('#organization-validation','automatic');
+  assert.match(await page.$eval('#summary-prerequisites',e=>e.textContent),/Précisez les arguments/);
+  await page.select('#organization-validation','human');
+  checks.push('Détails techniques dans une modale, Échap/focus corrects ; contrôles manquants signalés avant autorisation');
 
-- req-20 — Résumé fidèle aux limites et rôles effectifs : NON VÉRIFIÉ
-- req-21 — Diagnostic copié sans secret ni URL de session : NON VÉRIFIÉ
-- req-22 — Textes du parcours compréhensibles en FR/EN, détails techniques dans
-  les aides : NON VÉRIFIÉ
+  for(const theme of ['etat','sombre'])await captureTheme(page,theme,'summary-ready-'+theme+'.png','#organization-summary');
 
-## Constat initial (lecture, avant modification)
+  // FR/EN — labels translated, no rebuild of the screen.
+  await page.keyboard.press('Escape');
+  await Promise.all([page.waitForNavigation(),page.select('#swarm-language','en')]);
+  await page.waitForFunction(()=>document.documentElement.lang==='en');
+  await waitAction('convert');await page.click('#advance');await page.waitForSelector('#conversion-dialog[open]');
+  limits=await page.$eval('#summary-limits',e=>e.textContent);assert.match(limits,/Tasks \(plan\): 20 max/);assert.match(limits,/Calls per role \(owner\/reviewer\): 40 max/);
+  prereq=await page.$eval('#summary-prerequisites',e=>e.textContent);assert.match(prereq,/AI to choose|Validation to choose|Preflight not run/);
+  checks.push('Textes du résumé traduits en anglais sans changer la structure de l’écran (req-22)');
+  for(const theme of ['etat','sombre'])await captureTheme(page,theme,'summary-en-'+theme+'.png','#organization-summary');
+  await page.select('#organization-provider','recette');await page.select('#organization-validation','human');
+  await page.waitForFunction(()=>document.getElementById('organization-model').textContent.includes('Models resolved'));
+  await page.click('#organization-preflight');
+  await page.waitForFunction(()=>document.getElementById('organization-preflight-status').classList.contains('success'));
+  assert.equal(await page.$eval('#organization-preflight-status',e=>e.textContent),'Conditions checked. You can authorize this team.');
+  await page.click('#organization-preflight-details');
+  assert.equal(await page.$eval('#preflight-details-title',e=>e.textContent),'Pre-launch check details');
+  assert.match(await page.$eval('#preflight-details-content',e=>e.textContent),/executable and limits valid/);
+  assert.doesNotMatch(await page.$eval('#preflight-details-content',e=>e.textContent),/octets disponibles|dossier lisible|sonde configurée/);
+  for(const theme of ['etat','sombre'])await captureTheme(page,theme,'preflight-details-en-'+theme+'.png','#preflight-details-dialog');
+  await page.click('[data-close="preflight-details-dialog"]');
+  await page.waitForFunction(()=>document.activeElement.id==='organization-preflight-details');
+  checks.push('English preflight: short explanation, translated details dialog and focus restored');
 
-- T4 et T6 (dépendances de gate d'entrée) ont chacun un rapport daté du
-  2026-09-30 avec preuves PASS (`docs/T4-web-admin.md`, `docs/T6-quick-wins.md`).
-  Acceptation effective non vérifiée par cette tentative (hors périmètre) ;
-  seule la présence de preuves datées est constatée ici.
-- `docs/T1-inventaire-existant.md` (Lot 0) documente déjà précisément l'écart
-  REQ-SUM-01 (`web/pilot-actions.js` résumé partiel, rôles/modèles par tâche et
-  prérequis manquants absents) et REQ-DIAG-01 (aucun bouton copier/
-  `navigator.clipboard` trouvé côté web ; backend `attempt_diagnostic.go`
-  réutilisable).
-- Recherche complémentaire cette tentative : le vrai « résumé pré-lancement »
-  couvrant rôles/modèles est `#organization-summary` dans `web/prepare.html`
-  (alimenté par `PreparationConversion.updateSummary()` dans
-  `web/prephase-conversion.js`), pas le bloc `#prepared-launch-summary` de
-  `web/pilot-actions.js` (qui ne concerne que la reprise d'un lancement déjà
-  préparé). Il manque les limites effectives (plafonds tâches/appels) et les
-  prérequis manquants.
-- `locales/en.json` contient des entrées orphelines (jamais appelées dans
-  `web/*.js`) correspondant exactement aux thèmes cités dans le périmètre :
-  éditeur adapté aux petits écrans, bascule éditeur enrichi, mode Tab, prévol.
-  `web/prephase-editor.js:37` (`toggle()`) a un bug réel : les deux branches du
-  ternaire appellent `modeMessage` avec le même texte, donc le message affiché
-  ne distingue jamais éditeur simple/enrichi ; de plus la branche « simple dès
-  le départ » de `initialize()` (petits écrans) n'appelle jamais `showMode()`,
-  donc le libellé du bouton de bascule reste incorrect au chargement sur petit
-  écran.
-
-## Plan d'action (ciblé, sans redonner les écrans)
-
-1. Étendre `#organization-summary` (REQ-SUM-01) : deux lignes `<dt>/<dd>`
-   supplémentaires — limites effectives (plafonds tâches/appels) et prérequis
-   manquants — calculées dans `updateSummary()`.
-2. Ajouter un bouton « Copier le diagnostic » (REQ-DIAG-01) dans
-   `Mission.diagnosticView()` (`web/mission.js`), source de données =
-   `AttemptDiagnostic` déjà transmis (cause/tentative/version/prochaine
-   action), sans traces techniques ni URL de session dans le texte copié.
-3. Corriger le bug de bascule d'éditeur (`web/prephase-editor.js`) en
-   réutilisant les libellés déjà traduits mais orphelins, au lieu d'en
-   inventer de nouveaux.
-4. Ajouter les nouvelles clés de traduction strictement nécessaires à 1 et 2
-   dans `locales/en.json`, régénérer `web/i18n-en.js` via
-   `npm run i18n:build`.
-5. Contrôles : `go build ./...`, `node tests/i18n_test.cjs`, recette
-   navigateur ciblée (à écrire/adapter), `npm run test:i18n-ui` si le temps le
-   permet sans dépasser le périmètre.
-
-## Prochaine action
-
-Implémenter les points 1 à 4 ci-dessus, puis rejouer les contrôles listés au
-point 5 et mettre à jour ce fichier avec les résultats réels.
+```

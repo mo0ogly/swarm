@@ -12,14 +12,14 @@ import (
 // prose claims never become execution receipts. Failed/stale checks retain the
 // task without spending a review call.
 func (s *Store) independentValidationEvidence(t *Task) (string, map[string]string, error) {
-	if t.ValidationPolicy == nil || t.ValidationPolicy.Mode != "automatic" {
+	if t.ValidationPolicy == nil || len(t.ValidationPolicy.Controls) == 0 {
 		return "", nil, nil
 	}
 	a := t.AutoValidation
-	if a == nil || a.Attempt != latestAttemptID(t) || a.Controller != validationController || a.PolicyDigest != validationPolicyDigest(*t.ValidationPolicy) || !s.validGate(t) {
+	if a == nil || a.Attempt != latestAttemptID(t) || a.Controller != validationController || a.PolicyDigest != validationPolicyDigest(*t.ValidationPolicy) || (t.ValidationPolicy.Mode == "automatic" && !s.validGate(t)) {
 		return "", nil, fmt.Errorf("contrôles moteur courants requis avant la revue")
 	}
-	if a.State != "pending_review" && a.State != "accepted" {
+	if a.State != "pending_review" && a.State != "accepted" && a.State != "pending_human" {
 		return "", nil, fmt.Errorf("contrôles non réussis")
 	}
 	if len(a.Controls) != len(t.ValidationPolicy.Controls) || a.Receipt == "" || a.Artifacts[a.Receipt] == "" {
@@ -43,6 +43,9 @@ func (s *Store) independentValidationEvidence(t *Task) (string, map[string]strin
 // Reuse the frozen controls, never run them again just because the reviewer
 // finished. Acceptance still checks authorization, current evidence and review.
 func (s *Store) acceptReviewedValidation(w Work, t *Task, a Agent) (bool, string) {
+	if t.ValidationPolicy == nil || t.ValidationPolicy.Mode != "automatic" {
+		return false, "Décision humaine requise."
+	}
 	if _, _, err := s.independentValidationEvidence(t); err != nil {
 		return false, err.Error()
 	}
@@ -55,7 +58,7 @@ func (s *Store) acceptReviewedValidation(w Work, t *Task, a Agent) (bool, string
 		if err != nil {
 			return err
 		}
-		if task.Status != "submitted" || task.AutoValidation == nil || task.AutoValidation.Attempt != a.Attempt || task.AutoValidation.State != "pending_review" {
+		if task.ValidationPolicy == nil || task.ValidationPolicy.Mode != "automatic" || task.Status != "submitted" || task.AutoValidation == nil || task.AutoValidation.Attempt != a.Attempt || task.AutoValidation.State != "pending_review" {
 			return fmt.Errorf("validation remplacée")
 		}
 		if _, _, err = s.independentValidationEvidence(task); err != nil {

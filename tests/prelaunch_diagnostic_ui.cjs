@@ -168,10 +168,16 @@ time.sleep(2)
   for(const text of ['Attempt: ','Version: ','Cause: ','Available action: '])assert.match(copied,new RegExp(escapeRegExp(text)));
   assert.doesNotMatch(copied,/https?:\/\//,'copied diagnostic must not contain a session URL (en)');
   assert.match(copied,/3 tool errors observed/);assert.match(copied,/Execution environment/);assert.match(copied,/Inspect the trace, fix the cause/);assert.doesNotMatch(copied,/erreurs d’outil|La configuration nécessaire|Faire vérifier|Examiner la trace/);
+  const hostile=await page.evaluate(()=>Mission.diagnosticText({attempt_id:'token=TOPSECRET',observed_errors:3,summary:'Bearer TOPSECRET https://private/session',items:[{category:'limit',label:'TOPSECRET',cause:'password=TOPSECRET',action:'https://private/session',traces:['TOPSECRET']},{category:'__proto__',cause:'TOPSECRET'}]}));
+  assert.doesNotMatch(hostile,/TOPSECRET|https?:|password=|Bearer/);
+  assert.match(hostile,/Execution limit reached/);assert.match(hostile,/Unknown cause/);
+  checks.push('Copie : champs libres hostiles, secret, URL et catégorie inconnue exclus ; texte issu du catalogue seulement');
   checks.push('Diagnostic copié en anglais avec les mêmes garanties (req-21, req-22)');
   for(const theme of ['etat','sombre'])await captureTheme(page,theme,'diagnostic-copy-en-'+theme+'.png','.mission-task .mission-diagnostic');
   await page.evaluate(()=>{navigator.clipboard.writeText=()=>Promise.reject(new Error('clipboard denied'))});
-  await page.locator('.mission-task .mission-diagnostic-copy button').click();
+  // Keyboard activation also works after screenshot scrolling in the long panel.
+  await page.focus('.mission-task .mission-diagnostic-copy button');
+  await page.keyboard.press('Enter');
   await page.waitForFunction(()=>document.querySelector('.mission-task .mission-diagnostic-copy p')?.textContent.includes('Copy failed'));
   checks.push('Refus du presse-papiers : erreur explicite, aucun faux succès');
   await page.close();

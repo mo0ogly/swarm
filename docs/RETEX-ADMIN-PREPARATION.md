@@ -884,3 +884,135 @@ Le compteur public reste 6/8 : cette intervention n’est pas une acceptation in
 ### Suite T7/T8 pendant le quota fournisseur
 
 Les détails techniques du prévol sont maintenant dans une modale ; son ouverture, Échap, fermeture explicite et retour du focus sont contrôlés en FR/EN. Le récapitulatif ne masque plus les arguments de validation automatique manquants. Documentation INSTALL FR/EN complétée avec Administration, lecture CLI, diagnostic, reprise et captures réelles de fixtures isolées légendées. Ces travaux locaux ne sont ni une nouvelle tentative fournisseur ni une acceptation des tâches T7/T8.
+
+
+## 30 septembre — Reprise après 15 h : preuve CI liée au mauvais candidat
+
+Le compteur a régressé à 4/8 : T5 avait des preuves modifiées et T4 dépendait
+de T5. Le script de validation T5 gardait en dur le commit c5f1dea9131 et
+le run 36628140996, alors que le HEAD 7110a0b disposait du run 36719933441
+terminé avec succès. Reproduction : `t5_ci.py identity` refusait package.json.
+Ce refus ne prouvait pas un défaut du modèle : le contrôleur comparait deux
+révisions différentes. Le remplacement des deux références a fait passer
+identity puis ci (job et journal distant vérifiés).
+
+Correction : conserver les contrôles, actualiser leur référence et leur empreinte
+préautorisée depuis le web, puis soumettre le rapport existant. Aucun plafond de
+tentatives relevé, aucune consommation remise à zéro. Le rejeu navigateur et
+mutation reste nécessaire et son résultat est distinct de cette correction.
+Amélioration à généraliser : lier le commit et le run à un manifeste versionné
+de candidat ; signaler explicitement « référence de contrôle périmée » avant de
+proposer une nouvelle exécution de développement. Ne jamais suivre HEAD
+silencieusement pour transformer un contrôle ancien en preuve actuelle.
+
+Les alias Claude donnaient encore Sonnet 5. Les identifiants Sonnet 5.5 et
+Opus 5.5 sont désormais sélectionnables ; politique fournisseur et rôles de
+mission mis à jour via le web, deux réponses réelles reçues. Les avis historiques
+conservent leur modèle d'origine. Un test de connexion ne valide aucun livrable.
+
+### Correction : contrôles moteur et décision humaine sont deux dimensions
+
+Sur T7, la politique humaine ne permettait pas de fournir de `engine_controls`.
+Le vérificateur recevait donc des déclarations du producteur, sans reçu moteur,
+et demandait des preuves. Relancer le producteur ne réparait pas ce défaut du
+contrat d’évidence.
+
+Le moteur accepte désormais des contrôles explicitement autorisés en mode humain.
+Le reçu reste `pending_human` : aucune acceptation automatique, aucune libération
+de dépendance. Les fichiers `inputs` et le rapport sont empreints ; une preuve
+modifiée est refusée. Modifier la politique archive l’avis précédent, sans
+rembourser les appels, et reste interdit pendant une revue active. Un reçu humain
+courant est ignoré par la reprise des contrôles, pour ne pas affamer les tâches
+suivantes ni produire une nouvelle entrée à chaque passage du conducteur.
+
+La recette isolée couvre le succès sans acceptation, le maintien des dépendances,
+l’échec de commande, les chemins hors projet, la modification des preuves et le
+changement de politique pendant une revue. Le formulaire a été exercé en FR/EN,
+clair/sombre, jusqu’à sa persistance. Cela qualifie ce contrat précis ; cela ne
+signifie pas que T7 ou la mission entière est acceptée. Les fichiers non déclarés
+ne sont pas surveillés et les critères qualitatifs exigent toujours leur jugement.
+
+Vérification sur la mission réelle, 30 septembre 2026 : la politique humaine de
+T7 a été configurée via le formulaire puis le rapport existant soumis à nouveau.
+Le moteur a exécuté `python3 tools/verification/t7_prelaunch.py all` en 21 secondes
+(code 0), enregistré 11 empreintes (neuf entrées, rapport, reçu) et conservé
+`pending_human`. Le vérificateur a reconnu les preuves des critères 1 et 2 ; il
+maintient le critère 3 inconnu (clarté des textes non démontrée). Deux tentatives
+producteur avant et après : aucune relance de développement. La mission reste
+à 6/8 ; cet essai démontre la transmission de preuve, pas la clôture de T7.
+
+La lecture du cockpit après cet essai a détecté un second défaut : la projection
+appelait le reçu humain « stale » en l’absence de gate, alors que ses empreintes
+étaient courantes. Le calcul utilise désormais le reçu vérifié pour les contrôles
+humains, indépendamment de l’acceptation. Test avec modification du rapport :
+`fresh` puis `stale`, jamais une acceptation implicite. Après redémarrage, la modale
+réelle affiche preuve `fresh` et acceptation `not_accepted`, avec le troisième
+critère toujours insuffisant.
+
+Validation de la correction : tests ciblés moteur et projection PASS, test `-race`
+PASS, `go vet ./...` PASS, `npm test` PASS, recette formulaire FR/EN × deux thèmes
+PASS, parcours CLI preview/apply isolé PASS, contrat des méthodes et diff-check
+PASS. La suite globale `go test -timeout 25m ./...` a terminé en 1293 secondes
+avec un seul échec : `TestEngineContractRevisionKillsInferenceOnContractMutation`
+mesure 1,8337 s pour un seuil de 1,8 s. Le chronomètre inclut la préparation
+antérieure au démarrage du vérificateur. Rejeu isolé du même test, sans le modifier,
+`-count=3` : PASS (5,530 s total). Ce résultat suggère une sensibilité temporelle
+à la charge, sans démontrer sa cause ; la suite globale n’est pas déclarée verte.
+Les derniers ajustements de fraîcheur ont leur recette ciblée PASS ; ils n’ont
+pas fait l’objet d’un second passage complet de 21 minutes.
+
+### Clôture du parcours réel : huit tâches validées
+
+Le 30 septembre 2026, l’acceptation de T7 puis de T8 a été enregistrée depuis
+les modales du cockpit, après examen des gates et des preuves courantes. La
+révision 255 affiche « Tous les résultats sont validés. 8/8 tâches validées »
+et zéro agent actif. Les tentatives et avis antérieurs restent conservés.
+Aucune écriture directe dans la base ni appel d’API de mutation n’a servi à
+cette clôture.
+
+T7 : le rapport a été complété avec les résultats observables des contrôles et
+les textes réellement affichés. La revue indépendante a accepté les trois
+critères ; la gate comporte six contrôles PASS. Une reprise de production
+n’était pas nécessaire pour compléter ces preuves.
+
+T8 : la production a utilisé 27 appels d’outils. Les guides français et anglais
+conservent toutes leurs lignes initiales et ajoutent chacun 37 lignes. Les
+captures distinguent formulaire rempli, configuration enregistrée et lancement
+réel. La capture du lancement demeure française, explicitement légendée dans
+le guide anglais ; aucun lancement anglais n’est inventé. Le contrôle moteur
+rejoue une configuration isolée, lit sa révision depuis le CLI et vérifie les
+empreintes des 17 images. Il ne prétend pas juger les pixels.
+
+Un défaut majeur du contrat de revue a été confirmé : un critère visuel ne peut
+pas être établi avec le seul texte du rapport. Le moteur transmet maintenant
+au vérificateur Claude les pixels PNG/JPEG des captures déclarées dans les
+entrées des contrôles. Il vérifie leurs empreintes et refuse les fichiers hors
+du périmètre autorisé, les formats invalides et les dépassements de taille.
+Les limites sont 20 images, 5 Mio par image, 10 Mio au total et 20 mégapixels
+par image. Un fournisseur incompatible est refusé explicitement, sans appel
+payant ni omission silencieuse. Les permissions d’outils restent fermées.
+
+La revue réelle, réalisée le 30 septembre à 15:29 UTC, a accepté les quatre
+critères de T8 après observation des pixels, notamment l’absence de secrets.
+La gate comporte sept contrôles PASS. La décision finale reste distincte du
+contrôle automatique et de l’avis du vérificateur : elle a été confirmée dans
+l’interface. Aucune nouvelle tentative producteur n’a été lancée pour compléter
+la preuve visuelle.
+
+Leçon : avant de relancer un agent, diagnostiquer ce qui manque dans le contrat
+entre résultat, preuve, contrôle et revue. Une revue textuelle sans images ou
+un reçu absent ne se répare pas en demandant au producteur de refaire son
+travail. Les inconnues doivent conduire à une correction ciblée de ce contrat,
+puis à une seule nouvelle revue sur les preuves complétées.
+
+Vérifications du transport des images : tests ciblés PASS, tests ciblés avec
+`-race` PASS, `go vet ./...` PASS et contrôle des méthodes PASS. La suite Go
+complète est encore en cours au moment de cet enregistrement ; son résultat
+sera ajouté séparément. Cette clôture qualifie la mission et ses critères,
+pas une certification générale de tout le produit.
+
+Résultat final de la suite complète du moteur après cette correction :
+`go test ./... -timeout 40m` PASS (`swarm.local/companion`, 497,714 secondes,
+code 0). Les tests ciblés avec `-race`, `go vet ./...` et `git diff --check`
+sont également PASS. Le précédent échec chronométrique reste consigné plus
+haut comme observation historique ; ce passage complet est vert.

@@ -37,3 +37,55 @@ The producer fills `docs/<task>.delivery.json` with its own observations: execut
 The engine validates delivery attribution and completeness, executes its controls against the candidate revision, then requests an independent review. Producers and planners must not wait for these future steps before reporting actual local observations. A local `pass` cannot bypass a failed engine control or a rejecting review.
 
 The real trial on September 23, 2026 exposed this confusion: two `not_tested` deliveries stopped the pipeline before engine controls. Instructions and diagnostics were clarified; this does not yet demonstrate a successful new real-model trial.
+
+## Checks as evidence for human review
+
+A `human` policy may include explicitly authorized `controls`. Under an active
+mission authorization, the engine runs them and passes its receipt to the
+independent reviewer. Success keeps the task awaiting review: it neither accepts
+the task nor releases downstream tasks. Qualitative criteria may remain outside
+automated coverage.
+
+In “Configure validation”, keep human review, add checks, map their criteria and
+list examined files. `inputs` paths are relative to the project root, even when
+`dir` differs. The engine hashes these files and the report before checks and
+rejects evidence if their contents change. Without `inputs`, only the report is
+bound to the receipt; this does not prove that all source files stayed unchanged.
+
+The CLI shares this contract: `swarm --json validation preview WORK --task TASK
+--input policy.json`, then `validation apply` using the returned `preview_token`,
+the same `expected_revision`, and a new `event_id`. Example `policy` field:
+
+```json
+{"mode":"human","controls":[{"id":"tests","command":["go","test","./..."],"dir":".","timeout_seconds":300,"criteria":[1],"justification":"The suite checks the first criterion's behavior.","inputs":["go.mod","engine.go"]}]}
+```
+
+Adapt actual paths and criteria before confirming. Changing policy archives the
+old review and invalidates receipts; it is refused while review is active.
+Current receipts are reused without rerunning unchanged checks on each conductor
+pass. Undeclared files are not monitored.
+
+Focused verification of this contract:
+
+```sh
+go test -run 'TestHumanControl|TestHumanPolicy' -count=1
+go test -race -run 'TestHumanControl|TestHumanPolicy' -count=1
+go build -o /tmp/swarm-human-evidence .
+node tests/human_evidence_ui.cjs /tmp/swarm-human-evidence /tmp/swarm-human-evidence-ui
+```
+
+## Images in independent review
+
+Operator-declared PNG/JPEG control inputs are attached to the Claude reviewer
+only when their hashes match the current control receipt. Images must be
+under `docs/screenshots/`; report links never authorize additional reads.
+Limits: 20 images, 5 MiB per image, 10 MiB total, 20 million pixels per image.
+Missing, invalid, oversized or stale files block review before a paid call.
+Adapters without image support explicitly reject this review instead of
+silently omitting the images.
+
+The reviewer keeps its separate session, no editing tools and the usual
+budgets/deadlines. Pixel inspection remains an AI judgment, distinct from
+deterministic checks and acceptance. Changed image bytes invalidate the
+related hashes. Transport uses the image blocks in the
+[Claude streaming format](https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode).

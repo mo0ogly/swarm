@@ -2,8 +2,8 @@
 """Bounded, reproducible T5 checks. Never operates on the live Swarm database."""
 import hashlib, json, os, pathlib, shutil, subprocess, sys, tempfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-COMMIT = 'c5f1dea91310608f1b4b327a0cf6349e1bbc2c55'
-RUN = '36628140996'
+COMMIT = '7110a0b805caf4be1bb09a57b776176b8dc52a68'
+RUN = '36719933441'
 
 def run(args, cwd=ROOT, timeout=90):
     p = subprocess.run(args, cwd=cwd, text=True, stdout=subprocess.PIPE,

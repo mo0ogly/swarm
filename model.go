@@ -44,6 +44,7 @@ type ValidationPolicy struct {
 }
 
 type ValidationControl struct {
+	Inputs        []string `json:"inputs,omitempty"`
 	ID            string   `json:"id"`
 	Command       []string `json:"command"`
 	Criteria      []int    `json:"criteria"`

@@ -139,7 +139,7 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 			}
 		}
 		if nt, ok := nextBy[t.ID]; ok {
-			if t.ValidationPolicy != nil && t.ValidationPolicy.Mode == "automatic" {
+			if t.ValidationPolicy != nil && len(t.ValidationPolicy.Controls) > 0 {
 				for _, prior := range p.Conversion.Spec.Tasks {
 					if prefix+prior.ID == t.ID {
 						for _, next := range spec.Tasks {
@@ -150,7 +150,7 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 					}
 				}
 			}
-			if t.ValidationPolicy != nil && t.ValidationPolicy.Mode == "automatic" && !reflect.DeepEqual(t.Criteria, nt.Criteria) {
+			if t.ValidationPolicy != nil && len(t.ValidationPolicy.Controls) > 0 && !reflect.DeepEqual(t.Criteria, nt.Criteria) {
 				return fmt.Errorf("%s : critères modifiés ; réautoriser une politique de revue humaine avant cette révision ou conserver les critères couverts par les contrôles", t.Title)
 			}
 			if w.Planning != nil && len(nt.Criteria) < len(t.Criteria) {

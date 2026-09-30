@@ -244,12 +244,20 @@ func runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema 
 }
 
 func runStructuredProviderClock(provider Provider, route *ModelRoute, prompt, schema string, deadline time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
+	return runStructuredProviderImagesClock(provider, route, prompt, schema, nil, deadline, valid, record, now, observers...)
+}
+
+func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, deadline time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
 	p, err := assistantProvider(provider)
 	if err != nil {
 		return "", err
 	}
 	if route != nil {
 		p = applyModelRoute(p, route)
+	}
+	input, err := structuredReviewInput(&p, prompt, images)
+	if err != nil {
+		return "", err
 	}
 	dir, err := os.MkdirTemp("", "swarm-planner-")
 	if err != nil {
@@ -268,7 +276,7 @@ func runStructuredProviderClock(provider Provider, route *ModelRoute, prompt, sc
 	cmd := exec.Command(p.Command, p.Args...)
 	cmd.Dir = dir
 	cmd.Env = providerEnvironment(p.Env)
-	cmd.Stdin = strings.NewReader(prompt)
+	cmd.Stdin = strings.NewReader(input)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true, Pdeathsig: syscall.SIGKILL}
 	cmd.WaitDelay = 2 * time.Second
 	reader, writer := io.Pipe()

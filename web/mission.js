@@ -35,10 +35,24 @@ const Mission={
   return block;
  },
  diagnosticText(diagnostic){
+  // Copy only controlled wording and typed identifiers. Free provider text,
+  // summaries, causes, actions and traces never cross the clipboard boundary.
   const version=globalThis.RuntimeHealthPanel?.value?.version;
-  const versionLine=version?.available?version.revision.slice(0,12)+(version.modified?'*':''):tr_web_mission_js('état inconnu');
-  const lines=[tr_web_mission_js('Tentative : ')+(diagnostic.attempt_id||tr_web_mission_js('état inconnu')),tr_web_mission_js('Version : ')+versionLine,tr_web_mission_js('Cause : ')+missionText(diagnostic.summary),''];
-  for(const item of diagnostic.items){lines.push(missionText(item.label)+' — '+missionText(item.cause),tr_web_mission_js('Action disponible : ')+missionText(item.action),'');}
+  const revision=String(version?.revision||'');
+  const versionLine=version?.available&&/^[a-f0-9]{12,64}$/i.test(revision)?revision.slice(0,12)+(version.modified?'*':''):tr_web_mission_js('état inconnu');
+  const attempt=/^a-[a-f0-9]{16,64}$/i.test(String(diagnostic.attempt_id||''))?diagnostic.attempt_id:tr_web_mission_js('état inconnu');
+  const count=Number.isSafeInteger(diagnostic.observed_errors)&&diagnostic.observed_errors>=0?diagnostic.observed_errors:0;
+  const summary=count===0?'Aucune erreur d’outil structurée n’a été observée.':count===1?'1 erreur d’outil observée pendant cette tentative.':count+' erreurs d’outil observées pendant cette tentative.';
+  const wording={
+   configuration:['Configuration','La configuration nécessaire au lancement ou à l’outil est absente, invalide ou indisponible.','Corriger la configuration indiquée, vérifier qu’elle est relue, puis demander explicitement une nouvelle tentative.'],
+   environment:['Environnement d’exécution','Les traces signalent un refus d’accès ou une ressource indisponible dans l’environnement.','Faire vérifier les droits et l’accès aux ressources sur la machine qui exécute l’agent ; reprendre après correction vérifiée.'],
+   check:['Contrôle en échec','Un test ou contrôle observable a échoué.','Examiner la trace, corriger la cause, puis rejouer le même contrôle avec les mêmes options avant toute validation.'],
+   tool:['Outil','Un outil appelé pendant la tentative a signalé un échec.','Examiner la trace et les paramètres de l’outil, corriger la cause, puis demander explicitement la reprise.'],
+   limit:['Limite atteinte','Limite d’exécution atteinte.','Examiner les erreurs précédentes et les préconditions ; reprendre explicitement sans relever arbitrairement les protections.'],
+   unknown:['Cause inconnue','La cause exacte n’est pas disponible dans les événements structurés de cette tentative.','Ouvrir les traces conservées et établir la cause avant de choisir une reprise.']
+  };
+  const lines=[tr_web_mission_js('Tentative : ')+attempt,tr_web_mission_js('Version : ')+versionLine,tr_web_mission_js('Cause : ')+missionText(summary),''];
+  for(const item of diagnostic.items||[]){const [label,cause,action]=wording[Object.hasOwn(wording,item.category)?item.category:'unknown'];lines.push(missionText(label)+' — '+missionText(cause),tr_web_mission_js('Action disponible : ')+missionText(action),'');}
   return lines.join('\n').trim();
  },
  copyDiagnosticButton(diagnostic){
@@ -248,20 +262,22 @@ const Mission={
   const modeLabel=node('label',tr_web_mission_js('Mode de validation'));const mode=document.createElement('select');mode.id='validation-mode';mode.name='validation-mode';
   for(const [value,label]of [['human',tr_web_mission_js('Revue humaine')],['automatic',tr_web_mission_js('Contrôles structurés automatiques')],['remove',tr_web_mission_js('Retirer la politique')]]){const option=document.createElement('option');option.value=value;option.textContent=label;mode.append(option)}
   mode.value=policy?.mode||'human';modeLabel.append(mode);host.append(modeLabel,node('p',tr_web_mission_js('Portée : cette tâche seulement. Une suggestion IA ne sera jamais convertie en autorisation. Si un critère exige un jugement qualitatif, conservez la revue humaine.'),'notice info'));
+  host.append(node('p',tr_web_mission_js('En revue humaine, les contrôles facultatifs produisent des preuves sans accepter la tâche.')));
   const criteria=node('section',undefined,'validation-criteria');criteria.append(node('h3',tr_web_mission_js('Critères à couvrir')));task.criteria.forEach((text,index)=>criteria.append(node('p',(index+1)+'. '+text)));host.append(criteria);
   const controls=node('section',undefined,'validation-controls');controls.id='validation-controls';controls.append(node('h3',tr_web_mission_js('Contrôles autorisés')));
   const add=Pilot.command(tr_web_mission_js('Ajouter un contrôle'),()=>{this.validationControl(task);this.validationChanged()});add.type='button';add.id='validation-add-control';host.append(controls,add);
   const limits=node('details');limits.append(node('summary',tr_web_mission_js('Portée et limites imposées')),node('p',tr_web_mission_js('1 à 8 contrôles, 32 arguments par commande, 300 secondes cumulées et 64 Kio de sortie retenue par contrôle. Programmes autorisés : go, git, node, npm, python, python3 et pytest. Aucun shell implicite ; répertoire limité au projet.')));host.append(limits);
   for(const control of policy?.controls||[])this.validationControl(task,control);
-  const sync=()=>{const automatic=mode.value==='automatic';controls.hidden=!automatic;add.hidden=!automatic;this.validationChanged()};mode.addEventListener('change',sync);sync();
-  if(!['todo','blocked'].includes(task.status)){$('modal-error').textContent=tr_web_mission_js('Cette tâche doit d’abord être rouverte à « À faire » ou « Bloquée ». Aucun changement n’est possible dans son état actuel.');$('modal-error').hidden=false;$('confirm').disabled=true}
+  const sync=()=>{const automatic=mode.value!=='remove';controls.hidden=!automatic;add.hidden=!automatic;this.validationChanged()};mode.addEventListener('change',sync);sync();
+  if(!['todo','blocked','submitted'].includes(task.status)){$('modal-error').textContent=tr_web_mission_js('Cette tâche doit d’abord être rouverte à « À faire » ou « Bloquée ». Aucun changement n’est possible dans son état actuel.');$('modal-error').hidden=false;$('confirm').disabled=true}
   $('confirm').textContent=tr_web_mission_js('Examiner l’effet');
  },
  validationControl(task,control={}){
   const box=document.createElement('fieldset');box.className='validation-control';
   const legend=document.createElement('legend');legend.textContent=tr_web_mission_js('Contrôle structuré');box.append(legend);
   const input=(name,label,value,type='text')=>{const wrap=document.createElement('label');wrap.textContent=label;const el=document.createElement(type==='textarea'?'textarea':'input');el.dataset.validationField=name;el.value=value??'';if(type!=='textarea')el.type=type;wrap.append(el);box.append(wrap);return el};
-  input('id',tr_web_mission_js('Identifiant'),control.id||'');const programLabel=document.createElement('label');programLabel.textContent='Programme';const program=document.createElement('select');program.dataset.validationField='program';for(const value of ['go','git','node','npm','python','python3','pytest']){const option=document.createElement('option');option.value=value;option.textContent=value;program.append(option)}program.value=control.command?.[0]||'go';programLabel.append(program);box.append(programLabel);
+  input('inputs',tr_web_mission_js('Fichiers examinés — un chemin relatif par ligne'),(control.inputs||[]).join('\n'),'textarea');
+  input('id',tr_web_mission_js('Identifiant'),control.id||'');const programLabel=document.createElement('label');programLabel.textContent=tr_web_mission_js('Programme');const program=document.createElement('select');program.dataset.validationField='program';for(const value of ['go','git','node','npm','python','python3','pytest']){const option=document.createElement('option');option.value=value;option.textContent=value;program.append(option)}program.value=control.command?.[0]||'go';programLabel.append(program);box.append(programLabel);
   const args=input('args',tr_web_mission_js('Arguments — un argument exact par ligne'),(control.command||[]).slice(1).join('\n'),'textarea');args.rows=3;const justification=input('justification',tr_web_mission_js('Justification objective de la couverture'),control.justification||'','textarea');justification.rows=2;input('dir',tr_web_mission_js('Répertoire relatif au projet'),control.dir||'.');const timeout=input('timeout',tr_web_mission_js('Délai en secondes'),String(control.timeout_seconds||60),'number');timeout.min='1';timeout.max='300';
   const mapped=document.createElement('fieldset');mapped.className='validation-mapping';const mappedLegend=document.createElement('legend');mappedLegend.textContent=tr_web_mission_js('Critères objectivement contrôlés');mapped.append(mappedLegend);task.criteria.forEach((text,index)=>{const label=document.createElement('label');const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.dataset.criterion=String(index+1);checkbox.checked=(control.criteria||[]).includes(index+1);label.append(checkbox,document.createTextNode((index+1)+'. '+text));mapped.append(label)});box.append(mapped);
   const remove=Pilot.command(tr_web_mission_js('Retirer ce contrôle'),()=>{box.remove();this.validationChanged()});remove.type='button';box.append(remove);for(const el of box.querySelectorAll('input,select,textarea'))el.addEventListener('input',()=>this.validationChanged());$('validation-controls').append(box);
@@ -269,13 +285,13 @@ const Mission={
  validationChanged(){if(!modalContext||modalContext.action!=='validation-policy')return;modalContext.validationPreview=null;modalContext.validationSignature='';$('preview').hidden=true;$('confirm').textContent=tr_web_mission_js('Examiner l’effet');$('modal-error').hidden=true},
  validationFields(){
   const mode=$('validation-mode').value;if(mode==='remove')return {intent:'remove'};
-  const controls=[];if(mode==='automatic')for(const box of document.querySelectorAll('#validation-controls .validation-control')){const get=name=>box.querySelector('[data-validation-field="'+name+'"]');const command=[get('program').value,...get('args').value.split('\n').map(x=>x.trim()).filter(Boolean)];controls.push({id:get('id').value.trim(),command,criteria:[...box.querySelectorAll('[data-criterion]:checked')].map(x=>Number(x.dataset.criterion)),justification:get('justification').value.trim(),dir:get('dir').value.trim(),timeout_seconds:Number(get('timeout').value)})}
+  const controls=[];if(mode!=='remove')for(const box of document.querySelectorAll('#validation-controls .validation-control')){const get=name=>box.querySelector('[data-validation-field="'+name+'"]');const command=[get('program').value,...get('args').value.split('\n').map(x=>x.trim()).filter(Boolean)];controls.push({inputs:get('inputs').value.split('\n').map(x=>x.trim()).filter(Boolean),id:get('id').value.trim(),command,criteria:[...box.querySelectorAll('[data-criterion]:checked')].map(x=>Number(x.dataset.criterion)),justification:get('justification').value.trim(),dir:get('dir').value.trim(),timeout_seconds:Number(get('timeout').value)})}
   return {intent:'replace',policy:{mode,controls}};
  },
  validationPreview(result){
-  const lines=[tr_web_mission_js('Portée : ')+result.scope,'',tr_web_mission_js('Critères :')];for(const criterion of result.criteria)lines.push('- '+criterion.index+'. '+criterion.text+' — '+criterion.review+(criterion.control_ids?.length?' ('+criterion.control_ids.join(', ')+')':''));
-  lines.push('',tr_web_mission_js('Contrôles autorisés :'));for(const control of result.controls||[])lines.push('- '+control.id+' : '+JSON.stringify(control.command)+tr_web_mission_js(' · justification : ')+control.justification+tr_web_mission_js(' · répertoire ')+(control.dir||'.')+tr_web_mission_js(' · délai ')+control.timeout_seconds+' s');lines.push('',tr_web_mission_js('Conséquences :'),...(result.effects||[]).map(x=>'- '+x));
-  lines.push('',tr_web_mission_js('Effet confirmé : ')+result.confirmation,'',tr_web_mission_js('Limites :'),...result.limits.map(x=>'- '+x),'',tr_web_mission_js('Avertissements :'),...result.warnings.map(x=>'- '+x));preview(lines.join('\n'));
+  const lines=[tr_web_mission_js('Portée : ')+missionText(result.scope),'',tr_web_mission_js('Critères :')];for(const criterion of result.criteria)lines.push('- '+criterion.index+'. '+criterion.text+' — '+missionText(criterion.review)+(criterion.control_ids?.length?' ('+criterion.control_ids.join(', ')+')':''));
+  lines.push('',tr_web_mission_js('Contrôles autorisés :'));for(const control of result.controls||[])lines.push('- '+control.id+' : '+JSON.stringify(control.command)+(control.inputs?.length?' ['+control.inputs.join(', ')+']':'')+tr_web_mission_js(' · justification : ')+control.justification+tr_web_mission_js(' · répertoire ')+(control.dir||'.')+tr_web_mission_js(' · délai ')+control.timeout_seconds+' s');lines.push('',tr_web_mission_js('Conséquences :'),...(result.effects||[]).map(x=>'- '+missionText(x)));
+  lines.push('',tr_web_mission_js('Effet confirmé : ')+missionText(result.confirmation),'',tr_web_mission_js('Limites :'),...result.limits.map(x=>'- '+missionText(x)),'',tr_web_mission_js('Avertissements :'),...result.warnings.map(x=>'- '+missionText(x)));preview(lines.join('\n'));
  },
  render(){
   const d=snapshot.mission,host=$('mission-summary');if(!d||!host)return;
