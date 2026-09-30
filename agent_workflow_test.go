@@ -72,6 +72,11 @@ func TestAgentWorkflowReachesWorkerAndSurvivesReopen(t *testing.T) {
 		t.Fatal(err)
 	}
 	assertWorkflowDelivery(t, a.Prompt, "worker", a.Workflow)
+	for _, identity := range []string{"IDENTITÉ COURANTE FOURNIE PAR LE MOTEUR", a.ID, a.Attempt} {
+		if !strings.Contains(a.Prompt, identity) {
+			t.Fatalf("provider prompt missing current identity %q", identity)
+		}
+	}
 	if strings.Contains(a.Prompt, "UNTRUSTED_METHOD_OVERRIDE") || a.Context.SHA256 != hash([]byte(a.Prompt)) {
 		t.Fatal("local override replaced methods or methods escaped the context fingerprint")
 	}

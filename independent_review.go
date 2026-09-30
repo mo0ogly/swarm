@@ -22,6 +22,7 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
+	ReportArtifacts     map[string]string             `json:"report_artifacts,omitempty"`
 	FragmentJournal     *ManagedFragmentJournalAnchor `json:"fragment_journal,omitempty"`
 	ModelRoute          *ModelRoute                   `json:"model_route,omitempty"`
 	BatchPlanDigest     string                        `json:"batch_plan_sha256,omitempty"`
@@ -130,6 +131,9 @@ func (s *Store) independentReviewGuardVersion(w *Work, t *Task, historical bool)
 	}
 	if w.Planning.Repository != nil {
 		return s.managedIndependentReviewGuardVersion(w, t, historical)
+	}
+	if err := s.currentReportArtifacts(r.ReportArtifacts); err != nil {
+		return err
 	}
 	p, e := safeReport(s.root, r.Report)
 	if e != nil {
@@ -327,4 +331,13 @@ func managedBatchesAllPassed(r *IndependentReview) bool {
 		}
 	}
 	return true
+}
+
+// archiveIndependentReview invalidates evidence without refunding a review or
+// changing the production attempt. It is used when a task must be re-evaluated.
+func archiveIndependentReview(t *Task) {
+	if t.IndependentReview != nil {
+		t.PreviousReviews = append(t.PreviousReviews, *t.IndependentReview)
+		t.IndependentReview = nil
+	}
 }

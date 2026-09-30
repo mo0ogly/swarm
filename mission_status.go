@@ -467,7 +467,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 				x.Reason = "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche."
 			}
 		}
-		x.AttemptLimitReached = t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
+		x.AttemptLimitReached = !s.executionObserved(w.ID, t.ID) && t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
 		if t.IndependentReview != nil && t.IndependentReview.State == "running" {
 			x.AttemptLimitReached = false
 		}

@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 22
+const schemaVersion = 23
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -86,47 +86,48 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
-	ReviewCoordination *ReviewCoordinationRecord   `json:"review_coordination,omitempty"`
-	Restarts           []TaskRestart               `json:"restarts,omitempty"`
-	ModelSelection     *TaskModel                  `json:"model_selection,omitempty"`
-	Requalifications   []HistoricalRequalification `json:"requalifications,omitempty"`
-	IntegrationRetries []IntegrationRetry          `json:"integration_retries,omitempty"`
-	BatchReviewResume  *IndependentReview          `json:"batch_review_resume,omitempty"`
-	RecoveredResult    *RecoveredResult            `json:"recovered_result,omitempty"`
-	CorrectiveRecovery *CorrectiveRecovery         `json:"corrective_recovery,omitempty"`
-	PreviousReviews    []IndependentReview         `json:"previous_reviews,omitempty"`
-	IndependentReview  *IndependentReview          `json:"independent_review,omitempty"`
-	ScopeID            string                      `json:"scope_id,omitempty"`
-	Requirements       []string                    `json:"requirements,omitempty"`
-	ValidationPolicy   *ValidationPolicy           `json:"validation_policy,omitempty"`
-	AutoValidation     *AutomaticValidation        `json:"automatic_validation,omitempty"`
-	LaunchHeld         bool                        `json:"launch_held,omitempty"`
-	Profile            *LaunchProfile              `json:"launch_profile,omitempty"`
-	Revalidation       *Revalidation               `json:"revalidation,omitempty"`
-	PlanChecks         map[string]string           `json:"plan_checks,omitempty"`
-	PlanBriefHash      string                      `json:"plan_brief_hash,omitempty"`
-	PlanRole           string                      `json:"plan_role,omitempty"`
-	PlanningRetry      bool                        `json:"planning_retry,omitempty"`
-	PlanMaxAttempts    int                         `json:"plan_max_attempts,omitempty"`
-	PlanToolLimit      int                         `json:"plan_tool_limit,omitempty"`
-	Contexts           []SavedContext              `json:"contexts,omitempty"`
-	Answers            []BrainstormAnswer          `json:"answers,omitempty"`
-	Question           string                      `json:"question,omitempty"`
-	Response           string                      `json:"response,omitempty"`
-	ResponseError      string                      `json:"response_error,omitempty"`
-	Brainstorm         bool                        `json:"brainstorm,omitempty"`
-	Override           *ManualOverride             `json:"manual_override,omitempty"`
-	ID                 string                      `json:"id"`
-	Title              string                      `json:"title"`
-	Owner              string                      `json:"owner"`
-	Deliverable        string                      `json:"deliverable"`
-	Criteria           []string                    `json:"criteria"`
-	Depends            []string                    `json:"depends"`
-	Status             string                      `json:"status"`
-	Blocker            string                      `json:"blocker"`
-	Next               string                      `json:"next"`
-	Attempts           []Attempt                   `json:"attempts"`
-	Gate               *GateRecord                 `json:"gate,omitempty"`
+	LegacyReportSubmissions []Attempt                   `json:"legacy_report_submissions,omitempty"`
+	ReviewCoordination      *ReviewCoordinationRecord   `json:"review_coordination,omitempty"`
+	Restarts                []TaskRestart               `json:"restarts,omitempty"`
+	ModelSelection          *TaskModel                  `json:"model_selection,omitempty"`
+	Requalifications        []HistoricalRequalification `json:"requalifications,omitempty"`
+	IntegrationRetries      []IntegrationRetry          `json:"integration_retries,omitempty"`
+	BatchReviewResume       *IndependentReview          `json:"batch_review_resume,omitempty"`
+	RecoveredResult         *RecoveredResult            `json:"recovered_result,omitempty"`
+	CorrectiveRecovery      *CorrectiveRecovery         `json:"corrective_recovery,omitempty"`
+	PreviousReviews         []IndependentReview         `json:"previous_reviews,omitempty"`
+	IndependentReview       *IndependentReview          `json:"independent_review,omitempty"`
+	ScopeID                 string                      `json:"scope_id,omitempty"`
+	Requirements            []string                    `json:"requirements,omitempty"`
+	ValidationPolicy        *ValidationPolicy           `json:"validation_policy,omitempty"`
+	AutoValidation          *AutomaticValidation        `json:"automatic_validation,omitempty"`
+	LaunchHeld              bool                        `json:"launch_held,omitempty"`
+	Profile                 *LaunchProfile              `json:"launch_profile,omitempty"`
+	Revalidation            *Revalidation               `json:"revalidation,omitempty"`
+	PlanChecks              map[string]string           `json:"plan_checks,omitempty"`
+	PlanBriefHash           string                      `json:"plan_brief_hash,omitempty"`
+	PlanRole                string                      `json:"plan_role,omitempty"`
+	PlanningRetry           bool                        `json:"planning_retry,omitempty"`
+	PlanMaxAttempts         int                         `json:"plan_max_attempts,omitempty"`
+	PlanToolLimit           int                         `json:"plan_tool_limit,omitempty"`
+	Contexts                []SavedContext              `json:"contexts,omitempty"`
+	Answers                 []BrainstormAnswer          `json:"answers,omitempty"`
+	Question                string                      `json:"question,omitempty"`
+	Response                string                      `json:"response,omitempty"`
+	ResponseError           string                      `json:"response_error,omitempty"`
+	Brainstorm              bool                        `json:"brainstorm,omitempty"`
+	Override                *ManualOverride             `json:"manual_override,omitempty"`
+	ID                      string                      `json:"id"`
+	Title                   string                      `json:"title"`
+	Owner                   string                      `json:"owner"`
+	Deliverable             string                      `json:"deliverable"`
+	Criteria                []string                    `json:"criteria"`
+	Depends                 []string                    `json:"depends"`
+	Status                  string                      `json:"status"`
+	Blocker                 string                      `json:"blocker"`
+	Next                    string                      `json:"next"`
+	Attempts                []Attempt                   `json:"attempts"`
+	Gate                    *GateRecord                 `json:"gate,omitempty"`
 }
 
 // Origine d'une tentative : lancée à la main ou par l'ordonnanceur.

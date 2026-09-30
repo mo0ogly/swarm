@@ -207,3 +207,75 @@ file is already present byte-for-byte in the full diff with the same Git blob.
 The diff, reports, receipts and every changed line remain present. Existing
 modified files are never shortened. Context that still exceeds the limit is
 rejected before a provider call; deduplication does not permit truncation.
+
+### Latest attempt completed without a report
+
+A task without a managed Git repository, blocked after three attempts, can also
+show **Prepare one corrective attempt** when the conductor recorded that the latest
+attempt produced no report. This operational failure is not an independent review.
+Fix its cause before confirming a new instruction. The mission keeps its pause and
+tool-call limit; only one fourth attempt is authorized. Its result must still pass
+checks and independent review.
+
+The CLI uses the same `planning authorize-recovery` operation and fields above,
+replacing `review_id` with `"missing_report": true`. Keep the latest `attempt_id`,
+`expected_revision`, `confirm_recovery`, `reason` and `recovery_instruction`.
+Do not combine this cause with `review_id` or `result_commit`. The engine verifies
+the recorded conductor refusal; the supplied boolean alone never proves that a
+report is absent.
+
+### Review stopped by its time limit
+
+In the cockpit, **Review time limit** below the reviewer sets the duration of
+future reviews between 1 and 900 seconds, with a recorded reason. Saving preserves
+used calls and their limit; it does not restart anything. After fixing the cause,
+**Resume review** examines the existing result within the remaining budget, without
+starting another worker.
+
+## Checks before independent review
+
+For tasks with explicitly authorized automatic checks, the engine runs those
+checks before the AI review. Successful checks produce an execution receipt
+and leave the task awaiting review; they do not accept the task. The reviewer
+receives the current engine receipt, including commands, exit codes and hashes,
+and evaluates whether the checks actually cover the acceptance criteria.
+
+After a favorable review, the engine reuses the current receipt without running
+the commands again. Failed checks, stale evidence or a different attempt prevent
+acceptance. An imported report or manual gate cannot replace an engine receipt.
+Tasks using human review retain their existing workflow.
+
+## Recovery and tool budgets
+
+The last authorized tool may finish and its result is retained within the
+existing deadlines. Additional calls remain prohibited; repetition and error
+guards stay active. An interruption does not validate the work.
+
+A new attempt receives a bounded summary of operations observed in the previous
+attempt of the same task. This helps avoid repeating discovery, but does not
+prove that those operations succeeded. Instructions specify exploration and
+finalization milestones, reserving one fifth of the calls for checks and the
+report. These milestones guide the model; the engine monitors the total cap.
+
+## Observe a mission without execution caps
+
+In **Administration**, select the **Mission** scope, load its ID and choose
+**Execution mode → Observation — no execution caps**. Enter a reason, preview
+and confirm. This explicit choice is available only for mission administration.
+
+New workers, including retries, keep counting calls and results but are no
+longer interrupted by tool-call, repetition, error, silence or duration caps.
+The plan's attempt count no longer blocks their launch. Existing numeric
+limits remain recorded for reference; `observation_mode: 1` means they do not
+stop this execution. Already started attempts retain their original mode.
+
+Dependencies, acceptance checks, exclusive workspace ownership, manual stops
+and provider failures still apply. This mode resets nothing, accepts no result
+and does not create unlimited automatic retries. Planning and review budgets
+are separate. Select **Caps enabled** to end the experiment: subsequent launches
+use the configured limits and the existing counters again.
+
+The CLI uses the same operation: `swarm run-limits apply mission <id> -
+--input change.json`, with `values.observation_mode` set to `1` (observation)
+or `0` (caps enabled), an explicit `reason` and the expected revision. Include
+the scope's other existing values in the change document.

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -15,6 +16,51 @@ import (
 	"testing"
 	"time"
 )
+
+// REQ-VER-01/02: version shown or explicitly unknown, comparison degraded
+// without a network call when there is no local git source to compare against.
+func TestServerVersionReflectsBuildAndLocalGitWithoutNetwork(t *testing.T) {
+	root, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	head, e := exec.Command("git", "-C", root, "rev-parse", "HEAD").Output()
+	if e != nil {
+		t.Skip("no local git checkout available to compare against")
+	}
+	wantHead := strings.TrimSpace(string(head))
+
+	s := &Store{root: root}
+	v := s.serverVersion()
+	if v.Source != wantHead {
+		t.Fatalf("source revision mismatch: got %q want %q", v.Source, wantHead)
+	}
+	if v.Available {
+		if !v.Compared {
+			t.Fatal("compared must be true once both a build revision and a local source are known")
+		}
+		if v.Current != (v.Revision == v.Source) {
+			t.Fatalf("current disagrees with revision comparison: %+v", v)
+		}
+	} else if v.Compared {
+		t.Fatal("compared must be false without a known build revision (explicit unknown state)")
+	}
+
+	// Degraded mode: no git checkout at the given root, no network access
+	// attempted — comparison must fail explicit rather than guess.
+	other := t.TempDir()
+	s2 := &Store{root: other}
+	v2 := s2.serverVersion()
+	if v2.Source != "" {
+		t.Fatalf("expected no source revision outside a git checkout, got %q", v2.Source)
+	}
+	if v2.Compared {
+		t.Fatal("compared must be false without a local git source")
+	}
+	if v2.Current {
+		t.Fatal("current must be false when comparison is degraded")
+	}
+}
 
 func TestRuntimeHealthThresholdsAndUnavailableVolumes(t *testing.T) {
 	for _, tc := range []struct {

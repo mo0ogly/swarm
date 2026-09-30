@@ -163,3 +163,84 @@ swarm --root /path/to/project init
 Never change `PRAGMA user_version` to force a database to open. Back up all of
 `.swarm/`, not only `state.db`: reports, workspaces and configuration also matter.
 Automatic backups from some migrations do not replace a complete backup.
+
+## First mission: from requirements to launch
+
+1. Open the link printed by the server, then choose **Prepare a project**.
+2. Save your requirements and choose an AI configured under **AI and connections**.
+3. Review and adopt the proposed brief, then request a plan. Answer open decisions before checking the plan.
+4. Review the planner, workers and independent reviewer, including their project directory, models and limits.
+5. Choose how results are accepted. Human review requires acceptance after examining evidence; automatic acceptance requires commands that actually prove each criterion.
+6. Run the pre-launch checks and authorize the team. Open the mission dashboard, select the launch action, review its summary and confirm.
+7. Confirm that an attempt is active. Saved tasks do not mean an agent is running.
+
+![Actual launch in the French interface](../screenshots/installation/mission-lancee-fr.png)
+
+Actual French-interface capture, September 29, 2026: the Administration mission was launched through the web screens. This demonstrates launch, not completion of all eight tasks. Results still require review.
+
+**Current workflow:** team authorization and dashboard launch are separate steps. If nothing starts, read the reported cause before retrying.
+
+
+## Configure limits before starting agents
+
+Open **Administration** in the cockpit (switch to expert mode if it is hidden), then select the project, mission, role or task scope. Inherited values differ from explicit scope values: **0 means inherited**, not unlimited.
+
+1. Select **Configure this scope** or **Edit this scope**.
+2. Enter delays in seconds, tool-call counts and repetition/error limits. Provide a reason.
+3. Review the proposed effect and confirm the save. A filled form is not a saved configuration.
+4. Check the new revision in the history. Restoring a previous revision creates a new configuration entry; it does not erase consumed operations.
+5. Check effective limits for the task before its next launch. An attempt already running keeps the settings assigned when it started.
+
+![English Administration, light theme: values entered before confirmation](../screenshots/installation/admin-en-etat.png)
+
+*Actual screenshot from an isolated local test: a completed form before confirmation, not proof of persistence or launch.*
+
+![The same form in the dark theme](../screenshots/installation/admin-en-sombre.png)
+
+When explicitly authorized for a mission, **observation mode** retains counters while removing the execution cutoffs covered by that mode. It does not remove provider quotas, review requirements or acceptance conditions. It cannot bypass a provider 429 response. **AI budgets and costs** distinguishes reported costs from unknown costs; unknown does not mean zero.
+
+### Read the same settings from the CLI
+
+Read-only examples; replace the project path and identifiers with your own:
+
+```sh
+swarm --root /path/to/project run-limits show project - -
+swarm --root /path/to/project run-limits history project - -
+swarm --root /path/to/project run-limits effective MISSION_ID worker TASK_ID
+```
+
+A dash represents an empty value. `apply` and `rollback` use a JSON file, an expected revision and an event identifier. See the [user guide](USER-GUIDE.md) for the general workflow. The CLI and web use the same engine rules.
+
+## Read the summary and share a diagnostic
+
+Before authorization, the summary shows the owner, workers, reviewer and their resolved models. Plan and planning/review-role caps are separate from execution settings in Administration. Missing prerequisites explain what you need to complete.
+
+**Check before launch** starts no agent. **View check details** opens technical information after the check; Escape or **Close details** returns to the form. Only the subsequent authorization permits eligible launches.
+
+For an interrupted attempt, **Copy diagnostic** prepares a summary with its cause, attempt identifier, version and available action. Technical traces and session links are excluded from the prepared text. If clipboard access is denied, an explicit message tells you to select and copy the displayed text. Review anything you share.
+
+### When a task stops progressing
+
+| Visible state | Next action |
+| --- | --- |
+| Provider unavailable or quota 429 | Wait until the reported time or configure another authorized provider; raising Swarm limits does not restore provider quota. |
+| Report exists but task is not validated | Examine criteria, executed checks and review; a file alone is not acceptance. |
+| Configuration changed after checking | Run launch checks again against the new settings before authorization. |
+| Active agent without a final result | Open its session and inspect activity; distinguish activity, a result and validation. |
+
+Administration screenshots come from `tests/run_limits_admin_ui.cjs`. Summary and diagnostic checks are reproducible with `tools/verification/t7_prelaunch.py`. They demonstrate controlled local workflows, not autonomous completion by a real provider.
+
+
+### Summary and diagnostic screenshots
+
+![Pre-launch summary before choosing a provider](../screenshots/installation/summary-en-etat.png)
+
+*Isolated local test: configuration still incomplete. This is neither a saved team nor an active agent.*
+
+![Detailed launch checks, dark theme](../screenshots/installation/preflight-details-en-sombre.png)
+
+*Technical details are available on demand; closing the dialog returns to the summary.*
+
+![Diagnostic from an interrupted test attempt](../screenshots/installation/diagnostic-en-etat.png)
+
+*Errors are deliberately generated by the test fixture. “Diagnostic copied” uses a mocked OS clipboard in this test; this is not evidence of an external share.*

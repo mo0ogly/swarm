@@ -225,3 +225,84 @@ Ne modifiez jamais `PRAGMA user_version` pour forcer une ouverture. Sauvegardez
 l’ensemble de `.swarm/`, pas uniquement `state.db` : les rapports, copies de
 travail et configurations sont aussi nécessaires. Les sauvegardes automatiques
 de certaines migrations ne remplacent pas cette sauvegarde complète.
+
+## Première mission : du besoin au lancement
+
+1. Ouvrez le lien affiché au démarrage du serveur, puis **Préparer un projet**.
+2. Enregistrez votre besoin. Choisissez une IA configurée dans **IA et connexions**.
+3. Relisez et validez le brief proposé, puis demandez le plan. Répondez aux décisions ouvertes avant de vérifier le plan.
+4. Relisez l’équipe : responsable, exécutants et vérificateur indépendant. Vérifiez le dossier du projet, les modèles et les limites.
+5. Choisissez qui accepte les résultats. La revue humaine demande une acceptation après examen ; la validation automatique exige des commandes qui prouvent réellement chaque critère.
+6. Exécutez la vérification avant lancement et autorisez l’équipe. Dans le pilotage, cliquez **Lancer la mission**, relisez le récapitulatif puis confirmez.
+7. Vérifiez qu’une tentative est active. « Missions enregistrées » signifie que les tâches existent, pas qu’un agent travaille.
+
+![Mission réellement lancée : première tâche en cours](docs/screenshots/installation/mission-lancee-fr.png)
+
+Capture réelle du parcours français : mission Administration lancée depuis les écrans, le 29 septembre 2026. Le lancement ne prouve pas la réussite des huit tâches ; les résultats restent à examiner.
+
+**Point de vigilance :** le parcours actuel comporte une autorisation de l’équipe, puis un lancement dans le pilotage. Si aucune tâche ne démarre, consultez le motif affiché avant toute nouvelle tentative.
+
+
+## Configurer les limites avant de lancer les agents
+
+Ouvrez **Administration** dans le cockpit (passez en mode expert si cette rubrique est masquée), puis choisissez la portée : projet, mission, rôle ou tâche. Les valeurs héritées et les valeurs propres à la portée sont distinctes ; **0 signifie hérité**, pas « illimité ».
+
+1. Sélectionnez **Configurer cette portée** ou **Modifier cette portée**.
+2. Renseignez les délais en secondes, le nombre d’appels et les limites de répétition/erreurs. Donnez le motif du changement.
+3. Examinez l’effet proposé, puis confirmez l’enregistrement. Un formulaire rempli n’est pas une configuration enregistrée.
+4. Vérifiez la nouvelle révision dans l’historique. **Revenir à cette révision** crée une nouvelle entrée de configuration ; cela ne supprime pas les opérations déjà consommées.
+5. Consultez les limites effectives pour la tâche concernée avant son prochain départ. Une tentative déjà démarrée conserve les paramètres qui lui ont été attribués.
+
+![Administration en français, thème clair : valeurs saisies avant confirmation](docs/screenshots/installation/admin-fr-etat.png)
+
+*Capture réelle d’une recette locale isolée : formulaire rempli avant confirmation, pas preuve d’enregistrement ni de lancement.*
+
+![Même formulaire en thème sombre](docs/screenshots/installation/admin-fr-sombre.png)
+
+Le **mode observation**, lorsqu’il est explicitement autorisé pour une mission, conserve les compteurs mais retire les coupures d’exécution couvertes par ce mode. Il ne supprime ni les quotas du fournisseur, ni la revue, ni les conditions d’acceptation. Il n’est pas un moyen de contourner une erreur fournisseur 429. La rubrique **Budgets et coûts IA** distingue les coûts rapportés des coûts inconnus ; un coût inconnu ne vaut pas zéro.
+
+### Retrouver les mêmes réglages dans le CLI
+
+Exemples de lecture seule, à adapter à votre dossier et aux identifiants affichés par Swarm :
+
+```sh
+swarm --root /chemin/du/projet run-limits show project - -
+swarm --root /chemin/du/projet run-limits history project - -
+swarm --root /chemin/du/projet run-limits effective ID_MISSION worker ID_TACHE
+```
+
+Le tiret représente une valeur vide. Les commandes `apply` et `rollback` utilisent un fichier JSON, une révision attendue et un identifiant d’événement ; voir le [guide d’utilisation](GUIDE-UTILISATEUR.md) pour le parcours général. Le CLI et le web appliquent les mêmes règles du moteur.
+
+## Lire le récapitulatif et partager un diagnostic
+
+Avant autorisation, le récapitulatif montre le responsable, les exécutants, le vérificateur et leurs modèles résolus. Les plafonds du plan et des rôles de planification/revue sont affichés séparément des réglages d’exécution de l’Administration. Les prérequis manquants expliquent ce qu’il faut compléter.
+
+**Vérifier avant le lancement** ne démarre aucun agent. Après le contrôle, **Voir le détail des vérifications** ouvre les informations techniques ; Échap ou **Fermer les détails** revient au formulaire. Seule l’autorisation suivante permet les départs éligibles.
+
+Dans le diagnostic d’une tentative arrêtée, **Copier le diagnostic** prépare une synthèse avec la cause, l’identifiant de tentative, la version et l’action disponible. Les traces techniques et le lien de session sont exclus du texte préparé. Si le navigateur refuse le presse-papiers, un message le signale : sélectionnez alors le texte affiché. Relisez toujours ce que vous partagez.
+
+### Si une tâche ne progresse pas
+
+| Situation visible | Prochaine action |
+| --- | --- |
+| Fournisseur indisponible ou quota 429 | Attendre l’échéance annoncée ou configurer un autre fournisseur autorisé ; une hausse des limites Swarm ne restaure pas le quota. |
+| Rapport présent mais tâche non validée | Examiner les critères, contrôles et avis ; la présence d’un fichier ne vaut pas acceptation. |
+| Conditions modifiées après vérification | Refaire la vérification sur les nouveaux paramètres avant autorisation. |
+| Agent actif sans résultat final | Ouvrir sa session et consulter son activité ; ne pas confondre activité, résultat et validation. |
+
+Les captures d’Administration proviennent de `tests/run_limits_admin_ui.cjs` ; celles du récapitulatif et du diagnostic sont reproductibles avec `tools/verification/t7_prelaunch.py`. Elles démontrent des parcours locaux contrôlés, pas la réussite autonome d’un fournisseur réel.
+
+
+### Captures du récapitulatif et du diagnostic
+
+![Récapitulatif après vérification, avant autorisation](docs/screenshots/installation/summary-fr-etat.png)
+
+*Recette locale isolée : fournisseur de test, conditions vérifiées. Aucun agent n’a été lancé par cette vérification.*
+
+![Détails des vérifications, thème sombre](docs/screenshots/installation/preflight-details-fr-sombre.png)
+
+*Informations techniques à ouvrir au besoin ; la fermeture revient au récapitulatif.*
+
+![Diagnostic d’une tentative de test interrompue](docs/screenshots/installation/diagnostic-fr-etat.png)
+
+*Erreurs provoquées par la recette pour démontrer le diagnostic. Le message « Diagnostic copié » provient d’un presse-papiers simulé dans ce test, pas d’un essai de partage externe.*

@@ -1,0 +1,259 @@
+{
+  "recorded_at": "2026-09-30T10:04:41.534522+00:00",
+  "work": "w-843bb3ce22cff2965c5e77b6",
+  "note": "Read-only snapshot before observation activation. Tool calls are not model requests or billed tokens. No counters reset.",
+  "attempts": [
+    {
+      "agent": "auto-d5dd712e997ed4e6978d",
+      "task": "plan-843bb3ce22-T1",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 20,
+      "tool_results": 19,
+      "pending_tools": 1,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 20,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-886ed083f731952cfe40",
+      "task": "plan-843bb3ce22-T1",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 11,
+      "tool_results": 11,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 20,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-868b6989d4dc9cb8dfae",
+      "task": "plan-843bb3ce22-T1",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 2,
+      "tool_results": 2,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 20,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-86f3303ff0451e280da8",
+      "task": "plan-843bb3ce22-T1",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 14,
+      "tool_results": 14,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 20,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-41ed8e27f10bbd5598ed",
+      "task": "plan-843bb3ce22-T2",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 40,
+      "tool_results": 40,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 60,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-30515ac06db5f3445ec8",
+      "task": "plan-843bb3ce22-T5",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 38,
+      "tool_results": 38,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 50,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-b20a4cd7f84cb5da2842",
+      "task": "plan-843bb3ce22-T2",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 22,
+      "tool_results": 22,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 60,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-8c25c120ba786ccbec41",
+      "task": "plan-843bb3ce22-T6",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 40,
+      "tool_results": 39,
+      "pending_tools": 1,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 40,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-540941014719667e1a6e",
+      "task": "plan-843bb3ce22-T3",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 40,
+      "tool_results": 39,
+      "pending_tools": 1,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 40,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "2f02ea7a-22c1-4d3c-bcbf-1f38560853c5",
+      "task": "plan-843bb3ce22-T3",
+      "attempt": null,
+      "provider": "claude",
+      "status": "completed",
+      "tool_calls": 11,
+      "tool_results": 11,
+      "pending_tools": 0,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 40,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "auto-8c5d6707496b65348ff4",
+      "task": "plan-843bb3ce22-T4",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 60,
+      "tool_results": 59,
+      "pending_tools": 1,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 60,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "c93fef6b-f0a2-47f3-bfe0-0085dd593eed",
+      "task": "plan-843bb3ce22-T4",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 60,
+      "tool_results": 59,
+      "pending_tools": 1,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 60,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "6e065899-4cd0-4b4a-9239-fb7098a7644d",
+      "task": "plan-843bb3ce22-T6",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 40,
+      "tool_results": 39,
+      "pending_tools": 1,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 40,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    },
+    {
+      "agent": "1d0f0b55-1f50-4020-b5b7-050ddf4f3226",
+      "task": "plan-843bb3ce22-T4",
+      "attempt": null,
+      "provider": "claude",
+      "status": "interrupted",
+      "tool_calls": 61,
+      "tool_results": 59,
+      "pending_tools": 2,
+      "limits": {
+        "silence_seconds": 180,
+        "tool_seconds": 300,
+        "max_tool_calls": 60,
+        "max_repeated_calls": 4,
+        "max_consecutive_errors": 3
+      },
+      "observation_mode": 0
+    }
+  ]
+}

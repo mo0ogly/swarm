@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 class Element{constructor(tag,text,kind){this.tag=tag;this.textContent=text||'';this.className=kind||'';this.children=[];this.dataset={};this.attributes={}}append(...children){this.children.push(...children)}replaceChildren(...children){this.children=children}setAttribute(name,value){this.attributes[name]=value}}
-const m=vm.runInNewContext(fs.readFileSync(__dirname+'/../web/mission.js','utf8')+';Mission',{node:(tag,text,kind)=>new Element(tag,text,kind),document:{activeElement:null}});
+const m=vm.runInNewContext(fs.readFileSync(__dirname+'/../web/mission.js','utf8')+';Mission',{node:(tag,text,kind)=>new Element(tag,text,kind),document:{activeElement:null},Pilot:{command:(label,action)=>{const e=new Element('button',label);e.onclick=action;return e}}});
 const base={authorized:true,enabled:true,paused:false,validated:0,running:0,total:1,active_agents:0,uncertain_agents:0,supervision:{state:'active',source:'serveur web'},tasks:[]};
 const task=(state,id='t1',impact=0)=>({state,id,title:id,reason:'Motif du moteur',impact});
 for(const [d,kind,label]of [

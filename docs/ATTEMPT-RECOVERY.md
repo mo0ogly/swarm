@@ -226,3 +226,80 @@ exactement au diff intégral, avec le même objet Git. Le diff, les rapports, le
 reçus et toutes les lignes modifiées restent transmis. Aucun fichier modifié
 préexistant n’est raccourci. Un contexte encore trop grand reste refusé avant
 appel fournisseur ; cette déduplication n’autorise aucune troncature.
+
+### Dernière tentative terminée sans rapport
+
+Une tâche non gérée par Git, bloquée après trois tentatives, peut aussi présenter
+**Préparer un essai correctif** lorsque le conducteur a enregistré l’absence de
+rapport de la dernière tentative. Cette cause opérationnelle ne constitue pas un
+avis indépendant. Corrigez d’abord la cause, puis confirmez une nouvelle consigne.
+La mission conserve sa pause et la limite d’appels ; une seule quatrième tentative
+est autorisée. Son résultat devra ensuite passer les contrôles et la revue.
+
+Le CLI utilise la même opération `planning authorize-recovery` et les mêmes champs
+que ci-dessus, en remplaçant `review_id` par `"missing_report": true`. Conserver
+`attempt_id` de la dernière tentative, `expected_revision`, `confirm_recovery`,
+`reason` et `recovery_instruction`. Ne pas combiner cette cause avec `review_id`
+ou `result_commit`. Le moteur vérifie le refus de relais enregistré ; le booléen
+fourni ne suffit jamais à établir l’absence de rapport.
+
+### Revue interrompue par son délai
+
+Dans le cockpit, **Délai de vérification** sous le vérificateur permet de régler
+la durée des prochaines revues entre 1 et 900 secondes, avec un motif enregistré.
+La sauvegarde conserve les appels consommés et leur plafond ; elle ne relance rien.
+Après correction de la cause, **Reprendre la vérification** reprend l’examen du
+résultat existant dans le budget restant, sans lancer un nouvel exécutant.
+
+## Contrôles avant la revue indépendante
+
+Pour une tâche avec des contrôles automatiques explicitement autorisés, le
+moteur exécute ces contrôles avant la revue IA. Leur réussite produit un reçu
+et laisse la tâche en attente de revue : elle ne vaut pas acceptation. Le
+vérificateur reçoit les commandes, codes de sortie et empreintes du reçu
+moteur courant ; il examine si ces contrôles couvrent réellement les critères.
+
+Après avis favorable, le moteur réutilise le reçu courant sans rejouer les
+commandes. Un échec, une preuve périmée ou une autre tentative interdit cette
+acceptation. Un rapport importé ou une gate manuelle ne remplace pas le reçu.
+Les tâches en revue humaine conservent leur parcours habituel.
+
+## Reprise et budget des outils
+
+Le dernier outil autorisé peut terminer et son résultat est conservé, dans les
+délais existants. Un appel supplémentaire reste interdit et les protections
+contre répétitions et erreurs demeurent actives. Une interruption ne valide
+pas le travail.
+
+Une nouvelle tentative reçoit un résumé borné des opérations observées sur
+la tentative précédente de cette même tâche. Ce résumé évite un inventaire
+à repartir de zéro, mais ne prouve pas que les opérations ont réussi.
+Les consignes chiffrent une phase d'exploration et réservent un cinquième
+des appels aux contrôles et au rapport ; ces jalons restent indicatifs pour
+le modèle, tandis que le plafond total est surveillé par le moteur.
+
+## Observer une mission sans plafonds d’exécution
+
+Dans **Administration**, sélectionner la portée **Mission**, charger son
+identifiant, puis choisir **Mode d’exécution → Observation — sans plafonds
+d’exécution**. Un motif est obligatoire ; prévisualiser puis confirmer.
+Ce choix explicite est réservé à l’administration d’une mission.
+
+Les prochains exécutants, y compris les reprises, comptent toujours leurs
+appels et résultats mais ne sont plus interrompus par les plafonds d’appels,
+de répétitions, d’erreurs, de silence ou de durée. Le nombre de tentatives du
+plan ne refuse plus leur départ. Les anciennes limites restent conservées à
+titre de référence ; le champ `observation_mode: 1` indique qu’elles ne coupent
+pas cette exécution. Les tentatives déjà lancées gardent leur mode initial.
+
+Les dépendances, contrôles d’acceptation, exclusions d’espaces de travail,
+arrêts manuels et erreurs du fournisseur continuent de s’appliquer. Ce mode ne
+réinitialise rien, ne valide aucun résultat et ne crée pas de reprises
+automatiques illimitées. Les budgets de planification et de revue sont distincts.
+Pour terminer l’expérience, choisir **Plafonds actifs** : les futurs départs
+retrouvent les limites configurées et les compteurs antérieurs.
+
+Le CLI utilise la même opération `swarm run-limits apply mission <id> -
+--input changement.json`, avec `values.observation_mode` à `1` (observation) ou
+`0` (plafonds actifs), un `reason` explicite et la révision attendue. Conserver
+les autres valeurs de la portée dans le document de changement.

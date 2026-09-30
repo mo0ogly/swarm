@@ -292,16 +292,31 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
 		return false, "validation automatique retenue : " + reason
 	}
-	if e := s.independentReviewGuard(&w, t); e != nil {
-		return false, e.Error()
-	}
 	policy := *t.ValidationPolicy
 	if err := validationPolicyCoversTask(policy, t); err != nil {
 		return false, "revue humaine conservée : " + err.Error()
 	}
 	digest := validationPolicyDigest(policy)
 	if t.AutoValidation != nil && t.AutoValidation.Attempt == a.Attempt && t.AutoValidation.PolicyDigest == digest {
-		return t.AutoValidation.State == "accepted", "validation déjà décidée pour cette tentative"
+		if t.AutoValidation.State == "pending_review" {
+			// A resubmitted report can change without a new production attempt.
+			// Recheck only when its recorded content changed; unchanged polling
+			// must reuse the receipt and never repeat the controls.
+			path, readErr := safeReport(s.root, report)
+			if readErr != nil {
+				return false, readErr.Error()
+			}
+			content, readErr := os.ReadFile(path)
+			if readErr != nil || len(content) == 0 {
+				return false, "livrable vide ou illisible"
+			}
+			previous := t.AutoValidation.Artifacts[report]
+			if previous == "" || previous == hash(content) {
+				return s.acceptReviewedValidation(w, t, a)
+			}
+		} else {
+			return t.AutoValidation.State == "accepted", "validation déjà décidée pour cette tentative"
+		}
 	}
 	reportPath, err := safeReport(s.root, report)
 	if err != nil {
@@ -331,6 +346,9 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		Receipt: relReceipt, State: "blocked", At: now()}
 	if passed {
 		record.State, record.Reason = "accepted", "tous les contrôles préautorisés ont réussi"
+		if s.independentReviewGuard(&w, t) != nil {
+			record.State, record.Reason = "pending_review", "contrôles réussis ; revue indépendante requise avant acceptation"
+		}
 	} else {
 		record.Reason = "au moins un contrôle préautorisé a échoué"
 	}
@@ -369,9 +387,6 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		if findErr != nil || task.Status != "submitted" || task.ValidationPolicy == nil || validationPolicyDigest(*task.ValidationPolicy) != digest {
 			return fmt.Errorf("politique ou tâche modifiée pendant les contrôles ; revue humaine requise")
 		}
-		if e := s.independentReviewGuard(current, task); e != nil {
-			return e
-		}
 		fresh, evalErr := evaluate(document, s.root, "delivery")
 		if evalErr != nil {
 			return fmt.Errorf("preuve périmée pendant les contrôles : %w", evalErr)
@@ -383,6 +398,13 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 			task.Blocker = record.Reason
 			task.Next = "Examiner le reçu " + relReceipt + " ; corriger ou modifier explicitement la politique avant une nouvelle tentative."
 			return nil
+		}
+		if record.State == "pending_review" {
+			task.Next = record.Reason
+			return nil
+		}
+		if e := s.independentReviewGuard(current, task); e != nil {
+			return e
 		}
 		for _, dep := range task.Depends {
 			parent, _ := current.task(dep)
@@ -398,7 +420,7 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	if err != nil {
 		return false, err.Error()
 	}
-	return evaluation.Allowed, record.Reason + " ; reçu " + relReceipt
+	return evaluation.Allowed && record.State == "accepted", record.Reason + " ; reçu " + relReceipt
 }
 
 // resumeAutomaticValidations makes pause/restart honest: a submitted result is

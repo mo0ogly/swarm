@@ -31,7 +31,24 @@ const Mission={
    if(item.traces?.length){const traces=node('details');traces.dataset.missionDetail=scope+'-'+item.category;traces.append(node('summary',tr_web_mission_js('Traces techniques — ')+item.traces.length));const list=node('ul');for(const trace of item.traces)list.append(node('li',trace));traces.append(list);issue.append(traces)}
    block.append(issue);
   }
+  block.append(this.copyDiagnosticButton(diagnostic));
   return block;
+ },
+ diagnosticText(diagnostic){
+  const version=globalThis.RuntimeHealthPanel?.value?.version;
+  const versionLine=version?.available?version.revision.slice(0,12)+(version.modified?'*':''):tr_web_mission_js('état inconnu');
+  const lines=[tr_web_mission_js('Tentative : ')+(diagnostic.attempt_id||tr_web_mission_js('état inconnu')),tr_web_mission_js('Version : ')+versionLine,tr_web_mission_js('Cause : ')+missionText(diagnostic.summary),''];
+  for(const item of diagnostic.items){lines.push(missionText(item.label)+' — '+missionText(item.cause),tr_web_mission_js('Action disponible : ')+missionText(item.action),'');}
+  return lines.join('\n').trim();
+ },
+ copyDiagnosticButton(diagnostic){
+  const wrap=node('div',undefined,'mission-diagnostic-copy'),status=node('p','','hint');status.setAttribute('role','status');
+  const b=Pilot.command(tr_web_mission_js('Copier le diagnostic'),async()=>{
+   try{await navigator.clipboard.writeText(this.diagnosticText(diagnostic));status.textContent=tr_web_mission_js('Diagnostic copié.')}
+   catch(e){status.textContent=tr_web_mission_js('Copie impossible : sélectionnez et copiez le texte affiché.')}
+  });
+  wrap.append(b,status);
+  return wrap;
  },
  resultView(result){
   const block=node('section',undefined,'mission-result');

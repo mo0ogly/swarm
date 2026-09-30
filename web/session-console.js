@@ -28,7 +28,7 @@ export class SessionConsole {
    this.theme();this.editor=this.monaco.editor.create(this.host,{value:this.text,language:'plaintext',theme:'swarm-session',readOnly:true,domReadOnly:true,automaticLayout:true,minimap:{enabled:false},wordWrap:'on',fontSize:14,lineNumbers:'on',scrollBeyondLastLine:false,renderLineHighlight:'none',stickyScroll:{enabled:false},accessibilitySupport:'on',editContext:false,ariaLabel:tr_web_session_console_js('Journal de la session, lecture seule'),links:false});
    this.decorations=this.editor.createDecorationsCollection();this.fallback.hidden=true;this.paint();
    document.getElementById('console-mode-label').textContent=tr_web_session_console_js('Journal de l’agent · lecture seule · Ctrl+F pour rechercher');
-  }catch{this.host.hidden=true;this.fallback.hidden=false;document.getElementById('console-mode-label').textContent=tr_web_session_console_js('Journal en affichage simplifié · contenu conservé')}})();return this.loading;
+  }catch{this.host.hidden=true;this.fallback.hidden=false;document.getElementById('console-mode-label').textContent=tr_web_session_console_js('La coloration du journal est indisponible. Les messages restent consultables.')}})();return this.loading;
  }
  append(text){
   // Keep a bounded view; original history stays on the server / in the terminal.

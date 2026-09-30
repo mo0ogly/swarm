@@ -384,6 +384,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	}
 	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
+	s.registerRunLimitsAdmin(mux, send, fail)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
 	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {

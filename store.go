@@ -289,6 +289,17 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	// v23 adds run_limits_config/run_limits_history (see run_limits_admin.go).
+	if version < 23 {
+		if version != 0 {
+			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v23-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(runLimitsConfigMigration); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}

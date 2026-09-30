@@ -74,6 +74,7 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	MissingReport            bool `json:"missing_report,omitempty"`
 	preparedReviewInputs     map[string]any
 	coordinationInputs       map[string]*preparedCoordination
 	ScopeFiles               []string                       `json:"scope_files,omitempty"`
