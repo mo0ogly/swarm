@@ -3,10 +3,17 @@
 [English](en/AGENT-METHODS.md) · [Guide utilisateur](../GUIDE-UTILISATEUR.md)
 
 Ce dépôt fournit **neuf méthodes** pour cadrer, réaliser, vérifier et améliorer
-Swarm. Elles reprennent les pratiques utiles des méthodes APEX et audit PDCA de
-LIA : critères explicites, décisions tracées, preuves observables, reprise bornée
-et retour d'expérience. Elles sont réécrites pour ce dépôt, sans dépendance à
-l'installation LIA, ses hooks, ses scripts de déploiement ou ses permissions.
+Swarm : parcours guidé, examen et amélioration, construction et examen de
+spécification, revue du code, diagnostic, vérification, replanification et retour
+d’expérience. Elles partagent des critères explicites, des décisions tracées et
+des preuves observables, sans dépendance à une autre installation.
+
+## Catalogue lisible
+
+Les noms destinés aux utilisateurs sont ceux du [catalogue du README](../README.md#communication-et-méthodes). Les méthodes de spécification couvrent la rédaction du besoin et l’examen du plan. Les identifiants historiques ci-dessous servent uniquement aux commandes natives et à la compatibilité ; ils ne sont pas les noms à afficher dans l’interface.
+
+<details>
+<summary>Commandes natives et identifiants techniques</summary>
 
 ## Démarrer
 
@@ -39,6 +46,8 @@ Dans Claude, remplacez `$` par `/`. Les indications `--plan-only`, `--resume`,
 options de l'exécutable `swarm`. L'audit est en lecture seule par défaut.
 Les méthodes répondent dans la langue de la demande.
 
+</details>
+
 ## Depuis l'interface Swarm
 
 Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
@@ -63,8 +72,7 @@ swarm --root "$PWD" --json prepare methods
 ```
 
 Chaque entrée indique `available` et une empreinte `sha256`. `audit_pdca` reste
-un alias de `audit-pdca` dans Swarm et `/audit_pdca` dans Claude. Les anciennes
-commandes `/ks-feature` et `/ks-plan` sont conservées.
+un alias de `audit-pdca` dans Swarm et `/audit_pdca` dans Claude. Des alias historiques restent acceptés pour les anciennes intégrations ; utilisez les méthodes de spécification pour les nouveaux parcours.
 
 La méthode de préparation est lue dans **la racine de projet utilisée par Swarm**. Installer le
 binaire seul ne copie pas cette configuration dans d'autres projets. En Docker,
@@ -79,9 +87,9 @@ par Codex ou Claude pour fournir ce cadrage.
 
 | Rôle | Méthodes incluses | Limites |
 | --- | --- | --- |
-| Planificateur et sous-planificateur | APEX, audit-pdca, spec-builder, spec-audit, replan, debug | PLAN et ACT ; sans outils ni modification de code |
-| Exécutant | APEX, audit-pdca, verify-fix, debug, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
-| Vérificateur indépendant | audit-pdca, code-reviewer | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
+| Planificateur et sous-planificateur | Parcours guidé, examen et amélioration, construction et examen de spécification, replanification, diagnostic | PLAN et ACT ; sans outils ni modification de code |
+| Exécutant | Parcours guidé, examen et amélioration, vérification, diagnostic, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
+| Vérificateur indépendant | Examen et amélioration, revue du code | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
 
 Le champ `workflow` conserve la version, le rôle, la liste des méthodes et leur
 empreinte SHA-256. Le moteur refuse un rôle inconnu ou un cadrage dépassant sa

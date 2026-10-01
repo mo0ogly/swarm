@@ -201,7 +201,7 @@ Le script compile dans un fichier temporaire du dossier cible, puis remplace le 
 | Fournisseur absent | Installation dans le conteneur, PATH et `.swarm/providers.json` |
 | Agent installé mais appel refusé | Authentification, variables autorisées et capacités de sandbox |
 | Ancienne mission avec chemins invalides | Adapter les profils vers `/workspace` sans lancer deux serveurs sur la même base |
-| Méthode APEX, KS ou PDCA absente | Installer les ressources de méthode dans le projet piloté, voir [les limites](docs/migration/README.md) |
+| Méthode de préparation indisponible | Vérifier la racine utilisée par Swarm et les ressources de méthode de ce projet ; voir le [guide des méthodes](docs/AGENT-METHODS.md). Installer le binaire seul ne copie pas ces ressources dans un autre projet. |
 
 Le Dockerfile compile les sources présentes localement. Il n’existe pas ici de promesse d’image publique préconstruite ni de compatibilité universelle avec les fournisseurs.
 
@@ -244,13 +244,14 @@ de certaines migrations ne remplacent pas cette sauvegarde complète.
 
 Capture réelle du parcours français : mission Administration lancée depuis les écrans, le 29 septembre 2026. Le lancement ne prouve pas la réussite des huit tâches ; les résultats restent à examiner.
 
-### Trois états à ne pas confondre
+### Quatre états à ne pas confondre
 
 | État | Ce que vous voyez | Ce que cela prouve | Capture |
 | --- | --- | --- | --- |
 | Formulaire rempli | Valeurs saisies, aperçu « valeurs actuelles » avant confirmation | Rien n’est écrit : la révision n’a pas changé | `admin-fr-etat.png`, `admin-fr-sombre.png` |
 | Configuration enregistrée | Révision 1 dans la portée et dans l’historique, auteur et motif | Les valeurs seront utilisées par les **prochains départs** | `admin-saved-fr-etat.png`, `admin-saved-fr-sombre.png` |
 | Lancement effectif | Tâche en cours, tentative active dans le pilotage | Un agent a démarré ; ni résultat, ni acceptation | `mission-lancee-fr.png` |
+| Mission clôturée | Tous les résultats validés sur leurs preuves et responsabilité racine clôturée | Les résultats requis ont été acceptés ; ce n’est pas la seule fin des processus | [Capture du 1er octobre](docs/screenshots/mission-complete-fr.png) |
 
 **Point de vigilance :** le parcours actuel comporte une autorisation de l’équipe, puis un lancement dans le pilotage. Si aucune tâche ne démarre, consultez le motif affiché avant toute nouvelle tentative.
 
@@ -343,3 +344,49 @@ Observations réelles du 29 septembre 2026 (mission Administration pilotée depu
 | Le bouton « Soumettre le rapport » bloquait la revue | Défaut du moteur corrigé ; la réparation passe par le même bouton, sans modifier la base à la main. |
 
 Ne modifiez jamais directement `.swarm/state.db` pour contourner une erreur.
+
+## Choisir une méthode après installation
+
+Dans **Préparer avec l’IA**, choisissez une méthode avec son nom d’usage :
+
+- **Analyse et planification** : clarifier le besoin et proposer un plan.
+- **Parcours guidé — préparer une évolution** : cadrer le changement, ses critères et ses tâches.
+- **Examiner et améliorer — préparer l’examen** : définir les risques et les contrôles.
+- **Diagnostiquer et corriger un problème** : préparer le diagnostic à partir des faits connus.
+
+La préparation ne réalise aucune correction et ne lance aucun agent. Les méthodes
+**Construire la spécification** et **Examiner la spécification** couvrent la
+rédaction du besoin et la recherche des omissions dans les sessions natives ;
+elles ne sont pas deux boutons supplémentaires de ce menu.
+
+Vérifiez le catalogue de votre projet depuis le même emplacement qu’au lancement :
+
+```sh
+swarm --root /chemin/du/projet --json prepare methods
+```
+
+Chaque méthode expose sa disponibilité. Le binaire contient le cadrage des rôles
+pour l’exécution ; les méthodes de **préparation** sont lues dans le projet piloté.
+En Docker, cette racine est `/workspace`. Ne confondez pas un fournisseur installé,
+une méthode disponible et un plan autorisé. Voir le [catalogue des méthodes](docs/AGENT-METHODS.md).
+
+## Reconnaître le résultat après le lancement
+
+![Résultat de la mission réelle : huit résultats validés](docs/screenshots/mission-complete-fr.png)
+
+*Capture du 1er octobre 2026, après clôture de la mission Administration avec
+interventions humaines. Elle complète la capture historique de lancement du
+29 septembre ; elle ne constitue pas une nouvelle recette Docker.*
+
+![Organisation actuelle et flèches des dépendances](docs/screenshots/mission-graph-current-fr.png)
+
+*Orchestrateur à gauche, tâches au centre et vérificateur à droite. Les traits
+pleins représentent les dépendances ; les pointillés représentent les
+responsabilités et les remises au vérificateur. La vue d’ensemble réduit le zoom.*
+
+Les captures des formulaires d’Administration datées du 30 septembre restent des
+recettes isolées : elles prouvent les états indiqués dans leurs légendes. Les
+nouvelles captures de clôture montrent une autre étape du même parcours ; elles
+ne transforment pas ces tests isolés en preuve de succès de tous les fournisseurs.
+
+Pour une reprise ou un conflit de révision, consultez les [conditions du moteur](docs/ENGINE-RECOVERY.md).

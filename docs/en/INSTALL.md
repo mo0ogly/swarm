@@ -182,13 +182,14 @@ Automatic backups from some migrations do not replace a complete backup.
 
 Actual French-interface capture, September 29, 2026: the Administration mission was launched through the web screens. This demonstrates launch, not completion of all eight tasks. Results still require review.
 
-### Three states not to confuse
+### Four states not to confuse
 
 | State | What you see | What it proves | Capture |
 | --- | --- | --- | --- |
 | Completed form | Entered values and a "current values" preview before confirmation | Nothing is written: the revision is unchanged | `admin-en-etat.png`, `admin-en-sombre.png` |
 | Saved configuration | Revision 1 in the scope and in the history, with author and reason | Values apply to **future starts** | `admin-saved-en-etat.png`, `admin-saved-en-sombre.png` |
 | Actual launch | Task in progress, active attempt on the dashboard | An agent started; no result, no acceptance | `mission-lancee-fr.png` (French UI) |
+| Closed mission | All results validated against current evidence, root responsibility closed | Required results were accepted; this is more than process termination | [October 1 capture](../screenshots/en/mission-complete-en.png) |
 
 **Current workflow:** team authorization and dashboard launch are separate steps. If nothing starts, read the reported cause before retrying.
 
@@ -281,3 +282,48 @@ Actual observations from September 29, 2026 (Administration mission driven from 
 | "Submit report" button blocked the review | Engine defect, fixed; repair goes through the same button, without editing the database by hand. |
 
 Never edit `.swarm/state.db` directly to work around an error.
+
+## Choose a method after installation
+
+In **Prepare with AI**, use the methods by their user-facing purpose:
+
+- **Analysis and planning**: clarify requirements and propose a plan.
+- **Guided workflow — prepare an improvement**: define a change, its criteria and tasks.
+- **Examine and improve — prepare the assessment**: prepare the examination scope, risks and checks.
+- **Diagnose and fix a problem**: prepare a diagnosis from known facts.
+
+Preparation performs no correction and launches no agent. **Build the
+specification** and **Examine the specification** support requirements writing
+and gap analysis in native sessions; they are not two extra preparation buttons.
+
+Check the catalogue in the same project root used by your server:
+
+```sh
+swarm --root /path/to/project --json prepare methods
+```
+
+Each method reports its availability. Execution-role guidance is embedded in the
+binary; **preparation** methods are read from the controlled project. In Docker,
+that root is `/workspace`. Installing an AI provider, making a method available
+and authorizing a plan are distinct steps. Installing the binary alone does not
+copy preparation resources to another project. See the [method catalogue](AGENT-METHODS.md).
+
+## Recognize the result after launch
+
+![Actual mission result: eight validated results](../screenshots/en/mission-complete-en.png)
+
+*October 1, 2026 capture after closing the Administration mission with human
+interventions. It supplements the historical September 29 launch capture; it
+is not a new Docker installation test. User-authored mission names remain in French.*
+
+![Current organization and dependency arrows](../screenshots/en/mission-graph-current-en.png)
+
+*Orchestrator on the left, tasks in the middle and reviewer on the right. Solid
+arrows show dependencies; dotted arrows show responsibilities and reviewer
+handoffs. The overview reduces zoom to show the whole graph.*
+
+The dated September 30 Administration form captures remain isolated tests of
+the states described in their captions. The new completion captures show a
+later workflow stage; they do not qualify every provider's operation.
+
+For recovery or revision conflicts, see the [engine recovery conditions](ENGINE-RECOVERY.md).

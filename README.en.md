@@ -67,13 +67,25 @@ reproduces every part of Cursor's final architecture.
 
 ## See the interface
 
-These screenshots were captured on 29 September 2026 with demonstration data and no AI calls. The manual mission contains three unconfigured tasks; missing-role warnings are expected. This is not a completed autonomous run.
-They illustrate the French interface; choose English from the language selector.
+Actual application captures from **October 1, 2026**, showing an eight-task mission closed with human decisions. This is not evidence of unattended autonomy. User-authored task names retain their original French language.
 
-![Preparation](docs/screenshots/en/preparation.png)
-![Unconfigured tasks and dependency arrows](docs/screenshots/en/agents-horizontal.png)
-![Vertical graph](docs/screenshots/en/agents-vertical.png)
-![Detailed agent view](docs/screenshots/en/agent-detail.png)
+### Understand the current state
+
+The summary states what is happening, who acts and what comes next. All eight results here are validated against current evidence, with deliverables and reviews still accessible.
+
+![Current mission: 8/8 results validated](docs/screenshots/en/mission-complete-en.png)
+
+### See the team and dependencies
+
+The orchestrator is on the left, workers in the middle and the independent reviewer on the right. **Solid arrows** connect prerequisites to dependent tasks; **dotted arrows** show responsibilities and reviewer handoffs.
+
+![Current graph with orchestrator, workers, reviewer and arrows](docs/screenshots/en/mission-graph-current-en.png)
+
+[Open the graph at full size](docs/screenshots/en/mission-graph-current-en.png)
+
+Horizontal and vertical layouts, detail levels, filters and branch folding change the view without removing tasks. “Why is this task waiting?” explains prerequisites; “Where do calls and costs go?” separates observed consumption.
+
+Preparation turns needs into criteria, tasks and dependencies. Adopting a plan does not launch agents: check roles, connections, workspaces and limits before authorizing execution. See the [illustrated user guide](docs/en/USER-GUIDE.md) and [installation screenshots](docs/en/INSTALL.md).
 
 ## Install
 
@@ -117,7 +129,7 @@ tests do not qualify a real provider's authentication, permissions or results.
 
 Data is local under the controlled project's `.swarm/`. Keep this directory,
 authentication and session links private. This repository supplies nine
-[working methods](docs/en/AGENT-METHODS.md), including planning, PDCA audit,
+[working methods](docs/en/AGENT-METHODS.md), including planning, system examination and improvement,
 debugging, review and lessons learned. When controlling another project, check
 which method resources are available in that project.
 
@@ -127,7 +139,7 @@ which method resources are available in that project.
 - [English installation guide](docs/en/INSTALL.md)
 - [Authorize recovery and supply candidate sources to the reviewer](docs/en/ATTEMPT-RECOVERY.md)
 - [Storage diagnosis and exhausted attempts](docs/en/RUNTIME-RECOVERY.md)
-- [Codex and Claude methods: APEX, PDCA, review and verification](docs/en/AGENT-METHODS.md)
+- [Methods: requirements, specifications, planning, audit, diagnosis and verification](docs/en/AGENT-METHODS.md)
 - [Agent reports, evidence delivery and linked decisions](docs/en/AGENT-COMMUNICATION.md)
 - [English interface validation](docs/en/I18N-VALIDATION.md)
 - [Technical reference](docs/en/REFERENCE.md)
@@ -162,3 +174,21 @@ root responsibility. Deliverables, reviews and costs remain accessible.
 ![Closed mission in the cockpit](docs/screenshots/en/mission-complete-en.png)
 
 *Actual 8/8 recipe with human interventions. The user-authored title remains in French. See the [user guide](docs/en/USER-GUIDE.md#read-counters-and-recognize-completion) and [engine recovery](docs/en/ENGINE-RECOVERY.md).*
+
+## Working methods
+
+Methods provide a shared approach with criteria and evidence; executable engine rules remain authoritative.
+
+| Need | Method |
+| --- | --- |
+| Turn a need into a verified change | Guided change workflow |
+| Examine a system and address authorized findings | Examine and improve |
+| Define expected outcomes and acceptance criteria | Build the specification |
+| Find omissions and contradictions before execution | Examine the specification |
+| Find actionable implementation defects | Review the code |
+| Reproduce a problem and identify its cause | Diagnose and fix |
+| Recheck the affected flow after a correction | Verify the fix |
+| Recover a blocked plan while retaining history | Replan |
+| Explain outcomes and prioritize improvements | Lessons learned |
+
+The specification methods cover both requirements writing and plan examination. See the [method guide](docs/en/AGENT-METHODS.md) for actual preparation choices and native-session commands; not every method is a web button.

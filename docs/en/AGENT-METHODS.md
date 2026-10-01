@@ -3,10 +3,17 @@
 [Français](../AGENT-METHODS.md) · [User guide](USER-GUIDE.md)
 
 This repository includes **nine methods** for specifying, implementing, reviewing
-and improving Swarm. They adapt LIA's APEX and PDCA practices: explicit criteria,
-traceable decisions, observable evidence, bounded recovery and retrospectives.
-They have been rewritten for this repository and require no LIA installation,
-deployment scripts, hooks or permission settings.
+and improving Swarm: guided change workflow, examination and improvement,
+specification writing and examination, code review, diagnosis, verification,
+replanning and lessons learned. They use explicit criteria, traceable decisions
+and observable evidence without requiring another installation.
+
+## Plain-language catalogue
+
+User-facing names follow the [README catalogue](../../README.en.md#working-methods). Specification methods cover both requirements writing and plan examination. Historical identifiers below are native commands and compatibility identifiers, not interface labels.
+
+<details>
+<summary>Native commands and technical identifiers</summary>
 
 ## Start here
 
@@ -38,6 +45,8 @@ For Claude, replace `$` with `/`. `--plan-only`, `--resume`, `--fix` and
 `--score-only` are instructions interpreted by the method, not additional `swarm`
 binary flags. Audits are read-only by default. Methods answer in the user's language.
 
+</details>
+
 ## In Swarm preparation
 
 The existing **Prepare with AI** method selector uses:
@@ -60,8 +69,7 @@ swarm --root "$PWD" --json prepare methods
 ```
 
 Each entry includes `available` and a `sha256` fingerprint. `audit_pdca` remains
-an alias for `audit-pdca` in Swarm, and `/audit_pdca` in Claude. The legacy
-`/ks-feature` and `/ks-plan` commands are also provided.
+an alias for `audit-pdca` in Swarm, and `/audit_pdca` in Claude. Historical aliases remain accepted for older integrations; use the specification methods for new workflows.
 
 Preparation methods are read from **Swarm's configured project root**. Installing only the
 binary does not copy this configuration into other projects. With Docker, the
@@ -74,9 +82,9 @@ to the provider. This does not depend on native skill discovery in Codex or Clau
 
 | Role | Included methods | Boundaries |
 | --- | --- | --- |
-| Planner and subplanner | APEX, audit-pdca, spec-builder, spec-audit, replan, debug | PLAN and ACT; no tools or code changes |
-| Worker | APEX, audit-pdca, verify-fix, debug, handoff and tracking templates | DO and CHECK within authorized scope; read-only for audit-only tasks |
-| Independent reviewer | audit-pdca, code-reviewer | CHECK on supplied evidence; no tools or candidate changes |
+| Planner and subplanner | Guided workflow, examination and improvement, specification writing and examination, replanning, diagnosis | PLAN and ACT; no tools or code changes |
+| Worker | Guided workflow, examination and improvement, verification, diagnosis, handoff and tracking templates | DO and CHECK within authorized scope; read-only for audit-only tasks |
+| Independent reviewer | Examination and improvement, code review | CHECK on supplied evidence; no tools or candidate changes |
 
 The `workflow` field records version, role, method names and SHA-256 digest. Unknown
 roles and oversized framing are rejected. Methods are **embedded at build time**:
