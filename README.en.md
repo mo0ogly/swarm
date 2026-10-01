@@ -19,6 +19,8 @@ as a successful result.
 
 See the [illustrated user guide](docs/en/USER-GUIDE.md). Swarm is experimental; read the [qualification evidence and limitations](docs/COMMUNITY-QUALIFICATION.md).
 
+Start with **Choose a mission template** in preparation: [Guided workflow catalogue shared by web and CLI](docs/en/PREPARATION-TEMPLATES.md).
+
 ## What it does
 
 - Prepare requirements with AI, approve a brief and review a structured plan.

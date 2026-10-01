@@ -32,6 +32,9 @@ func TestAgentWorkflowRolesAreBounded(t *testing.T) {
 				t.Fatal(err)
 			}
 			assertWorkflowDelivery(t, prompt, role, &w)
+			if (role != "reviewer") != containsString(w.Methods, "debug") {
+				t.Fatal("diagnosis method assigned to the wrong role")
+			}
 			if (role == "worker") != strings.Contains(prompt, "SOURCE tools/agent-workflows/templates/HANDOFF.md") {
 				t.Fatal("file-writing template assigned to the wrong role")
 			}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnostiquer et corriger un problème"
+  short_description: "Isoler la cause et vérifier une correction ciblée"
+  default_prompt: "Utilise $debug pour diagnostiquer ce problème avec des preuves, puis corriger uniquement dans le périmètre autorisé."

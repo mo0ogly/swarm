@@ -2,7 +2,7 @@
 
 [Français](../AGENT-METHODS.md) · [User guide](USER-GUIDE.md)
 
-This repository includes **eight methods** for specifying, implementing, reviewing
+This repository includes **nine methods** for specifying, implementing, reviewing
 and improving Swarm. They adapt LIA's APEX and PDCA practices: explicit criteria,
 traceable decisions, observable evidence, bounded recovery and retrospectives.
 They have been rewritten for this repository and require no LIA installation,
@@ -19,6 +19,7 @@ Open Codex or Claude **in this repository**, then invoke a method:
 | Specify a need and testable requirements | `$spec-builder` | `/spec-builder` |
 | Find gaps in a plan | `$spec-audit` | `/spec-audit` |
 | Review code and implementation risks | `$code-reviewer` | `/code-reviewer` |
+| Diagnose a defect before a scoped fix | `$debug` | `/debug` |
 | Verify the affected flow after a fix | `$verify-fix` | `/verify-fix` |
 | Recover an existing blocked plan | `$replan` | `/replan` |
 | Explain outcomes and prioritize improvements | `$retex-analyzer` | `/retex-analyzer` |
@@ -43,9 +44,9 @@ The existing **Prepare with AI** method selector uses:
 
 | Preparation method | Material provided to the model |
 | --- | --- |
-| APEX | Need analysis and planning |
-| KS feature | Scope, criteria and task decomposition |
-| Audit PDCA | Audit scope, risks and verification plan |
+| Analysis and planning | Need analysis and planning |
+| Guided workflow — prepare a change | Scope, criteria and task decomposition |
+| Examiner et améliorer — préparer l’examen | Audit scope, risks and verification plan |
 
 Swarm sends the entire method files and shared contract to the model. Execution
 phases remain prohibited during preparation: the model proposes a brief or plan;
@@ -73,8 +74,8 @@ to the provider. This does not depend on native skill discovery in Codex or Clau
 
 | Role | Included methods | Boundaries |
 | --- | --- | --- |
-| Planner and subplanner | APEX, audit-pdca, spec-builder, spec-audit, replan | PLAN and ACT; no tools or code changes |
-| Worker | APEX, audit-pdca, verify-fix, handoff and tracking templates | DO and CHECK within authorized scope; read-only for audit-only tasks |
+| Planner and subplanner | APEX, audit-pdca, spec-builder, spec-audit, replan, debug | PLAN and ACT; no tools or code changes |
+| Worker | APEX, audit-pdca, verify-fix, debug, handoff and tracking templates | DO and CHECK within authorized scope; read-only for audit-only tasks |
 | Independent reviewer | audit-pdca, code-reviewer | CHECK on supplied evidence; no tools or candidate changes |
 
 The `workflow` field records version, role, method names and SHA-256 digest. Unknown
@@ -206,3 +207,14 @@ mission budgets or refund calls.
 ## Engine acceptance
 
 See [the six E1–E6 recipes](ENGINE-ACCEPTANCE.md), their requirements and the distinction between deterministic fixtures, browser checks and live-agent trials.
+
+## Structured diagnosis
+
+“Fix a reproducible defect” selects “Diagnose and fix a problem”. The engine embeds
+this method for new planners, subplanners and workers. Apply it to anomalies:
+reproduce, isolate, test a cause, fix if authorised, verify. Preparation remains
+tool-free; the reviewer retains its independent review method. Inclusion and its
+fingerprint prove the supplied context, not adherence or successful diagnosis.
+
+The portable version adapts the locally installed Debug skill, without mandatory
+connectors, machine paths or dependencies on another installation.

@@ -2,7 +2,7 @@
 
 [English](en/AGENT-METHODS.md) · [Guide utilisateur](../GUIDE-UTILISATEUR.md)
 
-Ce dépôt fournit **huit méthodes** pour cadrer, réaliser, vérifier et améliorer
+Ce dépôt fournit **neuf méthodes** pour cadrer, réaliser, vérifier et améliorer
 Swarm. Elles reprennent les pratiques utiles des méthodes APEX et audit PDCA de
 LIA : critères explicites, décisions tracées, preuves observables, reprise bornée
 et retour d'expérience. Elles sont réécrites pour ce dépôt, sans dépendance à
@@ -19,6 +19,7 @@ Ouvrez Codex ou Claude **dans ce dépôt**, puis utilisez la commande adaptée :
 | Rédiger un besoin et ses critères vérifiables | `$spec-builder` | `/spec-builder` |
 | Trouver les trous d'un plan | `$spec-audit` | `/spec-audit` |
 | Examiner le code et ses risques | `$code-reviewer` | `/code-reviewer` |
+| Diagnostiquer un défaut avant une correction ciblée | `$debug` | `/debug` |
 | Vérifier le parcours après une correction | `$verify-fix` | `/verify-fix` |
 | Reprendre un plan bloqué | `$replan` | `/replan` |
 | Comprendre les résultats et prioriser la suite | `$retex-analyzer` | `/retex-analyzer` |
@@ -44,9 +45,10 @@ Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
 
 | Méthode de préparation | Contenu fourni à l'IA |
 | --- | --- |
-| APEX | Analyse et planification du besoin |
-| KS — cadrer une fonctionnalité | Cadrage, critères et décomposition en tâches |
-| Audit PDCA | Définition du périmètre, des risques et du plan de contrôle |
+| Analyse et planification | Analyse et planification du besoin |
+| Parcours guidé — préparer une évolution | Cadrage, critères et décomposition en tâches |
+| Examiner et améliorer — préparer l’examen | Définition du périmètre, des risques et du plan de contrôle |
+| Diagnostiquer et corriger un problème | Hypothèses, preuves manquantes et plan de diagnostic ; aucune correction en préparation |
 
 Le fichier de méthode et le contrat commun sont transmis intégralement au modèle.
 Les phases d'exécution des méthodes restent interdites dans cette préparation :
@@ -77,8 +79,8 @@ par Codex ou Claude pour fournir ce cadrage.
 
 | Rôle | Méthodes incluses | Limites |
 | --- | --- | --- |
-| Planificateur et sous-planificateur | APEX, audit-pdca, spec-builder, spec-audit, replan | PLAN et ACT ; sans outils ni modification de code |
-| Exécutant | APEX, audit-pdca, verify-fix, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
+| Planificateur et sous-planificateur | APEX, audit-pdca, spec-builder, spec-audit, replan, debug | PLAN et ACT ; sans outils ni modification de code |
+| Exécutant | APEX, audit-pdca, verify-fix, debug, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
 | Vérificateur indépendant | audit-pdca, code-reviewer | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
 
 Le champ `workflow` conserve la version, le rôle, la liste des méthodes et leur
@@ -220,3 +222,16 @@ Cela ne modifie pas les budgets des missions existantes et ne rembourse aucun ap
 ## Recette du moteur
 
 Voir [les six recettes E1–E6](ENGINE-ACCEPTANCE.md), leurs prérequis et la distinction entre fixtures déterministes, contrôle navigateur et essai avec des agents réels.
+
+## Diagnostic structuré
+
+Le parcours « Corriger un défaut reproductible » sélectionne la méthode
+« Diagnostiquer et corriger un problème ». Le moteur embarque cette méthode pour
+les nouveaux planificateurs, sous-planificateurs et exécutants. Elle s’applique
+aux anomalies : reproduire, isoler, tester une cause, corriger si autorisé, vérifier.
+Une préparation reste sans outils ; le vérificateur conserve sa méthode de revue
+indépendante. L’inclusion et son empreinte prouvent le contexte fourni, pas le
+respect effectif de la méthode ni la réussite d’un diagnostic.
+
+La version portable adapte la skill Debug installée localement, sans connecteurs
+obligatoires, chemins machine ou dépendance à une autre installation.

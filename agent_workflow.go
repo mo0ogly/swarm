@@ -26,10 +26,10 @@ func agentWorkflow(role string) (AgentWorkflow, string, error) {
 	var boundary string
 	switch role {
 	case "planner", "subplanner":
-		w.Methods = []string{"apex", "audit-pdca", "spec-builder", "spec-audit", "replan"}
+		w.Methods = []string{"apex", "audit-pdca", "spec-builder", "spec-audit", "replan", "debug"}
 		boundary = "PLAN et ACT du PDCA : cadrer, décomposer, comparer les preuves et proposer une correction du plan. Analyse et planification seulement. Aucun outil, code, test exécuté ou livrable modifié. Les phases DO et CHECK exécutées dans les méthodes ci-dessous appartiennent aux exécutants et vérificateurs. Ne jamais déclarer un contrôle effectué à partir d'un simple rapport."
 	case "worker":
-		w.Methods = []string{"apex", "audit-pdca", "verify-fix"}
+		w.Methods = []string{"apex", "audit-pdca", "verify-fix", "debug"}
 		boundary = "DO et CHECK du PDCA : réaliser uniquement la tâche confiée, puis vérifier son effet avec les outils autorisés. Si la tâche demande seulement un audit, rester en lecture seule. Si elle autorise une correction, corriger dans son périmètre et rejouer les contrôles. Rapporter les preuves et limites au responsable ; aucune délégation, acceptation, modification de plan ou hausse de budget implicite. Ces contrôles personnels ne sont pas la revue indépendante."
 	case "reviewer":
 		w.Methods = []string{"audit-pdca", "code-reviewer"}

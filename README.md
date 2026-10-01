@@ -20,6 +20,8 @@ Swarm est un outil local de coordination d’agents de développement, avec une 
 
 → [Guide illustré : les étapes, les boutons et les blocages](GUIDE-UTILISATEUR.md)
 
+Pour démarrer avec une structure, utilisez « Choisir un modèle de mission » dans la préparation : [catalogue de parcours guidés partagé entre web et CLI](docs/PREPARATION-TEMPLATES.md).
+
 Swarm reste expérimental. Consultez les [essais réalisés et leurs limites](docs/COMMUNITY-QUALIFICATION.md) avant de lui confier une mission importante.
 
 ## Ce que vous pouvez faire
