@@ -1016,3 +1016,276 @@ Résultat final de la suite complète du moteur après cette correction :
 code 0). Les tests ciblés avec `-race`, `go vet ./...` et `git diff --check`
 sont également PASS. Le précédent échec chronométrique reste consigné plus
 haut comme observation historique ; ce passage complet est vert.
+
+## 1er octobre — reprise du moteur après redémarrage
+
+La recette isolée de coordination a reproduit un blocage créé par le moteur :
+le contrôle initial utilisait le rapport du workspace de la tentative, alors
+que la reprise pouvait choisir une copie portant le même nom dans le dossier
+principal. Cela déclenchait des contrôles supplémentaires et réécrivait un
+reçu déjà transmis au vérificateur. Un conflit de révision pouvait laisser
+le fichier réécrit sans enregistrer la nouvelle décision. La revue devenait
+alors périmée malgré un livrable inchangé.
+
+Correction : la reprise utilise le rapport de l’espace de la tentative,
+comme le relais initial. Chaque nouvelle publication reçoit un chemin de reçu
+unique ; elle ne remplace jamais le reçu historique, même après correction du
+rapport dans la même tentative ou conflit de révision. Les contrôles de
+fraîcheur du vérificateur restent obligatoires.
+
+Preuve : la recette `organized_coordination_process.py`, scénario `restart`,
+passe avec trois productions, trois relais, trois revues indépendantes, deux
+producteurs parallèles et clôture du responsable. Aucune intervention après
+le lancement. Cette preuve emploie des fournisseurs déterministes et aucun
+appel à un modèle IA ; elle qualifie ce parcours du moteur.
+
+Leçon : des appels supplémentaires peuvent venir de la sélection des preuves
+et de leur publication par l’orchestrateur. Avant d’augmenter les plafonds,
+mesurer les appels des agents séparément des contrôles et reprises du moteur.
+
+Validation du correctif : suite Go complète PASS (463,678 s), tests ciblés de
+reprise et de reçus immuables PASS, tests ciblés avec `-race` PASS,
+`go vet ./...` PASS et `npm test` PASS. La recette de résumé/action couvre
+FR/EN, clair/sombre, clavier et mobile ; elle constate zéro agent lancé et
+aucune mutation de mission lors de l’ouverture du diagnostic. Le dernier
+ajustement rédactionnel du résumé est couvert par les tests ciblés et cette
+recette navigateur. Les gates historiques de missions existantes ne sont
+pas renouvelées automatiquement par ces tests.
+
+## 1er octobre — sept améliorations de conduite livrées
+
+Les trois premiers changements sont conservés : résumé court partagé entre
+web et CLI, action principale avec effet annoncé, mémoire de reprise centrée
+sur la tâche et les dernières traces. Quatre vues les complètent :
+
+- Nouveaux résultats, blocages et décisions depuis le repère de visite ;
+  historique borné aux 200 derniers événements avec avertissement explicite.
+- Prérequis exacts, distinction entre validation manquante et preuves
+  périmées, bouton ouvrant la vraie tâche concernée.
+- Consommation séparée des exécutants, responsables, vérificateur et moteur.
+  Réservations enregistrées, outils observés et contrôles exécutés sont des
+  unités différentes. Une réservation ne prouve pas un appel fournisseur ;
+  une mesure absente ne vaut pas zéro.
+- Aperçu avant reprise : historique conservé, travail à refaire, critères et
+  correction attendue. Le formulaire suit la tentative sélectionnée et la
+  consigne saisie, sans augmenter de budget ni valider le résultat.
+
+Les commandes CLI `mission changes`, `mission spending`, `mission recovery`
+et `mission seen` utilisent les mêmes données que le web. Seule `seen`
+enregistre explicitement un repère de lecture ; ouvrir une aide ne modifie
+pas la mission.
+
+Recette navigateur PASS : FR/EN, thèmes clair/sombre, clavier, mobile,
+ouverture du prérequis réel, préservation de l'état après lecture. Un agent
+local déterministe terminé permet aussi de vérifier le formulaire de relance
+et la mise à jour de sa correction, sans confirmer une nouvelle tentative.
+Aucun appel IA payant dans cette recette. Aucun échec JavaScript ou HTTP.
+Preuve locale : `/tmp/swarm-more-qw-final-browser/result.json` et ses captures.
+
+Tests ciblés moteur PASS, tests ciblés avec `-race` PASS, `go vet` PASS,
+`npm test` PASS, contrôle des neuf méthodes Claude/Codex PASS, scanner des
+couleurs ajoutées PASS. Recette de redémarrage PASS avec trois productions,
+trois revues et clôture du responsable, sans intervention après lancement.
+
+Le serveur local est mis à jour et les nouvelles aides sont visibles.
+La mission historique reste à 5/8 preuves actuellement valides : les
+modifications de `main.go`, `web/mission.js` et du catalogue rendent deux
+résultats périmés et leur dépendance non validée. Ces aides n'enregistrent
+aucune acceptation artificielle et cette recette isolée ne clôture pas cette
+mission historique.
+
+Résultat de la suite Go complète pour cet ensemble :
+`go test ./... -timeout 40m` PASS (`swarm.local/companion`, 429,319 s,
+code 0). Les derniers ajustements de largeur des aides utilisent la classe
+existante `field-wide` et sont couverts par la recette navigateur finale.
+Captures de la mission réelle : `/tmp/swarm-seven-quickwins-live.png` et
+`/tmp/swarm-quickwins-dependencies-live.png`.
+
+## 1er octobre — renouvellement des preuves de la mission historique
+
+Après livraison des aides, T3 et T7 avaient des preuves périmées ; T8 était
+retenue par ses prérequis. Le rejeu courant des tests CLI (`TestRunLimitsCLI`),
+de `t7_prelaunch.py all` et de `t8_docs.py` est PASS. La revalidation native
+complète les rapports existants et conserve les tentatives et avis historiques.
+
+Parcours effectué : pause temporaire des départs, réouverture T3/T7,
+soumission des rapports corrigés, nouvelles gates et avis indépendants,
+acceptation depuis le cockpit. T7 a obtenu un nouveau reçu moteur immuable et
+un avis favorable. T3 a d'abord obtenu UNKNOWN sur la délégation des opérations
+CLI, car seul apply était cité : le rapport a été complété avec le fichier
+entier run_limits_cli.go ; la nouvelle revue est favorable. Le vérificateur
+précise que T3 ne possède pas de reçu de contrôle moteur et juge les critères
+sur le code et la documentation fournis. Les tests natifs sont une preuve
+supplémentaire du superviseur, pas une exécution attribuée au moteur.
+
+Résultat observé dans le cockpit : 8/8 validations actuelles. T8 retrouve sa
+validité quand T3/T7 sont acceptées ; aucune nouvelle revue T8 ni nouvelle
+production n'était nécessaire puisque ses fichiers restent inchangés.
+Le budget de revue est passé de 35 à 38 appels sur 40 ; aucune tentative de
+production ni augmentation des plafonds pour cette revalidation.
+
+Deux difficultés à conserver dans le RETEX : la nouvelle soumission d'un
+rapport après corrections demandées a nécessité une transition publique CLI
+vers Bloquée, car le formulaire web ne proposait pas cette transition depuis
+À vérifier. Une première mutation CLI a rencontré SQLITE_BUSY ; après
+relecture de l'état courant et libération de la transaction concurrente,
+l'opération a réussi. Aucun accès en écriture direct à SQLite. L'enregistrement
+d'une gate a aussi rencontré un conflit de révision pendant la fin d'une
+revue : fermeture du formulaire, nouvelle lecture puis nouveau calcul ont
+permis l'enregistrement. Les garde-fous ont été conservés.
+
+Cette reprise est supervisée par Codex et comporte des décisions humaines
+via le cockpit. Elle ne démontre pas une autonomie sans intervention. Une
+décision de clôture par le responsable a ensuite été demandée via la reprise
+de planification ; son résultat est consigné séparément.
+
+### Clôture effective — 1er octobre 2026
+
+Les huit tâches disposent de validations courantes. La clôture a été enregistrée
+par le moteur à la révision 301 : périmètre `root` fermé, aucun retour en attente,
+26 exigences couvertes. Cette fin est une reprise supervisée par Codex natif,
+pas une preuve d’autonomie complète. Aucun nouveau worker n’a été lancé.
+Trois appels de revue indépendante ont été nécessaires pour T3 et T7 ; la
+proposition du fournisseur pour clore le périmètre a d’abord été refusée.
+
+Cause supplémentaire découverte : les rapports corrigés avaient remplacé les
+fichiers auxquels renvoyaient d’anciennes remises. Le contrôle d’empreinte refusait
+alors même de présenter leur événement au responsable. Celui-ci ne pouvait ni
+constater l’obsolescence ni terminer le traitement de l’historique.
+
+Correction du moteur : la remise indisponible est présentée comme un diagnostic,
+sans fournir les octets modifiés ni les qualifier de preuve. Une décision qui
+inclut ce diagnostic ne peut contenir aucune opération. Le constat conserve
+l’événement et sa décision ; il ne valide aucune tâche. Les contrôles de clôture
+continuent d’exiger des validations fraîches, des exigences couvertes, des enfants
+fermés et aucun agent actif. Les événements hors du lot courant restent en attente.
+
+Les 51 retours historiques ont été examinés puis constatés par les commandes
+publiques `planning claim` et `planning decide`, sous l’identité explicite
+`native-codex-supervisor`. Sept lots de constat et une décision de clôture après
+un retour opérateur ont été enregistrés. Les activations sont comptées par le
+moteur, même sans appel supplémentaire au fournisseur : total final 25/40,
+décisions 22/40. Aucun compteur, plafond, tentative ou reçu n’a été effacé.
+
+Validation du correctif : tests des cinq cas de rapport indisponible (absent,
+modifié, hors projet, trop volumineux, binaire), refus d’opération et constat sans
+production, lots complets et refus d’événement non livré ; tests de clôture avec
+preuves périmées et de validation parent ; exécution ciblée avec `-race` réussie.
+Le nouveau binaire a été installé sur le serveur local ; l’état réel a été relu
+après redémarrage. La suite Go complète avait passé avant ce dernier correctif ;
+elle n’a pas été rejouée intégralement après cette modification ciblée.
+
+Observation UX restante : le KPI « Décisions à traiter » affiche 22 alors qu’il
+compte les décisions enregistrées, et que le responsable affiche correctement
+0 retour à traiter. Les 25 « appels IA » affichés incluent aussi les activations
+publiques du superviseur natif, qui n’ont pas déclenché de fournisseur. Ces libellés
+ne doivent pas être interprétés comme 22 blocages ou 25 nouveaux appels payants.
+Ils restent à corriger séparément sans modifier les preuves de cette mission clôturée.
+
+### Correction des compteurs, puis incident de revalidation
+
+Le KPI hiérarchique affiche les événements sans décision sous « Retours à traiter » ;
+les missions sans planification affichent leurs « Alertes non acquittées ». Le bilan
+sépare décisions enregistrées et activations de planification. La modale précise
+qu’une activation ne prouve aucun envoi au fournisseur. FR/EN et les deux thèmes
+sont vérifiés par `tests/planning_metrics_ui.cjs`, avec une base isolée et les
+commandes publiques : un retour passe de 1 à 0 alors qu’une décision et une
+activation restent enregistrées. `npm test` et `git diff --check` passent.
+
+Le changement du catalogue a invalidé la preuve de T7 et, par dépendance, T8.
+La tentative de rouvrir T7 a aussi déclenché un worker via la mission active :
+erreur d’intervention du superviseur natif. Ce départ inutile a été arrêté et
+les départs mis en pause. L’historique et l’arrêt restent conservés. Le résultat
+courant est donc 6/8 validés, et non 8/8. Le dernier essai de T7 étant interrompu,
+le moteur interdit de lui attribuer les contrôles d’un ancien essai terminé.
+La correction d’affichage est livrée et testée ; la revalidation de la mission
+reste à résoudre. Aucun compteur ni avis n’a été falsifié pour rétablir le vert.
+
+
+### Reprise attribuée en dossier partagé — 1er octobre 2026
+
+Après correction des compteurs, T7 a perdu sa preuve fraîche. Sa réouverture
+avant pause a provoqué une quatrième production inutile, interrompue après
+34 secondes. Le profil contenait encore une consigne de T4 : erreur de conduite
+à ne pas attribuer au modèle. L’historique de cette interruption est conservé.
+
+Deux chemins étudiés : récupérer la preuve de l’ancienne tentative terminée,
+ou autoriser une production courte avec une consigne propre à T7. Le premier
+ne convient pas : la dernière tentative est interrompue et la revue doit porter
+sur des preuves courantes. Le redémarrage explicite existait uniquement pour
+les missions Git isolées ; il est étendu aux dossiers partagés, lié à
+l’empreinte du livrable examiné. Cette autorisation prépare exactement une
+production et conserve les tentatives/coûts. Elle refuse les preuves modifiées,
+les processus non terminés et les agents actifs. Aucune validation automatique
+n’est déduite de cette réparation du moteur. Les contrôles et la revue de T7
+restent à renouveler, puis T8 doit être requalifiée par ses propres gardes.
+
+
+### Résultat de la reprise — mission clôturée, révision 328
+
+Le 1er octobre, le moteur et le DOM du cockpit confirment **8/8 résultats
+validés**, responsabilité racine `closed`, zéro retour sans décision et aucun
+agent actif. Aucun ancien essai n’a été supprimé. T7 dispose d’une nouvelle
+production terminée (a-d38aa7df53b896925c0c4858), du contrôle moteur exécuté
+code 0, de la revue indépendante review-8568bb22617ad1fe3a56c53e (trois
+critères pass) et d’une gate courante acceptée par le superviseur natif.
+T8 n’a pas été relancée : ses propres preuves n’ont pas changé et son prérequis
+T7 est redevenu frais. La clôture a été demandée par une décision native puis
+vérifiée par le moteur ; ce n’est pas une démonstration d’autonomie sans humain.
+
+La nouvelle production T7 dure environ 70 secondes et ajoute **4 appels
+d’outils observés**, contre 146 cumulés avant la reprise. Coût fournisseur
+rapporté pour cette tentative : 0,5075964 USD. Les compteurs précédents restent
+conservés ; les caches d’entrée sont rapportés séparément et ne sont pas
+assimilés à un nombre d’appels. La consigne courte avec deux recettes précises
+et deux documents permis a évité un nouvel inventaire global.
+
+Un second blocage est apparu lors de la clôture : le rapport de 28 213 octets
+respectait la limite du fichier, mais ne tenait pas dans le contexte restant
+après les méthodes. Le moteur réduit d’abord le lot aux événements entiers.
+Si même un seul rapport ne tient pas, il transmet maintenant un diagnostic
+explicite sans transmettre ni tronquer ce rapport. Cette décision ne peut
+contenir aucune opération. L’événement reste pending jusqu’à son acquittement ;
+la clôture ultérieure contrôle toujours les preuves actuelles de toutes les
+tâches. La réduction du contexte n’est donc jamais une validation implicite.
+Tests : rapport conservé intégralement, limite respectée, aucune preuve fabriquée,
+mutation refusée depuis le diagnostic et acquittement explicite contrôlé.
+
+Le premier rejeu complet Go a révélé un échec intermittent de
+TestManagedPreparedLaunchConcurrentResume (révision devenue périmée).
+Son rejeu ciblé, puis sa vérification avec détecteur de courses, passent.
+Cet échec est conservé dans le bilan ; un nouveau rejeu complet est lancé
+sur le correctif final avant déclaration de recette technique terminée.
+
+Preuve visuelle : `output/mission-final-8-sur-8-20261001.png`.
+Preuves T7 : `docs/plan-843bb3ce22-T7-final-20261001.evidence.json` et
+`docs/plan-843bb3ce22-T7-final-controls-20261001.txt`.
+Limites maintenues : recettes isolées, presse-papiers système simulé, aucun test
+utilisateur externe ; la clarté reste un jugement qualitatif. Cette mission
+n’établit pas la fiabilité de tout Swarm pour tout fournisseur et tout projet.
+
+
+Correction du conflit concurrent : la garde transactionnelle de lancement
+renvoie désormais le code structuré `revision_conflict` et `retryable=true`,
+comme la garde de reprise préparée. Le refus de la requête périmée est conservé ;
+aucun deuxième agent n’est créé. Cela corrige la cause du test intermittent,
+et pas simplement son assertion. Le scénario réel de deux Store concurrents
+est rejoué 25 fois avec le détecteur de courses avant le bilan final.
+
+### Recette finale du 1er octobre 2026
+
+Le rejeu complet sur le correctif final est **PASS** : `go test ./... -timeout 12m`,
+441,637 secondes. Le scénario `TestManagedPreparedLaunchConcurrentResume`
+est **PASS sur 25 répétitions avec `-race`** (16,745 secondes). Les tests ciblés
+des nouveaux contrats, `go vet ./...` et `git diff --check` passent également.
+Le premier échec reste documenté ci-dessus ; ce résultat remplace le statut
+« rejeu en cours » pour cette version.
+
+Les captures durables [française](screenshots/mission-complete-fr.png) et
+[anglaise](screenshots/en/mission-complete-en.png) montrent les 8/8 validés,
+la responsabilité racine clôturée et l’accès conservé aux résultats.
+Le titre saisi par l’utilisateur n’est pas traduit automatiquement.
+Les guides FR/EN distinguent désormais décisions, activations et appels d’outils,
+ainsi que diagnostic de contexte, acquittement et validation de résultat.
+Ce bilan qualifie cette mission et ces contrôles, pas tous les fournisseurs ni
+une autonomie sans humain.

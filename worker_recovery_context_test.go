@@ -99,3 +99,55 @@ func TestRecoverySelectsPreviousRecordNotCurrentOrFuture(t *testing.T) {
 		t.Fatal(got, err)
 	}
 }
+
+func TestRecoveryFocusPreservesTaskAndAttributedReviewWithoutFreshness(t *testing.T) {
+	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+	task, _ := w.task(a.TaskID)
+	task.Next = "Correct the failing control only"
+	task.Criteria = []string{"Preserve CLI", "Repair the web path"}
+	task.IndependentReview = &IndependentReview{ID: "review-owned", Attempt: a.Attempt, Producer: a.ID, Report: "docs/task-report.md", CandidateSHA: strings.Repeat("a", 40), Criteria: []ReviewCriterion{{Index: 1, Verdict: "pass"}, {Index: 2, Verdict: "fail"}}}
+	raw, _ := json.Marshal(w)
+	if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+		t.Fatal(err)
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	f, err := recoveryTaskFocus(tx, a, w.ID, a.TaskID)
+	if err != nil || f.Review != "review-owned" || len(f.Criteria) != 2 || f.Next != task.Next {
+		t.Fatalf("missing focused history: %+v %v", f, err)
+	}
+	for _, c := range f.Criteria {
+		if !c.VerificationRequired {
+			t.Fatal("historical criterion became valid")
+		}
+	}
+	other := a
+	other.Attempt = "another-attempt"
+	f, err = recoveryTaskFocus(tx, other, w.ID, a.TaskID)
+	if err != nil || f.Review != "" || f.Criteria[0].HistoricalVerdict != "" {
+		t.Fatal("unattributed evidence crossed attempts", f, err)
+	}
+}
+func TestRecoveryContextUsesRecentOperationsInsteadOfRepeatedInitialInventory(t *testing.T) {
+	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+	for i := 0; i < 165; i++ {
+		if err := s.log(a.ID, "activity", "Read · old-inventory.go"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := s.log(a.ID, "activity", "Test · latest-failing-check"); err != nil {
+		t.Fatal(err)
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	got, err := workerRecoveryContext(tx, a, w.ID, a.TaskID)
+	if err != nil || !strings.Contains(got, "latest-failing-check") || !strings.Contains(got, `"bounded_excerpt":true`) {
+		t.Fatal("latest failure not carried into recovery", got, err)
+	}
+}

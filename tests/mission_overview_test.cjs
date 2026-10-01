@@ -44,3 +44,8 @@ console.log('PASS: décisions de pilotage, coordination A8, triplet factuel, dia
 
 const safeCopy=m.diagnosticText({attempt_id:'SECRET',observed_errors:3,summary:'Bearer SECRET',items:[{category:'check',label:'SECRET',cause:'SECRET',action:'https://private/session',traces:['SECRET']},{category:'__proto__',cause:'SECRET'}]});
 assert.doesNotMatch(safeCopy,/SECRET|https?:/);assert.match(safeCopy,/Examiner la trace/);assert.match(safeCopy,/Cause inconnue/);
+
+const authoritative={...base,guidance:{what:'A result requires inspection.',next:'Examine its evidence.',actor:'You',primary:{kind:'task',label:'Inspect the result',effect:'Opens evidence without restarting.',task:'blocked',tone:'attention'}},tasks:[task('configure','setup'),task('intervention','blocked')]};
+assert.equal(m.overview(authoritative).task.id,'blocked');assert.equal(m.overview(authoritative).label,'Inspect the result');assert.equal(m.overview(authoritative).effect,'Opens evidence without restarting.');
+const compact=m.summaryView(authoritative);assert.equal(compact.children.length,2);assert.equal(compact.children[0].textContent,authoritative.guidance.what);assert.equal(compact.children[1].textContent,'You — Examine its evidence.');
+let selected;m.action=t=>selected=t.id;m.primary(m.overview(authoritative));assert.equal(selected,'blocked');

@@ -98,6 +98,13 @@ func TestChangedPendingReportRechecksOnceWithoutNewWorker(t *testing.T) {
 		}
 	}
 	checkCount("x")
+	initial, _ := s.get(w.ID)
+	initialTask, _ := initial.task(a.TaskID)
+	oldReceipt := initialTask.AutoValidation.Receipt
+	oldBytes, err := os.ReadFile(filepath.Join(s.root, oldReceipt))
+	if err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(filepath.Join(s.root, report), []byte("Updated report with exact browser assertions"), 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -113,6 +120,57 @@ func TestChangedPendingReportRechecksOnceWithoutNewWorker(t *testing.T) {
 	if task.AutoValidation.Attempt != a.Attempt {
 		t.Fatal("changed producer attempt")
 	}
+	if task.AutoValidation.Receipt == oldReceipt {
+		t.Fatal("corrected report overwrote historical receipt")
+	}
+	if got, err := os.ReadFile(filepath.Join(s.root, oldReceipt)); err != nil || string(got) != string(oldBytes) {
+		t.Fatal("historical receipt changed", err)
+	}
 	s.runAutomaticValidation(a, report)
 	checkCount("xx")
+}
+
+// Polling must retain the attempt-local report selected by the handoff, even
+// when the project root also contains an identically named report.
+func TestResumeValidationUsesAttemptWorkspace(t *testing.T) {
+	s, w, a, report := automaticValidationFixture(t, automaticPolicy("python3", "-c", "from pathlib import Path; p=Path('count'); p.write_text(p.read_text()+'x' if p.exists() else 'x')"), false)
+	current, _ := s.get(w.ID)
+	task, _ := current.task(a.TaskID)
+	task.IndependentReview = nil
+	raw, _ := json.Marshal(current)
+	if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+		t.Fatal(err)
+	}
+	a.CWD = filepath.Join(s.root, "worker")
+	local := filepath.Join(a.CWD, report)
+	if err := os.MkdirAll(filepath.Dir(local), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(local, []byte("résultat mesuré\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.saveAgent(a); err != nil {
+		t.Fatal(err)
+	}
+	s.conduct(a, "completed")
+	current, _ = s.get(w.ID)
+	task, _ = current.task(a.TaskID)
+	if task.AutoValidation == nil {
+		t.Fatal("control receipt absent")
+	}
+	receipt := task.AutoValidation.Receipt
+	if task.AutoValidation.Artifacts[filepath.ToSlash(filepath.Join("worker", report))] == "" {
+		t.Fatal("handoff did not select local report")
+	}
+	if _, err := s.resumeAutomaticValidations(w.ID); err != nil {
+		t.Fatal(err)
+	}
+	current, _ = s.get(w.ID)
+	task, _ = current.task(a.TaskID)
+	if task.AutoValidation.Receipt != receipt {
+		t.Fatal("polling replaced the current receipt with a root-copy receipt")
+	}
+	if count, err := os.ReadFile(filepath.Join(s.root, "count")); err != nil || string(count) != "x" {
+		t.Fatalf("repeated controls: %q %v", count, err)
+	}
 }

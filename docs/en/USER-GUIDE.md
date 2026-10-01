@@ -309,8 +309,8 @@ in a file restricted to the process account, without application-level encryptio
 Do not publish this directory or session links. Captured output may contain
 sensitive project content.
 
-APEX, KS and PDCA methods require their resources in the controlled project; not
-all are included. Standard preparation does not implicitly create isolated Git
+This repository supplies nine [working methods](AGENT-METHODS.md). For another
+controlled project, check its method resources. Standard preparation does not implicitly create isolated Git
 copies. The advanced managed Git workflow is separate.
 
 The standalone installation recipe used deterministic agent processes. It does
@@ -337,3 +337,91 @@ This is not a complete static dependency analysis or a guarantee that an AI revi
 will detect every defect. Reuse from a previous protocol-3 reuse plan is currently
 unsupported and falls back to a full review. Oversized evidence is rejected before
 calls, never silently truncated.
+
+## Understand and resume a mission
+
+The cockpit starts with a short summary: what is happening, followed by who acts
+and what happens next. The primary button targets the task holding up the most
+dependents before tasks that only need configuration. Storage incidents, missing
+organisation and planning incidents retain priority. Its effect is displayed:
+opening a diagnosis does not restart an agent or accept a result.
+
+`swarm mission status ID` displays the same summary, action and effect. `--json`
+exposes `guidance` and `tasks[].primary_action` for tools presenting this status.
+Existing recovery commands retain their confirmations, checks and limits.
+
+For a new attempt of the same task, Swarm supplies recent operations, the next
+action, current criteria and review references attributed to the previous attempt.
+Verdicts are historical: evidence must be checked again against the current
+candidate. Raw reports, sibling task results and secrets are not copied into this
+memory. The context is bounded and marks incomplete excerpts.
+
+### Understand waiting, consumption and recovery
+
+In **Overview**, three buttons open read-only dialogs:
+
+- **Since your last visit** groups results, blockages and decisions. Events are
+  historical; current validation remains authoritative. The first visit and
+  excerpts limited to 200 events are explicitly identified.
+- **Why is this task waiting?** lists prerequisites without current validation
+  and opens their actual task details. For waits without a dependency, it shows
+  the engine reason, such as an occupied workspace. Opening details starts nothing.
+- **Where do calls and costs go?** separates workers by task, planners and the
+  independent reviewer. Recorded checks and worker retries are separate engine
+  measurements. Missing tokens and dollars remain unreported. Internal provider
+  network requests are not all observable. The breakdown also appears in **AI budgets and costs**.
+
+**Before retrying**, in task details and retry/corrective-attempt forms, shows
+what is kept, what must be checked again, unchanged criteria and the expected
+correction. It follows the selected attempt and entered instructions. This is
+not launch authorization and does not promise a successful outcome.
+
+CLI equivalents support `--lang en` and `--json`:
+
+```bash
+swarm mission changes WORK
+swarm mission seen WORK                # explicitly mark this revision as seen
+swarm mission spending WORK
+swarm mission recovery WORK TASK       # latest attempt for this task
+swarm mission recovery WORK TASK AGENT
+swarm mission status WORK              # includes blocking prerequisites
+```
+
+Reading does not move the visit checkpoint. The web preserves the existing
+checkpoint behavior on leaving a work or explicitly marking it seen. The CLI
+uses the same local operator and checkpoint via `mission seen`.
+
+### Explicit restart after attempt exhaustion
+
+`swarm planning restart-task WORK --input restart.json` prepares exactly one new
+production following an explicit operator decision. Previous attempts, costs
+and reviews remain recorded; authorization alone does not launch an agent.
+The request contains `schema_version`, `event_id`, `expected_revision`,
+`task_id`, `attempt_id`, `confirm_recovery: true`, `reason`,
+`recovery_instruction` and `expected_candidate`. For isolated Git missions,
+the latter is the current Git candidate. For shared-workspace missions, it is
+the SHA-256 digest of the examined declared deliverable (maximum 48 KB).
+The latest attempt must have ended, with no active agent or review. A changed
+instruction is required. Controls, independent review and acceptance must be
+renewed afterwards. Historical overruns remain visible and are never refunded.
+
+### Read counters and recognize completion
+
+- **Tool calls**: observed provider actions during an attempt, not a count of model requests.
+- **Recorded decisions**: planning decisions saved by the engine.
+- **Planning activations**: planner claims, including native supervisor claims. They do not demonstrate the same number of paid AI calls.
+- **Handoffs to process**: events without a decision; receiving an event does not validate a task.
+
+A stopped agent or a favorable review is insufficient. **Finished and validated**
+means current evidence satisfies the task checks. A mission is closed when all
+required results are validated and its root planner has closed its scope.
+Changing evidence may make a validation stale.
+
+![Completed mission: 8/8 results validated](../screenshots/en/mission-complete-en.png)
+
+*Actual capture, October 1, 2026: validated results and closed root responsibility. “View results” retains access to deliverables and reviews. The user-authored mission title remains in French. This recipe includes human decisions; it does not demonstrate unattended autonomy.*
+
+A previously recorded operator stop is not removed by restart authorization
+alone: use an explicit launch after checking conditions. See the
+[engine recovery guide](ENGINE-RECOVERY.md) for revision conflicts and reports
+that exceed the available context.

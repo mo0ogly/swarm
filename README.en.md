@@ -116,8 +116,10 @@ Closing the cockpit does not stop agents. An installed binary and simulated-agen
 tests do not qualify a real provider's authentication, permissions or results.
 
 Data is local under the controlled project's `.swarm/`. Keep this directory,
-authentication and session links private. APEX, KS and PDCA require their method
-resources in the controlled project; not all are distributed in this repository.
+authentication and session links private. This repository supplies nine
+[working methods](docs/en/AGENT-METHODS.md), including planning, PDCA audit,
+debugging, review and lessons learned. When controlling another project, check
+which method resources are available in that project.
 
 ## Documentation and development
 
@@ -150,3 +152,13 @@ see [licensing details](docs/LICENSING.md) and [third-party notices](THIRD_PARTY
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for checks and pull requests, and
 [SECURITY.md](SECURITY.md) for sensitive reports.
+
+### Recognize a closed mission
+
+The cockpit distinguishes a finished agent from a validated result. A closed
+mission reports every result validated against current evidence and a closed
+root responsibility. Deliverables, reviews and costs remain accessible.
+
+![Closed mission in the cockpit](docs/screenshots/en/mission-complete-en.png)
+
+*Actual 8/8 recipe with human interventions. The user-authored title remains in French. See the [user guide](docs/en/USER-GUIDE.md#read-counters-and-recognize-completion) and [engine recovery](docs/en/ENGINE-RECOVERY.md).*

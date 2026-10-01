@@ -32,7 +32,8 @@ swarm console [travail] [--plain]
 swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
 swarm dispatch <travail>
 swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
-swarm mission status|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission status|changes|spending|seen|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission recovery <travail> <tâche> [agent]
 swarm lifecycle list
 swarm lifecycle preview|apply <travail> archive|restore|purge|delete --input requete.json
 swarm validation preview|apply <travail> --task <tâche> --input politique.json

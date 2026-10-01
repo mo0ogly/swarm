@@ -364,7 +364,10 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	if e := s.currentReportArtifacts(artifacts); e != nil {
 		return false, "Fichiers modifiés pendant les contrôles ; preuves à renouveler : " + e.Error()
 	}
-	relReceipt := filepath.ToSlash(filepath.Join(".swarm", "validation", w.ID, t.ID, a.Attempt+".json"))
+	// A report can be corrected within the same attempt, or publication can
+	// lose an optimistic revision race. Never overwrite a receipt already
+	// frozen into a review, even when the new decision cannot be persisted.
+	relReceipt := filepath.ToSlash(filepath.Join(".swarm", "validation", w.ID, t.ID, a.Attempt+"-"+newID("receipt-")+".json"))
 	absReceipt := filepath.Join(s.root, filepath.FromSlash(relReceipt))
 	if err = os.MkdirAll(filepath.Dir(absReceipt), 0700); err != nil {
 		return false, "création du reçu impossible : " + err.Error()
@@ -494,7 +497,9 @@ func (s *Store) resumeAutomaticValidations(work string) (bool, error) {
 			if agent.TaskID != task.ID || agent.Status != "completed" || agent.Attempt == "" {
 				continue
 			}
-			report, _ := s.provenReport(task.ID, agent.Started)
+			// Use the same workspace as handoff publication. A similarly named
+			// root copy is not the report produced by this attempt.
+			report, _ := s.provenAttemptReport(agent)
 			if report == "" {
 				continue
 			}

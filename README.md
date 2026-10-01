@@ -213,7 +213,7 @@ Ouvrez **le lien de session imprimé dans le terminal**. Il donne accès au cock
 3. Choisissez les agents, les espaces de travail et les conditions d’acceptation.
 4. Autorisez le lancement, puis suivez le graphe et les résultats à examiner.
 
-Les agents externes doivent être installés et authentifiés séparément. Les méthodes APEX, KS et PDCA nécessitent les ressources correspondantes dans le projet piloté ; elles ne sont pas toutes livrées par ce dépôt. Consultez les [limites de migration](docs/migration/README.md).
+Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’audit PDCA, le diagnostic, la revue et le RETEX. Pour piloter un autre projet, vérifiez les ressources de méthode disponibles dans ce projet. Consultez aussi les [limites de migration](docs/migration/README.md).
 
 ### Et en ligne de commande ?
 
@@ -298,3 +298,13 @@ Voir le [cadrage APEX et PDCA des agents](docs/AGENT-METHODS.md) et le
 
 Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les contrôles et les pull requests,
 [SECURITY.md](SECURITY.md) pour les signalements sensibles.
+
+### Reconnaître une mission clôturée
+
+Le cockpit distingue un agent terminé d’un résultat validé. Une mission clôturée
+annonce tous ses résultats validés sur les preuves actuelles et la responsabilité
+racine clôturée. Les livrables, avis et coûts restent consultables.
+
+![Mission clôturée dans le cockpit](docs/screenshots/mission-complete-fr.png)
+
+*Recette réelle à 8/8, avec interventions humaines. Voir le [guide utilisateur](GUIDE-UTILISATEUR.md#lire-les-compteurs-et-reconnaître-la-fin) et les [reprises du moteur](docs/ENGINE-RECOVERY.md).*

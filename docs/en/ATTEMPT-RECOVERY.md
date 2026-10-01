@@ -279,3 +279,11 @@ The CLI uses the same operation: `swarm run-limits apply mission <id> -
 --input change.json`, with `values.observation_mode` set to `1` (observation)
 or `0` (caps enabled), an explicit `reason` and the expected revision. Include
 the scope's other existing values in the change document.
+
+## Explicit restart is separate from corrective recovery
+
+The four-production limit of `authorize-recovery` remains in force. A separate
+operator decision, `swarm planning restart-task`, can authorize exactly one new
+production after examining the current result. This is neither an automatic fifth
+attempt nor a counter reset. See the
+[restart conditions and evidence bindings](ENGINE-RECOVERY.md#restarting-a-blocked-task).

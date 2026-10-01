@@ -527,6 +527,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 			if scope.Delivery != nil && !containsString(scope.Delivery.Events, id) {
 				return fmt.Errorf("événement non fourni dans cette activation : %s", id)
 			}
+			if scope.Delivery != nil && scope.Delivery.Unavailable[id] != "" && len(r.Operations) > 0 {
+				return fmt.Errorf("rapport indisponible : seul un constat sans opération est autorisé : %s", id)
+			}
 		}
 		scopeID := scope.ID
 		for _, op := range r.Operations {

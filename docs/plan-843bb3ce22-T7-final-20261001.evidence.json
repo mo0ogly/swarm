@@ -1,0 +1,150 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T7",
+  "artifacts": {
+    "docs/plan-843bb3ce22-T7.md": "0f01590352808e0530009ddb774f6caa5221a985dd66e61a557010f8837ee4b2",
+    "docs/T7-documentation-retex.md": "d8a5ca9203697935d5307603dae7fb4d97a58f97c696c0bc4720dc25ea450048",
+    "locales/en.json": "e3ccbbcd8de146e8d2ff6b1f00c26ace0929bcdd3772a18a60a407cde47028c8",
+    "tests/prelaunch_diagnostic_ui.cjs": "02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2",
+    "tools/verification/t7_prelaunch.py": "f5e86c2b39f32d3384e4d3a5b6a9317fb84648f67b776d61d8819d765c67b2b3",
+    "web/i18n-en.js": "742db086906b2007e701d7d41d30d25ddf06b0e7cadfc9d20f0be265d940e95c",
+    "web/mission.js": "c8d6318b9042244ae086f1d203be8840d49e4a2d2575efa7a7adf072ccc22570",
+    "web/prepare.html": "8bff9e4931df8ae2ad605ae502a2f4825fa2f0e2ee6bc24d32beb3c884c04eb1",
+    "web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
+    "web/prephase-editor.js": "859de925d60b31720a09d47f9d0ccf05b1b572a8f334d47812f54d4123c942d2",
+    "web/prephase.js": "a55e6b254d515d4b1c221a0edf0ec34f90d721df5a4f707dd030f0c2cde2ffc5",
+    "docs/plan-843bb3ce22-T7-final-controls-20261001.txt": "735078d8b977b9a81f65e898ac43f0d483e2f1a5a9964d103b8b11c4a4240f07",
+    ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json": "17da429bb1d7a03980c09b4bc8cddbf73cc178358b8f34f3aca7711d24b471d9",
+    "web/cockpit.js": "fb7de97cc76d2ca74f855508a9c3ef64e611a2321341f34edbf244df4509bbc9",
+    "web/planning.js": "7b2ffecef97d524fad43d3138a8bc6fcc93338909e5dfd9b2b36367758a2ac29",
+    "web/index.html": "21a8fa5b1b13e9b8ae400b85fdfc4f4b57b4ebfccf86285ee46a7b13ed313cef",
+    "tests/planning_metrics_ui.cjs": "3dabaa42792950f17409fca4ac5326dfb352b5128830ee6b77786c36ecbd998e"
+  },
+  "domains": {
+    "quality": 100
+  },
+  "checks": [
+    {
+      "id": "plan-criterion-1",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-entry",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-final-controls-20261001.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json"
+      ],
+      "reason": "Contrôles moteur exécutés code 0 sur la tentative courante ; recettes FR/EN deux thèmes et diagnostic hostile ; revue indépendante review-8568bb22617ad1fe3a56c53e favorable pour les trois critères ; observation des captures par le superviseur. Presse-papiers simulé et fournisseurs réels hors portée des recettes."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-final-controls-20261001.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json"
+      ],
+      "reason": "Contrôles moteur exécutés code 0 sur la tentative courante ; recettes FR/EN deux thèmes et diagnostic hostile ; revue indépendante review-8568bb22617ad1fe3a56c53e favorable pour les trois critères ; observation des captures par le superviseur. Presse-papiers simulé et fournisseurs réels hors portée des recettes."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-final-controls-20261001.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json"
+      ],
+      "reason": "Contrôles moteur exécutés code 0 sur la tentative courante ; recettes FR/EN deux thèmes et diagnostic hostile ; revue indépendante review-8568bb22617ad1fe3a56c53e favorable pour les trois critères ; observation des captures par le superviseur. Presse-papiers simulé et fournisseurs réels hors portée des recettes."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-final-controls-20261001.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json"
+      ],
+      "reason": "Contrôles moteur exécutés code 0 sur la tentative courante ; recettes FR/EN deux thèmes et diagnostic hostile ; revue indépendante review-8568bb22617ad1fe3a56c53e favorable pour les trois critères ; observation des captures par le superviseur. Presse-papiers simulé et fournisseurs réels hors portée des recettes."
+    },
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-final-controls-20261001.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json"
+      ],
+      "reason": "Contrôles moteur exécutés code 0 sur la tentative courante ; recettes FR/EN deux thèmes et diagnostic hostile ; revue indépendante review-8568bb22617ad1fe3a56c53e favorable pour les trois critères ; observation des captures par le superviseur. Presse-papiers simulé et fournisseurs réels hors portée des recettes."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-final-controls-20261001.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-d38aa7df53b896925c0c4858-receipt-731a986099df01251899ff3f.json"
+      ],
+      "reason": "Contrôles moteur exécutés code 0 sur la tentative courante ; recettes FR/EN deux thèmes et diagnostic hostile ; revue indépendante review-8568bb22617ad1fe3a56c53e favorable pour les trois critères ; observation des captures par le superviseur. Presse-papiers simulé et fournisseurs réels hors portée des recettes."
+    }
+  ]
+}

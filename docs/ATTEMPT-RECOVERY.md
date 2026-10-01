@@ -303,3 +303,11 @@ Le CLI utilise la même opération `swarm run-limits apply mission <id> -
 --input changement.json`, avec `values.observation_mode` à `1` (observation) ou
 `0` (plafonds actifs), un `reason` explicite et la révision attendue. Conserver
 les autres valeurs de la portée dans le document de changement.
+
+## Redémarrage explicite distinct de l’essai correctif
+
+La limite de quatre productions du parcours `authorize-recovery` reste applicable.
+Une décision opérateur distincte, `swarm planning restart-task`, peut autoriser
+une seule nouvelle production après examen du résultat courant. Ce n’est ni une
+cinquième tentative automatique ni une remise à zéro. Voir les
+[conditions et empreintes du redémarrage](ENGINE-RECOVERY.md#repartir-sur-une-tâche-bloquée).

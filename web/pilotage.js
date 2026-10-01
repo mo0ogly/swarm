@@ -184,7 +184,7 @@ const Pilot = {
   else parts.append(node('span',tr_web_pilotage_js('Aucune décision en attente')));
   host.append(parts);
   const visit=change?.entrees?(change.complet?'':tr_web_pilotage_js('Au moins '))+change.entrees+(change.entrees===1?tr_web_pilotage_js(' événement'):tr_web_pilotage_js(' événements'))+tr_web_pilotage_js(' depuis votre visite'):tr_web_pilotage_js('Rien de neuf depuis votre visite');
-  const visitButton=this.command(visit,()=>{$('fil-bloc').open=true;$('fil-titre').scrollIntoView({block:'start'});$('fil-titre').focus()},'pilot-summary-note accueil-segment');host.append(visitButton);
+  const visitButton=this.command(visit,()=>Mission.changes(),'pilot-summary-note accueil-segment');host.append(visitButton);
   if(snapshot.cost?.attempts_with_cost||snapshot.cost?.attempts_without_cost)host.append(node('span',snapshot.cost_text,'pilot-summary-note'));
   if(focused)[...host.querySelectorAll('[data-summary-key]')].find(n=>n.dataset.summaryKey===focused)?.focus();
  },

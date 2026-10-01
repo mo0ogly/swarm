@@ -241,3 +241,108 @@ placement des détails dans la modale.
   checks.push('English preflight: short explanation, translated details dialog and focus restored');
 
 ```
+
+
+## Revalidation du 1er octobre 2026 — aides et résumé de conduite
+
+Auteur de cette revalidation : superviseur Codex dans une session native,
+sans nouvelle production ni réinitialisation des tentatives.
+`python3 tools/verification/t7_prelaunch.py all` rejoué le 1er octobre : code 0,
+quatorze captures FR/EN clair/sombre, contrôles liés aux empreintes actuelles,
+rejeu du catalogue i18n PASS. La frontière du presse-papiers système demeure
+simulée dans cette recette, comme dans la preuve d'origine.
+
+- Critère 1 : la recette pré-lancement vérifie les rôles et limites effectifs.
+  La recette supplémentaire mission_guidance_ui.cjs confirme l'égalité du
+  résumé web/CLI et l'ouverture de la vraie tâche depuis l'action principale.
+- Critère 2 : le diagnostic copiable a été rejoué avec exclusions des secrets
+  et URL de session ; aucune clé privée n'est ajoutée aux aides.
+- Critère 3 : FR/EN et deux thèmes contrôlés ; le résumé principal explique
+  l'état en deux lignes et l'effet de l'action. Les détails nouveaux sont dans
+  des modales ouvertes explicitement. Critères, consignes et titres utilisateur
+  ne sont pas traduits automatiquement. Cette appréciation est une auto-revue.
+
+La recette mission_guidance_ui.cjs passe aussi au clavier et sur mobile :
+prérequis précis, lecture sans mutation et aperçu dans un vrai formulaire de
+relance d'un agent déterministe terminé ; aucune confirmation de reprise.
+Un agent de test local, zéro appel IA payant. Suite Go complète code 0,
+429,319 s ; race ciblée, go vet, npm test PASS. Nouvelle revue indépendante
+attendue ; aucune validation historique n'est déclarée renouvelée ici.
+
+### Correction des compteurs — 1er octobre 2026
+
+Le catalogue FR/EN a changé pour corriger deux indications trompeuses. Le KPI
+hiérarchique compte désormais les événements de planification sans décision
+(`Retours à traiter` / `Pending handoffs`) ; les anciennes notifications restent
+consultables dans leur écran. Sans planification, il compte les alertes non
+acquittées. Le bilan sépare les `décisions enregistrées` et les `activations de
+planification`. Une activation ne prouve pas l’envoi d’un appel au fournisseur :
+cette explication est dans la modale des décisions, fermée par défaut.
+
+Recette isolée `node tests/planning_metrics_ui.cjs /tmp/swarm-metrics-fix
+/tmp/swarm-metrics-proof` : PASS. Le retour passe de 1 à 0 après une décision
+publique sans appel au fournisseur, tandis que décisions et activations restent
+à 1. FR/EN, deux thèmes, jetons définis, aide et fermeture Échap vérifiés.
+`npm test` : PASS. Aucune nouvelle couleur ni style inline coloré introduit.
+Cette correction est une intervention native supervisée ; elle ne valide pas
+une autonomie réelle. Les contrôles préautorisés de T7 doivent être rejoués sur
+le catalogue courant et la revue indépendante renouvelée avant acceptation.
+
+## Compte rendu de reprise — 1er octobre 2026 (tentative a-d38aa7df53b896925c0c4858, départ 5/5, révision 311)
+
+Identité : mission w-843bb3ce22cff2965c5e77b6, tâche plan-843bb3ce22-T7, agent
+native-launch-t7-6e287928-f4b6-437b-8950-1303ddf4f43e. Périmètre : T7 seul ; T4
+non traité (consigne périmée) ; aucun inventaire refait. Aucun code, aucune
+configuration ni aucun autre document modifié : seuls ce rapport et
+`docs/T7-documentation-retex.md` ont été complétés.
+
+Base Git : `7fba73aef48073c35b5d21f6921331e34321f6b2`, 42 entrées de
+`git status --short` (modifications non commitées, dont celles de ce candidat).
+Les sections ci-dessus restent historiques : leurs empreintes (par ex.
+`web/mission.js` 707c551c…, `locales/en.json` 82a2b31b…) et leur base `7110a0b`
+**ne sont pas celles de cette reprise**. Aucune conclusion ancienne n'est reprise
+comme preuve de cette tentative.
+
+### Commandes rejouées (11:28:48–11:29:09 UTC, racine du dépôt)
+
+| Contrôle | Commande | Code | Résultat observé |
+| --- | --- | --- | --- |
+| Recette pré-lancement | `python3 tools/verification/t7_prelaunch.py all` | 0 | `PASS T7 all` : prérequis, build Go temporaire, recette navigateur `tests/prelaunch_diagnostic_ui.cjs`, 11 constats (résumé, prévol, diagnostic FR/EN, copie hostile, refus du presse-papiers), `tests/i18n_test.cjs` (parité du catalogue), quatorze captures, présence du rapport. |
+| Compteurs de planification | `node tests/planning_metrics_ui.cjs /tmp/swarm-next /tmp/swarm-t7-final-metrics` | 0 | `PASS: truthful planning metrics, FR/EN, both themes and help`. |
+
+Sorties brutes : `/tmp/t7-final-prelaunch.log`, `/tmp/t7-final-metrics.log`
+(hors dépôt). Aucune base réelle `.swarm/state.db` touchée.
+
+Empreintes SHA-256 des entrées de cette reprise :
+
+```
+web/mission.js                      c8d6318b9042244ae086f1d203be8840d49e4a2d2575efa7a7adf072ccc22570
+tests/prelaunch_diagnostic_ui.cjs   02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2
+tests/planning_metrics_ui.cjs       3dabaa42792950f17409fca4ac5326dfb352b5128830ee6b77786c36ecbd998e
+locales/en.json                     e3ccbbcd8de146e8d2ff6b1f00c26ace0929bcdd3772a18a60a407cde47028c8
+web/i18n-en.js                      742db086906b2007e701d7d41d30d25ddf06b0e7cadfc9d20f0be265d940e95c
+tools/verification/t7_prelaunch.py  f5e86c2b39f32d3384e4d3a5b6a9317fb84648f67b776d61d8819d765c67b2b3
+```
+
+`web/mission.js` et `locales/en.json` diffèrent de la section historique ;
+`tests/prelaunch_diagnostic_ui.cjs` est identique (02ecc54d…).
+
+### Matrice critères / preuves de cette reprise
+
+| Exigence | Observable | Résultat | Limite |
+| --- | --- | --- | --- |
+| req-20 / REQ-SUM-01 | Limites par défaut puis saisies, rôles et modèles résolus, prérequis manquants, vide après prévol : assertions de la recette | PASS (recette locale) | Fixtures ; le résumé ne prouve pas le comportement d'un fournisseur réel. |
+| req-21 / REQ-DIAG-01 | Texte construit par `Mission.diagnosticText` : données hostiles (secret, URL, catégorie inconnue) absentes, copie FR/EN, refus du presse-papiers sans faux succès | PASS (recette locale) | Presse-papiers système **simulé** ; aucune permission du navigateur personnel affirmée. |
+| req-22 | Textes FR/EN du résumé, de la prévol et du diagnostic ; détails dans la modale, Échap et focus rendus | PARTIAL | Recette locale FR/EN, deux thèmes. **Le jugement de clarté est réservé à la revue indépendante** ; le PASS rédactionnel plus haut est un avis de superviseur, pas indépendant. |
+| Compteurs | `Retours à traiter` / `Pending handoffs` : événements de planification sans décision ; `activations de planification` ≠ nombre prouvé d'appels fournisseur | PASS (recette locale) | Le compteur ne mesure pas les appels fournisseur ; aucun nombre d'appels n'est établi par ces recettes. |
+
+### Limites réelles
+
+- Recette navigateur **locale**, FR/EN, thèmes clair et sombre ; aucune exécution en CI distante n'est démontrée ici.
+- Presse-papiers système simulé.
+- Aucune preuve de fonctionnement d'un fournisseur réel : fixtures et doubles uniquement.
+- Aucune relecture de captures par cette tentative ; les quatorze captures sont régénérées dans `test-results/t7-engine/` mais leur contenu n'a pas été examiné ici.
+- Pas de revue indépendante, pas d'acceptation : le producteur ne déclare ni l'une ni l'autre. Reçu moteur et revue indépendante à renouveler sur ce candidat.
+
+Prochaine action : le responsable relance le contrôle moteur sur ce candidat,
+puis la revue indépendante juge la clarté FR/EN.

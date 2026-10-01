@@ -605,7 +605,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		return a, false, e
 	}
 	if w.Revision != r.Revision {
-		return a, false, fmt.Errorf("révision périmée ; relire le travail")
+		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
 	}
 	if e = s.providerCooldownGuard(r.Provider); e != nil {
 		return a, false, e
