@@ -136,6 +136,15 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 		a = s.reviewReceiptEvidence(t)
 	}
 	if a != nil {
+		controlFresh := gateFresh
+		if t.ValidationPolicy != nil && t.ValidationPolicy.Mode == "human" && len(t.ValidationPolicy.Controls) > 0 {
+			_, _, evidenceErr := s.independentValidationEvidence(t)
+			controlFresh = evidenceErr == nil
+			e.Freshness = "stale"
+			if controlFresh {
+				e.Freshness = "fresh"
+			}
+		}
 		e.Attempt = valueOrUnknown(a.Attempt)
 		e.ObservedAt = valueOrUnknown(a.At)
 		hasFailed, hasUnknown, hasPassed := false, false, false
@@ -163,7 +172,7 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 				hasPassed = true
 			}
 			freshness := "stale"
-			if gateFresh && (attempt == "unknown" || a.Attempt == attempt) {
+			if controlFresh && (attempt == "unknown" || a.Attempt == attempt) {
 				freshness = "fresh"
 			}
 			command := append([]string(nil), r.Command...)

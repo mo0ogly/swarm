@@ -7,7 +7,18 @@ const RuntimeHealthPanel = {
   catch{this.value={state:'unknown',message:'État du stockage non vérifié.',next_step:'Vérifiez la connexion au serveur puis réessayez.',volumes:[]};this.render(this.value)}
   finally{this.pending=false}
  },
+ // Comparison uses the build's embedded VCS revision against this checkout's
+ // local git HEAD — both already resolved server-side, no network call.
+ renderVersion(v){
+  const el=$('server-version');if(!el)return;
+  if(!v||!v.available){el.textContent=SwarmI18n.t('Version : état inconnu');el.title=SwarmI18n.t('Identifiant de build indisponible sur ce binaire.');return}
+  const rev=v.revision.slice(0,12)+(v.modified?'*':'');
+  if(!v.compared){el.textContent=SwarmI18n.t('Version : ')+rev;el.title=SwarmI18n.t('Comparaison indisponible : dépôt local non détecté.');return}
+  el.textContent=SwarmI18n.t('Version : ')+rev+(v.current?' · '+SwarmI18n.t('à jour'):' · '+SwarmI18n.t('différente de la copie locale'));
+  el.title=v.current?SwarmI18n.t('Identique à la copie locale du dépôt.'):SwarmI18n.t('Le binaire lancé ne correspond pas au HEAD local — redémarrage probable requis.');
+ },
  render(h){
+  this.renderVersion(h.version);
   const host=$('runtime-health');if(!host)return;
   const key=JSON.stringify([h.state,h.message,h.next_step]);if(key===this.signature)return;this.signature=key;
   host.hidden=h.state==='ready';host.replaceChildren();if(host.hidden)return;

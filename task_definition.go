@@ -26,6 +26,9 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 	if !r.editsDefinition() {
 		return nil
 	}
+	if t.IndependentReview != nil && t.IndependentReview.State == "running" {
+		return fmt.Errorf("terminer la vérification en cours avant de modifier le contrat")
+	}
 	if (t.Status != "todo" && t.Status != "blocked") || (r.Status != "" && r.Status != t.Status) {
 		return fmt.Errorf("modifier le contrat exige une tâche todo ou blocked, sans transition simultanée ; rouvrir la tâche au préalable")
 	}
@@ -125,6 +128,9 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 	}
 	if next.Title == t.Title && next.Deliverable == t.Deliverable && reflect.DeepEqual(next.Criteria, t.Criteria) && reflect.DeepEqual(next.Depends, t.Depends) && next.PlanMaxAttempts == t.PlanMaxAttempts && next.PlanToolLimit == t.PlanToolLimit && reflect.DeepEqual(next.ValidationPolicy, t.ValidationPolicy) {
 		return nil
+	}
+	if reviewContract(&next) != reviewContract(t) {
+		archiveIndependentReview(&next)
 	}
 	next.Gate = nil
 	next.AutoValidation = nil

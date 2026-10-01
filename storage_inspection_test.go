@@ -14,7 +14,7 @@ func TestInspectionCLIRefusesImplicitStorageUpgrade(t *testing.T) {
 	if _, err := s.db.Exec("PRAGMA user_version=21"); err != nil {
 		t.Fatal(err)
 	}
-	for _, args := range [][]string{{"work", "show", w.ID}, {"work", "list"}, {"planning", "show", w.ID}, {"mission", "status", w.ID}, {"agent", "list", w.ID}, {"agent", "logs", "absent"}, {"prepare", "list"}, {"providers", "show"}} {
+	for _, args := range [][]string{{"run-limits", "show", "project", "-", "-"}, {"run-limits", "history", "project", "-", "-"}, {"run-limits", "effective", w.ID, "worker", "t1"}, {"work", "show", w.ID}, {"work", "list"}, {"planning", "show", w.ID}, {"mission", "status", w.ID}, {"agent", "list", w.ID}, {"agent", "logs", "absent"}, {"prepare", "list"}, {"providers", "show"}} {
 		var out, errOut bytes.Buffer
 		code := run(append([]string{"--root", s.root, "--json"}, args...), &out, &errOut)
 		if code != 2 || !strings.Contains(out.String()+errOut.String(), "storage_upgrade_required") {

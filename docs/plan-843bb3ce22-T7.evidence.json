@@ -1,0 +1,133 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T7",
+  "artifacts": {
+    "docs/plan-843bb3ce22-T7-final-review.json": "7ec050af2117d1d2b2eb02b1030ae999ee1916cf6e88e837b7d1be3f80eff645",
+    "docs/plan-843bb3ce22-T7.md": "c8520a38f8518c0c9814d7f3a87ff93f35a21487148917719559018cfee27719",
+    "docs/T7-documentation-retex.md": "f409364d7724aa3a4d6a300a17ca85f22284cec42af604e347843ade72a76e4a",
+    ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json": "6e798201c3d51dd8b2d451bc04c2aa0a06868c1fe0f706b2cef7d7dcf739e704",
+    "tests/prelaunch_diagnostic_ui.cjs": "02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2",
+    "web/mission.js": "707c551caf558a26ddc2fce7d824569fed57a87529c3aff7239bbf06a354865a"
+  },
+  "domains": {
+    "quality": 100
+  },
+  "checks": [
+    {
+      "id": "plan-criterion-1",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-entry",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7-final-review.json",
+        "docs/plan-843bb3ce22-T7.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json"
+      ]
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7-final-review.json",
+        "docs/plan-843bb3ce22-T7.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json"
+      ]
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7-final-review.json",
+        "docs/plan-843bb3ce22-T7.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json"
+      ]
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7-final-review.json",
+        "docs/plan-843bb3ce22-T7.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json"
+      ]
+    },
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7-final-review.json",
+        "docs/plan-843bb3ce22-T7.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json"
+      ]
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7-final-review.json",
+        "docs/plan-843bb3ce22-T7.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json"
+      ]
+    }
+  ]
+}

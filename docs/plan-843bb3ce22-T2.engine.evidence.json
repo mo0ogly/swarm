@@ -1,0 +1,154 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T2",
+  "artifacts": {
+    "docs/T2-contrat-moteur.md": "297f5671e416bac4a07822a6cbed8171c1b8c1dd5114251fefad6ccbeb90bc3a",
+    "docs/plan-843bb3ce22-T2.md": "297f5671e416bac4a07822a6cbed8171c1b8c1dd5114251fefad6ccbeb90bc3a",
+    "agents_store.go": "7fb34953605d2de6d7ed26e0bafc6ab0e6737c1d6e4a222fd9d86bb80c65373f",
+    "run_limits_admin.go": "9c2eabbc4b382099490526888486cf37bb516f23ecff81b750cb0efd80f49abf",
+    "run_limits_admin_test.go": "901e2594c55e71010deff03b57bed268e8822feb3cb60bdb6d4c66ec1da66b05",
+    "run_limits_launch_test.go": "fad62b09fed4d68046e57f633bb9ab2e07a5987a92f5e9884dbf656055dd09b2",
+    "store.go": "bdbda0b866848dc4c13ef5ae13887c40e02de28d5846e230798347a62722d237",
+    "model.go": "ad518b97cad8c6b34d5bf2b2c6fa38c5eadc2e3d835f49cb2f21e545296d20ac"
+  },
+  "domains": {
+    "engine_verification": 100
+  },
+  "checks": [
+    {
+      "id": "plan-entry",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-1",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-4",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "T1 demeure validée dans le cockpit ; contrat moteur et exigences T2 lus avant correction."
+    },
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "TestRunLimitsConfigRejectsInvalidValue exécuté : valeurs négatives et hors bornes refusées ; code et sortie inclus dans le rapport."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "TestRunLimitsConfigPersistsAfterRealRestart exécuté : fermeture SQLite, openStore, relecture de 42 appels et révision 1."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "TestRunLimitsHierarchyResolutionAndFrozenAttemptUnaffected et TestRunLimitsConfigConcurrencyAndReplay exécutés : historique, rollback_of, conflit et rejeu contrôlés."
+    },
+    {
+      "id": "plan-criterion-4",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "TestRunLimitsActualLaunchFreezesConfiguration exécuté : deux réservations persistées ; première reste 30 après changement, seconde reçoit 12. Contre-épreuve sans branchement échoue comme attendu."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "Superviseur Codex : go test ./... -count=1 -timeout 12m code 0 en 368.466 s ; go vet, build et diff --check codes 0 ; contrôles ciblés -race code 0. Tests SQLite isolés, pas de recette web/CLI revendiquée."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T2-contrat-moteur.md",
+        "docs/plan-843bb3ce22-T2.md"
+      ],
+      "reason": "Rapports courants et binaire installé examinés. Avis indépendant Claude favorable observé dans le cockpit après remise du code complet des tests : quatre critères étayés ; limite explicite de revue sans outils. Le moteur vérifiera sa fraîcheur à l’acceptation."
+    }
+  ]
+}

@@ -212,3 +212,7 @@ engine as the web: `version: 1`, `expected_digest`, `connection` (`id`, `label`,
 `base_url`, `model`, `disabled`, optional `key`) and `replace_key`. Interactive
 connection testing is available in the web; this CLI save command makes no call.
 Custom connections are not implicitly activated for every mission.
+
+## Templates
+
+[KS mission templates (web and CLI)](PREPARATION-TEMPLATES.md).

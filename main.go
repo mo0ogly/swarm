@@ -20,6 +20,10 @@ swarm task-model show|preview|apply <travail> [--input request.json]
 swarm quotas show|preview|apply <travail> [--input quotas.json]
 swarm pricing list|save|estimate [--input request.json]
 swarm budget show|preview|apply <travail> [--input budget.json]
+swarm run-limits show|history <portée> <mission> <clé>
+swarm run-limits apply <portée> <mission> <clé> --input changement.json
+swarm run-limits rollback <portée> <mission> <clé> <révision_cible> --input requête.json
+swarm run-limits effective <mission> <rôle> <tâche>
 swarm aide [sujet]
 swarm providers init|show
 swarm providers cooldown show|clear <fournisseur> [--input demande.json]
@@ -28,7 +32,8 @@ swarm console [travail] [--plain]
 swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
 swarm dispatch <travail>
 swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
-swarm mission status|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission status|changes|spending|seen|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission recovery <travail> <tâche> [agent]
 swarm lifecycle list
 swarm lifecycle preview|apply <travail> archive|restore|purge|delete --input requete.json
 swarm validation preview|apply <travail> --task <tâche> --input politique.json
@@ -266,6 +271,12 @@ func run(args []string, out, errOut io.Writer) int {
 	}
 	if pos[0] == "budget" {
 		if e := s.budgetCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "run-limits" {
+		if e := s.runLimitsCLI(pos, input, out); e != nil {
 			return fail(e)
 		}
 		return 0

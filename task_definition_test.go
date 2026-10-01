@@ -202,3 +202,36 @@ func TestTaskDefinitionRequestEncoding(t *testing.T) {
 		t.Fatal("custom mandatory gate lost")
 	}
 }
+
+func TestTaskDefinitionArchivesOnlyChangedReviewContract(t *testing.T) {
+	w := Work{Tasks: []Task{{ID: "t1", Status: "blocked", Title: "one", Deliverable: "docs/r.md", Criteria: []string{"old"}, IndependentReview: &IndependentReview{ID: "review-old", State: "changes_requested"}, Attempts: []Attempt{{ID: "attempt-old"}}}}}
+	if e := updateTaskDefinition(&w, &w.Tasks[0], Request{MaxToolCalls: 20}); e != nil {
+		t.Fatal(e)
+	}
+	if w.Tasks[0].IndependentReview == nil {
+		t.Fatal("budget edit erased verdict")
+	}
+	if e := updateTaskDefinition(&w, &w.Tasks[0], Request{Criteria: []string{"clarified"}}); e != nil {
+		t.Fatal(e)
+	}
+	got := w.Tasks[0]
+	if got.IndependentReview != nil || len(got.PreviousReviews) != 1 || got.PreviousReviews[0].ID != "review-old" || len(got.Attempts) != 1 || got.Attempts[0].ID != "attempt-old" {
+		t.Fatalf("history or attempt lost: %+v", got)
+	}
+	if e := updateTaskDefinition(&w, &w.Tasks[0], Request{Criteria: []string{"clarified"}}); e != nil {
+		t.Fatal(e)
+	}
+	if len(w.Tasks[0].PreviousReviews) != 1 {
+		t.Fatal("duplicate history")
+	}
+}
+
+func TestTaskDefinitionRejectsActiveIndependentReview(t *testing.T) {
+	w := Work{Tasks: []Task{{ID: "t1", Status: "blocked", Title: "old", IndependentReview: &IndependentReview{ID: "live", State: "running"}}}}
+	if err := updateTaskDefinition(&w, &w.Tasks[0], Request{Title: "new"}); err == nil {
+		t.Fatal("active review contract changed")
+	}
+	if w.Tasks[0].Title != "old" || w.Tasks[0].IndependentReview.ID != "live" || len(w.Tasks[0].PreviousReviews) != 0 {
+		t.Fatal("rejected change mutated evidence")
+	}
+}

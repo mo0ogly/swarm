@@ -264,12 +264,13 @@ Sans cette option, la règle historique du refus démontré reste applicable.
 
 ### Repartir sur une tâche bloquée
 
-`planning restart-task WORK --input request.json` (ou l'action HTTP
+`swarm planning restart-task WORK --input request.json` (ou l'action HTTP
 `restart-task`) prépare une nouvelle production après une décision explicite de
 l'opérateur. Ce n'est pas une remise à zéro des coûts ni de l'historique.
 La requête contient `schema_version: 1`, `event_id`, `expected_revision`,
 `task_id`, `attempt_id` (la dernière tentative), `expected_candidate` (le SHA
-cumulatif de départ), `confirm_recovery: true`, `reason` et une nouvelle
+cumulatif de départ en dépôt Git géré, ou l’empreinte SHA-256 du livrable déclaré
+en dossier partagé), `confirm_recovery: true`, `reason` et une nouvelle
 `recovery_instruction`.
 
 Le moteur exige une tâche bloquée ayant épuisé son nombre de tentatives, un
@@ -293,3 +294,33 @@ avis ou une confirmation absente sont refusés. L'ancien avis est archivé ; la
 tâche reste bloquée jusqu'aux nouveaux contrôles et à un nouveau verdict.
 Une ancienne production réparée peut être réexaminée si son résultat, son
 agent arrêté et sa tentative concordent. Aucun compteur n'est remis à zéro.
+
+## Reprise dans un dossier partagé
+
+Le redémarrage explicite décrit ci-dessus couvre également un dossier partagé.
+Le livrable examiné doit être accessible, inchangé et ne pas dépasser **48 000
+octets**. La fin du processus de la dernière tentative doit être confirmée.
+Un dépassement historique du nombre d’essais reste enregistré ; l’autorisation
+accorde un seul essai supplémentaire sans rembourser les coûts ni la revue.
+Le prochain lancement utilise le dossier partagé ; il ne crée pas de copie Git.
+
+## Refus de révision pendant un lancement concurrent
+
+Si deux demandes utilisent la même révision, la garde transactionnelle refuse
+la demande devenue périmée avec `revision_conflict` et `retryable: true`.
+Relisez le travail et les lancements préparés : si l’agent existe déjà, retrouvez
+cette opération. Ne recréez pas un départ pour contourner le refus. Le caractère
+réessayable autorise une reprise après relecture, pas une boucle aveugle.
+
+## Rapport trop grand pour le contexte de planification
+
+La limite du fichier et la place disponible dans une consigne sont distinctes.
+Le moteur réduit d’abord le lot à des événements entiers. Si un rapport seul
+ne tient toujours pas, il transmet un diagnostic explicite, **sans contenu du
+rapport et sans troncature**. Le fichier d’origine est conservé intégralement.
+
+Cette remise de diagnostic n’autorise aucune opération de production, reprise
+ou clôture. L’événement reste en attente jusqu’à une décision explicite sans
+opération qui l’acquitte. Examinez ensuite le fichier complet avant toute
+décision métier. Une clôture ultérieure vérifie toujours les validations
+actuelles de toutes les tâches ; l’acquittement n’accepte aucun résultat.

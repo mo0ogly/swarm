@@ -1,0 +1,146 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T7",
+  "artifacts": {
+    "docs/plan-843bb3ce22-T7.md": "1709a717766f65442f5a926c08106e104df002e18c0126e928a9dc6f10bbc636",
+    "docs/T7-documentation-retex.md": "f409364d7724aa3a4d6a300a17ca85f22284cec42af604e347843ade72a76e4a",
+    "docs/plan-843bb3ce22-T7-revalidation-tests.txt": "6f7fa0739e2b7a98f8f80231342ec40d282d3519df070ed084962f5962ea03f9",
+    ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json": "1e1e4c0588e3be485381282a07d29a18fdfc890d87783cf3d4c68014a38c3aac",
+    "locales/en.json": "0ad02431234e04415fc91875e5abcf90589c4481634a2d7868b5ad02c1bc47fa",
+    "tests/prelaunch_diagnostic_ui.cjs": "02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2",
+    "tools/verification/t7_prelaunch.py": "f5e86c2b39f32d3384e4d3a5b6a9317fb84648f67b776d61d8819d765c67b2b3",
+    "web/i18n-en.js": "fac819bcbbfeae7cf97682cf873d95fcd1983dfee653613cbe1bd0d85741cdbf",
+    "web/mission.js": "c8d6318b9042244ae086f1d203be8840d49e4a2d2575efa7a7adf072ccc22570",
+    "web/prepare.html": "8bff9e4931df8ae2ad605ae502a2f4825fa2f0e2ee6bc24d32beb3c884c04eb1",
+    "web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
+    "web/prephase-editor.js": "859de925d60b31720a09d47f9d0ccf05b1b572a8f334d47812f54d4123c942d2",
+    "web/prephase.js": "a55e6b254d515d4b1c221a0edf0ec34f90d721df5a4f707dd030f0c2cde2ffc5"
+  },
+  "domains": {
+    "quality": 100
+  },
+  "checks": [
+    {
+      "id": "plan-criterion-1",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-entry",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-revalidation-tests.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json"
+      ],
+      "reason": "Revalidation du 1er octobre : contrôles moteur actuels réussis, recette FR/EN et deux thèmes, diagnostic expurgé ; appréciation qualitative du superviseur documentée dans le rapport. Nouvelle revue indépendante requise séparément."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-revalidation-tests.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json"
+      ],
+      "reason": "Revalidation du 1er octobre : contrôles moteur actuels réussis, recette FR/EN et deux thèmes, diagnostic expurgé ; appréciation qualitative du superviseur documentée dans le rapport. Nouvelle revue indépendante requise séparément."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-revalidation-tests.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json"
+      ],
+      "reason": "Revalidation du 1er octobre : contrôles moteur actuels réussis, recette FR/EN et deux thèmes, diagnostic expurgé ; appréciation qualitative du superviseur documentée dans le rapport. Nouvelle revue indépendante requise séparément."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-revalidation-tests.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json"
+      ],
+      "reason": "Revalidation du 1er octobre : contrôles moteur actuels réussis, recette FR/EN et deux thèmes, diagnostic expurgé ; appréciation qualitative du superviseur documentée dans le rapport. Nouvelle revue indépendante requise séparément."
+    },
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-revalidation-tests.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json"
+      ],
+      "reason": "Revalidation du 1er octobre : contrôles moteur actuels réussis, recette FR/EN et deux thèmes, diagnostic expurgé ; appréciation qualitative du superviseur documentée dans le rapport. Nouvelle revue indépendante requise séparément."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T7.md",
+        "docs/plan-843bb3ce22-T7-revalidation-tests.txt",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98-receipt-f98754ac12b9a7fee7c5c217.json"
+      ],
+      "reason": "Revalidation du 1er octobre : contrôles moteur actuels réussis, recette FR/EN et deux thèmes, diagnostic expurgé ; appréciation qualitative du superviseur documentée dans le rapport. Nouvelle revue indépendante requise séparément."
+    }
+  ]
+}

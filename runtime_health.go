@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 
 	"golang.org/x/sys/unix"
 )
@@ -28,6 +29,42 @@ type RuntimeHealth struct {
 	Message       string          `json:"message"`
 	Next          string          `json:"next_step"`
 	Volumes       []StorageVolume `json:"volumes"`
+	Version       ServerVersion   `json:"version"`
+}
+
+// ServerVersion reports the running binary's build revision, never a network
+// lookup. Revision comes from Go's automatic VCS stamping (go 1.18+); Source is
+// the local checkout's current HEAD via the existing gitState helper — the same
+// mechanism already used to detect drift on a Work's checkpoint. Comparison is
+// degraded (Compared=false) rather than guessed when either side is unavailable.
+type ServerVersion struct {
+	Revision  string `json:"revision"`
+	Modified  bool   `json:"modified"`
+	Available bool   `json:"available"`
+	Source    string `json:"source_revision"`
+	Compared  bool   `json:"compared"`
+	Current   bool   `json:"current"`
+}
+
+func (s *Store) serverVersion() ServerVersion {
+	v := ServerVersion{}
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			switch setting.Key {
+			case "vcs.revision":
+				v.Revision = setting.Value
+			case "vcs.modified":
+				v.Modified = setting.Value == "true"
+			}
+		}
+	}
+	v.Available = v.Revision != ""
+	v.Source = gitState(s.root).Head
+	v.Compared = v.Available && v.Source != ""
+	if v.Compared {
+		v.Current = v.Revision == v.Source
+	}
+	return v
 }
 
 func readStorageVolume(path string) (uint64, uint64, error) {
@@ -49,7 +86,7 @@ func (s *Store) runtimeHealth() RuntimeHealth {
 	if read == nil {
 		read = readStorageVolume
 	}
-	h := RuntimeHealth{State: "ready", LaunchAllowed: true, ObservedAt: now(), Volumes: []StorageVolume{}}
+	h := RuntimeHealth{State: "ready", LaunchAllowed: true, ObservedAt: now(), Volumes: []StorageVolume{}, Version: s.serverVersion()}
 	for _, target := range []struct{ kind, path string }{{"store", filepath.Join(s.root, ".swarm")}, {"temporary", os.TempDir()}} {
 		bytes, inodes, err := read(target.path)
 		v := StorageVolume{Kind: target.kind, Path: target.path, Available: bytes, Inodes: inodes, State: "ready"}

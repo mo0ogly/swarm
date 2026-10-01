@@ -35,8 +35,8 @@ func normalizeValidationPolicy(p ValidationPolicy) (ValidationPolicy, error) {
 	if p.Mode != "human" && p.Mode != "automatic" {
 		return p, fmt.Errorf("validation_policy.mode : human ou automatic requis")
 	}
-	if p.Mode == "human" && len(p.Controls) != 0 {
-		return p, fmt.Errorf("une politique human ne peut pas préautoriser de contrôle")
+	if len(p.Controls) > maxValidationControls {
+		return p, fmt.Errorf("trop de contrôles préautorisés")
 	}
 	if p.Mode == "automatic" && (len(p.Controls) == 0 || len(p.Controls) > maxValidationControls) {
 		return p, fmt.Errorf("une politique automatic exige 1 à %d contrôles", maxValidationControls)
@@ -45,6 +45,14 @@ func normalizeValidationPolicy(p ValidationPolicy) (ValidationPolicy, error) {
 	totalTimeout := 0
 	for i := range p.Controls {
 		c := &p.Controls[i]
+		if len(c.Inputs) > 64 {
+			return p, fmt.Errorf("trop de fichiers de preuve")
+		}
+		for _, name := range c.Inputs {
+			if name == "" || filepath.IsAbs(name) || filepath.Clean(name) == ".." || strings.HasPrefix(filepath.Clean(name), "../") {
+				return p, fmt.Errorf("fichier de preuve hors projet")
+			}
+		}
 		c.ID = strings.TrimSpace(c.ID)
 		if !safeName(c.ID) || seen[c.ID] {
 			return p, fmt.Errorf("identifiant de contrôle absent, invalide ou dupliqué")
@@ -94,9 +102,6 @@ func normalizeValidationPolicy(p ValidationPolicy) (ValidationPolicy, error) {
 }
 
 func validationPolicyCoversTask(p ValidationPolicy, t *Task) error {
-	if p.Mode != "automatic" {
-		return nil
-	}
 	criteria := map[int]bool{}
 	controls := map[string]bool{}
 	for _, control := range p.Controls {
@@ -107,6 +112,9 @@ func validationPolicyCoversTask(p ValidationPolicy, t *Task) error {
 			}
 			criteria[criterion] = true
 		}
+	}
+	if p.Mode == "human" {
+		return nil
 	}
 	for i := range t.Criteria {
 		if !criteria[i+1] {
@@ -286,14 +294,11 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		return false, "tentative ancienne ou non terminée ; validation refusée"
 	}
 
-	if t.ValidationPolicy == nil || t.ValidationPolicy.Mode != "automatic" {
+	if t.ValidationPolicy == nil || len(t.ValidationPolicy.Controls) == 0 {
 		return false, "revue humaine conservée : aucun contrôle automatique préautorisé"
 	}
 	if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
 		return false, "validation automatique retenue : " + reason
-	}
-	if e := s.independentReviewGuard(&w, t); e != nil {
-		return false, e.Error()
 	}
 	policy := *t.ValidationPolicy
 	if err := validationPolicyCoversTask(policy, t); err != nil {
@@ -301,7 +306,28 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	}
 	digest := validationPolicyDigest(policy)
 	if t.AutoValidation != nil && t.AutoValidation.Attempt == a.Attempt && t.AutoValidation.PolicyDigest == digest {
-		return t.AutoValidation.State == "accepted", "validation déjà décidée pour cette tentative"
+		if t.AutoValidation.State == "pending_review" || t.AutoValidation.State == "pending_human" {
+			// A resubmitted report can change without a new production attempt.
+			// Recheck only when its recorded content changed; unchanged polling
+			// must reuse the receipt and never repeat the controls.
+			path, readErr := safeReport(s.root, report)
+			if readErr != nil {
+				return false, readErr.Error()
+			}
+			content, readErr := os.ReadFile(path)
+			if readErr != nil || len(content) == 0 {
+				return false, "livrable vide ou illisible"
+			}
+			previous := t.AutoValidation.Artifacts[report]
+			if previous == hash(content) && s.currentReportArtifacts(t.AutoValidation.Artifacts) == nil {
+				if policy.Mode == "human" {
+					return false, "Contrôles disponibles ; décision humaine requise."
+				}
+				return s.acceptReviewedValidation(w, t, a)
+			}
+		} else {
+			return t.AutoValidation.State == "accepted", "validation déjà décidée pour cette tentative"
+		}
 	}
 	reportPath, err := safeReport(s.root, report)
 	if err != nil {
@@ -310,6 +336,20 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	reportBytes, err := os.ReadFile(reportPath)
 	if err != nil || len(reportBytes) == 0 {
 		return false, "livrable vide ou illisible"
+	}
+	artifacts := map[string]string{report: hash(reportBytes)}
+	for _, control := range policy.Controls {
+		for _, name := range control.Inputs {
+			path, e := safeReport(s.root, name)
+			if e != nil {
+				return false, "preuve inaccessible : " + name
+			}
+			data, e := os.ReadFile(path)
+			if e != nil {
+				return false, e.Error()
+			}
+			artifacts[name] = hash(data)
+		}
 	}
 	results := make([]ValidationControlResult, 0, len(policy.Controls))
 	passed := true
@@ -321,18 +361,36 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		results = append(results, result)
 		passed = passed && result.Passed
 	}
-	relReceipt := filepath.ToSlash(filepath.Join(".swarm", "validation", w.ID, t.ID, a.Attempt+".json"))
+	if e := s.currentReportArtifacts(artifacts); e != nil {
+		return false, "Fichiers modifiés pendant les contrôles ; preuves à renouveler : " + e.Error()
+	}
+	// A report can be corrected within the same attempt, or publication can
+	// lose an optimistic revision race. Never overwrite a receipt already
+	// frozen into a review, even when the new decision cannot be persisted.
+	relReceipt := filepath.ToSlash(filepath.Join(".swarm", "validation", w.ID, t.ID, a.Attempt+"-"+newID("receipt-")+".json"))
 	absReceipt := filepath.Join(s.root, filepath.FromSlash(relReceipt))
 	if err = os.MkdirAll(filepath.Dir(absReceipt), 0700); err != nil {
 		return false, "création du reçu impossible : " + err.Error()
 	}
 	record := AutomaticValidation{Attempt: a.Attempt, Revision: w.Revision, Producer: a.ID, Controller: validationController, PolicyDigest: digest, Policy: policy,
-		Artifacts: map[string]string{report: hash(reportBytes)}, Controls: results,
+		Artifacts: artifacts, Controls: results,
 		Receipt: relReceipt, State: "blocked", At: now()}
 	if passed {
 		record.State, record.Reason = "accepted", "tous les contrôles préautorisés ont réussi"
+		if s.independentReviewGuard(&w, t) != nil {
+			record.State, record.Reason = "pending_review", "contrôles réussis ; revue indépendante requise avant acceptation"
+		}
+		if policy.Mode == "human" {
+			record.State, record.Reason = "pending_human", "Contrôles disponibles ; décision humaine requise."
+		}
 	} else {
-		record.Reason = "au moins un contrôle préautorisé a échoué"
+		failed := []string{}
+		for _, result := range results {
+			if !result.Passed {
+				failed = append(failed, result.ID+" : "+result.Summary)
+			}
+		}
+		record.Reason = "Contrôles en échec : " + strings.Join(failed, " ; ")
 	}
 	receiptBytes, _ := json.MarshalIndent(record, "", "  ")
 	receiptBytes = append(receiptBytes, '\n')
@@ -369,9 +427,6 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		if findErr != nil || task.Status != "submitted" || task.ValidationPolicy == nil || validationPolicyDigest(*task.ValidationPolicy) != digest {
 			return fmt.Errorf("politique ou tâche modifiée pendant les contrôles ; revue humaine requise")
 		}
-		if e := s.independentReviewGuard(current, task); e != nil {
-			return e
-		}
 		fresh, evalErr := evaluate(document, s.root, "delivery")
 		if evalErr != nil {
 			return fmt.Errorf("preuve périmée pendant les contrôles : %w", evalErr)
@@ -383,6 +438,18 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 			task.Blocker = record.Reason
 			task.Next = "Examiner le reçu " + relReceipt + " ; corriger ou modifier explicitement la politique avant une nouvelle tentative."
 			return nil
+		}
+		if policy.Mode == "human" {
+			task.Gate = nil
+			task.Next = record.Reason
+			return nil
+		}
+		if record.State == "pending_review" {
+			task.Next = record.Reason
+			return nil
+		}
+		if e := s.independentReviewGuard(current, task); e != nil {
+			return e
 		}
 		for _, dep := range task.Depends {
 			parent, _ := current.task(dep)
@@ -398,7 +465,7 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	if err != nil {
 		return false, err.Error()
 	}
-	return evaluation.Allowed, record.Reason + " ; reçu " + relReceipt
+	return evaluation.Allowed && record.State == "accepted", record.Reason + " ; reçu " + relReceipt
 }
 
 // resumeAutomaticValidations makes pause/restart honest: a submitted result is
@@ -415,14 +482,24 @@ func (s *Store) resumeAutomaticValidations(work string) (bool, error) {
 	}
 	for i := range w.Tasks {
 		task := &w.Tasks[i]
-		if task.Status != "submitted" || task.ValidationPolicy == nil || task.ValidationPolicy.Mode != "automatic" {
+		if task.Status != "submitted" || task.ValidationPolicy == nil || len(task.ValidationPolicy.Controls) == 0 {
 			continue
+		}
+		// A human decision may remain pending indefinitely. Reuse its current
+		// receipt without starving checks belonging to later tasks or logging
+		// the same retained decision on every conductor tick.
+		if task.ValidationPolicy.Mode == "human" {
+			if _, _, evidenceErr := s.independentValidationEvidence(task); evidenceErr == nil {
+				continue
+			}
 		}
 		for _, agent := range agents {
 			if agent.TaskID != task.ID || agent.Status != "completed" || agent.Attempt == "" {
 				continue
 			}
-			report, _ := s.provenReport(task.ID, agent.Started)
+			// Use the same workspace as handoff publication. A similarly named
+			// root copy is not the report produced by this attempt.
+			report, _ := s.provenAttemptReport(agent)
 			if report == "" {
 				continue
 			}

@@ -130,7 +130,7 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 		if !changed[t.ID] {
 			continue
 		}
-		if t.Status == "running" {
+		if t.Status == "running" || (t.IndependentReview != nil && t.IndependentReview.State == "running") {
 			return fmt.Errorf("tâche en cours : %s", t.ID)
 		}
 		if w.Planning != nil && oldIDs[t.ID] {
@@ -139,7 +139,7 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 			}
 		}
 		if nt, ok := nextBy[t.ID]; ok {
-			if t.ValidationPolicy != nil && t.ValidationPolicy.Mode == "automatic" {
+			if t.ValidationPolicy != nil && len(t.ValidationPolicy.Controls) > 0 {
 				for _, prior := range p.Conversion.Spec.Tasks {
 					if prefix+prior.ID == t.ID {
 						for _, next := range spec.Tasks {
@@ -150,7 +150,7 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 					}
 				}
 			}
-			if t.ValidationPolicy != nil && t.ValidationPolicy.Mode == "automatic" && !reflect.DeepEqual(t.Criteria, nt.Criteria) {
+			if t.ValidationPolicy != nil && len(t.ValidationPolicy.Controls) > 0 && !reflect.DeepEqual(t.Criteria, nt.Criteria) {
 				return fmt.Errorf("%s : critères modifiés ; réautoriser une politique de revue humaine avant cette révision ou conserver les critères couverts par les contrôles", t.Title)
 			}
 			if w.Planning != nil && len(nt.Criteria) < len(t.Criteria) {
@@ -163,7 +163,19 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 			t.Next = nt.Next
 			t.PlanRole = nt.PlanRole
 			t.PlanChecks = nt.PlanChecks
-			t.PlanMaxAttempts = nt.PlanMaxAttempts
+			// An unchanged plan limit must not erase the separately authorized
+			// one-off recovery. An explicit reduction in the plan still applies.
+			preserveRecovery := false
+			if t.CorrectiveRecovery != nil && t.PlanMaxAttempts == 4 {
+				for _, prior := range p.Conversion.Spec.Tasks {
+					if prefix+prior.ID == t.ID && prior.MaxAttempts == nt.PlanMaxAttempts {
+						preserveRecovery = true
+					}
+				}
+			}
+			if !preserveRecovery {
+				t.PlanMaxAttempts = nt.PlanMaxAttempts
+			}
 			t.PlanToolLimit = nt.PlanToolLimit
 			if w.Planning != nil && w.Planning.HumanReviewAuthorized != "" {
 				root, _ := w.Planning.scope("root")
@@ -183,6 +195,9 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 				}
 			}
 		}
+		// All impacted tasks need a fresh review, including dependents whose
+		// contract text is unchanged. Keep the verdict and spent calls in history.
+		archiveIndependentReview(t)
 		t.Status = "todo"
 		t.Gate = nil
 		t.AutoValidation = nil

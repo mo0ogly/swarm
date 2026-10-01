@@ -365,8 +365,8 @@ sont dans un fichier réservé au compte du processus, **sans chiffrement applic
 Ne publiez ni ce dossier ni les liens de session. Les sorties capturées peuvent
 contenir du contenu sensible du projet.
 
-Les méthodes APEX, KS et PDCA nécessitent leurs ressources dans le projet piloté ;
-elles ne sont pas toutes incluses. La préparation standard ne crée pas
+Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md). Pour un autre
+projet piloté, vérifiez ses ressources de méthode. La préparation standard ne crée pas
 implicitement des copies Git isolées : ne confondez pas ce parcours avec le mode
 avancé de dépôt Git géré, décrit dans la référence.
 
@@ -375,3 +375,97 @@ fournisseur réel et de votre projet.
 
 Pour approfondir : [préparation](PREPARATION-UX.md), [cockpit technique](COCKPIT.md),
 [référence CLI](REFERENCE.md), [installation](INSTALL.md).
+
+## Comprendre et reprendre une mission
+
+Le pilotage commence par un résumé court : ce qui se passe, puis qui agit et
+quelle est la prochaine étape. Le bouton principal cible la tâche qui retient
+le plus de dépendants avant les tâches simplement à configurer. Un incident de
+stockage, une organisation incomplète ou une planification à reprendre reste
+prioritaire. Le texte sous le résumé annonce l’effet du bouton : ouvrir un
+diagnostic ne relance pas l’agent et ne valide pas son résultat.
+
+Le CLI `swarm mission status IDENTIFIANT` affiche le même résumé, la même action
+et son effet. `--json` expose `guidance` et `tasks[].primary_action` pour les
+outils qui présentent ce suivi. Les commandes de reprise existantes gardent
+leurs confirmations, contrôles et limites.
+
+Pour une nouvelle tentative de la même tâche, Swarm fournit les opérations
+récentes, la prochaine action, les critères actuels et les références de revue
+liées à la tentative précédente. Les verdicts transmis sont historiques : les
+preuves doivent être revérifiées sur le résultat courant. Les rapports bruts,
+les résultats des autres tâches et les secrets ne sont pas recopiés dans cette
+mémoire. Son contenu reste borné et signale les extraits incomplets.
+
+### Comprendre l’attente, les appels et une reprise
+
+Dans **Conduite**, trois boutons ouvrent des fenêtres de lecture :
+
+- **Depuis votre dernière visite** sépare résultats, blocages et décisions.
+  Ces événements décrivent l’historique, pas une validation actuelle. La première
+  visite est annoncée ; un extrait limité à 200 événements est signalé.
+- **Pourquoi cette tâche attend ?** donne les prérequis non validés ou périmés
+  et permet d’ouvrir leur fiche. Une attente sans dépendance affiche le motif du
+  moteur, par exemple un espace occupé. Ouvrir la fiche ne relance rien.
+- **Où vont les appels et les coûts ?** distingue exécutants par tâche,
+  responsables et vérificateur. Les contrôles enregistrés et les reprises
+  d’agents sont séparés des appels IA. Les jetons et dollars absents restent
+  explicitement non rapportés. Ce tableau ne mesure pas toutes les requêtes
+  réseau internes aux fournisseurs. Il est aussi visible dans **Budgets et coûts IA**.
+
+Dans le détail d’une tâche, **Avant une relance** présente les éléments
+conservés, les vérifications à refaire, les critères inchangés et la correction
+attendue. Cet aperçu apparaît aussi dans le formulaire de relance ou d’essai
+correctif ; il suit la tentative sélectionnée et la consigne saisie. Il ne
+constitue ni une autorisation de départ ni une promesse de succès.
+
+Équivalents CLI, utilisables avec `--lang en` ou `--json` :
+
+```bash
+swarm mission changes WORK
+swarm mission seen WORK               # marque explicitement la révision comme vue
+swarm mission spending WORK
+swarm mission recovery WORK TASK      # dernière tentative de cette tâche
+swarm mission recovery WORK TASK AGENT
+swarm mission status WORK             # inclut les prérequis qui retiennent les tâches
+```
+
+Une lecture ne déplace pas le repère de visite. Sur le web, le repère existant
+est enregistré en quittant le travail, ou via « Marquer comme vu ». Le CLI
+utilise le même compte local et le même repère, avec `mission seen`.
+
+### Redémarrage explicite après épuisement des tentatives
+
+`swarm planning restart-task WORK --input reprise.json` prépare une seule nouvelle
+production après décision explicite de l’opérateur. Les anciennes tentatives,
+coûts et revues restent conservés ; l’autorisation seule ne lance aucun agent.
+Le JSON contient `schema_version`, `event_id`, `expected_revision`, `task_id`,
+`attempt_id`, `confirm_recovery: true`, `reason`, `recovery_instruction` et
+`expected_candidate`. Pour une mission Git isolée, ce dernier est le candidat
+Git courant. Pour une mission dans un dossier partagé, c’est l’empreinte SHA-256
+du fichier déclaré comme livrable, examiné avant la demande (48 Ko maximum).
+La dernière tentative doit être terminée et aucun agent ni revue ne doit être
+actif. Une consigne différente est obligatoire. Les contrôles, la revue
+indépendante et la décision d’acceptation doivent ensuite être renouvelés.
+Un dépassement historique reste visible : il n’est pas remis à zéro.
+
+### Lire les compteurs et reconnaître la fin
+
+- **Appels d’outils** : actions observées du fournisseur pendant une tentative ; ce n’est pas un nombre de requêtes au modèle.
+- **Décisions enregistrées** : décisions de planification conservées par le moteur.
+- **Activations de planification** : prises en charge du planificateur, y compris celles effectuées par le superviseur natif. Elles ne prouvent pas autant d’appels IA payants.
+- **Retours à traiter** : événements encore sans décision ; un événement reçu ne constitue pas une tâche validée.
+
+Un agent arrêté ou un avis favorable ne suffisent pas. **Terminé et validé**
+indique que les preuves actuelles satisfont les contrôles de la tâche. La mission
+est clôturée lorsque tous les résultats requis sont validés et que le responsable
+racine a clôturé son périmètre. Une preuve modifiée peut rendre la validation périmée.
+
+![Mission clôturée : 8/8 résultats validés](docs/screenshots/mission-complete-fr.png)
+
+*Capture réelle du 1er octobre 2026 : résultats validés et responsabilité racine clôturée. « Voir les résultats » conserve l’accès aux livrables et aux avis. Cette recette comprend des décisions humaines ; elle ne prouve pas une autonomie sans intervention.*
+
+Si une reprise autorisée reste arrêtée par une décision opérateur précédente,
+l’autorisation seule n’enlève pas cet arrêt : utilisez le lancement explicite
+après vérification des conditions. Le [guide moteur](docs/ENGINE-RECOVERY.md)
+détaille les refus de révision et les rapports trop grands pour le contexte.

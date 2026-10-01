@@ -81,6 +81,10 @@ Dans **IA et connexions**, ajoutez le nom, l’adresse du service, l’identifia
 
 Le protocole attendu est compatible avec `POST /chat/completions`. Une connexion API peut servir à préparer, planifier ou examiner un rapport. Elle ne donne pas automatiquement des outils d’accès aux fichiers.
 
+![Formulaire Ajouter une IA rempli, avant enregistrement](docs/screenshots/connexion.png)
+
+*Capture réelle du formulaire rempli (fournisseur local d’exemple, champ de clé vide) : ni testé ni enregistré, « Connexion non testée dans ce formulaire » est affiché. Aucune clé n’apparaît. Cliquez **Tester la connexion** puis **Enregistrer la connexion** ; l’enregistrement ne prouve pas que le service répond.*
+
 Avec le réseau hôte Linux, une API locale peut être joignable par exemple à `http://127.0.0.1:11434/v1`, si vous avez effectivement lancé un service compatible à cette adresse.
 
 ### Agents capables de modifier le projet
@@ -197,7 +201,7 @@ Le script compile dans un fichier temporaire du dossier cible, puis remplace le 
 | Fournisseur absent | Installation dans le conteneur, PATH et `.swarm/providers.json` |
 | Agent installé mais appel refusé | Authentification, variables autorisées et capacités de sandbox |
 | Ancienne mission avec chemins invalides | Adapter les profils vers `/workspace` sans lancer deux serveurs sur la même base |
-| Méthode APEX, KS ou PDCA absente | Installer les ressources de méthode dans le projet piloté, voir [les limites](docs/migration/README.md) |
+| Méthode de préparation indisponible | Vérifier la racine utilisée par Swarm et les ressources de méthode de ce projet ; voir le [guide des méthodes](docs/AGENT-METHODS.md). Installer le binaire seul ne copie pas ces ressources dans un autre projet. |
 
 Le Dockerfile compile les sources présentes localement. Il n’existe pas ici de promesse d’image publique préconstruite ni de compatibilité universelle avec les fournisseurs.
 
@@ -225,3 +229,164 @@ Ne modifiez jamais `PRAGMA user_version` pour forcer une ouverture. Sauvegardez
 l’ensemble de `.swarm/`, pas uniquement `state.db` : les rapports, copies de
 travail et configurations sont aussi nécessaires. Les sauvegardes automatiques
 de certaines migrations ne remplacent pas cette sauvegarde complète.
+
+## Première mission : du besoin au lancement
+
+1. Ouvrez le lien affiché au démarrage du serveur, puis **Préparer un projet**.
+2. Enregistrez votre besoin. Choisissez une IA configurée dans **IA et connexions**.
+3. Relisez et validez le brief proposé, puis demandez le plan. Répondez aux décisions ouvertes avant de vérifier le plan.
+4. Relisez l’équipe : responsable, exécutants et vérificateur indépendant. Vérifiez le dossier du projet, les modèles et les limites.
+5. Choisissez qui accepte les résultats. La revue humaine demande une acceptation après examen ; la validation automatique exige des commandes qui prouvent réellement chaque critère.
+6. Exécutez la vérification avant lancement et autorisez l’équipe. Dans le pilotage, cliquez **Lancer la mission**, relisez le récapitulatif puis confirmez.
+7. Vérifiez qu’une tentative est active. « Missions enregistrées » signifie que les tâches existent, pas qu’un agent travaille.
+
+![Mission réellement lancée : première tâche en cours](docs/screenshots/installation/mission-lancee-fr.png)
+
+Capture réelle du parcours français : mission Administration lancée depuis les écrans, le 29 septembre 2026. Le lancement ne prouve pas la réussite des huit tâches ; les résultats restent à examiner.
+
+### Quatre états à ne pas confondre
+
+| État | Ce que vous voyez | Ce que cela prouve | Capture |
+| --- | --- | --- | --- |
+| Formulaire rempli | Valeurs saisies, aperçu « valeurs actuelles » avant confirmation | Rien n’est écrit : la révision n’a pas changé | `admin-fr-etat.png`, `admin-fr-sombre.png` |
+| Configuration enregistrée | Révision 1 dans la portée et dans l’historique, auteur et motif | Les valeurs seront utilisées par les **prochains départs** | `admin-saved-fr-etat.png`, `admin-saved-fr-sombre.png` |
+| Lancement effectif | Tâche en cours, tentative active dans le pilotage | Un agent a démarré ; ni résultat, ni acceptation | `mission-lancee-fr.png` |
+| Mission clôturée | Tous les résultats validés sur leurs preuves et responsabilité racine clôturée | Les résultats requis ont été acceptés ; ce n’est pas la seule fin des processus | [Capture du 1er octobre](docs/screenshots/mission-complete-fr.png) |
+
+**Point de vigilance :** le parcours actuel comporte une autorisation de l’équipe, puis un lancement dans le pilotage. Si aucune tâche ne démarre, consultez le motif affiché avant toute nouvelle tentative.
+
+
+## Configurer les limites avant de lancer les agents
+
+Ouvrez **Administration** dans le cockpit (passez en mode expert si cette rubrique est masquée), puis choisissez la portée : projet, mission, rôle ou tâche. Les valeurs héritées et les valeurs propres à la portée sont distinctes ; **0 signifie hérité**, pas « illimité ».
+
+1. Sélectionnez **Configurer cette portée** ou **Modifier cette portée**.
+2. Renseignez les délais en secondes, le nombre d’appels et les limites de répétition/erreurs. Donnez le motif du changement.
+3. Examinez l’effet proposé, puis confirmez l’enregistrement. Un formulaire rempli n’est pas une configuration enregistrée.
+4. Vérifiez la nouvelle révision dans l’historique. **Revenir à cette révision** crée une nouvelle entrée de configuration ; cela ne supprime pas les opérations déjà consommées.
+5. Consultez les limites effectives pour la tâche concernée avant son prochain départ. Une tentative déjà démarrée conserve les paramètres qui lui ont été attribués.
+
+![Administration en français, thème clair : valeurs saisies avant confirmation](docs/screenshots/installation/admin-fr-etat.png)
+
+*Capture réelle d’une recette locale isolée : formulaire rempli avant confirmation, pas preuve d’enregistrement ni de lancement.*
+
+![Même formulaire en thème sombre](docs/screenshots/installation/admin-fr-sombre.png)
+
+![Administration en français, thème clair : configuration enregistrée en révision 1](docs/screenshots/installation/admin-saved-fr-etat.png)
+
+*Capture réelle, racine temporaire isolée, 30 septembre 2026 : après confirmation, la révision 1 est lue par le CLI (`run-limits show`) et apparaît dans l’historique. C’est une configuration enregistrée, pas un lancement. Le badge de version du serveur est visible dans la colonne de gauche.*
+
+![Configuration enregistrée, thème sombre](docs/screenshots/installation/admin-saved-fr-sombre.png)
+
+Le **mode observation**, lorsqu’il est explicitement autorisé pour une mission, conserve les compteurs mais retire les coupures d’exécution couvertes par ce mode. Il ne supprime ni les quotas du fournisseur, ni la revue, ni les conditions d’acceptation. Il n’est pas un moyen de contourner une erreur fournisseur 429. La rubrique **Budgets et coûts IA** distingue les coûts rapportés des coûts inconnus ; un coût inconnu ne vaut pas zéro.
+
+### Retrouver les mêmes réglages dans le CLI
+
+Exemples de lecture seule, à adapter à votre dossier et aux identifiants affichés par Swarm :
+
+```sh
+swarm --root /chemin/du/projet run-limits show project - -
+swarm --root /chemin/du/projet run-limits history project - -
+swarm --root /chemin/du/projet run-limits effective ID_MISSION worker ID_TACHE
+```
+
+Le tiret représente une valeur vide. Les commandes `apply` et `rollback` utilisent un fichier JSON, une révision attendue et un identifiant d’événement ; voir le [guide d’utilisation](GUIDE-UTILISATEUR.md) pour le parcours général. Le CLI et le web appliquent les mêmes règles du moteur.
+
+## Version du serveur et liens vers une mission supprimée
+
+Le badge **Version** du rail gauche affiche la révision de build du serveur. Elle est comparée au dépôt Git local, sans requête réseau : si la révision est absente, l’état « inconnu » est affiché ; si la comparaison est impossible, elle est signalée comme dégradée. Un `*` indique un arbre de travail modifié au moment de la compilation. Un lien vers une mission supprimée affiche un message clair et l’action **Choisir une mission**, qui ouvre la gestion des missions.
+
+## Lire le récapitulatif et partager un diagnostic
+
+Avant autorisation, le récapitulatif montre le responsable, les exécutants, le vérificateur et leurs modèles résolus. Les plafonds du plan et des rôles de planification/revue sont affichés séparément des réglages d’exécution de l’Administration. Les prérequis manquants expliquent ce qu’il faut compléter.
+
+**Vérifier avant le lancement** ne démarre aucun agent. Après le contrôle, **Voir le détail des vérifications** ouvre les informations techniques ; Échap ou **Fermer les détails** revient au formulaire. Seule l’autorisation suivante permet les départs éligibles.
+
+Dans le diagnostic d’une tentative arrêtée, **Copier le diagnostic** prépare une synthèse avec la cause, l’identifiant de tentative, la version et l’action disponible. Les traces techniques et le lien de session sont exclus du texte préparé. Si le navigateur refuse le presse-papiers, un message le signale : sélectionnez alors le texte affiché. Relisez toujours ce que vous partagez.
+
+### Si une tâche ne progresse pas
+
+| Situation visible | Prochaine action |
+| --- | --- |
+| Fournisseur indisponible ou quota 429 | Attendre l’échéance annoncée ou configurer un autre fournisseur autorisé ; une hausse des limites Swarm ne restaure pas le quota. |
+| Rapport présent mais tâche non validée | Examiner les critères, contrôles et avis ; la présence d’un fichier ne vaut pas acceptation. |
+| Conditions modifiées après vérification | Refaire la vérification sur les nouveaux paramètres avant autorisation. |
+| Agent actif sans résultat final | Ouvrir sa session et consulter son activité ; ne pas confondre activité, résultat et validation. |
+
+Les captures d’Administration proviennent de `tests/run_limits_admin_ui.cjs` ; celles du récapitulatif et du diagnostic sont reproductibles avec `tools/verification/t7_prelaunch.py`. Elles démontrent des parcours locaux contrôlés, pas la réussite autonome d’un fournisseur réel.
+
+
+### Captures du récapitulatif et du diagnostic
+
+![Récapitulatif après vérification, avant autorisation](docs/screenshots/installation/summary-fr-etat.png)
+
+*Recette locale isolée : fournisseur de test, conditions vérifiées. Aucun agent n’a été lancé par cette vérification.*
+
+![Détails des vérifications, thème sombre](docs/screenshots/installation/preflight-details-fr-sombre.png)
+
+*Informations techniques à ouvrir au besoin ; la fermeture revient au récapitulatif.*
+
+![Diagnostic d’une tentative de test interrompue](docs/screenshots/installation/diagnostic-fr-etat.png)
+
+*Erreurs provoquées par la recette pour démontrer le diagnostic. Le message « Diagnostic copié » provient d’un presse-papiers simulé dans ce test, pas d’un essai de partage externe.*
+
+## Erreurs rencontrées et résolution
+
+Observations réelles du 29 septembre 2026 (mission Administration pilotée depuis les écrans). Détail : [RETEX](docs/RETEX-ADMIN-PREPARATION.md).
+
+| Erreur ou friction | Résolution |
+| --- | --- |
+| L’autorisation de l’équipe ne démarre pas les agents | Cliquez ensuite **Lancer la mission** dans le pilotage ; vérifiez qu’une tentative est active. |
+| La validation automatique refuse le plan | Elle exige une commande de contrôle par critère, y compris documentaire : ajoutez de vraies commandes ou choisissez la revue humaine. Aucun contrôle factice. |
+| Une tâche déclare des exigences « non définies » | Le contexte transmis était incomplet : révisez le plan pour inclure les définitions, puis reprenez. Les tentatives consommées restent comptées. |
+| Revue indépendante interrompue (citation introuvable) | Ce n’est pas une validation. Relancer la revue depuis le cockpit sur le même rapport ; ne pas forcer l’acceptation. |
+| Responsable sans réponse finale après son délai | Consulter l’activité de la session ; la reprise n’augmente pas silencieusement les limites. |
+| Le bouton « Soumettre le rapport » bloquait la revue | Défaut du moteur corrigé ; la réparation passe par le même bouton, sans modifier la base à la main. |
+
+Ne modifiez jamais directement `.swarm/state.db` pour contourner une erreur.
+
+## Choisir une méthode après installation
+
+Dans **Préparer avec l’IA**, choisissez une méthode avec son nom d’usage :
+
+- **Analyse et planification** : clarifier le besoin et proposer un plan.
+- **Parcours guidé — préparer une évolution** : cadrer le changement, ses critères et ses tâches.
+- **Examiner et améliorer — préparer l’examen** : définir les risques et les contrôles.
+- **Diagnostiquer et corriger un problème** : préparer le diagnostic à partir des faits connus.
+
+La préparation ne réalise aucune correction et ne lance aucun agent. Les méthodes
+**Construire la spécification** et **Examiner la spécification** couvrent la
+rédaction du besoin et la recherche des omissions dans les sessions natives ;
+elles ne sont pas deux boutons supplémentaires de ce menu.
+
+Vérifiez le catalogue de votre projet depuis le même emplacement qu’au lancement :
+
+```sh
+swarm --root /chemin/du/projet --json prepare methods
+```
+
+Chaque méthode expose sa disponibilité. Le binaire contient le cadrage des rôles
+pour l’exécution ; les méthodes de **préparation** sont lues dans le projet piloté.
+En Docker, cette racine est `/workspace`. Ne confondez pas un fournisseur installé,
+une méthode disponible et un plan autorisé. Voir le [catalogue des méthodes](docs/AGENT-METHODS.md).
+
+## Reconnaître le résultat après le lancement
+
+![Résultat de la mission réelle : huit résultats validés](docs/screenshots/mission-complete-fr.png)
+
+*Capture du 1er octobre 2026, après clôture de la mission Administration avec
+interventions humaines. Elle complète la capture historique de lancement du
+29 septembre ; elle ne constitue pas une nouvelle recette Docker.*
+
+![Organisation actuelle et flèches des dépendances](docs/screenshots/mission-graph-current-fr.png)
+
+*Orchestrateur à gauche, tâches au centre et vérificateur à droite. Les traits
+pleins représentent les dépendances ; les pointillés représentent les
+responsabilités et les remises au vérificateur. La vue d’ensemble réduit le zoom.*
+
+Les captures des formulaires d’Administration datées du 30 septembre restent des
+recettes isolées : elles prouvent les états indiqués dans leurs légendes. Les
+nouvelles captures de clôture montrent une autre étape du même parcours ; elles
+ne transforment pas ces tests isolés en preuve de succès de tous les fournisseurs.
+
+Pour une reprise ou un conflit de révision, consultez les [conditions du moteur](docs/ENGINE-RECOVERY.md).

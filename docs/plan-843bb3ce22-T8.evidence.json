@@ -1,0 +1,170 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T8",
+  "artifacts": {
+    "docs/plan-843bb3ce22-T8-final-review.json": "3f91dfe1a964d41f1c6483f6aad0b9f07542526f26e0089fbdcc51bc66963c27",
+    "docs/plan-843bb3ce22-T8.md": "202622f08cc700ceda56a195b21ab2f727e9112a85a30423fefa958f6785169c",
+    "docs/T8-install-illustre.md": "3900fe80912c09939e8633ab23bed185db07abca144487754dd0bdd9a366a457",
+    ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json": "2b6b3d92d8b30e8ecd463eabf8f6592df43d44c667947c58ca96d3d3aa5e3bf3",
+    "INSTALL.md": "c590a46770296086e94ec275719b122cc52bc63cc56809209aab07fee1157023",
+    "docs/en/INSTALL.md": "90e6f4bcdeaae84cfa9cb7816ae6c1d04309b15e8ddb215a2ca196fd7930f1de",
+    "docs/plan-843bb3ce22-T8-visual-review.json": "d5686174aad24962dae82324019f8ad67a448a0cfcbd5b4bd9a7504fa87b6c30",
+    "docs/screenshots/connexion.png": "8c3c35786d543231d0a3d1954f40e834f898bbfa74be1f935131ebf2c8a20e6f",
+    "docs/screenshots/installation/mission-lancee-fr.png": "cc00614be99096b57ef22f6ec712b995f96636026a5351fc73c7ac3ac322c819",
+    "docs/screenshots/installation/admin-fr-etat.png": "c85eb915eb5d1f455947c282cdd2243d7d1bb809213c432ae468c3951ea213ef",
+    "docs/screenshots/installation/admin-fr-sombre.png": "2dc8dd46ac4d3217f48d248aa2ca77c22e3fd6498642ab041835d4f6fd079e68",
+    "docs/screenshots/installation/admin-saved-fr-etat.png": "3b4bac2055c3b2eef0ac75c20ffbc91a8a721ca2a94bce2dad7c644f2a0ee4db",
+    "docs/screenshots/installation/admin-saved-fr-sombre.png": "ad6c543c90a0c347cfa0c86510fd9ab964f00c3fe17c0179a22d00d0faf2a376",
+    "docs/screenshots/installation/summary-fr-etat.png": "ea705fa6fbfea0bb2077bf05e7bb99e3914b4dc1adf6ca7ac4fdfb1ddc14616f",
+    "docs/screenshots/installation/preflight-details-fr-sombre.png": "b3b141054d142e8463f246384827d544a5c21a5f2bb56e09137f8a09ee28c6a2",
+    "docs/screenshots/installation/diagnostic-fr-etat.png": "379651de02625dda15ea517e449edec4112b9967ce0d2d3b6fe9a6bc1fe8868b",
+    "docs/screenshots/en/connexion.png": "ab1649d8f983c4f6178d4c5853f7a6d2fa1a718f297327738ce413a4d24b9f5e",
+    "docs/screenshots/installation/admin-en-etat.png": "c1d378f7577c037d3158ee76331988bd405a9afb1b70864242ef982283019797",
+    "docs/screenshots/installation/admin-en-sombre.png": "3cc26331f3f1545489df6c95bdaccc62b6776cffdb9605bbc0b38110c4dff23e",
+    "docs/screenshots/installation/admin-saved-en-etat.png": "6804f9f4f0f56cd0cecf710700c73440c4c6491de44b046687ab974bdd26d99e",
+    "docs/screenshots/installation/admin-saved-en-sombre.png": "10e19be2449a6aa46275a50e974808aa5f8c3adae47b25bfe8700396d513d5bd",
+    "docs/screenshots/installation/summary-en-etat.png": "30a54b451fc15dbaeff5de1c4e98f3dfc43433479ef172517e62779f5d78f042",
+    "docs/screenshots/installation/preflight-details-en-sombre.png": "42443f5a84284717665826710b4548f7b24bf59d45764744241cebe92feb027b",
+    "docs/screenshots/installation/diagnostic-en-etat.png": "a3958e9f31a8c4ea5ff6fa78659b6b0309e63ba735de7529d08ba5e5aaa111ca"
+  },
+  "domains": {
+    "quality": 100
+  },
+  "checks": [
+    {
+      "id": "plan-criterion-1",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-4",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-entry",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "quality",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    },
+    {
+      "id": "plan-criterion-4",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    },
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plan-843bb3ce22-T8-final-review.json",
+        "docs/plan-843bb3ce22-T8.md",
+        ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json"
+      ]
+    }
+  ]
+}

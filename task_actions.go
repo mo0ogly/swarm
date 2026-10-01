@@ -131,7 +131,7 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	submitRaison := ""
 	if taskActive {
 		submitRaison = "Une tentative est en cours : attendez sa fin avant de soumettre un rapport."
-	} else if t.Status != "todo" && t.Status != "blocked" {
+	} else if _, repairable := s.legacyReportSubmission(w.ID, t, agents); t.Status != "todo" && t.Status != "blocked" && !repairable {
 		submitRaison = "Un rapport se soumet depuis une tâche « À faire » ou « Bloquée » qui vient de produire son livrable."
 	}
 
@@ -317,7 +317,7 @@ func (s *Store) startBlockReason(w *Work, t *Task) string {
 	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
 		return "Brief du plan modifié : relisez le brief avant de lancer."
 	}
-	if t.PlanMaxAttempts > 0 {
+	if t.PlanMaxAttempts > 0 && !s.executionObserved(w.ID, t.ID) {
 		var count int
 		if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", w.ID, t.ID).Scan(&count); e == nil && count >= t.PlanMaxAttempts {
 			return "Plafond de tentatives du plan atteint."
@@ -353,7 +353,7 @@ func (s *Store) assistCanStart(w *Work, t *Task) bool {
 	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
 		return false
 	}
-	if t.PlanMaxAttempts > 0 {
+	if t.PlanMaxAttempts > 0 && !s.executionObserved(w.ID, t.ID) {
 		var count int
 		if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", w.ID, t.ID).Scan(&count); e != nil || count >= t.PlanMaxAttempts {
 			return false

@@ -2,11 +2,18 @@
 
 [English](en/AGENT-METHODS.md) · [Guide utilisateur](../GUIDE-UTILISATEUR.md)
 
-Ce dépôt fournit **huit méthodes** pour cadrer, réaliser, vérifier et améliorer
-Swarm. Elles reprennent les pratiques utiles des méthodes APEX et audit PDCA de
-LIA : critères explicites, décisions tracées, preuves observables, reprise bornée
-et retour d'expérience. Elles sont réécrites pour ce dépôt, sans dépendance à
-l'installation LIA, ses hooks, ses scripts de déploiement ou ses permissions.
+Ce dépôt fournit **neuf méthodes** pour cadrer, réaliser, vérifier et améliorer
+Swarm : parcours guidé, examen et amélioration, construction et examen de
+spécification, revue du code, diagnostic, vérification, replanification et retour
+d’expérience. Elles partagent des critères explicites, des décisions tracées et
+des preuves observables, sans dépendance à une autre installation.
+
+## Catalogue lisible
+
+Les noms destinés aux utilisateurs sont ceux du [catalogue du README](../README.md#communication-et-méthodes). Les méthodes de spécification couvrent la rédaction du besoin et l’examen du plan. Les identifiants historiques ci-dessous servent uniquement aux commandes natives et à la compatibilité ; ils ne sont pas les noms à afficher dans l’interface.
+
+<details>
+<summary>Commandes natives et identifiants techniques</summary>
 
 ## Démarrer
 
@@ -19,6 +26,7 @@ Ouvrez Codex ou Claude **dans ce dépôt**, puis utilisez la commande adaptée :
 | Rédiger un besoin et ses critères vérifiables | `$spec-builder` | `/spec-builder` |
 | Trouver les trous d'un plan | `$spec-audit` | `/spec-audit` |
 | Examiner le code et ses risques | `$code-reviewer` | `/code-reviewer` |
+| Diagnostiquer un défaut avant une correction ciblée | `$debug` | `/debug` |
 | Vérifier le parcours après une correction | `$verify-fix` | `/verify-fix` |
 | Reprendre un plan bloqué | `$replan` | `/replan` |
 | Comprendre les résultats et prioriser la suite | `$retex-analyzer` | `/retex-analyzer` |
@@ -38,15 +46,18 @@ Dans Claude, remplacez `$` par `/`. Les indications `--plan-only`, `--resume`,
 options de l'exécutable `swarm`. L'audit est en lecture seule par défaut.
 Les méthodes répondent dans la langue de la demande.
 
+</details>
+
 ## Depuis l'interface Swarm
 
 Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
 
 | Méthode de préparation | Contenu fourni à l'IA |
 | --- | --- |
-| APEX | Analyse et planification du besoin |
-| KS — cadrer une fonctionnalité | Cadrage, critères et décomposition en tâches |
-| Audit PDCA | Définition du périmètre, des risques et du plan de contrôle |
+| Analyse et planification | Analyse et planification du besoin |
+| Parcours guidé — préparer une évolution | Cadrage, critères et décomposition en tâches |
+| Examiner et améliorer — préparer l’examen | Définition du périmètre, des risques et du plan de contrôle |
+| Diagnostiquer et corriger un problème | Hypothèses, preuves manquantes et plan de diagnostic ; aucune correction en préparation |
 
 Le fichier de méthode et le contrat commun sont transmis intégralement au modèle.
 Les phases d'exécution des méthodes restent interdites dans cette préparation :
@@ -61,8 +72,7 @@ swarm --root "$PWD" --json prepare methods
 ```
 
 Chaque entrée indique `available` et une empreinte `sha256`. `audit_pdca` reste
-un alias de `audit-pdca` dans Swarm et `/audit_pdca` dans Claude. Les anciennes
-commandes `/ks-feature` et `/ks-plan` sont conservées.
+un alias de `audit-pdca` dans Swarm et `/audit_pdca` dans Claude. Des alias historiques restent acceptés pour les anciennes intégrations ; utilisez les méthodes de spécification pour les nouveaux parcours.
 
 La méthode de préparation est lue dans **la racine de projet utilisée par Swarm**. Installer le
 binaire seul ne copie pas cette configuration dans d'autres projets. En Docker,
@@ -77,9 +87,9 @@ par Codex ou Claude pour fournir ce cadrage.
 
 | Rôle | Méthodes incluses | Limites |
 | --- | --- | --- |
-| Planificateur et sous-planificateur | APEX, audit-pdca, spec-builder, spec-audit, replan | PLAN et ACT ; sans outils ni modification de code |
-| Exécutant | APEX, audit-pdca, verify-fix, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
-| Vérificateur indépendant | audit-pdca, code-reviewer | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
+| Planificateur et sous-planificateur | Parcours guidé, examen et amélioration, construction et examen de spécification, replanification, diagnostic | PLAN et ACT ; sans outils ni modification de code |
+| Exécutant | Parcours guidé, examen et amélioration, vérification, diagnostic, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
+| Vérificateur indépendant | Examen et amélioration, revue du code | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
 
 Le champ `workflow` conserve la version, le rôle, la liste des méthodes et leur
 empreinte SHA-256. Le moteur refuse un rôle inconnu ou un cadrage dépassant sa
@@ -220,3 +230,16 @@ Cela ne modifie pas les budgets des missions existantes et ne rembourse aucun ap
 ## Recette du moteur
 
 Voir [les six recettes E1–E6](ENGINE-ACCEPTANCE.md), leurs prérequis et la distinction entre fixtures déterministes, contrôle navigateur et essai avec des agents réels.
+
+## Diagnostic structuré
+
+Le parcours « Corriger un défaut reproductible » sélectionne la méthode
+« Diagnostiquer et corriger un problème ». Le moteur embarque cette méthode pour
+les nouveaux planificateurs, sous-planificateurs et exécutants. Elle s’applique
+aux anomalies : reproduire, isoler, tester une cause, corriger si autorisé, vérifier.
+Une préparation reste sans outils ; le vérificateur conserve sa méthode de revue
+indépendante. L’inclusion et son empreinte prouvent le contexte fourni, pas le
+respect effectif de la méthode ni la réussite d’un diagnostic.
+
+La version portable adapte la skill Debug installée localement, sans connecteurs
+obligatoires, chemins machine ou dépendance à une autre installation.

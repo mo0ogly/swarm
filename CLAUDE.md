@@ -4,7 +4,7 @@ Read `AGENTS.md` and `tools/agent-workflows/CONTRACT.md` at the repository root.
 They are the common project rules for Claude, Codex and Swarm preparation.
 
 Project skills live in `.claude/skills/`: `/apex`, `/audit-pdca`, `/spec-builder`,
-`/spec-audit`, `/code-reviewer`, `/verify-fix`, `/replan`, `/retex-analyzer`.
+`/debug`, `/spec-audit`, `/code-reviewer`, `/verify-fix`, `/replan`, `/retex-analyzer`.
 The legacy `/audit_pdca`, `/ks-feature` and `/ks-plan` commands are also provided.
 
 Use the existing connection and model settings. These methods grant no additional

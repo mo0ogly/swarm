@@ -18,9 +18,10 @@ type PreparationMethod struct {
 // An explicit catalogue; arbitrary file names never become commands or permissions.
 func (s *Store) preparationMethods() []PreparationMethod {
 	methods := []PreparationMethod{
-		{ID: "apex", Title: "APEX — analyser et planifier", Phases: []string{"Analyze", "Plan"}, Paths: []string{".claude/skills/apex/SKILL.md"}},
-		{ID: "ks-feature", Title: "KS — cadrer une fonctionnalité", Phases: []string{"Cadrage", "Plan"}, Paths: []string{".claude/commands/ks-feature.md", ".claude/commands/ks-plan.md"}},
-		{ID: "audit-pdca", Title: "Audit PDCA — préparer l’audit", Phases: []string{"Plan"}, Paths: []string{".claude/skills/audit-pdca/SKILL.md"}},
+		{ID: "apex", Title: "Analyse et planification", Phases: []string{"Analyze", "Plan"}, Paths: []string{".claude/skills/apex/SKILL.md"}},
+		{ID: "ks-feature", Title: "Parcours guidé — préparer une évolution", Phases: []string{"Cadrage", "Plan"}, Paths: []string{".claude/commands/ks-feature.md", ".claude/commands/ks-plan.md"}},
+		{ID: "debug", Title: "Diagnostiquer et corriger un problème", Phases: []string{"Diagnostic", "Plan"}, Paths: []string{".claude/skills/debug/SKILL.md"}},
+		{ID: "audit-pdca", Title: "Examiner et améliorer — préparer l’examen", Phases: []string{"Plan"}, Paths: []string{".claude/skills/audit-pdca/SKILL.md"}},
 	}
 	for i := range methods {
 		m := &methods[i]

@@ -28,22 +28,23 @@ const PilotActions={
  async extensionDialog(task){await taskDialog(task);if(modalContext?.task===task&&(modalContext.data.actions||[]).some(a=>a.kind==='extend-attempt'&&a.disponible))taskFields('extend-attempt')},
  async recoveryDialog(task){await taskDialog(task);if(modalContext?.task===task&&(modalContext.data.actions||[]).some(a=>a.kind==='authorize-recovery'&&a.disponible))taskFields('authorize-recovery')},
  recoveryFields(d){
-  const t=d.task,r=t.independent_review;
+  const t=d.task,r=t.independent_review,missing=!r||r.attempt!==t.attempts.at(-1).id||r.state!=="changes_requested",rejection=missing?t.blocker:r.reason;
+  modalContext.missingReport=missing;
   $('modal-title').textContent=tr_web_pilot_actions_js('Préparer un essai correctif')+' — '+t.title;
-  $('modal-description').textContent=tr_web_pilot_actions_js('Relisez la correction proposée à partir du refus. Votre confirmation autorise un seul essai supplémentaire pour cette tâche.');
+  $('modal-description').textContent=tr_web_pilot_actions_js(missing?'La dernière tentative n’a pas livré de rapport. Votre confirmation autorise un seul essai supplémentaire pour produire les preuves manquantes.':'Relisez la correction proposée à partir du refus. Votre confirmation autorise un seul essai supplémentaire pour cette tâche.');
   const summary=node('section',undefined,'notice attention field-wide');summary.id='corrective-recovery-summary';
-  summary.append(node('p',tr_web_pilot_actions_js('Tentatives consommées : ')+t.attempts.length+' / 3 → 4'),node('p',tr_web_pilot_actions_js('Une seule autorisation exceptionnelle. Historique et critères conservés ; aucune validation sans contrôles et nouvel avis indépendant.')),node('p',r.reason));
+  summary.append(node('p',tr_web_pilot_actions_js('Tentatives consommées : ')+t.attempts.length+' / 3 → 4'),node('p',tr_web_pilot_actions_js('Une seule autorisation exceptionnelle. Historique et critères conservés ; aucune validation sans contrôles et nouvel avis indépendant.')),node('p',rejection));
   const cfg=snapshot.work.planning?.reviewer;if(cfg)summary.append(node('p',tr_web_pilot_actions_js('Vérificateur indépendant')+' : '+cfg.provider+' · '+cfg.calls+' / '+cfg.max_calls));
   $('modal-fields').append(summary);
-  const reason=field('reason',tr_web_pilot_actions_js('Pourquoi autoriser cette reprise ?'),tr_web_pilot_actions_js('Corriger les écarts du dernier avis indépendant en conservant les critères et les preuves.'),null,true);reason.required=true;reason.minLength=8;reason.maxLength=2000;
-  const proposal=[tr_web_pilot_actions_js('Corriger les écarts ci-dessous, vérifier tous les critères inchangés et fournir les commandes exécutées, leurs résultats et les preuves du candidat corrigé.'),r.reason,...(r.criteria||[]).filter(c=>c.verdict!=='pass').map(c=>tr_web_pilot_actions_js('Critère ')+c.index+' : '+c.evidence)].join('\n\n');
+  const reason=field('reason',tr_web_pilot_actions_js('Pourquoi autoriser cette reprise ?'),tr_web_pilot_actions_js(missing?'Produire le rapport absent après correction de la cause du blocage, sans changer les critères ni les limites d’appels.':'Corriger les écarts du dernier avis indépendant en conservant les critères et les preuves.'),null,true);reason.required=true;reason.minLength=8;reason.maxLength=2000;
+  const proposal=[tr_web_pilot_actions_js('Corriger les écarts ci-dessous, vérifier tous les critères inchangés et fournir les commandes exécutées, leurs résultats et les preuves du candidat corrigé.'),rejection,...(missing?[]:(r.criteria||[])).filter(c=>c.verdict!=='pass').map(c=>tr_web_pilot_actions_js('Critère ')+c.index+' : '+c.evidence)].join('\n\n');
   const correction=field('recovery_instruction',tr_web_pilot_actions_js('Correction proposée — à relire'),proposal,null,true,tr_web_pilot_actions_js('Cette proposition reprend le refus ; elle ne prouve pas que le diagnostic est complet. Précisez les corrections nécessaires avant de confirmer.'));correction.required=true;correction.minLength=20;correction.maxLength=16000;
   $('confirm').textContent=tr_web_pilot_actions_js('Autoriser cet essai correctif');
   preview(tr_web_pilot_actions_js('Si la mission est active, Swarm lancera cet essai dès que les dépendances, le budget, le stockage et le vérificateur le permettent. Une mission en pause reste en pause. Aucun cinquième essai ne sera autorisé par ce parcours.'));
  },
  async authorizeRecovery(c,f){
   c.recoveryEvent ||= crypto.randomUUID();const r=c.data.task.independent_review;
-  await api('/api/v1/planning?'+new URLSearchParams({work:c.workID,action:'authorize-recovery'}),{schema_version:1,event_id:c.recoveryEvent,expected_revision:c.revision,task_id:c.task,review_id:r.id,attempt_id:r.attempt,confirm_recovery:true,reason:f.reason,recovery_instruction:f.recovery_instruction});
+  await api('/api/v1/planning?'+new URLSearchParams({work:c.workID,action:'authorize-recovery'}),{schema_version:1,event_id:c.recoveryEvent,expected_revision:c.revision,task_id:c.task,review_id:c.missingReport?undefined:r.id,attempt_id:c.data.task.attempts.at(-1).id,missing_report:!!c.missingReport,confirm_recovery:true,reason:f.reason,recovery_instruction:f.recovery_instruction});
   if(modalContext!==c||work!==c.workID)return;
   closeModal();await refresh(true);notice(tr_web_pilot_actions_js('Essai correctif autorisé. La mission le prendra en charge selon ses conditions de lancement ; le résultat reste à vérifier.'));
  },

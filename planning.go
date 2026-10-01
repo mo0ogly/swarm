@@ -74,6 +74,7 @@ type PlanningOperation struct {
 	Next           string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	MissingReport            bool `json:"missing_report,omitempty"`
 	preparedReviewInputs     map[string]any
 	coordinationInputs       map[string]*preparedCoordination
 	ScopeFiles               []string                       `json:"scope_files,omitempty"`
@@ -525,6 +526,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 			}
 			if scope.Delivery != nil && !containsString(scope.Delivery.Events, id) {
 				return fmt.Errorf("événement non fourni dans cette activation : %s", id)
+			}
+			if scope.Delivery != nil && scope.Delivery.Unavailable[id] != "" && len(r.Operations) > 0 {
+				return fmt.Errorf("rapport indisponible : seul un constat sans opération est autorisé : %s", id)
 			}
 		}
 		scopeID := scope.ID

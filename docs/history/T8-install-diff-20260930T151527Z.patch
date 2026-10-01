@@ -1,0 +1,146 @@
+diff --git a/INSTALL.md b/INSTALL.md
+index 5b45366..cbd87f9 100644
+--- a/INSTALL.md
++++ b/INSTALL.md
+@@ -81,6 +81,10 @@ Dans **IA et connexions**, ajoutez le nom, l’adresse du service, l’identifia
+ 
+ Le protocole attendu est compatible avec `POST /chat/completions`. Une connexion API peut servir à préparer, planifier ou examiner un rapport. Elle ne donne pas automatiquement des outils d’accès aux fichiers.
+ 
++![Formulaire Ajouter une IA rempli, avant enregistrement](docs/screenshots/connexion.png)
++
++*Capture réelle du formulaire rempli (fournisseur local d’exemple, champ de clé vide) : ni testé ni enregistré, « Connexion non testée dans ce formulaire » est affiché. Aucune clé n’apparaît. Cliquez **Tester la connexion** puis **Enregistrer la connexion** ; l’enregistrement ne prouve pas que le service répond.*
++
+ Avec le réseau hôte Linux, une API locale peut être joignable par exemple à `http://127.0.0.1:11434/v1`, si vous avez effectivement lancé un service compatible à cette adresse.
+ 
+ ### Agents capables de modifier le projet
+@@ -240,6 +244,14 @@ de certaines migrations ne remplacent pas cette sauvegarde complète.
+ 
+ Capture réelle du parcours français : mission Administration lancée depuis les écrans, le 29 septembre 2026. Le lancement ne prouve pas la réussite des huit tâches ; les résultats restent à examiner.
+ 
++### Trois états à ne pas confondre
++
++| État | Ce que vous voyez | Ce que cela prouve | Capture |
++| --- | --- | --- | --- |
++| Formulaire rempli | Valeurs saisies, aperçu « valeurs actuelles » avant confirmation | Rien n’est écrit : la révision n’a pas changé | `admin-fr-etat.png`, `admin-fr-sombre.png` |
++| Configuration enregistrée | Révision 1 dans la portée et dans l’historique, auteur et motif | Les valeurs seront utilisées par les **prochains départs** | `admin-saved-fr-etat.png`, `admin-saved-fr-sombre.png` |
++| Lancement effectif | Tâche en cours, tentative active dans le pilotage | Un agent a démarré ; ni résultat, ni acceptation | `mission-lancee-fr.png` |
++
+ **Point de vigilance :** le parcours actuel comporte une autorisation de l’équipe, puis un lancement dans le pilotage. Si aucune tâche ne démarre, consultez le motif affiché avant toute nouvelle tentative.
+ 
+ 
+@@ -259,6 +271,12 @@ Ouvrez **Administration** dans le cockpit (passez en mode expert si cette rubriq
+ 
+ ![Même formulaire en thème sombre](docs/screenshots/installation/admin-fr-sombre.png)
+ 
++![Administration en français, thème clair : configuration enregistrée en révision 1](docs/screenshots/installation/admin-saved-fr-etat.png)
++
++*Capture réelle, racine temporaire isolée, 30 septembre 2026 : après confirmation, la révision 1 est lue par le CLI (`run-limits show`) et apparaît dans l’historique. C’est une configuration enregistrée, pas un lancement. Le badge de version du serveur est visible dans la colonne de gauche.*
++
++![Configuration enregistrée, thème sombre](docs/screenshots/installation/admin-saved-fr-sombre.png)
++
+ Le **mode observation**, lorsqu’il est explicitement autorisé pour une mission, conserve les compteurs mais retire les coupures d’exécution couvertes par ce mode. Il ne supprime ni les quotas du fournisseur, ni la revue, ni les conditions d’acceptation. Il n’est pas un moyen de contourner une erreur fournisseur 429. La rubrique **Budgets et coûts IA** distingue les coûts rapportés des coûts inconnus ; un coût inconnu ne vaut pas zéro.
+ 
+ ### Retrouver les mêmes réglages dans le CLI
+@@ -273,6 +291,10 @@ swarm --root /chemin/du/projet run-limits effective ID_MISSION worker ID_TACHE
+ 
+ Le tiret représente une valeur vide. Les commandes `apply` et `rollback` utilisent un fichier JSON, une révision attendue et un identifiant d’événement ; voir le [guide d’utilisation](GUIDE-UTILISATEUR.md) pour le parcours général. Le CLI et le web appliquent les mêmes règles du moteur.
+ 
++## Version du serveur et liens vers une mission supprimée
++
++Le badge **Version** du rail gauche affiche la révision de build du serveur. Elle est comparée au dépôt Git local, sans requête réseau : si la révision est absente, l’état « inconnu » est affiché ; si la comparaison est impossible, elle est signalée comme dégradée. Un `*` indique un arbre de travail modifié au moment de la compilation. Un lien vers une mission supprimée affiche un message clair et l’action **Choisir une mission**, qui ouvre la gestion des missions.
++
+ ## Lire le récapitulatif et partager un diagnostic
+ 
+ Avant autorisation, le récapitulatif montre le responsable, les exécutants, le vérificateur et leurs modèles résolus. Les plafonds du plan et des rôles de planification/revue sont affichés séparément des réglages d’exécution de l’Administration. Les prérequis manquants expliquent ce qu’il faut compléter.
+@@ -306,3 +328,18 @@ Les captures d’Administration proviennent de `tests/run_limits_admin_ui.cjs` ;
+ ![Diagnostic d’une tentative de test interrompue](docs/screenshots/installation/diagnostic-fr-etat.png)
+ 
+ *Erreurs provoquées par la recette pour démontrer le diagnostic. Le message « Diagnostic copié » provient d’un presse-papiers simulé dans ce test, pas d’un essai de partage externe.*
++
++## Erreurs rencontrées et résolution
++
++Observations réelles du 29 septembre 2026 (mission Administration pilotée depuis les écrans). Détail : [RETEX](docs/RETEX-ADMIN-PREPARATION.md).
++
++| Erreur ou friction | Résolution |
++| --- | --- |
++| L’autorisation de l’équipe ne démarre pas les agents | Cliquez ensuite **Lancer la mission** dans le pilotage ; vérifiez qu’une tentative est active. |
++| La validation automatique refuse le plan | Elle exige une commande de contrôle par critère, y compris documentaire : ajoutez de vraies commandes ou choisissez la revue humaine. Aucun contrôle factice. |
++| Une tâche déclare des exigences « non définies » | Le contexte transmis était incomplet : révisez le plan pour inclure les définitions, puis reprenez. Les tentatives consommées restent comptées. |
++| Revue indépendante interrompue (citation introuvable) | Ce n’est pas une validation. Relancer la revue depuis le cockpit sur le même rapport ; ne pas forcer l’acceptation. |
++| Responsable sans réponse finale après son délai | Consulter l’activité de la session ; la reprise n’augmente pas silencieusement les limites. |
++| Le bouton « Soumettre le rapport » bloquait la revue | Défaut du moteur corrigé ; la réparation passe par le même bouton, sans modifier la base à la main. |
++
++Ne modifiez jamais directement `.swarm/state.db` pour contourner une erreur.
+diff --git a/docs/en/INSTALL.md b/docs/en/INSTALL.md
+index d440dda..15e0317 100644
+--- a/docs/en/INSTALL.md
++++ b/docs/en/INSTALL.md
+@@ -64,6 +64,10 @@ For text APIs, open **AI and connections → Add an AI connection**, enter a com
+ These connections can prepare, plan and review; they do not automatically gain
+ file editing tools.
+ 
++![Completed Add an AI connection form, before saving](../screenshots/en/connexion.png)
++
++*Actual capture of the completed form (example local provider, empty key field): neither tested nor saved; "Connection not tested in this form" is shown. No key is visible. Select **Test connection** then **Save connection**; saving does not prove the service responds.*
++
+ For implementation, install a tool-enabled agent inside the container and
+ follow its publisher's authentication instructions:
+ 
+@@ -178,6 +182,14 @@ Automatic backups from some migrations do not replace a complete backup.
+ 
+ Actual French-interface capture, September 29, 2026: the Administration mission was launched through the web screens. This demonstrates launch, not completion of all eight tasks. Results still require review.
+ 
++### Three states not to confuse
++
++| State | What you see | What it proves | Capture |
++| --- | --- | --- | --- |
++| Completed form | Entered values and a "current values" preview before confirmation | Nothing is written: the revision is unchanged | `admin-en-etat.png`, `admin-en-sombre.png` |
++| Saved configuration | Revision 1 in the scope and in the history, with author and reason | Values apply to **future starts** | `admin-saved-en-etat.png`, `admin-saved-en-sombre.png` |
++| Actual launch | Task in progress, active attempt on the dashboard | An agent started; no result, no acceptance | `mission-lancee-fr.png` (French UI) |
++
+ **Current workflow:** team authorization and dashboard launch are separate steps. If nothing starts, read the reported cause before retrying.
+ 
+ 
+@@ -197,6 +209,12 @@ Open **Administration** in the cockpit (switch to expert mode if it is hidden),
+ 
+ ![The same form in the dark theme](../screenshots/installation/admin-en-sombre.png)
+ 
++![English Administration, light theme: configuration saved as revision 1](../screenshots/installation/admin-saved-en-etat.png)
++
++*Actual capture, isolated temporary root, September 30, 2026: after confirmation, revision 1 is read back by the CLI (`run-limits show`) and listed in the history. This is a saved configuration, not a launch. The server version badge is visible in the left rail.*
++
++![Saved configuration, dark theme](../screenshots/installation/admin-saved-en-sombre.png)
++
+ When explicitly authorized for a mission, **observation mode** retains counters while removing the execution cutoffs covered by that mode. It does not remove provider quotas, review requirements or acceptance conditions. It cannot bypass a provider 429 response. **AI budgets and costs** distinguishes reported costs from unknown costs; unknown does not mean zero.
+ 
+ ### Read the same settings from the CLI
+@@ -211,6 +229,10 @@ swarm --root /path/to/project run-limits effective MISSION_ID worker TASK_ID
+ 
+ A dash represents an empty value. `apply` and `rollback` use a JSON file, an expected revision and an event identifier. See the [user guide](USER-GUIDE.md) for the general workflow. The CLI and web use the same engine rules.
+ 
++## Server version and links to deleted missions
++
++The **Version** badge in the left rail shows the server's build revision. It is compared with the local Git repository without any network request: an absent revision is shown as unknown, and an impossible comparison is reported as degraded. A `*` means the working tree was modified at build time. A link to a deleted mission shows a clear message and the **Choose a mission** action, which opens mission management.
++
+ ## Read the summary and share a diagnostic
+ 
+ Before authorization, the summary shows the owner, workers, reviewer and their resolved models. Plan and planning/review-role caps are separate from execution settings in Administration. Missing prerequisites explain what you need to complete.
+@@ -244,3 +266,18 @@ Administration screenshots come from `tests/run_limits_admin_ui.cjs`. Summary an
+ ![Diagnostic from an interrupted test attempt](../screenshots/installation/diagnostic-en-etat.png)
+ 
+ *Errors are deliberately generated by the test fixture. “Diagnostic copied” uses a mocked OS clipboard in this test; this is not evidence of an external share.*
++
++## Errors encountered and how they were resolved
++
++Actual observations from September 29, 2026 (Administration mission driven from the screens). Details: [RETEX](../RETEX-ADMIN-PREPARATION.md) (French).
++
++| Error or friction | Resolution |
++| --- | --- |
++| Team authorization does not start agents | Then select **Launch mission** on the dashboard and confirm an attempt is active. |
++| Automatic validation refuses the plan | It needs one check command per criterion, documentation criteria included: add real commands or choose human review. No placeholder check. |
++| A task reports requirements as "undefined" | The context supplied was incomplete: revise the plan to include the definitions, then resume. Consumed attempts remain counted. |
++| Independent review interrupted (quote not found) | This is not a validation. Resume the review from the cockpit on the same report; do not force acceptance. |
++| Owner gave no final answer before its deadline | Inspect the session activity; resuming does not silently raise limits. |
++| "Submit report" button blocked the review | Engine defect, fixed; repair goes through the same button, without editing the database by hand. |
++
++Never edit `.swarm/state.db` directly to work around an error.

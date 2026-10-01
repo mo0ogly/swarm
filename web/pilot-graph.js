@@ -65,9 +65,9 @@ const PilotGraph = (() => {
   if(task.status==='running')return tr_web_pilot_graph_js('Suivi : ouvrir le journal de l’agent');
   if(validation?.state==='stale')return tr_web_pilot_graph_js('À vérifier : preuves périmées');
   const missing=[];
-  if(!task.deliverable?.trim())missing.push('livrable');
+  if(!task.deliverable?.trim())missing.push(tr_web_pilot_graph_js('livrable'));
   if(!task.criteria?.length)missing.push(tr_web_pilot_graph_js('critère de réussite'));
-  if(!task.next?.trim()&&!task.launch_profile?.instruction?.trim())missing.push('consigne');
+  if(!task.next?.trim()&&!task.launch_profile?.instruction?.trim())missing.push(tr_web_pilot_graph_js('consigne'));
   if(missing.length)return tr_web_pilot_graph_js('À compléter : ')+missing.join(', ');
   if(go?.visible&&!go.ready)return tr_web_pilot_graph_js('En attente : ')+go.reason;
   return go?.ready?tr_web_pilot_graph_js('Prête à démarrer'):tr_web_pilot_graph_js('Voir les conditions de la tâche');
