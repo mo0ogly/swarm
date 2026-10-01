@@ -1,9 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Limits are frozen in each launch; configuration changes affect new attempts only.
 type RunLimits struct {
+	ObservationMode      int `json:"observation_mode,omitempty"`
 	SilenceSeconds       int `json:"silence_seconds"`
 	ToolSeconds          int `json:"tool_seconds"`
 	MaxToolCalls         int `json:"max_tool_calls"`
@@ -11,7 +15,12 @@ type RunLimits struct {
 	MaxConsecutiveErrors int `json:"max_consecutive_errors"`
 }
 
+func (l RunLimits) observing() bool { return l.ObservationMode == 1 }
+
 func (l RunLimits) normalized() (RunLimits, error) {
+	if l.ObservationMode < 0 || l.ObservationMode > 1 {
+		return l, fmt.Errorf("observation_mode : 0 ou 1")
+	}
 	fields := []struct {
 		p        *int
 		def, max int
@@ -27,7 +36,7 @@ func (l RunLimits) normalized() (RunLimits, error) {
 	return l, nil
 }
 func executionDirectives(root, workspace, task string, l RunLimits) string {
-	return fmt.Sprintf(`
+	out := workerBudgetMilestones(l) + fmt.Sprintf(`
 CADRE D'EXÉCUTION — tâche bornée
 Seule racine de travail de cette tentative : %s
 Toutes les lectures du code, recherches, modifications, commandes Git, tests et rapports se font dans cette racine. Le dépôt hôte, les copies voisines et les chemins historiques cités dans les rapports ne sont pas votre espace de travail. Ne pas y faire cd ni les modifier. Vérifier pwd et git rev-parse --show-toplevel avant de commencer ; résoudre les chemins de code depuis VOTRE copie.
@@ -42,10 +51,20 @@ Budget superviseur : %d appels d'outils, %d appels identiques consécutifs, %d e
 Créer dès le début docs/%s.md avec les critères encore non vérifiés, puis le mettre à jour après chaque résultat utile et au plus tous les dix appels. Réserver le dernier cinquième du budget aux vérifications et à la remise ; à cette borne, arrêter l’exploration et consigner aussi les critères non testés. Le rapport contient observations, commandes, résultats, limites et prochaine action. Ce fichier est relayé automatiquement pour évaluation s'il est le seul rapport écrit par cette tentative ; son absence, un fichier vide ou plusieurs rapports concurrents laissent la tâche bloquée. Le relais n'est ni une gate ni une acceptation. Le superviseur peut interrompre avant le dernier message.
 Ne pas déclarer un diagnostic certain sans reproduction ; comparer les builds avec les mêmes options. Ne pas fabriquer de preuve ni de mesure. La capture des logs n'est pas une autorisation d'exposer des secrets.
 `, workspace, l.ToolSeconds, l.MaxToolCalls, l.MaxRepeatedCalls, l.MaxConsecutiveErrors, l.SilenceSeconds, l.ToolSeconds, task)
+	if l.observing() {
+		start := strings.Index(out, "Budget superviseur :")
+		end := strings.Index(out[start:], "Créer dès le début") + start
+		out = out[:start] + "MODE OBSERVATION AUTORISÉ : appels, répétitions, erreurs et durée mesurés sans interruption par ces plafonds. Arrêt manuel toujours possible. Finir dès que les critères sont vérifiés, sans exploration inutile.\n" + out[end:]
+		out = strings.ReplaceAll(out, "Réserver le dernier cinquième du budget aux vérifications et à la remise ; à cette borne, arrêter l’exploration et consigner aussi les critères non testés.", "Après chaque résultat utile, consigner les preuves et les critères restant à vérifier.")
+	}
+	return out
 }
 
 // A mission may tighten provider limits, never silently relax them. Zero inherits.
 func (l RunLimits) tightened(request RunLimits) (RunLimits, error) {
+	if l.ObservationMode != 0 || request.ObservationMode != 0 {
+		return RunLimits{}, fmt.Errorf("mode observation : configuration administrative requise")
+	}
 	base, err := l.normalized()
 	if err != nil {
 		return base, err

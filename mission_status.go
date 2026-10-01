@@ -9,6 +9,9 @@ import (
 )
 
 type MissionTask struct {
+	Waits               []MissionWait        `json:"waiting_on"`
+	RecoveryPreview     RecoveryPreview      `json:"recovery_preview"`
+	Primary             MissionPrimaryAction `json:"primary_action"`
 	AttemptsUsed        int                  `json:"attempts_used"`
 	AttemptsAllowed     int                  `json:"attempts_allowed"`
 	AttemptLimitReached bool                 `json:"attempt_limit_reached"`
@@ -72,6 +75,9 @@ type MissionCoordinationPhase struct {
 	Relative string `json:"relative,omitempty"`
 }
 type MissionStatus struct {
+	Changes           MissionChanges             `json:"changes_since_visit"`
+	Spending          MissionSpending            `json:"spending"`
+	Guidance          MissionGuidance            `json:"guidance"`
 	Runtime           RuntimeHealth              `json:"runtime"`
 	ProviderCooldowns []ProviderCooldown         `json:"provider_cooldowns,omitempty"`
 	EvidenceStage     string                     `json:"evidence_stage"`
@@ -467,7 +473,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 				x.Reason = "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche."
 			}
 		}
-		x.AttemptLimitReached = t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
+		x.AttemptLimitReached = !s.executionObserved(w.ID, t.ID) && t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
 		if t.IndependentReview != nil && t.IndependentReview.State == "running" {
 			x.AttemptLimitReached = false
 		}
@@ -609,6 +615,32 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 		d.Understanding = missionUnderstanding(d)
 		d.Next = d.Runtime.Next
 	}
+	for i := range d.Tasks {
+		d.Tasks[i].Primary = missionTaskPrimary(d.Tasks[i])
+		t, _ := w.task(d.Tasks[i].ID)
+		d.Tasks[i].Waits = s.taskWaits(&w, t)
+		var previous *Agent
+		for j := range agents {
+			if agents[j].TaskID == t.ID {
+				previous = &agents[j]
+				break
+			}
+		}
+		d.Tasks[i].RecoveryPreview = recoveryPreviewFor(w, t, previous)
+	}
+	v, err := s.visit(work, operatorIdentity())
+	if err != nil {
+		return d, err
+	}
+	d.Changes, err = s.missionChanges(w, v)
+	if err != nil {
+		return d, err
+	}
+	d.Spending, err = s.missionSpending(w, agents)
+	if err != nil {
+		return d, err
+	}
+	d.Guidance = missionGuidance(w, d)
 	d.Coordination = missionCoordinationPhases(&w, d, exchanges, time.Now())
 	return d, nil
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -29,6 +30,10 @@ func (s *Store) restartTask(work string, r PlanningRequest) (Work, error) {
 		return Work{}, err
 	}
 	defer unlock()
+	agents, err := s.agents(work)
+	if err != nil {
+		return Work{}, err
+	}
 	raw, _ := json.Marshal(r)
 	return s.mutateWithHook(work, "task.restart", r.EventID, r.Revision, raw, func(w *Work) error {
 		t, e := w.task(r.Task)
@@ -38,8 +43,39 @@ func (s *Store) restartTask(work string, r PlanningRequest) (Work, error) {
 		if t.Status != "blocked" || t.PlanningRetry || len(t.Attempts) == 0 || t.Attempts[len(t.Attempts)-1].ID != r.Attempt {
 			return fmt.Errorf("redémarrage réservé à la dernière tentative bloquée, sans reprise déjà préparée")
 		}
-		if w.Planning == nil || w.Planning.Repository == nil || w.Planning.Repository.Candidate != r.ExpectedCandidate {
-			return fmt.Errorf("candidat de départ modifié ou absent")
+		if w.Planning == nil {
+			return fmt.Errorf("planification absente")
+		}
+		if w.Planning.Repository != nil {
+			if w.Planning.Repository.Candidate != r.ExpectedCandidate {
+				return fmt.Errorf("candidat de départ modifié ou absent")
+			}
+		} else {
+			// Shared-workspace missions bind the authorization to the examined
+			// report, not to a fictitious managed Git candidate. This grants one
+			// new production; it does not requalify the interrupted process.
+			path, err := safeReport(s.root, t.Deliverable)
+			if err != nil {
+				return fmt.Errorf("rapport de départ inaccessible : %w", err)
+			}
+			info, err := os.Stat(path)
+			if err != nil || info.Size() > 48000 {
+				return fmt.Errorf("rapport de départ absent ou supérieur à 48 Ko")
+			}
+			body, err := os.ReadFile(path)
+			if err != nil || len(body) > 48000 || hash(body) != r.ExpectedCandidate {
+				return fmt.Errorf("rapport de départ modifié ou absent")
+			}
+			stopped := false
+			for _, a := range agents {
+				if a.TaskID == t.ID && a.Attempt == r.Attempt {
+					stopped = a.Ended != "" && (a.Status == "interrupted" || a.Status == "failed" || a.Status == "completed") && recoveryProcessEnded(a, hostIdentity(), processStamp(a.Child))
+					break
+				}
+			}
+			if !stopped {
+				return fmt.Errorf("fin de la dernière tentative non confirmée")
+			}
 		}
 		if e = reviewerLaunchGuard(*w); e != nil {
 			return e
@@ -49,7 +85,7 @@ func (s *Store) restartTask(work string, r PlanningRequest) (Work, error) {
 				return fmt.Errorf("attendre la fin de la revue active")
 			}
 		}
-		if t.Profile == nil || t.PlanMaxAttempts != len(t.Attempts) {
+		if t.Profile == nil || t.PlanMaxAttempts > len(t.Attempts) || (w.Planning.Repository != nil && t.PlanMaxAttempts != len(t.Attempts)) {
 			return fmt.Errorf("profil requis et tentatives existantes à terminer avant redémarrage")
 		}
 		if strings.TrimSpace(r.RecoveryInstruction) == strings.TrimSpace(t.Profile.Instruction) {
@@ -65,7 +101,7 @@ func (s *Store) restartTask(work string, r PlanningRequest) (Work, error) {
 		t.AutoValidation = nil
 		t.Gate = nil
 		t.Override = nil
-		t.PlanMaxAttempts++
+		t.PlanMaxAttempts = len(t.Attempts) + 1
 		t.PlanningRetry = true
 		t.Status = "todo"
 		t.Blocker = ""

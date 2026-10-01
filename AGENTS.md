@@ -16,6 +16,7 @@ Project skills are in `.agents/skills/`. They link to the canonical files under
 | Turn a need into requirements and a dependency-aware plan | `spec-builder` |
 | Find contradictions or omissions before executing a plan | `spec-audit` |
 | Review an implementation for actionable defects | `code-reviewer` |
+| Diagnose a failure before a scoped correction | `debug` |
 | Reproduce a fix through the actual CLI, API or web flow | `verify-fix` |
 | Recover a blocked plan without erasing history or limits | `replan` |
 | Explain outcomes and prioritize evidence-based improvements | `retex-analyzer` |

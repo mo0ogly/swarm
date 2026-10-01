@@ -237,11 +237,12 @@ budgets remain mandatory. Without this flag the previous refusal rule applies.
 
 ### Restarting a blocked task
 
-`planning restart-task WORK --input request.json` (also available as the HTTP
+`swarm planning restart-task WORK --input request.json` (also available as the HTTP
 `restart-task` action) prepares one fresh production after an explicit operator
 decision. It does not refund costs or erase history. Required fields are
 `schema_version: 1`, `event_id`, `expected_revision`, `task_id`, `attempt_id`
-(the latest attempt), `expected_candidate` (the cumulative starting SHA),
+(the latest attempt), `expected_candidate` (the cumulative starting SHA for
+managed Git, or the declared deliverable SHA-256 digest for a shared workspace),
 `confirm_recovery: true`, `reason` and a new `recovery_instruction`.
 
 The task must be blocked with its attempt allowance exhausted, have a launch
@@ -263,3 +264,32 @@ and revision bindings. A still-valid review, a different review or missing
 confirmation is rejected. The old review is retained; new checks and a new
 independent verdict are required. A recovered historical result is eligible
 only when its stopped agent, attempt and result match. Counters are not reset.
+
+## Shared-workspace restart
+
+The explicit restart above also supports shared workspaces. The examined declared
+deliverable must be accessible, unchanged and no larger than **48,000 bytes**.
+The latest attempt’s process must be confirmed ended. Historical attempt overruns
+remain recorded; authorization grants exactly one new attempt without refunding
+costs or reviews. The next launch uses the shared directory, not a new Git copy.
+
+## Revision conflicts during concurrent launches
+
+When two requests use the same revision, the transaction guard refuses the stale
+request with `revision_conflict` and `retryable: true`. Read the work and prepared
+launches again: if an agent already exists, recover that operation. Do not create
+a fresh launch to bypass the refusal. Retryable means retry after rereading, not
+an unconditional loop.
+
+## A report exceeds the available planning context
+
+The file limit and the available prompt space are separate constraints. The engine
+first reduces a batch to whole events. If a single report still does not fit, it
+sends an explicit diagnostic **without report contents and without truncation**.
+The original file remains intact.
+
+This diagnostic delivery permits no production, restart or closure operation.
+The event remains pending until an explicit no-operation decision acknowledges
+it. Examine the complete file before a subsequent substantive decision. Later
+closure still checks every task’s current validation; acknowledgment accepts no
+result.

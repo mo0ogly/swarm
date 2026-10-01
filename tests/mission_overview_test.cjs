@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 class Element{constructor(tag,text,kind){this.tag=tag;this.textContent=text||'';this.className=kind||'';this.children=[];this.dataset={};this.attributes={}}append(...children){this.children.push(...children)}replaceChildren(...children){this.children=children}setAttribute(name,value){this.attributes[name]=value}}
-const m=vm.runInNewContext(fs.readFileSync(__dirname+'/../web/mission.js','utf8')+';Mission',{node:(tag,text,kind)=>new Element(tag,text,kind),document:{activeElement:null}});
+const m=vm.runInNewContext(fs.readFileSync(__dirname+'/../web/mission.js','utf8')+';Mission',{node:(tag,text,kind)=>new Element(tag,text,kind),document:{activeElement:null},Pilot:{command:(label,action)=>{const e=new Element('button',label);e.onclick=action;return e}}});
 const base={authorized:true,enabled:true,paused:false,validated:0,running:0,total:1,active_agents:0,uncertain_agents:0,supervision:{state:'active',source:'serveur web'},tasks:[]};
 const task=(state,id='t1',impact=0)=>({state,id,title:id,reason:'Motif du moteur',impact});
 for(const [d,kind,label]of [
@@ -41,3 +41,11 @@ assert.ok(supervision);assert.match(text(supervision),/vérification en retard/)
 const coordination=host.children.find(e=>e.className==='mission-coordination');assert.ok(coordination);assert.equal(coordination.attributes['aria-label'],'Coordination de la mission');assert.deepEqual(Array.from(coordination.children.slice(1),e=>e.children[0].textContent),['Travail','Attente','Échanges','Vérification']);assert.match(text(coordination),/Assembler attend Produire/);assert.match(text(coordination),/Acteur : Le superviseur/);assert.match(text(coordination),/18 sept\. 2026/);
 const noAction=new Element('section');m.status(noAction,{...base,total:0,authorized:true,enabled:false,supervision:{state:'absent'}},false);assert.match(text(noAction),/aucune action enregistrée/);assert.doesNotMatch(text(noAction),/Conducteur Swarm observé/);
 console.log('PASS: décisions de pilotage, coordination A8, triplet factuel, diagnostic Q3 et supervision Q5');
+
+const safeCopy=m.diagnosticText({attempt_id:'SECRET',observed_errors:3,summary:'Bearer SECRET',items:[{category:'check',label:'SECRET',cause:'SECRET',action:'https://private/session',traces:['SECRET']},{category:'__proto__',cause:'SECRET'}]});
+assert.doesNotMatch(safeCopy,/SECRET|https?:/);assert.match(safeCopy,/Examiner la trace/);assert.match(safeCopy,/Cause inconnue/);
+
+const authoritative={...base,guidance:{what:'A result requires inspection.',next:'Examine its evidence.',actor:'You',primary:{kind:'task',label:'Inspect the result',effect:'Opens evidence without restarting.',task:'blocked',tone:'attention'}},tasks:[task('configure','setup'),task('intervention','blocked')]};
+assert.equal(m.overview(authoritative).task.id,'blocked');assert.equal(m.overview(authoritative).label,'Inspect the result');assert.equal(m.overview(authoritative).effect,'Opens evidence without restarting.');
+const compact=m.summaryView(authoritative);assert.equal(compact.children.length,2);assert.equal(compact.children[0].textContent,authoritative.guidance.what);assert.equal(compact.children[1].textContent,'You — Examine its evidence.');
+let selected;m.action=t=>selected=t.id;m.primary(m.overview(authoritative));assert.equal(selected,'blocked');

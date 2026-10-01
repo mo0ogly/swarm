@@ -384,6 +384,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	}
 	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
+	s.registerRunLimitsAdmin(mux, send, fail)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
 	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {
@@ -487,6 +488,11 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		}
 		desired, _ := s.desired(a.ID)
 		send(w, map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())})
+	})
+	mux.HandleFunc("/api/v1/recovery-preview", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" { http.Error(w, "GET requis", 405); return }
+		p,e := s.recoveryPreview(r.URL.Query().Get("work"), r.URL.Query().Get("task"), r.URL.Query().Get("agent"))
+		if e != nil { fail(w,e); return }; send(w,p)
 	})
 	mux.HandleFunc("/api/v1/task", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")

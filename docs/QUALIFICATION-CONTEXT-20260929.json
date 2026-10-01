@@ -1,0 +1,58 @@
+{
+  "result": {
+    "status": "PASS",
+    "missing": []
+  },
+  "work": "w-826efc700b0e0eadf79e4582",
+  "engine_sha256": "e9d022cb524935131351ba7c4b6f9143a6a14c5e108c9ec9cccd7742db6a419e",
+  "duration_seconds": 306.1,
+  "planning_activations": 5,
+  "independent_review_calls": 1,
+  "scopes": [
+    {
+      "id": "root",
+      "state": "closed"
+    },
+    {
+      "id": "delegate-is-expected",
+      "state": "closed"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "impl-is-expected",
+      "status": "accepted",
+      "attempts": 2,
+      "review_state": "passed",
+      "candidate_sha": null
+    }
+  ],
+  "producers": [
+    {
+      "id": "auto-dd4a5c9e198916eaf27a",
+      "attempt": "a-1f66d2cd1eccd07557895cef",
+      "status": "completed",
+      "tool_calls": 8,
+      "max_tool_calls": 20,
+      "reported_cost_usd": 0.3185008
+    },
+    {
+      "id": "auto-d1daef74a2a10c1c6453",
+      "attempt": "a-14cda13449f3d2b1f6475ef3",
+      "status": "completed",
+      "tool_calls": 8,
+      "max_tool_calls": 20,
+      "reported_cost_usd": 0.3370372
+    }
+  ],
+  "evidence_sha256": {
+    "observed.json": "f2ccb42413b9ec1f09433f1d8d2c05ca604c78dfff113310c826ea854443f167",
+    "result.json": "1821d6ef69e0bd4adda406580e94418f114185495ed784f6597feedf102242ad",
+    "cli.jsonl": "14891e2d2c6142aa4ccb47b2261b483ea679f3d1fc14248c9a99e26255ac200d"
+  },
+  "limitations": [
+    "Disposable one-function CLI scenario with one deliberately injected defect.",
+    "Not a qualification of the full web preparation flow or the blocked Administration mission.",
+    "Reported producer cost excludes planner and reviewer costs."
+  ]
+}

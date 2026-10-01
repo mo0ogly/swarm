@@ -369,7 +369,7 @@ func TestProviderCooldownStorageVersionPreservesHistoryBeforeUpgrade(t *testing.
 	defer next.db.Close()
 	var version int
 	next.db.QueryRow("PRAGMA user_version").Scan(&version)
-	if version != 22 || schemaVersion != 22 {
+	if version != schemaVersion || schemaVersion < 22 {
 		t.Fatal("old binaries are not fenced", version)
 	}
 	backup, e := filepath.Glob(filepath.Join(s.root, ".swarm", "state-pre-v22-*.db"))

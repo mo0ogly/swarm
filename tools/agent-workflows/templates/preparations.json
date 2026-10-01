@@ -1,0 +1,672 @@
+[
+  {
+    "id": "application",
+    "version": 1,
+    "title": {
+      "fr": "Améliorer une application",
+      "en": "Improve an existing application"
+    },
+    "need": {
+      "fr": "# Améliorer une application\n\nFonctionnalité à ajouter : [à préciser].\nPourquoi et pour qui : [à préciser].\nPérimètre autorisé : [à préciser].\nExclusions : [à préciser].\nContraintes et budget : [à préciser, aucun plafond préautorisé].\n\n## Parcours proposé\nCadrage du besoin → Recherche → Planification → Réalisation → Revue → Livraison. La conception s’applique seulement si une interface est concernée.\n\n## Organisation attendue\nUn planificateur porte le besoin ; des sous-planificateurs ne sont ajoutés que pour des périmètres justifiés. Les exécutants réalisent les tâches ; une revue indépendante examine leurs résultats. Définir les dépendances, espaces de travail, responsables et limites avant lancement.\n\n## Méthodes par rôle\n- Planificateur : Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.\n- Exécutants : Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.\n- Vérificateur indépendant : Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.\nLes méthodes sont incluses par le moteur selon le rôle. En préparation, seules l’analyse et la planification sont permises. Un sous-planificateur conserve les limites du planificateur. Une méthode ne donne aucune permission supplémentaire.\n\nExaminer et améliorer : préparer → réaliser → vérifier → améliorer. Chaque rôle reste limité à sa mission.\n\n## Livrables et preuves\nBrief validé ; contexte recherché avec sources ; conception justifiée si nécessaire ; plan en tâches bornées ; résultat et contrôles reproductibles ; rapport de revue ; livraison préparée. Pour un nouveau produit, ajouter PRD et stories avant le plan.\n\n## Critères à préciser\nComportement observable : [à préciser].\nVérification reproductible : [commande ou parcours à préciser].\nCas d’échec et reprise : [à préciser].\nLa présence d’un rapport ou la fin d’un processus ne vaut pas acceptation.\n\n## Décisions\nRelire le brief et le plan avant autorisation. Le modèle ne préautorise aucune exécution, augmentation de budget, acceptation, publication ou fusion. Toute inconnue reste une question explicite.\n\nStructure proposée : application v1. Les étapes proposées ne sont pas des commandes exécutées.\n",
+      "en": "# Improve an existing application\n\nFeature to add: [describe it].\nWhy and for whom: [describe it].\nAuthorised scope: [define it].\nOut of scope: [define it].\nConstraints and budget: [define them; no preauthorised limits].\n\n## Proposed workflow\nRequirements framing → Research → Planning → Implementation → Review → Delivery. Design applies only when a user interface is involved.\n\n## Expected organisation\nA planner owns the need; add subplanners only for justified scopes. Workers deliver tasks; an independent review examines their results. Define dependencies, workspaces, owners and limits before launch.\n\n## Methods by role\n- Planner : Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan.\n- Workers : Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review.\n- Independent reviewer : Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance.\nMethods are included by the engine according to role. Preparation allows analysis and planning only. A subplanner retains planner boundaries. A method grants no additional permission.\n\nExamine and improve: prepare → implement → verify → improve. Each role remains within its assignment.\n\n## Deliverables and evidence\nApproved brief; research with sources; justified design when relevant; plan with bounded tasks; result and reproducible checks; review report; prepared delivery. For a new product, add a PRD and stories before the plan.\n\n## Criteria to complete\nObservable behaviour: [define it].\nReproducible verification: [define a command or user journey].\nFailure and recovery cases: [define them].\nA report's presence or a process ending does not constitute acceptance.\n\n## Decisions\nReview the brief and plan before authorising work. This template does not authorise execution, budget increases, acceptance, publication or merge. Keep unknowns as explicit questions.\n\nProposed structure: application v1. Proposed steps are not executed commands.\n"
+    },
+    "phases": [
+      "frame",
+      "research",
+      "plan",
+      "implement",
+      "review",
+      "deliver"
+    ],
+    "recommended_method": "apex",
+    "questions": [
+      {
+        "id": "objective",
+        "label": {
+          "fr": "Quelle fonctionnalité voulez-vous ajouter ?",
+          "en": "Which feature do you want to add?"
+        },
+        "line": {
+          "fr": "Fonctionnalité à ajouter : [à préciser].",
+          "en": "Feature to add: [describe it]."
+        },
+        "required": true
+      },
+      {
+        "id": "audience",
+        "label": {
+          "fr": "Pourquoi et pour qui ?",
+          "en": "Why and for whom?"
+        },
+        "line": {
+          "fr": "Pourquoi et pour qui : [à préciser].",
+          "en": "Why and for whom: [describe it]."
+        },
+        "required": true
+      },
+      {
+        "id": "scope",
+        "label": {
+          "fr": "Quels fichiers, écrans ou fonctions sont concernés ?",
+          "en": "Which files, screens or features are in scope?"
+        },
+        "line": {
+          "fr": "Périmètre autorisé : [à préciser].",
+          "en": "Authorised scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "exclusions",
+        "label": {
+          "fr": "Que faut-il préserver ou exclure ?",
+          "en": "What must be preserved or excluded?"
+        },
+        "line": {
+          "fr": "Exclusions : [à préciser].",
+          "en": "Out of scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "constraints",
+        "label": {
+          "fr": "Quelles contraintes et limites souhaitez-vous ?",
+          "en": "Which constraints and limits do you want?"
+        },
+        "line": {
+          "fr": "Contraintes et budget : [à préciser, aucun plafond préautorisé].",
+          "en": "Constraints and budget: [define them; no preauthorised limits]."
+        },
+        "required": true
+      },
+      {
+        "id": "acceptance",
+        "label": {
+          "fr": "Comment reconnaître un résultat réussi ?",
+          "en": "How will you recognise a successful result?"
+        },
+        "line": {
+          "fr": "Comportement observable : [à préciser].",
+          "en": "Observable behaviour: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "verification",
+        "label": {
+          "fr": "Quel contrôle permettra de le vérifier ?",
+          "en": "Which check will verify it?"
+        },
+        "line": {
+          "fr": "Vérification reproductible : [commande ou parcours à préciser].",
+          "en": "Reproducible verification: [define a command or user journey]."
+        },
+        "required": true
+      },
+      {
+        "id": "recovery",
+        "label": {
+          "fr": "Que faire en cas d’échec ?",
+          "en": "What should happen on failure?"
+        },
+        "line": {
+          "fr": "Cas d’échec et reprise : [à préciser].",
+          "en": "Failure and recovery cases: [define them]."
+        },
+        "required": true
+      }
+    ],
+    "team": [
+      {
+        "role": "planner",
+        "title": {
+          "fr": "Planificateur",
+          "en": "Planner"
+        },
+        "responsibility": {
+          "fr": "Cadre le besoin, prépare les tâches et leurs dépendances ; ne réalise pas les modifications.",
+          "en": "Frames the need, prepares tasks and dependencies; does not implement changes."
+        },
+        "method_guidance": {
+          "fr": "Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.",
+          "en": "Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan."
+        }
+      },
+      {
+        "role": "worker",
+        "title": {
+          "fr": "Exécutants",
+          "en": "Workers"
+        },
+        "responsibility": {
+          "fr": "Réalisent chacun un périmètre défini et rendent les preuves au planificateur.",
+          "en": "Each delivers an assigned scope and returns evidence to the planner."
+        },
+        "method_guidance": {
+          "fr": "Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.",
+          "en": "Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review."
+        }
+      },
+      {
+        "role": "reviewer",
+        "title": {
+          "fr": "Vérificateur indépendant",
+          "en": "Independent reviewer"
+        },
+        "responsibility": {
+          "fr": "Examine le résultat et les contrôles dans un contexte distinct ; ne valide pas son propre travail.",
+          "en": "Examines the result and checks in a separate context; does not approve its own work."
+        },
+        "method_guidance": {
+          "fr": "Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.",
+          "en": "Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance."
+        }
+      }
+    ]
+  },
+  {
+    "id": "correction",
+    "version": 1,
+    "title": {
+      "fr": "Corriger un défaut reproductible",
+      "en": "Fix a reproducible defect"
+    },
+    "need": {
+      "fr": "# Corriger un défaut reproductible\n\nDéfaut observé et étapes de reproduction : [à préciser].\nPourquoi et pour qui : [à préciser].\nPérimètre autorisé : [à préciser].\nExclusions : [à préciser].\nContraintes et budget : [à préciser, aucun plafond préautorisé].\n\n## Parcours proposé\nCadrage du besoin → Recherche → Planification → Réalisation → Revue → Livraison. La conception s’applique seulement si une interface est concernée.\n\n## Organisation attendue\nUn planificateur porte le besoin ; des sous-planificateurs ne sont ajoutés que pour des périmètres justifiés. Les exécutants réalisent les tâches ; une revue indépendante examine leurs résultats. Définir les dépendances, espaces de travail, responsables et limites avant lancement.\n\n## Méthodes par rôle\n- Planificateur : Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.\n- Exécutants : Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.\n- Vérificateur indépendant : Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.\nLes méthodes sont incluses par le moteur selon le rôle. En préparation, seules l’analyse et la planification sont permises. Un sous-planificateur conserve les limites du planificateur. Une méthode ne donne aucune permission supplémentaire.\n\nExaminer et améliorer : préparer → réaliser → vérifier → améliorer. Chaque rôle reste limité à sa mission.\n\n## Livrables et preuves\nBrief validé ; contexte recherché avec sources ; conception justifiée si nécessaire ; plan en tâches bornées ; résultat et contrôles reproductibles ; rapport de revue ; livraison préparée. Pour un nouveau produit, ajouter PRD et stories avant le plan.\n\n## Critères à préciser\nComportement observable : [à préciser].\nVérification reproductible : [commande ou parcours à préciser].\nCas d’échec et reprise : [à préciser].\nLa présence d’un rapport ou la fin d’un processus ne vaut pas acceptation.\n\n## Décisions\nRelire le brief et le plan avant autorisation. Le modèle ne préautorise aucune exécution, augmentation de budget, acceptation, publication ou fusion. Toute inconnue reste une question explicite.\n\nStructure proposée : correction v1. Les étapes proposées ne sont pas des commandes exécutées.\n\nDiagnostiquer et corriger un problème : reproduire → isoler → identifier la cause → corriger dans le périmètre autorisé → vérifier. En préparation, proposer ces étapes seulement ; aucun outil ni correction.\n",
+      "en": "# Fix a reproducible defect\n\nObserved defect and reproduction steps: [describe them].\nWhy and for whom: [describe it].\nAuthorised scope: [define it].\nOut of scope: [define it].\nConstraints and budget: [define them; no preauthorised limits].\n\n## Proposed workflow\nRequirements framing → Research → Planning → Implementation → Review → Delivery. Design applies only when a user interface is involved.\n\n## Expected organisation\nA planner owns the need; add subplanners only for justified scopes. Workers deliver tasks; an independent review examines their results. Define dependencies, workspaces, owners and limits before launch.\n\n## Methods by role\n- Planner : Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan.\n- Workers : Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review.\n- Independent reviewer : Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance.\nMethods are included by the engine according to role. Preparation allows analysis and planning only. A subplanner retains planner boundaries. A method grants no additional permission.\n\nExamine and improve: prepare → implement → verify → improve. Each role remains within its assignment.\n\n## Deliverables and evidence\nApproved brief; research with sources; justified design when relevant; plan with bounded tasks; result and reproducible checks; review report; prepared delivery. For a new product, add a PRD and stories before the plan.\n\n## Criteria to complete\nObservable behaviour: [define it].\nReproducible verification: [define a command or user journey].\nFailure and recovery cases: [define them].\nA report's presence or a process ending does not constitute acceptance.\n\n## Decisions\nReview the brief and plan before authorising work. This template does not authorise execution, budget increases, acceptance, publication or merge. Keep unknowns as explicit questions.\n\nProposed structure: correction v1. Proposed steps are not executed commands.\n\nDiagnose and fix a problem: reproduce → isolate → identify the cause → fix within the authorised scope → verify. During preparation, propose these steps only; no tools or corrections.\n"
+    },
+    "phases": [
+      "frame",
+      "research",
+      "plan",
+      "implement",
+      "review",
+      "deliver"
+    ],
+    "recommended_method": "debug",
+    "questions": [
+      {
+        "id": "objective",
+        "label": {
+          "fr": "Quel défaut observez-vous et comment le reproduire ?",
+          "en": "What defect do you observe and how can it be reproduced?"
+        },
+        "line": {
+          "fr": "Défaut observé et étapes de reproduction : [à préciser].",
+          "en": "Observed defect and reproduction steps: [describe them]."
+        },
+        "required": true
+      },
+      {
+        "id": "audience",
+        "label": {
+          "fr": "Pourquoi et pour qui ?",
+          "en": "Why and for whom?"
+        },
+        "line": {
+          "fr": "Pourquoi et pour qui : [à préciser].",
+          "en": "Why and for whom: [describe it]."
+        },
+        "required": true
+      },
+      {
+        "id": "scope",
+        "label": {
+          "fr": "Quels fichiers, écrans ou fonctions sont concernés ?",
+          "en": "Which files, screens or features are in scope?"
+        },
+        "line": {
+          "fr": "Périmètre autorisé : [à préciser].",
+          "en": "Authorised scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "exclusions",
+        "label": {
+          "fr": "Que faut-il préserver ou exclure ?",
+          "en": "What must be preserved or excluded?"
+        },
+        "line": {
+          "fr": "Exclusions : [à préciser].",
+          "en": "Out of scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "constraints",
+        "label": {
+          "fr": "Quelles contraintes et limites souhaitez-vous ?",
+          "en": "Which constraints and limits do you want?"
+        },
+        "line": {
+          "fr": "Contraintes et budget : [à préciser, aucun plafond préautorisé].",
+          "en": "Constraints and budget: [define them; no preauthorised limits]."
+        },
+        "required": true
+      },
+      {
+        "id": "acceptance",
+        "label": {
+          "fr": "Comment reconnaître un résultat réussi ?",
+          "en": "How will you recognise a successful result?"
+        },
+        "line": {
+          "fr": "Comportement observable : [à préciser].",
+          "en": "Observable behaviour: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "verification",
+        "label": {
+          "fr": "Quel contrôle permettra de le vérifier ?",
+          "en": "Which check will verify it?"
+        },
+        "line": {
+          "fr": "Vérification reproductible : [commande ou parcours à préciser].",
+          "en": "Reproducible verification: [define a command or user journey]."
+        },
+        "required": true
+      },
+      {
+        "id": "recovery",
+        "label": {
+          "fr": "Que faire en cas d’échec ?",
+          "en": "What should happen on failure?"
+        },
+        "line": {
+          "fr": "Cas d’échec et reprise : [à préciser].",
+          "en": "Failure and recovery cases: [define them]."
+        },
+        "required": true
+      }
+    ],
+    "team": [
+      {
+        "role": "planner",
+        "title": {
+          "fr": "Planificateur",
+          "en": "Planner"
+        },
+        "responsibility": {
+          "fr": "Cadre le besoin, prépare les tâches et leurs dépendances ; ne réalise pas les modifications.",
+          "en": "Frames the need, prepares tasks and dependencies; does not implement changes."
+        },
+        "method_guidance": {
+          "fr": "Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.",
+          "en": "Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan."
+        }
+      },
+      {
+        "role": "worker",
+        "title": {
+          "fr": "Exécutants",
+          "en": "Workers"
+        },
+        "responsibility": {
+          "fr": "Réalisent chacun un périmètre défini et rendent les preuves au planificateur.",
+          "en": "Each delivers an assigned scope and returns evidence to the planner."
+        },
+        "method_guidance": {
+          "fr": "Diagnostiquer et corriger un problème : reproduire → isoler → identifier la cause → corriger dans le périmètre autorisé → vérifier. En préparation, proposer ces étapes seulement ; aucun outil ni correction.",
+          "en": "Diagnose and fix a problem: reproduce → isolate → identify the cause → fix within the authorised scope → verify. During preparation, propose these steps only; no tools or corrections."
+        }
+      },
+      {
+        "role": "reviewer",
+        "title": {
+          "fr": "Vérificateur indépendant",
+          "en": "Independent reviewer"
+        },
+        "responsibility": {
+          "fr": "Examine le résultat et les contrôles dans un contexte distinct ; ne valide pas son propre travail.",
+          "en": "Examines the result and checks in a separate context; does not approve its own work."
+        },
+        "method_guidance": {
+          "fr": "Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.",
+          "en": "Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance."
+        }
+      }
+    ]
+  },
+  {
+    "id": "interface",
+    "version": 1,
+    "title": {
+      "fr": "Améliorer une interface",
+      "en": "Create or improve an interface"
+    },
+    "need": {
+      "fr": "# Améliorer une interface\n\nParcours utilisateur et écran concernés : [à préciser].\nPourquoi et pour qui : [à préciser].\nPérimètre autorisé : [à préciser].\nExclusions : [à préciser].\nContraintes et budget : [à préciser, aucun plafond préautorisé].\n\n## Parcours proposé\nCadrage du besoin → Recherche → Conception de l’interface → Planification → Réalisation → Revue → Livraison. La conception s’applique seulement si une interface est concernée.\n\n## Organisation attendue\nUn planificateur porte le besoin ; des sous-planificateurs ne sont ajoutés que pour des périmètres justifiés. Les exécutants réalisent les tâches ; une revue indépendante examine leurs résultats. Définir les dépendances, espaces de travail, responsables et limites avant lancement.\n\n## Méthodes par rôle\n- Planificateur : Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.\n- Exécutants : Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.\n- Vérificateur indépendant : Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.\nLes méthodes sont incluses par le moteur selon le rôle. En préparation, seules l’analyse et la planification sont permises. Un sous-planificateur conserve les limites du planificateur. Une méthode ne donne aucune permission supplémentaire.\n\nExaminer et améliorer : préparer → réaliser → vérifier → améliorer. Chaque rôle reste limité à sa mission.\n\n## Livrables et preuves\nBrief validé ; contexte recherché avec sources ; conception justifiée si nécessaire ; plan en tâches bornées ; résultat et contrôles reproductibles ; rapport de revue ; livraison préparée. Pour un nouveau produit, ajouter PRD et stories avant le plan.\n\n## Critères à préciser\nComportement observable : [à préciser].\nVérification reproductible : [commande ou parcours à préciser].\nCas d’échec et reprise : [à préciser].\nLa présence d’un rapport ou la fin d’un processus ne vaut pas acceptation.\n\n## Décisions\nRelire le brief et le plan avant autorisation. Le modèle ne préautorise aucune exécution, augmentation de budget, acceptation, publication ou fusion. Toute inconnue reste une question explicite.\n\nStructure proposée : interface v1. Les étapes proposées ne sont pas des commandes exécutées.\n",
+      "en": "# Create or improve an interface\n\nUser journey and screen involved: [describe them].\nWhy and for whom: [describe it].\nAuthorised scope: [define it].\nOut of scope: [define it].\nConstraints and budget: [define them; no preauthorised limits].\n\n## Proposed workflow\nRequirements framing → Research → Interface design → Planning → Implementation → Review → Delivery. Design applies only when a user interface is involved.\n\n## Expected organisation\nA planner owns the need; add subplanners only for justified scopes. Workers deliver tasks; an independent review examines their results. Define dependencies, workspaces, owners and limits before launch.\n\n## Methods by role\n- Planner : Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan.\n- Workers : Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review.\n- Independent reviewer : Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance.\nMethods are included by the engine according to role. Preparation allows analysis and planning only. A subplanner retains planner boundaries. A method grants no additional permission.\n\nExamine and improve: prepare → implement → verify → improve. Each role remains within its assignment.\n\n## Deliverables and evidence\nApproved brief; research with sources; justified design when relevant; plan with bounded tasks; result and reproducible checks; review report; prepared delivery. For a new product, add a PRD and stories before the plan.\n\n## Criteria to complete\nObservable behaviour: [define it].\nReproducible verification: [define a command or user journey].\nFailure and recovery cases: [define them].\nA report's presence or a process ending does not constitute acceptance.\n\n## Decisions\nReview the brief and plan before authorising work. This template does not authorise execution, budget increases, acceptance, publication or merge. Keep unknowns as explicit questions.\n\nProposed structure: interface v1. Proposed steps are not executed commands.\n"
+    },
+    "phases": [
+      "frame",
+      "research",
+      "design",
+      "plan",
+      "implement",
+      "review",
+      "deliver"
+    ],
+    "recommended_method": "apex",
+    "questions": [
+      {
+        "id": "objective",
+        "label": {
+          "fr": "Quel parcours et quel écran voulez-vous améliorer ?",
+          "en": "Which journey and screen do you want to improve?"
+        },
+        "line": {
+          "fr": "Parcours utilisateur et écran concernés : [à préciser].",
+          "en": "User journey and screen involved: [describe them]."
+        },
+        "required": true
+      },
+      {
+        "id": "audience",
+        "label": {
+          "fr": "Pourquoi et pour qui ?",
+          "en": "Why and for whom?"
+        },
+        "line": {
+          "fr": "Pourquoi et pour qui : [à préciser].",
+          "en": "Why and for whom: [describe it]."
+        },
+        "required": true
+      },
+      {
+        "id": "scope",
+        "label": {
+          "fr": "Quels fichiers, écrans ou fonctions sont concernés ?",
+          "en": "Which files, screens or features are in scope?"
+        },
+        "line": {
+          "fr": "Périmètre autorisé : [à préciser].",
+          "en": "Authorised scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "exclusions",
+        "label": {
+          "fr": "Que faut-il préserver ou exclure ?",
+          "en": "What must be preserved or excluded?"
+        },
+        "line": {
+          "fr": "Exclusions : [à préciser].",
+          "en": "Out of scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "constraints",
+        "label": {
+          "fr": "Quelles contraintes et limites souhaitez-vous ?",
+          "en": "Which constraints and limits do you want?"
+        },
+        "line": {
+          "fr": "Contraintes et budget : [à préciser, aucun plafond préautorisé].",
+          "en": "Constraints and budget: [define them; no preauthorised limits]."
+        },
+        "required": true
+      },
+      {
+        "id": "acceptance",
+        "label": {
+          "fr": "Comment reconnaître un résultat réussi ?",
+          "en": "How will you recognise a successful result?"
+        },
+        "line": {
+          "fr": "Comportement observable : [à préciser].",
+          "en": "Observable behaviour: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "verification",
+        "label": {
+          "fr": "Quel contrôle permettra de le vérifier ?",
+          "en": "Which check will verify it?"
+        },
+        "line": {
+          "fr": "Vérification reproductible : [commande ou parcours à préciser].",
+          "en": "Reproducible verification: [define a command or user journey]."
+        },
+        "required": true
+      },
+      {
+        "id": "recovery",
+        "label": {
+          "fr": "Que faire en cas d’échec ?",
+          "en": "What should happen on failure?"
+        },
+        "line": {
+          "fr": "Cas d’échec et reprise : [à préciser].",
+          "en": "Failure and recovery cases: [define them]."
+        },
+        "required": true
+      }
+    ],
+    "team": [
+      {
+        "role": "planner",
+        "title": {
+          "fr": "Planificateur",
+          "en": "Planner"
+        },
+        "responsibility": {
+          "fr": "Cadre le besoin, prépare les tâches et leurs dépendances ; ne réalise pas les modifications.",
+          "en": "Frames the need, prepares tasks and dependencies; does not implement changes."
+        },
+        "method_guidance": {
+          "fr": "Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.",
+          "en": "Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan."
+        }
+      },
+      {
+        "role": "worker",
+        "title": {
+          "fr": "Exécutants",
+          "en": "Workers"
+        },
+        "responsibility": {
+          "fr": "Réalisent chacun un périmètre défini et rendent les preuves au planificateur.",
+          "en": "Each delivers an assigned scope and returns evidence to the planner."
+        },
+        "method_guidance": {
+          "fr": "Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.",
+          "en": "Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review."
+        }
+      },
+      {
+        "role": "reviewer",
+        "title": {
+          "fr": "Vérificateur indépendant",
+          "en": "Independent reviewer"
+        },
+        "responsibility": {
+          "fr": "Examine le résultat et les contrôles dans un contexte distinct ; ne valide pas son propre travail.",
+          "en": "Examines the result and checks in a separate context; does not approve its own work."
+        },
+        "method_guidance": {
+          "fr": "Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.",
+          "en": "Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance."
+        }
+      }
+    ]
+  },
+  {
+    "id": "product",
+    "version": 1,
+    "title": {
+      "fr": "Préparer une nouvelle application",
+      "en": "Frame a new application"
+    },
+    "need": {
+      "fr": "# Préparer une nouvelle application\n\nUtilisateurs, problème et valeur attendue : [à préciser].\nPourquoi et pour qui : [à préciser].\nPérimètre autorisé : [à préciser].\nExclusions : [à préciser].\nContraintes et budget : [à préciser, aucun plafond préautorisé].\n\n## Parcours proposé\nBesoins du produit → Parcours et fonctionnalités → Revue des fonctionnalités → Architecture → Règles de conception → Recherche → Conception de l’interface → Planification → Réalisation → Revue → Livraison. La conception s’applique seulement si une interface est concernée.\n\n## Organisation attendue\nUn planificateur porte le besoin ; des sous-planificateurs ne sont ajoutés que pour des périmètres justifiés. Les exécutants réalisent les tâches ; une revue indépendante examine leurs résultats. Définir les dépendances, espaces de travail, responsables et limites avant lancement.\n\n## Méthodes par rôle\n- Planificateur : Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.\n- Exécutants : Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.\n- Vérificateur indépendant : Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.\nLes méthodes sont incluses par le moteur selon le rôle. En préparation, seules l’analyse et la planification sont permises. Un sous-planificateur conserve les limites du planificateur. Une méthode ne donne aucune permission supplémentaire.\n\nExaminer et améliorer : préparer → réaliser → vérifier → améliorer. Chaque rôle reste limité à sa mission.\n\n## Livrables et preuves\nBrief validé ; contexte recherché avec sources ; conception justifiée si nécessaire ; plan en tâches bornées ; résultat et contrôles reproductibles ; rapport de revue ; livraison préparée. Pour un nouveau produit, ajouter PRD et stories avant le plan.\n\n## Critères à préciser\nComportement observable : [à préciser].\nVérification reproductible : [commande ou parcours à préciser].\nCas d’échec et reprise : [à préciser].\nLa présence d’un rapport ou la fin d’un processus ne vaut pas acceptation.\n\n## Décisions\nRelire le brief et le plan avant autorisation. Le modèle ne préautorise aucune exécution, augmentation de budget, acceptation, publication ou fusion. Toute inconnue reste une question explicite.\n\nStructure proposée : product v1. Les étapes proposées ne sont pas des commandes exécutées.\n",
+      "en": "# Frame a new application\n\nUsers, problem and expected value: [describe them].\nWhy and for whom: [describe it].\nAuthorised scope: [define it].\nOut of scope: [define it].\nConstraints and budget: [define them; no preauthorised limits].\n\n## Proposed workflow\nProduct requirements → Journeys and features → Feature review → Architecture → Design rules → Research → Interface design → Planning → Implementation → Review → Delivery. Design applies only when a user interface is involved.\n\n## Expected organisation\nA planner owns the need; add subplanners only for justified scopes. Workers deliver tasks; an independent review examines their results. Define dependencies, workspaces, owners and limits before launch.\n\n## Methods by role\n- Planner : Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan.\n- Workers : Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review.\n- Independent reviewer : Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance.\nMethods are included by the engine according to role. Preparation allows analysis and planning only. A subplanner retains planner boundaries. A method grants no additional permission.\n\nExamine and improve: prepare → implement → verify → improve. Each role remains within its assignment.\n\n## Deliverables and evidence\nApproved brief; research with sources; justified design when relevant; plan with bounded tasks; result and reproducible checks; review report; prepared delivery. For a new product, add a PRD and stories before the plan.\n\n## Criteria to complete\nObservable behaviour: [define it].\nReproducible verification: [define a command or user journey].\nFailure and recovery cases: [define them].\nA report's presence or a process ending does not constitute acceptance.\n\n## Decisions\nReview the brief and plan before authorising work. This template does not authorise execution, budget increases, acceptance, publication or merge. Keep unknowns as explicit questions.\n\nProposed structure: product v1. Proposed steps are not executed commands.\n"
+    },
+    "phases": [
+      "requirements",
+      "stories",
+      "story-review",
+      "architecture",
+      "design-system",
+      "research",
+      "design",
+      "plan",
+      "implement",
+      "review",
+      "deliver"
+    ],
+    "recommended_method": "apex",
+    "questions": [
+      {
+        "id": "objective",
+        "label": {
+          "fr": "Quel problème doit résoudre la nouvelle application ?",
+          "en": "Which problem should the new application solve?"
+        },
+        "line": {
+          "fr": "Utilisateurs, problème et valeur attendue : [à préciser].",
+          "en": "Users, problem and expected value: [describe them]."
+        },
+        "required": true
+      },
+      {
+        "id": "audience",
+        "label": {
+          "fr": "Pourquoi et pour qui ?",
+          "en": "Why and for whom?"
+        },
+        "line": {
+          "fr": "Pourquoi et pour qui : [à préciser].",
+          "en": "Why and for whom: [describe it]."
+        },
+        "required": true
+      },
+      {
+        "id": "scope",
+        "label": {
+          "fr": "Quels fichiers, écrans ou fonctions sont concernés ?",
+          "en": "Which files, screens or features are in scope?"
+        },
+        "line": {
+          "fr": "Périmètre autorisé : [à préciser].",
+          "en": "Authorised scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "exclusions",
+        "label": {
+          "fr": "Que faut-il préserver ou exclure ?",
+          "en": "What must be preserved or excluded?"
+        },
+        "line": {
+          "fr": "Exclusions : [à préciser].",
+          "en": "Out of scope: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "constraints",
+        "label": {
+          "fr": "Quelles contraintes et limites souhaitez-vous ?",
+          "en": "Which constraints and limits do you want?"
+        },
+        "line": {
+          "fr": "Contraintes et budget : [à préciser, aucun plafond préautorisé].",
+          "en": "Constraints and budget: [define them; no preauthorised limits]."
+        },
+        "required": true
+      },
+      {
+        "id": "acceptance",
+        "label": {
+          "fr": "Comment reconnaître un résultat réussi ?",
+          "en": "How will you recognise a successful result?"
+        },
+        "line": {
+          "fr": "Comportement observable : [à préciser].",
+          "en": "Observable behaviour: [define it]."
+        },
+        "required": true
+      },
+      {
+        "id": "verification",
+        "label": {
+          "fr": "Quel contrôle permettra de le vérifier ?",
+          "en": "Which check will verify it?"
+        },
+        "line": {
+          "fr": "Vérification reproductible : [commande ou parcours à préciser].",
+          "en": "Reproducible verification: [define a command or user journey]."
+        },
+        "required": true
+      },
+      {
+        "id": "recovery",
+        "label": {
+          "fr": "Que faire en cas d’échec ?",
+          "en": "What should happen on failure?"
+        },
+        "line": {
+          "fr": "Cas d’échec et reprise : [à préciser].",
+          "en": "Failure and recovery cases: [define them]."
+        },
+        "required": true
+      }
+    ],
+    "team": [
+      {
+        "role": "planner",
+        "title": {
+          "fr": "Planificateur",
+          "en": "Planner"
+        },
+        "responsibility": {
+          "fr": "Cadre le besoin, prépare les tâches et leurs dépendances ; ne réalise pas les modifications.",
+          "en": "Frames the need, prepares tasks and dependencies; does not implement changes."
+        },
+        "method_guidance": {
+          "fr": "Analyse et planification — cadrer le besoin seulement. Définir les tâches, critères et dépendances ; aucune réalisation ni validation de son propre plan.",
+          "en": "Analysis and planning — frame the need only. Define tasks, criteria and dependencies; no implementation or approval of its own plan."
+        }
+      },
+      {
+        "role": "worker",
+        "title": {
+          "fr": "Exécutants",
+          "en": "Workers"
+        },
+        "responsibility": {
+          "fr": "Réalisent chacun un périmètre défini et rendent les preuves au planificateur.",
+          "en": "Each delivers an assigned scope and returns evidence to the planner."
+        },
+        "method_guidance": {
+          "fr": "Réalisation et vérification — analyser, réaliser puis vérifier la tâche autorisée. Transmettre les preuves ; ses contrôles ne remplacent pas la revue indépendante.",
+          "en": "Implementation and verification — analyse, implement and verify the authorised task. Return evidence; its checks do not replace independent review."
+        }
+      },
+      {
+        "role": "reviewer",
+        "title": {
+          "fr": "Vérificateur indépendant",
+          "en": "Independent reviewer"
+        },
+        "responsibility": {
+          "fr": "Examine le résultat et les contrôles dans un contexte distinct ; ne valide pas son propre travail.",
+          "en": "Examines the result and checks in a separate context; does not approve its own work."
+        },
+        "method_guidance": {
+          "fr": "Revue indépendante — examiner les preuves et proposer les corrections. Ne pas réaliser les corrections ; seul le moteur décide de la validation.",
+          "en": "Independent review — examine evidence and propose corrections. Do not implement corrections; only the engine decides acceptance."
+        }
+      }
+    ]
+  }
+]

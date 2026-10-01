@@ -15,7 +15,10 @@
     "test:pricing": "node tests/pricing_ui.cjs bin/swarm test-results/pricing",
     "test:quotas": "node tests/quotas_ui.cjs bin/swarm test-results/quotas",
     "test:task-models": "node tests/task_models_ui.cjs bin/swarm test-results/task-models",
-    "test:role-models": "node tests/role_models_ui.cjs bin/swarm test-results/role-models"
+    "test:role-models": "node tests/role_models_ui.cjs bin/swarm test-results/role-models",
+    "test:admin": "node tests/run_limits_admin_ui.cjs bin/swarm test-results/admin",
+    "test:quickwins": "node tests/quick_wins_ui.cjs bin/swarm test-results/quick-wins",
+    "test:planning-metrics": "node tests/planning_metrics_ui.cjs bin/swarm test-results/planning-metrics"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

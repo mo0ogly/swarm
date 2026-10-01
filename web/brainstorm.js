@@ -13,7 +13,7 @@ function renderBrainstorm(){
  if(key===brainKey)return;brainKey=key;
  const focused=document.activeElement?.closest('[data-brain]')?.dataset.brain;
  $('brain-messages').replaceChildren();
- if(!turns.length)$('brain-messages').append(node('p',tr_web_brainstorm_js('Commencez par votre idée : l’IA explorera les options et proposera un plan APEX.')));
+ if(!turns.length)$('brain-messages').append(node('p',tr_web_brainstorm_js('Commencez par votre idée : l’IA explorera les options et proposera un plan.')));
  for(const t of turns){
   const card=node('article',undefined,'card brain-turn');card.dataset.brain=t.id;card.dataset.state=t.response_error?'failed':t.response?'completed':'running';
   card.append(node('h3',tr_web_brainstorm_js('Votre message'),'message-role'),node('p',t.question,'message-question'),node('h3',tr_web_brainstorm_js('Réponse IA · ')+(t.owner||'Planner'),'message-role ai-role'));
@@ -38,7 +38,7 @@ async function reviewBrainstorm(t){
 }
 $('brain-form').onsubmit=e=>{
  e.preventDefault();
- openModal(tr_web_brainstorm_js('Brainstorming avec une IA · APEX'),tr_web_brainstorm_js('Examinez le contexte, puis confirmez l’envoi. La réponse sera conservée directement dans le dialogue.'),{action:'brainstorm',launchEvent:crypto.randomUUID()});
+ openModal(tr_web_brainstorm_js('Explorer une idée avec l’IA'),tr_web_brainstorm_js('Examinez le contexte, puis confirmez l’envoi. La réponse sera conservée directement dans le dialogue.'),{action:'brainstorm',launchEvent:crypto.randomUUID()});
  field('provider',tr_web_brainstorm_js('IA / fournisseur'),'',Object.keys(snapshot.providers?.providers||{}).sort().map(x=>[x,x]));
  if(typeof addModelFields==='function')addModelFields('brainstorm');
  field('workspace',tr_web_brainstorm_js('Espace à examiner'),snapshot.root);

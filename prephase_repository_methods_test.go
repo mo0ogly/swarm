@@ -105,3 +105,33 @@ func TestRepositoryPreparationContractChangeRejectsOldContext(t *testing.T) {
 		}
 	}
 }
+
+func TestRepositoryDebugPreparationPersistsWithoutLaunch(t *testing.T) {
+	s := storeTest(t)
+	installRepositoryPreparationMethods(t, s)
+	req := prepRequest(Preparation{}, "create")
+	req.Title, req.Method, req.Text = "Diagnose a blocked launch", "debug", "Observed failure; plan the investigation only."
+	p, err := s.preparationCommand(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := s.preparationMethod("debug")
+	if err != nil || p.Method != "debug" || p.MethodHash != m.Hash {
+		t.Fatalf("debug method not adopted: %+v %v", p, err)
+	}
+	reopened, err := openStore(s.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	saved, err := reopened.preparation(p.ID)
+	if err != nil || saved.Method != "debug" || saved.MethodHash != m.Hash {
+		t.Fatalf("debug method lost: %+v %v", saved, err)
+	}
+	for _, table := range []string{"agents", "reservations", "preparation_turns"} {
+		var count int
+		if err := s.db.QueryRow("SELECT count(*) FROM " + table).Scan(&count); err != nil || count != 0 {
+			t.Fatalf("draft launched activity: %s %d %v", table, count, err)
+		}
+	}
+}

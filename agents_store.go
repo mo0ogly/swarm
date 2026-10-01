@@ -577,6 +577,17 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if archivedCount > 0 {
 		return a, false, &CommandError{Code: "mission_archived", Message: "mission archivée ; restaurer avant de lancer un agent"}
 	}
+	adminLimits, err := configuredRunLimitsWith(tx, work, r.Role, r.TaskID)
+	if err != nil {
+		return a, false, err
+	}
+	if r.Mode == "terminal" && adminLimits != (RunLimits{}) {
+		return a, false, fmt.Errorf("Limites administratives incompatibles avec le terminal natif ; utiliser le mode automatisé.")
+	}
+	// Administrative preferences never raise provider, explicit mission,
+	// plan or retry ceilings. Freeze them with the launch reservation.
+	limits = limits.cappedBy(adminLimits)
+	limits.ObservationMode = adminLimits.ObservationMode
 	var paused bool
 	e = tx.QueryRow("SELECT paused FROM cockpit_controls WHERE work_id=?", work).Scan(&paused)
 	if e != nil && e != sql.ErrNoRows {
@@ -594,7 +605,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		return a, false, e
 	}
 	if w.Revision != r.Revision {
-		return a, false, fmt.Errorf("révision périmée ; relire le travail")
+		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
 	}
 	if e = s.providerCooldownGuard(r.Provider); e != nil {
 		return a, false, e
@@ -671,7 +682,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", work, t.ID).Scan(&attempts); e != nil {
 			return a, false, e
 		}
-		if attempts >= t.PlanMaxAttempts {
+		if attempts >= t.PlanMaxAttempts && !limits.observing() {
 			return a, false, fmt.Errorf("Plafond du plan atteint : %d tentatives. Consigner une OODA et revoir le plan avant toute nouvelle mission.", t.PlanMaxAttempts)
 		}
 		if t.PlanToolLimit > 0 && (limits.MaxToolCalls == 0 || t.PlanToolLimit < limits.MaxToolCalls) {
@@ -782,6 +793,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 			return Agent{}, false, err
 		}
 		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, r.Instruction)
+	}
+	if r.Role == "worker" {
+		prompt += workerExecutionContext(w, t, r.EventID)
 	}
 	prompt = workflowPrompt + prompt
 	prompt += recoveryInstructions

@@ -1,0 +1,162 @@
+{
+  "work": "w-843bb3ce22cff2965c5e77b6",
+  "task": "plan-843bb3ce22-T7",
+  "attempt": "a-cde55af340e16467351f8d98",
+  "independent_review": {
+    "report_artifacts": {
+      ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json": "6e798201c3d51dd8b2d451bc04c2aa0a06868c1fe0f706b2cef7d7dcf739e704",
+      "docs/T7-documentation-retex.md": "f409364d7724aa3a4d6a300a17ca85f22284cec42af604e347843ade72a76e4a",
+      "docs/plan-843bb3ce22-T7.md": "c8520a38f8518c0c9814d7f3a87ff93f35a21487148917719559018cfee27719",
+      "locales/en.json": "82a2b31b29ed26157b092919690919af29ea3660b08f8083996e5d40126e2a92",
+      "tests/prelaunch_diagnostic_ui.cjs": "02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2",
+      "tools/verification/t7_prelaunch.py": "f5e86c2b39f32d3384e4d3a5b6a9317fb84648f67b776d61d8819d765c67b2b3",
+      "web/i18n-en.js": "bd15d1fc3f47e31bf45f968fad0cd17e11a3e2cc4967e3f744d2afe7fbe08b97",
+      "web/mission.js": "707c551caf558a26ddc2fce7d824569fed57a87529c3aff7239bbf06a354865a",
+      "web/prepare.html": "301246c624aa5994f9c042e1bffe21821b629263efe3a3b44875139fc876c593",
+      "web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
+      "web/prephase-editor.js": "859de925d60b31720a09d47f9d0ccf05b1b572a8f334d47812f54d4123c942d2",
+      "web/prephase.js": "29c4c3428c975162ea1dd2cfed6e2ff532036f0a50cbe290871671d00f62825d"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "claude-sonnet-5-5",
+      "effort": "",
+      "billing": "external",
+      "policy_hash": "5df85e5d7681717e295ac45c6b7093bef8196a2d027f0457b0721e592634f606",
+      "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+    },
+    "timeout_seconds": 300,
+    "workflow": {
+      "version": 1,
+      "role": "reviewer",
+      "methods": [
+        "audit-pdca",
+        "code-reviewer"
+      ],
+      "sha256": "3210ccc9ec754961397f04faaee25b17830e1a178ad246f84888a7ac2728f1f2"
+    },
+    "id": "review-be052d73ccd4f4be35aeb132",
+    "attempt": "a-cde55af340e16467351f8d98",
+    "producer": "auto-5576386e98793d2abaa8",
+    "reviewer": "reviewer://claude",
+    "report": "docs/plan-843bb3ce22-T7.md",
+    "sha256": "c8520a38f8518c0c9814d7f3a87ff93f35a21487148917719559018cfee27719",
+    "contract": "e425d280338a1c6441ca0397f21d2d67978b5654e28e213b9d86377da047edf8",
+    "state": "passed",
+    "reason": "Critères 1 et 2 : démontrés par le contrôle moteur (code 0, entrées liées par empreinte) et par les assertions citées dans le rapport, dont le test hostile sur la copie. Critère 3 : la transcription FR/EN est claire et les détails techniques sont dans la modale (assertion sur le message principal). Il reste pourtant des limites : critère hors périmètre du contrôle moteur (qui ne couvre que 1 et 2), relecture qualitative faite par le superviseur et non indépendante, anglais de la copie assertionné seulement pour deux catégories sur six, aucune captures examinée par moi. L'heure du contrôle citée dans le rapport diffère de celle du reçu. Décision humaine requise (pending_human) ; aucune acceptation de ma part.",
+    "criteria": [
+      {
+        "index": 1,
+        "verdict": "pass",
+        "evidence": "assert.match(limits,/Tâches \\(plan\\) : 15 max · Appels par rôle \\(responsable\\/vérificateur\\) : 25 max/);"
+      },
+      {
+        "index": 2,
+        "verdict": "pass",
+        "evidence": "assert.doesNotMatch(hostile,/TOPSECRET|https?:|password=|Bearer/);"
+      },
+      {
+        "index": 3,
+        "verdict": "pass",
+        "evidence": "assert.doesNotMatch(await page.$eval('#organization-preflight-status',e=>e.textContent),/ready|verified|octets/);"
+      }
+    ],
+    "started": "2026-09-30T15:10:55.087572173Z",
+    "finished": "2026-09-30T15:11:22.343339091Z",
+    "usage": {
+      "cache_read_input_tokens": 5243,
+      "cache_creation_input_tokens": 17121,
+      "provider_reported_cost_usd": 0.1976846,
+      "input_tokens": 2,
+      "output_tokens": 2983,
+      "source": "événement fournisseur result",
+      "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+      "at": "2026-09-30T15:11:22.021012394Z"
+    }
+  },
+  "engine_controls": {
+    "attempt_id": "a-cde55af340e16467351f8d98",
+    "revision": 234,
+    "candidate_sha": "",
+    "producer_agent_id": "auto-5576386e98793d2abaa8",
+    "controller": "controller://swarm-validation",
+    "policy_digest": "d593b42ef402f852de0022d92308dff28b74a454b5c2bacc98b419641ac60a25",
+    "policy": {
+      "mode": "human",
+      "controls": [
+        {
+          "inputs": [
+            "tools/verification/t7_prelaunch.py",
+            "web/mission.js",
+            "web/prephase-conversion.js",
+            "web/prephase-editor.js",
+            "web/prepare.html",
+            "web/prephase.js",
+            "web/i18n-en.js",
+            "locales/en.json",
+            "tests/prelaunch_diagnostic_ui.cjs"
+          ],
+          "id": "t7-browser-evidence",
+          "command": [
+            "python3",
+            "tools/verification/t7_prelaunch.py",
+            "all"
+          ],
+          "criteria": [
+            1,
+            2
+          ],
+          "justification": "Recette navigateur isolée : résumé des rôles et limites, diagnostic sans secret ni URL de session ; FR/EN et deux thèmes. Le jugement qualitatif et la décision humaine restent requis.",
+          "dir": ".",
+          "timeout_seconds": 300
+        }
+      ],
+      "authorized_at": "2026-09-30T14:03:38.806389939Z",
+      "actor": "fpizzi/uid:1001"
+    },
+    "artifacts": {
+      ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json": "6e798201c3d51dd8b2d451bc04c2aa0a06868c1fe0f706b2cef7d7dcf739e704",
+      "docs/plan-843bb3ce22-T7.md": "c8520a38f8518c0c9814d7f3a87ff93f35a21487148917719559018cfee27719",
+      "locales/en.json": "82a2b31b29ed26157b092919690919af29ea3660b08f8083996e5d40126e2a92",
+      "tests/prelaunch_diagnostic_ui.cjs": "02ecc54dcc28c689578d97a8eb074825fdb1119f74b019bb538a8c726b01c4f2",
+      "tools/verification/t7_prelaunch.py": "f5e86c2b39f32d3384e4d3a5b6a9317fb84648f67b776d61d8819d765c67b2b3",
+      "web/i18n-en.js": "bd15d1fc3f47e31bf45f968fad0cd17e11a3e2cc4967e3f744d2afe7fbe08b97",
+      "web/mission.js": "707c551caf558a26ddc2fce7d824569fed57a87529c3aff7239bbf06a354865a",
+      "web/prepare.html": "301246c624aa5994f9c042e1bffe21821b629263efe3a3b44875139fc876c593",
+      "web/prephase-conversion.js": "c009b494ffb4d1e594e54cddade342a10068d20e0cb2d87c41079fa22ac801e6",
+      "web/prephase-editor.js": "859de925d60b31720a09d47f9d0ccf05b1b572a8f334d47812f54d4123c942d2",
+      "web/prephase.js": "29c4c3428c975162ea1dd2cfed6e2ff532036f0a50cbe290871671d00f62825d"
+    },
+    "controls": [
+      {
+        "id": "t7-browser-evidence",
+        "command": [
+          "python3",
+          "tools/verification/t7_prelaunch.py",
+          "all"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "d93b3f4ff16f76916a9af8436f629d1f26b4764a4fd8baede0d162df3b94789a",
+        "summary": "contrôle réussi",
+        "started_at": "2026-09-30T15:10:34.192450139Z",
+        "finished_at": "2026-09-30T15:10:54.332409091Z"
+      }
+    ],
+    "receipt": ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T7/a-cde55af340e16467351f8d98.json",
+    "state": "pending_human",
+    "reason": "Contrôles disponibles ; décision humaine requise.",
+    "at": "2026-09-30T15:10:54.33480996Z"
+  },
+  "dependencies": [
+    {
+      "id": "plan-843bb3ce22-T4",
+      "status": "accepted"
+    },
+    {
+      "id": "plan-843bb3ce22-T6",
+      "status": "accepted"
+    }
+  ]
+}

@@ -108,6 +108,40 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 		}
 		send(w, map[string]any{"preparations": ps, "limit": 100})
 	})
+	mux.HandleFunc("/api/v1/preparations/templates", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		v, e := preparationTemplates()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/preparations/template-check", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		b, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 16384))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		var request PreparationTemplateAnswers
+		if e = strict(b, &request); e != nil {
+			fail(w, e)
+			return
+		}
+		v, e := checkPreparationTemplate(request)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
 	mux.HandleFunc("/api/v1/preparations/methods", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			w.WriteHeader(405)

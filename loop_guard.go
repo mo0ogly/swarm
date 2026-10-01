@@ -62,10 +62,10 @@ func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	}
 	g.lastSignature = sig
 	g.calls++
-	if g.calls >= g.limits.MaxToolCalls {
+	if !g.limits.observing() && (g.calls > g.limits.MaxToolCalls || (g.calls == g.limits.MaxToolCalls && id == "")) {
 		g.reason = "Limite d'appels d'outils atteinte"
 	}
-	if g.repeated >= g.limits.MaxRepeatedCalls {
+	if !g.limits.observing() && (g.repeated >= g.limits.MaxRepeatedCalls) {
 		g.reason = "Limite de répétitions identiques atteinte"
 	}
 }
@@ -77,6 +77,10 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	context := g.contexts[id]
 	delete(g.contexts, id)
 	g.completed++
+	// The last authorized tool may finish; never discard its result at start.
+	if !g.limits.observing() && (g.calls >= g.limits.MaxToolCalls && len(g.pending) == 0) {
+		g.reason = "Limite d'appels d'outils atteinte"
+	}
 	g.lastResult = now()
 	sig, tracked := g.signatures[id]
 	delete(g.signatures, id)
@@ -94,7 +98,7 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	g.failures = recent
 	if tracked && failed {
 		g.failures = append(g.failures, failedCall{sig, g.completed})
-		if count+1 >= g.limits.MaxRepeatedCalls {
+		if !g.limits.observing() && (count+1 >= g.limits.MaxRepeatedCalls) {
 			g.reason = "Limite d'échecs identiques entrelacés atteinte"
 		}
 	}
@@ -110,7 +114,7 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	} else {
 		g.errors = 0
 	}
-	if g.errors >= g.limits.MaxConsecutiveErrors {
+	if !g.limits.observing() && (g.errors >= g.limits.MaxConsecutiveErrors) {
 		g.reason = "Limite d'erreurs d'outils consécutives atteinte"
 	}
 }
@@ -183,6 +187,9 @@ func (g *loopGuard) observe(d map[string]any, now time.Time) {
 	}
 }
 func (g *loopGuard) check(now time.Time) string {
+	if g.limits.observing() {
+		return ""
+	}
 	if g.reason != "" {
 		return g.reason
 	}

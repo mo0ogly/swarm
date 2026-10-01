@@ -95,3 +95,7 @@ Les clés sont enregistrées dans `.swarm/ai-connections.json`, fichier local en
 CLI : `swarm connections list` retourne les connexions sans secrets et leur empreinte. `swarm connections save --input connexion.json` utilise le même moteur que le web : `version: 1`, `expected_digest`, `connection` (`id`, `label`, `base_url`, `model`, `disabled`, éventuellement `key`) et `replace_key`. Le test interactif de connexion est disponible dans le web ; cette commande CLI ne déclenche aucun appel.
 
 Les connexions personnalisées n’activent pas implicitement un fournisseur pour toutes les missions.
+
+## Templates
+
+[Modèles de mission KS (web et CLI)](docs/PREPARATION-TEMPLATES.md).

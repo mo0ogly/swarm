@@ -13,9 +13,63 @@ import (
 
 func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Writer) error {
 	if len(args) < 3 {
-		return fmt.Errorf("usage : mission status|preview|start|pause|resume|stop|watch WORK [--input profil.json]")
+		return fmt.Errorf("usage : mission status|changes|spending|seen|recovery|preview|start|pause|resume|stop|watch WORK [--input profil.json]")
 	}
 	action, work := args[1], args[2]
+	if action == "seen" {
+		w, e := s.get(work)
+		if e != nil {
+			return e
+		}
+		if e = s.markVisit(work, operatorIdentity(), w.Revision); e != nil {
+			return e
+		}
+		v, e := s.visit(work, operatorIdentity())
+		if e != nil {
+			return e
+		}
+		if asJSON {
+			return printJSON(out, v)
+		}
+		fmt.Fprintln(out, uiText("Révision marquée comme vue."))
+		return nil
+	}
+	if action == "recovery" {
+		if len(args) < 4 {
+			return fmt.Errorf("usage : mission recovery WORK TASK [AGENT]")
+		}
+		agent := ""
+		if len(args) > 4 {
+			agent = args[4]
+		}
+		p, e := s.recoveryPreview(work, args[3], agent)
+		if e != nil {
+			return e
+		}
+		if asJSON {
+			return printJSON(out, p)
+		}
+		printRecoveryPreview(out, p)
+		return nil
+	}
+	if action == "changes" || action == "spending" {
+		d, e := s.missionStatus(work)
+		if e != nil {
+			return e
+		}
+		if action == "changes" {
+			if asJSON {
+				return printJSON(out, d.Changes)
+			}
+			printMissionChanges(out, d.Changes)
+		} else {
+			if asJSON {
+				return printJSON(out, d.Spending)
+			}
+			printMissionSpending(out, d.Spending)
+		}
+		return nil
+	}
 	switch action {
 	case "preview", "start":
 		var p LaunchProfile
@@ -117,8 +171,16 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 		return printJSON(out, d)
 	}
 	fmt.Fprintln(out, "Mission")
-	printMissionUnderstanding(out, d.Understanding, d.Tasks, "  ")
+	fmt.Fprintln(out, uiText("La mission en bref"))
+	fmt.Fprintln(out, uiFactText(d.Guidance.What, d.Tasks))
+	fmt.Fprintf(out, "%s — %s\n", uiEngineText(d.Guidance.Actor), uiEngineText(d.Guidance.Next))
+	fmt.Fprintf(out, uiText("Action principale : %s\nEffet : %s\n"), uiEngineText(d.Guidance.Primary.Label), uiEngineText(d.Guidance.Primary.Effect))
+	if d.Guidance.Primary.Task != "" {
+		fmt.Fprintf(out, uiText("Tâche concernée : %s\n"), d.Guidance.Primary.Task)
+	}
 	fmt.Fprintln(out, uiEngineText(d.Organization.Label))
+	printMissionChanges(out, d.Changes)
+	printMissionSpending(out, d.Spending)
 	for _, issue := range d.Organization.Issues {
 		fmt.Fprintln(out, "- "+uiEngineText(issue))
 	}
@@ -176,11 +238,14 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 		fmt.Fprintln(out, uiText("Dernière action — Conducteur Swarm : aucune action enregistrée pour cette mission."))
 	}
 	for _, t := range d.Tasks {
+		for _, wait := range t.Waits {
+			fmt.Fprintf(out, uiText("Attente — %s : %s (%s) · %s · swarm mission status %s\n"), t.Title, wait.Title, wait.Task, uiEngineText(wait.Reason), work)
+		}
 		fmt.Fprintf(out, uiText("\nTâche — %s\n"), t.Title)
 		fmt.Fprintf(out, uiText("  Résultat : %s\n"), uiEngineText(t.Result.Label))
 		fmt.Fprintf(out, uiText("  Processus : %s · rapport : %s · validation : %s\n"), uiEngineText(t.Result.ProcessLabel), uiEngineText(t.Result.ReportLabel), uiEngineText(t.Result.ValidationLabel))
 		printMissionUnderstanding(out, t.Understanding, d.Tasks, "  ")
-		fmt.Fprintf(out, uiText("  Action disponible : %s · tâche %s · %d dépendants\n"), uiEngineText(t.Label), t.Target, t.Impact)
+		fmt.Fprintf(out, uiText("  Action disponible : %s · tâche %s · %d dépendants\n"), uiEngineText(t.Primary.Label), t.Target, t.Impact)
 		if t.Diagnostic != nil {
 			printAttemptDiagnostic(out, *t.Diagnostic, "  ")
 		}

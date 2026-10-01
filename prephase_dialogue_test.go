@@ -264,7 +264,7 @@ func TestPreparationDeterministicActionsDoNotInvokeProvider(t *testing.T) {
 	// Catalogue and capability inspection, document mutations, adoption and
 	// validation are local operations. Only sendPreparation followed by the
 	// runtime is allowed to execute the configured provider.
-	if len(s.preparationMethods()) != 3 || len(s.preparationCapabilities()) != 1 {
+	if len(s.preparationMethods()) != 4 || len(s.preparationCapabilities()) != 1 {
 		t.Fatal("catalogue or capability unavailable")
 	}
 	p := prepCreate(t, s)
@@ -299,6 +299,7 @@ func TestPreparationMethodCatalogueStaysInPrephase(t *testing.T) {
 		"apex":       "Analyze,Plan",
 		"ks-feature": "Cadrage,Plan",
 		"audit-pdca": "Plan",
+		"debug":      "Diagnostic,Plan",
 	}
 	methods := s.preparationMethods()
 	if len(methods) != len(want) {

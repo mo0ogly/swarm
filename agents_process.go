@@ -340,6 +340,13 @@ func (s *Store) supervise(id string) error {
 	signals := make(chan os.Signal, 2)
 	signal.Notify(signals, syscall.SIGTERM, syscall.SIGINT)
 	defer signal.Stop(signals)
+	if a.Role == "worker" {
+		context, contextErr := s.workerRecoveryForAgent(a)
+		if contextErr != nil {
+			return s.finishAgent(a, "failed", "Contexte de reprise inaccessible : "+contextErr.Error(), nil)
+		}
+		a.Prompt += context
+	}
 	cmd := exec.Command(a.Command, a.Args...)
 	cmd.Dir = a.CWD
 	cmd.Env = providerEnvironment(a.Env)
@@ -368,6 +375,9 @@ func (s *Store) supervise(id string) error {
 		return e
 	}
 	_ = s.log(id, "lifecycle", "Processus fournisseur démarré")
+	if limits.observing() {
+		_ = s.log(id, "limits", "Mode observation autorisé : plafonds d’exécution désactivés ; compteurs conservés ; arrêt manuel disponible")
+	}
 	_ = s.log(id, "limits", fmt.Sprintf("Limites : durée %ds ; silence %ds ; outil observable %ds ; appels %d ; répétitions %d ; erreurs consécutives %d", a.Timeout, limits.SilenceSeconds, limits.ToolSeconds, limits.MaxToolCalls, limits.MaxRepeatedCalls, limits.MaxConsecutiveErrors))
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait() }()
@@ -445,7 +455,7 @@ func (s *Store) supervise(id string) error {
 			if reason := sink.guardReason(); reason != "" {
 				requestStop(reason, "garde")
 			}
-			if time.Now().After(deadline) {
+			if !limits.observing() && time.Now().After(deadline) {
 				requestStop("Budget de temps atteint", "delai")
 			}
 			if stopping && time.Since(stopAt) > 3*time.Second && !forced {

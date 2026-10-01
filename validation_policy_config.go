@@ -101,8 +101,8 @@ func (s *Store) previewValidationPolicy(work string, change ValidationPolicyChan
 	if err != nil {
 		return preview, err
 	}
-	if t.Status != "todo" && t.Status != "blocked" {
-		return preview, fmt.Errorf("configurer les validations exige une tâche à faire ou bloquée ; rouvrir la tâche au préalable")
+	if t.Status != "todo" && t.Status != "blocked" && t.Status != "submitted" {
+		return preview, fmt.Errorf("configurer les validations exige une tâche à faire, bloquée ou à vérifier ; rouvrir la tâche au préalable")
 	}
 	mode := "none"
 	if change.Policy != nil {
@@ -132,7 +132,7 @@ func (s *Store) previewValidationPolicy(work string, change ValidationPolicyChan
 		}
 		preview.Criteria = append(preview.Criteria, ValidationCriterionPreview{Index: i + 1, Text: text, ControlIDs: covered[i+1], Review: review})
 	}
-	if s.paused(work) && mode == "automatic" {
+	if s.paused(work) && len(preview.Controls) > 0 {
 		preview.Warnings = append(preview.Warnings, "La mission est en pause : les contrôles automatiques resteront suspendus jusqu’à une reprise explicite.")
 	}
 	switch {
@@ -140,6 +140,9 @@ func (s *Store) previewValidationPolicy(work string, change ValidationPolicyChan
 		preview.Confirmation = "Retirer la politique et revenir à la revue humaine sans exécuter de contrôle."
 	case mode == "human":
 		preview.Confirmation = "Enregistrer la revue humaine pour tous les critères."
+		if len(preview.Controls) > 0 {
+			preview.Confirmation = "Exécuter les contrôles autorisés comme preuves ; aucune acceptation automatique. La décision humaine reste obligatoire."
+		}
 	default:
 		preview.Confirmation = "Préautoriser exactement les contrôles affichés ; ils ne pourront valider que cette tâche, sous autorisation de mission active."
 	}
@@ -175,8 +178,11 @@ func (s *Store) applyValidationPolicy(work string, change ValidationPolicyChange
 		if findErr != nil {
 			return findErr
 		}
-		if t.Status != "todo" && t.Status != "blocked" {
-			return fmt.Errorf("la tâche doit être à faire ou bloquée")
+		if t.Status != "todo" && t.Status != "blocked" && t.Status != "submitted" {
+			return fmt.Errorf("la tâche doit être à faire, bloquée ou à vérifier")
+		}
+		if t.IndependentReview != nil && t.IndependentReview.State == "running" {
+			return fmt.Errorf("attendre la fin de la revue avant de modifier la politique")
 		}
 		if normalized.Policy != nil {
 			if coverErr := validationPolicyCoversTask(*normalized.Policy, t); coverErr != nil {
@@ -190,6 +196,7 @@ func (s *Store) applyValidationPolicy(work string, change ValidationPolicyChange
 			policy.Authorized, policy.Actor = now(), operatorIdentity()
 			t.ValidationPolicy = &policy
 		}
+		archiveIndependentReview(t)
 		t.Gate, t.AutoValidation, t.Override, t.Revalidation = nil, nil, nil, nil
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error { return validationPolicyChangeGuard(tx, work, change.TaskID) })

@@ -250,9 +250,10 @@ func TestMissionStatusCLIPrintsSameUnderstanding(t *testing.T) {
 	}
 	text := out.String()
 	for _, expected := range []string{
-		"Mission\n  Ce qui se passe : " + d.Understanding.What,
-		"  Prochaine étape : " + d.Understanding.NextStep,
-		"  Qui agit : " + d.Understanding.Actor,
+		"Mission\nLa mission en bref\n" + d.Guidance.What,
+		d.Guidance.Actor + " — " + d.Guidance.Next,
+		"Action principale : " + d.Guidance.Primary.Label,
+		"Effet : " + d.Guidance.Primary.Effect,
 		"Tâche — " + d.Tasks[0].Title,
 		"  Ce qui se passe : " + d.Tasks[0].Understanding.What,
 		"  Prochaine étape : " + d.Tasks[0].Understanding.NextStep,

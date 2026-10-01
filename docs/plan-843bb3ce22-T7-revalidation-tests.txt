@@ -1,0 +1,20 @@
+PASS prerequisites
+COMMAND ['go', 'build', '-o', '/tmp/swarm-t7-check-vzr0oucr/swarm', '.']
+COMMAND ['node', 'tests/prelaunch_diagnostic_ui.cjs', '/tmp/swarm-t7-check-vzr0oucr/swarm', '/home/fpizzi/workspace/swarm-engine-contract/source/test-results/t7-engine']
+Résumé initial : limites par défaut et 3 prérequis manquants affichés (REQ-SUM-01)
+Limites effectives suivent les plafonds saisis sans relance manuelle (REQ-SUM-01)
+Rôles et modèles effectifs résolus ; prérequis restant = prévol uniquement (REQ-SUM-01)
+Prérequis manquants vides après prévol exploitable (REQ-SUM-01)
+Détails techniques dans une modale, Échap/focus corrects ; contrôles manquants signalés avant autorisation
+Textes du résumé traduits en anglais sans changer la structure de l’écran (req-22)
+English preflight: short explanation, translated details dialog and focus restored
+Diagnostic copié en français : cause, tentative, version, action ; ni URL ni chemin d’espace de travail (req-21)
+Copie : champs libres hostiles, secret, URL et catégorie inconnue exclus ; texte issu du catalogue seulement
+Diagnostic copié en anglais avec les mêmes garanties (req-21, req-22)
+Refus du presse-papiers : erreur explicite, aucun faux succès
+PASS T7 pre-launch summary and copyable diagnostic (FR/EN, both themes)
+COMMAND ['node', 'tests/i18n_test.cjs']
+PASS i18n locale, fallback, interpolation, engine formats and catalogue parity
+PASS fresh source-bound browser checks and fourteen screenshots; clipboard OS boundary mocked
+PASS report presence; qualitative independent review remains required
+PASS T7 all

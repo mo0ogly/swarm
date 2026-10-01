@@ -1,0 +1,216 @@
+{
+  "work": "w-843bb3ce22cff2965c5e77b6",
+  "task": "plan-843bb3ce22-T8",
+  "attempt": "a-0978abf2bb9d55b0bb8c9fa6",
+  "independent_review": {
+    "report_artifacts": {
+      ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json": "2b6b3d92d8b30e8ecd463eabf8f6592df43d44c667947c58ca96d3d3aa5e3bf3",
+      "INSTALL.md": "c590a46770296086e94ec275719b122cc52bc63cc56809209aab07fee1157023",
+      "docs/T8-install-illustre.md": "3900fe80912c09939e8633ab23bed185db07abca144487754dd0bdd9a366a457",
+      "docs/en/INSTALL.md": "90e6f4bcdeaae84cfa9cb7816ae6c1d04309b15e8ddb215a2ca196fd7930f1de",
+      "docs/plan-843bb3ce22-T8-visual-review.json": "d5686174aad24962dae82324019f8ad67a448a0cfcbd5b4bd9a7504fa87b6c30",
+      "docs/plan-843bb3ce22-T8.md": "202622f08cc700ceda56a195b21ab2f727e9112a85a30423fefa958f6785169c",
+      "docs/screenshots/connexion.png": "8c3c35786d543231d0a3d1954f40e834f898bbfa74be1f935131ebf2c8a20e6f",
+      "docs/screenshots/en/connexion.png": "ab1649d8f983c4f6178d4c5853f7a6d2fa1a718f297327738ce413a4d24b9f5e",
+      "docs/screenshots/installation/admin-en-etat.png": "c1d378f7577c037d3158ee76331988bd405a9afb1b70864242ef982283019797",
+      "docs/screenshots/installation/admin-en-sombre.png": "3cc26331f3f1545489df6c95bdaccc62b6776cffdb9605bbc0b38110c4dff23e",
+      "docs/screenshots/installation/admin-fr-etat.png": "c85eb915eb5d1f455947c282cdd2243d7d1bb809213c432ae468c3951ea213ef",
+      "docs/screenshots/installation/admin-fr-sombre.png": "2dc8dd46ac4d3217f48d248aa2ca77c22e3fd6498642ab041835d4f6fd079e68",
+      "docs/screenshots/installation/admin-saved-en-etat.png": "6804f9f4f0f56cd0cecf710700c73440c4c6491de44b046687ab974bdd26d99e",
+      "docs/screenshots/installation/admin-saved-en-sombre.png": "10e19be2449a6aa46275a50e974808aa5f8c3adae47b25bfe8700396d513d5bd",
+      "docs/screenshots/installation/admin-saved-fr-etat.png": "3b4bac2055c3b2eef0ac75c20ffbc91a8a721ca2a94bce2dad7c644f2a0ee4db",
+      "docs/screenshots/installation/admin-saved-fr-sombre.png": "ad6c543c90a0c347cfa0c86510fd9ab964f00c3fe17c0179a22d00d0faf2a376",
+      "docs/screenshots/installation/diagnostic-en-etat.png": "a3958e9f31a8c4ea5ff6fa78659b6b0309e63ba735de7529d08ba5e5aaa111ca",
+      "docs/screenshots/installation/diagnostic-fr-etat.png": "379651de02625dda15ea517e449edec4112b9967ce0d2d3b6fe9a6bc1fe8868b",
+      "docs/screenshots/installation/mission-lancee-fr.png": "cc00614be99096b57ef22f6ec712b995f96636026a5351fc73c7ac3ac322c819",
+      "docs/screenshots/installation/preflight-details-en-sombre.png": "42443f5a84284717665826710b4548f7b24bf59d45764744241cebe92feb027b",
+      "docs/screenshots/installation/preflight-details-fr-sombre.png": "b3b141054d142e8463f246384827d544a5c21a5f2bb56e09137f8a09ee28c6a2",
+      "docs/screenshots/installation/summary-en-etat.png": "30a54b451fc15dbaeff5de1c4e98f3dfc43433479ef172517e62779f5d78f042",
+      "docs/screenshots/installation/summary-fr-etat.png": "ea705fa6fbfea0bb2077bf05e7bb99e3914b4dc1adf6ca7ac4fdfb1ddc14616f",
+      "tools/verification/t8_docs.py": "e561d07127808ed33e91049bcc856ead714de241ae83f8c18ed792b4cc0ec0cc",
+      "tools/verification/t8_saved_config_shots.cjs": "7e41763603725386947d4de50509d82e48bcc071abefb579d004d740d879905b"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "claude-sonnet-5-5",
+      "effort": "",
+      "billing": "external",
+      "policy_hash": "5df85e5d7681717e295ac45c6b7093bef8196a2d027f0457b0721e592634f606",
+      "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+    },
+    "timeout_seconds": 300,
+    "workflow": {
+      "version": 1,
+      "role": "reviewer",
+      "methods": [
+        "audit-pdca",
+        "code-reviewer"
+      ],
+      "sha256": "3210ccc9ec754961397f04faaee25b17830e1a178ad246f84888a7ac2728f1f2"
+    },
+    "id": "review-3e79049c9dda0a8147ca7b82",
+    "attempt": "a-0978abf2bb9d55b0bb8c9fa6",
+    "producer": "auto-a03203a46a39674502a6",
+    "reviewer": "reviewer://claude",
+    "report": "docs/plan-843bb3ce22-T8.md",
+    "sha256": "202622f08cc700ceda56a195b21ab2f727e9112a85a30423fefa958f6785169c",
+    "contract": "fa34870a82e7fda3c5a343a5f97f3e45fe96fe6cbb243b822442ebf628a08be0",
+    "state": "passed",
+    "reason": "Aucune commande lancée ; jugement sur le diff fourni, les contrôles moteur et l'observation des pixels des captures. Critère 1 : les guides FR et EN ajoutent un tableau des trois états avec légendes, cohérent avec les captures (formulaires remplis, révision 1 enregistrée, mission lancée). La capture de lancement n'existe qu'en français, signalée « French UI » dans la légende EN ; le critère n'exige pas de version EN. Critère 2 : le diff est +37/0 par guide ; le contrôle moteur t8-install-evidence (code 0) vérifie la conservation de chaque ligne d'origine. Critère 3 : la section « Erreurs rencontrées et résolution » liste six erreurs avec leur résolution. Critère 4 : aucune clé ni aucun jeton visible ; le champ de clé est vide ; seuls apparaissent localhost, le hachage de version et l'auteur local fpizzi/uid:1001. Le contrôle moteur ne juge pas les pixels, donc ce point repose sur l'examen visuel. Écart mineur de formulation sur l'« aperçu » de la ligne « formulaire rempli ».",
+    "criteria": [
+      {
+        "index": 1,
+        "verdict": "pass",
+        "evidence": "| Lancement effectif | Tâche en cours, tentative active dans le pilotage | Un agent a démarré ; ni résultat, ni acceptation | `mission-lancee-fr.png` |"
+      },
+      {
+        "index": 2,
+        "verdict": "pass",
+        "evidence": "chaque ligne initiale est conservée dans l’ordre, diff +37/0 dans chaque guide"
+      },
+      {
+        "index": 3,
+        "verdict": "pass",
+        "evidence": "+## Erreurs rencontrées et résolution"
+      },
+      {
+        "index": 4,
+        "verdict": "pass",
+        "evidence": "aucune clé, jeton d’accès ou URL de session visible"
+      }
+    ],
+    "started": "2026-09-30T15:29:12.001453215Z",
+    "finished": "2026-09-30T15:29:31.642423168Z",
+    "usage": {
+      "cache_read_input_tokens": 5243,
+      "cache_creation_input_tokens": 49484,
+      "provider_reported_cost_usd": 0.4452286,
+      "input_tokens": 2,
+      "output_tokens": 2415,
+      "source": "événement fournisseur result",
+      "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+      "at": "2026-09-30T15:29:31.310064143Z"
+    }
+  },
+  "engine_controls": {
+    "attempt_id": "a-0978abf2bb9d55b0bb8c9fa6",
+    "revision": 250,
+    "candidate_sha": "",
+    "producer_agent_id": "auto-a03203a46a39674502a6",
+    "controller": "controller://swarm-validation",
+    "policy_digest": "cb87b06eb557c2aacbe0fe3155cd3911cdabf0cca0e227d8e368ddee55a77d02",
+    "policy": {
+      "mode": "human",
+      "controls": [
+        {
+          "inputs": [
+            "tools/verification/t8_docs.py",
+            "tools/verification/t8_saved_config_shots.cjs",
+            "INSTALL.md",
+            "docs/en/INSTALL.md",
+            "docs/plan-843bb3ce22-T8-visual-review.json",
+            "docs/screenshots/connexion.png",
+            "docs/screenshots/en/connexion.png",
+            "docs/screenshots/installation/mission-lancee-fr.png",
+            "docs/screenshots/installation/admin-fr-etat.png",
+            "docs/screenshots/installation/admin-fr-sombre.png",
+            "docs/screenshots/installation/admin-en-etat.png",
+            "docs/screenshots/installation/admin-en-sombre.png",
+            "docs/screenshots/installation/admin-saved-fr-etat.png",
+            "docs/screenshots/installation/admin-saved-fr-sombre.png",
+            "docs/screenshots/installation/admin-saved-en-etat.png",
+            "docs/screenshots/installation/admin-saved-en-sombre.png",
+            "docs/screenshots/installation/summary-fr-etat.png",
+            "docs/screenshots/installation/summary-en-etat.png",
+            "docs/screenshots/installation/preflight-details-fr-sombre.png",
+            "docs/screenshots/installation/preflight-details-en-sombre.png",
+            "docs/screenshots/installation/diagnostic-fr-etat.png",
+            "docs/screenshots/installation/diagnostic-en-etat.png"
+          ],
+          "id": "t8-install-evidence",
+          "command": [
+            "python3",
+            "tools/verification/t8_docs.py"
+          ],
+          "criteria": [
+            1,
+            2
+          ],
+          "justification": "Conservation de chaque ligne des guides d’origine, liens des 17 images et empreintes de leur revue visuelle, rejeu navigateur isolé de l’enregistrement FR/EN et lecture de la révision 1 par le CLI. Le contrôle ne juge pas les pixels : la revue des secrets reste qualitative.",
+          "dir": ".",
+          "timeout_seconds": 300
+        }
+      ],
+      "authorized_at": "2026-09-30T15:21:20.633375835Z",
+      "actor": "fpizzi/uid:1001"
+    },
+    "artifacts": {
+      ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json": "2b6b3d92d8b30e8ecd463eabf8f6592df43d44c667947c58ca96d3d3aa5e3bf3",
+      "INSTALL.md": "c590a46770296086e94ec275719b122cc52bc63cc56809209aab07fee1157023",
+      "docs/en/INSTALL.md": "90e6f4bcdeaae84cfa9cb7816ae6c1d04309b15e8ddb215a2ca196fd7930f1de",
+      "docs/plan-843bb3ce22-T8-visual-review.json": "d5686174aad24962dae82324019f8ad67a448a0cfcbd5b4bd9a7504fa87b6c30",
+      "docs/plan-843bb3ce22-T8.md": "202622f08cc700ceda56a195b21ab2f727e9112a85a30423fefa958f6785169c",
+      "docs/screenshots/connexion.png": "8c3c35786d543231d0a3d1954f40e834f898bbfa74be1f935131ebf2c8a20e6f",
+      "docs/screenshots/en/connexion.png": "ab1649d8f983c4f6178d4c5853f7a6d2fa1a718f297327738ce413a4d24b9f5e",
+      "docs/screenshots/installation/admin-en-etat.png": "c1d378f7577c037d3158ee76331988bd405a9afb1b70864242ef982283019797",
+      "docs/screenshots/installation/admin-en-sombre.png": "3cc26331f3f1545489df6c95bdaccc62b6776cffdb9605bbc0b38110c4dff23e",
+      "docs/screenshots/installation/admin-fr-etat.png": "c85eb915eb5d1f455947c282cdd2243d7d1bb809213c432ae468c3951ea213ef",
+      "docs/screenshots/installation/admin-fr-sombre.png": "2dc8dd46ac4d3217f48d248aa2ca77c22e3fd6498642ab041835d4f6fd079e68",
+      "docs/screenshots/installation/admin-saved-en-etat.png": "6804f9f4f0f56cd0cecf710700c73440c4c6491de44b046687ab974bdd26d99e",
+      "docs/screenshots/installation/admin-saved-en-sombre.png": "10e19be2449a6aa46275a50e974808aa5f8c3adae47b25bfe8700396d513d5bd",
+      "docs/screenshots/installation/admin-saved-fr-etat.png": "3b4bac2055c3b2eef0ac75c20ffbc91a8a721ca2a94bce2dad7c644f2a0ee4db",
+      "docs/screenshots/installation/admin-saved-fr-sombre.png": "ad6c543c90a0c347cfa0c86510fd9ab964f00c3fe17c0179a22d00d0faf2a376",
+      "docs/screenshots/installation/diagnostic-en-etat.png": "a3958e9f31a8c4ea5ff6fa78659b6b0309e63ba735de7529d08ba5e5aaa111ca",
+      "docs/screenshots/installation/diagnostic-fr-etat.png": "379651de02625dda15ea517e449edec4112b9967ce0d2d3b6fe9a6bc1fe8868b",
+      "docs/screenshots/installation/mission-lancee-fr.png": "cc00614be99096b57ef22f6ec712b995f96636026a5351fc73c7ac3ac322c819",
+      "docs/screenshots/installation/preflight-details-en-sombre.png": "42443f5a84284717665826710b4548f7b24bf59d45764744241cebe92feb027b",
+      "docs/screenshots/installation/preflight-details-fr-sombre.png": "b3b141054d142e8463f246384827d544a5c21a5f2bb56e09137f8a09ee28c6a2",
+      "docs/screenshots/installation/summary-en-etat.png": "30a54b451fc15dbaeff5de1c4e98f3dfc43433479ef172517e62779f5d78f042",
+      "docs/screenshots/installation/summary-fr-etat.png": "ea705fa6fbfea0bb2077bf05e7bb99e3914b4dc1adf6ca7ac4fdfb1ddc14616f",
+      "tools/verification/t8_docs.py": "e561d07127808ed33e91049bcc856ead714de241ae83f8c18ed792b4cc0ec0cc",
+      "tools/verification/t8_saved_config_shots.cjs": "7e41763603725386947d4de50509d82e48bcc071abefb579d004d740d879905b"
+    },
+    "controls": [
+      {
+        "id": "t8-install-evidence",
+        "command": [
+          "python3",
+          "tools/verification/t8_docs.py"
+        ],
+        "executed": true,
+        "passed": true,
+        "exit_code": 0,
+        "output_sha256": "77f4aba827cbd699786fa8e1b45200fdfaa3be68840ccdc6db64cc907191a327",
+        "summary": "contrôle réussi",
+        "started_at": "2026-09-30T15:28:56.42774948Z",
+        "finished_at": "2026-09-30T15:29:11.070634939Z"
+      }
+    ],
+    "receipt": ".swarm/validation/w-843bb3ce22cff2965c5e77b6/plan-843bb3ce22-T8/a-0978abf2bb9d55b0bb8c9fa6.json",
+    "state": "pending_human",
+    "reason": "Contrôles disponibles ; décision humaine requise.",
+    "at": "2026-09-30T15:29:11.078357927Z"
+  },
+  "dependencies": [
+    {
+      "id": "plan-843bb3ce22-T3",
+      "status": "accepted"
+    },
+    {
+      "id": "plan-843bb3ce22-T4",
+      "status": "accepted"
+    },
+    {
+      "id": "plan-843bb3ce22-T5",
+      "status": "accepted"
+    },
+    {
+      "id": "plan-843bb3ce22-T6",
+      "status": "accepted"
+    },
+    {
+      "id": "plan-843bb3ce22-T7",
+      "status": "accepted"
+    }
+  ]
+}

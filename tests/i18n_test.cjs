@@ -22,3 +22,7 @@ for(const [source,target]of Object.entries(catalog)){
 const generated={};vm.runInNewContext(fs.readFileSync('web/i18n-en.js','utf8'),generated);
 assert.equal(JSON.stringify(generated.SwarmEnglish),JSON.stringify(catalog),'rebuild the web catalogue');
 console.log('PASS i18n locale, fallback, interpolation, engine formats and catalogue parity');
+// Missing task fields must be localized without rewriting user text.
+const graphContext={SwarmI18n:api,module:{exports:{}}};
+vm.runInNewContext(fs.readFileSync('web/pilot-graph.js','utf8'),graphContext);
+assert.equal(graphContext.module.exports.guidance({}), 'Complete: deliverable, success criterion, instructions');

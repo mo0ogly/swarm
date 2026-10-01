@@ -264,12 +264,29 @@ func (s *Store) submitReportVerified(work, id, report string, expected int, orig
 	if expected >= 0 && w.Revision != expected {
 		return &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; relire avant soumission.", Retryable: true}
 	}
+	agents, e := s.agents(work)
+	if e != nil {
+		return e
+	}
+	current, e := w.task(id)
+	if e != nil {
+		return e
+	}
+	legacyReport, repairable := s.legacyReportSubmission(work, current, agents)
 	r := Request{Schema: 1, EventID: event, Revision: w.Revision, ID: id, Status: "submitted", Origin: origin, Next: "Évaluer les preuves et la gate delivery ; handoff : " + report}
 	raw, _ := json.Marshal(r)
 	_, e = s.mutate(work, "task.submit", r.EventID, r.Revision, raw, func(w *Work) error {
 		t, e := w.task(id)
 		if e != nil {
 			return e
+		}
+		if repairable && legacyReport == report {
+			// Preserve the erroneous record and the original event; no produced
+			// attempt or consumed reviewer call is removed or refunded.
+			t.LegacyReportSubmissions = append(t.LegacyReportSubmissions, t.Attempts[len(t.Attempts)-1])
+			t.Attempts = t.Attempts[:len(t.Attempts)-1]
+			t.Status, t.Blocker, t.Next = "submitted", "", r.Next
+			return nil
 		}
 		if t.Status != "blocked" && t.Status != "todo" {
 			return fmt.Errorf(
@@ -324,6 +341,34 @@ func (s *Store) submitReportVerified(work, id, report string, expected int, orig
 			}
 			t.Status, t.Blocker, t.Next = "submitted", "", r.Next
 			return nil
+		}
+		if len(t.Attempts) > 0 {
+			current := t.Attempts[len(t.Attempts)-1]
+			for _, a := range agents {
+				if a.TaskID == id && a.Attempt == current.ID && a.Status == "completed" && current.Status == "completed" {
+					proven, why := s.provenAttemptReport(a)
+					if proven != report && w.Planning != nil {
+						return fmt.Errorf("rapport non attribuable à la tentative courante : %s", why)
+					}
+					if review := t.IndependentReview; review != nil && w.Planning != nil && w.Planning.Repository == nil && review.Attempt == current.ID {
+						if review.State == "running" {
+							return fmt.Errorf("Vérification en cours ; attendre son résultat avant une nouvelle soumission.")
+						}
+						if review.State == "changes_requested" {
+							updated, err := os.ReadFile(path)
+							if err != nil {
+								return err
+							}
+							if review.Report != report || review.Digest == "" || hash(updated) == review.Digest {
+								return fmt.Errorf("Rapport refusé inchangé ; compléter les corrections et les preuves avant de soumettre à nouveau.")
+							}
+							archiveIndependentReview(t)
+						}
+					}
+					t.Status, t.Blocker, t.Next = "submitted", "", r.Next
+					return nil
+				}
+			}
 		}
 		if e = s.apply(w, "task.update", Request{ID: id, Status: "running", Origin: origin, Next: "Handoff examiné : " + report}); e != nil {
 			return e
