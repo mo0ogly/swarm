@@ -28,13 +28,14 @@ jobs:
       - run: python3 tools/check_distribution.py
       - run: python3 tools/agent-workflows/check.py
       - run: bash -n install.sh && sh -n deploy/entrypoint.sh
+      - run: make build
+      - run: npm run test:action-skills
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - run: go vet ./...
       - run: go test -timeout 25m ./...
       - run: npm test
       - run: make smoke
-      - run: npm run test:action-skills
-        env:
-          CHROME_BIN: /usr/bin/google-chrome
       - run: npm run test:i18n-ui
         env:
           CHROME_BIN: /usr/bin/google-chrome
