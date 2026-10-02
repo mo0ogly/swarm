@@ -334,6 +334,11 @@ func (s *Store) supervise(id string) error {
 		a.StopKind = "provider_quota"
 		return s.finishAgent(a, "failed", e.Error(), nil)
 	}
+	if a.Workflow != nil {
+		if e = s.projectContextGuard(a.Workflow.Project, a.Role); e != nil {
+			return s.finishAgent(a, "failed", e.Error(), nil)
+		}
+	}
 	if interactiveMode(a.Mode) {
 		return s.superviseTerminal(a)
 	}

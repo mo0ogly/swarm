@@ -338,7 +338,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		return s.finishManagedFragmentReview(w.ID, a, record.ID, runErr)
 	}
 	data, _ := json.Marshal(context)
-	workflow, workflowPrompt, e := agentWorkflow("reviewer")
+	workflow, workflowPrompt, e := s.projectAgentWorkflow("reviewer")
 	if e != nil {
 		return e
 	}

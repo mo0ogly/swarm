@@ -106,7 +106,7 @@ func (s *Store) diagnoseManagedFragmentReview(work string, req PlanningRequest) 
 		}
 		sources = append(sources, src)
 	}
-	_, method, e := agentWorkflow("reviewer")
+	_, method, e := s.projectAgentWorkflow("reviewer")
 	if e != nil {
 		return Work{}, e
 	}

@@ -126,6 +126,15 @@ func (s *Store) independentReviewGuardVersion(w *Work, t *Task, historical bool)
 	if r == nil || r.State != "passed" {
 		return fmt.Errorf("vérification IA indépendante requise avant acceptation")
 	}
+	var project *ProjectContext
+	if r.Workflow != nil {
+		project = r.Workflow.Project
+	}
+	if !historical {
+		if err := s.projectContextGuard(project, "reviewer"); err != nil {
+			return err
+		}
+	}
 	if len(t.Attempts) == 0 || r.Attempt != t.Attempts[len(t.Attempts)-1].ID || r.Contract != reviewContract(t) {
 		return fmt.Errorf("vérification IA périmée : tentative ou consigne modifiée")
 	}

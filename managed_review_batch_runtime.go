@@ -404,7 +404,7 @@ func (s *Store) managedBatchPlanIntactVersion(w Work, r IndependentReview, histo
 	if e != nil {
 		return e
 	}
-	workflow, prompt, e := agentWorkflow("reviewer")
+	workflow, prompt, e := s.projectAgentWorkflow("reviewer")
 	if e != nil {
 		return e
 	}

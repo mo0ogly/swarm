@@ -30,7 +30,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 	if err != nil {
 		return "", nil, err
 	}
-	_, method, err := agentWorkflow("reviewer")
+	_, method, err := s.projectAgentWorkflow("reviewer")
 	if err != nil {
 		return "", nil, err
 	}

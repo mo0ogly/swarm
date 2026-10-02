@@ -390,3 +390,7 @@ nouvelles captures de clôture montrent une autre étape du même parcours ; ell
 ne transforment pas ces tests isolés en preuve de succès de tous les fournisseurs.
 
 Pour une reprise ou un conflit de révision, consultez les [conditions du moteur](docs/ENGINE-RECOVERY.md).
+
+## Consignes du projet cible
+
+Après installation, configurez les règles transmises aux agents depuis la racine du projet cible : [profil par rôle](docs/PROJECT-PROFILE.md). Cette configuration ne lance aucune mission.

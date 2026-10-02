@@ -52,7 +52,7 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 			}
 		}
 	}
-	workflow, prompt, err := agentWorkflow("reviewer")
+	workflow, prompt, err := s.projectAgentWorkflow("reviewer")
 	if err != nil {
 		return p, j, err
 	}

@@ -142,6 +142,55 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 		}
 		send(w, v)
 	})
+	mux.HandleFunc("/api/v1/project-profile/catalog", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		v, e := s.projectProfileCatalog()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/project-profile/select", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var request struct {
+			ID       string `json:"id"`
+			Expected string `json:"expected_sha256"`
+		}
+		body, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 16384))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if e := strict(body, &request); e != nil {
+			fail(w, e)
+			return
+		}
+		v, e := s.selectProjectProfile(request.ID, request.Expected)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/project-profile", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		v, e := s.projectProfileStatus()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
 	mux.HandleFunc("/api/v1/preparations/methods", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			w.WriteHeader(405)

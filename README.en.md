@@ -192,3 +192,7 @@ Methods provide a shared approach with criteria and evidence; executable engine 
 | Explain outcomes and prioritize improvements | Lessons learned |
 
 The specification methods cover both requirements writing and plan examination. See the [method guide](docs/en/AGENT-METHODS.md) for actual preparation choices and native-session commands; not every method is a web button.
+
+### Project instructions
+
+Pass repository rules to each role with an explicit project profile. [Configuration and boundaries](docs/en/PROJECT-PROFILE.md).

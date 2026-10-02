@@ -284,3 +284,7 @@ racine clôturée. Les livrables, avis et coûts restent consultables.
 ![Mission clôturée dans le cockpit](docs/screenshots/mission-complete-fr.png)
 
 *Recette réelle à 8/8, avec interventions humaines. Voir le [guide utilisateur](GUIDE-UTILISATEUR.md#lire-les-compteurs-et-reconnaître-la-fin) et les [reprises du moteur](docs/ENGINE-RECOVERY.md).*
+
+### Consignes du projet
+
+Transmettez les règles du dépôt à chaque rôle avec un profil de projet explicite. [Configuration et limites](docs/PROJECT-PROFILE.md).

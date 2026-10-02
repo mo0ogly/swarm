@@ -80,7 +80,7 @@ func (s *Store) planningStep(work string) error {
 	if err = s.providerCooldownGuard(p.Provider); err != nil {
 		return err
 	}
-	workflow, workflowPrompt, err := agentWorkflow(planningWorkflowRole(scope))
+	workflow, workflowPrompt, err := s.projectAgentWorkflow(planningWorkflowRole(scope))
 	if err != nil {
 		return err
 	}

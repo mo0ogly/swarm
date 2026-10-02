@@ -761,7 +761,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e = s.recheckPreflight(preflight, r.Provider, p, cwd, r); e != nil {
 		return a, false, e
 	}
-	workflow, workflowPrompt, e := agentWorkflow(r.Role)
+	workflow, workflowPrompt, e := s.projectAgentWorkflow(r.Role)
 	if e != nil {
 		return a, false, e
 	}

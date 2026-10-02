@@ -94,7 +94,7 @@ func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, 
 		if err != nil {
 			return p, err
 		}
-		_, method, err := agentWorkflow("reviewer")
+		_, method, err := s.projectAgentWorkflow("reviewer")
 		if err != nil {
 			return managedReviewFragmentPlan{}, err
 		}
@@ -122,7 +122,7 @@ func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, 
 	if err != nil {
 		return p, err
 	}
-	_, method, err := agentWorkflow("reviewer")
+	_, method, err := s.projectAgentWorkflow("reviewer")
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
 	}

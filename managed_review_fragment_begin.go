@@ -37,7 +37,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	if err != nil {
 		return empty, err
 	}
-	workflow, method, err := agentWorkflow("reviewer")
+	workflow, method, err := s.projectAgentWorkflow("reviewer")
 	if err != nil {
 		return empty, err
 	}
