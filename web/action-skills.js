@@ -13,7 +13,7 @@ const ProjectSkills={
   host.append(node('p',this.tr('Choisissez les méthodes utiles à cette action. Aucun script ni permission supplémentaire n’est activé.')));
   const state=node('p',this.tr('Chargement des skills…'),'notice info');state.setAttribute('role','status');host.append(state);
   const input=node('input');input.type='hidden';input.name='skills';input.value='[]';host.append(input);
-  $('modal-fields').append(host);context.skillLoading=true;
+  $('modal-fields').append(host);context.skillLoading=true;context.skillError=false;
   try{
    const data=await api('/api/v1/skills');if(modalContext!==context||!host.isConnected)return;
    const prior=context.action==='retry'?snapshot.agents.find(x=>x.agent.id===$('field-agent')?.value)?.agent?.workflow?.skills:context.data?.task?.launch_profile?.skills;
@@ -35,7 +35,7 @@ const ProjectSkills={
    $('field-agent')?.addEventListener('change',()=>{const prior=snapshot.agents.find(x=>x.agent.id===$('field-agent').value)?.agent?.workflow?.skills||[];const paths=new Set(prior.map(s=>s.path));for(const {box,item} of boxes)box.checked=item.available&&paths.has(item.path);update()});
    context.skillLoading=false;update();
    const role=$('field-role');const syncRole=()=>{host.hidden=!!role&&role.value!=='worker'};role?.addEventListener('change',syncRole);syncRole();
-  }catch(error){if(modalContext!==context)return;context.skillLoading=false;context.skillError=true;state.className='notice alert';state.textContent=error.message;}
+  }catch(error){if(modalContext!==context||!host.isConnected)return;context.skillLoading=false;context.skillError=true;state.className='notice alert';state.textContent=error.message;}
  }
 };
 globalThis.ProjectSkills=ProjectSkills;
