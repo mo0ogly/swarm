@@ -50,7 +50,7 @@ func (s *Store) readManagedFragmentFinal(r IndependentReview, p managedReviewFra
 	if err = strict(raw, &c); err != nil {
 		return empty, c, "", err
 	}
-	_, method, err := agentWorkflow("reviewer")
+	_, method, err := s.projectAgentWorkflow("reviewer")
 	if err != nil {
 		return empty, c, "", err
 	}

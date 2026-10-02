@@ -469,7 +469,7 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		if err := checkScopeActivation(p, scope.ID); err != nil {
 			return err
 		}
-		workflow, workflowPrompt, err := agentWorkflow(planningWorkflowRole(scope))
+		workflow, workflowPrompt, err := s.projectAgentWorkflow(planningWorkflowRole(scope))
 		if err != nil {
 			return err
 		}

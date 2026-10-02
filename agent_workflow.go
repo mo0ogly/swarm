@@ -14,10 +14,11 @@ import (
 var agentWorkflowFiles embed.FS
 
 type AgentWorkflow struct {
-	Version int      `json:"version"`
-	Role    string   `json:"role"`
-	Methods []string `json:"methods"`
-	SHA256  string   `json:"sha256"`
+	Project *ProjectContext `json:"project,omitempty"`
+	Version int             `json:"version"`
+	Role    string          `json:"role"`
+	Methods []string        `json:"methods"`
+	SHA256  string          `json:"sha256"`
 }
 
 // Frozen guidance, never an authorization or a verdict. Insert before task data.

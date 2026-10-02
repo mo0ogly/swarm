@@ -176,7 +176,7 @@ func (s *Store) independentReviewStep(work string) error {
 		if cfg.ModelRoute != nil && (route == nil || route.PolicyHash != cfg.ModelRoute.PolicyHash) {
 			return fmt.Errorf("politique du modèle du vérificateur modifiée")
 		}
-		workflow, workflowPrompt, e := agentWorkflow("reviewer")
+		workflow, workflowPrompt, e := s.projectAgentWorkflow("reviewer")
 		if e != nil {
 			return e
 		}

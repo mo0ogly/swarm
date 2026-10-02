@@ -18,7 +18,9 @@
     "test:role-models": "node tests/role_models_ui.cjs bin/swarm test-results/role-models",
     "test:admin": "node tests/run_limits_admin_ui.cjs bin/swarm test-results/admin",
     "test:quickwins": "node tests/quick_wins_ui.cjs bin/swarm test-results/quick-wins",
-    "test:planning-metrics": "node tests/planning_metrics_ui.cjs bin/swarm test-results/planning-metrics"
+    "test:planning-metrics": "node tests/planning_metrics_ui.cjs bin/swarm test-results/planning-metrics",
+    "test:project-profile": "node tests/project_profile_ui.cjs bin/swarm test-results/project-profile",
+    "test:project-profile-selection": "node tests/project_profile_selection_ui.cjs bin/swarm test-results/project-profile-selection"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

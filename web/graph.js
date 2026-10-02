@@ -83,7 +83,7 @@ function drawPilotGraph(){
  const links=(snapshot.pilotage?.edges||[]).filter(e=>ids.has(e.from_task_id)&&ids.has(e.to_task_id)&&!state.collapsed.includes(e.from_task_id));
  const organization=PilotGraph.organization(snapshot.work,kept,snapshot.paused);
  const shape=JSON.stringify([work,organization.nodes.map(n=>[n.id,n.title,n.tone]),organization.edges,kept.map(t=>[t.id,t.depends]),links.map(e=>[e.from_task_id,e.to_task_id]),state.orientation,state.detail,state.collapsed]);
- const height=state.detail==='detailed'?300:186,width=310;
+ const height=state.detail==='detailed'?324:210,width=310;
  if(shape!==Pilot.graphKey){
   Pilot.graphKey=shape;
   const focus=document.activeElement?.dataset.task,foldFocus=document.activeElement?.classList.contains('graph-fold'),goFocus=document.activeElement?.classList.contains('graph-go');
@@ -91,7 +91,7 @@ function drawPilotGraph(){
   const g=new dagre.graphlib.Graph();g.setGraph({rankdir:state.orientation,nodesep:28,ranksep:70,marginx:20,marginy:20});g.setDefaultEdgeLabel(()=>({}));
   for(const t of kept)g.setNode(t.id,{width,height});
   for(const e of links)g.setEdge(e.from_task_id,e.to_task_id);
-  for(const n of organization.nodes)g.setNode(n.id,{width,height:130});
+  for(const n of organization.nodes)g.setNode(n.id,{width,height:155});
   for(const e of organization.edges)g.setEdge(e.from,e.to);
   dagre.layout(g);
   // Independent tasks have no ranks: respect the explicitly chosen orientation.
@@ -112,10 +112,10 @@ function drawPilotGraph(){
    edge.dataset.from=e.from_task_id;edge.dataset.to=e.to_task_id;svg.append(edge);
   }
   for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
-  for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-65;
+  for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-77.5;
    const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;group.dataset.agentRole=n.role||n.kind;
-   group.append(svgNode('rect',{x:left,y:top,width,height:130,rx:12}));
-   for(let i=0;i<4;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
+   group.append(svgNode('rect',{x:left,y:top,width,height:155,rx:12}));
+   for(let i=0;i<5;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
    const open=()=>Planning.inspectRole(n.kind);group.addEventListener('click',e=>{if(e.isTrusted)open()});group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});svg.append(group);
   }
   const children=PilotGraph.children(tasks);
@@ -126,6 +126,7 @@ function drawPilotGraph(){
    group.append(svgNode('rect',{x:left,y:top,width,height,rx:12,class:'graph-cadre'}));
    group.append(svgNode('rect',{x:left+10,y:top+48,width:width-20,height:20,rx:4,class:'graph-role-surface'}));
    for(let line=0;line<(state.detail==='detailed'?10:5);line++)group.append(svgNode('text',{x:left+14,y:top+24+line*19,class:line===0?'graph-titre':line===1?'graph-sous-titre':'graph-agent','data-line':line}));
+   group.append(svgNode('rect',{x:left+10,y:top+height-88,width:width-20,height:20,rx:4,class:'graph-profile-surface'}),svgNode('text',{x:left+14,y:top+height-73,class:'graph-profile-text','data-profile-line':'true'}));
    const open=()=>Pilot.inspect('task',t.id);
    group.addEventListener('click',e=>{if(e.isTrusted)open()});
    group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});
@@ -152,10 +153,11 @@ function drawPilotGraph(){
  }
  const svg=canvas.querySelector('svg');if(!svg)return;
  scalePilotGraph(svg,state.zoom);
- for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=n.role==='subplanner'?[n.title,n.scopeLabel,n.description,n.detail]:[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
+ for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=n.role==='subplanner'?[n.title,n.scopeLabel,n.description,n.detail]:[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];lines.push(globalThis.ProjectProfiles?ProjectProfiles.summary(n.workflow):'');group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
  const byTask=graphAgentsParTache();
  for(const group of canvas.querySelectorAll('.graph-noeud')){
   const t=tasks.find(t=>t.id===group.dataset.task),v=snapshot.validation?.tasks[t.id],agent=byTask[t.id]?.[0]?.agent;
+  const profileText=group.querySelector('[data-profile-line]');if(profileText&&globalThis.ProjectProfiles){const profileAgent=agent||snapshot.agents.filter(x=>x.agent.task_id===t.id).sort((a,b)=>(b.agent.started||'').localeCompare(a.agent.started||''))[0]?.agent;const label=profileAgent?ProjectProfiles.summary(profileAgent.workflow):'▤ '+tr_web_graph_js('Profil non encore transmis');const profile=ProjectProfiles.describe(profileAgent?.workflow);profileText.dataset.profileFamily=profile.family;group.querySelector('.graph-profile-surface').dataset.profileFamily=profile.family;profileText.textContent=label.length>41?label.slice(0,40)+'…':label;profileText.setAttribute('aria-label',label);profileText.replaceChildren(document.createTextNode(profileText.textContent),svgNode('title',{},label));}
   const uncertain=Pilot.uncertainExecution(t,agent);
   group.dataset.etat=uncertain?'attention':graphTonalites[v?.state||t.status]||'neutre';
   group.dataset.selected=String(Pilot.selectedTask()===t.id);

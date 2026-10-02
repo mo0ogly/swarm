@@ -143,7 +143,7 @@ const Pilot = {
   const sig=JSON.stringify([organization.nodes,this.state.detail,this.state.grouped,entries.map(({t,a})=>[t.id,t.title,t.status,t.plan_role,t.launch_profile,t.deliverable,t.criteria,t.next,t.blocker,a?.role,this.goState(t),a?.id,a?.progress,snapshot.validation?.tasks[t.id]?.state,snapshot.pilotage?.health[a?.id]?.activity_label,graphCoutTache(t.id),snapshot.pilotage?.health[a?.id]?.process_label])]);
   if(sig===this.listKey)return;this.listKey=sig;
   const focused=document.activeElement?.dataset.pilotIdentity,host=$('pilot-list');host.replaceChildren();
-  for(const n of organization.nodes){const card=node('article',undefined,'team-role-card');card.dataset.tone=n.tone;card.dataset.responsibility=n.id;const open=this.command(n.title,()=>Planning.inspectRole(n.kind));open.id='list-role-'+encodeURIComponent(n.id);open.dataset.pilotIdentity=n.id;card.append(open,node('p',n.description),node('p',n.detail));host.append(card)}
+  for(const n of organization.nodes){const card=node('article',undefined,'team-role-card');card.dataset.tone=n.tone;card.dataset.responsibility=n.id;const open=this.command(n.title,()=>Planning.inspectRole(n.kind));open.id='list-role-'+encodeURIComponent(n.id);open.dataset.pilotIdentity=n.id;card.append(open,node('p',n.description),node('p',n.detail));if(globalThis.ProjectProfiles)card.append(ProjectProfiles.badge(n.workflow));host.append(card)}
   const groups=this.state.grouped?['En activité','À examiner','Historique','À préparer']:[''];
   for(const group of groups){
    const set=entries.filter(({t,a})=>!group||(a&&active(a)?'En activité':t.status==='submitted'||t.status==='blocked'?'À examiner':a?'Historique':'À préparer')===group);
@@ -152,7 +152,7 @@ const Pilot = {
    for(const {t,a}of set){
     const card=node('article',undefined,'pilot-card');card.dataset.state=this.uncertainExecution(t,a)?'stale':snapshot.validation?.tasks[t.id]?.state||t.status;
     const select=this.command(this.taskTitle(t),()=>this.inspect(a?'agent':'task',a?.id||t.id),'pilot-card-title');select.dataset.pilotIdentity=a?.id||t.id;
-    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);if(typeof TaskModels!=='undefined'){card.append(node('p',TaskModels.text(t,a)),this.command(tr_web_pilotage_js('Modèle de la tâche'),()=>TaskModels.open(t.id)))}
+    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);if(a&&globalThis.ProjectProfiles)card.append(ProjectProfiles.badge(a.workflow));if(typeof TaskModels!=='undefined'){card.append(node('p',TaskModels.text(t,a)),this.command(tr_web_pilotage_js('Modèle de la tâche'),()=>TaskModels.open(t.id)))}
     card.append(node('p',PilotGraph.guidance(t,this.goState(t),snapshot.validation?.tasks[t.id]),'pilot-guidance'));
     const h=snapshot.pilotage?.health[a?.id];
     card.append(node('p',a?this.uncertainExecution(t,a)||(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label)||tr_web_pilotage_js('Observation indisponible'):labels[t.status]||t.status,'pilot-card-state'));

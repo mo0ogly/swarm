@@ -327,3 +327,7 @@ the states described in their captions. The new completion captures show a
 later workflow stage; they do not qualify every provider's operation.
 
 For recovery or revision conflicts, see the [engine recovery conditions](ENGINE-RECOVERY.md).
+
+## Target project instructions
+
+After installation, configure instructions from the target project root: [role-specific project profile](PROJECT-PROFILE.md). Configuration does not start a mission.

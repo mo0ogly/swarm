@@ -124,7 +124,7 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	if e != nil {
 		return nil, e
 	}
-	_, workflow, e := agentWorkflow("reviewer")
+	_, workflow, e := s.projectAgentWorkflow("reviewer")
 	if e != nil {
 		return nil, e
 	}

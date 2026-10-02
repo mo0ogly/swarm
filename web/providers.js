@@ -17,7 +17,7 @@ function addModelFields(purpose,fixedProvider='',initial='auto'){
  if(typeof fixedProvider==='function'&&$('field-agent'))$('field-agent').addEventListener('change',update);if(purpose==='planning'&&$('field-planning-provider'))$('field-planning-provider').addEventListener('change',update);if(['task-model','role-model'].includes(c.action)&&$('field-inherit'))$('field-inherit').addEventListener('change',update);level.onchange=update;if(!fixedProvider&&$('field-provider'))$('field-provider').addEventListener('change',update);update();
 }
 async function loadProviderAdmin(){
- if(providerLoading)return;providerLoading=true;void AIConnections.load();$('providers-state').textContent=tr_web_providers_js('Chargement des fournisseurs et des modèles…');
+ if(providerLoading)return;providerLoading=true;void AIConnections.load();void ProjectProfiles.load();$('providers-state').textContent=tr_web_providers_js('Chargement des fournisseurs et des modèles…');
  try{providerAdmin=await api('/api/v1/providers/admin');renderProviderAdmin();$('providers-state').className='notice info';$('providers-state').textContent=tr_web_providers_js('Politique locale : aucun appel IA au chargement. Un modèle exigeant demande un choix explicite ; aucun repli automatique.')}
  catch(e){$('providers-state').className='notice alert';$('providers-state').textContent=e.message}
  finally{providerLoading=false}

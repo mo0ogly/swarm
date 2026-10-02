@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-02",
+  "scope": "Explicit web and CLI project profile selection, recorded per-agent icons, role-scoped context and freshness checks",
+  "real_ai_provider_calls": 0,
+  "checks": {
+    "project_profile_race": "passed (5.142 seconds)",
+    "browser": [
+      "fr/etat: roles, hashes, no source content, Escape and focus",
+      "fr/sombre: roles, hashes, no source content, Escape and focus",
+      "en/etat: roles, hashes, no source content, Escape and focus",
+      "en/sombre: roles, hashes, no source content, Escape and focus",
+      "No profile and missing source states",
+      "fr: explicit selection, file/role preview, confirmation, Escape/focus and CLI parity",
+      "fr: graph keeps arrows and original Claude profile after current selection changes",
+      "en: explicit selection, file/role preview, confirmation, Escape/focus and CLI parity",
+      "en: graph keeps arrows and original Claude profile after current selection changes",
+      "Selection modal and graph rendered in French/English, light/dark; recorded profile preserved after configuration change",
+      "Wattson isolated preview: Claude profile visibly selected through UI"
+    ],
+    "i18n_and_frontend": "npm test passed",
+    "vet": "go vet ./... passed",
+    "build": "bin/swarm built",
+    "full_suite": "go test ./... -timeout 15m passed (486.359 seconds)"
+  },
+  "limitations": [
+    "Browser test used an isolated project and a fake provider; no Wattson business mission was launched.",
+    "Claude native hooks and authentication were not exercised with a real paid provider.",
+    "Credential detection is partial; operators must select reviewed, secret-free sources."
+  ]
+}

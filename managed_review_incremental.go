@@ -19,7 +19,7 @@ type ManagedReviewBaseline struct {
 }
 
 func (s *Store) incrementalManagedReviewFallback(w Work, a Agent, c managedReviewContext) (managedReviewContext, error) {
-	_, workflow, e := agentWorkflow("reviewer")
+	_, workflow, e := s.projectAgentWorkflow("reviewer")
 	if e != nil {
 		return c, e
 	}

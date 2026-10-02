@@ -58,7 +58,7 @@ func (s *Store) managedReviewCostPreview(work, task string) (ManagedReviewCost, 
 		out.ReuseReason = "Groupes d’observations locales historiques : toutes les pièces vues sont identiques. Nouveau delta complet et résolution explicite des impacts exigés dans l’avis final actuel."
 	}
 	out.FitsBudget = out.CallsRequired <= out.CallsAvailable
-	_, method, methodErr := agentWorkflow("reviewer")
+	_, method, methodErr := s.projectAgentWorkflow("reviewer")
 	if methodErr != nil {
 		return out, methodErr
 	}
