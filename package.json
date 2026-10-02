@@ -20,7 +20,8 @@
     "test:quickwins": "node tests/quick_wins_ui.cjs bin/swarm test-results/quick-wins",
     "test:planning-metrics": "node tests/planning_metrics_ui.cjs bin/swarm test-results/planning-metrics",
     "test:project-profile": "node tests/project_profile_ui.cjs bin/swarm test-results/project-profile",
-    "test:project-profile-selection": "node tests/project_profile_selection_ui.cjs bin/swarm test-results/project-profile-selection"
+    "test:project-profile-selection": "node tests/project_profile_selection_ui.cjs bin/swarm test-results/project-profile-selection",
+    "test:action-skills": "node tests/action_skills_ui.cjs bin/swarm test-results/action-skills"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

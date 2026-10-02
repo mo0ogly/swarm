@@ -113,3 +113,48 @@ swarm --root /path/to/project project-profile select claude-project --input sele
 ![Explicit instruction profile selection](../screenshots/project-profile/selection-en-dark.png)
 
 ![Recorded agent profile](../screenshots/project-profile/agent-en-dark.png)
+
+## Skills selected for an action
+
+Project instructions frame agents; a skill adds a method to one specific task.
+In **Start this task** or **Restart this task**, **Skills for this task** lists
+`.claude/skills/<name>/SKILL.md` and `.agents/skills/<name>/SKILL.md` in the project
+controlled by Swarm. Select useful methods before confirming. New tasks have no
+automatically selected skills. Aliases referring to the same file are grouped.
+
+Selections apply to workers only. They remain in that task’s launch profile,
+including automatic dispatch, without becoming defaults for the whole mission.
+Retries retain the previous selection; you can change it or clear it. Planners
+and independent reviewers keep their own engine framing: injecting these action
+skills into those roles is rejected.
+
+Swarm copies selected texts into the prompt and records their names, paths and
+SHA-256 digests in the attempt. The 🧩 marker in the transmitted profile shows
+this selection. Files must remain inside the project, contain UTF-8 text and
+have no detectable secrets. Limits are 8 skills, 16,000 bytes per file and
+32,000 bytes in total, with no truncation. Changes between selection and launch
+are rejected.
+
+### CLI
+
+```bash
+swarm --root /path/to/project --json skills list
+```
+
+Copy the catalogue path and digest into the existing `agent start` or
+`agent retry` JSON request:
+
+```json
+{"skills":[{"path":".claude/skills/review/SKILL.md","sha256":"catalogue-digest"}]}
+```
+
+This fragment supplements the request’s other required fields. On retry,
+omitting `skills` retains the previous choice; `"skills": []` clears it.
+
+### Activation guarantees
+
+Swarm transmits `SKILL.md` and identifies its resource directory. It does not
+copy or execute scripts and references, or import hooks, credentials or extra
+permissions. Agents must consult needed resources using their usual authorized
+tools. A directory inaccessible from their runtime remains inaccessible.
+Explicit selection does not replace the provider’s native skill discovery.

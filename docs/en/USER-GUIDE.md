@@ -65,6 +65,29 @@ Use the mission selector to consult different missions in the same browser tab.
 If the server runs on another machine, `127.0.0.1` in your browser refers to your
 own computer: use the SSH tunnel described in the installation guide.
 
+### Read version and release history
+
+**Version and what's new** appears in the cockpit rail and preparation header.
+The dialog keeps the actual running binary separate from local sources, then
+shows embedded releases and commits. Until a verified release is declared, it
+shows an empty history rather than fabricating a version. `devel`, `unknown` and
+`null` are explicit states, not hidden failures or release numbers.
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+These commands work without a project database. To compare them with the web UI,
+run them from the same binary as the server. Restart the server after rebuilding
+or upgrading before diagnosing a mismatch. Escape closes the dialog and restores
+focus to the button that opened it.
+
+![Version and what's new in preparation, English, State theme](../screenshots/version-history/prepare-en-etat.png)
+
+[Bilingual captures and loading/unavailable states](../screenshots/version-history/manifest.json).
+
 ## 2. Connect AI providers
 
 Open **AI and connections**. Two types of connection have different capabilities:

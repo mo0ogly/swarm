@@ -1,0 +1,16 @@
+
+> test
+> node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && node tests/audit_acceptance_runner_test.cjs && npm run test:i18n
+
+PASS: shared branches, nested folds, reveal, identity-safe preferences
+PASS: multiple roots, topology growth and removed node identity
+PASS: deterministic reveal, shorter path and removed target
+PASS: orchestrator, delegated responsibility, independent reviewer and honest missing-role state
+PASS: décisions de pilotage, coordination A8, triplet factuel, diagnostic Q3 et supervision Q5
+PASS: visible refresh, hidden-tab suspension, immediate return, timer and listener cleanup
+PASS: audit acceptance runner fails closed for DOM, Go, zero tests and unknown cases
+
+> test:i18n
+> node tests/i18n_test.cjs
+
+PASS i18n locale, fallback, interpolation, engine formats and catalogue parity

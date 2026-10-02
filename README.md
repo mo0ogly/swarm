@@ -191,6 +191,33 @@ Le CLI travaille sur le même état local que le web. Il permet notamment de ret
 
 Les commandes de mutation utilisent des contrats explicites décrits dans la [référence technique](REFERENCE.md). Les parcours web et CLI ne sont pas identiques : par exemple, le test interactif d’une connexion API est disponible dans le web.
 
+### Vérifier la version réellement lancée
+
+Ces trois formes lisent l’identité embarquée dans le binaire et fonctionnent sans
+projet initialisé ni base SQLite :
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+`devel` signifie qu’aucun tag de release vérifié n’a été injecté. `unknown` ou
+`null` signifie que la métadonnée correspondante n’est pas disponible ; ce n’est
+ni une release ni un contrôle réussi. Le JSON sépare l’identité du **binaire** de
+l’état éventuel des **sources locales** présenté par le web. Après recompilation
+ou installation, redémarrez le serveur : un processus déjà lancé continue
+d’utiliser son ancien binaire.
+
+Dans le cockpit et dans la préparation, **Version et nouveautés** ouvre la même
+fenêtre bilingue. Elle affiche le binaire lancé, compare séparément les sources
+locales, puis liste l’historique embarqué. Aucune release n’étant déclarée à ce
+jour, l’historique reste vide plutôt que d’inventer un numéro ou une date.
+
+![Version et nouveautés dans le cockpit, français, thème État](docs/screenshots/version-history/cockpit-fr-etat.png)
+
+[Voir les captures FR/EN, État/sombre et les états dégradés](docs/screenshots/version-history/manifest.json).
+
 ## Comment Swarm utilise les modèles
 
 | Capacité | Fournisseur adapté |
@@ -288,3 +315,8 @@ racine clôturée. Les livrables, avis et coûts restent consultables.
 ### Consignes du projet
 
 Transmettez les règles du dépôt à chaque rôle avec un profil de projet explicite. [Configuration et limites](docs/PROJECT-PROFILE.md).
+
+Dans **Lancer / Relancer → Skills pour cette tâche**, sélectionnez les méthodes
+du projet pour un exécutant. Le choix est conservé avec la tentative, sans
+activer automatiquement les scripts ou changer les permissions. Le CLI propose
+`swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).

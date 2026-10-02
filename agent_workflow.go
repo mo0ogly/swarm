@@ -14,6 +14,7 @@ import (
 var agentWorkflowFiles embed.FS
 
 type AgentWorkflow struct {
+	Skills  []ActionSkill   `json:"skills,omitempty"`
 	Project *ProjectContext `json:"project,omitempty"`
 	Version int             `json:"version"`
 	Role    string          `json:"role"`

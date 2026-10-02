@@ -335,6 +335,9 @@ func (s *Store) supervise(id string) error {
 		return s.finishAgent(a, "failed", e.Error(), nil)
 	}
 	if a.Workflow != nil {
+		if e = s.actionSkillsGuard(a.Workflow.Skills); e != nil {
+			return s.finishAgent(a, "failed", e.Error(), nil)
+		}
 		if e = s.projectContextGuard(a.Workflow.Project, a.Role); e != nil {
 			return s.finishAgent(a, "failed", e.Error(), nil)
 		}
@@ -352,9 +355,13 @@ func (s *Store) supervise(id string) error {
 		}
 		a.Prompt += context
 	}
-	cmd := exec.Command(a.Command, a.Args...)
+	environment, args, cacheErr := s.workerLaunchEnvironment(a)
+	if cacheErr != nil {
+		return s.finishAgent(a, "failed", cacheErr.Error(), nil)
+	}
+	cmd := exec.Command(a.Command, args...)
 	cmd.Dir = a.CWD
-	cmd.Env = providerEnvironment(a.Env)
+	cmd.Env = environment
 	cmd.Stdin = strings.NewReader(a.Prompt)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	limits, e := a.Limits.normalized()

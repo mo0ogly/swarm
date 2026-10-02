@@ -127,7 +127,7 @@ func (s *Store) launchEligibility(r webRequest) map[string]any {
 	if strings.TrimSpace(r.Provider) == "" || strings.TrimSpace(r.Workspace) == "" {
 		return result
 	}
-	_, _, e := s.prepareLaunch(r.Work, Launch{Mode: r.Mode, Schema: 1, EventID: newID("preview-"), Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Workspace: r.Workspace, Role: r.Role, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Instruction: r.Instruction}, true)
+	_, _, e := s.prepareLaunch(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Schema: 1, EventID: newID("preview-"), Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Workspace: r.Workspace, Role: r.Role, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Instruction: r.Instruction}, true)
 	if e != nil {
 		result["reason_code"] = "launch_refused"
 		result["reason_label"] = e.Error()

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 
 	"golang.org/x/sys/unix"
 )
@@ -32,37 +31,55 @@ type RuntimeHealth struct {
 	Version       ServerVersion   `json:"version"`
 }
 
-// ServerVersion reports the running binary's build revision, never a network
-// lookup. Revision comes from Go's automatic VCS stamping (go 1.18+); Source is
-// the local checkout's current HEAD via the existing gitState helper — the same
-// mechanism already used to detect drift on a Work's checkpoint. Comparison is
-// degraded (Compared=false) rather than guessed when either side is unavailable.
+type SourceVersion struct {
+	Available     bool    `json:"available"`
+	Commit        *string `json:"commit"`
+	Modified      *bool   `json:"modified"`
+	Compared      bool    `json:"compared"`
+	MatchesBinary *bool   `json:"matches_binary"`
+}
+
+// ServerVersion keeps binary identity separate from the optional local source
+// comparison. The legacy Go-only fields avoid disrupting internal callers while
+// the serialized contract remains unambiguous for the web client.
 type ServerVersion struct {
-	Revision  string `json:"revision"`
-	Modified  bool   `json:"modified"`
-	Available bool   `json:"available"`
-	Source    string `json:"source_revision"`
-	Compared  bool   `json:"compared"`
-	Current   bool   `json:"current"`
+	Binary  BinaryVersion  `json:"binary"`
+	Sources SourceVersion  `json:"source"`
+	History VersionHistory `json:"history"`
+
+	Revision  string `json:"-"`
+	Modified  bool   `json:"-"`
+	Available bool   `json:"-"`
+	Source    string `json:"-"`
+	Compared  bool   `json:"-"`
+	Current   bool   `json:"-"`
 }
 
 func (s *Store) serverVersion() ServerVersion {
-	v := ServerVersion{}
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			switch setting.Key {
-			case "vcs.revision":
-				v.Revision = setting.Value
-			case "vcs.modified":
-				v.Modified = setting.Value == "true"
-			}
-		}
+	binary := binaryVersion()
+	v := ServerVersion{Binary: binary, History: loadVersionHistory()}
+	if binary.Commit != nil {
+		v.Revision = *binary.Commit
+		v.Available = true
 	}
-	v.Available = v.Revision != ""
-	v.Source = gitState(s.root).Head
+	if binary.Modified != nil {
+		v.Modified = *binary.Modified
+	}
+	state := gitState(s.root)
+	v.Source = state.Head
+	v.Sources.Available = state.Head != ""
+	if v.Sources.Available {
+		commit := state.Head
+		modified := state.Changes != ""
+		v.Sources.Commit = &commit
+		v.Sources.Modified = &modified
+	}
 	v.Compared = v.Available && v.Source != ""
+	v.Sources.Compared = v.Compared
 	if v.Compared {
 		v.Current = v.Revision == v.Source
+		matches := v.Current
+		v.Sources.MatchesBinary = &matches
 	}
 	return v
 }

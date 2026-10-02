@@ -79,6 +79,30 @@ Le sélecteur permet de consulter plusieurs missions dans le même onglet.
 Si le navigateur est sur un autre ordinateur, `127.0.0.1` désigne cet ordinateur,
 pas le serveur : utilisez le [tunnel décrit dans l’installation](INSTALL.md#réseau-et-accès-au-navigateur).
 
+### Lire la version et les nouveautés
+
+Le bouton **Version et nouveautés** se trouve dans le rail du cockpit et dans
+l’en-tête de la préparation. La fenêtre distingue le binaire effectivement lancé
+des sources locales, puis affiche les releases embarquées et leurs commits. Tant
+qu’aucune release vérifiée n’est déclarée, elle affiche un historique vide sans
+fabriquer de version. `devel`, `unknown` et `null` sont donc des états explicites,
+pas des échecs masqués ni des numéros de release.
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+Ces commandes fonctionnent sans base de projet. Pour comparer avec le web,
+exécutez-les sur le même binaire que le serveur. Après recompilation ou mise à
+jour, redémarrez le serveur avant de conclure à un écart. Échap ferme la fenêtre
+et rend le focus au bouton qui l’a ouverte.
+
+![Version et nouveautés dans la préparation, français, thème État](docs/screenshots/version-history/prepare-fr-etat.png)
+
+[Captures bilingues et états de chargement/indisponibilité](docs/screenshots/version-history/manifest.json).
+
 ## 2. Connecter les IA
 
 Ouvrez **IA et connexions**. Deux sortes de connexions ont des usages différents :

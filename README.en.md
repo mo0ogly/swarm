@@ -119,6 +119,32 @@ swarm --lang en help management
 `SWARM_LANG=en` sets the CLI default. JSON keys, commands and stored user content
 retain their original identifiers and language. French remains available.
 
+### Check the binary that is actually running
+
+These forms read identity embedded in the binary and work without an initialized
+project or SQLite database:
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+`devel` means that no verified release tag was injected. `unknown` or `null`
+means that the corresponding metadata is unavailable; it is neither a release
+nor a successful check. JSON keeps **binary** identity separate from the optional
+**local source** state displayed by the web UI. Restart the server after rebuilding
+or installing: an existing process keeps running its previous binary.
+
+In both the cockpit and preparation page, **Version and what's new** opens the
+same bilingual dialog. It shows the running binary, compares local sources
+separately, then lists the embedded history. No release is currently declared,
+so the history stays empty instead of inventing a version or date.
+
+![Version and what's new in the cockpit, English, State theme](docs/screenshots/version-history/cockpit-en-etat.png)
+
+[See the FR/EN, State/dark and degraded-state capture manifest](docs/screenshots/version-history/manifest.json).
+
 ## Limits that matter
 
 A finished agent is not necessarily a validated task. Workspace reservations may
@@ -196,3 +222,8 @@ The specification methods cover both requirements writing and plan examination. 
 ### Project instructions
 
 Pass repository rules to each role with an explicit project profile. [Configuration and boundaries](docs/en/PROJECT-PROFILE.md).
+
+In **Start / Restart → Skills for this task**, select project methods for a
+worker. Choices are recorded with the attempt without automatically running
+scripts or changing permissions. The CLI provides `swarm skills list`.
+[Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).

@@ -142,6 +142,18 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 		}
 		send(w, v)
 	})
+	mux.HandleFunc("/api/v1/skills", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		items, e := s.actionSkillCatalog()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]any{"skills": items})
+	})
 	mux.HandleFunc("/api/v1/project-profile/catalog", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			w.WriteHeader(405)

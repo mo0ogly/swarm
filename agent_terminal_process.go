@@ -198,7 +198,11 @@ func (s *Store) superviseTerminal(a Agent) error {
 	var monitorDone chan struct{}
 	var dialogueReader, dialogueWriter *os.File
 	var authReader, authWriter *os.File
-	cmd := exec.Command(a.Command, a.Args...)
+	environment, args, cacheErr := s.workerLaunchEnvironment(a)
+	if cacheErr != nil {
+		return cacheErr
+	}
+	cmd := exec.Command(a.Command, args...)
 	if a.Mode == "dialogue" {
 		exe, err := os.Executable()
 		if err != nil {
@@ -224,7 +228,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 		go func() { monitor.consume(dialogueReader); close(monitorDone) }()
 	}
 	cmd.Dir = a.CWD
-	cmd.Env = providerEnvironment(a.Env)
+	cmd.Env = environment
 	// Replace rather than duplicate TERM: native providers need terminal capabilities.
 	for i := len(cmd.Env) - 1; i >= 0; i-- {
 		if len(cmd.Env[i]) >= 5 && cmd.Env[i][:5] == "TERM=" {

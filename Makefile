@@ -1,7 +1,9 @@
 .PHONY: build test frontend smoke test-install
+
+SWARM_OUTPUT ?= bin/swarm
+
 build:
-	mkdir -p bin
-	CGO_ENABLED=0 go build -trimpath -o bin/swarm .
+	sh ./build.sh "$(SWARM_OUTPUT)"
 test:
 	go test ./...
 	npm test

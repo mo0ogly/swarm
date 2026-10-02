@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "binary": {
+    "version": "devel",
+    "commit": "8d1e223053d7c047bde94276ea3094bd748c82f5",
+    "modified": true,
+    "build_date": "2026-10-02T19:07:06Z",
+    "provenance": "injected"
+  }
+}

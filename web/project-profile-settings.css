@@ -11,3 +11,11 @@
 .graph-profile-text[data-profile-family="claude"] { fill:var(--wattson-attention-encre); }
 .graph-profile-surface[data-profile-family="unknown"] { fill:var(--wattson-carte-appuyee); }
 .graph-profile-text[data-profile-family="unknown"] { fill:var(--wattson-texte-discret); }
+
+.action-skills{background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:.5rem;padding:1rem;max-width:100%;min-width:0}
+.action-skills legend{color:var(--wattson-titre);font-weight:700}
+.action-skills .action-skill-option{display:flex;gap:.75rem;align-items:flex-start;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);padding:.75rem;margin:.5rem 0;border-radius:.35rem;color:var(--wattson-texte)}
+.action-skill-option input[type=checkbox]{width:auto;flex:none;accent-color:var(--wattson-lien)}
+.action-skill-option input:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:3px}
+.action-skill-option span{min-width:0;overflow-wrap:anywhere}
+.action-skill-option small:not(.notice){display:block;color:var(--wattson-texte-discret);margin-top:.25rem}
