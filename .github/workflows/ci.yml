@@ -32,6 +32,9 @@ jobs:
       - run: go test -timeout 25m ./...
       - run: npm test
       - run: make smoke
+      - run: npm run test:action-skills
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - run: npm run test:i18n-ui
         env:
           CHROME_BIN: /usr/bin/google-chrome

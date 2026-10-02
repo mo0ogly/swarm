@@ -15,6 +15,7 @@ const help = `swarm — compagnon local de reprise (schema_version: 1)
 Options globales : --root <projet> --json --lang fr|en
 swarm version | swarm --version
 swarm init
+swarm skills list
 swarm project-profile show|check|list|select PROFILE|apply [--input profil.json]
 swarm doctor
 swarm role-model show|preview|apply <travail> [--input request.json]
@@ -334,6 +335,28 @@ func run(args []string, out, errOut io.Writer) int {
 	if pos[0] == "prepare" {
 		if e := s.preparationEntry(pos[1:], input, output, asJSON, out); e != nil {
 			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "skills" {
+		if len(pos) != 2 || pos[1] != "list" {
+			return fail(fmt.Errorf("usage : swarm skills list"))
+		}
+		items, e := s.actionSkillCatalog()
+		if e != nil {
+			return fail(e)
+		}
+		if asJSON {
+			if e = printJSON(out, map[string]any{"skills": items}); e != nil {
+				return fail(e)
+			}
+		} else {
+			for _, item := range items {
+				fmt.Fprintf(out, "%s · %s · %s\n", item.Path, item.Name, item.Description)
+				if !item.Available {
+					fmt.Fprintln(out, item.Reason)
+				}
+			}
 		}
 		return 0
 	}

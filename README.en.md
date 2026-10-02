@@ -222,3 +222,8 @@ The specification methods cover both requirements writing and plan examination. 
 ### Project instructions
 
 Pass repository rules to each role with an explicit project profile. [Configuration and boundaries](docs/en/PROJECT-PROFILE.md).
+
+In **Start / Restart → Skills for this task**, select project methods for a
+worker. Choices are recorded with the attempt without automatically running
+scripts or changing permissions. The CLI provides `swarm skills list`.
+[Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).

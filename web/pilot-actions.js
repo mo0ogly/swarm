@@ -98,7 +98,7 @@ const PilotActions={
  async preview(context,fields=Object.fromEntries(new FormData($('action-form')))){
   const generation=context.previewGeneration=(context.previewGeneration||0)+1;
   const signature=JSON.stringify(fields);
-  const coordinates={mode:fields.mode,task:context.task,provider:fields.provider,workspace:fields.workspace,role:fields.role||'worker',instruction:fields.instruction,level:fields.level,model_policy_hash:fields.model_policy_hash};
+  const coordinates={skills:ProjectSkills.selected(fields),mode:fields.mode,task:context.task,provider:fields.provider,workspace:fields.workspace,role:fields.role||'worker',instruction:fields.instruction,level:fields.level,model_policy_hash:fields.model_policy_hash};
   const requested=work;
   const current=await api('/api/v1/task?'+new URLSearchParams({work:requested,task:context.task}));
   if(modalContext!==context||context.action!=='start'||work!==requested||context.previewGeneration!==generation)return false;

@@ -121,3 +121,53 @@ swarm --root /chemin/du/projet project-profile select claude-project --input sel
 ![Sélection explicite des consignes](screenshots/project-profile/selection-fr-light.png)
 
 ![Profil enregistré et flèches conservées](screenshots/project-profile/agent-fr-light.png)
+
+## Skills sélectionnés pour une action
+
+Les consignes du projet et les skills ont des usages distincts. Les consignes
+cadrent les agents ; un skill apporte une méthode à une tâche précise.
+
+Dans **Lancer cette tâche** ou **Relancer cette tâche**, le panneau **Skills pour
+cette tâche** propose les fichiers `.claude/skills/<nom>/SKILL.md` et
+`.agents/skills/<nom>/SKILL.md` du projet contrôlé par Swarm. Cochez les méthodes
+utiles avant de confirmer. Rien n’est coché automatiquement pour une nouvelle
+tâche. Les alias pointant sur un même fichier sont regroupés.
+
+La sélection concerne les exécutants. Elle reste attachée au profil de la tâche
+et aux départs automatiques de cette tâche, sans devenir le choix par défaut de
+la mission. Une reprise conserve la sélection précédente ; vous pouvez la
+modifier ou tout décocher. Les planificateurs et vérificateurs conservent leur
+cadrage propre : le moteur refuse de leur injecter ces skills d’action.
+
+Le moteur copie les textes sélectionnés dans la consigne et enregistre leurs
+noms, chemins et empreintes SHA-256 avec la tentative. Le marqueur 🧩 dans le
+profil transmis montre cette sélection. Les fichiers doivent rester dans le
+projet, être des textes UTF-8 et ne pas contenir de secret détectable. La sélection
+est limitée à 8 skills, 16 000 octets par fichier et 32 000 octets au total ; aucun
+texte n’est tronqué. Un fichier modifié entre sélection et lancement est refusé.
+
+### CLI
+
+```bash
+swarm --root /chemin/du/projet --json skills list
+```
+
+Recopiez le chemin et l’empreinte du catalogue dans la requête JSON existante de
+`agent start` ou `agent retry` :
+
+```json
+{"skills":[{"path":".claude/skills/review/SKILL.md","sha256":"empreinte-du-catalogue"}]}
+```
+
+Ce fragment complète les autres champs obligatoires de votre requête. Pour une
+reprise, omettre `skills` conserve le choix précédent ; `"skills": []` le retire.
+
+### Ce que l’activation garantit
+
+Swarm transmet le fichier `SKILL.md` et indique le répertoire de ses ressources.
+Il ne copie pas les scripts ou références, ne les exécute pas, et n’importe ni
+hooks, ni clés, ni permissions supplémentaires. L’agent doit consulter les
+ressources nécessaires avec ses outils habituels et dans ses permissions. Un
+répertoire inaccessible depuis son environnement reste inaccessible. Cette
+sélection explicite ne remplace pas les mécanismes natifs de découverte du
+fournisseur.

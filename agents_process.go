@@ -335,6 +335,9 @@ func (s *Store) supervise(id string) error {
 		return s.finishAgent(a, "failed", e.Error(), nil)
 	}
 	if a.Workflow != nil {
+		if e = s.actionSkillsGuard(a.Workflow.Skills); e != nil {
+			return s.finishAgent(a, "failed", e.Error(), nil)
+		}
 		if e = s.projectContextGuard(a.Workflow.Project, a.Role); e != nil {
 			return s.finishAgent(a, "failed", e.Error(), nil)
 		}

@@ -315,3 +315,8 @@ racine clôturée. Les livrables, avis et coûts restent consultables.
 ### Consignes du projet
 
 Transmettez les règles du dépôt à chaque rôle avec un profil de projet explicite. [Configuration et limites](docs/PROJECT-PROFILE.md).
+
+Dans **Lancer / Relancer → Skills pour cette tâche**, sélectionnez les méthodes
+du projet pour un exécutant. Le choix est conservé avec la tentative, sans
+activer automatiquement les scripts ou changer les permissions. Le CLI propose
+`swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).

@@ -23,6 +23,7 @@ import (
 var cockpitWeb embed.FS
 
 type webRequest struct {
+	Skills               []ActionSkillSelection `json:"skills,omitempty"`
 	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
 	Turn                 string                 `json:"turn,omitempty"`
 	Step                 int                    `json:"step,omitempty"`
@@ -202,7 +203,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		return a, e
 	}
 	if r.Kind == "preflight" {
-		result, _ := s.preflightLaunch(r.Work, Launch{Mode: r.Mode, Level: r.Level, Provider: r.Provider, Workspace: r.Workspace})
+		result, _ := s.preflightLaunch(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Level: r.Level, Provider: r.Provider, Workspace: r.Workspace})
 		return result, nil
 	}
 	if r.Kind == "plan-read" {
@@ -239,7 +240,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Kind == "brainstorm" && r.ContextHash == "" {
 			return nil, fmt.Errorf("Examiner le contexte avant envoi.")
 		}
-		a, created, e := s.prepare(r.Work, Launch{Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+		a, created, e := s.prepare(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
 		if e != nil {
 			return nil, e
 		}
@@ -261,7 +262,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Level == "" && a.ModelRoute != nil {
 			r.Level = a.ModelRoute.Level
 		}
-		next, created, e := s.prepare(r.Work, Launch{PreconditionEvidence: r.PreconditionEvidence, Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+		next, created, e := s.prepare(r.Work, Launch{Skills: r.Skills, PreconditionEvidence: r.PreconditionEvidence, Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
 		if e == nil && created {
 			e = s.spawnAgent(next)
 		}
@@ -490,9 +491,16 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		send(w, map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())})
 	})
 	mux.HandleFunc("/api/v1/recovery-preview", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" { http.Error(w, "GET requis", 405); return }
-		p,e := s.recoveryPreview(r.URL.Query().Get("work"), r.URL.Query().Get("task"), r.URL.Query().Get("agent"))
-		if e != nil { fail(w,e); return }; send(w,p)
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		p, e := s.recoveryPreview(r.URL.Query().Get("work"), r.URL.Query().Get("task"), r.URL.Query().Get("agent"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, p)
 	})
 	mux.HandleFunc("/api/v1/task", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")

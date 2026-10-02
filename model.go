@@ -140,7 +140,7 @@ const (
 
 // launchProfile fige ce que l'opérateur a choisi, workspace résolu compris.
 func launchProfile(r Launch, cwd string) LaunchProfile {
-	p := LaunchProfile{Provider: r.Provider, Role: r.Role, Workspace: cwd, Instruction: r.Instruction,
+	p := LaunchProfile{Skills: append([]ActionSkillSelection(nil), r.Skills...), Provider: r.Provider, Role: r.Role, Workspace: cwd, Instruction: r.Instruction,
 		Level: r.Level, Timeout: r.Timeout, Capture: r.Capture, Limits: r.Limits,
 		Updated: now(), Actor: launchOrigin(r)}
 	if p.Role == "" {
@@ -160,16 +160,17 @@ func launchOrigin(r Launch) string {
 // que l'ordonnanceur rejoue, au lieu de redemander le même formulaire.
 // Le profil d'une tâche prime sur celui du travail.
 type LaunchProfile struct {
-	Limits      *RunLimits `json:"limits,omitempty"`
-	Provider    string     `json:"provider"`
-	Role        string     `json:"role"`
-	Workspace   string     `json:"workspace"`
-	Instruction string     `json:"instruction,omitempty"`
-	Level       string     `json:"level,omitempty"`
-	Timeout     int        `json:"timeout_seconds,omitempty"`
-	Capture     bool       `json:"capture_output,omitempty"`
-	Updated     string     `json:"updated"`
-	Actor       string     `json:"actor"`
+	Skills      []ActionSkillSelection `json:"skills,omitempty"`
+	Limits      *RunLimits             `json:"limits,omitempty"`
+	Provider    string                 `json:"provider"`
+	Role        string                 `json:"role"`
+	Workspace   string                 `json:"workspace"`
+	Instruction string                 `json:"instruction,omitempty"`
+	Level       string                 `json:"level,omitempty"`
+	Timeout     int                    `json:"timeout_seconds,omitempty"`
+	Capture     bool                   `json:"capture_output,omitempty"`
+	Updated     string                 `json:"updated"`
+	Actor       string                 `json:"actor"`
 }
 type Attempt struct {
 	ID      string `json:"id"`

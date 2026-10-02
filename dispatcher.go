@@ -396,7 +396,7 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 		}
 		r := Launch{Schema: 1, EventID: automaticEventID(work, d.TaskID, len(agents)), Revision: current.Revision, ConductorID: conductor,
 			TaskID: d.TaskID, Provider: p.Provider, Role: p.Role, Workspace: p.Workspace,
-			Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor,
+			Skills: p.Skills, Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor,
 			Previous: d.Previous, recoveryCategory: d.RecoveryCategory, recoveryCause: d.CauseFingerprint,
 			recoveryOperation: d.OperationID, recoveryNext: d.NextEligibleAt}
 		if d.Previous != "" {

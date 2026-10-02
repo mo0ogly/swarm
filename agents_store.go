@@ -25,30 +25,31 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
-	PreconditionEvidence string        `json:"precondition_evidence,omitempty"`
-	ConductorID          string        `json:"conductor_id,omitempty"`
-	ProviderDigest       string        `json:"provider_digest,omitempty"`
-	Mode                 string        `json:"mode,omitempty"`
-	Limits               *RunLimits    `json:"limits,omitempty"`
-	Level                string        `json:"level,omitempty"`
-	ModelPolicyHash      string        `json:"model_policy_hash,omitempty"`
-	PlanBriefHash        string        `json:"plan_brief_hash,omitempty"`
-	References           []DialogueRef `json:"references,omitempty"`
-	ContextHash          string        `json:"context_hash,omitempty"`
-	Brainstorm           bool          `json:"brainstorm,omitempty"`
-	Schema               int           `json:"schema_version"`
-	EventID              string        `json:"event_id"`
-	Revision             int           `json:"expected_revision"`
-	TaskID               string        `json:"task_id"`
-	Origin               string        `json:"origin,omitempty"`
-	Provider             string        `json:"provider"`
-	Workspace            string        `json:"workspace"`
-	Instruction          string        `json:"instruction"`
-	Role                 string        `json:"role"`
-	Parent               string        `json:"parent,omitempty"`
-	Previous             string        `json:"previous,omitempty"`
-	Timeout              int           `json:"timeout_seconds"`
-	Capture              bool          `json:"capture_output"`
+	Skills               []ActionSkillSelection `json:"skills,omitempty"`
+	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
+	ConductorID          string                 `json:"conductor_id,omitempty"`
+	ProviderDigest       string                 `json:"provider_digest,omitempty"`
+	Mode                 string                 `json:"mode,omitempty"`
+	Limits               *RunLimits             `json:"limits,omitempty"`
+	Level                string                 `json:"level,omitempty"`
+	ModelPolicyHash      string                 `json:"model_policy_hash,omitempty"`
+	PlanBriefHash        string                 `json:"plan_brief_hash,omitempty"`
+	References           []DialogueRef          `json:"references,omitempty"`
+	ContextHash          string                 `json:"context_hash,omitempty"`
+	Brainstorm           bool                   `json:"brainstorm,omitempty"`
+	Schema               int                    `json:"schema_version"`
+	EventID              string                 `json:"event_id"`
+	Revision             int                    `json:"expected_revision"`
+	TaskID               string                 `json:"task_id"`
+	Origin               string                 `json:"origin,omitempty"`
+	Provider             string                 `json:"provider"`
+	Workspace            string                 `json:"workspace"`
+	Instruction          string                 `json:"instruction"`
+	Role                 string                 `json:"role"`
+	Parent               string                 `json:"parent,omitempty"`
+	Previous             string                 `json:"previous,omitempty"`
+	Timeout              int                    `json:"timeout_seconds"`
+	Capture              bool                   `json:"capture_output"`
 	// Les champs recovery* sont calculés par le conducteur. Ils ne font pas
 	// partie du contrat JSON externe : un client ne peut ni s'accorder un
 	// budget supplémentaire ni choisir sa propre catégorie de reprise.
@@ -761,7 +762,16 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e = s.recheckPreflight(preflight, r.Provider, p, cwd, r); e != nil {
 		return a, false, e
 	}
+	if r.Skills == nil && previous.Workflow != nil {
+		for _, skill := range previous.Workflow.Skills {
+			r.Skills = append(r.Skills, ActionSkillSelection{skill.Path, skill.SHA256})
+		}
+	}
 	workflow, workflowPrompt, e := s.projectAgentWorkflow(r.Role)
+	if e != nil {
+		return a, false, e
+	}
+	workflow, workflowPrompt, e = s.withActionSkills(workflow, workflowPrompt, r.Skills)
 	if e != nil {
 		return a, false, e
 	}
@@ -783,7 +793,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 			}
 		}
 		if r.Origin != originConductor {
-			w.Profile = &profile
+			workProfile := profile
+			workProfile.Skills = nil // Action-specific selection must not leak to other tasks.
+			w.Profile = &workProfile
 		}
 	}
 	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
