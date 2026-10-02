@@ -352,9 +352,13 @@ func (s *Store) supervise(id string) error {
 		}
 		a.Prompt += context
 	}
-	cmd := exec.Command(a.Command, a.Args...)
+	environment, args, cacheErr := s.workerLaunchEnvironment(a)
+	if cacheErr != nil {
+		return s.finishAgent(a, "failed", cacheErr.Error(), nil)
+	}
+	cmd := exec.Command(a.Command, args...)
 	cmd.Dir = a.CWD
-	cmd.Env = providerEnvironment(a.Env)
+	cmd.Env = environment
 	cmd.Stdin = strings.NewReader(a.Prompt)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	limits, e := a.Limits.normalized()

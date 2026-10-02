@@ -1,0 +1,13 @@
+Full default-suite coverage: 926 named tests/examples/fuzz targets; [220, 220, 228, 258] per group
+Group 4 exit 0 
+ok  	swarm.local/companion	77.076s
+
+Group 1 exit 0 
+ok  	swarm.local/companion	88.230s
+
+Group 3 exit 0 
+ok  	swarm.local/companion	96.512s
+
+Group 2 exit 0 
+ok  	swarm.local/companion	229.620s
+

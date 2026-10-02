@@ -13,6 +13,7 @@ import (
 const help = `swarm — compagnon local de reprise (schema_version: 1)
 
 Options globales : --root <projet> --json --lang fr|en
+swarm version | swarm --version
 swarm init
 swarm project-profile show|check|list|select PROFILE|apply [--input profil.json]
 swarm doctor
@@ -122,6 +123,8 @@ func run(args []string, out, errOut io.Writer) int {
 		switch a {
 		case "--json":
 			asJSON = true
+		case "--version":
+			pos = append(pos, "version")
 		case "--help", "-h":
 			fmt.Fprint(out, uiText(help))
 			return 0
@@ -181,6 +184,20 @@ func run(args []string, out, errOut io.Writer) int {
 	}
 	if len(pos) == 0 {
 		fmt.Fprint(out, uiText(help))
+		return 0
+	}
+	if pos[0] == "version" {
+		if len(pos) != 1 {
+			return fail(fmt.Errorf("swarm version [--json]"))
+		}
+		version := binaryVersion()
+		if asJSON {
+			if err := printJSON(out, versionResponse{Schema: 1, Binary: version}); err != nil {
+				return fail(err)
+			}
+		} else {
+			fmt.Fprint(out, versionText(version))
+		}
 		return 0
 	}
 	if pos[0] == "aide" || pos[0] == "help" {

@@ -1,0 +1,9 @@
+# V3 — constats du superviseur (2 octobre 2026)
+
+- Cache moteur : journal `environment` présent dans les deux tentatives V3 ; la deuxième a observé `go env GOCACHE` égal au cache de l’espace de travail, sans variable ajoutée dans sa commande. La compilation/browser complète reste à vérifier séparément.
+- Première tentative : recherche `runtime.?health|Préparer|Prepare|cockpit|theme|locale|lang` sur tout `web tests`, incluant les bundles. Un événement dépasse 1 Mio ; le suivi par outil passe en visibilité dégradée. Après les sorties suivantes, le fournisseur reste silencieux 180 s et la tentative est interrompue. Ce constat ne démontre pas que le gros événement a causé le silence. Aucun changement web produit par cette tentative.
+- Amélioration concrète : limiter les recherches aux fichiers du périmètre, exclure web/lib et les bundles minifiés ; borner les extraits par octets, car quelques lignes minifiées peuvent représenter plusieurs Mio. Ne pas relever simplement la limite d’événement.
+- Recette native du premier candidat web : timeout à tests/version_ui.cjs:13. La recette dérive une URL racine depuis le lien de session sans ouvrir ce lien auparavant ; le parcours d’authentification local doit être effectué comme dans les recettes existantes. Correction du test à vérifier après la fin de l’exécutant, sans écrire simultanément dans son périmètre.
+- Deuxième tentative : `go test ./... -count=1` lancé bien que les modifications V3 soient frontend. L’environnement de l’agent avait déjà refusé les sockets lors de V2 ; cette commande ne remplace pas la recette web native. Éviter de répéter cette suite dans le même environnement sans changement de précondition.
+
+Les tentatives et erreurs sont conservées. Aucun PASS de V3 ni fonctionnement autonome complet n’est revendiqué par cette note.

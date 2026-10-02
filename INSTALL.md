@@ -294,7 +294,62 @@ Le tiret représente une valeur vide. Les commandes `apply` et `rollback` utilis
 
 ## Version du serveur et liens vers une mission supprimée
 
-Le badge **Version** du rail gauche affiche la révision de build du serveur. Elle est comparée au dépôt Git local, sans requête réseau : si la révision est absente, l’état « inconnu » est affiché ; si la comparaison est impossible, elle est signalée comme dégradée. Un `*` indique un arbre de travail modifié au moment de la compilation. Un lien vers une mission supprimée affiche un message clair et l’action **Choisir une mission**, qui ouvre la gestion des missions.
+Contrôlez d’abord le binaire, sans initialiser de projet ni ouvrir SQLite :
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+Les deux commandes texte sont des alias. Le JSON stable place l’identité sous
+`binary` : `version`, SHA complet `commit`, état `modified`, `build_date` UTC et
+`provenance`. `devel` est la valeur honnête en l’absence de tag de release vérifié ;
+`unknown` en texte et `null` en JSON signalent une donnée indisponible. Ils ne
+doivent pas être remplacés par une release supposée.
+
+`make build`, `./install.sh --mode native` et le Dockerfile appellent tous
+`build.sh`. Pour contrôler chaque chemin après construction :
+
+```sh
+make build
+./bin/swarm --json version
+
+./install.sh --mode native --bin-dir "$HOME/.local/bin"
+"$HOME/.local/bin/swarm" --json version
+
+./install.sh --project "$HOME/projets/mon-projet" --no-start
+docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
+```
+
+Une release explicite exige une version SemVer, un SHA de 40 caractères, un état
+modifié connu et une date UTC ; `SOURCE_DATE_EPOCH` permet un build reproductible.
+Le build Docker accepte les arguments `SWARM_VERSION`, `SWARM_COMMIT`,
+`SWARM_MODIFIED` et `SWARM_BUILD_DATE`. N’annoncez pas une release avant que son
+tag et ses métadonnées aient été contrôlés.
+
+Le bouton **Version et nouveautés** existe dans le cockpit et la préparation. La
+fenêtre distingue le **binaire lancé** des **sources locales** : un `*` sur le
+résumé décrit le binaire modifié au build, tandis que l’état sale du checkout est
+une donnée source séparée. La comparaison ne fait aucune requête réseau. La liste
+embarquée est actuellement vide faute de release déclarée et l’interface le dit
+explicitement ; le lien GitHub donne accès à l’historique complet des commits.
+Échap ferme la fenêtre et rend le focus au bouton.
+
+![Cockpit français, thème État](docs/screenshots/version-history/cockpit-fr-etat.png)
+
+![Préparation française, thème sombre](docs/screenshots/version-history/prepare-fr-sombre.png)
+
+Les [empreintes des dix captures](docs/screenshots/version-history/manifest.json)
+couvrent cockpit/préparation, FR/EN, État/sombre, chargement et indisponibilité.
+Ce sont des captures d’un parcours local isolé, pas la preuve d’une mission réelle.
+
+Après `make build`, une installation ou une reconstruction Docker, redémarrez le
+serveur/conteneur et relisez `version`. Un `git pull` ou une compilation ne change
+pas le binaire d’un processus déjà lancé.
+
+Un lien vers une mission supprimée affiche un message clair et l’action **Choisir
+une mission**, qui ouvre la gestion des missions.
 
 ## Lire le récapitulatif et partager un diagnostic
 
@@ -394,3 +449,31 @@ Pour une reprise ou un conflit de révision, consultez les [conditions du moteur
 ## Consignes du projet cible
 
 Après installation, configurez les règles transmises aux agents depuis la racine du projet cible : [profil par rôle](docs/PROJECT-PROFILE.md). Cette configuration ne lance aucune mission.
+
+## Cache Go des agents — correctif en cours de livraison
+
+Un agent peut lire le cache Go global sans pouvoir y écrire dans son bac à sable.
+Une erreur `read-only file system` visant ce cache ne signifie donc pas que le
+code ou un test a échoué : la compilation peut ne pas avoir commencé.
+
+Le moteur corrigé prépare un cache réutilisable dans
+`<espace-de-travail>/.swarm/cache/go-build`, vérifie son écriture avant de lancer
+l'exécutant et transmet `GOCACHE` au fournisseur. Pour Codex, il transmet aussi
+ce réglage explicitement à l'environnement des commandes. Le journal de l'agent
+indique le chemin effectivement préparé. Cela couvre l'exécution, le terminal
+et le dialogue ; les planificateurs et vérificateurs ne reçoivent pas ce réglage.
+
+Le cache global reste intact. Les répertoires redirigés par un lien symbolique
+ou remplacés par un fichier sont refusés. Le cache local est conservé entre les
+tentatives : il faut prévoir de l'espace disque, sans purge automatique.
+
+Ce correctif ne donne aucun droit supplémentaire au bac à sable et ne résout
+pas un refus de socket, de réseau ou d'accès au démon Docker. Après mise à jour,
+redémarrez le serveur Swarm puis vérifiez le journal d'une nouvelle tentative
+et `go env GOCACHE` dans son environnement. Un `git pull` ou une compilation
+seuls ne mettent pas à jour un serveur déjà lancé.
+
+Au 2 octobre 2026, la suite Go complète et les tests ciblés avec détection des
+courses passent sur la copie du correctif. Le serveur de la mission utilise maintenant ce correctif. Un agent Codex réel
+a confirmé le chemin via `go env GOCACHE` et compilé le candidat sans réglage
+manuellement ajouté. Le correctif n’est pas encore publié.

@@ -1,0 +1,1 @@
+Décision de cadrage pour V2 : dépôt public canonique https://github.com/mo0ogly/swarm ; confirmé par git remote get-url github. Utiliser cette origine pour les liens sûrs, sans prendre origin (dépôt géré local). Aucun tag/release inventé.

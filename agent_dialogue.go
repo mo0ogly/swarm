@@ -122,9 +122,21 @@ func (s *Store) runAgentDialogue(id string) error {
 		if _, e = io.ReadFull(authorization, ack[:]); e != nil || ack[0] != 1 {
 			return fmt.Errorf("Le superviseur refuse un nouvel échange ; limite ou arrêt demandé")
 		}
+		environment, _, cacheErr := s.workerLaunchEnvironment(a)
+		if cacheErr != nil {
+			return cacheErr
+		}
+		if a.Role == "worker" {
+			for _, value := range environment {
+				if strings.HasPrefix(value, "GOCACHE=") {
+					args = workerCacheArgs(a.Command, args, strings.TrimPrefix(value, "GOCACHE="))
+					break
+				}
+			}
+		}
 		cmd := exec.Command(a.Command, args...)
 		cmd.Dir = a.CWD
-		cmd.Env = providerEnvironment(a.Env)
+		cmd.Env = environment
 		cmd.Stdin = strings.NewReader(question)
 		cmd.WaitDelay = 2 * time.Second
 		pipe, err := cmd.StdoutPipe()

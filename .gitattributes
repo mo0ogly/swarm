@@ -2,3 +2,5 @@
 *.pdf binary
 *.pptx binary
 *.zip binary
+# Preserve exact stdout bytes of hash-bound qualification logs.
+docs/plans/version-history/**/*.log whitespace=-blank-at-eol,-blank-at-eof

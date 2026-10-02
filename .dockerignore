@@ -21,4 +21,6 @@
 !LICENSE
 !THIRD_PARTY_NOTICES.md
 !Dockerfile
+!build.sh
+!version_history.json
 *_test.go

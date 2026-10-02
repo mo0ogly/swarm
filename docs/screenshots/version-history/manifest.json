@@ -1,0 +1,15 @@
+{
+  "origin": "Engine control version-web-real; actual native server on isolated root, no --fixture",
+  "captures": {
+    "cockpit-en-etat.png": "9ee0e6d1576eefe43b99f49165999b6384022e58a205ca2dc314742660838c66",
+    "cockpit-en-sombre.png": "6c28117a884cd71894f56a0e0b2a9090c3d22bb91a78691b4bf891b73fd5bb7f",
+    "cockpit-fr-etat.png": "d56af7740249863a935566ef74e57c62b92d721b171ce0932497a84c8a65acdb",
+    "cockpit-fr-sombre.png": "cb2f866a44077a4ed5b6db46ab39c148908b60fd183f66fe18b796179711c046",
+    "loading-fr-etat.png": "6ad3b8f5b11449a8f20d9701d26d5abe5935d65db198b1342804a39405cdea46",
+    "prepare-en-etat.png": "29cd5fdbb19144acacf1f66a47cd2d24a3fff4b97dc060ac0bd0fefff18c5542",
+    "prepare-en-sombre.png": "74faa2d7a565b598f4445b7ab0e3354c53c91046a85172e905291a0f3aa19666",
+    "prepare-fr-etat.png": "90730ce3c457a19e95f9dc174c1a6278faacdf5cdaab726eebdfc6520d8552a9",
+    "prepare-fr-sombre.png": "699ae751cf6e1e3dafcaf4fc91b165e04e025fdb3049003eb12b7ea3ef301405",
+    "unavailable-en-sombre.png": "630d5109de948c46bc733e26a68fff833f758b473b1f59049a6413af479242da"
+  }
+}

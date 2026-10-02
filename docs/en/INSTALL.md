@@ -232,7 +232,62 @@ A dash represents an empty value. `apply` and `rollback` use a JSON file, an exp
 
 ## Server version and links to deleted missions
 
-The **Version** badge in the left rail shows the server's build revision. It is compared with the local Git repository without any network request: an absent revision is shown as unknown, and an impossible comparison is reported as degraded. A `*` means the working tree was modified at build time. A link to a deleted mission shows a clear message and the **Choose a mission** action, which opens mission management.
+First inspect the binary without initializing a project or opening SQLite:
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+The two text commands are aliases. Stable JSON places identity under `binary`:
+`version`, full `commit` SHA, `modified`, UTC `build_date` and `provenance`.
+`devel` is the truthful value when no verified release tag was injected;
+`unknown` in text and `null` in JSON mean unavailable data. Do not turn either
+value into an assumed release.
+
+`make build`, `./install.sh --mode native` and the Dockerfile all call
+`build.sh`. Check each build path after construction:
+
+```sh
+make build
+./bin/swarm --json version
+
+./install.sh --mode native --bin-dir "$HOME/.local/bin"
+"$HOME/.local/bin/swarm" --json version
+
+./install.sh --project "$HOME/projects/my-project" --no-start
+docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
+```
+
+An explicit release requires a SemVer version, a 40-character SHA, a known
+modified state and a UTC date; `SOURCE_DATE_EPOCH` supports reproducible builds.
+The Docker build accepts `SWARM_VERSION`, `SWARM_COMMIT`, `SWARM_MODIFIED` and
+`SWARM_BUILD_DATE` arguments. Do not advertise a release until its tag and
+metadata have been checked.
+
+**Version and what's new** is available in both cockpit and preparation. The
+dialog keeps the **running binary** separate from **local sources**: `*` in the
+summary describes the binary at build time, while local checkout dirtiness is a
+separate source fact. Comparison makes no network request. The embedded release
+list is currently empty because no release is declared; the UI says so and links
+to the complete GitHub commit history. Escape closes the dialog and restores
+focus to its trigger.
+
+![English cockpit, State theme](../screenshots/version-history/cockpit-en-etat.png)
+
+![English preparation page, dark theme](../screenshots/version-history/prepare-en-sombre.png)
+
+The [ten-capture fingerprint manifest](../screenshots/version-history/manifest.json)
+covers cockpit/preparation, FR/EN, State/dark, loading and unavailable states.
+These are isolated local-journey captures, not proof of a real mission.
+
+After `make build`, installation or a Docker rebuild, restart the server/container
+and inspect `version` again. A `git pull` or build does not replace the binary of
+an already running process.
+
+A link to a deleted mission shows a clear message and the **Choose a mission**
+action, which opens mission management.
 
 ## Read the summary and share a diagnostic
 
@@ -331,3 +386,30 @@ For recovery or revision conflicts, see the [engine recovery conditions](ENGINE-
 ## Target project instructions
 
 After installation, configure instructions from the target project root: [role-specific project profile](PROJECT-PROFILE.md). Configuration does not start a mission.
+
+## Agent Go cache — fix being delivered
+
+An agent may be able to read the global Go cache but not write to it inside its
+sandbox. A `read-only file system` error targeting that cache does not prove a
+code or test failure: compilation may not have started.
+
+The updated engine prepares a reusable cache at
+`<workspace>/.swarm/cache/go-build`, checks write access before starting the
+worker and passes `GOCACHE` to the provider. For Codex, it also explicitly sets
+this value in the command environment. The agent journal records the prepared
+path. This covers execution, terminal and dialogue sessions; planners and
+reviewers do not receive this setting.
+
+The global cache is preserved. Symbolic links and files replacing cache
+directories are rejected. The local cache survives attempts: allow disk space;
+there is no automatic purge.
+
+This fix does not grant additional sandbox permissions or resolve socket,
+network or Docker daemon access failures. After updating, restart the Swarm
+server and check a new attempt's journal and `go env GOCACHE` in its environment.
+A `git pull` or a build alone does not update an already running server.
+
+As of October 2, 2026, the full Go suite and targeted race tests pass in the fix
+checkout. The mission server now runs this fix. A real Codex worker confirmed the path
+with `go env GOCACHE` and built the candidate without manually adding this
+setting. The fix has not been published yet.

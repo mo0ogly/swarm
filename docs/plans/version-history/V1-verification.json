@@ -1,0 +1,62 @@
+{
+  "task": "plan-10b0e692d2-V1",
+  "candidate": "8d1e223053d7c047bde94276ea3094bd748c82f5",
+  "checks": [
+    "Rapport conservé au chemin moteur et copié au livrable demandé",
+    "Empreinte de revue indépendante actuelle vérifiée",
+    "Contrat CLI/JSON, build, historique borné et accessibilité présents",
+    "Dépôt GitHub canonique confirmé par remote github"
+  ],
+  "independent_review": {
+    "model_route": {
+      "level": "standard",
+      "model": "gpt-5.6-sol",
+      "effort": "medium",
+      "billing": "external",
+      "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+      "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+    },
+    "timeout_seconds": 90,
+    "workflow": {
+      "version": 1,
+      "role": "reviewer",
+      "methods": [
+        "audit-pdca",
+        "code-reviewer"
+      ],
+      "sha256": "3210ccc9ec754961397f04faaee25b17830e1a178ad246f84888a7ac2728f1f2"
+    },
+    "id": "review-f5d816012d4e7098ed6f5404",
+    "attempt": "a-b179f710addb1eea9f15f625",
+    "producer": "auto-4825107401c936ce8bc7",
+    "reviewer": "reviewer://codex",
+    "report": "docs/plan-10b0e692d2-V1.md",
+    "sha256": "7727e26163ecf7f29473131eccd55024d7b40c0af82428506954d92f58c61933",
+    "contract": "e760ddcf4b10aace01dbbc091e92c447f92b0b1474750d01e9e4a8ed8b159c6c",
+    "state": "passed",
+    "reason": "Les deux critères sont couverts par un cadrage substantiel : la convention distingue release, commit, état modifié, date de build et provenance, avec des formats texte/JSON explicites et aucune release synthétique. Le rapport inventorie aussi les quatre voies de compilation, définit le comportement accessible et bilingue de la modale, et fournit une matrice détaillée des cas dégradés. L’URL GitHub canonique demeure volontairement inconnue et les comportements futurs ne sont pas exécutés, mais ces limites n’empêchent pas la réussite des critères de cadrage documentaire. Le décalage de chemin de rapport signalé est un problème de livraison à corriger en ACT, sans invalider le contenu évalué fourni ici.",
+    "criteria": [
+      {
+        "index": 1,
+        "verdict": "pass",
+        "evidence": "Une release existe uniquement si le commit compilé correspond exactement à un tag Git validé de forme `vMAJOR.MINOR.PATCH` avec suffixes SemVer 2 éventuels. Tant qu’aucun tel tag n’existe, `version` vaut littéralement `devel`; ne jamais utiliser `v0.0.0`, une date ou le nombre de commits comme fausse release."
+      },
+      {
+        "index": 2,
+        "verdict": "pass",
+        "evidence": "Deux déclencheurs visibles, cockpit et préparation, portent « Version et nouveautés » / “Version and what’s new”. Ils ouvrent le même composant et le même jeu de données."
+      }
+    ],
+    "started": "2026-10-02T17:40:09.669921171Z",
+    "finished": "2026-10-02T17:40:28.403000137Z",
+    "usage": {
+      "cached_input_tokens": 0,
+      "input_tokens": 16569,
+      "output_tokens": 588,
+      "source": "événement fournisseur turn.completed",
+      "scope": "champs bruts du dernier événement ; caches séparés, sans somme ni cumul de session",
+      "at": "2026-10-02T17:40:27.548274306Z"
+    }
+  },
+  "scope": "Cadrage documentaire seulement ; aucune preuve de fonctionnement de la future implémentation"
+}

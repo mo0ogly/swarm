@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "objective": "Afficher une version fiable de Swarm dans le CLI et le web, avec une fenêtre bilingue des versions, nouveautés et commits.",
+  "assumptions": [
+    "La copie part de main 8d1e223 ; aucun tag de release existant constaté.",
+    "L’historique GitHub complet reste accessible par lien ; la modale ne contient que des données publiques embarquées."
+  ],
+  "questions": [],
+  "tasks": [
+    {
+      "id": "V1",
+      "title": "Cadrer le contrat de version et l’historique",
+      "role": "worker",
+      "scope": "runtime_health.go, main.go, Makefile, install.sh, Dockerfile, .github ; lecture ciblée uniquement. Comparer deux solutions.",
+      "deliverable": "docs/plans/version-history/V1-handoff.md",
+      "depends": [],
+      "criteria": [
+        "Convention de version, provenance du binaire et formats CLI/JSON figés sans inventer des releases",
+        "Inventaire précis des builds, contrat modal et cas dégradés documentés"
+      ],
+      "proof": "Rapport court, commandes exécutées, résultats exacts, SHA/diff et captures pertinentes. Les captures de test ne prouvent pas une mission réelle.",
+      "entry": "Prérequis acceptés, règles AGENTS.md et CONTRACT lus ; aucune écriture hors périmètre.",
+      "validation": "Contrôles reproductibles du livrable et revue indépendante ; aucun auto-PASS.",
+      "delivery": "Handoff au responsable par moteur ; acceptation distincte et preuves fraîches.",
+      "stop": "En cas d’échec identifier cause et précondition ; ne pas répéter à l’identique ; transmettre blocage et prochaine action.",
+      "max_attempts": 3,
+      "max_tool_calls": 100
+    },
+    {
+      "id": "V2",
+      "title": "Implémenter la version du moteur et du CLI",
+      "role": "worker",
+      "scope": "main.go, runtime_health.go, nouveaux fichiers version/history, Makefile et build/install/Docker seulement si nécessaire. Respecter le contrat V1.",
+      "deliverable": "docs/plans/version-history/V2-handoff.md",
+      "depends": [
+        "V1"
+      ],
+      "criteria": [
+        "CLI version et --version sans stockage, JSON fiable ; version embarquée cohérente avec le build",
+        "Tests normaux et sans Git ; historique borné et données sûres ; tests Go et vet réussis"
+      ],
+      "proof": "Rapport court, commandes exécutées, résultats exacts, SHA/diff et captures pertinentes. Les captures de test ne prouvent pas une mission réelle.",
+      "entry": "Prérequis acceptés, règles AGENTS.md et CONTRACT lus ; aucune écriture hors périmètre.",
+      "validation": "Contrôles reproductibles du livrable et revue indépendante ; aucun auto-PASS.",
+      "delivery": "Handoff au responsable par moteur ; acceptation distincte et preuves fraîches.",
+      "stop": "En cas d’échec identifier cause et précondition ; ne pas répéter à l’identique ; transmettre blocage et prochaine action.",
+      "max_attempts": 3,
+      "max_tool_calls": 100
+    },
+    {
+      "id": "V3",
+      "title": "Afficher Version et nouveautés dans le web",
+      "role": "worker",
+      "scope": "web/runtime-health.js, cockpit/préparation, styles via jetons --wattson-* uniquement, locales FR/EN, recette navigateur. Aucun changement au graphe.",
+      "deliverable": "docs/plans/version-history/V3-handoff.md",
+      "depends": [
+        "V2"
+      ],
+      "criteria": [
+        "Version et commit visibles dans cockpit/préparation ; modale présente avec historique et liens",
+        "Recette FR/EN × sombre/État, clavier/Échap/focus, historique indisponible et chargement ; captures réelles"
+      ],
+      "proof": "Rapport court, commandes exécutées, résultats exacts, SHA/diff et captures pertinentes. Les captures de test ne prouvent pas une mission réelle.",
+      "entry": "Prérequis acceptés, règles AGENTS.md et CONTRACT lus ; aucune écriture hors périmètre.",
+      "validation": "Contrôles reproductibles du livrable et revue indépendante ; aucun auto-PASS.",
+      "delivery": "Handoff au responsable par moteur ; acceptation distincte et preuves fraîches.",
+      "stop": "En cas d’échec identifier cause et précondition ; ne pas répéter à l’identique ; transmettre blocage et prochaine action.",
+      "max_attempts": 3,
+      "max_tool_calls": 100
+    },
+    {
+      "id": "V4",
+      "title": "Recetter et documenter la livraison",
+      "role": "worker",
+      "scope": "Tests ciblés CLI/API/web, README et installation FR/EN, docs/plans/version-history ; corriger uniquement défauts confirmés du périmètre.",
+      "deliverable": "docs/plans/version-history/V4-handoff.md",
+      "depends": [
+        "V3"
+      ],
+      "criteria": [
+        "Matrice R1-R5 liée au SHA/diff, résultats exacts et limitations ; revue indépendante distincte",
+        "Documentation bilingue et captures actualisées ; commandes build/install/Docker contrôlées, aucune publication"
+      ],
+      "proof": "Rapport court, commandes exécutées, résultats exacts, SHA/diff et captures pertinentes. Les captures de test ne prouvent pas une mission réelle.",
+      "entry": "Prérequis acceptés, règles AGENTS.md et CONTRACT lus ; aucune écriture hors périmètre.",
+      "validation": "Contrôles reproductibles du livrable et revue indépendante ; aucun auto-PASS.",
+      "delivery": "Handoff au responsable par moteur ; acceptation distincte et preuves fraîches.",
+      "stop": "En cas d’échec identifier cause et précondition ; ne pas répéter à l’identique ; transmettre blocage et prochaine action.",
+      "max_attempts": 3,
+      "max_tool_calls": 100
+    }
+  ]
+}
