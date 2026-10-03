@@ -107,6 +107,7 @@ type outputSink struct {
 	collectReply     bool
 	reply            string
 	usage            *Usage
+	reportedModel    *ReportedModel
 	discarding       bool
 	visibilityLogged bool
 	guard            *loopGuard
@@ -161,6 +162,9 @@ func (w *outputSink) line(line []byte) {
 		w.visibilityLost("Événement JSON illisible ; chronométrage par outil suspendu")
 	}
 	if decodeErr == nil {
+		if observed := providerReportedModel(data); observed != nil {
+			w.reportedModel = observed
+		}
 		if c := observedProviderCooldown(data, time.Now()); c != nil {
 			if w.s != nil && w.provider != "" {
 				if e := w.s.recordProviderCooldown(w.provider, w.id, c); e != nil {
@@ -440,6 +444,7 @@ func (s *Store) supervise(id string) error {
 			a.Progress = sink.progress()
 			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt, reason)
 			a.Usage = sink.usageSnapshot()
+			a.ReportedModel = sink.reportedModelSnapshot()
 			a.Reply = sink.replySnapshot()
 			code := cmd.ProcessState.ExitCode()
 			state := "completed"
@@ -481,6 +486,7 @@ func (s *Store) supervise(id string) error {
 			a.Progress = sink.progress()
 			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt)
 			a.Usage = sink.usageSnapshot()
+			a.ReportedModel = sink.reportedModelSnapshot()
 			a.Reply = sink.replySnapshot()
 			a.Heartbeat = now()
 			if e = s.saveAgent(a); e != nil {

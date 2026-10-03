@@ -1,7 +1,7 @@
 'use strict';
 const trTaskModel=s=>globalThis.SwarmI18n?.t(s)??s;
 const TaskModels={
- text(t,a){if(a?.model_route)return trTaskModel('Utilisé : ')+a.provider+' · '+a.model_route.model;const m=t?.model_selection;if(m)return trTaskModel('Prévu : ')+m.provider+' · '+m.route.model;const p=t?.launch_profile||snapshot.work.launch_profile;return trTaskModel('Hérité : ')+(p?p.provider+' · '+(p.level||'auto'):trTaskModel('À configurer'))},
+ text(t,a){if(a)return trTaskModel('Modèle demandé : ')+a.provider+' · '+(a.model_route?.model||trTaskModel('Inconnu'))+' · '+trTaskModel('Modèle rapporté : ')+(a.reported_model?.model||trTaskModel('Inconnu')); const m=t?.model_selection;if(m)return trTaskModel('Prévu : ')+m.provider+' · '+m.route.model;const p=t?.launch_profile||snapshot.work.launch_profile;return trTaskModel('Hérité : ')+(p?p.provider+' · '+(p.level||'auto'):trTaskModel('À configurer'))},
  open(id){const t=snapshot.work.tasks.find(x=>x.id===id);if(!t)return;const m=t.model_selection,p=t.launch_profile||snapshot.work.launch_profile;
  openModal(trTaskModel('Modèle de la tâche')+' — '+t.title,trTaskModel('Ce choix vaut pour les prochains départs. Il ne change ni les anciennes tentatives, ni les responsables, ni le vérificateur. Les budgets restent appliqués.'),{action:'task-model',task:id});
  field('inherit',trTaskModel('Origine du choix'),m?'false':'true',[['true',trTaskModel('Hériter du profil de lancement')],['false',trTaskModel('Choisir pour cette tâche')]]);

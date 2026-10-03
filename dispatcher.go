@@ -388,7 +388,7 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 		}
 		p := d.Profile
 		if task, err := current.task(d.TaskID); err == nil && task.Profile == nil {
-			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next + "\nConsignes communes : " + p.Instruction
+			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next
 		}
 		conductor := ""
 		if len(conductors) > 0 {

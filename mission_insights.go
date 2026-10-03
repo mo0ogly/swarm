@@ -3,9 +3,12 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 )
 
@@ -16,15 +19,29 @@ type MissionWait struct {
 	Reason string `json:"reason"`
 }
 type RecoveryPreview struct {
-	Work       string   `json:"work"`
-	Task       string   `json:"task"`
-	Revision   int      `json:"revision"`
-	Agent      string   `json:"agent,omitempty"`
-	Kept       []string `json:"kept"`
-	Redone     []string `json:"redone"`
-	Correction string   `json:"correction"`
-	Criteria   []string `json:"criteria"`
-	Limits     string   `json:"limits"`
+	Work         string             `json:"work"`
+	Task         string             `json:"task"`
+	Revision     int                `json:"revision"`
+	Agent        string             `json:"agent,omitempty"`
+	Kept         []string           `json:"kept"`
+	Redone       []string           `json:"redone"`
+	Correction   string             `json:"correction"`
+	Criteria     []string           `json:"criteria"`
+	Limits       string             `json:"limits"`
+	SinceRefusal *MissionChanges    `json:"since_refusal,omitempty"`
+	Evidence     []RecoveryEvidence `json:"evidence,omitempty"`
+	Remaining    []string           `json:"remaining_criteria"`
+	RefusalNote  string             `json:"refusal_note"`
+	EvidenceNote string             `json:"evidence_note"`
+}
+
+// RecoveryEvidence (REQ-QW4): one entry per report/artifact bound to the task's
+// latest bound review: unchanged inputs, changed inputs, or unknown.
+// This input comparison is not a favorable verdict or permission to reuse acceptance.
+type RecoveryEvidence struct {
+	Report string `json:"report"`
+	State  string `json:"state"`
+	Reason string `json:"reason"`
 }
 type MissionChange struct {
 	Revision int    `json:"revision"`
@@ -54,10 +71,93 @@ type SpendingRow struct {
 	Cost         CostTotal `json:"cost"`
 }
 type MissionSpending struct {
-	Rows     []SpendingRow `json:"rows"`
-	Controls int           `json:"recorded_control_executions"`
-	Retries  int           `json:"worker_retries"`
-	Note     string        `json:"note"`
+	Rows     []SpendingRow   `json:"rows"`
+	Controls int             `json:"recorded_control_executions"`
+	Retries  int             `json:"worker_retries"`
+	Note     string          `json:"note"`
+	Attempts []AttemptLedger `json:"attempts"`
+}
+
+// AttemptLedger is the per-attempt bilan (REQ-QW3): one row per agent+attempt
+// of a task, never aggregated with other attempts of the same task. Unlike
+// SpendingRow, it keeps the process outcome (ProcessState, from the agent's
+// own lifecycle) separate from task acceptance (Accepted, decided by the
+// engine independently of any single attempt's process ending).
+type AttemptLedger struct {
+	Task         string    `json:"task"`
+	Label        string    `json:"label"`
+	Agent        string    `json:"agent"`
+	Attempt      string    `json:"attempt"`
+	ProcessState string    `json:"process_state"`
+	Accepted     bool      `json:"task_acceptance_recorded"`
+	Measurement  string    `json:"measurement"`
+	Calls        int       `json:"recorded_calls"`
+	Tools        int       `json:"observed_tool_calls"`
+	Measured     bool      `json:"measured"`
+	Reads        int       `json:"tool_reads"`
+	Writes       int       `json:"tool_writes"`
+	Unclassified int       `json:"tool_unclassified"`
+	Tests        string    `json:"tests"`
+	Errors       int       `json:"tool_errors_total"`
+	Repeats      int       `json:"tool_repeats_total"`
+	Degraded     string    `json:"degraded,omitempty"`
+	Input        int64     `json:"input_tokens"`
+	Output       int64     `json:"output_tokens"`
+	MissingUsage bool      `json:"usage_missing"`
+	Cost         CostTotal `json:"cost"`
+}
+
+const attemptTestsUnknown = "inconnu : aucun signal fiable ne distingue un test dans les commandes observées"
+
+func attemptLedgers(w Work, agents []Agent) []AttemptLedger {
+	out := []AttemptLedger{}
+	for _, a := range agents {
+		label := a.TaskID
+		accepted := false
+		if t, _ := w.task(a.TaskID); t != nil {
+			label = t.Title
+			accepted = t.Status == "accepted"
+		}
+		row := AttemptLedger{Task: a.TaskID, Label: label, Agent: a.ID, Attempt: a.Attempt,
+			ProcessState: a.Status, Accepted: accepted, Calls: 1, Tools: a.Progress.ToolCalls,
+			Tests: attemptTestsUnknown, Degraded: a.Progress.Degraded, Measurement: "unknown"}
+		if a.Progress.MetricsVersion == attemptMetricsVersion && a.Mode != "terminal" {
+			row.Measured = true
+			row.Measurement = "observed"
+			if a.Progress.Degraded != "" || a.Progress.PendingTools > 0 {
+				row.Measurement = "partial"
+			}
+			row.Reads = a.Progress.Reads
+			row.Writes = a.Progress.Writes
+			row.Unclassified = a.Progress.Unclassified
+			row.Errors = a.Progress.Errors
+			row.Repeats = a.Progress.Repeats
+		}
+		if a.Usage == nil {
+			row.MissingUsage = true
+			row.Cost.Silent++
+		} else {
+			row.Input = a.Usage.Input
+			row.Output = a.Usage.Output
+			if a.Usage.ReportedCost == nil {
+				row.Cost.Silent++
+			} else {
+				row.Cost.WithCost++
+				row.Cost.Reported += *a.Usage.ReportedCost
+			}
+		}
+		out = append(out, row)
+	}
+	sort.Slice(out, func(i, j int) bool {
+		if out[i].Task != out[j].Task {
+			return out[i].Task < out[j].Task
+		}
+		if out[i].Agent != out[j].Agent {
+			return out[i].Agent < out[j].Agent
+		}
+		return out[i].Attempt < out[j].Attempt
+	})
+	return out
 }
 
 func (s *Store) taskWaits(w *Work, t *Task) []MissionWait {
@@ -115,16 +215,185 @@ func (s *Store) recoveryPreview(work, task, agent string) (RecoveryPreview, erro
 	if e != nil {
 		return RecoveryPreview{}, e
 	}
+	var p RecoveryPreview
+	found := false
 	for i := range agents {
 		a := &agents[i]
 		if a.TaskID == task && (agent == "" || a.ID == agent) {
-			return recoveryPreviewFor(w, t, a), nil
+			p, found = recoveryPreviewFor(w, t, a), true
+			break
 		}
 	}
-	if agent != "" {
-		return RecoveryPreview{}, fmt.Errorf("tentative hors tâche ou introuvable")
+	if !found {
+		if agent != "" {
+			return RecoveryPreview{}, fmt.Errorf("tentative hors tâche ou introuvable")
+		}
+		p = recoveryPreviewFor(w, t, nil)
 	}
-	return recoveryPreviewFor(w, t, nil), nil
+	if v, at, ok, err := s.lastRefusalRevision(w, task); err != nil {
+		p.RefusalNote = "Historique du refus indisponible ; aucun changement n’est supposé."
+	} else if ok {
+		changes, err := s.missionChanges(w, Visit{Revision: v, At: at})
+		if err != nil {
+			return RecoveryPreview{}, err
+		}
+		// Other tasks' activity is not a change to this refused result.
+		filtered := []MissionChange{}
+		for _, item := range changes.Items {
+			if item.Task == task {
+				filtered = append(filtered, item)
+			}
+		}
+		changes.Items = filtered
+		p.SinceRefusal = &changes
+		p.RefusalNote = "Changements enregistrés depuis le dernier refus de cette tâche."
+	} else {
+		p.RefusalNote = "Aucun refus identifié dans les 500 derniers événements ; historique plus ancien non inspecté."
+	}
+	p.Evidence = s.recoveryEvidence(t)
+	p.EvidenceNote = "Seules les preuves liées au dernier avis sont comparées, au plus 64 fichiers et 32 Mio ; aucun inventaire du dépôt. Une preuve inchangée ne vaut ni avis favorable ni validation."
+	p.Remaining = append([]string{}, t.Criteria...)
+	r := recoveryReview(t)
+	unchanged := len(p.Evidence) > 0
+	for _, e := range p.Evidence {
+		if e.State != "unchanged" {
+			unchanged = false
+		}
+	}
+	if r != nil && unchanged && r.Contract == reviewContract(t) {
+		p.Remaining = []string{}
+		for i, criterion := range t.Criteria {
+			covered := false
+			for _, verdict := range r.Criteria {
+				if verdict.Index == i+1 && verdict.Verdict == "pass" {
+					covered = true
+				}
+			}
+			if !covered {
+				p.Remaining = append(p.Remaining, criterion)
+			}
+		}
+	}
+
+	return p, nil
+}
+
+// lastRefusalRevision (REQ-QW4): the mission revision at which this task was
+// last refused or blocked, read from the durable event log — never from the
+// operator's own last visit, which tracks a different, human-anchored boundary.
+// Bounded to the same 500 most recent mission events scanned by missionChanges;
+// an older refusal outside that window is reported absent, not assumed at r0.
+func (s *Store) lastRefusalRevision(w Work, task string) (int, string, bool, error) {
+	rows, e := s.db.Query("SELECT revision,kind,at,payload FROM events WHERE work_id=? AND revision<=? ORDER BY revision DESC LIMIT 500", w.ID, w.Revision)
+	if e != nil {
+		return 0, "", false, e
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var rev int
+		var kind, at string
+		var raw []byte
+		if e = rows.Scan(&rev, &kind, &at, &raw); e != nil {
+			return 0, "", false, e
+		}
+		category, _ := missionChangeCategory(kind, raw)
+		if category != "block" {
+			continue
+		}
+		var p activityPayload
+		_ = json.Unmarshal(raw, &p)
+		if kind == "review.result" {
+			var review IndependentReview
+			_ = json.Unmarshal(raw, &review)
+			for _, t2 := range w.Tasks {
+				if t2.ID != task {
+					continue
+				}
+				if (t2.IndependentReview != nil && t2.IndependentReview.ID == review.ID) || taskReviewHistoryHas(&t2, review.ID) {
+					return rev, at, true, nil
+				}
+			}
+			continue
+		}
+		if p.task() == task {
+			return rev, at, true, nil
+		}
+	}
+	return 0, "", false, rows.Err()
+}
+
+func taskReviewHistoryHas(t *Task, id string) bool {
+	for _, r := range t.PreviousReviews {
+		if r.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+// recoveryEvidence (REQ-QW4): classifies the report/artifacts bound to the
+// task's current or last refusal verdict. Mirrors the hash comparison already
+// used by boundReviewEvidenceChanged, but exposes each input individually
+// instead of collapsing them into a single "changed" bool, so the operator
+// sees which specific proof is still reusable and which is stale.
+func recoveryReview(t *Task) *IndependentReview {
+	if t.IndependentReview != nil {
+		return t.IndependentReview
+	}
+	if len(t.PreviousReviews) > 0 {
+		return &t.PreviousReviews[len(t.PreviousReviews)-1]
+	}
+	return nil
+}
+
+func (s *Store) recoveryEvidence(t *Task) []RecoveryEvidence {
+	r := recoveryReview(t)
+	if r == nil {
+		return nil
+	}
+	inputs := map[string]string{}
+	for name, digest := range r.ReportArtifacts {
+		inputs[name] = digest
+	}
+	if r.Report != "" {
+		inputs[r.Report] = r.Digest
+	}
+	names := make([]string, 0, len(inputs))
+	for name := range inputs {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	out := make([]RecoveryEvidence, 0, min(64, len(names)))
+	remaining := int64(32 << 20)
+	for i, name := range names {
+		if i >= 64 {
+			out = append(out, RecoveryEvidence{State: "unknown", Reason: "Autres preuves non inspectées : limite de 64 fichiers atteinte."})
+			break
+		}
+		item := RecoveryEvidence{Report: name, State: "unknown", Reason: "Empreinte ou contenu indisponible : réutilisation non démontrée."}
+		path, err := safeReport(s.root, name)
+		if err == nil && inputs[name] != "" && remaining > 0 {
+			f, e := os.Open(path)
+			if e == nil {
+				info, e := f.Stat()
+				if e == nil && info.Mode().IsRegular() && info.Size() <= 8<<20 && info.Size() <= remaining {
+					h := sha256.New()
+					n, e := io.Copy(h, io.LimitReader(f, min(int64(8<<20), remaining)+1))
+					remaining -= n
+					if e == nil && n <= 8<<20 && remaining >= 0 {
+						if hex.EncodeToString(h.Sum(nil)) == inputs[name] {
+							item.State, item.Reason = "unchanged", "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+						} else {
+							item.State, item.Reason = "changed", "Contenu modifié depuis l’avis : ancienne preuve périmée, vérification requise."
+						}
+					}
+				}
+				f.Close()
+			}
+		}
+		out = append(out, item)
+	}
+	return out
 }
 
 // Typed events only: never classify prose or treat an historical event as
@@ -132,6 +401,7 @@ func (s *Store) recoveryPreview(work, task, agent string) (RecoveryPreview, erro
 func missionChangeCategory(kind string, raw []byte) (string, string) {
 	var p struct {
 		Status string `json:"status"`
+		Next   string `json:"next"`
 		State  string `json:"state"`
 	}
 	_ = json.Unmarshal(raw, &p)
@@ -144,6 +414,9 @@ func missionChangeCategory(kind string, raw []byte) (string, string) {
 			return "result", "Acceptation enregistrée"
 		case "blocked":
 			return "block", "Blocage enregistré"
+		}
+		if p.Next != "" {
+			return "decision", "Consigne de reprise modifiée"
 		}
 	case "review.result":
 		if p.State == "passed" {
@@ -343,6 +616,7 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 	for _, k := range keys {
 		out.Rows = append(out.Rows, *by[k])
 	}
+	out.Attempts = attemptLedgers(w, agents)
 	return out, nil
 }
 
@@ -370,10 +644,63 @@ func printMissionSpending(out io.Writer, c MissionSpending) {
 		if r.Kind != "worker" {
 			label = uiEngineText(label)
 		}
-		fmt.Fprintf(out, uiText("%s · %d tentatives ou appels enregistrés · %d appels d’outils observés · %d mesures d’outils incomplètes · %d/%d jetons entrée/sortie rapportés · %d usages absents · %s\n"), label, r.Calls, r.Tools, r.UnknownTools, r.Input, r.Output, r.MissingUsage, uiEngineText(r.Cost.Text()))
+		if r.Calls > 0 && r.MissingUsage >= r.Calls {
+			fmt.Fprintf(out, uiText("%s · %d tentatives ou appels enregistrés · %d appels d’outils observés · jetons non rapportés · %s\n"), label, r.Calls, r.Tools, uiEngineText(r.Cost.Text()))
+		} else {
+			fmt.Fprintf(out, uiText("%s · %d tentatives ou appels enregistrés · %d appels d’outils observés · %d mesures d’outils incomplètes · %d/%d jetons entrée/sortie rapportés · %d usages absents · %s\n"), label, r.Calls, r.Tools, r.UnknownTools, r.Input, r.Output, r.MissingUsage, uiEngineText(r.Cost.Text()))
+		}
 	}
 	fmt.Fprintf(out, uiText("Moteur : %d contrôles enregistrés · %d reprises d’agents\n"), c.Controls, c.Retries)
 	fmt.Fprintln(out, uiText(c.Note))
+	printAttemptLedgers(out, c.Attempts)
+}
+func attemptProcessLabel(state string) string {
+	switch state {
+	case "completed":
+		return "Processus terminé"
+	case "interrupted":
+		return "Processus interrompu"
+	case "failed":
+		return "Processus en échec"
+	case "running":
+		return "Processus en cours"
+	case "queued":
+		return "Démarrage en attente"
+	default:
+		return "État du processus inconnu"
+	}
+}
+
+func printAttemptLedgers(out io.Writer, rows []AttemptLedger) {
+	fmt.Fprintln(out, uiText("Bilan par tentative"))
+	if len(rows) == 0 {
+		fmt.Fprintln(out, uiText("Aucune tentative enregistrée."))
+		return
+	}
+	for _, r := range rows {
+		accepted := uiText("non")
+		if r.Accepted {
+			accepted = uiText("oui")
+		}
+		fmt.Fprintf(out, uiText("%s · agent %s · tentative %s · état du processus : %s · validation enregistrée de la tâche (toutes tentatives) : %s\n"), r.Label, r.Agent, r.Attempt, uiText(attemptProcessLabel(r.ProcessState)), accepted)
+		fmt.Fprintf(out, uiText("  %d départ enregistré · %d appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.\n"), r.Calls, r.Tools)
+		if r.Measurement == "partial" {
+			fmt.Fprintln(out, uiText("  Mesure partielle : ces compteurs couvrent uniquement les événements reçus."))
+		}
+		if r.Measured {
+			fmt.Fprintf(out, uiText("  %d appels d’outils observés · lectures %d · écritures %d · non classés %d · tests %s · erreurs %d · répétitions %d\n"), r.Tools, r.Reads, r.Writes, r.Unclassified, uiText(r.Tests), r.Errors, r.Repeats)
+		} else {
+			fmt.Fprintln(out, uiText("  Mesure détaillée indisponible pour cette tentative : lectures, écritures, erreurs et répétitions restent inconnues, pas zéro."))
+		}
+		if r.Degraded != "" {
+			fmt.Fprintf(out, uiText("  Mesure incomplète : %s\n"), uiEngineText(r.Degraded))
+		}
+		if r.MissingUsage {
+			fmt.Fprintln(out, uiText("  Coût et usage non rapportés par le fournisseur pour cette tentative."))
+		} else {
+			fmt.Fprintf(out, uiText("  %d/%d jetons entrée/sortie rapportés · %s\n"), r.Input, r.Output, uiEngineText(r.Cost.Text()))
+		}
+	}
 }
 func printRecoveryPreview(out io.Writer, p RecoveryPreview) {
 	fmt.Fprintln(out, uiText("Avant une relance"))
@@ -385,6 +712,31 @@ func printRecoveryPreview(out io.Writer, p RecoveryPreview) {
 		for _, item := range section.items {
 			fmt.Fprintln(out, "- "+uiEngineText(item))
 		}
+	}
+	fmt.Fprintln(out, uiText("Depuis le refus"))
+	fmt.Fprintln(out, uiText(p.RefusalNote))
+	if p.SinceRefusal != nil {
+		for _, c := range p.SinceRefusal.Items {
+			fmt.Fprintf(out, "- r%d · %s · %s\n", c.Revision, c.At, uiText(c.Label))
+		}
+		if p.SinceRefusal.More {
+			fmt.Fprintln(out, uiText("Historique partiel : d’autres événements restent à examiner."))
+		}
+	}
+	fmt.Fprintln(out, uiText("Preuves à reprendre"))
+	fmt.Fprintln(out, uiText(p.EvidenceNote))
+	if len(p.Evidence) == 0 {
+		fmt.Fprintln(out, uiText("Aucune preuve liée à un avis disponible ; réutilisation non démontrée."))
+	}
+	for _, e := range p.Evidence {
+		fmt.Fprintf(out, "- %s · %s\n", e.Report, uiText(e.Reason))
+	}
+	fmt.Fprintln(out, uiText("Critères restant à vérifier"))
+	for _, c := range p.Remaining {
+		fmt.Fprintln(out, "- "+c)
+	}
+	if len(p.Remaining) == 0 {
+		fmt.Fprintln(out, uiText("Tous les critères ont un avis favorable sur ces entrées inchangées ; les contrôles et la décision restent requis."))
 	}
 	fmt.Fprintln(out, uiText("Correction attendue"))
 	fmt.Fprintln(out, p.Correction)

@@ -35,7 +35,8 @@ function closeModal(){
  let target=returnFocus;
  if(!target?.isConnected){
   const task=returnFocus?.dataset.missionHelp;
-  target=task?[...document.querySelectorAll('[data-mission-help]')].find(e=>e.dataset.missionHelp===task):returnFocus?.id?$(returnFocus.id):null;
+  const action=returnFocus?.dataset.missionAction;
+  target=task?[...document.querySelectorAll('[data-mission-help]')].find(e=>e.dataset.missionHelp===task):action?[...document.querySelectorAll('[data-mission-action]')].find(e=>e.dataset.missionAction===action):returnFocus?.id?$(returnFocus.id):null;
  }
  (target||$('pilot-view'))?.focus();modalContext=null;
 }

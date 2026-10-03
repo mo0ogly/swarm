@@ -239,7 +239,7 @@ func TestDispatchLaunchesFromCapturedProfile(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if current.Profile == nil || current.Profile.Provider != "fixture" || current.Profile.Instruction != "Consigne de référence" {
+	if current.Profile == nil || current.Profile.Provider != "fixture" || current.Profile.Instruction != "" {
 		t.Fatalf("profil de lancement non conservé : %+v", current.Profile)
 	}
 	if stored, _ := s.agent(a.ID); stored.Origin != originOperator {
@@ -264,6 +264,9 @@ func TestDispatchLaunchesFromCapturedProfile(t *testing.T) {
 			}
 			if x.Provider != "fixture" {
 				t.Fatalf("profil non réutilisé : %+v", x)
+			}
+			if strings.Contains(x.Prompt, "Consigne de référence") {
+				t.Fatal("task-specific instruction leaked into next task")
 			}
 		}
 	}
@@ -348,6 +351,10 @@ func TestSetProfileAllowsDispatchWithoutFirstManualLaunch(t *testing.T) {
 	}
 	if len(launched) != 1 || launched[0].TaskID != "t1" {
 		t.Fatalf("départ automatique attendu sans lancement manuel préalable : %+v", launched)
+	}
+	agents, err := s.agents(w.ID)
+	if err != nil || len(agents) != 1 || strings.Count(agents[0].Prompt, "Consigne du plan") != 1 {
+		t.Fatal("common instruction must be inherited exactly once", err)
 	}
 }
 
@@ -435,5 +442,25 @@ func TestCostReadFailureStopsDispatchAndDecisions(t *testing.T) {
 	}
 	if _, e := s.dispatch(w.ID); e == nil {
 		t.Fatal("réserve illisible : l'ordonnancement doit s'arrêter, pas repartir sans plafond")
+	}
+}
+
+func TestManualLaunchPreservesExplicitCommonInstruction(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	if err := s.setProfile(w.ID, "", LaunchProfile{Provider: r.Provider, Workspace: s.root, Role: "worker", Instruction: "Shared project instruction"}, -1); err != nil {
+		t.Fatal(err)
+	}
+	w, _ = s.get(w.ID)
+	r.Revision = w.Revision
+	r.Instruction = "Task one only"
+	a, _, err := s.prepare(w.ID, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	current, _ := s.get(w.ID)
+	task, _ := current.task(r.TaskID)
+	if current.Profile.Instruction != "Shared project instruction" || task.Profile.Instruction != "Task one only" || !strings.Contains(a.Prompt, "Task one only") || strings.Count(a.Prompt, "Shared project instruction") != 1 {
+		t.Fatal("common/local instruction boundary lost")
 	}
 }

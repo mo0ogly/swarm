@@ -33,6 +33,17 @@ func (s *Store) independentValidationEvidence(t *Task) (string, map[string]strin
 			return "", nil, fmt.Errorf("contrôle %s non démontré", c.ID)
 		}
 	}
+	// Older receipts remain valid with sharing disabled. Sharing is policy-bound;
+	// truncated observations remain visibly partial and never become a full log.
+	for i, r := range a.Controls {
+		c := t.ValidationPolicy.Controls[i]
+		if !c.ReviewOutput && (r.ReviewOutput != "" || r.OutputBytes != 0 || r.ReviewOutputTruncated) {
+			return "", nil, fmt.Errorf("sortie de contrôle non autorisée : %s", c.ID)
+		}
+		if c.ReviewOutput && (len(r.ReviewOutput) > maxValidationReviewOutput || r.OutputBytes < len(r.ReviewOutput) || r.ReviewOutputTruncated != (r.OutputBytes > len(r.ReviewOutput))) {
+			return "", nil, fmt.Errorf("sortie de contrôle incohérente : %s", c.ID)
+		}
+	}
 	if err := s.currentReportArtifacts(a.Artifacts); err != nil {
 		return "", nil, err
 	}

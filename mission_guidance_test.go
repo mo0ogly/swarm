@@ -27,6 +27,7 @@ func TestMissionGuidanceKeepsInfrastructureAndPlanningPriority(t *testing.T) {
 		t.Fatal("missing organization bypassed")
 	}
 	d.Organization.Ready = true
+	d.Tasks[0].State = "waiting"
 	failed := missionGuidance(Work{Planning: &PlanningState{Failure: "planning provider failed"}}, d)
 	if failed.Primary.Kind != "planning" || failed.What == d.Understanding.What || len(failed.What) > 160 {
 		t.Fatal("planning incident hidden by task")
@@ -50,5 +51,66 @@ func TestMissionGuidanceAutomaticReviewDoesNotRequestHumanValidation(t *testing.
 	d.Validated = 0
 	if missionGuidance(Work{}, d).Primary.Tone == "succes" {
 		t.Fatal("waiver presented as validated success")
+	}
+}
+
+func TestPlanningFailureDoesNotHideExistingTaskActions(t *testing.T) {
+	w := Work{Planning: &PlanningState{Failure: "planner timed out"}}
+	for _, tc := range []struct{ state, kind string }{
+		{"running", "follow"}, {"review", "task"}, {"intervention", "task"}, {"configure", "task"},
+	} {
+		t.Run(tc.state, func(t *testing.T) {
+			d := MissionStatus{Total: 1, Organization: Organization{Ready: true},
+				Tasks: []MissionTask{{ID: "existing", State: tc.state, Action: "inspect", ValidationMode: "human"}}}
+			if tc.state == "running" {
+				d.Running, d.ActiveAgents = 1, 1
+			}
+			if tc.state == "review" {
+				d.Review = 1
+			}
+			d.Understanding = missionUnderstanding(d)
+			g := missionGuidance(w, d)
+			if missionPlanningOwnsNextStep(d) || g.Primary.Kind != tc.kind || g.Primary.Task != "existing" || g.What != d.Understanding.What || g.Next != d.Understanding.NextStep {
+				t.Fatalf("planning error replaced actual task action: %+v", g)
+			}
+		})
+	}
+	for _, state := range []string{"ready", "manual"} {
+		if missionPlanningOwnsNextStep(MissionStatus{Tasks: []MissionTask{{State: state}}}) {
+			t.Fatalf("existing %s task treated as awaiting a new planning decision", state)
+		}
+	}
+}
+
+func TestMissionStatusKeepsExistingAttemptVisibleAfterPlanningFailure(t *testing.T) {
+	s := storeTest(t)
+	w, launch := setupAgent(t, s)
+	// Prepare a real engine reservation in an isolated root, without launching
+	// any provider. It remains an observable queued attempt.
+	a, _, err := s.prepare(w.ID, launch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	organizedFixtureStore(t, s)
+	w, _ = s.get(w.ID)
+	_, err = s.mutate(w.ID, "planning.test-failure", newID("e-"), w.Revision, []byte("{}"), func(w *Work) error {
+		w.Planning.Paused = false
+		w.Planning.Failure = "planner timed out"
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, err := s.missionStatus(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if d.Running != 1 || d.Guidance.Primary.Kind != "follow" || d.Guidance.Primary.Task != launch.TaskID || d.Understanding.ActorKind == "user" || d.Understanding.What == "planner timed out" {
+		t.Fatalf("planning failure hid reserved attempt: %+v", d)
+	}
+	current, _ := s.get(w.ID)
+	stored, _ := s.agent(a.ID)
+	if current.Planning.Failure != "planner timed out" || stored.Status != a.Status {
+		t.Fatal("presentation changed the planning diagnostic or attempt")
 	}
 }

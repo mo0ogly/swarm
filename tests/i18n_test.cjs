@@ -9,6 +9,7 @@ assert.equal(runtime('',storage.get('swarm.language')).api.language,'en');
 assert.equal(runtime('?lang=invalid','en').api.language,'en');
 assert.equal(api.t('My own task title'),'My own task title');
 assert.equal(api.t('{name}',{name:'$& $` $\''}),'$& $` $\'');
+assert.equal(api.engine('2 tâche(s) ne peuvent pas continuer sans intervention.'),'2 task(s) cannot continue without intervention.');
 assert.equal(api.engine('Fournisseur inconnu : my-provider'),'Unknown provider: my-provider');
 assert.equal(api.engine('Le serveur a répondu HTTP 401. Vérifiez la clé, le modèle et l’adresse.'),'The server returned HTTP 401. Check the key, model and URL.');
 assert.equal(api.engine('Envoi non confirmé : /renvoyer. error: $& /my/path'),'Send not confirmed: /renvoyer. error: $& /my/path');

@@ -434,15 +434,14 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 		return w, e
 	}
 	defer tx.Rollback()
-	if strings.HasPrefix(kind, "review.") || kind == "managed.requalify" || kind == "role.model" || kind == "task.model" || kind == "quotas.configure" || kind == "budget.configure" || kind == "managed.integrated" || kind == "task.attempt-extension" || kind == "task.corrective-recovery" {
-		// Reserve SQLite's writer before reading and checking immutable evidence.
-		// A deferred read transaction cannot upgrade after another connection
-		// writes (BUSY_SNAPSHOT); busy_timeout cannot repair that stale snapshot.
-		// This no-op is rolled back on any failed guard and changes no revision.
-		if _, e = tx.Exec("UPDATE works SET revision=revision WHERE id=?", id); e != nil {
-			return w, e
-		}
+	// Every mutation reads then writes. Reserve the writer before any reads;
+	// a per-kind allowlist leaves new and ordinary mutations exposed to
+	// BUSY_SNAPSHOT, which busy_timeout cannot repair. This no-op also works
+	// for creation (no matching row) and rolls back on failed guards.
+	if _, e = tx.Exec("UPDATE works SET revision=revision WHERE id=?", id); e != nil {
+		return w, e
 	}
+
 	var oldID, oldKind string
 	var oldRequest []byte
 	e = tx.QueryRow("SELECT work_id,kind,request FROM events WHERE id=?", event).Scan(&oldID, &oldKind, &oldRequest)

@@ -14,6 +14,11 @@ type failedCall struct {
 	completed int
 }
 
+// attemptMetricsVersion marks AgentProgress rows carrying the categorised,
+// cumulative bilan counters below. Attempts persisted before this version
+// have no such counters: a report must show them as unknown, never as zero.
+const attemptMetricsVersion = 1
+
 type loopGuard struct {
 	signatures              map[string][32]byte
 	failures                []failedCall
@@ -32,10 +37,16 @@ type loopGuard struct {
 	lastAction              string
 	actionDetail            string
 	lastResult              string
+	// Cumulative bilan counters (REQ-QW3): unlike errors/repeated above, these
+	// never reset on success or on lost visibility — they report what was
+	// actually observed, not a current streak.
+	reads, writes, unclassified int
+	totalErrors, totalRepeats   int
+	sigSeen                     map[[32]byte]int
 }
 
 func newLoopGuard(l RunLimits) *loopGuard {
-	return &loopGuard{signatures: map[string][32]byte{}, limits: l, lastOutput: time.Now(), seen: map[string]bool{}, pending: map[string]time.Time{}, contexts: map[string]toolFailure{}}
+	return &loopGuard{signatures: map[string][32]byte{}, limits: l, lastOutput: time.Now(), seen: map[string]bool{}, pending: map[string]time.Time{}, contexts: map[string]toolFailure{}, sigSeen: map[[32]byte]int{}}
 }
 func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	if id != "" && g.seen[id] {
@@ -54,6 +65,23 @@ func (g *loopGuard) call(id, name string, input any, now time.Time) {
 		g.repeated++
 	} else {
 		g.repeated = 1
+	}
+	switch toolCategory(name) {
+	case "read":
+		g.reads++
+	case "write":
+		g.writes++
+	default:
+		g.unclassified++
+	}
+	// Total repeats: every identical (name,input) signature seen again after
+	// id-dedup above, not only adjacent ones — distinct from g.repeated which
+	// is the current consecutive streak used for the loop-limit decision.
+	if n, ok := g.sigSeen[sig]; ok {
+		g.totalRepeats++
+		g.sigSeen[sig] = n + 1
+	} else {
+		g.sigSeen[sig] = 1
 	}
 	g.lastTool = terminalText(name)
 	g.lastAction, g.actionDetail = describeOperation(name, input)
@@ -111,6 +139,7 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 		context.technical = operationText(detail, 600)
 		g.toolFailures = append(g.toolFailures, context)
 		g.errors++
+		g.totalErrors++
 	} else {
 		g.errors = 0
 	}
@@ -219,7 +248,8 @@ func (g *loopGuard) loseVisibility(reason string) {
 	g.contexts = map[string]toolFailure{}
 }
 func (g *loopGuard) summary() AgentProgress {
-	return AgentProgress{Action: g.lastAction, Detail: g.actionDetail, ToolCalls: g.calls, ToolResults: g.completed, PendingTools: len(g.pending), LastTool: g.lastTool, LastResult: g.lastResult, Degraded: g.degraded}
+	return AgentProgress{Action: g.lastAction, Detail: g.actionDetail, ToolCalls: g.calls, ToolResults: g.completed, PendingTools: len(g.pending), LastTool: g.lastTool, LastResult: g.lastResult, Degraded: g.degraded,
+		MetricsVersion: attemptMetricsVersion, Reads: g.reads, Writes: g.writes, Unclassified: g.unclassified, Errors: g.totalErrors, Repeats: g.totalRepeats}
 }
 func (g *loopGuard) diagnostic(agent, attempt, stopReason string) AttemptDiagnostic {
 	if stopReason == "" {

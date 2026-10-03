@@ -44,6 +44,7 @@ type ValidationPolicy struct {
 }
 
 type ValidationControl struct {
+	ReviewOutput  bool     `json:"review_output,omitempty"`
 	Inputs        []string `json:"inputs,omitempty"`
 	ID            string   `json:"id"`
 	Command       []string `json:"command"`
@@ -54,15 +55,18 @@ type ValidationControl struct {
 }
 
 type ValidationControlResult struct {
-	ID         string   `json:"id"`
-	Command    []string `json:"command,omitempty"`
-	Executed   bool     `json:"executed"`
-	Passed     bool     `json:"passed"`
-	ExitCode   int      `json:"exit_code"`
-	OutputHash string   `json:"output_sha256"`
-	Summary    string   `json:"summary"`
-	Started    string   `json:"started_at,omitempty"`
-	Finished   string   `json:"finished_at,omitempty"`
+	ReviewOutput          string   `json:"review_output,omitempty"`
+	OutputBytes           int      `json:"output_bytes,omitempty"`
+	ReviewOutputTruncated bool     `json:"review_output_truncated,omitempty"`
+	ID                    string   `json:"id"`
+	Command               []string `json:"command,omitempty"`
+	Executed              bool     `json:"executed"`
+	Passed                bool     `json:"passed"`
+	ExitCode              int      `json:"exit_code"`
+	OutputHash            string   `json:"output_sha256"`
+	Summary               string   `json:"summary"`
+	Started               string   `json:"started_at,omitempty"`
+	Finished              string   `json:"finished_at,omitempty"`
 }
 
 type AutomaticValidation struct {

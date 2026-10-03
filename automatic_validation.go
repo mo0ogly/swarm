@@ -136,6 +136,9 @@ func validationPolicyDigest(p ValidationPolicy) string {
 	return hash(b)
 }
 
+// Review output is opt-in and smaller than the diagnostic capture.
+const maxValidationReviewOutput = 8 * 1024
+
 type limitedValidationOutput struct {
 	b bytes.Buffer
 	n int
@@ -184,7 +187,21 @@ func runValidationControl(root string, c ValidationControl) (r ValidationControl
 func runValidationControlCaptured(root string, c ValidationControl) (r ValidationControlResult, captured []byte, total int) {
 	var output limitedValidationOutput
 	r = ValidationControlResult{ID: c.ID, Command: append([]string(nil), c.Command...), ExitCode: -1, Started: now()}
-	defer func() { r.Finished = now(); captured = append([]byte(nil), output.b.Bytes()...); total = output.n }()
+	defer func() {
+		r.Finished = now()
+		captured = append([]byte(nil), output.b.Bytes()...)
+		total = output.n
+		if c.ReviewOutput {
+			r.OutputBytes = total
+			review := captured
+			if len(review) > maxValidationReviewOutput {
+				review = review[:maxValidationReviewOutput]
+			}
+			// Drop an incomplete UTF-8 suffix; JSON must not silently replace it.
+			r.ReviewOutput = strings.ToValidUTF8(string(review), "")
+			r.ReviewOutputTruncated = total > len(r.ReviewOutput)
+		}
+	}()
 	dir, err := validationDir(root, c.Dir)
 	if err != nil {
 		r.Summary = err.Error()

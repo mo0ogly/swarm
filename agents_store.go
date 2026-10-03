@@ -80,6 +80,14 @@ type AgentProgress struct {
 	LastTool     string `json:"last_tool,omitempty"`
 	LastResult   string `json:"last_result_at,omitempty"`
 	Degraded     string `json:"degraded,omitempty"`
+	// MetricsVersion==0 means this attempt predates the categorised bilan
+	// counters below: a reader must show them as unknown, never as zero.
+	MetricsVersion int `json:"metrics_version,omitempty"`
+	Reads          int `json:"tool_reads,omitempty"`
+	Writes         int `json:"tool_writes,omitempty"`
+	Unclassified   int `json:"tool_unclassified,omitempty"`
+	Errors         int `json:"tool_errors_total,omitempty"`
+	Repeats        int `json:"tool_repeats_total,omitempty"`
 }
 type AttemptDiagnostic struct {
 	AgentID                 string           `json:"agent_id"`
@@ -112,6 +120,7 @@ type Agent struct {
 	Mode                 string            `json:"mode,omitempty"`
 	UnregisteredClaim    bool              `json:"-"`
 	ModelRoute           *ModelRoute       `json:"model_route,omitempty"`
+	ReportedModel        *ReportedModel    `json:"reported_model,omitempty"`
 	Context              *ContextManifest  `json:"context,omitempty"`
 	Brainstorm           bool              `json:"brainstorm,omitempty"`
 	Reply                string            `json:"reply,omitempty"`
@@ -795,16 +804,24 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if r.Origin != originConductor {
 			workProfile := profile
 			workProfile.Skills = nil // Action-specific selection must not leak to other tasks.
+			workProfile.Instruction = ""
+			if w.Profile != nil {
+				workProfile.Instruction = w.Profile.Instruction
+			}
 			w.Profile = &workProfile
 		}
 	}
-	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
+	instruction := r.Instruction
+	if w.Profile != nil && strings.TrimSpace(w.Profile.Instruction) != "" && w.Profile.Instruction != r.Instruction {
+		instruction = "Consignes communes de la mission :\n" + w.Profile.Instruction + "\nConsignes propres à cette tâche :\n" + r.Instruction
+	}
+	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, instruction)
 	if w.Planning != nil {
 		scope, err := w.Planning.scope(t.ScopeID)
 		if err != nil {
 			return Agent{}, false, err
 		}
-		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, r.Instruction)
+		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, instruction)
 	}
 	if r.Role == "worker" {
 		prompt += workerExecutionContext(w, t, r.EventID)

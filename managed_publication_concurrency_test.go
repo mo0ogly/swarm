@@ -10,7 +10,7 @@ import (
 )
 
 func TestManagedPublicationReservesWriterBeforeEvidenceChecks(t *testing.T) {
-	for _, kind := range []string{"managed.integrated", "task.attempt-extension", "task.corrective-recovery", "review.managed.claim", "review.managed.result", "review.managed.batch.claim"} {
+	for _, kind := range []string{"task.update", "future.mutation", "validation-policy.change", "managed.integrated", "task.attempt-extension", "task.corrective-recovery", "review.managed.claim", "review.managed.result", "review.managed.batch.claim"} {
 		t.Run(kind, func(t *testing.T) {
 			s := storeTest(t)
 			w := createTest(t, s)

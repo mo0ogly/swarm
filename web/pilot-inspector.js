@@ -46,7 +46,7 @@ const PilotInspector={
   const validation=snapshot.validation?.tasks[tid],uncertain=Pilot.uncertainExecution(t,a,h);
   const shown=PilotGraph.visible(snapshot.work.tasks,Pilot.state.collapsed);
   const masked=t&&(!shown.has(t.id)||!Pilot.matches(t,a));
-  const signature=JSON.stringify([work,selected,t,a?.progress,a?.status,a?.usage,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
+  const signature=JSON.stringify([work,selected,t,a?.progress,a?.status,a?.usage,a?.reported_model,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
   if(signature===Pilot.inspectorKey&&!open)return;Pilot.inspectorKey=signature;const token=++this.generation;
   const body=$('pilot-inspector-body'),focusKey=document.activeElement?.dataset.inspectorAction;
   const activityExpanded=body.querySelector('#pilot-activity-details')?.open===true;

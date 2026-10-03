@@ -1,0 +1,185 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-115c11e8f8-T1",
+  "artifacts": {
+    "docs/plans/clear-launch-recovery/T1-handoff.md": "044ce591778559a901a880e2ca9c73a2215a4d0b4e41d3bcd5da0e9edb332b4d",
+    "docs/plans/clear-launch-recovery/T1-candidate.json": "b7767ad2a140739807aca8f95aa99473ea10f7c36d1e4c485d691bcd5d29ef91",
+    "docs/plan-115c11e8f8-T1.md": "98f96ebe048ff3c70c2e1fbc1e70f89bec3e30a88ddbefc231cd2a9061726e8a",
+    "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png": "f39a6df31df25eb906f5aa28e37daeba019e188b52a6677eb9011ac16ad35618",
+    "docs/screenshots/clear-launch-recovery/launch-v2-focus.json": "73a60f007f3723de80929c1f6160bde6425e79698317c3d273eeca056a2a3721",
+    "docs/screenshots/clear-launch-recovery/launch-v2-focus.png": "e5b233f2b36d95e47a196c6f03073a0ba28e69855b830724467ab7af7bc1f31e",
+    "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png": "915346facf14b577aaf915c0ffc3a3db846bdca3323686a93f582d9619ee28ca",
+    "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png": "91044d4c501bfbe9d3df20bff7c22b55397406872f1c5584765c42283f47967b",
+    "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png": "568d4cda6a0720dad1d221f261556d6fa40f2dc679e9d528550428441ac787a9",
+    "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png": "7342e8b7f49d91700dd3c4e5b5beca9e5c193c673ee1a5e4dd1ed216f322da33"
+  },
+  "domains": {
+    "launch_summary": 100
+  },
+  "checks": [
+    {
+      "id": "plan-criterion-1",
+      "domain": "launch_summary",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "launch_summary",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "launch_summary",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "launch_summary",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-entry",
+      "domain": "launch_summary",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "launch_summary",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T1-handoff.md",
+        "docs/plans/clear-launch-recovery/T1-candidate.json",
+        "docs/plan-115c11e8f8-T1.md",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png"
+      ],
+      "reason": "Résumé objectif, identité, scope et limites contrôlé dans le CLI réel et les six captures : objectif depuis Work.Objective, profil et skills explicites. Revue indépendante favorable sur le critère 1."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T1-handoff.md",
+        "docs/plans/clear-launch-recovery/T1-candidate.json",
+        "docs/plan-115c11e8f8-T1.md",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png"
+      ],
+      "reason": "Fournisseur legacy affiche Unknown sans modèle inféré ; observation Unknown before execution distincte de la configuration. Tests moteur et capture anglais clair contrôlés ; revue indépendante critère 2 pass."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T1-handoff.md",
+        "docs/plans/clear-launch-recovery/T1-candidate.json",
+        "docs/plan-115c11e8f8-T1.md",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png"
+      ],
+      "reason": "Recette manuelle réelle FR/EN × etat/sombre. Focus après Échap observé mission-primary, focusVisible=true, dialogOpen=false ; relevé DOM et capture transmis. Pas de ré-exécution prétendue par le réviseur. Revue indépendante critère 3 pass."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T1-handoff.md",
+        "docs/plans/clear-launch-recovery/T1-candidate.json",
+        "docs/plan-115c11e8f8-T1.md",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png"
+      ],
+      "reason": "Avis indépendant review-ab40ae2a22da1643a55be10f passé sur les trois critères et les six captures ; même tentative a-62b5c700c364e7236430a9ca. Aucune dérogation ni acceptation automatique."
+    },
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T1-handoff.md",
+        "docs/plans/clear-launch-recovery/T1-candidate.json",
+        "docs/plan-115c11e8f8-T1.md",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png"
+      ],
+      "reason": "T0 accepté et frais, périmètre T1 conservé, candidat courant identifié par six empreintes."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T1-handoff.md",
+        "docs/plans/clear-launch-recovery/T1-candidate.json",
+        "docs/plan-115c11e8f8-T1.md",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+        "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+        "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png"
+      ],
+      "reason": "Contrôleur moteur a exécuté Go/npm et contrôle du relevé enregistré ; tous exit0, reçus et empreintes courants sous politique humaine. Tests ciblés superviseur et vet PASS. La suite Go globale du dernier complément héritage reste en cours et ne sert pas de preuve de réussite pour T1."
+    }
+  ]
+}

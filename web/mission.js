@@ -82,7 +82,24 @@ const Mission={
   for(const phase of d.coordination||[]){const item=node('article',undefined,'mission-coordination-item');item.dataset.kind=phase.kind;item.append(node('h5',missionText(phase.label)),node('p',missionText(phase.summary)));const next=node('p',tr_web_mission_js('Acteur : ')+missionText(phase.actor)+tr_web_mission_js(' · prochaine étape : ')+missionText(phase.next_step),'mission-coordination-next');item.append(next);if(phase.at)item.append(node('p',this.readableDate(phase.at)+(phase.relative?' · '+phase.relative:''),'mission-coordination-date'));block.append(item)}
   return block;
  },
- launchContractView(contract){const list=node('dl',undefined,'mission-launch-contract');for(const [label,value]of [[tr_web_mission_js('Portée'),contract.scope],['Budget',contract.budget],['Reprises',contract.recovery],['Validations',contract.validation]]){const row=node('div');row.append(node('dt',label),node('dd',value));list.append(row)}return list},
+ launchIdentityView(identity={}){
+  const list=node('dl',undefined,'mission-launch-contract');
+  list.dataset.launchIdentity='true';
+  const role={worker:tr_web_mission_js('Exécutant'),planner:tr_web_mission_js('Responsable'),subplanner:tr_web_mission_js('Sous-planificateur')}[identity.role]||identity.role;
+  const rows=[
+   [tr_web_mission_js('Objectif'),identity.objective],
+   [tr_web_mission_js('Rôle'),role],
+   [tr_web_mission_js('Fournisseur'),identity.provider],
+   [tr_web_mission_js('Niveau demandé'),identity.requested_level==='auto'?tr_web_mission_js('Automatique'):identity.requested_level],
+   [tr_web_mission_js('Modèle résolu par la configuration'),identity.resolved_model],
+   [tr_web_mission_js('Modèle rapporté par le fournisseur'),tr_web_mission_js('Inconnu avant l’exécution')],
+   [tr_web_mission_js('Profil du projet'),identity.project_profile||tr_web_mission_js('Aucun profil de projet')],
+   [tr_web_mission_js('Skills sélectionnés'),identity.skills?.join(', ')||tr_web_mission_js('Aucun skill sélectionné')]
+  ];
+  for(const [label,value]of rows){const row=node('div');row.append(node('dt',label),node('dd',value||tr_web_mission_js('Inconnu')));list.append(row)}
+  return list;
+ },
+ launchContractView(contract){const list=node('dl',undefined,'mission-launch-contract');for(const [label,value]of [[tr_web_mission_js('Portée'),contract.scope],[tr_web_mission_js('Budget'),contract.budget],[tr_web_mission_js('Reprises'),contract.recovery],[tr_web_mission_js('Validations'),contract.validation]]){const row=node('div');row.append(node('dt',label),node('dd',missionText(value)));list.append(row)}return list},
  openDetails(){const details=$('mission-results');if(details){details.open=true;details.querySelector('summary')?.focus();details.scrollIntoView({block:'nearest'})}},
  openJournal(){const journal=$('fil-bloc');if(journal){journal.open=true;journal.querySelector('summary')?.focus();journal.scrollIntoView({block:'nearest'})}},
  organizationHelp(){const o=snapshot.mission.organization;openModal(tr_web_mission_js('Organisation de la mission'),missionText(o.next),{action:'help'});$('confirm').hidden=true;$('cancel').textContent=tr_web_mission_js('Fermer');preview(o.issues.map(missionText).join('\n')+'\n'+missionText(o.verification)+tr_web_mission_js('\nCréez un travail vide depuis Gérer les missions, puis utilisez Confier ce besoin à une équipe autonome. Les anciennes missions ne sont pas converties automatiquement.'))},
@@ -108,7 +125,7 @@ const Mission={
   return {summary:counts,next:tr_web_mission_js('Swarm attend les conditions de départ et réessaie automatiquement. Vous pouvez consulter le détail.'),label:tr_web_mission_js('Voir ce qui attend'),kind:'results',tone:'info'};
  },
  primary(o){
-  if(o.kind==='task'){this.action(o.task);return}
+  if(o.kind==='task'){if(snapshot.independent_reviews?.[o.task.id]?.revalidation_available===true){Planning.retryReview(o.task.id);return}this.action(o.task);return}
   if(o.kind==='runtime'){RuntimeHealthPanel.open();return}
   if(o.kind==='decision'&&o.task.attempt_limit_reached){this.recovery(o.task.id);return}
   if(o.kind==='organization'){this.organizationHelp();return}
@@ -160,13 +177,13 @@ const Mission={
   if(modalContext!==context||work!==requested||context.previewGeneration!==generation)return null;
   context.launchSignature=JSON.stringify(fields);context.launchPreview=result;
   const host=$('mission-launch-preview');if(!host)return result;
-  host.className='mission-launch-preview';host.replaceChildren(node('h3',tr_web_mission_js('Aperçu du moteur')),node('p',result.immediate+tr_web_mission_js(' départ(s) possible(s) maintenant · concurrence réelle ')+result.effective_concurrency+'/'+result.requested_slots+'.'),node('p',result.concurrency_detail),node('h4',tr_web_mission_js('Autorisation examinée une fois')));
+  host.className='mission-launch-preview';host.replaceChildren(node('h3',tr_web_mission_js('Aperçu du moteur')),node('p',result.immediate+tr_web_mission_js(' départ(s) possible(s) maintenant · concurrence réelle ')+result.effective_concurrency+'/'+result.requested_slots+'.'),node('p',missionText(result.concurrency_detail)),node('h4',tr_web_mission_js('Autorisation examinée une fois')));
   $('confirm').disabled=result.organization?.ready===false;
   if(result.organization?.ready===false)host.append(node('p',missionText(result.organization.label)+' : '+result.organization.issues.map(missionText).join(' '),'notice attention'));
-  host.append(this.launchContractView(result.contract));
-  if(result.departures.length){const list=node('ul');for(const item of result.departures)list.append(node('li',tr_web_mission_js('Départ : ')+item.title));host.append(list)}
-  if(result.waiting.length){const waiting=node('details');waiting.open=true;waiting.append(node('summary',tr_web_mission_js('Attentes prévues — ')+result.waiting.length));const list=node('ul');for(const item of result.waiting)list.append(node('li',item.title+' — '+item.reason));waiting.append(list);host.append(waiting)}
-  const limits=node('details');limits.append(node('summary',tr_web_mission_js('Limites conservées')));const list=node('ul');for(const text of result.limits)list.append(node('li',text));limits.append(list);host.append(limits);
+  host.append(this.launchContractView(result.contract),node('h4',tr_web_mission_js('Configuration commune')),this.launchIdentityView(result.identity));
+  if(result.departures.length){const list=node('ul');for(const item of result.departures){const entry=node('li',tr_web_mission_js('Départ : ')+item.title);if(item.identity)entry.append(this.launchIdentityView(item.identity));list.append(entry)};host.append(list)}
+  if(result.waiting.length){const waiting=node('details');waiting.open=true;waiting.append(node('summary',tr_web_mission_js('Attentes prévues — ')+result.waiting.length));const list=node('ul');for(const item of result.waiting)list.append(node('li',item.title+' — '+missionText(item.reason)));waiting.append(list);host.append(waiting)}
+  const limits=node('details');limits.append(node('summary',tr_web_mission_js('Limites conservées')));const list=node('ul');for(const text of result.limits)list.append(node('li',missionText(text)));limits.append(list);host.append(limits);
   return result;
  },
  async confirmPreview(context){
@@ -285,13 +302,14 @@ const Mission={
   input('inputs',tr_web_mission_js('Fichiers examinés — un chemin relatif par ligne'),(control.inputs||[]).join('\n'),'textarea');
   input('id',tr_web_mission_js('Identifiant'),control.id||'');const programLabel=document.createElement('label');programLabel.textContent=tr_web_mission_js('Programme');const program=document.createElement('select');program.dataset.validationField='program';for(const value of ['go','git','node','npm','python','python3','pytest']){const option=document.createElement('option');option.value=value;option.textContent=value;program.append(option)}program.value=control.command?.[0]||'go';programLabel.append(program);box.append(programLabel);
   const args=input('args',tr_web_mission_js('Arguments — un argument exact par ligne'),(control.command||[]).slice(1).join('\n'),'textarea');args.rows=3;const justification=input('justification',tr_web_mission_js('Justification objective de la couverture'),control.justification||'','textarea');justification.rows=2;input('dir',tr_web_mission_js('Répertoire relatif au projet'),control.dir||'.');const timeout=input('timeout',tr_web_mission_js('Délai en secondes'),String(control.timeout_seconds||60),'number');timeout.min='1';timeout.max='300';
+  const share=input('review-output',tr_web_mission_js('Partager la sortie avec le vérificateur — 8 Kio maximum, peut contenir des données sensibles'),'', 'checkbox');share.checked=control.review_output===true;
   const mapped=document.createElement('fieldset');mapped.className='validation-mapping';const mappedLegend=document.createElement('legend');mappedLegend.textContent=tr_web_mission_js('Critères objectivement contrôlés');mapped.append(mappedLegend);task.criteria.forEach((text,index)=>{const label=document.createElement('label');const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.dataset.criterion=String(index+1);checkbox.checked=(control.criteria||[]).includes(index+1);label.append(checkbox,document.createTextNode((index+1)+'. '+text));mapped.append(label)});box.append(mapped);
   const remove=Pilot.command(tr_web_mission_js('Retirer ce contrôle'),()=>{box.remove();this.validationChanged()});remove.type='button';box.append(remove);for(const el of box.querySelectorAll('input,select,textarea'))el.addEventListener('input',()=>this.validationChanged());$('validation-controls').append(box);
  },
  validationChanged(){if(!modalContext||modalContext.action!=='validation-policy')return;modalContext.validationPreview=null;modalContext.validationSignature='';$('preview').hidden=true;$('confirm').textContent=tr_web_mission_js('Examiner l’effet');$('modal-error').hidden=true},
  validationFields(){
   const mode=$('validation-mode').value;if(mode==='remove')return {intent:'remove'};
-  const controls=[];if(mode!=='remove')for(const box of document.querySelectorAll('#validation-controls .validation-control')){const get=name=>box.querySelector('[data-validation-field="'+name+'"]');const command=[get('program').value,...get('args').value.split('\n').map(x=>x.trim()).filter(Boolean)];controls.push({inputs:get('inputs').value.split('\n').map(x=>x.trim()).filter(Boolean),id:get('id').value.trim(),command,criteria:[...box.querySelectorAll('[data-criterion]:checked')].map(x=>Number(x.dataset.criterion)),justification:get('justification').value.trim(),dir:get('dir').value.trim(),timeout_seconds:Number(get('timeout').value)})}
+  const controls=[];if(mode!=='remove')for(const box of document.querySelectorAll('#validation-controls .validation-control')){const get=name=>box.querySelector('[data-validation-field="'+name+'"]');const command=[get('program').value,...get('args').value.split('\n').map(x=>x.trim()).filter(Boolean)];controls.push({review_output:get('review-output').checked,inputs:get('inputs').value.split('\n').map(x=>x.trim()).filter(Boolean),id:get('id').value.trim(),command,criteria:[...box.querySelectorAll('[data-criterion]:checked')].map(x=>Number(x.dataset.criterion)),justification:get('justification').value.trim(),dir:get('dir').value.trim(),timeout_seconds:Number(get('timeout').value)})}
   return {intent:'replace',policy:{mode,controls}};
  },
  validationPreview(result){

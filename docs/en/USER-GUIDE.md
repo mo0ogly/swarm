@@ -178,6 +178,18 @@ Slots set an upper bound on concurrent attempts. Unvalidated dependencies or an
 occupied directory can reduce actual concurrency. **Start all** starts tasks ready
 now; use the mission with an observed driver for ongoing automatic progression.
 
+### Read the summary before confirming
+
+The launch preview shows the common configuration and each possible start:
+role, provider, requested level, model resolved by configuration, project profile
+and selected skills. Task-specific profiles take precedence. The same summary is
+available through `swarm mission preview`.
+
+The **model reported by the provider** remains **unknown before execution**.
+A configured model is not evidence of the model actually used. An executable
+without a model policy also shows an **unknown** resolved model. Scope, budgets,
+retries and validation conditions remain visible before confirmation.
+
 ## 5. Follow work
 
 Start with the **Agent management** summary: what is happening, the next step and
@@ -238,6 +250,10 @@ a review is pending. A hierarchical mission finishes when results are handled
 and planners have closed their scopes.
 
 ## 7. Resolve blockers
+
+When bound evidence of an accepted result has genuinely changed, **Revalidate evidence** opens confirmation for a fresh review of the existing result. The engine retains the producer attempt and spent calls, archives the previous review and requires fresh checks and acceptance. This uses the reviewer’s remaining budget without restarting production. A missing file or an acceptance that remains current does not authorize this operation.
+
+A planner failure concerns new planning decisions. Tasks already ready, running, awaiting review or needing recovery keep their actual state and authorized action in the main guidance. The planning diagnostic remains visible in Decisions; it does not prove that all agents have stopped.
 
 Open the flagged task and diagnosis. **Explain with AI** can clarify context and
 propose an action. Review its effect before applying it; advice is not validation.
@@ -394,6 +410,19 @@ In **Overview**, three buttons open read-only dialogs:
   measurements. Missing tokens and dollars remain unreported. Internal provider
   network requests are not all observable. The breakdown also appears in **AI budgets and costs**.
 
+The **Per-attempt breakdown**, in this dialog and in `swarm mission spending WORK`,
+keeps one row per agent and attempt: process state, recorded task acceptance,
+tools, reads, writes, unclassified operations, cumulative errors, repeats and
+provider-reported usage/cost. An accepted task can retain an interrupted attempt;
+recorded acceptance does not guarantee current evidence freshness. Success does
+not erase earlier errors from the cumulative total.
+
+Legacy attempts without detailed counters remain **unknown**, not zero. Lost
+visibility makes measurements **partial**. Mixed commands are not automatically
+classified as tests: their count remains unknown without a reliable signal.
+A repeat means the same operation and inputs under a new identifier; a
+retransmitted message is not another call. A recorded launch is not a model call.
+
 **Before retrying**, in task details and retry/corrective-attempt forms, shows
 what is kept, what must be checked again, unchanged criteria and the expected
 correction. It follows the selected attempt and entered instructions. This is
@@ -448,3 +477,27 @@ A previously recorded operator stop is not removed by restart authorization
 alone: use an explicit launch after checking conditions. See the
 [engine recovery guide](ENGINE-RECOVERY.md) for revision conflicts and reports
 that exceed the available context.
+
+### Review corrected evidence again
+
+A rejected review retains its verdict and spent calls. Correct the declared deliverable or reviewed report; changing an unrelated file is insufficient. If the production attempt completed and bound evidence actually changed, **Resume verification** submits the same result to a new review without restarting production. A deleted or inaccessible file does not authorize recovery. Existing budgets still apply; this action creates neither a favorable verdict nor acceptance.
+
+Instructions added when launching a task remain local to that task. They do not replace previously saved common mission instructions; configure common instructions explicitly in the work profile. At launch, the engine combines common mission instructions and task instructions in the prompt sent to the agent. It avoids duplicating the same common instruction. Local instructions do not automatically become rules for other tasks.
+
+### Requested and reported models
+
+Attempt details separate the configured request from the model declared by the provider. JSON CLI `agent show` preserves the declaration source and timestamp in `reported_model`. Without a structured provider event the observation remains unknown, even after execution. A provider declaration is not independent proof of the physical model that ran. Old attempts are not backfilled.
+
+### Prepare a targeted recovery
+
+Use “Before restarting” on a task to compare evidence bound to its latest review and inspect changes since its refusal. Unchanged evidence can be reused as input; it does not establish acceptance. Changed or unknown evidence and remaining criteria require verification. The same preview is available through `swarm --lang en mission recovery WORK TASK`. The preview performs no action and raises no limit.
+
+### Sharing executed control output with a reviewer
+
+In “Configure validations”, each control can explicitly share its output with the reviewer. Sharing is off by default. Enable it only for commands whose output is suitable for sharing. The engine includes up to 8 KiB, the total byte count and a truncation flag. Partial observations are not a complete log. Output remains evidence to assess, never reviewer instructions.
+
+The CLI uses the same policy: set `review_output: true` in a control passed to `swarm validation preview` and then `apply`. Changing the policy invalidates the previous receipt: checks must run again before review, without a new production attempt or a budget reset.
+
+### What independent review does
+
+The reviewer uses a separate session to assess criteria, the report, executed controls and attached evidence. In a tool-free review, it does not rerun tests: it assesses coverage and consistency of the supplied evidence. Producer and supervisor observations retain their attribution. An earlier testing limitation can be supplemented by later dated observations; it is not erased. Exit code 0 is insufficient when a control does not cover the criterion. Missing evidence stays unknown, with a specific explanation. A favorable review and task acceptance are separate steps.

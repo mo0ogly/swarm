@@ -104,20 +104,24 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 				return printJSON(out, preview)
 			}
 			fmt.Fprintf(out, uiText("%d départ(s) possible(s) maintenant · concurrence réelle %d/%d\n"), preview.Immediate, preview.EffectiveConcurrency, preview.RequestedSlots)
-			fmt.Fprintln(out, preview.ConcurrencyDetail)
+			fmt.Fprintln(out, uiEngineText(preview.ConcurrencyDetail))
+			printMissionLaunchIdentity(out, preview.Identity)
 			fmt.Fprintln(out, uiText("Autorisation examinée une fois :"))
-			fmt.Fprintf(out, uiText("- Portée : %s\n"), preview.Contract.Scope)
-			fmt.Fprintf(out, uiText("- Budget : %s\n"), preview.Contract.Budget)
-			fmt.Fprintf(out, uiText("- Reprises : %s\n"), preview.Contract.Recovery)
-			fmt.Fprintf(out, uiText("- Validations : %s\n"), preview.Contract.Validation)
+			fmt.Fprintf(out, uiText("- Portée : %s\n"), uiEngineText(preview.Contract.Scope))
+			fmt.Fprintf(out, uiText("- Budget : %s\n"), uiEngineText(preview.Contract.Budget))
+			fmt.Fprintf(out, uiText("- Reprises : %s\n"), uiEngineText(preview.Contract.Recovery))
+			fmt.Fprintf(out, uiText("- Validations : %s\n"), uiEngineText(preview.Contract.Validation))
 			for _, item := range preview.Departures {
 				fmt.Fprintf(out, uiText("- Départ : %s\n"), item.Title)
+				if item.Identity != nil {
+					printMissionLaunchIdentity(out, *item.Identity)
+				}
 			}
 			for _, item := range preview.Waiting {
-				fmt.Fprintf(out, uiText("- Attente : %s — %s\n"), item.Title, item.Reason)
+				fmt.Fprintf(out, uiText("- Attente : %s — %s\n"), item.Title, uiEngineText(item.Reason))
 			}
 			for _, limit := range preview.Limits {
-				fmt.Fprintf(out, uiText("- Limite : %s\n"), limit)
+				fmt.Fprintf(out, uiText("- Limite : %s\n"), uiEngineText(limit))
 			}
 			return nil
 		}
@@ -312,4 +316,43 @@ func printMissionUnderstanding(out io.Writer, facts MissionUnderstanding, tasks 
 	fmt.Fprintf(out, uiText("%sCe qui se passe : %s\n"), indent, uiFactText(facts.What, tasks))
 	fmt.Fprintf(out, uiText("%sProchaine étape : %s\n"), indent, uiEngineText(facts.NextStep))
 	fmt.Fprintf(out, uiText("%sQui agit : %s\n"), indent, uiEngineText(facts.Actor))
+}
+
+func printMissionLaunchIdentity(out io.Writer, identity MissionLaunchIdentity) {
+	value := func(s string) string {
+		if s == "" {
+			return uiText("Inconnu")
+		}
+		return s
+	}
+	profile := identity.ProjectProfile
+	if profile == "" {
+		profile = uiText("Aucun profil de projet")
+	}
+	skills := strings.Join(identity.Skills, ", ")
+	if skills == "" {
+		skills = uiText("Aucun skill sélectionné")
+	}
+	role := identity.Role
+	switch role {
+	case "worker":
+		role = uiText("Exécutant")
+	case "planner":
+		role = uiText("Responsable")
+	case "subplanner":
+		role = uiText("Sous-planificateur")
+	}
+	level := identity.RequestedLevel
+	if level == "auto" {
+		level = uiText("Automatique")
+	}
+	for _, row := range [][2]string{
+		{uiText("Objectif"), value(identity.Objective)},
+		{uiText("Rôle"), role}, {uiText("Fournisseur"), value(identity.Provider)},
+		{uiText("Niveau demandé"), value(level)}, {uiText("Modèle résolu par la configuration"), value(identity.ResolvedModel)},
+		{uiText("Modèle rapporté par le fournisseur"), uiText("Inconnu avant l’exécution")},
+		{uiText("Profil du projet"), profile}, {uiText("Skills sélectionnés"), skills},
+	} {
+		fmt.Fprintf(out, "- %s : %s\n", row[0], row[1])
+	}
 }

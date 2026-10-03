@@ -134,7 +134,7 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 
 	// A recovered result can be reviewed without rewriting its producer exit.
 	// The review projection checks the current attempt and producer identities.
-	if a != nil && (a.Status == "failed" || a.Status == "interrupted") && s.managedReviewPresentation(w, t, a, &p) {
+	if a != nil && (a.Status == "failed" || a.Status == "interrupted") && s.currentReviewPresentation(w, t, a, &p) {
 		return p
 	}
 
@@ -165,7 +165,7 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 		}
 		return p
 	}
-	if a != nil && a.Status == "completed" && s.managedReviewPresentation(w, t, a, &p) {
+	if a != nil && a.Status == "completed" && s.currentReviewPresentation(w, t, a, &p) {
 		return p
 	}
 
@@ -220,6 +220,46 @@ func (s *Store) resultPresentation(w *Work, t *Task, agents []Agent, validation 
 		p.ValidationState = "failed_or_stale"
 	}
 	return p
+}
+
+// Ordinary reviews must remain visible after they block a completed producer.
+// Presentation never changes the attempt, budgets or acceptance decision.
+func (s *Store) currentReviewPresentation(w *Work, t *Task, a *Agent, p *ResultPresentation) bool {
+	if w.Planning != nil && w.Planning.Repository != nil {
+		return s.managedReviewPresentation(w, t, a, p)
+	}
+	r := t.IndependentReview
+	if w.Planning == nil || r == nil || r.State == "passed" || !currentTaskAttempt(t, r.Attempt) || r.Attempt != a.Attempt || r.Producer != a.ID {
+		return false
+	}
+	p.ReportID, p.ReceiptID, p.ReportState = r.Report, r.Receipt, "submitted"
+	p.State, p.Label, p.ValidationState = "review_blocked", reviewStateLabel(r.State), "review_unvalidated"
+	p.Reason = fmt.Sprintf("Revue indépendante : %s", r.Reason)
+	p.NextStep = "Examiner le rapport et le motif de la revue avant de choisir une correction ou une reprise autorisée."
+	if _, err := s.artifactDigest(ExchangeArtifact{Path: r.Report, SHA256: r.Digest}); err != nil {
+		p.ReportState, p.ValidationState, p.Label = "stale", "failed_or_stale", "Preuves à renouveler"
+		p.Reason = "Le rapport transmis au vérificateur est indisponible ou modifié ; ses preuves doivent être réexaminées."
+		return true
+	}
+	if r.Contract != reviewContract(t) || s.currentReportArtifacts(r.ReportArtifacts) != nil {
+		p.ValidationState, p.Label = "failed_or_stale", "Avis périmé"
+		p.Reason = "Le contrat ou la révision de base a changé depuis cette revue."
+		return true
+	}
+	switch r.State {
+	case "changes_requested":
+		p.ValidationState = "review_changes_requested"
+	case "stale":
+		p.ValidationState = "failed_or_stale"
+	case "running":
+		p.State, p.ValidationState = "review_in_progress", "pending_review"
+		p.Reason = "Le rapport est conservé ; le vérificateur indépendant examine le candidat testé."
+		p.NextStep = "Attendre l’avis indépendant ; le résultat n’est pas encore accepté."
+	case "passed":
+		// A positive opinion does not replace the gate or human decision.
+		return false
+	}
+	return true
 }
 
 // Managed reports live beside the candidate receipt, not in the host's docs/.

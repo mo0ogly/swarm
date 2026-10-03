@@ -1,0 +1,54 @@
+{
+  "origin": "Actual CUA Enter/Escape on existing isolated protocol fixture and visible corrected focus border; no new LLM, no DOM mutation",
+  "at": "2026-10-03T15:51:57.533Z",
+  "cases": [
+    {
+      "lang": "en",
+      "theme": "etat",
+      "afterEscape": {
+        "borderPattern": "4px, 2px",
+        "borderWidth": "4px",
+        "dialogOpen": false,
+        "focusVisible": true,
+        "label": "Modèle demandé distinct du modèle rapporté. Blocked. ⚙ Worker · Inherited: claude · standard. model-proof. Resolve: Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis — inspect task",
+        "role": "button"
+      }
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "afterEscape": {
+        "borderPattern": "4px, 2px",
+        "borderWidth": "4px",
+        "dialogOpen": false,
+        "focusVisible": true,
+        "label": "Modèle demandé distinct du modèle rapporté. Blocked. ⚙ Worker · Inherited: claude · standard. model-proof. Resolve: Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis — inspect task",
+        "role": "button"
+      }
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "afterEscape": {
+        "borderPattern": "4px, 2px",
+        "borderWidth": "4px",
+        "dialogOpen": false,
+        "focusVisible": true,
+        "label": "Modèle demandé distinct du modèle rapporté. Bloquée. ⚙ Exécutant · Hérité : claude · standard. model-proof. À résoudre : Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis — examiner la tâche",
+        "role": "button"
+      }
+    },
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "afterEscape": {
+        "borderPattern": "4px, 2px",
+        "borderWidth": "4px",
+        "dialogOpen": false,
+        "focusVisible": true,
+        "label": "Modèle demandé distinct du modèle rapporté. Bloquée. ⚙ Exécutant · Hérité : claude · standard. model-proof. À résoudre : Processus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis — examiner la tâche",
+        "role": "button"
+      }
+    }
+  ]
+}
