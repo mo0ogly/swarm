@@ -74,11 +74,12 @@ l'exploitation ordinaire d'un système distribué et d'agents faillibles.
 | F1 | Réponse perdue après un effet, suivie d'un nouvel essai |
 | F2 | Deux processus de conduite actifs sur le même travail |
 | F3 | Arrêt brutal entre l'exécution d'un effet et son enregistrement |
-| F4 | Candidat modifié après sa validation |
-| F5 | Indisponibilité d'un service nécessaire au contrôle |
+| F4 | Candidat modifié après sa validation, une fois l'exécution de l'effet lancée |
+| F4e | Candidat modifié après sa validation, avant le lancement de l'exécution de l'effet |
+| F5 | Indisponibilité persistante (plusieurs appels consécutifs) d'un service nécessaire au contrôle |
 | F6 | Agent qui boucle et épuise son budget |
-| F7 | Processus de conduite figé au-delà de son bail, puis réveillé |
-| F8 | Résultat d'une tentative ancienne présenté après une tentative plus récente |
+| F7 | Processus de conduite figé au-delà de son bail pendant une tentative en cours, puis réveillé |
+| F8 | Remise d'une tentative ancienne et rejetée coexistant avec celle d'une tentative plus récente |
 
 Les attaques par injection de prompt et les agents délibérément malveillants
 sont hors du périmètre de cet article ; les défenses par construction comme
@@ -90,7 +91,7 @@ déclenchées volontairement ; nous les traitons ici comme des fautes.
 ### 4.4 Invariants du moteur
 
 Le moteur doit maintenir les huit invariants suivants, quelles que soient les
-fautes F1 à F8.
+fautes F1 à F8 et F4e.
 
 - **I1 — Effet unique par intention.** Deux requêtes portant le même `event_id`
   produisent au plus une mutation ; la seconde renvoie le résultat de la
@@ -156,7 +157,8 @@ exprime une hypothèse de conception ; la section 6 la confronte aux mesures.
 | F1 Réponse perdue + nouvel essai | E2 (et I1 pour les mutations du moteur) | Clé d'idempotence de paiement |
 | F2 Deux conducteurs | I4, I2 | Verrou sur l'instruction de paiement |
 | F3 Arrêt entre effet et enregistrement | E2, I1 | Rapprochement avant relance |
-| F4 Candidat modifié après validation | I3, E3 | Validation liée à la version de l'ordre |
+| F4 Candidat modifié après lancement de l'effet | E3 | Contrôle de l'ordre au moment de l'exécution |
+| F4e Candidat modifié avant lancement de l'effet | I3 | Validation liée à la version de l'ordre |
 | F5 Service indisponible | I6 | Reprise après incident documentée |
 | F6 Budget épuisé | I5 | Plafond, arrêt en position sûre |
 | F7 Conducteur figé puis réveillé | I4, I2 | Mise à l'écart d'un opérateur dont le mandat a expiré |

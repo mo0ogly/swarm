@@ -38,6 +38,32 @@ double reste possible, donc mesurable. Toutes les données sont synthétiques.
   est validé par un contrôle structuré contre le grand livre, la validation est
   liée à l'empreinte du lot, et seul le règlement détient le jeton de paiement.
 
+### 6.2 bis Condition S en mission hiérarchique (amendement du 5 octobre 2026)
+
+Swarm impose une organisation hiérarchique à toute mission autonome. En S :
+un responsable de mission scripté et déterministe (aucun modèle appelé) reçoit
+les remises et clôt le périmètre ; `prepare` (exigence `req-1`, contrôle
+`check_lot`) produit le lot dans `docs/prepare.md`, que le moteur remet avec
+son empreinte et l'identité de la tentative ; `settle` (exigence `req-2`,
+contrôle `verify_settlement`) ne règle que la remise de la tentative acceptée
+de `prepare`, après vérification d'empreinte. Les données de la banque et le
+jeton de règlement sont hors de l'espace des agents ; seul le règlement reçoit
+le jeton. **Succès déclaré en S** : `settle` acceptée et périmètre du
+responsable clos. Le responsable scripté émet une reprise unique après un
+arrêt brutal du règlement (F3) ; le moteur borne les tentatives à deux.
+La revue indépendante imposée par Swarm accepte tout rapport non vide : elle
+ne discrimine rien dans ce banc.
+
+Adaptations des fautes au modèle hiérarchique : F4 est injectée après le
+lancement du règlement (elle teste le règlement, E3) et la variante F4e avant
+ce lancement (elle teste la fraîcheur des preuves côté moteur, I3), l'ordre
+étant prouvé par horodatage ; F5 renvoie plusieurs indisponibilités
+consécutives ; F6 passe par la limite d'appels du profil de lancement, le
+contrat d'une tâche planifiée étant immuable ; F7 fige le conducteur pendant
+l'exécution de `prepare` ; F8 fait coexister la remise d'une tentative rejetée
+et celle de la tentative suivante. Chaque résultat sous F4 et F4e enregistre
+quel composant a arrêté le paiement (moteur, règlement ou aucun).
+
 ### 6.3 Facteur croisé : la clé d'idempotence
 
 Chaque condition est croisée avec trois modes de clé, utilisés par le
@@ -48,7 +74,7 @@ séparer ce que la clé seule empêche de ce que le moteur ajoute.
 
 ### 6.4 Fautes injectées
 
-Les huit fautes F1 à F8 de la section 4.3 sont injectées de façon déterministe,
+Les neuf fautes de la section 4.3 (F1 à F8, plus la variante F4e) sont injectées de façon déterministe,
 plus une exécution sans faute (contrôle négatif). Chaque injection laisse un
 **marqueur** horodaté, écrit par le composant fautif au moment où la faute
 agit (API, règlement, préparateur) ou par le harnais après vérification du
@@ -129,7 +155,7 @@ comme les autres.
 
 - **Agents scriptés** : 100 exécutions par case (condition × clé × faute),
   graines 1000 à 1099, identiques d'une condition à l'autre. Soit
-  3 × 3 × 9 × 100 = 8 100 exécutions.
+  3 × 3 × 10 × 100 = 9 000 exécutions (neuf fautes et le cas sans faute).
 - **Agents réels** : condition S, clé métier, fautes {aucune, F1, F3, F4, F5},
   k = 5 essais par scénario, modèle, version et outil figés et déclarés ;
   plafond d'appels fixé avant lancement.
@@ -190,8 +216,7 @@ campagne et comparée à celle du début.
 
 ## Points ouverts avant gel définitif
 
-1. Condition S : définitions à relire après la refonte hiérarchique (passation
-   au responsable de mission au lieu de l'échange, statut d'acceptation).
+1. Condition S : définitions hiérarchiques ajoutées en 6.2 bis ; à figer après la relecture de la tâche 9.
 2. Seuil de 10 % d'exclusions par case : à confirmer par l'opérateur.
 3. Choix du modèle et de l'outil pour les agents réels, et plafond d'appels.
 4. Recrutement du second annotateur.
