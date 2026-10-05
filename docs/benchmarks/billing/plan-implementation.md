@@ -2212,3 +2212,87 @@ Attendu : `OK` deux fois, puis `aucune dépendance applicative`.
 avec le commit du banc. Ne pas l'écrire avant que les tests soient verts.
 
 **Étape 4 :** commit (si demandé) : `benchmarks/billing/README.md`, `docs(banc): README du banc de facturation`.
+
+---
+
+## Condition S hiérarchique (2026-10-05) — remplace les tâches 8 à 10
+
+Décision opérateur du 5 octobre 2026 : la condition S est mesurée sur le dépôt
+swarm de référence (`main`, commit `53f2564` et suivants), en mode
+hiérarchique. Référence fonctionnelle : `tests/organized_coordination_process.py`
+et `tests/organized_fixture.py` (PASS sur `bin/swarm` construit par `make build`).
+
+### Faits établis dans le code (à ne pas re-supposer)
+
+- Un agent d'une mission hiérarchique ne reçoit plus la ligne « Coordination
+  structurée » ; son prompt contient « Tâche <id> : » et la consigne d'écrire
+  `docs/<id>.md`. Le conducteur remet automatiquement ce rapport au responsable
+  de mission avec `{"path", "sha256"}` et l'identité de la tentative, et
+  seulement pour une tentative terminée normalement (`review_dialog.go:214-236`).
+- `exchange send` est refusé en mission hiérarchique (`agent_exchange.go:261`).
+- Une décision du responsable qui s'appuie sur une tentative périmée est
+  refusée (`planning.go:413`) ; l'empreinte des artefacts est revérifiée à la
+  décision (`planning.go:416`, `agent_exchange.go:156`).
+- Les contrôles sont déclarés par exigence (`checks={"req-N": [...]}` dans
+  `planning enable`) et les tâches sont créées par une décision du responsable
+  (`planning claim` puis `planning decide` avec des opérations `task`).
+- Une revue indépendante par le fournisseur du responsable s'ajoute aux
+  contrôles automatiques.
+
+### Conception
+
+- Responsable de mission scripté (`bench/planner_fixture.py`), adapté de
+  `tests/organized_fixture.py` : revue « pass » si le rapport est non vide,
+  clôture quand toutes les tâches sont acceptées. Aucun modèle appelé.
+- `prepare` (exigence `req-1`, contrôle `check_lot`) : le préparateur écrit le
+  lot JSON dans `docs/prepare.md`, son livrable ; le moteur le remet avec son
+  empreinte.
+- `settle` (dépend de `prepare`, exigence `req-2`, contrôle
+  `verify_settlement`) : le règlement lit dans `work show` la remise de
+  `prepare` correspondant à la tentative acceptée, relit le fichier, compare
+  l'empreinte (E3), paie avec la clé configurée, écrit `docs/settle.md`.
+- Jeton de règlement transmis au seul règlement (E1).
+- Fautes : F1, F2, F5, F7 inchangées ; F3 crash du règlement ; F4 modification
+  de `docs/prepare.md` après acceptation, avant lecture par le règlement ;
+  F6 budget d'appels bas sur `prepare` ; F8 redéfinie : la tentative 1 de
+  `prepare` se termine normalement avec un lot faux (rejeté par `check_lot`),
+  la tentative 2 produit le bon lot ; deux remises coexistent.
+- Succès déclaré en S : `settle` acceptée et périmètre du responsable clos.
+
+### Tâche 8H.0 — essai jetable (STOP si démenti)
+
+Établir et consigner dans `docs/benchmarks/billing/observations.md` :
+1. le `path` réel de l'artefact remis quand l'agent a un espace propre
+   (`racine/prepare`) ou partagé (`racine`) ;
+2. le champ de `work show` qui identifie la tentative acceptée d'une tâche ;
+3. le comportement du moteur sur un code 137 du règlement et un code 3 du
+   contrôle.
+
+### Tâche 8H.1 à 8H.3 — implémentation, cas nominal seulement
+
+Réécrire `bench/provider_s.py` et `bench/run_s.py` selon la conception, ajouter
+`bench/planner_fixture.py`, conserver l'infrastructure existante (`Swarm.cli`,
+conducteurs, nettoyage, `BenchError`, marqueurs). Test d'intégration
+`tests/test_run_s.py` (avec `BANC_SWARM=1`) : clé métier, sans faute →
+`status` OK, `correct` et `declared_success` vrais, tâches acceptées,
+responsable clos, deux remises avec artefacts. Les fautes F1 à F8 ne sont pas
+exercées dans ce lot.
+
+### Décisions opérateur sur les fautes en S (2026-10-05)
+
+Validées après la relecture de la condition S hiérarchique :
+
+- **F6 (budget)** : la mutation du contrat d'une tâche planifiée est refusée
+  (`store.go:444-445`). La limite d'appels est passée par le profil de
+  lancement (`limits.max_tool_calls`, à vérifier en essai jetable) et le
+  préparateur varie ses commandes pour ne pas déclencher le garde-fou de
+  répétition (`loop_guard.go`) avant le budget.
+- **F3 (crash du règlement)** : le responsable scripté émet une reprise bornée
+  unique (`PlanMaxAttempts` = 2). Sans elle, aucune seconde exécution n'a lieu
+  et les modes de clé sont indiscernables.
+- **F4 (lot modifié)** : le banc enregistre si `settle` a été lancée ; les
+  résultats distinguent « arrêté par le moteur » (fraîcheur des preuves avant
+  lancement) et « arrêté par le règlement » (empreinte, code 4).
+- **F8 (remise ancienne)** : conservée ; décrite comme une relance par
+  correction automatique du moteur suivie du choix de la bonne remise par le
+  règlement. Elle ne mesure ni la coordination ni la qualité de la correction.

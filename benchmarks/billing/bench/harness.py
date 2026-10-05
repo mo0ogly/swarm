@@ -162,9 +162,13 @@ def provenance():
     return record
 
 
-def finish(run_dir, *, condition, key_mode, fault, seed, started, declared_success, timed_out, extra):
-    """Mesure après arrêt de l'API : le grand livre ne bouge plus."""
-    conn = ledger.connect(str(run_dir / "ledger.db"))
+def finish(run_dir, *, condition, key_mode, fault, seed, started, declared_success, timed_out, extra, bank_dir=None):
+    """Mesure après arrêt de l'API : le grand livre ne bouge plus.
+
+    `bank_dir` : dossier du grand livre quand il est séparé de la racine d'exécution (condition S) ;
+    par défaut la racine elle-même (B0, B1).
+    """
+    conn = ledger.connect(str(Path(bank_dir or run_dir) / "ledger.db"))
     try:
         m = metrics.measure(conn, config.CAP_CENTS)
     finally:

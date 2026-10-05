@@ -1,14 +1,37 @@
 #!/usr/bin/env python3
-"""Condition S : préparation et règlement conduits par Swarm, fautes injectées de l'extérieur.
+"""Condition S hiérarchique : préparation et règlement conduits par Swarm, fautes injectées de l'extérieur.
 
-Chaque exécution a sa propre racine Swarm (`swarm init` dans la racine d'exécution), son API, et un
+Chaque exécution a sa propre racine d'exécution, séparée en deux dossiers :
+- `swarm/` : racine Swarm (`swarm init`) et espace de travail partagé des agents ;
+- `bank/` : grand livre, jeton de règlement, `api.port`, `api.log` de l'API de paiement.
+E1 par construction, pour le fournisseur scripté seulement : le jeton n'est ni dans l'espace des
+agents ni passé au fournisseur `banc-prepare` ; seul `banc-settle` reçoit son chemin. Un agent réel
+n'est pas isolé du système de fichiers : il pourrait lire `../bank`. Les marqueurs de fautes restent dans
+`faults/` de la racine d'exécution. Chaque exécution a aussi son API et un
 conducteur `web` sans adresse : il écoute sur 127.0.0.1:0 (web_server.go, serveWeb), donc aucun
 conflit de port entre conducteurs ni entre exécutions.
 
+Organisation (docs/benchmarks/billing/plan-implementation.md, « Condition S hiérarchique ») :
+un responsable de mission scripté (planner_fixture) possède le périmètre racine ; le travail a deux
+critères, donc deux exigences, chacune avec son contrôle déclaré à `planning enable` :
+`req-1` → check_lot sur `docs/prepare.md`, `req-2` → verify_settlement. Les tâches `prepare` puis
+`settle` sont créées par une décision du responsable (`planning claim` puis `planning decide`).
+Les deux tâches s'exécutent dans la racine (espace partagé) : en espace propre, le moteur ne
+revalide pas un rapport absent de `racine/docs` (observations.md, § 1).
+
+Les contrôles s'exécutent dans la racine du projet (automatic_validation.go : runValidationControl
+avec s.root) : `docs/prepare.md` y désigne le livrable remis. Ils peuvent s'exécuter plusieurs fois
+par tentative (observations.md, § 5) ; check_lot et verify_settlement sont en lecture seule.
+
+Succès déclaré : `settle` acceptée ET périmètre racine clos par le responsable.
+
 Un échec du banc lui-même (CLI swarm en échec pendant l'installation, API non démarrée, conducteur
-mort) lève harness.BenchError : c'est une ERREUR, jamais une mesure. Un dépassement de
-S_RUN_TIMEOUT_S donne DÉLAI. Le nettoyage arrête mission, agents, conducteurs et API dans tous les
-cas, puis tue tout processus restant dont la ligne de commande désigne la racine d'exécution.
+mort, contrat du moteur différent de celui observé, panne du responsable ou du vérificateur, budget
+de planification épuisé, fournisseur sorti avec un code qu'aucune faute prévue n'explique,
+`settle` acceptée sans clôture du périmètre) lève harness.BenchError : c'est une ERREUR,
+jamais une mesure. Un dépassement de S_RUN_TIMEOUT_S donne DÉLAI. Le nettoyage arrête mission,
+agents, conducteurs et API dans tous les cas, puis tue tout processus restant dont la ligne de
+commande désigne la racine d'exécution.
 """
 import json
 import os
@@ -21,11 +44,66 @@ from pathlib import Path
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from bench import config, harness, markers
+from bench import config, harness, markers, planner_fixture
 
 SWARM = harness.SWARM_BIN
 ACTIVE = {"queued", "starting", "running", "stopping"}   # agents_store.go : activeAgent
+PENDING = {"running", "submitted"}                       # tâche dont le moteur n'a pas fini de décider
 LISTENING = "Cockpit local : http://127.0.0.1:"          # web_server.go : annonce d'écoute de serveWeb
+LOT_REL = "docs/prepare.md"                              # livrable de prepare, relatif à la racine
+PLAN_MAX_ATTEMPTS = 2                                    # planning.go : PlanMaxAttempts d'une tâche planifiée
+CRITERIA = ("lot conforme au grand livre", "chaque facture payée une fois au montant exact")
+# Codes de sortie du fournisseur qu'une faute prévue explique, en plus de 0. Provisoire : les fautes
+# relèvent de décisions de l'opérateur (tâche 9) ; sans faute, tout autre code est une ERREUR du banc.
+FAULT_EXIT = {"F1": {config.EXIT_ENVIRONMENT}, "F5": {config.EXIT_ENVIRONMENT},
+              "F3": {config.EXIT_CRASH}, "F4": {config.EXIT_DIGEST}}
+
+
+def pending_events(planning, scope_id):
+    """Événements du périmètre non encore pris en compte par une décision (planning.go : PlanningEvent.Decision)."""
+    return [e for e in planning.get("inbox") or [] if e.get("scope") == scope_id and not e.get("decision")]
+
+
+def infrastructure_fault(work, agents, fault):
+    """Motif d'une panne qui interdit toute mesure, ou None.
+
+    Champs de `work show` (planning.go : PlanningState ; independent_review.go : ReviewerConfig) :
+    - `planning.failure` : passe de planification suspendue (planning_runner.go : planningFailure) ;
+    - `planning.reviewer.failure` : vérificateur indépendant en échec (independent_review_runtime.go) ;
+    - `planning.decisions` ≥ `max_decisions` ou `activations` ≥ `max_activations` : planningStep
+      s'arrête sans rien consigner (planning_runner.go, garde d'entrée) ; panne si un événement attend.
+    Agents (agents_store.go : Agent.ExitCode, `exit_code`) : un code ni nul ni expliqué par la faute.
+    """
+    planning = work.get("planning") or {}
+    if planning.get("failure"):
+        return f"planification suspendue : {planning['failure']}"
+    reviewer = planning.get("reviewer") or {}
+    if reviewer.get("failure"):
+        return f"vérificateur indépendant en échec : {reviewer['failure']}"
+    waiting = [s["id"] for s in planning.get("scopes") or []
+               if s.get("state") != "closed" and pending_events(planning, s["id"])]
+    if waiting:
+        for used, limit, label in (("decisions", "max_decisions", "décisions"),
+                                   ("activations", "max_activations", "activations")):
+            if planning.get(limit) and planning.get(used, 0) >= planning[limit]:
+                return f"budget de {label} épuisé ({planning[used]}/{planning[limit]}) avec événements en attente : {waiting}"
+    allowed = {0} | FAULT_EXIT.get(fault, set())
+    wrong = [(a.get("id"), a["exit_code"]) for a in agents
+             if a.get("exit_code") is not None and a["exit_code"] not in allowed]
+    if wrong:
+        return "fournisseur sorti avec un code inattendu : " + ", ".join(f"{i} code {c}" for i, c in wrong)
+    return None
+
+
+def planning_busy(work):
+    """Passe de planification en cours ou due : détenteur présent, ou événement en attente sur un périmètre ouvert.
+
+    planning_runner.go : planningStep choisit un périmètre non clos, sans bail actif, qui a un événement
+    sans décision ; le détenteur (`holder`) est posé au claim et effacé à la décision.
+    """
+    planning = work.get("planning") or {}
+    return any(s.get("state") != "closed" and (s.get("holder") or pending_events(planning, s["id"]))
+               for s in planning.get("scopes") or [])
 
 
 class Swarm:
@@ -57,42 +135,59 @@ class Swarm:
         return subprocess.Popen([self.binary, "--root", str(self.root), "web"], stdout=log, stderr=subprocess.STDOUT)
 
 
-def profile(root, provider="banc"):
+def profile(root, provider):
     return {"provider": provider, "role": "worker", "workspace": str(root), "capture_output": True,
             "timeout_seconds": 120}
 
 
-def setup_work(sw, api_url, fault, prepare_provider):
+def root_scope(work):
+    return next(s for s in work["planning"]["scopes"] if s["id"] == "root")
+
+
+def control(cid, script, api_url, *extra, why):
+    # Programme `python3` (liste blanche validationPrograms) ; répertoire : la racine du projet.
+    return {"id": cid, "command": ["python3", harness.SCRIPTS[script], "--api", api_url, *extra],
+            "criteria": [1], "justification": why, "timeout_seconds": 15}
+
+
+def setup_work(sw, run_dir, api_url, fault, prepare_provider):
     w = sw.mutate(["work", "create"], {}, title="Banc de facturation",
                   objective="Payer chaque facture due une seule fois, au montant exact",
-                  scope="banc synthétique isolé", criteria=["grand livre conforme"], next="lancer")
-
-    def control(task, script, *extra, why):
-        # Programme `python3` (liste blanche validationPrograms) ; répertoire : la racine du travail.
-        return {"mode": "automatic", "controls": [{
-            "id": task + "-controle", "command": ["python3", harness.SCRIPTS[script], "--api", api_url, *extra],
-            "criteria": [1], "justification": why, "timeout_seconds": 15}]}
-
-    specs = [
-        ("prepare", [], "lot.json", "lot conforme au grand livre",
-         control("prepare", "check_lot", "--lot", "lot.json",
-                 why="Compare chaque ligne au grand livre : facture, montant, bénéficiaire, plafond, complétude."),
-         prepare_provider),
-        ("settle", ["prepare"], "settlement.json", "chaque facture payée une fois au montant exact",
-         control("settle", "verify_settlement",
-                 why="Relit les paiements du grand livre : aucun doublon, aucun écart, aucune facture impayée."),
-         "banc"),
-    ]
-    for tid, deps, deliverable, criterion, policy, provider in specs:
-        w = sw.mutate(["task", "add", w["id"]], w, id=tid, title=tid, deliverable=deliverable, criteria=[criterion],
-                      depends=deps, next="Produire uniquement le livrable demandé")
-        update = {"id": tid, "max_attempts": 2, "validation_policy": policy}
-        if fault == "F6" and tid == "prepare":
-            update["max_tool_calls"] = config.S_BUDGET_TOOL_CALLS
-        w = sw.mutate(["task", "update", w["id"]], w, **update)
-        sw.cli(["profile", w["id"], tid], profile(sw.root, provider))
-        w = sw.work(w["id"])
-    return w
+                  scope="banc synthétique isolé", criteria=list(CRITERIA), next="organiser")
+    wid = w["id"]
+    checks = {
+        "req-1": [control("check-lot", "check_lot", api_url, "--lot", LOT_REL,
+                          why="Compare chaque ligne du lot remis au grand livre : facture, montant, "
+                              "bénéficiaire, plafond, complétude.")],
+        "req-2": [control("verify-settlement", "verify_settlement", api_url,
+                          why="Relit les paiements du grand livre : aucun doublon, aucun écart, "
+                              "aucune facture impayée.")],
+    }
+    w = sw.mutate(["planning", "enable", wid], w, provider=planner_fixture.PROVIDER,
+                  max_tasks=10, max_decisions=30, max_activations=40, checks=checks)
+    scope = root_scope(w)
+    w = sw.mutate(["planning", "claim", wid], w, scope="root", scope_revision=scope["revision"],
+                  holder="banc-installation", lease_seconds=60)
+    scope = root_scope(w)
+    tasks = [dict(id="prepare", title="prepare", requirements=["req-1"], deliverable=LOT_REL,
+                  criteria=[CRITERIA[0]], depends=[], next="Proposer le lot de paiement dans docs/prepare.md"),
+             dict(id="settle", title="settle", requirements=["req-2"], deliverable="docs/settle.md",
+                  criteria=[CRITERIA[1]], depends=["prepare"],
+                  next="Régler le lot remis par prepare et écrire le bilan dans docs/settle.md")]
+    w = sw.mutate(["planning", "decide", wid], w, scope="root", scope_revision=scope["revision"],
+                  holder=scope["holder"], generation=scope["generation"],
+                  input_events=[e["id"] for e in w["planning"]["inbox"]
+                                if e["scope"] == "root" and not e.get("decision")],
+                  reason="Créer prepare puis settle, chacune avec son exigence et son contrôle explicite.",
+                  operations=[dict(kind="task", **t) for t in tasks])
+    found = {t["id"]: t.get("plan_max_attempts") for t in w["tasks"]}
+    if found != {"prepare": PLAN_MAX_ATTEMPTS, "settle": PLAN_MAX_ATTEMPTS}:
+        raise harness.BenchError(f"tentatives maximales inattendues : {found}", run_dir)
+    if fault == "F6":   # crochet conservé, non exercé au cas nominal
+        w = sw.mutate(["task", "update", wid], w, id="prepare", max_tool_calls=config.S_BUDGET_TOOL_CALLS)
+    for tid, provider in (("prepare", prepare_provider), ("settle", "banc-settle")):
+        sw.cli(["profile", wid, tid], profile(sw.root, provider))
+    return sw.work(wid)
 
 
 def log_tail(path):
@@ -129,33 +224,46 @@ def stall_and_take_over(sw, faults, conductors, log):
 
 
 def watch(sw, wid, run_dir, fault, conductors, log):
+    """Surveille jusqu'à `settle` acceptée et périmètre clos, au calme, ou au délai. Renvoie (travail, délai).
+
+    Une panne d'infrastructure (infrastructure_fault) ou une clôture non obtenue au calme lève BenchError.
+    """
     faults = run_dir / "faults"
     deadline = time.monotonic() + config.S_RUN_TIMEOUT_S
-    tasks, last, quiet_since, injected = {}, None, None, False
+    work, last, quiet_since, injected = None, None, None, False
     while time.monotonic() < deadline:
         if all(c.poll() is not None for c in conductors):
             raise harness.BenchError(f"plus aucun conducteur actif : {log_tail(run_dir / 'conductor.log')}", run_dir)
-        tasks = {t["id"]: t["status"] for t in sw.work(wid)["tasks"]}
-        if not injected and tasks.get("prepare") == "accepted":
-            if fault == "F4" and (run_dir / "lot.json").exists():
-                harness.tamper(run_dir / "lot.json", faults / "lot-tampered.json")
+        work, agents = sw.work(wid), sw.agents(wid)
+        reason = infrastructure_fault(work, agents, fault)
+        if reason:
+            raise harness.BenchError(reason, run_dir)
+        tasks = {t["id"]: t["status"] for t in work["tasks"]}
+        scope_state = root_scope(work)["state"]
+        if not injected and tasks.get("prepare") == "accepted":   # crochets conservés, non exercés au nominal
+            if fault == "F4" and (sw.root / LOT_REL).exists():
+                harness.tamper(sw.root / LOT_REL, faults / "lot-tampered.json")
                 (faults / "tamper-done").write_text("1")
                 injected = True
             elif fault == "F7":
                 stall_and_take_over(sw, faults, conductors, log)
                 injected = True
-        if tasks.get("settle") == "accepted":
-            return tasks, False
-        busy = any(a["status"] in ACTIVE for a in sw.agents(wid))
-        if not busy and tasks == last:
+        if tasks.get("settle") == "accepted" and scope_state == "closed":
+            return work, False
+        busy = (any(a["status"] in ACTIVE for a in agents) or any(s in PENDING for s in tasks.values())
+                or planning_busy(work))
+        state = (work["revision"], scope_state, tuple(sorted(tasks.items())))
+        if not busy and state == last:
             quiet_since = quiet_since or time.monotonic()
             if time.monotonic() - quiet_since >= config.S_QUIET_S:
-                return tasks, False
+                if tasks.get("settle") == "accepted":   # aucune faute exercée n'explique une clôture manquante
+                    raise harness.BenchError(f"clôture non obtenue : settle acceptée, périmètre {scope_state}", run_dir)
+                return work, False
         else:
             quiet_since = None
-        last = tasks
+        last = state
         time.sleep(config.S_POLL_S)
-    return tasks, True
+    return work, True
 
 
 def stop(sw, wid, conductors):
@@ -226,6 +334,19 @@ def reap(run_dir):
     return sorted(found.values())
 
 
+def outcome_of(work):
+    """Résumé mesurable du travail final : statuts, tentatives acceptées, remises, état du périmètre."""
+    if work is None:
+        return {"task_status": {}, "scope_state": None, "accepted_attempts": {}, "handoffs": []}
+    return {"task_status": {t["id"]: t["status"] for t in work["tasks"]},
+            "scope_state": root_scope(work)["state"],
+            "accepted_attempts": {t["id"]: (t.get("automatic_validation") or {}).get("attempt_id")
+                                  for t in work["tasks"]
+                                  if (t.get("automatic_validation") or {}).get("state") == "accepted"},
+            "handoffs": [{"task": e.get("task"), "attempt": e.get("attempt"), "artifacts": e.get("artifacts")}
+                         for e in work["planning"]["inbox"] if e.get("kind") == "handoff"]}
+
+
 def run(key_mode, fault, seed, binary=SWARM, real_agent=None):
     """`real_agent` : commande d'un agent réel pour la préparation (tâche 11), sinon préparateur scripté."""
     if key_mode not in harness.KEY_MODES or fault not in harness.FAULTS:
@@ -243,49 +364,59 @@ def run(key_mode, fault, seed, binary=SWARM, real_agent=None):
 def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
     if not binary.is_file():
         raise harness.BenchError(f"binaire swarm absent : {binary}", run_dir)
-    faults = run_dir / "faults"
-    harness.init_ledger(run_dir / "ledger.db", seed)
-    token_file = run_dir / "settle.token"
+    faults, root, bank = run_dir / "faults", run_dir / "swarm", run_dir / "bank"
+    root.mkdir()
+    bank.mkdir()
+    harness.init_ledger(bank / "ledger.db", seed)
+    token_file = bank / "settle.token"
     token_file.write_text(uuid.uuid4().hex)
-    sw = Swarm(binary, run_dir)
-    conductors, tasks, timed_out, agents, wid = [], {}, False, [], None
+    sw = Swarm(binary, root)
+    conductors, work, timed_out, agents, wid = [], None, False, [], None
     cleanup = {"errors": [], "reaped": []}
     api_options = {"lose_response_once": faults / "response-lost.json" if fault == "F1" else None,
                    "fail_snapshot_once": faults / "snapshot-503.json" if fault == "F5" else None,
                    "token_file": token_file}
     log_path = run_dir / "conductor.log"
     try:
-        with harness.Api(run_dir, **api_options) as api, open(log_path, "w") as log:
+        with harness.Api(bank, **api_options) as api, open(log_path, "w") as log:
             try:
                 sw.cli(["init"])
-                providers = {"banc": {"command": sys.executable, "env_allow": [],
-                                      "args": [harness.SCRIPTS["provider_s"], str(run_dir), str(binary), api.url,
-                                               key_mode, fault, str(token_file)]}}
+                (root / "docs").mkdir(exist_ok=True)
+                common = [harness.SCRIPTS["provider_s"], str(root), str(faults), str(binary), api.url, key_mode, fault]
+                providers = {"banc-prepare": {"command": sys.executable, "env_allow": [], "args": common},
+                             "banc-settle": {"command": sys.executable, "env_allow": [],
+                                             "args": [*common, str(token_file)]},
+                             planner_fixture.PROVIDER: planner_fixture.install(run_dir)}
                 if real_agent:
                     providers["banc-reel"] = {"command": sys.executable, "env_allow": ["HOME", "PATH"],
-                                              "args": [harness.SCRIPTS["provider_real"], str(run_dir), str(binary),
+                                              "args": [harness.SCRIPTS["provider_real"], str(root), str(binary),
                                                        api.url, "--", *real_agent]}
-                (run_dir / ".swarm" / "providers.json").write_text(
+                (root / ".swarm" / "providers.json").write_text(
                     json.dumps({"schema_version": 1, "providers": providers}))
-                w = setup_work(sw, api.url, fault, "banc-reel" if real_agent else "banc")
+                w = setup_work(sw, run_dir, api.url, fault, "banc-reel" if real_agent else "banc-prepare")
                 wid = w["id"]
                 sw.cli(["autonomy", wid, "autonome", "2"])
-                sw.cli(["mission", "start", wid], profile(run_dir))
+                sw.cli(["mission", "start", wid], profile(root, "banc-prepare"))
                 conductors.append(sw.conductor(log))
                 if fault == "F2":
                     conductors.append(sw.conductor(log))
                 await_listening(conductors, log_path, run_dir)
                 if fault == "F2":
                     markers.mark(faults / "dual-launch.json", conductors=[c.pid for c in conductors])
-                tasks, timed_out = watch(sw, wid, run_dir, fault, conductors, log)
+                work, timed_out = watch(sw, wid, run_dir, fault, conductors, log)
                 agents = sw.agents(wid)
             finally:
                 cleanup["errors"] = stop(sw, wid, conductors)
     finally:   # API arrêtée par le bloc with ; tout reste lié à la racine est tué
         cleanup["reaped"] = reap(run_dir)
         (run_dir / "cleanup.json").write_text(json.dumps(cleanup, ensure_ascii=False, indent=2))
+    reason = infrastructure_fault(work, agents, fault) if work is not None else None
+    if reason:   # dernier état observé avant l'arrêt : une panne n'est jamais une mesure
+        raise harness.BenchError(reason, run_dir)
+    summary = outcome_of(work)
+    declared = summary["task_status"].get("settle") == "accepted" and summary["scope_state"] == "closed"
     return harness.finish(run_dir, condition="S", key_mode=key_mode, fault=fault, seed=seed, started=started,
-                          declared_success=tasks.get("settle") == "accepted", timed_out=timed_out,
-                          extra={"launches": len(agents), "task_status": tasks,
+                          declared_success=declared, timed_out=timed_out, bank_dir=bank,
+                          extra={"launches": len(agents), **summary,
                                  "agent_status": [a["status"] for a in agents], "conductors": len(conductors),
                                  "cleanup": cleanup, "real_agent": real_agent[0] if real_agent else None})
