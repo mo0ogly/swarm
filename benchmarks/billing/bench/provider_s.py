@@ -24,6 +24,12 @@ même endroit (observations.md, § 1 et § 4).
   puis écrit le bilan JSON dans `docs/settle.md`. Un refus ou un arrêt ne produit pas
   de livrable et sort en code non nul : le moteur ne remet alors rien.
 
+- `verrou` (F4e seulement) : tâche sans dépendance, lancée dans le même espace dès la fin de
+  `prepare` ; elle attend que run_s ait modifié le lot (`faults/tamper-done`), puis écrit
+  `docs/verrou.md`. Tant qu'elle tourne, l'espace est occupé et `settle` ne peut pas partir
+  (dispatcher.go : « espace de travail déjà occupé par une tentative active ») : la
+  modification tombe entre l'acceptation de `prepare` et le départ de `settle`, sans course.
+
 Sortie standard au format du harnais de référence (`item.completed` / `agent_message`).
 Crochets de fautes conservés, non exercés au cas nominal : F3 (plantage après un
 paiement), F4 (attente de la modification du lot par run_s), F6 (lot partiel puis
@@ -84,7 +90,11 @@ class Swarm:
                            capture_output=True, timeout=config.S_CLI_TIMEOUT_S)
         if p.returncode:
             raise RuntimeError(f"swarm {' '.join(args[:2])} : code {p.returncode} : {(p.stdout + p.stderr).strip()}")
-        return json.loads(p.stdout) if p.stdout.strip() else None
+        try:
+            return json.loads(p.stdout) if p.stdout.strip() else None
+        except ValueError as e:   # sortie non JSON : erreur lisible, rattrapée par le nettoyage comme les autres
+            raise RuntimeError(f"swarm {' '.join(args[:2])} : sortie non JSON ({e}) : "
+                               f"{p.stdout.strip()[:config.ERROR_TEXT_MAX]!r} {p.stderr.strip()[:config.ERROR_TEXT_MAX]!r}") from e
 
     def work(self):
         works = self.cli(["work", "list"])
@@ -127,15 +137,29 @@ def accepted_handoff(work, tid):
     return attempt, artifact
 
 
+def wait_for(path, timeout):
+    """Attend qu'un fichier de synchronisation posé par run_s existe ; False au délai."""
+    deadline = time.monotonic() + timeout
+    while not Path(path).exists():
+        if time.monotonic() > deadline:
+            return False
+        time.sleep(0.1)
+    return True
+
+
 def run_prepare(sw, faults, api, fault, workspace):
+    if fault == "F7" and not wait_for(faults / "owner-stalled.json", config.S_GATE_TIMEOUT_S):
+        # rester en cours jusqu'au gel du premier conducteur ; sans gel, la faute n'a pas eu lieu : défaut du banc
+        print("F7 : gel du conducteur jamais observé pendant prepare", file=sys.stderr)
+        return config.EXIT_INTERNAL
     attempt, rank = current_attempt(sw.work(), "prepare")
     first = rank == 1
     mode = "partial" if fault == "F6" else ("wrong-amount" if fault == "F8" and first else "nominal")
     sha = preparer.write_lot(workspace / "docs" / "prepare.md", preparer.build(api, mode))
     if fault == "F6":
         markers.mark(faults / "budget-loop.json", attempt=attempt)
-        for i in range(1, 60):
-            tool_call(i, "recompter les factures")
+        for i in range(1, 60):   # commandes distinctes : le garde-fou de répétition (loop_guard.go) ne doit pas
+            tool_call(i, f"recompter les factures, passe {i}")   # arrêter la tentative avant le budget d'appels
             time.sleep(0.1)
     if fault == "F8" and first:
         markers.mark(faults / "stale-report.json", attempt=attempt, lot_sha256=sha)
@@ -143,11 +167,19 @@ def run_prepare(sw, faults, api, fault, workspace):
     return 0
 
 
+def run_hold(faults, workspace):
+    """F4e : occupe l'espace jusqu'à la modification du lot par run_s, puis remet un rapport non vide."""
+    done = wait_for(faults / "tamper-done", config.S_HOLD_TIMEOUT_S)
+    (workspace / "docs" / "verrou.md").write_text(f"verrou levé ; lot modifié : {'oui' if done else 'non (délai)'}\n")
+    message("Verrou de séquencement levé.")
+    return 0
+
+
 def run_settle(sw, root, faults, api, key_mode, fault, token_file, workspace):
-    if fault == "F4":
-        deadline = time.monotonic() + config.S_GATE_TIMEOUT_S
-        while not (faults / "tamper-done").exists() and time.monotonic() < deadline:
-            time.sleep(0.1)
+    if fault == "F4" and not wait_for(faults / "tamper-done", config.S_GATE_TIMEOUT_S):
+        # sans modification dans le délai, la faute n'a pas eu lieu : ne pas payer le lot intact
+        print("F4 : modification du lot jamais observée avant le règlement", file=sys.stderr)
+        return config.EXIT_INTERNAL
     work = sw.work()
     attempt, _ = current_attempt(work, "settle")
     try:
@@ -193,6 +225,8 @@ def _main(argv):
     try:
         if task == "prepare":
             return run_prepare(sw, faults, api, fault, workspace)
+        if task == "verrou" and fault == "F4e":
+            return run_hold(faults, workspace)
         if task == "settle":
             return run_settle(sw, root, faults, api, key_mode, fault, token_file, workspace)
     except Unexpected as e:

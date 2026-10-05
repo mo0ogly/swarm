@@ -2,8 +2,10 @@
 """API de paiement simulée : seul processus qui écrit dans le grand livre.
 
 Fautes injectables : réponse perdue après un paiement (une fois), instantané
-indisponible (une fois) ; le marqueur est posé sous verrou, donc une seule fois
-même sous requêtes concurrentes. Politique B1 : contrôle par appel, sans état de
+indisponible (F5 : config.F5_SNAPSHOT_FAILURES réponses 503 consécutives) ; le
+marqueur `snapshot-503` est réécrit sous verrou après l'envoi de chaque 503 avec le
+compte réellement envoyé (un 503 dont l'envoi échoue n'est pas compté), et `snapshot-recovered` est posé au premier instantané
+normal servi après un 503 (faute absorbée). Politique B1 : contrôle par appel, sans état de
 tentative ni de fraîcheur. Jeton de règlement optionnel (capacité séparée), non vide.
 
 Toute demande reçoit une réponse : 400 entrée invalide (JSON, champ manquant ou
@@ -34,7 +36,7 @@ DUE_SQL = (f"SELECT {COLUMNS} FROM invoices i WHERE NOT EXISTS (SELECT 1 FROM pa
 class PaymentServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, db_path, policy="none", lose_response_once=None, fail_snapshot_once=None,
+    def __init__(self, address, db_path, policy="none", lose_response_once=None, fail_snapshot=None,
                  token=None):
         if token is not None and (not isinstance(token, str) or not token):
             raise ValueError("jeton de règlement vide : refusé")
@@ -43,7 +45,10 @@ class PaymentServer(ThreadingHTTPServer):
         self.lock = threading.Lock()
         self.policy = policy
         self.lose_response_once = Path(lose_response_once) if lose_response_once else None
-        self.fail_snapshot_once = Path(fail_snapshot_once) if fail_snapshot_once else None
+        self.fail_snapshot = Path(fail_snapshot) if fail_snapshot else None   # marqueur F5
+        self.snapshot_failures = 0   # 503 réservés (décidés sous verrou)
+        self.snapshot_503_sent = 0   # 503 effectivement envoyés : compte publié dans le marqueur
+        self.snapshot_recovered = False   # instantané normal servi après au moins un 503
         self.token = token
 
     def handle_error(self, request, client_address):
@@ -120,18 +125,30 @@ class Handler(BaseHTTPRequestHandler):
             with s.lock:
                 return self.send_json(200, s.query(DUE_SQL))
         if self.path == "/snapshot":
-            with s.lock:
-                fail = bool(s.fail_snapshot_once) and not s.fail_snapshot_once.exists()
+            with s.lock:   # réservation sous verrou : jamais plus de F5_SNAPSHOT_FAILURES réponses 503
+                fail = bool(s.fail_snapshot) and s.snapshot_failures < config.F5_SNAPSHOT_FAILURES
                 if fail:
-                    markers.mark(s.fail_snapshot_once, fault="snapshot-503")
+                    s.snapshot_failures += 1
+                recovery = not fail and s.snapshot_failures > 0 and not s.snapshot_recovered
+                if recovery:
+                    s.snapshot_recovered = True
             if fail:
-                return self.send_json(503, {"error": "service de paiement indisponible"})
+                self.send_json(503, {"error": "service de paiement indisponible"})
+                with s.lock:   # compté seulement une fois la réponse envoyée ; marqueur réécrit à chaque 503
+                    s.snapshot_503_sent += 1
+                    markers.mark(s.fail_snapshot, fault="snapshot-503", served=s.snapshot_503_sent,
+                                 planned=config.F5_SNAPSHOT_FAILURES)
+                return None
             with s.lock:
                 body = {"invoices": s.query(f"SELECT {COLUMNS} FROM invoices ORDER BY supplier, number"),
                         "payments": s.query(f"SELECT {COLUMNS} FROM payments ORDER BY id"),
                         "treasury_cents": ledger.balance(s.conn, ledger.TREASURY),
                         "cap_cents": config.CAP_CENTS}
-            return self.send_json(200, body)
+            self.send_json(200, body)
+            if recovery:   # F5 absorbée : un instantané normal a été envoyé après au moins un 503
+                markers.mark(s.fail_snapshot.with_name("snapshot-recovered.json"), fault="snapshot-recovered",
+                             after_503=s.snapshot_failures)
+            return None
         self.send_json(404, {"error": "ressource inconnue"})
 
     def handle_post(self):
@@ -181,11 +198,11 @@ def main(argv=None):
     p.add_argument("--port-file", required=True)
     p.add_argument("--policy", choices=("none", "b1"), default="none")
     p.add_argument("--lose-response-once")
-    p.add_argument("--fail-snapshot-once")
+    p.add_argument("--fail-snapshot", help="F5 : marqueur ; F5_SNAPSHOT_FAILURES réponses 503 consécutives")
     p.add_argument("--token-file")
     a = p.parse_args(argv)
     token = Path(a.token_file).read_text().strip() if a.token_file else None
-    server = PaymentServer(("127.0.0.1", 0), a.db, a.policy, a.lose_response_once, a.fail_snapshot_once, token)
+    server = PaymentServer(("127.0.0.1", 0), a.db, a.policy, a.lose_response_once, a.fail_snapshot, token)
     tmp = Path(a.port_file + ".tmp")
     tmp.write_text(str(server.server_address[1]))
     os.replace(tmp, a.port_file)

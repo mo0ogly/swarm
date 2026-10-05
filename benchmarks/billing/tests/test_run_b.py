@@ -50,6 +50,13 @@ class RunBTest(unittest.TestCase):
         r = self.run_ok("B0", "business", "F5")
         self.assertIn("snapshot-503", r["markers"])
         self.assertTrue(r["correct"])
+        self.assertEqual(r["final_review"], "indisponible")   # F5 persistante : la relance unique échoue aussi
+
+    def test_f4e_is_injected_like_f4_without_engine(self):
+        r = self.run_ok("B0", "business", "F4e")
+        self.assertIn("lot-tampered-early", r["markers"])
+        self.assertEqual(r["metrics"]["wrong"], 1)
+        self.assertTrue(r["declared_success"] and r["false_success"])
 
     def run_error(self, condition, key, fault):
         """L'exécution doit échouer en BenchError, sans résultat ; la racine conservée est nettoyée ici."""

@@ -9,8 +9,12 @@ reconnus au contexte JSON contenu dans le prompt (stdin) :
   le rapport n'est pas vide, « unknown » sinon. Les contrôles automatiques restent seuls
   juges du fond (check_lot, verify_settlement).
 - passe de planification (sinon) : prend acte de tous les événements reçus, et clôt le
-  périmètre quand toutes les tâches sont acceptées. Jamais de reprise (`retry`) : une
-  tentative en échec reste bloquée, ce que le banc mesure.
+  périmètre quand toutes les tâches sont acceptées. Une seule reprise : une tâche bloquée
+  par un processus sorti en 137 (crash du règlement, F3) après sa première tentative
+  reçoit l'opération `retry` (planning.go : reprise bornée, tâche `blocked`, tentatives
+  < `PlanMaxAttempts` = 2, `next` nouveau et différent). Aucune autre reprise : une autre
+  tentative en échec reste bloquée, ce que le banc mesure. Le contexte fournit `status`,
+  `attempts_used`, `attempts_max` et `blocker` par tâche (planning_context.go).
 
 Nom imposé : le moteur n'accepte comme responsable ou vérificateur qu'un exécutable
 désigné par un chemin absolu dont le nom de base est `claude`, `codex` ou
@@ -27,6 +31,8 @@ import sys
 from pathlib import Path
 
 PROVIDER = "fixture-planner"
+CRASH_BLOCKER = "(code 137)"   # agents_process.go : « Processus en échec (code N) » repris dans blocker
+RETRY_NEXT = "Reprise unique après un arrêt brutal (code 137) : régler le lot remis, la progression enregistrée fait foi."
 BENCH_ROOT = Path(__file__).resolve().parents[1]   # benchmarks/billing : rend `bench` importable
 
 
@@ -59,6 +65,11 @@ def respond(context):
                 "reason": "Retours lus par le responsable scripté du banc.", "operations": []}
     if tasks and all(t["status"] == "accepted" for t in tasks):
         response["operations"] = [{"kind": "close"}]
+    else:
+        response["operations"] = [{"kind": "retry", "id": t["id"], "next": RETRY_NEXT} for t in tasks
+                                  if t["status"] == "blocked" and t.get("attempts_used") == 1
+                                  and t.get("attempts_used", 0) < t.get("attempts_max", 0)
+                                  and CRASH_BLOCKER in (t.get("blocker") or "") and t.get("next") != RETRY_NEXT]
     return response
 
 

@@ -72,7 +72,7 @@ def _run(run_dir, condition, key_mode, fault, seed, started):
     launches, ok, review, timed_out = 0, [], None, False
     api_options = {"policy": "b1" if condition == "B1" else "none",
                    "lose_response_once": faults / "response-lost.json" if fault == "F1" else None,
-                   "fail_snapshot_once": faults / "snapshot-503.json" if fault == "F5" else None}
+                   "fail_snapshot": faults / "snapshot-503.json" if fault == "F5" else None}
     with harness.Api(run_dir, **api_options) as api:
 
         def prepare(name, mode="nominal", hang=False, fail=False):
@@ -150,9 +150,10 @@ def _run(run_dir, condition, key_mode, fault, seed, started):
                 if code == config.EXIT_CRASH:   # relance naïve : même progression, nouvelle exécution
                     code = settle(lot, "a1-relance", "a1")
                 ok.append(code == 0)
-            elif fault == "F4":
+            elif fault in ("F4", "F4e"):   # sans moteur, F4e n'a pas de « départ » distinct : même injection
                 lot = prepare("a1")
-                harness.tamper(lot, faults / "lot-tampered.json")
+                name = harness.EXPECTED_MARKER[fault]
+                harness.tamper(lot, faults / f"{name}.json", fault=name)
                 ok.append(settle(lot, "a1", "a1") == 0)
             elif fault == "F6":
                 ok.append(settle(prepare("a1", mode="partial", hang=True), "a1", "a1") == 0)

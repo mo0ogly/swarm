@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from bench import harness
+from bench import harness, markers
 
 SEED = 7
 
@@ -47,3 +47,29 @@ class ProvenanceTest(unittest.TestCase):
                            declared_success=False, timed_out=False, extra={})
         r["provenance"]["git_commit"] = "altéré"
         self.assertNotEqual(harness.provenance()["git_commit"], "altéré")
+
+
+class SnapshotFaultReportTest(unittest.TestCase):
+    def finish(self, recovered):
+        run_dir = harness.new_run_dir("banc-f5-")
+        self.addCleanup(shutil.rmtree, run_dir)
+        harness.init_ledger(run_dir / "ledger.db", SEED)
+        markers.mark(run_dir / "faults" / "snapshot-503.json", fault="snapshot-503", served=4)
+        if recovered:
+            markers.mark(run_dir / "faults" / "snapshot-recovered.json", fault="snapshot-recovered")
+        return harness.finish(run_dir, condition="B0", key_mode="none", fault="F5", seed=SEED, started=0.0,
+                              declared_success=False, timed_out=False, extra={})
+
+    def test_reports_503_served_and_not_absorbed(self):
+        r = self.finish(recovered=False)
+        self.assertEqual((r["status"], r["f5_503_served"], r["f5_absorbed"]), ("OK", 4, False))
+
+    def test_absorbed_fault_is_marked_not_excluded(self):
+        r = self.finish(recovered=True)
+        self.assertEqual((r["status"], r["f5_absorbed"]), ("OK", True))
+
+
+class FaultsTest(unittest.TestCase):
+    def test_f4e_declared_with_its_marker(self):
+        self.assertIn("F4e", harness.FAULTS)
+        self.assertEqual(harness.EXPECTED_MARKER["F4e"], "lot-tampered-early")

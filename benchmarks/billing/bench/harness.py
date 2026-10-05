@@ -15,8 +15,11 @@ from bench import config, invoices, ledger, markers, metrics, preparer
 BENCH_DIR = Path(__file__).resolve().parent
 SCRIPTS = {name: str(BENCH_DIR / f"{name}.py") for name in (
     "payment_api", "preparer", "settle", "check_lot", "verify_settlement", "provider_s", "provider_real")}
+# F4 : lot modifié après le départ du règlement ; F4e : après acceptation de prepare, avant le départ
+# du règlement (en B0/B1, sans moteur, F4e s'injecte comme F4).
 EXPECTED_MARKER = {"F1": "response-lost", "F2": "dual-launch", "F3": "crash-before-record", "F4": "lot-tampered",
-                   "F5": "snapshot-503", "F6": "budget-loop", "F7": "owner-stalled", "F8": "stale-report"}
+                   "F4e": "lot-tampered-early", "F5": "snapshot-503", "F6": "budget-loop", "F7": "owner-stalled",
+                   "F8": "stale-report"}
 FAULTS = ("none",) + tuple(EXPECTED_MARKER)
 KEY_MODES = ("none", "attempt", "business")
 REPO_ROOT = BENCH_DIR.parents[2]          # racine du dépôt swarm : benchmarks/billing/bench -> racine
@@ -73,13 +76,13 @@ def stop(proc):
 class Api:
     """API de paiement en sous-processus, arrêtée à la sortie du bloc `with`, même sur exception."""
 
-    def __init__(self, run_dir, policy="none", lose_response_once=None, fail_snapshot_once=None, token_file=None):
+    def __init__(self, run_dir, policy="none", lose_response_once=None, fail_snapshot=None, token_file=None):
         self.port_file = run_dir / "api.port"
         self.log_path = run_dir / "api.log"
         self.args = [sys.executable, SCRIPTS["payment_api"], "--db", str(run_dir / "ledger.db"),
                      "--port-file", str(self.port_file), "--policy", policy]
         for flag, value in (("--lose-response-once", lose_response_once),
-                            ("--fail-snapshot-once", fail_snapshot_once), ("--token-file", token_file)):
+                            ("--fail-snapshot", fail_snapshot), ("--token-file", token_file)):
             if value:
                 self.args += [flag, str(value)]
 
@@ -121,13 +124,13 @@ def amount_deltas(db, lot_path):
             if (line["supplier"], line["number"]) in due and line["amount_cents"] != due[(line["supplier"], line["number"])]]
 
 
-def tamper(lot_path, marker):
-    """F4 : modifie le montant de la première ligne après validation."""
+def tamper(lot_path, marker, fault="lot-tampered"):
+    """F4 et F4e : modifie le montant de la première ligne après validation ; `fault` nomme le marqueur."""
     before = hashlib.sha256(Path(lot_path).read_bytes()).hexdigest()
     lot = json.loads(Path(lot_path).read_text())
     lot["lines"][0]["amount_cents"] += config.TAMPER_DELTA_CENTS
     after = preparer.write_lot(lot_path, lot)
-    markers.mark(marker, fault="lot-tampered", before=before, after=after)
+    markers.mark(marker, fault=fault, before=before, after=after)
 
 
 @functools.lru_cache(maxsize=None)
@@ -174,6 +177,9 @@ def finish(run_dir, *, condition, key_mode, fault, seed, started, declared_succe
     finally:
         conn.close()
     seen = markers.read_all(run_dir / "faults")
+    if fault == "F5":   # compte réellement servi ; une faute absorbée est marquée, jamais exclue
+        extra = {**extra, "f5_503_served": seen.get("snapshot-503", {}).get("served", 0),
+                 "f5_absorbed": "snapshot-recovered" in seen}
     expected = EXPECTED_MARKER.get(fault)
     status = "DÉLAI" if timed_out else ("INVALIDE" if expected and expected not in seen else "OK")
     return {"condition": condition, "key_mode": key_mode, "fault": fault, "seed": seed, "status": status,

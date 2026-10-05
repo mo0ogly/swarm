@@ -35,11 +35,13 @@ commande désigne la racine d'exécution.
 """
 import json
 import os
+import sqlite3
 import signal
 import subprocess
 import sys
 import time
 import uuid
+from datetime import datetime
 from pathlib import Path
 
 if __package__ in (None, ""):
@@ -53,10 +55,14 @@ LISTENING = "Cockpit local : http://127.0.0.1:"          # web_server.go : annon
 LOT_REL = "docs/prepare.md"                              # livrable de prepare, relatif à la racine
 PLAN_MAX_ATTEMPTS = 2                                    # planning.go : PlanMaxAttempts d'une tâche planifiée
 CRITERIA = ("lot conforme au grand livre", "chaque facture payée une fois au montant exact")
-# Codes de sortie du fournisseur qu'une faute prévue explique, en plus de 0. Provisoire : les fautes
-# relèvent de décisions de l'opérateur (tâche 9) ; sans faute, tout autre code est une ERREUR du banc.
-FAULT_EXIT = {"F1": {config.EXIT_ENVIRONMENT}, "F5": {config.EXIT_ENVIRONMENT},
-              "F3": {config.EXIT_CRASH}, "F4": {config.EXIT_DIGEST}}
+# Codes de sortie du fournisseur qu'une faute prévue explique, en plus de 0. Fixés d'après l'exploration
+# de la tâche 9 (docs/benchmarks/billing/observations.md, « Exploration des fautes en S ») : 137 sous F3
+# (plantage injecté), 4 sous F4 (empreinte du lot). F6 : l'arrêt par la garde (status interrupted,
+# stop_kind garde, code -1) est traité à part. Jamais observés, donc ERREUR : 3 sous F1/F5 (la
+# coupure de F1 est absorbée par les réessais du règlement, le 503 de F5 touche un contrôle, pas le
+# fournisseur) et 2, refus métier de l'API, qu'aucune faute en S ne provoque.
+FAULT_EXIT = {"F3": {config.EXIT_CRASH}, "F4": {config.EXIT_DIGEST}, "F4e": {config.EXIT_DIGEST}}
+HOLD_CRITERION = "verrou de séquencement levé après la modification du lot"   # F4e seulement
 
 
 def pending_events(planning, scope_id):
@@ -89,9 +95,137 @@ def infrastructure_fault(work, agents, fault):
                 return f"budget de {label} épuisé ({planning[used]}/{planning[limit]}) avec événements en attente : {waiting}"
     allowed = {0} | FAULT_EXIT.get(fault, set())
     wrong = [(a.get("id"), a["exit_code"]) for a in agents
-             if a.get("exit_code") is not None and a["exit_code"] not in allowed]
+             if a.get("exit_code") is not None and a["exit_code"] not in allowed and not budget_stop(a, fault)]
     if wrong:
         return "fournisseur sorti avec un code inattendu : " + ", ".join(f"{i} code {c}" for i, c in wrong)
+    return None
+
+
+BUDGET_REASON = "Limite d'appels d'outils atteinte"   # loop_guard.go (raison), agents_process.go (activité)
+
+
+def budget_stop(agent, fault):
+    """F6 : seul l'arrêt de `prepare` par la garde pour le budget d'appels est attendu.
+
+    agents_process.go : à l'arrêt par la garde, status `interrupted`, stop_kind `garde`, activité
+    « <raison> ; fin du processus confirmée », la raison venant de loop_guard.go.
+    """
+    return (fault == "F6" and agent.get("task_id") == "prepare" and agent.get("status") == "interrupted"
+            and agent.get("stop_kind") == "garde" and (agent.get("activity") or "").startswith(BUDGET_REASON))
+
+
+def settle_outcome(agents, fault):
+    """Lancements du règlement et, sous F4, qui a arrêté le paiement.
+
+    `agent list` renvoie le plus récent d'abord (agents_store.go : ORDER BY rowid DESC) : les codes sont
+    remis dans l'ordre des lancements. `stopped_by` (F4 seulement) : `engine` si settle n'a jamais été
+    lancée (fraîcheur des preuves avant départ), `settlement` si le règlement est sorti en 4 (empreinte),
+    `none` sinon.
+    """
+    codes = [a.get("exit_code") for a in reversed(agents) if a.get("task_id") == "settle"]
+    stopped = None
+    if fault in ("F4", "F4e"):
+        stopped = "engine" if not codes else ("settlement" if config.EXIT_DIGEST in codes else "none")
+    return {"settle_launched": bool(codes), "settle_exit_codes": codes, "stopped_by": stopped}
+
+
+def epoch(stamp):
+    """Horodatage Go RFC3339Nano (UTC) en secondes depuis l'époque ; None si absent."""
+    return datetime.fromisoformat(stamp).timestamp() if stamp else None
+
+
+def f4e_order(accepted_at, tampered_at, settle_started):
+    """F4e : acceptation de prepare < modification du lot < départ de settle (ou aucun départ)."""
+    accepted, started = epoch(accepted_at), epoch(settle_started)
+    proven = (accepted is not None and tampered_at is not None and accepted < tampered_at
+              and (started is None or tampered_at < started))
+    return {"proven": proven, "prepare_accepted_at": accepted, "tampered_at": tampered_at, "settle_started_at": started}
+
+
+def f4_order(settle_started, tampered_at):
+    """F4 : le lot est modifié après le départ de settle (sinon ce serait F4e, ou aucune faute)."""
+    started = epoch(settle_started)
+    proven = started is not None and tampered_at is not None and started < tampered_at
+    return {"proven": proven, "settle_started_at": started, "tampered_at": tampered_at}
+
+
+WEB_CONDUCTOR = "serveur web"   # mission.go : missionLoop, source du bail d'un conducteur `web`
+
+
+def f7_order(takeover_at, settle_started, launcher, old_holder, new_holder, new_source):
+    """F7 : settle lancée après la prise de main, par le nouveau détenteur du bail.
+
+    `launcher` : `conductor_id` du départ de settle (Launch, agents_store.go, persisté dans
+    agents.request) ; `old_holder`/`new_holder` : `mission_supervision.conductor_id` avant le gel et
+    après la prise de main (mission_supervision.go). automaticLaunchGuard (mission.go) n'accepte un
+    départ que du détenteur vivant du bail. Le nouveau détenteur doit être un conducteur `web`
+    (`mission_supervision.source` = « serveur web ») : un superviseur prend aussi des baux éphémères
+    « release-conductor-… », de source « libération de ressource » (dispatcher.go :
+    dispatchAfterSettle). Le banc ne lance que deux conducteurs `web` : un détenteur `web` différent
+    de l'ancien est donc le second.
+    """
+    started = epoch(settle_started)
+    proven = (takeover_at is not None and started is not None and takeover_at < started
+              and new_holder is not None and new_holder != old_holder and new_source == WEB_CONDUCTOR
+              and launcher == new_holder)
+    return {"proven": proven, "takeover_at": takeover_at, "settle_started_at": started,
+            "settle_conductor": launcher, "holder_before": old_holder, "holder_after": new_holder,
+            "holder_after_source": new_source}
+
+
+def engine_stop_consistent(stopped_by, validation_state):
+    """« Arrêté par le moteur » exige que la preuve de prepare soit réellement périmée (`stale`)."""
+    return stopped_by != "engine" or validation_state == "stale"
+
+
+def state_rows(root, query, args=()):
+    """Lecture seule de la base Swarm, pour les seuls faits que la CLI n'expose pas (preuves F7).
+
+    Ouverte en `mode=ro` : le banc n'écrit jamais dans `.swarm/state.db`.
+    """
+    conn = sqlite3.connect(f"file:{Path(root) / '.swarm' / 'state.db'}?mode=ro", uri=True, timeout=5)
+    try:
+        return conn.execute(query, args).fetchall()
+    finally:
+        conn.close()
+
+
+def supervision_holder(root, wid):
+    """Détenteur du bail de supervision : (mission_supervision.conductor_id, source), ou (None, None)."""
+    rows = state_rows(root, "SELECT conductor_id, source FROM mission_supervision WHERE work_id=?", (wid,))
+    return tuple(rows[0]) if rows else (None, None)
+
+
+def settle_launcher(root, wid):
+    """`conductor_id` du premier départ de settle, lu dans la requête de lancement persistée."""
+    rows = state_rows(root, "SELECT request FROM agents WHERE work_id=? AND task_id='settle' ORDER BY rowid LIMIT 1",
+                      (wid,))
+    return json.loads(rows[0][0]).get("conductor_id") if rows else None
+
+
+def prepare_validation_state(sw, wid):
+    """Fraîcheur réelle de prepare : `mission status`, tasks[].result.validation_state (result_presentation.go)."""
+    tasks = sw.cli(["mission", "status", wid]).get("tasks") or []
+    return next(((t.get("result") or {}).get("validation_state") for t in tasks if t.get("id") == "prepare"), None)
+
+
+def order_proof(fault, work, agents, faults, root=None, wid=None):
+    """Preuve d'ordre exigée par F4, F4e et F7 ; None pour les autres fautes."""
+    starts = sorted(a["started"] for a in agents if a.get("task_id") == "settle" and a.get("started"))
+    first = starts[0] if starts else None
+    found = markers.read_all(faults)
+    if fault == "F4":
+        return f4_order(first, found.get("lot-tampered", {}).get("at"))
+    if fault == "F4e":
+        prepare = next((t for t in (work or {}).get("tasks", []) if t["id"] == "prepare"), {})
+        validation = prepare.get("automatic_validation") or {}
+        accepted = validation.get("at") if validation.get("state") == "accepted" else None
+        return f4e_order(accepted, found.get("lot-tampered-early", {}).get("at"), first)
+    if fault == "F7":
+        stall = found.get("owner-stalled", {})
+        launcher = settle_launcher(root, wid) if first else None
+        return f7_order(stall.get("takeover_at"), first, launcher, stall.get("holder_before"),
+                        stall.get("holder_after"), stall.get("holder_after_source"))
     return None
 
 
@@ -117,7 +251,11 @@ class Swarm:
                            text=True, capture_output=True, timeout=config.S_CLI_TIMEOUT_S)
         if p.returncode:
             raise RuntimeError(f"swarm {' '.join(args[:2])} : code {p.returncode} : {(p.stdout + p.stderr).strip()}")
-        return json.loads(p.stdout) if p.stdout.strip() else None
+        try:
+            return json.loads(p.stdout) if p.stdout.strip() else None
+        except ValueError as e:   # sortie non JSON : erreur lisible, rattrapée par le nettoyage comme les autres
+            raise RuntimeError(f"swarm {' '.join(args[:2])} : sortie non JSON ({e}) : "
+                               f"{p.stdout.strip()[:config.ERROR_TEXT_MAX]!r} {p.stderr.strip()[:config.ERROR_TEXT_MAX]!r}") from e
 
     def mutate(self, args, work, **fields):
         out = self.cli(args, dict(schema_version=1, event_id=uuid.uuid4().hex,
@@ -151,9 +289,10 @@ def control(cid, script, api_url, *extra, why):
 
 
 def setup_work(sw, run_dir, api_url, fault, prepare_provider):
+    criteria = list(CRITERIA) + ([HOLD_CRITERION] if fault == "F4e" else [])
     w = sw.mutate(["work", "create"], {}, title="Banc de facturation",
                   objective="Payer chaque facture due une seule fois, au montant exact",
-                  scope="banc synthétique isolé", criteria=list(CRITERIA), next="organiser")
+                  scope="banc synthétique isolé", criteria=criteria, next="organiser")
     wid = w["id"]
     checks = {
         "req-1": [control("check-lot", "check_lot", api_url, "--lot", LOT_REL,
@@ -163,6 +302,11 @@ def setup_work(sw, run_dir, api_url, fault, prepare_provider):
                           why="Relit les paiements du grand livre : aucun doublon, aucun écart, "
                               "aucune facture impayée.")],
     }
+    if fault == "F4e":
+        checks["req-3"] = [{"id": "verrou-rapport", "command": ["python3", "-c",
+                            "import pathlib,sys; sys.exit(0 if pathlib.Path('docs/verrou.md').read_text().strip() else 1)"],
+                            "criteria": [1], "justification": "Le verrou de séquencement a remis un rapport non vide.",
+                            "timeout_seconds": 15}]
     w = sw.mutate(["planning", "enable", wid], w, provider=planner_fixture.PROVIDER,
                   max_tasks=10, max_decisions=30, max_activations=40, checks=checks)
     scope = root_scope(w)
@@ -174,6 +318,9 @@ def setup_work(sw, run_dir, api_url, fault, prepare_provider):
              dict(id="settle", title="settle", requirements=["req-2"], deliverable="docs/settle.md",
                   criteria=[CRITERIA[1]], depends=["prepare"],
                   next="Régler le lot remis par prepare et écrire le bilan dans docs/settle.md")]
+    if fault == "F4e":   # sans dépendance, même espace : part dès la fin de prepare et retient settle
+        tasks.append(dict(id="verrou", title="verrou", requirements=["req-3"], deliverable="docs/verrou.md",
+                          criteria=[HOLD_CRITERION], depends=[], next="Lever le verrou après la modification du lot"))
     w = sw.mutate(["planning", "decide", wid], w, scope="root", scope_revision=scope["revision"],
                   holder=scope["holder"], generation=scope["generation"],
                   input_events=[e["id"] for e in w["planning"]["inbox"]
@@ -181,12 +328,18 @@ def setup_work(sw, run_dir, api_url, fault, prepare_provider):
                   reason="Créer prepare puis settle, chacune avec son exigence et son contrôle explicite.",
                   operations=[dict(kind="task", **t) for t in tasks])
     found = {t["id"]: t.get("plan_max_attempts") for t in w["tasks"]}
-    if found != {"prepare": PLAN_MAX_ATTEMPTS, "settle": PLAN_MAX_ATTEMPTS}:
+    if found != {t["id"]: PLAN_MAX_ATTEMPTS for t in tasks}:
         raise harness.BenchError(f"tentatives maximales inattendues : {found}", run_dir)
-    if fault == "F6":   # crochet conservé, non exercé au cas nominal
-        w = sw.mutate(["task", "update", wid], w, id="prepare", max_tool_calls=config.S_BUDGET_TOOL_CALLS)
-    for tid, provider in (("prepare", prepare_provider), ("settle", "banc-settle")):
-        sw.cli(["profile", wid, tid], profile(sw.root, provider))
+    profiles = [("prepare", prepare_provider), ("settle", "banc-settle")] + (
+        [("verrou", "banc-prepare")] if fault == "F4e" else [])
+    for tid, provider in profiles:
+        launch = profile(sw.root, provider)
+        if fault == "F6" and tid == "prepare":
+            # Le contrat d'une tâche planifiée est immuable (store.go : « contrat hiérarchique immuable ») ;
+            # le budget passe par le profil de lancement (model.go : LaunchProfile.Limits, run_limits.go :
+            # RunLimits.max_tool_calls), transmis au départ (dispatcher.go) et resserré (agents_store.go).
+            launch["limits"] = {"max_tool_calls": config.S_BUDGET_TOOL_CALLS}
+        sw.cli(["profile", wid, tid], launch)
     return sw.work(wid)
 
 
@@ -212,15 +365,32 @@ def await_listening(conductors, log_path, run_dir):
         time.sleep(0.05)
 
 
-def stall_and_take_over(sw, faults, conductors, log):
-    """F7 : le premier conducteur est figé au-delà du seuil de péremption, un second prend la main."""
+def stall_and_take_over(sw, wid, faults, conductors, log):
+    """F7 : pendant prepare, le premier conducteur est figé au-delà du bail, un second prend la main.
+
+    Le marqueur est posé au gel (prepare l'attend pour terminer : le gel tombe pendant prepare), puis
+    réécrit avec `takeover_at`, le lancement du second conducteur après S_STALL_S, et `woke_at`.
+    """
     first = conductors[0]
+    before, _ = supervision_holder(sw.root, wid)
     os.kill(first.pid, signal.SIGSTOP)
-    markers.mark(faults / "owner-stalled.json", pid=first.pid, stalled_for_s=config.S_STALL_S)
+    frozen = time.time()
+    marker = faults / "owner-stalled.json"
+    markers.mark(marker, pid=first.pid, stalled_for_s=config.S_STALL_S, frozen_at=frozen, holder_before=before)
     time.sleep(config.S_STALL_S)
     conductors.append(sw.conductor(log))
-    time.sleep(2)
+    takeover = time.time()
+    after, source = before, None
+    deadline = time.monotonic() + config.S_TAKEOVER_TIMEOUT_S
+    # le second conducteur `web` doit obtenir le bail (CAS) ; un bail éphémère de superviseur ne compte pas
+    while (after == before or source != WEB_CONDUCTOR) and time.monotonic() < deadline:
+        time.sleep(0.1)
+        after, source = supervision_holder(sw.root, wid)
     os.kill(first.pid, signal.SIGCONT)
+    taken = after != before and source == WEB_CONDUCTOR
+    markers.mark(marker, pid=first.pid, stalled_for_s=config.S_STALL_S, frozen_at=frozen, takeover_at=takeover,
+                 holder_before=before, holder_after=after if taken else None,
+                 holder_after_source=source if taken else None, woke_at=time.time())
 
 
 def watch(sw, wid, run_dir, fault, conductors, log):
@@ -240,14 +410,17 @@ def watch(sw, wid, run_dir, fault, conductors, log):
             raise harness.BenchError(reason, run_dir)
         tasks = {t["id"]: t["status"] for t in work["tasks"]}
         scope_state = root_scope(work)["state"]
-        if not injected and tasks.get("prepare") == "accepted":   # crochets conservés, non exercés au nominal
-            if fault == "F4" and (sw.root / LOT_REL).exists():
-                harness.tamper(sw.root / LOT_REL, faults / "lot-tampered.json")
-                (faults / "tamper-done").write_text("1")
-                injected = True
-            elif fault == "F7":
-                stall_and_take_over(sw, faults, conductors, log)
-                injected = True
+        if not injected and fault == "F7" and tasks.get("prepare") == "running":
+            stall_and_take_over(sw, wid, faults, conductors, log)
+            injected = True
+        settle_active = any(a.get("task_id") == "settle" and a["status"] in ACTIVE for a in agents)
+        if not injected and tasks.get("prepare") == "accepted" and (sw.root / LOT_REL).exists() \
+                and (fault == "F4e" or (fault == "F4" and settle_active)):
+            # F4 : seulement une fois settle vue active (elle attend tamper-done) ; F4e : le verrou la retient.
+            name = harness.EXPECTED_MARKER[fault]
+            harness.tamper(sw.root / LOT_REL, faults / f"{name}.json", fault=name)
+            (faults / "tamper-done").write_text("1")
+            injected = True
         if tasks.get("settle") == "accepted" and scope_state == "closed":
             return work, False
         busy = (any(a["status"] in ACTIVE for a in agents) or any(s in PENDING for s in tasks.values())
@@ -371,10 +544,10 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
     token_file = bank / "settle.token"
     token_file.write_text(uuid.uuid4().hex)
     sw = Swarm(binary, root)
-    conductors, work, timed_out, agents, wid = [], None, False, [], None
+    conductors, work, timed_out, agents, wid, validation = [], None, False, [], None, None
     cleanup = {"errors": [], "reaped": []}
     api_options = {"lose_response_once": faults / "response-lost.json" if fault == "F1" else None,
-                   "fail_snapshot_once": faults / "snapshot-503.json" if fault == "F5" else None,
+                   "fail_snapshot": faults / "snapshot-503.json" if fault == "F5" else None,
                    "token_file": token_file}
     log_path = run_dir / "conductor.log"
     try:
@@ -405,6 +578,8 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
                     markers.mark(faults / "dual-launch.json", conductors=[c.pid for c in conductors])
                 work, timed_out = watch(sw, wid, run_dir, fault, conductors, log)
                 agents = sw.agents(wid)
+                if fault in ("F4", "F4e"):
+                    validation = prepare_validation_state(sw, wid)
             finally:
                 cleanup["errors"] = stop(sw, wid, conductors)
     finally:   # API arrêtée par le bloc with ; tout reste lié à la racine est tué
@@ -413,10 +588,19 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
     reason = infrastructure_fault(work, agents, fault) if work is not None else None
     if reason:   # dernier état observé avant l'arrêt : une panne n'est jamais une mesure
         raise harness.BenchError(reason, run_dir)
+    proof = order_proof(fault, work, agents, faults, root, wid)
     summary = outcome_of(work)
     declared = summary["task_status"].get("settle") == "accepted" and summary["scope_state"] == "closed"
-    return harness.finish(run_dir, condition="S", key_mode=key_mode, fault=fault, seed=seed, started=started,
+    result = harness.finish(run_dir, condition="S", key_mode=key_mode, fault=fault, seed=seed, started=started,
                           declared_success=declared, timed_out=timed_out, bank_dir=bank,
-                          extra={"launches": len(agents), **summary,
+                          extra={"launches": len(agents), **summary, **settle_outcome(agents, fault),
                                  "agent_status": [a["status"] for a in agents], "conductors": len(conductors),
-                                 "cleanup": cleanup, "real_agent": real_agent[0] if real_agent else None})
+                                 "cleanup": cleanup, "real_agent": real_agent[0] if real_agent else None,
+                                 "order_proof": proof})
+    if fault in ("F4", "F4e"):
+        result["prepare_validation_state"] = validation
+        if not engine_stop_consistent(result["stopped_by"], validation) and result["status"] == "OK":
+            result["status"] = "INVALIDE"   # « arrêté par le moteur » sans preuve périmée : attribution infondée
+    if proof is not None and not proof["proven"] and result["status"] == "OK":   # ordre non prouvé : faute non injectée
+        result["status"] = "INVALIDE"
+    return result

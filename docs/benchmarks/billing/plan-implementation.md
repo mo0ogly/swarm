@@ -2296,3 +2296,16 @@ Validées après la relecture de la condition S hiérarchique :
 - **F8 (remise ancienne)** : conservée ; décrite comme une relance par
   correction automatique du moteur suivie du choix de la bonne remise par le
   règlement. Elle ne mesure ni la coordination ni la qualité de la correction.
+
+### Décisions opérateur après l'exploration (2026-10-05)
+
+- **F4 en deux variantes.** `F4` : lot modifié après le départ de `settle`
+  (teste le règlement, E3). `F4e` (nouvelle) : lot modifié après acceptation de
+  `prepare` mais avant le départ de `settle` (teste la fraîcheur des preuves
+  côté moteur, I3). En B0/B1, `F4e` s'injecte comme `F4` (pas de moteur).
+- **F5 persistante.** L'instantané renvoie 503 sur plusieurs appels consécutifs
+  (nombre fixé en constante), dans toutes les conditions, pour forcer le
+  diagnostic d'environnement au lieu d'être absorbé par un rejeu.
+- **F7 plus tôt.** Le premier conducteur est figé pendant l'exécution de
+  `prepare`, de sorte que le départ de `settle` dépende de la prise de main par
+  le second conducteur.

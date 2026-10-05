@@ -49,8 +49,9 @@ class CheckLotTest(unittest.TestCase):
     def test_environment_failure_exits_3(self):
         path = self.f.dir / "lot.json"
         preparer.write_lot(path, self.lot)
-        self.f.server.fail_snapshot_once = self.f.dir / "snapshot-503.json"
-        self.assertEqual(check_lot.main(["--api", self.f.url, "--lot", str(path)]), config.EXIT_ENVIRONMENT)
+        self.f.server.fail_snapshot = self.f.dir / "snapshot-503.json"
+        for _ in range(config.F5_SNAPSHOT_FAILURES):
+            self.assertEqual(check_lot.main(["--api", self.f.url, "--lot", str(path)]), config.EXIT_ENVIRONMENT)
         self.assertEqual(check_lot.main(["--api", self.f.url, "--lot", str(path)]), 0)
 
     def verify(self):

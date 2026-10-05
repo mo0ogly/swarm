@@ -44,12 +44,20 @@ class PaymentApiTest(unittest.TestCase):
         self.assertEqual(json.loads((f.dir / "response-lost.json").read_text())["fault"], "response-lost")
         self.assertTrue(client.post(f.url, "/pay", body(line, key="k"))["replay"])
 
-    def test_snapshot_fails_once_then_answers(self):
+    def test_snapshot_fails_n_times_then_answers(self):
+        """F5 persistante : F5_SNAPSHOT_FAILURES réponses 503 consécutives, marqueur au premier 503."""
         f = self.fixture()
-        f.server.fail_snapshot_once = f.dir / "snapshot-503.json"
-        with self.assertRaises(client.Unavailable):
-            client.snapshot(f.url)
+        f.server.fail_snapshot = f.dir / "snapshot-503.json"
+        for i in range(config.F5_SNAPSHOT_FAILURES):
+            with self.assertRaises(client.Unavailable):
+                client.snapshot(f.url)
+            self.assertEqual(self.served(f, i + 1), i + 1)
+        self.assertFalse((f.dir / "snapshot-recovered.json").exists())
         self.assertEqual(len(client.snapshot(f.url)["invoices"]), config.INVOICE_COUNT)
+        deadline = time.monotonic() + 2   # marqueur écrit après l'envoi de l'instantané : juste après la réponse
+        while not (f.dir / "snapshot-recovered.json").exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        self.assertTrue((f.dir / "snapshot-recovered.json").exists())   # faute absorbée : instantané servi
 
     def test_b1_refuses_unknown_beneficiary_and_over_cap(self):
         f = self.fixture(policy="b1")
@@ -183,13 +191,37 @@ class PaymentApiTest(unittest.TestCase):
             real(*args, **kwargs)
         return mock.patch.object(payment_api.markers, "mark", side_effect=slow)
 
-    def test_snapshot_fault_fires_once_under_concurrency(self):
+    @staticmethod
+    def served(f, expected, timeout=2.0):
+        """Compte publié dans le marqueur ; il est écrit après l'envoi du 503, donc juste après la réponse."""
+        deadline = time.monotonic() + timeout
+        value = None
+        while time.monotonic() < deadline:
+            path = f.dir / "snapshot-503.json"
+            value = json.loads(path.read_text())["served"] if path.exists() else None
+            if value == expected:
+                break
+            time.sleep(0.01)
+        return value
+
+    def test_snapshot_503_counted_only_once_sent(self):
         f = self.fixture()
-        f.server.fail_snapshot_once = f.dir / "snapshot-503.json"
+        f.server.fail_snapshot = f.dir / "snapshot-503.json"
+        with mock.patch.object(payment_api.Handler, "send_json", side_effect=ConnectionResetError("client parti")):
+            with self.assertRaises(Exception):
+                client.snapshot(f.url)
+        time.sleep(0.2)
+        self.assertFalse((f.dir / "snapshot-503.json").exists(), "503 non envoyé : rien à compter")
+
+    def test_snapshot_fault_count_holds_under_concurrency(self):
+        f = self.fixture()
+        f.server.fail_snapshot = f.dir / "snapshot-503.json"
+        n = config.F5_SNAPSHOT_FAILURES
         with self.slow_markers():
-            errors = self.concurrent([lambda: client.snapshot(f.url)] * 6)
-        self.assertEqual(sum(isinstance(e, client.Unavailable) for e in errors), 1, errors)
-        self.assertEqual(sum(e is None for e in errors), 5, errors)
+            errors = self.concurrent([lambda: client.snapshot(f.url)] * (n + 2))
+        self.assertEqual(sum(isinstance(e, client.Unavailable) for e in errors), n, errors)
+        self.assertEqual(sum(e is None for e in errors), 2, errors)
+        self.assertEqual(self.served(f, n), n)
 
     def test_lost_response_fires_once_under_concurrency(self):
         f = self.fixture()

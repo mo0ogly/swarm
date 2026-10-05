@@ -19,8 +19,19 @@ S_RUN_TIMEOUT_S = 120
 S_QUIET_S = 5                    # aucune activité ni changement d'état pendant 5 s : fin d'exécution
 S_STALL_S = 35                   # > 30 s : missionConductorStaleAfter (mission_supervision.go du dépôt swarm)
 S_BUDGET_TOOL_CALLS = 5
+# F5 persistante : nombre de réponses 503 consécutives sur /snapshot, dans toutes les conditions.
+# En S, un contrôle préautorisé peut s'exécuter plusieurs fois par tentative : une passe perdue sur un
+# conflit de révision est rejouée (automatic_validation.go : runAutomaticValidation, puis
+# resumeAutomaticValidations ; observé : 2 exécutions par tentative), et un contrôle en échec
+# déclenche une seule correction automatique (dispatcher.go : automaticCorrection, borne
+# PlanMaxAttempts = 2, planning.go). 2 tentatives x 3 exécutions (une de plus que l'observé) = 6 :
+# aucune exécution de check_lot pendant le budget de prepare ne voit l'instantané. En B0/B1, la
+# revue finale ne relance qu'une fois : elle reste « indisponible ».
+F5_SNAPSHOT_FAILURES = 6
 S_GATE_TIMEOUT_S = 15
+S_HOLD_TIMEOUT_S = 60            # F4e : durée maximale du verrou (acceptation de prepare observée en 8 s)
 S_CLI_TIMEOUT_S = 30              # un appel de la CLI swarm
+S_TAKEOVER_TIMEOUT_S = 10        # F7 : délai pour voir le second conducteur prendre le bail
 S_CONDUCTOR_START_S = 5          # le conducteur web doit annoncer son écoute loopback dans ce délai
 S_CLEANUP_TIMEOUT_S = 15         # attente de l'arrêt des agents avant arrêt forcé
 S_POLL_S = 0.3
