@@ -1,0 +1,20 @@
+flowchart TB
+ H[Humain<br/>Objectif et autorisations] --> P[Planificateur IA<br/>Décompose et adapte]
+ P --> M[Moteur déterministe<br/>Droits · dépendances · budgets · espace]
+ M -->|Départ autorisé| A[Agents IA<br/>Exécutent et transmettent leurs résultats]
+ M -->|Condition absente| R[Attente ou refus expliqué]
+ A --> E[État durable et traces<br/>Tentative · actions · candidat · preuves]
+ E --> V[Validation<br/>Contrôles ciblés et revue selon la politique]
+ V -->|Critères satisfaits| F[Résultat accepté]
+ V -->|Échec ou incertitude| D[Diagnostic<br/>Cause et précondition à corriger]
+ D --> P
+ R --> H
+ E -. Suivi de la consommation observable .-> M
+ classDef human fill:#fff0d1,stroke:#a57226,color:#5b3c12
+ classDef agent fill:#e6dcfa,stroke:#7151a8,color:#35234e
+ classDef motor fill:#dceef8,stroke:#31658b,color:#18394f
+ classDef evidence fill:#e4f2e8,stroke:#427553,color:#264832
+ class H,R,D human
+ class P,A agent
+ class M motor
+ class E,V,F evidence

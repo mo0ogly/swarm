@@ -1,0 +1,19 @@
+sequenceDiagram
+ autonumber
+ participant R as Règlement
+ participant B as Banque (API de paiement)
+ R->>B: Payer facture F-12 · 4 200 €
+ Note over B: Virement exécuté
+ B--xR: Réponse perdue sur le réseau
+ Note over R: Délai dépassé : le règlement réessaie
+ alt Sans clé d'idempotence
+  R->>B: Payer facture F-12 · 4 200 €
+  Note over B: Second virement : doublon
+ else Clé liée à la tentative (tentative-2:F-12)
+  R->>B: Payer F-12 · clé neuve
+  Note over B: Clé inconnue : second virement
+ else Clé métier (fournisseur S01 + facture F-12)
+  R->>B: Payer F-12 · même clé
+  Note over B: Clé connue : aucun nouveau virement
+  B-->>R: Paiement déjà exécuté (rejeu)
+ end
