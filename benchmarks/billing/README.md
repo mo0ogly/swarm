@@ -22,7 +22,9 @@ Plan d'implémentation et amendements : [`docs/benchmarks/billing/plan-implement
 | `bench/metrics.py` | Mesures : doublons, paiements inexacts, impayés, violations |
 | `bench/harness.py` | Racine isolée par exécution, API, mesure, provenance |
 | `bench/run_b.py` | Conditions B0 (sans moteur) et B1 (contrôle par appel) |
-| `bench/run_s.py`, `bench/provider_s.py` | Condition S (Swarm) — voir « État » |
+| `bench/run_s.py`, `bench/provider_s.py`, `bench/planner_fixture.py` | Condition S : Swarm en mission hiérarchique, responsable de mission scripté, préparateur et règlement scriptés |
+| `bench/campaign.py` | Campagne : grille condition × clé × faute × répétition, JSONL reprenable |
+| `bench/tables.py` | Tableaux de l'article : taux, intervalles de Wilson, exclusions, durées, annexes |
 
 ## Lancer les tests
 
@@ -48,13 +50,39 @@ ailleurs.
 
 - Conditions B0 et B1 : implémentées, relues, avec contrôles positifs : chaque
   faute produit le défaut attendu dans la chaîne sans protection.
-- Condition S : à refaire sur le modèle hiérarchique de Swarm. La version
-  actuelle de `run_s.py` repose sur des échanges directs entre tâches, que
-  Swarm refuse en mission hiérarchique ; le test d'intégration échoue donc à
-  l'installation, avec une erreur explicite (« Organisation autonome non
-  configurée »).
-- Campagne (`campaign.py`, `tables.py`) et préparateur réel
-  (`provider_real.py`) : pas encore écrits.
+- Condition S : refaite sur le modèle hiérarchique de Swarm (responsable de
+  mission scripté, remise automatique au responsable, contrôles déclarés par
+  exigence). Fautes F1 à F8 et F4e adaptées et explorées ; observations et
+  preuves d'ordre dans [`docs/benchmarks/billing/observations.md`](../../docs/benchmarks/billing/observations.md).
+- Campagne et tables : `campaign.py` et `tables.py` écrits et testés. Une
+  répétition générale (2 répétitions, 180 exécutions) passe le critère du
+  protocole : [`docs/benchmarks/billing/resultats/`](../../docs/benchmarks/billing/resultats/).
+- Préparateur réel (`provider_real.py`) : pas encore écrit.
+
+## Campagne
+
+```sh
+cd benchmarks/billing
+systemd-inhibit --what=sleep:idle --why="banc swarm" \
+  python3 bench/campaign.py --out ../../docs/benchmarks/billing/resultats/campagne-AAAAMMJJ.jsonl \
+  --reps 100 --purge-ok --jobs-b 4 --jobs-s 1
+python3 bench/tables.py ../../docs/benchmarks/billing/resultats/campagne-AAAAMMJJ.jsonl \
+  --out ../../docs/benchmarks/billing/resultats/campagne-AAAAMMJJ.md
+```
+
+- `systemd-inhibit` empêche la mise en veille : une veille pendant une
+  exécution S fausserait le bail du conducteur (F7) et les preuves d'ordre,
+  sans que la durée mesurée (horloge monotone) le montre.
+- `--jobs-s 1` : une exécution S parallèle charge la machine et fausse les
+  durées, donc la mesure de H5.
+- `--purge-ok` supprime la racine d'une exécution OK après écriture de sa ligne
+  (`run_dir_purged: true`) ; les racines INVALIDE, DÉLAI et ERREUR restent pour
+  diagnostic. Sans l'option, chaque exécution garde sa racine dans le dossier
+  temporaire.
+- La campagne est reprenable : relancer la même commande saute les cases déjà
+  écrites. Ctrl-C laisse un JSONL fait de lignes complètes.
+- L'empreinte du banc et du binaire est enregistrée au début et à la fin ; un
+  changement est signalé dans le JSONL et en tête des tableaux.
 
 ## Limites
 
