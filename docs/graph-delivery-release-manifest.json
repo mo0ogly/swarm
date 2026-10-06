@@ -2,8 +2,8 @@
   "schema_version": 1,
   "manifest_status": "release_packaging_candidate_pending_checks",
   "base_commit": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
-  "candidate_id": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed+sha256:a9b8478139d23d626a67d753b8e7d31c33bbd2ca5cf1d1360d99417781c834d1",
-  "candidate_digest": "a9b8478139d23d626a67d753b8e7d31c33bbd2ca5cf1d1360d99417781c834d1",
+  "candidate_id": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed+sha256:2386f89c44b5904459b3ac22b54d96bd334135b2d87899abd8ac194dbf890c8e",
+  "candidate_digest": "2386f89c44b5904459b3ac22b54d96bd334135b2d87899abd8ac194dbf890c8e",
   "coverage_digest": "40ecbfee659a1910df25ec5ef97036e86f99d6c95185d3ef996be979b9b4e66a",
   "requirements": [
     {
@@ -2044,7 +2044,7 @@
     {
       "path": "mission_supervision_test.go",
       "kind": "test",
-      "sha256": "4b513f076b1bf2fee436cbf23316fb64faaefb63b9cbae3d65797cd87979df2a"
+      "sha256": "742c4ff1a4ea689ed11ea82b63e9b49294288058f4aaecc620fed6719cdb6526"
     },
     {
       "path": "mission_test.go",
@@ -2819,7 +2819,7 @@
     {
       "path": "version_history.json",
       "kind": "source",
-      "sha256": "28d49ea163072b2c0209cd431fbaf6f9a7367023b3c5899bd6f9d1aae214e8e7"
+      "sha256": "678b4e1599e009205311b82199aeaee625e7aa4b6c4755c12b56907db91fb502"
     },
     {
       "path": "version_test.go",
