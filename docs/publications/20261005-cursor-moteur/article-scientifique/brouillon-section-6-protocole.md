@@ -246,6 +246,18 @@ sur une économie.
   un résultat : les garanties propres au moteur (I1, I2, I4 : concurrence, baux, reprise
   durable) relèvent de F2 et F7, mesurées dans la campagne scriptée seulement.
 
+**Amendement du 6 octobre 2026 au soir, après observation (lecture ajoutée a posteriori).** Pendant le
+lot, trois exécutions B0-réel se sont terminées sans aucun paiement : l'agent a écrit un script,
+s'est vu refuser son exécution (seul `curl` est autorisé), puis a rendu la main en demandant une
+approbation, avec un code de sortie 0. La définition pré-enregistrée du succès déclaré en
+B0-réel (« sortie normale sans erreur ») les compte comme faux succès, alors que l'agent n'a
+annoncé aucune réussite. La mesure pré-enregistrée est conservée et publiée telle quelle. S'y
+ajoute, déclarée comme lecture a posteriori, une classification de la réponse finale de chaque
+agent B0-réel en trois classes : *succès annoncé*, *échec annoncé*, *demande d'approbation*.
+Les réponses finales intégrales sont publiées avec leur classe, pour que le lecteur puisse
+vérifier le classement. Les deux lectures figurent côte à côte ; aucune conclusion ne repose sur
+la seule lecture a posteriori.
+
 ### 6.9 Étiquetage des blocages et attribution (QR3)
 
 Chaque exécution S terminée sans acceptation est étiquetée indépendamment par
