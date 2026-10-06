@@ -102,6 +102,13 @@ modèle qui a produit le candidat a changé.
   choix de conception ; un contrôle par appel plus riche réduirait l'écart avec
   la condition S. Les résultats doivent être lus comme une comparaison avec ce
   B1 précis, non avec toute approche par appel.
+- **Durées sensibles à la charge de l'hôte.** Les conditions B0 et B1 tournent
+  sur quatre exécutants en parallèle, S en série. Dans la campagne du
+  5 octobre 2026, les durées de B dérivent dans le temps à condition égale
+  (B0, clé métier, sans faute : 0,8 à 0,9 s en début de bloc, 2,2 à 2,9 s en fin
+  de bloc), sous l'effet de la charge de la machine. Les durées de B ne se
+  comparent donc pas entre elles à mieux qu'un facteur 2 à 3 ; H5 (surcoût de
+  S, facteur 8 à 30) n'en dépend pas.
 
 ### 10.2 Validité externe
 
