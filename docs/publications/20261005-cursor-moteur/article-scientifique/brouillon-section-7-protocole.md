@@ -87,20 +87,40 @@ l'absence de catégorie orchestrateur dans MAST.
 
 ### 7.6 Annotation
 
-- Deux annotateurs indépendants étiquettent toutes les unités avec la taxonomie de 7.2, après
-  une séance d'étalonnage sur dix unités tirées hors corpus, exclues des mesures.
-- Les désaccords sont résolus par discussion après le calcul de l'accord ; la classe résolue
-  sert de seconde référence, à côté de la vérité par construction.
+*Amendement du 6 octobre 2026, avant constitution du corpus : aucun second annotateur humain
+n'est disponible.*
+
+- **Annotateur humain unique** : l'auteur étiquette toutes les unités avec la taxonomie de 7.2,
+  après une séance d'étalonnage sur dix unités tirées hors corpus, exclues des mesures.
+  L'accord entre annotateurs humains n'est pas mesuré ; l'article le déclare. Si un second
+  annotateur humain devient disponible avant l'analyse, il étiquette le même corpus selon la
+  même procédure et la mesure 1 est rétablie.
+- **Annotateur LLM, mesure secondaire** : un modèle différent de celui des agents mesurés
+  (`claude-opus-5-5`, contre `claude-sonnet-5` pour les agents du lot réel), sans outils, reçoit
+  pour chaque unité les mêmes pièces que l'annotateur humain (7.3) et la même consigne écrite
+  (définitions de 7.2, une classe principale, au plus une classe aggravante, et « inconnu »
+  autorisé). Consigne, modèle, version du client et réponses brutes sont publiés. Il étiquette
+  indépendamment : ni l'auteur ne voit ses étiquettes avant d'avoir fini, ni le modèle ne voit
+  celles de l'auteur.
+- Le modèle n'est pas un second annotateur humain : son accord avec l'auteur est rapporté comme
+  une mesure distincte (sur le modèle de MAST, qui rapporte séparément l'accord humain et celui
+  d'un juge LLM), jamais comme κ inter-annotateurs.
+- La vérité par construction (7.4) reste la référence principale ; aucune étiquette n'est
+  corrigée après comparaison.
 
 ### 7.7 Mesures
 
-1. Accord entre annotateurs : κ de Cohen sur la classe principale, avec intervalle à 95 %
-   par bootstrap (1 000 rééchantillonnages, graine fixée).
+1. Accord entre annotateurs humains : κ de Cohen sur la classe principale, avec intervalle à
+   95 % par bootstrap (1 000 rééchantillonnages, graine fixée). *Non mesuré tant qu'un seul
+   annotateur humain est disponible.*
 2. Diagnostic du moteur contre la vérité de référence : précision et rappel par classe,
    matrice de confusion, taux d'`unknown`.
-3. Annotateurs contre la vérité de référence : exactitude, pour vérifier que la taxonomie est
-   applicable à partir des seules traces.
-4. Cas où le moteur est fautif ou aggravant : nombre, défaut en cause (D1 à D5), et part de
+3. Auteur contre la vérité de référence, et annotateur LLM contre la vérité de référence :
+   exactitude, séparément, pour vérifier que la taxonomie est applicable à partir des seules
+   traces.
+4. Accord auteur et annotateur LLM : κ de Cohen avec le même intervalle, rapporté comme accord
+   humain–modèle, et liste des désaccords.
+5. Cas où le moteur est fautif ou aggravant : nombre, défaut en cause (D1 à D5), et part de
    ces cas que le diagnostic du moteur attribue à l'agent.
 
 Aucune mesure n'est agrégée en score unique. Avec environ une centaine d'unités, les
@@ -110,8 +130,7 @@ intervalles seront larges ; QR3 est une étude exploratoire, pas un test d'hypot
 
 ## Points à décider avant le lot
 
-1. **Seconds annotateurs.** Qui, à part l'auteur ? Sans second annotateur, pas de κ : la
-   mesure 1 tombe et la section le dit.
+1. **Second annotateur humain** : aucun à ce jour (amendement 7.6) ; place conservée.
 2. **Lieu du diagnostic dans `state.db`.** Vérifier sur une racine conservée où se trouvent la
    catégorie de reprise et le motif de blocage, puis écrire l'extraction des pièces de 7.3.
 3. **Lancement du lot** : après la campagne principale, pour ne pas fausser ses durées.
