@@ -788,7 +788,7 @@ func planningAttemptEnded(w *Work, a Agent, outcome string, artifacts ...Exchang
 
 // Validation is a distinct input. A planner that has already read a process
 // result must wake again when the controller validates (or reopens) the task.
-func planningValidationSignals(w *Work, before map[string]string, eventID string) {
+func (s *Store) planningValidationSignals(w *Work, before map[string]string, kind, eventID string) {
 	if w.Planning == nil {
 		return
 	}
@@ -809,6 +809,54 @@ func planningValidationSignals(w *Work, before map[string]string, eventID string
 		for scope.Parent != "" {
 			scope, _ = w.Planning.scope(scope.Parent)
 			scope.State = "ready"
+		}
+	}
+	if kind == "task.auto-validation" || kind == "task.auto-validation-reviewed" || kind == "managed.integrated" || kind == "managed.recovered-result" {
+		s.autoCloseProvenPlanningScopes(w, eventID)
+	}
+}
+
+// A controller acceptance is already a versioned engine decision. For the
+// common, non-delegated root scope, do not spend another planner activation
+// merely to restate that every requirement has fresh evidence. Delegated
+// graphs retain their explicit child/parent handoff contract.
+func (s *Store) autoCloseProvenPlanningScopes(w *Work, eventID string) {
+	if w.Planning == nil || w.Planning.Reviewer == nil || len(w.Planning.Scopes) != 1 {
+		return
+	}
+	scope := &w.Planning.Scopes[0]
+	if scope.ID != "root" || scope.State == "closed" {
+		return
+	}
+	decision := planningEventID(eventID, "auto-close")
+	hasWork, ready := false, true
+	covered := map[string]bool{}
+	for i := range w.Tasks {
+		task := &w.Tasks[i]
+		if task.ScopeID != "root" {
+			continue
+		}
+		hasWork = true
+		if task.Status != "accepted" || task.IndependentReview == nil || task.IndependentReview.State != "passed" || !s.acceptedFresh(w, task, map[string]bool{}) {
+			ready = false
+			continue
+		}
+		for _, req := range task.Requirements {
+			covered[req] = true
+		}
+	}
+	for _, req := range scope.Requirements {
+		ready = ready && covered[req]
+	}
+	if !hasWork || !ready {
+		return
+	}
+	scope.State, scope.Holder, scope.Until = "closed", "", ""
+	scope.Revision++
+	scope.Generation++
+	for i := range w.Planning.Inbox {
+		if w.Planning.Inbox[i].Scope == "root" && w.Planning.Inbox[i].Decision == "" {
+			w.Planning.Inbox[i].Decision = decision
 		}
 	}
 }

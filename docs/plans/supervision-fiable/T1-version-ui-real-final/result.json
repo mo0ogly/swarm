@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "mode": "real candidate server",
+  "root": "/tmp/swarm-version-ui-cyUwIy",
+  "binary": "/tmp/swarm-r1-recovery-candidate",
+  "checks": [
+    "cockpit fr/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "cockpit fr/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "cockpit en/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "cockpit en/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare fr/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare fr/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare en/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare en/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "loading state before delayed real runtime-health response",
+    "explicit unavailable state on HTTP 503"
+  ],
+  "errors": [],
+  "failed": []
+}

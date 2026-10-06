@@ -151,3 +151,34 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 	*t = next
 	return nil
 }
+
+// A confirmed operator amendment repairs a blocked acceptance contract without
+// changing ownership, dependencies, attempts, budgets or global requirements.
+func validateHierarchicalContractRevision(w *Work, r Request) error {
+	if !r.ConfirmContractRevision || len(strings.TrimSpace(r.ContractRevisionReason)) < 16 || len(r.ContractRevisionReason) > 2000 {
+		return fmt.Errorf("contrat hiérarchique immuable par défaut ; confirmation et motif explicites requis")
+	}
+	if w.Planning.Repository != nil {
+		return fmt.Errorf("révision de contrat géré non prise en charge")
+	}
+	t, err := w.task(r.ID)
+	if err != nil {
+		return err
+	}
+	if t.Status != "blocked" || r.Status != "" || t.ScopeID == "" || r.ExpectedContract != reviewContract(t) {
+		return fmt.Errorf("révision exige tâche bloquée et empreinte courante du contrat, sans transition")
+	}
+	if r.Criteria == nil || len(r.Criteria) != len(t.Criteria) || r.Title != "" || r.Deliverable != "" || r.Depends != nil || r.MaxAttempts != 0 || r.MaxToolCalls != 0 || r.ValidationPolicy != nil {
+		return fmt.Errorf("révision limitée aux critères existants ; identité, dépendances et budgets inchangés")
+	}
+	scope, err := w.Planning.scope(t.ScopeID)
+	if err != nil || scope.State == "closed" {
+		return fmt.Errorf("périmètre absent ou clos")
+	}
+	for _, task := range w.Tasks {
+		if task.IndependentReview != nil && task.IndependentReview.State == "running" {
+			return fmt.Errorf("terminer toutes les revues avant révision du contrat")
+		}
+	}
+	return nil
+}

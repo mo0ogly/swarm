@@ -1,0 +1,12 @@
+{
+  "base": "1d9570bd4ef617130c6be96b7ec88844fdbcd00e",
+  "files_sha256": {
+    "mission_status.go": "5f9711c758d674a3249f96833f4f0e6f13beefa92b7116f1419ff4edc4fb7fd0",
+    "mission_cli.go": "09ff5a8f955661caef0a70242f03abc10e438ce4a9e3fad89579ab767e9731fc",
+    "web/mission.js": "bfeeba57a581fc6c0fc7d2db84fc176338e039556956dcbe55b36f3264d481fe",
+    "locales/en.json": "405d74e7e5b462b79586ed0ee892926fad4c37f1daee7a40adfdb7d29c41dbaa",
+    "web/i18n-en.js": "d2e95248b7e93146ebb99e9ecaf1a2698050f02295a1aee733547b820ed7a3cb",
+    "mission_launch_identity_test.go": "c021f19b4c7a87a903ae9cc9f97f25c912b80b515c7f10ea428e0d84a6c9c736"
+  },
+  "dirty": true
+}

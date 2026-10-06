@@ -63,6 +63,7 @@ const Pilot = {
   const list=node('div',undefined,'pilot-list');list.id='pilot-list';
   const mission=node('section',undefined,'mission-summary');mission.id='mission-summary';mission.setAttribute('aria-label',tr_web_pilotage_js('Résultats et conduite de la mission'));
   $('graph').replaceChildren(mission,toolbar,actions,status,canvas,list);
+  GraphDraft.mount();
  },
  changed(){this.save();this.listKey='';this.render();},
  zoom(delta){this.state.zoom=Math.max(.15,Math.min(2,this.state.zoom+delta));this.changed()},
@@ -93,7 +94,8 @@ const Pilot = {
    this.state.filter==='unknown'&&a&&active(a)&&!['running','stopping'].includes(health?.process_state)||
    this.state.filter==='finished'&&a&&!active(a);
  },
- inspect(kind,id){const a=kind==='agent'?snapshot.agents.find(x=>x.agent.id===id)?.agent:kind==='task'?snapshot.agents.find(x=>x.agent.task_id===id)?.agent:null;if(['terminal','dialogue'].includes(a?.mode)){AgentTerminal.open(a);return}this.state.selection={kind,id};this.inspectorKey='';this.save();PilotInspector.render(true)},
+ taskAgent(id){const agent=snapshot.pilotage?.tasks?.[id]?.attempt?.agent_id;return snapshot.agents.find(x=>x.agent.id===agent)?.agent||snapshot.agents.find(x=>x.agent.task_id===id)?.agent},
+ inspect(kind,id){const a=kind==='agent'?snapshot.agents.find(x=>x.agent.id===id)?.agent:kind==='task'?this.taskAgent(id):null;if(['terminal','dialogue'].includes(a?.mode)){AgentTerminal.open(a);return}this.state.selection={kind,id,agent_id:a?.id||''};this.inspectorKey='';this.save();PilotInspector.render(true)},
  selectedTask(){
   const s=this.state.selection;
   return s?.kind==='task'?s.id:s?.kind==='agent'?(snapshot.agents.find(x=>x.agent.id===s.id)?.agent.task_id||PilotInspector.loaded?.agent?.task_id):
@@ -121,14 +123,16 @@ const Pilot = {
   for(const id of ['pilot-orientation','pilot-collapse','pilot-expand','pilot-fit','pilot-zoom-in','pilot-zoom-out'])$(id).disabled=!graph;
   $('pilot-group').hidden=graph;$('pilot-group').textContent=this.state.grouped?tr_web_pilotage_js('Afficher les agents'):'Regrouper';
   $('pilot-reveal').disabled=!this.selectedTask();
+  const fitWidth=graph&&this.fitPending?$('pilot-canvas').clientWidth:0;
   if(graph){drawPilotGraph();if(this.fitPending){
    const svg=$('pilot-canvas').querySelector('svg');
-   if(svg){const port=$('pilot-canvas');this.state.zoom=Math.max(.15,Math.min(1,(port.clientWidth-20)/Number(svg.dataset.width),(innerHeight*.65-50)/Number(svg.dataset.height)));scalePilotGraph(svg,this.state.zoom);this.state.x=0;this.state.y=0;port.scrollTo(0,0);this.fitPending=false;this.save()}
+   if(svg){const port=$('pilot-canvas');this.state.zoom=Math.max(.15,Math.min(1,(fitWidth-20)/Number(svg.dataset.width),(innerHeight*.65-50)/Number(svg.dataset.height)));scalePilotGraph(svg,this.state.zoom);this.state.x=0;this.state.y=0;port.scrollTo(0,0);this.fitPending=false;this.save()}
   }if(this.restorePosition){$('pilot-canvas').scrollTo(this.state.x,this.state.y);this.restorePosition=false}}else this.cards();
+  GraphDraft.render();
   const edges=snapshot.pilotage?.edges||[];
   $('pilot-status').textContent=this.storageWarning||(this.state.search.trim()?tr_web_pilotage_js('Recherche dans toutes les tâches, y compris les branches repliées.'):!snapshot.work.tasks.length?tr_web_pilotage_js('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.'):graph&&!edges.length?tr_web_pilotage_js('Tâches indépendantes : aucune dépendance déclarée, donc aucune flèche.'):graph?tr_web_pilotage_js('Les flèches vont du prérequis vers la tâche qui en dépend. Zoom ')+Math.round(this.state.zoom*100)+' %.':tr_web_pilotage_js('Sélectionnez un agent ou une tâche pour comprendre son état et examiner ses résultats.'));
   $('pilot-status').classList.toggle('notice',graph&&!edges.length&&snapshot.work.tasks.length>0);$('pilot-status').classList.toggle('info',graph&&!edges.length&&snapshot.work.tasks.length>0);
-  if(graph&&edges.length){const visible=$('pilot-canvas').querySelectorAll('.graph-arete').length;$('pilot-status').append(' '+visible+tr_web_pilotage_js(' dépendances affichées sur ')+edges.length+'.');if(visible<edges.length)$('pilot-status').append(tr_web_pilotage_js(' Des branches sont repliées ou filtrées : utilisez « Toutes les dépendances ».'))}
+  if(graph&&edges.length){const visible=$('pilot-canvas').querySelectorAll('.graph-arete').length,visibleTasks=$('pilot-canvas').querySelectorAll('.graph-noeud').length,hiddenTasks=Math.max(0,snapshot.work.tasks.length-visibleTasks),hiddenLinks=Math.max(0,edges.length-visible);$('pilot-status').append(' '+visible+tr_web_pilotage_js(' dépendances affichées sur ')+edges.length+'.');if(hiddenTasks||hiddenLinks)$('pilot-status').append(' '+hiddenTasks+tr_web_pilotage_js(' tâche(s) et ')+hiddenLinks+tr_web_pilotage_js(' lien(s) masqué(s).'));if(visible<edges.length)$('pilot-status').append(tr_web_pilotage_js(' Des branches sont repliées ou filtrées : utilisez « Toutes les dépendances ».'))}
   if(graph&&snapshot.work.planning)$('pilot-status').append(tr_web_pilotage_js(' Pointillés : responsabilités et remise au vérificateur. Traits pleins : dépendances entre tâches.'));
   if(graph&&(this.state.filter!=='all'||this.state.search.trim()))$('pilot-status').append(tr_web_pilotage_js(' Les liens dont une extrémité est filtrée restent masqués.'));
   if(this.state.selection)PilotInspector.render();

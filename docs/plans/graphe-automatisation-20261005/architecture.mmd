@@ -1,0 +1,22 @@
+flowchart LR
+ U[Utilisateur web ou CLI] --> B[Brouillon et prévisualisation]
+ B --> G[Service Go commun]
+ X[Horaire ou événement autorisé] --> Q[Demandes durables et déduplication]
+ Q --> G
+ G --> D[Gardes et conducteur]
+ D --> A[Agents avec périmètres]
+ A --> E[Résultats et traces]
+ E --> V[Contrôles et revue]
+ V --> C[Acceptation par le moteur]
+ V --> R[Diagnostic et reprise causale]
+ R --> G
+ G --> P[Projection publique]
+ P --> U
+ classDef person fill:#fff0d1,stroke:#a57226,color:#5b3c12
+ classDef motor fill:#dceef8,stroke:#31658b,color:#18394f
+ classDef agent fill:#e6dcfa,stroke:#7151a8,color:#35234e
+ classDef proof fill:#e4f2e8,stroke:#427553,color:#264832
+ class U,B,X person
+ class G,Q,D,P motor
+ class A agent
+ class E,V,C,R proof

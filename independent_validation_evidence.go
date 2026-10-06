@@ -8,6 +8,29 @@ import (
 	"fmt"
 )
 
+// independentValidationReviewEvidence keeps the persisted receipt as the
+// canonical control evidence and exposes only complete, policy-authorized
+// observations as literal quotation sources. Callers must use the returned
+// values together: the observations inherit the attempt, policy and artifact
+// checks performed by independentValidationEvidence.
+func (s *Store) independentValidationReviewEvidence(t *Task) (string, map[string]string, []string, error) {
+	controls, artifacts, err := s.independentValidationEvidence(t)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	var observations []string
+	if t.ValidationPolicy == nil || t.AutoValidation == nil {
+		return controls, artifacts, observations, nil
+	}
+	for i, result := range t.AutoValidation.Controls {
+		control := t.ValidationPolicy.Controls[i]
+		if control.ReviewOutput && !result.ReviewOutputTruncated && result.ReviewOutput != "" {
+			observations = append(observations, result.ReviewOutput)
+		}
+	}
+	return controls, artifacts, observations, nil
+}
+
 // Only persisted engine executions are evidence; imported gate results and
 // prose claims never become execution receipts. Failed/stale checks retain the
 // task without spending a review call.
@@ -31,6 +54,17 @@ func (s *Store) independentValidationEvidence(t *Task) (string, map[string]strin
 		actual, _ := json.Marshal(r.Command)
 		if r.ID != c.ID || string(command) != string(actual) || !r.Executed || !r.Passed || r.ExitCode != 0 || r.Started == "" || r.Finished == "" {
 			return "", nil, fmt.Errorf("contrôle %s non démontré", c.ID)
+		}
+	}
+	// Older receipts remain valid with sharing disabled. Sharing is policy-bound;
+	// truncated observations remain visibly partial and never become a full log.
+	for i, r := range a.Controls {
+		c := t.ValidationPolicy.Controls[i]
+		if !c.ReviewOutput && (r.ReviewOutput != "" || r.OutputBytes != 0 || r.ReviewOutputTruncated) {
+			return "", nil, fmt.Errorf("sortie de contrôle non autorisée : %s", c.ID)
+		}
+		if c.ReviewOutput && (len(r.ReviewOutput) > maxValidationReviewOutput || r.OutputBytes < len(r.ReviewOutput) || r.ReviewOutputTruncated != (r.OutputBytes > len(r.ReviewOutput))) {
+			return "", nil, fmt.Errorf("sortie de contrôle incohérente : %s", c.ID)
 		}
 	}
 	if err := s.currentReportArtifacts(a.Artifacts); err != nil {

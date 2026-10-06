@@ -91,3 +91,71 @@ ses budgets/délais habituels. La revue des pixels reste un jugement IA ; elle
 n’est ni un contrôle déterministe, ni une acceptation. Une image modifiée
 invalide les preuves liées par empreinte. Le transport utilise les blocs
 image du [format streaming Claude](https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode).
+
+## Recontrôler un résultat terminé après correction
+
+Un contrôle non exécuté ou interrompu sans code de fin n’établit pas un défaut
+réparable du livrable : il ne déclenche plus automatiquement un exécutant.
+Après un échec objectif, changer le chemin du reçu ne suffit pas à rendre
+nouvelle une cause identique. Examiner et corriger la précondition avant reprise.
+
+Pour une tâche bloquée par ses contrôles, les commandes explicites
+`validation recheck-preview` puis `validation recheck-apply` réutilisent le
+contrat `recheck_completed` avec `"intent": "replace"` et une politique
+corrigée différente. Les autres champs de la requête et le jeton d’aperçu restent
+obligatoires. La dernière tentative doit être terminée et correspondre au reçu.
+Cette opération remet **le résultat existant** à vérifier, invalide les preuves
+courantes et ne crée ni agent, ni tentative, ni budget supplémentaire. Le
+conducteur ne rejoue les contrôles que sous autorisation de mission active.
+La revue indépendante et une gate fraîche restent nécessaires à l’acceptation.
+Ne pas utiliser le retrait des contrôles ou une politique vide comme reprise.
+L’action web **Recontrôler le résultat** suit exactement ce double aperçu/apply.
+
+## Lire les contrôles et leurs mesures
+
+`swarm mission status WORK` et les détails web utilisent la même projection de
+preuves. Le **verdict actuel** est présenté avant l’historique ; les anciens
+échecs restent consultables après un recontrôle. Chaque contrôle indique son
+état, son résultat, sa commande, ses horaires et sa durée murale mesurée.
+
+Le temps CPU n’apparaît comme mesure que lorsque le processus l’a fourni. Coût
+et tokens restent `unknown` : Swarm ne les déduit ni du nombre de commandes ni
+de la durée. Le top cinq trie uniquement les contrôles possédant une durée
+murale mesurée ; les reçus anciens sans durée restent dans l’historique mais ne
+sont pas classés. Les durées sont celles des processus de contrôle, pas une
+estimation de la durée totale de la mission.
+
+Après acceptation, le moteur clôt automatiquement une racine non déléguée
+seulement si toutes ses tâches disposent encore d’une gate fraîche et d’une
+revue indépendante courante. Un incident historique reste consultable mais ne
+force pas une activation supplémentaire ; une preuve périmée ou une revue
+absente conserve la racine ouverte. Les graphes délégués gardent leur clôture
+enfant/parent explicite.
+
+### Recette finale complète et observable
+
+`python3 tests/supervision_final_acceptance.py` vérifie la suite Go, vet,
+configuration, diff, build canonique et la recette navigateur isolée. La suite
+Go découvre tous les tests du package et les répartit dans quatre processus
+sans doublon. Chaque test découvert doit apparaître dans les événements Go ;
+chaque groupe doit terminer avec le code 0. Un inventaire vide, dupliqué, un
+changement du nombre de packages ou une couverture manquante sont refusés.
+Les sous-tests restent exécutés par leur test parent. Le délai interne Go est
+240 secondes par groupe ; le plafond **cumulé du contrôle moteur reste 300 s**.
+Ce découpage améliore le temps écoulé, pas le résultat attendu ; aucun groupe
+n’est facultatif. Une exécution locale ne remplace pas le reçu du moteur.
+
+Les recettes navigateur prouvent leurs interactions sur un serveur candidat
+isolé. Elles ne prouvent ni l’autonomie d’un fournisseur externe ni la clôture
+de la mission réelle. Un rapport présent ou un processus terminé ne vaut pas
+une acceptation. Les coûts non rapportés restent inconnus.
+
+### Découpage entre agents : évolution proposée
+
+Un superviseur de validation pourrait gérer les lots moteur, CLI/configuration,
+web et preuves/RETEX. Les sous-agents analyseraient les anomalies et les critères
+qualitatifs ; les commandes automatiques resteraient des processus déterministes.
+Le superviseur vérifierait couverture et même candidat, invaliderait les lots
+affectés par une correction puis remettrait la consolidation au vérificateur
+indépendant. Seul le moteur déciderait la clôture. **Cette organisation entre
+agents est une proposition ; la recette à quatre processus ne l’implémente pas.**

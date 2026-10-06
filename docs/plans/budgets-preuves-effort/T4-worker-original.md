@@ -1,0 +1,128 @@
+# Rapport — T4 (QW8 : vérifier le dossier avant la revue)
+
+Tentative : a-600fdd2ca2efc0385bded831 (départ 2/2, reprise après a-987b01425800fd26ea11 interrompue).
+Révision du travail au départ : 78. Racine de travail : `/home/fpizzi/workspace/swarm-action-skills`
+(vérifié par `pwd` + `git rev-parse --show-toplevel`).
+
+## Constat de reprise
+
+La tentative précédente (interrompue à l'appel 41) avait déjà écrit
+`independent_review_dossier_gate_test.go` sans toucher au code applicatif. Aucun
+rapport `docs/plan-01567e073c-T4.md` n'existait (`test -f` → absent). Pas de
+nouvelle tâche créée, pas de modification de `.swarm/state.db`.
+
+Le dossier `docs/plans/budgets-preuves-effort/` contient déjà les preuves de
+T1–T3 (T1.md, T1-worker-original.md, T2-*, T3-*). Ces preuves ne sont pas
+ré-examinées ici (hors périmètre T4) ; seul leur existence est notée.
+
+## Ce qui existait déjà dans le moteur (pas une création de T4)
+
+Le contrôle déterministe du dossier avant appel fournisseur existe déjà et est
+partagé par le CLI et le web (même point d'entrée) :
+
+- `independent_review_runtime.go:52` — `(s *Store) independentReviewStep` :
+  point d'entrée unique. Appelé par :
+  - CLI : `planning_api.go:19` (`planning review-step`)
+  - Web : `mission.go:261` (boucle de fond du réviseur)
+  - Tests déjà présents : `independent_review_test.go:82,114`,
+    `provider_cooldown_test.go:144`, `runtime_health_test.go:163`.
+- `independent_review_runtime.go:140-148` : avant tout appel fournisseur,
+  construit `deliveryDocuments` (`independent_review_documents.go:13`) puis
+  `controls` via `independentValidationEvidence` (`independent_validation_evidence.go:14`).
+  Si cette dernière renvoie une erreur, la boucle fait `continue` **sans
+  dépenser d'appel de revue et sans démarrer le process fournisseur** (ligne 147,
+  commentaire : « Deterministic checks must finish before a paid review is
+  claimed »).
+- `independent_validation_evidence.go:14-52` : refuse si preuve absente,
+  fournisseur différent, attempt obsolète (`a.Attempt != latestAttemptID(t)`),
+  digest de politique différent, contrôle non exécuté/échoué, reçu incomplet,
+  ou artefact non courant (`currentReportArtifacts`, ligne 47) → périmée.
+- `independentReviewStep` ligne 72 : refus silencieux additionnel si mission en
+  pause, planification incomplète, ou gestion déléguée (`Repository != nil`).
+
+Aucune modification de ce code n'a été faite par T4 (confirmé par
+`git status --short` : seuls des fichiers de T2/T3 — `agents_store.go`,
+`mission_guidance.go`, `web/*.js`, etc. — sont modifiés ; aucun des fichiers
+`independent_review_*.go` ni `automatic_validation.go` n'apparaît en `M`).
+
+## Ajout de T4
+
+`independent_review_dossier_gate_test.go` (nouveau, non suivi avant ce commit) :
+test `TestIndependentReviewStepGatesDossierBeforeProviderCall`, exerçant
+**le même point d'entrée moteur** que le CLI (`planning review-step`, appelé
+directement en fin de test) et le web (`mission.go:261`) :
+
+1. **Cas négatif** : tâche soumise, aucun `AutoValidation` déposé (contrôles
+   moteur non exécutés) → `independentReviewStep` :
+   - ne renseigne pas `task.IndependentReview` ;
+   - ne consomme pas d'appel (`Planning.Reviewer.Calls` inchangé) ;
+   - n'invoque pas le process fournisseur (marqueur fichier absent,
+     `os.IsNotExist` vérifié explicitement).
+2. **Cas positif** : dépôt d'un `AutoValidation` frais (attempt courant,
+   contrôleur `validationController`, digest de politique courant, contrôle
+   exécuté/réussi, reçu + artefacts présents) → le dossier devient admissible ;
+   l'appel via `planningCLI([]string{"planning","review-step", work})` (donc le
+   chemin CLI réel) produit une vraie revue : `IndependentReview.State ==
+   "passed"`, un appel consommé, process fournisseur effectivement invoqué.
+
+Ce test ne modifie aucune règle existante ; il démontre par l'exécution que la
+garde documentée ci-dessus fonctionne sur le chemin CLI réel (le même chemin
+sert le web, par construction : un seul point d'entrée).
+
+## Contrôles exécutés (candidat : arbre de travail non commité, racine ci-dessus)
+
+| # | Commande exacte | Résultat | Preuve |
+| - | - | - | - |
+| 1 | `go test ./... -run 'TestIndependentReviewStepGatesDossierBeforeProviderCall' -count=1 -v` | PASS (1/1) | sortie "Go test: 1 passed in 1 packages" |
+| 2 | `go vet ./...` | PASS, exit 0 | aucune diagnostic |
+| 3 | `go test ./... -run 'TestIndependentReview\|TestValidationEvidence\|TestAcceptReviewedValidation\|TestAutomaticValidation\|TestManagedReviewDossier\|TestHumanValidationEvidence' -count=1 -v` | PASS (12/12) | sortie "Go test: 12 passed in 1 packages" |
+| 4 | `git diff --check` | PASS, exit 0 (aucune erreur d'espace) | — |
+| 5 | `go test ./... -count=1` (suite complète) | EN COURS au moment de la rédaction (dépassait 280 s) ; relancée en tâche de fond, résultat à joindre avant remise finale | voir mise à jour ci-dessous |
+
+Web/CLI : aucune surface web nouvelle n'est introduite par T4 (le contrôle est
+interne au moteur, déjà utilisé par le web via `mission.go:261`) ; pas de
+capture d'écran requise par le contrat de cette tâche (contrairement à T2/T3).
+
+## Critères (req-10, req-11, req-12)
+
+- **req-10** (refus motivé avant appel fournisseur si preuve absente/périmée) :
+  démontré par le cas négatif du test ci-dessus (ligne 62-79 du fichier) — le
+  motif exact (`fmt.Errorf("contrôles moteur courants requis avant la revue")`
+  etc., `independent_validation_evidence.go:20,23,26,33,41,44`) est produit par
+  `independentValidationEvidence` mais **absorbé en `continue` silencieux** par
+  l'appelant (`independent_review_runtime.go:147`) plutôt que journalisé par
+  tâche — limite notée ci-dessous. → **PASS avec réserve** (refus confirmé sans
+  appel fournisseur ; motif existe dans le code mais n'est pas exposé par tâche
+  à ce point du flux).
+- **req-11** (dossier admissible poursuit une revue indépendante réelle ; aucune
+  acceptation ni verdict inventé) : démontré par le cas positif — `passed` est
+  obtenu via un vrai appel fournisseur (script simulé répondant un verdict),
+  jamais assigné directement. → **PASS**.
+- **req-12** (tests positifs/négatifs du même chemin moteur web/CLI, historique
+  et protections conservées) : un seul test couvre les deux cas sur le même
+  point d'entrée que CLI et web ; `git status` confirme qu'aucun fichier
+  historique n'a été modifié par T4, et les anciens tests (`independent_review_test.go`,
+  `provider_cooldown_test.go`, `runtime_health_test.go`) restent inchangés et
+  passent (voir contrôle #3). → **PASS**.
+
+## Limite relevée (à transmettre au responsable)
+
+Le motif de refus (`independentValidationEvidence`) n'est pas actuellement
+journalisé par tâche au moment du `continue` dans `independentReviewStep`
+(ligne 147) : il existe en mémoire (valeur de l'erreur) mais n'est pas persisté
+ni exposé en CLI/web à ce point. Un opérateur consultant l'état de la tâche ne
+verra donc pas directement *pourquoi* la revue n'a pas eu lieu à ce cycle,
+seulement qu'elle n'a pas eu lieu. Ce n'est pas un défaut introduit par T4 (code
+préexistant, non modifié) ; signalé pour décision du responsable (hors
+périmètre d'édition autorisé pour cette tâche : le brief T4 est un contrôle,
+pas une correction).
+
+## État et prochaine action
+
+Dossier T4 : code de garde vérifié existant et correct sur le chemin CLI réel
+(partagé avec le web) ; test positif/négatif ajouté et vert ; aucune régression
+observée sur les suites ciblées. Suite complète en cours de finalisation.
+Aucune acceptation ni verdict de qualité n'est prononcé ici : cette tâche n'est
+pas elle-même la revue indépendante. Prochaine action : responsable transmet ce
+candidat (SHA de travail + diff non commité) à un vérificateur indépendant en
+contexte séparé pour gate fraîche ; pas de push/merge effectué.

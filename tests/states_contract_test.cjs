@@ -85,3 +85,5 @@ assert.equal(paused.dataset.reviewState,'paused');
 assert.match(paused.children[1].textContent,/Mission en pause/);
 
 console.log('PASS states DOM: invariant verdicts, FR/EN, complete, partial, stale, error, pause and reviewer absent/configured');
+
+assert.equal(states.planning({failure:'old timeout',paused:true,scopes:[{state:'closed'}]}),'completed');

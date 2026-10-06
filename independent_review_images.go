@@ -83,7 +83,33 @@ func (s *Store) independentReviewImages(t *Task, artifacts map[string]string) ([
 }
 
 func supportsReviewImages(p Provider) bool {
-	return p.APIConnectionID == "" && filepath.Base(p.Command) == "claude"
+	name := filepath.Base(p.Command)
+	return p.APIConnectionID == "" && (name == "claude" || name == "codex")
+}
+
+// Keep the receipt-bound bytes private and immutable for the provider call.
+// The caller owns this temporary directory and removes it after process exit.
+func codexReviewImageArgs(p *Provider, dir string, images []reviewImage) error {
+	if len(images) == 0 {
+		return nil
+	}
+	if !supportsReviewImages(*p) || filepath.Base(p.Command) != "codex" || len(p.Args) == 0 || p.Args[len(p.Args)-1] != "-" {
+		return fmt.Errorf("adaptateur images Codex invalide")
+	}
+	args := append([]string{}, p.Args[:len(p.Args)-1]...)
+	for index, img := range images {
+		ext := map[string]string{"image/png": ".png", "image/jpeg": ".jpg"}[img.MediaType]
+		if ext == "" || len(img.Data) == 0 || img.SHA256 != hash(img.Data) {
+			return fmt.Errorf("capture Codex invalide ou empreinte périmée : %s", img.Path)
+		}
+		path := filepath.Join(dir, fmt.Sprintf("review-image-%d%s", index, ext))
+		if err := os.WriteFile(path, img.Data, 0600); err != nil {
+			return err
+		}
+		args = append(args, "--image", path)
+	}
+	p.Args = append(args, "-")
+	return nil
 }
 
 func structuredReviewInput(p *Provider, prompt string, images []reviewImage) (string, error) {
@@ -92,6 +118,9 @@ func structuredReviewInput(p *Provider, prompt string, images []reviewImage) (st
 	}
 	if !supportsReviewImages(*p) {
 		return "", fmt.Errorf("revue visuelle indisponible pour cet adaptateur ; aucun appel sans les captures requises")
+	}
+	if filepath.Base(p.Command) == "codex" {
+		return prompt, nil // Images are attached through private --image files.
 	}
 	content := []any{map[string]any{"type": "text", "text": prompt}}
 	for _, img := range images {
@@ -103,4 +132,34 @@ func structuredReviewInput(p *Provider, prompt string, images []reviewImage) (st
 	}
 	p.Args = append(p.Args, "--input-format", "stream-json")
 	return string(raw) + "\n", nil
+}
+
+// A pre-call refusal has no verdict to retry. Recheck its exact cause before
+// clearing the retained failure; the reviewer still claims its call normally.
+func (s *Store) repairedImageReviewPreflight(w *Work, t *Task) error {
+	cfg := w.Planning.Reviewer
+	if cfg.Failure != "revue visuelle indisponible pour cet adaptateur ; aucun appel sans les captures requises" || t.Status != "submitted" || t.IndependentReview != nil || len(t.Attempts) == 0 || t.Attempts[len(t.Attempts)-1].Status != "completed" {
+		return fmt.Errorf("refus préappel images non disponible")
+	}
+	_, artifacts, _, err := s.independentValidationReviewEvidence(t)
+	if err != nil {
+		return err
+	}
+	images, err := s.independentReviewImages(t, artifacts)
+	if err != nil {
+		return err
+	}
+	if len(images) == 0 {
+		return fmt.Errorf("captures courantes requises")
+	}
+	providers, err := s.providers()
+	if err != nil {
+		return err
+	}
+	provider, ok := providers.Providers[cfg.Provider]
+	raw, _ := json.Marshal(provider)
+	if !ok || hash(raw) != cfg.ProviderDigest || !supportsReviewImages(provider) {
+		return fmt.Errorf("adaptateur images toujours indisponible ou modifié")
+	}
+	return s.providerCooldownGuard(cfg.Provider)
 }

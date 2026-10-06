@@ -1,0 +1,137 @@
+{
+  "observed_at": "2026-10-04T09:41:17.509982301Z",
+  "measurement_source": "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events",
+  "rows": [
+    {
+      "kind": "worker",
+      "id": "effort",
+      "label": "effort",
+      "recorded_calls": 2,
+      "observed_tool_calls": 11,
+      "attempts_with_incomplete_tool_measurement": 1,
+      "input_tokens": 100,
+      "output_tokens": 20,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.25,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 2,
+      "task_retries": 1,
+      "recorded_process_ms": 150000,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "unknown",
+      "label": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 1
+    }
+  ],
+  "recorded_control_executions": 0,
+  "worker_retries": 1,
+  "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+  "attempts": [
+    {
+      "task": "effort",
+      "label": "effort",
+      "agent": "new",
+      "attempt": "new",
+      "process_state": "completed",
+      "task_acceptance_recorded": false,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 7,
+      "measured": true,
+      "tool_reads": 3,
+      "tool_writes": 2,
+      "tool_unclassified": 2,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 100,
+      "output_tokens": 20,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.25,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      },
+      "started": "2026-10-04T08:01:30Z",
+      "ended": "2026-10-04T08:02:00Z",
+      "recorded_process_ms": 30000
+    },
+    {
+      "task": "effort",
+      "label": "effort",
+      "agent": "old",
+      "attempt": "old",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 4,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "started": "2026-10-04T08:00:00Z",
+      "ended": "2026-10-04T08:02:00Z",
+      "recorded_process_ms": 120000
+    },
+    {
+      "task": "unknown",
+      "label": "unknown",
+      "agent": "missing",
+      "attempt": "missing",
+      "process_state": "completed",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 0,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "started": "",
+      "recorded_process_ms": null
+    }
+  ]
+}

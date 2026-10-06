@@ -27,9 +27,11 @@ swarm planning show WORK
 swarm planning review-timeout WORK --input timeout.json
 ```
 
-The authenticated local API accepts the same request at
-`POST /api/v1/planning?work=WORK&action=review-timeout`. This change adds no dedicated
-web configuration button; the setting is available in its data.
+In the cockpit: **Overview → Independent reviewer → Review time limit**. Expand the mission details if the team cards are collapsed. The modal displays the current duration, accepts a value from 1 to 900 seconds and requires a reason. **Save time limit** records a decision in the mission history and does not restart a review.
+
+The historical 90-second compatibility default applies when no duration has been saved. It is configurable: the persisted `planning.reviewer.timeout_seconds` overrides it for subsequent reviews. Completed reviews retain their original deadline.
+
+The authenticated local API accepts the same request at `POST /api/v1/planning?work=WORK&action=review-timeout`.
 
 An active review cannot be reconfigured. Stale revisions are rejected and replaying
 the same decision is idempotent. Call budgets, worker attempts, verdicts, models,

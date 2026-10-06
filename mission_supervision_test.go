@@ -167,7 +167,10 @@ func TestMissionSupervisionReplacementDoesNotDoubleStart(t *testing.T) {
 	if err := s.beginMissionSupervision(w.ID, "old", "serveur web", time.Now().Add(-time.Hour)); err != nil {
 		t.Fatal(err)
 	}
-	s.missionCycle(map[string]string{}, w.ID)
+	// Isolate conductor replacement from asynchronous review scheduling.
+	if _, err := s.dispatch(w.ID); err != nil {
+		t.Fatal(err)
+	}
 	before, err := s.agents(w.ID)
 	if err != nil || len(before) != 1 {
 		t.Fatalf("first departure: %v %v", before, err)
@@ -176,7 +179,9 @@ func TestMissionSupervisionReplacementDoesNotDoubleStart(t *testing.T) {
 	if err = s.beginMissionSupervision(w.ID, "new", "mission watch", now); err != nil {
 		t.Fatal(err)
 	}
-	s.missionCycle(map[string]string{}, w.ID)
+	if _, err := s.dispatch(w.ID, "new"); err != nil {
+		t.Fatal(err)
+	}
 	if err = s.checkMissionSupervision(w.ID, "new", now, nil); err != nil {
 		t.Fatal(err)
 	}

@@ -86,12 +86,57 @@ func TestMissionSpendingSeparatesUnitsAndMissingCost(t *testing.T) {
 	}
 	for _, row := range got.Rows {
 		if row.Kind == "worker" {
-			if row.Calls != 2 || row.Tools != 7 || row.UnknownTools != 1 || row.Cost.Reported != price || row.Cost.WithCost != 1 || row.Cost.Silent != 1 || row.MissingUsage != 1 {
+			if row.Calls != 2 || row.Tools != 7 || row.UnknownTools != 2 || row.Cost.Reported != price || row.Cost.WithCost != 1 || row.Cost.Silent != 1 || row.MissingUsage != 1 {
 				t.Fatal(row)
 			}
 		} else if row.Calls != 1 || row.Tools != 0 || row.MissingUsage != 1 || row.Cost.WithCost != 0 {
 			t.Fatal("unreported usage invented", row)
 		}
+	}
+}
+
+// REQ-QW7: reviews and retries are reported per task, so one task's rework
+// does not inflate another task's row nor the engine-wide total.
+func TestMissionSpendingTracksReviewsAndRetriesPerTask(t *testing.T) {
+	s := storeTest(t)
+	w := Work{ID: "w-fixture", Tasks: []Task{
+		{ID: "t1", Title: "Reviewed twice", Status: "accepted",
+			IndependentReview: &IndependentReview{ID: "cur"},
+			PreviousReviews:   []IndependentReview{{ID: "old"}}},
+		{ID: "t2", Title: "Never reviewed", Status: "ready"},
+	}}
+	agents := []Agent{
+		{TaskID: "t1", Progress: AgentProgress{ToolCalls: 1}},
+		{TaskID: "t1", Previous: "old-attempt", Progress: AgentProgress{ToolCalls: 1}},
+		{TaskID: "t2", Progress: AgentProgress{ToolCalls: 1}},
+	}
+	got, e := s.missionSpending(w, agents)
+	if e != nil {
+		t.Fatal(e)
+	}
+	by := map[string]SpendingRow{}
+	for _, row := range got.Rows {
+		if row.Kind == "worker" {
+			by[row.ID] = row
+		}
+	}
+	if by["t1"].Reviews != 2 || by["t1"].TaskRetries != 1 {
+		t.Fatal("reviewed task with one retry misreported", by["t1"])
+	}
+	if by["t2"].Reviews != 0 || by["t2"].TaskRetries != 0 {
+		t.Fatal("never-reviewed, never-retried task must report real zeros, not t1's counts", by["t2"])
+	}
+	if got.Retries != 1 {
+		t.Fatal("engine-wide retries must still equal the sum across tasks", got.Retries)
+	}
+	var out bytes.Buffer
+	printMissionSpending(&out, got)
+	text := out.String()
+	if !strings.Contains(text, "2 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche") {
+		t.Fatalf("per-task review/retry line missing for t1: %s", text)
+	}
+	if !strings.Contains(text, "0 revue(s) enregistrée(s) pour cette tâche · 0 reprise(s) pour cette tâche") {
+		t.Fatalf("per-task review/retry line missing for t2: %s", text)
 	}
 }
 func TestRecoveryPreviewScopesAttemptAndPreservesState(t *testing.T) {

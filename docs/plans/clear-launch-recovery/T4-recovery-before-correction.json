@@ -1,0 +1,122 @@
+{
+  "work": "w-115c11e8f802a4f98c3def32",
+  "task": "plan-115c11e8f8-T4",
+  "revision": 187,
+  "agent": "3500cb7c-3823-48cf-a454-295a032b309e",
+  "kept": [
+    "Historique des tentatives, rapports et avis précédents.",
+    "Critères et dépendances du plan.",
+    "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement."
+  ],
+  "redone": [
+    "Vérification des conditions de lancement et du candidat courant.",
+    "Contrôles et revue requis pour la nouvelle tentative.",
+    "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique."
+  ],
+  "correction": "Corriger les critères signalés puis remettre un nouveau rapport. Le rapport donne des citations précises et des sorties de commande (exit 0, attestées par engine_controls) pour les critères 1 et 2 : tests Go/JS démontrant la distinction changé/inchangé/inconnu, le recalcul des exigences restantes depuis le refus, et le respect des bornes (taille, nombre, traversée de chemin) sans mutation d'état. Mais aucun des deux contrôles moteur exécutés (go test, npm test) n'est un test de bout en bout en conditions réelles web+CLI ; ce sont des tests de code/rendu isolé. Le rapport admet lui-même n'avoir « ni exécuté ni observé » le parcours réel, attesté seulement par un document superviseur non corroboré et par 4 captures montrant un seul état statique de modale, pas une séquence refus→correction→reprise. Le critère 3 reste donc une preuve absente, pas un défaut démontré.",
+  "criteria": [
+    "Vue affiche les changements depuis le refus, les exigences restantes et distingue preuves réutilisables de preuves périmées",
+    "Aucun réinventaire complet déclenché, aucune hausse de budget automatique",
+    "Parcours réel refus puis correction bornée puis reprise vérifié en web et en CLI"
+  ],
+  "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+  "since_refusal": {
+    "from_revision": 185,
+    "to_revision": 187,
+    "first_visit": false,
+    "more": false,
+    "items": []
+  },
+  "evidence": [
+    {
+      "report": ".swarm/validation/w-115c11e8f802a4f98c3def32/plan-115c11e8f8-T4/a-9b4502ef490c0a9b2227676b-receipt-9ca93f0b6c6b531b4a86a223.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plan-115c11e8f8-T4.md",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plans/clear-launch-recovery/T4-handoff.md",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plans/clear-launch-recovery/T4-recovery-observation.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plans/clear-launch-recovery/T4-supervisor-recipe.md",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/t4-recovery-en-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/t4-recovery-en-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/t4-recovery-fr-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/t4-recovery-fr-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "locales/en.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "managed_publication_concurrency_test.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "mission_insights.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "recovery_evidence_test.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "store.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "tests/recovery_evidence_test.cjs",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/i18n-en.js",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/mission-insights.js",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    }
+  ],
+  "remaining_criteria": [
+    "Parcours réel refus puis correction bornée puis reprise vérifié en web et en CLI"
+  ],
+  "refusal_note": "Changements enregistrés depuis le dernier refus de cette tâche.",
+  "evidence_note": "Seules les preuves liées au dernier avis sont comparées, au plus 64 fichiers et 32 Mio ; aucun inventaire du dépôt. Une preuve inchangée ne vaut ni avis favorable ni validation."
+}

@@ -17,11 +17,14 @@ import (
 // by the same code path TestRunLimitsConfigRejectsInvalidValue and
 // TestRunLimitsConfigConcurrencyAndReplay already cover.
 func (s *Store) runLimitsCLI(pos []string, input string, out io.Writer) error {
-	usage := "swarm run-limits show|history <portée> <mission> <clé> | apply <portée> <mission> <clé> --input changement.json | rollback <portée> <mission> <clé> <révision_cible> --input requête.json | effective <mission> <rôle> <tâche>"
+	usage := "swarm run-limits performance show|history|preview|apply [--input configuration.json] | swarm run-limits show|history <portée> <mission> <clé> | apply <portée> <mission> <clé> --input changement.json | rollback <portée> <mission> <clé> <révision_cible> --input requête.json | effective <mission> <rôle> <tâche>"
 	if len(pos) < 2 {
 		return fmt.Errorf("%s", usage)
 	}
 	action := pos[1]
+	if action == "performance" {
+		return s.graphPerformanceCLI(pos, input, out)
+	}
 	if action == "effective" {
 		if len(pos) != 5 {
 			return fmt.Errorf("swarm run-limits effective <mission> <rôle> <tâche>")

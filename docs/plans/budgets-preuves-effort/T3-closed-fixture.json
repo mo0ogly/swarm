@@ -1,0 +1,465 @@
+{
+  "mission": {
+    "changes_since_visit": {
+      "from_revision": 0,
+      "to_revision": 9,
+      "first_visit": true,
+      "more": false,
+      "items": []
+    },
+    "spending": {
+      "rows": [
+        {
+          "kind": "planner",
+          "id": "root",
+          "label": "Responsable : root",
+          "recorded_calls": 2,
+          "observed_tool_calls": 0,
+          "attempts_with_incomplete_tool_measurement": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "calls_without_usage": 2,
+          "cost": {
+            "reported_usd": 0,
+            "attempts_with_cost": 0,
+            "attempts_without_cost": 2
+          }
+        }
+      ],
+      "recorded_control_executions": 0,
+      "worker_retries": 0,
+      "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+      "attempts": []
+    },
+    "guidance": {
+      "what": "Tous les résultats sont validés sur les preuves actuelles.",
+      "next": "Aucune action requise ; les livrables restent consultables.",
+      "actor": "Personne pour le moment",
+      "primary": {
+        "kind": "results",
+        "label": "Voir les résultats",
+        "effect": "Affiche les résultats et leur validation actuelle.",
+        "tone": "succes"
+      }
+    },
+    "runtime": {
+      "state": "ready",
+      "launch_allowed": true,
+      "observed_at": "2026-10-04T08:28:46.339150417Z",
+      "message": "Le stockage est disponible.",
+      "next_step": "Les autres conditions de lancement restent contrôlées par le moteur.",
+      "volumes": [
+        {
+          "kind": "store",
+          "path": "/tmp/TestMissionClosedHistoryAndCurrentBlockCLI2117668355/001/.swarm",
+          "available_bytes": 1183178752,
+          "available_inodes": 975643,
+          "state": "ready"
+        },
+        {
+          "kind": "temporary",
+          "path": "/tmp",
+          "available_bytes": 1183178752,
+          "available_inodes": 975643,
+          "state": "ready"
+        }
+      ],
+      "version": {
+        "binary": {
+          "version": "devel",
+          "commit": null,
+          "modified": null,
+          "build_date": null,
+          "provenance": "unknown"
+        },
+        "source": {
+          "available": false,
+          "commit": null,
+          "modified": null,
+          "compared": false,
+          "matches_binary": null
+        },
+        "history": {
+          "schema_version": 1,
+          "available": true,
+          "releases": []
+        }
+      }
+    },
+    "evidence_stage": "Résultats validés et responsabilité racine clôturée dans cette mission.",
+    "organization": {
+      "ready": true,
+      "label": "Organisation autonome configurée",
+      "issues": [],
+      "next": "Consulter les responsables et les contrôles autorisés.",
+      "verification": "Vérificateur IA indépendant : organization-review-fixture · 0/100 appels. Avis requis avant acceptation. Contrôles configurés ; aucune revue IA indépendante implicite."
+    },
+    "authorized": false,
+    "enabled": false,
+    "paused": false,
+    "summary": "1/1 résultats validés · 0 à examiner · 0 tâche(s) en cours · 0 agent(s) actif(s) confirmé(s) · 0 état(s) agent incertain(s)",
+    "next": "Tous les résultats sont actuellement validés. Consultez les livrables ci-dessous.",
+    "validated": 1,
+    "review": 0,
+    "running": 0,
+    "active_agents": 0,
+    "uncertain_agents": 0,
+    "total": 1,
+    "supervision": {
+      "state": "absent",
+      "late": false
+    },
+    "understanding": {
+      "what": "Tous les résultats sont validés sur les preuves actuelles.",
+      "next_step": "Aucune action requise ; les livrables restent consultables.",
+      "actor": "Personne pour le moment",
+      "actor_kind": "none",
+      "situation": "termine"
+    },
+    "coordination": [
+      {
+        "kind": "work",
+        "label": "Travail",
+        "summary": "Aucune tâche n’est actuellement déclarée en cours.",
+        "actor": "Personne pour le moment",
+        "next_step": "Suivre la prochaine action indiquée."
+      },
+      {
+        "kind": "wait",
+        "label": "Attente",
+        "summary": "Aucune attente normale signalée.",
+        "actor": "Personne pour le moment",
+        "next_step": "Aucune résolution d’attente requise."
+      },
+      {
+        "kind": "exchange",
+        "label": "Échanges",
+        "summary": "Aucun échange structuré enregistré.",
+        "actor": "Personne pour le moment",
+        "next_step": "Les remises et demandes d’aide apparaîtront ici."
+      },
+      {
+        "kind": "validation",
+        "label": "Vérification",
+        "summary": "Aucun résultat n’attend actuellement de vérification.",
+        "actor": "Personne pour le moment",
+        "next_step": "Les contrôles apparaîtront après une remise de résultat."
+      }
+    ],
+    "tasks": [
+      {
+        "waiting_on": [],
+        "recovery_preview": {
+          "work": "w-e44f5fe75752369ea4b4552b",
+          "task": "t1",
+          "revision": 9,
+          "kept": [
+            "Historique des tentatives, rapports et avis précédents.",
+            "Critères et dépendances du plan."
+          ],
+          "redone": [
+            "Vérification des conditions de lancement et du candidat courant.",
+            "Contrôles et revue requis pour la nouvelle tentative."
+          ],
+          "correction": "Vérifier les fichiers",
+          "criteria": [
+            "preuve courante"
+          ],
+          "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+          "remaining_criteria": null,
+          "refusal_note": "",
+          "evidence_note": ""
+        },
+        "primary_action": {
+          "kind": "task",
+          "label": "Voir le résultat",
+          "effect": "Ouvre les preuves et les actions autorisées ; aucune reprise immédiate.",
+          "task": "t1",
+          "tone": "attention"
+        },
+        "attempts_used": 1,
+        "attempts_allowed": 2,
+        "attempt_limit_reached": false,
+        "id": "t1",
+        "title": "Vérifier",
+        "state": "validated",
+        "reason": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+        "action": "report",
+        "label": "Voir le résultat",
+        "target": "t1",
+        "impact": 0,
+        "deliverable": "proof.txt",
+        "validation_mode": "human",
+        "result": {
+          "process_label": "Pas encore commencé",
+          "report_label": "Rapport soumis, contenu à vérifier",
+          "validation_label": "Preuves actuelles",
+          "state": "validated",
+          "label": "Validé",
+          "process_state": "not_started",
+          "report_state": "submitted",
+          "validation_state": "fresh",
+          "reason": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+          "next_step": "Consulter le résultat ; revalider si une preuve change.",
+          "gate_id": "t1"
+        },
+        "understanding": {
+          "what": "Gate delivery et preuves actuelles ; la tâche est acceptée.",
+          "next_step": "Aucune action requise ; le résultat reste consultable.",
+          "actor": "Personne pour le moment",
+          "actor_kind": "none",
+          "situation": "termine"
+        }
+      }
+    ]
+  },
+  "work": {
+    "planning": {
+      "reviewer_required": true,
+      "reviewer": {
+        "provider": "organization-review-fixture",
+        "provider_digest": "5298bd6add89e956c998ebe24d67218befd17cb7658530b7ca17354b3b437d47",
+        "model_route": {
+          "level": "standard",
+          "model": "sonnet",
+          "effort": "",
+          "billing": "external",
+          "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+          "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+        },
+        "max_calls": 100,
+        "calls": 0,
+        "authorized": "2026-10-04T08:28:46.332352097Z"
+      },
+      "checks": {
+        "req-1": [
+          {
+            "id": "objective-check",
+            "command": [
+              "go",
+              "version"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "La commande vérifie objectivement le critère annoncé.",
+            "timeout_seconds": 10
+          }
+        ]
+      },
+      "provider": "organization-fixture",
+      "activations": 2,
+      "max_activations": 15,
+      "failure": "old timeout",
+      "version": 1,
+      "paused": true,
+      "max_tasks": 10,
+      "max_decisions": 10,
+      "decisions": 2,
+      "scopes": [
+        {
+          "last_model": {
+            "provider": "organization-fixture",
+            "provider_digest": "",
+            "route": null,
+            "actor": "",
+            "at": "2026-10-04T08:28:46.335611824Z"
+          },
+          "delivery": {
+            "context_sha256": "bf9b9911f9124bd255bb5db126556bbf6b9c26a4847dd59fb3355c9d07da7367",
+            "events": [
+              "plan-3ebef47d5889c3dd5992bbf7c1e5b55e1923ea5f45373792ee4ad548ab929259"
+            ],
+            "decision": "decision-7de2ef1099bf9d0f637aa357"
+          },
+          "workflow": {
+            "version": 1,
+            "role": "planner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug"
+            ],
+            "sha256": "47a6dc0c7ea4219691753a896371e4004c6524df758bc33b3983a435a79b5235"
+          },
+          "activations": 2,
+          "id": "root",
+          "objective": "Préserver le travail",
+          "requirements": [
+            "req-1"
+          ],
+          "revision": 3,
+          "generation": 4,
+          "state": "closed"
+        }
+      ],
+      "inbox": [
+        {
+          "id": "test-plan-e25661ea86f6e04457409115",
+          "scope": "root",
+          "kind": "brief",
+          "message": "Préserver le travail",
+          "decision": "decision-a9569d96527885335d408e0e",
+          "at": "2026-10-04T08:28:46.325266888Z"
+        },
+        {
+          "id": "plan-3ebef47d5889c3dd5992bbf7c1e5b55e1923ea5f45373792ee4ad548ab929259",
+          "scope": "root",
+          "kind": "validation_changed",
+          "task": "t1",
+          "attempt": "fixture-production",
+          "message": "accepted",
+          "decision": "decision-7de2ef1099bf9d0f637aa357",
+          "at": "2026-10-04T08:28:46.333573216Z"
+        }
+      ]
+    },
+    "schema_version": 1,
+    "id": "w-e44f5fe75752369ea4b4552b",
+    "revision": 9,
+    "title": "Reprise claire",
+    "objective": "Préserver le travail",
+    "scope": "projet local",
+    "criteria": [
+      "preuves courantes"
+    ],
+    "next": "Ajouter une tâche",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-04T08:28:46.315429747Z",
+    "updated": "2026-10-04T08:28:46.338608406Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": [
+      {
+        "independent_review": {
+          "id": "fixture-review-56399b119b46e075bd351bcf",
+          "attempt": "fixture-production",
+          "producer": "fixture-producer",
+          "reviewer": "reviewer://organization-review-fixture",
+          "report": "proof.txt",
+          "sha256": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7",
+          "contract": "0339bca9a4e48953b742de2a8c4c25390a0c25b189431836f54722780ab697a0",
+          "state": "passed",
+          "reason": "Précondition explicite de fixture ; aucune revue IA observée",
+          "started": "2026-10-04T08:28:46.334325583Z",
+          "finished": "2026-10-04T08:28:46.334327116Z"
+        },
+        "scope_id": "root",
+        "requirements": [
+          "req-1"
+        ],
+        "validation_policy": {
+          "mode": "human",
+          "controls": null,
+          "authorized_at": "2026-10-04T08:28:46.332370502Z",
+          "actor": "explicit test fixture"
+        },
+        "plan_role": "worker",
+        "plan_max_attempts": 2,
+        "id": "t1",
+        "title": "Vérifier",
+        "owner": "root",
+        "deliverable": "proof.txt",
+        "criteria": [
+          "preuve courante"
+        ],
+        "depends": null,
+        "status": "accepted",
+        "blocker": "",
+        "next": "Vérifier les fichiers",
+        "attempts": [
+          {
+            "id": "fixture-production",
+            "status": "completed",
+            "started": ""
+          }
+        ],
+        "gate": {
+          "document": {
+            "method_version": "2",
+            "scope_id": "t1",
+            "artifacts": {
+              "proof.txt": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7"
+            },
+            "domains": {
+              "quality": 90,
+              "security": 10
+            },
+            "checks": [
+              {
+                "id": "q",
+                "domain": "quality",
+                "mandatory": true,
+                "gate": "validation",
+                "penalty": 10,
+                "max_penalty": 100,
+                "severity": "minor"
+              },
+              {
+                "id": "s",
+                "domain": "security",
+                "mandatory": true,
+                "gate": "validation",
+                "penalty": 60,
+                "max_penalty": 100,
+                "severity": "major"
+              }
+            ],
+            "results": [
+              {
+                "id": "q",
+                "status": "PASS",
+                "count": 0,
+                "evidence": [
+                  "proof.txt"
+                ]
+              },
+              {
+                "id": "s",
+                "status": "PASS",
+                "count": 0,
+                "evidence": [
+                  "proof.txt"
+                ]
+              }
+            ]
+          },
+          "evaluation": {
+            "method_version": "2",
+            "scope_id": "t1",
+            "phase": "delivery",
+            "config_digest": "f19697b7c63aa14e2e66aef1d356b52852a87196760f544b55a5817dc4d57be9",
+            "applicability_digest": "284ef2fafc8c0ec575a73617a16d9121bada13d05e80ec05231d03f89600755e",
+            "artifacts": {
+              "proof.txt": "c1cda26362828b69266512052b97cb3729e3b052e4ade47c0a1e3383defe73c7"
+            },
+            "domain_scores": {
+              "quality": 100,
+              "security": 100
+            },
+            "quality": 100,
+            "provisional": false,
+            "quality_band": "OK",
+            "progress": {
+              "passed": 2,
+              "applicable": 2,
+              "percent": 100
+            },
+            "max_severity": "none",
+            "blockers": [],
+            "allowed": true,
+            "ship_allowed": true
+          },
+          "at": "2026-10-04T08:28:46.329587973Z"
+        }
+      }
+    ]
+  }
+}

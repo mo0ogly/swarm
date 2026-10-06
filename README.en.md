@@ -9,6 +9,12 @@ It makes responsibilities, dependencies, attempts, evidence and blockers visible
 so that several agents can collaborate without treating every completed process
 as a successful result.
 
+## Release v0.1.0
+
+The [first experimental release](https://github.com/mo0ogly/swarm/releases/tag/v0.1.0) adds dependency editing with previews, durable automation programs and configurable administration. The engine retains authorization, budgets, required checks and independent reviews.
+
+See the [release notes](docs/releases/v0.1.0.md), [automation programs guide](docs/en/AUTOMATION-PROGRAMS.md) and [blocked contract recovery](docs/en/CONTRACT-REVISION.md). Quotas of external provider sessions are not observed automatically.
+
 ## First run
 
 1. Follow [installation](docs/en/INSTALL.md) and open the session link printed by the server.

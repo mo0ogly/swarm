@@ -42,6 +42,31 @@ func missionTaskPrimary(t MissionTask) MissionPrimaryAction {
 	}
 	return a
 }
+
+// Planning failures affect new decisions, not actions already represented by
+// the dispatcher or result lifecycle. Keep those actions visible in both UIs.
+func missionPlanningOwnsNextStep(d MissionStatus) bool {
+	if d.Running > 0 || d.ActiveAgents > 0 || d.Review > 0 {
+		return false
+	}
+	for _, task := range d.Tasks {
+		switch task.State {
+		case "running", "review", "intervention", "configure", "ready", "manual":
+			return false
+		}
+	}
+	return true
+}
+
+// Closed responsibility retains diagnostics for history, without requiring recovery.
+func missionPlanningOpen(w Work) bool {
+	if w.Planning == nil {
+		return false
+	}
+	root, _ := w.Planning.scope("root")
+	return root == nil || root.State != "closed"
+}
+
 func missionGuidance(w Work, d MissionStatus) MissionGuidance {
 	g := MissionGuidance{What: d.Understanding.What, Next: d.Understanding.NextStep, Actor: d.Understanding.Actor}
 	set := func(kind, label, effect, tone string) {
@@ -52,11 +77,11 @@ func missionGuidance(w Work, d MissionStatus) MissionGuidance {
 		set("runtime", "Diagnostic du stockage", "Ouvre le diagnostic de la machine ; aucun départ n’est autorisé.", "attention")
 	case !d.Organization.Ready:
 		set("organization", "Préparer l’organisation", "Affiche les rôles et les conditions manquantes.", "attention")
-	case w.Planning != nil && w.Planning.Failure != "":
-		g.What = "Le responsable n’a pas terminé sa décision ; les prochains départs restent en attente."
+	case missionPlanningOpen(w) && w.Planning.Failure != "" && missionPlanningOwnsNextStep(d):
+		g.What = "Le responsable n’a pas terminé sa décision."
 		g.Next = "Examinez le diagnostic du responsable avant de reprendre la planification."
 		set("planning", "Voir les décisions", "Ouvre les décisions et les retours du responsable.", "attention")
-	case w.Planning != nil && w.Planning.Paused:
+	case missionPlanningOpen(w) && w.Planning.Paused:
 		set("planning-resume", "Reprendre la planification", "Demande la reprise des décisions dans les limites déjà autorisées.", "attention")
 	default:
 		needs := []MissionTask{}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "binary": {
+    "version": "devel",
+    "commit": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+    "modified": true,
+    "build_date": "2026-10-04T15:54:41Z",
+    "provenance": "injected"
+  },
+  "diagnostic": {
+    "installed_cli": {
+      "available": true,
+      "version": "devel",
+      "commit": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+      "modified": true,
+      "provenance": "injected"
+    },
+    "active_server": {
+      "available": false,
+      "version": null,
+      "commit": null,
+      "modified": null,
+      "provenance": "runtime_health",
+      "hint": "Fournissez l’URL de session du serveur actif avec --server."
+    },
+    "candidate": {
+      "available": true,
+      "version": null,
+      "commit": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+      "modified": true,
+      "provenance": "git"
+    },
+    "state": "unknown",
+    "differences": [],
+    "next_step": "Rendez accessibles les identités manquantes (active_server) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server."
+  }
+}

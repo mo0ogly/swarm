@@ -16,3 +16,10 @@ node_modules/
 # Generated installer configuration (local paths).
 /deploy/install.env
 /deploy/.install-env.*
+
+# Local qualification output is retained outside published source.
+*.test
+/docs/plans/**/execution/**/results/
+/docs/plans/**/execution/**/final-results/
+/docs/plans/**/execution/**/journal-results/
+/docs/plans/**/execution/**/closure/

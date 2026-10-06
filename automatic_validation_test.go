@@ -228,7 +228,7 @@ func TestAutomaticValidationSingleSupervisor(t *testing.T) {
 func TestValidationTimeoutKillsDescendants(t *testing.T) {
 	start := time.Now()
 	result := runValidationControl(t.TempDir(), ValidationControl{ID: "timeout", Command: []string{"python3", "-c", "import subprocess,time; subprocess.Popen(['sleep','20']); time.sleep(20)"}, Timeout: 1})
-	if result.Passed || !strings.Contains(result.Summary, "délai") || time.Since(start) > 4*time.Second {
+	if result.Passed || !strings.Contains(result.Summary, "délai") || time.Since(start) > 4*time.Second || result.WallDurationMS == nil || *result.WallDurationMS < 900 || result.CPUDurationMS == nil {
 		t.Fatalf("timeout not bounded: %+v, %s", result, time.Since(start))
 	}
 }

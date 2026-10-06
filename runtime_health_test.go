@@ -149,6 +149,9 @@ func TestRuntimeHealthEndpointSurvivesDatabaseFailure(t *testing.T) {
 		if rr.Code != 200 || json.Unmarshal(rr.Body.Bytes(), &health) != nil || health.State != "blocked" {
 			t.Fatal(rr.Code, rr.Body.String())
 		}
+		if health.Diagnostic.State != versionStateUnknown || health.Diagnostic.InstalledCLI.Available || !health.Diagnostic.ActiveServer.Available || !strings.Contains(health.Diagnostic.NextStep, "installed_cli") {
+			t.Fatal("runtime-health did not expose an actionable canonical version diagnostic", health.Diagnostic)
+		}
 	}
 }
 

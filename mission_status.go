@@ -9,26 +9,27 @@ import (
 )
 
 type MissionTask struct {
-	Waits               []MissionWait        `json:"waiting_on"`
-	RecoveryPreview     RecoveryPreview      `json:"recovery_preview"`
-	Primary             MissionPrimaryAction `json:"primary_action"`
-	AttemptsUsed        int                  `json:"attempts_used"`
-	AttemptsAllowed     int                  `json:"attempts_allowed"`
-	AttemptLimitReached bool                 `json:"attempt_limit_reached"`
-	ID                  string               `json:"id"`
-	Title               string               `json:"title"`
-	State               string               `json:"state"`
-	Reason              string               `json:"reason"`
-	Action              string               `json:"action"`
-	Label               string               `json:"label"`
-	Target              string               `json:"target,omitempty"`
-	Impact              int                  `json:"impact"`
-	Deliverable         string               `json:"deliverable"`
-	ValidationMode      string               `json:"validation_mode"`
-	ValidationReceipt   string               `json:"validation_receipt,omitempty"`
-	Result              ResultPresentation   `json:"result"`
-	Understanding       MissionUnderstanding `json:"understanding"`
-	Diagnostic          *AttemptDiagnostic   `json:"diagnostic,omitempty"`
+	Waits               []MissionWait            `json:"waiting_on"`
+	RecoveryPreview     RecoveryPreview          `json:"recovery_preview"`
+	Primary             MissionPrimaryAction     `json:"primary_action"`
+	AttemptsUsed        int                      `json:"attempts_used"`
+	AttemptsAllowed     int                      `json:"attempts_allowed"`
+	AttemptLimitReached bool                     `json:"attempt_limit_reached"`
+	ID                  string                   `json:"id"`
+	Title               string                   `json:"title"`
+	State               string                   `json:"state"`
+	Reason              string                   `json:"reason"`
+	Action              string                   `json:"action"`
+	Label               string                   `json:"label"`
+	Target              string                   `json:"target,omitempty"`
+	Impact              int                      `json:"impact"`
+	Deliverable         string                   `json:"deliverable"`
+	ValidationMode      string                   `json:"validation_mode"`
+	ValidationReceipt   string                   `json:"validation_receipt,omitempty"`
+	Result              ResultPresentation       `json:"result"`
+	Understanding       MissionUnderstanding     `json:"understanding"`
+	Diagnostic          *AttemptDiagnostic       `json:"diagnostic,omitempty"`
+	Attempt             MissionAttemptProjection `json:"attempt"`
 }
 type MissionUnderstanding struct {
 	What      string `json:"what"`
@@ -37,14 +38,29 @@ type MissionUnderstanding struct {
 	ActorKind string `json:"actor_kind"`
 	Situation string `json:"situation"`
 }
+
+// Configuration resolved for a future departure. The actual provider model is
+// deliberately unknown until the provider reports it during execution.
+type MissionLaunchIdentity struct {
+	Objective      string   `json:"objective"`
+	Role           string   `json:"role"`
+	Provider       string   `json:"provider"`
+	RequestedLevel string   `json:"requested_level"`
+	ResolvedModel  string   `json:"resolved_model"`
+	ActualModel    string   `json:"actual_model"`
+	ProjectProfile string   `json:"project_profile"`
+	Skills         []string `json:"skills"`
+}
 type MissionLaunchItem struct {
-	ID        string `json:"id"`
-	Title     string `json:"title"`
-	Reason    string `json:"reason,omitempty"`
-	Workspace string `json:"workspace,omitempty"`
-	Normal    bool   `json:"normal,omitempty"`
+	ID        string                 `json:"id"`
+	Title     string                 `json:"title"`
+	Reason    string                 `json:"reason,omitempty"`
+	Workspace string                 `json:"workspace,omitempty"`
+	Identity  *MissionLaunchIdentity `json:"identity,omitempty"`
+	Normal    bool                   `json:"normal,omitempty"`
 }
 type MissionLaunchPreview struct {
+	Identity             MissionLaunchIdentity `json:"identity"`
 	Organization         Organization          `json:"organization"`
 	Token                string                `json:"verdict_token"`
 	Revision             int                   `json:"revision"`
@@ -154,6 +170,11 @@ func (s *Store) missionLaunchPreview(work string, profile LaunchProfile, slots i
 	if err != nil {
 		return preview, err
 	}
+	preview.Identity, err = s.missionLaunchIdentity(profile, providers)
+	if err != nil {
+		return preview, err
+	}
+	preview.Identity.Objective = w.Objective
 	preview.Revision = w.Revision
 	preview.Organization = organization(w)
 	if preview.Organization.Ready {
@@ -222,7 +243,12 @@ func (s *Store) missionLaunchPreview(work string, profile LaunchProfile, slots i
 		if task != nil {
 			title = task.Title
 		}
-		preview.Departures = append(preview.Departures, MissionLaunchItem{ID: decision.TaskID, Title: title, Workspace: decision.Profile.Workspace})
+		identity, identityErr := s.missionLaunchIdentity(decision.Profile, providers)
+		if identityErr != nil {
+			return preview, identityErr
+		}
+		identity.Objective = w.Objective
+		preview.Departures = append(preview.Departures, MissionLaunchItem{ID: decision.TaskID, Title: title, Workspace: decision.Profile.Workspace, Identity: &identity})
 	}
 	workspaces := []string{}
 	for _, task := range w.Tasks {
@@ -356,6 +382,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 		t := &w.Tasks[i]
 		v := validation.Tasks[t.ID]
 		x := MissionTask{ID: t.ID, Title: t.Title, State: t.Status, Deliverable: t.Deliverable, Target: t.ID, Impact: descendantCount(&w, t.ID), ValidationMode: "human"}
+		x.Attempt = projectMissionAttempt(t, agents)
 		x.AttemptsUsed, x.AttemptsAllowed = len(t.Attempts), t.PlanMaxAttempts
 		if t.ValidationPolicy != nil {
 			x.ValidationMode = t.ValidationPolicy.Mode
@@ -473,7 +500,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 				x.Reason = "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche."
 			}
 		}
-		x.AttemptLimitReached = !s.executionObserved(w.ID, t.ID) && t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
+		x.AttemptLimitReached = t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review" && !s.executionObserved(w.ID, t.ID)
 		if t.IndependentReview != nil && t.IndependentReview.State == "running" {
 			x.AttemptLimitReached = false
 		}
@@ -548,11 +575,11 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 	d.Understanding = missionUnderstanding(d)
 	if w.Planning != nil {
 		root, _ := w.Planning.scope("root")
-		if w.Planning.Failure != "" {
+		if missionPlanningOpen(w) && w.Planning.Failure != "" && missionPlanningOwnsNextStep(d) {
 			d.Understanding = understanding(w.Planning.Failure, "Corrigez la cause puis reprenez la planification.", "Vous", "user", "decision_humaine")
 		} else if root != nil && root.State != "closed" && (w.Planning.Activations >= w.Planning.MaxActivations || w.Planning.Decisions >= w.Planning.MaxDecisions) {
 			d.Understanding = understanding("Le plafond de planification est atteint.", "Examinez les décisions et préparez une nouvelle mission bornée pour le travail restant.", "Vous", "user", "decision_humaine")
-		} else if w.Planning.Paused {
+		} else if missionPlanningOpen(w) && w.Planning.Paused {
 			d.Understanding = understanding("La planification est en pause.", "Reprenez lorsque vous êtes prêt.", "Vous", "user", "decision_humaine")
 		} else if root != nil && root.State != "closed" && (d.Total == 0 || d.Total == d.Validated) {
 			d.Understanding = understanding("Les résultats attendent une décision du responsable du périmètre.", "Le responsable examine les retours avant de clore ou compléter le plan.", "Le planificateur", "supervisor", "attente_normale")
@@ -1019,4 +1046,36 @@ func missionDispatchState(in dispatchInputs, t Task) (string, string) {
 		reason = "Départ automatique retenu : examiner les conditions de lancement"
 	}
 	return "intervention", reason
+}
+
+func (s *Store) missionLaunchIdentity(profile LaunchProfile, providers Providers) (MissionLaunchIdentity, error) {
+	out := MissionLaunchIdentity{Role: profile.Role, Provider: profile.Provider, RequestedLevel: profile.Level, Skills: []string{}}
+	if out.Role == "" {
+		out.Role = "worker"
+	}
+	if out.RequestedLevel == "" {
+		out.RequestedLevel = "auto"
+	}
+	provider, ok := providers.Providers[profile.Provider]
+	if !ok {
+		return out, fmt.Errorf("Fournisseur inconnu : %s", profile.Provider)
+	}
+	_, route, err := resolveModel(provider, profile.Level, "work")
+	if err != nil {
+		return out, err
+	}
+	if route != nil {
+		out.ResolvedModel = route.Model
+	}
+	context, _, err := s.projectContext(out.Role)
+	if err != nil {
+		return out, err
+	}
+	if context != nil {
+		out.ProjectProfile = context.Name
+	}
+	for _, skill := range profile.Skills {
+		out.Skills = append(out.Skills, skill.Path)
+	}
+	return out, nil
 }

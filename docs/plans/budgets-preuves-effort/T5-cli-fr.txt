@@ -1,0 +1,29 @@
+Où vont les appels et les coûts ?
+Mesures observées : 2026-10-04T09:41:17.520747784Z · Source : Horaires des processus, activité reçue, usages fournisseurs et historique des revues.
+effort · 2 tentatives ou appels enregistrés · 11 appels d’outils observés · 1 mesures d’outils incomplètes · 100/20 jetons entrée/sortie rapportés · 1 usages absents · 0.25 USD rapportés sur 1 tentative(s) · 1 sans coût rapporté
+  Durée cumulée des processus : 150.000 s · 0 durée(s) non rapportée(s)
+  2 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche
+unknown · 1 tentatives enregistrées · appels d’outils non rapportés · coût réel non rapporté
+  Durée cumulée des processus : non rapporté · 1 durée(s) non rapportée(s)
+  0 revue(s) enregistrée(s) pour cette tâche · 0 reprise(s) pour cette tâche
+Moteur : 0 contrôles enregistrés · 1 reprises d’agents
+Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.
+Bilan par tentative
+effort · agent new · tentative new · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : non
+  Départ : 2026-10-04T08:01:30Z · Fin : 2026-10-04T08:02:00Z
+  Durée du processus : 30.000 s
+  1 départ enregistré · 7 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  7 appels d’outils observés · lectures 3 · écritures 2 · non classés 2 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  100/20 jetons entrée/sortie rapportés · 0.25 USD rapportés sur 1 tentative(s)
+effort · agent old · tentative old · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : non
+  Départ : 2026-10-04T08:00:00Z · Fin : 2026-10-04T08:02:00Z
+  Durée du processus : 120.000 s
+  1 départ enregistré · 4 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  Mesure détaillée indisponible pour cette tentative : lectures, écritures, erreurs et répétitions restent inconnues, pas zéro.
+  Coût et usage non rapportés par le fournisseur pour cette tentative.
+unknown · agent missing · tentative missing · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : non
+  Départ : non rapporté · Fin : non rapporté
+  Durée du processus : non rapporté
+  Appels d’outils non rapportés.
+  Mesure détaillée indisponible pour cette tentative : lectures, écritures, erreurs et répétitions restent inconnues, pas zéro.
+  Coût et usage non rapportés par le fournisseur pour cette tentative.

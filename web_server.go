@@ -374,10 +374,17 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	fail := func(w http.ResponseWriter, e error) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		status := 400
-		if commandFailure(e).Code == "revision_conflict" {
+		code := commandFailure(e).Code
+		if code == "revision_conflict" || code == "preview_stale" || code == "active_scope_conflict" || code == "event_conflict" || code == "draft_conflict" || code == "already_applied" {
 			status = 409
 		}
-		if commandFailure(e).Code == "storage_unavailable" {
+		if code == "authorization_required" {
+			status = http.StatusForbidden
+		}
+		if code == "unknown_work" || code == "unknown_task" {
+			status = http.StatusNotFound
+		}
+		if code == "storage_unavailable" {
 			status = http.StatusInsufficientStorage
 		}
 		w.WriteHeader(status)
@@ -386,6 +393,9 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
 	s.registerRunLimitsAdmin(mux, send, fail)
+	registerGraphDraftHTTP(s, mux, send, fail)
+	registerAutomationHTTP(s, mux, send, fail)
+	registerAutomationExternalHTTP(s, mux, time.Now)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
 	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {
@@ -823,6 +833,10 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 		if r.Host != host {
 			http.Error(w, "Hôte refusé", 403)
+			return
+		}
+		if r.URL.Path == automationExternalPath {
+			mux.ServeHTTP(w, r)
 			return
 		}
 		if strings.HasPrefix(r.URL.Path, "/session/") {

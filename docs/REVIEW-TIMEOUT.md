@@ -30,9 +30,11 @@ swarm planning show WORK
 swarm planning review-timeout WORK --input delai.json
 ```
 
-API : `POST /api/v1/planning?work=WORK&action=review-timeout`, avec la même
-demande et l'authentification locale habituelle. Aucun bouton de réglage dédié
-n'est ajouté au web par cette évolution ; le champ est visible dans ses données.
+Dans le cockpit : **Conduite → Vérificateur indépendant → Délai de vérification**. Si les cartes de l’équipe sont repliées, afficher les détails de la mission. La modale affiche la durée actuelle, accepte une nouvelle valeur de 1 à 900 secondes et demande un motif. Cliquer sur **Enregistrer le délai** conserve une décision dans l’historique de la mission ; aucune revue n’est relancée.
+
+Les 90 secondes constituent le défaut historique de compatibilité lorsqu’aucune durée n’a été enregistrée. Il ne s’agit pas d’un plafond fixe : la valeur persistée dans `planning.reviewer.timeout_seconds` remplace ce défaut pour les prochaines revues. L’ancien délai reste attaché aux revues déjà effectuées.
+
+API : `POST /api/v1/planning?work=WORK&action=review-timeout`, avec la même demande et l’authentification locale habituelle.
 
 Le changement est refusé pendant une revue active. Une révision périmée est
 refusée ; le rejeu de la même décision ne la duplique pas. Aucun budget d'appels,

@@ -19,6 +19,9 @@ func TestProviderHelper(t *testing.T) {
 		return
 	}
 	raw, _ := io.ReadAll(os.Stdin)
+	if strings.Contains(string(raw), "TEST_REPORTED_MODEL") {
+		fmt.Println(`{"type":"system","subtype":"init","model":"provider-reported-model"}`)
+	}
 	fmt.Println(`{"type":"item.started","item":{"type":"command_execution"}}`)
 	if strings.Contains(string(raw), "TEST_SLEEP") {
 		time.Sleep(60 * time.Second)

@@ -230,6 +230,73 @@ l’ensemble de `.swarm/`, pas uniquement `state.db` : les rapports, copies de
 travail et configurations sont aussi nécessaires. Les sauvegardes automatiques
 de certaines migrations ne remplacent pas cette sauvegarde complète.
 
+### Sauvegarde et retour arrière vérifiables
+
+Effectuez la sauvegarde avec les missions et agents arrêtés, puis arrêtez le
+serveur ou le conteneur. L’export d’une mission ne remplace pas la sauvegarde complète :
+il ne contient ni toute la configuration, ni les authentifications, ni l’ensemble
+des espaces de travail. L’exemple natif suivant conserve tout `.swarm/` sans lire
+une base SQLite en cours d’utilisation :
+
+```sh
+install -d -m 700 /srv/sauvegardes/swarm-avant-mise-a-jour
+tar -C /chemin/du/projet -cpf \
+  /srv/sauvegardes/swarm-avant-mise-a-jour/projet-swarm.tar .swarm
+tar -C "$HOME/.local/share/swarm" -cpf \
+  /srv/sauvegardes/swarm-avant-mise-a-jour/agents.tar agents
+sha256sum /srv/sauvegardes/swarm-avant-mise-a-jour/*.tar > \
+  /srv/sauvegardes/swarm-avant-mise-a-jour/SHA256SUMS
+```
+
+Adaptez le second chemin à `SWARM_AGENT_HOME` dans `deploy/install.env`. Vérifiez
+les archives avec `sha256sum -c`, conservez-les hors du projet, puis mettez à jour.
+Après l’installation du nouveau binaire, et toujours sans ancien serveur actif :
+
+```sh
+swarm --root /chemin/du/projet init
+swarm --root /chemin/du/projet --json work list
+swarm --root /chemin/du/projet --json automation list
+swarm --root /chemin/du/projet --json version
+```
+
+Une migration v26 vers v27 crée aussi une copie privée
+`.swarm/state-pre-v27-*.db`. Cette copie automatique ne couvre pas les autres
+fichiers et ne remplace donc pas l’archive complète ci-dessus. Une commande de
+consultation refuse une ancienne base avec `storage_upgrade_required` au lieu de
+la migrer silencieusement.
+
+Pour un retour arrière, arrêtez le nouveau serveur et tous ses agents. Gardez
+l’état ayant échoué sous un autre nom, restaurez **ensemble** l’archive complète,
+le dossier des agents et le binaire correspondant à cette sauvegarde, puis
+contrôlez les empreintes avant le redémarrage. Ne changez jamais
+`PRAGMA user_version` et ne lancez pas un ancien binaire sur une base déjà migrée.
+
+### Archives de mission compatibles
+
+Ces commandes utilisent le format d’archive public ; elles ne remplacent pas la
+sauvegarde précédente :
+
+```sh
+swarm --root /chemin/du/projet export ID_MISSION --output mission.zip
+swarm --root /autre/projet import --input mission.zip
+swarm --root /autre/projet --json automation list
+```
+
+L’import refuse d’écraser une mission existante et conserve les pièces dans
+`.swarm/imports/`. Les programmes importés restent désactivés : examinez leur
+cible, leur horaire, leurs limites et leur fournisseur avant une activation
+explicite. Les formats d’archive 1 (mission sans état d’automatisation) et 2
+(automatisation incluse) sont acceptés par ce candidat ; une archive inconnue,
+altérée ou contenant un chemin non sûr est refusée.
+
+### Captures du candidat documenté
+
+Les captures D01 du graphe, des conflits/journaux et des programmes sont
+[répertoriées avec leurs empreintes dans le dossier D02](docs/D02-dossier.md#captures-réutilisées).
+Elles couvrent français/anglais et thèmes État/sombre sur le candidat du
+6 octobre 2026. D02 les réutilise par empreinte : il ne prétend pas avoir rejoué
+le navigateur ni qualifié un fournisseur réel.
+
 ## Première mission : du besoin au lancement
 
 1. Ouvrez le lien affiché au démarrage du serveur, puis **Préparer un projet**.
@@ -477,3 +544,7 @@ Au 2 octobre 2026, la suite Go complète et les tests ciblés avec détection de
 courses passent sur la copie du correctif. Le serveur de la mission utilise maintenant ce correctif. Un agent Codex réel
 a confirmé le chemin via `go env GOCACHE` et compilé le candidat sans réglage
 manuellement ajouté. Le correctif n’est pas encore publié.
+
+### Captures du candidat D02
+
+La recette fraîche du 6 octobre lie le candidat produit aux captures [graphe clair](docs/screenshots/graph-delivery-d02/fr-etat-graph.png), [graphe sombre](docs/screenshots/graph-delivery-d02/fr-sombre-graph.png), [programmes clairs](docs/screenshots/graph-delivery-d02/fr-etat-programs.png) et [programmes sombres](docs/screenshots/graph-delivery-d02/fr-sombre-programs.png). Il s’agit de parcours isolés sans fournisseur réel, après contrôle de migration et de rollback. Voir le [dossier D02](docs/D02-dossier.md#captures-d02-fraîches--6-octobre-2026).

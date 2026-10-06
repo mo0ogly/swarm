@@ -10,6 +10,12 @@ Swarm est un outil local de coordination d’agents de développement, avec une 
 
 [Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
 
+## Release v0.1.0
+
+La [première release expérimentale](https://github.com/mo0ogly/swarm/releases/tag/v0.1.0) ajoute l’édition des dépendances avec prévisualisation, les programmes durables et l’administration de leurs paramètres. Le moteur conserve les autorisations, budgets, contrôles et revues indépendantes.
+
+Voir les [notes de version](docs/releases/v0.1.0.md), le [guide des programmes](docs/AUTOMATION-PROGRAMS.md) et la [reprise des contrats bloqués](docs/CONTRACT-REVISION.md). Les quotas des sessions externes aux fournisseurs ne sont pas observés automatiquement.
+
 ## Première utilisation
 
 1. **Installer et ouvrir** : suivre [l’installation](INSTALL.md), puis ouvrir le lien de session affiché au lancement.

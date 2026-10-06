@@ -93,6 +93,12 @@ func TestIndependentReviewProcessPersistsAndBlocksStaleEvidence(t *testing.T) {
 			t.Fatal(err)
 		}
 		assertWorkflowDelivery(t, string(observed), "reviewer", gt.IndependentReview.Workflow)
+		if !strings.Contains(string(observed), `"review_mode":"evidence_assessment_without_tools"`) {
+			t.Fatal("provider did not receive the declared evidence-review mode")
+		}
+		if !strings.Contains(string(observed), "Place toute explication dans reason") {
+			t.Fatal("literal citation contract missing from provider prompt")
+		}
 		if !strings.Contains(string(observed), "Separately supplied declared deliverable") {
 			t.Fatal("declared deliverable missing from real provider prompt")
 		}
@@ -190,6 +196,7 @@ func TestIndependentReportQuotationFormattingAndBoundaries(t *testing.T) {
 		{"paragraph splice", "Les limites sont figées\n\nau lancement.", "Les limites sont figées au lancement.", false},
 		{"code alteration", "```go\nconst message = \"a  b\"\n```", "const message = \"a b\"", false},
 		{"paraphrase", "Les limites restent inchangées.", "Les limites ne changent pas.", false},
+		{"comment appended", "Les limites restent inchangées.", "Les limites restent inchangées. — contrôle réellement exécuté", false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			raw, _ := json.Marshal(map[string]any{"reason": "Citation examinée dans le rapport fourni", "criteria": []ReviewCriterion{{Index: 1, Verdict: "pass", Evidence: tc.quote}}})

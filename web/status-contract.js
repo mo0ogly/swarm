@@ -15,9 +15,9 @@ const SwarmStatusContract={
   return verdict;
  },
  planning(p){
+  if(Array.isArray(p?.scopes)&&p.scopes.length>0&&p.scopes.every(scope=>scope.state==='closed'))return 'completed';
   if(p?.failure)return 'error';
   if(p?.paused)return 'paused';
-  if(Array.isArray(p?.scopes)&&p.scopes.length>0&&p.scopes.every(scope=>scope.state==='closed'))return 'completed';
   return 'active';
  },
  review(p,tasks=[],paused=false){

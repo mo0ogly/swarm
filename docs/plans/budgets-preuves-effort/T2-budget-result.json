@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checks": [
+    "budget escalation keyboard entry targets selected mission",
+    "preview is read-only",
+    "web and CLI parity",
+    "stale modal rejected",
+    "Escape restores focus",
+    "French and English",
+    "both themes"
+  ],
+  "root": "/tmp/swarm-budget-ui-C48VY2"
+}

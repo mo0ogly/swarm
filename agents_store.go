@@ -79,7 +79,19 @@ type AgentProgress struct {
 	PendingTools int    `json:"pending_tools"`
 	LastTool     string `json:"last_tool,omitempty"`
 	LastResult   string `json:"last_result_at,omitempty"`
+	LastOutput   string `json:"last_output_at,omitempty"`
+	OutputState  string `json:"output_state,omitempty"`
+	ToolState    string `json:"tool_state,omitempty"`
+	Vitality     string `json:"provider_vitality,omitempty"`
 	Degraded     string `json:"degraded,omitempty"`
+	// MetricsVersion==0 means this attempt predates the categorised bilan
+	// counters below: a reader must show them as unknown, never as zero.
+	MetricsVersion int `json:"metrics_version,omitempty"`
+	Reads          int `json:"tool_reads,omitempty"`
+	Writes         int `json:"tool_writes,omitempty"`
+	Unclassified   int `json:"tool_unclassified,omitempty"`
+	Errors         int `json:"tool_errors_total,omitempty"`
+	Repeats        int `json:"tool_repeats_total,omitempty"`
 }
 type AttemptDiagnostic struct {
 	AgentID                 string           `json:"agent_id"`
@@ -112,6 +124,7 @@ type Agent struct {
 	Mode                 string            `json:"mode,omitempty"`
 	UnregisteredClaim    bool              `json:"-"`
 	ModelRoute           *ModelRoute       `json:"model_route,omitempty"`
+	ReportedModel        *ReportedModel    `json:"reported_model,omitempty"`
 	Context              *ContextManifest  `json:"context,omitempty"`
 	Brainstorm           bool              `json:"brainstorm,omitempty"`
 	Reply                string            `json:"reply,omitempty"`
@@ -449,6 +462,13 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if err != nil {
 		return a, false, err
 	}
+	// A concurrent identical launch may commit between the idempotency read
+	// and this snapshot. Refuse its stale request before interpreting that new
+	// active attempt as a recovery of historical work. The transaction below
+	// still rechecks revision and all guards before reserving anything.
+	if launchWork.Revision != r.Revision {
+		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
+	}
 	if task, taskErr := launchWork.task(r.TaskID); taskErr == nil && task.ModelSelection != nil {
 		selected := task.ModelSelection
 		if r.Provider != selected.Provider || (r.Level != "" && r.Level != "auto" && r.Level != selected.Route.Level) {
@@ -717,6 +737,21 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if previous.WorkID != work || previous.TaskID != r.TaskID || activeAgent(previous) {
 			return a, false, fmt.Errorf("précédent incompatible ou encore actif")
 		}
+		if previous.Provider != r.Provider {
+			cooldown := previous.ProviderCooldown
+			if cooldown == nil {
+				cooldown, _, e = s.providerCooldown(previous.Provider)
+				if e != nil {
+					return a, false, e
+				}
+			}
+			if cooldown != nil && cooldown.active(time.Now()) {
+				decision := t.ProviderRelayDecision
+				if decision == nil || decision.AgentID != previous.ID || decision.Action != providerRelayAction || decision.Provider != r.Provider {
+					return a, false, fmt.Errorf("Relais fournisseur non autorisé : enregistrer un choix explicite avec providers relay decide.")
+				}
+			}
+		}
 		if r.Mode != previous.Mode {
 			return a, false, fmt.Errorf("Une reprise conserve le mode de la tentative précédente.")
 		}
@@ -795,16 +830,29 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if r.Origin != originConductor {
 			workProfile := profile
 			workProfile.Skills = nil // Action-specific selection must not leak to other tasks.
+			workProfile.Limits = nil
+			workProfile.Timeout = 0
+			workProfile.Instruction = ""
+			if w.Profile != nil {
+				workProfile.Instruction = w.Profile.Instruction
+				// A task launch is not authorization to change mission-wide ceilings.
+				workProfile.Limits = w.Profile.Limits
+				workProfile.Timeout = w.Profile.Timeout
+			}
 			w.Profile = &workProfile
 		}
 	}
-	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
+	instruction := r.Instruction
+	if w.Profile != nil && strings.TrimSpace(w.Profile.Instruction) != "" && w.Profile.Instruction != r.Instruction {
+		instruction = "Consignes communes de la mission :\n" + w.Profile.Instruction + "\nConsignes propres à cette tâche :\n" + r.Instruction
+	}
+	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, instruction)
 	if w.Planning != nil {
 		scope, err := w.Planning.scope(t.ScopeID)
 		if err != nil {
 			return Agent{}, false, err
 		}
-		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, r.Instruction)
+		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, instruction)
 	}
 	if r.Role == "worker" {
 		prompt += workerExecutionContext(w, t, r.EventID)

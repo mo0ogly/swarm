@@ -89,3 +89,66 @@ budgets/deadlines. Pixel inspection remains an AI judgment, distinct from
 deterministic checks and acceptance. Changed image bytes invalidate the
 related hashes. Transport uses the image blocks in the
 [Claude streaming format](https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode).
+
+## Rechecking a completed result after a correction
+
+A check that did not execute or was interrupted without an exit verdict does
+not establish a repairable delivery defect and no longer automatically starts
+a worker. A different receipt path does not make an unchanged failure new.
+Diagnose and correct the relevant precondition before retrying.
+
+For a task blocked by its checks, the explicit `validation recheck-preview`
+then `validation recheck-apply` commands reuse the `recheck_completed` contract
+with `"intent": "replace"` and a different,
+corrected policy. The other request fields and the exact preview token remain
+required. The latest producer must be completed and match the failed receipt.
+This resubmits the **existing result**, invalidates current evidence, and creates
+no worker, attempt, or additional budget. Checks require an active mission
+authorization; independent review and a fresh gate still precede acceptance.
+Removing checks or supplying an empty policy is not a recovery mechanism.
+The web **Recheck result** action follows the same preview/apply sequence.
+
+## Reading checks and their measurements
+
+`swarm mission status WORK` and web task details use the same evidence
+projection. The **current verdict** is shown before history, while prior
+failures remain available after a recheck. Each check shows its state, result,
+command, timestamps, and measured wall-clock duration.
+
+CPU time is shown as measured only when the process reports it. Cost and tokens
+remain `unknown`: Swarm derives neither from command counts nor duration. The
+top five ranks only checks with a measured wall-clock duration; older receipts
+without one remain in history but are not ranked. These are check-process
+durations, not estimates of total mission elapsed time.
+
+After acceptance, the engine automatically closes a non-delegated root only
+while every task still has a fresh gate and a current independent review. A
+historical incident remains available but does not require another planner
+activation; stale evidence or a missing review keeps the root open. Delegated
+graphs retain their explicit child/parent closure contract.
+
+### Complete, observable final recipe
+
+`python3 tests/supervision_final_acceptance.py` runs the Go suite, vet,
+configuration checks, diff checks, canonical build, and the isolated browser
+recipe. The Go runner discovers every test in the package and partitions the
+inventory into four disjoint processes. Every discovered test must appear in
+Go events and every group must exit 0. Empty or duplicate inventories, a changed
+package count, and missing coverage fail the recipe. Subtests run with their
+parent test. Go has a 240-second timeout per group; the **engine control retains
+its total 300-second deadline**. No group is optional and no test is removed.
+A local execution does not replace the engine's evidence receipt.
+
+Browser recipes demonstrate their interactions on an isolated candidate server,
+not external-provider autonomy or closure of the actual mission. Process exit
+and report presence are not acceptance. Unreported costs remain unknown.
+
+### Agent decomposition: proposed evolution
+
+A validation supervisor could own engine, CLI/configuration, web, and
+proof/retrospective groups. Subagents would investigate anomalies and qualitative
+criteria; automated checks would remain deterministic processes. The supervisor
+would enforce complete coverage of the same candidate, invalidate affected
+groups after a correction, and hand the consolidation to an independent reviewer.
+Only the engine would decide closure. **This agent organization is proposed;
+the four-process test recipe does not implement it.**

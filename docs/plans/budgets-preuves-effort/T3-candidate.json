@@ -1,0 +1,19 @@
+{
+  "head": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+  "inputs": {
+    "agents_store.go": "95906a9e6b8cd0a3e2f4ec6019622d2c0e693fec2de1b2ab8cdd0e83e9c8635e",
+    "dispatcher_test.go": "8245e6e848cebe6d0c9463d4e5c0318e3f584bc65d581033893597cb6d4e988f",
+    "mission_guidance.go": "1014d7022a0161506f8740ad42011b75bbf3ca7bc95106c98e4a429317497cd4",
+    "mission_status.go": "c20e6f79a0fcbd98ea00baf99fdf2559e9ec10a00f710594ce6d7979dd7a9328",
+    "mission_guidance_test.go": "6c1067e868dcb72a1341e8062b9e3749d0f07661ab78b9d1c61d9d37ac83a259",
+    "mission_closed_history_test.go": "b468ac38eb535b4fe06f613e4ad28a1595784d41d86cb594933f988b3a028251",
+    "web/planning.js": "e024bfb90c01d130fbd02e1f425cafcbe75e4d7f4560a7ea6154abf2a82bc12a",
+    "web/status-contract.js": "f9ba0690f8dace61990ddab69c40daf5194d539615b9cc4ccd6aa2c383a88012",
+    "web/i18n-en.js": "a1950cd803fc5ef585fe729f0fae238bdae24604d741f9730d631f3fa66aaf67",
+    "locales/en.json": "dc15cdfba0b42502470e0407965e5e28fa47f88c6fb5fee6343d334f647a0e9c",
+    "tests/states_contract_test.cjs": "fcd1011753161c9693616f388c71c464d7f2d2db6e8549528a9f885b44eb12b8",
+    "tests/qw6_closed_history_ui.cjs": "b5deaba1bd47ac86a7740c24f9ac141aeb51d605219422b5f7339b1fbadf0845",
+    "tests/qw6_acceptance.py": "70a0e206f07bd9f0d90af28026c12e7878c5477d6a86b254cfe347489cf79a0c"
+  },
+  "candidate_sha256": "7ab47467df35501762143aa4ab12ba4705f0af399f41b797b3d6c0594e3a7d3a"
+}

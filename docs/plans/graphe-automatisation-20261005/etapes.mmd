@@ -1,0 +1,24 @@
+flowchart LR
+ A01[A01 Cartographie] --> A02[A02 Contrats]
+ A02 --> A03[A03 Prototype du graphe]
+ A03 --> A04[A04 Audit de préparation]
+ A04 --> B01[B01 Service de révision]
+ B01 --> B02[B02 CLI du brouillon]
+ B02 --> B03[B03 Éditeur web]
+ B03 --> B04[B04 Suivi et preuves]
+ B04 --> C01[C01 Demandes durables]
+ C01 --> C02[C02 Programmation et reprise]
+ C02 --> C03[C03 Événement externe]
+ C03 --> C04[C04 Administration]
+ C04 --> D01[D01 Recette intégrée]
+ D01 --> D02[D02 Documentation]
+ D02 --> D03[D03 Validation indépendante]
+ D03 --> D04[D04 Livraison et RETEX]
+ classDef cadrage fill:#e6dcfa,stroke:#7151a8,color:#35234e
+ classDef graphe fill:#dceef8,stroke:#31658b,color:#18394f
+ classDef auto fill:#fff0d1,stroke:#a57226,color:#5b3c12
+ classDef livraison fill:#e4f2e8,stroke:#427553,color:#264832
+ class A01,A02,A03,A04 cadrage
+ class B01,B02,B03,B04 graphe
+ class C01,C02,C03,C04 auto
+ class D01,D02,D03,D04 livraison

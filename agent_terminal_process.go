@@ -329,6 +329,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 				}
 				var guardReason string
 				a.Progress, a.Usage, guardReason, a.Activity = monitor.snapshot()
+				a.ReportedModel = monitor.sink.reportedModelSnapshot()
 				if guardReason != "" {
 					stop(guardReason, "garde")
 				}
@@ -355,6 +356,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 			if monitor != nil {
 				var guardReason string
 				a.Progress, a.Usage, guardReason, a.Activity = monitor.snapshot()
+				a.ReportedModel = monitor.sink.reportedModelSnapshot()
 				if guardReason != "" {
 					stop(guardReason, "garde")
 				}

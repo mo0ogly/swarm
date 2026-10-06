@@ -1,0 +1,18 @@
+{
+  "keyboard_p95_ms": 100,
+  "samples": 5,
+  "loads": [
+    {
+      "cards": 50,
+      "render_p95_ms": 1000
+    },
+    {
+      "cards": 200,
+      "render_p95_ms": 1000
+    },
+    {
+      "cards": 500,
+      "render_p95_ms": 2000
+    }
+  ]
+}

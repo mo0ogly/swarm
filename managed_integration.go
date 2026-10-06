@@ -219,6 +219,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 				return fmt.Errorf("preuve d’intégration refusée")
 			}
 			target.Gate = &GateRecord{Name: "Contrôles sur révision intégrée", Document: doc, Evaluation: evaluation, At: now()}
+			target.EvidenceStaleReason = ""
 			attempt := a.Attempt
 			if len(target.Attempts) > 0 {
 				attempt = target.Attempts[len(target.Attempts)-1].ID

@@ -1,0 +1,17 @@
+{
+  "base_sha": "1d9570bd4ef617130c6be96b7ec88844fdbcd00e",
+  "dirty": true,
+  "sources": {
+    "agents_store.go": "008789afdb695f95aa080c1e5710c866336c93ec8b258409a17941f986411c3c",
+    "activity_description.go": "c489c4a2cbe6a0441b50c3df905da5341c9a6975a7421c475be9fe73eca0e868",
+    "loop_guard.go": "eca763bf41cffeecd2797dc33c5cc1f5738b16250678ea06e7a0662ab2bb2018",
+    "mission_insights.go": "488443e29439ec62eae3208b0c04c11372719ec92935c36473871f6c613ee6cb",
+    "attempt_ledger_test.go": "8e9421a990c16fa16ec031bba131ac40093d31d0ed8ea88433e8b940c4eae403",
+    "web/mission-insights.js": "e7bc3bf3b20d14319658b63db9c37f952f9c82fbd72fe2bd2214e876778d52d0",
+    "web/cockpit.js": "e30df129498a5b617e5dad344850db8abe95b7b0b3bdd8f10fa467fb9fed0c0d",
+    "tests/attempt_ledger_test.cjs": "9475933a0a96b15b62bbe6b41d967a9fffd455a425e5a2fc6c9c68b2b2aa0ec1",
+    "locales/en.json": "9b294384e9e2daf33d6ff6b4ea7d9f550e7d6ad3c0de1a024c1bf23f4aff51c8",
+    "web/i18n-en.js": "1855433f4736ca1283fb232cf0c96567948461889c3c14f0d9003bd65759c9f3",
+    "package.json": "8aaa996e23ea28c3ed63dde9ac7aea0ab404a6a97e77b107fb9386f9801fc9da"
+  }
+}

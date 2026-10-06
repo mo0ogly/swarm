@@ -1,0 +1,81 @@
+{
+  "source": "CUA real keyboard actions, Codex supervisor; waiting explanation on live work with no currently waiting dependency; original organization/attempt-limit cases preserved separately",
+  "cases": [
+    {
+      "language": "fr",
+      "theme": "etat",
+      "openedBy": "Enter on waiting explanation button",
+      "opened": {
+        "at": "2026-10-03T19:46:17.881Z",
+        "dialogOpen": true,
+        "focus": "Fermer",
+        "focusVisible": true,
+        "language": "fr",
+        "theme": "etat"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Pourquoi cette tâche attend ?",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "openedBy": "Enter on waiting explanation button",
+      "opened": {
+        "at": "2026-10-03T19:46:18.656Z",
+        "dialogOpen": true,
+        "focus": "Fermer",
+        "focusVisible": true,
+        "language": "fr",
+        "theme": "sombre"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Pourquoi cette tâche attend ?",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "openedBy": "Enter on waiting explanation button",
+      "opened": {
+        "at": "2026-10-03T19:46:35.496Z",
+        "dialogOpen": true,
+        "focus": "Close",
+        "focusVisible": true,
+        "language": "en",
+        "theme": "sombre"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Why is this task waiting?",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "openedBy": "Enter on waiting explanation button",
+      "opened": {
+        "at": "2026-10-03T19:46:36.300Z",
+        "dialogOpen": true,
+        "focus": "Close",
+        "focusVisible": true,
+        "language": "en",
+        "theme": "etat"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Why is this task waiting?",
+        "focusVisible": true
+      }
+    }
+  ]
+}

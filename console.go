@@ -41,13 +41,18 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	actions := map[string][]TaskAction{}
 	for i := range w.Tasks {
 		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
-		if w.Tasks[i].IndependentReview != nil {
+		changed := s.refusedReviewEvidenceChanged(&w, &w.Tasks[i])
+		if w.Tasks[i].IndependentReview != nil || changed {
 			err := s.independentReviewGuard(&w, &w.Tasks[i])
 			reason := ""
 			if err != nil {
 				reason = err.Error()
 			}
-			reviews[w.Tasks[i].ID] = map[string]any{"current": err == nil, "reason": reason}
+			view := map[string]any{"current": err == nil, "reason": reason, "evidence_changed": changed, "revalidation_available": s.acceptedReviewRevalidationAvailable(&w, &w.Tasks[i])}
+			if w.Tasks[i].IndependentReview == nil && changed {
+				view["archived_review"] = w.Tasks[i].PreviousReviews[len(w.Tasks[i].PreviousReviews)-1]
+			}
+			reviews[w.Tasks[i].ID] = view
 		}
 	}
 	validation := s.validationState(&w)
