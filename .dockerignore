@@ -23,4 +23,6 @@
 !Dockerfile
 !build.sh
 !version_history.json
+!config/
+!config/*.json
 *_test.go

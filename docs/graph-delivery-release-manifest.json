@@ -2,8 +2,8 @@
   "schema_version": 1,
   "manifest_status": "release_packaging_candidate_pending_checks",
   "base_commit": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
-  "candidate_id": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed+sha256:39a0b8f640f2df8f7abae1f7e0a2e3d3c4c58e37047f1ae5e136c894a4cf6cf2",
-  "candidate_digest": "39a0b8f640f2df8f7abae1f7e0a2e3d3c4c58e37047f1ae5e136c894a4cf6cf2",
+  "candidate_id": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed+sha256:a9b8478139d23d626a67d753b8e7d31c33bbd2ca5cf1d1360d99417781c834d1",
+  "candidate_digest": "a9b8478139d23d626a67d753b8e7d31c33bbd2ca5cf1d1360d99417781c834d1",
   "coverage_digest": "40ecbfee659a1910df25ec5ef97036e86f99d6c95185d3ef996be979b9b4e66a",
   "requirements": [
     {
@@ -171,6 +171,11 @@
     }
   ],
   "inputs": [
+    {
+      "path": ".dockerignore",
+      "kind": "harness",
+      "sha256": "61859054f76cf0780de02b7608880e340fa23ab417a4bb516b2bb8e3fb07718f"
+    },
     {
       "path": ".gitignore",
       "kind": "doc",
