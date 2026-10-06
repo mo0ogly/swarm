@@ -78,8 +78,9 @@ func TestLoopGuardCaptureOffAndDefaults(t *testing.T) {
 	}
 	g := newLoopGuard(l)
 	g.lastOutput = time.Now().Add(-181 * time.Second)
-	if !strings.Contains(g.check(time.Now()), "sans sortie") {
-		t.Fatal("silence not detected")
+	g.outputSeen = true
+	if output, _, vitality := g.monitoring(time.Now()); output != "silent" || vitality != "unknown" || g.check(time.Now()) != "" {
+		t.Fatal("silence must be visible without fabricating vitality or stopping")
 	}
 }
 func TestLoopProvider(t *testing.T) {
@@ -88,6 +89,19 @@ func TestLoopProvider(t *testing.T) {
 	}
 	prompt, _ := io.ReadAll(os.Stdin)
 	switch {
+	case strings.Contains(string(prompt), "R3_SILENT_RESPONSE"):
+		time.Sleep(1500 * time.Millisecond)
+		fmt.Println(`{"type":"result","result":"response after visible silence"}`)
+		return
+	case strings.Contains(string(prompt), "R3_WAIT_RELEASE"):
+		for i := 0; i < 200; i++ {
+			if _, err := os.Stat("r3-release"); err == nil {
+				fmt.Println(`{"type":"result","result":"released"}`)
+				return
+			}
+			time.Sleep(10 * time.Millisecond)
+		}
+		os.Exit(3)
 	case strings.Contains(string(prompt), "GUARD_LAST_RESULT"):
 		fmt.Println(`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"last","name":"Write","input":{"file_path":"last-authorized-result"}}]}}`)
 		time.Sleep(700 * time.Millisecond)
@@ -121,7 +135,7 @@ func TestLoopProvider(t *testing.T) {
 	os.Exit(0)
 }
 func TestSupervisorGuardStopsAndBlocksTask(t *testing.T) {
-	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_SILENCE", "GUARD_TOOL"} {
+	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_TOOL"} {
 		t.Run(mode, func(t *testing.T) {
 			s := storeTest(t)
 			w, r := setupAgent(t, s)

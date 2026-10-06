@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checks": [
+    "quota preview read-only",
+    "web CLI parity",
+    "counts preserved",
+    "missing reviewer not invented",
+    "stale form refused",
+    "keyboard focus",
+    "FR EN both themes"
+  ],
+  "root": "/tmp/swarm-budget-ui-E4NGQS"
+}

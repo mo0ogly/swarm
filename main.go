@@ -13,7 +13,7 @@ import (
 const help = `swarm — compagnon local de reprise (schema_version: 1)
 
 Options globales : --root <projet> --json --lang fr|en
-swarm version | swarm --version
+swarm version [--server URL_DE_SESSION] | swarm --version
 swarm init
 swarm skills list
 swarm project-profile show|check|list|select PROFILE|apply [--input profil.json]
@@ -27,9 +27,11 @@ swarm run-limits show|history <portée> <mission> <clé>
 swarm run-limits apply <portée> <mission> <clé> --input changement.json
 swarm run-limits rollback <portée> <mission> <clé> <révision_cible> --input requête.json
 swarm run-limits effective <mission> <rôle> <tâche>
+swarm automation list|show|preview|create|enable|pause|archive|cancel|params
 swarm aide [sujet]
 swarm providers init|show
 swarm providers cooldown show|clear <fournisseur> [--input demande.json]
+swarm providers relay show <agent> | decide <agent> [--input décision.json]
 swarm connections list|save --input connexion.json
 swarm console [travail] [--plain]
 swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
@@ -39,7 +41,7 @@ swarm mission status|changes|spending|seen|preview|start|pause|resume|stop|watch
 swarm mission recovery <travail> <tâche> [agent]
 swarm lifecycle list
 swarm lifecycle preview|apply <travail> archive|restore|purge|delete --input requete.json
-swarm validation preview|apply <travail> --task <tâche> --input politique.json
+swarm validation preview|apply|recheck-preview|recheck-apply <travail> --task <tâche> --input politique.json
 swarm profile <travail> [tâche] [--input profil.json]
 swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
@@ -73,6 +75,10 @@ Les requêtes sont décrites dans README.md. --input - lit stdin.
 Codes généraux : 0 succès ; 1 gate bloquée ; 2 erreur.
 Préparer : 2 contrat ; 3 conflit ; 4 autorisation ; 5 fournisseur ou méthode indisponible ; 6 arrêt non confirmé.
 `
+
+func mainHelpText() string {
+	return uiText(help) + uiText("Brouillons du plan : swarm plan draft show|export|import|compare|preview|apply|undo|redo TRAVAIL [BROUILLON]\n")
+}
 
 func readInput(path string) ([]byte, error) {
 	var r io.Reader = os.Stdin
@@ -117,6 +123,7 @@ func run(args []string, out, errOut io.Writer) int {
 	output := ""
 	task := ""
 	phase := "delivery"
+	serverURL := ""
 	asJSON := false
 	pos := []string{}
 	for i := 0; i < len(args); i++ {
@@ -127,9 +134,9 @@ func run(args []string, out, errOut io.Writer) int {
 		case "--version":
 			pos = append(pos, "version")
 		case "--help", "-h":
-			fmt.Fprint(out, uiText(help))
+			fmt.Fprint(out, mainHelpText())
 			return 0
-		case "--root", "--input", "--output", "--task", "--phase":
+		case "--root", "--input", "--output", "--task", "--phase", "--server":
 			if i+1 == len(args) {
 				fmt.Fprintln(errOut, uiText("valeur manquante :"), a)
 				return 2
@@ -146,6 +153,8 @@ func run(args []string, out, errOut io.Writer) int {
 				task = args[i]
 			case "--phase":
 				phase = args[i]
+			case "--server":
+				serverURL = args[i]
 			}
 		default:
 			pos = append(pos, a)
@@ -171,33 +180,44 @@ func run(args []string, out, errOut io.Writer) int {
 			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(commandFailure(e).Message))
 		}
 		switch commandFailure(e).Code {
-		case "conflict":
+		case "conflict", "revision_conflict", "preview_stale", "active_scope_conflict", "event_conflict", "idempotency_conflict", "terminal_target", "already_applied", "effect_started", "draft_conflict":
 			return 3
-		case "source_refused", "preparation_disabled":
+		case "source_refused", "preparation_disabled", "authorization_required":
 			return 4
-		case "provider_unavailable", "method_unavailable":
+		case "provider_unavailable", "method_unavailable", "workspace_wait":
 			return 5
-		case "interrupted":
+		case "interrupted", "uncertain_effect":
 			return 6
+		case "operation_pending":
+			return 7
 		default:
 			return 2
 		}
 	}
 	if len(pos) == 0 {
-		fmt.Fprint(out, uiText(help))
+		fmt.Fprint(out, mainHelpText())
 		return 0
 	}
 	if pos[0] == "version" {
 		if len(pos) != 1 {
-			return fail(fmt.Errorf("swarm version [--json]"))
+			return fail(fmt.Errorf("swarm version [--json] [--root PROJET] [--server URL_DE_SESSION]"))
 		}
 		version := binaryVersion()
+		active := VersionObservation{Available: false, Provenance: "runtime_health", Hint: "Fournissez l’URL de session du serveur actif avec --server."}
+		if serverURL != "" {
+			var e error
+			active, e = serverObservation(serverURL)
+			if e != nil {
+				active.Hint = e.Error()
+			}
+		}
+		diagnostic := compareVersions(binaryObservation(version), active, candidateObservation(root))
 		if asJSON {
-			if err := printJSON(out, versionResponse{Schema: 1, Binary: version}); err != nil {
+			if err := printJSON(out, versionResponse{Schema: 1, Binary: version, Diagnostic: diagnostic}); err != nil {
 				return fail(err)
 			}
 		} else {
-			fmt.Fprint(out, versionText(version))
+			fmt.Fprint(out, versionText(version), versionDiagnosticText(diagnostic))
 		}
 		return 0
 	}
@@ -219,6 +239,15 @@ func run(args []string, out, errOut io.Writer) int {
 			fmt.Fprint(out, text)
 		}
 		return 0
+	}
+	if pos[0] == "automation" && len(pos) == 2 && (pos[1] == "help" || pos[1] == "aide") {
+		fmt.Fprint(out, automationCLIHelp())
+		return 0
+	}
+	if pos[0] == "plan" {
+		if err := validateGraphDraftCLISyntax(pos); err != nil {
+			return fail(err)
+		}
 	}
 	root, e := filepath.Abs(root)
 	if e != nil {
@@ -296,6 +325,12 @@ func run(args []string, out, errOut io.Writer) int {
 	}
 	if pos[0] == "run-limits" {
 		if e := s.runLimitsCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "automation" {
+		if e := s.automationCLI(pos, input, out); e != nil {
 			return fail(e)
 		}
 		return 0
@@ -380,8 +415,8 @@ func run(args []string, out, errOut io.Writer) int {
 		return 0
 	}
 	if pos[0] == "validation" {
-		if len(pos) != 3 || (pos[1] != "preview" && pos[1] != "apply") || task == "" || input == "" {
-			return fail(fmt.Errorf("usage : validation preview|apply WORK --task TASK --input politique.json"))
+		if len(pos) != 3 || (pos[1] != "preview" && pos[1] != "apply" && pos[1] != "recheck-preview" && pos[1] != "recheck-apply") || task == "" || input == "" {
+			return fail(fmt.Errorf("usage : validation preview|apply|recheck-preview|recheck-apply WORK --task TASK --input politique.json"))
 		}
 		b, readErr := readInput(input)
 		if readErr != nil {
@@ -397,7 +432,11 @@ func run(args []string, out, errOut io.Writer) int {
 		if change.TaskID != task {
 			return fail(fmt.Errorf("task_id ne correspond pas à --task"))
 		}
-		if pos[1] == "preview" {
+		action := pos[1]
+		if action == "recheck-preview" || action == "recheck-apply" {
+			change.RecheckCompleted = true
+		}
+		if action == "preview" || action == "recheck-preview" {
 			preview, previewErr := s.previewValidationPolicy(pos[2], change)
 			if previewErr != nil {
 				return fail(previewErr)
@@ -429,7 +468,7 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		return 0
 	}
-	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "exchange" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
+	if pos[0] == "plan" || pos[0] == "console" || pos[0] == "agent" || pos[0] == "exchange" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
 		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
 			return fail(e)
 		}

@@ -39,6 +39,12 @@ function inboxCard(d) {
   if (d.kind === 'gate' || d.kind === 'handoff') {
     c.append(button(d.kind === 'gate' ? tr_web_conduite_js('Revalider cette tâche') : tr_web_conduite_js('Examiner le rapport'), () => taskDialog(d.task_id)));
   }
+  // Le blocage budget vise le travail courant, jamais une tâche : ce bouton
+  // ouvre le même réglage que l'onglet Budget, ciblé sur la bonne mission,
+  // au lieu de router vers un acquittement qui ne change aucun plafond.
+  if (d.kind === 'budget') {
+    c.append(button(tr_web_conduite_js('Régler cette limite'), () => openBudgetEdit()));
+  }
   c.append(button(tr_web_conduite_js('Examiner et décider'), () => openDecision(d)));
   return c;
 }

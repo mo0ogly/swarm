@@ -32,8 +32,9 @@ type BinaryVersion struct {
 }
 
 type versionResponse struct {
-	Schema int           `json:"schema_version"`
-	Binary BinaryVersion `json:"binary"`
+	Schema     int               `json:"schema_version"`
+	Binary     BinaryVersion     `json:"binary"`
+	Diagnostic VersionDiagnostic `json:"diagnostic"`
 }
 
 func validReleaseVersion(v string) bool {

@@ -9,26 +9,27 @@ import (
 )
 
 type MissionTask struct {
-	Waits               []MissionWait        `json:"waiting_on"`
-	RecoveryPreview     RecoveryPreview      `json:"recovery_preview"`
-	Primary             MissionPrimaryAction `json:"primary_action"`
-	AttemptsUsed        int                  `json:"attempts_used"`
-	AttemptsAllowed     int                  `json:"attempts_allowed"`
-	AttemptLimitReached bool                 `json:"attempt_limit_reached"`
-	ID                  string               `json:"id"`
-	Title               string               `json:"title"`
-	State               string               `json:"state"`
-	Reason              string               `json:"reason"`
-	Action              string               `json:"action"`
-	Label               string               `json:"label"`
-	Target              string               `json:"target,omitempty"`
-	Impact              int                  `json:"impact"`
-	Deliverable         string               `json:"deliverable"`
-	ValidationMode      string               `json:"validation_mode"`
-	ValidationReceipt   string               `json:"validation_receipt,omitempty"`
-	Result              ResultPresentation   `json:"result"`
-	Understanding       MissionUnderstanding `json:"understanding"`
-	Diagnostic          *AttemptDiagnostic   `json:"diagnostic,omitempty"`
+	Waits               []MissionWait            `json:"waiting_on"`
+	RecoveryPreview     RecoveryPreview          `json:"recovery_preview"`
+	Primary             MissionPrimaryAction     `json:"primary_action"`
+	AttemptsUsed        int                      `json:"attempts_used"`
+	AttemptsAllowed     int                      `json:"attempts_allowed"`
+	AttemptLimitReached bool                     `json:"attempt_limit_reached"`
+	ID                  string                   `json:"id"`
+	Title               string                   `json:"title"`
+	State               string                   `json:"state"`
+	Reason              string                   `json:"reason"`
+	Action              string                   `json:"action"`
+	Label               string                   `json:"label"`
+	Target              string                   `json:"target,omitempty"`
+	Impact              int                      `json:"impact"`
+	Deliverable         string                   `json:"deliverable"`
+	ValidationMode      string                   `json:"validation_mode"`
+	ValidationReceipt   string                   `json:"validation_receipt,omitempty"`
+	Result              ResultPresentation       `json:"result"`
+	Understanding       MissionUnderstanding     `json:"understanding"`
+	Diagnostic          *AttemptDiagnostic       `json:"diagnostic,omitempty"`
+	Attempt             MissionAttemptProjection `json:"attempt"`
 }
 type MissionUnderstanding struct {
 	What      string `json:"what"`
@@ -381,6 +382,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 		t := &w.Tasks[i]
 		v := validation.Tasks[t.ID]
 		x := MissionTask{ID: t.ID, Title: t.Title, State: t.Status, Deliverable: t.Deliverable, Target: t.ID, Impact: descendantCount(&w, t.ID), ValidationMode: "human"}
+		x.Attempt = projectMissionAttempt(t, agents)
 		x.AttemptsUsed, x.AttemptsAllowed = len(t.Attempts), t.PlanMaxAttempts
 		if t.ValidationPolicy != nil {
 			x.ValidationMode = t.ValidationPolicy.Mode
@@ -498,7 +500,7 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 				x.Reason = "La copie et les réglages sont conservés. Confirmez la reprise du lancement depuis cette tâche."
 			}
 		}
-		x.AttemptLimitReached = !s.executionObserved(w.ID, t.ID) && t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review"
+		x.AttemptLimitReached = t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts && x.State != "review" && !s.executionObserved(w.ID, t.ID)
 		if t.IndependentReview != nil && t.IndependentReview.State == "running" {
 			x.AttemptLimitReached = false
 		}
@@ -573,11 +575,11 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 	d.Understanding = missionUnderstanding(d)
 	if w.Planning != nil {
 		root, _ := w.Planning.scope("root")
-		if w.Planning.Failure != "" && missionPlanningOwnsNextStep(d) {
+		if missionPlanningOpen(w) && w.Planning.Failure != "" && missionPlanningOwnsNextStep(d) {
 			d.Understanding = understanding(w.Planning.Failure, "Corrigez la cause puis reprenez la planification.", "Vous", "user", "decision_humaine")
 		} else if root != nil && root.State != "closed" && (w.Planning.Activations >= w.Planning.MaxActivations || w.Planning.Decisions >= w.Planning.MaxDecisions) {
 			d.Understanding = understanding("Le plafond de planification est atteint.", "Examinez les décisions et préparez une nouvelle mission bornée pour le travail restant.", "Vous", "user", "decision_humaine")
-		} else if w.Planning.Paused {
+		} else if missionPlanningOpen(w) && w.Planning.Paused {
 			d.Understanding = understanding("La planification est en pause.", "Reprenez lorsque vous êtes prêt.", "Vous", "user", "decision_humaine")
 		} else if root != nil && root.State != "closed" && (d.Total == 0 || d.Total == d.Validated) {
 			d.Understanding = understanding("Les résultats attendent une décision du responsable du périmètre.", "Le responsable examine les retours avant de clore ou compléter le plan.", "Le planificateur", "supervisor", "attente_normale")

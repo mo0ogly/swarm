@@ -58,7 +58,7 @@ func TestEvidenceContractExecutedControlAndStaleness(t *testing.T) {
 		t.Fatalf("preuve moteur incomplète : %+v", e)
 	}
 	c := e.Controls.Items[0]
-	if c.Execution != "executed" || strings.Join(c.Command, " ") != "go version" || c.ExitCode == nil || *c.ExitCode != 0 || c.Started == "unknown" || c.Finished == "unknown" || c.Revision == "unknown" {
+	if c.Execution != "executed" || strings.Join(c.Command, " ") != "go version" || c.ExitCode == nil || *c.ExitCode != 0 || c.Started == "unknown" || c.Finished == "unknown" || c.Revision == "unknown" || c.WallDurationMS == nil || c.Cost != "unknown" || c.Tokens != "unknown" {
 		t.Fatalf("métadonnées d’exécution absentes : %+v", c)
 	}
 	// The shared-workspace automatic validation path never merges nor commits
@@ -73,6 +73,51 @@ func TestEvidenceContractExecutedControlAndStaleness(t *testing.T) {
 	stale := s.validationState(&got).Tasks["t1"].Evidence
 	if stale.Freshness != "stale" || stale.Acceptance.State != "stale" || stale.Controls.Items[0].Freshness != "stale" {
 		t.Fatalf("preuve périmée présentée comme actuelle : %+v", stale)
+	}
+}
+
+func TestEvidenceContractCurrentVerdictHistoryAndMeasuredTopFive(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	task := &w.Tasks[0]
+	task.Attempts = []Attempt{{ID: "attempt-history"}}
+	attempt := latestAttemptID(task)
+	ms := func(v int64) *int64 { return &v }
+	old := AutomaticValidation{Attempt: attempt, Revision: 4, Receipt: "old.json", State: "blocked", At: now(), Controls: []ValidationControlResult{
+		{ID: "slow-failure", Executed: true, Passed: false, ExitCode: 1, Command: []string{"go", "test", "./..."}, Started: now(), Finished: now(), WallDurationMS: ms(9000), CPUDurationMS: ms(1200)},
+		{ID: "old-8", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "test", "./a"}, Started: now(), Finished: now(), WallDurationMS: ms(8000)},
+		{ID: "old-7", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "test", "./b"}, Started: now(), Finished: now(), WallDurationMS: ms(7000)},
+		{ID: "old-6", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "test", "./c"}, Started: now(), Finished: now(), WallDurationMS: ms(6000)},
+		{ID: "old-5", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "test", "./d"}, Started: now(), Finished: now(), WallDurationMS: ms(5000)},
+		{ID: "old-4", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "test", "./e"}, Started: now(), Finished: now(), WallDurationMS: ms(4000)},
+		{ID: "unknown-duration", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "vet", "./..."}, Started: now(), Finished: now()},
+	}}
+	raw, _ := json.Marshal(old)
+	if _, err := s.db.Exec("INSERT INTO events(id,work_id,revision,kind,at,payload,request) VALUES(?,?,?,?,?,?,?)", newID("event-"), w.ID, 4, "task.auto-validation", now(), raw, raw); err != nil {
+		t.Fatal(err)
+	}
+	// A different task with no attempt must never inherit this work's receipts.
+	if history := s.validationControlHistory(w.ID, &Task{ID: "unstarted"}, nil); len(history) != 0 {
+		t.Fatalf("unstarted task inherited another task's control history: %+v", history)
+	}
+	task.AutoValidation = &AutomaticValidation{Attempt: attempt, Revision: 5, Receipt: "current.json", State: "accepted", At: now(), Controls: []ValidationControlResult{{ID: "current", Executed: true, Passed: true, ExitCode: 0, Command: []string{"go", "test", "."}, Started: now(), Finished: now(), WallDurationMS: ms(3000)}}}
+	e := s.taskEvidence(&w, task, false)
+	if e.Controls.State != "passed" || len(e.Controls.History) != 7 || e.Controls.History[0].Result != "failed" {
+		t.Fatalf("verdict courant ou historique perdu : %+v", e.Controls)
+	}
+	if len(e.Controls.Longest) != 5 || e.Controls.Longest[0].ID != "slow-failure" || e.Controls.Longest[4].ID != "old-5" {
+		t.Fatalf("top mesuré incorrect ou durée inconnue inventée : %+v", e.Controls.Longest)
+	}
+	text := evidenceText(e)
+	if strings.Index(text, "Verdict actuel") > strings.Index(text, "Historique des contrôles") || !strings.Contains(text, "coût=unknown · tokens=unknown") {
+		t.Fatalf("ordre ou inconnues illisibles : %s", text)
+	}
+	t.Setenv("SWARM_LANG", "en")
+	english := evidenceText(e)
+	for _, want := range []string{"Current verdict", "Check history", "Five longest checks", "wall time=", "measured CPU=", "cost=unknown", "tokens=unknown"} {
+		if !strings.Contains(english, want) {
+			t.Fatalf("traduction anglaise absente (%s) : %s", want, english)
+		}
 	}
 }
 

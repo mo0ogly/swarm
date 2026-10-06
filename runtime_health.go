@@ -22,13 +22,14 @@ type StorageVolume struct {
 }
 
 type RuntimeHealth struct {
-	State         string          `json:"state"`
-	LaunchAllowed bool            `json:"launch_allowed"`
-	ObservedAt    string          `json:"observed_at"`
-	Message       string          `json:"message"`
-	Next          string          `json:"next_step"`
-	Volumes       []StorageVolume `json:"volumes"`
-	Version       ServerVersion   `json:"version"`
+	State         string            `json:"state"`
+	LaunchAllowed bool              `json:"launch_allowed"`
+	ObservedAt    string            `json:"observed_at"`
+	Message       string            `json:"message"`
+	Next          string            `json:"next_step"`
+	Volumes       []StorageVolume   `json:"volumes"`
+	Version       ServerVersion     `json:"version"`
+	Diagnostic    VersionDiagnostic `json:"version_diagnostic"`
 }
 
 type SourceVersion struct {
@@ -103,7 +104,9 @@ func (s *Store) runtimeHealth() RuntimeHealth {
 	if read == nil {
 		read = readStorageVolume
 	}
-	h := RuntimeHealth{State: "ready", LaunchAllowed: true, ObservedAt: now(), Volumes: []StorageVolume{}, Version: s.serverVersion()}
+	version := s.serverVersion()
+	installed := VersionObservation{Available: false, Provenance: "browser", Hint: "Le navigateur ne peut pas inspecter le CLI local. Lancez swarm version --server URL_DE_SESSION."}
+	h := RuntimeHealth{State: "ready", LaunchAllowed: true, ObservedAt: now(), Volumes: []StorageVolume{}, Version: version, Diagnostic: compareVersions(installed, binaryObservation(version.Binary), candidateObservation(s.root))}
 	for _, target := range []struct{ kind, path string }{{"store", filepath.Join(s.root, ".swarm")}, {"temporary", os.TempDir()}} {
 		bytes, inodes, err := read(target.path)
 		v := StorageVolume{Kind: target.kind, Path: target.path, Available: bytes, Inodes: inodes, State: "ready"}

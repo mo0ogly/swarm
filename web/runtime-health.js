@@ -1,6 +1,6 @@
 'use strict';
 const VersionHistoryPanel={
- value:null,error:null,pending:null,returnFocus:null,
+ value:null,diagnostic:null,error:null,pending:null,returnFocus:null,
  t(source){return globalThis.SwarmI18n?.t(source)??source},
  short(commit){return typeof commit==='string'&&/^[0-9a-f]{40}$/.test(commit)?commit.slice(0,12):this.t('inconnu')},
  normalize(raw){
@@ -24,6 +24,8 @@ const VersionHistoryPanel={
   const link=document.createElement('a');link.href=parsed.href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;return link;
  },
  line(term,value){const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=term;dd.textContent=value;row.append(dt,dd);return row},
+ observation(value){if(!value?.available)return this.t('Inconnue');const parts=[];if(value.version)parts.push(value.version);if(value.commit)parts.push(this.short(value.commit));if(value.modified===true)parts.push(this.t('modifiée'));return parts.length?parts.join(' · '):this.t('Inconnue')},
+ role(key){return this.t({installed_cli:'CLI installée',active_server:'Serveur actif',candidate:'Candidat'}[key]||key)},
  paintSummary(){
   const value=this.value,binary=value?.binary;
   for(const summary of document.querySelectorAll('[data-version-summary]')){
@@ -39,6 +41,8 @@ const VersionHistoryPanel={
   const {binary,source,history}=this.value,identity=document.createElement('section'),heading=document.createElement('h3'),list=document.createElement('dl');heading.textContent=this.t('Binaire lancé');
   list.append(this.line(this.t('Version'),binary?.version||'devel'),this.line(this.t('Commit du binaire'),this.short(binary?.commit)+(binary?.modified===true?' *':'')),this.line(this.t('Date de build'),binary?.build_date||this.t('inconnue')));
   identity.append(heading,list);host.append(identity);
+  const diagnostic=this.diagnostic;
+  if(diagnostic){const box=document.createElement('section'),title=document.createElement('h3'),values=document.createElement('dl'),state=document.createElement('p');title.textContent=this.t('Diagnostic comparatif');values.append(this.line(this.t('CLI installée'),this.observation(diagnostic.installed_cli)),this.line(this.t('Serveur actif'),this.observation(diagnostic.active_server)),this.line(this.t('Candidat'),this.observation(diagnostic.candidate)));state.className='notice '+(diagnostic.state==='divergent'?'alert':diagnostic.state==='unknown'?'attention':'info');state.textContent=this.t('État')+' : '+this.t({identical:'identique',divergent:'divergent',unknown:'inconnu'}[diagnostic.state]||'inconnu');box.append(title,values,state);for(const difference of diagnostic.differences||[]){const p=document.createElement('p');p.textContent=this.t('Divergence')+' : '+this.role(difference.left)+' / '+this.role(difference.right);box.append(p)}if(diagnostic.next_step){const next=document.createElement('p');next.textContent=(globalThis.SwarmI18n?.engine(diagnostic.next_step)??diagnostic.next_step);box.append(next)}host.append(box)}
   const sourceBox=document.createElement('section'),sourceTitle=document.createElement('h3'),sourceText=document.createElement('p');sourceTitle.textContent=this.t('Sources locales');
   sourceText.textContent=!source?.available?this.t('Copie locale non détectée.'):!source.compared?this.t('Comparaison avec le binaire indisponible.'):source.matches_binary?this.t('Les sources et le binaire utilisent le même commit. Les modifications locales ne sont pas comparées.'):this.t('Le commit des sources diffère de celui du binaire.');sourceBox.append(sourceTitle,sourceText);host.append(sourceBox);
   const news=document.createElement('section'),newsTitle=document.createElement('h3');newsTitle.textContent=this.t('Nouveautés');news.append(newsTitle);
@@ -49,14 +53,14 @@ const VersionHistoryPanel={
  },
  async load(){
   if(this.pending)return this.pending;this.error=null;this.paintSummary();this.paintDialog();
-  this.pending=fetch('/api/v1/runtime-health',{signal:AbortSignal.timeout(15000)}).then(async response=>{if(!response.ok)throw new Error(String(response.status));const health=await response.json();const value=this.normalize(health.version);if(!value)throw new Error('version contract');this.value=value;this.paintSummary();this.paintDialog();return health}).catch(error=>{this.error=error;this.paintSummary();this.paintDialog();throw error}).finally(()=>{this.pending=null});return this.pending;
+  this.pending=fetch('/api/v1/runtime-health',{signal:AbortSignal.timeout(15000)}).then(async response=>{if(!response.ok)throw new Error(String(response.status));const health=await response.json();const value=this.normalize(health.version);if(!value)throw new Error('version contract');this.value=value;this.diagnostic=health.version_diagnostic||null;this.paintSummary();this.paintDialog();return health}).catch(error=>{this.error=error;this.paintSummary();this.paintDialog();throw error}).finally(()=>{this.pending=null});return this.pending;
  },
  open(button){this.returnFocus=button;const dialog=this.ensureDialog();this.paintDialog();dialog.showModal();if(!this.value&&!this.pending)this.load().catch(()=>{})},
  start(){for(const button of document.querySelectorAll('[data-version-open]'))button.addEventListener('click',()=>this.open(button));this.paintSummary();this.load().then(health=>RuntimeHealthPanel.render(health)).catch(()=>RuntimeHealthPanel.renderFailure())}
 };
 const RuntimeHealthPanel={
  value:null,signature:'',
- renderVersion(v){VersionHistoryPanel.value=VersionHistoryPanel.normalize(v);VersionHistoryPanel.error=null;VersionHistoryPanel.paintSummary();VersionHistoryPanel.paintDialog()},
+ renderVersion(v,diagnostic){VersionHistoryPanel.value=VersionHistoryPanel.normalize(v);VersionHistoryPanel.diagnostic=diagnostic||null;VersionHistoryPanel.error=null;VersionHistoryPanel.paintSummary();VersionHistoryPanel.paintDialog()},
  render(h){
   this.value=h;const host=document.getElementById('runtime-health');if(!host)return;const key=JSON.stringify([h.state,h.message,h.next_step]);if(key===this.signature)return;this.signature=key;
   host.hidden=h.state==='ready';host.replaceChildren();if(host.hidden)return;host.className='notice '+(h.state==='blocked'?'alert':'attention');

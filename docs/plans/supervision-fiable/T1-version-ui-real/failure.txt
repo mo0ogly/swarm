@@ -1,0 +1,6 @@
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /État : divergent/. Input:
+
+'Version et nouveautésFermerBinaire lancéVersiondevelCommit du binairecc3069dc7bb6 *Date de build2026-10-04T15:54:41ZDiagnostic comparatifCLI installéeInconnueServeur actifdevel · cc3069dc7bb6 · modifiéeCandidatInconnueÉtat : inconnuRendez accessibles les identités manquantes (installed_cli, candidate) puis relancez le diagnostic. Pour le serveur actif, fournissez son URL de session avec --server.Sources localesCopie locale non détectée.NouveautésAucune version publiée n’est encore déclarée.Voir l’historique complet des commits sur GitHubFermer'
+
+    at verifySurface (/home/fpizzi/workspace/swarm-action-skills/tests/version_ui.cjs:26:192)
+    at async /home/fpizzi/workspace/swarm-action-skills/tests/version_ui.cjs:46:112

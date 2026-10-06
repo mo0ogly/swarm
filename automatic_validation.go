@@ -186,9 +186,12 @@ func runValidationControl(root string, c ValidationControl) (r ValidationControl
 // diagnostic bytes separately without inflating successful review contexts.
 func runValidationControlCaptured(root string, c ValidationControl) (r ValidationControlResult, captured []byte, total int) {
 	var output limitedValidationOutput
+	started := time.Now()
 	r = ValidationControlResult{ID: c.ID, Command: append([]string(nil), c.Command...), ExitCode: -1, Started: now()}
 	defer func() {
 		r.Finished = now()
+		wall := time.Since(started).Milliseconds()
+		r.WallDurationMS = &wall
 		captured = append([]byte(nil), output.b.Bytes()...)
 		total = output.n
 		if c.ReviewOutput {
@@ -224,6 +227,10 @@ func runValidationControlCaptured(root string, c ValidationControl) (r Validatio
 	if err == nil {
 		r.Executed = true
 		err = cmd.Wait()
+		if cmd.ProcessState != nil {
+			cpu := (cmd.ProcessState.UserTime() + cmd.ProcessState.SystemTime()).Milliseconds()
+			r.CPUDurationMS = &cpu
+		}
 	}
 	r.OutputHash = hash(output.b.Bytes())
 	if err == nil {
@@ -322,6 +329,7 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		return false, "revue humaine conservée : " + err.Error()
 	}
 	digest := validationPolicyDigest(policy)
+	relevantInputs := taskRelevantInputs(&w, t)
 	if t.AutoValidation != nil && t.AutoValidation.Attempt == a.Attempt && t.AutoValidation.PolicyDigest == digest {
 		if t.AutoValidation.State == "pending_review" || t.AutoValidation.State == "pending_human" {
 			// A resubmitted report can change without a new production attempt.
@@ -389,7 +397,11 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	if err = os.MkdirAll(filepath.Dir(absReceipt), 0700); err != nil {
 		return false, "création du reçu impossible : " + err.Error()
 	}
-	record := AutomaticValidation{Attempt: a.Attempt, Revision: w.Revision, Producer: a.ID, Controller: validationController, PolicyDigest: digest, Policy: policy,
+	candidate := ""
+	if w.Planning != nil && w.Planning.Repository != nil {
+		candidate = w.Planning.Repository.Candidate
+	}
+	record := AutomaticValidation{Attempt: a.Attempt, Revision: w.Revision, CandidateSHA: candidate, Producer: a.ID, Controller: validationController, PolicyDigest: digest, Policy: policy,
 		Artifacts: artifacts, Controls: results,
 		Receipt: relReceipt, State: "blocked", At: now()}
 	if passed {
@@ -439,10 +451,18 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 	}
 
 	payload, _ := json.Marshal(record)
-	_, err = s.mutateWithHook(w.ID, "task.auto-validation", newID("auto-validation-"), w.Revision, payload, func(current *Work) error {
+	// The receipt is attached to the latest administrative revision, but only
+	// after rechecking the exact candidate/task/policy inputs captured before
+	// the controls. A concurrent relevant change keeps the receipt on disk as
+	// history and refuses current acceptance.
+	publication, readErr := s.get(w.ID)
+	if readErr != nil {
+		return false, "révision courante illisible après les contrôles : " + readErr.Error()
+	}
+	_, err = s.mutateWithHook(w.ID, "task.auto-validation", newID("auto-validation-"), publication.Revision, payload, func(current *Work) error {
 		task, findErr := current.task(a.TaskID)
-		if findErr != nil || task.Status != "submitted" || task.ValidationPolicy == nil || validationPolicyDigest(*task.ValidationPolicy) != digest {
-			return fmt.Errorf("politique ou tâche modifiée pendant les contrôles ; revue humaine requise")
+		if findErr != nil || task.Status != "submitted" || task.ValidationPolicy == nil || validationPolicyDigest(*task.ValidationPolicy) != digest || taskRelevantInputs(current, task) != relevantInputs {
+			return fmt.Errorf("candidat ou entrées pertinentes modifiés pendant les contrôles ; reçu conservé mais périmé")
 		}
 		fresh, evalErr := evaluate(document, s.root, "delivery")
 		if evalErr != nil {
@@ -450,6 +470,7 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		}
 		task.AutoValidation = &record
 		task.Gate = &GateRecord{Name: "Validation automatique préautorisée", Document: document, Evaluation: fresh, At: now()}
+		task.EvidenceStaleReason = ""
 		if !fresh.Allowed {
 			task.Status = "blocked"
 			task.Blocker = record.Reason

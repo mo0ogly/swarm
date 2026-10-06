@@ -69,3 +69,41 @@ func TestAttemptLedgerKeepsAttemptsAndUnknowns(t *testing.T) {
 		}
 	}
 }
+
+// REQ-QW7: each attempt reports its own start/end exactly as the agent
+// recorded them (never computed), distinguishing a finished run from a still
+// running one instead of reporting both as an identical absence.
+func TestAttemptLedgerReportsDatedProvenanceWithoutInventingDuration(t *testing.T) {
+	w := Work{Tasks: []Task{{ID: "t", Title: "Result", Status: "accepted"}}}
+	agents := []Agent{
+		{ID: "finished", TaskID: "t", Attempt: "a1", Status: "completed", Started: "2026-01-01T00:00:00Z", Ended: "2026-01-01T00:05:00Z"},
+		{ID: "ongoing", TaskID: "t", Attempt: "a2", Status: "running", Started: "2026-01-02T00:00:00Z"},
+		{ID: "unstarted", TaskID: "t", Attempt: "a3", Status: "queued"},
+	}
+	rows := attemptLedgers(w, agents)
+	by := map[string]AttemptLedger{}
+	for _, r := range rows {
+		by[r.Attempt] = r
+	}
+	if by["a1"].Started != "2026-01-01T00:00:00Z" || by["a1"].Ended != "2026-01-01T00:05:00Z" {
+		t.Fatal("finished attempt lost its recorded timestamps", by["a1"])
+	}
+	if by["a2"].Started != "2026-01-02T00:00:00Z" || by["a2"].Ended != "" {
+		t.Fatal("running attempt must not get an invented end timestamp", by["a2"])
+	}
+	if by["a3"].Started != "" || by["a3"].Ended != "" {
+		t.Fatal("queued attempt without timestamps must stay empty, not zero-valued", by["a3"])
+	}
+	var out bytes.Buffer
+	printAttemptLedgers(&out, rows)
+	text := out.String()
+	if !strings.Contains(text, "2026-01-01T00:00:00Z") || !strings.Contains(text, "2026-01-01T00:05:00Z") {
+		t.Fatalf("finished attempt dates missing from report: %s", text)
+	}
+	if !strings.Contains(text, "en cours") {
+		t.Fatalf("running attempt without end must read as ongoing, not unreported: %s", text)
+	}
+	if !strings.Contains(text, "non rapporté") {
+		t.Fatalf("queued attempt without any timestamp must read as not reported: %s", text)
+	}
+}

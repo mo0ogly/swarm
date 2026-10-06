@@ -60,10 +60,15 @@ func automaticCorrection(t Task, a Agent) (string, string, bool) {
 		return "", "", false
 	}
 	findings := []string{"Reçu de contrôle : " + validation.Receipt + "."}
-	fingerprintParts := []string{validation.PolicyDigest, validation.Receipt}
+	fingerprintParts := []string{validation.PolicyDigest}
 	for _, control := range validation.Controls {
 		if control.Passed {
 			continue
+		}
+		// A timeout/start failure is a failure of the verification process,
+		// not an objective verdict that another worker can repair.
+		if !control.Executed || control.ExitCode < 0 {
+			return "", "", false
 		}
 		finding := fmt.Sprintf("Contrôle %s en échec (code %d, sortie sha256 %s) : %s.", control.ID, control.ExitCode, control.OutputHash, control.Summary)
 		findings = append(findings, finding)
@@ -72,7 +77,11 @@ func automaticCorrection(t Task, a Agent) (string, string, bool) {
 	if len(findings) == 1 {
 		return "", "", false
 	}
-	return strings.Join(findings, " "), hash([]byte(strings.Join(fingerprintParts, "|"))), true
+	cause := hash([]byte(strings.Join(fingerprintParts, "|")))
+	if a.Recovery.CauseFingerprint == cause {
+		return "", "", false
+	}
+	return strings.Join(findings, " "), cause, true
 }
 
 // planDispatch rend les départs à effectuer et, quand il n'en rend aucun, le

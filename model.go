@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 23
+const schemaVersion = 27
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -67,6 +67,8 @@ type ValidationControlResult struct {
 	Summary               string   `json:"summary"`
 	Started               string   `json:"started_at,omitempty"`
 	Finished              string   `json:"finished_at,omitempty"`
+	WallDurationMS        *int64   `json:"wall_duration_ms,omitempty"`
+	CPUDurationMS         *int64   `json:"cpu_duration_ms,omitempty"`
 }
 
 type AutomaticValidation struct {
@@ -91,6 +93,7 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
+	ProviderRelayDecision   *ProviderRelayDecision      `json:"provider_relay_decision,omitempty"`
 	LegacyReportSubmissions []Attempt                   `json:"legacy_report_submissions,omitempty"`
 	ReviewCoordination      *ReviewCoordinationRecord   `json:"review_coordination,omitempty"`
 	Restarts                []TaskRestart               `json:"restarts,omitempty"`
@@ -106,6 +109,7 @@ type Task struct {
 	Requirements            []string                    `json:"requirements,omitempty"`
 	ValidationPolicy        *ValidationPolicy           `json:"validation_policy,omitempty"`
 	AutoValidation          *AutomaticValidation        `json:"automatic_validation,omitempty"`
+	EvidenceStaleReason     string                      `json:"evidence_stale_reason,omitempty"`
 	LaunchHeld              bool                        `json:"launch_held,omitempty"`
 	Profile                 *LaunchProfile              `json:"launch_profile,omitempty"`
 	Revalidation            *Revalidation               `json:"revalidation,omitempty"`
@@ -217,30 +221,33 @@ type Event struct {
 	Payload  json.RawMessage `json:"payload"`
 }
 type Request struct {
-	MaxAttempts      int               `json:"max_attempts,omitempty"`
-	MaxToolCalls     int               `json:"max_tool_calls,omitempty"`
-	Schema           int               `json:"schema_version"`
-	EventID          string            `json:"event_id"`
-	Revision         int               `json:"expected_revision"`
-	ID               string            `json:"id,omitempty"`
-	Title            string            `json:"title,omitempty"`
-	Objective        string            `json:"objective,omitempty"`
-	Scope            string            `json:"scope,omitempty"`
-	Criteria         []string          `json:"criteria,omitempty"`
-	Owner            string            `json:"owner,omitempty"`
-	Deliverable      string            `json:"deliverable,omitempty"`
-	Depends          []string          `json:"depends,omitempty"`
-	Status           string            `json:"status,omitempty"`
-	Blocker          string            `json:"blocker,omitempty"`
-	Next             string            `json:"next,omitempty"`
-	Summary          string            `json:"summary,omitempty"`
-	Memory           []string          `json:"memory,omitempty"`
-	Outcome          string            `json:"outcome,omitempty"`
-	ValidationPolicy *ValidationPolicy `json:"validation_policy,omitempty"`
-	Observation      string            `json:"observation,omitempty"`
-	Orientation      string            `json:"orientation,omitempty"`
-	Decision         string            `json:"decision,omitempty"`
-	Result           string            `json:"result,omitempty"`
+	ConfirmContractRevision bool              `json:"confirm_contract_revision,omitempty"`
+	ExpectedContract        string            `json:"expected_contract,omitempty"`
+	ContractRevisionReason  string            `json:"contract_revision_reason,omitempty"`
+	MaxAttempts             int               `json:"max_attempts,omitempty"`
+	MaxToolCalls            int               `json:"max_tool_calls,omitempty"`
+	Schema                  int               `json:"schema_version"`
+	EventID                 string            `json:"event_id"`
+	Revision                int               `json:"expected_revision"`
+	ID                      string            `json:"id,omitempty"`
+	Title                   string            `json:"title,omitempty"`
+	Objective               string            `json:"objective,omitempty"`
+	Scope                   string            `json:"scope,omitempty"`
+	Criteria                []string          `json:"criteria,omitempty"`
+	Owner                   string            `json:"owner,omitempty"`
+	Deliverable             string            `json:"deliverable,omitempty"`
+	Depends                 []string          `json:"depends,omitempty"`
+	Status                  string            `json:"status,omitempty"`
+	Blocker                 string            `json:"blocker,omitempty"`
+	Next                    string            `json:"next,omitempty"`
+	Summary                 string            `json:"summary,omitempty"`
+	Memory                  []string          `json:"memory,omitempty"`
+	Outcome                 string            `json:"outcome,omitempty"`
+	ValidationPolicy        *ValidationPolicy `json:"validation_policy,omitempty"`
+	Observation             string            `json:"observation,omitempty"`
+	Orientation             string            `json:"orientation,omitempty"`
+	Decision                string            `json:"decision,omitempty"`
+	Result                  string            `json:"result,omitempty"`
 	// Auteur de la mutation, quand ce n'est pas un humain. « task.update » est
 	// écrit par les deux voies : l'opérateur depuis le cockpit, la CLI ou le
 	// terminal, et le moteur au départ, au relais et à la fin d'une tentative.

@@ -18,27 +18,33 @@ type CostTotal struct {
 
 type CostSummary struct {
 	CostTotal
-	ByTask map[string]CostTotal `json:"by_task"`
+	ByTask     map[string]CostTotal `json:"by_task"`
+	ByProvider map[string]CostTotal `json:"by_provider"`
 }
 
 func (s *Store) costSummary(work string) (CostSummary, error) {
-	out := CostSummary{ByTask: map[string]CostTotal{}}
+	out := CostSummary{ByTask: map[string]CostTotal{}, ByProvider: map[string]CostTotal{}}
 	agents, e := s.agents(work)
 	if e != nil {
 		return out, e
 	}
 	for _, a := range agents {
 		t := out.ByTask[a.TaskID]
+		p := out.ByProvider[a.Provider]
 		if a.Usage != nil && a.Usage.ReportedCost != nil {
 			out.Reported += *a.Usage.ReportedCost
 			out.WithCost++
 			t.Reported += *a.Usage.ReportedCost
 			t.WithCost++
+			p.Reported += *a.Usage.ReportedCost
+			p.WithCost++
 		} else {
 			out.Silent++
 			t.Silent++
+			p.Silent++
 		}
 		out.ByTask[a.TaskID] = t
+		out.ByProvider[a.Provider] = p
 	}
 	return out, nil
 }

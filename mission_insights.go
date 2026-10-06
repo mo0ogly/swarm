@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"time"
 )
 
 type MissionWait struct {
@@ -69,13 +70,22 @@ type SpendingRow struct {
 	Output       int64     `json:"output_tokens"`
 	MissingUsage int       `json:"calls_without_usage"`
 	Cost         CostTotal `json:"cost"`
+	// Reviews and TaskRetries (REQ-QW7) are scoped to this one task, unlike
+	// MissionSpending.Retries which sums every task so a single task's
+	// rework cannot be read off the engine-wide total.
+	Reviews          int    `json:"reviews_recorded"`
+	TaskRetries      int    `json:"task_retries"`
+	DurationMS       *int64 `json:"recorded_process_ms"`
+	MissingDurations int    `json:"attempts_without_duration"`
 }
 type MissionSpending struct {
-	Rows     []SpendingRow   `json:"rows"`
-	Controls int             `json:"recorded_control_executions"`
-	Retries  int             `json:"worker_retries"`
-	Note     string          `json:"note"`
-	Attempts []AttemptLedger `json:"attempts"`
+	ObservedAt string          `json:"observed_at"`
+	Source     string          `json:"measurement_source"`
+	Rows       []SpendingRow   `json:"rows"`
+	Controls   int             `json:"recorded_control_executions"`
+	Retries    int             `json:"worker_retries"`
+	Note       string          `json:"note"`
+	Attempts   []AttemptLedger `json:"attempts"`
 }
 
 // AttemptLedger is the per-attempt bilan (REQ-QW3): one row per agent+attempt
@@ -84,27 +94,36 @@ type MissionSpending struct {
 // own lifecycle) separate from task acceptance (Accepted, decided by the
 // engine independently of any single attempt's process ending).
 type AttemptLedger struct {
-	Task         string    `json:"task"`
-	Label        string    `json:"label"`
-	Agent        string    `json:"agent"`
-	Attempt      string    `json:"attempt"`
-	ProcessState string    `json:"process_state"`
-	Accepted     bool      `json:"task_acceptance_recorded"`
-	Measurement  string    `json:"measurement"`
-	Calls        int       `json:"recorded_calls"`
-	Tools        int       `json:"observed_tool_calls"`
-	Measured     bool      `json:"measured"`
-	Reads        int       `json:"tool_reads"`
-	Writes       int       `json:"tool_writes"`
-	Unclassified int       `json:"tool_unclassified"`
-	Tests        string    `json:"tests"`
-	Errors       int       `json:"tool_errors_total"`
-	Repeats      int       `json:"tool_repeats_total"`
-	Degraded     string    `json:"degraded,omitempty"`
-	Input        int64     `json:"input_tokens"`
-	Output       int64     `json:"output_tokens"`
-	MissingUsage bool      `json:"usage_missing"`
-	Cost         CostTotal `json:"cost"`
+	Task           string    `json:"task"`
+	Label          string    `json:"label"`
+	Agent          string    `json:"agent"`
+	Attempt        string    `json:"attempt"`
+	Role           string    `json:"role"`
+	RequestedModel string    `json:"requested_model,omitempty"`
+	ObservedModel  string    `json:"observed_model,omitempty"`
+	ProcessState   string    `json:"process_state"`
+	Accepted       bool      `json:"task_acceptance_recorded"`
+	Measurement    string    `json:"measurement"`
+	Calls          int       `json:"recorded_calls"`
+	Tools          int       `json:"observed_tool_calls"`
+	Measured       bool      `json:"measured"`
+	Reads          int       `json:"tool_reads"`
+	Writes         int       `json:"tool_writes"`
+	Unclassified   int       `json:"tool_unclassified"`
+	Tests          string    `json:"tests"`
+	Errors         int       `json:"tool_errors_total"`
+	Repeats        int       `json:"tool_repeats_total"`
+	Degraded       string    `json:"degraded,omitempty"`
+	Input          int64     `json:"input_tokens"`
+	Output         int64     `json:"output_tokens"`
+	MissingUsage   bool      `json:"usage_missing"`
+	Cost           CostTotal `json:"cost"`
+	// Started/Ended (REQ-QW7) come straight from the agent's own lifecycle
+	// timestamps, never computed: a still-running or never-started attempt
+	// reports an empty value, not an invented duration.
+	Started    string `json:"started"`
+	Ended      string `json:"ended,omitempty"`
+	DurationMS *int64 `json:"recorded_process_ms"`
 }
 
 const attemptTestsUnknown = "inconnu : aucun signal fiable ne distingue un test dans les commandes observées"
@@ -118,9 +137,16 @@ func attemptLedgers(w Work, agents []Agent) []AttemptLedger {
 			label = t.Title
 			accepted = t.Status == "accepted"
 		}
-		row := AttemptLedger{Task: a.TaskID, Label: label, Agent: a.ID, Attempt: a.Attempt,
+		row := AttemptLedger{Task: a.TaskID, Label: label, Agent: a.ID, Attempt: a.Attempt, Role: a.Role,
 			ProcessState: a.Status, Accepted: accepted, Calls: 1, Tools: a.Progress.ToolCalls,
-			Tests: attemptTestsUnknown, Degraded: a.Progress.Degraded, Measurement: "unknown"}
+			Tests: attemptTestsUnknown, Degraded: a.Progress.Degraded, Measurement: "unknown",
+			Started: a.Started, Ended: a.Ended, DurationMS: recordedProcessDuration(a.Started, a.Ended)}
+		if a.ModelRoute != nil {
+			row.RequestedModel = a.ModelRoute.Model
+		}
+		if a.ReportedModel != nil {
+			row.ObservedModel = a.ReportedModel.Model
+		}
 		if a.Progress.MetricsVersion == attemptMetricsVersion && a.Mode != "terminal" {
 			row.Measured = true
 			row.Measurement = "observed"
@@ -346,6 +372,17 @@ func recoveryReview(t *Task) *IndependentReview {
 	return nil
 }
 
+// taskReviewCount (REQ-QW7) counts only reviews actually recorded for this
+// task: its current independent review plus its retained history. A task
+// never reviewed reports zero, a real count, not an absence to hide.
+func taskReviewCount(t *Task) int {
+	n := len(t.PreviousReviews)
+	if t.IndependentReview != nil {
+		n++
+	}
+	return n
+}
+
 func (s *Store) recoveryEvidence(t *Task) []RecoveryEvidence {
 	r := recoveryReview(t)
 	if r == nil {
@@ -524,7 +561,7 @@ func addMeasuredUsage(row *SpendingRow, u *Usage) {
 	}
 }
 func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error) {
-	out := MissionSpending{Rows: []SpendingRow{}, Note: "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur."}
+	out := MissionSpending{ObservedAt: now(), Source: "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events", Rows: []SpendingRow{}, Note: "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur."}
 	by := map[string]*SpendingRow{}
 	rowFor := func(kind, id, label string) *SpendingRow {
 		key := kind + ":" + id
@@ -540,12 +577,24 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 		}
 		row := rowFor("worker", a.TaskID, label)
 		row.Calls++
+		if duration := recordedProcessDuration(a.Started, a.Ended); duration != nil {
+			if row.DurationMS == nil {
+				row.DurationMS = new(int64)
+			}
+			*row.DurationMS += *duration
+		} else {
+			row.MissingDurations++
+		}
 		row.Tools += a.Progress.ToolCalls
-		if a.Mode == "terminal" || a.Progress.Degraded != "" {
+		if a.Mode == "terminal" || a.Progress.Degraded != "" || a.Progress.MetricsVersion != attemptMetricsVersion {
 			row.UnknownTools++
+		}
+		if t, _ := w.task(a.TaskID); t != nil {
+			row.Reviews = taskReviewCount(t)
 		}
 		if a.Previous != "" {
 			out.Retries++
+			row.TaskRetries++
 		}
 		addMeasuredUsage(row, a.Usage)
 	}
@@ -639,20 +688,70 @@ func printMissionChanges(out io.Writer, c MissionChanges) {
 }
 func printMissionSpending(out io.Writer, c MissionSpending) {
 	fmt.Fprintln(out, uiText("Où vont les appels et les coûts ?"))
+	sourceLabel := uiText("non rapporté")
+	if c.Source != "" {
+		sourceLabel = uiText("Horaires des processus, activité reçue, usages fournisseurs et historique des revues.")
+	}
+	fmt.Fprintf(out, uiText("Mesures observées : %s · Source : %s\n"), attemptStampOrUnknown(c.ObservedAt), sourceLabel)
 	for _, r := range c.Rows {
 		label := r.Label
 		if r.Kind != "worker" {
 			label = uiEngineText(label)
 		}
-		if r.Calls > 0 && r.MissingUsage >= r.Calls {
+		if r.Kind == "worker" && r.Tools == 0 && r.UnknownTools > 0 {
+			fmt.Fprintf(out, uiText("%s · %d tentatives enregistrées · appels d’outils non rapportés · %s\n"), label, r.Calls, uiEngineText(r.Cost.Text()))
+		} else if r.Calls > 0 && r.MissingUsage >= r.Calls {
 			fmt.Fprintf(out, uiText("%s · %d tentatives ou appels enregistrés · %d appels d’outils observés · jetons non rapportés · %s\n"), label, r.Calls, r.Tools, uiEngineText(r.Cost.Text()))
 		} else {
 			fmt.Fprintf(out, uiText("%s · %d tentatives ou appels enregistrés · %d appels d’outils observés · %d mesures d’outils incomplètes · %d/%d jetons entrée/sortie rapportés · %d usages absents · %s\n"), label, r.Calls, r.Tools, r.UnknownTools, r.Input, r.Output, r.MissingUsage, uiEngineText(r.Cost.Text()))
+		}
+		if r.Kind == "worker" {
+			fmt.Fprintf(out, uiText("  Durée cumulée des processus : %s · %d durée(s) non rapportée(s)\n"), durationLabel(r.DurationMS), r.MissingDurations)
+			fmt.Fprintf(out, uiText("  %d revue(s) enregistrée(s) pour cette tâche · %d reprise(s) pour cette tâche\n"), r.Reviews, r.TaskRetries)
 		}
 	}
 	fmt.Fprintf(out, uiText("Moteur : %d contrôles enregistrés · %d reprises d’agents\n"), c.Controls, c.Retries)
 	fmt.Fprintln(out, uiText(c.Note))
 	printAttemptLedgers(out, c.Attempts)
+}
+
+// A known zero remains zero; absent, invalid or reversed timestamps remain unknown.
+func recordedProcessDuration(started, ended string) *int64 {
+	start, err := time.Parse(time.RFC3339Nano, started)
+	if err != nil {
+		return nil
+	}
+	end, err := time.Parse(time.RFC3339Nano, ended)
+	if err != nil || end.Before(start) {
+		return nil
+	}
+	value := end.Sub(start).Milliseconds()
+	return &value
+}
+func durationLabel(value *int64) string {
+	if value == nil {
+		return uiText("non rapporté")
+	}
+	return fmt.Sprintf("%.3f s", float64(*value)/1000)
+}
+
+// attemptStampOrUnknown / attemptEndStampLabel (REQ-QW7): report an absent
+// timestamp as such instead of an empty or invented value; a running/queued
+// attempt without an end timestamp is "ongoing", not "unreported".
+func attemptStampOrUnknown(stamp string) string {
+	if stamp == "" {
+		return uiText("non rapporté")
+	}
+	return stamp
+}
+func attemptEndStampLabel(r AttemptLedger) string {
+	if r.Ended != "" {
+		return r.Ended
+	}
+	if r.ProcessState == "running" || r.ProcessState == "queued" {
+		return uiText("en cours")
+	}
+	return uiText("non rapporté")
 }
 func attemptProcessLabel(state string) string {
 	switch state {
@@ -683,7 +782,13 @@ func printAttemptLedgers(out io.Writer, rows []AttemptLedger) {
 			accepted = uiText("oui")
 		}
 		fmt.Fprintf(out, uiText("%s · agent %s · tentative %s · état du processus : %s · validation enregistrée de la tâche (toutes tentatives) : %s\n"), r.Label, r.Agent, r.Attempt, uiText(attemptProcessLabel(r.ProcessState)), accepted)
-		fmt.Fprintf(out, uiText("  %d départ enregistré · %d appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.\n"), r.Calls, r.Tools)
+		fmt.Fprintf(out, uiText("  Départ : %s · Fin : %s\n"), attemptStampOrUnknown(r.Started), attemptEndStampLabel(r))
+		fmt.Fprintf(out, uiText("  Durée du processus : %s\n"), durationLabel(r.DurationMS))
+		if r.Tools == 0 && !r.Measured {
+			fmt.Fprintln(out, uiText("  Appels d’outils non rapportés."))
+		} else {
+			fmt.Fprintf(out, uiText("  %d départ enregistré · %d appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.\n"), r.Calls, r.Tools)
+		}
 		if r.Measurement == "partial" {
 			fmt.Fprintln(out, uiText("  Mesure partielle : ces compteurs couvrent uniquement les événements reçus."))
 		}

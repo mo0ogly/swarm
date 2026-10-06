@@ -114,3 +114,23 @@ func TestMissionStatusKeepsExistingAttemptVisibleAfterPlanningFailure(t *testing
 		t.Fatal("presentation changed the planning diagnostic or attempt")
 	}
 }
+
+func TestClosedPlanningKeepsHistoricalFailureWithoutRequestingRecovery(t *testing.T) {
+	w := Work{Planning: &PlanningState{Failure: "old timeout", Paused: true, Scopes: []PlanningScope{{ID: "root", State: "closed"}}}}
+	d := MissionStatus{Total: 1, Validated: 1, Organization: Organization{Ready: true}, Tasks: []MissionTask{{ID: "done", State: "validated"}}}
+	d.Understanding = missionUnderstanding(d)
+	g := missionGuidance(w, d)
+	if g.Primary.Kind != "results" || g.What != d.Understanding.What {
+		t.Fatalf("historical failure became active: %+v", g)
+	}
+	if w.Planning.Failure != "old timeout" || !w.Planning.Paused {
+		t.Fatal("history mutated")
+	}
+	d.Validated = 0
+	d.Tasks[0].State = "intervention"
+	d.Tasks[0].Action = "inspect"
+	g = missionGuidance(w, d)
+	if g.Primary.Task != "done" {
+		t.Fatalf("current blocker hidden: %+v", g)
+	}
+}

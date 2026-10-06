@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "manifest_status": "documentation_candidate_unreviewed",
+  "identity": {
+    "mission": "w-58060a818f1fad5e9a3286b7",
+    "task": "T4",
+    "attempt": "a-00e9ec4294d638a5177a0e0e",
+    "producer": "auto-81668d4e6e34e6b6171c"
+  },
+  "candidate": {
+    "base_commit": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+    "worktree": "dirty",
+    "input_digest_algorithm": "sha256(sorted sha256sum lines)",
+    "input_digest": "4d7636bc2e096b361d1d64e7b5e391fa9ce293a5a766b356c0623ee81e08b32b",
+    "candidate_id": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed+sha256:4d7636bc2e096b361d1d64e7b5e391fa9ce293a5a766b356c0623ee81e08b32b",
+    "scope": "The explicit inputs below, excluding this self-referential manifest and the T4 handoff. This is a documentation candidate identity, not an engine gate."
+  },
+  "requirements": [
+    {
+      "id": "req-5",
+      "components": [
+        "common-candidate",
+        "deterministic-final-controls",
+        "bounded-review-coordination"
+      ],
+      "controls": [
+        "manifest-integrity",
+        "review-coordination-targeted",
+        "final-recipe-reserved"
+      ],
+      "evidence": [
+        "documentation-fr-en",
+        "review-coordination-contract",
+        "t2-t3-reports"
+      ]
+    },
+    {
+      "id": "req-6",
+      "components": [
+        "bilingual-retrospective",
+        "attribution-and-measurement",
+        "actual-versus-proposed"
+      ],
+      "controls": [
+        "manifest-integrity",
+        "documentation-parity"
+      ],
+      "evidence": [
+        "historical-timeout-diagnostic",
+        "historical-supervision-retrospective",
+        "engine-acceptance-fr-en"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "manifest-integrity",
+      "kind": "deterministic",
+      "command": "python3 -m json.tool docs/final-validation-coverage.json",
+      "task_t4_status": "pass",
+      "task_t4_evidence": "JSON, 23 paths including this control, individual SHA-256 values, aggregate digest, requirement coverage and bilingual retrospective assertions passed."
+    },
+    {
+      "id": "documentation-parity",
+      "kind": "deterministic",
+      "command": "targeted bilingual headings, historical values, attribution, path and hash assertions",
+      "task_t4_status": "pass",
+      "task_t4_evidence": "French and English documents contain 2 x 300 s, 974 tests, four test processes, about 234 s, subagent/process separation, independent reviewer and proposed-state markers."
+    },
+    {
+      "id": "review-coordination-targeted",
+      "kind": "deterministic",
+      "command": "go test . -run '^(TestReviewCoordination.*|TestCoordinated.*|TestCoordinationGitPaths|TestReviewCostAvailableWithoutBudgetAndWithoutMutation)$' -count=1 -timeout=180s",
+      "task_t4_status": "pass",
+      "task_t4_evidence": "Focused documentation contract run passed in 1.091 s; expanded coordination/execution/cost run passed in 27.238 s."
+    },
+    {
+      "id": "final-recipe-reserved",
+      "kind": "deterministic",
+      "command": "python3 tests/supervision_final_acceptance.py",
+      "task_t4_status": "not_run_reserved_for_final_engine_control",
+      "limits": "Four test processes are not subagents. A local run would not replace the engine receipt or independent review."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "documentation-fr-en",
+      "paths": [
+        "docs/FINAL-VALIDATION-COORDINATION.md",
+        "docs/en/FINAL-VALIDATION-COORDINATION.md"
+      ],
+      "status": "produced_by_T4"
+    },
+    {
+      "id": "review-coordination-contract",
+      "paths": [
+        "docs/REVIEW-COORDINATION.md",
+        "docs/en/REVIEW-COORDINATION.md",
+        "managed_review_coordination.go",
+        "managed_review_coordination_execution.go"
+      ],
+      "status": "existing_behavior"
+    },
+    {
+      "id": "t2-t3-reports",
+      "paths": [
+        "docs/T2.md",
+        "docs/T3.md"
+      ],
+      "status": "prior_task_evidence_not_rerun_by_T4"
+    },
+    {
+      "id": "historical-timeout-diagnostic",
+      "paths": [
+        "docs/plans/supervision-fiable/T5-diagnostic-superviseur.md"
+      ],
+      "status": "historical_context_corroborated_in_repository_not_rerun_by_T4"
+    },
+    {
+      "id": "historical-supervision-retrospective",
+      "paths": [
+        "docs/plans/supervision-fiable/RETEX-suivi.md"
+      ],
+      "status": "historical_context_corroborated_in_repository_not_rerun_by_T4"
+    },
+    {
+      "id": "engine-acceptance-fr-en",
+      "paths": [
+        "docs/ENGINE-ACCEPTANCE.md",
+        "docs/en/ENGINE-ACCEPTANCE.md"
+      ],
+      "status": "existing_behavior_documentation_protected_unchanged_by_T4"
+    }
+  ],
+  "responsibilities": {
+    "engine": "Validate identity, coverage, freshness, limits, gate and acceptance; the historical identical retry and recovery guard defect are attributed here.",
+    "provider": "Run configured model calls; no provider failure is proven by the two historical control timeouts.",
+    "agent": "Produce or analyze only its bounded assignment; the historical second producer changed the report but not the failing precondition.",
+    "supervisor": "Freeze the manifest, run deterministic controls once, diagnose changed preconditions, consolidate outputs and hand them to the independent reviewer.",
+    "independent_reviewer": "Inspect bounded groups and cross-group interactions on the same candidate; never replaced by producer self-checks."
+  },
+  "measurements": {
+    "historical_control_timeouts": {
+      "count": 2,
+      "wall_clock_seconds_each": 300,
+      "aggregate_cpu": "unknown",
+      "cost": "unknown",
+      "tokens": "unknown"
+    },
+    "historical_successful_final_recipe": {
+      "tests": 974,
+      "test_processes": 4,
+      "wall_clock_seconds_approx": 234,
+      "aggregate_cpu": "unknown",
+      "cost": "unknown",
+      "tokens": "unknown",
+      "task_t4_rerun": false
+    }
+  },
+  "inputs": [
+    {"path":"docs/FINAL-VALIDATION-COORDINATION.md","sha256":"9016e23a784ded7f461b61e102e136db4ac8cf418b1e8e41030266d0585bf869"},
+    {"path":"docs/en/FINAL-VALIDATION-COORDINATION.md","sha256":"69e9f711e147477209bee0519e5871e419753f2cdddfbab4887021e472c92a76"},
+    {"path":"docs/REVIEW-COORDINATION.md","sha256":"9f071674155871cdce64b0468b1edb7b4cf5a84adc5cde9a510c8456f94c25b7"},
+    {"path":"docs/en/REVIEW-COORDINATION.md","sha256":"90ae64c5bd05b14369b27e78c8c821e11a59376cee307c6d39b8a6127e715dfe"},
+    {"path":"managed_review_coordination.go","sha256":"56cf031fab9633d4117a5cc1a922d58edcb6ea88e0e0071a12fa0d680f381c2c"},
+    {"path":"managed_review_coordination_execution.go","sha256":"e886df01f778291e154ec6cc50dfa8ef53680ad71c5b8271d2b392c4d3982873"},
+    {"path":"managed_review_coordination_test.go","sha256":"26e15fe4f82655ee5c26bf44e9aecaca8fe3f13102cf3610efc4cb8e4ca87059"},
+    {"path":"managed_review_coordination_execution_test.go","sha256":"a162b4c625475b540504e1395d0e6bd51fcff1f3d825bd3127eb4757f0844cf4"},
+    {"path":"tests/supervision_final_acceptance.py","sha256":"34713b92e530d72b01fe57d9647b396bee51dc1f913c45ba66bc0a56bffbce4a"},
+    {"path":"tests/supervision_go_suite.py","sha256":"a7b45b4334a705390ce45c6e5dae568424b34018101eb9ebd7bbcf66b498ed40"},
+    {"path":"tests/validation_documentation_acceptance.py","sha256":"94489795b9468540368e476a10501637bc9ac7875375ab78942e1a800af00cab"},
+    {"path":"validation_policy_config.go","sha256":"c10c7e58c3b6996d1e730583d5cc5bac2830e25fedfb954c100ee24ce5ccebc9"},
+    {"path":"validation_recheck_test.go","sha256":"3325337060ecadf8d2f629d3768e06232ab6ab9ac755570d8188e3329782a258"},
+    {"path":"evidence_projection.go","sha256":"3db613d258b2c3bcf2dc22d7ad3bb8f56670c75ae716cb5838f2cd9ceebec4ff"},
+    {"path":"evidence_contract_test.go","sha256":"0029700487c2ab877c9f5f348702ce8d2174f61e3daf437ab05979573be96ba2"},
+    {"path":"web/evidence-contract.js","sha256":"30f755cb7386db088a5fcbec9c755f55baa57266992063b011f3204b0f01d9d7"},
+    {"path":"tests/t3_validation_ui.cjs","sha256":"1099cacf54810f1c1b3ae69058e0b51b0c82fe4fd9573d145a45465df5f62998"},
+    {"path":"docs/T2.md","sha256":"8da173acb407885a7c987ea04dced7497c5841c4e014c23775ede4d1a8ab5a46"},
+    {"path":"docs/T3.md","sha256":"b50005dbf97c0ce7f1486ed6d7a7a533d6f6fbf65595d26fce35b6c70ec2bf35"},
+    {"path":"docs/plans/supervision-fiable/T5-diagnostic-superviseur.md","sha256":"803acd8dd9effab43b26d69c0c6dfa1435d72d2fc65247a49ca3761d1c4b405a"},
+    {"path":"docs/plans/supervision-fiable/RETEX-suivi.md","sha256":"f796ee62ace653522dd20e1e33c246ac6a63dbf422da0aaa16e64599ca789285"},
+    {"path":"docs/ENGINE-ACCEPTANCE.md","sha256":"a43377f1f1ffe9f146467f4e63390a1c3cd587629a95256264f74357a7c653cd"},
+    {"path":"docs/en/ENGINE-ACCEPTANCE.md","sha256":"09600b74d323ba6f85a3ee36a7aa2f47a439dc0d7df876e39f2ce403b14ad089"}
+  ]
+}

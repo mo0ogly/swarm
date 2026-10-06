@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"unicode"
 	"unicode/utf8"
-
-	"github.com/tiktoken-go/tokenizer/codec"
 )
 
 // A versioned capacity calculation, not provider authorization. This contract
@@ -95,13 +93,12 @@ func (b managedReviewInputBudget) measure(prompt, schema string) (managedReviewI
 			}
 		}
 	}
-	// A fresh codec owns its regexp state. Vocabulary initialization is protected
-	// by the dependency's sync.Once; no mutable codec is shared across callers.
-	encoder := codec.NewO200kBase()
-	if out.PromptTokens, err = encoder.Count(prompt); err != nil {
+	// Reuse only exact content counts. Every call still checks the contract,
+	// byte/UTF-8/lexical limits and current token room above and below this cache.
+	if out.PromptTokens, err = reviewTokenCounts.count(prompt); err != nil {
 		return out, fmt.Errorf("comptage du message impossible : %w", err)
 	}
-	if out.SchemaTokens, err = encoder.Count(schema); err != nil {
+	if out.SchemaTokens, err = reviewTokenCounts.count(schema); err != nil {
 		return out, fmt.Errorf("comptage du schéma impossible : %w", err)
 	}
 	out.UTF8Bytes = len(prompt) + len(schema)

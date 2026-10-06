@@ -141,7 +141,7 @@ func (s *Store) independentReviewStep(work string) error {
 		if e != nil {
 			return e
 		}
-		controls, controlArtifacts, e := s.independentValidationEvidence(t)
+		controls, controlArtifacts, controlObservations, e := s.independentValidationReviewEvidence(t)
 		if e != nil {
 			// Deterministic checks must finish before a paid review is claimed.
 			continue
@@ -213,6 +213,9 @@ Retourne seulement {"reason":"synthèse française claire","criteria":[{"index":
 		quotationSources := string(data) + "\n\n" + controls
 		for _, document := range deliveryDocuments {
 			quotationSources += "\n\n" + document
+		}
+		for _, observation := range controlObservations {
+			quotationSources += "\n\n" + observation
 		}
 		prompt = workflowPrompt + independentReviewGuidance + prompt
 		if len(images) > 0 {

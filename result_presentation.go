@@ -229,6 +229,14 @@ func (s *Store) currentReviewPresentation(w *Work, t *Task, a *Agent, p *ResultP
 		return s.managedReviewPresentation(w, t, a, p)
 	}
 	r := t.IndependentReview
+	if w.Planning != nil && w.Planning.ReviewerRequired && r == nil && t.Status == "submitted" && a.Status == "completed" && currentTaskAttempt(t, a.Attempt) {
+		if _, _, err := s.independentValidationEvidence(t); err != nil {
+			p.State, p.Label, p.ValidationState = "review_blocked", "Preuves à renouveler", "failed_or_stale"
+			p.Reason = err.Error()
+			p.NextStep = "Renouveler les preuves et rejouer les contrôles préautorisés avant de demander la revue."
+			return true
+		}
+	}
 	if w.Planning == nil || r == nil || r.State == "passed" || !currentTaskAttempt(t, r.Attempt) || r.Attempt != a.Attempt || r.Producer != a.ID {
 		return false
 	}

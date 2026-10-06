@@ -219,15 +219,15 @@ func reviewStateLabel(state string) string {
 // refusedReviewEvidenceChanged permits a new explicit review only after a
 // successfully read, previously bound input changed. Missing files and unrelated
 // repository edits are not recovery evidence. It never authorizes acceptance.
-func (s *Store) refusedReviewEvidenceChanged(w *Work, t *Task) bool {
-	return s.boundReviewEvidenceChanged(w, t, "changes_requested") || s.boundReviewEvidenceChanged(w, t, "error")
+func (s *Store) refusedReviewEvidenceChanged(w *Work, t *Task, audit ...[]Event) bool {
+	return s.boundReviewEvidenceChanged(w, t, "changes_requested", audit...) || s.boundReviewEvidenceChanged(w, t, "error", audit...)
 }
 
 func (s *Store) acceptedReviewRevalidationAvailable(w *Work, t *Task) bool {
 	return t.Status == "accepted" && s.boundReviewEvidenceChanged(w, t, "passed")
 }
 
-func (s *Store) boundReviewEvidenceChanged(w *Work, t *Task, state string) bool {
+func (s *Store) boundReviewEvidenceChanged(w *Work, t *Task, state string, audit ...[]Event) bool {
 	r := t.IndependentReview
 	// A validation-policy change archives the previous verdict. A refused,
 	// completed result can still be explicitly reviewed after its bound proof
@@ -235,7 +235,11 @@ func (s *Store) boundReviewEvidenceChanged(w *Work, t *Task, state string) bool 
 	if r == nil && (state == "changes_requested" || state == "error") && t.Status == "blocked" && len(t.PreviousReviews) > 0 {
 		r = &t.PreviousReviews[len(t.PreviousReviews)-1]
 	}
-	if w.Planning == nil || w.Planning.Repository != nil || r == nil || r.State != state || r.Finished == "" || len(t.Attempts) == 0 || r.Attempt != t.Attempts[len(t.Attempts)-1].ID || t.Attempts[len(t.Attempts)-1].Status != "completed" || r.Contract != reviewContract(t) {
+	if w.Planning == nil || w.Planning.Repository != nil || r == nil || r.State != state || r.Finished == "" || len(t.Attempts) == 0 || r.Attempt != t.Attempts[len(t.Attempts)-1].ID || t.Attempts[len(t.Attempts)-1].Status != "completed" {
+		return false
+	}
+	contractChanged := r.Contract != reviewContract(t)
+	if contractChanged && !((state == "changes_requested" || state == "error") && t.Status == "blocked" && s.recordedContractRevisionMatches(w.ID, t, r.Contract, audit...)) {
 		return false
 	}
 	inputs := make(map[string]string, len(r.ReportArtifacts)+1)
@@ -245,7 +249,7 @@ func (s *Store) boundReviewEvidenceChanged(w *Work, t *Task, state string) bool 
 	if r.Report != "" && r.Digest != "" {
 		inputs[r.Report] = r.Digest
 	}
-	changed := false
+	changed := contractChanged
 	for name, digest := range inputs {
 		p, err := safeReport(s.root, name)
 		if err != nil || digest == "" {
@@ -266,6 +270,10 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 	if len(r.Reason) < 8 || len(r.Reason) > 2000 {
 		return Work{}, fmt.Errorf("décrire la correction avant une nouvelle vérification (8 à 2000 caractères)")
 	}
+	audit, auditErr := s.events(work)
+	if auditErr != nil {
+		return Work{}, auditErr
+	}
 	raw, _ := json.Marshal(r)
 	managedProducer := ""
 	preflight, preflightErr := s.prepareManagedPreflightRetry(work, r.Task)
@@ -281,7 +289,14 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			return e
 		}
 		v := t.IndependentReview
-		if v == nil && s.refusedReviewEvidenceChanged(w, t) {
+		if v == nil && cfg.Failure != "" && r.ConfirmReviewErrorRepair {
+			if err := s.repairedImageReviewPreflight(w, t); err != nil {
+				return err
+			}
+			cfg.Failure = ""
+			return nil
+		}
+		if v == nil && s.refusedReviewEvidenceChanged(w, t, audit) {
 			v = &t.PreviousReviews[len(t.PreviousReviews)-1]
 		}
 		if cfg.Calls >= cfg.MaxCalls && !managedBatchesAllPassed(v) && !s.managedFragmentVerdictDurable(v) {
@@ -302,9 +317,9 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		}
 		// Use the same freshness check as the console. A completed favorable
 		// record can become stale without its persisted state changing.
-		derivedStale := (v != nil && v.State == "passed" && v.Finished != "" && s.independentReviewGuard(w, t) != nil) || s.refusedReviewEvidenceChanged(w, t)
+		derivedStale := (v != nil && v.State == "passed" && v.Finished != "" && s.independentReviewGuard(w, t) != nil) || s.refusedReviewEvidenceChanged(w, t, audit)
 		revalidating := s.acceptedReviewRevalidationAvailable(w, t)
-		if (t.Status != "submitted" && !revalidating && !(t.Status == "blocked" && (managed || s.refusedReviewEvidenceChanged(w, t)))) || v == nil || (v.State != "error" && v.State != "stale" && !derivedStale) {
+		if (t.Status != "submitted" && !revalidating && !(t.Status == "blocked" && (managed || s.refusedReviewEvidenceChanged(w, t, audit)))) || v == nil || (v.State != "error" && v.State != "stale" && !derivedStale) {
 			return fmt.Errorf("seule une vérification interrompue ou périmée d’un résultat soumis peut être reprise")
 		}
 		if managed {
@@ -410,4 +425,35 @@ func archiveIndependentReview(t *Task) {
 		t.PreviousReviews = append(t.PreviousReviews, *t.IndependentReview)
 		t.IndependentReview = nil
 	}
+}
+
+// A contract amendment may only resume a refused completed result. The durable
+// operator event proves the explicit old-to-new contract transition; it never
+// makes an old favorable verdict valid under a different contract.
+func (s *Store) recordedContractRevisionMatches(work string, t *Task, prior string, audit ...[]Event) bool {
+	var events []Event
+	if len(audit) > 0 {
+		events = audit[0]
+	} else {
+		var err error
+		events, err = s.events(work)
+		if err != nil {
+			return false
+		}
+	}
+	for i := len(events) - 1; i >= 0; i-- {
+		if events[i].Kind != "task.update" {
+			continue
+		}
+		var request Request
+		if json.Unmarshal(events[i].Payload, &request) != nil || request.ID != t.ID || !request.ConfirmContractRevision || request.ExpectedContract != prior || len(strings.TrimSpace(request.ContractRevisionReason)) < 16 {
+			continue
+		}
+		reconstructed := *t
+		reconstructed.Criteria = request.Criteria
+		if reviewContract(&reconstructed) == reviewContract(t) {
+			return true
+		}
+	}
+	return false
 }

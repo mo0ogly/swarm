@@ -235,7 +235,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	}
 	if version < 18 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v18-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v18-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -245,7 +245,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	}
 	if version < 19 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v19-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v19-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -255,7 +255,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	}
 	if version < 20 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v20-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v20-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -269,7 +269,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	// freshness guards, not migration, decide whether an old verdict applies.
 	if version < 21 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v21-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v21-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -281,7 +281,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	// A v21 process must not erase these fields by rewriting an agent body.
 	if version < 22 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v22-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v22-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -292,7 +292,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	// v23 adds run_limits_config/run_limits_history (see run_limits_admin.go).
 	if version < 23 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v23-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v23-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -300,10 +300,68 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	if version < 24 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v24-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(graphDraftMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 25 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v25-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(automationRequestMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 26 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v26-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(automationScheduleMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 27 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v27-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(automationExternalMigration); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
 	return s, nil
+}
+
+// SQLite otherwise creates VACUUM INTO destinations with the process umask,
+// which may expose a migration snapshot containing credentials or mission data.
+func migrationBackup(db *sql.DB, path string) error {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	if err = file.Close(); err != nil {
+		_ = os.Remove(path)
+		return err
+	}
+	if _, err = db.Exec("VACUUM INTO ?", path); err != nil {
+		_ = os.Remove(path)
+		return err
+	}
+	return nil
 }
 
 // Les réglages d'autonomie s'ajoutent à une table existante : selon la version
@@ -496,7 +554,16 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 			return w, e
 		}
 		if w.Planning != nil && r.editsDefinition() {
-			return w, fmt.Errorf("contrat hiérarchique immuable ; créer une tâche de correction via le responsable")
+			if kind != "task.update" {
+				return w, fmt.Errorf("réviser explicitement le contrat via task update avant remise")
+			}
+			var paused bool
+			if e = tx.QueryRow("SELECT paused FROM cockpit_controls WHERE work_id=?", id).Scan(&paused); e != nil || !paused {
+				return w, fmt.Errorf("révision de contrat : mission doit être en pause publique")
+			}
+			if e = validateHierarchicalContractRevision(&w, r); e != nil {
+				return w, e
+			}
 		}
 		if r.Status == "running" {
 			if e = preparationLaunchGuard(tx, id, r.ID); e != nil {
@@ -522,7 +589,7 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 	if e = fn(&w); e != nil {
 		return w, e
 	}
-	planningValidationSignals(&w, beforePlanning, event)
+	s.planningValidationSignals(&w, beforePlanning, kind, event)
 	if e = validatePlanningState(&w); e != nil {
 		return w, e
 	}
@@ -648,6 +715,7 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 		if r.Status == "running" && t.Status != "running" {
 			t.Attempts = append(t.Attempts, Attempt{ID: newID("a-"), Status: "recorded", Started: now()})
 			t.Gate = nil
+			t.EvidenceStaleReason = ""
 			// Une correction est une nouvelle production : la décision et la
 			// preuve de la tentative précédente restent dans leur reçu, mais ne
 			// doivent plus apparaître comme la validation courante de la tâche.
@@ -658,6 +726,7 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 				t.Revalidation = &Revalidation{PreviousArtifacts: t.Gate.Evaluation.Artifacts, Config: t.Gate.Evaluation.ConfigDigest}
 			}
 			t.Gate = nil
+			t.EvidenceStaleReason = ""
 			t.Override = nil
 		}
 		t.Status = r.Status

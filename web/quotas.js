@@ -6,6 +6,7 @@ const Quotas={
   if(!p){notice(trQuotas('Cette mission ne dispose pas de planification hiérarchique.'),true);return}
   openModal(trQuotas('Plafonds de planification et de vérification'),trQuotas('Les consommations sont conservées. Cette modification ne lance aucun agent et ne valide aucun résultat. Une mission active pourra utiliser le nouveau plafond au prochain passage du conducteur.'),{action:'quotas',hasReviewer:!!p.reviewer});
   const box=node('section',undefined,'notice info field-wide');box.append(node('p',trQuotas('Consommés ou engagés : ')+p.activations+' / '+p.max_activations+' · '+trQuotas('Décisions')+' '+p.decisions+' / '+p.max_decisions+' · '+trQuotas('Vérifications')+' '+(p.reviewer?p.reviewer.calls+' / '+p.reviewer.max_calls:trQuotas('Non configuré'))));
+  for(const [label,used,max] of [['Activations de planification',p.activations,p.max_activations],['Décisions',p.decisions,p.max_decisions],...(p.reviewer?[['Appels du vérificateur',p.reviewer.calls,p.reviewer.max_calls]]:[])])box.append(node('p',trQuotas(label)+' · '+trQuotas('Restant : ')+Math.max(0,max-used)));
   if(p.quota_authorization){const a=p.quota_authorization;box.append(node('p',a.actor+' · '+a.at+' · '+a.reason))}
   box.append(node('p',trQuotas('Les plafonds propres aux sous-planificateurs restent inchangés. Les tentatives de production se réautorisent depuis leur tâche, avec une consigne corrective.')));
   for(const s of p.scopes||[])if(s.max_activations)box.append(node('p',s.id+' : '+s.activations+' / '+s.max_activations));$('modal-fields').append(box);

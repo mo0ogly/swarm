@@ -55,8 +55,36 @@ func TestVersionCLIIsStableAndDoesNotOpenStorage(t *testing.T) {
 		t.Fatalf("--version resolved an invalid root: %d %q", code, stderr.String())
 	}
 	want := "Swarm v1.2.3 (commit " + commit + "; modified=false; built=2026-10-02T16:00:00Z; provenance=injected)\n"
-	if out.String() != want {
-		t.Fatalf("text output=%q want=%q", out.String(), want)
+	if !strings.HasPrefix(out.String(), want) || !strings.Contains(out.String(), "CLI installée : v1.2.3 · "+commit) || !strings.Contains(out.String(), "Serveur actif : inconnue") || !strings.Contains(out.String(), "État : unknown") {
+		t.Fatalf("text output=%q", out.String())
+	}
+}
+
+func TestVersionDiagnosticDistinguishesThreeValuesAndMissingValue(t *testing.T) {
+	commit := func(r byte) *string { value := strings.Repeat(string(r), 40); return &value }
+	observed := func(r byte) VersionObservation {
+		return VersionObservation{Available: true, Commit: commit(r), Provenance: "test"}
+	}
+	diagnostic := compareVersions(observed('a'), observed('b'), observed('c'))
+	if diagnostic.State != versionStateDivergent || len(diagnostic.Differences) != 3 {
+		t.Fatalf("three distinct values not diagnosed: %+v", diagnostic)
+	}
+	text := versionDiagnosticText(diagnostic)
+	for _, expected := range []string{"CLI installée : " + strings.Repeat("a", 40), "Serveur actif : " + strings.Repeat("b", 40), "Candidat : " + strings.Repeat("c", 40), "État : divergent", "Divergence : installed_cli / active_server"} {
+		if !strings.Contains(text, expected) {
+			t.Fatalf("public CLI rendering misses %q in %q", expected, text)
+		}
+	}
+	if diagnostic.Differences[0] != (VersionDifference{Left: "installed_cli", Right: "active_server"}) {
+		t.Fatalf("divergent elements not named: %+v", diagnostic.Differences)
+	}
+	missing := compareVersions(observed('a'), VersionObservation{Available: false}, observed('a'))
+	if missing.State != versionStateUnknown || len(missing.Differences) != 0 || !strings.Contains(missing.NextStep, "active_server") || !strings.Contains(missing.NextStep, "--server") {
+		t.Fatalf("missing value was not actionable unknown: %+v", missing)
+	}
+	equal := compareVersions(observed('a'), observed('a'), observed('a'))
+	if equal.State != versionStateIdentical || len(equal.Differences) != 0 {
+		t.Fatalf("equal values not diagnosed: %+v", equal)
 	}
 }
 
@@ -108,10 +136,17 @@ func TestReleaseBuildRequiresCompleteIdentity(t *testing.T) {
 	}
 }
 
-func TestEmbeddedVersionHistoryIsEmptyUntilAReleaseIsVerified(t *testing.T) {
+func TestEmbeddedVersionHistoryMatchesPublishedReleaseManifest(t *testing.T) {
 	history := loadVersionHistory()
-	if history.Schema != 1 || !history.Available || history.Releases == nil || len(history.Releases) != 0 {
+	if history.Schema != 1 || !history.Available || history.Releases == nil {
 		t.Fatalf("unexpected embedded history: %+v", history)
+	}
+	seen := map[string]bool{}
+	for _, release := range history.Releases {
+		if err := validateVersionRelease(release, seen); err != nil {
+			t.Fatalf("invalid embedded release: %v", err)
+		}
+		seen[release.Version] = true
 	}
 }
 

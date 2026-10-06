@@ -1,0 +1,8 @@
+{
+  "head": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+  "dirty": true,
+  "binary": "/tmp/swarm-qw7-candidate",
+  "binary_sha256": "a93d41f50c662bc9c17bc8b23e7094051e0d511f3ad34fb0f855b952b60aa768",
+  "full_suite": "PASS 408.945s; completed before final translation-only addition. Final targeted and frontend rerun after addition.",
+  "fixture": "synthetic telemetry in isolated SQLite; actual CLI HTTP and cockpit; not real provider"
+}

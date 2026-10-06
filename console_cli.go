@@ -29,6 +29,8 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return ""
 	}
 	switch pos[0] {
+	case "plan":
+		return s.graphDraftCLI(pos, input, output, out)
 	case "workspace":
 		switch arg(1) {
 		case "status":
@@ -202,6 +204,35 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		}
 		return s.console(arg(1), os.Stdin, out, asJSON)
 	case "providers":
+		if arg(1) == "relay" {
+			if len(pos) != 4 {
+				return fmt.Errorf("providers relay show|decide <agent> [--input décision.json]")
+			}
+			switch arg(2) {
+			case "show":
+				v, e := s.providerRelayView(arg(3))
+				if e != nil {
+					return e
+				}
+				return printJSON(out, v)
+			case "decide":
+				b, e := readInput(input)
+				if e != nil {
+					return e
+				}
+				var request ProviderRelayRequest
+				if e = strict(b, &request); e != nil {
+					return e
+				}
+				v, e := s.decideProviderRelay(arg(3), request)
+				if e != nil {
+					return e
+				}
+				return printJSON(out, v)
+			default:
+				return fmt.Errorf("providers relay show|decide <agent>")
+			}
+		}
 		if arg(1) == "cooldown" {
 			if len(pos) != 4 {
 				return fmt.Errorf("providers cooldown show|clear <fournisseur> [--input demande.json]")

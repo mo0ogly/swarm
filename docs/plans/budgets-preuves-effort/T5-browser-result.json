@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "fixture": "isolated synthetic telemetry, real Go CLI/HTTP and cockpit; no real provider execution claimed",
+  "observations": [
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "task_duration_ms": 150000,
+      "tools": 11,
+      "reviews": 2,
+      "retries": 1,
+      "missing_duration": null,
+      "missing_tools": "unreported",
+      "missing_cost": "unreported",
+      "opened_by_keyboard": true,
+      "escape_focus": "spending"
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "task_duration_ms": 150000,
+      "tools": 11,
+      "reviews": 2,
+      "retries": 1,
+      "missing_duration": null,
+      "missing_tools": "unreported",
+      "missing_cost": "unreported",
+      "opened_by_keyboard": true,
+      "escape_focus": "spending"
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "task_duration_ms": 150000,
+      "tools": 11,
+      "reviews": 2,
+      "retries": 1,
+      "missing_duration": null,
+      "missing_tools": "unreported",
+      "missing_cost": "unreported",
+      "opened_by_keyboard": true,
+      "escape_focus": "spending"
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "task_duration_ms": 150000,
+      "tools": 11,
+      "reviews": 2,
+      "retries": 1,
+      "missing_duration": null,
+      "missing_tools": "unreported",
+      "missing_cost": "unreported",
+      "opened_by_keyboard": true,
+      "escape_focus": "spending"
+    }
+  ],
+  "history_preserved": true,
+  "console_errors": []
+}

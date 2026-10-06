@@ -265,6 +265,9 @@ func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prom
 	}
 	defer os.RemoveAll(dir)
 	if filepath.Base(p.Command) == "codex" {
+		if err = codexReviewImageArgs(&p, dir, images); err != nil {
+			return "", err
+		}
 		schemaPath := filepath.Join(dir, "planning-schema.json")
 		if err = os.WriteFile(schemaPath, []byte(schema), 0600); err != nil {
 			return "", err

@@ -195,6 +195,18 @@ retries and validation conditions remain visible before confirmation.
 Start with the **Agent management** summary: what is happening, the next step and
 who acts. Then use the graph or list.
 
+When you select a task, the panel keeps the displayed attempt identity stable while
+the snapshot updates. It separates declared role, process state, received activity,
+and task validation: a finished process or log entry is never acceptance. Requested
+and provider-reported models remain separate. If the provider reports no usage
+amount, cost remains **unknown**; it is neither replaced with zero nor confused with
+tool calls or tokens.
+
+A dependency, task contract, validation policy, or tested-candidate change makes
+the affected evidence stale while preserving its historical receipts. A display or
+administrative change may reuse evidence only when the relevant-input digest is
+unchanged. Zoom, orientation, filters, and selection do not change business state.
+
 - Dependency arrows go from prerequisite to dependent task. Their verdict includes
   the freshness of evidence.
 - Responsibility links connect roles to scopes. Read their legend; do not rely on
@@ -213,6 +225,17 @@ optional; without it, not all raw provider output is retained.
 ### Read the graph and inspect a task
 
 Arrows point from the prerequisite to the dependent task. These tasks have not started; they do not demonstrate accepted results.
+
+Use **Edit dependencies** to open the draft inside the product graph. Choose
+add or remove, then activate the prerequisite and dependent task with the mouse,
+Enter, or Space. **Undo** and **Redo** change only the draft. **Preview** asks
+the engine for its verdict; **Apply explicitly** is the only action that changes
+the mission. Undoing every change disables the preview. Previously saved
+proposals remain in the history; redoing a change saves a new proposal that
+requires a new preview. The minimap and hidden task/link counts preserve context across
+filters, collapsed branches, and zoom. After a conflict, keep the proposed
+operations, reload and recreate the draft on the current revision, then preview
+it again.
 
 ![Tasks and dependency arrows](../screenshots/en/agents-horizontal.png)
 
@@ -501,3 +524,69 @@ The CLI uses the same policy: set `review_output: true` in a control passed to `
 ### What independent review does
 
 The reviewer uses a separate session to assess criteria, the report, executed controls and attached evidence. In a tool-free review, it does not rerun tests: it assesses coverage and consistency of the supplied evidence. Producer and supervisor observations retain their attribution. An earlier testing limitation can be supplemented by later dated observations; it is not erased. Exit code 0 is insufficient when a control does not cover the criterion. Missing evidence stays unknown, with a specific explanation. A favorable review and task acceptance are separate steps.
+
+### Final validation and recovery
+
+See [Engine acceptance](ENGINE-ACCEPTANCE.md#rechecking-a-completed-result-after-a-correction) for complete-suite coverage, explicit rechecking of an existing result, and the proposed validation supervisor. A control timeout does not justify a new worker by itself.
+
+### Prepare dependencies without launching a task
+
+The engine stores a durable graph draft separately from graph presentation. An
+authenticated client records `add_dependency` or `remove_dependency` operations
+with `POST /api/v1/graph-drafts`, then analyzes them with
+`POST /api/v1/graph-drafts/preview`. Preview changes neither the mission nor its
+attempts or evidence, and explicitly reports that `apply_plan` is still required.
+
+Explicit application uses `POST /api/v1/graph-drafts/apply` with the
+`preview_token`, `content_digest`, expected business revision, and a stable
+`event_id`. Replaying the same event and content returns the original result;
+different content, a concurrent revision, revoked permission, an active task, a
+cycle, or an unknown endpoint is rejected without a partial effect. Read a draft
+with `GET /api/v1/graph-drafts?work=WORK&draft=DRAFT`. Applying a draft never
+launches an agent. These routes are product integration points, not a way around
+web session controls.
+
+In the cockpit, open **Agent coordination**, then **Edit dependencies**. The
+properties panel calls these routes directly, reports affected tasks and states
+that no start is implicit. Closing it restores focus to its trigger. Orientation,
+detail level, colored roles, groups, folding, and existing coordination actions
+remain available while preparing the draft.
+
+The CLI uses the same business service and storage:
+
+```bash
+swarm plan draft import WORK --input proposal.json --json
+swarm plan draft show WORK DRAFT --json
+swarm plan draft export WORK DRAFT --output draft.json --json
+swarm plan draft compare WORK DRAFT --json
+swarm plan draft preview WORK --input preview.json --json
+swarm plan draft apply WORK --input apply.json --json
+swarm plan draft undo WORK DRAFT --input previous-edit.json --json
+swarm plan draft redo WORK DRAFT --input next-edit.json --json
+```
+
+Import and export files are limited to 64 KiB and strictly validated. `compare`
+shows dependencies before and after, affected tasks, and the preview token.
+`undo` and `redo` save a new draft edit: they never remove an applied revision or
+change an attempt. To reverse an applied effect, create a new inverse proposal,
+then preview and apply it under current guards. Detailed help is available with
+`swarm --lang en help drafts` or `swarm aide brouillons`.
+# Programs and automation
+
+The cockpit provides a **Programs** view separate from the coordination graph. A program always targets an existing, pre-authorized mission: it requests a resume, does not create a new mission, and a processed occurrence never means that the mission is validated.
+
+In the web UI, enter the name, target, IANA timezone and schedule, then choose **Preview without effect**. Creation is only available with that current preview and always produces a disabled program. Enable it explicitly afterwards; the engine then revalidates authorization, budgets and limits. **Pause** prevents future occurrences, **Archive** is final, and an occurrence can only be cancelled while it is still pending with no claim or effect.
+
+The CLI uses the same business service:
+
+```text
+swarm automation list
+swarm automation show PROGRAM
+swarm automation preview --input program.json
+swarm automation create --input creation.json
+swarm automation enable|pause|archive PROGRAM --input revision.json
+swarm automation cancel OCCURRENCE --input revision.json
+swarm automation params show|apply [--input settings.json]
+```
+
+`create` receives `{ "schedule": <previewed document>, "preview_token": "..." }`. Transitions and cancellations receive `expected_revision` and reject conflicts without overwriting. The view separately shows program state, occurrence, request, mission validation, authorization, profile, limits and actually reported costs. A missing provider value remains **unknown**, never zero. Operational settings are versioned in the local root; changing them raises no budget and changes no already-started attempt.

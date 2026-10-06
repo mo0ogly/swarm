@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -462,5 +463,51 @@ func TestManualLaunchPreservesExplicitCommonInstruction(t *testing.T) {
 	task, _ := current.task(r.TaskID)
 	if current.Profile.Instruction != "Shared project instruction" || task.Profile.Instruction != "Task one only" || !strings.Contains(a.Prompt, "Task one only") || strings.Count(a.Prompt, "Shared project instruction") != 1 {
 		t.Fatal("common/local instruction boundary lost")
+	}
+}
+
+func TestManualTaskLimitDoesNotReplaceMissionLimit(t *testing.T) {
+	for _, explicit := range []bool{false, true} {
+		t.Run(fmt.Sprint(explicit), func(t *testing.T) {
+			s := storeTest(t)
+			w, r := setupAgent(t, s)
+			profile := LaunchProfile{Provider: r.Provider, Workspace: s.root, Role: "worker", Timeout: 600}
+			if explicit {
+				profile.Limits = &RunLimits{MaxToolCalls: 60}
+			}
+			if err := s.setProfile(w.ID, "", profile, -1); err != nil {
+				t.Fatal(err)
+			}
+			w, _ = s.get(w.ID)
+			r.Revision = w.Revision
+			r.Timeout = 90
+			r.Limits = &RunLimits{MaxToolCalls: 12}
+			a, _, err := s.prepare(w.ID, r)
+			if err != nil {
+				t.Fatal(err)
+			}
+			current, _ := s.get(w.ID)
+			task, _ := current.task(r.TaskID)
+			if current.Profile.Timeout != 600 || (explicit && (current.Profile.Limits == nil || current.Profile.Limits.MaxToolCalls != 60)) || (!explicit && current.Profile.Limits != nil) {
+				t.Fatalf("task limit leaked: %+v", current.Profile)
+			}
+			if task.Profile.Limits == nil || task.Profile.Limits.MaxToolCalls != 12 || a.Limits.MaxToolCalls != 12 {
+				t.Fatal("local cap lost")
+			}
+		})
+	}
+}
+
+func TestFirstTaskLaunchDoesNotSeedMissionCeilings(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	r.Limits = &RunLimits{MaxToolCalls: 12}
+	r.Timeout = 90
+	if _, _, err := s.prepare(w.ID, r); err != nil {
+		t.Fatal(err)
+	}
+	current, _ := s.get(w.ID)
+	if current.Profile == nil || current.Profile.Limits != nil || current.Profile.Timeout != 0 {
+		t.Fatalf("local ceilings seeded mission: %+v", current.Profile)
 	}
 }

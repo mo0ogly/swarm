@@ -1,0 +1,169 @@
+{
+  "observed_at": "2026-10-04T10:20:44.435790644Z",
+  "measurement_source": "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events",
+  "rows": [
+    {
+      "kind": "planner",
+      "id": "root",
+      "label": "Responsable : root",
+      "recorded_calls": 7,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 10,
+      "output_tokens": 18704,
+      "calls_without_usage": 2,
+      "cost": {
+        "reported_usd": 0.6194144,
+        "attempts_with_cost": 5,
+        "attempts_without_cost": 2
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "reviewer",
+      "id": "reviewer",
+      "label": "Vérificateur indépendant",
+      "recorded_calls": 16,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 54,
+      "output_tokens": 225541,
+      "calls_without_usage": 2,
+      "cost": {
+        "reported_usd": 4.458726599999999,
+        "attempts_with_cost": 14,
+        "attempts_without_cost": 2
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T1",
+      "label": "Inspection ciblée et contrats",
+      "recorded_calls": 1,
+      "observed_tool_calls": 9,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 18,
+      "output_tokens": 18153,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0.7008699999999999,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      },
+      "reviews_recorded": 2,
+      "task_retries": 0,
+      "recorded_process_ms": 227263,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T2",
+      "label": "QW5 — Régler la limite qui bloque",
+      "recorded_calls": 2,
+      "observed_tool_calls": 65,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 12,
+      "output_tokens": 11644,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.4133056,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 5,
+      "task_retries": 1,
+      "recorded_process_ms": 766062,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T3",
+      "label": "QW6 — État actuel et historique",
+      "recorded_calls": 2,
+      "observed_tool_calls": 23,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 24,
+      "output_tokens": 16447,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.7033048,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 6,
+      "task_retries": 1,
+      "recorded_process_ms": 364823,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T4",
+      "label": "QW8 — Vérifier le dossier avant la revue",
+      "recorded_calls": 2,
+      "observed_tool_calls": 62,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 32,
+      "output_tokens": 10187,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.5456905999999999,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 1,
+      "task_retries": 1,
+      "recorded_process_ms": 1074899,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T5",
+      "label": "QW7 — Voir l’effort par tâche",
+      "recorded_calls": 2,
+      "observed_tool_calls": 67,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 12,
+      "output_tokens": 5807,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.3136046,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 1,
+      "task_retries": 1,
+      "recorded_process_ms": 558122,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T6",
+      "label": "Recette globale et RETEX avant/après",
+      "recorded_calls": 2,
+      "observed_tool_calls": 30,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 20,
+      "output_tokens": 11822,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.6492668,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 0,
+      "task_retries": 1,
+      "recorded_process_ms": 486591,
+      "attempts_without_duration": 0
+    }
+  ],
+  "recorded_control_executions": 26,
+  "worker_retries": 5,
+  "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur."
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "checks": [
+    "closed planning with retained failure",
+    "current error visible",
+    "history keyboard open close focus",
+    "FR EN both themes"
+  ],
+  "console_errors": [],
+  "failed_requests": []
+}

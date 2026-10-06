@@ -1,0 +1,21 @@
+{
+  "status": "PARTIAL",
+  "mode": "browser fixture; server socket unavailable",
+  "root": "/tmp/swarm-version-ui-1okpOS",
+  "binary": "/tmp/swarm-r1-recovery-candidate",
+  "checks": [
+    "cockpit fr/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "cockpit fr/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "cockpit en/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "cockpit en/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare fr/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare fr/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare en/etat: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "prepare en/sombre: binary version+commit, empty history, safe link, keyboard/Escape/focus",
+    "loading state before delayed fixture runtime-health response",
+    "explicit unavailable state on HTTP 503",
+    "missing installed CLI remains unknown with actionable guidance"
+  ],
+  "errors": [],
+  "failed": []
+}

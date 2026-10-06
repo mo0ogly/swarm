@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -32,23 +33,29 @@ type EvidenceReportReview struct {
 }
 
 type EvidenceControls struct {
-	State string            `json:"state"`
-	Items []EvidenceControl `json:"items"`
+	State   string            `json:"state"`
+	Items   []EvidenceControl `json:"items"`
+	History []EvidenceControl `json:"history"`
+	Longest []EvidenceControl `json:"longest_measured"`
 }
 
 type EvidenceControl struct {
-	ID           string   `json:"id"`
-	Attempt      string   `json:"attempt_id"`
-	Execution    string   `json:"execution"`
-	Revision     string   `json:"revision"`
-	CandidateSHA string   `json:"candidate_sha"`
-	Command      []string `json:"command"`
-	ExitCode     *int     `json:"exit_code"`
-	Started      string   `json:"started_at"`
-	Finished     string   `json:"finished_at"`
-	Freshness    string   `json:"freshness"`
-	Result       string   `json:"result"`
-	Limits       []string `json:"limits"`
+	ID             string   `json:"id"`
+	Attempt        string   `json:"attempt_id"`
+	Execution      string   `json:"execution"`
+	Revision       string   `json:"revision"`
+	CandidateSHA   string   `json:"candidate_sha"`
+	Command        []string `json:"command"`
+	ExitCode       *int     `json:"exit_code"`
+	Started        string   `json:"started_at"`
+	Finished       string   `json:"finished_at"`
+	WallDurationMS *int64   `json:"wall_duration_ms"`
+	CPUDurationMS  *int64   `json:"cpu_duration_ms"`
+	Cost           string   `json:"cost"`
+	Tokens         string   `json:"tokens"`
+	Freshness      string   `json:"freshness"`
+	Result         string   `json:"result"`
+	Limits         []string `json:"limits"`
 }
 
 type EvidenceAcceptance struct {
@@ -62,7 +69,7 @@ func unknownEvidenceControl(id, freshness string) EvidenceControl {
 		id = "unknown"
 	}
 	return EvidenceControl{ID: id, Attempt: "unknown", Execution: "unknown", Revision: "unknown", CandidateSHA: "unknown", Command: []string{}, ExitCode: nil,
-		Started: "unknown", Finished: "unknown", Freshness: freshness, Result: "unknown",
+		Started: "unknown", Finished: "unknown", WallDurationMS: nil, CPUDurationMS: nil, Cost: "unknown", Tokens: "unknown", Freshness: freshness, Result: "unknown",
 		Limits: []string{"Aucun reçu d’exécution moteur : une citation du rapport ou un statut de gate ne démontre ni la commande ni son code de sortie."}}
 }
 
@@ -99,7 +106,7 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 	attempt := latestAttemptID(t)
 	e := TaskEvidence{Attempt: attempt, Revision: w.Revision, Freshness: "unknown", ObservedAt: "unknown",
 		ReportReview: EvidenceReportReview{State: "not_configured", Attempt: attempt, Reviewer: "unknown", At: "unknown", Limits: []string{"Aucune revue indépendante du rapport n’est configurée."}},
-		Controls:     EvidenceControls{State: "unknown", Items: []EvidenceControl{}},
+		Controls:     EvidenceControls{State: "unknown", Items: []EvidenceControl{}, History: []EvidenceControl{}, Longest: []EvidenceControl{}},
 		Acceptance:   EvidenceAcceptance{State: "not_accepted", Revision: "unknown", At: "unknown"},
 		Limits:       []string{"Les valeurs unknown ne constituent pas un succès."}}
 
@@ -189,7 +196,7 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 				testedRevision = strconv.Itoa(a.Revision)
 			}
 			e.Controls.Items = append(e.Controls.Items, EvidenceControl{ID: r.ID, Attempt: valueOrUnknown(a.Attempt), Execution: execution, Revision: testedRevision, CandidateSHA: valueOrUnknown(a.CandidateSHA), Command: command,
-				ExitCode: exitCode, Started: valueOrUnknown(r.Started), Finished: valueOrUnknown(r.Finished), Freshness: freshness, Result: result,
+				ExitCode: exitCode, Started: valueOrUnknown(r.Started), Finished: valueOrUnknown(r.Finished), WallDurationMS: r.WallDurationMS, CPUDurationMS: r.CPUDurationMS, Cost: "unknown", Tokens: "unknown", Freshness: freshness, Result: result,
 				Limits: []string{fmt.Sprintf("Sortie non exposée ; seule son empreinte SHA-256 est conservée. Plafond %d octets.", maxValidationOutput)}})
 		}
 		// Aggregate independently of item order: a failure is never masked by a
@@ -221,6 +228,14 @@ func (s *Store) taskEvidence(w *Work, t *Task, acceptedFresh bool) TaskEvidence 
 	} else {
 		e.Controls.Items = append(e.Controls.Items, unknownEvidenceControl("unknown", "unknown"))
 	}
+	e.Controls.History = s.validationControlHistory(w.ID, t, a)
+	measured := append(append([]EvidenceControl{}, e.Controls.Items...), e.Controls.History...)
+	measured = slicesDeleteUnmeasured(measured)
+	sort.SliceStable(measured, func(i, j int) bool { return *measured[i].WallDurationMS > *measured[j].WallDurationMS })
+	if len(measured) > 5 {
+		measured = measured[:5]
+	}
+	e.Controls.Longest = measured
 
 	switch {
 	case t.Status == "accepted" && acceptedFresh:
@@ -245,21 +260,89 @@ func valueOrUnknown(value string) string {
 	return value
 }
 
+func slicesDeleteUnmeasured(items []EvidenceControl) []EvidenceControl {
+	out := items[:0]
+	for _, item := range items {
+		if item.WallDurationMS != nil {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
+// validationControlHistory projects immutable prior receipts. It never turns an
+// event into a current verdict and filters by attempts owned by the selected task.
+func (s *Store) validationControlHistory(work string, t *Task, current *AutomaticValidation) []EvidenceControl {
+	attempts := map[string]bool{}
+	for _, attempt := range t.Attempts {
+		attempts[attempt.ID] = true
+	}
+	// No receipt can belong to a task without an attempt. Avoid rescanning
+	// the work's event history for every unstarted card in a large graph.
+	if len(attempts) == 0 {
+		return []EvidenceControl{}
+	}
+	rows, err := s.db.Query("SELECT payload FROM events WHERE work_id=? AND kind='task.auto-validation' ORDER BY revision DESC", work)
+	if err != nil {
+		return []EvidenceControl{}
+	}
+	defer rows.Close()
+	history := []EvidenceControl{}
+	seen := map[string]bool{}
+	for rows.Next() {
+		var raw []byte
+		var receipt AutomaticValidation
+		if rows.Scan(&raw) != nil || json.Unmarshal(raw, &receipt) != nil || !attempts[receipt.Attempt] || (current != nil && receipt.Receipt == current.Receipt) || seen[receipt.Receipt] {
+			continue
+		}
+		seen[receipt.Receipt] = true
+		for _, result := range receipt.Controls {
+			state, execution := "failed", "not_executed"
+			if result.Executed {
+				execution = "executed"
+				if result.Passed {
+					state = "passed"
+				}
+			} else if result.Started == "" {
+				state, execution = "unknown", "unknown"
+			}
+			exit := result.ExitCode
+			history = append(history, EvidenceControl{ID: result.ID, Attempt: valueOrUnknown(receipt.Attempt), Execution: execution, Revision: strconv.Itoa(receipt.Revision), CandidateSHA: valueOrUnknown(receipt.CandidateSHA), Command: append([]string(nil), result.Command...), ExitCode: &exit, Started: valueOrUnknown(result.Started), Finished: valueOrUnknown(result.Finished), WallDurationMS: result.WallDurationMS, CPUDurationMS: result.CPUDurationMS, Cost: "unknown", Tokens: "unknown", Freshness: "historical", Result: state, Limits: []string{"Reçu historique conservé ; il ne constitue pas le verdict actuel."}})
+		}
+	}
+	return history
+}
+
 func evidenceText(e TaskEvidence) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, uiText("PREUVES STRUCTURÉES — tentative : %s · révision lue : %d · fraîcheur : %s\n"), e.Attempt, e.Revision, e.Freshness)
 	fmt.Fprintf(&b, uiText("Revue du rapport : %s · date : %s (ne vaut ni exécution de contrôle ni acceptation)\n"), e.ReportReview.State, e.ReportReview.At)
+	fmt.Fprintf(&b, uiText("Verdict actuel — contrôles : %s · acceptation : %s\n"), e.Controls.State, e.Acceptance.State)
 	for _, c := range e.Controls.Items {
-		command, exit := "unknown", "unknown"
+		command, exit, wall, cpu := "unknown", "unknown", "unknown", "unknown"
 		if len(c.Command) > 0 {
 			command = strings.Join(c.Command, " ")
 		}
 		if c.ExitCode != nil {
 			exit = strconv.Itoa(*c.ExitCode)
 		}
-		fmt.Fprintf(&b, uiText("Contrôle %s : tentative=%s · exécution=%s · révision=%s · sha_candidat=%s · commande=%s · code de sortie=%s · début=%s · fin=%s · fraîcheur=%s\n"), c.ID, c.Attempt, c.Execution, c.Revision, c.CandidateSHA, command, exit, c.Started, c.Finished, c.Freshness)
+		if c.WallDurationMS != nil {
+			wall = fmt.Sprintf("%d ms", *c.WallDurationMS)
+		}
+		if c.CPUDurationMS != nil {
+			cpu = fmt.Sprintf("%d ms", *c.CPUDurationMS)
+		}
+		fmt.Fprintf(&b, uiText("Contrôle %s : tentative=%s · résultat=%s · exécution=%s · révision=%s · sha_candidat=%s · commande=%s · code de sortie=%s · début=%s · fin=%s · durée murale=%s · CPU mesuré=%s · coût=%s · tokens=%s · fraîcheur=%s\n"), c.ID, c.Attempt, c.Result, c.Execution, c.Revision, c.CandidateSHA, command, exit, c.Started, c.Finished, wall, cpu, c.Cost, c.Tokens, c.Freshness)
 	}
 	fmt.Fprintf(&b, uiText("Acceptation : %s · révision : %s · date : %s\n"), e.Acceptance.State, e.Acceptance.Revision, e.Acceptance.At)
+	fmt.Fprintln(&b, uiText("Historique des contrôles (les échecs restent conservés) :"))
+	for _, c := range e.Controls.History {
+		fmt.Fprintf(&b, "- %s · %s · %s\n", c.Attempt, c.ID, c.Result)
+	}
+	fmt.Fprintln(&b, uiText("Top cinq des contrôles les plus longs (durées murales mesurées uniquement) :"))
+	for _, c := range e.Controls.Longest {
+		fmt.Fprintf(&b, "- %s · %s · %d ms\n", c.Attempt, c.ID, *c.WallDurationMS)
+	}
 	for _, limit := range append(append([]string{}, e.ReportReview.Limits...), e.Limits...) {
 		fmt.Fprintf(&b, uiText("Limite : %s\n"), uiEngineText(limit))
 	}

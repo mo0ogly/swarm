@@ -386,7 +386,7 @@ func evaluateWithDigests(raw []byte, root, phase string, digests map[string]stri
 	return out, nil
 }
 func (s *Store) validGate(t *Task) bool {
-	if t.Gate == nil || !t.Gate.Evaluation.Ship || requiredPlanChecks(t, t.Gate.Document) != nil {
+	if t.Gate == nil || t.EvidenceStaleReason != "" || !t.Gate.Evaluation.Ship || requiredPlanChecks(t, t.Gate.Document) != nil {
 		return false
 	}
 	ev, e := evaluateWithDigests(t.Gate.Document, s.root, "delivery", s.readDigests)

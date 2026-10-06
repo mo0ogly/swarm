@@ -129,6 +129,7 @@ func (w *outputSink) Write(p []byte) (int, error) {
 	n := len(p)
 	if w.guard != nil && n > 0 {
 		w.guard.lastOutput = time.Now()
+		w.guard.outputSeen = true
 	}
 	// Provider activity is updated in memory; supervisor persists it on heartbeat.
 	for len(p) > 0 {
@@ -249,6 +250,12 @@ func (w *outputSink) current() string {
 	}
 	if w.guard != nil && w.guard.calls > 0 {
 		return fmt.Sprintf("%d appels · %d résultats · dernier outil : %s", w.guard.calls, w.guard.completed, w.guard.lastTool)
+	}
+	if w.guard != nil {
+		output, _, _ := w.guard.monitoring(time.Now())
+		if output == "silent" {
+			return "Silence fournisseur observé ; vitalité indéterminée ; attente bornée par la durée totale"
+		}
 	}
 	return w.activity
 }
@@ -427,6 +434,15 @@ func (s *Store) supervise(id string) error {
 			_ = syscall.Kill(-a.Child, syscall.SIGKILL)
 			if err := sink.flush(); err != nil {
 				e = err
+			}
+			if !stopping {
+				// A persisted operator stop wins the stop/result race. Process exit
+				// still supplies the effective-end proof used below.
+				if desiredNow, desiredErr := s.desired(id); desiredErr == nil && desiredNow == "stop" {
+					stopping = true
+					reason = "Arrêt demandé par opérateur"
+					a.StopKind = "operateur"
+				}
 			}
 			if !stopping {
 				if limitReason := sink.guardReason(); limitReason != "" {

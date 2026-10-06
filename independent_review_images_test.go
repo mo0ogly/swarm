@@ -98,7 +98,7 @@ func TestStructuredReviewImagesContainsActualBytesAndNoTools(t *testing.T) {
 	if !strings.Contains(args, "--tools||--safe-mode") || !strings.Contains(args, "--input-format|stream-json") || strings.Contains(args, "--resume") || strings.Contains(args, "skip-permissions") {
 		t.Fatal("unsafe review arguments", args)
 	}
-	if _, err = structuredReviewInput(&Provider{Command: "/usr/bin/codex"}, "p", []reviewImage{{}}); err == nil {
+	if _, err = structuredReviewInput(&Provider{Command: "/usr/bin/unsupported"}, "p", []reviewImage{{}}); err == nil {
 		t.Fatal("unsupported provider silently loses images")
 	}
 	prompt, err := structuredReviewInput(&p, "unchanged text", nil)

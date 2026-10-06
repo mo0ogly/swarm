@@ -8,6 +8,29 @@ import (
 	"fmt"
 )
 
+// independentValidationReviewEvidence keeps the persisted receipt as the
+// canonical control evidence and exposes only complete, policy-authorized
+// observations as literal quotation sources. Callers must use the returned
+// values together: the observations inherit the attempt, policy and artifact
+// checks performed by independentValidationEvidence.
+func (s *Store) independentValidationReviewEvidence(t *Task) (string, map[string]string, []string, error) {
+	controls, artifacts, err := s.independentValidationEvidence(t)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	var observations []string
+	if t.ValidationPolicy == nil || t.AutoValidation == nil {
+		return controls, artifacts, observations, nil
+	}
+	for i, result := range t.AutoValidation.Controls {
+		control := t.ValidationPolicy.Controls[i]
+		if control.ReviewOutput && !result.ReviewOutputTruncated && result.ReviewOutput != "" {
+			observations = append(observations, result.ReviewOutput)
+		}
+	}
+	return controls, artifacts, observations, nil
+}
+
 // Only persisted engine executions are evidence; imported gate results and
 // prose claims never become execution receipts. Failed/stale checks retain the
 // task without spending a review call.

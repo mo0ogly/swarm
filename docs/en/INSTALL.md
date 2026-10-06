@@ -168,6 +168,69 @@ Never change `PRAGMA user_version` to force a database to open. Back up all of
 `.swarm/`, not only `state.db`: reports, workspaces and configuration also matter.
 Automatic backups from some migrations do not replace a complete backup.
 
+### Verifiable backup and rollback
+
+Take the backup after stopping missions and agents, then stop the server or
+container. A mission export does not replace the complete backup: it omits part
+of the configuration, authentication and workspaces. This native example keeps
+all of `.swarm/` without copying a live SQLite database:
+
+```sh
+install -d -m 700 /srv/backups/swarm-before-upgrade
+tar -C /path/to/project -cpf \
+  /srv/backups/swarm-before-upgrade/project-swarm.tar .swarm
+tar -C "$HOME/.local/share/swarm" -cpf \
+  /srv/backups/swarm-before-upgrade/agents.tar agents
+sha256sum /srv/backups/swarm-before-upgrade/*.tar > \
+  /srv/backups/swarm-before-upgrade/SHA256SUMS
+```
+
+Adapt the second path to `SWARM_AGENT_HOME` in `deploy/install.env`. Run
+`sha256sum -c`, keep the archives outside the project, and only then upgrade.
+After installing the new binary, with no old server still active:
+
+```sh
+swarm --root /path/to/project init
+swarm --root /path/to/project --json work list
+swarm --root /path/to/project --json automation list
+swarm --root /path/to/project --json version
+```
+
+A v26 to v27 migration also creates a private
+`.swarm/state-pre-v27-*.db` copy. That automatic file excludes the rest of the
+project state and does not replace the complete archive above. An inspection
+command rejects old storage with `storage_upgrade_required` instead of silently
+migrating it.
+
+For rollback, stop the new server and all its agents. Preserve the failed state
+under another name, restore the complete archive, agent home and binary that
+belong to the same snapshot, then verify hashes before restart. Never change
+`PRAGMA user_version`, and never run an old binary against already migrated data.
+
+### Compatible mission archives
+
+These commands use the public archive format; they are not a full backup:
+
+```sh
+swarm --root /path/to/project export WORK_ID --output mission.zip
+swarm --root /other/project import --input mission.zip
+swarm --root /other/project --json automation list
+```
+
+Import refuses to overwrite an existing mission and keeps evidence under
+`.swarm/imports/`. Imported programs remain disabled: review their target,
+schedule, limits and provider before explicitly enabling them. Archive format 1
+(mission without automation state) and format 2 (automation included) are
+accepted by this candidate; unknown, altered or unsafe-path archives are rejected.
+
+### Documented-candidate screenshots
+
+D01 screenshots of the graph, conflicts/journal and programs are
+[listed with hashes in the D02 dossier](../D02-dossier.md#reused-captures).
+They cover French/English and State/dark themes on the October 6, 2026 candidate.
+D02 reuses them by hash: it does not claim a new browser run or a qualified real
+provider.
+
 ## First mission: from requirements to launch
 
 1. Open the link printed by the server, then choose **Prepare a project**.
@@ -413,3 +476,7 @@ As of October 2, 2026, the full Go suite and targeted race tests pass in the fix
 checkout. The mission server now runs this fix. A real Codex worker confirmed the path
 with `go env GOCACHE` and built the candidate without manually adding this
 setting. The fix has not been published yet.
+
+### D02 candidate screenshots
+
+The fresh October 6 recipe binds the product candidate to [light graph](../screenshots/graph-delivery-d02/en-etat-graph.png), [dark graph](../screenshots/graph-delivery-d02/en-sombre-graph.png), [light programs](../screenshots/graph-delivery-d02/en-etat-programs.png) and [dark programs](../screenshots/graph-delivery-d02/en-sombre-programs.png). These are isolated journeys with no real provider, following migration and rollback checks. See the [D02 dossier](../D02-dossier.md#captures-d02-fraîches--6-octobre-2026).

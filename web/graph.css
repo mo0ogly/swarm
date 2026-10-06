@@ -65,3 +65,17 @@
 .graph-responsibility[data-agent-role="subplanner"] text[data-role-line="1"]{font-weight:700}
 /* Keep keyboard focus visible above semantic state and selection borders. */
 .graph-noeud[role=button]:focus-visible .graph-cadre{stroke:var(--wattson-lien);stroke-width:4;stroke-dasharray:4 2}
+.graph-noeud[data-draft-editing=true]{cursor:crosshair}
+.graph-noeud[data-draft-source=true] .graph-cadre{stroke:var(--wattson-info-encre);stroke-width:5;stroke-dasharray:8 3}
+.graph-noeud[data-draft-target=true] .graph-cadre{stroke:var(--wattson-accent);stroke-width:5}
+.graph-minimap{position:sticky;left:12px;bottom:12px;width:180px;height:110px;padding:4px;background:var(--wattson-carte);border:1px solid var(--wattson-ligne);border-radius:8px;box-shadow:0 2px 8px color-mix(in srgb,var(--wattson-titre) 16%,transparent)}
+.graph-minimap-edge{fill:none;stroke:var(--wattson-libelle);stroke-width:8;vector-effect:non-scaling-stroke}
+.graph-minimap-node{fill:var(--wattson-info-fond);stroke:var(--wattson-info-encre);stroke-width:5;vector-effect:non-scaling-stroke}
+.graph-draft-panel{padding:16px;border:1px solid var(--wattson-info-encre);border-top:0;background:var(--wattson-info-fond);color:var(--wattson-info-encre)}
+.graph-draft-panel[hidden]{display:none}
+.graph-draft-heading,.graph-draft-controls,.graph-draft-fields{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.graph-draft-heading{justify-content:space-between;align-items:center}.graph-draft-heading h4{margin:0;color:inherit}
+.graph-draft-fields label{display:flex;flex:1 1 220px;flex-direction:column;gap:5px;font-size:12px;font-weight:600}
+.graph-draft-fields select{min-height:40px;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne)}
+.graph-draft-controls{margin-top:12px}.graph-draft-status{font-weight:600}.graph-draft-error{display:flex;gap:12px;align-items:center}.graph-draft-error[hidden]{display:none}
+.graph-draft-panel ol{margin-bottom:0}.graph-draft-panel button:focus-visible,.graph-draft-panel select:focus-visible{outline:2px solid var(--wattson-lien);outline-offset:2px}
