@@ -31,6 +31,10 @@ n'a aucune catégorie pour l'orchestrateur lui-même :
 Une unité peut recevoir une classe principale et, au plus, une classe aggravante (exemple :
 environnement, aggravée par le moteur).
 
+À part la cause, chaque unité reçoit un résultat : arrêt correct (la faute n'a produit aucun
+effet faux) ou non. *Amendement du 6 octobre 2026 :* ce résultat remplace la classe « faute
+injectée correctement arrêtée » du § 6.9, qui mêlait cause et résultat.
+
 ### 7.3 Corpus
 
 - **Source.** Un lot S séparé de la campagne principale, dont les racines sont conservées
