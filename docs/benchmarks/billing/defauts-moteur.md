@@ -16,6 +16,7 @@ Le banc ne modifie pas le code Go. Chaque défaut est contourné ou mesuré tel 
 | D3 | Indisponibilité d'un service traitée comme un échec métier | I6 | haute : régénère le livrable | mesuré : F5, impayés sans absorption |
 | D4 | Aucune reprise automatique après arrêt brutal (code 137) | aucun (choix de sûreté) | faible : la décision revient au responsable | contourné : le responsable scripté émet `retry` |
 | D5 | SQLITE_BUSY non réessayé à l'application d'une décision | I1 (disponibilité) | moyenne : échec durable sur un verrou transitoire | mesuré : ERREUR possibles sous F4e |
+| D6 | Couverture des exigences vérifiée à la clôture, pas avant l'effet | I3 (étendue) | haute avec un responsable réel : effet possible sur un candidat non contrôlé | non exercé : responsable scripté ; prévu sous F12 |
 
 ## D1 — Validation jamais reprise en espace de travail propre
 
@@ -93,3 +94,20 @@ exclusion dans les autres cas.
 
 **Piste.** Réessayer SQLITE_BUSY avec attente bornée dans la boucle d'application et dans le
 vérificateur indépendant, comme les autres chemins.
+
+## D6 — Couverture des exigences vérifiée à la clôture, pas avant l'effet
+
+**Constaté à la lecture du code (6 octobre 2026), non observé en exécution.** La clôture d'un
+périmètre refuse une exigence sans tâche acceptée à preuve fraîche (`planning.go:603-620`), et
+la création d'une tâche exige au moins une exigence possédée (`planning.go:471-480`). Rien
+n'impose en revanche qu'une tâche à effet (le règlement) ne parte qu'après l'acceptation des
+tâches qui portent les contrôles du candidat : c'est au responsable de déclarer la dépendance.
+
+**Pourquoi c'est grave.** Avec un responsable réel, une erreur de planification (contrôle du
+lot rattaché à une autre tâche, dépendance oubliée) laisse partir le règlement sur un lot non
+contrôlé ; la clôture est refusée ensuite, le paiement déjà fait. Dans le banc, seul l'exécutant
+l'empêche (E3 : il ne paie que la remise acceptée de `prepare`).
+
+**Piste.** Permettre de déclarer, au niveau du travail et non du responsable, qu'une exigence
+doit être acceptée avant le départ de toute tâche portant une exigence donnée (par exemple
+`req-1` avant `req-2`), vérifié par le répartiteur.

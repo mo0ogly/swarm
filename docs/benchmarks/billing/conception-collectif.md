@@ -50,9 +50,12 @@ comme opérations.
    le règlement ne paie que la remise acceptée de `prepare` (E3, propriété de l'exécutant, pas du
    moteur). C'est le risque principal de l'étude : à mesurer (F12), en distinguant ce qu'arrête
    le moteur de ce qu'arrête l'exécutant.
-2. Une revue « pass » peut-elle faire accepter une tâche dont un contrôle échoue ? Les observations
-   (§ 4 de `observations.md`) montrent un blocage sur contrôle en échec ; à confirmer quand la
-   revue est un modèle.
+2. ~~Une revue « pass » peut-elle faire accepter une tâche dont un contrôle échoue ?~~
+   **Vérifié le 6 octobre 2026 : non.** La revue indépendante est une condition préalable
+   (`independentReviewGuard`, `automatic_validation.go:283`), puis chaque contrôle préautorisé est
+   exécuté et l'acceptation exige qu'ils réussissent tous (`automatic_validation.go:303-322`). Un
+   verdict favorable du vérificateur ne lève jamais un contrôle en échec. F11 teste ce point avec
+   un vérificateur réel : attendu, arrêt par le moteur.
 3. Où la consommation enregistrée (`record`) est-elle lisible : `state.db`, CLI, journal ?
 4. Le profil de lancement d'une tâche créée par le responsable peut-il être fixé par le banc avant
    son départ, sans course avec le répartiteur ?
