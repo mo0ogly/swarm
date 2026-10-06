@@ -84,6 +84,12 @@ devenu `planning.failure` durable (`planning_runner.go:183`).
 relais de remise (`conductor.go:33`, `:42`) et les échanges (`agent_exchange.go:216`) réessaient
 pourtant SQLITE_BUSY.
 
-**Piste.** Réessayer SQLITE_BUSY avec attente bornée dans la boucle d'application, comme les
-autres chemins. La répétition générale (6 exécutions F4e) n'a pas reproduit l'erreur ; la
-campagne complète donnera sa fréquence.
+**Seconde voie (campagne complète, 6 octobre 2026).** Le vérificateur indépendant échoue lui
+aussi sur SQLITE_BUSY : `planning.reviewer.failure` portant « database is locked (5)
+(SQLITE_BUSY) » (moteur : `independent_review_runtime.go`, chemin exact à localiser). À mi-campagne,
+toutes les exclusions de S sont sous F4e et sur ces deux voies : clé `none`, 8 ERREUR et
+1 DÉLAI sur 100 ; clé `attempt`, 5 ERREUR et 2 DÉLAI sur environ 60 exécutions faites. Aucune
+exclusion dans les autres cas.
+
+**Piste.** Réessayer SQLITE_BUSY avec attente bornée dans la boucle d'application et dans le
+vérificateur indépendant, comme les autres chemins.
