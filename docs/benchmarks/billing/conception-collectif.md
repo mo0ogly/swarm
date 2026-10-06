@@ -38,10 +38,18 @@ comme opérations.
 
 **À vérifier avant implémentation :**
 
-1. La clôture exige-t-elle que chaque exigence soit couverte par une tâche acceptée, ou seulement
-   possédée par un périmètre ? Un responsable qui omet `req-1` sur `prepare` ferait alors régler
-   un lot non contrôlé. C'est le risque principal de l'étude ; il doit être lu dans le code, puis
-   mesuré.
+1. ~~La clôture exige-t-elle que chaque exigence soit couverte par une tâche acceptée ?~~
+   **Vérifié le 6 octobre 2026 : oui.** La clôture refuse « exigence sans preuve » tant qu'une
+   exigence du périmètre n'est pas portée par une tâche acceptée à preuve fraîche
+   (`planning.go:603-620`), et la création d'une tâche exige au moins une exigence possédée par
+   le périmètre (`planning.go:471-480`). **Limite :** cette garantie porte sur la *clôture*, pas
+   sur l'*effet*. Le règlement paie quand sa tâche s'exécute, avant la clôture. Un responsable
+   qui donnerait `req-1` (contrôle du lot) à une autre tâche que celle qui produit le lot, ou qui
+   n'imposerait pas la dépendance de `settle` à `prepare`, pourrait faire partir le règlement sur
+   un lot non contrôlé ; la clôture serait refusée ensuite, le paiement déjà fait. Dans le banc,
+   le règlement ne paie que la remise acceptée de `prepare` (E3, propriété de l'exécutant, pas du
+   moteur). C'est le risque principal de l'étude : à mesurer (F12), en distinguant ce qu'arrête
+   le moteur de ce qu'arrête l'exécutant.
 2. Une revue « pass » peut-elle faire accepter une tâche dont un contrôle échoue ? Les observations
    (§ 4 de `observations.md`) montrent un blocage sur contrôle en échec ; à confirmer quand la
    revue est un modèle.
