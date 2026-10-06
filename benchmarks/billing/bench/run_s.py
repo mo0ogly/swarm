@@ -46,7 +46,7 @@ from pathlib import Path
 
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from bench import config, harness, markers, planner_fixture
+from bench import agent_real, config, harness, markers, planner_fixture
 
 SWARM = harness.SWARM_BIN
 ACTIVE = {"queued", "starting", "running", "stopping"}   # agents_store.go : activeAgent
@@ -274,8 +274,9 @@ class Swarm:
 
 
 def profile(root, provider):
+    timeout = config.REAL_PROFILE_TIMEOUT_S if provider == "banc-reel" else 120
     return {"provider": provider, "role": "worker", "workspace": str(root), "capture_output": True,
-            "timeout_seconds": 120}
+            "timeout_seconds": timeout}
 
 
 def root_scope(work):
@@ -393,13 +394,13 @@ def stall_and_take_over(sw, wid, faults, conductors, log):
                  holder_after_source=source if taken else None, woke_at=time.time())
 
 
-def watch(sw, wid, run_dir, fault, conductors, log):
+def watch(sw, wid, run_dir, fault, conductors, log, timeout=config.S_RUN_TIMEOUT_S):
     """Surveille jusqu'à `settle` acceptée et périmètre clos, au calme, ou au délai. Renvoie (travail, délai).
 
     Une panne d'infrastructure (infrastructure_fault) ou une clôture non obtenue au calme lève BenchError.
     """
     faults = run_dir / "faults"
-    deadline = time.monotonic() + config.S_RUN_TIMEOUT_S
+    deadline = time.monotonic() + timeout
     work, last, quiet_since, injected = None, None, None, False
     while time.monotonic() < deadline:
         if all(c.poll() is not None for c in conductors):
@@ -522,7 +523,8 @@ def outcome_of(work):
 
 def run(key_mode, fault, seed, binary=SWARM, real_agent=None):
     """`real_agent` : commande d'un agent réel pour la préparation (tâche 11), sinon préparateur scripté."""
-    if key_mode not in harness.KEY_MODES or fault not in harness.FAULTS:
+    allowed = harness.REAL_FAULTS["S"] if real_agent else harness.FAULTS
+    if key_mode not in harness.KEY_MODES or fault not in allowed:
         raise ValueError((key_mode, fault))
     started = time.monotonic()
     run_dir = harness.new_run_dir("banc-s-")
@@ -548,7 +550,9 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
     cleanup = {"errors": [], "reaped": []}
     api_options = {"lose_response_once": faults / "response-lost.json" if fault == "F1" else None,
                    "fail_snapshot": faults / "snapshot-503.json" if fault == "F5" else None,
-                   "token_file": token_file}
+                   "token_file": token_file,
+                   "inject_memo": faults / "memo-injected.json" if fault == "F9" else None,
+                   "request_log": bank / "requests.jsonl" if real_agent else None}
     log_path = run_dir / "conductor.log"
     try:
         with harness.Api(bank, **api_options) as api, open(log_path, "w") as log:
@@ -563,7 +567,7 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
                 if real_agent:
                     providers["banc-reel"] = {"command": sys.executable, "env_allow": ["HOME", "PATH"],
                                               "args": [harness.SCRIPTS["provider_real"], str(root), str(binary),
-                                                       api.url, "--", *real_agent]}
+                                                       api.url, str(faults), fault, "--", *real_agent]}
                 (root / ".swarm" / "providers.json").write_text(
                     json.dumps({"schema_version": 1, "providers": providers}))
                 w = setup_work(sw, run_dir, api.url, fault, "banc-reel" if real_agent else "banc-prepare")
@@ -576,7 +580,8 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
                 await_listening(conductors, log_path, run_dir)
                 if fault == "F2":
                     markers.mark(faults / "dual-launch.json", conductors=[c.pid for c in conductors])
-                work, timed_out = watch(sw, wid, run_dir, fault, conductors, log)
+                work, timed_out = watch(sw, wid, run_dir, fault, conductors, log,
+                                        config.REAL_S_RUN_TIMEOUT_S if real_agent else config.S_RUN_TIMEOUT_S)
                 agents = sw.agents(wid)
                 if fault in ("F4", "F4e"):
                     validation = prepare_validation_state(sw, wid)
@@ -596,6 +601,8 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
                           extra={"launches": len(agents), **summary, **settle_outcome(agents, fault),
                                  "agent_status": [a["status"] for a in agents], "conductors": len(conductors),
                                  "cleanup": cleanup, "real_agent": real_agent[0] if real_agent else None,
+                                 "real_usage": agent_real.read_usage(run_dir / "real-usage.jsonl"),
+                                 **({"requests": harness.read_jsonl(bank / "requests.jsonl")} if real_agent else {}),
                                  "order_proof": proof})
     if fault in ("F4", "F4e"):
         result["prepare_validation_state"] = validation

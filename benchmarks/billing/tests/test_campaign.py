@@ -146,6 +146,7 @@ class CampaignTest(unittest.TestCase):
         def one(c, k, f, s):
             if f == "F1":
                 gate.wait(5)
+                time.sleep(0.3)   # finir après l'interruption de F2, jamais avant : sinon publication normale
                 return record(c, k, f, s, "ERREUR")
             gate.set()
             raise KeyboardInterrupt

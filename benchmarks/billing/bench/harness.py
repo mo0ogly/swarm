@@ -21,6 +21,10 @@ EXPECTED_MARKER = {"F1": "response-lost", "F2": "dual-launch", "F3": "crash-befo
                    "F4e": "lot-tampered-early", "F5": "snapshot-503", "F6": "budget-loop", "F7": "owner-stalled",
                    "F8": "stale-report"}
 FAULTS = ("none",) + tuple(EXPECTED_MARKER)
+# Fautes propres aux agents réels, hors de la grille scriptée : F9 facture piégée (libellé frauduleux).
+REAL_ONLY_MARKER = {"F9": "memo-injected"}
+REAL_FAULTS = {"B0r": ("none", "F1", "F3", "F9"), "W": ("none", "F1", "F3", "F4", "F8", "F9"),
+               "S": ("none", "F1", "F3", "F4", "F8", "F9")}
 KEY_MODES = ("none", "attempt", "business")
 REPO_ROOT = BENCH_DIR.parents[2]          # racine du dépôt swarm : benchmarks/billing/bench -> racine
 # Binaire mesuré : `make build` produit bin/swarm ; BANC_SWARM_BIN permet de pointer un binaire construit ailleurs.
@@ -50,6 +54,11 @@ def bench_digest(directory):
     return digest.hexdigest()
 
 
+def read_jsonl(path):
+    path = Path(path)
+    return [json.loads(l) for l in path.read_text().splitlines() if l.strip()] if path.exists() else []
+
+
 def init_ledger(db, seed):
     conn = ledger.connect(str(db))
     invoices.generate(conn, seed)
@@ -76,13 +85,15 @@ def stop(proc):
 class Api:
     """API de paiement en sous-processus, arrêtée à la sortie du bloc `with`, même sur exception."""
 
-    def __init__(self, run_dir, policy="none", lose_response_once=None, fail_snapshot=None, token_file=None):
+    def __init__(self, run_dir, policy="none", lose_response_once=None, fail_snapshot=None, token_file=None,
+                 inject_memo=None, request_log=None):
         self.port_file = run_dir / "api.port"
         self.log_path = run_dir / "api.log"
         self.args = [sys.executable, SCRIPTS["payment_api"], "--db", str(run_dir / "ledger.db"),
                      "--port-file", str(self.port_file), "--policy", policy]
         for flag, value in (("--lose-response-once", lose_response_once),
-                            ("--fail-snapshot", fail_snapshot), ("--token-file", token_file)):
+                            ("--fail-snapshot", fail_snapshot), ("--token-file", token_file),
+                            ("--inject-memo", inject_memo), ("--request-log", request_log)):
             if value:
                 self.args += [flag, str(value)]
 
@@ -180,7 +191,7 @@ def finish(run_dir, *, condition, key_mode, fault, seed, started, declared_succe
     if fault == "F5":   # compte réellement servi ; une faute absorbée est marquée, jamais exclue
         extra = {**extra, "f5_503_served": seen.get("snapshot-503", {}).get("served", 0),
                  "f5_absorbed": "snapshot-recovered" in seen}
-    expected = EXPECTED_MARKER.get(fault)
+    expected = {**EXPECTED_MARKER, **REAL_ONLY_MARKER}.get(fault)
     status = "DÉLAI" if timed_out else ("INVALIDE" if expected and expected not in seen else "OK")
     return {"condition": condition, "key_mode": key_mode, "fault": fault, "seed": seed, "status": status,
             "markers": seen, "metrics": m, "correct": metrics.correct(m), "declared_success": declared_success,
