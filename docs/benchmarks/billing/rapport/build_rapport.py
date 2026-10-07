@@ -140,6 +140,22 @@ def answers(doc, runs, path):
     return final
 
 
+def rerun(doc, path):
+    runs, campaign = tables_reel.load(path)
+    doc.add_heading("2.6 Rejeu F8 après correction du banc", level=2)
+    note(doc, "La série F8 du lot initial est invalidée par un défaut du banc : l'outil d'écriture de l'agent refuse "
+              "d'écraser un fichier non lu, et le préparateur n'a pas d'outil de lecture ; le lot faussé restait en "
+              "place à la seconde tentative. Correction (amendement du 7 octobre 2026) : le lot précédent est retiré "
+              "avant chaque appel. Mêmes graines ; les deux séries sont publiées.")
+    provenance(doc, campaign, Path(path).name)
+    rows = [tables_reel.run_row(r) for r in runs]
+    table(doc, ["Faute", "Cond.", "Valides/k", "Correctes", "pass^k", "Faux succès", "Coût agent ($)", "Tours méd.",
+                "Durée méd. (s)"],
+          [[f, c, f"{s['valid']}/{s['k']}", s["correct"], "oui" if s["pass_k"] else "non", s["false_success"],
+            f"{s['cost_usd']:.3f}", s["median_turns"], s["median_duration_s"]]
+           for (c, f), s in tables_reel.ordered(tables_reel.scenarios(rows))])
+
+
 def appendix(doc, final):
     doc.add_heading("Annexe : réponses finales intégrales des agents B0-réel", level=1)
     for (f, s), a in sorted(final.items()):
@@ -184,6 +200,7 @@ def main(argv=None):
     p.add_argument("--scripted", required=True)
     p.add_argument("--real")
     p.add_argument("--responses", help="réponses des agents extraites par bench/reponses.py")
+    p.add_argument("--rerun", action="append", default=[], help="lot de rejeu après correction du banc")
     p.add_argument("--out", required=True)
     a = p.parse_args(argv)
     doc = styled(Document())
@@ -193,6 +210,8 @@ def main(argv=None):
     par.alignment = WD_ALIGN_PARAGRAPH.LEFT
     complete = scripted(doc, a.scripted)
     final = real(doc, a.real, a.responses) if a.real else None
+    for path in a.rerun:
+        rerun(doc, path)
     doc.add_heading("Limites", level=1)
     for text in ("Agents, responsable et revue scriptés dans la campagne principale : les résultats valent pour le "
                  "mécanisme, pas pour le comportement d'un modèle.",
