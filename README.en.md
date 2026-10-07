@@ -15,6 +15,8 @@ The [first experimental release](https://github.com/mo0ogly/swarm/releases/tag/v
 
 See the [release notes](docs/releases/v0.1.0.md), [automation programs guide](docs/en/AUTOMATION-PROGRAMS.md) and [blocked contract recovery](docs/en/CONTRACT-REVISION.md). Quotas of external provider sessions are not observed automatically.
 
+[Business prerequisites and control recovery](docs/en/ENGINE-BUSINESS-CONTROLS.md)
+
 ## First run
 
 1. Follow [installation](docs/en/INSTALL.md) and open the session link printed by the server.

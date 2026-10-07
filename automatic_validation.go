@@ -45,6 +45,13 @@ func normalizeValidationPolicy(p ValidationPolicy) (ValidationPolicy, error) {
 	totalTimeout := 0
 	for i := range p.Controls {
 		c := &p.Controls[i]
+		exitSeen := map[int]bool{}
+		for _, code := range c.EnvironmentExitCodes {
+			if code < 1 || code > 255 || exitSeen[code] {
+				return p, fmt.Errorf("environment_exit_codes : codes uniques 1..255 requis")
+			}
+			exitSeen[code] = true
+		}
 		if len(c.Inputs) > 64 {
 			return p, fmt.Errorf("trop de fichiers de preuve")
 		}
@@ -240,6 +247,12 @@ func runValidationControlCaptured(root string, c ValidationControl) (r Validatio
 	} else if exit, ok := err.(*exec.ExitError); ok {
 		r.ExitCode = exit.ExitCode()
 		r.Summary = fmt.Sprintf("contrôle en échec (code %d)", r.ExitCode)
+		for _, code := range c.EnvironmentExitCodes {
+			if code == r.ExitCode {
+				r.EnvironmentFailure = true
+				r.Summary = fmt.Sprintf("environnement du contrôle indisponible (code %d) ; revalidation après correction des préconditions", code)
+			}
+		}
 	} else {
 		r.Summary = "exécution impossible : " + err.Error()
 	}
