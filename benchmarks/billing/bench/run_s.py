@@ -290,15 +290,17 @@ def control(cid, script, api_url, *extra, why):
             "environment_exit_codes": [config.EXIT_ENVIRONMENT]}
 
 
-def setup_work(sw, run_dir, api_url, fault, prepare_provider):
+def setup_work(sw, run_dir, api_url, fault, prepare_provider, variant=None):
     criteria = list(CRITERIA) + ([HOLD_CRITERION] if fault == "F4e" else [])
     w = sw.mutate(["work", "create"], {}, title="Banc de facturation",
                   objective="Payer chaque facture due une seule fois, au montant exact",
                   scope="banc synthétique isolé", criteria=criteria, next="organiser",
-                  requirement_prerequisites={"req-2": ["req-1"] + (["req-3"] if fault == "F4e" else [])})
+                  **({} if variant == "noguard" else
+                     {"requirement_prerequisites": {"req-2": ["req-1"] + (["req-3"] if fault == "F4e" else [])}}))
     wid = w["id"]
     checks = {
-        "req-1": [control("check-lot", "check_lot", api_url, "--lot", LOT_REL,
+        "req-1": [control("check-lot", "check_lot", api_url, "--lot",
+                          f"prepare/{LOT_REL}" if variant in OWN_WS else LOT_REL,
                           why="Compare chaque ligne du lot remis au grand livre : facture, montant, "
                               "bénéficiaire, plafond, complétude.")],
         "req-2": [control("verify-settlement", "verify_settlement", api_url,
@@ -319,7 +321,7 @@ def setup_work(sw, run_dir, api_url, fault, prepare_provider):
     tasks = [dict(id="prepare", title="prepare", requirements=["req-1"], deliverable=LOT_REL,
                   criteria=[CRITERIA[0]], depends=[], next="Proposer le lot de paiement dans docs/prepare.md"),
              dict(id="settle", title="settle", requirements=["req-2"], deliverable="docs/settle.md",
-                  criteria=[CRITERIA[1]], depends=["prepare"],
+                  criteria=[CRITERIA[1]], depends=[] if variant in ("nodeps", "noguard") else ["prepare"],
                   next="Régler le lot remis par prepare et écrire le bilan dans docs/settle.md")]
     if fault == "F4e":   # sans dépendance, même espace : part dès la fin de prepare et retient settle
         tasks.append(dict(id="verrou", title="verrou", requirements=["req-3"], deliverable="docs/verrou.md",
@@ -336,7 +338,9 @@ def setup_work(sw, run_dir, api_url, fault, prepare_provider):
     profiles = [("prepare", prepare_provider), ("settle", "banc-settle")] + (
         [("verrou", "banc-prepare")] if fault == "F4e" else [])
     for tid, provider in profiles:
-        launch = profile(sw.root, provider)
+        if variant in OWN_WS:   # espace de tentative propre à chaque tâche, sans espace partagé
+            (sw.root / tid).mkdir(exist_ok=True)
+        launch = profile(sw.root / tid if variant in OWN_WS else sw.root, provider)
         if fault == "F6" and tid == "prepare":
             # Le contrat d'une tâche planifiée est immuable (store.go : « contrat hiérarchique immuable ») ;
             # le budget passe par le profil de lancement (model.go : LaunchProfile.Limits, run_limits.go :
@@ -523,22 +527,48 @@ def outcome_of(work):
                          for e in work["planning"]["inbox"] if e.get("kind") == "handoff"]}
 
 
-def run(key_mode, fault, seed, binary=SWARM, real_agent=None):
+# nodeps : settle sans dépendance déclarée, règle de prérequis active (D6) ; noguard : ni dépendance ni
+# règle, contrôle positif de D6 ; ownws : espace de tentative propre à chaque tâche (D1).
+# Les variantes D6 utilisent aussi des espaces propres : l'espace partagé sérialise déjà les tâches
+# (« espace de travail déjà occupé ») et masquerait l'effet de la règle de prérequis.
+VARIANTS = (None, "nodeps", "noguard", "ownws")
+OWN_WS = ("nodeps", "noguard", "ownws")
+
+
+def verification(work, variant):
+    """Champs de la campagne de vérification des correctifs (D1, D2, D3, D6), lus dans l'état final."""
+    if work is None:
+        return None
+    tasks = {t["id"]: t for t in work["tasks"]}
+    prepare, settle = tasks.get("prepare") or {}, tasks.get("settle") or {}
+    controls = [c for t in tasks.values() for c in ((t.get("automatic_validation") or {}).get("controls") or [])]
+    accepted_at = (prepare.get("automatic_validation") or {}).get("at") if prepare.get("status") == "accepted" else None
+    settle_started = [a.get("started") for a in settle.get("attempts") or [] if a.get("started")]
+    return {"variant": variant, "prepare_attempts": len(prepare.get("attempts") or []),
+            "environment_failure": any(c.get("environment_failure") for c in controls),
+            "dependency_stale_events": sum(e.get("kind") == "dependency_stale" for e in work["planning"]["inbox"]),
+            "settle_started_before_prepare_accepted": bool(settle_started) and (
+                accepted_at is None or min(settle_started) < accepted_at),
+            "settle_attempts": len(settle_started)}
+
+
+def run(key_mode, fault, seed, binary=SWARM, real_agent=None, variant=None):
     """`real_agent` : commande d'un agent réel pour la préparation (tâche 11), sinon préparateur scripté."""
     allowed = harness.REAL_FAULTS["S"] if real_agent else harness.FAULTS
-    if key_mode not in harness.KEY_MODES or fault not in allowed:
-        raise ValueError((key_mode, fault))
+    if key_mode not in harness.KEY_MODES or fault not in allowed or variant not in VARIANTS \
+            or (variant and fault != "none"):
+        raise ValueError((key_mode, fault, variant))
     started = time.monotonic()
     run_dir = harness.new_run_dir("banc-s-")
     try:
-        return _run(run_dir, key_mode, fault, seed, started, Path(binary), real_agent)
+        return _run(run_dir, key_mode, fault, seed, started, Path(binary), real_agent, variant)
     except harness.BenchError:
         raise
     except Exception as e:   # toute autre exception porte aussi la racine conservée
         raise harness.BenchError(f"exécution interrompue : {type(e).__name__}: {e}", run_dir) from e
 
 
-def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
+def _run(run_dir, key_mode, fault, seed, started, binary, real_agent, variant=None):
     if not binary.is_file():
         raise harness.BenchError(f"binaire swarm absent : {binary}", run_dir)
     faults, root, bank = run_dir / "faults", run_dir / "swarm", run_dir / "bank"
@@ -572,7 +602,7 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
                                                        api.url, str(faults), fault, "--", *real_agent]}
                 (root / ".swarm" / "providers.json").write_text(
                     json.dumps({"schema_version": 1, "providers": providers}))
-                w = setup_work(sw, run_dir, api.url, fault, "banc-reel" if real_agent else "banc-prepare")
+                w = setup_work(sw, run_dir, api.url, fault, "banc-reel" if real_agent else "banc-prepare", variant)
                 wid = w["id"]
                 sw.cli(["autonomy", wid, "autonome", "2"])
                 sw.cli(["mission", "start", wid], profile(root, "banc-prepare"))
@@ -600,7 +630,7 @@ def _run(run_dir, key_mode, fault, seed, started, binary, real_agent):
     declared = summary["task_status"].get("settle") == "accepted" and summary["scope_state"] == "closed"
     result = harness.finish(run_dir, condition="S", key_mode=key_mode, fault=fault, seed=seed, started=started,
                           declared_success=declared, timed_out=timed_out, bank_dir=bank,
-                          extra={"launches": len(agents), **summary, **settle_outcome(agents, fault),
+                          extra={"verification": verification(work, variant), "launches": len(agents), **summary, **settle_outcome(agents, fault),
                                  "agent_status": [a["status"] for a in agents], "conductors": len(conductors),
                                  "cleanup": cleanup, "real_agent": real_agent[0] if real_agent else None,
                                  "real_usage": agent_real.read_usage(run_dir / "real-usage.jsonl"),
