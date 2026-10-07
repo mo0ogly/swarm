@@ -19,7 +19,7 @@ from docx.shared import Pt, RGBColor
 
 BILLING = Path(__file__).resolve().parents[4] / "benchmarks" / "billing"
 sys.path.insert(0, str(BILLING))
-from bench import hypotheses, tables, tables_reel  # noqa: E402
+from bench import hypotheses, reponses, tables, tables_reel  # noqa: E402
 
 KEYS = ("none", "attempt", "business")
 FAULTS = ("none", "F1", "F2", "F3", "F4", "F4e", "F5", "F6", "F7", "F8")
@@ -126,7 +126,28 @@ def scripted(doc, path):
     return complete
 
 
-def real(doc, path):
+def answers(doc, runs, path):
+    doc.add_heading("2.5 Réponses finales des agents B0-réel (lecture a posteriori)", level=2)
+    note(doc, "Lecture ajoutée après observation (amendement du 6 octobre 2026 au soir). Elle complète la mesure "
+              "pré-enregistrée du succès déclaré (sortie normale de l'agent) sans la remplacer. Classes par règles "
+              "lexicales fixes (bench/reponses.py) ; textes intégraux en annexe.")
+    final = reponses.final_answers(path)
+    pre = {(r["fault"], r["seed"]): r for r in runs if r["condition"] == "B0r"}
+    table(doc, ["Faute", "Graine", "Payées", "Impayées", "Faux succès (pré-enregistré)", "Réponse finale (a posteriori)"],
+          [[f, s, (pre[(f, s)].get("metrics") or {}).get("payments"), (pre[(f, s)].get("metrics") or {}).get("unpaid"),
+            "oui" if pre[(f, s)].get("false_success") else "non", a["class"]]
+           for (f, s), a in sorted(final.items()) if (f, s) in pre])
+    return final
+
+
+def appendix(doc, final):
+    doc.add_heading("Annexe : réponses finales intégrales des agents B0-réel", level=1)
+    for (f, s), a in sorted(final.items()):
+        doc.add_paragraph(f"{f}, graine {s}, {a['call']} : {a['class']}", style="List Bullet")
+        note(doc, a["result"] or "(vide)")
+
+
+def real(doc, path, responses=None):
     runs, campaign = tables_reel.load(path)
     doc.add_heading("2. Lot à agents réels (exploratoire)", level=1)
     provenance(doc, campaign, Path(path).name)
@@ -155,12 +176,14 @@ def real(doc, path):
           [[x["condition"], x["fault"], x["seed"], x["status"], x["payments"], x["doubles"], x["wrong"], x["unpaid"],
             "oui" if x["false_success"] else "non", x["attacker_paid"], f"{x['cost_usd']:.3f}", x["turns"],
             x["duration_s"]] for x in sorted(rows, key=lambda x: (x["fault"], x["condition"], x["seed"]))], size=7)
+    return answers(doc, runs, responses) if responses else None
 
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--scripted", required=True)
     p.add_argument("--real")
+    p.add_argument("--responses", help="réponses des agents extraites par bench/reponses.py")
     p.add_argument("--out", required=True)
     a = p.parse_args(argv)
     doc = styled(Document())
@@ -169,8 +192,7 @@ def main(argv=None):
                             "de résultats ; données entièrement synthétiques.")
     par.alignment = WD_ALIGN_PARAGRAPH.LEFT
     complete = scripted(doc, a.scripted)
-    if a.real:
-        real(doc, a.real)
+    final = real(doc, a.real, a.responses) if a.real else None
     doc.add_heading("Limites", level=1)
     for text in ("Agents, responsable et revue scriptés dans la campagne principale : les résultats valent pour le "
                  "mécanisme, pas pour le comportement d'un modèle.",
@@ -178,6 +200,8 @@ def main(argv=None):
                  "Lot réel exploratoire : cinq essais par scénario, un modèle, un client.",
                  "H6 et l'attribution des blocages relèvent de l'étiquetage humain (section 7)."):
         doc.add_paragraph(text, style="List Bullet")
+    if final:
+        appendix(doc, final)
     if not complete:
         note(doc, "Campagne scriptée en cours au moment de la génération : chiffres provisoires.")
     doc.save(a.out)

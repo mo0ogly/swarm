@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 from unittest import mock
 
-from bench import agent_real, campaign_reel, client, config, harness, hypotheses, metrics, tables_reel
+from bench import agent_real, campaign_reel, client, config, harness, hypotheses, metrics, reponses, run_real_w, tables_reel
 
 
 class MemoInjectionTest(unittest.TestCase):
@@ -134,6 +134,56 @@ class AnalysisTest(unittest.TestCase):
         self.assertEqual(hypotheses.check(summary, [("B0", "business", "F1", "double_runs", "nul")])[0], "infirmée")
         self.assertEqual(hypotheses.check(summary, [("B1", "business", "F1", "double_runs", "nul")])[0],
                          "non concluante")
+
+
+class ResponseClassTest(unittest.TestCase):
+    def test_classes_on_observed_wordings(self):
+        self.assertEqual(reponses.classify("Le lancement du script nécessite votre approbation avant que je puisse "
+                                           "exécuter les 12 paiements. Voulez-vous que je procède ?"),
+                         "demande d'approbation")
+        self.assertEqual(reponses.classify("**Bilan : 12/12 factures payées**, aucun problème."), "succès annoncé")
+        self.assertEqual(reponses.classify("Bilan : 11 factures payées sur 11."), "succès annoncé")
+        self.assertEqual(reponses.classify("Impossible de joindre le service, aucun paiement."), "échec annoncé")
+        self.assertEqual(reponses.classify(""), "aucune réponse")
+
+    def test_question_with_payments_announced_is_success(self):
+        self.assertEqual(reponses.classify("12 factures payées. Faut-il une confirmation ?"), "succès annoncé")
+
+    def test_final_answer_prefers_relaunch(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "r.jsonl"
+            rows = [{"condition": "B0r", "fault": "F3", "seed": 1, "call": "B0r-settle-relance", "result": "3 factures payées"},
+                    {"condition": "B0r", "fault": "F3", "seed": 1, "call": "B0r-settle", "result": None}]
+            path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+            self.assertEqual(reponses.final_answers(path)[("F3", 1)]["class"], "succès annoncé")
+
+
+class PreviousLotRemovedTest(unittest.TestCase):
+    """L'outil d'écriture refuse d'écraser un fichier non lu : le lot précédent doit disparaître avant l'agent."""
+
+    def test_w_removes_previous_lot_before_each_agent_call(self):
+        seen = []
+
+        def fake(prompt, cwd, model, usage, label, **kw):
+            lot = Path(cwd) / "docs" / "prepare.md"
+            seen.append(lot.exists())
+            lot.write_text("{}")   # lot illisible : la boucle passe à la correction
+            return 0, ""
+        with mock.patch.object(agent_real, "run", side_effect=fake):
+            try:
+                run_real_w.run("business", "none", 1000)
+            except harness.BenchError:
+                pass
+        self.assertEqual(seen, [False, False])
+
+    def test_only_filter_limits_grid(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "r.jsonl"
+            calls = []
+            with mock.patch.object(campaign_reel, "one", side_effect=lambda c, f, s, m: calls.append((c, f, s)) or
+                                   {"condition": c, "fault": f, "seed": s, "status": "OK", "real_usage": []}):
+                campaign_reel.main(["--out", str(out), "--reps", "2", "--only", "W:F8", "--only", "S:F8"])
+        self.assertEqual(sorted(calls), [("S", "F8", 1000), ("S", "F8", 1001), ("W", "F8", 1000), ("W", "F8", 1001)])
 
 
 if __name__ == "__main__":

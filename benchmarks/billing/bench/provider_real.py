@@ -61,6 +61,9 @@ def _main(argv):
     workspace = Path.cwd()
     (workspace / "docs").mkdir(exist_ok=True)
     usage = Path(root).parent / "real-usage.jsonl"
+    # L'outil d'écriture refuse d'écraser un fichier non lu, et le préparateur n'a pas d'outil de lecture :
+    # le lot d'une tentative précédente est retiré avant l'appel (sa remise est déjà empreinte par le moteur).
+    (workspace / "docs" / "prepare.md").unlink(missing_ok=True)
     code, result = agent_real.run(prompt_for(api), workspace, model, usage, "S-prepare")
     if code or not lot_readable(workspace / "docs" / "prepare.md"):
         print(f"agent réel : échec ou lot illisible (code {code}) : {result[-config.ERROR_TEXT_MAX:]}",

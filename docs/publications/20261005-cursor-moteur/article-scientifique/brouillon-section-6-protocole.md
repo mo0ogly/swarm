@@ -258,6 +258,17 @@ Les réponses finales intégrales sont publiées avec leur classe, pour que le l
 vérifier le classement. Les deux lectures figurent côte à côte ; aucune conclusion ne repose sur
 la seule lecture a posteriori.
 
+**Amendement du 7 octobre 2026 : défaut du banc sous F8, rejeu.** Dans le lot réel du
+6 octobre, F8 a donné 0 exécution correcte sur 5 en W-réel et en S-réel. Cause : à la seconde
+tentative, l'outil d'écriture de l'agent refuse d'écraser un fichier qu'il n'a pas lu, et le
+profil préparateur n'a pas d'outil de lecture (retiré après la sonde d'isolement) ; le lot faussé
+de la première tentative restait en place. L'issue était sûre (aucun paiement), mais l'échec de
+la correction vient du banc, non de l'agent ni du moteur. Correction : le banc retire le lot
+précédent avant chaque appel du préparateur ; l'empreinte de la remise précédente est déjà
+consignée par le moteur (S-réel) et par le workflow (W-réel). Les dix exécutions F8 sont
+rejouées, mêmes graines (1000 à 1004), dans un fichier distinct. Les deux séries sont publiées ;
+la série du 6 octobre est présentée comme invalidée par un défaut du banc.
+
 ### 6.9 Étiquetage des blocages et attribution (QR3)
 
 Chaque exécution S terminée sans acceptation est étiquetée indépendamment par

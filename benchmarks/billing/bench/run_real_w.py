@@ -75,6 +75,7 @@ def _run(run_dir, fault, seed, started, model):
 
         checked_sha = None
         for rank in (1, 2):   # préparation, puis une seule correction
+            lot.unlink(missing_ok=True)   # écriture sans lecture préalable impossible : lot précédent retiré
             code, _ = agent_real.run(prompt_for(api.url), workspace, model, usage, f"W-prepare-{rank}")
             steps.append({"step": "prepare", "rank": rank, "code": code})
             if code or not lot_readable(lot):

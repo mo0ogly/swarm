@@ -56,6 +56,8 @@ def main(argv=None):
     p.add_argument("--seed-base", type=int, default=1000)
     p.add_argument("--model", default=config.REAL_MODEL)
     p.add_argument("--ceiling-usd", type=float, default=config.REAL_COST_CEILING_USD)
+    p.add_argument("--only", action="append", default=[], metavar="CONDITION:FAUTE",
+                   help="limiter la grille à ces scénarios (rejeu après correction du banc)")
     a = p.parse_args(argv)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -64,7 +66,8 @@ def main(argv=None):
     done = {(r["condition"], r["fault"], r["seed"]) for r in runs}
     spent, missing = sum(cost(r) for r in runs), sum(unpriced(r) for r in runs)
     worst = max([u.get("cost_usd") or 0 for r in runs for u in r.get("real_usage") or []] + [0])
-    todo = [c for c in plan(a.reps, a.seed_base) if c not in done]
+    only = {tuple(x.split(":", 1)) for x in a.only}
+    todo = [c for c in plan(a.reps, a.seed_base) if c not in done and (not only or (c[0], c[1]) in only)]
     append(out, {"kind": "campaign", "event": "start", "at": time.time(), "todo": len(todo), "spent_usd": spent,
                  "args": vars(a), **harness.provenance()})
     stopped = None
