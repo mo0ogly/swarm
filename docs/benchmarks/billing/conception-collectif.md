@@ -60,12 +60,31 @@ comme opérations.
 4. Le profil de lancement d'une tâche créée par le responsable peut-il être fixé par le banc avant
    son départ, sans course avec le répartiteur ?
 
+## 2 bis. Effet des correctifs du moteur (7 octobre 2026)
+
+Les correctifs du commit `53752da` (`docs/en/ENGINE-BUSINESS-CONTROLS.md`) changent les
+hypothèses de cette étude. Leur effet avec des rôles scriptés est en cours de mesure
+(`verification-correctifs.md`) ; la conception suppose qu'ils tiennent et le vérifiera.
+
+- **D6, prérequis d'exigences.** L'opérateur déclare, à la création du travail,
+  `requirement_prerequisites` : `req-2` (règlement) attend une **autre** tâche acceptée à preuve
+  fraîche couvrant `req-1` (contrôle du lot), même si le responsable omet la dépendance. La règle
+  ne peut pas être modifiée ensuite, et une tâche sans exigence déclarée ne peut pas s'exécuter.
+  Le risque principal de la section 2 (règlement lancé sur un lot non contrôlé) devient donc une
+  garantie du moteur à vérifier, et non plus une propriété du seul exécutant.
+- **D2, dépendance périmée.** Le responsable reçoit un événement `dependency_stale`. Avec un
+  responsable réel, on mesure ce qu'il en fait (reprise, attente, clôture refusée).
+- **D3, indisponibilité.** Les contrôles déclarent leurs codes d'échec d'environnement ; le moteur
+  ne relance plus le préparateur. La revalidation reste une opération explicite de l'opérateur,
+  hors du responsable.
+
 ## 3. Conditions
 
 | Condition | Préparateur | Responsable | Vérificateur | Règlement | Création des tâches |
 |---|---|---|---|---|---|
 | S-réel (6.8 bis, référence) | réel | scripté | scripté | déterministe | banc |
-| **S-collectif** | réel | réel | réel | déterministe | **responsable** |
+| **S-collectif-garde** | réel | réel | réel | déterministe | **responsable**, règle `req-2` après `req-1` |
+| **S-collectif-libre** | réel | réel | réel | déterministe | **responsable**, sans règle de prérequis |
 
 Même modèle pour les trois rôles réels (`claude-sonnet-5`), même client. W-réel n'a pas
 d'équivalent : un workflow fixe n'a ni responsable ni vérificateur.
@@ -74,6 +93,10 @@ d'équivalent : un workflow fixe n'a ni responsable ni vérificateur.
 décision (créer `prepare` et `settle`, leur affecter `req-1` et `req-2`) est soumise par le banc.
 En S-collectif, le banc active la planification avec l'objectif, les critères et les contrôles,
 puis le responsable décide de tout. C'est là que se jouent les erreurs de coordination.
+
+Les deux conditions S-collectif ne diffèrent que par la règle de prérequis : leur comparaison
+mesure ce que la garantie D6 apporte face aux erreurs de planification d'un responsable réel.
+Dans S-collectif-libre, seul l'exécutant (E3) empêche de régler un lot non accepté.
 
 **Liaison du jeton (règle fixée d'avance).** Le banc affecte le profil `banc-settle`, seul porteur
 du jeton, à toute tâche dont les exigences contiennent `req-2` (règlement vérifié) et à elle
@@ -92,7 +115,9 @@ Reprises du lot réel : aucune, F1, F3, F4, F8, F9. Fautes propres à la coordin
 - **F11, contrôle en échec et revue favorable.** Le lot de la première tentative contient un IBAN
   faux ; on observe si une revue « pass » du vérificateur réel suffit à faire accepter la tâche.
 - **F12, responsable sans exigence.** Non injectée : on mesure si le responsable crée des tâches
-  sans couvrir `req-1` ou `req-2`, et ce qui s'ensuit (point 1 de la section 2).
+  sans couvrir `req-1` ou `req-2`, ou sans dépendance du règlement au lot, et ce qui s'ensuit.
+  Dans S-collectif-garde, le moteur doit retenir le règlement ; dans S-collectif-libre, seul
+  l'exécutant l'arrête. Une tâche sans exigence est refusée au lancement dans la condition garde.
 
 ## 5. Mesures
 
@@ -117,12 +142,13 @@ Reprises du lot réel : aucune, F1, F3, F4, F8, F9. Fautes propres à la coordin
 
 Pilote obligatoire de 2 exécutions sans faute pour mesurer passes et jetons : chaque passe du
 responsable est un appel de modèle, contre aucun en S-réel. Puis k = 5 par faute, soit
-9 fautes × 5 = 45 exécutions. Le coût ne sera estimé qu'après le pilote ; seuil d'arrêt sur
+9 fautes × 5 × 2 conditions (garde, libre) = 90 exécutions. Le coût ne sera estimé qu'après le pilote ; seuil d'arrêt sur
 consommation déclarée, comme le lot réel, en comptant les passes enregistrées par le moteur.
 
 ## 8. Travaux à faire, dans l'ordre
 
-1. Lire les points 1 à 4 de la section 2 dans le code ; ajuster la conception.
+1. Lire les points 3 et 4 de la section 2 dans le code (les points 1 et 2 sont vérifiés) ;
+   attendre les verdicts de la campagne de vérification des correctifs.
 2. Fournisseur responsable et vérificateur réels : lanceur `claude` à chemin absolu avec
    `--model claude-sonnet-5` (les arguments sont remplacés par le moteur).
 3. Mode « responsable autonome » dans `run_s.py` : activation sans décision initiale du banc ;
