@@ -81,32 +81,40 @@ arguments transmis, non sur un cloisonnement du système de fichiers : un agent
 réel pourrait lire le répertoire de la banque, et l'isoler exigerait un bac à
 sable.
 
-### 5.3 Ce que l'implémentation a révélé
+### 5.3 Ce que l'implémentation et l'évaluation ont révélé
 
-La construction du banc a mis au jour quatre comportements du moteur que la
-conception n'anticipait pas. Nous les rapportons parce qu'ils conditionnent
-l'interprétation des mesures.
+La construction du banc et les campagnes ont mis au jour cinq défauts du moteur et un choix de
+sûreté que la conception n'anticipait pas. Nous les rapportons parce qu'ils conditionnent
+l'interprétation des mesures ; le relevé détaillé (`defauts-moteur.md`) est transmis aux
+mainteneurs.
 
-1. **Espace de travail propre.** Lorsqu'une tâche s'exécute dans son propre
-   sous-répertoire, la remise lit le livrable dans cet espace mais la reprise
-   de la validation le cherche à la racine du projet ; la tâche n'est jamais
-   acceptée. Le harnais de référence du moteur n'y échappe qu'en écrivant le
-   livrable aux deux endroits. Le banc utilise un espace partagé.
-2. **Refus silencieux.** Une tâche dont la dépendance n'est plus fraîche n'est
-   pas lancée, sans motif journalisé ni événement adressé au responsable ; la
-   dépendance reste affichée comme acceptée.
-3. **Indisponibilité traitée comme un échec métier.** Un contrôle qui échoue
-   parce qu'un service est indisponible déclenche la correction automatique
-   de la tâche, donc la régénération du livrable, au lieu d'une attente de
-   rétablissement.
-4. **Absence de reprise après arrêt brutal.** Un agent tué sans diagnostic
-   bloque la tâche ; aucune reprise automatique n'a lieu, la décision revient
-   au responsable.
+1. **Espace de travail propre (D1).** Lorsqu'une tâche s'exécute dans son propre
+   sous-répertoire, la remise lit le livrable dans cet espace mais la reprise de la validation
+   le cherche à la racine du projet ; la tâche n'est jamais acceptée. Le harnais de référence
+   du moteur n'y échappe qu'en écrivant le livrable aux deux endroits. Le banc utilise un
+   espace partagé.
+2. **Refus silencieux (D2).** Une tâche dont la dépendance n'est plus fraîche n'est pas lancée,
+   sans motif journalisé ni événement adressé au responsable ; la dépendance reste affichée
+   comme acceptée. L'arrêt est sûr, le diagnostic absent.
+3. **Indisponibilité traitée comme un échec métier (D3).** Un contrôle qui échoue parce qu'un
+   service est indisponible déclenche la correction automatique de la tâche, donc la
+   régénération du livrable, au lieu d'une attente de rétablissement. Dans la campagne, aucune
+   exécution sous indisponibilité persistante n'est absorbée.
+4. **Verrou SQLite non réessayé (D5).** Un verrou transitoire pendant l'application d'une
+   décision du responsable, ou pendant la revue indépendante, devient un échec durable de la
+   planification. C'est la seule cause des 32 exécutions exclues sur 3 000 en condition S.
+5. **Couverture des exigences vérifiée à la clôture, pas avant l'effet (D6).** La clôture
+   refuse une exigence sans tâche acceptée, mais rien n'impose qu'une tâche à effet ne parte
+   qu'après l'acceptation des tâches qui contrôlent son candidat : c'est au responsable de
+   déclarer la dépendance. Constaté à la lecture du code ; non exercé, le responsable du banc
+   étant scripté.
+6. **Absence de reprise après arrêt brutal (D4, choix de sûreté).** Un agent tué sans
+   diagnostic bloque la tâche ; la reprise revient au responsable. Nous le présentons comme
+   un choix défendable, non comme un défaut.
 
-Les points 1 à 3 sont des écarts entre le comportement observé et le modèle
-de la section 4 ; le point 3 concerne directement l'invariant I6. [À AJUSTER :
-statut de ces écarts auprès des mainteneurs du moteur au moment de la
-soumission.]
+Les points 3 et 5 touchent directement les invariants de la section 4 : le premier I6 (reprise
+justifiée), le second l'étendue de I3 (preuve fraîche avant l'effet, et non seulement avant la
+clôture).
 
 ---
 
@@ -115,5 +123,4 @@ soumission.]
 1. Recalculer les tailles (lignes, fichiers, tests) au commit figé.
 2. Vérifier la liste des fournisseurs pris en charge dans la configuration du
    moteur avant de les nommer.
-3. Point 3 de 5.3 : formuler l'écart avec I6 après la campagne, sur plus d'une
-   exécution.
+3. Point 3 de 5.3 : confirmé par la campagne (F5 jamais absorbée, 300 exécutions S).
