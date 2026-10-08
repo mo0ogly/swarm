@@ -14,7 +14,7 @@ func (s *Store) reportContext(b *contextBuilder, c PageCoordinates) error {
 		return fmt.Errorf("Sélectionner une tâche pour analyser son rapport.")
 	}
 	allowed := false
-	for _, path := range s.taskReports(c.Selected[0]) {
+	for _, path := range s.taskReportsForWork(b.ctx.WorkID, c.Selected[0]) {
 		if path == c.Report {
 			allowed = true
 			break
@@ -26,6 +26,9 @@ func (s *Store) reportContext(b *contextBuilder, c PageCoordinates) error {
 	path, err := safeReport(s.root, c.Report)
 	if err != nil {
 		return err
+	}
+	if !s.readableTaskReport(b.ctx.WorkID, c.Selected[0], path) {
+		return fmt.Errorf("Rapport non associé à la tâche sélectionnée.")
 	}
 	f, err := os.Open(path)
 	if err != nil {

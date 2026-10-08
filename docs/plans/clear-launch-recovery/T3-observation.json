@@ -1,0 +1,313 @@
+{
+  "rows": [
+    {
+      "kind": "planner",
+      "id": "root",
+      "label": "Responsable : root",
+      "recorded_calls": 5,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 6,
+      "output_tokens": 18077,
+      "calls_without_usage": 2,
+      "cost": {
+        "reported_usd": 0.451902,
+        "attempts_with_cost": 3,
+        "attempts_without_cost": 2
+      }
+    },
+    {
+      "kind": "reviewer",
+      "id": "reviewer",
+      "label": "Vérificateur indépendant",
+      "recorded_calls": 18,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 42,
+      "output_tokens": 212029,
+      "calls_without_usage": 2,
+      "cost": {
+        "reported_usd": 4.1610824,
+        "attempts_with_cost": 16,
+        "attempts_without_cost": 2
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-115c11e8f8-T0",
+      "label": "Inspection ciblée lecture seule (RETEX + points d'entrée)",
+      "recorded_calls": 2,
+      "observed_tool_calls": 27,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 6,
+      "output_tokens": 5404,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.28512860000000007,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-115c11e8f8-T1",
+      "label": "REQ-QW1 — Résumé avant lancement (web + CLI)",
+      "recorded_calls": 3,
+      "observed_tool_calls": 51,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 38,
+      "output_tokens": 30589,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 1.0946986,
+        "attempts_with_cost": 2,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-115c11e8f8-T2",
+      "label": "REQ-QW2 — Blocage expliqué (web + CLI)",
+      "recorded_calls": 2,
+      "observed_tool_calls": 37,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 20,
+      "output_tokens": 16528,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.6520226,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-115c11e8f8-T3",
+      "label": "REQ-QW3 — Bilan par tentative",
+      "recorded_calls": 1,
+      "observed_tool_calls": 25,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    }
+  ],
+  "recorded_control_executions": 37,
+  "worker_retries": 3,
+  "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+  "attempts": [
+    {
+      "task": "plan-115c11e8f8-T0",
+      "label": "Inspection ciblée lecture seule (RETEX + points d'entrée)",
+      "agent": "03555e5d-e077-4d87-a9ba-07d11f8181b5",
+      "attempt": "a-4936ef9cae21f9cf1074a1c8",
+      "process_state": "completed",
+      "task_acceptance_recorded": true,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 7,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 6,
+      "output_tokens": 5404,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.28512860000000007,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T0",
+      "label": "Inspection ciblée lecture seule (RETEX + points d'entrée)",
+      "agent": "auto-e122f979a3f5979466a4",
+      "attempt": "a-11dfc92d2d3e00955874d4d9",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": true,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 20,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T1",
+      "label": "REQ-QW1 — Résumé avant lancement (web + CLI)",
+      "agent": "79d3a82f-f7af-4d5f-9e9b-8b13770e7e40",
+      "attempt": "a-103e74130246beb41392ea22",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 25,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T1",
+      "label": "REQ-QW1 — Résumé avant lancement (web + CLI)",
+      "agent": "auto-b7d047b00f1da849d6a4",
+      "attempt": "a-0f315d4664a70dececf92271",
+      "process_state": "completed",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 18,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 26,
+      "output_tokens": 24319,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.7622554000000001,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T1",
+      "label": "REQ-QW1 — Résumé avant lancement (web + CLI)",
+      "agent": "f7bf328d-d2ba-4d92-84e5-6bee6bbd9447",
+      "attempt": "a-62b5c700c364e7236430a9ca",
+      "process_state": "completed",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 8,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 12,
+      "output_tokens": 6270,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.3324432,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T2",
+      "label": "REQ-QW2 — Blocage expliqué (web + CLI)",
+      "agent": "537b1d6b-7c30-4e7f-878a-3c832554c719",
+      "attempt": "a-4fea4cb374a0cf60b5cc2680",
+      "process_state": "completed",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 12,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 20,
+      "output_tokens": 16528,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.6520226,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T2",
+      "label": "REQ-QW2 — Blocage expliqué (web + CLI)",
+      "agent": "auto-4d827ecc9cb075bf602d",
+      "attempt": "a-1838917a21fb55cd54481c1c",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 25,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "task": "plan-115c11e8f8-T3",
+      "label": "REQ-QW3 — Bilan par tentative",
+      "agent": "auto-9360370fa68120c26daa",
+      "attempt": "a-cacc533574c699dddab19104",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": false,
+      "measurement": "unknown",
+      "recorded_calls": 1,
+      "observed_tool_calls": 25,
+      "measured": false,
+      "tool_reads": 0,
+      "tool_writes": 0,
+      "tool_unclassified": 0,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    }
+  ]
+}

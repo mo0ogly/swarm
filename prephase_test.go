@@ -39,7 +39,7 @@ func prepSave(t *testing.T, s *Store, p Preparation, kind, text string) Preparat
 
 func prepMethods(t *testing.T, s *Store) {
 	t.Helper()
-	for _, path := range []string{".claude/skills/apex/SKILL.md", ".claude/commands/ks-feature.md", ".claude/commands/ks-plan.md", ".claude/skills/audit-pdca/SKILL.md", "tools/agent-workflows/CONTRACT.md"} {
+	for _, path := range []string{".claude/skills/apex/SKILL.md", ".claude/skills/debug/SKILL.md", ".claude/commands/ks-feature.md", ".claude/commands/ks-plan.md", ".claude/skills/audit-pdca/SKILL.md", "tools/agent-workflows/CONTRACT.md"} {
 		full := filepath.Join(s.root, path)
 		if e := os.MkdirAll(filepath.Dir(full), 0700); e != nil {
 			t.Fatal(e)

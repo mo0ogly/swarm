@@ -9,6 +9,26 @@ It makes responsibilities, dependencies, attempts, evidence and blockers visible
 so that several agents can collaborate without treating every completed process
 as a successful result.
 
+## Release v0.1.0
+
+The [first experimental release](https://github.com/mo0ogly/swarm/releases/tag/v0.1.0) adds dependency editing with previews, durable automation programs and configurable administration. The engine retains authorization, budgets, required checks and independent reviews.
+
+See the [release notes](docs/releases/v0.1.0.md), [automation programs guide](docs/en/AUTOMATION-PROGRAMS.md) and [blocked contract recovery](docs/en/CONTRACT-REVISION.md). Quotas of external provider sessions are not observed automatically.
+
+[Business prerequisites and control recovery](docs/en/ENGINE-BUSINESS-CONTROLS.md)
+
+## First run
+
+1. Follow [installation](docs/en/INSTALL.md) and open the session link printed by the server.
+2. Open **AI and connections** to configure providers available in your environment.
+3. Prepare your objective, constraints and acceptance criteria; review the proposed plan.
+4. Check roles, workspaces and limits before authorizing and launching the mission.
+5. Follow tasks and examine their evidence. A finished process is not yet a validated result.
+
+See the [illustrated user guide](docs/en/USER-GUIDE.md). Swarm is experimental; read the [qualification evidence and limitations](docs/COMMUNITY-QUALIFICATION.md).
+
+Start with **Choose a mission template** in preparation: [Guided workflow catalogue shared by web and CLI](docs/en/PREPARATION-TEMPLATES.md).
+
 ## What it does
 
 - Prepare requirements with AI, approve a brief and review a structured plan.
@@ -55,13 +75,25 @@ reproduces every part of Cursor's final architecture.
 
 ## See the interface
 
-These screenshots use simulated demonstration data, with no real agents running.
-They illustrate the French interface; choose English from the language selector.
+Actual application captures from **October 1, 2026**, showing an eight-task mission closed with human decisions. This is not evidence of unattended autonomy. User-authored task names retain their original French language.
 
-![Preparation](docs/screenshots/preparation.png)
-![Agent roles and dependency arrows](docs/screenshots/agents-horizontal.png)
-![Vertical graph](docs/screenshots/agents-vertical.png)
-![Detailed agent view](docs/screenshots/agent-detail.png)
+### Understand the current state
+
+The summary states what is happening, who acts and what comes next. All eight results here are validated against current evidence, with deliverables and reviews still accessible.
+
+![Current mission: 8/8 results validated](docs/screenshots/en/mission-complete-en.png)
+
+### See the team and dependencies
+
+The orchestrator is on the left, workers in the middle and the independent reviewer on the right. **Solid arrows** connect prerequisites to dependent tasks; **dotted arrows** show responsibilities and reviewer handoffs.
+
+![Current graph with orchestrator, workers, reviewer and arrows](docs/screenshots/en/mission-graph-current-en.png)
+
+[Open the graph at full size](docs/screenshots/en/mission-graph-current-en.png)
+
+Horizontal and vertical layouts, detail levels, filters and branch folding change the view without removing tasks. “Why is this task waiting?” explains prerequisites; “Where do calls and costs go?” separates observed consumption.
+
+Preparation turns needs into criteria, tasks and dependencies. Adopting a plan does not launch agents: check roles, connections, workspaces and limits before authorizing execution. See the [illustrated user guide](docs/en/USER-GUIDE.md) and [installation screenshots](docs/en/INSTALL.md).
 
 ## Install
 
@@ -95,6 +127,32 @@ swarm --lang en help management
 `SWARM_LANG=en` sets the CLI default. JSON keys, commands and stored user content
 retain their original identifiers and language. French remains available.
 
+### Check the binary that is actually running
+
+These forms read identity embedded in the binary and work without an initialized
+project or SQLite database:
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+`devel` means that no verified release tag was injected. `unknown` or `null`
+means that the corresponding metadata is unavailable; it is neither a release
+nor a successful check. JSON keeps **binary** identity separate from the optional
+**local source** state displayed by the web UI. Restart the server after rebuilding
+or installing: an existing process keeps running its previous binary.
+
+In both the cockpit and preparation page, **Version and what's new** opens the
+same bilingual dialog. It shows the running binary, compares local sources
+separately, then lists the embedded history. No release is currently declared,
+so the history stays empty instead of inventing a version or date.
+
+![Version and what's new in the cockpit, English, State theme](docs/screenshots/version-history/cockpit-en-etat.png)
+
+[See the FR/EN, State/dark and degraded-state capture manifest](docs/screenshots/version-history/manifest.json).
+
 ## Limits that matter
 
 A finished agent is not necessarily a validated task. Workspace reservations may
@@ -104,13 +162,19 @@ Closing the cockpit does not stop agents. An installed binary and simulated-agen
 tests do not qualify a real provider's authentication, permissions or results.
 
 Data is local under the controlled project's `.swarm/`. Keep this directory,
-authentication and session links private. APEX, KS and PDCA require their method
-resources in the controlled project; not all are distributed in this repository.
+authentication and session links private. This repository supplies nine
+[working methods](docs/en/AGENT-METHODS.md), including planning, system examination and improvement,
+debugging, review and lessons learned. When controlling another project, check
+which method resources are available in that project.
 
 ## Documentation and development
 
 - [English user guide](docs/en/USER-GUIDE.md)
 - [English installation guide](docs/en/INSTALL.md)
+- [Authorize recovery and supply candidate sources to the reviewer](docs/en/ATTEMPT-RECOVERY.md)
+- [Storage diagnosis and exhausted attempts](docs/en/RUNTIME-RECOVERY.md)
+- [Methods: requirements, specifications, planning, audit, diagnosis and verification](docs/en/AGENT-METHODS.md)
+- [Agent reports, evidence delivery and linked decisions](docs/en/AGENT-COMMUNICATION.md)
 - [English interface validation](docs/en/I18N-VALIDATION.md)
 - [Technical reference](docs/en/REFERENCE.md)
 - [Preparation and revision contracts](docs/en/PREPARATION-UX.md)
@@ -129,3 +193,45 @@ noncommercial use under that license; commercial use requires separate permissio
 This is **not an OSI-approved open-source license**. Previous Apache-licensed
 versions and third-party components retain their respective rights and notices:
 see [licensing details](docs/LICENSING.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Contributing and reporting issues
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for checks and pull requests, and
+[SECURITY.md](SECURITY.md) for sensitive reports.
+
+### Recognize a closed mission
+
+The cockpit distinguishes a finished agent from a validated result. A closed
+mission reports every result validated against current evidence and a closed
+root responsibility. Deliverables, reviews and costs remain accessible.
+
+![Closed mission in the cockpit](docs/screenshots/en/mission-complete-en.png)
+
+*Actual 8/8 recipe with human interventions. The user-authored title remains in French. See the [user guide](docs/en/USER-GUIDE.md#read-counters-and-recognize-completion) and [engine recovery](docs/en/ENGINE-RECOVERY.md).*
+
+## Working methods
+
+Methods provide a shared approach with criteria and evidence; executable engine rules remain authoritative.
+
+| Need | Method |
+| --- | --- |
+| Turn a need into a verified change | Guided change workflow |
+| Examine a system and address authorized findings | Examine and improve |
+| Define expected outcomes and acceptance criteria | Build the specification |
+| Find omissions and contradictions before execution | Examine the specification |
+| Find actionable implementation defects | Review the code |
+| Reproduce a problem and identify its cause | Diagnose and fix |
+| Recheck the affected flow after a correction | Verify the fix |
+| Recover a blocked plan while retaining history | Replan |
+| Explain outcomes and prioritize improvements | Lessons learned |
+
+The specification methods cover both requirements writing and plan examination. See the [method guide](docs/en/AGENT-METHODS.md) for actual preparation choices and native-session commands; not every method is a web button.
+
+### Project instructions
+
+Pass repository rules to each role with an explicit project profile. [Configuration and boundaries](docs/en/PROJECT-PROFILE.md).
+
+In **Start / Restart → Skills for this task**, select project methods for a
+worker. Choices are recorded with the attempt without automatically running
+scripts or changing permissions. The CLI provides `swarm skills list`.
+[Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).

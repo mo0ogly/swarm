@@ -149,3 +149,7 @@
 .team-role-card[data-tone="attention"]{background:var(--wattson-attention-fond);color:var(--wattson-attention-encre);border-color:var(--wattson-attention-encre)}
 .team-role-card[data-tone="succes"]{background:var(--wattson-succes-fond);color:var(--wattson-succes-encre);border-color:var(--wattson-succes-encre)}
 .team-role-arrow{align-self:center;font-size:1.6rem;color:var(--wattson-texte-discret)}
+
+#modal-fields:has(#review-evidence){grid-template-columns:minmax(0,1fr)}
+#modal:has(#review-evidence) p{overflow-wrap:anywhere;min-width:0}
+#review-evidence{min-width:0;max-height:none;overflow:visible;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;padding:1rem;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);border-radius:8px}

@@ -60,10 +60,15 @@ func automaticCorrection(t Task, a Agent) (string, string, bool) {
 		return "", "", false
 	}
 	findings := []string{"Reçu de contrôle : " + validation.Receipt + "."}
-	fingerprintParts := []string{validation.PolicyDigest, validation.Receipt}
+	fingerprintParts := []string{validation.PolicyDigest}
 	for _, control := range validation.Controls {
 		if control.Passed {
 			continue
+		}
+		// A timeout/start failure is a failure of the verification process,
+		// not an objective verdict that another worker can repair.
+		if !control.Executed || control.ExitCode < 0 || control.EnvironmentFailure {
+			return "", "", false
 		}
 		finding := fmt.Sprintf("Contrôle %s en échec (code %d, sortie sha256 %s) : %s.", control.ID, control.ExitCode, control.OutputHash, control.Summary)
 		findings = append(findings, finding)
@@ -72,7 +77,11 @@ func automaticCorrection(t Task, a Agent) (string, string, bool) {
 	if len(findings) == 1 {
 		return "", "", false
 	}
-	return strings.Join(findings, " "), hash([]byte(strings.Join(fingerprintParts, "|"))), true
+	cause := hash([]byte(strings.Join(fingerprintParts, "|")))
+	if a.Recovery.CauseFingerprint == cause {
+		return "", "", false
+	}
+	return strings.Join(findings, " "), cause, true
 }
 
 // planDispatch rend les départs à effectuer et, quand il n'en rend aucun, le
@@ -142,6 +151,7 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 				t.ID, in.taskCost[t.ID].Reported, in.reserve))
 			continue
 		case !in.depsReady[t.ID]:
+			reasons = append(reasons, t.ID+" : prérequis non validés ou preuves périmées ; décision du responsable requise")
 			continue
 		case in.launchBlocked[t.ID] != "":
 			reasons = append(reasons, t.ID+" : "+in.launchBlocked[t.ID])
@@ -251,6 +261,12 @@ func profileFor(in dispatchInputs, t Task) *LaunchProfile {
 	}
 	if p == nil {
 		return nil
+	}
+	if t.ModelSelection != nil {
+		copy := *p
+		copy.Provider = t.ModelSelection.Provider
+		copy.Level = t.ModelSelection.Route.Level
+		p = &copy
 	}
 	if in.work.Planning != nil && in.work.Planning.Repository != nil {
 		copy := *p
@@ -370,9 +386,19 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 		if e != nil {
 			return done, e
 		}
+		if task, err := current.task(d.TaskID); err == nil {
+			pending, err := s.preparedLaunchForTask(current, task)
+			if err != nil {
+				return done, err
+			}
+			if pending != nil {
+				_ = s.dispatchEvent(work, "Lancements préparés conservés ; confirmer leur reprise depuis les tâches signalées.")
+				continue
+			}
+		}
 		p := d.Profile
 		if task, err := current.task(d.TaskID); err == nil && task.Profile == nil {
-			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next + "\nConsignes communes : " + p.Instruction
+			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next
 		}
 		conductor := ""
 		if len(conductors) > 0 {
@@ -380,7 +406,7 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 		}
 		r := Launch{Schema: 1, EventID: automaticEventID(work, d.TaskID, len(agents)), Revision: current.Revision, ConductorID: conductor,
 			TaskID: d.TaskID, Provider: p.Provider, Role: p.Role, Workspace: p.Workspace,
-			Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor,
+			Skills: p.Skills, Instruction: p.Instruction, Level: p.Level, Timeout: p.Timeout, Capture: p.Capture, Limits: p.Limits, Origin: originConductor,
 			Previous: d.Previous, recoveryCategory: d.RecoveryCategory, recoveryCause: d.CauseFingerprint,
 			recoveryOperation: d.OperationID, recoveryNext: d.NextEligibleAt}
 		if d.Previous != "" {
@@ -415,6 +441,9 @@ func automaticEventID(work, task string, generation int) string {
 }
 
 func (s *Store) dependenciesReady(w *Work, t *Task) bool {
+	if s.requirementPrerequisiteGuard(w, t) != nil {
+		return false
+	}
 	for _, id := range t.Depends {
 		dep, e := w.task(id)
 		if e != nil || !s.acceptedFresh(w, dep, map[string]bool{}) {

@@ -21,7 +21,7 @@ const (
 	pageContextContract = "page-context.v1"
 	assistAnswerVersion = 1
 	assistAnswerName    = "assistant-answer.v1"
-	assistPromptVersion = "swarm-page-assistant.prompts.v1"
+	assistPromptVersion = "swarm-page-assistant.prompts.v2"
 	maxContextBytes     = 48000
 	maxAnswerBytes      = 24576
 	maxFactsPerPage     = 60

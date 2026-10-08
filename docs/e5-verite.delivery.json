@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "task": "e5-verite",
+  "attempt": "a-c1faf94c71267b4728ab3c4b",
+  "contract": "f57553563d95bd70b8ccdcacb17c9b178aec91f64f7d72bdef52731db3dbf237",
+  "outcome": "complete",
+  "criteria": [
+    {
+      "index": 1,
+      "status": "pass",
+      "reason": "Obligations U1 vérifiées avec tests comportementaux et recette navigateur ; réparation externe explicitement attribuée, revue indépendante encore requise.",
+      "controls": [
+        "check-580455705d6a3292eadcadc8"
+      ],
+      "evidence": [
+        "engine_contract_truth_test.go",
+        "docs/e5-verite.md",
+        "docs/e5-verite.browser.json"
+      ]
+    }
+  ]
+}

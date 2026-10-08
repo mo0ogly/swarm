@@ -57,7 +57,7 @@ ailleurs.
 - Campagne et tables : `campaign.py` et `tables.py` écrits et testés. Une
   répétition générale (2 répétitions, 180 exécutions) passe le critère du
   protocole : [`docs/benchmarks/billing/resultats/`](../../docs/benchmarks/billing/resultats/).
-- Préparateur réel (`provider_real.py`) : pas encore écrit.
+- Préparateur réel (`provider_real.py`) : implémenté ; le responsable et la revue du banc restent des fixtures scriptées.
 
 ## Campagne
 
@@ -91,3 +91,13 @@ python3 bench/tables.py ../../docs/benchmarks/billing/resultats/campagne-AAAAMMJ
 - L'API simulée déduplique parfaitement par clé ; une API réelle peut limiter
   la conservation des clés ou rejeter un rejeu dont les paramètres diffèrent.
 - Un seul scénario métier ; aucune validation sur un système bancaire réel.
+
+## Amendement après audit du 7 octobre 2026
+
+Voir [les corrections du moteur et du banc](../../docs/ENGINE-BUSINESS-CONTROLS.md)
+et [leur version anglaise](../../docs/en/ENGINE-BUSINESS-CONTROLS.md).
+Les politiques S déclarent maintenant le code d’environnement 3 et les prérequis
+entre exigences. Elles nécessitent le candidat corrigé ; le binaire historique
+ne connaît pas ces champs. Fournir son chemin avec `BANC_SWARM_BIN`.
+Les journaux historiques ne doivent pas être écrasés par une nouvelle campagne.
+Un test sans appel LLM ne valide pas l’autonomie réelle du fournisseur.

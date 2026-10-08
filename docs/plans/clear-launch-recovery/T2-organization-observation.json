@@ -1,0 +1,140 @@
+{
+  "changes_since_visit": {
+    "from_revision": 1,
+    "to_revision": 1,
+    "first_visit": false,
+    "more": false,
+    "items": []
+  },
+  "spending": {
+    "rows": [],
+    "recorded_control_executions": 0,
+    "worker_retries": 0,
+    "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur."
+  },
+  "guidance": {
+    "what": "Organisation autonome non configurée",
+    "next": "Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.",
+    "actor": "Vous",
+    "primary": {
+      "kind": "organization",
+      "label": "Préparer l’organisation",
+      "effect": "Affiche les rôles et les conditions manquantes.",
+      "tone": "attention"
+    }
+  },
+  "runtime": {
+    "state": "ready",
+    "launch_allowed": true,
+    "observed_at": "2026-10-03T14:57:34.279087414Z",
+    "message": "Le stockage est disponible.",
+    "next_step": "Les autres conditions de lancement restent contrôlées par le moteur.",
+    "volumes": [
+      {
+        "kind": "store",
+        "path": "/tmp/swarm-t2-qw2-v2-1046661/.swarm",
+        "available_bytes": 1848864768,
+        "available_inodes": 977820,
+        "state": "ready"
+      },
+      {
+        "kind": "temporary",
+        "path": "/tmp",
+        "available_bytes": 1848864768,
+        "available_inodes": 977820,
+        "state": "ready"
+      }
+    ],
+    "version": {
+      "binary": {
+        "version": "devel",
+        "commit": "1d9570bd4ef617130c6be96b7ec88844fdbcd00e",
+        "modified": true,
+        "build_date": "2026-10-03T14:46:32Z",
+        "provenance": "injected"
+      },
+      "source": {
+        "available": false,
+        "commit": null,
+        "modified": null,
+        "compared": false,
+        "matches_binary": null
+      },
+      "history": {
+        "schema_version": 1,
+        "available": true,
+        "releases": []
+      }
+    }
+  },
+  "evidence_stage": "Parcours de cette mission non encore vérifié jusqu’à la clôture. Une recette isolée ou une installation ne vaut pas cette preuve.",
+  "organization": {
+    "ready": false,
+    "label": "Organisation autonome non configurée",
+    "issues": [
+      "Responsable de mission absent : planification hiérarchique non configurée."
+    ],
+    "next": "Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.",
+    "verification": "Politique incomplète ; aucune vérification de mission démontrée."
+  },
+  "authorized": false,
+  "enabled": false,
+  "paused": false,
+  "summary": "0/0 résultats validés · 0 à examiner · 0 tâche(s) en cours · 0 agent(s) actif(s) confirmé(s) · 0 état(s) agent incertain(s)",
+  "next": "Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.",
+  "validated": 0,
+  "review": 0,
+  "running": 0,
+  "active_agents": 0,
+  "uncertain_agents": 0,
+  "total": 0,
+  "supervision": {
+    "state": "active",
+    "source": "serveur web",
+    "observed_at": "2026-10-03T14:57:34.152502019Z",
+    "last_check_at": "2026-10-03T14:57:34.152502019Z",
+    "last_check_relative": "à l’instant",
+    "reconciled_at": "2026-10-03T14:55:20.147194505Z",
+    "next_check_at": "2026-10-03T14:57:36.152502019Z",
+    "next_check_relative": "dans moins de 2 s",
+    "late": false
+  },
+  "understanding": {
+    "what": "Organisation autonome non configurée",
+    "next_step": "Préparer une mission hiérarchique avec un responsable et des contrôles explicites. Les tâches existantes restent consultables et exécutables manuellement.",
+    "actor": "Vous",
+    "actor_kind": "user",
+    "situation": "decision_humaine"
+  },
+  "coordination": [
+    {
+      "kind": "work",
+      "label": "Travail",
+      "summary": "Aucune tâche n’est actuellement déclarée en cours.",
+      "actor": "Personne pour le moment",
+      "next_step": "Suivre la prochaine action indiquée."
+    },
+    {
+      "kind": "wait",
+      "label": "Attente",
+      "summary": "Aucune attente normale signalée.",
+      "actor": "Personne pour le moment",
+      "next_step": "Aucune résolution d’attente requise."
+    },
+    {
+      "kind": "exchange",
+      "label": "Échanges",
+      "summary": "Aucun échange structuré enregistré.",
+      "actor": "Personne pour le moment",
+      "next_step": "Les remises et demandes d’aide apparaîtront ici."
+    },
+    {
+      "kind": "validation",
+      "label": "Vérification",
+      "summary": "Aucun résultat n’attend actuellement de vérification.",
+      "actor": "Personne pour le moment",
+      "next_step": "Les contrôles apparaîtront après une remise de résultat."
+    }
+  ],
+  "tasks": []
+}

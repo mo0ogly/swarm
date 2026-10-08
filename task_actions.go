@@ -17,12 +17,25 @@ type TaskField struct {
 // TaskAction décrit une action proposée sur une tâche : disponibilité, motif
 // d'indisponibilité, statut conseillé pour l'état courant et champs attendus.
 type TaskAction struct {
-	Kind       string      `json:"kind"`
-	Label      string      `json:"label"`
-	Disponible bool        `json:"disponible"`
-	Raison     string      `json:"raison,omitempty"`
-	Conseillee bool        `json:"conseillee,omitempty"`
-	Champs     []TaskField `json:"champs,omitempty"`
+	Prepared   *PreparedLaunch `json:"prepared_launch,omitempty"`
+	Kind       string          `json:"kind"`
+	Label      string          `json:"label"`
+	Disponible bool            `json:"disponible"`
+	Raison     string          `json:"raison,omitempty"`
+	Conseillee bool            `json:"conseillee,omitempty"`
+	Champs     []TaskField     `json:"champs,omitempty"`
+}
+
+type PreparedLaunch struct {
+	ID          string     `json:"id"`
+	Task        string     `json:"task"`
+	Ready       bool       `json:"ready"`
+	Reason      string     `json:"reason,omitempty"`
+	Provider    string     `json:"provider,omitempty"`
+	Workspace   string     `json:"workspace,omitempty"`
+	Instruction string     `json:"instruction,omitempty"`
+	Timeout     int        `json:"timeout_seconds,omitempty"`
+	Limits      *RunLimits `json:"limits,omitempty"`
 }
 
 func champ(name, label, aide string, requis bool) TaskField {
@@ -118,7 +131,7 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	submitRaison := ""
 	if taskActive {
 		submitRaison = "Une tentative est en cours : attendez sa fin avant de soumettre un rapport."
-	} else if t.Status != "todo" && t.Status != "blocked" {
+	} else if _, repairable := s.legacyReportSubmission(w.ID, t, agents); t.Status != "todo" && t.Status != "blocked" && !repairable {
 		submitRaison = "Un rapport se soumet depuis une tâche « À faire » ou « Bloquée » qui vient de produire son livrable."
 	}
 
@@ -174,6 +187,14 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 		action("reopen", "Rouvrir la tâche", reopenRaison == "", reopenRaison),
 		action("assign", "Changer le responsable", true, ""),
 	}
+	if t.Status == "blocked" && t.PlanMaxAttempts > 0 && len(t.Attempts) >= t.PlanMaxAttempts {
+		reason := attemptExtensionReason(t, agents)
+		actions = append(actions, action("extend-attempt", "Autoriser une tentative supplémentaire", reason == "", reason))
+		if t.PlanMaxAttempts >= 3 {
+			reason = correctiveRecoveryReason(w, t, agents)
+			actions = append(actions, action("authorize-recovery", "Préparer un essai correctif", reason == "", reason))
+		}
+	}
 
 	champs := map[string][]TaskField{
 		"start": {
@@ -207,6 +228,29 @@ func (s *Store) taskActions(w *Work, t *Task, agents []Agent) []TaskAction {
 	}
 
 	conseillee := conseilleePour(t.Status, acceptedFresh, taskActive, len(gates) > 0)
+	if !taskActive {
+		if pending, e := s.preparedLaunchForTask(*w, t); e == nil && pending != nil {
+			resume := action("resume-launch", "Reprendre le lancement préparé", pending.Ready && canStart, pending.Reason)
+			resume.Prepared = pending
+			if resume.Raison == "" && !canStart {
+				resume.Raison = s.startBlockReason(w, t)
+			}
+			actions = append(actions, resume)
+			for i := range actions {
+				if actions[i].Kind == "start" || actions[i].Kind == "retry" {
+					actions[i].Disponible = false
+					actions[i].Raison = "Un lancement est déjà préparé. Reprendre cette opération conserve sa copie et évite un doublon."
+				}
+			}
+			conseillee = "resume-launch"
+		}
+	}
+	if t.Status == "blocked" && attemptExtensionReason(t, agents) == "" {
+		conseillee = "extend-attempt"
+	}
+	if correctiveRecoveryReason(w, t, agents) == "" {
+		conseillee = "authorize-recovery"
+	}
 	for i := range actions {
 		actions[i].Conseillee = actions[i].Kind == conseillee && actions[i].Disponible
 		if actions[i].Conseillee {
@@ -273,7 +317,7 @@ func (s *Store) startBlockReason(w *Work, t *Task) string {
 	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
 		return "Brief du plan modifié : relisez le brief avant de lancer."
 	}
-	if t.PlanMaxAttempts > 0 {
+	if t.PlanMaxAttempts > 0 && !s.executionObserved(w.ID, t.ID) {
 		var count int
 		if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", w.ID, t.ID).Scan(&count); e == nil && count >= t.PlanMaxAttempts {
 			return "Plafond de tentatives du plan atteint."
@@ -309,7 +353,7 @@ func (s *Store) assistCanStart(w *Work, t *Task) bool {
 	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
 		return false
 	}
-	if t.PlanMaxAttempts > 0 {
+	if t.PlanMaxAttempts > 0 && !s.executionObserved(w.ID, t.ID) {
 		var count int
 		if e := s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", w.ID, t.ID).Scan(&count); e != nil || count >= t.PlanMaxAttempts {
 			return false

@@ -2,11 +2,26 @@
   "name": "swarm-local-tests",
   "private": true,
   "scripts": {
-    "test": "node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && npm run test:i18n",
+    "test": "node tests/pilot_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && node tests/audit_acceptance_runner_test.cjs && node tests/review_recovery_test.cjs && node tests/reported_model_test.cjs && node tests/attempt_ledger_test.cjs && node tests/recovery_evidence_test.cjs && npm run test:i18n",
+    "test:audit:cursor": "node tests/audit_acceptance.cjs --case cursor",
+    "test:audit:states": "node tests/audit_acceptance.cjs --case states",
+    "test:audit:evidence": "node tests/audit_acceptance.cjs --case evidence",
+    "test:audit:journey": "node tests/audit_acceptance.cjs --case journey",
     "test:connections": "node tests/ai_connections_ui.cjs bin/swarm test-results/connections",
     "i18n:build": "node scripts/i18n/build.cjs",
     "test:i18n": "node tests/i18n_test.cjs",
-    "test:i18n-ui": "node tests/i18n_ui.cjs bin/swarm test-results/i18n"
+    "test:i18n-ui": "node tests/i18n_ui.cjs bin/swarm test-results/i18n",
+    "test:budgets": "node tests/budget_ui.cjs bin/swarm test-results/budgets",
+    "test:pricing": "node tests/pricing_ui.cjs bin/swarm test-results/pricing",
+    "test:quotas": "node tests/quotas_ui.cjs bin/swarm test-results/quotas",
+    "test:task-models": "node tests/task_models_ui.cjs bin/swarm test-results/task-models",
+    "test:role-models": "node tests/role_models_ui.cjs bin/swarm test-results/role-models",
+    "test:admin": "node tests/run_limits_admin_ui.cjs bin/swarm test-results/admin",
+    "test:quickwins": "node tests/quick_wins_ui.cjs bin/swarm test-results/quick-wins",
+    "test:planning-metrics": "node tests/planning_metrics_ui.cjs bin/swarm test-results/planning-metrics",
+    "test:project-profile": "node tests/project_profile_ui.cjs bin/swarm test-results/project-profile",
+    "test:project-profile-selection": "node tests/project_profile_selection_ui.cjs bin/swarm test-results/project-profile-selection",
+    "test:action-skills": "node tests/action_skills_ui.cjs bin/swarm test-results/action-skills"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

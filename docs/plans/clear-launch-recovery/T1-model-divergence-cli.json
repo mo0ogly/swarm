@@ -1,0 +1,21 @@
+{
+  "id": "da0b9711-8efa-48fc-b0b8-54e80bc82dc5",
+  "work_id": "w-eae97600d116e687fb000f42",
+  "task_id": "model-proof",
+  "attempt_id": "a-19604d2dcaecfa574372061b",
+  "status": "completed",
+  "model_route": {
+    "level": "standard",
+    "model": "sonnet",
+    "effort": "",
+    "billing": "external",
+    "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+    "reason": "Politique du fournisseur · work · sans montée en gamme automatique"
+  },
+  "reported_model": {
+    "model": "fixture-reported-model",
+    "source": "provider system/init",
+    "at": "2026-10-03T14:18:30.087233546Z"
+  },
+  "provenance": "Public CLI agent show after a real child protocol fixture process; no real LLM call"
+}

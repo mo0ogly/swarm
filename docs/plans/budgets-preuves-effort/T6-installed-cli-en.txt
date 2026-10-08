@@ -1,0 +1,91 @@
+Where do calls and costs go?
+Measurements observed: 2026-10-04T10:13:52.334834406Z · Source: Process timestamps, received activity, provider usage and review history.
+Planner: root · 7 attempts or recorded calls · 0 observed tool calls · 0 incomplete tool measurements · 10/18704 reported input/output tokens · 2 missing usage reports · 0.62 USD reported for 5 attempt(s) · 2 without reported cost
+Independent reviewer · 16 attempts or recorded calls · 0 observed tool calls · 0 incomplete tool measurements · 54/225541 reported input/output tokens · 2 missing usage reports · 4.46 USD reported for 14 attempt(s) · 2 without reported cost
+Inspection ciblée et contrats · 1 attempts or recorded calls · 9 observed tool calls · 0 incomplete tool measurements · 18/18153 reported input/output tokens · 0 missing usage reports · 0.70 USD reported for 1 attempt(s)
+  Sum of process durations: 227.263 s · 0 duration(s) not reported
+  2 review(s) recorded for this task · 0 retry(ies) for this task
+QW5 — Régler la limite qui bloque · 2 attempts or recorded calls · 65 observed tool calls · 0 incomplete tool measurements · 12/11644 reported input/output tokens · 1 missing usage reports · 0.41 USD reported for 1 attempt(s) · 1 without reported cost
+  Sum of process durations: 766.062 s · 0 duration(s) not reported
+  5 review(s) recorded for this task · 1 retry(ies) for this task
+QW6 — État actuel et historique · 2 attempts or recorded calls · 23 observed tool calls · 0 incomplete tool measurements · 24/16447 reported input/output tokens · 1 missing usage reports · 0.70 USD reported for 1 attempt(s) · 1 without reported cost
+  Sum of process durations: 364.823 s · 0 duration(s) not reported
+  6 review(s) recorded for this task · 1 retry(ies) for this task
+QW8 — Vérifier le dossier avant la revue · 2 attempts or recorded calls · 62 observed tool calls · 0 incomplete tool measurements · 32/10187 reported input/output tokens · 1 missing usage reports · 0.55 USD reported for 1 attempt(s) · 1 without reported cost
+  Sum of process durations: 1074.899 s · 0 duration(s) not reported
+  1 review(s) recorded for this task · 1 retry(ies) for this task
+QW7 — Voir l’effort par tâche · 2 attempts or recorded calls · 67 observed tool calls · 0 incomplete tool measurements · 12/5807 reported input/output tokens · 1 missing usage reports · 0.31 USD reported for 1 attempt(s) · 1 without reported cost
+  Sum of process durations: 558.122 s · 0 duration(s) not reported
+  1 review(s) recorded for this task · 1 retry(ies) for this task
+Recette globale et RETEX avant/après · 2 attempts or recorded calls · 30 observed tool calls · 0 incomplete tool measurements · 20/11822 reported input/output tokens · 1 missing usage reports · 0.65 USD reported for 1 attempt(s) · 1 without reported cost
+  Sum of process durations: 486.591 s · 0 duration(s) not reported
+  0 review(s) recorded for this task · 1 retry(ies) for this task
+Engine: 26 recorded checks · 5 agent retries
+Tool calls, AI calls and engine checks are different measurements. Missing data is not zero; not all internal provider retries are observable. A call reservation does not prove it was sent to the provider.
+Per-attempt breakdown
+Inspection ciblée et contrats · agent auto-832c66f95abe8d67a38a · attempt a-5621887914ca22818b315dfd · process state: Process completed · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T07:34:45.177118839Z · End: 2026-10-04T07:38:32.441081431Z
+  Process duration: 227.263 s
+  1 recorded launch · 9 observed tool calls; internal provider calls are not measured.
+  9 observed tool calls · reads 2 · writes 1 · unclassified 6 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  18/18153 reported input/output tokens · 0.70 USD reported for 1 attempt(s)
+QW5 — Régler la limite qui bloque · agent auto-ed82e20e57f3200af263 · attempt a-b45d8905fcf816f645fa0ec2 · process state: Process interrupted · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T07:47:41.216401703Z · End: 2026-10-04T07:57:54.581117331Z
+  Process duration: 613.364 s
+  1 recorded launch · 60 observed tool calls; internal provider calls are not measured.
+  60 observed tool calls · reads 14 · writes 6 · unclassified 40 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  Cost and usage not reported by the provider for this attempt.
+QW5 — Régler la limite qui bloque · agent eee438b9-6b15-4d8b-88d4-55194eb26b5b · attempt a-b455ca4bfd2338cc09d99801 · process state: Process completed · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T08:05:54.792569233Z · End: 2026-10-04T08:08:27.490944122Z
+  Process duration: 152.698 s
+  1 recorded launch · 5 observed tool calls; internal provider calls are not measured.
+  5 observed tool calls · reads 0 · writes 1 · unclassified 4 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  12/11644 reported input/output tokens · 0.41 USD reported for 1 attempt(s)
+QW6 — État actuel et historique · agent 1426ec9c-5a9d-4d45-85ec-316341a236eb · attempt a-008c49f126275727492dfa40 · process state: Process completed · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T08:20:49.040559412Z · End: 2026-10-04T08:24:54.410539382Z
+  Process duration: 245.369 s
+  1 recorded launch · 11 observed tool calls; internal provider calls are not measured.
+  11 observed tool calls · reads 2 · writes 2 · unclassified 7 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  24/16447 reported input/output tokens · 0.70 USD reported for 1 attempt(s)
+QW6 — État actuel et historique · agent auto-21e1c20e88473e830f46 · attempt a-c26b7567bc5d7543dcf487b3 · process state: Process interrupted · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T08:17:35.314048557Z · End: 2026-10-04T08:19:34.768677968Z
+  Process duration: 119.454 s
+  1 recorded launch · 12 observed tool calls; internal provider calls are not measured.
+  12 observed tool calls · reads 4 · writes 0 · unclassified 8 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  Cost and usage not reported by the provider for this attempt.
+QW8 — Vérifier le dossier avant la revue · agent auto-987b01425800fd26ea11 · attempt a-b4ff21ad8b32899aa05db623 · process state: Process interrupted · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T08:48:40.867920971Z · End: 2026-10-04T08:58:43.060938298Z
+  Process duration: 602.193 s
+  1 recorded launch · 41 observed tool calls; internal provider calls are not measured.
+  41 observed tool calls · reads 15 · writes 1 · unclassified 25 · tests unknown: no reliable signal identifies tests within observed commands · errors 2 · repeats 0
+  Cost and usage not reported by the provider for this attempt.
+QW8 — Vérifier le dossier avant la revue · agent auto-d9d0f38349900e043509 · attempt a-600fdd2ca2efc0385bded831 · process state: Process completed · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T08:59:00.890107409Z · End: 2026-10-04T09:06:53.596311776Z
+  Process duration: 472.706 s
+  1 recorded launch · 21 observed tool calls; internal provider calls are not measured.
+  21 observed tool calls · reads 3 · writes 1 · unclassified 17 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  32/10187 reported input/output tokens · 0.55 USD reported for 1 attempt(s)
+QW7 — Voir l’effort par tâche · agent auto-5a61f5425d209232370d · attempt a-58b415b09e3effca87fb4a92 · process state: Process interrupted · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T09:13:52.722811416Z · End: 2026-10-04T09:21:41.589320557Z
+  Process duration: 468.866 s
+  1 recorded launch · 60 observed tool calls; internal provider calls are not measured.
+  60 observed tool calls · reads 8 · writes 16 · unclassified 36 · tests unknown: no reliable signal identifies tests within observed commands · errors 2 · repeats 0
+  Cost and usage not reported by the provider for this attempt.
+QW7 — Voir l’effort par tâche · agent bdebfa65-3638-4789-9297-4f3bfab8d8d0 · attempt a-a83c686e77dd1365dfc56f22 · process state: Process completed · recorded task acceptance (all attempts): yes
+  Start: 2026-10-04T09:58:23.29882262Z · End: 2026-10-04T09:59:52.555099211Z
+  Process duration: 89.256 s
+  1 recorded launch · 7 observed tool calls; internal provider calls are not measured.
+  7 observed tool calls · reads 0 · writes 1 · unclassified 6 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  12/5807 reported input/output tokens · 0.31 USD reported for 1 attempt(s)
+Recette globale et RETEX avant/après · agent 147899a3-11a7-4a56-a0b5-f0c0b9b8df85 · attempt a-e7c206a90a5dd2ba05448d47 · process state: Process interrupted · recorded task acceptance (all attempts): no
+  Start: 2026-10-04T10:08:40.292644518Z · End: 2026-10-04T10:13:47.433223451Z
+  Process duration: 307.140 s
+  1 recorded launch · 13 observed tool calls; internal provider calls are not measured.
+  13 observed tool calls · reads 0 · writes 1 · unclassified 12 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  Cost and usage not reported by the provider for this attempt.
+Recette globale et RETEX avant/après · agent auto-17b39e37f002c9254bf4 · attempt a-f4dfe3fc03d07aa3396b87a6 · process state: Process interrupted · recorded task acceptance (all attempts): no
+  Start: 2026-10-04T10:03:01.171816595Z · End: 2026-10-04T10:06:00.6237555Z
+  Process duration: 179.451 s
+  1 recorded launch · 17 observed tool calls; internal provider calls are not measured.
+  17 observed tool calls · reads 8 · writes 0 · unclassified 9 · tests unknown: no reliable signal identifies tests within observed commands · errors 1 · repeats 0
+  20/11822 reported input/output tokens · 0.65 USD reported for 1 attempt(s)

@@ -29,7 +29,7 @@ func (s *Store) pilotage(w *Work, agents []Agent, validation WorkValidation) map
 			}
 			edges = append(edges, map[string]any{"from_task_id": id, "to_task_id": t.ID, "satisfied_now": fresh, "reason_code": code, "reason_label": label, "evaluated_revision": w.Revision, "evaluated_at": at})
 		}
-		tasks[t.ID] = map[string]any{"ready": s.assistCanStart(w, t), "waiting_on": waiting, "delivery": validation.Tasks[t.ID]}
+		tasks[t.ID] = map[string]any{"ready": s.assistCanStart(w, t), "waiting_on": waiting, "delivery": validation.Tasks[t.ID], "attempt": projectMissionAttempt(t, agents)}
 	}
 	health := map[string]any{}
 	confirmed, unknown, occupied := 0, 0, 0
@@ -92,9 +92,27 @@ func pilotAgentHealth(a Agent, desired, at string) map[string]any {
 	if a.Mode == "terminal" {
 		activity, label = "unknown", "Terminal interactif — progression et appels d’outils non mesurés"
 	}
+	outputState := a.Progress.OutputState
+	if outputState == "" {
+		outputState = "unknown"
+	}
+	toolState := a.Progress.ToolState
+	if toolState == "" {
+		toolState = "unknown"
+	}
+	vitality := a.Progress.Vitality
+	if vitality == "" {
+		vitality = "unknown"
+	}
+	completion := "open"
+	if state == "completed" || state == "failed" || state == "interrupted" {
+		completion = "finished"
+	}
 	return map[string]any{"can_cancel_pending": cancellableQueuedAgent(a), "same_host": a.Host == hostIdentity(), "agent_id": a.ID, "task_attempt_id": a.Attempt, "process_state": state, "process_label": message,
 		"activity_state": activity, "activity_label": label, "last_result_at": a.Progress.LastResult,
-		"threshold_seconds": limits.SilenceSeconds, "observed_at": at, "heartbeat": a.Heartbeat, "stop_requested": desired == "stop"}
+		"output_state": outputState, "last_output_at": a.Progress.LastOutput, "tool_state": toolState,
+		"provider_vitality": vitality, "completion_state": completion, "completion_rule": "process_wait_confirmed",
+		"threshold_seconds": limits.SilenceSeconds, "observed_at": at, "heartbeat": a.Heartbeat, "supervisor_heartbeat": a.Heartbeat, "stop_requested": desired == "stop"}
 }
 
 // Toujours inclure les intentions actives, même au-delà de l'historique récent.
@@ -127,7 +145,7 @@ func (s *Store) launchEligibility(r webRequest) map[string]any {
 	if strings.TrimSpace(r.Provider) == "" || strings.TrimSpace(r.Workspace) == "" {
 		return result
 	}
-	_, _, e := s.prepareLaunch(r.Work, Launch{Mode: r.Mode, Schema: 1, EventID: newID("preview-"), Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Workspace: r.Workspace, Role: r.Role, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Instruction: r.Instruction}, true)
+	_, _, e := s.prepareLaunch(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Schema: 1, EventID: newID("preview-"), Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Workspace: r.Workspace, Role: r.Role, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Instruction: r.Instruction}, true)
 	if e != nil {
 		result["reason_code"] = "launch_refused"
 		result["reason_label"] = e.Error()

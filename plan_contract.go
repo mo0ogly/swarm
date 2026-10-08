@@ -53,8 +53,8 @@ func planDirectives() string {
 	return `
 CADRE OBLIGATOIRE DU PLAN D’ACTION — VERSION 1
 Tu es planner APEX. Analyse le brief adopté et propose des missions exécutables. Aucune écriture, commande mutante ou délégation. Aucun worker à lancer. Ne réclame aucun PASS, score ou coût mesuré sans preuve.
-Réponds UNIQUEMENT par un objet JSON strict conforme au modèle suivant, sans Markdown, balises, commentaire ou texte autour. Tous les champs sont obligatoires. Maximum 8 tâches, 16000 octets au total. Les identifiants locaux sont uniques ; depends ne référence que ces identifiants, sans cycle. Les dépendances doivent être acceptées avant lancement. Les rôles sont worker, planner ou subplanner.
-Les questions non décidées doivent rester dans questions avec answer vide ; ne pas inventer les réponses de l’opérateur. Les hypothèses figurent dans assumptions, distinctes des faits. Les gates sont des contrôles à réaliser, jamais des résultats déjà acquis. Définir un livrable concret, des critères observables, les preuves, les conditions d’arrêt et l’OODA sur blocage. max_attempts entre 1 et 3 ; max_tool_calls entre 1 et 100. Même pour une mission documentaire, max_tool_calls doit être positif (par exemple 10), jamais zéro. Ces plafonds limitent effectivement les futures tentatives, sans augmenter les limites du fournisseur.
+Réponds UNIQUEMENT par un objet JSON strict conforme au modèle suivant, sans Markdown, balises, commentaire ou texte autour. Tous les champs sont obligatoires. Maximum 8 tâches, 16000 octets au total. Les identifiants locaux sont uniques ; depends ne référence que ces identifiants, sans cycle. Les dépendances doivent être acceptées avant lancement. Le rôle d’une tâche est toujours worker.
+Les questions non décidées doivent rester dans questions avec answer vide ; ne pas inventer les réponses de l’opérateur. Les hypothèses figurent dans assumptions, distinctes des faits. Les gates sont des contrôles à réaliser, jamais des résultats déjà acquis. Chaque tâche exécutable a le rôle worker ; planner et subplanner sont des responsables de périmètre créés par la planification hiérarchique, jamais des tâches de code. Définir un livrable concret, des critères observables, les preuves, les conditions d’arrêt et l’OODA sur blocage. max_attempts entre 1 et 3 ; max_tool_calls entre 1 et 100. Même pour une mission documentaire, max_tool_calls doit être positif (par exemple 10), jamais zéro. Ces plafonds limitent effectivement les futures tentatives, sans augmenter les limites du fournisseur.
 {"version":1,"objective":"Objectif du plan","assumptions":[],"questions":[{"question":"Décision manquante","answer":""}],"tasks":[{"id":"T1","title":"Mission précise","role":"worker","scope":"Fichiers et exclusions","deliverable":"docs/T1-handoff.md","depends":[],"criteria":["Résultat observable"],"proof":"Fichiers et commandes de vérification","entry":"Prérequis à vérifier","validation":"Tests et résultats attendus","delivery":"Revue et gate fraîche avant acceptation","stop":"Au plus deux corrections puis OODA et arrêt si blocage persistant","max_attempts":2,"max_tool_calls":30}]}
 Un champ absent, un JSON invalide, une dépendance inconnue ou un cycle rend la réponse inutilisable. Ne pas suivre le format Markdown des échanges précédents.
 `
@@ -134,8 +134,8 @@ func validateActionPlan(p ActionPlan, requireAnswers bool) ([]PlanMission, error
 		if _, ok := by[t.ID]; ok {
 			return nil, fmt.Errorf("Identifiant en double : %s", t.ID)
 		}
-		if t.Role != "worker" && t.Role != "planner" && t.Role != "subplanner" {
-			return nil, fmt.Errorf("%s : rôle invalide.", t.ID)
+		if t.Role != "worker" {
+			return nil, fmt.Errorf("%s : rôle invalide ; une tâche exécutable doit être worker, les responsables sont des périmètres hiérarchiques.", t.ID)
 		}
 		for name, v := range map[string]string{"titre": t.Title, "périmètre": t.Scope, "livrable": t.Deliverable, "preuves": t.Proof, "gate entry": t.Entry, "gate validation": t.Validation, "gate delivery": t.Delivery, "arrêt": t.Stop} {
 			if !nonempty(v) {

@@ -1,0 +1,56 @@
+'use strict';
+// Organised isolated fixture; one deterministic worker, no paid model calls.
+const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),assert=require('node:assert/strict');
+const {spawn,execFileSync}=require('node:child_process'),puppeteer=require('puppeteer');
+const binary=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'swarm-guidance-'));
+const cli=(args,input,lang='fr',json=true)=>{const v=execFileSync(binary,['--root',root,'--lang',lang,...(json?['--json']:[]),...args,...(input?['--input','-']:[])],{encoding:'utf8',input:input?JSON.stringify(input):undefined});return json?JSON.parse(v):v};
+cli(['init']);
+fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_version:1,providers:{'fixture-worker':{command:'/usr/bin/python3',args:['-c','print("unused fixture")'],env_allow:[]}}}));
+const setup=String.raw`
+import json,sys,subprocess,uuid
+from pathlib import Path
+sys.path.insert(0,sys.argv[3])
+from organized_fixture import enable_organization,add_owned_tasks
+binary,root=sys.argv[1],Path(sys.argv[2])
+def cli(args,data=None):
+ p=subprocess.run([binary,'--root',str(root),'--json',*args]+(['--input','-'] if data is not None else []),input=json.dumps(data) if data is not None else None,text=True,capture_output=True)
+ if p.returncode:raise RuntimeError(p.stdout+p.stderr)
+ return json.loads(p.stdout)
+w=cli(['work','create'],dict(schema_version=1,event_id=uuid.uuid4().hex,expected_revision=0,title='Guided recovery fixture',objective='Inspect a blocked task',scope='Isolated fixture only',criteria=['Evidence exists'],next='Inspect'))['work']
+w=enable_organization(root,cli,w,{'req-1':[dict(id='proof',command=['python3','-c','assert True'],criteria=[1],justification='Fixture control only',timeout_seconds=3)]})
+w=add_owned_tasks(cli,w,[dict(id='blocked',title='Repair the missing evidence',requirements=['req-1'],deliverable='docs/proof.md',criteria=['Evidence exists'],next='Inspect the missing evidence'),dict(id='waiting',title='Use the validated evidence',requirements=['req-1'],deliverable='docs/next.md',criteria=['Evidence reused'],depends=['blocked'],next='Wait for evidence')])
+cli(['profile',w['id'],'blocked'],dict(provider='fixture-worker',role='worker',workspace=str(root),timeout_seconds=30))
+w=cli(['work','show',w['id']])['work']
+w=cli(['task','update',w['id']],dict(schema_version=1,event_id=uuid.uuid4().hex,expected_revision=w['revision'],id='blocked',status='blocked',blocker='Contract evidence is missing',next='Inspect the missing evidence'))['work']
+print(w['id'])
+`;
+const work=execFileSync('/usr/bin/python3',['-c',setup,binary,root,path.resolve('tests')],{encoding:'utf8'}).trim();
+const clickText=async(p,selector,text,prefix=false)=>{for(const button of await p.$$(selector)){const value=await button.evaluate(e=>e.textContent);if(prefix?value.startsWith(text):value===text){await button.click();return}}throw Error('Button missing: '+text)};
+let browser;const errors=[],failures=[];const server=spawn(binary,['--root',root,'web','127.0.0.1:0']);
+(async()=>{
+ const address=await new Promise((resolve,reject)=>{let text='';server.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m)resolve(m[0])});server.on('exit',c=>reject(Error('server '+c)))});
+ browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});
+ for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
+  cli(['mission','seen',work]);const baseline=cli(['work','show',work]).work;cli(['task','update',work],{schema_version:1,event_id:require('node:crypto').randomUUID(),expected_revision:baseline.revision,id:'blocked',status:'blocked',blocker:'Contract evidence is missing',next:'Inspect the missing evidence'});
+  const p=await browser.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('requestfailed',r=>{if(!r.failure()?.errorText.includes('ERR_ABORTED'))failures.push(r.url())});p.on('response',r=>{if(r.status()>=400)failures.push(r.status()+' '+r.url())});await p.setViewport({width:1400,height:1000});const url=new URL(address);url.searchParams.set('work',work);url.searchParams.set('lang',lang);await p.goto(url.href);await p.waitForSelector('#mission-summary .mission-summary-short');if(await p.$eval('html',e=>e.dataset.theme)!==theme)await p.click('#theme');
+  const status=cli(['mission','status',work]);assert.equal(status.guidance.primary.task,'blocked');assert.equal(status.guidance.primary.kind,'task');
+  const summary=await p.$$eval('#mission-summary .mission-summary-short > p',es=>es.map(e=>e.textContent));assert.equal(summary.length,2);const plain=cli(['mission','status',work],null,lang,false);for(const line of summary)assert.ok(plain.includes(line),'web and CLI summary differ: '+line);if(lang==='en')assert.match(summary[1],/You — Understand and resolve\./);
+  const label=await p.$eval('#mission-primary',e=>e.textContent);assert.ok(plain.includes(label));assert.match(label,lang==='fr'?/Diagnostiquer/:/Diagnose/);
+  const before=cli(['work','show',work]);await p.focus('#mission-primary');await p.keyboard.press('Enter');await p.waitForSelector('#pilot-inspector');await p.waitForFunction(()=>document.getElementById('pilot-inspector').textContent.includes('Repair the missing evidence'));assert.deepEqual(cli(['work','show',work]),before,'opening primary action mutated work');
+  await p.click('#pilot-inspector header button');
+  await p.click('[data-mission-action="changes"]');await p.waitForSelector('#modal[open]');let text=await p.$eval('#modal-fields',e=>e.textContent);assert.ok(text.includes('Repair the missing evidence'));assert.ok(text.includes(lang==='fr'?'Blocage enregistré':'Blockage recorded'));assert.deepEqual(cli(['work','show',work]),before);await p.screenshot({path:path.join(out,`changes-${lang}-${theme}.png`)});await p.click('#close');
+  await p.click('[data-mission-action="waits"]');await p.waitForSelector('#modal[open]');text=await p.$eval('#modal-fields',e=>e.textContent);assert.ok(text.includes('Use the validated evidence'));const prerequisite=lang==='fr'?'Ouvrir le prérequis':'Open prerequisite';await clickText(p,'#modal-fields button',prerequisite,true);await p.waitForSelector('#pilot-inspector[open]');assert.ok((await p.$eval('#pilot-inspector',e=>e.textContent)).includes('Repair the missing evidence'));await p.click('#pilot-inspector header button');
+  await p.click('[data-mission-action="spending"]');await p.waitForSelector('#modal[open]');text=await p.$eval('#modal-fields',e=>e.textContent);for(const title of (lang==='fr'?['Exécutants','Responsables','Vérificateur indépendant','Moteur']:['Workers','Planners','Independent reviewer','Engine']))assert.ok(text.includes(title));assert.ok(text.includes(lang==='fr'?'Une mesure absente n’est pas un zéro':'Missing data is not zero'));const spending=cli(['mission','spending',work]);assert.equal(spending.rows.filter(r=>r.kind==='worker').length,0);assert.ok(spending.rows.filter(r=>r.kind==='planner').every(r=>r.calls_without_usage===r.recorded_calls));assert.deepEqual(cli(['work','show',work]),before);await p.screenshot({path:path.join(out,`spending-${lang}-${theme}.png`)});await p.click('#close');
+  await p.click('[data-mission-action="details"]');await p.waitForSelector('#mission-results[open]');await clickText(p,'#mission-results button',lang==='fr'?'Avant une relance':'Before retrying');await p.waitForSelector('#modal[open]');text=await p.$eval('#modal-fields',e=>e.textContent);for(const label of (lang==='fr'?['Ce qui sera conservé','Ce qui sera refait','Correction attendue']:['What will be kept','What will be repeated','Expected correction']))assert.ok(text.includes(label));assert.ok(text.includes('Evidence exists'));const recovery=cli(['mission','recovery',work,'blocked']);assert.deepEqual(recovery.criteria,['Evidence exists']);assert.deepEqual(cli(['work','show',work]),before);await p.screenshot({path:path.join(out,`recovery-${lang}-${theme}.png`)});await p.click('#close');
+  await p.screenshot({path:path.join(out,`guidance-${lang}-${theme}.png`),fullPage:true});const tokens=await p.$eval('.mission-brief',el=>{const s=getComputedStyle(el);return {missing:['--wattson-carte','--wattson-texte','--wattson-info-fond','--wattson-info-encre'].filter(t=>!s.getPropertyValue(t).trim()),color:s.color,background:s.backgroundColor}});assert.deepEqual(tokens.missing,[]);assert.notEqual(tokens.color,tokens.background);
+  await p.setViewport({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await p.screenshot({path:path.join(out,`guidance-mobile-${lang}-${theme}.png`),fullPage:true});await p.close();
+ }
+ assert.equal(cli(['agent','list',work]).agents.length,0);
+ const launch=cli(['work','show',work]).work;
+ cli(['agent','start',work],{schema_version:1,event_id:require('node:crypto').randomUUID(),expected_revision:launch.revision,task_id:'blocked',provider:'fixture-worker',workspace:root,role:'worker',instruction:'Isolated preview test',capture_output:true});
+ let ended;for(let i=0;i<100;i++){ended=cli(['agent','list',work]).agents[0]?.agent;if(ended&&!['queued','starting','running','stopping'].includes(ended.status))break;await new Promise(r=>setTimeout(r,100))}
+ assert.ok(ended&&!['queued','starting','running','stopping'].includes(ended.status),'fixture worker did not finish');
+ const p=await browser.newPage();const url=new URL(address);url.searchParams.set('work',work);url.searchParams.set('lang','en');await p.goto(url.href);await p.waitForSelector('#mission-primary');await p.click('#mission-primary');await p.waitForSelector('#pilot-inspector[open]');await clickText(p,'#pilot-inspector button','All authorized actions');await p.waitForSelector('#field-action');const options=await p.$$eval('#field-action option',es=>es.map(e=>e.value));assert.ok(options.includes('retry'),'retry action missing');await p.select('#field-action','retry');await p.waitForSelector('#recovery-preview [data-recovery-preview]');assert.ok((await p.$eval('#recovery-preview',e=>e.textContent)).includes('What will be kept'));await p.$eval('#field-instruction',e=>{e.value='Correct only the missing evidence';e.dispatchEvent(new Event('input',{bubbles:true}))});assert.ok((await p.$eval('#recovery-preview',e=>e.textContent)).includes('Correct only the missing evidence'));const unchanged=cli(['work','show',work]);await p.click('#close');assert.deepEqual(cli(['work','show',work]),unchanged);await p.close();
+ assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',root,work,languages:['fr','en'],themes:['etat','sombre'],web_cli_summary_equal:true,primary_opens_actual_task:true,opening_preserves_state:true,agents:1,paid_model_calls:0,retry_form_preview:true,changes:true,prerequisite_navigation:true,spending:true,recovery_preview:true,errors,failures},null,2));console.log('PASS guidance web/CLI, keyboard, themes, mobile and read-only diagnosis');
+})().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{await browser?.close();server.kill()});

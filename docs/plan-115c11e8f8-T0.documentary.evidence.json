@@ -1,0 +1,129 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-115c11e8f8-T0",
+  "artifacts": {
+    "docs/plans/clear-launch-recovery/T0-inventaire.md": "6396daecf21a7c4dae9f27307588068f7aa09509302fe2429e9803500a51ebc6",
+    "docs/plan-115c11e8f8-T0.md": "e65e038bd9ee2dde03275258590ad5a65603b488eb324baf3604a9cc5478d56d"
+  },
+  "domains": {
+    "documentary_review": 100
+  },
+  "checks": [
+    {
+      "id": "plan-entry",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-1",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T0-inventaire.md",
+        "docs/plan-115c11e8f8-T0.md"
+      ],
+      "reason": "Racine swarm-action-skills et mission courante confirmées par work show et agent list ; seuls les deux documents autorisés ont été ajoutés selon git status."
+    },
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T0-inventaire.md",
+        "docs/plan-115c11e8f8-T0.md"
+      ],
+      "reason": "Lecture superviseur du livrable et des définitions MissionLaunchPreview, MissionUnderstanding, RecoveryPreview et SpendingRow, ainsi que mission_cli.go:74-122 et missionSpending:253-332 : les quatre familles ont des références concrètes et des lacunes séparées. Contrôle documentaire, aucune réussite applicative revendiquée."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T0-inventaire.md",
+        "docs/plan-115c11e8f8-T0.md"
+      ],
+      "reason": "Source docs/RETEX-ADMIN-PREPARATION.md:1055-1102 relue : aperçu reprise, coûts et parité CLI/web décrits ; définitions courantes corroborées dans mission_status.go et mission_insights.go. La présence du code ne constitue pas une recette visuelle de cette mission."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T0-inventaire.md",
+        "docs/plan-115c11e8f8-T0.md"
+      ],
+      "reason": "Les six inconnues sont explicitement datées 2026-10-03 ; modèle, granularité, diagnostics et rendu navigateur non vérifiés restent inconnus. Aucun comportement non lu n’est affirmé."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T0-inventaire.md",
+        "docs/plan-115c11e8f8-T0.md"
+      ],
+      "reason": "Contrôle documentaire effectué par le superviseur, distinct du producteur. Pas de tests applicatifs nécessaires pour cet inventaire sans modification de code. Les incohérences de métadonnées de départ du handoff sont conservées comme limites, sans les utiliser pour prouver une réussite."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/plans/clear-launch-recovery/T0-inventaire.md",
+        "docs/plan-115c11e8f8-T0.md"
+      ],
+      "reason": "Avis indépendant review-660c4549ce1320835c2b1930 passed, tentative a-4936ef9cae21f9cf1074a1c8, terminé 2026-10-03T08:24:24.186347931Z : trois critères pass. Avis limité à la conformité documentaire sans outils ; le superviseur a corroboré les structures sources citées. Le moteur vérifiera sa fraîcheur à l’acceptation."
+    }
+  ]
+}

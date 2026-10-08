@@ -1,0 +1,3 @@
+AssertionError [ERR_ASSERTION]: rendered diagnostic must match real server state
+    at verifySurface (/home/fpizzi/workspace/swarm-action-skills/tests/version_ui.cjs:26:344)
+    at async /home/fpizzi/workspace/swarm-action-skills/tests/version_ui.cjs:46:112

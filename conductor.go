@@ -28,9 +28,26 @@ const reportClockSkew = 2 * time.Second
 func (s *Store) conduct(a Agent, outcome string) {
 	if w, e := s.get(a.WorkID); e == nil && w.Planning != nil && w.Planning.Repository != nil {
 		if outcome == "completed" {
+			// A retained refusal is not queued work. Reopening Git on every
+			// polling pass can starve new launches and overwrite the original
+			// diagnosis. Explicit recovery rearms integration separately.
+			if item, err := s.managedAttempt(a.ID); err == nil && (item.State == "conflict" || item.State == "integrated") {
+				if item.State == "conflict" {
+					_ = s.reconcileOrphanedManagedReview(w, a)
+				}
+				return
+			}
 			if err := s.integrateManagedAttempt(a); err != nil {
+				if commandFailure(err).Code == "storage_unavailable" {
+					return
+				}
+				// Another bounded integration already owns the cross-process
+				// lock. A polling pass must not emit a new failure every time.
+				if strings.Contains(err.Error(), "déjà en cours") {
+					return
+				}
 				_ = s.log(a.ID, "validation", err.Error())
-				if allowed, _ := s.automaticValidationAuthorized(a.WorkID); allowed && commandFailure(err).Code != "revision_conflict" && !strings.Contains(err.Error(), "déjà en cours") && !strings.Contains(err.Error(), "SQLITE_BUSY") {
+				if allowed, _ := s.automaticValidationAuthorized(a.WorkID); allowed && commandFailure(err).Code != "revision_conflict" && commandFailure(err).Code != "provider_cooldown" && !strings.Contains(err.Error(), "déjà en cours") && !strings.Contains(err.Error(), "SQLITE_BUSY") {
 					_ = s.managedFailure(a, "Intégration interrompue : "+err.Error())
 				}
 			}
@@ -59,6 +76,39 @@ func (s *Store) conduct(a Agent, outcome string) {
 		_ = s.log(a.ID, "validation", validationReason)
 		_ = s.controlEvent(a.WorkID, kind, a.TaskID+" · tentative "+a.Attempt+" : "+validationReason)
 	}
+}
+
+// A retained conflict must not hide a review left running by a dead controller.
+// Real managed reviews hold this cross-process lock throughout inference. Only
+// its free ownership proves that reconciliation cannot interrupt a live review.
+// This records interruption; it never rearms integration or reserves a new call.
+func (s *Store) reconcileOrphanedManagedReview(w Work, a Agent) error {
+	t, err := w.task(a.TaskID)
+	if err != nil || t.IndependentReview == nil || t.IndependentReview.State != "running" || t.IndependentReview.Attempt != a.Attempt {
+		return err
+	}
+	unlock, err := managedLock(s.root, w.ID)
+	if err != nil {
+		return err
+	}
+	defer unlock()
+	releaseReview, err := managedReviewOwnershipLock(s.root, w.ID, a.ID)
+	if err != nil {
+		return err
+	}
+	defer releaseReview()
+	w, err = s.get(w.ID)
+	if err != nil {
+		return err
+	}
+	t, err = w.task(a.TaskID)
+	if err != nil || t.IndependentReview == nil || t.IndependentReview.State != "running" || t.IndependentReview.Attempt != a.Attempt || !currentTaskAttempt(t, a.Attempt) {
+		return err
+	}
+	record := *t.IndependentReview
+	record.State, record.Finished = "error", now()
+	record.Reason = "Revue interrompue avant verdict durable ; reprise explicite requise sur le candidat conservé. Aucun nouvel appel automatique."
+	return s.saveManagedReview(w.ID, a, record)
 }
 
 // relayHandoff retourne le rapport relayé et le motif journalisable.

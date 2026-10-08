@@ -16,7 +16,7 @@ func TestValidationDriftBlocksAckAndDependencies(t *testing.T) {
 	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "submitted", Outcome: "completed"})
 	w = gateTest(t, s, w, fixture(t, s.root))
 	w = applyTest(t, s, w, "task.update", Request{ID: "t1", Status: "accepted"})
-	if v := s.validationState(&w); v.State != "VALIDÉ" || v.Validated != 1 {
+	if v := s.validationState(&w); v.State != "validated" || v.Label != "VALIDÉ" || v.Validated != 1 {
 		t.Fatal(v)
 	}
 	w = applyTest(t, s, w, "task.add", Request{ID: "t2", Title: "suite", Deliverable: "preuve", Criteria: []string{"ok"}, Depends: []string{"t1"}})
@@ -24,7 +24,7 @@ func TestValidationDriftBlocksAckAndDependencies(t *testing.T) {
 		t.Fatal(err)
 	}
 	v := s.validationState(&w)
-	if v.Validated != 0 || v.Historical != 1 || v.Stale != 1 || v.State != "BLOQUÉ" || !strings.Contains(strings.Join(v.Tasks["t1"].Blockers, " "), "proof.txt") {
+	if v.Validated != 0 || v.Historical != 1 || v.Stale != 1 || v.State != "blocked" || v.Label != "BLOQUÉ" || !strings.Contains(strings.Join(v.Tasks["t1"].Blockers, " "), "proof.txt") {
 		t.Fatal(v)
 	}
 	if err := s.apply(&w, "task.update", Request{ID: "t2", Status: "running"}); err == nil {

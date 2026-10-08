@@ -45,7 +45,21 @@ func status(s string) string {
 	m := map[string]string{"todo": uiText("À FAIRE"), "running": uiText("EN COURS (activité non confirmée)"), "blocked": uiText("BLOQUÉE"), "submitted": uiText("SOUMISE — À VALIDER"), "accepted": uiText("ACCEPTÉE"), "waived": uiText("ACCEPTÉE PAR DÉROGATION"), "abandoned": uiText("ABANDONNÉE")}
 	return m[s]
 }
-func (s *Store) workStatus(w Work) (string, int, int) {
+func workStatusLabel(code string) string {
+	labels := map[string]string{
+		"validated": uiText("VALIDÉ"),
+		"waived":    uiText("ACCEPTÉ AVEC DÉROGATION"),
+		"blocked":   uiText("BLOQUÉ"),
+		"abandoned": uiText("ABANDONNÉ"),
+		"partial":   uiText("PARTIEL"),
+		"open":      uiText("OUVERT"),
+	}
+	return labels[code]
+}
+
+// workStatusCode is the single language-independent work verdict used by JSON
+// clients. workStatus remains the text boundary for the human CLI.
+func (s *Store) workStatusCode(w Work) (string, int, int) {
 	s = s.readScope()
 	accepted, total, abandoned := 0, len(w.Tasks), 0
 	blocked := false
@@ -65,21 +79,25 @@ func (s *Store) workStatus(w Work) (string, int, int) {
 	if total > 0 && accepted == total {
 		for _, t := range w.Tasks {
 			if t.Status == "waived" {
-				return uiText("ACCEPTÉ AVEC DÉROGATION"), accepted, total
+				return "waived", accepted, total
 			}
 		}
-		return uiText("VALIDÉ"), accepted, total
+		return "validated", accepted, total
 	}
 	if blocked {
-		return uiText("BLOQUÉ"), accepted, total
+		return "blocked", accepted, total
 	}
 	if total > 0 && abandoned == total {
-		return uiText("ABANDONNÉ"), accepted, total
+		return "abandoned", accepted, total
 	}
 	if abandoned > 0 && accepted+abandoned == total {
-		return uiText("PARTIEL"), accepted, total
+		return "partial", accepted, total
 	}
-	return uiText("OUVERT"), accepted, total
+	return "open", accepted, total
+}
+func (s *Store) workStatus(w Work) (string, int, int) {
+	code, accepted, total := s.workStatusCode(w)
+	return workStatusLabel(code), accepted, total
 }
 func (s *Store) listView(ws []Work) string {
 	var b strings.Builder
@@ -159,7 +177,21 @@ func (s *Store) view(w Work) (string, error) {
 		}
 	}
 	b.WriteString(uiText("\n## Gates, qualité et progression vérifiée\n"))
+	validation := s.validationState(&w)
 	for _, t := range w.Tasks {
+		evidence := validation.Tasks[t.ID].Evidence
+		fmt.Fprintf(&b, uiText("- %s · preuve structurée : tentative=%s ; révision=%d ; fraîcheur=%s\n  Revue du rapport=%s ; contrôles exécutés=%s ; acceptation=%s\n"), t.ID, evidence.Attempt, evidence.Revision, evidence.Freshness, evidence.ReportReview.State, evidence.Controls.State, evidence.Acceptance.State)
+		for _, control := range evidence.Controls.Items {
+			command := "unknown"
+			if len(control.Command) > 0 {
+				command = strings.Join(control.Command, " ")
+			}
+			exit := "unknown"
+			if control.ExitCode != nil {
+				exit = fmt.Sprint(*control.ExitCode)
+			}
+			fmt.Fprintf(&b, uiText("  Contrôle %s : tentative=%s ; exécution=%s ; révision=%s ; sha_candidat=%s ; commande=%s ; code=%s ; début=%s ; fin=%s ; fraîcheur=%s\n"), control.ID, control.Attempt, control.Execution, control.Revision, control.CandidateSHA, command, exit, control.Started, control.Finished, control.Freshness)
+		}
 		if t.Gate == nil {
 			fmt.Fprintf(&b, uiText("- %s : gate non renseignée.\n"), t.ID)
 			continue

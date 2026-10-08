@@ -6,15 +6,70 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
 
 func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Writer) error {
 	if len(args) < 3 {
-		return fmt.Errorf("usage : mission status|preview|start|pause|resume|stop|watch WORK [--input profil.json]")
+		return fmt.Errorf("usage : mission status|changes|spending|seen|recovery|preview|start|pause|resume|stop|watch WORK [--input profil.json]")
 	}
 	action, work := args[1], args[2]
+	if action == "seen" {
+		w, e := s.get(work)
+		if e != nil {
+			return e
+		}
+		if e = s.markVisit(work, operatorIdentity(), w.Revision); e != nil {
+			return e
+		}
+		v, e := s.visit(work, operatorIdentity())
+		if e != nil {
+			return e
+		}
+		if asJSON {
+			return printJSON(out, v)
+		}
+		fmt.Fprintln(out, uiText("Révision marquée comme vue."))
+		return nil
+	}
+	if action == "recovery" {
+		if len(args) < 4 {
+			return fmt.Errorf("usage : mission recovery WORK TASK [AGENT]")
+		}
+		agent := ""
+		if len(args) > 4 {
+			agent = args[4]
+		}
+		p, e := s.recoveryPreview(work, args[3], agent)
+		if e != nil {
+			return e
+		}
+		if asJSON {
+			return printJSON(out, p)
+		}
+		printRecoveryPreview(out, p)
+		return nil
+	}
+	if action == "changes" || action == "spending" {
+		d, e := s.missionStatus(work)
+		if e != nil {
+			return e
+		}
+		if action == "changes" {
+			if asJSON {
+				return printJSON(out, d.Changes)
+			}
+			printMissionChanges(out, d.Changes)
+		} else {
+			if asJSON {
+				return printJSON(out, d.Spending)
+			}
+			printMissionSpending(out, d.Spending)
+		}
+		return nil
+	}
 	switch action {
 	case "preview", "start":
 		var p LaunchProfile
@@ -49,20 +104,24 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 				return printJSON(out, preview)
 			}
 			fmt.Fprintf(out, uiText("%d départ(s) possible(s) maintenant · concurrence réelle %d/%d\n"), preview.Immediate, preview.EffectiveConcurrency, preview.RequestedSlots)
-			fmt.Fprintln(out, preview.ConcurrencyDetail)
+			fmt.Fprintln(out, uiEngineText(preview.ConcurrencyDetail))
+			printMissionLaunchIdentity(out, preview.Identity)
 			fmt.Fprintln(out, uiText("Autorisation examinée une fois :"))
-			fmt.Fprintf(out, uiText("- Portée : %s\n"), preview.Contract.Scope)
-			fmt.Fprintf(out, uiText("- Budget : %s\n"), preview.Contract.Budget)
-			fmt.Fprintf(out, uiText("- Reprises : %s\n"), preview.Contract.Recovery)
-			fmt.Fprintf(out, uiText("- Validations : %s\n"), preview.Contract.Validation)
+			fmt.Fprintf(out, uiText("- Portée : %s\n"), uiEngineText(preview.Contract.Scope))
+			fmt.Fprintf(out, uiText("- Budget : %s\n"), uiEngineText(preview.Contract.Budget))
+			fmt.Fprintf(out, uiText("- Reprises : %s\n"), uiEngineText(preview.Contract.Recovery))
+			fmt.Fprintf(out, uiText("- Validations : %s\n"), uiEngineText(preview.Contract.Validation))
 			for _, item := range preview.Departures {
 				fmt.Fprintf(out, uiText("- Départ : %s\n"), item.Title)
+				if item.Identity != nil {
+					printMissionLaunchIdentity(out, *item.Identity)
+				}
 			}
 			for _, item := range preview.Waiting {
-				fmt.Fprintf(out, uiText("- Attente : %s — %s\n"), item.Title, item.Reason)
+				fmt.Fprintf(out, uiText("- Attente : %s — %s\n"), item.Title, uiEngineText(item.Reason))
 			}
 			for _, limit := range preview.Limits {
-				fmt.Fprintf(out, uiText("- Limite : %s\n"), limit)
+				fmt.Fprintf(out, uiText("- Limite : %s\n"), uiEngineText(limit))
 			}
 			return nil
 		}
@@ -116,20 +175,42 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 		return printJSON(out, d)
 	}
 	fmt.Fprintln(out, "Mission")
-	printMissionUnderstanding(out, d.Understanding, "  ")
-	fmt.Fprintln(out, d.Organization.Label)
-	for _, issue := range d.Organization.Issues {
-		fmt.Fprintln(out, "- "+issue)
+	fmt.Fprintln(out, uiText("La mission en bref"))
+	fmt.Fprintln(out, uiFactText(d.Guidance.What, d.Tasks))
+	fmt.Fprintf(out, "%s — %s\n", uiEngineText(d.Guidance.Actor), uiEngineText(d.Guidance.Next))
+	fmt.Fprintf(out, uiText("Action principale : %s\nEffet : %s\n"), uiEngineText(d.Guidance.Primary.Label), uiEngineText(d.Guidance.Primary.Effect))
+	if d.Guidance.Primary.Task != "" {
+		fmt.Fprintf(out, uiText("Tâche concernée : %s\n"), d.Guidance.Primary.Task)
 	}
-	fmt.Fprintln(out, d.Organization.Verification)
+	fmt.Fprintln(out, uiEngineText(d.Organization.Label))
+	printMissionChanges(out, d.Changes)
+	printMissionSpending(out, d.Spending)
+	for _, issue := range d.Organization.Issues {
+		fmt.Fprintln(out, "- "+uiEngineText(issue))
+	}
+	fmt.Fprintln(out, uiEngineText(d.Organization.Verification))
+	if !d.Organization.Ready {
+		fmt.Fprintln(out, uiEngineText(d.Organization.Next))
+	}
 	if current, e := s.get(work); e == nil {
 		for _, t := range current.Tasks {
 			if r := t.IndependentReview; r != nil {
-				fmt.Fprintf(out, uiText("Vérification — %s : %s · %s\n"), t.Title, reviewStateLabel(r.State), r.Reason)
+				// r.Reason is reviewer-authored free text (model output); never translated, matching web/planning.js.
+				fmt.Fprintf(out, uiText("Vérification — %s : %s · %s\n"), t.Title, uiEngineText(reviewStateLabel(r.State)), r.Reason)
 			}
 		}
 	}
-	fmt.Fprintln(out, d.EvidenceStage)
+	if current, err := s.get(work); err == nil {
+		validation := s.validationState(&current)
+		for _, task := range current.Tasks {
+			fmt.Fprintln(out, task.Title)
+			if r := task.IndependentReview; r != nil {
+				fmt.Fprintf(out, uiText("Producteur : %s · Vérificateur : %s · SHA candidat : %s\n"), r.Producer, r.Reviewer, valueOrUnknown(r.CandidateSHA))
+			}
+			fmt.Fprintln(out, evidenceText(validation.Tasks[task.ID].Evidence))
+		}
+	}
+	fmt.Fprintln(out, uiEngineText(d.EvidenceStage))
 	permission := uiText("non autorisée")
 	if d.Authorized {
 		permission = uiText("autorisée")
@@ -161,11 +242,14 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 		fmt.Fprintln(out, uiText("Dernière action — Conducteur Swarm : aucune action enregistrée pour cette mission."))
 	}
 	for _, t := range d.Tasks {
+		for _, wait := range t.Waits {
+			fmt.Fprintf(out, uiText("Attente — %s : %s (%s) · %s · swarm mission status %s\n"), t.Title, wait.Title, wait.Task, uiEngineText(wait.Reason), work)
+		}
 		fmt.Fprintf(out, uiText("\nTâche — %s\n"), t.Title)
-		fmt.Fprintf(out, uiText("  Résultat : %s\n"), t.Result.Label)
-		fmt.Fprintf(out, uiText("  Processus : %s · rapport : %s · validation : %s\n"), t.Result.ProcessLabel, t.Result.ReportLabel, t.Result.ValidationLabel)
-		printMissionUnderstanding(out, t.Understanding, "  ")
-		fmt.Fprintf(out, uiText("  Action disponible : %s · tâche %s · %d dépendants\n"), t.Label, t.Target, t.Impact)
+		fmt.Fprintf(out, uiText("  Résultat : %s\n"), uiEngineText(t.Result.Label))
+		fmt.Fprintf(out, uiText("  Processus : %s · rapport : %s · validation : %s\n"), uiEngineText(t.Result.ProcessLabel), uiEngineText(t.Result.ReportLabel), uiEngineText(t.Result.ValidationLabel))
+		printMissionUnderstanding(out, t.Understanding, d.Tasks, "  ")
+		fmt.Fprintf(out, uiText("  Action disponible : %s · tâche %s · %d dépendants\n"), uiEngineText(t.Primary.Label), t.Target, t.Impact)
 		if t.Diagnostic != nil {
 			printAttemptDiagnostic(out, *t.Diagnostic, "  ")
 		}
@@ -179,7 +263,7 @@ func missionCLI(s *Store, args []string, input string, asJSON bool, out io.Write
 				when += " (" + phase.Relative + ")"
 			}
 		}
-		fmt.Fprintf(out, uiText("- %s : %s%s\n  Qui agit : %s · prochaine étape : %s\n"), phase.Label, phase.Summary, when, phase.Actor, phase.NextStep)
+		fmt.Fprintf(out, uiText("- %s : %s%s\n  Qui agit : %s · prochaine étape : %s\n"), uiEngineText(phase.Label), uiEngineText(phase.Summary), when, uiEngineText(phase.Actor), uiEngineText(phase.NextStep))
 	}
 	if d.Authorized && !d.Enabled && !d.Paused {
 		if d.Supervision.State == "error" {
@@ -200,12 +284,12 @@ func missionReadableTime(value string) string {
 }
 
 func printAttemptDiagnostic(out io.Writer, diagnostic AttemptDiagnostic, indent string) {
-	fmt.Fprintf(out, uiText("%sDiagnostic de la tentative %s : %s\n"), indent, diagnostic.AgentID, diagnostic.Summary)
+	fmt.Fprintf(out, uiText("%sDiagnostic de la tentative %s : %s\n"), indent, diagnostic.AgentID, uiEngineText(diagnostic.Summary))
 	for _, item := range diagnostic.Items {
-		fmt.Fprintf(out, "%s- %s\n", indent, item.Label)
-		fmt.Fprintf(out, uiText("%s  Cause : %s\n"), indent, item.Cause)
-		fmt.Fprintf(out, uiText("%s  Conséquence : %s\n"), indent, item.Consequence)
-		fmt.Fprintf(out, uiText("%s  Action disponible : %s\n"), indent, item.Action)
+		fmt.Fprintf(out, "%s- %s\n", indent, uiEngineText(item.Label))
+		fmt.Fprintf(out, uiText("%s  Cause : %s\n"), indent, uiEngineText(item.Cause))
+		fmt.Fprintf(out, uiText("%s  Conséquence : %s\n"), indent, uiEngineText(item.Consequence))
+		fmt.Fprintf(out, uiText("%s  Action disponible : %s\n"), indent, uiEngineText(item.Action))
 		if len(item.Traces) > 0 {
 			fmt.Fprintf(out, uiText("%s  Traces techniques :\n"), indent)
 			for _, trace := range item.Traces {
@@ -215,8 +299,60 @@ func printAttemptDiagnostic(out io.Writer, diagnostic AttemptDiagnostic, indent 
 	}
 }
 
-func printMissionUnderstanding(out io.Writer, facts MissionUnderstanding, indent string) {
-	fmt.Fprintf(out, uiText("%sCe qui se passe : %s\n"), indent, facts.What)
-	fmt.Fprintf(out, uiText("%sProchaine étape : %s\n"), indent, facts.NextStep)
-	fmt.Fprintf(out, uiText("%sQui agit : %s\n"), indent, facts.Actor)
+// uiFactText mirrors web/mission.js missionFactText: a "what" fact can be
+// prefixed with a task title ("Title — reason"); only the reason tail is
+// translated so a real task title is never run through the UI catalog.
+func uiFactText(text string, tasks []MissionTask) string {
+	for _, t := range tasks {
+		prefix := t.Title + " — "
+		if strings.HasPrefix(text, prefix) {
+			return prefix + uiEngineText(strings.TrimPrefix(text, prefix))
+		}
+	}
+	return uiEngineText(text)
+}
+
+func printMissionUnderstanding(out io.Writer, facts MissionUnderstanding, tasks []MissionTask, indent string) {
+	fmt.Fprintf(out, uiText("%sCe qui se passe : %s\n"), indent, uiFactText(facts.What, tasks))
+	fmt.Fprintf(out, uiText("%sProchaine étape : %s\n"), indent, uiEngineText(facts.NextStep))
+	fmt.Fprintf(out, uiText("%sQui agit : %s\n"), indent, uiEngineText(facts.Actor))
+}
+
+func printMissionLaunchIdentity(out io.Writer, identity MissionLaunchIdentity) {
+	value := func(s string) string {
+		if s == "" {
+			return uiText("Inconnu")
+		}
+		return s
+	}
+	profile := identity.ProjectProfile
+	if profile == "" {
+		profile = uiText("Aucun profil de projet")
+	}
+	skills := strings.Join(identity.Skills, ", ")
+	if skills == "" {
+		skills = uiText("Aucun skill sélectionné")
+	}
+	role := identity.Role
+	switch role {
+	case "worker":
+		role = uiText("Exécutant")
+	case "planner":
+		role = uiText("Responsable")
+	case "subplanner":
+		role = uiText("Sous-planificateur")
+	}
+	level := identity.RequestedLevel
+	if level == "auto" {
+		level = uiText("Automatique")
+	}
+	for _, row := range [][2]string{
+		{uiText("Objectif"), value(identity.Objective)},
+		{uiText("Rôle"), role}, {uiText("Fournisseur"), value(identity.Provider)},
+		{uiText("Niveau demandé"), value(level)}, {uiText("Modèle résolu par la configuration"), value(identity.ResolvedModel)},
+		{uiText("Modèle rapporté par le fournisseur"), uiText("Inconnu avant l’exécution")},
+		{uiText("Profil du projet"), profile}, {uiText("Skills sélectionnés"), skills},
+	} {
+		fmt.Fprintf(out, "- %s : %s\n", row[0], row[1])
+	}
 }

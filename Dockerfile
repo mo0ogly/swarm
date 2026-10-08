@@ -1,10 +1,18 @@
 # syntax=docker/dockerfile:1
 FROM golang:1.26-bookworm AS build
+ARG SWARM_VERSION=devel
+ARG SWARM_COMMIT=
+ARG SWARM_MODIFIED=unknown
+ARG SWARM_BUILD_DATE=
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -trimpath -o /out/swarm .
+RUN SWARM_VERSION="$SWARM_VERSION" \
+    SWARM_COMMIT="$SWARM_COMMIT" \
+    SWARM_MODIFIED="$SWARM_MODIFIED" \
+    SWARM_BUILD_DATE="$SWARM_BUILD_DATE" \
+    sh ./build.sh /out/swarm
 
 FROM node:22-bookworm-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \

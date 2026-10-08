@@ -14,13 +14,14 @@ import (
 const archiveLimit = 128 << 20
 
 type Bundle struct {
-	Assistant []AssistTurn      `json:"assistant_history,omitempty"`
-	Cockpit   *CockpitHistory   `json:"cockpit_history,omitempty"`
-	Schema    int               `json:"schema_version"`
-	Work      Work              `json:"work"`
-	Events    []Event           `json:"events"`
-	Files     map[string]string `json:"files"`
-	Missing   []string          `json:"missing"`
+	Automation []lifecycleTable  `json:"automation_state,omitempty"`
+	Assistant  []AssistTurn      `json:"assistant_history,omitempty"`
+	Cockpit    *CockpitHistory   `json:"cockpit_history,omitempty"`
+	Schema     int               `json:"schema_version"`
+	Work       Work              `json:"work"`
+	Events     []Event           `json:"events"`
+	Files      map[string]string `json:"files"`
+	Missing    []string          `json:"missing"`
 }
 
 func sortedArtifacts(m map[string]string) []string {
@@ -73,10 +74,31 @@ func (s *Store) export(id, dest string) error {
 	if e != nil {
 		return e
 	}
+	var automation []lifecycleTable
+	specs, e := lifecycleSpecs(tx, id)
+	if e != nil {
+		return e
+	}
+	for _, spec := range specs {
+		if !strings.HasPrefix(spec.name, "automation_") {
+			continue
+		}
+		table, err := snapshotTable(tx, spec)
+		if err != nil {
+			return err
+		}
+		if len(table.Rows) > 0 {
+			automation = append(automation, table)
+		}
+	}
 	if e = tx.Commit(); e != nil {
 		return e
 	}
-	bundle := Bundle{Assistant: assistant, Cockpit: history, Schema: 1, Work: w, Events: events, Files: map[string]string{}, Missing: []string{}}
+	bundleSchema := 1
+	if len(automation) > 0 {
+		bundleSchema = 2
+	}
+	bundle := Bundle{Automation: automation, Assistant: assistant, Cockpit: history, Schema: bundleSchema, Work: w, Events: events, Files: map[string]string{}, Missing: []string{}}
 	data := map[string][]byte{}
 	total := 0
 	for _, t := range w.Tasks {
@@ -277,7 +299,7 @@ func (s *Store) importBundle(path string) (Work, error) {
 		return zero, e
 	}
 	w := bundle.Work
-	if bundle.Schema != 1 || w.Schema != 1 || !safeName(w.ID) || w.Revision < 1 || len(bundle.Events) != w.Revision {
+	if (bundle.Schema != 1 && bundle.Schema != 2) || (bundle.Schema == 1 && len(bundle.Automation) > 0) || w.Schema != 1 || !safeName(w.ID) || w.Revision < 1 || len(bundle.Events) != w.Revision {
 		return zero, fmt.Errorf("manifeste/version/historique invalide")
 	}
 	seen := map[string]bool{}
@@ -357,6 +379,9 @@ func (s *Store) importBundle(path string) (Work, error) {
 		if _, e = tx.Exec("INSERT INTO events VALUES(?,?,?,?,?,?,?)", v.ID, w.ID, v.Revision, v.Kind, v.At, []byte(v.Payload), []byte(v.Payload)); e != nil {
 			return zero, e
 		}
+	}
+	if e = importAutomationTables(tx, w.ID, bundle.Automation); e != nil {
+		return zero, e
 	}
 	if bundle.Cockpit != nil {
 		for _, d := range bundle.Cockpit.Decisions {

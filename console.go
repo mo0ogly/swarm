@@ -41,13 +41,18 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 	actions := map[string][]TaskAction{}
 	for i := range w.Tasks {
 		actions[w.Tasks[i].ID] = s.taskActions(&w, &w.Tasks[i], agents)
-		if w.Tasks[i].IndependentReview != nil {
+		changed := s.refusedReviewEvidenceChanged(&w, &w.Tasks[i])
+		if w.Tasks[i].IndependentReview != nil || changed {
 			err := s.independentReviewGuard(&w, &w.Tasks[i])
 			reason := ""
 			if err != nil {
 				reason = err.Error()
 			}
-			reviews[w.Tasks[i].ID] = map[string]any{"current": err == nil, "reason": reason}
+			view := map[string]any{"current": err == nil, "reason": reason, "evidence_changed": changed, "revalidation_available": s.acceptedReviewRevalidationAvailable(&w, &w.Tasks[i])}
+			if w.Tasks[i].IndependentReview == nil && changed {
+				view["archived_review"] = w.Tasks[i].PreviousReviews[len(w.Tasks[i].PreviousReviews)-1]
+			}
+			reviews[w.Tasks[i].ID] = view
 		}
 	}
 	validation := s.validationState(&w)
@@ -160,7 +165,7 @@ func (s *Store) consoleCommand(work, line string, state *consoleState) (bool, er
 			state.dialog.review = text
 			return false, nil
 		}
-		state.message = consoleHelp
+		state.message = uiText(consoleHelp)
 		s.openTerminalHelp(work, state)
 		return false, nil
 	case "freeze":
@@ -351,7 +356,7 @@ func clip(text string, width int) string {
 }
 func (s *Store) renderConsole(work string, state *consoleState, width, height int, input string) string {
 	var b strings.Builder
-	line := func(format string, args ...any) { fmt.Fprintln(&b, clip(fmt.Sprintf(format, args...), width)) }
+	line := func(format string, args ...any) { fmt.Fprintln(&b, clip(fmt.Sprintf(uiText(format), args...), width)) }
 	w, e := s.get(work)
 	if e != nil {
 		return terminalText(e.Error())
@@ -375,7 +380,7 @@ func (s *Store) renderConsole(work string, state *consoleState, width, height in
 				gate = "gate delivery valide"
 			}
 		}
-		line("%s | %d | %s | %s | %s | %s", t.ID, priority[t.ID], t.Status, t.Owner, t.Deliverable, gate)
+		line("%s | %d | %s | %s | %s | %s", t.ID, priority[t.ID], t.Status, t.Owner, t.Deliverable, uiText(gate))
 	}
 	line("AGENTS : ID | tâche | fournisseur/rôle | état observé | activité")
 	agents, e := s.agents(work)
@@ -401,7 +406,7 @@ func (s *Store) renderConsole(work string, state *consoleState, width, height in
 		}
 		d, _ := s.desired(a.ID)
 		if d != "" {
-			status += " (demande " + d + ")"
+			status += fmt.Sprintf(uiText(" (demande %s)"), d)
 		}
 		line("%s%s | %s | %s/%s", marker, a.ID, a.TaskID, a.Provider, a.Role)
 		line("  %s | %s", status, a.Activity)

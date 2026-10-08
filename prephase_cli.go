@@ -11,10 +11,55 @@ import (
 
 func (s *Store) preparationCLI(args []string, input, output string, out io.Writer) error {
 	if len(args) == 0 {
-		_, e := fmt.Fprintln(out, "Préparations — documents et dialogue IA\nprepare list | methods | show ID | conversion ID | history ID DOCUMENT [avant_revision]\nprepare create --input requete.json\nprepare save|method|adopt-brief|validate-plan|answer-questions|create-missions|revise-missions|release-plan ID --input requete.json\nprepare export ID --output NOUVEAU_DOSSIER\nLes commandes renvoient du JSON. prepare providers | dialogue ID | send ID --input requete.json | stop ID TURN\nprepare files ID [recherche] | source ID CHEMIN DEBUT FIN | budget ID\nprepare source-add|source-remove|budget ID --input requete.json\nprepare use-proposal ID --input requete.json\nprepare chat [ID] : dialogue interactif ; prepare resume ID reprend en terminal.\nCodes : 0 succès, 2 contrat, 3 conflit, 4 autorisation, 5 fournisseur/méthode indisponible, 6 arrêt non confirmé.")
+		_, e := fmt.Fprintln(out, "Préparations — documents et dialogue IA\nprepare template-check MODELE --input reponses.json\nprepare templates | template MODELE | list | methods | show ID | conversion ID | history ID DOCUMENT [avant_revision]\nprepare create --input requete.json\nprepare save|method|adopt-brief|validate-plan|answer-questions|authorize-plan|create-missions|revise-missions|release-plan ID --input requete.json\nprepare export ID --output NOUVEAU_DOSSIER\nLes commandes renvoient du JSON. prepare providers | dialogue ID | send ID --input requete.json | stop ID TURN\nprepare files ID [recherche] | source ID CHEMIN DEBUT FIN | budget ID\nprepare source-add|source-remove|budget ID --input requete.json\nprepare use-proposal ID --input requete.json\nprepare chat [ID] : dialogue interactif ; prepare resume ID reprend en terminal.\nCodes : 0 succès, 2 contrat, 3 conflit, 4 autorisation, 5 fournisseur/méthode indisponible, 6 arrêt non confirmé.")
 		return e
 	}
 	kind := args[0]
+	if kind == "template-check" {
+		if len(args) != 2 || input == "" {
+			return preparationError("invalid_request", "prepare template-check ID --input reponses.json")
+		}
+		b, e := readInput(input)
+		if e != nil {
+			return e
+		}
+		if len(b) > 16384 {
+			return preparationError("invalid_request", uiText("Réponses limitées à 16 Kio."))
+		}
+		var r PreparationTemplateAnswers
+		if e = strict(b, &r); e != nil {
+			return e
+		}
+		if r.TemplateID != "" && r.TemplateID != args[1] {
+			return preparationError("invalid_request", uiText("Le modèle ne correspond pas à la commande."))
+		}
+		r.TemplateID = args[1]
+		v, e := checkPreparationTemplate(r)
+		if e != nil {
+			return e
+		}
+		return printJSON(out, v)
+	}
+	if kind == "templates" {
+		if len(args) != 1 {
+			return preparationError("invalid_request", "prepare templates")
+		}
+		v, e := preparationTemplates()
+		if e != nil {
+			return e
+		}
+		return printJSON(out, v)
+	}
+	if kind == "template" {
+		if len(args) != 2 {
+			return preparationError("invalid_request", "prepare template ID")
+		}
+		v, e := preparationTemplate(args[1])
+		if e != nil {
+			return e
+		}
+		return printJSON(out, v)
+	}
 	if kind == "files" || kind == "source" || kind == "budget" && input == "" {
 		if len(args) < 2 {
 			return fmt.Errorf("prepare %s ID [chemin/recherche]", kind)

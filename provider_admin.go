@@ -133,6 +133,7 @@ func (s *Store) changePolicies(change PolicyChange) (map[string]any, error) {
 }
 func (s *Store) registerProviderAdmin(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
 	s.registerAIConnections(mux, send, fail)
+	s.registerPricing(mux, send, fail)
 	mux.HandleFunc("/api/v1/providers/admin", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "GET requis", 405)

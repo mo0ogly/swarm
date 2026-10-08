@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -52,6 +53,15 @@ func TestEngineErrorTranslationPreservesDetails(t *testing.T) {
 	}
 	t.Setenv("SWARM_LANG", "fr")
 	if got := uiEngineText("Configuration IA trop grande."); got != "Configuration IA trop grande." {
+		t.Fatal(got)
+	}
+}
+
+func TestIncompleteDeliveryTranslationKeepsEvidencePath(t *testing.T) {
+	t.Setenv("SWARM_LANG", "en")
+	source := "Livraison incomplète : bilan par critère absent (docs/task.delivery.json). Aucun appel de revue lancé ; le responsable doit examiner les éléments manquants avant une reprise autorisée."
+	got := uiEngineText(source)
+	if !strings.Contains(got, "Incomplete delivery: per-criterion delivery manifest missing (docs/task.delivery.json)") || strings.Contains(got, "Aucun") {
 		t.Fatal(got)
 	}
 }

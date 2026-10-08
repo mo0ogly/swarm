@@ -1,0 +1,91 @@
+Où vont les appels et les coûts ?
+Mesures observées : 2026-10-04T10:13:52.855745437Z · Source : Horaires des processus, activité reçue, usages fournisseurs et historique des revues.
+Responsable : root · 7 tentatives ou appels enregistrés · 0 appels d’outils observés · 0 mesures d’outils incomplètes · 10/18704 jetons entrée/sortie rapportés · 2 usages absents · 0.62 USD rapportés sur 5 tentative(s) · 2 sans coût rapporté
+Vérificateur indépendant · 16 tentatives ou appels enregistrés · 0 appels d’outils observés · 0 mesures d’outils incomplètes · 54/225541 jetons entrée/sortie rapportés · 2 usages absents · 4.46 USD rapportés sur 14 tentative(s) · 2 sans coût rapporté
+Inspection ciblée et contrats · 1 tentatives ou appels enregistrés · 9 appels d’outils observés · 0 mesures d’outils incomplètes · 18/18153 jetons entrée/sortie rapportés · 0 usages absents · 0.70 USD rapportés sur 1 tentative(s)
+  Durée cumulée des processus : 227.263 s · 0 durée(s) non rapportée(s)
+  2 revue(s) enregistrée(s) pour cette tâche · 0 reprise(s) pour cette tâche
+QW5 — Régler la limite qui bloque · 2 tentatives ou appels enregistrés · 65 appels d’outils observés · 0 mesures d’outils incomplètes · 12/11644 jetons entrée/sortie rapportés · 1 usages absents · 0.41 USD rapportés sur 1 tentative(s) · 1 sans coût rapporté
+  Durée cumulée des processus : 766.062 s · 0 durée(s) non rapportée(s)
+  5 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche
+QW6 — État actuel et historique · 2 tentatives ou appels enregistrés · 23 appels d’outils observés · 0 mesures d’outils incomplètes · 24/16447 jetons entrée/sortie rapportés · 1 usages absents · 0.70 USD rapportés sur 1 tentative(s) · 1 sans coût rapporté
+  Durée cumulée des processus : 364.823 s · 0 durée(s) non rapportée(s)
+  6 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche
+QW8 — Vérifier le dossier avant la revue · 2 tentatives ou appels enregistrés · 62 appels d’outils observés · 0 mesures d’outils incomplètes · 32/10187 jetons entrée/sortie rapportés · 1 usages absents · 0.55 USD rapportés sur 1 tentative(s) · 1 sans coût rapporté
+  Durée cumulée des processus : 1074.899 s · 0 durée(s) non rapportée(s)
+  1 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche
+QW7 — Voir l’effort par tâche · 2 tentatives ou appels enregistrés · 67 appels d’outils observés · 0 mesures d’outils incomplètes · 12/5807 jetons entrée/sortie rapportés · 1 usages absents · 0.31 USD rapportés sur 1 tentative(s) · 1 sans coût rapporté
+  Durée cumulée des processus : 558.122 s · 0 durée(s) non rapportée(s)
+  1 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche
+Recette globale et RETEX avant/après · 2 tentatives ou appels enregistrés · 30 appels d’outils observés · 0 mesures d’outils incomplètes · 20/11822 jetons entrée/sortie rapportés · 1 usages absents · 0.65 USD rapportés sur 1 tentative(s) · 1 sans coût rapporté
+  Durée cumulée des processus : 486.591 s · 0 durée(s) non rapportée(s)
+  0 revue(s) enregistrée(s) pour cette tâche · 1 reprise(s) pour cette tâche
+Moteur : 26 contrôles enregistrés · 5 reprises d’agents
+Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.
+Bilan par tentative
+Inspection ciblée et contrats · agent auto-832c66f95abe8d67a38a · tentative a-5621887914ca22818b315dfd · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T07:34:45.177118839Z · Fin : 2026-10-04T07:38:32.441081431Z
+  Durée du processus : 227.263 s
+  1 départ enregistré · 9 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  9 appels d’outils observés · lectures 2 · écritures 1 · non classés 6 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  18/18153 jetons entrée/sortie rapportés · 0.70 USD rapportés sur 1 tentative(s)
+QW5 — Régler la limite qui bloque · agent auto-ed82e20e57f3200af263 · tentative a-b45d8905fcf816f645fa0ec2 · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T07:47:41.216401703Z · Fin : 2026-10-04T07:57:54.581117331Z
+  Durée du processus : 613.364 s
+  1 départ enregistré · 60 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  60 appels d’outils observés · lectures 14 · écritures 6 · non classés 40 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  Coût et usage non rapportés par le fournisseur pour cette tentative.
+QW5 — Régler la limite qui bloque · agent eee438b9-6b15-4d8b-88d4-55194eb26b5b · tentative a-b455ca4bfd2338cc09d99801 · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T08:05:54.792569233Z · Fin : 2026-10-04T08:08:27.490944122Z
+  Durée du processus : 152.698 s
+  1 départ enregistré · 5 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  5 appels d’outils observés · lectures 0 · écritures 1 · non classés 4 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  12/11644 jetons entrée/sortie rapportés · 0.41 USD rapportés sur 1 tentative(s)
+QW6 — État actuel et historique · agent 1426ec9c-5a9d-4d45-85ec-316341a236eb · tentative a-008c49f126275727492dfa40 · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T08:20:49.040559412Z · Fin : 2026-10-04T08:24:54.410539382Z
+  Durée du processus : 245.369 s
+  1 départ enregistré · 11 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  11 appels d’outils observés · lectures 2 · écritures 2 · non classés 7 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  24/16447 jetons entrée/sortie rapportés · 0.70 USD rapportés sur 1 tentative(s)
+QW6 — État actuel et historique · agent auto-21e1c20e88473e830f46 · tentative a-c26b7567bc5d7543dcf487b3 · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T08:17:35.314048557Z · Fin : 2026-10-04T08:19:34.768677968Z
+  Durée du processus : 119.454 s
+  1 départ enregistré · 12 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  12 appels d’outils observés · lectures 4 · écritures 0 · non classés 8 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  Coût et usage non rapportés par le fournisseur pour cette tentative.
+QW8 — Vérifier le dossier avant la revue · agent auto-987b01425800fd26ea11 · tentative a-b4ff21ad8b32899aa05db623 · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T08:48:40.867920971Z · Fin : 2026-10-04T08:58:43.060938298Z
+  Durée du processus : 602.193 s
+  1 départ enregistré · 41 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  41 appels d’outils observés · lectures 15 · écritures 1 · non classés 25 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 2 · répétitions 0
+  Coût et usage non rapportés par le fournisseur pour cette tentative.
+QW8 — Vérifier le dossier avant la revue · agent auto-d9d0f38349900e043509 · tentative a-600fdd2ca2efc0385bded831 · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T08:59:00.890107409Z · Fin : 2026-10-04T09:06:53.596311776Z
+  Durée du processus : 472.706 s
+  1 départ enregistré · 21 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  21 appels d’outils observés · lectures 3 · écritures 1 · non classés 17 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  32/10187 jetons entrée/sortie rapportés · 0.55 USD rapportés sur 1 tentative(s)
+QW7 — Voir l’effort par tâche · agent auto-5a61f5425d209232370d · tentative a-58b415b09e3effca87fb4a92 · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T09:13:52.722811416Z · Fin : 2026-10-04T09:21:41.589320557Z
+  Durée du processus : 468.866 s
+  1 départ enregistré · 60 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  60 appels d’outils observés · lectures 8 · écritures 16 · non classés 36 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 2 · répétitions 0
+  Coût et usage non rapportés par le fournisseur pour cette tentative.
+QW7 — Voir l’effort par tâche · agent bdebfa65-3638-4789-9297-4f3bfab8d8d0 · tentative a-a83c686e77dd1365dfc56f22 · état du processus : Processus terminé · validation enregistrée de la tâche (toutes tentatives) : oui
+  Départ : 2026-10-04T09:58:23.29882262Z · Fin : 2026-10-04T09:59:52.555099211Z
+  Durée du processus : 89.256 s
+  1 départ enregistré · 7 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  7 appels d’outils observés · lectures 0 · écritures 1 · non classés 6 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  12/5807 jetons entrée/sortie rapportés · 0.31 USD rapportés sur 1 tentative(s)
+Recette globale et RETEX avant/après · agent 147899a3-11a7-4a56-a0b5-f0c0b9b8df85 · tentative a-e7c206a90a5dd2ba05448d47 · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : non
+  Départ : 2026-10-04T10:08:40.292644518Z · Fin : 2026-10-04T10:13:47.433223451Z
+  Durée du processus : 307.140 s
+  1 départ enregistré · 13 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  13 appels d’outils observés · lectures 0 · écritures 1 · non classés 12 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 0 · répétitions 0
+  Coût et usage non rapportés par le fournisseur pour cette tentative.
+Recette globale et RETEX avant/après · agent auto-17b39e37f002c9254bf4 · tentative a-f4dfe3fc03d07aa3396b87a6 · état du processus : Processus interrompu · validation enregistrée de la tâche (toutes tentatives) : non
+  Départ : 2026-10-04T10:03:01.171816595Z · Fin : 2026-10-04T10:06:00.6237555Z
+  Durée du processus : 179.451 s
+  1 départ enregistré · 17 appels d’outils observés ; les appels internes du fournisseur ne sont pas mesurés.
+  17 appels d’outils observés · lectures 8 · écritures 0 · non classés 9 · tests inconnu : aucun signal fiable ne distingue un test dans les commandes observées · erreurs 1 · répétitions 0
+  20/11822 jetons entrée/sortie rapportés · 0.65 USD rapportés sur 1 tentative(s)

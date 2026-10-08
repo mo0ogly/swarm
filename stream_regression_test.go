@@ -53,8 +53,8 @@ func TestOversizedEventDegradesTimingWithoutFalseFailure(t *testing.T) {
 		t.Fatal("parser did not recover at next line")
 	}
 	sink.guard.lastOutput = time.Now().Add(-181 * time.Second)
-	if !strings.Contains(sink.guardReason(), "sans sortie") {
-		t.Fatal("silence guard disabled")
+	if output, _, vitality := sink.guard.monitoring(time.Now()); sink.guardReason() != "" || output != "silent" || vitality != "unknown" {
+		t.Fatal("silence must remain observable without becoming a false guard failure")
 	}
 }
 

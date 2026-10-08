@@ -1,0 +1,81 @@
+{
+  "source": "CUA real keyboard actions, Codex supervisor; not independent execution by reviewer",
+  "cases": [
+    {
+      "language": "fr",
+      "theme": "etat",
+      "openedBy": "Enter on spending button",
+      "opened": {
+        "at": "2026-10-03T19:44:54.022Z",
+        "dialogOpen": true,
+        "focus": "Fermer",
+        "focusVisible": true,
+        "language": "fr",
+        "theme": "etat"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Où vont les appels et les coûts ?",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "openedBy": "Enter on spending button",
+      "opened": {
+        "at": "2026-10-03T19:45:15.516Z",
+        "dialogOpen": true,
+        "focus": "Fermer",
+        "focusVisible": true,
+        "language": "fr",
+        "theme": "sombre"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Où vont les appels et les coûts ?",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "openedBy": "Enter on spending button",
+      "opened": {
+        "at": "2026-10-03T19:45:41.820Z",
+        "dialogOpen": true,
+        "focus": "Close",
+        "focusVisible": true,
+        "language": "en",
+        "theme": "sombre"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Where do calls and costs go?",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "openedBy": "Enter on spending button",
+      "opened": {
+        "at": "2026-10-03T19:45:42.545Z",
+        "dialogOpen": true,
+        "focus": "Close",
+        "focusVisible": true,
+        "language": "en",
+        "theme": "etat"
+      },
+      "closedBy": "Escape",
+      "closed": {
+        "dialogOpen": false,
+        "focus": "Where do calls and costs go?",
+        "focusVisible": true
+      }
+    }
+  ]
+}

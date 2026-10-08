@@ -46,6 +46,10 @@ assert.equal(G.guidance({status:'blocked',blocker:'test en échec'},{}),'À rés
 const organizationWork={planning:{provider:'claude',scopes:[{id:'root',requirements:['r1']},{id:'branch',parent:'root',requirements:['r1']}],reviewer:{provider:'codex',calls:0,max_calls:4}}};
 const org=G.organization(organizationWork,[{id:'t1',scope_id:'branch'}],true);
 assert.equal(org.nodes.length,3);
+assert.equal(org.nodes[1].role,'subplanner');
+assert.equal(org.nodes[1].title,'⑂ Sous-planificateur');
+assert.equal(org.nodes[1].tone,'attention');
+assert.equal(org.nodes[1].scopeLabel,'branch');
 assert.deepEqual(org.edges,[{from:'@scope/root',to:'@scope/branch'},{from:'@scope/branch',to:'t1'},{from:'t1',to:'@reviewer'}]);
 assert.ok(org.nodes.every(n=>n.description==='En pause'));
 assert.equal(G.organization({},[]).nodes.length,0);

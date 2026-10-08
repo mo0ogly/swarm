@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "work": "w-4c205618ddcc39909fb3159a",
+  "engine_revision": "21ceb41483d82f3438b4229eefd5a8de8d3d187d",
+  "engine_sha256": "b0da6ff82833d74fb0d0fe3444ec7a6212d0545e4ff097d106f356b935c543ec",
+  "candidate_sha": "d594ddd173eda36c54007f239fe2c273326c3494",
+  "activations": 5,
+  "producers": 2,
+  "producer_tool_calls": [
+    8,
+    8
+  ],
+  "reviews": 1,
+  "scopes": [
+    [
+      "root",
+      "closed"
+    ],
+    [
+      "sub-1",
+      "closed"
+    ]
+  ],
+  "processes_stopped": true,
+  "artifacts": {
+    "observed.json": "873f96762a1e5f490e7abfb1be4ccc5276a75c049a66531d41e936144f5a513b",
+    "result.json": "1821d6ef69e0bd4adda406580e94418f114185495ed784f6597feedf102242ad",
+    "cli.jsonl": "adf4a821f6d64aed8dae97f86bfd9f40afbd944fa2815c45d2186ba1cf06265a"
+  }
+}

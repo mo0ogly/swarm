@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 20
+const schemaVersion = 27
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -44,24 +44,44 @@ type ValidationPolicy struct {
 }
 
 type ValidationControl struct {
-	ID            string   `json:"id"`
-	Command       []string `json:"command"`
-	Criteria      []int    `json:"criteria"`
-	Justification string   `json:"justification"`
-	Dir           string   `json:"dir,omitempty"`
-	Timeout       int      `json:"timeout_seconds,omitempty"`
+	EnvironmentExitCodes []int    `json:"environment_exit_codes,omitempty"`
+	ReviewOutput         bool     `json:"review_output,omitempty"`
+	Inputs               []string `json:"inputs,omitempty"`
+	ID                   string   `json:"id"`
+	Command              []string `json:"command"`
+	Criteria             []int    `json:"criteria"`
+	Justification        string   `json:"justification"`
+	Dir                  string   `json:"dir,omitempty"`
+	Timeout              int      `json:"timeout_seconds,omitempty"`
 }
 
 type ValidationControlResult struct {
-	ID         string `json:"id"`
-	Passed     bool   `json:"passed"`
-	ExitCode   int    `json:"exit_code"`
-	OutputHash string `json:"output_sha256"`
-	Summary    string `json:"summary"`
+	EnvironmentFailure    bool     `json:"environment_failure,omitempty"`
+	ReviewOutput          string   `json:"review_output,omitempty"`
+	OutputBytes           int      `json:"output_bytes,omitempty"`
+	ReviewOutputTruncated bool     `json:"review_output_truncated,omitempty"`
+	ID                    string   `json:"id"`
+	Command               []string `json:"command,omitempty"`
+	Executed              bool     `json:"executed"`
+	Passed                bool     `json:"passed"`
+	ExitCode              int      `json:"exit_code"`
+	OutputHash            string   `json:"output_sha256"`
+	Summary               string   `json:"summary"`
+	Started               string   `json:"started_at,omitempty"`
+	Finished              string   `json:"finished_at,omitempty"`
+	WallDurationMS        *int64   `json:"wall_duration_ms,omitempty"`
+	CPUDurationMS         *int64   `json:"cpu_duration_ms,omitempty"`
 }
 
 type AutomaticValidation struct {
-	Attempt      string                    `json:"attempt_id"`
+	DeliveryVersion int    `json:"delivery_version,omitempty"`
+	Attempt         string `json:"attempt_id"`
+	Revision        int    `json:"revision"`
+	// CandidateSHA is the Git commit actually merged, committed and checked
+	// out when the controls below ran (managed_integration.go's commit-tree
+	// result), never derived from Reason text. Distinct from Revision, the
+	// business work revision counter, and from At, the receipt timestamp.
+	CandidateSHA string                    `json:"candidate_sha"`
 	Producer     string                    `json:"producer_agent_id"`
 	Controller   string                    `json:"controller"`
 	PolicyDigest string                    `json:"policy_digest"`
@@ -75,38 +95,50 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
-	IndependentReview *IndependentReview   `json:"independent_review,omitempty"`
-	ScopeID           string               `json:"scope_id,omitempty"`
-	Requirements      []string             `json:"requirements,omitempty"`
-	ValidationPolicy  *ValidationPolicy    `json:"validation_policy,omitempty"`
-	AutoValidation    *AutomaticValidation `json:"automatic_validation,omitempty"`
-	LaunchHeld        bool                 `json:"launch_held,omitempty"`
-	Profile           *LaunchProfile       `json:"launch_profile,omitempty"`
-	Revalidation      *Revalidation        `json:"revalidation,omitempty"`
-	PlanChecks        map[string]string    `json:"plan_checks,omitempty"`
-	PlanBriefHash     string               `json:"plan_brief_hash,omitempty"`
-	PlanRole          string               `json:"plan_role,omitempty"`
-	PlanningRetry     bool                 `json:"planning_retry,omitempty"`
-	PlanMaxAttempts   int                  `json:"plan_max_attempts,omitempty"`
-	PlanToolLimit     int                  `json:"plan_tool_limit,omitempty"`
-	Contexts          []SavedContext       `json:"contexts,omitempty"`
-	Answers           []BrainstormAnswer   `json:"answers,omitempty"`
-	Question          string               `json:"question,omitempty"`
-	Response          string               `json:"response,omitempty"`
-	ResponseError     string               `json:"response_error,omitempty"`
-	Brainstorm        bool                 `json:"brainstorm,omitempty"`
-	Override          *ManualOverride      `json:"manual_override,omitempty"`
-	ID                string               `json:"id"`
-	Title             string               `json:"title"`
-	Owner             string               `json:"owner"`
-	Deliverable       string               `json:"deliverable"`
-	Criteria          []string             `json:"criteria"`
-	Depends           []string             `json:"depends"`
-	Status            string               `json:"status"`
-	Blocker           string               `json:"blocker"`
-	Next              string               `json:"next"`
-	Attempts          []Attempt            `json:"attempts"`
-	Gate              *GateRecord          `json:"gate,omitempty"`
+	ProviderRelayDecision   *ProviderRelayDecision      `json:"provider_relay_decision,omitempty"`
+	LegacyReportSubmissions []Attempt                   `json:"legacy_report_submissions,omitempty"`
+	ReviewCoordination      *ReviewCoordinationRecord   `json:"review_coordination,omitempty"`
+	Restarts                []TaskRestart               `json:"restarts,omitempty"`
+	ModelSelection          *TaskModel                  `json:"model_selection,omitempty"`
+	Requalifications        []HistoricalRequalification `json:"requalifications,omitempty"`
+	IntegrationRetries      []IntegrationRetry          `json:"integration_retries,omitempty"`
+	BatchReviewResume       *IndependentReview          `json:"batch_review_resume,omitempty"`
+	RecoveredResult         *RecoveredResult            `json:"recovered_result,omitempty"`
+	CorrectiveRecovery      *CorrectiveRecovery         `json:"corrective_recovery,omitempty"`
+	PreviousReviews         []IndependentReview         `json:"previous_reviews,omitempty"`
+	IndependentReview       *IndependentReview          `json:"independent_review,omitempty"`
+	ScopeID                 string                      `json:"scope_id,omitempty"`
+	Requirements            []string                    `json:"requirements,omitempty"`
+	ValidationPolicy        *ValidationPolicy           `json:"validation_policy,omitempty"`
+	AutoValidation          *AutomaticValidation        `json:"automatic_validation,omitempty"`
+	EvidenceStaleReason     string                      `json:"evidence_stale_reason,omitempty"`
+	LaunchHeld              bool                        `json:"launch_held,omitempty"`
+	Profile                 *LaunchProfile              `json:"launch_profile,omitempty"`
+	Revalidation            *Revalidation               `json:"revalidation,omitempty"`
+	PlanChecks              map[string]string           `json:"plan_checks,omitempty"`
+	PlanBriefHash           string                      `json:"plan_brief_hash,omitempty"`
+	PlanRole                string                      `json:"plan_role,omitempty"`
+	PlanningRetry           bool                        `json:"planning_retry,omitempty"`
+	PlanMaxAttempts         int                         `json:"plan_max_attempts,omitempty"`
+	PlanToolLimit           int                         `json:"plan_tool_limit,omitempty"`
+	Contexts                []SavedContext              `json:"contexts,omitempty"`
+	Answers                 []BrainstormAnswer          `json:"answers,omitempty"`
+	Question                string                      `json:"question,omitempty"`
+	Response                string                      `json:"response,omitempty"`
+	ResponseError           string                      `json:"response_error,omitempty"`
+	Brainstorm              bool                        `json:"brainstorm,omitempty"`
+	Override                *ManualOverride             `json:"manual_override,omitempty"`
+	ID                      string                      `json:"id"`
+	Title                   string                      `json:"title"`
+	Owner                   string                      `json:"owner"`
+	Deliverable             string                      `json:"deliverable"`
+	Criteria                []string                    `json:"criteria"`
+	Depends                 []string                    `json:"depends"`
+	Status                  string                      `json:"status"`
+	Blocker                 string                      `json:"blocker"`
+	Next                    string                      `json:"next"`
+	Attempts                []Attempt                   `json:"attempts"`
+	Gate                    *GateRecord                 `json:"gate,omitempty"`
 }
 
 // Origine d'une tentative : lancée à la main ou par l'ordonnanceur.
@@ -118,7 +150,7 @@ const (
 
 // launchProfile fige ce que l'opérateur a choisi, workspace résolu compris.
 func launchProfile(r Launch, cwd string) LaunchProfile {
-	p := LaunchProfile{Provider: r.Provider, Role: r.Role, Workspace: cwd, Instruction: r.Instruction,
+	p := LaunchProfile{Skills: append([]ActionSkillSelection(nil), r.Skills...), Provider: r.Provider, Role: r.Role, Workspace: cwd, Instruction: r.Instruction,
 		Level: r.Level, Timeout: r.Timeout, Capture: r.Capture, Limits: r.Limits,
 		Updated: now(), Actor: launchOrigin(r)}
 	if p.Role == "" {
@@ -138,16 +170,17 @@ func launchOrigin(r Launch) string {
 // que l'ordonnanceur rejoue, au lieu de redemander le même formulaire.
 // Le profil d'une tâche prime sur celui du travail.
 type LaunchProfile struct {
-	Limits      *RunLimits `json:"limits,omitempty"`
-	Provider    string     `json:"provider"`
-	Role        string     `json:"role"`
-	Workspace   string     `json:"workspace"`
-	Instruction string     `json:"instruction,omitempty"`
-	Level       string     `json:"level,omitempty"`
-	Timeout     int        `json:"timeout_seconds,omitempty"`
-	Capture     bool       `json:"capture_output,omitempty"`
-	Updated     string     `json:"updated"`
-	Actor       string     `json:"actor"`
+	Skills      []ActionSkillSelection `json:"skills,omitempty"`
+	Limits      *RunLimits             `json:"limits,omitempty"`
+	Provider    string                 `json:"provider"`
+	Role        string                 `json:"role"`
+	Workspace   string                 `json:"workspace"`
+	Instruction string                 `json:"instruction,omitempty"`
+	Level       string                 `json:"level,omitempty"`
+	Timeout     int                    `json:"timeout_seconds,omitempty"`
+	Capture     bool                   `json:"capture_output,omitempty"`
+	Updated     string                 `json:"updated"`
+	Actor       string                 `json:"actor"`
 }
 type Attempt struct {
 	ID      string `json:"id"`
@@ -161,25 +194,26 @@ type GitState struct {
 	Changes string `json:"changes"`
 }
 type Work struct {
-	Planning      *PlanningState `json:"planning,omitempty"`
-	Profile       *LaunchProfile `json:"launch_profile,omitempty"`
-	Plans         []ApprovedPlan `json:"plans,omitempty"`
-	Retex         []Retex        `json:"retex,omitempty"`
-	PlanningBrief *PlanningBrief `json:"planning_brief,omitempty"`
-	Schema        int            `json:"schema_version"`
-	ID            string         `json:"id"`
-	Revision      int            `json:"revision"`
-	Title         string         `json:"title"`
-	Objective     string         `json:"objective"`
-	Scope         string         `json:"scope"`
-	Criteria      []string       `json:"criteria"`
-	Next          string         `json:"next"`
-	Summary       string         `json:"summary"`
-	Memory        []string       `json:"memory"`
-	Created       string         `json:"created"`
-	Updated       string         `json:"updated"`
-	Git           GitState       `json:"git"`
-	Tasks         []Task         `json:"tasks"`
+	RequirementPrerequisites map[string][]string `json:"requirement_prerequisites,omitempty"`
+	Planning                 *PlanningState      `json:"planning,omitempty"`
+	Profile                  *LaunchProfile      `json:"launch_profile,omitempty"`
+	Plans                    []ApprovedPlan      `json:"plans,omitempty"`
+	Retex                    []Retex             `json:"retex,omitempty"`
+	PlanningBrief            *PlanningBrief      `json:"planning_brief,omitempty"`
+	Schema                   int                 `json:"schema_version"`
+	ID                       string              `json:"id"`
+	Revision                 int                 `json:"revision"`
+	Title                    string              `json:"title"`
+	Objective                string              `json:"objective"`
+	Scope                    string              `json:"scope"`
+	Criteria                 []string            `json:"criteria"`
+	Next                     string              `json:"next"`
+	Summary                  string              `json:"summary"`
+	Memory                   []string            `json:"memory"`
+	Created                  string              `json:"created"`
+	Updated                  string              `json:"updated"`
+	Git                      GitState            `json:"git"`
+	Tasks                    []Task              `json:"tasks"`
 }
 type Event struct {
 	ID       string          `json:"id"`
@@ -190,30 +224,34 @@ type Event struct {
 	Payload  json.RawMessage `json:"payload"`
 }
 type Request struct {
-	MaxAttempts      int               `json:"max_attempts,omitempty"`
-	MaxToolCalls     int               `json:"max_tool_calls,omitempty"`
-	Schema           int               `json:"schema_version"`
-	EventID          string            `json:"event_id"`
-	Revision         int               `json:"expected_revision"`
-	ID               string            `json:"id,omitempty"`
-	Title            string            `json:"title,omitempty"`
-	Objective        string            `json:"objective,omitempty"`
-	Scope            string            `json:"scope,omitempty"`
-	Criteria         []string          `json:"criteria,omitempty"`
-	Owner            string            `json:"owner,omitempty"`
-	Deliverable      string            `json:"deliverable,omitempty"`
-	Depends          []string          `json:"depends,omitempty"`
-	Status           string            `json:"status,omitempty"`
-	Blocker          string            `json:"blocker,omitempty"`
-	Next             string            `json:"next,omitempty"`
-	Summary          string            `json:"summary,omitempty"`
-	Memory           []string          `json:"memory,omitempty"`
-	Outcome          string            `json:"outcome,omitempty"`
-	ValidationPolicy *ValidationPolicy `json:"validation_policy,omitempty"`
-	Observation      string            `json:"observation,omitempty"`
-	Orientation      string            `json:"orientation,omitempty"`
-	Decision         string            `json:"decision,omitempty"`
-	Result           string            `json:"result,omitempty"`
+	RequirementPrerequisites map[string][]string `json:"requirement_prerequisites,omitempty"`
+	ConfirmContractRevision  bool                `json:"confirm_contract_revision,omitempty"`
+	ExpectedContract         string              `json:"expected_contract,omitempty"`
+	ContractRevisionReason   string              `json:"contract_revision_reason,omitempty"`
+	MaxAttempts              int                 `json:"max_attempts,omitempty"`
+	MaxToolCalls             int                 `json:"max_tool_calls,omitempty"`
+	Schema                   int                 `json:"schema_version"`
+	EventID                  string              `json:"event_id"`
+	Revision                 int                 `json:"expected_revision"`
+	ID                       string              `json:"id,omitempty"`
+	Title                    string              `json:"title,omitempty"`
+	Objective                string              `json:"objective,omitempty"`
+	Scope                    string              `json:"scope,omitempty"`
+	Criteria                 []string            `json:"criteria,omitempty"`
+	Owner                    string              `json:"owner,omitempty"`
+	Deliverable              string              `json:"deliverable,omitempty"`
+	Depends                  []string            `json:"depends,omitempty"`
+	Status                   string              `json:"status,omitempty"`
+	Blocker                  string              `json:"blocker,omitempty"`
+	Next                     string              `json:"next,omitempty"`
+	Summary                  string              `json:"summary,omitempty"`
+	Memory                   []string            `json:"memory,omitempty"`
+	Outcome                  string              `json:"outcome,omitempty"`
+	ValidationPolicy         *ValidationPolicy   `json:"validation_policy,omitempty"`
+	Observation              string              `json:"observation,omitempty"`
+	Orientation              string              `json:"orientation,omitempty"`
+	Decision                 string              `json:"decision,omitempty"`
+	Result                   string              `json:"result,omitempty"`
 	// Auteur de la mutation, quand ce n'est pas un humain. « task.update » est
 	// écrit par les deux voies : l'opérateur depuis le cockpit, la CLI ou le
 	// terminal, et le moteur au départ, au relais et à la fin d'une tentative.

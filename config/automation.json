@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "revision": 0,
+  "values": {
+    "claim_lease_seconds": 30,
+    "due_grace_seconds": 60,
+    "max_preview_occurrences": 20,
+    "max_schedule_occurrences": 366,
+    "external_max_payload_bytes": 65536,
+    "external_rate_limit": 60,
+    "external_rate_window_seconds": 60,
+    "external_timestamp_window_seconds": 300
+  },
+  "history": []
+}

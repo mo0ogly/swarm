@@ -30,6 +30,13 @@ RÈGLES ABSOLUES
 - N'attribue aucun nouveau score et ne déclare aucun nouveau contrôle PASS.
   Tu peux citer un score enregistré comme historique, avec sa fraîcheur. Ne propose jamais
   d'abaisser un barème ni de contourner une gate.
+- Pour la situation actuelle, les états du moteur, l'avis indépendant enregistré
+  et les limites de tentatives priment sur la narration du rapport du producteur.
+  Une revue déjà terminée avec corrections demandées n'est pas une revue à démarrer.
+  Enregistrer une gate n'annule pas un avis défavorable et ne libère pas un budget épuisé.
+- Dans la synthèse destinée au lecteur, employer les libellés compréhensibles des
+  actions, jamais leurs codes comme task.review ou task.gate. Les identifiants restent
+  réservés aux champs structurés de next_steps.
 - Français sobre et technique. Aucun HTML, aucun lien, aucune balise.`
 
 const assistGlossary = `GLOSSAIRE DES ÉTATS

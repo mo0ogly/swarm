@@ -1,0 +1,134 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T3",
+  "artifacts": {
+    "docs/T3-cli-admin.md": "e2c6fcafb63a57c772b2b80e9b266e8c597cd487e5d36b3a015c5e5798280db0",
+    "docs/plan-843bb3ce22-T3.md": "4d999aead412f5076952d005ba56e334eb34bddf749321845d1c7fe320201b43",
+    "main.go": "1b0acf5b40441515507c3a0cd6551ffd898afe6ffbafd62cee29547fd0783d58",
+    "run_limits_cli.go": "fba9eee51d75ac8857d80cfd35c632a0b97353da99c6e0286c4c91f64f9d3f68",
+    "run_limits_cli_test.go": "5571a45a3dacfadc159b6f000c54599a59d80d09b4e2cca5237ba02cdd7363da",
+    "storage_inspection.go": "0cae5813813143ceff827b22651224d766d0db94e053e89403c24714d1e8007e",
+    "storage_inspection_test.go": "850ae823c4c7f5b7d0cd38852a815d56d5a1b2bb282f6aece05fbf95de6a6e4c"
+  },
+  "domains": {
+    "engine_verification": 100
+  },
+  "checks": [
+    {
+      "id": "plan-entry",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-1",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "engine_verification",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T3-cli-admin.md",
+        "docs/plan-843bb3ce22-T3.md"
+      ],
+      "reason": "Dépendance T2 acceptée dans le cockpit ; périmètre CLI et inspection des migrations respecté."
+    },
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T3-cli-admin.md",
+        "docs/plan-843bb3ce22-T3.md"
+      ],
+      "reason": "Tests CLI et moteur comparent les cinq mêmes valeurs invalides ou nulles ; tests ciblés PASS."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T3-cli-admin.md",
+        "docs/plan-843bb3ce22-T3.md"
+      ],
+      "reason": "Lecture du code : délégation aux méthodes Store, contrôle parser de cohérence uniquement."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T3-cli-admin.md",
+        "docs/plan-843bb3ce22-T3.md"
+      ],
+      "reason": "Usage documenté et aide du binaire exécutée ; arguments et exemples présents dans les rapports."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T3-cli-admin.md",
+        "docs/plan-843bb3ce22-T3.md"
+      ],
+      "reason": "go test ./... -timeout 12m PASS 364.374s ; go vet, build, diffcheck PASS ; tests inspection et CLI PASS 0.168s ; essai du binaire sur SQLite temporaire."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T3-cli-admin.md",
+        "docs/plan-843bb3ce22-T3.md"
+      ],
+      "reason": "Avis indépendant favorable sur les trois critères observé dans le cockpit ; binaire testé installé sha256 7970e68d697fd0bed4261dba008be6bb30c6a9df88353917dad706f6aae6c17b."
+    }
+  ]
+}

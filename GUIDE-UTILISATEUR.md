@@ -7,6 +7,8 @@ installés et authentifiés dans l’environnement où Swarm les exécute.
 
 Les captures illustrent des données de démonstration, sans agents réels en cours.
 
+Pour une copie déjà préparée ou une livraison incomplète : [reprise et contrôles du moteur](docs/ENGINE-RECOVERY.md).
+
 ## Choisir la langue
 
 Le sélecteur **Langue** propose Français et English dans le cockpit, la préparation
@@ -21,6 +23,25 @@ Les commandes, codes et clés JSON restent identiques. Les titres, rapports et
 sorties des agents conservent leur langue d’origine.
 
 [Read the English user guide](docs/en/USER-GUIDE.md).
+
+En cas de refus du fournisseur : [comprendre et traiter une attente de quota IA](docs/PROVIDER-QUOTAS.md).
+
+Pour les garanties et leurs limites : [contrat du moteur et design Cursor](docs/architecture/CURSOR-ENGINE-CONTRACT.md).
+
+## Le parcours en un coup d’œil
+
+| Vous voulez… | Ouvrez… | Vérifiez avant de continuer |
+|---|---|---|
+| Choisir l’IA | IA et connexions | Le modèle, son accès et l’environnement d’exécution |
+| Expliquer le besoin | Préparer avec l’IA | Objectif, contraintes et critères concrets |
+| Démarrer | Pilotage, puis Lancer la mission | Rôles, dossier, limites et autorisation |
+| Comprendre l’attente | La tâche, puis son diagnostic | Cause, personne ou agent qui doit agir, prochaine action |
+| Voir les sorties | Voir l’agent travailler, si une tentative existe | Heure du signal et résultat réellement reçu |
+| Confirmer la fin | Résultats et validations | Critères, contrôles et revue ; pas seulement la fin du processus |
+
+![Préparation : saisir un besoin et ses critères](docs/screenshots/preparation.png)
+
+Les écrans ci-dessous ont été recapturés le 29 septembre 2026 sur une instance isolée. La mission manuelle présente trois tâches **à préparer** ; les alertes de rôles manquants sont réelles. Elle ne démontre pas une exécution autonome.
 
 ## Sommaire
 
@@ -57,6 +78,30 @@ Le sélecteur permet de consulter plusieurs missions dans le même onglet.
 
 Si le navigateur est sur un autre ordinateur, `127.0.0.1` désigne cet ordinateur,
 pas le serveur : utilisez le [tunnel décrit dans l’installation](INSTALL.md#réseau-et-accès-au-navigateur).
+
+### Lire la version et les nouveautés
+
+Le bouton **Version et nouveautés** se trouve dans le rail du cockpit et dans
+l’en-tête de la préparation. La fenêtre distingue le binaire effectivement lancé
+des sources locales, puis affiche les releases embarquées et leurs commits. Tant
+qu’aucune release vérifiée n’est déclarée, elle affiche un historique vide sans
+fabriquer de version. `devel`, `unknown` et `null` sont donc des états explicites,
+pas des échecs masqués ni des numéros de release.
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+Ces commandes fonctionnent sans base de projet. Pour comparer avec le web,
+exécutez-les sur le même binaire que le serveur. Après recompilation ou mise à
+jour, redémarrez le serveur avant de conclure à un écart. Échap ferme la fenêtre
+et rend le focus au bouton qui l’a ouverte.
+
+![Version et nouveautés dans la préparation, français, thème État](docs/screenshots/version-history/prepare-fr-etat.png)
+
+[Captures bilingues et états de chargement/indisponibilité](docs/screenshots/version-history/manifest.json).
 
 ## 2. Connecter les IA
 
@@ -115,11 +160,14 @@ vérifier la réussite. Exemple à adapter :
 4. Avec **Modifier les missions**, précisez chaque titre, périmètre, livrable,
    critère de réussite et dépendance.
 5. Utilisez **Vérifier le plan** et corrigez les problèmes signalés.
-6. Choisissez **Créer les missions**, puis les fournisseurs, l’espace de travail,
-   les limites et le mode de validation.
+6. Choisissez **Relire l’équipe proposée**, puis vérifiez le responsable, les
+   exécutants, la revue, les IA, l’espace de travail, les limites et le mode de
+   validation. Exécutez le prévol, puis donnez l’autorisation unique récapitulative.
 
 La vérification du plan contrôle sa cohérence ; elle ne prouve pas que le travail
-est réalisé. Créer les missions ne démarre pas les agents.
+est réalisé. Aucun travail ni agent n’est créé avant l’autorisation. Après celle-ci,
+seules les missions éligibles peuvent partir ; dépendances, budget, pause et espace
+occupé restent contrôlés.
 
 ![Préparation d’une mission](docs/screenshots/preparation.png)
 
@@ -162,10 +210,36 @@ non validées ou un dossier déjà occupé peuvent réduire le parallélisme ré
 **Lancer tout** démarre les tâches prêtes à cet instant ; pour un enchaînement
 durable, utilisez la mission et vérifiez que son conducteur est observé.
 
+### Lire le résumé avant de confirmer
+
+L’aperçu de lancement présente la configuration commune et celle de chaque départ
+possible : rôle, fournisseur, niveau demandé, modèle résolu par la configuration,
+profil du projet et skills sélectionnés. Les profils propres aux tâches restent
+prioritaires. Le même résumé est disponible avec `swarm mission preview`.
+
+Le **modèle rapporté par le fournisseur** reste **inconnu avant l’exécution**.
+Un modèle configuré n’est pas une preuve du modèle réellement utilisé. Un programme
+sans politique de modèles affiche aussi un modèle résolu **inconnu**. Le périmètre,
+les budgets, les reprises et les validations restent visibles avant confirmation.
+
 ## 5. Suivre le travail
 
 Commencez par le résumé du **Pilotage des agents** : ce qui se passe, la prochaine
 action et qui doit agir. Consultez ensuite le graphe ou la liste.
+
+Quand vous sélectionnez une tâche, le panneau conserve l’identité de la tentative
+affichée pendant les mises à jour. Il sépare le rôle déclaré, l’état du processus,
+l’activité reçue et la validation de la tâche : une fin de processus ou une ligne
+de journal ne vaut jamais acceptation. Le modèle demandé et le modèle rapporté
+restent deux valeurs distinctes. Si le fournisseur ne transmet pas sa consommation,
+le coût reste **inconnu** ; il n’est ni remplacé par zéro ni confondu avec les appels
+d’outils ou les jetons.
+
+Une modification de dépendance, du contrat de tâche, de la politique de contrôle ou
+du candidat testé rend les preuves concernées périmées tout en conservant leurs
+reçus historiques. Une modification d’affichage ou administrative ne réutilise une
+preuve que si son digest d’entrées pertinentes est identique. Zoom, orientation,
+filtres et sélection ne changent pas la révision métier.
 
 - Les flèches de dépendance vont du prérequis vers la tâche qui en dépend.
   Elles tiennent compte du verdict du moteur et de la fraîcheur des preuves.
@@ -175,10 +249,22 @@ action et qui doit agir. Consultez ensuite le graphe ou la liste.
   change les informations visibles. Aucun de ces réglages ne réordonne le travail.
 - **+ / −** replie ou déplie une branche. Cela ne supprime aucune tâche.
 - Les filtres et **Vue d’ensemble** aident à retrouver une branche hors écran.
+- **Éditer les dépendances** ouvre le brouillon dans le graphe. Choisissez
+  ajouter ou retirer, puis activez le prérequis et la tâche dépendante à la
+  souris, avec Entrée ou avec Espace. **Annuler** et **Rétablir** modifient le
+  brouillon seulement. **Prévisualiser** demande le verdict du moteur ;
+  **Appliquer explicitement** est la seule action qui modifie la mission.
+  Si vous annulez toutes les modifications, l’aperçu est désactivé. Les
+  propositions déjà enregistrées restent dans l’historique ; rétablir une
+  modification crée une nouvelle proposition à prévisualiser.
+- La mini-carte, le compteur de tâches/liens masqués et **Retrouver ma
+  sélection** permettent de conserver le contexte après filtre, repli ou zoom.
+  Un conflit conserve les opérations : rechargez et recréez le brouillon sur
+  la révision courante, puis prévisualisez-le de nouveau.
 - Un clic ouvre les détails. **Voir l’agent travailler** ouvre sa session ;
   un double-clic sur une tâche ouvre sa session lorsqu’elle existe.
 
-![Rôles, tâches et flèches](docs/screenshots/agents-horizontal.png)
+![Tâches à préparer et flèches de dépendance](docs/screenshots/agents-horizontal.png)
 
 Dans la session, lisez l’heure, le type d’événement et le message. Les sorties
 reçues décrivent l’activité observable : elles ne donnent pas accès au raisonnement
@@ -189,6 +275,19 @@ brut du fournisseur n’est pas nécessairement conservé.
 
 **Ces captures utilisent des données de démonstration**, sans agents réels en
 cours. Les fournisseurs, missions et états de votre installation seront différents.
+
+### Adapter l’affichage
+
+![Orientation verticale en thème sombre](docs/screenshots/agents-vertical.png)
+
+Utilisez **Vue d’ensemble** pour retrouver les flèches après un zoom. Le repli masque une branche ; il ne change ni les dépendances ni l’ordre d’exécution.
+
+<details>
+<summary>Voir les livrables en liste détaillée</summary>
+
+![Liste détaillée des trois tâches de démonstration](docs/screenshots/agents-liste.png)
+
+</details>
 
 ## 6. Comprendre les états et valider
 
@@ -218,6 +317,10 @@ La mission hiérarchique n’est achevée que lorsque les résultats sont trait�
 et que les responsables ont clos leurs périmètres.
 
 ## 7. Résoudre un blocage
+
+Pour une acceptation périmée dont les preuves liées ont réellement changé, **Revalider les preuves** ouvre une confirmation de nouvelle vérification du résultat existant. Le moteur conserve la tentative et les appels consommés, archive l’ancien avis et exige de nouveaux contrôles puis une acceptation. Cette reprise utilise le budget restant du vérificateur ; elle ne relance pas le producteur. Un fichier absent ou une acceptation encore fraîche ne suffit pas à autoriser cette reprise.
+
+Un échec du planificateur concerne ses nouvelles décisions. Les tâches déjà prêtes, en cours, à examiner ou à reprendre conservent leur état et leur action autorisée dans le bandeau. Le diagnostic du planificateur reste consultable dans les décisions ; il ne prouve pas que tous les agents sont arrêtés.
 
 Ouvrez la tâche signalée et son diagnostic. **Expliquer avec l’IA** peut aider à
 comprendre le contexte et proposer une action. Examinez l’effet de cette action
@@ -328,8 +431,8 @@ sont dans un fichier réservé au compte du processus, **sans chiffrement applic
 Ne publiez ni ce dossier ni les liens de session. Les sorties capturées peuvent
 contenir du contenu sensible du projet.
 
-Les méthodes APEX, KS et PDCA nécessitent leurs ressources dans le projet piloté ;
-elles ne sont pas toutes incluses. La préparation standard ne crée pas
+Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md). Pour un autre
+projet piloté, vérifiez ses ressources de méthode. La préparation standard ne crée pas
 implicitement des copies Git isolées : ne confondez pas ce parcours avec le mode
 avancé de dépôt Git géré, décrit dans la référence.
 
@@ -338,3 +441,208 @@ fournisseur réel et de votre projet.
 
 Pour approfondir : [préparation](PREPARATION-UX.md), [cockpit technique](COCKPIT.md),
 [référence CLI](REFERENCE.md), [installation](INSTALL.md).
+
+## Comprendre et reprendre une mission
+
+Le pilotage commence par un résumé court : ce qui se passe, puis qui agit et
+quelle est la prochaine étape. Le bouton principal cible la tâche qui retient
+le plus de dépendants avant les tâches simplement à configurer. Un incident de
+stockage, une organisation incomplète ou une planification à reprendre reste
+prioritaire. Le texte sous le résumé annonce l’effet du bouton : ouvrir un
+diagnostic ne relance pas l’agent et ne valide pas son résultat.
+
+Le CLI `swarm mission status IDENTIFIANT` affiche le même résumé, la même action
+et son effet. `--json` expose `guidance` et `tasks[].primary_action` pour les
+outils qui présentent ce suivi. Les commandes de reprise existantes gardent
+leurs confirmations, contrôles et limites.
+
+Pour une nouvelle tentative de la même tâche, Swarm fournit les opérations
+récentes, la prochaine action, les critères actuels et les références de revue
+liées à la tentative précédente. Les verdicts transmis sont historiques : les
+preuves doivent être revérifiées sur le résultat courant. Les rapports bruts,
+les résultats des autres tâches et les secrets ne sont pas recopiés dans cette
+mémoire. Son contenu reste borné et signale les extraits incomplets.
+
+### Comprendre l’attente, les appels et une reprise
+
+Dans **Conduite**, trois boutons ouvrent des fenêtres de lecture :
+
+- **Depuis votre dernière visite** sépare résultats, blocages et décisions.
+  Ces événements décrivent l’historique, pas une validation actuelle. La première
+  visite est annoncée ; un extrait limité à 200 événements est signalé.
+- **Pourquoi cette tâche attend ?** donne les prérequis non validés ou périmés
+  et permet d’ouvrir leur fiche. Une attente sans dépendance affiche le motif du
+  moteur, par exemple un espace occupé. Ouvrir la fiche ne relance rien.
+- **Où vont les appels et les coûts ?** distingue exécutants par tâche,
+  responsables et vérificateur. Les contrôles enregistrés et les reprises
+  d’agents sont séparés des appels IA. Les jetons et dollars absents restent
+  explicitement non rapportés. Ce tableau ne mesure pas toutes les requêtes
+  réseau internes aux fournisseurs. Il est aussi visible dans **Budgets et coûts IA**.
+
+Le **Bilan par tentative**, dans cette même modale et dans `swarm mission spending WORK`,
+conserve une ligne par agent et tentative : processus, validation enregistrée de
+la tâche, outils, lectures, écritures, opérations non classées, erreurs cumulées,
+répétitions et usage/coût fournisseur. Une tâche acceptée peut conserver une
+tentative interrompue ; son acceptation enregistrée ne garantit pas la fraîcheur
+actuelle des preuves. Une erreur ne disparaît pas du total après un succès.
+
+Les anciennes tentatives sans compteurs détaillés restent **inconnues**, pas zéro.
+Une perte de visibilité produit une mesure **partielle**. Les commandes mixtes
+ne sont pas automatiquement considérées comme des tests : leur nombre reste
+inconnu sans signal fiable. Une répétition compte une même opération avec les
+mêmes entrées sous un nouvel identifiant ; un message retransmis n’est pas
+un nouvel appel. Un départ enregistré n’est pas un appel au modèle.
+
+Dans le détail d’une tâche, **Avant une relance** présente les éléments
+conservés, les vérifications à refaire, les critères inchangés et la correction
+attendue. Cet aperçu apparaît aussi dans le formulaire de relance ou d’essai
+correctif ; il suit la tentative sélectionnée et la consigne saisie. Il ne
+constitue ni une autorisation de départ ni une promesse de succès.
+
+Équivalents CLI, utilisables avec `--lang en` ou `--json` :
+
+```bash
+swarm mission changes WORK
+swarm mission seen WORK               # marque explicitement la révision comme vue
+swarm mission spending WORK
+swarm mission recovery WORK TASK      # dernière tentative de cette tâche
+swarm mission recovery WORK TASK AGENT
+swarm mission status WORK             # inclut les prérequis qui retiennent les tâches
+```
+
+Une lecture ne déplace pas le repère de visite. Sur le web, le repère existant
+est enregistré en quittant le travail, ou via « Marquer comme vu ». Le CLI
+utilise le même compte local et le même repère, avec `mission seen`.
+
+### Redémarrage explicite après épuisement des tentatives
+
+`swarm planning restart-task WORK --input reprise.json` prépare une seule nouvelle
+production après décision explicite de l’opérateur. Les anciennes tentatives,
+coûts et revues restent conservés ; l’autorisation seule ne lance aucun agent.
+Le JSON contient `schema_version`, `event_id`, `expected_revision`, `task_id`,
+`attempt_id`, `confirm_recovery: true`, `reason`, `recovery_instruction` et
+`expected_candidate`. Pour une mission Git isolée, ce dernier est le candidat
+Git courant. Pour une mission dans un dossier partagé, c’est l’empreinte SHA-256
+du fichier déclaré comme livrable, examiné avant la demande (48 Ko maximum).
+La dernière tentative doit être terminée et aucun agent ni revue ne doit être
+actif. Une consigne différente est obligatoire. Les contrôles, la revue
+indépendante et la décision d’acceptation doivent ensuite être renouvelés.
+Un dépassement historique reste visible : il n’est pas remis à zéro.
+
+### Lire les compteurs et reconnaître la fin
+
+- **Appels d’outils** : actions observées du fournisseur pendant une tentative ; ce n’est pas un nombre de requêtes au modèle.
+- **Décisions enregistrées** : décisions de planification conservées par le moteur.
+- **Activations de planification** : prises en charge du planificateur, y compris celles effectuées par le superviseur natif. Elles ne prouvent pas autant d’appels IA payants.
+- **Retours à traiter** : événements encore sans décision ; un événement reçu ne constitue pas une tâche validée.
+
+Un agent arrêté ou un avis favorable ne suffisent pas. **Terminé et validé**
+indique que les preuves actuelles satisfont les contrôles de la tâche. La mission
+est clôturée lorsque tous les résultats requis sont validés et que le responsable
+racine a clôturé son périmètre. Une preuve modifiée peut rendre la validation périmée.
+
+![Mission clôturée : 8/8 résultats validés](docs/screenshots/mission-complete-fr.png)
+
+*Capture réelle du 1er octobre 2026 : résultats validés et responsabilité racine clôturée. « Voir les résultats » conserve l’accès aux livrables et aux avis. Cette recette comprend des décisions humaines ; elle ne prouve pas une autonomie sans intervention.*
+
+Si une reprise autorisée reste arrêtée par une décision opérateur précédente,
+l’autorisation seule n’enlève pas cet arrêt : utilisez le lancement explicite
+après vérification des conditions. Le [guide moteur](docs/ENGINE-RECOVERY.md)
+détaille les refus de révision et les rapports trop grands pour le contexte.
+
+### Refaire une revue après correction des preuves
+
+Une revue refusée conserve son avis et ses appels consommés. Corrigez le livrable déclaré ou le rapport examiné ; modifier un fichier sans lien avec la revue ne suffit pas. Si la tentative de production est terminée et que les preuves liées ont réellement changé, **Reprendre la vérification** permet de soumettre ce même résultat à un nouvel examen, sans relancer la production. Un fichier supprimé ou inaccessible ne permet pas cette reprise. Le budget existant reste applicable ; aucun avis favorable ni aucune acceptation ne sont créés par ce bouton.
+
+Les consignes ajoutées pour lancer une tâche restent propres à cette tâche. Elles ne remplacent pas les consignes communes déjà enregistrées pour la mission ; celles-ci se configurent explicitement dans le profil du travail. Au départ, le moteur assemble les consignes communes et celles de la tâche dans le message transmis à l’agent. Il évite de recopier deux fois une même consigne commune. Une consigne locale ne devient pas automatiquement une règle des autres tâches.
+
+### Modèle demandé et modèle rapporté
+
+Le détail d’une tentative affiche séparément le modèle demandé par la configuration et celui déclaré par le fournisseur. L’observation conserve sa source et sa date dans le CLI JSON `agent show` (`reported_model`). Sans événement fournisseur structuré, la valeur reste inconnue, même après exécution. Une déclaration fournisseur n’est pas une preuve indépendante du modèle physique exécuté. Les anciennes tentatives ne sont pas rétroactivement renseignées.
+
+### Préparer une reprise ciblée
+
+Dans la tâche, « Avant une relance » compare les preuves liées au dernier avis et affiche les changements depuis le refus. Les preuves inchangées peuvent servir d’entrées ; elles ne constituent pas une validation. Les preuves modifiées ou inconnues et les critères restants doivent être vérifiés. Le même aperçu est disponible avec `swarm mission recovery TRAVAIL TACHE`. Cet aperçu n’exécute aucune action et ne relève aucun plafond.
+
+### Sortie des contrôles transmise à la revue
+
+Dans « Configurer les validations », chaque contrôle peut autoriser le partage de sa sortie avec le vérificateur. Ce choix est désactivé par défaut ; activez-le seulement pour une commande dont la sortie peut être partagée. Le moteur transmet au maximum 8 Kio, indique la taille totale et signale une sortie tronquée. Une observation partielle ne vaut pas journal complet. Les sorties restent des données à examiner, jamais des instructions pour le vérificateur.
+
+Le CLI utilise la même politique : `review_output: true` dans le contrôle JSON de `swarm validation preview` puis `apply`. Toute modification invalide le reçu précédent : les contrôles doivent être rejoués avant la revue, sans nouvelle tentative de production ni remise à zéro du budget.
+
+### Ce que fait la revue indépendante
+
+Le vérificateur utilise une session distincte pour examiner les critères, le rapport, les contrôles réellement exécutés et les pièces jointes. En mode sans outils, il ne rejoue pas les tests : il examine leur couverture et la cohérence des preuves fournies. Les observations du producteur ou du superviseur gardent leur attribution. Une ancienne limite de recette peut être complétée par des observations ultérieures datées ; elle n’est pas effacée. Un code de sortie 0 ne suffit pas si le contrôle ne couvre pas le critère. Une preuve manquante reste « inconnue » avec une explication précise. L’avis favorable et l’acceptation de la tâche sont deux étapes différentes.
+
+### Validation finale et reprise
+
+Voir [Acceptation par le moteur](docs/ENGINE-ACCEPTANCE.md#recontrôler-un-résultat-terminé-après-correction)
+pour la couverture complète de la suite, le recontrôle explicite d’un résultat
+existant et la proposition de superviseur de validation. Un dépassement de délai
+d’un contrôle ne justifie pas, à lui seul, un nouvel exécutant.
+
+### Préparer les dépendances sans lancer de tâche
+
+Le moteur expose un brouillon durable distinct de la présentation du graphe. Un
+client authentifié enregistre les opérations `add_dependency` ou
+`remove_dependency` avec `POST /api/v1/graph-drafts`, puis demande leur analyse
+avec `POST /api/v1/graph-drafts/preview`. Cette prévisualisation ne modifie ni la
+mission, ni ses tentatives, ni ses preuves et indique explicitement que le droit
+`apply_plan` reste nécessaire.
+
+L’application explicite utilise `POST /api/v1/graph-drafts/apply` avec le
+`preview_token`, le `content_digest`, la révision métier attendue et un
+`event_id` stable. Le même événement et le même contenu retrouvent le résultat
+initial ; un contenu différent, une révision concurrente, une permission retirée,
+une tâche active, un cycle ou une extrémité inconnue sont refusés sans effet
+partiel. Un brouillon se relit avec
+`GET /api/v1/graph-drafts?work=WORK&draft=DRAFT`. L’application ne lance jamais
+un agent. Ces routes sont pour l’intégration produit, pas pour contourner le
+contrôle de session web.
+
+Dans le cockpit, ouvrez **Pilotage des agents**, puis **Éditer les
+dépendances**. Le panneau de propriétés utilise directement ces routes. Il
+annonce les tâches affectées, le fait qu’aucun départ n’est implicite et rend le
+focus au bouton d’ouverture à la fermeture. L’orientation, le niveau de détail,
+les rôles colorés, les groupes, le repli et les boutons de pilotage restent
+disponibles pendant la préparation.
+
+Le CLI utilise le même service métier et le même stockage :
+
+```bash
+swarm plan draft import WORK --input proposition.json --json
+swarm plan draft show WORK DRAFT --json
+swarm plan draft export WORK DRAFT --output brouillon.json --json
+swarm plan draft compare WORK DRAFT --json
+swarm plan draft preview WORK --input preview.json --json
+swarm plan draft apply WORK --input apply.json --json
+swarm plan draft undo WORK DRAFT --input edition-precedente.json --json
+swarm plan draft redo WORK DRAFT --input edition-suivante.json --json
+```
+
+Les fichiers d’import et d’export sont limités à 64 Kio et validés strictement.
+`compare` affiche les dépendances avant/après, les tâches affectées et le jeton de
+prévisualisation. `undo` et `redo` enregistrent une nouvelle édition du brouillon :
+ils ne retirent jamais une révision appliquée et ne modifient aucune tentative.
+Pour inverser un effet appliqué, créez une nouvelle proposition inverse, puis
+prévisualisez-la et appliquez-la sous les gardes courantes. L’aide détaillée est
+disponible avec `swarm aide brouillons` ou `swarm --lang en help drafts`.
+# Programmes et automatisation
+
+Le cockpit propose une vue **Programmes** distincte du graphe de conduite. Une programmation cible toujours une mission existante et préautorisée : elle demande une reprise, elle ne crée pas une nouvelle mission et une occurrence traitée ne signifie jamais que la mission est validée.
+
+Dans le web, renseignez le nom, la cible, le fuseau IANA et l’horaire, puis choisissez **Prévisualiser sans effet**. La création n’est possible qu’avec cet aperçu courant et produit toujours un programme désactivé. Activez ensuite explicitement le programme ; le moteur revalide alors l’autorisation, les budgets et les limites. **Suspendre** empêche les prochaines occurrences, **Archiver** est définitif, et une occurrence ne peut être annulée que tant qu’elle attend encore sans prise en charge ni effet.
+
+La CLI utilise le même service métier :
+
+```text
+swarm automation list
+swarm automation show PROGRAMME
+swarm automation preview --input programme.json
+swarm automation create --input creation.json
+swarm automation enable|pause|archive PROGRAMME --input revision.json
+swarm automation cancel OCCURRENCE --input revision.json
+swarm automation params show|apply [--input reglages.json]
+```
+
+`create` reçoit `{ "schedule": <document prévisualisé>, "preview_token": "..." }`. Les transitions et annulations reçoivent `expected_revision` et refusent un conflit sans écrasement. La vue affiche séparément l’état du programme, l’occurrence, la demande, la validation de mission, l’autorisation, le profil, les limites et les coûts réellement rapportés. Une valeur fournisseur absente reste **inconnue**, jamais zéro. Les paramètres opérationnels sont versionnés dans la racine locale ; les modifier ne relève aucun budget et ne change aucune tentative déjà lancée.

@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -143,6 +144,57 @@ func TestPreparationConversionAtomicLocksRelease(t *testing.T) {
 	as, _ := s.agents(w.ID)
 	if len(as) != 0 {
 		t.Fatal(as)
+	}
+}
+
+func TestPreparationAuthorizePlanIsOneAtomicExplicitCommand(t *testing.T) {
+	s := storeTest(t)
+	provider := filepath.Join(s.root, "claude")
+	if e := os.WriteFile(provider, []byte("#!/bin/sh\nexit 0\n"), 0700); e != nil {
+		t.Fatal(e)
+	}
+	setPreflightProvider(t, s, Provider{Command: provider})
+	p := readyPreparation(t, s, "")
+	r := conversionRequest(t, s, p, "authorize-plan")
+	r.Organization = &PreparationOrganization{
+		Provider: "fixture", Workspace: ".", Validation: "human", MaxTasks: 20, MaxCalls: 40,
+	}
+	p, e := s.preparationCommand(r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if p.Conversion == nil || p.Conversion.ReleasedAt == "" {
+		t.Fatal("single authorization did not create and release the plan", p.Conversion)
+	}
+	w, e := s.get(p.WorkID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if w.Planning == nil || w.Planning.Paused || w.Profile == nil {
+		t.Fatal("proposed organization not committed", w.Planning, w.Profile)
+	}
+	for _, id := range p.Conversion.TaskIDs {
+		task, _ := w.task(id)
+		if task.LaunchHeld {
+			t.Fatal("authorized task remained held", id)
+		}
+	}
+	var agents, reservations, released int
+	if e = s.db.QueryRow("SELECT count(*) FROM agents").Scan(&agents); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.db.QueryRow("SELECT count(*) FROM reservations").Scan(&reservations); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.db.QueryRow("SELECT count(*) FROM preparation_launch_locks WHERE preparation_id=? AND released=1", p.ID).Scan(&released); e != nil {
+		t.Fatal(e)
+	}
+	if agents != 0 || reservations != 0 || released != len(p.Conversion.TaskIDs) {
+		t.Fatalf("authorization must not silently launch: agents=%d reservations=%d released=%d", agents, reservations, released)
+	}
+	var events int
+	if e = s.db.QueryRow("SELECT count(*) FROM events WHERE work_id=? AND kind='preparation.authorize-plan'", w.ID).Scan(&events); e != nil || events != 1 {
+		t.Fatal("explicit authorization event missing", events, e)
 	}
 }
 func TestPreparationConversionRollbackStaleAndConcurrency(t *testing.T) {

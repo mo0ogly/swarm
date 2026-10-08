@@ -34,6 +34,29 @@ func successfulShellPreflight() Provider {
 	return verifiedPreflightProvider("/bin/sh", "-c", "printf '%s\\n' '"+verifiedPreflightJSON+"'")
 }
 
+func TestPreparationPreflightRunsBeforeWorkCreation(t *testing.T) {
+	s := storeTest(t)
+	setPreflightProvider(t, s, successfulShellPreflight())
+	result, err := s.preparationPreflight("fixture", ".", "auto")
+	if err != nil || result.Verdict != "ready" || result.Verification != "verified" {
+		t.Fatal(result, err)
+	}
+	var works, agents int
+	if err = s.db.QueryRow("SELECT count(*) FROM works").Scan(&works); err != nil {
+		t.Fatal(err)
+	}
+	if err = s.db.QueryRow("SELECT count(*) FROM agents").Scan(&agents); err != nil {
+		t.Fatal(err)
+	}
+	if works != 0 || agents != 0 {
+		t.Fatalf("preflight created state silently: works=%d agents=%d", works, agents)
+	}
+	failed, err := s.preparationPreflight("absent", ".", "auto")
+	if err == nil || failed.Verdict != "intervention" {
+		t.Fatal("missing provider did not produce an actionable failure", failed, err)
+	}
+}
+
 func TestPreflightFailureConsumesNoAttemptOrBudget(t *testing.T) {
 	s := storeTest(t)
 	w := taskTest(t, s, createTest(t, s))

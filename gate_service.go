@@ -43,6 +43,7 @@ func (s *Store) applyGateDocument(w *Work, task, phase, name string, raw json.Ra
 		return fmt.Errorf("barème modifié : rouvrir une tentative après réorientation explicite")
 	}
 	t.Gate = &GateRecord{Name: strings.TrimSpace(name), Document: raw, Evaluation: ev, At: now()}
+	t.EvidenceStaleReason = ""
 	return nil
 }
 

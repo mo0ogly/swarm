@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-10-02T19:17:14.717947+00:00",
+  "work": "w-10b0e692d202f36ee05a1b28",
+  "revision": 113,
+  "tasks": [
+    {
+      "id": "plan-10b0e692d2-V1",
+      "status": "accepted",
+      "deliverable": "docs/plans/version-history/V1-handoff.md",
+      "independent_review": "review-f5d816012d4e7098ed6f5404",
+      "review_state": "passed"
+    },
+    {
+      "id": "plan-10b0e692d2-V2",
+      "status": "accepted",
+      "deliverable": "docs/plans/version-history/V2-handoff.md",
+      "independent_review": "review-3b47746c82861f2751cda474",
+      "review_state": "passed"
+    },
+    {
+      "id": "plan-10b0e692d2-V3",
+      "status": "accepted",
+      "deliverable": "docs/plans/version-history/V3-handoff.md",
+      "independent_review": "review-6e2886bdc57fa3c393b16c21",
+      "review_state": "passed"
+    },
+    {
+      "id": "plan-10b0e692d2-V4",
+      "status": "accepted",
+      "deliverable": "docs/plans/version-history/V4-handoff.md",
+      "independent_review": "review-22ed0a2bfb7064fb96f63d75",
+      "review_state": "passed"
+    }
+  ],
+  "root_scope": "closed",
+  "live_server": "127.0.0.1:18791",
+  "browser_observation": "TRAVAIL TERMINÉ — Tous les résultats sont validés sur les preuves actuelles. Résultats validés et responsabilité racine clôturée dans cette mission.",
+  "publication": "not committed or published by this mission"
+}

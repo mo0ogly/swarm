@@ -77,21 +77,23 @@ function scalePilotGraph(svg,zoom){
 }
 function drawPilotGraph(){
  const canvas=$('pilot-canvas'),state=Pilot.state,tasks=snapshot.work.tasks;
+ const tasksByID=new Map(tasks.map(task=>[task.id,task])),selectedTask=Pilot.selectedTask();
  const shown=PilotGraph.visible(tasks,state.collapsed);
  const kept=tasks.filter(t=>(state.search.trim()||shown.has(t.id))&&(Pilot.matches(t,null)||snapshot.agents.some(x=>x.agent.task_id===t.id&&Pilot.matches(t,x.agent))));
  const ids=new Set(kept.map(t=>t.id));
  const links=(snapshot.pilotage?.edges||[]).filter(e=>ids.has(e.from_task_id)&&ids.has(e.to_task_id)&&!state.collapsed.includes(e.from_task_id));
  const organization=PilotGraph.organization(snapshot.work,kept,snapshot.paused);
  const shape=JSON.stringify([work,organization.nodes.map(n=>[n.id,n.title,n.tone]),organization.edges,kept.map(t=>[t.id,t.depends]),links.map(e=>[e.from_task_id,e.to_task_id]),state.orientation,state.detail,state.collapsed]);
- const height=state.detail==='detailed'?300:186,width=310;
+ const height=state.detail==='detailed'?324:210,width=310;
+ let restoredViewport=null,restoredFocus=null;
  if(shape!==Pilot.graphKey){
   Pilot.graphKey=shape;
   const focus=document.activeElement?.dataset.task,foldFocus=document.activeElement?.classList.contains('graph-fold'),goFocus=document.activeElement?.classList.contains('graph-go');
   const x=canvas.scrollLeft,y=canvas.scrollTop;
-  const g=new dagre.graphlib.Graph();g.setGraph({rankdir:state.orientation,nodesep:28,ranksep:70,marginx:20,marginy:20});g.setDefaultEdgeLabel(()=>({}));
+  const g=new dagre.graphlib.Graph();g.setGraph({rankdir:state.orientation,ranker:'tight-tree',nodesep:28,ranksep:70,marginx:20,marginy:20});g.setDefaultEdgeLabel(()=>({}));
   for(const t of kept)g.setNode(t.id,{width,height});
   for(const e of links)g.setEdge(e.from_task_id,e.to_task_id);
-  for(const n of organization.nodes)g.setNode(n.id,{width,height:130});
+  for(const n of organization.nodes)g.setNode(n.id,{width,height:155});
   for(const e of organization.edges)g.setEdge(e.from,e.to);
   dagre.layout(g);
   // Independent tasks have no ranks: respect the explicitly chosen orientation.
@@ -112,10 +114,10 @@ function drawPilotGraph(){
    edge.dataset.from=e.from_task_id;edge.dataset.to=e.to_task_id;svg.append(edge);
   }
   for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
-  for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-65;
-   const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;
-   group.append(svgNode('rect',{x:left,y:top,width,height:130,rx:12}));
-   for(let i=0;i<4;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
+  for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-77.5;
+   const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;group.dataset.agentRole=n.role||n.kind;
+   group.append(svgNode('rect',{x:left,y:top,width,height:155,rx:12}));
+   for(let i=0;i<5;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
    const open=()=>Planning.inspectRole(n.kind);group.addEventListener('click',e=>{if(e.isTrusted)open()});group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});svg.append(group);
   }
   const children=PilotGraph.children(tasks);
@@ -126,10 +128,12 @@ function drawPilotGraph(){
    group.append(svgNode('rect',{x:left,y:top,width,height,rx:12,class:'graph-cadre'}));
    group.append(svgNode('rect',{x:left+10,y:top+48,width:width-20,height:20,rx:4,class:'graph-role-surface'}));
    for(let line=0;line<(state.detail==='detailed'?10:5);line++)group.append(svgNode('text',{x:left+14,y:top+24+line*19,class:line===0?'graph-titre':line===1?'graph-sous-titre':'graph-agent','data-line':line}));
-   const open=()=>Pilot.inspect('task',t.id);
+   group.append(svgNode('rect',{x:left+10,y:top+height-88,width:width-20,height:20,rx:4,class:'graph-profile-surface'}),svgNode('text',{x:left+14,y:top+height-73,class:'graph-profile-text','data-profile-line':'true'}));
+   const open=()=>GraphDraft.editing?GraphDraft.choose(t.id):Pilot.inspect('task',t.id);
    group.addEventListener('click',e=>{if(e.isTrusted)open()});
    group.addEventListener('keydown',e=>{if(e.isTrusted&&['Enter',' '].includes(e.key)){e.preventDefault();open()}});
    svg.append(group);
+   GraphDraft.decorate(group,t.id);
    const go=svgNode('g',{class:'graph-go',tabindex:0,role:'button'});go.dataset.task=t.id;
    go.append(svgNode('rect',{x:left+12,y:top+height-62,width:width-24,height:26,rx:5}),svgNode('text',{x:left+20,y:top+height-44}),svgNode('title',{}));
    const openSessionOrLaunch=()=>{const session=PilotGraph.taskSession(snapshot.agents,t.id);if(session)AgentTerminal.open(session.agent);else Pilot.go(t.id)};
@@ -147,22 +151,25 @@ function drawPilotGraph(){
   }
   canvas.replaceChildren(svg,graphLegendeEtats());
   if(!kept.length)canvas.append(node('p',tasks.length?tr_web_graph_js('Aucun nœud pour ces filtres. Affichez tout le travail.'):tr_web_graph_js('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.')));
-  canvas.scrollLeft=x||state.x;canvas.scrollTop=y||state.y;
-  if(focus)[...canvas.querySelectorAll(goFocus?'.graph-go':foldFocus?'.graph-fold':'.graph-noeud')].find(n=>n.dataset.task===focus)?.focus();
+  restoredViewport={x:x||state.x,y:y||state.y};
+  if(focus)restoredFocus=[...canvas.querySelectorAll(goFocus?'.graph-go':foldFocus?'.graph-fold':'.graph-noeud')].find(n=>n.dataset.task===focus);
  }
  const svg=canvas.querySelector('svg');if(!svg)return;
- scalePilotGraph(svg,state.zoom);
- for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
+  scalePilotGraph(svg,state.zoom);
+ GraphDraft.minimap(svg);
+ for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=n.role==='subplanner'?[n.title,n.scopeLabel,n.description,n.detail]:[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];lines.push(globalThis.ProjectProfiles?ProjectProfiles.summary(n.workflow):'');group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
  const byTask=graphAgentsParTache();
  for(const group of canvas.querySelectorAll('.graph-noeud')){
-  const t=tasks.find(t=>t.id===group.dataset.task),v=snapshot.validation?.tasks[t.id],agent=byTask[t.id]?.[0]?.agent;
+  const t=tasksByID.get(group.dataset.task),v=snapshot.validation?.tasks[t.id],agent=byTask[t.id]?.[0]?.agent;
+  const profileText=group.querySelector('[data-profile-line]');if(profileText&&globalThis.ProjectProfiles){const profileAgent=agent||snapshot.agents.filter(x=>x.agent.task_id===t.id).sort((a,b)=>(b.agent.started||'').localeCompare(a.agent.started||''))[0]?.agent;const label=profileAgent?ProjectProfiles.summary(profileAgent.workflow):'▤ '+tr_web_graph_js('Profil non encore transmis');const profile=ProjectProfiles.describe(profileAgent?.workflow);profileText.dataset.profileFamily=profile.family;group.querySelector('.graph-profile-surface').dataset.profileFamily=profile.family;profileText.textContent=label.length>41?label.slice(0,40)+'…':label;profileText.setAttribute('aria-label',label);profileText.replaceChildren(document.createTextNode(profileText.textContent),svgNode('title',{},label));}
   const uncertain=Pilot.uncertainExecution(t,agent);
   group.dataset.etat=uncertain?'attention':graphTonalites[v?.state||t.status]||'neutre';
-  group.dataset.selected=String(Pilot.selectedTask()===t.id);
+  group.dataset.selected=String(selectedTask===t.id);
+  GraphDraft.decorate(group,t.id);
   const lines=[t.title,uncertain||labels[v?.state||t.status]||t.status,agent?agent.provider+' · '+(uncertain?(snapshot.pilotage?.health[agent.id]?.stop_requested?tr_web_graph_js('Arrêt demandé'):tr_web_graph_js('Activité non confirmée')):agent.progress?.detail||agent.progress?.action||tr_web_graph_js('Activité non reçue')):t.id];
   const role=PilotGraph.role(t,agent);
   group.querySelector('.graph-role-surface').dataset.tone=role.tone;
-  lines.splice(2,0,role.icon+' '+role.label);
+  lines.splice(2,0,role.icon+' '+role.label);if(typeof TaskModels!=='undefined')lines[2]+=' · '+TaskModels.text(t,agent);
   lines.push(PilotGraph.guidance(t,Pilot.goState(t),v));
   group.setAttribute('aria-label',lines.join('. ')+tr_web_graph_js(' — examiner la tâche'));
   if(state.detail==='detailed'){
@@ -175,7 +182,7 @@ function drawPilotGraph(){
   for(const text of group.querySelectorAll('[data-line]')){const value=lines[Number(text.dataset.line)]||'';text.setAttribute('aria-label',value);text.classList.toggle('graph-role',text.dataset.line==='2');if(text.dataset.line==='2')text.dataset.tone=role.tone;const shortened=value.length>41?value.slice(0,40)+'…':value;if(text.firstChild?.nodeValue!==shortened){text.replaceChildren(document.createTextNode(shortened),svgNode('title',{},value))}}
  }
  for(const button of canvas.querySelectorAll('.graph-go')){
-  const t=tasks.find(t=>t.id===button.dataset.task),go=Pilot.goState(t),session=PilotGraph.taskSession(snapshot.agents,t.id);
+  const t=tasksByID.get(button.dataset.task),go=Pilot.goState(t),session=PilotGraph.taskSession(snapshot.agents,t.id);
   if(session){button.style.display='';button.dataset.ready='true';button.dataset.taskSession=t.id;button.dataset.sessionLocation='graph';button.dataset.agentSession=session.agent.id;button.setAttribute('aria-label',session.label+' : '+t.title);button.querySelector('text').textContent=session.label;button.querySelector('title').textContent=tr_web_graph_js('Ouvrir la dernière tentative de cette tâche');continue}
   delete button.dataset.taskSession;delete button.dataset.agentSession;delete button.dataset.sessionLocation;
   const label=go.ready?tr_web_graph_js('Go — lancer'):tr_web_graph_js('Voir le blocage');button.style.display=go.visible?'':'none';button.dataset.ready=String(go.ready);button.setAttribute('aria-label',label+' : '+t.title+(go.ready?'':'. '+go.reason));if(button.querySelector('text').textContent!==label)button.querySelector('text').textContent=label;button.querySelector('title').textContent=go.ready?tr_web_graph_js('Configurer et confirmer le lancement'):go.reason;
@@ -188,11 +195,15 @@ function drawPilotGraph(){
   const label=fold.querySelector('text');if(label.textContent!==value)label.textContent=value;
   fold.setAttribute('aria-label',(closed?tr_web_graph_js('Déplier'):'Replier')+tr_web_graph_js(' la branche ')+id+(closed?' : '+hidden.length+tr_web_graph_js(' tâches masquées, ')+agents+tr_web_graph_js(' agents, ')+alerts+tr_web_graph_js(' alertes'):''));
  }
+ const linksByPair=new Map(links.map(e=>[JSON.stringify([e.from_task_id,e.to_task_id]),e]));
  for(const edge of canvas.querySelectorAll('.graph-arete')){
-  const e=links.find(e=>e.from_task_id===edge.dataset.from&&e.to_task_id===edge.dataset.to);
+  const e=linksByPair.get(JSON.stringify([edge.dataset.from,edge.dataset.to]));
   edge.dataset.lien=e?.satisfied_now?'satisfait':'attente';
   edge.setAttribute('marker-end',e?.satisfied_now?'url(#pilot-arrow-ok)':'url(#pilot-arrow)');
  }
+ // Restore position after the SVG writes; fitting owns the initial viewport.
+ if(restoredViewport&&!Pilot.fitPending)canvas.scrollTo(restoredViewport.x,restoredViewport.y);
+ restoredFocus?.focus();
 }
 
 // La couleur d'un nœud ne s'invente pas : cette légende dit ce que chaque

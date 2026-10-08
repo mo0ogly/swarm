@@ -1,0 +1,329 @@
+{
+  "rows": [
+    {
+      "kind": "planner",
+      "id": "root",
+      "label": "Responsable : root",
+      "recorded_calls": 7,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 10,
+      "output_tokens": 18704,
+      "calls_without_usage": 2,
+      "cost": {
+        "reported_usd": 0.6194144,
+        "attempts_with_cost": 5,
+        "attempts_without_cost": 2
+      }
+    },
+    {
+      "kind": "reviewer",
+      "id": "reviewer",
+      "label": "Vérificateur indépendant",
+      "recorded_calls": 14,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 44,
+      "output_tokens": 185612,
+      "calls_without_usage": 3,
+      "cost": {
+        "reported_usd": 3.5709478,
+        "attempts_with_cost": 11,
+        "attempts_without_cost": 3
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T1",
+      "label": "Inspection ciblée et contrats",
+      "recorded_calls": 1,
+      "observed_tool_calls": 9,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 18,
+      "output_tokens": 18153,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0.7008699999999999,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T2",
+      "label": "QW5 — Régler la limite qui bloque",
+      "recorded_calls": 2,
+      "observed_tool_calls": 65,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 12,
+      "output_tokens": 11644,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.4133056,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T3",
+      "label": "QW6 — État actuel et historique",
+      "recorded_calls": 2,
+      "observed_tool_calls": 23,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 24,
+      "output_tokens": 16447,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.7033048,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T4",
+      "label": "QW8 — Vérifier le dossier avant la revue",
+      "recorded_calls": 2,
+      "observed_tool_calls": 62,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 32,
+      "output_tokens": 10187,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0.5456905999999999,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "kind": "worker",
+      "id": "plan-01567e073c-T5",
+      "label": "QW7 — Voir l’effort par tâche",
+      "recorded_calls": 1,
+      "observed_tool_calls": 60,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    }
+  ],
+  "recorded_control_executions": 23,
+  "worker_retries": 3,
+  "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+  "attempts": [
+    {
+      "task": "plan-01567e073c-T1",
+      "label": "Inspection ciblée et contrats",
+      "agent": "auto-832c66f95abe8d67a38a",
+      "attempt": "a-5621887914ca22818b315dfd",
+      "process_state": "completed",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 9,
+      "measured": true,
+      "tool_reads": 2,
+      "tool_writes": 1,
+      "tool_unclassified": 6,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 18,
+      "output_tokens": 18153,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.7008699999999999,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-01567e073c-T2",
+      "label": "QW5 — Régler la limite qui bloque",
+      "agent": "auto-ed82e20e57f3200af263",
+      "attempt": "a-b45d8905fcf816f645fa0ec2",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 60,
+      "measured": true,
+      "tool_reads": 14,
+      "tool_writes": 6,
+      "tool_unclassified": 40,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "task": "plan-01567e073c-T2",
+      "label": "QW5 — Régler la limite qui bloque",
+      "agent": "eee438b9-6b15-4d8b-88d4-55194eb26b5b",
+      "attempt": "a-b455ca4bfd2338cc09d99801",
+      "process_state": "completed",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 5,
+      "measured": true,
+      "tool_reads": 0,
+      "tool_writes": 1,
+      "tool_unclassified": 4,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 12,
+      "output_tokens": 11644,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.4133056,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-01567e073c-T3",
+      "label": "QW6 — État actuel et historique",
+      "agent": "1426ec9c-5a9d-4d45-85ec-316341a236eb",
+      "attempt": "a-008c49f126275727492dfa40",
+      "process_state": "completed",
+      "task_acceptance_recorded": false,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 11,
+      "measured": true,
+      "tool_reads": 2,
+      "tool_writes": 2,
+      "tool_unclassified": 7,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 24,
+      "output_tokens": 16447,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.7033048,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-01567e073c-T3",
+      "label": "QW6 — État actuel et historique",
+      "agent": "auto-21e1c20e88473e830f46",
+      "attempt": "a-c26b7567bc5d7543dcf487b3",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": false,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 12,
+      "measured": true,
+      "tool_reads": 4,
+      "tool_writes": 0,
+      "tool_unclassified": 8,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "task": "plan-01567e073c-T4",
+      "label": "QW8 — Vérifier le dossier avant la revue",
+      "agent": "auto-987b01425800fd26ea11",
+      "attempt": "a-b4ff21ad8b32899aa05db623",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 41,
+      "measured": true,
+      "tool_reads": 15,
+      "tool_writes": 1,
+      "tool_unclassified": 25,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 2,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    },
+    {
+      "task": "plan-01567e073c-T4",
+      "label": "QW8 — Vérifier le dossier avant la revue",
+      "agent": "auto-d9d0f38349900e043509",
+      "attempt": "a-600fdd2ca2efc0385bded831",
+      "process_state": "completed",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 21,
+      "measured": true,
+      "tool_reads": 3,
+      "tool_writes": 1,
+      "tool_unclassified": 17,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 32,
+      "output_tokens": 10187,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0.5456905999999999,
+        "attempts_with_cost": 1,
+        "attempts_without_cost": 0
+      }
+    },
+    {
+      "task": "plan-01567e073c-T5",
+      "label": "QW7 — Voir l’effort par tâche",
+      "agent": "auto-5a61f5425d209232370d",
+      "attempt": "a-58b415b09e3effca87fb4a92",
+      "process_state": "interrupted",
+      "task_acceptance_recorded": false,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 60,
+      "measured": true,
+      "tool_reads": 8,
+      "tool_writes": 16,
+      "tool_unclassified": 36,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 2,
+      "tool_repeats_total": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "usage_missing": true,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      }
+    }
+  ]
+}

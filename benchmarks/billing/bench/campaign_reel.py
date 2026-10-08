@@ -35,10 +35,32 @@ def one(condition, fault, seed, model):
         if condition == "W":
             return run_real_w.run(KEY, fault, seed, model)
         return run_s.run(KEY, fault, seed, real_agent=[model])
-    except Exception as e:   # publiée comme ERREUR, jamais comme mesure
+    except Exception as e:   # publiée comme ERREUR ; les appels déjà engagés restent comptabilisés
+        run_dir = getattr(e, "run_dir", None)
+        usage_error = None
+        try:
+            usage = []
+            if run_dir:
+                usage_path = Path(run_dir) / "real-usage.jsonl"
+                if not usage_path.exists():
+                    usage_error = "journal de consommation absent"
+                else:
+                    for line in usage_path.read_text().splitlines():
+                        if not line.strip():
+                            continue
+                        try:
+                            entry = json.loads(line)
+                            if not isinstance(entry, dict):
+                                raise ValueError("entrée non objet")
+                            usage.append(entry)
+                        except ValueError:
+                            usage.append({"cost_usd": None, "invalid_usage_entry": True})
+                            usage_error = "journal de consommation partiellement illisible"
+        except (OSError, ValueError) as read_error:
+            usage_error = str(read_error)[:config.ERROR_TEXT_MAX]
         return {"condition": condition, "key_mode": KEY, "fault": fault, "seed": seed, "status": "ERREUR",
                 "error": f"{type(e).__name__}: {e}"[:config.ERROR_TEXT_MAX * 3],
-                "run_dir": getattr(e, "run_dir", None), "provenance": dict(harness.provenance()), "real_agent": model}
+                "run_dir": run_dir, "real_usage": usage, "usage_recovery_error": usage_error, "usage_complete": run_dir is not None and usage_error is None, "provenance": dict(harness.provenance()), "real_agent": model}
 
 
 def cost(record):
@@ -70,8 +92,11 @@ def main(argv=None):
     todo = [c for c in plan(a.reps, a.seed_base) if c not in done and (not only or (c[0], c[1]) in only)]
     append(out, {"kind": "campaign", "event": "start", "at": time.time(), "todo": len(todo), "spent_usd": spent,
                  "args": vars(a), **harness.provenance()})
-    stopped = None
+    stopped = ("consommation historique non récupérable intégralement : reprise suspendue, coût inconnu"
+               if any(r.get("usage_complete") is False for r in runs) else None)
     for condition, fault, seed in todo:
+        if stopped:
+            break
         charged = spent + missing * worst
         if charged >= a.ceiling_usd:
             stopped = (f"seuil d'arrêt atteint : {charged:.2f} $ >= {a.ceiling_usd:.2f} $ "
@@ -83,6 +108,9 @@ def main(argv=None):
         worst = max([worst] + [u.get("cost_usd") or 0 for u in record.get("real_usage") or []])
         append(out, record)
         print(f"{condition} {fault} {seed} {record['status']} cumul {spent:.2f} $", flush=True)
+        if record.get("usage_complete") is False:
+            stopped = "consommation non récupérable intégralement : arrêt conservateur, coût inconnu"
+            break
     append(out, {"kind": "campaign", "event": "stopped" if stopped else "end", "at": time.time(),
                  "spent_usd": round(spent, 4), "unpriced_calls": missing, "reason": stopped})
     return 3 if stopped else 0

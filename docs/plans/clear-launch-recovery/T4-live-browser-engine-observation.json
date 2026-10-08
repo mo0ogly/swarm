@@ -1,0 +1,30 @@
+{
+  "result": "PASS",
+  "execution": "Fresh CUA UI interaction requested during this engine control, not an archived DOM fixture",
+  "challenge": {
+    "nonce": "f293d3b88df60239d4e4c50543e3b2d9",
+    "started_unix": 1791046822.1676774,
+    "expires_unix": 1791046867.1676774,
+    "work": "w-115c11e8f802a4f98c3def32",
+    "task": "plan-115c11e8f8-T4",
+    "operation": "CUA Enter -> rendered recovery preview -> Escape -> focus",
+    "response": "/tmp/swarm-qw-cua/response-f293d3b88df60239d4e4c50543e3b2d9.json"
+  },
+  "observation": {
+    "nonce": "f293d3b88df60239d4e4c50543e3b2d9",
+    "driver": "CUA actual browser interaction",
+    "observed_unix": 1791046835.01,
+    "url": "http://127.0.0.1:18792/?work=w-115c11e8f802a4f98c3def32&lang=fr",
+    "opened": {
+      "dialog_open": true,
+      "text": "Swarm — lancement clair et reprise fiable — quatre quick wins\n\nAvant une relance\nFermer\n\nRelisez la correction et les critères ; aucune action n’est exécutée ici.\n\nComprendre cette action\nAvant une relance\nDepuis le refus\n\nChangements enregistrés depuis le dernier refus de cette tâche.\n\nr201 · 2026-10-03T16:59:46.281760648Z · Consigne de reprise modifiée\nPreuves à reprendre\n\nSeules les preuves liées au dernier avis sont comparées, au plus 64 fichiers et 32 Mio ; aucun inventaire du dépôt. Une preuve inchangée ne vaut ni avis favorable ni validation.\n\ndocs/plans/clear-launch-recovery/T4-handoff.md\n\nContenu modifié depuis l’avis : ancienne preuve périmée, vérification requise.\n\nVoir les preuves inchangées\nCritères restant à vérifier\nVue affiche les changements depuis le refus, les exigences restantes et distingue preuves réutilisables de preuves périmées\nAucun réinventaire complet déclenché, aucune hausse de budget automatique\nParcours réel refus puis correction bornée puis reprise vérifié en web et en CLI\nCe qui sera conservé\nHistorique des tentatives, rapports et avis précédents.\nCritères et dépendances du plan.\nFournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.\nCe qui sera refait\nVérification des conditions de lancement et du candidat courant.\nContrôles et revue requis pour la nouvelle tentative.\nUne nouvelle tentative d’agent ; l’ancienne reste dans l’historique.\nCritères inchangés\nVue affiche les changements depuis le refus, les exigences restantes et distingue preuves réutilisables de preuves périmées\nAucun réinventaire complet déclenché, aucune hausse de budget automatique\nParcours réel refus puis correction bornée puis reprise vérifié en web et en CLI\nCorrection attendue\n\nLivrable corrigé remis au vérificateur indépendant ; acceptation toujours requise.\n\nAucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.\n\nFermer",
+      "theme": "etat"
+    },
+    "closed": {
+      "dialog_open": false,
+      "focus_visible": true,
+      "focused_action": "recovery-preview-plan-115c11e8f8-T4"
+    },
+    "screenshot": "/home/fpizzi/workspace/swarm-action-skills/docs/screenshots/clear-launch-recovery/t4-live-cua-f293d3b88df60239d4e4c50543e3b2d9.png"
+  }
+}

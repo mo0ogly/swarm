@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"time"
 )
 
 func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.Writer) error {
@@ -28,6 +29,8 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return ""
 	}
 	switch pos[0] {
+	case "plan":
+		return s.graphDraftCLI(pos, input, output, out)
 	case "workspace":
 		switch arg(1) {
 		case "status":
@@ -201,6 +204,68 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		}
 		return s.console(arg(1), os.Stdin, out, asJSON)
 	case "providers":
+		if arg(1) == "relay" {
+			if len(pos) != 4 {
+				return fmt.Errorf("providers relay show|decide <agent> [--input décision.json]")
+			}
+			switch arg(2) {
+			case "show":
+				v, e := s.providerRelayView(arg(3))
+				if e != nil {
+					return e
+				}
+				return printJSON(out, v)
+			case "decide":
+				b, e := readInput(input)
+				if e != nil {
+					return e
+				}
+				var request ProviderRelayRequest
+				if e = strict(b, &request); e != nil {
+					return e
+				}
+				v, e := s.decideProviderRelay(arg(3), request)
+				if e != nil {
+					return e
+				}
+				return printJSON(out, v)
+			default:
+				return fmt.Errorf("providers relay show|decide <agent>")
+			}
+		}
+		if arg(1) == "cooldown" {
+			if len(pos) != 4 {
+				return fmt.Errorf("providers cooldown show|clear <fournisseur> [--input demande.json]")
+			}
+			switch arg(2) {
+			case "show":
+				c, d, e := s.providerCooldown(arg(3))
+				if e != nil {
+					return e
+				}
+				active := false
+				if c != nil {
+					active = c.active(time.Now())
+				}
+				return printJSON(out, map[string]any{"provider": arg(3), "cooldown": c, "digest": d, "active": active})
+			case "clear":
+				b, e := readInput(input)
+				if e != nil {
+					return e
+				}
+				var r ProviderCooldownClear
+				if e = strict(b, &r); e != nil {
+					return e
+				}
+				c, e := s.clearProviderCooldown(arg(3), r)
+				if e != nil {
+					return e
+				}
+				return printJSON(out, map[string]any{"cooldown": c, "message": "Attente levée explicitement. Disponibilité du fournisseur non démontrée ; aucune exécution lancée et aucun budget remboursé."})
+			default:
+				return fmt.Errorf("providers cooldown show|clear <fournisseur>")
+			}
+		}
 		if arg(1) == "init" {
 			if e := s.initProviders(); e != nil {
 				return e
@@ -215,6 +280,46 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, p)
 	case "agent":
 		switch arg(1) {
+		case "prepared":
+			w, e := s.get(arg(2))
+			if e != nil {
+				return e
+			}
+			pending := []*PreparedLaunch{}
+			for i := range w.Tasks {
+				p, e := s.preparedLaunchForTask(w, &w.Tasks[i])
+				if e != nil {
+					return e
+				}
+				if p != nil {
+					pending = append(pending, p)
+				}
+			}
+			return printJSON(out, map[string]any{"revision": w.Revision, "preparations": pending})
+		case "resume-launch":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var r struct {
+				Schema   int    `json:"schema_version"`
+				ID       string `json:"prepared_id"`
+				Revision int    `json:"expected_revision"`
+			}
+			if e = strict(b, &r); e != nil {
+				return e
+			}
+			if r.Schema != 1 {
+				return fmt.Errorf("schema_version doit valoir 1")
+			}
+			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision)
+			if e == nil && (created || a.Status == "queued") {
+				e = s.spawnAgent(a)
+			}
+			if e != nil {
+				return e
+			}
+			return printJSON(out, map[string]any{"agent": a, "created": created})
 		case "preflight":
 			b, e := readInput(input)
 			if e != nil {

@@ -1,0 +1,252 @@
+{
+  "work": "w-115c11e8f802a4f98c3def32",
+  "task": "plan-115c11e8f8-T1",
+  "revision": 153,
+  "agent": "f7bf328d-d2ba-4d92-84e5-6bee6bbd9447",
+  "kept": [
+    "Historique des tentatives, rapports et avis précédents.",
+    "Critères et dépendances du plan.",
+    "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement."
+  ],
+  "redone": [
+    "Vérification des conditions de lancement et du candidat courant.",
+    "Contrôles et revue requis pour la nouvelle tentative.",
+    "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique."
+  ],
+  "correction": "Contrôles disponibles ; décision humaine requise.",
+  "criteria": [
+    "Résumé affiché avant lancement montre objectif, rôle, fournisseur, modèle demandé/réel/inconnu, profil, skills, périmètre et limites",
+    "Statut \"inconnu\" explicite affiché si une donnée moteur manque, jamais de valeur inventée",
+    "Recette FR/EN, clair/sombre, focus clavier documentée, incluant le cas modèle demandé différent du modèle réel"
+  ],
+  "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+  "since_refusal": {
+    "from_revision": 131,
+    "to_revision": 153,
+    "first_visit": false,
+    "more": false,
+    "items": [
+      {
+        "revision": 152,
+        "at": "2026-10-03T16:29:07.628829261Z",
+        "category": "result",
+        "label": "Contrôles enregistrés",
+        "task": "plan-115c11e8f8-T1",
+        "title": "REQ-QW1 — Résumé avant lancement (web + CLI)"
+      },
+      {
+        "revision": 139,
+        "at": "2026-10-03T15:56:39.348985615Z",
+        "category": "result",
+        "label": "Acceptation enregistrée",
+        "task": "plan-115c11e8f8-T1",
+        "title": "REQ-QW1 — Résumé avant lancement (web + CLI)"
+      },
+      {
+        "revision": 137,
+        "at": "2026-10-03T15:55:41.275541767Z",
+        "category": "result",
+        "label": "Avis indépendant enregistré",
+        "task": "plan-115c11e8f8-T1",
+        "title": "REQ-QW1 — Résumé avant lancement (web + CLI)"
+      },
+      {
+        "revision": 135,
+        "at": "2026-10-03T15:53:30.320032668Z",
+        "category": "result",
+        "label": "Contrôles enregistrés",
+        "task": "plan-115c11e8f8-T1",
+        "title": "REQ-QW1 — Résumé avant lancement (web + CLI)"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "report": ".swarm/validation/w-115c11e8f802a4f98c3def32/plan-115c11e8f8-T1/a-62b5c700c364e7236430a9ca-receipt-7b0dcd5b01e19fb7b0407205.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "agent_reported_model.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "agent_reported_model_test.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "agent_terminal_process.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "agents_process.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "agents_store.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plan-115c11e8f8-T1.md",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plans/clear-launch-recovery/T1-handoff.md",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/plans/clear-launch-recovery/T1-model-divergence-cli.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-en-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-en-light-unknown.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-en-scope.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-focus.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-focus.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-fr-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/launch-v2-fr-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-divergence-browser.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-divergence-en-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-divergence-en-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-divergence-fr-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-divergence-fr-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-focus-browser.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-focus-en-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-focus-en-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-focus-fr-dark.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "docs/screenshots/clear-launch-recovery/model-focus-fr-light.png",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "locales/en.json",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "mission_cli.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "mission_launch_identity_test.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "mission_status.go",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "tests/reported_model_test.cjs",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/graph.css",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/i18n-en.js",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/mission.js",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/pilot-inspector.js",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    },
+    {
+      "report": "web/task-models.js",
+      "state": "unchanged",
+      "reason": "Contenu inchangé ; réutilisable comme entrée seulement, pas comme validation."
+    }
+  ],
+  "remaining_criteria": [
+    "Résumé affiché avant lancement montre objectif, rôle, fournisseur, modèle demandé/réel/inconnu, profil, skills, périmètre et limites",
+    "Statut \"inconnu\" explicite affiché si une donnée moteur manque, jamais de valeur inventée",
+    "Recette FR/EN, clair/sombre, focus clavier documentée, incluant le cas modèle demandé différent du modèle réel"
+  ],
+  "refusal_note": "Changements enregistrés depuis le dernier refus de cette tâche.",
+  "evidence_note": "Seules les preuves liées au dernier avis sont comparées, au plus 64 fichiers et 32 Mio ; aucun inventaire du dépôt. Une preuve inchangée ne vaut ni avis favorable ni validation."
+}

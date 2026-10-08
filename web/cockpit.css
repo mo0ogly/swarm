@@ -12,3 +12,9 @@ html[data-theme="etat"] body{background:var(--wattson-carte-appuyee)}
 .memory-search button{margin:.3rem}
 #brain-attachments:not(:empty){padding:.8rem;background:var(--wattson-info-fond);color:var(--wattson-info-encre);border:1px solid var(--wattson-ligne)}
 #brain-search-results pre{max-height:10rem;overflow:auto;white-space:pre-wrap}
+
+#version-open{display:grid;gap:.2rem;text-align:left}#version-open small{font-weight:400;color:var(--wattson-texte-discret)}
+#version-dialog>header,#version-dialog>footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:18px 24px;background:var(--wattson-carte-appuyee)}#version-dialog>header{border-bottom:1px solid var(--wattson-ligne)}#version-dialog>footer{border-top:1px solid var(--wattson-ligne);justify-content:flex-end}#version-dialog>section{padding:22px 24px;max-height:66vh;overflow:auto}#version-dialog section+section{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--wattson-ligne)}#version-dialog dl{display:grid;gap:.5rem}#version-dialog dl div{display:grid;grid-template-columns:minmax(9rem,1fr) 2fr;gap:1rem}#version-dialog dt{font-weight:650;color:var(--wattson-libelle)}#version-dialog dd{margin:0;overflow-wrap:anywhere}#version-dialog article{padding:1rem;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-carte-appuyee)}
+
+#version-dialog a{color:var(--wattson-lien)}
+#version-dialog-content>section:not(:first-child){background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:.5rem;padding:1rem;margin-top:1rem}

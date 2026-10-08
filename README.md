@@ -4,11 +4,33 @@
 
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
 
-Swarm est un outil local de coordination d’agents de développement, avec une **interface web en français** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
+Swarm est un outil local de coordination d’agents de développement, avec une **interface web en français et en anglais** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
 
 **Pourquoi Swarm ?** Quand plusieurs agents travaillent sur un projet, quelqu’un doit encore transmettre les consignes, gérer les dépendances, retrouver les rapports et décider si le résultat est réellement utilisable. Swarm organise ces passages de relais pour réduire cette coordination manuelle et rendre les blocages visibles.
 
 [Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
+
+## Release v0.1.0
+
+La [première release expérimentale](https://github.com/mo0ogly/swarm/releases/tag/v0.1.0) ajoute l’édition des dépendances avec prévisualisation, les programmes durables et l’administration de leurs paramètres. Le moteur conserve les autorisations, budgets, contrôles et revues indépendantes.
+
+Voir les [notes de version](docs/releases/v0.1.0.md), le [guide des programmes](docs/AUTOMATION-PROGRAMS.md) et la [reprise des contrats bloqués](docs/CONTRACT-REVISION.md). Les quotas des sessions externes aux fournisseurs ne sont pas observés automatiquement.
+
+[Prérequis métier et reprise des contrôles](docs/ENGINE-BUSINESS-CONTROLS.md)
+
+## Première utilisation
+
+1. **Installer et ouvrir** : suivre [l’installation](INSTALL.md), puis ouvrir le lien de session affiché au lancement.
+2. **Connecter une IA** : ouvrir « IA et connexions » et choisir les fournisseurs disponibles dans votre environnement.
+3. **Préparer le besoin** : préciser le résultat attendu, le périmètre et les critères ; relire le plan proposé.
+4. **Autoriser et lancer** : vérifier les rôles, les espaces et les limites. L’adoption d’un plan ne lance pas à elle seule les agents.
+5. **Suivre et examiner** : ouvrir le graphe puis le détail d’une tâche. Un processus terminé n’est pas encore un résultat validé.
+
+→ [Guide illustré : les étapes, les boutons et les blocages](GUIDE-UTILISATEUR.md)
+
+Pour démarrer avec une structure, utilisez « Choisir un modèle de mission » dans la préparation : [catalogue de parcours guidés partagé entre web et CLI](docs/PREPARATION-TEMPLATES.md).
+
+Swarm reste expérimental. Consultez les [essais réalisés et leurs limites](docs/COMMUNITY-QUALIFICATION.md) avant de lui confier une mission importante.
 
 ## Ce que vous pouvez faire
 
@@ -87,67 +109,29 @@ Ce schéma décrit l’organisation disponible avec planification hiérarchique 
 
 ## Voir le parcours
 
-Captures de l’application réelle, avec **données fictives de démonstration**. Elles illustrent l’interface ; aucun agent n’a été lancé pour ces captures.
+Captures de l’application réelle du **1er octobre 2026**, sur une mission de huit tâches clôturée avec des décisions humaines. Elles montrent les résultats et l’organisation réellement configurée, pas une démonstration d’autonomie sans intervention.
 
-### 1. Décrire le résultat attendu
+### 1. Comprendre l’état et la prochaine action
 
-Commencez avec vos mots : le besoin, les contraintes et les critères de réussite. La préparation sert à clarifier ce qui sera demandé aux agents.
+Le résumé indique ce qui se passe, qui agit et la prochaine étape. Ici, les huit résultats sont validés sur leurs preuves actuelles ; les livrables et les avis restent consultables.
 
-![Préparation d’une recherche accessible : nom, besoin et critères](docs/screenshots/preparation.png)
+![Mission réelle : 8/8 résultats validés et responsabilité racine clôturée](docs/screenshots/mission-complete-fr.png)
 
-### 2. Visualiser l’équipe et ses flèches
+### 2. Voir qui décide, qui réalise et qui vérifie
 
-Cette seconde démonstration utilise une **organisation simulée en pause** : un orchestrateur, un sous-responsable, trois tâches d’exécutants et un vérificateur indépendant. Aucun fournisseur n’est lancé, aucun résultat n’est présenté comme validé.
+L’orchestrateur apparaît à gauche, les huit tâches au centre et le vérificateur indépendant à droite. Les **traits pleins** vont du prérequis vers la tâche qui en dépend ; les **pointillés** montrent les responsabilités et les remises au vérificateur.
 
-- **Bleu : orchestrateur**, chargé de coordonner la mission.
-- **Orange : sous-responsable**, chargé ici du périmètre accessibilité.
-- **Cartes de tâches : exécutants**, chargés de produire les livrables.
-- **Vert : vérificateur indépendant**, chargé d’examiner les rapports.
-- **Flèches pleines : dépendances entre tâches.**
-- **Flèches pointillées : responsabilités et remise au vérificateur.**
+![Graphe actuel avec orchestrateur, exécutants, vérificateur et flèches](docs/screenshots/mission-graph-current-fr.png)
 
-![Équipe en vue horizontale : orchestrateur, sous-responsable, exécutants et vérificateur reliés par des flèches](docs/screenshots/agents-horizontal.png)
+[Ouvrir le graphe en grand](docs/screenshots/mission-graph-current-fr.png)
 
-[Ouvrir le graphe horizontal en grand](docs/screenshots/agents-horizontal.png)
+L’orientation horizontale ou verticale, la vue détaillée, les filtres et le repli des branches changent l’affichage sans supprimer les tâches. « Pourquoi cette tâche attend ? » explique les prérequis ; « Où vont les appels et les coûts ? » distingue les consommations observées.
 
-#### La même organisation en vue verticale
+### 3. Préparer et examiner avant de lancer
 
-L’orientation peut être adaptée à la forme du plan. Le thème sombre conserve les couleurs des rôles et les deux types de flèches.
+La préparation transforme le besoin en critères, tâches et dépendances. Les méthodes ci-dessous aident à cadrer ce travail. L’adoption du plan ne démarre pas les agents à elle seule : vous vérifiez les rôles, les connexions, les espaces et les limites avant d’autoriser le départ.
 
-![Équipe en vue verticale et thème sombre, avec liens de responsabilité et dépendances](docs/screenshots/agents-vertical.png)
-
-[Ouvrir le graphe vertical en grand](docs/screenshots/agents-vertical.png)
-
-#### Retrouver les rôles et les livrables en liste
-
-La vue liste complète le graphe : elle expose les responsabilités, les tâches et leurs livrables sans suivre chaque flèche. Dans cet exemple, les tâches attendent leur autorisation de démarrage.
-
-![Liste détaillée des responsables, du vérificateur et des tâches des exécutants](docs/screenshots/agents-liste.png)
-
-#### Examiner une tâche sans quitter le pilotage
-
-Le panneau de détail rassemble le résultat attendu, les critères et les actions disponibles. Cette capture montre une tâche avant lancement ; un journal d’exécution nécessite une tentative effectivement démarrée.
-
-![Détail de la tâche Créer la recherche, avec livrable, critères et état](docs/screenshots/agent-detail.png)
-
-### 3. Lire un graphe simple avant de configurer l’équipe
-
-Les flèches relient un prérequis à la tâche qui en dépend. Le graphe peut être orienté, filtré et replié pour retrouver une partie du travail. Cette mission de démonstration est manuelle et ses tâches restent à préparer.
-
-![Pilotage en thème clair : trois tâches reliées par leurs dépendances](docs/screenshots/pilotage-etat.png)
-
-<details>
-<summary>Voir le même parcours en thème sombre</summary>
-
-![Pilotage des tâches en thème sombre](docs/screenshots/pilotage-sombre.png)
-
-</details>
-
-### 4. Choisir un modèle et sa connexion
-
-Ajoutez une connexion API avec un nom, une adresse et un modèle, puis testez-la explicitement. L’exemple ci-dessous montre un formulaire de démonstration, sans clé ni connexion validée.
-
-![Formulaire d’ajout d’un modèle local](docs/screenshots/connexion.png)
+Voir le [guide illustré de préparation et d’utilisation](GUIDE-UTILISATEUR.md) et les [captures de l’installation](INSTALL.md).
 
 ## Une autonomie encadrée
 
@@ -200,7 +184,7 @@ Ouvrez **le lien de session imprimé dans le terminal**. Il donne accès au cock
 3. Choisissez les agents, les espaces de travail et les conditions d’acceptation.
 4. Autorisez le lancement, puis suivez le graphe et les résultats à examiner.
 
-Les agents externes doivent être installés et authentifiés séparément. Les méthodes APEX, KS et PDCA nécessitent les ressources correspondantes dans le projet piloté ; elles ne sont pas toutes livrées par ce dépôt. Consultez les [limites de migration](docs/migration/README.md).
+Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Pour piloter un autre projet, vérifiez les ressources de méthode disponibles dans ce projet. Consultez aussi les [limites de migration](docs/migration/README.md).
 
 ### Et en ligne de commande ?
 
@@ -214,6 +198,33 @@ Le CLI travaille sur le même état local que le web. Il permet notamment de ret
 ```
 
 Les commandes de mutation utilisent des contrats explicites décrits dans la [référence technique](REFERENCE.md). Les parcours web et CLI ne sont pas identiques : par exemple, le test interactif d’une connexion API est disponible dans le web.
+
+### Vérifier la version réellement lancée
+
+Ces trois formes lisent l’identité embarquée dans le binaire et fonctionnent sans
+projet initialisé ni base SQLite :
+
+```sh
+swarm version
+swarm --version
+swarm --json version
+```
+
+`devel` signifie qu’aucun tag de release vérifié n’a été injecté. `unknown` ou
+`null` signifie que la métadonnée correspondante n’est pas disponible ; ce n’est
+ni une release ni un contrôle réussi. Le JSON sépare l’identité du **binaire** de
+l’état éventuel des **sources locales** présenté par le web. Après recompilation
+ou installation, redémarrez le serveur : un processus déjà lancé continue
+d’utiliser son ancien binaire.
+
+Dans le cockpit et dans la préparation, **Version et nouveautés** ouvre la même
+fenêtre bilingue. Elle affiche le binaire lancé, compare séparément les sources
+locales, puis liste l’historique embarqué. Aucune release n’étant déclarée à ce
+jour, l’historique reste vide plutôt que d’inventer un numéro ou une date.
+
+![Version et nouveautés dans le cockpit, français, thème État](docs/screenshots/version-history/cockpit-fr-etat.png)
+
+[Voir les captures FR/EN, État/sombre et les états dégradés](docs/screenshots/version-history/manifest.json).
 
 ## Comment Swarm utilise les modèles
 
@@ -236,6 +247,9 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 **Commencer ici : [Guide utilisateur — du besoin au résultat](GUIDE-UTILISATEUR.md)**
 
 - [Installation Docker et native](INSTALL.md)
+- [Autoriser une reprise et transmettre les sources au vérificateur](docs/ATTEMPT-RECOVERY.md)
+- [Diagnostic du stockage et tentatives épuisées](docs/RUNTIME-RECOVERY.md)
+- [Méthodes : besoin, spécification, planification, audit, diagnostic et vérification](docs/AGENT-METHODS.md)
 
 - [Référence technique complète et contrats CLI](REFERENCE.md)
 - [Cockpit : lancement, pilotage et supervision](COCKPIT.md)
@@ -269,3 +283,48 @@ Les captures nécessitent Chrome ou Chromium installé et Python 3 pour le scén
 La restriction commerciale signifie que ce projet n’est pas présenté comme « open source » au sens de la [définition de l’Open Source Initiative](https://opensource.org/osd). Pour un usage commercial non couvert, une autorisation distincte des titulaires des droits est nécessaire.
 
 **Les versions déjà publiées sous Apache 2.0 conservent cette licence.** Le changement ne retire pas les droits accordés sur ces versions. Les bibliothèques tierces conservent également leurs propres licences : voir [les notices](THIRD_PARTY_NOTICES.md) et [les précisions de licence](docs/LICENSING.md).
+## Communication et méthodes
+
+Les méthodes donnent une démarche commune aux agents, avec des critères et des preuves. Elles ne remplacent pas les règles exécutables du moteur.
+
+| Besoin | Méthode |
+| --- | --- |
+| Passer du besoin à une évolution vérifiée | Parcours guidé — préparer une évolution |
+| Examiner un système et corriger les constats autorisés | Examiner et améliorer |
+| Définir le résultat attendu et les critères | Construire la spécification |
+| Détecter les contradictions et omissions avant lancement | Examiner la spécification |
+| Rechercher les défauts concrets d’une implémentation | Examiner le code |
+| Reproduire un problème et trouver sa cause | Diagnostiquer et corriger |
+| Rejouer le parcours après correction | Vérifier la correction |
+| Reprendre un plan bloqué en conservant son historique | Replanifier |
+| Analyser les résultats et prioriser les améliorations | Retour d’expérience |
+
+Les méthodes disponibles dans le **catalogue de préparation** sont décrites dans le [guide des méthodes](docs/AGENT-METHODS.md) ; toutes les méthodes ne sont pas des boutons web. La construction et l’examen de spécification couvrent l’expression du besoin et l’analyse du plan. Voir aussi le [circuit des rapports, preuves et décisions](docs/AGENT-COMMUNICATION.md).
+
+### Budgets
+
+[Budgets et coûts IA — web et CLI](docs/BUDGETS.md) · [English guide](docs/en/BUDGETS.md).
+
+## Contribuer et signaler un problème
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les contrôles et les pull requests,
+[SECURITY.md](SECURITY.md) pour les signalements sensibles.
+
+### Reconnaître une mission clôturée
+
+Le cockpit distingue un agent terminé d’un résultat validé. Une mission clôturée
+annonce tous ses résultats validés sur les preuves actuelles et la responsabilité
+racine clôturée. Les livrables, avis et coûts restent consultables.
+
+![Mission clôturée dans le cockpit](docs/screenshots/mission-complete-fr.png)
+
+*Recette réelle à 8/8, avec interventions humaines. Voir le [guide utilisateur](GUIDE-UTILISATEUR.md#lire-les-compteurs-et-reconnaître-la-fin) et les [reprises du moteur](docs/ENGINE-RECOVERY.md).*
+
+### Consignes du projet
+
+Transmettez les règles du dépôt à chaque rôle avec un profil de projet explicite. [Configuration et limites](docs/PROJECT-PROFILE.md).
+
+Dans **Lancer / Relancer → Skills pour cette tâche**, sélectionnez les méthodes
+du projet pour un exécutant. Le choix est conservé avec la tentative, sans
+activer automatiquement les scripts ou changer les permissions. Le CLI propose
+`swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).

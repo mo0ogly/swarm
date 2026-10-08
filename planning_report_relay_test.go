@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -22,7 +23,8 @@ func TestPlanningReportRelayIsAtomicScopedAndIdempotent(t *testing.T) {
 	raw, _ := json.Marshal(w)
 	s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID)
 	report := filepath.Join(cwd, "docs", id+".md")
-	os.WriteFile(report, []byte("Observed result; evidence and limitations."), 0600)
+	reportBody := strings.Repeat("Observed result; evidence and limitations.\n", 140) + "IMPORTANT_FINDING_AFTER_4000_BYTES"
+	os.WriteFile(report, []byte(reportBody), 0600)
 	// Another root report must not replace this attempt's workspace report.
 	os.MkdirAll(filepath.Join(s.root, "docs"), 0700)
 	os.WriteFile(filepath.Join(s.root, "docs", id+".md"), []byte("Unrelated report"), 0600)
@@ -55,7 +57,7 @@ func TestPlanningReportRelayIsAtomicScopedAndIdempotent(t *testing.T) {
 	for _, event := range got.Planning.Inbox {
 		if event.Kind == "handoff" {
 			count++
-			if event.Attempt != a.Attempt || len(event.Artifacts) != 1 || event.Artifacts[0].Path != path || event.Artifacts[0].SHA256 != hash([]byte("Observed result; evidence and limitations.")) {
+			if event.Attempt != a.Attempt || event.Handoff == nil || len(event.Artifacts) != 1 || event.Artifacts[0].Path != path || event.Artifacts[0].SHA256 != hash([]byte(reportBody)) {
 				t.Fatal(event)
 			}
 		}
@@ -70,6 +72,53 @@ func TestPlanningReportRelayIsAtomicScopedAndIdempotent(t *testing.T) {
 	got, _ = s.get(w.ID)
 	if got.Revision != revision {
 		t.Fatal("duplicate mutation")
+	}
+	// A real child process receives the complete report, including a finding
+	// beyond the old 4000-byte excerpt, and uses it to propose a scoped task.
+	ps, err := s.providers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	provider := ps.Providers[got.Planning.Provider]
+	script := `#!/usr/bin/env python3
+import json,sys
+text=sys.stdin.read()
+ctx=json.loads(text[text.rfind('\n{')+1:])
+reports=ctx['handoff_contents']
+assert len(reports)==1 and reports[0]['text'].endswith('IMPORTANT_FINDING_AFTER_4000_BYTES')
+assert reports[0]['scope']==ctx['scope']['id']
+with open(__file__+'.context','w') as f: json.dump(ctx,f)
+op={'kind':'task','id':'followup-finding','title':'Traiter le constat remonté','requirements':list(ctx['requirements']), 'deliverable':'docs/followup-finding.md','criteria':['Le constat est vérifié'], 'depends':[], 'next':'Traiter IMPORTANT_FINDING_AFTER_4000_BYTES sans modifier les autres tâches'}
+reply={'input_events':[reports[0]['event_id']],'reason':'Le retour complet révèle une action dans mon périmètre','operations':[op]}
+print(json.dumps({'type':'result','result':json.dumps(reply)}))
+`
+	if err = os.WriteFile(provider.Command, []byte(script), 0700); err != nil {
+		t.Fatal(err)
+	}
+	got.Planning.Paused = false // fixture release; no real mission is touched
+	raw, _ = json.Marshal(got)
+	if _, err = s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, got.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err = s.planningStep(got.ID); err != nil {
+		t.Fatal(err)
+	}
+	final, err := s.get(got.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	followup, err := final.task("followup-finding")
+	if err != nil || !strings.Contains(followup.Next, "IMPORTANT_FINDING_AFTER_4000_BYTES") {
+		t.Fatal("planner did not act on the delivered finding", err)
+	}
+	owner, _ := final.Planning.scope(followup.ScopeID)
+	if owner.Delivery == nil || owner.Delivery.Decision == "" || len(owner.Delivery.Reports) != 1 {
+		t.Fatal("missing durable context/decision receipt")
+	}
+	for _, event := range final.Planning.Inbox {
+		if event.Kind == "handoff" && event.Decision != owner.Delivery.Decision {
+			t.Fatal("decision not linked to the delivered handoff")
+		}
 	}
 }
 func TestAttemptReportRefusesStaleAmbiguousOutsideAndInterrupted(t *testing.T) {

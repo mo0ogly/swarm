@@ -73,6 +73,27 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 		}
 		send(w, review)
 	})
+	mux.HandleFunc("/api/v1/preparations/preflight", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var req struct {
+			Provider  string `json:"provider"`
+			Workspace string `json:"workspace"`
+			Level     string `json:"level"`
+		}
+		b, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 4096))
+		if e == nil {
+			e = strict(b, &req)
+		}
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		result, _ := s.preparationPreflight(req.Provider, req.Workspace, req.Level)
+		send(w, result)
+	})
 	s.registerPreparationDialogue(mux, send, fail)
 	s.registerPreparationResources(mux, send, fail)
 	mux.HandleFunc("/api/v1/preparations", func(w http.ResponseWriter, r *http.Request) {
@@ -86,6 +107,101 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 			return
 		}
 		send(w, map[string]any{"preparations": ps, "limit": 100})
+	})
+	mux.HandleFunc("/api/v1/preparations/templates", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		v, e := preparationTemplates()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/preparations/template-check", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		b, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 16384))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		var request PreparationTemplateAnswers
+		if e = strict(b, &request); e != nil {
+			fail(w, e)
+			return
+		}
+		v, e := checkPreparationTemplate(request)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/skills", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		items, e := s.actionSkillCatalog()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]any{"skills": items})
+	})
+	mux.HandleFunc("/api/v1/project-profile/catalog", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		v, e := s.projectProfileCatalog()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/project-profile/select", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			w.WriteHeader(405)
+			return
+		}
+		var request struct {
+			ID       string `json:"id"`
+			Expected string `json:"expected_sha256"`
+		}
+		body, e := io.ReadAll(http.MaxBytesReader(w, r.Body, 16384))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if e := strict(body, &request); e != nil {
+			fail(w, e)
+			return
+		}
+		v, e := s.selectProjectProfile(request.ID, request.Expected)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/project-profile", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(405)
+			return
+		}
+		v, e := s.projectProfileStatus()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
 	})
 	mux.HandleFunc("/api/v1/preparations/methods", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {

@@ -62,22 +62,25 @@ def run(prompt, cwd, model, usage_path, label, kill_when=None, profile=PREPARER)
     code = 137 if killed else (None if timed_out else proc.returncode)
     stdout, stderr = out_path.read_text(), err_path.read_text()
     try:
-        data = json.loads(stdout) if stdout.strip() else {}
+        data = json.loads(stdout) if stdout.strip() else None
     except ValueError:
-        data = {}
-    usage = data.get("usage") or {}
+        data = None
+    valid_result = (isinstance(data, dict) and isinstance(data.get("result"), str)
+                    and isinstance(data.get("is_error"), bool))
+    data = data if isinstance(data, dict) else {}
+    usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
     line = {"label": label, "model": model, "tools": profile[0], "exit_code": code, "timed_out": timed_out, "killed": killed,
-            "is_error": data.get("is_error"), "num_turns": data.get("num_turns"),
+            "invalid_response": not valid_result, "is_error": data.get("is_error"), "num_turns": data.get("num_turns"),
             "cost_usd": data.get("total_cost_usd"),
             "input_tokens": usage.get("input_tokens"), "output_tokens": usage.get("output_tokens"),
             "cache_creation_input_tokens": usage.get("cache_creation_input_tokens"),
             "cache_read_input_tokens": usage.get("cache_read_input_tokens"),
-            "models_used": sorted(data.get("modelUsage") or {}),
+            "models_used": sorted(data.get("modelUsage")) if isinstance(data.get("modelUsage"), dict) else [],
             "duration_s": round(time.monotonic() - started, 1),
             "stderr_tail": stderr.strip()[-config.ERROR_TEXT_MAX:]}
     with open(usage_path, "a") as f:
         f.write(json.dumps(line, ensure_ascii=False) + "\n")
-    ok = not timed_out and not killed and code == 0 and not data.get("is_error")
+    ok = valid_result and not timed_out and not killed and code == 0 and not data.get("is_error")
     return (0 if ok else 1), str(data.get("result") or "")
 
 

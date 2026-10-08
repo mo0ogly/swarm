@@ -1,0 +1,54 @@
+{
+  "origin": "CUA actual UI, protocol provider process without real LLM",
+  "at": "2026-10-03T14:20:41.179Z",
+  "cases": [
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "requested": "sonnet",
+      "reported": "fixture-reported-model",
+      "text": "Agent claude\nFermer le détail\n\nRecette — modèle demandé et rapporté\n\n▤\nProfil non enregistré pour cette tentative\n\nModèle demandé : claude · sonnet · Modèle rapporté : fixture-reported-model\n\nModèle de la tâche\nModèle demandé distinct du modèle rapporté\n\nValidation actuelle : Bloquée\n\nCe que fait cet agent\n\nL’exécution est terminée.\n\nDernière action : aucune description disponible.\n\nExaminez le rapport et ses preuves pour vérifier le résultat de la tâche.\n\nRésultat attendu : report.md\n\nCoût inconnu : le fournisseur n’a pas transmis de montant à Swarm.\n\nVoir la commande et les signaux techniques\nAgir sur cette tâche\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nRelancer cette tâche\nActualiser l’état\n\nVérifier la séparation des deux identifiants ; fournisseur de protocole isolé, aucun appel IA réel\n\nCe qui était demandé\nDeux valeurs distinctes ; aucune auto-validation\nVoir la session de l’agent\nDépendances et impact\n\nAucune tâche ne dépend de celle-ci.\n\nQue faire maintenant ?\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nLancer un agentToutes les actions autorisées\n\nArrêter la tentative : Aucune tentative active sur cette tâche.\n\nAccepter après revue : Un rapport doit être soumis avant l'acceptation.\n\nRapports et preuves de la tâche\n\nAucun rapport détecté pour cette tâche.\n\nExaminer les contrôles de validation\nIdentifiants et détails techniques",
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "",
+        "focusVisible": true
+      }
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "requested": "sonnet",
+      "reported": "fixture-reported-model",
+      "text": "Agent claude\nFermer le détail\n\nRecette — modèle demandé et rapporté\n\n▤\nProfil non enregistré pour cette tentative\n\nModèle demandé : claude · sonnet · Modèle rapporté : fixture-reported-model\n\nModèle de la tâche\nModèle demandé distinct du modèle rapporté\n\nValidation actuelle : Bloquée\n\nCe que fait cet agent\n\nL’exécution est terminée.\n\nDernière action : aucune description disponible.\n\nExaminez le rapport et ses preuves pour vérifier le résultat de la tâche.\n\nRésultat attendu : report.md\n\nCoût inconnu : le fournisseur n’a pas transmis de montant à Swarm.\n\nVoir la commande et les signaux techniques\nAgir sur cette tâche\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nRelancer cette tâche\nActualiser l’état\n\nVérifier la séparation des deux identifiants ; fournisseur de protocole isolé, aucun appel IA réel\n\nCe qui était demandé\nDeux valeurs distinctes ; aucune auto-validation\nVoir la session de l’agent\nDépendances et impact\n\nAucune tâche ne dépend de celle-ci.\n\nQue faire maintenant ?\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nLancer un agentToutes les actions autorisées\n\nArrêter la tentative : Aucune tentative active sur cette tâche.\n\nAccepter après revue : Un rapport doit être soumis avant l'acceptation.\n\nRapports et preuves de la tâche\n\nAucun rapport détecté pour cette tâche.\n\nExaminer les contrôles de validation\nIdentifiants et détails techniques",
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "",
+        "focusVisible": true
+      }
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "requested": "sonnet",
+      "reported": "fixture-reported-model",
+      "text": "Agent claude\nClose details\n\nRecette — modèle demandé et rapporté\n\n▤\nProfile not recorded for this attempt\n\nRequested model: claude · sonnet · Reported model: fixture-reported-model\n\nTask model\nModèle demandé distinct du modèle rapporté\n\nCurrent validation: Blocked\n\nWhat this agent is doing\n\nExecution completed.\n\nLatest action: no description available.\n\nReview the report and evidence to verify the task result.\n\nExpected result: report.md\n\nCost unknown: the provider has not sent an amount to Swarm.\n\nView command and technical signals\nAct on this task\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nRetry this task\nRefresh state\n\nVérifier la séparation des deux identifiants ; fournisseur de protocole isolé, aucun appel IA réel\n\nWhat was requested\nDeux valeurs distinctes ; aucune auto-validation\nView agent session\nDependencies and impact\n\nNo tasks depend on this one.\n\nWhat should I do now?\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nLancer un agentAll authorized actions\n\nArrêter la tentative : Aucune tentative active sur cette tâche.\n\nAccepter après revue : Un rapport doit être soumis avant l'acceptation.\n\nTask reports and evidence\n\nNo report detected for this task.\n\nReview validation checks\nIdentifiers and technical details",
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "",
+        "focusVisible": true
+      }
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "requested": "sonnet",
+      "reported": "fixture-reported-model",
+      "text": "Agent claude\nClose details\n\nRecette — modèle demandé et rapporté\n\n▤\nProfile not recorded for this attempt\n\nRequested model: claude · sonnet · Reported model: fixture-reported-model\n\nTask model\nModèle demandé distinct du modèle rapporté\n\nCurrent validation: Blocked\n\nWhat this agent is doing\n\nExecution completed.\n\nLatest action: no description available.\n\nReview the report and evidence to verify the task result.\n\nExpected result: report.md\n\nCost unknown: the provider has not sent an amount to Swarm.\n\nView command and technical signals\nAct on this task\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nRetry this task\nRefresh state\n\nVérifier la séparation des deux identifiants ; fournisseur de protocole isolé, aucun appel IA réel\n\nWhat was requested\nDeux valeurs distinctes ; aucune auto-validation\nView agent session\nDependencies and impact\n\nNo tasks depend on this one.\n\nWhat should I do now?\n\nProcessus terminé ; résultat à examiner, tâche non acceptée ; handoff et validation requis\n\nLancer un agentAll authorized actions\n\nArrêter la tentative : Aucune tentative active sur cette tâche.\n\nAccepter après revue : Un rapport doit être soumis avant l'acceptation.\n\nTask reports and evidence\n\nNo report detected for this task.\n\nReview validation checks\nIdentifiers and technical details",
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "",
+        "focusVisible": true
+      }
+    }
+  ]
+}

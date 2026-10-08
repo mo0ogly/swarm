@@ -1,0 +1,29 @@
+Where do calls and costs go?
+Measurements observed: 2026-10-04T09:41:17.530460525Z · Source: Process timestamps, received activity, provider usage and review history.
+effort · 2 attempts or recorded calls · 11 observed tool calls · 1 incomplete tool measurements · 100/20 reported input/output tokens · 1 missing usage reports · 0.25 USD reported for 1 attempt(s) · 1 without reported cost
+  Sum of process durations: 150.000 s · 0 duration(s) not reported
+  2 review(s) recorded for this task · 1 retry(ies) for this task
+unknown · 1 recorded attempts · tool calls not reported · actual cost not reported
+  Sum of process durations: not reported · 1 duration(s) not reported
+  0 review(s) recorded for this task · 0 retry(ies) for this task
+Engine: 0 recorded checks · 1 agent retries
+Tool calls, AI calls and engine checks are different measurements. Missing data is not zero; not all internal provider retries are observable. A call reservation does not prove it was sent to the provider.
+Per-attempt breakdown
+effort · agent new · attempt new · process state: Process completed · recorded task acceptance (all attempts): no
+  Start: 2026-10-04T08:01:30Z · End: 2026-10-04T08:02:00Z
+  Process duration: 30.000 s
+  1 recorded launch · 7 observed tool calls; internal provider calls are not measured.
+  7 observed tool calls · reads 3 · writes 2 · unclassified 2 · tests unknown: no reliable signal identifies tests within observed commands · errors 0 · repeats 0
+  100/20 reported input/output tokens · 0.25 USD reported for 1 attempt(s)
+effort · agent old · attempt old · process state: Process interrupted · recorded task acceptance (all attempts): no
+  Start: 2026-10-04T08:00:00Z · End: 2026-10-04T08:02:00Z
+  Process duration: 120.000 s
+  1 recorded launch · 4 observed tool calls; internal provider calls are not measured.
+  Detailed measurement unavailable for this attempt: reads, writes, errors and repeats remain unknown, not zero.
+  Cost and usage not reported by the provider for this attempt.
+unknown · agent missing · attempt missing · process state: Process completed · recorded task acceptance (all attempts): no
+  Start: not reported · End: not reported
+  Process duration: not reported
+  Tool calls not reported.
+  Detailed measurement unavailable for this attempt: reads, writes, errors and repeats remain unknown, not zero.
+  Cost and usage not reported by the provider for this attempt.

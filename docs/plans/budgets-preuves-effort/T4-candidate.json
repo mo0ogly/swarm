@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-04T09:11:23.749138+00:00",
+  "head": "cc3069dc7bb61b90168d21f945cb2eb5e27578ed",
+  "modified": true,
+  "files": {
+    "result_presentation.go": "60ded94984c046f790349d2fd69f0b61d0e0a7d635a91835164e5d87a898e5c5",
+    "independent_review_dossier_gate_test.go": "792029dee7095edee9e762e6a0f95ca85d8bbcd767cd9f6937d4e6b099e5c1f5",
+    "independent_review_runtime.go": "67abc932f3286118031d68c62d7253afc5d2d000bce60adce70883c6778dfd56",
+    "independent_validation_evidence.go": "24e7250eaa1c1afb56a07efbdbcfb15ab3f5e430a1866ebca58b34dc378b5833"
+  },
+  "binary": {
+    "path": "/tmp/swarm-qw8-candidate",
+    "sha256": "5830e019444bc6814df49776058df7a8aea89fde0b1e374ee9d8f7a62ed28304"
+  },
+  "limits": "Full Go started before final wording adjustment; final targeted controls bind the current sources. No frontend layout was changed."
+}

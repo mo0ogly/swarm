@@ -162,7 +162,7 @@ func (s *Store) preparationCommand(r PreparationRequest) (p Preparation, err err
 		if p.Method == "audit_pdca" {
 			p.Method = "audit-pdca"
 		}
-		if p.Method != "apex" && p.Method != "ks-feature" && p.Method != "audit-pdca" {
+		if p.Method != "apex" && p.Method != "ks-feature" && p.Method != "audit-pdca" && p.Method != "debug" {
 			return p, preparationError("method_unavailable", "Méthode inconnue.")
 		}
 		if m, err := s.preparationMethod(p.Method); err == nil {
@@ -236,7 +236,7 @@ func (s *Store) preparationCommand(r PreparationRequest) (p Preparation, err err
 			edit.Text = string(saved)
 		}
 	}
-	if r.Action == "create-missions" || r.Action == "revise-missions" || r.Action == "release-plan" {
+	if r.Action == "create-missions" || r.Action == "authorize-plan" || r.Action == "revise-missions" || r.Action == "release-plan" {
 		if e = s.convertPreparation(tx, &p, r); e != nil {
 			return p, e
 		}

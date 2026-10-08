@@ -141,15 +141,30 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 	_ = s.settleAssistTurn(turn, out.reply, out.usage, failure)
 }
 
+const structuredSchemaRefusal = "Schéma de réponse refusé par le fournisseur (invalid_json_schema) ; aucune revue produite"
+
 type assistOutput struct {
-	reply string
-	usage *Usage
-	err   error
+	streamBytes       int64
+	events            int
+	lastEvent         string
+	finalSeen         bool
+	assistantEvents   int
+	systemEvents      int
+	systemSubtypes    map[string]int
+	apiRetries        int
+	lastSystemSubtype string
+
+	cooldown      *ProviderCooldown
+	cooldownError error
+	reply         string
+	usage         *Usage
+	err           error
 }
 
-func readAssistOutput(r io.Reader) assistOutput {
+func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) assistOutput {
 	out := assistOutput{}
-	limited := &io.LimitedReader{R: r, N: assistReplyLimit + 1}
+	counted := &assistCountingReader{Reader: r}
+	limited := &io.LimitedReader{R: counted, N: assistReplyLimit + 1}
 	scanner := bufio.NewScanner(limited)
 	scanner.Buffer(make([]byte, 0, 64*1024), assistReplyLimit)
 	for scanner.Scan() {
@@ -161,8 +176,47 @@ func readAssistOutput(r io.Reader) assistOutput {
 		if json.Unmarshal([]byte(line), &data) != nil {
 			continue
 		}
+		out.events++
+		out.lastEvent = assistEventKind(data["type"])
+		if data["type"] == "assistant" {
+			out.assistantEvents++
+		}
+		if data["type"] == "system" {
+			out.systemEvents++
+			out.lastSystemSubtype = assistSystemSubtype(data["subtype"])
+			if out.systemSubtypes == nil {
+				out.systemSubtypes = make(map[string]int)
+			}
+			out.systemSubtypes[out.lastSystemSubtype]++
+			if data["subtype"] == "api_retry" {
+				out.apiRetries++
+			}
+		}
+		if data["type"] == "result" || data["type"] == "turn.completed" {
+			out.finalSeen = true
+		}
+		if c := observedProviderCooldown(data, time.Now()); c != nil {
+			if out.cooldown != nil && c.ResetAt == 0 {
+				c.ResetAt = out.cooldown.ResetAt
+			}
+			for _, observe := range observers {
+				if observe != nil {
+					if e := observe(c); e != nil {
+						out.cooldownError = e
+					}
+				}
+			}
+			out.cooldown = c
+		}
 		if data["is_error"] == true || data["type"] == "error" {
 			out.err = fmt.Errorf("%s", guardBlock(fmt.Sprint(data["result"], " ", data["error"]), 600))
+		}
+		// Keep a stable diagnostic without reflecting provider payloads or secrets.
+		if data["type"] == "error" || data["type"] == "turn.failed" {
+			encoded, _ := json.Marshal(data)
+			if strings.Contains(string(encoded), "invalid_json_schema") {
+				out.err = fmt.Errorf("%s", structuredSchemaRefusal)
+			}
 		}
 		if reply := providerReply(data); reply != "" {
 			out.reply = reply
@@ -183,7 +237,8 @@ func readAssistOutput(r io.Reader) assistOutput {
 	if limited.N == 0 {
 		out.err = io.ErrShortBuffer
 	}
-	_, _ = io.Copy(io.Discard, r)
+	_, _ = io.Copy(io.Discard, counted)
+	out.streamBytes = counted.bytes
 	return out
 }
 
@@ -230,4 +285,42 @@ func stopVerifiedAssist(t AssistTurn) {
 	if t.PID > 0 && t.Host == hostIdentity() && t.ProcessStamp != "" && processStamp(t.PID) == t.ProcessStamp {
 		_ = syscall.Kill(-t.PID, syscall.SIGKILL)
 	}
+}
+
+// Counters only: never retain provider text, identifiers or arbitrary event types.
+type assistCountingReader struct {
+	io.Reader
+	bytes int64
+}
+
+func (r *assistCountingReader) Read(p []byte) (int, error) {
+	n, e := r.Reader.Read(p)
+	r.bytes += int64(n)
+	return n, e
+}
+func assistEventKind(v any) string {
+	switch v {
+	case "system", "assistant", "user", "result", "error", "stream_event", "thread.started", "turn.started", "turn.completed", "turn.failed", "item.started", "item.updated", "item.completed":
+		return v.(string)
+	default:
+		return "other"
+	}
+}
+
+// Only protocol labels are retained; arbitrary provider values may contain secrets.
+func assistSystemSubtype(v any) string {
+	switch v {
+	case "init", "init_milestone", "thinking_tokens", "api_error", "informational", "notification", "turn_duration", "turn_starting", "model_fallback", "model_refusal_fallback", "model_refusal_no_fallback", "permission_denied", "permission_retry", "api_retry", "status", "compact_boundary", "hook_started", "hook_progress", "hook_response", "task_started", "task_progress", "task_notification":
+		return v.(string)
+	default:
+		return "other"
+	}
+}
+func (o assistOutput) progressDiagnostic() string {
+	last := o.lastEvent
+	if last == "" {
+		last = "none"
+	}
+	subtypes, _ := json.Marshal(o.systemSubtypes)
+	return fmt.Sprintf("sortie fournisseur : %d octets, %d événements JSON, dernier type=%s, événement final=%t ; messages assistant=%d, événements système=%d, relances API signalées=%d, dernier sous-type système=%s ; types système=%s ; ceci ne vaut pas validation", o.streamBytes, o.events, last, o.finalSeen, o.assistantEvents, o.systemEvents, o.apiRetries, o.lastSystemSubtype, subtypes)
 }

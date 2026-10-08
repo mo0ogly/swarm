@@ -8,7 +8,8 @@ const puppeteer = require('puppeteer');
 const repo = path.resolve(__dirname, '..');
 const binary = path.join(repo, 'bin/swarm');
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'swarm-readme-'));
-const output = path.join(repo, 'docs/screenshots');
+const english = process.argv.includes('--lang=en');
+const output = path.join(repo, 'docs/screenshots', english ? 'en' : '');
 let server, browser;
 function cli(args, data) {
   return JSON.parse(execFileSync(binary, ['--root', root, '--json', ...args, ...(data ? ['--input', '-'] : [])], {input:data ? JSON.stringify(data) : undefined, encoding:'utf8'}));
@@ -19,11 +20,11 @@ function change(args, work, fields) {
 (async()=>{
   fs.mkdirSync(output,{recursive:true});
   cli(['init']);
-  let w=change(['work','create'],null,{title:'Démo — Une recherche accessible',objective:'Ajouter une recherche au catalogue et vérifier son utilisation au clavier.',scope:'Projet fictif de démonstration. Aucun agent lancé.',criteria:['Trouver un article par son titre','Parcours clavier vérifié'],next:'Préparer les missions puis choisir les agents.'});
+  let w=change(['work','create'],null,{title:(english?'Demo — Accessible catalogue search':'Démo — Une recherche accessible'),objective:(english?'Add catalogue search and verify keyboard accessibility.':'Ajouter une recherche au catalogue et vérifier son utilisation au clavier.'),scope:(english?'Demonstration project. No agents started.':'Projet fictif de démonstration. Aucun agent lancé.'),criteria:[(english?'Find an item by title':'Trouver un article par son titre'),(english?'Keyboard navigation checked':'Parcours clavier vérifié')],next:(english?'Prepare tasks and choose agents.':'Préparer les missions puis choisir les agents.')});
   for(const t of [
-    {id:'interface',title:'Créer la recherche',deliverable:'Champ de recherche et liste filtrée',criteria:['Filtrage par titre']},
-    {id:'verification',title:'Tester le parcours clavier',deliverable:'Tests et rapport de vérification',criteria:['Résultats accessibles au clavier'],depends:['interface']},
-    {id:'livraison',title:'Préparer la livraison',deliverable:'Résumé des changements et guide utilisateur',criteria:['Limites documentées'],depends:['verification']}
+    {id:'interface',title:(english?'Build search':'Créer la recherche'),deliverable:(english?'Search field and filtered list':'Champ de recherche et liste filtrée'),criteria:[(english?'Filter by title':'Filtrage par titre')]},
+    {id:'verification',title:(english?'Test keyboard navigation':'Tester le parcours clavier'),deliverable:(english?'Tests and verification report':'Tests et rapport de vérification'),criteria:[(english?'Keyboard-accessible results':'Résultats accessibles au clavier')],depends:['interface']},
+    {id:'livraison',title:(english?'Prepare delivery':'Préparer la livraison'),deliverable:(english?'Change summary and user guide':'Résumé des changements et guide utilisateur'),criteria:[(english?'Documented limitations':'Limites documentées')],depends:['verification']}
   ])w=change(['task','add',w.id],w,t);
   cli(['autonomy',w.id,'manuel']);
   server=spawn(binary,['--root',root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});
@@ -31,17 +32,14 @@ function change(args, work, fields) {
   browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',headless:true,args:['--no-sandbox']});
   const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.setViewport({width:1600,height:1050,deviceScaleFactor:1});
-  await page.goto(url+'?work='+w.id);await page.waitForSelector('#pilot-canvas svg');
+  await page.goto(url+'?work='+w.id+'&lang='+(english?'en':'fr'));await page.waitForSelector('#pilot-canvas svg');
   for(const theme of ['etat','sombre']){
     await page.evaluate(t=>setTheme(t),theme);
     await page.$eval('#pilot-toolbar',e=>e.scrollIntoView({block:'start'}));
     const clip=await page.evaluate(()=>{const a=document.getElementById('pilot-toolbar').getBoundingClientRect(),b=document.getElementById('pilot-canvas').getBoundingClientRect();return {x:a.x+scrollX,y:a.y+scrollY,width:a.width,height:b.bottom-a.top};});
     await page.screenshot({path:path.join(output,'pilotage-'+theme+'.png'),clip});
   }
-  // Second scénario : données d'organisation simulées, sans aucun fournisseur actif.
-  execFileSync('python3',[path.join(__dirname,'readme-team-fixture.py'),root]);
-  await page.reload();await page.waitForSelector('#pilot-canvas svg');
-  await page.waitForFunction(()=>document.querySelector('#pilot-canvas').textContent.includes('Orchestrateur'));
+  // Conserver les tâches créées par le CLI public ; aucun état interne injecté.
   await page.setViewport({width:1800,height:1200,deviceScaleFactor:1});
   await page.evaluate(()=>setTheme('etat'));
   async function captureGraph(name){
@@ -53,7 +51,7 @@ function change(args, work, fields) {
   }
   await captureGraph('agents-horizontal');
   const arrows=await page.$$eval('#pilot-canvas [marker-end]',els=>els.filter(e=>e.hasAttribute('marker-end')).length);
-  if(arrows<3)throw new Error('Flèches de coordination absentes');
+  if(arrows<2)throw new Error('Flèches de coordination absentes');
   await page.setViewport({width:1120,height:1900,deviceScaleFactor:1});
   await page.focus('#pilot-orientation');await page.keyboard.press('End');await page.keyboard.press('Enter');
   await page.evaluate(()=>setTheme('sombre'));
@@ -69,15 +67,15 @@ function change(args, work, fields) {
   await page.click('.pilot-inspector-head button');
   await page.setViewport({width:1600,height:1200,deviceScaleFactor:1});
   await page.click('[data-view="providers"]');await page.waitForSelector('#connections-add');await page.click('#connections-add');await page.waitForSelector('#modal[open]');
-  for(const [id,value] of Object.entries({connection_id:'modele-local',connection_label:'Mon modèle local',connection_url:'http://localhost:11434/v1',connection_model:'mon-modele'}))await page.type('#field-'+id,value);
+  for(const [id,value] of Object.entries({connection_id:(english?'local-model':'modele-local'),connection_label:(english?'My local model':'Mon modèle local'),connection_url:'http://localhost:11434/v1',connection_model:(english?'my-model':'mon-modele')}))await page.type('#field-'+id,value);
   await page.evaluate(()=>setTheme('etat'));
   await page.setViewport({width:1600,height:1200,deviceScaleFactor:1});
   await page.screenshot({path:path.join(output,'connexion.png')});
   await page.setViewport({width:1600,height:1050,deviceScaleFactor:1});
-  await page.goto(new URL('/prepare.html',url).href);await page.waitForSelector('#new-title');
-  await page.type('#new-title','Une recherche accessible dans le catalogue');
+  await page.goto(new URL('/prepare.html?lang='+(english?'en':'fr'),url).href);await page.waitForSelector('#new-title');
+  await page.type('#new-title',(english?'Accessible catalogue search':'Une recherche accessible dans le catalogue'));
   await page.$eval('#new-need',e=>e.spellcheck=false);
-  await page.type('#new-need','Je souhaite retrouver un article en saisissant quelques mots de son titre.\n\nLa recherche doit être utilisable au clavier et présenter clairement les résultats.\n\nRésultat attendu : une interface simple, des tests du filtrage et du parcours clavier, puis un court guide utilisateur.\n\nContrainte : conserver le fonctionnement actuel du catalogue.');
+  await page.type('#new-need',english?'Find catalogue items by title. Search must work with the keyboard and show clear results. Deliver the interface, filtering and keyboard tests, and a short user guide. Preserve existing catalogue behaviour.':'Je souhaite retrouver un article en saisissant quelques mots de son titre.\n\nLa recherche doit être utilisable au clavier et présenter clairement les résultats.\n\nRésultat attendu : une interface simple, des tests du filtrage et du parcours clavier, puis un court guide utilisateur.\n\nContrainte : conserver le fonctionnement actuel du catalogue.');
   await page.evaluate(()=>document.documentElement.dataset.theme='etat');
   await page.screenshot({path:path.join(output,'preparation.png')});
   if(errors.length)throw new Error(errors.join('\n'));

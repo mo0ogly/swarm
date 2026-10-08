@@ -208,3 +208,15 @@ func TestSubmittedReportDoesNotInventProcessCompletion(t *testing.T) {
 		t.Fatalf("unproven execution: %+v", p)
 	}
 }
+
+func TestResultPresentationIncompleteDeliveryIsNotPendingReview(t *testing.T) {
+	s := storeTest(t)
+	w := taskTest(t, s, createTest(t, s))
+	w.Tasks[0].Status = "blocked"
+	w.Tasks[0].Blocker = deliveryIncomplete("browser not tested").Error()
+	a := Agent{ID: "partial", Attempt: "attempt-partial", TaskID: "t1", Status: "completed"}
+	got := resultFor(t, s, w, []Agent{a})
+	if got.State != "delivery_incomplete" || got.Label != "Résultat à compléter" || got.ValidationState != "not_validated" {
+		t.Fatalf("partial result hidden: %+v", got)
+	}
+}

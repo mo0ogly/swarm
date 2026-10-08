@@ -1,0 +1,2 @@
+# Optional offline diagnostics only; not a Swarm runtime dependency.
+tiktoken==0.14.0

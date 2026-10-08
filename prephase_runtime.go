@@ -66,6 +66,10 @@ func (s *Store) runPreparationTurnWithin(t PreparationTurn, deadline time.Durati
 		return
 	}
 	fail := func(msg string) { _ = s.finishPreparationTurn(t, "", nil, msg) }
+	if e = s.projectContextGuard(t.Project, "preparation"); e != nil {
+		fail(e.Error())
+		return
+	}
 	ps, e := s.providers()
 	if e != nil {
 		fail("Configuration du fournisseur indisponible.")

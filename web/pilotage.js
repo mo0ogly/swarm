@@ -47,6 +47,7 @@ const Pilot = {
    ['pilot-expand',tr_web_pilotage_js('Tout déplier'),()=>{this.state.collapsed=[];this.changed()}],
    ['pilot-zoom-out',tr_web_pilotage_js('Réduire le zoom'),()=>this.zoom(-.15)],
    ['pilot-zoom-in',tr_web_pilotage_js('Agrandir le zoom'),()=>this.zoom(.15)],
+   ['pilot-planners',tr_web_pilotage_js('Voir les sous-planificateurs'),()=>{this.state.view='dependencies';this.state.zoom=1;this.changed();const n=document.querySelector('.graph-responsibility[data-agent-role="subplanner"]');n?.focus();n?.scrollIntoView({block:'center',inline:'center'})}],
    ['pilot-fit',tr_web_pilotage_js('Vue d’ensemble'),()=>{this.fitPending=true;this.changed()}],
    ['pilot-reveal',tr_web_pilotage_js('Retrouver ma sélection'),()=>this.revealSelection()],
    ['pilot-reset',tr_web_pilotage_js('Réinitialiser l’affichage'),()=>{this.state=PilotGraph.preferences();this.fitPending=true;this.changed();$('pilot-canvas').scrollTo(0,0)}],
@@ -62,6 +63,7 @@ const Pilot = {
   const list=node('div',undefined,'pilot-list');list.id='pilot-list';
   const mission=node('section',undefined,'mission-summary');mission.id='mission-summary';mission.setAttribute('aria-label',tr_web_pilotage_js('Résultats et conduite de la mission'));
   $('graph').replaceChildren(mission,toolbar,actions,status,canvas,list);
+  GraphDraft.mount();
  },
  changed(){this.save();this.listKey='';this.render();},
  zoom(delta){this.state.zoom=Math.max(.15,Math.min(2,this.state.zoom+delta));this.changed()},
@@ -92,7 +94,8 @@ const Pilot = {
    this.state.filter==='unknown'&&a&&active(a)&&!['running','stopping'].includes(health?.process_state)||
    this.state.filter==='finished'&&a&&!active(a);
  },
- inspect(kind,id){const a=kind==='agent'?snapshot.agents.find(x=>x.agent.id===id)?.agent:kind==='task'?snapshot.agents.find(x=>x.agent.task_id===id)?.agent:null;if(['terminal','dialogue'].includes(a?.mode)){AgentTerminal.open(a);return}this.state.selection={kind,id};this.inspectorKey='';this.save();PilotInspector.render(true)},
+ taskAgent(id){const agent=snapshot.pilotage?.tasks?.[id]?.attempt?.agent_id;return snapshot.agents.find(x=>x.agent.id===agent)?.agent||snapshot.agents.find(x=>x.agent.task_id===id)?.agent},
+ inspect(kind,id){const a=kind==='agent'?snapshot.agents.find(x=>x.agent.id===id)?.agent:kind==='task'?this.taskAgent(id):null;if(['terminal','dialogue'].includes(a?.mode)){AgentTerminal.open(a);return}this.state.selection={kind,id,agent_id:a?.id||''};this.inspectorKey='';this.save();PilotInspector.render(true)},
  selectedTask(){
   const s=this.state.selection;
   return s?.kind==='task'?s.id:s?.kind==='agent'?(snapshot.agents.find(x=>x.agent.id===s.id)?.agent.task_id||PilotInspector.loaded?.agent?.task_id):
@@ -120,14 +123,16 @@ const Pilot = {
   for(const id of ['pilot-orientation','pilot-collapse','pilot-expand','pilot-fit','pilot-zoom-in','pilot-zoom-out'])$(id).disabled=!graph;
   $('pilot-group').hidden=graph;$('pilot-group').textContent=this.state.grouped?tr_web_pilotage_js('Afficher les agents'):'Regrouper';
   $('pilot-reveal').disabled=!this.selectedTask();
+  const fitWidth=graph&&this.fitPending?$('pilot-canvas').clientWidth:0;
   if(graph){drawPilotGraph();if(this.fitPending){
    const svg=$('pilot-canvas').querySelector('svg');
-   if(svg){const port=$('pilot-canvas');this.state.zoom=Math.max(.15,Math.min(1,(port.clientWidth-20)/Number(svg.dataset.width),(innerHeight*.65-50)/Number(svg.dataset.height)));scalePilotGraph(svg,this.state.zoom);this.state.x=0;this.state.y=0;port.scrollTo(0,0);this.fitPending=false;this.save()}
+   if(svg){const port=$('pilot-canvas');this.state.zoom=Math.max(.15,Math.min(1,(fitWidth-20)/Number(svg.dataset.width),(innerHeight*.65-50)/Number(svg.dataset.height)));scalePilotGraph(svg,this.state.zoom);this.state.x=0;this.state.y=0;port.scrollTo(0,0);this.fitPending=false;this.save()}
   }if(this.restorePosition){$('pilot-canvas').scrollTo(this.state.x,this.state.y);this.restorePosition=false}}else this.cards();
+  GraphDraft.render();
   const edges=snapshot.pilotage?.edges||[];
   $('pilot-status').textContent=this.storageWarning||(this.state.search.trim()?tr_web_pilotage_js('Recherche dans toutes les tâches, y compris les branches repliées.'):!snapshot.work.tasks.length?tr_web_pilotage_js('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.'):graph&&!edges.length?tr_web_pilotage_js('Tâches indépendantes : aucune dépendance déclarée, donc aucune flèche.'):graph?tr_web_pilotage_js('Les flèches vont du prérequis vers la tâche qui en dépend. Zoom ')+Math.round(this.state.zoom*100)+' %.':tr_web_pilotage_js('Sélectionnez un agent ou une tâche pour comprendre son état et examiner ses résultats.'));
   $('pilot-status').classList.toggle('notice',graph&&!edges.length&&snapshot.work.tasks.length>0);$('pilot-status').classList.toggle('info',graph&&!edges.length&&snapshot.work.tasks.length>0);
-  if(graph&&edges.length){const visible=$('pilot-canvas').querySelectorAll('.graph-arete').length;$('pilot-status').append(' '+visible+tr_web_pilotage_js(' dépendances affichées sur ')+edges.length+'.');if(visible<edges.length)$('pilot-status').append(tr_web_pilotage_js(' Des branches sont repliées ou filtrées : utilisez « Toutes les dépendances ».'))}
+  if(graph&&edges.length){const visible=$('pilot-canvas').querySelectorAll('.graph-arete').length,visibleTasks=$('pilot-canvas').querySelectorAll('.graph-noeud').length,hiddenTasks=Math.max(0,snapshot.work.tasks.length-visibleTasks),hiddenLinks=Math.max(0,edges.length-visible);$('pilot-status').append(' '+visible+tr_web_pilotage_js(' dépendances affichées sur ')+edges.length+'.');if(hiddenTasks||hiddenLinks)$('pilot-status').append(' '+hiddenTasks+tr_web_pilotage_js(' tâche(s) et ')+hiddenLinks+tr_web_pilotage_js(' lien(s) masqué(s).'));if(visible<edges.length)$('pilot-status').append(tr_web_pilotage_js(' Des branches sont repliées ou filtrées : utilisez « Toutes les dépendances ».'))}
   if(graph&&snapshot.work.planning)$('pilot-status').append(tr_web_pilotage_js(' Pointillés : responsabilités et remise au vérificateur. Traits pleins : dépendances entre tâches.'));
   if(graph&&(this.state.filter!=='all'||this.state.search.trim()))$('pilot-status').append(tr_web_pilotage_js(' Les liens dont une extrémité est filtrée restent masqués.'));
   if(this.state.selection)PilotInspector.render();
@@ -142,7 +147,7 @@ const Pilot = {
   const sig=JSON.stringify([organization.nodes,this.state.detail,this.state.grouped,entries.map(({t,a})=>[t.id,t.title,t.status,t.plan_role,t.launch_profile,t.deliverable,t.criteria,t.next,t.blocker,a?.role,this.goState(t),a?.id,a?.progress,snapshot.validation?.tasks[t.id]?.state,snapshot.pilotage?.health[a?.id]?.activity_label,graphCoutTache(t.id),snapshot.pilotage?.health[a?.id]?.process_label])]);
   if(sig===this.listKey)return;this.listKey=sig;
   const focused=document.activeElement?.dataset.pilotIdentity,host=$('pilot-list');host.replaceChildren();
-  for(const n of organization.nodes){const card=node('article',undefined,'team-role-card');card.dataset.tone=n.tone;card.dataset.responsibility=n.id;const open=this.command(n.title,()=>Planning.inspectRole(n.kind));open.id='list-role-'+encodeURIComponent(n.id);open.dataset.pilotIdentity=n.id;card.append(open,node('p',n.description),node('p',n.detail));host.append(card)}
+  for(const n of organization.nodes){const card=node('article',undefined,'team-role-card');card.dataset.tone=n.tone;card.dataset.responsibility=n.id;const open=this.command(n.title,()=>Planning.inspectRole(n.kind));open.id='list-role-'+encodeURIComponent(n.id);open.dataset.pilotIdentity=n.id;card.append(open,node('p',n.description),node('p',n.detail));if(globalThis.ProjectProfiles)card.append(ProjectProfiles.badge(n.workflow));host.append(card)}
   const groups=this.state.grouped?['En activité','À examiner','Historique','À préparer']:[''];
   for(const group of groups){
    const set=entries.filter(({t,a})=>!group||(a&&active(a)?'En activité':t.status==='submitted'||t.status==='blocked'?'À examiner':a?'Historique':'À préparer')===group);
@@ -151,7 +156,7 @@ const Pilot = {
    for(const {t,a}of set){
     const card=node('article',undefined,'pilot-card');card.dataset.state=this.uncertainExecution(t,a)?'stale':snapshot.validation?.tasks[t.id]?.state||t.status;
     const select=this.command(this.taskTitle(t),()=>this.inspect(a?'agent':'task',a?.id||t.id),'pilot-card-title');select.dataset.pilotIdentity=a?.id||t.id;
-    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);
+    const role=PilotGraph.role(t,a),badge=node('p',role.icon+' '+role.label+(a?' · '+a.provider:''),'pilot-role');badge.dataset.tone=role.tone;card.append(badge,select);if(a&&globalThis.ProjectProfiles)card.append(ProjectProfiles.badge(a.workflow));if(typeof TaskModels!=='undefined'){card.append(node('p',TaskModels.text(t,a)),this.command(tr_web_pilotage_js('Modèle de la tâche'),()=>TaskModels.open(t.id)))}
     card.append(node('p',PilotGraph.guidance(t,this.goState(t),snapshot.validation?.tasks[t.id]),'pilot-guidance'));
     const h=snapshot.pilotage?.health[a?.id];
     card.append(node('p',a?this.uncertainExecution(t,a)||(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label)||tr_web_pilotage_js('Observation indisponible'):labels[t.status]||t.status,'pilot-card-state'));
@@ -183,7 +188,7 @@ const Pilot = {
   else parts.append(node('span',tr_web_pilotage_js('Aucune décision en attente')));
   host.append(parts);
   const visit=change?.entrees?(change.complet?'':tr_web_pilotage_js('Au moins '))+change.entrees+(change.entrees===1?tr_web_pilotage_js(' événement'):tr_web_pilotage_js(' événements'))+tr_web_pilotage_js(' depuis votre visite'):tr_web_pilotage_js('Rien de neuf depuis votre visite');
-  const visitButton=this.command(visit,()=>{$('fil-bloc').open=true;$('fil-titre').scrollIntoView({block:'start'});$('fil-titre').focus()},'pilot-summary-note accueil-segment');host.append(visitButton);
+  const visitButton=this.command(visit,()=>Mission.changes(),'pilot-summary-note accueil-segment');host.append(visitButton);
   if(snapshot.cost?.attempts_with_cost||snapshot.cost?.attempts_without_cost)host.append(node('span',snapshot.cost_text,'pilot-summary-note'));
   if(focused)[...host.querySelectorAll('[data-summary-key]')].find(n=>n.dataset.summaryKey===focused)?.focus();
  },

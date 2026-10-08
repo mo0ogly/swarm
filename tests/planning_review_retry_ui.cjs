@@ -1,0 +1,17 @@
+'use strict';
+// Isolated browser fixture: actual Planning.roles rendering, no live mission writes.
+const fs=require('fs'),path=require('path'),assert=require('assert/strict'),puppeteer=require('puppeteer');
+(async()=>{const browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});try{
+ const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.setContent('<html><body><main id="panel"></main><dialog id="modal"><h2 id="title"></h2><div id="modal-fields"></div><button id="confirm"></button><button id="cancel">Close</button></dialog></body></html>');
+ for(const name of ['wattson_themes','cockpit','pilotage','mission'])await page.addStyleTag({path:path.resolve('web/'+name+'.css')});
+ await page.addScriptTag({path:path.resolve('web/i18n-en.js')});
+ await page.evaluate(()=>{globalThis.lang='fr';globalThis.SwarmI18n={t:s=>lang==='en'?(SwarmEnglish[s]||s):s};globalThis.$=id=>document.getElementById(id);globalThis.node=(tag,text,cls)=>{const e=document.createElement(tag);if(text)e.textContent=text;if(cls)e.className=cls;return e};globalThis.Pilot={command:(text,fn)=>{const e=node('button',text);e.onclick=fn;return e}};globalThis.RoleModels={open(){}};globalThis.SwarmStatusContract={review:()=>({message:'',availability:'available',state:'idle'})};globalThis.openModal=(title,text,context)=>{globalThis.modalContext=context;$('modal-fields').replaceChildren();$('title').textContent=title;$('modal').showModal()};globalThis.field=(id,label)=>{$('modal-fields').append(node('label',label))};});
+ await page.addScriptTag({path:path.resolve('web/planning.js')});
+ for(const lang of ['fr','en'])for(const theme of ['etat','sombre'])for(const [state,current,status,retry] of [['passed',false,'submitted',true],['passed',true,'submitted',false],['running',false,'submitted',false],['error',false,'submitted',true],['passed',false,'accepted',false]]){
+ await page.evaluate(({lang,theme,state,current,status})=>{globalThis.lang=lang;document.documentElement.dataset.theme=theme;globalThis.snapshot={work:{tasks:[{id:'t1',title:'Review fixture',status,independent_review:{state,reason:'Reason',criteria:[]}}]},independent_reviews:{t1:{current,reason:'Candidate changed'}}};$('panel').replaceChildren();Planning.roles($('panel'),{scopes:[],provider:'codex',decisions:0,reviewer:{provider:'codex',calls:1,max_calls:10}})}, {lang,theme,state,current,status});
+ assert.equal(!!await page.$('#review-retry-t1'),retry,`${lang}/${theme}/${state}/${current}/${status}`);
+ if(retry){await page.focus('#review-retry-t1');await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>modalContext.planningAction),'retry-review');assert.equal(await page.evaluate(()=>modalContext.reviewTask),'t1');if(state==='passed')assert.equal(await page.$eval('#title',e=>e.textContent),lang==='en'? 'Resume review':'Reprendre la vérification');if(process.env.SWARM_SCREENSHOTS&&state==='passed'){fs.mkdirSync(process.env.SWARM_SCREENSHOTS,{recursive:true});await page.screenshot({path:path.join(process.env.SWARM_SCREENSHOTS,`retry-${lang}-${theme}.png`)});}await page.keyboard.press('Escape');assert.equal(await page.$eval('#modal',e=>e.open),false);}
+ }
+ assert.deepEqual(errors,[]);console.log('PASS: stale review retry, current/running/accepted guards, FR/EN, both themes, keyboard and modal');
+ }finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

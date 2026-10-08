@@ -13,21 +13,40 @@ import (
 const help = `swarm — compagnon local de reprise (schema_version: 1)
 
 Options globales : --root <projet> --json --lang fr|en
+swarm version [--server URL_DE_SESSION] | swarm --version
 swarm init
+swarm skills list
+swarm project-profile show|check|list|select PROFILE|apply [--input profil.json]
+swarm doctor
+swarm role-model show|preview|apply <travail> [--input request.json]
+swarm task-model show|preview|apply <travail> [--input request.json]
+swarm quotas show|preview|apply <travail> [--input quotas.json]
+swarm pricing list|save|estimate [--input request.json]
+swarm budget show|preview|apply <travail> [--input budget.json]
+swarm run-limits show|history <portée> <mission> <clé>
+swarm run-limits apply <portée> <mission> <clé> --input changement.json
+swarm run-limits rollback <portée> <mission> <clé> <révision_cible> --input requête.json
+swarm run-limits effective <mission> <rôle> <tâche>
+swarm automation list|show|preview|create|enable|pause|archive|cancel|params
 swarm aide [sujet]
 swarm providers init|show
+swarm providers cooldown show|clear <fournisseur> [--input demande.json]
+swarm providers relay show <agent> | decide <agent> [--input décision.json]
 swarm connections list|save --input connexion.json
 swarm console [travail] [--plain]
 swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
 swarm dispatch <travail>
 swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
-swarm mission status|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission status|changes|spending|seen|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission recovery <travail> <tâche> [agent]
 swarm lifecycle list
 swarm lifecycle preview|apply <travail> archive|restore|purge|delete --input requete.json
-swarm validation preview|apply <travail> --task <tâche> --input politique.json
+swarm validation preview|apply|recheck-preview|recheck-apply <travail> --task <tâche> --input politique.json
 swarm profile <travail> [tâche] [--input profil.json]
 swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
+swarm agent prepared <travail>
+swarm agent resume-launch <travail> --input reprise.json
 swarm agent preflight <travail> --input lancement.json
 swarm agent list <travail>
 swarm agent show|stop|reconcile <agent>
@@ -36,7 +55,7 @@ swarm exchange list <travail>
 swarm exchange send|consume <travail> --input requête.json
 swarm workspace status <travail>
 swarm workspace integrate <travail> --input manifeste.json
-swarm planning show|enable|claim|decide|handoff|step|pause|resume <travail> [--input requête.json]
+swarm planning show|enable|claim|decide|handoff|step|authorize-recovery|requalify|submit-recovered-result|revise-recovered-result|pause|resume <travail> [--input requête.json]
 swarm work create --input fichier.json
 swarm work update <travail> --input fichier.json
 swarm work list
@@ -56,6 +75,10 @@ Les requêtes sont décrites dans README.md. --input - lit stdin.
 Codes généraux : 0 succès ; 1 gate bloquée ; 2 erreur.
 Préparer : 2 contrat ; 3 conflit ; 4 autorisation ; 5 fournisseur ou méthode indisponible ; 6 arrêt non confirmé.
 `
+
+func mainHelpText() string {
+	return uiText(help) + uiText("Brouillons du plan : swarm plan draft show|export|import|compare|preview|apply|undo|redo TRAVAIL [BROUILLON]\n")
+}
 
 func readInput(path string) ([]byte, error) {
 	var r io.Reader = os.Stdin
@@ -100,6 +123,7 @@ func run(args []string, out, errOut io.Writer) int {
 	output := ""
 	task := ""
 	phase := "delivery"
+	serverURL := ""
 	asJSON := false
 	pos := []string{}
 	for i := 0; i < len(args); i++ {
@@ -107,10 +131,12 @@ func run(args []string, out, errOut io.Writer) int {
 		switch a {
 		case "--json":
 			asJSON = true
+		case "--version":
+			pos = append(pos, "version")
 		case "--help", "-h":
-			fmt.Fprint(out, uiText(help))
+			fmt.Fprint(out, mainHelpText())
 			return 0
-		case "--root", "--input", "--output", "--task", "--phase":
+		case "--root", "--input", "--output", "--task", "--phase", "--server":
 			if i+1 == len(args) {
 				fmt.Fprintln(errOut, uiText("valeur manquante :"), a)
 				return 2
@@ -127,6 +153,8 @@ func run(args []string, out, errOut io.Writer) int {
 				task = args[i]
 			case "--phase":
 				phase = args[i]
+			case "--server":
+				serverURL = args[i]
 			}
 		default:
 			pos = append(pos, a)
@@ -149,23 +177,48 @@ func run(args []string, out, errOut io.Writer) int {
 		if asJSON {
 			_ = printJSON(errOut, map[string]any{"schema_version": 1, "error": e.Error(), "failure": commandFailure(e)})
 		} else {
-			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(e.Error()))
+			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(commandFailure(e).Message))
 		}
 		switch commandFailure(e).Code {
-		case "conflict":
+		case "conflict", "revision_conflict", "preview_stale", "active_scope_conflict", "event_conflict", "idempotency_conflict", "terminal_target", "already_applied", "effect_started", "draft_conflict":
 			return 3
-		case "source_refused", "preparation_disabled":
+		case "source_refused", "preparation_disabled", "authorization_required":
 			return 4
-		case "provider_unavailable", "method_unavailable":
+		case "provider_unavailable", "method_unavailable", "workspace_wait":
 			return 5
-		case "interrupted":
+		case "interrupted", "uncertain_effect":
 			return 6
+		case "operation_pending":
+			return 7
 		default:
 			return 2
 		}
 	}
 	if len(pos) == 0 {
-		fmt.Fprint(out, uiText(help))
+		fmt.Fprint(out, mainHelpText())
+		return 0
+	}
+	if pos[0] == "version" {
+		if len(pos) != 1 {
+			return fail(fmt.Errorf("swarm version [--json] [--root PROJET] [--server URL_DE_SESSION]"))
+		}
+		version := binaryVersion()
+		active := VersionObservation{Available: false, Provenance: "runtime_health", Hint: "Fournissez l’URL de session du serveur actif avec --server."}
+		if serverURL != "" {
+			var e error
+			active, e = serverObservation(serverURL)
+			if e != nil {
+				active.Hint = e.Error()
+			}
+		}
+		diagnostic := compareVersions(binaryObservation(version), active, candidateObservation(root))
+		if asJSON {
+			if err := printJSON(out, versionResponse{Schema: 1, Binary: version, Diagnostic: diagnostic}); err != nil {
+				return fail(err)
+			}
+		} else {
+			fmt.Fprint(out, versionText(version), versionDiagnosticText(diagnostic))
+		}
 		return 0
 	}
 	if pos[0] == "aide" || pos[0] == "help" {
@@ -186,6 +239,15 @@ func run(args []string, out, errOut io.Writer) int {
 			fmt.Fprint(out, text)
 		}
 		return 0
+	}
+	if pos[0] == "automation" && len(pos) == 2 && (pos[1] == "help" || pos[1] == "aide") {
+		fmt.Fprint(out, automationCLIHelp())
+		return 0
+	}
+	if pos[0] == "plan" {
+		if err := validateGraphDraftCLISyntax(pos); err != nil {
+			return fail(err)
+		}
 	}
 	root, e := filepath.Abs(root)
 	if e != nil {
@@ -210,11 +272,69 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		return 0
 	}
-	s, e := openStore(root, pos[0] == "init")
+	if pos[0] == "doctor" {
+		h := (&Store{root: root}).runtimeHealth()
+		if asJSON {
+			_ = printJSON(out, h)
+		} else {
+			fmt.Fprintln(out, uiText(h.Message))
+			fmt.Fprintln(out, uiText(h.Next))
+			for _, v := range h.Volumes {
+				fmt.Fprintf(out, "%s: %s · %d MiB · %s\n", v.Kind, v.Path, v.Available/(1024*1024), v.State)
+			}
+		}
+		if !h.LaunchAllowed {
+			return 2
+		}
+		return 0
+	}
+	s, e := openStoreWithMigration(root, pos[0] == "init", !cliStorageInspection(pos))
 	if e != nil {
 		return fail(e)
 	}
 	defer s.db.Close()
+	if pos[0] == "role-model" {
+		if err := s.roleModelCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "task-model" {
+		if err := s.taskModelCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "quotas" {
+		if err := s.quotasCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "pricing" {
+		if err := s.pricingCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "budget" {
+		if e := s.budgetCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "run-limits" {
+		if e := s.runLimitsCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "automation" {
+		if e := s.automationCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
 	if pos[0] == "connections" {
 		if len(pos) != 2 {
 			return fail(fmt.Errorf("swarm connections list|save --input connexion.json"))
@@ -253,6 +373,34 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		return 0
 	}
+	if pos[0] == "skills" {
+		if len(pos) != 2 || pos[1] != "list" {
+			return fail(fmt.Errorf("usage : swarm skills list"))
+		}
+		items, e := s.actionSkillCatalog()
+		if e != nil {
+			return fail(e)
+		}
+		if asJSON {
+			if e = printJSON(out, map[string]any{"skills": items}); e != nil {
+				return fail(e)
+			}
+		} else {
+			for _, item := range items {
+				fmt.Fprintf(out, "%s · %s · %s\n", item.Path, item.Name, item.Description)
+				if !item.Available {
+					fmt.Fprintln(out, item.Reason)
+				}
+			}
+		}
+		return 0
+	}
+	if pos[0] == "project-profile" {
+		if e := s.projectProfileCLI(pos[1:], input, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
 	if pos[0] == "mission" {
 		returnErr := missionCLI(s, pos, input, asJSON, out)
 		if returnErr != nil {
@@ -267,8 +415,8 @@ func run(args []string, out, errOut io.Writer) int {
 		return 0
 	}
 	if pos[0] == "validation" {
-		if len(pos) != 3 || (pos[1] != "preview" && pos[1] != "apply") || task == "" || input == "" {
-			return fail(fmt.Errorf("usage : validation preview|apply WORK --task TASK --input politique.json"))
+		if len(pos) != 3 || (pos[1] != "preview" && pos[1] != "apply" && pos[1] != "recheck-preview" && pos[1] != "recheck-apply") || task == "" || input == "" {
+			return fail(fmt.Errorf("usage : validation preview|apply|recheck-preview|recheck-apply WORK --task TASK --input politique.json"))
 		}
 		b, readErr := readInput(input)
 		if readErr != nil {
@@ -284,7 +432,11 @@ func run(args []string, out, errOut io.Writer) int {
 		if change.TaskID != task {
 			return fail(fmt.Errorf("task_id ne correspond pas à --task"))
 		}
-		if pos[1] == "preview" {
+		action := pos[1]
+		if action == "recheck-preview" || action == "recheck-apply" {
+			change.RecheckCompleted = true
+		}
+		if action == "preview" || action == "recheck-preview" {
 			preview, previewErr := s.previewValidationPolicy(pos[2], change)
 			if previewErr != nil {
 				return fail(previewErr)
@@ -316,7 +468,7 @@ func run(args []string, out, errOut io.Writer) int {
 		}
 		return 0
 	}
-	if pos[0] == "console" || pos[0] == "agent" || pos[0] == "exchange" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
+	if pos[0] == "plan" || pos[0] == "console" || pos[0] == "agent" || pos[0] == "exchange" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
 		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
 			return fail(e)
 		}
@@ -372,7 +524,7 @@ func run(args []string, out, errOut io.Writer) int {
 					}
 				}
 			}
-			_ = printJSON(out, map[string]any{"work": w, "events": ev, "current_gates": current, "current_git": gitState(s.root), "resume_markdown": v})
+			_ = printJSON(out, map[string]any{"work": w, "validation": s.validationState(&w), "events": ev, "current_gates": current, "current_git": gitState(s.root), "resume_markdown": v})
 		} else {
 			fmt.Fprintln(out, v)
 		}

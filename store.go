@@ -5,20 +5,27 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	_ "modernc.org/sqlite"
+	"modernc.org/sqlite"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type Store struct {
-	db          *sql.DB
-	root        string
-	readDigests map[string]string // request-local clone only; never retained by the live store
+	db           *sql.DB
+	root         string
+	readDigests  map[string]string                    // request-local clone only; never retained by the live store
+	storageProbe func(string) (uint64, uint64, error) // immutable per store; nil uses the filesystem
 }
 
 func openStore(root string, init bool) (*Store, error) {
+	return openStoreWithMigration(root, init, true)
+}
+
+// Inspection commands must not upgrade storage behind an older running server.
+func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	root, e := filepath.Abs(root)
 	if e != nil {
 		return nil, e
@@ -73,6 +80,9 @@ func openStore(root string, init bool) (*Store, error) {
 	}
 	if version < 0 || version > schemaVersion {
 		return fail(fmt.Errorf("version de stockage non supportée : %d", version))
+	}
+	if !migrate && version > 0 && version < schemaVersion {
+		return fail(&CommandError{Code: "storage_upgrade_required", Message: fmt.Sprintf("Stockage version %d, CLI version %d : consultation sans migration. Utilisez le CLI du serveur actif ; pour mettre à niveau, arrêtez les anciens processus puis exécutez swarm init avec le nouveau CLI.", version, schemaVersion)})
 	}
 	if version == 0 {
 		if !init {
@@ -226,7 +236,7 @@ func openStore(root string, init bool) (*Store, error) {
 	}
 	if version < 18 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v18-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v18-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -236,7 +246,7 @@ func openStore(root string, init bool) (*Store, error) {
 	}
 	if version < 19 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v19-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v19-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -246,7 +256,7 @@ func openStore(root string, init bool) (*Store, error) {
 	}
 	if version < 20 {
 		if version != 0 {
-			if _, e = db.Exec("VACUUM INTO ?", filepath.Join(dir, newID("state-pre-v20-")+".db")); e != nil {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v20-")+".db")); e != nil {
 				return fail(e)
 			}
 		}
@@ -254,10 +264,105 @@ func openStore(root string, init bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	// v21 binds managed independent reviews to a Git candidate and immutable
+	// receipts. Older binaries must refuse this store rather than silently
+	// dropping those fields while rewriting a Work. Preserve historical data;
+	// freshness guards, not migration, decide whether an old verdict applies.
+	if version < 21 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v21-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=21"); e != nil {
+			return fail(e)
+		}
+	}
+	// v22 retains typed provider cooldown evidence and recovery state on agents.
+	// A v21 process must not erase these fields by rewriting an agent body.
+	if version < 22 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v22-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=22"); e != nil {
+			return fail(e)
+		}
+	}
+	// v23 adds run_limits_config/run_limits_history (see run_limits_admin.go).
+	if version < 23 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v23-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(runLimitsConfigMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 24 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v24-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(graphDraftMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 25 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v25-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(automationRequestMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 26 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v26-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(automationScheduleMigration); e != nil {
+			return fail(e)
+		}
+	}
+	if version < 27 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v27-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec(automationExternalMigration); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
 	return s, nil
+}
+
+// SQLite otherwise creates VACUUM INTO destinations with the process umask,
+// which may expose a migration snapshot containing credentials or mission data.
+func migrationBackup(db *sql.DB, path string) error {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	if err = file.Close(); err != nil {
+		_ = os.Remove(path)
+		return err
+	}
+	if _, err = db.Exec("VACUUM INTO ?", path); err != nil {
+		_ = os.Remove(path)
+		return err
+	}
+	return nil
 }
 
 // Les réglages d'autonomie s'ajoutent à une table existante : selon la version
@@ -379,6 +484,21 @@ func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn 
 }
 
 func (s *Store) mutateWithHook(id, kind, event string, expected int, request []byte, fn func(*Work) error, hook func(*sql.Tx, *Work) error) (Work, error) {
+	policy, err := s.storageRetryPolicy()
+	if err != nil {
+		return Work{}, err
+	}
+	for attempt := 0; ; attempt++ {
+		w, err := s.mutateWithHookOnce(id, kind, event, expected, request, fn, hook)
+		var busy *sqlite.Error
+		if !errors.As(err, &busy) || busy.Code()&255 != 5 || attempt >= policy.Retries {
+			return w, err
+		}
+		time.Sleep(time.Duration(policy.DelayMS) * time.Millisecond)
+	}
+}
+
+func (s *Store) mutateWithHookOnce(id, kind, event string, expected int, request []byte, fn func(*Work) error, hook func(*sql.Tx, *Work) error) (Work, error) {
 	var w Work
 	if !safeName(event) {
 		return w, fmt.Errorf("event_id obligatoire (lettres, chiffres, tirets)")
@@ -388,6 +508,14 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 		return w, e
 	}
 	defer tx.Rollback()
+	// Every mutation reads then writes. Reserve the writer before any reads;
+	// a per-kind allowlist leaves new and ordinary mutations exposed to
+	// BUSY_SNAPSHOT, which busy_timeout cannot repair. This no-op also works
+	// for creation (no matching row) and rolls back on failed guards.
+	if _, e = tx.Exec("UPDATE works SET revision=revision WHERE id=?", id); e != nil {
+		return w, e
+	}
+
 	var oldID, oldKind string
 	var oldRequest []byte
 	e = tx.QueryRow("SELECT work_id,kind,request FROM events WHERE id=?", event).Scan(&oldID, &oldKind, &oldRequest)
@@ -442,7 +570,16 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 			return w, e
 		}
 		if w.Planning != nil && r.editsDefinition() {
-			return w, fmt.Errorf("contrat hiérarchique immuable ; créer une tâche de correction via le responsable")
+			if kind != "task.update" {
+				return w, fmt.Errorf("réviser explicitement le contrat via task update avant remise")
+			}
+			var paused bool
+			if e = tx.QueryRow("SELECT paused FROM cockpit_controls WHERE work_id=?", id).Scan(&paused); e != nil || !paused {
+				return w, fmt.Errorf("révision de contrat : mission doit être en pause publique")
+			}
+			if e = validateHierarchicalContractRevision(&w, r); e != nil {
+				return w, e
+			}
 		}
 		if r.Status == "running" {
 			if e = preparationLaunchGuard(tx, id, r.ID); e != nil {
@@ -468,7 +605,7 @@ func (s *Store) mutateWithHook(id, kind, event string, expected int, request []b
 	if e = fn(&w); e != nil {
 		return w, e
 	}
-	planningValidationSignals(&w, beforePlanning, event)
+	s.planningValidationSignals(&w, beforePlanning, kind, event)
 	if e = validatePlanningState(&w); e != nil {
 		return w, e
 	}
@@ -517,6 +654,10 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 		w.Objective = r.Objective
 		w.Scope = r.Scope
 		w.Criteria = r.Criteria
+		w.RequirementPrerequisites = r.RequirementPrerequisites
+		if e := validateRequirementPrerequisites(w); e != nil {
+			return e
+		}
 		w.Next = r.Next
 		w.Git = gitState(s.root)
 	case "task.add":
@@ -562,6 +703,9 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 			return &CommandError{Code: "invalid_transition", Message: fmt.Sprintf("transition refusée : %s → %s", t.Status, r.Status)}
 		}
 		if r.Status == "running" || r.Status == "accepted" {
+			if e := s.requirementPrerequisiteGuard(w, t); e != nil {
+				return e
+			}
 			for _, dep := range t.Depends {
 				d, _ := w.task(dep)
 				if !s.acceptedFresh(w, d, map[string]bool{}) {
@@ -594,6 +738,7 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 		if r.Status == "running" && t.Status != "running" {
 			t.Attempts = append(t.Attempts, Attempt{ID: newID("a-"), Status: "recorded", Started: now()})
 			t.Gate = nil
+			t.EvidenceStaleReason = ""
 			// Une correction est une nouvelle production : la décision et la
 			// preuve de la tentative précédente restent dans leur reçu, mais ne
 			// doivent plus apparaître comme la validation courante de la tâche.
@@ -604,6 +749,7 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 				t.Revalidation = &Revalidation{PreviousArtifacts: t.Gate.Evaluation.Artifacts, Config: t.Gate.Evaluation.ConfigDigest}
 			}
 			t.Gate = nil
+			t.EvidenceStaleReason = ""
 			t.Override = nil
 		}
 		t.Status = r.Status

@@ -219,3 +219,32 @@ func TestProviderAdminAuthenticationAndStrictImport(t *testing.T) {
 		}
 	}
 }
+
+func TestClaudePinned55Routes(t *testing.T) {
+	p := Provider{Command: "/fixture/claude", Args: []string{"-p", "--model", "sonnet"}}
+	p.ModelPolicy = effectiveModelPolicy(p)
+	p.ModelPolicy.Levels["standard"] = ModelChoice{Model: "claude-sonnet-5-5"}
+	p.ModelPolicy.Levels["exigeant"] = ModelChoice{Model: "claude-opus-5-5"}
+	if err := validateModelPolicy(p, p.ModelPolicy); err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct{ level, model string }{{"standard", "claude-sonnet-5-5"}, {"exigeant", "claude-opus-5-5"}} {
+		got, route, err := resolveModel(p, tc.level, "work")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if route.Model != tc.model || configuredModel(got) != tc.model {
+			t.Fatalf("route not pinned: %+v %+v", route, got.Args)
+		}
+	}
+	for _, level := range []string{"simple", "standard"} {
+		p.ModelPolicy.Levels[level] = ModelChoice{Model: "claude-opus-5-5"}
+		if err := validateModelPolicy(p, p.ModelPolicy); err == nil {
+			t.Fatal("pinned Opus accepted outside explicit demanding level")
+		}
+		if _, _, err := resolveModel(p, level, "work"); err == nil {
+			t.Fatal("pinned Opus routed outside explicit demanding level")
+		}
+		p.ModelPolicy.Levels[level] = ModelChoice{Model: "sonnet"}
+	}
+}

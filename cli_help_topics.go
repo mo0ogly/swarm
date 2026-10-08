@@ -7,6 +7,7 @@ import (
 )
 
 var cliHelpTopics = map[string]string{
+	"brouillons": graphDraftCLIHelpSource,
 	"planification": `CONFIER UN BESOIN À UNE ÉQUIPE
 Sur une mission vide : swarm planning enable TRAVAIL --input activation.json.
 L’activation fixe le fournisseur, les limites, le dépôt Git et les contrôles par
@@ -133,7 +134,7 @@ Le terminal propose ses propres dialogues et raccourcis : la parité UX n’est 
 
 func cliTopicHelp(topic string) (string, error) {
 	topic = strings.ToLower(strings.TrimSpace(topic))
-	aliases := map[string]string{"planning": "planification", "management": "pilotage", "tasks": "taches", "validation": "validations", "lifecycle": "cycle-vie", "logs": "journaux", "context": "contexte", "parity": "parite"}
+	aliases := map[string]string{"planning": "planification", "draft": "brouillons", "drafts": "brouillons", "management": "pilotage", "tasks": "taches", "validation": "validations", "lifecycle": "cycle-vie", "logs": "journaux", "context": "contexte", "parity": "parite"}
 	if target, ok := aliases[topic]; ok {
 		topic = target
 	}
@@ -148,6 +149,9 @@ func cliTopicHelp(topic string) (string, error) {
 	text, ok := cliHelpTopics[topic]
 	if !ok {
 		return "", fmt.Errorf("sujet d’aide inconnu : %s ; swarm aide liste les sujets", topic)
+	}
+	if topic == "brouillons" {
+		return graphDraftCLIHelp(), nil
 	}
 	return uiText(text) + "\n", nil
 }

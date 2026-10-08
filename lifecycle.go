@@ -613,7 +613,15 @@ func lifecycleSpecs(tx *sql.Tx, work string) ([]lifecycleSpec, error) {
 	prepWhere, prepArgs := inClause("preparation_id", preps)
 	turnWhere := "preparation_id IN (SELECT id FROM preparations WHERE work_id=?)"
 	return []lifecycleSpec{
-		{"works", "id=?", []any{work}}, {"events", "work_id=?", []any{work}},
+		{"works", "id=?", []any{work}},
+		{"automation_requests", "target_work_id=?", []any{work}},
+		{"automation_occurrences", "request_id IN (SELECT request_id FROM automation_requests WHERE target_work_id=?)", []any{work}},
+		{"automation_effects", "target_work_id=?", []any{work}},
+		{"automation_schedules", "target_work_id=?", []any{work}},
+		{"automation_schedule_journal", "schedule_id IN (SELECT schedule_id FROM automation_schedules WHERE target_work_id=?)", []any{work}},
+		{"automation_request_origins", "request_id IN (SELECT request_id FROM automation_requests WHERE target_work_id=?)", []any{work}},
+		{"automation_causal_recoveries", "request_id IN (SELECT request_id FROM automation_requests WHERE target_work_id=?)", []any{work}},
+		{"events", "work_id=?", []any{work}},
 		{"agents", "work_id=?", []any{work}}, {"agent_logs", agentWhere, agentArgs},
 		{"terminal_events", agentWhere, agentArgs}, {"agent_dialogue_turns", agentWhere, agentArgs},
 		{"cockpit_events", "work_id=?", []any{work}}, {"cockpit_controls", "work_id=?", []any{work}},
@@ -802,7 +810,7 @@ func restoreTable(tx *sql.Tx, table lifecycleTable) error {
 		return nil
 	}
 	allowed := map[string]bool{}
-	for _, spec := range []string{"works", "events", "agents", "agent_logs", "terminal_events", "agent_dialogue_turns", "cockpit_events", "cockpit_controls", "cockpit_tasks", "decisions", "session_visits", "budgets", "reservations", "assist_turns", "assist_previews", "assist_reservations", "mission_supervision", "mission_coordination_events", "agent_exchanges", "exchange_acknowledgements", "workspace_turns", "workspace_integrations", "planning_calls", "managed_attempts", "preparations", "preparation_documents", "preparation_commands", "preparation_turns", "preparation_reservations", "preparation_launch_locks", "mission_lifecycle"} {
+	for _, spec := range []string{"works", "automation_requests", "automation_occurrences", "automation_effects", "automation_schedules", "automation_schedule_journal", "automation_request_origins", "automation_causal_recoveries", "events", "agents", "agent_logs", "terminal_events", "agent_dialogue_turns", "cockpit_events", "cockpit_controls", "cockpit_tasks", "decisions", "session_visits", "budgets", "reservations", "assist_turns", "assist_previews", "assist_reservations", "mission_supervision", "mission_coordination_events", "agent_exchanges", "exchange_acknowledgements", "workspace_turns", "workspace_integrations", "planning_calls", "managed_attempts", "preparations", "preparation_documents", "preparation_commands", "preparation_turns", "preparation_reservations", "preparation_launch_locks", "mission_lifecycle"} {
 		allowed[spec] = true
 	}
 	if !allowed[table.Name] {

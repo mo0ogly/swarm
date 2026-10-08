@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit PDCA"
+  short_description: "Audit reliability with reproducible evidence"
+  default_prompt: "Use $audit-pdca to audit Swarm coordination and report evidence, gaps and priorities."

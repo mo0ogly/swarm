@@ -22,6 +22,6 @@ const AgentTerminal={
   const button=node('button',tr_web_agent_terminal_js('Fermer la vue'));button.type='button';button.addEventListener('click',e=>{if(e.isTrusted)close()});
   dialog.addEventListener('cancel',e=>{e.preventDefault();close()});
   const details=node('button',tr_web_agent_terminal_js('Détails et validation'));details.type='button';details.id='agent-terminal-details';details.addEventListener('click',e=>{if(!e.isTrusted)return;close();if(work!==a.work_id){notice(tr_web_agent_terminal_js('Revenez au travail de cette session pour examiner sa validation.'),true);return}Pilot.state.selection={kind:'agent',id:a.id};Pilot.inspectorKey='';Pilot.save();PilotInspector.render(true)});
-  const actions=node('div',undefined,'agent-terminal-actions');actions.append(details,button);header.append(title,actions);dialog.append(header,frame);document.body.append(dialog);window.addEventListener('message',message);observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});dialog.showModal();button.focus();
+  const actions=node('div',undefined,'agent-terminal-actions');actions.append(details,button);header.append(title,ProjectProfiles.badge(a.workflow),actions);dialog.append(header,frame);document.body.append(dialog);window.addEventListener('message',message);observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});dialog.showModal();button.focus();
  }
 };

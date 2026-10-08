@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code review"
+  short_description: "Review correctness, isolation and recovery"
+  default_prompt: "Use $code-reviewer to review this candidate for actionable defects and evidence gaps."

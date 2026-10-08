@@ -26,6 +26,9 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 	if !r.editsDefinition() {
 		return nil
 	}
+	if t.IndependentReview != nil && t.IndependentReview.State == "running" {
+		return fmt.Errorf("terminer la vérification en cours avant de modifier le contrat")
+	}
 	if (t.Status != "todo" && t.Status != "blocked") || (r.Status != "" && r.Status != t.Status) {
 		return fmt.Errorf("modifier le contrat exige une tâche todo ou blocked, sans transition simultanée ; rouvrir la tâche au préalable")
 	}
@@ -126,6 +129,9 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 	if next.Title == t.Title && next.Deliverable == t.Deliverable && reflect.DeepEqual(next.Criteria, t.Criteria) && reflect.DeepEqual(next.Depends, t.Depends) && next.PlanMaxAttempts == t.PlanMaxAttempts && next.PlanToolLimit == t.PlanToolLimit && reflect.DeepEqual(next.ValidationPolicy, t.ValidationPolicy) {
 		return nil
 	}
+	if reviewContract(&next) != reviewContract(t) {
+		archiveIndependentReview(&next)
+	}
 	next.Gate = nil
 	next.AutoValidation = nil
 	next.Override = nil
@@ -143,5 +149,36 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 		}
 	}
 	*t = next
+	return nil
+}
+
+// A confirmed operator amendment repairs a blocked acceptance contract without
+// changing ownership, dependencies, attempts, budgets or global requirements.
+func validateHierarchicalContractRevision(w *Work, r Request) error {
+	if !r.ConfirmContractRevision || len(strings.TrimSpace(r.ContractRevisionReason)) < 16 || len(r.ContractRevisionReason) > 2000 {
+		return fmt.Errorf("contrat hiérarchique immuable par défaut ; confirmation et motif explicites requis")
+	}
+	if w.Planning.Repository != nil {
+		return fmt.Errorf("révision de contrat géré non prise en charge")
+	}
+	t, err := w.task(r.ID)
+	if err != nil {
+		return err
+	}
+	if t.Status != "blocked" || r.Status != "" || t.ScopeID == "" || r.ExpectedContract != reviewContract(t) {
+		return fmt.Errorf("révision exige tâche bloquée et empreinte courante du contrat, sans transition")
+	}
+	if r.Criteria == nil || len(r.Criteria) != len(t.Criteria) || r.Title != "" || r.Deliverable != "" || r.Depends != nil || r.MaxAttempts != 0 || r.MaxToolCalls != 0 || r.ValidationPolicy != nil {
+		return fmt.Errorf("révision limitée aux critères existants ; identité, dépendances et budgets inchangés")
+	}
+	scope, err := w.Planning.scope(t.ScopeID)
+	if err != nil || scope.State == "closed" {
+		return fmt.Errorf("périmètre absent ou clos")
+	}
+	for _, task := range w.Tasks {
+		if task.IndependentReview != nil && task.IndependentReview.State == "running" {
+			return fmt.Errorf("terminer toutes les revues avant révision du contrat")
+		}
+	}
 	return nil
 }

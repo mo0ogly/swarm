@@ -23,6 +23,7 @@ import (
 var cockpitWeb embed.FS
 
 type webRequest struct {
+	Skills               []ActionSkillSelection `json:"skills,omitempty"`
 	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
 	Turn                 string                 `json:"turn,omitempty"`
 	Step                 int                    `json:"step,omitempty"`
@@ -54,6 +55,9 @@ type webRequest struct {
 	Author               string                 `json:"author"`
 	Decision             string                 `json:"decision"`
 	Request              Request                `json:"request"`
+	RoleModel            RoleModelRequest       `json:"role_model"`
+	TaskModel            TaskModelRequest       `json:"task_model"`
+	Quotas               QuotaChange            `json:"quotas"`
 	Budget               Budget                 `json:"budget"`
 	ValidationPolicy     ValidationPolicyChange `json:"validation_policy,omitempty"`
 	Autonomy             string                 `json:"autonomy,omitempty"`
@@ -63,6 +67,44 @@ type webRequest struct {
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Kind == "role-model-preview" || r.Kind == "role-model" {
+		q := r.RoleModel
+		q.Schema = 1
+		q.Revision = r.Revision
+		q.EventID = r.Event
+		if r.Kind == "role-model-preview" {
+			return s.previewRoleModel(r.Work, q)
+		}
+		return s.configureRoleModel(r.Work, q)
+	}
+	if r.Kind == "task-model-preview" || r.Kind == "task-model" {
+		q := r.TaskModel
+		q.Schema = 1
+		q.Revision = r.Revision
+		q.EventID = r.Event
+		q.Task = r.Task
+		if r.Kind == "task-model-preview" {
+			return s.previewTaskModel(r.Work, q)
+		}
+		return s.configureTaskModel(r.Work, q)
+	}
+	if r.Kind == "quotas-preview" || r.Kind == "quotas" {
+		q := r.Quotas
+		q.Schema = 1
+		q.EventID = r.Event
+		q.Revision = r.Revision
+		if r.Kind == "quotas-preview" {
+			return s.previewQuotas(r.Work, q)
+		}
+		return s.configureQuotas(r.Work, q)
+	}
+	if r.Kind == "budget" || r.Kind == "budget-preview" {
+		change := BudgetChange{Schema: 1, EventID: r.Event, Revision: r.Revision, Budget: r.Budget}
+		if r.Kind == "budget-preview" {
+			return s.previewBudget(r.Work, change)
+		}
+		return s.configureBudget(r.Work, change)
+	}
 	if r.Kind == "lifecycle-preview" || r.Kind == "lifecycle-apply" {
 		request := LifecycleRequest{Schema: 1, EventID: r.Event, Revision: r.Revision, Action: r.LifecycleAction, RetentionDays: r.RetentionDays, PreviewToken: r.PreviewToken}
 		if r.Kind == "lifecycle-preview" {
@@ -153,8 +195,15 @@ func (s *Store) webAction(r webRequest) (any, error) {
 	if r.Kind == "launch-preview" {
 		return s.launchEligibility(r), nil
 	}
+	if r.Kind == "resume-launch" {
+		a, created, e := s.resumePreparedLaunch(r.Work, r.Agent, r.Revision)
+		if e == nil && (created || a.Status == "queued") {
+			e = s.spawnAgent(a)
+		}
+		return a, e
+	}
 	if r.Kind == "preflight" {
-		result, _ := s.preflightLaunch(r.Work, Launch{Mode: r.Mode, Level: r.Level, Provider: r.Provider, Workspace: r.Workspace})
+		result, _ := s.preflightLaunch(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Level: r.Level, Provider: r.Provider, Workspace: r.Workspace})
 		return result, nil
 	}
 	if r.Kind == "plan-read" {
@@ -191,7 +240,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Kind == "brainstorm" && r.ContextHash == "" {
 			return nil, fmt.Errorf("Examiner le contexte avant envoi.")
 		}
-		a, created, e := s.prepare(r.Work, Launch{Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+		a, created, e := s.prepare(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
 		if e != nil {
 			return nil, e
 		}
@@ -213,7 +262,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Level == "" && a.ModelRoute != nil {
 			r.Level = a.ModelRoute.Level
 		}
-		next, created, e := s.prepare(r.Work, Launch{PreconditionEvidence: r.PreconditionEvidence, Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
+		next, created, e := s.prepare(r.Work, Launch{Skills: r.Skills, PreconditionEvidence: r.PreconditionEvidence, Mode: a.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: a.TaskID, Provider: a.Provider, Role: a.Role, Workspace: a.CWD, Instruction: r.Instruction, Previous: a.ID, Parent: a.Parent, Capture: r.Capture})
 		if e == nil && created {
 			e = s.spawnAgent(next)
 		}
@@ -269,8 +318,6 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		e = s.overrideReviewedTaskAt(r.Work, r.Task, r.Note, r.Revision)
 	case "decision":
 		e = s.resolveDecision(r.Work, r.Decision, operatorIdentity(), r.Note)
-	case "budget":
-		e = s.setBudget(r.Work, r.Budget)
 	case "pause":
 		e = s.pause(r.Work, true)
 	case "unpause":
@@ -327,16 +374,37 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	fail := func(w http.ResponseWriter, e error) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		status := 400
-		if commandFailure(e).Code == "revision_conflict" {
+		code := commandFailure(e).Code
+		if code == "revision_conflict" || code == "preview_stale" || code == "active_scope_conflict" || code == "event_conflict" || code == "draft_conflict" || code == "already_applied" {
 			status = 409
 		}
+		if code == "authorization_required" {
+			status = http.StatusForbidden
+		}
+		if code == "unknown_work" || code == "unknown_task" {
+			status = http.StatusNotFound
+		}
+		if code == "storage_unavailable" {
+			status = http.StatusInsufficientStorage
+		}
 		w.WriteHeader(status)
-		send(w, map[string]any{"error": e.Error(), "failure": commandFailure(e)})
+		send(w, map[string]any{"error": commandFailure(e).Message, "failure": commandFailure(e)})
 	}
 	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
+	s.registerRunLimitsAdmin(mux, send, fail)
+	registerGraphDraftHTTP(s, mux, send, fail)
+	registerAutomationHTTP(s, mux, send, fail)
+	registerAutomationExternalHTTP(s, mux, time.Now)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
+	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		send(w, s.runtimeHealth())
+	})
 	mux.HandleFunc("/api/v1/works", func(w http.ResponseWriter, r *http.Request) {
 		v, e := s.list()
 		if e != nil {
@@ -432,6 +500,18 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		desired, _ := s.desired(a.ID)
 		send(w, map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())})
 	})
+	mux.HandleFunc("/api/v1/recovery-preview", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		p, e := s.recoveryPreview(r.URL.Query().Get("work"), r.URL.Query().Get("task"), r.URL.Query().Get("agent"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, p)
+	})
 	mux.HandleFunc("/api/v1/task", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
 		id := r.URL.Query().Get("task")
@@ -451,7 +531,8 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			fail(w, e)
 			return
 		}
-		send(w, map[string]any{"revision": ww.Revision, "task": t, "reports": s.taskReports(id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
+		validation := s.validationState(&ww).Tasks[id]
+		send(w, map[string]any{"revision": ww.Revision, "task": t, "evidence": validation.Evidence, "reports": s.taskReportsForWork(work, id), "gates": s.gateFiles(id), "review": s.reviewText(work, d), "actions": s.taskActions(&ww, t, agents)})
 	})
 	mux.HandleFunc("/api/v1/report", func(w http.ResponseWriter, r *http.Request) {
 		p, e := safeReport(s.root, r.URL.Query().Get("path"))
@@ -459,9 +540,9 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			fail(w, e)
 			return
 		}
-		// Only project documentation is readable through this endpoint.
-		rel, err := filepath.Rel(filepath.Join(s.root, "docs"), p)
-		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		// Managed reports live outside docs. Read only the report attributed to
+		// the selected task, never arbitrary files from the private runtime.
+		if !s.readableTaskReport(r.URL.Query().Get("work"), r.URL.Query().Get("task"), p) {
 			http.Error(w, "Rapport hors documentation", 403)
 			return
 		}
@@ -752,6 +833,10 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 		if r.Host != host {
 			http.Error(w, "Hôte refusé", 403)
+			return
+		}
+		if r.URL.Path == automationExternalPath {
+			mux.ServeHTTP(w, r)
 			return
 		}
 		if strings.HasPrefix(r.URL.Path, "/session/") {

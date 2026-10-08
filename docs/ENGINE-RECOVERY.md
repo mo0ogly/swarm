@@ -1,0 +1,326 @@
+# Reprendre un lancement et contrôler une livraison incomplète
+
+[English](en/ENGINE-RECOVERY.md) · [Guide utilisateur](../GUIDE-UTILISATEUR.md)
+
+## Ce que le moteur distingue
+
+Une copie de travail préparée n’est pas encore un agent enregistré. Un processus
+terminé n’est pas un résultat accepté. Une déclaration de couverture ne remplace
+ni les contrôles exécutés ni l’avis indépendant.
+
+### Lancement interrompu après la création de sa copie
+
+Pour les nouveaux lancements dans un dépôt géré, le moteur conserve une opération
+identifiée : tâche, copie, base Git, fournisseur, consigne et paramètres de lancement.
+Si l’enregistrement de l’agent échoue, la transaction ne consomme pas de tentative.
+La copie reste attribuée à l’opération initiale, même après redémarrage du serveur.
+Le moteur retrouve aussi le fichier d’attribution lorsque l’interruption précède
+son enregistrement SQLite.
+
+Les erreurs SQLite BUSY/LOCKED peuvent entraîner deux nouvelles tentatives
+**d’enregistrement**, avec la même identité (trois essais au total). Elles ne lancent
+aucun fournisseur. Si la préparation reste en attente, le conducteur ne répète pas
+le lancement à chaque passage : une reprise explicite est présentée.
+
+Dans le **Pilotage des agents**, ouvrir la tâche puis choisir **Reprendre le
+lancement préparé**. La modale expose la copie et les réglages conservés, une aide,
+et une confirmation. Annuler ou Échap ne modifie pas la tâche. L’action existe
+aussi dans le menu interactif du terminal.
+
+Le CLI utilise la même opération et les mêmes gardes :
+
+```sh
+swarm --root /chemin/projet agent prepared IDENTIFIANT_TRAVAIL
+swarm --root /chemin/projet agent resume-launch IDENTIFIANT_TRAVAIL --input reprise.json
+```
+
+```json
+{
+  "schema_version": 1,
+  "prepared_id": "identifiant_retourne_par_agent_prepared",
+  "expected_revision": 42
+}
+```
+
+La révision doit être celle retournée par `agent prepared`. Une confirmation
+répétée retrouve l’agent initial. Si son superviseur n’a pas encore pris en charge
+la demande, la reprise peut le solliciter : une prise en charge atomique empêche
+le démarrage de deux fournisseurs pour cet agent.
+
+Les critères, consignes, budgets de tâche et base Git ne doivent pas avoir changé.
+Les dépendances, budgets, organisation, fournisseur et disponibilité sont revérifiés
+au départ. Une copie non attribuée, redirigée ou incohérente reste refusée ; elle
+n’est jamais écrasée pour « débloquer ». Les anciennes préparations sans paramètres
+sauvegardés nécessitent la demande initiale identifiée : le moteur n’invente pas
+les réglages manquants.
+
+## Bilan de livraison avant la revue
+
+Un nouvel exécutant automatisé dans un dépôt géré reçoit un modèle de fichier
+`docs/IDENTIFIANT_TACHE.delivery.json`, à produire avec son rapport Markdown.
+Le fichier doit être inclus dans la révision Git remise. Pour un projet dans un
+sous-dossier du dépôt, `docs/` se rapporte au dossier du projet ; les références
+`evidence` se rapportent à la racine Git.
+
+```json
+{
+  "version": 1,
+  "task": "tache-exemple",
+  "attempt": "identifiant_fourni_par_le_moteur",
+  "contract": "empreinte_fournie_par_le_moteur",
+  "outcome": "complete",
+  "criteria": [
+    {
+      "index": 1,
+      "status": "pass",
+      "reason": "Comportement observé et limites de la vérification",
+      "controls": ["controle_autorise_pour_ce_critere"],
+      "evidence": ["tests/preuve_test.go", "docs/tache-exemple.md"]
+    }
+  ]
+}
+```
+
+Un élément est requis pour chaque critère, sans doublon. La tentative et le
+contrat doivent correspondre. Les contrôles référencés doivent être préautorisés
+pour ce critère, et les fichiers de preuve doivent exister comme fichiers ordinaires
+dans la révision examinée. Liens symboliques et chemins sortant du dépôt sont refusés.
+Le bilan est limité à 32 Kio, sans troncature.
+
+Si une obligation n’a pas été testée, déclarer `not_tested` ; si elle a échoué,
+`fail`. `not_applicable` exige une justification et conserve ici un résultat à
+examiner : cette déclaration ne supprime pas un critère. `outcome` vaut `partial`
+ou `blocked` tant que toutes les obligations ne sont pas démontrées.
+
+Un bilan absent, invalide, partiel ou mal attribué produit **Résultat à compléter**.
+La copie et le rapport sont conservés, le candidat publié reste inchangé, et aucun
+appel de revue n’est consommé. Le responsable reçoit un événement d’intégration
+refusée avec son motif. Toute correction reste soumise aux tentatives autorisées.
+
+Dans le détail de la tâche, **Rapports et preuves de la tâche** permet d’ouvrir
+le rapport conservé, y compris après une revue refusée. Le CLI interactif propose
+le même rapport par l’action de lecture. Le lecteur web exige l’attribution au
+travail et à la tâche pour les fichiers internes ; il ne donne pas accès aux autres
+fichiers du moteur. Un rapport de revue modifié depuis son enregistrement n’est
+pas présenté comme la preuve courante.
+
+La synthèse IA reçoit aussi l’état actuel de la revue et le nombre de tentatives
+consommées. Ces faits du moteur priment sur les annonces historiques du rapport.
+Son schéma impose deux lignes courtes ; une réponse non conforme reste refusée,
+sans masquer le rapport ni produire une validation.
+
+Un bilan complet autorise la suite des contrôles ; il n’accepte jamais la tâche.
+Le moteur exécute les commandes autorisées, puis transmet au vérificateur le
+candidat, les reçus, le rapport, les sources disponibles et le bilan. Le vérificateur
+doit respecter les critères exacts : un audit peut prouver qu’un code préexistant
+convient ; l’absence de modification n’est pas, à elle seule, un défaut. Une preuve
+manquante ou un contrat ambigu doit être distingué d’un défaut démontré.
+
+## Limites et compatibilité
+
+- Le contrôle de structure ne juge pas la suffisance sémantique d’une preuve.
+  Un critère qui regroupe dix obligations peut toujours être mal couvert par un
+  seul test. La qualité du plan et de la revue reste déterminante.
+- La consigne au vérificateur améliore son cadrage ; elle ne garantit pas chaque
+  jugement d’un modèle. Les tests déterministes vérifient le protocole, pas cette qualité.
+- L’obligation du bilan concerne les nouveaux exécutants automatisés gérés.
+  Les tentatives historiques et les modes interactifs ne deviennent pas rétroactivement
+  non conformes. Un bilan présent est néanmoins contrôlé.
+- Aucun budget n’est remboursé, aucun plafond augmenté, aucune ancienne décision
+  de revue changée par ces mécanismes. Une mission au plafond reste bloquée.
+
+## Décisions et vérification
+
+La reprise conserve une identité et exige une confirmation après l’échec persistant.
+L’adoption automatique d’une copie par une nouvelle demande a été écartée : elle
+mélangerait consignes, attribution et fichiers. Le contrôle utilise un bilan structuré
+au lieu de rechercher des mots comme « partiel » dans un rapport libre ; il conserve
+la revue indépendante pour l’analyse du fond.
+
+Tests de référence : `managed_preparation_test.go`, `managed_delivery_test.go`,
+`result_presentation_test.go`, `tests/managed_recovery_ui.cjs`. La recette navigateur
+utilise un fournisseur déterministe réellement lancé, dans une racine temporaire :
+elle ne démontre pas une mission autonome réussie avec une IA réelle.
+
+```sh
+go test ./...
+go vet ./...
+go test -race -run '^TestManaged(PreparedLaunch|Delivery|CompleteDelivery)' .
+npm test
+# Après construction du binaire ; Puppeteer et Chrome doivent être disponibles.
+SWARM_RECOVERY_UI_BINARY=/chemin/absolu/swarm \
+SWARM_RECOVERY_UI_OUT=/chemin/absolu/recette \
+go test -run '^TestManagedRecoveryBrowserRecipe$' -count=1 -v .
+```
+
+### Avis favorable enregistré, publication interrompue
+
+Une réparation externe explicitement soumise peut avoir passé la revue après un
+ancien refus de taille, puis rencontrer une erreur de stockage lors de la
+publication. Rejouer exactement la même demande de réparation permet de reprendre
+cette publication : le moteur réutilise l'avis enregistré après revalidation du
+candidat, du contrat, du contexte et des reçus. Aucun nouvel appel IA ni producteur
+n'est créé. Un avis défavorable, une preuve modifiée ou une autre tentative ne
+bénéficie pas de cette reprise. Un avis favorable seul reste distinct d'une tâche
+acceptée ; vérifier l'état public après l'opération.
+
+La transaction finale réserve l'écriture SQLite avant de relire ses preuves.
+Cela évite qu'une écriture concurrente empêche ensuite de promouvoir une
+transaction de lecture en écriture. La réservation ne modifie aucune révision
+et est annulée si une garde échoue. Les commandes de contrôle et la revue IA
+restent hors de cette transaction. Un test avec deux connexions reproduit
+SQLITE_BUSY avant le correctif, puis vérifie la publication unique après.
+
+### Refus conservé et surveillance du conducteur
+
+Une intégration en état `conflict` conserve son diagnostic et ses preuves. Le
+conducteur ne la remet pas en traitement à chaque vérification : cela reprendrait
+inutilement le verrou Git partagé avec les nouveaux départs. Une intégration déjà
+publiée est également ignorée. Les opérations publiques de reprise explicite
+restent disponibles et conservent les vérifications, identités et budgets. Une
+réparation réarmée en état `integrating` reste reprise par le conducteur.
+
+### Diagnostic d’un contrôle Git refusé
+
+Lorsqu’un contrôle cumulatif échoue, le motif indique désormais un fichier local
+`.swarm/managed/<mission>/diagnostics/control-failure-*.json`. Il contient la
+commande, le code de sortie, les identités, le candidat testé et les octets de
+sortie (`output_base64`, encodage base64 JSON), avec leur empreinte. La sortie
+est bornée à 64 Kio ; `output_bytes` indique sa taille totale et `truncated`
+signale explicitement une capture partielle. Ce diagnostic peut contenir des
+informations du projet : il reste local et n’est pas envoyé automatiquement au
+vérificateur. Le candidat est conservé sous une référence Git privée
+`refs/swarm/failed-controls/<SHA>`. Il ne remplace jamais le candidat accepté.
+Ces artefacts facilitent l’examen ; ils ne justifient ni une acceptation, ni un
+nouvel essai automatique. Une conservation impossible reste un refus explicite.
+
+### Exploration avant un livrable
+
+Le moteur injecte des exemples de commandes bornées dans chaque nouvelle
+consigne d'exécution : vérifier l'existence d'un rapport facultatif avant `cat`,
+passer les motifs de fichiers entre guillemets à `rg --files`, distinguer le code
+1 de recherche vide du code 2 d'erreur. Les contrôles de validation conservent
+leur code de sortie réel ; aucun `|| true` généralisé n'est recommandé.
+Ce cadrage aide l'agent, mais ne garantit pas qu'il suivra la consigne. Le moteur
+ne transforme pas une commande échouée en succès et conserve tous les plafonds.
+Une reprise après arrêt requiert une correction explicite et une tentative disponible.
+
+### Citations ancrées dans les pièces de revue
+
+Pour une nouvelle inspection fragmentée, le moteur propose jusqu'à deux courts
+extraits exacts par pièce. Le schéma impose leurs numéros, pour éviter les
+restrictions du fournisseur sur les guillemets dans les valeurs textuelles. Le vérificateur choisit une
+ancre et conserve son jugement : pièce examinée, défaut démontré ou preuve
+manquante. Une ancre situe la pièce ; elle ne prouve pas sa conformité. Le contenu
+complet reste transmis et la décision finale demeure une étape distincte.
+
+Chaque résultat est lié à un index obligatoire et à l'empreinte du paquet entier.
+Les anciennes réponses restent lisibles avec leurs contrôles historiques ; aucune
+réponse refusée n'est convertie en preuve. Sans extrait utilisable, « examinée »
+est interdit. Le moteur contrôle la taille du contenu et du schéma avant de
+réserver un appel. Une reprise conserve les inspections acquises et les dépenses.
+Les clés compactes `v`, `r`, `e`, `n` du transport signifient verdict, raison,
+extrait et preuves nécessaires ; elles ne changent pas le vocabulaire utilisateur.
+
+Le découpage des nouveaux dossiers compte séparément le contenu, le schéma et
+la table des extraits, puis réserve l’espace des consignes. Le contrôle final
+de tous les envois précède toute dépense. Les anciens paquets restent lisibles ;
+une nouvelle règle de découpage ne réécrit pas leur journal.
+
+### Demander un diagnostic détaillé d’un refus fragmenté
+
+`planning diagnose-review TRAVAIL --input demande.json` consomme **un appel de
+revue dans le plafond existant** et conserve le refus. La demande contient
+`schema_version: 1`, `event_id`, `expected_revision`, `task_id`, `review_id`,
+`reason` et, éventuellement, `input_events` (jusqu’à huit chemins de sources du
+candidat immuable à fournir comme contexte). Elle exige un refus fragmenté durable.
+
+Le même vérificateur explique chaque constat : défaut confirmé avec citation,
+contexte nécessaire, ou défaut non reproduit, avec explication et scénario.
+Le résultat et son empreinte sont référencés dans l’événement
+`review.diagnostic.result`. Le fichier privé est placé près du journal de revue.
+Même une réponse « non reproduit » ne supprime pas le refus : ce diagnostic
+n’est jamais un avis favorable, une preuve d’acceptation ou une relance.
+Un rejeu du même événement ne consomme pas de nouvel appel. Une interruption
+conserve la réservation consommée ; elle ne déclenche aucune reprise automatique.
+
+### Sources de plusieurs tâches
+
+Chaque tâche peut déclarer jusqu’à 24 fichiers et 128 Kio de sources de contexte.
+La revue cumulative conserve l’union complète des sources, avec dédoublonnage :
+deux tâches de treize fichiers ne sont pas rejetées au motif que leur somme
+dépasse 24. Les limites restent contrôlées pour chaque tâche, puis pour chaque
+envoi du dossier fragmenté et pour son budget d’appels. Aucun fichier n’est omis.
+
+## Correction explicite après erreur du vérificateur
+`planning revise-recovered-result` accepte `confirm_review_error_repair: true`
+en plus de `confirm_recovery: true`, de la révision, du review_id courant, des
+identités agent/tentative, de l’arbre Git corrigé et du motif opérateur.
+Cette option autorise une nouvelle remise après une revue terminale `error`
+dont les preuves et la configuration sont intactes et sans appel réservé.
+Elle ne transforme pas l’erreur en refus démontré ou en avis favorable.
+L’arbre doit avoir changé ; contrôles, nouvelle revue et budgets restent exigés.
+Sans cette option, la règle historique du refus démontré reste applicable.
+
+### Repartir sur une tâche bloquée
+
+`swarm planning restart-task WORK --input request.json` (ou l'action HTTP
+`restart-task`) prépare une nouvelle production après une décision explicite de
+l'opérateur. Ce n'est pas une remise à zéro des coûts ni de l'historique.
+La requête contient `schema_version: 1`, `event_id`, `expected_revision`,
+`task_id`, `attempt_id` (la dernière tentative), `expected_candidate` (le SHA
+cumulatif de départ en dépôt Git géré, ou l’empreinte SHA-256 du livrable déclaré
+en dossier partagé), `confirm_recovery: true`, `reason` et une nouvelle
+`recovery_instruction`.
+
+Le moteur exige une tâche bloquée ayant épuisé son nombre de tentatives, un
+profil, un vérificateur configuré, aucun agent actif dans la mission et aucune
+revue en cours. Il autorise exactement une tentative supplémentaire, remet la
+tâche à faire et conserve les tentatives, avis et preuves historiques. Le
+prochain lancement géré utilise une nouvelle copie numérotée, issue du candidat
+cumulatif accepté ; il ne recycle pas la copie refusée. La décision ne lance
+pas elle-même de fournisseur. Dépendances, budgets de revue et contrôles de
+lancement continuent de s'appliquer. E1–E5 ne sont pas revalidées implicitement.
+Une répétition du même événement est idempotente ; une deuxième décision avant
+consommation de la tentative préparée est refusée.
+
+### Avis favorable devenu périmé
+
+L'action `planning requalify` accepte aussi un ancien avis `passed` qui ne
+satisfait plus le contrat courant. Fournir son `review_id` et
+`confirm_recovery: true`, en plus des identités habituelles (tâche, agent,
+tentative, résultat, candidat et révision). Un avis encore valide, un autre
+avis ou une confirmation absente sont refusés. L'ancien avis est archivé ; la
+tâche reste bloquée jusqu'aux nouveaux contrôles et à un nouveau verdict.
+Une ancienne production réparée peut être réexaminée si son résultat, son
+agent arrêté et sa tentative concordent. Aucun compteur n'est remis à zéro.
+
+## Reprise dans un dossier partagé
+
+Le redémarrage explicite décrit ci-dessus couvre également un dossier partagé.
+Le livrable examiné doit être accessible, inchangé et ne pas dépasser **48 000
+octets**. La fin du processus de la dernière tentative doit être confirmée.
+Un dépassement historique du nombre d’essais reste enregistré ; l’autorisation
+accorde un seul essai supplémentaire sans rembourser les coûts ni la revue.
+Le prochain lancement utilise le dossier partagé ; il ne crée pas de copie Git.
+
+## Refus de révision pendant un lancement concurrent
+
+Si deux demandes utilisent la même révision, la garde transactionnelle refuse
+la demande devenue périmée avec `revision_conflict` et `retryable: true`.
+Relisez le travail et les lancements préparés : si l’agent existe déjà, retrouvez
+cette opération. Ne recréez pas un départ pour contourner le refus. Le caractère
+réessayable autorise une reprise après relecture, pas une boucle aveugle.
+
+## Rapport trop grand pour le contexte de planification
+
+La limite du fichier et la place disponible dans une consigne sont distinctes.
+Le moteur réduit d’abord le lot à des événements entiers. Si un rapport seul
+ne tient toujours pas, il transmet un diagnostic explicite, **sans contenu du
+rapport et sans troncature**. Le fichier d’origine est conservé intégralement.
+
+Cette remise de diagnostic n’autorise aucune opération de production, reprise
+ou clôture. L’événement reste en attente jusqu’à une décision explicite sans
+opération qui l’acquitte. Examinez ensuite le fichier complet avant toute
+décision métier. Une clôture ultérieure vérifie toujours les validations
+actuelles de toutes les tâches ; l’acquittement n’accepte aucun résultat.

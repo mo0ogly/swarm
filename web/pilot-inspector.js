@@ -41,18 +41,18 @@ const PilotInspector={
   }
   const tid=selected.kind==='task'?selected.id:decision?.task_id||a?.task_id;
   const t=snapshot.work.tasks.find(t=>t.id===tid);
-  if(!a&&t&&selected.kind==='task')a=snapshot.agents.find(x=>x.agent.task_id===tid)?.agent;
+  if(!a&&t&&selected.kind==='task')a=snapshot.agents.find(x=>x.agent.id===(selected.agent_id||snapshot.pilotage?.tasks?.[tid]?.attempt?.agent_id))?.agent||Pilot.taskAgent(tid);
   const h=snapshot.pilotage?.health[a?.id]||(a&&this.loaded?.agent.id===a.id?this.loaded.health:null);
   const validation=snapshot.validation?.tasks[tid],uncertain=Pilot.uncertainExecution(t,a,h);
   const shown=PilotGraph.visible(snapshot.work.tasks,Pilot.state.collapsed);
   const masked=t&&(!shown.has(t.id)||!Pilot.matches(t,a));
-  const signature=JSON.stringify([work,selected,t,a?.progress,a?.status,a?.usage,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
+  const signature=JSON.stringify([work,selected,t,a?.progress,a?.status,a?.usage,a?.reported_model,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
   if(signature===Pilot.inspectorKey&&!open)return;Pilot.inspectorKey=signature;const token=++this.generation;
   const body=$('pilot-inspector-body'),focusKey=document.activeElement?.dataset.inspectorAction;
   const activityExpanded=body.querySelector('#pilot-activity-details')?.open===true;
   body.replaceChildren();
   $('pilot-inspector-title').textContent=decision?tr_web_pilot_inspector_js('Intervention à examiner'):t?.status==='submitted'?tr_web_pilot_inspector_js('Résultat à examiner')+(a?' — '+a.provider:''):a?'Agent '+a.provider:Pilot.taskTitle(t);
-  const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);
+  const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);if(a)mission.append(ProjectProfiles.badge(a.workflow));if(t&&typeof TaskModels!=='undefined')mission.append(node('p',TaskModels.text(t,a)),Pilot.command(tr_web_pilot_inspector_js('Modèle de la tâche'),()=>TaskModels.open(t.id)));
   if(!t&&!decision){body.append(node('p',tr_web_pilot_inspector_js('Élément supprimé ou indisponible. Aucune commande ne sera exécutée.'),'notice attention'));this.queueFooter(body);return}
   if(t){
    mission.append(node('h3',Pilot.taskTitle(t)));
@@ -78,9 +78,10 @@ const PilotInspector={
   if(a){
    body.append(this.action(['terminal','dialogue'].includes(a.mode)?tr_web_pilot_inspector_js('Ouvrir la session interactive'):tr_web_pilot_inspector_js('Voir la session de l’agent'),()=>AgentTerminal.open(a),'terminal'));
    const health=node('section',undefined,'pilot-section');health.id='pilot-current-activity';
-   health.append(node('h4',tr_web_pilot_inspector_js('Ce que fait cet agent')));
+   health.append(node('h4',tr_web_pilot_inspector_js('Rôle, processus, activité et validation')));
    const explanation=this.activityExplanation(a,h,uncertain);
-   health.append(node('p',explanation.state),node('p',explanation.operation),node('p',explanation.next));
+   const identity=snapshot.pilotage?.tasks?.[tid]?.attempt||{};
+   health.append(node('p',tr_web_pilot_inspector_js('Rôle déclaré : ')+(identity.role||tr_web_pilot_inspector_js('Rôle à préciser'))),node('p',tr_web_pilot_inspector_js('Processus : ')+explanation.state),node('p',tr_web_pilot_inspector_js('Activité : ')+explanation.operation),node('p',tr_web_pilot_inspector_js('Prochaine action : ')+explanation.next),node('p',tr_web_pilot_inspector_js('Validation : ')+(labels[validation?.state||t?.status]||tr_web_pilot_inspector_js('inconnue'))));
    if(t?.deliverable)health.append(node('p',tr_web_pilot_inspector_js('Résultat attendu : ')+t.deliverable));
    health.append(node('p',typeof a.usage?.provider_reported_cost_usd==='number'?tr_web_pilot_inspector_js('Coût de cette tentative : ')+a.usage.provider_reported_cost_usd.toFixed(2)+' USD':tr_web_pilot_inspector_js('Coût inconnu : le fournisseur n’a pas transmis de montant à Swarm.')));
    const details=node('details');details.id='pilot-activity-details';details.open=activityExpanded;
@@ -128,9 +129,11 @@ const PilotInspector={
   }
   this.queueFooter(body);
   const technical=node('details',undefined,'pilot-section');technical.append(node('summary',tr_web_pilot_inspector_js('Identifiants et détails techniques')));
-  for(const [name,value]of [[tr_web_pilot_inspector_js('Tâche'),t?.id],[tr_web_pilot_inspector_js('Session agent'),a?.id],[tr_web_pilot_inspector_js('Tentative métier'),a?.attempt_id],[tr_web_pilot_inspector_js('Espace de travail'),a?.workspace],[tr_web_pilot_inspector_js('Livrable attendu'),t?.deliverable]])if(value)technical.append(node('p',name+' : '+value));
+  const projectedAttempt=snapshot.pilotage?.tasks?.[tid]?.attempt||{};
+  for(const [name,value]of [[tr_web_pilot_inspector_js('Tâche'),t?.id],[tr_web_pilot_inspector_js('Session agent'),a?.id||projectedAttempt.agent_id],[tr_web_pilot_inspector_js('Tentative métier'),a?.attempt_id||projectedAttempt.attempt_id],[tr_web_pilot_inspector_js('Espace de travail'),a?.workspace],[tr_web_pilot_inspector_js('Livrable attendu'),t?.deliverable]])if(value)technical.append(node('p',name+' : '+value));
   body.append(technical);
-  if(focusKey)[...body.querySelectorAll('[data-inspector-action]')].find(n=>n.dataset.inspectorAction===focusKey)?.focus();
+  if(open)panel.scrollTop=0;
+  else if(focusKey)[...body.querySelectorAll('[data-inspector-action]')].find(n=>n.dataset.inspectorAction===focusKey)?.focus({preventScroll:true});
  },
  activityExplanation(a,h,uncertain=''){
   const progress=a.progress||{},detail=progress.detail||'',action=progress.action||'';
@@ -195,8 +198,8 @@ const PilotInspector={
    }
   }else{
    section.append(node('p',t.status==='blocked'?(t.blocker||tr_web_pilot_inspector_js('La tentative est arrêtée. Vous pouvez préparer une nouvelle exécution.')):tr_web_pilot_inspector_js('Choisissez une exécution pour cette tâche.')));
-   if(!add('retry',tr_web_pilot_inspector_js('Relancer cette tâche'),true))add('start',tr_web_pilot_inspector_js('Lancer cette tâche'),true);
-   const refusal=options.find(x=>x.kind==='retry'&&!x.disponible)||options.find(x=>x.kind==='start'&&!x.disponible);
+   if(!add('resume-launch',tr_web_pilot_inspector_js('Reprendre le lancement préparé'),true)&&!add('authorize-recovery',tr_web_pilot_inspector_js('Préparer un essai correctif'),true)&&!add('extend-attempt',tr_web_pilot_inspector_js('Autoriser une tentative supplémentaire'),true)&&!add('retry',tr_web_pilot_inspector_js('Relancer cette tâche'),true))add('start',tr_web_pilot_inspector_js('Lancer cette tâche'),true);
+   const refusal=options.find(x=>x.kind==='resume-launch'&&!x.disponible)||options.find(x=>x.kind==='retry'&&!x.disponible)||options.find(x=>x.kind==='start'&&!x.disponible);
    if(!section.querySelector('button')&&refusal?.raison)section.append(node('p',refusal.raison,'notice attention'));
   }
   const refreshButton=this.action(tr_web_pilot_inspector_js('Actualiser l’état'),async()=>{refreshButton.disabled=true;try{await refresh(true)}catch(e){notice(e.message,true)}finally{if(refreshButton.isConnected)refreshButton.disabled=false}},'recovery:refresh');section.append(refreshButton);
@@ -249,13 +252,13 @@ const PilotInspector={
  },
  async readReport(path,taskID){
   const selected=JSON.stringify(Pilot.state.selection),requested=work;
+  const selection=Pilot.state.selection;
+  taskID=taskID||(selection?.kind==='task'?selection.id:selection?.kind==='agent'?snapshot.agents.find(x=>x.agent.id===selection.id)?.agent.task_id:snapshot.decisions.find(x=>x.id===selection?.id)?.task_id);
   try{
-   const data=await api('/api/v1/report?'+new URLSearchParams({path}));
+   const data=await api('/api/v1/report?'+new URLSearchParams({path,work:requested,task:taskID||''}));
    if(work!==requested||JSON.stringify(Pilot.state.selection)!==selected)return;
    openModal(tr_web_pilot_inspector_js('Conclusions du rapport'),tr_web_pilot_inspector_js('Lisez les constats, les preuves et les limites avant de décider.'),{action:'help'});
    $('confirm').hidden=true;$('cancel').textContent=tr_web_pilot_inspector_js('Fermer le rapport');preview(data.text);
-   const selection=Pilot.state.selection;
-   taskID=taskID||(selection?.kind==='task'?selection.id:selection?.kind==='agent'?snapshot.agents.find(x=>x.agent.id===selection.id)?.agent.task_id:snapshot.decisions.find(x=>x.id===selection?.id)?.task_id);
    if(taskID){mountReportSummary(path,taskID);const task=snapshot.work.tasks.find(t=>t.id===taskID);if(task?.status==='submitted')$('modal-fields').append(this.reviewControls(task,null,false))}
   }catch(e){if(work!==requested||JSON.stringify(Pilot.state.selection)!==selected)return;const host=$('pilot-reports');host?.querySelector('.pilot-report-error')?.remove();const error=node('p',tr_web_pilot_inspector_js('Rapport inaccessible. Le fichier a pu être déplacé, supprimé ou son accès interrompu. Vérifiez sa disponibilité puis réessayez.'),'notice alert pilot-report-error');error.setAttribute('role','alert');host?.append(error);notice(error.textContent,true)}
  }

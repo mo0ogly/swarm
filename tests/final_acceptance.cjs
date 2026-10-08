@@ -1,0 +1,64 @@
+#!/usr/bin/env node
+'use strict';
+const fs=require('node:fs'),path=require('node:path');
+const {spawnSync}=require('node:child_process');
+const root=path.resolve(__dirname,'..');
+// "proofs" covers R1 — Fiabiliser les états des preuves: only evidence_projection.go
+// and evidence_contract_test.go. It must refuse to report success on zero executed
+// Go tests (a JSON test log with no run/pass record is not evidence of anything).
+// "git" covers R2 — Attribuer les preuves à la révision Git: the managed
+// integration receipt must carry the Git commit actually merged and tested
+// (managed_integration.go's commit-tree result), never a value equal to the
+// business revision counter, and it must stay "unknown" for a legacy receipt
+// recorded before this field existed. Required tests span the unit-level
+// evidence projection and the end-to-end managed integration path.
+const cases={
+ proofs:{dependencies:['go.mod','evidence_projection.go','evidence_contract_test.go'],pattern:'^TestEvidenceContract',
+  required:['TestEvidenceContractControlAggregationIsOrderIndependent','TestEvidenceContractReviewerConfiguredWithoutVerdictIsNotNotConfigured'],
+  message:'proofs acceptance: order-independent failed-priority aggregation, empty-list unknown, null exit_code on unknown history, and configured-reviewer-pending states verified\n'},
+ git:{dependencies:['go.mod','model.go','managed_integration.go','evidence_projection.go','evidence_contract_test.go','managed_git_test.go'],
+  pattern:'^(TestEvidenceContract.*|TestManagedIntegrationRecordsRealCandidateSHA|TestManagedIntegrationAtomicAndConflict|TestManagedFailedControlNeverPublishes)$',
+  required:['TestEvidenceContractCandidateSHADistinctFromRevisionAndUnknownForLegacy','TestManagedIntegrationRecordsRealCandidateSHA'],
+  message:'git acceptance: managed integration receipt carries the real tested candidate commit, distinct from the business revision and timestamps, unknown for legacy receipts, verified end to end\n'},
+ // "diagnostic" covers R3 — Expliquer la cause réelle du blocage: only
+ // managed_integration.go and managed_git_test.go. Once a report is already
+ // committed into the managed copy (state left "integrating" after a crash
+ // mid-integration), task.blocker must reflect the real cause — a failed
+ // control, a missing provider/quota, a ceiling suspension or a workspace
+ // lock — and never a stale "rapport absent" re-derived from the emptied
+ // ephemeral workspace.
+ diagnostic:{dependencies:['go.mod','managed_integration.go','managed_git_test.go'],
+  pattern:'^(TestManagedIntegrationTrustsReportAlreadyInManagedCopy|TestManagedIntegrationFailedControlOutranksMissingReport|TestManagedIntegrationMissingProviderOutranksMissingReport|TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport|TestManagedIntegrationWorkspaceLockOutranksMissingReport|TestManagedIntegrationAtomicAndConflict|TestManagedFailedControlNeverPublishes)$',
+  required:['TestManagedIntegrationTrustsReportAlreadyInManagedCopy','TestManagedIntegrationFailedControlOutranksMissingReport','TestManagedIntegrationMissingProviderOutranksMissingReport','TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport','TestManagedIntegrationWorkspaceLockOutranksMissingReport'],
+  message:'diagnostic acceptance: task.blocker priority fixed so intégration échouée outranks rapport absent once the report already exists in the managed copy, verified for a failed control, a missing provider/quota, a ceiling suspension and a workspace lock, without regressing the atomic/conflict and failed-control paths\n'},
+ // "planner" covers R4 — Reprendre le responsable sans boucle: only
+ // planning.go and planning_test.go. A requirement already confided to a
+ // blocked task must be resumed through "retry" on that task, never by
+ // spawning a fresh "task" op for the same requirement (unbounded new
+ // activations instead of converging). A stale attempt event (superseded by
+ // a later attempt) must be acknowledged by a no-operation decision before
+ // the current return is decided on, and a task that exhausted
+ // plan_max_attempts must stay refused, never loop indefinitely.
+ planner:{dependencies:['go.mod','planning.go','planning_test.go'],
+  pattern:'^(TestPlanningTaskForConfidedRequirementRefusedGuidingRetry|TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn)$',
+  required:['TestPlanningTaskForConfidedRequirementRefusedGuidingRetry','TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn'],
+  message:'planner acceptance: the responsable is guided to retry a blocked task instead of spawning a new one for the same requirement, stale attempt returns are acknowledged with a no-operation decision before current returns are decided, and retries stay bounded by plan_max_attempts, verified without regressing the existing hierarchical planning suite\n'},
+};
+function runAcceptance(selected,options={}){
+ const spec=cases[selected],projectRoot=options.root||root,exists=options.exists||fs.existsSync,out=options.stdout||process.stdout,err=options.stderr||process.stderr,spawn=options.spawnSync||spawnSync;
+ if(!spec){err.write(`unknown final acceptance case: ${selected}\n`);return 2}
+ for(const dependency of spec.dependencies)if(!exists(path.join(projectRoot,dependency))){err.write(`${selected} acceptance dependency missing: ${dependency}\n`);return 3}
+ const env={...process.env,...options.env};if(!env.TMPDIR)env.TMPDIR='/dev/shm';if(!env.GOTMPDIR)env.GOTMPDIR='/dev/shm';if(!env.GOCACHE)env.GOCACHE='/dev/shm/swarm-final-go-cache';fs.mkdirSync(env.GOCACHE,{recursive:true});
+ const go=spawn(options.goCommand||'go',['test','-json','-count=1','-run',spec.pattern,'.'],{cwd:projectRoot,env,encoding:'utf8',timeout:300000});out.write(go.stdout||'');err.write(go.stderr||'');
+ if(go.error&&go.status===null){err.write(`${selected} acceptance could not execute Go: ${go.error.message}\n`);return 4}
+ if(go.status!==0)return go.status??1;
+ const records=(go.stdout||'').split('\n').filter(Boolean).map(line=>{try{return JSON.parse(line)}catch{return null}}).filter(Boolean);
+ if(!records.some(record=>record.Action==='run'&&record.Test)||!records.some(record=>record.Action==='pass'&&!record.Test)){err.write(`${selected} acceptance produced no executed Go test success record\n`);return 5}
+ const passedTests=records.filter(record=>record.Action==='pass'&&record.Test).map(record=>record.Test);
+ for(const required of spec.required)
+  if(!passedTests.includes(required)){err.write(`${selected} acceptance missing required passing test: ${required}\n`);return 6}
+ out.write(spec.message);
+ return 0;
+}
+function main(argv=process.argv.slice(2)){const index=argv.indexOf('--case');if(index<0||!argv[index+1]){console.error('usage: node tests/final_acceptance.cjs --case proofs|git|diagnostic|planner');return 2}return runAcceptance(argv[index+1])}
+module.exports={runAcceptance,main};if(require.main===module)process.exitCode=main();

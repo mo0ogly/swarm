@@ -98,8 +98,8 @@ func modelOptions(p Provider) []ModelOption {
 			}
 		}
 	case "claude":
-		for _, id := range []string{"haiku", "sonnet", "opus"} {
-			out = append(out, ModelOption{ID: id, Efforts: []string{}, Source: "alias de la CLI Claude ; accès à tester"})
+		for _, id := range []string{"haiku", "sonnet", "opus", "claude-sonnet-5-5", "claude-opus-5-5"} {
+			out = append(out, ModelOption{ID: id, Efforts: []string{}, Source: "identifiant accepté par la CLI Claude ; accès à tester"})
 		}
 	}
 	current := configuredModel(p)
@@ -193,7 +193,7 @@ func validateModelPolicy(p Provider, policy *ModelPolicy) error {
 		if !effortOK {
 			return fmt.Errorf("Effort %s non annoncé pour %s.", choice.Effort, choice.Model)
 		}
-		if level != "exigeant" && (strings.Contains(choice.Model, "astra") || choice.Model == "opus") {
+		if level != "exigeant" && (strings.Contains(choice.Model, "astra") || (choice.Model == "opus" || strings.HasPrefix(choice.Model, "claude-opus-"))) {
 			return fmt.Errorf("Le modèle frontière %s est réservé au niveau exigeant explicite.", choice.Model)
 		}
 	}
@@ -244,7 +244,7 @@ func resolveModel(p Provider, level, purpose string) (Provider, *ModelRoute, err
 	if !available || !effortOK {
 		return p, nil, fmt.Errorf("Modèle ou effort indisponible dans le catalogue : %s / %s. Aucun repli automatique.", choice.Model, choice.Effort)
 	}
-	if level != "exigeant" && (strings.Contains(choice.Model, "astra") || choice.Model == "opus") {
+	if level != "exigeant" && (strings.Contains(choice.Model, "astra") || (choice.Model == "opus" || strings.HasPrefix(choice.Model, "claude-opus-"))) {
 		return p, nil, fmt.Errorf("Modèle frontière réservé au choix exigeant explicite.")
 	}
 	raw, _ := json.Marshal(policy)

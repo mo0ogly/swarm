@@ -1,0 +1,113 @@
+{
+  "date": "2026-09-26",
+  "source_base": "f46d89043ab0883c9b65eebba9942f07251c44ec",
+  "added_test_sha256": "fbb84595500ed4b12c839b7798b3228f977f4ed94213c042c9831a319ae8de06",
+  "scope": "Direct Codex verification; not an independent verdict or main mission acceptance",
+  "scenarios": [
+    {
+      "case": "launch",
+      "exit": 0,
+      "seconds": 3.728
+    },
+    {
+      "case": "ownership",
+      "exit": 0,
+      "seconds": 5.606
+    },
+    {
+      "case": "revision",
+      "exit": 0,
+      "seconds": 8.188
+    },
+    {
+      "case": "recovery",
+      "exit": 0,
+      "seconds": 6.74
+    },
+    {
+      "case": "truth",
+      "exit": 0,
+      "seconds": 14.703
+    },
+    {
+      "case": "real",
+      "exit": 0,
+      "seconds": 3.172
+    },
+    {
+      "case": "history",
+      "exit": 0,
+      "seconds": 9.923
+    },
+    {
+      "case": "delivery",
+      "exit": 0,
+      "seconds": 4.59,
+      "test_runs": 20
+    }
+  ],
+  "other_checks": [
+    {
+      "command": "npm test",
+      "exit": 0
+    },
+    {
+      "command": "go vet ./...",
+      "exit": 0
+    },
+    {
+      "command": "python3 tools/agent-workflows/check.py",
+      "exit": 0
+    },
+    {
+      "command": "go test ./...",
+      "exit": 0,
+      "seconds": 238.944
+    }
+  ],
+  "historical_artifacts": [
+    {
+      "artifact": "campaign.json",
+      "hash_matches": true
+    },
+    {
+      "artifact": "observed.json",
+      "hash_matches": true
+    },
+    {
+      "artifact": "result.json",
+      "hash_matches": true
+    },
+    {
+      "artifact": "completion-summary.json",
+      "hash_matches": true
+    },
+    {
+      "artifact": "cli.jsonl",
+      "hash_matches": true
+    },
+    {
+      "artifact": "run-started.json",
+      "hash_matches": true
+    }
+  ],
+  "review_calls_consumed": 38,
+  "review_calls_authorized": 49,
+  "main_mission_validated": 5,
+  "main_mission_total": 8,
+  "monetary_cost": null,
+  "raw_logs_location": "direct-takeover-20260926 outside repository",
+  "logs_sha256": {
+    "revision.log": "db7dcaabb1b81656d94a195447d4f8e98a3de4eb077ef6b7541895c24a3095de",
+    "frontend.log": "e36b90e7ff533e9cb521dab54b4e375e91ec33c817586b0a2d6e5be814c9f216",
+    "ownership.log": "cc91a9a6f54a8ca896b829a7321e3cd926f51bdfa7bc6530ee76435cc0ed5fe9",
+    "recovery.log": "1d005eb54f7ab8b2a47f2c8d7a9949be716b05e1ef1204f5bbda9a791e8452f1",
+    "truth.log": "3e06e96a2822c6083957a954f1273cc2fc4cbb0356f2ac06d760e10f75d7aa15",
+    "delivery.log": "c1816663d53629960880ba6098e4a470072c01d2f62db5c65de4690c6d16cf96",
+    "history.log": "2aeede2b5a45dffc5468be0d93a08d694b6b6df0debbd25f60dc2f6837e6c065",
+    "methods.log": "40f3d118472146f9ea5b683e64a0e96f959a86875272503e9658de780b7d30fe",
+    "launch.log": "90f548602c3a7d07489458a4a9b3df7776b3d33b79f72009d528c38670007f74",
+    "real.log": "0781312802a896b4de78289e6a3e151c77903d2b203874a0f05546c337fdb0ca",
+    "full.log": "d68bf4c3613532f50d95941907bbab9c4ef863c7906a55de9ccef2d6bce23e4b"
+  }
+}

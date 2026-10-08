@@ -9,14 +9,18 @@ import (
 
 // Derived on every read, never persisted as a substitute for checking the files.
 type TaskValidation struct {
-	State    string   `json:"state"`
-	Fresh    bool     `json:"fresh"`
-	Blockers []string `json:"blockers"`
-	Owner    string   `json:"owner"`
-	Next     string   `json:"next"`
+	State    string       `json:"state"`
+	Fresh    bool         `json:"fresh"`
+	Blockers []string     `json:"blockers"`
+	Owner    string       `json:"owner"`
+	Next     string       `json:"next"`
+	Evidence TaskEvidence `json:"evidence"`
 }
 type WorkValidation struct {
+	// State is a stable business code. Label is presentation text and may be
+	// localized by a CLI client; consumers must never branch on Label.
 	State      string                    `json:"state"`
+	Label      string                    `json:"label"`
 	Validated  int                       `json:"validated"`
 	Historical int                       `json:"historical"`
 	Stale      int                       `json:"stale"`
@@ -26,7 +30,8 @@ type WorkValidation struct {
 func (s *Store) validationState(w *Work) WorkValidation {
 	s = s.readScope()
 	v := WorkValidation{Tasks: map[string]TaskValidation{}}
-	v.State, _, _ = s.workStatus(*w)
+	v.State, _, _ = s.workStatusCode(*w)
+	v.Label = workStatusLabel(v.State)
 	memo := map[string]bool{}
 	digests := map[string]string{}
 	for i := range w.Tasks {
@@ -84,6 +89,7 @@ func (s *Store) validationState(w *Work) WorkValidation {
 		if len(x.Blockers) > 0 {
 			x.Next = "Rouvrir la tâche si elle est acceptée ; exécuter les contrôles affectés, soumettre un nouveau rapport et ses preuves, enregistrer la gate puis accepter après revue. Traiter les dépendances en premier."
 		}
+		x.Evidence = s.taskEvidence(w, t, x.Fresh)
 		v.Tasks[t.ID] = x
 	}
 	return v

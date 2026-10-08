@@ -51,7 +51,7 @@ if [ "$mode" = native ]; then
     bin_dir=$(cd -- "$bin_dir" && pwd -P)
     stage_file=$(mktemp "$bin_dir/.swarm-install.XXXXXXXX")
     trap 'rm -f -- "${stage_file:-}"' EXIT
-    (cd "$repo_dir" && CGO_ENABLED=0 go build -trimpath -o "$stage_file" .)
+    (cd "$repo_dir" && sh ./build.sh "$stage_file")
     chmod 755 "$stage_file"
     mv -f -- "$stage_file" "$bin_dir/swarm"
     if [ -n "$project_dir" ]; then "$bin_dir/swarm" --root "$project_dir" init; fi

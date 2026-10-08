@@ -1,0 +1,203 @@
+{
+  "attempt_id": "a-b455ca4bfd2338cc09d99801",
+  "revision": 40,
+  "candidate_sha": "",
+  "producer_agent_id": "eee438b9-6b15-4d8b-88d4-55194eb26b5b",
+  "controller": "controller://swarm-validation",
+  "policy_digest": "de418e4f0b74e0be6112dabf6e6434a3ec9f31dacb2c834ea925ecbb24f0b4d1",
+  "policy": {
+    "mode": "human",
+    "controls": [
+      {
+        "review_output": true,
+        "inputs": [
+          "web/cockpit.js",
+          "web/conduite.js",
+          "web/mission.js",
+          "web/planning.js",
+          "web/quotas.js",
+          "web/admin.js",
+          "web/i18n-en.js",
+          "locales/en.json",
+          "tests/qw5_resolve_blocking_limit_ui.cjs",
+          "tests/qw5_quota_entry_ui.cjs",
+          "docs/plans/budgets-preuves-effort/T2-candidate.json"
+        ],
+        "id": "qw5-build",
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "/tmp/swarm-qw5-candidate",
+          "."
+        ],
+        "criteria": [
+          1,
+          2,
+          3
+        ],
+        "justification": "Construire le binaire embarquant les fichiers courants li\u00e9s au re\u00e7u avant les recettes.",
+        "dir": ".",
+        "timeout_seconds": 120
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "web/cockpit.js",
+          "web/conduite.js",
+          "web/mission.js",
+          "web/planning.js",
+          "web/quotas.js",
+          "web/admin.js",
+          "web/i18n-en.js",
+          "locales/en.json",
+          "tests/qw5_resolve_blocking_limit_ui.cjs",
+          "tests/qw5_quota_entry_ui.cjs",
+          "docs/plan-01567e073c-T2.md",
+          "docs/plans/budgets-preuves-effort/T2-budget-result.json",
+          "docs/screenshots/qw5/T2-budget-en-etat.png",
+          "docs/screenshots/qw5/T2-budget-en-sombre.png",
+          "docs/screenshots/qw5/T2-budget-fr-etat.png",
+          "docs/screenshots/qw5/T2-budget-fr-sombre.png"
+        ],
+        "id": "qw5-budget",
+        "command": [
+          "node",
+          "tests/qw5_resolve_blocking_limit_ui.cjs",
+          "/tmp/swarm-qw5-candidate",
+          "/tmp/swarm-qw5-engine-budget"
+        ],
+        "criteria": [
+          1,
+          2,
+          3
+        ],
+        "justification": "Recette isol\u00e9e : entr\u00e9e au clavier, cible exacte, aper\u00e7u sans \u00e9criture, confirmation, parit\u00e9 CLI, conflits et FR/EN deux th\u00e8mes. \u00c9tats de blocage fournis par fixtures d\u00e9clar\u00e9es.",
+        "dir": ".",
+        "timeout_seconds": 60
+      },
+      {
+        "review_output": true,
+        "inputs": [
+          "web/cockpit.js",
+          "web/conduite.js",
+          "web/mission.js",
+          "web/planning.js",
+          "web/quotas.js",
+          "web/admin.js",
+          "web/i18n-en.js",
+          "locales/en.json",
+          "tests/qw5_resolve_blocking_limit_ui.cjs",
+          "tests/qw5_quota_entry_ui.cjs",
+          "docs/plan-01567e073c-T2.md",
+          "docs/plans/budgets-preuves-effort/T2-quotas-result.json",
+          "docs/screenshots/qw5/T2-quotas-quotas-fr-etat.png",
+          "docs/screenshots/qw5/T2-quotas-quotas-en-sombre.png",
+          "docs/screenshots/qw5/T2-quotas-quotas-en-etat.png",
+          "docs/screenshots/qw5/T2-quotas-quotas-fr-sombre.png"
+        ],
+        "id": "qw5-quotas",
+        "command": [
+          "node",
+          "tests/qw5_quota_entry_ui.cjs",
+          "/tmp/swarm-qw5-candidate",
+          "/tmp/swarm-qw5-engine-quotas"
+        ],
+        "criteria": [
+          1,
+          2,
+          3
+        ],
+        "justification": "Recette isol\u00e9e : entr\u00e9e au clavier, cible exacte, aper\u00e7u sans \u00e9criture, confirmation, parit\u00e9 CLI, conflits et FR/EN deux th\u00e8mes. \u00c9tats de blocage fournis par fixtures d\u00e9clar\u00e9es.",
+        "dir": ".",
+        "timeout_seconds": 60
+      }
+    ],
+    "authorized_at": "2026-10-04T08:12:02.823560151Z",
+    "actor": "fpizzi/uid:1001"
+  },
+  "artifacts": {
+    ".swarm/validation/w-01567e073c1ed2f3d4c71c9e/plan-01567e073c-T2/a-b455ca4bfd2338cc09d99801-receipt-c0a5e3b9f9565edcc2bbe3a9.json": "57d38648afaecc002070709d1ac705f27913477d9fca664472fd5efce362e394",
+    "docs/plan-01567e073c-T2.md": "5ce81f0734b81826199b7c58167b5d9d28d0662fbfa3d38b4a903aa5691d9945",
+    "docs/plans/budgets-preuves-effort/T2-budget-result.json": "29abdc8a5a07b63e308bb454f7b0914ddff0cc86d0b0407bd2a559b22c01afe2",
+    "docs/plans/budgets-preuves-effort/T2-candidate.json": "1f07513135e7b9c1a1d6dafa3c9c68a69bcc5f748c8881915a321da1837b1b70",
+    "docs/plans/budgets-preuves-effort/T2-quotas-result.json": "20b89009664bdd713516c9cbf2848a3febec1c9e2592a6dcceb6917c1f09a782",
+    "docs/screenshots/qw5/T2-budget-en-etat.png": "6176b4c8e4077082e7b979bb7c2a4b71b7c5ec376af1073af2e4b295d188c232",
+    "docs/screenshots/qw5/T2-budget-en-sombre.png": "a78d505d1e5a5d27d7c70aad7694703de9d8258bc8f78f2595b6076aed8e6e80",
+    "docs/screenshots/qw5/T2-budget-fr-etat.png": "8fb8d355786b95143854cabd18a5de3af04dcab64156b4bb5a0ff59b0e83fcb1",
+    "docs/screenshots/qw5/T2-budget-fr-sombre.png": "1cd59904f3597b48e52f4399ed38a801773bf3c75c238918445cbeca60dfd936",
+    "docs/screenshots/qw5/T2-quotas-quotas-en-etat.png": "ae6a31f73a76765efe021a02c1dce28879e8b93a94599b0738b70cdcacfb0865",
+    "docs/screenshots/qw5/T2-quotas-quotas-en-sombre.png": "4cc6ef1e96584a2bbd017b559698a86eb1f56cc221fa10b6ab34594d66de0512",
+    "docs/screenshots/qw5/T2-quotas-quotas-fr-etat.png": "224697a7ec4527f4c95a76811dbf729d402264abc1e0360b62eb8002bc0cd64b",
+    "docs/screenshots/qw5/T2-quotas-quotas-fr-sombre.png": "7f430476109c98829fe272ea143460c510637d13dac6edf2aabb179147ee17b5",
+    "locales/en.json": "3001b57c4ec286d4d69dfb7d170cfff3c5287b5a911eaf0f35a494bf59bbaac7",
+    "tests/qw5_quota_entry_ui.cjs": "fbd5e3f855613ce5a23653fbf5ba24c02105f9cac6f72b2548a8a6245c20659f",
+    "tests/qw5_resolve_blocking_limit_ui.cjs": "7d6a2595541da5866fbd508d59e72a332c8ecbbb916021fd824bb2fd853906d5",
+    "web/admin.js": "c1f4137f24ecd292335aaf7da76b83d3c3b0c9dcc9f3fa05a0224cc7d70c3e33",
+    "web/cockpit.js": "db7437d5b85fca4b554f9782c9f380ede2ed575a6de3e4142caa32997c6fc18d",
+    "web/conduite.js": "f70db504c2c1c4cc215767048b084ea81e7a8b6acf426f20f2c8b654d04ab484",
+    "web/i18n-en.js": "8c7c012058476fcfb8e2b8f0f84481d3dd623da059ab39b8583d29f008b6f6e9",
+    "web/mission.js": "488512223cc9de8f407092d91b95b33fb50a4e51ba9536329a4307189bfbdead",
+    "web/planning.js": "1908692110c74d592d91828d1398b6821ebe8e386dadacd9f3a65bb0a70b9c32",
+    "web/quotas.js": "b24ab62489de35504930ed54bb9ebd790b67c946d41d27dd497eaf2692cfd950"
+  },
+  "controls": [
+    {
+      "id": "qw5-build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/swarm-qw5-candidate",
+        "."
+      ],
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summary": "contr\u00f4le r\u00e9ussi",
+      "started_at": "2026-10-04T08:13:05.22062203Z",
+      "finished_at": "2026-10-04T08:13:05.820350301Z"
+    },
+    {
+      "review_output": "PASS budget UI\n",
+      "output_bytes": 15,
+      "id": "qw5-budget",
+      "command": [
+        "node",
+        "tests/qw5_resolve_blocking_limit_ui.cjs",
+        "/tmp/swarm-qw5-candidate",
+        "/tmp/swarm-qw5-engine-budget"
+      ],
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "9ce7c02da5564cd6dc5ce3484fe5e02d9846730485c8bb113973a2a555a90b97",
+      "summary": "contr\u00f4le r\u00e9ussi",
+      "started_at": "2026-10-04T08:13:05.820748089Z",
+      "finished_at": "2026-10-04T08:13:09.835649108Z"
+    },
+    {
+      "review_output": "PASS quotas UI\n",
+      "output_bytes": 15,
+      "id": "qw5-quotas",
+      "command": [
+        "node",
+        "tests/qw5_quota_entry_ui.cjs",
+        "/tmp/swarm-qw5-candidate",
+        "/tmp/swarm-qw5-engine-quotas"
+      ],
+      "executed": true,
+      "passed": true,
+      "exit_code": 0,
+      "output_sha256": "1e7d3909e0f2f0007b971ae20fe4c0a67b9fdafad28b091a33b45837f3cd0910",
+      "summary": "contr\u00f4le r\u00e9ussi",
+      "started_at": "2026-10-04T08:13:09.836012592Z",
+      "finished_at": "2026-10-04T08:13:13.862528324Z"
+    }
+  ],
+  "receipt": ".swarm/validation/w-01567e073c1ed2f3d4c71c9e/plan-01567e073c-T2/a-b455ca4bfd2338cc09d99801-receipt-c0a5e3b9f9565edcc2bbe3a9.json",
+  "state": "pending_human",
+  "reason": "Contr\u00f4les disponibles ; d\u00e9cision humaine requise.",
+  "at": "2026-10-04T08:13:13.876025572Z"
+}

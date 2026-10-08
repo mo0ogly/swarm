@@ -1,0 +1,9 @@
+{
+  "activeElement": "mission-primary",
+  "buttonText": "Start mission",
+  "dialogOpen": false,
+  "focusOutline": "rgb(78, 165, 232) solid 2px",
+  "focusVisible": true,
+  "theme": "sombre",
+  "url": "http://127.0.0.1:44631/?work=w-5005b909a2a3a9131f96fde6&lang=en"
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"syscall"
 )
 
 // Machine-readable code is stable; the French message is shared by terminal and CLI.
@@ -17,6 +18,10 @@ func commandFailure(err error) *CommandError {
 	var e *CommandError
 	if errors.As(err, &e) {
 		return e
+	}
+	var sqliteCode interface{ Code() int }
+	if errors.Is(err, syscall.ENOSPC) || (errors.As(err, &sqliteCode) && sqliteCode.Code()&255 == 13) {
+		return &CommandError{Code: "storage_unavailable", Message: "Écriture impossible : stockage plein. Libérez de l’espace puis vérifiez l’état de la mission avant de reprendre ; aucun résultat n’est validé par cette erreur."}
 	}
 	var preparation *PreparationError
 	if errors.As(err, &preparation) {

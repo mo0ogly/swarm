@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-10-06",
+      "summary": {
+        "fr": "Première release expérimentale : édition du graphe avec prévisualisation, automatisation durable, administration des paramètres, validation indépendante et reprise tracée des contrats bloqués.",
+        "en": "First experimental release: graph editing with previews, durable automation, configurable administration, independent validation and audited recovery of blocked contracts."
+      },
+      "commits": [
+        {
+          "sha": "191616999c5f4b30e901042b51898cfbb21a3e06",
+          "url": "https://github.com/mo0ogly/swarm/commit/191616999c5f4b30e901042b51898cfbb21a3e06"
+        },
+        {
+          "sha": "2d08f0510d7f6da36d7f03cb9481dde7de249fe8",
+          "url": "https://github.com/mo0ogly/swarm/commit/2d08f0510d7f6da36d7f03cb9481dde7de249fe8"
+        }
+      ],
+      "release_url": "https://github.com/mo0ogly/swarm/releases/tag/v0.1.0"
+    }
+  ]
+}

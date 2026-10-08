@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "files": [
+    "mission_cli.go",
+    "evidence_projection.go",
+    "engine_contract_truth_test.go",
+    "web/planning.js",
+    "web/evidence-contract.js",
+    "web/mission.css",
+    "docs/e5-verite.browser.json"
+  ]
+}

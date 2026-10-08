@@ -185,6 +185,13 @@ func parcours(t *testing.T, regime string) int {
 			return e
 		})
 
+		// This historical comparison measures handoff/acceptance gestures only;
+		// an approved report is an explicit fixture, not an autonomy claim.
+		reviewReport, _ := s.provenAttemptReport(agent)
+		if reviewReport == "" {
+			reviewReport = filepath.Join("docs", id+".md")
+		}
+		approveReportFixture(t, s, w.ID, id, agent.ID, reviewReport)
 		count.human("accepter "+id, func() error {
 			current, e := s.get(w.ID)
 			if e != nil {

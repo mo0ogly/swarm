@@ -4,11 +4,14 @@ import "fmt"
 
 // Reframe an unstarted work without replacing its tasks or event history.
 func updateWorkDefinition(w *Work, r Request) error {
-	if r.Title == "" && r.Objective == "" && r.Scope == "" && r.Criteria == nil {
+	if r.Title == "" && r.Objective == "" && r.Scope == "" && r.Criteria == nil && r.RequirementPrerequisites == nil {
 		return fmt.Errorf("title, objective, scope ou criteria requis")
 	}
 	if r.Status != "" || r.ID != "" || r.Depends != nil || r.Deliverable != "" || r.MaxAttempts != 0 || r.MaxToolCalls != 0 {
 		return fmt.Errorf("champs réservés aux tâches")
+	}
+	if (r.RequirementPrerequisites != nil || (r.Criteria != nil && len(w.RequirementPrerequisites) > 0)) && len(w.Tasks) > 0 {
+		return fmt.Errorf("prérequis métier : configurer avant la création des tâches")
 	}
 	for _, task := range w.Tasks {
 		if task.Status != "todo" && task.Status != "blocked" {
@@ -41,6 +44,12 @@ func updateWorkDefinition(w *Work, r Request) error {
 	}
 	if r.Criteria != nil {
 		w.Criteria = r.Criteria
+	}
+	if r.RequirementPrerequisites != nil {
+		w.RequirementPrerequisites = r.RequirementPrerequisites
+	}
+	if err := validateRequirementPrerequisites(w); err != nil {
+		return err
 	}
 	for i := range w.Tasks {
 		w.Tasks[i].Gate = nil

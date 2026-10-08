@@ -39,6 +39,19 @@ class RunSTest(unittest.TestCase):
         self.assertEqual(remise["attempt"], r["accepted_attempts"]["prepare"], remise)
         self.assertEqual(bilan["lot_sha256"], remise["artifacts"][0]["sha256"], (bilan, remise))
 
+    def test_environment_failure_retains_batch_without_new_producer(self):
+        r = run_s.run("business", "F5", seed=11)
+        self.addCleanup(shutil.rmtree, r["run_dir"], ignore_errors=True)
+        self.assertEqual(r["status"], "OK", r)
+        root = Path(r["run_dir"]) / "swarm"
+        sw = run_s.Swarm(run_s.SWARM, root)
+        work = sw.work(sw.cli(["work", "list"])[0]["id"])
+        prepare = next(t for t in work["tasks"] if t["id"] == "prepare")
+        self.assertEqual(len(prepare["attempts"]), 1)
+        self.assertTrue(any(c.get("environment_failure") for c in prepare["automatic_validation"]["controls"]))
+        self.assertEqual(r["metrics"]["payments"], 0)
+
+
 
 if __name__ == "__main__":
     unittest.main()

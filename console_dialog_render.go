@@ -232,6 +232,19 @@ func renderTaskDialog(base string, d *taskDialog, width, height int) string {
 				rows = append(rows, m+line)
 			}
 			rows = append(rows, uiText("Tab : champ · ←→ : fournisseur/rôle/niveau · Ctrl-U : effacer"), uiText("Après un échec d’environnement, décrire une vérification observée est obligatoire. Entrée sur Confirmer lance réellement le fournisseur."))
+		case "resume-launch":
+			title = uiText("Reprendre le lancement préparé")
+			if d.prepared != nil {
+				rows = append(rows, uiText("Fournisseur : ")+d.prepared.Provider, uiText("Espace : ")+d.prepared.Workspace, uiText("Consigne : ")+d.prepared.Instruction)
+			}
+			rows = append(rows, uiText("La copie et les réglages sont conservés. Les conditions sont vérifiées à nouveau."))
+			for i, label := range []string{uiText("Reprendre le lancement préparé"), uiText("Annuler")} {
+				mark := "  "
+				if i == d.row {
+					mark = "> "
+				}
+				rows = append(rows, mark+label)
+			}
 		case "stop", "reconcile":
 			title = uiText("Confirmer — ") + d.task.ID
 			text := uiText("Demander l'arrêt de l'agent sélectionné ?")

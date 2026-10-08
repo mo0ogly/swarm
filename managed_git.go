@@ -31,14 +31,16 @@ type ManagedRepository struct {
 	RequestDigest string   `json:"request_digest"`
 }
 type ManagedAttempt struct {
-	Agent  string `json:"agent_id"`
-	Work   string `json:"work_id"`
-	Task   string `json:"task_id"`
-	Base   string `json:"base_commit"`
-	Path   string `json:"path"`
-	State  string `json:"state"`
-	Result string `json:"result_commit"`
-	Detail string `json:"detail"`
+	Request             *Launch `json:"launch_request,omitempty"`
+	PreparationContract string  `json:"preparation_contract,omitempty"`
+	Agent               string  `json:"agent_id"`
+	Work                string  `json:"work_id"`
+	Task                string  `json:"task_id"`
+	Base                string  `json:"base_commit"`
+	Path                string  `json:"path"`
+	State               string  `json:"state"`
+	Result              string  `json:"result_commit"`
+	Detail              string  `json:"detail"`
 }
 
 func managedGit(dir string, args ...string) (string, error) {
@@ -60,6 +62,12 @@ func managedGit(dir string, args ...string) (string, error) {
 		return "", fmt.Errorf("git %s : %s", args[0], guardBlock(string(out), 2000))
 	}
 	return strings.TrimSpace(string(out)), nil
+}
+
+// Review ownership is separate from mission Git serialization. Hash the pair
+// so valid long work/agent identifiers cannot exceed the lock-name limit.
+func managedReviewOwnershipLock(root, work, agent string) (func(), error) {
+	return managedLock(root, "review-"+hash([]byte(work+"\x00"+agent)))
 }
 func managedLock(root, work string) (func(), error) {
 	if !safeName(work) {
@@ -272,6 +280,10 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		return "", err
 	}
 	defer unlock()
+	recovery, err := s.managedRecoveryHandoff(w, taskForPreparation(w, r.TaskID))
+	if err != nil {
+		return "", err
+	}
 	if prior, e := s.managedAttempt(r.EventID); e == nil {
 		if prior.Work != w.ID || prior.Task != r.TaskID {
 			return "", fmt.Errorf("copie attribuée à une autre tâche")
@@ -279,15 +291,18 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		if prior.State != "ready" {
 			return "", fmt.Errorf("copie non disponible : %s", prior.State)
 		}
-		if filepath.Dir(prior.Path) != filepath.Join(repo.Storage, "copies") {
-			return "", fmt.Errorf("copie hors dépôt géré")
+		if record, e := s.readPreparedLaunch(w, r.EventID); e == nil && record.Request != nil {
+			if !s.preparedContractMatches(w, taskForPreparation(w, r.TaskID), record) || !preparedRequestCompatible(*record.Request, r) {
+				return "", &CommandError{Code: "prepared_launch_changed", Message: "Le contrat ou les paramètres du lancement préparé ont changé ; sa copie est conservée. Examiner la préparation avant reprise."}
+			}
+		} else if e != nil && !os.IsNotExist(e) {
+			return "", e
 		}
-		actual, e := filepath.EvalSymlinks(prior.Path)
-		if e != nil || actual != prior.Path {
-			return "", fmt.Errorf("copie absente ou redirigée")
+		if e := verifyManagedCopy(repo, prior.Path); e != nil {
+			return "", e
 		}
-		if st, e := os.Lstat(filepath.Join(prior.Path, ".git")); e != nil || !st.IsDir() {
-			return "", fmt.Errorf("métadonnées Git non isolées")
+		if e := installManagedRecovery(repo, prior.Path, recovery); e != nil {
+			return "", e
 		}
 		return filepath.Join(prior.Path, repo.Subdir), nil
 	} else if e != sql.ErrNoRows {
@@ -300,13 +315,33 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 	path := managedCopyRoot(repo, task.ID, len(task.Attempts)+1)
 	manifest := filepath.Join(repo.Storage, "copy-"+r.EventID+".json")
 	if _, err = os.Lstat(path); err == nil {
-		raw, e := os.ReadFile(manifest)
+		prior, e := s.readPreparedLaunch(w, r.EventID)
 		if e != nil {
+			var owner string
+			if lookupErr := s.db.QueryRow("SELECT agent_id FROM managed_attempts WHERE work_id=? AND task_id=? AND path=?", w.ID, task.ID, path).Scan(&owner); lookupErr == nil {
+				return "", &CommandError{Code: "prepared_launch_exists", Message: "Un lancement est déjà préparé pour cette tâche (" + owner + "). Choisissez « Reprendre le lancement préparé » ; la copie est conservée.", Retryable: true}
+			}
+			if owner, lookupErr := s.preparedManifestForTask(w, task); lookupErr == nil && owner != "" {
+				return "", &CommandError{Code: "prepared_launch_exists", Message: "Un lancement est déjà préparé pour cette tâche (" + owner + "). Choisissez « Reprendre le lancement préparé » ; la copie est conservée.", Retryable: true}
+			}
 			return "", fmt.Errorf("copie existante sans attribution ; ne pas écraser")
 		}
-		var prior ManagedAttempt
-		if e = json.Unmarshal(raw, &prior); e != nil || prior.Agent != r.EventID || prior.Work != w.ID || prior.Task != task.ID || prior.Path != path {
+		if prior.Agent != r.EventID || prior.Work != w.ID || prior.Task != task.ID || prior.Path != path {
 			return "", fmt.Errorf("attribution de copie incohérente")
+		}
+		if prior.Request != nil {
+			if e := s.preparedLaunchGuard(w, task, prior); e != nil {
+				return "", e
+			}
+			if !preparedRequestCompatible(*prior.Request, r) {
+				return "", fmt.Errorf("paramètres de lancement préparé modifiés")
+			}
+		}
+		if e := verifyManagedCopy(repo, path); e != nil {
+			return "", e
+		}
+		if e := installManagedRecovery(repo, path, recovery); e != nil {
+			return "", e
 		}
 		_, e = s.db.Exec("INSERT INTO managed_attempts(agent_id,work_id,task_id,base_commit,path,state) VALUES(?,?,?,?,?,'ready')", prior.Agent, prior.Work, prior.Task, prior.Base, prior.Path)
 		if e != nil {
@@ -329,7 +364,32 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 	if _, err = managedGit(clone, "checkout", "--detach", repo.Candidate); err != nil {
 		return "", err
 	}
-	record, _ := json.Marshal(ManagedAttempt{Agent: r.EventID, Work: w.ID, Task: task.ID, Base: repo.Candidate, Path: path, State: "ready"})
+	if err = verifyManagedWorkspace(clone, repo.Subdir); err != nil {
+		return "", err
+	}
+	if err = installManagedRecovery(repo, clone, recovery); err != nil {
+		return "", err
+	}
+	attribution := ManagedAttempt{Agent: r.EventID, Work: w.ID, Task: task.ID, Base: repo.Candidate, Path: path, State: "ready"}
+	if r.Schema == 1 {
+		request := r
+		providers, e := s.providers()
+		if e != nil {
+			return "", e
+		}
+		provider, ok := providers.Providers[r.Provider]
+		if !ok {
+			return "", fmt.Errorf("fournisseur inconnu")
+		}
+		providerBytes, _ := json.Marshal(provider)
+		if request.ProviderDigest != "" && request.ProviderDigest != hash(providerBytes) {
+			return "", fmt.Errorf("La configuration a changé : demandez une nouvelle proposition")
+		}
+		request.ProviderDigest = hash(providerBytes)
+		attribution.Request = &request
+		attribution.PreparationContract = managedPreparationContract(w, task)
+	}
+	record, _ := json.Marshal(attribution)
 	if err = atomicWrite(manifest, record); err != nil {
 		return "", err
 	}
@@ -363,10 +423,59 @@ func (s *Store) managedFailure(a Agent, reason string) error {
 		task.Status = "blocked"
 		task.Blocker = reason
 		task.Next = "Le responsable doit proposer une correction sur la révision actuelle."
+		if strings.HasPrefix(reason, managedScopeRefusal+" : ") {
+			task.Next = "Le responsable doit organiser le découpage de revue avec un sous-planificateur : scope-preview expose les signaux et les types possibles ; ne pas retirer automatiquement des fichiers."
+		}
 		scope, _ := w.Planning.scope(task.ScopeID)
 		scope.State = "ready"
 		w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{ID: planningEventID(a.ID, reason), Scope: scope.ID, Kind: "integration_failed", Task: task.ID, Attempt: a.Attempt, Message: guardBlock(reason, 4000), At: now()})
 		return nil
 	})
 	return err
+}
+
+// Both ordinary replay and recovery of rename-before-DB must enforce the same
+// physical copy identity before persisting an attribution.
+func verifyManagedCopy(repo *ManagedRepository, path string) error {
+	if filepath.Dir(path) != filepath.Join(repo.Storage, "copies") {
+		return fmt.Errorf("copie hors dépôt géré")
+	}
+	actual, e := filepath.EvalSymlinks(path)
+	if e != nil || actual != path {
+		return fmt.Errorf("copie absente ou redirigée")
+	}
+	gitDir := filepath.Join(path, ".git")
+	if st, e := os.Lstat(gitDir); e != nil || !st.IsDir() {
+		return fmt.Errorf("métadonnées Git non isolées")
+	}
+	common, e := managedGit(path, "rev-parse", "--git-common-dir")
+	if e != nil {
+		return e
+	}
+	if !filepath.IsAbs(common) {
+		common = filepath.Join(path, common)
+	}
+	actual, e = filepath.EvalSymlinks(common)
+	if e != nil || actual != gitDir {
+		return fmt.Errorf("métadonnées Git partagées ou redirigées")
+	}
+	return verifyManagedWorkspace(path, repo.Subdir)
+}
+
+// A project may use a subdirectory of its Git root. Its effective working
+// directory must remain in the attributed copy, including after recovery.
+func verifyManagedWorkspace(root, subdir string) error {
+	workspace := filepath.Join(root, subdir)
+	rel, e := filepath.Rel(root, workspace)
+	if e != nil || filepath.IsAbs(subdir) || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return fmt.Errorf("espace de travail hors copie attribuée")
+	}
+	actual, e := filepath.EvalSymlinks(workspace)
+	if e != nil || actual != workspace {
+		return fmt.Errorf("espace de travail absent ou redirigé")
+	}
+	if st, e := os.Stat(workspace); e != nil || !st.IsDir() {
+		return fmt.Errorf("répertoire de travail absent")
+	}
+	return nil
 }

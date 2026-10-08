@@ -52,6 +52,21 @@ func describeOperation(name string, input any) (string, string) {
 	return action, detail
 }
 
+// Conservative tool categorisation for the per-attempt ledger: only tool
+// names with an unambiguous read/write meaning are classified. Shell-style
+// tools (Bash, command_execution, mcp_tool_call, web_search) mix arbitrary
+// operations and are never inferred from their text content, so they stay
+// unclassified rather than guessed.
+func toolCategory(name string) string {
+	switch name {
+	case "Read", "Glob", "Grep":
+		return "read"
+	case "Write", "Edit", "MultiEdit", "file_change":
+		return "write"
+	}
+	return ""
+}
+
 func operationTarget(detail string) string {
 	if detail == "" {
 		return ""

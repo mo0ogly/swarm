@@ -1,0 +1,129 @@
+{
+  "method_version": "2",
+  "scope_id": "plan-843bb3ce22-T1",
+  "artifacts": {
+    "docs/T1-inventaire-existant.md": "b0226aa4f3efd6d27c026eabbc4677635f5187aa5a1a90c5770b56e20728a182",
+    "docs/plan-843bb3ce22-T1.md": "9231786f4d37ecd99f5b7b41b9370c5d7f1ae00b0daf55410caad1e6315daa3c"
+  },
+  "domains": {
+    "documentary_review": 100
+  },
+  "checks": [
+    {
+      "id": "plan-entry",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "entry",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-1",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-2",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-criterion-3",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-validation",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "validation",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    },
+    {
+      "id": "plan-delivery",
+      "domain": "documentary_review",
+      "mandatory": true,
+      "gate": "delivery",
+      "penalty": 100,
+      "max_penalty": 100,
+      "severity": "major"
+    }
+  ],
+  "results": [
+    {
+      "id": "plan-entry",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T1-inventaire-existant.md",
+        "docs/plan-843bb3ce22-T1.md"
+      ],
+      "reason": "Accès au dépôt et brief courant attestés dans la remise ; les commandes pwd et git rev-parse sont reproduites dans le journal natif exporté."
+    },
+    {
+      "id": "plan-criterion-1",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T1-inventaire-existant.md",
+        "docs/plan-843bb3ce22-T1.md"
+      ],
+      "reason": "Revue documentaire par l’assistant superviseur : tableau REQ-ADM-01 à 07 et tableau QW1 à QW5 présents, points de réutilisation et absences explicités. Les fonctionnalités restent à réaliser en T2–T8 ; aucune réussite applicative n’est revendiquée."
+    },
+    {
+      "id": "plan-criterion-2",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T1-inventaire-existant.md",
+        "docs/plan-843bb3ce22-T1.md"
+      ],
+      "reason": "Lecture du rapport et du code des routes web/CLI : les mêmes services traitent chaque famille. La précision du superviseur rectifie la généralisation SQLite : tarifs et fournisseurs ont chacun leur fichier canonique JSON, sans doublon par interface."
+    },
+    {
+      "id": "plan-criterion-3",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T1-inventaire-existant.md",
+        "docs/plan-843bb3ce22-T1.md"
+      ],
+      "reason": "Revue des 14 appels du journal natif, corroborés par les événements Swarm 11414–11448 : 9 Bash de consultation, 3 Read et 2 Write sur les deux documents autorisés. Sortie Git antérieure aux écritures incluse. Les ajouts ultérieurs du superviseur sont attribués séparément. Pas de preuve d’absence de changements provenant d’autres sessions : ce contrôle porte sur cette tentative."
+    },
+    {
+      "id": "plan-validation",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T1-inventaire-existant.md",
+        "docs/plan-843bb3ce22-T1.md"
+      ],
+      "reason": "Revue documentaire opérateur effectuée par l’assistant superviseur, distincte de la production. Couverture et limites examinées avec les traces brutes, aucune commande de test applicatif présentée comme exécutée par T1."
+    },
+    {
+      "id": "plan-delivery",
+      "status": "PASS",
+      "count": 0,
+      "evidence": [
+        "docs/T1-inventaire-existant.md",
+        "docs/plan-843bb3ce22-T1.md"
+      ],
+      "reason": "Livrable et handoff lus avec empreintes courantes. Avis indépendant Claude observé dans le cockpit : passed, 2026-09-29T19:25:53.297978302Z, tentative a-d2c72df363d076d4e5134554, révision lue 69, trois critères pass. Le vérificateur signale sa limite : il lit les traces reproduites, sans accès au journal natif. Le superviseur a extrait directement ce journal ; aucun test applicatif n’est revendiqué. Le moteur doit encore contrôler la fraîcheur de cet avis à l’acceptation."
+    }
+  ]
+}

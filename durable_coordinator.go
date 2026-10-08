@@ -4,7 +4,11 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"syscall"
 	"time"
 )
 
@@ -51,14 +55,29 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 	if err != nil {
 		return err
 	}
+	w, err := s.get(work)
+	if err != nil {
+		return err
+	}
 	for _, agent := range agents {
 		switch {
 		case !activeAgent(agent):
-			if err = s.settleAgentTask(agent); err != nil {
-				return err
+			if w.Planning != nil && w.Planning.Repository != nil {
+				// Managed settlement can run controls and an independent provider
+				// review. Keep that bounded operation off the conductor loop so
+				// its lease and other missions continue to be checked. The
+				// existing cross-process managed lock and review claim deduplicate
+				// polling/restarts; no new production attempt is created here.
+				if _, e := s.startManagedSettlement(agent, func() {
+					if e := s.reconcileKnownMissionResult(agent, conductor); e != nil {
+						_ = s.recordCoordinationEvent("settle-error:"+agent.ID, agent.WorkID, agent.ID, conductor, "settle-error", e.Error())
+					}
+				}); e != nil {
+					return e
+				}
+				continue
 			}
-			if err = s.recordCoordinationEvent("known-result:"+agent.ID, work, agent.ID, conductor,
-				"known-result", "Résultat terminal connu et réconcilié sans nouvelle tentative"); err != nil {
+			if err = s.reconcileKnownMissionResult(agent, conductor); err != nil {
 				return err
 			}
 		case agent.Status == "queued" && agent.Supervisor == 0 && agent.Child == 0 && agent.Heartbeat == "":
@@ -92,7 +111,50 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 	return nil
 }
 
+func (s *Store) reconcileKnownMissionResult(agent Agent, conductor string) error {
+	// Explicitly authorized external repairs keep their original stopped status.
+	// A retry-review queues integration without changing that process history.
+	if w, err := s.get(agent.WorkID); err == nil && w.Planning != nil && w.Planning.Repository != nil {
+		if task, err := w.task(agent.TaskID); err == nil {
+			if item, err := s.managedAttempt(agent.ID); err == nil && item.State == "integrating" && recoveredResultMatches(task, agent, item) {
+				return s.integrateManagedAttempt(agent)
+			}
+		}
+	}
+
+	if err := s.settleAgentTask(agent); err != nil {
+		return err
+	}
+	return s.recordCoordinationEvent("known-result:"+agent.ID, agent.WorkID, agent.ID, conductor,
+		"known-result", "Résultat terminal connu et réconcilié sans nouvelle tentative")
+}
+
 func (s *Store) signalResourceReleased(agent Agent) {
 	_ = s.recordCoordinationEvent("resource-released:"+agent.ID, agent.WorkID, agent.ID, conductorAuthor,
 		"resource-released", "Réservation libérée ; les conducteurs autorisés réévaluent leur file")
+}
+
+// Claim before launching asynchronous work, including before any database reads.
+// The nonblocking OS lock covers separate Store handles and processes, and is
+// released by the kernel after a crash. It does not replace the durable review
+// journal or the integration locks that fence publication.
+func (s *Store) startManagedSettlement(a Agent, settle func()) (bool, error) {
+	dir := filepath.Join(s.root, ".swarm", "settlement-locks")
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return false, err
+	}
+	name := hash([]byte(a.WorkID+"\x00"+a.ID+"\x00"+a.Attempt)) + ".lock"
+	f, err := os.OpenFile(filepath.Join(dir, name), os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		return false, err
+	}
+	if err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
+		f.Close()
+		if errors.Is(err, syscall.EWOULDBLOCK) || errors.Is(err, syscall.EAGAIN) {
+			return false, nil
+		}
+		return false, err
+	}
+	go func() { defer f.Close(); defer syscall.Flock(int(f.Fd()), syscall.LOCK_UN); settle() }()
+	return true, nil
 }

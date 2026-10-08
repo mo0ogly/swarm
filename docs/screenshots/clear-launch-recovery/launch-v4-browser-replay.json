@@ -1,0 +1,50 @@
+{
+  "origin": "CUA live browser interactions; read-only DOM assertions after real keyboard actions; not an independent AI browser run",
+  "at": "2026-10-03T14:11:01.781Z",
+  "cases": [
+    {
+      "language": "en",
+      "text": "Recette QW1 — aperçu sans départ\n\nStart all\nClose\n\nSwarm chains tasks in order. A waiting task resumes automatically when possible. Results requiring validation will be flagged.\n\nUnderstand this action\nSelected AI\nChoose…\nclaude\nlegacy\nThe provider runs this attempt with its existing configuration.\nProject directory\nProject directory to inspect or modify for this mission.\nMaximum concurrent attempts\nAgent level\nAutomatic — provider policy\nSimple — focused operation, rephrasing, help\nStandard — routine development and tests\nDemanding — architecture or complex analysis, explicit choice\n\nStandard · sonnet · external provider\n\nTask-specific profiles are retained. With the shared directory proposed here, tasks write one at a time: additional slots do not create concurrent writers in that directory. Budgets, prerequisites, stop requests and attempt limits remain enforced. An AI summary does not validate evidence.\n\nEngine preview\n\n0 possible start(s) now · actual concurrency 0/2.\n\nAnnounced concurrency is the first wave calculated now; slots, dependencies, budget and available workspaces may limit it.\n\nAuthorization reviewed once\nScope\nRacine isolée de recette · 0 task(s) · directory /tmp/swarm-qw1-visual-joy403z4\nBudget\nNo financial limit configured; tool and attempt limits for each task remain enforced.\nRetries\nAt most 2 automatic attempts per retry chain, including the first start; an unchanged environment awaits a new check and task-specific limits take precedence.\nValidations\n0 task(s) under human review · 0 task(s) with 0 preauthorized automatic check(s).\nCommon configuration\nObjective\nComprendre les agents avant de lancer\nRole\nWorker\nProvider\nclaude\nRequested level\nAutomatic\nModel resolved by configuration\nsonnet\nModel reported by provider\nUnknown before execution\nProject profile\nNo project profile\nSelected skills\nNo selected skills\nLimits retained\nCancel\nStart mission",
+      "theme": "etat",
+      "visible": true,
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "mission-primary",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "en",
+      "text": "Recette QW1 — aperçu sans départ\n\nStart all\nClose\n\nSwarm chains tasks in order. A waiting task resumes automatically when possible. Results requiring validation will be flagged.\n\nUnderstand this action\nSelected AI\nChoose…\nclaude\nlegacy\nThe provider runs this attempt with its existing configuration.\nProject directory\nProject directory to inspect or modify for this mission.\nMaximum concurrent attempts\nAgent level\nAutomatic — provider policy\nSimple — focused operation, rephrasing, help\nStandard — routine development and tests\nDemanding — architecture or complex analysis, explicit choice\n\nStandard · sonnet · external provider\n\nTask-specific profiles are retained. With the shared directory proposed here, tasks write one at a time: additional slots do not create concurrent writers in that directory. Budgets, prerequisites, stop requests and attempt limits remain enforced. An AI summary does not validate evidence.\n\nEngine preview\n\n0 possible start(s) now · actual concurrency 0/2.\n\nAnnounced concurrency is the first wave calculated now; slots, dependencies, budget and available workspaces may limit it.\n\nAuthorization reviewed once\nScope\nRacine isolée de recette · 0 task(s) · directory /tmp/swarm-qw1-visual-joy403z4\nBudget\nNo financial limit configured; tool and attempt limits for each task remain enforced.\nRetries\nAt most 2 automatic attempts per retry chain, including the first start; an unchanged environment awaits a new check and task-specific limits take precedence.\nValidations\n0 task(s) under human review · 0 task(s) with 0 preauthorized automatic check(s).\nCommon configuration\nObjective\nComprendre les agents avant de lancer\nRole\nWorker\nProvider\nclaude\nRequested level\nAutomatic\nModel resolved by configuration\nsonnet\nModel reported by provider\nUnknown before execution\nProject profile\nNo project profile\nSelected skills\nNo selected skills\nLimits retained\nCancel\nStart mission",
+      "theme": "sombre",
+      "visible": true,
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "mission-primary",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "fr",
+      "text": "Recette QW1 — aperçu sans départ\n\nLancer tout\nFermer\n\nSwarm enchaîne les tâches dans le bon ordre. Si une tâche doit attendre, elle reprend automatiquement dès que possible. Les résultats à valider vous seront signalés.\n\nComprendre cette action\nIA utilisée\nChoisir…\nclaude\nlegacy\nLe fournisseur exécute cette tentative avec sa configuration existante.\nDossier du projet\nRépertoire du projet à examiner ou modifier pour cette mission.\nCréneaux maximum\nNiveau de l’agent\nAutomatique — politique du fournisseur\nSimple — opération ciblée, reformulation, aide\nStandard — développement et tests usuels\nExigeant — architecture ou analyse difficile, choix explicite\n\nStandard · sonnet · fournisseur externe\n\nLes profils propres aux tâches sont conservés. Avec le dossier commun proposé ici, les tâches écrivent à tour de rôle : plusieurs créneaux n’ajoutent pas plusieurs écrivains dans ce dossier. Budgets, prérequis, arrêts demandés et limites de tentatives restent appliqués. Une synthèse IA ne valide pas les preuves.\n\nAperçu du moteur\n\n0 départ(s) possible(s) maintenant · concurrence réelle 0/2.\n\nLa concurrence annoncée est la première vague calculée maintenant ; créneaux, dépendances, budget et espaces disponibles peuvent la borner.\n\nAutorisation examinée une fois\nPortée\nRacine isolée de recette · 0 tâche(s) · dossier /tmp/swarm-qw1-visual-joy403z4\nBudget\nAucun plafond financier configuré ; les limites d’outils et de tentatives de chaque tâche restent appliquées.\nReprises\nAu plus 2 tentatives automatiques par chaîne de reprise, premier départ compris ; un environnement inchangé attend une nouvelle vérification et les plafonds propres aux tâches restent prioritaires.\nValidations\n0 tâche(s) en revue humaine · 0 tâche(s) avec 0 contrôle(s) automatique(s) préautorisés.\nConfiguration commune\nObjectif\nComprendre les agents avant de lancer\nRôle\nExécutant\nFournisseur\nclaude\nNiveau demandé\nAutomatique\nModèle résolu par la configuration\nsonnet\nModèle rapporté par le fournisseur\nInconnu avant l’exécution\nProfil du projet\nAucun profil de projet\nSkills sélectionnés\nAucun skill sélectionné\nLimites conservées\nAnnuler\nLancer la mission",
+      "theme": "sombre",
+      "visible": true,
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "mission-primary",
+        "focusVisible": true
+      }
+    },
+    {
+      "language": "fr",
+      "text": "Recette QW1 — aperçu sans départ\n\nLancer tout\nFermer\n\nSwarm enchaîne les tâches dans le bon ordre. Si une tâche doit attendre, elle reprend automatiquement dès que possible. Les résultats à valider vous seront signalés.\n\nComprendre cette action\nIA utilisée\nChoisir…\nclaude\nlegacy\nLe fournisseur exécute cette tentative avec sa configuration existante.\nDossier du projet\nRépertoire du projet à examiner ou modifier pour cette mission.\nCréneaux maximum\nNiveau de l’agent\nAutomatique — politique du fournisseur\nSimple — opération ciblée, reformulation, aide\nStandard — développement et tests usuels\nExigeant — architecture ou analyse difficile, choix explicite\n\nStandard · sonnet · fournisseur externe\n\nLes profils propres aux tâches sont conservés. Avec le dossier commun proposé ici, les tâches écrivent à tour de rôle : plusieurs créneaux n’ajoutent pas plusieurs écrivains dans ce dossier. Budgets, prérequis, arrêts demandés et limites de tentatives restent appliqués. Une synthèse IA ne valide pas les preuves.\n\nAperçu du moteur\n\n0 départ(s) possible(s) maintenant · concurrence réelle 0/2.\n\nLa concurrence annoncée est la première vague calculée maintenant ; créneaux, dépendances, budget et espaces disponibles peuvent la borner.\n\nAutorisation examinée une fois\nPortée\nRacine isolée de recette · 0 tâche(s) · dossier /tmp/swarm-qw1-visual-joy403z4\nBudget\nAucun plafond financier configuré ; les limites d’outils et de tentatives de chaque tâche restent appliquées.\nReprises\nAu plus 2 tentatives automatiques par chaîne de reprise, premier départ compris ; un environnement inchangé attend une nouvelle vérification et les plafonds propres aux tâches restent prioritaires.\nValidations\n0 tâche(s) en revue humaine · 0 tâche(s) avec 0 contrôle(s) automatique(s) préautorisés.\nConfiguration commune\nObjectif\nComprendre les agents avant de lancer\nRôle\nExécutant\nFournisseur\nclaude\nNiveau demandé\nAutomatique\nModèle résolu par la configuration\nsonnet\nModèle rapporté par le fournisseur\nInconnu avant l’exécution\nProfil du projet\nAucun profil de projet\nSkills sélectionnés\nAucun skill sélectionné\nLimites conservées\nAnnuler\nLancer la mission",
+      "theme": "etat",
+      "visible": true,
+      "afterEscape": {
+        "dialogOpen": false,
+        "focus": "mission-primary",
+        "focusVisible": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "base": "1d9570bd4ef617130c6be96b7ec88844fdbcd00e",
+  "files_sha256": {
+    "mission_status.go": "c9bcbb57a9bb385cffb692b3a51e66a2bce88b51bb82cf79d511dbafc5e92596",
+    "mission_cli.go": "1ba1092aecd5d01d926784fd0f166d0105e703364e401e3bea446136b67bccd4",
+    "web/mission.js": "9157125da2f2d5683c87788513f869b7d27835acfaa5dd7970a7dab9365e9301",
+    "locales/en.json": "2d6c6fc139588b10e7d7350f3457bd9d95e441c69950778e5fe3ac65dc87ecf9",
+    "web/i18n-en.js": "8e2cb1c57b67383d30e5714ce6cab9e896edbf5b9f52c436cc1520a37f30e938",
+    "mission_launch_identity_test.go": "341d3a7c56d7d978a25bbec47d00f372bf9a14e530a6a9391173d2cd1ed737b8",
+    "agents_store.go": "7c8553b2057dc4978ca0e074d3a13b5647e1b3c9bf4fce2c33123d4c33ab28ca",
+    "agents_process.go": "bc3656fc705f3e5ff6523c0460bcb0c5f08a037c9fbd53c5bd1b0def836aa9d3",
+    "agent_terminal_process.go": "ef6cc4957c0ea65ddaf51ddacdbae6153526fe5da692851e4226f3bcf4abc1ab",
+    "agent_reported_model.go": "762a7a6807ffd0fe61c73dc2dd98f69669250ec8a04e030b3a3401fe5d0c35fb",
+    "agent_reported_model_test.go": "f5a8991ad91e7317bbd7c7742ce0c056f2d70c20693897fcc84b54621409eb4f",
+    "web/task-models.js": "7af3c5745d8b066549629d4993c0e24b948fbbb185d7153b440a272e2f7ebdca",
+    "web/pilot-inspector.js": "5395c6f5855ba77eb92a27993e75fa36a3a1b0da08a53fc494aa9bf8abd6c152",
+    "tests/reported_model_test.cjs": "f4c6789628e0b391b350976fb07fd178a495c92d0c3cd83529f8f9ba40392976"
+  },
+  "dirty": true
+}

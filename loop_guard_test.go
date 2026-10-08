@@ -69,13 +69,18 @@ func TestLoopGuardCaptureOffAndDefaults(t *testing.T) {
 	l.MaxToolCalls = 1
 	sink := &outputSink{guard: newLoopGuard(l), capture: false}
 	_, _ = sink.Write([]byte(`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"1","name":"Read","input":{}}]}}` + "\n"))
-	if sink.guardReason() == "" || len(sink.logs) != 1 || sink.logs[0].Kind != "activity" {
+	if sink.guardReason() != "" || len(sink.logs) != 1 || sink.logs[0].Kind != "activity" {
 		t.Fatal("capture-off disabled guard or failed structured activity")
+	}
+	_, _ = sink.Write([]byte(`{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"1","content":"read completed"}]}}` + "\n"))
+	if sink.guardReason() == "" || sink.guard.completed != 1 {
+		t.Fatal("cap must apply after the last result")
 	}
 	g := newLoopGuard(l)
 	g.lastOutput = time.Now().Add(-181 * time.Second)
-	if !strings.Contains(g.check(time.Now()), "sans sortie") {
-		t.Fatal("silence not detected")
+	g.outputSeen = true
+	if output, _, vitality := g.monitoring(time.Now()); output != "silent" || vitality != "unknown" || g.check(time.Now()) != "" {
+		t.Fatal("silence must be visible without fabricating vitality or stopping")
 	}
 }
 func TestLoopProvider(t *testing.T) {
@@ -84,6 +89,27 @@ func TestLoopProvider(t *testing.T) {
 	}
 	prompt, _ := io.ReadAll(os.Stdin)
 	switch {
+	case strings.Contains(string(prompt), "R3_SILENT_RESPONSE"):
+		time.Sleep(1500 * time.Millisecond)
+		fmt.Println(`{"type":"result","result":"response after visible silence"}`)
+		return
+	case strings.Contains(string(prompt), "R3_WAIT_RELEASE"):
+		for i := 0; i < 200; i++ {
+			if _, err := os.Stat("r3-release"); err == nil {
+				fmt.Println(`{"type":"result","result":"released"}`)
+				return
+			}
+			time.Sleep(10 * time.Millisecond)
+		}
+		os.Exit(3)
+	case strings.Contains(string(prompt), "GUARD_LAST_RESULT"):
+		fmt.Println(`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"last","name":"Write","input":{"file_path":"last-authorized-result"}}]}}`)
+		time.Sleep(700 * time.Millisecond)
+		if err := os.WriteFile("last-authorized-result", []byte("finished"), 0600); err != nil {
+			os.Exit(2)
+		}
+		fmt.Println(`{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"last","content":"finished"}]}}`)
+		time.Sleep(3 * time.Second)
 	case strings.Contains(string(prompt), "GUARD_INTERLEAVED"):
 		for i := 0; i < 3; i++ {
 			fmt.Printf(`{"type":"item.started","item":{"id":"f%d","type":"command_execution","command":"build"}}`+"\n", i)
@@ -109,7 +135,7 @@ func TestLoopProvider(t *testing.T) {
 	os.Exit(0)
 }
 func TestSupervisorGuardStopsAndBlocksTask(t *testing.T) {
-	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_SILENCE", "GUARD_TOOL"} {
+	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_TOOL"} {
 		t.Run(mode, func(t *testing.T) {
 			s := storeTest(t)
 			w, r := setupAgent(t, s)
@@ -162,5 +188,32 @@ func TestSupervisorGuardStopsAndBlocksTask(t *testing.T) {
 				t.Fatal("stop cause not persisted")
 			}
 		})
+	}
+}
+
+func TestSupervisorRetainsLastAuthorizedResult(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	exe, _ := os.Executable()
+	t.Setenv("SWARM_LOOP_FIXTURE", "1")
+	p := Providers{Schema: 1, Providers: map[string]Provider{"fixture": {Command: exe, Args: []string{"-test.run=^TestLoopProvider$"}, Env: []string{"SWARM_LOOP_FIXTURE"}, Limits: RunLimits{MaxToolCalls: 1, ToolSeconds: 3}}}}
+	raw, _ := json.Marshal(p)
+	if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	r.Instruction = "GUARD_LAST_RESULT"
+	a, _, err := s.prepare(w.ID, r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = s.supervise(a.ID); err != nil {
+		t.Fatal(err)
+	}
+	a, _ = s.agent(a.ID)
+	if _, err = os.Stat(filepath.Join(a.CWD, "last-authorized-result")); err != nil {
+		t.Fatal("last allowed write killed", err)
+	}
+	if a.Progress.ToolCalls != 1 || a.Progress.ToolResults != 1 || a.Status != "interrupted" {
+		t.Fatalf("wrong result %+v", a.Progress)
 	}
 }

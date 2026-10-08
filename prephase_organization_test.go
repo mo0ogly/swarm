@@ -236,3 +236,51 @@ func TestPreparationRetainsOnlyExactOperatorDecisions(t *testing.T) {
 		t.Fatal("decision invented or lost", saved.Questions)
 	}
 }
+
+func TestPreparedRevisionPreservesRecoveryAndArchivesReviews(t *testing.T) {
+	s, p := preparedTeam(t)
+	w, e := s.get(p.WorkID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	// Isolated fixture: a produced task and a dependent both have historical verdicts.
+	for i := range w.Tasks {
+		task := &w.Tasks[i]
+		task.Status = "blocked"
+		task.IndependentReview = &IndependentReview{ID: "old-" + task.ID, State: "changes_requested"}
+		task.Attempts = []Attempt{{ID: "produced-" + task.ID, Status: "completed"}}
+	}
+	w.Tasks[0].PlanMaxAttempts = 4
+	w.Tasks[0].CorrectiveRecovery = &CorrectiveRecovery{Event: "operator-grant"}
+	w.Planning.Reviewer.Calls = 4
+	raw, _ := json.Marshal(w)
+	if _, e = s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); e != nil {
+		t.Fatal(e)
+	}
+	spec := p.Conversion.Spec
+	spec.Tasks[0].Title = "Clarified documentary scope"
+	raw, _ = json.Marshal(spec)
+	p = prepSave(t, s, p, "plan", string(raw))
+	r := prepRequest(p, "validate-plan")
+	r.Hash = p.Documents["plan"].Hash
+	p, e = s.preparationCommand(r)
+	if e != nil {
+		t.Fatal(e)
+	}
+	p, e = s.preparationCommand(conversionRequest(t, s, p, "revise-missions"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	got, e := s.get(p.WorkID)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if got.Tasks[0].PlanMaxAttempts != 4 || got.Tasks[0].CorrectiveRecovery.Event != "operator-grant" || got.Planning.Reviewer.Calls != 4 {
+		t.Fatal("lost grant or refunded review", got.Tasks[0], got.Planning.Reviewer)
+	}
+	for _, task := range got.Tasks {
+		if task.IndependentReview != nil || len(task.PreviousReviews) != 1 || task.PreviousReviews[0].ID != "old-"+task.ID || len(task.Attempts) != 1 || task.Attempts[0].ID != "produced-"+task.ID {
+			t.Fatalf("stale review or lost evidence: %+v", task)
+		}
+	}
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -24,30 +25,31 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
-	PreconditionEvidence string        `json:"precondition_evidence,omitempty"`
-	ConductorID          string        `json:"conductor_id,omitempty"`
-	ProviderDigest       string        `json:"provider_digest,omitempty"`
-	Mode                 string        `json:"mode,omitempty"`
-	Limits               *RunLimits    `json:"limits,omitempty"`
-	Level                string        `json:"level,omitempty"`
-	ModelPolicyHash      string        `json:"model_policy_hash,omitempty"`
-	PlanBriefHash        string        `json:"plan_brief_hash,omitempty"`
-	References           []DialogueRef `json:"references,omitempty"`
-	ContextHash          string        `json:"context_hash,omitempty"`
-	Brainstorm           bool          `json:"brainstorm,omitempty"`
-	Schema               int           `json:"schema_version"`
-	EventID              string        `json:"event_id"`
-	Revision             int           `json:"expected_revision"`
-	TaskID               string        `json:"task_id"`
-	Origin               string        `json:"origin,omitempty"`
-	Provider             string        `json:"provider"`
-	Workspace            string        `json:"workspace"`
-	Instruction          string        `json:"instruction"`
-	Role                 string        `json:"role"`
-	Parent               string        `json:"parent,omitempty"`
-	Previous             string        `json:"previous,omitempty"`
-	Timeout              int           `json:"timeout_seconds"`
-	Capture              bool          `json:"capture_output"`
+	Skills               []ActionSkillSelection `json:"skills,omitempty"`
+	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
+	ConductorID          string                 `json:"conductor_id,omitempty"`
+	ProviderDigest       string                 `json:"provider_digest,omitempty"`
+	Mode                 string                 `json:"mode,omitempty"`
+	Limits               *RunLimits             `json:"limits,omitempty"`
+	Level                string                 `json:"level,omitempty"`
+	ModelPolicyHash      string                 `json:"model_policy_hash,omitempty"`
+	PlanBriefHash        string                 `json:"plan_brief_hash,omitempty"`
+	References           []DialogueRef          `json:"references,omitempty"`
+	ContextHash          string                 `json:"context_hash,omitempty"`
+	Brainstorm           bool                   `json:"brainstorm,omitempty"`
+	Schema               int                    `json:"schema_version"`
+	EventID              string                 `json:"event_id"`
+	Revision             int                    `json:"expected_revision"`
+	TaskID               string                 `json:"task_id"`
+	Origin               string                 `json:"origin,omitempty"`
+	Provider             string                 `json:"provider"`
+	Workspace            string                 `json:"workspace"`
+	Instruction          string                 `json:"instruction"`
+	Role                 string                 `json:"role"`
+	Parent               string                 `json:"parent,omitempty"`
+	Previous             string                 `json:"previous,omitempty"`
+	Timeout              int                    `json:"timeout_seconds"`
+	Capture              bool                   `json:"capture_output"`
 	// Les champs recovery* sont calculés par le conducteur. Ils ne font pas
 	// partie du contrat JSON externe : un client ne peut ni s'accorder un
 	// budget supplémentaire ni choisir sa propre catégorie de reprise.
@@ -77,7 +79,19 @@ type AgentProgress struct {
 	PendingTools int    `json:"pending_tools"`
 	LastTool     string `json:"last_tool,omitempty"`
 	LastResult   string `json:"last_result_at,omitempty"`
+	LastOutput   string `json:"last_output_at,omitempty"`
+	OutputState  string `json:"output_state,omitempty"`
+	ToolState    string `json:"tool_state,omitempty"`
+	Vitality     string `json:"provider_vitality,omitempty"`
 	Degraded     string `json:"degraded,omitempty"`
+	// MetricsVersion==0 means this attempt predates the categorised bilan
+	// counters below: a reader must show them as unknown, never as zero.
+	MetricsVersion int `json:"metrics_version,omitempty"`
+	Reads          int `json:"tool_reads,omitempty"`
+	Writes         int `json:"tool_writes,omitempty"`
+	Unclassified   int `json:"tool_unclassified,omitempty"`
+	Errors         int `json:"tool_errors_total,omitempty"`
+	Repeats        int `json:"tool_repeats_total,omitempty"`
 }
 type AttemptDiagnostic struct {
 	AgentID                 string           `json:"agent_id"`
@@ -102,11 +116,15 @@ type DiagnosticItem struct {
 	Traces      []string `json:"traces"`
 }
 type Agent struct {
+	DeliveryVersion      int               `json:"delivery_version,omitempty"`
+	Workflow             *AgentWorkflow    `json:"workflow,omitempty"`
+	ProviderCooldown     *ProviderCooldown `json:"provider_cooldown,omitempty"`
 	Preflight            *PreflightResult  `json:"preflight,omitempty"`
 	PreconditionEvidence string            `json:"precondition_evidence,omitempty"`
 	Mode                 string            `json:"mode,omitempty"`
 	UnregisteredClaim    bool              `json:"-"`
 	ModelRoute           *ModelRoute       `json:"model_route,omitempty"`
+	ReportedModel        *ReportedModel    `json:"reported_model,omitempty"`
 	Context              *ContextManifest  `json:"context,omitempty"`
 	Brainstorm           bool              `json:"brainstorm,omitempty"`
 	Reply                string            `json:"reply,omitempty"`
@@ -378,7 +396,18 @@ func (s *Store) paused(work string) bool {
 }
 
 func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
-	return s.prepareLaunch(work, r, false)
+	policy, err := s.storageRetryPolicy()
+	if err != nil {
+		return Agent{}, false, err
+	}
+	for attempt := 0; ; attempt++ {
+		a, created, e := s.prepareLaunch(work, r, false)
+		var coded interface{ Code() int }
+		if e == nil || attempt >= policy.Retries || !errors.As(e, &coded) || (coded.Code()&255 != 5 && coded.Code()&255 != 6) {
+			return a, created, e
+		}
+		time.Sleep(time.Duration(policy.DelayMS) * time.Millisecond)
+	}
 }
 
 func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, bool, error) {
@@ -408,6 +437,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	} else if e != sql.ErrNoRows {
 		return a, false, e
 	}
+	if err := s.storageGuard(); err != nil {
+		return a, false, err
+	}
 	if archived, archiveErr := s.archived(work); archiveErr != nil {
 		return a, false, archiveErr
 	} else if archived {
@@ -428,23 +460,44 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if len(r.Instruction) > 16000 {
 		return a, false, fmt.Errorf("instruction limitée à 16000 octets")
 	}
-	if managedWork, err := s.get(work); err == nil && managedWork.Planning != nil && managedWork.Planning.Repository != nil {
-		if previewOnly {
-			r.Workspace = managedWork.Planning.Repository.Source
-		} else {
-			path, err := s.ensureManagedAttempt(managedWork, r)
-			if err != nil {
-				return a, false, err
-			}
-			r.Workspace = path
+	launchWork, err := s.get(work)
+	if err != nil {
+		return a, false, err
+	}
+	// A concurrent identical launch may commit between the idempotency read
+	// and this snapshot. Refuse its stale request before interpreting that new
+	// active attempt as a recovery of historical work. The transaction below
+	// still rechecks revision and all guards before reserving anything.
+	if launchWork.Revision != r.Revision {
+		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
+	}
+	if task, taskErr := launchWork.task(r.TaskID); taskErr == nil && task.ModelSelection != nil {
+		selected := task.ModelSelection
+		if r.Provider != selected.Provider || (r.Level != "" && r.Level != "auto" && r.Level != selected.Route.Level) {
+			return a, false, fmt.Errorf("Le lancement ne correspond pas au modèle configuré pour cette tâche.")
 		}
+		r.Level = selected.Route.Level
+		r.ModelPolicyHash = selected.Route.PolicyHash
 	}
-	if r.Workspace == "" {
-		r.Workspace = "."
+	if launchWork.Planning != nil && r.Role != "worker" {
+		return a, false, fmt.Errorf("mission hiérarchique : un responsable ne peut pas lancer une tâche de codage ; rôle worker requis")
 	}
-	cwd, e := resolveWorkspace(s.root, r.Workspace)
-	if e != nil {
-		return a, false, e
+	if launchWork.Planning != nil && r.Parent != "" {
+		return a, false, fmt.Errorf("mission hiérarchique : communication directe entre exécutants interdite ; remise au responsable requise")
+	}
+	if err = s.providerCooldownGuard(r.Provider); err != nil {
+		return a, false, err
+	}
+	if err = s.reviewerAvailable(launchWork); err != nil {
+		return a, false, err
+	}
+	recoveryHandoff, err := s.managedRecoveryHandoff(launchWork, taskForPreparation(launchWork, r.TaskID))
+	if err != nil {
+		return a, false, err
+	}
+	recoveryInstructions, err := managedRecoveryInstructions(recoveryHandoff)
+	if err != nil {
+		return a, false, err
 	}
 	providers, e := s.providers()
 	if e != nil {
@@ -503,6 +556,24 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e != nil || !info.Mode().IsRegular() || info.Mode()&0111 == 0 {
 		return a, false, fmt.Errorf("exécutable fournisseur indisponible")
 	}
+	if managedWork := launchWork; managedWork.Planning != nil && managedWork.Planning.Repository != nil {
+		if previewOnly {
+			r.Workspace = managedWork.Planning.Repository.Source
+		} else {
+			path, err := s.ensureManagedAttempt(managedWork, r)
+			if err != nil {
+				return a, false, err
+			}
+			r.Workspace = path
+		}
+	}
+	if r.Workspace == "" {
+		r.Workspace = "."
+	}
+	cwd, e := resolveWorkspace(s.root, r.Workspace)
+	if e != nil {
+		return a, false, e
+	}
 	// La sonde externe peut durer plusieurs secondes. Elle précède donc toute
 	// transaction ; son reçu court et son contexte seront revérifiés dedans.
 	preflight, e := s.runProviderPreflight(r.Provider, p, cwd, r)
@@ -515,12 +586,31 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	defer tx.Rollback()
 	var archivedCount int
+	// Reserve the writer before reading launch guards. Otherwise another
+	// connection's heartbeat can make the read snapshot impossible to upgrade,
+	// producing SQLITE_BUSY instead of waiting for that short write to finish.
+	// Preflight has already completed outside this transaction. Preview and
+	// rejected launches roll back this no-op with all their other reservations.
+	if _, e = tx.Exec("UPDATE works SET revision=revision WHERE id=?", work); e != nil {
+		return a, false, e
+	}
 	if e = tx.QueryRow("SELECT count(*) FROM mission_lifecycle WHERE work_id=?", work).Scan(&archivedCount); e != nil {
 		return a, false, e
 	}
 	if archivedCount > 0 {
 		return a, false, &CommandError{Code: "mission_archived", Message: "mission archivée ; restaurer avant de lancer un agent"}
 	}
+	adminLimits, err := configuredRunLimitsWith(tx, work, r.Role, r.TaskID)
+	if err != nil {
+		return a, false, err
+	}
+	if r.Mode == "terminal" && adminLimits != (RunLimits{}) {
+		return a, false, fmt.Errorf("Limites administratives incompatibles avec le terminal natif ; utiliser le mode automatisé.")
+	}
+	// Administrative preferences never raise provider, explicit mission,
+	// plan or retry ceilings. Freeze them with the launch reservation.
+	limits = limits.cappedBy(adminLimits)
+	limits.ObservationMode = adminLimits.ObservationMode
 	var paused bool
 	e = tx.QueryRow("SELECT paused FROM cockpit_controls WHERE work_id=?", work).Scan(&paused)
 	if e != nil && e != sql.ErrNoRows {
@@ -538,7 +628,13 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		return a, false, e
 	}
 	if w.Revision != r.Revision {
-		return a, false, fmt.Errorf("révision périmée ; relire le travail")
+		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
+	}
+	if e = s.providerCooldownGuard(r.Provider); e != nil {
+		return a, false, e
+	}
+	if e = s.reviewerAvailable(w); e != nil {
+		return a, false, e
 	}
 	if r.Brainstorm {
 		if r.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != r.PlanBriefHash) {
@@ -562,6 +658,23 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	t, e := w.task(r.TaskID)
 	if e != nil {
 		return a, false, e
+	}
+	if e = s.requirementPrerequisiteGuard(&w, t); e != nil {
+		return a, false, e
+	}
+	if w.Planning != nil {
+		// Scope owners are activated by planningStep in a separate tool-free
+		// context. They are never executable task agents, and workers cannot form
+		// a side-channel hierarchy through Agent.Parent.
+		if r.Role != "worker" {
+			return a, false, fmt.Errorf("mission hiérarchique : un responsable ne peut pas lancer une tâche de codage ; rôle worker requis")
+		}
+		if t.PlanRole != "" && t.PlanRole != "worker" {
+			return a, false, fmt.Errorf("mission hiérarchique : seuls les exécutants peuvent lancer une tâche")
+		}
+		if r.Parent != "" {
+			return a, false, fmt.Errorf("mission hiérarchique : communication directe entre exécutants interdite ; remise au responsable requise")
+		}
 	}
 	var latestAttempt Agent
 	var latestBody []byte
@@ -595,13 +708,15 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		if e = tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=?", work, t.ID).Scan(&attempts); e != nil {
 			return a, false, e
 		}
-		if attempts >= t.PlanMaxAttempts {
+		if attempts >= t.PlanMaxAttempts && !limits.observing() {
 			return a, false, fmt.Errorf("Plafond du plan atteint : %d tentatives. Consigner une OODA et revoir le plan avant toute nouvelle mission.", t.PlanMaxAttempts)
 		}
 		if t.PlanToolLimit > 0 && (limits.MaxToolCalls == 0 || t.PlanToolLimit < limits.MaxToolCalls) {
 			limits.MaxToolCalls = t.PlanToolLimit
 		}
-		r.Role = t.PlanRole
+		if t.PlanRole != "" {
+			r.Role = t.PlanRole
+		}
 	}
 	if t.PlanBriefHash != "" && (w.PlanningBrief == nil || w.PlanningBrief.SHA256 != t.PlanBriefHash) {
 		return a, false, fmt.Errorf("Brief modifié : préparer un nouveau plan.")
@@ -626,6 +741,21 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		}
 		if previous.WorkID != work || previous.TaskID != r.TaskID || activeAgent(previous) {
 			return a, false, fmt.Errorf("précédent incompatible ou encore actif")
+		}
+		if previous.Provider != r.Provider {
+			cooldown := previous.ProviderCooldown
+			if cooldown == nil {
+				cooldown, _, e = s.providerCooldown(previous.Provider)
+				if e != nil {
+					return a, false, e
+				}
+			}
+			if cooldown != nil && cooldown.active(time.Now()) {
+				decision := t.ProviderRelayDecision
+				if decision == nil || decision.AgentID != previous.ID || decision.Action != providerRelayAction || decision.Provider != r.Provider {
+					return a, false, fmt.Errorf("Relais fournisseur non autorisé : enregistrer un choix explicite avec providers relay decide.")
+				}
+			}
 		}
 		if r.Mode != previous.Mode {
 			return a, false, fmt.Errorf("Une reprise conserve le mode de la tentative précédente.")
@@ -672,6 +802,19 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e = s.recheckPreflight(preflight, r.Provider, p, cwd, r); e != nil {
 		return a, false, e
 	}
+	if r.Skills == nil && previous.Workflow != nil {
+		for _, skill := range previous.Workflow.Skills {
+			r.Skills = append(r.Skills, ActionSkillSelection{skill.Path, skill.SHA256})
+		}
+	}
+	workflow, workflowPrompt, e := s.projectAgentWorkflow(r.Role)
+	if e != nil {
+		return a, false, e
+	}
+	workflow, workflowPrompt, e = s.withActionSkills(workflow, workflowPrompt, r.Skills)
+	if e != nil {
+		return a, false, e
+	}
 	originalNext := t.Next
 	// Same transaction as the session intent: no orphan running task on launch conflict.
 	if e = s.apply(&w, "task.update", Request{ID: r.TaskID, Status: "running", Owner: r.Provider, Origin: conductorAuthor, Next: "Examiner le handoff et les preuves après exécution"}); e != nil {
@@ -690,17 +833,37 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 			}
 		}
 		if r.Origin != originConductor {
-			w.Profile = &profile
+			workProfile := profile
+			workProfile.Skills = nil // Action-specific selection must not leak to other tasks.
+			workProfile.Limits = nil
+			workProfile.Timeout = 0
+			workProfile.Instruction = ""
+			if w.Profile != nil {
+				workProfile.Instruction = w.Profile.Instruction
+				// A task launch is not authorization to change mission-wide ceilings.
+				workProfile.Limits = w.Profile.Limits
+				workProfile.Timeout = w.Profile.Timeout
+			}
+			w.Profile = &workProfile
 		}
 	}
-	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, r.Instruction)
+	instruction := r.Instruction
+	if w.Profile != nil && strings.TrimSpace(w.Profile.Instruction) != "" && w.Profile.Instruction != r.Instruction {
+		instruction = "Consignes communes de la mission :\n" + w.Profile.Instruction + "\nConsignes propres à cette tâche :\n" + r.Instruction
+	}
+	prompt := fmt.Sprintf("Travail: %s\nObjectif: %s\nPérimètre: %s\nRôle: %s\nTâche %s: %s\nLivrable: %s\nCritères: %s\nProchaine action: %s\nCheckpoint: %s\nInstructions complémentaires: %s\n", w.Title, w.Objective, w.Scope, r.Role, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, w.Summary, instruction)
 	if w.Planning != nil {
 		scope, err := w.Planning.scope(t.ScopeID)
 		if err != nil {
 			return Agent{}, false, err
 		}
-		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, r.Instruction)
+		prompt = fmt.Sprintf("Périmètre délégué : %s\nTâche %s : %s\nLivrable : %s\nCritères : %s\nProchaine action : %s\nInstructions locales : %s\n", scope.Objective, t.ID, t.Title, t.Deliverable, strings.Join(t.Criteria, "; "), originalNext, instruction)
 	}
+	if r.Role == "worker" {
+		prompt += workerExecutionContext(w, t, r.EventID)
+	}
+	prompt = workflowPrompt + prompt
+	prompt += recoveryInstructions
 	if r.Mode == "terminal" {
 		prompt += fmt.Sprintf("\nSession interactive supervisée, durée maximale %d secondes. Les appels d’outils et le coût ne sont pas mesurables dans ce mode ; ne pas prétendre qu’ils sont contrôlés. Respecter les permissions natives du fournisseur. Attendre les instructions de l’opérateur en cas de doute.\n", r.Timeout)
 	} else {
@@ -759,8 +922,17 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.ContextHash != "" && manifest.SHA256 != r.ContextHash {
 		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
 	}
+	p = synchronousAttemptProvider(p, r.Mode)
 	recovery := recoveryForLaunch(r, previous)
 	a = Agent{Preflight: &preflight, PreconditionEvidence: r.PreconditionEvidence, Mode: r.Mode, ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, Recovery: recovery, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	a.Workflow = &workflow
+	if w.Planning != nil && w.Planning.Repository != nil && r.Role == "worker" && r.Mode == "" {
+		a.DeliveryVersion = 1
+		a.Prompt += managedDeliveryInstructions(t, a.Attempt)
+		if len(a.Prompt) > 128000 {
+			return Agent{}, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+		}
+	}
 	if r.Mode == "terminal" {
 		if len(s.terminalSocket(a.ID)) >= 108 {
 			return a, false, fmt.Errorf("Chemin du terminal trop long ; utiliser une racine de projet plus courte.")
@@ -918,6 +1090,14 @@ func (s *Store) settleAgentTask(a Agent) error {
 	if state == "interrupted" {
 		outcome = "interrupted"
 	}
+	var stopArtifacts []ExchangeArtifact
+	if w.Planning != nil && (state == "failed" || state == "interrupted") {
+		if record, err := s.interruptionRecord(a); err != nil {
+			_ = s.log(a.ID, "warning", "Bilan d’arrêt non conservé : "+err.Error())
+		} else if record != nil {
+			stopArtifacts = append(stopArtifacts, *record)
+		}
+	}
 	// A crash after task.update(blocked) but before conduct leaves the exact
 	// attempt outcome durable. Resume that attributable handoff once. Relay on
 	// the agent is persisted before validation, so later polling does not relay
@@ -938,7 +1118,7 @@ func (s *Store) settleAgentTask(a Agent) error {
 		if e := s.apply(w, "task.update", r); e != nil {
 			return e
 		}
-		planningAttemptEnded(w, a, outcome)
+		planningAttemptEnded(w, a, outcome, stopArtifacts...)
 		task, _ := w.task(a.TaskID)
 		if task.Brainstorm {
 			body, e := readBrainstormReport(s.root, task.ID)
