@@ -111,6 +111,28 @@ class LocalWeb(unittest.TestCase):
         self.run_cli("restart")
         self.assertTrue(json.loads(self.run_cli("status"))["ready"])
 
+    def test_configure_retains_installed_binary_without_rebuilding(self):
+        checkout = Path(self.temp.name) / "launcher checkout"
+        (checkout / "tools").mkdir(parents=True)
+        shutil.copy2(SOURCE / "swarm.sh", checkout / "swarm.sh")
+        shutil.copy2(SOURCE / "tools/swarm_local.py", checkout / "tools/swarm_local.py")
+        configured = [str(checkout / "swarm.sh")]
+        result = subprocess.run([*configured, "configure", "--root", str(self.root),
+                                 "--address", self.address, "--binary", BINARY],
+                                text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        settings = json.loads((checkout / "deploy/local-web.json").read_text())
+        self.assertEqual(settings["binary"], str(Path(BINARY).resolve()))
+        try:
+            for action in ["start", "restart"]:
+                result = subprocess.run([*configured, action, "--no-open"], text=True, capture_output=True, timeout=40)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                status = json.loads(subprocess.check_output([*configured, "status"], text=True))
+                self.assertTrue(status["ready"])
+                self.assertEqual(Path(f'/proc/{status["pid"]}/exe').resolve(), Path(BINARY).resolve())
+        finally:
+            subprocess.run([*configured, "stop"], capture_output=True, timeout=20)
+
     def test_stale_pid_does_not_kill_unrelated_process(self):
         sleeper = subprocess.Popen(["sleep", "60"])
         try:

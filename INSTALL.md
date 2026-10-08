@@ -225,7 +225,7 @@ Le script compile dans un fichier temporaire du dossier cible, puis remplace le 
 | Fournisseur absent | Installation dans le conteneur, PATH et `.swarm/providers.json` |
 | Agent installé mais appel refusé | Authentification, variables autorisées et capacités de sandbox |
 | Ancienne mission avec chemins invalides | Adapter les profils vers `/workspace` sans lancer deux serveurs sur la même base |
-| Méthode de préparation indisponible | Vérifier la racine utilisée par Swarm et les ressources de méthode de ce projet ; voir le [guide des méthodes](docs/AGENT-METHODS.md). Installer le binaire seul ne copie pas ces ressources dans un autre projet. |
+| Méthode de préparation indisponible | Mettre à jour puis reconstruire Swarm : les méthodes sont embarquées et fonctionnent dans un projet vide. Si un fichier local existe, vérifier l’erreur précise et ses droits ; voir le [guide des méthodes](docs/AGENT-METHODS.md). |
 
 Le Dockerfile compile les sources présentes localement. Il n’existe pas ici de promesse d’image publique préconstruite ni de compatibilité universelle avec les fournisseurs.
 
@@ -511,10 +511,18 @@ Vérifiez le catalogue de votre projet depuis le même emplacement qu’au lance
 swarm --root /chemin/du/projet --json prepare methods
 ```
 
-Chaque méthode expose sa disponibilité. Le binaire contient le cadrage des rôles
-pour l’exécution ; les méthodes de **préparation** sont lues dans le projet piloté.
-En Docker, cette racine est `/workspace`. Ne confondez pas un fournisseur installé,
-une méthode disponible et un plan autorisé. Voir le [catalogue des méthodes](docs/AGENT-METHODS.md).
+Les quatre méthodes de préparation sont embarquées dans le binaire : elles sont
+utilisables dans un projet vide, en natif comme dans Docker. Aucun répertoire
+`.claude` n’est créé dans votre projet. Pour chaque fichier, une personnalisation
+présente dans la racine du projet remplace la version embarquée ; si ce fichier
+est absent, Swarm utilise sa version intégrée. Les fichiers locaux doivent être
+réguliers, UTF-8 et de 128 Kio maximum ; liens symboliques, fichiers vides ou
+invalides et accès refusés rendent la méthode indisponible, sans remplacement
+silencieux. Une modification ou un retrait change l’empreinte du contexte.
+Le contenu reste limité à l’analyse et à la planification pendant la préparation.
+
+En Docker, la racine du projet est `/workspace`. Un fournisseur installé et un
+plan autorisé restent des étapes distinctes. Voir le [catalogue des méthodes](docs/AGENT-METHODS.md) et la [recette d’installation neuve](docs/FRESH-INSTALL.md).
 
 ## Reconnaître le résultat après le lancement
 

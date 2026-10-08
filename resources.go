@@ -7,7 +7,7 @@ import "embed"
 //go:embed web/*
 var Web embed.FS
 
-//go:embed tools/agent-workflows/CONTRACT.md tools/agent-workflows/templates/*.md .claude/skills/*/SKILL.md
+//go:embed tools/agent-workflows/CONTRACT.md tools/agent-workflows/templates/*.md .claude/skills/*/SKILL.md .claude/commands/ks-feature.md .claude/commands/ks-plan.md
 var AgentWorkflow embed.FS
 
 //go:embed tools/agent-workflows/templates/preparations.json

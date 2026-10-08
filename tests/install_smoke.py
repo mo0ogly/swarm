@@ -44,6 +44,12 @@ try:
     run(['./install.sh', '--mode', 'native', '--bin-dir', str(native), '--project', str(project)])
     initial = json.loads(run([str(native / 'swarm'), '--root', str(project), '--json', 'work', 'list']))
     assert initial is not None
+    def methods_available(command):
+        methods = json.loads(run(command + ['prepare', 'methods']))
+        assert {m['id'] for m in methods} == {'apex', 'ks-feature', 'debug', 'audit-pdca'}
+        assert all(m['available'] and m['sha256'] for m in methods), methods
+        assert not (project / '.claude').exists(), 'Bundled methods must not populate project files'
+    methods_available([str(native / 'swarm'), '--root', str(project), '--json'])
     # Preserve sentinel proves initialization does not remove project content.
     (project / 'keep.txt').write_text('preserve me')
     with socket.socket() as sock:
@@ -57,6 +63,9 @@ try:
     with browser.open(url) as response:
         assert response.status == 200 and b'SWARM' in response.read().upper()
     prefix = compose + ['exec', '-T', 'swarm', 'swarm', '--root', '/workspace', '--json']
+    methods_available(prefix)
+    http_methods = json.loads(browser.open(f'http://127.0.0.1:{port}/api/v1/preparations/methods').read())
+    assert len(http_methods) == 4 and all(m['available'] for m in http_methods)
     work = json.loads(run(prefix + ['work', 'create', '--input', '-'], input=json.dumps({
         'schema_version': 1, 'event_id': str(uuid.uuid4()), 'expected_revision': 0,
         'title': 'Docker persistence test', 'objective': 'Preserve this mission across recreation',
@@ -71,6 +80,7 @@ try:
     run(compose + ['down'])
     run(compose + ['up', '-d', '--wait', '--wait-timeout', '60'])
     restored = json.loads(run(prefix + ['work', 'show', work['id']]))
+    methods_available(prefix)
     assert work['id'] in json.dumps(restored)
     assert (agent_home / 'keep-agent.txt').read_text() == 'persisted'
     assert (project / 'keep.txt').read_text() == 'preserve me'

@@ -430,11 +430,18 @@ Check the catalogue in the same project root used by your server:
 swarm --root /path/to/project --json prepare methods
 ```
 
-Each method reports its availability. Execution-role guidance is embedded in the
-binary; **preparation** methods are read from the controlled project. In Docker,
-that root is `/workspace`. Installing an AI provider, making a method available
-and authorizing a plan are distinct steps. Installing the binary alone does not
-copy preparation resources to another project. See the [method catalogue](AGENT-METHODS.md).
+All four preparation methods are embedded in the binary and work in an empty
+project, in native and Docker installations. Swarm creates no `.claude` directory
+in your project. For each file, an existing project-root override replaces the
+bundled version; an absent file uses the embedded version. Local files must be
+regular UTF-8 text, nonempty and at most 128 KiB. Symbolic links, invalid files
+and denied access make the method unavailable rather than silently replacing it.
+Changing or removing an override changes the context fingerprint. Preparation
+remains restricted to analysis and planning.
+
+In Docker, the project root is `/workspace`. Provider setup and plan authorization
+remain separate steps. See the [method catalogue](AGENT-METHODS.md) and the
+[fresh installation recipe](FRESH-INSTALL.md).
 
 ## Recognize the result after launch
 

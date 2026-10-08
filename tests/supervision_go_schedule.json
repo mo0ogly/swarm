@@ -1,8 +1,13 @@
 {
   "version": 1,
-  "groups": 16,
+  "groups": 13,
   "parallelism": 16,
   "test_timeout_seconds": 240,
+  "dedicated": [
+    "TestManagedFragmentHistoricalPublicRecovery",
+    "TestManagedFragmentRuntimeProviderProtocol",
+    "TestManagedFragmentIntegrationPublishesOnlyFinalVerdict"
+  ],
   "isolated": [
     "TestEngineContractRevisionKillsInferenceOnContractMutation",
     "TestEngineContractRevisionRejectsReceiptChangedDuringInference",

@@ -53,8 +53,9 @@ func prepMethods(t *testing.T, s *Store) {
 func TestPreparationDraftReopenHistoryAndNoAgents(t *testing.T) {
 	s := storeTest(t)
 	p := prepCreate(t, s)
-	if p.Method != "apex" || p.MethodHash != "" {
-		t.Fatal("draft must work without methods")
+	m, err := s.preparationMethod("apex")
+	if err != nil || p.Method != "apex" || p.MethodHash != m.Hash || m.Hash == "" {
+		t.Fatal("draft must use bundled methods in an empty project", err)
 	}
 	p = prepSave(t, s, p, "besoin", "Évolution web et CLI")
 	p = prepSave(t, s, p, "besoin", "Version courante")

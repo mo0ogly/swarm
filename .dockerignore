@@ -13,6 +13,9 @@
 !.claude/
 !.claude/skills/
 !.claude/skills/**
+!.claude/commands/
+!.claude/commands/ks-feature.md
+!.claude/commands/ks-plan.md
 !tools/
 !tools/agent-workflows/
 !tools/agent-workflows/CONTRACT.md

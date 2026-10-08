@@ -1,10 +1,5 @@
 package engine
 
-import (
-	"io"
-	"os"
-)
-
 type PreparationMethod struct {
 	ID        string   `json:"id"`
 	Title     string   `json:"title"`
@@ -29,30 +24,10 @@ func (s *Store) preparationMethods() []PreparationMethod {
 		joined := ""
 		m.Available = true
 		for _, path := range m.Paths {
-			p, e := localFile(s.root, path)
+			b, e := s.preparationMethodSource(path)
 			if e != nil {
 				m.Available = false
-				m.Reason = "Méthode hors périmètre : " + path
-				break
-			}
-			f, e := os.Open(p)
-			if e != nil {
-				m.Available = false
-				m.Reason = "Fichier de méthode indisponible : " + path
-				break
-			}
-			info, statErr := f.Stat()
-			if statErr != nil || !info.Mode().IsRegular() {
-				f.Close()
-				m.Available = false
-				m.Reason = "Fichier de méthode non régulier : " + path
-				break
-			}
-			b, e := io.ReadAll(io.LimitReader(f, 131073))
-			f.Close()
-			if e != nil || len(b) > 131072 {
-				m.Available = false
-				m.Reason = "Fichier de méthode illisible ou trop long : " + path
+				m.Reason = e.Error()
 				break
 			}
 			joined += path + "\x00" + hash(b) + "\n"

@@ -326,11 +326,7 @@ func (s *Store) preparationPromptForMode(p Preparation, m PreparationMethod, tur
 	sources := map[string]string{}
 	joined := ""
 	for _, path := range m.Paths {
-		full, e := localFile(s.root, path)
-		if e != nil {
-			return "", e
-		}
-		b, e := os.ReadFile(full)
+		b, e := s.preparationMethodSource(path)
 		if e != nil {
 			return "", e
 		}

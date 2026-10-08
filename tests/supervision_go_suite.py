@@ -12,9 +12,11 @@ def partition(names, plan):
     if not names or len(names) != len(set(names)):
         raise ValueError('empty or duplicate test inventory')
     isolated = plan['isolated']
-    if len(isolated) != len(set(isolated)) or not set(isolated) <= set(names):
+    dedicated = plan.get('dedicated', [])
+    reserved = isolated + dedicated
+    if len(reserved) != len(set(reserved)) or not set(reserved) <= set(names):
         raise ValueError('isolated test inventory mismatch')
-    remaining = set(names) - set(isolated)
+    remaining = set(names) - set(reserved)
     groups = [[] for _ in range(min(plan['groups'], len(remaining)))]
     weights = plan['observed_seconds']
     costs = [0.0 for _ in groups]
@@ -24,7 +26,9 @@ def partition(names, plan):
         index = min(range(len(groups)), key=lambda i: (costs[i], len(groups[i]), i))
         groups[index].append(name)
         costs[index] += weights.get(name, 1)
-    all_groups = [[name] for name in isolated] + groups
+    # Long protocols get their own bounded process. They are not timing-sensitive
+    # isolated cases, so run them alongside the remaining distributed groups.
+    all_groups = [[name] for name in reserved] + groups
     if sorted(name for group in all_groups for name in group) != sorted(names):
         raise ValueError('incomplete or duplicate coverage')
     return all_groups, len(isolated)

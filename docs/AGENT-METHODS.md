@@ -74,10 +74,15 @@ swarm --root "$PWD" --json prepare methods
 Chaque entrée indique `available` et une empreinte `sha256`. `audit_pdca` reste
 un alias de `audit-pdca` dans Swarm et `/audit_pdca` dans Claude. Des alias historiques restent acceptés pour les anciennes intégrations ; utilisez les méthodes de spécification pour les nouveaux parcours.
 
-La méthode de préparation est lue dans **la racine de projet utilisée par Swarm**. Installer le
-binaire seul ne copie pas cette configuration dans d'autres projets. En Docker,
-le projet monté comme racine doit contenir ces fichiers, liens compris. Ne pointez
-pas par erreur vers une ancienne copie du dépôt.
+Les quatre méthodes de préparation sont embarquées dans le binaire : elles sont
+utilisables dans un projet vide, en natif comme dans Docker. Aucun répertoire
+`.claude` n’est créé dans votre projet. Pour chaque fichier, une personnalisation
+présente dans la racine du projet remplace la version embarquée ; si ce fichier
+est absent, Swarm utilise sa version intégrée. Les fichiers locaux doivent être
+réguliers, UTF-8, non vides et de 128 Kio maximum. Les liens symboliques, fichiers
+invalides ou accès refusés rendent la méthode indisponible, sans remplacement
+silencieux. Une modification ou un retrait change l’empreinte du contexte.
+La préparation reste limitée à l’analyse et à la planification.
 
 ## Cadrage automatique des agents par le moteur
 
@@ -97,7 +102,7 @@ limite. Les méthodes sont **embarquées à la compilation** : modifier celles d
 espace exécutant ne remplace pas les consignes du moteur. Une modification de ce
 pack exige une reconstruction du binaire pour les futures tentatives.
 
-Les préparations continuent à lire leurs méthodes dans le projet. Les anciennes
+La préparation utilise le pack embarqué ou des fichiers locaux valides. Les anciennes
 tentatives ne reçoivent pas rétroactivement ces métadonnées. Le champ prouve le
 cadrage construit, pas l'obéissance du modèle. Les contrôles exécutables restent
 nécessaires.

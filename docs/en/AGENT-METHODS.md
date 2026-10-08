@@ -71,9 +71,14 @@ swarm --root "$PWD" --json prepare methods
 Each entry includes `available` and a `sha256` fingerprint. `audit_pdca` remains
 an alias for `audit-pdca` in Swarm, and `/audit_pdca` in Claude. Historical aliases remain accepted for older integrations; use the specification methods for new workflows.
 
-Preparation methods are read from **Swarm's configured project root**. Installing only the
-binary does not copy this configuration into other projects. With Docker, the
-mounted project root must contain these files, including their symbolic links.
+All four preparation methods are embedded in the binary and work in an empty
+project, in native and Docker installations. Swarm creates no `.claude` directory
+in your project. For each file, an existing project-root override replaces the
+bundled version; an absent file uses the embedded version. Local files must be
+regular UTF-8 text, nonempty and at most 128 KiB. Symbolic links, invalid files
+and denied access make the method unavailable rather than silently replacing it.
+Changing or removing an override changes the context fingerprint. Preparation
+remains restricted to analysis and planning.
 
 ## Automatic engine framing
 
