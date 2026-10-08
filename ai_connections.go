@@ -140,6 +140,10 @@ func (s *Store) aiConnectionsPublic() (any, error) {
 	return map[string]any{"version": 1, "digest": digest, "connections": rows}, nil
 }
 func callAIConnection(ctx context.Context, c AIConnection, prompt, schema string) (string, error) {
+	return callAIConnectionDebug(ctx, c, prompt, schema, nil)
+}
+func callAIConnectionDebug(ctx context.Context, c AIConnection, prompt, schema string, debug *aiConnectionDebug) (string, error) {
+	ctx = debug.trace(ctx)
 	if e := validateAIConnection(c); e != nil {
 		return "", e
 	}
@@ -160,17 +164,23 @@ func callAIConnection(ctx context.Context, c AIConnection, prompt, schema string
 	if c.Key != "" {
 		req.Header.Set("Authorization", "Bearer "+c.Key)
 	}
+	debug.add("request", fmt.Sprintf("POST %s ; modèle : %s", req.URL.Redacted(), c.Model))
+	debug.add("auth", fmt.Sprintf("Clé présente : %v ; appel exécuté par le serveur Swarm", c.Key != ""))
 	client := &http.Client{Timeout: 60 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return fmt.Errorf("Redirection refusée") }}
 	resp, e := client.Do(req)
 	if e != nil {
-		return "", fmt.Errorf("Connexion impossible ou délai dépassé ; vérifiez l’adresse et l’accès réseau.")
+		return "", aiConnectionNetworkError(e)
 	}
 	defer resp.Body.Close()
+	debug.add("http", fmt.Sprintf("HTTP %d", resp.StatusCode))
 	if resp.StatusCode != 200 {
 		return "", fmt.Errorf("Le serveur a répondu HTTP %d. Vérifiez la clé, le modèle et l’adresse.", resp.StatusCode)
 	}
 	raw, e := io.ReadAll(io.LimitReader(resp.Body, (1<<20)+1))
-	if e != nil || len(raw) > 1<<20 {
+	if e != nil {
+		return "", aiConnectionNetworkError(e)
+	}
+	if len(raw) > 1<<20 {
 		return "", fmt.Errorf("Réponse illisible ou supérieure à 1 Mio.")
 	}
 	var answer struct {
@@ -244,18 +254,20 @@ func (s *Store) registerAIConnections(mux *http.ServeMux, send func(http.Respons
 				return
 			}
 		}
-		ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+		ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
 		defer cancel()
 		start := time.Now()
-		reply, e := callAIConnection(ctx, c, "Réponds seulement : Connexion réussie.", "")
+		debug := &aiConnectionDebug{start: start}
+		debug.add("start", "Délai maximal : 60 s ; aucune donnée de mission envoyée")
+		reply, e := callAIConnectionDebug(ctx, c, "Réponds seulement : Connexion réussie.", "", debug)
 		if e != nil {
-			send(w, map[string]any{"ok": false, "error": e.Error(), "latency_ms": time.Since(start).Milliseconds()})
+			send(w, map[string]any{"ok": false, "error": e.Error(), "latency_ms": time.Since(start).Milliseconds(), "diagnostics": debug.snapshot(c.Key)})
 			return
 		}
 		if c.Key != "" {
 			reply = strings.ReplaceAll(reply, c.Key, "[secret masqué]")
 		}
-		send(w, map[string]any{"ok": true, "text": guardBlock(reply, 500), "latency_ms": time.Since(start).Milliseconds()})
+		send(w, map[string]any{"ok": true, "text": guardBlock(reply, 500), "latency_ms": time.Since(start).Milliseconds(), "diagnostics": debug.snapshot(c.Key)})
 	})
 }
 

@@ -13,3 +13,5 @@
 
 .connection-wide { grid-column: 1 / -1; }
 input.connection-readonly { background: var(--wattson-carte-appuyee); color: var(--wattson-texte-discret); }
+
+.connection-debug-log {white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;padding:12px;border:1px solid var(--wattson-ligne);border-radius:8px;background:var(--wattson-champ);color:var(--wattson-texte);font-size:.85rem}
