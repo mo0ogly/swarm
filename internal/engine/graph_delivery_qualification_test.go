@@ -190,6 +190,22 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	// AI diagnostics use a new pending candidate snapshot, preserving historical proof.
+	aiManifest := "docs/ai-connection-debug-candidate-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, aiManifest)); e == nil {
+		manifestPath = aiManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
+	// Native distribution changes have their own pending snapshot; retain prior evidence.
+	launcherManifest := "docs/native-launcher-candidate-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, launcherManifest)); e == nil {
+		manifestPath = launcherManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

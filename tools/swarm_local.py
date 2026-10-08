@@ -71,10 +71,13 @@ def stop(state, timeout, address):
         time.sleep(.1)
 
 
-def ready(address):
+def ready(address, root):
     try:
-        # A protected API may reply 403; a browser document must be available.
-        with urllib.request.urlopen(f"http://{address}/", timeout=1) as response:
+        key_path = root / ".swarm" / ("web-session-" + hashlib.sha256(address.encode()).hexdigest()[:16])
+        token = key_path.read_text().strip()
+        request = urllib.request.Request(f"http://{address}/", headers={
+            "Cookie": "swarm_session_" + hashlib.sha256(address.encode()).hexdigest()[:12] + "=" + token})
+        with urllib.request.urlopen(request, timeout=1) as response:
             return response.status == 200
     except (OSError, urllib.error.HTTPError):
         return False
@@ -131,7 +134,7 @@ def main():
             return 0
         if args.action == "status":
             print(json.dumps({"running": bool(running), "pid": state["pid"] if running else None,
-                              "root": str(root), "url": f"http://{args.address}/", "ready": ready(args.address) if running else False}))
+                              "root": str(root), "url": f"http://{args.address}/", "ready": ready(args.address, root) if running else False}))
             return 0 if running else 1
         if args.action == "logs":
             # The underlying server prints a bearer URL. Never expose that credential.
@@ -177,7 +180,7 @@ def main():
             while time.monotonic() < end:
                 if process.poll() is not None:
                     raise RuntimeError("Démarrage refusé ; ./swarm.sh logs pour le diagnostic sans clé privée.")
-                if ready(args.address):
+                if ready(args.address, root):
                     break
                 time.sleep(.1)
             else:

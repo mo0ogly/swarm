@@ -67,6 +67,7 @@ class LocalWeb(unittest.TestCase):
         client.open(self.url + "/session/" + key).close()
         cookie = list(jar)[0]
         self.assertIsNotNone(cookie.expires)
+        self.assertTrue(cookie.has_nonstandard_attr("HttpOnly"))
         request_path = self.root / "work.json"
         request_path.write_text(json.dumps({"schema_version": 1, "event_id": "stable-site-create", "expected_revision": 0,
                                           "title": "Persistent site", "objective": "Preserve", "scope": "Isolated lifecycle test", "criteria": ["State retained"]}))

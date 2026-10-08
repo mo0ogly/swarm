@@ -5,7 +5,7 @@ SWARM_OUTPUT ?= bin/swarm
 build:
 	sh ./build.sh "$(SWARM_OUTPUT)"
 test:
-	go test ./...
+	python3 tests/supervision_go_suite.py
 	npm test
 frontend:
 	cd frontend && npm ci --ignore-scripts --no-audit --no-fund && npm run build

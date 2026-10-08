@@ -580,3 +580,32 @@ manuellement ajouté. Le correctif n’est pas encore publié.
 ### Captures du candidat D02
 
 La recette fraîche du 6 octobre lie le candidat produit aux captures [graphe clair](docs/screenshots/graph-delivery-d02/fr-etat-graph.png), [graphe sombre](docs/screenshots/graph-delivery-d02/fr-sombre-graph.png), [programmes clairs](docs/screenshots/graph-delivery-d02/fr-etat-programs.png) et [programmes sombres](docs/screenshots/graph-delivery-d02/fr-sombre-programs.png). Il s’agit de parcours isolés sans fournisseur réel, après contrôle de migration et de rollback. Voir le [dossier D02](docs/D02-dossier.md#captures-d02-fraîches--6-octobre-2026).
+
+## Lanceur natif Linux
+
+Le dépôt fournit `swarm.sh` avec `tools/swarm_local.py`. Python 3 et Go sont
+requis pour construire ; `xdg-open` ouvre le navigateur. Depuis la racine :
+
+```sh
+./swarm.sh configure --root /chemin/du/projet
+./swarm.sh start
+./swarm.sh restart
+./swarm.sh status
+./swarm.sh open
+./swarm.sh logs
+./swarm.sh stop
+```
+
+`configure` enregistre le projet et l’adresse dans `deploy/local-web.json`,
+ignoré par Git. Le port natif par défaut est `18792`. Sans configuration,
+répétez `--root` pour conserver le même projet. `--no-open` évite l’ouverture
+du navigateur ; `--binary /chemin/swarm` utilise un binaire déjà construit.
+`start` réutilise son instance ; `restart` remplace uniquement le processus
+identifié dans son registre. Un autre processus occupant le port est refusé.
+Les missions et les clés du projet sont conservées. Le lanceur ne termine pas
+les agents : vérifiez l’activité avant de redémarrer. L’authentification reste
+active ; `open` transmet le lien privé au navigateur sans l’imprimer.
+
+Pour Docker, utilisez Docker Compose, pas ce lanceur. Voir le
+[guide des overrides et des IA sur site](docs/ON-PREMISE-AI.md) pour les
+certificats internes, DNS, proxies, montages et la conservation des connexions.

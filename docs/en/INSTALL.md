@@ -497,3 +497,28 @@ setting. The fix has not been published yet.
 ### D02 candidate screenshots
 
 The fresh October 6 recipe binds the product candidate to [light graph](../screenshots/graph-delivery-d02/en-etat-graph.png), [dark graph](../screenshots/graph-delivery-d02/en-sombre-graph.png), [light programs](../screenshots/graph-delivery-d02/en-etat-programs.png) and [dark programs](../screenshots/graph-delivery-d02/en-sombre-programs.png). These are isolated journeys with no real provider, following migration and rollback checks. See the [D02 dossier](../D02-dossier.md#captures-d02-fraîches--6-octobre-2026).
+
+## Native Linux launcher and on-premise APIs
+
+The repository ships `swarm.sh` and `tools/swarm_local.py`. Requires Python 3,
+Go for building and `xdg-open` to open the browser. Run from the repository:
+
+```sh
+./swarm.sh configure --root /path/to/project
+./swarm.sh start
+./swarm.sh restart
+./swarm.sh status
+./swarm.sh open
+./swarm.sh logs
+./swarm.sh stop
+```
+
+Configuration stays in Git-ignored `deploy/local-web.json`. The native default
+port is 18792. Without configuration, keep the same `--root` on each command.
+Use `--no-open` on a headless host or `--binary /path/to/swarm` for an existing
+binary. Only the recorded server is stopped; unrelated listeners are refused.
+Project data and keys are retained. Agents are not stopped by this launcher.
+Authentication stays enabled and private browser URLs are not printed.
+
+Docker uses Compose instead. The [on-premise override guide](../ON-PREMISE-AI.md)
+(French) covers internal CAs, DNS, proxies, mounts and saved connections.
