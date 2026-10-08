@@ -1,82 +1,97 @@
-# Résultat — réorganisation du dépôt Swarm
+# Résultat — réorganisation et installation de Swarm
 
-## Résultat et état
+## Résultat
 
-504 fichiers Go de la racine sont regroupés dans `internal/engine` ;
-`cmd/swarm/main.go` appelle le moteur et `resources.go` intègre les ressources
-canoniques. Compilation, installation native et retour arrière (deux cas D04 passés),
-Docker, contrôles CLI/HTTP, npm et vet sont vérifiés ; la suite Go complète est
-incomplète : la commande séquentielle a dépassé 25 minutes et trois groupes du
-harnais ont atteint leur limite de 240 secondes. Une recette rééquilibrée doit
-être rejouée avant publication finale.
+504 fichiers Go de la racine sont regroupés dans `internal/engine`.
+`cmd/swarm/main.go` appelle le moteur ; `resources.go` conserve les ressources
+canoniques embarquées. Le moteur reste un paquet : aucun découpage métier en
+plusieurs modules n'est revendiqué. Le build, les tests, les installateurs et la
+documentation suivent cette structure.
 
-## Identité et périmètre
+Le code `45b18eb` a passé la
+[CI complète](https://github.com/mo0ogly/swarm/actions/runs/37836580717), puis la
+[PR #10](https://github.com/mo0ogly/swarm/pull/10) a été fusionnée sur `main`
+(`c1f2b92`). Le second clone a installé ce main propre en natif, puis vérifié
+les méthodes dans une nouvelle racine vide et le redémarrage du serveur existant.
+Les corrections de méthodes et les captures sont détaillées dans le
+[rapport d'installation](fresh-install-methods-20261008.md).
 
-- Session : Codex native, demande utilisateur « organise mon repo ».
-- Dépôt : `/home/fpizzi/workspace/swarm` ; branche `codex/repository-organization`.
-- Base : `a09ae41d09c8bd229a7b7b299184ad7c9ac14eaf` ; candidat : `a09ae41d09c8bd229a7b7b299184ad7c9ac14eaf+sha256:efe034c579fe69b57825b6e82000abd974dc6eff27c4369864bb876b002af024`.
-- État : snapshot de réorganisation ; recette d’installation neuve et correction des méthodes en cours avant publication finale.
-- Les travaux préexistants sont préservés ; aucun état de mission n’est modifié.
-- La structure est organisée, mais le moteur reste un paquet : aucun découpage
-  métier en plusieurs modules n’est présenté comme réalisé.
+## Périmètre et conservation
 
-Le snapshot comprend les changements locaux d’installation, de session web et de
-formation nécessaires à une livraison cohérente. Les travaux de benchmark et de
-publication scientifique restent hors de ce commit.
+La base initiale de réorganisation est `a09ae41d09c8bd229a7b7b299184ad7c9ac14eaf`.
+Le pack public de formation FR/EN et les changements préexistants d'installation,
+de session web et de préparation nécessaires à la distribution sont inclus.
+Les travaux de benchmark et de publication scientifique restent hors de ces
+commits ; 80 fichiers hors périmètre gardent leur empreinte d'origine.
+Aucun état de mission utilisateur ni plafond d'exécution du moteur n'est modifié.
 
-## Constats et ajustements
+Les directives `go:embed` ne remontent pas vers un parent : le paquet de ressources
+à la racine évite de dupliquer les méthodes, configurations et fichiers web.
+Les tests gardent leur accès aux fonctions privées dans le paquet du moteur.
+Leurs lecteurs et sous-commandes utilisent explicitement la racine du dépôt,
+sans changement global du répertoire de travail des processus d'agents.
 
-Les directives `go:embed` ne peuvent pas remonter vers un parent. Un paquet de
-ressources à la racine conserve les fichiers canoniques sans les dupliquer.
-Les scripts de build, d’installation et les harnais doivent viser `./cmd/swarm` ;
-les recettes de tests ciblées doivent viser `./internal/engine`.
+Le manifeste de réorganisation est un snapshot d'intégrité du code actuel,
+prioritaire sur les anciens snapshots. Il ne renouvelle aucune acceptation
+historique : les exigences antérieures restent marquées à requalifier.
 
-Les 1 068 tests/examples/fuzz enregistrés sont identiques avant et après migration.
-La partition du harnais reste complète et sans doublons, avec 19 groupes dont
-3 isolés. Les tests Go restent avec le code pour conserver l’accès aux fonctions
-privées. Les lecteurs de fixtures et commandes de tests utilisent explicitement
-la racine du dépôt, sans changer le répertoire de travail des processus d’agents.
+## Vérification
 
-Un test DOM optionnel échouait déjà sur les fichiers exacts de `HEAD` : sa fixture
-ne fournissait plus les scopes ni le constructeur de boutons. La fixture est
-adaptée au contrat actuel ; les assertions existantes passent et la recette
-exécute réellement deux tests Go. Le DOM est simulé ; ce n’est pas un navigateur.
+| Contrôle | Résultat | Preuve et limite |
+| --- | --- | --- |
+| Structure, build CLI et métadonnées | PASS | Trois paquets, un seul Go à la racine ; binaire installé depuis main identifié et propre |
+| Inventaire Go | PASS | 1 068 cas conservés, trois régressions ajoutées : 1 071 cas découverts |
+| Suite Go en CI | PASS | 19 groupes, six isolés et treize distribués sur quatre processus ; délai inchangé de 240 s par groupe ; tous les codes de sortie 0 |
+| Résultats Go en CI | PASS avec skips explicites | 1 059 passés, 12 ignorés ; les skips ne sont pas comptés comme des succès |
+| `go vet ./...`, `npm test` | PASS | CI et contrôles locaux ; régression des réponses JSON avec retours à la ligne incluse |
+| Lanceur natif | PASS | Huit tests de vrais processus : paramètres conservés, reprise, persistance et serveur étranger |
+| Installation native et Compose | PASS | Candidat local, clone GitHub propre et job CI ; recréation, HTTP authentifié, méthodes, propriété et intégrité SQLite |
+| CLI, états et campagne Python | PASS | Racines isolées ; campagne : quatre tests passés et un skip opt-in ; fixture DOM explicitement simulée |
+| Contrat et distribution | PASS | Neuf méthodes canoniques versionnées, commandes et documentation FR/EN ; aucun état ou secret suivi |
+| Confidentialité et conservation | PASS | Archives publiques inspectées, overrides et documents privés ignorés, empreintes des travaux hors périmètre identiques |
 
-Les manifestes antérieurs restent inchangés. Le nouveau manifeste est un snapshot
-d’intégrité et marque les exigences historiques comme à requalifier : les anciennes
-captures et revues ne certifient pas ce candidat.
+Les douze skips Go en CI sont : `TestManagedRecoveryBrowserRecipe`,
+`TestEngineContractTruthBrowser`, `TestLiveProviderStreamReplay`,
+`TestCorrectiveRecoveryBrowserRecipe`, `TestHistoricalRequalificationBrowser`,
+`TestAssistBudgetSharesTheLaunchEnvelope`, `TestRecoveryHealthBrowserRecipe`,
+`TestOperatorPreview`, `TestAssistAskRequiresReviewedContextAndStaysSingle`,
+`TestAssistTurnsStayWithinTheirWork`, `TestExecutionExplorationDirectives`
+(`rg` absent dans le runner) et `TestMissingReportRecoveryBrowserRecipe`.
+Les recettes de navigateur effectivement exécutées par CI sont distinctes de
+ces skips : la disponibilité des méthodes des agents et l'i18n.
 
-## Exigences et vérification
+## Échecs locaux conservés et correction de la recette
 
-| ID | Vérification exécutée | Résultat | Preuve et limite |
-| --- | --- | --- | --- |
-| ORG-01 | `go list ./...` ; `sh build.sh /tmp/swarm-repo-organization-aulsuzw3/swarm` | PASS | Trois paquets ; binaire identifié et un seul Go à la racine |
-| ORG-02 | Build Docker ; conteneur sans réseau externe ; version, init, commande invalide, session, API et ressources web | PASS | Empreinte du JavaScript intégré identique au source ; image locale uniquement |
-| ORG-03 | Inventaire enregistré ; 6 tests ciblés ; `npm test` ; `go vet ./...` | PASS | Aucun test Go perdu ; scripts et assertions exécutés |
-| ORG-03 | `go test -json -count=1 -timeout 25m ./...` | TIMEOUT | Aucun test individuel en échec avant le dépassement ; suite incomplète |
-| ORG-03 | Harnais exhaustif de 1 068 cas | TIMEOUT | 16 groupes terminés ; 3 groupes dépassent 240 s, sans échec fonctionnel antérieur |
-| ORG-03 | `SWARM_TEST_BINARY=/tmp/swarm-repo-organization-aulsuzw3/swarm python3 -m unittest discover -s tests -p test_swarm_local.py` | PASS | 7 tests ; redémarrage, persistance et processus étrangers |
-| ORG-03 | Harnais de campagne Python ; recette d’états DOM et Go ; recette CLI `tests/smoke.py` | PASS | Campagne : 4 tests passés et 1 skip opt-in ; pas de fournisseur IA réel |
-| ORG-04 | `python3 tools/check_distribution.py` ; `python3 tools/agent-workflows/check.py` | PASS | Liens de documentation et 9 méthodes vérifiés ; cartes FR/EN |
-| ORG-05 | Empreintes avant/après ; `git check-ignore` ; `git diff --check` | PASS | Aucun fichier hors périmètre modifié ; documentation Skynet et données privées exclues |
+La première suite Go séquentielle a dépassé 25 minutes. Des partitions à seize
+processus ont également atteint 240 secondes dans trois puis quatre groupes.
+Avec quatre processus, les deux protocoles les plus lourds ont encore dépassé
+ce délai et le lecteur de manifeste sélectionnait un ancien snapshot après
+l'intégration de main. Les protocoles longs sont désormais isolés, le snapshot
+courant est sélectionné en dernier, et son entrée de régression JS porte le
+bon type. Le test d'intégrité refuse toujours les entrées absentes, modifiées
+ou incomplètes ; les contrôles ciblés passent dans le clone propre.
 
-Les logs, inventaires et sauvegardes se trouvent dans
-`/tmp/swarm-repo-organization-aulsuzw3`. Les contrôles Docker utilisent un
-répertoire tmpfs isolé, sans volume de mission, avec `--network none`.
-Le test CLI utilise des racines temporaires et ne lance aucun fournisseur IA.
-Le premier probe Docker supposait à tort que `work list` renvoyait un objet :
-il a été corrigé pour vérifier le tableau réellement retourné, puis réexécuté.
-La suite préliminaire a été interrompue ; un premier run du candidat a été
-relancé après correction d’un chemin absolu de fixture trouvé en auto-revue.
-Ces exécutions interrompues ne sont pas comptées comme des succès.
+Dans la dernière recette locale, les trois protocoles longs passent en 169,2 s,
+75,5 s et 154,2 s. Un test sensible au démarrage a échoué à attendre son
+sous-processus ; le contrôle ciblé suivant passe en 1,95 s sans changement de
+son assertion. La fin de cette recette locale a été arrêtée lorsque la suite
+CI exhaustive du même code a terminé avec succès. Ce run local n'est donc pas
+présenté comme une suite verte. Aucun délai ou quota du moteur n'a été augmenté.
 
-## Revue, récupération et limites
+Une ancienne fixture DOM optionnelle échouait aussi sur les fichiers exacts de
+la base : elle est adaptée aux scopes et boutons actuels, sans supprimer les
+assertions. La recette passe et exécute deux tests Go ; le DOM simulé ne constitue
+pas une vérification dans un navigateur.
 
-Auto-revue dans la session de l’auteur, sans revue indépendante ni acceptation
-par le moteur. La sauvegarde contient les sources avant déplacement, les fichiers
-adaptés, le diff antérieur et les empreintes. Restaurer uniquement ce périmètre,
-sans écraser les travaux apparus depuis ni toucher aux bases `.swarm`.
+## Revue et limites
 
-Le site pizza en cours d’utilisation reste lancé. Le serveur Swarm déjà lancé
-utilise son binaire antérieur : les tests portent sur le candidat construit pour
-les fixtures, sans prétendre avoir mis à jour le processus actif.
+Auto-revue dans la session de l'auteur ; aucune revue indépendante ou acceptation
+par le moteur n'est revendiquée. Les sauvegardes, inventaires et logs locaux sont
+conservés dans le répertoire temporaire de recette. Restaurer uniquement les
+fichiers de ce périmètre, sans écraser les travaux apparus depuis ni modifier
+les bases `.swarm`.
+
+Le navigateur vérifie l'installation avec un fournisseur HTTP simulé local.
+Aucun fournisseur IA externe, départ d'agent, paiement ou livraison réelle n'est
+revendiqué. Le serveur utilisateur et le site pizza restent distincts de la
+seconde installation de recette ; leurs données sont conservées.
