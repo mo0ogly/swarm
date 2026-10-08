@@ -38,3 +38,9 @@ staged diff whitespace check and Docker Compose CA override validation.
 Git ignore probes match private DOCX/PDF, private document directory,
 local override and certificates. Public additions contain no organization URL,
 internal address, key or certificate. GitHub CI remains the final merge gate.
+
+Qualification follow-up: `.gitignore` is a hashed input of the previous
+candidate. Add a separate pending native-launcher snapshot and select it in the
+qualification loader, without changing historical manifests or acceptance
+statuses. It hashes the clean main-based candidate and its launcher/docs/CI
+inputs. A clean clone also passes all seven lifecycle tests (11.693 s).
