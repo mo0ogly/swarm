@@ -82,6 +82,9 @@ Ne désactivez pas la vérification TLS pour masquer une autorité manquante.
 4. Vérifier les quatre méthodes : analyse et planification, parcours guidé,
    diagnostic, examen et amélioration. Elles sont embarquées dans Swarm ; un
    projet vide n’a pas besoin d’un dossier `.claude` ou d’une installation Claude.
+   Les profils de consignes du projet sont distincts : dans un projet vide,
+   `.claude`, `AGENTS.md` ou les autres profils peuvent être indiqués
+   **indisponibles**. Cela ne rend pas les méthodes embarquées indisponibles.
 5. Ajouter votre propre IA et utiliser **Tester la connexion**. En cas d’échec,
    copier les diagnostics en masquant les informations internes avant partage.
 6. Envoyer une demande de préparation. Elle propose du texte et un plan ; elle
@@ -95,6 +98,12 @@ Le [guide utilisateur](../GUIDE-UTILISATEUR.md) explique les étapes suivantes e
 les graphes. La [formation pizza FR/EN](training/casa-pizza/README.md) fournit un
 atelier détaillé. Une installation ou une méthode disponible ne prouve pas la
 réussite d’une mission réelle avec un fournisseur IA.
+
+Les sources livrées sont versionnées dans [`.claude/skills`](../.claude/skills),
+les commandes de préparation dans [`.claude/commands`](../.claude/commands) et
+le [contrat partagé](../tools/agent-workflows/CONTRACT.md). Le build les intègre
+dans le binaire et l’image ; elles restent accessibles si le projet utilisateur
+ne contient aucun de ces fichiers.
 
 ## Contrôler les méthodes depuis le terminal
 

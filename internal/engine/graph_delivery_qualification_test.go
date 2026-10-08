@@ -182,14 +182,6 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
-	// Layout integrity is a fresh snapshot, never a renewal of historical acceptance.
-	layoutManifest := "docs/repository-organization-manifest.json"
-	if _, e := os.Stat(filepath.Join(root, layoutManifest)); e == nil {
-		manifestPath = layoutManifest
-	} else if !os.IsNotExist(e) {
-		t.Fatal(e)
-	}
-
 	// AI diagnostics use a new pending candidate snapshot, preserving historical proof.
 	aiManifest := "docs/ai-connection-debug-candidate-manifest.json"
 	if _, e := os.Stat(filepath.Join(root, aiManifest)); e == nil {
@@ -202,6 +194,15 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 	launcherManifest := "docs/native-launcher-candidate-manifest.json"
 	if _, e := os.Stat(filepath.Join(root, launcherManifest)); e == nil {
 		manifestPath = launcherManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
+	// Layout integrity covers the current combined source tree, after older snapshots.
+	// It is never a renewal of historical acceptance.
+	layoutManifest := "docs/repository-organization-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, layoutManifest)); e == nil {
+		manifestPath = layoutManifest
 	} else if !os.IsNotExist(e) {
 		t.Fatal(e)
 	}

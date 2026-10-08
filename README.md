@@ -192,7 +192,7 @@ Le lanceur construit le binaire et ouvre la session locale automatiquement. L’
 3. Choisissez les agents, les espaces de travail et les conditions d’acceptation.
 4. Autorisez le lancement, puis suivez le graphe et les résultats à examiner.
 
-Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Pour piloter un autre projet, vérifiez les ressources de méthode disponibles dans ce projet. Consultez aussi les [limites de migration](docs/migration/README.md).
+Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Les quatre méthodes de préparation fonctionnent dans un projet vide grâce au pack embarqué ; les personnalisations locales restent contrôlées. Consultez aussi les [limites de migration](docs/migration/README.md).
 
 ### Et en ligne de commande ?
 
@@ -265,6 +265,11 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 - [Workflows et points de reprise](WORKFLOWS.md)
 - [Extraction vers le dépôt autonome et limites connues](docs/migration/README.md)
 - [Licence et historique de licence](docs/LICENSING.md)
+
+
+Les fichiers des méthodes sont versionnés dans [`.claude/skills/`](.claude/skills/)
+et les commandes de préparation dans [`.claude/commands/`](.claude/commands/).
+[Recette pour une installation neuve](docs/FRESH-INSTALL.md).
 
 ## Structure du dépôt
 

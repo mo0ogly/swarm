@@ -91,6 +91,14 @@ See the [user guide](USER-GUIDE.md) for subsequent steps and task graphs, and th
 workshop. Installing Swarm or loading a method does not prove successful delivery
 of a real mission with an AI provider.
 
+The shipped sources are versioned in [`.claude/skills`](../../.claude/skills),
+with preparation commands in [`.claude/commands`](../../.claude/commands) and
+the [shared contract](../../tools/agent-workflows/CONTRACT.md). The build embeds
+them in the binary and image. An empty user project does not need these files.
+Project instruction profiles are separate: `.claude`, `AGENTS.md` or other
+profiles may be unavailable in an empty project while bundled methods remain
+available.
+
 ## Check the method catalogue
 
 ```sh

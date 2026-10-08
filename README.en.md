@@ -185,8 +185,12 @@ tests do not qualify a real provider's authentication, permissions or results.
 Data is local under the controlled project's `.swarm/`. Keep this directory,
 authentication and session links private. This repository supplies nine
 [working methods](docs/en/AGENT-METHODS.md), including planning, system examination and improvement,
-debugging, review and lessons learned. When controlling another project, check
-which method resources are available in that project.
+debugging, review and lessons learned. All four preparation methods work from the bundled pack in an empty project;
+existing local overrides are checked before use.
+
+Method source files are tracked in [`.claude/skills/`](.claude/skills/) and
+preparation commands in [`.claude/commands/`](.claude/commands/).
+[Fresh installation checklist](docs/en/FRESH-INSTALL.md).
 
 ## Repository layout
 

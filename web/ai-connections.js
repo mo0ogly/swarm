@@ -1,6 +1,15 @@
 const tr_web_ai_connections_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 /* Operator-owned text APIs. Secrets are write-only and never put in storage. */
 const AIConnections={state:null,
+ responseText(text){
+  // Decode only valid JSON replies; plain text and literal backslashes stay intact.
+  try{
+   const reply=JSON.parse(text);
+   if(typeof reply==='string')return reply;
+   if(reply&&typeof reply.message==='string')return [reply.message,typeof reply.brief==='string'?reply.brief:''].filter(Boolean).join('\n\n');
+  }catch{}
+  return text;
+ },
  async load(){
   const host=$('ai-connections-list');host.textContent=tr_web_ai_connections_js('Chargement des connexions…');
   try{this.state=await api('/api/v1/providers/connections');this.render()}catch(e){host.textContent=e.message}
@@ -35,7 +44,7 @@ const AIConnections={state:null,
   const copy=button(tr_web_ai_connections_js('Copier le diagnostic'),async()=>{try{await navigator.clipboard.writeText(log.textContent);copyStatus.textContent=tr_web_ai_connections_js('Diagnostic copié.')}catch{copyStatus.textContent=tr_web_ai_connections_js('Copie impossible : sélectionnez et copiez le texte affiché.')}});copy.id='connection-debug-copy';
   const copyActions=node('div',undefined,'provider-actions');copyActions.append(copy);debug.append(copyActions,copyStatus);
   const ctx=modalContext;
-  const test=button(tr_web_ai_connections_js('Tester la connexion'),async()=>{test.disabled=true;log.textContent=tr_web_ai_connections_js('Navigateur → serveur Swarm : test en cours (60 s maximum)…');result.textContent=tr_web_ai_connections_js('Test en cours…');try{const data=await api('/api/v1/providers/connections/test',this.request());if(modalContext!==ctx)return;log.textContent=[tr_web_ai_connections_js('Diagnostic serveur Swarm'),...(data.diagnostics||[]).map(e=>'['+e.elapsed_ms+' ms] '+e.stage+' : '+(globalThis.SwarmI18n?.engine(e.message)??e.message)),tr_web_ai_connections_js('Durée totale : ')+data.latency_ms+' ms',data.ok?tr_web_ai_connections_js('Connexion réussie.'):(globalThis.SwarmI18n?.engine(data.error)??data.error)].join('\n');result.className='notice '+(data.ok?'success':'alert');result.textContent=data.ok?tr_web_ai_connections_js('Réponse reçue en ')+data.latency_ms+' ms : '+data.text:(globalThis.SwarmI18n?.engine(data.error)??data.error)}catch(e){if(modalContext===ctx){result.className='notice alert';result.textContent=e.message;log.textContent=tr_web_ai_connections_js('Navigateur → serveur Swarm : échec. Vérifiez la requête /api/v1/providers/connections/test dans les outils réseau du navigateur.')+'\n'+e.message}}finally{if(modalContext===ctx)test.disabled=false}});
+  const test=button(tr_web_ai_connections_js('Tester la connexion'),async()=>{test.disabled=true;log.textContent=tr_web_ai_connections_js('Navigateur → serveur Swarm : test en cours (60 s maximum)…');result.textContent=tr_web_ai_connections_js('Test en cours…');try{const data=await api('/api/v1/providers/connections/test',this.request());if(modalContext!==ctx)return;log.textContent=[tr_web_ai_connections_js('Diagnostic serveur Swarm'),...(data.diagnostics||[]).map(e=>'['+e.elapsed_ms+' ms] '+e.stage+' : '+(globalThis.SwarmI18n?.engine(e.message)??e.message)),tr_web_ai_connections_js('Durée totale : ')+data.latency_ms+' ms',data.ok?tr_web_ai_connections_js('Connexion réussie.'):(globalThis.SwarmI18n?.engine(data.error)??data.error)].join('\n');result.className='notice '+(data.ok?'success':'alert');result.textContent=data.ok?tr_web_ai_connections_js('Réponse reçue en ')+data.latency_ms+' ms : '+this.responseText(data.text):(globalThis.SwarmI18n?.engine(data.error)??data.error)}catch(e){if(modalContext===ctx){result.className='notice alert';result.textContent=e.message;log.textContent=tr_web_ai_connections_js('Navigateur → serveur Swarm : échec. Vérifiez la requête /api/v1/providers/connections/test dans les outils réseau du navigateur.')+'\n'+e.message}}finally{if(modalContext===ctx)test.disabled=false}});
   test.id='connection-test';
   const actions=node('div',undefined,'provider-actions connection-wide');actions.append(test);$('modal-fields').append(actions,result,debug);$('confirm').textContent=tr_web_ai_connections_js('Enregistrer la connexion');
  },

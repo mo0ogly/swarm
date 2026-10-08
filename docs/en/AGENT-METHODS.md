@@ -55,6 +55,7 @@ The existing **Prepare with AI** method selector uses:
 | --- | --- |
 | Analysis and planning | Need analysis and planning |
 | Guided workflow — prepare a change | Scope, criteria and task decomposition |
+| Diagnose and fix a problem | Known facts, diagnosis and a scoped verification plan |
 | Examiner et améliorer — préparer l’examen | Audit scope, risks and verification plan |
 
 Swarm sends the entire method files and shared contract to the model. Execution
