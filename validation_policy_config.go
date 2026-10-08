@@ -13,14 +13,15 @@ import (
 // authorizes anything; apply requires the opaque token emitted for the exact
 // work revision and normalized policy.
 type ValidationPolicyChange struct {
-	RecheckCompleted bool              `json:"recheck_completed,omitempty"`
-	Schema           int               `json:"schema_version"`
-	EventID          string            `json:"event_id,omitempty"`
-	Revision         int               `json:"expected_revision"`
-	TaskID           string            `json:"task_id"`
-	Intent           string            `json:"intent"`
-	Policy           *ValidationPolicy `json:"policy,omitempty"`
-	PreviewToken     string            `json:"preview_token,omitempty"`
+	EnvironmentRecoveryReason string            `json:"environment_recovery_reason,omitempty"`
+	RecheckCompleted          bool              `json:"recheck_completed,omitempty"`
+	Schema                    int               `json:"schema_version"`
+	EventID                   string            `json:"event_id,omitempty"`
+	Revision                  int               `json:"expected_revision"`
+	TaskID                    string            `json:"task_id"`
+	Intent                    string            `json:"intent"`
+	Policy                    *ValidationPolicy `json:"policy,omitempty"`
+	PreviewToken              string            `json:"preview_token,omitempty"`
 }
 
 type ValidationCriterionPreview struct {
@@ -51,6 +52,10 @@ type ValidationPolicyPreview struct {
 func normalizeValidationPolicyChange(change ValidationPolicyChange) (ValidationPolicyChange, error) {
 	change.TaskID = strings.TrimSpace(change.TaskID)
 	change.Intent = strings.TrimSpace(change.Intent)
+	change.EnvironmentRecoveryReason = strings.TrimSpace(change.EnvironmentRecoveryReason)
+	if change.EnvironmentRecoveryReason != "" && (!change.RecheckCompleted || len([]rune(change.EnvironmentRecoveryReason)) < 8 || len([]rune(change.EnvironmentRecoveryReason)) > 500) {
+		return change, fmt.Errorf("environment_recovery_reason : motif explicite de 8 à 500 caractères avec recheck_completed requis")
+	}
 	if change.Schema != 1 || !safeName(change.TaskID) {
 		return change, fmt.Errorf("schema_version/task_id invalide")
 	}
@@ -106,7 +111,7 @@ func (s *Store) previewValidationPolicy(work string, change ValidationPolicyChan
 		return preview, fmt.Errorf("configurer les validations exige une tâche à faire, bloquée ou à vérifier ; rouvrir la tâche au préalable")
 	}
 	if change.RecheckCompleted {
-		if err = validationRecheckGuard(t, change.Policy); err != nil {
+		if err = validationRecheckGuard(t, change.Policy, change.EnvironmentRecoveryReason); err != nil {
 			return preview, err
 		}
 		var body []byte
@@ -167,12 +172,20 @@ func (s *Store) previewValidationPolicy(work string, change ValidationPolicyChan
 	return preview, nil
 }
 
-func validationRecheckGuard(t *Task, policy *ValidationPolicy) error {
+func validationRecheckGuard(t *Task, policy *ValidationPolicy, recoveryReasons ...string) error {
 	if t == nil || t.Status != "blocked" || t.AutoValidation == nil || t.AutoValidation.State != "blocked" || latestAttemptID(t) == "" || t.AutoValidation.Attempt != latestAttemptID(t) || policy == nil {
 		return fmt.Errorf("recontrôle : résultat terminé bloqué par ses contrôles requis")
 	}
 	if validationPolicyDigest(*policy) == t.AutoValidation.PolicyDigest {
-		return fmt.Errorf("recontrôle : politique corrigée différente requise")
+		environment := false
+		for _, control := range t.AutoValidation.Controls {
+			if control.EnvironmentFailure {
+				environment = true
+			}
+		}
+		if !environment || len(recoveryReasons) == 0 || strings.TrimSpace(recoveryReasons[0]) == "" {
+			return fmt.Errorf("recontrôle : politique corrigée différente requise ; pour un échec d’environnement identifié, déclarer la précondition corrigée")
+		}
 	}
 	return nil
 }
@@ -220,7 +233,7 @@ func (s *Store) applyValidationPolicy(work string, change ValidationPolicyChange
 			if change.Intent != "replace" {
 				return fmt.Errorf("recontrôle : remplacement explicite de la politique requis")
 			}
-			if err := validationRecheckGuard(t, normalized.Policy); err != nil {
+			if err := validationRecheckGuard(t, normalized.Policy, normalized.EnvironmentRecoveryReason); err != nil {
 				return err
 			}
 			t.Status, t.Blocker = "submitted", ""

@@ -160,6 +160,23 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 	} else if !os.IsNotExist(e) {
 		t.Fatal(e)
 	}
+	// Billing recovery has a distinct candidate snapshot; none of the accepted
+	// mission or release manifests are rewritten to bless subsequent changes.
+	billingManifest := "docs/billing-engine-recovery-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, billingManifest)); e == nil {
+		manifestPath = billingManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
+	// AI diagnostics use a new pending candidate snapshot, preserving historical proof.
+	aiManifest := "docs/ai-connection-debug-candidate-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, aiManifest)); e == nil {
+		manifestPath = aiManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

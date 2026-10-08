@@ -1,0 +1,19 @@
+flowchart TB
+ A[Agent IA<br/>Prépare le lot de paiements<br/>aucun droit de payer] -->|lot proposé + empreinte| M[Moteur déterministe<br/>Contrôle le lot contre le grand livre<br/>facture · montant · bénéficiaire · plafond]
+ M -->|Lot accepté<br/>empreinte enregistrée| S[Règlement déterministe<br/>seul détenteur du droit de payer]
+ M -->|Non conforme| X[Refus expliqué<br/>nouvelle préparation ou arbitrage humain]
+ S -->|Empreinte identique| P[Banque<br/>paiements avec clé métier]
+ S -->|Lot modifié depuis la validation| Y[Règlement refusé<br/>aucun virement]
+ P --> L[Grand livre<br/>mesures : doublons · écarts · impayés]
+ H[Humain<br/>Objectif · périmètre · exceptions] -.-> M
+ X -.-> H
+ classDef human fill:#fff0d1,stroke:#a57226,color:#5b3c12
+ classDef agent fill:#e6dcfa,stroke:#7151a8,color:#35234e
+ classDef motor fill:#dceef8,stroke:#31658b,color:#18394f
+ classDef evidence fill:#e4f2e8,stroke:#427553,color:#264832
+ classDef stop fill:#fbe3e1,stroke:#a33a2f,color:#5a1d17
+ class H,X human
+ class A agent
+ class M,S motor
+ class P,L evidence
+ class Y stop

@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	_ "modernc.org/sqlite"
+	"modernc.org/sqlite"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type Store struct {
@@ -483,6 +484,21 @@ func (s *Store) mutate(id, kind, event string, expected int, request []byte, fn 
 }
 
 func (s *Store) mutateWithHook(id, kind, event string, expected int, request []byte, fn func(*Work) error, hook func(*sql.Tx, *Work) error) (Work, error) {
+	policy, err := s.storageRetryPolicy()
+	if err != nil {
+		return Work{}, err
+	}
+	for attempt := 0; ; attempt++ {
+		w, err := s.mutateWithHookOnce(id, kind, event, expected, request, fn, hook)
+		var busy *sqlite.Error
+		if !errors.As(err, &busy) || busy.Code()&255 != 5 || attempt >= policy.Retries {
+			return w, err
+		}
+		time.Sleep(time.Duration(policy.DelayMS) * time.Millisecond)
+	}
+}
+
+func (s *Store) mutateWithHookOnce(id, kind, event string, expected int, request []byte, fn func(*Work) error, hook func(*sql.Tx, *Work) error) (Work, error) {
 	var w Work
 	if !safeName(event) {
 		return w, fmt.Errorf("event_id obligatoire (lettres, chiffres, tirets)")
@@ -638,6 +654,10 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 		w.Objective = r.Objective
 		w.Scope = r.Scope
 		w.Criteria = r.Criteria
+		w.RequirementPrerequisites = r.RequirementPrerequisites
+		if e := validateRequirementPrerequisites(w); e != nil {
+			return e
+		}
 		w.Next = r.Next
 		w.Git = gitState(s.root)
 	case "task.add":
@@ -683,6 +703,9 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 			return &CommandError{Code: "invalid_transition", Message: fmt.Sprintf("transition refusée : %s → %s", t.Status, r.Status)}
 		}
 		if r.Status == "running" || r.Status == "accepted" {
+			if e := s.requirementPrerequisiteGuard(w, t); e != nil {
+				return e
+			}
 			for _, dep := range t.Depends {
 				d, _ := w.task(dep)
 				if !s.acceptedFresh(w, d, map[string]bool{}) {

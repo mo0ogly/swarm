@@ -396,15 +396,17 @@ func (s *Store) paused(work string) bool {
 }
 
 func (s *Store) prepare(work string, r Launch) (Agent, bool, error) {
+	policy, err := s.storageRetryPolicy()
+	if err != nil {
+		return Agent{}, false, err
+	}
 	for attempt := 0; ; attempt++ {
 		a, created, e := s.prepareLaunch(work, r, false)
 		var coded interface{ Code() int }
-		if e == nil || attempt >= 2 || !errors.As(e, &coded) || (coded.Code()&255 != 5 && coded.Code()&255 != 6) {
+		if e == nil || attempt >= policy.Retries || !errors.As(e, &coded) || (coded.Code()&255 != 5 && coded.Code()&255 != 6) {
 			return a, created, e
 		}
-		// A bounded storage retry reuses the same request and prepared copy.
-		// No provider has been launched by prepareLaunch.
-		time.Sleep(time.Duration(attempt+1) * 25 * time.Millisecond)
+		time.Sleep(time.Duration(policy.DelayMS) * time.Millisecond)
 	}
 }
 
@@ -655,6 +657,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	t, e := w.task(r.TaskID)
 	if e != nil {
+		return a, false, e
+	}
+	if e = s.requirementPrerequisiteGuard(&w, t); e != nil {
 		return a, false, e
 	}
 	if w.Planning != nil {

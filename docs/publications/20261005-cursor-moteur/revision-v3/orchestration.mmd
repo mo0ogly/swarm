@@ -1,0 +1,24 @@
+flowchart TB
+ H[Humain<br/>Objectif et autorisations] --> P[Planification IA<br/>Périmètres et passations]
+ H -. Évolutions prévues .-> B[Brouillon graphique<br/>ou programmation]
+ B -. Demande à vérifier .-> M[Moteur déterministe<br/>Droits · dépendances · budgets · espace]
+ P --> M
+ M -->|Départ autorisé| A[Agents IA<br/>Produisent et transmettent leurs résultats]
+ M -->|Condition absente| R[Attente ou refus expliqué]
+ A --> E[État durable et traces<br/>Tentative · actions · candidat · preuves]
+ E --> V[Contrôles et revue<br/>sur le candidat concerné]
+ V -->|Critères satisfaits| F[Résultat accepté par le moteur]
+ V -->|Échec ou incertitude| D[Diagnostic<br/>Cause et précondition à corriger]
+ D --> M
+ R --> H
+ E -. Consommation observable .-> M
+ classDef human fill:#fff0d1,stroke:#a57226,color:#5b3c12
+ classDef agent fill:#e6dcfa,stroke:#7151a8,color:#35234e
+ classDef motor fill:#dceef8,stroke:#31658b,color:#18394f
+ classDef evidence fill:#e4f2e8,stroke:#427553,color:#264832
+ classDef proposed fill:#f5f5f5,stroke:#777777,color:#333333,stroke-dasharray:5 3
+ class H,R,D human
+ class P,A agent
+ class M motor
+ class E,V,F evidence
+ class B proposed

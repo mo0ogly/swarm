@@ -894,6 +894,9 @@ func revokePlanningTx(tx *sql.Tx, work string) error {
 
 // Imported history never supplies an unchecked tree to ownership traversal.
 func validatePlanningState(w *Work) error {
+	if err := validateRequirementPrerequisites(w); err != nil {
+		return err
+	}
 	p := w.Planning
 	if p == nil {
 		return nil
@@ -979,6 +982,11 @@ func validatePlanningState(w *Work) error {
 // Proof drift can happen without a database write. Reopen a closed owner once,
 // leaving the controller's original record intact and never relaunching by fiat.
 func (s *Store) reconcilePlanningProofs(w Work) (Work, error) {
+	var err error
+	w, err = s.signalDependencyProofDrift(w)
+	if err != nil {
+		return w, err
+	}
 	if w.Planning == nil {
 		return w, nil
 	}

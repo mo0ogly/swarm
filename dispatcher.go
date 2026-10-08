@@ -67,7 +67,7 @@ func automaticCorrection(t Task, a Agent) (string, string, bool) {
 		}
 		// A timeout/start failure is a failure of the verification process,
 		// not an objective verdict that another worker can repair.
-		if !control.Executed || control.ExitCode < 0 {
+		if !control.Executed || control.ExitCode < 0 || control.EnvironmentFailure {
 			return "", "", false
 		}
 		finding := fmt.Sprintf("Contrôle %s en échec (code %d, sortie sha256 %s) : %s.", control.ID, control.ExitCode, control.OutputHash, control.Summary)
@@ -151,6 +151,7 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 				t.ID, in.taskCost[t.ID].Reported, in.reserve))
 			continue
 		case !in.depsReady[t.ID]:
+			reasons = append(reasons, t.ID+" : prérequis non validés ou preuves périmées ; décision du responsable requise")
 			continue
 		case in.launchBlocked[t.ID] != "":
 			reasons = append(reasons, t.ID+" : "+in.launchBlocked[t.ID])
@@ -440,6 +441,9 @@ func automaticEventID(work, task string, generation int) string {
 }
 
 func (s *Store) dependenciesReady(w *Work, t *Task) bool {
+	if s.requirementPrerequisiteGuard(w, t) != nil {
+		return false
+	}
 	for _, id := range t.Depends {
 		dep, e := w.task(id)
 		if e != nil || !s.acceptedFresh(w, dep, map[string]bool{}) {
