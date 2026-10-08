@@ -28,17 +28,17 @@ class PlanTest(unittest.TestCase):
 class VerdictTest(unittest.TestCase):
     def test_d5_fails_on_one_busy_exclusion(self):
         runs = [run("F4e", status="ERREUR", error="database is locked (5) (SQLITE_BUSY)")]
-        self.assertEqual(tables_verif.verdicts(runs, [])["D5"][0], "NON CORRIGÉ")
+        self.assertEqual(tables_verif.verdicts(runs, [])["D5"][0], "CRITÈRE NON TENU")
 
     def test_d6_needs_positive_control(self):
         runs = [run(variant="nodeps", settle_started_before_prepare_accepted=False)]
-        self.assertEqual(tables_verif.verdicts(runs, [])["D6"][0], "NON CORRIGÉ")
+        self.assertEqual(tables_verif.verdicts(runs, [])["D6"][0], "CRITÈRE NON TENU")
         runs.append(run(variant="noguard", status="ERREUR", correct=False, error="code 5"))
-        self.assertEqual(tables_verif.verdicts(runs, [])["D6"][0], "corrigé")
+        self.assertEqual(tables_verif.verdicts(runs, [])["D6"][0], "critère tenu")
 
     def test_d3_requires_single_attempt_and_environment_receipt(self):
         two = run("F5", correct=False, prepare_attempts=2, environment_failure=True)
-        self.assertEqual(tables_verif.verdicts([two], [])["D3"][0], "NON CORRIGÉ")
+        self.assertEqual(tables_verif.verdicts([two], [])["D3"][0], "CRITÈRE NON TENU")
 
 
 if __name__ == "__main__":

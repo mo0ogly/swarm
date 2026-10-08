@@ -43,7 +43,7 @@ def ok(runs):
 
 
 def verdict(passed, detail):
-    return ("corrigé" if passed else "NON CORRIGÉ"), detail
+    return ("critère tenu" if passed else "CRITÈRE NON TENU"), detail
 
 
 def verdicts(verif, historical):
