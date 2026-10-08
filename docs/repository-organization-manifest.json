@@ -729,6 +729,6 @@
     {"path": "web/task-models.js","kind": "source","sha256": "7af3c5745d8b066549629d4993c0e24b948fbbb185d7153b440a272e2f7ebdca"},
     {"path": "web/terminal.html","kind": "source","sha256": "928a0c618bf90815f23ea301e7036cf91b0098bcf6c7372701b29103f27d0bca"},
     {"path": "web/wattson_themes.css","kind": "source","sha256": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59"},
-    {"path": "tests/ai_connections_response_test.cjs","sha256": "2dce270a348d9550b963152a1c42b5d7247a1b19f31b0e60f71e026c637773a9"}
+    {"path": "tests/ai_connections_response_test.cjs","sha256": "2dce270a348d9550b963152a1c42b5d7247a1b19f31b0e60f71e026c637773a9","kind": "test"}
   ]
 }
