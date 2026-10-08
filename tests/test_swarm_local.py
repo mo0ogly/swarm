@@ -61,8 +61,12 @@ class LocalWeb(unittest.TestCase):
         key = (self.root / ".swarm" / ("web-session-" + hashlib.sha256(self.address.encode()).hexdigest()[:16])).read_text()
         jar = http.cookiejar.CookieJar()
         client = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+        page = client.open(self.url + "/").read().decode()
+        self.assertIn("Connexion à Swarm", page)
+        self.assertNotIn(key, page)
         client.open(self.url + "/session/" + key).close()
         cookie = list(jar)[0]
+        self.assertIsNotNone(cookie.expires)
         self.assertTrue(cookie.has_nonstandard_attr("HttpOnly"))
         request_path = self.root / "work.json"
         request_path.write_text(json.dumps({"schema_version": 1, "event_id": "stable-site-create", "expected_revision": 0,
@@ -107,6 +111,28 @@ class LocalWeb(unittest.TestCase):
         self.assertTrue(json.loads(self.run_cli("status"))["running"])
         self.run_cli("restart")
         self.assertTrue(json.loads(self.run_cli("status"))["ready"])
+
+    def test_configure_retains_installed_binary_without_rebuilding(self):
+        checkout = Path(self.temp.name) / "launcher checkout"
+        (checkout / "tools").mkdir(parents=True)
+        shutil.copy2(SOURCE / "swarm.sh", checkout / "swarm.sh")
+        shutil.copy2(SOURCE / "tools/swarm_local.py", checkout / "tools/swarm_local.py")
+        configured = [str(checkout / "swarm.sh")]
+        result = subprocess.run([*configured, "configure", "--root", str(self.root),
+                                 "--address", self.address, "--binary", BINARY],
+                                text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        settings = json.loads((checkout / "deploy/local-web.json").read_text())
+        self.assertEqual(settings["binary"], str(Path(BINARY).resolve()))
+        try:
+            for action in ["start", "restart"]:
+                result = subprocess.run([*configured, action, "--no-open"], text=True, capture_output=True, timeout=40)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                status = json.loads(subprocess.check_output([*configured, "status"], text=True))
+                self.assertTrue(status["ready"])
+                self.assertEqual(Path(f'/proc/{status["pid"]}/exe').resolve(), Path(BINARY).resolve())
+        finally:
+            subprocess.run([*configured, "stop"], capture_output=True, timeout=20)
 
     def test_stale_pid_does_not_kill_unrelated_process(self):
         sleeper = subprocess.Popen(["sleep", "60"])

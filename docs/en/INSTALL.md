@@ -42,6 +42,16 @@ docker compose --env-file deploy/install.env up -d --wait
 replace an active Compose service. Stop missions and agents deliberately before
 reinstallation.
 
+### Stable local launcher
+
+For native Linux development, use `./swarm.sh start --root /path/to/project`. The launcher builds the canonical binary, initializes the project and opens the authenticated browser automatically. `start` reuses its existing server; `restart` replaces only its recorded process after checking PID, start time, executable and command. Missions, project data and agents are retained. An unrelated listener is never killed. Stop a legacy server explicitly before the first managed start.
+
+Commands: `start`, `restart`, `stop`, `status`, `logs`, `open`, `build`. Use the same root with every command. The stable default URL is `http://127.0.0.1:18792/`. Options: `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--no-open`, `--mask-cifs`. Environment: `SWARM_PROJECT_ROOT`, `SWARM_WEB_ADDRESS`, `SWARM_BINARY`, `SWARM_BROWSER`. Requires Python 3, Go for building, and `xdg-open` for browser launch. `--mask-cifs` needs `bwrap` and only masks the host share inside the server's mount namespace.
+
+`configure --root PROJECT --address ADDRESS` persists the project, address and mount-mask choice in Git-ignored `deploy/local-web.json`; subsequent commands reuse them. `adopt --pid PID --root PROJECT --binary BINARY --address ADDRESS` can take ownership of a known legacy server only when its full process command matches exactly. No name-based process killing or project data deletion occurs.
+
+Authentication remains enabled. `open` supplies the private session to the local browser without printing its credential. The persistent HttpOnly, SameSite strict cookie survives server restarts. A browser without a cookie sees a real FR/EN, dark/light sign-in page. Configure cookie lifetime in `.swarm/web-session.json`: `{"schema_version":1,"cookie_max_age_seconds":2592000}` (default 30 days; range one second to 365 days). Restart and sign in again to renew the cookie after changing the policy. Removing the private session key while stopped revokes sessions; ordinary restarts preserve it. Origin and CSRF checks remain enforced. Logs and identity records stay under `.swarm/local-web/` outside Git; `logs` redacts session links. The launcher stops the web server, not agents. Docker remains a separate installation.
+
 ### Network access
 
 Swarm listens on loopback only. Compose uses `network_mode: host`, without a
@@ -420,11 +430,18 @@ Check the catalogue in the same project root used by your server:
 swarm --root /path/to/project --json prepare methods
 ```
 
-Each method reports its availability. Execution-role guidance is embedded in the
-binary; **preparation** methods are read from the controlled project. In Docker,
-that root is `/workspace`. Installing an AI provider, making a method available
-and authorizing a plan are distinct steps. Installing the binary alone does not
-copy preparation resources to another project. See the [method catalogue](AGENT-METHODS.md).
+All four preparation methods are embedded in the binary and work in an empty
+project, in native and Docker installations. Swarm creates no `.claude` directory
+in your project. For each file, an existing project-root override replaces the
+bundled version; an absent file uses the embedded version. Local files must be
+regular UTF-8 text, nonempty and at most 128 KiB. Symbolic links, invalid files
+and denied access make the method unavailable rather than silently replacing it.
+Changing or removing an override changes the context fingerprint. Preparation
+remains restricted to analysis and planning.
+
+In Docker, the project root is `/workspace`. Provider setup and plan authorization
+remain separate steps. See the [method catalogue](AGENT-METHODS.md) and the
+[fresh installation recipe](FRESH-INSTALL.md).
 
 ## Recognize the result after launch
 

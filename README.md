@@ -20,13 +20,22 @@ Voir les [notes de version](docs/releases/v0.1.0.md), le [guide des programmes](
 
 ## Première utilisation
 
-1. **Installer et ouvrir** : suivre [l’installation](INSTALL.md), puis ouvrir le lien de session affiché au lancement.
+1. **Installer et ouvrir** : suivre [l’installation](INSTALL.md) ; en développement natif, `./swarm.sh start` ouvre automatiquement le cockpit.
 2. **Connecter une IA** : ouvrir « IA et connexions » et choisir les fournisseurs disponibles dans votre environnement.
 3. **Préparer le besoin** : préciser le résultat attendu, le périmètre et les critères ; relire le plan proposé.
 4. **Autoriser et lancer** : vérifier les rôles, les espaces et les limites. L’adoption d’un plan ne lance pas à elle seule les agents.
 5. **Suivre et examiner** : ouvrir le graphe puis le détail d’une tâche. Un processus terminé n’est pas encore un résultat validé.
 
 → [Guide illustré : les étapes, les boutons et les blocages](GUIDE-UTILISATEUR.md)
+
+### Formation pratique Casa Pizza
+
+[Atelier pour débutants en français et en anglais](docs/training/casa-pizza/README.md) : guides Word de 36 pages, captures du cockpit, lecture du graphe, contrôles automatiques et décisions humaines, puis recette d'une application locale de livraison de pizzas.
+
+- [Guide français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx) · [Kit français avec code et captures](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+- [English guide](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx) · [English kit with code and screenshots](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+
+La référence passe onze tests et son parcours a été vérifié sur ordinateur et à 390 pixels. Les exemples de politiques automatiques montrent une configuration ; ils ne sont pas présentés comme une mission autonome exécutée. L'application reste en français dans les deux kits.
 
 Pour démarrer avec une structure, utilisez « Choisir un modèle de mission » dans la préparation : [catalogue de parcours guidés partagé entre web et CLI](docs/PREPARATION-TEMPLATES.md).
 
@@ -169,22 +178,21 @@ Ouvrez le lien de session affiché. Le projet et les missions persistent sur vot
 ```sh
 git clone https://github.com/mo0ogly/swarm.git
 cd swarm
-make build
-
 # Choisissez le projet sur lequel les agents travailleront.
-./bin/swarm --root /chemin/du/projet init
-./bin/swarm --root /chemin/du/projet providers init
-./bin/swarm --root /chemin/du/projet web 127.0.0.1:18787
+./swarm.sh start --root /chemin/du/projet
+# Même adresse et mêmes missions après remplacement de l'instance.
+./swarm.sh restart --root /chemin/du/projet
+./swarm.sh status --root /chemin/du/projet
 ```
 
-Ouvrez **le lien de session imprimé dans le terminal**. Il donne accès au cockpit ; conservez-le privé. Depuis le même onglet, sélectionnez une mission ou préparez un nouveau besoin.
+Le lanceur construit le binaire et ouvre la session locale automatiquement. L’adresse reste **http://127.0.0.1:18792/** ; `./swarm.sh open` reconnecte le navigateur sans copier de lien privé. Python 3 et `xdg-open` sont nécessaires au lanceur (`--no-open` pour un serveur sans navigateur). Utilisez le même `--root` pour chaque commande ; les réglages et limites sont décrits dans le [guide d’installation](INSTALL.md#lanceur-local-stable).
 
 1. Ouvrez **IA et connexions** pour vérifier les fournisseurs et les modèles disponibles.
 2. Préparez le besoin, adoptez le brief et vérifiez le plan.
 3. Choisissez les agents, les espaces de travail et les conditions d’acceptation.
 4. Autorisez le lancement, puis suivez le graphe et les résultats à examiner.
 
-Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Pour piloter un autre projet, vérifiez les ressources de méthode disponibles dans ce projet. Consultez aussi les [limites de migration](docs/migration/README.md).
+Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Les quatre méthodes de préparation fonctionnent dans un projet vide grâce au pack embarqué ; les personnalisations locales restent contrôlées. Consultez aussi les [limites de migration](docs/migration/README.md).
 
 ### Et en ligne de commande ?
 
@@ -257,6 +265,18 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 - [Workflows et points de reprise](WORKFLOWS.md)
 - [Extraction vers le dépôt autonome et limites connues](docs/migration/README.md)
 - [Licence et historique de licence](docs/LICENSING.md)
+
+
+Les fichiers des méthodes sont versionnés dans [`.claude/skills/`](.claude/skills/)
+et les commandes de préparation dans [`.claude/commands/`](.claude/commands/).
+[Recette pour une installation neuve](docs/FRESH-INSTALL.md).
+
+## Structure du dépôt
+
+Le point d’entrée de la CLI se trouve dans `cmd/swarm`, le moteur Go et ses tests
+unitaires dans `internal/engine`, l’interface dans `web` et `frontend`, et les
+guides dans `docs`. Voir la [carte du dépôt](docs/REPOSITORY-STRUCTURE.md), dont
+les [guides de formation pizza](docs/training/casa-pizza/README.md).
 
 ## Développer et vérifier
 

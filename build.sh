@@ -79,5 +79,5 @@ if test "$version" != devel; then
 fi
 
 mkdir -p "$(dirname -- "$output")"
-ldflags="-X main.buildVersion=$version -X main.buildCommit=$commit -X main.buildModified=$modified -X main.buildDate=$build_date -X main.buildProvenance=injected"
-CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags "$ldflags" -o "$output" .
+ldflags="-X swarm.local/companion/internal/engine.buildVersion=$version -X swarm.local/companion/internal/engine.buildCommit=$commit -X swarm.local/companion/internal/engine.buildModified=$modified -X swarm.local/companion/internal/engine.buildDate=$build_date -X swarm.local/companion/internal/engine.buildProvenance=injected"
+CGO_ENABLED=0 go build -buildvcs=false -trimpath -ldflags "$ldflags" -o "$output" ./cmd/swarm

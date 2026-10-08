@@ -2,6 +2,10 @@
 !go.mod
 !go.sum
 !*.go
+!cmd/
+!cmd/**
+!internal/
+!internal/**
 !locales/
 !locales/en.json
 !contracts/
@@ -9,11 +13,15 @@
 !.claude/
 !.claude/skills/
 !.claude/skills/**
+!.claude/commands/
+!.claude/commands/ks-feature.md
+!.claude/commands/ks-plan.md
 !tools/
 !tools/agent-workflows/
 !tools/agent-workflows/CONTRACT.md
 !tools/agent-workflows/templates/
 !tools/agent-workflows/templates/*.md
+!tools/agent-workflows/templates/preparations.json
 !web/
 !web/**
 !deploy/
@@ -26,3 +34,4 @@
 !config/
 !config/*.json
 *_test.go
+**/*_test.go

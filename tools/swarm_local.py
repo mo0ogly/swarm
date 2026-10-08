@@ -91,7 +91,7 @@ def main():
                         choices=["start", "stop", "restart", "status", "logs", "open", "build", "configure", "adopt"])
     parser.add_argument("--root", default=os.environ.get("SWARM_PROJECT_ROOT", settings.get("root", str(SOURCE))))
     parser.add_argument("--address", default=os.environ.get("SWARM_WEB_ADDRESS", settings.get("address", "127.0.0.1:18792")))
-    parser.add_argument("--binary", default=os.environ.get("SWARM_BINARY", ""))
+    parser.add_argument("--binary", default=os.environ.get("SWARM_BINARY", settings.get("binary", "")))
     parser.add_argument("--startup-timeout", type=float, default=30)
     parser.add_argument("--stop-timeout", type=float, default=15)
     parser.add_argument("--no-open", action="store_true")
@@ -119,7 +119,8 @@ def main():
         if args.action == "configure":
             config_path.parent.mkdir(parents=True, exist_ok=True)
             temporary = config_path.with_suffix(".tmp")
-            temporary.write_text(json.dumps({"root":str(root), "address":args.address, "mask_cifs":args.mask_cifs}))
+            temporary.write_text(json.dumps({"root":str(root), "address":args.address, "mask_cifs":args.mask_cifs,
+                                             "binary":str(binary) if args.binary else ""}))
             temporary.replace(config_path)
             print("Configuration locale enregistrée (projet et adresse stables).")
             return 0

@@ -34,6 +34,30 @@ Pour retrouver ce lien :
 docker compose --env-file deploy/install.env logs --tail 20 swarm
 ```
 
+### Lanceur local stable
+
+Pour le développement natif sous Linux, le dépôt fournit un point d’entrée unique :
+
+```sh
+./swarm.sh configure --root /chemin/du/projet
+./swarm.sh start --root /chemin/du/projet
+./swarm.sh restart --root /chemin/du/projet
+./swarm.sh status --root /chemin/du/projet
+./swarm.sh open --root /chemin/du/projet
+./swarm.sh logs --root /chemin/du/projet
+./swarm.sh stop --root /chemin/du/projet
+```
+
+`start` construit le binaire canonique, initialise le projet et ouvre le navigateur ; si son serveur est déjà présent, il réutilise cette instance. `restart` arrête uniquement l’instance dont le PID, l’identité et la commande correspondent au registre privé, puis la remplace. Il conserve `.swarm`, les missions et les agents. Un autre processus occupant le port est refusé et n’est jamais tué. Une instance ancienne lancée sans ce script doit être arrêtée explicitement une première fois.
+
+`configure` mémorise le projet, l’adresse et le choix du masquage dans `deploy/local-web.json`, ignoré par Git : les commandes suivantes n’ont plus besoin de répéter ces options. Pour reprendre une instance antérieure connue, `adopt --pid PID --root PROJET --binary BINAIRE --address ADRESSE` exige une correspondance exacte avant tout arrêt ; il ne recherche ni ne tue les processus par leur nom. Les données ne sont jamais effacées lors d’un redémarrage.
+
+L’adresse par défaut est `http://127.0.0.1:18792/`. Les options `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--no-open` et `--mask-cifs` sont disponibles ; les variables `SWARM_PROJECT_ROOT`, `SWARM_WEB_ADDRESS`, `SWARM_BINARY` et `SWARM_BROWSER` permettent de conserver les choix. `--mask-cifs` nécessite `bwrap` et masque uniquement ce montage dans l’espace du serveur, sans réparer le partage hôte. Le lanceur demande Linux, Python 3, Go pour la compilation et `xdg-open` pour ouvrir le navigateur. `build` construit sans démarrer.
+
+L’authentification reste active. Le lanceur transmet la clé privée au navigateur sans l’imprimer ; le cookie est HttpOnly, SameSite strict et persistant. Sans cookie, l’adresse normale affiche une page de connexion FR/EN, sombre/État, plutôt qu’un texte d’erreur. `open` reconnecte automatiquement le navigateur local. La durée du cookie est configurable dans `.swarm/web-session.json` : `{"schema_version":1,"cookie_max_age_seconds":2592000}` (30 jours par défaut, de 1 seconde à 365 jours). Changer ce réglage exige un redémarrage et une nouvelle connexion pour renouveler le cookie. Supprimer la clé privée quand le serveur est arrêté révoque les sessions ; un redémarrage ordinaire ne la change pas. Les commandes modifiant l’état gardent les contrôles Origin et CSRF.
+
+Les logs et le registre PID se trouvent dans `.swarm/local-web/`, hors Git. `logs` masque les liens privés. Le lanceur gère le serveur, pas l’arrêt des agents ; vérifiez l’activité avant de remplacer le binaire d’une mission en cours. Les commandes Docker ci-dessus restent une installation distincte.
+
 ### Ce qui est installé
 
 - Un binaire Swarm compilé depuis votre copie du dépôt, avec les ressources web embarquées.
@@ -201,7 +225,7 @@ Le script compile dans un fichier temporaire du dossier cible, puis remplace le 
 | Fournisseur absent | Installation dans le conteneur, PATH et `.swarm/providers.json` |
 | Agent installé mais appel refusé | Authentification, variables autorisées et capacités de sandbox |
 | Ancienne mission avec chemins invalides | Adapter les profils vers `/workspace` sans lancer deux serveurs sur la même base |
-| Méthode de préparation indisponible | Vérifier la racine utilisée par Swarm et les ressources de méthode de ce projet ; voir le [guide des méthodes](docs/AGENT-METHODS.md). Installer le binaire seul ne copie pas ces ressources dans un autre projet. |
+| Méthode de préparation indisponible | Mettre à jour puis reconstruire Swarm : les méthodes sont embarquées et fonctionnent dans un projet vide. Si un fichier local existe, vérifier l’erreur précise et ses droits ; voir le [guide des méthodes](docs/AGENT-METHODS.md). |
 
 Le Dockerfile compile les sources présentes localement. Il n’existe pas ici de promesse d’image publique préconstruite ni de compatibilité universelle avec les fournisseurs.
 
@@ -487,10 +511,18 @@ Vérifiez le catalogue de votre projet depuis le même emplacement qu’au lance
 swarm --root /chemin/du/projet --json prepare methods
 ```
 
-Chaque méthode expose sa disponibilité. Le binaire contient le cadrage des rôles
-pour l’exécution ; les méthodes de **préparation** sont lues dans le projet piloté.
-En Docker, cette racine est `/workspace`. Ne confondez pas un fournisseur installé,
-une méthode disponible et un plan autorisé. Voir le [catalogue des méthodes](docs/AGENT-METHODS.md).
+Les quatre méthodes de préparation sont embarquées dans le binaire : elles sont
+utilisables dans un projet vide, en natif comme dans Docker. Aucun répertoire
+`.claude` n’est créé dans votre projet. Pour chaque fichier, une personnalisation
+présente dans la racine du projet remplace la version embarquée ; si ce fichier
+est absent, Swarm utilise sa version intégrée. Les fichiers locaux doivent être
+réguliers, UTF-8 et de 128 Kio maximum ; liens symboliques, fichiers vides ou
+invalides et accès refusés rendent la méthode indisponible, sans remplacement
+silencieux. Une modification ou un retrait change l’empreinte du contexte.
+Le contenu reste limité à l’analyse et à la planification pendant la préparation.
+
+En Docker, la racine du projet est `/workspace`. Un fournisseur installé et un
+plan autorisé restent des étapes distinctes. Voir le [catalogue des méthodes](docs/AGENT-METHODS.md) et la [recette d’installation neuve](docs/FRESH-INSTALL.md).
 
 ## Reconnaître le résultat après le lancement
 

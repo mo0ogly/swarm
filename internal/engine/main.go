@@ -1,0 +1,628 @@
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+const help = `swarm — compagnon local de reprise (schema_version: 1)
+
+Options globales : --root <projet> --json --lang fr|en
+swarm version [--server URL_DE_SESSION] | swarm --version
+swarm init
+swarm skills list
+swarm project-profile show|check|list|select PROFILE|apply [--input profil.json]
+swarm doctor
+swarm role-model show|preview|apply <travail> [--input request.json]
+swarm task-model show|preview|apply <travail> [--input request.json]
+swarm quotas show|preview|apply <travail> [--input quotas.json]
+swarm pricing list|save|estimate [--input request.json]
+swarm budget show|preview|apply <travail> [--input budget.json]
+swarm run-limits show|history <portée> <mission> <clé>
+swarm run-limits apply <portée> <mission> <clé> --input changement.json
+swarm run-limits rollback <portée> <mission> <clé> <révision_cible> --input requête.json
+swarm run-limits effective <mission> <rôle> <tâche>
+swarm automation list|show|preview|create|enable|pause|archive|cancel|params
+swarm aide [sujet]
+swarm providers init|show
+swarm providers cooldown show|clear <fournisseur> [--input demande.json]
+swarm providers relay show <agent> | decide <agent> [--input décision.json]
+swarm connections list|save --input connexion.json
+swarm console [travail] [--plain]
+swarm prepare list|methods|show|history|create|save|method|adopt-brief|validate-plan|export
+swarm dispatch <travail>
+swarm autonomy <travail> [manuel|assiste|autonome] [créneaux]
+swarm mission status|changes|spending|seen|preview|start|pause|resume|stop|watch <travail> [--input profil.json]
+swarm mission recovery <travail> <tâche> [agent]
+swarm lifecycle list
+swarm lifecycle preview|apply <travail> archive|restore|purge|delete --input requete.json
+swarm validation preview|apply|recheck-preview|recheck-apply <travail> --task <tâche> --input politique.json
+swarm profile <travail> [tâche] [--input profil.json]
+swarm control <travail> --input commande.json
+swarm agent start <travail> --input lancement.json
+swarm agent prepared <travail>
+swarm agent resume-launch <travail> --input reprise.json
+swarm agent preflight <travail> --input lancement.json
+swarm agent list <travail>
+swarm agent show|stop|reconcile <agent>
+swarm agent logs <agent> [après_seq] [--output nouveau.jsonl]
+swarm exchange list <travail>
+swarm exchange send|consume <travail> --input requête.json
+swarm workspace status <travail>
+swarm workspace integrate <travail> --input manifeste.json
+swarm planning show|enable|claim|decide|handoff|step|authorize-recovery|requalify|submit-recovered-result|revise-recovered-result|pause|resume <travail> [--input requête.json]
+swarm work create --input fichier.json
+swarm work update <travail> --input fichier.json
+swarm work list
+swarm work show <travail>
+swarm task add|update <travail> --input fichier.json
+swarm checkpoint <travail> --input fichier.json
+swarm ooda <travail> --input fichier.json
+swarm gate <travail> --task <tâche> --input requête.json
+swarm resume [travail]
+swarm export <travail> --output archive.zip
+swarm import --input archive.zip
+swarm evaluate --input evidence.json [--phase delivery]
+
+Les mutations exigent schema_version, event_id et expected_revision.
+Une gate attend aussi task_id, phase, document (méthode d’évaluation 2).
+Les requêtes sont décrites dans README.md. --input - lit stdin.
+Codes généraux : 0 succès ; 1 gate bloquée ; 2 erreur.
+Préparer : 2 contrat ; 3 conflit ; 4 autorisation ; 5 fournisseur ou méthode indisponible ; 6 arrêt non confirmé.
+`
+
+func mainHelpText() string {
+	return uiText(help) + uiText("Brouillons du plan : swarm plan draft show|export|import|compare|preview|apply|undo|redo TRAVAIL [BROUILLON]\n")
+}
+
+func readInput(path string) ([]byte, error) {
+	var r io.Reader = os.Stdin
+	if path != "-" {
+		f, e := os.Open(path)
+		if e != nil {
+			return nil, e
+		}
+		defer f.Close()
+		r = f
+	}
+	b, e := io.ReadAll(io.LimitReader(r, (16<<20)+1))
+	if len(b) > 16<<20 {
+		return nil, fmt.Errorf("entrée supérieure à 16 Mio")
+	}
+	return b, e
+}
+func strict(b []byte, v any) error {
+	d := json.NewDecoder(bytes.NewReader(b))
+	d.DisallowUnknownFields()
+	if e := d.Decode(v); e != nil {
+		return e
+	}
+	var extra any
+	if e := d.Decode(&extra); e != io.EOF {
+		return fmt.Errorf("un seul document JSON requis")
+	}
+	return nil
+}
+func printJSON(w io.Writer, v any) error {
+	e := json.NewEncoder(w)
+	e.SetIndent("", "  ")
+	e.SetEscapeHTML(false)
+	return e.Encode(v)
+}
+func run(args []string, out, errOut io.Writer) int {
+	if len(args) > 0 && args[0] == "_api_chat" {
+		return runAPIChat(args, out, errOut)
+	}
+	root := "."
+	input := ""
+	output := ""
+	task := ""
+	phase := "delivery"
+	serverURL := ""
+	asJSON := false
+	pos := []string{}
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		switch a {
+		case "--json":
+			asJSON = true
+		case "--version":
+			pos = append(pos, "version")
+		case "--help", "-h":
+			fmt.Fprint(out, mainHelpText())
+			return 0
+		case "--root", "--input", "--output", "--task", "--phase", "--server":
+			if i+1 == len(args) {
+				fmt.Fprintln(errOut, uiText("valeur manquante :"), a)
+				return 2
+			}
+			i++
+			switch a {
+			case "--root":
+				root = args[i]
+			case "--input":
+				input = args[i]
+			case "--output":
+				output = args[i]
+			case "--task":
+				task = args[i]
+			case "--phase":
+				phase = args[i]
+			case "--server":
+				serverURL = args[i]
+			}
+		default:
+			pos = append(pos, a)
+		}
+	}
+	// Machine-readable responses and server projections keep their canonical
+	// language. Browser localization happens only at the display boundary.
+	if asJSON || len(pos) > 0 && pos[0] == "web" {
+		previous, present := os.LookupEnv("SWARM_LANG")
+		_ = os.Setenv("SWARM_LANG", "fr")
+		defer func() {
+			if present {
+				_ = os.Setenv("SWARM_LANG", previous)
+			} else {
+				_ = os.Unsetenv("SWARM_LANG")
+			}
+		}()
+	}
+	fail := func(e error) int {
+		if asJSON {
+			_ = printJSON(errOut, map[string]any{"schema_version": 1, "error": e.Error(), "failure": commandFailure(e)})
+		} else {
+			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(commandFailure(e).Message))
+		}
+		switch commandFailure(e).Code {
+		case "conflict", "revision_conflict", "preview_stale", "active_scope_conflict", "event_conflict", "idempotency_conflict", "terminal_target", "already_applied", "effect_started", "draft_conflict":
+			return 3
+		case "source_refused", "preparation_disabled", "authorization_required":
+			return 4
+		case "provider_unavailable", "method_unavailable", "workspace_wait":
+			return 5
+		case "interrupted", "uncertain_effect":
+			return 6
+		case "operation_pending":
+			return 7
+		default:
+			return 2
+		}
+	}
+	if len(pos) == 0 {
+		fmt.Fprint(out, mainHelpText())
+		return 0
+	}
+	if pos[0] == "version" {
+		if len(pos) != 1 {
+			return fail(fmt.Errorf("swarm version [--json] [--root PROJET] [--server URL_DE_SESSION]"))
+		}
+		version := binaryVersion()
+		active := VersionObservation{Available: false, Provenance: "runtime_health", Hint: "Fournissez l’URL de session du serveur actif avec --server."}
+		if serverURL != "" {
+			var e error
+			active, e = serverObservation(serverURL)
+			if e != nil {
+				active.Hint = e.Error()
+			}
+		}
+		diagnostic := compareVersions(binaryObservation(version), active, candidateObservation(root))
+		if asJSON {
+			if err := printJSON(out, versionResponse{Schema: 1, Binary: version, Diagnostic: diagnostic}); err != nil {
+				return fail(err)
+			}
+		} else {
+			fmt.Fprint(out, versionText(version), versionDiagnosticText(diagnostic))
+		}
+		return 0
+	}
+	if pos[0] == "aide" || pos[0] == "help" {
+		topic := ""
+		if len(pos) > 2 {
+			return fail(fmt.Errorf("swarm aide [sujet]"))
+		}
+		if len(pos) == 2 {
+			topic = pos[1]
+		}
+		text, err := cliTopicHelp(topic)
+		if err != nil {
+			return fail(err)
+		}
+		if asJSON {
+			_ = printJSON(out, map[string]string{"topic": topic, "help": text})
+		} else {
+			fmt.Fprint(out, text)
+		}
+		return 0
+	}
+	if pos[0] == "automation" && len(pos) == 2 && (pos[1] == "help" || pos[1] == "aide") {
+		fmt.Fprint(out, automationCLIHelp())
+		return 0
+	}
+	if pos[0] == "plan" {
+		if err := validateGraphDraftCLISyntax(pos); err != nil {
+			return fail(err)
+		}
+	}
+	root, e := filepath.Abs(root)
+	if e != nil {
+		return fail(e)
+	}
+	root, e = filepath.EvalSymlinks(root)
+	if e != nil {
+		return fail(e)
+	}
+	if pos[0] == "evaluate" {
+		raw, e := readInput(input)
+		if e != nil {
+			return fail(e)
+		}
+		ev, e := evaluate(raw, root, phase)
+		if e != nil {
+			return fail(e)
+		}
+		_ = printJSON(out, ev)
+		if !ev.Allowed {
+			return 1
+		}
+		return 0
+	}
+	if pos[0] == "doctor" {
+		h := (&Store{root: root}).runtimeHealth()
+		if asJSON {
+			_ = printJSON(out, h)
+		} else {
+			fmt.Fprintln(out, uiText(h.Message))
+			fmt.Fprintln(out, uiText(h.Next))
+			for _, v := range h.Volumes {
+				fmt.Fprintf(out, "%s: %s · %d MiB · %s\n", v.Kind, v.Path, v.Available/(1024*1024), v.State)
+			}
+		}
+		if !h.LaunchAllowed {
+			return 2
+		}
+		return 0
+	}
+	s, e := openStoreWithMigration(root, pos[0] == "init", !cliStorageInspection(pos))
+	if e != nil {
+		return fail(e)
+	}
+	defer s.db.Close()
+	if pos[0] == "role-model" {
+		if err := s.roleModelCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "task-model" {
+		if err := s.taskModelCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "quotas" {
+		if err := s.quotasCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "pricing" {
+		if err := s.pricingCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "budget" {
+		if e := s.budgetCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "run-limits" {
+		if e := s.runLimitsCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "automation" {
+		if e := s.automationCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "connections" {
+		if len(pos) != 2 {
+			return fail(fmt.Errorf("swarm connections list|save --input connexion.json"))
+		}
+		if pos[1] == "save" {
+			raw, e := readInput(input)
+			if e != nil {
+				return fail(e)
+			}
+			var c AIConnectionChange
+			if e = strict(raw, &c); e != nil {
+				return fail(e)
+			}
+			if e = s.saveAIConnection(c); e != nil {
+				return fail(e)
+			}
+		} else if pos[1] != "list" {
+			return fail(fmt.Errorf("Action inconnue."))
+		}
+		v, e := s.aiConnectionsPublic()
+		if e != nil {
+			return fail(e)
+		}
+		_ = printJSON(out, v)
+		return 0
+	}
+	if pos[0] == "planning" {
+		if e := s.planningCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "prepare" {
+		if e := s.preparationEntry(pos[1:], input, output, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "skills" {
+		if len(pos) != 2 || pos[1] != "list" {
+			return fail(fmt.Errorf("usage : swarm skills list"))
+		}
+		items, e := s.actionSkillCatalog()
+		if e != nil {
+			return fail(e)
+		}
+		if asJSON {
+			if e = printJSON(out, map[string]any{"skills": items}); e != nil {
+				return fail(e)
+			}
+		} else {
+			for _, item := range items {
+				fmt.Fprintf(out, "%s · %s · %s\n", item.Path, item.Name, item.Description)
+				if !item.Available {
+					fmt.Fprintln(out, item.Reason)
+				}
+			}
+		}
+		return 0
+	}
+	if pos[0] == "project-profile" {
+		if e := s.projectProfileCLI(pos[1:], input, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "mission" {
+		returnErr := missionCLI(s, pos, input, asJSON, out)
+		if returnErr != nil {
+			return fail(returnErr)
+		}
+		return 0
+	}
+	if pos[0] == "lifecycle" {
+		if e := lifecycleCLI(s, pos, input, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "validation" {
+		if len(pos) != 3 || (pos[1] != "preview" && pos[1] != "apply" && pos[1] != "recheck-preview" && pos[1] != "recheck-apply") || task == "" || input == "" {
+			return fail(fmt.Errorf("usage : validation preview|apply|recheck-preview|recheck-apply WORK --task TASK --input politique.json"))
+		}
+		b, readErr := readInput(input)
+		if readErr != nil {
+			return fail(readErr)
+		}
+		var change ValidationPolicyChange
+		if readErr = strict(b, &change); readErr != nil {
+			return fail(readErr)
+		}
+		if change.TaskID == "" {
+			change.TaskID = task
+		}
+		if change.TaskID != task {
+			return fail(fmt.Errorf("task_id ne correspond pas à --task"))
+		}
+		action := pos[1]
+		if action == "recheck-preview" || action == "recheck-apply" {
+			change.RecheckCompleted = true
+		}
+		if action == "preview" || action == "recheck-preview" {
+			preview, previewErr := s.previewValidationPolicy(pos[2], change)
+			if previewErr != nil {
+				return fail(previewErr)
+			}
+			if asJSON {
+				_ = printJSON(out, preview)
+			} else {
+				fmt.Fprintf(out, uiText("Aperçu — %s · %s\n%s\n"), preview.TaskID, preview.TaskTitle, preview.Scope)
+				for _, criterion := range preview.Criteria {
+					fmt.Fprintf(out, uiText("- Critère %d : %s — %s"), criterion.Index, criterion.Text, criterion.Review)
+					if len(criterion.ControlIDs) > 0 {
+						fmt.Fprintf(out, " (%s)", strings.Join(criterion.ControlIDs, ", "))
+					}
+					fmt.Fprintln(out)
+				}
+				fmt.Fprintln(out, uiText("Effet : ")+preview.Confirmation)
+				fmt.Fprintln(out, uiText("Jeton à confirmer : ")+preview.Token)
+			}
+			return 0
+		}
+		updated, applyErr := s.applyValidationPolicy(pos[2], change)
+		if applyErr != nil {
+			return fail(applyErr)
+		}
+		if asJSON {
+			_ = printJSON(out, map[string]any{"work": updated, "applied": true, "task_id": task})
+		} else {
+			fmt.Fprintf(out, uiText("Politique enregistrée pour %s à la révision %d.\n"), task, updated.Revision)
+		}
+		return 0
+	}
+	if pos[0] == "plan" || pos[0] == "console" || pos[0] == "agent" || pos[0] == "exchange" || pos[0] == "providers" || (pos[0] == "_supervise" || pos[0] == "_assist" || pos[0] == "_prepare_turn" || pos[0] == "_dialogue_agent") || pos[0] == "control" || pos[0] == "web" || pos[0] == "dispatch" || pos[0] == "autonomy" || pos[0] == "profile" {
+		if e := agentCLI(s, pos, input, output, asJSON, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "init" {
+		_ = printJSON(out, map[string]any{"schema_version": 1, "root": s.root, "state": ".swarm/state.db"})
+		return 0
+	}
+	kind := pos[0]
+	id := ""
+	if kind == "work" || kind == "task" {
+		if len(pos) < 2 {
+			return fail(fmt.Errorf("sous-commande manquante"))
+		}
+		kind += "." + pos[1]
+		if len(pos) > 2 {
+			id = pos[2]
+		}
+	} else if len(pos) > 1 {
+		id = pos[1]
+	}
+	if kind == "work.list" || kind == "resume" && id == "" {
+		ws, e := s.list()
+		if e != nil {
+			return fail(e)
+		}
+		if asJSON {
+			_ = printJSON(out, ws)
+		} else {
+			fmt.Fprint(out, s.listView(ws))
+		}
+		return 0
+	}
+	emit := func(w Work) int {
+		v, e := s.view(w)
+		if kind != "work.show" {
+			v, e = s.render(w)
+		}
+		if e != nil {
+			return fail(fmt.Errorf("état conservé mais fiche non générée : %w", e))
+		}
+		if asJSON {
+			ev, _ := s.events(w.ID)
+			current := map[string]any{}
+			for _, t := range w.Tasks {
+				if t.Gate != nil {
+					r, e := evaluate(t.Gate.Document, s.root, t.Gate.Evaluation.Phase)
+					if e != nil {
+						current[t.ID] = map[string]any{"valid": false, "error": e.Error()}
+					} else {
+						current[t.ID] = map[string]any{"valid": true, "evaluation": r}
+					}
+				}
+			}
+			_ = printJSON(out, map[string]any{"work": w, "validation": s.validationState(&w), "events": ev, "current_gates": current, "current_git": gitState(s.root), "resume_markdown": v})
+		} else {
+			fmt.Fprintln(out, v)
+		}
+		return 0
+	}
+	if kind == "work.show" || kind == "resume" {
+		w, e := s.get(id)
+		if e != nil {
+			return fail(e)
+		}
+		return emit(w)
+	}
+	if kind == "export" {
+		if output == "" {
+			return fail(fmt.Errorf("--output requis"))
+		}
+		if e = s.export(id, output); e != nil {
+			return fail(e)
+		}
+		_ = printJSON(out, map[string]string{"archive": output})
+		return 0
+	}
+	if kind == "import" {
+		w, e := s.importBundle(input)
+		if e != nil {
+			return fail(e)
+		}
+		return emit(w)
+	}
+	if kind == "gate" {
+		var r struct {
+			Schema   int             `json:"schema_version"`
+			Event    string          `json:"event_id"`
+			Revision int             `json:"expected_revision"`
+			TaskID   string          `json:"task_id"`
+			Phase    string          `json:"phase"`
+			Name     string          `json:"name"`
+			Document json.RawMessage `json:"document"`
+		}
+		b, e := readInput(input)
+		if e != nil {
+			return fail(e)
+		}
+		if e = strict(b, &r); e != nil {
+			return fail(e)
+		}
+		if r.Schema != 1 || r.TaskID == "" || task != "" && task != r.TaskID {
+			return fail(fmt.Errorf("schema_version/task_id invalide"))
+		}
+		normalized, _ := json.Marshal(r)
+		w, e := s.mutate(id, kind, r.Event, r.Revision, normalized, func(w *Work) error {
+			return s.applyGateDocument(w, r.TaskID, r.Phase, r.Name, r.Document)
+		})
+		if e != nil {
+			return fail(e)
+		}
+		code := emit(w)
+		if code == 0 {
+			t, _ := w.task(r.TaskID)
+			if t.Gate != nil && !t.Gate.Evaluation.Allowed {
+				return 1
+			}
+		}
+		return code
+	}
+	switch kind {
+	case "work.create", "work.update", "task.add", "task.update", "checkpoint", "ooda":
+	default:
+		return fail(fmt.Errorf("commande inconnue : %s", kind))
+	}
+	b, e := readInput(input)
+	if e != nil {
+		return fail(e)
+	}
+	var r Request
+	if e = strict(b, &r); e != nil {
+		return fail(e)
+	}
+	if r.Schema != 1 {
+		return fail(fmt.Errorf("schema_version doit valoir 1"))
+	}
+	// Une entree fournie par un appelant reste un geste humain : le moteur
+	// ecrit ses mutations en interne, jamais par cette porte.
+	r.Origin = ""
+	w, e := s.executeRequest(id, kind, r)
+	if e != nil {
+		return fail(e)
+	}
+	return emit(w)
+}
+
+// Main runs the Swarm command and exits with its CLI status.
+func Main() {
+	args, language, err := languageArgs(os.Args[1:])
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
+	}
+	_ = os.Setenv("SWARM_LANG", language)
+	os.Exit(run(args, os.Stdout, os.Stderr))
+}

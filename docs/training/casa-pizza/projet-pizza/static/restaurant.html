@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Restaurant — Casa Pizza</title><link rel="stylesheet" href="/static/style.css"></head>
+<body>
+  <div class="demo-bar">Atelier Swarm <span>Restaurant fictif · avancement manuel</span></div>
+  <header class="small-header"><nav><a class="brand" href="/" aria-label="Casa Pizza accueil">casa<span>pizza</span><small>La table est ouverte</small></a><div class="nav-links"><a href="/">Retour à la carte</a></div></nav></header>
+  <main class="restaurant-main">
+    <section id="login-panel" class="login-panel"><p class="eyebrow">Accès réservé</p><h1>Espace restaurant</h1><form id="login-form"><label for="password">Mot de passe</label><input id="password" type="password" autocomplete="current-password" required><p id="login-error" class="message error" role="alert" hidden></p><button class="button" type="submit">Se connecter</button></form></section>
+    <section id="orders-panel" hidden><div class="section-title"><div><p class="eyebrow">Cuisine</p><h1>Commandes</h1></div><button id="refresh-orders" class="button secondary" type="button">Actualiser</button></div><div class="order-search"><label for="order-filter">Filtrer par numéro</label><input id="order-filter" type="search" placeholder="CP-..." autocomplete="off"></div><p id="orders-message" class="message" role="status"></p><div id="orders-list" class="restaurant-orders"></div></section>
+  </main>
+  <script src="/static/restaurant.js" defer></script>
+</body>
+</html>

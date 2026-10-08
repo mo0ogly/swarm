@@ -16,6 +16,8 @@ node_modules/
 # Generated installer configuration (local paths).
 /deploy/install.env
 /deploy/.install-env.*
+/deploy/local-web.json
+/deploy/local-web.tmp
 
 # Local qualification output is retained outside published source.
 *.test

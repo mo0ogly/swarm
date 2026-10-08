@@ -1,0 +1,12 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const context=vm.createContext({$:()=>({addEventListener(){}})});
+vm.runInContext(fs.readFileSync('web/ai-connections.js','utf8')+'\nthis.subject=AIConnections;',context);
+const render=text=>context.subject.responseText(text);
+const brief='# Brief\n\nFirst line\nSecond line';
+assert.equal(render(JSON.stringify({message:'OK',brief})),'OK\n\n'+brief);
+assert.equal(render(JSON.stringify({message:'OK'})),'OK');
+assert.equal(render(JSON.stringify('First line\nSecond line')),'First line\nSecond line');
+for(const text of ['OK','First line\nSecond line','Use \\n in code','{"message":broken}', '{"other":"value\\n"}','null','[1,2]'])assert.equal(render(text),text);
+assert.equal(render(JSON.stringify({message:'<script>alert(1)</script>',brief})),'<script>alert(1)</script>\n\n'+brief);
+console.log('PASS JSON connection replies use real newlines; plain text and literal backslashes are preserved');

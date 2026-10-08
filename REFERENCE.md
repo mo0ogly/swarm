@@ -49,7 +49,7 @@ Depuis ce dossier :
 ```sh
 go test -race ./...
 mkdir -p bin
-CGO_ENABLED=0 go build -trimpath -o bin/swarm .
+CGO_ENABLED=0 go build -trimpath -o bin/swarm ./cmd/swarm
 ```
 
 Depuis le dépôt Swarm, ou avec le binaire installé dans le PATH :
@@ -379,7 +379,7 @@ ne prouve pas leur exécution par un fournisseur.
 ```sh
 go test -race ./...
 go vet ./...
-go build -o /tmp/swarm-companion .
+go build -o /tmp/swarm-companion ./cmd/swarm
 SWARM_BINARY=/tmp/swarm-companion python3 tests/parity.py
 ```
 

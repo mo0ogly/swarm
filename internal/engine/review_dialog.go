@@ -1,0 +1,463 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
+
+// Discovery is limited to project documentation; no host scan or symlink walk.
+func (s *Store) taskReports(id string) []string {
+	type candidate struct {
+		path     string
+		modified int64
+	}
+	found := []candidate{}
+	visits := 0
+	_ = filepath.WalkDir(filepath.Join(s.root, "docs"), func(path string, d fs.DirEntry, e error) error {
+		visits++
+		if visits > 5000 {
+			return fs.SkipAll
+		}
+		if e != nil {
+			return nil
+		}
+		if d.IsDir() {
+			return nil
+		}
+		name := d.Name()
+		if name != id+".md" && !(strings.HasPrefix(name, id+"-") && strings.Contains(name, "handoff") && strings.HasSuffix(name, ".md")) {
+			return nil
+		}
+		rel, e := filepath.Rel(s.root, path)
+		if e != nil {
+			return nil
+		}
+		if _, e = safeReport(s.root, rel); e != nil {
+			return nil
+		}
+		info, e := d.Info()
+		if e == nil {
+			found = append(found, candidate{rel, info.ModTime().UnixNano()})
+		}
+		return nil
+	})
+	sort.Slice(found, func(i, j int) bool { return found[i].modified > found[j].modified })
+	out := []string{}
+	for _, f := range found {
+		out = append(out, f.path)
+	}
+	return out
+}
+
+// Include the preserved report of an incomplete managed result. It is exposed
+// for examination, never promoted to proof of acceptance.
+func (s *Store) taskReportsForWork(work, id string) []string {
+	reports := s.taskReports(id)
+	for _, report := range s.attributedTaskReports(work, id) {
+		found := false
+		for _, path := range reports {
+			if path == report {
+				found = true
+			}
+		}
+		if !found {
+			reports = append([]string{report}, reports...)
+		}
+	}
+	return reports
+}
+
+// Only engine-attributed artifacts can extend the HTTP documentation boundary.
+// Filename discovery under docs must never authorize a symlink into runtime data.
+func (s *Store) attributedTaskReports(work, id string) []string {
+	reports := []string{}
+	w, e := s.get(work)
+	if e != nil {
+		return reports
+	}
+	t, e := w.task(id)
+	if e != nil {
+		return reports
+	}
+	if review := t.IndependentReview; review != nil && currentTaskAttempt(t, review.Attempt) && review.Report != "" {
+		if _, e := s.artifactDigest(ExchangeArtifact{Path: review.Report, SHA256: review.Digest}); e == nil {
+			exists := false
+			for _, path := range reports {
+				if path == review.Report {
+					exists = true
+				}
+			}
+			if !exists {
+				reports = append([]string{review.Report}, reports...)
+			}
+		}
+	}
+	agents, e := s.agents(work)
+	if e != nil {
+		return reports
+	}
+	if path := s.incompleteDeliveryReport(&w, t, latestTaskAgent(agents, id)); path != "" {
+		for _, prior := range reports {
+			if prior == path {
+				return reports
+			}
+		}
+		reports = append([]string{path}, reports...)
+	}
+	return reports
+}
+
+func (s *Store) readableTaskReport(work, id, path string) bool {
+	rel, err := filepath.Rel(filepath.Join(s.root, "docs"), path)
+	if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return true
+	}
+	for _, report := range s.attributedTaskReports(work, id) {
+		if attributed, err := safeReport(s.root, report); err == nil && attributed == path {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Store) incompleteDeliveryReport(w *Work, t *Task, a *Agent) string {
+	if a == nil || a.Status != "completed" || !currentTaskAttempt(t, a.Attempt) || t.Status != "blocked" || !strings.HasPrefix(t.Blocker, "Livraison incomplète :") || w.Planning == nil || w.Planning.Repository == nil {
+		return ""
+	}
+	rel, e := filepath.Rel(s.root, filepath.Join(w.Planning.Repository.Storage, "proofs", a.ID, "report.md"))
+	if e != nil {
+		return ""
+	}
+	if _, e = safeReport(s.root, rel); e != nil {
+		return ""
+	}
+	return filepath.ToSlash(rel)
+}
+
+func safeReport(root, path string) (string, error) {
+	p, e := localFile(root, path)
+	if e != nil {
+		return "", e
+	}
+	info, e := os.Stat(p)
+	if e != nil {
+		return "", e
+	}
+	if !info.Mode().IsRegular() {
+		return "", fmt.Errorf("Le rapport doit être un fichier ordinaire")
+	}
+	return p, nil
+}
+func (s *Store) reviewText(work string, d *taskDialog) string {
+	w, e := s.get(work)
+	if e != nil {
+		return e.Error()
+	}
+	t, e := w.task(d.task.ID)
+	if e != nil {
+		return e.Error()
+	}
+	text := s.gateSummary(work, d.task.ID) + "\n\nTâche : " + t.Title + "\nÉtat : " + uiStatus(t.Status) + "\nLivrable : " + t.Deliverable + "\nCritères : " + strings.Join(t.Criteria, " ; ") + "\nProchaine action : " + t.Next
+	text += "\n\n" + evidenceText(s.validationState(&w).Tasks[t.ID].Evidence)
+	if t.Override != nil {
+		text += "\n\nDÉROGATION MANUELLE : " + t.Override.Reason + "\nOpérateur local : " + t.Override.Actor + " · " + t.Override.At + "\nLes contrôles ne sont pas transformés en PASS."
+	}
+	if t.Gate == nil {
+		return text + "\n\nACCEPTATION INDISPONIBLE : aucune gate de validation enregistrée.\nLe conducteur doit examiner le rapport et enregistrer son évaluation."
+	}
+	text += "\n\nGate : " + gateLabel(t) + " · phase " + t.Gate.Evaluation.Phase
+	if current, err := evaluate(t.Gate.Document, s.root, "delivery"); err != nil {
+		text += "\nContrôle des preuves : " + err.Error()
+	} else {
+		for _, reason := range current.Blockers {
+			text += "\nBlocage : " + reason
+		}
+	}
+	if s.validGate(t) {
+		text += " · valide et preuves courantes"
+	} else {
+		text += " · échouée, périmée ou phase delivery absente"
+	}
+	b, e := jsonReview(t.Gate.Document)
+	if e == nil {
+		text += "\n" + b
+	}
+	for _, dep := range t.Depends {
+		dt, _ := w.task(dep)
+		if !s.acceptedFresh(&w, dt, map[string]bool{}) {
+			text += "\nDépendance non validée ou périmée : " + dep
+		}
+	}
+	return text
+}
+func (s *Store) acceptReviewedTask(work, id string) error {
+	w, e := s.get(work)
+	if e != nil {
+		return e
+	}
+	t, e := w.task(id)
+	if e != nil {
+		return e
+	}
+	if t.Status == "accepted" {
+		return fmt.Errorf("Tâche déjà acceptée. Voir les preuves ou utiliser une dérogation si elles sont périmées.")
+	}
+	if t.Status != "submitted" {
+		return fmt.Errorf("Soumettre d’abord le rapport : état actuel %s", uiStatus(t.Status))
+	}
+	if !s.validGate(t) {
+		return fmt.Errorf("Acceptation refusée : gate delivery absente, échouée ou preuves périmées. Ouvrir les gates et preuves.")
+	}
+	return s.operatorTask(work, Request{ID: id, Status: "accepted", Next: "Rapport accepté après revue et contrôle des preuves courantes"})
+}
+
+func jsonReview(raw json.RawMessage) (string, error) {
+	var d struct {
+		Results []struct {
+			ID, Status string
+			Evidence   []string
+		}
+	}
+	if e := json.Unmarshal(raw, &d); e != nil {
+		return "", e
+	}
+	lines := []string{}
+	for _, r := range d.Results {
+		lines = append(lines, r.ID+" : "+r.Status)
+		for _, p := range r.Evidence {
+			lines = append(lines, "Preuve : "+p)
+		}
+	}
+	return strings.Join(lines, "\n"), nil
+}
+
+func (s *Store) submitReport(work, id, report string) error {
+	return s.submitReportAt(work, id, report, -1, "")
+}
+
+// origin nomme le moteur quand le conducteur relaie ; vide pour un geste humain.
+func (s *Store) submitReportAt(work, id, report string, expected int, origin string) error {
+	return s.submitReportVerified(work, id, report, expected, origin, newID("operator-"), "")
+}
+
+func (s *Store) submitReportVerified(work, id, report string, expected int, origin, event, digest string) error {
+	path, e := safeReport(s.root, report)
+	if e != nil {
+		return e
+	}
+	info, e := os.Stat(path)
+	if e != nil || info.Size() == 0 {
+		return fmt.Errorf("handoff vide")
+	}
+	w, e := s.get(work)
+	if e != nil {
+		return e
+	}
+	if expected >= 0 && w.Revision != expected {
+		return &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; relire avant soumission.", Retryable: true}
+	}
+	agents, e := s.agents(work)
+	if e != nil {
+		return e
+	}
+	current, e := w.task(id)
+	if e != nil {
+		return e
+	}
+	legacyReport, repairable := s.legacyReportSubmission(work, current, agents)
+	r := Request{Schema: 1, EventID: event, Revision: w.Revision, ID: id, Status: "submitted", Origin: origin, Next: "Évaluer les preuves et la gate delivery ; handoff : " + report}
+	raw, _ := json.Marshal(r)
+	_, e = s.mutate(work, "task.submit", r.EventID, r.Revision, raw, func(w *Work) error {
+		t, e := w.task(id)
+		if e != nil {
+			return e
+		}
+		if repairable && legacyReport == report {
+			// Preserve the erroneous record and the original event; no produced
+			// attempt or consumed reviewer call is removed or refunded.
+			t.LegacyReportSubmissions = append(t.LegacyReportSubmissions, t.Attempts[len(t.Attempts)-1])
+			t.Attempts = t.Attempts[:len(t.Attempts)-1]
+			t.Status, t.Blocker, t.Next = "submitted", "", r.Next
+			return nil
+		}
+		if t.Status != "blocked" && t.Status != "todo" {
+			return fmt.Errorf(
+				"Soumission refusée : la tâche est « %s ». Un rapport se soumet depuis une tâche « À faire » ou « Bloquée » qui vient de produire son livrable. Pour un nouveau rapport de contrôle, rouvrir explicitement la tâche (action « Rouvrir la tâche » ou [o] dans la console) ; cela retire sa validation courante.",
+				uiStatus(t.Status),
+			)
+		}
+		var reportBytes []byte
+		if digest != "" || t.Revalidation != nil || origin == conductorAuthor {
+			bytes, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			reportBytes = bytes
+			if digest != "" && hash(bytes) != digest {
+				return fmt.Errorf("Rapport modifié : examiner une nouvelle proposition avant soumission")
+			}
+		}
+		if t.Revalidation != nil {
+			digest := hash(reportBytes)
+			for _, old := range t.Revalidation.PreviousArtifacts {
+				if digest == old {
+					return fmt.Errorf("Revalidation : nouveau rapport de contrôles requis ; ce contenu appartient aux anciennes preuves")
+				}
+			}
+			t.Revalidation.Report = report
+			t.Revalidation.ReportHash = digest
+		}
+		// A conductor relays the completed production attempt; it does not
+		// create a synthetic attempt merely to submit its report.
+		if origin == conductorAuthor {
+			if t.Status != "blocked" || len(t.Attempts) == 0 || t.Attempts[len(t.Attempts)-1].Status != "completed" {
+				return fmt.Errorf("relais sans tentative terminée courante")
+			}
+			if w.Planning != nil && w.Planning.Repository == nil {
+				attempt := t.Attempts[len(t.Attempts)-1].ID
+				exists := false
+				for _, event := range w.Planning.Inbox {
+					if event.Kind == "handoff" && event.Attempt == attempt {
+						exists = true
+					}
+				}
+				if !exists {
+					scope, err := w.Planning.scope(t.ScopeID)
+					if err != nil {
+						return err
+					}
+					scope.State = "ready"
+					ref := ExchangeArtifact{Path: report, SHA256: hash(reportBytes)}
+					w.Planning.Inbox = append(w.Planning.Inbox, PlanningEvent{Handoff: &ref, ID: planningEventID("report", id, attempt), Scope: scope.ID, Kind: "handoff", Task: id, Attempt: attempt, Message: "Rapport remis automatiquement après fin normale. Examiner les preuves et limites ; résultat non validé.", Artifacts: []ExchangeArtifact{ref}, At: now()})
+				}
+			}
+			t.Status, t.Blocker, t.Next = "submitted", "", r.Next
+			return nil
+		}
+		if len(t.Attempts) > 0 {
+			current := t.Attempts[len(t.Attempts)-1]
+			for _, a := range agents {
+				if a.TaskID == id && a.Attempt == current.ID && a.Status == "completed" && current.Status == "completed" {
+					proven, why := s.provenAttemptReport(a)
+					if proven != report && w.Planning != nil {
+						return fmt.Errorf("rapport non attribuable à la tentative courante : %s", why)
+					}
+					if review := t.IndependentReview; review != nil && w.Planning != nil && w.Planning.Repository == nil && review.Attempt == current.ID {
+						if review.State == "running" {
+							return fmt.Errorf("Vérification en cours ; attendre son résultat avant une nouvelle soumission.")
+						}
+						if review.State == "changes_requested" {
+							updated, err := os.ReadFile(path)
+							if err != nil {
+								return err
+							}
+							if review.Report != report || review.Digest == "" || hash(updated) == review.Digest {
+								return fmt.Errorf("Rapport refusé inchangé ; compléter les corrections et les preuves avant de soumettre à nouveau.")
+							}
+							archiveIndependentReview(t)
+						}
+					}
+					t.Status, t.Blocker, t.Next = "submitted", "", r.Next
+					return nil
+				}
+			}
+		}
+		if e = s.apply(w, "task.update", Request{ID: id, Status: "running", Origin: origin, Next: "Handoff examiné : " + report}); e != nil {
+			return e
+		}
+		return s.apply(w, "task.update", Request{ID: id, Status: "submitted", Origin: origin, Outcome: "completed", Next: r.Next})
+	})
+	return e
+}
+
+func (s *Store) loadReport(d *taskDialog) {
+	path, e := safeReport(s.root, d.reportPath)
+	if e != nil {
+		d.review = e.Error()
+		return
+	}
+	f, e := os.Open(path)
+	if e != nil {
+		d.review = e.Error()
+		return
+	}
+	defer f.Close()
+	b, e := io.ReadAll(io.LimitReader(f, 262145))
+	if e != nil {
+		d.review = e.Error()
+		return
+	}
+	tail := ""
+	if len(b) > 262144 {
+		b = b[:262144]
+		tail = "\n[Affichage limité à 256 Kio : consulter le fichier pour la suite.]"
+	}
+	d.review = "Rapport : " + d.reportPath + "\n\n" + string(b) + tail
+}
+
+// An override is an operator decision, never a fabricated successful gate.
+func (s *Store) overrideReviewedTask(work, id, reason string) error {
+	return s.overrideReviewedTaskAt(work, id, reason, -1)
+}
+func (s *Store) overrideReviewedTaskAt(work, id, reason string, expected int) error {
+	reason = strings.TrimSpace(reason)
+	if len([]rune(reason)) < 10 || len(reason) > 2000 {
+		return fmt.Errorf("Motif requis : 10 caractères minimum, 2000 octets maximum.")
+	}
+	w, e := s.get(work)
+	if e != nil {
+		return e
+	}
+	if expected >= 0 && w.Revision != expected {
+		return &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; relire avant dérogation.", Retryable: true}
+	}
+	var active int
+	if e = s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')", work, id).Scan(&active); e != nil {
+		return e
+	}
+	task, e := w.task(id)
+	if e != nil {
+		return e
+	}
+	actor := fmt.Sprintf("uid:%d", os.Getuid())
+	decision := ManualOverride{Reason: reason, Actor: actor, At: now(), Revision: w.Revision, PreviousStatus: task.Status}
+	b, _ := json.Marshal(struct {
+		TaskID   string         `json:"task_id"`
+		Decision ManualOverride `json:"decision"`
+	}{id, decision})
+	_, e = s.mutate(work, "task.override", newID("operator-"), w.Revision, b, func(w *Work) error {
+		t, e := w.task(id)
+		if e != nil {
+			return e
+		}
+		if active > 0 || t.Status == "running" {
+			return fmt.Errorf("Agent ou tâche en cours : arrêter et réconcilier avant dérogation.")
+		}
+		if t.Status == "waived" {
+			return fmt.Errorf("Dérogation déjà enregistrée ; rouvrir la tâche pour la modifier.")
+		}
+		if t.Status == "abandoned" {
+			return fmt.Errorf("Rouvrir la tâche abandonnée avant dérogation.")
+		}
+		for _, dep := range t.Depends {
+			dt, _ := w.task(dep)
+			if !s.acceptedFresh(w, dt, map[string]bool{}) {
+				return fmt.Errorf("Accepter d’abord la dépendance %s (revue ou dérogation).", dep)
+			}
+		}
+		t.Override = &decision
+		t.Status = "waived"
+		t.Blocker = ""
+		t.Next = "Acceptée par dérogation : " + reason
+		return nil
+	})
+	return e
+}

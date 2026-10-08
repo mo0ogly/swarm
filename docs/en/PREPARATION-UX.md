@@ -216,3 +216,17 @@ Custom connections are not implicitly activated for every mission.
 ## Templates
 
 [KS mission templates (web and CLI)](PREPARATION-TEMPLATES.md).
+
+### Rejected preparation answers
+
+The engine accepts a strict JSON object, optionally wrapped in a single Markdown
+`json` fence. It does not extract objects from free prose and still rejects
+unexpected fields. Byte limits are 8,000 for message, 16,000 for brief or plan,
+and 24,576 for the complete response.
+
+Rejections now identify JSON syntax/type, unexpected fields, an empty message,
+encoding, or size with actual and maximum values. Diagnostics do not echo private
+provider content. A rejected proposal changes no document and triggers no automatic
+retry. Correct the cause before sending again; history and usage remain recorded.
+Old generic errors cannot be diagnosed retrospectively when the original answer
+was not retained.

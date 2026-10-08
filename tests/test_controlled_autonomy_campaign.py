@@ -70,7 +70,7 @@ class PublicCampaignTests(unittest.TestCase):
         # Runs actual Swarm processes with a deterministic provider, never a model.
         with tempfile.TemporaryDirectory(prefix='swarm-campaign-test-') as tmp:
             base=Path(tmp);provider=base/'claude';review=base/'review.py'
-            source=Path(__file__).resolve().parent.parent/'managed_review_test.go'
+            source=Path(__file__).resolve().parent.parent/'internal/engine/managed_review_test.go'
             fixture=source.read_text().split('const managedReviewerFixture = `',1)[1].split('\n`',1)[0]
             review.write_text(fixture)
             provider.write_text('#!'+sys.executable+'\n'+r'''

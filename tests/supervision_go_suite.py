@@ -12,9 +12,11 @@ def partition(names, plan):
     if not names or len(names) != len(set(names)):
         raise ValueError('empty or duplicate test inventory')
     isolated = plan['isolated']
-    if len(isolated) != len(set(isolated)) or not set(isolated) <= set(names):
+    dedicated = plan.get('dedicated', [])
+    reserved = isolated + dedicated
+    if len(reserved) != len(set(reserved)) or not set(reserved) <= set(names):
         raise ValueError('isolated test inventory mismatch')
-    remaining = set(names) - set(isolated)
+    remaining = set(names) - set(reserved)
     groups = [[] for _ in range(min(plan['groups'], len(remaining)))]
     weights = plan['observed_seconds']
     costs = [0.0 for _ in groups]
@@ -24,7 +26,9 @@ def partition(names, plan):
         index = min(range(len(groups)), key=lambda i: (costs[i], len(groups[i]), i))
         groups[index].append(name)
         costs[index] += weights.get(name, 1)
-    all_groups = [[name] for name in isolated] + groups
+    # Long protocols get their own bounded process. They are not timing-sensitive
+    # isolated cases, so run them alongside the remaining distributed groups.
+    all_groups = [[name] for name in reserved] + groups
     if sorted(name for group in all_groups for name in group) != sorted(names):
         raise ValueError('incomplete or duplicate coverage')
     return all_groups, len(isolated)
@@ -80,19 +84,30 @@ def main():
     assert plan['version'] == 1 and 1 <= plan['parallelism'] <= 16
     assert 1 <= plan['groups'] <= 16 and 0 < plan['test_timeout_seconds'] <= 240
     assert all(isinstance(v, (float, int)) and 0 <= v < 10000 for v in plan['observed_seconds'].values())
-    packages = subprocess.run(['go', 'list', './...'], capture_output=True, text=True, check=True).stdout.splitlines()
-    if len(packages) != 1:
-        raise SystemExit('Package inventory changed: update suite coverage before running.')
+    inventory = subprocess.run(['go', 'list', '-json', './...'], capture_output=True, text=True, check=True).stdout
+    decoder = json.JSONDecoder()
+    packages, tested = [], []
+    while inventory.strip():
+        record, end = decoder.raw_decode(inventory.lstrip())
+        inventory = inventory.lstrip()[end:]
+        packages.append(record['ImportPath'])
+        if record.get('TestGoFiles') or record.get('XTestGoFiles'):
+            tested.append(record['ImportPath'])
+    engine = 'swarm.local/companion/internal/engine'
+    if tested != [engine]:
+        raise SystemExit('Test package inventory changed: update shard coverage before running.')
+    # Build every package; the disjoint schedule covers the one discovered test package.
+    subprocess.run(['go', 'build', './...'], check=True)
     with tempfile.TemporaryDirectory(prefix='swarm-go-suite-') as folder:
         binary = Path(folder)/'companion.test'
-        subprocess.run(['go', 'test', '-c', '-o', str(binary), packages[0]], check=True)
+        subprocess.run(['go', 'test', '-c', '-o', str(binary), engine], check=True)
         listing = subprocess.run([str(binary), '-test.list', '.'], capture_output=True, text=True, check=True)
         names = [name for name in listing.stdout.splitlines() if re.match(r'^(Test|Example|Fuzz)\w*$', name)]
         groups, isolated = partition(names, plan)
-        print(f'GO SUITE package={packages[0]} tests={len(names)} shards={len(groups)} coverage=disjoint-complete compile=once', flush=True)
-        codes = [run(groups[i], i, binary, packages[0], plan['test_timeout_seconds']) for i in range(isolated)]
+        print(f'GO SUITE package={engine} tests={len(names)} shards={len(groups)} coverage=disjoint-complete compile=once', flush=True)
+        codes = [run(groups[i], i, binary, engine, plan['test_timeout_seconds']) for i in range(isolated)]
         with concurrent.futures.ThreadPoolExecutor(max_workers=plan['parallelism']) as pool:
-            codes.extend(pool.map(lambda pair: run(pair[1], pair[0]+isolated, binary, packages[0], plan['test_timeout_seconds']), enumerate(groups[isolated:])))
+            codes.extend(pool.map(lambda pair: run(pair[1], pair[0]+isolated, binary, engine, plan['test_timeout_seconds']), enumerate(groups[isolated:])))
         if any(codes):
             raise SystemExit(1)
         print(f'PASS full discovered Go suite: {len(names)} tests; all shards exited 0.', flush=True)

@@ -1,0 +1,16 @@
+body { margin:0; background:var(--wattson-fond); color:var(--wattson-texte); font:1rem/1.5 system-ui,sans-serif; }
+main { max-width:36rem; margin:8vh auto; border:1px solid var(--wattson-ligne); border-radius:1rem; background:var(--wattson-carte); overflow:hidden; }
+header, section, footer { padding:1.5rem; }
+header, footer { background:var(--wattson-carte-appuyee); }
+header { border-bottom:1px solid var(--wattson-ligne); }
+footer { border-top:1px solid var(--wattson-ligne); }
+h1 { color:var(--wattson-titre); margin-top:0; }
+form { display:grid; gap:.75rem; }
+input { min-width:0; padding:.75rem; color:var(--wattson-texte); background:var(--wattson-champ); border:1px solid var(--wattson-ligne); border-radius:.4rem; font:inherit; }
+label { color:var(--wattson-libelle); }
+button { padding:.75rem; font:inherit; color:var(--wattson-action-encre); background:var(--wattson-action-fond); border:1px solid var(--wattson-action-bordure); border-radius:.4rem; cursor:pointer; }
+button:disabled { color:var(--wattson-texte-discret); background:var(--wattson-carte-appuyee); border-color:var(--wattson-ligne); cursor:wait; }
+a { color:var(--wattson-lien); margin-right:1rem; }
+:focus-visible { outline:2px solid var(--wattson-lien); outline-offset:3px; }
+[role=alert] { padding:.75rem; background:var(--wattson-alerte-fond); color:var(--wattson-alerte-encre); }
+@media (max-width:40rem) { main { margin:1rem; } }

@@ -34,7 +34,7 @@ jobs:
         env:
           CHROME_BIN: /usr/bin/google-chrome
       - run: go vet ./...
-      - run: go test -timeout 25m ./...
+      - run: python3 tests/supervision_go_suite.py
       - run: npm test
       - run: make smoke
       - run: npm run test:i18n-ui

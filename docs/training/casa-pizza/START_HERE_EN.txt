@@ -1,0 +1,52 @@
+SWARM TRAINING CASA PIZZA
+
+Open Swarm_Casa_Pizza_Training_EN.docx.
+36 illustrated chapters for beginners.
+
+TRY THE REFERENCE
+In a terminal, from the extracted folder:
+  cd projet-pizza
+  python3 app.py
+Client: http://127.0.0.1:18841/
+Restaurant: http://127.0.0.1:18841/restaurant
+Local demo password: atelier
+Keep the terminal open. Stop: Ctrl+C.
+
+CHECK THE CODE
+From projet-pizza:
+  python3 -W error::ResourceWarning -m unittest -v
+Expected result for the reference: 11 passing tests.
+The suite includes a real HTTP server and a restart using the same database.
+
+LEARN SWARM
+Chapters 3 and 4: purpose and responsibilities.
+Chapters 5 to 16: workstation, fresh project, brief and execution.
+Chapters 11 to 13: graph, task details and dependency editing.
+Chapters 17 to 24: evidence, automated checks and human decisions.
+Chapters 25 and 26: visual brief and design review.
+Chapters 27 to 34: ordering, restaurant, mobile and network diagnosis.
+Chapters 35 and 36: exercises, stopping and limitations.
+
+atelier_swarm.py creates a fresh project using an installed Swarm executable
+and Codex already installed and authenticated. It launches no agent and copies
+no credentials. After initialization, creer_plan_pedagogique.py creates an
+optional six-task demonstration plan in another mission (chapter 11). Launch
+no agents for that demonstration. Run it once per workshop.
+
+Python 3.10 or later runs the reference without packages or external services.
+Generation with Codex depends on the provider configured on your computer.
+The reference was refined after the original workshop: FORMATEUR.md describes
+historical verification; REFONTE.md records the current visual refinement.
+Historical acceptance is not a gate for the refinement.
+
+The guide and these instructions are English. The application, helper messages
+and source reports remain French. New cockpit captures follow the guide
+language; historical labels and mission/task names remain in their original
+language. The English guide explains the French UI labels. Keep command option
+names and file paths as written.
+
+Use fictional contact details only. No real payment or delivery.
+The restaurant advances statuses manually. Confirmation clears the basket while
+tracking remains in the tab. Listening on 127.0.0.1 confines the demo to the
+computer running the server. This is not a production deployment.
+The kit excludes credentials, private sessions, SQLite databases and Git history.
