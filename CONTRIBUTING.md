@@ -4,6 +4,15 @@ Start with [AGENTS.md](AGENTS.md) and the shared
 [workflow contract](tools/agent-workflows/CONTRACT.md). Contributions remain
 subject to [LICENSE](LICENSE); this project uses a noncommercial license.
 
+## Source layout
+
+See the [repository map](docs/en/REPOSITORY-STRUCTURE.md). The executable entry
+point is `cmd/swarm`; engine sources and Go tests live in `internal/engine`.
+Use `make build` for an identified binary, or `go build -o bin/swarm ./cmd/swarm`
+for a plain development build. Run focused engine cases with
+`go test ./internal/engine -run PATTERN`; `go test ./...` covers every package.
+The root `resources.go` embeds canonical assets; no generated asset copies are required.
+
 ## Local development
 
 Use Linux, Go 1.24 or newer, Node.js 22 and npm. Docker Engine and Compose v2

@@ -8,7 +8,7 @@ import sys
 import json
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-FILES = ('run_limits_web.go', 'run_limits_web_test.go', 'web/admin.js',
+FILES = ('internal/engine/run_limits_web.go', 'internal/engine/run_limits_web_test.go', 'web/admin.js',
          'web/cockpit.js', 'web/index.html', 'tests/run_limits_admin_ui.cjs')
 
 def run(command):
@@ -34,7 +34,7 @@ if mode in ('unit', 'all'):
 if mode in ('browser', 'all'):
     with tempfile.TemporaryDirectory(prefix='swarm-t4-control-') as directory:
         binary = str(pathlib.Path(directory) / 'swarm')
-        run(['go', 'build', '-o', binary, '.'])
+        run(['go', 'build', '-o', binary, './cmd/swarm'])
         run(['node', 'tests/run_limits_admin_ui.cjs', binary, str(out)])
     (out / 'sources.json').write_text(json.dumps(fingerprints, sort_keys=True))
 

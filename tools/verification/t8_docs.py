@@ -40,7 +40,7 @@ run(['git', 'diff', '--check'])
 print('PASS 17 referenced images match the visual review; this is hash binding, not automatic image analysis', flush=True)
 with tempfile.TemporaryDirectory(prefix='swarm-t8-control-') as directory:
     binary = str(pathlib.Path(directory) / 'swarm')
-    run(['go', 'build', '-trimpath', '-o', binary, '.'])
+    run(['go', 'build', '-trimpath', '-o', binary, './cmd/swarm'])
     output = run(['node', 'tools/verification/t8_saved_config_shots.cjs', binary, str(pathlib.Path(directory) / 'shots')])
     print(output, flush=True)
     assert 'PASS fr saved revision 1' in output and 'PASS en saved revision 1' in output

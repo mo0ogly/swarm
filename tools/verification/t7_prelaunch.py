@@ -16,7 +16,7 @@ if mode in ('entry','all'):
 if mode in ('browser','all'):
  with tempfile.TemporaryDirectory(prefix='swarm-t7-check-') as d:
   binary=str(pathlib.Path(d)/'swarm')
-  run(['go','build','-o',binary,'.'])
+  run(['go','build','-o',binary,'./cmd/swarm'])
   run(['node','tests/prelaunch_diagnostic_ui.cjs',binary,str(out)])
  run(['node','tests/i18n_test.cjs'])
  assert fingerprints=={f:hashlib.sha256((ROOT/f).read_bytes()).hexdigest() for f in FILES},'source changed during check'

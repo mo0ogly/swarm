@@ -36,13 +36,13 @@ def browser(mutate=False):
     with tempfile.TemporaryDirectory(prefix='swarm-t5-check-') as temp:
         dst=pathlib.Path(temp)
         for p in ROOT.glob('*.go'): shutil.copy2(p,dst/p.name)
-        for name in ['go.mod','go.sum','package.json']: shutil.copy2(ROOT/name,dst/name)
-        for name in ['web','locales','contracts','scripts','tools/agent-workflows','.claude/skills']:
+        for name in ['go.mod','go.sum','package.json','version_history.json']: shutil.copy2(ROOT/name,dst/name)
+        for name in ['cmd','internal','config','web','locales','contracts','scripts','tools/agent-workflows','.claude/skills']:
             shutil.copytree(ROOT/name,dst/name)
         (dst/'node_modules').symlink_to(ROOT/'node_modules',target_is_directory=True)
         (dst/'tests').mkdir();shutil.copy2(ROOT/'tests/i18n_ui.cjs',dst/'tests/i18n_ui.cjs')
         def build():
-            p=run(['go','build','-o','swarm','.'],dst)
+            p=run(['go','build','-o','swarm','./cmd/swarm'],dst)
             assert p.returncode==0,p.stdout[-3000:]
         def check():
             return run(['node','tests/i18n_ui.cjs','swarm','screens'],dst,timeout=60)

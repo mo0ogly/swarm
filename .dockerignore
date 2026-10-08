@@ -2,6 +2,10 @@
 !go.mod
 !go.sum
 !*.go
+!cmd/
+!cmd/**
+!internal/
+!internal/**
 !locales/
 !locales/en.json
 !contracts/
@@ -14,6 +18,7 @@
 !tools/agent-workflows/CONTRACT.md
 !tools/agent-workflows/templates/
 !tools/agent-workflows/templates/*.md
+!tools/agent-workflows/templates/preparations.json
 !web/
 !web/**
 !deploy/
@@ -26,3 +31,4 @@
 !config/
 !config/*.json
 *_test.go
+**/*_test.go

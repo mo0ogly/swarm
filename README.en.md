@@ -29,6 +29,15 @@ See the [illustrated user guide](docs/en/USER-GUIDE.md). Swarm is experimental; 
 
 Start with **Choose a mission template** in preparation: [Guided workflow catalogue shared by web and CLI](docs/en/PREPARATION-TEMPLATES.md).
 
+### Casa Pizza hands-on training
+
+[Beginner workshop in English and French](docs/training/casa-pizza/README.md): 36-page Word guides with cockpit screenshots, task graphs, automated checks, human decisions and a working local pizza delivery application.
+
+- [English guide](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx) · [English kit with code and screenshots](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+- [Guide français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx) · [Kit français avec code et captures](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+
+The reference passes eleven tests and its browser journey was checked on desktop and at 390 pixels. Automatic policy examples demonstrate configuration, not an executed autonomous mission. The application remains French in both kits.
+
 ## What it does
 
 - Prepare requirements with AI, approve a brief and review a structured plan.
@@ -106,7 +115,19 @@ mkdir -p "$HOME/projects/my-project"
 ./install.sh --project "$HOME/projects/my-project"
 ```
 
-Open the session link printed by the installer. Select **English** in the cockpit.
+For native local development, use the stable launcher:
+
+```sh
+./swarm.sh start
+./swarm.sh restart
+./swarm.sh status
+```
+
+The cockpit stays at `http://127.0.0.1:18792/`. The launcher opens the browser,
+replaces its previous server on restart and preserves project data. Use
+`./swarm.sh open` to reconnect locally. Python 3 and a local browser opener are required.
+For the Docker installation above, use the session link printed by the installer.
+Select **English** in the cockpit.
 For native installation, configuration, authentication and remote access, see
 [Install Swarm](docs/en/INSTALL.md).
 
@@ -166,6 +187,13 @@ authentication and session links private. This repository supplies nine
 [working methods](docs/en/AGENT-METHODS.md), including planning, system examination and improvement,
 debugging, review and lessons learned. When controlling another project, check
 which method resources are available in that project.
+
+## Repository layout
+
+The CLI entry point is in `cmd/swarm`, the Go engine and its unit tests in
+`internal/engine`, the interface in `web` and `frontend`, and guides in `docs`.
+See the [repository map](docs/en/REPOSITORY-STRUCTURE.md) and the
+[pizza training guides](docs/training/casa-pizza/README.md).
 
 ## Documentation and development
 

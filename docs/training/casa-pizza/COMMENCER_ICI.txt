@@ -1,0 +1,46 @@
+FORMATION SWARM CASA PIZZA
+
+Ouvrir le guide Word Formation_Swarm_Casa_Pizza.docx.
+36 chapitres illustrés pour débutants.
+
+ESSAYER LA RÉFÉRENCE
+Dans un terminal, depuis le dossier extrait :
+  cd projet-pizza
+  python3 app.py
+Client : http://127.0.0.1:18841/
+Restaurant : http://127.0.0.1:18841/restaurant
+Mot de passe de démonstration locale : atelier
+Garder le terminal ouvert. Arrêt : Ctrl+C.
+
+VÉRIFIER LE CODE
+Depuis projet-pizza :
+  python3 -W error::ResourceWarning -m unittest -v
+Résultat attendu pour la référence : 11 tests réussis.
+La suite vérifie aussi un vrai serveur HTTP et un redémarrage sur la même base.
+
+APPRENDRE SWARM
+Chapitres 3 et 4 : utilité et responsabilités.
+Chapitres 5 à 16 : poste, projet neuf, brief et exécution.
+Chapitres 11 à 13 : graphe, fiche de tâche et édition des dépendances.
+Chapitres 17 à 24 : preuves, contrôles automatiques et décision humaine.
+Chapitres 25 et 26 : brief visuel et recette graphique.
+Chapitres 27 à 34 : commande, restaurant, mobile et diagnostic réseau.
+Chapitres 35 et 36 : exercices, arrêt et limites.
+
+atelier_swarm.py crée un projet neuf avec un binaire Swarm installé et Codex
+installé et authentifié. Aucun agent n'est lancé et aucune clé n'est copiée.
+Le plan facultatif se crée avec creer_plan_pedagogique.py après initialisation
+(chapitre 11). Il ajoute six tâches à faire dans une autre mission ; ne lancer
+aucun agent pour cette démonstration. L'exécuter une seule fois par atelier.
+
+Python 3.10 ou plus récent suffit pour exécuter la référence sans paquet ni
+service externe. La génération avec Codex dépend du fournisseur du poste.
+La référence a été retravaillée après l'atelier initial : FORMATEUR.md décrit
+la recette historique et REFONTE.md celle de la révision visuelle actuelle.
+L'acceptation historique n'est pas une gate pour la refonte.
+
+Utiliser des coordonnées fictives. Aucun paiement ni livraison réels.
+Les statuts avancent manuellement dans l'espace restaurant. Après confirmation,
+le panier est vidé et le suivi reste dans l'onglet. L'écoute 127.0.0.1 garde
+cette démo sur le poste qui exécute le serveur. Ce n'est pas un déploiement.
+Le kit exclut credentials, sessions privées, bases SQLite et historique Git.

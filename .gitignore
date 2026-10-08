@@ -16,6 +16,8 @@ node_modules/
 # Generated installer configuration (local paths).
 /deploy/install.env
 /deploy/.install-env.*
+/deploy/local-web.json
+/deploy/local-web.tmp
 
 # Local qualification output is retained outside published source.
 *.test
@@ -23,3 +25,18 @@ node_modules/
 /docs/plans/**/execution/**/final-results/
 /docs/plans/**/execution/**/journal-results/
 /docs/plans/**/execution/**/closure/
+
+# Machine-specific launcher and on-premise configuration.
+/deploy/local-web.json
+/deploy/local-web.tmp
+/compose.override.yaml
+/compose.override.yml
+/certs/
+# Internal Skynet installation documents stay local.
+/docs/skynet/
+/docs/Skynet/
+/[Ii]nstallation_[Ss]kynet*
+**/[Ii]nstallation_[Ss]kynet*.docx
+**/[Ii]nstallation_[Ss]kynet*.pdf
+**/*[Ss][Kk][Yy][Nn][Ee][Tt]*.docx
+**/*[Ss][Kk][Yy][Nn][Ee][Tt]*.pdf

@@ -99,3 +99,18 @@ Les connexions personnalisées n’activent pas implicitement un fournisseur pou
 ## Templates
 
 [Modèles de mission KS (web et CLI)](docs/PREPARATION-TEMPLATES.md).
+
+### Réponse de préparation rejetée
+
+Le moteur accepte un objet JSON strict, éventuellement entouré d'une unique
+balise Markdown `json`. Il n'extrait pas un objet depuis du texte libre et
+refuse toujours les champs non prévus. Les limites sont exprimées en octets :
+message 8 000, brief ou plan 16 000, réponse complète 24 576.
+
+Un rejet indique désormais sa catégorie : syntaxe/type JSON, champ non prévu,
+message vide, encodage ou taille avec valeur et plafond. Le diagnostic ne
+reproduit pas le texte privé du fournisseur. Une proposition rejetée ne modifie
+aucun document et ne déclenche aucune relance automatique. Corriger la cause
+avant un nouvel envoi ; l'échange et sa consommation restent dans l'historique.
+Les anciens rejets génériques ne peuvent pas être diagnostiqués rétroactivement
+si la réponse originale n'a pas été conservée.

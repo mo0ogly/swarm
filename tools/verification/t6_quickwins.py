@@ -8,7 +8,7 @@ import sys
 import json
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-for name in ('runtime_health.go', 'runtime_health_test.go', 'web/runtime-health.js',
+for name in ('internal/engine/runtime_health.go', 'internal/engine/runtime_health_test.go', 'web/runtime-health.js',
              'web/cockpit.js', 'tests/quick_wins_ui.cjs'):
     print('SOURCE', name, hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), flush=True)
 
@@ -17,7 +17,7 @@ def run(command):
     subprocess.run(command, cwd=ROOT, check=True, timeout=150)
 
 mode = sys.argv[1] if len(sys.argv) > 1 else 'all'
-files = ('runtime_health.go', 'runtime_health_test.go', 'web/runtime-health.js', 'web/cockpit.js', 'tests/quick_wins_ui.cjs')
+files = ('internal/engine/runtime_health.go', 'internal/engine/runtime_health_test.go', 'web/runtime-health.js', 'web/cockpit.js', 'tests/quick_wins_ui.cjs')
 fingerprints = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in files}
 out = ROOT / 'test-results/t6-engine'
 if mode in ('entry', 'all'):
@@ -26,11 +26,11 @@ if mode in ('entry', 'all'):
     assert (ROOT / 'node_modules/puppeteer').is_dir()
     print('PASS prerequisites: source, tests and browser dependency present')
 if mode in ('version', 'all'):
-    run(['go', 'test', '.', '-run', '^TestServerVersionReflectsBuildAndLocalGitWithoutNetwork$', '-count=1', '-v'])
+    run(['go', 'test', './internal/engine', '-run', '^TestServerVersionReflectsBuildAndLocalGitWithoutNetwork$', '-count=1', '-v'])
 if mode in ('browser', 'all'):
     with tempfile.TemporaryDirectory(prefix='swarm-t6-control-') as directory:
         binary = str(pathlib.Path(directory) / 'swarm')
-        run(['go', 'build', '-o', binary, '.'])
+        run(['go', 'build', '-o', binary, './cmd/swarm'])
         run(['node', 'tests/quick_wins_ui.cjs', binary, str(out)])
     (out / 'sources.json').write_text(json.dumps(fingerprints, sort_keys=True))
 if mode in ('validation', 'delivery', 'all'):

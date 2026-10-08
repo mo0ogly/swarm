@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#233d30">
+  <title>Casa Pizza — Livraison locale</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#carte">Aller à la carte</a>
+  <div class="demo-bar">Atelier Swarm <span>Application locale · commandes fictives</span></div>
+  <header class="site-header">
+    <nav aria-label="Navigation principale">
+      <a class="brand" href="/" aria-label="Casa Pizza accueil">casa<span>pizza</span><small>La table est ouverte</small></a>
+      <div class="nav-links"><a href="#carte">La carte</a><a href="#confirmation" id="tracking-link" hidden>Mon suivi</a><a class="basket-link" href="#panier">Mon panier <span id="basket-count">0</span></a></div>
+    </nav>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy"><p class="eyebrow">Six recettes · Une envie de partager</p><h1 id="hero-title">La bonne pizza.<br><em>Le bon moment.</em></h1><p class="hero-description">Le classique qu’on aime. La recette qu’on découvre. Choisissez vos pizzas, on s’occupe du reste dans cet atelier.</p><a class="button" href="#carte">Choisir ma pizza <span aria-hidden="true">↗</span></a><p class="hero-note">Livraison 2,90 € · Minimum 10 € hors livraison</p></div>
+      <div class="hero-visual" aria-hidden="true"><span class="hero-word">BUON<br>APPETITO</span><img class="hero-pizza" src="/static/images/margherita.svg" alt="" width="600" height="600"><span class="recipe-stamp">La classique<br><strong>Margherita</strong><span>Tomate · mozzarella · basilic</span></span></div>
+    </section>
+    <div class="service-strip"><span><b>01</b> Choisissez vos recettes</span><span><b>02</b> Confirmez votre commande</span><span><b>03</b> Suivez sa préparation</span></div>
+    <section id="carte" class="menu-section" aria-labelledby="titre-carte">
+      <div class="section-title"><div><p class="eyebrow">À chacun sa préférée</p><h2 id="titre-carte">La carte de la casa<span>.</span></h2><p class="section-description">Six recettes, des ingrédients lisibles et le plaisir de choisir.</p></div><label class="toggle"><input id="vegetarian-filter" type="checkbox"> Végétariennes uniquement</label></div>
+      <div id="catalog" class="pizza-grid" aria-live="polite"></div>
+      <p id="basket-feedback" class="basket-feedback" role="status"></p>
+    </section>
+    <section id="panier" class="checkout-section" aria-labelledby="titre-panier">
+      <div class="section-title"><div><p class="eyebrow">On passe à table ?</p><h2 id="titre-panier">Votre commande<span>.</span></h2></div><p class="section-description">Une dernière vérification avant de confirmer.</p></div>
+      <div class="order-layout">
+        <div class="basket-panel"><div class="panel-title"><h3>Votre sélection</h3><span class="small-label">01 / Panier</span></div><div id="basket-items"><p class="empty-basket">Votre panier est vide.<br><a href="#carte">Trouvez votre préférée dans la carte.</a></p></div><div class="totals"><p><span>Sous-total</span><strong id="subtotal">0,00 €</strong></p><p><span>Livraison</span><strong id="delivery">0,00 €</strong></p><p class="grand-total"><span>Total</span><strong id="total">0,00 €</strong></p></div><p class="hint">Minimum de commande : 10,00 € hors livraison.</p></div>
+        <form id="checkout" novalidate><div class="panel-title"><h3>Où vous livrer ?</h3><span class="small-label">02 / Coordonnées</span></div><p class="hint form-intro">Pour cet atelier, utilisez uniquement des coordonnées fictives.</p>
+          <label for="customer-name">Nom</label><input id="customer-name" name="customer_name" autocomplete="name" placeholder="Camille Exemple" required minlength="2" maxlength="80">
+          <label for="address">Adresse fictive</label><textarea id="address" name="address" autocomplete="street-address" placeholder="12 rue de la Démonstration" required minlength="5" maxlength="240"></textarea>
+          <label for="phone">Téléphone fictif</label><input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="0600000000" required minlength="6" maxlength="30" pattern="[0-9 +().-]+">
+          <p id="form-error" class="message error" role="alert" hidden></p><button class="button" type="submit">Confirmer la commande <span aria-hidden="true">→</span></button><p class="hint payment-note">Paiement à la livraison simulé · aucun paiement réel</p>
+        </form>
+      </div>
+    </section>
+    <section id="confirmation" class="confirmation" aria-live="polite" hidden><div class="confirmation-top"><div><p class="eyebrow">Commande confirmée</p><h2>Merci et bon appétit<span>.</span></h2></div><span class="confirmation-symbol" aria-hidden="true">✓</span></div><p id="confirmation-text"></p><div id="tracking-steps" class="steps"></div><div class="tracking-footer"><p id="tracking-message" class="hint">Le restaurant fait avancer le statut de votre commande.</p><button id="refresh-status" class="button secondary" type="button">Actualiser le suivi</button></div><p id="tracking-error" class="message error" role="alert" hidden></p></section>
+  </main>
+  <footer><div class="footer-brand">casa pizza<span>Une table. Six recettes. À vous de choisir.</span></div><div><p>Démonstration locale · sans paiement réel</p><a href="/restaurant">Espace restaurant <span aria-hidden="true">↗</span></a></div></footer>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
