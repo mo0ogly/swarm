@@ -29,6 +29,15 @@ See the [illustrated user guide](docs/en/USER-GUIDE.md). Swarm is experimental; 
 
 Start with **Choose a mission template** in preparation: [Guided workflow catalogue shared by web and CLI](docs/en/PREPARATION-TEMPLATES.md).
 
+### Casa Pizza hands-on training
+
+[Beginner workshop in English and French](docs/training/casa-pizza/README.md): 36-page Word guides with cockpit screenshots, task graphs, automated checks, human decisions and a working local pizza delivery application.
+
+- [English guide](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx) · [English kit with code and screenshots](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+- [Guide français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx) · [Kit français avec code et captures](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+
+The reference passes eleven tests and its browser journey was checked on desktop and at 390 pixels. Automatic policy examples demonstrate configuration, not an executed autonomous mission. The application remains French in both kits.
+
 ## What it does
 
 - Prepare requirements with AI, approve a brief and review a structured plan.

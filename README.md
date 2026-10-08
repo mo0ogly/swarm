@@ -28,6 +28,15 @@ Voir les [notes de version](docs/releases/v0.1.0.md), le [guide des programmes](
 
 → [Guide illustré : les étapes, les boutons et les blocages](GUIDE-UTILISATEUR.md)
 
+### Formation pratique Casa Pizza
+
+[Atelier pour débutants en français et en anglais](docs/training/casa-pizza/README.md) : guides Word de 36 pages, captures du cockpit, lecture du graphe, contrôles automatiques et décisions humaines, puis recette d'une application locale de livraison de pizzas.
+
+- [Guide français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx) · [Kit français avec code et captures](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+- [English guide](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx) · [English kit with code and screenshots](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+
+La référence passe onze tests et son parcours a été vérifié sur ordinateur et à 390 pixels. Les exemples de politiques automatiques montrent une configuration ; ils ne sont pas présentés comme une mission autonome exécutée. L'application reste en français dans les deux kits.
+
 Pour démarrer avec une structure, utilisez « Choisir un modèle de mission » dans la préparation : [catalogue de parcours guidés partagé entre web et CLI](docs/PREPARATION-TEMPLATES.md).
 
 Swarm reste expérimental. Consultez les [essais réalisés et leurs limites](docs/COMMUNITY-QUALIFICATION.md) avant de lui confier une mission importante.
