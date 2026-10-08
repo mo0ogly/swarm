@@ -32,7 +32,7 @@ projet restent distincts des méthodes livrées avec Swarm.
 | Clé après redémarrage | PASS | Nouveau test réussi sans ressaisie ; clé non affichée et absente du diagnostic copié |
 | Cadre vert avec réponse JSON | PASS | Défaut reproduit ; JSON décodé, vrais retours à la ligne ; texte ordinaire préservé |
 | Langues, thèmes, clavier et copie | PASS | Français clair et anglais sombre, focus au clavier, copie égale au diagnostic, aucune erreur JS observée |
-| Suite Go exhaustive | EN COURS | Inventaire de 1 071 cas ; résultats finaux consignés dans le rapport de réorganisation |
+| Suite Go exhaustive | PASS CI | 1 071 cas découverts : 1 059 passés et 12 skips optionnels explicites ; 19 groupes, tous sortis avec le code 0 |
 
 La recette navigateur utilise un **fournisseur simulé HTTP local**, nommé
 « Local installation test double ». Aucun appel IA externe ni départ d'agent
@@ -40,9 +40,26 @@ n'est réalisé. Elle vérifie le transport, les fichiers embarqués, la persist
 et l'adoption ; elle ne démontre pas la qualité d'un modèle, l'authentification
 d'un fournisseur réel ou l'exécution autonome d'une application.
 
-L'installation initiale vient du Git distant. La recette de correction ci-dessus
-utilise ensuite le binaire du candidat local ; la requalification du clone après
-publication est à consigner séparément avant de déclarer la livraison achevée.
+Après publication, le second clone propre a récupéré `45b18eb` depuis GitHub.
+Installation native et recette complète native/Compose : code de sortie 0.
+Le besoin, l'échange, le brief adopté et la clé restent disponibles après
+réinstallation. Un changement d'adresse refuse de transmettre la clé conservée ;
+un test sans clé sur un port fermé affiche une erreur TCP, puis le test réussit
+avec la destination d'origine. Aucun de ces essais ne modifie la connexion
+stockée.
+
+La [CI du code `45b18eb`](https://github.com/mo0ogly/swarm/actions/runs/37836580717)
+est verte : contrôles moteur, interface, lanceur et installation.
+La [PR #10](https://github.com/mo0ogly/swarm/pull/10) est fusionnée dans `main`
+au commit `c1f2b92`. Le second clone a ensuite récupéré **main**, reconstruit et
+installé ce binaire (`modified: false`), puis relancé avec `swarm.sh` sans
+répéter les paramètres du projet ou du binaire. Une nouvelle racine temporaire
+vide expose les quatre méthodes, sans créer `.claude`.
+
+Les scripts de navigateur de CI vérifient les méthodes des agents et l'i18n ;
+la recette manuelle décrite ici utilise le navigateur intégré. Les recettes
+optionnelles ignorées par Go ne sont pas présentées comme exécutées : voir le
+[rapport de réorganisation](repository-organization-20261008.md).
 
 ## Captures de la recette
 
