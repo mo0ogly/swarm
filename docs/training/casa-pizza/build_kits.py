@@ -13,6 +13,7 @@ PROJECT = [
 ]
 PROJECT += [f'static/images/{name}.svg' for name in
             ['margherita', 'reine', 'fromages', 'vegetarienne', 'diavola', 'calzone']]
+TRAINING_FRAMES = ['00-besoin-en.png','00-besoin-fr.png','01-catalogue.png','02-filtre.png','03-minimum.png','04-quantite.png','05-confirmee.png','06-connexion.png','07-refus-acces.png','08-commande-recue.png','09-preparation.png','10-suivi-preparation.png','11-livraison.png','12-livree.png','13-graphe-en.png','13-graphe-fr.png','14-tache-en.png','14-tache-fr.png','15-humaine-en.png','15-humaine-fr.png','16-controle-en.png','16-controle-fr.png','17-apercu-en.png','17-apercu-fr.png','18-graphe-sombre.png','19-commande-en.png','19-commande-fr.png']
 COMMON = [
     '00-swarm-besoin.png', '01-swarm-mission.png', '02-swarm-lancement.png',
     '04-swarm-activite.png', '05-casa-catalogue.png', '07-casa-erreur-minimum.png',
@@ -23,7 +24,11 @@ COMMON = [
 
 
 def build(lang, guide, start, output):
-    files = [guide, start, 'atelier_swarm.py', 'creer_plan_pedagogique.py']
+    files = ['Formation_Swarm_Casa_Pizza.pdf', 'Swarm_Casa_Pizza_Training_EN.pdf', 'Formation_Swarm_Casa_Pizza.docx', 'Swarm_Casa_Pizza_Training_EN.docx', start, 'atelier_swarm.py', 'creer_plan_pedagogique.py']
+    files += ['tutoriels/swarm-logo.png', 'tutoriels/index.html', 'tutoriels/player.css', 'tutoriels/player.js', 'tutoriels/storyboard.json', 'tutoriels/manifest.json', 'tutoriels/README.md']
+    files += [f'tutoriels/frames/{name}' for name in TRAINING_FRAMES]
+    files += [f'tutoriels/media/{module}-{language}{suffix}' for module in ['01-plan', '02-controles', '03-client', '04-restaurant'] for language in ['fr', 'en'] for suffix in ['.mp4', '.gif', '.txt', '.vtt', '-poster.jpg']]
+    files += ['tutoriels/media/graph-overview-fr.mp4', 'tutoriels/media/graph-overview-fr-poster.png', 'tutoriels/media/graph-overview-fr.vtt']
     files += [f'projet-pizza/{name}' for name in PROJECT]
     images = COMMON + [f'{name}-{lang}.jpg' for name in [
         '18-graph', '19-task', '20-validation-human', '21-validation-command',

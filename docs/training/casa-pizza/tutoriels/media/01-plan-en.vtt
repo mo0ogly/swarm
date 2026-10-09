@@ -1,0 +1,17 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Write and save the requirements
+Scope, rules and required evidence are explicit. No AI call here.
+
+00:00:06.000 --> 00:00:12.000
+Open Overview and Fit overview
+Six tasks remain to do; arrows connect prerequisites to dependent tasks.
+
+00:00:12.000 --> 00:00:18.000
+Click the automatic tests task
+The task waits for Order and tracking. Details show criteria, dependencies and no report.
+
+00:00:18.000 --> 00:00:24.000
+Compare the same graph in dark mode
+Changing the theme changes neither dependencies nor task status.

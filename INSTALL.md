@@ -6,6 +6,16 @@ Swarm propose deux installations **sous Linux** : Docker pour un environnement d
 
 Après installation, suivre le [guide utilisateur](GUIDE-UTILISATEUR.md) pour connecter une IA, préparer une mission et lire ses résultats.
 
+## Formation embarquée et identité visuelle
+
+Une fois le cockpit ouvert, choisissez **Aide du cockpit → Formation Casa Pizza**. Le lecteur propose vidéos, aperçus GIF, transcriptions, PDF de 38 pages et kit hors ligne téléchargeable. La langue choisie dans le cockpit sélectionne les ressources françaises ou anglaises ; le sélecteur du lecteur actualise tous les liens. Les fichiers Word restent les sources éditables.
+
+Le logo, la favicon des onglets, le lecteur, les PDF, vidéos et kits sont embarqués dans le binaire. Aucun serveur de médias séparé ni connexion Internet n’est nécessaire pour les consulter après installation. Après une mise à jour des sources, reconstruisez le binaire puis redémarrez son serveur géré, après avoir vérifié qu’aucun agent n’est actif : `./swarm.sh build`, puis `./swarm.sh restart --root /chemin/du/projet`. Un serveur utilisant encore un ancien binaire conserve ses anciennes ressources. Sous Docker, reconstruisez l’image selon votre procédure d’installation existante.
+
+Voir les [ressources de formation](docs/training/casa-pizza/README.md). Dans **Conduite**, le graphe précède le résumé détaillé de la mission ; les preuves des tâches et les décisions restent accessibles en dessous.
+
+La présentation du graphe (63 secondes) est aussi disponible dans le lecteur français, avec téléchargement MP4. Les quatre modules pédagogiques restent proposés en français et en anglais.
+
 ## 1. Installation Docker
 
 Prérequis : Git, Bash, Docker Engine démarré et accessible à votre utilisateur, Docker Compose v2 avec `up --wait`. Les téléchargements des images et dépendances nécessitent Internet. Vérifiez :

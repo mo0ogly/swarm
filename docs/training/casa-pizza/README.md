@@ -2,7 +2,7 @@
 
 Un atelier pour débutants : comprendre à quoi sert Swarm, préparer un besoin,
 lancer une tâche limitée, lire le graphe et vérifier une application locale.
-Chaque guide comprend 36 pages, des captures réelles du cockpit et du site,
+Chaque guide comprend 38 pages, des captures réelles du cockpit et du site,
 des étapes à suivre, des résultats attendus et des exercices.
 
 | Langue | Guide Word | Kit avec code et captures | Première lecture |
@@ -96,3 +96,13 @@ Le script utilise une liste explicite des fichiers autorisés. Il n'inclut pas
 automatiquement les fichiers présents dans un dossier de travail.
 Pour mettre à jour les guides, modifier les Word, vérifier leur rendu et aligner
 les captures avec la version réellement testée avant de reconstruire les kits.
+
+## Tutoriels animés et accès dans le cockpit
+
+Dans la nouvelle version : **Aide du cockpit → Formation Casa Pizza — tutoriels, guides Word et kits**. Les ressources sont embarquées et conservent l’authentification du cockpit. Un ancien binaire doit être mis à jour pour obtenir cette entrée.
+
+Le [lecteur hors ligne](tutoriels/index.html) complète les guides : quatre modules, vidéos courtes de 24 à 42 secondes, aperçus GIF, explications FR/EN, mode pas à pas, transcriptions et exercices corrigés. Les chapitres 37 et 38 des Word expliquent ce parcours. Les 36 chapitres et les illustrations antérieures sont conservés. Extraire complètement le ZIP avant d’ouvrir `tutoriels/index.html`. Les liens de téléchargement des ZIP sont réservés à la version servie ; le lecteur hors ligne dispose déjà de tous les médias.
+
+Ces vidéos sont des captures successives de vraies interactions, montées avec légendes, sans audio ni déformation. Elles ne sont pas des screencasts continus. La commande fictive a réellement été jouée ; le plan pédagogique n’a pas été exécuté et les politiques ont été prévisualisées puis annulées. Aucun appel fournisseur IA pendant cette capture. Voir [méthode et limites](tutoriels/README.md).
+
+PDF : Formation_Swarm_Casa_Pizza.pdf (FR), Swarm_Casa_Pizza_Training_EN.pdf (EN). Guides de 38 pages accessibles depuis le lecteur et inclus dans les kits ; Word conservés comme sources éditables.

@@ -1,5 +1,7 @@
 # Swarm
 
+<img src="web/swarm-logo.png" alt="Swarm" width="96">
+
 ### Give an AI team an objective. See who does what. Verify what it delivers.
 
 [Français](README.md) · [User guide](docs/en/USER-GUIDE.md) · [Installation](docs/en/INSTALL.md)
@@ -8,6 +10,14 @@ Swarm is a local cockpit and CLI for organizing software work across AI agents.
 It makes responsibilities, dependencies, attempts, evidence and blockers visible,
 so that several agents can collaborate without treating every completed process
 as a successful result.
+
+## See the graph first
+
+[![See the graph first](docs/screenshots/graph-linkedin/Swarm_graphe_apercu_FR_V2.gif)](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4)
+
+Explore dependencies and branches, inspect a blocker and define validation checks. This one-minute demonstration shows actual browser interactions with French explanations, in a teaching plan. No provider agent is launched; the control configuration is an unsaved example.
+
+[Watch the MP4](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4) · [Still image](docs/screenshots/graph-tour/graph-tour-en.png). GitHub displays the animated GIF preview; the video opens through the link.
 
 ## Release v0.1.0
 
@@ -19,7 +29,7 @@ See the [release notes](docs/releases/v0.1.0.md), [automation programs guide](do
 
 ## First run
 
-1. Follow [installation](docs/en/INSTALL.md) and open the session link printed by the server.
+1. Follow [installation](docs/en/INSTALL.md); for native development, `./swarm.sh start` opens the authenticated cockpit at its stable local address.
 2. Open **AI and connections** to configure providers available in your environment.
 3. Prepare your objective, constraints and acceptance criteria; review the proposed plan.
 4. Check roles, workspaces and limits before authorizing and launching the mission.
@@ -31,12 +41,13 @@ Start with **Choose a mission template** in preparation: [Guided workflow catalo
 
 ### Casa Pizza hands-on training
 
-[Beginner workshop in English and French](docs/training/casa-pizza/README.md): 36-page Word guides with cockpit screenshots, task graphs, automated checks, human decisions and a working local pizza delivery application.
+Open **Cockpit help → Casa Pizza training** for four captioned video tutorials, GIF previews, transcripts and a **38-page PDF guide**. Resources follow the selected cockpit language; switching language in the reader updates videos, captions, PDF and kit links. The reader also works offline from the kit, without external services or AI calls.
 
-- [English guide](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx) · [English kit with code and screenshots](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
-- [Guide français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx) · [Kit français avec code et captures](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+- [English PDF](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf) · [English kit](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+- [PDF français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf) · [Kit français](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+- [Workshop contents and limitations](docs/training/casa-pizza/README.md)
 
-The reference passes eleven tests and its browser journey was checked on desktop and at 390 pixels. Automatic policy examples demonstrate configuration, not an executed autonomous mission. The application remains French in both kits.
+The videos are sequences of real screenshots, with captions, rather than continuous recordings. The reference application passes eleven tests and remains French in both kits. Word sources are retained for editing. The Swarm logo appears in the cockpit, preparation and reader; its favicon identifies browser tabs.
 
 ## What it does
 
@@ -268,4 +279,4 @@ worker. Choices are recorded with the attempt without automatically running
 scripts or changing permissions. The CLI provides `swarm skills list`.
 [Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).
 
-The [KS product workflow](docs/en/PRODUCT-WORKFLOW.md) documents migrated methods, design, gates and application → journey → story → task navigation.
+The [application creation workflow](docs/en/PRODUCT-WORKFLOW.md) documents migrated methods, design, gates and application → journey → story → task navigation.

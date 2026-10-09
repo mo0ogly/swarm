@@ -3,7 +3,7 @@ name: product-delivery
 description: "Evidence based research, design and implementation per story"
 ---
 
-# KS product delivery for Swarm
+# Product delivery for Swarm
 
 Read `tools/agent-workflows/CONTRACT.md`. Work only on the assigned task and stage.
 A planning/documentation task never authorises application code, scaffolding,

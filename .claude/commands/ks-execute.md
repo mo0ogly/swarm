@@ -1,8 +1,8 @@
 ---
-description: "KS execute compatibility method adapted to the current Swarm role."
+description: "Product workflow — execute compatibility method adapted to the current Swarm role."
 ---
 
-# KS execute
+# Product workflow — execute
 
 Use `.claude/skills/product-delivery/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its execute stage.

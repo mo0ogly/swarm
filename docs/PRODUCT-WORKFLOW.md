@@ -1,33 +1,42 @@
-# Créer ou faire évoluer une application avec les méthodes KS
+# Parcours de création d’application
 
 Swarm fournit maintenant les méthodes produit **Planification produit**,
 **Réalisation produit** et **Revue produit**. Le modèle de nouvelle application,
-d’évolution et d’interface sélectionne `ks-product`. Les sources sont versionnées
+d’évolution et d’interface sélectionne **Parcours de création d’application**. Les sources sont versionnées
 et embarquées ; un projet vide n’a pas besoin de copier le dossier `.claude`.
 
-## Ce qui a été migré
+## Étapes et méthodes
 
-Les commandes KS sont des points d’entrée de compatibilité vers les méthodes
-adaptées à Swarm. Les modèles documentaires génériques sont dans
+Le parcours distingue le cadrage du produit et le travail sur chaque fonctionnalité.
+Les méthodes sont adaptées aux rôles de Swarm. Les modèles documentaires génériques sont dans
 [`tools/agent-workflows/templates/ks`](../tools/agent-workflows/templates/ks).
 Les instructions privées d’une application, sa configuration et ses clés ne sont
 pas importées dans le pack.
 
-| Commande d’origine | Logique conservée | Méthode Swarm |
+### Cadrage : cinq étapes pour le produit
+
+| Étape | Logique conservée | Méthode Swarm |
 | --- | --- | --- |
-| `ks-prd` | Mode, utilisateurs, problème, boucle de valeur, périmètre/exclusions, succès mesurable ; remplacement facultatif et vérifié | `product-planning` |
-| `ks-stories` | Slices de valeur de bout en bout, critères, identifiants stables, dépendances, complexité et découpage d’un 5 | `product-planning` |
-| `ks-stories-review` | Couverture du PRD, exclusions, chevauchements, critères et ordre ; contexte distinct, constats conservés | `product-review` |
-| `ks-architect` | Architecture existante vérifiée d’abord ; delta minimal ; greenfield explicite, choix de stack et ADR avant scaffold | `product-planning` + tâche de recherche `product-delivery` |
-| `ks-design-system` | Direction existante/explicite, tokens, composants, états et règles ; blocage si la direction manque | `product-delivery` |
-| `ks-design` | Story et système obligatoires, agent ou brief externe, quatre états, accessibilité, gaps ; maquette comme référence | `product-delivery` |
-| `ks-feature` | Besoin, périmètre, critères et décisions avant le plan | `product-planning` + compatibilité existante |
-| `ks-research` | Code actuel, symboles, signatures, usages, persistance, impact, contrôles et inconnues | `product-delivery` |
-| `ks-plan` | Tâches bornées, fichiers, dépendances, tests, gates, rollback et adoption explicite | `product-planning` + compatibilité existante |
-| `ks-execute` | Tâche autorisée, contrôle d’échec avant correction si pertinent, composants réels, retour au plan sur dérive | `product-delivery` |
-| `ks-review` | Candidat et preuves de même révision, APIs vérifiées, design, régressions, sévérité et inconnues | `product-review` |
-| `ks-ship` | Autorité explicite, checks/revue frais, PR sans doublon, protection de branche, merge/deploy confirmé | `product-delivery` |
-| `ks-status`, `ks-help`, `ks-orchestrator` | Lire les étapes et décisions réelles, conserver IDs et reprise ; ne pas inventer un passage de gate | `product-planning` |
+| 1. Définir les besoins du produit | Mode, utilisateurs, problème, boucle de valeur, périmètre/exclusions, succès mesurable ; remplacement facultatif et vérifié | `product-planning` |
+| 2. Décrire les parcours et fonctionnalités | Slices de valeur de bout en bout, critères, identifiants stables, dépendances, complexité et découpage d’un 5 | `product-planning` |
+| 3. Vérifier la couverture des besoins | Couverture du PRD, exclusions, chevauchements, critères et ordre ; contexte distinct, constats conservés | `product-review` |
+| 4. Définir l’architecture | Architecture existante vérifiée d’abord ; delta minimal ; greenfield explicite, choix de stack et ADR avant scaffold | `product-planning` + tâche de recherche `product-delivery` |
+| 5. Définir les règles visuelles et composants | Direction existante/explicite, tokens, composants, états et règles ; blocage si la direction manque | `product-delivery` |
+
+### Réalisation : six étapes pour chaque fonctionnalité
+
+| Étape | Logique conservée | Méthode Swarm |
+| --- | --- | --- |
+| 6. Examiner l’existant | Code actuel, symboles, signatures, usages, persistance, impact, contrôles et inconnues | `product-delivery` |
+| 7. Concevoir les écrans | Story et système obligatoires, agent ou brief externe, quatre états, accessibilité, gaps ; maquette comme référence | `product-delivery` |
+| 8. Planifier les tâches | Tâches bornées, fichiers, dépendances, tests, gates, rollback et adoption explicite | `product-planning` + compatibilité existante |
+| 9. Réaliser | Tâche autorisée, contrôle d’échec avant correction si pertinent, composants réels, retour au plan sur dérive | `product-delivery` |
+| 10. Vérifier le résultat | Candidat et preuves de même révision, APIs vérifiées, design, régressions, sévérité et inconnues | `product-review` |
+| 11. Livrer | Autorité explicite, checks/revue frais, PR sans doublon, protection de branche, merge/deploy confirmé | `product-delivery` |
+
+Pour une évolution ciblée, cadrer son besoin avant ce cycle. Le suivi doit indiquer
+l’étape réelle, les preuves manquantes et l’action suivante. **Le suivi persistant
+des onze étapes et leurs transitions automatiques ne sont pas encore implémentés.**
 
 ### Adaptations nécessaires
 
@@ -43,7 +52,7 @@ départ du moteur. Les phases du pack sont une méthode, pas un nouvel ordonnanc
 qui exécute automatiquement onze commandes. Aucun budget n’est préautorisé.
 
 Les méthodes intégrales adaptées sont incluses selon le rôle et leur empreinte
-figure dans `workflow`. La préparation `ks-product` reçoit les trois sources pour
+figure dans `workflow`. La préparation du parcours produit reçoit les trois sources pour
 proposer le cycle, tout en restant limitée à l’analyse et au plan. Cela prouve
 l’envoi du cadrage, pas l’obéissance d’un modèle ou la réussite d’un produit entier.
 
@@ -137,7 +146,7 @@ crée 25 parcours, 26 stories et 6 tâches verrouillées via le CLI public ; auc
 appel IA, départ d’agent, publication ou acceptation de livrable. Ce test ne prouve
 pas une construction autonome complète d’application par un fournisseur réel.
 
-Avec la méthode `ks-product`, la structure `product` est obligatoire pour vérifier et adopter le plan. Son absence conserve le brouillon sans le déclarer prêt. Elle reste facultative avec les anciennes méthodes.
+Avec **Parcours de création d’application**, la structure `product` est obligatoire pour vérifier et adopter le plan. Son absence conserve le brouillon sans le déclarer prêt. Elle reste facultative avec les anciennes méthodes.
 
 ## Vues vérifiées
 
@@ -148,3 +157,11 @@ Captures de recette isolée : aucune IA ni exécution de tâche ; les données p
 ![Shared task context and prerequisites](screenshots/ks-product/story-en-light.jpg)
 
 ![Canonical task graph](screenshots/ks-product/tasks-en-light.jpg)
+
+## Identifiants conservés pour compatibilité
+
+Le libellé utilisateur est **Parcours de création d’application**. Les identifiants
+`ks-product`, `ks-feature` et les fichiers de commandes `ks-*` restent des alias
+techniques pour les appels existants. Ils ne désignent pas un autre moteur.
+Les anciennes préparations restent lisibles ; une méthode dont le contenu change
+doit être réappliquée et son plan revérifié avant lancement.

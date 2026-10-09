@@ -1,8 +1,8 @@
 ---
-description: "KS design compatibility method adapted to the current Swarm role."
+description: "Product workflow — design compatibility method adapted to the current Swarm role."
 ---
 
-# KS design
+# Product workflow — design
 
 Use `.claude/skills/product-delivery/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its design stage.

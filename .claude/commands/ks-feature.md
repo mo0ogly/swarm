@@ -2,7 +2,7 @@
 description: "Cadrer une fonctionnalité Swarm et ses critères avant de planifier."
 ---
 
-# KS feature — compatibility preparation command
+# Product workflow — feature — compatibility preparation command
 
 Read `tools/agent-workflows/CONTRACT.md` and
 `.claude/skills/product-planning/SKILL.md`. Analyze the requested need using supplied

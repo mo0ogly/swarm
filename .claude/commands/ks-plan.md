@@ -2,7 +2,7 @@
 description: "Décomposer un brief Swarm en tâches, dépendances et preuves attendues."
 ---
 
-# KS plan — compatibility preparation command
+# Product workflow — plan — compatibility preparation command
 
 Read `tools/agent-workflows/CONTRACT.md` and
 `.claude/skills/product-planning/SKILL.md`. From the current brief, build a bounded

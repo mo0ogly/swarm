@@ -1,0 +1,11 @@
+00s — Write and save the requirements
+Scope, rules and required evidence are explicit. No AI call here.
+
+06s — Open Overview and Fit overview
+Six tasks remain to do; arrows connect prerequisites to dependent tasks.
+
+12s — Click the automatic tests task
+The task waits for Order and tracking. Details show criteria, dependencies and no report.
+
+18s — Compare the same graph in dark mode
+Changing the theme changes neither dependencies nor task status.

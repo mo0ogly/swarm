@@ -1,8 +1,8 @@
 ---
-description: "KS review compatibility method adapted to the current Swarm role."
+description: "Product workflow — review compatibility method adapted to the current Swarm role."
 ---
 
-# KS review
+# Product workflow — review
 
 Use `.claude/skills/product-review/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its review stage.

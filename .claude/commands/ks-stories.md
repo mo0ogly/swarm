@@ -1,8 +1,8 @@
 ---
-description: "KS stories compatibility method adapted to the current Swarm role."
+description: "Product workflow — stories compatibility method adapted to the current Swarm role."
 ---
 
-# KS stories
+# Product workflow — stories
 
 Use `.claude/skills/product-planning/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its stories stage.

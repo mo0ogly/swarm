@@ -1,0 +1,119 @@
+[
+  [
+    "01-dependances",
+    5,
+    "VOIR LE PLAN",
+    "Six tâches.\nDes dépendances explicites.",
+    "Les flèches montrent les prérequis, pas une promesse de réussite.",
+    [
+      290,
+      120,
+      1240,
+      590
+    ]
+  ],
+  [
+    "02-zoom",
+    5,
+    "EXPLORER",
+    "Zoomer pour lire\nchaque étape.",
+    "Une vue globale, puis le détail utile à la décision.",
+    [
+      290,
+      120,
+      1240,
+      590
+    ]
+  ],
+  [
+    "04-branche",
+    5,
+    "RÉDUIRE LE BRUIT",
+    "Replier une branche.\nGarder les liens utiles.",
+    "Le repli réduit la vue ; il ne supprime aucune tâche.",
+    [
+      290,
+      120,
+      1240,
+      590
+    ]
+  ],
+  [
+    "03-prerequis",
+    5,
+    "INSPECTER",
+    "Ouvrir la tâche\ndepuis le graphe.",
+    "Consulter le résultat attendu et les actions disponibles.",
+    [
+      785,
+      0,
+      1240,
+      680
+    ]
+  ],
+  [
+    "05-impact",
+    7,
+    "COMPRENDRE",
+    "Pourquoi cette tâche\nne démarre pas ?",
+    "Deux prérequis restent non validés. Deux tâches sont en aval.",
+    [
+      785,
+      0,
+      1240,
+      680
+    ]
+  ],
+  [
+    "06-criteres",
+    5,
+    "DÉFINIR LA PREUVE",
+    "Choisir ce qui doit\nêtre vérifié.",
+    "Le critère est explicite. La revue humaine reste une option.",
+    [
+      170,
+      30,
+      1090,
+      680
+    ]
+  ],
+  [
+    "08-entrees",
+    5,
+    "LIER AU CANDIDAT",
+    "Déclarer les fichiers\net le programme.",
+    "Exemple préparé dans l’interface, non enregistré dans cette démo.",
+    [
+      190,
+      135,
+      1060,
+      645
+    ]
+  ],
+  [
+    "07-controle",
+    6,
+    "BORNER LE CONTRÔLE",
+    "Arguments exacts.\nDélai explicite.",
+    "La politique décrit ce qui est autorisé avant toute exécution.",
+    [
+      190,
+      125,
+      1060,
+      600
+    ]
+  ],
+  [
+    "09-conclusion",
+    5,
+    "SWARM",
+    "Des agents probabilistes.\nUn cadre de contrôle explicite.",
+    "Voir le plan, comprendre les blocages, définir les preuves.",
+    [
+      290,
+      120,
+      1240,
+      590
+    ]
+  ]
+]

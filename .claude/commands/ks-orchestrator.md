@@ -1,8 +1,8 @@
 ---
-description: "KS orchestrator compatibility method adapted to the current Swarm role."
+description: "Product workflow — orchestrator compatibility method adapted to the current Swarm role."
 ---
 
-# KS orchestrator
+# Product workflow — orchestrator
 
 Use `.claude/skills/product-planning/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its orchestrator stage.

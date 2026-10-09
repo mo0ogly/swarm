@@ -1,0 +1,17 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Écrire puis enregistrer le besoin
+Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.
+
+00:00:06.000 --> 00:00:12.000
+Ouvrir Conduite et Vue d’ensemble
+Six tâches à faire ; les flèches relient prérequis et tâches dépendantes.
+
+00:00:12.000 --> 00:00:18.000
+Cliquer sur Tests automatiques
+La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.
+
+00:00:18.000 --> 00:00:24.000
+Comparer le même graphe en sombre
+Un changement de thème ne change ni dépendances ni état des tâches.
