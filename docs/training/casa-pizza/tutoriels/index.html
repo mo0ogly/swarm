@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr" data-theme="etat"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Casa Pizza — Tutoriels Swarm</title>
+<link rel="icon" href="swarm-logo.png" type="image/png">
+<link rel="stylesheet" href="player.css">
+<main>
+<header><div class="training-brand"><img class="swarm-logo" src="swarm-logo.png" width="108" height="108" alt=""><div><span class="muted">CASA PIZZA · SWARM</span><h1 id="title"></h1></div></div><div class="tools"><label for="language" id="language-label"></label><select id="language"><option value="fr">Français</option><option value="en">English</option></select><button id="theme" type="button"></button></div></header>
+<p id="intro"></p><p class="muted" id="scope"></p>
+<nav id="chapters" aria-label="Chapters"></nav>
+<section class="panel" aria-labelledby="lesson-title"><h2 id="lesson-title"></h2><p id="related"></p><div class="tools"><button id="step-mode" type="button"></button><button id="video-mode" type="button"></button></div>
+<div id="steps"><div class="stepmeta"><h3 id="step-action"></h3><span id="counter" class="muted"></span></div><figure><img id="step-image" alt=""></figure><p id="step-result" role="status" aria-live="polite"></p><div class="tools"><button id="previous" type="button"></button><button id="next" type="button" class="primary"></button></div></div>
+<div id="video-box" hidden><p class="muted" id="video-note"></p><video id="video" controls preload="none" playsinline></video><p id="video-caption" aria-live="off"></p><div class="tools"><label for="speed" id="speed-label"></label><select id="speed"><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option></select></div></div>
+</section>
+<section class="panel secondary"><h2 id="exercise-title"></h2><p id="question"></p><details id="solution"><summary id="answer-title"></summary><p id="answer"></p></details><details><summary id="transcript-title"></summary><ol id="transcript"></ol></details></section>
+<section class="panel"><h2 id="downloads-title"></h2><div class="download"><a id="download-video" download></a><a id="download-gif" download></a><a id="download-text" download></a></div><p id="gif-note" class="muted"></p><h3 id="guides-title"></h3><p id="resource-language" role="status" aria-live="polite"></p><p><a id="download-guide" download></a></p><p id="kit-downloads" hidden><a id="download-kit" download></a></p></section>
+<section class="panel secondary" id="graph-intro" aria-labelledby="graph-intro-title" hidden><h2 id="graph-intro-title">Le graphe et ses contrôles — présentation en français</h2><p>63 secondes : zoom, branches, prérequis et configuration d’un contrôle. Capture réelle montée, sans lancement d’agent ; configuration annulée.</p><video id="graph-intro-video" controls preload="none" playsinline poster="media/graph-overview-fr-poster.png" aria-label="Présentation du graphe Swarm en français"><source src="media/graph-overview-fr.mp4" type="video/mp4"><track kind="subtitles" src="media/graph-overview-fr.vtt" srclang="fr" label="Français"></video><p><a href="media/graph-overview-fr.mp4" download>Télécharger la présentation MP4 en français</a></p></section>
+<footer id="footer"></footer>
+</main>
+<script src="player.js" defer></script></html>

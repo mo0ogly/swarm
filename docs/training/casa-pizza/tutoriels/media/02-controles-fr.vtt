@@ -1,0 +1,17 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Tâches puis Configurer les validations
+La revue humaine reste disponible pour un jugement qualitatif.
+
+00:00:06.000 --> 00:00:12.000
+Choisir python3 et saisir un argument par ligne
+La commande est exacte : -W error::ResourceWarning -m unittest -v. Pas de shell implicite.
+
+00:00:12.000 --> 00:00:18.000
+Relier le contrôle au critère et régler le délai
+Le délai affiché de 60 secondes est éditable ; il ne constitue pas une limite universelle.
+
+00:00:18.000 --> 00:00:24.000
+Examiner l’effet avant de confirmer
+L’aperçu explique la portée et l’invalidation des anciennes preuves. Nous avons annulé.

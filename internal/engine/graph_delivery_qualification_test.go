@@ -223,6 +223,14 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	// Training delivery has a separate source snapshot; earlier evidence stays intact.
+	trainingManifest := "docs/training-delivery-source-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, trainingManifest)); e == nil {
+		manifestPath = trainingManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

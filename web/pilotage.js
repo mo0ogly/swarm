@@ -62,7 +62,7 @@ const Pilot = {
   canvas.addEventListener('pointerup',()=>{drag=null;this.save()});canvas.addEventListener('pointercancel',()=>{drag=null});
   const list=node('div',undefined,'pilot-list');list.id='pilot-list';
   const mission=node('section',undefined,'mission-summary');mission.id='mission-summary';mission.setAttribute('aria-label',tr_web_pilotage_js('Résultats et conduite de la mission'));
-  $('graph').replaceChildren(mission,toolbar,actions,status,canvas,list);
+  $('graph').replaceChildren(toolbar,actions,status,canvas,list,mission);
   ProductViews.mount($('graph'));
   GraphDraft.mount();
  },

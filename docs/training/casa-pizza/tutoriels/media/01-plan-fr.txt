@@ -1,0 +1,11 @@
+00s — Écrire puis enregistrer le besoin
+Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.
+
+06s — Ouvrir Conduite et Vue d’ensemble
+Six tâches à faire ; les flèches relient prérequis et tâches dépendantes.
+
+12s — Cliquer sur Tests automatiques
+La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.
+
+18s — Comparer le même graphe en sombre
+Un changement de thème ne change ni dépendances ni état des tâches.

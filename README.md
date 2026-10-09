@@ -1,5 +1,7 @@
 # Swarm
 
+<img src="web/swarm-logo.png" alt="Swarm" width="96">
+
 [English](README.en.md) · Français
 
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
@@ -9,6 +11,14 @@ Swarm est un outil local de coordination d’agents de développement, avec une 
 **Pourquoi Swarm ?** Quand plusieurs agents travaillent sur un projet, quelqu’un doit encore transmettre les consignes, gérer les dépendances, retrouver les rapports et décider si le résultat est réellement utilisable. Swarm organise ces passages de relais pour réduire cette coordination manuelle et rendre les blocages visibles.
 
 [Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
+
+## Voir le graphe dès le départ
+
+[![Voir le graphe dès le départ](docs/screenshots/graph-linkedin/Swarm_graphe_apercu_FR_V2.gif)](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4)
+
+Lire les dépendances, explorer les branches, comprendre un blocage et définir les contrôles. Cette démonstration d’environ une minute montre les interactions réelles dans un plan pédagogique, avec des explications en français ; aucun agent n’est lancé et le contrôle montré reste un exemple non enregistré.
+
+[Voir la vidéo MP4](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4) · [Image fixe](docs/screenshots/graph-tour/graph-tour-fr.png). GitHub affiche l’aperçu GIF animé ; la vidéo s’ouvre depuis le lien.
 
 ## Release v0.1.0
 
@@ -30,12 +40,13 @@ Voir les [notes de version](docs/releases/v0.1.0.md), le [guide des programmes](
 
 ### Formation pratique Casa Pizza
 
-[Atelier pour débutants en français et en anglais](docs/training/casa-pizza/README.md) : guides Word de 36 pages, captures du cockpit, lecture du graphe, contrôles automatiques et décisions humaines, puis recette d'une application locale de livraison de pizzas.
+Ouvrez **Aide du cockpit → Formation Casa Pizza** pour accéder à quatre tutoriels vidéo sous-titrés, leurs aperçus GIF, les transcriptions et un **guide PDF de 38 pages**. Les ressources suivent la langue du cockpit ; changer de langue dans le lecteur actualise les vidéos, légendes, liens PDF et kit. Le lecteur fonctionne aussi hors ligne depuis le kit, sans service externe ni appel IA.
 
-- [Guide français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx) · [Kit français avec code et captures](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
-- [English guide](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx) · [English kit with code and screenshots](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+- [PDF français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf) · [Kit français](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
+- [English PDF](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf) · [English kit](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
+- [Contenu de l’atelier et limites](docs/training/casa-pizza/README.md)
 
-La référence passe onze tests et son parcours a été vérifié sur ordinateur et à 390 pixels. Les exemples de politiques automatiques montrent une configuration ; ils ne sont pas présentés comme une mission autonome exécutée. L'application reste en français dans les deux kits.
+Les vidéos sont des séquences de captures réelles légendées, plutôt que des enregistrements continus. L’application de référence passe onze tests et reste en français dans les deux kits. Les sources Word sont conservées pour l’édition. Le logo Swarm apparaît dans le cockpit, la préparation et le lecteur ; sa favicon identifie les onglets du navigateur.
 
 Pour démarrer avec une structure, utilisez « Choisir un modèle de mission » dans la préparation : [catalogue de parcours guidés partagé entre web et CLI](docs/PREPARATION-TEMPLATES.md).
 

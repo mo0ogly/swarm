@@ -825,6 +825,8 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		}
 	})
 	files, _ := fs.Sub(cockpitWeb, "web")
+	training, _ := fs.Sub(resources.Training, "docs/training/casa-pizza")
+	mux.Handle("/training/casa-pizza/", http.StripPrefix("/training/casa-pizza/", http.FileServer(http.FS(training))))
 	mux.Handle("/", http.FileServer(http.FS(files)))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")

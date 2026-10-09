@@ -3824,5 +3824,7 @@ globalThis.SwarmEnglish = {
   "Tâches communes et non classées": "Common and unclassified tasks",
   "Objectif et critères de la story": "Story objective and criteria",
   "Le parcours application complète exige la structure product : parcours, stories et liens vers les tâches. Le brouillon est conservé.": "The full application workflow requires product structure: journeys, stories and task links. The draft is preserved.",
-  "Parcours de création d’application": "Application creation workflow"
+  "Parcours de création d’application": "Application creation workflow",
+  "Formation Casa Pizza — tutoriels, guides PDF et kits": "Casa Pizza training — tutorials, PDF guides and kits",
+  "Apprendre avec un atelier guidé, sans lancer d’agent depuis cette aide.": "Learn through a guided workshop without starting an agent from this help."
 };

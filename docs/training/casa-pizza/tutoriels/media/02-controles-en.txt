@@ -1,0 +1,11 @@
+00s — Tasks then Configure validation
+Human review remains available for qualitative judgment.
+
+06s — Choose python3 and enter one argument per line
+The exact command is -W error::ResourceWarning -m unittest -v. No implicit shell.
+
+12s — Link the check to its criterion and set its timeout
+The displayed 60-second timeout is editable; it is not a universal limit.
+
+18s — Review the effect before confirming
+The preview explains scope and invalidation of old evidence. We cancelled.

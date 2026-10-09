@@ -1,0 +1,7 @@
+file '/home/fpizzi/workspace/swarm/docs/screenshots/graph-linkedin/renders/01.png'
+duration 3
+file '/home/fpizzi/workspace/swarm/docs/screenshots/graph-linkedin/renders/03.png'
+duration 3
+file '/home/fpizzi/workspace/swarm/docs/screenshots/graph-linkedin/renders/05.png'
+duration 3
+file '/home/fpizzi/workspace/swarm/docs/screenshots/graph-linkedin/renders/05.png'

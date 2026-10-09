@@ -103,3 +103,5 @@ dialog::backdrop{background:color-mix(in srgb,var(--wattson-fond) 78%,transparen
 .mission-controls a{color:var(--wattson-lien)}
 
 #prepared-launch-summary p{overflow-wrap:anywhere;white-space:pre-wrap}
+
+.brand-logo{display:block;width:64px;height:64px;object-fit:contain;margin-bottom:8px;padding:4px;border-radius:10px;background:var(--wattson-carte-appuyee);filter:drop-shadow(0 0 1px var(--wattson-texte))}
