@@ -34,6 +34,9 @@ const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const er
   await button('Application');await page.type('#pilot-search','futur 26');
   await page.waitForFunction(()=>document.querySelectorAll('.product-open').length===1);
   assert.match(await page.$eval('.product-count',e=>e.textContent),/1–1\/1/);
+  await button('Application');await button('account · Suivre mes commandes');
+  await button('s02-order · Commander une pizza');
+  assert.equal(await page.$eval('.product-breadcrumb',e=>e.textContent.includes('Suivre mes commandes')),true);
   await button('Application');await button('buy · Acheter une pizza');
   const story=await page.$('.product-open');await story.focus();await page.keyboard.press('Enter');
   await page.waitForFunction(()=>document.querySelectorAll('.graph-noeud').length===1);

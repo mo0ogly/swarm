@@ -10,6 +10,7 @@ const ProductViews={
  },
  navigate(level,key=''){
   if(GraphDraft.editing)GraphDraft.close();
+  Pilot.state.productParent=level==='story'?(Pilot.state.productLevel==='journey'?Pilot.state.productKey:Pilot.state.productParent):level==='journey'?key:'';
   Pilot.state.productLevel=level;Pilot.state.productKey=key;Pilot.state.search='';Pilot.state.filter='all';Pilot.state.collapsed=[];
   Pilot.fitPending=true;this.page=1;this.signature='';Pilot.changed();
   $('product-heading')?.focus();
@@ -36,13 +37,13 @@ const ProductViews={
   const panel=$('product-views');panel.hidden=!c.journeys.length;
   if(!c.journeys.length)return false;
   const current=Pilot.state,graphMode=['overview','journey'].includes(current.productLevel);
-  const signature=JSON.stringify([work,snapshot.work.revision,snapshot.validation,snapshot.decisions,current.productLevel,current.productKey,current.search,current.orientation,this.page]);
+  const signature=JSON.stringify([work,snapshot.work.revision,snapshot.validation,snapshot.decisions,current.productLevel,current.productKey,current.productParent,current.search,current.orientation,this.page]);
   if(signature===this.signature)return graphMode;
   this.signature=signature;const focused=document.activeElement?.dataset.productFocus;panel.replaceChildren();
   const nav=node('nav',undefined,'product-breadcrumb');nav.setAttribute('aria-label',tr_web_product_views_js('Navigation du produit'));
   const add=(text,level,key='')=>{const b=Pilot.command(text,()=>this.navigate(level,key));b.dataset.productFocus=level+':'+key;nav.append(b);return b};
   add(tr_web_product_views_js('Application'),'overview');
-  const journey=current.productLevel==='journey'?c.byJourney.get(current.productKey):c.journeys.find(j=>j.storyKeys.includes(current.productKey));
+  const journey=ProductGraph.parent(c,current);
   if(journey)add(journey.title,'journey',journey.key);
   const story=current.productLevel==='story'?c.byStory.get(current.productKey):null;
   if(story){const label=node('span',story.title);label.setAttribute('aria-current','page');nav.append(label)}

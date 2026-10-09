@@ -21,6 +21,12 @@ const ProductGraph=(()=>{
   const common=[...tasks.keys()].filter(id=>!membership.has(id));
   return {journeys,stories,byStory,byJourney,tasks,phases,membership,common};
  }
+ function parent(c,state){
+  if(state.productLevel==='journey')return c.byJourney.get(state.productKey);
+  if(state.productLevel!=='story')return undefined;
+  const chosen=c.byJourney.get(state.productParent);
+  return chosen?.storyKeys.includes(state.productKey)?chosen:c.journeys.find(j=>j.storyKeys.includes(state.productKey));
+ }
  function selection(c,state){
   if(state.productLevel==='story')return c.byStory.get(state.productKey)?.taskIDs||[];
   if(state.productLevel==='common')return c.common;
@@ -59,6 +65,6 @@ const ProductGraph=(()=>{
   if(state.productLevel==='journey'&&!c.byJourney.has(state.productKey)||state.productLevel==='story'&&!c.byStory.has(state.productKey))return {...state,productLevel:'overview',productKey:''};
   return state;
  }
- return {catalogue,selection,stats,boundary,links,normalize};
+ return {catalogue,parent,selection,stats,boundary,links,normalize};
 })();
 if(typeof module!=='undefined')module.exports=ProductGraph;

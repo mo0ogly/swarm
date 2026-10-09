@@ -71,7 +71,7 @@ stories = [
 journeys = [dict(id='buy', title='Acheter une pizza', goal='Du catalogue à la confirmation',
                 story_ids=['s01-catalogue', 's02-order']),
             dict(id='account', title='Suivre mes commandes', goal='Retrouver mes achats',
-                 story_ids=['s03-history'])]
+                 story_ids=['s02-order', 's03-history'])]
 for index in range(4, 27):
     identity = f's{index:02}-later'
     stories.append(dict(id=identity, title=f'Fonction future {index:02}', user='Client',

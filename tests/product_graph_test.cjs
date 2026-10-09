@@ -22,6 +22,11 @@ assert.equal(P.catalogue({...work,plans:[plan,next]}).stories.length,1,'only lat
 assert.equal(P.normalize(P.catalogue({...work,plans:[next]}),{productLevel:'story',productKey:'p/s02-history'}).productLevel,'overview');
 assert.equal(G.preferences({productLevel:'bad',productKey:27}).productLevel,'overview');
 assert.equal(G.preferences({productLevel:'story',productKey:'p/s01-order'}).productKey,'p/s01-order');
+const shared=JSON.parse(JSON.stringify(plan));shared.spec.product.journeys[1].story_ids.push('s01-order');
+const sharedCatalogue=P.catalogue({...work,plans:[shared]});
+assert.equal(P.parent(sharedCatalogue,{productLevel:'story',productKey:'p/s01-order',productParent:'p/history'}).key,'p/history','keep the journey actually opened');
+assert.equal(P.parent(sharedCatalogue,{productLevel:'story',productKey:'p/s01-order',productParent:'removed'}).key,'p/order','removed parent falls back to an existing journey');
+assert.equal(G.preferences({productParent:'p/history'}).productParent,'p/history');
 const other={...plan,source:'q'};assert.equal(P.catalogue({...work,plans:[plan,other]}).stories.length,6,'sources do not collide');
 assert.equal(P.catalogue({tasks}).journeys.length,0,'legacy tasks do not fabricate a product');
 const large=JSON.parse(JSON.stringify(plan));large.spec.product.stories=Array.from({length:300},(_,i)=>({id:'s'+i+'-story',task_ids:['A'],depends:[]}));large.spec.product.journeys=[{id:'all',story_ids:large.spec.product.stories.map(s=>s.id)}];
