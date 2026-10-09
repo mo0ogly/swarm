@@ -15,7 +15,7 @@ const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const er
  await page.waitForSelector('#product-heading');
  const button=async text=>{
   const buttons=await page.$$('#product-views button');
-  for(const b of buttons)if(await b.evaluate(e=>e.textContent===text)){await b.click();return}
+  for(const b of buttons)if(await b.evaluate((e,wanted)=>e.textContent===wanted,text)){await b.click();return}
   throw Error('Missing product button '+text);
  };
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
