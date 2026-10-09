@@ -26,13 +26,13 @@ func agentWorkflow(role string) (AgentWorkflow, string, error) {
 	var boundary string
 	switch role {
 	case "planner", "subplanner":
-		w.Methods = []string{"apex", "audit-pdca", "spec-builder", "spec-audit", "replan", "debug"}
+		w.Methods = []string{"apex", "audit-pdca", "spec-builder", "spec-audit", "replan", "debug", "product-planning"}
 		boundary = "PLAN et ACT du PDCA : cadrer, décomposer, comparer les preuves et proposer une correction du plan. Analyse et planification seulement. Aucun outil, code, test exécuté ou livrable modifié. Les phases DO et CHECK exécutées dans les méthodes ci-dessous appartiennent aux exécutants et vérificateurs. Ne jamais déclarer un contrôle effectué à partir d'un simple rapport."
 	case "worker":
-		w.Methods = []string{"apex", "audit-pdca", "verify-fix", "debug"}
+		w.Methods = []string{"apex", "audit-pdca", "verify-fix", "debug", "product-delivery"}
 		boundary = "DO et CHECK du PDCA : réaliser uniquement la tâche confiée, puis vérifier son effet avec les outils autorisés. Si la tâche demande seulement un audit, rester en lecture seule. Si elle autorise une correction, corriger dans son périmètre et rejouer les contrôles. Rapporter les preuves et limites au responsable ; aucune délégation, acceptation, modification de plan ou hausse de budget implicite. Ces contrôles personnels ne sont pas la revue indépendante."
 	case "reviewer":
-		w.Methods = []string{"audit-pdca", "code-reviewer"}
+		w.Methods = []string{"audit-pdca", "code-reviewer", "product-review"}
 		boundary = "CHECK indépendant du PDCA : examiner seulement les éléments fournis, sans outils ni modification du candidat. Aucune commande, recherche de fichier ou test à exécuter, même si une méthode générale le suggère. Une preuve manquante reste inconnue. Proposer les corrections au responsable pour ACT ; ne pas les exécuter, relancer un agent ou accepter la tâche."
 	default:
 		return w, "", fmt.Errorf("rôle de méthode non pris en charge : %s", role)

@@ -14,7 +14,8 @@ type PreparationMethod struct {
 func (s *Store) preparationMethods() []PreparationMethod {
 	methods := []PreparationMethod{
 		{ID: "apex", Title: "Analyse et planification", Phases: []string{"Analyze", "Plan"}, Paths: []string{".claude/skills/apex/SKILL.md"}},
-		{ID: "ks-feature", Title: "Parcours guidé — préparer une évolution", Phases: []string{"Cadrage", "Plan"}, Paths: []string{".claude/commands/ks-feature.md", ".claude/commands/ks-plan.md"}},
+		{ID: "ks-feature", Title: "Parcours guidé — préparer une évolution", Phases: []string{"Cadrage", "Plan"}, Paths: []string{".claude/commands/ks-feature.md", ".claude/commands/ks-plan.md", ".claude/skills/product-planning/SKILL.md"}},
+		{ID: "ks-product", Title: "Application complète — parcours, conception et livraison", Phases: []string{"Cadrage produit", "Parcours et stories", "Architecture", "Conception", "Plan"}, Paths: []string{".claude/skills/product-planning/SKILL.md", ".claude/skills/product-delivery/SKILL.md", ".claude/skills/product-review/SKILL.md"}},
 		{ID: "debug", Title: "Diagnostiquer et corriger un problème", Phases: []string{"Diagnostic", "Plan"}, Paths: []string{".claude/skills/debug/SKILL.md"}},
 		{ID: "audit-pdca", Title: "Examiner et améliorer — préparer l’examen", Phases: []string{"Plan"}, Paths: []string{".claude/skills/audit-pdca/SKILL.md"}},
 	}

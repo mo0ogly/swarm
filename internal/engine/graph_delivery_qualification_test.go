@@ -207,6 +207,14 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	// Product workflow changes have a new source snapshot; historical acceptance stays unchanged.
+	productManifest := "docs/ks-product-candidate-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, productManifest)); e == nil {
+		manifestPath = productManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

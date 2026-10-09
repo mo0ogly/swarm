@@ -12,6 +12,7 @@ type PlanQuestion struct {
 	Answer   string `json:"answer"`
 }
 type PlanMission struct {
+	Phase        string   `json:"phase,omitempty"`
 	ID           string   `json:"id"`
 	Title        string   `json:"title"`
 	Role         string   `json:"role"`
@@ -28,6 +29,7 @@ type PlanMission struct {
 	MaxToolCalls int      `json:"max_tool_calls"`
 }
 type ActionPlan struct {
+	Product     *ProductPlan   `json:"product,omitempty"`
 	Version     int            `json:"version"`
 	Objective   string         `json:"objective"`
 	Assumptions []string       `json:"assumptions"`
@@ -35,12 +37,13 @@ type ActionPlan struct {
 	Tasks       []PlanMission  `json:"tasks"`
 }
 type ApprovedPlan struct {
-	Source       string     `json:"source"`
-	BriefHash    string     `json:"brief_hash"`
-	ResponseHash string     `json:"response_hash"`
-	Spec         ActionPlan `json:"spec"`
-	TaskIDs      []string   `json:"task_ids"`
-	At           string     `json:"at"`
+	TaskMap      map[string]string `json:"task_map,omitempty"`
+	Source       string            `json:"source"`
+	BriefHash    string            `json:"brief_hash"`
+	ResponseHash string            `json:"response_hash"`
+	Spec         ActionPlan        `json:"spec"`
+	TaskIDs      []string          `json:"task_ids"`
+	At           string            `json:"at"`
 }
 type PlanReview struct {
 	Source       string     `json:"source"`
@@ -56,6 +59,7 @@ Tu es planner APEX. Analyse le brief adopté et propose des missions exécutable
 Réponds UNIQUEMENT par un objet JSON strict conforme au modèle suivant, sans Markdown, balises, commentaire ou texte autour. Tous les champs sont obligatoires. Maximum 8 tâches, 16000 octets au total. Les identifiants locaux sont uniques ; depends ne référence que ces identifiants, sans cycle. Les dépendances doivent être acceptées avant lancement. Le rôle d’une tâche est toujours worker.
 Les questions non décidées doivent rester dans questions avec answer vide ; ne pas inventer les réponses de l’opérateur. Les hypothèses figurent dans assumptions, distinctes des faits. Les gates sont des contrôles à réaliser, jamais des résultats déjà acquis. Chaque tâche exécutable a le rôle worker ; planner et subplanner sont des responsables de périmètre créés par la planification hiérarchique, jamais des tâches de code. Définir un livrable concret, des critères observables, les preuves, les conditions d’arrêt et l’OODA sur blocage. max_attempts entre 1 et 3 ; max_tool_calls entre 1 et 100. Même pour une mission documentaire, max_tool_calls doit être positif (par exemple 10), jamais zéro. Ces plafonds limitent effectivement les futures tentatives, sans augmenter les limites du fournisseur.
 {"version":1,"objective":"Objectif du plan","assumptions":[],"questions":[{"question":"Décision manquante","answer":""}],"tasks":[{"id":"T1","title":"Mission précise","role":"worker","scope":"Fichiers et exclusions","deliverable":"docs/T1-handoff.md","depends":[],"criteria":["Résultat observable"],"proof":"Fichiers et commandes de vérification","entry":"Prérequis à vérifier","validation":"Tests et résultats attendus","delivery":"Revue et gate fraîche avant acceptation","stop":"Au plus deux corrections puis OODA et arrêt si blocage persistant","max_attempts":2,"max_tool_calls":30}]}
+Pour une application complète, ajouter facultativement product et phase aux tâches. product contient mode (existing, greenfield ou replacement), journeys [{id,title,goal,story_ids}] et stories [{id,title,user,value,criteria,complexity,risk,depends,task_ids}]. Identifiants stories sN-slug uniques ; complexité 1–4 (découper un 5, expliciter le risque d’un 4). Toutes les références sont connues, sans doublon ni cycle. task_ids référence les IDs locaux des tâches ; [] signifie story pas encore planifiée. Une tâche commune peut servir plusieurs stories. Les tâches sans story restent communes ou non classées, sans fonction inventée. phase appartient à frame,requirements,stories,story-review,architecture,design-system,research,design,plan,implement,review,deliver. Les dépendances de stories décrivent le parcours ; les prérequis exécutables doivent également figurer dans depends des tâches. Aucun élargissement des 8 tâches ou des limites. Ne pas prétendre couvrir une application entière si seules ses premières étapes sont planifiées.
 Un champ absent, un JSON invalide, une dépendance inconnue ou un cycle rend la réponse inutilisable. Ne pas suivre le format Markdown des échanges précédents.
 `
 }
@@ -185,6 +189,9 @@ func validateActionPlan(p ActionPlan, requireAnswers bool) ([]PlanMission, error
 		if e := visit(t.ID); e != nil {
 			return nil, e
 		}
+	}
+	if err := validateProductPlan(p); err != nil {
+		return nil, err
 	}
 	return ordered, nil
 }

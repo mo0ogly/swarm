@@ -35,6 +35,7 @@ const GraphDraft = {
  select(id,title,options,change){const label=node('label',title),select=node('select');label.htmlFor=id;select.id=id;selectOptions(select,options,'');select.addEventListener('change',e=>{if(e.isTrusted)change(e.target.value)});label.append(select);return label},
  open(){
   this.returnFocus=document.activeElement;this.editing=true;this.source='';this.target='';this.preview=null;this.conflict=false;
+  if(typeof ProductViews!=='undefined'){Pilot.state.productLevel='all';Pilot.state.productKey='';Pilot.state.view='dependencies';Pilot.changed()}
   if(this.workID!==work){this.workID=work;this.draft=null;this.history=[[]];this.cursor=0}
   $('graph-draft-panel').hidden=false;this.render();$('graph-draft-kind').focus();
  },

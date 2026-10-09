@@ -46,7 +46,7 @@ try:
     assert initial is not None
     def methods_available(command):
         methods = json.loads(run(command + ['prepare', 'methods']))
-        assert {m['id'] for m in methods} == {'apex', 'ks-feature', 'debug', 'audit-pdca'}
+        assert {m['id'] for m in methods} == {'apex', 'ks-feature', 'ks-product', 'debug', 'audit-pdca'}
         assert all(m['available'] and m['sha256'] for m in methods), methods
         assert not (project / '.claude').exists(), 'Bundled methods must not populate project files'
     methods_available([str(native / 'swarm'), '--root', str(project), '--json'])
@@ -65,7 +65,7 @@ try:
     prefix = compose + ['exec', '-T', 'swarm', 'swarm', '--root', '/workspace', '--json']
     methods_available(prefix)
     http_methods = json.loads(browser.open(f'http://127.0.0.1:{port}/api/v1/preparations/methods').read())
-    assert len(http_methods) == 4 and all(m['available'] for m in http_methods)
+    assert len(http_methods) == 5 and all(m['available'] for m in http_methods)
     work = json.loads(run(prefix + ['work', 'create', '--input', '-'], input=json.dumps({
         'schema_version': 1, 'event_id': str(uuid.uuid4()), 'expected_revision': 0,
         'title': 'Docker persistence test', 'objective': 'Preserve this mission across recreation',

@@ -2,7 +2,7 @@
 
 [English](en/AGENT-METHODS.md) · [Guide utilisateur](../GUIDE-UTILISATEUR.md)
 
-Ce dépôt fournit **neuf méthodes** pour cadrer, réaliser, vérifier et améliorer
+Ce dépôt fournit **douze méthodes** pour cadrer, réaliser, vérifier et améliorer
 Swarm : parcours guidé, examen et amélioration, construction et examen de
 spécification, revue du code, diagnostic, vérification, replanification et retour
 d’expérience. Elles partagent des critères explicites, des décisions tracées et
@@ -21,6 +21,9 @@ Ouvrez Codex ou Claude **dans ce dépôt**, puis utilisez la commande adaptée :
 
 | Besoin | Codex | Claude |
 | --- | --- | --- |
+| Cadrer PRD, parcours, stories, architecture et plan | `$product-planning` | `/product-planning` |
+| Réaliser recherche, conception et tâches autorisées | `$product-delivery` | `/product-delivery` |
+| Examiner couverture, conception et preuves | `$product-review` | `/product-review` |
 | Analyser, planifier et réaliser un changement | `$apex` | `/apex` |
 | Auditer avec des preuves reproductibles | `$audit-pdca` | `/audit-pdca` |
 | Rédiger un besoin et ses critères vérifiables | `$spec-builder` | `/spec-builder` |
@@ -55,6 +58,7 @@ Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
 | Méthode de préparation | Contenu fourni à l'IA |
 | --- | --- |
 | Analyse et planification | Analyse et planification du besoin |
+| Application complète — parcours, conception et livraison | Cadrage produit, parcours/stories, architecture, conception et plan ; aucune exécution en préparation |
 | Parcours guidé — préparer une évolution | Cadrage, critères et décomposition en tâches |
 | Examiner et améliorer — préparer l’examen | Définition du périmètre, des risques et du plan de contrôle |
 | Diagnostiquer et corriger un problème | Hypothèses, preuves manquantes et plan de diagnostic ; aucune correction en préparation |
@@ -62,8 +66,7 @@ Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
 Le fichier de méthode et le contrat commun sont transmis intégralement au modèle.
 Les phases d'exécution des méthodes restent interdites dans cette préparation :
 elle propose un brief ou un plan, sans lancer ni accepter des agents.
-Les cinq autres méthodes s'utilisent dans les sessions natives Codex/Claude ;
-elles ne sont pas cinq nouveaux boutons dans le menu de préparation.
+Les autres méthodes s’utilisent dans les sessions natives ou le cadrage des rôles ; elles ne sont pas des boutons supplémentaires de préparation. Le [guide produit](PRODUCT-WORKFLOW.md) précise l’adaptation des commandes KS.
 
 Le CLI expose le même catalogue :
 
@@ -74,7 +77,7 @@ swarm --root "$PWD" --json prepare methods
 Chaque entrée indique `available` et une empreinte `sha256`. `audit_pdca` reste
 un alias de `audit-pdca` dans Swarm et `/audit_pdca` dans Claude. Des alias historiques restent acceptés pour les anciennes intégrations ; utilisez les méthodes de spécification pour les nouveaux parcours.
 
-Les quatre méthodes de préparation sont embarquées dans le binaire : elles sont
+Les cinq méthodes de préparation sont embarquées dans le binaire : elles sont
 utilisables dans un projet vide, en natif comme dans Docker. Aucun répertoire
 `.claude` n’est créé dans votre projet. Pour chaque fichier, une personnalisation
 présente dans la racine du projet remplace la version embarquée ; si ce fichier
@@ -92,9 +95,9 @@ par Codex ou Claude pour fournir ce cadrage.
 
 | Rôle | Méthodes incluses | Limites |
 | --- | --- | --- |
-| Planificateur et sous-planificateur | Parcours guidé, examen et amélioration, construction et examen de spécification, replanification, diagnostic | PLAN et ACT ; sans outils ni modification de code |
-| Exécutant | Parcours guidé, examen et amélioration, vérification, diagnostic, modèles de rapport et de suivi | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
-| Vérificateur indépendant | Examen et amélioration, revue du code | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
+| Planificateur et sous-planificateur | Parcours guidé, examen et amélioration, construction et examen de spécification, replanification, diagnostic, planification produit | PLAN et ACT ; sans outils ni modification de code |
+| Exécutant | Parcours guidé, examen et amélioration, vérification, diagnostic, modèles de rapport et de suivi, réalisation produit | DO et CHECK dans le périmètre autorisé ; audit seul si demandé |
+| Vérificateur indépendant | Examen et amélioration, revue du code, revue produit | CHECK sur les preuves fournies ; sans outils ni modification du candidat |
 
 Le champ `workflow` conserve la version, le rôle, la liste des méthodes et leur
 empreinte SHA-256. Le moteur refuse un rôle inconnu ou un cadrage dépassant sa
@@ -116,10 +119,10 @@ aux retours, ainsi que leurs limites.
 ```text
 AGENTS.md                         règles chargées pour Codex
 CLAUDE.md                         point d'entrée pour Claude
-.claude/skills/<nom>/SKILL.md      source canonique des huit méthodes
+.claude/skills/<nom>/SKILL.md      source canonique des douze méthodes
 .agents/skills/<nom>              lien relatif vers la même méthode
 .claude/skills/<nom>/agents/      noms et exemples du sélecteur Codex
-.claude/commands/                 trois commandes de compatibilité
+.claude/commands/                 commandes natives et de compatibilité KS
 tools/agent-workflows/CONTRACT.md règles communes, également lues par Swarm
 ```
 

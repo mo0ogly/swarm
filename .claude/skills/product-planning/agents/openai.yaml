@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product planning"
+  short_description: "PRD, journeys, stories, architecture and validated plans"
+  default_prompt: "Use $product-planning within the current Swarm role and authorised scope."

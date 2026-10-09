@@ -20,6 +20,9 @@ Project skills are in `.agents/skills/`. They link to the canonical files under
 | Reproduce a fix through the actual CLI, API or web flow | `verify-fix` |
 | Recover a blocked plan without erasing history or limits | `replan` |
 | Explain outcomes and prioritize evidence-based improvements | `retex-analyzer` |
+| Frame a complete application with journeys, stories and design prerequisites | `product-planning` |
+| Research, design and implement an assigned product slice | `product-delivery` |
+| Review product coverage, design and candidate evidence | `product-review` |
 
 Choose the smallest relevant method. Do not chain every method for a trivial edit.
 See `docs/AGENT-METHODS.md` (French) or `docs/en/AGENT-METHODS.md` (English).

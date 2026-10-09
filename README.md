@@ -192,7 +192,7 @@ Le lanceur construit le binaire et ouvre la session locale automatiquement. L’
 3. Choisissez les agents, les espaces de travail et les conditions d’acceptation.
 4. Autorisez le lancement, puis suivez le graphe et les résultats à examiner.
 
-Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit neuf [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Les quatre méthodes de préparation fonctionnent dans un projet vide grâce au pack embarqué ; les personnalisations locales restent contrôlées. Consultez aussi les [limites de migration](docs/migration/README.md).
+Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit douze [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Les cinq méthodes de préparation fonctionnent dans un projet vide grâce au pack embarqué ; les personnalisations locales restent contrôlées. Consultez aussi les [limites de migration](docs/migration/README.md).
 
 ### Et en ligne de commande ?
 
@@ -348,3 +348,5 @@ Dans **Lancer / Relancer → Skills pour cette tâche**, sélectionnez les méth
 du projet pour un exécutant. Le choix est conservé avec la tentative, sans
 activer automatiquement les scripts ou changer les permissions. Le CLI propose
 `swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).
+
+Le [parcours produit KS](docs/PRODUCT-WORKFLOW.md) détaille les méthodes migrées, la conception, les gates et la navigation application → parcours → story → tâches.

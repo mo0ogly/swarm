@@ -42,7 +42,7 @@ const Pilot = {
    ['pilot-launch-all',tr_web_pilotage_js('Lancer tout'),()=>Mission.open()],
    ['pilot-next',tr_web_pilotage_js('Prochaine intervention'),()=>this.nextIntervention()],
    ['pilot-group','Regrouper',()=>{this.state.grouped=!this.state.grouped;this.changed()}],
-   ['pilot-all-links',tr_web_pilotage_js('Toutes les dépendances'),()=>{this.state.view='dependencies';this.state.collapsed=[];this.state.filter='all';this.state.search='';this.fitPending=true;this.changed()}],
+   ['pilot-all-links',tr_web_pilotage_js('Toutes les dépendances'),()=>{this.state.productLevel='all';this.state.productKey='';this.state.view='dependencies';this.state.collapsed=[];this.state.filter='all';this.state.search='';this.fitPending=true;this.changed()}],
    ['pilot-collapse',tr_web_pilotage_js('Tout replier'),()=>{this.state.collapsed=snapshot.work.tasks.filter(t=>PilotGraph.children(snapshot.work.tasks).get(t.id)?.length).map(t=>t.id);this.changed()}],
    ['pilot-expand',tr_web_pilotage_js('Tout déplier'),()=>{this.state.collapsed=[];this.changed()}],
    ['pilot-zoom-out',tr_web_pilotage_js('Réduire le zoom'),()=>this.zoom(-.15)],
@@ -63,6 +63,7 @@ const Pilot = {
   const list=node('div',undefined,'pilot-list');list.id='pilot-list';
   const mission=node('section',undefined,'mission-summary');mission.id='mission-summary';mission.setAttribute('aria-label',tr_web_pilotage_js('Résultats et conduite de la mission'));
   $('graph').replaceChildren(mission,toolbar,actions,status,canvas,list);
+  ProductViews.mount($('graph'));
   GraphDraft.mount();
  },
  changed(){this.save();this.listKey='';this.render();},
@@ -104,6 +105,7 @@ const Pilot = {
  revealSelection(){
   const id=this.selectedTask();if(!id)return;
   this.state.collapsed=PilotGraph.reveal(snapshot.work.tasks,id,this.state.collapsed);
+  this.state.productLevel='all';this.state.productKey='';
   this.state.filter='all';this.state.search='';this.state.view='dependencies';this.changed();
   const n=[...document.querySelectorAll('.graph-noeud')].find(n=>n.dataset.task===id);
   n?.focus();n?.scrollIntoView({block:'center',inline:'center'});this.save();
@@ -119,16 +121,20 @@ const Pilot = {
    if(this.controlsWork!==work||document.activeElement!==$(id))$(id).value=this.state[property];
   }
   this.controlsWork=work;
-  const graph=this.state.view==='dependencies';$('pilot-canvas').hidden=!graph;$('pilot-list').hidden=graph;
+  const productOverview=ProductViews.render();
+  $('pilot-filter').disabled=productOverview;$('pilot-detail').disabled=productOverview;
+  $('pilot-search').placeholder=ProductViews.catalogue?.journeys.length?tr_web_pilotage_js('Parcours, story ou tâche'):tr_web_pilotage_js('Tâche, rôle ou fournisseur');
+  const graph=this.state.view==='dependencies'&&!productOverview;$('pilot-canvas').hidden=!graph;$('pilot-list').hidden=graph||productOverview;
   for(const id of ['pilot-orientation','pilot-collapse','pilot-expand','pilot-fit','pilot-zoom-in','pilot-zoom-out'])$(id).disabled=!graph;
-  $('pilot-group').hidden=graph;$('pilot-group').textContent=this.state.grouped?tr_web_pilotage_js('Afficher les agents'):'Regrouper';
+  $('pilot-group').hidden=graph||productOverview;$('pilot-group').textContent=this.state.grouped?tr_web_pilotage_js('Afficher les agents'):'Regrouper';
   $('pilot-reveal').disabled=!this.selectedTask();
   const fitWidth=graph&&this.fitPending?$('pilot-canvas').clientWidth:0;
   if(graph){drawPilotGraph();if(this.fitPending){
    const svg=$('pilot-canvas').querySelector('svg');
    if(svg){const port=$('pilot-canvas');this.state.zoom=Math.max(.15,Math.min(1,(fitWidth-20)/Number(svg.dataset.width),(innerHeight*.65-50)/Number(svg.dataset.height)));scalePilotGraph(svg,this.state.zoom);this.state.x=0;this.state.y=0;port.scrollTo(0,0);this.fitPending=false;this.save()}
-  }if(this.restorePosition){$('pilot-canvas').scrollTo(this.state.x,this.state.y);this.restorePosition=false}}else this.cards();
+  }if(this.restorePosition){$('pilot-canvas').scrollTo(this.state.x,this.state.y);this.restorePosition=false}}else if(!productOverview)this.cards();
   GraphDraft.render();
+  if(productOverview){$('pilot-status').textContent=tr_web_pilotage_js('La vue produit regroupe les mêmes tâches ; ouvrez une story pour examiner les dépendances.');if(this.state.selection)PilotInspector.render();return}
   const edges=snapshot.pilotage?.edges||[];
   $('pilot-status').textContent=this.storageWarning||(this.state.search.trim()?tr_web_pilotage_js('Recherche dans toutes les tâches, y compris les branches repliées.'):!snapshot.work.tasks.length?tr_web_pilotage_js('Aucune tâche : le graphe apparaîtra dès qu’un plan existe.'):graph&&!edges.length?tr_web_pilotage_js('Tâches indépendantes : aucune dépendance déclarée, donc aucune flèche.'):graph?tr_web_pilotage_js('Les flèches vont du prérequis vers la tâche qui en dépend. Zoom ')+Math.round(this.state.zoom*100)+' %.':tr_web_pilotage_js('Sélectionnez un agent ou une tâche pour comprendre son état et examiner ses résultats.'));
   $('pilot-status').classList.toggle('notice',graph&&!edges.length&&snapshot.work.tasks.length>0);$('pilot-status').classList.toggle('info',graph&&!edges.length&&snapshot.work.tasks.length>0);
@@ -139,11 +145,11 @@ const Pilot = {
  },
  cards(){
   const entries=[];
-  for(const t of snapshot.work.tasks){
+  for(const t of snapshot.work.tasks.filter(t=>ProductViews.contains(t.id))){
    const agents=snapshot.agents.filter(x=>x.agent.task_id===t.id).map(x=>x.agent);
    for(const a of agents.length?agents:[null])if(this.matches(t,a))entries.push({t,a});
   }
-  const organization=PilotGraph.organization(snapshot.work,snapshot.work.tasks,snapshot.paused);
+  const organization=ProductViews.organization(snapshot.work.tasks.filter(t=>ProductViews.contains(t.id)));
   const sig=JSON.stringify([organization.nodes,this.state.detail,this.state.grouped,entries.map(({t,a})=>[t.id,t.title,t.status,t.plan_role,t.launch_profile,t.deliverable,t.criteria,t.next,t.blocker,a?.role,this.goState(t),a?.id,a?.progress,snapshot.validation?.tasks[t.id]?.state,snapshot.pilotage?.health[a?.id]?.activity_label,graphCoutTache(t.id),snapshot.pilotage?.health[a?.id]?.process_label])]);
   if(sig===this.listKey)return;this.listKey=sig;
   const focused=document.activeElement?.dataset.pilotIdentity,host=$('pilot-list');host.replaceChildren();

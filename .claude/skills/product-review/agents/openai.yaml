@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product review"
+  short_description: "Independent coverage, design and candidate review"
+  default_prompt: "Use $product-review within the current Swarm role and authorised scope."

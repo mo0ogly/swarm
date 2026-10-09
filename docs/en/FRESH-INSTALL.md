@@ -74,7 +74,7 @@ must be accessible inside the container. Keep TLS verification enabled.
 1. Open the cockpit, then **Prepare a project**.
 2. Enter a title and requirements, then save the requirements.
 3. Open **Prepare with AI**. **Analysis and planning** is APEX.
-4. Check all four methods: analysis and planning, guided workflow, diagnosis,
+4. Check all five methods: analysis and planning, guided workflow, diagnosis,
    examination and improvement. They are bundled with Swarm; an empty project
    needs neither a `.claude` directory nor a Claude installation.
 5. Add your own AI and test the connection. If it fails, copy the diagnostic
@@ -110,7 +110,7 @@ docker compose --env-file deploy/install.env exec -T swarm \
   swarm --root /workspace --json prepare methods
 ```
 
-All four entries should have `available: true` and a `sha256` fingerprint. Existing
+All five entries should have `available: true` and a `sha256` fingerprint. Existing
 project method files take precedence. Symbolic links, invalid files or denied
 access remain explicit errors; repair those files rather than expanding the
 project boundary. See the [method rules](AGENT-METHODS.md).
@@ -120,3 +120,5 @@ the project, then run `git pull --ff-only`. If Git refuses, preserve local chang
 and examine the divergence. Rebuild with `install.sh` in the selected mode and
 restart. Pulling Git changes alone does not replace an installed native binary
 or a running container.
+
+[KS product workflow and graph views](PRODUCT-WORKFLOW.md).

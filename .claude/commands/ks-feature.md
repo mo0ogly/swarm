@@ -4,7 +4,8 @@ description: "Cadrer une fonctionnalité Swarm et ses critères avant de planifi
 
 # KS feature — compatibility preparation command
 
-Read `tools/agent-workflows/CONTRACT.md`. Analyze the requested need using supplied
+Read `tools/agent-workflows/CONTRACT.md` and
+`.claude/skills/product-planning/SKILL.md`. Analyze the requested need using supplied
 evidence. In a native session, use `spec-builder` for the full specification method.
 In Swarm preparation, stay within its tool-free structured response contract.
 

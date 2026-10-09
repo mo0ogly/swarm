@@ -33,6 +33,9 @@ jobs:
       - run: npm run test:action-skills
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      - run: npm run test:product-views
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - run: go vet ./...
       - run: python3 tests/supervision_go_suite.py
       - run: npm test

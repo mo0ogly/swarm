@@ -35,7 +35,7 @@ func TestPreparationTemplatesCLIIsReadOnlyAndRejectsUnknown(t *testing.T) {
 				t.Fatal("invalid localized draft", v.ID, lang)
 			}
 		}
-		if (v.ID == "correction" && v.RecommendedMethod != "debug") || (v.ID != "correction" && v.RecommendedMethod != "apex") {
+		if (v.ID == "correction" && v.RecommendedMethod != "debug") || (v.ID != "correction" && v.RecommendedMethod != "ks-product") {
 			t.Fatal("unsupported method")
 		}
 		out.Reset()
@@ -164,7 +164,7 @@ func TestPreparationTemplateReadableIDsAndLegacyLookup(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if template.ID != current || (current == "correction" && template.RecommendedMethod != "debug") || (current != "correction" && template.RecommendedMethod != "apex") {
+		if template.ID != current || (current == "correction" && template.RecommendedMethod != "debug") || (current != "correction" && template.RecommendedMethod != "ks-product") {
 			t.Fatal("legacy lookup does not return current template", old)
 		}
 		for _, lang := range []string{"fr", "en"} {

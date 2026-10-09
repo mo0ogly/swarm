@@ -4,7 +4,8 @@ description: "Décomposer un brief Swarm en tâches, dépendances et preuves att
 
 # KS plan — compatibility preparation command
 
-Read `tools/agent-workflows/CONTRACT.md`. From the current brief, build a bounded
+Read `tools/agent-workflows/CONTRACT.md` and
+`.claude/skills/product-planning/SKILL.md`. From the current brief, build a bounded
 plan in the format required by Swarm. In a native session, `spec-builder` provides
 the full method. In Swarm preparation, only propose the requested structured output.
 
