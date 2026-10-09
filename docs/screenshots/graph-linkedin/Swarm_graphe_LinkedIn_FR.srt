@@ -1,0 +1,44 @@
+1
+00:00:00,000 --> 00:00:05,000
+Six tâches. Des dépendances explicites.
+Les flèches montrent les prérequis, pas une promesse de réussite.
+
+2
+00:00:05,000 --> 00:00:10,000
+Zoomer pour lire chaque étape.
+Une vue globale, puis le détail utile à la décision.
+
+3
+00:00:10,000 --> 00:00:15,000
+Replier une branche. Garder les liens utiles.
+Le repli réduit la vue ; il ne supprime aucune tâche.
+
+4
+00:00:15,000 --> 00:00:20,000
+Ouvrir la tâche depuis le graphe.
+Consulter le résultat attendu et les actions disponibles.
+
+5
+00:00:20,000 --> 00:00:27,000
+Pourquoi cette tâche ne démarre pas ?
+Deux prérequis restent non validés. Deux tâches sont en aval.
+
+6
+00:00:27,000 --> 00:00:32,000
+Choisir ce qui doit être vérifié.
+Le critère est explicite. La revue humaine reste une option.
+
+7
+00:00:32,000 --> 00:00:37,000
+Déclarer les fichiers et le programme.
+Exemple préparé dans l’interface, non enregistré dans cette démo.
+
+8
+00:00:37,000 --> 00:00:43,000
+Arguments exacts. Délai explicite.
+La politique décrit ce qui est autorisé avant toute exécution.
+
+9
+00:00:43,000 --> 00:00:48,000
+Des agents probabilistes. Un cadre de contrôle explicite.
+Voir le plan, comprendre les blocages, définir les preuves.

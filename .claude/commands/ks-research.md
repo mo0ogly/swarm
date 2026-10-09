@@ -1,8 +1,8 @@
 ---
-description: "KS research compatibility method adapted to the current Swarm role."
+description: "Product workflow — research compatibility method adapted to the current Swarm role."
 ---
 
-# KS research
+# Product workflow — research
 
 Use `.claude/skills/product-delivery/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its research stage.

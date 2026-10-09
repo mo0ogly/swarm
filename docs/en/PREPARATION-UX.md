@@ -215,7 +215,7 @@ Custom connections are not implicitly activated for every mission.
 
 ## Templates
 
-[KS mission templates (web and CLI)](PREPARATION-TEMPLATES.md).
+[Guided mission templates (web and CLI)](PREPARATION-TEMPLATES.md).
 
 ### Rejected preparation answers
 

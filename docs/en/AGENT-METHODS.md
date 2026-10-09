@@ -57,14 +57,14 @@ The existing **Prepare with AI** method selector uses:
 | Preparation method | Material provided to the model |
 | --- | --- |
 | Analysis and planning | Need analysis and planning |
-| Full application — journeys, design and delivery | Product framing, journeys/stories, architecture, design and plan; no execution in preparation |
+| Application creation workflow | Product framing, journeys/stories, architecture, design and plan; no execution in preparation |
 | Guided workflow — prepare a change | Scope, criteria and task decomposition |
 | Diagnose and fix a problem | Known facts, diagnosis and a scoped verification plan |
 | Examiner et améliorer — préparer l’examen | Audit scope, risks and verification plan |
 
 Swarm sends the entire method files and shared contract to the model. Execution
 phases remain prohibited during preparation: the model proposes a brief or plan;
-it cannot launch or accept agents. Other methods are available in native sessions or role framing, rather than extra preparation buttons. The [product guide](PRODUCT-WORKFLOW.md) explains the adapted KS commands.
+it cannot launch or accept agents. Other methods are available in native sessions or role framing, rather than extra preparation buttons. The [product guide](PRODUCT-WORKFLOW.md) explains the application creation workflow stages.
 
 The CLI exposes the same catalogue:
 
@@ -116,7 +116,7 @@ CLAUDE.md                         Claude project entry point
 .claude/skills/<name>/SKILL.md     canonical sources for all twelve methods
 .agents/skills/<name>             relative link to the same method
 .claude/skills/<name>/agents/     Codex selector labels and sample prompts
-.claude/commands/                 native and KS compatibility commands
+.claude/commands/                 native commands and compatibility aliases
 tools/agent-workflows/CONTRACT.md shared rules also loaded by Swarm
 ```
 

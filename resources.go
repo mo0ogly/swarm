@@ -7,6 +7,9 @@ import "embed"
 //go:embed web/*
 var Web embed.FS
 
+//go:embed docs/training/casa-pizza/*.pdf docs/training/casa-pizza/*.docx docs/training/casa-pizza/*.zip docs/training/casa-pizza/tutoriels/swarm-logo.png docs/training/casa-pizza/tutoriels/index.html docs/training/casa-pizza/tutoriels/player.css docs/training/casa-pizza/tutoriels/player.js docs/training/casa-pizza/tutoriels/frames/*.png docs/training/casa-pizza/tutoriels/media/*
+var Training embed.FS
+
 //go:embed tools/agent-workflows/CONTRACT.md tools/agent-workflows/templates/*.md tools/agent-workflows/templates/ks/*.md .claude/skills/*/SKILL.md .claude/commands/ks-*.md
 var AgentWorkflow embed.FS
 

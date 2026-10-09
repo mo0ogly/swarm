@@ -58,7 +58,7 @@ Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
 | Méthode de préparation | Contenu fourni à l'IA |
 | --- | --- |
 | Analyse et planification | Analyse et planification du besoin |
-| Application complète — parcours, conception et livraison | Cadrage produit, parcours/stories, architecture, conception et plan ; aucune exécution en préparation |
+| Parcours de création d’application | Cadrage produit, parcours/stories, architecture, conception et plan ; aucune exécution en préparation |
 | Parcours guidé — préparer une évolution | Cadrage, critères et décomposition en tâches |
 | Examiner et améliorer — préparer l’examen | Définition du périmètre, des risques et du plan de contrôle |
 | Diagnostiquer et corriger un problème | Hypothèses, preuves manquantes et plan de diagnostic ; aucune correction en préparation |
@@ -66,7 +66,7 @@ Dans **Préparer avec l'IA**, la liste des méthodes existante utilise :
 Le fichier de méthode et le contrat commun sont transmis intégralement au modèle.
 Les phases d'exécution des méthodes restent interdites dans cette préparation :
 elle propose un brief ou un plan, sans lancer ni accepter des agents.
-Les autres méthodes s’utilisent dans les sessions natives ou le cadrage des rôles ; elles ne sont pas des boutons supplémentaires de préparation. Le [guide produit](PRODUCT-WORKFLOW.md) précise l’adaptation des commandes KS.
+Les autres méthodes s’utilisent dans les sessions natives ou le cadrage des rôles ; elles ne sont pas des boutons supplémentaires de préparation. Le [guide produit](PRODUCT-WORKFLOW.md) précise les étapes du parcours de création d’application.
 
 Le CLI expose le même catalogue :
 
@@ -122,7 +122,7 @@ CLAUDE.md                         point d'entrée pour Claude
 .claude/skills/<nom>/SKILL.md      source canonique des douze méthodes
 .agents/skills/<nom>              lien relatif vers la même méthode
 .claude/skills/<nom>/agents/      noms et exemples du sélecteur Codex
-.claude/commands/                 commandes natives et de compatibilité KS
+.claude/commands/                 commandes natives et alias de compatibilité
 tools/agent-workflows/CONTRACT.md règles communes, également lues par Swarm
 ```
 

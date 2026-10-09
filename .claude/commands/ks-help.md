@@ -1,8 +1,8 @@
 ---
-description: "KS help compatibility method adapted to the current Swarm role."
+description: "Product workflow — help compatibility method adapted to the current Swarm role."
 ---
 
-# KS help
+# Product workflow — help
 
 Use `.claude/skills/product-planning/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its help stage.

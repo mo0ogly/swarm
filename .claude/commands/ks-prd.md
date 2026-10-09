@@ -1,8 +1,8 @@
 ---
-description: "KS prd compatibility method adapted to the current Swarm role."
+description: "Product workflow — prd compatibility method adapted to the current Swarm role."
 ---
 
-# KS prd
+# Product workflow — prd
 
 Use `.claude/skills/product-planning/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its prd stage.

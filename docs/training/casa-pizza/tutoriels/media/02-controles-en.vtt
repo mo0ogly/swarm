@@ -1,0 +1,17 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Tasks then Configure validation
+Human review remains available for qualitative judgment.
+
+00:00:06.000 --> 00:00:12.000
+Choose python3 and enter one argument per line
+The exact command is -W error::ResourceWarning -m unittest -v. No implicit shell.
+
+00:00:12.000 --> 00:00:18.000
+Link the check to its criterion and set its timeout
+The displayed 60-second timeout is editable; it is not a universal limit.
+
+00:00:18.000 --> 00:00:24.000
+Review the effect before confirming
+The preview explains scope and invalidation of old evidence. We cancelled.

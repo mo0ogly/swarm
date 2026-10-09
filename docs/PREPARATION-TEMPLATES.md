@@ -28,15 +28,14 @@ L’enregistrement ne constitue ni un brief adopté ni un plan validé.
 Les parcours décrivent les étapes utiles : cadrage, recherche, conception si
 nécessaire, planification, réalisation, revue et livraison. Ce sont des
 propositions, pas des commandes exécutées. Le pack fournit désormais les méthodes
-produit adaptées à Swarm et les modèles documentaires génériques KS ; il n’importe
+produit adaptées à Swarm et les modèles documentaires génériques du parcours produit ; il n’importe
 ni règles privées d’application ni permissions de publication.
 
-Les évolutions, interfaces et nouveaux produits utilisent **Application complète —
-parcours, conception et livraison** (`ks-product`) ; la correction utilise le
+Les évolutions, interfaces et nouveaux produits utilisent **Parcours de création d’application** ; la correction utilise le
 diagnostic structuré. La disponibilité est contrôlée avant un appel IA. Un
 brouillon reste conservé si la méthode est indisponible. La préparation complète
 exige la structure produit pour vérifier le plan ; aucune phase ne lance d’agent.
-Voir la [correspondance KS/Swarm et les vues des graphes](PRODUCT-WORKFLOW.md).
+Voir la [étapes du parcours et les vues des graphes](PRODUCT-WORKFLOW.md).
 
 Les rôles, dépendances, workspaces, preuves et limites sont des exigences du
 brouillon à compléter. Le modèle ne crée pas une équipe ni un vérificateur. La

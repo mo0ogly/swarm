@@ -1,8 +1,8 @@
 ---
-description: "KS status compatibility method adapted to the current Swarm role."
+description: "Product workflow — status compatibility method adapted to the current Swarm role."
 ---
 
-# KS status
+# Product workflow — status
 
 Use `.claude/skills/product-planning/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its status stage.

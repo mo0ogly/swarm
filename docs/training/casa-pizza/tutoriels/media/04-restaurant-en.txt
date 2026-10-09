@@ -1,0 +1,20 @@
+00s — Open the restaurant area
+Signing in is required to view and advance orders.
+
+06s — Try an incorrect password
+Access is rejected; the public catalogue remains separate from the restaurant area.
+
+12s — Sign in with atelier in this demo
+The restaurant shows the same order and total.
+
+18s — Move to Preparing
+The restaurant advances the status manually; no AI autonomy is demonstrated.
+
+24s — Refresh tracking on the customer side
+Preparing matches the restaurant action.
+
+30s — Move to Out for delivery
+The steps are traversed in order.
+
+36s — Move to Delivered then refresh the customer
+Tracking confirms fictitious delivery of the same order number.

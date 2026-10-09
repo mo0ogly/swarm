@@ -91,7 +91,7 @@ func TestProductAdoptedPlanPersistsMappingsAndWorkerContext(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, fragment := range []string{"s01-order", "s02-history", "Commande persistée et confirmée", "Étape produit : research", "KS product delivery"} {
+	for _, fragment := range []string{"s01-order", "s02-history", "Commande persistée et confirmée", "Étape produit : research", "Product delivery"} {
 		if !strings.Contains(a.Prompt, fragment) {
 			t.Fatalf("worker did not receive %s", fragment)
 		}

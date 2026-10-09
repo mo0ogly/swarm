@@ -6,6 +6,16 @@ The supported installation path is Linux. Choose Docker for a dedicated runtime,
 or a native binary to use tools already installed on your machine. The installer
 does not request sudo, modify shell profiles or install Docker for you.
 
+## Included training resources and branding
+
+After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.
+
+The logo and browser favicon, reader, PDFs, videos and kits are embedded in the binary. No separate media server or internet connection is needed to consult them after installation. When updating a source checkout, rebuild the binary and restart its managed server after checking that no agent is active: `./swarm.sh build`, then `./swarm.sh restart --root /path/to/project`. A server already running an older binary retains its older assets. Docker users must rebuild their image using their existing installation procedure.
+
+See the [training resources](../training/casa-pizza/README.md). The graph is shown before the detailed mission summary in **Overview**; task evidence and decision controls remain available below it.
+
+The French reader also includes a 63-second graph presentation with an MP4 download. The four training modules remain available in both French and English.
+
 ## Docker
 
 Requirements: Git, Bash, a local accessible Docker Engine and Compose v2 with
