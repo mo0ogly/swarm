@@ -349,4 +349,4 @@ du projet pour un exécutant. Le choix est conservé avec la tentative, sans
 activer automatiquement les scripts ou changer les permissions. Le CLI propose
 `swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).
 
-Le [parcours produit KS](docs/PRODUCT-WORKFLOW.md) détaille les méthodes migrées, la conception, les gates et la navigation application → parcours → story → tâches.
+Le [parcours de création d’application](docs/PRODUCT-WORKFLOW.md) détaille les méthodes migrées, la conception, les gates et la navigation application → parcours → story → tâches.

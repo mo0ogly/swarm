@@ -1,4 +1,4 @@
-> KS document structure adapted for Swarm. Role permissions and engine gates apply.
+> Product workflow document structure for Swarm. Role permissions and engine gates apply.
 
 # Design — Story <id>
 

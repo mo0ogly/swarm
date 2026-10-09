@@ -3,9 +3,9 @@ name: product-planning
 description: "PRD, journeys, stories, architecture and validated plans"
 ---
 
-# KS product planning for Swarm
+# Product planning for Swarm
 
-Read `tools/agent-workflows/CONTRACT.md`. This is the planning part of the KS
+Read `tools/agent-workflows/CONTRACT.md`. This is the planning part of the product
 application lifecycle, not permission to implement or adopt anything. Preparation
 uses supplied documents only; planners and subplanners have no execution tools.
 Ask only material unanswered questions. Reuse the current adopted decisions.

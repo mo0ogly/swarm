@@ -128,4 +128,4 @@ conservez les modifications locales et examinez la divergence. Reconstruisez ave
 `install.sh` dans le mode choisi, puis relancez. Un `git pull` seul ne remplace
 pas un binaire natif déjà installé ou un conteneur existant.
 
-[Parcours produit KS et vues des graphes](PRODUCT-WORKFLOW.md).
+[Parcours de création d’application et vues des graphes](PRODUCT-WORKFLOW.md).

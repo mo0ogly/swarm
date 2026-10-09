@@ -1,27 +1,38 @@
-# KS product methods and journey graphs
+# Application creation workflow
 
 Swarm ships three role-specific methods: `product-planning`, `product-delivery`
 and `product-review`. Application, interface and new-product templates select
-`ks-product`. Canonical sources and generic document templates are versioned and
+**Application creation workflow**. Canonical sources and generic document templates are versioned and
 embedded; a new project does not need its own `.claude` directory.
 
-## Migrated logic
+## Stages and methods
 
-The `ks-*` commands are compatibility entry points to the adapted methods:
+The workflow separates product framing from the work on each feature:
+
+### Product framing: five stages
 
 | Stage | Preserved logic |
 | --- | --- |
-| PRD | Existing/greenfield/replacement mode, users, problem, operating context, value loop, scope/exclusions, measurable success; verified optional external reference |
-| Journeys/stories | End-to-end user value, stable IDs, observable criteria, dependencies, complexity; split a 5, document a 4's risk |
-| Story review | PRD coverage, scope leaks, overlaps, criteria and executable order, distinct review context and retained findings |
-| Architecture | Inspect existing architecture first; smallest justified delta; explicit greenfield choice and ADR before scaffolding |
-| Design system/screen | Existing or explicit direction, tokens/components, four states, accessibility; required system and story; external brief waits for its returned result |
-| Research | Current code, exact symbols/signatures, callers, persistence, impact, checks and open questions |
-| Plan | Bounded owned tasks, dependencies, evidence, gates, rollback, explicit adoption and return to Plan on drift |
-| Implementation | Authorised slice, meaningful failing check where relevant, actual components, scope checks and handoff |
-| Review | Same candidate and test evidence, verified APIs, design compliance, regressions, severity and missing evidence |
-| Delivery | Explicit authority, fresh checks/review, existing PR handling, branch protections and proven merge/deployment |
-| Status/help/orchestration | Inspect real state, preserve IDs/history, report unresolved gates without inventing results |
+| 1. PRD | Existing/greenfield/replacement mode, users, problem, operating context, value loop, scope/exclusions, measurable success; verified optional external reference |
+| 2. Journeys/stories | End-to-end user value, stable IDs, observable criteria, dependencies, complexity; split a 5, document a 4's risk |
+| 3. Story review | PRD coverage, scope leaks, overlaps, criteria and executable order, distinct review context and retained findings |
+| 4. Architecture | Inspect existing architecture first; smallest justified delta; explicit greenfield choice and ADR before scaffolding |
+| 5. Design system | Existing or explicit visual direction, tokens, components, interaction patterns and states; unresolved required elements block readiness |
+
+### Delivery: six stages per feature
+
+| Stage | Preserved logic |
+| --- | --- |
+| 6. Research | Current code, exact symbols/signatures, callers, persistence, impact, checks and open questions |
+| 7. Screen design | Required system and story, exact actions and four states, responsiveness and accessibility; an external brief waits for its returned result |
+| 8. Plan | Bounded owned tasks, dependencies, evidence, gates, rollback, explicit adoption and return to Plan on drift |
+| 9. Implementation | Authorised slice, meaningful failing check where relevant, actual components, scope checks and handoff |
+| 10. Review | Same candidate and test evidence, verified APIs, design compliance, regressions, severity and missing evidence |
+| 11. Delivery | Explicit authority, fresh checks/review, existing PR handling, branch protections and proven merge/deployment |
+
+Frame a focused change before entering its feature cycle. Status must reflect the
+actual stage, missing evidence and next action. **Persistent tracking of all eleven
+stages and automatic transitions between them are not yet implemented.**
 
 Sources: [canonical skills](../../.claude/skills) and
 [generic document structures](../../tools/agent-workflows/templates/ks).
@@ -37,7 +48,7 @@ can run its own checks.
 
 Markdown `validated: yes`, `Stories ready` or `Ship allowed` cannot replace engine
 adoption, fresh evidence, review policies or dispatch authority. The pack supplies
-methods; it is not a new scheduler automatically running eleven KS commands.
+methods; it is not a new scheduler automatically running eleven workflow stages.
 All three methods reach product preparation; launched roles receive their complete
 assigned method with a workflow fingerprint. This proves framing delivery, not
 model obedience or autonomous delivery of a whole application.
@@ -105,7 +116,7 @@ Acheter une pizza → Commander une pizza. The explicit fixture creates 25 journ
 agent execution, publishing or acceptance is performed; this recipe does not
 demonstrate autonomous full-application delivery by a real provider.
 
-With `ks-product`, the `product` structure is required before plan validation and adoption. Missing structure preserves the draft without marking it ready. It remains optional for legacy methods.
+With **Application creation workflow**, the `product` structure is required before plan validation and adoption. Missing structure preserves the draft without marking it ready. It remains optional for legacy methods.
 
 ## Verified views
 
@@ -116,3 +127,11 @@ Isolated UI recipe screenshots: no model call or task execution; pizza data only
 ![Shared task context and prerequisites](../screenshots/ks-product/story-en-light.jpg)
 
 ![Canonical task graph](../screenshots/ks-product/tasks-en-light.jpg)
+
+## Compatibility identifiers
+
+The user-facing name is **Application creation workflow**. Existing `ks-product`,
+`ks-feature` identifiers and `ks-*` command files remain technical aliases for
+existing calls. They do not designate another engine. Existing preparations remain
+readable; changed method content must be reapplied and its plan revalidated before
+launch.

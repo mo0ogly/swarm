@@ -268,4 +268,4 @@ worker. Choices are recorded with the attempt without automatically running
 scripts or changing permissions. The CLI provides `swarm skills list`.
 [Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).
 
-The [KS product workflow](docs/en/PRODUCT-WORKFLOW.md) documents migrated methods, design, gates and application → journey → story → task navigation.
+The [application creation workflow](docs/en/PRODUCT-WORKFLOW.md) documents migrated methods, design, gates and application → journey → story → task navigation.

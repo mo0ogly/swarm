@@ -215,6 +215,14 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	// Terminology changes use a separate snapshot, preserving earlier evidence.
+	namingManifest := "docs/product-workflow-naming-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, namingManifest)); e == nil {
+		manifestPath = namingManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

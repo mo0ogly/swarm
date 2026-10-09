@@ -33,7 +33,7 @@ les données des missions du projet source ne sont pas distribuées.
 
 ## Limites explicites
 
-La préparation APEX/KS/PDCA recherche encore les méthodes et
+La préparation, le parcours produit et l’audit recherche encore les méthodes et
 `tools/agent-workflows/CONTRACT.md` dans le projet piloté. Ces ressources ne
 sont pas copiées depuis une installation personnelle ni activées implicitement.
 Sur un nouveau projet sans méthodes, leur indisponibilité reste affichée.

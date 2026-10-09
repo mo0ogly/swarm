@@ -1,8 +1,8 @@
 ---
-description: "KS architect compatibility method adapted to the current Swarm role."
+description: "Product workflow — architect compatibility method adapted to the current Swarm role."
 ---
 
-# KS architect
+# Product workflow — architect
 
 Use `.claude/skills/product-planning/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its architect stage.

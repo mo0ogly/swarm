@@ -1,8 +1,8 @@
 ---
-description: "KS ship compatibility method adapted to the current Swarm role."
+description: "Product workflow — ship compatibility method adapted to the current Swarm role."
 ---
 
-# KS ship
+# Product workflow — ship
 
 Use `.claude/skills/product-delivery/SKILL.md` and
 `tools/agent-workflows/CONTRACT.md`, specifically its ship stage.

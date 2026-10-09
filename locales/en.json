@@ -3264,14 +3264,10 @@
   "Limite d’exécution atteinte.": "Execution limit reached.",
   "Modèle de mission introuvable.": "Mission template not found.",
   "Choisir un modèle de mission": "Choose a mission template",
-  "Modèles de mission KS": "KS mission templates",
   "Choisissez une structure, puis complétez le besoin avant de l’enregistrer. Aucun appel IA ni départ d’agent.": "Choose a structure, then complete the need before saving it. No AI call or agent launch.",
   "Type de mission": "Mission type",
   "Utiliser ce brouillon": "Use this draft",
-  "Utiliser ce brouillon avec KS": "Use this draft with KS",
   "Utiliser ce brouillon avec APEX": "Use this draft with APEX",
-  "Méthode KS disponible dans ce projet.": "KS method available in this project.",
-  "Structure KS ; préparation avec APEX. Les commandes KS ne sont pas installées ou sont indisponibles dans ce projet.": "KS structure; preparation with APEX. KS commands are not installed or are unavailable in this project.",
   "Chargement des modèles…": "Loading templates…",
   "Votre brouillon est conservé. Téléchargez-le ou commencez une nouvelle préparation avant d’utiliser un modèle.": "Your draft is preserved. Download it or start a new preparation before using a template.",
   "Brouillon de modèle à compléter — méthode : ": "Template draft to complete — method: ",
@@ -3788,7 +3784,6 @@
   "Résolution DNS : %s": "DNS lookup: %s",
   "Connexion TCP : %s": "TCP connection: %s",
   "POST %s ; modèle : %s": "POST %s; model: %s",
-  "Application complète — parcours, conception et livraison": "Full application — journeys, design and delivery",
   "Cadrage produit": "Product framing",
   "Parcours et stories": "Journeys and stories",
   "Architecture": "Architecture",
@@ -3826,5 +3821,6 @@
   "Parcours, story ou tâche": "Journey, story or task",
   "Tâches communes et non classées": "Common and unclassified tasks",
   "Objectif et critères de la story": "Story objective and criteria",
-  "Le parcours application complète exige la structure product : parcours, stories et liens vers les tâches. Le brouillon est conservé.": "The full application workflow requires product structure: journeys, stories and task links. The draft is preserved."
+  "Le parcours application complète exige la structure product : parcours, stories et liens vers les tâches. Le brouillon est conservé.": "The full application workflow requires product structure: journeys, stories and task links. The draft is preserved.",
+  "Parcours de création d’application": "Application creation workflow"
 }

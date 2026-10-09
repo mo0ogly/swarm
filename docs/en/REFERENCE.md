@@ -26,7 +26,7 @@ make frontend
 make smoke
 ```
 
-Open the session link printed by the server. APEX, KS and PDCA method resources
+Open the session link printed by the server. Planning, product workflow and audit method resources
 belong to the controlled project; the standalone repository does not bundle
 private project methods, `.swarm/` state, missions or keys. Installed agents
 have their own authentication. Custom API connections use **AI and connections**.

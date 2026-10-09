@@ -3,9 +3,9 @@ name: product-review
 description: "Independent coverage, design and candidate review"
 ---
 
-# KS product review for Swarm
+# Product review for Swarm
 
-Read `tools/agent-workflows/CONTRACT.md`. This method adapts KS review to Swarm's
+Read `tools/agent-workflows/CONTRACT.md`. This method defines product review to Swarm's
 independent, tool-free reviewer. Inspect only supplied evidence in the assigned
 context; never execute tools, rewrite stories/code, launch workers or approve your
 own candidate. Missing evidence remains unknown. Native authorised review sessions

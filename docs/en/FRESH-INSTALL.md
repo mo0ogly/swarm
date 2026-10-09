@@ -121,4 +121,4 @@ and examine the divergence. Rebuild with `install.sh` in the selected mode and
 restart. Pulling Git changes alone does not replace an installed native binary
 or a running container.
 
-[KS product workflow and graph views](PRODUCT-WORKFLOW.md).
+[Application creation workflow and graph views](PRODUCT-WORKFLOW.md).
