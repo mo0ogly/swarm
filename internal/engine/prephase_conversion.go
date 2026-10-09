@@ -154,6 +154,9 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 		if _, e := validateActionPlan(spec, true); e != nil {
 			return e
 		}
+		if e := validatePreparedProduct(p.Method, spec); e != nil {
+			return e
+		}
 		if create {
 			if e := s.apply(&w, "work.create", Request{Title: p.Title, Objective: spec.Objective, Scope: p.Brief.Text, Criteria: []string{"Chaque mission satisfait ses critères et sa gate delivery avec des preuves fraîches."}}); e != nil {
 				return e

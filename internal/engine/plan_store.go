@@ -76,12 +76,19 @@ func (s *Store) materializePlan(w *Work, review PlanReview) error {
 	}
 	prefix := "plan-" + hash([]byte(review.Source))[:10] + "-"
 	ids := []string{}
+	taskMap := map[string]string{}
 	for _, m := range ordered {
 		deps := []string{}
 		for _, id := range m.Depends {
 			deps = append(deps, prefix+id)
 		}
 		next := fmt.Sprintf("Périmètre : %s\nPreuves : %s\nGate entry : %s\nGate validation : %s\nGate delivery : %s\nConditions d’arrêt : %s\nOODA : consigner observation, orientation, décision et résultat sur blocage.\nObjectif du plan : %s\nHypothèses : %s", m.Scope, m.Proof, m.Entry, m.Validation, m.Delivery, m.Stop, review.Spec.Objective, strings.Join(review.Spec.Assumptions, " ; "))
+		if m.Phase != "" {
+			next += "\nÉtape produit : " + m.Phase
+		}
+		for _, story := range productTaskContract(review.Spec.Product, m.ID) {
+			next += fmt.Sprintf("\nStory %s — %s ; utilisateur : %s ; valeur : %s ; critères : %s ; dépendances stories : %s", story.ID, story.Title, story.User, story.Value, strings.Join(story.Criteria, " ; "), strings.Join(story.Depends, ", "))
+		}
 		for _, q := range review.Spec.Questions {
 			next += "\nDécision : " + q.Question + " → " + q.Answer
 		}
@@ -99,7 +106,8 @@ func (s *Store) materializePlan(w *Work, review PlanReview) error {
 		task.PlanMaxAttempts = m.MaxAttempts
 		task.PlanToolLimit = m.MaxToolCalls
 		ids = append(ids, id)
+		taskMap[m.ID] = id
 	}
-	w.Plans = append(w.Plans, ApprovedPlan{Source: review.Source, BriefHash: review.BriefHash, ResponseHash: review.ResponseHash, Spec: review.Spec, TaskIDs: ids, At: now()})
+	w.Plans = append(w.Plans, ApprovedPlan{Source: review.Source, BriefHash: review.BriefHash, ResponseHash: review.ResponseHash, Spec: review.Spec, TaskIDs: ids, TaskMap: taskMap, At: now()})
 	return nil
 }

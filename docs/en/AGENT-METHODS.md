@@ -2,7 +2,7 @@
 
 [Français](../AGENT-METHODS.md) · [User guide](USER-GUIDE.md)
 
-This repository includes **nine methods** for specifying, implementing, reviewing
+This repository includes **twelve methods** for specifying, implementing, reviewing
 and improving Swarm: guided change workflow, examination and improvement,
 specification writing and examination, code review, diagnosis, verification,
 replanning and lessons learned. They use explicit criteria, traceable decisions
@@ -21,6 +21,9 @@ Open Codex or Claude **in this repository**, then invoke a method:
 
 | Need | Codex | Claude |
 | --- | --- | --- |
+| Frame PRD, journeys, stories, architecture and plan | `$product-planning` | `/product-planning` |
+| Deliver authorized research, design and tasks | `$product-delivery` | `/product-delivery` |
+| Review coverage, design and evidence | `$product-review` | `/product-review` |
 | Analyze, plan and deliver a bounded change | `$apex` | `/apex` |
 | Audit with reproducible evidence | `$audit-pdca` | `/audit-pdca` |
 | Specify a need and testable requirements | `$spec-builder` | `/spec-builder` |
@@ -54,14 +57,14 @@ The existing **Prepare with AI** method selector uses:
 | Preparation method | Material provided to the model |
 | --- | --- |
 | Analysis and planning | Need analysis and planning |
+| Full application — journeys, design and delivery | Product framing, journeys/stories, architecture, design and plan; no execution in preparation |
 | Guided workflow — prepare a change | Scope, criteria and task decomposition |
 | Diagnose and fix a problem | Known facts, diagnosis and a scoped verification plan |
 | Examiner et améliorer — préparer l’examen | Audit scope, risks and verification plan |
 
 Swarm sends the entire method files and shared contract to the model. Execution
 phases remain prohibited during preparation: the model proposes a brief or plan;
-it cannot launch or accept agents. The other five methods are available in native
-Codex/Claude sessions, not as extra preparation menu buttons.
+it cannot launch or accept agents. Other methods are available in native sessions or role framing, rather than extra preparation buttons. The [product guide](PRODUCT-WORKFLOW.md) explains the adapted KS commands.
 
 The CLI exposes the same catalogue:
 
@@ -72,7 +75,7 @@ swarm --root "$PWD" --json prepare methods
 Each entry includes `available` and a `sha256` fingerprint. `audit_pdca` remains
 an alias for `audit-pdca` in Swarm, and `/audit_pdca` in Claude. Historical aliases remain accepted for older integrations; use the specification methods for new workflows.
 
-All four preparation methods are embedded in the binary and work in an empty
+All five preparation methods are embedded in the binary and work in an empty
 project, in native and Docker installations. Swarm creates no `.claude` directory
 in your project. For each file, an existing project-root override replaces the
 bundled version; an absent file uses the embedded version. Local files must be
@@ -88,9 +91,9 @@ to the provider. This does not depend on native skill discovery in Codex or Clau
 
 | Role | Included methods | Boundaries |
 | --- | --- | --- |
-| Planner and subplanner | Guided workflow, examination and improvement, specification writing and examination, replanning, diagnosis | PLAN and ACT; no tools or code changes |
-| Worker | Guided workflow, examination and improvement, verification, diagnosis, handoff and tracking templates | DO and CHECK within authorized scope; read-only for audit-only tasks |
-| Independent reviewer | Examination and improvement, code review | CHECK on supplied evidence; no tools or candidate changes |
+| Planner and subplanner | Guided workflow, examination and improvement, specification writing and examination, replanning, diagnosis, product planning | PLAN and ACT; no tools or code changes |
+| Worker | Guided workflow, examination and improvement, verification, diagnosis, handoff and tracking templates, product delivery | DO and CHECK within authorized scope; read-only for audit-only tasks |
+| Independent reviewer | Examination and improvement, code review, product review | CHECK on supplied evidence; no tools or candidate changes |
 
 The `workflow` field records version, role, method names and SHA-256 digest. Unknown
 roles and oversized framing are rejected. Methods are **embedded at build time**:
@@ -110,10 +113,10 @@ Check that you are using the intended checkout, not an older copy.
 ```text
 AGENTS.md                         Codex project instructions
 CLAUDE.md                         Claude project entry point
-.claude/skills/<name>/SKILL.md     canonical sources for all eight methods
+.claude/skills/<name>/SKILL.md     canonical sources for all twelve methods
 .agents/skills/<name>             relative link to the same method
 .claude/skills/<name>/agents/     Codex selector labels and sample prompts
-.claude/commands/                 three compatibility commands
+.claude/commands/                 native and KS compatibility commands
 tools/agent-workflows/CONTRACT.md shared rules also loaded by Swarm
 ```
 

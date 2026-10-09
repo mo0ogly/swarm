@@ -183,9 +183,9 @@ Closing the cockpit does not stop agents. An installed binary and simulated-agen
 tests do not qualify a real provider's authentication, permissions or results.
 
 Data is local under the controlled project's `.swarm/`. Keep this directory,
-authentication and session links private. This repository supplies nine
+authentication and session links private. This repository supplies twelve
 [working methods](docs/en/AGENT-METHODS.md), including planning, system examination and improvement,
-debugging, review and lessons learned. All four preparation methods work from the bundled pack in an empty project;
+debugging, review and lessons learned. All five preparation methods work from the bundled pack in an empty project;
 existing local overrides are checked before use.
 
 Method source files are tracked in [`.claude/skills/`](.claude/skills/) and
@@ -267,3 +267,5 @@ In **Start / Restart → Skills for this task**, select project methods for a
 worker. Choices are recorded with the attempt without automatically running
 scripts or changing permissions. The CLI provides `swarm skills list`.
 [Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).
+
+The [KS product workflow](docs/en/PRODUCT-WORKFLOW.md) documents migrated methods, design, gates and application → journey → story → task navigation.

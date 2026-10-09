@@ -25,7 +25,7 @@ func preparationPlanChanges(old, next ActionPlan) []PreparationPlanChange {
 		kind := "conservée"
 		if !ok {
 			kind = "ajoutée"
-		} else if !reflect.DeepEqual(prior, m) || old.Objective != next.Objective || !reflect.DeepEqual(old.Questions, next.Questions) || !reflect.DeepEqual(old.Assumptions, next.Assumptions) {
+		} else if !reflect.DeepEqual(prior, m) || productTaskChanged(old.Product, next.Product, m.ID) || old.Objective != next.Objective || !reflect.DeepEqual(old.Questions, next.Questions) || !reflect.DeepEqual(old.Assumptions, next.Assumptions) {
 			kind = "modifiée"
 		}
 		out = append(out, PreparationPlanChange{m.ID, kind, m.Title})
@@ -92,6 +92,9 @@ func (s *Store) revisePreparedMissions(tx *sql.Tx, w *Work, p *Preparation, r Pr
 		return e
 	}
 	if _, e := validateActionPlan(spec, true); e != nil {
+		return e
+	}
+	if e := validatePreparedProduct(p.Method, spec); e != nil {
 		return e
 	}
 	temp := Work{Tasks: []Task{}}

@@ -35,6 +35,7 @@ const PilotGraph = (() => {
  }
  function preferences(v={}) {
   return {view:['agents','dependencies'].includes(v.view)?v.view:'dependencies',
+	productLevel:['overview','journey','story','common','all'].includes(v.productLevel)?v.productLevel:'overview',productKey:typeof v.productKey==='string'?v.productKey.slice(0,160):'',
    orientation:v.orientation==='TB'?'TB':'LR',detail:v.detail==='detailed'?'detailed':'simple',
    groups:Object.fromEntries(['En activité','À examiner','Historique','À préparer'].filter(k=>typeof v.groups?.[k]==='boolean').map(k=>[k,v.groups[k]])),
    grouped:v.grouped===true,filter:['all','active','unknown','review','waiting','finished'].includes(v.filter)?v.filter:'all',

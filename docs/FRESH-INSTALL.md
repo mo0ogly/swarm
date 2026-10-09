@@ -79,7 +79,7 @@ Ne désactivez pas la vérification TLS pour masquer une autorité manquante.
 1. Ouvrir le cockpit, puis **Préparer un projet**.
 2. Donner un nom et un besoin, puis **Enregistrer le besoin**.
 3. Ouvrir **Préparer avec l’IA**. **Analyse et planification** correspond à APEX.
-4. Vérifier les quatre méthodes : analyse et planification, parcours guidé,
+4. Vérifier les cinq méthodes : analyse et planification, parcours guidé,
    diagnostic, examen et amélioration. Elles sont embarquées dans Swarm ; un
    projet vide n’a pas besoin d’un dossier `.claude` ou d’une installation Claude.
    Les profils de consignes du projet sont distincts : dans un projet vide,
@@ -116,7 +116,7 @@ docker compose --env-file deploy/install.env exec -T swarm \
   swarm --root /workspace --json prepare methods
 ```
 
-Les quatre entrées doivent contenir `available: true` et une empreinte `sha256`.
+Les cinq entrées doivent contenir `available: true` et une empreinte `sha256`.
 Si une méthode locale personnalisée existe, elle est prioritaire. Un lien
 symbolique, un fichier invalide ou un accès refusé reste une erreur explicite ;
 corrigez ce fichier plutôt que de changer le périmètre du projet. Voir les
@@ -127,3 +127,5 @@ serveur, sauvegardez le projet, puis utilisez `git pull --ff-only`. Si Git refus
 conservez les modifications locales et examinez la divergence. Reconstruisez avec
 `install.sh` dans le mode choisi, puis relancez. Un `git pull` seul ne remplace
 pas un binaire natif déjà installé ou un conteneur existant.
+
+[Parcours produit KS et vues des graphes](PRODUCT-WORKFLOW.md).

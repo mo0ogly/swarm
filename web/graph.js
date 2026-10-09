@@ -79,10 +79,10 @@ function drawPilotGraph(){
  const canvas=$('pilot-canvas'),state=Pilot.state,tasks=snapshot.work.tasks;
  const tasksByID=new Map(tasks.map(task=>[task.id,task])),selectedTask=Pilot.selectedTask();
  const shown=PilotGraph.visible(tasks,state.collapsed);
- const kept=tasks.filter(t=>(state.search.trim()||shown.has(t.id))&&(Pilot.matches(t,null)||snapshot.agents.some(x=>x.agent.task_id===t.id&&Pilot.matches(t,x.agent))));
+ const kept=tasks.filter(t=>ProductViews.contains(t.id)&&(state.search.trim()||shown.has(t.id))&&(Pilot.matches(t,null)||snapshot.agents.some(x=>x.agent.task_id===t.id&&Pilot.matches(t,x.agent))));
  const ids=new Set(kept.map(t=>t.id));
  const links=(snapshot.pilotage?.edges||[]).filter(e=>ids.has(e.from_task_id)&&ids.has(e.to_task_id)&&!state.collapsed.includes(e.from_task_id));
- const organization=PilotGraph.organization(snapshot.work,kept,snapshot.paused);
+ const organization=ProductViews.organization(kept);
  const shape=JSON.stringify([work,organization.nodes.map(n=>[n.id,n.title,n.tone]),organization.edges,kept.map(t=>[t.id,t.depends]),links.map(e=>[e.from_task_id,e.to_task_id]),state.orientation,state.detail,state.collapsed]);
  const height=state.detail==='detailed'?324:210,width=310;
  let restoredViewport=null,restoredFocus=null;

@@ -22,7 +22,7 @@ func TestPreparationBundledMethodsInEmptyProject(t *testing.T) {
 	w := httptest.NewRecorder()
 	h.ServeHTTP(w, r)
 	var methods []PreparationMethod
-	if err := json.Unmarshal(w.Body.Bytes(), &methods); err != nil || w.Code != 200 || len(methods) != 4 {
+	if err := json.Unmarshal(w.Body.Bytes(), &methods); err != nil || w.Code != 200 || len(methods) != 5 {
 		t.Fatalf("catalogue: %d %s %v", w.Code, w.Body.String(), err)
 	}
 	for _, m := range methods {

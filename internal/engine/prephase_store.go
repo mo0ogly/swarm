@@ -162,7 +162,7 @@ func (s *Store) preparationCommand(r PreparationRequest) (p Preparation, err err
 		if p.Method == "audit_pdca" {
 			p.Method = "audit-pdca"
 		}
-		if p.Method != "apex" && p.Method != "ks-feature" && p.Method != "audit-pdca" && p.Method != "debug" {
+		if p.Method != "apex" && p.Method != "ks-feature" && p.Method != "ks-product" && p.Method != "audit-pdca" && p.Method != "debug" {
 			return p, preparationError("method_unavailable", "Méthode inconnue.")
 		}
 		if m, err := s.preparationMethod(p.Method); err == nil {
@@ -406,6 +406,9 @@ func (s *Store) editPreparation(p *Preparation, r PreparationRequest, d **Prepar
 			return preparationError("invalid_plan", e.Error())
 		}
 		if _, e = validateActionPlan(plan, true); e != nil {
+			return preparationError("invalid_plan", e.Error())
+		}
+		if e = validatePreparedProduct(p.Method, plan); e != nil {
 			return preparationError("invalid_plan", e.Error())
 		}
 		p.Verdict = &PreparationVerdict{PlanHash: doc.Hash, BriefHash: p.Brief.Hash, MethodHash: m.Hash, At: now()}
