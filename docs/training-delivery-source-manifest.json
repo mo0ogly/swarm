@@ -2,8 +2,8 @@
   "schema_version": 1,
   "manifest_status": "TRAINING_DELIVERY_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
   "base_commit": "85e72f848936de226367b79761da35d3836f7526",
-  "candidate_id": "85e72f848936de226367b79761da35d3836f7526+sha256:8284ddcb7899ce91e82885db62229b25040e7afd598a365fb28b036d6b2da125",
-  "candidate_digest": "8284ddcb7899ce91e82885db62229b25040e7afd598a365fb28b036d6b2da125",
+  "candidate_id": "85e72f848936de226367b79761da35d3836f7526+sha256:844cbffe7cc19705c7e1f15dce2f62cbcd62aad5427a9c9bd21946ec806a1db2",
+  "candidate_digest": "844cbffe7cc19705c7e1f15dce2f62cbcd62aad5427a9c9bd21946ec806a1db2",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/product-workflow-naming-manifest.json",
   "requirements": [
@@ -309,8 +309,8 @@
     },
     {
       "path": ".dockerignore",
-      "kind": "harness",
-      "sha256": "f1ffdf7444b67537e1f3fc17c398b64cb5036b2df04569590a142e0889d18797"
+      "kind": "source",
+      "sha256": "591183546ced7aade149a3012f2145c8504455f0b95d3d138c8d2f8d133f6f78"
     },
     {
       "path": ".github/workflows/ci.yml",

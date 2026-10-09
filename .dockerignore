@@ -24,6 +24,10 @@
 !tools/agent-workflows/templates/preparations.json
 !web/
 !web/**
+!docs/
+!docs/training/
+!docs/training/casa-pizza/
+!docs/training/casa-pizza/**
 !deploy/
 !deploy/entrypoint.sh
 !LICENSE
