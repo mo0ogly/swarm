@@ -77,7 +77,9 @@ Préparer : 2 contrat ; 3 conflit ; 4 autorisation ; 5 fournisseur ou méthode i
 `
 
 func mainHelpText() string {
-	return uiText(help) + uiText("Brouillons du plan : swarm plan draft show|export|import|compare|preview|apply|undo|redo TRAVAIL [BROUILLON]\n")
+	base := uiText(help)
+	base = strings.Replace(base, "swarm automation", "swarm storage-retry show|apply [--input configuration.json]\nswarm automation", 1)
+	return base + uiText("Brouillons du plan : swarm plan draft show|export|import|compare|preview|apply|undo|redo TRAVAIL [BROUILLON]\n")
 }
 
 func readInput(path string) ([]byte, error) {
@@ -325,6 +327,12 @@ func run(args []string, out, errOut io.Writer) int {
 	}
 	if pos[0] == "run-limits" {
 		if e := s.runLimitsCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "storage-retry" {
+		if e := s.storageRetryCLI(pos, input, out); e != nil {
 			return fail(e)
 		}
 		return 0

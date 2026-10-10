@@ -1,6 +1,20 @@
 'use strict';
 const tr_web_admin_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 
+Object.assign(globalThis.SwarmEnglish || {}, {
+ 'Attente du stockage SQLite':'SQLite storage wait',
+ 'Ces réglages traitent uniquement la cause stockage sqlite_busy. Ils ne relancent ni fournisseur ni agent et n’affichent aucun secret ou contenu de requête.':'These settings only handle the sqlite_busy storage cause. They do not restart a provider or agent and show no secret or query content.',
+ 'Reprises après contention':'Retries after contention',
+ 'Délai entre reprises (ms)':'Delay between retries (ms)',
+ 'Attente SQLite par tentative (ms)':'SQLite wait per attempt (ms)',
+ 'Enregistrer l’attente':'Save wait settings',
+ 'Chargement des valeurs effectives…':'Loading effective values…',
+ 'Source':'Source', 'Persisté':'Persisted', 'oui':'yes', 'non':'no', 'Valeurs configurées':'Configured values', 'Valeurs effectives':'Effective values',
+ 'Cause stockage visible':'Visible storage cause', 'Attente totale maximale':'Maximum total wait',
+ 'Valeurs effectives chargées.':'Effective values loaded.',
+ 'Réglages de stockage enregistrés et relus.':'Storage settings saved and read back.',
+});
+
 const runLimitsFieldList = [
  ['observation_mode', 'Mode d’exécution'],
  ['silence_seconds', 'Silence maximal avant relance'],
@@ -10,6 +24,64 @@ const runLimitsFieldList = [
  ['max_consecutive_errors', 'Erreurs consécutives tolérées'],
 ];
 let runLimitsAdmin = null, runLimitsLoading = false;
+let storageRetryLoading = false;
+
+function mountStorageRetryAdmin() {
+ if ($('storage-retry-admin')) return;
+ const article=node('article',undefined,'card'); article.id='storage-retry-admin'; article.setAttribute('aria-labelledby','storage-retry-title');
+ const title=node('h3',tr_web_admin_js('Attente du stockage SQLite')); title.id='storage-retry-title';
+ const description=node('p',tr_web_admin_js('Ces réglages traitent uniquement la cause stockage sqlite_busy. Ils ne relancent ni fournisseur ni agent et n’affichent aucun secret ou contenu de requête.'));
+ const form=node('form',undefined,'toolbar'); form.id='storage-retry-form';
+ const addNumber=(id,name,label,min,max)=>{const wrap=node('label',tr_web_admin_js(label));wrap.htmlFor=id;const input=node('input');input.id=id;input.name=name;input.type='number';input.min=String(min);input.max=String(max);input.step='1';input.required=true;wrap.append(input);form.append(wrap)};
+ addNumber('storage-busy-retries','busy_retries','Reprises après contention',0,10);
+ addNumber('storage-retry-delay','busy_retry_delay_ms','Délai entre reprises (ms)',0,1000);
+ addNumber('storage-busy-timeout','busy_timeout_ms','Attente SQLite par tentative (ms)',1,60000);
+ const save=node('button',tr_web_admin_js('Enregistrer l’attente'),'primary');save.id='storage-retry-save';save.type='submit';form.append(save);
+ const state=node('p',tr_web_admin_js('Chargement des valeurs effectives…'),'notice info');state.id='storage-retry-state';state.setAttribute('role','status');state.tabIndex=-1;
+ const effective=node('pre');effective.id='storage-retry-effective';effective.tabIndex=0;effective.hidden=true;
+ article.append(title,description,form,state,effective);
+ $('admin').insertBefore(article,$('admin-scope-form'));
+ form.addEventListener('submit',saveStorageRetryAdmin);
+}
+
+function storageRetryDescription(data) {
+ const policy=p=>`busy_retries=${p.busy_retries}\nbusy_retry_delay_ms=${p.busy_retry_delay_ms}\nbusy_timeout_ms=${p.busy_timeout_ms}`;
+ return [
+  tr_web_admin_js('Source')+' : '+data.source,
+  tr_web_admin_js('Persisté')+' : '+tr_web_admin_js(data.persisted?'oui':'non'),
+  tr_web_admin_js('Valeurs configurées')+' :\n'+policy(data.configured),
+  tr_web_admin_js('Valeurs effectives')+' :\n'+policy(data.effective),
+  tr_web_admin_js('Cause stockage visible')+' : '+data.storage_failure_cause,
+  tr_web_admin_js('Attente totale maximale')+' : '+data.maximum_total_wait_ms+' ms',
+ ].join('\n\n');
+}
+
+async function loadStorageRetryAdmin() {
+ if(storageRetryLoading)return; storageRetryLoading=true;
+ const state=$('storage-retry-state');state.className='notice info';state.textContent=tr_web_admin_js('Chargement des valeurs effectives…');
+ try{
+  const data=await api('/api/v1/storage-retry');
+  $('storage-busy-retries').value=data.configured.busy_retries;
+  $('storage-retry-delay').value=data.configured.busy_retry_delay_ms;
+  $('storage-busy-timeout').value=data.configured.busy_timeout_ms;
+  $('storage-retry-effective').textContent=storageRetryDescription(data);$('storage-retry-effective').hidden=false;
+  state.textContent=tr_web_admin_js('Valeurs effectives chargées.');
+ }catch(e){state.className='notice alert';state.textContent=e.message}
+ finally{storageRetryLoading=false}
+}
+
+async function saveStorageRetryAdmin(event) {
+ event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;
+ const state=$('storage-retry-state'),save=$('storage-retry-save');state.className='notice info';save.disabled=true;
+ try{
+  const data=await api('/api/v1/storage-retry',{schema_version:1,busy_retries:Number($('storage-busy-retries').value),busy_retry_delay_ms:Number($('storage-retry-delay').value),busy_timeout_ms:Number($('storage-busy-timeout').value)});
+  $('storage-retry-effective').textContent=storageRetryDescription(data);$('storage-retry-effective').hidden=false;
+  state.textContent=tr_web_admin_js('Réglages de stockage enregistrés et relus.');state.focus();
+ }catch(e){state.className='notice alert';state.textContent=e.message;state.tabIndex=-1;state.focus()}
+ finally{save.disabled=false}
+}
+
+mountStorageRetryAdmin();
 
 // Open the exact task scope; never silently edit limits or restart an agent.
 function openTaskRunLimits(taskID) {
@@ -32,6 +104,7 @@ function runLimitsValueRow(values) {
  return runLimitsFieldList.map(([key, label]) => tr_web_admin_js(label) + ' : ' + runLimitsDisplay(key, values[key])).join('\n');
 }
 async function loadRunLimitsAdmin() {
+ loadStorageRetryAdmin();
  if (runLimitsLoading) return; runLimitsLoading = true;
  $('admin-state').className = 'notice info'; $('admin-state').textContent = tr_web_admin_js('Chargement de cette portée…');
  try {

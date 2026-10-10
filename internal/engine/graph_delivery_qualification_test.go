@@ -231,6 +231,12 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	sqliteIntegration := "docs/sqlite-main-integration-source-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, sqliteIntegration)); e == nil {
+		manifestPath = sqliteIntegration
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

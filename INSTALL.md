@@ -619,3 +619,8 @@ active ; `open` transmet le lien privé au navigateur sans l’imprimer.
 Pour Docker, utilisez Docker Compose, pas ce lanceur. Voir le
 [guide des overrides et des IA sur site](docs/ON-PREMISE-AI.md) pour les
 certificats internes, DNS, proxies, montages et la conservation des connexions.
+
+
+### Attente SQLite configurable
+
+Dans **Administration → Attente du stockage SQLite**, consulter ou régler les reprises, le délai entre reprises et le délai SQLite par tentative. La CLI expose les mêmes valeurs persistées via `swarm storage-retry show` et `swarm storage-retry apply --input configuration.json`. Ces paramètres ne relancent ni fournisseur ni agent. Voir [le guide de reprise SQLite](docs/SQLITE-CONTENTION-RECOVERY.md).

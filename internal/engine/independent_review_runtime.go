@@ -15,6 +15,68 @@ import (
 
 const independentReviewSchema = `{"type":"object","additionalProperties":false,"properties":{"reason":{"type":"string","minLength":8,"maxLength":1000,"description":"Concise rationale, at most 1000 characters; discuss coverage and material defects, not a transcript of every source."},"criteria":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"index":{"type":"integer"},"verdict":{"type":"string","enum":["pass","fail","unknown"]},"evidence":{"type":"string","minLength":8,"maxLength":1000,"description":"For pass: one short contiguous verbatim excerpt copied from the supplied report. No paraphrase, ellipsis, concatenation or added quotation marks. Keep analysis in reason. For fail or unknown: explain the defect or missing evidence."}},"required":["index","verdict","evidence"]}}},"required":["reason","criteria"]}`
 
+type pendingIndependentReviewResult struct {
+	Schema int               `json:"schema_version"`
+	Work   string            `json:"work_id"`
+	Task   string            `json:"task_id"`
+	Review IndependentReview `json:"review"`
+}
+
+func (s *Store) pendingIndependentReviewResultPath(id string) (string, error) {
+	if !safeName(id) {
+		return "", fmt.Errorf("identifiant de revue invalide")
+	}
+	return filepath.Join(s.root, ".swarm", "independent-review-result-"+id+".json"), nil
+}
+
+// The provider has already been charged when this journal is written. Keeping
+// its bounded result outside SQLite lets a later pass finish the same database
+// event after contention without calling the provider or spending an attempt.
+func (s *Store) savePendingIndependentReviewResult(work, task string, r IndependentReview) error {
+	path, err := s.pendingIndependentReviewResultPath(r.ID)
+	if err != nil {
+		return err
+	}
+	raw, err := json.Marshal(pendingIndependentReviewResult{Schema: 1, Work: work, Task: task, Review: r})
+	if err != nil {
+		return err
+	}
+	if len(raw) > 256*1024 {
+		return fmt.Errorf("résultat de revue supérieur à 256 Kio ; reprise refusée")
+	}
+	return atomicWrite(path, raw)
+}
+
+func (s *Store) loadPendingIndependentReviewResult(work, task string, running IndependentReview) (IndependentReview, bool, error) {
+	path, err := s.pendingIndependentReviewResultPath(running.ID)
+	if err != nil {
+		return IndependentReview{}, false, err
+	}
+	info, err := os.Lstat(path)
+	if os.IsNotExist(err) {
+		return IndependentReview{}, false, nil
+	}
+	if err != nil {
+		return IndependentReview{}, false, err
+	}
+	if !info.Mode().IsRegular() || info.Size() > 256*1024 {
+		return IndependentReview{}, false, fmt.Errorf("journal de résultat de revue invalide")
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return IndependentReview{}, false, err
+	}
+	var pending pendingIndependentReviewResult
+	if err = strict(raw, &pending); err != nil {
+		return IndependentReview{}, false, fmt.Errorf("journal de résultat de revue illisible : %w", err)
+	}
+	r := pending.Review
+	if pending.Schema != 1 || pending.Work != work || pending.Task != task || r.ID != running.ID || r.Attempt != running.Attempt || r.Producer != running.Producer || r.Reviewer != running.Reviewer || r.Report != running.Report || r.Digest != running.Digest || r.Contract != running.Contract || r.Started != running.Started || r.State == "running" || r.Finished == "" {
+		return IndependentReview{}, false, fmt.Errorf("journal de résultat de revue non attribuable ; reprise refusée")
+	}
+	return r, true, nil
+}
+
 func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCriterion, error) {
 	var reply struct {
 		Reason   string            `json:"reason"`
@@ -94,6 +156,13 @@ func (s *Store) independentReviewStep(work string) error {
 		}
 		if old := t.IndependentReview; old != nil && old.Attempt == attempt.ID {
 			if old.State == "running" {
+				pending, found, err := s.loadPendingIndependentReviewResult(work, t.ID, *old)
+				if err != nil {
+					return err
+				}
+				if found {
+					return s.saveIndependentReview(work, t.ID, pending)
+				}
 				old.State = "error"
 				old.Reason = "Vérification interrompue avant enregistrement du verdict. Aucun nouvel appel automatique."
 				old.Finished = now()
@@ -244,6 +313,9 @@ Retourne seulement {"reason":"synthèse française claire","criteria":[{"index":
 		if callErr != nil {
 			record.State = "error"
 			record.Reason = guardBlock(callErr.Error(), 2000)
+		}
+		if e = s.savePendingIndependentReviewResult(work, t.ID, record); e != nil {
+			return e
 		}
 		return s.saveIndependentReview(work, t.ID, record)
 	}

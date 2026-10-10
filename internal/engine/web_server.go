@@ -393,6 +393,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	s.registerPlanning(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
 	s.registerRunLimitsAdmin(mux, send, fail)
+	s.registerStorageRetryAdmin(mux, send, fail)
 	registerGraphDraftHTTP(s, mux, send, fail)
 	registerAutomationHTTP(s, mux, send, fail)
 	registerAutomationExternalHTTP(s, mux, time.Now)
