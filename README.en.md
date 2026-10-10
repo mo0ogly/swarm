@@ -89,9 +89,11 @@ An **independent AI reviewer** examines reports in a separate session. Its opini
 does not replace required deterministic checks or chosen human acceptance.
 
 This organization draws on the planning/worker separation discussed in
-[Cursor's self-driving codebases research](https://cursor.com/blog/self-driving-codebases).
-Swarm's independent reviewer is an additional design choice, not a claim that it
-reproduces every part of Cursor's final architecture.
+[Cursor's January research](https://cursor.com/blog/scaling-agents) and
+[February architecture](https://cursor.com/blog/self-driving-codebases).
+The requested target includes an end-of-cycle judge and fresh iterations. Swarm's
+independent candidate reviewer does not by itself demonstrate those mechanisms;
+full alignment remains unproven.
 
 ## See the interface
 

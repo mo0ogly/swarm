@@ -83,10 +83,13 @@ Le moteur doit maintenir les huit invariants suivants, quelles que soient les
 fautes F1 à F8 et F4e.
 
 - **I1 — Effet unique par intention.** Deux requêtes portant le même `event_id`
-  produisent au plus une mutation ; la seconde renvoie le résultat de la
-  première.
+  et le même contenu produisent au plus une mutation. Le rejeu exact renvoie l’état
+  courant du travail, pas nécessairement le résultat historique initial ; réutiliser
+  l’identifiant avec un contenu différent est un conflit.
 - **I2 — Pas de mutation sur un état périmé.** Une requête dont
-  `expected_revision` diffère de la révision courante est refusée sans effet.
+  `expected_revision` diffère de la révision courante est refusée sans nouvelle
+  mutation. Le rejeu exact d’un événement déjà appliqué est reconnu avant ce contrôle
+  et peut donc réussir malgré une révision ancienne, sans second effet.
 - **I3 — Acceptation liée au candidat.** Une tâche n'est acceptée que si chacun
   de ses critères est couvert par une preuve produite par la tentative
   courante, sur le candidat dont l'empreinte est la sienne au moment de
@@ -95,15 +98,20 @@ fautes F1 à F8 et F4e.
   atomique, idempotent, et réserve un espace de travail qu'aucune autre
   tentative active ne recouvre.
 - **I5 — Limite atteinte, jamais succès.** L'épuisement d'un budget, ou
-  l'impossibilité de lire la consommation, bloque la tâche ; il ne peut pas
-  produire une acceptation.
+  l’impossibilité d’établir un compteur nécessaire à une limite configurée, bloque
+  la tâche ; il ne peut pas produire une acceptation. Un coût monétaire inconnu,
+  conservé comme inconnu, ne signifie pas que tous les compteurs sont illisibles.
 - **I6 — Reprise justifiée.** Après un échec attribué à l'environnement, une
-  nouvelle tentative exige une preuve nouvelle que la cause est levée, et
-  conserve les limites déjà consommées.
-- **I7 — Aucun texte de modèle exécuté.** Les contrôles sont des commandes
+  reprise doit être justifiée par une cause levée et conserve les limites déjà
+  consommées. C’est une exigence de conception : l’opération explicite actuelle
+  enregistre un motif opérateur, sans prouver indépendamment le rétablissement
+  du service. La campagne du chapitre 7 vérifie seulement l’absence de régénération.
+- **I7 — Commandes de contrôle structurées.** Les contrôles sont des commandes
   structurées, tirées d'une liste de programmes autorisés et exécutées sans
   interpréteur de commandes ; aucun texte produit par un modèle (plan,
-  rapport, réponse) n'est interprété comme une commande.
+  rapport, réponse) n’est directement interprété comme une commande de contrôle.
+  Cette propriété ne signifie pas qu’aucun code généré par modèle n’est exécuté
+  par les outils des agents ou par un programme autorisé.
 - **I8 — Confirmation de ce qui a été montré.** Une modification soumise à
   confirmation humaine n'est appliquée que si la confirmation porte sur
   l'aperçu exact présenté ; tout changement intervenu entre-temps impose un
@@ -153,7 +161,7 @@ exprime une hypothèse de conception ; le chapitre 6 la confronte aux mesures.
 | F7 Conducteur figé puis réveillé | I4, I2 | Mise à l'écart d'un opérateur dont le mandat a expiré |
 | F8 Résultat ancien présenté | I3 | Rejet d'une instruction supplantée |
 | — | I7 | Séparation entre instruction et exécution |
-| — | I8 | Contrôle à quatre yeux |
+| — | I8 | Confirmation liée à l’aperçu exact, sans exigence de deux personnes distinctes |
 
 ## 3.7 Ce que le modèle ne garantit pas
 

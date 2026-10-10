@@ -14,13 +14,11 @@ chiffre hors résumé : lire le texte avant de l'écrire dans l'article.
 ## 1. Plus proche de notre contribution
 
 ### ACRFence — reprise après checkpoint et effets irréversibles
-- Zheng, Yang, Zhang, Quinn. *ACRFence: Preventing Semantic Rollback Attacks in Agent Checkpoint-Restore*. arXiv:2603.20625, 21 mars 2026, atelier CoDAIM 2026. [arXiv](https://arxiv.org/abs/2603.20625) — **texte**.
-- Constat : les cadres d'agents conseillent de rendre les appels d'outils « sûrs à réessayer », mais « All existing protection mechanisms...share the same assumption: *the caller will send identical requests on retry*. LLM agents violate this assumption. »
+- Zheng, Yang, Zhang, Quinn. *ACRFence: Preventing Semantic Rollback Attacks in Agent Checkpoint-Restore*. arXiv:2603.20625, 21 mars 2026, atelier CoDAIM 2026. [arXiv](https://arxiv.org/abs/2603.20625) — **texte**. retry*. LLM agents violate this assumption. »
 - Menaces : *Action Replay* (un crash provoqué après un paiement réussi fait réémettre le paiement « with a fresh reference ID ») et *Authority Resurrection* (réutilisation d'une approbation à usage unique après retour arrière).
-- Mécanisme : proxy MCP + journal d'effets des appels irréversibles (eBPF) ; après restauration, « a lightweight *analyzer LLM* compares the new tool call against the logged entry » → rejeu de la réponse enregistrée si équivalent, blocage si différent.
-- Évaluation : Claude Code CLI avec Qwen3-32B, services simulés ; Action Replay : 10/10 essais avec checkpoint produisent un doublon, 0/10 sans checkpoint ; 12 cadres recensés comme exposés.
-- **Position par rapport à nous** : même problème que notre faute F3/F1 (crash ou relance après un paiement réussi). Différence de conception : ACRFence juge l'équivalence par un LLM, donc de façon non déterministe ; notre approche retire au LLM tout droit de paiement et confie l'effet à un règlement déterministe dont la clé dérive de l'identité métier (fournisseur, facture), pas de la requête générée. À citer en premier ; notre banc doit montrer ce que cette différence change, sans le présumer.
-
+- Mécanisme : proxy MCP + journal d
+- Constat : les cadres d'agents conseillent de rendre les appels d'outils « sûrs à réessayer », mais « All existing protection mechanisms...share the same assumption: *the caller will send identical requests on'effets des appels irréversibles (eBPF) ; après restauration, « a lightweight *analyzer LLM* compares the new tool call against the logged entry » → rejeu de la réponse enregistrée si équivalent, blocage si différent.
+- Évaluation : Claude Code CLI avec Qwen3-ok
 ### Safe to Resume? — continuité d'exécution et retour arrière
 - Wu, Li, Jiang, Niu, Wang, Zhang. *Safe to Resume? Breaking Execution Continuity of Agent Execution via Rollback*. arXiv:2608.29381, 29 août 2026, cs.CR. [arXiv](https://arxiv.org/abs/2608.29381) — **texte**.
 - Cinq modes (SF1 état interne incomplet ; SF2 état incohérent ; SF3 décalage avec l'état externe ; SF4 rejeu non déterministe non lié ; SF5 « action produces effect outside recovery boundary, but rollback removes internal record that action occurred »).
@@ -154,3 +152,79 @@ affirmation qu'après la campagne de mesures.
 3. **MAST** donne la base de la taxonomie d'attribution ; la classe « faute du moteur » est notre extension.
 4. **Textes intégraux lus** : ACRFence, Safe to Resume?, RAILS, Policies on Paths, MAST, Design Patterns (passages ciblés). Restent au niveau du résumé : AgentSpec, AgenticRei, What Can Be Enforced?, CaMeL, Compositional Policy Violations, Workflow fidelity, Governing FinTech, τ-bench ; PEP MCP indirect.
 5. **Motivation chiffrée disponible** : Safe to Resume? (93,8 % / 96,9 % d'échecs sur effets externes), ACRFence (10/10 doublons), Workflow fidelity (10 modèles sur 18 sautent la confirmation).
+
+
+## 5. Moteur Swarm — sources industrielles actualisées au 10 octobre 2026
+
+Priorité demandée : **Cursor**, puis comparaison avec Google/Gemini, OpenAI et Anthropic.
+Les références de janvier et février sont conservées. Les publications suivantes complètent
+la recherche ; leur seule présence ne change ni l’architecture adoptée ni les permissions.
+Les identifiants ci-dessous stabilisent la traçabilité des sources, pas des tâches de mission.
+Toutes les pages primaires ont été consultées le 10 octobre 2026 ; niveau **texte** : passages
+techniques pertinents lus, sans exécution de leurs exemples ni reproduction de leurs résultats.
+
+### Cursor — corpus prioritaire
+
+| ID | Date et source primaire | Apport décrit | Question à tester dans Swarm |
+|---|---|---|---|
+| SRC-CUR-01 | 14 janvier 2026 — [Scaling long-running autonomous coding](https://cursor.com/blog/scaling-agents) [Lin 2026c] | Planificateurs et workers, juge de cycle, itérations fraîches | JAN-1..JAN-7 ; distinguer juge et revue candidat |
+| SRC-CUR-02 | 5 février 2026 — [Towards self-driving codebases](https://cursor.com/blog/self-driving-codebases) [Lin 2026a] | Hiérarchie continue, remise au propriétaire, retrait de l’intégrateur | FEB-1..FEB-4 ; relier découvertes et décisions persistées |
+| SRC-CUR-03 | 20 juillet 2026 — [Agent swarms and the new model economics](https://cursor.com/blog/agent-swarm-model-economics) [Lin 2026b] | Décisions partagées, résolution des conflits par tiers, revues complémentaires, modèles par rôle | Mesurer conflits, fraîcheur des décisions et coût par résultat accepté |
+| SRC-CUR-04 | 30 avril 2026 — [Continually improving our agent harness](https://cursor.com/blog/continually-improving-agent-harness) [Heule-Katz 2026] | Contexte dynamique et évaluation des évolutions du moteur selon les modèles | Comparer deux variantes à données et budget comparables |
+| SRC-CUR-05 | 23 septembre 2026 — [Improved token efficiency for longer agent runs](https://cursor.com/blog/improved-token-efficiency) [Katz et al. 2026] | Réduction du contexte répété, chargement des outils, cache et délégation | Mesurer contexte, latence et qualité sans perdre de preuve |
+
+**Évolution à préserver.** Janvier expose un juge de cycle ; février le retire dans une
+évolution intermédiaire et décrit un système final continu. Juillet introduit notamment un
+réconciliateur de documents et un tiers pour les conflits de fusion : ce rôle ne peut être
+confondu automatiquement avec l’ancien intégrateur global. Il faut comparer leurs responsabilités
+et leur effet sur le débit. JAN-4/JAN-5 restent conservés dans le cadrage Swarm courant ; leur
+articulation avec le fonctionnement continu doit être explicitée. Les publications ne prescrivent
+pas une unique architecture immuable. Les modèles et coûts rapportés sont ceux des expériences
+Cursor, pas un classement actuel ni une mesure de Swarm.
+
+### Google / Gemini — contrôle des workflows et recherche
+
+| ID | Date et source primaire | Apport décrit | Limite et application envisagée |
+|---|---|---|---|
+| SRC-GOO-01 | 1er juillet 2026 — [Why we built ADK 2.0](https://developers.googleblog.com/why-we-built-adk-20/) [Google ADK 2026] | Séparation du routage déterministe et du raisonnement, contexte par nœud, délégation spécialisée | Comparer aux transitions Go et aux permissions Swarm ; les métriques d’exemple utilisent des API simulées |
+| SRC-GOO-02 | 21 avril 2026 — [Deep Research Max](https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/) [Google Deep Research 2026] | Recherche autonome longue, sources externes et connexions MCP | Utile à l’exploration documentaire ; aucune preuve d’un moteur de développement collectif conforme à Swarm |
+
+Gemini désigne ici les capacités du modèle et de recherche ; ADK désigne le moteur d’orchestration.
+Éviter de comparer une fonctionnalité du chatbot avec une garantie transactionnelle du moteur.
+L’annonce d’un produit et le code illustratif ne démontrent pas une reprise exactement une fois.
+
+### OpenAI — boucle d’agent et environnement vérifiable
+
+| ID | Date et source primaire | Apport décrit | Application à évaluer |
+|---|---|---|---|
+| SRC-OAI-01 | 23 janvier 2026 — [Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/) [Bolin 2026] | Boucle modèle/outils, assemblage du contexte et compaction | Comparer collecte du contexte, arrêt et persistance ; fin de tour ≠ acceptation Swarm |
+| SRC-OAI-02 | 11 février 2026 — [Harness engineering](https://openai.com/index/harness-engineering/) [Lopopolo 2026] | Documentation navigable, application observable, contrôles d’architecture et boucles de revue | Vérifier accès réel aux preuves et environnement par candidat ; les compromis de fusion ne valent pas autorisation de retirer nos contrôles |
+
+Ces retours décrivent des environnements particuliers et leurs résultats internes. Ils ne
+prouvent ni l’autonomie de Swarm ni la validité de ses contrats de reprise ou d’acceptation.
+
+### Anthropic — évaluation séparée et reprise durable
+
+| ID | Date et source primaire | Apport décrit | Application à évaluer |
+|---|---|---|---|
+| SRC-ANT-01 | 24 mars 2026 — [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) [Rajasekaran 2026] | Planificateur, générateur et évaluateur, contrat par étape ; gestion du contexte dépendante du modèle | Recette indépendante sur interactions réelles ; ne pas imposer un reset à tous les modèles par analogie |
+| SRC-ANT-02 | 8 avril 2026 — [Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents) [Martin et al. 2026] | Journal de session durable séparé du moteur et des environnements d’exécution | Tester crash/reprise et accès sélectif aux événements ; durabilité du journal ≠ idempotence de tous les effets |
+
+### Hypothèses de recherche et protocole de comparaison
+
+Le tableau suivant exprime nos hypothèses, pas des garanties annoncées par les sources.
+
+| Axe | Sources prioritaires | Essai discriminant proposé | État Swarm |
+|---|---|---|---|
+| Coordination | CUR-01/02/03 | Deux sous-périmètres actifs, découvertes relayées, conflit et adaptation durables | À mesurer |
+| Fraîcheur et mémoire | CUR-03/05, ANT-01/02 | Renouveler le contexte puis reprendre après arrêt sans perdre objectif, preuves ou limites | À mesurer |
+| Jugement et qualité | CUR-01/03, ANT-01, OAI-02 | Défaut volontaire détecté par revue indépendante ; candidat changé refusé | Couverture ciblée à relier au candidat ; recette globale à compléter |
+| Contrôle du flux | GOO-01, OAI-01 | Action interdite refusée, état inchangé, rejeu sans double consommation | Contrats existants à vérifier sur le parcours réel |
+| Débit et coût | CUR-03/04/05 | Concurrence progressive, tokens/cache, attente Git/SQLite, débit accepté et corrections | Non mesuré à grande échelle |
+
+Conserver le même besoin, données, budget et règle d’acceptation entre variantes. Identifier
+fournisseur, modèle, politique, commit et diff sale ; séparer simulations et fournisseurs réels.
+Rapporter les interventions humaines et échecs, pas seulement le temps ou le nombre de commits.
+Tout nouveau réglage est persisté et disponible dans Admin FR/EN ; les essais n’augmentent pas
+les budgets ni ne remettent à zéro les tentatives. Une décision d’architecture issue de cette
+recherche doit être enregistrée séparément avant exécution.

@@ -34,12 +34,39 @@ def main():
         "docs/training/casa-pizza/tutoriels/build_graph_overview.py": "harness",
         "docs/UI-DESIGN.md": "doc", "docs/reports/ui-redesign-20261010.md": "doc",
         "tools/refresh_ui_source_manifest.py": "harness",
+        "web/projects.html": "source", "web/projects.css": "source", "web/projects.js": "source",
+        "web/prephase-templates.js": "source", "internal/engine/preparation_templates.go": "source",
+        "internal/engine/preparation_templates_test.go": "test",
+        "internal/engine/preparation_work_model.go": "source",
+        "internal/engine/preparation_work_model_test.go": "test",
+        "web/preparation-work-graph.js": "source",
+        "web/preparation-work-model.css": "source",
+        "tests/preparation_work_model_ui.cjs": "test",
+        "docs/reports/portal-model-20261010.json": "doc",
+        "internal/engine/preparation_subjects_test.go": "test",
+        "tools/agent-workflows/templates/preparations.json": "source",
+        "tests/projects_home_ui.cjs": "test", "tests/preparation_subjects_ui.cjs": "test",
+        "tests/preparation_templates_ui.cjs": "test",
+        "tests/projects_method_ui.cjs": "test",
+        "docs/reports/projects-method-20261010.md": "doc",
+        "docs/PRODUCT-ARCHITECTURE.md": "doc",
+        ".claude/skills/swarm-model-design/SKILL.md": "source",
+        ".claude/skills/swarm-model-design/agents/openai.yaml": "source",
+        "AGENTS.md": "doc", "CLAUDE.md": "doc",
+        "docs/PREPARATION-TEMPLATES.md": "doc", "docs/en/PREPARATION-TEMPLATES.md": "doc",
+        "docs/plans/dev-launcher-20261010/PLAN.md": "doc",
+        "docs/reports/projects-home-20261010.md": "doc",
+        "docs/reports/preparation-subjects-20261010.md": "doc",
     }
     for path in (ROOT / "docs/training/casa-pizza/tutoriels/frames").glob("overview-*.png"):
         additions[path.relative_to(ROOT).as_posix()] = "capture"
     for path in (ROOT / "docs/screenshots/ui-redesign-20261010").iterdir():
         if path.is_file():
             additions[path.relative_to(ROOT).as_posix()] = "capture" if path.suffix == ".png" else "doc"
+    for directory in ["docs/screenshots/projects-home-20261010", "docs/screenshots/preparation-subjects-20261010", "docs/screenshots/projects-method-20261010", "docs/screenshots/portal-model-20261010"]:
+        for path in (ROOT / directory).iterdir():
+            if path.is_file():
+                additions[path.relative_to(ROOT).as_posix()] = "capture" if path.suffix == ".png" else "doc"
     for name, kind in additions.items():
         inputs[name] = {"path": name, "kind": kind}
     for name, row in inputs.items():

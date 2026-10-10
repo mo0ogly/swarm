@@ -1,7 +1,9 @@
 # Swarm moteur — contrat Cursor et vérification obligatoire
 
 État : contrat à démontrer, jamais certification de conformité par déclaration.
-Source de conception : [Cursor, The final system design](https://cursor.com/blog/self-driving-codebases#the-final-system-design), consultée le 19 septembre 2026.
+Références retenues : [Cursor — Scaling long-running autonomous coding](https://cursor.com/blog/scaling-agents), 14 janvier 2026, et [Towards self-driving codebases](https://cursor.com/blog/self-driving-codebases), 5 février 2026.
+
+Clarification utilisateur du 10 octobre 2026 : les deux publications sont retenues. La correction précédente avait exclu février à tort. Janvier reste la référence des exigences JAN-1 à JAN-7 ; février complète l’architecture et explicite son évolution. Les différences entre versions doivent être documentées, sans déclarer une conformité par addition de leurs descriptions. Cette correction documentaire ne modifie pas le moteur.
 
 ## Résultat attendu par l'utilisateur
 
@@ -9,9 +11,23 @@ Un lancement depuis Swarm doit constituer une équipe réelle : responsable du b
 
 ## Principes repris et décisions propres à Swarm
 
-Cursor décrit un responsable racine sans activité de codage, une délégation récursive de périmètres, des exécutants isolés et une remise structurée au responsable demandeur. Celui-ci se réactive avec les retours et adapte le travail. Les exécutants ne se coordonnent pas directement entre eux. Ces propriétés doivent être vérifiées dans les transitions du moteur, pas déduites de noms de rôles.
+La publication de janvier décrit des planificateurs qui explorent continuellement le code et créent des tâches, avec des sous-planificateurs récursifs. Les workers terminent leurs tâches sans coordination directe entre eux, puis poussent leurs changements. Un juge décide en fin de cycle s’il faut poursuivre ; l’itération suivante démarre avec un contexte frais. Les copies isolées et les remises structurées sont détaillées dans la publication de février ; leur mise en œuvre Swarm reste à vérifier dans les transitions du moteur.
 
-La revue indépendante obligatoire est une exigence utilisateur de Swarm. Le juge a été retiré dans l'évolution décrite par Cursor ; il ne faut pas attribuer cette exigence au design final. Swarm conserve une acceptation stricte avant publication d'un candidat validé, contrairement au compromis de débit et de tolérance aux erreurs de leur expérience. La sérialisation de la publication Git doit rester courte ; mesurer le coût de la revue et des contrôles. Les révisions de travail peuvent être imparfaites ; aucune ne doit être annoncée acceptée tant que les conditions ci-dessous ne sont pas satisfaites.
+Swarm conserve une revue indépendante et une acceptation stricte avant publication d’un candidat validé. Cette revue par livraison ne démontre pas l’existence du juge de fin de cycle demandé par la référence de janvier. Le juge global et le démarrage frais des cycles doivent être vérifiés séparément ; leur absence reste un écart ouvert. La sérialisation actuelle des contrôles, de la revue et de la publication doit être mesurée et corrigée si elle empêche le débit visé. Aucune de ces différences ne vaut autorisation de s’écarter de la cible utilisateur.
+
+## Couverture à compléter avant une déclaration d’alignement
+
+La [matrice JAN-1 à JAN-7](../../architecture/CURSOR-ENGINE-CONTRACT.md#exigences-de-la-référence-de-janvier-à-vérifier)
+précise les comportements et les preuves attendus contre la publication demandée.
+La matrice FEB-1 à FEB-4 du même contrat complète cet audit. Le juge est retiré dans une évolution décrite en février ; JAN-4/JAN-5 restent conservés pour Swarm, à articuler explicitement avec la hiérarchie continue.
+Les invariants C1–C3 et V1–V5 ci-dessous sont le contrat historique de Swarm ;
+ils ne couvrent pas à eux seuls cette matrice, notamment le juge de fin de cycle,
+le renouvellement global du contexte et la planification parallèle.
+
+`plan.json` conserve sa source historique dans `source` et indique la cible
+initiale dans `requested_reference` et les deux références retenues dans `requested_references`. Ses huit tâches restent historiques : leur
+réussite ne vaut pas validation des exigences JAN-1 à JAN-7. Aucune nouvelle
+mission ni autorisation d’exécution n’est créée par cette révision documentaire.
 
 ## Invariants non négociables
 

@@ -1,0 +1,78 @@
+PORTAIL CLIENT / CLIENT PORTAL — graphes de conception v1, 10 octobre 2026
+
+Mode : modèle de travail intégré au catalogue Portail client v2. Les fichiers
+Mermaid restent les vues de conception ; les plans ActionPlan v1 réellement
+consommés viennent de preparations.json, work_model. La projection API/CLI adapte
+les réponses et l’incrément ; l’interface dessine les dépendances de ces mêmes
+plans et les conserve comme brouillons. Adoption et lancement restent explicites.
+
+Entrées : intervention (créer, évoluer, corriger, migrer), application existante
+ou nouvelle, fournisseurs d’identité, règles tenant/rôles, formats et volumes des
+documents, conservation, contraintes, budget et autorité de publication.
+Les inconnues restent des questions avant adoption. Examiner les acquis avant
+réutilisation. Pour une migration : mapping, sauvegarde, répétition isolée et
+rollback ; pour une correction : reproduction et cause avant changement.
+
+Trois vues FR/EN : foundations.mmd (cinq étapes communes), design-backend.mmd
+(détail de réalisation), feature-cycle.mmd (six étapes par fonctionnalité).
+Les boucles sont des décisions de reprise, pas des cycles dans depends.
+
+Stories et dépendances proposées :
+s1-session : se connecter et révoquer sa session ; dépendances [] après fondations.
+s2-documents : consulter ses documents ; dépendances [s1-session].
+s3-administration : attribuer ou retirer des droits ; dépendances [s1-session].
+s4-revocation : constater immédiatement le retrait d’accès à un document ;
+dépendances [s2-documents, s3-administration].
+F1 à F5 et le contrat C sont partagés, sans duplication par story.
+Chaque story instancie S6 à S11. D1–DG et B1–BG détaillent S7/S9/S10 ; ils
+ne constituent pas un deuxième cycle ni des tâches communes dupliquées.
+
+Responsabilités et sorties :
+Planificateur : besoin, stories, dépendances et décisions ; recherche de code
+confiée à un worker. Sorties : PRD, critères, plan adapté.
+Worker design : parcours, maquettes, prototype, composants réels, rapport clavier
+et mobile. Refus : manque d’un état, action ambiguë, focus perdu, droit trompeur.
+Worker backend : contrat API, modèle tenant/rôles, sessions, stockage, migrations,
+contrôles reproductibles. Refus : accès interclients, contrôle client seul,
+session révoquée encore utilisable, secrets dans traces, perte de données.
+Worker intégration : candidat commun, parcours UI/API et preuves liées à sa
+révision. Les vues peuvent avancer en parallèle seulement avec contrats stabilisés,
+ownership et isolation de fichiers ; aucun agent n’est lancé par cette définition.
+Vérificateur : revue indépendante des mêmes preuves/candidat, constats conservés.
+Humain : arbitrage des inconnues, adoption et autorisation externe.
+
+Preuves attendues :
+Design : écran et comportement pour vide/chargement/erreur/succès ; petits et grands
+écrans ; Tab/Maj+Tab, focus, erreurs explicites, retour après échec ; FR/EN si le
+produit les exige. Tester que le client comprend quelle donnée et quel droit il voit.
+Backend : A ne lit/modifie/télécharge jamais une ressource B, y compris ID deviné
+et URL directe ; API refuse absence de session et droits insuffisants ; révocation
+appliquée ; téléchargement et stockage privés ; validation serveur ; tests de
+transactions, reprise et doublons lorsque l’opération promet ces propriétés.
+Intégration : connexion, liste, téléchargement, déconnexion ; retrait admin suivi
+du refus d’accès réel ; panne affichée sans exposer données ni faux succès.
+Livraison : contrôles/revue frais, plan migration et rollback, autorité enregistrée,
+effet publié confirmé. Refus de publication : conserver le livrable préparé.
+
+Correspondance moteur observée :
+ActionPlan v1 accepte tasks[].depends (DAG), entry, criteria, proof, validation,
+delivery, stop, max_attempts et max_tool_calls ; product porte journeys/stories.
+Les tâches exécutables ont role=worker. Le planificateur et le vérificateur ne
+sont pas transformés en tâches worker. Un incrément compte 1–8 tâches et au plus
+16000 octets ; le modèle global doit être adapté en incréments cohérents.
+Les liens de stories ne remplacent pas depends des tâches du même plan.
+Les tests exécutables nécessitent une ValidationPolicy explicite du candidat.
+Un texte dans validation ou une flèche « Oui » ne crée pas une garde automatique.
+Les décisions DG/BG/V orientent les corrections via révision/replanification et
+contrôles publics existants ; aucune branche conditionnelle générique ou suivi
+automatique des onze étapes n’est livré par ces fichiers.
+Une erreur impose diagnostic ; reprise seulement après changement pertinent,
+autorisation applicable et limites restantes. Ne pas augmenter les budgets ou
+effacer les tentatives. Modifier le candidat nécessite de nouvelles preuves.
+
+Fin : chaque story du périmètre remplit ses critères sur le même candidat ; les
+effets externes autorisés sont confirmés. Préparation seule reste une proposition.
+Contrôles : recette tests/preparation_work_model_ui.cjs via CLI/API/UX, tests
+preparation_work_model_test.go. Les résultats exacts sont dans les artefacts de
+vérification du candidat. Aucune réalisation d’un portail client ni exécution
+d’agent LLM n’est déclarée par la recette du modèle.

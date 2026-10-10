@@ -27,7 +27,22 @@ Project skills are in `.agents/skills/`. They link to the canonical files under
 Choose the smallest relevant method. Do not chain every method for a trivial edit.
 See `docs/AGENT-METHODS.md` (French) or `docs/en/AGENT-METHODS.md` (English).
 
+## Modèles Swarm
+
+Toute création ou modification d’un modèle Swarm doit utiliser la skill
+[`swarm-model-design`](.claude/skills/swarm-model-design/SKILL.md), disponible
+comme `$swarm-model-design` pour Codex et `/swarm-model-design` pour Claude.
+Lire et appliquer cette skill avant de concevoir le modèle ou modifier le catalogue.
+Distinguer le modèle de cadrage du modèle de travail exécutable. Pour ce dernier,
+vérifier les actions, dépendances, orientations de décision, validations et reprises
+avec les opérations publiques réellement prises en charge par le moteur.
+La création d’un modèle ne vaut ni adoption du plan ni autorisation d’exécution.
+
 ## Web interface
+
+Read `docs/PRODUCT-ARCHITECTURE.md` before planning product navigation or frontend
+architecture. The Projects and Business Processes UX share the Swarm engine but
+must remain independently buildable and deployable. Wattson is outside this scope.
 
 Read `docs/UI-DESIGN.md` before changing web layout, navigation, themes or reading accordions.
 Keep the logo palette, shared semantic tokens, FR/EN labels and progressive disclosure consistent.

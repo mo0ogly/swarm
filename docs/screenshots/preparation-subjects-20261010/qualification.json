@@ -1,0 +1,24 @@
+{
+  "command": "go test -json ./...",
+  "exit_code": 0,
+  "duration_seconds": 461.511,
+  "passed": 1787,
+  "skipped": [
+    "TestOperatorPreview",
+    "TestCorrectiveRecoveryBrowserRecipe",
+    "TestEngineContractTruthBrowser",
+    "TestHistoricalRequalificationBrowser",
+    "TestManagedRecoveryBrowserRecipe",
+    "TestMissingReportRecoveryBrowserRecipe",
+    "TestRecoveryHealthBrowserRecipe",
+    "TestLiveProviderStreamReplay"
+  ],
+  "failed": [],
+  "vet_exit_code": 0,
+  "binary_sha256": "55825f2b139b9feb731e744802ba040e52c7ecb77b440e09efd20e70d28269c8",
+  "base_commit": "d4539e0041000a38acb162a17f053e318fb3db5d",
+  "candidate_state": "dirty; preexisting unrelated edits preserved",
+  "ui_subjects_result": "docs/screenshots/preparation-subjects-20261010/result.json",
+  "ui_home_result": "docs/screenshots/projects-home-20261010/result.json",
+  "limits": "Native checks, no independent reviewer, no paid provider or managed acceptance."
+}

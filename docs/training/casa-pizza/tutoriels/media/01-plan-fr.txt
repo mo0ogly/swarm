@@ -1,5 +1,5 @@
 00s — Écrire puis enregistrer le besoin
-Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.
+Périmètre, règles et preuves attendues sont enregistrés pour préparer le plan de travail.
 
 06s — Ouvrir Conduite et Vue d’ensemble
 Six tâches à faire ; les flèches relient prérequis et tâches dépendantes.

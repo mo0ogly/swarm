@@ -1,8 +1,10 @@
-# Engine contract: alignment with Cursor's final design
+# Engine contract: January and February 2026 Cursor references
 
 [Français](../architecture/CURSOR-ENGINE-CONTRACT.md)
 
-Source: [Cursor — The final system design](https://cursor.com/blog/self-driving-codebases#the-final-system-design), accessed September 19, 2026.
+Retained references: [Cursor — Scaling long-running autonomous coding](https://cursor.com/blog/scaling-agents), January 14, 2026, and [Towards self-driving codebases](https://cursor.com/blog/self-driving-codebases), February 5, 2026.
+
+User clarification, October 10, 2026: both publications are retained. The previous correction wrongly excluded February. January remains the source for JAN-1 through JAN-7; February complements the architecture and explains its evolution. Document differences between versions without claiming compliance by combining their descriptions. This documentation correction does not change the engine.
 
 This document separates a design rule, its engine enforcement and evidence that
 it ran. “Cursor compliant” is not a certification: the article describes a
@@ -19,15 +21,44 @@ that a live Swarm mission finishes without assistance.
 | Independent reviewer | Examines the result and evidence for the candidate revision. | A reasoned opinion, without writing tools or self-acceptance. |
 | Deterministic controller | Executes checks and enforces publication rules. | Receipts, refusals and atomic transitions when all conditions hold. |
 
-The first three roles follow Cursor's final design. Mandatory independent review
-is an additional Swarm requirement: Cursor removed its judge during the evolution
-described in the article. Swarm requires a green revision before acceptance;
-Cursor describes tolerating transient errors to increase throughput.
+The January publication separates planners and workers, supports recursive subplanners, and includes a judge at the end of each cycle followed by a fresh iteration. Swarm’s independent candidate review does not replace that global judge. Additional evidence and acceptance safeguards must be distinguished from these requirements. Global cycle judgment and fresh iterations remain open alignment gaps until demonstrated, not authorized deviations.
 
 Repository copies separate changes and Git references. They are not a security
 boundary against a malicious process with the host account's permissions. These
 guarantees concern public engine operations; an administrator who can alter the
 database or executables is outside that boundary.
+
+## January reference requirements to verify
+
+This matrix defines the target, not already delivered features. Local limits and
+Swarm safeguards are not Cursor prescriptions. Evidence must distinguish source
+inspection, simulated tests and live-provider execution.
+
+| ID | Expected behavior | Required evidence | Status in this audit |
+|---|---|---|---|
+| JAN-1 | Planners continuously explore the codebase and create tasks. | Show repository information actually available to the planner and adaptation based on a new discovery. | Partial: event-driven decisions exist; continuous exploration is not demonstrated by a tool-free prompt. |
+| JAN-2 | Planning can be recursive and parallel. | Observe two simultaneously active subplanners with distinct owned scopes and persisted decisions. | Delegation exists; actual subplanner concurrency was not demonstrated in this audit. |
+| JAN-3 | Workers complete tasks without direct worker coordination and publish their changes. | Observe two independent tasks in parallel, rejected lateral channels and delivered results. | Targeted tests passed; Swarm’s central integration path differs from Cursor’s described behavior. |
+| JAN-4 | An end-of-cycle judge decides whether work should continue. | A verdict covering the objective and cycle results, with a persisted continue or finish decision. | Not demonstrated: candidate review or deterministic closure alone is insufficient. |
+| JAN-5 | The next iteration starts with fresh context. | Observe a two-cycle transition, the new context and preservation of the objective, evidence and limits. | Partial: fresh activation projections exist; a global cycle transition was not demonstrated. |
+| JAN-6 | Coordination increases throughput without excessive central waiting. | Measure computation, lock waits, checks, review, publication and throughput at multiple concurrency levels. | Not measured; a 16-worker limit per mission and serialized publication lane were identified. |
+| JAN-7 | Prompts and model selection fit each role. | Inspect actual prompts and compare long-running missions with identified models and costs. | Distinct routes exist; suitability and endurance were not demonstrated. |
+
+The targeted coordination tests passed on October 10, 2026, including `-race`;
+they do not alone cover JAN-1 through JAN-7. Missing evidence does not prove a
+missing feature, but prevents claiming complete alignment. The engine audit
+still needs to cover these requirements.
+
+## February additions and relationship between references
+
+February describes a continuous hierarchy, worker-owned repository copies and handoffs to the owner. It removes the judge in an intermediate evolution and the central integrator. JAN-4 and JAN-5 remain retained Swarm requirements; they are not described as invariants of February’s final system. Compare a continuous hierarchy with judgment checkpoints against explicit cycles before choosing how they fit together.
+
+| ID | Addition to verify | Expected evidence | Status |
+|---|---|---|---|
+| FEB-1 | Recursive ownership and handoff to the owner | Durable return, exact owner, reactivation after restart | Partial: mechanisms present, real-provider journey pending |
+| FEB-2 | Handoff includes limits and discoveries | Actual content used in a subsequent decision | Unproven |
+| FEB-3 | Freshness during continuous work | Observed renewal preserving objective and evidence | Unproven |
+| FEB-4 | Explicit throughput and quality tradeoffs | Measurements and a distinct validated publication policy | Unmeasured; Swarm checks retained |
 
 ## Rules to verify in the engine
 

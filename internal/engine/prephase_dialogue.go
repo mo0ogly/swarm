@@ -66,6 +66,7 @@ type PreparationTurn struct {
 	Usage           *Usage                  `json:"usage,omitempty"`
 	Stale           bool                    `json:"stale"`
 	TimeoutSeconds  int                     `json:"timeout_seconds"`
+	TimeoutMaximum  int                     `json:"timeout_maximum_seconds,omitempty"`
 	PID             int                     `json:"pid,omitempty"`
 	ProcessStamp    string                  `json:"process_stamp,omitempty"`
 	SupervisorPID   int                     `json:"supervisor_pid,omitempty"`
@@ -84,14 +85,12 @@ type PreparationCapability struct {
 	Available bool   `json:"available"`
 	Reason    string `json:"reason,omitempty"`
 	Timeout   int    `json:"timeout_seconds"`
+	Maximum   int    `json:"max_timeout_seconds"`
 }
 
 func preparationCapability(name string, p Provider) PreparationCapability {
 	b, _ := json.Marshal(p)
-	c := PreparationCapability{Provider: name, TextOnly: p.APIConnectionID != "", Hash: hash(append([]byte("preparation-dialogue.v2\n"), b...)), Timeout: 120}
-	if p.AssistantTimeout > 0 && p.AssistantTimeout < 120 {
-		c.Timeout = p.AssistantTimeout
-	}
+	c := PreparationCapability{Provider: name, TextOnly: p.APIConnectionID != "", Hash: hash(append([]byte("preparation-dialogue.v4\n"), b...)), Timeout: 0}
 	// Skynet's wrapper is not certified for preparation yet; no implicit fallback.
 	if p.APIConnectionID == "" && filepath.Base(p.Command) != "codex" && filepath.Base(p.Command) != "claude" {
 		c.Reason = "Adaptateur de préparation sans outils non vérifié."
@@ -104,6 +103,20 @@ func preparationCapability(name string, p Provider) PreparationCapability {
 	}
 	return c
 }
+func (s *Store) preparationCapability(name string, p Provider) PreparationCapability {
+	c := preparationCapability(name, p)
+	policy, err := s.preparationTimeoutConfig()
+	if err != nil {
+		c.Available = false
+		c.Reason = err.Error()
+		return c
+	}
+	c.Timeout = policy.Values.Timeout
+	c.Maximum = policy.Values.Maximum
+	raw, _ := json.Marshal(policy)
+	c.Hash = hash([]byte(c.Hash + "\n" + hash(raw)))
+	return c
+}
 func (s *Store) preparationCapabilities() []PreparationCapability {
 	out := []PreparationCapability{}
 	ps, e := s.providers()
@@ -111,7 +124,7 @@ func (s *Store) preparationCapabilities() []PreparationCapability {
 		return out
 	}
 	for n, p := range ps.Providers {
-		out = append(out, preparationCapability(n, p))
+		out = append(out, s.preparationCapability(n, p))
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Provider < out[j].Provider })
 	return out
@@ -228,7 +241,7 @@ func (s *Store) sendPreparation(r PreparationSend) (PreparationTurn, error) {
 	if !ok {
 		return zero, preparationError("provider_unavailable", "Fournisseur absent.")
 	}
-	cap := preparationCapability(r.Provider, provider)
+	cap := s.preparationCapability(r.Provider, provider)
 	if !cap.Available {
 		return zero, preparationError("provider_unavailable", cap.Reason)
 	}
@@ -269,13 +282,16 @@ func (s *Store) sendPreparation(r PreparationSend) (PreparationTurn, error) {
 	if e = s.projectContextGuard(project, "preparation"); e != nil {
 		return zero, e
 	}
-	t := PreparationTurn{Project: project, ModelRoute: route, ContextMode: r.ContextMode, Target: r.Target, ID: id, PreparationID: p.ID, Status: "pending", CreatedAt: now(), Revision: p.Revision, MethodHash: m.Hash, Provider: r.Provider, ProviderDigest: hash(pb), RequestHash: digest, Question: r.Message, Prompt: prompt, TimeoutSeconds: cap.Timeout}
+	t := PreparationTurn{Project: project, ModelRoute: route, ContextMode: r.ContextMode, Target: r.Target, ID: id, PreparationID: p.ID, Status: "pending", CreatedAt: now(), Revision: p.Revision, MethodHash: m.Hash, Provider: r.Provider, ProviderDigest: hash(pb), RequestHash: digest, Question: r.Message, Prompt: prompt, TimeoutSeconds: cap.Timeout, TimeoutMaximum: cap.Maximum}
 	body, _ := json.Marshal(t)
 	tx, e := s.db.Begin()
 	if e != nil {
 		return zero, e
 	}
 	defer tx.Rollback()
+	if current := s.preparationCapability(r.Provider, provider); !current.Available || current.Hash != r.Capability {
+		return zero, preparationError("conflict", "Réglages de préparation modifiés ; rechargez avant l’envoi.")
+	}
 	var revision int
 	if e = tx.QueryRow("SELECT revision FROM preparations WHERE id=?", p.ID).Scan(&revision); e != nil {
 		return zero, e

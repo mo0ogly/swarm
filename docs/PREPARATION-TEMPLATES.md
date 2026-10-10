@@ -1,8 +1,10 @@
 # Parcours guidés pour préparer une mission
 
-Dans **Préparer un projet**, choisir **Choisir un modèle de mission**. Quatre
-structures sont proposées : évolution d’application, défaut reproductible,
-interface et nouvelle application. La modale permet de lire le brouillon avant
+Dans **Préparer un projet**, choisir **Choisir un modèle de mission**. Dix
+modèles sont proposés : quatre structures générales (évolution d’application,
+défaut reproductible, interface et nouvelle application) et six sujets
+spécialisés : outil interne, portail client, API et intégration, gestion des
+stocks, traitement de données et tableau de bord. La modale permet de lire le brouillon avant
 insertion. Compléter les indications entre crochets, puis enregistrer le besoin.
 Le modèle ne remplace jamais une saisie existante : télécharger le brouillon ou
 ouvrir une nouvelle préparation pour repartir d’une structure différente.
@@ -42,7 +44,7 @@ brouillon à compléter. Le modèle ne crée pas une équipe ni un vérificateur
 vérification du plan, l’organisation et l’autorisation de départ restent les
 contrats existants. Il ne préautorise ni budget, acceptation, publication ou merge.
 
-Ce premier catalogue contient quatre modèles embarqués. L’import, l’édition et
+Le catalogue contient quatre structures générales et six sujets embarqués. L’import, l’édition et
 la sauvegarde de modèles personnalisés ne sont pas encore proposés.
 
 ## Préparation guidée et équipe proposée
@@ -94,7 +96,8 @@ Les identifiants attendus sont `objective`, `audience`, `scope`, `exclusions`,
 `constraints`, `acceptance`, `verification`, `recovery`. Les autres clés sont
 refusées. Une réponse est limitée à 1 000 octets UTF-8. La sortie contient le
 brouillon rendu, `missing` (identifiants des réponses manquantes), `answered`,
-`total`, `need_complete`, `proposed_team` et `launch_authorized`. Les réponses
+`total`, `need_complete`, `proposed_team`, `recommended_method` et
+`launch_authorized`. Un sujet retourne aussi `intervention`. Les réponses
 vides ou contenant les indications à compléter du modèle restent manquantes.
 
 ## Méthodes fournies aux rôles
@@ -122,3 +125,68 @@ Le parcours **Corriger un défaut reproductible** utilise désormais
 **Diagnostiquer et corriger un problème**. En préparation, l’IA propose le plan de
 diagnostic ; elle n’exécute aucun outil ni correction. Les nouveaux exécutants
 reçoivent aussi la méthode embarquée selon les limites de leur rôle.
+
+
+## Sujets et interventions
+
+L’accueil **Projets et développement** présente les six sujets. Chaque entrée
+expose le résultat attendu et les preuves à prévoir ; elle ouvre directement
+le sujet choisi dans la préparation. La modale ajoute un exemple, les livrables
+et les risques à examiner. Aucun besoin n’est enregistré par ce choix.
+
+Choisir ensuite **Créer**, **Faire évoluer**, **Corriger** ou **Migrer**. Le sujet
+et l’intervention enrichissent le brouillon sans remplacer le cadre commun :
+**cinq étapes communes au produit, puis six étapes répétées pour chaque
+fonctionnalité**. Les acquis sont examinés avant réutilisation ; une étape non
+applicable doit être justifiée. Aucun suivi automatique d’étapes n’est créé.
+
+Corriger propose la méthode de diagnostic ; les autres interventions proposent
+le parcours produit. Le choix est conservé par sujet dans la page, comme les
+réponses. L’enregistrement explicite conserve ensuite le besoin et la méthode.
+Une migration exige encore la décision de bascule, les contrôles de parité et
+une reprise vérifiée ; sélectionner Migrer ne donne aucune autorisation.
+
+```sh
+swarm prepare template service-api
+swarm prepare template-check service-api --input reponses-api.json
+```
+
+Le fichier de réponses utilise le contrat précédent avec un champ optionnel
+`"intervention": "migrate"`. Les valeurs admises sont `create`, `improve`,
+`correct`, `migrate` ; l’absence du champ choisit `create` pour un sujet.
+Les quatre structures générales conservent leur contrat sans intervention.
+L’API publique `/api/v1/preparations/template-check` utilise la même projection
+que le CLI. Le catalogue et ses métadonnées FR/EN sont versionnés ensemble.
+
+## Modèle de travail Portail client
+
+La version 2 expose un graphe inspectable et cinq incréments : fondations communes,
+connexion et sessions, documents, administration des accès et révocation de bout
+en bout. Les cinq fondations sont partagées ; chaque fonctionnalité suit les six
+étapes du parcours produit. Les tâches design et backend convergent vers
+l’intégration, la revue puis la livraison préparée.
+
+Dans le dialogue du modèle, choisir l’incrément, inspecter les tâches et leurs
+critères, puis compléter les réponses. **Télécharger le plan adapté** retourne
+un `ActionPlan` v1 ; **Utiliser ce parcours**, puis enregistrer la nouvelle
+préparation, conserve le besoin et insère le plan dans son éditeur. Le brief reste
+à rédiger et adopter ; les décisions ouvertes doivent être résolues avant de
+vérifier le plan et créer les missions. Les réponses ne sont jamais interprétées
+comme des commandes de contrôle ou une autorisation de publication.
+
+Le CLI utilise la même projection :
+
+```sh
+swarm prepare template-check client-portal --input reponses.json
+```
+
+Le fichier accepte `increment` : `foundations`, `session`, `documents`,
+`administration` ou `revocation`. La réponse contient `work_plan` et `increment`.
+Les plans ont au plus huit tâches ; les dépendances locales sont contrôlées par
+le moteur. Les stories futures restent non planifiées. Les préconditions entre
+incréments demandent une décision explicite et des preuves acceptées avant adoption ;
+aucune synchronisation automatique entre missions n’est annoncée. Les refus et
+reprises sont présentés séparément des dépendances : leur traitement utilise les
+opérations existantes de correction et révision, sans introduire un ordonnanceur
+conditionnel. Les politiques exécutables de contrôle restent à autoriser pour
+le dépôt et le candidat réels.

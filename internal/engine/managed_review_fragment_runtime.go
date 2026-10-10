@@ -80,7 +80,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		return record.FragmentJournal != nil && hash(model) == record.FragmentJournal.ModelConfigDigest && s.managedReviewFilesIntact(record) == nil && s.managedBatchProviderIntact(current.Planning.Reviewer, record) == nil
 	}
 	call := func(id, prompt, schema string) (string, error) {
-		reply, e := runStructuredProvider(provider, route, prompt, schema, time.Duration(r.TimeoutSeconds)*time.Second, valid, func(u *Usage) { _ = s.savePlanningUsage(id, u) }, s.providerCooldownObserver(cfg.Provider, id))
+		reply, e := s.runStructuredProvider(provider, route, prompt, schema, time.Duration(r.TimeoutSeconds)*time.Second, valid, func(u *Usage) { _ = s.savePlanningUsage(id, u) }, s.providerCooldownObserver(cfg.Provider, id))
 		if reply != "" {
 			// Preserve even malformed/provider-error replies for diagnosis. These files
 			// are not review proof; only an anchored parsed response can be reused.

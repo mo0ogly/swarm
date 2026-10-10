@@ -429,7 +429,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 	if e != nil {
 		return e
 	}
-	reply, callErr := runStructuredProvider(provider, route, prompt, managedReviewSchema, time.Duration(record.TimeoutSeconds)*time.Second, func() bool {
+	reply, callErr := s.runStructuredProvider(provider, route, prompt, managedReviewSchema, time.Duration(record.TimeoutSeconds)*time.Second, func() bool {
 		if e := s.providerCooldownGuard(cfg.Provider); e != nil {
 			return false
 		}

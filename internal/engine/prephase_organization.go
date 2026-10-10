@@ -8,6 +8,7 @@ import (
 
 // Operator supplied configuration; never accepted from the model's plan JSON.
 type PreparationOrganization struct {
+	Repository     *ManagedRepositoryRequest      `json:"repository,omitempty"`
 	WorkerProvider string                         `json:"worker_provider,omitempty"`
 	Provider       string                         `json:"provider"`
 	Level          string                         `json:"level,omitempty"`
@@ -111,6 +112,16 @@ func (s *Store) configurePreparedOrganization(w *Work, p Preparation, config Pre
 	}
 	planning.Reviewer = configReview
 	planning.ReviewerRequired = true
+	if config.Repository != nil {
+		if config.Validation != "automatic" {
+			return fmt.Errorf("dépôt géré : autoriser des contrôles automatiques explicites")
+		}
+		repository, err := s.configureManagedRepository(w.ID, *config.Repository)
+		if err != nil {
+			return err
+		}
+		planning.Repository = repository
+	}
 	w.Planning = planning
 	w.Profile = &LaunchProfile{Provider: workerID, Level: config.Level, Role: "worker", Workspace: workspace, Updated: now(), Actor: originOperator}
 	return organizationGuard(*w)

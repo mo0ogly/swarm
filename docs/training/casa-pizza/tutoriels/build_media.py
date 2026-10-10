@@ -10,7 +10,7 @@ def module(id,fr,en,steps,qfr,qen,afr,aen):
  return dict(id=id,title={'fr':fr,'en':en},steps=steps,question={'fr':qfr,'en':qen},answer={'fr':afr,'en':aen})
 MODULES=[
  module('01-plan','Du besoin au graphe','From requirements to the graph',[
- step('00-besoin-{lang}','Écrire puis enregistrer le besoin','Write and save the requirements','Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.','Scope, rules and required evidence are explicit. No AI call here.'),
+ step('00-besoin-{lang}','Écrire puis enregistrer le besoin','Write and save the requirements','Périmètre, règles et preuves attendues sont enregistrés pour préparer le plan de travail.','Scope, rules and required evidence are saved to prepare the work plan.'),
  step('13-graphe-{lang}','Ouvrir Conduite et Vue d’ensemble','Open Overview and Fit overview','Six tâches à faire ; les flèches relient prérequis et tâches dépendantes.','Six tasks remain to do; arrows connect prerequisites to dependent tasks.'),
  step('14-tache-{lang}','Ouvrir Tests automatiques puis Toutes les actions autorisées','Open Automatic tests, then All allowed actions','La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.','The task waits for Order and tracking. Details show criteria, dependencies and no report.'),
  step('18-graphe-sombre','Comparer le même graphe en sombre','Compare the same graph in dark mode','Un changement de thème ne change ni dépendances ni état des tâches.','Changing the theme changes neither dependencies nor task status.')],
@@ -20,9 +20,9 @@ MODULES=[
  step('15-humaine-{lang}','Tâches puis Configurer les validations','Tasks then Configure validation','La revue humaine reste disponible pour un jugement qualitatif.','Human review remains available for qualitative judgment.'),
  step('19-commande-{lang}','Choisir python3 et saisir un argument par ligne','Choose python3 and enter one argument per line','La commande est exacte : -W error::ResourceWarning -m unittest -v. Pas de shell implicite.','The exact command is -W error::ResourceWarning -m unittest -v. No implicit shell.'),
  step('16-controle-{lang}','Relier le contrôle au critère et régler le délai','Link the check to its criterion and set its timeout','Le délai affiché de 60 secondes est éditable ; il ne constitue pas une limite universelle.','The displayed 60-second timeout is editable; it is not a universal limit.'),
- step('17-apercu-{lang}','Examiner l’effet avant de confirmer','Review the effect before confirming','L’aperçu explique la portée et l’invalidation des anciennes preuves. Nous avons annulé.','The preview explains scope and invalidation of old evidence. We cancelled.')],
+ step('17-apercu-{lang}','Examiner l’effet avant de confirmer','Review the effect before confirming','L’aperçu permet de vérifier la portée du changement et les preuves à renouveler avant de confirmer.','The preview shows the scope of the change and which evidence needs renewing before you confirm.')],
  'Une commande réussie suffit-elle à déclarer la mission terminée ?','Does a successful command mean the mission is complete?',
- 'Non. Elle apporte une preuve sur les fichiers et critères liés au candidat. La recette visuelle, la revue et les conditions d’acceptation restent distinctes. Dans cet enregistrement, aucune politique n’a été appliquée et aucune tâche n’a été acceptée.','No. It provides evidence for the files and criteria linked to the candidate. Visual testing, review and acceptance conditions remain distinct. No policy was applied and no task was accepted in this recording.'),
+ 'Non. Elle apporte une preuve sur les fichiers et critères liés au candidat. La recette visuelle, la revue et les conditions d’acceptation restent distinctes.','No. It provides evidence for the files and criteria linked to the candidate. Visual testing, review and acceptance conditions remain distinct.'),
  module('03-client','Commander et traiter un refus','Order and handle a rejection',[
  step('01-catalogue','Ouvrir le catalogue local','Open the local catalogue','Six recettes disponibles ; atelier fictif, sans paiement réel.','Six recipes are available; fictitious workshop with no real payment.'),
  step('02-filtre','Cocher Végétariennes uniquement','Check Vegetarian only','Trois recettes restent visibles.','Three recipes remain visible.'),
@@ -55,7 +55,7 @@ def card(mod,st,lang,n):
  canvas=Image.new('RGB',(1280,900),'#f7f5ef'); dr=ImageDraw.Draw(canvas)
  bold=ImageFont.truetype(FONT,24); small=ImageFont.truetype(FONT,18); body=ImageFont.truetype(FONT,23)
  dr.rectangle((0,0,1280,72),fill='#062338');dr.text((24,12),'CASA PIZZA  /  '+mod['title'][lang],font=bold,fill='#f8d779')
- dr.text((24,43),('Captures réelles montées · sans audio' if lang=='fr' else 'Edited real screenshots · no audio'),font=small,fill='#dbe9e1')
+ dr.text((24,43),('Tutoriel sous-titré · sans audio' if lang=='fr' else 'Captioned tutorial · no audio'),font=small,fill='#dbe9e1')
  # Crop tall client captures to the relevant area; preserve proportions.
  if im.height>900 and st['frame'] in {'01-catalogue','02-filtre','03-minimum','04-quantite','05-confirmee','10-suivi-preparation','12-livree'}:
   top={'01-catalogue':0,'02-filtre':100,'03-minimum':450,'04-quantite':450,'05-confirmee':480,'10-suivi-preparation':480,'12-livree':480}.get(st['frame'],0)

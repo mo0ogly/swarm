@@ -49,9 +49,6 @@ func (s *Store) runPreparationTurn(t PreparationTurn) {
 	s.runPreparationTurnWithin(t, time.Duration(t.TimeoutSeconds)*time.Second)
 }
 func (s *Store) runPreparationTurnWithin(t PreparationTurn, deadline time.Duration) {
-	if deadline <= 0 || deadline > 120*time.Second {
-		deadline = 120 * time.Second
-	}
 	t.Status = "running"
 	t.SupervisorPID = os.Getpid()
 	t.SupervisorStamp = processStamp(os.Getpid())
@@ -66,6 +63,15 @@ func (s *Store) runPreparationTurnWithin(t PreparationTurn, deadline time.Durati
 		return
 	}
 	fail := func(msg string) { _ = s.finishPreparationTurn(t, "", nil, msg) }
+	maximum := t.TimeoutMaximum
+	if maximum == 0 {
+		maximum = t.TimeoutSeconds
+	} // Legacy exchanges retain their admitted deadline.
+	if maximum < 1 || int64(maximum) > int64(^uint64(0)>>1)/int64(time.Second) || deadline <= 0 || deadline > time.Duration(maximum)*time.Second {
+		fail("Délai de préparation invalide ; aucun appel lancé.")
+		return
+	}
+
 	if e = s.projectContextGuard(t.Project, "preparation"); e != nil {
 		fail(e.Error())
 		return

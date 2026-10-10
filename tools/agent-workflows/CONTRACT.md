@@ -51,9 +51,15 @@ these are method instructions, not new flags on the `swarm` binary.
   candidate revision. Changed code, method or relevant inputs invalidate old evidence.
   Record both a commit SHA and a dirty diff when reviewing uncommitted changes.
 
-Cursor's planner/worker separation is an architectural inspiration. Swarm's
-independent review and acceptance rules are its own explicit contract; do not
-claim a Cursor certification or infer missing enforcement from role labels.
+The user retains both Cursor references: January 14, 2026,
+https://cursor.com/blog/scaling-agents, and February 5, 2026,
+https://cursor.com/blog/self-driving-codebases. Audit JAN-1 through JAN-7 and
+FEB-1 through FEB-4 in docs/architecture/CURSOR-ENGINE-CONTRACT.md. Preserve
+both sources and document differences between their versions. JAN-4/JAN-5 remain
+retained Swarm requirements, not claims about February's final architecture.
+Candidate review is distinct from a global cycle judge. Do not infer permission
+to remove Swarm checks or raise budgets from research tradeoffs. Do not claim
+compliance from role labels or fixture tests alone.
 
 ## 4. Bounded execution and recovery
 

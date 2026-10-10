@@ -8,4 +8,4 @@ La commande est exacte : -W error::ResourceWarning -m unittest -v. Pas de shell 
 Le délai affiché de 60 secondes est éditable ; il ne constitue pas une limite universelle.
 
 18s — Examiner l’effet avant de confirmer
-L’aperçu explique la portée et l’invalidation des anciennes preuves. Nous avons annulé.
+L’aperçu permet de vérifier la portée du changement et les preuves à renouveler avant de confirmer.

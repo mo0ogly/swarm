@@ -21,6 +21,21 @@ mécanisme déterministe qui médiatise chaque lancement, chaque reprise et chaq
 selon le principe du moniteur de référence (Anderson, 1972) : les agents proposent, le moteur
 autorise, un exécutant déterministe agit. Ce contrôle a un coût, qui doit être mesuré.
 
+Corpus moteur actualisé le 10 octobre 2026 à la demande de l’utilisateur : Cursor en priorité,
+avec janvier, février, avril, juillet et septembre ; Google/Gemini, OpenAI et Anthropic en
+comparaison. Voir les [fiches de lecture et essais proposés](article-scientifique/fiches-lecture.md#5-moteur-swarm--sources-industrielles-actualisées-au-10-octobre-2026)
+et l’[état de l’art actualisé](dossier-recherche/02-etat-art.md#26-actualisation-du-corpus-moteur--10-octobre-2026).
+Cette extension du corpus ne change pas les résultats déjà mesurés ni les critères d’acceptation.
+
+Observation moteur ajoutée le 10 octobre 2026 : les plafonds fixes de 90 secondes
+coupaient la revue et le diagnostic du responsable. La correction distingue
+activité, silence, durée totale facultative et bail renouvelé, avec réglages
+persistés dans Admin. La reprise réelle a produit un verdict puis une décision de
+correction automatique. Voir le [chapitre sur le moniteur](dossier-recherche/07-moniteur.md#76-vivacité-des-superviseurs--observation-du-10-octobre-2026)
+et la [note de recherche datée](dossier-recherche/revisions/20261010-vivacite-supervision.md).
+Ce cas hors campagne ne modifie pas les résultats de facturation ni les causes
+inconnues des cinq délais historiques.
+
 ## 2. Questions de recherche
 
 | Question | Énoncé | État |
@@ -121,6 +136,7 @@ Un article est à portée ; une thèse demande davantage. Manques identifiés :
 | `article-scientifique/PLAN.md` | Plan détaillé de l'article |
 | `article-scientifique/brouillon-*.md` | Sections rédigées (résumé, 2 à 7, 9 à 11, annexes) |
 | `article-scientifique/fiches-lecture.md` | Travaux liés vérifiés |
+| `dossier-recherche/revisions/20261010-vivacite-supervision.md` | Coupures de durée, rôle du superviseur, correction, reprise réelle et protocole de comparaison proposé |
 | `docs/benchmarks/billing/conception.md`, `plan-implementation.md` | Conception et réalisation du banc |
 | `docs/benchmarks/billing/observations.md`, `defauts-moteur.md` | Comportements du moteur et défauts |
 | `docs/benchmarks/billing/verification-correctifs.md` | Vérification des correctifs (pré-enregistrement) |

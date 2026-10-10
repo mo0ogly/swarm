@@ -8,7 +8,7 @@ cette distinction est consignée dans les fiches de lecture du dépôt.
 
 ## 2.1 Orchestration d'agents et défaillances
 
-Les rapports de Cursor décrivent l'organisation la plus aboutie publiquement : des planificateurs
+Les rapports de Cursor décrivent une organisation d’agents à grande échelle : des planificateurs
 et sous-planificateurs répartissent le travail entre des exécutants à périmètre limité, reliés
 par des passations structurées [Lin 2026a]. Le retrait de l'intégrateur central et l'acceptation
 d'un taux d'erreur non nul y sont des choix d'ingénierie explicites. La version suivante consigne
@@ -17,15 +17,18 @@ discutant le coût selon le mélange de modèles [Lin 2026b]. Anthropic rapporte
 de recherche multi-agents, une consommation de l'ordre de quinze fois celle d'une conversation et
 recommande des protections déterministes comme la reprise et les points de sauvegarde
 [Hadfield 2025]. Ces textes sont des rapports d'ingénierie, non évalués par des pairs ; ils
-documentent surtout des travaux réversibles.
+documentent surtout la recherche et la production d’artefacts intermédiaires. Cursor décrit
+aussi des contrôles avant livraison et une infrastructure de coordination : notre proposition
+porte sur la médiation de chaque transition avant un effet externe, et non sur une absence
+supposée de contrôle déterministe chez Cursor.
 
 Du côté de l'analyse, Cemri et al. étudient 1 642 traces de systèmes multi-agents et proposent la
 taxonomie MAST : quatorze modes de défaillance répartis entre conception du système, désalignement
 entre agents et vérification des tâches, avec un accord inter-annotateurs de κ = 0,88
-[Cemri 2025]. La vérification absente, incomplète ou incorrecte y figure en bonne place. MAST ne
-contient en revanche aucune catégorie pour les défauts de l'orchestrateur lui-même : un moteur qui
-applique une règle erronée, ou une règle juste mais mal calibrée, n'y a pas de place. La question
-d'attribution QR3 part de ce manque.
+[Cemri 2025]. La vérification absente, incomplète ou incorrecte y figure en bonne place. MAST contient une catégorie de défauts de conception du système. Elle ne doit donc pas être
+présentée comme ignorant l’orchestration. QR3 propose une distinction opérationnelle plus fine
+entre défaut de moteur transactionnel, politique mal calibrée, faute de l’agent et environnement,
+à confronter aux catégories existantes plutôt qu’à supposer absente de toute analyse antérieure.
 
 ## 2.2 Contrôle des actions à l'exécution
 
@@ -111,3 +114,19 @@ qualifie pas leur efficacité, qui relève de leurs propres évaluations.
 Le manque que ce travail vise est donc précis : aucun des travaux recensés ne combine la
 médiation du cycle de vie des tentatives (lancement, reprise, acceptation), le lien entre la
 preuve et le candidat exécuté, et une évaluation sous fautes ordinaires avec et sans médiation.
+
+
+## 2.6 Actualisation du corpus moteur — 10 octobre 2026
+
+Cursor reste le corpus prioritaire : janvier et février sont conservés, avec les évolutions
+sur les swarms de juillet [Lin 2026b], l’évaluation du moteur d’avril [Heule-Katz 2026] et
+l’efficacité du contexte de septembre [Katz et al. 2026]. Il faut comparer les versions plutôt
+que supposer une architecture fixe. Cette recherche est complétée par Google/Gemini
+[Google ADK 2026 ; Google Deep Research 2026], OpenAI [Bolin 2026 ; Lopopolo 2026] et
+Anthropic [Rajasekaran 2026 ; Martin et al. 2026]. Ce sont des sources industrielles primaires,
+pas une certification de Swarm. Les fiches distinguent mécanismes décrits, limites et hypothèses
+à tester ; les résultats fournisseurs ne sont pas transposés en résultats du dépôt.
+
+La [comparaison détaillée et le protocole](../article-scientifique/fiches-lecture.md#5-moteur-swarm--sources-industrielles-actualisées-au-10-octobre-2026)
+portent sur coordination, mémoire, jugement, contrôle du flux, débit et coût. Leur ajout est
+une actualisation documentaire ; il ne modifie pas les résultats expérimentaux des sections suivantes.

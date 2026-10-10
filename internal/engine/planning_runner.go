@@ -3,6 +3,7 @@
 package engine
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -88,7 +89,11 @@ func (s *Store) planningStep(work string) error {
 	if err != nil {
 		return s.planningFailure(work, selected, scope.Generation, err.Error())
 	}
-	claim := PlanningRequest{Schema: 1, EventID: newID("planning-claim-"), Revision: w.Revision, Scope: selected, ScopeRevision: scope.Revision, Holder: newID("planner-"), LeaseSeconds: 120}
+	waitPolicy, err := s.providerWaitConfig()
+	if err != nil {
+		return err
+	}
+	claim := PlanningRequest{Schema: 1, EventID: newID("planning-claim-"), Revision: w.Revision, Scope: selected, ScopeRevision: scope.Revision, Holder: newID("planner-"), LeaseSeconds: waitPolicy.Values.Lease}
 	w, err = s.planningChange(work, "claim", claim)
 	if err != nil {
 		if commandFailure(err).Code == "budget_exhausted" {
@@ -144,7 +149,7 @@ Pour un retour périmé ou sans action utile : operations vide et justification 
 	if p.ModelRoute != nil && (route == nil || route.PolicyHash != p.ModelRoute.PolicyHash) {
 		return s.planningFailure(work, selected, generation, "Politique de modèles modifiée ; réexaminer la configuration.")
 	}
-	reply, err := runStructuredProvider(provider, route, prompt, planningSchemaForEvents(scope.Delivery.Events), 90*time.Second, func() bool {
+	reply, err := s.runStructuredProvider(provider, route, prompt, planningSchemaForEvents(scope.Delivery.Events), 0, func() bool {
 		if e := s.providerCooldownGuard(p.Provider); e != nil {
 			return false
 		}
@@ -153,7 +158,18 @@ Pour un retour périmé ou sans action utile : operations vide et justification 
 			return false
 		}
 		currentScope, e := current.Planning.scope(selected)
-		return e == nil && currentScope.Generation == generation && currentScope.Holder == claim.Holder
+		if e != nil || currentScope.Generation != generation || currentScope.Holder != claim.Holder {
+			return false
+		}
+		until, e := time.Parse(time.RFC3339Nano, currentScope.Until)
+		if e != nil || !time.Now().Before(until) {
+			return false
+		}
+		if time.Until(until) < time.Duration(claim.LeaseSeconds)*time.Second/2 {
+			err := s.renewPlanningLease(current, selected, claim.Holder, generation, claim.LeaseSeconds)
+			return err == nil || commandFailure(err).Code == "revision_conflict"
+		}
+		return true
 	}, func(u *Usage) { _ = s.savePlanningUsage(claim.EventID, u) }, s.providerCooldownObserver(p.Provider, claim.EventID))
 	if err != nil {
 		if quota := s.providerCooldownGuard(p.Provider); quota != nil {
@@ -184,6 +200,38 @@ Pour un retour périmé ou sans action utile : operations vide et justification 
 		}
 	}
 	return s.planningFailure(work, selected, generation, "Proposition non appliquée : "+err.Error())
+}
+
+// A live call retains ownership without spending another activation. Expired,
+// replaced or paused claims never resurrect; the next claim has a new generation.
+func (s *Store) renewPlanningLease(w Work, scope, holder string, generation, seconds int) error {
+	payload, _ := json.Marshal(map[string]any{"scope": scope, "holder": holder, "generation": generation, "lease_seconds": seconds})
+	_, err := s.mutateWithHook(w.ID, "planning.lease-renew", newID("lease-renew-"), w.Revision, payload, func(current *Work) error {
+		if current.Planning == nil || current.Planning.Paused || current.Planning.Failure != "" {
+			return fmt.Errorf("activation révoquée")
+		}
+		owner, err := current.Planning.scope(scope)
+		if err != nil {
+			return err
+		}
+		until, err := time.Parse(time.RFC3339Nano, owner.Until)
+		if err != nil || owner.Holder != holder || owner.Generation != generation || !time.Now().Before(until) {
+			return planningError("stale_lease", "activation expirée ou remplacée")
+		}
+		owner.Until = time.Now().Add(time.Duration(seconds) * time.Second).Format(time.RFC3339Nano)
+		return nil
+	}, func(tx *sql.Tx, _ *Work) error {
+		var paused int
+		err := tx.QueryRow("SELECT paused FROM cockpit_controls WHERE work_id=?", w.ID).Scan(&paused)
+		if err != nil && err != sql.ErrNoRows {
+			return err
+		}
+		if paused != 0 {
+			return fmt.Errorf("activation révoquée")
+		}
+		return nil
+	})
+	return err
 }
 
 func (s *Store) planningFailure(work, scope string, generation int, reason string) error {
@@ -248,6 +296,27 @@ func runStructuredProviderClock(provider Provider, route *ModelRoute, prompt, sc
 }
 
 func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, deadline time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
+	return runStructuredProviderPolicyClock(provider, route, prompt, schema, images, 0, deadline, valid, record, now, observers...)
+}
+
+func (s *Store) runStructuredProvider(provider Provider, route *ModelRoute, prompt, schema string, maximum time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+	return s.runStructuredProviderImages(provider, route, prompt, schema, nil, maximum, valid, record, observers...)
+}
+
+func (s *Store) runStructuredProviderImages(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, maximum time.Duration, valid func() bool, record func(*Usage), observers ...func(*ProviderCooldown) error) (string, error) {
+	config, err := s.providerWaitConfig()
+	if err != nil {
+		return "", err
+	}
+	if maximum == 0 {
+		maximum = time.Duration(config.Values.Maximum) * time.Second
+	}
+	return runStructuredProviderPolicyClock(provider, route, prompt, schema, images, time.Duration(config.Values.Silence)*time.Second, maximum, valid, record, suspendAwareNow, observers...)
+}
+
+// Freeze the policy once per call. Activity resets only the silence deadline;
+// an explicitly enabled total duration remains independent and bounded.
+func runStructuredProviderPolicyClock(provider Provider, route *ModelRoute, prompt, schema string, images []reviewImage, silence, maximum time.Duration, valid func() bool, record func(*Usage), now func() time.Duration, observers ...func(*ProviderCooldown) error) (string, error) {
 	p, err := assistantProvider(provider)
 	if err != nil {
 		return "", err
@@ -287,7 +356,15 @@ func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prom
 	diagnostic := &assistDiagnostic{}
 	cmd.Stderr = diagnostic
 	output := make(chan assistOutput, 1)
-	go func() { output <- readAssistOutput(reader, observers...) }()
+	activity := make(chan struct{}, 1)
+	go func() {
+		output <- readAssistOutputObserved(reader, func() {
+			select {
+			case activity <- struct{}{}:
+			default:
+			}
+		}, observers...)
+	}()
 	if !valid() {
 		writer.Close()
 		<-output
@@ -302,9 +379,34 @@ func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prom
 	}
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait(); writer.Close() }()
-	expires := now() + deadline
-	timer := time.NewTimer(deadline)
-	defer timer.Stop()
+	started := now()
+	lastActivity := started
+	var timer *time.Timer
+	var timerC <-chan time.Time
+	if maximum > 0 {
+		timer = time.NewTimer(maximum)
+		timerC = timer.C
+		defer timer.Stop()
+	}
+	var silenceTimer *time.Timer
+	var silenceC <-chan time.Time
+	if silence > 0 {
+		silenceTimer = time.NewTimer(silence)
+		silenceC = silenceTimer.C
+		defer silenceTimer.Stop()
+	}
+	refreshActivity := func() {
+		lastActivity = now()
+		if silenceTimer != nil {
+			if !silenceTimer.Stop() {
+				select {
+				case <-silenceTimer.C:
+				default:
+				}
+			}
+			silenceTimer.Reset(silence)
+		}
+	}
 	tick := time.NewTicker(200 * time.Millisecond)
 	defer tick.Stop()
 	stopped := false
@@ -312,7 +414,21 @@ func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prom
 		select {
 		case err = <-done:
 			stopped = true
-		case <-timer.C:
+		case <-activity:
+			refreshActivity()
+		case <-silenceC:
+			// Drain activity already parsed at the deadline before declaring silence.
+			select {
+			case <-activity:
+				refreshActivity()
+				continue
+			default:
+			}
+			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+			<-done
+			err = fmt.Errorf("silence du fournisseur dépassé / provider silence exceeded")
+			stopped = true
+		case <-timerC:
 			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 			<-done
 			err = fmt.Errorf("délai du planificateur dépassé")
@@ -320,10 +436,24 @@ func runStructuredProviderImagesClock(provider Provider, route *ModelRoute, prom
 		case <-tick.C:
 			// Go timers exclude Linux suspend time. Check boot time as well so
 			// waking the host cannot extend a billable provider's authorization.
-			if now() >= expires {
+			currentTime := now()
+			if maximum > 0 && currentTime-started >= maximum {
 				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 				<-done
 				err = fmt.Errorf("délai du planificateur dépassé (veille comprise)")
+				stopped = true
+				continue
+			}
+			if silence > 0 && currentTime-lastActivity >= silence {
+				select {
+				case <-activity:
+					refreshActivity()
+					continue
+				default:
+				}
+				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+				<-done
+				err = fmt.Errorf("silence du fournisseur dépassé (veille comprise) / provider silence exceeded including suspend")
 				stopped = true
 				continue
 			}

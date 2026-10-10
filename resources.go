@@ -36,3 +36,9 @@ var Automation []byte
 
 //go:embed config/web-session.json
 var WebSession []byte
+
+//go:embed config/preparation-timeout.json
+var PreparationTimeout []byte
+
+//go:embed config/provider-wait.json
+var ProviderWait []byte

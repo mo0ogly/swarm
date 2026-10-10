@@ -141,7 +141,7 @@ func TestManagedFragmentResumeRejectsInvalidDeadline(t *testing.T) {
 	s, w, a, r, _, _ := fragmentStoreFixture(t)
 	task, _ := w.task(a.TaskID)
 	task.IndependentReview = &r
-	w.Planning.Reviewer.TimeoutSeconds = 901
+	w.Planning.Reviewer.TimeoutSeconds = -1
 	if err := s.queueManagedFragmentResume(w, task, "invalid-deadline"); err == nil {
 		t.Fatal("invalid deadline accepted")
 	}

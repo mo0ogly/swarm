@@ -1,0 +1,5 @@
+{
+  "silence_seconds": 300,
+  "max_duration_seconds": 0,
+  "planning_lease_seconds": 120
+}

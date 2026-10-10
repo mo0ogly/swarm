@@ -114,3 +114,21 @@ aucun document et ne déclenche aucune relance automatique. Corriger la cause
 avant un nouvel envoi ; l'échange et sa consommation restent dans l'historique.
 Les anciens rejets génériques ne peuvent pas être diagnostiqués rétroactivement
 si la réponse originale n'a pas été conservée.
+
+## Délai du dialogue de préparation
+
+Administration → Dialogue de préparation expose le délai par défaut et le plafond,
+en secondes. Les deux valeurs sont modifiables, prévisualisées avant sauvegarde,
+persistées avec révision, auteur et motif, puis consultables dans l’historique.
+Un retour à un ancien réglage applique ses valeurs dans une nouvelle révision.
+CLI : `swarm run-limits preparation show|history|preview|apply` ; CLI et API
+authentifiée utilisent la même validation.
+
+Les valeurs initiales sont dans `config/preparation-timeout.json` ; aucun plafond
+de politique de 120, 300 ou 600 secondes ne reste dans le runtime Go. Les valeurs
+positives doivent respecter délai ≤ plafond et être représentables par une durée
+Go. La politique s’applique aux nouveaux échanges de préparation ; chacun fige
+ses deux valeurs. Les appels existants conservent leur délai d’origine. Arrêt
+manuel et absence de relance automatique sont conservés. Les délais des workers
+et des revues restent des réglages distincts. Le binaire corrigé doit être actif
+pour utiliser ces contrôles.

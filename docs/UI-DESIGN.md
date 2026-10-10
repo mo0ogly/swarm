@@ -178,8 +178,17 @@ accepte `--modules` et `--swarm-recorded` pour conserver les autres enregistreme
 Exécuter la présentation avant le générateur de modules pour inclure ses empreintes
 dans `manifest.json`, puis `build_player.py`, `build_kits.py` et reconstruire le binaire.
 
-Dater chaque module selon sa véritable capture. Le lecteur indique les dates
-distinctes Swarm/client/restaurant ; les captures historiques des PDF et DOCX
+Dater chaque module selon sa véritable capture. Le storyboard et la documentation
+indiquent les dates distinctes Swarm/client/restaurant ; les captures historiques des PDF et DOCX
 restent datées. `tests/training_design_ui.cjs` vérifie le lecteur embarqué et les
 deux kits extraits : FR/EN, vidéos, décodage, déplacement dans la vidéo, absence
 de lecture automatique, thèmes et largeur mobile.
+
+## Texte destiné aux utilisateurs
+
+Le lecteur de formation privilégie les gestes à apprendre et leur résultat.
+Les conditions de capture, les détails d’encodage et les preuves de vérification
+restent dans le storyboard et la documentation technique. Ne pas les répéter en
+introduction, en pied de page ou dans des avertissements génériques.
+Une précision reste visible lorsqu’elle aide à comprendre une action, son effet
+ou une décision réelle : une erreur, un coût, une confirmation ou un résultat.

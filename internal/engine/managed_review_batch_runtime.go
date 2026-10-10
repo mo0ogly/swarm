@@ -212,7 +212,7 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 			return finish("error", e.Error())
 		}
 		record.Batches[i] = child
-		reply, callErr := runStructuredProvider(provider, route, child.RetryFeedback+b.Prompt, managedReviewSchema, time.Duration(timeout)*time.Second, func() bool {
+		reply, callErr := s.runStructuredProvider(provider, route, child.RetryFeedback+b.Prompt, managedReviewSchema, time.Duration(timeout)*time.Second, func() bool {
 			if s.providerCooldownGuard(cfg.Provider) != nil || s.paused(w.ID) || s.managedReviewFilesIntact(record) != nil {
 				return false
 			}

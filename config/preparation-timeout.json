@@ -1,0 +1,4 @@
+{
+  "timeout_seconds": 300,
+  "max_timeout_seconds": 600
+}

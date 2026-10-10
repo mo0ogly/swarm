@@ -1,0 +1,4 @@
+interface:
+  display_name: "Modèles Swarm"
+  short_description: "Concevoir des modèles Swarm et vérifier leurs parcours"
+  default_prompt: "Utilise $swarm-model-design pour concevoir un modèle Swarm avec ses actions, décisions, validations et parcours FR/EN."

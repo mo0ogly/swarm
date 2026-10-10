@@ -16,8 +16,8 @@
             "en": "Write and save the requirements"
           },
           "result": {
-            "fr": "Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.",
-            "en": "Scope, rules and required evidence are explicit. No AI call here."
+            "fr": "Périmètre, règles et preuves attendues sont enregistrés pour préparer le plan de travail.",
+            "en": "Scope, rules and required evidence are saved to prepare the work plan."
           },
           "seconds": 6
         },
@@ -118,8 +118,8 @@
             "en": "Review the effect before confirming"
           },
           "result": {
-            "fr": "L’aperçu explique la portée et l’invalidation des anciennes preuves. Nous avons annulé.",
-            "en": "The preview explains scope and invalidation of old evidence. We cancelled."
+            "fr": "L’aperçu permet de vérifier la portée du changement et les preuves à renouveler avant de confirmer.",
+            "en": "The preview shows the scope of the change and which evidence needs renewing before you confirm."
           },
           "seconds": 6
         }
@@ -129,8 +129,8 @@
         "en": "Does a successful command mean the mission is complete?"
       },
       "answer": {
-        "fr": "Non. Elle apporte une preuve sur les fichiers et critères liés au candidat. La recette visuelle, la revue et les conditions d’acceptation restent distinctes. Dans cet enregistrement, aucune politique n’a été appliquée et aucune tâche n’a été acceptée.",
-        "en": "No. It provides evidence for the files and criteria linked to the candidate. Visual testing, review and acceptance conditions remain distinct. No policy was applied and no task was accepted in this recording."
+        "fr": "Non. Elle apporte une preuve sur les fichiers et critères liés au candidat. La recette visuelle, la revue et les conditions d’acceptation restent distinctes.",
+        "en": "No. It provides evidence for the files and criteria linked to the candidate. Visual testing, review and acceptance conditions remain distinct."
       },
       "recorded": "2026-10-10"
     },

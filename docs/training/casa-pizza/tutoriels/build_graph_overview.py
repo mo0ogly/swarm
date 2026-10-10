@@ -21,11 +21,25 @@ def main():
         ('19-commande-fr', 3, 'python3 : un programme autorisé et visible.'),
         ('19-commande-fr', 3, 'Les arguments sont exacts. Un par ligne.'),
         ('16-controle-fr', 10, 'Un délai configurable : 60 secondes.'),
-        ('17-apercu-fr', 6, 'Aperçu annulé. Aucun contrôle exécuté.'),
+        ('17-apercu-fr', 6, 'Examiner l’effet du changement avant de confirmer.'),
     ]
     mod = module('graph-overview', 'Le graphe et ses contrôles', '', [], '', '', '', '')
-    mod['steps'] = [step(frame, text, '', 'Captures Swarm du 10 octobre 2026 · aucune tâche exécutée.', '')
-                    for frame, _, text in scenes]
+    results = [
+        'Les flèches vont du prérequis vers la tâche qui en dépend.',
+        'Ajustez le zoom pour lire les informations de chaque tâche.',
+        'Réduisez une branche pour vous concentrer sur une partie du travail.',
+        'Le détail rassemble les critères, les dépendances et les actions.',
+        'Les prérequis déterminent les étapes à terminer en premier.',
+        'Choisissez les contrôles adaptés aux critères de la tâche.',
+        'Le critère précise le résultat attendu.',
+        'Le contrôle examine les fichiers indiqués.',
+        'Choisissez le programme qui réalise le contrôle.',
+        'Saisissez chaque argument sur sa propre ligne.',
+        'Adaptez le délai à la durée prévue du contrôle.',
+        'Vérifiez la portée et les preuves à renouveler.',
+    ]
+    mod['steps'] = [step(frame, text, '', result, '')
+                    for (frame, _, text), result in zip(scenes, results)]
     cues = ['WEBVTT', '']
     elapsed = 0
     with tempfile.TemporaryDirectory(prefix='overview-') as directory:

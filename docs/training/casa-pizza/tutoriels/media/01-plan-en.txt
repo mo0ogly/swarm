@@ -1,5 +1,5 @@
 00s — Write and save the requirements
-Scope, rules and required evidence are explicit. No AI call here.
+Scope, rules and required evidence are saved to prepare the work plan.
 
 06s — Open Overview and Fit overview
 Six tasks remain to do; arrows connect prerequisites to dependent tasks.

@@ -22,6 +22,75 @@ func preparedTeam(t *testing.T) (*Store, Preparation) {
 	}
 	return s, p
 }
+
+func TestPreparedOrganizationManagedRepository(t *testing.T) {
+	for _, validation := range []string{"automatic", "human"} {
+		t.Run(validation, func(t *testing.T) {
+			s, _, _ := prepDialogueFixture(t, prepReplyScript)
+			p := readyPreparation(t, s, "")
+			source := filepath.Join(s.root, "source")
+			if err := os.MkdirAll(source, 0700); err != nil {
+				t.Fatal(err)
+			}
+			gitTest(t, source, "init")
+			if err := os.WriteFile(filepath.Join(source, "value.txt"), []byte("base\n"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			gitTest(t, source, "add", ".")
+			gitTest(t, source, "commit", "-m", "base")
+			original := gitTest(t, source, "rev-parse", "HEAD")
+			if err := os.WriteFile(filepath.Join(source, "value.txt"), []byte("selected dirty value\n"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			r := conversionRequest(t, s, p, "create-missions")
+			controls := map[string][]ValidationControl{}
+			for _, task := range fixturePlan().Tasks {
+				for _, id := range []string{"plan-entry", "plan-validation", "plan-delivery", "plan-criterion-1"} {
+					c := automaticPolicy("git", "diff", "--exit-code").Controls[0]
+					c.ID = id
+					controls[task.ID] = append(controls[task.ID], c)
+				}
+			}
+			r.Organization = &PreparationOrganization{Provider: "test", Workspace: source, Validation: validation, Controls: controls, MaxTasks: 10, MaxCalls: 30, Repository: &ManagedRepositoryRequest{Path: source, Include: []string{"value.txt"}}}
+			got, err := s.preparationCommand(r)
+			if validation == "human" {
+				if err == nil || !strings.Contains(err.Error(), "contrôles automatiques") {
+					t.Fatal(err)
+				}
+				fresh, _ := s.preparation(p.ID)
+				if fresh.Revision != p.Revision || fresh.Conversion != nil {
+					t.Fatal("rejected conversion changed preparation")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			w, err := s.get(got.WorkID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if w.Planning.Repository == nil || w.Planning.Repository.Base == original {
+				t.Fatal("selected snapshot was not attached")
+			}
+			copy, err := s.ensureManagedAttempt(w, Launch{EventID: "snapshot-attempt", TaskID: w.Tasks[0].ID})
+			if err != nil {
+				t.Fatal(err)
+			}
+			b, err := os.ReadFile(filepath.Join(copy, "value.txt"))
+			if err != nil || string(b) != "selected dirty value\n" {
+				t.Fatal(string(b), err)
+			}
+			if gitTest(t, source, "rev-parse", "HEAD") != original {
+				t.Fatal("source HEAD changed")
+			}
+			replayed, err := s.preparationCommand(r)
+			if err != nil || replayed.WorkID != got.WorkID || replayed.Revision != got.Revision {
+				t.Fatal("conversion replay changed snapshot", err)
+			}
+		})
+	}
+}
 func TestPreparedOrganizationAndRevision(t *testing.T) {
 	s, p := preparedTeam(t)
 	w, e := s.get(p.WorkID)

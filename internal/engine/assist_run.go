@@ -162,6 +162,10 @@ type assistOutput struct {
 }
 
 func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) assistOutput {
+	return readAssistOutputObserved(r, nil, observers...)
+}
+
+func readAssistOutputObserved(r io.Reader, activity func(), observers ...func(*ProviderCooldown) error) assistOutput {
 	out := assistOutput{}
 	counted := &assistCountingReader{Reader: r}
 	limited := &io.LimitedReader{R: counted, N: assistReplyLimit + 1}
@@ -177,6 +181,9 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 			continue
 		}
 		out.events++
+		if activity != nil && assistProductiveActivity(data) {
+			activity()
+		}
 		out.lastEvent = assistEventKind(data["type"])
 		if data["type"] == "assistant" {
 			out.assistantEvents++
@@ -240,6 +247,21 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 	_, _ = io.Copy(io.Discard, counted)
 	out.streamBytes = counted.bytes
 	return out
+}
+
+// Known reasoning/content events indicate liveness, not task success. Setup,
+// errors, quota retries, unknown JSON and arbitrary output cannot extend silence.
+func assistProductiveActivity(data map[string]any) bool {
+	switch data["type"] {
+	case "assistant", "item.updated", "item.completed":
+		return true
+	case "system":
+		return data["subtype"] == "thinking_tokens" || data["subtype"] == "task_progress" || data["subtype"] == "hook_progress"
+	case "stream_event":
+		event, ok := data["event"].(map[string]any)
+		return ok && event["type"] == "content_block_delta"
+	}
+	return false
 }
 
 type assistDiagnostic struct{ bytes.Buffer }

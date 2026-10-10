@@ -30,7 +30,8 @@ documenté, non un défaut.
 
 **D5 — Verrou SQLite non réessayé.** Un verrou transitoire pendant l'application d'une décision du
 responsable, ou pendant la revue indépendante, devenait un échec durable de la planification.
-C'est la seule cause des 32 exécutions exclues sur 3 000 dans la condition S.
+C’est la cause explicite de 27 erreurs sur 3 000 essais S. Les cinq délais supplémentaires
+présentent un claim sans décision suivante ; leur cause initiale reste inconnue (section 6.4).
 
 **D6 — Exigences vérifiées à la clôture, pas avant l'effet.** La clôture d'un périmètre refusait
 une exigence sans tâche acceptée, mais rien n'imposait qu'une tâche à effet ne parte qu'après
@@ -84,7 +85,7 @@ la clé métier sur les autres cas.
 
 | Défaut | Critère pré-enregistré | Avant correctif | Après correctif |
 |---|---|---|---|
-| D5 | aucune exclusion due au verrou SQLite sous F4e | 31 exclusions sur 300 | 0 sur 300 |
+| D5 | aucune exclusion due au verrou SQLite sous F4e | 26 ERREUR SQLite + 5 DÉLAI non attribués sur 300 | 0 sur 300 |
 | D3 | sous F5 : un seul lancement de `prepare`, reçu d'échec d'environnement, ni faux succès ni paiement inexact | lot régénéré | tenu sur 300 exécutions valides sur 300 |
 | D2 | sous F4e : événement `dependency_stale` et arrêt attribué au moteur | arrêt muet | tenu sur 300 sur 300 |
 | D6 | sans dépendance déclarée et avec la règle : aucun départ du règlement avant l'acceptation de `prepare`, règlement exact | non exercé | tenu sur 100 sur 100 |
@@ -123,3 +124,42 @@ disent pas que les défauts sont corrigés en général.
 
 La boucle « mesure, défaut, correctif, re-mesure » constitue néanmoins une contribution de méthode :
 elle traite le moniteur comme un objet d'évaluation au même titre que les agents qu'il contrôle.
+
+## 7.5 Relecture des entrées archivées
+
+Le 8 octobre 2026, après collecte des données, le lecteur CLI `tables_verif.py` a été durci
+pour refuser une grille incomplète, les graines dupliquées ou inattendues, une fin de campagne
+absente, les empreintes incohérentes entre les en-têtes et les lignes, et les preuves d’ordre
+manquantes. Ce changement de validation des entrées n’est pas un critère pré-enregistré : il
+ne modifie ni les critères métier, ni les JSONL historiques. La non-régression compare seulement
+les huit cas annoncés et refuse une comparaison sans mesures valides.
+
+Les 1 700 lignes de vérification et les 9 000 lignes historiques satisfont ces contrôles.
+Les cinq verdicts « critère tenu » et la non-régression restent inchangés. Cette relecture
+est une vérification technique distincte de l’analyse initiale ; elle ne vaut pas revue par
+les pairs ni inspection de chaque trace d’exécution. Les empreintes sont comparées dans
+l’archive ; ce contrôle ne reconstruit pas le binaire historique à partir de son commit.
+
+## 7.6 Vivacité des superviseurs — observation du 10 octobre 2026
+
+Une interruption de la mission d'évolution Cursor révèle une limite distincte
+des défauts D1 à D6. Le vérificateur puis le responsable racine ont été arrêtés
+par un plafond total de 90 secondes malgré une activité de raisonnement observée.
+Les événements avaient été adressés au responsable : le défaut concernait sa
+capacité à terminer le diagnostic, pas l'absence de routage.
+
+La correction sépare silence, durée totale facultative et bail de propriété
+renouvelable. Ces politiques sont persistées et réglables dans Admin, sans valeurs
+de politique en constantes Go. Les superviseurs analysent les retours et proposent
+les corrections ; le moteur contrôle propriété, budgets et acceptation. Seul le
+responsable racine était actif dans ce cas ; aucun sous-planificateur n'avait été
+créé. Un événement de raisonnement prolonge l'attente autorisée, sans prouver que
+le travail avance utilement.
+
+Après correction sur le serveur réel, la revue a terminé en 166,40 secondes avec
+une demande de preuve complémentaire. Le responsable a ensuite enregistré une
+correction ciblée et le moteur a lancé la deuxième tentative de T1. La
+[note datée](revisions/20261010-vivacite-supervision.md) conserve la chronologie,
+les réglages, la vérification, les limites et l'essai comparatif proposé.
+Cette observation après incident ne constitue ni une nouvelle campagne
+pré-enregistrée ni une preuve d'absence générale de blocages.

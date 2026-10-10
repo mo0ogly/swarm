@@ -19,7 +19,6 @@ async function reader(prefix,offline){
  for(const lang of ['fr','en']){
   await page.goto(prefix+'?lang='+lang,{waitUntil:'load'});
   await page.waitForSelector('#chapters button');assert.equal(await page.$eval('html',e=>e.lang),lang);
-  assert((await page.$eval('#scope',e=>e.textContent)).includes('10'));
   assert.equal(await page.$eval('#graph-intro',e=>e.hidden),lang==='en');
   assert.equal(await page.$eval('#kit-downloads',e=>e.hidden),offline);
   for(let i=0;i<4;i++){

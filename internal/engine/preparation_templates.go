@@ -11,6 +11,7 @@ import (
 var preparationTemplateFiles = resources.Preparations
 
 type PreparationTemplate struct {
+	WorkModel         *PreparationWorkModel         `json:"work_model,omitempty"`
 	ID                string                        `json:"id"`
 	Version           int                           `json:"version"`
 	Title             map[string]string             `json:"title"`
@@ -19,6 +20,24 @@ type PreparationTemplate struct {
 	RecommendedMethod string                        `json:"recommended_method"`
 	Questions         []PreparationTemplateQuestion `json:"questions"`
 	Team              []PreparationTemplateRole     `json:"team"`
+	Subject           *PreparationSubject           `json:"subject,omitempty"`
+}
+
+type PreparationSubject struct {
+	Summary       map[string]string         `json:"summary"`
+	Outcome       map[string]string         `json:"outcome"`
+	Example       map[string]string         `json:"example"`
+	Deliverables  map[string][]string       `json:"deliverables"`
+	Evidence      map[string][]string       `json:"evidence"`
+	Risks         map[string][]string       `json:"risks"`
+	Interventions []PreparationIntervention `json:"interventions"`
+}
+
+type PreparationIntervention struct {
+	ID                string            `json:"id"`
+	Title             map[string]string `json:"title"`
+	Guidance          map[string]string `json:"guidance"`
+	RecommendedMethod string            `json:"recommended_method"`
 }
 
 type PreparationTemplateQuestion struct {
@@ -35,21 +54,27 @@ type PreparationTemplateRole struct {
 	Workflow       *AgentWorkflow    `json:"workflow"`
 }
 type PreparationTemplateAnswers struct {
-	TemplateID string            `json:"template_id"`
-	Language   string            `json:"language"`
-	Answers    map[string]string `json:"answers"`
+	Increment    string            `json:"increment,omitempty"`
+	TemplateID   string            `json:"template_id"`
+	Language     string            `json:"language"`
+	Answers      map[string]string `json:"answers"`
+	Intervention string            `json:"intervention,omitempty"`
 }
 type PreparationTemplateCheck struct {
-	TemplateID       string                    `json:"template_id"`
-	Version          int                       `json:"version"`
-	Title            string                    `json:"title"`
-	Need             string                    `json:"need"`
-	Missing          []string                  `json:"missing"`
-	Answered         int                       `json:"answered"`
-	Total            int                       `json:"total"`
-	NeedComplete     bool                      `json:"need_complete"`
-	LaunchAuthorized bool                      `json:"launch_authorized"`
-	Team             []PreparationTemplateRole `json:"proposed_team"`
+	WorkPlan          *ActionPlan               `json:"work_plan,omitempty"`
+	Increment         string                    `json:"increment,omitempty"`
+	TemplateID        string                    `json:"template_id"`
+	Version           int                       `json:"version"`
+	Title             string                    `json:"title"`
+	Need              string                    `json:"need"`
+	Missing           []string                  `json:"missing"`
+	Answered          int                       `json:"answered"`
+	Total             int                       `json:"total"`
+	NeedComplete      bool                      `json:"need_complete"`
+	LaunchAuthorized  bool                      `json:"launch_authorized"`
+	Team              []PreparationTemplateRole `json:"proposed_team"`
+	Intervention      string                    `json:"intervention,omitempty"`
+	RecommendedMethod string                    `json:"recommended_method"`
 }
 
 // This checks draft completeness only. It neither creates agents nor grants
@@ -75,6 +100,32 @@ func checkPreparationTemplate(r PreparationTemplateAnswers) (PreparationTemplate
 		}
 	}
 	v := PreparationTemplateCheck{TemplateID: t.ID, Version: t.Version, Title: t.Title[r.Language], Need: t.Need[r.Language], Missing: []string{}, Total: len(t.Questions), Team: t.Team}
+	v.RecommendedMethod = t.RecommendedMethod
+	if t.Subject != nil {
+		if r.Intervention == "" && len(t.Subject.Interventions) > 0 {
+			r.Intervention = t.Subject.Interventions[0].ID
+		}
+		found := false
+		for _, intervention := range t.Subject.Interventions {
+			if intervention.ID != r.Intervention {
+				continue
+			}
+			found = true
+			v.Intervention = intervention.ID
+			v.RecommendedMethod = intervention.RecommendedMethod
+			if intervention.Title[r.Language] == "" || intervention.Guidance[r.Language] == "" || (v.RecommendedMethod != "ks-product" && v.RecommendedMethod != "debug") {
+				return PreparationTemplateCheck{}, fmt.Errorf("%s", uiText("Intervention du modèle invalide."))
+			}
+			v.Title += " — " + intervention.Title[r.Language]
+			v.Need += "\n## " + intervention.Title[r.Language] + "\n" + intervention.Guidance[r.Language] + "\n"
+			break
+		}
+		if !found {
+			return PreparationTemplateCheck{}, fmt.Errorf("%s", uiText("Intervention du modèle invalide."))
+		}
+	} else if r.Intervention != "" {
+		return PreparationTemplateCheck{}, fmt.Errorf("%s", uiText("Ce modèle ne propose pas de choix d’intervention."))
+	}
 	for _, q := range t.Questions {
 		answer := strings.TrimSpace(r.Answers[q.ID])
 		if answer == "" || strings.Contains(answer, "[à préciser") || strings.Contains(answer, "[define") || strings.Contains(answer, "[describe") {
@@ -96,6 +147,9 @@ func checkPreparationTemplate(r PreparationTemplateAnswers) (PreparationTemplate
 		return PreparationTemplateCheck{}, fmt.Errorf("%s", uiText("Brouillon limité à 16 000 octets."))
 	}
 	v.NeedComplete = len(v.Missing) == 0
+	if e := projectPreparationWorkPlan(t, r, &v); e != nil {
+		return PreparationTemplateCheck{}, e
+	}
 	return v, nil
 }
 
@@ -111,6 +165,9 @@ func preparationTemplates() ([]PreparationTemplate, error) {
 	}
 	// Use the same frozen role framing as agent launches, not a second list.
 	for i := range v {
+		if err := validatePreparationWorkModel(v[i].WorkModel); err != nil {
+			return nil, fmt.Errorf("%s: %w", v[i].ID, err)
+		}
 		for j := range v[i].Team {
 			w, _, err := agentWorkflow(v[i].Team[j].Role)
 			if err != nil {

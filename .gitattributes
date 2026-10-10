@@ -7,3 +7,5 @@ docs/plans/version-history/**/*.log whitespace=-blank-at-eol,-blank-at-eof
 # Preserve verbatim source excerpts in hash-bound review evidence.
 docs/plans/clear-launch-recovery/T1-handoff.md whitespace=-blank-at-eol
 docs/plans/clear-launch-recovery/T1-handoff-before-guidance-revalidation.md whitespace=-blank-at-eol
+# Patch context prefixes are data; preserve the hash-bound recovery artifact.
+docs/plans/engine-cursor-contract/recovery/*.patch whitespace=-blank-at-eol,-space-before-tab

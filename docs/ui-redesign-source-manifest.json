@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "manifest_status": "UI_REDESIGN_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
-  "base_commit": "36f884b8131a7d8e1b3c1c270a35f3f5b7a5c873",
-  "candidate_id": "36f884b8131a7d8e1b3c1c270a35f3f5b7a5c873+sha256:5b7ca49df2cd6fa10c97fb68b0ba486cc9efe806a74283c3cfaa3724261f22cb",
-  "candidate_digest": "5b7ca49df2cd6fa10c97fb68b0ba486cc9efe806a74283c3cfaa3724261f22cb",
+  "base_commit": "d4539e0041000a38acb162a17f053e318fb3db5d",
+  "candidate_id": "d4539e0041000a38acb162a17f053e318fb3db5d+sha256:9b53256813c31dd07de24ed512a888456b08f66700d0e22a37645afbfd00be55",
+  "candidate_digest": "9b53256813c31dd07de24ed512a888456b08f66700d0e22a37645afbfd00be55",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/training-delivery-source-manifest.json",
   "requirements": [
@@ -308,6 +308,16 @@
       "sha256": "89505ced3ad0a690094186957af92c51d06356e1b5aaf61c0cc886b503c4d401"
     },
     {
+      "path": ".claude/skills/swarm-model-design/SKILL.md",
+      "kind": "source",
+      "sha256": "413b14fc49985a8e5e45bfd7ce49d81e24dc0e47be8edb2e2f155ac1315a04a5"
+    },
+    {
+      "path": ".claude/skills/swarm-model-design/agents/openai.yaml",
+      "kind": "source",
+      "sha256": "14171a37eeddaa0ba1d51af3d50c58d827ef01684c84bc5b37164e321187afff"
+    },
+    {
       "path": ".dockerignore",
       "kind": "harness",
       "sha256": "f1ffdf7444b67537e1f3fc17c398b64cb5036b2df04569590a142e0889d18797"
@@ -324,13 +334,13 @@
     },
     {
       "path": "AGENTS.md",
-      "kind": "source",
-      "sha256": "9c376f4679093071d60851967271d745d0cb13649acdb07eec59377104cd2080"
+      "kind": "doc",
+      "sha256": "72577dd2795cb5d1e5793a61e83a8af10f1ad46e0c3fd807860dd60e67dd54fe"
     },
     {
       "path": "CLAUDE.md",
-      "kind": "source",
-      "sha256": "f6006acc9280902e9300bcf242caefb88a89bff1950788f1b4005508ef262a9f"
+      "kind": "doc",
+      "sha256": "59922cf36adece7150d81a3a60ba468370e70af8687ee415903713c18e6aa150"
     },
     {
       "path": "INSTALL.md",
@@ -475,7 +485,12 @@
     {
       "path": "docs/PREPARATION-TEMPLATES.md",
       "kind": "doc",
-      "sha256": "a80ffc46397ffcee67a72b50394d24b953a1f0ecc8c570c51a5f70d9d04a9d18"
+      "sha256": "8d789011108ed74f7c62717e940e03cb8974d56450e28f1d9fd3352db4e88ac3"
+    },
+    {
+      "path": "docs/PRODUCT-ARCHITECTURE.md",
+      "kind": "doc",
+      "sha256": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d"
     },
     {
       "path": "docs/PRODUCT-WORKFLOW.md",
@@ -490,7 +505,7 @@
     {
       "path": "docs/UI-DESIGN.md",
       "kind": "doc",
-      "sha256": "b76bc8e9f9ab1fbd7055972ec2e90522771ec7bec1c04dcaf7d2b97846af6a2d"
+      "sha256": "a2f01ba8f9ffa95a3ec03088dfa753879bdcf3c4e486f60f6d2e374a9ed8ebd1"
     },
     {
       "path": "docs/en/AGENT-METHODS.md",
@@ -518,6 +533,11 @@
       "sha256": "c7f2cc09d89fbcef361795ebe69e5e4101a46393a8fac255ec4177ddf0ff0c96"
     },
     {
+      "path": "docs/en/PREPARATION-TEMPLATES.md",
+      "kind": "doc",
+      "sha256": "3e33c88c9be2ab12d115875a13105942357571cfc8decfc37aff5e86f86f1842"
+    },
+    {
       "path": "docs/en/PREPARATION-UX.md",
       "kind": "doc",
       "sha256": "c9ffe55379a50af599fdade16425a52657802ce4f0bd8c8a0197bfe176c7c306"
@@ -536,6 +556,11 @@
       "path": "docs/graph-delivery-qualification-manifest.json",
       "kind": "doc",
       "sha256": "7f16ac09c204884e91c11eec172af2d68390ca90618bf250abea2a18b76a1def"
+    },
+    {
+      "path": "docs/plans/dev-launcher-20261010/PLAN.md",
+      "kind": "doc",
+      "sha256": "65af7a46ed1912db13cc7f3d9452a1b189f4693e4ed542e053621122077e5315"
     },
     {
       "path": "docs/plans/fresh-install-methods-20261008.md",
@@ -603,9 +628,29 @@
       "sha256": "c6501375f53626bb0b09484534db1c11e15106044e73d555f1e4499a93e62227"
     },
     {
+      "path": "docs/reports/portal-model-20261010.json",
+      "kind": "doc",
+      "sha256": "e9bd6263f96247ce36d312ddab255fc4ca9c62b3fe89f839739a85851b022abc"
+    },
+    {
+      "path": "docs/reports/preparation-subjects-20261010.md",
+      "kind": "doc",
+      "sha256": "721eb911df0c8b04da7a4046705dd46b05a34252694ba3c1fe7c969d6ec1494f"
+    },
+    {
+      "path": "docs/reports/projects-home-20261010.md",
+      "kind": "doc",
+      "sha256": "507693c9f4659660b0220394d28ca79bf4e322b82533a884a6f0ea04eef70963"
+    },
+    {
+      "path": "docs/reports/projects-method-20261010.md",
+      "kind": "doc",
+      "sha256": "4359f7965f79d19fd49feca21d065365571b77445f82aea1f4a31031df16c03b"
+    },
+    {
       "path": "docs/reports/ui-redesign-20261010.md",
       "kind": "doc",
-      "sha256": "c21289bec20440ebc5d0d69b791947b3d60160caa2bc251430e18e8683675f90"
+      "sha256": "b67fb8e5aac24145ad953bef18d31c029649d6039553e56ba84466916c10b79e"
     },
     {
       "path": "docs/screenshots/graph-delivery-d01/en-etat-graph.png",
@@ -953,9 +998,264 @@
       "sha256": "4c49b9f58f2daa42f01ad761646c2cf35969ec430b93a0c8e6a2ca6561206bd6"
     },
     {
+      "path": "docs/screenshots/portal-model-20261010/graph-en-etat.png",
+      "kind": "capture",
+      "sha256": "e1e44b4941e6f8fb23bca0885793703ccb1518ee76dfb539b918f0ea1c6e609e"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-en-sombre.png",
+      "kind": "capture",
+      "sha256": "43950281468154d8c3273b280c04c81d292735f957bf5d045d9b3ee5f4205bee"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-fr-etat.png",
+      "kind": "capture",
+      "sha256": "f23c48eac9c479a1108d1aa306fb214fed891ed8683a0ea6f09305fda3379eed"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-fr-sombre.png",
+      "kind": "capture",
+      "sha256": "847b6ac182b8ec28b5093ce16d1594dc54a931511e8c85afc75b03c02ebacb1f"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-en-etat.png",
+      "kind": "capture",
+      "sha256": "c36ede914c6884911bb43692b8d249f3df9492fb89d37dce424967c5ef4c8744"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-en-sombre.png",
+      "kind": "capture",
+      "sha256": "dd00acd898bb4d46ff6eec23c76c2219f74cdd6c78c912e0405e7a6ab828390d"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-fr-etat.png",
+      "kind": "capture",
+      "sha256": "f58a714456bad65a67945e3c6677976d4783ef440adc3a478ae62fd417de275f"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-fr-sombre.png",
+      "kind": "capture",
+      "sha256": "5410b269090bdba851056774b630b310b0aeccd021ef5d1c97db8c11ff8b4d09"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/product-visible.png",
+      "kind": "capture",
+      "sha256": "10da1075a829779b3ab35cb85a21c30c90840ac61db08d83ddd4bc66c7696006"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-etat.png",
+      "kind": "capture",
+      "sha256": "c2cefbaeac39ac1262f24eae1b0ff21ec177c539c6a9cbbd7b5c6590e833ad77"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-sombre.png",
+      "kind": "capture",
+      "sha256": "94974a109247e6b6db2e79fa18a023f0bafea69ef475e50174e60ecf9279048a"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-etat.png",
+      "kind": "capture",
+      "sha256": "e3b5a2cd8fddc4518580eeb7ccb278ccdfc92e8053767bae89929d9f4c510c56"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-sombre.png",
+      "kind": "capture",
+      "sha256": "d4fdfebfc5fed9c3cdf6f2d5ac4b68173073f39036334efb1bbf16e652c37797"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/check-error-en.png",
+      "kind": "capture",
+      "sha256": "1080da73e580b7c080dbbc92f74df7f889fb34c0d87fc2119357c7e5f0fe6e7c"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/qualification.json",
+      "kind": "doc",
+      "sha256": "efb7d2e761c98f7e115f39ef4e1ec44f5d75b58d5326f658a79b6257b9a15113"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/result.json",
+      "kind": "doc",
+      "sha256": "b56b9516327710a0d6fd85351b043ae4637c59a9035f5d06b19fd4670414627d"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat-mobile.png",
+      "kind": "capture",
+      "sha256": "5c730f45ca45c58d3e7814e8cea6f456e82b9423a9186f5f4ef421da28ac7bd7"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
+      "kind": "capture",
+      "sha256": "dece9f329db8a0c3b6cc0e00d1bab85b4c0cbc42c300d038c8993d0dea265880"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
+      "kind": "capture",
+      "sha256": "925a34f46411f78e847f03a2977e4c44d45162a4de2821adc355fa081808b6b6"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
+      "kind": "capture",
+      "sha256": "d29bf44ff459b59d66e5eaa9d7a341a86256593e7674e23def4b5f37748a1c1e"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
+      "kind": "capture",
+      "sha256": "e8de3cf6a5514112acb33898a7a3d24882806fa636f7b6fd82c4cf1438a9236c"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
+      "kind": "capture",
+      "sha256": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
+      "kind": "capture",
+      "sha256": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
+      "kind": "capture",
+      "sha256": "4c2df9433e549879b59199f3f41a52b624493d722ac4ae4af08f68e81115aefe"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
+      "kind": "capture",
+      "sha256": "4e5f3deaf5e80592d40137d763d2d0b6e6bc840c2fa4874b9aa17e867e397853"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-etat.png",
+      "kind": "capture",
+      "sha256": "179fe14ce98157407f4668e013a6e5ca317813a92316b2b9fdea8e8114376665"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
+      "kind": "capture",
+      "sha256": "c38fa3d745ab2171af2c25abeb0fb76b1ccb7fd72a3df04ffd7dbfc2dc78feb5"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
+      "kind": "capture",
+      "sha256": "362a9d7ac5860c0e053cc5c0ef98aa63c26d414360838e3fe1e7f659c38603cf"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
+      "kind": "capture",
+      "sha256": "ad3dda130c1053782ca27de5177f9128225959fee4e24cd86e3eff9a54175260"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
+      "kind": "capture",
+      "sha256": "63c8a1cd8400232f8f4ec2f97026e7f26ac8062244c35c74af9872f802e5b47f"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
+      "kind": "capture",
+      "sha256": "b932ce091fbe5ffae966c3e3614a3193b0e4454446d8a07bba4f01beff787225"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
+      "kind": "capture",
+      "sha256": "574216c70777d524e6ccc981995160f972ec659d6ba069c8a23f62cf2b441343"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/result.json",
+      "kind": "doc",
+      "sha256": "dfc203fe428d2d01c4756e2a8370453c030c3ceb6e7dc7dc2cabfb638c9237e3"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
+      "kind": "capture",
+      "sha256": "840c965748f6cf9bf2530adb6266cc5733c53dfa2a1e0be54abc21862fcc0bb1"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
+      "kind": "capture",
+      "sha256": "00ce6a6875a472c3b744d51af6f5929e88df4101daaa3ba07371912b8a3ea607"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
+      "kind": "capture",
+      "sha256": "39a95ab1ce7db37111a2e7baee259eadf57bd81e7ed253f1b607463848b516e3"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
+      "kind": "capture",
+      "sha256": "047ebfbdd1a3f794a4a8a04f548007bffd8584ac2b4b480f8db9ded585a48f3b"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
+      "kind": "capture",
+      "sha256": "9d4021def5970f8c39f27561a7c56c7a891167a8f81efb32849d18bb78f6929a"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
+      "kind": "capture",
+      "sha256": "c9f03bc3b92b3ba26d32c7c5365ee166cd386810cad358c72229a3c5f1a30b13"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
+      "kind": "capture",
+      "sha256": "edd5e7d687d8153315682e4f526b7b051b5913e3a17d142a9b997be102c67647"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
+      "kind": "capture",
+      "sha256": "5e32034594e55f3c477a2d6f5659838c246c0690f9288c5b2d6780f10ac4ca9e"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
+      "kind": "capture",
+      "sha256": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
+      "kind": "capture",
+      "sha256": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
+      "kind": "capture",
+      "sha256": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
+      "kind": "capture",
+      "sha256": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
+      "kind": "capture",
+      "sha256": "4fbda8e7ea68f6ac2f2bbdaa23a8ac2a7db4b401bcaf5127c3eb940e3b729c61"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
+      "kind": "capture",
+      "sha256": "6b8f952f08831fdc6431d438fb4c6ae5024b0dba3a9c09b246abb753f7a257d3"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
+      "kind": "capture",
+      "sha256": "0775f1656fe2098f97c67ef34e9fa9710049a61e5cfd670217fb8eaa590191b3"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
+      "kind": "capture",
+      "sha256": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/qualification.json",
+      "kind": "doc",
+      "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/result.json",
+      "kind": "doc",
+      "sha256": "41d27d83107db17355397fc4fdf5371148831574610a2a3bba07df906ee4364d"
+    },
+    {
       "path": "docs/screenshots/ui-redesign-20261010/README.md",
       "kind": "doc",
-      "sha256": "1bc7109ff80bb44234caaa92ef030d5735482593a853eddfb92ab2d19acb47b4"
+      "sha256": "b608b5975621c44793911af1de0e9573e62ddb53593733158e67b51418d63f59"
     },
     {
       "path": "docs/screenshots/ui-redesign-20261010/candidate-graph-cache.json",
@@ -1133,6 +1433,21 @@
       "sha256": "b896473bedc1b10b328387f78bc11026b09f57375b079542248ba62d22dbeeeb"
     },
     {
+      "path": "docs/screenshots/ui-redesign-20261010/training-copy-candidate.json",
+      "kind": "doc",
+      "sha256": "f6da6a458d3ed84064b095558e6cdc0af9f46c177af5a31be252102e6f9b09c4"
+    },
+    {
+      "path": "docs/screenshots/ui-redesign-20261010/training-copy-fr.png",
+      "kind": "capture",
+      "sha256": "d5f188c5f69dbd7ffc3b0a8338a83b88aa7e0c7aba78ffe0fecf51ef6f8d4055"
+    },
+    {
+      "path": "docs/screenshots/ui-redesign-20261010/training-copy-result.json",
+      "kind": "doc",
+      "sha256": "47547a561b69f420f7c9e8f5ccd4837918017e2b01f1ba734f9355f1db8a455e"
+    },
+    {
       "path": "docs/screenshots/ui-redesign-20261010/training-media-result.json",
       "kind": "doc",
       "sha256": "d0c0b6bb0e47ecb4db4d4652208133a65969fc1ffde066b338c8a46ea2bce797"
@@ -1165,7 +1480,7 @@
     {
       "path": "docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip",
       "kind": "doc",
-      "sha256": "2f6e94b55d80f5ba688ff1e8221e848015c9b6475b59894aa1af4713adcc253d"
+      "sha256": "b29008bf3b6c810ab5067b4877386cb1d33ef6949a6eb3360e78cb023fabcd67"
     },
     {
       "path": "docs/training/casa-pizza/README.md",
@@ -1190,7 +1505,7 @@
     {
       "path": "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip",
       "kind": "doc",
-      "sha256": "aeac2f4cd8db7c925099a7a72eb63fa9f77d1a31297199b8a3f32b8dd80f6a4b"
+      "sha256": "cd8f95bb91584d154e0b82d209a130f3a552bd6aeb476957e4c3bde39984497f"
     },
     {
       "path": "docs/training/casa-pizza/VERIFICATION.md",
@@ -1490,17 +1805,17 @@
     {
       "path": "docs/training/casa-pizza/tutoriels/build_graph_overview.py",
       "kind": "harness",
-      "sha256": "bd423e2b3468b618ed7791fc346274d87b8b43ce7095f1901c2369b92e81b1a0"
+      "sha256": "ff48f42ed96b83df0ef56773957eac931e44c765220bff4b0f22c35fab45b077"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/build_media.py",
       "kind": "doc",
-      "sha256": "0e08d7ffd3ccd8db0d5632c327f3dca7b5470a2b3298f3a84c6deb264f017129"
+      "sha256": "6f6dbafaf1096a3944e63e8312373066f99c31db2dfb9778db1912a738e35cf5"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/build_player.py",
       "kind": "doc",
-      "sha256": "472663ed6b9df966e484830e9df65e5d5921e6dd510d0c78e9839d5da372d8a2"
+      "sha256": "b393de4be73385a8415c4e12acc8f5b79362f58cc59ac34e0382f08bb657b0f5"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/extend_guides.py",
@@ -1665,112 +1980,112 @@
     {
       "path": "docs/training/casa-pizza/tutoriels/index.html",
       "kind": "doc",
-      "sha256": "31d227dc7634f76f3a18863f344de3997c94128007b69d3667a8fd22099cad1d"
+      "sha256": "54e8d368f8a8e8e608544ed3d7da9302621eef386ce6477bf84db19c552c194c"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/manifest.json",
       "kind": "doc",
-      "sha256": "cdbd187ad820cbde2a8f0285d0cc4247659ef4b2d95f4b05b6f97afcefd9646a"
+      "sha256": "07aec1197f332748a77b04af4766e322903db106f55739daae8a52d763b9624e"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg",
       "kind": "doc",
-      "sha256": "2a7219c07b4297db3433a7675e20d150481d982f938a96d7e9b11a7697cdf044"
+      "sha256": "8a1ff80ced9c9fb1ae232d92a26526a6b529e42974aa6bcfc0294522d8d63435"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.gif",
       "kind": "doc",
-      "sha256": "51962caeed08d8497b6d3ff0332b6d395375e9ba5f2d49a309a9b8bf2df5a878"
+      "sha256": "c634d78c3a356d8d933306fd32e2cbd1f5dfbd9ae5a437fd635568a0cba37b0a"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
       "kind": "doc",
-      "sha256": "b75c584521a443226d39b4d6920a87a0f5987698994a9dd8371662d3c557dcd3"
+      "sha256": "61ea3a0e8e2049df308886f40a51de13379a310b27538ec1afcc80498bcbbc54"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.txt",
       "kind": "doc",
-      "sha256": "7e614939769ac026c392f500a309871337d9c933815991fafcf762ba815214a2"
+      "sha256": "c338a24b09e2e1f5b7e6ab788674e26c22261428881da11ec9b9abe1c0c08061"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.vtt",
       "kind": "doc",
-      "sha256": "ec23142f3d2f821008d4d8b55f399bba020ffcbd7c957bc694d85319bae1a475"
+      "sha256": "cedefebcc05ce9ca555750400d8972a207e2c35736d286d6b9d8b6303b39ab3e"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg",
       "kind": "doc",
-      "sha256": "29755023ca06f731837e085d9bbe981a8c738d48b96bab1659aba3926ae27bb1"
+      "sha256": "681e1e81762fdbe56d3c94887c920497701534f6c9a0ac372005adb83cca46fa"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif",
       "kind": "doc",
-      "sha256": "fcd21724387432e4c39ef068843ace65fe64b0405005ef38aa5dc21e3e145d23"
+      "sha256": "48521b15a987941e4df56ec0e2168f96224b08c7695a32868cda5baf6c74b508"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
       "kind": "doc",
-      "sha256": "4f721a961a2968afca40c2218d212ce7e87f55aed7fb4fa399e31b87314a36bb"
+      "sha256": "f884fe92e34b578915f968f31edbe9387ca772932bd3c675bfc728c601d114e8"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.txt",
       "kind": "doc",
-      "sha256": "95745bab606afcfb5aa1a7d053c6747448a41d275775dde3e6f9ca0bc72253d2"
+      "sha256": "477a1ef5fc6f75f014afcb9f9fdf67b0982df17bc79dca58f8107e161a3eb9b2"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.vtt",
       "kind": "doc",
-      "sha256": "5966336f55604c756a38317583d54e103aa87120be960a00db0dea28bc70e373"
+      "sha256": "1ba0d1075e3c585aee6754790e2eceedd2f15cade1166a14c8c2db5deb327ba3"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg",
       "kind": "doc",
-      "sha256": "961e688e6f8bc045febf81c0a86c66698988c22d6cef5a946fa98d6778916eba"
+      "sha256": "07943470c61821de67b82a775952a403e6b41ae584112f704cf49fad0720f8bc"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.gif",
       "kind": "doc",
-      "sha256": "4e6a1396ccf45efcfb824303d8c7ff3898f922a8bbf76a7de3e72eff952512d8"
+      "sha256": "38dd6cd4736454a06e0c08dc4c6bc811f42958519026cd33420bb99e47155dc0"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
       "kind": "doc",
-      "sha256": "30f2763d455ed43aebfb3350cf8d7ad4f23b31a47f31ca5204a231d1939b412e"
+      "sha256": "3d918c2623e74e1c57f90c6611dda24da9d701acbaddc213be31350ef10b2b75"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.txt",
       "kind": "doc",
-      "sha256": "e39f50a702fe586e0521da24524129342a308855fe08cefa5ea9cdd74254e2d1"
+      "sha256": "d555e8b09d902fe88689c1a0dc234eb42bcdc46f458efbe69db4ba32b743d216"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.vtt",
       "kind": "doc",
-      "sha256": "d3a9eac390f5f19775425db619d13046df752c6e0117575dfa56b5f2ed224371"
+      "sha256": "d04d94bf0ff9dcfdc9cc2885d34cdfb62ddddb06f4d6d25cbe907e9c89ae211a"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg",
       "kind": "doc",
-      "sha256": "d3f2cc86eedfce289ffe55344f05f8bb59fdf60123ca5e40be65c6cdb008ec1c"
+      "sha256": "a2fbfd2212f0ac23ffdc8bd96ee95d9f62d843cdd2a169d651813c0f0cbc7d34"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif",
       "kind": "doc",
-      "sha256": "fc8740bf70dc770881d6c6e364a33eea07a499f3d745e4d53d7bd31e7e2007b6"
+      "sha256": "b63185fdd6429e4a98141aa0ca029855546df0ae3867e725aec16490726559f9"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
       "kind": "doc",
-      "sha256": "c030fc5e6d251dae9942f23dc15ef039fd198812218141c4f72a07804a245fa5"
+      "sha256": "72654ffbae275e5537aafcf49e078966401423fa789f43318e100b8bba4bb910"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.txt",
       "kind": "doc",
-      "sha256": "bf16ecec8d735ba70fe2abbd3819c5bd42531c39f81df241fbfd66129d76f21a"
+      "sha256": "0da2bd22faaf185158bba0a39e407d87f19c7bcb0711f0b4b38e926aa60e9e16"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.vtt",
       "kind": "doc",
-      "sha256": "8bdb58b61bd313fc6d125f73c20140c78c9f8776b0c646cfd5a4af40836d8e87"
+      "sha256": "23ffcdfbe10b48b1d9b88a784c95ca5b54ebcd05514c0bceb7a34c8a8cb9e79d"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/03-client-en-poster.jpg",
@@ -1875,17 +2190,17 @@
     {
       "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr-poster.png",
       "kind": "doc",
-      "sha256": "d1be36ca1008d9c38820fdc7136152eda64aa7193b21b012074c549d0390d725"
+      "sha256": "bc66367e82f683d50ad32cd151704d1fe7553a0172ad2c5abee76a778afc70db"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4",
       "kind": "doc",
-      "sha256": "0248dbd5555ba4bb6b64b3a5a839b89c910effc0ffb78fe5b13a0cece4f93930"
+      "sha256": "5aef9a0dc13d4aa03c762f4dbf412d17eea85a046d06438ca81c69652a641ecc"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.vtt",
       "kind": "doc",
-      "sha256": "49cdadafff1a77691c4836ff84d2b7658b96320fb2d41ca77ca0efd667ac2d4b"
+      "sha256": "0b8743655c4c43174a0281bccd62828c054b20970dd2f7a0f5d8f0de248e638d"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/player.css",
@@ -1895,12 +2210,12 @@
     {
       "path": "docs/training/casa-pizza/tutoriels/player.js",
       "kind": "doc",
-      "sha256": "2623bf5f024a2b63e28541cb831c15f4e57a86afdbc594b51945f1fc5e670a23"
+      "sha256": "e998022f1fe534621cf1c3d84830fd4b8dc09c9cda03db18127eea61ce183666"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/storyboard.json",
       "kind": "doc",
-      "sha256": "c5bb4b48d8a7ea41dbd66b9c1c24bdb7f0d70a904d8b962f83ea2e6a79b96764"
+      "sha256": "9b834ff498ac5e1e4f58c1235114ecf58e5fbe137f2296caf1b48cb2f9268b56"
     },
     {
       "path": "docs/training/casa-pizza/tutoriels/swarm-logo.png",
@@ -3733,14 +4048,29 @@
       "sha256": "552b0c47859e4daa0ad8d6e8cc74b49cd5236b457ef5c4e637ef6212dab19cc8"
     },
     {
+      "path": "internal/engine/preparation_subjects_test.go",
+      "kind": "test",
+      "sha256": "2fadcb4b145d89de8454c23351492d22e9126c08e917142d208a24b5dc8f0f67"
+    },
+    {
       "path": "internal/engine/preparation_templates.go",
       "kind": "source",
-      "sha256": "a656f4d73f2de2d71c0e5c24d41c19b09421ed81acdafab87192b1196e2019ce"
+      "sha256": "ad99c355a0ece0480f9d0cc12072d23e7a2b39a38250a2e6ebfa64a208eae02f"
     },
     {
       "path": "internal/engine/preparation_templates_test.go",
       "kind": "test",
-      "sha256": "4838e5cc5f5fcfaf1a4c4ad742ded408bf6d30bc2f3ee2453f222691a834fed0"
+      "sha256": "0d35bb8488cd953da64462907422c5aa3e1e50e022ca694dae4a72508f76e5fc"
+    },
+    {
+      "path": "internal/engine/preparation_work_model.go",
+      "kind": "source",
+      "sha256": "f41f190f91ac9d88cd744ad2d9cb4e428c7a1c13758570a01018f20edf35c1d1"
+    },
+    {
+      "path": "internal/engine/preparation_work_model_test.go",
+      "kind": "test",
+      "sha256": "6839cd514363f805bf3325e2e92288dc015e8a126fdc22d818709f3240a588dd"
     },
     {
       "path": "internal/engine/prephase_answer_test.go",
@@ -4475,7 +4805,7 @@
     {
       "path": "locales/en.json",
       "kind": "source",
-      "sha256": "c09d7de1e11943950cde9ca1a810e208e9010c441bd245acd7696b2476afdbcf"
+      "sha256": "1e0a465baad415000bfd7b5011090a1f578ac80916ab0abbcda0c1597d750e3d"
     },
     {
       "path": "package.json",
@@ -4543,9 +4873,19 @@
       "sha256": "a459da96c1797e203b314c9ed0172446361984ef72379716e69a10d43b999979"
     },
     {
+      "path": "tests/preparation_subjects_ui.cjs",
+      "kind": "test",
+      "sha256": "812eb48828af2c314a3de419f7b6131dfbcc13c0015060fc0a6b4fd5f2f2f5ca"
+    },
+    {
       "path": "tests/preparation_templates_ui.cjs",
       "kind": "test",
-      "sha256": "207a3b7ee978350cd4b2391b8d444fea6ea1270d904772679b7900ade683d54e"
+      "sha256": "310552c2a5add174f7f8adc03331791b7803aa4d3e79f2e10bebc9a58f00ff19"
+    },
+    {
+      "path": "tests/preparation_work_model_ui.cjs",
+      "kind": "test",
+      "sha256": "11246779b3aa5163758faf5a1a8c298d9548277c91015a20bb2aceadc9531455"
     },
     {
       "path": "tests/product_graph_test.cjs",
@@ -4561,6 +4901,16 @@
       "path": "tests/product_views_ui.cjs",
       "kind": "test",
       "sha256": "228afed643bdc2c0f59925a870f3fcdb80d6bd5bf8bfb9713bd484b80211c5be"
+    },
+    {
+      "path": "tests/projects_home_ui.cjs",
+      "kind": "test",
+      "sha256": "092ab0ab335710c8764ad99ef7334eb31d4bd939106fe0b8e43beb077c0acf51"
+    },
+    {
+      "path": "tests/projects_method_ui.cjs",
+      "kind": "test",
+      "sha256": "d8e5309e32b7b8fdcc8c6af55635f7da448961861d6479fc59b0a2f450218993"
     },
     {
       "path": "tests/states_contract_test.cjs",
@@ -4605,7 +4955,7 @@
     {
       "path": "tests/training_design_ui.cjs",
       "kind": "test",
-      "sha256": "78eed95a5fe3cf727e211ffd2910b4f4d696ce9290bfc3da7a1621d692ff4eb2"
+      "sha256": "64c0c3eb387417c03dd4e0ae1b09a3ef7004d48c1c7d638e570185f8048b8a86"
     },
     {
       "path": "tools/agent-workflows/check.py",
@@ -4670,12 +5020,12 @@
     {
       "path": "tools/agent-workflows/templates/preparations.json",
       "kind": "source",
-      "sha256": "c72c282e891f1a4c2333b97acd6c6812cfa5a1e269d650df8b012c28561367e1"
+      "sha256": "ce6add5a3b3ff46e82cf2e977e5c95d35e5ce088ca05b75462a96eef25480557"
     },
     {
       "path": "tools/refresh_ui_source_manifest.py",
       "kind": "harness",
-      "sha256": "5fa4eb95429e1aded90ef4b13399e53449ef2c372574609359268f78d5ee3e67"
+      "sha256": "7ba32025640e8808bdf072a13c99ad1ad964dd3c80920dfe5af509697243114c"
     },
     {
       "path": "tools/swarm_local.py",
@@ -4850,7 +5200,7 @@
     {
       "path": "web/i18n-en.js",
       "kind": "source",
-      "sha256": "81d64bc27cf893f4446bd9d6eddfef3e2daaed3991e251e6c4abfffe4fca5ca4"
+      "sha256": "58163018f1678f9a917354fbc0fa798c10b979e87db40faf05b54cec2e9d6d51"
     },
     {
       "path": "web/i18n.js",
@@ -4860,7 +5210,7 @@
     {
       "path": "web/index.html",
       "kind": "source",
-      "sha256": "7189e2db7462f21d07156c9937ff69ba70611587b2ef9d669a9f7c0d1a39ca4a"
+      "sha256": "a940a6d04569490ba75ddd403f6424feea5d9d6e25cf70aa7b3d86dc892ee9c3"
     },
     {
       "path": "web/lib/dagre.LICENSE.txt",
@@ -5043,9 +5393,19 @@
       "sha256": "e024bfb90c01d130fbd02e1f425cafcbe75e4d7f4560a7ea6154abf2a82bc12a"
     },
     {
+      "path": "web/preparation-work-graph.js",
+      "kind": "source",
+      "sha256": "1031d4a2f0f6037b13765c9559e859c894443af6dd6a7aab6d3bcb2af8cffc50"
+    },
+    {
+      "path": "web/preparation-work-model.css",
+      "kind": "source",
+      "sha256": "41400774fcbf409acbcb4d0515ab5e749e4b3bc118aa45a4a1fa32d48534de48"
+    },
+    {
       "path": "web/prepare.html",
       "kind": "source",
-      "sha256": "b1169828201885650c9911e9cc790b5503eb989ae5cd5118bf4c5ff58df1808b"
+      "sha256": "b802b889aa15815a514ae9512939455452512529c01fe24c62ae660897e2248d"
     },
     {
       "path": "web/prephase-conversion.js",
@@ -5080,17 +5440,17 @@
     {
       "path": "web/prephase-templates.js",
       "kind": "source",
-      "sha256": "4e52eea5aca331adeec9b7eee41296005c540e3f3485ea2580c9244ca95ab1e7"
+      "sha256": "5b32152c97f5f35d248cc33b5913bacc014389cdaf7ec7d6d61c4ce386e025d2"
     },
     {
       "path": "web/prephase.css",
       "kind": "source",
-      "sha256": "4fee12fc1f2719ff48dfcdc6ff14b9d26a78686b06aac3024199632ac5cebc2a"
+      "sha256": "c8e01abf61de43935a2ca414f0fc3061bcf2c0fd5012a15e1b1744f7fb64b990"
     },
     {
       "path": "web/prephase.js",
       "kind": "source",
-      "sha256": "575f94f24109485804057603aea79ad8d14ddf1580fd9b83ba0068619c7d8388"
+      "sha256": "0cfd6e567f70ccfad815aef1fc2366c749551d0815c1e21ca7ddb9ac3575cc1a"
     },
     {
       "path": "web/pricing.js",
@@ -5126,6 +5486,21 @@
       "path": "web/project-profile.js",
       "kind": "source",
       "sha256": "b372bd35fd2094d1ed4859d10c38afc108fce741d5ad923159e0daf9ec745bbb"
+    },
+    {
+      "path": "web/projects.css",
+      "kind": "source",
+      "sha256": "af40ed42aa967494e6fe4883ef92418e0c6f5c31c209ccb24e2bbccbfbf38846"
+    },
+    {
+      "path": "web/projects.html",
+      "kind": "source",
+      "sha256": "af15cd21124b191cb1122dd0c6fd5351deb504f504a6ee2ac4a6cff24c2a591b"
+    },
+    {
+      "path": "web/projects.js",
+      "kind": "source",
+      "sha256": "32aad078913ae729d16eab6d4ce62bdcf2bbf112036e12c621af6da8fecd9445"
     },
     {
       "path": "web/providers.css",

@@ -1,8 +1,10 @@
 # Guided workflows to prepare a mission
 
-In **Prepare a project**, choose **Choose a mission template**. Four structures
-cover an application improvement, reproducible defect, user interface and new
-application. Read the draft in the dialog, insert it, complete the bracketed
+In **Prepare a project**, choose **Choose a mission template**. Ten templates
+cover four general structures (application improvement, reproducible defect,
+user interface and new application) and six subjects: internal tool, client
+portal, API and integration, inventory management, data processing and
+dashboard. Read the draft in the dialog, insert it, complete the bracketed
 fields and save the need. Existing text is preserved: download it or start a new
 preparation before applying another template.
 
@@ -39,7 +41,7 @@ not create a team or reviewer. Existing plan validation, organisation and launch
 authorisation contracts remain necessary. No budget, acceptance, publication or
 merge is preauthorised.
 
-This starter catalogue contains four embedded templates. Importing, editing and
+The catalogue contains four general structures and six embedded subjects. Importing, editing and
 saving custom templates are not yet available.
 
 ## Guided preparation and proposed team
@@ -87,7 +89,8 @@ Accepted answer IDs: `objective`, `audience`, `scope`, `exclusions`,
 `constraints`, `acceptance`, `verification`, `recovery`. Unknown keys are
 rejected. Each answer is limited to 1,000 UTF-8 bytes. The output contains the
 rendered draft, `missing` answer IDs, `answered`, `total`, `need_complete`,
-`proposed_team` and `launch_authorized`. Blank answers or answers containing
+`proposed_team`, `recommended_method` and `launch_authorized`. A subject also
+returns `intervention`. Blank answers or answers containing
 the template's completion placeholders remain missing.
 
 ## Methods supplied to roles
@@ -113,3 +116,59 @@ identifiers or bundled methods.
 **Fix a reproducible defect** now uses **Diagnose and fix a problem**. During
 preparation, AI proposes the diagnostic plan without tools or corrections. New
 workers also receive the embedded method under their role boundaries.
+
+
+## Subjects and interventions
+
+The **Projects and development** home displays the six subjects. Each entry
+shows its expected result and required evidence, then opens the selected
+subject in preparation. The dialog adds an example, deliverables and risks to
+examine. Selecting a subject does not save a need.
+
+Choose **Create**, **Improve**, **Correct** or **Migrate**. The subject and
+intervention enrich the draft while retaining the shared framework: **five
+stages common to the product, then six stages repeated for each feature**.
+Existing work is examined before reuse; non-applicable stages require a reason.
+No automatic stage tracker is created.
+
+Correct recommends diagnosis; other interventions recommend the product
+workflow. The choice and answers survive subject switches in the current page.
+An explicit save then persists the need and method. Migration still requires
+a cutover decision, parity checks and verified recovery; choosing Migrate
+grants no authorisation.
+
+```sh
+swarm prepare template service-api
+swarm prepare template-check service-api --input api-answers.json
+```
+
+The answer file uses the previous contract with an optional
+`"intervention": "migrate"` field. Accepted values are `create`, `improve`,
+`correct`, `migrate`; omitting it defaults to `create` for a subject.
+The four general structures retain their contract without an intervention.
+The public `/api/v1/preparations/template-check` API uses the same projection
+as the CLI. The catalogue and FR/EN metadata are versioned together.
+
+## Client portal work model
+
+Version 2 provides an inspectable graph and five increments: shared foundations,
+sign-in and sessions, documents, access administration, and end-to-end revocation.
+Foundations are shared; each feature follows the six-stage product cycle. Design
+and backend tasks converge into integration, review and prepared delivery.
+
+Select an increment, inspect its tasks and checks, and complete the answers.
+**Download the adapted plan** returns the public `ActionPlan` v1 contract.
+**Use this journey**, then save the new preparation, preserves the need and inserts
+the plan into its editor. Draft and adopt the brief, resolve open decisions, then
+validate the plan before converting it to missions. Answers never authorize
+check commands or publication.
+
+The same CLI projection accepts `increment` (`foundations`, `session`, `documents`,
+`administration`, `revocation`) through `prepare template-check client-portal
+--input answers.json` and returns `work_plan`. Each plan has at most eight tasks.
+The engine checks local dependencies. Future stories stay unplanned; cross-increment
+prerequisites require explicit decisions and accepted evidence before adoption.
+Automatic synchronization across missions is not provided. Recovery descriptions
+use existing corrections and plan revisions, rather than a conditional scheduler.
+Executable validation policies still require authorization for the actual repository
+and candidate.

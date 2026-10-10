@@ -44,3 +44,8 @@ intégral), `training-reader-result.json` (binaire et deux kits hors ligne).
 `candidate-next.json` désigne le binaire livré avec les médias actualisés.
 `preview-final-collapsed.png` et `preview-final-training.png` sont les vues
 vérifiées dans le navigateur de l’application.
+
+Texte de formation : `training-copy-result.json` et `training-copy-candidate.json`
+concernent le lecteur allégé et les légendes pédagogiques ; `training-copy-fr.png`
+montre le lecteur actualisé dans le navigateur. Les preuves précédentes restent
+conservées comme jalons distincts.

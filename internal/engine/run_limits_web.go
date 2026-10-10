@@ -47,6 +47,8 @@ type runLimitsRollbackRequest struct {
 
 func (s *Store) registerRunLimitsAdmin(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
 	s.registerGraphPerformance(mux, send, fail)
+	s.registerPreparationTimeout(mux, send, fail)
+	s.registerProviderWait(mux, send, fail)
 	mux.HandleFunc("/api/v1/run-limits", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "GET requis", 405)

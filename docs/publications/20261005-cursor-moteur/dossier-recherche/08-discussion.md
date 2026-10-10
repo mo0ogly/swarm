@@ -49,7 +49,8 @@ fichier hors du répertoire par un chemin détourné.
 
 Un moteur déterministe applique une règle erronée avec la même régularité qu'une règle juste. Ray
 souligne que le blocage modifie lui-même la suite de l'exécution [Ray 2026], et la taxonomie MAST
-ne prévoit pas de catégorie pour ces défauts [Cemri 2025]. Le chapitre 7 en donne des exemples
+inclut les défauts de conception du système [Cemri 2025]. QR3 vise une attribution
+plus précise aux mécanismes du moteur et aux règles, sans nier cette catégorie existante. Le chapitre 7 en donne des exemples
 concrets : un verrou transitoire transformé en échec durable, une indisponibilité traitée comme
 une faute de l'agent, une garantie appliquée à la clôture plutôt qu'avant l'effet. Aucun de ces
 défauts n'a produit de paiement faux dans nos campagnes ; tous ont produit des blocages, des
@@ -83,7 +84,8 @@ modèle qui a produit le candidat a changé.
   montant attendu ni le doublon ; la comparaison vaut pour ce B1 précis.
 - *Durées de B.* Les conditions B0 et B1 tournent sur quatre exécutants parallèles et leurs
   durées dérivent avec la charge de la machine ; elles ne se comparent pas entre elles à mieux
-  qu'un facteur 2 à 3. H5 n'en dépend pas.
+  qu’un facteur 2 à 3. Le ratio de H5 dépend lui aussi de cette charge ; seule la
+  direction du surcoût est observée dans ce protocole.
 
 **Validité externe.** Un seul scénario métier, sur données synthétiques ; une API de paiement
 idéalisée, qui déduplique parfaitement par clé, sans limite de conservation des clés ; un seul
@@ -99,3 +101,10 @@ sont publiées case par case. Le lot réel, avec cinq essais, décrit des compor
 pas de taux. Chaque résultat porte le commit, l'état de l'arbre et les empreintes du banc et du
 binaire ; la campagne scriptée a été exécutée sur un arbre propre, empreintes inchangées du début à
 la fin.
+
+
+## 8.7 Ce que peut renforcer une réplication
+
+La distinction centrale est entre sûreté et progression. Retenir un paiement sur preuve périmée peut être correct tout en laissant le processus métier inachevé. Un moteur utile doit expliquer cet arrêt et permettre une reprise causale autorisée ; il ne doit ni payer malgré l'incertitude ni régénérer aveuglément les agents. Les indicateurs doivent distinguer effet indu, impayé attendu, blocage injustifié, délai, reprise et consommation.
+
+Une réplication de milliers de cases peut renforcer la reproductibilité de ces mécanismes sur la grille choisie et révéler des régressions. Elle ne transforme pas des acteurs scriptés en agents LLM autonomes, ni une API synthétique en infrastructure bancaire. Pour évaluer l'apport propre de l'orchestration, il reste nécessaire d'aligner les contrôles d'un workflow fixe, de tester des ablations et d'exercer de vrais rôles de coordination. La revue indépendante du protocole et des analyses reste distincte des tests et de la supervision qui les a produits.

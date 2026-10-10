@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+  "assumptions": [
+    "Les constats d’audit sont à confirmer sur le checkout et la révision candidate, avec distinction simulations/fournisseurs réels.",
+    "Janvier et février sont retenus ; JAN-4/JAN-5 restent des exigences Swarm, sans les attribuer au système final de février.",
+    "La comparaison inclut les sources de recherche du 10 octobre, Cursor prioritaire, Google/Gemini, OpenAI et Anthropic ; leurs résultats ne sont pas des preuves Swarm.",
+    "Objectif distinct de la finalisation historique w-fff7368010d114f6e2578985, dont tâches, tentatives, preuves et budgets restent inchangés. La préparation d’origine est conservée et référencée ; aucune réinitialisation de mission.",
+    "Tous les réglages de politique ajoutés sont persistés, exposés dans Admin FR/EN et utilisés par le moteur."
+  ],
+  "questions": [],
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Confirmer les écarts et décider l’architecture de l’évolution",
+      "role": "worker",
+      "scope": "Lecture du moteur, docs/architecture/CURSOR-ENGINE-CONTRACT.md et dossier de recherche, contrat racine et historique par CLI publique. Rapport de conception uniquement ; préserver identifiants et tâches acceptées. Documentation d’architecture des changements de ce lot incluse. Aucun accès à la base privée .swarm ; l’état historique déjà vérifié est fourni dans la note de lancement. Pas de modification du code Go pour T1.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T1-handoff.md",
+      "depends": [],
+      "criteria": [
+        "Matrice JAN-1..JAN-7 et FEB-1..FEB-4 avec faits, hypothèses et preuves distincts.",
+        "Comparer cycles explicites et hiérarchie continue avec points de jugement ; les deux doivent couvrir le juge global et le renouvellement requis.",
+        "Décision motivée sur reprise, débit, qualité, effort et compatibilité. Examiner juillet Cursor et les sources complémentaires avant de décider.",
+        "Documenter la séparation avec la finalisation historique et le lancement public en copie isolée sans remise à zéro ; architecture cible, migrations, reprise et risques consignés."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    },
+    {
+      "id": "T2",
+      "title": "Implémenter le juge global et le renouvellement des cycles",
+      "role": "worker",
+      "scope": "internal/engine/planning*.go, schéma/persistance et commandes publiques nécessaires. JAN-4/JAN-5/FEB-3. Aucun changement de revue candidat dans cette tâche. Documentation d’architecture des changements de ce lot incluse.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T2-handoff.md",
+      "depends": [
+        "T1"
+      ],
+      "criteria": [
+        "Verdict global de poursuivre ou finir distinct de la revue indépendante de candidat.",
+        "Transition durable entre cycles, contexte reconstruit, objectif, preuves, tentatives et limites conservés.",
+        "Rejeu, verdict périmé, panne, quota et limite refusent les effets ou appels doubles.",
+        "Aucune clôture globale sans les preuves fraîches requises. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    },
+    {
+      "id": "T3",
+      "title": "Implémenter exploration et sous-planification concurrente",
+      "role": "worker",
+      "scope": "internal/engine/planning_runner.go, planning_context.go, planning.go, mission.go et adaptateurs de lecture. JAN-1/JAN-2/FEB-1. Pas de commandes de codage par les planificateurs. Documentation d’architecture des changements de ce lot incluse.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T3-handoff.md",
+      "depends": [
+        "T2"
+      ],
+      "criteria": [
+        "Exploration en lecture réellement utilisable par le planificateur, liée à une révision et un périmètre.",
+        "Nouvelle découverte produit une adaptation persistée de tâches.",
+        "Deux sous-planificateurs de périmètres distincts peuvent être actifs simultanément, décisions atomiques et budgets partagés conservés.",
+        "Arrêt, reprise et réservations périmées ne doublent ni tâches ni dépenses. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    },
+    {
+      "id": "T4",
+      "title": "Corriger publication, conflits et richesse des remises",
+      "role": "worker",
+      "scope": "internal/engine/managed_publication_lane.go, managed_integration.go et contrats/relay de remise. JAN-3/JAN-6/FEB-1/FEB-2/FEB-4. Contrôles et revue indépendante conservés. Documentation d’architecture des changements de ce lot incluse.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T4-handoff.md",
+      "depends": [
+        "T3"
+      ],
+      "criteria": [
+        "Workers isolés sans coordination directe ; remise unique au responsable exact avec changements, limites, découvertes et décisions attendues.",
+        "Responsable exploite une découverte et se réactive après redémarrage.",
+        "Mesurer la voie exclusive ; réduire l’attente centrale selon T1 sans accepter un candidat différent de celui contrôlé.",
+        "Publication concurrente, conflit, preuve périmée et échec de revue ont des refus et reprises observables ; aucune autoacceptation. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    },
+    {
+      "id": "T5",
+      "title": "Exposer les politiques et adapter les prompts par rôle",
+      "role": "worker",
+      "scope": "Configuration et API/CLI publiques, web/admin.js et modules Admin dédiés, traduction FR/EN ; workflows planner/subplanner/worker/reviewer/juge. JAN-7 et politiques T2..T4. Documentation d’architecture des changements de ce lot incluse.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T5-handoff.md",
+      "depends": [
+        "T4"
+      ],
+      "criteria": [
+        "Chaque nouveau réglage est visible, modifiable et enregistré dans Admin ; moteur et CLI lisent la même valeur.",
+        "Aperçu sans écriture, validation, révision concurrente, historique et restauration vérifiés.",
+        "Paramètres de politique absents des constantes Go ; les bornes techniques sont distinguées des choix configurables.",
+        "Routes modèles et prompts effectifs identifiés par rôle ; aucune montée de gamme ni relance silencieuse.",
+        "Parcours clavier/mobile, thèmes clair/sombre, FR/EN et erreurs vérifiés. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    },
+    {
+      "id": "T6",
+      "title": "Vérifier les transitions et mesurer débit, contexte et coût",
+      "role": "worker",
+      "scope": "internal/engine/*_test.go, tests de parcours et scripts de mesure dans racines temporaires isolées. Aucun état de mission active utilisé comme fixture. Documentation d’architecture des changements de ce lot incluse.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T6-handoff.md",
+      "depends": [
+        "T5"
+      ],
+      "criteria": [
+        "Scénarios normaux, invalides, concurrence, redémarrage et refus d’acceptation sur candidat changé.",
+        "Tests ciblés, package pertinent, go test ./..., go vet ./... et -race sur synchronisation ; échecs préexistants séparés sans falsifier de manifeste.",
+        "Comparer plusieurs niveaux de concurrence dans les limites existantes : temps de travail, attente des verrous, revue, publication, tokens/cache et débit accepté.",
+        "Relier toute preuve au commit et au diff exacts ; ne pas transformer les résultats simulés en autonomie réelle. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    },
+    {
+      "id": "T7",
+      "title": "Revue indépendante et recette réelle cumulative",
+      "role": "worker",
+      "scope": "Même révision candidate que T6, preuves et rapports de la mission. Contexte de vérification indépendant, sans modification du candidat. Documentation d’architecture des changements de ce lot incluse.",
+      "deliverable": "docs/plans/engine-cursor-contract/evidence/T7-handoff.md",
+      "depends": [
+        "T6"
+      ],
+      "criteria": [
+        "Fournisseur réellement disponible et politique de modèle figés ; absence de quota ou configuration bloque l’appel sans essai de contournement.",
+        "Observer découverte, délégation parallèle, remise, correction, jugement global, contexte frais et reprise avec fournisseur réel.",
+        "Avis indépendant et contrôles couvrent le même candidat ; échec bloque acceptation et clôture.",
+        "Rapport cumulatif JAN/FEB avec interventions humaines, coût connu ou inconnu, échecs et critères non démontrés. Architecture documentée dans le même candidat, avec schémas et limites à jour."
+      ],
+      "proof": "Rapport traçable : commit/diff, entrées, commandes/interactions, dates, codes de sortie et limites. Aucun PASS sans résultat observable.",
+      "entry": "Prérequis acceptés et frais ; adoption publique du plan et organisation avec copie Git isolée, contrôles explicites et revue indépendante obligatoire. Respecter limites et historique.",
+      "validation": "Contrôles comportementaux et revue indépendante sur le même candidat ; distinguer contrôle du plan et acceptation de livraison.",
+      "delivery": "Remise au propriétaire via le moteur, preuves fraîches et verdict requis avant acceptation. Mettre à jour docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md et les contrats FR/EN ; documenter composants, états, reprise, configuration Admin et preuves, en séparant cible et comportement vérifié.",
+      "stop": "Sur défaut, quota, incompatibilité ou preuve périmée : collecter la cause, arrêter l’effet dépendant et proposer une correction nouvelle. Ne pas relancer à préconditions identiques, augmenter les budgets ou effacer les tentatives.",
+      "max_attempts": 2,
+      "max_tool_calls": 80
+    }
+  ]
+}

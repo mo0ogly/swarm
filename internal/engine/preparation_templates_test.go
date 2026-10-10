@@ -26,7 +26,11 @@ func TestPreparationTemplatesCLIIsReadOnlyAndRejectsUnknown(t *testing.T) {
 	}
 	ids := map[string]bool{}
 	for _, v := range ts {
-		if ids[v.ID] || v.Version != 1 {
+		expectedVersion := 1
+		if v.ID == "client-portal" {
+			expectedVersion = 2
+		}
+		if ids[v.ID] || v.Version != expectedVersion {
 			t.Fatal("invalid catalogue identity", v.ID)
 		}
 		ids[v.ID] = true
@@ -46,7 +50,7 @@ func TestPreparationTemplatesCLIIsReadOnlyAndRejectsUnknown(t *testing.T) {
 			t.Fatal("missing CLI template")
 		}
 	}
-	if len(ts) != 4 {
+	if len(ts) != 10 {
 		t.Fatal("missing starter workflows")
 	}
 }

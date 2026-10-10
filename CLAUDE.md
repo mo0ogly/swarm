@@ -6,6 +6,8 @@ They are the common project rules for Claude, Codex and Swarm preparation.
 Project skills live in `.claude/skills/`: `/apex`, `/audit-pdca`, `/spec-builder`,
 `/debug`, `/spec-audit`, `/code-reviewer`, `/verify-fix`, `/replan`, `/retex-analyzer`.
 Product methods: `/product-planning`, `/product-delivery`, `/product-review`.
+Creating or changing a Swarm template requires `/swarm-model-design`; read and
+apply `.claude/skills/swarm-model-design/SKILL.md` before changing the model.
 The `/ks-*` compatibility commands cover the product lifecycle and use these methods.
 The legacy `/audit_pdca` alias is also provided.
 

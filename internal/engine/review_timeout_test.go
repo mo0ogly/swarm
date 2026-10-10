@@ -10,15 +10,16 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestReviewTimeoutConfigurationPreservesBudgetAndHistory(t *testing.T) {
 	s, w := managedFixture(t)
 	original := *w.Planning.Reviewer
-	if seconds, err := reviewTimeoutSeconds(w.Planning.Reviewer); err != nil || seconds != 90 {
+	if seconds, err := reviewTimeoutSeconds(w.Planning.Reviewer); err != nil || seconds != 0 {
 		t.Fatal(seconds, err)
 	}
-	for _, seconds := range []int{-1, 0, 901} {
+	for _, seconds := range []int{-1, int(int64(^uint64(0)>>1)/int64(time.Second)) + 1} {
 		if _, err := s.planningChange(w.ID, "review-timeout", PlanningRequest{Schema: 1, EventID: newID("invalid-"), Revision: w.Revision, ReviewTimeoutSeconds: seconds, Reason: "Explicit fixture configuration"}); err == nil {
 			t.Fatalf("invalid timeout accepted: %d", seconds)
 		}

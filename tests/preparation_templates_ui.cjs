@@ -14,7 +14,7 @@ const app=spawn(binary,['--root',root,'web','127.0.0.1:0']);let browser;const er
  await p.goto(new URL('/prepare.html?lang='+lang,url).href);await p.waitForFunction(()=>document.getElementById('connection').textContent.match(/Connecté au projet|Connected to project/));
  if(await p.$eval('html',e=>e.dataset.theme)!==theme)await p.click('#theme');
  await p.click('#template-open');await p.waitForFunction(()=>!document.getElementById('template-use').disabled);
- assert.equal(await p.$$eval('#template-choice option',es=>es.length),4);assert.doesNotMatch(await p.$eval('#template-dialog',e=>e.textContent),/\bKS\b|ks-|\bAPEX\b|\bPDCA\b/);
+ assert.equal(await p.$$eval('#template-choice option',es=>es.length),10);assert.doesNotMatch(await p.$eval('#template-dialog',e=>e.textContent),/\bKS\b|ks-|\bAPEX\b|\bPDCA\b/);
  await p.select('#template-choice','correction');assert.match(await p.$eval('#template-method',e=>e.textContent),/Diagnostic|Diagnosis/);
  assert.match(await p.$eval('#template-preview',e=>e.textContent),lang==='fr'?/Défaut observé/:/Observed defect/);
  await p.screenshot({path:path.join(out,`templates-${lang}-${theme}.png`)});

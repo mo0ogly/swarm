@@ -20,14 +20,24 @@ organisation.
    de l'art complet sur la médiation à l'exécution, les transactions distribuées et la sûreté des
    agents.
 
+**Comparaison à ajouter avant une conclusion sur l’apport propre de Swarm.** Un workflow fixe
+scripté doit subir la même grille de fautes, avec les mêmes contrôles, le même exécutant et le
+même parallélisme que Swarm. Des ablations ciblées (fraîcheur des preuves, garde de lancement,
+reprise et persistance) isoleront les contributions. B1 est une garde minimale ; le résultat
+contre B1 ne démontre pas une supériorité sur tous les systèmes de politiques à l’exécution.
+La question est : quelles garanties supplémentaires apporte un orchestrateur durable à un
+workflow doté des mêmes contrôles, et à quel coût ? Ce travail reste à réaliser.
+
 ## 9.2 Axe 1 — Attribution des échecs (QR3)
 
 Quand une tentative échoue ou qu'une tâche se bloque, le moteur doit attribuer la faute au bon
 responsable ; une attribution fausse a un coût direct, puisqu'une indisponibilité prise pour une
 faute de l'agent déclenche une régénération du livrable. Le protocole pré-enregistré
 (annexe B) définit cinq classes de cause, dérivées de MAST et étendues au moteur et à la règle :
-agent, environnement, règle, moteur, inconnu. Son originalité tient à la vérité de référence, connue
-par construction puisque chaque faute est injectée. Les mesures prévues sont la précision et le
+agent, environnement, règle, moteur, inconnu. L’injection fournit une perturbation connue,
+pas automatiquement la cause de chaque blocage : les traces doivent établir que la perturbation
+a eu lieu, identifier les mécanismes intermédiaires et distinguer une cause initiale d’une cause
+aggravante. Les mesures prévues sont la précision et le
 rappel du diagnostic du moteur contre cette référence, l'exactitude de l'annotateur humain, et
 l'accord entre l'annotateur humain et un annotateur fondé sur un modèle différent, rapporté comme
 tel et jamais comme un accord entre humains. Un constat est acquis d'avance : le moteur n'a pas de
@@ -42,6 +52,14 @@ Le responsable y crée lui-même les tâches, ce qui expose le moteur aux erreur
 Un fait du moteur en conditionne la conception : un responsable ou un vérificateur fondé sur un
 modèle est lancé sans aucun outil, si bien qu'il ne peut que proposer des opérations, toutes
 validées par le moteur.
+
+Une [observation de terrain du 10 octobre 2026](revisions/20261010-vivacite-supervision.md)
+montre une revue et une décision de correction par des modèles réels dans la
+mission d'évolution Cursor, hors de S-collectif. Elle ajoute une question de
+vivacité : un contrôle de durée peut empêcher le superviseur de traiter le défaut
+qu'il est chargé de diagnostiquer. L'essai comparatif proposé sépare durée totale,
+silence, bail renouvelé et correction supervisée ; il doit être pré-enregistré
+avant collecte. Cette observation ne remplace pas la campagne S-collectif.
 
 Deux conditions ne diffèrent que par la règle de prérequis du correctif D6 : avec la règle
 (« garde »), le moteur retient le règlement si le responsable oublie la dépendance ; sans elle

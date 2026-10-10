@@ -343,3 +343,32 @@ Contrôle final corrigé : `TestWebTrainingAssetsAndAuthentication` et
 Les tests Go complets et `go vet` du précédent jalon restent leurs preuves
 datées ; ils ne sont pas présentés comme relancés pour cette actualisation
 de ressources et scripts frontend.
+
+### Texte de formation allégé à la demande de l’utilisateur
+
+L’introduction accumulait les conditions de capture (fournisseur IA, plan
+non exécuté, paramètres annulés, commande manuelle) au lieu de présenter
+l’apprentissage. Ce bloc a été retiré en FR/EN. L’introduction présente les
+quatre parcours ; le pied de page se concentre sur le kit hors ligne.
+La présentation du graphe garde sa durée et ses sujets. Les conditions de
+capture et les preuves restent dans les documents de vérification et le
+storyboard. Les légendes Swarm mettent désormais l’accent sur le geste appris,
+la portée du changement et les résultats attendus. Les captures restent
+identiques et ne prétendent pas à une exécution supplémentaire.
+
+La première recette du lecteur allégé a passé avant la révision des légendes
+vidéo. La vérification finale est donc menée sur un nouveau binaire après
+réencodage des modules Swarm et reconstruction des kits. Les preuves du
+jalon précédent sont conservées. La règle éditoriale durable est ajoutée
+à `docs/UI-DESIGN.md`.
+
+La recette finale `training-reader-copy-final` passe sur le binaire
+`/tmp/swarm-ui-20261010/swarm-training-copy-final`, SHA-256 `30763335512de76808611fb3647d9f719b7e44f43ad285b868fba940e47383a7` :
+lecteur embarqué et deux kits extraits, FR/EN, quatre modules, lecture/seek,
+thèmes et 320 px. Les cinq vidéos réencodées passent le décodage ffmpeg
+intégral, et les empreintes du manifeste correspondent aux fichiers.
+Preuves : `training-copy-result.json`, `training-copy-candidate.json`,
+`training-copy-fr.png`. Le test de la date dans le paragraphe supprimé est
+retiré du harnais ; ses assertions de comportement restent inchangées.
+Le binaire est copié dans `bin/swarm` et seul l’aperçu de cette tâche sur
+44977 est renouvelé. Vérification visuelle dans le navigateur de l’application.

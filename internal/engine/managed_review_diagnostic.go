@@ -176,7 +176,7 @@ func (s *Store) diagnoseManagedFragmentReview(work string, req PlanningRequest) 
 		t, err := current.task(req.Task)
 		return err == nil && current.Planning != nil && current.Planning.Repository != nil && t.IndependentReview != nil && t.IndependentReview.ID == r.ID && t.IndependentReview.State == "changes_requested" && modelMatches(current.Planning.Reviewer) && reviewContract(t) == r.Contract && currentTaskAttempt(t, r.Attempt) && current.Planning.Repository.Candidate == r.PreviousCandidate && s.managedBatchProviderIntact(current.Planning.Reviewer, r) == nil && s.managedReviewFilesIntact(r) == nil && s.providerCooldownGuard(cfg.Provider) == nil
 	}
-	reply, callErr := runStructuredProvider(provider, r.ModelRoute, prompt, fragmentDiagnosticSchema, time.Duration(timeout)*time.Second, valid, func(u *Usage) { _ = s.savePlanningUsage(callID, u) }, s.providerCooldownObserver(cfg.Provider, callID))
+	reply, callErr := s.runStructuredProvider(provider, r.ModelRoute, prompt, fragmentDiagnosticSchema, time.Duration(timeout)*time.Second, valid, func(u *Usage) { _ = s.savePlanningUsage(callID, u) }, s.providerCooldownObserver(cfg.Provider, callID))
 	if callErr == nil {
 		callErr = parseFragmentDiagnostic(reply, r, artifacts)
 	}
