@@ -1,0 +1,289 @@
+{
+  "surface": "swarm-product",
+  "environment": {
+    "host": "linux 6.17.0-41-generic x64 AMD Ryzen 5 PRO 4650U with Radeon Graphics",
+    "browser": "Chrome/130.0.6723.116",
+    "viewport": "1440x1000",
+    "binary": "/tmp/swarm-ui-20261010/swarm-next"
+  },
+  "variants": [
+    {
+      "variant": "fr-sombre",
+      "activity_screenshot": "fr-sombre-attempt.png",
+      "assertions": {
+        "arrows": true,
+        "space_connect": true,
+        "keyboard_connect": true,
+        "mouse_connect": true,
+        "preview_apply": true,
+        "no_implicit_launch": true,
+        "conflict": true,
+        "undo_redo": true,
+        "fold_counts": true,
+        "viewport": true,
+        "focus_restore": true,
+        "task_table_fresh": true,
+        "selection_attempt_stable": true,
+        "activity_not_validation": true,
+        "unknown_cost_projected": true
+      },
+      "console_errors": [],
+      "network_errors": [],
+      "expected_console_errors": [
+        "Failed to load resource: the server responded with a status of 409 (Conflict)"
+      ],
+      "screenshot": "fr-sombre.png",
+      "viewport_observations": [
+        {
+          "before": {
+            "x": 0,
+            "y": 165
+          },
+          "after": {
+            "x": 0,
+            "y": 165
+          }
+        },
+        {
+          "before": {
+            "x": 0,
+            "y": 572
+          },
+          "after": {
+            "x": 0,
+            "y": 572
+          }
+        }
+      ],
+      "revision_before": 7,
+      "revision_after": 13
+    },
+    {
+      "variant": "fr-etat",
+      "activity_screenshot": "fr-etat-attempt.png",
+      "assertions": {
+        "arrows": true,
+        "space_connect": true,
+        "keyboard_connect": true,
+        "mouse_connect": true,
+        "preview_apply": true,
+        "no_implicit_launch": true,
+        "conflict": true,
+        "undo_redo": true,
+        "fold_counts": true,
+        "viewport": true,
+        "focus_restore": true,
+        "task_table_fresh": true,
+        "selection_attempt_stable": true,
+        "activity_not_validation": true,
+        "unknown_cost_projected": true
+      },
+      "console_errors": [],
+      "network_errors": [],
+      "expected_console_errors": [
+        "Failed to load resource: the server responded with a status of 409 (Conflict)"
+      ],
+      "screenshot": "fr-etat.png",
+      "viewport_observations": [
+        {
+          "before": {
+            "x": 0,
+            "y": 165
+          },
+          "after": {
+            "x": 0,
+            "y": 165
+          }
+        },
+        {
+          "before": {
+            "x": 0,
+            "y": 572
+          },
+          "after": {
+            "x": 0,
+            "y": 572
+          }
+        }
+      ],
+      "revision_before": 7,
+      "revision_after": 13
+    },
+    {
+      "variant": "en-sombre",
+      "activity_screenshot": "en-sombre-attempt.png",
+      "assertions": {
+        "arrows": true,
+        "space_connect": true,
+        "keyboard_connect": true,
+        "mouse_connect": true,
+        "preview_apply": true,
+        "no_implicit_launch": true,
+        "conflict": true,
+        "undo_redo": true,
+        "fold_counts": true,
+        "viewport": true,
+        "focus_restore": true,
+        "task_table_fresh": true,
+        "selection_attempt_stable": true,
+        "activity_not_validation": true,
+        "unknown_cost_projected": true
+      },
+      "console_errors": [],
+      "network_errors": [],
+      "expected_console_errors": [
+        "Failed to load resource: the server responded with a status of 409 (Conflict)"
+      ],
+      "screenshot": "en-sombre.png",
+      "viewport_observations": [
+        {
+          "before": {
+            "x": 0,
+            "y": 165
+          },
+          "after": {
+            "x": 0,
+            "y": 165
+          }
+        },
+        {
+          "before": {
+            "x": 0,
+            "y": 572
+          },
+          "after": {
+            "x": 0,
+            "y": 572
+          }
+        }
+      ],
+      "revision_before": 7,
+      "revision_after": 13
+    },
+    {
+      "variant": "en-etat",
+      "activity_screenshot": "en-etat-attempt.png",
+      "assertions": {
+        "arrows": true,
+        "space_connect": true,
+        "keyboard_connect": true,
+        "mouse_connect": true,
+        "preview_apply": true,
+        "no_implicit_launch": true,
+        "conflict": true,
+        "undo_redo": true,
+        "fold_counts": true,
+        "viewport": true,
+        "focus_restore": true,
+        "task_table_fresh": true,
+        "selection_attempt_stable": true,
+        "activity_not_validation": true,
+        "unknown_cost_projected": true
+      },
+      "console_errors": [],
+      "network_errors": [],
+      "expected_console_errors": [
+        "Failed to load resource: the server responded with a status of 409 (Conflict)"
+      ],
+      "screenshot": "en-etat.png",
+      "viewport_observations": [
+        {
+          "before": {
+            "x": 0,
+            "y": 165
+          },
+          "after": {
+            "x": 0,
+            "y": 165
+          }
+        },
+        {
+          "before": {
+            "x": 0,
+            "y": 572
+          },
+          "after": {
+            "x": 0,
+            "y": 572
+          }
+        }
+      ],
+      "revision_before": 7,
+      "revision_after": 13
+    }
+  ],
+  "load_measurements": [
+    {
+      "cards": 50,
+      "samples": 5,
+      "initial_p95_ms": 740,
+      "keyboard_p95_ms": 32.30000001192093,
+      "initial_samples_ms": [
+        461,
+        740,
+        689,
+        493,
+        492
+      ],
+      "keyboard_samples_ms": [
+        29.900000005960464,
+        23.700000002980232,
+        23.80000001192093,
+        32.30000001192093,
+        29.5
+      ],
+      "keyboard_method": "trusted keydown timestamp to second animation frame",
+      "expected_reload_aborts": [],
+      "arrows": true,
+      "focus_recovered": true
+    },
+    {
+      "cards": 200,
+      "samples": 5,
+      "initial_p95_ms": 1093,
+      "keyboard_p95_ms": 35.1000000089407,
+      "initial_samples_ms": [
+        677,
+        924,
+        1026,
+        1093,
+        815
+      ],
+      "keyboard_samples_ms": [
+        33,
+        25.600000008940697,
+        35.1000000089407,
+        31.799999997019768,
+        30.80000001192093
+      ],
+      "keyboard_method": "trusted keydown timestamp to second animation frame",
+      "expected_reload_aborts": [],
+      "arrows": true,
+      "focus_recovered": true
+    },
+    {
+      "cards": 500,
+      "samples": 5,
+      "initial_p95_ms": 1734,
+      "keyboard_p95_ms": 48.599999994039536,
+      "initial_samples_ms": [
+        1734,
+        1664,
+        1613,
+        1599,
+        1521
+      ],
+      "keyboard_samples_ms": [
+        23.799999997019768,
+        31.69999998807907,
+        26.5,
+        48.599999994039536,
+        24.099999994039536
+      ],
+      "keyboard_method": "trusted keydown timestamp to second animation frame",
+      "expected_reload_aborts": [],
+      "arrows": true,
+      "focus_recovered": true
+    }
+  ]
+}

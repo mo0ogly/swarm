@@ -94,7 +94,7 @@ click('terminal-stop',()=>{$('terminal-stop-review').hidden=false;$('terminal-st
 click('terminal-stop-cancel',()=>{$('terminal-stop-review').hidden=true;terminal.focus()});
 click('terminal-stop-confirm',async()=>{
  $('terminal-stop-confirm').disabled=true;
- try{const current=await api('/api/v1/snapshot?'+new URLSearchParams({work}));await api('/api/v1/action',{kind:'stop',agent,work,event_id:crypto.randomUUID(),expected_revision:current.work.revision});lock();status='stopping';state();$('terminal-stop-review').hidden=true;message(tr_frontend_terminal_js('Arrêt demandé. Le superviseur doit encore confirmer la fin du processus.'))}
+ try{const current=await api('/api/v1/snapshot?'+new URLSearchParams({work}));const task=current.agents.find(x=>x.agent.id===agent)?.agent.task_id;if(!task)throw Error(tr_frontend_terminal_js('Session indisponible'));await api('/api/v1/action',{kind:'stop',agent,work,task,event_id:crypto.randomUUID(),expected_revision:current.work.revision});lock();status='stopping';state();$('terminal-stop-review').hidden=true;message(tr_frontend_terminal_js('Arrêt demandé. Le superviseur doit encore confirmer la fin du processus.'))}
  finally{$('terminal-stop-confirm').disabled=false}
 });
 window.addEventListener('message',e=>{if(e.origin!==location.origin||e.source!==parent)return;if(e.data?.kind==='swarm-terminal-theme'){theme(e.data.theme);terminal.options.theme=palette();consoleView.theme()}});

@@ -231,6 +231,14 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	// UI redesign records current source integrity without renewing historical acceptance.
+	uiManifest := "docs/ui-redesign-source-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, uiManifest)); e == nil {
+		manifestPath = uiManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)

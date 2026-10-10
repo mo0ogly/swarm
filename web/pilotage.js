@@ -62,7 +62,13 @@ const Pilot = {
   canvas.addEventListener('pointerup',()=>{drag=null;this.save()});canvas.addEventListener('pointercancel',()=>{drag=null});
   const list=node('div',undefined,'pilot-list');list.id='pilot-list';
   const mission=node('section',undefined,'mission-summary');mission.id='mission-summary';mission.setAttribute('aria-label',tr_web_pilotage_js('Résultats et conduite de la mission'));
-  $('graph').replaceChildren(toolbar,actions,status,canvas,list,mission);
+  const tools=node('details',undefined,'reading-fold graph-tools');tools.dataset.foldKey='graph-tools';
+  tools.append(node('summary',tr_web_pilotage_js('Affichage et navigation du graphe')));
+  const secondary=node('div',undefined,'fold-body graph-tools-body');
+  for(const id of ['pilot-orientation','pilot-detail'])secondary.append(toolbar.querySelector('#'+id).parentElement);
+  for(const id of ['pilot-group','pilot-all-links','pilot-collapse','pilot-expand','pilot-planners','pilot-reveal','pilot-reset','pilot-help'])secondary.append(actions.querySelector('#'+id));
+  tools.append(secondary);
+  $('graph').replaceChildren(mission,toolbar,actions,tools,status,canvas,list);
   ProductViews.mount($('graph'));
   GraphDraft.mount();
  },

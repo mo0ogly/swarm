@@ -1,0 +1,174 @@
+{
+  "status": "PASS",
+  "checks": [
+    "results populated at first opening; all tasks available; expanded results/nested details/action focus survive refresh; closed refresh defers construction",
+    "real tab geometry cache survives reload with exact routes; corrupted positions recompute without browser errors",
+    "all 12 destinations accessible in simplified mode; active group and route identity",
+    "delayed connections loading disables the action, then enables a working dialog",
+    "keyboard accordions; graph disclosure persisted across reload",
+    "FR/EN; themes; semantic contrast AA; 1440/1024/760/390/320px; mobile menu and escape; modal return focus; draft guard",
+    "desktop rail collapse gives >200px to graph; keyboard and focus; graph identity/zoom/selection/revision retained; preference persists; mobile menu independent; FR/EN and both themes",
+    "real preparation creation and saved document; AI/context accordion via keyboard and persisted disclosure; no AI request",
+    "direct-link group opening; pending decision reachable with closed group; failed refresh preserves data and recovers",
+    "login before authentication: logo and design assets; FR/EN; themes; 320px; private API tested in Go"
+  ],
+  "contrasts": {
+    "fr-etat": [
+      {
+        "pair": "texte/fond",
+        "ratio": 10.271546225261547
+      },
+      {
+        "pair": "titre/carte",
+        "ratio": 14.356066358942192
+      },
+      {
+        "pair": "texte-discret/fond",
+        "ratio": 5.226877999472789
+      },
+      {
+        "pair": "libelle/champ",
+        "ratio": 7.886155910990276
+      },
+      {
+        "pair": "info-encre/info-fond",
+        "ratio": 6.688935548806072
+      },
+      {
+        "pair": "succes-encre/succes-fond",
+        "ratio": 7.086540062576022
+      },
+      {
+        "pair": "attention-encre/attention-fond",
+        "ratio": 6.314109990723454
+      },
+      {
+        "pair": "alerte-encre/alerte-fond",
+        "ratio": 6.694765365821365
+      },
+      {
+        "pair": "action-encre/action-fond",
+        "ratio": 14.487732305657662
+      }
+    ],
+    "fr-sombre": [
+      {
+        "pair": "texte/fond",
+        "ratio": 14.763806035480357
+      },
+      {
+        "pair": "titre/carte",
+        "ratio": 13.220777128604107
+      },
+      {
+        "pair": "texte-discret/fond",
+        "ratio": 9.568820917196804
+      },
+      {
+        "pair": "libelle/champ",
+        "ratio": 11.074880841925914
+      },
+      {
+        "pair": "info-encre/info-fond",
+        "ratio": 8.565290106757649
+      },
+      {
+        "pair": "succes-encre/succes-fond",
+        "ratio": 8.212877886646528
+      },
+      {
+        "pair": "attention-encre/attention-fond",
+        "ratio": 8.628540827878389
+      },
+      {
+        "pair": "alerte-encre/alerte-fond",
+        "ratio": 8.057797055516255
+      },
+      {
+        "pair": "action-encre/action-fond",
+        "ratio": 9.096062373277045
+      }
+    ],
+    "en-etat": [
+      {
+        "pair": "texte/fond",
+        "ratio": 10.271546225261547
+      },
+      {
+        "pair": "titre/carte",
+        "ratio": 14.356066358942192
+      },
+      {
+        "pair": "texte-discret/fond",
+        "ratio": 5.226877999472789
+      },
+      {
+        "pair": "libelle/champ",
+        "ratio": 7.886155910990276
+      },
+      {
+        "pair": "info-encre/info-fond",
+        "ratio": 6.688935548806072
+      },
+      {
+        "pair": "succes-encre/succes-fond",
+        "ratio": 7.086540062576022
+      },
+      {
+        "pair": "attention-encre/attention-fond",
+        "ratio": 6.314109990723454
+      },
+      {
+        "pair": "alerte-encre/alerte-fond",
+        "ratio": 6.694765365821365
+      },
+      {
+        "pair": "action-encre/action-fond",
+        "ratio": 14.487732305657662
+      }
+    ],
+    "en-sombre": [
+      {
+        "pair": "texte/fond",
+        "ratio": 14.763806035480357
+      },
+      {
+        "pair": "titre/carte",
+        "ratio": 13.220777128604107
+      },
+      {
+        "pair": "texte-discret/fond",
+        "ratio": 9.568820917196804
+      },
+      {
+        "pair": "libelle/champ",
+        "ratio": 11.074880841925914
+      },
+      {
+        "pair": "info-encre/info-fond",
+        "ratio": 8.565290106757649
+      },
+      {
+        "pair": "succes-encre/succes-fond",
+        "ratio": 8.212877886646528
+      },
+      {
+        "pair": "attention-encre/attention-fond",
+        "ratio": 8.628540827878389
+      },
+      {
+        "pair": "alerte-encre/alerte-fond",
+        "ratio": 8.057797055516255
+      },
+      {
+        "pair": "action-encre/action-fond",
+        "ratio": 9.096062373277045
+      }
+    ]
+  },
+  "errors": [],
+  "networkErrors": [],
+  "navigationAborts": [],
+  "fixtureRoot": "/tmp/swarm-design-fPmJQ1",
+  "agents": 0
+}

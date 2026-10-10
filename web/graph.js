@@ -69,6 +69,52 @@ function graphMesures(tache, agents) {
   return { width: 260, height: 30 + lignes * 17 };
 }
 
+// Round dagre's routed corners, preserving the route around nodes.
+function graphEdgePath(points){
+ if(!points?.length)return '';
+ let d='M '+points[0].x+' '+points[0].y;
+ for(let i=1;i<points.length-1;i++){
+  const previous=points[i-1],point=points[i],next=points[i+1];
+  const before=Math.hypot(point.x-previous.x,point.y-previous.y),after=Math.hypot(next.x-point.x,next.y-point.y);
+  if(!before||!after)continue;
+  const radius=Math.min(14,before/2,after/2);
+  const x1=point.x+(previous.x-point.x)*radius/before,y1=point.y+(previous.y-point.y)*radius/before;
+  const x2=point.x+(next.x-point.x)*radius/after,y2=point.y+(next.y-point.y)*radius/after;
+  d+=' L '+x1+' '+y1+' Q '+point.x+' '+point.y+' '+x2+' '+y2;
+ }
+ const last=points[points.length-1];return d+' L '+last.x+' '+last.y;
+}
+// One optional, tab-local geometry cache. Task state, labels and actions always
+// come from the current snapshot. A changed topology/display recomputes dagre.
+function graphLayout(g,shape){
+ const key='swarm-pilot-layout:v1';
+ const signature=JSON.stringify([1,dagre.version,g.graph(),g.nodes().map(id=>[id,g.node(id)]),shape]);
+ try{
+  const cached=JSON.parse(sessionStorage.getItem(key)||'null');
+  if(cached?.signature===signature){
+   const edges=g.edges(),ids=g.nodes();
+   const finite=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=1e8;
+   const graph=cached.graph;
+   const point=p=>p&&finite(p.x)&&finite(p.y)&&p.x<=graph.width+40&&p.y<=graph.height+40;
+   if(graph&&finite(graph.width)&&finite(graph.height)&&graph.width>0&&graph.height>0&&
+      Array.isArray(cached.nodes)&&cached.nodes.length===ids.length&&
+      cached.nodes.every((n,i)=>n.id===ids[i]&&point(n))&&
+      Array.isArray(cached.edges)&&cached.edges.length===edges.length&&
+      cached.edges.every((e,i)=>e.v===edges[i].v&&e.w===edges[i].w&&e.name===edges[i].name&&Array.isArray(e.points)&&e.points.length>=2&&e.points.every(point))){
+    Object.assign(g.graph(),graph);
+    for(const n of cached.nodes)Object.assign(g.node(n.id),{x:n.x,y:n.y});
+    for(let i=0;i<edges.length;i++)g.edge(edges[i]).points=cached.edges[i].points;
+    return;
+   }
+  }
+ }catch{ /* Unavailable or malformed storage falls back to the layout engine. */ }
+ dagre.layout(g);
+ try{
+  const nodes=g.nodes().map(id=>({id,x:g.node(id).x,y:g.node(id).y}));
+  const edges=g.edges().map(e=>({...e,points:g.edge(e).points}));
+  sessionStorage.setItem(key,JSON.stringify({signature,graph:{width:g.graph().width,height:g.graph().height},nodes,edges}));
+ }catch{ /* Geometry caching is optional, including when storage is full. */ }
+}
 function renderGraph(){Pilot.render()}
 function scalePilotGraph(svg,zoom){
  svg.setAttribute('width',Number(svg.dataset.width)*zoom);svg.setAttribute('height',Number(svg.dataset.height)*zoom);
@@ -95,7 +141,7 @@ function drawPilotGraph(){
   for(const e of links)g.setEdge(e.from_task_id,e.to_task_id);
   for(const n of organization.nodes)g.setNode(n.id,{width,height:155});
   for(const e of organization.edges)g.setEdge(e.from,e.to);
-  dagre.layout(g);
+  graphLayout(g,shape);
   // Independent tasks have no ranks: respect the explicitly chosen orientation.
   if(!links.length&&!organization.nodes.length)kept.forEach((t,i)=>g.setNode(t.id,{width,height,x:20+width/2+(state.orientation==='LR'?i*(width+28):0),y:20+height/2+(state.orientation==='TB'?i*(height+28):0)}));
   const totalWidth=links.length||organization.nodes.length?g.graph().width:state.orientation==='LR'?kept.length*(width+28)+12:width+40;
@@ -110,10 +156,10 @@ function drawPilotGraph(){
   svg.append(defs);
   for(const e of links){
    const data=g.edge(e.from_task_id,e.to_task_id);
-   const edge=svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-arete'});
+   const edge=svgNode('path',{d:graphEdgePath(data.points),class:'graph-arete'});
    edge.dataset.from=e.from_task_id;edge.dataset.to=e.to_task_id;svg.append(edge);
   }
-  for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('polyline',{points:data.points.map(p=>p.x+','+p.y).join(' '),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
+  for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('path',{d:graphEdgePath(data.points),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
   for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-77.5;
    const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;group.dataset.agentRole=n.role||n.kind;
    group.append(svgNode('rect',{x:left,y:top,width,height:155,rx:12}));

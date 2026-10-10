@@ -22,9 +22,9 @@ function start(root){
 }
 const waitForRevision=(page,revision)=>page.waitForFunction(value=>snapshot?.work?.revision>value,{},revision);
 const p95=values=>values.slice().sort((a,b)=>a-b)[Math.ceil(values.length*.95)-1];
-async function choose(page,selector,value){const index=await page.$eval(selector,(element,wanted)=>[...element.options].findIndex(option=>option.value===wanted),value);assert.ok(index>=0,`option ${value} absente`);await page.focus(selector);await page.keyboard.press('Home');for(let step=0;step<index;step++)await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter')}
+async function choose(page,selector,value){await page.$eval(selector,e=>{for(let a=e.parentElement;a;a=a.parentElement)if(a.tagName==='DETAILS')a.open=true});const index=await page.$eval(selector,(element,wanted)=>[...element.options].findIndex(option=>option.value===wanted),value);assert.ok(index>=0,`option ${value} absente`);await page.focus(selector);await page.keyboard.press('Home');for(let step=0;step<index;step++)await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter')}
 async function openProduct(browser,root,work,lang,theme,diagnostics){
- const server=await start(root),page=await browser.newPage();page.setDefaultTimeout(25000);
+ const server=await start(root),page=await browser.newPage();page.on('close',()=>server.child.kill('SIGTERM'));page.setDefaultTimeout(25000);
  await page.setViewport({width:1440,height:1000});
  page.on('pageerror',error=>diagnostics.console_errors.push(String(error)));
  page.on('console',message=>{
@@ -42,9 +42,9 @@ async function openProduct(browser,root,work,lang,theme,diagnostics){
   diagnostics.network_errors.push('failed '+new URL(request.url()).pathname+' '+request.failure()?.errorText);
  });
  page.on('response',response=>{if(response.status()>=400&&!diagnostics.expected_http.has(response.status()+':'+new URL(response.url()).pathname))diagnostics.network_errors.push(response.status()+' '+response.url())});
- const target=new URL(server.url);target.searchParams.set('work',work.id);target.searchParams.set('lang',lang);await page.goto(target.href,{waitUntil:'domcontentloaded'});await page.waitForFunction(id=>snapshot?.work?.id===id&&document.querySelectorAll('.graph-noeud').length>0,{},work.id);
- if(await page.$eval('html',element=>element.dataset.theme)!==theme)await page.click('#theme');assert.equal(await page.$eval('html',element=>element.dataset.theme),theme);
- return {server,page};
+ const target=new URL(server.url);target.searchParams.set('work',work.id);target.searchParams.set('lang',lang);const firstOpenStarted=Date.now();await page.goto(target.href,{waitUntil:'domcontentloaded'});await page.waitForFunction(id=>snapshot?.work?.id===id&&document.querySelectorAll('.graph-noeud').length>0,{},work.id);const firstOpenMS=Date.now()-firstOpenStarted;
+ if(await page.$eval('html',element=>element.dataset.theme)!==theme){await page.$eval('#theme',e=>e.closest('details').open=true);await page.click('#theme');}assert.equal(await page.$eval('html',element=>element.dataset.theme),theme);
+ return {server,page,firstOpenMS};
 }
 async function selectNode(page,id,key='Enter'){
  const selector=`.graph-noeud[data-task="${id}"]`;
@@ -89,7 +89,7 @@ async function variant(browser,base,work,name,lang,theme){
   assert.equal(selectedAttempt.selection.id,'t000');assert.ok(selectedAttempt.projection.attempt_id,'tentative sélectionnée absente');assert.equal(selectedAttempt.projection.cost_state,'unknown','coût absent transformé en valeur rapportée');assert.match(selectedAttempt.technical,new RegExp(selectedAttempt.projection.attempt_id));assert.doesNotMatch(selectedAttempt.validation,/validée|validated/i,'activité simple affichée comme validation');assert.equal(selectedAttempt.reports,'false');
   const activityScreenshot=name+'-attempt.png';await page.screenshot({path:path.join(outDir,activityScreenshot),fullPage:true});
   const administrative=mutate(root,['checkpoint',work.id],attemptWork.revision,{summary:'Affichage actualisé',next:'Consulter la tentative'});await page.waitForFunction(revision=>snapshot?.work?.revision>=revision,{},administrative.revision);assert.deepEqual(await page.evaluate(()=>({id:Pilot.state.selection.id,attempt:snapshot.pilotage.tasks.t000.attempt.attempt_id})),{id:'t000',attempt:selectedAttempt.projection.attempt_id},'sélection ou tentative déplacée par une mise à jour administrative');
-  await page.click('#mode');await page.click('#tabs [data-view=tasks]');
+  await page.$eval('#mode',e=>e.closest('details').open=true);await page.click('#mode');await page.click('#tabs [data-view=tasks]');
   await page.waitForFunction(count=>document.querySelectorAll('#tasks-body tr').length===count,{},after.tasks.length);
   for(const task of after.tasks)assert.equal(await page.$eval('#tasks-body tr[data-task="'+task.id+'"] td:nth-child(4)',element=>element.textContent),(task.depends||[]).join(', ')||'Aucune','task table did not use current snapshot');
   await page.click('#tabs [data-view=conduite]');assert.deepEqual(diagnostics.console_errors,[]);assert.deepEqual(diagnostics.network_errors,[]);
@@ -97,9 +97,9 @@ async function variant(browser,base,work,name,lang,theme){
  }finally{await page?.close();server?.child.kill('SIGTERM')}
 }
 async function loadMeasurement(browser,cards){
- const root=path.join(temporary,'load-'+cards),work=fixture(root,cards),diagnostics={console_errors:[],network_errors:[],expected_http:new Set()},initial=[],keyboard=[];let server,page;
+ const root=path.join(temporary,'load-'+cards),work=fixture(root,cards),diagnostics={console_errors:[],network_errors:[],expected_http:new Set()},initial=[],keyboard=[];let server,page,firstOpenMS;
  try{
-  ({server,page}=await openProduct(browser,root,work,'fr','etat',diagnostics));
+  ({server,page,firstOpenMS}=await openProduct(browser,root,work,'fr','etat',diagnostics));
   const sampleCount=5;
   for(let sample=0;sample<sampleCount;sample++){
    diagnostics.reloadAbortRequests=new Set(diagnostics.inflightRequests);const startAt=Date.now();await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(count=>document.querySelectorAll('.graph-noeud').length===count,{},cards);initial.push(Date.now()-startAt);
@@ -117,16 +117,17 @@ async function loadMeasurement(browser,cards){
    const observation=await page.evaluate(()=>window.b03KeyboardMeasurement);
    assert.equal(observation.selected,true,'keyboard input did not select the graph node');assert.equal(observation.focused,true,'keyboard focus lost');keyboard.push(observation.milliseconds);await page.click('#graph-draft-close');assert.equal(await page.evaluate(()=>document.activeElement.id),'pilot-edit-graph','load journey lost focus');
   }
-  assert.deepEqual(diagnostics.console_errors,[]);assert.deepEqual(diagnostics.network_errors,[]);const initialP95=p95(initial),keyboardP95=p95(keyboard);fs.writeFileSync(path.join(outDir,'load-'+cards+'-measurements.json'),JSON.stringify({cards,initial,keyboard,keyboard_method:'trusted keydown event timestamp through two animation frames, browser clock; focus setup and automation round trips excluded',initialP95,keyboardP95},null,2));assert.ok(initialP95<=(cards===500?2000:1000),`rendu p95 ${cards}: ${initialP95} ms`);assert.ok(keyboardP95<=100,`clavier p95 ${cards}: ${keyboardP95} ms`);
-  return {cards,samples:sampleCount,initial_p95_ms:initialP95,keyboard_p95_ms:keyboardP95,initial_samples_ms:initial,keyboard_samples_ms:keyboard,keyboard_method:'trusted keydown timestamp to second animation frame',expected_reload_aborts:diagnostics.expected_network_aborts,arrows:await page.$$eval('.graph-arete',nodes=>nodes.length>0),focus_recovered:true};
+  assert.deepEqual(diagnostics.console_errors,[]);assert.deepEqual(diagnostics.network_errors,[]);const initialP95=p95(initial),keyboardP95=p95(keyboard);fs.writeFileSync(path.join(outDir,'load-'+cards+'-measurements.json'),JSON.stringify({cards,initial,keyboard,keyboard_method:'trusted keydown event timestamp through two animation frames, browser clock; focus setup and automation round trips excluded',initialP95,keyboardP95},null,2));
+  return {cards,samples:sampleCount,first_open_ms:firstOpenMS,first_open_method:'one cold geometry observation including session-link redirect; excluded from the historical five reload p95 samples',initial_method:'five page reloads in the same tab; optional geometry cache can be warm',initial_p95_ms:initialP95,keyboard_p95_ms:keyboardP95,initial_samples_ms:initial,keyboard_samples_ms:keyboard,keyboard_method:'trusted keydown timestamp to second animation frame',expected_reload_aborts:diagnostics.expected_network_aborts,arrows:await page.$$eval('.graph-arete',nodes=>nodes.length>0),focus_recovered:true};
  }finally{await page?.close();server?.child.kill('SIGTERM')}
 }
 (async()=>{
  const base=path.join(temporary,'base'),work=fixture(base),browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',userDataDir:path.join(temporary,'chrome'),args:['--no-sandbox','--disable-dev-shm-usage','--disable-crash-reporter','--disable-breakpad']});
  try{
-  if(process.env.SWARM_B03_LOAD_ONLY){const cards=Number(process.env.SWARM_B03_LOAD_ONLY);assert.ok([50,200,500].includes(cards));const row=await loadMeasurement(browser,cards);fs.writeFileSync(path.join(outDir,'diagnostic-load-'+cards+'.json'),JSON.stringify(row,null,2));console.log(JSON.stringify({diagnostic_only:true,row}));return}
+  if(process.env.SWARM_B03_LOAD_ONLY){const cards=Number(process.env.SWARM_B03_LOAD_ONLY);assert.ok([50,200,500].includes(cards));const row=await loadMeasurement(browser,cards);fs.writeFileSync(path.join(outDir,'diagnostic-load-'+cards+'.json'),JSON.stringify(row,null,2));console.log(JSON.stringify({diagnostic_only:true,row}));assert.ok(row.initial_p95_ms<=(cards===500?2000:1000),`rendu p95 ${cards}: ${row.initial_p95_ms} ms`);assert.ok(row.keyboard_p95_ms<=100,`clavier p95 ${cards}: ${row.keyboard_p95_ms} ms`);return}
   const variants=[];for(const [name,lang,theme]of[['fr-sombre','fr','sombre'],['fr-etat','fr','etat'],['en-sombre','en','sombre'],['en-etat','en','etat']])variants.push(await variant(browser,base,work,name,lang,theme));
   const load_measurements=[];for(const cards of [50,200,500])load_measurements.push(await loadMeasurement(browser,cards));
   const results={surface:'swarm-product',environment:{host:`${os.platform()} ${os.release()} ${os.arch()} ${os.cpus()[0]?.model||'unknown'}`,browser:await browser.version(),viewport:'1440x1000',binary},variants,load_measurements};fs.writeFileSync(path.join(outDir,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify(results,null,2));
+  const failures=load_measurements.flatMap(row=>[...(row.initial_p95_ms>(row.cards===500?2000:1000)?[`rendu p95 ${row.cards}: ${row.initial_p95_ms} ms`]:[]),...(row.keyboard_p95_ms>100?[`clavier p95 ${row.cards}: ${row.keyboard_p95_ms} ms`]:[])]);assert.deepEqual(failures,[],'performance budgets; all measurements retained');
  }finally{await browser.close()}
 })().catch(error=>{fs.writeFileSync(path.join(outDir,'failure.json'),JSON.stringify({error:error.stack,temporary_root:temporary},null,2));console.error(error);process.exitCode=1});

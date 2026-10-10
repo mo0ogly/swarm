@@ -1,0 +1,26 @@
+{
+  "base": "36f884b8131a7d8e1b3c1c270a35f3f5b7a5c873",
+  "files": {
+    "web/swarm-design.css": "7e2a9b971c944fb1306e959459958eaf3e0874ff71a62a8b3f061eae05300d90",
+    "web/swarm-shell.js": "21e025f6f4b08c103da54c0a4d9013fbf0a172cbd9a7ce3cc03743c0ec4a68a1",
+    "web/index.html": "7189e2db7462f21d07156c9937ff69ba70611587b2ef9d669a9f7c0d1a39ca4a",
+    "web/prepare.html": "b1169828201885650c9911e9cc790b5503eb989ae5cd5118bf4c5ff58df1808b",
+    "web/access.html": "92fe04fcb0bc35f209afda22049e569649a0e874f1e921b1d2c9fbe409ce8497",
+    "web/terminal.html": "d1261f1b52a0ca73c313de3ce196f9d2074b36cf32f374b4271e9ed0d72c299d",
+    "web/cockpit.js": "d4c1e52ec6bfef285040c4d5e5dcc335c5d242fed4a9380bae631f7526ca3a09",
+    "web/conduite.js": "735b206a1c783f22b54a3f07ed62b812e6f9d75d4d582436cfa58801aeaf0bb0",
+    "web/mission.js": "06c8530e4c130885b04dcc6943cf7ee93aabccd6005b2cbb90974bf3d84b2d6b",
+    "web/pilotage.js": "9206d97e3282ec56be20cbb253ff1948953a2e8be1d3f098f87fdbd00e97daf8",
+    "web/graph.js": "3a08c2df00cc1ea1a374c9fb76923f3931f21a44118bf109ebfcc6e4f4eacacf",
+    "web/graph-draft.js": "99b7b9d0cfee90dea85f48d9dd34fdc3b324bb112abe14a5af63f848d1c228a2",
+    "web/ai-connections.js": "a2360f5207b2779ef64a060f2170da0b082508b0d98da82be42f06c31ff211b9",
+    "locales/en.json": "c09d7de1e11943950cde9ca1a810e208e9010c441bd245acd7696b2476afdbcf",
+    "web/i18n-en.js": "81d64bc27cf893f4446bd9d6eddfef3e2daaed3991e251e6c4abfffe4fca5ca4",
+    "internal/engine/web_server.go": "4e95e5f9459ab55a08923bac56368606f4170ccbf15c23dc097afaf57d0d11af",
+    "internal/engine/web_prephase.go": "96ff3aba31188d3f01ed72e6af29730a7555e813b1a979e96f6bf640e0579776",
+    "frontend/terminal.js": "a02dcf7615ec23ec15783b7914c4b64c160bbd73f642b8d618fde50c70782d18",
+    "web/lib/terminal/terminal.js": "de51876e8ba728520c6e56742a0ace9761bbfd62fab7626530a5ea05704e06ce"
+  },
+  "digest": "cca7cea896320b8314ce535dfbb9d4893672558893a7060491a7e7d7a70bfbf7",
+  "binary_sha256": "241e4754cb993cf3901be2750ef4f3301f5a35f1c60d3da42ad31270cc497fe7"
+}

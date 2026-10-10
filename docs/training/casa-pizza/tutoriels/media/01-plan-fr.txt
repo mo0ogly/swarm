@@ -4,7 +4,7 @@ Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.
 06s — Ouvrir Conduite et Vue d’ensemble
 Six tâches à faire ; les flèches relient prérequis et tâches dépendantes.
 
-12s — Cliquer sur Tests automatiques
+12s — Ouvrir Tests automatiques puis Toutes les actions autorisées
 La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.
 
 18s — Comparer le même graphe en sombre

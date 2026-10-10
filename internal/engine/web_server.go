@@ -845,7 +845,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			webLogin(w, r, host, token, sessionMaxAge)
 			return
 		}
-		if (r.Method == "GET" || r.Method == "HEAD") && (r.URL.Path == "/access.css" || r.URL.Path == "/access.js" || r.URL.Path == "/wattson_themes.css") {
+		if (r.Method == "GET" || r.Method == "HEAD") && (r.URL.Path == "/access.css" || r.URL.Path == "/access.js" || r.URL.Path == "/wattson_themes.css" || r.URL.Path == "/swarm-design.css" || r.URL.Path == "/swarm-logo.png") {
 			mux.ServeHTTP(w, r)
 			return
 		}

@@ -104,7 +104,7 @@ const GraphDraft = {
  minimap(svg){
   const old=$('graph-minimap');if(svg&&svg===this.minimapSource&&old?.isConnected)return;old?.remove();if(!svg||!$('pilot-canvas'))return;this.minimapSource=svg;
   const map=svgNode('svg',{id:'graph-minimap',class:'graph-minimap',viewBox:svg.getAttribute('viewBox'),role:'img','aria-label':tr_web_graph_draft_js('Mini-carte du graphe')});
-  for(const edge of svg.querySelectorAll('.graph-arete,.graph-organisation-link'))map.append(svgNode('polyline',{points:edge.getAttribute('points'),class:'graph-minimap-edge'}));
+  for(const edge of svg.querySelectorAll('.graph-arete,.graph-organisation-link'))map.append(svgNode('path',{d:edge.getAttribute('d'),class:'graph-minimap-edge'}));
   for(const item of svg.querySelectorAll('.graph-noeud .graph-cadre,.graph-responsibility rect'))map.append(svgNode('rect',{x:item.getAttribute('x'),y:item.getAttribute('y'),width:item.getAttribute('width'),height:item.getAttribute('height'),rx:8,class:'graph-minimap-node'}));
   $('pilot-canvas').append(map);
  }

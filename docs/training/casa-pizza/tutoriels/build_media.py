@@ -1,5 +1,5 @@
 """Encode locally captured UI steps; no provider call, remote asset or live database."""
-import hashlib,json,subprocess,tempfile,textwrap
+import argparse,hashlib,json,subprocess,tempfile,textwrap
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 ROOT=Path(__file__).resolve().parent
@@ -12,7 +12,7 @@ MODULES=[
  module('01-plan','Du besoin au graphe','From requirements to the graph',[
  step('00-besoin-{lang}','Écrire puis enregistrer le besoin','Write and save the requirements','Périmètre, règles et preuves attendues sont explicites. Aucun appel IA ici.','Scope, rules and required evidence are explicit. No AI call here.'),
  step('13-graphe-{lang}','Ouvrir Conduite et Vue d’ensemble','Open Overview and Fit overview','Six tâches à faire ; les flèches relient prérequis et tâches dépendantes.','Six tasks remain to do; arrows connect prerequisites to dependent tasks.'),
- step('14-tache-{lang}','Cliquer sur Tests automatiques','Click the automatic tests task','La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.','The task waits for Order and tracking. Details show criteria, dependencies and no report.'),
+ step('14-tache-{lang}','Ouvrir Tests automatiques puis Toutes les actions autorisées','Open Automatic tests, then All allowed actions','La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.','The task waits for Order and tracking. Details show criteria, dependencies and no report.'),
  step('18-graphe-sombre','Comparer le même graphe en sombre','Compare the same graph in dark mode','Un changement de thème ne change ni dépendances ni état des tâches.','Changing the theme changes neither dependencies nor task status.')],
  'Quelle tâche doit précéder les tests ? Le graphe prouve-t-il une exécution ?','Which task precedes tests? Does the graph prove execution?',
  'Commande et suivi précède Tests automatiques. Non : les six tâches sont non exécutées, sans agent actif. Le plan a été créé par le script pédagogique, séparément du besoin enregistré.','Order and tracking precedes Automatic tests. No: all six tasks are unexecuted, with no active agent. The teaching script created this plan separately from the saved requirements.'),
@@ -54,29 +54,38 @@ def card(mod,st,lang,n):
  frame=st['frame'].replace('{lang}',lang)+'.png'; im=Image.open(ROOT/'frames'/frame).convert('RGB')
  canvas=Image.new('RGB',(1280,900),'#f7f5ef'); dr=ImageDraw.Draw(canvas)
  bold=ImageFont.truetype(FONT,24); small=ImageFont.truetype(FONT,18); body=ImageFont.truetype(FONT,23)
- dr.rectangle((0,0,1280,72),fill='#17392f');dr.text((24,12),'CASA PIZZA  /  '+mod['title'][lang],font=bold,fill='white')
+ dr.rectangle((0,0,1280,72),fill='#062338');dr.text((24,12),'CASA PIZZA  /  '+mod['title'][lang],font=bold,fill='#f8d779')
  dr.text((24,43),('Captures réelles montées · sans audio' if lang=='fr' else 'Edited real screenshots · no audio'),font=small,fill='#dbe9e1')
  # Crop tall client captures to the relevant area; preserve proportions.
- if im.height>900:
+ if im.height>900 and st['frame'] in {'01-catalogue','02-filtre','03-minimum','04-quantite','05-confirmee','10-suivi-preparation','12-livree'}:
   top={'01-catalogue':0,'02-filtre':100,'03-minimum':450,'04-quantite':450,'05-confirmee':480,'10-suivi-preparation':480,'12-livree':480}.get(st['frame'],0)
   crop_height=round(im.width*712/1264);top=min(top,im.height-crop_height);im=im.crop((0,top,im.width,top+crop_height))
- im=ImageOps.contain(im,(1264,712));canvas.paste(im,((1280-im.width)//2,76+(712-im.height)//2));dr.rectangle((0,790,1280,900),fill='#17392f')
- dr.text((22,802),f'{n+1:02d}/{len(mod["steps"]):02d}   '+st['action'][lang],font=bold,fill='white')
+ im=ImageOps.contain(im,(1264,712));canvas.paste(im,((1280-im.width)//2,76+(712-im.height)//2));dr.rectangle((0,790,1280,900),fill='#062338')
+ action=f'{n+1:02d}/{len(mod["steps"]):02d}   '+st['action'][lang]
+ action_font=bold if bold.getlength(action)<=1236 else ImageFont.truetype(FONT,20)
+ dr.text((22,802),action,font=action_font,fill='#f8d779')
  for i,line in enumerate(lines(st['result'][lang],body,1228)):
   dr.text((22,837+27*i),line,font=body,fill='#dbe9e1')
  # Editorial progress bar. It does not masquerade as a captured pointer.
- dr.rectangle((0,897,int(1280*(n+1)/len(mod['steps'])),900),fill='#e6a474')
+ dr.rectangle((0,897,int(1280*(n+1)/len(mod['steps'])),900),fill='#f8c650')
  return canvas
 
 def timestamp(n):return f'{n//3600:02d}:{n//60%60:02d}:{n%60:02d}.000'
 
 def main():
- data={'recorded':'2026-10-09','method':'Real UI screenshots captured during browser interactions; edited still sequences, not continuous screencasts. No AI provider invoked.','modules':MODULES}
+ parser=argparse.ArgumentParser(description=__doc__)
+ parser.add_argument('--modules',nargs='+',choices=[m['id'] for m in MODULES])
+ previous=json.loads((ROOT/'storyboard.json').read_text()) if (ROOT/'storyboard.json').exists() else {}
+ parser.add_argument('--swarm-recorded',default=previous.get('recorded','2026-10-09'))
+ args=parser.parse_args()
+ for mod in MODULES:mod['recorded']=args.swarm_recorded if mod['id'] in ('01-plan','02-controles') else '2026-10-09'
+ data={'recorded':args.swarm_recorded,'method':'Real UI screenshots captured during browser interactions; edited still sequences, not continuous screencasts. No AI provider invoked. Module recording dates are explicit.','modules':MODULES}
  (ROOT/'storyboard.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
  (ROOT/'media').mkdir(exist_ok=True)
  with tempfile.TemporaryDirectory(prefix='encode-',dir=ROOT) as td:
   td=Path(td)
   for mod in MODULES:
+   if args.modules and mod['id'] not in args.modules:continue
    for lang in ('fr','en'):
     cards=[]; cues=['WEBVTT','']; transcript=[]
     for i,st in enumerate(mod['steps']):
@@ -93,5 +102,6 @@ def main():
     (ROOT/'media'/f'{mod["id"]}-{lang}.vtt').write_text('\n'.join(cues))
     (ROOT/'media'/f'{mod["id"]}-{lang}.txt').write_text('\n\n'.join(transcript)+'\n')
  (ROOT/'manifest.json').write_text(json.dumps({'recorded':data['recorded'],'method':data['method'],'files':[{'path':str(p.relative_to(ROOT)),'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in sorted(list((ROOT/'frames').glob('*.png'))+list((ROOT/'media').glob('*')))]},indent=2)+'\n')
- print('Encoded 8 videos, 8 GIF previews, 8 posters and bilingual transcripts/subtitles.')
+ count=2*sum(not args.modules or m['id'] in args.modules for m in MODULES)
+ print(f'Encoded {count} videos, GIF previews, posters and bilingual transcripts/subtitles.')
 if __name__=='__main__':main()

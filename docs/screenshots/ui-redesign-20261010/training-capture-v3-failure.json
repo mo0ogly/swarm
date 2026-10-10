@@ -1,0 +1,6 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: program is visible in command capture\n\nfalse !== true\n\n    at /home/fpizzi/workspace/swarm/tools/verification/training_ui_capture.cjs:71:10",
+  "errors": [],
+  "failures": [],
+  "root": "/tmp/swarm-training-ui-2RWa0Z"
+}

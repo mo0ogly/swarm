@@ -11,8 +11,8 @@ const AIConnections={state:null,
   return text;
  },
  async load(){
-  const host=$('ai-connections-list');host.textContent=tr_web_ai_connections_js('Chargement des connexions…');
-  try{this.state=await api('/api/v1/providers/connections');this.render()}catch(e){host.textContent=e.message}
+  const host=$('ai-connections-list'),add=$('connections-add');add.disabled=true;host.textContent=tr_web_ai_connections_js('Chargement des connexions…');
+  try{this.state=await api('/api/v1/providers/connections');this.render();add.disabled=false}catch(e){host.textContent=e.message}
  },
  render(){
   const host=$('ai-connections-list');host.replaceChildren();

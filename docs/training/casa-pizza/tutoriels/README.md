@@ -17,13 +17,13 @@ Chaque module existe en FR et EN. Le lecteur fournit un exercice corrigé et rel
 
 ## Nature des images et limites
 
-Actions réellement effectuées le 9 octobre 2026 dans un projet temporaire et des serveurs loopback isolés. Captures successives montées en séquences fixes ; ce ne sont pas des screencasts continus. Les captures client hautes sont recadrées dans les vidéos sur la zone utile, sans déformation ; le lecteur conserve les images complètes. Les barres de progression et légendes sont des ajouts éditoriaux. Les vidéos sont sans audio.
+Actions Swarm recapturées le 10 octobre 2026 avec le nouveau graphisme ; parcours client et restaurant enregistrés le 9 octobre 2026 dans un projet temporaire et des serveurs loopback isolés. Captures successives montées en séquences fixes ; ce ne sont pas des screencasts continus. Les captures client hautes sont recadrées dans les vidéos sur la zone utile, sans déformation ; le lecteur conserve les images complètes. Les barres de progression et légendes sont des ajouts éditoriaux. Les vidéos sont sans audio.
 
 Le besoin enregistré et le plan pédagogique créé par le script sont deux démonstrations distinctes. Les six tâches restent non exécutées. Les contrôles sont prévisualisés puis annulés : aucune autorisation, aucun reçu ni avis d’acceptation inventé. La commande fictive est réellement créée et avancée manuellement côté restaurant. Aucun fournisseur IA n’a été invoqué pendant la capture ; cela ne signifie pas que créer les supports n’a consommé aucune ressource.
 
 ## Reproduction des médias
 
-Avec Python, Pillow et ffmpeg installés : `python3 build_media.py`, puis `python3 build_player.py`. Les scripts ne pilotent pas le navigateur et ne reconstruisent pas une interface fictive : ils assemblent les images de `frames/`. `storyboard.json` relie chaque étape à sa capture. `manifest.json` contient les empreintes des captures et des médias. Les DOCX sont mis à jour par `extend_guides.py --originals-dir DOSSIER_DES_GUIDES_36_CHAPITRES` à partir d’une sauvegarde, puis rendus et vérifiés avant `python3 ../build_kits.py`.
+Depuis la racine du dépôt : `node tools/verification/training_ui_capture.cjs CHEMIN_BINAIRE DOSSIER_TEMPORAIRE` effectue les interactions dans un atelier jetable. Après réussite et inspection visuelle, copier ses PNG dans `frames/`. Avec Python, Pillow et ffmpeg installés, depuis ce dossier : `python3 build_graph_overview.py`, `python3 build_media.py --modules 01-plan 02-controles --swarm-recorded 2026-10-10`, puis `python3 build_player.py`. Les scripts ne pilotent pas le navigateur et ne reconstruisent pas une interface fictive : ils assemblent les images de `frames/`. `storyboard.json` relie chaque étape à sa capture. `manifest.json` contient les empreintes des captures et des médias. Les DOCX sont mis à jour par `extend_guides.py --originals-dir DOSSIER_DES_GUIDES_36_CHAPITRES` à partir d’une sauvegarde, puis rendus et vérifiés avant `python3 ../build_kits.py`.
 
 # English
 
@@ -35,6 +35,8 @@ These are edited real screenshots, not continuous screencasts. Tall customer cap
 
 PDF : Formation_Swarm_Casa_Pizza.pdf (FR), Swarm_Casa_Pizza_Training_EN.pdf (EN). Guides de 38 pages accessibles depuis le lecteur et inclus dans les kits ; Word conservés comme sources éditables.
 
-## Présentation du graphe — V2
+## Présentation du graphe — interface du 10 octobre 2026
 
-Le lecteur français propose également une capture montée des interactions réelles (63 secondes, 4:5) : zoom, repli, détail des prérequis et paramètres de validation. Cette présentation est uniquement en français et masquée dans le lecteur anglais. Les quatre modules bilingues ne sont pas remplacés. Le MP4 et ses sous-titres sont embarqués et inclus dans les deux kits, pour permettre de changer la langue hors ligne. Aucun agent lancé ni contrôle exécuté dans cette présentation.
+Le lecteur français propose également une capture montée des interactions réelles (63 secondes, 1280 × 900) : zoom, repli, détail des prérequis et paramètres de validation. Cette présentation est uniquement en français et masquée dans le lecteur anglais. Les quatre modules bilingues ne sont pas remplacés. Le MP4 et ses sous-titres sont embarqués et inclus dans les deux kits, pour permettre de changer la langue hors ligne. Aucun agent lancé ni contrôle exécuté dans cette présentation.
+
+Les nouvelles captures concernent les tutoriels Swarm et leur présentation du graphe. Les captures des PDF et DOCX conservent leur date historique. Le plan demeure non exécuté et les paramètres montrés ont été annulés.

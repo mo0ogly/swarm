@@ -1,6 +1,6 @@
 {
-  "recorded": "2026-10-09",
-  "method": "Real UI screenshots captured during browser interactions; edited still sequences, not continuous screencasts. No AI provider invoked.",
+  "recorded": "2026-10-10",
+  "method": "Real UI screenshots captured during browser interactions; edited still sequences, not continuous screencasts. No AI provider invoked. Module recording dates are explicit.",
   "modules": [
     {
       "id": "01-plan",
@@ -36,8 +36,8 @@
         {
           "frame": "14-tache-{lang}",
           "action": {
-            "fr": "Cliquer sur Tests automatiques",
-            "en": "Click the automatic tests task"
+            "fr": "Ouvrir Tests automatiques puis Toutes les actions autorisées",
+            "en": "Open Automatic tests, then All allowed actions"
           },
           "result": {
             "fr": "La tâche attend Commande et suivi. Le détail montre critère, dépendances et absence de rapport.",
@@ -65,7 +65,8 @@
       "answer": {
         "fr": "Commande et suivi précède Tests automatiques. Non : les six tâches sont non exécutées, sans agent actif. Le plan a été créé par le script pédagogique, séparément du besoin enregistré.",
         "en": "Order and tracking precedes Automatic tests. No: all six tasks are unexecuted, with no active agent. The teaching script created this plan separately from the saved requirements."
-      }
+      },
+      "recorded": "2026-10-10"
     },
     {
       "id": "02-controles",
@@ -130,7 +131,8 @@
       "answer": {
         "fr": "Non. Elle apporte une preuve sur les fichiers et critères liés au candidat. La recette visuelle, la revue et les conditions d’acceptation restent distinctes. Dans cet enregistrement, aucune politique n’a été appliquée et aucune tâche n’a été acceptée.",
         "en": "No. It provides evidence for the files and criteria linked to the candidate. Visual testing, review and acceptance conditions remain distinct. No policy was applied and no task was accepted in this recording."
-      }
+      },
+      "recorded": "2026-10-10"
     },
     {
       "id": "03-client",
@@ -207,7 +209,8 @@
       "answer": {
         "fr": "Le minimum s’applique aux pizzas seules : 9,50 euros reste inférieur à 10 euros. La livraison de 2,90 euros ne compte pas dans ce minimum.",
         "en": "The minimum applies only to pizzas: EUR 9.50 is below EUR 10. The EUR 2.90 delivery charge does not count towards that minimum."
-      }
+      },
+      "recorded": "2026-10-09"
     },
     {
       "id": "04-restaurant",
@@ -308,7 +311,8 @@
       "answer": {
         "fr": "Le formateur, via les boutons du restaurant. Comparer numéro, contenu et total entre restaurant et client. Le parcours ne démontre ni livraison réelle ni agent autonome.",
         "en": "The instructor used the restaurant buttons. Compare order number, contents and total between restaurant and customer. This journey demonstrates neither real delivery nor an autonomous agent."
-      }
+      },
+      "recorded": "2026-10-09"
     }
   ]
 }

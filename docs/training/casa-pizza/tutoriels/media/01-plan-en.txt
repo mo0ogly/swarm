@@ -4,7 +4,7 @@ Scope, rules and required evidence are explicit. No AI call here.
 06s — Open Overview and Fit overview
 Six tasks remain to do; arrows connect prerequisites to dependent tasks.
 
-12s — Click the automatic tests task
+12s — Open Automatic tests, then All allowed actions
 The task waits for Order and tracking. Details show criteria, dependencies and no report.
 
 18s — Compare the same graph in dark mode

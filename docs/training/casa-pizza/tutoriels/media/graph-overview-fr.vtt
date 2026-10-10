@@ -1,49 +1,37 @@
 WEBVTT
 
-1
-00:00:00.000 --> 00:00:03.191
+00:00:00.000 --> 00:00:03.000
 Des tâches reliées par des prérequis.
 
-2
-00:00:03.191 --> 00:00:07.202
+00:00:03.000 --> 00:00:07.000
 Zoomer pour lire une étape.
 
-3
-00:00:07.202 --> 00:00:14.027
+00:00:07.000 --> 00:00:14.000
 Replier les branches. Garder le contexte.
 
-4
-00:00:14.027 --> 00:00:18.109
-Passer du graphe à une tâche.
+00:00:14.000 --> 00:00:18.000
+Passer du graphe au détail d’une tâche.
 
-5
-00:00:18.109 --> 00:00:23.044
-Deux prérequis non validés. Deux tâches en aval.
+00:00:18.000 --> 00:00:23.000
+Commande et suivi : deux prérequis, deux tâches en aval.
 
-6
-00:00:23.044 --> 00:00:33.694
+00:00:23.000 --> 00:00:33.000
 Revue humaine ou contrôles structurés.
 
-7
-00:00:33.694 --> 00:00:37.194
-Le critère de réussite est écrit avant le contrôle.
+00:00:33.000 --> 00:00:37.000
+Écrire le critère de réussite avant le contrôle.
 
-8
-00:00:37.194 --> 00:00:41.400
+00:00:37.000 --> 00:00:41.000
 Déclarer les fichiers examinés.
 
-9
-00:00:41.400 --> 00:00:43.712
+00:00:41.000 --> 00:00:44.000
 python3 : un programme autorisé et visible.
 
-10
-00:00:43.712 --> 00:00:47.109
-Les arguments sont exacts. un par ligne.
+00:00:44.000 --> 00:00:47.000
+Les arguments sont exacts. Un par ligne.
 
-11
-00:00:47.109 --> 00:00:56.726
+00:00:47.000 --> 00:00:57.000
 Un délai configurable : 60 secondes.
 
-12
-00:00:56.726 --> 00:00:58.948
-Exemple annulé. Aucun contrôle exécuté.
+00:00:57.000 --> 00:01:03.000
+Aperçu annulé. Aucun contrôle exécuté.

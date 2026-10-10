@@ -98,3 +98,31 @@ func TestWebSessionLifetimeConfiguration(t *testing.T) {
 		t.Fatal("symlink accepted")
 	}
 }
+
+func TestWebLoginDesignAssetsRemainPublicAndAPIPrivate(t *testing.T) {
+	h := newWebHandler(storeTest(t), "local.test", "fixture-secret")
+	for _, asset := range []struct{ path, contentType string }{
+		{"/swarm-design.css", "text/css"},
+		{"/swarm-logo.png", "image/png"},
+	} {
+		for _, method := range []string{"GET", "HEAD"} {
+			rr := httptest.NewRecorder()
+			h.ServeHTTP(rr, httptest.NewRequest(method, "http://local.test"+asset.path, nil))
+			if rr.Code != 200 || !strings.Contains(rr.Header().Get("Content-Type"), asset.contentType) {
+				t.Fatalf("login asset %s %s unavailable: %d %s", method, asset.path, rr.Code, rr.Header().Get("Content-Type"))
+			}
+		}
+		wrongHost := httptest.NewRecorder()
+		h.ServeHTTP(wrongHost, httptest.NewRequest("GET", "http://evil.test"+asset.path, nil))
+		if wrongHost.Code != 403 {
+			t.Fatal("public asset bypassed host validation")
+		}
+	}
+	for _, path := range []string{"/api/v1/works", "/cockpit.js", "/swarm-shell.js", "/terminal.html"} {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, httptest.NewRequest("GET", "http://local.test"+path, nil))
+		if rr.Code != 403 {
+			t.Fatalf("private route %s opened without session: %d", path, rr.Code)
+		}
+	}
+}

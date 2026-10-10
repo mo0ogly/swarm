@@ -19,8 +19,8 @@ fs.writeFileSync(path.join(root,'.swarm/providers.json'),JSON.stringify({schema_
 let w=mutate(['work','create'],0,{title:'Recette — session interactive',objective:'Répondre à un agent depuis le graphe',scope:'Terminal supervisé, aucune IA appelée',criteria:['saisie et reprise'],next:'Ouvrir la session'});
 w=mutate(['task','add',w.id],w.revision,{id:'terminal-demo',title:'Échanger avec l’agent',deliverable:'Session de démonstration',criteria:['aller-retour terminal'],next:'Démarrer en mode interactif'});
 cli('autonomy',w.id,'manuel');
-let server,browser,url;
-async function startServer(){server=spawn(binary,['--root',root,'web'],{stdio:['ignore','pipe','pipe']});return await new Promise((resolve,reject)=>{let text='';const timer=setTimeout(()=>reject(Error(text)),10000);server.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}});server.stderr.on('data',d=>text+=d)})}
+let server,browser,url,frame;
+async function startServer(){server=spawn(binary,['--root',root,'web','127.0.0.1:0'],{stdio:['ignore','pipe','pipe']});return await new Promise((resolve,reject)=>{let text='';const timer=setTimeout(()=>reject(Error(text)),10000);server.stdout.on('data',d=>{text+=d;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}});server.stderr.on('data',d=>text+=d)})}
 const checks=[],errors=[],csp=[],external=[];
 (async()=>{
  url=await startServer();browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});const page=await browser.newPage();page.setDefaultTimeout(10000);await page.setViewport({width:1450,height:1050});
@@ -28,7 +28,7 @@ const checks=[],errors=[],csp=[],external=[];
  await page.goto(url);await page.waitForSelector('.graph-noeud');await page.click('.graph-noeud');await page.waitForSelector('#pilot-inspector[open]');
  const all=await page.$('[data-inspector-action="actions"]');await all.click();await page.waitForSelector('#field-mode');await page.select('#field-mode','terminal');await page.click('#confirm');
  await page.waitForSelector('#agent-terminal-dialog[open]');
- let frame=await (await page.$('#agent-terminal-dialog iframe')).contentFrame();
+ frame=await (await page.$('#agent-terminal-dialog iframe')).contentFrame();
  await frame.waitForFunction(()=>document.querySelector('#terminal-screen').textContent.includes('SESSION INTERACTIVE'));
  assert.match(await frame.$eval('#terminal-status',e=>e.textContent),/Lecture seule/);
  await frame.waitForSelector('#session-console .monaco-editor');assert.equal(await frame.$eval('#session-console-wrap',e=>e.hidden),false);assert.match(await frame.$eval('#console-toggle',e=>e.textContent),/Journal de l’agent/);checks.push('Monaco visible dès ouverture interactive');
@@ -72,4 +72,4 @@ const checks=[],errors=[],csp=[],external=[];
  await frame.click('#terminal-stop-confirm');await frame.waitForFunction(()=>/interrompue|terminée/.test(document.querySelector('#terminal-status').textContent));assert.equal(cli('agent','show',agent.id).agent.status,'interrupted');assert.notEqual(cli('work','show',w.id).work.tasks[0].status,'accepted');checks.push('arrêt confirmé, saisie désactivée, aucune acceptation automatique');
  assert.deepEqual(errors,[]);assert.deepEqual(csp,[]);assert.deepEqual(external,[]);
  fs.writeFileSync(path.join(out,'ui.json'),JSON.stringify({status:'PASS',checks,errors,csp,external,root},null,2));
-})().catch(e=>{console.error(e);fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:e.stack,errors,csp,root},null,2));process.exitCode=1}).finally(async()=>{if(browser)await browser.close();if(server)server.kill('SIGTERM');try{for(const a of cli('agent','list',w.id).agents||[])if(['running','starting','queued'].includes(a.agent.status))cli('agent','stop',a.agent.id)}catch{}});
+})().catch(async e=>{console.error(e);const terminal=await frame?.evaluate(()=>({status:document.querySelector('#terminal-status').textContent,notice:document.querySelector('#terminal-notice').textContent,reviewHidden:document.querySelector('#terminal-stop-review').hidden})).catch(()=>null);fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:e.stack,terminal,checks,errors,csp,root},null,2));process.exitCode=1}).finally(async()=>{if(browser)await browser.close();if(server)server.kill('SIGTERM');try{for(const a of cli('agent','list',w.id).agents||[])if(['running','starting','queued'].includes(a.agent.status))cli('agent','stop',a.agent.id)}catch{}});

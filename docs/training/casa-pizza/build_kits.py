@@ -14,6 +14,7 @@ PROJECT = [
 PROJECT += [f'static/images/{name}.svg' for name in
             ['margherita', 'reine', 'fromages', 'vegetarienne', 'diavola', 'calzone']]
 TRAINING_FRAMES = ['00-besoin-en.png','00-besoin-fr.png','01-catalogue.png','02-filtre.png','03-minimum.png','04-quantite.png','05-confirmee.png','06-connexion.png','07-refus-acces.png','08-commande-recue.png','09-preparation.png','10-suivi-preparation.png','11-livraison.png','12-livree.png','13-graphe-en.png','13-graphe-fr.png','14-tache-en.png','14-tache-fr.png','15-humaine-en.png','15-humaine-fr.png','16-controle-en.png','16-controle-fr.png','17-apercu-en.png','17-apercu-fr.png','18-graphe-sombre.png','19-commande-en.png','19-commande-fr.png']
+TRAINING_FRAMES += [f'overview-{i:02d}.png' for i in range(1,5)]
 COMMON = [
     '00-swarm-besoin.png', '01-swarm-mission.png', '02-swarm-lancement.png',
     '04-swarm-activite.png', '05-casa-catalogue.png', '07-casa-erreur-minimum.png',

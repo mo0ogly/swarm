@@ -23,7 +23,7 @@ func (s *Store) registerPreparations(mux *http.ServeMux) {
 		if os.Getenv("SWARM_PREPARATION_DISABLED") == "1" {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusServiceUnavailable)
-			io.WriteString(w, `<!doctype html><html lang="fr" data-theme="etat"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Préparation désactivée</title><link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/prephase.css"></head><body><main><h1>Préparation désactivée</h1><p>Le pilotage reste disponible. Les documents sont conservés et restent consultables ou exportables depuis le CLI.</p><a href="/">Revenir au pilotage des agents</a></main></body></html>`)
+			io.WriteString(w, `<!doctype html><html lang="fr" data-theme="etat"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Préparation désactivée</title><link rel="stylesheet" href="/wattson_themes.css"><link rel="stylesheet" href="/prephase.css"><link rel="stylesheet" href="/swarm-design.css"></head><body><main><h1>Préparation désactivée</h1><p>Le pilotage reste disponible. Les documents sont conservés et restent consultables ou exportables depuis le CLI.</p><a href="/">Revenir au pilotage des agents</a></main></body></html>`)
 			return
 		}
 		raw, err := cockpitWeb.ReadFile("web/prepare.html")

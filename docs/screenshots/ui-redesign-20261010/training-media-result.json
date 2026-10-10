@@ -1,0 +1,178 @@
+{
+  "status": "PASS",
+  "manifest_hashes": 74,
+  "unchanged_client_restaurant_media": true,
+  "videos": [
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
+      "sha256": "b75c584521a443226d39b4d6920a87a0f5987698994a9dd8371662d3c557dcd3",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "24.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
+      "sha256": "4f721a961a2968afca40c2218d212ce7e87f55aed7fb4fa399e31b87314a36bb",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "24.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
+      "sha256": "30f2763d455ed43aebfb3350cf8d7ad4f23b31a47f31ca5204a231d1939b412e",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "24.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
+      "sha256": "c030fc5e6d251dae9942f23dc15ef039fd198812218141c4f72a07804a245fa5",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "24.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/03-client-en.mp4",
+      "sha256": "e78c580be7f15fe2df6ae5533761ef8f8dc3e56d747d03e9e074a2102c014763",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "30.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/03-client-fr.mp4",
+      "sha256": "8fbc6a1c51902c57b5b30e9b551198f114fc045ed76876a17e3d28833eaaad40",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "30.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/04-restaurant-en.mp4",
+      "sha256": "65aa898c262999671287ca47298403e6691e439fd9dc9627a490147966750024",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "42.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.mp4",
+      "sha256": "4dfea5ea34cca2b9e87fdfd42ae29a6053900e1db99391eee1ffb7cc558be283",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "42.000000"
+        }
+      },
+      "full_decode": "PASS"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4",
+      "sha256": "0248dbd5555ba4bb6b64b3a5a839b89c910effc0ffb78fe5b13a0cece4f93930",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "63.000000"
+        }
+      },
+      "full_decode": "PASS"
+    }
+  ]
+}

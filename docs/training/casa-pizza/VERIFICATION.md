@@ -57,3 +57,18 @@ README FR/EN : logo, aperçu GIF du graphe dès le début avec MP4 et image fixe
 - `go test ./internal/engine -run '^TestWebTrainingAssetsAndAuthentication$' -count=1` PASS, 0.159 s. Les nouveaux médias sont présents dans l’embed authentifié.
 - Kits reconstruits : 129 fichiers chacun, contrôle ZIP intègre. `node --check` et `git diff --check` PASS.
 - Recette du lecteur menée sur serveur statique loopback isolé ; service des ressources authentifiées couvert séparément par le test Go. Le serveur principal 18792 n’a pas été reconstruit ni redémarré : intégration source validée, déploiement non effectué.
+
+## Actualisation graphique du 10 octobre 2026
+
+Les tutoriels Swarm sont recapturés avec la nouvelle interface, puis les quatre
+MP4 FR/EN et la présentation du graphe sont reconstruits avec leurs posters et GIF.
+Les médias client/restaurant du 9 octobre restent inchangés. Les dates sont
+explicites ; les illustrations PDF/DOCX restent historiques. Les deux kits
+ZIP contiennent les nouveaux médias et 133 fichiers chacun.
+
+La recette `tests/training_design_ui.cjs` passe sur le binaire SHA-256
+`35dc4e13b70f8eda87eb175451c53e1e40b8737b775c19f68450fc7ebee0055a`
+et les deux kits extraits : FR/EN, lecture/seek, durées, aucune lecture automatique,
+thèmes et mobile. Les neuf vidéos passent le décodage intégral ffmpeg.
+Preuves dans `docs/screenshots/ui-redesign-20261010/training-*-result.json` ;
+méthode et limites dans `docs/reports/ui-redesign-20261010.md`.

@@ -27,6 +27,11 @@ Project skills are in `.agents/skills/`. They link to the canonical files under
 Choose the smallest relevant method. Do not chain every method for a trivial edit.
 See `docs/AGENT-METHODS.md` (French) or `docs/en/AGENT-METHODS.md` (English).
 
+## Web interface
+
+Read `docs/UI-DESIGN.md` before changing web layout, navigation, themes or reading accordions.
+Keep the logo palette, shared semantic tokens, FR/EN labels and progressive disclosure consistent.
+
 ## Repository checks
 
 - Go engine: targeted `go test` cases, then the relevant package suite; run
