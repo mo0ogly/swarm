@@ -280,3 +280,8 @@ scripts or changing permissions. The CLI provides `swarm skills list`.
 [Selection guide](docs/en/PROJECT-PROFILE.md#skills-selected-for-an-action).
 
 The [application creation workflow](docs/en/PRODUCT-WORKFLOW.md) documents migrated methods, design, gates and application → journey → story → task navigation.
+
+
+### Configurable SQLite wait
+
+Open **Administration → SQLite storage wait** to inspect or change retries, retry delay and SQLite wait per attempt. The CLI exposes the same persisted settings through `swarm storage-retry show` and `swarm storage-retry apply --input configuration.json`. These settings do not restart a provider or agent. See the [SQLite recovery guide](docs/en/SQLITE-CONTENTION-RECOVERY.md).

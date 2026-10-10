@@ -71,7 +71,11 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 	db.SetMaxOpenConns(1)
 	s := &Store{db: db, root: root}
 	fail := func(e error) (*Store, error) { db.Close(); return nil, e }
-	if _, e = db.Exec(`PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;`); e != nil {
+	storagePolicy, e := s.storageRetryPolicy()
+	if e != nil {
+		return fail(e)
+	}
+	if _, e = db.Exec(fmt.Sprintf(`PRAGMA busy_timeout=%d; PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;`, storagePolicy.BusyTimeoutMS)); e != nil {
 		return fail(e)
 	}
 	var version int

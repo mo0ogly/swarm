@@ -532,3 +532,8 @@ Authentication stays enabled and private browser URLs are not printed.
 
 Docker uses Compose instead. The [on-premise override guide](../ON-PREMISE-AI.md)
 (French) covers internal CAs, DNS, proxies, mounts and saved connections.
+
+
+### Configurable SQLite wait
+
+Open **Administration → SQLite storage wait** to inspect or change retries, retry delay and SQLite wait per attempt. The CLI exposes the same persisted settings through `swarm storage-retry show` and `swarm storage-retry apply --input configuration.json`. These settings do not restart a provider or agent. See the [SQLite recovery guide](SQLITE-CONTENTION-RECOVERY.md).

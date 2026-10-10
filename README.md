@@ -361,3 +361,8 @@ activer automatiquement les scripts ou changer les permissions. Le CLI propose
 `swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).
 
 Le [parcours de création d’application](docs/PRODUCT-WORKFLOW.md) détaille les méthodes migrées, la conception, les gates et la navigation application → parcours → story → tâches.
+
+
+### Attente SQLite configurable
+
+Dans **Administration → Attente du stockage SQLite**, consulter ou régler les reprises, le délai entre reprises et le délai SQLite par tentative. La CLI expose les mêmes valeurs persistées via `swarm storage-retry show` et `swarm storage-retry apply --input configuration.json`. Ces paramètres ne relancent ni fournisseur ni agent. Voir [le guide de reprise SQLite](docs/SQLITE-CONTENTION-RECOVERY.md).
