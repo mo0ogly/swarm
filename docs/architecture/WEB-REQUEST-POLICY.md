@@ -103,5 +103,7 @@ Cette correction concerne le transport de l'interface. Les limites serveur fixes
 [contrat d'attente des fournisseurs](PROVIDER-LIVENESS.md) fournit la durée totale
 aux tests de connexion et à l'assistance de page. Modifier `connection_test_ms`
 ne modifie pas cette durée serveur. L'attente de chargement de l'éditeur dans
-`prephase-editor.js` reste une politique fixe à administrer. Les budgets de
+Le chargement CSS/module de `prephase-editor.js` utilise maintenant `general_ms`. Les budgets de
 lancement et délais de préparation gardent leurs contrats distincts.
+
+Le chargement de l’éditeur utilise le délai courant Admin `general_ms` ; 0 désactive cette expiration. En cas d’expiration, le texte simple reste éditable et enregistrable. Un import dynamique déjà parti continue sans rejeu ; il ne crée pas tardivement un éditeur après le passage en mode simple. La durée reçue est conservée pour ce chargement.

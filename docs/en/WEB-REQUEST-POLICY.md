@@ -88,5 +88,7 @@ This fix concerns browser transport. The subsequent source correction removes
 fixed server 60-second limits: the [provider waiting contract](PROVIDER-LIVENESS.md)
 supplies total duration to connection tests and page assistance. Changing
 `connection_test_ms` does not change this server duration. Editor loading wait in
-`prephase-editor.js` remains a fixed policy to administer. Launch budgets and
+`prephase-editor.js` now uses the Admin `general_ms` value. Launch budgets and
 preparation deadlines keep their distinct contracts.
+
+The preparation editor CSS/module loading uses `general_ms` from the same Admin policy. Zero disables this loading deadline. On expiry, editable plain text remains available; dynamic imports are not replayed or forcibly cancelled. An already-started load keeps its received duration.

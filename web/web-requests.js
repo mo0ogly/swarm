@@ -13,20 +13,28 @@ globalThis.SwarmWebRequests={
   const route=new URL(path,location.origin).pathname;
   return this.config.values[route==='/api/v1/providers/connections/test'?'connection_test_ms':route==='/api/v1/snapshot'?'snapshot_ms':'general_ms'];
  },
- async withResponse(path,options,read){
-  const duration=this.duration(path),controller=new AbortController(),external=options?.signal;
-  const cancel=()=>controller.abort(external.reason);let timer,remaining=duration,start=performance.now();
-  if(external?.aborted)cancel();else external?.addEventListener('abort',cancel,{once:true});
-  const tick=()=>{
-   const current=performance.now();remaining-=current-start;start=current;
-   if(remaining<=0)controller.abort(new DOMException('Browser request waiting time expired','TimeoutError'));
+ armDeadline(duration,expire){
+  let timer,remaining=duration,start=performance.now();
+  const tick=()=>{const now=performance.now();remaining-=now-start;start=now;
+   if(remaining<=0)expire(new DOMException('Browser request waiting time expired','TimeoutError'));
    else timer=setTimeout(tick,Math.min(remaining,0x7fffffff));
   };
-  // 31-bit timer chunks are a browser representation constraint. They never
-  // shorten the configured duration, which can exceed one timer chunk.
+  // Timer chunks are a browser representation bound, not an operator cutoff.
   if(duration>0)timer=setTimeout(tick,Math.min(remaining,0x7fffffff));
+  return ()=>clearTimeout(timer);
+ },
+ async waitFor(operation,path){
+  const duration=this.duration(path);let stop;
+  const timeout=new Promise((_,reject)=>{stop=this.armDeadline(duration,reject)});
+  try{return await Promise.race([operation,timeout])}finally{stop()}
+ },
+ async withResponse(path,options,read){
+  const duration=this.duration(path),controller=new AbortController(),external=options?.signal;
+  const cancel=()=>controller.abort(external.reason);
+  if(external?.aborted)cancel();else external?.addEventListener('abort',cancel,{once:true});
+  const stop=this.armDeadline(duration,error=>controller.abort(error));
   try{return await read(await fetch(path,{...options,signal:controller.signal}))}
-  finally{clearTimeout(timer);external?.removeEventListener('abort',cancel)}
+  finally{stop();external?.removeEventListener('abort',cancel)}
  },
  text(path,options={}){return this.withResponse(path,options,async response=>({response,value:await response.text()}))},
  json(path,options={}){return this.withResponse(path,options,async response=>{
