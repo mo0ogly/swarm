@@ -447,7 +447,7 @@
   {
     "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
     "kind": "doc",
-    "sha256": "afcdd08724e03f3c7a2d1a5a99b4dea67ba57669d5371da8b84ff36986a690cd"
+    "sha256": "6b28750e08b8f298b5a31b26ec3825d515ba120bad504982b0dfaf6753f1694e"
   },
   {
     "path": "docs/architecture/GARDE-ORGANISATION.md",
@@ -573,6 +573,11 @@
     "path": "docs/en/CURSOR-ENGINE-CONTRACT.md",
     "kind": "doc",
     "sha256": "289ab3c04e05e019f450721843953d2377674ff893d91b0e41a7a2aae89775fd"
+  },
+  {
+    "path": "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "kind": "doc",
+    "sha256": "df697786c0f8d3c615db42d8d9b67a97f01390645be565f80ca550261ed9dadb"
   },
   {
     "path": "docs/en/DELIVERY-SCOPE.md",
@@ -1458,10 +1463,5 @@
     "path": "docs/screenshots/projects-method-20261010/qualification.json",
     "kind": "doc",
     "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/result.json",
-    "kind": "doc",
-    "sha256": "41d27d83107db17355397fc4fdf5371148831574610a2a3bba07df906ee4364d"
   }
 ]

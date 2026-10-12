@@ -81,3 +81,14 @@ puis sauvegarde/relecture des onze profils. Le retour de focus doit suivre la
 relecture asynchrone, afin de ne pas se perdre lorsque le bouton est désactivé.
 
 Le [reçu de ce complément](direct-20261012/performance-policy-verification-receipt.json) contient les empreintes, les onze tests et sous-cas Go et les quatre recettes Admin réellement terminées. Le build et `go vet ./internal/engine` passent. Aucune suite globale de 884 tests n’est rejouée.
+
+## Prévenir les reprises sans progrès
+
+L'audit de clôture conservait une séquence de travaux déjà réalisés et la page
+d'architecture demandait encore une décision T1 au futur. Ce guidage pouvait
+faire repartir la prochaine activation sur des étapes terminées. La décision,
+sa comparaison et ses sources sont maintenant explicites en FR/EN ; l'audit
+courant dirige la reprise vers T7 et sa décision manquante. Les preuves passées
+restent inchangées. La leçon rejoint la règle existante de replan : une reprise
+part de l'état réel, apporte une preuve ou une précondition nouvelle, et distingue
+un processus actif d'une autorisation encore attendue.

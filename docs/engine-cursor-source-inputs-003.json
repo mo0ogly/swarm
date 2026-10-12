@@ -1,5 +1,10 @@
 [
   {
+    "path": "internal/engine/budget_commands.go",
+    "kind": "source",
+    "sha256": "093433dfe585e77f936cfca47403efe2c612b560aedbda9d1ca325be7670d7f9"
+  },
+  {
     "path": "internal/engine/budget_commands_test.go",
     "kind": "test",
     "sha256": "a148ac03f08d827abb3c7bc85014d7a78c3733c2e4eb60445a92c7138a770e5b"

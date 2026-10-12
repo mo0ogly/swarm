@@ -11,7 +11,7 @@ recette réelle et acceptation historique. Les contrôles restent nécessaires a
 développement ; les phases natives ne conditionnent plus ses modifications.
 
 Ce document accompagne le [plan d’évolution](../plans/engine-cursor-contract/evolution-20261010.json).
-Il décrit une cible à décider et à implémenter, pas une conformité déjà acquise.
+Il distingue la décision consolidée, les composants vérifiés localement et la recette réelle encore requise ; la conformité n’est pas acquise.
 Le [contrat JAN/FEB](CURSOR-ENGINE-CONTRACT.md) conserve les deux publications
 Cursor de janvier et février. Le corpus récent, Cursor prioritaire, se trouve
 dans les [fiches de recherche](../publications/20261005-cursor-moteur/article-scientifique/fiches-lecture.md).
@@ -22,13 +22,77 @@ vise une finalisation ciblée depuis un ancien candidat, sans nouvelle explorati
 globale. Elle reste intacte, avec ses tâches acceptées et ses compteurs. La présente
 évolution constitue un objectif distinct ; elle ne remplace aucune tentative en échec.
 
-## Décision à produire au lot T1
+## Décision T1 consolidée le 13 octobre : hiérarchie continue et cycles explicites
 
-Comparer les cycles explicites et une hiérarchie continue avec points de jugement.
-Évaluer correction, reprise, débit, coût, effort et compatibilité des migrations.
-Les exigences Swarm de jugement global et de contexte renouvelé restent retenues.
-Un juge de cycle et un reviewer de candidat ont des responsabilités différentes.
-Les publications récentes constituent des hypothèses à éprouver sur Swarm.
+Le choix de développement est une hiérarchie continue de responsables de
+périmètre, avec jugement global explicite et renouvellement du contexte racine.
+Cette décision formalise la composition déjà présente dans les sources ; elle
+reste soumise à la recette et à la revue indépendante T7. Elle n'est pas une
+acceptation de livraison ni une nouvelle autorisation d'exécution.
+
+### Alternatives examinées
+
+| Axe | Cycles globaux avec barrière de fin | Hiérarchie continue avec points de jugement — retenue |
+| --- | --- | --- |
+| Correction | Un bilan global clair ; une découverte peut attendre le prochain cycle | Remises attribuées et adaptation dans le périmètre ; jugement global reste distinct |
+| Reprise | Contexte renouvelé à chaque cycle ; risque de refaire les étapes sans identité durable | Révisions, événements et générations conservés ; renouvellement explicite sans remboursement |
+| Débit | La barrière peut attendre la tâche la plus lente | Production indépendante et remise anticipée ; publication exclusive conservée |
+| Coût | Redémarrages globaux et retransmission du contexte à mesurer | Réactivation du propriétaire et contexte reconstruit à mesurer ; aucun gain financier supposé |
+| Effort | Deux niveaux d'ordonnancement à articuler avec les scopes existants | Réutilise scopes, baux et opérations existantes, avec `judge`/`renew` à la racine |
+| Compatibilité | Imposer des cycles à toute mission ancienne serait une migration métier | Missions et compteurs conservés ; parcours legacy garde ses contrôles, sans équivalence automatique au nouveau protocole |
+
+Le choix privilégie la reprise attribuée et la réactivité aux découvertes.
+Le coût et l'efficacité des modèles restent inconnus sans recette réelle.
+Les mesures de concurrence en fixtures établissent le chevauchement et les
+attentes observées, sans démontrer une accélération ni un débit accepté réel.
+
+### Sources primaires et adaptation à Swarm
+
+Sources réexaminées le 13 octobre. [Janvier](https://cursor.com/blog/scaling-agents)
+sépare planification et réalisation avec jugement et fraîcheur de cycle.
+[Février](https://cursor.com/blog/self-driving-codebases) privilégie la hiérarchie
+continue et les remises, après simplification des rôles centraux.
+[Juillet](https://cursor.com/blog/agent-swarm-model-economics) insiste sur les
+décisions partagées, la résolution tierce des conflits et les angles de revue.
+Ces versions ne constituent pas un cahier des charges cumulatif inchangé.
+
+Notre adaptation garde JAN-4/JAN-5 selon le besoin utilisateur : le superviseur
+racine exerce le jugement métier global, le reviewer indépendant examine le
+candidat, et Go valide/applique leurs décisions autorisées. Le mécanisme de
+publication exclusive est un choix Swarm pour garantir la fraîcheur du candidat ;
+il n'est pas attribué au système final de février. Aucun VCS personnalisé ni
+résolveur IA de conflits nouveau n'est présenté comme implémenté.
+
+Les sources complémentaires confirment des axes de comparaison, pas nos résultats :
+[Google ADK](https://developers.googleblog.com/why-we-built-adk-20/) distingue
+raisonnement et flux déterministe ; [OpenAI](https://openai.com/index/harness-engineering/)
+relie accès à l'environnement, preuves et documentation ;
+[Anthropic](https://www.anthropic.com/engineering/harness-design-long-running-apps)
+évalue la séparation planification, génération et contrôle selon la tâche.
+Ces résultats externes ne mesurent ni notre autonomie ni nos coûts.
+
+### Composants, limites et migration
+
+| Contrat | Composants existants et preuve |
+| --- | --- |
+| Décision racine et contexte renouvelé | `planning_judge.go`, `planning_context.go`, `planning_schema.go` ; tests du contexte réellement reçu et de `judge`/`renew` |
+| Exploration et adaptation | `planning_exploration.go`, `planning.go` ; lectures Git attribuées, découverte persistée et scopes concurrents en fixtures |
+| Remise avant publication | `managed_result_staging.go`, `managed_publication_lane.go`, `managed_integration.go` ; résultat immuable, refus/reprise et candidat vérifié |
+| Politiques et modèle effectif | `quotas.go`, configurations Admin et route reçue par rôle ; aperçu, historique, révisions et consommateurs communs |
+| Sources déplacées | Contrat [PROJECT-RELOCATION](PROJECT-RELOCATION.md) ; alias de racine autorisé, redirections internes refusées |
+
+Le schéma 32 et la migration sont vérifiés sur base isolée. L'activation sur le
+service historique est une étape distincte : contrôler les autres travaux du
+processus partagé, sauvegarde et reprise compatible, puis vérifier l'effet public.
+Aucune réécriture des tentatives, consommations ou preuves antérieures ne fait
+partie de cette décision. Le défaut source corrigé n'est pas réputé installé.
+
+L'observabilité eBPF reste une extension étudiée : commencer par les événements
+et mesures Go existants, puis comparer un collecteur optionnel si une attente
+noyau non expliquée le justifie. Il n'a pas été intégré ni activé. Il peut aider
+à attribuer une attente à un PID/cgroup ; il ne remplace ni les réservations,
+les droits, le contrôle de candidat ou la décision du superviseur. L'étude
+ci-dessous conserve ses contraintes et sa proposition de réglages Admin.
 
 ```mermaid
 flowchart TD
@@ -36,7 +100,8 @@ flowchart TD
     P --> S[Sous-planificateurs de périmètres]
     S --> W[Workers en copies Git isolées]
     W --> H[Remises au propriétaire : changements, découvertes, limites]
-    H --> P
+    H --> S
+    S -->|retours transversaux| P
     W --> C[Contrôles sur candidat figé]
     C --> R[Revue indépendante du même candidat]
     R --> A[Acceptation par le moteur]
@@ -46,9 +111,9 @@ flowchart TD
     J -->|finir avec preuves fraîches| F[Clôture]
 ```
 
-Ce schéma est la cible fonctionnelle. T1 doit préciser les composants existants,
-ceux à modifier et les transitions absentes ; les lots suivants actualisent le
-schéma avec les opérations et états effectivement implémentés.
+Ce schéma décrit la composition retenue. Les composants et preuves ci-dessus
+identifient ce qui est vérifié localement ; son exécution cumulative avec vrai
+fournisseur et revue indépendante reste à démontrer.
 
 Dans les sources actuelles, les opérations racine `judge` et `renew` sont
 raccordées au contexte et au schéma réellement reçus, puis vérifiées en fixtures.
@@ -155,7 +220,7 @@ mission/tâche/tentative via les PID, leurs descendants et, si disponibles, les
 cgroups. Les décisions du planner, tokens et verdicts restent des événements du
 moteur ; les métriques noyau ne permettent pas d’en déduire la réussite.
 
-Cible proposée, à valider par T1 : collecteur Linux optionnel utilisant
+Option étudiée, non implémentée : collecteur Linux optionnel utilisant
 [`cilium/ebpf`](https://ebpf-go.dev/), séparé du moteur et relié par un transport
 local. Le moteur fonctionne sans collecteur. Documenter capabilities nécessaires,
 détection des fonctionnalités, disponibilité BTF selon les sondes, pertes de
