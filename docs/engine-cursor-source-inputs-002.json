@@ -1,5 +1,15 @@
 [
   {
+    "path": "docs/screenshots/ui-redesign-20261010/README.md",
+    "kind": "doc",
+    "sha256": "b608b5975621c44793911af1de0e9573e62ddb53593733158e67b51418d63f59"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-graph-cache.json",
+    "kind": "doc",
+    "sha256": "8bc34f373bf01e5c1b2d6c0ffb0a3c20596d6c191f3d964dc9c614eef0351371"
+  },
+  {
     "path": "docs/screenshots/ui-redesign-20261010/candidate-menu.json",
     "kind": "doc",
     "sha256": "b199dc606539e9cc251a6c7a0ad35fb6c86bb6c0972b7a6fd899f92e2b8deb2d"
@@ -1373,15 +1383,5 @@
     "path": "internal/engine/budget_commands.go",
     "kind": "source",
     "sha256": "093433dfe585e77f936cfca47403efe2c612b560aedbda9d1ca325be7670d7f9"
-  },
-  {
-    "path": "internal/engine/budget_commands_test.go",
-    "kind": "test",
-    "sha256": "a148ac03f08d827abb3c7bc85014d7a78c3733c2e4eb60445a92c7138a770e5b"
-  },
-  {
-    "path": "internal/engine/budgets.go",
-    "kind": "source",
-    "sha256": "70a16ccf9de07c4070cfc329fcae0e56b3b5a2182d3985ff0008c1f7d8e124e0"
   }
 ]

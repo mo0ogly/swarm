@@ -437,7 +437,7 @@
   {
     "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
     "kind": "doc",
-    "sha256": "5cd0517db0ed835adf6ce7c8e924404863e13c122ee06fb459ef84dc5399b383"
+    "sha256": "af3b8194948bd4103f1c754f84d00dfa1181c25a197b69d8ac64141995b2eaa3"
   },
   {
     "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
@@ -448,6 +448,11 @@
     "path": "docs/architecture/GARDE-ORGANISATION.md",
     "kind": "doc",
     "sha256": "b69337bfad664d150e92d00ad2a92f165fe2ebbf72bc3e7e35c11a469e765e4d"
+  },
+  {
+    "path": "docs/architecture/GRAPH-STUDIO.md",
+    "kind": "doc",
+    "sha256": "7e54b761aa751b065b2465456cc9b071ba41f115ae4a9085b7eb2a068a3f36f4"
   },
   {
     "path": "docs/architecture/INSTRUCTION-LEARNING.md",
@@ -462,7 +467,7 @@
   {
     "path": "docs/architecture/LOG-CONSOLE.md",
     "kind": "doc",
-    "sha256": "319d6f17ce5459682f8fb6a53b1e27a72d358ceaf092b884127f6d1ac05d9d0f"
+    "sha256": "a0c620849d0d9c10193e547adce0361069ac4ab50884fc1e4d5c0599e33d9b47"
   },
   {
     "path": "docs/architecture/MANAGED-PLAN-GATES.md",
@@ -497,7 +502,7 @@
   {
     "path": "docs/architecture/WEB-REQUEST-POLICY.md",
     "kind": "doc",
-    "sha256": "6c2166c3cf0de728cf13ce4cf6922e6d75e11bdbfc85f84311584bfd2072b2c1"
+    "sha256": "f5c686ab77760daea34fb96fb13c05f82ca8cf1636b9fb685f10ae481b558df8"
   },
   {
     "path": "docs/en/AGENT-COMMUNICATION.md",
@@ -562,7 +567,7 @@
   {
     "path": "docs/en/CURSOR-ENGINE-CONTRACT.md",
     "kind": "doc",
-    "sha256": "de1472ee6a7b02dfaa8e75d620ed0190f1610584116e591614765fc6128dff22"
+    "sha256": "289ab3c04e05e019f450721843953d2377674ff893d91b0e41a7a2aae89775fd"
   },
   {
     "path": "docs/en/DELIVERY-SCOPE.md",
@@ -605,6 +610,11 @@
     "sha256": "51fbb7d27fe6c662a00ed7849424e5169f8c39aabffa0c2e70ec49ba28587ae4"
   },
   {
+    "path": "docs/en/GRAPH-STUDIO.md",
+    "kind": "doc",
+    "sha256": "3e776a61174fc5d822101def2edd88b4b7332c94b1ea35eeff2b39970782d116"
+  },
+  {
     "path": "docs/en/I18N-VALIDATION.md",
     "kind": "doc",
     "sha256": "fd41473fc6612722ca0c0d0b71f899a16cb94688f8466fa989b704b389525b05"
@@ -632,7 +642,7 @@
   {
     "path": "docs/en/LOG-CONSOLE.md",
     "kind": "doc",
-    "sha256": "b566cb3af501b18a98e4372e6d67ac83d3d113295aa3db2d87140369e4025c0f"
+    "sha256": "c97b401f330c10854281f27a7f4d5d91c77a92e0134182aef83efcdd6aa83347"
   },
   {
     "path": "docs/en/MANAGED-PLAN-GATES.md",
@@ -732,7 +742,7 @@
   {
     "path": "docs/en/WEB-REQUEST-POLICY.md",
     "kind": "doc",
-    "sha256": "e8ae18f67604be5448ade72abe4720daaae11799385d57bfe968ec678f28555f"
+    "sha256": "3f66a8838ead7d496a931bb96e0415d16a48b4af71c76cba4edfb671f8ea2580"
   },
   {
     "path": "docs/en/e6-real.md",
@@ -1448,15 +1458,5 @@
     "path": "docs/screenshots/projects-method-20261010/result.json",
     "kind": "doc",
     "sha256": "41d27d83107db17355397fc4fdf5371148831574610a2a3bba07df906ee4364d"
-  },
-  {
-    "path": "docs/screenshots/ui-redesign-20261010/README.md",
-    "kind": "doc",
-    "sha256": "b608b5975621c44793911af1de0e9573e62ddb53593733158e67b51418d63f59"
-  },
-  {
-    "path": "docs/screenshots/ui-redesign-20261010/candidate-graph-cache.json",
-    "kind": "doc",
-    "sha256": "8bc34f373bf01e5c1b2d6c0ffb0a3c20596d6c191f3d964dc9c614eef0351371"
   }
 ]

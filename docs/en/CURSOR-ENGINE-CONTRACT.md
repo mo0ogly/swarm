@@ -32,7 +32,7 @@ boundary against a malicious process with the host account's permissions. These
 guarantees concern public engine operations; an administrator who can alter the
 database or executables is outside that boundary.
 
-## January reference requirements to verify
+## January requirements — historical audit state on October 10
 
 This matrix defines the target, not already delivered features. Local limits and
 Swarm safeguards are not Cursor prescriptions. Evidence must distinguish source
@@ -53,7 +53,7 @@ they do not alone cover JAN-1 through JAN-7. Missing evidence does not prove a
 missing feature, but prevents claiming complete alignment. The engine audit
 still needs to cover these requirements.
 
-## February additions and relationship between references
+## February additions — historical audit state on October 10
 
 February describes a continuous hierarchy, worker-owned repository copies and handoffs to the owner. It removes the judge in an intermediate evolution and the central integrator. JAN-4 and JAN-5 remain retained Swarm requirements; they are not described as invariants of February’s final system. Compare a continuous hierarchy with judgment checkpoints against explicit cycles before choosing how they fit together.
 
@@ -183,3 +183,24 @@ flowchart TD
     Q -->|Available| A[Atomic scope reservation]
     A --> L[Invoke the same frozen route]
 ```
+
+Current `judge`/`renew` has fixture evidence for received context and observed effect; cumulative real-provider verification remains required. See [judgment cycles](JUDGMENT-CYCLES.md) and the candidate delivery reports.
+
+## Evidence after direct development on October 13
+
+The matrices above retain the initial audit, not the current implementation state.
+The [T1–T8 reports](../plans/engine-cursor-contract/completion-audit-20261012.md)
+and original receipts now distinguish:
+
+| Requirement | Current local evidence | Evidence still required |
+| --- | --- | --- |
+| JAN-1/JAN-2 | Attributed repository reading, persisted adaptation and concurrent fixture scopes | Multiple real planners and autonomous discovery |
+| JAN-3/FEB-1/FEB-2 | Owned copies, attributed handoff, restart and controlled publication tests | Real-provider handoffs used by subsequent decisions |
+| JAN-4/JAN-5/FEB-3 | Received judge/renew context, observed renewal, freshness and duplicate-effect guards | Real-provider judgment and renewal |
+| JAN-6/FEB-4 | Production/publication waiting measured at two fixture concurrency levels | Real throughput, cost, tokens and long-running arbitration |
+| JAN-7 | Configurable role routes and policies with tested consumers | Compared suitability and endurance on real models |
+
+Current architecture combines continuous hierarchy and judgment checkpoints,
+exclusive publication and parallel production. Effective Admin settings replace
+the historical bounds cited in the original audit. This evidence does not provide
+Cursor certification or native acceptance.

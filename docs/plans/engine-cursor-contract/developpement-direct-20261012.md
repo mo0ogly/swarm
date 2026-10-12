@@ -204,3 +204,12 @@ versionnables. Les bundles de reprise et deux patchs cumulatifs de sources de
 archive ni preuve historique n'est supprimée. Les sources du manifeste de
 vérification ne dépendent pas de ces archives. La sauvegarde ne vaut pas
 déploiement, indépendance de revue ou acceptation native.
+
+## Livraison locale du 13 octobre
+
+L'atelier du graphe, les quick wins liés à sa recette et le délai éditeur hérité
+de la modale Admin sont développés et vérifiés. Les rapports T1–T8 sont consolidés
+sans acceptation fabriquée. Voir le [reçu du lot](evidence/direct-20261012/graph-studio-verification-receipt.json)
+et le [RETEX local](evidence/T8-handoff.md). La question d'une recette Codex isolée
+avec vrai modèle et revue indépendante est explicitement posée ; elle ne relance
+pas la mission historique. Le candidat reste distinct du serveur installé.

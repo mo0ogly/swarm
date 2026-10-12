@@ -71,6 +71,7 @@ const Pilot = {
   $('graph').replaceChildren(mission,toolbar,actions,tools,status,canvas,list);
   ProductViews.mount($('graph'));
   GraphDraft.mount();
+  GraphStudio.mount();
  },
  changed(){this.save();this.listKey='';this.render();},
  zoom(delta){this.state.zoom=Math.max(.15,Math.min(2,this.state.zoom+delta));this.changed()},

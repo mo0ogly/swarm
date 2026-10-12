@@ -378,3 +378,31 @@ input::placeholder,textarea::placeholder { color: var(--wattson-texte-discret); 
 .engine-quota-summary th,.engine-quota-summary td { padding: 6px 8px; overflow-wrap: anywhere; }
 .engine-quota-summary td:first-child { min-width: 0; }
 .engine-quota-summary td:not(:first-child) { font-variant-numeric: tabular-nums; }
+
+/* Graph workbench: all colours come from shared semantic pairs. */
+.graph-studio { border:1px solid var(--wattson-ligne); border-radius:8px; padding:14px; background:var(--wattson-carte-creuse); }
+.graph-studio .pilot-canvas { min-height:55vh; background-image:radial-gradient(var(--wattson-ligne) 1px,transparent 1px); background-size:24px 24px; }
+.graph-studio.is-fullscreen { position:fixed; inset:0; z-index:90; border:0; border-radius:0; height:100dvh; box-sizing:border-box; overflow:auto; display:flex; flex-direction:column; gap:6px; }
+.graph-studio.is-fullscreen .pilot-canvas { flex:1; min-height:35vh; max-height:none; }
+body.graph-studio-open { overflow:hidden; }
+.graph-studio-hint { color:var(--wattson-texte-discret); font-size:.9rem; margin:8px 0; }
+.graph-link-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:10px; background:var(--wattson-info-fond); color:var(--wattson-info-encre); border-radius:6px; }
+.graph-link-toolbar[hidden] { display:none; }
+.graph-link-toolbar span { font-weight:700; margin-right:auto; }
+.graph-drag { cursor:grab; touch-action:none; }
+.graph-drag:active { cursor:grabbing; }
+.graph-drag rect { fill:var(--wattson-carte-appuyee); stroke:var(--wattson-ligne); }
+.graph-drag text { fill:var(--wattson-texte); font-size:24px; pointer-events:none; }
+.graph-port { fill:var(--wattson-info-fond); stroke:var(--wattson-lien); stroke-width:3; cursor:crosshair; touch-action:none; }
+.graph-port[data-side=in] { fill:var(--wattson-carte); }
+.graph-arete { cursor:pointer; pointer-events:stroke; }
+.graph-arete.is-selected,.graph-link-ghost { stroke:var(--wattson-accent); stroke-width:4; fill:none; }
+.graph-link-ghost { stroke-dasharray:9 6; pointer-events:none; }
+.graph-drag:focus rect,.graph-port:focus,.graph-arete:focus { stroke:var(--wattson-accent); stroke-width:4; outline:none; }
+@media(max-width:700px) { .graph-studio { padding:8px; } .graph-studio.is-fullscreen .pilot-toolbar { gap:6px; } .graph-studio.is-fullscreen .pilot-actions { flex-wrap:wrap; } }
+
+body.graph-studio-open .pilot-inspector { z-index:91; }
+
+.graph-studio .graph-minimap { pointer-events:none; }
+
+.graph-studio.is-fullscreen #pilot-list { overflow:auto; }

@@ -4068,5 +4068,19 @@ globalThis.SwarmEnglish = {
   "Délai maximal : %d s ; aucune donnée de mission envoyée": "Timeout: %d s; no mission data sent",
   "Réglages d’attente modifiés depuis l’aperçu ; examiner à nouveau la demande.": "Waiting settings changed since preview; review the request again.",
   "Délai d’assistance invalide ; aucun appel exécuté.": "Invalid assistant timeout; no call executed.",
-  "Délai d’assistance entier positif ou nul requis ; représentation de durée valide requise": "Assistant timeout must be a nonnegative integer with a valid duration representation"
+  "Délai d’assistance entier positif ou nul requis ; représentation de durée valide requise": "Assistant timeout must be a nonnegative integer with a valid duration representation",
+  "Plein écran": "Full screen",
+  "Quitter le plein écran": "Exit full screen",
+  "Ranger les cartes": "Arrange cards",
+  "Retirer ce lien": "Remove this link",
+  "Changer le prérequis": "Change prerequisite",
+  "Changer la destination": "Change destination",
+  "Déplacer la carte": "Move card",
+  "Relier cette sortie": "Connect this output",
+  "Relier cette entrée": "Connect this input",
+  "Positions indisponibles ; placement automatique conservé.": "Positions unavailable; automatic layout retained.",
+  "Positions non mémorisées sur cet appareil.": "Positions could not be saved on this device.",
+  "Choisissez l’autre carte pour préparer le lien. Aucune modification avant confirmation.": "Choose the other card to prepare the link. Nothing changes before confirmation.",
+  "Lien préparé. Prévisualisez puis confirmez dans le brouillon.": "Link prepared. Preview and confirm in the draft.",
+  "Déplacez les cartes par leur poignée. Reliez une sortie à une entrée. Sélectionnez un lien pour le modifier. Échap annule le geste ou quitte le plein écran.": "Move cards using their handles. Connect an output to an input. Select a link to edit it. Escape cancels the gesture or exits full screen."
 };

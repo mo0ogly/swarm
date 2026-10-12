@@ -1,5 +1,15 @@
 [
   {
+    "path": "internal/engine/mission_provider_cooldown_test.go",
+    "kind": "test",
+    "sha256": "c4c99fcefffdc5dd39a43039ca2ded137fe459ad9157e789ab2a3a8a49e5385a"
+  },
+  {
+    "path": "internal/engine/mission_status.go",
+    "kind": "source",
+    "sha256": "4bee17fc35cc7a963f1df2a1996a5aa9788861c397d08829ffb4b3c82c5ceab1"
+  },
+  {
     "path": "internal/engine/mission_status_test.go",
     "kind": "test",
     "sha256": "5ad922a230d64567b4755e8114c6dd5bd62a3009f1a230af2bf37e30a4206d5f"
@@ -1187,7 +1197,7 @@
   {
     "path": "locales/en.json",
     "kind": "source",
-    "sha256": "078e44451a60a5bf60d40a96ddac05bb8c16617e07a7879f63defb8abd83fb38"
+    "sha256": "484b46bfcda91e8fdc14e6f5f48a5982952bd18bdc20fd681988be63364cf1a0"
   },
   {
     "path": "package.json",
@@ -1218,6 +1228,11 @@
     "path": "tests/api_wait_admin_ui.cjs",
     "kind": "harness",
     "sha256": "293359b67270290d3e7031d7c7e6ab478e4c1d71d5fedac36fa060794c642c6f"
+  },
+  {
+    "path": "tests/asset_loading_policy_test.cjs",
+    "kind": "harness",
+    "sha256": "54dcd1a9cea1708b5fb1891069cabc8b810488e76cf5f16ed106571349564165"
   },
   {
     "path": "tests/audit_acceptance.cjs",
@@ -1255,6 +1270,16 @@
     "sha256": "1dc5a1e7f1c6ef4a92e451cdff44c1cc1941dbd4ae29c6766344b51ca7004c22"
   },
   {
+    "path": "tests/graph_studio_test.cjs",
+    "kind": "harness",
+    "sha256": "cbf25c1d25cd5069b6104403f03ed2fe457383749a5eed0a23e3512acf48226b"
+  },
+  {
+    "path": "tests/graph_studio_ui.cjs",
+    "kind": "harness",
+    "sha256": "1516be5c6c3769e655b9fb6b128eddd934416e460abff368f15e8d7cbdf2e97f"
+  },
+  {
     "path": "tests/install_smoke.py",
     "kind": "test",
     "sha256": "1b4a86a8bb45c285321d0cc259ff57bdac48ac7f0da78a5110c8e140cfb0ab43"
@@ -1273,6 +1298,11 @@
     "path": "tests/observable_validation_acceptance.py",
     "kind": "harness",
     "sha256": "a459da96c1797e203b314c9ed0172446361984ef72379716e69a10d43b999979"
+  },
+  {
+    "path": "tests/preparation_editor_policy_ui.cjs",
+    "kind": "harness",
+    "sha256": "4c570d8ccc9ab9d538209edfdddf02e54945f66ca43712948752e8a32e4979b7"
   },
   {
     "path": "tests/preparation_subjects_ui.cjs",
@@ -1458,35 +1488,5 @@
     "path": "tools/refresh_ui_source_manifest.py",
     "kind": "harness",
     "sha256": "7ba32025640e8808bdf072a13c99ad1ad964dd3c80920dfe5af509697243114c"
-  },
-  {
-    "path": "tools/swarm_local.py",
-    "kind": "source",
-    "sha256": "69a7de970c5c8160706277c416772f7826ce232b85c1592a6bd7597f1c449df5"
-  },
-  {
-    "path": "tools/verification/refresh_engine_source_manifest.py",
-    "kind": "harness",
-    "sha256": "5d5c078d209d5cd1313bcc7dcb0334a31e887ff159d82c02dd79b80107dbb281"
-  },
-  {
-    "path": "tools/verification/t4_admin.py",
-    "kind": "harness",
-    "sha256": "f19e49dcdfad83b871f7a6c60bebdf9761f7882de343270d1d5e69f4380039ab"
-  },
-  {
-    "path": "tools/verification/t5_ci.py",
-    "kind": "harness",
-    "sha256": "3b291a78aea24c752efff7bd5cc3b217c1025831d1a0276207b91c137177fd09"
-  },
-  {
-    "path": "tools/verification/t6_quickwins.py",
-    "kind": "harness",
-    "sha256": "d6b132b8921d674ff0ed731a08caf6426bee9b73cab1c89c8c8ae6fb983e42b8"
-  },
-  {
-    "path": "tools/verification/t7_prelaunch.py",
-    "kind": "harness",
-    "sha256": "32f44914f8aebea63aaecfdf4488a2683e1ba130acf2b213dcf4467b3e960e5e"
   }
 ]

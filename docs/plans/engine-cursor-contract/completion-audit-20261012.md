@@ -7,15 +7,15 @@ T1–T8 et UX-GRAPH-01 ; les exemples ci-dessous ne constituent pas leur totalit
 
 | Lot | Preuve disponible | Lacune qui empêche sa clôture |
 | --- | --- | --- |
-| T1 | Contrat JAN/FEB, corpus de recherche, architectures et décisions de reprise existants | Rapport T1 nommé absent du dépôt principal ; décision et couverture cumulées à consolider sur le candidat actuel |
-| T2 | Cycles, judge/renew effectivement reçus et appliqués en fixtures ; fraîcheur, rejeu et fin explicite contrôlés | Rapport T2 nommé absent ; recette fournisseur réel et revue indépendante du candidat actuel non démontrées |
-| T3 | Exploration attribuée, adaptation du plan et sous-planification concurrente couvertes par tests ciblés conservés | Rapport T3 nommé absent ; comportement réel de plusieurs sous-planificateurs non démontré pour cette reprise |
-| T4 | Remise anticipée, candidat immuable, revue/publication exclusive, conflits ; correction du déplacement et des sous-dossiers vérifiée | Rapport T4 nommé absent ; effet du correctif sur le serveur natif historique encore non vérifié |
-| T5 | Budgets, hiérarchie, cycles et délais administrables ; API/CLI et recettes FR/EN ; transport sans seconds plafonds 60/300 | Rapport T5 nommé absent ; délai de chargement de l'éditeur encore fixe ; audit global des politiques/consommateurs à terminer |
-| T6 | Vérifications ciblées, `-race`, compilation/vet et mesures de deux niveaux de concurrence | Rapport T6 nommé absent ; coûts/tokens/cache réels non mesurés ; anciens échecs de suite complète non transformés en PASS |
-| T7 | Parcours CLI/API/navigateur sur stockage isolé et HTTP local ; compteurs/probes réellement observés | Aucun modèle réel ni avis indépendant du candidat actuel ; rapport T7 absent ; recette cumulative réelle à organiser dans les droits accordés |
-| T8 | Phase RETEX dans le produit et RETEX intermédiaire de reprise documentés | RETEX final après recette complète et réalisation des quick wins nécessaires encore à produire |
-| UX-GRAPH-01 | Tâche et critères GRAPH-01..GRAPH-09 ajoutés, surfaces existantes identifiées | Plein écran, manipulation des cartes/liens, rendu et recette moderne encore à implémenter/vérifier |
+| T1 | Contrat JAN/FEB, corpus de recherche, architectures et décisions de reprise existants | Rapport T1 consolidé ; couverture cumulative et revue indépendante du candidat actuel encore requises |
+| T2 | Cycles, judge/renew effectivement reçus et appliqués en fixtures ; fraîcheur, rejeu et fin explicite contrôlés | Rapport T2 consolidé ; recette fournisseur réel et revue indépendante du candidat actuel non démontrées |
+| T3 | Exploration attribuée, adaptation du plan et sous-planification concurrente couvertes par tests ciblés conservés | Rapport T3 consolidé ; comportement réel de plusieurs sous-planificateurs non démontré pour cette reprise |
+| T4 | Remise anticipée, candidat immuable, revue/publication exclusive, conflits ; correction du déplacement et des sous-dossiers vérifiée | Rapport T4 consolidé ; effet du correctif sur le serveur natif historique encore non vérifié |
+| T5 | Budgets, hiérarchie, cycles et délais administrables ; API/CLI et recettes FR/EN ; transport sans seconds plafonds 60/300 | Rapport T5 consolidé ; délai éditeur désormais hérité d’Admin et vérifié ; qualification cumulative restante |
+| T6 | Vérifications ciblées, `-race`, compilation/vet et mesures de deux niveaux de concurrence | Rapport T6 consolidé ; coûts/tokens/cache réels non mesurés ; anciens échecs de suite complète non transformés en PASS |
+| T7 | Parcours CLI/API/navigateur sur stockage isolé et HTTP local ; compteurs/probes réellement observés | Aucun modèle réel ni avis indépendant du candidat actuel ; rapport T7 consolidé et explicitement partiel ; recette cumulative réelle à organiser dans les droits accordés |
+| T8 | Phase RETEX dans le produit et RETEX intermédiaire de reprise documentés | RETEX local et quick wins réalisés ; bilan cumulatif final dépend de T7 |
+| UX-GRAPH-01 | Tâche et critères GRAPH-01..GRAPH-09 ajoutés, surfaces existantes identifiées | Implémentation et recette locale FR/EN : plein écran, déplacement, ports, retrait/reconnexion et cycles refusés ; déploiement natif et revue indépendante non effectués |
 
 Le critère historique T6 demandait notamment `go test ./...` et `go vet ./...`.
 L'utilisateur a ensuite demandé uniquement les contrôles nécessaires et le dépôt
@@ -38,3 +38,5 @@ plus large exige une dépendance ou un risque concret, pas le volume des tests.
 Les obligations de revue/fournisseur réel ne sont pas retirées pour faciliter la
 clôture. La reprise directe n'autorise pas de relance de la mission historique,
 de remise à zéro, de fausse autonomie ou d'acceptation par simple documentation.
+
+Mise à jour du 13 octobre : rapports nommés consolidés en `evidence/T1-handoff.md` à `T7-handoff.md`, sans fabrication d’acceptation. Les quick wins de recette du graphe et la suppression du délai éditeur fixe sont réalisés. La demande de recette Codex isolée avec modèle réel et revue indépendante est en attente de décision ; la mission historique n’est pas relancée.

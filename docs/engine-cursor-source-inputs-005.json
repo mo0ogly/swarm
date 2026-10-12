@@ -1,5 +1,35 @@
 [
   {
+    "path": "tools/swarm_local.py",
+    "kind": "source",
+    "sha256": "69a7de970c5c8160706277c416772f7826ce232b85c1592a6bd7597f1c449df5"
+  },
+  {
+    "path": "tools/verification/refresh_engine_source_manifest.py",
+    "kind": "harness",
+    "sha256": "7222a45230cbd83674aa073662922bc22c824d8206854bdd2ac550e532d12ebb"
+  },
+  {
+    "path": "tools/verification/t4_admin.py",
+    "kind": "harness",
+    "sha256": "f19e49dcdfad83b871f7a6c60bebdf9761f7882de343270d1d5e69f4380039ab"
+  },
+  {
+    "path": "tools/verification/t5_ci.py",
+    "kind": "harness",
+    "sha256": "3b291a78aea24c752efff7bd5cc3b217c1025831d1a0276207b91c137177fd09"
+  },
+  {
+    "path": "tools/verification/t6_quickwins.py",
+    "kind": "harness",
+    "sha256": "d6b132b8921d674ff0ed731a08caf6426bee9b73cab1c89c8c8ae6fb983e42b8"
+  },
+  {
+    "path": "tools/verification/t7_prelaunch.py",
+    "kind": "harness",
+    "sha256": "32f44914f8aebea63aaecfdf4488a2683e1ba130acf2b213dcf4467b3e960e5e"
+  },
+  {
     "path": "tools/verification/t8_docs.py",
     "kind": "harness",
     "sha256": "02180ae427806feaffab840575b358bbbf924f00a53228990bd3fd5dcb970966"
@@ -132,7 +162,12 @@
   {
     "path": "web/graph-draft.js",
     "kind": "source",
-    "sha256": "99b7b9d0cfee90dea85f48d9dd34fdc3b324bb112abe14a5af63f848d1c228a2"
+    "sha256": "2ce47b4300806202f98d8f2103fcb16a76bb058886b0fb84115c1270393f4478"
+  },
+  {
+    "path": "web/graph-studio.js",
+    "kind": "source",
+    "sha256": "3a1b28646df002e443b5e9c1e081772e2eb684638c76b1704ca54981d2ac843f"
   },
   {
     "path": "web/graph.css",
@@ -142,12 +177,12 @@
   {
     "path": "web/graph.js",
     "kind": "source",
-    "sha256": "535c670d4f91d70610f5ab4b9ed5faafdc4590fb0f6bcdffd368da353e225819"
+    "sha256": "92c760ac2d4417110852bf090a59aa2353f10af2beb00926842e927e70b28d28"
   },
   {
     "path": "web/i18n-en.js",
     "kind": "source",
-    "sha256": "2a556d386214e9829f8ed779eb6d65f2daaa57c42de77c267e2b0a0170acbfe7"
+    "sha256": "a99dd2a260fc4af8775f6f6efca63b6bd7f2569dc1738bf3fedba4b841d6eb20"
   },
   {
     "path": "web/i18n.js",
@@ -157,7 +192,7 @@
   {
     "path": "web/index.html",
     "kind": "source",
-    "sha256": "7fe5f0a5638ef4ad37f760d411177616c4f057d773bc45e2d02c52d8070888d8"
+    "sha256": "cfd2e863b6fb8cec62c1c86ec60027bc299bc1efe70b7c11eac020f07623b8d9"
   },
   {
     "path": "web/instruction-revisions.js",
@@ -297,7 +332,7 @@
   {
     "path": "web/log-console.js",
     "kind": "source",
-    "sha256": "4ceba9b502a574f176db378e0b4f57af8aa4675bd98cc5cc5fca10d3cfc9b3d4"
+    "sha256": "bbc2db46ce9d4735658c724e058a10774a509309461f8471cf49e17c80212c3f"
   },
   {
     "path": "web/mission-help.js",
@@ -347,7 +382,7 @@
   {
     "path": "web/pilotage.js",
     "kind": "source",
-    "sha256": "9206d97e3282ec56be20cbb253ff1948953a2e8be1d3f098f87fdbd00e97daf8"
+    "sha256": "fedc96ce1f5784ca0c62ee2d71248b923d5e33e8e0001c7797cfc62859ca9e3e"
   },
   {
     "path": "web/plan.css",
@@ -412,7 +447,7 @@
   {
     "path": "web/prephase-editor.js",
     "kind": "source",
-    "sha256": "859de925d60b31720a09d47f9d0ccf05b1b572a8f334d47812f54d4123c942d2"
+    "sha256": "b6378db5f10427040ddcebf9f330399f3301a0f8dd78ea6c21aa8415e9bfc905"
   },
   {
     "path": "web/prephase-missions.js",
@@ -542,7 +577,7 @@
   {
     "path": "web/swarm-design.css",
     "kind": "source",
-    "sha256": "d55669ed658866d62b19069a7255ce72b5af9304c65d18894fe6592b0b94c12e"
+    "sha256": "9a15b7bfa9163f32c8542d50e0ad62c8acb346a4e2e61a7a8f110c831c9740d3"
   },
   {
     "path": "web/swarm-logo.png",
@@ -577,6 +612,6 @@
   {
     "path": "web/web-requests.js",
     "kind": "source",
-    "sha256": "d3cf45e07b7336f0267af1bbb914d1f3d4d9eaafce24d574ed7cde90822cd3ea"
+    "sha256": "03dedcfd1b05078d607670c27ca682fb967fc7532d58dd7a5ed040d95d85f5c2"
   }
 ]

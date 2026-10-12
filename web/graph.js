@@ -159,7 +159,7 @@ function drawPilotGraph(){
    const edge=svgNode('path',{d:graphEdgePath(data.points),class:'graph-arete'});
    edge.dataset.from=e.from_task_id;edge.dataset.to=e.to_task_id;svg.append(edge);
   }
-  for(const e of organization.edges){const data=g.edge(e.from,e.to);svg.append(svgNode('path',{d:graphEdgePath(data.points),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'}))}
+  for(const e of organization.edges){const data=g.edge(e.from,e.to),edge=svgNode('path',{d:graphEdgePath(data.points),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'});edge.dataset.from=e.from;edge.dataset.to=e.to;svg.append(edge)}
   for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-77.5;
    const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;group.dataset.agentRole=n.role||n.kind;
    group.append(svgNode('rect',{x:left,y:top,width,height:155,rx:12}));
@@ -202,7 +202,7 @@ function drawPilotGraph(){
  }
  const svg=canvas.querySelector('svg');if(!svg)return;
   scalePilotGraph(svg,state.zoom);
- GraphDraft.minimap(svg);
+ GraphStudio.render(svg);
  for(const n of organization.nodes){const group=[...svg.querySelectorAll('.graph-responsibility')].find(e=>e.dataset.responsibility===n.id);if(!group)continue;const lines=n.role==='subplanner'?[n.title,n.scopeLabel,n.description,n.detail]:[n.title,n.description,n.detail,tr_web_graph_js('Ouvrir les décisions et avis')];lines.push(globalThis.ProjectProfiles?ProjectProfiles.summary(n.workflow):'');group.setAttribute('aria-label',lines.join('. '));for(const text of group.querySelectorAll('[data-role-line]')){const value=lines[Number(text.dataset.roleLine)];text.textContent=value.length>40?value.slice(0,39)+'…':value}}
  const byTask=graphAgentsParTache();
  for(const group of canvas.querySelectorAll('.graph-noeud')){
