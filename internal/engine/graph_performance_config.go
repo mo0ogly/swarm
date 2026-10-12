@@ -51,32 +51,51 @@ type graphPerformanceBound struct {
 	Max int `json:"max"`
 }
 
+// Values cross Go and JavaScript. This is a representation bound, not an
+// operational limit on duration, samples, workloads or graph size.
+func graphPerformanceExactIntegerMax() int {
+	native := uint64(^uint(0) >> 1)
+	jsonExact := uint64(1<<53 - 1)
+	if native > jsonExact {
+		native = jsonExact
+	}
+	return int(native)
+}
+
 var graphPerformanceBounds = map[string]graphPerformanceBound{
-	"keyboard_p95_ms": {1, 60000}, "samples": {1, 100}, "cards": {2, 10000}, "render_p95_ms": {1, 60000}, "loads": {1, 10},
+	"keyboard_p95_ms": {1, graphPerformanceExactIntegerMax()},
+	"samples":         {1, graphPerformanceExactIntegerMax()},
+	"cards":           {2, graphPerformanceExactIntegerMax()},
+	"render_p95_ms":   {1, graphPerformanceExactIntegerMax()},
+	"loads":           {1, graphPerformanceExactIntegerMax()},
 }
 
 func graphPerformanceView(c GraphPerformanceConfig) any {
 	return struct {
 		GraphPerformanceConfig
-		Bounds map[string]graphPerformanceBound `json:"bounds"`
-	}{c, graphPerformanceBounds}
+		Bounds                map[string]graphPerformanceBound `json:"bounds"`
+		BoundsKind            string                           `json:"bounds_kind"`
+		RequestMaxBytes       int                              `json:"request_max_bytes"`
+		ConfigurationMaxBytes int                              `json:"configuration_max_bytes"`
+	}{c, graphPerformanceBounds, "exact_integer_representation", 16384, 1048576}
 }
 func withinGraphPerformance(name string, value int) bool {
 	b := graphPerformanceBounds[name]
 	return value >= b.Min && value <= b.Max
 }
 func validateGraphPerformance(v GraphPerformanceValues) error {
-	// Operational safety bounds are separate from the editable acceptance targets.
+	// Positive samples/targets and a graph with at least two cards define this
+	// measurement recipe. Upper bounds are solely exact representation limits.
 	if !withinGraphPerformance("keyboard_p95_ms", v.KeyboardP95) || !withinGraphPerformance("samples", v.Samples) {
-		return fmt.Errorf("keyboard_p95_ms: 1..60000 ms ; samples: 1..100")
+		return fmt.Errorf("keyboard_p95_ms, samples: entiers positifs représentables / representable positive integers (max %d)", graphPerformanceExactIntegerMax())
 	}
 	if !withinGraphPerformance("loads", len(v.Loads)) {
-		return fmt.Errorf("loads: 1..10 profils / profiles")
+		return fmt.Errorf("loads: au moins un profil requis / at least one profile required")
 	}
 	seen := map[int]bool{}
 	for _, row := range v.Loads {
 		if !withinGraphPerformance("cards", row.Cards) || !withinGraphPerformance("render_p95_ms", row.RenderP95) || seen[row.Cards] {
-			return fmt.Errorf("loads: cards 2..10000 uniques / unique ; render_p95_ms 1..60000 ms")
+			return fmt.Errorf("loads: cards >= 2 uniques ; render_p95_ms > 0 ; entiers représentables / unique cards >= 2, positive render target, representable integers (max %d)", graphPerformanceExactIntegerMax())
 		}
 		seen[row.Cards] = true
 	}
@@ -161,14 +180,16 @@ func (s *Store) changeGraphPerformance(r GraphPerformanceChange, preview bool) (
 	c.Revision++
 	c.Values = r.Values
 	c.History = append(c.History, GraphPerformanceRevision{Revision: c.Revision, Values: r.Values, Actor: operatorIdentity(), At: now(), Change: r})
+	raw, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return empty, err
+	}
+	// Preview and application have identical representation/size validation.
+	// Include the newline actually written so the next read accepts the file.
+	if len(raw)+1 > 1048576 {
+		return empty, fmt.Errorf("Historique plein / History full")
+	}
 	if !preview {
-		raw, err := json.MarshalIndent(c, "", "  ")
-		if err != nil {
-			return empty, err
-		}
-		if len(raw) > 1048576 {
-			return empty, fmt.Errorf("Historique plein / History full")
-		}
 		if err = atomicWrite(filepath.Join(s.root, ".swarm", "graph-performance.json"), append(raw, '\n')); err != nil {
 			return empty, err
 		}

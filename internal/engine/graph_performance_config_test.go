@@ -169,3 +169,117 @@ func TestGraphPerformanceCLIHTTPParityAuthAndPreview(t *testing.T) {
 		t.Fatal(rr.Code, rr.Body.String())
 	}
 }
+
+func TestGraphPerformanceOperatorTargetsWithoutHistoricalCeilings(t *testing.T) {
+	cases := []struct {
+		name   string
+		change func(*GraphPerformanceValues)
+	}{
+		{"keyboard", func(v *GraphPerformanceValues) { v.KeyboardP95 = 60001 }},
+		{"samples", func(v *GraphPerformanceValues) { v.Samples = 101 }},
+		{"cards", func(v *GraphPerformanceValues) { v.Loads[0].Cards = 10001 }},
+		{"render", func(v *GraphPerformanceValues) { v.Loads[0].RenderP95 = 60001 }},
+		{"profiles", func(v *GraphPerformanceValues) {
+			v.Loads = nil
+			for i := 0; i < 11; i++ {
+				v.Loads = append(v.Loads, GraphPerformanceLoad{Cards: i + 2, RenderP95: 1000})
+			}
+		}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			s := storeTest(t)
+			req := performanceRequest()
+			tc.change(&req.Values)
+			h := newWebHandler(s, "local.test", "performance-token")
+			raw, err := json.Marshal(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			preview := runLimitsWebRequest(h, "POST", "/api/v1/graph-performance/preview", "performance-token", raw)
+			if preview.Code != 200 {
+				t.Fatalf("operator target refused: %d %s", preview.Code, preview.Body.String())
+			}
+			if _, err = os.Stat(filepath.Join(s.root, ".swarm", "graph-performance.json")); !os.IsNotExist(err) {
+				t.Fatalf("preview persisted: %v", err)
+			}
+			applied := runLimitsWebRequest(h, "POST", "/api/v1/graph-performance/apply", "performance-token", raw)
+			if applied.Code != 200 {
+				t.Fatalf("apply refused: %d %s", applied.Code, applied.Body.String())
+			}
+			other, err := openStore(s.root, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer other.db.Close()
+			var output bytes.Buffer
+			if err = other.graphPerformanceCLI([]string{"run-limits", "performance", "show"}, "", &output); err != nil {
+				t.Fatal(err)
+			}
+			var received struct {
+				Values   GraphPerformanceValues `json:"values"`
+				Revision int                    `json:"revision"`
+			}
+			if err = json.Unmarshal(output.Bytes(), &received); err != nil {
+				t.Fatal(err)
+			}
+			want, _ := json.Marshal(req.Values)
+			got, _ := json.Marshal(received.Values)
+			if received.Revision != 1 || string(got) != string(want) {
+				t.Fatalf("persisted target mismatch: %s", output.String())
+			}
+		})
+	}
+}
+
+func TestGraphPerformanceRepresentationAndTransportBounds(t *testing.T) {
+	s := storeTest(t)
+	h := newWebHandler(s, "local.test", "performance-token")
+	shown := runLimitsWebRequest(h, "GET", "/api/v1/graph-performance", "performance-token", nil)
+	var received struct {
+		Bounds        map[string]graphPerformanceBound `json:"bounds"`
+		Kind          string                           `json:"bounds_kind"`
+		Request       int                              `json:"request_max_bytes"`
+		Configuration int                              `json:"configuration_max_bytes"`
+	}
+	if shown.Code != 200 || json.Unmarshal(shown.Body.Bytes(), &received) != nil {
+		t.Fatal(shown.Code, shown.Body.String())
+	}
+	if received.Kind != "exact_integer_representation" || received.Request != 16384 || received.Configuration != 1048576 {
+		t.Fatalf("missing technical contract: %+v", received)
+	}
+	for name, b := range received.Bounds {
+		if b.Max != graphPerformanceExactIntegerMax() {
+			t.Fatalf("hidden upper policy in %s: %+v", name, b)
+		}
+	}
+	req := performanceRequest()
+	req.Values.KeyboardP95 = graphPerformanceExactIntegerMax()
+	if _, err := s.changeGraphPerformance(req, true); err != nil {
+		t.Fatal("exact endpoint rejected", err)
+	}
+	req.Values.KeyboardP95++
+	if _, err := s.changeGraphPerformance(req, false); err == nil {
+		t.Fatal("unrepresentable integer accepted")
+	}
+	if _, err := os.Stat(filepath.Join(s.root, ".swarm", "graph-performance.json")); !os.IsNotExist(err) {
+		t.Fatal("invalid write persisted", err)
+	}
+}
+
+func TestGraphPerformanceOversizePreviewAndApplyAgree(t *testing.T) {
+	s := storeTest(t)
+	req := performanceRequest()
+	req.Values.Loads = nil
+	for i := 0; i < 18000; i++ {
+		req.Values.Loads = append(req.Values.Loads, GraphPerformanceLoad{Cards: i + 2, RenderP95: 1000})
+	}
+	for _, preview := range []bool{true, false} {
+		if _, err := s.changeGraphPerformance(req, preview); err == nil {
+			t.Fatalf("oversized configuration approved; preview=%v", preview)
+		}
+		if _, err := os.Stat(filepath.Join(s.root, ".swarm", "graph-performance.json")); !os.IsNotExist(err) {
+			t.Fatalf("oversize persisted: %v", err)
+		}
+	}
+}
