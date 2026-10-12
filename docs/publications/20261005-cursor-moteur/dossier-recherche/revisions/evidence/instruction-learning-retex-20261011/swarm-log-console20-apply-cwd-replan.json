@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-11T18:38:14.578272+00:00",
+  "observed": "Fresh-index apply failed because Python helper default cwd=work captured the first packaging directory, while --work-tree and GIT_INDEX_FILE had moved to the second verification copy.",
+  "scope": "Isolated operator packaging/apply copies only. Original native mission and frozen qualified sources untouched.",
+  "original_error": "does not match index / new file already exists; no patch application completed",
+  "correction": "Resolve cwd from the current work variable at every subprocess call; explicit git-dir/work-tree/index and refreshed stat index retained.",
+  "linked_prior": "17 index-boundary replan; this instance identifies a distinct caller-default capture rather than stale file bytes.",
+  "condition": "Exact patch apply must recover the declared result tree and every postimage byte before publication."
+}

@@ -36,6 +36,11 @@ et la [note de recherche datée](dossier-recherche/revisions/20261010-vivacite-s
 Ce cas hors campagne ne modifie pas les résultats de facturation ni les causes
 inconnues des cinq délais historiques.
 
+Autre observation du 10 octobre : deux refus `unknown` persistent parce que les
+citations sont transmises sans leur source complète. La [note sur le dossier de revue](dossier-recherche/revisions/20261010-refus-contexte-revue.md)
+étudie la correction supervisée insuffisante, la réparation externe explicite et
+les mesures à pré-enregistrer. Ce cas ne requalifie aucun verdict historique.
+
 ## 2. Questions de recherche
 
 | Question | Énoncé | État |
@@ -137,6 +142,8 @@ Un article est à portée ; une thèse demande davantage. Manques identifiés :
 | `article-scientifique/brouillon-*.md` | Sections rédigées (résumé, 2 à 7, 9 à 11, annexes) |
 | `article-scientifique/fiches-lecture.md` | Travaux liés vérifiés |
 | `dossier-recherche/revisions/20261010-vivacite-supervision.md` | Coupures de durée, rôle du superviseur, correction, reprise réelle et protocole de comparaison proposé |
+| `dossier-recherche/revisions/20261010-refus-contexte-revue.md` | Deux refus par manque de source complète, limite de la correction supervisée, réparation explicite et essai comparatif proposé |
+| `dossier-recherche/revisions/20261010-correction-globale-preuves.md` | Transmission automatique des preuves, inventaire aux superviseurs, vérifications et installation ; schémas d’architecture FR/EN |
 | `docs/benchmarks/billing/conception.md`, `plan-implementation.md` | Conception et réalisation du banc |
 | `docs/benchmarks/billing/observations.md`, `defauts-moteur.md` | Comportements du moteur et défauts |
 | `docs/benchmarks/billing/verification-correctifs.md` | Vérification des correctifs (pré-enregistrement) |

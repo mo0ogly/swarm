@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "expected_revision": 636,
+  "event_id": "T2-unpaused-fresh-preflight-449b38e708754053b5f8c122cf23039a",
+  "task_id": "plan-ca937edf4e-T2",
+  "reason": "Replan du séquencement opérateur : le protocole a été corrigé et les avis historiques conservés, mais la remise a été réarmée pendant la pause ; begin a refusé avant tout appel. Routage futur maintenant terminé, mission réellement dépausée. Préparer et reprendre ce même candidat sur état courant, avec contrat de citation1 et contrôles authentifiés, sans nouvelle production ni acceptation prescrite. Aucune mutation de routage pendant cette préparation."
+}

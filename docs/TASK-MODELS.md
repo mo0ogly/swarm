@@ -51,6 +51,19 @@ vérificateur : ces rôles ont un contrat distinct. Leurs modèles se règlent d
 Les propositions automatiques du planificateur ne sont pas livrées. Le choix d’un modèle exact ou de son effort se règle dans
 **IA et connexions → Configurer les niveaux** ; la tâche choisit ensuite un niveau.
 
+Pour Sonnet et Opus, l’Admin permet de choisir explicitement l’effort Claude
+`low`, `medium`, `high`, `xhigh` ou `max`. Le choix reste une politique enregistrée,
+prévisualisée et versionnée ; le moteur ne remplace pas automatiquement un effort
+vide. **Réglage hérité de Claude Code** signifie que le client résout son propre
+réglage, éventuellement personnel, et non qu’un effort précis a été observé.
+Un choix explicite est transmis avec `--effort` aux prochains appels. La CLI peut
+l’abaisser selon le modèle effectivement résolu ou une limite administrée ; la
+route conservée indique l’effort demandé, pas une attestation de l’effort appliqué.
+Voir la [documentation Claude](https://code.claude.com/docs/en/model-config#adjust-effort-level).
+L’ancien alias Haiku et les modèles personnalisés sans capacités vérifiées
+conservent un effort vide. Un changement d’effort ne rembourse pas les appels
+et ne permet pas de réutiliser des avis produits sous une autre configuration.
+
 
 ## Planificateur, sous-planificateurs et vérificateur
 

@@ -1,0 +1,4 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/review_attempt_lifecycle_test.go:74:18: undefined: fixtureReceipt
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

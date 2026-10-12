@@ -100,19 +100,36 @@ d’abonnement, paliers, durées de cache et remises nécessitent un tarif adapt
 cas étudié ; le calculateur ne les devine pas. Les versions ne sont pas supprimées
 par l’interface ; le catalogue refuse d’en ajouter au-delà de 1 000 versions.
 
-## Plafonds de planification et de vérification
+## Réglages du moteur
 
-Dans **Budgets et coûts IA**, ouvrir **Plafonds de planification et de vérification**.
-Le formulaire affiche les consommations, les allocations locales et la dernière
-autorisation. Saisir les plafonds et un motif, prévisualiser puis autoriser.
+Dans **Admin**, ouvrir **Réglages du moteur** ; le même dialogue reste accessible
+dans **Budgets et coûts IA**. Le tableau distingue l'utilisation courante des
+plafonds ; l'historique et les allocations locales sont consultables à la demande.
+Saisir les réglages et un motif, prévisualiser puis autoriser.
 Une modification des champs invalide la prévisualisation. Une révision périmée
 est refusée. Aucun compteur consommé, historique, échec ou état de pause n’est effacé.
 
-Ces plafonds sont globaux : 1–200 activations, 1–100 décisions et 1–100 appels du
-vérificateur déjà configuré. Un plafond ne peut pas être inférieur au consommé.
-Les allocations des sous-planificateurs restent inchangées et continuent de
-s’appliquer. Si un planificateur détient une session ou une vérification est en
-cours, attendre sa libération ou sa fin avant modification.
+Ces politiques sont persistantes, communes au web, à l'API et au CLI. Aucun second
+plafond fixe de 100, 200 ou 500 n'est appliqué dans le moteur ou le formulaire.
+
+| Champ de `limits` | Signification |
+| --- | --- |
+| `planning_tasks` | Nombre maximal de tâches ; entier positif, au moins le nombre actuel |
+| `planning_activations` | Activations globales ; entier positif, au moins le consommé |
+| `planning_decisions` | Décisions globales ; entier positif, au moins le consommé |
+| `review_calls` | Appels du vérificateur configuré ; entier positif, au moins le consommé, ou `null` sans vérificateur |
+| `planning_scopes` | Nombre maximal de périmètres ; `0` sans plafond supplémentaire, sinon au moins le nombre actuel |
+| `delegation_depth` | Nombre maximal de niveaux ; racine = niveau 1, `0` sans plafond supplémentaire, sinon au moins la profondeur actuelle |
+| `judge_cycles` | Nombre maximal de cycles du juge ; `0` sans plafond supplémentaire, sinon au moins le cycle actuel |
+
+Omettre les champs optionnels de tâches, périmètres, niveaux ou cycles conserve
+leur valeur. Un zéro ne supprime ni les budgets d'appels ni les droits et autres
+contrôles. Les allocations propres aux sous-planificateurs restent inchangées et
+s'appliquent encore. Une réservation de planificateur ou une revue en cours
+interdit la modification jusqu'à sa libération. La lecture `GET /api/v1/quotas`
+expose valeurs, consommation, révision et dernière autorisation ; `remaining`
+vaut `null` pour une dimension sans plafond. Les bornes techniques sont distinguées
+des politiques ; les valeurs entières doivent rester représentables sans perte.
 
 ```sh
 swarm quotas show WORK --json
@@ -123,7 +140,7 @@ swarm quotas apply WORK --input quotas.json --json
 Exemple de `quotas.json` : adapter la révision et les valeurs à `show`.
 
 ```json
-{"schema_version":1,"event_id":"quota-authorization-001","expected_revision":12,"limits":{"planning_activations":30,"planning_decisions":20,"review_calls":10},"reason":"Autorisation explicite après examen du travail restant"}
+{"schema_version":1,"event_id":"quota-authorization-001","expected_revision":12,"limits":{"planning_tasks":30,"planning_activations":60,"planning_decisions":40,"review_calls":20,"planning_scopes":0,"delegation_depth":0,"judge_cycles":0},"reason":"Autorisation explicite après examen du travail restant"}
 ```
 
 Sans vérificateur configuré, `review_calls` doit être `null`. Le réglage n’en crée
@@ -174,3 +191,11 @@ avec l'auteur et le motif. Un périmètre inconnu, un plafond inférieur à sa
 consommation ou supérieur au parent/global est refusé. Un parent explicitement
 borné doit être relevé dans la même demande si nécessaire. Une session de
 planification ou une revue active interdit toujours la modification.
+
+## Délais navigateur distincts des budgets
+
+Dans Admin, la modale **Attente des requêtes navigateur** règle les lectures/actions
+courantes, les snapshots et les tests de connexion. `0` désactive l'expiration de
+l'interface ; cela ne change ni les limites des agents ni les délais d'exécution
+serveur. Aperçu, sauvegarde, historique et CLI partagent le contrat Go. Voir les
+[unités, effets et limites](architecture/WEB-REQUEST-POLICY.md).

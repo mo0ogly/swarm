@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
+  "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:6d0c7e99361e804eae844ff05da517aefb63ffc436b87c71e6174e5e338b9f69",
+  "candidate_digest": "6d0c7e99361e804eae844ff05da517aefb63ffc436b87c71e6174e5e338b9f69",
+  "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
+  "historical_manifest": "docs/ui-redesign-source-manifest.json",
+  "requirements": [
+    {
+      "id": "R01",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B03.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R02",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B01.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R03",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B01.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R04",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B03.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R05",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B03.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R06",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B04.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R07",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B02.md",
+        "docs/B03.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R08",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B02.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R09",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/C01.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R10",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/C01.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R11",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/C02.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R12",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/C03.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R13",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/C02.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R14",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B04.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R15",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B03.md",
+        "docs/C04.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R16",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/D02.md",
+        "docs/D02-dossier.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R17",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/C01.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    },
+    {
+      "id": "R18",
+      "status": "HISTORICAL_EVIDENCE_PENDING_REQUALIFICATION",
+      "evidence": [
+        "docs/B04.md",
+        "docs/D01.md"
+      ],
+      "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
+    }
+  ],
+  "limits": "Current source integrity only. Historical R01-R18 acceptance remains pending requalification. Existing user edits are observed inputs, not claimed authorship. This snapshot is neither an executed test receipt nor an independent verdict. Research and runtime results are separate.",
+  "historical_manifest_sha256": "b2fc32432a8c8b9852f9a909f7ac05ef81ee4161b1541242275386930442e2eb",
+  "input_parts": [
+    {
+      "path": "docs/engine-cursor-source-inputs-001.json",
+      "sha256": "8f6fd6a394519f24b9c1bce67e75455be38485278dc3f27124a475360c3f2a85"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-002.json",
+      "sha256": "35ec1e2829082521c4176a96b1880795ea4d2d08606e32d8f601f948c24b8198"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-003.json",
+      "sha256": "f7292316a608f4f73c8ec6ae0fe2c21491c5e2321d1bf2b18fb0ab77bc039af6"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-004.json",
+      "sha256": "27149d0ea36112ce352936080ef3d0c3ae75e5d17e938bfbc863013fe2b93b95"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-005.json",
+      "sha256": "5468a7e83637257a8cdee0a543e4286018ffbb8f98fde84fb7cb48ad42579068"
+    }
+  ]
+}

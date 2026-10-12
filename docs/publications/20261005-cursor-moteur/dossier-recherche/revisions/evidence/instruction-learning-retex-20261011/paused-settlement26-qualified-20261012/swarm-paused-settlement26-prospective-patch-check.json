@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-12T07:50:38.029085+00:00",
+  "parent": "defect-citation-contract-recovery-20261012.patch",
+  "parent_tree": "71cc42626482c6a8da39bcc839ae57bb7d6c46ec",
+  "preimage_tree": "71cc42626482c6a8da39bcc839ae57bb7d6c46ec",
+  "preimage_extensions": [],
+  "preimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "6575b2d9561e7f90fc361dc5ed589c9a606b576033cfb3508ccdfdd5699f688f",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "7ec29ee4006941fcbb835ef218f2c49545bb7b9064ba322751fe69129468913c",
+    "docs/engine-cursor-source-inputs-001.json": "78b8deae6460b88f88a6adaae1cef1f424a4520cdff6458c004f344ba1b50b16",
+    "internal/engine/managed_integration.go": "1fb00848f3900a5eefe8886d4de2e75bf892969ffe264d2b87ce5ad3e9c83aaf",
+    "internal/engine/managed_settlement_pause_test.go": null,
+    "docs/engine-cursor-source-inputs-003.json": "b900b99767d57e2a00c1774b696e8d0a7874ad1ddb587cf7596e346fa7456b7f",
+    "docs/engine-cursor-source-inputs-004.json": "02062f941d12a38c67b8b52bca712bc7a4506c4b9a5a57d7a6df4e8ec31604d8",
+    "docs/engine-cursor-source-inputs-005.json": "03376c06bafcdf1f9855af0623b056e24849f0d13e6cda72e4871b467eb3bdbb",
+    "docs/engine-cursor-source-manifest.json": "3be750dd9f0ea73873b62601e58dc3fd284a04126349aa8c566de0745f799c13"
+  },
+  "postimages": {
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "1f18b489e5459bb695f162bb446e2b5a7716dd8bf2017b46d9b3ed1ac73824e3",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "cdd59e0a6328f026c97464848797c15feb07b04e832cd3243d11468c4daa8473",
+    "docs/engine-cursor-source-inputs-001.json": "92995cd6f62befd7279ad2f91efda51f348e3070fbfb04f6d1f8372f60a269d1",
+    "internal/engine/managed_integration.go": "d9ddc849f6444226751e124e3144cfa0fc701dcb46c39ec0ac655738358aaa0f",
+    "internal/engine/managed_settlement_pause_test.go": "e3841586e0da879c8cb2af3a39a2dc047deca265544deafcaf9bccda86fb27fe",
+    "docs/engine-cursor-source-inputs-003.json": "1747e9e2a3af4f5e6d6c777a126938c784ed74a685da439fb4c6aeac9b950a5a",
+    "docs/engine-cursor-source-inputs-004.json": "883cbafb77608c12cd6215ab177135d3b2804a995d6dd98aa8073d136f91bae3",
+    "docs/engine-cursor-source-inputs-005.json": "2bc49e2712135cd6d38e61675a28ea08c23114c44e93074b84f0d941067cd8c5",
+    "docs/engine-cursor-source-manifest.json": "a6a466fcc0cf8c8b61fa8f58b2550bd729e553eec27da7fb7466ad17488bb6c2"
+  },
+  "result_tree": "12ed6e04a2e35cd8bf1e2590e5e6e8d8e079520d",
+  "patch": "/tmp/swarm-paused-settlement26-prospective.patch",
+  "patch_sha256": "d66e2b326508bd56d366b2bfcec5c778391c4b5d596f4f8c6163f0e53a9dd084",
+  "paths": [
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "docs/engine-cursor-source-inputs-001.json",
+    "docs/engine-cursor-source-inputs-003.json",
+    "docs/engine-cursor-source-inputs-004.json",
+    "docs/engine-cursor-source-inputs-005.json",
+    "docs/engine-cursor-source-manifest.json",
+    "internal/engine/managed_integration.go",
+    "internal/engine/managed_settlement_pause_test.go"
+  ],
+  "candidate_digest": "2232f9c7573b2e404cc383ba0b64fdd7c53e5e6ae0a77d9ec7c72e3c960e6150",
+  "check": "PASS exact path diff, isolated refreshed-index apply, result tree and all postimages",
+  "qualification": {
+    "state": "running; no installation permitted until complete local qualification"
+  },
+  "purpose": "Preserve an explicitly armed managed review during either global or planning pause; no control, call, opinion or failure conversion before both pauses clear. Public HTTP regression covers all pause combinations, partial/full resume and idempotent settlement. Existing admission and publication guards retained.",
+  "preimage_scope": "Exact current primary preimages checked; any divergence from historical24 external packaging tree explicitly extended without rewriting its old objects."
+}

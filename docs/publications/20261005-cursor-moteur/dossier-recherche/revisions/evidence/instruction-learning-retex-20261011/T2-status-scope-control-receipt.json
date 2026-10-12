@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "executor": "Codex operator in separate owned recovery copy",
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff",
+    "-count=1",
+    "-timeout",
+    "25s"
+  ],
+  "control": "plan-validation",
+  "scope": "Only tests selected by -run; package label does not mean full suite",
+  "start": "2026-10-11T13:11:58.851353+00:00",
+  "end": "2026-10-11T13:12:05.565979+00:00",
+  "exit": 0,
+  "output": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
+  "sha256": "4aa00edbabbb2be14f82c1a21b7f79bfa46e4f787abb1f6df4983feba204e34c",
+  "go_sources": {
+    "internal/engine/planning.go": "c3d8ac967e7b800ca5c8124da586f33afee83d967d4370e608a8b27ffab97fa6",
+    "internal/engine/planning_api.go": "9004ed00bfb31b5209972516dddf53c85cea6ebcfcb9385a45c0cd49e29b9d94",
+    "internal/engine/planning_context.go": "66176ec869f60bded108597cd81b18549a370b7c4dd11cc9903881ac8c605cc9",
+    "internal/engine/planning_judge.go": "63de41bafd8f876fb90a667d9a3005233daf7fb274bbbce082ab448f8211986b",
+    "internal/engine/planning_judge_test.go": "2be9973bad1ba5dbf0a625cbb5984f30f1da80b0bf48965a78fd7b491e65c9dd"
+  },
+  "review_candidate_source_equivalence": "Go files equal candidate1ce2af045bef41baf4af808c610a921c7fe71224; no final Git commit execution claim"
+}

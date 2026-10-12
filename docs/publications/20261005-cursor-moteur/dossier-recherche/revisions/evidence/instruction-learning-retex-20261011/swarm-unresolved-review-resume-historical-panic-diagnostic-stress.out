@@ -1,0 +1,42 @@
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.38s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.38s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.34s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.35s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.31s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.29s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.34s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.33s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.32s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.34s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.29s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.33s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.37s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.30s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.29s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.28s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.33s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.33s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.38s)
+=== RUN   TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt
+--- PASS: TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt (0.31s)
+PASS
+ok  	swarm.local/companion/internal/engine	6.658s

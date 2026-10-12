@@ -1,0 +1,325 @@
+diff --git a/.claude/skills/code-reviewer/SKILL.md b/.claude/skills/code-reviewer/SKILL.md
+index 97f02a18f12ff2f0b6f7c8408d79208db87a9272..3ad26b9c3d6b7f9aaf9bfd7d18c889fcb2e6875e 100644
+--- a/.claude/skills/code-reviewer/SKILL.md
++++ b/.claude/skills/code-reviewer/SKILL.md
+@@ -21,6 +21,8 @@ it cannot satisfy the engine's independent reviewer requirement.
+ 4. Report actionable introduced defects with severity, exact location, triggering
+    precondition, observable consequence and a concrete reproduction or argument.
+    Separate confirmed findings from unverified risks. Avoid preference-only findings.
++   Copy quotes from the supplied original byte-for-byte at its physical line;
++   preserve spaces, punctuation and patch signs ("x ;" differs from "x;").
+ 5. Re-check claimed fixes against the same candidate. A later code change requires
+    renewed checks/review; approval on a different SHA is not current evidence.
+ 
+diff --git a/docs/architecture/AGENT-ENGINE-PROTOCOL.md b/docs/architecture/AGENT-ENGINE-PROTOCOL.md
+index 48e521a790fa33b5a374646e431e94c35cb370d2..a41bbdf037dea6e2a2b99c1e092568c39c8be9c2 100644
+--- a/docs/architecture/AGENT-ENGINE-PROTOCOL.md
++++ b/docs/architecture/AGENT-ENGINE-PROTOCOL.md
+@@ -73,6 +73,14 @@ Le conducteur réserve ensuite chaque appel dans le budget existant. Le garde-fo
+ existant sur deux interruptions identiques reste applicable. Une justification
+ ne prouve pas à elle seule que sa correction a été exécutée.
+ 
++Le schéma gelé avec la remise retire `retry` quand aucune tâche du propriétaire
++ne permet une reprise de production : état, réservation, autorisation déjà
++accordée, tentatives restantes et erreur de protocole sont pris en compte. Il
++conserve `review-retry`. Ce filtrage évite de proposer une action indisponible ;
++les contrôles transactionnels restent nécessaires et ne donnent aucun droit
++supplémentaire. La projection attribue la revue actuelle et son erreur ; un
++ancien motif différent reste sous `previous_blocker`, sans modifier l’historique.
++
+ `retry` de production est refusé pour cette erreur. L’ordonnanceur et la réservation
+ d’un départ refusent aussi une ancienne autorisation correspondante. La reprise
+ publique opérateur `planning retry-review` conserve son parcours et annule la
+@@ -148,6 +156,12 @@ un lot d’anciens retours, avec `operations` obligatoirement vide dans le sché
+ remis au fournisseur. La transaction refuse également toute action fondée sur
+ une tentative périmée. L’acquittement conserve historique, tentatives et coûts.
+ 
++Les consignes publiques `operator_resume` passent en tête du lot, de la plus
++récente à la plus ancienne selon l’ordre des transactions. Ainsi la réduction
++du lot pour transmettre des rapports entiers conserve d’abord la dernière
++correction opérateur. Les consignes antérieures restent en attente ou traitées
++explicitement ; leur priorité ne les acquitte jamais automatiquement.
++
+ Les budgets et droits restent contrôlés. Une autorisation utilisateur explicite
+ peut permettre leur augmentation par les opérations publiques ; la démarche
+ replan, un agent ou une documentation ne crée pas cette autorité. Les dépenses
+diff --git a/docs/en/AGENT-ENGINE-PROTOCOL.md b/docs/en/AGENT-ENGINE-PROTOCOL.md
+index da42a4cb4474b5bac9438fd8a1e3e28db2bc34bc..fd7e6dfd1ae4206795ab1f5a82ec58f674191fea 100644
+--- a/docs/en/AGENT-ENGINE-PROTOCOL.md
++++ b/docs/en/AGENT-ENGINE-PROTOCOL.md
+@@ -65,6 +65,13 @@ attempt. The conductor later reserves calls within existing limits. The guard
+ against two identical interruptions still applies. A justification alone cannot
+ prove its correction was executed.
+ 
++The frozen delivery schema omits `retry` when no owned task permits producer
++recovery, considering status, launch holds, already granted recovery, remaining
++attempts and protocol failures. It retains `review-retry`. This avoids offering
++an unavailable operation; transactional guards remain required and no new rights
++are granted. Task projection attributes the current review and its error, while
++a different older cause remains under `previous_blocker` without changing history.
++
+ Producer `retry`, dispatch and launch reservation reject this protocol error,
+ including obsolete producer authorization. Public operator `planning retry-review`
+ retains its path and clears superseded producer retry when queueing fragments.
+@@ -132,6 +139,11 @@ batch of older returns with an empty `operations` array enforced by the provider
+ schema. The transaction also rejects actions based on stale attempts. Explicit
+ acknowledgement preserves history, attempts and costs.
+ 
++Public `operator_resume` instructions lead the admitted batch, newest first in
++transaction order. Reducing the batch to deliver whole reports therefore keeps
++the latest operator correction first. Earlier instructions remain pending until
++explicitly handled; priority never acknowledges them automatically.
++
+ Rights and budgets remain enforced. Explicit user authority may permit an
+ increase through public operations; replan, agents and documentation do not
+ create that authority. Earlier expenses and refusals remain visible.
+diff --git a/internal/engine/planning_context.go b/internal/engine/planning_context.go
+index 46cc1062a24b95edc15cfdddf2a6d7c9c09d1516..77e31cc0135e6d21f6fa6429e4a07f6617529814 100644
+--- a/internal/engine/planning_context.go
++++ b/internal/engine/planning_context.go
+@@ -19,7 +19,7 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
+ 		return nil, e
+ 	}
+ 	events := []PlanningEvent{}
+-	actionable, current, historical := []PlanningEvent{}, []PlanningEvent{}, []PlanningEvent{}
++	operator, actionable, current, historical := []PlanningEvent{}, []PlanningEvent{}, []PlanningEvent{}, []PlanningEvent{}
+ 	for _, event := range p.Inbox {
+ 		if event.Scope != id || event.Decision != "" {
+ 			continue
+@@ -32,6 +32,8 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
+ 		}
+ 		if stale {
+ 			historical = append(historical, event)
++		} else if event.Kind == "operator_resume" {
++			operator = append(operator, event)
+ 		} else if needsAction {
+ 			actionable = append(actionable, event)
+ 		} else {
+@@ -42,8 +44,16 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
+ 	// Mixing them in the admitted batch would forbid every operational proposal.
+ 	// Once current inputs are acknowledged, explicitly admit a historical-only
+ 	// batch for acknowledgement. Projection never consumes an event itself.
+-	pending := len(actionable) + len(current) + len(historical)
+-	selected := append(actionable, current...)
++	pending := len(operator) + len(actionable) + len(current) + len(historical)
++	// Public resumption instructions change the precondition for this activation.
++	// Prefer the latest committed instruction even when reports reduce the batch
++	// to a single event. Older inputs remain pending; timestamps are not authority.
++	selected := []PlanningEvent{}
++	for i := len(operator) - 1; i >= 0; i-- {
++		selected = append(selected, operator[i])
++	}
++	selected = append(selected, actionable...)
++	selected = append(selected, current...)
+ 	historicalOnly := len(selected) == 0 && len(historical) > 0
+ 	readonlyHistory := []PlanningEvent{}
+ 	if historicalOnly {
+@@ -65,16 +75,30 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
+ 	tasks := []map[string]any{}
+ 	counts := map[string]int{}
+ 	omitted := 0
++	productionRetryAvailable := false
+ 	for _, task := range w.Tasks {
+ 		if task.ScopeID != id {
+ 			continue
+ 		}
+ 		counts[task.Status]++
++		if task.Status == "blocked" && !task.LaunchHeld && !task.PlanningRetry && len(task.Attempts) < task.PlanMaxAttempts && !currentReviewProtocolFailure(&task) {
++			productionRetryAvailable = true
++		}
+ 		if !relevant[task.ID] && len(tasks) >= 20 {
+ 			omitted++
+ 			continue
+ 		}
+-		tasks = append(tasks, map[string]any{"id": task.ID, "title": task.Title, "status": task.Status, "requirements": task.Requirements, "dependencies": task.Depends, "next": guardBlock(task.Next, 1000), "review_coordination": task.ReviewCoordination, "instruction_revisions_count": len(task.InstructionRevisions), "attempts_used": len(task.Attempts), "attempts_max": task.PlanMaxAttempts, "blocker": task.Blocker})
++		row := map[string]any{"id": task.ID, "title": task.Title, "status": task.Status, "requirements": task.Requirements, "dependencies": task.Depends, "next": guardBlock(task.Next, 1000), "review_coordination": task.ReviewCoordination, "instruction_revisions_count": len(task.InstructionRevisions), "attempts_used": len(task.Attempts), "attempts_max": task.PlanMaxAttempts, "blocker": guardBlock(task.Blocker, 1000)}
++		if review := task.IndependentReview; review != nil {
++			row["current_review"] = map[string]any{"id": review.ID, "state": review.State, "candidate_commit": review.CandidateSHA, "reason": guardBlock(review.Reason, 1000)}
++			if task.Status == "blocked" && review.State == "error" && currentTaskAttempt(&task, review.Attempt) {
++				if task.Blocker != "" && task.Blocker != review.Reason {
++					row["previous_blocker"] = guardBlock(task.Blocker, 1000)
++				}
++				row["blocker"] = guardBlock(review.Reason, 1000)
++			}
++		}
++		tasks = append(tasks, row)
+ 	}
+ 	requirements := map[string]string{}
+ 	for _, req := range scope.Requirements {
+@@ -100,7 +124,7 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
+ 			children = append(children, map[string]any{"id": child.ID, "state": child.State, "requirements": child.Requirements})
+ 		}
+ 	}
+-	return json.Marshal(map[string]any{"delivery_evidence_contract": deliveryEvidenceBoundary, "review_source_contract": reviewSourceBoundary, "scope": scope, "requirements": requirements, "events": events, "historical_events": readonlyHistory, "historical_events_total": len(historical), "historical_only": historicalOnly, "pending_events_total": pending, "tasks": tasks, "task_counts": counts, "tasks_not_in_projection": omitted, "children": children, "task_capacity_remaining": p.MaxTasks - len(w.Tasks), "delegated_requirements": delegated, "projection_note": "Historique et documents de preuve exclus. Les événements restants seront remis au prochain tour ; next est un extrait d’affichage limité à 1000 caractères. La clôture est contrôlée sur l’état complet."})
++	return json.Marshal(map[string]any{"delivery_evidence_contract": deliveryEvidenceBoundary, "review_source_contract": reviewSourceBoundary, "scope": scope, "requirements": requirements, "events": events, "historical_events": readonlyHistory, "historical_events_total": len(historical), "historical_only": historicalOnly, "production_retry_unavailable": !productionRetryAvailable, "pending_events_total": pending, "tasks": tasks, "task_counts": counts, "tasks_not_in_projection": omitted, "children": children, "task_capacity_remaining": p.MaxTasks - len(w.Tasks), "delegated_requirements": delegated, "projection_note": "Historique et documents de preuve exclus. Les événements restants seront remis au prochain tour ; next est un extrait d’affichage limité à 1000 caractères. La clôture est contrôlée sur l’état complet."})
+ }
+ 
+ func planningScopeWithin(p *PlanningState, ownerID, ancestor string) bool {
+diff --git a/internal/engine/planning_context_priority_test.go b/internal/engine/planning_context_priority_test.go
+index d3dfd23214f53ad5bd2553eea4e7d809e72920a0..9db575168e8faa8db41c6653da5d506c6d9d1cb3 100644
+--- a/internal/engine/planning_context_priority_test.go
++++ b/internal/engine/planning_context_priority_test.go
+@@ -77,3 +77,27 @@ func TestPlanningContextPrioritizesBlockedTaskOverAcceptedCurrentAttempt(t *test
+ 		t.Fatal("accepted event lost", string(raw))
+ 	}
+ }
++
++func TestPlanningContextNewestOperatorResumePrecedesBlockedReturns(t *testing.T) {
++	w := Work{Planning: &PlanningState{Scopes: []PlanningScope{{ID: "root"}}, Inbox: []PlanningEvent{
++		{ID: "earlier-instruction", Scope: "root", Kind: "operator_resume"},
++		{ID: "blocked-return", Scope: "root", Task: "task", Attempt: "current"},
++		{ID: "latest-instruction", Scope: "root", Kind: "operator_resume"},
++	}}, Tasks: []Task{{ID: "task", ScopeID: "root", Status: "blocked", Attempts: []Attempt{{ID: "current"}}}}}
++	before, _ := json.Marshal(w)
++	raw, err := planningContextLimit(w, "root", 1)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var ctx struct {
++		Events  []PlanningEvent `json:"events"`
++		Pending int             `json:"pending_events_total"`
++	}
++	if err = json.Unmarshal(raw, &ctx); err != nil || len(ctx.Events) != 1 || ctx.Events[0].ID != "latest-instruction" || ctx.Pending != 3 {
++		t.Fatal("latest correction not delivered first", string(raw), err)
++	}
++	after, _ := json.Marshal(w)
++	if string(after) != string(before) {
++		t.Fatal("priority silently consumed history")
++	}
++}
+diff --git a/internal/engine/planning_delivery.go b/internal/engine/planning_delivery.go
+index 293fe2cc8cd032c09bc9eb0212601c4e525ed5b3..a92f246f94d7b628c455e8a000c8293cd2b4ff4d 100644
+--- a/internal/engine/planning_delivery.go
++++ b/internal/engine/planning_delivery.go
+@@ -12,12 +12,13 @@ import (
+ // Prepared means included in the exact context, not understood by the model.
+ // Decision records a response that explicitly references these input events.
+ type PlanningDelivery struct {
+-	HistoricalOnly bool               `json:"historical_only,omitempty"`
+-	SHA256         string             `json:"context_sha256"`
+-	Events         []string           `json:"events"`
+-	Reports        []ExchangeArtifact `json:"reports,omitempty"`
+-	Decision       string             `json:"decision,omitempty"`
+-	Unavailable    map[string]string  `json:"unavailable_reports,omitempty"`
++	ProductionRetryUnavailable bool               `json:"production_retry_unavailable,omitempty"`
++	HistoricalOnly             bool               `json:"historical_only,omitempty"`
++	SHA256                     string             `json:"context_sha256"`
++	Events                     []string           `json:"events"`
++	Reports                    []ExchangeArtifact `json:"reports,omitempty"`
++	Decision                   string             `json:"decision,omitempty"`
++	Unavailable                map[string]string  `json:"unavailable_reports,omitempty"`
+ }
+ 
+ type planningReportContent struct {
+@@ -79,6 +80,9 @@ func (s *Store) planningDeliveryContext(w Work, scope string, limit int, inputs
+ 		if err = json.Unmarshal(context["historical_only"], &receipt.HistoricalOnly); err != nil {
+ 			return nil, receipt, err
+ 		}
++		if err = json.Unmarshal(context["production_retry_unavailable"], &receipt.ProductionRetryUnavailable); err != nil {
++			return nil, receipt, err
++		}
+ 		reports := []planningReportContent{}
+ 		for _, event := range events {
+ 			report, err := s.planningReport(event)
+diff --git a/internal/engine/planning_historical_delivery_test.go b/internal/engine/planning_historical_delivery_test.go
+index 393f8ce239bfddb53d5ab4a0444a08119aa79aa6..ec725d02839884e47f7f0d51fbb57fa880c4bf77 100644
+--- a/internal/engine/planning_historical_delivery_test.go
++++ b/internal/engine/planning_historical_delivery_test.go
+@@ -39,7 +39,7 @@ func TestPlanningHistoricalInputsCannotPoisonCurrentDecision(t *testing.T) {
+ 		return w, PlanningRequest{Scope: "root", ScopeRevision: owner.Revision, Generation: owner.Generation, Holder: owner.Holder, Inputs: owner.Delivery.Events, Reason: "Handle exactly the admitted inputs"}
+ 	}
+ 	w, r = claim(w)
+-	if !reflect.DeepEqual(r.Inputs, []string{"current-return", "operator-retex"}) {
++	if !reflect.DeepEqual(r.Inputs, []string{"operator-retex", "current-return"}) {
+ 		t.Fatalf("current decision poisoned by old return: %v", r.Inputs)
+ 	}
+ 	final := planningTask("final-retex")
+@@ -139,3 +139,66 @@ func TestPlanningContextMissingTaskIsHistoricalEvenWithoutAttempt(t *testing.T)
+ 		t.Fatal(string(raw), err)
+ 	}
+ }
++
++func TestPlanningDeliveryExcludesUnavailableProductionRetry(t *testing.T) {
++	s, w := planningFixture(t)
++	w, r := planningClaim(t, s, w, "root")
++	r.Operations = []PlanningOperation{planningTask("producer")}
++	w = planningDo(t, s, w, "decide", r)
++	var err error
++	w, err = s.mutate(w.ID, "test.protocol-error", "strict-current-protocol", w.Revision, []byte(`{}`), func(w *Work) error {
++		task := &w.Tasks[0]
++		task.Status = "blocked"
++		task.Blocker = "old semantic alias refusal"
++		task.Attempts = []Attempt{{ID: "current"}}
++		task.IndependentReview = &IndependentReview{ID: "current-review", Attempt: "current", State: "error", FailureCode: reviewFragmentProtocolError, Reason: "inspection de fragment : defect quote absent at original line"}
++		w.Planning.Inbox = []PlanningEvent{{ID: reviewPlanningEventID(task.IndependentReview), Kind: "independent_review", Scope: "root", Task: task.ID, Attempt: "current"}}
++		return nil
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++	owner, _ := w.Planning.scope("root")
++	w = planningDo(t, s, w, "claim", PlanningRequest{Scope: "root", ScopeRevision: owner.Revision, Holder: "strict-owner", LeaseSeconds: 60})
++	owner, _ = w.Planning.scope("root")
++	var schema struct {
++		Properties map[string]struct {
++			Items struct {
++				Properties map[string]struct {
++					Enum []string `json:"enum"`
++				} `json:"properties"`
++			} `json:"items"`
++		} `json:"properties"`
++	}
++	if err = json.Unmarshal([]byte(planningSchemaForDelivery(*owner.Delivery)), &schema); err != nil {
++		t.Fatal(err)
++	}
++	kinds := schema.Properties["operations"].Items.Properties["kind"].Enum
++	if containsString(kinds, "retry") || !containsString(kinds, "review-retry") {
++		t.Fatal("provider offered forbidden production retry", kinds)
++	}
++	raw, _, err := s.planningDeliveryContext(w, "root", 64000)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var ctx struct {
++		Tasks []struct {
++			Blocker         string         `json:"blocker"`
++			PreviousBlocker string         `json:"previous_blocker"`
++			Review          map[string]any `json:"current_review"`
++		} `json:"tasks"`
++	}
++	if err = json.Unmarshal(raw, &ctx); err != nil || len(ctx.Tasks) != 1 || ctx.Tasks[0].Blocker != w.Tasks[0].IndependentReview.Reason || ctx.Tasks[0].PreviousBlocker != "old semantic alias refusal" || ctx.Tasks[0].Review["state"] != "error" {
++		t.Fatal("old blocker presented as current instead of attributed history", string(raw), err)
++	}
++	// Restore a semantic refusal with remaining attempts: ordinary correction
++	// must stay available; this is a projection restriction, not new authority.
++	w.Tasks[0].IndependentReview.State = "changes_requested"
++	raw, d, err := s.planningDeliveryContext(w, "root", 64000)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err = json.Unmarshal([]byte(planningSchemaForDelivery(d)), &schema); err != nil || !containsString(schema.Properties["operations"].Items.Properties["kind"].Enum, "retry") {
++		t.Fatal("valid production correction was removed", string(raw), err)
++	}
++}
+diff --git a/internal/engine/planning_schema.go b/internal/engine/planning_schema.go
+index adc7a35b916a03b0d02d773db21d3ad84cbaa962..f54340e0cd4417b83cab0c914db18083d1737e7d 100644
+--- a/internal/engine/planning_schema.go
++++ b/internal/engine/planning_schema.go
+@@ -48,6 +48,17 @@ func planningSchemaForDelivery(delivery PlanningDelivery) string {
+ 	if delivery.HistoricalOnly {
+ 		properties["operations"].(map[string]any)["maxItems"] = 0
+ 	}
++	if delivery.ProductionRetryUnavailable {
++		operations := properties["operations"].(map[string]any)
++		kinds := operations["items"].(map[string]any)["properties"].(map[string]any)["kind"].(map[string]any)
++		available := []any{}
++		for _, kind := range kinds["enum"].([]any) {
++			if kind != "retry" {
++				available = append(available, kind)
++			}
++		}
++		kinds["enum"] = available
++	}
+ 	raw, err := json.Marshal(schema)
+ 	if err != nil {
+ 		panic(err)

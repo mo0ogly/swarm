@@ -1,0 +1,20 @@
+{
+  "state": "finished",
+  "started": "2026-10-11T21:34:24.702549+00:00",
+  "finished": "2026-10-11T21:34:26.476100+00:00",
+  "argv": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-preview-9nhe432y",
+  "candidate_digest": "982ca76a2310bd67407536ec01df27faae84bd9e0a15caa879facdd7ff536a17",
+  "manifest_sha256": "2cebef4a773349478dc0ff5f0de50834b1d8977f3f846145e489a3db811558a7",
+  "frozen_paths": 2108,
+  "wall_seconds": 1.773569982004119,
+  "exit": 0,
+  "output": "/tmp/swarm-contract-resolution23-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

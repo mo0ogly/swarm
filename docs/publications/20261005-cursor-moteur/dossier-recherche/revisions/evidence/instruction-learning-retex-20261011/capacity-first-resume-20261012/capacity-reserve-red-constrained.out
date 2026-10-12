@@ -1,0 +1,5 @@
+--- FAIL: TestMeasuredFinalCapacityCountsVariableFieldsOnce (0.18s)
+    managed_review_capacity_reserve_test.go:33: complete bounded final inventory falsely refused aucune capacité restante pour les preuves finales
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.224s
+FAIL

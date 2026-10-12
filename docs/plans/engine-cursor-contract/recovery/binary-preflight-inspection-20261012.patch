@@ -1,0 +1,463 @@
+diff --git a/docs/architecture/AUTORECURSIVE-RECOVERY.md b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+index acdf501..5b66eca 100644
+--- a/docs/architecture/AUTORECURSIVE-RECOVERY.md
++++ b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+@@ -689,3 +689,18 @@ Une référence de fichier seule ne donne pas son contenu au superviseur sans ou
+ L’opérateur peut consulter cette preuve publiquement puis transmettre le diagnostic
+ et les originaux par le handoff autorisé. Cette API ne prouve pas, à elle seule, une
+ transmission automatique dans chaque contexte ni une décision autonome d’un modèle.
++
++### Inventorier un candidat non examinable sans autoriser sa revue
++
++Le précontrôle de revue et l’inventaire de reprise ont des finalités distinctes.
++Une modification binaire reste refusée par le vérificateur textuel et ne peut
++produire de verdict implicite. `scope-preview` et la préparation d’une correction
++explicite peuvent cependant lire le candidat conservé, après vérification de la
++production terminée, du résultat, du checkpoint et de tous les contrôles réussis.
++Le contexte est marqué `inspection_only` ; l’inventaire garde tous les chemins,
++critères et l’empreinte, sans suppression silencieuse de binaire, appel ou mutation.
++Un reçu altéré, un contrôle non réussi ou une attribution remplacée reste refusé.
++Les reprises ordinaires et les lots de revue textuelle gardent leur refus binaire.
++Le responsable choisit ensuite une correction de périmètre explicite et tracée,
++ou un mode de revue adapté. L’inventaire n’est ni une acceptation ni une inspection
++visuelle du contenu. Les travaux hors périmètre restent conservés avec leur origine.
+diff --git a/docs/en/AUTORECURSIVE-RECOVERY.md b/docs/en/AUTORECURSIVE-RECOVERY.md
+index f0b9dbd..1b728bb 100644
+--- a/docs/en/AUTORECURSIVE-RECOVERY.md
++++ b/docs/en/AUTORECURSIVE-RECOVERY.md
+@@ -645,3 +645,16 @@ A file reference alone does not deliver its contents to a tool-free supervisor.
+ An operator can inspect this public evidence then send diagnosis and originals
+ through an authorized handoff. This API alone does not establish automatic delivery
+ in every role context or autonomous real-model judgment.
++
++### Inventory an unreviewable candidate without authorizing its review
++
++Review preflight and recovery inventory serve different purposes. Binary changes
++remain refused by a text-only reviewer and imply no verdict. `scope-preview` and
++explicit correction preparation may inspect the retained candidate after checking
++ended production, result attribution, checkpoint and every successful control.
++The context is marked `inspection_only`; all paths, criteria and the evidence hash
++remain present without a dropped binary, paid call or mutation. Altered receipts,
++failed controls or replaced attribution are still rejected. Ordinary retry and
++text-review batches keep their binary refusal. The owner chooses an explicit,
++traceable scope repair or an appropriate review mode. Inventory is neither
++acceptance nor visual examination; deferred work and its origins remain intact.
+diff --git a/docs/engine-cursor-source-inputs-001.json b/docs/engine-cursor-source-inputs-001.json
+index 3bdb3f5..77c956f 100644
+--- a/docs/engine-cursor-source-inputs-001.json
++++ b/docs/engine-cursor-source-inputs-001.json
+@@ -422,7 +422,7 @@
+   {
+     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+     "kind": "doc",
+-    "sha256": "72d5dd8e40f54c16b33a76cd9231174187bd3f2123a5a0e0ebf51ee13edb6037"
++    "sha256": "c1d8861be09ce4e9d7c2f73454188fe2b48d4fc5f9f6cd236ec1bb3f1cc4f3f4"
+   },
+   {
+     "path": "docs/architecture/CONTROLS-AND-FEEDBACK.md",
+@@ -517,7 +517,7 @@
+   {
+     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
+     "kind": "doc",
+-    "sha256": "5588f117f597ca674ba9592a0ff520a12267257ab7d2bb813bd7a934fa1caac3"
++    "sha256": "3dbd0e9b5bf1d6443b872b95930187d8bcb24bdff2a37f0fb7d49f17a06a8d79"
+   },
+   {
+     "path": "docs/en/BUDGETS.md",
+diff --git a/docs/engine-cursor-source-inputs-003.json b/docs/engine-cursor-source-inputs-003.json
+index 9b8716e..08ed32a 100644
+--- a/docs/engine-cursor-source-inputs-003.json
++++ b/docs/engine-cursor-source-inputs-003.json
+@@ -524,6 +524,11 @@
+     "kind": "source",
+     "sha256": "0e989a912ffb066751944f9a0b8ac6e1d70cacc42ba32bef7c202a2021679512"
+   },
++  {
++    "path": "internal/engine/managed_binary_preflight_inspection_test.go",
++    "kind": "test",
++    "sha256": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5"
++  },
+   {
+     "path": "internal/engine/managed_checkpoint_recovery_test.go",
+     "kind": "test",
+@@ -662,7 +667,7 @@
+   {
+     "path": "internal/engine/managed_review.go",
+     "kind": "source",
+-    "sha256": "c595e413e2e27b8eea848df7c7decdbf1689b3e2a6e5d328ac9cf385936628e5"
++    "sha256": "9fe00c135d1dbff86cf1a829e4c0e0863c53d6181411ce67ba813e5fa5e7044f"
+   },
+   {
+     "path": "internal/engine/managed_review_batch_runtime.go",
+@@ -1152,7 +1157,7 @@
+   {
+     "path": "internal/engine/managed_review_preflight_retry.go",
+     "kind": "source",
+-    "sha256": "4a1ccc613bc2e211b1c9ab91c9748c04880cf9c341df4a245e2e8a01f37b8f07"
++    "sha256": "d42fd3644bc2659252b1f0ba387326d4db9c092c2c80aef87e98751896f08b4d"
+   },
+   {
+     "path": "internal/engine/managed_review_preflight_retry_test.go",
+@@ -1242,7 +1247,7 @@
+   {
+     "path": "internal/engine/managed_scope.go",
+     "kind": "source",
+-    "sha256": "a610a939cb03d4cea51f4ff7eb593a2e18dd0313c780f7f1a8a40c97e178017d"
++    "sha256": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2"
+   },
+   {
+     "path": "internal/engine/managed_scope_test.go",
+@@ -1418,10 +1423,5 @@
+     "path": "internal/engine/pilotage_test.go",
+     "kind": "test",
+     "sha256": "96e36315b579f78f0de20d8a52dce0b903dac4313523dde1d69c6967d1c201b8"
+-  },
+-  {
+-    "path": "internal/engine/plan_contract.go",
+-    "kind": "source",
+-    "sha256": "1dc52ac99dee53d507d7ee00f994ecd6f7e3e820b41ac1dc749c12f09b44b0a8"
+   }
+ ]
+diff --git a/docs/engine-cursor-source-inputs-004.json b/docs/engine-cursor-source-inputs-004.json
+index 130b0d0..233283a 100644
+--- a/docs/engine-cursor-source-inputs-004.json
++++ b/docs/engine-cursor-source-inputs-004.json
+@@ -1,4 +1,9 @@
+ [
++  {
++    "path": "internal/engine/plan_contract.go",
++    "kind": "source",
++    "sha256": "1dc52ac99dee53d507d7ee00f994ecd6f7e3e820b41ac1dc749c12f09b44b0a8"
++  },
+   {
+     "path": "internal/engine/plan_store.go",
+     "kind": "source",
+@@ -1508,10 +1513,5 @@
+     "path": "web/lib/monaco/chunk-SYF7BLLQ.js",
+     "kind": "source",
+     "sha256": "96807eefdc1d703037f2c7cf63c12a7cf9aa1bd6a97b06074ea45e3e71cae7f7"
+-  },
+-  {
+-    "path": "web/lib/monaco/codicon-KP4OV2OO.ttf",
+-    "kind": "source",
+-    "sha256": "cc2472e239e17062e7760af87f8f5997720cc0d94aa014a615c418baaf6333a8"
+   }
+ ]
+diff --git a/docs/engine-cursor-source-inputs-005.json b/docs/engine-cursor-source-inputs-005.json
+index e2f2113..2630fa6 100644
+--- a/docs/engine-cursor-source-inputs-005.json
++++ b/docs/engine-cursor-source-inputs-005.json
+@@ -1,4 +1,9 @@
+ [
++  {
++    "path": "web/lib/monaco/codicon-KP4OV2OO.ttf",
++    "kind": "source",
++    "sha256": "cc2472e239e17062e7760af87f8f5997720cc0d94aa014a615c418baaf6333a8"
++  },
+   {
+     "path": "web/lib/monaco/editor.css",
+     "kind": "source",
+diff --git a/docs/engine-cursor-source-manifest.json b/docs/engine-cursor-source-manifest.json
+index 2314792..1621d14 100644
+--- a/docs/engine-cursor-source-manifest.json
++++ b/docs/engine-cursor-source-manifest.json
+@@ -2,8 +2,8 @@
+   "schema_version": 1,
+   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
+   "base_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+-  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:3876dc260921b698fca67e4a632e88893329d71bd85c8ae20bbae183b37289dc",
+-  "candidate_digest": "3876dc260921b698fca67e4a632e88893329d71bd85c8ae20bbae183b37289dc",
++  "candidate_id": "1169df70bec73d50fd23f640245b8ffd1317b9de+sha256:55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
++  "candidate_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
+   "historical_manifest": "docs/ui-redesign-source-manifest.json",
+   "requirements": [
+@@ -176,7 +176,7 @@
+   "input_parts": [
+     {
+       "path": "docs/engine-cursor-source-inputs-001.json",
+-      "sha256": "fd672e4db0311fb91bf3eaae29796fb3ee4c2393038e0d24c8aabde5c10bfebe"
++      "sha256": "b905c2efec1dae486b69efebcb6e9b94fd051d480a5afd243191636a6ded43e3"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-002.json",
+@@ -184,15 +184,15 @@
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-003.json",
+-      "sha256": "e3f9e58560610da271b6024d633922ee40006eba18398fd69bb6a16f780405ed"
++      "sha256": "8eb929b44b3827024720faed37185c0860167c081a1e11bdfd19392444960de9"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-004.json",
+-      "sha256": "55e64ba7568f874a4f9656cc2786adb91ca0192a2c881e6c15d219cdb5ea86c9"
++      "sha256": "51afd4d2eb649ed705261292b80cb63caf203d9f36e18888cc82f3244f388c2c"
+     },
+     {
+       "path": "docs/engine-cursor-source-inputs-005.json",
+-      "sha256": "dd8b44f3fd2c7f1ff9921b59af23e8913d9e8e846aa35dbfc7c71c03d9b2aeaa"
++      "sha256": "5ad939baea6c37166d03262a4f933342e926047f8f00bba070510f8b3c7e7e8b"
+     }
+   ]
+ }
+diff --git a/internal/engine/managed_binary_preflight_inspection_test.go b/internal/engine/managed_binary_preflight_inspection_test.go
+new file mode 100644
+index 0000000..8456040
+--- /dev/null
++++ b/internal/engine/managed_binary_preflight_inspection_test.go
+@@ -0,0 +1,135 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"fmt"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func binaryPreflightInspectionFixture(t *testing.T) (*Store, Work, Agent) {
++	t.Helper()
++	s, w := managedFixture(t)
++	a := managedCompleted(t, s, w, "first", "original engine result")
++	a.Ended = now()
++	raw, _ := json.Marshal(a)
++	if _, err := s.db.Exec("UPDATE agents SET body=? WHERE id=?", raw, a.ID); err != nil {
++		t.Fatal(err)
++	}
++	for i := 0; i < 101; i++ {
++		if err := os.WriteFile(filepath.Join(a.CWD, fmt.Sprintf("source-%03d.txt", i)), []byte("complete original source\n"), 0600); err != nil {
++			t.Fatal(err)
++		}
++	}
++	if err := os.WriteFile(filepath.Join(a.CWD, "picture.png"), []byte{137, 80, 78, 71, 13, 10, 26, 10, 0, 1, 2}, 0600); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.integrateManagedAttempt(a); err != nil {
++		t.Fatal(err)
++	}
++	w, _ = s.get(w.ID)
++	if !strings.HasPrefix(w.Tasks[0].Blocker, managedScopeRefusal) {
++		t.Fatal("size refusal not preserved", w.Tasks[0].Blocker)
++	}
++	return s, w, a
++}
++func TestBinaryPreflightScopeInspectionPreservesRefusalAndSpending(t *testing.T) {
++	s, w, a := binaryPreflightInspectionFixture(t)
++	before, _ := s.managedAttempt(a.ID)
++	preview, err := s.managedScopePreview(w.ID, PlanningRequest{Task: a.TaskID}, false)
++	if err != nil {
++		t.Fatalf("scope inventory blocked by unreadable binary: %v", err)
++	}
++	if len(preview.Files) < 103 || preview.Evidence == "" || len(preview.Criteria) == 0 {
++		t.Fatal("incomplete attributed scope inventory", preview)
++	}
++	found := false
++	for _, name := range preview.Files {
++		found = found || name == "picture.png"
++	}
++	if !found {
++		t.Fatal("binary silently dropped from inventory")
++	}
++	if _, err = s.prepareManagedPreflightRetry(w.ID, a.TaskID); err == nil {
++		t.Fatal("text-only paid review of binary admitted")
++	}
++	after, _ := s.get(w.ID)
++	item, _ := s.managedAttempt(a.ID)
++	if after.Revision != w.Revision || item.Result != before.Result || item.State != before.State || managedReviewCalls(t, s) != 0 {
++		t.Fatal("scope inspection changed result, refusal or spending")
++	}
++}
++
++func TestBinaryPreflightScopeInspectionRequiresOriginalPassedReceipts(t *testing.T) {
++	for _, mode := range []string{"failed-control", "wrong-candidate", "wrong-attempt"} {
++		t.Run(mode, func(t *testing.T) {
++			s, w, a := binaryPreflightInspectionFixture(t)
++			path := filepath.Join(w.Planning.Repository.Storage, "proofs", a.ID, "receipt.json")
++			raw, err := os.ReadFile(path)
++			if err != nil {
++				t.Fatal(err)
++			}
++			var r map[string]json.RawMessage
++			if err = json.Unmarshal(raw, &r); err != nil {
++				t.Fatal(err)
++			}
++			switch mode {
++			case "wrong-candidate":
++				r["candidate_commit"] = json.RawMessage(`"replaced"`)
++			case "wrong-attempt":
++				r["attempt_id"] = json.RawMessage(`"replaced"`)
++			case "failed-control":
++				var controls map[string][]ValidationControlResult
++				if err = json.Unmarshal(r["controls"], &controls); err != nil {
++					t.Fatal(err)
++				}
++				for id, rows := range controls {
++					rows[0].Passed = false
++					controls[id] = rows
++					break
++				}
++				r["controls"], _ = json.Marshal(controls)
++			}
++			raw, _ = json.Marshal(r)
++			if err = os.WriteFile(path, raw, 0600); err != nil {
++				t.Fatal(err)
++			}
++			if _, err = s.managedScopePreview(w.ID, PlanningRequest{Task: a.TaskID}, false); err == nil {
++				t.Fatal("altered receipt admitted", mode)
++			}
++			after, _ := s.get(w.ID)
++			if after.Revision != w.Revision || managedReviewCalls(t, s) != 0 {
++				t.Fatal("rejected inspection changed state")
++			}
++		})
++	}
++}
++func TestBinaryPreflightCorrectionInspectionKeepsInterruptedResultAndTextRefusal(t *testing.T) {
++	s, w, a := binaryPreflightInspectionFixture(t)
++	item, _ := s.managedAttempt(a.ID)
++	a.Status = "interrupted"
++	raw, _ := json.Marshal(a)
++	if _, err := s.db.Exec("UPDATE agents SET status=?,body=? WHERE id=?", a.Status, raw, a.ID); err != nil {
++		t.Fatal(err)
++	}
++	w.Tasks[0].RecoveredResult = &RecoveredResult{Agent: a.ID, Attempt: a.Attempt, Result: item.Result, ProcessStatus: a.Status}
++	raw, _ = json.Marshal(w)
++	if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
++		t.Fatal(err)
++	}
++	prepared, err := s.readManagedPreflightCorrectionEvidence(w.ID, a.TaskID)
++	if err != nil || !prepared.Context.InspectionOnly {
++		t.Fatal("recovery inspection unavailable", err)
++	}
++	if _, err = s.prepareManagedPreflightRetry(w.ID, a.TaskID); err == nil {
++		t.Fatal("inspection authorized binary text review")
++	}
++	after, _ := s.get(w.ID)
++	if after.Revision != w.Revision || len(after.Tasks[0].Attempts) != 1 || managedReviewCalls(t, s) != 0 {
++		t.Fatal("inspection spent or replaced producer")
++	}
++}
+diff --git a/internal/engine/managed_review.go b/internal/engine/managed_review.go
+index 44a7b07..e4915e3 100644
+--- a/internal/engine/managed_review.go
++++ b/internal/engine/managed_review.go
+@@ -96,13 +96,14 @@ func (s *Store) preparedManagedCandidate(w Work, t *Task, a Agent, item ManagedA
+ const managedReviewSchema = `{"type":"object","additionalProperties":false,"properties":{"candidate_commit":{"type":"string"},"tasks":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"task":{"type":"string"},"reason":{"type":"string","minLength":8,"maxLength":1000,"description":"Concise rationale, at most 1000 characters; discuss coverage and material defects, not a transcript of every source."},"criteria":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"index":{"type":"integer"},"verdict":{"type":"string","enum":["pass","fail","unknown"]},"evidence":{"type":"string","minLength":8,"maxLength":1000,"description":"For pass: one short contiguous verbatim excerpt copied exactly from supplied evidence. No paraphrase, ellipsis, concatenation or added quotes. Put analysis in reason. For fail or unknown: describe the defect or missing evidence."}},"required":["index","verdict","evidence"]}}},"required":["task","reason","criteria"]}}},"required":["candidate_commit","tasks"]}`
+ 
+ type managedReviewContext struct {
+-	Baseline  *ManagedReviewBaseline     `json:"accepted_baseline,omitempty"`
+-	Sources   []ReviewSource             `json:"sources,omitempty"`
+-	Candidate string                     `json:"candidate_commit"`
+-	Previous  string                     `json:"previous_candidate"`
+-	Diff      string                     `json:"diff"`
+-	Receipt   json.RawMessage            `json:"receipt"`
+-	Tasks     []managedReviewTaskContext `json:"tasks"`
++	InspectionOnly bool                       `json:"inspection_only,omitempty"`
++	Baseline       *ManagedReviewBaseline     `json:"accepted_baseline,omitempty"`
++	Sources        []ReviewSource             `json:"sources,omitempty"`
++	Candidate      string                     `json:"candidate_commit"`
++	Previous       string                     `json:"previous_candidate"`
++	Diff           string                     `json:"diff"`
++	Receipt        json.RawMessage            `json:"receipt"`
++	Tasks          []managedReviewTaskContext `json:"tasks"`
+ }
+ type managedReviewTaskContext struct {
+ 	Delivery    *ManagedDelivery          `json:"delivery,omitempty"`
+@@ -116,6 +117,10 @@ type managedReviewTaskContext struct {
+ }
+ 
+ func (s *Store) managedReviewContext(w Work, a Agent, candidate string, receipt []byte) (managedReviewContext, error) {
++	return s.managedReviewContextForInspection(w, a, candidate, receipt, false)
++}
++
++func (s *Store) managedReviewContextForInspection(w Work, a Agent, candidate string, receipt []byte, allowBinary bool) (managedReviewContext, error) {
+ 	c := managedReviewContext{Candidate: candidate, Previous: w.Planning.Repository.Candidate, Receipt: receipt}
+ 	repo := w.Planning.Repository
+ 	bare := filepath.Join(repo.Storage, "repository.git")
+@@ -125,7 +130,10 @@ func (s *Store) managedReviewContext(w Work, a Agent, candidate string, receipt
+ 		return c, e
+ 	}
+ 	if managedDiffHasBinary(c.Diff) {
+-		return c, fmt.Errorf("revue retenue : modification binaire non examinable par ce vérificateur")
++		if !allowBinary {
++			return c, fmt.Errorf("revue retenue : modification binaire non examinable par ce vérificateur")
++		}
++		c.InspectionOnly = true
+ 	}
+ 	var r struct {
+ 		Candidate string                               `json:"candidate_commit"`
+@@ -181,6 +189,9 @@ func (s *Store) managedReviewContext(w Work, a Agent, candidate string, receipt
+ 	if e == nil {
+ 		e = compactManagedReviewContext(&c, bare, repo.Base)
+ 	}
++	if e == nil && c.InspectionOnly {
++		return c, nil
++	}
+ 	if e == nil {
+ 		return s.incrementalManagedReviewFallback(w, a, c)
+ 	}
+diff --git a/internal/engine/managed_review_preflight_retry.go b/internal/engine/managed_review_preflight_retry.go
+index a2789e6..31d97d8 100644
+--- a/internal/engine/managed_review_preflight_retry.go
++++ b/internal/engine/managed_review_preflight_retry.go
+@@ -24,16 +24,21 @@ type managedPreflightRetry struct {
+ // Never create a producer, rerun checks, replace a candidate or synthesize an
+ // opinion here. The conductor revalidates the retained candidate afterward.
+ func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflightRetry, error) {
+-	return s.readManagedPreflight(work, task, false)
++	return s.readManagedPreflight(work, task, false, false)
++}
++
++// Scope inventory is an attributed read, never a text-review authorization.
++func (s *Store) readManagedScopeEvidence(work, task string) (*managedPreflightRetry, error) {
++	return s.readManagedPreflight(work, task, false, true)
+ }
+ 
+ // Correction may inspect a verified checkpoint whose source capacity was
+ // refused. Ordinary review retries still require the complete bounded context.
+ func (s *Store) readManagedPreflightCorrectionEvidence(work, task string) (*managedPreflightRetry, error) {
+-	return s.readManagedPreflight(work, task, true)
++	return s.readManagedPreflight(work, task, true, true)
+ }
+ 
+-func (s *Store) readManagedPreflight(work, task string, allowSourceCapacity bool) (*managedPreflightRetry, error) {
++func (s *Store) readManagedPreflight(work, task string, allowSourceCapacity, allowBinary bool) (*managedPreflightRetry, error) {
+ 	w, e := s.get(work)
+ 	if e != nil {
+ 		return nil, e
+@@ -108,7 +113,7 @@ func (s *Store) readManagedPreflight(work, task string, allowSourceCapacity bool
+ 	if saved.Agent != a.ID || saved.Attempt != a.Attempt || saved.Base != item.Base || saved.Previous != cp.Previous || saved.Candidate != cp.Candidate || string(actual) != string(expected) {
+ 		return nil, fmt.Errorf("reçu de précontrôle différent du candidat conservé")
+ 	}
+-	c, e := s.managedReviewContext(w, a, cp.Candidate, receipt)
++	c, e := s.managedReviewContextForInspection(w, a, cp.Candidate, receipt, allowBinary)
+ 	if e != nil && !(allowSourceCapacity && managedReviewSourceCapacityRefusal(e) && e.Error() == item.Detail) {
+ 		return nil, e
+ 	}
+diff --git a/internal/engine/managed_scope.go b/internal/engine/managed_scope.go
+index 721917d..b49c0f1 100644
+--- a/internal/engine/managed_scope.go
++++ b/internal/engine/managed_scope.go
+@@ -65,7 +65,7 @@ func managedScope(bare, base, candidate string) (ManagedScopePlan, error) {
+ 	return p, nil
+ }
+ func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) (ManagedScopePlan, error) {
+-	e, err := s.readManagedPreflightEvidence(work, r.Task)
++	e, err := s.readManagedScopeEvidence(work, r.Task)
+ 	if err != nil {
+ 		return ManagedScopePlan{}, err
+ 	}
+@@ -77,6 +77,9 @@ func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool)
+ 	p.Revision = e.Revision
+ 	p.Evidence = coordinationEvidence(e.Context)
+ 	p.Criteria = coordinationCriteria(e.Context)
++	if e.Context.InspectionOnly {
++		p.Next = "Inventaire de récupération uniquement : le candidat contient des binaires non examinables par la revue textuelle. Conserver candidat et preuves ; préparer une correction de périmètre explicite ou une revue adaptée. Aucun appel, verdict ou acceptation autorisé par cet inventaire."
++	}
+ 	if patch {
+ 		if r.Revision != e.Revision || r.ExpectedCandidate != p.Candidate {
+ 			return p, fmt.Errorf("candidat ou révision modifié ; relire scope-preview")

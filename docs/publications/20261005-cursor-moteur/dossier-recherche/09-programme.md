@@ -61,6 +61,13 @@ qu'il est chargé de diagnostiquer. L'essai comparatif proposé sépare durée t
 silence, bail renouvelé et correction supervisée ; il doit être pré-enregistré
 avant collecte. Cette observation ne remplace pas la campagne S-collectif.
 
+Une [seconde observation sur le dossier de revue](revisions/20261010-refus-contexte-revue.md)
+montre une correction supervisée qui ajoute des citations sans transmettre leur
+source complète. Elle propose de comparer les modes de transmission des preuves,
+à critères, fournisseur et budgets figés, en comptant séparément les inconnus
+justifiés et les acceptations insuffisamment prouvées. Ce cas après incident
+n'ajoute aucun résultat à S-collectif.
+
 Deux conditions ne diffèrent que par la règle de prérequis du correctif D6 : avec la règle
 (« garde »), le moteur retient le règlement si le responsable oublie la dépendance ; sans elle
 (« libre »), seul l'exécutant l'arrête. Leur comparaison mesure ce que vaut la garantie face aux
@@ -70,6 +77,40 @@ rattachée par le responsable, observée sans être injectée. La question posé
 s'est-il laissé manipuler ? », mais « la manipulation a-t-elle produit un effet ? ».
 
 ## 9.4 Axe 3 — Fondements formels
+
+### Traçabilité comme exigence de développement
+
+Le [contrat de traçabilité](../../../architecture/TRACEABILITY.md) relie objectif,
+décision, tentative, candidat, exécution, revue et acceptation. Ses repères TR-1
+à TR-6 précisent les lots existants du moteur : attribution des preuves, contexte
+des superviseurs, remise au propriétaire, concurrence, reprise publique et mesures.
+La [note de travail](revisions/20261010-tracabilite-developpement.md) sépare ces
+exigences du constat intermédiaire T2 et des vérifications effectivement réalisées.
+Tester l’utilisation de ces informations par les responsables et l’attribution
+des manques ; une documentation ou un inventaire fourni ne prouve pas leur usage.
+La [démarche autorécursive](revisions/20261010-demarche-autorecursive.md) ajoute
+le contrôle du diagnostic et de la transmission eux-mêmes : une erreur de méthode
+devient un problème lié, puis la correction revient à l’exigence initiale.
+
+### Étude du parallélisme et des dépendances
+
+Le [contrat de parallélisme des agents](../../../architecture/AGENT-PARALLELISM.md)
+sépare sous-planification, production, vérifications locales et publication.
+La [décision de plan](revisions/20261010-parallelisme-plan.md) conserve le graphe
+séquentiel de la mission ; elle ne démontre pas la concurrence.
+
+Comparer travaux indépendants, chaînes de résultats et écritures communes, à
+objectif et contrôles identiques. Mesurer chevauchement d’activité utile, temps
+total, attente centrale, résultats acceptés, conflits, reprises et coût connu
+ou inconnu. Distinguer capacité et débit, décisions de modèles et interventions
+humaines. Fixer conditions et répétitions avant collecte ; cette documentation
+n’ajoute aucun gain ni résultat aux campagnes historiques.
+
+Le [défaut de phases de publication](revisions/20261010-phases-plan-integration.md)
+ajoute un cas d’attribution au moteur : un avis indépendant favorable ne rendait
+pas une acceptation utilisable, car la preuve générée contredisait le plan.
+La garde des dépendances bloquait correctement la suite. Étudier séparément
+la qualité du livrable, sa preuve structurée et le diagnostic du responsable.
 
 Les invariants I1 (effet unique par intention), I2 (pas de mutation sur un état périmé) et I4
 (lancement atomique et exclusif) se prêtent à une vérification par modèle sur de petites instances,
@@ -90,6 +131,16 @@ La fraude au changement d'IBAN testée a été déjouée par le modèle lui-mêm
 plausibles, construites pour tromper un modèle compétent (lot cohérent mais faux, montant arrondi
 de façon crédible, facture oubliée), et plusieurs modèles, dont certains dédiés à la revue, pour
 évaluer des revues décorrélées.
+
+## 9.6.1 Apprentissages et améliorations après recette
+
+La [révision du 11 octobre](revisions/20261011-instruction-learning-retex.md)
+ajoute deux objets à évaluer : l’apprentissage attribué dans les consignes des
+tâches futures, et les propositions de quick wins issues d’une recette acceptée.
+Comparer pertinence, réception effective, effet sur l’erreur récurrente et rejet
+utilisateur. Distinguer le protocole vérifié avec fixtures de l’efficacité avec
+modèles réels. Conserver les sources, les coûts cumulés et les interventions,
+puis mesurer les incréments adoptés plutôt que compter les propositions.
 
 ## 9.7 Organisation proposée
 

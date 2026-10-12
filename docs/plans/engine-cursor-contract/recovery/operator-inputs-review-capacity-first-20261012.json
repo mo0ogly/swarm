@@ -1,0 +1,11 @@
+{
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-review-capacity-first-20261012.bundle",
+  "sha256": "0aa00d487e3e75fb446404f979a8ef21b45047a3cd5ed9d051423350c3fe92b7",
+  "commit": "fb369a2aa3ca19b1207f0ba88b48afacf339137b",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 144,
+  "manifest_sha256": "27a06ff370cbfce7bc05cb9b175fd10ee17ce3fae554294c2330e97cb3b57dc9",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/capacity-first-inputs144-n86dw6jh",
+  "old142_preserved": true,
+  "check": "PASS isolated import and all original bytes"
+}

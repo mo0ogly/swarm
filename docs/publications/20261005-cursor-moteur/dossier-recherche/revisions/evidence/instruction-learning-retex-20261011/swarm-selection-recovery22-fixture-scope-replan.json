@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T19:26:56.172565+00:00",
+  "parent": "swarm-selection-recovery22-red-receipt.json",
+  "observed": "Root counterexample reproduced at actual absent recovery context. Child fixture failed earlier: scope.Revision0 is invalid under validatePlanningState.",
+  "owner": "operator test fixture",
+  "correction": "Provision isolated child scope with Revision1 and correct ownership before public claim; preserve validator and rerun the scoped counterexample.",
+  "limits": "No native database, model or authority change; do not attribute malformed fixture to engine recovery result."
+}

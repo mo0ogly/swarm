@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "attempt": "a-67814a677979c23767c4e6c5",
+  "candidate_commit": "7bfc163eef748ef321e3e80f8de02cc4b2b669f7",
+  "candidate_tree": "52b15c9e3c3bd900fae81ef0b5716e592cd03ab4",
+  "git_status_before_run": "clean (git status --short empty; HEAD at candidate_commit; no code or test file modified before or during execution)",
+  "command": ["go", "test", "./...", "-count=1", "-timeout=12m"],
+  "wrapper": "rtk proxy go test ./... -count=1 -timeout=12m",
+  "executor": "worker local run, copy plan-ca937edf4e-T2-4",
+  "pid": 4194129,
+  "started_observed": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/go-test-full-engine.started",
+  "finished_observed": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/go-test-full-engine.finished",
+  "package_wall_duration_from_output": "476.902s (internal/engine package line: 'ok  swarm.local/companion/internal/engine 476.902s')",
+  "exit_code": 0,
+  "output_path": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/go-test-full-engine.out",
+  "output_sha256": "fe67f79f467119bbbbdbf7bcfec85d902831929ee4bf6e5e319cc891c68d34a9",
+  "output_lines": 3,
+  "named_required_tests_separately_verified": {
+    "command": ["go", "test", "./internal/engine", "-run", "TestGraphDeliveryD03QualificationManifest|TestManagedFragmentHistoricalPublicRecovery|TestPlanningJudge", "-count=1", "-v", "-timeout=120s"],
+    "output_path": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/go-test-named-required.out",
+    "output_sha256": "2f0050c8e20e313dd093d5be7996994badf8d23a316a366996ab61bb174c4e69",
+    "result": "all PASS, including TestGraphDeliveryD03QualificationManifest and TestManagedFragmentHistoricalPublicRecovery (and its pass/fail/exit sub-cases), and all TestPlanningJudge* cases",
+    "exit_code": 0
+  },
+  "engine_controls_also_rerun_on_same_candidate": {
+    "plan-validation": {
+      "output_path": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/go-test-plan-validation.out",
+      "output_sha256": "dd378641b9647fde8ef0bc401a8faf8dc74effc66eaf2b570b3efd0ee3341010",
+      "exit_code": 0
+    },
+    "go_vet": {
+      "output_path": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/go-vet.out",
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit_code": 0
+    },
+    "check-evolution-docs": {
+      "output_path": "docs/plans/engine-cursor-contract/evidence/T2-execution-4/check-evolution-docs.out",
+      "output_sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee",
+      "exit_code": 0
+    }
+  },
+  "relation_to_prior_refused_evidence": "The commit 4af006a35e56d799a26eae29dd197326bf6288f5 reviewed under review-8e5cc55c66eca0c86032c505 was refused on criterion 3 because its own diff carried a go-test-full-engine.out with exit=1 (stale input: AGENTS.md, then a panic after a 4m30s timeout on TestManagedFragmentHistoricalPublicRecovery), and the later full-suite-canonical-20261011 receipt cited as superseding it did not carry a candidate_digest/previous_candidate binding to that exact commit. This receipt instead names the exact commit (candidate_commit above) and tree that the working copy was at, confirmed clean (no uncommitted code changes) immediately before and during this run, so the exit=0 result binds directly to that commit's tree rather than to a separately dated external receipt.",
+  "stale_agents_md_finding_rechecked": "At candidate_commit 7bfc163eef748ef321e3e80f8de02cc4b2b669f7, docs/engine-cursor-source-manifest.json (input_parts) is the manifest TestGraphDeliveryD03QualificationManifest actually loads (it is the last-created overlay in graphDeliveryD03Load's existence chain). docs/engine-cursor-source-inputs-001.json declares AGENTS.md sha256=72577dd2795cb5d1e5793a61e83a8af10f1ad46e0c3fd807860dd60e67dd54fe, which equals sha256sum AGENTS.md computed directly in this copy. The stale-input failure recorded in the historical docs/plans/engine-cursor-contract/evidence/T2-execution/go-test-full-engine.out is not reproduced at this commit; it is preserved as historical evidence, not erased, and not claimed to be a verdict on the current candidate.",
+  "limits": "This is a producer local run in the worker's isolated copy; it is not the engine's own control execution nor independent review. A single full run; no repeated runs to measure flakiness beyond the two separately-also-run named-test and full-suite executions above. CPU-only timing; no race detector pass included in this run (race evidence from -run race kept historical)."
+}

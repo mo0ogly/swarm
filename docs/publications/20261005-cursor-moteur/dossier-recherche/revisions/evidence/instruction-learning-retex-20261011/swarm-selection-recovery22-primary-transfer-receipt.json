@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-11T19:49:11.716287+00:00",
+  "paths_transferred": [
+    ".claude/skills/replan/SKILL.md",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "internal/engine/agent_workflow.go",
+    "internal/engine/independent_review.go",
+    "internal/engine/managed_review_recovery.go",
+    "internal/engine/managed_review_retry_delivery.go",
+    "internal/engine/managed_review_selection_capacity_recovery.go",
+    "internal/engine/managed_review_selection_capacity_recovery_test.go",
+    "internal/engine/planning.go",
+    "internal/engine/planning_delivery.go",
+    "internal/engine/planning_prompt.go",
+    "internal/engine/planning_review_retry.go"
+  ],
+  "preimages_verified": true,
+  "all_source_paths_verified": 1189,
+  "source_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+  "full_receipt": "/tmp/swarm-selection-recovery22-qualified-v1-full-receipt.json",
+  "operator_patch": "selection-capacity-recovery-20261011.patch",
+  "runtime": "pending installation"
+}

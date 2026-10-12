@@ -1,0 +1,5 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/control_command_deadline_test.go:120:50: unknown field Mission in struct literal of type RunLimitsConfigEntry
+internal/engine/control_command_deadline_test.go:120:65: unknown field Key in struct literal of type RunLimitsConfigEntry
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

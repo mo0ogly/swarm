@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-11T22:02:29.173152+00:00",
+  "validator": "jsonschema Draft202012Validator",
+  "validator_version": "4.25.1",
+  "checks": {
+    "legacy_schema_admits_actual_native_contradiction": true,
+    "current_schema_rejects_rebound_contradiction": true,
+    "uncertainty_remains_valid": true,
+    "mixed_local_inspected_and_unknown_valid": true,
+    "reject_inspected_with_empty_needs": true,
+    "reject_inspected_with_requested_proof": true,
+    "reject_invalid_anchor": true,
+    "reject_unoffered_artifact": true,
+    "reject_missing_original": true,
+    "reject_wrong_packet_identity": true
+  },
+  "schema_hashes": {
+    "legacy-schema.json": "c7e15ef3fc422b628d09d60bbb014708bfc275dd7a5e7be7a9a81a126bb78a83",
+    "current-schema.json": "b17c72ea5cf03e3ad088692325399e2f41a1fbd42f380f4952b92d3501ec3126"
+  },
+  "limits": "Independent local schema oracle using actual generated schemas and original native counterexample. Rebound responses are diagnostic fixtures, not native opinions. No provider call, permission, budget or business acceptance."
+}

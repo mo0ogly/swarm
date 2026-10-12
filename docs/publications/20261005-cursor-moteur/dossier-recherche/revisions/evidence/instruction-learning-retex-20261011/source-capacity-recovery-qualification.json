@@ -1,0 +1,91 @@
+[
+  {
+    "command": [
+      "go",
+      "test",
+      "./...",
+      "-count=1",
+      "-timeout=12m"
+    ],
+    "start": "2026-10-11T14:37:17.821458+00:00",
+    "end": "2026-10-11T14:45:22.179226+00:00",
+    "seconds": 484.35775427800036,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-full.out",
+    "output_sha256": "809fc10f9268dcf7ff5455f87c8c46815fdddaeaa15692dc241390a9ae5da1a3",
+    "source_manifest_sha256": "3f04ea459630ace7c056e043162e42bf3aad9f5a4eaf16040c29d362d0b1a1b7",
+    "candidate_digest": "981af32b469a52a5efbe392a3bbb50dbd23b30519faf237857bb31774c16d6ac",
+    "paths": 1172,
+    "source_drift": [],
+    "manifest_changed": false
+  },
+  {
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-run",
+      "TestRecoveredResult|TestManagedPreflight|TestManagedReviewSources",
+      "-count=1",
+      "-timeout=120s"
+    ],
+    "start": "2026-10-11T14:37:17.821868+00:00",
+    "end": "2026-10-11T14:39:22.792769+00:00",
+    "seconds": 124.9709125010013,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-race.out",
+    "output_sha256": "572a248a37056cbfb2e3c3e523172c4c7fb9e14f22914110b67187fbd84e6158"
+  },
+  {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "start": "2026-10-11T14:37:17.822236+00:00",
+    "end": "2026-10-11T14:37:29.051137+00:00",
+    "seconds": 11.228920215999096,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-vet.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "start": "2026-10-11T14:37:17.822983+00:00",
+    "end": "2026-10-11T14:37:21.677606+00:00",
+    "seconds": 3.854638478002016,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-workflows.out",
+    "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "start": "2026-10-11T14:37:21.678135+00:00",
+    "end": "2026-10-11T14:37:21.738192+00:00",
+    "seconds": 0.060076304001995595,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-diff.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "sh",
+      "./build.sh",
+      "/tmp/swarm-source-capacity-recovery-candidate"
+    ],
+    "start": "2026-10-11T14:37:21.738731+00:00",
+    "end": "2026-10-11T14:37:31.757700+00:00",
+    "seconds": 10.018987168998137,
+    "exit": 0,
+    "output": "/tmp/swarm-source-capacity-recovery-build.out",
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T12:52:57.442383+00:00",
+  "finished": "2026-10-12T13:05:36.514596+00:00",
+  "argv": [
+    "go",
+    "test",
+    "-json",
+    "./...",
+    "-count=1",
+    "-timeout=18m"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-runtime-recovery-3xcsfteh",
+  "candidate_digest": "21b1e7fe8a43f2e7f43929273e174dd2c27f296495b59faa3ddc008629de38e5",
+  "manifest_sha256": "954b910b0c986f07f1c8da7359258bc305a78f5f94ea1398b5835284c15d0d57",
+  "frozen_paths": 2131,
+  "wall_seconds": 759.0729599859915,
+  "exit": 0,
+  "output": "/tmp/swarm-control-infrastructure-recovery-suite-budget-full.out",
+  "output_sha256": "f6f8194be2073e29e973bc9e5ccbb749346372ed3a8a7235291f13533c3819eb",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

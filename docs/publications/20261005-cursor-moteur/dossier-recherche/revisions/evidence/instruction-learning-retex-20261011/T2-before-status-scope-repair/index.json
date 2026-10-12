@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "executor": "Codex operator recovery, independent owned copy",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "task": "plan-ca937edf4e-T2",
+  "agent": "auto-f2abbcfe6bed66fd1a5e",
+  "attempt": "a-a349f9134d355713576b7166",
+  "accepted_base": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+  "original_stash": "a73f26244e8e0e59877fb30e8c88a8628b7ad33d",
+  "executor_head": "a73f26244e8e0e59877fb30e8c88a8628b7ad33d",
+  "executor_dirty": true,
+  "source_snapshot": "docs/engine-cursor-source-manifest.json",
+  "source_candidate_digest": "d62229308d111bd7233db5a401d1f130e48238a313d1f32872242cfe7c7fbea9",
+  "checked_at": "2026-10-11T11:20:14.092737+00:00",
+  "native_candidate_sha": "Not yet created by the public managed integration; no local receipt claims that final commit was tested. Source fingerprints bind these runs; ordinary controller checks/review bind the eventual native candidate.",
+  "checks": {
+    "judge_targeted": "PASS 8 named tests including public managed checkpoint, process/control/review rejections",
+    "race": "PASS exit 0, 9.616s",
+    "vet": "PASS final source, exit 0",
+    "adopted_validation": "PASS exit 0, actual configured Go command; formerly absent checkpoint is now exercised",
+    "canonical_suite_before_checkpoint": "PASS 1094 discovered targets, all 19 processes exit 0",
+    "canonical_suite_final": "PASS 1095 discovered targets, all 19 processes exit 0; optional skips explicit",
+    "architecture": "PASS mechanical doc checker, independent semantic verdict still required",
+    "mermaid": "PASS FR/EN diagrams, receipts preserved",
+    "source_part_integrity": "PASS targeted; complete reconstruction plus tampering, unsafe/duplicate/ambiguous/missing parts rejected",
+    "canonical_suite_source_parts": "PASS 1096 discovered targets, all 19 processes exit 0; optional skips explicit",
+    "source_path_alias_red": "FAIL expected before canonical path fix; dot and parent aliases double counted",
+    "source_path_alias_targeted": "PASS canonical paths rejected as duplicates; full input integrity still checked",
+    "source_path_alias_race": "PASS exit 0",
+    "source_path_alias_vet": "PASS exit 0",
+    "canonical_suite_source_alias": "PASS 1096 discovered targets, all 19 groups exit 0; optional skips explicit",
+    "localization_and_source_integrity": "PASS targeted public judge/checkpoint, full source integrity and alias cases, exit0 3.253s; judge code unchanged from canonical1096 receipt",
+    "localization_structure": "PASS mechanical docs checker, not an independent semantic verdict"
+  },
+  "limits": [
+    "Provider doubles, no autonomous real-model judge/renewal observed",
+    "No additional production attempt or budget",
+    "Admin cycle policy and native structured judge orchestration remain later-batch integration",
+    "Original stash/HEAD preserved; first explicit operator repair was applied to the stopped native copy and submitted, then blocked before any review call. Its result/ref/receipts remain retained."
+  ],
+  "artifacts": [
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/adopted-validation.out",
+      "sha256": "6d2f42038799fbbca0fc513661b4a9224ff1cc711121e79eacdcfd4cba5d4ba5"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/architecture-check.out",
+      "sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/en-0.mermaid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/en-0.mermaid.stdout",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/en-0.mmd",
+      "sha256": "d81622989973e1e33ebb0d5ba76d887187034c4aa716c1fb670f027b5a5e176a"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/en-0.svg",
+      "sha256": "3dbade35b63b1d27952efd5a40d306f865a888ed4f8af48cd0e9417c12021232"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/en-architecture-before-localization-correction.md",
+      "sha256": "94a976fa491e961b0e0f1a2a78f148bc056e88bc4b95301687ff3fdeeec66ca4"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/fr-0.mermaid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/fr-0.mermaid.stdout",
+      "sha256": "561a11b7a6c00acc18c8f2f729f2f7d45d0db369c0d66c9cc61a6a8bfcc0ac6d"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/fr-0.mmd",
+      "sha256": "9ba78fb0099e933db883ca098a0a70eb89976e549329ef7fce0399d903500d17"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/fr-0.svg",
+      "sha256": "28435f0a375ce037a67196532b43c7d1ec3c2eff3655328df57dbc1d76a494da"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/full-suite-final.out",
+      "sha256": "ea3662f5da5c777915df43ceb39ae26120e1133b48bc66c2879b2f6d31ea89f6"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index-before-localization-correction.json",
+      "sha256": "0cf4c7c01e995103f97558767d4cf64ae18d1aa595dd8b2e43bd481756d25fda"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index-before-source-alias-repair.json",
+      "sha256": "d0407cc89a30bd1f6dd43825a1fffcac70698041af92c43f554434e3acae5c31"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-baseline-red.out",
+      "sha256": "d4372f44eb88a4c4a0dd827f348906033d62fdd5ea10a3c408339ec3637c1365"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-race.out",
+      "sha256": "98d922727149c2b525168eba16dd5ca1c59b5dd57c458e7002c0e09bf593a652"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-targeted.out",
+      "sha256": "ea31ccf421957ef4ad4083e39db850792ab1f89c3032e3b9609f2ece71d9c44e"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/judge-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/localization-doc-check.out",
+      "sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/localization-semantic-refusal.json",
+      "sha256": "b71591add614e981c0efc05ab8aafa1443c9b09d0bc639dd651ba3d5e75a7136"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/localization-targeted.out",
+      "sha256": "d63c167dc67b5fa817199d4e45b8ee3fbf06ddd9ad50664818ba45d93a307ef7"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/mermaid-receipts.json",
+      "sha256": "7384d539b8a6e9f4de01febb24eba84757d3aa6e9c06fb76894cb338f403c55c"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/original-T2-handoff.md",
+      "sha256": "24ffffea5f59652c57121185fd0ef71f91a7c5cd5a16232b02d289451cb9cd69"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/original-index.json",
+      "sha256": "a38ede517ea80d43bf3b7619aa21388095892c6ed3a6d4788e804f8e03c514d0"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/original-plan-ca937edf4e-T2.delivery.json",
+      "sha256": "1e4a8bc32d3ee287475229b358ca4ad9568423c047052ad6b027a8ebd2b6d51b"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/original-plan-ca937edf4e-T2.md",
+      "sha256": "25e2ca53f352b916d4158ab49bc762ecbc464ec1111d5af10879ec17d0a5412b"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-full-suite.out",
+      "sha256": "14ac1d7a7423f8ca394e653013cc60ba07bae85bedf3ff8d443b3ca336308675"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-race.out",
+      "sha256": "b7f0a8a51fc1706f41dc399bb8dc0e53d38dbdbdcfaef9ff97504effccaa0618"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-red.out",
+      "sha256": "ac22e9e69f73865680a490489894950e0ba711e418680841fb47a2eaae0db48a"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-semantic-refusal.json",
+      "sha256": "65f2a77c1da5c28ba1ca1d57771076849218c771d51aedf94f91de626cb0edfd"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-targeted.out",
+      "sha256": "1c47ae5625372b5aac5b782483ddf944e6db53e980839dc2e81d6889068e9dfd"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-vet.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-parts-full-suite.out",
+      "sha256": "f169b24a7bd493e7c94c8e813ed834b1a68cc1380b736c50beae21cac083f267"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-parts-targeted.out",
+      "sha256": "72f991f6f253154046ceecdfa821c8d999d3af580c8f4c7e115015083be3a5d8"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/suite-before-checkpoint.out",
+      "sha256": "2de435aac5608956905ddaf9b7d4273b99f197e3efd00aab65d41631510c9eb7"
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/unpaid-preflight-observation.json",
+      "sha256": "05495abd846f3ea9ec6a34f8f92aa163892c6718f911af367d7045166c4296ee"
+    }
+  ],
+  "commands": {
+    "targeted": "go test ./internal/engine -run '^(TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 70s -v",
+    "race": "go test -race ./internal/engine -run '^(TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 80s -v",
+    "full_suite": "python3 tests/supervision_go_suite.py",
+    "vet": "go vet ./...",
+    "adopted_validation": "Exact command from live task validation_policy/plan-validation, unchanged",
+    "source_parts_targeted": "go test ./internal/engine -run '^(TestGraphDeliverySourceParts|TestGraphDeliveryD03|TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 75s -v",
+    "source_alias_targeted": "go test ./internal/engine -run 'TestGraphDeliverySourceParts' -count=1",
+    "source_alias_race": "go test -race ./internal/engine -run 'TestGraphDeliverySourceParts' -count=1",
+    "source_alias_full_suite": "python3 tests/supervision_go_suite.py",
+    "localization_targeted": "go test ./internal/engine -run '^(TestGraphDeliveryD03|TestGraphDeliverySourceParts|TestManagedCheckpointRecovery|TestPlanningJudge)' -count=1 -timeout 90s",
+    "localization_docs": "python3 docs/plans/engine-cursor-contract/check-evolution-docs.py T2"
+  },
+  "prior_unpaid_submission": {
+    "result": "60bdc8ad5b395b5abc972eb701ff244faed45e69",
+    "tested_candidate": "1168413b5be72556464fde60efd5fd3d73b79a98",
+    "revision": 114,
+    "calls": 11,
+    "max_calls": 30,
+    "accepted": false
+  },
+  "prior_semantic_refusal": {
+    "review": "review-4b2233e89effd7e81afc1b5e",
+    "candidate": "8213f83900ef26d53a993e9c5d9e89eb06d55d36",
+    "state": "changes_requested",
+    "revision": 135,
+    "calls": 14,
+    "max_calls": 30,
+    "accepted": false
+  },
+  "prior_protocol_error": {
+    "review": "review-6eadd171c67897f10f4ec754",
+    "candidate": "d405c0ee9479fb26521fc6041cc6932f9929a3a1",
+    "state": "error",
+    "calls": 15,
+    "max_calls": 30,
+    "cause": "Quote omits space before French semicolon; raw retained by live engine",
+    "local_diagnosis": "FR/EN wording mismatch locally confirmed; EN corrected to retain actual Go default/bound, Admin exposure assigned to T5",
+    "limit": "Original protocol error retained; method-restart produced a new valid semantic refusal, not reuse of the invalid response."
+  },
+  "localization_semantic_refusal": {
+    "review": "review-dec9eececb2d49ee384f93de",
+    "candidate": "d405c0ee9479fb26521fc6041cc6932f9929a3a1",
+    "state": "changes_requested",
+    "revision": 175,
+    "calls": 16,
+    "accepted": false
+  }
+}

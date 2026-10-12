@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T16:05:01.118913+00:00",
+  "parent": "provider-account-change-recovery-20261011.patch",
+  "parent_sha256": "8945660400f783909b8c0df1647124e9cc9f6840136f74861d705a33d3c8c7ca",
+  "preimage_tree": "4573752c01f9c01359e9fd5279d8638cbebf4fe7",
+  "preimage_extensions": [
+    {
+      "path": "internal/engine/provider_models.go",
+      "sha256": "8fdc2ed3b17e9b3e504008359218170c991d96a9a2a47852dddf4104168a5a5a",
+      "blob": "22e25f9211fb73653241f7830fda7c9404552f7c",
+      "origin": "Frozen, fully qualified Judge+13 preview; unchanged by native Judge patch, same runtime13 preimage"
+    },
+    {
+      "path": "internal/engine/provider_models_test.go",
+      "sha256": "62aa8e91f60bcd8cd28ca21cc4a57fed4f2a3953dacd175dc76586962c017b8e",
+      "blob": "9e0f0553723aa92125d9bd41e01481ed947568ff",
+      "origin": "Frozen, fully qualified Judge+13 preview; unchanged by native Judge patch, same runtime13 preimage"
+    },
+    {
+      "path": "web/providers.js",
+      "sha256": "bf1d8ae125a128f757e09afa71b054055448bd303d929f1142e3ed8f08ebb2d0",
+      "blob": "d1caff1422270d2692159fb63d5865d4d202035d",
+      "origin": "Frozen, fully qualified Judge+13 preview; unchanged by native Judge patch, same runtime13 preimage"
+    },
+    {
+      "path": "web/i18n-en.js",
+      "sha256": "5a44cfd825c3748655b587a0cfc16c6e2a4e21c28d1e0c18a5774e78dab37275",
+      "blob": "580319afd2940698af84defcec42d505d24a8b79",
+      "origin": "Frozen, fully qualified Judge+13 preview; unchanged by native Judge patch, same runtime13 preimage"
+    },
+    {
+      "path": "locales/en.json",
+      "sha256": "0a565fea6b42285baf3bd8836438d1e90973bec789881d341f49d41105d8629e",
+      "blob": "ac6d4d044d931303da54d1ab1c2495126a2717de",
+      "origin": "Frozen, fully qualified Judge+13 preview; unchanged by native Judge patch, same runtime13 preimage"
+    },
+    {
+      "path": "docs/TASK-MODELS.md",
+      "sha256": "c2fedcbde8716f7c26c0d552338599ce263e0a27398d6446a4eef14b6c8698e8",
+      "blob": "44bb757999fac86f340cc7c3701d4246aa87c2e9",
+      "origin": "French documentation matches primary HEAD and unchanged runtime13 preview; outside canonical source manifest, recorded as explicit supplemental preimage"
+    },
+    {
+      "path": "docs/en/TASK-MODELS.md",
+      "sha256": "7f70f4fb6929b79fd4dd90ed136a07d62f976e3c8737c0aa980e7542867acac8",
+      "blob": "277ce89736f6fd8e72ef4423f638f946357c20a5",
+      "origin": "Frozen, fully qualified Judge+13 preview; unchanged by native Judge patch, same runtime13 preimage"
+    }
+  ],
+  "result_tree": "65a37782ee5aa1de81802ba274b361303e4202f2",
+  "patch": "docs/plans/engine-cursor-contract/recovery/claude-effort-recovery-20261011.patch",
+  "sha256": "c11969ded95b4268fe875f6d35a34a8ce00f181f868b0f99cdc9a98851f62ab9",
+  "bytes": 12792,
+  "paths": [
+    "internal/engine/provider_models.go",
+    "internal/engine/provider_models_test.go",
+    "web/providers.js",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "docs/TASK-MODELS.md",
+    "docs/en/TASK-MODELS.md"
+  ],
+  "purpose": "Expose requested Claude Sonnet/Opus effort in existing Admin CAS policy; show blank effort as inherited client setting FR/EN. Never impose effort, assert actual applied level or change running calls. Old Haiku/custom options remain unverified.",
+  "tests": "RED policy validation refused supported effort; GREEN persistent preview/save/reopen and conflicting CLI override, invalid workflow effort rejection; race44.497s, vet/workflows/diff/build PASS. Full frozen-source suite running. Isolated rendered Admin medium save/reopen/preview/Escape passed; extended bilingual/mobile checks running.",
+  "limits": "Effort may be clamped by actual model/account policy. Current inherited xhigh is a hypothesis; requested medium experiment needs real call measurement. Changing model configuration invalidates opinion reuse; no silent fallback or acceptance."
+}

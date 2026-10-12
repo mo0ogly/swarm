@@ -15,6 +15,10 @@ de Swarm ne prouvent pas à eux seuls qu'une mission réelle se termine sans aid
 
 ## Répartition des responsabilités
 
+Le [parallélisme des agents](AGENT-PARALLELISM.md) précise les besoins, les
+contraintes et les preuves attendues, avec schémas Mermaid et distinction entre
+production parallèle et publication exclusive.
+
 | Rôle | Responsabilité | Effet autorisé |
 |---|---|---|
 | Responsable racine | Possède l'ensemble du besoin ; décompose et adapte le travail. | Décisions structurées de planification, aucune commande de codage. |

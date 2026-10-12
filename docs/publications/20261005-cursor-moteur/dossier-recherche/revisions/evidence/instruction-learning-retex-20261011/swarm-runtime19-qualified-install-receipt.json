@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-11T18:23:41.771569+00:00",
+  "before_pid": 2182028,
+  "after_pid": 2669097,
+  "old_sha256": "20d067a54279fe4271614d55395cd3682f1a3ec8c8edfb8ca159a377d748c37e",
+  "installed_sha256": "e23d4ff43d8cb6f64b00bee8b4e531dcb3da2a71f390d8be5c130f3f79445ece",
+  "executed_sha256": "e23d4ff43d8cb6f64b00bee8b4e531dcb3da2a71f390d8be5c130f3f79445ece",
+  "source_digest": "afc079ad08db70a1c0f18a0e53e6a3081054ecd55e432d0dab965c6099d85690",
+  "idle_before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 446,
+      "paused": false,
+      "enabled": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "enabled": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "enabled": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "idle_paused": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 447,
+      "paused": true,
+      "enabled": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "enabled": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "enabled": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "public_work_exactly_preserved_against_post_pause_baseline": true,
+  "private_storage_backup": {
+    "path": "/home/fpizzi/workspace/swarm/.swarm/state-pre-v29-68bf3d7e7d03c2d1bb67ba7e.db",
+    "mode": "0600"
+  },
+  "legacy_reader_exit": 2,
+  "legacy_reader_error": "version de stockage non supportée : 29",
+  "health_state": "ready",
+  "launch_allowed": true,
+  "mission": "Kept paused while routing fresh immutable84 inputs, then public resume. Other works untouched.",
+  "scope": "Cumulative17..19 installed after full/race/target qualifications. Native supervisor reception, decision and provider effect pending; no operator acceptance."
+}

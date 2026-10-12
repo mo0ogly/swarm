@@ -1,0 +1,7 @@
+=== RUN   TestFragmentPartialNegativeRequiresWholeCandidateDecision
+    managed_review_fragment_partial_scope_test.go:13: sizes 164551 168167 21899 parts 1
+    managed_review_fragment_partial_scope_test.go:38: partial finding closed review before whole-candidate decision: inspected 1/2 final="" state=changes_requested err=inspection 1 : changes_requested
+--- FAIL: TestFragmentPartialNegativeRequiresWholeCandidateDecision (1.08s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.113s
+FAIL

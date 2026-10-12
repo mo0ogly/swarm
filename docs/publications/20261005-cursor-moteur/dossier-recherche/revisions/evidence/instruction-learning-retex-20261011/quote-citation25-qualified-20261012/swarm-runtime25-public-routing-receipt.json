@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-12T07:05:04.264457+00:00",
+  "bundle": {
+    "at": "2026-10-12T07:03:38.023356+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-defect-citation-contract-20261012.bundle",
+    "sha256": "d8ad78949ac673fc820254f75ff9f6792c3bd8002643c319f3b33f9fbb1bb8ac",
+    "commit": "f3d451f28912221bf3788594ab5e89aeeb9ed33a",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 116,
+    "manifest_sha256": "cac911b762022c8f6a2395b9ded4192b6b85a9a18e3512908b8de37c1cd1f9c4",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-inputs-a3rfgaj_",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-import-nzu87fyy",
+    "old114_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Cumulative114 original inputs unchanged, including six-example documentation; plus qualified25 quote-only defect citation contract and explicit complete protocol restart. T3 integrates all operator fixes then qualifies its own candidate. T4 guards exact, short, multiline, Unicode, absent and ambiguous quotations, historical schema, full protocol restart and preserved original opinions/calls. T5 handles observed clock/provider-recovery projection omission; current runtime25 fixes citations only. T7 proves actual reception/decision/application/effect; T8 RETEX after recipe. No native acceptance inferred; methods, schema29, actor authority, counters and original proofs preserved."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "revision": 630,
+      "operator_base_sha256": "bfe5272dfa9ae6626ea9d033811cfe5544964e612798b5a327d10c9bb2e7f5ba",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 631,
+      "operator_base_sha256": "69826f2754b0eff8a62e2fb2556f97bf42d22099dc070fed001a4fbecd2c8897",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 632,
+      "operator_base_sha256": "c9823fc5b1e7d080ea62f2de7cc5a4d9c9cdd6d05826cd63aa3a33d770fc8981",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 633,
+      "operator_base_sha256": "079381ccdb44a119c35abd2466ad9d18b36ac8355453d43b9f5a58b5375caf7b",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 634,
+      "operator_base_sha256": "e815e989c3b7e9ca4b313be4d462cfb82c924c9cc1239794c4933b4491f3ef0f",
+      "criteria_dependencies_attempts_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 635,
+      "operator_base_sha256": "1d1d4a303b576b06a299b8599aac5c1baddfc19b57d0398a6e232f004b71ab91",
+      "criteria_dependencies_attempts_learning_preserved": true
+    }
+  ],
+  "native_revision": 635,
+  "paused": false,
+  "t2_original_preserved": true,
+  "limits": "Inputs saved by public operations; future worker reception and native acceptance remain required."
+}

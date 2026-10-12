@@ -1,0 +1,15 @@
+{
+  "id": "planning-claim-0a755bd9fb948a65f580ded9-decision",
+  "at": "2026-10-11T18:27:21.555712358Z",
+  "scope": "root",
+  "reason": "L'événement traité confirme que l'incident sur plan-ca937edf4e-T2 (review-14a105dc677c088e4121afb7-result-535af40f3d61106c) reste non résolu malgré son acquittement historique : il ne figure pas dans input_events car sa réception est déjà acquittée, seule sa résolution reste ouverte. Le premier défaut de protocole identifié est localisé : le vérificateur a déclaré des artefacts (3/23) comme « inspected » tout en listant des besoins (needs) non vides, ce qui est incohérent — le statut inspected impose needs=[]. S'il manque réellement une preuve, le statut correct est unknown avec un besoin précisément nommé, l'original existant par ailleurs dans un autre fragment selon le rapport. Il s'agit d'une erreur de protocole du vérificateur (failure_code=review_fragment_protocol, owner=reviewer_protocol, producer_correction_required=false), donc aucune défaillance du producteur n'est démontrée et aucun retry de production n'est proposé (production_retry_unavailable=true, et T2 a d'ailleurs épuisé ses tentatives 3/3). review_retry_unavailable=false et le candidat/contexte sont inchangés : je propose donc review-retry sur T2 avec une correction précise adressée au vérificateur, sans toucher au périmètre, aux critères ni aux budgets. Les tâches T3..T8 portent déjà dans leur champ next les instructions du paquet84 qualifié (cumul84, SHA256 référencé) ; aucune nouvelle diffusion n'est nécessaire à cette activation, elles restent en attente de la levée du blocage T2 qui les précède dans la chaîne de dépendances.",
+  "operations": [
+    {
+      "kind": "review-retry",
+      "id": "plan-ca937edf4e-T2",
+      "title": "",
+      "requirements": [],
+      "next": "Correction adressée au vérificateur pour la revue review-14a105dc677c088e4121afb7 sur le candidat inchangé b3cdfcf607d0466cace8cc27de4325ee5a1d75e8, sous les identités actuelles (review_id, attempt a-2f9e1debb1548be96273f0d3, contexte déjà reçu) : la précédente classification de 3 artefacts sur 23 comme « inspected » avec une liste de besoins (needs) non vide est un défaut de protocole, pas un refus sémantique valide. Le statut inspected exige needs=[]. Si un extrait original manque réellement pour ces 3 artefacts, reclasser explicitement chacun en unknown et nommer précisément l'extrait original manquant, son chemin/fragment attendu et la vérification qui le rendrait disponible — le rapport indique qu'un original existe dans un autre fragment déjà transmis, donc vérifier d'abord cette localisation avant de conclure à une absence réelle. Ne pas inventer de contenu manquant ni transformer ce doute en refus du producteur : rejouer l'inspection sur les mêmes sources jointes, sans nouvelle preuve demandée au producteur tant que la reclassification needs/inspected n'a pas été corrigée."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "case": "fr/etat",
+    "phase": "request",
+    "action": "reject-instructions",
+    "method": "POST",
+    "at": 1791836427428
+  },
+  {
+    "case": "fr/etat",
+    "phase": "response",
+    "action": "reject-instructions",
+    "status": 200,
+    "at": 1791836427433
+  },
+  {
+    "case": "fr/sombre",
+    "phase": "request",
+    "action": "reject-instructions",
+    "method": "POST",
+    "at": 1791836433918
+  },
+  {
+    "case": "fr/sombre",
+    "phase": "response",
+    "action": "reject-instructions",
+    "status": 200,
+    "at": 1791836433924
+  },
+  {
+    "case": "en/etat",
+    "phase": "request",
+    "action": "reject-instructions",
+    "method": "POST",
+    "at": 1791836440485
+  },
+  {
+    "case": "en/etat",
+    "phase": "response",
+    "action": "reject-instructions",
+    "status": 200,
+    "at": 1791836440492
+  },
+  {
+    "case": "en/sombre",
+    "phase": "request",
+    "action": "reject-instructions",
+    "method": "POST",
+    "at": 1791836445378
+  },
+  {
+    "case": "en/sombre",
+    "phase": "response",
+    "action": "reject-instructions",
+    "status": 409,
+    "at": 1791836445626
+  }
+]

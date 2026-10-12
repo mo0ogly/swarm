@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-11T16:00:38.625847+00:00",
+  "source": "/tmp/swarm-T2-historical-handoff-repair-20261011-n5zjdmir",
+  "base_candidate": "39e89b169fc55255e828e66e765a0fee4ef91530",
+  "base_tree": "ad247d51e040a737335e3672d6a9687750256cd0",
+  "result_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
+  "paths": [
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T1-handoff.md",
+      "before_sha256": "edf193bda4111be34435f7d0a5536e874817381067b16259f83ea3eefeb96a26",
+      "after_sha256": "08bab9381ee79fb529b912e942e3151943d5a7d1e503cfdcb34f5b1c628be779"
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.md",
+      "before_sha256": "5cdab60a72f915ee59bebc572ac4497b52bfe6a36921a5c52704cf1453b9cac4",
+      "after_sha256": "8ca028daaa85b31afeeab556a8201f901e1ae3b32aa76f5c40e2f0bfafa0baf0"
+    }
+  ],
+  "patch_sha256": "ecf1be25d5906f27c7a931e3fa8aff2e4272e818dd8fd5f73257d50bd045bc3a",
+  "checks": [
+    {
+      "task": "T1",
+      "exit": 0,
+      "output": "/tmp/swarm-T2-historical-handoff-check-T1.out",
+      "sha256": "bc1c1278eb4b3c9a632f04a177f2ce1bd31156d33430b79efcfa0131655778f8"
+    },
+    {
+      "task": "T2",
+      "exit": 0,
+      "output": "/tmp/swarm-T2-historical-handoff-check-T2.out",
+      "sha256": "b9077a8bb8a9d595586a6d4d03ba1dfa68d76474518c2460d72632ce9b4bc3ee"
+    }
+  ],
+  "limit": "Isolated operator documentation correction. No Go change, fresh native controls and review required; no native acceptance."
+}

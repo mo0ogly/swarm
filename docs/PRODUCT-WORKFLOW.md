@@ -126,7 +126,7 @@ du libellé d’un parcours ne change pas les preuves.
 
 Modes : `existing`, `greenfield`, `replacement`. Phases : `frame`, `requirements`,
 `stories`, `story-review`, `architecture`, `design-system`, `research`, `design`,
-`plan`, `implement`, `review`, `deliver`.
+`plan`, `implement`, `review`, `deliver`, `retex`.
 
 Les limites de 8 tâches par plan d’action et 16 000 octets par document restent
 inchangées. Utiliser des incréments bornés ; les stories futures peuvent rester
@@ -165,3 +165,47 @@ Le libellé utilisateur est **Parcours de création d’application**. Les ident
 techniques pour les appels existants. Ils ne désignent pas un autre moteur.
 Les anciennes préparations restent lisibles ; une méthode dont le contenu change
 doit être réappliquée et son plan revérifié avant lancement.
+
+## Après la recette : RETEX & quick wins
+
+Une phase facultative suit la recette acceptée : tirer les enseignements du
+résultat et offrir à l’utilisateur des évolutions du projet. Le cockpit présente
+un encadré « Après la recette · RETEX & quick wins ». Le moteur vérifie les
+acceptations et leurs preuves à chaque lecture ; en mode hiérarchique, le
+responsable doit aussi avoir clos le périmètre racine. Une preuve périmée rend
+la phase indisponible, même si une ancienne acceptation reste dans l’historique.
+
+L’utilisateur consigne un fait sourcé ou une hypothèse, puis choisit **quick win**
+ou **évolution structurante**. La fiche contient proposition, valeur utilisateur,
+effort, risque, critère et preuves. Elle reste une proposition. « Préparer cette
+évolution » ouvre un cadrage prérempli avec la fiche et l’empreinte de la recette ;
+il faut encore créer/adopter le nouvel incrément et autoriser son exécution.
+La consultation et l’enregistrement ne lancent aucun agent. Le résultat accepté
+est conservé. Une fiche écartée ne propose plus cette préparation.
+
+La projection CLI `planning post-delivery WORK` et le champ `post_delivery` du
+snapshot exposent la même disponibilité. `retex-save` avec
+`source_kind: "acceptance"` exige la source exacte reçue, encore fraîche.
+`GET /api/v1/retex-evolution?work=WORK&retex=ID` transmet ce contexte au cadrage ;
+il ne crée pas de mission. La phase `retex` est également acceptée dans un plan
+adopté ; ses prérequis exécutables doivent figurer dans `depends`. Le libellé de
+phase ne vaut pas autorisation automatique.
+
+```mermaid
+flowchart TD
+  R[Recette : contrôles et décision requis] --> F{Preuves fraîches et clôture du responsable ?}
+  F -->|Non| C[Corriger puis reprendre la recette]
+  F -->|Oui| T[RETEX et quick wins facultatifs]
+  T --> P[Constat ou hypothèse, valeur, effort, risque, critère]
+  P --> U{Choix utilisateur}
+  U -->|Écarter ou conserver| H[Historique préservé]
+  U -->|Faire évoluer| B[Préparation du nouvel incrément]
+  B --> A[Adoption du plan et autorisation de départ]
+  A --> E[Réalisation, vérification et nouvelle recette]
+  E --> T
+```
+
+Pour l’amélioration récursive des **consignes** des prochaines tâches, voir
+[Consignes améliorées](architecture/INSTRUCTION-LEARNING.md) : ces ajouts sont
+appliqués par défaut et rejetables avant transmission. Cela ne valide ni
+n’exécute automatiquement les évolutions proposées dans le RETEX.

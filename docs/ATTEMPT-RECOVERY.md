@@ -1,5 +1,17 @@
 # Reprendre une tâche dont les tentatives sont épuisées
 
+## Avis historique et nouvelle production
+
+Une nouvelle tentative conserve l'ancien avis dans l'historique et prépare sa
+propre revue. Un avis encore actif ou en file bloque ce changement. Les dépenses
+et les tentatives consommées ne sont pas effacées.
+
+Pour un ancien état conservant par erreur un avis courant d'une tentative
+antérieure, le précontrôle du candidat actuel reste disponible si cet avis est
+terminé et attribuable à cette tâche. L'inventaire ne modifie aucun état ; une
+reprise validée archive l'avis dans la même transaction. Un avis inconnu,
+inachevé ou de la tentative actuelle n'est jamais ignoré.
+
 Dans **Pilotage des agents**, la carte bloquée et son détail proposent
 **Autoriser une tentative supplémentaire** lorsque toutes les tentatives prévues
 sont consommées. Indiquez le motif et la correction à apporter : sources manquantes,
@@ -123,6 +135,12 @@ déjà autorisée ; elle ne remplace pas la décision sur un plafond épuisé.
 
 ## Donner au vérificateur les sources du candidat
 
+Les fichiers déclarés dans `delivery.criteria[].evidence` sont désormais joints
+intégralement depuis le candidat contrôlé, même inchangés. Le rapport est déjà
+fourni. Le manifeste ci-dessous sert à ajouter des sources complémentaires ; il
+n'est plus nécessaire pour joindre un fichier déjà déclaré comme preuve.
+Voir le [contrat global et ses schémas](architecture/REVIEW-EVIDENCE.md).
+
 Pour une intégration Git gérée, le producteur peut ajouter
 `docs/ID-DE-TACHE.review-context.json` dans le sous-projet de la mission :
 
@@ -139,8 +157,8 @@ maintenir un verdict inconnu si une preuve nécessaire manque.
 Limites : manifeste de 8 Kio ; 24 fichiers distincts ; 96 Kio par fichier ; 128 Kio
 pour les sources ; limite globale de revue de 192 Kio. Chemins invalides, fichiers
 absents, liens symboliques, contenu binaire et dépassements sont refusés sans
-troncature ni appel de revue. Un manifeste absent conserve le parcours existant
-(diff, rapports et reçus des contrôles). Cette livraison est un contexte explicite,
+troncature ni appel de revue. Sans manifeste, les preuves de la livraison restent jointes. Une tentative
+historique sans bilan ni manifeste conserve diff, rapports et reçus. Cette livraison est un contexte explicite,
 pas une surveillance générale des fichiers ni un message direct entre agents.
 
 ## Réparer un résultat interrompu sans réécrire son historique
@@ -157,11 +175,19 @@ un rapport dès le début, actualisé régulièrement. C’est un cadrage explic
 un confinement système du fournisseur ni une garantie qu’il suivra ces consignes.
 
 Pour une réparation externe expressément demandée, un opérateur peut compléter
-la copie arrêtée, vérifier toutes les obligations et remettre **une seule** révision
+la copie arrêtée, vérifier toutes les obligations et remettre **une seule** révision par tentative
 par `planning submit-recovered-result`. Cette opération ne lance aucun exécutant,
 ne change aucun plafond et conserve le processus et la tentative interrompus.
 Le reçu transmis au vérificateur identifie `external_repair` et son auteur.
 Elle ne constitue donc pas une démonstration d’autonomie.
+
+Une réparation conservée d’une tentative précédente n’empêche pas la remise de
+la tentative courante arrêtée. La nouvelle remise conserve l’ancienne réparation,
+son avis et sa coordination dans l’événement durable ; leurs références Git et
+reçus restent intacts. Elle exige ses propres contrôles et un nouvel avis. Une
+deuxième soumission implicite de la même tentative reste refusée ; une correction
+de ce résultat passe par `revise-recovered-result` et son refus indépendant attribué, ou le précontrôle
+sans appel vérifié décrit plus bas.
 
 Après examen du diff et des preuves, indexer la copie avec `git add -A`, relever
 `git write-tree`, puis fournir à la commande un JSON contenant `schema_version: 1`,
@@ -246,7 +272,8 @@ fourni ne suffit jamais à établir l’absence de rapport.
 ### Revue interrompue par son délai
 
 Dans le cockpit, **Délai de vérification** sous le vérificateur permet de régler
-la durée des prochaines revues entre 1 et 900 secondes, avec un motif enregistré.
+une durée positive pour les prochaines revues, ou `0` pour hériter de la
+politique du projet configurée dans Admin, avec un motif enregistré.
 La sauvegarde conserve les appels consommés et leur plafond ; elle ne relance rien.
 Après correction de la cause, **Reprendre la vérification** reprend l’examen du
 résultat existant dans le budget restant, sans lancer un nouvel exécutant.
@@ -311,3 +338,63 @@ Une décision opérateur distincte, `swarm planning restart-task`, peut autorise
 une seule nouvelle production après examen du résultat courant. Ce n’est ni une
 cinquième tentative automatique ni une remise à zéro. Voir les
 [conditions et empreintes du redémarrage](ENGINE-RECOVERY.md#repartir-sur-une-tâche-bloquée).
+
+### Corriger un précontrôle sans appel après interruption
+
+Une réparation externe peut avoir une déclaration complète et passer les
+contrôles, puis échouer avant toute revue parce qu’une pièce de contexte est
+trop grande. La même tentative arrêtée peut être corrigée explicitement par
+`planning revise-recovered-result`, sans `review_id` puisqu’aucun avis n’existe.
+Fournir les identités, la révision courante, `confirm_recovery`, un motif concret
+et le nouvel `result_tree` examiné ; l’arbre doit différer du résultat conservé.
+
+Le moteur relit le précontrôle conservé : cause connue sans appel, tâche bloquée,
+agent/tentative courants, processus effectivement terminé, résultat attribuable,
+checkpoint candidat et reçu concordants avec base/contrat/contrôles. Leur
+altération refuse la reprise avant mutation. Une erreur arbitraire n’autorise
+pas cette correction. Le résultat, l’avis éventuel, les références et reçus
+antérieurs restent conservés ; des contrôles et une revue frais couvrent le
+nouveau candidat. Le rejeu n’ajoute aucun appel, essai ou remboursement.
+
+Un grand manifeste d’intégrité peut être réparti en plusieurs fichiers complets,
+chacun lié par SHA-256 à son manifeste parent. Le harness reconstruit toutes
+les entrées avant d’en vérifier le digest cumulé. Ce découpage ne retire aucune
+preuve, ne relève aucun plafond et ne renouvelle aucune acceptation historique.
+
+Les seuils de durée et de silence restent des observations aussi en mode
+plafonds actifs. Le changement de mode concerne les plafonds d’exécution et
+les tentatives ; la décision IA de conduite conserve son attribution.
+
+## Réparer un refus de capacité des sources avant la revue
+
+Un bilan complet et un diff borné peuvent encore dépasser la capacité totale des
+sources jointes. Ce refus n’a payé aucun appel de revue ; le moteur conserve le
+résultat Git, le candidat préparé et les contrôles. La correction publique
+`planning revise-recovered-result` doit pouvoir corriger la sélection déclarée
+sans créer une nouvelle production ni prétendre une acceptation.
+
+Le moteur vérifie travail, tâche, tentative terminée, résultat immuable, contrat,
+candidat précédent, checkpoint et reçu de contrôles concordants. Il reconstruit
+le contexte original et reconnaît seulement une erreur de capacité typée dont
+le message correspond au refus enregistré. Un checkpoint altéré, un autre
+défaut, une ancienne tentative ou un avis indépendant existant ne donnent pas
+cette autorisation. Une reprise de revue ordinaire conserve son exigence de
+contexte complet et borné. Seul le parcours de réparation peut examiner le
+checkpoint vérifié malgré cette capacité dépassée.
+
+La réparation garde les originaux et retire seulement les déclarations
+redondantes, ou produit des pièces adaptées avec leur filiation. Elle est
+attribuée à l’opérateur. Le nouveau résultat passe à nouveau les contrôles et
+la revue indépendante ; tentatives et consommations restent conservées.
+
+```mermaid
+flowchart TD
+  A[Production terminée et bilan complet] --> C[Contrôles sur candidat immuable]
+  C --> B[Sources dépassant la capacité, aucun appel de revue]
+  B --> V{Checkpoint, reçu et refus typé concordants}
+  V -->|Non| R[Refus sans effet ni appel]
+  V -->|Oui| O[Réparation opérateur attribuée]
+  O --> N[Nouveau résultat, originaux conservés]
+  N --> F[Contrôles frais puis revue indépendante]
+  F --> P[Acceptation seulement si preuves valides]
+```

@@ -1,0 +1,459 @@
+{
+  "at": "2026-10-12T15:14:15.463385+00:00",
+  "copy": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T3-4",
+  "producer_status": "interrupted",
+  "attempt": "a-cd4afa7836a7687fe0e466c5",
+  "previous_result": "61693d4413607770cfff22508236f3986c20bd33",
+  "new_tree": "e961404761454c28165194e426e3b40d9ff5a41d",
+  "source_digest": "822b12c35ce0bd328e3fde5b948044b889645ad68ee79f08010722de41ddd3b0",
+  "source_inputs_verified": 1157,
+  "binary_repairs": [
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-en-etat.png",
+      "before": "e1e44b4941e6f8fb23bca0885793703ccb1518ee76dfb539b918f0ea1c6e609e",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/graph-en-etat.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-en-sombre.png",
+      "before": "43950281468154d8c3273b280c04c81d292735f957bf5d045d9b3ee5f4205bee",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/graph-en-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-fr-etat.png",
+      "before": "f23c48eac9c479a1108d1aa306fb214fed891ed8683a0ea6f09305fda3379eed",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/graph-fr-etat.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/graph-fr-sombre.png",
+      "before": "847b6ac182b8ec28b5093ce16d1594dc54a931511e8c85afc75b03c02ebacb1f",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/graph-fr-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-en-etat.png",
+      "before": "c36ede914c6884911bb43692b8d249f3df9492fb89d37dce424967c5ef4c8744",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/mobile-en-etat.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-en-sombre.png",
+      "before": "dd00acd898bb4d46ff6eec23c76c2219f74cdd6c78c912e0405e7a6ab828390d",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/mobile-en-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-fr-etat.png",
+      "before": "f58a714456bad65a67945e3c6677976d4783ef440adc3a478ae62fd417de275f",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/mobile-fr-etat.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/mobile-fr-sombre.png",
+      "before": "5410b269090bdba851056774b630b310b0aeccd021ef5d1c97db8c11ff8b4d09",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/mobile-fr-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/portal-model-20261010/product-visible.png",
+      "before": "10da1075a829779b3ab35cb85a21c30c90840ac61db08d83ddd4bc66c7696006",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/portal-model-20261010/product-visible.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-etat.png",
+      "before": "c2cefbaeac39ac1262f24eae1b0ff21ec177c539c6a9cbbd7b5c6590e833ad77",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/catalog-en-etat.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-sombre.png",
+      "before": "94974a109247e6b6db2e79fa18a023f0bafea69ef475e50174e60ecf9279048a",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/catalog-en-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-etat.png",
+      "before": "e3b5a2cd8fddc4518580eeb7ccb278ccdfc92e8053767bae89929d9f4c510c56",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/catalog-fr-etat.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-sombre.png",
+      "before": "d4fdfebfc5fed9c3cdf6f2d5ac4b68173073f39036334efb1bbf16e652c37797",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/catalog-fr-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/check-error-en.png",
+      "before": "1080da73e580b7c080dbbc92f74df7f889fb34c0d87fc2119357c7e5f0fe6e7c",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/check-error-en.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat-mobile.png",
+      "before": "5c730f45ca45c58d3e7814e8cea6f456e82b9423a9186f5f4ef421da28ac7bd7",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-en-etat-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
+      "before": "dece9f329db8a0c3b6cc0e00d1bab85b4c0cbc42c300d038c8993d0dea265880",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-en-etat.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
+      "before": "925a34f46411f78e847f03a2977e4c44d45162a4de2821adc355fa081808b6b6",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
+      "before": "d29bf44ff459b59d66e5eaa9d7a341a86256593e7674e23def4b5f37748a1c1e",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
+      "before": "e8de3cf6a5514112acb33898a7a3d24882806fa636f7b6fd82c4cf1438a9236c",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
+      "before": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
+      "before": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
+      "before": "4c2df9433e549879b59199f3f41a52b624493d722ac4ae4af08f68e81115aefe",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
+      "before": "4e5f3deaf5e80592d40137d763d2d0b6e6bc840c2fa4874b9aa17e867e397853",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/en-etat-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-etat.png",
+      "before": "179fe14ce98157407f4668e013a6e5ca317813a92316b2b9fdea8e8114376665",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/en-etat.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
+      "before": "c38fa3d745ab2171af2c25abeb0fb76b1ccb7fd72a3df04ffd7dbfc2dc78feb5",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/en-sombre-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
+      "before": "362a9d7ac5860c0e053cc5c0ef98aa63c26d414360838e3fe1e7f659c38603cf",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/en-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
+      "before": "ad3dda130c1053782ca27de5177f9128225959fee4e24cd86e3eff9a54175260",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/fr-etat-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
+      "before": "63c8a1cd8400232f8f4ec2f97026e7f26ac8062244c35c74af9872f802e5b47f",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/fr-etat.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
+      "before": "b932ce091fbe5ffae966c3e3614a3193b0e4454446d8a07bba4f01beff787225",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/fr-sombre-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
+      "before": "574216c70777d524e6ccc981995160f972ec659d6ba069c8a23f62cf2b441343",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-home-20261010/fr-sombre.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
+      "before": "840c965748f6cf9bf2530adb6266cc5733c53dfa2a1e0be54abc21862fcc0bb1",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-etat-deliver.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
+      "before": "00ce6a6875a472c3b744d51af6f5929e88df4101daaa3ba07371912b8a3ea607",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
+      "before": "39a95ab1ce7db37111a2e7baee259eadf57bd81e7ed253f1b607463848b516e3",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-etat-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
+      "before": "047ebfbdd1a3f794a4a8a04f548007bffd8584ac2b4b480f8db9ded585a48f3b",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-etat-plan.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
+      "before": "9d4021def5970f8c39f27561a7c56c7a891167a8f81efb32849d18bb78f6929a",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-sombre-deliver.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
+      "before": "c9f03bc3b92b3ba26d32c7c5365ee166cd386810cad358c72229a3c5f1a30b13",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
+      "before": "edd5e7d687d8153315682e4f526b7b051b5913e3a17d142a9b997be102c67647",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-sombre-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
+      "before": "5e32034594e55f3c477a2d6f5659838c246c0690f9288c5b2d6780f10ac4ca9e",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/en-sombre-plan.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
+      "before": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-etat-deliver.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
+      "before": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
+      "before": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-etat-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
+      "before": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-etat-plan.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
+      "before": "4fbda8e7ea68f6ac2f2bbdaa23a8ac2a7db4b401bcaf5127c3eb940e3b729c61",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-sombre-deliver.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
+      "before": "6b8f952f08831fdc6431d438fb4c6ae5024b0dba3a9c09b246abb753f7a257d3",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
+      "before": "0775f1656fe2098f97c67ef34e9fa9710049a61e5cfd670217fb8eaa590191b3",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-sombre-mobile.png"
+    },
+    {
+      "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
+      "before": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/projects-method-20261010/fr-sombre-plan.png"
+    },
+    {
+      "path": "docs/screenshots/ui-redesign-20261010/training-copy-fr.png",
+      "before": "d5f188c5f69dbd7ffc3b0a8338a83b88aa7e0c7aba78ffe0fecf51ef6f8d4055",
+      "after": null,
+      "action": "deferred new evidence from engine candidate",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/screenshots/ui-redesign-20261010/training-copy-fr.png"
+    },
+    {
+      "path": "docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip",
+      "before": "b29008bf3b6c810ab5067b4877386cb1d33ef6949a6eb3360e78cb023fabcd67",
+      "after": "2f6e94b55d80f5ba688ff1e8221e848015c9b6475b59894aa1af4713adcc253d",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip"
+    },
+    {
+      "path": "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip",
+      "before": "cd8f95bb91584d154e0b82d209a130f3a552bd6aeb476957e4c3bde39984497f",
+      "after": "aeac2f4cd8db7c925099a7a72eb63fa9f77d1a31297199b8a3f32b8dd80f6a4b",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg",
+      "before": "8a1ff80ced9c9fb1ae232d92a26526a6b529e42974aa6bcfc0294522d8d63435",
+      "after": "2a7219c07b4297db3433a7675e20d150481d982f938a96d7e9b11a7697cdf044",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.gif",
+      "before": "c634d78c3a356d8d933306fd32e2cbd1f5dfbd9ae5a437fd635568a0cba37b0a",
+      "after": "51962caeed08d8497b6d3ff0332b6d395375e9ba5f2d49a309a9b8bf2df5a878",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/01-plan-en.gif"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
+      "before": "61ea3a0e8e2049df308886f40a51de13379a310b27538ec1afcc80498bcbbc54",
+      "after": "b75c584521a443226d39b4d6920a87a0f5987698994a9dd8371662d3c557dcd3",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg",
+      "before": "681e1e81762fdbe56d3c94887c920497701534f6c9a0ac372005adb83cca46fa",
+      "after": "29755023ca06f731837e085d9bbe981a8c738d48b96bab1659aba3926ae27bb1",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif",
+      "before": "48521b15a987941e4df56ec0e2168f96224b08c7695a32868cda5baf6c74b508",
+      "after": "fcd21724387432e4c39ef068843ace65fe64b0405005ef38aa5dc21e3e145d23",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
+      "before": "f884fe92e34b578915f968f31edbe9387ca772932bd3c675bfc728c601d114e8",
+      "after": "4f721a961a2968afca40c2218d212ce7e87f55aed7fb4fa399e31b87314a36bb",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg",
+      "before": "07943470c61821de67b82a775952a403e6b41ae584112f704cf49fad0720f8bc",
+      "after": "961e688e6f8bc045febf81c0a86c66698988c22d6cef5a946fa98d6778916eba",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.gif",
+      "before": "38dd6cd4736454a06e0c08dc4c6bc811f42958519026cd33420bb99e47155dc0",
+      "after": "4e6a1396ccf45efcfb824303d8c7ff3898f922a8bbf76a7de3e72eff952512d8",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/02-controles-en.gif"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
+      "before": "3d918c2623e74e1c57f90c6611dda24da9d701acbaddc213be31350ef10b2b75",
+      "after": "30f2763d455ed43aebfb3350cf8d7ad4f23b31a47f31ca5204a231d1939b412e",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg",
+      "before": "a2fbfd2212f0ac23ffdc8bd96ee95d9f62d843cdd2a169d651813c0f0cbc7d34",
+      "after": "d3f2cc86eedfce289ffe55344f05f8bb59fdf60123ca5e40be65c6cdb008ec1c",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif",
+      "before": "b63185fdd6429e4a98141aa0ca029855546df0ae3867e725aec16490726559f9",
+      "after": "fc8740bf70dc770881d6c6e364a33eea07a499f3d745e4d53d7bd31e7e2007b6",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
+      "before": "72654ffbae275e5537aafcf49e078966401423fa789f43318e100b8bba4bb910",
+      "after": "c030fc5e6d251dae9942f23dc15ef039fd198812218141c4f72a07804a245fa5",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr-poster.png",
+      "before": "bc66367e82f683d50ad32cd151704d1fe7553a0172ad2c5abee76a778afc70db",
+      "after": "d1be36ca1008d9c38820fdc7136152eda64aa7193b21b012074c549d0390d725",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/graph-overview-fr-poster.png"
+    },
+    {
+      "path": "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4",
+      "before": "5aef9a0dc13d4aa03c762f4dbf412d17eea85a046d06438ca81c69652a641ecc",
+      "after": "0248dbd5555ba4bb6b64b3a5a839b89c910effc0ffb78fe5b13a0cece4f93930",
+      "action": "restored accepted-base bytes",
+      "original_preserved": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals/docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4"
+    }
+  ],
+  "go_sources_unchanged": 574,
+  "primary_binaries_unchanged": true,
+  "originals_backup": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-binary-scope-originals",
+  "remaining_delta_files": 272,
+  "native_db_or_private_proof_read": false,
+  "limits": "Explicit external source-copy repair only. Public revise-recovered-result, new controls and review remain required. No acceptance."
+}

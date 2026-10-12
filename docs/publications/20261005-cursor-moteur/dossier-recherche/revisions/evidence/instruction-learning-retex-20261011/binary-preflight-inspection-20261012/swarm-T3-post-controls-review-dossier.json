@@ -1,0 +1,11 @@
+{
+  "status": 400,
+  "error": {
+    "error": "revue retenue : modification binaire non examinable par ce vérificateur",
+    "failure": {
+      "code": "command_failed",
+      "message": "revue retenue : modification binaire non examinable par ce vérificateur",
+      "retryable": false
+    }
+  }
+}

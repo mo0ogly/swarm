@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "start": "2026-10-11T14:53:00.851068+00:00",
+  "end": "2026-10-11T15:01:05.817877+00:00",
+  "seconds": 484.9667909439995,
+  "exit": 0,
+  "output": "/tmp/swarm-T2-primary12-preview-full.out",
+  "output_sha256": "1a2dc770b7c4c39515237df57196ccc7969931249767d9cf02b0790bfb5c989a",
+  "source_manifest_sha256": "a1a1b90cff1a37e8626b6183b99048a34c7b3d4e9599841ba3c22f60e0db5b53",
+  "candidate_digest": "c01c2cbf41a0d8b19a6f2c8d0fe40712bed7f784ed1fafbf736d73adca534cb3",
+  "paths": 1174,
+  "source_drift": [],
+  "manifest_changed": false
+}

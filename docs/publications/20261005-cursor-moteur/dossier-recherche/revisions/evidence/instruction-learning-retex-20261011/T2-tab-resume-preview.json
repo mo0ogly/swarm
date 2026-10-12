@@ -1,0 +1,17 @@
+{
+  "revision": 224,
+  "task_id": "plan-ca937edf4e-T2",
+  "review_id": "review-f5cb258178e80a4bdc4778d3",
+  "candidate_commit": "1ce2af045bef41baf4af808c610a921c7fe71224",
+  "state": "change_required",
+  "cause": "inspection de fragment : defect quote absent at original line (artifact 17, line 7)",
+  "next_step": "Examiner la cause et enregistrer une correction pertinente avant reprise ; aucune relance automatique identique.",
+  "actor": "operator",
+  "inspections_remaining": 4,
+  "inspections_reusable": 1,
+  "calls_required": 6,
+  "calls_available": 52,
+  "calls_missing": 0,
+  "minimum_review_limit": 24,
+  "timeout_seconds": 0
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T20:01:16.589855+00:00",
+  "original_index_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "originals": [
+    {
+      "path": "docs/plan-ca937edf4e-T2.delivery.json",
+      "sha256": "0801b313dce42aaf154d46d557989c8509852adeeba732b2ea3b8fafa8003f90",
+      "bytes": 5116
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.review-context.json",
+      "sha256": "7530eb991b90e7394ac867d0d2ee692e949d28045b2efbf9571991ff319637fa",
+      "bytes": 481
+    },
+    {
+      "path": "docs/plan-ca937edf4e-T2.md",
+      "sha256": "96967d14c176524eb05e3f6fd0c2990f6a074f0b5693035d477ce55c1b3a3b08",
+      "bytes": 4573
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T1-handoff.md",
+      "sha256": "08bab9381ee79fb529b912e942e3151943d5a7d1e503cfdcb34f5b1c628be779",
+      "bytes": 35462
+    },
+    {
+      "path": "docs/plans/engine-cursor-contract/evidence/T2-handoff.md",
+      "sha256": "63c4b3307fc77ed9968c9bf0ad39fbdc816b7f89b0d01418c23f504715112e98",
+      "bytes": 7511
+    }
+  ],
+  "citation_counterexamples": [
+    {
+      "id": "SRC-GOO-02",
+      "actual": "21 avril 2026 — [Deep Research Max]",
+      "expected": "21 avril 2026 — [Deep Research Max](https://blog.google/innovation-and-ai/models-and-research/gemini-models/next-generation-gemini-deep-research/) [Google Deep Research 2026]"
+    },
+    {
+      "id": "SRC-OAI-01",
+      "actual": "23 janvier 2026 — [Unrolling the Codex agent loop]",
+      "expected": "23 janvier 2026 — [Unrolling the Codex agent loop](https://openai.com/index/unrolling-the-codex-agent-loop/) [Bolin 2026]"
+    },
+    {
+      "id": "SRC-OAI-02",
+      "actual": "11 février 2026 — [Harness engineering]",
+      "expected": "11 février 2026 — [Harness engineering](https://openai.com/index/harness-engineering/) [Lopopolo 2026]"
+    },
+    {
+      "id": "SRC-ANT-01",
+      "actual": "24 mars 2026 — [Harness design for long-running application development]",
+      "expected": "24 mars 2026 — [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) [Rajasekaran 2026]"
+    },
+    {
+      "id": "SRC-ANT-02",
+      "actual": "8 avril 2026 — [Scaling Managed Agents]",
+      "expected": "8 avril 2026 — [Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents) [Martin et al. 2026]"
+    }
+  ],
+  "citation_validation": [
+    {
+      "id": "SRC-CUR-03",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-CUR-04",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-CUR-05",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-GOO-01",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-GOO-02",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-OAI-01",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-OAI-02",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-ANT-01",
+      "exact_date_source_cell": true
+    },
+    {
+      "id": "SRC-ANT-02",
+      "exact_date_source_cell": true
+    }
+  ],
+  "source_original_sha256": "1c7e84b87fc2e7baa53383be0c494658f6d0c1615962daf40511d99c7301934a",
+  "source_go_manifest_sha256": "46d5667a01bd38a935c49b19097fe89d3fe95f305a2093de3a46f4eaaa89acd4",
+  "source_go_drift": [],
+  "local_receipt_exit": 0,
+  "local_stdout_hash_verified": true,
+  "native_review_result_preserved": "review-14a105dc677c088e4121afb7-result-5617cbea21b4b611",
+  "limits": [
+    "Local evidence repair only; independent native controls/review required",
+    "No provider quota delay cleared; no consumed call refunded"
+  ]
+}

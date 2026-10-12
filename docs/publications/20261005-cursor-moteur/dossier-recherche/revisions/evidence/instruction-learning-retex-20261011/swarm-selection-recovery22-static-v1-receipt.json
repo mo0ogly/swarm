@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-11T19:44:40.546161+00:00",
+  "vet": {
+    "command": [
+      "go",
+      "vet",
+      "./..."
+    ],
+    "exit": 0,
+    "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "methods": {
+    "command": [
+      "python3",
+      "tools/agent-workflows/check.py"
+    ],
+    "exit": 0,
+    "output": "OK:12sharedClaude/Codexskills, preparation commands, contract and engine-built rolecontexts"
+  },
+  "staged_patch_diff_and_apply": "PASS13paths exact pre/postimages and result tree",
+  "source_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd"
+}

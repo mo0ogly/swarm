@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T13:50:17.427889+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-20261011.bundle",
+  "sha256": "47463691a600a5ef5f80f4ab6c7446f87fda4ceecdfa7c8c5bd2edab500ca8c3",
+  "bytes": 312627,
+  "ref": "refs/heads/operator-inputs",
+  "commit": "30171f7b07b881b5999faf5d4216e849f0dc72b4",
+  "manifest_sha256": "9dc5371901f2c7dfc2d1bba912350dc64a6e66bd0940de6dfca1c0424f0ff737",
+  "input_files": 45,
+  "source": "/tmp/swarm-operator-patch-inputs-20261011-4bt_auzi",
+  "isolated_import_check": "/tmp/swarm-operator-input-import-check-6bksd_ie",
+  "verification": "PASS bundle verification, isolated fetch and all full input bytes/hashes recovered",
+  "limits": "Import into owned task copy and inspect there. Verify bundle/manifest hashes and patch preimages; preserve accepted T2 code and source histories. Native model receipt/use not yet demonstrated."
+}

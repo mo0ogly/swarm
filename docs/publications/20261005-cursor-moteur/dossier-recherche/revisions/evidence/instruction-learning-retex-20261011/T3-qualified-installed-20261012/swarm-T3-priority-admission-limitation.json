@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-12T09:25:55.279223+00:00",
+  "revision": 704,
+  "public_revision_refusal": "contrat hiérarchique immuable par défaut; managed contract revision unsupported and existing dependency immutable",
+  "failed_operation": "T4 dependency amendment preceding T3 reorder",
+  "graph_changed": false,
+  "T2_acceptance_fabricated": false,
+  "owned_pauses_restored": true,
+  "runtime": "26 unchanged;27 explicitly deferred",
+  "next": "Implement T3 in isolated operator-owned source; native T3 remains prerequisite-blocked until supported admission."
+}

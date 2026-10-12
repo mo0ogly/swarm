@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-final-source-alias-named-proof-after-review-20261011",
+  "expected_revision": 388,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "review_id": "review-754dbd4d247114000994bbc6",
+  "confirm_recovery": true,
+  "result_tree": "201b3a8e2e0f724a7cc88fef7107bf2d41569316",
+  "reason": "Replan du refus indépendant754dbd4d : ancien source-parts-targeted.out conservé explicitement historique antérieur aux deux alias. Reçu nouveau intégral et metadata : test final exact arbre e1491d45 correspondant candidat6089c4fb, sept sous-cas nommés PASS dont alias-dot/alias-parent,11.311s, aucun drift2009fichiers ni Go modifié. Rapport/index attribuent correction et originaux. Préimages/transfert sur copie du producteur terminé vérifiés, même tentative et consommation conservées, contrôles/revue indépendante frais requis. Source supplémentaire toujours17fichiers130040octets ; nouveaux reçus fournis intégralement dans le diff sans duplication ni troncature. Runtime14 maintenant qualifié full Go493.114s sourcecb3f5558 inchangée, race/vet/workflows/UI PASS et binaire exécuté vérifié. Routes explicites medium conservées ; aucun avis/opinion non concordant réutilisable ni acceptation fabriquée."
+}

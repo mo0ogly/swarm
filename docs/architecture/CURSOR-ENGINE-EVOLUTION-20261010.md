@@ -2,6 +2,14 @@
 
 ## Statut et périmètre
 
+Le 12 octobre, l'utilisateur demande de poursuivre le développement directement
+dans le dépôt avec Codex seul, sans Claude ni orchestration de la mission par
+Swarm. La mission est conservée en pause. Le
+[plan de reprise directe](../plans/engine-cursor-contract/developpement-direct-20261012.md)
+conserve T1 à T8, les critères et la distinction entre vérification locale,
+recette réelle et acceptation historique. Les contrôles restent nécessaires au
+développement ; les phases natives ne conditionnent plus ses modifications.
+
 Ce document accompagne le [plan d’évolution](../plans/engine-cursor-contract/evolution-20261010.json).
 Il décrit une cible à décider et à implémenter, pas une conformité déjà acquise.
 Le [contrat JAN/FEB](CURSOR-ENGINE-CONTRACT.md) conserve les deux publications
@@ -58,6 +66,26 @@ Chaque lot met à jour ce document et les contrats FR/EN pertinents. Décrire le
 valeurs de politique dans la configuration persistée et l’Admin ; ne pas les
 introduire en constantes Go. Distinguer limites techniques et choix réglables.
 
+### Concurrence et dépendances
+
+Le [contrat de traçabilité](TRACEABILITY.md) complète cette architecture : preuves
+locales et reçus moteur, rôle de chaque superviseur, intégrité et événements
+concurrents, avec schémas Mermaid FR/EN.
+Le [diagnostic autorécursif](AUTORECURSIVE-RECOVERY.md) précise la boucle de reprise
+obligatoire et les contrôles de la méthode elle-même. Les lots T3 à T7 doivent
+démontrer son usage et ses effets, pas seulement ajouter des consignes.
+
+Le [contrat de parallélisme des agents](AGENT-PARALLELISM.md) documente les besoins,
+les contraintes, l’admission, la supervision et les preuves avec six schémas
+Mermaid ; une [version anglaise](../en/AGENT-PARALLELISM.md) l’accompagne.
+
+La mission adoptée reste une chaîne T1 → T7. La
+[précision sur le parallélisme](../publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-parallelisme-plan.md)
+demande à T3 de justifier les dépendances et de démontrer une adaptation persistée
+du graphe, à T6 de mesurer le chevauchement et le débit, et à T7 de l’observer
+avec fournisseur réel. Ces attentes complètent les remises des lots existants ;
+elles ne démontrent pas un parallélisme déjà disponible dans cette mission.
+
 ## Précondition de lancement corrigée
 
 La reprise après les expirations du vérificateur et du responsable est décrite
@@ -77,6 +105,39 @@ la revue indépendante doit examiner la couverture sémantique des critères et
 refuser les preuves insuffisantes. Un test de régression n’est pas une preuve
 d’autonomie ni une recette fournisseur réel. Les échecs historiques de la suite
 globale restent visibles ; leurs manifestes ne doivent pas être falsifiés.
+
+## Frontière de preuve entre producteur et vérificateur
+
+Le vérificateur reçoit le contexte composé par le moteur, sans accès aux outils
+ni à la copie du producteur. Le [correctif global de transmission des preuves](REVIEW-EVIDENCE.md) joint les
+fichiers déclarés dans `delivery.criteria[].evidence`, même inchangés. Le manifeste
+`docs/TASK-ID.review-context.json` permet de déclarer ces sources :
+`managedReviewSourcesByTask` charge les blobs complets depuis le candidat testé,
+avec chemin, objet Git et SHA256 ; `managedReviewContext` les joint dans `sources`.
+Les entrées invalides ou trop grandes sont refusées sans troncature. Le
+[guide de reprise](../ATTEMPT-RECOVERY.md#donner-au-vérificateur-les-sources-du-candidat)
+donne le format et les limites applicables.
+
+Le cas T1 du 10 octobre montre deux refus `unknown` avant une réparation externe
+explicite du dossier. La [note de recherche](../publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-refus-contexte-revue.md)
+conserve la chronologie et distingue une source citée d'une source reçue.
+`planning revise-recovered-result` enregistre l'acteur, l'arbre examiné, le résultat
+remplacé et le refus précédent ; la nouvelle preuve exige de nouveaux contrôles
+et une revue fraîche. Les tentatives et plafonds restent inchangés. Cette
+réparation manuelle ne prouve pas une récupération autonome par le responsable.
+
+La correction commune du moteur et des consignes est distincte du candidat figé
+de la mission. T5 doit intégrer cette correction et vérifier son diagnostic
+dans le résultat géré, avec documentation FR/EN. Une transmission complète ne garantit ni
+un verdict favorable ni la conformité JAN/FEB.
+
+## Publication et fraîcheur des phases du plan
+
+La [publication des phases du plan](MANAGED-PLAN-GATES.md) corrige également
+une acceptation T1 inutilisable par T2 : le moteur doit reprendre les phases
+persistées plutôt qu’affecter la livraison à tous les contrôles. La
+requalification publique conserve le résultat et les preuves précédentes,
+puis exige de nouveaux contrôles et une revue indépendante.
 
 ## Extension demandée : observabilité eBPF
 
@@ -100,3 +161,179 @@ Observation locale au lancement : noyau `6.17.0-41-generic`, BTF lisible dans
 permissions de chargement ni la disponibilité de toutes les sondes.
 Sources primaires consultées : [présentation eBPF](https://ebpf.io/what-is-ebpf/)
 et [guide eBPF en Go](https://ebpf-go.dev/guides/getting-started/).
+
+### T3 : exploration et adaptation des tâches futures
+
+Le planificateur demande une lecture par l’opération `explore`, dans sa décision
+réservée : `id` identifie la requête et `deliverable` contient le JSON du mode
+`list` ou `read`, le commit accepté exact et le répertoire ou les fichiers.
+Le moteur lit l’arbre Git immuable, puis conserve dans un événement les sources
+entières, leurs empreintes, le périmètre, la génération et la révision observée.
+Il ne lance aucune commande proposée par l’IA et ne modifie pas le dépôt.
+Le planificateur reçoit ces originaux lors d’une activation suivante.
+
+La capacité provient du transport existant du rôle, après ses méthodes et ses
+instructions effectivement transmises. Il n’existe pas de nouveau plafond de
+lecture arbitraire : une pièce entière hors capacité est refusée avec sa cause.
+La lecture complète doit être transmissible avant la décision persistée ; une
+source attachée n’est ni comprise ni validée par ce seul fait. Une nouvelle base
+acceptée rend les anciennes découvertes historiques, sans effacer leurs octets.
+
+`revise-dependencies` permet au superviseur de modifier uniquement les dépendances
+d’une tâche future `todo`, sans tentative et dans son périmètre. Le tableau est
+explicite, y compris vide. Le moteur vérifie le graphe sans cycle, les identités,
+le bail, l’absence de processus et de préparation déjà réservés pour cette tâche.
+Les critères, exigences, budgets et résultats des autres tâches restent intacts ;
+l’ancien et le nouveau graphe sont attribués dans un événement. Modifier l’ordre
+ne vaut jamais acceptation du résultat dont la dépendance a été retirée.
+
+```mermaid
+flowchart TD
+    P[Superviseur reserve et demande une lecture] --> G[Moteur lit le commit accepte]
+    G --> E[Evenement avec originaux et attribution]
+    E --> R[Activation suivante recoit la decouverte]
+    R --> D[Superviseur decide les dependances futures]
+    D --> V[Moteur verifie droits et graphe sans cycle]
+    V --> T[Tache future admissible sous ses controles]
+    T --> A[Revue et acceptation restent requises]
+```
+
+Deux sous-superviseurs peuvent détenir des baux différents simultanément.
+Chaque décision conserve son périmètre et sa génération ; la transaction atomique
+conserve les compteurs propres, ceux des ancêtres et le budget partagé. Les
+régressions font chevaucher deux vrais sous-processus de fournisseurs déterministes,
+vérifient les réservations, le refus d’un troisième créneau hors budget, la pause,
+le rejeu et la conservation après réouverture. Elles ne prouvent pas l’autonomie
+de deux fournisseurs IA réels ; cette recette reste à T7.
+
+Cette évolution T3 a été développée et qualifiée en copie isolée, puis composée
+dans le dépôt courant avec le juge développé en T2. Les contrôles du candidat
+T3 ont réussi, mais sa revue indépendante n'a pas abouti : sa présence dans le
+code ne vaut pas acceptation de T2 ou T3. Le dernier état public observe T3
+dépendante de T1, T4 dépendante de T2 et T3, et la mission en pause à la révision
+839. La reprise directe conserve ces preuves historiques.
+
+### Revue et identité d'une nouvelle tentative
+
+Une nouvelle production archive l'avis précédent, conserve les dépenses et
+réinitialise la coordination de revue propre à l'ancien candidat. Une revue
+encore active ou en file interdit cette nouvelle production. Pour les anciens
+états qui ont conservé un avis courant par erreur, le précontrôle reconnaît
+uniquement un avis terminé lié à une tentative antérieure de la même tâche.
+Une lecture d'inventaire reste sans écriture ni appel ; l'archivage accompagne
+ensuite une décision ou une réservation validée dans sa transaction.
+
+Une tentative inconnue, un avis inachevé ou celui de la tentative actuelle reste
+bloquant. L'avis historique ne devient jamais une preuve favorable du nouveau
+candidat. Le journal d'une réparation retrouve son avis par producteur et
+tentative, même après archivage, sans le rétablir comme revue courante.
+
+```mermaid
+flowchart TD
+    N[Nouvelle production demandée] --> A{Revue active ou en file}
+    A -->|Oui| B[Refus sans nouvelle tentative]
+    A -->|Non| H[Ancien avis conservé en historique]
+    H --> P[Nouvelle tentative et coordination distinctes]
+    P --> C[Contrôles sur le nouveau candidat]
+    C --> R[Revue fraîche du même candidat]
+```
+
+### T4 : reprendre une préparation automatique conservée
+
+Le [contrat de parallélisme](AGENT-PARALLELISM.md) décrit également la conservation
+anticipée d'un résultat terminé pendant la revue d'un autre candidat : les
+gardes sont partagées, le résultat est immuable et la publication reste exclusive.
+Ce gain de remise est vérifié en fixture concurrente avec détection de courses ;
+il ne constitue pas une mesure de débit avec fournisseurs réels.
+
+Le conducteur peut reprendre une copie préparée dont la réservation d'agent n'a
+pas abouti, uniquement lorsque la demande sauvegardée porte une origine
+automatique et un conducteur identifié. Il conserve l'identifiant de lancement,
+les fichiers de la copie, les paramètres gelés et la référence Git. Le conducteur
+courant doit posséder un bail frais ; une reprise après redémarrage peut donc
+changer son identité sans transformer l'origine en demande de l'opérateur.
+
+La reprise passe par les mêmes vérifications transactionnelles que le lancement :
+mission autorisée, mode autonome, pause, droits, fournisseur, créneaux, budget,
+dépendances et contrat de la copie. Une préparation de l'opérateur reste soumise
+à `resume-launch`. Une intention ancienne sans conducteur attribuable exige
+aussi une reprise explicite. Un refus conserve la copie et ne crée ni agent,
+tentative ni dépense. Le journal de lancement distingue le conducteur de
+l'opérateur local.
+
+```mermaid
+flowchart TD
+    P[Copie préparée conservée sans agent] --> O{Origine automatique attribuée}
+    O -->|Non| U[Reprise explicite par utilisateur]
+    O -->|Oui| L{Conducteur courant et droits frais}
+    L -->|Refus| C[Copie et historique conservés]
+    L -->|Valide| R[Réservation de la même identité]
+    R --> A[Agent lancé dans la copie conservée]
+    A --> V[Contrôles et revue du résultat]
+```
+
+Les régressions emploient une base isolée et un fournisseur déterministe. Elles
+prouvent la reprise de réservation et son attribution, pas l'autonomie d'une IA
+réelle. La mission historique reste en pause pendant le développement direct.
+
+### T5 : politique de cycles réglable
+
+Le [contrat de jugement global](JUDGMENT-CYCLES.md), disponible en FR/EN,
+documente la liaison entre contexte reçu, opérations structurées `judge`/`renew`,
+décision sous bail et nouvelle activation. La racine décide ; le moteur conserve
+et applique sous ses contrôles, sans jugement implicite ni remise à zéro.
+
+Le plafond de cycles du juge global est enregistré dans `JudgeState.MaxCycles`.
+Il est visible et modifiable depuis **Admin → Réglages du moteur** et la vue
+des budgets. `GET /api/v1/quotas` et `quotas show` exposent les mêmes valeurs,
+consommations, bornes techniques et dernière autorisation ; aperçu et application
+utilisent la révision commune de la mission. `limits.judge_cycles` omis conserve
+la valeur existante, une valeur positive fixe un plafond, `0` signifie aucun
+plafond de cycle. Les plafonds d'appels et de dépenses restent distincts.
+
+Une nouvelle mission n'hérite plus d'un plafond implicite de vingt cycles. Les
+missions existantes conservent exactement leur configuration. Une modification
+ne rembourse ni cycle ni appel, ne supprime aucun verdict et ne relance aucun
+agent. Elle est refusée si un responsable ou une revue détient encore sa
+réservation, si la révision est périmée ou si un plafond positif est inférieur
+au nombre de cycles déjà ouverts. La restauration utilise le même aperçu et
+les valeurs historiques, sous ces vérifications courantes.
+
+Le schéma de stockage 32 protège cette sémantique et les valeurs avant/après
+de l'autorisation contre un ancien décodeur. La migration sauvegarde la base et
+ne réécrit aucun corps de mission. Elle a été vérifiée sur une base isolée ;
+aucune migration de la mission historique n'est déduite du développement.
+
+```mermaid
+flowchart LR
+    U[Admin ou CLI : politique choisie] --> P[Aperçu sans écriture]
+    P --> V[Révision, droits, consommations et réservations]
+    V --> A[Valeurs et autorisation persistées]
+    A --> J[Renouvellement utilise cette politique]
+    J --> H[Cycles et verdicts historiques conservés]
+```
+
+### Réservation et fournisseur effectif du superviseur
+
+Après une sélection explicite de modèle sur un périmètre, le contrôle de quota
+de la réservation utilise ce fournisseur effectif, comme le lancement. Un délai
+du fournisseur par défaut ne bloque pas un autre fournisseur choisi ; le délai
+du fournisseur réellement choisi interdit la réservation sans consommer de budget.
+La sélection d’un sous-superviseur reste propre à son périmètre. Le fournisseur
+par défaut, les autres délais, les compteurs et les réponses historiques demeurent
+intacts. Un replay de réservation déjà appliquée ne crée aucun nouvel appel.
+
+Le défaut est reproduit sur une base isolée avant correction : réservation
+refusée sur le mauvais fournisseur et réservation autorisée malgré le délai du
+fournisseur choisi, pour racine et enfant. Les six variantes de sélection/héritage
+et les régressions de quotas/modèles passent. Ce constat local ne certifie ni
+la disponibilité du compte alternatif ni la reprise native de T3.
+
+```mermaid
+flowchart TD
+    S[Perimetre demande] --> R[Selection explicite ou fournisseur par defaut]
+    R --> Q{Quota du fournisseur effectif}
+    Q -->|Bloque| W[Attente conservee sans reservation]
+    Q -->|Disponible| A[Reservation atomique du perimetre]
+    A --> L[Appel sur la meme route gelee]
+```

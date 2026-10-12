@@ -1,0 +1,33 @@
+=== RUN   TestGraphDeliveryD03QualificationManifest
+--- PASS: TestGraphDeliveryD03QualificationManifest (0.24s)
+=== RUN   TestManagedFragmentHistoricalPublicRecovery
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/pass
+    managed_review_fragment_reuse_test.go:350: Actual subprocess calls: original=6 differential=4; reused=2; exact candidate, reopen, corruption and idempotence checked
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/fail
+=== RUN   TestManagedFragmentHistoricalPublicRecovery/exit
+--- PASS: TestManagedFragmentHistoricalPublicRecovery (46.33s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/pass (13.72s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/fail (15.76s)
+    --- PASS: TestManagedFragmentHistoricalPublicRecovery/exit (16.85s)
+=== RUN   TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs
+--- PASS: TestPlanningJudgeEndRejectsMatchingCandidateWithoutProofs (0.04s)
+=== RUN   TestPlanningJudgeVerdictDistinctFromCandidateReview
+--- PASS: TestPlanningJudgeVerdictDistinctFromCandidateReview (0.04s)
+=== RUN   TestPlanningJudgeEndRequiresFreshMatchingCandidate
+--- PASS: TestPlanningJudgeEndRequiresFreshMatchingCandidate (0.88s)
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/review
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/control
+=== RUN   TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/active
+--- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess (2.28s)
+    --- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/review (0.80s)
+    --- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/control (0.77s)
+    --- PASS: TestPlanningJudgeEndRejectsStaleReviewAndActiveProcess/active (0.71s)
+=== RUN   TestPlanningJudgeRenewalPreservesContextAndHistory
+--- PASS: TestPlanningJudgeRenewalPreservesContextAndHistory (0.03s)
+=== RUN   TestPlanningJudgeReplayStaleAndDoubleVerdictRefused
+--- PASS: TestPlanningJudgeReplayStaleAndDoubleVerdictRefused (0.02s)
+=== RUN   TestPlanningJudgePausedAndQuotaRefuseEffects
+--- PASS: TestPlanningJudgePausedAndQuotaRefuseEffects (0.03s)
+PASS
+ok  	swarm.local/companion/internal/engine	49.928s

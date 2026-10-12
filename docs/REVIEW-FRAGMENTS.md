@@ -106,7 +106,7 @@ Le diagnostic distingue également les messages assistant, les événements syst
 
 ## Réserves de contexte entre fragments
 
-Une inspection `unknown` achevée reste un avis durable : elle ne vaut pas conformité. Elle est réutilisée sans refaire payer le même lot, et les lots suivants sont examinés. Un défaut `fail` reste un arrêt. La sélection finale reçoit toutes les demandes `needs`, identifiées par lot, pièce et index ; elle doit chercher les originaux nécessaires dans l’inventaire complet.
+Une inspection `unknown` achevée reste un avis durable : elle ne vaut pas conformité. Elle est réutilisée sans refaire payer le même lot, et les lots suivants sont examinés. Un constat local `fail` reste attribué dans le journal ; il ne clôt pas la revue du candidat complet. La sélection finale reçoit toutes les demandes `needs`, identifiées par lot, pièce et index ; elle doit chercher les originaux nécessaires dans l’inventaire complet.
 
 En présence de réserves, la réponse finale contient `review` et `resolutions`. Chaque réserve exige exactement une résolution indépendante, avec justification et, pour `resolved`, une citation originale visible. Une réserve oubliée, dupliquée ou une citation inventée invalide la réponse. Une réserve `unknown` ou `fail` interdit l’acceptation même si tous les critères de tâche annoncent `pass`. Une inspection sans demande explicite, une preuve altérée ou un contexte trop grand reste bloquant. Les tailles réelles sont recontrôlées, sans troncature.
 
@@ -118,10 +118,23 @@ Le schéma envoyé à l’IA fixe le nombre exact de réponses attendues, les id
 
 ### Refus partiel et correction explicite
 
-Une inspection peut arrêter la revue dès qu’elle démontre un défaut. Ce refus
-est enregistré comme `changes_requested`, même si les autres lots n’ont pas
-encore été lus. Il ne valide aucun critère et ne permet aucune publication.
-Une erreur de transport reste `error` ; son texte ne constitue pas un refus.
+Une inspection défavorable est enregistrée comme constat local
+`changes_requested`. Le moteur poursuit les autres paquets du même candidat,
+conserve chaque défaut original (pièce, ligne, citation, explication,
+reproduction, attendu) et le remet à la sélection puis à la revue finale.
+Chaque constat exige une résolution attribuée sur les originaux visibles.
+Le vérificateur final peut confirmer le défaut, le réfuter avec preuve originale
+ou conserver une incertitude ; un avis local ne devient jamais un refus global
+par une règle du moteur. Une réserve non résolue interdit l’acceptation même si
+les critères sont déclarés favorables. Un défaut global confirmé reste refusé.
+
+Une erreur de transport, de protocole, de droits ou de capacité garde sa cause
+réelle et les avis locaux antérieurs. Ces avis ne remplacent pas l’erreur par un
+verdict global inventé. Les réponses achevées sont réutilisables sur le même plan
+intact ; aucun appel interrompu n’est remboursé. La capacité finale réserve les
+défauts JSON sérialisés, les questions et la marge de tokens avant la dépense.
+Les anciens refus durables restent historiques ; cette évolution ne les accepte
+pas rétroactivement.
 
 Pour les anciennes revues enregistrées comme `error` malgré un refus durable,
 `planning revise-recovered-result` vérifie le journal original, ses empreintes,
@@ -201,3 +214,12 @@ brute correspondant au paquet et à sa réservation ; son empreinte est contrôl
 Il ne remplace jamais une réponse valide, ne remplit pas le journal des preuves,
 et ne vaut pas verdict. La taille du message complet est vérifiée avant toute
 nouvelle réservation d'appel. Les anciens appels restent consommés.
+
+
+Les nouvelles préparations de revue peuvent passer directement au calcul de capacité fournisseur lorsque seule la taille du format historique bloque une pièce textuelle complète. Les preuves et lots demeurent entiers ; provenance, budget et message final sont recontrôlés. Le budget ancre final_reserve_contract_version=1 : le socle est mesuré en tokens et octets, puis chaque champ variable sérialisé est réservé une seule fois. La valeur0 conserve le calcul historique et les anciens prompts. Les messages réellement envoyés restent intégralement mesurés avant chaque appel. Aucun verdict ni budget supplémentaire n’est déduit de la préparation.
+
+
+Le contrat de réserve1 impose des constats indexés et les ancres de citation réellement proposées. Le précontrôle réserve la taille sérialisée maximale de ces ancres, avec la raison bornée, plutôt qu’un extrait arbitraire. Les tableaux historiques restent admis sous le contrat0 ; ils sont refusés sur les nouveaux paquets afin que la borne annoncée corresponde exactement aux réponses acceptables.
+
+
+La planification utilise également la capacité observée du modèle lorsque son client est reconnu. Le contexte complet et son schéma sont mesurés avant réservation, puis leur empreinte est revérifiée dans la réservation ; client, fournisseur et modèle sont contrôlés avant l’appel. La capacité mesurée est présente dans le contexte dont le reçu conserve l’empreinte. Un fournisseur non reconnu conserve la limite historique, sans hausse implicite. Cette adaptation du transport ne modifie ni budgets d’appels, droits ni critères.

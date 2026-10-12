@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T14:12:02.097343+00:00",
+  "parent": "review-status-owner-context-20261011.patch",
+  "parent_sha256": "9d70e9fd8eab43bfd73c365c082f87187937aa8b01577ef46899ca55b8118b72",
+  "preimage_tree": "857853d0f395f378099804367d6e0d80656fc599",
+  "result_tree": "339d20a7b2d47c229ce1febea2285b02b46565b4",
+  "patch": "docs/plans/engine-cursor-contract/recovery/instruction-operator-composition-20261011.patch",
+  "sha256": "48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd",
+  "bytes": 13681,
+  "paths": [
+    "internal/engine/model.go",
+    "internal/engine/store.go",
+    "internal/engine/instruction_revision.go",
+    "internal/engine/instruction_revision_operator_test.go",
+    "docs/architecture/INSTRUCTION-LEARNING.md",
+    "docs/en/INSTRUCTION-LEARNING.md"
+  ],
+  "purpose": "Preserve immutable original and attributed learning when operator inputs change future-task Next; separable current operator base permits rejecting only the selected unused learning. Recognizable legacy prefixes recover; ambiguous edits and frozen attempts remain refused. Public events and historical hashes retained.",
+  "tests": "Three public-path regression cases failed before correction; all instruction tests now pass including replacement and atomic ambiguous-edit refusal. Full Go/race/vet/workflows qualification receipt separate.",
+  "limits": "Local correction, not native task acceptance or real UX verification; apply in worker-owned copy. No budgets, attempts, criteria or account limits changed.",
+  "preimage_extension": {
+    "path": "internal/engine/store.go",
+    "blob": "0ad8e9dbf372fdb405d1b121d362784ba5bf76d1",
+    "source_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "reason": "Sparse patch lineage had not tracked this existing, previously unchanged file."
+  },
+  "prior_packaging_diagnostic": "docs/plans/engine-cursor-contract/recovery/instruction-operator-composition-20261011-packaging-invalid.patch"
+}

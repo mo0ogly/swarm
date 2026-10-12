@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-12T15:08:51.951745+00:00",
+  "old_pid": 3975914,
+  "new_pid": 188619,
+  "old_sha256": "1cc9723d090ceea7b24458cb54fac498acb98c4fef31a1de24f173ee5279d174",
+  "installed_sha256": "476e602235d5f631eba521f6ab12e3f3dcd574b7d583a391018985c2d7c55b94",
+  "executed_sha256": "476e602235d5f631eba521f6ab12e3f3dcd574b7d583a391018985c2d7c55b94",
+  "source_digest": "55ca089bb9b8d6986593cd401c898d8194ad3a493eb2407dbe544230bc748300",
+  "schema": 31,
+  "idle_before": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 801,
+      "paused": false,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "idle_after": [
+    {
+      "work": "w-ca937edf4e0abd85f8d3d67b",
+      "revision": 803,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-fff7368010d114f6e2578985",
+      "revision": 31,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    },
+    {
+      "work": "w-5757437164b50815bee50a0c",
+      "revision": 55,
+      "paused": true,
+      "active_agents": [],
+      "active_reviews": [],
+      "holders": []
+    }
+  ],
+  "public_work_post_pause_bodies_exact": true,
+  "public_cli_init_for_contract_upgrade": false,
+  "direct_storage_operation_or_copy": false,
+  "private_log_mode": "0600",
+  "health": "ready",
+  "launch_allowed": true,
+  "scope": "Qualified read-only binary preflight inspection installed quiescent; mission paused for exact candidate inventory and explicit repair. Schema31 unchanged. No native acceptance inferred."
+}

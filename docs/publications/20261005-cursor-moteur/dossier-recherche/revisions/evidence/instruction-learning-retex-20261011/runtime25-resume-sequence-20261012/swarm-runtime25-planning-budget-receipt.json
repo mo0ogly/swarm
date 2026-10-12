@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-12T07:03:51.415181+00:00",
+  "revision": 628,
+  "consumed": 57,
+  "old_limit": 60,
+  "new_limit": 72,
+  "open_tasks": 7,
+  "allocation": 15,
+  "all_counters_preserved": true,
+  "user_authorization": "AGENTS.md current Cursor project explicit budget increase authority",
+  "limits": "Only Swarm supervision budget; provider account and independent acceptance unchanged."
+}

@@ -1,0 +1,84 @@
+{
+  "observed_at": "2026-10-11T07:48:28.116273+00:00",
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "revision": 96,
+  "mission_enabled": true,
+  "mission_paused": false,
+  "mission_observation_limit": "successive read-only public CLI observations, not an atomic cross-endpoint snapshot",
+  "task": "plan-ca937edf4e-T2",
+  "producer_attempts": 1,
+  "review": {
+    "id": "review-83368e7fc18d39d4c7968034",
+    "state": "running",
+    "candidate_commit": "56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9",
+    "attempt": "a-5fff6319655d0b5b9b34413a",
+    "started": "2026-10-11T07:37:41.67536118Z",
+    "finished": null,
+    "failure_code": null
+  },
+  "historical_reviews": 1,
+  "planning_retry": false,
+  "old_proof_integrity": {
+    ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/review-d69462672b530e6dad368bce-context.json": {
+      "before": "bb261b4e145ad17e8538eb85b0f73fd807bc4fd101ead495e8660260ef9535ef",
+      "after": "bb261b4e145ad17e8538eb85b0f73fd807bc4fd101ead495e8660260ef9535ef"
+    },
+    ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/review-d69462672b530e6dad368bce-report-948e0a7f068fb4715f6285e8f731219e20b268ca3c584f906614fe26524dabb5.md": {
+      "before": "be8b7b8186d64e4796caa77026b5b89cd244b51f7783e41ca2431f3131ed60f6",
+      "after": "be8b7b8186d64e4796caa77026b5b89cd244b51f7783e41ca2431f3131ed60f6"
+    },
+    ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/receipt.json": {
+      "before": "923ade83a2c9a327122b7e509cd7230782b64ca730c1e839fb54b75273cc1604",
+      "after": "923ade83a2c9a327122b7e509cd7230782b64ca730c1e839fb54b75273cc1604"
+    },
+    ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/review-d69462672b530e6dad368bce-plan.json": {
+      "before": "2a64a3bc4a2911e138667af0faca290e7464b9fcece550b892817a330c1d6fcc",
+      "after": "2a64a3bc4a2911e138667af0faca290e7464b9fcece550b892817a330c1d6fcc"
+    },
+    ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-0f7f61a183068fd63528-repair-7ee30d29ee8d98ec/fragment-journal-d38fc8e09ddcaadee20c885137f3361760ade3fec9115122a1e14aad3b7df9c7.json": {
+      "before": "d38fc8e09ddcaadee20c885137f3361760ade3fec9115122a1e14aad3b7df9c7",
+      "after": "d38fc8e09ddcaadee20c885137f3361760ade3fec9115122a1e14aad3b7df9c7"
+    }
+  },
+  "server_binary": {
+    "version": "devel",
+    "commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "modified": true,
+    "build_date": "2026-10-11T07:30:55Z",
+    "provenance": "injected"
+  },
+  "server_observed_at": "2026-10-11T07:40:45.416973421Z",
+  "public_changes": [
+    {
+      "operation": "planning retry-review",
+      "event_id": "review-protocol-repair-20261011",
+      "from_revision": 90,
+      "to_revision": 91,
+      "confirm_review_error_repair": true,
+      "calls_before": 10,
+      "calls_after_mutation": 10,
+      "required_fresh_calls": 5,
+      "available_at_preview": 20
+    },
+    {
+      "operation": "task update",
+      "event_id": "protocol-integration-T5-20261011",
+      "to_revision": 94
+    },
+    {
+      "operation": "mission start",
+      "enabled": true,
+      "paused": false,
+      "budget_change": false
+    },
+    {
+      "operation": "task update",
+      "event_id": "protocol-ux-T5-20261011",
+      "to_revision": 96,
+      "next_prefix_characters": 553,
+      "ui_implementation": "assigned to native T5, not implemented by this local patch"
+    }
+  ],
+  "acceptance": "T2 not accepted; fresh independent review running at observation",
+  "call_measurement": "11 reviewer calls recorded in public mission status; 30 limit unchanged; a reservation is not proof of a provider send"
+}

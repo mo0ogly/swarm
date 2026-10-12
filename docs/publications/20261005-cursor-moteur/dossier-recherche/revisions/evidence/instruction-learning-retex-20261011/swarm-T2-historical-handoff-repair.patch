@@ -1,0 +1,75 @@
+diff --git a/docs/plan-ca937edf4e-T2.md b/docs/plan-ca937edf4e-T2.md
+index 053e35be1e1b3cf18836d93f5296246637e595fc..403fac288d055239696e8ea821c39fae5dca06b4 100644
+--- a/docs/plan-ca937edf4e-T2.md
++++ b/docs/plan-ca937edf4e-T2.md
+@@ -253,3 +253,18 @@ Aucun fichier Go n'a été modifié par cette tentative : les cinq fichiers du j
+ `planning_judge_test.go`) proviennent intégralement de la fusion fast-forward du
+ résultat réparé attribué. Seule la définition externe du contrôle `plan-validation`
+ (hors de ce dépôt applicatif) et les preuves/rapports de cette copie ont changé.
++
++
++## Correction opérateur du handoff historique T1 — 11 octobre 2026
++
++La revue indépendante `review-dd11fa7937a5314dd9b58538` du candidat
++`39e89b169fc55255e828e66e765a0fee4ef91530` demande de corriger la ligne JAN-4
++du handoff T1, qui affirmait encore l’absence du Judge. Le handoff reçu dans
++le candidat est maintenant explicitement daté avant T2 ; JAN-4/JAN-5 décrivent
++les primitives Go et les tests doubles T2, avec leurs limites T3/T7. Les recherches
++négatives historiques ne sont pas effacées ni présentées comme observations
++du nouveau candidat. Seuls ce rapport et le handoff T1 changent ; les cinq Go
++et les sorties d’exécution T2 sont inchangés. Le refus, les trois tentatives,
++les avis et les appels consommés restent conservés. Cette correction externe
++n’est ni une nouvelle production autonome ni une acceptation ; les contrôles
++frais et la revue indépendante du nouvel arbre sont requis.
+diff --git a/docs/plans/engine-cursor-contract/evidence/T1-handoff.md b/docs/plans/engine-cursor-contract/evidence/T1-handoff.md
+index 236bf9d39b7762c578d6f029f6cdd54dd076643b..b8ed64a9103c2a93eae96e0ed1cd8e2dd1afb8da 100644
+--- a/docs/plans/engine-cursor-contract/evidence/T1-handoff.md
++++ b/docs/plans/engine-cursor-contract/evidence/T1-handoff.md
+@@ -1,5 +1,19 @@
+ # T1 — Confirmer les écarts et décider l'architecture de l'évolution
+ 
++## Mise à jour attribuée au lot T2 — 11 octobre 2026
++
++Correction opérateur du refus indépendant `review-dd11fa7937a5314dd9b58538`,
++lié au candidat `39e89b169fc55255e828e66e765a0fee4ef91530`. Les observations
++initiales ci-dessous décrivent la remise T1, avant T2, et restent historiques.
++Le candidat T2 ajoute `internal/engine/planning_judge.go` et ses sept tests
++`TestPlanningJudge*`, exécutés dans les sorties intégrales déclarées par T2.
++JAN-4/JAN-5 ont donc des primitives Go testées localement avec fournisseurs
++doubles. La conduite IA réelle et l’initialisation du Judge de cette mission
++restent à démontrer par T3/T7 ; cette correction ne les présente pas comme livrées.
++Les recherches négatives de T1 ne prouvent plus leur absence dans le candidat T2.
++Les preuves T1, leur auteur et les consommations sont conservés ; de nouveaux
++contrôles et une nouvelle revue du candidat corrigé restent obligatoires.
++
+ ## Identité et portée
+ 
+ - Mission : `w-ca937edf4e0abd85f8d3d67b` · Tâche : `plan-ca937edf4e-T1` · Agent : `auto-ed3d6ce2b54e02740a68` · Tentative : `a-29a7a2f21ea5f1f764409e08` (départ 2/2, dernière avant blocage définitif) · Révision du travail : 18.
+@@ -10,7 +24,7 @@
+ 
+ ## Outcome en deux phrases
+ 
+-Confirmation par lecture et tests Go réellement exécutés que les invariants de responsabilité, d'isolement et de remise (C1–C3, une partie de V1–V5) sont implémentés et testés sur le chemin dépôt géré, tandis que le juge de fin de cycle (JAN-4), le renouvellement global de contexte (JAN-5) et toute mesure de débit/coût (JAN-6, FEB-4) restent absents du code et non mesurés. Décision produite : adopter la hiérarchie continue de février comme socle (déjà implémentée) et y ajouter le juge global et le renouvellement de contexte comme points de contrôle Swarm distincts, plutôt que de construire un second modèle de cycles discrets ; étude eBPF ajoutée comme observabilité Linux optionnelle, sans collecteur privilégié installé par défaut.
++À la remise T1, avant le lot T2 : confirmation par lecture et tests Go réellement exécutés que les invariants de responsabilité, d'isolement et de remise (C1–C3, une partie de V1–V5) sont implémentés et testés sur le chemin dépôt géré, tandis que le juge de fin de cycle (JAN-4), le renouvellement global de contexte (JAN-5) et toute mesure de débit/coût (JAN-6, FEB-4) restent absents du code et non mesurés. Décision produite : adopter la hiérarchie continue de février comme socle (déjà implémentée) et y ajouter le juge global et le renouvellement de contexte comme points de contrôle Swarm distincts, plutôt que de construire un second modèle de cycles discrets ; étude eBPF ajoutée comme observabilité Linux optionnelle, sans collecteur privilégié installé par défaut.
+ 
+ ## Méthode de vérification locale (rejouée cette tentative)
+ 
+@@ -25,15 +39,15 @@ Les résultats exacts (sortie, code de sortie) des deux premières commandes, re
+ 
+ ## 1. Matrice JAN-1..JAN-7 — faits, hypothèses, preuves
+ 
+-Reprend et corrige la matrice de `docs/architecture/CURSOR-ENGINE-CONTRACT.md`, en séparant explicitement ce qui a été observé ce lot (fait), ce qui reste supposé (hypothèse) et la preuve exacte. **Contenu confirmé `pass` par la revue indépendante `review-849606d4679df263de116295` (critère 1) ; repris sans modification de fond.**
++Reprend et corrige la matrice de `docs/architecture/CURSOR-ENGINE-CONTRACT.md`, en séparant explicitement ce qui a été observé ce lot (fait), ce qui reste supposé (hypothèse) et la preuve exacte. **Contenu historique confirmé `pass` par la revue T1 `review-849606d4679df263de116295` (critère 1) ; JAN-4/JAN-5 mis à jour par la correction T2 attribuée ci-dessus, à réexaminer indépendamment.**
+ 
+ | ID | Comportement attendu (source) | Fait observé ce lot | Hypothèse restante | Preuve | Statut |
+ | --- | --- | --- | --- | --- | --- |
+ | JAN-1 | Planificateurs explorent continuellement le dépôt et créent des tâches. | Le responsable racine reçoit un `ProjectProfileStatus` en lecture (`internal/engine/project_profile.go`), une lecture ponctuelle, pas une boucle continue. | Une exploration *continue* (relance répétée sur découverte) n'existe pas comme mécanisme dédié observé. | Lecture de code ; aucun test d'exploration répétée exécuté. | PARTIAL |
+ | JAN-2 | Planification récursive et parallèle. | `PlanningScope` (`internal/engine/planning.go:34`) et les opérations de délégation existent ; `TestCursorContractRecursiveDelegationHandoffAndAdaptation` **PASS** (root→child→leaf, bornes profondeur 3 / 20 périmètres selon `docs/p0-cursor.md`). | Deux sous-planificateurs *simultanés* et actifs en parallèle, avec décisions persistées concurrentes, non observés (le test couvre la récursion, pas la concurrence réelle). | Test Go, `PASS`. | PARTIAL |
+ | JAN-3 | Workers terminent sans coordination directe, publient leurs changements. | `TestCursorContractHierarchicalWorkersCannotCrossTalkOrBecomePlanners` **PASS** ; `TestManagedRecoveryHandoffSuppliesRejectedWorkWithoutPublishingIt` et consorts **PASS**. | Le chemin d'intégration central sérialisé de Swarm (verrou, fusion, rejeu des contrôles) reste distinct du fonctionnement décrit par Cursor à grande échelle ; aucun débit mesuré. | Tests Go, `PASS`. | PARTIAL |
+-| JAN-4 | Juge de fin de cycle décide de la poursuite. | `rg` sur `judge`/`fin de cycle` : 0 occurrence dans tout `internal/`. | Aucune hypothèse de remplacement trouvée : ni la revue indépendante de candidat (V1–V5) ni la clôture de périmètre ne portent sur l'objectif global du cycle. | Recherche de code, résultat négatif. | NOT TESTED (absence confirmée, fonctionnalité non implémentée) |
+-| JAN-5 | L'itération suivante démarre avec un contexte frais. | Le même `rg` ne trouve aucun mécanisme de « nouveau cycle global ». Les projections par activation (prompt borné au périmètre/tâche) existent mais ne constituent pas un renouvellement de cycle documenté comme tel. | Un renouvellement localisé (par activation) existe peut-être déjà fonctionnellement sans porter ce nom ; non vérifié précisément. | Lecture de code, pas de test ciblé rejoué. | PARTIAL |
++| JAN-4 | Juge de fin de cycle décide de la poursuite. | Observation historique T1 : recherche négative. Mise à jour T2 : `PlanningJudgeState` et `planning_judge.go` ajoutés au candidat. | Conduite IA réelle et initialisation sur la mission existante à démontrer par T3/T7. | Sortie intégrale T2 `go-test-plan-validation.out` : sept `TestPlanningJudge*` PASS, dont verdict distinct et refus sans preuves fraîches, avec fournisseurs doubles. | PARTIAL — primitives Go testées localement ; constat d’absence T1 dépassé par T2 |
++| JAN-5 | L’itération suivante démarre avec un contexte frais. | Observation historique T1 : aucun cycle global trouvé. Mise à jour T2 : renouvellement durable du Judge et projection `global_cycle`. | Renouvellement IA réel sur cette mission à démontrer par T3/T7. | Sortie intégrale T2 `go-test-plan-validation.out` : `TestPlanningJudgeRenewalPreservesContextAndHistory` PASS avec fournisseur double. | PARTIAL — primitive locale testée ; constat T1 dépassé par T2 |
+ | JAN-6 | Débit accru sans attente centrale excessive. | Aucune instrumentation de latence/débit (`pprof`/`prometheus`/`expvar`) dans tout le dépôt. `docs/p0-cursor.md` documente un verrou d'intégration sérialisé volontaire. | Le plafond de 16 workers par mission cité dans le contrat FR n'a pas été revérifié dans le code. | `rg` négatif sur l'instrumentation ; constat qualitatif du verrou dans `docs/p0-cursor.md`. | NOT TESTED (non mesurable en l'état) |
+ | JAN-7 | Prompts et choix de modèle adaptés au rôle. | `docs/p0-cursor.md` documente des routes `assistantProvider` distinctes (Codex en lecture seule, outils Claude vidés pour le rôle responsable). Non revérifié dans le code ce lot. | Adéquation et endurance sur missions longues non démontrées. | Report de preuve historique, non rejouée ce lot. | NOT TESTED |
+ 

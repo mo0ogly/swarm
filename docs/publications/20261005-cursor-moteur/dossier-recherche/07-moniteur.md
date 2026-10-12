@@ -163,3 +163,47 @@ correction ciblée et le moteur a lancé la deuxième tentative de T1. La
 les réglages, la vérification, les limites et l'essai comparatif proposé.
 Cette observation après incident ne constitue ni une nouvelle campagne
 pré-enregistrée ni une preuve d'absence générale de blocages.
+
+## 7.7 Refus répété et dossier incomplet — observation du 10 octobre 2026
+
+Sur la même tâche Cursor, deux revues achevées rendent le critère 3 `unknown` :
+le producteur cite une source inchangée, mais son contenu n'est pas joint au
+vérificateur. La première correction supervisée ajoute des citations sans
+résoudre cette absence ; la seconde tentative consomme donc le budget restant.
+Le superviseur a traité les retours et respecté les limites, mais n'a pas rendu
+le dossier vérifiable. La [note d'étude](revisions/20261010-refus-contexte-revue.md)
+sépare cette cause de la coupure de durée, conserve les deux avis et examine
+la transmission explicite du blob source par le mécanisme existant.
+La réparation externe est manuelle. Une revue fraîche valide ensuite les quatre
+critères et le moteur accepte T1, sans hausse de budget. Ce résultat ne vaut ni
+récupération autonome ni faux négatif démontré du vérificateur.
+
+Le [correctif global ultérieur](revisions/20261010-correction-globale-preuves.md)
+traite les déclarations de preuve dans le moteur et remet un inventaire aux
+responsables racine et enfants. Ses essais de protocole et son installation sont
+distincts de la reprise manuelle de T1 ; aucun gain statistique n'est établi.
+
+## 7.8 Le temps observe ; le responsable décide — 11 octobre 2026
+
+T2 a été coupé après 1 800 secondes pendant un test, avec 78 appels sur 80. Ce
+fait ne démontre aucun achèvement ni absence de progrès. La décision utilisateur
+retire cette fonction aux deux superviseurs techniques de production : durée
+totale et attente d’outil alimentent désormais la boîte de réception du responsable,
+avec décisions structurées de continuation ou d’arrêt et attribution à la tentative.
+Les budgets restent distincts. Le [contrat d’architecture](../../../architecture/RUN-SUPERVISION.md)
+explique les rôles, la concurrence et l’indisponibilité ; la
+[note datée](revisions/20261011-run-supervision.md) distingue reproduction, tests,
+installation et absence actuelle d’acceptation native de T2.
+
+## 7.9 Consignes récursives, frontière du contexte et RETEX — 11 octobre 2026
+
+La [révision documentée](revisions/20261011-instruction-learning-retex.md)
+relie les retours reçus à des ajouts attribués pour les prochaines tâches,
+appliqués par défaut et rejetables par l’utilisateur avant transmission. Elle
+explicite la phase facultative RETEX et quick wins après recette fraîche, puis
+la préparation d’un nouvel incrément au choix. Les tests publics et navigateur
+sont distingués de l’usage autonome encore à qualifier avec un fournisseur réel.
+La reprise du responsable a aussi révélé une contamination de son lot d’entrées
+par une tentative historique : la correction sépare les entrées actuelles du
+contexte historique et réserve son acquittement à une décision sans opération.
+L’autorisation utilisateur d’ajuster les budgets n’efface aucun coût ou refus.

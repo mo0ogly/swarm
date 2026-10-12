@@ -62,9 +62,29 @@ that check:
 swarm --root /path/to/project --json providers cooldown clear claude --input check.json
 ```
 
-The command records the reason and local operator. It refuses to clear a known
-future deadline. It launches no agents, accepts no results and does not prove
-quota recovery. If the state changed after `show`, read it again.
+The command records the reason and local operator. By default it refuses to clear
+a known future deadline. It launches no agents, accepts no results and does not
+prove quota recovery. If the state changed after `show`, read it again.
+
+## After a confirmed account change
+
+The hold belongs to the account that rejected the call. When the user confirms
+an account change and requests resumption, the operator may add
+`"confirm_account_change": true` to the same public request, using the current
+digest and a reason attributed to that confirmation. This new precondition permits
+clearing the former account’s future hold. An active login, an agent’s statement
+or a successful test never implicitly provides this confirmation.
+
+The engine archives the complete original rejection, preserves its deadline,
+source and timestamp, and records `clear_account_change`, reason and operator.
+No consumption, call, attempt or budget is reset. Clearing the hold and resuming
+a review remain separate operations: explicit recovery still verifies the candidate,
+proofs and available calls. The next real call establishes availability; a new
+429 rejection blocks again. Replaying an event with changed confirmation is refused.
+
+Replace older controllers that cannot read this provenance before use; incompatible
+reads fail rather than ignoring the protection. No account identifier or secret
+is stored in the evidence.
 
 ## Current coverage
 

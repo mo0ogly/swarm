@@ -1,0 +1,12 @@
+--- FAIL: TestNewProductionArchivesPriorIndependentReview (0.16s)
+    review_attempt_lifecycle_test.go:28: new attempt retained an old current opinion or lost history
+--- FAIL: TestLegacyPriorReviewDoesNotBlockPublicPreflight (5.21s)
+    --- FAIL: TestLegacyPriorReviewDoesNotBlockPublicPreflight/changes_requested (1.06s)
+        review_attempt_lifecycle_test.go:35: sizes 164551 168165 21899 parts 1
+        review_attempt_lifecycle_test.go:63: legacy preflight state=changes_requested code=400: aucun précontrôle de revue impayé à reprendre
+    --- FAIL: TestLegacyPriorReviewDoesNotBlockPublicPreflight/error (0.95s)
+        review_attempt_lifecycle_test.go:35: sizes 164551 168165 21899 parts 1
+        review_attempt_lifecycle_test.go:63: legacy preflight state=error code=400: aucun précontrôle de revue impayé à reprendre
+FAIL
+FAIL	swarm.local/companion/internal/engine	5.476s
+FAIL

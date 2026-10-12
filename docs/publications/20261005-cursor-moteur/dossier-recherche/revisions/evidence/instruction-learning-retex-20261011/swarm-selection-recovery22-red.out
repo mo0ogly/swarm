@@ -1,0 +1,10 @@
+--- FAIL: TestSelectionCapacityRecoverySupervisorReceivesDecidesAndHasActualEffect (1.71s)
+    --- FAIL: TestSelectionCapacityRecoverySupervisorReceivesDecidesAndHasActualEffect/root (0.85s)
+        managed_review_selection_capacity_recovery_test.go:58: sizes 164551 168167 21899 parts 1
+        managed_review_selection_capacity_recovery_test.go:76: supervisor did not receive verified changed selection precondition {map[] map[]}
+    --- FAIL: TestSelectionCapacityRecoverySupervisorReceivesDecidesAndHasActualEffect/child (0.86s)
+        managed_review_selection_capacity_recovery_test.go:58: sizes 164551 168167 21899 parts 1
+        managed_review_selection_capacity_recovery_test.go:58: périmètre invalide
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.741s
+FAIL

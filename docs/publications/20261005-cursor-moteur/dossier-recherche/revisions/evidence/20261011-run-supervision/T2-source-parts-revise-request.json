@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-unpaid-preflight-source-parts-revision-20261011",
+  "expected_revision": 114,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-f2abbcfe6bed66fd1a5e",
+  "attempt_id": "a-a349f9134d355713576b7166",
+  "confirm_recovery": true,
+  "result_tree": "6add0b67cfcc588f64bd92d1c2100cc29940b533",
+  "reason": "Correction explicite du précontrôle de contexte impayé conservé : le manifeste source est découpé en quatre tableaux JSON avec SHA-256, les 1049 entrées et leur digest complet conservés ; aucun contenu ni plafond retiré. Le résultat original 60bdc8ad5b395b5abc972eb701ff244faed45e69, son candidat contrôlé, ses reçus et références restent conservés. Tests ciblés de partition et juge PASS ; suite complète du candidat 1096 cibles/19 groupes PASS. Le processus reste interrupted, deux essais et 78/80 appels conservés ; aucune nouvelle production. Nouvelle révision examinée après correction testée du parcours strict de précontrôle sans appel : contrôles et revue indépendante ordinaires frais obligatoires, dans les 19 appels encore disponibles. Réparation opérateur, aucune autonomie ou acceptation déclarée."
+}

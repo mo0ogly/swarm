@@ -1,0 +1,30 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff|TestPlanningJudge",
+    "-count=1",
+    "-timeout",
+    "25s",
+    "-v"
+  ],
+  "start": "2026-10-11T19:56:45.391400+00:00",
+  "end": "2026-10-11T19:57:02.882998+00:00",
+  "exit": 0,
+  "wall_seconds": 17.491583274997538,
+  "package_elapsed_reported": "7.274s",
+  "stdout_path": "docs/plans/engine-cursor-contract/evidence/T2-execution/traceability-repair-20261011/producer-targeted-v2.out",
+  "stdout_sha256": "6834fc81f27d4733708a6eb135f03e7a41f13ebdfaebade9e2432df2231bcd81",
+  "go_source_drift": [],
+  "original_index_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "distinct_from_engine_plan_validation": true,
+  "scope": "Inactive attributed producer source only; no native DB fixture/copy/edit; targeted new local receipt, independent controls and acceptance still required",
+  "executor": "Codex operator, inactive attributed T2 producer workspace",
+  "source_go_manifest_sha256": "46d5667a01bd38a935c49b19097fe89d3fe95f305a2093de3a46f4eaaa89acd4",
+  "source_go_files": 517,
+  "source_go_manifest_original": "operator archive / T2-traceability-originals-20261011 / producer-targeted-v2-started.json",
+  "native_controls_are_distinct_runs": true,
+  "no_native_independent_verdict_claimed": true
+}

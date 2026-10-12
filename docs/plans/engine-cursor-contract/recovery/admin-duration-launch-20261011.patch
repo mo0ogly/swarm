@@ -1,0 +1,207 @@
+diff --git a/docs/architecture/RUN-SUPERVISION.md b/docs/architecture/RUN-SUPERVISION.md
+index 8589554..f1482c5 100644
+--- a/docs/architecture/RUN-SUPERVISION.md
++++ b/docs/architecture/RUN-SUPERVISION.md
+@@ -156,3 +156,19 @@ Cette documentation oriente les lots suivants ; elle ne remplace pas leurs preuv
+ Le contrat complète [le protocole IA/moteur](AGENT-ENGINE-PROTOCOL.md),
+ [la reprise autorécursive](AUTORECURSIVE-RECOVERY.md) et
+ [le parallélisme](AGENT-PARALLELISM.md).
++
++## Valeurs Admin effectivement reçues au lancement
++
++Les seuils `tool_seconds` et `silence_seconds` explicitement enregistrés dans
++Admin remplacent les valeurs d’observation par défaut du fournisseur et celles
++de la tentative précédente pour un nouveau départ. Un délai explicite plus court
++dans la requête de lancement reste conservé. Le moteur relit ces réglages dans
++la transaction de réservation : un changement pendant le préflight ne fige pas
++un ancien seuil. Les valeurs et les directives de commande sont alors gelées
++dans l’agent réellement créé ; modifier Admin ensuite ne réécrit pas sa session.
++
++Les plafonds d’appels, d’erreurs, de répétitions, de plan et de reprise restent
++restrictifs. Une augmentation de seuil temporel ne leur accorde aucun budget et
++ne modifie aucune limite de compte du fournisseur. L’absence de valeur Admin
++explicite conserve l’héritage et les plafonds historiques. Ce choix corrige le
++cas mesuré où Admin indiquait900s mais le nouveau prompt restait limité à300s.
+diff --git a/docs/en/RUN-SUPERVISION.md b/docs/en/RUN-SUPERVISION.md
+index ede09fc..5fd315d 100644
+--- a/docs/en/RUN-SUPERVISION.md
++++ b/docs/en/RUN-SUPERVISION.md
+@@ -126,3 +126,18 @@ not prove autonomous real-model conduct or T2 acceptance. Exact receipts and
+ installation state are recorded in the [dated research note](../publications/20261005-cursor-moteur/dossier-recherche/revisions/20261011-run-supervision.md).
+ See [AI/engine protocol](AGENT-ENGINE-PROTOCOL.md),
+ [recursive recovery](AUTORECURSIVE-RECOVERY.md) and [parallelism](AGENT-PARALLELISM.md).
++
++## Admin values actually received by a launch
++
++Explicit Admin `tool_seconds` and `silence_seconds` values replace provider
++default observation thresholds and historical attempt thresholds for a new
++launch. An explicitly smaller launch request remains effective. The engine
++re-reads these settings in the reservation transaction, preventing stale
++preflight settings from entering the new context. Values and command directives
++are frozen into the actual agent; subsequent Admin changes never rewrite it.
++
++Tool-call, error, repetition, plan and retry ceilings remain restrictive. Raising
++a time threshold adds no call budget and changes no provider account limits.
++Without an explicit Admin value, inheritance and historical ceilings remain.
++This addresses the measured case where Admin reported900s while a newly created
++agent prompt still required300s.
+diff --git a/internal/engine/agents_store.go b/internal/engine/agents_store.go
+index 7bd28e9..6c3b6d8 100644
+--- a/internal/engine/agents_store.go
++++ b/internal/engine/agents_store.go
+@@ -557,7 +557,11 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
+ 	if r.Limits != nil {
+ 		missionLimits = *r.Limits
+ 	}
+-	limits, e := p.Limits.tightened(missionLimits)
++	initialAdmin, e := configuredRunLimitsWith(s.db, work, r.Role, r.TaskID)
++	if e != nil {
++		return a, false, e
++	}
++	limits, e := administrativeDurationThresholds(p.Limits, initialAdmin).tightened(missionLimits)
+ 	if e != nil {
+ 		return a, false, e
+ 	}
+@@ -619,8 +623,12 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
+ 	if r.Mode == "terminal" && adminLimits != (RunLimits{}) {
+ 		return a, false, fmt.Errorf("Limites administratives incompatibles avec le terminal natif ; utiliser le mode automatisé.")
+ 	}
+-	// Administrative preferences never raise provider, explicit mission,
+-	// plan or retry ceilings. Freeze them with the launch reservation.
++	// Re-resolve on the reservation snapshot. Explicit administrative time
++	// thresholds apply to new contexts; call/error ceilings remain restrictive.
++	limits, e = administrativeDurationThresholds(p.Limits, adminLimits).tightened(missionLimits)
++	if e != nil {
++		return a, false, e
++	}
+ 	limits = limits.cappedBy(adminLimits)
+ 	limits.ObservationMode = adminLimits.ObservationMode
+ 	var paused bool
+@@ -791,6 +799,15 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
+ 		}
+ 		// A retry from any interface keeps the tighter previous ceilings.
+ 		limits = limits.cappedBy(previous.Limits)
++		// An explicit current duration policy may replace the historical
++		// observation threshold, without raising any consumed/call budget.
++		limits = administrativeDurationThresholds(limits, adminLimits)
++		if missionLimits.ToolSeconds > 0 && missionLimits.ToolSeconds < limits.ToolSeconds {
++			limits.ToolSeconds = missionLimits.ToolSeconds
++		}
++		if missionLimits.SilenceSeconds > 0 && missionLimits.SilenceSeconds < limits.SilenceSeconds {
++			limits.SilenceSeconds = missionLimits.SilenceSeconds
++		}
+ 		if previous.Timeout > 0 && previous.Timeout < r.Timeout {
+ 			r.Timeout = previous.Timeout
+ 		}
+diff --git a/internal/engine/run_limits_admin.go b/internal/engine/run_limits_admin.go
+index a97584d..2ea1120 100644
+--- a/internal/engine/run_limits_admin.go
++++ b/internal/engine/run_limits_admin.go
+@@ -340,3 +340,15 @@ func (s *Store) executionObserved(work, task string) bool {
+ 	l, err := configuredRunLimitsWith(s.db, work, "worker", task)
+ 	return err == nil && l.observing()
+ }
++
++// Operator time thresholds are policy values for the next launch, not provider
++// account limits. Zero inherits. Tool/call/error budgets are handled separately.
++func administrativeDurationThresholds(base, admin RunLimits) RunLimits {
++	if admin.ToolSeconds > 0 {
++		base.ToolSeconds = admin.ToolSeconds
++	}
++	if admin.SilenceSeconds > 0 {
++		base.SilenceSeconds = admin.SilenceSeconds
++	}
++	return base
++}
+diff --git a/internal/engine/run_limits_duration_launch_test.go b/internal/engine/run_limits_duration_launch_test.go
+new file mode 100644
+index 0000000..db4a915
+--- /dev/null
++++ b/internal/engine/run_limits_duration_launch_test.go
+@@ -0,0 +1,86 @@
++//go:build linux
++
++package engine
++
++import (
++	"strings"
++	"testing"
++	"time"
++)
++
++func TestAdminDurationThresholdFrozenIntoLaunch(t *testing.T) {
++	s := storeTest(t)
++	w, r := setupAgent(t, s)
++	_, err := s.configureRunLimits(RunLimitsConfigChange{Schema: 1, EventID: "duration900", Scope: ScopeTask, Mission: w.ID, Key: r.TaskID, Values: RunLimits{ToolSeconds: 900, MaxToolCalls: 40}, Reason: "Operator authorizes a long verification command"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	a, _, err := s.prepare(w.ID, r)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if a.Limits.ToolSeconds != 900 || a.Limits.MaxToolCalls != 40 || !strings.Contains(a.Prompt, "au plus 900 secondes") {
++		t.Fatalf("admin duration not frozen into actual launch: %+v", a.Limits)
++	}
++	_, err = s.configureRunLimits(RunLimitsConfigChange{Schema: 1, EventID: "duration1200", Scope: ScopeTask, Mission: w.ID, Key: r.TaskID, Revision: 1, Values: RunLimits{ToolSeconds: 1200, MaxToolCalls: 40}, Reason: "Next attempt only"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	stored, err := s.agent(a.ID)
++	if err != nil || stored.Limits.ToolSeconds != 900 || stored.Prompt != a.Prompt {
++		t.Fatal("live context rewritten by admin change", err)
++	}
++}
++
++func TestAdminDurationThresholdRetryOverridesHistoricalDurationOnly(t *testing.T) {
++	s := storeTest(t)
++	w, r := setupAgent(t, s)
++	r.Limits = &RunLimits{MaxToolCalls: 30}
++	a, _, err := s.prepare(w.ID, r)
++	if err != nil {
++		t.Fatal(err)
++	}
++	a.Heartbeat = time.Now().Add(-time.Minute).UTC().Format(time.RFC3339Nano)
++	if err = s.saveAgent(a); err != nil {
++		t.Fatal(err)
++	}
++	if err = s.reconcile(a.ID); err != nil {
++		t.Fatal(err)
++	}
++	_, err = s.configureRunLimits(RunLimitsConfigChange{Schema: 1, EventID: "retry-duration900", Scope: ScopeTask, Mission: w.ID, Key: r.TaskID, Values: RunLimits{ToolSeconds: 900, MaxToolCalls: 80}, Reason: "Explicitly authorize longer next verification, retain call budget"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	w, err = s.get(w.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	r.EventID = "retry-new-duration"
++	r.Revision = w.Revision
++	r.Previous = a.ID
++	r.Limits = nil
++	next, _, err := s.prepare(w.ID, r)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if next.Limits.ToolSeconds != 900 || next.Limits.MaxToolCalls != 30 || a.Limits.ToolSeconds != 300 {
++		t.Fatalf("retry duration or historical call ceiling incorrect: old=%+v next=%+v", a.Limits, next.Limits)
++	}
++}
++
++func TestAdminDurationThresholdRetainsExplicitSmallerLaunch(t *testing.T) {
++	s := storeTest(t)
++	w, r := setupAgent(t, s)
++	_, err := s.configureRunLimits(RunLimitsConfigChange{Schema: 1, EventID: "explicit-duration900", Scope: ScopeTask, Mission: w.ID, Key: r.TaskID, Values: RunLimits{ToolSeconds: 900}, Reason: "Operator threshold"})
++	if err != nil {
++		t.Fatal(err)
++	}
++	r.Limits = &RunLimits{ToolSeconds: 120}
++	a, _, err := s.prepare(w.ID, r)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if a.Limits.ToolSeconds != 120 {
++		t.Fatalf("explicit smaller launch ignored: %+v", a.Limits)
++	}
++}

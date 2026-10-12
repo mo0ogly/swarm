@@ -1,0 +1,206 @@
+diff --git a/docs/architecture/AUTORECURSIVE-RECOVERY.md b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+index a2f9b13..a296eaa 100644
+--- a/docs/architecture/AUTORECURSIVE-RECOVERY.md
++++ b/docs/architecture/AUTORECURSIVE-RECOVERY.md
+@@ -172,8 +172,18 @@ La transaction vérifie attribution, droits, candidat, budget et capacité de
+ transmission avant tout appel. Les réservations et originaux restent conservés.
+ Un diagnostic de plusieurs défauts pour une même pièce rappelle la contrainte
+ existante d'une entrée par pièce en échec, sans fabriquer un nouvel avis.
+-Les lecteurs actuels conservent les anciens journaux sans directive ; un ancien
+-lecteur strict refuse les champs nouveaux plutôt que de les interpréter.
++Les lecteurs actuels conservent les anciens journaux sans directive. La lecture
++stricte des journaux ne protège pas à elle seule le corps JSON du travail : un
++ancien processus peut ignorer puis perdre un champ inconnu lors d'une écriture.
++Le contrat de stockage passe donc en version 28 avec sauvegarde privée, sans
++réécrire le travail, ses événements, sa révision ou ses consommations. La consultation
++avec migration désactivée refuse une ancienne version ; chaque mutation contrôle
++la version sous la réservation d'écriture, avant décodage et effets du callback.
++Un ancien CLI refuse une version future dès l'ouverture. Avant la migration publique
++par `swarm init`, l'opérateur doit arrêter les anciens processus après réconciliation
++et absence d'acteurs actifs ; un processus ancien déjà ouvert ne reçoit pas
++rétroactivement cette nouvelle protection. Les tests de migration et de connexion
++périmée utilisent exclusivement des racines isolées.
+ 
+ ```mermaid
+ sequenceDiagram
+diff --git a/docs/en/AUTORECURSIVE-RECOVERY.md b/docs/en/AUTORECURSIVE-RECOVERY.md
+index c8eacb4..46ad4bf 100644
+--- a/docs/en/AUTORECURSIVE-RECOVERY.md
++++ b/docs/en/AUTORECURSIVE-RECOVERY.md
+@@ -155,7 +155,16 @@ The transaction checks attribution, authority, freshness, budget and input capac
+ before any call. Original evidence and spent reservations are retained. Diagnostic
+ feedback for multiple defects on one artifact states the existing one-entry-per-failed-
+ artifact rule without inventing an opinion. Current readers preserve old journals
+-without directives; older strict readers reject the new fields rather than interpret them.
++without directives. Strict journal decoding alone does not protect Work JSON:
++an old process can ignore an unknown field and drop it on its next write.
++Storage contract version 28 therefore creates a private backup without rewriting
++work, events, revision or consumption. Non-migrating reads reject older storage;
++each mutation checks the version under the writer reservation before decoding or
++invoking callbacks. Older CLIs reject future versions when opening storage. Before
++public migration through `swarm init`, the operator must stop older processes after
++reconciliation and confirming no active actors; already-open older binaries cannot
++retroactively acquire the new guard. Migration and stale-connection tests run only
++in isolated roots.
+ 
+ ```mermaid
+ sequenceDiagram
+diff --git a/internal/engine/managed_review_retry_storage_test.go b/internal/engine/managed_review_retry_storage_test.go
+new file mode 100644
+index 0000000..722a7cb
+--- /dev/null
++++ b/internal/engine/managed_review_retry_storage_test.go
+@@ -0,0 +1,98 @@
++//go:build linux
++
++package engine
++
++import (
++	"os"
++	"path/filepath"
++	"strconv"
++	"testing"
++)
++
++func TestReviewRetryStorageMigrationPreservesQueuedInstruction(t *testing.T) {
++	s, w, a := planningProtocolReviewFixture(t)
++	w, request := planningClaim(t, s, w, "root")
++	request.Operations = []PlanningOperation{{Kind: "review-retry", ID: a.TaskID, Next: "Keep the authorized supervisor correction across a storage upgrade."}}
++	after, err := s.planningChange(w.ID, "decide", request)
++	if err != nil {
++		t.Fatal(err)
++	}
++	var before []byte
++	if err = s.db.QueryRow("SELECT body FROM works WHERE id=?", w.ID).Scan(&before); err != nil {
++		t.Fatal(err)
++	}
++	if _, err = s.db.Exec("PRAGMA user_version=27"); err != nil {
++		t.Fatal(err)
++	}
++	if err = s.db.Close(); err != nil {
++		t.Fatal(err)
++	}
++	reader, err := openStoreWithMigration(s.root, false, false)
++	if err == nil {
++		reader.db.Close()
++		t.Fatal("v27 writer-compatible storage still allows losing the newly saved review instruction")
++	}
++	if commandFailure(err).Code != "storage_upgrade_required" {
++		t.Fatal(err)
++	}
++	upgraded, err := openStoreWithMigration(s.root, false, true)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer upgraded.db.Close()
++	var body []byte
++	if err = upgraded.db.QueryRow("SELECT body FROM works WHERE id=?", w.ID).Scan(&body); err != nil {
++		t.Fatal(err)
++	}
++	if string(body) != string(before) {
++		t.Fatal("migration rewrote original mission evidence")
++	}
++	current, err := upgraded.get(w.ID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	task, _ := current.task(a.TaskID)
++	if task.IndependentReview.FragmentJournal.RetryDirective == nil || task.IndependentReview.FragmentJournal.RetryDirective.Decision != request.EventID || current.Revision != after.Revision || current.Planning.Reviewer.Calls != after.Planning.Reviewer.Calls {
++		t.Fatal("queued instruction, revision or consumption lost")
++	}
++	backups, err := filepath.Glob(filepath.Join(s.root, ".swarm", "state-pre-v28-*.db"))
++	if err != nil || len(backups) != 1 {
++		t.Fatal("original migration backup missing", err)
++	}
++	stat, err := os.Stat(backups[0])
++	if err != nil || stat.Mode().Perm() != 0600 {
++		t.Fatal("migration evidence is not private", err)
++	}
++}
++
++func TestReviewRetryConnectedWriterRejectsChangedStorageBeforeMutation(t *testing.T) {
++	s, w, _ := planningProtocolReviewFixture(t)
++	var before []byte
++	if err := s.db.QueryRow("SELECT body FROM works WHERE id=?", w.ID).Scan(&before); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := s.db.Exec("PRAGMA user_version=" + strconv.Itoa(schemaVersion+1)); err != nil {
++		t.Fatal(err)
++	}
++	_, err := s.mutate(w.ID, "fixture.version", "changed-storage-must-not-write", w.Revision, []byte(`{}`), func(current *Work) error {
++		current.Title = "Must not be written by the outdated connected process"
++		return nil
++	})
++	if err == nil {
++		t.Fatal("outdated open connection rewrote newer mission storage")
++	}
++	if commandFailure(err).Code != "storage_version_conflict" {
++		t.Fatal(err)
++	}
++	var after []byte
++	if err = s.db.QueryRow("SELECT body FROM works WHERE id=?", w.ID).Scan(&after); err != nil {
++		t.Fatal(err)
++	}
++	var count int
++	if err = s.db.QueryRow("SELECT count(*) FROM events WHERE id=?", "changed-storage-must-not-write").Scan(&count); err != nil {
++		t.Fatal(err)
++	}
++	if string(before) != string(after) || count != 0 {
++		t.Fatal("storage rejection mutated mission or event history")
++	}
++}
+diff --git a/internal/engine/model.go b/internal/engine/model.go
+index 8c11a90..a70fd95 100644
+--- a/internal/engine/model.go
++++ b/internal/engine/model.go
+@@ -11,7 +11,7 @@ import (
+ 	"time"
+ )
+ 
+-const schemaVersion = 27
++const schemaVersion = 28
+ 
+ type ManualOverride struct {
+ 	Reason         string `json:"reason"`
+diff --git a/internal/engine/store.go b/internal/engine/store.go
+index 3749b52..b4713a8 100644
+--- a/internal/engine/store.go
++++ b/internal/engine/store.go
+@@ -341,6 +341,19 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
+ 			return fail(e)
+ 		}
+ 	}
++	// Version 28 reserves the Work JSON contract for attributed review-retry
++	// directives. Older binaries ignore unknown JSON fields and could erase a
++	// queued supervisor decision before a strict journal entry is written.
++	if version < 28 {
++		if version != 0 {
++			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v28-")+".db")); e != nil {
++				return fail(e)
++			}
++		}
++		if _, e = db.Exec("PRAGMA user_version=28"); e != nil {
++			return fail(e)
++		}
++	}
+ 	if e = os.Chmod(path, 0600); e != nil {
+ 		return fail(e)
+ 	}
+@@ -516,6 +529,17 @@ func (s *Store) mutateWithHookOnce(id, kind, event string, expected int, request
+ 		return w, e
+ 	}
+ 
++	// Opening-time validation does not protect a process whose connection
++	// predates a storage upgrade. Check under the writer reservation, before
++	// decoding or rewriting Work JSON or invoking mutation hooks.
++	var version int
++	if e = tx.QueryRow("PRAGMA user_version").Scan(&version); e != nil {
++		return w, e
++	}
++	if version != schemaVersion {
++		return w, &CommandError{Code: "storage_version_conflict", Message: fmt.Sprintf("Stockage version %d, processus version %d : écriture refusée. Arrêtez les anciens processus puis utilisez le CLI du serveur actif.", version, schemaVersion)}
++	}
++
+ 	var oldID, oldKind string
+ 	var oldRequest []byte
+ 	e = tx.QueryRow("SELECT work_id,kind,request FROM events WHERE id=?", event).Scan(&oldID, &oldKind, &oldRequest)

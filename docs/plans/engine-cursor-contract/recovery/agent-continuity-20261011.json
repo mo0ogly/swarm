@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-11T08:20:30.630237+00:00",
+  "patch": "docs/plans/engine-cursor-contract/recovery/agent-continuity-20261011.patch",
+  "sha256": "c644c794682b6878b278c7b3d9f4604051e350f3a7320cf930c3047c91738755",
+  "bytes": 7266,
+  "parent_patches": [
+    "agent-engine-protocol-20261011.patch",
+    "agent-engine-protocol-resumption-20261011.patch"
+  ],
+  "files": [
+    "AGENTS.md",
+    ".claude/skills/replan/SKILL.md",
+    "tools/agent-workflows/CONTRACT.md",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md"
+  ],
+  "checks": {
+    "parent_reconstruction_and_application": "exit 0; resulting five files byte-identical to local sources",
+    "reverse_check": "exit 0",
+    "workflow_contexts": "four roles bounded; actual worker delivery and reopen test exit 0",
+    "skill_metadata": "personal/project replan validated",
+    "limits": "guidance only; no engine autonomy or native task acceptance claimed; live frozen contexts unchanged"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-exact-quote-method-restart-20261011",
+  "expected_revision": 165,
+  "task_id": "plan-ca937edf4e-T2",
+  "review_id": "review-6eadd171c67897f10f4ec754",
+  "reason": "Méthode corrigée et installée, build2026-10-11T11:02:33Z, code-reviewer exige maintenant copie byte-for-byte des citations à la ligne physique originale, espaces et signes inclus (x ; diffère de x;). Erreur actuelle de protocole : citation française perdant l’espace avant point-virgule, aucun verdict valide. Confirmer la nouvelle revue complète du même candidat d405c0ee9479fb26521fc6041cc6932f9929a3a1 selon aperçu public method_restart_ready,7 appels nécessaires/15 disponibles ; archiver l’ancienne revue, conserver raw et tous les appels, ne réutiliser aucune observation. Aucune nouvelle production, aucune acceptation fabriquée. Le contexte racine dépassant sa taille est un défaut distinct en correction.",
+  "confirm_review_error_repair": true
+}

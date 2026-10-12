@@ -1,0 +1,1422 @@
+[
+  {
+    "path": "internal/engine/cli_help_topics_test.go",
+    "kind": "test",
+    "sha256": "8c795163b8db7406b7f26fa9dcad4a6132cdc433b4b954d2fcc00ca56a390cd0"
+  },
+  {
+    "path": "internal/engine/cockpit_service.go",
+    "kind": "source",
+    "sha256": "10a8dfa137035a50a808d333a4befbb2596760bbe3b406ad1ce4e80b171770b1"
+  },
+  {
+    "path": "internal/engine/cockpit_service_test.go",
+    "kind": "test",
+    "sha256": "7a15404486a197318bab8d169c38ed4422dec96e63d2fdecde65fb2967562333"
+  },
+  {
+    "path": "internal/engine/companion_test.go",
+    "kind": "test",
+    "sha256": "432de600d183455ce95ab9c1b4bc436cb11ca360de76e9b68914539b3a887799"
+  },
+  {
+    "path": "internal/engine/completion_clarity_test.go",
+    "kind": "test",
+    "sha256": "bb77ca4e55926d6a2970d98edd2387d2bd1ffab14cd8f1b1a420b2c3da41785e"
+  },
+  {
+    "path": "internal/engine/conductor.go",
+    "kind": "source",
+    "sha256": "ec8d3907172e70475ffe28b9abab3cfbef1715ebaf74405531a0dbe18118ead5"
+  },
+  {
+    "path": "internal/engine/conductor_managed_conflict_test.go",
+    "kind": "test",
+    "sha256": "f1d53b6958462287bf500a2326db6821fc425d11d1360b3db658a1bee1279868"
+  },
+  {
+    "path": "internal/engine/conductor_test.go",
+    "kind": "test",
+    "sha256": "e57d981d707ccd5f36e275e452523caaf55c6bdd275d49e24ce76a87f72e7827"
+  },
+  {
+    "path": "internal/engine/console.go",
+    "kind": "source",
+    "sha256": "3f594018c49f272093da0e02f01a13d05daf43379a58b12e93e5ed217543a640"
+  },
+  {
+    "path": "internal/engine/console_cli.go",
+    "kind": "source",
+    "sha256": "014a25e57ca2af8f022dbdd7e4caeca432777ee82dcaa7ac63f19ed9ef7a7103"
+  },
+  {
+    "path": "internal/engine/console_conduite.go",
+    "kind": "source",
+    "sha256": "265bbd3e92539852cf5ee5923e777de88fdd43e37f3a4694adaf6e5674b8ed06"
+  },
+  {
+    "path": "internal/engine/console_conduite_test.go",
+    "kind": "test",
+    "sha256": "e937324cfdd8b808d8325200ddbda6edd7b7c5a9e9a5f0b7f1edefea3e9e1c21"
+  },
+  {
+    "path": "internal/engine/console_dialog.go",
+    "kind": "source",
+    "sha256": "1c3741d829440edba725aad5cffc42c2689b6c5b50d32a663360b267158956f5"
+  },
+  {
+    "path": "internal/engine/console_dialog_render.go",
+    "kind": "source",
+    "sha256": "b4b008462cd49fd64a7638e2f846c417ef124126e96719c3f9b5a620d5d643aa"
+  },
+  {
+    "path": "internal/engine/console_dialog_test.go",
+    "kind": "test",
+    "sha256": "00613e076a0d95465243482c05f0be041f9fc69b78a72bc6639d319eef4da1c5"
+  },
+  {
+    "path": "internal/engine/console_i18n_test.go",
+    "kind": "test",
+    "sha256": "501fc2be966d32f756dd0617852da580fcb077f166faee4986eb2aaf69c30862"
+  },
+  {
+    "path": "internal/engine/console_input.go",
+    "kind": "source",
+    "sha256": "5d2f1ffb409f6a4ee822900f67c491f233aad1af001582a7db0397f952aee2ef"
+  },
+  {
+    "path": "internal/engine/console_panels.go",
+    "kind": "source",
+    "sha256": "7c401d1e3a70a613d1d8afd82f6fd3b6b723b5d12c6fcee1cc2d67a7a3132295"
+  },
+  {
+    "path": "internal/engine/console_start.go",
+    "kind": "source",
+    "sha256": "946dddae3a11f5925b758b0447e577ec07101eefb9074c343605fd211571b12b"
+  },
+  {
+    "path": "internal/engine/control_command_deadline_test.go",
+    "kind": "test",
+    "sha256": "120b1e9686c9f6a6876e4d81f4729c0e41098d1aea3858b71118ca74927b12c5"
+  },
+  {
+    "path": "internal/engine/control_runtime_limits.go",
+    "kind": "source",
+    "sha256": "2243fdc6c84e0a779a1f022e4ed7e6827258da12f65256ec367bba36353bc593"
+  },
+  {
+    "path": "internal/engine/control_runtime_recovery_test.go",
+    "kind": "test",
+    "sha256": "be681adcf9d633855f19cf162f82436637f0cafd74e6823af620cd485654f3c5"
+  },
+  {
+    "path": "internal/engine/control_runtime_storage_test.go",
+    "kind": "test",
+    "sha256": "669da81d94cef5248cbe8d11caf0db5b4309ee240305c7345192a0de59a69a44"
+  },
+  {
+    "path": "internal/engine/corrective_delivery_recovery_test.go",
+    "kind": "test",
+    "sha256": "4f7402e3f34cf4fef97d0fb97a06c2c0672a8030f931b9da19a6d16a35f083e5"
+  },
+  {
+    "path": "internal/engine/corrective_recovery.go",
+    "kind": "source",
+    "sha256": "54aae396cf9cb0975901a5d42bb67763cb3b5272a355552e2cbd41e7c5a05e32"
+  },
+  {
+    "path": "internal/engine/corrective_recovery_test.go",
+    "kind": "test",
+    "sha256": "1a74f199073e1c5d4adc422c73ab370eb916acacc58b3933f787fd65bde9d28c"
+  },
+  {
+    "path": "internal/engine/costs.go",
+    "kind": "source",
+    "sha256": "c107cf540c1eb9ffcb63094abe2d67d8d7ce478403f1a1d2645916f670cbd5e1"
+  },
+  {
+    "path": "internal/engine/costs_test.go",
+    "kind": "test",
+    "sha256": "1329f6a10b1dc81ca4b359b8f720d026de4cf4b97bf7e25528efbe1027b5b593"
+  },
+  {
+    "path": "internal/engine/cursor_contract_test.go",
+    "kind": "test",
+    "sha256": "84800a8de57432ac930275ecf976e22bb447a3b171c44cc327652861aae53878"
+  },
+  {
+    "path": "internal/engine/cursor_engine_t3_concurrent_test.go",
+    "kind": "test",
+    "sha256": "210a68df6c0db886098d35c29341e2c85b61d3d87d45e74108c1f541c677df5b"
+  },
+  {
+    "path": "internal/engine/cursor_engine_t3_effective_provider_test.go",
+    "kind": "test",
+    "sha256": "f00eaf69d8e846f420c0d189c29047371f0f7666848d0fa386bd8c0c849997c4"
+  },
+  {
+    "path": "internal/engine/cursor_engine_t3_exploration_test.go",
+    "kind": "test",
+    "sha256": "491f8f29a0f148e5c5a32dc1f194b3d9031d5e7774b2e73eb278571e8d6b3d40"
+  },
+  {
+    "path": "internal/engine/dashboard.go",
+    "kind": "source",
+    "sha256": "349967066bd38d58c34d6ed01274a11f50d171a14baab1b4267e33a388332c70"
+  },
+  {
+    "path": "internal/engine/dependency_proof_signal.go",
+    "kind": "source",
+    "sha256": "50c39e6e9bb11c99e984725ad189dac7d18ab4f1e22a96110a84a07996c0a824"
+  },
+  {
+    "path": "internal/engine/dialogue_context.go",
+    "kind": "source",
+    "sha256": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab"
+  },
+  {
+    "path": "internal/engine/dispatcher.go",
+    "kind": "source",
+    "sha256": "ffeb1d97e147789842b218894d57ca460ec6e9534a769b5877916d7efede7b9b"
+  },
+  {
+    "path": "internal/engine/dispatcher_test.go",
+    "kind": "test",
+    "sha256": "db383d303515729a0bdd6e52bd3d248158dc24b46b501f0c9cbaea25d90c8500"
+  },
+  {
+    "path": "internal/engine/durable_coordinator.go",
+    "kind": "source",
+    "sha256": "aabd170b2d42ae58c48f7d40ce583a4ea66b79a07abff981add4b284ab5fecc8"
+  },
+  {
+    "path": "internal/engine/durable_coordinator_test.go",
+    "kind": "test",
+    "sha256": "1b0398db918bd3cfb668ed844aa06ffd7101cce359a7d05fcb8147421d8400a3"
+  },
+  {
+    "path": "internal/engine/durable_coordinator_unsupported.go",
+    "kind": "source",
+    "sha256": "1e5cd16b0b9545bba98bb1d0bae7eed30116de8c2c89dd8dc1d01f823d6d9268"
+  },
+  {
+    "path": "internal/engine/durable_settlement_claim_test.go",
+    "kind": "test",
+    "sha256": "0c666ec53dc721368afd99e671435b568f12ca504ac9b16f26484f5069a5213f"
+  },
+  {
+    "path": "internal/engine/engine_contract_delivery_test.go",
+    "kind": "test",
+    "sha256": "0a6dd545f2bd338b5594512f0a9605bde7c56ca4cf73fce70d736ff6394caa38"
+  },
+  {
+    "path": "internal/engine/engine_contract_handoff_test.go",
+    "kind": "test",
+    "sha256": "88eda38c609afeab294cf26b4ac520f5121c945583e56aa25e0946c9b13ee39c"
+  },
+  {
+    "path": "internal/engine/engine_contract_history_test.go",
+    "kind": "test",
+    "sha256": "94e304f709c06e5a08ed37180a0df77737a174c2c9ace289ba8ff1c25d9fb6ca"
+  },
+  {
+    "path": "internal/engine/engine_contract_launch_candidate_test.go",
+    "kind": "test",
+    "sha256": "6a1d614e36c4b376bf00022386ed8295a71566a4ce7e56f25a4b9805554689f8"
+  },
+  {
+    "path": "internal/engine/engine_contract_launch_test.go",
+    "kind": "test",
+    "sha256": "119b2b8df4f15e40f4a020dd7900ddc5c0f49f175154dc299701f749d0971ddb"
+  },
+  {
+    "path": "internal/engine/engine_contract_ownership_candidate_test.go",
+    "kind": "test",
+    "sha256": "b0daea49d4ff188111a3327b7e0d031062b0f45cedf74db06342a359b6b2817a"
+  },
+  {
+    "path": "internal/engine/engine_contract_ownership_test.go",
+    "kind": "test",
+    "sha256": "fb858b4cb697b271e75238d994bdb511c0b89fc0560640868ef3c1a33e3f672c"
+  },
+  {
+    "path": "internal/engine/engine_contract_real_test.go",
+    "kind": "test",
+    "sha256": "58a0a14b201d0ea5e586b9127877c25efa018df7c62224507502aea2ba12df16"
+  },
+  {
+    "path": "internal/engine/engine_contract_recovery_test.go",
+    "kind": "test",
+    "sha256": "47dde6cde87a7b73be46cce8dc4ea5a9783960824fa631b834b82d84aaac7487"
+  },
+  {
+    "path": "internal/engine/engine_contract_revision_coverage_test.go",
+    "kind": "test",
+    "sha256": "89b6c62dc342a409be9c2be30128b6774cbbca4a631d0988451c0a0a20d8f62f"
+  },
+  {
+    "path": "internal/engine/engine_contract_revision_test.go",
+    "kind": "test",
+    "sha256": "2734a979d8772c38435b25646e409d6ffdceb6815b50f4a9639a90ba02a1b5f8"
+  },
+  {
+    "path": "internal/engine/engine_contract_truth_test.go",
+    "kind": "test",
+    "sha256": "47d83101abab4549fcd293ee9c46062fc21a22629e9bf5973bcf3e5bc956c5f2"
+  },
+  {
+    "path": "internal/engine/engine_review_budget_boundary_test.go",
+    "kind": "test",
+    "sha256": "bfbef91d93105537ee257c98ed9c76f908b5b19421852591035d8d5096dd4910"
+  },
+  {
+    "path": "internal/engine/environment_retry_test.go",
+    "kind": "test",
+    "sha256": "06368a8d23ecb0f827e4af5bc7513fab7aa4ecb64d7390779686aaa3cb519cb6"
+  },
+  {
+    "path": "internal/engine/escalations.go",
+    "kind": "source",
+    "sha256": "abf9887ff3e60c81d6125e135a4b65ce73e66acf121ab72f74c7547656b4bf8b"
+  },
+  {
+    "path": "internal/engine/escalations_test.go",
+    "kind": "test",
+    "sha256": "b962423bcb1993b366d75020b8843f4eec3bf1c06fd49a96e4fed605b2732e1c"
+  },
+  {
+    "path": "internal/engine/evidence_contract_test.go",
+    "kind": "test",
+    "sha256": "4b9c016a797a9366fda9bbf82f51d07450ffe343368e493e846a89aa2b5b05c9"
+  },
+  {
+    "path": "internal/engine/evidence_projection.go",
+    "kind": "source",
+    "sha256": "e2f6e54631ce3331c244969505f306656b6dfcb0795dd4fa607bec559939242f"
+  },
+  {
+    "path": "internal/engine/execution_exploration_test.go",
+    "kind": "test",
+    "sha256": "c58023a8c747c2bb176c4b091c7306121646a9eb82fd37b42dd47f758e31dbb2"
+  },
+  {
+    "path": "internal/engine/freshness_performance_test.go",
+    "kind": "test",
+    "sha256": "c3cdec76658304aa818723258ca5a4c076aa009a18a6e17d5600393728c04d12"
+  },
+  {
+    "path": "internal/engine/gate_dialog.go",
+    "kind": "source",
+    "sha256": "42813faffbf5d2a001e16d664d2d518affe297a37b43416a05b0cf65310d089a"
+  },
+  {
+    "path": "internal/engine/gate_dialog_test.go",
+    "kind": "test",
+    "sha256": "2f789201d2c52ecca0fae0f091d0f9a1ee37535977d9e571c709a67bf154050c"
+  },
+  {
+    "path": "internal/engine/gate_service.go",
+    "kind": "source",
+    "sha256": "490342742d6c6b5664e9bec2e213fdc6c1f13fcd1d4beb2fbb4ae842b6185a3b"
+  },
+  {
+    "path": "internal/engine/graph_delivery_e2e_test.go",
+    "kind": "test",
+    "sha256": "3ca8c786a218654d90def9e3f034f48354703b66319924a003d74ab999307919"
+  },
+  {
+    "path": "internal/engine/graph_delivery_install_test.go",
+    "kind": "test",
+    "sha256": "4680e993c3e8e2f52e0e0ab7350c820e8a37e856d37ed76cf54f956d116f5e08"
+  },
+  {
+    "path": "internal/engine/graph_delivery_migration_test.go",
+    "kind": "test",
+    "sha256": "754ddee09f7ac4efb7beb7f188df42b3e377cb04b34d4bff648b52f44b4ea623"
+  },
+  {
+    "path": "internal/engine/graph_delivery_qualification_test.go",
+    "kind": "test",
+    "sha256": "a11f3373197c20bef984ffab9957a07d245773e7bd783bbf395d33bd9c9435f6"
+  },
+  {
+    "path": "internal/engine/graph_draft.go",
+    "kind": "source",
+    "sha256": "a5446281e2ee1b8ddf927d54befdb84e7d2e396e343ebf053a5469a7cbe64eac"
+  },
+  {
+    "path": "internal/engine/graph_draft_cli.go",
+    "kind": "source",
+    "sha256": "8ded9ce7814bf753ab5a68c0e15f179500ed2f57b71952089a17ce78c0531a92"
+  },
+  {
+    "path": "internal/engine/graph_draft_cli_test.go",
+    "kind": "test",
+    "sha256": "c1977c185da0f68c10e75a862c7e569727e9d25bf42c88a4e9ac3d0b0dd37b35"
+  },
+  {
+    "path": "internal/engine/graph_draft_http.go",
+    "kind": "source",
+    "sha256": "f95c94723a2d91a7beb01a9a4728feb0631d689bcf21e3ee288973a8e0f29437"
+  },
+  {
+    "path": "internal/engine/graph_draft_http_test.go",
+    "kind": "test",
+    "sha256": "6a3da728831bbda7a5fb7fa30e84adccef5191839c1a3d4e6463335730800571"
+  },
+  {
+    "path": "internal/engine/graph_draft_projection.go",
+    "kind": "source",
+    "sha256": "38c5e1c245ca5ab559b00e629adadb283b65e66fffd79d8274cf904bdff6d9ae"
+  },
+  {
+    "path": "internal/engine/graph_draft_projection_test.go",
+    "kind": "test",
+    "sha256": "2a18f2acff4796caf694929ea79aabdeadada9747ed8b401c5c3597919be7942"
+  },
+  {
+    "path": "internal/engine/graph_draft_test.go",
+    "kind": "test",
+    "sha256": "08ae8fbbc0c9abbfdca48354fc3646ce25a452412c230cacd04525be4fcef10c"
+  },
+  {
+    "path": "internal/engine/graph_performance_config.go",
+    "kind": "source",
+    "sha256": "f7c4acc5ce2ecb46128b0cfa7d3956928108f96432030735a63c28b902785e8c"
+  },
+  {
+    "path": "internal/engine/graph_performance_config_test.go",
+    "kind": "test",
+    "sha256": "cfddac1da2045e9f2aa64020e346a0840573fbc51e8ca2afdeca6db1c5c268d3"
+  },
+  {
+    "path": "internal/engine/guide_contract.go",
+    "kind": "source",
+    "sha256": "ebe27bf3706bb1f66df134364bac26d9f35eeae0915e7cd074565d7220bb87c5"
+  },
+  {
+    "path": "internal/engine/hierarchical_contract_revision_test.go",
+    "kind": "test",
+    "sha256": "b78d8b9ed96be171df88257d87cb226692f19da6cc3cf44e94d0eb35069d5146"
+  },
+  {
+    "path": "internal/engine/historical_requalification.go",
+    "kind": "source",
+    "sha256": "d0e7b76cd4e5e9478c8bda064d9e27d65f34c1205eaeec178d2cf82fcf16accd"
+  },
+  {
+    "path": "internal/engine/historical_requalification_test.go",
+    "kind": "test",
+    "sha256": "ba7ec4b6bfeaab79b6630637de9b137c2ae9ca8c2e3a36a0e6978047c796879b"
+  },
+  {
+    "path": "internal/engine/historical_requalification_ui_test.go",
+    "kind": "test",
+    "sha256": "2c5859c12c07da15228a9ef3d9b797a5e1a4c65684a082bfe9a8a561a3c7d822"
+  },
+  {
+    "path": "internal/engine/human_validation_evidence_test.go",
+    "kind": "test",
+    "sha256": "32e7ba125b535509d1f209c6055413d087c653ebd421dd085559dc4a7c6be4c1"
+  },
+  {
+    "path": "internal/engine/i18n.go",
+    "kind": "source",
+    "sha256": "4cc365c65b8cb3b55586f3bdfd665a490d8f143a24d10044cf6c5fe738512424"
+  },
+  {
+    "path": "internal/engine/i18n_test.go",
+    "kind": "test",
+    "sha256": "50001a89b00a9fd249f974d402047d4bb7c21ccc39025905039d1864a9bb3096"
+  },
+  {
+    "path": "internal/engine/independent_review.go",
+    "kind": "source",
+    "sha256": "6957056fd97db8fb18b5b539dae7c12f727778d4d7d0b5b5e13c264c46a1d00e"
+  },
+  {
+    "path": "internal/engine/independent_review_changed_evidence_test.go",
+    "kind": "test",
+    "sha256": "e67681faa86fb9b2832b43ccf34df195211e294f100e2b4e7b6bab70c243f139"
+  },
+  {
+    "path": "internal/engine/independent_review_documents.go",
+    "kind": "source",
+    "sha256": "b15295a47e44ce7b544678c01d03e36fb7a983430336685596ba15a714d3d213"
+  },
+  {
+    "path": "internal/engine/independent_review_documents_test.go",
+    "kind": "test",
+    "sha256": "374a1be9fccd4169155251419e4249293940fed7fd76a4eefc7141116cb7b06b"
+  },
+  {
+    "path": "internal/engine/independent_review_dossier_gate_test.go",
+    "kind": "test",
+    "sha256": "2050e27019b7429dbeeddb183bbac5159ed2750df0e6b19f1ece3c595abfe90f"
+  },
+  {
+    "path": "internal/engine/independent_review_images.go",
+    "kind": "source",
+    "sha256": "f39d226a268dbe5bc74a7371a957c871b8ec78cf9064e300eb62ccbe6bdd6d4d"
+  },
+  {
+    "path": "internal/engine/independent_review_images_test.go",
+    "kind": "test",
+    "sha256": "d00130760178824f3e7367c9a7cc36b116ff22ee662a647dee8a0ec58be38a4b"
+  },
+  {
+    "path": "internal/engine/independent_review_runtime.go",
+    "kind": "source",
+    "sha256": "ac61dcf342d60564ff9fdbfaae152b8b917313435a476c6dd9383aeded6ec5d3"
+  },
+  {
+    "path": "internal/engine/independent_review_test.go",
+    "kind": "test",
+    "sha256": "8585684374d8338d7c90ff0e42eff90a183c387584e3173ca22d99c0aa8cb46b"
+  },
+  {
+    "path": "internal/engine/independent_validation_evidence.go",
+    "kind": "source",
+    "sha256": "a925921d406f0c23ba5104dda4129e7823c63575c7e473df4ea82495dc3f994d"
+  },
+  {
+    "path": "internal/engine/independent_validation_evidence_test.go",
+    "kind": "test",
+    "sha256": "1bb6599627f2d3c1d2e3efa32ef2ad01fe3a8504dcf8bae8fe6c2c13fae424c2"
+  },
+  {
+    "path": "internal/engine/infrastructure_supervision_test.go",
+    "kind": "test",
+    "sha256": "b0b63a616cff00df793c231d7b7e7869b78b2ff1c97286f2f02d935087916f52"
+  },
+  {
+    "path": "internal/engine/instruction_revision.go",
+    "kind": "source",
+    "sha256": "8fb06af1125ed0785f282e77be4607e81e4a76e32f1a1ee36a4863cb6efc8615"
+  },
+  {
+    "path": "internal/engine/instruction_revision_operator_test.go",
+    "kind": "test",
+    "sha256": "595d052c1e8a425463220e98af2674f4e213eb2db6c9c2a72d9f0560c6d6c747"
+  },
+  {
+    "path": "internal/engine/instruction_revision_test.go",
+    "kind": "test",
+    "sha256": "e6a3c4d1869b2c8fdb235d5d111912f3b07a266e24f35df9f96cfa86b0b7bc08"
+  },
+  {
+    "path": "internal/engine/interruption_record.go",
+    "kind": "source",
+    "sha256": "82c0a0d33be3e7dfaa9d4024417d7480fb292a04fbd10adbf7dba6a0b1529dd6"
+  },
+  {
+    "path": "internal/engine/interruption_record_test.go",
+    "kind": "test",
+    "sha256": "ab164c8321d8aaeb611cf24bbf1279dd1910a0eaf83abbdaccf959fc04230ba6"
+  },
+  {
+    "path": "internal/engine/interruptions_test.go",
+    "kind": "test",
+    "sha256": "254b2306b66e75241e9725d911510372617adf1e7b3c8703a34cd0ba6fbdaedd"
+  },
+  {
+    "path": "internal/engine/launch_writer_test.go",
+    "kind": "test",
+    "sha256": "d2417e2d4917f8599074648c38e177de507190b9a65929d6a58021ac923cf581"
+  },
+  {
+    "path": "internal/engine/lifecycle.go",
+    "kind": "source",
+    "sha256": "4937f7c7bb07cc30913ced91eb369117ba43743d663f758e79a0259efec4e96b"
+  },
+  {
+    "path": "internal/engine/lifecycle_test.go",
+    "kind": "test",
+    "sha256": "87dca773a4821ffd95f5d1034710d4b470d636324cf3580f50f4d8088d9f72a4"
+  },
+  {
+    "path": "internal/engine/log_query.go",
+    "kind": "source",
+    "sha256": "e84f96e8a2fead8fde09ea1ae416ae3e550dc34f2b6644a074252cc942a830a1"
+  },
+  {
+    "path": "internal/engine/loop_failures_test.go",
+    "kind": "test",
+    "sha256": "07c9976317ef9147a4376615ad909ef89ec1e69395588dcdcf90e6638b06b172"
+  },
+  {
+    "path": "internal/engine/loop_guard.go",
+    "kind": "source",
+    "sha256": "ec27c180ec9d40aec5440579cd716c5b492e7a2355e4ea06b3d603d08115a149"
+  },
+  {
+    "path": "internal/engine/loop_guard_test.go",
+    "kind": "test",
+    "sha256": "c0c78ed4e894544f1b7cfcbc294eebf8c02d886576a7ec937722a387114b5297"
+  },
+  {
+    "path": "internal/engine/main.go",
+    "kind": "source",
+    "sha256": "0e989a912ffb066751944f9a0b8ac6e1d70cacc42ba32bef7c202a2021679512"
+  },
+  {
+    "path": "internal/engine/managed_binary_preflight_inspection_test.go",
+    "kind": "test",
+    "sha256": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5"
+  },
+  {
+    "path": "internal/engine/managed_checkpoint_recovery_test.go",
+    "kind": "test",
+    "sha256": "3463d9bbe6a58d88c55a81662bce9d52998b7ee38864dbf415c53bf8ae014c80"
+  },
+  {
+    "path": "internal/engine/managed_cleanup.go",
+    "kind": "source",
+    "sha256": "fe41a0d11c7330db7ae6be03bab4980c6dfac44d9b09159e5cf9bbc504c72303"
+  },
+  {
+    "path": "internal/engine/managed_control_diagnostic_api.go",
+    "kind": "source",
+    "sha256": "adee0d146b55c7abcd803bc709c6da1ad35aa400ac31061ec5b4b903ae1caa73"
+  },
+  {
+    "path": "internal/engine/managed_control_diagnostic_api_test.go",
+    "kind": "test",
+    "sha256": "7790dab1b8c48a32dff8b1dd0f1e43e3350a374048da7ec1625592d7ccbbf051"
+  },
+  {
+    "path": "internal/engine/managed_control_failure.go",
+    "kind": "source",
+    "sha256": "8f9b13a213eecd6097d6f7686b2f27cbddfd5119c4fd57d6939cc6282d3a1334"
+  },
+  {
+    "path": "internal/engine/managed_control_failure_test.go",
+    "kind": "test",
+    "sha256": "6cdf98f3d5d352b39630096989817c8ffb4e448ed24186350a79304c8d91cf36"
+  },
+  {
+    "path": "internal/engine/managed_delivery.go",
+    "kind": "source",
+    "sha256": "8ce7cd0b95fdf5429e72b2e8020f6bd776d137f2352fe3b39948d6d741cbe41a"
+  },
+  {
+    "path": "internal/engine/managed_delivery_contract.go",
+    "kind": "source",
+    "sha256": "cf6a1b068469fcb556bf44fc47a19793786264dcf63cd09615d0bb42387681d1"
+  },
+  {
+    "path": "internal/engine/managed_delivery_test.go",
+    "kind": "test",
+    "sha256": "423bafba96b9504e217cd84d5b81d05cf56c6189f90ec61d6dd22f50ae509f2e"
+  },
+  {
+    "path": "internal/engine/managed_git.go",
+    "kind": "source",
+    "sha256": "fc144895a205abdd76330078355bd23c077996e6d91e364642e76e7a7600b4c1"
+  },
+  {
+    "path": "internal/engine/managed_git_test.go",
+    "kind": "test",
+    "sha256": "06275a74d75c7a8381e37fa0b60e768cb7df7f8d79f6fd5f720c30391e104f73"
+  },
+  {
+    "path": "internal/engine/managed_integration.go",
+    "kind": "source",
+    "sha256": "cee9d91d092685d1f5ee6385f61d871592d5f3c391f3c66b41e61928442df98d"
+  },
+  {
+    "path": "internal/engine/managed_integration_retry.go",
+    "kind": "source",
+    "sha256": "959604ce6c87e0daa141ee92cce56df192cb39101b9c38d49e177ec31ee7a2c3"
+  },
+  {
+    "path": "internal/engine/managed_integration_retry_test.go",
+    "kind": "test",
+    "sha256": "95c971a8abc97c1e77ac3fba6b143f6c0827c8a7023d8f219f9df44f14e7c01a"
+  },
+  {
+    "path": "internal/engine/managed_live_review_test.go",
+    "kind": "test",
+    "sha256": "8e3fca3722009022f219a762a2b427c1f433891adcd32187c7946e4e7032a3b7"
+  },
+  {
+    "path": "internal/engine/managed_orphan_review_test.go",
+    "kind": "test",
+    "sha256": "bd05cdeb7ddd31402fdcc188f5955456a5a3e8e58aa98bc345d67aefa702ca4d"
+  },
+  {
+    "path": "internal/engine/managed_plan_gate_test.go",
+    "kind": "test",
+    "sha256": "daccecb9dd34c95b1bc0a0c971bc69bb50cb389e7630292075ed9e8053edd3ae"
+  },
+  {
+    "path": "internal/engine/managed_preparation.go",
+    "kind": "source",
+    "sha256": "baa8aadc4ab98481f1af066c672c6d986e9342f96f71c47ba2dc9e1507294060"
+  },
+  {
+    "path": "internal/engine/managed_preparation_dispatch_test.go",
+    "kind": "test",
+    "sha256": "8441a4fedfc1383d0750e2d97fa5945cac118c47cb663ad4a61d63723965e73d"
+  },
+  {
+    "path": "internal/engine/managed_preparation_revision_test.go",
+    "kind": "test",
+    "sha256": "50bf840fec9e5cd783eb9f608327efa32a499c8385ed1fd98c4adae372a8e0e2"
+  },
+  {
+    "path": "internal/engine/managed_preparation_test.go",
+    "kind": "test",
+    "sha256": "bdc97dc190dda4c89980818b09ab196db32319e5e209409fc67b24b26dacd889"
+  },
+  {
+    "path": "internal/engine/managed_publication_concurrency_test.go",
+    "kind": "test",
+    "sha256": "4b52c13087ece1ee7ebbbb7731bd3fc481617b12251a5a65d763971f42d8bd17"
+  },
+  {
+    "path": "internal/engine/managed_publication_lane.go",
+    "kind": "source",
+    "sha256": "2fa67d1ff93b66fb9ad27a1a30685b7742bc3b4b024e96b1e8cf1499d8461fbb"
+  },
+  {
+    "path": "internal/engine/managed_publication_lane_test.go",
+    "kind": "test",
+    "sha256": "0fcdda99c7123e7a26714304fba49c20de1909cc1e32cb06840208a53b99faee"
+  },
+  {
+    "path": "internal/engine/managed_publication_measurement_test.go",
+    "kind": "test",
+    "sha256": "193b2db533c716125f3a960d87fae52e3b3651d15163d2c8a894683145043789"
+  },
+  {
+    "path": "internal/engine/managed_recovery_handoff.go",
+    "kind": "source",
+    "sha256": "81f8e96e1bce3cc03372d4037b3bbe85c2fa6a486da92d04e31e52ff24038d67"
+  },
+  {
+    "path": "internal/engine/managed_recovery_handoff_test.go",
+    "kind": "test",
+    "sha256": "982fde450f3431df320780dc232fb348ff4f41d6ac52c2384e3520effed51c18"
+  },
+  {
+    "path": "internal/engine/managed_recovery_repaired_handoff_test.go",
+    "kind": "test",
+    "sha256": "3ffbfa3015828e06daf5c1ccfacbd3b35f7c47dbc4eb4b5e5b09f6fb293d0dc9"
+  },
+  {
+    "path": "internal/engine/managed_recovery_ui_test.go",
+    "kind": "test",
+    "sha256": "7a04e57489fb65f77db7b93e0e4e21900e542d835b2118ddfb26c430003f5db3"
+  },
+  {
+    "path": "internal/engine/managed_result_staging.go",
+    "kind": "source",
+    "sha256": "f80f23c36cce38c7f08be04a9eec88c402c7b4cc8aef42bd65b3621b66d7e2ae"
+  },
+  {
+    "path": "internal/engine/managed_review.go",
+    "kind": "source",
+    "sha256": "3350d25d222c56ed6f7dfb6de51ddfe0fa2c1d5f8206ada01cdbae8d78d35fd2"
+  },
+  {
+    "path": "internal/engine/managed_review_batch_runtime.go",
+    "kind": "source",
+    "sha256": "98f7fa2ad89bae0ca321d0f049a7c6172509c85355d82bb659dddcabe4515360"
+  },
+  {
+    "path": "internal/engine/managed_review_batch_runtime_test.go",
+    "kind": "test",
+    "sha256": "15b360e0fb49d17bb832d2db8b817df188101247731ee78dad340d76f59634fb"
+  },
+  {
+    "path": "internal/engine/managed_review_batches.go",
+    "kind": "source",
+    "sha256": "909a83aaf821b19e3bce415f079e18d3c71927ac4ddbda52a77b2a826e49f560"
+  },
+  {
+    "path": "internal/engine/managed_review_batches_test.go",
+    "kind": "test",
+    "sha256": "ae28405a20833cca05bac8555ee6de971d7ad55ed2e78565b2a203479cdb63fd"
+  },
+  {
+    "path": "internal/engine/managed_review_capacity_first.go",
+    "kind": "source",
+    "sha256": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275"
+  },
+  {
+    "path": "internal/engine/managed_review_capacity_first_test.go",
+    "kind": "test",
+    "sha256": "459343a04dd5d6864836e3d28c3262ae14b6740b2f287442a906c9138deab841"
+  },
+  {
+    "path": "internal/engine/managed_review_capacity_reserve_test.go",
+    "kind": "test",
+    "sha256": "831081468355ee8aae3811a54041553f321cfcbeeca769e6a53ae2dec839fdc7"
+  },
+  {
+    "path": "internal/engine/managed_review_compact_test.go",
+    "kind": "test",
+    "sha256": "e9586b9184571e7a70b6f1cf08fa942b0777e8484449062c65586b42173941f6"
+  },
+  {
+    "path": "internal/engine/managed_review_coordination.go",
+    "kind": "source",
+    "sha256": "ee699535fea8416b15929444aa4d07bf521653443249e971ee7a2b0a8e8a9b27"
+  },
+  {
+    "path": "internal/engine/managed_review_coordination_execution.go",
+    "kind": "source",
+    "sha256": "44ae31640bab07f1685d8eecb899382be5ea85375e1ba23e744ac93c45749b3a"
+  },
+  {
+    "path": "internal/engine/managed_review_coordination_execution_test.go",
+    "kind": "test",
+    "sha256": "ab6ecd0ab8068ddaa54664cd54fc4af1efc311327a92f98dbf20848ea510fb39"
+  },
+  {
+    "path": "internal/engine/managed_review_coordination_test.go",
+    "kind": "test",
+    "sha256": "d0358cdba3b28607d21d8a376854705a800964c9c2c2b32d502064d795c581d2"
+  },
+  {
+    "path": "internal/engine/managed_review_cost.go",
+    "kind": "source",
+    "sha256": "0dacb9ddfbbdef2abe043ff6f9a4c1aeb8d52dc59cd580bfc4d6b7c3ca5c1b96"
+  },
+  {
+    "path": "internal/engine/managed_review_cost_test.go",
+    "kind": "test",
+    "sha256": "1f6c07c845abcd350914fec9f89e34c3828d376e29c7c9bb62dbdac9a9f604f1"
+  },
+  {
+    "path": "internal/engine/managed_review_decomposition.go",
+    "kind": "source",
+    "sha256": "0a820206941c2b0b1ab81b0b397c63ee7ea20da7aff581b610282c5e65f164a2"
+  },
+  {
+    "path": "internal/engine/managed_review_decomposition_test.go",
+    "kind": "test",
+    "sha256": "db4f2315c5716b5ee976ba5bda42e14f79d2150278db8721ba137629e4609674"
+  },
+  {
+    "path": "internal/engine/managed_review_dedup_test.go",
+    "kind": "test",
+    "sha256": "ef62f5e14ced1bb833f0949359914c356af1b083d4e82e5914f592f4be738a73"
+  },
+  {
+    "path": "internal/engine/managed_review_delivery_sources_test.go",
+    "kind": "test",
+    "sha256": "ebc406c48f00e4a5563315ccc9d4dfbfacd0f859e9ff5c93215e91d034f8d67d"
+  },
+  {
+    "path": "internal/engine/managed_review_diagnostic.go",
+    "kind": "source",
+    "sha256": "40a686d13184e00b33cf47a4f9be99182d04814a69177f62e8f59f16f62c97bb"
+  },
+  {
+    "path": "internal/engine/managed_review_diagnostic_test.go",
+    "kind": "test",
+    "sha256": "47906e036ab7f8f530755a07d70951031e7b6084bda234a11383a2dee8b11ea6"
+  },
+  {
+    "path": "internal/engine/managed_review_dossier.go",
+    "kind": "source",
+    "sha256": "90b36eff4f3b36a3abda93cf65ed7036b5dd01fdbd7c40b0478e6335c7ac43fa"
+  },
+  {
+    "path": "internal/engine/managed_review_dossier_test.go",
+    "kind": "test",
+    "sha256": "cc22e46d57b1551b1a692c8d6dfde997c6cd0fd9237154ea151ead524c084038"
+  },
+  {
+    "path": "internal/engine/managed_review_evidence_inventory.go",
+    "kind": "source",
+    "sha256": "63e20c9f7e7effd1cc5042001f00353f720ed31eece9baf50c1b9926e3296bac"
+  },
+  {
+    "path": "internal/engine/managed_review_evidence_inventory_test.go",
+    "kind": "test",
+    "sha256": "5a547494de2d3693e1e759a35e8e64dc4b5d90f9066d14cc7ad44f7f9a6bd3a7"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_begin.go",
+    "kind": "source",
+    "sha256": "d7f9d7852c1b3f7cac5545f64d979d971d9fdd5e81cccd615ce2dae69f8cd6f9"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_begin_test.go",
+    "kind": "test",
+    "sha256": "1fe40bda97ef3b12b080d0fd33449d73a64b4067aa3c585cbd9f138b465ca2f6"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_capacity.go",
+    "kind": "source",
+    "sha256": "a86160ffcaf772160fb8e43afb0021762a9fdf3bd6aadd1d37960231bee86047"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_capacity_test.go",
+    "kind": "test",
+    "sha256": "f7e9b76adecdf88e9765480756aee8699f90bad80028c2b75cebfcfe3e05697b"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_contract_evidence_test.go",
+    "kind": "test",
+    "sha256": "671eae9b9a7a131b2cb6ee22b7007db922c7e36d6eca80245f2227a0181e02c2"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_decision.go",
+    "kind": "source",
+    "sha256": "c5dc788b276ac6fbeaf98f0cbd95d62be6ac8b494c1cf965b23c971694909217"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_decision_test.go",
+    "kind": "test",
+    "sha256": "f4db70a2c61abe958b61d811f7dee21d24c2d194ae8c6a74905c700e114d017b"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_defect.go",
+    "kind": "source",
+    "sha256": "49f250c715e1a546371181d8216c87252c9116a4f9af004743e70b9731fc5bb3"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_defect_citation.go",
+    "kind": "source",
+    "sha256": "ba0d29de1af73735718b6e9848f5d5f6b7a6b6f09bdd58865d1c6640cef9b68e"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_defect_citation_test.go",
+    "kind": "test",
+    "sha256": "d38708f1dcb199ef7a122adf4a0b03cf18e3a065cb7d614ebe8922eeee5d35ed"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_defect_test.go",
+    "kind": "test",
+    "sha256": "d4a3759787a08e5e2f364f3780e71ee8dcf3fa46341c40902280c4834b3748a3"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_envelope_test.go",
+    "kind": "test",
+    "sha256": "385ba66cdfe016c1bf606757f43676d0bb0520533d9aef32cbcc49ef6d9edcc9"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_feedback.go",
+    "kind": "source",
+    "sha256": "2a8d3c6f618cb10aadb8f85845543308d389b3d0ae9112b577dec26c4b7b6c09"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_feedback_test.go",
+    "kind": "test",
+    "sha256": "297c149c108c73771a7ebb42f04a5dae03a3ee487703ac5edf55666b0d39f9d7"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_final.go",
+    "kind": "source",
+    "sha256": "3a227e0cb5579ddd6827f8c1c98ea2f98316d3896e81a5beefb0e58406e01676"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_final_journal.go",
+    "kind": "source",
+    "sha256": "f3b943887ccf506785aa574139f5af8360740848825992460e42b9c995fdae6e"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_final_journal_test.go",
+    "kind": "test",
+    "sha256": "d7c89dc76ff3a506ac6b9cb753667bae2edd6b6f11dba9b5fa9dd3afb743ccb8"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_final_store.go",
+    "kind": "source",
+    "sha256": "bdb210eff44812ae3fb4ec6d8e66d5d2ad2ad2b6c307526b79ca0ed6f218bd45"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_final_store_test.go",
+    "kind": "test",
+    "sha256": "53da5bc5078d1d231caaf9034f14c113099c83bf465b90fa81d9125defc065e1"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_final_test.go",
+    "kind": "test",
+    "sha256": "4c0b507fd87c30a7d2e0574ed71e0acc222afdaa9d7f849e5d49ff7131f3525b"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_finding_contract.go",
+    "kind": "source",
+    "sha256": "3a01d0bc54564d3b62341bb4ccb16a562d641f26aae96e26a22eb5a3d1f053dd"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_finding_contract_test.go",
+    "kind": "test",
+    "sha256": "c595a7dedc0ff76ada9f8051cb6cea3b21ad9fd5562fd7fa3bc43e95ad693bdb"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_finish.go",
+    "kind": "source",
+    "sha256": "8aac461c7f976ca4a824e97a2e62c33bdbba24028335ef8f5c8deb91cd492140"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_finish_test.go",
+    "kind": "test",
+    "sha256": "722ae4a116d4b5d07498353d0a5e417d03785df958702f0ea058ae3b92de49cc"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_grounded_test.go",
+    "kind": "test",
+    "sha256": "8262f9050fc3ab43b67585ff89ba2bcaf83651d8b9677000979e6e8b0a302055"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_integration_test.go",
+    "kind": "test",
+    "sha256": "8c69175147213ea3ee56ba9afaeaa40f660bee762912f5b06947889524adf9c5"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_journal.go",
+    "kind": "source",
+    "sha256": "48b7d6b9e0d9c5206e35c39cc26d1caca8f595a701c9bdef0d9e90fffd3965e5"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_journal_test.go",
+    "kind": "test",
+    "sha256": "ba1c6fe94bb9d45272b2c76c9cf64489a789f0b4c8623e0a8618f69917f2f0af"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_loop_test.go",
+    "kind": "test",
+    "sha256": "2645d4c82923006b1a417114d0c6c1a3387cb954fa2e6da7962e817edd880f92"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_partial_scope_test.go",
+    "kind": "test",
+    "sha256": "bb5ef1ab7daea09e299dae229a7f2e60c6301de83b833d3c3ebf894e36151830"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_plan.go",
+    "kind": "source",
+    "sha256": "66a87a389ad8e0ca5a6d1b7eea0f8cc962c12143459b38e573f814f26837855a"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_plan_test.go",
+    "kind": "test",
+    "sha256": "fbf91b14cd8f3cc7eb535e5f4969b4503ddb0adeeddfcb8188dccbda0f7aae82"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_prompt.go",
+    "kind": "source",
+    "sha256": "2fb9081b32b80906ded3a99813087729a63459f947e6ab9719a24b92c702110d"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_prompt_test.go",
+    "kind": "test",
+    "sha256": "bcaf8d3f59ca603a3892a0b8581de232d7c681bc6d65bf39ec1ebfd7e860f194"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_provenance_test.go",
+    "kind": "test",
+    "sha256": "ce404dd55ebf87871274add07f709909fd6b5d88ba81aacd3eed0a5c2ef9dc53"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_questions.go",
+    "kind": "source",
+    "sha256": "b1de119d145e4ec5538027ea8efc08a2680f737607bc0448b2759f5d74efc181"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_questions_test.go",
+    "kind": "test",
+    "sha256": "e871b8459750cc15d51c1342681b07f19ceb881fdf11c85b4a2744ddc913df69"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_quote.go",
+    "kind": "source",
+    "sha256": "e4eb8028cd7c2c8c941969cc23c1be001c63b4e781f8c1bf51d271c8c8f629e4"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_quote_test.go",
+    "kind": "test",
+    "sha256": "496b55d462a30a9c1ce10b53091c092c5ecdcf1d64f54b8c1871505d38aa396f"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_replan.go",
+    "kind": "source",
+    "sha256": "4a9ac33e7a0e58e1f211e275f1369fa32d96c35fafc26c936029039d16c8cf44"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_replan_test.go",
+    "kind": "test",
+    "sha256": "ecfc05bdd34ea56af271279b2ef8ccd3e0aeb14df26c07276b979f6f619861eb"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_reply.go",
+    "kind": "source",
+    "sha256": "8bbf3a39698a7de428413ce2416a5481cebcb4180b4a58c82af6734d9035aa0e"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_reply_test.go",
+    "kind": "test",
+    "sha256": "fa409453b7a0dc9d71088de3e20034af427a7342360b8f9764dcdcbd6f07b3c3"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_request.go",
+    "kind": "source",
+    "sha256": "b8e2a99232d58edb23e4aa4b6b9f27bd6189e967b33180290299640c5db24fad"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_request_prompt.go",
+    "kind": "source",
+    "sha256": "7d32394fb5302ecc25b013c4d995fd682444d8a22072805891d9a4ab2491b591"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_request_prompt_test.go",
+    "kind": "test",
+    "sha256": "a9fca90b6687fcfc40cbf4830c101951bd6096e1ce298b6336ee090ca270a39a"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_request_test.go",
+    "kind": "test",
+    "sha256": "ddc3fd5171ed88a3291937ee987473efd11ab52fdc0967f851a3bc684ea07e8a"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_resume.go",
+    "kind": "source",
+    "sha256": "02d8fcf814396e45738d91f4688a27b08feec91b29917585554dc10d65d83524"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_resume_test.go",
+    "kind": "test",
+    "sha256": "fa06455ebf2a8dfcf7e945405fccd9f416cd218262e2fe3dd972638f0064a91d"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_reuse.go",
+    "kind": "source",
+    "sha256": "5df98be22297463805afe8b0181ba9c9f2fdfd228512935fe4ead37bf41a6f41"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_reuse_test.go",
+    "kind": "test",
+    "sha256": "c6bdf2dd84cbb3e006bbe790cf46e1cea47315f6ee3ad5a332c3c21608b6c13b"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_runtime.go",
+    "kind": "source",
+    "sha256": "7d6d9b5e89965c793a1da11eac41bdfde4abeb9c77d552271965ff4763f5ea44"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_runtime_test.go",
+    "kind": "test",
+    "sha256": "d77624e4873822bc97f525e7b079733253b71716f2057f642f70563c700f2aa2"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_schema_test.go",
+    "kind": "test",
+    "sha256": "d11052b6b290ddd01c83f3bb2627ecd8ec23c639b1d0296794f9df6e99e10fd5"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_selection.go",
+    "kind": "source",
+    "sha256": "3c21f9ee18261e5fb0ce06e3c8c3c90037d631ce65224a9b9175720a0219cce8"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_selection_test.go",
+    "kind": "test",
+    "sha256": "7f235ea48915c1cb02d5a118ae2097bf2648ef37750d5ef54197623fe7a556c4"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_store.go",
+    "kind": "source",
+    "sha256": "1bc3ac7838d5f03dbc251638180a6511d1005b7ae1039b496adb83a095f0e6ba"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_store_test.go",
+    "kind": "test",
+    "sha256": "09138e349ca419a2c59a981ce7275bbb5f88ca24b35cb6da869bdb551b6ea4f5"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_tokens.go",
+    "kind": "source",
+    "sha256": "4b3bdae24f6848e701423d71f02119d23583d5c2b9637a7f0b9a07a7a32a2d88"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_tokens_store_test.go",
+    "kind": "test",
+    "sha256": "60cb662e91e6478cb8ecacc6c6ab0231a367d94d1bcb316ad6330db32d2f0413"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_tokens_test.go",
+    "kind": "test",
+    "sha256": "006c98f654f41ddbe7a4d8938d3add4a672784612bae9a52879edb22c221048b"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_transport.go",
+    "kind": "source",
+    "sha256": "188f105cb2be949bbb80fe51c7aaef766e8e45cf616b2beb909f07820090372d"
+  },
+  {
+    "path": "internal/engine/managed_review_fragment_transport_test.go",
+    "kind": "test",
+    "sha256": "309df9c6687749fed1560b21a463aed918ee88478fa48da23a63a132c23a5a4f"
+  },
+  {
+    "path": "internal/engine/managed_review_history_version_test.go",
+    "kind": "test",
+    "sha256": "3361bc0830701686ec3896097bb44a53ceabfe9f1fe348c0f46a7ec513b07e08"
+  },
+  {
+    "path": "internal/engine/managed_review_hunks.go",
+    "kind": "source",
+    "sha256": "2e164b2856b1256e573ac7272a2137b904877754e8deed1dc46462f98e74daad"
+  },
+  {
+    "path": "internal/engine/managed_review_hunks_test.go",
+    "kind": "test",
+    "sha256": "d1ea2e14957efd4cf7126aae20c8443d8904792f7986bf4288c6edec9c645d4a"
+  },
+  {
+    "path": "internal/engine/managed_review_incremental.go",
+    "kind": "source",
+    "sha256": "601402025252298aac6c8523b060006d0d6b51d1147838c1fcf8d9efc04d9496"
+  },
+  {
+    "path": "internal/engine/managed_review_incremental_test.go",
+    "kind": "test",
+    "sha256": "0dea1d4837d27a49b0fecdc113c40acf7b54498be7918b5234f148ccd6d4868a"
+  },
+  {
+    "path": "internal/engine/managed_review_input_budget.go",
+    "kind": "source",
+    "sha256": "cf735165be79cff8a5f6ac1cf40da2a416a6970c0b9a71801e02c5245d64255f"
+  },
+  {
+    "path": "internal/engine/managed_review_input_budget_test.go",
+    "kind": "test",
+    "sha256": "f973b2859eec76c4041c5073ec6589c599e44b9f42f86d4d3cb2bbd2313706e7"
+  },
+  {
+    "path": "internal/engine/managed_review_input_provider.go",
+    "kind": "source",
+    "sha256": "e56486f586476ade5a3af30f0be0a8f8901b4818deed83f36d68c5b380ae19a4"
+  },
+  {
+    "path": "internal/engine/managed_review_local_negative_resume_test.go",
+    "kind": "test",
+    "sha256": "fa015a97b0ca9d00c6ba585e9709da517f89dd220d021542c0317cc322c778b7"
+  },
+  {
+    "path": "internal/engine/managed_review_method_restart.go",
+    "kind": "source",
+    "sha256": "c7440751d4e3f31827d60596e3d7575979245326ca40f108c440f303697ec1b2"
+  },
+  {
+    "path": "internal/engine/managed_review_method_restart_test.go",
+    "kind": "test",
+    "sha256": "e2a7af3f9d634dd9500449b6709e0799238e89214f2b2d39093688adbdf33219"
+  },
+  {
+    "path": "internal/engine/managed_review_packet.go",
+    "kind": "source",
+    "sha256": "b91158bd92404537550c0d3f36adde58a52477b37177fd767bea9d4400e21bc9"
+  },
+  {
+    "path": "internal/engine/managed_review_packet_test.go",
+    "kind": "test",
+    "sha256": "865c95ef23d15ad2a8a817064e86b84395b5b976e9ad5c7337568cda4cc46293"
+  },
+  {
+    "path": "internal/engine/managed_review_preflight_retry.go",
+    "kind": "source",
+    "sha256": "682246e44774c37feaa3daff8d62815ae52167cf70e2063981794a08aa78386f"
+  },
+  {
+    "path": "internal/engine/managed_review_preflight_retry_test.go",
+    "kind": "test",
+    "sha256": "98bd97f7d6b21b57350f1c1b7e0d3f63223425fcd977bf10f3bf43fb02dd3d07"
+  },
+  {
+    "path": "internal/engine/managed_review_provider_recovery.go",
+    "kind": "source",
+    "sha256": "df67d9bc4bd0a6ceca31ea7e6b068c13b6a2945708dd8c56ef618e633bb01fbf"
+  },
+  {
+    "path": "internal/engine/managed_review_provider_recovery_test.go",
+    "kind": "test",
+    "sha256": "44aa26c7d21be8f6d98cd2cbd0dc70b8b4f79cc3567fd2f186f22bec1170c5ea"
+  },
+  {
+    "path": "internal/engine/managed_review_recovery.go",
+    "kind": "source",
+    "sha256": "40b33af97bc3841d494da10da14b0de2cd32649f254324ef4d83290df381bf7f"
+  },
+  {
+    "path": "internal/engine/managed_review_recovery_test.go",
+    "kind": "test",
+    "sha256": "5a51022dc2b57f67bae02d051aca262fae19ac3d1a1ae926e6f06e1f64e4e0e9"
+  },
+  {
+    "path": "internal/engine/managed_review_reply_test.go",
+    "kind": "test",
+    "sha256": "d7062852787ee0a18221430f4d32e33ea478ac6400cbeb50a341c44f62e0a948"
+  },
+  {
+    "path": "internal/engine/managed_review_retry_delivery.go",
+    "kind": "source",
+    "sha256": "840d55483264ebf93ba55378fa2e3810d8a2073c1a4adcf0a81f9478bbd594a7"
+  },
+  {
+    "path": "internal/engine/managed_review_retry_delivery_test.go",
+    "kind": "test",
+    "sha256": "0df3cddfaf15c149a056723dc8602d992698bfec69d858549fc6ccb5cb3a217d"
+  },
+  {
+    "path": "internal/engine/managed_review_retry_storage_test.go",
+    "kind": "test",
+    "sha256": "dce74d665fe1b263a00a30d9097775665f0f45ec99c7b85f621884d7623fbd87"
+  },
+  {
+    "path": "internal/engine/managed_review_selection_capacity_recovery.go",
+    "kind": "source",
+    "sha256": "dc8513bfb4ff70ae41a5917de85b8dded850e1b47eea45315744fcc551531d30"
+  },
+  {
+    "path": "internal/engine/managed_review_selection_capacity_recovery_test.go",
+    "kind": "test",
+    "sha256": "9d2740d42a38f6131d0196bc634dc02fb2c3bd4c7d2ac5bc367b96ebaaff2938"
+  },
+  {
+    "path": "internal/engine/managed_review_sources.go",
+    "kind": "source",
+    "sha256": "f6fdf0333878cbc7422727a91bafff9a29705a7e8c087b9dc1cfb6d7d714c235"
+  },
+  {
+    "path": "internal/engine/managed_review_sources_test.go",
+    "kind": "test",
+    "sha256": "ca3895bfab4eccb67125fbc4c533f76461341dcec94801d78e05aecf1fcfb8ab"
+  },
+  {
+    "path": "internal/engine/managed_review_status_contract_test.go",
+    "kind": "test",
+    "sha256": "08514ee288f0dbfd0f7932ae12e0d564438cb66b8b93148ed3e12ef139c96b36"
+  },
+  {
+    "path": "internal/engine/managed_review_test.go",
+    "kind": "test",
+    "sha256": "a387a37288a98720cb468114307d2f4294cf772746721d9f0897e54fad77c1a4"
+  },
+  {
+    "path": "internal/engine/managed_review_token_count_cache.go",
+    "kind": "source",
+    "sha256": "d24f0a5f7b4fa96894e17f81424f6f43de81284ad544f13ad967cf156d14d6bf"
+  },
+  {
+    "path": "internal/engine/managed_review_token_count_cache_test.go",
+    "kind": "test",
+    "sha256": "3e90c1727e2fb5e691fe06a3e50eb189801b12707455ed9a4e65eb8e29efe014"
+  },
+  {
+    "path": "internal/engine/managed_scope.go",
+    "kind": "source",
+    "sha256": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2"
+  },
+  {
+    "path": "internal/engine/managed_scope_test.go",
+    "kind": "test",
+    "sha256": "601f9b6ac2944c277cf9af07bbaf43e4df9fe4a88b2c5c8a9bd09ad18dee8a34"
+  },
+  {
+    "path": "internal/engine/managed_settlement_pause_test.go",
+    "kind": "test",
+    "sha256": "e3841586e0da879c8cb2af3a39a2dc047deca265544deafcaf9bccda86fb27fe"
+  },
+  {
+    "path": "internal/engine/managed_supervision_test.go",
+    "kind": "test",
+    "sha256": "64661bb44fed381979e49fad52ee06caa2f269dc4d901b16aedcfc291d284edd"
+  },
+  {
+    "path": "internal/engine/memory_test.go",
+    "kind": "test",
+    "sha256": "6d344f9ba09eb7448221016610ceb69c99219b886a37d9198e831bb1ddc5f557"
+  },
+  {
+    "path": "internal/engine/missing_report_recovery_test.go",
+    "kind": "test",
+    "sha256": "df6faa91af7b998b636354a815b2fbeb21042b5dddb1b60ea91b9afc74b5e2a6"
+  },
+  {
+    "path": "internal/engine/mission.go",
+    "kind": "source",
+    "sha256": "dacdf7fe36ce15ff76e2cbcc6e5075dae89afeff3c89bfda753213a3e1e8fe01"
+  },
+  {
+    "path": "internal/engine/mission_cli.go",
+    "kind": "source",
+    "sha256": "1fe0ffc56439b71c9c6e8fa88b2f4c5b175d302ffdef6e1bc7f94ee8362adc74"
+  },
+  {
+    "path": "internal/engine/mission_closed_history_test.go",
+    "kind": "test",
+    "sha256": "7f93f9c16652653659ac9dd82e1cee501050de60e525398390209472d541b8b5"
+  },
+  {
+    "path": "internal/engine/mission_effort_test.go",
+    "kind": "test",
+    "sha256": "cf507089fffb3fe96043f9e3232199ca07c5c3f96709ac178ea3a1480248cc11"
+  },
+  {
+    "path": "internal/engine/mission_guidance.go",
+    "kind": "source",
+    "sha256": "69895d5bab15756c47957f1fc7a2cf5d93893391683ec00fb5cdbec07596db33"
+  },
+  {
+    "path": "internal/engine/mission_guidance_test.go",
+    "kind": "test",
+    "sha256": "2cc65e699af6f344996c57bfd239e4207da764e408090995038449f386409cc4"
+  },
+  {
+    "path": "internal/engine/mission_help_test.go",
+    "kind": "test",
+    "sha256": "5b4a53d17b5abb26dc7dc3987e13651fb693763d22ad2a0ac616adb70a51b5d4"
+  },
+  {
+    "path": "internal/engine/mission_insights.go",
+    "kind": "source",
+    "sha256": "7ad16617038215f6353cef3f462b18d5fc92b796c1af61e6a96a5394c22e440b"
+  },
+  {
+    "path": "internal/engine/mission_insights_test.go",
+    "kind": "test",
+    "sha256": "a1b6fb40189fc4f8db87b90c0d4df7755c4ef3a048cc58df573fbb7135c007a0"
+  },
+  {
+    "path": "internal/engine/mission_launch_identity_test.go",
+    "kind": "test",
+    "sha256": "1dc9d93f5b051ed8e027f53797cf43ce9772e3110c0da4f7a3dee845da9a468e"
+  },
+  {
+    "path": "internal/engine/mission_preview_review_test.go",
+    "kind": "test",
+    "sha256": "ef3a10242cd66cee193fa8ee8a19b4edbb0562ad15448c4776501fee7c7ee5a5"
+  },
+  {
+    "path": "internal/engine/mission_provider_cooldown_test.go",
+    "kind": "test",
+    "sha256": "c4c99fcefffdc5dd39a43039ca2ded137fe459ad9157e789ab2a3a8a49e5385a"
+  },
+  {
+    "path": "internal/engine/mission_status.go",
+    "kind": "source",
+    "sha256": "4bee17fc35cc7a963f1df2a1996a5aa9788861c397d08829ffb4b3c82c5ceab1"
+  },
+  {
+    "path": "internal/engine/mission_status_test.go",
+    "kind": "test",
+    "sha256": "5ad922a230d64567b4755e8114c6dd5bd62a3009f1a230af2bf37e30a4206d5f"
+  },
+  {
+    "path": "internal/engine/mission_supervision.go",
+    "kind": "source",
+    "sha256": "a078550f9d75ce86e570ef87600a7d345f87f66862939233bda61aa45baed952"
+  },
+  {
+    "path": "internal/engine/mission_supervision_test.go",
+    "kind": "test",
+    "sha256": "ee27d92d8d3ddcbcb6e59e3c93afe682279c62b8563f0cf2c8397c0c5a70c591"
+  }
+]

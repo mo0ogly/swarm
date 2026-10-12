@@ -1,0 +1,5 @@
+--- FAIL: TestInstructionRevisionPublicDecision (0.03s)
+    instruction_revision_test.go:15: opération non autorisée : revise-instructions
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.050s
+FAIL

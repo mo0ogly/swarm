@@ -1,0 +1,20 @@
+{
+  "state": "finished",
+  "started": "2026-10-11T22:29:07.473033+00:00",
+  "finished": "2026-10-11T22:29:09.195159+00:00",
+  "argv": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/inspection-state24-preview-_ieu0dde",
+  "candidate_digest": "780e0c1d47c2dd6fbeb77c39ac9f393400204cda11fb87abcf0c0c1ec2936aac",
+  "manifest_sha256": "25093e48a5213e1003385577114b414439a09874ac355ac9309cb981a1527f75",
+  "frozen_paths": 2113,
+  "wall_seconds": 1.7221502339962171,
+  "exit": 0,
+  "output": "/tmp/swarm-inspection-state24-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

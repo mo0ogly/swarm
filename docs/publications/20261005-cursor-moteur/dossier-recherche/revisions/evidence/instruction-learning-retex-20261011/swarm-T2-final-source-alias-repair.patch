@@ -1,0 +1,163 @@
+diff --git a/docs/plan-ca937edf4e-T2.md b/docs/plan-ca937edf4e-T2.md
+index 403fac2..095ca6a 100644
+--- a/docs/plan-ca937edf4e-T2.md
++++ b/docs/plan-ca937edf4e-T2.md
+@@ -145,7 +145,9 @@ revue indépendants frais. L’observation d’origine reste dans l’index de p
+ La suite après découpage couvre 1 096 cibles, les 19 processus sortent à 0 ;
+ les skips restent explicites. Son reçu `source-parts-full-suite.out` et le
+ parcours ciblé `source-parts-targeted.out` sont conservés séparément des reçus
+-antérieurs à 1 094 et 1 095 cibles.
++antérieurs à 1 094 et 1 095 cibles. Ce reçu source-parts est historique, antérieur
++aux cas alias-dot/alias-parent ; il ne prouve pas leur exécution dans le code final.
++La preuve finale nommée est source-alias-final-targeted.out, décrite ci-dessous.
+ 
+ ## Correction du refus sémantique — chemins équivalents
+ 
+@@ -268,3 +270,24 @@ et les sorties d’exécution T2 sont inchangés. Le refus, les trois tentatives
+ les avis et les appels consommés restent conservés. Cette correction externe
+ n’est ni une nouvelle production autonome ni une acceptation ; les contrôles
+ frais et la revue indépendante du nouvel arbre sont requis.
++
++
++## Replan du reçu historique des alias — 11 octobre 2026
++
++La revue754dbd4d du candidat6089c4fb demande une preuve verbeuse couvrant les
++sept cas du test final TestGraphDeliverySourcePartsPreserveIntegrity. Le vieux
++source-parts-targeted.out est conservé intact : il précède l'ajout alias-dot et
++alias-parent et ne sert pas de preuve finale de leur exécution. Le reçu ultérieur
++source-alias-targeted.out non verbeux atteste exit0 mais ne nomme pas les cas.
++
++L'opérateur réexécute le test seul, avec -count=1 -v -timeout=60s, dans sa copie
++isolée dont l'arbre indexé e1491d45 est exactement celui du candidat6089c4fb.
++Le reçu source-alias-final-targeted-receipt.json porte la commande, l'exécuteur,
++les dates16:31:59→16:32:10UTC,11,311s, l'arbre, les empreintes et l'absence de drift.
++La sortie intégrale source-alias-final-targeted.out montre PASS pour tampered,
++escape, duplicate, alias-dot, alias-parent, ambiguous et missing. Tous deux sont
++nouveaux fichiers du diff fourni à la revue ; aucun original n'est tronqué ou
++supprimé, ni besoin de les dupliquer dans les sources supplémentaires déjà bornées.
++Ces fichiers sont sous docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/.
++Le Go est inchangé. Cette preuve externe est attribuée, sans nouvelle tentative
++native, remboursement ni acceptation. Contrôles et revue du nouveau candidat requis.
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
+index e6c8112..ab5f08d 100644
+--- a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json
+@@ -31,7 +31,8 @@
+     "canonical_suite_source_alias": "PASS 1096 discovered targets, all 19 groups exit 0; optional skips explicit",
+     "localization_and_source_integrity": "PASS targeted public judge/checkpoint, full source integrity and alias cases, exit0 3.253s; judge code unchanged from canonical1096 receipt",
+     "localization_structure": "PASS mechanical docs checker, not an independent semantic verdict",
+-    "status_scope_validation": "PASS selected -run tests only; raw receipt + exact argv; not full suite"
++    "status_scope_validation": "PASS selected -run tests only; raw receipt + exact argv; not full suite",
++    "final_source_alias_named_cases": "PASS fresh exact-tree verbose receipt: tampered,escape,duplicate,alias-dot,alias-parent,ambiguous,missing; no source drift, code unchanged."
+   },
+   "limits": [
+     "Provider doubles, no autonomous real-model judge/renewal observed",
+@@ -191,6 +192,14 @@
+     {
+       "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/status-scope-validation.out",
+       "sha256": "4aa00edbabbb2be14f82c1a21b7f79bfa46e4f787abb1f6df4983feba204e34c"
++    },
++    {
++      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out",
++      "sha256": "20a5231bb6e125999159510686de3096a238d4a1a6dd734b44debebf350937fa"
++    },
++    {
++      "path": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json",
++      "sha256": "0066d3170d28626ffde753cdb365b30c8a4c50d1dde0cc877ffccddfb7b0b4b4"
+     }
+   ],
+   "commands": {
+@@ -249,5 +258,12 @@
+     "state": "changes_requested",
+     "accepted": false,
+     "repair": "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/review-status-scope.json"
++  },
++  "final_source_alias_recheck": {
++    "prior_index_sha256": "1aacdd4729ca4ab72d0c4979955451e7c82cf1003e9a32cf5ecf75172e8f5d57",
++    "refusal": "review-754dbd4d247114000994bbc6",
++    "base_candidate": "6089c4fb54e72b344e2950628ca8662da38c1b07",
++    "source_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
++    "scope": "Fresh operator isolated verbose test of exactly seven final source-part integrity subtests; no Go changed, source-parts-targeted.out retained as historical pre-alias receipt, not final named coverage proof."
+   }
+ }
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json
+new file mode 100644
+index 0000000..100d347
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json
+@@ -0,0 +1,51 @@
++{
++  "schema_version": 1,
++  "executor": "operator external isolated verification after independent refusal; not native autonomous worker",
++  "command": [
++    "go",
++    "test",
++    "./internal/engine",
++    "-run",
++    "^TestGraphDeliverySourcePartsPreserveIntegrity$",
++    "-count=1",
++    "-v",
++    "-timeout=60s"
++  ],
++  "cwd": "/tmp/swarm-T2-historical-handoff-repair-20261011-n5zjdmir",
++  "start": "2026-10-11T16:31:59.672853+00:00",
++  "end": "2026-10-11T16:32:10.983796+00:00",
++  "seconds": 11.310935427994991,
++  "exit": 0,
++  "public_base_candidate": "6089c4fb54e72b344e2950628ca8662da38c1b07",
++  "verified_local_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
++  "local_head": "39e89b169fc55255e828e66e765a0fee4ef91530",
++  "basis": "Existing isolated clone indexed tree exactly equals public candidate tree; no unstaged change. Public candidate commit lives in integration repository, not producer copy; attempted producer fetch failed before any reset. No requirement for same local commit identity claimed.",
++  "tracked_files": 2009,
++  "source_drift": [],
++  "new_code_changes": false,
++  "expected_subtests": [
++    "tampered",
++    "escape",
++    "duplicate",
++    "alias-dot",
++    "alias-parent",
++    "ambiguous",
++    "missing"
++  ],
++  "passed_subtests": [
++    "tampered",
++    "escape",
++    "duplicate",
++    "alias-dot",
++    "alias-parent",
++    "ambiguous",
++    "missing"
++  ],
++  "original_output": "/tmp/swarm-T2-final-source-alias-targeted.out",
++  "output_sha256": "20a5231bb6e125999159510686de3096a238d4a1a6dd734b44debebf350937fa",
++  "qualification_environment": {
++    "TMPDIR": "/tmp",
++    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
++  },
++  "supersedes_as_final_test_proof": "Historical source-parts-targeted.out retained intact; it predates alias-dot/alias-parent and alone does not prove final source-parts implementation."
++}
+diff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out
+new file mode 100644
+index 0000000..1b9a779
+--- /dev/null
++++ b/docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out
+@@ -0,0 +1,18 @@
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/tampered
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/escape
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/duplicate
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/alias-dot
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/alias-parent
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/ambiguous
++=== RUN   TestGraphDeliverySourcePartsPreserveIntegrity/missing
++--- PASS: TestGraphDeliverySourcePartsPreserveIntegrity (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/tampered (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/escape (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/duplicate (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/alias-dot (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/alias-parent (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/ambiguous (0.00s)
++    --- PASS: TestGraphDeliverySourcePartsPreserveIntegrity/missing (0.00s)
++PASS
++ok  	swarm.local/companion/internal/engine	0.030s

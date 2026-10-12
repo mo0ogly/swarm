@@ -1,0 +1,48 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "TestSelectionCapacityRecovery|TestPlanningReviewRetry|TestManagedFragmentFinalStore",
+    "-count=1",
+    "-timeout=6m"
+  ],
+  "start": "2026-10-11T19:39:17.497248+00:00",
+  "end": "2026-10-11T19:43:52.129069+00:00",
+  "seconds": 274.6318120149954,
+  "exit": 0,
+  "output": "/tmp/swarm-selection-recovery22-race-v1-full.out",
+  "output_sha256": "dc0037a77c3e0a77273d6bc75ea9ffd0ddd0359ca4e675f5980ef9a36db06022",
+  "qualification_environment": {
+    "TMPDIR": "/tmp",
+    "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+  },
+  "source_manifest_sha256": "a4acd582cc9177b6f856ceff10427b59e9761067863df85d77f0e72d2325e169",
+  "candidate_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+  "paths": 1189,
+  "source_drift": [],
+  "manifest_changed": false,
+  "driver": {
+    "start": "2026-10-11T19:39:17.497248+00:00",
+    "driver_pid": 3284136,
+    "pgid": 3284136,
+    "sid": 3284136,
+    "command": [
+      "go",
+      "test",
+      "-race",
+      "./internal/engine",
+      "-run",
+      "TestSelectionCapacityRecovery|TestPlanningReviewRetry|TestManagedFragmentFinalStore",
+      "-count=1",
+      "-timeout=6m"
+    ],
+    "manifest_sha256": "a4acd582cc9177b6f856ceff10427b59e9761067863df85d77f0e72d2325e169",
+    "source_digest": "5238f34c3c8c61b983dc220f75352078ae5f728f721db24332042dba881332bd",
+    "paths": 1189,
+    "precondition": "Qualified21 plus generic guarded historical selection-capacity recovery, no mission-ID exceptions; fresh receipt/authorized supervisor decision, immutable originals and spending, actual negative verdict preserved for root/child. Projection avoids DB connection reacquisition; producer termination guarded in commit transaction. Personal common directives/planner/worker prevention updated, reviewer method unchanged. Native read-only counterexample PASS11sources14618to79564 with54calls available. Full before install; source and runtime evidence separate.",
+    "go_pid": 3284152
+  }
+}

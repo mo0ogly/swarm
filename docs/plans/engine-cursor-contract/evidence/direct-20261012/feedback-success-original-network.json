@@ -1,0 +1,16 @@
+[
+  {
+    "case": "fr/etat",
+    "phase": "request",
+    "action": "reject-instructions",
+    "method": "POST",
+    "at": 1791836867509
+  },
+  {
+    "case": "fr/etat",
+    "phase": "response",
+    "action": "reject-instructions",
+    "status": 200,
+    "at": 1791836867522
+  }
+]

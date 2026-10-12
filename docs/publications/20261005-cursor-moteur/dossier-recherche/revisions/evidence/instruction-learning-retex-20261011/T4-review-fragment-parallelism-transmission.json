@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-11T14:55:50.226909+00:00",
+  "before": 320,
+  "after": 321,
+  "task": "plan-ca937edf4e-T4",
+  "next_sha256": "2e0c04afaffa7897e9971a288dd5ff531bd83fbd36d7ec6c6eb1bba7627f33a2",
+  "effect": "Public future-task refinement, review current contract/candidate/provider unchanged; not implementation or parallel execution proof"
+}

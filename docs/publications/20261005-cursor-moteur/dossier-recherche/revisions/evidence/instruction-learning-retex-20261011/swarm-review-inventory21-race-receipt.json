@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "TestReviewEvidenceInventory|TestPlanningUnresolvedReviewIncidentRemainsExactScopedAndReadOnly|TestPlanningAcknowledgedProtocolIncident|TestManagedFragmentFinalJournal|TestManagedFragmentFinal.*Store|TestManagedFragmentSelectionUsesReceivedEvidenceCapacity",
+    "-count=1",
+    "-timeout=6m"
+  ],
+  "start": "2026-10-11T19:11:04.406482+00:00",
+  "end": "2026-10-11T19:13:06.325189+00:00",
+  "seconds": 121.9186936240003,
+  "exit": 0,
+  "output": "/tmp/swarm-review-inventory21-race.out",
+  "sha256": "c05dc00fa426d05b4c333e37706424a0daf8a63dfb7819fdc58bf65a50b947fc",
+  "scope": "Isolated persisted final-journal transitions, exact historical prompt versions, current acknowledged knowledge and protocol reception, no native DB/provider."
+}

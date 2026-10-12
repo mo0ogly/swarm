@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-11T16:08:12.613328+00:00",
+  "moved": [
+    {
+      "original": "/tmp/swarm-account-change-recovery-candidate",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-account-change-recovery-candidate",
+      "bytes": 78249852,
+      "sha256": "a5696bdf09fc97f58a0abb1c4c0342e8afc13cab3b5419215832c8b66d417079",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-admin-duration-launch-candidate",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-admin-duration-launch-candidate",
+      "bytes": 78249118,
+      "sha256": "0f619612409b93915cee22614e1fbee3c00c6fdea62c94459d0766ba9d48f0c4",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-instruction-operator-composition-candidate",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-instruction-operator-composition-candidate",
+      "bytes": 78247294,
+      "sha256": "a58e2791621fbe2bacd21a4d8836ce8b9ba7f35c4128ccb21b8a4d1e267922ed",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-source-capacity-recovery-candidate",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-source-capacity-recovery-candidate",
+      "bytes": 78246852,
+      "sha256": "7c87e87adec51a145a00afb4ce8d0e609876b62486c388c009a0f64d4012b8d9",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-T2-primary13-preview-candidate",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-T2-primary13-preview-candidate",
+      "bytes": 78263764,
+      "sha256": "a716ddf30944c526a8d071e0ba2fbcd4927d3aa9097c760e569536780553db88",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-before-account-change-recovery-install",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-before-account-change-recovery-install",
+      "bytes": 78246852,
+      "sha256": "7c87e87adec51a145a00afb4ce8d0e609876b62486c388c009a0f64d4012b8d9",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-before-source-capacity-recovery-install",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-before-source-capacity-recovery-install",
+      "bytes": 78249118,
+      "sha256": "0f619612409b93915cee22614e1fbee3c00c6fdea62c94459d0766ba9d48f0c4",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    },
+    {
+      "original": "/tmp/swarm-claude-effort-recovery-candidate",
+      "retained": "/home/fpizzi/.cache/swarm-operator-replan-20261011/swarm-claude-effort-recovery-candidate",
+      "bytes": 78255180,
+      "sha256": "1250e99e8f4c3f65a25a26186f46bc688dfab5e9c3b8bf48c1543ca3f33576cd",
+      "original_path_preserved": "symlink",
+      "active_execution": false
+    }
+  ],
+  "total_bytes": 626008030,
+  "purpose": "Free operator-owned binaries from low-space tmpfs; all bytes/hashes and original referenced paths retained; no evidence, repository or database removed."
+}

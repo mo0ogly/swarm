@@ -1,0 +1,36 @@
+{
+  "observed_at": "2026-10-11T07:57:57.380919+00:00",
+  "source_work_revision": 105,
+  "work": "w-ca937edf4e0abd85f8d3d67b",
+  "task": "plan-ca937edf4e-T2",
+  "review": {
+    "id": "review-83368e7fc18d39d4c7968034",
+    "state": "changes_requested",
+    "candidate_commit": "56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9",
+    "attempt": "a-5fff6319655d0b5b9b34413a",
+    "started": "2026-10-11T07:37:41.67536118Z",
+    "finished": "2026-10-11T07:49:42.398606326Z",
+    "failure_code": null,
+    "result_event": "review-83368e7fc18d39d4c7968034-result-3c2307483b320eef",
+    "reason": "Correction demandée : diff --git a/docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md b/docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md, ligne de la pièce 66 : Le document affirme sans réserve que la suite complète internal/engine a produit 1017 PASS/5 ignorés/1 échec. La seule reproduction jointe au même candidat (interrupted-suite-observation.json) montre une exécution interrompue (code 143, complete=false) avec des chiffres différents : 979 PASS/8 ignorés/1 échec, et précise qu'aucun bilan complet n'est établi. Reproduction : Comparer « 1017 tests PASS, 5 ignorés » de ce document avec partial_top_level_outcomes de interrupted-suite-observation.json (pièce 7) dans le même candidat : pass=979, skip=8, complete=false. Attendu : Le chiffre 1017/5/1 ne devrait pas être présenté comme preuve acquise sans mentionner qu'il n'a jamais été reproduit, contrairement aux 979/8/1 effectivement obtenus.\ndiff --git a/docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md b/docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md, ligne de la pièce 65 : Le miroir anglais répète la même affirmation non réservée : 1017 PASS/5 skipped sur la suite complète internal/engine. La même pièce de reproduction jointe (interrupted-suite-observation.json, pièce 7) montre une exécution interrompue avec 979 PASS/8 skip et complete=false, contredisant ce chiffre présenté comme preuve. Reproduction : Comparer « the full internal/engine suite (1017 tests PASS, 5 skipped) » avec partial_top_level_outcomes de la pièce 7 (979/8/1, complete=false) pour le même candidat. Attendu : Le miroir anglais devrait porter la même réserve que la note de correction, pas le chiffre non reproduit présenté comme un fait établi.\ndiff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/index.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/index.json, ligne de la pièce 10 : Ce fichier de preuve pour la tâche T2 du candidat 56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9 déclare avoir exécuté les tests sur le commit a27e175eb4f3e38f9cede1c888956a5ca5a0310f, distinct du candidat revu. Seule une correspondance de blob git pour 3 fichiers est avancée, non vérifiable par ce rôle sans outil, et ne couvre ni go build ni go vet ni la suite complète citées ailleurs. Reproduction : Comparer le champ source_candidate de ce fichier avec candidate_commit fourni pour cette revue (56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9) : ils diffèrent, sans chaîne de commit ni reçu moteur reliant les deux. Attendu : Les preuves d'exécution soumises pour l'acceptation d'un candidat devraient être produites directement sur ce commit, ou accompagnées d'un lien vérifiable par le moteur, pas d'une correspondance de blob auto-déclarée sur un autre SHA.\ndiff --git a/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json b/docs/plans/engine-cursor-contract/evidence/T2-execution/judge-execution.json, ligne de la pièce 10 : Ce journal d'exécution des tests du juge déclare le commit a27e175eb4f3e38f9cede1c888956a5ca5a0310f comme candidate, alors que la revue porte sur 56ca8cab5bfde7dc9ddf7a7a5d2169231d87c9a9. Le même écart de chaîne de preuve que l'index (pièce 6) se répète ici, pour l'unique exécution positive (exit 0) citée en support des critères 1 à 3 du bilan. Reproduction : Comparer le champ candidate de judge-execution.json avec candidate_commit fourni à cette revue ; aucun élément du paquet ne prouve l'équivalence des deux commits au-delà d'une correspondance de blob auto-déclarée. Attendu : Le journal d'exécution devrait porter le SHA du candidat réellement revu, ou documenter explicitement et de façon vérifiable l'équivalence avec ce SHA."
+  },
+  "report_sha256": "be8b7b8186d64e4796caa77026b5b89cd244b51f7783e41ca2431f3131ed60f6",
+  "native_root_action": {
+    "operation": "retry",
+    "event_id": "planning-claim-3397c22c8a1b9ee8f3e51f3b-decision",
+    "revision": 102,
+    "source_event": "review-83368e7fc18d39d4c7968034-result-3c2307483b320eef"
+  },
+  "dispatch_refusal": "reprise : résultat Git absent ou attribution modifiée",
+  "dispatch_refusal_at": "2026-10-11T07:51:01.808914811Z",
+  "linked_planning_failure": {
+    "revision": 105,
+    "reason": "Proposition non appliquée : reprise non disponible"
+  },
+  "cause": "repair stored under refs/swarm/repairs/PROOF_KEY but recovery handoff still checks refs/swarm/attempts/AGENT",
+  "local_method_errors": [
+    "First new test enabled a rejecting provider too late, after finishAgent had already integrated with a pass; corrected before red reproduction.",
+    "Saved historical source with .go extension inadvertently created a Go package under research evidence; renamed .go.txt without changing bytes or SHA. Re-ran vet and full suite."
+  ],
+  "acceptance": false
+}

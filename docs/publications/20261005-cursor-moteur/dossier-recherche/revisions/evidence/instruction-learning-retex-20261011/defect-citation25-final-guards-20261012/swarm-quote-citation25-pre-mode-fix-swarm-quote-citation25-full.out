@@ -1,0 +1,10 @@
+?   	swarm.local/companion	[no test files]
+?   	swarm.local/companion/cmd/swarm	[no test files]
+2026/10/12 08:35:47 http: TLS handshake error from 127.0.0.1:40308: remote error: tls: bad certificate
+--- FAIL: TestGraphDeliveryD04InstallVersion (0.00s)
+    graph_delivery_install_test.go:95: native install v0.0.0-d04 failed: fork/exec ./install.sh: permission denied
+--- FAIL: TestGraphDeliveryD04RollbackSafety (0.00s)
+    graph_delivery_install_test.go:137: native install v0.0.0-d04-old failed: fork/exec ./install.sh: permission denied
+FAIL
+FAIL	swarm.local/companion/internal/engine	513.756s
+FAIL

@@ -1,0 +1,20 @@
+{
+  "state": "finished",
+  "started": "2026-10-12T11:02:36.059443+00:00",
+  "finished": "2026-10-12T11:02:39.258294+00:00",
+  "argv": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-effective-provider-3el54ztk",
+  "candidate_digest": "1dba385b5ee3b3b8d29e2588f3d35d9ce624f4659a8dbf179147141d335e85fe",
+  "manifest_sha256": "5c19a0eb9e709d2e591bdc78f5953d68244e1c3cb1e56b53f3ff24cfda93fc6b",
+  "frozen_paths": 2127,
+  "wall_seconds": 3.198880641008145,
+  "exit": 0,
+  "output": "/tmp/swarm-T3-effective-provider-linked-vet.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": [],
+  "limits": "Isolated source/build/method inputs, no native database or real model call. Not native acceptance."
+}

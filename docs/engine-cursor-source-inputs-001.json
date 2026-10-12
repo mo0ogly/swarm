@@ -1,0 +1,1462 @@
+[
+  {
+    "path": ".agents/skills/product-delivery/SKILL.md",
+    "kind": "source",
+    "sha256": "864bb09eb52c8fc0d70fb68ccce94380098f9813b4be1e14d986e9cfc18fedc5"
+  },
+  {
+    "path": ".agents/skills/product-delivery/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "69667332179dd4a2e51fd1530e23332b66c00b1d249b2bede9626ad4db6f7626"
+  },
+  {
+    "path": ".agents/skills/product-planning/SKILL.md",
+    "kind": "source",
+    "sha256": "90457e484c240ebe04709ebddefdd87c73a64fbdbc9c786fd18fdc9a2555eeaa"
+  },
+  {
+    "path": ".agents/skills/product-planning/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "61c260fe43de24133ecc34a8ed3aea2e096601a22666aa603dc0ee7dd77fa853"
+  },
+  {
+    "path": ".agents/skills/product-review/SKILL.md",
+    "kind": "source",
+    "sha256": "b7d3493730eac8f3d4082b2e7e1f275e8f6ffa859b388765b6613724c24815f5"
+  },
+  {
+    "path": ".agents/skills/product-review/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "89505ced3ad0a690094186957af92c51d06356e1b5aaf61c0cc886b503c4d401"
+  },
+  {
+    "path": ".claude/commands/ks-architect.md",
+    "kind": "source",
+    "sha256": "66589d8eff58cf04970113eae671253966e4dfe316e672d2d3592feedf375002"
+  },
+  {
+    "path": ".claude/commands/ks-design-system.md",
+    "kind": "source",
+    "sha256": "13ba13ebd50be79359cb0abf251317ff5de04d2e1b22be044323ca30eef3b95b"
+  },
+  {
+    "path": ".claude/commands/ks-design.md",
+    "kind": "source",
+    "sha256": "47ee172540d2095a45e1542bd57a22f9b857fad6859f0e64a1884fa4253e0d07"
+  },
+  {
+    "path": ".claude/commands/ks-execute.md",
+    "kind": "source",
+    "sha256": "5ac16b20e1c57a96a78fd0c4235338c180f0c8ebc1baeec8ff1626fd97af2194"
+  },
+  {
+    "path": ".claude/commands/ks-feature.md",
+    "kind": "source",
+    "sha256": "67a3f5bae56b8c4aabf06c536264fbe26aeaf3b668316e89817afdd22991f03d"
+  },
+  {
+    "path": ".claude/commands/ks-help.md",
+    "kind": "source",
+    "sha256": "10d400b0edb4f20d4c32ea30d045ab4f009d9a73fa655d91d42ecf14e86d4620"
+  },
+  {
+    "path": ".claude/commands/ks-orchestrator.md",
+    "kind": "source",
+    "sha256": "5693f8c694711893f765944880b10b6d34c8fcf97ebbf5e70b09b11179a7907a"
+  },
+  {
+    "path": ".claude/commands/ks-plan.md",
+    "kind": "source",
+    "sha256": "f94c0d6cf078b081b7b14d5de36c28df972991bb2da4b2efb34a9a8bbae3e0d9"
+  },
+  {
+    "path": ".claude/commands/ks-prd.md",
+    "kind": "source",
+    "sha256": "c6bb90b1b4f2fd00505f5a35f4d9179927f829efd1046650deff3bd51d321878"
+  },
+  {
+    "path": ".claude/commands/ks-research.md",
+    "kind": "source",
+    "sha256": "aade0bcb1e259d8eb3f8bce0ff881e4b80c099e9f073a27966983542d9a3b62a"
+  },
+  {
+    "path": ".claude/commands/ks-review.md",
+    "kind": "source",
+    "sha256": "aa0b5a2bd811bfb70e276e3f542ebada667a7ba601b93f93c349e420a9c1f18f"
+  },
+  {
+    "path": ".claude/commands/ks-ship.md",
+    "kind": "source",
+    "sha256": "b04b9f056c5f0c2e97cad8284d0ee0add33bfd6e4d4b777c5b406f62f7b87f8a"
+  },
+  {
+    "path": ".claude/commands/ks-status.md",
+    "kind": "source",
+    "sha256": "bf46fe719790f64883b870ac006521959cc0a520fc3ca3491037883c1517084f"
+  },
+  {
+    "path": ".claude/commands/ks-stories-review.md",
+    "kind": "source",
+    "sha256": "bda2e32fb9da5f06b30f75c3e88d90d5323cc3a6fd2f706f68bde2881863b862"
+  },
+  {
+    "path": ".claude/commands/ks-stories.md",
+    "kind": "source",
+    "sha256": "e45295f6c143faa3fb4b042dbc7432ebe2b42b00728c8cb052adc1eae65fe5db"
+  },
+  {
+    "path": ".claude/skills/apex/SKILL.md",
+    "kind": "source",
+    "sha256": "5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde"
+  },
+  {
+    "path": ".claude/skills/audit-pdca/SKILL.md",
+    "kind": "source",
+    "sha256": "156028694aff20c19836f8fd63bf38d31f310984d44cce003692112bd769acf5"
+  },
+  {
+    "path": ".claude/skills/code-reviewer/SKILL.md",
+    "kind": "source",
+    "sha256": "6e2a902c4d8668b4c12ef9760e95d3dc28ebc28ebf8715d3529d500b7bb84344"
+  },
+  {
+    "path": ".claude/skills/debug/SKILL.md",
+    "kind": "source",
+    "sha256": "300c8d642e352cf7f5737f833346d1fcbf6174734c455f46da083d63d72d2536"
+  },
+  {
+    "path": ".claude/skills/product-delivery/SKILL.md",
+    "kind": "source",
+    "sha256": "864bb09eb52c8fc0d70fb68ccce94380098f9813b4be1e14d986e9cfc18fedc5"
+  },
+  {
+    "path": ".claude/skills/product-delivery/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "69667332179dd4a2e51fd1530e23332b66c00b1d249b2bede9626ad4db6f7626"
+  },
+  {
+    "path": ".claude/skills/product-planning/SKILL.md",
+    "kind": "source",
+    "sha256": "90457e484c240ebe04709ebddefdd87c73a64fbdbc9c786fd18fdc9a2555eeaa"
+  },
+  {
+    "path": ".claude/skills/product-planning/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "61c260fe43de24133ecc34a8ed3aea2e096601a22666aa603dc0ee7dd77fa853"
+  },
+  {
+    "path": ".claude/skills/product-review/SKILL.md",
+    "kind": "source",
+    "sha256": "b7d3493730eac8f3d4082b2e7e1f275e8f6ffa859b388765b6613724c24815f5"
+  },
+  {
+    "path": ".claude/skills/product-review/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "89505ced3ad0a690094186957af92c51d06356e1b5aaf61c0cc886b503c4d401"
+  },
+  {
+    "path": ".claude/skills/replan/SKILL.md",
+    "kind": "source",
+    "sha256": "a496827ab164f790fb6961fc864a32e653cdef809e773eb6f4b035cf1f631a68"
+  },
+  {
+    "path": ".claude/skills/retex-analyzer/SKILL.md",
+    "kind": "source",
+    "sha256": "20073fca0e99731f31cfe9fee3ee246dfd5e5e6f4c1ab7c694acdd87b3022b16"
+  },
+  {
+    "path": ".claude/skills/spec-audit/SKILL.md",
+    "kind": "source",
+    "sha256": "743f90f0981ed3e71ce988d6812fbecdf3bb602c88558091566eb00f4152d01f"
+  },
+  {
+    "path": ".claude/skills/spec-builder/SKILL.md",
+    "kind": "source",
+    "sha256": "4fcd62035957ee7f40d5f4368b125962f705bb0457acad572f4fd405bd3844c7"
+  },
+  {
+    "path": ".claude/skills/swarm-model-design/SKILL.md",
+    "kind": "source",
+    "sha256": "413b14fc49985a8e5e45bfd7ce49d81e24dc0e47be8edb2e2f155ac1315a04a5"
+  },
+  {
+    "path": ".claude/skills/swarm-model-design/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "14171a37eeddaa0ba1d51af3d50c58d827ef01684c84bc5b37164e321187afff"
+  },
+  {
+    "path": ".claude/skills/verify-fix/SKILL.md",
+    "kind": "source",
+    "sha256": "b9973567ae668f505d47058e04d651c61f1f1c3309d9544f6bb0a38be678ba44"
+  },
+  {
+    "path": ".dockerignore",
+    "kind": "harness",
+    "sha256": "f1ffdf7444b67537e1f3fc17c398b64cb5036b2df04569590a142e0889d18797"
+  },
+  {
+    "path": ".github/workflows/ci.yml",
+    "kind": "source",
+    "sha256": "86e47eb48a77eca1a33e8b49cce3c9ec917e72755ecc9811699d7c8918b83410"
+  },
+  {
+    "path": ".gitignore",
+    "kind": "source",
+    "sha256": "df290d1d2950317f43e5e5fa583b9dfef33db258d7135c05f9a98ccd1c9e0ee1"
+  },
+  {
+    "path": "AGENTS.md",
+    "kind": "doc",
+    "sha256": "5352753c841b2452f82b40a86ab44b99ba056fdf4943a9bcd6ce1b5c8b9b9956"
+  },
+  {
+    "path": "CLAUDE.md",
+    "kind": "doc",
+    "sha256": "b196675319970382eb150cf67b70b7f27f2fe5e56aca65ca03ec1b8adb49e777"
+  },
+  {
+    "path": "INSTALL.md",
+    "kind": "doc",
+    "sha256": "e4ea40e7cc8e04af96f0c73aa57ad872049980a517779baf6cb0be75829c0a01"
+  },
+  {
+    "path": "PREPARATION-UX.md",
+    "kind": "doc",
+    "sha256": "5d6e1016aff21ef22ff9b5d4f27d10c75a21e6f617801ca02cac3dcb1947d06f"
+  },
+  {
+    "path": "README.en.md",
+    "kind": "doc",
+    "sha256": "a1c483bb1564c8569b7db1924b5abafb5154f6c5c9b10e76fcac894920f02a60"
+  },
+  {
+    "path": "README.md",
+    "kind": "doc",
+    "sha256": "f89012b44a5fdee3ca2995061a23cc0eea21aa847b73e96ba153d26e62497a39"
+  },
+  {
+    "path": "build.sh",
+    "kind": "harness",
+    "sha256": "05811cd8695a75abe03eaa0def11b6e1c2a91414345bf1cd53428f909d39806c"
+  },
+  {
+    "path": "cmd/swarm/main.go",
+    "kind": "source",
+    "sha256": "98a5c8cc6a0413228d0155d37f1841aab653aef70ac219ed20436c1e90447f69"
+  },
+  {
+    "path": "config/automation.json",
+    "kind": "source",
+    "sha256": "140b163f68b25d5feb2e6359033c93ba31f5b7bf24d90f14ab909ae1acc6087f"
+  },
+  {
+    "path": "config/graph-performance.json",
+    "kind": "source",
+    "sha256": "ac78157efb1c71102dee3545558e96147cbc6153730ceaf4bf63a514141a1b0f"
+  },
+  {
+    "path": "config/preparation-timeout.json",
+    "kind": "source",
+    "sha256": "1191fe682e4023d13e9109a0c6a6cd84eb7c17762567bea1dff46836a856a75a"
+  },
+  {
+    "path": "config/provider-wait.json",
+    "kind": "source",
+    "sha256": "0087893b8cfae0d762d34cbcea302819072a79cc63ad815d0c0c97d9128836b1"
+  },
+  {
+    "path": "config/storage-retry.json",
+    "kind": "source",
+    "sha256": "9d682788e697718df082fdf0f35730ec9b9f551e06f23699e4481de32d817deb"
+  },
+  {
+    "path": "config/web-requests.json",
+    "kind": "source",
+    "sha256": "e93688764193124252a11ff96f51e66fbdc4fbe98faa8eca2e0abe76df58754c"
+  },
+  {
+    "path": "config/web-session.json",
+    "kind": "source",
+    "sha256": "44500431a22cfa00776eb0ed7d0e9e0d2acbc03e48a8f53e096f8dd793e81653"
+  },
+  {
+    "path": "contracts/assistant-answer.v1.schema.json",
+    "kind": "source",
+    "sha256": "b724b5d137c83ab95cd04df752f81dc80c7444c73b1cd93839cd18d78a4c63c6"
+  },
+  {
+    "path": "docs/A01.md",
+    "kind": "doc",
+    "sha256": "3d8b6fe14c2092dbb853fd779e5ee7e4c1221cdadda8dfbf7fa7d0229dc606a8"
+  },
+  {
+    "path": "docs/A02.md",
+    "kind": "doc",
+    "sha256": "f56d34cdabda43f64d0d19b379e641bacf7aa749f05e416e4ec4d18be4c28751"
+  },
+  {
+    "path": "docs/A03.md",
+    "kind": "doc",
+    "sha256": "efc3f66735fce452777548f685465cf3427bae7c0decb0e59f39eeaccb2730fa"
+  },
+  {
+    "path": "docs/A04.md",
+    "kind": "doc",
+    "sha256": "9df4210c27d95a7144d1395f9fdcf82c738fbed4a5c70d16846deb1d28bd9a10"
+  },
+  {
+    "path": "docs/AGENT-METHODS.md",
+    "kind": "doc",
+    "sha256": "733bbda6d08f6414311d462651b3362e39f4b1870344171a48fb75e434fee45b"
+  },
+  {
+    "path": "docs/B01.md",
+    "kind": "doc",
+    "sha256": "0680b4092712dc8c805f8cf583be84cbb92e7f28a8713d97db7aedd268bf696d"
+  },
+  {
+    "path": "docs/B02.md",
+    "kind": "doc",
+    "sha256": "a836ba979f697a446396eebac38553abebb14b854c9a6118bbabe43d6fac6a9c"
+  },
+  {
+    "path": "docs/B03.md",
+    "kind": "doc",
+    "sha256": "b9b32704ebee3747aff5e50ab8808a2fb0b640114c658d020038f8f0f2e38184"
+  },
+  {
+    "path": "docs/B04.md",
+    "kind": "doc",
+    "sha256": "95aa13fc965ad19dddce7d892fd0362b1e8d94728447cf49b4187d9a9ef9a028"
+  },
+  {
+    "path": "docs/C01.md",
+    "kind": "doc",
+    "sha256": "7590cee9a8268b8137eea4303ac1aeb80af52f9554d4a156db3d337d4b5e3916"
+  },
+  {
+    "path": "docs/C02.md",
+    "kind": "doc",
+    "sha256": "a2904c5a9ff4b061d24de52bb5507e6c4e69d391075b99b0534c3d0c0142f900"
+  },
+  {
+    "path": "docs/C03.md",
+    "kind": "doc",
+    "sha256": "de14e33e1d21c7ef1e2b87f58b1eb9a13c9dafaa9e4631050092d9f5544e097a"
+  },
+  {
+    "path": "docs/C04.md",
+    "kind": "doc",
+    "sha256": "4d0d1808d3205326631722a06115cab208d6b574c81a0cd17b6bf18b0c8f10fd"
+  },
+  {
+    "path": "docs/CONTRACT-REVISION.md",
+    "kind": "doc",
+    "sha256": "ace697039805ba168497bad9b3b32663a554ef74b39fe5590a7a2dd275bf1d16"
+  },
+  {
+    "path": "docs/D01-dossier.md",
+    "kind": "doc",
+    "sha256": "f8efd3587a9bf467aed76abf8dd3e34ae302f2e4b192b3ab727c3d5b06bcdbf4"
+  },
+  {
+    "path": "docs/D01.md",
+    "kind": "doc",
+    "sha256": "f2921cbeec0787e2a5c667f4bc3396d02e2254d7fc7794c54ac76c654b46cd9b"
+  },
+  {
+    "path": "docs/D02-dossier.md",
+    "kind": "doc",
+    "sha256": "8a7d5edadfc96988f818488d339d83ce6caf142b10467a9cdec1fd6bae452cb2"
+  },
+  {
+    "path": "docs/D02.md",
+    "kind": "doc",
+    "sha256": "9bc40fd0a6a0467a743d859a7eeab0b0d1b1126e39f5ea8f3394d3a4419fcefc"
+  },
+  {
+    "path": "docs/ENGINE-BUSINESS-CONTROLS.md",
+    "kind": "doc",
+    "sha256": "83b535b38a1876dcf14055fa93d3bcb91f1c03ca1d8635ce7821866ed0ce442d"
+  },
+  {
+    "path": "docs/FRESH-INSTALL.md",
+    "kind": "doc",
+    "sha256": "76666ac533e02b824ac50c0b91ff39e6147974afd3fb2cab387b8e8d3b866bf9"
+  },
+  {
+    "path": "docs/PREPARATION-TEMPLATES.md",
+    "kind": "doc",
+    "sha256": "8d789011108ed74f7c62717e940e03cb8974d56450e28f1d9fd3352db4e88ac3"
+  },
+  {
+    "path": "docs/PRODUCT-ARCHITECTURE.md",
+    "kind": "doc",
+    "sha256": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d"
+  },
+  {
+    "path": "docs/PRODUCT-WORKFLOW.md",
+    "kind": "doc",
+    "sha256": "ce2f77059b6d90db265044d7f9d142053ebbc1532ca488fa0755bc502bd2d489"
+  },
+  {
+    "path": "docs/REPOSITORY-STRUCTURE.md",
+    "kind": "doc",
+    "sha256": "369284f5c2cf31aa31588cf8a778d68f481afe1c46d5b018ffd1980d5bd1323f"
+  },
+  {
+    "path": "docs/REVIEW-FRAGMENTS.md",
+    "kind": "doc",
+    "sha256": "112cdee57235b1b7dbca53e6a96b1ae5c1864a0f1eb1d4e1cba954e13e8fe7a6"
+  },
+  {
+    "path": "docs/UI-DESIGN.md",
+    "kind": "doc",
+    "sha256": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3"
+  },
+  {
+    "path": "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
+    "kind": "doc",
+    "sha256": "14c496d71907e97a9658c6823e065f39dfd415291480861bc2a008890f613ae8"
+  },
+  {
+    "path": "docs/architecture/AGENT-PARALLELISM.md",
+    "kind": "doc",
+    "sha256": "db551dc7a5bb1be188dd5487d55560b7dcd14c2101b99e5dd3b194ad889f4bc0"
+  },
+  {
+    "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "kind": "doc",
+    "sha256": "c1d8861be09ce4e9d7c2f73454188fe2b48d4fc5f9f6cd236ec1bb3f1cc4f3f4"
+  },
+  {
+    "path": "docs/architecture/CONTROLS-AND-FEEDBACK.md",
+    "kind": "doc",
+    "sha256": "e0670a2fede5c5f8b7a8423c939e71aa655f5323f0f0da83beb52666ce78858d"
+  },
+  {
+    "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+    "kind": "doc",
+    "sha256": "5cd0517db0ed835adf6ce7c8e924404863e13c122ee06fb459ef84dc5399b383"
+  },
+  {
+    "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
+    "kind": "doc",
+    "sha256": "225be08ba074b111d2135a867601222c360f54c3864950dbc171867a02d10805"
+  },
+  {
+    "path": "docs/architecture/GARDE-ORGANISATION.md",
+    "kind": "doc",
+    "sha256": "b69337bfad664d150e92d00ad2a92f165fe2ebbf72bc3e7e35c11a469e765e4d"
+  },
+  {
+    "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+    "kind": "doc",
+    "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+  },
+  {
+    "path": "docs/architecture/JUDGMENT-CYCLES.md",
+    "kind": "doc",
+    "sha256": "cb1e187000a56dd4f254aeff04b3d5b0d2d303670c09b72ff8b954832170f944"
+  },
+  {
+    "path": "docs/architecture/LOG-CONSOLE.md",
+    "kind": "doc",
+    "sha256": "319d6f17ce5459682f8fb6a53b1e27a72d358ceaf092b884127f6d1ac05d9d0f"
+  },
+  {
+    "path": "docs/architecture/MANAGED-PLAN-GATES.md",
+    "kind": "doc",
+    "sha256": "26512b1a4af9dacf8de7dd7683dad95a14b3bca53e38d9fa4f02230e0eca250d"
+  },
+  {
+    "path": "docs/architecture/PROVIDER-LIVENESS.md",
+    "kind": "doc",
+    "sha256": "388d8be941caebc1b597963f14e5d1fc79654e7b57ff2587988f050f92fd20f9"
+  },
+  {
+    "path": "docs/architecture/REVIEW-EVIDENCE.md",
+    "kind": "doc",
+    "sha256": "4d2ecb04425609df5d1d8de3004a3daf4639620571969052e0b4048927cad1f9"
+  },
+  {
+    "path": "docs/architecture/RUN-SUPERVISION.md",
+    "kind": "doc",
+    "sha256": "7a2fba9d4f3f23a6f648521a00b46386b843845c288d090b98c694812c249a4a"
+  },
+  {
+    "path": "docs/architecture/TRACEABILITY.md",
+    "kind": "doc",
+    "sha256": "fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741"
+  },
+  {
+    "path": "docs/architecture/WEB-REQUEST-POLICY.md",
+    "kind": "doc",
+    "sha256": "6c2166c3cf0de728cf13ce4cf6922e6d75e11bdbfc85f84311584bfd2072b2c1"
+  },
+  {
+    "path": "docs/en/AGENT-COMMUNICATION.md",
+    "kind": "doc",
+    "sha256": "94d4991335d87b22a994bd9030ffadee310f0d93b398fa3a0c93de8d21f851f6"
+  },
+  {
+    "path": "docs/en/AGENT-ENGINE-PROTOCOL.md",
+    "kind": "doc",
+    "sha256": "e3127993f5a681b045e9e761d8c9205a02748632f0df2cddbbbdb22d94096a7f"
+  },
+  {
+    "path": "docs/en/AGENT-METHODS.md",
+    "kind": "doc",
+    "sha256": "b3c6cb254a834c588518235ccbbf1396886bfcf5ea813a8c1f873a06c9bb4fb7"
+  },
+  {
+    "path": "docs/en/AGENT-PARALLELISM.md",
+    "kind": "doc",
+    "sha256": "34c028ca657bf5b7c6bdeca026deeca60a274a88452a06078b3cce93de669823"
+  },
+  {
+    "path": "docs/en/ATTEMPT-RECOVERY.md",
+    "kind": "doc",
+    "sha256": "77d1499fd0e78459988a6126a2b5c4a6fdb9ed148a3917360ab732586925c76e"
+  },
+  {
+    "path": "docs/en/AUTOMATION-PROGRAMS.md",
+    "kind": "doc",
+    "sha256": "53d22933acdceb063a621bc57e73cefa8e33401378dcc57f97046a5bdc6d2229"
+  },
+  {
+    "path": "docs/en/AUTOMATION.md",
+    "kind": "doc",
+    "sha256": "cfa10e246c3cd95497a36ab4dc0d9150b2e5c11cdacc0fb34888224b86da140c"
+  },
+  {
+    "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
+    "kind": "doc",
+    "sha256": "3dbd0e9b5bf1d6443b872b95930187d8bcb24bdff2a37f0fb7d49f17a06a8d79"
+  },
+  {
+    "path": "docs/en/BUDGETS.md",
+    "kind": "doc",
+    "sha256": "0014e68b246dbd93e46b58cab6f30a15fe9c8f30d5d172a65c7a4b82ef0b9069"
+  },
+  {
+    "path": "docs/en/CONTRACT-REVISION.md",
+    "kind": "doc",
+    "sha256": "47ecee687962622642db2dc4d1e3e18d2594cebe9d579f955ff8188d93b8f37e"
+  },
+  {
+    "path": "docs/en/CONTROLLED-AUTONOMY-TRIAL.md",
+    "kind": "doc",
+    "sha256": "64127a9bc3653f8c376569540c36e89c14eb547e7c92eeabc7e6f111d74327ac"
+  },
+  {
+    "path": "docs/en/CONTROLS-AND-FEEDBACK.md",
+    "kind": "doc",
+    "sha256": "960235f11c297321163c22172b4b40c9c84af528e7353566f0eba2d3dea5ec6a"
+  },
+  {
+    "path": "docs/en/CURSOR-ENGINE-CONTRACT.md",
+    "kind": "doc",
+    "sha256": "de1472ee6a7b02dfaa8e75d620ed0190f1610584116e591614765fc6128dff22"
+  },
+  {
+    "path": "docs/en/DELIVERY-SCOPE.md",
+    "kind": "doc",
+    "sha256": "98049f624f8496ef28ee1ce7e1f2e376210639724a31cf5cd28cc9ab8bdcccdd"
+  },
+  {
+    "path": "docs/en/ENGINE-ACCEPTANCE.md",
+    "kind": "doc",
+    "sha256": "09600b74d323ba6f85a3ee36a7aa2f47a439dc0d7df876e39f2ce403b14ad089"
+  },
+  {
+    "path": "docs/en/ENGINE-BUSINESS-CONTROLS.md",
+    "kind": "doc",
+    "sha256": "7196256bd57390e4b8d49feac508beb5811df6f2cbe81c4f5f2fe06bd040d5db"
+  },
+  {
+    "path": "docs/en/ENGINE-RECOVERY.md",
+    "kind": "doc",
+    "sha256": "d70acce770e816bbc33847e8143ed324215f122f8ab8072efcf2b0bf768fc6a9"
+  },
+  {
+    "path": "docs/en/FINAL-VALIDATION-COORDINATION.md",
+    "kind": "doc",
+    "sha256": "69e9f711e147477209bee0519e5871e419753f2cdddfbab4887021e472c92a76"
+  },
+  {
+    "path": "docs/en/FRESH-INSTALL.md",
+    "kind": "doc",
+    "sha256": "4cec4e7ffcf8763cff6f6c953efe9d0ef51beaa5f161511205f79f9e3b280d5f"
+  },
+  {
+    "path": "docs/en/GRAPH-AUTOMATION-DELIVERY.md",
+    "kind": "doc",
+    "sha256": "421128b6ae86777d622240d75ddadd4f3b89bd4bb04b456bff778be6c930e632"
+  },
+  {
+    "path": "docs/en/GRAPH-PERFORMANCE.md",
+    "kind": "doc",
+    "sha256": "51fbb7d27fe6c662a00ed7849424e5169f8c39aabffa0c2e70ec49ba28587ae4"
+  },
+  {
+    "path": "docs/en/I18N-VALIDATION.md",
+    "kind": "doc",
+    "sha256": "fd41473fc6612722ca0c0d0b71f899a16cb94688f8466fa989b704b389525b05"
+  },
+  {
+    "path": "docs/en/INSTALL.md",
+    "kind": "doc",
+    "sha256": "c7f2cc09d89fbcef361795ebe69e5e4101a46393a8fac255ec4177ddf0ff0c96"
+  },
+  {
+    "path": "docs/en/INSTRUCTION-LEARNING.md",
+    "kind": "doc",
+    "sha256": "bc7dd5570a4525c4842980e98a50ad51b0ae1f361232a3958ef3ded82c59c55d"
+  },
+  {
+    "path": "docs/en/JUDGMENT-CYCLES.md",
+    "kind": "doc",
+    "sha256": "90b14b7d628bd7d6ac66a1aea40b81af0345c413775c35e64c619bf7d9c9f932"
+  },
+  {
+    "path": "docs/en/LOCAL-WEB-RECOVERY.md",
+    "kind": "doc",
+    "sha256": "0c6f37073455aef12675c479df89c316b0312dec5d5900a649b1194ce6e7454d"
+  },
+  {
+    "path": "docs/en/LOG-CONSOLE.md",
+    "kind": "doc",
+    "sha256": "b566cb3af501b18a98e4372e6d67ac83d3d113295aa3db2d87140369e4025c0f"
+  },
+  {
+    "path": "docs/en/MANAGED-PLAN-GATES.md",
+    "kind": "doc",
+    "sha256": "4a6eb55b80d78f50fcbbd1cd0663d99783d99eb40a5bed88bac0390160ea4797"
+  },
+  {
+    "path": "docs/en/PREPARATION-TEMPLATES.md",
+    "kind": "doc",
+    "sha256": "3e33c88c9be2ab12d115875a13105942357571cfc8decfc37aff5e86f86f1842"
+  },
+  {
+    "path": "docs/en/PREPARATION-UX.md",
+    "kind": "doc",
+    "sha256": "db7d457076a0e8f409a37046809a4a27e2cf138358fd030288d06eee4d0b55b5"
+  },
+  {
+    "path": "docs/en/PRODUCT-WORKFLOW.md",
+    "kind": "doc",
+    "sha256": "f3acd1d5c1addb7a79f58c6060140903e623fdbde143df971e6b4a8105b62010"
+  },
+  {
+    "path": "docs/en/PROJECT-PROFILE.md",
+    "kind": "doc",
+    "sha256": "f2e92d44f54db6e56d0d9728b7b889f28159919ca26d7d793c3c60bf58b13cbe"
+  },
+  {
+    "path": "docs/en/PROVIDER-LIVENESS.md",
+    "kind": "doc",
+    "sha256": "675aeeb3cf1b6fbf2f09b52e19673b097e70f91fbb9fe77d132a15ee33b93e6e"
+  },
+  {
+    "path": "docs/en/PROVIDER-QUOTAS.md",
+    "kind": "doc",
+    "sha256": "fa9345e130a3b4a3b3bc78b030b0b5351547e1d79d3417284f565bc007413e2f"
+  },
+  {
+    "path": "docs/en/REFERENCE.md",
+    "kind": "doc",
+    "sha256": "eb9bdd1b809f1bd5a15c59c257261ae191cc7b6cff6e1156b9b47c4729c13cd7"
+  },
+  {
+    "path": "docs/en/REPOSITORY-STRUCTURE.md",
+    "kind": "doc",
+    "sha256": "625454d9d29de34ec2082edecaa644357589617e49b90ce4a99d96239213cb97"
+  },
+  {
+    "path": "docs/en/REVIEW-COORDINATION.md",
+    "kind": "doc",
+    "sha256": "90ae64c5bd05b14369b27e78c8c821e11a59376cee307c6d39b8a6127e715dfe"
+  },
+  {
+    "path": "docs/en/REVIEW-EVIDENCE.md",
+    "kind": "doc",
+    "sha256": "0c8a2fd20d62c7646f6213fa1d2b07fb6a3eb632a278433f821715d3f25ce3ec"
+  },
+  {
+    "path": "docs/en/REVIEW-FRAGMENTS.md",
+    "kind": "doc",
+    "sha256": "d978eb43e8d2ec108ce15a887a93bcb9e2817fd24753a1ed8f08f0ec4636a64d"
+  },
+  {
+    "path": "docs/en/REVIEW-TIMEOUT.md",
+    "kind": "doc",
+    "sha256": "afd45d46a2b76624b0a98140abd6ce875da0b550ce61c7cf7e83510d9746e13d"
+  },
+  {
+    "path": "docs/en/RUN-SUPERVISION.md",
+    "kind": "doc",
+    "sha256": "200029b11e2ea32c403728ab2f85170d01fcf76b6d8c85464dbd465f9965d878"
+  },
+  {
+    "path": "docs/en/RUNTIME-RECOVERY.md",
+    "kind": "doc",
+    "sha256": "fd62b17a3f1bc2bc6269354bdcfdd5da07b7060cda0a90be1d739576f01584aa"
+  },
+  {
+    "path": "docs/en/TASK-MODELS.md",
+    "kind": "doc",
+    "sha256": "b4d63ab8c19b1040eefcebd19e83ef7ee45b39f6ebd333baeefa526ad8d90ffd"
+  },
+  {
+    "path": "docs/en/TRACEABILITY.md",
+    "kind": "doc",
+    "sha256": "f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d"
+  },
+  {
+    "path": "docs/en/USER-GUIDE.md",
+    "kind": "doc",
+    "sha256": "33d9c565c7db2f908f3f70a44f064d04a318aa4210f1db7fc1fbc9698c7cbb8f"
+  },
+  {
+    "path": "docs/en/WEB-REQUEST-POLICY.md",
+    "kind": "doc",
+    "sha256": "e8ae18f67604be5448ade72abe4720daaae11799385d57bfe968ec678f28555f"
+  },
+  {
+    "path": "docs/en/e6-real.md",
+    "kind": "doc",
+    "sha256": "1ed7b6153f9f2c9f84c1ba4b07cbdb927ef53cd4a0cc8574eaa39df6b9a42b98"
+  },
+  {
+    "path": "docs/en/e7-history.md",
+    "kind": "doc",
+    "sha256": "c0a7963db0f64dd55d67d9a31673cb9fed58b9a07d544ab3ecf490c04926cbdb"
+  },
+  {
+    "path": "docs/en/e8-delivery.md",
+    "kind": "doc",
+    "sha256": "085b28e8a5f7394c11f4408d2ce5a6b0f2a7166dfb254508543a39a6d2af0b8f"
+  },
+  {
+    "path": "docs/graph-delivery-qualification-manifest.json",
+    "kind": "doc",
+    "sha256": "7f16ac09c204884e91c11eec172af2d68390ca90618bf250abea2a18b76a1def"
+  },
+  {
+    "path": "docs/plans/dev-launcher-20261010/PLAN.md",
+    "kind": "doc",
+    "sha256": "65af7a46ed1912db13cc7f3d9452a1b189f4693e4ed542e053621122077e5315"
+  },
+  {
+    "path": "docs/plans/fresh-install-methods-20261008.md",
+    "kind": "doc",
+    "sha256": "f292d0c715694bfd1a1bc99aa46fc8803efbc9c5756edaf4a67b5d903bd23128"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/CONTRACTS.md",
+    "kind": "doc",
+    "sha256": "eaf91e3adfc61bb1b704a66c435970cd51940c26c7a212e92b3017aa327b5a23"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/PLAN.md",
+    "kind": "doc",
+    "sha256": "dad983571d368780a4a8b65161ea7fa5cadcdf3269299355ab7cba1055ac0e72"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/RECETTE.md",
+    "kind": "doc",
+    "sha256": "1ef8f4f63fec5aba213e93e20466a9a2eb5d9825eae3f8f47003c97e91843737"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/execution/PREPARATION-D.md",
+    "kind": "doc",
+    "sha256": "cde49f38c27efb08385206491f45b3ae09375da33ef659c8f645e6659ca4a7f4"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/execution/d/INSTRUCTIONS.md",
+    "kind": "doc",
+    "sha256": "894bfaf377c331edfdce898b7a23238cc0982e2e778c79609a1f5617fcb85b23"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/execution/d/d02-fresh-browser-manifest.json",
+    "kind": "harness",
+    "sha256": "abf067330dd681de55c1a2f0bd746cf505990a91078cd9896472233f39d2a732"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/execution/d/verify.py",
+    "kind": "harness",
+    "sha256": "02c3e01e1126772195dc04adaacdfcf05ff3321fca297adfbcdad494ce7d6d20"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/execution/d/verify_contract_revision.py",
+    "kind": "harness",
+    "sha256": "928f445f67133e048823bd68fe440a1a8d64b54c8e187584e433d12627eeed19"
+  },
+  {
+    "path": "docs/plans/graphe-automatisation-20261005/execution/d/verify_d03_final.py",
+    "kind": "harness",
+    "sha256": "9209ed44f527ac5fd58cd2ee2723ff8fc22bc50314943700bfaad1e706ec7042"
+  },
+  {
+    "path": "docs/plans/ks-product-views.md",
+    "kind": "doc",
+    "sha256": "8a8c3a4c1b49dbcaec1cfc344e4106957cbd01f4f39e486fddfe2b465985fad4"
+  },
+  {
+    "path": "docs/plans/repository-organization-20261008.md",
+    "kind": "doc",
+    "sha256": "86294d2b40b5b7e287c80ccae8d2bcb18b203b3472cb16977116357a5f385950"
+  },
+  {
+    "path": "docs/releases/v0.1.0.md",
+    "kind": "doc",
+    "sha256": "c6501375f53626bb0b09484534db1c11e15106044e73d555f1e4499a93e62227"
+  },
+  {
+    "path": "docs/reports/portal-model-20261010.json",
+    "kind": "doc",
+    "sha256": "e9bd6263f96247ce36d312ddab255fc4ca9c62b3fe89f839739a85851b022abc"
+  },
+  {
+    "path": "docs/reports/preparation-subjects-20261010.md",
+    "kind": "doc",
+    "sha256": "721eb911df0c8b04da7a4046705dd46b05a34252694ba3c1fe7c969d6ec1494f"
+  },
+  {
+    "path": "docs/reports/projects-home-20261010.md",
+    "kind": "doc",
+    "sha256": "507693c9f4659660b0220394d28ca79bf4e322b82533a884a6f0ea04eef70963"
+  },
+  {
+    "path": "docs/reports/projects-method-20261010.md",
+    "kind": "doc",
+    "sha256": "4359f7965f79d19fd49feca21d065365571b77445f82aea1f4a31031df16c03b"
+  },
+  {
+    "path": "docs/reports/ui-redesign-20261010.md",
+    "kind": "doc",
+    "sha256": "b67fb8e5aac24145ad953bef18d31c029649d6039553e56ba84466916c10b79e"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/en-etat-graph.png",
+    "kind": "capture",
+    "sha256": "a8cc2dc1051756b8ae47643370d5af33db4af821d5d5358108c8a26944e43b70"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/en-etat-programs.png",
+    "kind": "capture",
+    "sha256": "c5cfb65d3e393ea27b90a1266fe325188dbd654086a129398a92778ac9b375af"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/en-sombre-graph.png",
+    "kind": "capture",
+    "sha256": "201fc68bcb513d24f89d35c69c4eb0bd3336c07756c652bafd4bf4ccf2765fa8"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/en-sombre-programs.png",
+    "kind": "capture",
+    "sha256": "b13021506c5a8495d6a6236e0fbf64e9ec11526cdf0dfa775e7a63e31af75d32"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/fr-etat-graph.png",
+    "kind": "capture",
+    "sha256": "cdef3e04e8c27ae00d8a2b993515570cbbd03c87cfb9337686c11706be6476ca"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/fr-etat-programs.png",
+    "kind": "capture",
+    "sha256": "0ff3c7320a508ecbf72405eeba81428a185408a535bffc0c55b2a3d53ecb577e"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/fr-sombre-graph.png",
+    "kind": "capture",
+    "sha256": "09e0af40ef9a8712a19f681ac1a83ea39a7a74c8028a3f415cd73fbf901fe362"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d01/fr-sombre-programs.png",
+    "kind": "capture",
+    "sha256": "b63ebef0687462fcdf528fb2c6278f023852b398064cd1d5b47fab4aaf42431b"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/en-etat-graph.png",
+    "kind": "capture",
+    "sha256": "2922f3c51d0b281260630a5f0479b92005e4768a76d22d0e07c10ec7c20074f1"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/en-etat-programs.png",
+    "kind": "capture",
+    "sha256": "74c00de6f1c4c0ade932e5afcb9825112b6202705cfb3ace5151182e5ef7e721"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/en-sombre-graph.png",
+    "kind": "capture",
+    "sha256": "2a7b8ef6d1d776321f3022365b90a83fece7edd4921028c9f0729b3ccf04edd3"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/en-sombre-programs.png",
+    "kind": "capture",
+    "sha256": "58b9f551b1aa5dba50d6535f55329ddbf9942c7f5877f3c47bcb6fc282b4dc98"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/fr-etat-graph.png",
+    "kind": "capture",
+    "sha256": "3e978ce9ac23f7c094e9dea069ad2251b4a9339a9d4f9501726edbfb7f3a95d3"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/fr-etat-programs.png",
+    "kind": "capture",
+    "sha256": "7c0811167dd599b56f6f6f0e59b543b2b1bc53305481ef7bab9fdb85725dc162"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/fr-sombre-graph.png",
+    "kind": "capture",
+    "sha256": "e2d15e10c8d8124339c383fe2ec13324675f2af03fa226813aa9866862bac17e"
+  },
+  {
+    "path": "docs/screenshots/graph-delivery-d02/fr-sombre-programs.png",
+    "kind": "capture",
+    "sha256": "ed9147643deb65b86fd017318f378498bce52734aa01b051ea5c208b7e19733a"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/AUDIT-V2.md",
+    "kind": "doc",
+    "sha256": "8a47e42d1ca6b7ccc0bb0949e365f882f118a04926a6dc1aebe195592753fec1"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/AUDIT.md",
+    "kind": "doc",
+    "sha256": "b5bbd002af445879e3db5b8b0b90d3597e45670cf5c261fd91eef975f5944440"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/README.md",
+    "kind": "doc",
+    "sha256": "486193e2065167524d524a300de538d4bef9fb1c19d9e078cf05e94569307a65"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR.mp4",
+    "kind": "capture",
+    "sha256": "4ae43cb4cd22167c769f152f830a5f9f513f40aad891362ec59b5fc33a7b4b19"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR.srt",
+    "kind": "doc",
+    "sha256": "e51cae478e66c57c8f82e14b699e5e9db6fa8758616b25e43f698f1f36101ff7"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4",
+    "kind": "capture",
+    "sha256": "9b8d290d6d405ac17dfc7e826bb12449d3b70777dde9d0ab1d89b67cd1d61999"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.srt",
+    "kind": "doc",
+    "sha256": "78ecbbce3c59b962aaea0249c90d308ff0240899f97c6090e68b334b18739007"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_couverture.png",
+    "kind": "capture",
+    "sha256": "51f67030219fd82595578d0504e25a0d24b46a653193b947ba5c5bce84c7076e"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_couverture_V2.png",
+    "kind": "capture",
+    "sha256": "42dbb40ce428aa6ecbb69d9b6a984c82c0d01404aae9cdf0881fefec9c51a10f"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_apercu_FR.gif",
+    "kind": "capture",
+    "sha256": "9d73ccf4e0631688f9b1629253983c6f9685aecf09c93dd945d6d972199598b4"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/Swarm_graphe_apercu_FR_V2.gif",
+    "kind": "capture",
+    "sha256": "7b1732dbcc0adfbd93f6bce9e061d32204723ff4d3c9b465b8667cf0e764d599"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/build.py",
+    "kind": "doc",
+    "sha256": "4edaeae8e623cffa1c52c2b8cb630080461d55dd216907f50a2a005e5ba1ae86"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/build_v2.py",
+    "kind": "doc",
+    "sha256": "9865ea445b518d0dd1be4c2b375fe744193049bc926c8d2da6ea2bc276163ce9"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/01-dependances.png",
+    "kind": "capture",
+    "sha256": "90fcc75088fa33c9cf58a545282257fc00a45dcccf4ea5166eb43dda365db8ef"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/02-zoom.png",
+    "kind": "capture",
+    "sha256": "65a6296a1923c4888161e28b30a1dbf6e8e6b9ce3739ef62db3a1171b11aadd9"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/03-prerequis.png",
+    "kind": "capture",
+    "sha256": "915b2f36ad26440e9d63a06239080540cd3a7b6de1c8061bbef46654b92b6780"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/04-branche.png",
+    "kind": "capture",
+    "sha256": "39ccd527940854ff4eb6fc0600e2988bee61fbe3676a9b93ba76340382f7f325"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/05-impact.png",
+    "kind": "capture",
+    "sha256": "a10468efd1ac273f7ef2dd97b4aba7ad3c54660739e4d875d79211e598bdf483"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/06-criteres.png",
+    "kind": "capture",
+    "sha256": "d54731dc7f010878dada096b705272fdeeee9be4e79d0752354df5cf51809cc3"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/07-controle.png",
+    "kind": "capture",
+    "sha256": "2e49a3a1cbcf3c1b8413a22a6c1246d7ad992791af7a145a3d1ad9c32ae20942"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/08-entrees.png",
+    "kind": "capture",
+    "sha256": "63377a94190ef8dc341f287eed8aa2669f342e865a9ec8adcea2fdc434cd2a15"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/frames/09-conclusion.png",
+    "kind": "capture",
+    "sha256": "2bfc93689c35b23c7d59310668041c9f51ce546b6e05440e09651c0ccba8e043"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/manifest-v2.json",
+    "kind": "doc",
+    "sha256": "2a470241f7870aa7ca272f1aacff5a9290221ccdad08d162a993dfe7c231ea00"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/manifest.json",
+    "kind": "doc",
+    "sha256": "d9729311fb641bbd911a9c6f82714f9b7ee6da95d5527e55bfa4d625ec1a4cce"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/preview.txt",
+    "kind": "doc",
+    "sha256": "e0c6096d32c65e2cda993af5c3b9d72403f24b44f82e0197f89df23cd8c270e8"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/01.png",
+    "kind": "capture",
+    "sha256": "51f67030219fd82595578d0504e25a0d24b46a653193b947ba5c5bce84c7076e"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/02.png",
+    "kind": "capture",
+    "sha256": "a21cd43754b166069f2817cbf829f1fbcf3e3d0a058d50d63fcab685b9c02267"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/03.png",
+    "kind": "capture",
+    "sha256": "ee68c39c17dd84cf7e6ea41c2351c165592c7cf46fc9fdbafd8a0cb8cad20868"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/04.png",
+    "kind": "capture",
+    "sha256": "23b01939dc361385c5ac3e646cfbdf54c472e8c97139e5ca815f09191c6033bd"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/05.png",
+    "kind": "capture",
+    "sha256": "86aa6f9a7d12da95eac79a79d1a5f0ffcf9d7c2ea66a983b27b35949c50ae18d"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/06.png",
+    "kind": "capture",
+    "sha256": "32109739665e2baae9bc3856ceef4850efd08c2d61f28dd1de920be37f7ec0ef"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/07.png",
+    "kind": "capture",
+    "sha256": "699d88461d9a059afb79e420dace18df7319a9cdac1361d5092a92af8ed9d00a"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/08.png",
+    "kind": "capture",
+    "sha256": "378d5ca20e5182844208912fd891638db0ed7e385b267f87eb8f45f1422ef7d3"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/renders/09.png",
+    "kind": "capture",
+    "sha256": "c274fe4148346efba31bcd3c74a1fdbd86fe8a2efe357959094c0c9d3c0be298"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/storyboard.json",
+    "kind": "doc",
+    "sha256": "ff4be8328d842126b17f04b5832def361c7ff01f77f2952d6d807f71bb1aae93"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/timeline-v2.json",
+    "kind": "doc",
+    "sha256": "5b28a1f58f237e994bdf96b64f62d7539fe9be57eb011de80e3ea9c3f1f3cc55"
+  },
+  {
+    "path": "docs/screenshots/graph-linkedin/timeline.txt",
+    "kind": "doc",
+    "sha256": "b8c5f9f356db71214d8cf18958e846a14cfd8ce6f844b3fbbeaa2bbc641ea9a4"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/README.md",
+    "kind": "doc",
+    "sha256": "5ca333ca7587f44acf49086b9daf513bdf7887fa61bb4be78f2f880d89fb2440"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/build.py",
+    "kind": "doc",
+    "sha256": "dc11b285c8ad53e28f0f435645a0dad45583d99e8e1ced36b3d8dd92a7426a45"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/dark-en.png",
+    "kind": "capture",
+    "sha256": "65f8ff7fc9afab46f8112a3897fc28cdd2331750247eafb39181f3f1c0c5eaa9"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/dark-fr.png",
+    "kind": "capture",
+    "sha256": "2106dddcca5fdb275d6124035cb5bbe15c6550929f930287cadace00a606b67a"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/graph-tour-en.gif",
+    "kind": "capture",
+    "sha256": "06345d2777fb316c3423bf495c9d35a2f857916f33436cacd832e6a0043d5aec"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/graph-tour-en.mp4",
+    "kind": "capture",
+    "sha256": "fc82366dfd0dd95ac98a2b87d5f0721be19d7c2727c1e464b552a9d57e04d1e8"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/graph-tour-en.png",
+    "kind": "capture",
+    "sha256": "eae81f03464649bf2b774186cc7ca7f2649b781dab15af5851789f392f0534cb"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/graph-tour-fr.gif",
+    "kind": "capture",
+    "sha256": "04050f72c4c728853571fa02f82edecbceb2d3a246eb9b980f41f0f2ff41f10c"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/graph-tour-fr.mp4",
+    "kind": "capture",
+    "sha256": "9d9120459c9bfac982198032419baa55da8378fe9eedf8675ec5c6247b313efa"
+  },
+  {
+    "path": "docs/screenshots/graph-tour/graph-tour-fr.png",
+    "kind": "capture",
+    "sha256": "2636ee7066a9a3b938c23a63efa14ab8731cd62eb6874db3a81229585c97960b"
+  },
+  {
+    "path": "docs/screenshots/ks-product/journey-fr-light.jpg",
+    "kind": "capture",
+    "sha256": "6800c8f9683eb938e4914ee607f819c586eae8070ad05b44738042547fa5fe7a"
+  },
+  {
+    "path": "docs/screenshots/ks-product/story-en-dark.jpg",
+    "kind": "capture",
+    "sha256": "33100dc34e5116fbec6daedf3f8db5753308e6638de1134ced28441c1436c2d3"
+  },
+  {
+    "path": "docs/screenshots/ks-product/story-en-light.jpg",
+    "kind": "capture",
+    "sha256": "763ceb141ebe5262d0f78f025598387244da94d8f76af12bff9a9e672009134f"
+  },
+  {
+    "path": "docs/screenshots/ks-product/story-fr-dark.jpg",
+    "kind": "capture",
+    "sha256": "0b13edc96086c2e1172633df0518eb1223f0f0e95107f008171844f47d1c5664"
+  },
+  {
+    "path": "docs/screenshots/ks-product/story-fr-light.jpg",
+    "kind": "capture",
+    "sha256": "bbf37ac6a55a800b08f3d9261d0de4371df94a035edf4f0702a5f9defb54c46a"
+  },
+  {
+    "path": "docs/screenshots/ks-product/tasks-en-light.jpg",
+    "kind": "capture",
+    "sha256": "4c49b9f58f2daa42f01ad761646c2cf35969ec430b93a0c8e6a2ca6561206bd6"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/graph-en-etat.png",
+    "kind": "capture",
+    "sha256": "e1e44b4941e6f8fb23bca0885793703ccb1518ee76dfb539b918f0ea1c6e609e"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/graph-en-sombre.png",
+    "kind": "capture",
+    "sha256": "43950281468154d8c3273b280c04c81d292735f957bf5d045d9b3ee5f4205bee"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/graph-fr-etat.png",
+    "kind": "capture",
+    "sha256": "f23c48eac9c479a1108d1aa306fb214fed891ed8683a0ea6f09305fda3379eed"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/graph-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "847b6ac182b8ec28b5093ce16d1594dc54a931511e8c85afc75b03c02ebacb1f"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/mobile-en-etat.png",
+    "kind": "capture",
+    "sha256": "c36ede914c6884911bb43692b8d249f3df9492fb89d37dce424967c5ef4c8744"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/mobile-en-sombre.png",
+    "kind": "capture",
+    "sha256": "dd00acd898bb4d46ff6eec23c76c2219f74cdd6c78c912e0405e7a6ab828390d"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/mobile-fr-etat.png",
+    "kind": "capture",
+    "sha256": "f58a714456bad65a67945e3c6677976d4783ef440adc3a478ae62fd417de275f"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/mobile-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "5410b269090bdba851056774b630b310b0aeccd021ef5d1c97db8c11ff8b4d09"
+  },
+  {
+    "path": "docs/screenshots/portal-model-20261010/product-visible.png",
+    "kind": "capture",
+    "sha256": "10da1075a829779b3ab35cb85a21c30c90840ac61db08d83ddd4bc66c7696006"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-etat.png",
+    "kind": "capture",
+    "sha256": "c2cefbaeac39ac1262f24eae1b0ff21ec177c539c6a9cbbd7b5c6590e833ad77"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/catalog-en-sombre.png",
+    "kind": "capture",
+    "sha256": "94974a109247e6b6db2e79fa18a023f0bafea69ef475e50174e60ecf9279048a"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-etat.png",
+    "kind": "capture",
+    "sha256": "e3b5a2cd8fddc4518580eeb7ccb278ccdfc92e8053767bae89929d9f4c510c56"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/catalog-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "d4fdfebfc5fed9c3cdf6f2d5ac4b68173073f39036334efb1bbf16e652c37797"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/check-error-en.png",
+    "kind": "capture",
+    "sha256": "1080da73e580b7c080dbbc92f74df7f889fb34c0d87fc2119357c7e5f0fe6e7c"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/qualification.json",
+    "kind": "doc",
+    "sha256": "efb7d2e761c98f7e115f39ef4e1ec44f5d75b58d5326f658a79b6257b9a15113"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/result.json",
+    "kind": "doc",
+    "sha256": "b56b9516327710a0d6fd85351b043ae4637c59a9035f5d06b19fd4670414627d"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "5c730f45ca45c58d3e7814e8cea6f456e82b9423a9186f5f4ef421da28ac7bd7"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
+    "kind": "capture",
+    "sha256": "dece9f329db8a0c3b6cc0e00d1bab85b4c0cbc42c300d038c8993d0dea265880"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "925a34f46411f78e847f03a2977e4c44d45162a4de2821adc355fa081808b6b6"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
+    "kind": "capture",
+    "sha256": "d29bf44ff459b59d66e5eaa9d7a341a86256593e7674e23def4b5f37748a1c1e"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "e8de3cf6a5514112acb33898a7a3d24882806fa636f7b6fd82c4cf1438a9236c"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
+    "kind": "capture",
+    "sha256": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
+    "kind": "capture",
+    "sha256": "4c2df9433e549879b59199f3f41a52b624493d722ac4ae4af08f68e81115aefe"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "4e5f3deaf5e80592d40137d763d2d0b6e6bc840c2fa4874b9aa17e867e397853"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-etat.png",
+    "kind": "capture",
+    "sha256": "179fe14ce98157407f4668e013a6e5ca317813a92316b2b9fdea8e8114376665"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "c38fa3d745ab2171af2c25abeb0fb76b1ccb7fd72a3df04ffd7dbfc2dc78feb5"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
+    "kind": "capture",
+    "sha256": "362a9d7ac5860c0e053cc5c0ef98aa63c26d414360838e3fe1e7f659c38603cf"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "ad3dda130c1053782ca27de5177f9128225959fee4e24cd86e3eff9a54175260"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
+    "kind": "capture",
+    "sha256": "63c8a1cd8400232f8f4ec2f97026e7f26ac8062244c35c74af9872f802e5b47f"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "b932ce091fbe5ffae966c3e3614a3193b0e4454446d8a07bba4f01beff787225"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
+    "kind": "capture",
+    "sha256": "574216c70777d524e6ccc981995160f972ec659d6ba069c8a23f62cf2b441343"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/result.json",
+    "kind": "doc",
+    "sha256": "dfc203fe428d2d01c4756e2a8370453c030c3ceb6e7dc7dc2cabfb638c9237e3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
+    "kind": "capture",
+    "sha256": "840c965748f6cf9bf2530adb6266cc5733c53dfa2a1e0be54abc21862fcc0bb1"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "00ce6a6875a472c3b744d51af6f5929e88df4101daaa3ba07371912b8a3ea607"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "39a95ab1ce7db37111a2e7baee259eadf57bd81e7ed253f1b607463848b516e3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
+    "kind": "capture",
+    "sha256": "047ebfbdd1a3f794a4a8a04f548007bffd8584ac2b4b480f8db9ded585a48f3b"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
+    "kind": "capture",
+    "sha256": "9d4021def5970f8c39f27561a7c56c7a891167a8f81efb32849d18bb78f6929a"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "c9f03bc3b92b3ba26d32c7c5365ee166cd386810cad358c72229a3c5f1a30b13"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "edd5e7d687d8153315682e4f526b7b051b5913e3a17d142a9b997be102c67647"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
+    "kind": "capture",
+    "sha256": "5e32034594e55f3c477a2d6f5659838c246c0690f9288c5b2d6780f10ac4ca9e"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
+    "kind": "capture",
+    "sha256": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
+    "kind": "capture",
+    "sha256": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
+    "kind": "capture",
+    "sha256": "4fbda8e7ea68f6ac2f2bbdaa23a8ac2a7db4b401bcaf5127c3eb940e3b729c61"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "6b8f952f08831fdc6431d438fb4c6ae5024b0dba3a9c09b246abb753f7a257d3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "0775f1656fe2098f97c67ef34e9fa9710049a61e5cfd670217fb8eaa590191b3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
+    "kind": "capture",
+    "sha256": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/qualification.json",
+    "kind": "doc",
+    "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/result.json",
+    "kind": "doc",
+    "sha256": "41d27d83107db17355397fc4fdf5371148831574610a2a3bba07df906ee4364d"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/README.md",
+    "kind": "doc",
+    "sha256": "b608b5975621c44793911af1de0e9573e62ddb53593733158e67b51418d63f59"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-graph-cache.json",
+    "kind": "doc",
+    "sha256": "8bc34f373bf01e5c1b2d6c0ffb0a3c20596d6c191f3d964dc9c614eef0351371"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-menu.json",
+    "kind": "doc",
+    "sha256": "b199dc606539e9cc251a6c7a0ad35fb6c86bb6c0972b7a6fd899f92e2b8deb2d"
+  },
+  {
+    "path": "docs/screenshots/ui-redesign-20261010/candidate-next.json",
+    "kind": "doc",
+    "sha256": "e83c59dd6979d0448be50b533950a398c5d37074233a5f80388080dfaef1520a"
+  }
+]

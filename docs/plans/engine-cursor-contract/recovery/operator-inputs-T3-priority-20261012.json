@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-12T09:22:05.351208+00:00",
+  "bundle": "/home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-inputs-T3-priority-20261012.bundle",
+  "sha256": "ee61e908630b8ee087ca38d23445bbd7ff22016ed3617e12c815b62c10dfec49",
+  "commit": "ad693b90a9560ebbf99706c871856f959dfd58ed",
+  "ref": "refs/heads/operator-inputs",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/T3-priority-inputs-762u35ru",
+  "input_files": 122,
+  "manifest_sha256": "7dd7d3c6405f67e7557b5a937af5972cda4e3dbad943c17f94c978768b442325",
+  "original120_preserved": true,
+  "verification": "PASS isolated import and every byte",
+  "deferred_runtime27": true
+}

@@ -1,0 +1,29 @@
+{
+  "after_digest": "e017a0fb2c2f8d9a18798fb79efffd4913d3b35e8ef2409886785a81e9ce0878",
+  "applied": true,
+  "before_digest": "d6ad84beae4b54a2f8168eb40feadd8c7161e9f912e21fef3caaf6a146725e5f",
+  "policies": {
+    "claude": {
+      "version": 1,
+      "billing": "external",
+      "work_level": "standard",
+      "page_level": "simple",
+      "levels": {
+        "exigeant": {
+          "model": "opus",
+          "effort": ""
+        },
+        "simple": {
+          "model": "haiku",
+          "effort": ""
+        },
+        "standard": {
+          "model": "sonnet",
+          "effort": "medium"
+        }
+      }
+    }
+  },
+  "preview": false,
+  "saved_at": "2026-10-11T16:12:19.899220705Z"
+}

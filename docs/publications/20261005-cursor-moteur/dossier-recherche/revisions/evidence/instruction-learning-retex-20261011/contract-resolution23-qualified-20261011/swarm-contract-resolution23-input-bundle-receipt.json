@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-11T21:35:16.110189+00:00",
+  "bundle": "docs/plans/engine-cursor-contract/recovery/operator-patch-inputs-typed-original-evidence-20261011.bundle",
+  "sha256": "52da3100e77eb2cd50c810202a3b5224c33699d458346d2a736fa37df8b15a89",
+  "commit": "60426c9d20952a748ad52700a96e3dbfa6f65b85",
+  "ref": "refs/heads/operator-inputs",
+  "input_files": 110,
+  "manifest_sha256": "e79171a282e0983bcac9ba8620d493c8f03b021c1a084a25b43ffed9072e9b4c",
+  "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-inputs-z3b_8prt",
+  "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/contract-resolution23-import-1g_uaaqw",
+  "old101_originals_preserved": true,
+  "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+  "limits": "Cumulative101 inputs preserved byte-for-byte, including six-example controls/feedback documentation, plus qualified23 typed original-evidence recovery and versioned exact preimages. Apply current preimages only when justified by recorded prior hash; never overwrite a divergence. T3 integrates all corrections and native Judge then qualifies its own complete candidate. T4 checks invalid original citations, task metadata cannot prove business completion, selected/unselected sources and per-file typed boundaries. T7 proves actual reception/decision/application/effect; T8 RETEX after recipe. Complete2108-path local qualification recorded; native acceptance remains independent. Reviewer/planner methods, schema29, histories, provider consumption and original refusals preserved."
+}

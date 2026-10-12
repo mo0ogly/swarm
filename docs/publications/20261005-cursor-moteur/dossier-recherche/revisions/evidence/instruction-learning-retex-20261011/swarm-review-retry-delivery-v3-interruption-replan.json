@@ -1,0 +1,17 @@
+{
+  "driver": "/tmp/swarm-review-retry-delivery-qualification-v3.py",
+  "observed_exit": 143,
+  "source_digest": "559483bd8fcba9ef9172403f744a9991d98cc074644c52549d47c3a88eb97716",
+  "full_output": "/tmp/swarm-review-retry-delivery-qualified-v3-full.out",
+  "result": "INCOMPLETE, not PASS and no completed package result",
+  "cause_observed": "SIGTERM-style exit of owning command session; no test failure before termination; caller of signal not established",
+  "owner": "Codex operator qualification runner",
+  "changed_precondition": {
+    "at": "2026-10-11T17:01:48.514051+00:00",
+    "pid": 1697723,
+    "log": "/tmp/swarm-review-retry-delivery-detached-full-driver.out",
+    "script": "/tmp/swarm-review-retry-delivery-detached-full.py",
+    "scheduled": false,
+    "owned_isolated_test_roots": true
+  }
+}

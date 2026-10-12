@@ -1,0 +1,17 @@
+{
+  "revision": 606,
+  "task_id": "plan-ca937edf4e-T2",
+  "review_id": "review-44f2da6a502adf1b1853484b",
+  "candidate_commit": "4af006a35e56d799a26eae29dd197326bf6288f5",
+  "state": "change_required",
+  "cause": "Fournisseur claude : quota refusé (429). Nouveaux appels suspendus jusqu’au 2026-10-12 01:00:00 UTC. Les tentatives et budgets déjà consommés restent conservés.",
+  "next_step": "Examiner la cause et enregistrer une correction pertinente avant reprise ; aucune relance automatique identique.",
+  "actor": "operator",
+  "inspections_remaining": 6,
+  "inspections_reusable": 0,
+  "calls_required": 8,
+  "calls_available": 30,
+  "calls_missing": 0,
+  "minimum_review_limit": 78,
+  "timeout_seconds": 0
+}

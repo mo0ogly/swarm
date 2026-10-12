@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-11T17:12:39.903494+00:00",
+  "parent": "review-retry-delivery-20261011.patch",
+  "parent_sha256": "ddb7d6ebfdfc9eca7f2aa43e4c5da537a1e20939dfa386379c695dba72e24dba",
+  "parent_tree": "4df897e2d154d23085af28a7dd15ec96c51b70ca",
+  "preimage_tree": "4df897e2d154d23085af28a7dd15ec96c51b70ca",
+  "preimage_extensions": [],
+  "preimages": {
+    "internal/engine/model.go": "d09e6519e43ffd930d6aeda1a8378ac62aa4c163d4fc23b06a5641ded5b82efb",
+    "internal/engine/store.go": "0c6c29b5ad281591edbfec7acb3aaeef6db21f915132769f9e866642cbd4b2f9",
+    "internal/engine/managed_review_retry_storage_test.go": null,
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "377c6852872a034edb7d66e8535840fb21483dd2da2fe9ee583e248b5ac6d824",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "6902e399226b0dec67d43df097131cec9e3206cdd02356c1608c841244984ec3"
+  },
+  "result_tree": "df4d5cde55580e3ab4533eeeb90baca0674031e1",
+  "patch": "docs/plans/engine-cursor-contract/recovery/review-retry-storage-20261011.patch",
+  "patch_sha256": "57b671f05817cef7d56674fb0435c4959e6d15b727a91dc540b52e0e1954c80b",
+  "paths": [
+    "internal/engine/model.go",
+    "internal/engine/store.go",
+    "internal/engine/managed_review_retry_storage_test.go",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md",
+    "docs/en/AUTORECURSIVE-RECOVERY.md"
+  ],
+  "postimages": {
+    "internal/engine/model.go": "fadce2e824c4f3ba07f11978d0b0ef557bf31e200e7c15ab3746ed1a24325a5b",
+    "internal/engine/store.go": "475c87496faab62e314a6e20ba749ea22ed4f26e15268e5731615f8e8b2741b4",
+    "internal/engine/managed_review_retry_storage_test.go": "dce74d665fe1b263a00a30d9097775665f0f45ec99c7b85f621884d7623fbd87",
+    "docs/architecture/AUTORECURSIVE-RECOVERY.md": "b2e905069f67e5132b947a5f9f8f7f3c121a1cc6794813551e37c3176559fb7e",
+    "docs/en/AUTORECURSIVE-RECOVERY.md": "5b6b4f1b670f19fd4e5b660ec90162c5cd35a31d90881f1958a5bd843dd2250c"
+  },
+  "check": "PASS isolated exact preimages, apply--check, apply and exact result tree",
+  "purpose": "Storage28 prevents older binaries dropping queued review-retry directive; backup without rewriting mission; per-transaction schema guard for already-open writers. Old-process shutdown required before public init.",
+  "qualification": {
+    "full": {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "start": "2026-10-11T17:22:38.016915+00:00",
+      "end": "2026-10-11T17:31:30.181061+00:00",
+      "seconds": 532.1660955530024,
+      "exit": 0,
+      "output": "/tmp/swarm-review-retry-storage-qualified-v2-full.out",
+      "output_sha256": "94d9dd5ec284b5ff376e5415a0590563c670c44e2f81ed694cdb0093f5a5ce9b",
+      "qualification_environment": {
+        "TMPDIR": "/tmp",
+        "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+      },
+      "source_manifest_sha256": "818d49be64e86baa9eefa219e8acf8de1200ec455138b6d70a02bd764f0aabc8",
+      "candidate_digest": "aa71b5c2b7bb950ec73e89d79c0ad0beb36532df204b372ecfe84e1c8d5df53f",
+      "paths": 1175,
+      "source_drift": [],
+      "manifest_changed": false,
+      "driver": {
+        "start": "2026-10-11T17:22:38.016915+00:00",
+        "driver_pid": 2003267,
+        "pgid": 2003267,
+        "sid": 2003267,
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1",
+          "-timeout=12m"
+        ],
+        "manifest_sha256": "818d49be64e86baa9eefa219e8acf8de1200ec455138b6d70a02bd764f0aabc8",
+        "source_digest": "aa71b5c2b7bb950ec73e89d79c0ad0beb36532df204b372ecfe84e1c8d5df53f",
+        "paths": 1175,
+        "precondition": "Replan16: original full fails only obsolete historical future-version fixture hardcoded28. Fixture now tests schemaVersion+1; production code unchanged, all other full cases previously passed. New frozen1175 snapshot, full required again; originals retained.",
+        "go_pid": 2003289
+      }
+    },
+    "full_before_obsolete_fixture_fix": {
+      "command": [
+        "go",
+        "test",
+        "-json",
+        "./...",
+        "-count=1",
+        "-timeout=12m"
+      ],
+      "start": "2026-10-11T17:11:21.501910+00:00",
+      "end": "2026-10-11T17:20:45.704619+00:00",
+      "seconds": 564.2031929880031,
+      "exit": 1,
+      "output": "/tmp/swarm-review-retry-storage-qualified-v1-full.out",
+      "output_sha256": "2356f1c06901ad562a93e5acaff0b3d3ef7f0642f9332448dde245a66588e973",
+      "qualification_environment": {
+        "TMPDIR": "/tmp",
+        "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+      },
+      "source_manifest_sha256": "2217207848fd1732269e21631b5de2d81cba0ab19bdc0cfa24bf14f1cb0bf84d",
+      "candidate_digest": "e77e9a9354363634c0306a83031ecea9f952a90b60341ec09fd71c683182c64f",
+      "paths": 1175,
+      "source_drift": [],
+      "manifest_changed": false,
+      "driver": {
+        "start": "2026-10-11T17:11:21.501910+00:00",
+        "driver_pid": 1817739,
+        "pgid": 1817739,
+        "sid": 1817739,
+        "command": [
+          "go",
+          "test",
+          "-json",
+          "./...",
+          "-count=1",
+          "-timeout=12m"
+        ],
+        "manifest_sha256": "2217207848fd1732269e21631b5de2d81cba0ab19bdc0cfa24bf14f1cb0bf84d",
+        "source_digest": "e77e9a9354363634c0306a83031ecea9f952a90b60341ec09fd71c683182c64f",
+        "paths": 1175,
+        "precondition": "Scoped16 storage version28 and per-mutation guard combined with fully qualified15; isolated RED→GREEN, fresh1175-source snapshot. Detached owning session verified survives coupled wrapper termination.",
+        "go_pid": 1817749
+      }
+    },
+    "checks": [
+      {
+        "command": [
+          "go",
+          "test",
+          "./internal/engine",
+          "-run",
+          "TestReviewRetryStorage|TestReviewRetryConnected|TestPlanningReviewRetryDelivers|TestConcurrentWriters|TestMutation.*Busy|TestInspectionCLIRefuses|TestMigrationBackup|TestVersionTwoBackup|TestProviderCooldownStorageVersion|TestRunLimitsMigration|TestMigrationOnePreserves",
+          "-count=1",
+          "-v",
+          "-timeout=150s"
+        ],
+        "start": "2026-10-11T17:11:21.618545+00:00",
+        "end": "2026-10-11T17:11:42.755147+00:00",
+        "seconds": 21.136596377000387,
+        "exit": 0,
+        "output": "/tmp/swarm-review-retry-storage-qualified-v1-targeted.out",
+        "output_sha256": "0e53203e002e38b24824cf1cba7c881f6ad6e8743cf5a418196d65428427f250",
+        "qualification_environment": {
+          "TMPDIR": "/tmp",
+          "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+        }
+      },
+      {
+        "command": [
+          "go",
+          "test",
+          "-race",
+          "./internal/engine",
+          "-run",
+          "TestReviewRetryStorage|TestReviewRetryConnected|TestPlanningReviewRetryDelivers|TestConcurrentWriters|TestMutation.*Busy|TestInspectionCLIRefuses|TestMigrationBackup|TestVersionTwoBackup|TestProviderCooldownStorageVersion|TestRunLimitsMigration|TestMigrationOnePreserves",
+          "-count=1",
+          "-timeout=150s"
+        ],
+        "start": "2026-10-11T17:11:42.755539+00:00",
+        "end": "2026-10-11T17:13:26.211621+00:00",
+        "seconds": 103.45609949599748,
+        "exit": 0,
+        "output": "/tmp/swarm-review-retry-storage-qualified-v1-race.out",
+        "output_sha256": "37635fbfeac95628e8c0eac54a8375af2245bf39c39d05fba51ee569d109996b",
+        "qualification_environment": {
+          "TMPDIR": "/tmp",
+          "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+        }
+      },
+      {
+        "command": [
+          "go",
+          "vet",
+          "./..."
+        ],
+        "start": "2026-10-11T17:13:26.217556+00:00",
+        "end": "2026-10-11T17:13:30.332076+00:00",
+        "seconds": 4.114548188998015,
+        "exit": 0,
+        "output": "/tmp/swarm-review-retry-storage-qualified-v1-vet.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "qualification_environment": {
+          "TMPDIR": "/tmp",
+          "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+        }
+      },
+      {
+        "command": [
+          "python3",
+          "tools/agent-workflows/check.py"
+        ],
+        "start": "2026-10-11T17:13:26.217874+00:00",
+        "end": "2026-10-11T17:13:30.342143+00:00",
+        "seconds": 4.1242804450012045,
+        "exit": 0,
+        "output": "/tmp/swarm-review-retry-storage-qualified-v1-workflow.out",
+        "output_sha256": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+        "qualification_environment": {
+          "TMPDIR": "/tmp",
+          "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+        }
+      },
+      {
+        "command": [
+          "sh",
+          "./build.sh",
+          "/tmp/swarm-review-retry-storage-candidate"
+        ],
+        "start": "2026-10-11T17:13:26.218241+00:00",
+        "end": "2026-10-11T17:13:28.877467+00:00",
+        "seconds": 2.6592534349983907,
+        "exit": 0,
+        "output": "/tmp/swarm-review-retry-storage-qualified-v1-build.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "qualification_environment": {
+          "TMPDIR": "/tmp",
+          "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+        }
+      },
+      {
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "start": "2026-10-11T17:13:26.218965+00:00",
+        "end": "2026-10-11T17:13:26.295809+00:00",
+        "seconds": 0.07685099700029241,
+        "exit": 0,
+        "output": "/tmp/swarm-review-retry-storage-qualified-v1-diff.out",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "qualification_environment": {
+          "TMPDIR": "/tmp",
+          "GOTMPDIR": "/home/fpizzi/.cache/swarm-operator-replan-20261011/qualification-tmp"
+        }
+      }
+    ],
+    "public_compatibility": {
+      "at": "2026-10-11T17:16:45.882862+00:00",
+      "steps": [
+        {
+          "label": "old_reader",
+          "command": [
+            "/home/fpizzi/workspace/swarm/bin/swarm",
+            "--root",
+            "/tmp/swarm-storage28-public-0uk761nu",
+            "work",
+            "list",
+            "--json"
+          ],
+          "start": "2026-10-11T17:16:45.813757+00:00",
+          "end": "2026-10-11T17:16:45.844617+00:00",
+          "exit": 2,
+          "error": "version de stockage non supportée : 28",
+          "output": "/tmp/swarm-storage28-public-read-recheck-old_reader.json",
+          "output_sha256": "f33f73864aa39237d9cdfff01c1760d95a317bf0337a2efa4766392df5b2b336"
+        },
+        {
+          "label": "new_reader",
+          "command": [
+            "/tmp/swarm-review-retry-storage-candidate",
+            "--root",
+            "/tmp/swarm-storage28-public-0uk761nu",
+            "work",
+            "list",
+            "--json"
+          ],
+          "start": "2026-10-11T17:16:45.844729+00:00",
+          "end": "2026-10-11T17:16:45.882780+00:00",
+          "exit": 0,
+          "error": null,
+          "output": "/tmp/swarm-storage28-public-read-recheck-new_reader.json",
+          "output_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+        }
+      ],
+      "why_recheck": "Correct summary helper type handling and directly capture previously unavailable exit codes. Existing isolated28 store, read-only calls, no native state.",
+      "result": "PASS"
+    }
+  },
+  "limits": "Qualified cumulative15+16+future-version fixture correction. Standalone16 product code passes but historical fixture must be updated by following patch; original full FAIL retained. Requires idle old process shutdown and public init before deployment. Global recovery/parallel supervisors/RETEX still unverified."
+}

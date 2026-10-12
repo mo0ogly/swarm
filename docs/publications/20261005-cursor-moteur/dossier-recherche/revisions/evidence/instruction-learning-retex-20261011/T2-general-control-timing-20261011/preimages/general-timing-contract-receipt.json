@@ -1,0 +1,11 @@
+{
+  "at": "2026-10-11T20:30:12.494193+00:00",
+  "counterexample_preserved": "Prior criterion asserted wall_duration_ms=11434 as current, while new immutable controller receipt measured9354 for candidate151cb. Original files retained in this archive.",
+  "corrected_contract": "Producer own local receipts retain their measured times; every subsequently controlled candidate owns a fresh native receipt. Producer predicts no native duration.",
+  "old_assertion_removed": true,
+  "local_receipts_and_named_test_supplied": true,
+  "declared_sources": 19,
+  "declared_bytes": 124087,
+  "method_incident": "Invalid provisional check searched the digit1 anywhere in prose and matched a date. No replay of source rewrite; evidence-bound checks above distinguish the obsolete native timing assertion from valid local dates.",
+  "limits": "Documentation/evidence repair only. No native acceptance inferred."
+}

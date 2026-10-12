@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-11T20:02:01.132179+00:00",
+  "result_tree": "d6d50406eb7b82b153efe79f4beb09a92b28bc5b",
+  "old_tree": "3f4ddf6990e07c3895f88b223c8269fe5d7eec9d",
+  "declared_texts": 22,
+  "declared_bytes": 191243,
+  "Go_sources_unchanged": 517,
+  "exact_citations": 9,
+  "old_counterexamples_retained": true,
+  "local_exit": 0,
+  "no_native_independent_acceptance": true
+}

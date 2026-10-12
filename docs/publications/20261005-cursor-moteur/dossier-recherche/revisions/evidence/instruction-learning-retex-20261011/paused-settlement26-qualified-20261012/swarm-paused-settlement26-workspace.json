@@ -1,0 +1,6 @@
+{
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/paused-settlement26-8vsuigt1",
+  "parent": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-preview-6ff2n61k",
+  "parent_digest": "6fb31492cf25976e3f4ab9ed187b7903defd1d95ee7224813cc28f3f36c11c0a",
+  "copy": "complete verified parent25, preserve symlinks and executable modes, no native state"
+}

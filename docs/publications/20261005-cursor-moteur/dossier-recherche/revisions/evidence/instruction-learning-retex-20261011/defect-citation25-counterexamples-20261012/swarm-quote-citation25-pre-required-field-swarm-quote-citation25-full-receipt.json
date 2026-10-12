@@ -1,0 +1,14 @@
+{
+  "state": "running",
+  "started": "2026-10-12T06:27:53.077623+00:00",
+  "argv": [
+    "go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=12m"
+  ],
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/quote-citation25-preview-6ff2n61k",
+  "candidate_digest": "240466d0538802c43fe02a217227b165f8b371bcbd1f4ea716e5fa81a93a2acd",
+  "frozen_paths": 2118
+}

@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant A as Agent
+  participant S as Superviseur propriétaire
+  participant M as Moteur déterministe
+  participant U as Utilisateur
+  participant F as Agent de la prochaine tâche
+  A->>M: Retour attribué
+  M->>S: Activation et événement figé
+  S->>M: revise-instructions et motif
+  M->>M: Droits, bail, événement, tâche future, transaction
+  M->>U: Encadré cyan, validée par défaut
+  alt Rejet avant réservation
+    U->>M: reject-instructions
+    M->>M: Conserver l'ajout rejeté et recomposer la consigne
+  else Ajout conservé
+    M->>F: Réserver la tentative et figer la consigne composée
+    M->>U: Transmise, rejet désactivé
+  end

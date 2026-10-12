@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-12T11:07:51.762637+00:00",
+  "revision": 744,
+  "agent": "auto-3e403acbdfe6bfcc8251",
+  "attempt": "a-8ab4c5f89ce3947eb46b3bf6",
+  "status": "running",
+  "provider": "codex",
+  "workspace": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T3-3",
+  "current_bundle_commit_received": true,
+  "current_bundle_manifest_received": true,
+  "current_bundle_path_received": true,
+  "prompt_sha256": "ef516d769bd5263cc0453a81c12f181b397c40ef4f1ac42b0b0c808f4b2a596f",
+  "operator_resume_launch_used": true,
+  "progress": {
+    "elapsed_seconds": 11,
+    "action": "Exécution d’une commande",
+    "detail": "/bin/bash -lc 'set -eu pwd git rev-parse --show-toplevel git fetch --no-tags /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-inputs-T3-effective-provider-20261012.bundle refs/heads/operator-inputs:refs/swarm/operator-inputs git rev-parse refs/swarm/operator-inputs sha256sum /home/fpizzi/workspace/swarm/docs/plans/engine-cursor-contract/recovery/operator-inputs-T3-effective-provider-20261012.bundle git show refs/swarm/operator-inputs:operator-inputs.json | sha256sum'",
+    "tool_calls": 2,
+    "tool_results": 2,
+    "last_result_at": "2026-10-12T11:07:51.059641313Z"
+  },
+  "limits": "Same prepared ID/copy resumed publicly after explicit provider relay; prompt receipt is not import or acceptance. Older root next contains superseded125 identities; current frozen worker profile supplies127 originals."
+}

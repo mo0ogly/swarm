@@ -1,5 +1,17 @@
 # Recover an exhausted task
 
+## Historical opinion and new production
+
+A new production attempt archives the previous opinion and prepares its own
+review. A running or queued review blocks that transition. Consumed attempts
+and review calls remain unchanged.
+
+Older states may incorrectly retain a finished opinion from a previous attempt.
+The current candidate's preflight remains available only when that opinion is
+attributable to an earlier attempt on the same task. Inventory is read-only;
+a validated retry archives the opinion atomically. Unknown, unfinished and
+current-attempt opinions are never ignored.
+
 In **Agent management**, a blocked card and its details offer **Authorize an
 additional attempt** when the current allowance is exhausted. Enter a reason and
 a concrete correction: missing sources, a verified precondition or partial work
@@ -68,6 +80,11 @@ the operator's decision when the attempt limit has been reached.
 
 ## Supply candidate sources to the independent reviewer
 
+Files declared in `delivery.criteria[].evidence` are now supplied completely
+from the tested candidate, even if unchanged; the report is already present.
+The manifest below adds extra sources rather than enabling declared evidence.
+See the [global contract and diagrams](REVIEW-EVIDENCE.md).
+
 For managed Git integration, the producer may add
 `docs/TASK-ID.review-context.json` inside the mission's repository subdirectory:
 
@@ -83,7 +100,8 @@ sufficient evidence; a reviewer must still return unknown for unsupported criter
 Limits: 8 KiB manifest; 24 distinct files; 96 KiB per file; 128 KiB combined sources;
 192 KiB overall review context. Invalid paths, missing files, symlinks, binary
 content and oversized input are rejected without truncation or a review call.
-Without a manifest, the existing diff/report/control-receipt flow remains available.
+Without a manifest, declared delivery evidence is still supplied. Historical
+attempts without either delivery or manifest retain diff/report/control receipts.
 This is explicit context delivery, not general file watching or direct worker messaging.
 
 ## After three attempts: one explicit corrective authorization
@@ -145,10 +163,18 @@ updated report. These instructions are guidance, not an OS sandbox or a guarante
 that a provider will follow them.
 
 For explicitly requested external repairs, an operator may finish the stopped
-copy and submit one examined revision through `planning submit-recovered-result`.
+copy and submit one examined revision per attempt through `planning submit-recovered-result`.
 The operation launches no worker and preserves the interrupted process, attempt
 and budgets. The reviewer receipt identifies `external_repair` and its actor;
 such a repair does not demonstrate autonomous completion.
+
+A retained repair from a previous attempt does not prevent submission of the
+current stopped attempt. The durable event preserves the old repair, review and
+coordination; their Git references and receipts remain intact. The new submission
+requires its own checks and a fresh review. Another implicit submission of the
+same attempt remains rejected; correcting that result uses
+`revise-recovered-result` and its attributed independent rejection, or the
+verified no-call preflight described below.
 
 After reviewing the diff and evidence, run `git add -A` and `git write-tree` in the
 copy. Supply JSON with `schema_version: 1`, `event_id`, `expected_revision`,
@@ -159,8 +185,8 @@ mandatory even for legacy attempts.
 
 Normal checks and independent review still cover the same candidate. A rejection
 stays blocked; no fifth attempt is created. Replaying the same event uses the
-recorded revision and does not repeat a rejected review. A second repair submission
-for the task is refused. Review incidents use the existing explicit retry path.
+recorded revision and does not repeat a rejected review. Another implicit submission
+of the same attempt is refused. Review incidents use the existing explicit retry path.
 
 Oversized review context can come from unchanged diff lines. Above 160 KiB of
 serialized context, the engine uses three Git context lines instead of forty.
@@ -227,7 +253,8 @@ report is absent.
 ### Review stopped by its time limit
 
 In the cockpit, **Review time limit** below the reviewer sets the duration of
-future reviews between 1 and 900 seconds, with a recorded reason. Saving preserves
+future reviews to a positive duration, or `0` to inherit the project policy
+configured in Admin, with a recorded reason. Saving preserves
 used calls and their limit; it does not restart anything. After fixing the cause,
 **Resume review** examines the existing result within the remaining budget, without
 starting another worker.
@@ -247,8 +274,8 @@ Tasks using human review retain their existing workflow.
 
 ## Recovery and tool budgets
 
-The last authorized tool may finish and its result is retained within the
-existing deadlines. Additional calls remain prohibited; repetition and error
+The last authorized tool may finish and its result is retained. Duration
+thresholds send observations to the owner; they do not stop production. Additional calls remain prohibited; repetition and error
 guards stay active. An interruption does not validate the work.
 
 A new attempt receives a bounded summary of operations observed in the previous
@@ -287,3 +314,61 @@ operator decision, `swarm planning restart-task`, can authorize exactly one new
 production after examining the current result. This is neither an automatic fifth
 attempt nor a counter reset. See the
 [restart conditions and evidence bindings](ENGINE-RECOVERY.md#restarting-a-blocked-task).
+
+### Correct a no-call preflight after interruption
+
+An external repair may have complete delivery and pass controls, then fail
+before any review because one context artifact is too large. Explicit
+`planning revise-recovered-result` can correct that same stopped attempt
+without `review_id`, since no opinion exists. Supply the current identities
+and revision, `confirm_recovery`, a concrete reason and the examined new
+`result_tree`; its tree must differ from the retained result.
+
+The engine rereads the retained preflight: a known no-call cause, blocked task,
+current agent/attempt, confirmed process exit, attributed result, and candidate
+checkpoint/receipt matching the base, contract and controls. Tampering refuses
+the correction before mutation. An arbitrary controller error grants no such
+permission. Previous results, opinions where present, references and receipts
+remain retained. Fresh controls and review cover the new candidate. Replay
+grants no additional call, attempt or refund.
+
+A large integrity manifest may use several complete files, each linked by
+SHA-256 to its parent manifest. The harness reconstructs every input before
+checking the aggregate digest. Packaging removes no evidence, raises no
+limit and renews no historical acceptance.
+
+Duration and silence thresholds remain observations with caps enabled as well.
+Changing the mode affects execution caps and attempts; AI conduct decisions
+retain their attribution.
+
+## Correcting unpaid source-capacity refusals
+
+A complete delivery with a bounded diff may still exceed the aggregate attached
+source capacity. No review call is spent. The engine retains the immutable Git
+result, prepared candidate and controls. Public `planning revise-recovered-result`
+can correct the declared selection without creating another production or
+claiming acceptance.
+
+The engine verifies work, task, completed attempt, immutable result, contract,
+previous candidate and matching checkpoint/control receipt. It rebuilds the
+original context and recognizes only a typed capacity error matching the stored
+refusal. Altered checkpoints, different failures, stale attempts or an existing
+independent opinion grant no such authority. Ordinary review retries still
+require a complete bounded context; only explicit repair can inspect the verified
+checkpoint while source capacity remains exceeded.
+
+Retain originals, remove only redundant declarations or create suitable pieces
+with attribution and lineage. The new result runs fresh controls and independent
+review; consumed attempts and budgets remain unchanged.
+
+```mermaid
+flowchart TD
+  A[Completed production and delivery] --> C[Controls on immutable candidate]
+  C --> B[Source capacity exceeded, no review call]
+  B --> V{Matching checkpoint, receipt and typed refusal}
+  V -->|No| R[Refuse without effects or calls]
+  V -->|Yes| O[Attributed operator repair]
+  O --> N[New result with original evidence retained]
+  N --> F[Fresh controls and independent review]
+  F --> P[Accept only valid fresh evidence]
+```

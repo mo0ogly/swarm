@@ -13,6 +13,10 @@ that a live Swarm mission finishes without assistance.
 
 ## Responsibilities
 
+The [agent parallelism contract](AGENT-PARALLELISM.md) explains needs, constraints
+and required evidence, with Mermaid diagrams separating parallel production
+from exclusive publication.
+
 | Role | Responsibility | Permitted effect |
 |---|---|---|
 | Root planner | Owns the complete requirement; decomposes and adapts the work. | Structured planning decisions, no coding commands. |
@@ -121,3 +125,61 @@ A newly added report already reproduced in full in the diff may reference that
 copy after exact text comparison. Its length and digest remain explicit. Modified
 or partially present reports stay attached in full. On rejection, diagnostics
 record actual prompt and instruction sizes without exposing content.
+
+### T3 implementation: read exploration and future dependencies
+
+The reserved planner may request `explore` with a unique id and JSON
+`deliverable`: `list` plus a relative directory, or `read` plus exact files,
+bound to the accepted Git commit. The engine preserves whole original sources,
+blob and SHA256 identities, scope, generation and observed revision in a durable
+event. It executes no caller command and changes no source. Actual role transport
+capacity is computed after workflow and instruction overhead; oversized complete
+input is refused. A later planner activation receives the originals. A replaced
+accepted candidate makes earlier discoveries historical and cannot authorize
+new operations from that old input.
+
+`revise-dependencies` changes only the explicit dependency array of an owned
+future todo task with no attempt. Acyclic graph, lease and absence of active or
+already prepared production are checked transactionally. Criteria, requirements,
+spent budgets and blocked producer results are preserved. The old and new
+dependencies are attributed to the supervisor decision. Reordering never accepts
+the producer whose ordering prerequisite was removed.
+
+```mermaid
+flowchart TD
+    P[Supervisor requests immutable exploration] --> E[Engine records whole originals]
+    E --> D[Next activation receives discovery]
+    D --> R[Supervisor revises future dependencies]
+    R --> G[Engine verifies ownership and acyclic graph]
+    G --> W[Eligible work still needs controls and independent review]
+```
+
+Two concurrent subprocess fixtures demonstrate distinct sub-supervisor leases,
+atomic scoped decisions, own and ancestor counters, shared reservations, pause,
+replay and persistence. They are deterministic provider doubles; real-model
+behavior remains a T7 recipe. This isolated T3 source includes the original
+developed T2 Judge but does not accept T2. Deferred correction27 is excluded.
+Runtime26 still lacks these new capabilities until qualification and installation.
+
+### Supervisor reservation and effective provider
+
+Claim admission checks the provider selected for the requested scope, matching
+the provider used for its invocation. A default-provider cooldown does not block
+an explicitly selected alternative; the effective provider's own cooldown blocks
+the reservation without spending a claim. Child selections remain scoped. Default
+identity, other provider waits, counters and historical responses are preserved.
+Replaying an applied claim does not create a new call.
+
+Isolated tests first reproduce both wrong-provider refusal and missed selected-
+provider refusal for root and child scopes. Selection, inheritance, cooldown and
+model regressions pass locally. This does not certify alternative-account access
+or native T3 recovery.
+
+```mermaid
+flowchart TD
+    S[Requested scope] --> R[Explicit selection or default provider]
+    R --> Q{Effective provider cooldown}
+    Q -->|Blocked| W[Preserve wait without reservation]
+    Q -->|Available| A[Atomic scope reservation]
+    A --> L[Invoke the same frozen route]
+```

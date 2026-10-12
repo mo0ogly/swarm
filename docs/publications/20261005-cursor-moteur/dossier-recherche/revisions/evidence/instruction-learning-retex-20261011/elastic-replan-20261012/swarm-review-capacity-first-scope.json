@@ -1,0 +1,11 @@
+{
+  "algorithm": "fresh measured-capacity complete artifact packing by conservative binary-search prefixes",
+  "coverage": "canonical artifacts exact equality or coordination coverage before counting and complete final validation",
+  "native_state": "T3 candidate, controls and82 reviewer calls unchanged",
+  "schema": 31,
+  "limitations": [
+    "does not implement autonomous run budgets or Elasticsearch ingestion",
+    "legacy historical packets unchanged",
+    "a piece exceeding actual measured capacity remains refused"
+  ]
+}

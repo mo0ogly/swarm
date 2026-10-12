@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-11T19:51:36.561265+00:00",
+  "original_private": "/tmp/swarm-runtime22-post-pause-public-baseline.json",
+  "original_sha256": "458c973cf5f7484f0e82ee2d000feef5bbe2115f80bcf9f6873cf4a1acc65e4c",
+  "mode": "0600",
+  "work_body_sha256": {
+    "w-ca937edf4e0abd85f8d3d67b": "b7c6ef06ffae44f0979562030f7b0f21e1d2d12ebc9be2d372207b042a5dfb65",
+    "w-fff7368010d114f6e2578985": "e9e99b6ef1d25b8e087abeec928fb1d916c94c87d5d1749013fb48421cda4f80",
+    "w-5757437164b50815bee50a0c": "e35ff95408e0080e45861fda4010a8377b4b43b6cdf652f32a5c46f1a8eca747"
+  },
+  "install_verified_bodies_exact": true,
+  "scope": "Original full three-work public snapshot contains session-route data in unrelated mission content. Original preserved privately and never printed/published; this derived digest receipt is public evidence, not a substituted original."
+}

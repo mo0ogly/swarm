@@ -1,0 +1,37 @@
+{
+  "at": "2026-10-12T15:19:03.082068+00:00",
+  "revision": 806,
+  "remaining_before": 7,
+  "future_tasks": [
+    "plan-ca937edf4e-T4",
+    "plan-ca937edf4e-T5",
+    "plan-ca937edf4e-T6",
+    "plan-ca937edf4e-T7",
+    "plan-ca937edf4e-T8"
+  ],
+  "planning_limit_after": 150,
+  "decision_limit_after": 100,
+  "review_limit_unchanged": 100,
+  "consumption_and_history_preserved": true,
+  "authorization": {
+    "before_scope_activations": {
+      "root": 0
+    },
+    "after_scope_activations": {
+      "root": 150
+    },
+    "before": {
+      "planning_activations": 88,
+      "planning_decisions": 70,
+      "review_calls": 100
+    },
+    "after": {
+      "planning_activations": 150,
+      "planning_decisions": 100,
+      "review_calls": 100
+    },
+    "actor": "fpizzi/uid:1001",
+    "at": "2026-10-12T15:18:57.490221361Z",
+    "reason": "Autorisation utilisateur pour ce projet jusqu’au RETEX : il reste cinq tâches T4–T8 sans essai, dont élasticité supervisée et recette ; au moins une décision de départ et une de traitement de résultat par tâche dépassent les activations restantes, sans compter coordination T3 et reprise T2. Augmenter seulement les enveloppes de planification88→150 et décisions70→100, périmètre racine150. Conserver consommation, échecs, pauses, sous-périmètres, appels de revue et tâches ; aucune remise à zéro, nouvelle tâche de remplacement ou acceptation. Budget revue actuel100 inchangé, coût de la future coordination à vérifier avant appel."
+  }
+}

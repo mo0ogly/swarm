@@ -1,0 +1,10 @@
+=== RUN   TestPlanningScopeOwnActivationBudgetDiscriminant
+=== RUN   TestPlanningScopeOwnActivationBudgetDiscriminant/one
+    planning_scope_activation_discriminant_test.go:48: self=1 ancestor/global=2; next claim refused budget_exhausted with state unchanged; no model called
+=== RUN   TestPlanningScopeOwnActivationBudgetDiscriminant/two
+    planning_scope_activation_discriminant_test.go:48: self=2 ancestor/global=3; next claim refused budget_exhausted with state unchanged; no model called
+--- PASS: TestPlanningScopeOwnActivationBudgetDiscriminant (0.06s)
+    --- PASS: TestPlanningScopeOwnActivationBudgetDiscriminant/one (0.03s)
+    --- PASS: TestPlanningScopeOwnActivationBudgetDiscriminant/two (0.03s)
+PASS
+ok  	swarm.local/companion/internal/engine	0.083s

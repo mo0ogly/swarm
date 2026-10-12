@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-12T10:24:47.199134+00:00",
+  "revision": 714,
+  "supervisor_decision": "planning-claim-edd757dc6932de7f4662591f-decision",
+  "T2": {
+    "status": "blocked",
+    "attempts": 4,
+    "review_calls": 82
+  },
+  "T3": {
+    "id": "plan-ca937edf4e-T3",
+    "status": "running",
+    "depends": [
+      "plan-ca937edf4e-T1"
+    ],
+    "attempts": [
+      {
+        "id": "a-8314de66e60d5d36bb4ccb5c",
+        "status": "recorded",
+        "started": "2026-10-12T10:24:03.212026507Z"
+      }
+    ],
+    "agent": "auto-b39bb80661d6d56b9df2",
+    "agent_status": "running",
+    "workspace": "/home/fpizzi/workspace/swarm/.swarm/managed/w-ca937edf4e0abd85f8d3d67b/copies/plan-ca937edf4e-T3-1",
+    "started": "2026-10-12T10:24:03.213130525Z",
+    "prompt_bytes": 67635,
+    "prompt_sha256": "d85710c16ae629af6857e2c4a576c0cffef31bd67382563780aaffee0d377ab9",
+    "bundle_path_received": true,
+    "bundle_sha256_received": true,
+    "bundle_commit_received": true,
+    "patch_name_received": true,
+    "progress": {
+      "elapsed_seconds": 43,
+      "action": "Annonce de l’agent : Search Activations usage in planning.go",
+      "tool_calls": 3,
+      "tool_results": 2,
+      "last_result_at": "2026-10-12T10:24:28.173887396Z"
+    }
+  },
+  "T4_depends": [
+    "plan-ca937edf4e-T3",
+    "plan-ca937edf4e-T2"
+  ],
+  "operator_resume_launch_used": false,
+  "limits": "Native agent running and prompt reception measured; actual import, candidate qualification, independent review and acceptance remain required. Root classified unverifiable operator technical claims as suspected injection, while independently applying the legitimate graph decision."
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-10T18:41:35.810526+00:00",
+  "work_id": "w-ca937edf4e0abd85f8d3d67b",
+  "work_revision": 49,
+  "runtime_binary_sha256": "ecd2256d04cf71c6c23a50ef88db6c5f26604fdd52e94c4d89dadf6953f86bf0",
+  "requalification_event": "plan-phase-requalification-2ec9419434be4ef0b16332ddc116881a",
+  "T1": {
+    "task_id": "plan-ca937edf4e-T1",
+    "status": "accepted",
+    "validated_by_public_mission_status": true,
+    "attempts_preserved": [
+      "a-d01bafdfcfe21d50ef1d7d8c",
+      "a-29a7a2f21ea5f1f764409e08"
+    ],
+    "candidate": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "plan_phases_match_gate": true,
+    "review_id": "review-536346277798553f58126b80",
+    "review_state": "passed",
+    "review_started": "2026-10-10T18:35:25.870508221Z",
+    "review_finished": "2026-10-10T18:39:01.084477908Z",
+    "review_calls": 5,
+    "review_max_calls": 30,
+    "historical_artifacts": {
+      ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-ed3d6ce2b54e02740a68-repair-493138f7620f40fe/receipt.json": {
+        "sha256": "cb18ecf326da9f9f1c6550fcf8b985b5893a25e5def1f8084803039bba0d1f02",
+        "unchanged": true
+      },
+      ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-ed3d6ce2b54e02740a68-repair-493138f7620f40fe/report.md": {
+        "sha256": "e1e39d5c6660e1c3aee2cbc5b3cef30047c13f7de26efd029a4f295851c10525",
+        "unchanged": true
+      }
+    }
+  },
+  "T2": {
+    "task_id": "plan-ca937edf4e-T2",
+    "agent_id": "auto-0f7f61a183068fd63528",
+    "attempt_id": "a-5fff6319655d0b5b9b34413a",
+    "status": "running",
+    "child_pid": 4054024,
+    "workflow_skills": [
+      "apex"
+    ],
+    "resume": "Explicit public agent resume-launch of retained preparation; no duplicate attempt."
+  },
+  "full_go_suite": {
+    "command": "go test ./... -timeout 5m",
+    "exit_code": 1,
+    "manifest_failure": "stale input: PREPARATION-UX.md",
+    "timeout_scope": "whole internal/engine test package at 300.075 s",
+    "tests_running_at_timeout": [
+      "TestManagedFragmentHistoricalPublicRecovery (33s)",
+      "TestManagedFragmentHistoricalPublicRecovery/exit (6s)"
+    ],
+    "interpretation": "Last running case is not proven blocked; separate audit requested."
+  },
+  "limits": "T2 has started; T3..T7 not delivered. This explicit repair is not an autonomous recovery demonstration."
+}

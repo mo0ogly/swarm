@@ -91,17 +91,34 @@ retention durations and discounts require appropriately selected rates; they are
 not inferred. Prior versions cannot be deleted through this interface; further
 writes are refused after 1,000 versions.
 
-## Planning and review limits
+## Engine settings
 
-In **AI budgets and costs**, open the planning and review limits form. Inspect
-consumption and local allocations, enter new limits and a reason, preview, then
-authorize. Editing invalidates the preview; stale revisions are rejected.
+In **Admin**, open **Engine settings**; the same dialog is available in
+**AI budgets and costs**. The compact table separates current usage from limits;
+history and local allocations remain available on demand. Enter settings and a
+reason, preview, then authorize. Editing invalidates the preview; stale revisions are rejected.
 Consumption, history, failures and pauses are preserved.
 
-Global ranges: 1–200 planning activations, 1–100 decisions, 1–100 review calls.
-Limits cannot fall below consumption. Subplanner allocations remain unchanged
-and continue to apply. Wait until planner sessions are released and running
-reviews finish before changing these limits.
+These persisted policies share one source of truth across web, API and CLI.
+No second fixed ceiling of 100, 200 or 500 is applied in the engine or form.
+
+| `limits` field | Meaning |
+| --- | --- |
+| `planning_tasks` | Maximum tasks; positive integer, at least the current count |
+| `planning_activations` | Global activations; positive integer, at least consumed |
+| `planning_decisions` | Global decisions; positive integer, at least consumed |
+| `review_calls` | Configured reviewer calls; positive integer, at least consumed, or `null` without a reviewer |
+| `planning_scopes` | Maximum scopes; zero means no extra ceiling, otherwise at least the current count |
+| `delegation_depth` | Maximum levels; root counts as level 1, zero means no extra ceiling, otherwise at least current depth |
+| `judge_cycles` | Maximum judge cycles; zero means no extra ceiling, otherwise at least the current cycle |
+
+Omitted optional task/scope/depth/cycle fields preserve their current value. Zero
+does not remove call budgets, permissions or other checks. Subplanner allocations
+remain unchanged and still apply. Active planner reservations and reviews prevent
+changes until released. `GET /api/v1/quotas` exposes values, consumption, revision
+and latest authorization; `remaining` is `null` for an unlimited dimension.
+Technical bounds remain distinct from policies; integers must be representable
+without precision loss.
 
 ```sh
 swarm quotas show WORK --json
@@ -112,7 +129,7 @@ swarm quotas apply WORK --input quotas.json --json
 Example request; use the revision and consumption returned by `show`:
 
 ```json
-{"schema_version":1,"event_id":"quota-authorization-001","expected_revision":12,"limits":{"planning_activations":30,"planning_decisions":20,"review_calls":10},"reason":"Explicit authorization after reviewing remaining work"}
+{"schema_version":1,"event_id":"quota-authorization-001","expected_revision":12,"limits":{"planning_tasks":30,"planning_activations":60,"planning_decisions":40,"review_calls":20,"planning_scopes":0,"delegation_depth":0,"judge_cycles":0},"reason":"Explicit authorization after reviewing remaining work"}
 ```
 
 Without a configured reviewer, `review_calls` must be `null`. This operation does
@@ -143,3 +160,10 @@ are preserved, and before/after limits are recorded with the actor and reason.
 Unknown scopes, limits below consumption, and limits above the parent/global
 limit are rejected. Explicitly bounded parents must be raised in the same request
 when needed. Active planning leases and reviews still prevent quota changes.
+
+## Browser timeouts are separate from budgets
+
+The **Browser request waiting time** Admin dialog configures general API calls,
+snapshots and connection tests. `0` disables interface expiry; agent budgets and
+server execution deadlines remain separate. Preview, save, history and CLI use
+the shared Go contract. See [units, effects and limits](WEB-REQUEST-POLICY.md).

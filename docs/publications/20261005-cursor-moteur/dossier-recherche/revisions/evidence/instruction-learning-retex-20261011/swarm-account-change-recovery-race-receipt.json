@@ -1,0 +1,18 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "TestProviderCooldown|TestManagedReviewFragmentResume|TestManagedReviewProviderRecovery",
+    "-count=1",
+    "-timeout=120s"
+  ],
+  "start": "2026-10-11T15:31:45.415044+00:00",
+  "end": "2026-10-11T15:32:25.211759+00:00",
+  "seconds": 39.79672645199753,
+  "exit": 0,
+  "output": "/tmp/swarm-account-change-recovery-race.out",
+  "output_sha256": "4592306293c133abc9fd6c552f36160378b513026561a8865712e51e4e955193"
+}

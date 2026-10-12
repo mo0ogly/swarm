@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-11T13:42:08.646934+00:00",
+  "native_review": "review-f61323bfa5817ab0f9bb4433",
+  "pid": 4020797,
+  "alive": true,
+  "observation": "Kernel I/O only; not semantic progress or verdict",
+  "io": {
+    "rchar": "2497138",
+    "wchar": "359972",
+    "syscr": "1232",
+    "syscw": "3213",
+    "read_bytes": "8085504",
+    "write_bytes": "307200",
+    "cancelled_write_bytes": "0"
+  },
+  "delta": {
+    "rchar": 22204,
+    "wchar": 40063,
+    "syscr": 216,
+    "syscw": 1626
+  }
+}

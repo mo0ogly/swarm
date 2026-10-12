@@ -1,0 +1,7 @@
+{
+  "id": "planning-claim-7b56df25f3dad61cd46796d1-decision",
+  "at": "2026-10-12T11:04:49.493609665Z",
+  "scope": "root",
+  "reason": "Le constat de divergence concernait la seconde tentative désormais arrêtée et bloquée : aucune décision continue-run/stop-run n’est encore applicable. La précondition a bien changé dans l’état courant : route Codex standard installée, troisième tentative autorisée sans remise à zéro, et consigne T3 persistée imposant l’import initial du bundle127, la vérification du commit/manifeste/empreintes/préimages, le réemploi des patchs transmis, les quatre critères req-9 à req-12 et un bilan local réel. Cette consigne plus récente supplante la référence bundle125 des événements ; il ne faut ni la réécrire ni relancer l’ancienne seconde tentative. Toutefois l’état fourni déclare explicitement production_retry_unavailable=true : aucune opération autorisée de ce schéma ne peut reprendre la tâche bloquée, et créer une tâche de remplacement contournerait l’historique et les plafonds. Propriétaire du blocage : moteur Swarm. Condition concrète de reprise : rendre disponible le parcours public de retry de production pour plan-ca937edf4e-T3, en conservant attempts_used=2/attempts_max=3, compteurs, fichiers et budgets ; le retry devra alors appliquer la consigne persistée actuelle sur la route Codex, sans appel Claude avant la fin de son délai. T2 reste bloquée indépendamment et T4 conserve ses dépendances T2/T3.",
+  "operations": null
+}

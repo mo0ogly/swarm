@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-11T22:13:57.862259+00:00",
+  "state": "qualification_cancelled_for_new_observed_contract_defect",
+  "owned_go_pid": 215830,
+  "owned_driver_pid": 215645,
+  "descendants": [
+    215830,
+    217572,
+    221461,
+    221494,
+    221692,
+    221983,
+    238171,
+    238326,
+    238356,
+    248476,
+    279218,
+    280779,
+    282950
+  ],
+  "reason": "Native root proposals also combine review-retry with forbidden plan-edit fields; fold planner operation schema correction into this same candidate before qualification",
+  "limits": "Only this isolated local qualification is stopped; installed23, native histories and provider calls unchanged."
+}

@@ -1,0 +1,20 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "TestOperatorInventory21OriginalCounterexample",
+    "-v",
+    "-count=1",
+    "-timeout=3m"
+  ],
+  "start": "2026-10-11T19:09:19.135637+00:00",
+  "end": "2026-10-11T19:09:29.775811+00:00",
+  "exit": 0,
+  "source_sha256": "670303f349e9d41d4f932077cfb3e99568ea48abca8f926f2578d6ed63c0896e",
+  "proof_copy": "/home/fpizzi/.cache/swarm-operator-replan-20261011/review-inventory21-public-originals-nvpvgah_",
+  "output": "/tmp/swarm-review-inventory21-native-counterexample.out",
+  "output_sha256": "271ce3abf6ee323bb907ea535c2c1ccb54f6bf5a486714906a791b5c6bd88cd6",
+  "scope": "Isolated read of immutable declared public originals only, original unknown remains unknown, no provider or native database/mutation. Temporary diagnostic test removed before freezing production sources."
+}

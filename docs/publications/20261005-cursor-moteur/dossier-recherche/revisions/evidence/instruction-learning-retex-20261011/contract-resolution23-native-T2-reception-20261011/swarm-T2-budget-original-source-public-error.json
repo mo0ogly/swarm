@@ -1,0 +1,6 @@
+{
+  "at": "2026-10-11T21:36:09.732657+00:00",
+  "error": "timed out",
+  "event_id": "T2-own-scope-original-proof-repair-01ee70df3a1449e890353fd945033a56",
+  "condition": "Inspect public state before any further operation; do not replay an unknown outcome"
+}

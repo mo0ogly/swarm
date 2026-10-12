@@ -1,0 +1,55 @@
+{
+  "at": "2026-10-12T14:35:36.910486+00:00",
+  "bundle": {
+    "at": "2026-10-12T14:18:15.002335+00:00",
+    "bundle": "docs/plans/engine-cursor-contract/recovery/operator-inputs-control-command-deadline-20261012.bundle",
+    "sha256": "24ad1e2c764b60b31a5cfbfb500df7767648586f751f98bc8f1cfea597f21a31",
+    "commit": "9aa677b8c41c8d23fdb565951162350aff757321",
+    "ref": "refs/heads/operator-inputs",
+    "input_files": 139,
+    "manifest_sha256": "73106db65d40a2012a2c5226d83ac2bd50898ef380885fe251668c8b55aa13f0",
+    "source": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-command-deadline-inputs-z55euft4",
+    "isolated_import_check": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-command-deadline-import-0e2kpf3z",
+    "old137_originals_preserved": true,
+    "verification": "PASS isolated import, every original byte/hash and versioned preimage",
+    "limits": "Qualified two-budget Go control contract extends all 137 originals unchanged. Storage contract 31, explicit validation/validation-go-test Admin durations, actual effective argv and attributed configuration, combined reservation freshness. No default duration or acceptance. Preserve every prior input and history; deferred27 excluded. Native future tasks must verify matching preimages, preserve their own manifest and qualify the cumulative candidate; operator deployment is not native acceptance or autonomous recovery."
+  },
+  "updates": [
+    {
+      "task": "plan-ca937edf4e-T4",
+      "revision": 786,
+      "operator_base_sha256": "ce4703eacd1322eac2a06f535fa0cf262fc804cd15b581f0eb38e19efb4b90a7",
+      "instruction_bytes": 22954,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "revision": 787,
+      "operator_base_sha256": "e26e1fec13381ee763e6e5febb26070be3afc5decbd260bed906ff83b255898c",
+      "instruction_bytes": 26650,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T6",
+      "revision": 788,
+      "operator_base_sha256": "db2b9b5ca83584d5ef947a14b6f507c27f1a14fd8a2afa6b4abedf7a12319000",
+      "instruction_bytes": 22146,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T7",
+      "revision": 789,
+      "operator_base_sha256": "0a83b2069926104688dd77a2bb2f17b5dce6a623fe16f15adc8f662dead6a7fe",
+      "instruction_bytes": 21847,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    },
+    {
+      "task": "plan-ca937edf4e-T8",
+      "revision": 790,
+      "operator_base_sha256": "2704a4bc027dc9f6799a0f657449e11c3dfbf94c2a78b81f6948288aaa4e2090",
+      "instruction_bytes": 16333,
+      "criteria_dependencies_attempts_models_budget_learning_preserved": true
+    }
+  ],
+  "limit": "Future task inputs publicly saved, not yet received or executed by a worker; T3 retained result, policies and active control contract unchanged."
+}

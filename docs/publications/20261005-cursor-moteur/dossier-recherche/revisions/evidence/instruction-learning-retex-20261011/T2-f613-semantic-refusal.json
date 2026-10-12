@@ -1,0 +1,54 @@
+{
+  "revision": 283,
+  "review": {
+    "result_event": "review-f61323bfa5817ab0f9bb4433-result-e5dece419bfbd1d4",
+    "fragment_journal": {
+      "inspection_task": "plan-ca937edf4e-T2",
+      "inspection_attempt": "a-a349f9134d355713576b7166",
+      "inspection_producer": "auto-f2abbcfe6bed66fd1a5e",
+      "workflow_sha256": "0b5d056832b3443734c933d91b6681c63439e70d3e6f886e4215fe47988ca809",
+      "model_config_sha256": "79536be4d86f1f98f4778242ce73f8c41d01b43534eab7294fc48ec744f61a37",
+      "plan": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039/review-f61323bfa5817ab0f9bb4433-plan.json",
+      "plan_sha256": "9f8a0c32cd397f089e63e4c58930b4d12549495ef5ed36eca93875a63164dcaf",
+      "journal": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039/fragment-journal-664fafb196d922e6842d16722917f59ec6fe425142c4835504f0a7dbc7b42183.json",
+      "journal_sha256": "664fafb196d922e6842d16722917f59ec6fe425142c4835504f0a7dbc7b42183"
+    },
+    "model_route": {
+      "level": "standard",
+      "model": "sonnet",
+      "effort": "",
+      "billing": "external",
+      "policy_hash": "1cb0234143e9aa8ed95f3cd427d818ab0066d8c33139ce7f75a31f670f609b17",
+      "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+    },
+    "batch_provider_sha256": "a27bf0998ace86f44a53996649f88f3d0859bd8292b8deb2946e0896885e9459",
+    "workflow": {
+      "version": 1,
+      "role": "reviewer",
+      "methods": [
+        "audit-pdca",
+        "code-reviewer",
+        "product-review"
+      ],
+      "sha256": "28b293cca11cf97690380d482960742c94ed7df9cb0ce899b70fc82201bdcb50"
+    },
+    "git_report": "docs/plan-ca937edf4e-T2.md",
+    "candidate_commit": "859996a7c72fa4f5bbb9fba8c257d9b47cb4b671",
+    "previous_candidate": "e32388fda21e7c225c3b2416d230d6f5450230cd",
+    "receipt": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039/receipt.json",
+    "receipt_sha256": "952a11051811006c7d30e06a64127ce2c556a1dd706d29ccd1f305dd11415f9e",
+    "context": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039/review-f61323bfa5817ab0f9bb4433-context.json",
+    "context_sha256": "b47ea221183a6fb28e0e8794520f8890c88716d4f968694daf4aed490e2da84c",
+    "id": "review-f61323bfa5817ab0f9bb4433",
+    "attempt": "a-a349f9134d355713576b7166",
+    "producer": "auto-f2abbcfe6bed66fd1a5e",
+    "reviewer": "reviewer://claude",
+    "report": ".swarm/managed/w-ca937edf4e0abd85f8d3d67b/proofs/auto-f2abbcfe6bed66fd1a5e-repair-93d91c4070c4e039/review-f61323bfa5817ab0f9bb4433-report-948e0a7f068fb4715f6285e8f731219e20b268ca3c584f906614fe26524dabb5.md",
+    "sha256": "191e88e6d5793a3313e619ceaad8a26b5d8206c56c841224ba1d23beaa7612bc",
+    "contract": "42322681531fbc222f795d153904f9b002b1f11c597af097c3c7660509100044",
+    "state": "changes_requested",
+    "reason": "Correction demandée : contracts-reports-controls-baseline, ligne de la pièce 1 : delivery.json cite 'plan-validation' comme preuve des 4 criteres de plan-ca937edf4e-T2 (verdict distinct, renouvellement, rejeu/quota, cloture sans preuve). Mais cette commande receipt filtre 5 noms de test, aucun ne correspondant aux 7 fonctions TestPlanningJudge* ajoutees dans planning_judge_test.go. Seul TestManagedCheckpointRecovery est couvert ; end-verdict, rejets stale/quota/actif et cloture-sans-preuve, coeur des criteres 1/3/4, ne sont jamais executes par ce controle moteur malgre la citation. Reproduction : Executer go test ./internal/engine -run 'TestPreparedOrganizationManagedRepository|TestPlanningParent|TestPlanningReportRelay|TestManagedCheckpointRecovery|TestManagedRecoveryHandoff' -v et comparer aux 7 noms TestPlanningJudge* de planning_judge_test.go : aucun ne correspond. Attendu : Le motif -run de plan-validation devrait couvrir TestPlanningJudge* (ex: TestPlanningJudge.*) avant d'etre cite comme preuve des criteres qu'il est censu verifier.",
+    "started": "2026-10-11T13:34:46.512799836Z",
+    "finished": "2026-10-11T13:59:13.303953836Z"
+  }
+}

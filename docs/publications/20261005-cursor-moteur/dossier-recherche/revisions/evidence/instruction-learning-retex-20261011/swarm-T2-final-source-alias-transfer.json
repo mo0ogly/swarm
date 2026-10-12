@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-11T16:35:05.545836+00:00",
+  "agent": "auto-a23c60f03a732c02841f",
+  "status": "completed",
+  "ended": "2026-10-11T14:21:56.918328529Z",
+  "base_tree": "e1491d4539518ab4bd0955a41b8aee6d0d85e87f",
+  "result_tree": "201b3a8e2e0f724a7cc88fef7107bf2d41569316",
+  "paths": [
+    "docs/plan-ca937edf4e-T2.md",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/index.json",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted.out",
+    "docs/plans/engine-cursor-contract/evidence/T2-execution/operator-recovery-20261011/source-alias-final-targeted-receipt.json"
+  ],
+  "preimages_exact": true,
+  "postimages_exact": true,
+  "effect": "Attributed operator documents/fresh receipts only in inactive completed producer copy; no Go/state/attempt/usage/acceptance mutation."
+}

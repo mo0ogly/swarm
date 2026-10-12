@@ -1,0 +1,17 @@
+{
+  "started": "2026-10-12T13:55:20.341113+00:00",
+  "finished": "2026-10-12T13:55:31.216490+00:00",
+  "workspace": "/home/fpizzi/.cache/swarm-operator-replan-20261011/control-diagnostic-public-bk85g3ke",
+  "candidate_digest": "8e7a92256c448796e8a8873e79c4d9aaffcd9d33f2ced750d35c38880984b5e7",
+  "manifest_sha256": "185f805ec66a630f4456ec9bc465d9f8bff8bd068e9904466685b1a46d617959",
+  "argv": [
+    "go",
+    "vet",
+    "./..."
+  ],
+  "exit": 0,
+  "wall_seconds": 10.875382191996323,
+  "output": "/tmp/swarm-control-diagnostic-public-vet-targeted-policy.out",
+  "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drift": []
+}

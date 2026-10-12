@@ -1,0 +1,15 @@
+{
+  "cooldown": {
+    "provider": "claude",
+    "observed_at": "2026-10-11T19:51:22.255557233Z",
+    "resets_at": 1791750000,
+    "source": "fragment-final-cad05763af0dfb7d313a2e0d",
+    "signal": "result.api_error_status.429",
+    "cleared_at": "2026-10-11T20:02:30.080624909Z",
+    "clear_event": "claude-account-restored-ecda23edbc3d4b39a7000556c161ebde",
+    "clear_reason": "Utilisateur : « cest ok j'ai arrangé claude tu peux repartie ». Précondition de compte déclarée rétablie ; reprise explicite autorisée. Conserver le refus original, son délai et toutes les dépenses. Cette confirmation autorise un nouvel essai et ne prouve pas encore la disponibilité réelle du fournisseur.",
+    "clear_actor": "local-uid-1001",
+    "clear_account_change": true
+  },
+  "message": "Attente levée explicitement. Disponibilité du fournisseur non démontrée ; aucune exécution lancée et aucun budget remboursé."
+}

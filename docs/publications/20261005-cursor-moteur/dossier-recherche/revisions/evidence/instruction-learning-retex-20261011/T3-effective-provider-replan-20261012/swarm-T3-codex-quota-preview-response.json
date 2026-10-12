@@ -1,0 +1,254 @@
+{
+  "current": {
+    "revision": 730,
+    "limits": {
+      "planning_activations": 79,
+      "planning_decisions": 62,
+      "review_calls": 100
+    },
+    "consumed": {
+      "planning_activations": 69,
+      "planning_decisions": 52,
+      "review_calls": 82
+    },
+    "remaining": {
+      "planning_activations": 10,
+      "planning_decisions": 10,
+      "review_calls": 18
+    },
+    "last_authorization": {
+      "before": {
+        "planning_activations": 72,
+        "planning_decisions": 60,
+        "review_calls": 100
+      },
+      "after": {
+        "planning_activations": 79,
+        "planning_decisions": 62,
+        "review_calls": 100
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-12T08:37:29.36570117Z",
+      "reason": "Autorisation utilisateur explicite de relever budgets insuffisants. Même règle de réserve déjà appliquée à628 : deux activations/décisions par tâche non acceptée (décision et replan), plus clôture sous preuves. Sept tâches encore ouvertes =>15. Consommées64activations/47décisions, disponibles8/13 ; déficit7/2. Relever seulement plafonds à79/62 ; préserver64/47consommées,82appels et plafond100revues, quatre tentativesT2 dont3historiques, critères et dépendances. Aucun droit fournisseur, acceptation ou nouvelle mission."
+    },
+    "scopes": [
+      {
+        "model_selection": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "fpizzi/uid:1001",
+          "at": "2026-10-12T10:38:49.40994174Z"
+        },
+        "last_model": {
+          "provider": "claude",
+          "provider_digest": "eb426997b856a8ffad9b9101dfeda98886b0a2d7ea3f3b4ff5e7665103aebc23",
+          "route": {
+            "level": "standard",
+            "model": "sonnet",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "1bf3b70b3c0dc5153cf4fab9db87ff0e23668d2744a9cf3f7483e6cd2fa506f9",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-12T10:30:03.692752707Z"
+        },
+        "delivery": {
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "0c3d3ff5c362ac4186ceaa2eb7dc1bc5ced0954921ed81e3e153a1f6b72c81f7",
+          "events": [
+            "T3-worker-continuity-original-owner-e11cc690a5584a73905bc117634ad986"
+          ],
+          "decision": "planning-claim-26ee919cbffed0b00f63a124-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 69,
+        "id": "root",
+        "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29"
+        ],
+        "revision": 65,
+        "generation": 183,
+        "state": "ready"
+      }
+    ]
+  },
+  "proposed": {
+    "revision": 730,
+    "limits": {
+      "planning_activations": 84,
+      "planning_decisions": 67,
+      "review_calls": 100
+    },
+    "consumed": {
+      "planning_activations": 69,
+      "planning_decisions": 52,
+      "review_calls": 82
+    },
+    "remaining": {
+      "planning_activations": 15,
+      "planning_decisions": 15,
+      "review_calls": 18
+    },
+    "last_authorization": {
+      "before": {
+        "planning_activations": 79,
+        "planning_decisions": 62,
+        "review_calls": 100
+      },
+      "after": {
+        "planning_activations": 84,
+        "planning_decisions": 67,
+        "review_calls": 100
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-12T10:39:48.446329154Z",
+      "reason": "Autorisation utilisateur existante. Réserve restante de deux activations/décisions par tâche non acceptée plus clôture, recalculée après replans ; consommation intégralement conservée."
+    },
+    "scopes": [
+      {
+        "model_selection": {
+          "provider": "codex",
+          "provider_digest": "4ab19c62f865fd6dc897b9b971e918c896392aebfbc6c16c050aec83220f54f7",
+          "route": {
+            "level": "standard",
+            "model": "gpt-5.6-sol",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "cc05fc883f7a7ab1768743a76794fb504005839a9b3addbb2e4230e69172703f",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "fpizzi/uid:1001",
+          "at": "2026-10-12T10:38:49.40994174Z"
+        },
+        "last_model": {
+          "provider": "claude",
+          "provider_digest": "eb426997b856a8ffad9b9101dfeda98886b0a2d7ea3f3b4ff5e7665103aebc23",
+          "route": {
+            "level": "standard",
+            "model": "sonnet",
+            "effort": "medium",
+            "billing": "external",
+            "policy_hash": "1bf3b70b3c0dc5153cf4fab9db87ff0e23668d2744a9cf3f7483e6cd2fa506f9",
+            "reason": "Politique du fournisseur · planning · sans montée en gamme automatique"
+          },
+          "actor": "",
+          "at": "2026-10-12T10:30:03.692752707Z"
+        },
+        "delivery": {
+          "exploration_available": true,
+          "review_retry_unavailable": true,
+          "production_retry_unavailable": true,
+          "context_sha256": "0c3d3ff5c362ac4186ceaa2eb7dc1bc5ced0954921ed81e3e153a1f6b72c81f7",
+          "events": [
+            "T3-worker-continuity-original-owner-e11cc690a5584a73905bc117634ad986"
+          ],
+          "decision": "planning-claim-26ee919cbffed0b00f63a124-decision"
+        },
+        "workflow": {
+          "version": 1,
+          "role": "planner",
+          "methods": [
+            "apex",
+            "audit-pdca",
+            "spec-builder",
+            "spec-audit",
+            "replan",
+            "debug",
+            "product-planning"
+          ],
+          "sha256": "e537da8f3a71fb180c5eb65db1ef8ade5b4354414aa555c7f6dd95f4e498360b"
+        },
+        "activations": 69,
+        "id": "root",
+        "objective": "Aligner le moteur Go Swarm sur les exigences JAN-1..JAN-7 et FEB-1..FEB-4, avec Cursor prioritaire et comparaison des sources récentes documentées ; preuves et budgets préservés.",
+        "requirements": [
+          "req-1",
+          "req-2",
+          "req-3",
+          "req-4",
+          "req-5",
+          "req-6",
+          "req-7",
+          "req-8",
+          "req-9",
+          "req-10",
+          "req-11",
+          "req-12",
+          "req-13",
+          "req-14",
+          "req-15",
+          "req-16",
+          "req-17",
+          "req-18",
+          "req-19",
+          "req-20",
+          "req-21",
+          "req-22",
+          "req-23",
+          "req-24",
+          "req-25",
+          "req-26",
+          "req-27",
+          "req-28",
+          "req-29"
+        ],
+        "revision": 65,
+        "generation": 183,
+        "state": "ready"
+      }
+    ]
+  }
+}

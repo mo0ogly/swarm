@@ -1,0 +1,20 @@
+{
+  "before": "857853d0f395f378099804367d6e0d80656fc599",
+  "after": "339d20a7b2d47c229ce1febea2285b02b46565b4",
+  "applied_tree": "339d20a7b2d47c229ce1febea2285b02b46565b4",
+  "sha256": "48c037be3e38a7a5295c3182de8bdd90ca41a1c05aa236b094709a2bb1b352dd",
+  "paths": [
+    "internal/engine/model.go",
+    "internal/engine/store.go",
+    "internal/engine/instruction_revision.go",
+    "internal/engine/instruction_revision_operator_test.go",
+    "docs/architecture/INSTRUCTION-LEARNING.md",
+    "docs/en/INSTRUCTION-LEARNING.md"
+  ],
+  "preimage_extension": {
+    "path": "internal/engine/store.go",
+    "blob": "0ad8e9dbf372fdb405d1b121d362784ba5bf76d1",
+    "source_commit": "1169df70bec73d50fd23f640245b8ffd1317b9de",
+    "reason": "Sparse patch lineage had not tracked this existing, previously unchanged file."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-11T14:41:47.353994+00:00",
+  "receipts": [
+    {
+      "task": "plan-ca937edf4e-T3",
+      "before": 313,
+      "after": 314,
+      "next_sha256": "417d38cbf9f08ec49a2b8216d9cff5416e361b256b831934228d9005f7482c53",
+      "learning_history_preserved": true,
+      "review_calls": 23
+    },
+    {
+      "task": "plan-ca937edf4e-T5",
+      "before": 314,
+      "after": 315,
+      "next_sha256": "0af38217e5fd6fb13151c21434a1efcb305ca13dab4c8eab44a3bd692c2daf46",
+      "learning_history_preserved": true,
+      "review_calls": 23
+    }
+  ],
+  "limit": "Operator correction and task requirement, not evidence IA revised its own learning or future configurable capacity implemented"
+}

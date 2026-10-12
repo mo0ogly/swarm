@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-11T18:47:41.961375+00:00",
+  "paths_transferred": [
+    "docs/UI-DESIGN.md",
+    "docs/architecture/LOG-CONSOLE.md",
+    "docs/en/LOG-CONSOLE.md",
+    "internal/engine/web_terminal.go",
+    "internal/engine/web_log_console_test.go",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "web/cockpit.js",
+    "web/index.html",
+    "web/journal-console.js",
+    "web/log-console.html",
+    "web/log-console.js",
+    "web/log-console.css",
+    "tools/verification/refresh_engine_source_manifest.py",
+    "tests/log_console_ui.cjs"
+  ],
+  "preimages_verified": true,
+  "all_source_paths_verified": 1187,
+  "source_digest": "4398355922eb04e5eccd38b1ed3f8329c7af3af817c9fc97a9c754031546a696",
+  "full_receipt": "/tmp/swarm-log-console20-qualified-v1-full-receipt.json",
+  "operator_patch": "log-console-20261011.patch",
+  "runtime": "pending installation"
+}

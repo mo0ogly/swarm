@@ -192,3 +192,12 @@ restent dans le storyboard et la documentation technique. Ne pas les répéter e
 introduction, en pied de page ou dans des avertissements génériques.
 Une précision reste visible lorsqu’elle aide à comprendre une action, son effet
 ou une décision réelle : une erreur, un coût, une confirmation ou un résultat.
+
+## Console des journaux
+
+Dans Suivi → Journaux, Monaco remplace le préformaté brut. La source distingue
+les tentatives, l'activité du moteur et les incidents/décisions des superviseurs.
+Horodatages discrets, niveaux écrits et couleurs sémantiques accompagnent la
+recherche, le suivi débrayable, les pages et l'export original. Le cadre authentifié
+isole les styles de l'éditeur ; un repli texte conserve la lecture en cas d'échec.
+Voir [LOG-CONSOLE.md](architecture/LOG-CONSOLE.md) pour les frontières et preuves.

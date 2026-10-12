@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "T2-general-controller-timing-repair-2f646321bc444cf683e03e0fa4d5b201",
+  "expected_revision": 530,
+  "task_id": "plan-ca937edf4e-T2",
+  "agent_id": "auto-a23c60f03a732c02841f",
+  "attempt_id": "a-2f9e1debb1548be96273f0d3",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "review_id": "review-a11876529ad90296f47d5dd1",
+  "result_tree": "27374a41e3f7692acad236be8816650f9d832852",
+  "reason": "Réparation générale des affirmations de contrôle : la durée historique11434 était attribuée à tort au contrôle du nouveau candidat9354. Le producteur fournit désormais uniquement ses reçus locaux datés ; la durée native reste celle du reçu généré pour chaque candidat après la remise, jamais une prédiction numérique recopiée. Les préimages et refus restent conservés. Ajout original entier du test nommé TestManagedFragmentHistoricalPublicRecovery, trois variantesPASS, exit0 sous4m30s, paquet46.671s/mur48.587606s ; manifeste1049sources inchangé, stdout/SHA et reçu joints. Suite complète antérieurePASS492.395530s et ancien timeout distincts explicitement réconciliés. Code Go inchangé,19sources124087octets, aucun plafond relevé ni preuve native modifiée. Demander contrôles frais et véritable verdict indépendant ; la nouvelle preuve originale doit être effectivement sélectionnée avant toute résolution de constat historique."
+}

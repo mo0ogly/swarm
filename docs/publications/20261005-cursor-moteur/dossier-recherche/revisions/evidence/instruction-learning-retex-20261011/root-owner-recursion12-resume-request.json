@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "event_id": "root-owner-recursive-learning-correction-and-retex-continuity-20261011",
+  "expected_revision": 323,
+  "scope": "root",
+  "reason": "Précondition nouvelle : réparation source-capacité T2 attribuée9f688b59/treead247d51, originalffb conservé, contrôles frais T1/T2 dont7Judge PASS candidat39e89b16 ; revue-dd11fa active, aucune acceptation inventée. Runtime12qualifié484s/race/vet/méthodes SHA7c87e87a ; entrées cumulatives51fichiers702a96e9/SHAad021a0d enregistrées dans T3..T8. Au résultat frais, poursuivre jusqu'au RETEX T8 avec les dépendances/preuves ; absence de budget/droit concret est à remettre à l'opérateur autorisé à augmenter par API publique, pas abandonner. Corriger récursivement l'ajout T3 instruction-eb2db1e922c733c93f3ce330 qui confond128Kio par fichier : limites actuelles96Kio/source,128Kio/union d'une tâche,24fichiers, cumul partitionné. Diagnostic/consigne exacts dans Next T3 et T5 ; conserver l'ancien ajout et attribuer la nouvelle correction aux entrées reçues, pas un rejet utilisateur fabriqué. T3 exige version stockage/anciens writers et Judge mission existante, T4 inspections indépendantes parallèles et observation publique sous contraintes, T5politiquesAdmin effectives/UX propre FR/EN, T6qualification/T7fournisseur réel puis T8RETEX/quickwins sans adoption. Attente de revue ne vaut pas travail achevé ; préserver appels/tentatives/historique et revoir besoin initial."
+}

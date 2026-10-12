@@ -5,6 +5,12 @@ mission d’évolution Cursor. Ce contrat concerne les appels des planificateurs
 sous-planificateurs et vérificateurs. Les limites d’outils des workers et le
 dialogue de préparation disposent de leurs réglages distincts.
 
+Mise à jour du 12 octobre : la **durée totale** de cette politique sert aussi aux
+tests de connexion API et aux questions de page sans délai explicite propre au
+fournisseur. Leur transport HTTP n'impose plus de seconde limite à 60 secondes.
+La surveillance du silence reste celle des appels structurés des responsables et
+vérificateurs ; un test HTTP tamponné ne fournit pas ces événements d'activité.
+
 ## Cause observée
 
 Le vérificateur de T1 a été arrêté après 90 secondes malgré 70 événements
@@ -53,6 +59,21 @@ CLI : `swarm run-limits provider-wait show|history|preview|apply`. API :
 `GET /api/v1/provider-wait`, `POST /api/v1/provider-wait/preview|apply`.
 La prévisualisation n’écrit pas ; restaurer les valeurs d’une révision crée une
 nouvelle révision et conserve l’historique. Un appel déjà démarré garde ses valeurs.
+
+Le test de connexion lit cette politique au début et la fige dans son contexte.
+Le client HTTP utilise ce contexte, sans ajouter de durée totale. Une question
+de page fige sa durée dans l'aperçu ; une valeur effective modifiée avant la
+confirmation impose un nouvel aperçu. Le tour confirmé conserve ensuite sa
+durée. `assistant_timeout_seconds` explicitement positif reste un choix du
+fournisseur ; sinon la durée totale du projet est héritée. La limite cachée à
+300 secondes dans la prévisualisation et l'exécution est supprimée. `0` ne crée
+aucun timer ; annulation, arrêt du processus et détection d'un superviseur perdu
+restent opérationnels. Une durée invalide est refusée, jamais remplacée en silence.
+
+Le délai de requête du navigateur est [un contrat distinct](WEB-REQUEST-POLICY.md).
+Son expiration ne prouve pas une annulation de l'opération. Un fournisseur ou une
+connexion réseau peut aussi refuser l'appel ; aucune durée réglée ne prouve sa
+santé ou la qualité de sa réponse.
 
 Une ancienne durée de revue explicitement définie reste un plafond total explicite.
 `planning review-timeout` à 0 rétablit l’héritage de la politique de projet ; il

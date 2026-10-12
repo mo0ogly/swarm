@@ -88,7 +88,7 @@ Diagnostics also distinguish assistant messages, system events and provider-decl
 
 ## Cross-fragment context questions
 
-A completed `unknown` inspection is durable evidence of uncertainty, not approval. It can be reused without charging for the same packet again while remaining packets are inspected. A demonstrated `fail` still stops the review. Final evidence selection receives every `needs` question, identified by packet, artifact and index, and selects required originals from the complete inventory.
+A completed `unknown` inspection is durable evidence of uncertainty, not approval. It can be reused without charging for the same packet again while remaining packets are inspected. A local `fail` remains attributed in the journal; it does not close whole-candidate review. Final evidence selection receives every `needs` question, identified by packet, artifact and index, and selects required originals from the complete inventory.
 
 When questions exist, the final response contains `review` and `resolutions`. Every question requires exactly one independent resolution with a rationale and, for `resolved`, a quotation from visible original evidence. Missing or duplicate resolutions and invented quotations invalidate the response. Any unresolved or failed question prevents acceptance even when all task criteria claim `pass`. Missing explicit questions, tampered evidence and oversized context remain blockers. Actual message sizes are rechecked without truncation.
 
@@ -100,10 +100,22 @@ The provider schema fixes the exact finding count, candidate and packet identiti
 
 ### Early rejection and explicit correction
 
-An inspection can stop the review when it demonstrates a defect. This is stored
-as `changes_requested`, even when subsequent packets have not been read. It
-approves no criterion and cannot authorize publication. Transport failures stay
-`error`; their message is not evidence of a rejection.
+An adverse inspection is stored as a local `changes_requested` finding. The
+engine continues the remaining packets of the same candidate, retains every
+original defect (artifact, line, quote, explanation, reproduction, expected
+result), and delivers them to evidence selection and final review. Each finding
+requires an attributed resolution using visible originals. The final reviewer
+may confirm it, refute it with original evidence, or retain uncertainty. An
+engine rule never promotes a local opinion into a global rejection. An unresolved
+finding prevents acceptance even when criteria claim to pass; a confirmed global
+defect remains rejected.
+
+Transport, protocol, authority and capacity errors retain their actual cause and
+prior local opinions. Those opinions cannot replace an error with an invented
+global verdict. Completed replies are reusable on the same intact plan; interrupted
+calls are never refunded. Final capacity reserves serialized defect JSON,
+questions and token margin before spending. Legacy durable rejections remain
+historical; this evolution never accepts them retroactively.
 
 For legacy reviews stored as `error` despite a durable rejection,
 `planning revise-recovered-result` verifies the original journal, hashes,
@@ -179,3 +191,12 @@ content. Feedback uses the latest raw response matching that packet and its
 reservation, with a file hash check. It never substitutes for a valid response,
 updates the proof journal, or supplies a verdict. The full prompt size is checked
 before reserving another call. Previously spent calls remain charged.
+
+
+Fresh review preparation may calculate observed provider capacity directly when only the historical transport size rejects a complete text artifact. Evidence and coordination lots stay complete; provenance, call budget and final prompt remain checked. The anchored final_reserve_contract_version=1 measures fixed framing in tokens and bytes, then reserves each serialized variable field once. Zero preserves historical calculations and prompts. Every actual full prompt is still measured before spending a call. Preparation grants no verdict or additional budget.
+
+
+Reserve contract1 requires indexed findings and actually offered quotation anchors. Preflight reserves the maximum serialized offered anchor and the bounded rationale instead of an arbitrary excerpt. Historical arrays remain valid under contract0 and are refused on new packets, binding the advertised reserve to accepted response shapes.
+
+
+Planning also uses observed model capacity when its client is recognized. Complete context and schema are measured before reservation, their exact context digest is rechecked during reservation, and client/provider/model identities are checked before invocation. Measured capacity is included in the context anchored by the receipt. Unsupported clients retain the historical limit, without an implicit increase. This transport adaptation changes no call budget, rights or criteria.

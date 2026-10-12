@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-11T19:42:17.554603+00:00",
+  "owner": "Codex operator",
+  "parent": "Generic recovery22 and durable correction methodology",
+  "observed_failures": [
+    {
+      "boundary": "Owned-path discovery",
+      "evidence": "Attempted unobserved agent_workflows.go, managed_review_batch_provider.go and runtime20-install.py; actual rg results identified agent_workflow.go, managed_review_batch_runtime.go and retained runtime19-qualified-install.py.",
+      "cause": "Basename inferred from a symbol or previous version instead of inventory; recurrence proves wording alone insufficient."
+    },
+    {
+      "boundary": "Qualification repository identity",
+      "evidence": "Snapshot preview has no .git; source-manifest refresh failed at git rev-parse HEAD and git diff --check reported non-repository.",
+      "cause": "Source snapshot treated as Git checkout.",
+      "corrected_precondition": "Explicit observed GIT_DIR primary and GIT_WORK_TREE isolated snapshot; primary HEAD/source manifest base identity retained. Patch checked using staged isolated Git tree and every pre/postimage rather than snapshot git diff."
+    },
+    {
+      "boundary": "New shared-state projection",
+      "evidence": "SIGQUIT stack: planning.claim transaction -> planningDeliveryContext -> prepareSelectionCapacityRestart -> Store.agent -> database/sql.DB.conn wait.",
+      "corrected_precondition": "Read-only immutable-file projection; live producer attribution and termination read through existing SQL transaction at commit. Positive root/child and live-terminal negative regression PASS."
+    }
+  ],
+  "verification": [
+    "All13prospective patch preimages and staged diff --check PASS, refreshed-index apply and result tree exact.",
+    "Source manifest refreshed1189paths with explicit sourcebase Git context.",
+    "Root/child actual delivery-decision-reopen-two-simulated-calls-independent-refusal PASS6.249s; invalid cases PASS29.081s."
+  ],
+  "future_method": "Discover exact file/symbol before read; validate repository/runtime/qualification identity before commands; inspect every output and preserve original failures; preconditions must be changed before repeating; verify actual effect, not only new instructions.",
+  "limits": "Full qualification and native effect pending. No assertion that all possible future incidents cannot occur."
+}

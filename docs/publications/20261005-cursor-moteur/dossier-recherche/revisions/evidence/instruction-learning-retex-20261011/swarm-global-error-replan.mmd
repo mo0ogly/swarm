@@ -1,0 +1,15 @@
+flowchart TD
+    Incident[Incident observé : originaux, identité, contexte] --> Moteur[Moteur : conserver, attribuer et remettre]
+    Moteur --> Proprio[Sous-superviseur du périmètre]
+    Proprio --> Diagnostic[Replan : faits, hypothèse et preuve discriminante]
+    Diagnostic -->|Transversal ou droits manquants| Racine[Superviseur racine ou opérateur autorisé]
+    Diagnostic -->|Dans les droits| Decision[Correction ou transmission motivée]
+    Racine --> Decision
+    Decision --> Garde[Moteur : droits, budget, CAS et fraîcheur]
+    Garde -->|Précondition corrigée| Action[Opération publique attribuée]
+    Action --> Verif[Contrôle de l'effet et preuve du candidat courant]
+    Verif -->|Échec| Enfant[Incident lié : conserver la cause et diagnostiquer]
+    Enfant --> Diagnostic
+    Verif -->|Effet prouvé| Suite[Superviseur : reprendre le besoin initial]
+    Garde -->|Refus| Enfant
+    Suite --> Retex[Recette acceptée puis RETEX et choix utilisateur]
