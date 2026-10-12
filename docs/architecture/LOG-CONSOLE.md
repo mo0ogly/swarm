@@ -41,3 +41,5 @@ La recette isolée `tests/log_console_ui.cjs` doit vérifier les données reçue
 couleurs, langues, thèmes, clavier, filtres, changement de source/mission,
 direct, export, refus réseau et repli texte. Aucun appel de modèle réel n’est
 nécessaire pour cette recette ; elle ne démontre pas l’autonomie des superviseurs.
+
+Une console masquée conserve la page de messages reçue mais ne calcule pas son rendu Monaco. Un `ResizeObserver` reprend le rendu dès que le conteneur a une largeur et une hauteur positives ; le contenu n’est ni perdu ni rejoué. Cette frontière évite les mesures de lignes sur des plages DOM absentes. La recette du graphe couvre cinq rechargements avec console cachée ; la recette de console couvre son ouverture et ses filtres.

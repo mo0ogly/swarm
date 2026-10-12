@@ -9,6 +9,11 @@ function tone(kind) {
 }
 function render() {
   if (!editor) return;
+  // A hidden iframe has no DOM ranges for Monaco's wrapping measurement.
+  // Retain incoming entries and render when the actual host becomes visible.
+  const host=document.getElementById('journal-editor');
+  if(host.getBoundingClientRect().width<=0||host.getBoundingClientRect().height<=0)return;
+  editor.layout();
   const rows=[], marks=[];
   for (const entry of entries) {
     const role=tone(entry.kind || ''), start=rows.length+1;
@@ -49,5 +54,7 @@ try {
   globalThis.MonacoEnvironment={getWorker:()=>new Worker('/lib/monaco/worker.js',{type:'module'})};
   monaco=await import('/lib/monaco/editor.js');theme(document.documentElement.dataset.theme);
   editor=monaco.editor.create(document.getElementById('journal-editor'),{value:'',language:'plaintext',theme:'swarm-journal',readOnly:true,domReadOnly:true,automaticLayout:true,minimap:{enabled:false},wordWrap:'on',fontSize:14,lineNumbers:'on',scrollBeyondLastLine:false,renderLineHighlight:'none',stickyScroll:{enabled:false},accessibilitySupport:'on',editContext:false,links:false,ariaLabel:tr('Console des journaux, lecture seule')});
-  decorations=editor.createDecorationsCollection();render();parent.postMessage({type:'swarm-log-ready',monaco:true},location.origin);
+  decorations=editor.createDecorationsCollection();
+  const observer=new ResizeObserver(()=>render());observer.observe(document.getElementById('journal-editor'));
+  addEventListener('pagehide',()=>observer.disconnect(),{once:true});render();parent.postMessage({type:'swarm-log-ready',monaco:true},location.origin);
 } catch(error) {parent.postMessage({type:'swarm-log-ready',monaco:false,diagnostic:String(error?.message||error)},location.origin);}

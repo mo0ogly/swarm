@@ -38,3 +38,5 @@ The isolated `tests/log_console_ui.cjs` recipe checks received data, colours,
 languages, themes, keyboard, filters, source/mission changes, live following,
 export, network refusal and text fallback. It calls no real model and does not
 prove autonomous supervisor recovery.
+
+A hidden console retains the received message page but defers Monaco rendering. A `ResizeObserver` resumes rendering once the host has positive width and height; content is neither discarded nor replayed. This avoids wrapping measurements on missing DOM ranges. The graph recipe covers five reloads with the console hidden; the console recipe covers opening and filtering.

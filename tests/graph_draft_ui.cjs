@@ -27,9 +27,9 @@ async function openProduct(browser,root,work,lang,theme,diagnostics){
  const server=await start(root),page=await browser.newPage();page.on('close',()=>server.child.kill('SIGTERM'));page.setDefaultTimeout(25000);
  await page.setViewport({width:1440,height:1000});
  page.on('pageerror',error=>diagnostics.console_errors.push(String(error)));
- page.on('console',message=>{
+ page.on('console',async message=>{
   if(message.type()!=='error')return;
-  const text=message.text(),status=text.match(/^Failed to load resource: the server responded with a status of (\d+) /),url=message.location().url;
+  let text=message.text();if(text==='JSHandle@error'){text=await message.args()[0].evaluate(e=>e.stack||e.message||String(e))}const status=text.match(/^Failed to load resource: the server responded with a status of (\d+) /),url=message.location().url;
   if(status&&url&&diagnostics.expected_http.has(status[1]+':'+new URL(url).pathname)){(diagnostics.expected_console_errors??=[]).push(text);return}
   diagnostics.console_errors.push(text);
  });
