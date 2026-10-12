@@ -4080,5 +4080,6 @@
   "Positions non mémorisées sur cet appareil.": "Positions could not be saved on this device.",
   "Choisissez l’autre carte pour préparer le lien. Aucune modification avant confirmation.": "Choose the other card to prepare the link. Nothing changes before confirmation.",
   "Lien préparé. Prévisualisez puis confirmez dans le brouillon.": "Link prepared. Preview and confirm in the draft.",
-  "Déplacez les cartes par leur poignée. Reliez une sortie à une entrée. Sélectionnez un lien pour le modifier. Échap annule le geste ou quitte le plein écran.": "Move cards using their handles. Connect an output to an input. Select a link to edit it. Escape cancels the gesture or exits full screen."
+  "Déplacez les cartes par leur poignée. Reliez une sortie à une entrée. Sélectionnez un lien pour le modifier. Échap annule le geste ou quitte le plein écran.": "Move cards using their handles. Connect an output to an input. Select a link to edit it. Escape cancels the gesture or exits full screen.",
+  "Les maxima affichés protègent la représentation entière exacte, pas une limite de durée ou de charge. La taille des requêtes et de l’historique reste bornée.": "Displayed maxima protect exact integer representation, not a duration or workload limit. Request and history sizes remain bounded."
 }
