@@ -92,3 +92,5 @@ courant dirige la reprise vers T7 et sa décision manquante. Les preuves passée
 restent inchangées. La leçon rejoint la règle existante de replan : une reprise
 part de l'état réel, apporte une preuve ou une précondition nouvelle, et distingue
 un processus actif d'une autorisation encore attendue.
+
+Le profil 200 cartes possède maintenant sa preuve propre : cinq rechargements, p95 919 ms, clavier 32,6 ms, cibles 1 000 ms/100 ms conservées. Le démarrage froid 1 057 ms est séparé. Les réserves précédentes concernant la mesure 200 restent historiques ; elles ne sont pas effacées des anciens reçus. [Reçu complémentaire](direct-20261012/performance-200-verification-receipt.json).

@@ -87,3 +87,5 @@ flowchart LR
     E --> F
     F --> G[Reçu et résultats conservés]
 ```
+
+Complément de recette à 200 cartes : p95 des cinq rechargements 919 ms, clavier 32,6 ms, cibles inchangées de 1 000 ms et 100 ms. L’ouverture à froid de 1 057 ms est séparée des cinq rechargements ; elle n’est pas décrite comme inférieure à 1 000 ms. Le [reçu](plans/engine-cursor-contract/evidence/direct-20261012/performance-200-verification-receipt.json) conserve binaire, adaptateur, code généré et politique figée.

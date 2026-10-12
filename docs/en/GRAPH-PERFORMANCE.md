@@ -82,3 +82,5 @@ flowchart LR
     E --> F
     F --> G[Retained receipt and results]
 ```
+
+Additional 200-card recipe: five reloads, p95 919 ms; keyboard 32.6 ms; unchanged targets 1,000 ms and 100 ms. The cold opening of 1,057 ms is separate from reloads and is not described as below 1,000 ms. The [receipt](../plans/engine-cursor-contract/evidence/direct-20261012/performance-200-verification-receipt.json) preserves binary, adapter, generated source and frozen policy.

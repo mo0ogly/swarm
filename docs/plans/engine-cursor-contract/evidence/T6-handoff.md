@@ -32,3 +32,5 @@ des réglages ; il ne transforme pas ce résultat local en verdict indépendant.
 [Politique figée](direct-20261012/performance-500-frozen-policy.json) ·
 [mesures](direct-20261012/performance-500-measurements.json) ·
 [reçu](direct-20261012/performance-policy-verification-receipt.json).
+
+Le profil 200 cartes possède maintenant sa preuve propre : cinq rechargements, p95 919 ms, clavier 32,6 ms, cibles 1 000 ms/100 ms conservées. Le démarrage froid 1 057 ms est séparé. Les réserves précédentes concernant la mesure 200 restent historiques ; elles ne sont pas effacées des anciens reçus. [Reçu complémentaire](direct-20261012/performance-200-verification-receipt.json).
