@@ -531,7 +531,10 @@ func (s *Store) verifyPlanningHandoffArtifacts(a Agent, artifacts []ExchangeArti
 		return fmt.Errorf("espace du producteur absent")
 	}
 	workspace, e := filepath.EvalSymlinks(a.CWD)
-	if e != nil || workspace != filepath.Clean(a.CWD) {
+	if e == nil && workspace != filepath.Clean(a.CWD) {
+		workspace, e = canonicalOwnedProjectPath(s.root, a.CWD)
+	}
+	if e != nil {
 		return fmt.Errorf("espace du producteur absent ou redirigé")
 	}
 	for _, artifact := range artifacts {

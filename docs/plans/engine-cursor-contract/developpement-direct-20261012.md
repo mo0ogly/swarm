@@ -8,6 +8,10 @@ Les tentatives, dépenses et avis précédents restent historiques.
 
 ## Plan conservé, mode d'exécution changé
 
+L'[audit de clôture](completion-audit-20261012.md) rattache les critères conservés
+aux preuves et aux lacunes actuelles ; l'objectif reste actif. Aucun nombre de
+tests réussi ne remplace cette vérification lot par lot.
+
 Évolution suivante ajoutée à la demande de l'utilisateur :
 [UX-GRAPH-01 — graphe moderne, plein écran et édition visuelle](graphe-ux-20261012.md).
 Son ajout conserve T1–T8 et ne lance aucune orchestration native.

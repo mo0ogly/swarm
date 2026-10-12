@@ -313,6 +313,46 @@ func canonicalProjectRoot(root string) (string, error) {
 	return filepath.EvalSymlinks(abs)
 }
 
+// Only an alias of the complete authorized project root is compatible with
+// retained ownership. A redirected child directory is a different identity.
+func canonicalOwnedProjectPath(root, path string) (string, error) {
+	canonical, err := canonicalProjectRoot(root)
+	if err != nil {
+		return "", err
+	}
+	if !filepath.IsAbs(path) || filepath.Clean(path) != path {
+		return "", fmt.Errorf("chemin absolu normalisé requis")
+	}
+	var ancestors []string
+	for p := path; ; p = filepath.Dir(p) {
+		ancestors = append(ancestors, p)
+		if filepath.Dir(p) == p {
+			break
+		}
+	}
+	// Inspect from outside to inside: a child link back to the root must not be
+	// mistaken for another authorized project-root alias.
+	for i := len(ancestors) - 1; i >= 0; i-- {
+		prefix, e := filepath.EvalSymlinks(ancestors[i])
+		if e != nil || prefix != canonical {
+			continue
+		}
+		rel, e := filepath.Rel(ancestors[i], path)
+		if e != nil {
+			return "", e
+		}
+		actual, e := filepath.EvalSymlinks(path)
+		if e != nil {
+			return "", e
+		}
+		if actual != filepath.Join(canonical, rel) {
+			return "", fmt.Errorf("chemin attribué redirigé")
+		}
+		return actual, nil
+	}
+	return "", fmt.Errorf("chemin attribué hors projet")
+}
+
 func localFile(root, name string) (string, error) {
 	if !nonempty(name) || filepath.IsAbs(name) {
 		return "", fmt.Errorf("chemin relatif requis : %s", name)

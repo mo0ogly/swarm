@@ -197,7 +197,9 @@ func (s *Store) resumePreparedLaunchAs(work, id string, revision int, origin, co
 		if err != nil {
 			return Agent{}, false, err
 		}
-		if record.Request == nil || record.Request.Schema != 1 || record.PreparationContract == "" || a.Attempt != "a-"+hash([]byte(work + "|" + id))[:24] || record.Request.EventID != id || record.Request.TaskID != a.TaskID || record.Task != a.TaskID || bound.Agent != a.ID || bound.Work != work || bound.Task != a.TaskID || bound.Path != record.Path || bound.Base != record.Base || a.CWD != filepath.Join(record.Path, w.Planning.Repository.Subdir) {
+		expected, expectedErr := canonicalOwnedProjectPath(s.root, filepath.Join(record.Path, w.Planning.Repository.Subdir))
+		actual, actualErr := canonicalOwnedProjectPath(s.root, a.CWD)
+		if record.Request == nil || record.Request.Schema != 1 || record.PreparationContract == "" || a.Attempt != "a-"+hash([]byte(work + "|" + id))[:24] || record.Request.EventID != id || record.Request.TaskID != a.TaskID || record.Task != a.TaskID || bound.Agent != a.ID || bound.Work != work || bound.Task != a.TaskID || bound.Path != record.Path || bound.Base != record.Base || expectedErr != nil || actualErr != nil || actual != expected {
 			return Agent{}, false, fmt.Errorf("agent sans attribution à cette préparation")
 		}
 		task, err := w.task(a.TaskID)

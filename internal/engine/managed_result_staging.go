@@ -45,7 +45,7 @@ func (s *Store) managedIntegrationInput(a Agent) (Work, *Task, ManagedAttempt, b
 	if err != nil {
 		return Work{}, nil, item, false, err
 	}
-	if stored.WorkID != a.WorkID || stored.TaskID != a.TaskID || stored.Attempt != a.Attempt || stored.Status != a.Status || item.Work != a.WorkID || item.Task != a.TaskID || item.Path != stored.CWD {
+	if stored.WorkID != a.WorkID || stored.TaskID != a.TaskID || stored.Attempt != a.Attempt || stored.Status != a.Status || stored.CWD != a.CWD || item.Work != a.WorkID || item.Task != a.TaskID {
 		return Work{}, nil, item, false, fmt.Errorf("identité ou copie de tentative remplacée")
 	}
 	if item.State == "conflict" && item.Detail != managedReviewContextTooLarge {
@@ -58,11 +58,26 @@ func (s *Store) managedIntegrationInput(a Agent) (Work, *Task, ManagedAttempt, b
 	if err != nil {
 		return Work{}, nil, item, false, err
 	}
-	// A public retry may be armed during maintenance. Preserve that intent
-	// until both pause controls are clear; a deliberate pause is neither a
-	// candidate defect nor permission to start controls or a paid review.
+	// Preserve pending intent during maintenance before inspecting filesystem
+	// custody; no result/control/review can be started while either pause is set.
+	// A deliberate pause is not a candidate defect or another review authority.
 	if s.paused(a.WorkID) || (w.Planning != nil && w.Planning.Paused) {
 		return Work{}, nil, item, false, nil
+	}
+	repo, err := s.managedRepository(w)
+	if err != nil {
+		return Work{}, nil, item, false, err
+	}
+	expected, err := canonicalOwnedProjectPath(s.root, filepath.Join(item.Path, repo.Subdir))
+	if err != nil {
+		return Work{}, nil, item, false, err
+	}
+	actual, err := canonicalOwnedProjectPath(s.root, stored.CWD)
+	if err != nil || actual != expected {
+		return Work{}, nil, item, false, fmt.Errorf("identité ou copie de tentative remplacée")
+	}
+	if err = verifyManagedCopy(repo, item.Path); err != nil {
+		return Work{}, nil, item, false, err
 	}
 	t, err := w.task(a.TaskID)
 	if err != nil {

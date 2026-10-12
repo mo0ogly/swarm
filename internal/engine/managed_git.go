@@ -364,7 +364,7 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 	if _, err = managedGit(clone, "checkout", "--detach", repo.Candidate); err != nil {
 		return "", err
 	}
-	if err = verifyManagedWorkspace(clone, repo.Subdir); err != nil {
+	if err = verifyManagedWorkspace(clone, repo.Subdir, s.root); err != nil {
 		return "", err
 	}
 	if err = installManagedRecovery(repo, clone, recovery); err != nil {
@@ -440,31 +440,43 @@ func verifyManagedCopy(repo *ManagedRepository, path string) error {
 	if filepath.Dir(path) != filepath.Join(repo.Storage, "copies") {
 		return fmt.Errorf("copie hors dépôt géré")
 	}
-	actual, e := filepath.EvalSymlinks(path)
-	if e != nil || actual != path {
+	if filepath.Base(filepath.Dir(repo.Storage)) != "managed" || filepath.Base(filepath.Dir(filepath.Dir(repo.Storage))) != ".swarm" {
+		return fmt.Errorf("emplacement de dépôt géré invalide")
+	}
+	projectRoot := filepath.Dir(filepath.Dir(filepath.Dir(repo.Storage)))
+	actual, e := canonicalOwnedProjectPath(projectRoot, path)
+	if e != nil {
 		return fmt.Errorf("copie absente ou redirigée")
 	}
-	gitDir := filepath.Join(path, ".git")
+	copyPath := actual
+	gitDir := filepath.Join(copyPath, ".git")
 	if st, e := os.Lstat(gitDir); e != nil || !st.IsDir() {
 		return fmt.Errorf("métadonnées Git non isolées")
 	}
-	common, e := managedGit(path, "rev-parse", "--git-common-dir")
+	common, e := managedGit(copyPath, "rev-parse", "--git-common-dir")
 	if e != nil {
 		return e
 	}
 	if !filepath.IsAbs(common) {
-		common = filepath.Join(path, common)
+		common = filepath.Join(copyPath, common)
 	}
 	actual, e = filepath.EvalSymlinks(common)
 	if e != nil || actual != gitDir {
 		return fmt.Errorf("métadonnées Git partagées ou redirigées")
 	}
-	return verifyManagedWorkspace(path, repo.Subdir)
+	return verifyManagedWorkspace(copyPath, repo.Subdir)
 }
 
 // A project may use a subdirectory of its Git root. Its effective working
 // directory must remain in the attributed copy, including after recovery.
-func verifyManagedWorkspace(root, subdir string) error {
+func verifyManagedWorkspace(root, subdir string, projectRoot ...string) error {
+	if len(projectRoot) > 0 {
+		var err error
+		root, err = canonicalOwnedProjectPath(projectRoot[0], root)
+		if err != nil {
+			return err
+		}
+	}
 	workspace := filepath.Join(root, subdir)
 	rel, e := filepath.Rel(root, workspace)
 	if e != nil || filepath.IsAbs(subdir) || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {

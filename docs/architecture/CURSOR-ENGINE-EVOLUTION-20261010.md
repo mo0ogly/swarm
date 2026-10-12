@@ -40,7 +40,7 @@ flowchart TD
     W --> C[Contrôles sur candidat figé]
     C --> R[Revue indépendante du même candidat]
     R --> A[Acceptation par le moteur]
-    A --> J[Jugement global à implémenter]
+    A --> J[Jugement global explicite du superviseur]
     J -->|poursuivre| N[Contexte renouvelé, historique conservé]
     N --> P
     J -->|finir avec preuves fraîches| F[Clôture]
@@ -49,6 +49,13 @@ flowchart TD
 Ce schéma est la cible fonctionnelle. T1 doit préciser les composants existants,
 ceux à modifier et les transitions absentes ; les lots suivants actualisent le
 schéma avec les opérations et états effectivement implémentés.
+
+Dans les sources actuelles, les opérations racine `judge` et `renew` sont
+raccordées au contexte et au schéma réellement reçus, puis vérifiées en fixtures.
+Voir [les cycles](JUDGMENT-CYCLES.md), [le parallélisme](AGENT-PARALLELISM.md),
+[le déplacement et l'appartenance](PROJECT-RELOCATION.md) et
+[l'audit de clôture](../plans/engine-cursor-contract/completion-audit-20261012.md).
+La composition réelle avec fournisseur et revue indépendante demeure à démontrer.
 
 ## Livrables d’architecture par lot
 

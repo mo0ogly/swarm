@@ -1,5 +1,15 @@
 [
   {
+    "path": "internal/engine/budgets_test.go",
+    "kind": "test",
+    "sha256": "1e89f8e28c2f87507e3ec51f643ffac1ff94b2304c8077781776205087a05b98"
+  },
+  {
+    "path": "internal/engine/cli_help_topics.go",
+    "kind": "source",
+    "sha256": "4426f44588606830870cdda7dc90d21a7d6dbcfb6895525a4096c37bdec87cf9"
+  },
+  {
     "path": "internal/engine/cli_help_topics_test.go",
     "kind": "test",
     "sha256": "8c795163b8db7406b7f26fa9dcad4a6132cdc433b4b954d2fcc00ca56a390cd0"
@@ -597,7 +607,7 @@
   {
     "path": "internal/engine/managed_delivery.go",
     "kind": "source",
-    "sha256": "8ce7cd0b95fdf5429e72b2e8020f6bd776d137f2352fe3b39948d6d741cbe41a"
+    "sha256": "029a88427af8e200cd51a0462dd2fa3a40a6426fe75ce0f3e77c1ce650aca09a"
   },
   {
     "path": "internal/engine/managed_delivery_contract.go",
@@ -612,7 +622,7 @@
   {
     "path": "internal/engine/managed_git.go",
     "kind": "source",
-    "sha256": "fc144895a205abdd76330078355bd23c077996e6d91e364642e76e7a7600b4c1"
+    "sha256": "68a90c5707a4a7b262dcf8bd3eaeba5f719f98d077ef2e877d1e2fb9375b95b1"
   },
   {
     "path": "internal/engine/managed_git_test.go",
@@ -652,7 +662,7 @@
   {
     "path": "internal/engine/managed_preparation.go",
     "kind": "source",
-    "sha256": "baa8aadc4ab98481f1af066c672c6d986e9342f96f71c47ba2dc9e1507294060"
+    "sha256": "31d21ed4d3c8d4065f250fa10934ae8fc04c5895cf828d1dce2f3b22186430dc"
   },
   {
     "path": "internal/engine/managed_preparation_dispatch_test.go",
@@ -712,7 +722,7 @@
   {
     "path": "internal/engine/managed_result_staging.go",
     "kind": "source",
-    "sha256": "f80f23c36cce38c7f08be04a9eec88c402c7b4cc8aef42bd65b3621b66d7e2ae"
+    "sha256": "25610302433c1a846273c17717de7916d35599c7441a4c027376559cd2caaf2b"
   },
   {
     "path": "internal/engine/managed_review.go",
@@ -1310,6 +1320,11 @@
     "sha256": "3e90c1727e2fb5e691fe06a3e50eb189801b12707455ed9a4e65eb8e29efe014"
   },
   {
+    "path": "internal/engine/managed_root_alias_test.go",
+    "kind": "test",
+    "sha256": "3eaf4fd1caacf641e735c06f8ee11d831934ed767bb5a2da0d987442bb491d46"
+  },
+  {
     "path": "internal/engine/managed_scope.go",
     "kind": "source",
     "sha256": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2"
@@ -1403,20 +1418,5 @@
     "path": "internal/engine/mission_status.go",
     "kind": "source",
     "sha256": "4bee17fc35cc7a963f1df2a1996a5aa9788861c397d08829ffb4b3c82c5ceab1"
-  },
-  {
-    "path": "internal/engine/mission_status_test.go",
-    "kind": "test",
-    "sha256": "5ad922a230d64567b4755e8114c6dd5bd62a3009f1a230af2bf37e30a4206d5f"
-  },
-  {
-    "path": "internal/engine/mission_supervision.go",
-    "kind": "source",
-    "sha256": "a078550f9d75ce86e570ef87600a7d345f87f66862939233bda61aa45baed952"
-  },
-  {
-    "path": "internal/engine/mission_supervision_test.go",
-    "kind": "test",
-    "sha256": "ee27d92d8d3ddcbcb6e59e3c93afe682279c62b8563f0cf2c8397c0c5a70c591"
   }
 ]

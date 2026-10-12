@@ -1,5 +1,20 @@
 [
   {
+    "path": "tools/verification/t8_docs.py",
+    "kind": "harness",
+    "sha256": "02180ae427806feaffab840575b358bbbf924f00a53228990bd3fd5dcb970966"
+  },
+  {
+    "path": "tools/verification/training_ui_capture.cjs",
+    "kind": "harness",
+    "sha256": "9f1df4c0b2e95a9beb929b7ce05f8575f52d65de7b52d8e106b06795cb77216b"
+  },
+  {
+    "path": "version_history.json",
+    "kind": "source",
+    "sha256": "678b4e1599e009205311b82199aeaee625e7aa4b6c4755c12b56907db91fb502"
+  },
+  {
     "path": "web/access.css",
     "kind": "source",
     "sha256": "d500fb61f7c0ebdfd4c0de80e44596f2ac2725a79d8996667500e3f426bed345"

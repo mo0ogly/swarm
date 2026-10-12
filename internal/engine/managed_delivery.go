@@ -19,9 +19,13 @@ func (s *Store) managedRepository(w Work) (*ManagedRepository, error) {
 	if filepath.IsAbs(r.Subdir) || strings.HasPrefix(filepath.Clean(r.Subdir), "..") {
 		return nil, fmt.Errorf("périmètre de projet invalide")
 	}
-	expected := filepath.Join(s.root, ".swarm", "managed", w.ID)
-	actual, e := filepath.EvalSymlinks(r.Storage)
-	if e != nil || actual != expected || r.Storage != expected {
+	root, e := canonicalProjectRoot(s.root)
+	if e != nil {
+		return nil, e
+	}
+	expected := filepath.Join(root, ".swarm", "managed", w.ID)
+	actual, e := canonicalOwnedProjectPath(root, r.Storage)
+	if e != nil || actual != expected {
 		return nil, fmt.Errorf("dépôt absent ou importé : préparer une nouvelle mission locale")
 	}
 	bare := filepath.Join(expected, "repository.git")

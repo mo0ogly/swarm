@@ -1,5 +1,20 @@
 [
   {
+    "path": "internal/engine/mission_status_test.go",
+    "kind": "test",
+    "sha256": "5ad922a230d64567b4755e8114c6dd5bd62a3009f1a230af2bf37e30a4206d5f"
+  },
+  {
+    "path": "internal/engine/mission_supervision.go",
+    "kind": "source",
+    "sha256": "a078550f9d75ce86e570ef87600a7d345f87f66862939233bda61aa45baed952"
+  },
+  {
+    "path": "internal/engine/mission_supervision_test.go",
+    "kind": "test",
+    "sha256": "ee27d92d8d3ddcbcb6e59e3c93afe682279c62b8563f0cf2c8397c0c5a70c591"
+  },
+  {
     "path": "internal/engine/mission_test.go",
     "kind": "test",
     "sha256": "2c7973f5696ecb471b709f1a2683e76c3dff5be895c182fbbc9b637f421c6acd"
@@ -7,7 +22,7 @@
   {
     "path": "internal/engine/model.go",
     "kind": "source",
-    "sha256": "4d56779a9b958c0845b9463d4fa44262e1d2f4c9d54b28c2d37392432fbb116a"
+    "sha256": "5c619dc7757aa314a268887d28c1204efb742994b4ae86392d1a0adea00b5021"
   },
   {
     "path": "internal/engine/observation_mode_test.go",
@@ -1473,20 +1488,5 @@
     "path": "tools/verification/t7_prelaunch.py",
     "kind": "harness",
     "sha256": "32f44914f8aebea63aaecfdf4488a2683e1ba130acf2b213dcf4467b3e960e5e"
-  },
-  {
-    "path": "tools/verification/t8_docs.py",
-    "kind": "harness",
-    "sha256": "02180ae427806feaffab840575b358bbbf924f00a53228990bd3fd5dcb970966"
-  },
-  {
-    "path": "tools/verification/training_ui_capture.cjs",
-    "kind": "harness",
-    "sha256": "9f1df4c0b2e95a9beb929b7ce05f8575f52d65de7b52d8e106b06795cb77216b"
-  },
-  {
-    "path": "version_history.json",
-    "kind": "source",
-    "sha256": "678b4e1599e009205311b82199aeaee625e7aa4b6c4755c12b56907db91fb502"
   }
 ]

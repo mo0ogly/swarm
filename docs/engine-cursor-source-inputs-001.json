@@ -442,7 +442,7 @@
   {
     "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
     "kind": "doc",
-    "sha256": "225be08ba074b111d2135a867601222c360f54c3864950dbc171867a02d10805"
+    "sha256": "afcdd08724e03f3c7a2d1a5a99b4dea67ba57669d5371da8b84ff36986a690cd"
   },
   {
     "path": "docs/architecture/GARDE-ORGANISATION.md",
@@ -468,6 +468,11 @@
     "path": "docs/architecture/MANAGED-PLAN-GATES.md",
     "kind": "doc",
     "sha256": "26512b1a4af9dacf8de7dd7683dad95a14b3bca53e38d9fa4f02230e0eca250d"
+  },
+  {
+    "path": "docs/architecture/PROJECT-RELOCATION.md",
+    "kind": "doc",
+    "sha256": "d01ccbbc5ba966659e120b33611104fe01e3350ef5bbaa552fe69affd41d338c"
   },
   {
     "path": "docs/architecture/PROVIDER-LIVENESS.md",
@@ -653,6 +658,11 @@
     "path": "docs/en/PROJECT-PROFILE.md",
     "kind": "doc",
     "sha256": "f2e92d44f54db6e56d0d9728b7b889f28159919ca26d7d793c3c60bf58b13cbe"
+  },
+  {
+    "path": "docs/en/PROJECT-RELOCATION.md",
+    "kind": "doc",
+    "sha256": "56da745a5fd5780a92384b5251c80a9f11dd66e65dde2f8b74d5857c02b3c6a3"
   },
   {
     "path": "docs/en/PROVIDER-LIVENESS.md",
@@ -1448,15 +1458,5 @@
     "path": "docs/screenshots/ui-redesign-20261010/candidate-graph-cache.json",
     "kind": "doc",
     "sha256": "8bc34f373bf01e5c1b2d6c0ffb0a3c20596d6c191f3d964dc9c614eef0351371"
-  },
-  {
-    "path": "docs/screenshots/ui-redesign-20261010/candidate-menu.json",
-    "kind": "doc",
-    "sha256": "b199dc606539e9cc251a6c7a0ad35fb6c86bb6c0972b7a6fd899f92e2b8deb2d"
-  },
-  {
-    "path": "docs/screenshots/ui-redesign-20261010/candidate-next.json",
-    "kind": "doc",
-    "sha256": "e83c59dd6979d0448be50b533950a398c5d37074233a5f80388080dfaef1520a"
   }
 ]

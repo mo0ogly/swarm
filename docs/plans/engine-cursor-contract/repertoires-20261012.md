@@ -66,10 +66,15 @@ du refus des liens vers un fichier privé ou hors projet. Les originaux rouge,
 échec de compilation et vert sont conservés ; le reçu de chemins indique les
 empreintes des sources concernées et les résultats réellement exécutés.
 
-Cette vérification ne porte pas sur toute la migration d'une mission gérée : les
-gardes de dépôt, copie et remise conservent leurs contrôles contre les redirections.
-Leurs références absolues historiques demandent une vérification distincte avant
-reprise. Aucun remplacement de chemins dans la base native ni suppression de
-preuve n'est effectué. Le serveur ouvert utilise toujours son ancien binaire.
+Une correction source complémentaire couvre maintenant le dépôt géré, la copie,
+la remise, la publication et la préparation suivante après un déplacement réel
+de fixture. Le [contrat FR/EN](../../architecture/PROJECT-RELOCATION.md) décrit les
+27 tests/sous-cas qui passent avec détection de courses. Les références historiques
+restent inchangées et les redirections internes restent refusées. Le test existant
+de projet sous un sous-dossier Git échouait aussi sur une confusion entre racine
+de copie et workspace ; cette comparaison est corrigée au niveau de l'appartenance.
+Cela ne prouve pas la migration native complète. Aucun remplacement de chemins
+dans la base native ni suppression de preuve n'est effectué. Le serveur ouvert
+utilise toujours son ancien binaire.
 Son redémarrage ne doit pas interrompre l'autre mission observée activée et non
 en pause ; le précontrôle ne permet pas de déclarer tout le service en pause.
