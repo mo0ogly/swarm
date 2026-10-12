@@ -402,12 +402,12 @@
   {
     "path": "internal/engine/graph_performance_config.go",
     "kind": "source",
-    "sha256": "f7c4acc5ce2ecb46128b0cfa7d3956928108f96432030735a63c28b902785e8c"
+    "sha256": "9a4635cbc635da9907522e8bb755b55436570aa57b37a58798f32ba5f342e672"
   },
   {
     "path": "internal/engine/graph_performance_config_test.go",
     "kind": "test",
-    "sha256": "cfddac1da2045e9f2aa64020e346a0840573fbc51e8ca2afdeca6db1c5c268d3"
+    "sha256": "e1645d748560c0009cbe94aa127053a56487887c0f0a3e685af3af052a6066be"
   },
   {
     "path": "internal/engine/guide_contract.go",

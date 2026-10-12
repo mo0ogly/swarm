@@ -40,3 +40,5 @@ clôture. La reprise directe n'autorise pas de relance de la mission historique,
 de remise à zéro, de fausse autonomie ou d'acceptation par simple documentation.
 
 Mise à jour du 13 octobre : rapports nommés consolidés en `evidence/T1-handoff.md` à `T7-handoff.md`, sans fabrication d’acceptation. Les quick wins de recette du graphe et la suppression du délai éditeur fixe sont réalisés. La demande de recette Codex isolée avec modèle réel et revue indépendante est en attente de décision ; la mission historique n’est pas relancée.
+
+Complément de cette reprise : recette 500 cartes réussie avec politique inchangée ; plafonds de configuration performance retirés, aperçu/application cohérents et verdict conforme à la politique, avec régression et Admin FR/EN vérifiés. Ces preuves complètent T5/T6 et UX-GRAPH-01 sans fournir la recette modèle réelle ou la revue indépendante de T7.

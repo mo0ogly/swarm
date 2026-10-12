@@ -10,7 +10,7 @@ Preview does not save the configuration. Confirmation requires a reason and reco
 
 Defaults have one source: `config/graph-performance.json`, embedded at build time. They are displayed as **Default values** until the operator saves an override. The configurable recipe no longer hides these targets in its assertions.
 
-The CLI and web share the same engine validation. `.swarm/graph-performance.json` atomically stores current values and history. Expected revisions, operation identifiers, interprocess locking and symlink rejection protect changes. Replaying the same operation does not create a second revision. No secrets are stored here. API-advertised schema safety ranges also drive the form: 1–60,000 ms, 1–100 samples, and 1–10 distinct workloads of 2–10,000 cards. These ranges are separate from acceptance targets.
+The CLI and web share the same engine validation. `.swarm/graph-performance.json` atomically stores current values and history. Expected revisions, operation identifiers, interprocess locking and symlink rejection protect changes. Replaying the same operation does not create a second revision. No secrets are stored here. API-advertised maxima drive the form and reflect only exact Go/JSON integer representation, up to 2⁵³−1 on 64-bit platforms. The historical caps of 60,000 ms, 100 samples, 10 profiles and 10,000 cards are removed. Durations and samples remain positive; the recipe requires at least one workload, distinct card counts and at least two cards per graph. Web requests remain bounded to 16 KiB and configuration/history to 1 MiB; these transport/storage bounds are advertised separately. Preview validates the actual writable size without writing.
 
 These settings do not alter agent budgets, execution timeouts or tool-call limits.
 
@@ -56,3 +56,29 @@ For automatic validation, explicitly authorize this command in the task's public
 The historical B03 recipe (`tests/graph_draft_ui.cjs`) retains its original targets to reproduce archived evidence. The configurable entry point adapts it into a temporary output file, rejects incompatible source changes and leaves that archive unchanged. New performance checks must use the configurable entry point above.
 
 [Guide français](../GRAPH-PERFORMANCE.md)
+
+## Verdict matches received settings
+
+The configurable entry point uses the same targets for single-workload diagnostics
+and the final verdict across workloads. It rejects incompatible recipe formats.
+Generated-verdict tests cover stricter/relaxed targets, equality and custom card
+counts with controlled observations; these tests are not browser measurements.
+
+Local measurement on October 13, 500 cards: five reloads, rendering p95 1,342 ms;
+five keyboard observations, p95 31 ms. Received targets remained 2,000 ms and
+100 ms; no target was raised to obtain PASS. The cold first opening, 1,691 ms,
+is reported separately. The receipt preserves binary, recipe and frozen policy.
+This measurement calls no model.
+
+“Add workload” retains the last row’s rendering target using the same `render_p95_ms` field as the engine. After saving and readback, focus returns to settings, or reload if readback failed. The Admin recipe checks eleven complete workloads, values above historical caps, persistence/reopening, both languages and themes.
+
+```mermaid
+flowchart LR
+    A[Admin dialog or CLI] --> B[Persisted configuration and history]
+    B --> C[Single recipe read]
+    C --> D[Frozen policy and sources]
+    D --> E[Browser observations]
+    D --> F[Verdict against received targets]
+    E --> F
+    F --> G[Retained receipt and results]
+```

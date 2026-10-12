@@ -23,3 +23,12 @@ Les reçus conservent leurs révisions, empreintes et commandes originales. Ils 
 ## Condition de clôture
 
 Recette cumulative applicable et revue indépendante du même candidat, corrections nécessaires vérifiées, puis décision d’acceptation autorisée. Voir [l’audit de clôture](../completion-audit-20261012.md).
+
+## Complément — performance du graphe
+
+Les anciens maxima arbitraires sont remplacés par les bornes de représentation,
+annoncées dans l'API et reprises par la modale. Six tests Go, onze avec les
+sous-cas, passent avec `-race` ; quatre recettes Admin vérifient 101 échantillons,
+onze profils complets, valeurs > anciens plafonds, persistance, stale et focus.
+Le verdict du harnais configurable respecte les valeurs figées, y compris les
+cibles plus strictes ou plus souples. Voir le [reçu lié au candidat](direct-20261012/performance-policy-verification-receipt.json).

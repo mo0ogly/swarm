@@ -1,5 +1,20 @@
 [
   {
+    "path": "tools/agent-workflows/templates/ks/stories.md",
+    "kind": "source",
+    "sha256": "48b12f2e705b2ed7d879e097f2e68e7993679674cfd1d114067980612fb97668"
+  },
+  {
+    "path": "tools/agent-workflows/templates/preparations.json",
+    "kind": "source",
+    "sha256": "f6f539567f02773240598a6a1df4e98c13e72081471e2b44c480a86fff97a601"
+  },
+  {
+    "path": "tools/refresh_ui_source_manifest.py",
+    "kind": "harness",
+    "sha256": "7ba32025640e8808bdf072a13c99ad1ad964dd3c80920dfe5af509697243114c"
+  },
+  {
     "path": "tools/swarm_local.py",
     "kind": "source",
     "sha256": "69a7de970c5c8160706277c416772f7826ce232b85c1592a6bd7597f1c449df5"
@@ -7,7 +22,7 @@
   {
     "path": "tools/verification/refresh_engine_source_manifest.py",
     "kind": "harness",
-    "sha256": "7222a45230cbd83674aa073662922bc22c824d8206854bdd2ac550e532d12ebb"
+    "sha256": "b43eb85c2e7533a67d1df2f33d0410e3a5d441aa7552ee8770980bdd5ce9c10b"
   },
   {
     "path": "tools/verification/t4_admin.py",
@@ -72,7 +87,7 @@
   {
     "path": "web/admin.js",
     "kind": "source",
-    "sha256": "011f74f2f53059e8cd9e693bd138ddef5f420ff7a57d67519b139ebbb6485ec6"
+    "sha256": "c148b619d43d42176af0c6dc10c4723cbd88bb27dac103490664fafd32570dab"
   },
   {
     "path": "web/agent-terminal.css",
@@ -182,7 +197,7 @@
   {
     "path": "web/i18n-en.js",
     "kind": "source",
-    "sha256": "a99dd2a260fc4af8775f6f6efca63b6bd7f2569dc1738bf3fedba4b841d6eb20"
+    "sha256": "10f9d0c52d3ff2879c47d184b282dcfa5a765a0d442d8741dcdf8778f18dc041"
   },
   {
     "path": "web/i18n.js",

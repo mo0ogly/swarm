@@ -1197,7 +1197,7 @@
   {
     "path": "locales/en.json",
     "kind": "source",
-    "sha256": "484b46bfcda91e8fdc14e6f5f48a5982952bd18bdc20fd681988be63364cf1a0"
+    "sha256": "dacad200c2093b98ce2ee3f101eb9319042ade539388fc543d682304a10db1f4"
   },
   {
     "path": "package.json",
@@ -1268,6 +1268,21 @@
     "path": "tests/graph_layout_cache_test.cjs",
     "kind": "test",
     "sha256": "1dc5a1e7f1c6ef4a92e451cdff44c1cc1941dbd4ae29c6766344b51ca7004c22"
+  },
+  {
+    "path": "tests/graph_performance_adapter_test.cjs",
+    "kind": "harness",
+    "sha256": "0874aa166b477b8a9f36d3d35fdbe398a06a7193b2ef587a9a03da001b642732"
+  },
+  {
+    "path": "tests/graph_performance_admin_ui.cjs",
+    "kind": "harness",
+    "sha256": "156f31780f171eaf250d5903b24276e8594bf481ab04e8ea688e4d3d320f3d1d"
+  },
+  {
+    "path": "tests/graph_performance_ui.cjs",
+    "kind": "harness",
+    "sha256": "e12c19c03eea5d747fb037f197e10a985acd7085048498f2bf8ad70ff3c91ecd"
   },
   {
     "path": "tests/graph_studio_test.cjs",
@@ -1473,20 +1488,5 @@
     "path": "tools/agent-workflows/templates/ks/stories-review-checklist.md",
     "kind": "source",
     "sha256": "e2e9a0adabebb6cd486a8603498544282fce5f103dafdb44149917026665db58"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/stories.md",
-    "kind": "source",
-    "sha256": "48b12f2e705b2ed7d879e097f2e68e7993679674cfd1d114067980612fb97668"
-  },
-  {
-    "path": "tools/agent-workflows/templates/preparations.json",
-    "kind": "source",
-    "sha256": "f6f539567f02773240598a6a1df4e98c13e72081471e2b44c480a86fff97a601"
-  },
-  {
-    "path": "tools/refresh_ui_source_manifest.py",
-    "kind": "harness",
-    "sha256": "7ba32025640e8808bdf072a13c99ad1ad964dd3c80920dfe5af509697243114c"
   }
 ]

@@ -1,0 +1,86 @@
+[
+  {
+    "variant": "fr-sombre",
+    "preview_no_write": true,
+    "persistence": true,
+    "cli_web_parity": true,
+    "stale_conflict": true,
+    "escape_focus": true,
+    "errors": [],
+    "expected_http_conflict": [
+      [
+        409,
+        "/api/v1/graph-performance/preview"
+      ]
+    ],
+    "config_revision": 2,
+    "saved_focus": true,
+    "new_workload_target_retained": true,
+    "historical_caps_removed": true,
+    "saved_samples": 101,
+    "saved_loads": 11
+  },
+  {
+    "variant": "fr-etat",
+    "preview_no_write": true,
+    "persistence": true,
+    "cli_web_parity": true,
+    "stale_conflict": true,
+    "escape_focus": true,
+    "errors": [],
+    "expected_http_conflict": [
+      [
+        409,
+        "/api/v1/graph-performance/preview"
+      ]
+    ],
+    "config_revision": 2,
+    "saved_focus": true,
+    "new_workload_target_retained": true,
+    "historical_caps_removed": true,
+    "saved_samples": 101,
+    "saved_loads": 11
+  },
+  {
+    "variant": "en-sombre",
+    "preview_no_write": true,
+    "persistence": true,
+    "cli_web_parity": true,
+    "stale_conflict": true,
+    "escape_focus": true,
+    "errors": [],
+    "expected_http_conflict": [
+      [
+        409,
+        "/api/v1/graph-performance/preview"
+      ]
+    ],
+    "config_revision": 2,
+    "saved_focus": true,
+    "new_workload_target_retained": true,
+    "historical_caps_removed": true,
+    "saved_samples": 101,
+    "saved_loads": 11
+  },
+  {
+    "variant": "en-etat",
+    "preview_no_write": true,
+    "persistence": true,
+    "cli_web_parity": true,
+    "stale_conflict": true,
+    "escape_focus": true,
+    "errors": [],
+    "expected_http_conflict": [
+      [
+        409,
+        "/api/v1/graph-performance/preview"
+      ]
+    ],
+    "config_revision": 2,
+    "saved_focus": true,
+    "new_workload_target_retained": true,
+    "historical_caps_removed": true,
+    "saved_samples": 101,
+    "saved_loads": 11
+  }
+]

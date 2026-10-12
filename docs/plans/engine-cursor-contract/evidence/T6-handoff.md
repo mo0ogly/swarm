@@ -21,3 +21,14 @@ Les reçus conservent leurs révisions, empreintes et commandes originales. Ils 
 ## Condition de clôture
 
 Recette cumulative applicable et revue indépendante du même candidat, corrections nécessaires vérifiées, puis décision d’acceptation autorisée. Voir [l’audit de clôture](../completion-audit-20261012.md).
+
+## Mesure supplémentaire — 500 cartes
+
+La recette configurée lit la politique par CLI public sur racine isolée : cinq
+échantillons, rendu cible 2 000 ms et clavier cible 100 ms. Les observations
+passent : p95 1 342 ms / 31 ms. Le démarrage froid 1 691 ms est séparé. Le reçu
+conserve les identités distinctes du binaire mesuré et du binaire de correction
+des réglages ; il ne transforme pas ce résultat local en verdict indépendant.
+[Politique figée](direct-20261012/performance-500-frozen-policy.json) ·
+[mesures](direct-20261012/performance-500-measurements.json) ·
+[reçu](direct-20261012/performance-policy-verification-receipt.json).

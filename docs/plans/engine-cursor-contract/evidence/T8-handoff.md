@@ -55,3 +55,29 @@ cumulatif final. Propriétaire de cette décision manquante : utilisateur. Le se
 historique reste inchangé ; sa mise à jour exige une reprise compatible avec les
 autres travaux qui partagent ce processus. Le développement livré et l'acceptation
 native restent distincts.
+
+## Complément vérifié après le bilan local initial
+
+La recette configurable du graphe avait dérivé du format de sa recette source et
+conservait des constantes dans le verdict final. Le correctif restaure le parcours
+et utilise la politique figée pour tous les verdicts ; les variantes strictes,
+plus souples et égales sont vérifiées sur le code réellement généré. La mesure
+à 500 cartes passe sans relever la politique : p95 1 342 ms / clavier 31 ms,
+cinq observations, démarrage à froid séparé 1 691 ms. La restriction précédente
+« 200/500 non requalifiés » reste historique pour le premier reçu ; 200 cartes
+n'est toujours pas requalifié, 500 possède désormais son reçu propre.
+
+Les cinq plafonds de réglage sont reproduits comme refus avant correction puis
+remplacés par les contraintes de représentation. L'application et l'aperçu doivent
+également refuser une configuration trop volumineuse avant toute persistance ;
+un garde de régression porte ce cas. L'historique et les anciennes mesures ne
+sont pas modifiés pour faire apparaître un succès rétroactif.
+
+La recette Admin multi-profils a également révélé un désaccord de producteur et
+consommateur : le bouton d'ajout fournissait `render`, tandis que la ligne lisait
+`render_p95_ms`. Le moteur n'était pas appelé car la validation HTML détectait
+le champ vide. Correction du nom au producteur et garde de recette sur le champ,
+puis sauvegarde/relecture des onze profils. Le retour de focus doit suivre la
+relecture asynchrone, afin de ne pas se perdre lorsque le bouton est désactivé.
+
+Le [reçu de ce complément](direct-20261012/performance-policy-verification-receipt.json) contient les empreintes, les onze tests et sous-cas Go et les quatre recettes Admin réellement terminées. Le build et `go vet ./internal/engine` passent. Aucune suite globale de 884 tests n’est rejouée.

@@ -385,6 +385,11 @@
     "sha256": "76666ac533e02b824ac50c0b91ff39e6147974afd3fb2cab387b8e8d3b866bf9"
   },
   {
+    "path": "docs/GRAPH-PERFORMANCE.md",
+    "kind": "doc",
+    "sha256": "268f148ba278de1c09b7ef59231ebd99205eb02a04d5cc15d320ca9cd1158f30"
+  },
+  {
     "path": "docs/PREPARATION-TEMPLATES.md",
     "kind": "doc",
     "sha256": "8d789011108ed74f7c62717e940e03cb8974d56450e28f1d9fd3352db4e88ac3"
@@ -607,7 +612,7 @@
   {
     "path": "docs/en/GRAPH-PERFORMANCE.md",
     "kind": "doc",
-    "sha256": "51fbb7d27fe6c662a00ed7849424e5169f8c39aabffa0c2e70ec49ba28587ae4"
+    "sha256": "f553a892cd614661793dcffd589b8aa7dce810f260f45eac3999161c232d29c5"
   },
   {
     "path": "docs/en/GRAPH-STUDIO.md",
