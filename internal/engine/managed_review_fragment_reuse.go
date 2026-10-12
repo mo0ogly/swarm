@@ -148,7 +148,7 @@ func differentialFragmentPlan(c managedReviewContext, old managedReviewContext, 
 	for _, r := range reused {
 		r.Packet = len(p.Packets)
 		p.Reused = append(p.Reused, r)
-		p.Packets = append(p.Packets, managedReviewFragmentPacket{Version: 3, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: r.Packet, Artifacts: r.Original.Artifacts})
+		p.Packets = append(p.Packets, managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 3, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: r.Packet, Artifacts: r.Original.Artifacts})
 	}
 	if err = validateManagedReviewFragments(c, p); err != nil {
 		return managedReviewFragmentPlan{}, err
@@ -176,6 +176,15 @@ func (s *Store) planLegacyCandidateFragments(w Work, a Agent, c managedReviewCon
 	}
 	r, err := s.storedFragmentOrigin(w.ID, t.RecoveredResult.PriorReview)
 	if err != nil || r.FragmentJournal == nil || (r.State != "changes_requested" && r.State != "error") || r.Contract != reviewContract(t) || r.Producer != a.ID || r.Attempt != a.Attempt || s.managedBatchProviderIntact(w.Planning.Reviewer, r) != nil {
+		return planManagedReviewFragments(c, available, 2)
+	}
+	changed, _, err := s.fragmentReviewMethodChanged(&r)
+	if err != nil {
+		return managedReviewFragmentPlan{}, err
+	}
+	if changed {
+		// A full new inspection uses current candidate evidence, not historical
+		// opinions. A changed method forbids reuse, not fresh bounded review.
 		return planManagedReviewFragments(c, available, 2)
 	}
 	oldPlan, j, err := s.readFragmentJournalAnchor(r)

@@ -43,8 +43,16 @@ defect with a meaningful failing case where feasible. Make the smallest coherent
 change; preserve unrelated work. Maintain short decision and evidence notes.
 
 After failure, diagnose the concrete cause and change the precondition or approach.
-Use `replan` for a structural obstacle. Keep original attempts and budgets; never
+Apply `replan` on resume, failure, blockage, insufficient evidence or changed
+assumptions; revise the plan when the obstacle is structural. Keep original attempts and budgets; never
 start a new mission simply to escape a ceiling. Delegate only when already authorized.
+
+Reassess after each significant result. A failing diagnosis, evidence handoff or
+verification becomes a linked problem with its own hypothesis and bounded check;
+apply the same loop, then return to the original requirement. Check your own
+assumptions and the engine before blaming the worker. Verify what the responsible
+planner received and the decision recorded. See AUTORECURSIVE-RECOVERY.md under
+docs/architecture; documentation alone is not proof of autonomous recovery.
 
 ## Verify and close
 

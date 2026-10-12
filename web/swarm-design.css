@@ -168,7 +168,7 @@ button:disabled { opacity: .6; }
 .rail .language-picker { padding-top: 8px; font-size: 11px; }
 .rail .language-picker select { font-size: 12px; }
 .cockpit-page>main { margin-left: 248px; padding: 30px 38px 44px; max-width: 1960px; }
-.nav-collapse { position: sticky; top: 12px; z-index: 20; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; box-shadow: var(--wattson-ombre); }
+.nav-collapse { position: relative; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; box-shadow: var(--wattson-ombre); }
 .nav-collapse>[aria-hidden] { color: var(--wattson-lien); font-size: 18px; line-height: 1; }
 @media(min-width:761px) {
   .cockpit-page[data-nav-collapsed=true] .rail { display: none; }
@@ -249,6 +249,7 @@ section.view>h2 { margin: 18px 0 10px; }
 dialog { border-radius: 8px; box-shadow: var(--wattson-ombre); border-top: 3px solid var(--swarm-gold); }
 dialog::backdrop { background: #031929b3; backdrop-filter: blur(3px); }
 .modal-header { border-top: 0; }
+.modal-header > button { flex-shrink: 0; white-space: nowrap; }
 .modal-header,.modal-footer,dialog>header,dialog>footer { background: var(--wattson-carte); }
 #modal-fields>label { border: 0; border-left: 2px solid var(--wattson-ligne); border-radius: 0; background: transparent; }
 pre { border-radius: 4px; font-size: 12px; }
@@ -362,3 +363,18 @@ input,select,textarea { border-color: var(--swarm-control-border); }
 .graph-heading .context-help-button { background: transparent; border: 0; font-size: 11px; }
 #assistant.cockpit-accordion { background: var(--wattson-carte); border: 1px solid var(--wattson-ligne); }
 input::placeholder,textarea::placeholder { color: var(--wattson-texte-discret); opacity: 1; }
+
+/* Learning and post-delivery improvements use the shared cyan semantics. */
+.instruction-revisions,.post-delivery { border: 1px solid var(--wattson-accent-secondaire); border-left-width: 4px; border-radius: 8px; padding: 1rem; background: var(--wattson-info-fond); color: var(--wattson-info-encre); margin-block: 1rem; overflow-wrap: anywhere; }
+.instruction-revision { padding-block: .8rem; border-top: 1px solid var(--wattson-accent-secondaire); }
+.instruction-revision[data-state=rejected] { opacity: .85; }
+.instruction-addition { white-space: pre-wrap; }
+.instruction-revisions button,.post-delivery button,.post-delivery a { min-height: 44px; }
+.instruction-revisions summary { min-height: 44px; align-content: center; }
+.post-delivery-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+/* Compact engine settings state; inherited semantic table/theme colors. */
+.engine-quota-summary caption { text-align: left; font-weight: 650; color: var(--wattson-titre); margin-bottom: 8px; }
+.engine-quota-summary th,.engine-quota-summary td { padding: 6px 8px; overflow-wrap: anywhere; }
+.engine-quota-summary td:first-child { min-width: 0; }
+.engine-quota-summary td:not(:first-child) { font-variant-numeric: tabular-nums; }

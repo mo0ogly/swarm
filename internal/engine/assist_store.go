@@ -116,12 +116,9 @@ func (s *Store) assistPreview(work string, r AssistRequest) (AssistPreview, erro
 	if e != nil {
 		return p, e
 	}
-	timeout := provider.AssistantTimeout
-	if timeout == 0 {
-		timeout = 300
-	}
-	if timeout < 1 || timeout > 300 {
-		return p, fmt.Errorf("Délai d’assistance configurable : 1 à 300 secondes.")
+	timeout, err := s.assistTimeout(provider)
+	if err != nil {
+		return p, err
 	}
 	providerRaw, _ := json.Marshal(provider)
 	w, e := s.get(work)
@@ -165,6 +162,19 @@ func (s *Store) assistPreview(work string, r AssistRequest) (AssistPreview, erro
 	return p, nil
 }
 
+func (s *Store) assistTimeout(provider Provider) (int, error) {
+	seconds := provider.AssistantTimeout
+	if seconds == 0 {
+		policy, err := s.providerWaitConfig()
+		if err != nil {
+			return 0, err
+		}
+		seconds = policy.Values.Maximum
+	}
+	_, err := assistTimeoutDuration(seconds)
+	return seconds, err
+}
+
 // Record the turn after an explicit confirmation bound to the previewed context.
 func (s *Store) assistAsk(work string, r AssistRequest) (AssistTurn, error) {
 	if !safeName(r.EventID) {
@@ -200,6 +210,13 @@ func (s *Store) assistAsk(work string, r AssistRequest) (AssistTurn, error) {
 	providerRaw, _ := json.Marshal(ps.Providers[r.Provider])
 	if hash(providerRaw) != preview.Turn.ProviderDigest {
 		return AssistTurn{}, fmt.Errorf("Fournisseur modifié depuis l’aperçu ; examiner à nouveau la demande.")
+	}
+	seconds, err := s.assistTimeout(ps.Providers[r.Provider])
+	if err != nil {
+		return AssistTurn{}, err
+	}
+	if seconds != preview.Turn.TimeoutSeconds {
+		return AssistTurn{}, fmt.Errorf("Réglages d’attente modifiés depuis l’aperçu ; examiner à nouveau la demande.")
 	}
 	current, e := s.pageContext(work, r.Coordinates)
 	if e != nil {

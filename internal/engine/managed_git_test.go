@@ -539,8 +539,8 @@ func TestManagedPlannerWaitsForControllerVerdict(t *testing.T) {
 			t.Fatal(e)
 		}
 		pending, e := s.managedIntegrationPending(w, "root")
-		if e != nil || !pending {
-			t.Fatal("planner must wait", state, pending, e)
+		if e != nil || pending != (state == "completed") {
+			t.Fatal("planner must supervise production and wait for controller after completion", state, pending, e)
 		}
 	}
 	if e := s.integrateManagedAttempt(a); e != nil {

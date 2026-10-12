@@ -4,6 +4,7 @@ package engine
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -143,7 +144,7 @@ func TestGraphDeliveryD02BackupRestoreSafety(t *testing.T) {
 	if err != nil || string(raw) != "{\"schema_version\":1,\"providers\":[]}" {
 		t.Fatalf("rollback lost companion configuration: %q err=%v", raw, err)
 	}
-	if _, err = restored.db.Exec("PRAGMA user_version=28"); err != nil {
+	if _, err = restored.db.Exec(fmt.Sprintf("PRAGMA user_version=%d", schemaVersion+1)); err != nil {
 		t.Fatal(err)
 	}
 	if err = restored.db.Close(); err != nil {

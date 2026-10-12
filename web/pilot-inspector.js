@@ -46,7 +46,8 @@ const PilotInspector={
   const validation=snapshot.validation?.tasks[tid],uncertain=Pilot.uncertainExecution(t,a,h);
   const shown=PilotGraph.visible(snapshot.work.tasks,Pilot.state.collapsed);
   const masked=t&&(!shown.has(t.id)||!ProductViews.contains(t.id)||!Pilot.matches(t,a));
-  const signature=JSON.stringify([work,selected,t,a?.progress,a?.status,a?.usage,a?.reported_model,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
+  const instructionFeedback=(t?.instruction_revisions||[]).map(r=>InstructionRevisions.feedback.get(InstructionRevisions.key(work,r.id)));
+  const signature=JSON.stringify([work,selected,t,instructionFeedback,a?.progress,a?.status,a?.usage,a?.reported_model,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
   if(signature===Pilot.inspectorKey&&!open)return;Pilot.inspectorKey=signature;const token=++this.generation;
   const body=$('pilot-inspector-body'),focusKey=document.activeElement?.dataset.inspectorAction;
   const activityExpanded=body.querySelector('#pilot-activity-details')?.open===true;
@@ -69,6 +70,7 @@ const PilotInspector={
    const purpose=node('section',undefined,'pilot-section');purpose.classList.add('pilot-purpose');purpose.append(node('h4',tr_web_pilot_inspector_js('Ce qui était demandé')));
    const criteria=node('ul');for(const c of t.criteria||[])criteria.append(node('li',c));purpose.append(criteria);
    body.append(purpose);
+   const additions=InstructionRevisions.render(t);if(additions)body.append(additions);
   }
   if(decision){
    body.append(node('p',decision.resolved_at?tr_web_pilot_inspector_js('Cette demande a été traitée ailleurs.'):decisionObservation(decision).summary,'notice attention'),node('p',decision.evidence));
@@ -114,7 +116,7 @@ const PilotInspector={
    const opts=snapshot.task_actions?.[t.id]||[];
    const primary=opts.find(x=>x.conseillee&&x.disponible);
    if(h?.stop_requested)actions.append(node('p',tr_web_pilot_inspector_js('Arrêt déjà demandé — confirmation attendue.'),'notice info'));
-   if(t.status!=='submitted'&&primary&&!(primary.kind==='stop'&&h?.stop_requested))actions.append(this.action(primary.kind==='report'?tr_web_pilot_inspector_js('Ouvrir les conclusions du rapport'):primary.label,()=>this.taskAction(t.id,a?.id,primary.kind),'primary','primary'));
+   if(t.status!=='submitted'&&primary&&!(primary.kind==='stop'&&h?.stop_requested))actions.append(this.action(primary.kind==='report'?tr_web_pilot_inspector_js('Ouvrir les conclusions du rapport'):tr_web_pilot_inspector_js(primary.label),()=>this.taskAction(t.id,a?.id,primary.kind),'primary','primary'));
    actions.append(this.action(tr_web_pilot_inspector_js('Toutes les actions autorisées'),()=>taskDialog(t.id,a?.id),'actions'));
    for(const x of opts.filter(x=>!x.disponible&&['start','retry','stop','accepted'].includes(x.kind)))actions.append(node('p',x.label+' : '+x.raison,'pilot-muted'));
    body.append(actions);

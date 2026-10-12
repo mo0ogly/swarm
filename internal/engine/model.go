@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const schemaVersion = 27
+const schemaVersion = 32
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -56,21 +56,23 @@ type ValidationControl struct {
 }
 
 type ValidationControlResult struct {
-	EnvironmentFailure    bool     `json:"environment_failure,omitempty"`
-	ReviewOutput          string   `json:"review_output,omitempty"`
-	OutputBytes           int      `json:"output_bytes,omitempty"`
-	ReviewOutputTruncated bool     `json:"review_output_truncated,omitempty"`
-	ID                    string   `json:"id"`
-	Command               []string `json:"command,omitempty"`
-	Executed              bool     `json:"executed"`
-	Passed                bool     `json:"passed"`
-	ExitCode              int      `json:"exit_code"`
-	OutputHash            string   `json:"output_sha256"`
-	Summary               string   `json:"summary"`
-	Started               string   `json:"started_at,omitempty"`
-	Finished              string   `json:"finished_at,omitempty"`
-	WallDurationMS        *int64   `json:"wall_duration_ms,omitempty"`
-	CPUDurationMS         *int64   `json:"cpu_duration_ms,omitempty"`
+	CommandRuntimeLimits  *RunLimitsConfigEntry `json:"command_runtime_limits,omitempty"`
+	RuntimeLimits         *RunLimitsConfigEntry `json:"runtime_limits,omitempty"`
+	EnvironmentFailure    bool                  `json:"environment_failure,omitempty"`
+	ReviewOutput          string                `json:"review_output,omitempty"`
+	OutputBytes           int                   `json:"output_bytes,omitempty"`
+	ReviewOutputTruncated bool                  `json:"review_output_truncated,omitempty"`
+	ID                    string                `json:"id"`
+	Command               []string              `json:"command,omitempty"`
+	Executed              bool                  `json:"executed"`
+	Passed                bool                  `json:"passed"`
+	ExitCode              int                   `json:"exit_code"`
+	OutputHash            string                `json:"output_sha256"`
+	Summary               string                `json:"summary"`
+	Started               string                `json:"started_at,omitempty"`
+	Finished              string                `json:"finished_at,omitempty"`
+	WallDurationMS        *int64                `json:"wall_duration_ms,omitempty"`
+	CPUDurationMS         *int64                `json:"cpu_duration_ms,omitempty"`
 }
 
 type AutomaticValidation struct {
@@ -95,6 +97,9 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
+	InstructionBase         *string                     `json:"instruction_base,omitempty"`
+	InstructionOperatorBase *string                     `json:"instruction_operator_base,omitempty"`
+	InstructionRevisions    []InstructionRevision       `json:"instruction_revisions,omitempty"`
 	ProviderRelayDecision   *ProviderRelayDecision      `json:"provider_relay_decision,omitempty"`
 	LegacyReportSubmissions []Attempt                   `json:"legacy_report_submissions,omitempty"`
 	ReviewCoordination      *ReviewCoordinationRecord   `json:"review_coordination,omitempty"`
@@ -296,9 +301,25 @@ func safeName(s string) bool {
 	}
 	return true
 }
+
+// Resolve the authorized root and targets in the same physical namespace.
+// A retained alias after a project move must not make its own files outsiders.
+// Child symlinks still pass the existing containment checks below.
+func canonicalProjectRoot(root string) (string, error) {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return "", err
+	}
+	return filepath.EvalSymlinks(abs)
+}
+
 func localFile(root, name string) (string, error) {
 	if !nonempty(name) || filepath.IsAbs(name) {
 		return "", fmt.Errorf("chemin relatif requis : %s", name)
+	}
+	root, e := canonicalProjectRoot(root)
+	if e != nil {
+		return "", e
 	}
 	resolved, e := filepath.EvalSymlinks(filepath.Join(root, name))
 	if e != nil {

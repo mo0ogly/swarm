@@ -52,7 +52,7 @@ func TestManagedFragmentFinalBundlePreservesOriginalEvidence(t *testing.T) {
 	}
 }
 func TestManagedFragmentFinalBundleRefusesPartialOrUnknown(t *testing.T) {
-	for _, kind := range []string{"missing", "unknown", "fail", "tampered", "other-candidate"} {
+	for _, kind := range []string{"missing", "unknown", "tampered", "other-candidate"} {
 		t.Run(kind, func(t *testing.T) {
 			c, p, replies := finalBundleFixture(t)
 			switch kind {

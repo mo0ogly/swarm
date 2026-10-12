@@ -55,14 +55,24 @@ func TestSupervisionR3SilenceThenResponseBeforeTotalTimeout(t *testing.T) {
 	}
 }
 
-func TestSupervisionR3TotalTimeoutStillBoundsSilence(t *testing.T) {
+func TestSupervisionR3TimeThresholdDoesNotStopSilence(t *testing.T) {
 	s, _, a := setupSupervisionR3(t, "R3_SILENT_FOREVER", 1)
-	if err := s.supervise(a.ID); err != nil {
-		t.Fatal(err)
-	}
-	a, _ = s.agent(a.ID)
-	if a.Status != "interrupted" || a.StopKind != "delai" || a.Progress.OutputState != "none" || a.Progress.Vitality != "unknown" {
-		t.Fatalf("total timeout or unknown vitality lost: %+v", a)
+	done := make(chan error, 1)
+	go func() { done <- s.supervise(a.ID) }()
+	defer func() {
+		_ = s.stopAgent(a.ID)
+		select {
+		case err := <-done:
+			if err != nil {
+				t.Error(err)
+			}
+		case <-time.After(7 * time.Second):
+			t.Error("process not stopped")
+		}
+	}()
+	a = waitAgent(t, s, a.ID, func(current Agent) bool { return current.Progress.TimeThresholdExceeded || !activeAgent(current) })
+	if a.Status != "running" || a.StopKind != "" || !a.Progress.TimeThresholdExceeded || a.Progress.Vitality != "unknown" || a.Ended != "" {
+		t.Fatalf("time interpreted as a stop: status=%s stop=%s elapsed=%d threshold=%v vitality=%s", a.Status, a.StopKind, a.Progress.ElapsedSeconds, a.Progress.TimeThresholdExceeded, a.Progress.Vitality)
 	}
 }
 

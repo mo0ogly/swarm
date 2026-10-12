@@ -3,12 +3,13 @@
 package engine
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 )
 
-// A proved negative inspection can stop early; it can never approve a task.
+// Read a preserved local adverse opinion for diagnosis, never a global verdict.
 // Re-read the anchored original reply rather than trusting an error string.
 func (s *Store) managedFragmentRefusal(r IndependentReview) (string, error) {
 	if r.FragmentJournal == nil {
@@ -21,7 +22,13 @@ func (s *Store) managedFragmentRefusal(r IndependentReview) (string, error) {
 	if len(j.Entries) == 0 {
 		return "", nil
 	}
-	e := j.Entries[len(j.Entries)-1]
+	var e managedFragmentJournalEntry
+	for i := len(j.Entries) - 1; i >= 0; i-- {
+		if j.Entries[i].State == "changes_requested" {
+			e = j.Entries[i]
+			break
+		}
+	}
 	if e.State != "changes_requested" {
 		return "", nil
 	}
@@ -56,6 +63,7 @@ func (s *Store) finishManagedFragmentReview(work string, a Agent, reviewID strin
 	}
 	record := *task.IndependentReview
 	record.State = "error"
+	record.FailureCode = ""
 	record.Finished = now()
 	record.ManagedTasks = nil
 	record.Criteria = nil
@@ -81,9 +89,12 @@ func (s *Store) finishManagedFragmentReview(work string, a Agent, reviewID strin
 		record.State = "error"
 		record.ManagedTasks = nil
 		record.Reason = guardBlock(runErr.Error(), 4000)
+		var protocolErr *CommandError
+		if errors.As(runErr, &protocolErr) && protocolErr.Code == reviewFragmentProtocolError {
+			record.FailureCode = protocolErr.Code
+		}
 		if reason, proofErr := s.managedFragmentRefusal(record); proofErr == nil && reason != "" {
-			record.State = "changes_requested"
-			record.Reason = reason
+			record.Reason += "\nConstat PARTIEL conservé ; aucun verdict final : " + reason
 		}
 	} else {
 		record.Reason = "Verdict indépendant enregistré après inspection de toutes les pièces et examen final du même candidat."

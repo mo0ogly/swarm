@@ -13,18 +13,19 @@ import (
 // digests must remain unchanged. A caller must additionally establish the actual
 // provider/model/client configuration and anchor this object with the new plan.
 type managedReviewInputBudget struct {
-	ClientStamp      string `json:"client_executable_stamp,omitempty"`
-	ProviderDigest   string `json:"provider_sha256,omitempty"`
-	ClientVersion    string `json:"client_version,omitempty"`
-	CapabilityDigest string `json:"capability_sha256,omitempty"`
-	Version          int    `json:"version"`
-	Model            string `json:"model"`
-	Tokenizer        string `json:"tokenizer"`
-	ContextTokens    int    `json:"context_tokens"`
-	EffectivePct     int    `json:"effective_percent"`
-	ClientReserve    int    `json:"client_reserve_tokens"`
-	OutputReserve    int    `json:"output_reserve_tokens"`
-	MaxBytes         int    `json:"max_utf8_bytes"`
+	FinalReserveContractVersion int    `json:"final_reserve_contract_version,omitempty"`
+	ClientStamp                 string `json:"client_executable_stamp,omitempty"`
+	ProviderDigest              string `json:"provider_sha256,omitempty"`
+	ClientVersion               string `json:"client_version,omitempty"`
+	CapabilityDigest            string `json:"capability_sha256,omitempty"`
+	Version                     int    `json:"version"`
+	Model                       string `json:"model"`
+	Tokenizer                   string `json:"tokenizer"`
+	ContextTokens               int    `json:"context_tokens"`
+	EffectivePct                int    `json:"effective_percent"`
+	ClientReserve               int    `json:"client_reserve_tokens"`
+	OutputReserve               int    `json:"output_reserve_tokens"`
+	MaxBytes                    int    `json:"max_utf8_bytes"`
 }
 
 const managedReviewTokenizer = "o200k_base/tiktoken-go-v0.6.2"
@@ -32,7 +33,7 @@ const managedReviewTokenizer = "o200k_base/tiktoken-go-v0.6.2"
 // These are conservative ceilings for the observed Codex client, not an API
 // window upgrade. Reserves are explicit allowances, not measured hidden tokens.
 func (b managedReviewInputBudget) inputTokens() (int, error) {
-	if b.Version != 1 || b.Model != "gpt-5.6-sol" || b.Tokenizer != managedReviewTokenizer ||
+	if b.FinalReserveContractVersion < 0 || b.FinalReserveContractVersion > 1 || b.Version != 1 || b.Model != "gpt-5.6-sol" || b.Tokenizer != managedReviewTokenizer ||
 		b.ContextTokens <= 0 || b.ContextTokens > 272000 || b.EffectivePct <= 0 || b.EffectivePct > 95 ||
 		b.ClientReserve < 32768 || b.ClientReserve > b.ContextTokens ||
 		b.OutputReserve < 65536 || b.OutputReserve > b.ContextTokens ||

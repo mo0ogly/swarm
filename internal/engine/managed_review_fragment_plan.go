@@ -20,15 +20,17 @@ type managedReviewFragmentArtifact struct {
 	Content string `json:"content"`
 }
 type managedReviewFragmentPacket struct {
-	LotContract   *ReviewCoordinationLot          `json:"lot_contract,omitempty"`
-	LotCriteria   map[string]string               `json:"lot_criteria,omitempty"`
-	Lot           string                          `json:"lot,omitempty"`
-	InputBudget   *managedReviewInputBudget       `json:"input_budget,omitempty"`
-	Version       int                             `json:"version"`
-	Candidate     string                          `json:"candidate_commit"`
-	ContextDigest string                          `json:"context_sha256"`
-	Index         int                             `json:"index"`
-	Artifacts     []managedReviewFragmentArtifact `json:"artifacts"`
+	DefectCitationContractVersion int                             `json:"defect_citation_contract_version,omitempty"`
+	FindingContractVersion        int                             `json:"finding_contract_version,omitempty"`
+	LotContract                   *ReviewCoordinationLot          `json:"lot_contract,omitempty"`
+	LotCriteria                   map[string]string               `json:"lot_criteria,omitempty"`
+	Lot                           string                          `json:"lot,omitempty"`
+	InputBudget                   *managedReviewInputBudget       `json:"input_budget,omitempty"`
+	Version                       int                             `json:"version"`
+	Candidate                     string                          `json:"candidate_commit"`
+	ContextDigest                 string                          `json:"context_sha256"`
+	Index                         int                             `json:"index"`
+	Artifacts                     []managedReviewFragmentArtifact `json:"artifacts"`
 }
 type managedReviewFragmentPlan struct {
 	Coordination       *ReviewCoordinationProposal   `json:"coordination,omitempty"`
@@ -128,7 +130,7 @@ func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []man
 	empty := managedReviewFragmentPlan{}
 	canonical, _ := json.Marshal(c)
 	plan := managedReviewFragmentPlan{Version: 2, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
-	packet := managedReviewFragmentPacket{Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
+	packet := managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
 	// New plans reserve workflow space in addition to the variable schema and
 	// anchor table. Historical packets keep their original validation contract.
 	fits := func(p managedReviewFragmentPacket) bool {
@@ -140,12 +142,12 @@ func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []man
 		next.Artifacts = append(append([]managedReviewFragmentArtifact(nil), packet.Artifacts...), artifact)
 		if !fits(next) {
 			if len(packet.Artifacts) == 0 {
-				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
+				return empty, &managedFragmentLegacyCapacityError{Name: artifact.Name}
 			}
 			plan.Packets = append(plan.Packets, packet)
-			packet = managedReviewFragmentPacket{Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
+			packet = managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
 			if !fits(packet) {
-				return empty, fmt.Errorf("pièce indivisible trop grande : %s", artifact.Name)
+				return empty, &managedFragmentLegacyCapacityError{Name: artifact.Name}
 			}
 		} else {
 			packet = next
@@ -178,7 +180,7 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	actual := []managedReviewFragmentArtifact{}
 	for i, packet := range p.Packets {
 		raw, err := json.Marshal(packet)
-		if err != nil || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
+		if err != nil || !supportedFragmentDefectCitationContract(packet.DefectCitationContractVersion) || !supportedFragmentFindingContract(packet.FindingContractVersion) || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
 			return fmt.Errorf("paquet de revue modifié ou trop grand")
 		}
 		// Structural rechecks run inside journal/cancellation checks. Count the

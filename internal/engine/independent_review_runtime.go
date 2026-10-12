@@ -16,6 +16,10 @@ import (
 const independentReviewSchema = `{"type":"object","additionalProperties":false,"properties":{"reason":{"type":"string","minLength":8,"maxLength":1000,"description":"Concise rationale, at most 1000 characters; discuss coverage and material defects, not a transcript of every source."},"criteria":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"index":{"type":"integer"},"verdict":{"type":"string","enum":["pass","fail","unknown"]},"evidence":{"type":"string","minLength":8,"maxLength":1000,"description":"For pass: one short contiguous verbatim excerpt copied from the supplied report. No paraphrase, ellipsis, concatenation or added quotation marks. Keep analysis in reason. For fail or unknown: explain the defect or missing evidence."}},"required":["index","verdict","evidence"]}}},"required":["reason","criteria"]}`
 
 func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCriterion, error) {
+	return reviewReplyWithEvidence(raw, t, []managedReviewFragmentArtifact{{Name: "report.md", Kind: "source", Content: report}})
+}
+
+func reviewReplyWithEvidence(raw string, t *Task, originals []managedReviewFragmentArtifact) (string, string, []ReviewCriterion, error) {
 	var reply struct {
 		Reason   string            `json:"reason"`
 		Criteria []ReviewCriterion `json:"criteria"`
@@ -35,7 +39,14 @@ func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCr
 		seen[c.Index] = true
 		switch c.Verdict {
 		case "pass":
-			if !fragmentEvidencePresent(managedReviewFragmentArtifact{Name: "report.md", Kind: "source", Content: report}, c.Evidence) {
+			present := false
+			for _, original := range originals {
+				if fragmentEvidencePresent(original, c.Evidence) {
+					present = true
+					break
+				}
+			}
+			if !present {
 				return "", "", nil, fmt.Errorf("critère %d : citation exacte introuvable dans les preuves fournies ; reprendre après correction du format de citation ; extrait refusé : %.240s", c.Index, c.Evidence)
 			}
 		case "fail", "unknown":

@@ -31,6 +31,7 @@ type loopGuard struct {
 	pending                 map[string]time.Time
 	contexts                map[string]toolFailure
 	toolFailures            []toolFailure
+	environmentBlocked      bool
 	reason                  string
 	degraded                string
 	completed               int
@@ -94,7 +95,7 @@ func (g *loopGuard) call(id, name string, input any, now time.Time) {
 	if !g.limits.observing() && (g.calls > g.limits.MaxToolCalls || (g.calls == g.limits.MaxToolCalls && id == "")) {
 		g.reason = "Limite d'appels d'outils atteinte"
 	}
-	if !g.limits.observing() && (g.repeated >= g.limits.MaxRepeatedCalls) {
+	if !g.environmentBlocked && !g.limits.observing() && (g.repeated >= g.limits.MaxRepeatedCalls) {
 		g.reason = "Limite de répétitions identiques atteinte"
 	}
 }
@@ -105,6 +106,14 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	delete(g.pending, id)
 	context := g.contexts[id]
 	delete(g.contexts, id)
+	if len(technical) > 0 {
+		context.technical = operationText(technical[0], 600)
+	}
+	environment := failed && failureCategory(context) == "environment"
+	g.environmentBlocked = environment
+	if environment && g.reason == "Limite de répétitions identiques atteinte" {
+		g.reason = ""
+	}
 	g.completed++
 	// The last authorized tool may finish; never discard its result at start.
 	if !g.limits.observing() && (g.calls >= g.limits.MaxToolCalls && len(g.pending) == 0) {
@@ -125,7 +134,7 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 		}
 	}
 	g.failures = recent
-	if tracked && failed {
+	if tracked && failed && !environment {
 		g.failures = append(g.failures, failedCall{sig, g.completed})
 		if !g.limits.observing() && (count+1 >= g.limits.MaxRepeatedCalls) {
 			g.reason = "Limite d'échecs identiques entrelacés atteinte"
@@ -133,13 +142,12 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	}
 
 	if failed {
-		detail := ""
-		if len(technical) > 0 {
-			detail = technical[0]
-		}
-		context.technical = operationText(detail, 600)
 		g.toolFailures = append(g.toolFailures, context)
-		g.errors++
+		// Preserve infrastructure errors as evidence without attributing a tool
+		// invocation that did not start to the worker's consecutive-error streak.
+		if !environment {
+			g.errors++
+		}
 		g.totalErrors++
 	} else {
 		g.errors = 0
@@ -226,17 +234,13 @@ func (g *loopGuard) check(now time.Time) string {
 	if g.degraded != "" {
 		return ""
 	}
-	for _, started := range g.pending {
-		if now.Sub(started) >= time.Duration(g.limits.ToolSeconds)*time.Second {
-			return fmt.Sprintf("Délai d'outil observable atteint (%ds)", g.limits.ToolSeconds)
-		}
-	}
+
 	return ""
 }
 
 // monitoring separates observable output and tool state from provider vitality.
 // Silence is evidence about the stream only: it never proves progress, failure,
-// or completion and therefore cannot end an attempt before its total deadline.
+// or completion. Duration thresholds are observations, never stop decisions.
 func (g *loopGuard) monitoring(at time.Time) (output, tool, vitality string) {
 	output, tool, vitality = "none", "idle", "unknown"
 	if g.outputSeen {
@@ -270,7 +274,15 @@ func (g *loopGuard) summary() AgentProgress {
 	if g.outputSeen {
 		lastOutput = g.lastOutput.UTC().Format(time.RFC3339Nano)
 	}
-	return AgentProgress{Action: g.lastAction, Detail: g.actionDetail, ToolCalls: g.calls, ToolResults: g.completed, PendingTools: len(g.pending), LastTool: g.lastTool, LastResult: g.lastResult, LastOutput: lastOutput, OutputState: output, ToolState: tool, Vitality: vitality, Degraded: g.degraded,
+	waitSeconds := 0
+	if g.degraded == "" {
+		for _, started := range g.pending {
+			if seconds := int(time.Since(started).Seconds()); seconds > waitSeconds {
+				waitSeconds = seconds
+			}
+		}
+	}
+	return AgentProgress{ToolWaitSeconds: waitSeconds, ToolTimeThresholdExceeded: g.limits.ToolSeconds > 0 && len(g.pending) > 0 && g.degraded == "" && waitSeconds >= g.limits.ToolSeconds, Action: g.lastAction, Detail: g.actionDetail, ToolCalls: g.calls, ToolResults: g.completed, PendingTools: len(g.pending), LastTool: g.lastTool, LastResult: g.lastResult, LastOutput: lastOutput, OutputState: output, ToolState: tool, Vitality: vitality, Degraded: g.degraded,
 		MetricsVersion: attemptMetricsVersion, Reads: g.reads, Writes: g.writes, Unclassified: g.unclassified, Errors: g.totalErrors, Repeats: g.totalRepeats}
 }
 func (g *loopGuard) diagnostic(agent, attempt, stopReason string) AttemptDiagnostic {

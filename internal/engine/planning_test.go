@@ -36,12 +36,7 @@ func planningClaim(t *testing.T, s *Store, w Work, scope string) (Work, Planning
 	owner, _ := w.Planning.scope(scope)
 	w = planningDo(t, s, w, "claim", PlanningRequest{Scope: scope, ScopeRevision: owner.Revision, Holder: "test-owner", LeaseSeconds: 60})
 	owner, _ = w.Planning.scope(scope)
-	ids := []string{}
-	for _, e := range w.Planning.Inbox {
-		if e.Scope == scope && e.Decision == "" {
-			ids = append(ids, e.ID)
-		}
-	}
+	ids := append([]string(nil), owner.Delivery.Events...)
 	return w, PlanningRequest{Schema: 1, EventID: newID("decision-"), Revision: w.Revision, Scope: scope, ScopeRevision: owner.Revision, Generation: owner.Generation, Holder: owner.Holder, Inputs: ids, Reason: "Décision fondée sur les retours"}
 }
 func planningTask(id string) PlanningOperation {
@@ -529,10 +524,10 @@ func TestPlanningTaskForConfidedRequirementRefusedGuidingRetry(t *testing.T) {
 }
 
 // R4: an old attempt event superseded by a later attempt (stale, per
-// currentTaskAttempt) must be acknowledged with a no-operation decision before
-// the current return is decided on, and a task that has exhausted
+// currentTaskAttempt) is excluded from current inputs and later acknowledged
+// with a no-operation decision. A task that has exhausted
 // plan_max_attempts stays refused instead of retrying forever.
-func TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentReturn(t *testing.T) {
+func TestPlanningStaleAttemptAcknowledgementPreservesCurrentReturnAndRetryBudget(t *testing.T) {
 	s, w := planningFixture(t)
 	w, r := planningClaim(t, s, w, "root")
 	r.Operations = []PlanningOperation{planningTask("first")}
@@ -562,33 +557,51 @@ func TestPlanningStaleAttemptEventAcknowledgedWithoutOperationBeforeCurrentRetur
 		t.Fatal(e)
 	}
 	w, r = planningClaim(t, s, w, "root")
-	if len(r.Inputs) != 2 {
-		t.Fatal("expected both the stale and the current return pending", r.Inputs)
+	if len(r.Inputs) != 1 || r.Inputs[0] == staleID {
+		t.Fatal("claim must admit the current return only", r.Inputs)
 	}
 	decisionsBefore := w.Planning.Decisions
-
 	staleOnly := r
 	staleOnly.Inputs = []string{staleID}
 	staleOnly.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle X"}}
 	if _, e := s.planningChange(w.ID, "decide", staleOnly); e == nil {
 		t.Fatal("stale attempt return accepted an operation instead of being refused")
 	}
-
 	staleOnly.Operations = nil
-	w, e = s.planningChange(w.ID, "decide", staleOnly)
-	if e != nil {
-		t.Fatal("stale attempt return was not acknowledged by a no-operation decision", e)
-	}
-	if w.Planning.Decisions != decisionsBefore+1 {
-		t.Fatal("acknowledgement must count as exactly one bounded decision, no more", w.Planning)
-	}
-
-	w, r = planningClaim(t, s, w, "root")
-	if len(r.Inputs) != 1 || r.Inputs[0] == staleID {
-		t.Fatal("only the current return should remain pending", r.Inputs)
+	if _, e := s.planningChange(w.ID, "decide", staleOnly); e == nil {
+		t.Fatal("unadmitted historical input acknowledged in a current claim")
 	}
 	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle Y"}}
 	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
 		t.Fatal("retry beyond plan_max_attempts must stay bounded, never loop indefinitely")
+	}
+	r.Operations = nil
+	w, e = s.planningChange(w.ID, "decide", r)
+	if e != nil {
+		t.Fatal("current exhaustion diagnostic could not be acknowledged", e)
+	}
+	w, r = planningClaim(t, s, w, "root")
+	if len(r.Inputs) != 1 || r.Inputs[0] != staleID || !w.Planning.Scopes[0].Delivery.HistoricalOnly {
+		t.Fatal("only the historical return should remain admitted", r.Inputs)
+	}
+	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Corriger le contrôle X"}}
+	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
+		t.Fatal("historical acknowledgement authorized production")
+	}
+	r.Operations = nil
+	w, e = s.planningChange(w.ID, "decide", r)
+	if e != nil {
+		t.Fatal("historical no-operation acknowledgement refused", e)
+	}
+	if w.Planning.Decisions != decisionsBefore+2 || len(w.Tasks[0].Attempts) != 2 {
+		t.Fatal("exact acknowledgement consumption or attempt history changed", w.Planning)
+	}
+	w, r = planningClaim(t, s, w, "root")
+	if w.Planning.Scopes[0].Delivery.HistoricalOnly {
+		t.Fatal("continuation is not a current input")
+	}
+	r.Operations = []PlanningOperation{{Kind: "retry", ID: "first", Next: "Reprendre après examen des deux retours"}}
+	if _, e := s.planningChange(w.ID, "decide", r); e == nil {
+		t.Fatal("historical acknowledgement bypassed the retry budget")
 	}
 }

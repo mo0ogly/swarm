@@ -25,38 +25,40 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
-	Skills               []ActionSkillSelection `json:"skills,omitempty"`
-	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
-	ConductorID          string                 `json:"conductor_id,omitempty"`
-	ProviderDigest       string                 `json:"provider_digest,omitempty"`
-	Mode                 string                 `json:"mode,omitempty"`
-	Limits               *RunLimits             `json:"limits,omitempty"`
-	Level                string                 `json:"level,omitempty"`
-	ModelPolicyHash      string                 `json:"model_policy_hash,omitempty"`
-	PlanBriefHash        string                 `json:"plan_brief_hash,omitempty"`
-	References           []DialogueRef          `json:"references,omitempty"`
-	ContextHash          string                 `json:"context_hash,omitempty"`
-	Brainstorm           bool                   `json:"brainstorm,omitempty"`
-	Schema               int                    `json:"schema_version"`
-	EventID              string                 `json:"event_id"`
-	Revision             int                    `json:"expected_revision"`
-	TaskID               string                 `json:"task_id"`
-	Origin               string                 `json:"origin,omitempty"`
-	Provider             string                 `json:"provider"`
-	Workspace            string                 `json:"workspace"`
-	Instruction          string                 `json:"instruction"`
-	Role                 string                 `json:"role"`
-	Parent               string                 `json:"parent,omitempty"`
-	Previous             string                 `json:"previous,omitempty"`
-	Timeout              int                    `json:"timeout_seconds"`
-	Capture              bool                   `json:"capture_output"`
+	SkillRefresh         *PreparedSkillRefreshReceipt `json:"prepared_skill_refresh,omitempty"`
+	Skills               []ActionSkillSelection       `json:"skills,omitempty"`
+	PreconditionEvidence string                       `json:"precondition_evidence,omitempty"`
+	ConductorID          string                       `json:"conductor_id,omitempty"`
+	ProviderDigest       string                       `json:"provider_digest,omitempty"`
+	Mode                 string                       `json:"mode,omitempty"`
+	Limits               *RunLimits                   `json:"limits,omitempty"`
+	Level                string                       `json:"level,omitempty"`
+	ModelPolicyHash      string                       `json:"model_policy_hash,omitempty"`
+	PlanBriefHash        string                       `json:"plan_brief_hash,omitempty"`
+	References           []DialogueRef                `json:"references,omitempty"`
+	ContextHash          string                       `json:"context_hash,omitempty"`
+	Brainstorm           bool                         `json:"brainstorm,omitempty"`
+	Schema               int                          `json:"schema_version"`
+	EventID              string                       `json:"event_id"`
+	Revision             int                          `json:"expected_revision"`
+	TaskID               string                       `json:"task_id"`
+	Origin               string                       `json:"origin,omitempty"`
+	Provider             string                       `json:"provider"`
+	Workspace            string                       `json:"workspace"`
+	Instruction          string                       `json:"instruction"`
+	Role                 string                       `json:"role"`
+	Parent               string                       `json:"parent,omitempty"`
+	Previous             string                       `json:"previous,omitempty"`
+	Timeout              int                          `json:"timeout_seconds"`
+	Capture              bool                         `json:"capture_output"`
 	// Les champs recovery* sont calculés par le conducteur. Ils ne font pas
 	// partie du contrat JSON externe : un client ne peut ni s'accorder un
 	// budget supplémentaire ni choisir sa propre catégorie de reprise.
-	recoveryCategory  string
-	recoveryCause     string
-	recoveryOperation string
-	recoveryNext      string
+	recoveryCategory     string
+	recoveryCause        string
+	recoveryOperation    string
+	recoveryNext         string
+	preparedSkillRefresh bool
 }
 
 type RecoveryState struct {
@@ -72,18 +74,22 @@ type RecoveryState struct {
 	Disposition              string `json:"disposition,omitempty"`
 }
 type AgentProgress struct {
-	Action       string `json:"action,omitempty"`
-	Detail       string `json:"detail,omitempty"`
-	ToolCalls    int    `json:"tool_calls"`
-	ToolResults  int    `json:"tool_results"`
-	PendingTools int    `json:"pending_tools"`
-	LastTool     string `json:"last_tool,omitempty"`
-	LastResult   string `json:"last_result_at,omitempty"`
-	LastOutput   string `json:"last_output_at,omitempty"`
-	OutputState  string `json:"output_state,omitempty"`
-	ToolState    string `json:"tool_state,omitempty"`
-	Vitality     string `json:"provider_vitality,omitempty"`
-	Degraded     string `json:"degraded,omitempty"`
+	ElapsedSeconds            int    `json:"elapsed_seconds,omitempty"`
+	TimeThresholdExceeded     bool   `json:"time_threshold_exceeded,omitempty"`
+	ToolWaitSeconds           int    `json:"tool_wait_seconds,omitempty"`
+	ToolTimeThresholdExceeded bool   `json:"tool_time_threshold_exceeded,omitempty"`
+	Action                    string `json:"action,omitempty"`
+	Detail                    string `json:"detail,omitempty"`
+	ToolCalls                 int    `json:"tool_calls"`
+	ToolResults               int    `json:"tool_results"`
+	PendingTools              int    `json:"pending_tools"`
+	LastTool                  string `json:"last_tool,omitempty"`
+	LastResult                string `json:"last_result_at,omitempty"`
+	LastOutput                string `json:"last_output_at,omitempty"`
+	OutputState               string `json:"output_state,omitempty"`
+	ToolState                 string `json:"tool_state,omitempty"`
+	Vitality                  string `json:"provider_vitality,omitempty"`
+	Degraded                  string `json:"degraded,omitempty"`
 	// MetricsVersion==0 means this attempt predates the categorised bilan
 	// counters below: a reader must show them as unknown, never as zero.
 	MetricsVersion int `json:"metrics_version,omitempty"`
@@ -217,7 +223,7 @@ func (s *Store) providers() (Providers, error) {
 			return ps, fmt.Errorf("Connexion en conflit : %s", key)
 		}
 		raw, _ := json.Marshal(c)
-		ps.Providers[key] = Provider{APIConnectionID: id, Command: exe, Args: []string{"_api_chat", s.root, id, "--connection-digest", hash(raw), "--model", c.Model}, Env: []string{}, AssistantTimeout: 60}
+		ps.Providers[key] = Provider{APIConnectionID: id, Command: exe, Args: []string{"_api_chat", s.root, id, "--connection-digest", hash(raw), "--model", c.Model}, Env: []string{}}
 	}
 	return ps, nil
 }
@@ -437,6 +443,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	} else if e != sql.ErrNoRows {
 		return a, false, e
 	}
+	if r.SkillRefresh != nil && !r.preparedSkillRefresh {
+		return a, false, fmt.Errorf("actualisation des skills réservée à la reprise explicite du lancement préparé")
+	}
 	if err := s.storageGuard(); err != nil {
 		return a, false, err
 	}
@@ -470,6 +479,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	// still rechecks revision and all guards before reserving anything.
 	if launchWork.Revision != r.Revision {
 		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
+	}
+	if task, taskErr := launchWork.task(r.TaskID); taskErr == nil && currentReviewProtocolFailure(task) {
+		return a, false, planningError("review_recovery_required", "réponse du vérificateur invalide ; reprendre la revue avant toute nouvelle production")
 	}
 	if task, taskErr := launchWork.task(r.TaskID); taskErr == nil && task.ModelSelection != nil {
 		selected := task.ModelSelection
@@ -545,7 +557,11 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.Limits != nil {
 		missionLimits = *r.Limits
 	}
-	limits, e := p.Limits.tightened(missionLimits)
+	initialAdmin, e := configuredRunLimitsWith(s.db, work, r.Role, r.TaskID)
+	if e != nil {
+		return a, false, e
+	}
+	limits, e := administrativeDurationThresholds(p.Limits, initialAdmin).tightened(missionLimits)
 	if e != nil {
 		return a, false, e
 	}
@@ -607,8 +623,12 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if r.Mode == "terminal" && adminLimits != (RunLimits{}) {
 		return a, false, fmt.Errorf("Limites administratives incompatibles avec le terminal natif ; utiliser le mode automatisé.")
 	}
-	// Administrative preferences never raise provider, explicit mission,
-	// plan or retry ceilings. Freeze them with the launch reservation.
+	// Re-resolve on the reservation snapshot. Explicit administrative time
+	// thresholds apply to new contexts; call/error ceilings remain restrictive.
+	limits, e = administrativeDurationThresholds(p.Limits, adminLimits).tightened(missionLimits)
+	if e != nil {
+		return a, false, e
+	}
 	limits = limits.cappedBy(adminLimits)
 	limits.ObservationMode = adminLimits.ObservationMode
 	var paused bool
@@ -658,6 +678,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	t, e := w.task(r.TaskID)
 	if e != nil {
 		return a, false, e
+	}
+	if currentReviewProtocolFailure(t) {
+		return a, false, planningError("review_recovery_required", "réponse du vérificateur invalide ; reprendre la revue avant toute nouvelle production")
 	}
 	if e = s.requirementPrerequisiteGuard(&w, t); e != nil {
 		return a, false, e
@@ -776,6 +799,15 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		}
 		// A retry from any interface keeps the tighter previous ceilings.
 		limits = limits.cappedBy(previous.Limits)
+		// An explicit current duration policy may replace the historical
+		// observation threshold, without raising any consumed/call budget.
+		limits = administrativeDurationThresholds(limits, adminLimits)
+		if missionLimits.ToolSeconds > 0 && missionLimits.ToolSeconds < limits.ToolSeconds {
+			limits.ToolSeconds = missionLimits.ToolSeconds
+		}
+		if missionLimits.SilenceSeconds > 0 && missionLimits.SilenceSeconds < limits.SilenceSeconds {
+			limits.SilenceSeconds = missionLimits.SilenceSeconds
+		}
 		if previous.Timeout > 0 && previous.Timeout < r.Timeout {
 			r.Timeout = previous.Timeout
 		}
@@ -823,6 +855,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	// Same operation must bind the same attempt in preview and commit.
 	t.PlanningRetry = false
 	t.Attempts[len(t.Attempts)-1].ID = "a-" + hash([]byte(work + "|" + r.EventID))[:24]
+	freezeInstructionRevisions(t, t.Attempts[len(t.Attempts)-1].ID)
 	// Le choix fait une fois devient réutilisable : profil de la tâche, et
 	// profil du travail quand il vient d'un opérateur.
 	if !previewOnly && !interactiveMode(r.Mode) {
@@ -865,7 +898,7 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	prompt = workflowPrompt + prompt
 	prompt += recoveryInstructions
 	if r.Mode == "terminal" {
-		prompt += fmt.Sprintf("\nSession interactive supervisée, durée maximale %d secondes. Les appels d’outils et le coût ne sont pas mesurables dans ce mode ; ne pas prétendre qu’ils sont contrôlés. Respecter les permissions natives du fournisseur. Attendre les instructions de l’opérateur en cas de doute.\n", r.Timeout)
+		prompt += fmt.Sprintf("\nSession interactive supervisée, seuil d’observation de la durée %d secondes ; le temps seul ne déclenche aucun arrêt. Les appels d’outils et le coût ne sont pas mesurables dans ce mode ; ne pas prétendre qu’ils sont contrôlés. Respecter les permissions natives du fournisseur. Attendre les instructions de l’opérateur en cas de doute.\n", r.Timeout)
 	} else {
 		prompt += executionDirectives(s.root, cwd, t.ID, limits)
 		if w.Planning == nil {
@@ -973,7 +1006,11 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if _, e = tx.Exec("INSERT INTO events VALUES(?,?,?,?,?,?,?)", newID("launch-"), work, w.Revision, "agent.start", w.Updated, raw, raw); e != nil {
 		return a, false, e
 	}
-	if _, e = tx.Exec("INSERT INTO agent_logs(agent_id,at,kind,message) VALUES(?,?,?,?)", a.ID, now(), "command", "Lancement demandé par opérateur local"); e != nil {
+	launchAuthor := "opérateur local"
+	if a.Origin == originConductor {
+		launchAuthor = conductorAuthor
+	}
+	if _, e = tx.Exec("INSERT INTO agent_logs(agent_id,at,kind,message) VALUES(?,?,?,?)", a.ID, now(), "command", "Lancement demandé par "+launchAuthor); e != nil {
 		return a, false, e
 	}
 	if e = reserveBudget(tx, work, a.ID); e != nil {
@@ -1266,6 +1303,10 @@ func cockpitHistory(tx *sql.Tx, work string) (*CockpitHistory, error) {
 
 // A workspace is an explicit directory inside the selected project. No arbitrary cwd.
 func resolveWorkspace(root, workspace string) (string, error) {
+	root, e := canonicalProjectRoot(root)
+	if e != nil {
+		return "", e
+	}
 	cwd := workspace
 	if cwd == "" {
 		cwd = "."
@@ -1273,7 +1314,7 @@ func resolveWorkspace(root, workspace string) (string, error) {
 	if !filepath.IsAbs(cwd) {
 		cwd = filepath.Join(root, cwd)
 	}
-	cwd, e := filepath.EvalSymlinks(cwd)
+	cwd, e = filepath.EvalSymlinks(cwd)
 	if e != nil {
 		return "", e
 	}

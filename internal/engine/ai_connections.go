@@ -166,7 +166,7 @@ func callAIConnectionDebug(ctx context.Context, c AIConnection, prompt, schema s
 	}
 	debug.add("request", fmt.Sprintf("POST %s ; modèle : %s", req.URL.Redacted(), c.Model))
 	debug.add("auth", fmt.Sprintf("Clé présente : %v ; appel exécuté par le serveur Swarm", c.Key != ""))
-	client := &http.Client{Timeout: 60 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return fmt.Errorf("Redirection refusée") }}
+	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return fmt.Errorf("Redirection refusée") }}
 	resp, e := client.Do(req)
 	if e != nil {
 		return "", aiConnectionNetworkError(e)
@@ -254,11 +254,24 @@ func (s *Store) registerAIConnections(mux *http.ServeMux, send func(http.Respons
 				return
 			}
 		}
-		ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
+		policy, e := s.providerWaitConfig()
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		ctx, cancel := context.WithCancel(r.Context())
+		if policy.Values.Maximum > 0 {
+			cancel()
+			ctx, cancel = context.WithTimeout(r.Context(), time.Duration(policy.Values.Maximum)*time.Second)
+		}
 		defer cancel()
 		start := time.Now()
 		debug := &aiConnectionDebug{start: start}
-		debug.add("start", "Délai maximal : 60 s ; aucune donnée de mission envoyée")
+		if policy.Values.Maximum == 0 {
+			debug.add("start", "Durée totale sans plafond ; aucune donnée de mission envoyée")
+		} else {
+			debug.add("start", fmt.Sprintf("Délai maximal : %d s ; aucune donnée de mission envoyée", policy.Values.Maximum))
+		}
 		reply, e := callAIConnectionDebug(ctx, c, "Réponds seulement : Connexion réussie.", "", debug)
 		if e != nil {
 			send(w, map[string]any{"ok": false, "error": e.Error(), "latency_ms": time.Since(start).Milliseconds(), "diagnostics": debug.snapshot(c.Key)})

@@ -27,7 +27,7 @@ func finalFragmentTransition(old, next managedFragmentFinalJournal) (string, err
 		return "", fmt.Errorf("historique final modifié")
 	}
 	a, b := old.Calls[n-1], next.Calls[n-1]
-	if a.State != "reserved" || b.State == "reserved" || a.CallID != b.CallID || a.Phase != b.Phase || a.PromptDigest != b.PromptDigest {
+	if a.State != "reserved" || b.State == "reserved" || a.CallID != b.CallID || a.Phase != b.Phase || a.PromptDigest != b.PromptDigest || !reflect.DeepEqual(a.RetryDirective, b.RetryDirective) {
 		return "", fmt.Errorf("retour final non attribué")
 	}
 	return "", nil
@@ -60,7 +60,7 @@ func (s *Store) readManagedFragmentFinal(r IndependentReview, p managedReviewFra
 		return empty, c, "", fmt.Errorf("ancrage final absent")
 	}
 	journalRaw, _ := json.Marshal(j)
-	f := managedFragmentFinalJournal{Version: 1, InspectionDigest: hash(journalRaw)}
+	f := managedFragmentFinalJournal{Version: 2, InspectionDigest: hash(journalRaw)}
 	if anchor.FinalJournalDigest != "" {
 		path, err = safeReport(s.root, anchor.FinalJournal)
 		if err != nil {

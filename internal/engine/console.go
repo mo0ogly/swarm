@@ -56,7 +56,7 @@ func (s *Store) cockpitSnapshot(work string) (map[string]any, error) {
 		}
 	}
 	validation := s.validationState(&w)
-	return map[string]any{"independent_reviews": reviews, "pilotage": s.pilotage(&w, agents, validation), "work": w, "validation": validation, "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
+	return map[string]any{"post_delivery": s.postDelivery(&w), "independent_reviews": reviews, "pilotage": s.pilotage(&w, agents, validation), "work": w, "validation": validation, "agents": views, "paused": s.paused(work), "autonomy": s.autonomy(work), "autonomy_label": autonomyLabel(s.autonomy(work)), "slots": s.slots(work), "priority": s.priorities(work), "task_actions": actions, "cost": costs, "cost_text": costs.Text()}, nil
 }
 func (s *Store) priorities(work string) map[string]int {
 	out := map[string]int{}

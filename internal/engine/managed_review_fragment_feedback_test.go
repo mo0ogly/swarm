@@ -84,3 +84,52 @@ func TestFragmentRetryFeedbackRejectsInventedOperatorInCompactReply(t *testing.T
 		t.Fatal("foreign diagnostic reused")
 	}
 }
+
+func TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab(t *testing.T) {
+	s := storeTest(t)
+	contents := []string{"+prefix meaningful quote trailing\n", "+ok\tswarm.local/companion/internal/engine\n"}
+	artifacts := []managedReviewFragmentArtifact{}
+	for _, text := range contents {
+		artifacts = append(artifacts, managedReviewFragmentArtifact{Kind: "diff", Name: "proof", Content: text, Digest: hash([]byte(text))})
+	}
+	p := managedReviewFragmentPacket{Version: 2, Candidate: "candidate", ContextDigest: "context", Artifacts: artifacts}
+	packet, _ := json.Marshal(p)
+	defects := []managedFragmentDefect{
+		{Artifact: 0, Line: 1, Quote: "meaningful quote", Explanation: "A claimed semantic defect with an exact quote inside the declared line.", Reproduction: "Read the exact original physical line.", Expected: "Preserve its valid midline citation."},
+		{Artifact: 1, Line: 1, Quote: "+ok\\tswarm.local/companion/internal/engine", Explanation: "The quote uses literal backslash-t instead of the actual tab character.", Reproduction: "Compare the decoded JSON quote with the original tabbed source.", Expected: "Retain the exact original tab."},
+	}
+	reply := map[string]any{"candidate_commit": p.Candidate, "context_sha256": p.ContextDigest, "packet_sha256": hash(packet), "findings": map[string]any{"0": map[string]any{"v": "fail", "r": "Content examined", "e": 0, "n": []string{}}, "1": map[string]any{"v": "fail", "r": "Content examined", "e": 0, "n": []string{}}}, "defects": defects}
+	raw, _ := json.Marshal(reply)
+	r := IndependentReview{Context: ".swarm/review/context.json"}
+	j := managedFragmentJournal{Entries: []managedFragmentJournalEntry{{Packet: 0, PacketDigest: hash(packet), CallID: "mixed-locations", State: "interrupted"}}}
+	path := filepath.Join(s.root, ".swarm/review", "mixed-locations-raw-"+hash(raw)+".json")
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := json.Marshal(j)
+	feedback := s.fragmentRetryFeedback(r, j, p)
+	parts := strings.Split(feedback, "SWARM_REJECTED_DEFECT_DIAGNOSTIC\n")
+	var diagnostic []struct {
+		Artifact int    `json:"artifact"`
+		Quote    string `json:"rejected_quote"`
+		Lines    []struct {
+			Text string `json:"original_text"`
+		} `json:"original_nearby_lines"`
+	}
+	if len(parts) != 2 || json.Unmarshal([]byte(parts[1]), &diagnostic) != nil || len(diagnostic) != 1 || diagnostic[0].Artifact != 1 {
+		t.Fatal("valid midline quote misrepresented as rejected", feedback)
+	}
+	if diagnostic[0].Quote != defects[1].Quote || len(diagnostic[0].Lines) < 1 || diagnostic[0].Lines[0].Text != strings.TrimSuffix(contents[1], "\n") {
+		t.Fatal("tabs normalized or original context lost", feedback)
+	}
+	if _, _, err := parseManagedFragmentInspection(string(raw), p); err == nil {
+		t.Fatal("diagnostic promoted invalid quote to accepted proof")
+	}
+	after, _ := json.Marshal(j)
+	if string(before) != string(after) {
+		t.Fatal("diagnosis modified proof journal")
+	}
+}

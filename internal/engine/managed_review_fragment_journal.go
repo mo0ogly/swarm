@@ -18,12 +18,14 @@ type managedFragmentJournal struct {
 	Entries        []managedFragmentJournalEntry `json:"entries"`
 }
 type managedFragmentJournalEntry struct {
-	Packet       int    `json:"packet"`
-	PacketDigest string `json:"packet_sha256"`
-	CallID       string `json:"call_id"`
-	State        string `json:"state"`
-	Reply        string `json:"reply,omitempty"`
-	ReplyDigest  string `json:"reply_sha256,omitempty"`
+	RetryDirective *ManagedReviewRetryDirective `json:"retry_directive,omitempty"`
+	PromptDigest   string                       `json:"prompt_sha256,omitempty"`
+	Packet         int                          `json:"packet"`
+	PacketDigest   string                       `json:"packet_sha256"`
+	CallID         string                       `json:"call_id"`
+	State          string                       `json:"state"`
+	Reply          string                       `json:"reply,omitempty"`
+	ReplyDigest    string                       `json:"reply_sha256,omitempty"`
 }
 
 // Returns reusable completed inspections, including unresolved questions. Reserved/interrupted calls remain
@@ -50,6 +52,11 @@ func validateManagedFragmentJournal(j managedFragmentJournal, p managedReviewFra
 			return nil, fmt.Errorf("réservation dupliquée ou paquet inconnu")
 		}
 		seenCalls[entry.CallID] = true
+		if entry.RetryDirective != nil {
+			if _, err := managedReviewRecoveryPrefix("", entry.RetryDirective); err != nil || entry.RetryDirective.Candidate != p.Candidate || entry.RetryDirective.Attempt != j.Attempt || len(entry.PromptDigest) != 64 {
+				return nil, fmt.Errorf("réception de consigne de reprise non attribuée")
+			}
+		}
 		packet := p.Packets[entry.Packet]
 		packetRaw, _ := json.Marshal(packet)
 		if entry.PacketDigest != hash(packetRaw) {
@@ -72,7 +79,7 @@ func validateManagedFragmentJournal(j managedFragmentJournal, p managedReviewFra
 			if err != nil || state != entry.State {
 				return nil, fmt.Errorf("verdict du journal différent de la réponse originale")
 			}
-			if state == "inspected" || state == "unknown" {
+			if state == "inspected" || state == "unknown" || state == "changes_requested" {
 				reusable[entry.Packet] = entry.Reply
 			}
 		default:

@@ -82,8 +82,20 @@ func (s *Store) retexAction(q webRequest) (any, error) {
 			if _, e := findRetex(w, r.ID); e == nil {
 				return fmt.Errorf("RETEX déjà présent")
 			}
-			if _, e := resolveDialogue(*w, r.Source); e != nil {
-				return e
+			switch r.SourceKind {
+			case "acceptance":
+				if !nonempty(r.Impact) || len(r.Impact) > 8000 || (r.OpportunityKind != "quick_win" && r.OpportunityKind != "evolution") {
+					return fmt.Errorf("RETEX après recette : valeur attendue et type d’évolution requis")
+				}
+				if e := s.verifyAcceptanceRetexSource(w, r.Source); e != nil {
+					return e
+				}
+			case "", "dialogue":
+				if _, e := resolveDialogue(*w, r.Source); e != nil {
+					return e
+				}
+			default:
+				return fmt.Errorf("type de source RETEX inconnu")
 			}
 			count := 0
 			for _, prior := range w.Retex {
@@ -91,7 +103,7 @@ func (s *Store) retexAction(q webRequest) (any, error) {
 					count++
 				}
 			}
-			if count >= 3 {
+			if r.SourceKind != "acceptance" && count >= 3 {
 				return fmt.Errorf("Trois propositions maximum par réponse source.")
 			}
 			for _, v := range []string{r.Problem, r.Proposal, r.Effort, r.Risk, r.Criteria} {
@@ -128,6 +140,9 @@ func (s *Store) retexAction(q webRequest) (any, error) {
 			r.Nature = q.Retex.Nature
 			r.Proof = q.Retex.Proof
 		case "retex-task":
+			if r.SourceKind == "acceptance" {
+				return fmt.Errorf("préparer puis adopter l’évolution depuis le RETEX ; la recette reste conservée")
+			}
 			if r.Task != "" {
 				return nil
 			}

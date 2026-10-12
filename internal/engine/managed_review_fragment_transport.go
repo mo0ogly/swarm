@@ -6,6 +6,7 @@ package engine
 // original excerpt and opinion remains present, in the same order, with a
 // column legend. Durable journal/final evidence formats are unchanged.
 type managedFragmentFinalTransport struct {
+	Defects       []managedFragmentPartialDefect      `json:"partial_defects,omitempty"`
 	Candidate     string                              `json:"candidate_commit"`
 	ContextDigest string                              `json:"context_sha256"`
 	PlanDigest    string                              `json:"plan_sha256"`
@@ -22,6 +23,7 @@ func compactManagedFragmentFinalEvidence(b managedFragmentFinalEvidence) managed
 	for _, e := range b.Evidence {
 		out.Rows = append(out.Rows, []any{e.Packet, e.Artifact, e.Kind, e.Name, e.Digest, e.Excerpt, e.Opinion})
 	}
+	out.Defects = append([]managedFragmentPartialDefect(nil), b.Defects...)
 	out.Questions = append([]managedFragmentQuestion(nil), b.Questions...)
 	out.Historical = b.Historical
 	out.ChangeDiff = b.ChangeDiff

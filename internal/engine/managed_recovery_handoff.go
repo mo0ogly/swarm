@@ -18,21 +18,23 @@ const maxManagedRecoveryBytes = 512 * 1024
 // Recovery carries evidence, not permission or acceptance. The rejected result
 // is fetched into a private ref; HEAD still starts at the accepted candidate.
 type ManagedRecoveryHandoff struct {
-	Version         int                `json:"version"`
-	Work            string             `json:"work"`
-	Task            string             `json:"task"`
-	PreviousAgent   string             `json:"previous_agent,omitempty"`
-	PreviousAttempt string             `json:"previous_attempt"`
-	Status          string             `json:"previous_status"`
-	Activity        string             `json:"previous_activity,omitempty"`
-	Failure         string             `json:"failure,omitempty"`
-	Correction      string             `json:"correction"`
-	Base            string             `json:"base_commit,omitempty"`
-	Result          string             `json:"result_commit,omitempty"`
-	Report          string             `json:"report_in_result,omitempty"`
-	Review          *IndependentReview `json:"independent_review,omitempty"`
-	Receipt         json.RawMessage    `json:"receipt,omitempty"`
-	Limit           string             `json:"limit,omitempty"`
+	Version         int                      `json:"version"`
+	Work            string                   `json:"work"`
+	Task            string                   `json:"task"`
+	PreviousAgent   string                   `json:"previous_agent,omitempty"`
+	PreviousAttempt string                   `json:"previous_attempt"`
+	Status          string                   `json:"previous_status"`
+	Activity        string                   `json:"previous_activity,omitempty"`
+	Failure         string                   `json:"failure,omitempty"`
+	Correction      string                   `json:"correction"`
+	Base            string                   `json:"base_commit,omitempty"`
+	Result          string                   `json:"result_commit,omitempty"`
+	Report          string                   `json:"report_in_result,omitempty"`
+	Review          *IndependentReview       `json:"independent_review,omitempty"`
+	ReviewEvidence  *reviewEvidenceInventory `json:"review_evidence_inventory,omitempty"`
+	ExternalRepair  *RecoveredResult         `json:"external_repair,omitempty"`
+	Receipt         json.RawMessage          `json:"receipt,omitempty"`
+	Limit           string                   `json:"limit,omitempty"`
 }
 
 func (s *Store) managedRecoveryHandoff(w Work, t *Task) (*ManagedRecoveryHandoff, error) {
@@ -78,7 +80,24 @@ func (s *Store) managedRecoveryHandoff(w Work, t *Task) (*ManagedRecoveryHandoff
 		h.Limit = "Aucun résultat Git immuable enregistré ; les fichiers non remis de l’ancienne copie ne sont pas importés."
 	} else {
 		bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
-		bound, e := managedGit(bare, "rev-parse", "--verify", "refs/swarm/attempts/"+a.ID+"^{commit}")
+		ref := "refs/swarm/attempts/" + a.ID
+		// A public corrective repair retains the producer's original ref and
+		// binds the replacement to its own immutable repair ref. Never fall
+		// back to another result when either attribution or that ref fails.
+		if repair := t.RecoveredResult; repair != nil && (repair.Agent == a.ID || repair.Attempt == last.ID) {
+			if !recoveredResultMatches(t, a, item) {
+				return nil, fmt.Errorf("reprise : réparation non attribuable au résultat précédent")
+			}
+			if repair.ProofKey != "" {
+				ref = "refs/swarm/repairs/" + repair.ProofKey
+			}
+			tree, err := managedGit(bare, "rev-parse", "--verify", h.Result+"^{tree}")
+			if err != nil || repair.Tree == "" || tree != repair.Tree {
+				return nil, fmt.Errorf("reprise : arbre de réparation absent ou modifié")
+			}
+			h.ExternalRepair = repair
+		}
+		bound, e := managedGit(bare, "rev-parse", "--verify", ref+"^{commit}")
 		if e != nil || bound != h.Result {
 			return nil, fmt.Errorf("reprise : résultat Git absent ou attribution modifiée")
 		}
@@ -89,6 +108,8 @@ func (s *Store) managedRecoveryHandoff(w Work, t *Task) (*ManagedRecoveryHandoff
 	}
 	if review := t.IndependentReview; review != nil && review.Attempt == last.ID && review.Producer == a.ID {
 		h.Review = review
+		inventory := s.reviewEvidenceInventory(review)
+		h.ReviewEvidence = &inventory
 		if review.Receipt != "" && review.ReceiptDigest != "" {
 			path, e := localFile(s.root, review.Receipt)
 			if e != nil {
@@ -183,5 +204,5 @@ func managedRecoveryInstructions(h *ManagedRecoveryHandoff) (string, error) {
 	if e != nil {
 		return "", e
 	}
-	return fmt.Sprintf("\nDOSSIER DE REPRISE : depuis la racine Git de VOTRE copie, lire %s (sha256 %s). Il contient la correction du responsable, le motif d’arrêt et, lorsqu’ils existent, l’avis indépendant complet et son reçu. Ce sont des éléments à examiner, pas une autorisation ni une preuve de réussite. Le résultat précédent est disponible localement sous %s lorsqu’un result_commit est indiqué. Examiner son rapport avec git show COMMIT:CHEMIN et ses modifications avec git diff BASE_COMMIT RESULT_COMMIT ; ces identifiants et chemins figurent dans le dossier. Réutiliser et corriger les changements utiles uniquement dans VOTRE copie, après vérification des conflits avec HEAD. Ne pas modifier l’ancienne copie ni le dépôt géré. Aucun ancien avis ni reçu ne valide cette nouvelle tentative : refaire les contrôles et le bilan par critère. Une absence de résultat est explicitement signalée dans limit.\n", managedRecoveryFile, hash(b), managedRecoveryRef), nil
+	return fmt.Sprintf("\nDOSSIER DE REPRISE : depuis la racine Git de VOTRE copie, lire %s (sha256 %s). Il contient la correction du responsable, le motif d’arrêt et, lorsqu’ils existent, l’avis indépendant complet, son reçu et l’inventaire des sources effectivement jointes. Ce sont des éléments à examiner, pas une autorisation ni une preuve de réussite. Le résultat précédent est disponible localement sous %s lorsqu’un result_commit est indiqué. Examiner son rapport avec git show COMMIT:CHEMIN et ses modifications avec git diff BASE_COMMIT RESULT_COMMIT ; ces identifiants et chemins figurent dans le dossier. Réutiliser et corriger les changements utiles uniquement dans VOTRE copie, après vérification des conflits avec HEAD. Ne pas modifier l’ancienne copie ni le dépôt géré. Aucun ancien avis ni reçu ne valide cette nouvelle tentative : refaire les contrôles et le bilan par critère. Une absence de résultat est explicitement signalée dans limit.\n%s\n", managedRecoveryFile, hash(b), managedRecoveryRef, reviewSourceBoundary), nil
 }

@@ -391,6 +391,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		send(w, map[string]any{"error": commandFailure(e).Message, "failure": commandFailure(e)})
 	}
 	s.registerPlanning(mux, send, fail)
+	s.registerQuotas(mux, send, fail)
 	s.registerProviderAdmin(mux, send, fail)
 	s.registerRunLimitsAdmin(mux, send, fail)
 	registerGraphDraftHTTP(s, mux, send, fail)

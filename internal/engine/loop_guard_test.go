@@ -54,8 +54,8 @@ func TestLoopGuardEvents(t *testing.T) {
 	}
 	g.pending["slow"] = time.Now().Add(-301 * time.Second)
 	g.lastOutput = time.Now()
-	if !strings.Contains(g.check(time.Now()), "outil observable") {
-		t.Fatal("heartbeat hid long tool")
+	if g.check(time.Now()) != "" || !g.summary().ToolTimeThresholdExceeded {
+		t.Fatal("long tool must remain observable without interruption")
 	}
 }
 func TestLoopGuardCaptureOffAndDefaults(t *testing.T) {
@@ -89,6 +89,15 @@ func TestLoopProvider(t *testing.T) {
 	}
 	prompt, _ := io.ReadAll(os.Stdin)
 	switch {
+	case strings.Contains(string(prompt), "INFRASTRUCTURE_LIVE"):
+		for i := 0; i < 3; i++ {
+			fmt.Printf(`{"type":"item.started","item":{"id":"infra%d","type":"command_execution","command":"go test ./... %d"}}`+"\n", i, i)
+			fmt.Printf(`{"type":"item.completed","item":{"id":"infra%d","type":"command_execution","exit_code":1,"aggregated_output":"bwrap: Can't bind mount /oldroot on /newroot: Unable to apply mount flags: No such device"}}`+"\n", i)
+		}
+		for {
+			fmt.Println(`{"type":"system"}`)
+			time.Sleep(100 * time.Millisecond)
+		}
 	case strings.Contains(string(prompt), "R3_SILENT_RESPONSE"):
 		time.Sleep(1500 * time.Millisecond)
 		fmt.Println(`{"type":"result","result":"response after visible silence"}`)
@@ -135,7 +144,7 @@ func TestLoopProvider(t *testing.T) {
 	os.Exit(0)
 }
 func TestSupervisorGuardStopsAndBlocksTask(t *testing.T) {
-	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST", "GUARD_TOOL"} {
+	for _, mode := range []string{"GUARD_INTERLEAVED", "GUARD_REPEAT", "GUARD_REPEAT_FAST"} {
 		t.Run(mode, func(t *testing.T) {
 			s := storeTest(t)
 			w, r := setupAgent(t, s)

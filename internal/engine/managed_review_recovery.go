@@ -50,10 +50,29 @@ func (s *Store) reviewRecoveryPreview(work, id string) (ReviewRecovery, error) {
 		return ReviewRecovery{}, fmt.Errorf("reprise de revue fragmentée indisponible pour cette tâche")
 	}
 	if r.State != "error" {
+		prepared, err := s.prepareSelectionCapacityRestart(w, task)
+		if err != nil {
+			return ReviewRecovery{}, err
+		}
+		if prepared != nil {
+			v := ReviewRecovery{Revision: w.Revision, Task: id, Review: r.ID, Candidate: r.CandidateSHA, State: "selection_capacity_restart_ready", Cause: prepared.Facts.Reason, Actor: "operator", Reusable: 0, Required: prepared.Facts.Required, Available: prepared.Facts.Available, Missing: max(0, prepared.Facts.Required-prepared.Facts.Available), MinimumLimit: w.Planning.Reviewer.Calls + prepared.Facts.Required, Next: fmt.Sprintf("Capacité de sélection vérifiée : %d → %d octets. Une décision fraîche peut reprendre la sélection puis l'avis indépendant, sans nouvelle production ni remboursement.", prepared.Facts.Before, prepared.Facts.After)}
+			if p, _, err := s.readFragmentJournalAnchor(*r); err == nil {
+				v.Reusable = len(p.Packets)
+			}
+			if v.Missing > 0 {
+				v.State = "budget_authorization_required"
+			}
+			return v, nil
+		}
 		return ReviewRecovery{}, fmt.Errorf("la revue doit être interrompue avant de préparer sa reprise")
 	}
 	if fragmentReviewerChanged(w, *r) {
 		return s.fragmentReplacementPreview(w, task)
+	}
+	if restart, err := s.prepareReviewMethodRestart(w, task); err != nil {
+		return ReviewRecovery{}, err
+	} else if restart != nil {
+		return restart.Preview, nil
 	}
 	if err = s.managedBatchPlanIntact(w, *r); err != nil {
 		return ReviewRecovery{}, err
@@ -75,7 +94,7 @@ func (s *Store) reviewRecoveryPreview(work, id string) (ReviewRecovery, error) {
 		}
 	}
 	for _, entry := range j.Entries {
-		if entry.State != "interrupted" && entry.State != "inspected" && entry.State != "unknown" {
+		if entry.State != "interrupted" && entry.State != "inspected" && entry.State != "unknown" && entry.State != "changes_requested" {
 			return ReviewRecovery{}, fmt.Errorf("inspection non récupérable : %s", entry.State)
 		}
 	}

@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestAutomaticValidationClosesRootAfterFreshReviewDespiteOldFailure(t *testing.T) {
+func TestAutomaticValidationLeavesCompletionToSupervisorDespiteOldFailure(t *testing.T) {
 	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
 	current, err := s.get(w.ID)
 	if err != nil {
@@ -25,8 +25,8 @@ func TestAutomaticValidationClosesRootAfterFreshReviewDespiteOldFailure(t *testi
 		t.Fatal(err)
 	}
 	root, _ := got.Planning.scope("root")
-	if got.Tasks[0].Status != "accepted" || root.State != "closed" {
-		t.Fatalf("fresh accepted result did not close root: task=%s root=%s", got.Tasks[0].Status, root.State)
+	if got.Tasks[0].Status != "accepted" || root.State == "closed" {
+		t.Fatalf("accepted result closed the supervisor scope implicitly: task=%s root=%s", got.Tasks[0].Status, root.State)
 	}
 	if got.Planning.Failure != "old reviewer timeout" {
 		t.Fatal("historical failure was erased")

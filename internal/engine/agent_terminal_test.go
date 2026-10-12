@@ -252,20 +252,30 @@ func TestTerminalControlHTTPBoundary(t *testing.T) {
 	}
 }
 
-func TestTerminalDeadlineAndStop(t *testing.T) {
+func TestTerminalTimeThresholdAndExplicitStop(t *testing.T) {
 	s := storeTest(t)
 	w, r := terminalFixture(t, s)
 	r.Timeout = 1
-	a, _, e := s.prepare(w.ID, r)
-	if e != nil {
-		t.Fatal(e)
+	a, _, err := s.prepare(w.ID, r)
+	if err != nil {
+		t.Fatal(err)
 	}
-	if e = s.supervise(a.ID); e != nil {
-		t.Fatal(e)
-	}
-	a, e = s.agent(a.ID)
-	if e != nil || a.Status != "interrupted" || a.StopKind != "delai" {
-		t.Fatal(a.Status, a.StopKind, e)
+	done := make(chan error, 1)
+	go func() { done <- s.supervise(a.ID) }()
+	defer func() {
+		_ = s.stopAgent(a.ID)
+		select {
+		case err := <-done:
+			if err != nil {
+				t.Error(err)
+			}
+		case <-time.After(7 * time.Second):
+			t.Error("terminal not stopped")
+		}
+	}()
+	a = waitAgent(t, s, a.ID, func(current Agent) bool { return current.Progress.TimeThresholdExceeded || !activeAgent(current) })
+	if a.Status != "running" || a.StopKind != "" || !a.Progress.TimeThresholdExceeded {
+		t.Fatalf("terminal cut off by duration: status=%s stop=%s elapsed=%d threshold=%v", a.Status, a.StopKind, a.Progress.ElapsedSeconds, a.Progress.TimeThresholdExceeded)
 	}
 }
 

@@ -41,7 +41,13 @@ func boundedFragmentFindingText(text string) bool {
 func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPacket) (string, managedFragmentInspection, error) {
 	var result managedFragmentInspection
 	fail := func(reason string) (string, managedFragmentInspection, error) {
-		return "", managedFragmentInspection{}, fmt.Errorf("inspection de fragment : %s", reason)
+		return "", managedFragmentInspection{}, &CommandError{Code: reviewFragmentProtocolError, Message: "inspection de fragment : " + reason}
+	}
+	if !supportedFragmentDefectCitationContract(packet.DefectCitationContractVersion) {
+		return fail("contrat de citation non pris en charge")
+	}
+	if !supportedFragmentFindingContract(packet.FindingContractVersion) {
+		return fail("contrat de constat non pris en charge")
 	}
 	limit := managedFragmentReplyLimit
 	if packet.Version >= 2 {
@@ -51,6 +57,9 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 		return fail("réponse trop grande")
 	}
 	if err := decodeManagedFragmentInspection([]byte(reply), packet, &result); err != nil {
+		if citation, ok := err.(*CommandError); ok && citation.Code == reviewFragmentProtocolError {
+			return fail(citation.Message)
+		}
 		return fail("réponse structurée invalide")
 	}
 	raw, err := json.Marshal(packet)
@@ -77,8 +86,11 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 		}
 		switch finding.Verdict {
 		case "inspected":
-			if len(strings.TrimSpace(finding.Evidence)) < 8 || !fragmentEvidencePresent(artifact, finding.Evidence) || len(finding.Needs) != 0 {
-				return fail("extrait original absent ou preuve encore demandée")
+			if len(finding.Needs) != 0 {
+				return fail(fmt.Sprintf("pièce %d : inspected incompatible avec %d demande(s) de preuve ; retourner unknown", finding.Artifact, len(finding.Needs)))
+			}
+			if len(strings.TrimSpace(finding.Evidence)) < 8 || !fragmentEvidencePresent(artifact, finding.Evidence) {
+				return fail(fmt.Sprintf("pièce %d : extrait original absent", finding.Artifact))
 			}
 		case "fail":
 			state = "changes_requested"
@@ -112,17 +124,29 @@ func managedFragmentReplyFits(p managedReviewFragmentPacket) bool {
 // to an explicit inventory key and the immutable whole-packet digest.
 func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPacket, result *managedFragmentInspection) error {
 	var envelope struct {
-		Candidate string                  `json:"candidate_commit"`
-		Context   string                  `json:"context_sha256"`
-		Packet    string                  `json:"packet_sha256"`
-		Findings  json.RawMessage         `json:"findings"`
-		Defects   []managedFragmentDefect `json:"defects,omitempty"`
+		Candidate string          `json:"candidate_commit"`
+		Context   string          `json:"context_sha256"`
+		Packet    string          `json:"packet_sha256"`
+		Findings  json.RawMessage `json:"findings"`
+		Defects   json.RawMessage `json:"defects,omitempty"`
 	}
 	if err := strict(raw, &envelope); err != nil {
 		return err
 	}
+	defects, err := decodeManagedFragmentDefectCitations(envelope.Defects, packet)
+	if err != nil {
+		return err
+	}
 	if strings.HasPrefix(strings.TrimSpace(string(envelope.Findings)), "[") {
-		return strict(raw, result)
+		if packet.InputBudget != nil && packet.InputBudget.FinalReserveContractVersion == 1 {
+			return fmt.Errorf("nouveau contrat de réserve : constats indexés et ancres proposées requis")
+		}
+		var findings []managedFragmentFinding
+		if err := strict(envelope.Findings, &findings); err != nil {
+			return err
+		}
+		*result = managedFragmentInspection{Candidate: envelope.Candidate, ContextDigest: envelope.Context, PacketDigest: envelope.Packet, Findings: findings, Defects: defects}
+		return nil
 	}
 	var entries map[string]json.RawMessage
 	if err := strict(envelope.Findings, &entries); err != nil {
@@ -131,7 +155,7 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 	if len(entries) != len(packet.Artifacts) {
 		return fmt.Errorf("incomplete inventory")
 	}
-	*result = managedFragmentInspection{Candidate: envelope.Candidate, ContextDigest: envelope.Context, PacketDigest: envelope.Packet, Defects: envelope.Defects}
+	*result = managedFragmentInspection{Candidate: envelope.Candidate, ContextDigest: envelope.Context, PacketDigest: envelope.Packet, Defects: defects}
 	for i, a := range packet.Artifacts {
 		raw, ok := entries[strconv.Itoa(i)]
 		if !ok {

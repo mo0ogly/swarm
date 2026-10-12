@@ -47,8 +47,8 @@ func TestLastAuthorizedToolFinishesButNextCallStillStops(t *testing.T) {
 	if g.check(at) != "" {
 		t.Fatal("last authorized tool interrupted at start")
 	}
-	if !strings.Contains(g.check(at.Add(2*time.Second)), "outil observable") {
-		t.Fatal("pending tool timeout removed")
+	if g.check(at.Add(2*time.Second)) != "" {
+		t.Fatal("pending tool interrupted by elapsed time")
 	}
 	g.result("last", false)
 	if g.completed != 1 || !strings.Contains(g.check(at), "appels") {

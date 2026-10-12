@@ -90,6 +90,7 @@ func TestPolicyPreviewAtomicSaveConflictAndExport(t *testing.T) {
 	}
 	policy := effectiveModelPolicy(ps.Providers["claude"])
 	policy.WorkLevel = "simple"
+	policy.Levels["standard"] = ModelChoice{Model: "sonnet", Effort: "medium"}
 	change := PolicyChange{Version: 1, Expected: state["digest"].(string), Policies: map[string]*ModelPolicy{"claude": policy}, Preview: true}
 	if _, e = s.changePolicies(change); e != nil {
 		t.Fatal(e)
@@ -106,6 +107,10 @@ func TestPolicyPreviewAtomicSaveConflictAndExport(t *testing.T) {
 	if got.Providers["claude"].ModelPolicy.WorkLevel != "simple" || got.Providers["claude"].Command != "/fixture/claude" || got.Providers["claude"].Env[0] != "KEY_NAME_ONLY" {
 		t.Fatal("save altered connection")
 	}
+	selected, route, err := resolveModel(got.Providers["claude"], "standard", "planning")
+	if err != nil || route.Effort != "medium" || !strings.Contains(strings.Join(selected.Args, " "), "--effort medium") {
+		t.Fatalf("saved Claude effort not applied: %+v %v", route, err)
+	}
 	if _, e = s.changePolicies(change); e == nil {
 		t.Fatal("stale admin overwrote config")
 	}
@@ -116,6 +121,37 @@ func TestPolicyPreviewAtomicSaveConflictAndExport(t *testing.T) {
 	var bad PolicyChange
 	if strict([]byte(`{"version":1,"policies":{},"command":"evil"}`), &bad) == nil {
 		t.Fatal("command import accepted")
+	}
+}
+
+func TestClaudeConfiguredEffortOverridesCLIChoice(t *testing.T) {
+	p := Provider{Command: "/fixture/claude", Args: []string{"-p", "--model=opus", "--effort", "max", "--effort=xhigh", "--safe-mode", "--tools", ""}}
+	policy := effectiveModelPolicy(p)
+	if policy.Levels["standard"].Effort != "" {
+		t.Fatal("capability catalogue silently changed existing policy")
+	}
+	p.ModelPolicy = policy
+	for _, effort := range []string{"low", "medium", "high", "xhigh", "max"} {
+		p.ModelPolicy.Levels["standard"] = ModelChoice{Model: "sonnet", Effort: effort}
+		if err := validateModelPolicy(p, policy); err != nil {
+			t.Fatal(err)
+		}
+		got, route, err := resolveModel(p, "standard", "planning")
+		if err != nil || route.Effort != effort {
+			t.Fatalf("configured effort unavailable: %+v %v", route, err)
+		}
+		args := strings.Join(got.Args, " ")
+		if strings.Count(args, "--effort") != 1 || !strings.Contains(args, "--effort "+effort) || !strings.Contains(args, "--safe-mode") || !strings.Contains(args, "--model sonnet") {
+			t.Fatalf("ambiguous or altered CLI: %q", args)
+		}
+	}
+	p.ModelPolicy.Levels["standard"] = ModelChoice{Model: "sonnet", Effort: "ultracode"}
+	if err := validateModelPolicy(p, policy); err == nil {
+		t.Fatal("workflow setting accepted as an effort level")
+	}
+	p.ModelPolicy.Levels["simple"] = ModelChoice{Model: "haiku", Effort: "medium"}
+	if _, _, err := resolveModel(p, "simple", "planning"); err == nil {
+		t.Fatal("unverified legacy Haiku effort advertised")
 	}
 }
 func TestTerminalModelSelection(t *testing.T) {

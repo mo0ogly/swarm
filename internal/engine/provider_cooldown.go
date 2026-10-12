@@ -16,15 +16,16 @@ import (
 // from a tool transcript. Zero ResetAt means the provider supplied no reset.
 // It stays blocked until an explicit, reasoned operator clearance.
 type ProviderCooldown struct {
-	Provider    string `json:"provider"`
-	ObservedAt  string `json:"observed_at"`
-	ResetAt     int64  `json:"resets_at,omitempty"`
-	Source      string `json:"source"`
-	Signal      string `json:"signal"`
-	ClearedAt   string `json:"cleared_at,omitempty"`
-	ClearEvent  string `json:"clear_event,omitempty"`
-	ClearReason string `json:"clear_reason,omitempty"`
-	ClearActor  string `json:"clear_actor,omitempty"`
+	Provider           string `json:"provider"`
+	ObservedAt         string `json:"observed_at"`
+	ResetAt            int64  `json:"resets_at,omitempty"`
+	Source             string `json:"source"`
+	Signal             string `json:"signal"`
+	ClearedAt          string `json:"cleared_at,omitempty"`
+	ClearEvent         string `json:"clear_event,omitempty"`
+	ClearReason        string `json:"clear_reason,omitempty"`
+	ClearActor         string `json:"clear_actor,omitempty"`
+	ClearAccountChange bool   `json:"clear_account_change,omitempty"`
 }
 
 func observedProviderCooldown(event map[string]any, at time.Time) *ProviderCooldown {
@@ -190,10 +191,11 @@ func (s *Store) providerCooldownObserver(provider, source string) func(*Provider
 }
 
 type ProviderCooldownClear struct {
-	Schema int    `json:"schema_version"`
-	Event  string `json:"event_id"`
-	Digest string `json:"expected_digest"`
-	Reason string `json:"reason"`
+	Schema               int    `json:"schema_version"`
+	Event                string `json:"event_id"`
+	Digest               string `json:"expected_digest"`
+	Reason               string `json:"reason"`
+	ConfirmAccountChange bool   `json:"confirm_account_change,omitempty"`
 }
 
 func (s *Store) clearProviderCooldown(provider string, r ProviderCooldownClear) (*ProviderCooldown, error) {
@@ -213,7 +215,7 @@ func (s *Store) clearProviderCooldown(provider string, r ProviderCooldownClear) 
 		return nil, fmt.Errorf("aucune attente enregistrée")
 	}
 	if c.ClearEvent == r.Event {
-		if c.ClearReason != r.Reason {
+		if c.ClearReason != r.Reason || c.ClearAccountChange != r.ConfirmAccountChange {
 			return nil, fmt.Errorf("event_id déjà utilisé avec un autre motif")
 		}
 		return c, nil
@@ -221,7 +223,9 @@ func (s *Store) clearProviderCooldown(provider string, r ProviderCooldownClear) 
 	if r.Digest == "" || digest != r.Digest {
 		return nil, fmt.Errorf("attente fournisseur modifiée ; relire son état")
 	}
-	if c.ResetAt > 0 && c.active(time.Now()) {
+	// A changed account is a new operator-confirmed precondition, not quota recovery.
+	// Default clearance still respects the observed future deadline.
+	if c.ResetAt > 0 && c.active(time.Now()) && !r.ConfirmAccountChange {
 		return nil, c.failure()
 	}
 	path, _ := s.providerCooldownPath(provider)
@@ -236,6 +240,7 @@ func (s *Store) clearProviderCooldown(provider string, r ProviderCooldownClear) 
 	c.ClearedAt = now()
 	c.ClearEvent = r.Event
 	c.ClearReason = r.Reason
+	c.ClearAccountChange = r.ConfirmAccountChange
 	c.ClearActor = fmt.Sprintf("local-uid-%d", os.Getuid())
 	raw, _ = json.MarshalIndent(c, "", "  ")
 	if e = atomicWrite(path, raw); e != nil {

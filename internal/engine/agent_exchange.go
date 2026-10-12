@@ -161,13 +161,9 @@ func (s *Store) artifactDigest(artifact ExchangeArtifact) (string, error) {
 	if err != nil || len(wanted) != sha256.Size || strings.ToLower(artifact.SHA256) != artifact.SHA256 {
 		return "", fmt.Errorf("empreinte SHA-256 invalide pour %s", artifact.Path)
 	}
-	path, err := filepath.EvalSymlinks(filepath.Join(s.root, artifact.Path))
+	path, err := localFile(s.root, artifact.Path)
 	if err != nil {
 		return "", err
-	}
-	rel, err := filepath.Rel(s.root, path)
-	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-		return "", fmt.Errorf("artefact hors racine : %s", artifact.Path)
 	}
 	f, err := os.Open(path)
 	if err != nil {

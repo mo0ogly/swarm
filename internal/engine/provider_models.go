@@ -99,7 +99,14 @@ func modelOptions(p Provider) []ModelOption {
 		}
 	case "claude":
 		for _, id := range []string{"haiku", "sonnet", "opus", "claude-sonnet-5-5", "claude-opus-5-5"} {
-			out = append(out, ModelOption{ID: id, Efforts: []string{}, Source: "identifiant accepté par la CLI Claude ; accès à tester"})
+			efforts := []string{}
+			if id != "haiku" {
+				// CLI capability, never an imposed policy. Claude may clamp the
+				// requested level for an older model or an account's managed cap.
+				// A blank choice retains client inheritance; it proves no effort.
+				efforts = []string{"low", "medium", "high", "xhigh", "max"}
+			}
+			out = append(out, ModelOption{ID: id, Efforts: efforts, Source: "identifiant et effort demandés à la CLI Claude ; accès et niveau appliqué à vérifier"})
 		}
 	}
 	current := configuredModel(p)

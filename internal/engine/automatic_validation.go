@@ -395,7 +395,7 @@ func (s *Store) runAutomaticValidation(a Agent, report string) (bool, string) {
 		if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
 			return false, "validation automatique retenue : " + reason
 		}
-		result := runValidationControl(s.root, control)
+		result, _, _ := s.runConfiguredValidationControl(w.ID, s.root, control)
 		results = append(results, result)
 		passed = passed && result.Passed
 	}

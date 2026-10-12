@@ -26,11 +26,7 @@ func openStore(root string, init bool) (*Store, error) {
 
 // Inspection commands must not upgrade storage behind an older running server.
 func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
-	root, e := filepath.Abs(root)
-	if e != nil {
-		return nil, e
-	}
-	root, e = filepath.EvalSymlinks(root)
+	root, e := canonicalProjectRoot(root)
 	if e != nil {
 		return nil, e
 	}
@@ -341,6 +337,66 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	// Version 28 reserves the Work JSON contract for attributed review-retry
+	// directives. Older binaries ignore unknown JSON fields and could erase a
+	// queued supervisor decision before a strict journal entry is written.
+	if version < 28 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v28-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=28"); e != nil {
+			return fail(e)
+		}
+	}
+	// Version 29 binds unresolved review identities to the supervisor receipt.
+	// A v28 decoder may otherwise discard that authority/freshness boundary.
+	if version < 29 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v29-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=29"); e != nil {
+			return fail(e)
+		}
+	}
+	// Version 30 protects retained-control retry budget bindings and the live
+	// infrastructure observation from older Work decoders losing those fields.
+	if version < 30 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v30-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=30"); e != nil {
+			return fail(e)
+		}
+	}
+	// Version 31 fences the attributed internal-command budget receipt.
+	if version < 31 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v31-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=31"); e != nil {
+			return fail(e)
+		}
+	}
+	// Fence cycle-policy semantics and quota audit fields from older decoders.
+	// Keep every original Work body and explicitly configured ceiling unchanged.
+	if version < 32 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v32-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=32"); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
@@ -516,6 +572,17 @@ func (s *Store) mutateWithHookOnce(id, kind, event string, expected int, request
 		return w, e
 	}
 
+	// Opening-time validation does not protect a process whose connection
+	// predates a storage upgrade. Check under the writer reservation, before
+	// decoding or rewriting Work JSON or invoking mutation hooks.
+	var version int
+	if e = tx.QueryRow("PRAGMA user_version").Scan(&version); e != nil {
+		return w, e
+	}
+	if version != schemaVersion {
+		return w, &CommandError{Code: "storage_version_conflict", Message: fmt.Sprintf("Stockage version %d, processus version %d : écriture refusée. Arrêtez les anciens processus puis utilisez le CLI du serveur actif.", version, schemaVersion)}
+	}
+
 	var oldID, oldKind string
 	var oldRequest []byte
 	e = tx.QueryRow("SELECT work_id,kind,request FROM events WHERE id=?", event).Scan(&oldID, &oldKind, &oldRequest)
@@ -688,7 +755,9 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 				t.Owner = r.Owner
 			}
 			if r.Next != "" {
-				t.Next = r.Next
+				if err := updateTaskInstructions(t, r.Next); err != nil {
+					return err
+				}
 			}
 			if r.Blocker != "" {
 				t.Blocker = r.Blocker
@@ -736,6 +805,12 @@ func (s *Store) apply(w *Work, kind string, r Request) error {
 			a.Ended = now()
 		}
 		if r.Status == "running" && t.Status != "running" {
+			if t.IndependentReview != nil && (t.IndependentReview.State == "running" || t.IndependentReview.State == "queued") {
+				return fmt.Errorf("revue indépendante active ; terminer sa conduite avant une nouvelle production")
+			}
+			archiveIndependentReview(t)
+			t.BatchReviewResume = nil
+			t.ReviewCoordination = nil
 			t.Attempts = append(t.Attempts, Attempt{ID: newID("a-"), Status: "recorded", Started: now()})
 			t.Gate = nil
 			t.EvidenceStaleReason = ""

@@ -135,6 +135,9 @@ func planDispatch(in dispatchInputs) ([]dispatchDecision, string) {
 		switch {
 		case t.Status != "todo" && t.Status != "blocked":
 			continue
+		case currentReviewProtocolFailure(&t):
+			reasons = append(reasons, t.ID+" : réponse du vérificateur invalide ; reprise de revue requise, aucune nouvelle production")
+			continue
 		case t.Status == "blocked" && refused[t.ID] && !correction && !t.PlanningRetry:
 			// Tentative terminée dont le handoff n'a pas pu être relayé :
 			// relancer ne produirait pas la preuve manquante.
@@ -382,6 +385,10 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 	}
 	done := []dispatchDecision{}
 	for _, d := range plan {
+		conductor := ""
+		if len(conductors) > 0 {
+			conductor = conductors[0]
+		}
 		current, e := s.get(work)
 		if e != nil {
 			return done, e
@@ -392,6 +399,22 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 				return done, err
 			}
 			if pending != nil {
+				if pending.Ready && conductor != "" {
+					a, created, err := s.resumeAutomaticPreparedLaunch(work, pending.ID, current.Revision, conductor)
+					if err != nil {
+						_ = s.dispatchEvent(work, d.TaskID+" : préparation conservée — "+err.Error())
+						continue
+					}
+					if created {
+						if err = s.spawnAgent(a); err != nil {
+							_ = s.dispatchEvent(work, d.TaskID+" : processus de reprise non démarré — "+err.Error())
+							return done, nil
+						}
+						_ = s.dispatchEvent(work, d.TaskID+" : préparation automatique reprise par le conducteur courant ; identité et copie conservées")
+						done = append(done, d)
+					}
+					continue
+				}
 				_ = s.dispatchEvent(work, "Lancements préparés conservés ; confirmer leur reprise depuis les tâches signalées.")
 				continue
 			}
@@ -399,10 +422,6 @@ func (s *Store) dispatch(work string, conductors ...string) ([]dispatchDecision,
 		p := d.Profile
 		if task, err := current.task(d.TaskID); err == nil && task.Profile == nil {
 			p.Instruction = "Mission : " + task.Title + "\nLivrable : " + task.Deliverable + "\nProchaine action : " + task.Next
-		}
-		conductor := ""
-		if len(conductors) > 0 {
-			conductor = conductors[0]
 		}
 		r := Launch{Schema: 1, EventID: automaticEventID(work, d.TaskID, len(agents)), Revision: current.Revision, ConductorID: conductor,
 			TaskID: d.TaskID, Provider: p.Provider, Role: p.Role, Workspace: p.Workspace,

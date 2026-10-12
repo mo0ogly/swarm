@@ -39,6 +39,50 @@ type graphDeliveryD03ManifestValue struct {
 	CoverageDigest  string                        `json:"coverage_digest"`
 	Requirements    []graphDeliveryD03Requirement `json:"requirements"`
 	Inputs          []graphDeliveryD03Input       `json:"inputs"`
+	InputParts      []graphDeliveryD03Input       `json:"input_parts,omitempty"`
+}
+
+func graphDeliveryD03ReadInputs(root string, m *graphDeliveryD03ManifestValue) error {
+	if len(m.InputParts) == 0 {
+		return nil
+	}
+	if len(m.Inputs) != 0 {
+		return errors.New("ambiguous flat and partitioned source inputs")
+	}
+	seen := map[string]bool{}
+	var inputs []graphDeliveryD03Input
+	for _, part := range m.InputParts {
+		clean := filepath.Clean(filepath.FromSlash(part.Path))
+		if part.Path == "" || filepath.IsAbs(clean) || clean == "." || clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) || seen[clean] {
+			return errors.New("unsafe or duplicate source input part")
+		}
+		seen[clean] = true
+		name := filepath.Join(root, clean)
+		info, err := os.Lstat(name)
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			return errors.New("source input part is not a regular file")
+		}
+		raw, err := os.ReadFile(name)
+		if err != nil {
+			return err
+		}
+		if graphDeliveryD03Hash(raw) != part.SHA256 {
+			return errors.New("source input part digest mismatch")
+		}
+		var rows []graphDeliveryD03Input
+		if err = json.Unmarshal(raw, &rows); err != nil {
+			return err
+		}
+		if len(rows) == 0 {
+			return errors.New("empty source input part")
+		}
+		inputs = append(inputs, rows...)
+	}
+	m.Inputs = inputs
+	return nil
 }
 
 func graphDeliveryD03Hash(raw []byte) string {
@@ -239,12 +283,24 @@ func graphDeliveryD03Load(t *testing.T) (string, graphDeliveryD03ManifestValue) 
 		t.Fatal(e)
 	}
 
+	// Engine evolution records a distinct current source snapshot. Earlier
+	// manifests remain immutable; this never renews their semantic acceptance.
+	engineManifest := "docs/engine-cursor-source-manifest.json"
+	if _, e := os.Stat(filepath.Join(root, engineManifest)); e == nil {
+		manifestPath = engineManifest
+	} else if !os.IsNotExist(e) {
+		t.Fatal(e)
+	}
+
 	raw, err := os.ReadFile(filepath.Join(root, manifestPath))
 	if err != nil {
 		t.Fatal(err)
 	}
 	var manifest graphDeliveryD03ManifestValue
 	if err = json.Unmarshal(raw, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if err = graphDeliveryD03ReadInputs(root, &manifest); err != nil {
 		t.Fatal(err)
 	}
 	return root, manifest
@@ -274,5 +330,44 @@ func TestGraphDeliveryD03QualificationManifest(t *testing.T) {
 	incomplete.Requirements = append([]graphDeliveryD03Requirement(nil), manifest.Requirements[:len(manifest.Requirements)-1]...)
 	if err := graphDeliveryD03Validate(root, incomplete); err == nil || !strings.Contains(err.Error(), "incomplete") {
 		t.Fatalf("incomplete coverage was not rejected: %v", err)
+	}
+}
+
+func TestGraphDeliverySourcePartsPreserveIntegrity(t *testing.T) {
+	root := t.TempDir()
+	rows := []graphDeliveryD03Input{{Path: "source.go", Kind: "source", SHA256: strings.Repeat("a", 64)}}
+	raw, _ := json.Marshal(rows)
+	if err := os.WriteFile(filepath.Join(root, "part.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	original := graphDeliveryD03ManifestValue{InputParts: []graphDeliveryD03Input{{Path: "part.json", SHA256: graphDeliveryD03Hash(raw)}}}
+	m := original
+	if err := graphDeliveryD03ReadInputs(root, &m); err != nil || len(m.Inputs) != 1 || graphDeliveryD03CandidateDigest(m.Inputs) != graphDeliveryD03CandidateDigest(rows) {
+		t.Fatal("partition changed source identity", err)
+	}
+	for _, kind := range []string{"tampered", "escape", "duplicate", "alias-dot", "alias-parent", "ambiguous", "missing"} {
+		t.Run(kind, func(t *testing.T) {
+			m := original
+			m.InputParts = append([]graphDeliveryD03Input(nil), original.InputParts...)
+			switch kind {
+			case "tampered":
+				m.InputParts[0].SHA256 = strings.Repeat("0", 64)
+			case "escape":
+				m.InputParts[0].Path = "../part.json"
+			case "duplicate":
+				m.InputParts = append(m.InputParts, m.InputParts[0])
+			case "alias-dot":
+				m.InputParts = append(m.InputParts, graphDeliveryD03Input{Path: "./part.json", SHA256: m.InputParts[0].SHA256})
+			case "alias-parent":
+				m.InputParts = append(m.InputParts, graphDeliveryD03Input{Path: "sub/../part.json", SHA256: m.InputParts[0].SHA256})
+			case "ambiguous":
+				m.Inputs = rows
+			case "missing":
+				m.InputParts[0].Path = "missing.json"
+			}
+			if err := graphDeliveryD03ReadInputs(root, &m); err == nil {
+				t.Fatal("invalid source part accepted", kind)
+			}
+		})
 	}
 }

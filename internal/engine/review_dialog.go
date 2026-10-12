@@ -116,7 +116,13 @@ func (s *Store) attributedTaskReports(work, id string) []string {
 }
 
 func (s *Store) readableTaskReport(work, id, path string) bool {
-	rel, err := filepath.Rel(filepath.Join(s.root, "docs"), path)
+	root, err := canonicalProjectRoot(s.root)
+	if err != nil {
+		return false
+	}
+	// Resolve the project root, never the docs subtree: a docs symlink into
+	// private runtime files must still fail the documentation boundary.
+	rel, err := filepath.Rel(filepath.Join(root, "docs"), path)
 	if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
 		return true
 	}

@@ -30,6 +30,7 @@ func managedPreparationContract(w Work, t *Task) string {
 }
 
 func preparedRequestDigest(r Launch) string {
+	r.SkillRefresh = nil // Receipt records authorization, not a frozen setting.
 	r.Revision, r.EventID, r.Origin, r.ConductorID, r.ProviderDigest = 0, "", "", "", ""
 	if r.Role == "" {
 		r.Role = "worker"
@@ -43,6 +44,12 @@ func preparedRequestDigest(r Launch) string {
 
 // Resumption may lower an explicit tool budget; all other frozen settings stay exact.
 func preparedRequestCompatible(saved, requested Launch) bool {
+	if requested.preparedSkillRefresh {
+		if !samePreparedSkillPaths(saved.Skills, requested.Skills) {
+			return false
+		}
+		saved.Skills = requested.Skills
+	}
 	if preparedRequestDigest(saved) == preparedRequestDigest(requested) {
 		return true
 	}
@@ -120,6 +127,13 @@ func (s *Store) preparedLaunchForTask(w Work, t *Task) (*PreparedLaunch, error) 
 	}
 	r := record.Request
 	p.Provider, p.Workspace, p.Instruction, p.Timeout, p.Limits = r.Provider, filepath.Join(record.Path, w.Planning.Repository.Subdir), r.Instruction, r.Timeout, r.Limits
+	for _, selected := range r.Skills {
+		item, _, err := s.readActionSkill(selected.Path)
+		if err != nil || selected.SHA256 == "" || item.SHA256 != selected.SHA256 {
+			p.Reason = "Skill préparé modifié : examiner son empreinte actuelle puis confirmer explicitement l’actualisation avec agent resume-launch."
+			return p, nil
+		}
+	}
 	p.Ready = true
 	return p, nil
 }
@@ -138,7 +152,31 @@ func (s *Store) preparedLaunchGuard(w Work, t *Task, record ManagedAttempt) erro
 	return verifyManagedCopy(w.Planning.Repository, record.Path)
 }
 
-func (s *Store) resumePreparedLaunch(work, id string, revision int) (Agent, bool, error) {
+func (s *Store) resumePreparedLaunch(work, id string, revision int, refresh ...PreparedSkillRefresh) (Agent, bool, error) {
+	return s.resumePreparedLaunchAs(work, id, revision, originOperator, "", refresh...)
+}
+
+// Only the current conductor may resume its previously authorized automatic
+// intent. Operator preparations retain the explicit public resume path.
+func (s *Store) resumeAutomaticPreparedLaunch(work, id string, revision int, conductor string) (Agent, bool, error) {
+	if !safeName(conductor) {
+		return Agent{}, false, fmt.Errorf("conducteur courant identifié requis pour reprendre la préparation automatique")
+	}
+	w, err := s.get(work)
+	if err != nil {
+		return Agent{}, false, err
+	}
+	record, err := s.readPreparedLaunch(w, id)
+	if err != nil {
+		return Agent{}, false, err
+	}
+	if record.Request == nil || record.Request.Origin != originConductor || !safeName(record.Request.ConductorID) {
+		return Agent{}, false, fmt.Errorf("préparation opérateur ou intention automatique non attribuable ; reprise explicite requise")
+	}
+	return s.resumePreparedLaunchAs(work, id, revision, originConductor, conductor)
+}
+
+func (s *Store) resumePreparedLaunchAs(work, id string, revision int, origin, conductor string, refresh ...PreparedSkillRefresh) (Agent, bool, error) {
 	if !safeName(id) {
 		return Agent{}, false, fmt.Errorf("identifiant de préparation invalide")
 	}
@@ -194,7 +232,16 @@ func (s *Store) resumePreparedLaunch(work, id string, revision int) (Agent, bool
 		return Agent{}, false, e
 	}
 	r := *record.Request
-	r.Revision, r.Origin, r.ConductorID = revision, originOperator, ""
+	if len(refresh) > 1 {
+		return Agent{}, false, fmt.Errorf("une seule actualisation de skills autorisée")
+	}
+	if len(refresh) == 1 {
+		r, e = s.refreshPreparedSkills(r, refresh[0])
+		if e != nil {
+			return Agent{}, false, e
+		}
+	}
+	r.Revision, r.Origin, r.ConductorID = revision, origin, conductor
 	// An explicit resume retains the reservation while respecting the provider ceiling.
 	// Never change the saved manifest or the task profile, nor raise a smaller budget.
 	if r.Limits != nil {

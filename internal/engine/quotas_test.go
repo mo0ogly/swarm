@@ -114,7 +114,7 @@ func TestQuotasPublicParityPersistenceAndNoRefund(t *testing.T) {
 func TestQuotasRejectActivePlannerAndInvalidBudgets(t *testing.T) {
 	s, w := planningFixture(t)
 	r := QuotaChange{Schema: 1, EventID: "q", Revision: w.Revision, Limits: QuotaValues{Planning: 20, Decisions: 20}, Reason: "Budget de recette"}
-	for _, n := range []int{0, -1, 201} {
+	for _, n := range []int{0, -1} {
 		r.Limits.Planning = n
 		if _, err := s.previewQuotas(w.ID, r); err == nil {
 			t.Fatal(n)

@@ -15,20 +15,21 @@ import (
 // IntegrationRetry retains the original failure and consumes a single retry
 // for a result/base pair. It never grants another producer or a review verdict.
 type IntegrationRetry struct {
-	Event          string `json:"event_id"`
-	RequestDigest  string `json:"request_sha256"`
-	Agent          string `json:"agent_id"`
-	Attempt        string `json:"attempt_id"`
-	Result         string `json:"result_commit"`
-	Previous       string `json:"failed_base"`
-	Candidate      string `json:"expected_candidate"`
-	Contract       string `json:"contract_sha256"`
-	Failure        string `json:"original_failure"`
-	Evidence       string `json:"failure_evidence"`
-	EvidenceDigest string `json:"evidence_sha256"`
-	Legacy         bool   `json:"legacy_missing_output"`
-	Reason         string `json:"reason"`
-	At             string `json:"at"`
+	RuntimeBudgetDigest string `json:"control_runtime_budget_sha256,omitempty"`
+	Event               string `json:"event_id"`
+	RequestDigest       string `json:"request_sha256"`
+	Agent               string `json:"agent_id"`
+	Attempt             string `json:"attempt_id"`
+	Result              string `json:"result_commit"`
+	Previous            string `json:"failed_base"`
+	Candidate           string `json:"expected_candidate"`
+	Contract            string `json:"contract_sha256"`
+	Failure             string `json:"original_failure"`
+	Evidence            string `json:"failure_evidence"`
+	EvidenceDigest      string `json:"evidence_sha256"`
+	Legacy              bool   `json:"legacy_missing_output"`
+	Reason              string `json:"reason"`
+	At                  string `json:"at"`
 }
 
 var controlFailurePattern = regexp.MustCompile(`^Contrôle ([^ ]+) de ([^ ]+) en échec : .+ \(empreinte ([0-9a-f]{64})\)(?: ; diagnostic : (.+))?$`)
@@ -136,7 +137,7 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 			return w, nil
 		}
 	}
-	if w.Revision != r.Revision || w.Planning == nil || w.Planning.Repository == nil || w.Planning.Reviewer == nil || t.Status != "blocked" || !currentTaskAttempt(t, r.Attempt) || t.IndependentReview != nil || t.BatchReviewResume != nil || t.RecoveredResult != nil {
+	if w.Revision != r.Revision || w.Planning == nil || w.Planning.Repository == nil || w.Planning.Reviewer == nil || t.Status != "blocked" || !currentTaskAttempt(t, r.Attempt) || t.IndependentReview != nil || t.BatchReviewResume != nil {
 		return Work{}, fmt.Errorf("reprise réservée au dernier résultat terminé, sans avis ni réparation acquis")
 	}
 	if w.Planning.Reviewer.Calls >= w.Planning.Reviewer.MaxCalls || w.Planning.Reviewer.Failure != "" {
@@ -149,7 +150,7 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 	if e != nil {
 		return Work{}, e
 	}
-	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || a.Status != "completed" || a.Ended == "" || (a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp)) {
+	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "completed" && (t.RecoveredResult == nil || t.RecoveredResult.Agent != a.ID || t.RecoveredResult.Attempt != a.Attempt || t.RecoveredResult.ProcessStatus != a.Status)) || a.Ended == "" || (a.Child != 0 && (a.Host != hostIdentity() || processStamp(a.Child) == a.ChildStamp)) {
 		return Work{}, fmt.Errorf("production terminée et fin du processus confirmée requises")
 	}
 	item, e := s.managedAttempt(a.ID)
@@ -160,11 +161,21 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 		return Work{}, fmt.Errorf("résultat ou échec remplacé")
 	}
 	repo := w.Planning.Repository
+	runtimeDigest := ""
+	if r.ConfirmRecovery {
+		runtimeDigest, e = s.freshControlRuntimeBudget(w, a, item, r)
+		if e != nil {
+			return Work{}, e
+		}
+	}
+	if t.RecoveredResult != nil && (!recoveredResultMatches(t, a, item) || runtimeDigest == "") {
+		return Work{}, fmt.Errorf("résultat réparé : nouveau budget explicite et liaison exacte requis")
+	}
 	if repo.Candidate != r.ExpectedCandidate {
 		return Work{}, fmt.Errorf("base attendue remplacée")
 	}
 	for _, prior := range t.IntegrationRetries {
-		if prior.Result == item.Result && prior.Candidate == repo.Candidate {
+		if prior.Result == item.Result && prior.Candidate == repo.Candidate && prior.RuntimeBudgetDigest == runtimeDigest {
 			return Work{}, fmt.Errorf("reprise déjà consommée pour ce résultat et cette base")
 		}
 	}
@@ -182,7 +193,7 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 	if e != nil {
 		return Work{}, e
 	}
-	if previous == repo.Candidate {
+	if previous == repo.Candidate && runtimeDigest == "" {
 		return Work{}, fmt.Errorf("base validée inchangée ; aucune répétition du contrôle")
 	}
 	bare := filepath.Join(repo.Storage, "repository.git")
@@ -192,7 +203,7 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 	if _, e = managedGit(bare, "cat-file", "-e", item.Result+"^{commit}"); e != nil {
 		return Work{}, e
 	}
-	retry := IntegrationRetry{r.EventID, hash(raw), a.ID, a.Attempt, item.Result, previous, repo.Candidate, managedReviewContract(w, t.ID), item.Detail, evidence, digest, legacy, r.Reason, now()}
+	retry := IntegrationRetry{RuntimeBudgetDigest: runtimeDigest, Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: item.Result, Previous: previous, Candidate: repo.Candidate, Contract: managedReviewContract(w, t.ID), Failure: item.Detail, Evidence: evidence, EvidenceDigest: digest, Legacy: legacy, Reason: r.Reason, At: now()}
 	return s.mutateWithHook(work, "managed.retry-integration", r.EventID, r.Revision, raw, func(current *Work) error {
 		task, err := current.task(r.Task)
 		if err != nil {
@@ -205,6 +216,15 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 		task.Next = "Reprise du résultat conservé : contrôles cumulés puis nouvelle revue indépendante."
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error {
+		if runtimeDigest != "" {
+			_, currentDigest, err := validationRuntimeLimitsWith(tx, work)
+			if err != nil {
+				return err
+			}
+			if currentDigest != runtimeDigest {
+				return fmt.Errorf("budget de contrôle modifié avant réservation")
+			}
+		}
 		if err := automaticValidationGuard(tx, work); err != nil {
 			return err
 		}
@@ -212,7 +232,7 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 		if err := tx.QueryRow("SELECT status FROM agents WHERE id=?", a.ID).Scan(&status); err != nil {
 			return err
 		}
-		if status != "completed" {
+		if status != a.Status {
 			return fmt.Errorf("état producteur modifié")
 		}
 		result, err := tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND work_id=? AND task_id=? AND state='conflict' AND result_commit=? AND detail=?", a.ID, work, t.ID, item.Result, item.Detail)
@@ -230,12 +250,21 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 	})
 }
 
-func integrationRetryGuard(w Work, t *Task, a Agent, item ManagedAttempt) error {
+func (s *Store) integrationRetryGuard(w Work, t *Task, a Agent, item ManagedAttempt) error {
 	for i := len(t.IntegrationRetries) - 1; i >= 0; i-- {
 		r := t.IntegrationRetries[i]
 		if r.Agent == a.ID && r.Attempt == a.Attempt && r.Result == item.Result {
 			if r.Candidate != w.Planning.Repository.Candidate || r.Contract != managedReviewContract(w, t.ID) {
 				return fmt.Errorf("base ou contrat modifié depuis la reprise réservée ; résultat conservé")
+			}
+			if r.RuntimeBudgetDigest != "" {
+				_, digest, err := s.validationRuntimeLimits(w.ID)
+				if err != nil {
+					return err
+				}
+				if digest != r.RuntimeBudgetDigest {
+					return fmt.Errorf("budget de contrôle modifié depuis la reprise réservée ; résultat conservé")
+				}
 			}
 			return nil
 		}

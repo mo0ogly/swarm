@@ -23,6 +23,10 @@ func TestManagedReviewRetainsRejectedReplyWithoutAcceptingIt(t *testing.T) {
 	after, _ := s.get(w.ID)
 	task, _ := after.task(a.TaskID)
 	r := task.IndependentReview
+	if r == nil {
+		item, itemErr := s.managedAttempt(a.ID)
+		t.Fatal("independent review was not created", task.Status, task.Blocker, item.State, item.Detail, itemErr)
+	}
 	if task.Status == "accepted" || r.State != "error" || !strings.Contains(r.Reason, "critère 1") || !strings.Contains(r.Reason, "first") {
 		t.Fatal(task.Status, r)
 	}

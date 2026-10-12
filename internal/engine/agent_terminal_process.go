@@ -296,7 +296,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 	go func() { done <- cmd.Wait() }()
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
-	deadline := time.Now().Add(time.Duration(a.Timeout) * time.Second)
+	runStarted := time.Now()
 	var stopping time.Time
 	reason := ""
 	stop := func(message, cause string) {
@@ -340,6 +340,18 @@ func (s *Store) superviseTerminal(a Agent) error {
 			case <-time.After(time.Second):
 				_ = master.Close()
 			}
+			if stopping.IsZero() {
+				if desired, e := s.desired(a.ID); e == nil && desired == "stop" {
+					stop("Arrêt demandé par opérateur", "operateur")
+				}
+			}
+			if stopping.IsZero() {
+				if decision, e := s.runStopRequest(a); e != nil {
+					err = e
+				} else if decision != "" {
+					stop(decision, "planning")
+				}
+			}
 			state := "completed"
 			message := "Session terminée ; résultat à examiner, tâche non acceptée"
 			if err != nil {
@@ -350,6 +362,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 				state = "interrupted"
 				message = reason + " ; arrêt confirmé"
 			}
+			observeRunTime(&a, runStarted, time.Now())
 			code := cmd.ProcessState.ExitCode()
 			return s.finishAgent(a, state, message, &code)
 		case <-ticker.C:
@@ -368,8 +381,14 @@ func (s *Store) superviseTerminal(a Agent) error {
 			if desired == "stop" {
 				stop("Arrêt demandé par opérateur", "operateur")
 			}
-			if time.Now().After(deadline) {
-				stop("Durée maximale atteinte", "delai")
+
+			observeRunTime(&a, runStarted, time.Now())
+			if stopping.IsZero() {
+				if decision, err := s.observeRun(a); err != nil {
+					stop("Persistance de la supervision indisponible", "superviseur")
+				} else if decision != "" {
+					stop(decision, "planning")
+				}
 			}
 			if !stopping.IsZero() && time.Since(stopping) > 3*time.Second {
 				_ = syscall.Kill(-a.Child, syscall.SIGKILL)

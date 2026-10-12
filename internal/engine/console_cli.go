@@ -302,9 +302,12 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 				return e
 			}
 			var r struct {
-				Schema   int    `json:"schema_version"`
-				ID       string `json:"prepared_id"`
-				Revision int    `json:"expected_revision"`
+				Schema   int                    `json:"schema_version"`
+				ID       string                 `json:"prepared_id"`
+				Revision int                    `json:"expected_revision"`
+				Confirm  bool                   `json:"confirm_action_skill_refresh,omitempty"`
+				Reason   string                 `json:"reason,omitempty"`
+				Skills   []ActionSkillSelection `json:"skills,omitempty"`
 			}
 			if e = strict(b, &r); e != nil {
 				return e
@@ -312,7 +315,11 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 			if r.Schema != 1 {
 				return fmt.Errorf("schema_version doit valoir 1")
 			}
-			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision)
+			var refresh []PreparedSkillRefresh
+			if r.Confirm || r.Reason != "" || r.Skills != nil {
+				refresh = append(refresh, PreparedSkillRefresh{Confirm: r.Confirm, Reason: r.Reason, Skills: r.Skills})
+			}
+			a, created, e := s.resumePreparedLaunch(arg(2), r.ID, r.Revision, refresh...)
 			if e == nil && (created || a.Status == "queued") {
 				e = s.spawnAgent(a)
 			}

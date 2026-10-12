@@ -53,7 +53,7 @@ const VersionHistoryPanel={
  },
  async load(){
   if(this.pending)return this.pending;this.error=null;this.paintSummary();this.paintDialog();
-  this.pending=fetch('/api/v1/runtime-health',{signal:AbortSignal.timeout(15000)}).then(async response=>{if(!response.ok)throw new Error(String(response.status));const health=await response.json();const value=this.normalize(health.version);if(!value)throw new Error('version contract');this.value=value;this.diagnostic=health.version_diagnostic||null;this.paintSummary();this.paintDialog();return health}).catch(error=>{this.error=error;this.paintSummary();this.paintDialog();throw error}).finally(()=>{this.pending=null});return this.pending;
+  this.pending=SwarmWebRequests.json('/api/v1/runtime-health').then(({response,value:health})=>{if(!response.ok)throw new Error(String(response.status));const value=this.normalize(health.version);if(!value)throw new Error('version contract');this.value=value;this.diagnostic=health.version_diagnostic||null;this.paintSummary();this.paintDialog();return health}).catch(error=>{this.error=error;this.paintSummary();this.paintDialog();throw error}).finally(()=>{this.pending=null});return this.pending;
  },
  open(button){this.returnFocus=button;const dialog=this.ensureDialog();this.paintDialog();dialog.showModal();if(!this.value&&!this.pending)this.load().catch(()=>{})},
  start(){for(const button of document.querySelectorAll('[data-version-open]'))button.addEventListener('click',()=>this.open(button));this.paintSummary();this.load().then(health=>RuntimeHealthPanel.render(health)).catch(()=>RuntimeHealthPanel.renderFailure())}

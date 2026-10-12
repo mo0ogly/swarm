@@ -112,8 +112,17 @@ func TestReplayGLMRetryEventShapes(t *testing.T) {
 	if reason := sink.guard.check(at.Add(8 * time.Second)); reason != "" {
 		t.Fatal("reproduced false stop", reason)
 	}
-	if reason := sink.guard.check(at.Add(301 * time.Second)); reason == "" {
-		t.Fatal("genuine stall not bounded")
+	if reason := sink.guard.check(at.Add(301 * time.Second)); reason != "" {
+		t.Fatal("tool duration must reach the owner as an observation, not stop production", reason)
+	}
+	// summary uses the wall clock; keep the replay's pending call and move only
+	// its start to the observed stall, without inventing a completed result.
+	for id := range sink.guard.pending {
+		sink.guard.pending[id] = time.Now().Add(-301 * time.Second)
+	}
+	progress := sink.guard.summary()
+	if !progress.ToolTimeThresholdExceeded || progress.ToolWaitSeconds < 301 || progress.PendingTools != 1 || progress.ToolCalls != fixture.Calls || progress.ToolResults != fixture.Results {
+		t.Fatalf("stalled tool lost its duration observation or accounting: %+v", progress)
 	}
 }
 

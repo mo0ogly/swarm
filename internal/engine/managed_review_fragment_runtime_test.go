@@ -39,16 +39,21 @@ if '\nSWARM_FRAGMENT_PACKET\n' in text:
     original=a['content']
     if a['kind']=='source': original=json.loads(original)['content']
     line=next(j for j,l in enumerate(original.splitlines()) if len(l.strip())>=8)
-    reply['defects'].append({'artifact':i,'line':line+1,'quote':original.splitlines()[line][:120],'explanation':'Fixture refusal identifies a reproducible defect in the supplied content.','reproduction':'Run the isolated fixture with its failing input.','expected':'The isolated fixture must reject this input.'})
+    quote=original.splitlines()[line][:120]
+    if packet.get('defect_citation_contract_version',0)==1:
+     line,quote=next((j,l[:120]) for j,l in enumerate(original.splitlines()) if len(l.strip())>=8 and original.count(l[:120])==1)
+    defect={'artifact':i,'quote':quote,'explanation':'Fixture refusal identifies a reproducible defect in the supplied content.','reproduction':'Run the isolated fixture with its failing input.','expected':'The isolated fixture must reject this input.'}
+    if packet.get('defect_citation_contract_version',0)==0: defect['line']=line+1
+    reply['defects'].append(defect)
 elif '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n',1)[1]);b=payload['partial_inspections']
  reply={'candidate_commit':b['candidate_commit'],'context_sha256':b['context_sha256'],'plan_sha256':b['plan_sha256'],'state':'unknown' if mode=='selection-unknown' else 'ready','reason':'Fixture selection of original evidence','references':[]}
 else:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_FINAL_EVIDENCE\n',1)[1]);c=payload['task_contracts_reports_controls']
- reply={'candidate_commit':c['candidate_commit'],'tasks':[{'task':t['task'],'reason':'Fixture original report and control evidence','criteria':[{'index':i+1,'verdict':'fail' if mode=='decision-fail' else 'pass','evidence':t['report'][:24]} for i,_ in enumerate(t['criteria'])]} for t in c['tasks']]}
- if mode.startswith('questions-') or payload['partial_inspections'].get('historical_observations'):
+ reply={'candidate_commit':c['candidate_commit'],'tasks':[{'task':t['task'],'reason':'Fixture original report and control evidence','criteria':[{'index':i+1,'verdict':'fail' if mode in ('decision-fail','fail') else 'pass','evidence':t['report'][:24]} for i,_ in enumerate(t['criteria'])]} for t in c['tasks']]}
+ if mode=='fail' or mode.startswith('questions-') or payload['partial_inspections'].get('historical_observations'):
   qs=payload['partial_inspections']['unresolved_questions']
-  reply={'review':reply,'resolutions':[{'packet':q['packet'],'artifact':q['artifact'],'need_index':q['need_index'],'verdict':'unknown' if mode=='questions-open' else 'resolved','reason':'Fixture cites original visible report','evidence':c['tasks'][0]['report'][:24]} for q in qs]}
+  reply={'review':reply,'resolutions':[{'packet':q['packet'],'artifact':q['artifact'],'need_index':q['need_index'],'verdict':'fail' if mode=='fail' else 'unknown' if mode=='questions-open' else 'resolved','reason':'Fixture cites original visible report','evidence':c['tasks'][0]['report'][:24]} for q in qs]}
   if payload['partial_inspections'].get('historical_observations'):
    delta=payload['partial_inspections']['changes_since_observations']
    quote=next(line[1:] for line in delta.splitlines() if line.startswith('+') and not line.startswith('+++') and len(line)>8)
@@ -95,8 +100,7 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 					t.Fatal(state, runErr)
 				}
 			case "fail":
-				wantCalls = 1
-				if runErr == nil || state == "passed" {
+				if runErr != nil || state != "changes_requested" || len(records) != len(c.Tasks) {
 					t.Fatal(state, runErr)
 				}
 			case "exit":

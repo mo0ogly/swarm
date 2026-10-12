@@ -968,6 +968,9 @@ func missionUnderstanding(d MissionStatus) MissionUnderstanding {
 // Classify using the actual dispatcher, projected onto this task. More specific
 // explanations cover intentional silent skips; no independent ready predicate.
 func missionDispatchState(in dispatchInputs, t Task) (string, string) {
+	if currentReviewProtocolFailure(&t) {
+		return "intervention", "Réponse du vérificateur invalide : corriger le protocole puis reprendre la revue du même candidat."
+	}
 	w := *in.work
 	w.Tasks = []Task{t}
 	in.work = &w

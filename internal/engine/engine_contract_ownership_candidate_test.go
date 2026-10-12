@@ -193,6 +193,11 @@ func TestEngineContractOwnershipRefusesParentClosureBeforeChildrenValidated(t *t
 // distinct per task and per attempt.
 func TestEngineContractOwnershipRootChildGrandchildDelegationBoundsDepthAndIsolatesCopies(t *testing.T) {
 	s, w := planningFixture(t)
+	var policyErr error
+	w, policyErr = s.configureQuotas(w.ID, QuotaChange{Schema: 1, EventID: "explicit-recursion-policy", Revision: w.Revision, Reason: "Explicit three-level recursion policy for this test", Limits: QuotaValues{Planning: w.Planning.MaxActivations, Decisions: w.Planning.MaxDecisions, Depth: quotaInt(3)}})
+	if policyErr != nil {
+		t.Fatal(policyErr)
+	}
 	w, rootDecision := planningClaim(t, s, w, "root")
 	rootDecision.Operations = []PlanningOperation{{Kind: "delegate", ID: "child", Title: "Sous-périmètre", Requirements: []string{"req-1"}, Next: "Déléguer à la feuille"}}
 	w, err := s.planningChange(w.ID, "decide", rootDecision)

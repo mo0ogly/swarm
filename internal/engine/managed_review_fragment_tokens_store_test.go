@@ -4,6 +4,7 @@ package engine
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,7 +19,7 @@ if 'debug' in sys.argv and 'models' in sys.argv:
 `
 
 func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
-	for _, mode := range []string{"pass", "fail", "capacity-drift", "coordinated"} {
+	for _, mode := range []string{"pass", "fail", "capacity-drift", "coordinated", "fresh-capacity"} {
 		t.Run(mode, func(t *testing.T) {
 			s, w, a, c, path, receipt := fragmentBeginFixture(t)
 			catalog := filepath.Join(t.TempDir(), "models_cache.json")
@@ -77,6 +78,50 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
+			if mode == "fresh-capacity" {
+				workflow, method, e := s.projectAgentWorkflow("reviewer")
+				if e != nil {
+					t.Fatal(e)
+				}
+				_ = workflow
+				budget, e := s.reviewInputBudget(cfg)
+				if e != nil {
+					t.Fatal(e)
+				}
+				pieces, e := managedFragmentArtifacts(c)
+				if e != nil {
+					t.Fatal(e)
+				}
+				p, e := planFreshTokenFragments(c, [][]managedReviewFragmentArtifact{pieces}, nil, nil, nil, *budget, managedReviewPrefix(method), wantCalls)
+				if e != nil {
+					t.Fatal(e)
+				}
+				if p.InputBudget.FinalReserveContractVersion != 1 {
+					t.Fatal("new contract not anchored")
+				}
+				// Actual complete prompts and deterministic independent replies
+				// are validated together, including original final evidence.
+				replies := make([]string, len(p.Packets))
+				for i, packet := range p.Packets {
+					raw, _ := json.Marshal(packet)
+					findings := map[string]any{}
+					for j := range packet.Artifacts {
+						findings[fmt.Sprint(j)] = map[string]any{"v": "inspected", "r": "Content examined", "e": 0}
+					}
+					reply, _ := json.Marshal(map[string]any{"candidate_commit": packet.Candidate, "context_sha256": packet.ContextDigest, "packet_sha256": hash(raw), "findings": findings, "defects": []any{}})
+					replies[i] = string(reply)
+				}
+				if _, e = managedFragmentFinalBundle(c, p, replies); e != nil {
+					t.Fatal(e)
+				}
+				if _, e = managedFragmentRequestPrompt("", c, p, replies); e != nil {
+					t.Fatal(e)
+				}
+				if _, _, e = managedFragmentDecisionPrompt("", c, p, replies, nil); e != nil {
+					t.Fatal(e)
+				}
+				return
+			}
 			cost, err := s.managedReviewCostPreview(w.ID, a.TaskID)
 			if err != nil || cost.Protocol != 4 || cost.CallsRequired != wantCalls || !cost.FitsBudget || !cost.TransportReady {
 				t.Fatal("preflight differs from execution", cost, err)
@@ -121,8 +166,8 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 			}
 			state, records, err := s.runManagedFragmentReview(w, a, r)
 			if mode == "fail" {
-				if state == "passed" || managedReviewCalls(t, s) != 1 {
-					t.Fatal("defect not stopped", state, err)
+				if err != nil || state != "changes_requested" || len(records) != len(c.Tasks) || managedReviewCalls(t, s) != wantCalls {
+					t.Fatal("final independent refusal missing", state, err)
 				}
 			} else if err != nil || state != "passed" || len(records) != len(c.Tasks) || managedReviewCalls(t, s) != wantCalls {
 				t.Fatal("protocol runtime", state, len(records), managedReviewCalls(t, s), err)

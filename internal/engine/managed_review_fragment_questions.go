@@ -77,6 +77,19 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 	for _, t := range visible.Tasks {
 		controls, _ := json.Marshal(t.Controls)
 		originals += "\n" + t.Report + "\n" + string(controls)
+		// The final prompt also supplies these current, authoritative task
+		// contract fields. They can answer a question about assigned scope,
+		// but are deliberately not added to visible.Sources: parseManagedReview
+		// must still require implementation evidence for a business pass.
+		// Do not admit delivery claims, binding opinions or historical reviews
+		// merely because they occur elsewhere in the prompt metadata.
+		contract, _ := json.Marshal(struct {
+			Task        string   `json:"task"`
+			Title       string   `json:"title"`
+			Deliverable string   `json:"deliverable"`
+			Criteria    []string `json:"criteria"`
+		}{t.Task, t.Title, t.Deliverable, t.Criteria})
+		originals += "\n" + string(contract)
 	}
 	unresolved := false
 	for _, r := range response.Resolutions {
@@ -103,7 +116,7 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 	if err != nil {
 		return "", nil, err
 	}
-	if unresolved {
+	if unresolved && state != "changes_requested" {
 		return "unknown", nil, nil
 	}
 	return state, records, nil

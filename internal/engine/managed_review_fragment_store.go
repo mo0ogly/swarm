@@ -13,6 +13,7 @@ import (
 )
 
 type ManagedFragmentJournalAnchor struct {
+	RetryDirective     *ManagedReviewRetryDirective  `json:"retry_directive,omitempty"`
 	ReplannedFrom      *ManagedFragmentJournalAnchor `json:"replanned_from,omitempty"`
 	ResumeCalls        []string                      `json:"resume_calls,omitempty"`
 	InspectionTask     string                        `json:"inspection_task,omitempty"`
@@ -29,6 +30,12 @@ type ManagedFragmentJournalAnchor struct {
 }
 
 func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFragmentPlan, managedFragmentJournal, error) {
+	return s.readFragmentJournalAnchorVersion(r, false)
+}
+
+// Historical reading is only for preparing an explicit full restart. It cannot
+// authorize reuse, a call or acceptance under a changed method.
+func (s *Store) readFragmentJournalAnchorVersion(r IndependentReview, historical bool) (managedReviewFragmentPlan, managedFragmentJournal, error) {
 	var p managedReviewFragmentPlan
 	var j managedFragmentJournal
 	anchor := r.FragmentJournal
@@ -42,7 +49,7 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 		}
 		old := r
 		old.FragmentJournal = &prior
-		_, oldJournal, err := s.readFragmentJournalAnchor(old)
+		_, oldJournal, err := s.readFragmentJournalAnchorVersion(old, historical)
 		if err != nil {
 			return p, j, err
 		}
@@ -57,7 +64,7 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 		return p, j, err
 	}
 	methodRaw, _ := json.Marshal([]any{workflow, prompt})
-	if anchor.WorkflowDigest != hash(methodRaw) {
+	if len(anchor.WorkflowDigest) != 64 || (!historical && anchor.WorkflowDigest != hash(methodRaw)) {
 		return p, j, fmt.Errorf("méthode de revue des fragments modifiée")
 	}
 	path, e := safeReport(s.root, anchor.Plan)
@@ -143,6 +150,11 @@ func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFra
 	if e != nil {
 		return p, j, e
 	}
+	if d := anchor.RetryDirective; d != nil {
+		if _, e = managedReviewRecoveryPrefix("", d); e != nil || d.Candidate != p.Candidate || d.Attempt != attempt {
+			return p, j, fmt.Errorf("consigne de reprise d'un autre candidat ou d'une autre tentative")
+		}
+	}
 	authorized := map[string]bool{}
 	for _, id := range anchor.ResumeCalls {
 		if id == "" || authorized[id] {
@@ -170,7 +182,7 @@ func fragmentJournalTransition(old, next managedFragmentJournal) (string, error)
 	}
 	if len(next.Entries) == len(old.Entries)+1 && (len(old.Entries) == 0 || reflect.DeepEqual(next.Entries[:len(old.Entries)], old.Entries)) {
 		for _, entry := range old.Entries {
-			if entry.State == "reserved" || entry.State == "changes_requested" {
+			if entry.State == "reserved" {
 				return "", fmt.Errorf("inspection précédente non résolue")
 			}
 		}
@@ -185,7 +197,7 @@ func fragmentJournalTransition(old, next managedFragmentJournal) (string, error)
 		return "", fmt.Errorf("historique des appels modifié")
 	}
 	a, b := old.Entries[n-1], next.Entries[n-1]
-	if a.State != "reserved" || b.State == "reserved" || a.Packet != b.Packet || a.PacketDigest != b.PacketDigest || a.CallID != b.CallID {
+	if a.State != "reserved" || b.State == "reserved" || a.Packet != b.Packet || a.PacketDigest != b.PacketDigest || a.CallID != b.CallID || a.PromptDigest != b.PromptDigest || !reflect.DeepEqual(a.RetryDirective, b.RetryDirective) {
 		return "", fmt.Errorf("fin de réservation incohérente")
 	}
 	return "", nil

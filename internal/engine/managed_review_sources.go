@@ -22,6 +22,18 @@ type ReviewSource struct {
 	Content string `json:"content"`
 }
 
+const managedReviewSourceBytesExceeded = "sources de contexte supérieures à 128 Kio ; aucun contenu tronqué"
+const managedReviewSourceCountExceeded = "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"
+
+type managedReviewSourceCapacityError struct{ reason string }
+
+func (e *managedReviewSourceCapacityError) Error() string { return e.reason }
+
+func managedReviewSourceCapacityRefusal(err error) bool {
+	var capacity *managedReviewSourceCapacityError
+	return errors.As(err, &capacity)
+}
+
 // Read regular text blobs from the immutable tested candidate, never from a
 // producer checkout or arbitrary report path. There is no silent truncation.
 func candidateReviewSource(bare, candidate, name string, limit int) (ReviewSource, error) {
@@ -69,27 +81,40 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 	sources := []ReviewSource{}
 	total := 0
 	for _, task := range tasks {
+		// A delivery evidence path is an explicit producer declaration. Resolve
+		// it to candidate bytes, never to a quotation or a mutable checkout.
+		files := []string{}
 		manifestName := path.Join(repo.Subdir, "docs", task.Task+".review-context.json")
 		manifest, err := candidateReviewSource(bare, candidate, manifestName, 8192)
-		if errors.Is(err, os.ErrNotExist) {
-			continue // Existing tasks still use their diff, report and receipt.
-		}
-		if err != nil {
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			return nil, err
 		}
-		var request struct {
-			Version int      `json:"version"`
-			Files   []string `json:"files"`
+		if err == nil {
+			var request struct {
+				Version int      `json:"version"`
+				Files   []string `json:"files"`
+			}
+			if err = strict([]byte(manifest.Content), &request); err != nil || request.Version != 1 || len(request.Files) == 0 || len(request.Files) > 24 {
+				return nil, fmt.Errorf("manifeste de contexte de revue invalide : %s", manifestName)
+			}
+			files = append(files, request.Files...)
 		}
-		if err = strict([]byte(manifest.Content), &request); err != nil || request.Version != 1 || len(request.Files) == 0 || len(request.Files) > 24 {
-			return nil, fmt.Errorf("manifeste de contexte de revue invalide : %s", manifestName)
+		if task.Delivery != nil {
+			for _, criterion := range task.Delivery.Criteria {
+				for _, name := range criterion.Evidence {
+					// The task report is already supplied in full in Tasks.Report.
+					if name != task.Binding.Report {
+						files = append(files, name)
+					}
+				}
+			}
 		}
-		for _, name := range request.Files {
+		for _, name := range files {
 			if seen[name] {
 				continue
 			}
 			if len(sources) >= 24 {
-				return nil, fmt.Errorf("contexte de revue : 24 fichiers maximum, aucun contenu tronqué")
+				return nil, &managedReviewSourceCapacityError{managedReviewSourceCountExceeded}
 			}
 			source, err := candidateReviewSource(bare, candidate, name, 96*1024)
 			if err != nil {
@@ -97,7 +122,7 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 			}
 			total += source.Bytes
 			if total > 128*1024 {
-				return nil, fmt.Errorf("sources de contexte supérieures à 128 Kio ; aucun contenu tronqué")
+				return nil, &managedReviewSourceCapacityError{managedReviewSourceBytesExceeded}
 			}
 			seen[name] = true
 			sources = append(sources, source)

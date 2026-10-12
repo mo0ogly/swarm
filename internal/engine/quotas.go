@@ -4,13 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 )
 
 type QuotaValues struct {
-	Planning  int  `json:"planning_activations"`
-	Decisions int  `json:"planning_decisions"`
-	Reviews   *int `json:"review_calls"`
+	Scopes      *int `json:"planning_scopes,omitempty"`
+	Depth       *int `json:"delegation_depth,omitempty"`
+	Tasks       *int `json:"planning_tasks,omitempty"`
+	JudgeCycles *int `json:"judge_cycles,omitempty"`
+	Planning    int  `json:"planning_activations"`
+	Decisions   int  `json:"planning_decisions"`
+	Reviews     *int `json:"review_calls"`
 }
 type QuotaAuthorization struct {
 	BeforeScopes map[string]int `json:"before_scope_activations,omitempty"`
@@ -30,6 +35,7 @@ type QuotaChange struct {
 	Reason           string         `json:"reason"`
 }
 type QuotaView struct {
+	Bounds        QuotaValues         `json:"bounds"`
 	Revision      int                 `json:"revision"`
 	Limits        QuotaValues         `json:"limits"`
 	Consumed      QuotaValues         `json:"consumed"`
@@ -41,10 +47,18 @@ type QuotaView struct {
 func quotaValues(p *PlanningState) (QuotaValues, QuotaValues) {
 	limits := QuotaValues{Planning: p.MaxActivations, Decisions: p.MaxDecisions}
 	used := QuotaValues{Planning: p.Activations, Decisions: p.Decisions}
+	tasks := p.MaxTasks
+	limits.Tasks = &tasks
+	scopes, depth := p.MaxScopes, p.MaxDepth
+	limits.Scopes, limits.Depth = &scopes, &depth
 	if p.Reviewer != nil {
 		a, b := p.Reviewer.MaxCalls, p.Reviewer.Calls
 		limits.Reviews = &a
 		used.Reviews = &b
+	}
+	if p.Judge != nil {
+		limit, consumed := p.Judge.MaxCycles, p.Judge.Cycle
+		limits.JudgeCycles, used.JudgeCycles = &limit, &consumed
 	}
 	return limits, used
 }
@@ -53,12 +67,40 @@ func quotaView(w Work) (QuotaView, error) {
 		return QuotaView{}, fmt.Errorf("Cette mission ne dispose pas de planification hiérarchique.")
 	}
 	limits, used := quotaValues(w.Planning)
+	count := len(w.Tasks)
+	used.Tasks = &count
+	scopeCount := len(w.Planning.Scopes)
+	depth := 0
+	for _, scope := range w.Planning.Scopes {
+		ancestors := planningAncestors(w.Planning, scope.ID)
+		if len(ancestors) == 0 {
+			return QuotaView{}, fmt.Errorf("hiérarchie invalide ; aucun budget déduit")
+		}
+		depth = max(depth, len(ancestors))
+	}
+	used.Scopes, used.Depth = &scopeCount, &depth
+	availableTasks := max(0, *limits.Tasks-count)
 	remaining := QuotaValues{Planning: max(0, limits.Planning-used.Planning), Decisions: max(0, limits.Decisions-used.Decisions)}
+	remaining.Tasks = &availableTasks
+	if *limits.Scopes > 0 {
+		n := max(0, *limits.Scopes-scopeCount)
+		remaining.Scopes = &n
+	}
+	if *limits.Depth > 0 {
+		n := max(0, *limits.Depth-depth)
+		remaining.Depth = &n
+	}
 	if limits.Reviews != nil {
 		n := max(0, *limits.Reviews-*used.Reviews)
 		remaining.Reviews = &n
 	}
-	return QuotaView{Revision: w.Revision, Limits: limits, Consumed: used, Remaining: remaining, Authorization: w.Planning.QuotaAuthorization, Scopes: append([]PlanningScope(nil), w.Planning.Scopes...)}, nil
+	if limits.JudgeCycles != nil && *limits.JudgeCycles > 0 {
+		n := max(0, *limits.JudgeCycles-*used.JudgeCycles)
+		remaining.JudgeCycles = &n
+	}
+	// Zero/null bounds mean no additional policy ceiling in the executable.
+	// Explicit persisted budgets and current consumption remain authoritative.
+	return QuotaView{Bounds: QuotaValues{}, Revision: w.Revision, Limits: limits, Consumed: used, Remaining: remaining, Authorization: w.Planning.QuotaAuthorization, Scopes: append([]PlanningScope(nil), w.Planning.Scopes...)}, nil
 }
 func applyQuotaChange(w *Work, r QuotaChange) error {
 	if r.Schema != 1 || r.Revision < 1 {
@@ -71,14 +113,33 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 	if p == nil {
 		return fmt.Errorf("Cette mission ne dispose pas de planification hiérarchique.")
 	}
-	if r.Limits.Planning < max(1, p.Activations) || r.Limits.Planning > 200 || r.Limits.Decisions < max(1, p.Decisions) || r.Limits.Decisions > 100 {
-		return fmt.Errorf("Plafonds incompatibles avec la consommation : planification 1–200, décisions 1–100.")
+	if r.Limits.Planning < max(1, p.Activations) || r.Limits.Decisions < max(1, p.Decisions) {
+		return fmt.Errorf("Plafonds de planification incompatibles avec la consommation actuelle.")
+	}
+	if r.Limits.Tasks != nil && *r.Limits.Tasks < max(1, len(w.Tasks)) {
+		return fmt.Errorf("Plafond de tâches inférieur au nombre de tâches existantes.")
+	}
+	view, err := quotaView(*w)
+	if err != nil {
+		return err
+	}
+	if r.Limits.Scopes != nil && (*r.Limits.Scopes < 0 || (*r.Limits.Scopes > 0 && *r.Limits.Scopes < *view.Consumed.Scopes)) {
+		return fmt.Errorf("Plafond de périmètres inférieur à la hiérarchie existante.")
+	}
+	if r.Limits.Depth != nil && (*r.Limits.Depth < 0 || (*r.Limits.Depth > 0 && *r.Limits.Depth < *view.Consumed.Depth)) {
+		return fmt.Errorf("Profondeur configurée inférieure à la hiérarchie existante.")
 	}
 	if p.Reviewer == nil && r.Limits.Reviews != nil {
 		return fmt.Errorf("Aucun vérificateur configuré ; configurez son identité avant son budget.")
 	}
-	if p.Reviewer != nil && (r.Limits.Reviews == nil || *r.Limits.Reviews < max(1, p.Reviewer.Calls) || *r.Limits.Reviews > 100) {
-		return fmt.Errorf("Plafond de vérification requis entre la consommation actuelle (au moins 1) et 100.")
+	if p.Reviewer != nil && (r.Limits.Reviews == nil || *r.Limits.Reviews < max(1, p.Reviewer.Calls)) {
+		return fmt.Errorf("Plafond de vérification au moins égal à la consommation actuelle requis.")
+	}
+	if r.Limits.JudgeCycles != nil {
+		limit := *r.Limits.JudgeCycles
+		if p.Judge == nil || limit < 0 || (limit > 0 && limit < p.Judge.Cycle) {
+			return fmt.Errorf("Plafond de cycles du juge invalide : juge configuré requis, 0 sans plafond ou valeur au moins égale à la consommation actuelle.")
+		}
 	}
 	for _, scope := range p.Scopes {
 		if scope.Holder != "" {
@@ -127,8 +188,20 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 	before, _ := quotaValues(p)
 	p.MaxActivations = r.Limits.Planning
 	p.MaxDecisions = r.Limits.Decisions
+	if r.Limits.Tasks != nil {
+		p.MaxTasks = *r.Limits.Tasks
+	}
+	if r.Limits.Scopes != nil {
+		p.MaxScopes = *r.Limits.Scopes
+	}
+	if r.Limits.Depth != nil {
+		p.MaxDepth = *r.Limits.Depth
+	}
 	if p.Reviewer != nil {
 		p.Reviewer.MaxCalls = *r.Limits.Reviews
+	}
+	if r.Limits.JudgeCycles != nil {
+		p.Judge.MaxCycles = *r.Limits.JudgeCycles
 	}
 	after, _ := quotaValues(p)
 	for id, limit := range r.ScopeActivations {
@@ -139,6 +212,26 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 	// Failures, pauses, counters and unlisted sub-scope allocations are preserved.
 	// Explicit per-scope changes are audited; increasing a cap is not acceptance.
 	return nil
+}
+
+func (s *Store) registerQuotas(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
+	mux.HandleFunc("/api/v1/quotas", func(out http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(out, "GET requis", http.StatusMethodNotAllowed)
+			return
+		}
+		w, err := s.get(r.URL.Query().Get("work"))
+		if err != nil {
+			fail(out, err)
+			return
+		}
+		view, err := quotaView(w)
+		if err != nil {
+			fail(out, err)
+			return
+		}
+		send(out, view)
+	})
 }
 func (s *Store) previewQuotas(work string, r QuotaChange) (any, error) {
 	w, err := s.get(work)

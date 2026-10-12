@@ -24,6 +24,21 @@ type managedPreflightRetry struct {
 // Never create a producer, rerun checks, replace a candidate or synthesize an
 // opinion here. The conductor revalidates the retained candidate afterward.
 func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflightRetry, error) {
+	return s.readManagedPreflight(work, task, false, false)
+}
+
+// Scope inventory is an attributed read, never a text-review authorization.
+func (s *Store) readManagedScopeEvidence(work, task string) (*managedPreflightRetry, error) {
+	return s.readManagedPreflight(work, task, false, true)
+}
+
+// Correction may inspect a verified checkpoint whose source capacity was
+// refused. Ordinary review retries still require the complete bounded context.
+func (s *Store) readManagedPreflightCorrectionEvidence(work, task string) (*managedPreflightRetry, error) {
+	return s.readManagedPreflight(work, task, true, true)
+}
+
+func (s *Store) readManagedPreflight(work, task string, allowSourceCapacity, allowBinary bool) (*managedPreflightRetry, error) {
 	w, e := s.get(work)
 	if e != nil {
 		return nil, e
@@ -32,7 +47,7 @@ func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflig
 	if e != nil {
 		return nil, e
 	}
-	if w.Planning == nil || w.Planning.Repository == nil || w.Planning.Reviewer == nil || t.Status != "blocked" || t.IndependentReview != nil || t.BatchReviewResume != nil || len(t.Attempts) == 0 {
+	if w.Planning == nil || w.Planning.Repository == nil || w.Planning.Reviewer == nil || t.Status != "blocked" || (t.IndependentReview != nil && !priorAttemptReview(t)) || t.BatchReviewResume != nil || len(t.Attempts) == 0 {
 		return nil, fmt.Errorf("aucun précontrôle de revue impayé à reprendre")
 	}
 	agents, e := s.agents(work)
@@ -61,7 +76,7 @@ func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflig
 	// Historical cumulative file-count failures spent no review call either.
 	// Rebuild the complete immutable context below; never bypass its bounds.
 	historicalPlanRefusal := strings.HasPrefix(item.Detail, "base de revue non vérifiée : ") && strings.HasSuffix(item.Detail, " : plan ou méthode des lots modifié")
-	sizeRefusal := strings.HasPrefix(item.Detail, managedScopeRefusal+" : ") || item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ") || item.Detail == "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"
+	sizeRefusal := strings.HasPrefix(item.Detail, managedScopeRefusal+" : ") || item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ") || item.Detail == managedReviewSourceCountExceeded || item.Detail == managedReviewSourceBytesExceeded
 	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !(sizeRefusal || historicalPlanRefusal || item.Detail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != item.Detail {
 		return nil, fmt.Errorf("aucun refus de taille attribuable au résultat courant")
 	}
@@ -98,8 +113,8 @@ func (s *Store) readManagedPreflightEvidence(work, task string) (*managedPreflig
 	if saved.Agent != a.ID || saved.Attempt != a.Attempt || saved.Base != item.Base || saved.Previous != cp.Previous || saved.Candidate != cp.Candidate || string(actual) != string(expected) {
 		return nil, fmt.Errorf("reçu de précontrôle différent du candidat conservé")
 	}
-	c, e := s.managedReviewContext(w, a, cp.Candidate, receipt)
-	if e != nil {
+	c, e := s.managedReviewContextForInspection(w, a, cp.Candidate, receipt, allowBinary)
+	if e != nil && !(allowSourceCapacity && managedReviewSourceCapacityRefusal(e) && e.Error() == item.Detail) {
 		return nil, e
 	}
 	return &managedPreflightRetry{Revision: w.Revision, Agent: a, Item: item, Work: w, Context: c}, nil
@@ -165,7 +180,7 @@ func (s *Store) previewManagedFragments(work, task string) (managedReviewFragmen
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
 	}
-	if r := t.IndependentReview; r != nil && r.FragmentJournal != nil {
+	if r := t.IndependentReview; r != nil && !priorAttemptReview(t) && r.FragmentJournal != nil {
 		if err = s.managedBatchPlanIntact(w, *r); err != nil {
 			return managedReviewFragmentPlan{}, err
 		}

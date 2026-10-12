@@ -3,6 +3,7 @@
 
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 
@@ -61,4 +62,15 @@ if __name__ == "__main__":
         print(f"ERROR: {failure}", file=sys.stderr)
     if failures:
         sys.exit(1)
-    print(f"OK: {len(SKILLS)} shared Claude/Codex skills, preparation commands and contract")
+    # Valid individual files do not prove that their combined role context fits.
+    # Exercise the engine's actual embedded assembly, without a provider call or
+    # a second implementation of its capacities/framing in this Python checker.
+    result = subprocess.run(
+        ["go", "test", "./internal/engine", "-run",
+         "^TestAgentWorkflowRolesAreBounded$", "-count=1", "-timeout", "30s"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    if result.returncode:
+        print(result.stdout + result.stderr, file=sys.stderr, end="")
+        sys.exit(result.returncode)
+    print(f"OK: {len(SKILLS)} shared Claude/Codex skills, preparation commands, contract and engine-built role contexts")

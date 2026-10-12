@@ -40,3 +40,8 @@ node_modules/
 **/[Ii]nstallation_[Ss]kynet*.pdf
 **/*[Ss][Kk][Yy][Nn][Ee][Tt]*.docx
 **/*[Ss][Kk][Yy][Nn][Ee][Tt]*.pdf
+
+# Full Git recovery archives stay local; sources and bounded evidence are saved.
+/docs/plans/engine-cursor-contract/recovery/*.bundle
+/docs/plans/engine-cursor-contract/recovery/T3-native-base-cumulative-20261012.patch
+/docs/publications/20261005-cursor-moteur/dossier-recherche/revisions/evidence/instruction-learning-retex-20261011/T3-native-source-recovery-20261012/T3-native-base-cumulative-20261012.patch

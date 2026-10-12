@@ -71,7 +71,7 @@ func TestLoopGuardBuildsDiagnosticFromProviderEvents(t *testing.T) {
 		g.observe(map[string]any{"type": "item.completed", "item": map[string]any{"type": "command_execution", "id": id, "status": "failed", "exit_code": float64(1), "error": "operation not permitted"}}, time.Now())
 	}
 	d := g.diagnostic("agent-stream", "attempt-stream", "")
-	if d.ObservedErrors != 3 || !d.LimitReached || !strings.Contains(d.Summary, "3 erreurs d’outil observées") {
+	if d.ObservedErrors != 3 || d.LimitReached || !strings.Contains(d.Summary, "3 erreurs d’outil observées") {
 		t.Fatalf("événements fournisseur non diagnostiqués : %+v", d)
 	}
 	for _, item := range d.Items {

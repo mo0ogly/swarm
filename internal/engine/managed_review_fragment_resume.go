@@ -54,7 +54,7 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 			anchor.ResumeCalls = append(anchor.ResumeCalls, entry.CallID)
 		case "interrupted":
 			anchor.ResumeCalls = append(anchor.ResumeCalls, entry.CallID)
-		case "inspected", "unknown":
+		case "inspected", "unknown", "changes_requested":
 		default:
 			return fmt.Errorf("avis de fragment défavorable ou inconnu : correction des preuves requise")
 		}
@@ -77,6 +77,7 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 	}
 	r.FragmentJournal = &anchor
 	r.State = "queued"
+	r.FailureCode = ""
 	r.Finished = ""
 	r.Reason = "Reprise explicite des inspections manquantes ; preuves et appels consommés conservés."
 	task.IndependentReview = &r
@@ -172,6 +173,7 @@ func (s *Store) queueManagedFragmentFinalResume(w Work, task *Task, r Independen
 	}
 	r.FragmentJournal = &anchor
 	r.State = "queued"
+	r.FailureCode = ""
 	r.Finished = ""
 	r.Reason = "Reprise finale explicite ; inspections et dépenses conservées."
 	task.IndependentReview = &r

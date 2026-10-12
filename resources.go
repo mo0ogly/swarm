@@ -42,3 +42,6 @@ var PreparationTimeout []byte
 
 //go:embed config/provider-wait.json
 var ProviderWait []byte
+
+//go:embed config/web-requests.json
+var WebRequests []byte

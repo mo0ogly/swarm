@@ -22,7 +22,7 @@ func TestFragmentDiagnosticNeverAcceptsOrRepeatsCall(t *testing.T) {
 		t.Fatal(e)
 	}
 	state, _, e := s.runManagedFragmentReview(w, a, r)
-	if e == nil || state != "changes_requested" {
+	if e != nil || state != "changes_requested" {
 		t.Fatal(state, e)
 	}
 	w, e = s.get(w.ID)

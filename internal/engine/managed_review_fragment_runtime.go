@@ -113,21 +113,26 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 					authorized = true
 				}
 			}
-			if entry.State == "reserved" || (entry.State == "interrupted" && !authorized) || entry.State == "changes_requested" {
+			if entry.State == "reserved" || (entry.State == "interrupted" && !authorized) {
 				return entry.State, nil, fmt.Errorf("inspection inachevée ; reprise explicite requise")
 			}
 		}
-		prompt, e := managedFragmentInspectionPrompt(prefix, packet)
+		callPrefix, e := managedReviewRecoveryPrefix(prefix, r.FragmentJournal.RetryDirective)
 		if e != nil {
 			return "", nil, e
 		}
-		prompt += s.fragmentRetryFeedback(r, j, packet)
+		// Keep the packet as the final JSON value, including during diagnostics.
+		callPrefix += s.fragmentRetryFeedback(r, j, packet)
+		prompt, e := managedFragmentInspectionPrompt(callPrefix, packet)
+		if e != nil {
+			return "", nil, e
+		}
 		if err := fragmentInputFits(packet.InputBudget, prompt, managedFragmentPacketSchema(packet)); err != nil {
 			return "", nil, fmt.Errorf("paquet et diagnostic de reprise dépassent la limite ; aucun appel réservé")
 		}
 		raw, _ := json.Marshal(packet)
 		id := newID("fragment-call-")
-		j.Entries = append(j.Entries, managedFragmentJournalEntry{Packet: i, PacketDigest: hash(raw), CallID: id, State: "reserved"})
+		j.Entries = append(j.Entries, managedFragmentJournalEntry{Packet: i, PacketDigest: hash(raw), CallID: id, State: "reserved", RetryDirective: r.FragmentJournal.RetryDirective, PromptDigest: hash([]byte(prompt))})
 		if e = s.commitFragmentJournal(w.ID, a, r.ID, r.FragmentJournal.JournalDigest, id+"-reserve", j); e != nil {
 			return "", nil, e
 		}
@@ -156,7 +161,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if callErr != nil {
 			return "error", nil, callErr
 		}
-		if state != "inspected" && state != "unknown" {
+		if state != "inspected" && state != "unknown" && state != "changes_requested" {
 			return state, nil, fmt.Errorf("inspection %d : %s", i+1, state)
 		}
 	}
@@ -196,10 +201,14 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 			return state, nil, fmt.Errorf("appel final inachevé ; reprise explicite requise")
 		}
 		phase, schema := "selection", managedFragmentRequestSchema
+		callPrefix, prefixErr := managedReviewRecoveryPrefix(prefix, r.FragmentJournal.RetryDirective)
+		if prefixErr != nil {
+			return "", nil, prefixErr
+		}
 		var prompt string
 		var visible managedReviewContext
 		if state == "pending" {
-			prompt, e = managedFragmentRequestPrompt(prefix, c, p, replies)
+			prompt, e = managedFragmentRequestPromptVersion(callPrefix, c, p, replies, f.Version)
 		} else {
 			phase = "decision"
 			bundle, bundleErr := managedFragmentFinalBundle(c, p, replies)
@@ -213,17 +222,17 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 					selectionReply = prior.Reply
 				}
 			}
-			selection, parseErr := parseManagedFragmentFinalRequest(selectionReply, prefix, c, p, replies)
+			selection, parseErr := parseManagedFragmentFinalRequest(selectionReply, callPrefix, c, p, replies)
 			if parseErr != nil {
 				return "", nil, parseErr
 			}
-			prompt, visible, e = managedFragmentDecisionPrompt(prefix, c, p, replies, selection.References)
+			prompt, visible, e = managedFragmentDecisionPrompt(callPrefix, c, p, replies, selection.References)
 		}
 		if e != nil {
 			return "", nil, e
 		}
 		id := newID("fragment-final-")
-		f.Calls = append(f.Calls, managedFragmentFinalCall{Phase: phase, CallID: id, PromptDigest: hash([]byte(prompt)), State: "reserved"})
+		f.Calls = append(f.Calls, managedFragmentFinalCall{Phase: phase, CallID: id, PromptDigest: hash([]byte(prompt)), State: "reserved", RetryDirective: r.FragmentJournal.RetryDirective})
 		if e = s.commitManagedFragmentFinal(w.ID, a, r.ID, r.FragmentJournal.JournalDigest, r.FragmentJournal.FinalJournalDigest, id+"-reserve", f); e != nil {
 			return "", nil, e
 		}
@@ -237,7 +246,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		}
 		if callErr == nil {
 			if phase == "selection" {
-				request, parseErr := parseManagedFragmentFinalRequest(reply, prefix, c, p, replies)
+				request, parseErr := parseManagedFragmentFinalRequest(reply, callPrefix, c, p, replies)
 				callErr = parseErr
 				returned = request.State
 			} else {

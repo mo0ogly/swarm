@@ -254,7 +254,7 @@ func (w *outputSink) current() string {
 	if w.guard != nil {
 		output, _, _ := w.guard.monitoring(time.Now())
 		if output == "silent" {
-			return "Silence fournisseur observé ; vitalité indéterminée ; attente bornée par la durée totale"
+			return "Silence fournisseur observé ; vitalité indéterminée ; décision du responsable requise"
 		}
 	}
 	return w.activity
@@ -406,7 +406,7 @@ func (s *Store) supervise(id string) error {
 	go func() { done <- cmd.Wait() }()
 	tick := time.NewTicker(time.Second)
 	defer tick.Stop()
-	deadline := time.Now().Add(time.Duration(a.Timeout) * time.Second)
+	runStarted := time.Now()
 	stopping := false
 	forced := false
 	var stopAt time.Time
@@ -445,6 +445,13 @@ func (s *Store) supervise(id string) error {
 				}
 			}
 			if !stopping {
+				if decision, err := s.runStopRequest(a); err != nil {
+					e = err
+				} else if decision != "" {
+					stopping, reason, a.StopKind = true, decision, "planning"
+				}
+			}
+			if !stopping {
 				if limitReason := sink.guardReason(); limitReason != "" {
 					stopping = true
 					reason = limitReason
@@ -458,6 +465,7 @@ func (s *Store) supervise(id string) error {
 				stopping = true
 			}
 			a.Progress = sink.progress()
+			observeRunTime(&a, runStarted, time.Now())
 			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt, reason)
 			a.Usage = sink.usageSnapshot()
 			a.ReportedModel = sink.reportedModelSnapshot()
@@ -488,9 +496,7 @@ func (s *Store) supervise(id string) error {
 			if reason := sink.guardReason(); reason != "" {
 				requestStop(reason, "garde")
 			}
-			if !limits.observing() && time.Now().After(deadline) {
-				requestStop("Budget de temps atteint", "delai")
-			}
+
 			if stopping && time.Since(stopAt) > 3*time.Second && !forced {
 				forced = true
 				_ = syscall.Kill(-a.Child, syscall.SIGKILL)
@@ -500,6 +506,15 @@ func (s *Store) supervise(id string) error {
 				a.Activity = sink.current()
 			}
 			a.Progress = sink.progress()
+			observeRunTime(&a, runStarted, time.Now())
+			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt)
+			if !stopping {
+				if decision, err := s.observeRun(a); err != nil {
+					requestStop("Persistance de la supervision indisponible", "superviseur")
+				} else if decision != "" {
+					requestStop(decision, "planning")
+				}
+			}
 			a.Diagnostic = sink.diagnostic(a.ID, a.Attempt)
 			a.Usage = sink.usageSnapshot()
 			a.ReportedModel = sink.reportedModelSnapshot()

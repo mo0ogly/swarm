@@ -25,6 +25,30 @@ func TestManagedFragmentFinishRequiresDurableDecision(t *testing.T) {
 		t.Fatal("premature completion or charge")
 	}
 }
+
+func TestManagedFragmentFinishPersistsProtocolFailureCode(t *testing.T) {
+	s, w, a, c, path, receipt := fragmentBeginFixture(t)
+	r, err := s.beginManagedFragmentReview(w, a, c, path, receipt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.finishManagedFragmentReview(w.ID, a, r.ID, &CommandError{Code: reviewFragmentProtocolError, Message: "inspection de fragment : invalid fixture quote"}); err == nil {
+		t.Fatal("protocol failure accepted")
+	}
+	after, err := s.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := after.task(a.TaskID)
+	if task.IndependentReview.State != "error" || task.IndependentReview.FailureCode != reviewFragmentProtocolError || task.Status == "accepted" || after.Planning.Reviewer.Calls != w.Planning.Reviewer.Calls {
+		t.Fatal("protocol error lost its attribution or accepted the candidate")
+	}
+	routes := planningReviewFailureRouting(after, after.Planning.Inbox)
+	inventory := s.planningReviewEvidence(after, after.Planning.Inbox)
+	if routes[task.ID].Review != r.ID || inventory[task.ID].Review != r.ID || task.IndependentReview.ResultEvent == r.ID || task.IndependentReview.ResultEvent == "" {
+		t.Fatal("actual fragment result event did not deliver routing and inventory", routes, inventory)
+	}
+}
 func TestManagedFragmentSaveRejectsStaleJournalAnchor(t *testing.T) {
 	s, w, a, c, path, receipt := fragmentBeginFixture(t)
 	r, err := s.beginManagedFragmentReview(w, a, c, path, receipt)
@@ -55,9 +79,13 @@ func TestManagedFragmentRefusalRequiresOriginalProof(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, runErr := s.runManagedFragmentReview(w, a, r)
-	if runErr == nil {
-		t.Fatal("missing refusal")
+	plan, _, err := s.readFragmentJournalAnchor(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state, _, runErr := s.runManagedFragmentReview(w, a, r)
+	if runErr != nil || state != "changes_requested" {
+		t.Fatal("missing final independent refusal", state, runErr)
 	}
 	w, err = s.get(w.ID)
 	if err != nil {
@@ -69,8 +97,8 @@ func TestManagedFragmentRefusalRequiresOriginalProof(t *testing.T) {
 	if err != nil || reason == "" {
 		t.Fatal(reason, err)
 	}
-	if !strings.Contains(reason, "Reproduction :") || !strings.Contains(reason, "Attendu :") || managedReviewCalls(t, s) != 1 {
-		t.Fatal("actionable refusal required an extra provider call", reason)
+	if !strings.Contains(reason, "Reproduction :") || !strings.Contains(reason, "Attendu :") || managedReviewCalls(t, s) != len(plan.Packets)+2 {
+		t.Fatal("final refusal lacks complete inspections/selection/decision", reason)
 	}
 	// The legacy error label is not authority; original proof remains necessary.
 	r.State = "error"

@@ -129,13 +129,13 @@ func TestSupervisorSuccessIsNotAcceptance(t *testing.T) {
 		t.Fatal("stdout not logged")
 	}
 }
-func TestStopAndTimeoutConfirmExit(t *testing.T) {
-	for _, mode := range []string{"stop", "timeout"} {
+func TestStopAfterTimeObservationConfirmsExit(t *testing.T) {
+	for _, mode := range []string{"stop", "observation"} {
 		t.Run(mode, func(t *testing.T) {
 			s := storeTest(t)
 			w, r := setupAgent(t, s)
 			r.Instruction = "TEST_SLEEP"
-			if mode == "timeout" {
+			if mode == "observation" {
 				r.Timeout = 1
 			}
 			a, _, e := s.prepare(w.ID, r)
@@ -145,10 +145,15 @@ func TestStopAndTimeoutConfirmExit(t *testing.T) {
 			done := make(chan error, 1)
 			go func() { done <- s.supervise(a.ID) }()
 			waitAgent(t, s, a.ID, func(a Agent) bool { return a.Status == "running" })
-			if mode == "stop" {
-				if e = s.stopAgent(a.ID); e != nil {
-					t.Fatal(e)
+			if mode == "observation" {
+				current := waitAgent(t, s, a.ID, func(current Agent) bool { return current.Progress.TimeThresholdExceeded || !activeAgent(current) })
+				if current.Status != "running" {
+					_ = s.stopAgent(a.ID)
+					t.Fatalf("duration stopped process: %s", current.Status)
 				}
+			}
+			if e = s.stopAgent(a.ID); e != nil {
+				t.Fatal(e)
 			}
 			select {
 			case e = <-done:

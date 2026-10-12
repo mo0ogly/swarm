@@ -13,7 +13,7 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 		return s.managedBundle(pos[2], pos[3])
 	}
 	if len(pos) != 3 {
-		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|restart-task|authorize-recovery|requalify|recovery-preview|fragment-preview|scope-preview|scope-patch|review-cost|review-dossier|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|pause|resume WORK [--input requête.json]")
+		return fmt.Errorf("usage : planning show|enable|claim|decide|handoff|step|configure-reviewer|review-timeout|extend-attempt|restart-task|authorize-recovery|requalify|recovery-preview|fragment-preview|scope-preview|scope-patch|review-cost|review-dossier|submit-recovered-result|retry-review|diagnose-review|retry-integration|review-step|reject-instructions|pause|resume|judge|renew WORK [--input requête.json]")
 	}
 	if pos[1] == "review-step" {
 		return s.independentReviewStep(pos[2])
@@ -27,6 +27,13 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 			return e
 		}
 		return printJSON(out, v)
+	}
+	if pos[1] == "post-delivery" {
+		w, e := s.get(pos[2])
+		if e != nil {
+			return e
+		}
+		return printJSON(out, s.postDelivery(&w))
 	}
 	if pos[1] == "show" {
 		w, err := s.get(pos[2])
@@ -101,6 +108,30 @@ func (s *Store) planningCLI(pos []string, input string, out io.Writer) error {
 func (s *Store) registerPlanning(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
 	s.registerPlanningBundle(mux, fail)
 	s.registerManagedCleanup(mux, send, fail)
+	mux.HandleFunc("/api/v1/retex-evolution", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		v, e := s.retexEvolution(r.URL.Query().Get("work"), r.URL.Query().Get("retex"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
+	mux.HandleFunc("/api/v1/control-diagnostic", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "GET requis", 405)
+			return
+		}
+		v, e := s.managedControlDiagnostic(r.URL.Query().Get("work"), r.URL.Query().Get("task"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, v)
+	})
 	mux.HandleFunc("/api/v1/planning-history", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "GET requis", 405)

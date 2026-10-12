@@ -31,6 +31,7 @@ func agentWorkflow(role string) (AgentWorkflow, string, error) {
 	case "worker":
 		w.Methods = []string{"apex", "audit-pdca", "verify-fix", "debug", "product-delivery"}
 		boundary = "DO et CHECK du PDCA : réaliser uniquement la tâche confiée, puis vérifier son effet avec les outils autorisés. Si la tâche demande seulement un audit, rester en lecture seule. Si elle autorise une correction, corriger dans son périmètre et rejouer les contrôles. Rapporter les preuves et limites au responsable ; aucune délégation, acceptation, modification de plan ou hausse de budget implicite. Ces contrôles personnels ne sont pas la revue indépendante."
+		boundary += " Corriger le contrat général en défaut, sans exception liée à une mission, un identifiant, une date ou un texte d'erreur. Conserver le contre-exemple comme garde de régression avec variantes et entrées invalides. Une mesure provisoire reste provisoire ; une correction durable exige non-régression, réception, décision, application et effet observé. Transmettre l'apprentissage au superviseur pour les consignes suivantes."
 	case "reviewer":
 		w.Methods = []string{"audit-pdca", "code-reviewer", "product-review"}
 		boundary = "CHECK indépendant du PDCA : examiner seulement les éléments fournis, sans outils ni modification du candidat. Aucune commande, recherche de fichier ou test à exécuter, même si une méthode générale le suggère. Une preuve manquante reste inconnue. Proposer les corrections au responsable pour ACT ; ne pas les exécuter, relancer un agent ou accepter la tâche."
@@ -54,7 +55,14 @@ func agentWorkflow(role string) (AgentWorkflow, string, error) {
 		}
 		fmt.Fprintf(&body, "\nSOURCE %s\n%s\n", path, data)
 	}
-	body.WriteString("\nFIN DES MÉTHODES — rappel des limites du rôle : " + boundary + "\n")
+	closingBoundary := boundary
+	if role == "worker" {
+		// The complete boundary already precedes the task-independent methods.
+		// Keep the final reminder concise so required handoff evidence fits,
+		// without truncating guidance or increasing the technical frame bound.
+		closingBoundary = "Tâche confiée et outils autorisés seulement ; remettre preuves et limites au responsable. Aucun droit de délégation, acceptation ou hausse de budget implicite."
+	}
+	body.WriteString("\nFIN DES MÉTHODES — rappel des limites du rôle : " + closingBoundary + "\n")
 	if body.Len() > 32000 {
 		return w, "", fmt.Errorf("cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué")
 	}

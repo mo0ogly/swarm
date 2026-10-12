@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // Publication is the SQLite candidate pointer to an immutable Git commit.
@@ -20,8 +19,8 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		return err
 	}
 	if !acquired {
-		return nil
-	} // Retained result; conductor retries without another worker or paid call.
+		return s.stageManagedResult(a)
+	} // Freeze the sibling result; checks and review await the publication lane.
 	defer releasePublication()
 	unlock, err := managedLock(s.root, a.WorkID)
 	if err != nil {
@@ -39,46 +38,8 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		return err
 	}
 	defer releaseAttempt()
-	item, err := s.managedAttempt(a.ID)
-	if err != nil {
-		return err
-	}
-	if item.State == "conflict" && item.Detail != managedReviewContextTooLarge {
-		return s.managedFailure(a, item.Detail)
-	}
-	if item.State == "integrated" {
-		return nil
-	}
-	w, err := s.get(a.WorkID)
-	if err != nil {
-		return err
-	}
-	t, err := w.task(a.TaskID)
-	if err != nil {
-		return err
-	}
-	if err = historicalRequalificationGuard(w, t, a); err != nil {
-		return s.managedFailure(a, err.Error())
-	}
-	if err = integrationRetryGuard(w, t, a, item); err != nil {
-		return s.managedFailure(a, err.Error())
-	}
-	// An explicit replay may resume an unpaid preflight, or finish publication
-	// after a persisted pass. reviewManagedCandidate rechecks every binding and
-	// proof before reusing a pass; it never makes a second paid call in that case.
-	if item.State == "conflict" && (!recoveredResultMatches(t, a, item) || (t.IndependentReview != nil && t.IndependentReview.Attempt == a.Attempt && t.IndependentReview.State != "passed")) {
-		return s.managedFailure(a, item.Detail)
-	}
-	if !currentTaskAttempt(t, a.Attempt) || (a.Status != "completed" && !recoveredResultMatches(t, a, item)) {
-		return fmt.Errorf("tentative non intégrable")
-	}
-	if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
-		return fmt.Errorf("intégration suspendue : %s", reason)
-	}
-	if t.ValidationPolicy == nil || t.ValidationPolicy.Mode != "automatic" {
-		return s.managedFailure(a, "Contrôles non autorisés pour cette tâche ; aucune validation supposée")
-	}
-	if err = validationPolicyCoversTask(*t.ValidationPolicy, t); err != nil {
+	w, t, item, proceed, err := s.managedIntegrationInput(a)
+	if err != nil || !proceed {
 		return err
 	}
 	repo, err := s.managedRepository(w)
@@ -86,56 +47,9 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		return err
 	}
 	bare := filepath.Join(repo.Storage, "repository.git")
-	reportName := filepath.ToSlash(filepath.Join(repo.Subdir, "docs", t.ID+".md"))
-	var report []byte
-	if item.Result == "" {
-		reportPath, err := localFile(item.Path, reportName)
-		if err != nil {
-			return s.managedFailure(a, "Rapport de tentative absent : "+err.Error())
-		}
-		report, err = os.ReadFile(reportPath)
-		if err != nil || len(report) == 0 || len(report) > 1<<20 {
-			return s.managedFailure(a, "Rapport de tentative vide, illisible ou trop grand")
-		}
-		if old, e := managedGit(item.Path, "show", item.Base+":"+reportName); e == nil && hash([]byte(old)) == hash([]byte(strings.TrimSpace(string(report)))) {
-			return s.managedFailure(a, "Rapport identique à la base ; nouvelle preuve de tentative requise")
-		}
-		if _, err = managedGit(item.Path, "add", "-A", "--", "."); err != nil {
-			return err
-		}
-		tree, err := managedGit(item.Path, "write-tree")
-		if err != nil {
-			return err
-		}
-		result, err := managedGit(item.Path, "commit-tree", tree, "-p", item.Base, "-m", "Résultat "+a.ID)
-		if err != nil {
-			return err
-		}
-		if _, err = managedGit(bare, "fetch", "--no-tags", item.Path, result); err != nil {
-			return err
-		}
-		if _, err = managedGit(bare, "update-ref", "refs/swarm/attempts/"+a.ID, result); err != nil {
-			return err
-		}
-		if _, err = s.db.Exec("UPDATE managed_attempts SET state='integrating',result_commit=? WHERE agent_id=?", result, a.ID); err != nil {
-			return err
-		}
-		item.Result = result
-		if committed, e := managedGit(bare, "show", result+":"+reportName); e != nil || committed != strings.TrimSpace(string(report)) {
-			return s.managedFailure(a, "Rapport absent de la révision Git ; vérifier les fichiers ignorés")
-		}
-	} else {
-		// A prior pass already committed and verified this report into the bare
-		// repository (state left "integrating", e.g. after a crash before the
-		// merge/checks completed). Trust that managed copy instead of
-		// re-deriving from the ephemeral attempt workspace, which can churn
-		// between retries: past this point, any failure is a real integration
-		// failure, never a spurious "report missing".
-		committed, e := managedGit(bare, "show", item.Result+":"+reportName)
-		if e != nil {
-			return s.managedFailure(a, "Intégration échouée : révision "+item.Result+" absente de la copie gérée ("+e.Error()+")")
-		}
-		report = []byte(committed)
+	item, report, err := s.retainManagedResult(a, t, item, repo)
+	if err != nil {
+		return err
 	}
 	proofDir := filepath.Join(repo.Storage, "proofs", managedProofKey(t, a))
 	if err = os.MkdirAll(proofDir, 0700); err != nil {
@@ -207,10 +121,17 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 			checks := []map[string]any{}
 			observations := []map[string]any{}
 			for _, control := range controls {
-				checks = append(checks, map[string]any{"id": control.ID, "domain": "automation", "mandatory": true, "gate": "delivery", "penalty": 100, "max_penalty": 100, "severity": "major"})
+				phase := "delivery" // Legacy tasks have no imported plan phases.
+				if configured, ok := target.PlanChecks[control.ID]; ok {
+					phase = configured
+				}
+				checks = append(checks, map[string]any{"id": control.ID, "domain": "automation", "mandatory": true, "gate": phase, "penalty": 100, "max_penalty": 100, "severity": "major"})
 				observations = append(observations, map[string]any{"id": control.ID, "status": "PASS", "count": 0, "evidence": []string{filepath.ToSlash(relReceipt), filepath.ToSlash(relReport)}})
 			}
 			doc, _ := json.Marshal(map[string]any{"method_version": "2", "scope_id": id, "artifacts": artifacts, "domains": map[string]int{"automation": 1}, "checks": checks, "results": observations})
+			if e = requiredPlanChecks(target, doc); e != nil {
+				return e
+			}
 			evaluation, e := evaluate(doc, s.root, "delivery")
 			if e != nil {
 				return e
@@ -268,7 +189,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 
 // Do not ask a planner to retry between process completion and its controller verdict.
 func (s *Store) managedIntegrationPending(w Work, scope string) (bool, error) {
-	rows, e := s.db.Query("SELECT m.task_id FROM managed_attempts m JOIN agents a ON a.id=m.agent_id WHERE m.work_id=? AND m.state IN ('ready','integrating') AND a.status IN ('queued','starting','running','stopping','completed')", w.ID)
+	rows, e := s.db.Query("SELECT m.task_id FROM managed_attempts m JOIN agents a ON a.id=m.agent_id WHERE m.work_id=? AND ((m.state='integrating') OR (m.state='ready' AND a.status='completed'))", w.ID)
 	if e != nil {
 		return false, e
 	}
@@ -330,7 +251,7 @@ func (s *Store) prepareManagedCandidate(w Work, t *Task, a Agent, item ManagedAt
 			if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
 				return "", nil, fmt.Errorf("contrôles suspendus : %s", reason)
 			}
-			result, output, outputBytes := runValidationControlCaptured(filepath.Join(candidateDir, repo.Subdir), control)
+			result, output, outputBytes := s.runConfiguredValidationControl(w.ID, filepath.Join(candidateDir, repo.Subdir), control)
 			results[task.ID] = append(results[task.ID], result)
 			if !result.Passed {
 				// Keep the exact rejected commit reachable after the temporary

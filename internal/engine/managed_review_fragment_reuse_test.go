@@ -262,7 +262,15 @@ func fragmentHistoricalPublicRecovery(t *testing.T, mode string) {
 		if mode == "exit" {
 			expectedState = "error"
 		}
-		if current.Status != "blocked" || current.IndependentReview == nil || current.IndependentReview.State != expectedState || managedReviewCalls(t, s) != initialCalls+1 {
+		wantCalls := 1
+		if mode == "fail" {
+			plan, _, planErr := s.readFragmentJournalAnchor(*current.IndependentReview)
+			if planErr != nil {
+				t.Fatal(planErr)
+			}
+			wantCalls = fragmentPaidInspections(plan) + 2
+		}
+		if current.Status != "blocked" || current.IndependentReview == nil || current.IndependentReview.State != expectedState || managedReviewCalls(t, s) != initialCalls+wantCalls {
 			t.Fatal("new defect bypassed", current.Status, current.Blocker)
 		}
 		if current.AutoValidation != nil && current.AutoValidation.CandidateSHA == current.IndependentReview.CandidateSHA {
@@ -296,7 +304,7 @@ func fragmentHistoricalPublicRecovery(t *testing.T, mode string) {
 				t.Fatal("intermediate identity substituted")
 			}
 		}
-		if managedReviewCalls(t, s)-initialCalls-1 != fragmentPaidInspections(plan)+2 {
+		if managedReviewCalls(t, s)-initialCalls-wantCalls != fragmentPaidInspections(plan)+2 {
 			t.Fatal("wrong cumulative budget")
 		}
 		kept, _ := os.ReadFile(filepath.Join(s.root, origin.FragmentJournal.Journal))

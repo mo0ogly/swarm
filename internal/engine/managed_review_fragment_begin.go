@@ -48,7 +48,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	if err != nil {
 		return empty, err
 	}
-	if task.IndependentReview != nil || task.BatchReviewResume != nil {
+	if (task.IndependentReview != nil && !priorAttemptReview(task)) || task.BatchReviewResume != nil {
 		return empty, fmt.Errorf("revue existante à préserver")
 	}
 	timeout, err := reviewTimeoutSeconds(cfg)
@@ -122,6 +122,9 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 		ct, e := cw.task(a.TaskID)
 		if e != nil {
 			return e
+		}
+		if priorAttemptReview(ct) {
+			archiveIndependentReview(ct)
 		}
 		if ct.IndependentReview != nil || ct.BatchReviewResume != nil || !currentTaskAttempt(ct, a.Attempt) || cw.Planning == nil || cw.Planning.Repository == nil || cw.Planning.Reviewer == nil || cw.Planning.Paused || cw.Planning.Repository.Candidate != c.Previous || managedReviewContract(*cw, a.TaskID) != managedReviewContract(w, a.TaskID) {
 			return fmt.Errorf("préparation des fragments périmée")

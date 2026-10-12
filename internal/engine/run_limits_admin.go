@@ -340,3 +340,15 @@ func (s *Store) executionObserved(work, task string) bool {
 	l, err := configuredRunLimitsWith(s.db, work, "worker", task)
 	return err == nil && l.observing()
 }
+
+// Operator time thresholds are policy values for the next launch, not provider
+// account limits. Zero inherits. Tool/call/error budgets are handled separately.
+func administrativeDurationThresholds(base, admin RunLimits) RunLimits {
+	if admin.ToolSeconds > 0 {
+		base.ToolSeconds = admin.ToolSeconds
+	}
+	if admin.SilenceSeconds > 0 {
+		base.SilenceSeconds = admin.SilenceSeconds
+	}
+	return base
+}

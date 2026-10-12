@@ -8,12 +8,13 @@ import (
 )
 
 type managedFragmentFinalCall struct {
-	Phase        string `json:"phase"`
-	CallID       string `json:"call_id"`
-	PromptDigest string `json:"prompt_sha256"`
-	State        string `json:"state"`
-	Reply        string `json:"reply,omitempty"`
-	ReplyDigest  string `json:"reply_sha256,omitempty"`
+	RetryDirective *ManagedReviewRetryDirective `json:"retry_directive,omitempty"`
+	Phase          string                       `json:"phase"`
+	CallID         string                       `json:"call_id"`
+	PromptDigest   string                       `json:"prompt_sha256"`
+	State          string                       `json:"state"`
+	Reply          string                       `json:"reply,omitempty"`
+	ReplyDigest    string                       `json:"reply_sha256,omitempty"`
 }
 type managedFragmentFinalJournal struct {
 	ResumeCalls      []string                   `json:"resume_calls,omitempty"`
@@ -26,7 +27,7 @@ type managedFragmentFinalJournal struct {
 // review evidence only: publication still needs Store identities and controls.
 func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j managedFragmentJournal, c managedReviewContext, p managedReviewFragmentPlan, prefix string) (string, []ManagedTaskReview, error) {
 	raw, _ := json.Marshal(j)
-	if f.Version != 1 || f.InspectionDigest != hash(raw) || len(f.Calls) > p.ReservedFinalCalls+len(f.ResumeCalls) {
+	if (f.Version != 1 && f.Version != 2) || f.InspectionDigest != hash(raw) || len(f.Calls) > p.ReservedFinalCalls+len(f.ResumeCalls) {
 		return "", nil, fmt.Errorf("journal final périmé ou budget dépassé")
 	}
 	authorized := map[string]bool{}
@@ -78,12 +79,16 @@ func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j manage
 			return "", nil, fmt.Errorf("appel final dupliqué ou hors séquence")
 		}
 		seen[call.CallID] = true
+		callPrefix, prefixErr := managedReviewRecoveryPrefix(prefix, call.RetryDirective)
+		if prefixErr != nil || (call.RetryDirective != nil && (call.RetryDirective.Candidate != p.Candidate || call.RetryDirective.Attempt != j.Attempt)) {
+			return "", nil, fmt.Errorf("consigne de reprise finale non attribuée")
+		}
 		var prompt string
 		var visible managedReviewContext
 		if phase == "selection" {
-			prompt, err = managedFragmentRequestPrompt(prefix, c, p, replies)
+			prompt, err = managedFragmentRequestPromptVersion(callPrefix, c, p, replies, f.Version)
 		} else {
-			prompt, visible, err = managedFragmentDecisionPrompt(prefix, c, p, replies, refs)
+			prompt, visible, err = managedFragmentDecisionPrompt(callPrefix, c, p, replies, refs)
 		}
 		if err != nil {
 			return "", nil, err
@@ -102,7 +107,7 @@ func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j manage
 				return "", nil, fmt.Errorf("réponse finale modifiée")
 			}
 			if phase == "selection" {
-				request, e := parseManagedFragmentFinalRequest(call.Reply, prefix, c, p, replies)
+				request, e := parseManagedFragmentFinalRequest(call.Reply, callPrefix, c, p, replies)
 				if e != nil {
 					return "", nil, e
 				}

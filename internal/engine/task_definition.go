@@ -90,41 +90,8 @@ func updateTaskDefinition(w *Work, t *Task, r Request) error {
 			return fmt.Errorf("validation_policy : %w", err)
 		}
 	}
-	// Validate the entire resulting graph before touching the task.
-	state := map[string]int{}
-	var visit func(string) error
-	visit = func(id string) error {
-		if state[id] == 1 {
-			return fmt.Errorf("cycle de dépendances : %s", id)
-		}
-		if state[id] == 2 {
-			return nil
-		}
-		node, e := w.task(id)
-		if e != nil {
-			return e
-		}
-		if id == t.ID {
-			node = &next
-		}
-		state[id] = 1
-		seen := map[string]bool{}
-		for _, dep := range node.Depends {
-			if seen[dep] {
-				return fmt.Errorf("dépendance répétée : %s", dep)
-			}
-			seen[dep] = true
-			if e := visit(dep); e != nil {
-				return e
-			}
-		}
-		state[id] = 2
-		return nil
-	}
-	for _, node := range w.Tasks {
-		if e := visit(node.ID); e != nil {
-			return e
-		}
+	if err := validateTaskDependencyGraph(w, &next); err != nil {
+		return err
 	}
 	if next.Title == t.Title && next.Deliverable == t.Deliverable && reflect.DeepEqual(next.Criteria, t.Criteria) && reflect.DeepEqual(next.Depends, t.Depends) && next.PlanMaxAttempts == t.PlanMaxAttempts && next.PlanToolLimit == t.PlanToolLimit && reflect.DeepEqual(next.ValidationPolicy, t.ValidationPolicy) {
 		return nil
@@ -178,6 +145,46 @@ func validateHierarchicalContractRevision(w *Work, r Request) error {
 	for _, task := range w.Tasks {
 		if task.IndependentReview != nil && task.IndependentReview.State == "running" {
 			return fmt.Errorf("terminer toutes les revues avant révision du contrat")
+		}
+	}
+	return nil
+}
+
+// Shared graph validation for operator definitions and supervisor adaptation.
+func validateTaskDependencyGraph(w *Work, replacement *Task) error {
+	state := map[string]int{}
+	var visit func(string) error
+	visit = func(id string) error {
+		if state[id] == 1 {
+			return fmt.Errorf("cycle de dépendances : %s", id)
+		}
+		if state[id] == 2 {
+			return nil
+		}
+		node, e := w.task(id)
+		if e != nil {
+			return e
+		}
+		if id == replacement.ID {
+			node = replacement
+		}
+		state[id] = 1
+		seen := map[string]bool{}
+		for _, dep := range node.Depends {
+			if seen[dep] {
+				return fmt.Errorf("dépendance répétée : %s", dep)
+			}
+			seen[dep] = true
+			if e := visit(dep); e != nil {
+				return e
+			}
+		}
+		state[id] = 2
+		return nil
+	}
+	for _, node := range w.Tasks {
+		if e := visit(node.ID); e != nil {
+			return e
 		}
 	}
 	return nil

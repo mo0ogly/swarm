@@ -11,7 +11,16 @@ import (
 // Only original quoted bytes become final-review evidence. Inspection rationale
 // remains a separate opinion. This bundle is not a task verdict or permission to
 // publish, and the original full packets must remain durably available.
+// A local defect remains an attributed opinion, never a global verdict.
+const managedFragmentLocalDefectQuestion = "Évaluer ce constat local défavorable sur les originaux du candidat complet : confirmer le défaut, le réfuter avec preuve originale, ou demander une pièce manquante. Ne pas assimiler une absence du paquet à une absence du candidat."
+
+type managedFragmentPartialDefect struct {
+	Packet int                   `json:"packet"`
+	Defect managedFragmentDefect `json:"defect"`
+}
+
 type managedFragmentFinalEvidence struct {
+	Defects       []managedFragmentPartialDefect      `json:"partial_defects,omitempty"`
 	Coordination  *ReviewCoordinationProposal         `json:"coordination,omitempty"`
 	InputBudget   *managedReviewInputBudget           `json:"input_budget,omitempty"`
 	Candidate     string                              `json:"candidate_commit"`
@@ -48,12 +57,15 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 		if e != nil {
 			return empty, e
 		}
-		if state != "inspected" && state != "unknown" {
+		if state != "inspected" && state != "unknown" && state != "changes_requested" {
 			return empty, fmt.Errorf("fragment %d : défaut ou preuve manquante, décision finale interdite", i)
 		}
 		byIndex := map[int]managedFragmentFinding{}
 		for _, finding := range inspection.Findings {
 			byIndex[finding.Artifact] = finding
+		}
+		for _, defect := range inspection.Defects {
+			out.Defects = append(out.Defects, managedFragmentPartialDefect{Packet: i, Defect: defect})
 		}
 		out.ReplyDigests = append(out.ReplyDigests, hash([]byte(replies[i])))
 		if ref := fragmentReuseAt(p, i); ref != nil {
@@ -61,6 +73,9 @@ func managedFragmentFinalBundle(c managedReviewContext, p managedReviewFragmentP
 		}
 		for j, a := range packet.Artifacts {
 			finding := byIndex[j]
+			if finding.Verdict == "fail" {
+				out.Questions = append(out.Questions, managedFragmentQuestion{i, j, 0, managedFragmentLocalDefectQuestion})
+			}
 			if finding.Verdict == "unknown" {
 				if len(finding.Needs) == 0 {
 					return empty, fmt.Errorf("question sans demande de preuve explicite")

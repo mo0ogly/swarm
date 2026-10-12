@@ -142,7 +142,7 @@ func (s *Store) adoptReviewCoordination(w *Work, scope string, op PlanningOperat
 	if err != nil {
 		return err
 	}
-	if task.ScopeID != scope || task.Status != "blocked" || task.IndependentReview != nil {
+	if task.ScopeID != scope || task.Status != "blocked" || (task.IndependentReview != nil && !priorAttemptReview(task)) {
 		return fmt.Errorf("plan de revue réservé au responsable de la tâche bloquée sans revue engagée")
 	}
 	if task.ReviewCoordination != nil {
@@ -166,6 +166,9 @@ func (s *Store) adoptReviewCoordination(w *Work, scope string, op PlanningOperat
 	order, err := validateReviewCoordination(proposal, e.Context.Candidate, coordinationEvidence(e.Context), prepared.Files, coordinationCriteria(e.Context))
 	if err != nil {
 		return err
+	}
+	if priorAttemptReview(task) {
+		archiveIndependentReview(task)
 	}
 	raw, _ := json.Marshal(proposal)
 	task.ReviewCoordination = &ReviewCoordinationRecord{Proposal: proposal, Digest: hash(raw), Scope: scope, Decision: r.EventID, State: "validated_not_executed", Order: order}

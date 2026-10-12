@@ -65,3 +65,36 @@ func TestFragmentEvidenceSchemaHasMinimum(t *testing.T) {
 		t.Fatal(evidence)
 	}
 }
+
+// The size model must cover bounded UTF-8 claims, not only cheap ASCII strings.
+// These values are synthetic for capacity measurement, never review evidence.
+func TestManagedFragmentDecisionCapacityCoversSerializedLocalDefects(t *testing.T) {
+	c, p, _ := finalBundleFixture(t)
+	room, err := managedFragmentDecisionCapacity("guidance", c, p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := maximalManagedFragmentBundle(c, p)
+	for i := range b.Defects {
+		b.Defects[i].Defect.Explanation = strings.Repeat("é", 512)
+	}
+	for packet := range p.Packets {
+		defects := []managedFragmentDefect{}
+		for _, claim := range b.Defects {
+			if claim.Packet == packet {
+				defects = append(defects, claim.Defect)
+			}
+		}
+		raw, e := json.Marshal(defects)
+		if e != nil || len(raw) > managedFragmentDefectReserve {
+			t.Fatal("fixture exceeds the serialized defect contract", len(raw), e)
+		}
+	}
+	prompt, _, err := renderManagedFragmentDecision("guidance", c, b, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(prompt)+len(fragmentDecisionSchema(b))+room > managedReviewPromptLimit {
+		t.Fatal("UTF-8 local defects exceed advertised selection room")
+	}
+}

@@ -8,29 +8,48 @@ import (
 )
 
 func managedFragmentRequestPrompt(prefix string, c managedReviewContext, p managedReviewFragmentPlan, replies []string) (string, error) {
+	return managedFragmentRequestPromptVersion(prefix, c, p, replies, 2)
+}
+
+func managedFragmentRequestPromptVersion(prefix string, c managedReviewContext, p managedReviewFragmentPlan, replies []string, version int) (string, error) {
 	b, err := managedFragmentFinalBundle(c, p, replies)
 	if err != nil {
 		return "", err
 	}
-	return renderManagedFragmentRequest(prefix, c, p, b)
+	return renderManagedFragmentRequestVersion(prefix, c, p, b, version)
 }
 func renderManagedFragmentRequest(prefix string, c managedReviewContext, p managedReviewFragmentPlan, b managedFragmentFinalEvidence) (string, error) {
-	room, err := managedFragmentDecisionCapacity(prefix, c, p)
-	if err != nil {
-		return "", err
+	return renderManagedFragmentRequestVersion(prefix, c, p, b, 2)
+}
+
+func renderManagedFragmentRequestVersion(prefix string, c managedReviewContext, p managedReviewFragmentPlan, b managedFragmentFinalEvidence, version int) (string, error) {
+	if version != 1 && version != 2 {
+		return "", fmt.Errorf("version de sélection finale inconnue")
 	}
-	// Unresolved needs are variable-sized. Account for their actual full encoding.
+	// Partial replies are now immutable and validated. Measure their actual full
+	// encoding (including unresolved needs), rather than retaining reserves for
+	// hypothetical future findings/defects. Preflight still checks the maximal
+	// shape before the first paid inspection; final transport is checked again.
 	actualPrompt, _, actualErr := renderManagedFragmentDecision(prefix, c, b, nil)
 	if actualErr != nil {
 		return "", actualErr
 	}
-	actualRoom, err := fragmentInputRoom(p.InputBudget, actualPrompt, fragmentDecisionSchema(b))
+	room, err := fragmentInputRoom(p.InputBudget, actualPrompt, fragmentDecisionSchema(b))
 	if err != nil {
 		return "", err
 	}
-	actualRoom -= len(`,"requested_original_evidence":`)
-	if actualRoom < room {
-		room = actualRoom
+	room -= len(`,"requested_original_evidence":`)
+	if version == 1 {
+		// Replay immutable historical prompts byte-for-byte. Never attribute the
+		// new capacity calculation to an old paid call or rewrite its journal.
+		legacy, err := managedFragmentDecisionCapacity(prefix, c, p)
+		if err != nil {
+			return "", err
+		}
+		room = min(room, legacy)
+	}
+	if room <= 0 {
+		return "", fmt.Errorf("aucune capacité restante pour les preuves finales")
 	}
 	metadata := c
 	metadata.Diff = ""

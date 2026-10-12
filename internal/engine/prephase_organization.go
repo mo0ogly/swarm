@@ -27,8 +27,8 @@ func (s *Store) configurePreparedOrganization(w *Work, p Preparation, config Pre
 	if config.Validation != "human" && config.Validation != "automatic" {
 		return fmt.Errorf("choisir la revue humaine ou des contrôles automatiques explicites")
 	}
-	if config.MaxTasks < len(w.Tasks) || config.MaxTasks > 100 || config.MaxCalls < 1 || config.MaxCalls > 100 {
-		return fmt.Errorf("plafonds : nombre de tâches courant à 100 tâches, 1 à 100 appels")
+	if config.MaxTasks < max(1, len(w.Tasks)) || config.MaxCalls < 1 {
+		return fmt.Errorf("plafonds : nombre de tâches existantes au minimum et budget d'appels positif requis")
 	}
 	ps, err := s.providers()
 	if err != nil {

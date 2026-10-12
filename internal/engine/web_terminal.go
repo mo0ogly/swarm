@@ -13,13 +13,17 @@ import (
 
 func (s *Store) registerTerminals(mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
 	// xterm uses dynamically generated, nonced style elements and positioning
-	// attributes. Script policy stays self-only; this exception is terminal-frame-only.
+	// attributes. Script policy stays self-only; exceptions stay inside console frames.
 	serve := func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" && r.Method != "HEAD" {
 			w.WriteHeader(405)
 			return
 		}
-		raw, e := cockpitWeb.ReadFile("web/terminal.html")
+		page := "web/terminal.html"
+		if r.URL.Path == "/log-console.html" {
+			page = "web/log-console.html"
+		}
+		raw, e := cockpitWeb.ReadFile(page)
 		if e != nil {
 			fail(w, e)
 			return
@@ -33,6 +37,7 @@ func (s *Store) registerTerminals(mux *http.ServeMux, send func(http.ResponseWri
 		}
 	}
 	mux.HandleFunc("/terminal.html", serve)
+	mux.HandleFunc("/log-console.html", serve)
 	mux.HandleFunc("/api/v1/terminal", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			w.WriteHeader(405)

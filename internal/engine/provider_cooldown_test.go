@@ -449,3 +449,63 @@ func TestProviderCooldownClearAllowsExplicitRetryButDoesNotRestoreAttempts(t *te
 		t.Fatal("attempt history was lost", count)
 	}
 }
+
+func TestProviderCooldownAccountChangeRequiresExplicitAuditedConfirmation(t *testing.T) {
+	s := storeTest(t)
+	w, _ := setupAgent(t, s)
+	before, _ := s.get(w.ID)
+	original := futureCooldown(t, s, "claude")
+	originalRaw, _ := json.MarshalIndent(original, "", "  ")
+	_, digest, _ := s.providerCooldown("claude")
+	request := map[string]any{"schema_version": 1, "event_id": "account-changed", "expected_digest": digest, "reason": "Operator confirms a changed account; retry availability without refund", "confirm_account_change": true}
+	input := filepath.Join(t.TempDir(), "account.json")
+	run := func() error {
+		raw, _ := json.Marshal(request)
+		if e := os.WriteFile(input, raw, 0600); e != nil {
+			t.Fatal(e)
+		}
+		var out bytes.Buffer
+		return agentCLI(s, []string{"providers", "cooldown", "clear", "claude"}, input, "", true, &out)
+	}
+	request["expected_digest"] = "stale"
+	if e := run(); e == nil {
+		t.Fatal("stale confirmation accepted")
+	}
+	request["expected_digest"] = digest
+	if e := run(); e != nil {
+		t.Fatal("confirmed changed account remained blocked", e)
+	}
+	c, _, _ := s.providerCooldown("claude")
+	raw, _ := json.Marshal(c)
+	var fields map[string]any
+	json.Unmarshal(raw, &fields)
+	if c.ClearedAt == "" || c.ClearActor == "" || c.ResetAt != original.ResetAt || c.ObservedAt != original.ObservedAt || c.Source != original.Source || fields["clear_account_change"] != true {
+		t.Fatal("changed account provenance or original lost", c, fields)
+	}
+	historical, e := os.ReadFile(filepath.Join(s.root, ".swarm", "provider-cooldowns", "history", "claude", digest+".json"))
+	if e != nil || !bytes.Equal(historical, originalRaw) {
+		t.Fatal("original rejection not preserved", e)
+	}
+	if e := run(); e != nil {
+		t.Fatal("confirmed event replay failed", e)
+	}
+	request["confirm_account_change"] = false
+	if e := run(); e == nil {
+		t.Fatal("same event replay changed confirmation")
+	}
+	after, _ := s.get(w.ID)
+	a, _ := json.Marshal(before)
+	b, _ := json.Marshal(after)
+	if !bytes.Equal(a, b) {
+		t.Fatal("account change mutated mission or consumption")
+	}
+	var count int
+	s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=?", w.ID).Scan(&count)
+	if count != 0 {
+		t.Fatal("account change launched an agent")
+	}
+	futureCooldown(t, s, "claude")
+	if e := s.providerCooldownGuard("claude"); commandFailure(e).Code != "provider_cooldown" {
+		t.Fatal("new account rejection ignored", e)
+	}
+}

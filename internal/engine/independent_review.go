@@ -23,6 +23,8 @@ type ReviewerConfig struct {
 	Authorized     string      `json:"authorized"`
 }
 type IndependentReview struct {
+	ResultEvent         string                        `json:"result_event,omitempty"`
+	FailureCode         string                        `json:"failure_code,omitempty"`
 	ReportArtifacts     map[string]string             `json:"report_artifacts,omitempty"`
 	FragmentJournal     *ManagedFragmentJournalAnchor `json:"fragment_journal,omitempty"`
 	ModelRoute          *ModelRoute                   `json:"model_route,omitempty"`
@@ -156,8 +158,8 @@ func (s *Store) independentReviewGuardVersion(w *Work, t *Task, historical bool)
 	return nil
 }
 func (s *Store) reviewerConfig(provider, level string, max int) (*ReviewerConfig, error) {
-	if max < 1 || max > 100 {
-		return nil, fmt.Errorf("vérification : budget de 1 à 100 appels requis")
+	if max < 1 {
+		return nil, fmt.Errorf("vérification : budget d'appels positif requis")
 	}
 	ps, e := s.providers()
 	if e != nil {
@@ -279,6 +281,16 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 	managedProducer := ""
 	preflight, preflightErr := s.prepareManagedPreflightRetry(work, r.Task)
 	replacement, replacementErr := s.reviewRecoveryPreview(work, r.Task)
+	var methodRestart *preparedReviewMethodRestart
+	var methodRestartErr error
+	var selectionRestart *preparedSelectionCapacityRestart
+	var selectionRestartErr error
+	if current, err := s.get(work); err == nil {
+		if task, err := current.task(r.Task); err == nil {
+			methodRestart, methodRestartErr = s.prepareReviewMethodRestart(current, task)
+			selectionRestart, selectionRestartErr = s.prepareSelectionCapacityRestart(current, task)
+		}
+	}
 	unpaid := false
 	return s.mutateWithHook(work, "review.retry", r.EventID, r.Revision, raw, func(w *Work) error {
 		if w.Planning == nil || w.Planning.Reviewer == nil {
@@ -288,6 +300,9 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		t, e := w.task(r.Task)
 		if e != nil {
 			return e
+		}
+		if priorAttemptReview(t) {
+			archiveIndependentReview(t)
 		}
 		v := t.IndependentReview
 		if v == nil && cfg.Failure != "" && r.ConfirmReviewErrorRepair {
@@ -319,6 +334,23 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		// Use the same freshness check as the console. A completed favorable
 		// record can become stale without its persisted state changing.
 		derivedStale := (v != nil && v.State == "passed" && v.Finished != "" && s.independentReviewGuard(w, t) != nil) || s.refusedReviewEvidenceChanged(w, t, audit)
+		if v != nil && v.State == "unknown" && r.ConfirmReviewErrorRepair {
+			if selectionRestartErr != nil {
+				return selectionRestartErr
+			}
+			if selectionRestart != nil {
+				if err := s.providerCooldownGuard(cfg.Provider); err != nil {
+					return err
+				}
+				directive := &ManagedReviewRetryDirective{Decision: r.EventID, Scope: t.ScopeID, ResultEvent: reviewPlanningEventID(v), Review: v.ID, Candidate: v.CandidateSHA, Attempt: v.Attempt, FailureCode: reviewSelectionCapacityChanged, Cause: v.Reason, Instruction: r.Reason}
+				if err := s.applySelectionCapacityRestart(w, t, selectionRestart, directive); err != nil {
+					return err
+				}
+				managedProducer = v.Producer
+				cfg.Failure = ""
+				return nil
+			}
+		}
 		revalidating := s.acceptedReviewRevalidationAvailable(w, t)
 		if (t.Status != "submitted" && !revalidating && !(t.Status == "blocked" && (managed || s.refusedReviewEvidenceChanged(w, t, audit)))) || v == nil || (v.State != "error" && v.State != "stale" && !derivedStale) {
 			return fmt.Errorf("seule une vérification interrompue ou périmée d’un résultat soumis peut être reprise")
@@ -369,10 +401,24 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			return nil
 		}
 		if v.FragmentJournal != nil {
+			changed, _, err := s.fragmentReviewMethodChanged(v)
+			if err != nil {
+				return err
+			}
+			if changed {
+				if !r.ConfirmReviewErrorRepair {
+					return fmt.Errorf("méthode modifiée : confirmer explicitement la correction pour une nouvelle revue complète, sans réutilisation d’avis")
+				}
+				if methodRestartErr != nil {
+					return methodRestartErr
+				}
+				return s.applyReviewMethodRestart(w, t, methodRestart, r.Reason)
+			}
 			if err := s.queueManagedFragmentResume(*w, t, r.EventID); err != nil {
 				return err
 			}
 			cfg.Failure = ""
+			t.PlanningRetry = false // Explicit review recovery supersedes a producer retry.
 			return nil
 		}
 		// The former record remains in the event history. Call reservations are never refunded.
@@ -385,6 +431,11 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 	}, func(tx *sql.Tx, _ *Work) error {
 		if managedProducer == "" {
 			return nil
+		}
+		if selectionRestart != nil && r.ConfirmReviewErrorRepair {
+			if err := validateSelectionProducerTx(tx, work, r.Task, selectionRestart.Source.Attempt, managedProducer); err != nil {
+				return err
+			}
 		}
 		var result sql.Result
 		var e error
@@ -426,6 +477,26 @@ func archiveIndependentReview(t *Task) {
 		t.PreviousReviews = append(t.PreviousReviews, *t.IndependentReview)
 		t.IndependentReview = nil
 	}
+}
+
+// Older versions could leave a terminal opinion current after a new producer
+// started. Only a finished opinion of an earlier attempt on this task is history.
+func priorAttemptReview(t *Task) bool {
+	r := t.IndependentReview
+	if r == nil || r.Attempt == "" || r.Finished == "" || len(t.Attempts) < 2 || currentTaskAttempt(t, r.Attempt) {
+		return false
+	}
+	switch r.State {
+	case "passed", "changes_requested", "error", "stale", "unknown":
+	default:
+		return false
+	}
+	for _, a := range t.Attempts[:len(t.Attempts)-1] {
+		if a.ID == r.Attempt {
+			return true
+		}
+	}
+	return false
 }
 
 // A contract amendment may only resume a refused completed result. The durable

@@ -3,8 +3,8 @@ const tr_web_admin_js = source => globalThis.SwarmI18n?.t(source) ?? source;
 
 const runLimitsFieldList = [
  ['observation_mode', 'Mode d’exécution'],
- ['silence_seconds', 'Silence maximal avant relance'],
- ['tool_seconds', 'Durée maximale par outil'],
+ ['silence_seconds', 'Seuil d’observation du silence'],
+ ['tool_seconds', 'Seuil d’observation d’un outil'],
  ['max_tool_calls', 'Nombre maximal d’appels d’outil'],
  ['max_repeated_calls', 'Répétitions identiques tolérées'],
  ['max_consecutive_errors', 'Erreurs consécutives tolérées'],
@@ -62,6 +62,7 @@ function renderRunLimitsCurrent() {
  const agent=snapshot?.agents.map(x=>x.agent).filter(a=>a.task_id===task?.id).sort((a,b)=>(b.started||'').localeCompare(a.started||''))[0];
  if(runLimitsScopeQuery().scope==='task'&&agent){const used=agent.progress?.tool_calls,cap=agent.limits?.max_tool_calls;card.append(node('p',tr_web_admin_js('Dernière tentative : ')+agent.attempt_id+' · '+tr_web_admin_js('Appels d’outils : ')+(used??tr_web_admin_js('Non rapporté'))+' / '+(cap||tr_web_admin_js('Sans plafond'))+' · '+tr_web_admin_js('Restant : ')+(typeof used==='number'&&cap?Math.max(0,cap-used):tr_web_admin_js('Non rapporté'))));}
  const actions = node('div', undefined, 'toolbar');
+ if(snapshot?.work.planning){const limits=button(tr_web_admin_js('Réglages du moteur'),()=>Quotas.open().catch(e=>notice(e.message,true)));limits.id='admin-engine-limits';actions.append(limits)}
  actions.append(button(entry.revision ? tr_web_admin_js('Modifier cette portée') : tr_web_admin_js('Configurer cette portée'), () => openRunLimitsConfigModal()));
  card.append(actions); host.append(card);
 }
@@ -92,7 +93,7 @@ function renderRunLimitsHistory() {
 function openRunLimitsConfigModal() {
  const q = runLimitsScopeQuery(); const entry = runLimitsAdmin.entry;
  openModal(entry.revision ? tr_web_admin_js('Modifier les limites — ') + (q.scope) : tr_web_admin_js('Configurer les limites — ') + (q.scope),
-  tr_web_admin_js('Ces limites bornent le silence, la durée d’outil et les répétitions autorisées pour de nouvelles tentatives. Elles ne changent jamais une tentative déjà lancée (REQ-ADM-05).'),
+  tr_web_admin_js('Les durées signalent une observation au responsable, sans arrêt automatique. Les plafonds d’appels, de répétitions et d’erreurs restent applicables. Ces réglages sont figés pour chaque nouveau départ (REQ-ADM-05).'),
   { action: 'admin-config', scope: q.scope, mission: q.mission_id, key: q.scope_key, revision: entry.revision });
  for (const [key, label] of runLimitsFieldList) {
   if(key === 'observation_mode') {

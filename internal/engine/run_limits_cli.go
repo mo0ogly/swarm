@@ -17,6 +17,9 @@ import (
 // by the same code path TestRunLimitsConfigRejectsInvalidValue and
 // TestRunLimitsConfigConcurrencyAndReplay already cover.
 func (s *Store) runLimitsCLI(pos []string, input string, out io.Writer) error {
+	if len(pos) > 1 && pos[1] == "web-requests" {
+		return s.webRequestsCLI(pos, input, out)
+	}
 	if len(pos) > 1 && pos[1] == "provider-wait" {
 		return s.providerWaitCLI(pos, input, out)
 	}

@@ -68,9 +68,13 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 			return w, nil
 		}
 	}
-	staleReview := t.IndependentReview != nil && r.ConfirmRecovery && r.ReviewID != "" && r.ReviewID == t.IndependentReview.ID && t.IndependentReview.State == "passed" && t.IndependentReview.Attempt == r.Attempt && s.independentReviewGuard(&w, t) != nil
-	if w.Revision != r.Revision || w.Planning == nil || w.Planning.Repository == nil || t.Status != "accepted" || (t.IndependentReview != nil && !staleReview) || t.BatchReviewResume != nil || (t.RecoveredResult != nil && !staleReview) || !currentTaskAttempt(t, r.Attempt) || len(t.Requalifications) > 0 {
-		return Work{}, fmt.Errorf("ancienne acceptation sans avis indépendant et tentative inchangée requises")
+	// A passed review cannot repair a generated gate that lost imported phases.
+	// Explicitly withdraw that stale acceptance, retaining its proofs, then run
+	// controls and an independent review again under a new proof key.
+	confirmedReview := t.IndependentReview != nil && r.ConfirmRecovery && r.ReviewID != "" && r.ReviewID == t.IndependentReview.ID && t.IndependentReview.State == "passed" && t.IndependentReview.Attempt == r.Attempt
+	staleAcceptance := confirmedReview && (s.independentReviewGuard(&w, t) != nil || (t.Gate != nil && requiredPlanChecks(t, t.Gate.Document) != nil))
+	if w.Revision != r.Revision || w.Planning == nil || w.Planning.Repository == nil || t.Status != "accepted" || (t.IndependentReview != nil && !staleAcceptance) || t.BatchReviewResume != nil || (t.RecoveredResult != nil && !staleAcceptance) || !currentTaskAttempt(t, r.Attempt) || len(t.Requalifications) > 0 {
+		return Work{}, fmt.Errorf("ancienne acceptation sans avis indépendant ou acceptation périmée explicitement confirmée, avec tentative inchangée, requises")
 	}
 	for _, scope := range w.Planning.Scopes {
 		if scope.Holder != "" {
@@ -102,7 +106,7 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 	if e != nil {
 		return Work{}, e
 	}
-	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "completed" && !(staleReview && t.RecoveredResult != nil)) || !recoveryProcessEnded(a, hostIdentity(), processStamp(a.Child)) {
+	if a.WorkID != work || a.TaskID != t.ID || a.Attempt != r.Attempt || (a.Status != "completed" && !(staleAcceptance && t.RecoveredResult != nil)) || !recoveryProcessEnded(a, hostIdentity(), processStamp(a.Child)) {
 		return Work{}, fmt.Errorf("production terminée attribuable requise")
 	}
 	item, e := s.managedAttempt(a.ID)

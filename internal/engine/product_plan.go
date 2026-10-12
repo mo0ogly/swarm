@@ -43,7 +43,7 @@ func validatePreparedProduct(method string, p ActionPlan) error {
 }
 
 func productPhase(phase string) bool {
-	return containsString([]string{"frame", "requirements", "stories", "story-review", "architecture", "design-system", "research", "design", "plan", "implement", "review", "deliver"}, phase)
+	return containsString([]string{"frame", "requirements", "stories", "story-review", "architecture", "design-system", "research", "design", "plan", "implement", "review", "deliver", "retex"}, phase)
 }
 
 func validateProductPlan(p ActionPlan) error {

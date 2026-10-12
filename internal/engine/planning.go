@@ -26,54 +26,78 @@ type PlanningState struct {
 	Version               int                            `json:"version"`
 	Paused                bool                           `json:"paused"`
 	MaxTasks              int                            `json:"max_tasks"`
+	MaxScopes             int                            `json:"max_scopes,omitempty"`
+	MaxDepth              int                            `json:"max_depth,omitempty"`
 	MaxDecisions          int                            `json:"max_decisions"`
 	Decisions             int                            `json:"decisions"`
 	Scopes                []PlanningScope                `json:"scopes"`
 	Inbox                 []PlanningEvent                `json:"inbox"`
+	Judge                 *JudgeState                    `json:"judge,omitempty"`
 }
 type PlanningScope struct {
-	ModelSelection  *RoleModel        `json:"model_selection,omitempty"`
-	LastModel       *RoleModel        `json:"last_model,omitempty"`
-	Delivery        *PlanningDelivery `json:"delivery,omitempty"`
-	Workflow        *AgentWorkflow    `json:"workflow,omitempty"`
-	TaskLimit       int               `json:"max_tasks,omitempty"`
-	ActivationLimit int               `json:"max_activations,omitempty"`
-	Activations     int               `json:"activations"`
-	ID              string            `json:"id"`
-	Parent          string            `json:"parent,omitempty"`
-	Objective       string            `json:"objective"`
-	Requirements    []string          `json:"requirements"`
-	Revision        int               `json:"revision"`
-	Generation      int               `json:"generation"`
-	Holder          string            `json:"holder,omitempty"`
-	Until           string            `json:"lease_until,omitempty"`
-	State           string            `json:"state"`
+	RejectionWait   *PlanningRejectionWait `json:"rejection_wait,omitempty"`
+	ModelSelection  *RoleModel             `json:"model_selection,omitempty"`
+	LastModel       *RoleModel             `json:"last_model,omitempty"`
+	Delivery        *PlanningDelivery      `json:"delivery,omitempty"`
+	Workflow        *AgentWorkflow         `json:"workflow,omitempty"`
+	TaskLimit       int                    `json:"max_tasks,omitempty"`
+	ActivationLimit int                    `json:"max_activations,omitempty"`
+	Activations     int                    `json:"activations"`
+	ID              string                 `json:"id"`
+	Parent          string                 `json:"parent,omitempty"`
+	Objective       string                 `json:"objective"`
+	Requirements    []string               `json:"requirements"`
+	Revision        int                    `json:"revision"`
+	Generation      int                    `json:"generation"`
+	Holder          string                 `json:"holder,omitempty"`
+	Until           string                 `json:"lease_until,omitempty"`
+	State           string                 `json:"state"`
+}
+
+// An unchanged rejected operation is not fresh evidence for another paid call.
+// This affects only its owner; a changed relevant state or public input reopens it.
+type PlanningRejectionWait struct {
+	Event       string `json:"event_id"`
+	StateSHA256 string `json:"state_sha256"`
 }
 type PlanningEvent struct {
-	Handoff   *ExchangeArtifact  `json:"handoff,omitempty"`
-	ID        string             `json:"id"`
-	Scope     string             `json:"scope"`
-	Kind      string             `json:"kind"`
-	Task      string             `json:"task,omitempty"`
-	Attempt   string             `json:"attempt,omitempty"`
-	Message   string             `json:"message"`
-	Artifacts []ExchangeArtifact `json:"artifacts,omitempty"`
-	Decision  string             `json:"decision,omitempty"`
-	At        string             `json:"at"`
+	Exploration    *PlanningExploration `json:"exploration,omitempty"`
+	RejectionKey   string               `json:"rejection_key,omitempty"`
+	RunObservation *RunObservation      `json:"run_observation,omitempty"`
+	RunDecision    string               `json:"run_decision,omitempty"`
+	RunReason      string               `json:"run_reason,omitempty"`
+	Handoff        *ExchangeArtifact    `json:"handoff,omitempty"`
+	ID             string               `json:"id"`
+	Scope          string               `json:"scope"`
+	Kind           string               `json:"kind"`
+	Task           string               `json:"task,omitempty"`
+	Attempt        string               `json:"attempt,omitempty"`
+	Message        string               `json:"message"`
+	Artifacts      []ExchangeArtifact   `json:"artifacts,omitempty"`
+	Decision       string               `json:"decision,omitempty"`
+	At             string               `json:"at"`
 }
 type PlanningOperation struct {
-	MaxTasks       int      `json:"max_tasks,omitempty"`
-	MaxActivations int      `json:"max_activations,omitempty"`
-	Kind           string   `json:"kind"`
-	ID             string   `json:"id"`
-	Title          string   `json:"title"`
-	Requirements   []string `json:"requirements"`
-	Deliverable    string   `json:"deliverable,omitempty"`
-	Criteria       []string `json:"criteria,omitempty"`
-	Depends        []string `json:"depends,omitempty"`
-	Next           string   `json:"next,omitempty"`
+	JudgeVerdict      string   `json:"judge_verdict,omitempty"`
+	JudgeCycle        int      `json:"judge_cycle,omitempty"`
+	ExpectedCandidate string   `json:"expected_candidate,omitempty"`
+	MaxTasks          int      `json:"max_tasks,omitempty"`
+	MaxActivations    int      `json:"max_activations,omitempty"`
+	Kind              string   `json:"kind"`
+	ID                string   `json:"id"`
+	Title             string   `json:"title"`
+	Requirements      []string `json:"requirements"`
+	Deliverable       string   `json:"deliverable,omitempty"`
+	Criteria          []string `json:"criteria,omitempty"`
+	Depends           []string `json:"depends,omitempty"`
+	Next              string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
+	planningInputBudget      *managedReviewInputBudget
+	explorationInputs        map[string]*PlanningExploration
+	InstructionRevisionID    string `json:"instruction_revision_id,omitempty"`
+	methodRestarts           map[string]*preparedReviewMethodRestart
+	selectionRestarts        map[string]*preparedSelectionCapacityRestart
 	MissingReport            bool `json:"missing_report,omitempty"`
 	preparedReviewInputs     map[string]any
 	coordinationInputs       map[string]*preparedCoordination
@@ -110,6 +134,9 @@ type PlanningRequest struct {
 	Inputs                   []string                       `json:"input_events,omitempty"`
 	Operations               []PlanningOperation            `json:"operations,omitempty"`
 	Reason                   string                         `json:"reason,omitempty"`
+	JudgeVerdict             string                         `json:"judge_verdict,omitempty"`
+	JudgeCycle               int                            `json:"judge_cycle,omitempty"`
+	MaxJudgeCycles           int                            `json:"max_judge_cycles,omitempty"`
 }
 
 func (p *PlanningState) scope(id string) (*PlanningScope, error) {
@@ -131,8 +158,14 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	if len(r.ScopeFiles) > 0 {
 		return Work{}, fmt.Errorf("scope_files est réservé à scope-patch ; aucune modification implicite du périmètre")
 	}
-	if r.MaxReviewCalls != 0 && (action != "enable" || r.Provider == "" || r.MaxReviewCalls < 1 || r.MaxReviewCalls > 100) {
-		return Work{}, planningError("invalid_review_budget", "max_review_calls doit être compris entre 1 et 100, uniquement lors de enable avec un fournisseur")
+	if r.MaxReviewCalls != 0 && (action != "enable" || r.Provider == "" || r.MaxReviewCalls < 1) {
+		return Work{}, planningError("invalid_review_budget", "max_review_calls positif requis, uniquement lors de enable avec un fournisseur")
+	}
+	if action == "reject-instructions" {
+		return s.rejectTaskInstructions(work, r)
+	}
+	if r.InstructionRevisionID != "" {
+		return Work{}, fmt.Errorf("instruction_revision_id réservé au rejet de consigne")
 	}
 	if action == "claim" {
 		w, e := s.get(work)
@@ -140,10 +173,53 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 			return Work{}, e
 		}
 		r.preparedReviewInputs = s.planningReviewInputs(w, r.Scope)
+		r.planningInputBudget = s.planningInputCapacity(w, r.Scope)
 	}
 	if action == "decide" {
+		r.explorationInputs = map[string]*PlanningExploration{}
+		r.methodRestarts = map[string]*preparedReviewMethodRestart{}
+		r.selectionRestarts = map[string]*preparedSelectionCapacityRestart{}
 		r.coordinationInputs = map[string]*preparedCoordination{}
 		for _, op := range r.Operations {
+			if op.Kind == "explore" {
+				current, err := s.get(work)
+				if err != nil {
+					return Work{}, err
+				}
+				if current.Revision != r.Revision {
+					// The canonical transaction checks an identical replay before its
+					// revision guard. Skip new reads, never reject a durable replay here.
+					continue
+				}
+				prepared, err := s.preparePlanningExploration(current, r, op)
+				if err != nil {
+					return Work{}, err
+				}
+				if r.explorationInputs[op.ID] != nil {
+					return Work{}, fmt.Errorf("identifiant d’exploration répété")
+				}
+				r.explorationInputs[op.ID] = prepared
+			}
+			if op.Kind == "review-retry" {
+				current, err := s.get(work)
+				if err != nil {
+					return Work{}, err
+				}
+				task, err := current.task(op.ID)
+				if err != nil {
+					return Work{}, err
+				}
+				selection, err := s.prepareSelectionCapacityRestart(current, task)
+				if err != nil {
+					return Work{}, err
+				}
+				r.selectionRestarts[op.ID] = selection
+				prepared, err := s.prepareReviewMethodRestart(current, task)
+				if err != nil {
+					return Work{}, err
+				}
+				r.methodRestarts[op.ID] = prepared
+			}
 			if op.Kind == "review-plan" {
 				e, err := s.readManagedPreflightEvidence(work, op.ID)
 				if err != nil {
@@ -155,6 +231,15 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 				}
 				r.coordinationInputs[op.ID] = &preparedCoordination{Evidence: e, Files: preview.Files}
 			}
+		}
+	}
+	if len(r.explorationInputs) > 0 {
+		current, err := s.get(work)
+		if err != nil {
+			return Work{}, err
+		}
+		if err = s.checkPlanningExplorationDelivery(current, r); err != nil {
+			return Work{}, err
 		}
 	}
 	if action == "restart-task" {
@@ -215,7 +300,12 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 	}
 	return s.mutateWithHook(work, "planning."+action, r.EventID, r.Revision, raw, func(w *Work) error {
 		if action == "claim" && w.Planning != nil && w.Planning.Provider != "" {
-			if e := s.providerCooldownGuard(w.Planning.Provider); e != nil {
+			scope, e := w.Planning.scope(r.Scope)
+			if e != nil {
+				return e
+			}
+			selected := effectivePlanningScope(w.Planning, scope)
+			if e := s.providerCooldownGuard(selected.Provider); e != nil {
 				return e
 			}
 		}
@@ -253,7 +343,7 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 			if r.Provider != "" {
 				maxReviews := r.MaxReviewCalls
 				if maxReviews == 0 {
-					maxReviews = min(w.Planning.MaxActivations, 100)
+					maxReviews = w.Planning.MaxActivations
 				}
 				config, e := s.reviewerConfig(r.Provider, r.Level, maxReviews)
 				if e != nil {
@@ -266,7 +356,7 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 
 		return nil
 	}, func(tx *sql.Tx, w *Work) error {
-		if action == "claim" || action == "decide" {
+		if action == "claim" || action == "decide" || action == "judge" || action == "renew" {
 			var paused int
 			err := tx.QueryRow("SELECT paused FROM cockpit_controls WHERE work_id=?", work).Scan(&paused)
 			if err != nil && err != sql.ErrNoRows {
@@ -281,6 +371,19 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 			}
 			if archived > 0 {
 				return fmt.Errorf("mission archivée")
+			}
+		}
+		ending := action == "judge" && r.JudgeVerdict == "end"
+		for _, op := range r.Operations {
+			ending = ending || (action == "decide" && op.Kind == "judge" && op.JudgeVerdict == "end")
+		}
+		if ending {
+			var active int
+			if err := tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND status IN ('queued','starting','running','stopping')", work).Scan(&active); err != nil {
+				return err
+			}
+			if active > 0 {
+				return fmt.Errorf("tentative encore active ; jugement de fin refusé")
 			}
 		}
 		if action == "claim" {
@@ -306,6 +409,63 @@ func (s *Store) planningChange(work, action string, r PlanningRequest) (Work, er
 			}
 		}
 		for _, op := range r.Operations {
+			if op.Kind == "revise-instructions" || op.Kind == "revise-dependencies" {
+				if err := instructionIdleTx(tx, work, op.ID); err != nil {
+					return err
+				}
+				if op.Kind == "revise-dependencies" {
+					var pending int
+					if err := tx.QueryRow("SELECT count(*) FROM managed_attempts WHERE work_id=? AND task_id=? AND state='ready'", work, op.ID).Scan(&pending); err != nil {
+						return err
+					}
+					if pending != 0 {
+						return fmt.Errorf("dépendances déjà figées par une préparation ; reprise explicite requise")
+					}
+				}
+			}
+			if op.Kind == "continue-run" || op.Kind == "stop-run" {
+				if err := validateRunDecisionTx(tx, w, op, r); err != nil {
+					return err
+				}
+			}
+			if op.Kind == "review-retry" {
+				var active int
+				if e := tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')", work, op.ID).Scan(&active); e != nil {
+					return e
+				}
+				if active != 0 {
+					return fmt.Errorf("tentative encore active ; reprise de revue refusée")
+				}
+				task, e := w.task(op.ID)
+				if e != nil {
+					return fmt.Errorf("revue de reprise absente")
+				}
+				producer := ""
+				if task.IndependentReview != nil {
+					producer = task.IndependentReview.Producer
+				} else if prepared := r.methodRestarts[op.ID]; prepared != nil {
+					producer = prepared.Producer
+				}
+				if producer == "" {
+					return fmt.Errorf("producteur de reprise absent")
+				}
+				if prepared := r.selectionRestarts[op.ID]; prepared != nil {
+					if err := validateSelectionProducerTx(tx, work, op.ID, prepared.Source.Attempt, producer); err != nil {
+						return err
+					}
+				}
+				result, e := tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND work_id=? AND task_id=? AND state IN ('conflict','integrating') AND result_commit!=''", producer, work, op.ID)
+				if e != nil {
+					return e
+				}
+				n, e := result.RowsAffected()
+				if e != nil {
+					return e
+				}
+				if n != 1 {
+					return fmt.Errorf("candidat de reprise introuvable")
+				}
+			}
 			if op.Kind == "retry" {
 				if w.Planning.Repository != nil {
 					var pending int
@@ -342,20 +502,24 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		if w.Planning != nil || len(w.Tasks) > 0 {
 			return fmt.Errorf("activer sur une mission neuve sans tâches ; adoption historique non implicite")
 		}
-		if r.MaxActivations < 1 || r.MaxActivations > 200 {
-			return fmt.Errorf("max_activations : 1 à 200 requis")
+		if r.MaxActivations < 1 {
+			return fmt.Errorf("max_activations positif requis")
 		}
-		if r.MaxTasks < 1 || r.MaxTasks > 100 || r.MaxDecisions < 1 || r.MaxDecisions > 100 {
-			return fmt.Errorf("max_tasks et max_decisions : 1 à 100 requis")
+		if r.MaxTasks < 1 || r.MaxDecisions < 1 {
+			return fmt.Errorf("max_tasks et max_decisions positifs requis")
 		}
 		if len(w.Criteria) == 0 || len(w.Criteria) > 100 {
 			return fmt.Errorf("1 à 100 exigences requises")
+		}
+		maxJudgeCycles := r.MaxJudgeCycles
+		if maxJudgeCycles < 0 {
+			return fmt.Errorf("max_judge_cycles : 0 sans plafond de cycle ou valeur positive requise")
 		}
 		requirements := []string{}
 		for i := range w.Criteria {
 			requirements = append(requirements, fmt.Sprintf("req-%d", i+1))
 		}
-		w.Planning = &PlanningState{Provider: r.Provider, MaxActivations: r.MaxActivations, Version: 1, MaxTasks: r.MaxTasks, MaxDecisions: r.MaxDecisions, Scopes: []PlanningScope{{ID: "root", Objective: w.Objective, Requirements: requirements, Revision: 1, State: "ready"}}, Inbox: []PlanningEvent{{ID: r.EventID, Scope: "root", Kind: "brief", Message: w.Objective, At: at.Format(time.RFC3339Nano)}}}
+		w.Planning = &PlanningState{Provider: r.Provider, MaxActivations: r.MaxActivations, Version: 1, MaxTasks: r.MaxTasks, MaxDecisions: r.MaxDecisions, Scopes: []PlanningScope{{ID: "root", Objective: w.Objective, Requirements: requirements, Revision: 1, State: "ready"}}, Inbox: []PlanningEvent{{ID: r.EventID, Scope: "root", Kind: "brief", Message: w.Objective, At: at.Format(time.RFC3339Nano)}}, Judge: &JudgeState{Cycle: 1, MaxCycles: maxJudgeCycles}}
 		checks, e := normalizePlanningChecks(w, r.Checks)
 		if e != nil {
 			return e
@@ -463,6 +627,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		if p.Failure != "" {
 			return fmt.Errorf("planification arrêtée : %s", p.Failure)
 		}
+		if planningRejectionUnchanged(*w, scope) {
+			return planningError("rejection_requires_change", "même proposition refusée sans précondition nouvelle ; diagnostic du propriétaire requis")
+		}
 		if p.Decisions >= p.MaxDecisions {
 			return fmt.Errorf("budget de décisions atteint")
 		}
@@ -473,7 +640,7 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		if err != nil {
 			return err
 		}
-		_, delivery, err := s.planningDeliveryContext(*w, scope.ID, 64000-len(workflowPrompt)-3000, r.preparedReviewInputs)
+		_, delivery, err := s.planningCapacityContext(*w, scope.ID, workflowPrompt, r.planningInputBudget, r.preparedReviewInputs)
 		if err != nil {
 			return err
 		}
@@ -515,6 +682,9 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 							return fmt.Errorf("retour d’une tentative périmée : %s", id)
 						}
 					}
+					if !explorationCurrent(*w, event.Exploration) && len(r.Operations) > 0 {
+						return fmt.Errorf("exploration d’un candidat remplacé ; acquitter l’historique puis explorer le candidat actuel")
+					}
 					if e := s.verifyExchangeArtifacts(event.Artifacts); e != nil && len(r.Operations) > 0 {
 						return e
 					}
@@ -532,12 +702,13 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 			}
 		}
 		scopeID := scope.ID
-		for _, op := range r.Operations {
+		for index, op := range r.Operations {
 			if err := s.applyPlanningOperation(w, scopeID, op, r, at); err != nil {
-				return err
+				return &planningOperationError{Index: index, Kind: op.Kind, ID: op.ID, Err: err}
 			}
 		}
 		scope, _ = p.scope(scopeID) // delegation can reallocate the slice
+		scope.RejectionWait = nil
 		if scope.Delivery != nil {
 			scope.Delivery.Decision = r.EventID
 		}
@@ -558,7 +729,32 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 					scope.State = "ready"
 				}
 			}
+			if scope.State == "waiting" && scope.Delivery != nil && scope.Delivery.HistoricalOnly {
+				// The old returns authorize acknowledgement only. Wake the owner
+				// on a current receipt so it can reassess the original objective;
+				// the engine neither chooses an operation nor closes the scope.
+				p.Inbox = append(p.Inbox, PlanningEvent{ID: planningEventID(r.EventID, "historical-acknowledged"), Scope: scopeID, Kind: "historical_acknowledged", Message: "Retours historiques acquittés sans opération par " + r.EventID + ". Réexaminer le besoin et les exigences encore ouvertes sur l’état actuel ; aucune acceptation nouvelle n’est établie.", At: at.Format(time.RFC3339Nano)})
+				scope.State = "ready"
+			}
 		}
+		return nil
+	case "judge":
+		if scope.ID != "root" {
+			return fmt.Errorf("juge global : périmètre racine requis")
+		}
+		if err := s.applyJudgeVerdict(w, r, at); err != nil {
+			return err
+		}
+		scope.Revision++
+		return nil
+	case "renew":
+		if scope.ID != "root" {
+			return fmt.Errorf("renouvellement de cycle : périmètre racine requis")
+		}
+		if err := applyJudgeRenewal(w, r, at); err != nil {
+			return err
+		}
+		scope.Revision++
 		return nil
 	default:
 		return fmt.Errorf("action de planification inconnue : %s", action)
@@ -571,9 +767,24 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 	if scope.State == "closed" {
 		return fmt.Errorf("périmètre déjà clos")
 	}
+	if op.Kind != "judge" && op.Kind != "renew" && (op.JudgeCycle != 0 || op.JudgeVerdict != "" || op.ExpectedCandidate != "") {
+		return fmt.Errorf("champs de cycle interdits pour cette opération")
+	}
 	switch op.Kind {
+	case "judge", "renew":
+		return s.applyPlanningJudgeOperation(w, id, op, r, at)
+	case "revise-dependencies":
+		return applyPlanningDependencyRevision(w, id, op, r)
+	case "explore":
+		return applyPlanningExploration(w, id, op, r)
+	case "revise-instructions":
+		return s.reviseTaskInstructions(w, id, op, r, at)
+	case "continue-run", "stop-run":
+		return applyRunDecision(w, id, op, r)
 	case "review-plan":
 		return s.adoptReviewCoordination(w, id, op, r)
+	case "review-retry":
+		return s.applyPlanningReviewRetry(w, id, op, r)
 	case "task", "delegate":
 		if !safeName(op.ID) {
 			return fmt.Errorf("identifiant de l’opération invalide : %q", op.ID)
@@ -604,8 +815,8 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 				depth++
 				parent, _ = p.scope(parent.Parent)
 			}
-			if depth >= 3 || len(p.Scopes) >= 20 {
-				return fmt.Errorf("limite de délégation atteinte : profondeur 3, 20 périmètres")
+			if (p.MaxDepth > 0 && depth+1 > p.MaxDepth) || (p.MaxScopes > 0 && len(p.Scopes) >= p.MaxScopes) {
+				return fmt.Errorf("limite de délégation configurée atteinte : profondeur ou nombre de périmètres")
 			}
 			for _, task := range w.Tasks {
 				if task.ScopeID == id {
@@ -694,6 +905,13 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 		if err != nil {
 			return err
 		}
+		selection, err := s.prepareSelectionCapacityRestart(*w, task)
+		if err != nil {
+			return err
+		}
+		if currentReviewProtocolFailure(task) || selection != nil {
+			return planningError("review_recovery_required", "réponse du vérificateur invalide ; corriger le protocole puis utiliser review-retry, sans nouvelle production")
+		}
 		if task.ScopeID != id || task.Status != "blocked" || task.LaunchHeld || task.PlanningRetry {
 			return fmt.Errorf("reprise non disponible")
 		}
@@ -704,47 +922,8 @@ func (s *Store) applyPlanningOperation(w *Work, id string, op PlanningOperation,
 		task.Next = op.Next
 		return nil
 	case "close":
-		for _, event := range p.Inbox {
-			if event.Scope == id && event.Decision == "" && !containsString(r.Inputs, event.ID) {
-				return fmt.Errorf("retour non traité : %s", event.ID)
-			}
-		}
-		for _, child := range p.Scopes {
-			if child.Parent == id && child.State != "closed" {
-				return fmt.Errorf("périmètre enfant non terminé")
-			}
-		}
-		for _, task := range w.Tasks {
-			if task.ScopeID == "" {
-				return fmt.Errorf("tâche sans périmètre")
-			}
-			owner, err := p.scope(task.ScopeID)
-			if err != nil {
-				return err
-			}
-			for owner.ID != id && owner.Parent != "" {
-				owner, _ = p.scope(owner.Parent)
-			}
-			if owner.ID == id && (task.Status != "accepted" || !s.acceptedFresh(w, &task, map[string]bool{})) {
-				return fmt.Errorf("preuve descendante non valide : %s", task.ID)
-			}
-		}
-		covered := map[string]bool{}
-		for i := range w.Tasks {
-			task := &w.Tasks[i]
-			if task.ScopeID == id {
-				if task.Status != "accepted" || !s.acceptedFresh(w, task, map[string]bool{}) {
-					return fmt.Errorf("tâche non validée ou preuve périmée : %s", task.ID)
-				}
-				for _, req := range task.Requirements {
-					covered[req] = true
-				}
-			}
-		}
-		for _, req := range scope.Requirements {
-			if !covered[req] {
-				return fmt.Errorf("exigence sans preuve : %s", req)
-			}
+		if err := s.validatePlanningClosure(w, id, r); err != nil {
+			return err
 		}
 		scope.State = "closed"
 		if scope.Parent != "" {
@@ -811,54 +990,6 @@ func (s *Store) planningValidationSignals(w *Work, before map[string]string, kin
 			scope.State = "ready"
 		}
 	}
-	if kind == "task.auto-validation" || kind == "task.auto-validation-reviewed" || kind == "managed.integrated" || kind == "managed.recovered-result" {
-		s.autoCloseProvenPlanningScopes(w, eventID)
-	}
-}
-
-// A controller acceptance is already a versioned engine decision. For the
-// common, non-delegated root scope, do not spend another planner activation
-// merely to restate that every requirement has fresh evidence. Delegated
-// graphs retain their explicit child/parent handoff contract.
-func (s *Store) autoCloseProvenPlanningScopes(w *Work, eventID string) {
-	if w.Planning == nil || w.Planning.Reviewer == nil || len(w.Planning.Scopes) != 1 {
-		return
-	}
-	scope := &w.Planning.Scopes[0]
-	if scope.ID != "root" || scope.State == "closed" {
-		return
-	}
-	decision := planningEventID(eventID, "auto-close")
-	hasWork, ready := false, true
-	covered := map[string]bool{}
-	for i := range w.Tasks {
-		task := &w.Tasks[i]
-		if task.ScopeID != "root" {
-			continue
-		}
-		hasWork = true
-		if task.Status != "accepted" || task.IndependentReview == nil || task.IndependentReview.State != "passed" || !s.acceptedFresh(w, task, map[string]bool{}) {
-			ready = false
-			continue
-		}
-		for _, req := range task.Requirements {
-			covered[req] = true
-		}
-	}
-	for _, req := range scope.Requirements {
-		ready = ready && covered[req]
-	}
-	if !hasWork || !ready {
-		return
-	}
-	scope.State, scope.Holder, scope.Until = "closed", "", ""
-	scope.Revision++
-	scope.Generation++
-	for i := range w.Planning.Inbox {
-		if w.Planning.Inbox[i].Scope == "root" && w.Planning.Inbox[i].Decision == "" {
-			w.Planning.Inbox[i].Decision = decision
-		}
-	}
 }
 
 func revokePlanningTx(tx *sql.Tx, work string) error {
@@ -901,7 +1032,7 @@ func validatePlanningState(w *Work) error {
 	if p == nil {
 		return nil
 	}
-	if p.Version != 1 || len(p.Scopes) < 1 || len(p.Scopes) > 20 || p.MaxTasks < 1 || p.MaxTasks > 100 || len(w.Tasks) > p.MaxTasks || p.MaxDecisions < 1 || p.MaxDecisions > 100 || p.MaxActivations < 1 || p.MaxActivations > 200 || p.Activations < 0 || p.Activations > p.MaxActivations || p.Decisions < 0 || p.Decisions > p.MaxDecisions {
+	if p.Version != 1 || len(p.Scopes) < 1 || p.MaxScopes < 0 || (p.MaxScopes > 0 && len(p.Scopes) > p.MaxScopes) || p.MaxDepth < 0 || p.MaxTasks < 1 || len(w.Tasks) > p.MaxTasks || p.MaxDecisions < 1 || p.MaxActivations < 1 || p.Activations < 0 || p.Activations > p.MaxActivations || p.Decisions < 0 || p.Decisions > p.MaxDecisions {
 		return fmt.Errorf("contrat de planification invalide")
 	}
 	ids := map[string]bool{}
@@ -936,8 +1067,8 @@ func validatePlanningState(w *Work) error {
 			}
 			node = *parent
 		}
-		if len(seen) > 2 {
-			return fmt.Errorf("profondeur de délégation excessive")
+		if p.MaxDepth > 0 && len(seen)+1 > p.MaxDepth {
+			return fmt.Errorf("profondeur de délégation supérieure à la politique configurée")
 		}
 	}
 	if len(requirements) != len(w.Criteria) {
@@ -1027,4 +1158,57 @@ func (s *Store) reconcilePlanningProofs(w Work) (Work, error) {
 func planningEventID(parts ...string) string {
 	raw, _ := json.Marshal(parts)
 	return "plan-" + hash(raw)
+}
+
+// Shared by scope closure and the global judge: an AI end proposal never
+// replaces the existing acceptance, descendant and requirement proof checks.
+func (s *Store) validatePlanningClosure(w *Work, id string, r PlanningRequest) error {
+	p := w.Planning
+	scope, err := p.scope(id)
+	if err != nil {
+		return err
+	}
+	for _, event := range p.Inbox {
+		if event.Scope == id && event.Decision == "" && !containsString(r.Inputs, event.ID) {
+			return fmt.Errorf("retour non traité : %s", event.ID)
+		}
+	}
+	for _, child := range p.Scopes {
+		if child.Parent == id && child.State != "closed" {
+			return fmt.Errorf("périmètre enfant non terminé")
+		}
+	}
+	for _, task := range w.Tasks {
+		if task.ScopeID == "" {
+			return fmt.Errorf("tâche sans périmètre")
+		}
+		owner, err := p.scope(task.ScopeID)
+		if err != nil {
+			return err
+		}
+		for owner.ID != id && owner.Parent != "" {
+			owner, _ = p.scope(owner.Parent)
+		}
+		if owner.ID == id && (task.Status != "accepted" || !s.acceptedFresh(w, &task, map[string]bool{})) {
+			return fmt.Errorf("preuve descendante non valide : %s", task.ID)
+		}
+	}
+	covered := map[string]bool{}
+	for i := range w.Tasks {
+		task := &w.Tasks[i]
+		if task.ScopeID == id {
+			if task.Status != "accepted" || !s.acceptedFresh(w, task, map[string]bool{}) {
+				return fmt.Errorf("tâche non validée ou preuve périmée : %s", task.ID)
+			}
+			for _, req := range task.Requirements {
+				covered[req] = true
+			}
+		}
+	}
+	for _, req := range scope.Requirements {
+		if !covered[req] {
+			return fmt.Errorf("exigence sans preuve : %s", req)
+		}
+	}
+	return nil
 }

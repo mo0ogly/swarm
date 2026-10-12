@@ -28,6 +28,24 @@ type RecoveredResult struct {
 	ProcessStatus  string `json:"original_process_status"`
 }
 
+// This lookup preserves attribution; an archived opinion never becomes current.
+func previousRecoveryReview(t *Task) *IndependentReview {
+	if t.IndependentReview != nil {
+		return t.IndependentReview
+	}
+	repair := t.RecoveredResult
+	if repair == nil || repair.Agent == "" || repair.Attempt == "" {
+		return nil
+	}
+	for i := len(t.PreviousReviews) - 1; i >= 0; i-- {
+		opinion := &t.PreviousReviews[i]
+		if opinion.Producer == repair.Agent && opinion.Attempt == repair.Attempt {
+			return opinion
+		}
+	}
+	return nil
+}
+
 func recoveredResultMatches(t *Task, a Agent, item ManagedAttempt) bool {
 	r := t.RecoveredResult
 	return r != nil && r.Agent == a.ID && r.Attempt == a.Attempt && r.Result != "" && r.Result == item.Result && r.ProcessStatus == a.Status && (a.Status == "interrupted" || a.Status == "failed" || a.Status == "completed")
@@ -86,7 +104,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			}
 			return s.get(work)
 		}
-		if !revise {
+		if !revise && prior.Agent == r.Agent && prior.Attempt == r.Attempt {
 			return Work{}, fmt.Errorf("un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite")
 		}
 	}
@@ -126,10 +144,16 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		return Work{}, fmt.Errorf("copie ou résultat déjà remis incompatible avec cette réparation")
 	}
 	if unreviewedDelivery {
-		if a.Status != "completed" || a.DeliveryVersion != 1 {
+		// A stopped, externally repaired attempt may have complete delivery but
+		// fail the no-call transport preflight. Verify its existing immutable
+		// checkpoint and receipts through the same public recovery guard; never
+		// treat an arbitrary controller error as permission for another review.
+		preflight, preflightErr := s.readManagedPreflightCorrectionEvidence(work, t.ID)
+		unpaidPreflight := preflightErr == nil && preflight.Revision == w.Revision && preflight.Agent.ID == a.ID && preflight.Item.Result == item.Result
+		if !unpaidPreflight && (a.Status != "completed" || a.DeliveryVersion != 1) {
 			return Work{}, fmt.Errorf("livraison partielle terminée et attribuable requise")
 		}
-		if _, err := s.managedDelivery(w, t, a, item.Result); err == nil {
+		if _, err := s.managedDelivery(w, t, a, item.Result); err == nil && !unpaidPreflight {
 			scope, scopeErr := managedScope(filepath.Join(repo.Storage, "repository.git"), repo.Candidate, item.Result)
 			if scopeErr != nil {
 				return Work{}, scopeErr
@@ -172,13 +196,22 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 	// Mandatory even for a legacy worker: external repair has its own complete
 	// declaration and passes the ordinary candidate controls and review below.
 	a.DeliveryVersion = 1
-	if _, err = s.managedDelivery(w, t, a, result); err != nil {
+	delivery, err := s.managedDelivery(w, t, a, result)
+	if err != nil {
 		return Work{}, err
 	}
 	reportPath := filepath.ToSlash(filepath.Join(repo.Subdir, "docs", t.ID+".md"))
 	report, err := candidateReviewSource(bare, result, reportPath, 1<<20)
 	if err != nil || strings.TrimSpace(report.Content) == "" {
 		return Work{}, fmt.Errorf("rapport de réparation absent ou illisible")
+	}
+	// Check the repaired evidence before replacing the retained result/review.
+	// Reuse the ordinary immutable-source guard so recovery cannot drift from
+	// the limits, manifest handling or delivery evidence used by actual review.
+	if _, err = managedReviewSources(w, []managedReviewTaskContext{{
+		Task: t.ID, Binding: ManagedTaskReview{Report: reportPath}, Delivery: delivery,
+	}}, result); err != nil {
+		return Work{}, fmt.Errorf("sources de réparation non examinables avant soumission : %w", err)
 	}
 	proofKey := a.ID
 	ref := "refs/swarm/attempts/" + a.ID
@@ -190,15 +223,16 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		return Work{}, err
 	}
 	eventRaw := raw
-	if revise {
-		eventRaw, _ = json.Marshal(map[string]any{"request": r, "previous_review": t.IndependentReview, "previous_repair": t.RecoveredResult, "previous_result": item.Result, "previous_review_coordination": t.ReviewCoordination})
+	if revise || t.RecoveredResult != nil {
+		eventRaw, _ = json.Marshal(map[string]any{"request": r, "previous_review": previousRecoveryReview(t), "previous_repair": t.RecoveredResult, "previous_result": item.Result, "previous_review_coordination": t.ReviewCoordination})
 	}
 	_, err = s.mutateWithHook(work, "managed.recovered-result", r.EventID, r.Revision, eventRaw, func(current *Work) error {
 		task, e := current.task(t.ID)
 		if e != nil {
 			return e
 		}
-		if (!revise && task.RecoveredResult != nil) || (revise && !unreviewedDelivery && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewAllowsCorrection(*current, task.IndependentReview, r.ConfirmReviewErrorRepair))) || (unreviewedDelivery && task.IndependentReview != nil) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
+		prior := task.RecoveredResult
+		if (!revise && prior != nil && prior.Agent == a.ID && prior.Attempt == a.Attempt) || (revise && !unreviewedDelivery && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewAllowsCorrection(*current, task.IndependentReview, r.ConfirmReviewErrorRepair))) || (unreviewedDelivery && task.IndependentReview != nil) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
 			return fmt.Errorf("tentative remplacée ou réparation déjà soumise")
 		}
 		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: tree, Actor: operatorIdentity(), At: now(), Reason: r.Reason, ProcessStatus: a.Status}
@@ -206,6 +240,8 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			task.RecoveredResult.ProofKey = proofKey
 			task.RecoveredResult.ReplacesResult = item.Result
 			task.RecoveredResult.PriorReview = r.ReviewID
+		}
+		if revise || prior != nil {
 			task.IndependentReview = nil
 			// The previous immutable plan remains in the recovery event. A new
 			// candidate requires a fresh, explicitly adopted coverage plan.

@@ -196,7 +196,7 @@ async function submitAssist(f,c){
    tr_web_assistant_js('Modèle choisi : ')+routeText(p.turn.model_route),
    tr_web_assistant_js('Page : ')+ctx.page_title+tr_web_assistant_js(' · révision ')+ctx.revision+tr_web_assistant_js(' · empreinte ')+ctx.context_hash,
    tr_web_assistant_js('Éléments sélectionnés : ')+(ctx.selected_entities.join(', ')||'aucun')+tr_web_assistant_js(' · tranche visible ')+ctx.visible_slice.offset+'→'+(ctx.visible_slice.offset+ctx.visible_slice.count)+tr_web_assistant_js(' sur ')+ctx.visible_slice.total,
-   tr_web_assistant_js('Délai maximal : ')+p.turn.timeout_seconds+tr_web_assistant_js(' s · lancement sans outils dans un répertoire temporaire isolé'),
+   (p.turn.timeout_seconds===0?tr_web_assistant_js('Durée totale sans plafond'):tr_web_assistant_js('Délai maximal : ')+p.turn.timeout_seconds+tr_web_assistant_js(' s'))+tr_web_assistant_js(' · lancement sans outils dans un répertoire temporaire isolé'),
    tr_web_assistant_js('Faits transmis : ')+ctx.facts.length+tr_web_assistant_js(' · actions autorisées : ')+ctx.actions.filter(a=>a.available).map(a=>a.id).join(', '),
    'Omissions : '+(ctx.omissions.join(' | ')||'aucune'),
    tr_web_assistant_js('Données manquantes déclarées : ')+(ctx.missing.join(' | ')||'aucune'),

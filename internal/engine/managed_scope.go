@@ -65,7 +65,7 @@ func managedScope(bare, base, candidate string) (ManagedScopePlan, error) {
 	return p, nil
 }
 func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) (ManagedScopePlan, error) {
-	e, err := s.readManagedPreflightEvidence(work, r.Task)
+	e, err := s.readManagedScopeEvidence(work, r.Task)
 	if err != nil {
 		return ManagedScopePlan{}, err
 	}
@@ -77,6 +77,9 @@ func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) 
 	p.Revision = e.Revision
 	p.Evidence = coordinationEvidence(e.Context)
 	p.Criteria = coordinationCriteria(e.Context)
+	if e.Context.InspectionOnly {
+		p.Next = "Inventaire de récupération uniquement : le candidat contient des binaires non examinables par la revue textuelle. Conserver candidat et preuves ; préparer une correction de périmètre explicite ou une revue adaptée. Aucun appel, verdict ou acceptation autorisé par cet inventaire."
+	}
 	if patch {
 		if r.Revision != e.Revision || r.ExpectedCandidate != p.Candidate {
 			return p, fmt.Errorf("candidat ou révision modifié ; relire scope-preview")

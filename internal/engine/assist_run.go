@@ -15,17 +15,22 @@ import (
 	"time"
 )
 
-const assistDeadlineSeconds = 300
 const assistReplyLimit = 1 << 20
 
 // Single bounded inference in an empty directory, with coding tools disabled.
 // Claim by compare-and-swap prevents duplicate HTTP confirmations spawning twice.
-func (s *Store) runAssistTurn(turn AssistTurn) {
-	seconds := turn.TimeoutSeconds
-	if seconds < 1 || seconds > assistDeadlineSeconds {
-		seconds = assistDeadlineSeconds
+func assistTimeoutDuration(seconds int) (time.Duration, error) {
+	if seconds < 0 || int64(seconds) > int64(^uint64(0)>>1)/int64(time.Second) {
+		return 0, fmt.Errorf("Délai d’assistance entier positif ou nul requis ; représentation de durée valide requise")
 	}
-	s.runAssistTurnWithin(turn, time.Duration(seconds)*time.Second)
+	return time.Duration(seconds) * time.Second, nil
+}
+func (s *Store) runAssistTurn(turn AssistTurn) {
+	duration, err := assistTimeoutDuration(turn.TimeoutSeconds)
+	if err != nil {
+		duration = -1
+	}
+	s.runAssistTurnWithin(turn, duration)
 }
 func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 	turn.Status = "running"
@@ -39,6 +44,10 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 	}
 	n, _ := result.RowsAffected()
 	if n != 1 {
+		return
+	}
+	if deadline < 0 {
+		_ = s.settleAssistTurn(turn, "", nil, refuse("invalid_timeout", refusalService, "Délai d’assistance invalide ; aucun appel exécuté.", ""))
 		return
 	}
 	providers, e := s.providers()
@@ -100,8 +109,12 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 	_ = s.saveAssistTurn(turn)
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait(); _ = writer.Close() }()
-	timer := time.NewTimer(deadline)
-	defer timer.Stop()
+	var expired <-chan time.Time
+	if deadline > 0 {
+		timer := time.NewTimer(deadline)
+		defer timer.Stop()
+		expired = timer.C
+	}
 	poll := time.NewTicker(250 * time.Millisecond)
 	defer poll.Stop()
 	var failure *AssistRefusal
@@ -111,7 +124,7 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 		select {
 		case waitErr = <-done:
 			waiting = false
-		case <-timer.C:
+		case <-expired:
 			failure = refuse("timeout", refusalService, fmt.Sprintf("Délai de %.0f secondes dépassé ; aucune conclusion n’en est tirée.", deadline.Seconds()), "")
 			_ = syscall.Kill(-turn.PID, syscall.SIGKILL)
 			waitErr = <-done

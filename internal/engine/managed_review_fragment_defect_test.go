@@ -72,3 +72,42 @@ func TestFragmentDefectSourceLineUsesDecodedContents(t *testing.T) {
 		t.Fatal("line would point to JSON transport")
 	}
 }
+
+func TestFragmentDefectQuoteStartsWithinDeclaredLine(t *testing.T) {
+	quote := "Correction externe : sorties originales attribuées jointes."
+	content := "diff --git a/proof.json b/proof.json\n+  \"reason\": \"" + strings.Repeat("contexte ", 80) + quote + "\"\n+  \"state\": \"partial\"\n"
+	for _, tc := range []struct {
+		name, quote string
+		line        int
+		valid       bool
+	}{
+		{"inline Unicode on long JSON line", quote, 2, true},
+		{"exact multiline", quote + "\"\n+  \"state\"", 2, true},
+		{"wrong preceding line", quote, 1, false},
+		{"wrong following line", quote, 3, false},
+		{"invented quote", "Correction externe : preuve inventée.", 2, false},
+		{"normalized text", "Correction externe: sorties originales attribuées jointes.", 2, false},
+		{"line separator only", "\n+  \"state\": \"partial\"", 2, false},
+		{"zero line", quote, 0, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			p, r := inspectionReplyFixture()
+			p.Version = 2
+			p.Artifacts[0].Content = content
+			p.Artifacts[0].Digest = hash([]byte(content))
+			raw, _ := json.Marshal(p)
+			r.PacketDigest = hash(raw)
+			r.Findings[0].Digest = p.Artifacts[0].Digest
+			r.Findings[0].Verdict = "fail"
+			r.Defects = []managedFragmentDefect{{Artifact: 0, Line: tc.line, Quote: tc.quote, Explanation: "The supplied fixture omits the expected guard in this branch.", Reproduction: "Call the branch with the documented invalid input.", Expected: "Reject invalid input."}}
+			reply, _ := json.Marshal(r)
+			state, _, err := parseManagedFragmentInspection(string(reply), p)
+			if tc.valid && (err != nil || state != "changes_requested") {
+				t.Fatal(state, err)
+			}
+			if !tc.valid && err == nil {
+				t.Fatal("unattributed quote accepted")
+			}
+		})
+	}
+}

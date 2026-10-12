@@ -49,11 +49,13 @@ func (s *Store) savePlanningUsage(id string, u *Usage) error {
 
 func planningAncestors(p *PlanningState, id string) []*PlanningScope {
 	out := []*PlanningScope{}
+	seen := map[string]bool{}
 	for id != "" {
 		scope, err := p.scope(id)
-		if err != nil || len(out) > 20 {
+		if err != nil || seen[id] {
 			return nil
 		}
+		seen[id] = true
 		out = append(out, scope)
 		id = scope.Parent
 	}
