@@ -1,5 +1,10 @@
 [
   {
+    "path": "docs/screenshots/projects-method-20261010/qualification.json",
+    "kind": "doc",
+    "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
+  },
+  {
     "path": "docs/screenshots/projects-method-20261010/result.json",
     "kind": "doc",
     "sha256": "41d27d83107db17355397fc4fdf5371148831574610a2a3bba07df906ee4364d"
@@ -1378,10 +1383,5 @@
     "path": "internal/engine/brainstorm.go",
     "kind": "source",
     "sha256": "508ce579670192a0bffc997440d00a1f8d417763422f0f02ee6443837eeb5aca"
-  },
-  {
-    "path": "internal/engine/brainstorm_test.go",
-    "kind": "test",
-    "sha256": "19fd4f2fea33f17140b673b3d082b7e7445ad0016b3f81e935571314daed54b0"
   }
 ]

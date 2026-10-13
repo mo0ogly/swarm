@@ -442,7 +442,7 @@
   {
     "path": "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
     "kind": "doc",
-    "sha256": "af3b8194948bd4103f1c754f84d00dfa1181c25a197b69d8ac64141995b2eaa3"
+    "sha256": "78a99406c2c17326b35cf4fa7dff718f50f32c47bde25716b54e57d8250a7e47"
   },
   {
     "path": "docs/architecture/CURSOR-ENGINE-EVOLUTION-20261010.md",
@@ -572,12 +572,17 @@
   {
     "path": "docs/en/CURSOR-ENGINE-CONTRACT.md",
     "kind": "doc",
-    "sha256": "289ab3c04e05e019f450721843953d2377674ff893d91b0e41a7a2aae89775fd"
+    "sha256": "db9ff9e7464460e0f9a782342b5d625515762a6f544178a0481c8672b3804552"
   },
   {
     "path": "docs/en/CURSOR-ENGINE-EVOLUTION-20261010.md",
     "kind": "doc",
     "sha256": "df697786c0f8d3c615db42d8d9b67a97f01390645be565f80ca550261ed9dadb"
+  },
+  {
+    "path": "docs/en/CURSOR-ENGINE-RETEX-20261013.md",
+    "kind": "doc",
+    "sha256": "3b20426ea4994d96d76cce88e58bf1df3ca5d9755629e3af8ff464c2fdb2f943"
   },
   {
     "path": "docs/en/DELIVERY-SCOPE.md",
@@ -1458,10 +1463,5 @@
     "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
     "kind": "capture",
     "sha256": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/qualification.json",
-    "kind": "doc",
-    "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
   }
 ]

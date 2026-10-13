@@ -1,5 +1,10 @@
 [
   {
+    "path": "internal/engine/mission_preview_review_test.go",
+    "kind": "test",
+    "sha256": "ef3a10242cd66cee193fa8ee8a19b4edbb0562ad15448c4776501fee7c7ee5a5"
+  },
+  {
     "path": "internal/engine/mission_provider_cooldown_test.go",
     "kind": "test",
     "sha256": "c4c99fcefffdc5dd39a43039ca2ded137fe459ad9157e789ab2a3a8a49e5385a"
@@ -1483,10 +1488,5 @@
     "path": "tools/agent-workflows/templates/ks/prd.md",
     "kind": "source",
     "sha256": "d4a2a375bf958cddc8d241508f2f859fec52798ced608d2b710e81e728a07372"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/research.md",
-    "kind": "source",
-    "sha256": "8664d57b8bc38618efd0e70f842e19ad1527ff378efb66feb68668af7ce09048"
   }
 ]

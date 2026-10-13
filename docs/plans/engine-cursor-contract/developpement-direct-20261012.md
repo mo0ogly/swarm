@@ -9,7 +9,7 @@ Les tentatives, dépenses et avis précédents restent historiques.
 ## Plan conservé, mode d'exécution changé
 
 L'[audit de clôture](completion-audit-20261012.md) rattache les critères conservés
-aux preuves et aux lacunes actuelles ; l'objectif reste actif. Aucun nombre de
+aux preuves et aux limites actuelles ; sa mise à jour du 13 octobre clôt la livraison directe. Aucun nombre de
 tests réussi ne remplace cette vérification lot par lot.
 
 Évolution suivante ajoutée à la demande de l'utilisateur :
@@ -213,3 +213,8 @@ sans acceptation fabriquée. Voir le [reçu du lot](evidence/direct-20261012/gra
 et le [RETEX local](evidence/T8-handoff.md). La question d'une recette Codex isolée
 avec vrai modèle et revue indépendante est explicitement posée ; elle ne relance
 pas la mission historique. Le candidat reste distinct du serveur installé.
+
+
+## Clôture directe du 13 octobre
+
+T7 isolé avec Codex réel et revue indépendante a été autorisé explicitement, puis réalisé ; la mission historique n'est pas relancée. Le [RETEX final](RETEX-final-20261013.md) et [l'audit courant](completion-audit-20261012.md) remplacent les anciennes conditions de reprise de ce rapport. Les échecs, sources/révisions, interventions, limites et coûts inconnus restent conservés. L'installation native est vérifiée séparément du bundle de recette et des anciens verdicts historiques.

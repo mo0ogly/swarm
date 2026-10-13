@@ -27,7 +27,7 @@ production parallèle et publication exclusive.
 | Vérificateur indépendant | Examine le résultat et les preuves sur la révision candidate. | Avis motivé, sans outil d'écriture ni pouvoir d'autoacceptation. |
 | Contrôleur déterministe | Exécute les commandes de contrôle et applique les règles de publication. | Reçus, refus et transition atomique si toutes les conditions sont réunies. |
 
-La publication de janvier sépare planificateurs et workers, autorise des sous-planificateurs récursifs et prévoit un juge en fin de cycle, puis un démarrage frais de l’itération suivante. La revue indépendante d’un candidat dans Swarm ne remplace pas ce juge global. Les garanties supplémentaires de preuve et d’acceptation de Swarm doivent être distinguées de ces exigences. Le mécanisme actuel `judge`/`renew` est vérifié par fixtures, avec contexte reçu et effet observé ; la démonstration cumulative avec fournisseur réel reste un critère de recette. Voir [les cycles de jugement](JUDGMENT-CYCLES.md).
+La publication de janvier sépare planificateurs et workers, autorise des sous-planificateurs récursifs et prévoit un juge en fin de cycle, puis un démarrage frais de l’itération suivante. La revue indépendante d’un candidat dans Swarm ne remplace pas ce juge global. Les garanties supplémentaires de preuve et d’acceptation de Swarm doivent être distinguées de ces exigences. Le mécanisme actuel `judge`/`renew` est vérifié par fixtures, avec contexte reçu et effet observé ; la recette cumulative avec fournisseur réel est maintenant observée dans le périmètre décrit en fin de page. Voir [les cycles de jugement](JUDGMENT-CYCLES.md).
 
 Les copies isolent les modifications et les références Git. Elles ne constituent
 pas une frontière de sécurité contre un processus malveillant disposant des droits
@@ -135,21 +135,16 @@ transport conserve sa taille et son empreinte. Un rapport modifié ou partiellem
 présent reste joint en entier. En cas de refus, le journal indique la taille
 réelle et la part occupée par les consignes, sans exposer le contenu.
 
-## État des preuves après le développement direct du 13 octobre
+## État des preuves après livraison directe du 13 octobre
 
-Les matrices ci-dessus conservent le constat initial. Elles ne représentent pas
-l'état actuel des sources. Les [rapports T1–T8](../plans/engine-cursor-contract/completion-audit-20261012.md)
-et reçus distinguent désormais :
+Les matrices initiales ci-dessus restent historiques. La recette cumulative réelle, les corrections et avis indépendants sont maintenant qualifiés ; [audit T1–T8](../plans/engine-cursor-contract/completion-audit-20261012.md) et [RETEX final](../plans/engine-cursor-contract/RETEX-final-20261013.md).
 
-| Exigence | Preuve locale actuelle | Preuve encore requise |
+| Exigence | Preuve actuelle | Limite de démonstration |
 | --- | --- | --- |
-| JAN-1/JAN-2 | Exploration en lecture attribuée, adaptation persistée et scopes concurrents en fixtures | Plusieurs planificateurs réels et découverte autonome |
-| JAN-3/FEB-1/FEB-2 | Copies propres, remise attribuée, reprise et publication contrôlée testées | Remises effectivement exploitées sur recette modèle réelle |
-| JAN-4/JAN-5/FEB-3 | Contexte judge/renew reçu, renouvellement appliqué, fraîcheur et effets doubles contrôlés | Jugement et renouvellement observés avec fournisseur réel |
-| JAN-6/FEB-4 | Production et attente de publication mesurées sur deux niveaux en fixtures | Débit/coût/tokens réels et arbitrages d'une mission longue |
-| JAN-7 | Routes et politiques par rôle administrables ; consommateurs vérifiés | Adéquation et endurance comparées sur modèles réels |
+| JAN-1/JAN-2 | SPEC explorée et attribution persistée ; deux sous-planificateurs réels simultanément réservés | Deux modules ; pas exploration continue d'un grand dépôt |
+| JAN-3/FEB-1/FEB-2 | Workers isolés en parallèle, remise reçue, deux résultats accepted/fresh sur le même candidat publié | Reprise après défaut worker et refus sémantique couverte en fixtures, pas observée réellement dans cette recette |
+| JAN-4/JAN-5/FEB-3 | Continue/renew reçus et appliqués avec contexte neuf ; end explicite cycle 5, neuf scopes clos | Reprises assistées, pas endurance continue sur plusieurs jours |
+| JAN-6/FEB-4 | Deux niveaux en fixtures ; chevauchement réel53,149s ; trois contrôles enregistrés | Pas débit/coût comparé à grande échelle ; coût inconnu, usages incomplets |
+| JAN-7 | Route standard figée, ordre discriminant corrigé et effet réel sur les décisions | Pas comparaison d'endurance de plusieurs modèles |
 
-L'architecture actuelle combine hiérarchie continue et points de jugement,
-publication exclusive et production parallèle. Les valeurs effectives Admin
-remplacent les plafonds historiques cités par l'audit initial. Ces preuves ne
-constituent pas une certification Cursor ni une acceptation native.
+L'architecture combine hiérarchie continue et points de jugement, publication exclusive et production parallèle. Les politiques Admin remplacent les anciens plafonds cités dans l'audit initial. Le développement direct, la recette isolée, le code revu et le binaire installé ont des preuves distinctes. La mission historique reste en pause ; aucune certification Cursor ou autonomie générale n'est annoncée.

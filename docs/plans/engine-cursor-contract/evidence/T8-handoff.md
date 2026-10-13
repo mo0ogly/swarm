@@ -1,10 +1,9 @@
 # T8 — RETEX et quick wins de la livraison directe
 
-**PARTIAL — recette locale terminée pour les derniers correctifs, recette réelle
-et revue indépendante T7 encore attendues.** Ce bilan ne clôt pas la mission
+**PASS de la livraison directe — recette T7 et revue indépendante terminées, RETEX final FR/EN/Mermaid et quick wins traités.** Ce bilan ne clôt pas la mission
 historique et ne fabrique aucune acceptation native.
 
-## Résultat observé
+## Historique du bilan local — complété par la consolidation finale
 
 La reprise directe a corrigé les cycles de jugement, la planification, les remises
 et politiques décrites dans T1–T7. Le dernier lot ajoute l'atelier du graphe et
@@ -94,3 +93,10 @@ part de l'état réel, apporte une preuve ou une précondition nouvelle, et dist
 un processus actif d'une autorisation encore attendue.
 
 Le profil 200 cartes possède maintenant sa preuve propre : cinq rechargements, p95 919 ms, clavier 32,6 ms, cibles 1 000 ms/100 ms conservées. Le démarrage froid 1 057 ms est séparé. Les réserves précédentes concernant la mesure 200 restent historiques ; elles ne sont pas effacées des anciens reçus. [Reçu complémentaire](direct-20261012/performance-200-verification-receipt.json).
+
+
+## Consolidation finale du 13 octobre
+
+Les réserves de chronologie ci-dessus décrivent les étapes antérieures ; la frontière actuelle est le [RETEX final FR/EN](../RETEX-final-20261013.md) et [l'audit de clôture](../completion-audit-20261012.md). La recette T7 réelle et les avis code indépendants sont favorables, avec leurs limites. Les quick wins F1/F2/F2b, ordre de schéma, comptage de contrôles et lecture des preuves sont réalisés et vérifiés. Le bilan final distingue moteur, candidat de recette et service installé ; il conserve les interventions, usages incomplets et coût inconnu.
+
+La source/installation du correctif de lecture est qualifiée à 3f121f7. Les derniers documents seuls suivent le même parcours ; la clôture opérationnelle exige séparément les assertions PASS du reçu final d'identité/restauration dans le cache opérateur. La mission historique reste en pause, sans création d'une acceptation T8 artificielle. Les propositions de campagne d'endurance, de réparation sémantique réelle et d'attribution de coûts restent des évolutions possibles avec effort/risque/critère observable, pas des tâches engagées implicitement.

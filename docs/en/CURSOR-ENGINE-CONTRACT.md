@@ -159,7 +159,7 @@ atomic scoped decisions, own and ancestor counters, shared reservations, pause,
 replay and persistence. They are deterministic provider doubles; real-model
 behavior remains a T7 recipe. This isolated T3 source includes the original
 developed T2 Judge but does not accept T2. Deferred correction27 is excluded.
-Runtime26 still lacks these new capabilities until qualification and installation.
+Historical runtime26 lacked these capabilities at that audit; current installation qualification is recorded in the final delivery retrospective.
 
 ### Supervisor reservation and effective provider
 
@@ -184,23 +184,18 @@ flowchart TD
     A --> L[Invoke the same frozen route]
 ```
 
-Current `judge`/`renew` has fixture evidence for received context and observed effect; cumulative real-provider verification remains required. See [judgment cycles](JUDGMENT-CYCLES.md) and the candidate delivery reports.
+Current `judge`/`renew` has fixture evidence for received context and observed effect; cumulative real-provider verification is now observed within the scope described at the end of this page. See [judgment cycles](JUDGMENT-CYCLES.md) and the candidate delivery reports.
 
-## Evidence after direct development on October 13
+## Evidence after direct delivery on October13
 
-The matrices above retain the initial audit, not the current implementation state.
-The [T1–T8 reports](../plans/engine-cursor-contract/completion-audit-20261012.md)
-and original receipts now distinguish:
+The matrices above retain the initial audit. The real cumulative recipe, corrections and independent opinions are now qualified; see the [T1–T8 audit](../plans/engine-cursor-contract/completion-audit-20261012.md) and [final retrospective](CURSOR-ENGINE-RETEX-20261013.md).
 
-| Requirement | Current local evidence | Evidence still required |
+| Requirement | Current evidence | Demonstration limit |
 | --- | --- | --- |
-| JAN-1/JAN-2 | Attributed repository reading, persisted adaptation and concurrent fixture scopes | Multiple real planners and autonomous discovery |
-| JAN-3/FEB-1/FEB-2 | Owned copies, attributed handoff, restart and controlled publication tests | Real-provider handoffs used by subsequent decisions |
-| JAN-4/JAN-5/FEB-3 | Received judge/renew context, observed renewal, freshness and duplicate-effect guards | Real-provider judgment and renewal |
-| JAN-6/FEB-4 | Production/publication waiting measured at two fixture concurrency levels | Real throughput, cost, tokens and long-running arbitration |
-| JAN-7 | Configurable role routes and policies with tested consumers | Compared suitability and endurance on real models |
+| JAN-1/JAN-2 | Attributed SPEC discovery and two real simultaneously reserved subplanners | Two modules, not continuous large-repo exploration |
+| JAN-3/FEB-1/FEB-2 | Parallel isolated workers and handoffs; two accepted/fresh results on one published candidate | Defective-worker/semantic-refusal recovery retains fixture evidence, not real observation in this recipe |
+| JAN-4/JAN-5/FEB-3 | Received/applied continue/renew and new context; explicit end cycle5, nine closed scopes | Assisted resumptions, not multi-day endurance |
+| JAN-6/FEB-4 | Two fixture levels, real53.149s overlap, three recorded controls | No comparative real scale/cost campaign; cost unknown and usage incomplete |
+| JAN-7 | Frozen standard route and discriminator-order fix with observed effect | No comparative model endurance study |
 
-Current architecture combines continuous hierarchy and judgment checkpoints,
-exclusive publication and parallel production. Effective Admin settings replace
-the historical bounds cited in the original audit. This evidence does not provide
-Cursor certification or native acceptance.
+Current architecture combines continuous hierarchy and judgment checkpoints, exclusive publication and parallel production. Effective Admin policies replace the historical bounds in the initial audit. Direct development, isolated recipe, reviewed code and deployed binary have separate evidence. The historical mission stays paused; no Cursor certification or universal autonomy is claimed.

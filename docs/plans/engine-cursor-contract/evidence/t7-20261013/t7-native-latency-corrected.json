@@ -1,0 +1,26 @@
+{
+  "snapshot_seconds": 1.7676788699973258,
+  "snapshot_sha256": "6400cddc038a190b294b9480c7a8a708c5626a56e4bee19cf2260a950855f4a5",
+  "revision": 43,
+  "paused": true,
+  "validated": 5,
+  "stale": 0,
+  "active_agents": 0,
+  "review_states": {
+    "plan-a77d9f4799-F1": "passed",
+    "plan-a77d9f4799-F2": "passed",
+    "plan-a77d9f4799-F3": "passed",
+    "plan-a77d9f4799-F4": "passed",
+    "plan-a77d9f4799-F5": "passed"
+  },
+  "health": {
+    "version": "devel",
+    "commit": "3f121f759200b5f8d0a0d9c5d0170208b29b07ba",
+    "modified": false,
+    "build_date": "2026-10-13T08:30:53Z",
+    "provenance": "injected"
+  },
+  "cli_seconds": 10.417999247001717,
+  "cli_exit": 0,
+  "cli_sha256": "35d7aaf3101a1586963fd94746824f3aaa5d724dc0ac8bab271cc261cda773da"
+}

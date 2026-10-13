@@ -1,27 +1,25 @@
 # T7 — Revue indépendante et recette réelle cumulative
 
-Rapport consolidé de développement direct, 13 octobre 2026. **PARTIAL**, aucune acceptation native ni remise automatique. Le nom du livrable est conservé du plan original ; ce fichier ne fabrique pas une livraison par le moteur.
+**PASS de la qualification convenue**,13 octobre 2026, avec les limites ci-dessous. Développement direct Codex ; recette isolée avec Codex réel et reviewer séparé autorisés explicitement. Aucun statut de la mission historique n'est forcé.
 
-## Critères conservés
+| Critère | Résultat | Preuve |
+| --- | --- | --- |
+| Fournisseur disponible et route figée | Standard configuré gpt-5.6-sol/medium réellement utilisé ; premier refus de capacité conservé | frozen de phase et reçus de configuration publics dans le cache ; avis cumulatif |
+| Découverte, délégation parallèle, remise, jugement, contexte frais, reprise | SPEC explorée, deux sous-planificateurs réservés ensemble, deux workers se chevauchent53,149s ; neuf scopes clos, root end cycle 5 | Snapshot final, reçu cumulatif et bundle dans t7-20261013 |
+| Avis indépendants et contrôles sur même candidat | Première revue partielle puis une revue finale cumulative couvrant les deux tâches sur b569 ; deux contrôles finaux frais, trois exécutions au registre | Deux tâches accepted/fresh à r127 ; avis code6bfd100 et delta 3f121f7 favorables |
+| Bilan JAN/FEB, interventions, coûts et architecture | RETEX FR/EN et Mermaid, compteurs relus publiquement et corrections générales vérifiées | RETEX final et audit de clôture |
 
-1. **PARTIAL** — Fournisseur réellement disponible et politique de modèle figés ; absence de quota ou configuration bloque l’appel sans essai de contournement.
-2. **PARTIAL** — Observer découverte, délégation parallèle, remise, correction, jugement global, contexte frais et reprise avec fournisseur réel.
-3. **PARTIAL** — Avis indépendant et contrôles couvrent le même candidat ; échec bloque acceptation et clôture.
-4. **PARTIAL** — Rapport cumulatif JAN/FEB avec interventions humaines, coût connu ou inconnu, échecs et critères non démontrés. Architecture documentée dans le même candidat, avec schémas et limites à jour.
+Le candidat moteur de production finale est60c3dc6 ; le candidat du projet livré est `b569bb35fb5816bb806826000f99be32b973108c`. Les lectures corrigées6bfd100 puis3f121f7 conservent r127 et ses deux acceptations fraîches. Le reviewer code examine le moteur, le reviewer natif examine le projet : ces avis sont distincts.
 
-## Preuves et portée
+F1 aperçu/historique, F2 motif fournisseur, F2b outil/fournisseur, ordre du discriminant et F4 comptage sont corrigés avec rouges/verts et revues. Une lenteur apparue à l'installation a été corrigée au niveau des projections de lecture, sans cache d'acceptation :41,66→1,77s sur la même mission conservée. Le serveur et les assets ont une qualification d'installation distincte.
 
-Recettes locales et fournisseur HTTP/subprocess factice sont distincts d’une recette avec modèle réel. La revue de cette conversation n’est pas indépendante. L’utilisateur a autorisé ces vérifications finales isolées le 13 octobre (« go fais ca »). La revue du candidat 44a86e6 demande deux corrections P2 ; leurs régressions ciblées passent. La recette réelle Codex a observé des cycles renouvelés, l’exploration et deux sous-planificateurs simultanés ; sa livraison cumulative reste en cours.
+## Originaux et limites
 
-- [verification-receipt.json](direct-20261012/verification-receipt.json)
-- [completion-audit-20261012.md](../completion-audit-20261012.md)
+- [Avis cumulatif6bfd100](t7-20261013/t7-cumulative-review-6bfd100.md).
+- [Avis delta de lecture](t7-20261013/t7-read-scope-review.md).
+- [Reçu cumulatif](t7-20261013/t7-cumulative-public-receipt.json), [snapshot final](t7-20261013/final-public-work.json), [bundle](t7-20261013/delivery.bundle).
+- [RETEX final](../RETEX-final-20261013.md), [audit de clôture](../completion-audit-20261012.md).
 
-Les reçus conservent leurs révisions, empreintes et commandes originales. Ils ne sont pas redatés pour créer une revue du candidat courant. Le snapshot de sources courant est dans `docs/engine-cursor-source-manifest.json`. La mission historique reste en pause ; budgets, tentatives et verdicts antérieurs sont conservés.
+La recette traverse plusieurs candidats et interventions ; elle n'est pas une exécution neuve entièrement sous le dernier commit. Le harnais d'origine mentionnait trois scopes à tort : le snapshot et reçu distinct en établissent neuf. Le hash391f… du premier avis est corrigé additivement comme réception r15 ; l'original n'est pas réécrit. La somme d'usage rapporte44 entrées,8 sans usage, coût inconnu ; les probes hors mission restent séparées.
 
-## Condition de clôture
-
-Recette cumulative applicable et revue indépendante du même candidat, corrections nécessaires vérifiées, puis décision d’acceptation autorisée. Voir [l’audit de clôture](../completion-audit-20261012.md).
-
-Reprise T7 du 13 octobre : saturation réelle de gpt-6.1-sol, changement explicite vers le standard configuré gpt-5.6-sol/medium, appels consommés conservés. Une consigne de recette « FIRST » a entraîné des cycles répétés ; arrêt des départs puis instruction de phase via reprise publique, sans reset. Les deux sous-planificateurs ont été actifs simultanément. La revue indépendante a confirmé F1 aperçu/historique navigateur et F2 perte du motif d’erreur Codex ; rouges reproduits puis 11 tests ciblés / 18 avec sous-cas `-race` PASS. Répertoire courant : `evidence/t7-20261013`. Cela ne prouve pas encore livraison, recette cumulative achevée ni déploiement.
-
-La revue du candidat 61f82bd a trouvé F2b : `tool_result/is_error=true` pouvait être classé comme erreur fournisseur. Rouge conservé, puis prédicat limité aux seules enveloppes fournisseur ; 16 tests ciblés / 23 avec sous-cas `-race` PASS. Un ENOSPC de copie du binaire a été traité par nettoyage du cache Go reconstructible, sans suppression de preuve ni mission.
+Pas de worker défectueux puis réparation autonome réelle après refus sémantique, pas de campagne d'endurance ou de grande échelle. Les fixtures négatives gardent leur propre portée. Les tests ne deviennent pas des acceptations natives historiques. La mission historique demeure en pause.
