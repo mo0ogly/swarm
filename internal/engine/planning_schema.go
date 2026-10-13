@@ -2,6 +2,35 @@ package engine
 
 import "encoding/json"
 
+// Property order is part of the constrained generation interface. Keep the
+// shared discriminator before branch-specific payload, not alphabetically last.
+type planningSchemaProperty struct {
+	Name  string
+	Value any
+}
+type planningSchemaProperties []planningSchemaProperty
+
+func (properties planningSchemaProperties) MarshalJSON() ([]byte, error) {
+	raw := []byte{'{'}
+	for i, property := range properties {
+		key, err := json.Marshal(property.Name)
+		if err != nil {
+			return nil, err
+		}
+		value, err := json.Marshal(property.Value)
+		if err != nil {
+			return nil, err
+		}
+		if i > 0 {
+			raw = append(raw, ',')
+		}
+		raw = append(raw, key...)
+		raw = append(raw, ':')
+		raw = append(raw, value...)
+	}
+	return append(raw, '}'), nil
+}
+
 // All fields are required for structured-output adapters; unused fields remain
 // empty. This is a wire format, not authority to execute an operation.
 const planningProposalSchema = `{
@@ -97,13 +126,20 @@ func planningSchemaForDelivery(delivery PlanningDelivery) string {
 	for _, rawKind := range kinds {
 		kind := rawKind.(string)
 		fields := planningOperationSchemaFields(kind)
-		props := map[string]any{"kind": map[string]any{"type": "string", "enum": []string{kind}}}
+		props := planningSchemaProperties{{Name: "kind", Value: map[string]any{"type": "string", "enum": []string{kind}}}}
 		required := []string{"kind"}
 		for _, field := range fields {
-			props[field] = legacyProperties[field]
+			props = append(props, planningSchemaProperty{Name: field, Value: legacyProperties[field]})
 			required = append(required, field)
 		}
-		variants = append(variants, map[string]any{"type": "object", "additionalProperties": false, "required": required, "properties": props})
+		branch := map[string]any{"type": "object", "additionalProperties": false, "required": required, "properties": props}
+		switch kind {
+		case "task":
+			branch["description"] = "Create an executable worker task with a deliverable and criteria. This does not let the planner code; it assigns production to a worker."
+		case "delegate":
+			branch["description"] = "Create a child planner/subplanner scope for justified further decomposition. This never creates an executable worker, even if its title says worker."
+		}
+		variants = append(variants, branch)
 	}
 	operations["items"] = map[string]any{"anyOf": variants}
 	raw, err := json.Marshal(schema)

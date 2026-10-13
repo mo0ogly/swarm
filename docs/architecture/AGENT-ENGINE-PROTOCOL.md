@@ -229,3 +229,21 @@ Si ce contexte ne tient toujours pas, le parcours de réduction par événements
 entiers puis le diagnostic préalable restent applicables. La reproduction avec
 huit tâches et un refus courant volumineux exerce l’appel du fournisseur double,
 pas la compréhension autonome d’un fournisseur réel.
+
+## Choisir l’opération avant son contenu
+
+`task` propose une tâche worker exécutable ; le planificateur ne code pas. `delegate` propose un autre périmètre de planification ; un titre contenant « worker » ne transforme pas cette opération en tâche. Une décomposition supplémentaire exige une justification du responsable. Le moteur applique le choix autorisé reçu sans substituer l’une de ces décisions à l’autre.
+
+Le schéma de sortie conserve `anyOf`, les champs requis, les enums et toutes les validations. `planningSchemaProperties.MarshalJSON` sérialise `properties.kind` en premier dans chaque branche, puis son contenu. La génération structurée respecte l’ordre des clés du schéma : [documentation officielle OpenAI](https://developers.openai.com/api/docs/guides/structured-outputs). Dans la recette T7, l’ordre alphabétique plaçait `criteria` avant `kind` pour `task` et `id` avant `kind` pour `delegate`. Même prompt complet et même route : la probe a choisi `delegate` avec l’ancien ordre, puis `task` avec le seul discriminant déplacé en tête ; les schémas parsés sont égaux. Cela étaye cette cause pour ce cas, sans garantir tous les futurs choix d’un modèle.
+
+```mermaid
+flowchart LR
+    S[Schéma : kind en premier] --> K{IA choisit kind}
+    K -->|task| T[Livrable, critères, consigne du worker]
+    K -->|delegate| P[Objectif et périmètre du sous-planificateur]
+    T --> V[Moteur : droits, fraîcheur, budgets et schéma]
+    P --> V
+    V --> A[Appliquer seulement la proposition autorisée]
+```
+
+Une opération `judge` disponible n’oblige pas à ouvrir un nouveau cycle. Le responsable reprend l’exigence encore ouverte après une précondition accomplie ; les cycles et explorations déjà réalisés restent conservés. Les refus et les erreurs ne sont pas effacés. La recette réelle et la revue du candidat demeurent nécessaires ; une consigne seule ne prouve pas l’effet.

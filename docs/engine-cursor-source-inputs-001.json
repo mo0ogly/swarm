@@ -422,7 +422,7 @@
   {
     "path": "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
     "kind": "doc",
-    "sha256": "14c496d71907e97a9658c6823e065f39dfd415291480861bc2a008890f613ae8"
+    "sha256": "3d47b29e40df99d5a9c775e50e67e2c450b3d145fee7c9e3ab05b4d057fd66b3"
   },
   {
     "path": "docs/architecture/AGENT-PARALLELISM.md",
@@ -517,7 +517,7 @@
   {
     "path": "docs/en/AGENT-ENGINE-PROTOCOL.md",
     "kind": "doc",
-    "sha256": "e3127993f5a681b045e9e761d8c9205a02748632f0df2cddbbbdb22d94096a7f"
+    "sha256": "2100048c67cf9cc7f69ea311deda33e25bcf3fb0f568d5bdeb8d4dd0e13cd960"
   },
   {
     "path": "docs/en/AGENT-METHODS.md",

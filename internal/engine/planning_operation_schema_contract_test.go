@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -83,4 +84,32 @@ func planningOperationSchemaKinds(t *testing.T, raw string) []string {
 		t.Fatal("no operation branches")
 	}
 	return kinds
+}
+
+// Constrained output follows property order. The common discriminator must be
+// chosen before branch-specific required payload (criteria vs id, for example).
+func TestPlanningSchemaChoosesKindBeforePayload(t *testing.T) {
+	for _, delivery := range []PlanningDelivery{{}, {JudgeAvailable: true, JudgeCycle: 2, ExplorationAvailable: true}, {HistoricalOnly: true, DelegationUnavailable: true}} {
+		var schema struct {
+			Properties map[string]struct {
+				Items struct {
+					AnyOf []struct {
+						Properties json.RawMessage `json:"properties"`
+					} `json:"anyOf"`
+				} `json:"items"`
+			} `json:"properties"`
+		}
+		if err := json.Unmarshal([]byte(planningSchemaForDelivery(delivery)), &schema); err != nil {
+			t.Fatal(err)
+		}
+		for _, branch := range schema.Properties["operations"].Items.AnyOf {
+			decoder := json.NewDecoder(bytes.NewReader(branch.Properties))
+			if token, err := decoder.Token(); err != nil || token != json.Delim('{') {
+				t.Fatal("invalid properties object", token, err)
+			}
+			if key, err := decoder.Token(); err != nil || key != "kind" {
+				t.Fatalf("payload determines branch before discriminator: first=%v err=%v", key, err)
+			}
+		}
+	}
 }

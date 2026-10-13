@@ -207,3 +207,21 @@ acknowledged by this reduction. If the context still cannot fit, whole-event
 batch reduction and the pre-claim diagnostic remain applicable. The reproduction
 with eight tasks and a large current refusal exercises a provider double, not
 an autonomous real provider's understanding.
+
+## Choose the operation before its payload
+
+`task` proposes an executable worker task; the planner does not code. `delegate` proposes another planning scope; a title containing “worker” does not turn it into a task. Further decomposition needs the owner's justification. The engine applies the authorized choice received without substituting one decision for another.
+
+The output schema retains `anyOf`, required fields, enums and validation. `planningSchemaProperties.MarshalJSON` serializes `properties.kind` first in every branch, followed by its payload. Structured generation follows schema key order: [official OpenAI documentation](https://developers.openai.com/api/docs/guides/structured-outputs). In T7, alphabetical order put `criteria` before `kind` for `task` and `id` before `kind` for `delegate`. With the same complete prompt and route, the probe chose `delegate` in the original ordering and `task` when only the discriminator moved first; parsed schemas are equal. This supports the cause for that case, without guaranteeing every future model choice.
+
+```mermaid
+flowchart LR
+    S[Schema: kind first] --> K{AI chooses kind}
+    K -->|task| T[Worker deliverable, criteria and instructions]
+    K -->|delegate| P[Child planner objective and scope]
+    T --> V[Engine: rights, freshness, budgets and schema]
+    P --> V
+    V --> A[Apply only the authorized proposal]
+```
+
+An available `judge` operation does not require a new cycle. The owner resumes the outstanding requirement after completed prerequisites; existing cycles and explorations remain retained. Refusals and failures are not erased. Real recipe and candidate review remain necessary; instructions alone do not prove the effect.

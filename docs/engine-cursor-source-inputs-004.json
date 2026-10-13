@@ -202,7 +202,7 @@
   {
     "path": "internal/engine/planning_operation_schema_contract_test.go",
     "kind": "test",
-    "sha256": "8ea40eb102168b0c3348d9be17f52b53992e654bec7f8d593506834c6c1a2363"
+    "sha256": "2b97d641edd39ef6624d483086cb870189832dc83c675209657802d54fcf6f62"
   },
   {
     "path": "internal/engine/planning_parent_context_test.go",
@@ -212,7 +212,7 @@
   {
     "path": "internal/engine/planning_prompt.go",
     "kind": "source",
-    "sha256": "98b8cc8410936482d491e7fe6aece729ba1570277f05949eda7264968c783a1b"
+    "sha256": "c32dbbff1ec7279eabe91437257212b4c2238e0cbdb3fc27c6e1647e94ca1725"
   },
   {
     "path": "internal/engine/planning_prompt_envelope_test.go",
@@ -257,7 +257,7 @@
   {
     "path": "internal/engine/planning_schema.go",
     "kind": "source",
-    "sha256": "00f7a251ede7d1f25122dcc2e92f5548acb2d965bd69a1384ae1c91c477d2b2b"
+    "sha256": "e743a39d1ac6ccb016528f09cb59ed8d4084980d11d54d2d3d0161a9f2541080"
   },
   {
     "path": "internal/engine/planning_schema_events_test.go",
