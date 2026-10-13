@@ -222,3 +222,21 @@ grounded. Evidence also supports auditing supervisors, reviewers and the engine.
 `mission spending` and the cockpit read executions recorded in `task.auto-validation` and `managed.integrated`. The first carries a result list; the second carries per-task lists in `controls`. The counter adds each `executed=true` result, passed or failed, once per event for that mission. An unreadable structure remains an error and is not presented as zero.
 
 Example: publish alpha with one control, then publish beta with an alpha recheck and beta control. The ledger reports **3 recorded executions**, while the final candidate has **2 fresh controls**. These are different units; summing only final validations would lose the first control. Controls without a recorded result event are not inferred from worker tests or launch intentions. Missing cost stays unknown, even if a JSON sum is zero with no calls reporting cost.
+
+## Check once per projection and again at acceptance
+
+A mission display builds multiple projections of a task and its dependencies. Managed review guards can reread the full context, batches, historical chain and Git. Repeating this for every card amplifies latency: a retained mission with five tasks and two batches took 41.66 seconds for its public snapshot while storage remained responsive.
+
+`readScope` now creates a read-local copy. The HTTP snapshot and `missionStatus` share it with nested projections. The independent guard memoizes both success **and refusal**, keyed by the complete Work, Task and historical mode. Different contracts, attempts, candidates, reviewer configurations or modes cannot reuse an opinion. Serialization failure remains an error.
+
+This cache lasts only for the projection, like gate digests. The live Store has none: acceptance and every new request reread evidence. Missing or changed files invalidate the next read; no acceptance, consumption or persisted proof changes. Projections remain sequential within each request; this map is not a shared concurrent cache. Post-installation measurements belong to the delivery retrospective; this mechanism promises no universal threshold.
+
+```mermaid
+flowchart LR
+    HTTP[Read request] --> Scope[Local readScope copy]
+    Scope --> Cards[Cards, dependencies and summary]
+    Cards --> Guard[Guard bound to Work, Task and mode]
+    Guard --> Once[Physical evidence checked once]
+    Once --> End[Projection ends: discard cache]
+    New[New request or acceptance] --> Fresh[Fresh physical checks]
+```

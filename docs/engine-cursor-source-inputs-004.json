@@ -7,7 +7,7 @@
   {
     "path": "internal/engine/mission_status.go",
     "kind": "source",
-    "sha256": "4bee17fc35cc7a963f1df2a1996a5aa9788861c397d08829ffb4b3c82c5ceab1"
+    "sha256": "0eaec20b48ba59fa2357c6fa7a6490368714a53fef0931524ceb11bd2479a084"
   },
   {
     "path": "internal/engine/mission_status_test.go",
@@ -750,6 +750,11 @@
     "sha256": "d337d69fb5e4c56dc6ce0367ca1a3d9e7b2141b5a222bc05b485c4fbdd112cc3"
   },
   {
+    "path": "internal/engine/review_read_scope_test.go",
+    "kind": "test",
+    "sha256": "150ae915f15820bcc24dce1ad69e1be0c7babd6b28f1774666c8c78063eb037e"
+  },
+  {
     "path": "internal/engine/review_timeout_test.go",
     "kind": "test",
     "sha256": "93bcccdc0632071f77b6fe9d69883219bb53335a68d06d8e1395100d22800ab3"
@@ -877,7 +882,7 @@
   {
     "path": "internal/engine/store.go",
     "kind": "source",
-    "sha256": "a1d74fe951a943b14622bea3438ba85923aebc897486a32c941df59c69abdaa7"
+    "sha256": "31fea4b7f69f932b28354a9605cfe05e11b4335e918e504f4dad361435317502"
   },
   {
     "path": "internal/engine/stream_regression_test.go",
@@ -1107,7 +1112,7 @@
   {
     "path": "internal/engine/web_server.go",
     "kind": "source",
-    "sha256": "70500a23c68a9cf748dcec79ba4f8c2164a56ab0a0980daa97d709b264c4538a"
+    "sha256": "9ba70f5c3f045adeca6668753ca624d1ed7765b5ed4af808a2149ba1dcc23166"
   },
   {
     "path": "internal/engine/web_server_test.go",
@@ -1483,10 +1488,5 @@
     "path": "tools/agent-workflows/templates/ks/research.md",
     "kind": "source",
     "sha256": "8664d57b8bc38618efd0e70f842e19ad1527ff378efb66feb68668af7ce09048"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/review-checklist.md",
-    "kind": "source",
-    "sha256": "576b278bb2e645b117bca04eb8f790e59efbdcc8d54a45dd5430866a365e0975"
   }
 ]

@@ -1,0 +1,313 @@
+{
+  "observed_at": "2026-10-13T08:05:03.629886744Z",
+  "measurement_source": "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events",
+  "rows": [
+    {
+      "kind": "planner",
+      "id": "alpha-answer-42-impl-9f27c6a1",
+      "label": "Responsable : alpha-answer-42-impl-9f27c6a1",
+      "recorded_calls": 4,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 68577,
+      "output_tokens": 1504,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 4
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "alpha-answer-42-worker",
+      "label": "Responsable : alpha-answer-42-worker",
+      "recorded_calls": 4,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 64014,
+      "output_tokens": 1987,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 4
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "alpha-owner",
+      "label": "Responsable : alpha-owner",
+      "recorded_calls": 3,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 41894,
+      "output_tokens": 772,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 3
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "beta-answer-7",
+      "label": "Responsable : beta-answer-7",
+      "recorded_calls": 3,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 42036,
+      "output_tokens": 1288,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 3
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "beta-owner",
+      "label": "Responsable : beta-owner",
+      "recorded_calls": 2,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 41212,
+      "output_tokens": 1767,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 2
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "impl-beta-answer-7-8f3c2d91",
+      "label": "Responsable : impl-beta-answer-7-8f3c2d91",
+      "recorded_calls": 3,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 41334,
+      "output_tokens": 939,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 3
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "implement-beta-answer-7",
+      "label": "Responsable : implement-beta-answer-7",
+      "recorded_calls": 2,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 42134,
+      "output_tokens": 2125,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 2
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "root",
+      "label": "Responsable : root",
+      "recorded_calls": 16,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 291993,
+      "output_tokens": 4983,
+      "calls_without_usage": 2,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 16
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "planner",
+      "id": "worker-beta-answer-7-8f3c2d91",
+      "label": "Responsable : worker-beta-answer-7-8f3c2d91",
+      "recorded_calls": 3,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 44554,
+      "output_tokens": 1272,
+      "calls_without_usage": 1,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 3
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "reviewer",
+      "id": "reviewer",
+      "label": "Vérificateur indépendant",
+      "recorded_calls": 2,
+      "observed_tool_calls": 0,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 39067,
+      "output_tokens": 612,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 2
+      },
+      "reviews_recorded": 0,
+      "task_retries": 0,
+      "recorded_process_ms": null,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "alpha-answer-42-code-3c8e1a",
+      "label": "Implémenter alpha.answer() = 42",
+      "recorded_calls": 1,
+      "observed_tool_calls": 8,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 268770,
+      "output_tokens": 5005,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 1,
+      "task_retries": 0,
+      "recorded_process_ms": 57129,
+      "attempts_without_duration": 0
+    },
+    {
+      "kind": "worker",
+      "id": "impl-beta-answer-7-4c91a2",
+      "label": "Implémenter beta.answer() = 7",
+      "recorded_calls": 1,
+      "observed_tool_calls": 12,
+      "attempts_with_incomplete_tool_measurement": 0,
+      "input_tokens": 407251,
+      "output_tokens": 7496,
+      "calls_without_usage": 0,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "reviews_recorded": 1,
+      "task_retries": 0,
+      "recorded_process_ms": 82251,
+      "attempts_without_duration": 0
+    }
+  ],
+  "recorded_control_executions": 3,
+  "worker_retries": 0,
+  "note": "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur.",
+  "attempts": [
+    {
+      "task": "alpha-answer-42-code-3c8e1a",
+      "label": "Implémenter alpha.answer() = 42",
+      "agent": "auto-3c659d24398001a7ef3a",
+      "attempt": "a-41226ea6356ec8ff0ebad9eb",
+      "role": "worker",
+      "requested_model": "gpt-5.6-sol",
+      "process_state": "completed",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 8,
+      "measured": true,
+      "tool_reads": 0,
+      "tool_writes": 3,
+      "tool_unclassified": 5,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 0,
+      "input_tokens": 268770,
+      "output_tokens": 5005,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "started": "2026-10-13T07:48:43.582208653Z",
+      "ended": "2026-10-13T07:49:40.712109003Z",
+      "recorded_process_ms": 57129
+    },
+    {
+      "task": "impl-beta-answer-7-4c91a2",
+      "label": "Implémenter beta.answer() = 7",
+      "agent": "auto-9295b10d2edc3aba2613",
+      "attempt": "a-98610e7d814f52ebbdef106a",
+      "role": "worker",
+      "requested_model": "gpt-5.6-sol",
+      "process_state": "completed",
+      "task_acceptance_recorded": true,
+      "measurement": "observed",
+      "recorded_calls": 1,
+      "observed_tool_calls": 12,
+      "measured": true,
+      "tool_reads": 0,
+      "tool_writes": 5,
+      "tool_unclassified": 7,
+      "tests": "inconnu : aucun signal fiable ne distingue un test dans les commandes observées",
+      "tool_errors_total": 0,
+      "tool_repeats_total": 1,
+      "input_tokens": 407251,
+      "output_tokens": 7496,
+      "usage_missing": false,
+      "cost": {
+        "reported_usd": 0,
+        "attempts_with_cost": 0,
+        "attempts_without_cost": 1
+      },
+      "started": "2026-10-13T07:48:47.563141757Z",
+      "ended": "2026-10-13T07:50:09.815080425Z",
+      "recorded_process_ms": 82251
+    }
+  ]
+}

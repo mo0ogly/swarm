@@ -119,6 +119,27 @@ func (s *Store) independentReviewGuard(w *Work, t *Task) error {
 }
 
 func (s *Store) independentReviewGuardVersion(w *Work, t *Task, historical bool) error {
+	// Repeated projections of the same immutable input share physical review
+	// checks. The live store has no cache, so acceptance and each next read
+	// still inspect the current evidence. Bind the entire inputs, including
+	// contracts, attempts, repository, model configuration and historical mode.
+	if s.readReviews == nil {
+		return s.inspectIndependentReviewGuard(w, t, historical)
+	}
+	raw, err := json.Marshal([]any{historical, w, t})
+	if err != nil {
+		return err
+	}
+	key := hash(raw)
+	if result, known := s.readReviews[key]; known {
+		return result
+	}
+	result := s.inspectIndependentReviewGuard(w, t, historical)
+	s.readReviews[key] = result
+	return result
+}
+
+func (s *Store) inspectIndependentReviewGuard(w *Work, t *Task, historical bool) error {
 	if w.Planning != nil && w.Planning.Reviewer == nil {
 		return fmt.Errorf("vérificateur indépendant manquant")
 	}

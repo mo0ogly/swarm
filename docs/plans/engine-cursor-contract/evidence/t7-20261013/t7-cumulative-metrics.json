@@ -1,0 +1,13 @@
+{
+  "native_ledger": {
+    "recorded_calls": 44,
+    "input_tokens": 1392836,
+    "output_tokens": 29750,
+    "calls_without_usage": 8,
+    "cost_reporting_calls": 0
+  },
+  "recorded_control_executions": 3,
+  "worker_retries": 0,
+  "diagnostic_probes_counted_separately": true,
+  "cost": "unknown"
+}

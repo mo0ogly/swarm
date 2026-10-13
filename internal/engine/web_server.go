@@ -427,6 +427,7 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		send(w, missions)
 	})
 	mux.HandleFunc("/api/v1/snapshot", func(w http.ResponseWriter, r *http.Request) {
+		s := s.readScope()
 		work := r.URL.Query().Get("work")
 		snapshot, e := s.cockpitSnapshot(work)
 		if e != nil {

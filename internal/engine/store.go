@@ -16,6 +16,7 @@ import (
 type Store struct {
 	db           *sql.DB
 	root         string
+	readReviews  map[string]error                     // request-local review guards; nil on live mutation paths
 	readDigests  map[string]string                    // request-local clone only; never retained by the live store
 	storageProbe func(string) (uint64, uint64, error) // immutable per store; nil uses the filesystem
 }
@@ -870,5 +871,6 @@ func (s *Store) readScope() *Store {
 	}
 	clone := *s
 	clone.readDigests = map[string]string{}
+	clone.readReviews = map[string]error{}
 	return &clone
 }

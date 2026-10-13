@@ -282,3 +282,21 @@ les agents et le moteur, pas seulement à auditer les workers.
 `mission spending` et le cockpit lisent les exécutions enregistrées dans `task.auto-validation` et `managed.integrated`. Le premier transporte une liste de résultats ; le second une liste par tâche dans `controls`. Le compteur ajoute chaque résultat `executed=true`, réussi ou échoué, une fois par événement de cette mission. Une structure illisible reste une erreur et ne devient pas zéro.
 
 Exemple : publication alpha avec un contrôle, puis publication beta avec recontrôle alpha et contrôle beta. Le bilan indique **3 exécutions enregistrées**, tandis que le dernier candidat possède **2 contrôles frais**. Ces unités sont distinctes ; sommer seulement les validations finales perdrait le premier contrôle. Les contrôles sans événement de résultat enregistré ne sont pas déduits des tests du worker ni des intentions de lancement. Un coût absent reste inconnu, même si une somme JSON vaut zéro avec zéro appel ayant rapporté un coût.
+
+## Vérifier une fois par projection, de nouveau à l'acceptation
+
+Un affichage de mission construit plusieurs projections de la même tâche et de ses dépendances. Les gardes d'une revue gérée peuvent relire le contexte intégral, les lots, la chaîne historique et Git. Les répéter pour chaque carte amplifie la latence : une mission conservée à cinq tâches et deux lots a pris 41,66 secondes pour son snapshot public, alors que le stockage répondait normalement.
+
+`readScope` crée désormais une copie locale à la lecture. Le snapshot HTTP et `missionStatus` partagent cette copie avec leurs projections imbriquées. La garde indépendante mémorise succès **et refus**, avec une clé liée au Work complet, à la Task et au mode historique. Contrat, tentative, candidat, configuration de revue ou mode différents ne réutilisent pas un avis. L'échec de sérialisation reste une erreur.
+
+Ce cache ne vit que le temps de la projection, comme les empreintes de gate. Le Store actif n'en possède aucun : l'acceptation et chaque nouvelle requête relisent les preuves. Une disparition ou modification entre lectures invalide le prochain résultat ; aucune acceptation, consommation ou preuve persistée n'est modifiée. Les projections restent séquentielles dans la requête : cette map n'est pas un cache concurrent partagé. La mesure après installation est conservée dans le RETEX de livraison ; ce mécanisme ne promet pas un seuil universel.
+
+```mermaid
+flowchart LR
+    HTTP[Requête de lecture] --> Scope[Copie locale readScope]
+    Scope --> Cards[Cartes, dépendances et bilan]
+    Cards --> Guard[Garde liée au Work, Task et mode]
+    Guard --> Once[Preuves physiques vérifiées une fois]
+    Once --> End[Fin de projection : cache abandonné]
+    New[Nouvelle requête ou acceptation] --> Fresh[Nouvelles vérifications physiques]
+```

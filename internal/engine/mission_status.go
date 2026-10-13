@@ -327,6 +327,7 @@ func descendantCount(w *Work, id string) int {
 	return len(seen) - 1
 }
 func (s *Store) missionStatus(work string) (MissionStatus, error) {
+	s = s.readScope()
 	d := MissionStatus{Tasks: []MissionTask{}, Runtime: s.runtimeHealth()}
 	w, e := s.get(work)
 	if e != nil {
