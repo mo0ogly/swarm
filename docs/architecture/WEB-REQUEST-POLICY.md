@@ -52,6 +52,9 @@ plafond d'exploitation. Le transport découpe les timers longs en segments de
 31 bits, sans raccourcir le délai choisi. Il couvre réception des en-têtes **et
 lecture complète du corps** ; timers et listeners sont libérés à la fin.
 
+
+L’aperçu et l’application vérifient aussi la même représentation persistée, saut de ligne inclus, avant toute écriture. L’historique conserve une borne technique de fichier de 1 Mio ; lorsqu’elle est atteinte, les deux opérations refusent sans modifier valeurs ni historique. Ce refus ne réduit pas les délais choisis et n’efface pas les anciennes révisions.
+
 ## Réception dans les interfaces
 
 Le serveur authentifié sert `/api/v1/web-requests/script.js` avec `no-store`.
@@ -102,8 +105,7 @@ Cette correction concerne le transport de l'interface. Les limites serveur fixes
 à 60 secondes sont supprimées dans la correction source suivante : le
 [contrat d'attente des fournisseurs](PROVIDER-LIVENESS.md) fournit la durée totale
 aux tests de connexion et à l'assistance de page. Modifier `connection_test_ms`
-ne modifie pas cette durée serveur. L'attente de chargement de l'éditeur dans
-Le chargement CSS/module de `prephase-editor.js` utilise maintenant `general_ms`. Les budgets de
+ne modifie pas cette durée serveur. Le chargement CSS/module de `prephase-editor.js` utilise maintenant `general_ms`. Les budgets de
 lancement et délais de préparation gardent leurs contrats distincts.
 
 Le chargement de l’éditeur utilise le délai courant Admin `general_ms` ; 0 désactive cette expiration. En cas d’expiration, le texte simple reste éditable et enregistrable. Un import dynamique déjà parti continue sans rejeu ; il ne crée pas tardivement un éditeur après le passage en mode simple. La durée reçue est conservée pour ce chargement.

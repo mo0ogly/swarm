@@ -74,3 +74,9 @@ without a total timer, manual cancellation, explicit timeouts, stale previews
 and invalid duration refusal. The browser recipe saves the Admin setting, checks
 the page preview and observes expiry/success against a local HTTP fixture in
 FR/EN and both themes. No real model call or native installation is implied.
+
+## Structured provider failures
+
+Provider `error` and `turn.failed` envelopes are failures, never validated answers. Parsing covers direct fields and `error.message`/`error.code` without classifying quoted tool content. `provider_capacity` identifies model saturation, `invalid_json_schema` identifies a rejected schema, and `provider_error` retains an unclassified failure. Public diagnostics use bounded labels and do not reflect private content, URLs or credentials. The classified cause survives a nonzero process exit.
+
+Capacity is not an exhausted Swarm budget. The supervisor or operator reassesses availability and may explicitly select a configured route using public preview/application. Pausing, choosing a route or resuming refunds no calls or reservations. Model fallback and unchanged retries are never automatic.

@@ -1,5 +1,10 @@
 [
   {
+    "path": "tools/agent-workflows/templates/ks/stories-review-checklist.md",
+    "kind": "source",
+    "sha256": "e2e9a0adabebb6cd486a8603498544282fce5f103dafdb44149917026665db58"
+  },
+  {
     "path": "tools/agent-workflows/templates/ks/stories.md",
     "kind": "source",
     "sha256": "48b12f2e705b2ed7d879e097f2e68e7993679674cfd1d114067980612fb97668"

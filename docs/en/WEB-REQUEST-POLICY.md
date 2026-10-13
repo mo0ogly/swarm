@@ -92,3 +92,5 @@ supplies total duration to connection tests and page assistance. Changing
 preparation deadlines keep their distinct contracts.
 
 The preparation editor CSS/module loading uses `general_ms` from the same Admin policy. Zero disables this loading deadline. On expiry, editable plain text remains available; dynamic imports are not replayed or forcibly cancelled. An already-started load keeps its received duration.
+
+Preview and application validate the same persisted representation, including its trailing newline, before writing. History retains a technical 1 MiB file bound; reaching it rejects both operations without changing values or history. This refusal does not shorten configured deadlines or remove prior revisions.

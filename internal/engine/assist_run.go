@@ -156,6 +156,39 @@ func (s *Store) runAssistTurnWithin(turn AssistTurn, deadline time.Duration) {
 
 const structuredSchemaRefusal = "Schéma de réponse refusé par le fournisseur (invalid_json_schema) ; aucune revue produite"
 
+// Classify only provider error envelopes. Never reflect arbitrary error text,
+// URLs or credentials into public diagnostics, or classify quoted tool output.
+func structuredProviderFailure(data map[string]any) error {
+	if data["type"] != "error" && data["type"] != "turn.failed" && data["is_error"] != true {
+		return nil
+	}
+	code, _ := data["code"].(string)
+	message, _ := data["message"].(string)
+	if nested, ok := data["error"].(map[string]any); ok {
+		if v, ok := nested["code"].(string); ok {
+			code = v
+		}
+		if v, ok := nested["message"].(string); ok {
+			message = v
+		}
+	}
+	if v, ok := data["result"].(string); ok {
+		message += " " + v
+	}
+	if v, ok := data["error"].(string); ok {
+		message += " " + v
+	}
+	text := strings.ToLower(code + " " + message)
+	switch {
+	case strings.Contains(text, "invalid_json_schema"):
+		return fmt.Errorf("%s", structuredSchemaRefusal)
+	case code == "model_capacity_exceeded" || strings.Contains(text, "model is at capacity"):
+		return fmt.Errorf("provider_capacity : modèle à capacité ; réexaminer la disponibilité ou choisir explicitement une autre route ; aucune relance automatique / model at capacity")
+	default:
+		return fmt.Errorf("provider_error : erreur fournisseur non classée ; aucune réponse validée ; contenu privé non exposé / unclassified provider failure")
+	}
+}
+
 type assistOutput struct {
 	streamBytes       int64
 	events            int
@@ -228,15 +261,8 @@ func readAssistOutputObserved(r io.Reader, activity func(), observers ...func(*P
 			}
 			out.cooldown = c
 		}
-		if data["is_error"] == true || data["type"] == "error" {
-			out.err = fmt.Errorf("%s", guardBlock(fmt.Sprint(data["result"], " ", data["error"]), 600))
-		}
-		// Keep a stable diagnostic without reflecting provider payloads or secrets.
-		if data["type"] == "error" || data["type"] == "turn.failed" {
-			encoded, _ := json.Marshal(data)
-			if strings.Contains(string(encoded), "invalid_json_schema") {
-				out.err = fmt.Errorf("%s", structuredSchemaRefusal)
-			}
+		if failure := structuredProviderFailure(data); failure != nil {
+			out.err = failure
 		}
 		if reply := providerReply(data); reply != "" {
 			out.reply = reply

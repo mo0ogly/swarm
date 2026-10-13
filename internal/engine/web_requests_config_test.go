@@ -5,6 +5,7 @@ package engine
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -151,5 +152,47 @@ func TestWebRequestsConfigRefusesSymlinkAndAllPagesLoadPolicy(t *testing.T) {
 	}
 	if r := runLimitsWebRequest(h, "GET", "/api/v1/web-requests", "requests-token", nil); r.Code == 200 {
 		t.Fatal("config symlink accepted")
+	}
+}
+
+func TestWebRequestsFullHistoryPreviewAndApplyAgree(t *testing.T) {
+	s := storeTest(t)
+	c, err := s.webRequestsConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := WebRequestsChange{Schema: 1, EventID: "next-history", Values: c.Values, Reason: strings.Repeat("R", 2000)}
+	for {
+		next := c
+		next.History = append(append([]WebRequestsRevision(nil), c.History...), WebRequestsRevision{Revision: c.Revision + 1, Values: c.Values, Actor: "fixture", At: "2026-10-13T07:00:00.000000000Z", Change: WebRequestsChange{Schema: 1, EventID: fmt.Sprintf("history-%d", c.Revision+1), Revision: c.Revision, Values: c.Values, Reason: request.Reason}})
+		next.Revision++
+		raw, e := json.MarshalIndent(next, "", "  ")
+		if e != nil {
+			t.Fatal(e)
+		}
+		if len(raw)+1 > 1048576 {
+			break
+		}
+		c = next
+	}
+	path := filepath.Join(s.root, ".swarm", "web-requests.json")
+	before, _ := json.MarshalIndent(c, "", "  ")
+	before = append(before, '\n')
+	if err := os.WriteFile(path, before, 0600); err != nil {
+		t.Fatal(err)
+	}
+	request.Revision = c.Revision
+	for _, preview := range []bool{true, false} {
+		if _, err := s.changeWebRequests(request, preview); err == nil {
+			t.Fatalf("history overflow approved; preview=%v", preview)
+		}
+		after, err := os.ReadFile(path)
+		if err != nil || !bytes.Equal(before, after) {
+			t.Fatal("rejection changed persisted history", err)
+		}
+		read, err := s.webRequestsConfig()
+		if err != nil || read.Revision != c.Revision {
+			t.Fatal("history lost after refusal", err)
+		}
 	}
 }

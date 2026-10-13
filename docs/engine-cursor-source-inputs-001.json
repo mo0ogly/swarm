@@ -487,7 +487,7 @@
   {
     "path": "docs/architecture/PROVIDER-LIVENESS.md",
     "kind": "doc",
-    "sha256": "388d8be941caebc1b597963f14e5d1fc79654e7b57ff2587988f050f92fd20f9"
+    "sha256": "bf7cbbacde9ce1f2ab9d3e1918be3966cf4982be2d082ff8ca75de263e7307ed"
   },
   {
     "path": "docs/architecture/REVIEW-EVIDENCE.md",
@@ -507,7 +507,7 @@
   {
     "path": "docs/architecture/WEB-REQUEST-POLICY.md",
     "kind": "doc",
-    "sha256": "f5c686ab77760daea34fb96fb13c05f82ca8cf1636b9fb685f10ae481b558df8"
+    "sha256": "ea8392e5fc4dc8634d4e80ba08591151f4fe10b50643dc45ffc41818ede213a9"
   },
   {
     "path": "docs/en/AGENT-COMMUNICATION.md",
@@ -687,7 +687,7 @@
   {
     "path": "docs/en/PROVIDER-LIVENESS.md",
     "kind": "doc",
-    "sha256": "675aeeb3cf1b6fbf2f09b52e19673b097e70f91fbb9fe77d132a15ee33b93e6e"
+    "sha256": "44711a7a91cb4a68b12e60dab93bfb862b5f19c88bb49280f26c2433a01710a2"
   },
   {
     "path": "docs/en/PROVIDER-QUOTAS.md",
@@ -752,7 +752,7 @@
   {
     "path": "docs/en/WEB-REQUEST-POLICY.md",
     "kind": "doc",
-    "sha256": "3f66a8838ead7d496a931bb96e0415d16a48b4af71c76cba4edfb671f8ea2580"
+    "sha256": "b8652c35583dd1ab9bb0c842bb2c570943f62dff032964a3d9b1591998bf93a1"
   },
   {
     "path": "docs/en/e6-real.md",

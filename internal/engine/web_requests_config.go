@@ -156,14 +156,15 @@ func (s *Store) changeWebRequests(r WebRequestsChange, preview bool) (WebRequest
 	c.Revision++
 	c.Values = r.Values
 	c.History = append(c.History, WebRequestsRevision{Revision: c.Revision, Values: r.Values, Actor: operatorIdentity(), At: now(), Change: r})
+	raw, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return empty, err
+	}
+	// Preview validates the exact representation that application writes.
+	if len(raw)+1 > 1048576 {
+		return empty, fmt.Errorf("Historique plein / History full")
+	}
 	if !preview {
-		raw, err := json.MarshalIndent(c, "", "  ")
-		if err != nil {
-			return empty, err
-		}
-		if len(raw) > 1048576 {
-			return empty, fmt.Errorf("Historique plein / History full")
-		}
 		if err = atomicWrite(filepath.Join(s.root, ".swarm", "web-requests.json"), append(raw, '\n')); err != nil {
 			return empty, err
 		}

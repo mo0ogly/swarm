@@ -252,7 +252,7 @@
   {
     "path": "internal/engine/planning_runner.go",
     "kind": "source",
-    "sha256": "25f7303ee08189d91ece7223daf0dcf09b185ca8d21ef1cdb3eb240a392a14d9"
+    "sha256": "c22af213b08cd084c9a29c255bf1284347f3bfe707d121ce4cf6601505c2c834"
   },
   {
     "path": "internal/engine/planning_schema.go",
@@ -885,6 +885,11 @@
     "sha256": "409f0bd88b3665b2c0e84a303993374b308cad7e562e705fb8eedf1cf9e2b6ea"
   },
   {
+    "path": "internal/engine/structured_provider_failure_test.go",
+    "kind": "test",
+    "sha256": "b8daeffda8e7954f7f361147ed30955ec1e195506e831c5868d5eb28aba9cbfb"
+  },
+  {
     "path": "internal/engine/structured_provider_progress_test.go",
     "kind": "test",
     "sha256": "e1ccac1cad1aba27c84e718f1b99bd79c73c64b3f8da8d995d9384e7ab2f41fc"
@@ -1092,12 +1097,12 @@
   {
     "path": "internal/engine/web_requests_config.go",
     "kind": "source",
-    "sha256": "b7d03079a6fe6b5ac239256223479d352daedf32d94caf05d2dfd1a611dd130c"
+    "sha256": "7e06c63b5c2739eeb2e6b7d3823368c7e484e436803411bfed5de7a5424751eb"
   },
   {
     "path": "internal/engine/web_requests_config_test.go",
     "kind": "test",
-    "sha256": "ad40d0273db9ca9f27ef1f36ebe0932d40d108b99b8606c50e3e0e5a380e37e9"
+    "sha256": "10b21e6db9538f1703777fada93df5917e2fee5a15bf255408483fe2229de2b6"
   },
   {
     "path": "internal/engine/web_server.go",
@@ -1483,10 +1488,5 @@
     "path": "tools/agent-workflows/templates/ks/review-checklist.md",
     "kind": "source",
     "sha256": "576b278bb2e645b117bca04eb8f790e59efbdcc8d54a45dd5430866a365e0975"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/stories-review-checklist.md",
-    "kind": "source",
-    "sha256": "e2e9a0adabebb6cd486a8603498544282fce5f103dafdb44149917026665db58"
   }
 ]

@@ -90,9 +90,8 @@ pris en compte. Le processus fournisseur et ses descendants sont arrêtés lorsq
 condition d’arrêt autorisée est atteinte.
 
 Le sous-planificateur reçoit les incidents des tâches de son périmètre ; le
-responsable racine traite les siens et les remontées des enfants. Dans T1, seul le
-responsable racine est encore configuré. Déclarer plusieurs rôles dans un plan
-ne crée pas de sous-planificateur actif. Les contrôles d’acceptation restent
+responsable racine traite les siens et les remontées des enfants. La configuration et les réservations observées établissent les rôles réellement
+actifs ; leurs seuls noms dans un plan ne le prouvent pas. Les contrôles d’acceptation restent
 indépendants de ces rôles : une activité observée n’autorise pas à accepter un lot.
 
 La correction d’un défaut de surveillance permet une reprise publique explicite
@@ -118,3 +117,9 @@ L'[observation de terrain du 10 octobre 2026](../publications/20261005-cursor-mo
 documente la revue terminée au-delà de 90 secondes, la décision enregistrée du
 responsable et le départ de la correction. Les traces sont distinctes des
 campagnes de facturation et des garanties générales encore à éprouver.
+
+## Erreurs structurées du fournisseur
+
+Les enveloppes `error` et `turn.failed` sont des refus du fournisseur, jamais une réponse validée. La lecture traite les champs directs et `error.message`/`error.code`, sans classer le texte cité par un outil. `provider_capacity` indique la saturation du modèle ; `invalid_json_schema` indique le schéma refusé ; `provider_error` conserve un refus non classé. Le diagnostic public utilise des libellés bornés et ne recopie ni contenu privé ni URL ni credential. Le motif classé reste conservé même si le processus sort avec un code non nul.
+
+Une saturation n’est pas un budget Swarm épuisé. Le superviseur ou l’opérateur réexamine la disponibilité et peut choisir explicitement une route configurée via aperçu/application publics. Une pause, une nouvelle route ou une reprise ne rembourse aucun appel ni réservation. Aucun repli de modèle et aucune répétition inchangée ne sont automatiques.
