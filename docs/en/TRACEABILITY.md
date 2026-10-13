@@ -240,3 +240,12 @@ flowchart LR
     Once --> End[Projection ends: discard cache]
     New[New request or acceptance] --> Fresh[Fresh physical checks]
 ```
+
+## Detailed ledger and recovery
+
+The [call ledger](CALL-ACCOUNTING.md) attributes reservations, attempts and
+known/missing usage. It reads all retained mission history independently of the
+200-row recent-agent panel. Ordinary supervisor retries count distinct attempts
+while preserving historical links; missing consumption is never inferred from
+current configuration. The real refusal → retry decision → correction → fresh
+review chain is recorded in the [follow-up retrospective](CURSOR-ENGINE-RETEX-SUITES-20261013.md).

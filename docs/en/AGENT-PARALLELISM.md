@@ -267,3 +267,34 @@ Inspection covers `managed_publication_lane.go`, `managed_integration.go`, `mana
 source HEAD `1169df70` with local changes. This is mechanism inspection, not a
 throughput benchmark or autonomous acceptance run. Each managed candidate needs
 its own integrated documentation and evidence.
+
+## Four real producers measured, 13 October 2026
+
+The [follow-up retrospective](CURSOR-ENGINE-RETEX-SUITES-20261013.md) compares
+four identical tasks at one and four slots, with the same binary, initial Git
+tree and configured provider policy. Both reach four fresh acceptances and root
+judge end. Business wall352.434 s versus131.815 s; multiple workers advance tool
+counters in 14 windows (nominal 2 s pause plus CLI duration). This extends useful production evidence to
+four workers, not endurance or additional sub-supervisors: this recipe assigns
+tasks to the root.
+
+Publication stays exclusive. Up to 24.410 s separates worker completion from
+first control, including queue/preparation. Both record ten cumulative controls
+and four distinct reviews. The ledger separates raw tokens, cache and unknown
+cost. Observed ratio 2.67 is not linear scaling guaranteed; real calls produce
+different latencies and implementations.
+
+```mermaid
+flowchart LR
+    C[Configured slots: 1 or 4] --> A[Worker1: isolated copy]
+    C --> B[Worker2: isolated copy]
+    C --> D[Worker3: isolated copy]
+    C --> E[Worker4: isolated copy]
+    A --> Q[Per-mission publication queue]
+    B --> Q
+    D --> Q
+    E --> Q
+    Q --> V[Cumulative controls then independent review]
+    V --> P[Exclusive exact-candidate publication]
+    P --> R[Root: assess evidence and judge completion]
+```

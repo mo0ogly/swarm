@@ -1,5 +1,35 @@
 [
   {
+    "path": "internal/engine/mission_guidance.go",
+    "kind": "source",
+    "sha256": "69895d5bab15756c47957f1fc7a2cf5d93893391683ec00fb5cdbec07596db33"
+  },
+  {
+    "path": "internal/engine/mission_guidance_test.go",
+    "kind": "test",
+    "sha256": "2cc65e699af6f344996c57bfd239e4207da764e408090995038449f386409cc4"
+  },
+  {
+    "path": "internal/engine/mission_help_test.go",
+    "kind": "test",
+    "sha256": "5b4a53d17b5abb26dc7dc3987e13651fb693763d22ad2a0ac616adb70a51b5d4"
+  },
+  {
+    "path": "internal/engine/mission_insights.go",
+    "kind": "source",
+    "sha256": "1e98afcf0fc899e719165eae0b480d43d3e469ab7fd858d4d85bc96ed1b788d2"
+  },
+  {
+    "path": "internal/engine/mission_insights_test.go",
+    "kind": "test",
+    "sha256": "3aa04d9ceb43b408c955f29baf5f238362696f7f334b1a33188906c503b9cf28"
+  },
+  {
+    "path": "internal/engine/mission_launch_identity_test.go",
+    "kind": "test",
+    "sha256": "1dc9d93f5b051ed8e027f53797cf43ce9772e3110c0da4f7a3dee845da9a468e"
+  },
+  {
     "path": "internal/engine/mission_preview_review_test.go",
     "kind": "test",
     "sha256": "ef3a10242cd66cee193fa8ee8a19b4edbb0562ad15448c4776501fee7c7ee5a5"
@@ -12,7 +42,7 @@
   {
     "path": "internal/engine/mission_status.go",
     "kind": "source",
-    "sha256": "0eaec20b48ba59fa2357c6fa7a6490368714a53fef0931524ceb11bd2479a084"
+    "sha256": "552552072eb73e5ca1d479d833256af86876033330292de77eca256147e62f9c"
   },
   {
     "path": "internal/engine/mission_status_test.go",
@@ -865,6 +895,16 @@
     "sha256": "449fd157d53cc656f103984a997ec8d11297c660df5aaf6f32f1a3e94f1df62d"
   },
   {
+    "path": "internal/engine/spending_calls.go",
+    "kind": "source",
+    "sha256": "17d274b7795388da08bed63add537b6ad6ca2a8fe4e7c47c8796cbdc25ea97cf"
+  },
+  {
+    "path": "internal/engine/spending_calls_test.go",
+    "kind": "test",
+    "sha256": "ab4dfed3493a805108695a53b4c55852ee222cfa3de5ea751ec6a9ba44ce0aa9"
+  },
+  {
     "path": "internal/engine/states_contract_test.go",
     "kind": "test",
     "sha256": "91c2c5d6661c88749cab03b0c2cc60c7ca55320265a1b81bd69089cffcf565d7"
@@ -1212,12 +1252,12 @@
   {
     "path": "locales/en.json",
     "kind": "source",
-    "sha256": "dacad200c2093b98ce2ee3f101eb9319042ade539388fc543d682304a10db1f4"
+    "sha256": "d0b8e7d544846a8dd98dff539b0813b2a75f2b1f7479baddcda6e20d14d8fa17"
   },
   {
     "path": "package.json",
     "kind": "harness",
-    "sha256": "864f62dabf72c0f5fde72150dc0040e0ce5403d4d2b7f1c848dc08eeeb928b91"
+    "sha256": "c511525b7271896c99c42d7556595bde9fef6a6a6516b463ce5e56119310d917"
   },
   {
     "path": "resources.go",
@@ -1253,6 +1293,16 @@
     "path": "tests/audit_acceptance.cjs",
     "kind": "harness",
     "sha256": "1ac8a5d7036060f0fa3c1bd0075e84e2584e079dbf960c97e33e39c75faa2666"
+  },
+  {
+    "path": "tests/call_ledger_test.cjs",
+    "kind": "harness",
+    "sha256": "f4e2d24c9c8ab8d4b341ce33f01dc9d6817b5079a64b34aa466b1421f6c04b5b"
+  },
+  {
+    "path": "tests/call_ledger_ui.cjs",
+    "kind": "harness",
+    "sha256": "9178383ac51aa1e34564528be82b96df358e63382127e4632179271291a5f490"
   },
   {
     "path": "tests/design_system_ui.cjs",
@@ -1380,6 +1430,16 @@
     "sha256": "643833c876ae46395a3fb925447a0d82e945db8aba85f9de6fbc84331da1d6bf"
   },
   {
+    "path": "tests/retex_campaign_contract_test.py",
+    "kind": "harness",
+    "sha256": "3663b22a26e792dc066e08fbf60ba56f1311421ab6f8aeed6d0acf47fb71e302"
+  },
+  {
+    "path": "tests/retex_real_campaign.py",
+    "kind": "harness",
+    "sha256": "aee4768e34322565ab7e451d56a7cb977ab5732a0a5a4a7151dc28268a82fba5"
+  },
+  {
     "path": "tests/states_contract_test.cjs",
     "kind": "harness",
     "sha256": "81ce39751900d3a4bf8b30e5ff6b63e4bb7228ba095684e1e4d352a61a8af59e"
@@ -1433,60 +1493,5 @@
     "path": "tests/web_requests_test.cjs",
     "kind": "harness",
     "sha256": "c177f0d8e003c28c4b0a2fef5a8decc26b4275af15648dd3166617ce5404ccd2"
-  },
-  {
-    "path": "tools/agent-workflows/CONTRACT.md",
-    "kind": "doc",
-    "sha256": "3a942bb0c89d6fed1a6ef4020c941bccdded0cf7d083810d68640fcfc65266d3"
-  },
-  {
-    "path": "tools/agent-workflows/check.py",
-    "kind": "harness",
-    "sha256": "5d6f70809aa557abbfd1ebebccc4174c278d27a2efa9d9cc151b77e028066dde"
-  },
-  {
-    "path": "tools/agent-workflows/templates/HANDOFF.md",
-    "kind": "source",
-    "sha256": "c84b441c4713cf90b7a09b100d58b01ec53fe4f09eb3378b7ca480051c1d3a65"
-  },
-  {
-    "path": "tools/agent-workflows/templates/TRACKING.md",
-    "kind": "source",
-    "sha256": "16eb84f3960b2eb468ac79bb16fa8e42609aef32d1183f8b14e33693afd09a43"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/adr.md",
-    "kind": "source",
-    "sha256": "19032d95e2e3c7bffe8972e4c45c64282080ec5022a5e46744ddaa1d56b9c317"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/architecture.md",
-    "kind": "source",
-    "sha256": "6e61ebea01ea2bc74b65f355d05f9149e3ed05ae1242fe55052ecabbdf8b0182"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/design-brief.md",
-    "kind": "source",
-    "sha256": "08481cbc7808f19bf11ea033bcccdad34ebefb3e939d6813d96d448d582fbca7"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/design-screen.md",
-    "kind": "source",
-    "sha256": "d698a90b30dc288c12c9817e1d9d544fbff393d236799369977966f8bac0dcd0"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/design-system.md",
-    "kind": "source",
-    "sha256": "6be4a4b443579d8d522893a5d0af3155a64aa72a16880ee416eea48d4e4d3178"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/plan.md",
-    "kind": "source",
-    "sha256": "3cbe7bfd559c98a7a4e47c7f8c4bd5677c41b3a9dc122cf6681fb17d38455e7f"
-  },
-  {
-    "path": "tools/agent-workflows/templates/ks/prd.md",
-    "kind": "source",
-    "sha256": "d4a2a375bf958cddc8d241508f2f859fec52798ced608d2b710e81e728a07372"
   }
 ]

@@ -306,3 +306,35 @@ L’inspection porte sur `internal/engine/managed_publication_lane.go`,
 Les éléments actuels décrits ici sont une inspection de mécanismes, pas une
 mesure de débit ni une recette autonome. Le candidat géré de chaque lot doit
 intégrer ses changements et fournir ses propres preuves.
+
+## Mesure réelle de quatre productions, 13 octobre 2026
+
+Les [suites du RETEX](../plans/engine-cursor-contract/RETEX-suites-20261013.md)
+comparent quatre tâches identiques à un puis quatre créneaux, même binaire,
+arbre initial et politique fournisseur. Les deux campagnes obtiennent quatre
+acceptations fraîches et un jugement racine end. Temps métier352,434 s contre
+131,815 s ; les compteurs outils progressent pour plusieurs workers dans 14
+fenêtres (pause nominale de 2 s, avec durée CLI supplémentaire). Ce résultat élargit la preuve de production utile
+à quatre workers ; il ne démontre pas une endurance ni des sous-superviseurs
+supplémentaires dans cette recette, qui affecte les tâches à la racine.
+
+La publication reste exclusive : jusqu'à 24,410 s entre fin d'un worker et début
+contrôle, attente et préparation confondues. Dix contrôles cumulés et quatre
+revues distinctes sont conservés dans chaque campagne. Le registre distingue
+jetons bruts, cache et coût inconnu. Le rapport observé 2,67 n'est pas une promesse
+de gain linéaire ; les appels réels ont des latences et productions différentes.
+
+```mermaid
+flowchart LR
+    C[Créneaux configurés : 1 ou 4] --> A[Worker1 : copie isolée]
+    C --> B[Worker2 : copie isolée]
+    C --> D[Worker3 : copie isolée]
+    C --> E[Worker4 : copie isolée]
+    A --> Q[Attente de publication par mission]
+    B --> Q
+    D --> Q
+    E --> Q
+    Q --> V[Contrôles cumulatifs puis revue indépendante]
+    V --> P[Publication exclusive du candidat exact]
+    P --> R[Racine : examiner les preuves et juger la fin]
+```

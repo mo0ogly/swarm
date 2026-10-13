@@ -300,3 +300,13 @@ flowchart LR
     Once --> End[Fin de projection : cache abandonné]
     New[Nouvelle requête ou acceptation] --> Fresh[Nouvelles vérifications physiques]
 ```
+
+## Registre détaillé et reprises
+
+Le [registre des appels](CALL-ACCOUNTING.md) relie réservations, tentatives,
+usages connus ou absents. Sa lecture couvre tout l'historique retenu de la mission,
+indépendamment du panneau récent limité à 200 agents. Les reprises ordinaires du
+superviseur sont comptées par tentatives distinctes, avec les liens historiques
+conservés ; une consommation absente n'est pas déduite de la configuration actuelle.
+La chaîne réelle refus → décision retry → correction → revue fraîche est conservée
+dans les [suites du RETEX](../plans/engine-cursor-contract/RETEX-suites-20261013.md).

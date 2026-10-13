@@ -1,5 +1,60 @@
 [
   {
+    "path": "tools/agent-workflows/CONTRACT.md",
+    "kind": "doc",
+    "sha256": "3a942bb0c89d6fed1a6ef4020c941bccdded0cf7d083810d68640fcfc65266d3"
+  },
+  {
+    "path": "tools/agent-workflows/check.py",
+    "kind": "harness",
+    "sha256": "5d6f70809aa557abbfd1ebebccc4174c278d27a2efa9d9cc151b77e028066dde"
+  },
+  {
+    "path": "tools/agent-workflows/templates/HANDOFF.md",
+    "kind": "source",
+    "sha256": "c84b441c4713cf90b7a09b100d58b01ec53fe4f09eb3378b7ca480051c1d3a65"
+  },
+  {
+    "path": "tools/agent-workflows/templates/TRACKING.md",
+    "kind": "source",
+    "sha256": "16eb84f3960b2eb468ac79bb16fa8e42609aef32d1183f8b14e33693afd09a43"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/adr.md",
+    "kind": "source",
+    "sha256": "19032d95e2e3c7bffe8972e4c45c64282080ec5022a5e46744ddaa1d56b9c317"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/architecture.md",
+    "kind": "source",
+    "sha256": "6e61ebea01ea2bc74b65f355d05f9149e3ed05ae1242fe55052ecabbdf8b0182"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/design-brief.md",
+    "kind": "source",
+    "sha256": "08481cbc7808f19bf11ea033bcccdad34ebefb3e939d6813d96d448d582fbca7"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/design-screen.md",
+    "kind": "source",
+    "sha256": "d698a90b30dc288c12c9817e1d9d544fbff393d236799369977966f8bac0dcd0"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/design-system.md",
+    "kind": "source",
+    "sha256": "6be4a4b443579d8d522893a5d0af3155a64aa72a16880ee416eea48d4e4d3178"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/plan.md",
+    "kind": "source",
+    "sha256": "3cbe7bfd559c98a7a4e47c7f8c4bd5677c41b3a9dc122cf6681fb17d38455e7f"
+  },
+  {
+    "path": "tools/agent-workflows/templates/ks/prd.md",
+    "kind": "source",
+    "sha256": "d4a2a375bf958cddc8d241508f2f859fec52798ced608d2b710e81e728a07372"
+  },
+  {
     "path": "tools/agent-workflows/templates/ks/research.md",
     "kind": "source",
     "sha256": "8664d57b8bc38618efd0e70f842e19ad1527ff378efb66feb68668af7ce09048"
@@ -37,7 +92,12 @@
   {
     "path": "tools/verification/refresh_engine_source_manifest.py",
     "kind": "harness",
-    "sha256": "b43eb85c2e7533a67d1df2f33d0410e3a5d441aa7552ee8770980bdd5ce9c10b"
+    "sha256": "aa1e845ac23bbe051b0c0bd59fc59ce9e496e2cf3d62bc873fcd947a868e14e6"
+  },
+  {
+    "path": "tools/verification/retex_stage_analysis.py",
+    "kind": "harness",
+    "sha256": "5d0e1d88729a74ca4cd4f0469a39edf6758ff804391bc014bf7552fdc4fab695"
   },
   {
     "path": "tools/verification/t4_admin.py",
@@ -212,7 +272,7 @@
   {
     "path": "web/i18n-en.js",
     "kind": "source",
-    "sha256": "10f9d0c52d3ff2879c47d184b282dcfa5a765a0d442d8741dcdf8778f18dc041"
+    "sha256": "be047dcb55a7c7397a536970b2ce42c2ea5d76a099c10de2c5a3f1882d7a935f"
   },
   {
     "path": "web/i18n.js",
@@ -372,7 +432,7 @@
   {
     "path": "web/mission-insights.js",
     "kind": "source",
-    "sha256": "3961431fecb2d594ee6ba896114c8ca3eaad34eb465db1d76c116c746c77b164"
+    "sha256": "d291a341b41a7292efab5b93457282bf8ee282f07fc978f39c99ae5ea7cf306f"
   },
   {
     "path": "web/mission.css",

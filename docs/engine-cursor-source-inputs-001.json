@@ -427,12 +427,17 @@
   {
     "path": "docs/architecture/AGENT-PARALLELISM.md",
     "kind": "doc",
-    "sha256": "db551dc7a5bb1be188dd5487d55560b7dcd14c2101b99e5dd3b194ad889f4bc0"
+    "sha256": "73f58da6efa1dbf1f5591af924f19cd6d5f7fe5e5ed4379cb99fce1cf833d9cd"
   },
   {
     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
     "sha256": "c1d8861be09ce4e9d7c2f73454188fe2b48d4fc5f9f6cd236ec1bb3f1cc4f3f4"
+  },
+  {
+    "path": "docs/architecture/CALL-ACCOUNTING.md",
+    "kind": "doc",
+    "sha256": "e5dcd236a63900fdc375923428b515dcd676381bbcf96ffd4155de4a9611ba08"
   },
   {
     "path": "docs/architecture/CONTROLS-AND-FEEDBACK.md",
@@ -502,7 +507,7 @@
   {
     "path": "docs/architecture/TRACEABILITY.md",
     "kind": "doc",
-    "sha256": "e31c513df079069fc27eb5f91c7b0ebf339e033e897d701120dff3cce90d8be0"
+    "sha256": "b8849982a56455d1289dc8f6558b63e0c6b522e81381c8cea62008a91a5cea3e"
   },
   {
     "path": "docs/architecture/WEB-REQUEST-POLICY.md",
@@ -527,7 +532,7 @@
   {
     "path": "docs/en/AGENT-PARALLELISM.md",
     "kind": "doc",
-    "sha256": "34c028ca657bf5b7c6bdeca026deeca60a274a88452a06078b3cce93de669823"
+    "sha256": "91b20c223a2b52be35cbd17252ddecf9ba64d84505c4fabe984b91620f813472"
   },
   {
     "path": "docs/en/ATTEMPT-RECOVERY.md",
@@ -553,6 +558,11 @@
     "path": "docs/en/BUDGETS.md",
     "kind": "doc",
     "sha256": "0014e68b246dbd93e46b58cab6f30a15fe9c8f30d5d172a65c7a4b82ef0b9069"
+  },
+  {
+    "path": "docs/en/CALL-ACCOUNTING.md",
+    "kind": "doc",
+    "sha256": "63282327afa84ac2c599fd58424e796f22e511662b3fc5bf8ba1d2211558b886"
   },
   {
     "path": "docs/en/CONTRACT-REVISION.md",
@@ -583,6 +593,11 @@
     "path": "docs/en/CURSOR-ENGINE-RETEX-20261013.md",
     "kind": "doc",
     "sha256": "3b20426ea4994d96d76cce88e58bf1df3ca5d9755629e3af8ff464c2fdb2f943"
+  },
+  {
+    "path": "docs/en/CURSOR-ENGINE-RETEX-SUITES-20261013.md",
+    "kind": "doc",
+    "sha256": "fe6206dc42923c2070ddb8b0cb13028a43fd15f625d598cd878299fd973134c7"
   },
   {
     "path": "docs/en/DELIVERY-SCOPE.md",
@@ -747,7 +762,7 @@
   {
     "path": "docs/en/TRACEABILITY.md",
     "kind": "doc",
-    "sha256": "fef1d8ac7c88f76d25f80b4908f1a04ac01e821893281248c639bd4fa264c3c1"
+    "sha256": "4fa50bd3e8ab9edb576366235496ec46c85e57a549d55672a7f27e107e900a3e"
   },
   {
     "path": "docs/en/USER-GUIDE.md",
@@ -783,6 +798,16 @@
     "path": "docs/plans/dev-launcher-20261010/PLAN.md",
     "kind": "doc",
     "sha256": "65af7a46ed1912db13cc7f3d9452a1b189f4693e4ed542e053621122077e5315"
+  },
+  {
+    "path": "docs/plans/engine-cursor-contract/RETEX-suites-20261013.md",
+    "kind": "doc",
+    "sha256": "bb2718248ae60c800160bd4ad748c4638bb8821705e649b4f29596adf8e99536"
+  },
+  {
+    "path": "docs/plans/engine-cursor-contract/suites-retex-20261013.md",
+    "kind": "doc",
+    "sha256": "4a0cbf51f05c448b7fe2b3a602dc70dea5f929daf48b7c1ee9bb484852da3cb3"
   },
   {
     "path": "docs/plans/fresh-install-methods-20261008.md",
@@ -1438,30 +1463,5 @@
     "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
     "kind": "capture",
     "sha256": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
-    "kind": "capture",
-    "sha256": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
-    "kind": "capture",
-    "sha256": "4fbda8e7ea68f6ac2f2bbdaa23a8ac2a7db4b401bcaf5127c3eb940e3b729c61"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
-    "kind": "capture",
-    "sha256": "6b8f952f08831fdc6431d438fb4c6ae5024b0dba3a9c09b246abb753f7a257d3"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
-    "kind": "capture",
-    "sha256": "0775f1656fe2098f97c67ef34e9fa9710049a61e5cfd670217fb8eaa590191b3"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
-    "kind": "capture",
-    "sha256": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5"
   }
 ]

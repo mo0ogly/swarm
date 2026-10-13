@@ -1,5 +1,30 @@
 [
   {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
+    "kind": "capture",
+    "sha256": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-deliver.png",
+    "kind": "capture",
+    "sha256": "4fbda8e7ea68f6ac2f2bbdaa23a8ac2a7db4b401bcaf5127c3eb940e3b729c61"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "6b8f952f08831fdc6431d438fb4c6ae5024b0dba3a9c09b246abb753f7a257d3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "0775f1656fe2098f97c67ef34e9fa9710049a61e5cfd670217fb8eaa590191b3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-sombre-plan.png",
+    "kind": "capture",
+    "sha256": "2415abc2ecccdb4a9a99f0797a453041755ccf782e6462ea73225347e7dc52f5"
+  },
+  {
     "path": "docs/screenshots/projects-method-20261010/qualification.json",
     "kind": "doc",
     "sha256": "14bf2365b9ed9759155d9069502ff4d9a2d0b3a8e9da11aa813e111c49142f5e"
@@ -1142,7 +1167,7 @@
   {
     "path": "internal/engine/agents_store.go",
     "kind": "source",
-    "sha256": "790939c7d988adfb74164d2ca0c3339204feef26dfd7e6fd1cbc27e132fd024d"
+    "sha256": "26dbb4d6bbddc016e1efbd7af85db57042418bc618c795b33cc07b6cc155629f"
   },
   {
     "path": "internal/engine/agents_test.go",
@@ -1353,35 +1378,5 @@
     "path": "internal/engine/automation_schedule.go",
     "kind": "source",
     "sha256": "02a7890cd57787d1df659f66c4e626d7b276cab15b19f0a673bb729d73e0eacf"
-  },
-  {
-    "path": "internal/engine/automation_schedule_lifecycle_test.go",
-    "kind": "test",
-    "sha256": "026faee96f31e7a23ed12f7f49709d895f998ac05a51e93b6facc6ec30e3234a"
-  },
-  {
-    "path": "internal/engine/automation_schedule_test.go",
-    "kind": "test",
-    "sha256": "1efa052b2b21e3a8c3c83881a9f02a4e3b21c0da52734cf6cbd724fe578551e4"
-  },
-  {
-    "path": "internal/engine/automation_unsupported.go",
-    "kind": "source",
-    "sha256": "c0274e74d50ea5343be7c8a3954cd8abf2f425819eae73560dde3c65d843063f"
-  },
-  {
-    "path": "internal/engine/autonomy.go",
-    "kind": "source",
-    "sha256": "8eab8d7b4553beda59e778427848bb9b96b69296bd2018ea76c6a48d45b7b7ac"
-  },
-  {
-    "path": "internal/engine/billing_engine_recovery_test.go",
-    "kind": "test",
-    "sha256": "f3708785b024ae27d60193aa72f74ff253876cf594fb0c928425ea3c45c87d0c"
-  },
-  {
-    "path": "internal/engine/brainstorm.go",
-    "kind": "source",
-    "sha256": "508ce579670192a0bffc997440d00a1f8d417763422f0f02ee6443837eeb5aca"
   }
 ]

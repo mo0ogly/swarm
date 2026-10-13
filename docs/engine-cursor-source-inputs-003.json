@@ -1,5 +1,35 @@
 [
   {
+    "path": "internal/engine/automation_schedule_lifecycle_test.go",
+    "kind": "test",
+    "sha256": "026faee96f31e7a23ed12f7f49709d895f998ac05a51e93b6facc6ec30e3234a"
+  },
+  {
+    "path": "internal/engine/automation_schedule_test.go",
+    "kind": "test",
+    "sha256": "1efa052b2b21e3a8c3c83881a9f02a4e3b21c0da52734cf6cbd724fe578551e4"
+  },
+  {
+    "path": "internal/engine/automation_unsupported.go",
+    "kind": "source",
+    "sha256": "c0274e74d50ea5343be7c8a3954cd8abf2f425819eae73560dde3c65d843063f"
+  },
+  {
+    "path": "internal/engine/autonomy.go",
+    "kind": "source",
+    "sha256": "8eab8d7b4553beda59e778427848bb9b96b69296bd2018ea76c6a48d45b7b7ac"
+  },
+  {
+    "path": "internal/engine/billing_engine_recovery_test.go",
+    "kind": "test",
+    "sha256": "f3708785b024ae27d60193aa72f74ff253876cf594fb0c928425ea3c45c87d0c"
+  },
+  {
+    "path": "internal/engine/brainstorm.go",
+    "kind": "source",
+    "sha256": "508ce579670192a0bffc997440d00a1f8d417763422f0f02ee6443837eeb5aca"
+  },
+  {
     "path": "internal/engine/brainstorm_test.go",
     "kind": "test",
     "sha256": "19fd4f2fea33f17140b673b3d082b7e7445ad0016b3f81e935571314daed54b0"
@@ -1393,35 +1423,5 @@
     "path": "internal/engine/mission_effort_test.go",
     "kind": "test",
     "sha256": "cf507089fffb3fe96043f9e3232199ca07c5c3f96709ac178ea3a1480248cc11"
-  },
-  {
-    "path": "internal/engine/mission_guidance.go",
-    "kind": "source",
-    "sha256": "69895d5bab15756c47957f1fc7a2cf5d93893391683ec00fb5cdbec07596db33"
-  },
-  {
-    "path": "internal/engine/mission_guidance_test.go",
-    "kind": "test",
-    "sha256": "2cc65e699af6f344996c57bfd239e4207da764e408090995038449f386409cc4"
-  },
-  {
-    "path": "internal/engine/mission_help_test.go",
-    "kind": "test",
-    "sha256": "5b4a53d17b5abb26dc7dc3987e13651fb693763d22ad2a0ac616adb70a51b5d4"
-  },
-  {
-    "path": "internal/engine/mission_insights.go",
-    "kind": "source",
-    "sha256": "e7d0c12f214280de5a96379fc379c42a6cdd2d6ab65abcffbadcb9866a804c01"
-  },
-  {
-    "path": "internal/engine/mission_insights_test.go",
-    "kind": "test",
-    "sha256": "3aa04d9ceb43b408c955f29baf5f238362696f7f334b1a33188906c503b9cf28"
-  },
-  {
-    "path": "internal/engine/mission_launch_identity_test.go",
-    "kind": "test",
-    "sha256": "1dc9d93f5b051ed8e027f53797cf43ce9772e3110c0da4f7a3dee845da9a468e"
   }
 ]

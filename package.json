@@ -2,7 +2,7 @@
   "name": "swarm-local-tests",
   "private": true,
   "scripts": {
-    "test": "node tests/pilot_graph_test.cjs && node tests/graph_layout_cache_test.cjs && node tests/product_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && node tests/audit_acceptance_runner_test.cjs && node tests/review_recovery_test.cjs && node tests/reported_model_test.cjs && node tests/ai_connections_response_test.cjs && node tests/attempt_ledger_test.cjs && node tests/recovery_evidence_test.cjs && npm run test:i18n",
+    "test": "node tests/pilot_graph_test.cjs && node tests/graph_layout_cache_test.cjs && node tests/product_graph_test.cjs && node tests/mission_overview_test.cjs && node tests/cockpit_refresh_test.cjs && node tests/audit_acceptance_runner_test.cjs && node tests/review_recovery_test.cjs && node tests/reported_model_test.cjs && node tests/ai_connections_response_test.cjs && node tests/attempt_ledger_test.cjs && node tests/call_ledger_test.cjs && node tests/recovery_evidence_test.cjs && npm run test:i18n",
     "test:audit:cursor": "node tests/audit_acceptance.cjs --case cursor",
     "test:audit:states": "node tests/audit_acceptance.cjs --case states",
     "test:audit:evidence": "node tests/audit_acceptance.cjs --case evidence",
@@ -27,7 +27,10 @@
     "test:training-ui": "node tests/training_design_ui.cjs bin/swarm test-results/training-design",
     "test:web-requests": "node tests/web_requests_test.cjs",
     "test:web-requests-ui": "node tests/web_requests_admin_ui.cjs bin/swarm test-results/web-requests",
-    "test:api-wait-ui": "node tests/api_wait_admin_ui.cjs bin/swarm test-results/api-wait"
+    "test:api-wait-ui": "node tests/api_wait_admin_ui.cjs bin/swarm test-results/api-wait",
+    "test:call-ledger": "node tests/call_ledger_test.cjs",
+    "test:call-ledger-ui": "node tests/call_ledger_ui.cjs",
+    "test:retex-contract": "python3 tests/retex_campaign_contract_test.py"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"
