@@ -270,7 +270,20 @@ func (s *Store) agent(id string) (Agent, error) {
 	return decodeAgentRow(body, status, desired)
 }
 func (s *Store) agents(work string) ([]Agent, error) {
-	rows, err := s.db.Query("SELECT body,status,desired FROM agents WHERE work_id=? ORDER BY rowid DESC LIMIT 200", work)
+	return s.agentHistory(work, true)
+}
+
+// Accounting must cover every retained attempt, independently of the recent UI list.
+func (s *Store) spendingAgents(work string) ([]Agent, error) {
+	return s.agentHistory(work, false)
+}
+
+func (s *Store) agentHistory(work string, recent bool) ([]Agent, error) {
+	query := "SELECT body,status,desired FROM agents WHERE work_id=? ORDER BY rowid DESC"
+	if recent {
+		query += " LIMIT 200"
+	}
+	rows, err := s.db.Query(query, work)
 	if err != nil {
 		return nil, err
 	}

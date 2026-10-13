@@ -79,6 +79,7 @@ type SpendingRow struct {
 	MissingDurations int    `json:"attempts_without_duration"`
 }
 type MissionSpending struct {
+	Calls      []SpendingCall  `json:"calls"`
 	ObservedAt string          `json:"observed_at"`
 	Source     string          `json:"measurement_source"`
 	Rows       []SpendingRow   `json:"rows"`
@@ -561,7 +562,7 @@ func addMeasuredUsage(row *SpendingRow, u *Usage) {
 	}
 }
 func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error) {
-	out := MissionSpending{ObservedAt: now(), Source: "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events", Rows: []SpendingRow{}, Note: "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur."}
+	out := MissionSpending{ObservedAt: now(), Source: "agent.lifecycle + agent.progress + provider.result + task.review-history + planning_calls + events", Rows: []SpendingRow{}, Calls: []SpendingCall{}, Note: "Les appels d’outils, les appels IA et les contrôles du moteur sont des mesures différentes. Une mesure absente n’est pas un zéro ; les relances internes du fournisseur ne sont pas toutes observables. Une réservation d’appel ne prouve pas son envoi au fournisseur."}
 	by := map[string]*SpendingRow{}
 	rowFor := func(kind, id, label string) *SpendingRow {
 		key := kind + ":" + id
@@ -570,7 +571,15 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 		}
 		return by[key]
 	}
+	scopedAgents := []Agent{}
+	attemptsByTask := map[string]map[string]bool{}
+	explicitRetries := map[string]int{}
 	for _, a := range agents {
+		if a.WorkID != "" && a.WorkID != w.ID {
+			continue
+		}
+		scopedAgents = append(scopedAgents, a)
+		out.Calls = append(out.Calls, spendingAgentCall(w, a))
 		label := a.TaskID
 		if t, _ := w.task(a.TaskID); t != nil {
 			label = t.Title
@@ -593,19 +602,38 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 			row.Reviews = taskReviewCount(t)
 		}
 		if a.Previous != "" {
-			out.Retries++
-			row.TaskRetries++
+			explicitRetries[a.TaskID]++
+		}
+
+		// Count distinct recorded attempts, including ordinary supervisor retries
+		// which do not populate Agent.Previous. Preserve explicit legacy links.
+		if a.Attempt != "" {
+			if attemptsByTask[a.TaskID] == nil {
+				attemptsByTask[a.TaskID] = map[string]bool{}
+			}
+			attemptsByTask[a.TaskID][a.Attempt] = true
 		}
 		addMeasuredUsage(row, a.Usage)
 	}
-	rows, e := s.db.Query("SELECT scope_id,usage FROM planning_calls WHERE work_id=? AND state!='released' ORDER BY created_at,id", w.ID)
+	for _, row := range by {
+		n := len(attemptsByTask[row.ID]) - 1
+		if n < explicitRetries[row.ID] {
+			n = explicitRetries[row.ID]
+		}
+		if n < 0 {
+			n = 0
+		}
+		row.TaskRetries = n
+		out.Retries += n
+	}
+	rows, e := s.db.Query("SELECT id,scope_id,state,created_at,usage FROM planning_calls WHERE work_id=? AND state!='released' ORDER BY created_at,id", w.ID)
 	if e != nil {
 		return out, e
 	}
 	for rows.Next() {
-		var scope string
+		var id, scope, state, created string
 		var raw []byte
-		if e = rows.Scan(&scope, &raw); e != nil {
+		if e = rows.Scan(&id, &scope, &state, &created, &raw); e != nil {
 			rows.Close()
 			return out, e
 		}
@@ -615,16 +643,15 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 		}
 		row := rowFor(kind, scope, label)
 		row.Calls++
-		var u Usage
-		if len(raw) > 0 && string(raw) != "null" {
-			if e = json.Unmarshal(raw, &u); e != nil {
-				rows.Close()
-				return out, e
-			}
-			addMeasuredUsage(row, &u)
-		} else {
-			addMeasuredUsage(row, nil)
+		call := SpendingCall{ID: "planning/" + id, RecordType: "planning_reservation", Kind: kind, Role: kind, Scope: scope, State: state, RegisteredAt: created}
+		usage, err := decodeSpendingUsage(raw)
+		if err != nil {
+			rows.Close()
+			return out, err
 		}
+		addMeasuredUsage(row, usage)
+		call.Usage = usage
+		out.Calls = append(out.Calls, call)
 	}
 	e = rows.Err()
 	rows.Close()
@@ -680,7 +707,13 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 	for _, k := range keys {
 		out.Rows = append(out.Rows, *by[k])
 	}
-	out.Attempts = attemptLedgers(w, agents)
+	sort.SliceStable(out.Calls, func(i, j int) bool {
+		if out.Calls[i].RegisteredAt == out.Calls[j].RegisteredAt {
+			return out.Calls[i].ID < out.Calls[j].ID
+		}
+		return out.Calls[i].RegisteredAt < out.Calls[j].RegisteredAt
+	})
+	out.Attempts = attemptLedgers(w, scopedAgents)
 	return out, nil
 }
 

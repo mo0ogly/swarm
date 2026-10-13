@@ -20,8 +20,39 @@ Object.assign(Mission,{
   host.append(node('p',trMissionInsights('Mesures observées : ')+(c.observed_at||trMissionInsights('non rapporté'))+' · '+trMissionInsights('Source : ')+(c.measurement_source?trMissionInsights('Horaires des processus, activité reçue, usages fournisseurs et historique des revues.'):trMissionInsights('non rapporté'))));
   for(const [kind,label]of [['worker','Exécutants'],['planner','Responsables'],['reviewer','Vérificateur indépendant']]){const box=node('section',undefined,'mission-current field-wide');box.append(node('h3',trMissionInsights(label)));const rows=c.rows.filter(r=>r.kind===kind);if(!rows.length)box.append(node('p',trMissionInsights('Aucun appel enregistré pour ce rôle.')));for(const r of rows){box.append(node('h4',kind==='worker'?r.label:missionText(r.label)),node('p',r.recorded_calls+trMissionInsights(' tentatives ou appels enregistrés · ')+((r.observed_tool_calls===0&&r.attempts_with_incomplete_tool_measurement>0)?trMissionInsights('Appels d’outils non rapportés.'):r.observed_tool_calls+trMissionInsights(' appels d’outils observés'))),node('p',(r.recorded_calls>0&&r.calls_without_usage>=r.recorded_calls)?trMissionInsights('Jetons non rapportés.'):r.input_tokens+' / '+r.output_tokens+trMissionInsights(' jetons entrée/sortie rapportés · ')+r.calls_without_usage+trMissionInsights(' usages absents')),node('p',missionText(r.cost.attempts_with_cost?(r.cost.reported_usd.toFixed(2)+' USD rapportés sur '+r.cost.attempts_with_cost+' tentative(s)'):'coût réel non rapporté')+(r.cost.attempts_without_cost?' · '+r.cost.attempts_without_cost+trMissionInsights(' sans coût rapporté'):'')));if(r.attempts_with_incomplete_tool_measurement)box.append(node('p',r.attempts_with_incomplete_tool_measurement+trMissionInsights(' mesures d’outils incomplètes'),'notice attention'));if(kind==='worker')box.append(node('p',trMissionInsights('Durée cumulée des processus : ')+duration(r.recorded_process_ms)+' · '+r.attempts_without_duration+trMissionInsights(' durée(s) non rapportée(s)')),node('p',r.reviews_recorded+trMissionInsights(' revue(s) enregistrée(s) pour cette tâche · ')+r.task_retries+trMissionInsights(' reprise(s) pour cette tâche')))}host.append(box)}
   host.append(node('p',trMissionInsights('Les durées de processus additionnées ne sont pas la durée écoulée de la mission.'),'notice info'));
-  host.append(this.attemptsView(c.attempts));
+  host.append(this.attemptsView(c.attempts),this.callsView(c.calls));
   host.append(node('h3',trMissionInsights('Moteur')),node('p',c.recorded_control_executions+trMissionInsights(' contrôles enregistrés · ')+c.worker_retries+trMissionInsights(' reprises d’agents')),node('p',missionText(c.note),'notice info'));return host;
+ },
+ callsView(rows){
+  const host=node('details',undefined,'field-wide');host.dataset.callLedger='calls';
+  host.append(node('summary',trMissionInsights('Voir le registre des appels et réservations')+' · '+(rows?.length??trMissionInsights('non rapporté'))));
+  const body=node('section',undefined,'field-wide');host.append(body);let rendered=false;
+  const render=()=>{
+   if(!host.open||rendered)return;rendered=true;
+   body.append(node('p',trMissionInsights('Chaque ligne est une réservation ou tentative enregistrée, pas la preuve d’une inférence envoyée. Les caches restent séparés des jetons bruts et le coût rapporté n’est pas une facture.'),'notice info'));
+   if(!rows)body.append(node('p',trMissionInsights('Registre détaillé indisponible pour cette version.')));
+   else if(!rows.length)body.append(node('p',trMissionInsights('Aucun appel enregistré.')));
+   for(const call of rows||[]){
+    const box=node('article',undefined,'mission-current');box.dataset.providerCall=call.id;
+    const role=trMissionInsights(({worker:'Exécutant',planner:'Responsable',reviewer:'Vérificateur indépendant'})[call.kind]||'Rôle inconnu');
+    box.append(node('h4',role+' · '+call.id));
+    if(call.task)box.append(node('p',trMissionInsights('Tâche : ')+call.task+' · '+trMissionInsights('Tentative : ')+(call.attempt||trMissionInsights('non rapporté'))));
+    if(call.scope)box.append(node('p',trMissionInsights('Périmètre : ')+call.scope));
+    const states=call.record_type==='planning_reservation'?{estimated:'Réservation enregistrée',finished:'Réservation clôturée'}:{completed:'Processus terminé',failed:'Processus en échec',interrupted:'Processus interrompu',running:'Processus en cours',queued:'Démarrage en attente',starting:'Démarrage en cours',stopping:'Arrêt en cours'};
+    box.append(node('p',trMissionInsights('État enregistré : ')+trMissionInsights(states[call.state]||'État du processus inconnu')));
+    if(call.registered_at)box.append(node('p',trMissionInsights('Horodatage enregistré : ')+this.readableDate(call.registered_at)));
+    box.append(node('p',call.provider?trMissionInsights('Fournisseur : ')+call.provider:trMissionInsights('Fournisseur historique non attribuable.')));
+    box.append(node('p',call.requested_model?trMissionInsights('Modèle demandé : ')+call.requested_model:trMissionInsights('Modèle historique non attribuable.')));
+    if(call.observed_model)box.append(node('p',trMissionInsights('Modèle rapporté : ')+call.observed_model));
+    const usage=call.usage;
+    box.append(node('p',usage?usage.input_tokens+' / '+usage.output_tokens+trMissionInsights(' jetons entrée/sortie rapportés'):trMissionInsights('Usage non rapporté.')));
+    if(usage)for(const [key,label]of [['cached_input_tokens','Entrée en cache'],['cache_read_input_tokens','Cache lu'],['cache_creation_input_tokens','Cache créé']]){
+     if(usage[key]!==undefined&&usage[key]!==null)box.append(node('p',trMissionInsights(label)+' : '+usage[key]+trMissionInsights(' jetons déclarés (non additionnés).')));
+    }
+    box.append(node('p',usage?.provider_reported_cost_usd!==undefined&&usage.provider_reported_cost_usd!==null?usage.provider_reported_cost_usd+' USD · '+trMissionInsights('Coût rapporté, facture non vérifiée.'):trMissionInsights('Coût non rapporté.')));
+    body.append(box);
+   }
+  };host.addEventListener('toggle',render);return host;
  },
  attemptsView(rows){
   const host=node('section',undefined,'field-wide');host.append(node('h3',trMissionInsights('Bilan par tentative')),node('p',trMissionInsights('Un départ enregistré n’est pas un appel au modèle. Les appels internes du fournisseur ne sont pas mesurés.'),'notice info'));

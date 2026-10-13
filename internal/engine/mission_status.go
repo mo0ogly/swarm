@@ -664,7 +664,11 @@ func (s *Store) missionStatus(work string) (MissionStatus, error) {
 	if err != nil {
 		return d, err
 	}
-	d.Spending, err = s.missionSpending(w, agents)
+	spendingAgents, err := s.spendingAgents(work)
+	if err != nil {
+		return d, err
+	}
+	d.Spending, err = s.missionSpending(w, spendingAgents)
 	if err != nil {
 		return d, err
 	}

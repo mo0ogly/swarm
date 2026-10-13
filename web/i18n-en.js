@@ -252,7 +252,7 @@ globalThis.SwarmEnglish = {
   "Cache lu": "Cache read",
   "Cache créé": "Cache created",
   "Entrée en cache": "Cached input",
-  " jetons déclarés (non additionnés).": " reported tokens (not added together).",
+  " jetons déclarés (non additionnés).": " reported tokens (not added).",
   "Coût déclaré par le fournisseur : ": "Provider-reported cost: ",
   " USD — facture non vérifiée.": " USD — invoice not verified.",
   "Coût facturé : indisponible.": "Invoiced cost: unavailable.",
@@ -4083,5 +4083,17 @@ globalThis.SwarmEnglish = {
   "Choisissez l’autre carte pour préparer le lien. Aucune modification avant confirmation.": "Choose the other card to prepare the link. Nothing changes before confirmation.",
   "Lien préparé. Prévisualisez puis confirmez dans le brouillon.": "Link prepared. Preview and confirm in the draft.",
   "Déplacez les cartes par leur poignée. Reliez une sortie à une entrée. Sélectionnez un lien pour le modifier. Échap annule le geste ou quitte le plein écran.": "Move cards using their handles. Connect an output to an input. Select a link to edit it. Escape cancels the gesture or exits full screen.",
-  "Les maxima affichés protègent la représentation entière exacte, pas une limite de durée ou de charge. La taille des requêtes et de l’historique reste bornée.": "Displayed maxima protect exact integer representation, not a duration or workload limit. Request and history sizes remain bounded."
+  "Les maxima affichés protègent la représentation entière exacte, pas une limite de durée ou de charge. La taille des requêtes et de l’historique reste bornée.": "Displayed maxima protect exact integer representation, not a duration or workload limit. Request and history sizes remain bounded.",
+  "Voir le registre des appels et réservations": "View the call and reservation ledger",
+  "Chaque ligne est une réservation ou tentative enregistrée, pas la preuve d’une inférence envoyée. Les caches restent séparés des jetons bruts et le coût rapporté n’est pas une facture.": "Each row is a recorded reservation or attempt, not proof of sent inference. Caches remain separate from raw tokens and reported cost is not an invoice.",
+  "Registre détaillé indisponible pour cette version.": "Detailed ledger unavailable for this version.",
+  "Aucun appel enregistré.": "No calls recorded.",
+  "Réservation enregistrée": "Reservation recorded",
+  "Réservation clôturée": "Reservation settled",
+  "État enregistré : ": "Recorded state: ",
+  "Horodatage enregistré : ": "Recorded timestamp: ",
+  "Fournisseur historique non attribuable.": "Historical provider not attributable.",
+  "Modèle historique non attribuable.": "Historical model not attributable.",
+  "Usage non rapporté.": "Usage not reported.",
+  "Coût rapporté, facture non vérifiée.": "Reported cost, invoice not verified."
 };
