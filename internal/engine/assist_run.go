@@ -159,7 +159,7 @@ const structuredSchemaRefusal = "Schéma de réponse refusé par le fournisseur 
 // Classify only provider error envelopes. Never reflect arbitrary error text,
 // URLs or credentials into public diagnostics, or classify quoted tool output.
 func structuredProviderFailure(data map[string]any) error {
-	if data["type"] != "error" && data["type"] != "turn.failed" && data["is_error"] != true {
+	if data["type"] != "error" && data["type"] != "turn.failed" && !(data["type"] == "result" && data["is_error"] == true) {
 		return nil
 	}
 	code, _ := data["code"].(string)

@@ -28,8 +28,14 @@ func TestStructuredProviderFailurePreservesSafeCause(t *testing.T) {
 			}
 		})
 	}
-	out := readAssistOutput(strings.NewReader(`{"type":"item.completed","item":{"text":"Selected model is at capacity PRIVATE_SECRET"}}`))
-	if out.err != nil {
-		t.Fatal("tool or assistant text classified as provider refusal", out.err)
+	for _, line := range []string{
+		`{"type":"item.completed","item":{"text":"Selected model is at capacity PRIVATE_SECRET"}}`,
+		`{"type":"tool_result","is_error":true,"content":"command failed","error":"Selected model is at capacity PRIVATE_SECRET"}`,
+		`{"type":"user","message":{"content":[{"type":"tool_result","is_error":true,"content":"Selected model is at capacity PRIVATE_SECRET"}]}}`,
+	} {
+		out := readAssistOutput(strings.NewReader(line))
+		if out.err != nil {
+			t.Fatal("tool or assistant text classified as provider refusal", out.err)
+		}
 	}
 }

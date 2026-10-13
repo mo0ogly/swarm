@@ -1242,7 +1242,7 @@
   {
     "path": "internal/engine/assist_run.go",
     "kind": "source",
-    "sha256": "6dfe45dd8a8c0bae75afb244e453a8f564ca05bd3c4a98282d346ab836ce758c"
+    "sha256": "e9823ae05045a8717dbc967fccba2874e9b4885c8b404aaa8bc2011d7775aa4e"
   },
   {
     "path": "internal/engine/assist_schema.go",

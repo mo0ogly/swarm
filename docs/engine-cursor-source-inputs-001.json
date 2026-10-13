@@ -487,7 +487,7 @@
   {
     "path": "docs/architecture/PROVIDER-LIVENESS.md",
     "kind": "doc",
-    "sha256": "bf7cbbacde9ce1f2ab9d3e1918be3966cf4982be2d082ff8ca75de263e7307ed"
+    "sha256": "364f81dabf8ac064ebead09dd4700432898674147bbdbbc862e7f82f2c52c48c"
   },
   {
     "path": "docs/architecture/REVIEW-EVIDENCE.md",
@@ -687,7 +687,7 @@
   {
     "path": "docs/en/PROVIDER-LIVENESS.md",
     "kind": "doc",
-    "sha256": "44711a7a91cb4a68b12e60dab93bfb862b5f19c88bb49280f26c2433a01710a2"
+    "sha256": "0e887d932e24e2c1e92c86e31496b13d8e25cf918e0dbfec95d222ef23bfaf1e"
   },
   {
     "path": "docs/en/PROVIDER-QUOTAS.md",

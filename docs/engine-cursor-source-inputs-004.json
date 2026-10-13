@@ -887,7 +887,7 @@
   {
     "path": "internal/engine/structured_provider_failure_test.go",
     "kind": "test",
-    "sha256": "b8daeffda8e7954f7f361147ed30955ec1e195506e831c5868d5eb28aba9cbfb"
+    "sha256": "cad4eb6ba476b3befd579c1efa88dbef4bfe5d30b5a7edeba96c6201a25e01d3"
   },
   {
     "path": "internal/engine/structured_provider_progress_test.go",
