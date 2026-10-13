@@ -502,7 +502,7 @@
   {
     "path": "docs/architecture/TRACEABILITY.md",
     "kind": "doc",
-    "sha256": "fbd86fb95d15bcdc266cb6df54b85aa9d761b52da1c53362bb088c729071d741"
+    "sha256": "683ee94958a77864f0eeab956a72a618516d1658f6c266b7a671d4fa2a4af0fd"
   },
   {
     "path": "docs/architecture/WEB-REQUEST-POLICY.md",
@@ -742,7 +742,7 @@
   {
     "path": "docs/en/TRACEABILITY.md",
     "kind": "doc",
-    "sha256": "f3b32ca7185903651fe7051eb405e59747d741151ad116d9371897cc95f65c2d"
+    "sha256": "4ff0906380b9d8140cf0117e1a273ab39b1e74b85549032bffa192330b7a9a9c"
   },
   {
     "path": "docs/en/USER-GUIDE.md",

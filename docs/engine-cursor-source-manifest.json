@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
-  "base_commit": "7e9d02490a1da0366cbe1759c2e1c525f9cae298",
-  "candidate_id": "7e9d02490a1da0366cbe1759c2e1c525f9cae298+sha256:e7c858326e91f84f860303163fd4ee271355094672f0104f40cf6db138ae031f",
-  "candidate_digest": "e7c858326e91f84f860303163fd4ee271355094672f0104f40cf6db138ae031f",
+  "base_commit": "60c3dc65edf0f1f3915414e284f58543c6814924",
+  "candidate_id": "60c3dc65edf0f1f3915414e284f58543c6814924+sha256:3ce5ba2787090fc095f255df1260428d1a0c3e71e7ac6841649121beebd5f91e",
+  "candidate_digest": "3ce5ba2787090fc095f255df1260428d1a0c3e71e7ac6841649121beebd5f91e",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/ui-redesign-source-manifest.json",
   "requirements": [
@@ -176,7 +176,7 @@
   "input_parts": [
     {
       "path": "docs/engine-cursor-source-inputs-001.json",
-      "sha256": "fd9ee6d241c3c785225c2d8c894bee10f7c07c135ffcca2ac14fdc634848ec28"
+      "sha256": "0189597d1b9db73d9e50b64571cefd47db5d76b146b64609f85cc21df813fa89"
     },
     {
       "path": "docs/engine-cursor-source-inputs-002.json",
@@ -184,7 +184,7 @@
     },
     {
       "path": "docs/engine-cursor-source-inputs-003.json",
-      "sha256": "e95f8e92d146f8bdeac15a322febb81701be6c4505e07eb00ef2a03142a581a4"
+      "sha256": "226b4721bb41d8e68e0b152a4a799a91ba110ea97ef5aa29396f75e3a7e66cad"
     },
     {
       "path": "docs/engine-cursor-source-inputs-004.json",

@@ -216,3 +216,9 @@ Verify normal flow, refusals, changed-precondition recovery, persistence and
 concurrency in temporary roots. Separate doubles, real providers and human
 interventions. Intact sources may be wrong and favorable reviews insufficiently
 grounded. Evidence also supports auditing supervisors, reviewers and the engine.
+
+## Count managed controls without losing history
+
+`mission spending` and the cockpit read executions recorded in `task.auto-validation` and `managed.integrated`. The first carries a result list; the second carries per-task lists in `controls`. The counter adds each `executed=true` result, passed or failed, once per event for that mission. An unreadable structure remains an error and is not presented as zero.
+
+Example: publish alpha with one control, then publish beta with an alpha recheck and beta control. The ledger reports **3 recorded executions**, while the final candidate has **2 fresh controls**. These are different units; summing only final validations would lose the first control. Controls without a recorded result event are not inferred from worker tests or launch intentions. Missing cost stays unknown, even if a JSON sum is zero with no calls reporting cost.

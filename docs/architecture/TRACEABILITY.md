@@ -276,3 +276,9 @@ sources et candidat exacts. Séparer tests avec doubles, fournisseur réel et
 interventions humaines. Une source intacte peut contenir une erreur ; une revue
 favorable peut être insuffisamment fondée : les preuves servent aussi à auditer
 les agents et le moteur, pas seulement à auditer les workers.
+
+## Compter les contrôles gérés sans perdre leur historique
+
+`mission spending` et le cockpit lisent les exécutions enregistrées dans `task.auto-validation` et `managed.integrated`. Le premier transporte une liste de résultats ; le second une liste par tâche dans `controls`. Le compteur ajoute chaque résultat `executed=true`, réussi ou échoué, une fois par événement de cette mission. Une structure illisible reste une erreur et ne devient pas zéro.
+
+Exemple : publication alpha avec un contrôle, puis publication beta avec recontrôle alpha et contrôle beta. Le bilan indique **3 exécutions enregistrées**, tandis que le dernier candidat possède **2 contrôles frais**. Ces unités sont distinctes ; sommer seulement les validations finales perdrait le premier contrôle. Les contrôles sans événement de résultat enregistré ne sont pas déduits des tests du worker ni des intentions de lancement. Un coût absent reste inconnu, même si une somme JSON vaut zéro avec zéro appel ayant rapporté un coût.

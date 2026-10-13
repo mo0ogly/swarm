@@ -170,3 +170,33 @@ func TestMissionChangeCategoryIgnoresProse(t *testing.T) {
 		t.Fatal(cat)
 	}
 }
+
+func TestMissionSpendingCountsManagedAndAutomaticControlEvents(t *testing.T) {
+	s := storeTest(t)
+	w := createTest(t, s)
+	other := createTest(t, s)
+	nextRevision := map[string]int{}
+	add := func(work, kind string, payload any) {
+		t.Helper()
+		revision := nextRevision[work]
+		if revision == 0 {
+			revision = 2
+		}
+		nextRevision[work] = revision + 1
+		raw, _ := json.Marshal(payload)
+		if _, err := s.db.Exec("INSERT INTO events(id,work_id,revision,kind,at,payload,request) VALUES(?,?,?,?,?,?,?)", newID("fixture-"), work, revision, kind, now(), raw, raw); err != nil {
+			t.Fatal(err)
+		}
+	}
+	add(w.ID, "task.auto-validation", AutomaticValidation{Controls: []ValidationControlResult{{Executed: true}, {Executed: false}}})
+	add(w.ID, "managed.integrated", map[string]any{"candidate_commit": "fixture-candidate", "controls": map[string][]ValidationControlResult{"alpha": {{Executed: true, Passed: true}}, "beta": {{Executed: true, Passed: false}, {Executed: false}}}})
+	add(other.ID, "managed.integrated", map[string]any{"controls": map[string][]ValidationControlResult{"foreign": {{Executed: true}}}})
+	got, err := s.missionSpending(w, nil)
+	if err != nil || got.Controls != 3 {
+		t.Fatalf("recorded managed controls missing: got=%d err=%v", got.Controls, err)
+	}
+	add(w.ID, "managed.integrated", map[string]any{"controls": "invalid"})
+	if _, err := s.missionSpending(w, nil); err == nil {
+		t.Fatal("malformed recorded controls presented as zero")
+	}
+}

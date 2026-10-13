@@ -1407,12 +1407,12 @@
   {
     "path": "internal/engine/mission_insights.go",
     "kind": "source",
-    "sha256": "7ad16617038215f6353cef3f462b18d5fc92b796c1af61e6a96a5394c22e440b"
+    "sha256": "e7d0c12f214280de5a96379fc379c42a6cdd2d6ab65abcffbadcb9866a804c01"
   },
   {
     "path": "internal/engine/mission_insights_test.go",
     "kind": "test",
-    "sha256": "a1b6fb40189fc4f8db87b90c0d4df7755c4ef3a048cc58df573fbb7135c007a0"
+    "sha256": "3aa04d9ceb43b408c955f29baf5f238362696f7f334b1a33188906c503b9cf28"
   },
   {
     "path": "internal/engine/mission_launch_identity_test.go",

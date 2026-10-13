@@ -1,0 +1,16 @@
+{"Time":"2026-10-13T10:01:27.640275135+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-13T10:01:27.686150556+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingSeparatesUnitsAndMissingCost"}
+{"Time":"2026-10-13T10:01:27.686260542+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingSeparatesUnitsAndMissingCost","Output":"=== RUN   TestMissionSpendingSeparatesUnitsAndMissingCost\n"}
+{"Time":"2026-10-13T10:01:27.743642033+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingSeparatesUnitsAndMissingCost","Output":"--- PASS: TestMissionSpendingSeparatesUnitsAndMissingCost (0.06s)\n"}
+{"Time":"2026-10-13T10:01:27.743700383+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingSeparatesUnitsAndMissingCost","Elapsed":0.06}
+{"Time":"2026-10-13T10:01:27.74371503+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingTracksReviewsAndRetriesPerTask"}
+{"Time":"2026-10-13T10:01:27.743723216+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingTracksReviewsAndRetriesPerTask","Output":"=== RUN   TestMissionSpendingTracksReviewsAndRetriesPerTask\n"}
+{"Time":"2026-10-13T10:01:27.770704237+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingTracksReviewsAndRetriesPerTask","Output":"--- PASS: TestMissionSpendingTracksReviewsAndRetriesPerTask (0.03s)\n"}
+{"Time":"2026-10-13T10:01:27.770756044+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingTracksReviewsAndRetriesPerTask","Elapsed":0.03}
+{"Time":"2026-10-13T10:01:27.770769359+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents"}
+{"Time":"2026-10-13T10:01:27.770774619+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Output":"=== RUN   TestMissionSpendingCountsManagedAndAutomaticControlEvents\n"}
+{"Time":"2026-10-13T10:01:27.81064467+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Output":"--- PASS: TestMissionSpendingCountsManagedAndAutomaticControlEvents (0.04s)\n"}
+{"Time":"2026-10-13T10:01:27.810710695+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestMissionSpendingCountsManagedAndAutomaticControlEvents","Elapsed":0.04}
+{"Time":"2026-10-13T10:01:27.810732265+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"PASS\n"}
+{"Time":"2026-10-13T10:01:27.815414748+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"ok  \tswarm.local/companion/internal/engine\t0.175s\n"}
+{"Time":"2026-10-13T10:01:27.891178796+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Elapsed":0.251}

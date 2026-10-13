@@ -631,22 +631,37 @@ func (s *Store) missionSpending(w Work, agents []Agent) (MissionSpending, error)
 	if e != nil {
 		return out, e
 	}
-	controls, e := s.db.Query("SELECT payload FROM events WHERE work_id=? AND kind='task.auto-validation'", w.ID)
+	controls, e := s.db.Query("SELECT kind,payload FROM events WHERE work_id=? AND kind IN ('task.auto-validation','managed.integrated')", w.ID)
 	if e != nil {
 		return out, e
 	}
 	for controls.Next() {
+		var kind string
 		var raw []byte
-		if e = controls.Scan(&raw); e != nil {
+		if e = controls.Scan(&kind, &raw); e != nil {
 			controls.Close()
 			return out, e
 		}
-		var record AutomaticValidation
-		if e = json.Unmarshal(raw, &record); e != nil {
+		var results []ValidationControlResult
+		if kind == "managed.integrated" {
+			var record struct {
+				Controls map[string][]ValidationControlResult `json:"controls"`
+			}
+			if e = json.Unmarshal(raw, &record); e == nil {
+				for _, taskResults := range record.Controls {
+					results = append(results, taskResults...)
+				}
+			}
+		} else {
+			var record AutomaticValidation
+			e = json.Unmarshal(raw, &record)
+			results = record.Controls
+		}
+		if e != nil {
 			controls.Close()
 			return out, e
 		}
-		for _, c := range record.Controls {
+		for _, c := range results {
 			if c.Executed {
 				out.Controls++
 			}
