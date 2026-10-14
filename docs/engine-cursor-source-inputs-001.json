@@ -432,7 +432,7 @@
   {
     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
-    "sha256": "a77d8ec39c7944cf433d87be6b2a5b239c91a60280c0d05614e26d21b65f0063"
+    "sha256": "a46bd23fbe7168983024328e3596b36f8922779b4729907e7bab48c575e6f657"
   },
   {
     "path": "docs/architecture/CALL-ACCOUNTING.md",
@@ -557,7 +557,7 @@
   {
     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
-    "sha256": "458cfbf265a7ffbe71bb5a2fd027b93bbad3d49c7b68cd9b9209049b97055854"
+    "sha256": "3710095d2f57f63f4976d43518f3e284f46f50ceeb0beb6f1c7aa2473061c094"
   },
   {
     "path": "docs/en/BUDGETS.md",
@@ -817,7 +817,7 @@
   {
     "path": "docs/plans/engine-cursor-contract/replan-unblock-20261014.md",
     "kind": "doc",
-    "sha256": "366da072f01169b356b109d8511eedfd9d3703494ac812776fd50244dd36bc2c"
+    "sha256": "50d537a10fb0e96dd4a2957a437de104273f6ce5ec99c5c632ae95176444502a"
   },
   {
     "path": "docs/plans/engine-cursor-contract/suites-retex-20261013.md",

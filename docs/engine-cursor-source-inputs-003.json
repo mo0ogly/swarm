@@ -987,22 +987,22 @@
   {
     "path": "internal/engine/managed_review_fragment_final_journal.go",
     "kind": "source",
-    "sha256": "f3b943887ccf506785aa574139f5af8360740848825992460e42b9c995fdae6e"
+    "sha256": "aedc812566442551b3b9c2cf32adc4827769958f67631c09287abbb908e9e0cb"
   },
   {
     "path": "internal/engine/managed_review_fragment_final_journal_test.go",
     "kind": "test",
-    "sha256": "d7c89dc76ff3a506ac6b9cb753667bae2edd6b6f11dba9b5fa9dd3afb743ccb8"
+    "sha256": "01d79c82e4b35bd4c8fafdd9b0d03ae7bbd15725cf9813631850a6300d57da02"
   },
   {
     "path": "internal/engine/managed_review_fragment_final_store.go",
     "kind": "source",
-    "sha256": "bdb210eff44812ae3fb4ec6d8e66d5d2ad2ad2b6c307526b79ca0ed6f218bd45"
+    "sha256": "89f9c57eb3e1d7b0da057b3a0a6c7cef2e1e8b56c9cec6a4d222917423bc847d"
   },
   {
     "path": "internal/engine/managed_review_fragment_final_store_test.go",
     "kind": "test",
-    "sha256": "53da5bc5078d1d231caaf9034f14c113099c83bf465b90fa81d9125defc065e1"
+    "sha256": "c8ccea252bcf984452cb1e8ee129d46b9dab2922f13de09d099c38d1721b7143"
   },
   {
     "path": "internal/engine/managed_review_fragment_final_test.go",
@@ -1132,12 +1132,12 @@
   {
     "path": "internal/engine/managed_review_fragment_request_prompt.go",
     "kind": "source",
-    "sha256": "7d32394fb5302ecc25b013c4d995fd682444d8a22072805891d9a4ab2491b591"
+    "sha256": "2015ba168260376eb43397f45ebf280cb8e14fe108a56630df9d5f0b3f9bde2a"
   },
   {
     "path": "internal/engine/managed_review_fragment_request_prompt_test.go",
     "kind": "test",
-    "sha256": "a9fca90b6687fcfc40cbf4830c101951bd6096e1ce298b6336ee090ca270a39a"
+    "sha256": "b6df8bafe038da7df344a94279fb8f2647b333c7b876b5d2c31cb0a26a14d3fa"
   },
   {
     "path": "internal/engine/managed_review_fragment_request_test.go",
@@ -1342,12 +1342,12 @@
   {
     "path": "internal/engine/managed_review_selection_capacity_recovery.go",
     "kind": "source",
-    "sha256": "dc8513bfb4ff70ae41a5917de85b8dded850e1b47eea45315744fcc551531d30"
+    "sha256": "50b6352f183874bdb280ff8cec3d13733d8070eb457c3179a444a26575a7d188"
   },
   {
     "path": "internal/engine/managed_review_selection_capacity_recovery_test.go",
     "kind": "test",
-    "sha256": "9d2740d42a38f6131d0196bc634dc02fb2c3bd4c7d2ac5bc367b96ebaaff2938"
+    "sha256": "3ee2a4f51934f4c780c4c840ffb7c9b660ddf7b4f2cd0d97f69f58978010720e"
   },
   {
     "path": "internal/engine/managed_review_sources.go",
