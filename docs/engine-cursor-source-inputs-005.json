@@ -1,5 +1,10 @@
 [
   {
+    "path": "tests/supervision_r2_acceptance.py",
+    "kind": "harness",
+    "sha256": "7505c3acc05fb42ade0da1e569ff2794e1388907f457401fff44df7f7caea64d"
+  },
+  {
     "path": "tests/supervision_r3_acceptance.py",
     "kind": "harness",
     "sha256": "b7528ab6d375279be19280645e0003f1cdd645ab9ba41ff470be8a242b6c2cf4"

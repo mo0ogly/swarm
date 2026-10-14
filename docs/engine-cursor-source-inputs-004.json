@@ -172,7 +172,7 @@
   {
     "path": "internal/engine/planning.go",
     "kind": "source",
-    "sha256": "1b68f1e0bcc469a7b70038943c04c42f4469b2840c042efbb72bcd0b235e71bf"
+    "sha256": "540ba68838db0666d9c2897924265bea4c9fed556ad5e5bea03c46652cffe86b"
   },
   {
     "path": "internal/engine/planning_api.go",
@@ -247,7 +247,7 @@
   {
     "path": "internal/engine/planning_judge.go",
     "kind": "source",
-    "sha256": "480c7ae09178863b8a2ed041ca0b98ec9cba3e8df566a548af26d8967b196948"
+    "sha256": "053019b5a85ab2f292edca745178700117cbf0bfd588194d981e5dc24d9bcf38"
   },
   {
     "path": "internal/engine/planning_judge_operations_test.go",
@@ -255,9 +255,14 @@
     "sha256": "972026cf8f6cd1d3819e176277b4813423ec45f42ec722eeb2d93787749c562b"
   },
   {
+    "path": "internal/engine/planning_judge_state_validation_test.go",
+    "kind": "test",
+    "sha256": "b9901abc6188778ee34e75b0475b5b5ec27764021861f55bc8352e2cc0b429bf"
+  },
+  {
     "path": "internal/engine/planning_judge_test.go",
     "kind": "test",
-    "sha256": "959af7436d8b904d8198499a1852fafcb1ff37411f422056ca866cbf85874d95"
+    "sha256": "0cc0e5586497bc04fd53881d7101d9a12e0abb3fbe5f23ed55d270e423789573"
   },
   {
     "path": "internal/engine/planning_operation_schema_contract_test.go",
@@ -687,7 +692,7 @@
   {
     "path": "internal/engine/quotas_judge_test.go",
     "kind": "test",
-    "sha256": "5f1c2a22fcc9172473c380eaec1428efc8b7fc9bc6a418120d860d0c0822b41d"
+    "sha256": "192f23976a47acdc5037a549dcbfc2d191f9e250efa03bf12c5f581a433f910e"
   },
   {
     "path": "internal/engine/quotas_test.go",
@@ -1488,10 +1493,5 @@
     "path": "tests/supervision_go_suite.py",
     "kind": "harness",
     "sha256": "6cede83dc9304abe3b23ea17cde235beaee8a467498c82307889349d26f8d8ef"
-  },
-  {
-    "path": "tests/supervision_r2_acceptance.py",
-    "kind": "harness",
-    "sha256": "7505c3acc05fb42ade0da1e569ff2794e1388907f457401fff44df7f7caea64d"
   }
 ]

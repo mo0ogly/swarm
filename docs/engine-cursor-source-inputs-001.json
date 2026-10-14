@@ -472,7 +472,7 @@
   {
     "path": "docs/architecture/JUDGMENT-CYCLES.md",
     "kind": "doc",
-    "sha256": "20cc985636259c2ae8be1d6e628d413f70521a7a0b04543296cbed9875c0a284"
+    "sha256": "1c5e855fd68a66e4451bf3d408b3ef17224087c356d9aaa85a58c4c97eba800d"
   },
   {
     "path": "docs/architecture/LOG-CONSOLE.md",
@@ -497,7 +497,7 @@
   {
     "path": "docs/architecture/REVIEW-EVIDENCE.md",
     "kind": "doc",
-    "sha256": "b12e5a5fa9cd09d5a9c48bbb5d6cb055dc3d9f79c13f10bcde352417f3d992f2"
+    "sha256": "bf587a8640b58d23bb040260f8dbb50a0ccf75ba705c66cba9ad1de441877508"
   },
   {
     "path": "docs/architecture/REVIEW-POLICIES.md",
@@ -667,7 +667,7 @@
   {
     "path": "docs/en/JUDGMENT-CYCLES.md",
     "kind": "doc",
-    "sha256": "248199f2c7a1bc19d0f4ee3eac9b58e7ddf1c136713bda53685bca4e58181e04"
+    "sha256": "3c34f084ae75c2d2fcdcee0358d5d6313c657da03ceb8982d171e34666dd4cbb"
   },
   {
     "path": "docs/en/LOCAL-WEB-RECOVERY.md",
@@ -737,7 +737,7 @@
   {
     "path": "docs/en/REVIEW-EVIDENCE.md",
     "kind": "doc",
-    "sha256": "3b408dd965301bb75c8f3d9daf7c58f063f1cb5e136460503d147f70342ceb05"
+    "sha256": "0a2c66a499bb471f194b1c9e4569b8650e1c9c8905e95c07849a5e7e3f16996d"
   },
   {
     "path": "docs/en/REVIEW-FRAGMENTS.md",
@@ -817,7 +817,7 @@
   {
     "path": "docs/plans/engine-cursor-contract/replan-unblock-20261014.md",
     "kind": "doc",
-    "sha256": "e8e9e6f269343f55d820759f4ba6ab1e4379bbe0fc535a1affb9fdda5b508c2f"
+    "sha256": "366da072f01169b356b109d8511eedfd9d3703494ac812776fd50244dd36bc2c"
   },
   {
     "path": "docs/plans/engine-cursor-contract/suites-retex-20261013.md",

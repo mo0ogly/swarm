@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
-  "base_commit": "079e9fdfebb0148fb0c2aa42b8fec0dfa2384845",
-  "candidate_id": "079e9fdfebb0148fb0c2aa42b8fec0dfa2384845+sha256:073723b04aec78dac0cffce362008bc5aebef3331ad1951baed129346c007fd5",
-  "candidate_digest": "073723b04aec78dac0cffce362008bc5aebef3331ad1951baed129346c007fd5",
+  "base_commit": "fe3e04f2179d0edb2a81f8db3241e33f827a444b",
+  "candidate_id": "fe3e04f2179d0edb2a81f8db3241e33f827a444b+sha256:35292779de2fba816a8c9e822f1fe7e42868668ee033a8eb88912c94c883871a",
+  "candidate_digest": "35292779de2fba816a8c9e822f1fe7e42868668ee033a8eb88912c94c883871a",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/ui-redesign-source-manifest.json",
   "requirements": [
@@ -176,7 +176,7 @@
   "input_parts": [
     {
       "path": "docs/engine-cursor-source-inputs-001.json",
-      "sha256": "af3df8be3fd9bd76936d905508d5b668d8dd30adb2a0ffc455b9c74dd37bd017"
+      "sha256": "3792b641acb1d27bbafa77d6e11ba3edb047073288aa6e52d02d8cbd7d1136ce"
     },
     {
       "path": "docs/engine-cursor-source-inputs-002.json",
@@ -184,15 +184,15 @@
     },
     {
       "path": "docs/engine-cursor-source-inputs-003.json",
-      "sha256": "82c81de13d729f6aae7aedd94224c51d0ed526a85b61aad8458584ccdbe8096e"
+      "sha256": "499b69d9f504a85e251c042e2cf1fff358bf9fde3f75af3ba046af183ef08191"
     },
     {
       "path": "docs/engine-cursor-source-inputs-004.json",
-      "sha256": "8a5b3f0c96704f358adeb92a50eac5f0c42210365a94bea73eee40de84b0df2a"
+      "sha256": "5ed8be2dbcf17491e0027c07575d7067c19c93497f9cb0fadf320dbac23198ff"
     },
     {
       "path": "docs/engine-cursor-source-inputs-005.json",
-      "sha256": "462b8acdeb6d7d0002178024b962c0a7286373b0d82ca515250b25ca7b6637ef"
+      "sha256": "181f08f80ec3bfbdb5da5195c498c3393e7688e4e446302660e0ff65123f8f13"
     }
   ]
 }
