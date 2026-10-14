@@ -132,7 +132,7 @@ func graphDeliveryD03Validate(root string, manifest graphDeliveryD03ManifestValu
 		if input.Path == "" || filepath.IsAbs(clean) || clean == "." || clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
 			return fmt.Errorf("unsafe input path: %q", input.Path)
 		}
-		if !allowedKinds[input.Kind] || seenPaths[input.Path] {
+		if !allowedKinds[input.Kind] || seenPaths[clean] {
 			return fmt.Errorf("invalid or duplicate input: %s", input.Path)
 		}
 		raw, err := graphDeliveryD03ReadFile(root, clean)
@@ -142,7 +142,7 @@ func graphDeliveryD03Validate(root string, manifest graphDeliveryD03ManifestValu
 		if graphDeliveryD03Hash(raw) != input.SHA256 {
 			return fmt.Errorf("stale input: %s", input.Path)
 		}
-		seenPaths[input.Path] = true
+		seenPaths[clean] = true
 		seenKinds[input.Kind] = true
 	}
 	for _, kind := range []string{"source", "test", "doc", "capture", "harness"} {
@@ -473,5 +473,31 @@ func TestGraphDeliverySourceRejectsFIFOWithoutBlocking(t *testing.T) {
 		}
 		<-done
 		t.Fatal("non-regular source blocked before rejection")
+	}
+}
+
+func TestGraphDeliveryFlatInputsRejectCanonicalAliases(t *testing.T) {
+	root, original := graphDeliveryD03Load(t)
+	// Build a current integrity fixture; never renew a historical acceptance.
+	for i := range original.Inputs {
+		raw, err := graphDeliveryD03ReadFile(root, original.Inputs[i].Path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		original.Inputs[i].SHA256 = graphDeliveryD03Hash(raw)
+	}
+	for _, prefix := range []string{"./", "docs/../"} {
+		t.Run(prefix, func(t *testing.T) {
+			m := original
+			m.Inputs = append([]graphDeliveryD03Input(nil), original.Inputs...)
+			alias := m.Inputs[0]
+			alias.Path = prefix + alias.Path
+			m.Inputs = append(m.Inputs, alias)
+			m.CandidateDigest = graphDeliveryD03CandidateDigest(m.Inputs)
+			m.CandidateID = m.BaseCommit + "+sha256:" + m.CandidateDigest
+			if err := graphDeliveryD03Validate(root, m); err == nil || !strings.Contains(err.Error(), "duplicate") {
+				t.Fatal("canonical alias not rejected as duplicate", err)
+			}
+		})
 	}
 }
