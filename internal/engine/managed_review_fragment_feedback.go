@@ -53,7 +53,11 @@ func (s *Store) fragmentRetryFeedback(r IndependentReview, j managedFragmentJour
 				}
 			}
 			diagnostic, _ := json.Marshal(map[string]any{"defects_per_artifact": counts, "failed_artifacts": failed})
-			return "\nREPRISE APRÈS ASSOCIATION DE DÉFAUT INVALIDE. defects doit contenir exactement UNE entrée pour chaque pièce dont findings.v=fail, et aucune entrée pour une autre pièce. Plusieurs causes sur une même pièce doivent être regroupées dans cette entrée, avec citation exacte, explication et reproduction ; sinon signaler les preuves manquantes dans needs. Réexaminer toutes les pièces et garder votre décision indépendante ; ce diagnostic ne valide ni n'invalide le candidat. Comptages de la réponse originale non validée : " + string(diagnostic) + "\n"
+			association := "defects doit contenir exactement UNE entrée pour chaque pièce dont findings.v=fail, et aucune entrée pour une autre pièce. Plusieurs causes sur une même pièce doivent être regroupées dans cette entrée."
+			if packet.DefectCitationContractVersion == managedFragmentDefectCitationContractVersion {
+				association = "Chaque defect doit correspondre à une pièce dont findings.v=fail ; aucune entrée pour inspected ou unknown. Chaque fail exige au moins un défaut ; plusieurs défauts distincts pour une même pièce sont permis, sans doublon et sous le maximum commun."
+			}
+			return "\nREPRISE APRÈS ASSOCIATION DE DÉFAUT INVALIDE. " + association + " Conserver citation exacte, explication et reproduction ; sinon signaler les preuves manquantes dans needs. Réexaminer toutes les pièces et garder votre décision indépendante ; ce diagnostic ne valide ni n'invalide le candidat. Comptages de la réponse originale non validée : " + string(diagnostic) + "\n"
 		}
 		// A fabricated operator or a wrong location is not a defect in the code.
 		// Return bounded original context to the reviewer without accepting or

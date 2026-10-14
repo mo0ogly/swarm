@@ -38,6 +38,8 @@ fields are refused on other operations.
 
 ## Durable effect and fresh context
 
+The direct public `planning judge` verdict cannot process `input_events`: supplied inputs are rejected without mutation. Ending requires pending returns to have been acknowledged. To examine and acknowledge returns while proposing `end`, the supervisor uses `planning decide` with a valid lease and a single `judge` operation. Input validation, closure and acknowledgement share one transaction; a list supplied to a direct verdict never establishes that its events were handled.
+
 ```mermaid
 sequenceDiagram
     participant S as Root supervisor

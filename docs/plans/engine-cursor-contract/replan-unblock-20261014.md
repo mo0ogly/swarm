@@ -106,3 +106,13 @@ rouge `planning-pause-red.jsonl`, puis capture de la planification actuelle de l
 transaction et contrôle de pause des callbacks ordinaires et par lots.
 Les versions7ff3a92 et précédentes restent historiques ; la nouvelle autorisation
 et son effet natif restent à observer après qualification et installation.
+
+## Effet manuel observé puis protocole invalide
+
+079e9fd installé, reprise publique reçue r845 en mode manuel. Aucun nouveau worker ni activation : la revue native T2 consomme trois appels, compteur85/100 à r854. Le journal conserve les paquets0 et1 unknown, puis2 interrupted : `defect without unique failed artifact`. Les trois allégations sont associées à inspected, aucun fail ; la réponse originale ne constitue pas un verdict. Candidate88e76a inchangé, basee32388f inchangée et quatre tentatives T2 conservées. Original, paquet, diagnostic indépendant et compteurs sont dans la zone de vérification existante.
+
+Diagnostic indépendant : trois P2 présents également dans le canonique079e9fd. (1) Le helper de qualification D03 ne confine pas les parents symboliques et sa forme plate lit sans confinement ; ce constat concerne le helper, aucune fuite serveur démontrée. (2) Le judge public direct exempte des entrées qu’il ne valide ni acquitte. (3) Le test pause partage un quota déjà épuisé et n’identifie pas le refus. Deux défauts comportementaux sont reproduits en rouge ; un test isolé établit le refus de pause puis la réussite de la même reprise avec quota disponible.
+
+Choix : corriger ces contrats généraux et le diagnostic de reprise, plutôt que convertir le JSON en verdict ou rejouer un candidat inchangé. Le judge direct refuse Inputs ; decide→judge conserve validation et acquittement atomique. Les lectures D03 utilisent un handle enraciné pour pièces et sources. La revue de cette correction détecte le risque FIFO : Open en lecture peut bloquer avant Stat ; reproduire puis préserver le rejet non bloquant des fichiers spéciaux. Le feedback historique reste distinct du contrat citation1 autorisant plusieurs défauts distincts.
+
+Critères encore ouverts : qualification ciblée finale, livraison supportée, résultat T2 corrigé attribué et contrôlé, nouvelle revue native indépendante, puis récupération T3 et besoin initial/RETEX. Une correction canonique ne modifie pas le résultat historique ni son acceptation.

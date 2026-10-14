@@ -8,11 +8,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"syscall"
 	"testing"
+	"time"
 )
 
 const graphDeliveryD03Manifest = "docs/graph-delivery-qualification-manifest.json"
@@ -57,15 +60,7 @@ func graphDeliveryD03ReadInputs(root string, m *graphDeliveryD03ManifestValue) e
 			return errors.New("unsafe or duplicate source input part")
 		}
 		seen[clean] = true
-		name := filepath.Join(root, clean)
-		info, err := os.Lstat(name)
-		if err != nil {
-			return err
-		}
-		if !info.Mode().IsRegular() {
-			return errors.New("source input part is not a regular file")
-		}
-		raw, err := os.ReadFile(name)
+		raw, err := graphDeliveryD03ReadFile(root, clean)
 		if err != nil {
 			return err
 		}
@@ -140,7 +135,7 @@ func graphDeliveryD03Validate(root string, manifest graphDeliveryD03ManifestValu
 		if !allowedKinds[input.Kind] || seenPaths[input.Path] {
 			return fmt.Errorf("invalid or duplicate input: %s", input.Path)
 		}
-		raw, err := os.ReadFile(filepath.Join(root, clean))
+		raw, err := graphDeliveryD03ReadFile(root, clean)
 		if err != nil {
 			return fmt.Errorf("missing input %s: %w", input.Path, err)
 		}
@@ -369,5 +364,114 @@ func TestGraphDeliverySourcePartsPreserveIntegrity(t *testing.T) {
 				t.Fatal("invalid source part accepted", kind)
 			}
 		})
+	}
+}
+
+func TestGraphDeliverySourcePartsRejectSymlinkEscape(t *testing.T) {
+	for _, kind := range []string{"parent", "leaf"} {
+		t.Run(kind, func(t *testing.T) {
+			root, outside := t.TempDir(), t.TempDir()
+			raw, _ := json.Marshal([]graphDeliveryD03Input{{Path: "source.go", Kind: "source", SHA256: strings.Repeat("a", 64)}})
+			if err := os.WriteFile(filepath.Join(outside, "part.json"), raw, 0600); err != nil {
+				t.Fatal(err)
+			}
+			name, target := "escape", outside
+			if kind == "leaf" {
+				name, target = "part.json", filepath.Join(outside, "part.json")
+			}
+			if err := os.Symlink(target, filepath.Join(root, name)); err != nil {
+				t.Fatal(err)
+			}
+			path := "escape/part.json"
+			if kind == "leaf" {
+				path = "part.json"
+			}
+			m := graphDeliveryD03ManifestValue{InputParts: []graphDeliveryD03Input{{Path: path, SHA256: graphDeliveryD03Hash(raw)}}}
+			if err := graphDeliveryD03ReadInputs(root, &m); err == nil || len(m.Inputs) != 0 {
+				t.Fatal("outside source part accepted", err)
+			}
+		})
+	}
+}
+
+// Go's rooted handle prevents symlink traversal outside the fixture even if
+// paths change between validation and opening. The root itself may be canonicalized.
+func graphDeliveryD03ReadFile(root, name string) ([]byte, error) {
+	dir, err := os.OpenRoot(root)
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+	// Nonblocking open also rejects FIFOs without waiting for an external writer.
+	file, err := dir.OpenFile(name, os.O_RDONLY|syscall.O_NONBLOCK, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		return nil, errors.New("source input is not a regular file")
+	}
+	return io.ReadAll(file)
+}
+
+func TestGraphDeliveryFlatInputsRejectSymlinkEscape(t *testing.T) {
+	root, outside := t.TempDir(), t.TempDir()
+	raw := []byte("external original")
+	if err := os.WriteFile(filepath.Join(outside, "source.go"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outside, filepath.Join(root, "escape")); err != nil {
+		t.Fatal(err)
+	}
+	m := graphDeliveryD03ManifestValue{SchemaVersion: 1, ManifestStatus: "fixture", BaseCommit: strings.Repeat("a", 40), Inputs: []graphDeliveryD03Input{{Path: "escape/source.go", Kind: "source", SHA256: graphDeliveryD03Hash(raw)}}}
+	for i := 1; i <= 18; i++ {
+		m.Requirements = append(m.Requirements, graphDeliveryD03Requirement{ID: fmt.Sprintf("R%02d", i), Status: "fixture", Evidence: []string{"fixture"}})
+	}
+	m.CoverageDigest = graphDeliveryD03CoverageDigest(m.Requirements)
+	err := graphDeliveryD03Validate(root, m)
+	var pathError *os.PathError
+	if err == nil || !errors.As(err, &pathError) {
+		t.Fatal("external source read before containment rejection", err)
+	}
+	if _, err = graphDeliveryD03ReadFile(root, "escape/source.go"); err == nil {
+		t.Fatal("shared rooted reader escaped")
+	}
+	if err = os.WriteFile(filepath.Join(root, "local.go"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	local, err := graphDeliveryD03ReadFile(root, "local.go")
+	if err != nil || string(local) != string(raw) {
+		t.Fatal("local source refused", err)
+	}
+	if _, err = graphDeliveryD03ReadFile(root, "."); err == nil {
+		t.Fatal("directory accepted as source")
+	}
+}
+
+func TestGraphDeliverySourceRejectsFIFOWithoutBlocking(t *testing.T) {
+	root := t.TempDir()
+	name := filepath.Join(root, "fifo")
+	if err := syscall.Mkfifo(name, 0600); err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	go func() { _, err := graphDeliveryD03ReadFile(root, "fifo"); done <- err }()
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("FIFO accepted")
+		}
+	case <-time.After(time.Second):
+		// Release a defective blocking reader before failing, leaving no goroutine.
+		writer, err := syscall.Open(name, syscall.O_WRONLY|syscall.O_NONBLOCK, 0)
+		if err == nil {
+			syscall.Close(writer)
+		}
+		<-done
+		t.Fatal("non-regular source blocked before rejection")
 	}
 }

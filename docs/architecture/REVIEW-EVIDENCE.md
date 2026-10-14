@@ -220,3 +220,7 @@ simulé ne démontrent pas une meilleure qualité de décision d'un modèle rée
 La [note de recherche sur le correctif global](../publications/20261005-cursor-moteur/dossier-recherche/revisions/20261010-correction-globale-preuves.md)
 conserve commandes, résultats et statut d'installation. Aucun budget, délai de
 politique, critère ou état historique n'est modifié par ce contrat.
+
+### Association des défauts et reprise du protocole
+
+Un défaut cité exige un constat `fail` pour la même pièce. `inspected` ou `unknown` avec un défaut reste une réponse invalide, conservée avec son coût ; le moteur ne transforme pas ce contenu en refus ni en acceptation. Le contrat de citation1 permet plusieurs défauts distincts par pièce en échec, sous la borne commune de transport ; le contrat historique exige une seule entrée. Le diagnostic de reprise suit la version du paquet, conserve les identités et n’écrit aucune preuve dans le journal. Une allégation peut déclencher un diagnostic de code indépendant, sans fabriquer le verdict absent.

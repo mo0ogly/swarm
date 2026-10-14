@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -146,7 +148,20 @@ func TestPlanningJudgeEndRequiresFreshMatchingCandidate(t *testing.T) {
 			pending = append(pending, event.ID)
 		}
 	}
-	got, err := judgeDo(t, s, w, "judge", 1, PlanningRequest{Inputs: pending, JudgeVerdict: "end", Reason: "Toutes les tâches sont acceptées avec preuves fraîches", ExpectedCandidate: w.Planning.Repository.Candidate})
+	// A leased decision acknowledges the events before a separate direct verdict.
+	w, request := planningClaim(t, s, w, "root")
+	request.Operations = nil
+	var err error
+	w, err = s.planningChange(w.ID, "decide", request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, event := range w.Planning.Inbox {
+		if containsString(pending, event.ID) && event.Decision == "" {
+			t.Fatal("inbox event not acknowledged")
+		}
+	}
+	got, err := judgeDo(t, s, w, "judge", 1, PlanningRequest{JudgeVerdict: "end", Reason: "Toutes les tâches sont acceptées avec preuves fraîches", ExpectedCandidate: w.Planning.Repository.Candidate})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -316,5 +331,53 @@ func TestPlanningJudgePausedAndQuotaRefuseEffects(t *testing.T) {
 	_, err = s.planningChange(w.ID, "renew", PlanningRequest{Schema: 1, EventID: newID("test-judge-"), Revision: w.Revision, Scope: "root", ScopeRevision: owner.Revision, JudgeCycle: w.Planning.Judge.Cycle})
 	if err == nil {
 		t.Fatal("renouvellement accepté sur une mission en pause")
+	}
+}
+
+func TestPlanningJudgeDirectEndCannotAcknowledgeInputs(t *testing.T) {
+	s, w := judgeAcceptedFixture(t)
+	var pending []string
+	for _, event := range w.Planning.Inbox {
+		if event.Scope == "root" && event.Decision == "" {
+			pending = append(pending, event.ID)
+		}
+	}
+	if len(pending) == 0 {
+		t.Fatal("fixture lacks pending events")
+	}
+	for _, inputs := range [][]string{pending, append(append([]string(nil), pending...), "foreign-event")} {
+		_, err := judgeDo(t, s, w, "judge", 1, PlanningRequest{Inputs: inputs, JudgeVerdict: "end", Reason: "A direct verdict cannot acknowledge inbox events", ExpectedCandidate: w.Planning.Repository.Candidate})
+		if err == nil {
+			t.Fatal("direct end silently exempted pending events")
+		}
+		got, err := s.get(w.ID)
+		if err != nil || !reflect.DeepEqual(got, w) {
+			t.Fatal("refused verdict mutated work", err)
+		}
+	}
+}
+
+func TestPlanningJudgePauseIsIndependentOfQuota(t *testing.T) {
+	s := storeTest(t)
+	w := createTest(t, s)
+	w = planningDo(t, s, w, "enable", PlanningRequest{MaxTasks: 10, MaxDecisions: 10, MaxActivations: 15, MaxJudgeCycles: 2})
+	var err error
+	w, err = judgeDo(t, s, w, "judge", 1, PlanningRequest{JudgeVerdict: "continue", Reason: "Continue before isolated pause check"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	w = planningDo(t, s, w, "pause", PlanningRequest{})
+	_, err = judgeDo(t, s, w, "renew", 1, PlanningRequest{})
+	if err == nil || !strings.Contains(err.Error(), "planification en pause") {
+		t.Fatal("pause did not supply the refusal", err)
+	}
+	got, e := s.get(w.ID)
+	if e != nil || !reflect.DeepEqual(got, w) {
+		t.Fatal("paused renewal changed work", e)
+	}
+	w = planningDo(t, s, w, "resume", PlanningRequest{})
+	got, err = judgeDo(t, s, w, "renew", 1, PlanningRequest{})
+	if err != nil || got.Planning.Judge.Cycle != 2 || len(got.Planning.Judge.History) != 1 {
+		t.Fatal("same renewal did not succeed after resume", err)
 	}
 }

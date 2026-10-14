@@ -407,7 +407,7 @@
   {
     "path": "internal/engine/graph_delivery_qualification_test.go",
     "kind": "test",
-    "sha256": "a11f3373197c20bef984ffab9957a07d245773e7bd783bbf395d33bd9c9435f6"
+    "sha256": "d344f76651b89c08a2b9e9d631f523ce216b96e7ed51d7c23874bf186154534d"
   },
   {
     "path": "internal/engine/graph_draft.go",
@@ -972,12 +972,12 @@
   {
     "path": "internal/engine/managed_review_fragment_feedback.go",
     "kind": "source",
-    "sha256": "2a8d3c6f618cb10aadb8f85845543308d389b3d0ae9112b577dec26c4b7b6c09"
+    "sha256": "6cac59850f1a5e68d2bb2e67a96fe2294162eed41bf6576c70e85c45423d2beb"
   },
   {
     "path": "internal/engine/managed_review_fragment_feedback_test.go",
     "kind": "test",
-    "sha256": "297c149c108c73771a7ebb42f04a5dae03a3ee487703ac5edf55666b0d39f9d7"
+    "sha256": "3dfde4826e27e6eb473c3a6b738f5add45fdc770219ed60c410988fd0dc13fda"
   },
   {
     "path": "internal/engine/managed_review_fragment_final.go",

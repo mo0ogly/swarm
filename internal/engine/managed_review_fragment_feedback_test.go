@@ -4,6 +4,7 @@ package engine
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -131,5 +132,51 @@ func TestFragmentRetryFeedbackKeepsValidMidlineAndDiagnosesEscapedTab(t *testing
 	after, _ := json.Marshal(j)
 	if string(before) != string(after) {
 		t.Fatal("diagnosis modified proof journal")
+	}
+}
+
+func TestFragmentRetryAssociationFeedbackMatchesCitationContract(t *testing.T) {
+	for _, version := range []int{0, managedFragmentDefectCitationContractVersion} {
+		t.Run(fmt.Sprint(version), func(t *testing.T) {
+			s := storeTest(t)
+			text := "+meaningful quote\n"
+			p := managedReviewFragmentPacket{Version: 2, DefectCitationContractVersion: version, Candidate: "candidate", ContextDigest: "context", Artifacts: []managedReviewFragmentArtifact{{Kind: "diff", Name: "proof", Content: text, Digest: hash([]byte(text))}}}
+			packet, _ := json.Marshal(p)
+			defect := managedFragmentDefect{Artifact: 0, Line: 1, Quote: "meaningful quote", Explanation: "This independently alleged defect requires a failed finding.", Reproduction: "Compare the supplied finding and the defect association.", Expected: "Reject an inspected finding with an attached defect."}
+			reply := map[string]any{"candidate_commit": p.Candidate, "context_sha256": p.ContextDigest, "packet_sha256": hash(packet), "findings": map[string]any{"0": map[string]any{"v": "inspected", "r": "Code examined", "e": 0, "n": []string{}}}, "defects": []managedFragmentDefect{defect}}
+			if version == managedFragmentDefectCitationContractVersion {
+				encoded, _ := json.Marshal(defect)
+				var citation map[string]any
+				json.Unmarshal(encoded, &citation)
+				delete(citation, "line")
+				reply["defects"] = []map[string]any{citation}
+			}
+			raw, _ := json.Marshal(reply)
+			r := IndependentReview{Context: ".swarm/review/context.json"}
+			j := managedFragmentJournal{Entries: []managedFragmentJournalEntry{{Packet: 0, PacketDigest: hash(packet), CallID: "association", State: "interrupted"}}}
+			path := filepath.Join(s.root, ".swarm/review", "association-raw-"+hash(raw)+".json")
+			if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(path, raw, 0600); err != nil {
+				t.Fatal(err)
+			}
+			before, _ := json.Marshal(j)
+			feedback := s.fragmentRetryFeedback(r, j, p)
+			if version == 0 {
+				if !strings.Contains(feedback, "exactement UNE") {
+					t.Fatal("legacy association changed", feedback)
+				}
+			} else if !strings.Contains(feedback, "plusieurs défauts distincts") || strings.Contains(feedback, "exactement UNE") {
+				t.Fatal("current contract contradicted", feedback)
+			}
+			after, _ := json.Marshal(j)
+			if string(before) != string(after) {
+				t.Fatal("feedback changed journal")
+			}
+			if _, _, err := parseManagedFragmentInspection(string(raw), p); err == nil {
+				t.Fatal("invalid original became a verdict")
+			}
+		})
 	}
 }

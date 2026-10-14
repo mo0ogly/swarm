@@ -739,6 +739,11 @@ func (s *Store) applyPlanning(w *Work, action string, r PlanningRequest, at time
 		}
 		return nil
 	case "judge":
+		// Only a leased decide validates and acknowledges inbox inputs atomically.
+		// A direct verdict must never exempt events it leaves pending.
+		if len(r.Inputs) != 0 {
+			return planningError("unacknowledged_inputs", "le verdict direct ne traite pas les événements ; utiliser decide avec une activation valide")
+		}
 		if scope.ID != "root" {
 			return fmt.Errorf("juge global : périmètre racine requis")
 		}

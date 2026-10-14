@@ -40,6 +40,8 @@ autres opérations.
 
 ## Effet durable et contexte neuf
 
+Le verdict public direct `planning judge` ne peut pas traiter `input_events` : ces entrées sont refusées sans mutation. Il exige des retours déjà acquittés pour terminer. Pour examiner et acquitter les retours tout en proposant `end`, le superviseur utilise `planning decide` avec un bail valide et une seule opération `judge`. La validation des entrées, la clôture et leur acquittement partagent la même transaction ; le moteur ne déduit jamais leur traitement d’une simple liste fournie au verdict direct.
+
 ```mermaid
 sequenceDiagram
     participant S as Superviseur racine
