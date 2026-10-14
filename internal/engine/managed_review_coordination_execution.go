@@ -239,8 +239,11 @@ func (s *Store) coordinatedFragments(w Work, a Agent, c managedReviewContext, av
 	if hash(raw) != r.Digest {
 		return managedReviewFragmentPlan{}, fmt.Errorf("plan de revue altéré")
 	}
-	scope, e := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), c.Previous, c.Candidate)
+	scope, e := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), c.Previous, c.Candidate, effectiveReviewFileLimit(w.Planning.Reviewer))
 	if e != nil {
+		return managedReviewFragmentPlan{}, e
+	}
+	if e := validateReviewLotFilePolicy(r.Proposal, scope.Limit); e != nil {
 		return managedReviewFragmentPlan{}, e
 	}
 	order, e := validateReviewCoordination(r.Proposal, c.Candidate, coordinationEvidence(c), scope.Files, coordinationCriteria(c))

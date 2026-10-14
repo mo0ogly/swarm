@@ -12,15 +12,19 @@ import (
 // The reviewer is a separate, tool-free process. Its opinion never replaces
 // deterministic controls or an explicitly required human acceptance.
 type ReviewerConfig struct {
-	ModelSelection *RoleModel  `json:"model_selection,omitempty"`
-	TimeoutSeconds int         `json:"timeout_seconds,omitempty"`
-	Failure        string      `json:"failure,omitempty"`
-	Provider       string      `json:"provider"`
-	ProviderDigest string      `json:"provider_digest"`
-	ModelRoute     *ModelRoute `json:"model_route,omitempty"`
-	MaxCalls       int         `json:"max_calls"`
-	Calls          int         `json:"calls"`
-	Authorized     string      `json:"authorized"`
+	MaxContextFiles *int        `json:"max_context_files,omitempty"`
+	MaxSourceBytes  *int        `json:"max_source_bytes,omitempty"`
+	MaxContextBytes *int        `json:"max_context_bytes,omitempty"`
+	MaxFiles        *int        `json:"max_files,omitempty"`
+	ModelSelection  *RoleModel  `json:"model_selection,omitempty"`
+	TimeoutSeconds  int         `json:"timeout_seconds,omitempty"`
+	Failure         string      `json:"failure,omitempty"`
+	Provider        string      `json:"provider"`
+	ProviderDigest  string      `json:"provider_digest"`
+	ModelRoute      *ModelRoute `json:"model_route,omitempty"`
+	MaxCalls        int         `json:"max_calls"`
+	Calls           int         `json:"calls"`
+	Authorized      string      `json:"authorized"`
 }
 type IndependentReview struct {
 	ResultEvent         string                        `json:"result_event,omitempty"`
@@ -198,7 +202,9 @@ func (s *Store) reviewerConfig(provider, level string, max int) (*ReviewerConfig
 		return nil, e
 	}
 	raw, _ := json.Marshal(p)
-	return &ReviewerConfig{Provider: provider, ProviderDigest: hash(raw), ModelRoute: route, MaxCalls: max, Authorized: now()}, nil
+	files := defaultReviewDeliveryFiles
+	contextFiles, sourceBytes, contextBytes := defaultReviewContextFiles, defaultReviewSourceBytes, defaultReviewContextBytes
+	return &ReviewerConfig{MaxContextFiles: &contextFiles, MaxSourceBytes: &sourceBytes, MaxContextBytes: &contextBytes, MaxFiles: &files, Provider: provider, ProviderDigest: hash(raw), ModelRoute: route, MaxCalls: max, Authorized: now()}, nil
 }
 func (s *Store) configureReviewer(work string, r PlanningRequest) (Work, error) {
 	config, e := s.reviewerConfig(r.Provider, r.Level, r.MaxActivations)

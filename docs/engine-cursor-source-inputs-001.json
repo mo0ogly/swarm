@@ -497,7 +497,12 @@
   {
     "path": "docs/architecture/REVIEW-EVIDENCE.md",
     "kind": "doc",
-    "sha256": "4d2ecb04425609df5d1d8de3004a3daf4639620571969052e0b4048927cad1f9"
+    "sha256": "f570e62970fae80669252a297da28244c0a8c58b9ec1e37836f08f5ac6fbb7fc"
+  },
+  {
+    "path": "docs/architecture/REVIEW-POLICIES.md",
+    "kind": "doc",
+    "sha256": "52bc1490406d635795a8ceb7f93caaf1a83105096eba9e9d44aa97057f453890"
   },
   {
     "path": "docs/architecture/RUN-SUPERVISION.md",
@@ -732,12 +737,17 @@
   {
     "path": "docs/en/REVIEW-EVIDENCE.md",
     "kind": "doc",
-    "sha256": "0c8a2fd20d62c7646f6213fa1d2b07fb6a3eb632a278433f821715d3f25ce3ec"
+    "sha256": "c8cccfe0ff4c89b8cee742d0d91cb32814f0a50048e03621c6d9a33b9046749b"
   },
   {
     "path": "docs/en/REVIEW-FRAGMENTS.md",
     "kind": "doc",
     "sha256": "d978eb43e8d2ec108ce15a887a93bcb9e2817fd24753a1ed8f08f0ec4636a64d"
+  },
+  {
+    "path": "docs/en/REVIEW-POLICIES.md",
+    "kind": "doc",
+    "sha256": "7a66602695aa36c44f69023f71b6c6e6da8c2fdcd1367a83918729b945102f73"
   },
   {
     "path": "docs/en/REVIEW-TIMEOUT.md",
@@ -803,6 +813,11 @@
     "path": "docs/plans/engine-cursor-contract/RETEX-suites-20261013.md",
     "kind": "doc",
     "sha256": "bb2718248ae60c800160bd4ad748c4638bb8821705e649b4f29596adf8e99536"
+  },
+  {
+    "path": "docs/plans/engine-cursor-contract/replan-unblock-20261014.md",
+    "kind": "doc",
+    "sha256": "f66a5af2a857d9db27fb11d59cc02391d500ce870bda9fd640d624e748f0b245"
   },
   {
     "path": "docs/plans/engine-cursor-contract/suites-retex-20261013.md",
@@ -1453,15 +1468,5 @@
     "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
     "kind": "capture",
     "sha256": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
-    "kind": "capture",
-    "sha256": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
-    "kind": "capture",
-    "sha256": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691"
   }
 ]

@@ -1,5 +1,15 @@
 [
   {
+    "path": "internal/engine/automation_review_images_test.go",
+    "kind": "test",
+    "sha256": "54099ea9de922fd5d1107fd5d4987deb6f74190bee531c5a319f19cdaf996835"
+  },
+  {
+    "path": "internal/engine/automation_schedule.go",
+    "kind": "source",
+    "sha256": "02a7890cd57787d1df659f66c4e626d7b276cab15b19f0a673bb729d73e0eacf"
+  },
+  {
     "path": "internal/engine/automation_schedule_lifecycle_test.go",
     "kind": "test",
     "sha256": "026faee96f31e7a23ed12f7f49709d895f998ac05a51e93b6facc6ec30e3234a"
@@ -492,7 +502,7 @@
   {
     "path": "internal/engine/independent_review.go",
     "kind": "source",
-    "sha256": "ab786c3d8d6e51d1d98cbf099fe776d3ec21c04b98453292d7f7503c95e1c2bb"
+    "sha256": "20bcc88b9ba987c9b99177d7aca0033427322b36d61a25a955ed14c776200125"
   },
   {
     "path": "internal/engine/independent_review_changed_evidence_test.go",
@@ -777,7 +787,7 @@
   {
     "path": "internal/engine/managed_review.go",
     "kind": "source",
-    "sha256": "3350d25d222c56ed6f7dfb6de51ddfe0fa2c1d5f8206ada01cdbae8d78d35fd2"
+    "sha256": "b8d273e0741fb46d11f016dd4268ebff1901901ea36f26849a1492543cd08942"
   },
   {
     "path": "internal/engine/managed_review_batch_runtime.go",
@@ -792,7 +802,7 @@
   {
     "path": "internal/engine/managed_review_batches.go",
     "kind": "source",
-    "sha256": "909a83aaf821b19e3bce415f079e18d3c71927ac4ddbda52a77b2a826e49f560"
+    "sha256": "e4699a1f9d68ce5b57c43b6ec3b035ed82895d55eeb2355e51b9894e3ca87a59"
   },
   {
     "path": "internal/engine/managed_review_batches_test.go",
@@ -802,7 +812,7 @@
   {
     "path": "internal/engine/managed_review_capacity_first.go",
     "kind": "source",
-    "sha256": "d094003bdaf2a845542a4d7c27be905c964ec54d339ce24c936703e592d8c275"
+    "sha256": "f2c118c3f088aba18ec12be0c476cafdfb1ba7d889677e01f45c0dff92da3bc2"
   },
   {
     "path": "internal/engine/managed_review_capacity_first_test.go",
@@ -822,12 +832,12 @@
   {
     "path": "internal/engine/managed_review_coordination.go",
     "kind": "source",
-    "sha256": "ee699535fea8416b15929444aa4d07bf521653443249e971ee7a2b0a8e8a9b27"
+    "sha256": "000f14fba98ff32d8906e0411f260a03f543daa1e0e778488e8754fc308970f1"
   },
   {
     "path": "internal/engine/managed_review_coordination_execution.go",
     "kind": "source",
-    "sha256": "44ae31640bab07f1685d8eecb899382be5ea85375e1ba23e744ac93c45749b3a"
+    "sha256": "33b2e7a19369de686ee9126fcbe2f3f89ce90508af06d4c66718d2893066f4c0"
   },
   {
     "path": "internal/engine/managed_review_coordination_execution_test.go",
@@ -852,12 +862,12 @@
   {
     "path": "internal/engine/managed_review_decomposition.go",
     "kind": "source",
-    "sha256": "0a820206941c2b0b1ab81b0b397c63ee7ea20da7aff581b610282c5e65f164a2"
+    "sha256": "5ef34e8ae7f3a43d303b01a1e74638c0f370f24af48930325300e3d9a167fb82"
   },
   {
     "path": "internal/engine/managed_review_decomposition_test.go",
     "kind": "test",
-    "sha256": "db4f2315c5716b5ee976ba5bda42e14f79d2150278db8721ba137629e4609674"
+    "sha256": "8426cf75dcf6aef61f14ed61c92163ca7bcd7dacfa8381640206f8454228072d"
   },
   {
     "path": "internal/engine/managed_review_dedup_test.go",
@@ -872,7 +882,7 @@
   {
     "path": "internal/engine/managed_review_diagnostic.go",
     "kind": "source",
-    "sha256": "40a686d13184e00b33cf47a4f9be99182d04814a69177f62e8f59f16f62c97bb"
+    "sha256": "6b6d4ce00b93178bcf0533dd543821774b6d8bea880601fdd085b872e018df14"
   },
   {
     "path": "internal/engine/managed_review_diagnostic_test.go",
@@ -1282,7 +1292,7 @@
   {
     "path": "internal/engine/managed_review_preflight_retry.go",
     "kind": "source",
-    "sha256": "682246e44774c37feaa3daff8d62815ae52167cf70e2063981794a08aa78386f"
+    "sha256": "578dbea4ce4cf0ed71e31fe5bf34f45d20ff9e412464b8762ddbd5d858600895"
   },
   {
     "path": "internal/engine/managed_review_preflight_retry_test.go",
@@ -1342,7 +1352,7 @@
   {
     "path": "internal/engine/managed_review_sources.go",
     "kind": "source",
-    "sha256": "f6fdf0333878cbc7422727a91bafff9a29705a7e8c087b9dc1cfb6d7d714c235"
+    "sha256": "e4af44691e4d1d2da8b7792a231e2832203415367b0efc2e12d1dbfcf39136b8"
   },
   {
     "path": "internal/engine/managed_review_sources_test.go",
@@ -1377,7 +1387,7 @@
   {
     "path": "internal/engine/managed_scope.go",
     "kind": "source",
-    "sha256": "502d3eaea01ba0e087aa53b798490a09a46bac53d3abe5438dab8ccf9a1823d2"
+    "sha256": "456687faea81bf586c368f9f10c5c7173806cc996014ad5b91353fca3124780c"
   },
   {
     "path": "internal/engine/managed_scope_test.go",
@@ -1413,15 +1423,5 @@
     "path": "internal/engine/mission_cli.go",
     "kind": "source",
     "sha256": "1fe0ffc56439b71c9c6e8fa88b2f4c5b175d302ffdef6e1bc7f94ee8362adc74"
-  },
-  {
-    "path": "internal/engine/mission_closed_history_test.go",
-    "kind": "test",
-    "sha256": "7f93f9c16652653659ac9dd82e1cee501050de60e525398390209472d541b8b5"
-  },
-  {
-    "path": "internal/engine/mission_effort_test.go",
-    "kind": "test",
-    "sha256": "cf507089fffb3fe96043f9e3232199ca07c5c3f96709ac178ea3a1480248cc11"
   }
 ]

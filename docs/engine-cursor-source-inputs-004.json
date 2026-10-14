@@ -1,5 +1,15 @@
 [
   {
+    "path": "internal/engine/mission_closed_history_test.go",
+    "kind": "test",
+    "sha256": "7f93f9c16652653659ac9dd82e1cee501050de60e525398390209472d541b8b5"
+  },
+  {
+    "path": "internal/engine/mission_effort_test.go",
+    "kind": "test",
+    "sha256": "cf507089fffb3fe96043f9e3232199ca07c5c3f96709ac178ea3a1480248cc11"
+  },
+  {
     "path": "internal/engine/mission_guidance.go",
     "kind": "source",
     "sha256": "69895d5bab15756c47957f1fc7a2cf5d93893391683ec00fb5cdbec07596db33"
@@ -652,7 +662,7 @@
   {
     "path": "internal/engine/quotas.go",
     "kind": "source",
-    "sha256": "041cb1fbc9e99c1f342a60ddc8c142fea39d94bfbd9f39b8f340e5b56d920cfd"
+    "sha256": "f8ac04d81d072d7e1475346303a86407b8a1dbf65efcd0fdf57d266893d7fd54"
   },
   {
     "path": "internal/engine/quotas_configured_limits_test.go",
@@ -672,7 +682,7 @@
   {
     "path": "internal/engine/recovered_result.go",
     "kind": "source",
-    "sha256": "8e0210bd7ee9e2bc6ebda859f553414fdffc7dac6cd3c33ec00a7c996e8aceaa"
+    "sha256": "23b7d819a2682b8eac734a72980e63cab086ae91a7a3e55f2290d40df959caf0"
   },
   {
     "path": "internal/engine/recovered_result_evidence_test.go",
@@ -687,7 +697,7 @@
   {
     "path": "internal/engine/recovered_result_source_capacity_test.go",
     "kind": "test",
-    "sha256": "fafd04f26ac8779c33bf85fb072d58ba7d3f12fa958e8939fdeb12c77256369b"
+    "sha256": "ac7bee44907bfdf0647287ce282b131628bc1bf414a3ffeac99fa4f6c13a6dcc"
   },
   {
     "path": "internal/engine/recovered_result_test.go",
@@ -788,6 +798,11 @@
     "path": "internal/engine/review_read_scope_test.go",
     "kind": "test",
     "sha256": "150ae915f15820bcc24dce1ad69e1be0c7babd6b28f1774666c8c78063eb037e"
+  },
+  {
+    "path": "internal/engine/review_scope_policy_test.go",
+    "kind": "test",
+    "sha256": "bb07626fb8dcac5345f2f27f8e8dc5177512ab79c8e2c6e223f2b7007d751ebe"
   },
   {
     "path": "internal/engine/review_timeout_test.go",
@@ -1252,12 +1267,12 @@
   {
     "path": "locales/en.json",
     "kind": "source",
-    "sha256": "d0b8e7d544846a8dd98dff539b0813b2a75f2b1f7479baddcda6e20d14d8fa17"
+    "sha256": "7721025e7e13e4b02028e608ca6fc2bcd84c11fd13148ed4e663f9a0725ecbd8"
   },
   {
     "path": "package.json",
     "kind": "harness",
-    "sha256": "c511525b7271896c99c42d7556595bde9fef6a6a6516b463ce5e56119310d917"
+    "sha256": "4073f0842a06cc879f63827e90815f99a3dcefdf2d3ab1bff97f89bc37c4f93c"
   },
   {
     "path": "resources.go",
@@ -1440,6 +1455,11 @@
     "sha256": "aee4768e34322565ab7e451d56a7cb977ab5732a0a5a4a7151dc28268a82fba5"
   },
   {
+    "path": "tests/review_file_policy_ui.cjs",
+    "kind": "harness",
+    "sha256": "9b0ac685ed5959d5ba0d219808ae5a64f7a120b2cbe8d2ece5a553c5fa721bd4"
+  },
+  {
     "path": "tests/states_contract_test.cjs",
     "kind": "harness",
     "sha256": "81ce39751900d3a4bf8b30e5ff6b63e4bb7228ba095684e1e4d352a61a8af59e"
@@ -1473,25 +1493,5 @@
     "path": "tests/test_controlled_autonomy_campaign.py",
     "kind": "harness",
     "sha256": "1c9bd3fed8f148249ae2180a90b86d4b7c82eb1f5a5b441e44c528accf63bf26"
-  },
-  {
-    "path": "tests/test_swarm_local.py",
-    "kind": "test",
-    "sha256": "9b3e844adf1b837339e14c5ecd73d477748d069fcb0605a8de001bc512734ab4"
-  },
-  {
-    "path": "tests/training_design_ui.cjs",
-    "kind": "test",
-    "sha256": "64c0c3eb387417c03dd4e0ae1b09a3ef7004d48c1c7d638e570185f8048b8a86"
-  },
-  {
-    "path": "tests/web_requests_admin_ui.cjs",
-    "kind": "harness",
-    "sha256": "354d19e2b66a8f7875eb2eb4ddd7e16909d62d232029826fa8159388f55c3b3a"
-  },
-  {
-    "path": "tests/web_requests_test.cjs",
-    "kind": "harness",
-    "sha256": "c177f0d8e003c28c4b0a2fef5a8decc26b4275af15648dd3166617ce5404ccd2"
   }
 ]

@@ -9,13 +9,17 @@ import (
 )
 
 type QuotaValues struct {
-	Scopes      *int `json:"planning_scopes,omitempty"`
-	Depth       *int `json:"delegation_depth,omitempty"`
-	Tasks       *int `json:"planning_tasks,omitempty"`
-	JudgeCycles *int `json:"judge_cycles,omitempty"`
-	Planning    int  `json:"planning_activations"`
-	Decisions   int  `json:"planning_decisions"`
-	Reviews     *int `json:"review_calls"`
+	ReviewContextFiles *int `json:"review_context_files,omitempty"`
+	ReviewSourceBytes  *int `json:"review_source_bytes,omitempty"`
+	ReviewContextBytes *int `json:"review_context_bytes,omitempty"`
+	ReviewFiles        *int `json:"review_delivery_files,omitempty"`
+	Scopes             *int `json:"planning_scopes,omitempty"`
+	Depth              *int `json:"delegation_depth,omitempty"`
+	Tasks              *int `json:"planning_tasks,omitempty"`
+	JudgeCycles        *int `json:"judge_cycles,omitempty"`
+	Planning           int  `json:"planning_activations"`
+	Decisions          int  `json:"planning_decisions"`
+	Reviews            *int `json:"review_calls"`
 }
 type QuotaAuthorization struct {
 	BeforeScopes map[string]int `json:"before_scope_activations,omitempty"`
@@ -35,13 +39,14 @@ type QuotaChange struct {
 	Reason           string         `json:"reason"`
 }
 type QuotaView struct {
-	Bounds        QuotaValues         `json:"bounds"`
-	Revision      int                 `json:"revision"`
-	Limits        QuotaValues         `json:"limits"`
-	Consumed      QuotaValues         `json:"consumed"`
-	Remaining     QuotaValues         `json:"remaining"`
-	Authorization *QuotaAuthorization `json:"last_authorization,omitempty"`
-	Scopes        []PlanningScope     `json:"scopes"`
+	ReviewManifestBytes int                 `json:"review_manifest_transport_bytes"`
+	Bounds              QuotaValues         `json:"bounds"`
+	Revision            int                 `json:"revision"`
+	Limits              QuotaValues         `json:"limits"`
+	Consumed            QuotaValues         `json:"consumed"`
+	Remaining           QuotaValues         `json:"remaining"`
+	Authorization       *QuotaAuthorization `json:"last_authorization,omitempty"`
+	Scopes              []PlanningScope     `json:"scopes"`
 }
 
 func quotaValues(p *PlanningState) (QuotaValues, QuotaValues) {
@@ -54,6 +59,10 @@ func quotaValues(p *PlanningState) (QuotaValues, QuotaValues) {
 	if p.Reviewer != nil {
 		a, b := p.Reviewer.MaxCalls, p.Reviewer.Calls
 		limits.Reviews = &a
+		files := effectiveReviewFileLimit(p.Reviewer)
+		limits.ReviewFiles = &files
+		source := effectiveReviewSourcePolicy(p.Reviewer)
+		limits.ReviewContextFiles, limits.ReviewSourceBytes, limits.ReviewContextBytes = &source.Files, &source.SourceBytes, &source.TotalBytes
 		used.Reviews = &b
 	}
 	if p.Judge != nil {
@@ -100,7 +109,7 @@ func quotaView(w Work) (QuotaView, error) {
 	}
 	// Zero/null bounds mean no additional policy ceiling in the executable.
 	// Explicit persisted budgets and current consumption remain authoritative.
-	return QuotaView{Bounds: QuotaValues{}, Revision: w.Revision, Limits: limits, Consumed: used, Remaining: remaining, Authorization: w.Planning.QuotaAuthorization, Scopes: append([]PlanningScope(nil), w.Planning.Scopes...)}, nil
+	return QuotaView{ReviewManifestBytes: reviewManifestTransportBytes, Bounds: QuotaValues{}, Revision: w.Revision, Limits: limits, Consumed: used, Remaining: remaining, Authorization: w.Planning.QuotaAuthorization, Scopes: append([]PlanningScope(nil), w.Planning.Scopes...)}, nil
 }
 func applyQuotaChange(w *Work, r QuotaChange) error {
 	if r.Schema != 1 || r.Revision < 1 {
@@ -128,6 +137,14 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 	}
 	if r.Limits.Depth != nil && (*r.Limits.Depth < 0 || (*r.Limits.Depth > 0 && *r.Limits.Depth < *view.Consumed.Depth)) {
 		return fmt.Errorf("Profondeur configurée inférieure à la hiérarchie existante.")
+	}
+	for _, limit := range []*int{r.Limits.ReviewContextFiles, r.Limits.ReviewSourceBytes, r.Limits.ReviewContextBytes} {
+		if limit != nil && (p.Reviewer == nil || *limit < 0) {
+			return fmt.Errorf("limite de contexte de revue invalide : vérificateur requis, 0 sans plafond ou entier positif")
+		}
+	}
+	if r.Limits.ReviewFiles != nil && (p.Reviewer == nil || *r.Limits.ReviewFiles < 0) {
+		return fmt.Errorf("limite de fichiers de revue invalide : vérificateur requis, 0 sans plafond ou entier positif")
 	}
 	if p.Reviewer == nil && r.Limits.Reviews != nil {
 		return fmt.Errorf("Aucun vérificateur configuré ; configurez son identité avant son budget.")
@@ -199,6 +216,19 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 	}
 	if p.Reviewer != nil {
 		p.Reviewer.MaxCalls = *r.Limits.Reviews
+		for _, field := range []struct {
+			value  *int
+			target **int
+		}{{r.Limits.ReviewContextFiles, &p.Reviewer.MaxContextFiles}, {r.Limits.ReviewSourceBytes, &p.Reviewer.MaxSourceBytes}, {r.Limits.ReviewContextBytes, &p.Reviewer.MaxContextBytes}} {
+			if field.value != nil {
+				n := *field.value
+				*field.target = &n
+			}
+		}
+		if r.Limits.ReviewFiles != nil {
+			n := *r.Limits.ReviewFiles
+			p.Reviewer.MaxFiles = &n
+		}
 	}
 	if r.Limits.JudgeCycles != nil {
 		p.Judge.MaxCycles = *r.Limits.JudgeCycles

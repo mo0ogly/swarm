@@ -13,7 +13,16 @@ import (
 
 // This bounds one delivery, not a provider context window. Splitting review
 // packets must not silently turn an oversized delivery into an affordable one.
-const managedScopeFiles = 100
+// Legacy default is visible in Admin; new reviewer configurations persist it.
+const defaultReviewDeliveryFiles = 100
+
+func effectiveReviewFileLimit(cfg *ReviewerConfig) int {
+	if cfg == nil || cfg.MaxFiles == nil {
+		return defaultReviewDeliveryFiles
+	}
+	return *cfg.MaxFiles
+}
+
 const managedScopeRefusal = "remise trop large"
 
 type ManagedScopePlan struct {
@@ -43,8 +52,11 @@ func scopeGit(bare string, args ...string) (string, error) {
 	}
 	return string(data), nil
 }
-func managedScope(bare, base, candidate string) (ManagedScopePlan, error) {
-	p := ManagedScopePlan{Base: base, Candidate: candidate, Limit: managedScopeFiles, Next: "Examiner les fichiers nécessaires et leurs dépendances ; préparer un patch avec scope-patch. Appliquer sur une copie de la base acceptée, puis refaire les contrôles et la revue. Le candidat original reste conservé."}
+func managedScope(bare, base, candidate string, limit int) (ManagedScopePlan, error) {
+	p := ManagedScopePlan{Base: base, Candidate: candidate, Limit: limit, Next: "Examiner les fichiers nécessaires et leurs dépendances ; préparer un patch avec scope-patch. Appliquer sur une copie de la base acceptée, puis refaire les contrôles et la revue. Le candidat original reste conservé."}
+	if limit < 0 {
+		return p, fmt.Errorf("limite de fichiers négative")
+	}
 	raw, err := scopeGit(bare, "diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--name-only", "-z", base, candidate, "--")
 	if err != nil {
 		return p, err
@@ -52,12 +64,12 @@ func managedScope(bare, base, candidate string) (ManagedScopePlan, error) {
 	if raw != "" {
 		p.Files = strings.Split(strings.TrimSuffix(raw, "\x00"), "\x00")
 	}
-	p.RequiresReduction = len(p.Files) > p.Limit
+	p.RequiresReduction = p.Limit > 0 && len(p.Files) > p.Limit
 	diff, err := scopeGit(bare, "diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--binary", base, candidate, "--")
 	if err != nil {
 		return p, err
 	}
-	decomposition := detectReviewDecomposition(candidate, p.Files, len(diff))
+	decomposition := detectReviewDecomposition(candidate, p.Files, len(diff), limit)
 	p.Decomposition = &decomposition
 	if decomposition.Required {
 		p.Next = "Faire examiner les types de découpage et les lots proposés par le sous-planificateur. Conserver le candidat complet. Vérifier couverture, dépendances, capacité, budget et revue finale avant exécution ; les suggestions ne sont pas un plan autorisé."
@@ -70,7 +82,7 @@ func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) 
 		return ManagedScopePlan{}, err
 	}
 	bare := filepath.Join(e.Work.Planning.Repository.Storage, "repository.git")
-	p, err := managedScope(bare, e.Context.Previous, e.Context.Candidate)
+	p, err := managedScope(bare, e.Context.Previous, e.Context.Candidate, effectiveReviewFileLimit(e.Work.Planning.Reviewer))
 	if err != nil {
 		return p, err
 	}
@@ -84,7 +96,10 @@ func (s *Store) managedScopePreview(work string, r PlanningRequest, patch bool) 
 		if r.Revision != e.Revision || r.ExpectedCandidate != p.Candidate {
 			return p, fmt.Errorf("candidat ou révision modifié ; relire scope-preview")
 		}
-		if len(r.ScopeFiles) == 0 || len(r.ScopeFiles) > p.Limit {
+		if len(r.ScopeFiles) == 0 || (p.Limit > 0 && len(r.ScopeFiles) > p.Limit) {
+			if p.Limit == 0 {
+				return p, fmt.Errorf("sélection explicite non vide requise")
+			}
 			return p, fmt.Errorf("sélection explicite de 1 à %d fichiers requise", p.Limit)
 		}
 		known := map[string]bool{}

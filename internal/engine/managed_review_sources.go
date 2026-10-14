@@ -25,6 +25,36 @@ type ReviewSource struct {
 const managedReviewSourceBytesExceeded = "sources de contexte supérieures à 128 Kio ; aucun contenu tronqué"
 const managedReviewSourceCountExceeded = "contexte de revue : 24 fichiers maximum, aucun contenu tronqué"
 
+const reviewManifestTransportBytes = 8192
+const defaultReviewContextFiles = 24
+const defaultReviewSourceBytes = 96 * 1024
+const defaultReviewContextBytes = 128 * 1024
+
+type reviewSourcePolicy struct{ Files, SourceBytes, TotalBytes int }
+
+func effectiveReviewSourcePolicy(cfg *ReviewerConfig) reviewSourcePolicy {
+	p := reviewSourcePolicy{defaultReviewContextFiles, defaultReviewSourceBytes, defaultReviewContextBytes}
+	if cfg != nil {
+		if cfg.MaxContextFiles != nil {
+			p.Files = *cfg.MaxContextFiles
+		}
+		if cfg.MaxSourceBytes != nil {
+			p.SourceBytes = *cfg.MaxSourceBytes
+		}
+		if cfg.MaxContextBytes != nil {
+			p.TotalBytes = *cfg.MaxContextBytes
+		}
+	}
+	return p
+}
+
+func reviewSourceCapacityReason(reason string) bool {
+	return reason == managedReviewSourceCountExceeded || reason == managedReviewSourceBytesExceeded ||
+		strings.HasPrefix(reason, "source de contexte ") && strings.Contains(reason, "source de revue trop grande : ") && strings.HasSuffix(reason, " ; aucun contenu tronqué") ||
+		strings.HasPrefix(reason, "contexte de revue : ") && strings.HasSuffix(reason, " fichiers maximum, aucun contenu tronqué") ||
+		strings.HasPrefix(reason, "sources de contexte supérieures à ") && strings.HasSuffix(reason, " octets ; aucun contenu tronqué")
+}
+
 type managedReviewSourceCapacityError struct{ reason string }
 
 func (e *managedReviewSourceCapacityError) Error() string { return e.reason }
@@ -61,8 +91,11 @@ func candidateReviewSource(bare, candidate, name string, limit int) (ReviewSourc
 		return source, err
 	}
 	size, err := strconv.Atoi(sizeText)
-	if err != nil || size < 0 || size > limit {
-		return source, fmt.Errorf("source de revue trop grande : %s ; aucun contenu tronqué", name)
+	if err != nil || size < 0 || limit < 0 {
+		return source, fmt.Errorf("taille de source de revue invalide : %s", name)
+	}
+	if limit > 0 && size > limit {
+		return source, &managedReviewSourceCapacityError{fmt.Sprintf("source de revue trop grande : %s ; aucun contenu tronqué", name)}
 	}
 	content, err := exec.Command("git", "--git-dir", bare, "cat-file", "blob", meta[2]).Output()
 	if err != nil || len(content) != size {
@@ -76,6 +109,10 @@ func candidateReviewSource(bare, candidate, name string, limit int) (ReviewSourc
 
 func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate string) ([]ReviewSource, error) {
 	repo := w.Planning.Repository
+	policy := effectiveReviewSourcePolicy(w.Planning.Reviewer)
+	if policy.Files < 0 || policy.SourceBytes < 0 || policy.TotalBytes < 0 {
+		return nil, fmt.Errorf("limite de contexte de revue négative")
+	}
 	bare := filepath.Join(repo.Storage, "repository.git")
 	seen := map[string]bool{}
 	sources := []ReviewSource{}
@@ -85,7 +122,7 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 		// it to candidate bytes, never to a quotation or a mutable checkout.
 		files := []string{}
 		manifestName := path.Join(repo.Subdir, "docs", task.Task+".review-context.json")
-		manifest, err := candidateReviewSource(bare, candidate, manifestName, 8192)
+		manifest, err := candidateReviewSource(bare, candidate, manifestName, reviewManifestTransportBytes)
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			return nil, err
 		}
@@ -94,7 +131,7 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 				Version int      `json:"version"`
 				Files   []string `json:"files"`
 			}
-			if err = strict([]byte(manifest.Content), &request); err != nil || request.Version != 1 || len(request.Files) == 0 || len(request.Files) > 24 {
+			if err = strict([]byte(manifest.Content), &request); err != nil || request.Version != 1 || len(request.Files) == 0 {
 				return nil, fmt.Errorf("manifeste de contexte de revue invalide : %s", manifestName)
 			}
 			files = append(files, request.Files...)
@@ -113,16 +150,24 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 			if seen[name] {
 				continue
 			}
-			if len(sources) >= 24 {
-				return nil, &managedReviewSourceCapacityError{managedReviewSourceCountExceeded}
+			if policy.Files > 0 && len(sources) >= policy.Files {
+				reason := managedReviewSourceCountExceeded
+				if policy.Files != defaultReviewContextFiles {
+					reason = fmt.Sprintf("contexte de revue : %d fichiers maximum, aucun contenu tronqué", policy.Files)
+				}
+				return nil, &managedReviewSourceCapacityError{reason}
 			}
-			source, err := candidateReviewSource(bare, candidate, name, 96*1024)
+			source, err := candidateReviewSource(bare, candidate, name, policy.SourceBytes)
 			if err != nil {
 				return nil, fmt.Errorf("source de contexte %s : %w", name, err)
 			}
 			total += source.Bytes
-			if total > 128*1024 {
-				return nil, &managedReviewSourceCapacityError{managedReviewSourceBytesExceeded}
+			if policy.TotalBytes > 0 && total > policy.TotalBytes {
+				reason := managedReviewSourceBytesExceeded
+				if policy.TotalBytes != defaultReviewContextBytes {
+					reason = fmt.Sprintf("sources de contexte supérieures à %d octets ; aucun contenu tronqué", policy.TotalBytes)
+				}
+				return nil, &managedReviewSourceCapacityError{reason}
 			}
 			seen[name] = true
 			sources = append(sources, source)
@@ -131,10 +176,9 @@ func managedReviewSources(w Work, tasks []managedReviewTaskContext, candidate st
 	return sources, nil
 }
 
-// Each task keeps the original 128 KiB source bound. Cumulative reviews are
-// partitioned later into bounded prompts; do not sum unrelated task packets
-// against the single-task limit. Each task still has at most 24 files; the
-// cumulative union is bounded by the participating tasks and packet preflight.
+// Each task uses the persisted source policy. Cumulative reviews are partitioned
+// later into provider-capacity checked prompts; unrelated task packets are not
+// summed against a per-task policy. No missing/invalid source is silently omitted.
 func managedReviewSourcesByTask(w Work, tasks []managedReviewTaskContext, candidate string) ([]ReviewSource, error) {
 	sources := []ReviewSource{}
 	seen := map[string]bool{}

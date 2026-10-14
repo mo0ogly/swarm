@@ -341,7 +341,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 		_, e = s.managedReviewsForPublication(&current, a, candidate, receiptPath, receipt)
 		return e
 	}
-	scope, scopeErr := managedScope(filepath.Join(current.Planning.Repository.Storage, "repository.git"), current.Planning.Repository.Candidate, candidate)
+	scope, scopeErr := managedScope(filepath.Join(current.Planning.Repository.Storage, "repository.git"), current.Planning.Repository.Candidate, candidate, effectiveReviewFileLimit(current.Planning.Reviewer))
 	if scopeErr != nil {
 		return scopeErr
 	}

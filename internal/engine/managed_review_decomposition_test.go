@@ -43,7 +43,7 @@ func TestReviewDecompositionSignalsAndExactCoverage(t *testing.T) {
 	}{"mixed", mixed, 100, true})
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			d := detectReviewDecomposition("candidate", tc.files, tc.bytes)
+			d := detectReviewDecomposition("candidate", tc.files, tc.bytes, 100)
 			if d.Required != tc.required || d.Candidate != "candidate" || d.State != "proposal_only" || len(d.Options) != 5 || d.FinalReview == "" {
 				t.Fatal(d)
 			}
@@ -68,7 +68,7 @@ func TestReviewDecompositionSignalsAndExactCoverage(t *testing.T) {
 			for i, j := 0, len(reverse)-1; i < j; i, j = i+1, j-1 {
 				reverse[i], reverse[j] = reverse[j], reverse[i]
 			}
-			if !reflect.DeepEqual(d, detectReviewDecomposition("candidate", reverse, tc.bytes)) {
+			if !reflect.DeepEqual(d, detectReviewDecomposition("candidate", reverse, tc.bytes, 100)) {
 				t.Fatal("unstable proposal")
 			}
 		})

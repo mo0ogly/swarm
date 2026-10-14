@@ -153,8 +153,11 @@ func (s *Store) planFreshCapacityFragments(w Work, a Agent, c managedReviewConte
 	if hash(raw) != record.Digest {
 		return empty, fmt.Errorf("plan de revue altéré")
 	}
-	scope, err := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), c.Previous, c.Candidate)
+	scope, err := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), c.Previous, c.Candidate, effectiveReviewFileLimit(w.Planning.Reviewer))
 	if err != nil {
+		return empty, err
+	}
+	if err := validateReviewLotFilePolicy(record.Proposal, scope.Limit); err != nil {
 		return empty, err
 	}
 	groups, order, err := coordinatedArtifactGroups(c, record.Proposal, scope.Files)

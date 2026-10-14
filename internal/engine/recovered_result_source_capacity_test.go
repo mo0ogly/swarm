@@ -64,7 +64,7 @@ func TestRecoveredResultCompletedSourceCapacityRefusalCanBeCorrected(t *testing.
 	if err != nil {
 		t.Fatal(err)
 	}
-	scope, err := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), w.Planning.Repository.Candidate, old.Result)
+	scope, err := managedScope(filepath.Join(w.Planning.Repository.Storage, "repository.git"), w.Planning.Repository.Candidate, old.Result, effectiveReviewFileLimit(w.Planning.Reviewer))
 	if err != nil || scope.RequiresReduction {
 		t.Fatal("fixture scope should already be bounded", err)
 	}

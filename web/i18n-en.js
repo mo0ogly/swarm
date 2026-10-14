@@ -4095,5 +4095,17 @@ globalThis.SwarmEnglish = {
   "Fournisseur historique non attribuable.": "Historical provider not attributable.",
   "Modèle historique non attribuable.": "Historical model not attributable.",
   "Usage non rapporté.": "Usage not reported.",
-  "Coût rapporté, facture non vérifiée.": "Reported cost, invoice not verified."
+  "Coût rapporté, facture non vérifiée.": "Reported cost, invoice not verified.",
+  "Fichiers par remise ou lot de revue": "Files per delivery or review lot",
+  "Fichiers de revue : 0 sans plafond. La capacité du contexte, les budgets, les contrôles et la revue indépendante restent appliqués. Le défaut conservé pour une ancienne configuration est 100 fichiers.": "Review files: 0 means unlimited. Context capacity, budgets, controls and independent review still apply. The retained default for an older configuration is 100 files.",
+  "Sources jointes par tâche": "Attached sources per task",
+  "Octets par source jointe": "Bytes per attached source",
+  "Octets de sources jointes par tâche": "Attached source bytes per task",
+  "Sources jointes : limites par tâche en fichiers et octets, sans troncature. 0 signifie sans plafond pour le réglage concerné. Les paquets restent soumis à la capacité du fournisseur.": "Attached sources: per-task file and byte limits, without truncation. 0 means unlimited for that setting. Packets remain subject to provider capacity.",
+  "Format du manifeste de contexte : ": "Context manifest format: ",
+  " octets maximum. Cette borne de déclaration est distincte du volume des sources jointes.": " maximum bytes. This declaration bound is separate from attached source volume.",
+  "limite de contexte de revue invalide : vérificateur requis, 0 sans plafond ou entier positif": "Invalid review context limit: a configured reviewer is required; use 0 for unlimited or a positive integer.",
+  "limite de fichiers de revue invalide : vérificateur requis, 0 sans plafond ou entier positif": "Invalid review file limit: a configured reviewer is required; use 0 for unlimited or a positive integer.",
+  "limite de contexte de revue négative": "Negative review context limit",
+  "limite de fichiers négative": "Negative file limit"
 };

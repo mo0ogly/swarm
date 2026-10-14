@@ -154,7 +154,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			return Work{}, fmt.Errorf("livraison partielle terminée et attribuable requise")
 		}
 		if _, err := s.managedDelivery(w, t, a, item.Result); err == nil && !unpaidPreflight {
-			scope, scopeErr := managedScope(filepath.Join(repo.Storage, "repository.git"), repo.Candidate, item.Result)
+			scope, scopeErr := managedScope(filepath.Join(repo.Storage, "repository.git"), repo.Candidate, item.Result, effectiveReviewFileLimit(w.Planning.Reviewer))
 			if scopeErr != nil {
 				return Work{}, scopeErr
 			}

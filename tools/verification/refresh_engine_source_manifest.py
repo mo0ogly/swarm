@@ -69,6 +69,8 @@ def main():
         "web/post-delivery.js": "source",
         "tests/instruction_retex_ui.cjs": "harness",
         "tests/quotas_ui.cjs": "harness",
+        "tests/review_file_policy_ui.cjs": "harness",
+        "docs/plans/engine-cursor-contract/replan-unblock-20261014.md": "doc",
         "tests/web_requests_test.cjs": "harness",
         "tests/graph_studio_test.cjs": "harness",
         "tests/graph_performance_ui.cjs": "harness",

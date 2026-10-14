@@ -1,5 +1,15 @@
 [
   {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "6a5a76d8238ee337e153dd18ea2f4e5199e27f5dc4d6c914eadf4101347e3691"
+  },
+  {
     "path": "docs/screenshots/projects-method-20261010/fr-etat-plan.png",
     "kind": "capture",
     "sha256": "91cf8cd8e18df6f1c43909833e55e7660083df8b063199ca90df4a4f08f49df5"
@@ -1368,15 +1378,5 @@
     "path": "internal/engine/automation_requests_test.go",
     "kind": "test",
     "sha256": "d9b4827b3c8c52e846e01e8e00f304e24cf367f2c76ab5ad8e7621830964e4b6"
-  },
-  {
-    "path": "internal/engine/automation_review_images_test.go",
-    "kind": "test",
-    "sha256": "54099ea9de922fd5d1107fd5d4987deb6f74190bee531c5a319f19cdaf996835"
-  },
-  {
-    "path": "internal/engine/automation_schedule.go",
-    "kind": "source",
-    "sha256": "02a7890cd57787d1df659f66c4e626d7b276cab15b19f0a673bb729d73e0eacf"
   }
 ]

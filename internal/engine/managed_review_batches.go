@@ -67,7 +67,7 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 	}
 	sources := map[string]ReviewSource{}
 	for _, s := range c.Sources {
-		if s.Path == "" || s.Bytes != len(s.Content) || s.Digest != hash([]byte(s.Content)) || s.Bytes > 96*1024 {
+		if s.Path == "" || s.Bytes != len(s.Content) || s.Digest != hash([]byte(s.Content)) {
 			return nil, fmt.Errorf("source de revue incohérente")
 		}
 		if _, ok := sources[s.Path]; ok {
@@ -75,26 +75,18 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 		}
 		sources[s.Path] = s
 	}
-	if len(sources) > 24 {
-		return nil, fmt.Errorf("plafond global de sources dépassé")
-	}
 	assigned := map[string]bool{}
 	for id, paths := range sourceOwners {
 		if !tasks[id] {
 			return nil, fmt.Errorf("affectation de tâche inconnue")
 		}
 		seen := map[string]bool{}
-		taskBytes := 0
 		for _, p := range paths {
 			if _, ok := sources[p]; !ok || seen[p] {
 				return nil, fmt.Errorf("affectation de source inconnue ou dupliquée")
 			}
 			seen[p] = true
 			assigned[p] = true
-			taskBytes += sources[p].Bytes
-		}
-		if taskBytes > 128*1024 {
-			return nil, fmt.Errorf("plafond de sources dépassé pour la tâche %s", id)
 		}
 	}
 	for p := range sources {
@@ -155,6 +147,18 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 // Resolve ownership from immutable Git manifests. Sources omitted from the
 // canonical list must be exact added-file duplicates already present in the diff.
 func managedReviewSourceOwners(w Work, c managedReviewContext) (map[string][]string, error) {
+	// Collection enforces current operator policy before a new review is frozen.
+	// Rechecking a paid context verifies immutable attribution, never a later
+	// policy. No context bytes or assignments are trusted without Git comparison.
+	planning := *w.Planning
+	reviewer := ReviewerConfig{}
+	if planning.Reviewer != nil {
+		reviewer = *planning.Reviewer
+	}
+	zero := 0
+	reviewer.MaxContextFiles, reviewer.MaxSourceBytes, reviewer.MaxContextBytes = &zero, &zero, &zero
+	planning.Reviewer = &reviewer
+	w.Planning = &planning
 	owners := map[string][]string{}
 	canonical := map[string]ReviewSource{}
 	for _, source := range c.Sources {

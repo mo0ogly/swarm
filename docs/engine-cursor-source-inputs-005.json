@@ -1,5 +1,25 @@
 [
   {
+    "path": "tests/test_swarm_local.py",
+    "kind": "test",
+    "sha256": "9b3e844adf1b837339e14c5ecd73d477748d069fcb0605a8de001bc512734ab4"
+  },
+  {
+    "path": "tests/training_design_ui.cjs",
+    "kind": "test",
+    "sha256": "64c0c3eb387417c03dd4e0ae1b09a3ef7004d48c1c7d638e570185f8048b8a86"
+  },
+  {
+    "path": "tests/web_requests_admin_ui.cjs",
+    "kind": "harness",
+    "sha256": "354d19e2b66a8f7875eb2eb4ddd7e16909d62d232029826fa8159388f55c3b3a"
+  },
+  {
+    "path": "tests/web_requests_test.cjs",
+    "kind": "harness",
+    "sha256": "c177f0d8e003c28c4b0a2fef5a8decc26b4275af15648dd3166617ce5404ccd2"
+  },
+  {
     "path": "tools/agent-workflows/CONTRACT.md",
     "kind": "doc",
     "sha256": "3a942bb0c89d6fed1a6ef4020c941bccdded0cf7d083810d68640fcfc65266d3"
@@ -92,7 +112,7 @@
   {
     "path": "tools/verification/refresh_engine_source_manifest.py",
     "kind": "harness",
-    "sha256": "aa1e845ac23bbe051b0c0bd59fc59ce9e496e2cf3d62bc873fcd947a868e14e6"
+    "sha256": "e0ef9b4b2721e540d766743d82a0b38a4ba8c9581a5e971e79fd887f20cb711c"
   },
   {
     "path": "tools/verification/retex_stage_analysis.py",
@@ -272,7 +292,7 @@
   {
     "path": "web/i18n-en.js",
     "kind": "source",
-    "sha256": "be047dcb55a7c7397a536970b2ce42c2ea5d76a099c10de2c5a3f1882d7a935f"
+    "sha256": "ff5873957d275025e209ce1d05297c6831f48661653a8bb1831031588bcd4d24"
   },
   {
     "path": "web/i18n.js",
@@ -632,7 +652,7 @@
   {
     "path": "web/quotas.js",
     "kind": "source",
-    "sha256": "f15fd52deef2bc6ea00a98ae1781bf4bb8ac4c985b3643f95c1581a0627ae3f1"
+    "sha256": "ab679c5d7d1ceb308047ce8e1b7ef8d4f3393dc5f53a7c0f3517f13e246d1692"
   },
   {
     "path": "web/report-summary.js",

@@ -63,8 +63,9 @@ flowchart TD
 
 Il n'y a ni lecture de la copie vivante ni inférence de chemins depuis un texte
 libre. Une preuve mentionnée uniquement dans une phrase reste à déclarer. Les
-limites techniques existantes restent applicables : 24 fichiers distincts et
-128 Kio de sources par tâche, 96 Kio par fichier, manifeste de 8 Kio. Les transports
+[politiques de revue](REVIEW-POLICIES.md) sont persistées et réglables dans la
+modale Admin : défauts de 24 sources et 128 Kio par tâche, 96 Kio par source ;
+0 signifie sans plafond de politique. Le format du manifeste reste borné à 8 Kio. Les transports
 et la coordination de revue conservent leurs propres contrôles de capacité.
 Un fichier absent, non régulier, non textuel ou trop grand bloque avant réservation
 d'un appel payant. Aucun fichier n'est tronqué ou remplacé par son résumé.

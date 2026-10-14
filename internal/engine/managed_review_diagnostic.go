@@ -95,14 +95,20 @@ func (s *Store) diagnoseManagedFragmentReview(work string, req PlanningRequest) 
 	if len(artifacts) == 0 {
 		return Work{}, fmt.Errorf("aucun constat défavorable à expliquer")
 	}
-	if len(req.Inputs) > 8 {
-		return Work{}, fmt.Errorf("huit sources complémentaires au maximum")
+	policy := effectiveReviewSourcePolicy(w.Planning.Reviewer)
+	if policy.Files > 0 && len(req.Inputs) > policy.Files {
+		return Work{}, fmt.Errorf("nombre de sources complémentaires supérieur à la politique de revue")
 	}
 	sources := []ReviewSource{}
+	totalBytes := 0
 	for _, name := range req.Inputs {
-		src, err := candidateReviewSource(filepath.Join(w.Planning.Repository.Storage, "repository.git"), r.CandidateSHA, name, 96*1024)
+		src, err := candidateReviewSource(filepath.Join(w.Planning.Repository.Storage, "repository.git"), r.CandidateSHA, name, policy.SourceBytes)
 		if err != nil {
 			return Work{}, err
+		}
+		totalBytes += src.Bytes
+		if policy.TotalBytes > 0 && totalBytes > policy.TotalBytes {
+			return Work{}, fmt.Errorf("sources complémentaires supérieures à la politique de revue ; aucun contenu tronqué")
 		}
 		sources = append(sources, src)
 	}

@@ -48,8 +48,8 @@ func validateReviewCoordination(p ReviewCoordinationProposal, candidate, evidenc
 	if p.Candidate != candidate || p.Evidence != evidence {
 		return nil, fmt.Errorf("candidat ou preuves du plan périmés")
 	}
-	if len(p.Lots) < 1 || len(p.Lots) > 100 || len(strings.TrimSpace(p.FinalReview)) < 16 || len(p.FinalReview) > 4000 {
-		return nil, fmt.Errorf("lots bornés et revue finale des interactions requis")
+	if len(p.Lots) < 1 || len(strings.TrimSpace(p.FinalReview)) < 16 || len(p.FinalReview) > 4000 {
+		return nil, fmt.Errorf("lots non vides et revue finale des interactions requis")
 	}
 	knownFiles := map[string]bool{}
 	for _, f := range files {
@@ -71,7 +71,7 @@ func validateReviewCoordination(p ReviewCoordinationProposal, candidate, evidenc
 		default:
 			return nil, fmt.Errorf("type de découpage inconnu")
 		}
-		if len(lot.Files) == 0 || len(lot.Files) > managedScopeFiles || len(lot.Criteria) == 0 {
+		if len(lot.Files) == 0 || len(lot.Criteria) == 0 {
 			return nil, fmt.Errorf("lot sans fichiers, trop large ou sans critères")
 		}
 		local := map[string]bool{}
@@ -163,6 +163,9 @@ func (s *Store) adoptReviewCoordination(w *Work, scope string, op PlanningOperat
 	if e.Revision != w.Revision {
 		return fmt.Errorf("preuves modifiées pendant la décision")
 	}
+	if err := validateReviewLotFilePolicy(proposal, effectiveReviewFileLimit(w.Planning.Reviewer)); err != nil {
+		return err
+	}
 	order, err := validateReviewCoordination(proposal, e.Context.Candidate, coordinationEvidence(e.Context), prepared.Files, coordinationCriteria(e.Context))
 	if err != nil {
 		return err
@@ -202,4 +205,18 @@ func (s *Store) planningReviewInputs(w Work, scope string) map[string]any {
 		inputs[task.ID] = preview
 	}
 	return inputs
+}
+
+// Business policy is checked on new authorized decisions/executions, not when
+// verifying immutable historical packet coverage under its original policy.
+func validateReviewLotFilePolicy(p ReviewCoordinationProposal, limit int) error {
+	if limit < 0 {
+		return fmt.Errorf("limite de fichiers négative")
+	}
+	for _, lot := range p.Lots {
+		if limit > 0 && len(lot.Files) > limit {
+			return fmt.Errorf("lot %s : %d fichiers, plafond configuré %d", lot.ID, len(lot.Files), limit)
+		}
+	}
+	return nil
 }

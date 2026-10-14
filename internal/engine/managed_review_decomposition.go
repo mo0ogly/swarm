@@ -3,6 +3,7 @@
 package engine
 
 import (
+	"fmt"
 	"path"
 	"sort"
 	"strings"
@@ -60,7 +61,7 @@ func reviewComponent(file string) string {
 		return "contrats-transversaux"
 	}
 }
-func detectReviewDecomposition(candidate string, files []string, diffBytes int) ReviewDecomposition {
+func detectReviewDecomposition(candidate string, files []string, diffBytes, fileLimit int) ReviewDecomposition {
 	d := ReviewDecomposition{Version: 1, Candidate: candidate, DiffBytes: diffBytes, State: "proposal_only", FinalReview: "Revue des interactions et contrôles globaux sur le même candidat ; couverture de chaque fichier et critère obligatoire. Aucun lot ne vaut acceptation globale."}
 	d.Options = []ReviewCutOption{
 		{"requirement", "Plusieurs résultats fonctionnels dans la même remise", "Chaque critère doit avoir un responsable et des preuves."},
@@ -69,8 +70,8 @@ func detectReviewDecomposition(candidate string, files []string, diffBytes int) 
 		{"specialty", "Sécurité, concurrence ou ergonomie exigent des examens distincts", "Le recouvrement est permis ; chaque avis garde son périmètre explicite."},
 		{"volume", "Un lot cohérent dépasse encore la capacité du vérificateur", "Conserver tout le contexte commun et prévoir une synthèse ; ne rien tronquer."},
 	}
-	if len(files) > managedScopeFiles {
-		d.Reasons = append(d.Reasons, "Plus de 100 fichiers modifiés depuis le candidat accepté.")
+	if fileLimit > 0 && len(files) > fileLimit {
+		d.Reasons = append(d.Reasons, fmt.Sprintf("Plus de %d fichiers modifiés depuis le candidat accepté.", fileLimit))
 	}
 	if diffBytes > managedReviewPromptLimit {
 		d.Reasons = append(d.Reasons, "Le diff seul dépasse la capacité du contexte de revue ; preuves et consignes augmentent encore ce volume.")

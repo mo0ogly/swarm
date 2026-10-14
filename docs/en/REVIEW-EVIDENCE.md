@@ -31,8 +31,9 @@ flowchart TD
 ```
 
 There is no live-checkout read or path inference from prose. An original mentioned
-only in a quotation must still be declared. Existing technical limits remain:
-24 distinct files and 128 KiB of sources per task, 96 KiB per file, 8 KiB manifest.
+only in a quotation must still be declared. [Review policies](REVIEW-POLICIES.md) are persisted and editable in Admin:
+defaults are 24 sources and 128 KiB per task, 96 KiB per source;
+0 means no policy ceiling. The manifest format retains its 8 KiB transport bound.
 Review transports and coordination retain their own capacity checks. Missing,
 unsafe, non-text or oversized input prevents a paid review, without truncation.
 Binary images are not made visible to a text reviewer by this contract.
