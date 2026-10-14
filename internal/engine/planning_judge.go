@@ -170,3 +170,47 @@ func applyJudgeRenewal(w *Work, r PlanningRequest, at time.Time) error {
 	p.Judge.At = ""
 	return nil
 }
+
+// Validate durable/imported cycles without granting completion or imposing a
+// policy ceiling. Legacy planning without a judge remains supported.
+func validateJudgeState(j *JudgeState) error {
+	if j == nil {
+		return nil
+	}
+	invalid := func() error { return fmt.Errorf("état durable du juge incohérent") }
+	if j.Cycle < 1 || j.MaxCycles < 0 || (j.MaxCycles > 0 && j.Cycle > j.MaxCycles) || (j.Verdict != "" && j.Verdict != "continue" && j.Verdict != "end") || j.Closed != (j.Verdict == "end") {
+		return invalid()
+	}
+	count := j.Cycle - 1
+	if j.Verdict != "" {
+		count = j.Cycle
+	}
+	if len(j.History) != count {
+		return invalid()
+	}
+	if j.Verdict == "" && (j.Reason != "" || j.At != "" || j.EvidenceRef != "") {
+		return invalid()
+	}
+	for i, h := range j.History {
+		if h.Cycle != i+1 || !nonempty(h.Reason) || len(h.Reason) > 4000 {
+			return invalid()
+		}
+		if _, err := time.Parse(time.RFC3339Nano, h.At); err != nil {
+			return invalid()
+		}
+		if h.Cycle < j.Cycle {
+			if h.Verdict != "continue" {
+				return invalid()
+			}
+			if _, err := time.Parse(time.RFC3339Nano, h.RenewedAt); err != nil {
+				return invalid()
+			}
+		} else if h.Verdict != j.Verdict || h.Reason != j.Reason || h.At != j.At || h.EvidenceRef != j.EvidenceRef || h.RenewedAt != "" {
+			return invalid()
+		}
+		if h.Verdict == "end" && !nonempty(h.EvidenceRef) {
+			return invalid()
+		}
+	}
+	return nil
+}

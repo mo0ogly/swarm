@@ -89,3 +89,16 @@ decisions and then receives cycle 2 through `planningStep`. This establishes
 protocol transmission and effect, not real model judgment quality or autonomy.
 The historical mission remains paused; these checks establish no deployment.
 See the [direct development plan](../plans/engine-cursor-contract/developpement-direct-20261012.md).
+
+## Durable state admission
+
+`validatePlanningState` validates any present judge: positive cycle, nonnegative policy (`0` unlimited), positive ceiling at least equal to consumption, consistent verdict/closed state, and complete ordered history. Earlier cycles require `continue` and a renewal timestamp; the current verdict must match the latest record. A missing judge remains compatible with legacy missions. Import rejects inconsistent state before any partial write; this validation certifies neither candidate evidence nor business completion.
+
+```mermaid
+flowchart LR
+    I[Received state or archive] --> V[Shared judge and plan validation]
+    V -->|Inconsistent| R[Reject without partial import]
+    V -->|Consistent or missing legacy judge| P[Preserved state]
+    P --> C[Freshness and local authority checks]
+    C --> S[Explicit supervisor decision]
+```

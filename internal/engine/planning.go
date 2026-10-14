@@ -1040,6 +1040,9 @@ func validatePlanningState(w *Work) error {
 	if p.Version != 1 || len(p.Scopes) < 1 || p.MaxScopes < 0 || (p.MaxScopes > 0 && len(p.Scopes) > p.MaxScopes) || p.MaxDepth < 0 || p.MaxTasks < 1 || len(w.Tasks) > p.MaxTasks || p.MaxDecisions < 1 || p.MaxActivations < 1 || p.Activations < 0 || p.Activations > p.MaxActivations || p.Decisions < 0 || p.Decisions > p.MaxDecisions {
 		return fmt.Errorf("contrat de planification invalide")
 	}
+	if err := validateJudgeState(p.Judge); err != nil {
+		return err
+	}
 	ids := map[string]bool{}
 	requirements := map[string]bool{}
 	for _, scope := range p.Scopes {

@@ -381,3 +381,41 @@ func TestPlanningJudgePauseIsIndependentOfQuota(t *testing.T) {
 		t.Fatal("same renewal did not succeed after resume", err)
 	}
 }
+
+func TestPlanningStateRejectsMalformedJudge(t *testing.T) {
+	_, base := planningFixture(t)
+	for _, kind := range []string{"zero-cycle", "negative-cycle", "negative-limit", "closed-without-end", "end-without-closed", "missing-history", "unordered-history"} {
+		t.Run(kind, func(t *testing.T) {
+			raw, _ := json.Marshal(base)
+			var w Work
+			if err := json.Unmarshal(raw, &w); err != nil {
+				t.Fatal(err)
+			}
+			switch kind {
+			case "zero-cycle":
+				w.Planning.Judge.Cycle = 0
+			case "negative-cycle":
+				w.Planning.Judge.Cycle = -1
+			case "negative-limit":
+				w.Planning.Judge.MaxCycles = -1
+			case "closed-without-end":
+				w.Planning.Judge.Closed = true
+			case "end-without-closed":
+				w.Planning.Judge.Verdict = "end"
+			case "missing-history":
+				w.Planning.Judge.Cycle = 2
+			case "unordered-history":
+				w.Planning.Judge.Cycle = 3
+				w.Planning.Judge.History = []JudgeCycleRecord{{Cycle: 2, Verdict: "continue"}, {Cycle: 1, Verdict: "continue"}}
+			}
+			if err := validatePlanningState(&w); err == nil {
+				t.Fatal("invalid durable judge admitted", kind)
+			}
+		})
+	}
+	legacy := base
+	legacy.Planning.Judge = nil
+	if err := validatePlanningState(&legacy); err != nil {
+		t.Fatal("legacy nil judge rejected", err)
+	}
+}

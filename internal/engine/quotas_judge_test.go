@@ -52,8 +52,18 @@ func TestJudgeCycleQuotaRefusalsPreserveHistory(t *testing.T) {
 	for _, variant := range []string{"below-consumed", "negative", "missing-judge", "active-planner", "stale"} {
 		t.Run(variant, func(t *testing.T) {
 			s, w := planningFixture(t)
+			for cycle := 1; cycle < 3; cycle++ {
+				var err error
+				w, err = judgeDo(t, s, w, "judge", cycle, PlanningRequest{JudgeVerdict: "continue", Reason: "Advance with real history before the quota check"})
+				if err != nil {
+					t.Fatal(err)
+				}
+				w, err = judgeDo(t, s, w, "renew", cycle, PlanningRequest{})
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
 			w, err := s.mutate(w.ID, "test.judge-quota", "prepare-cycle", w.Revision, []byte(`{}`), func(current *Work) error {
-				current.Planning.Judge.Cycle = 3
 				if variant == "missing-judge" {
 					current.Planning.Judge = nil
 				}

@@ -95,3 +95,16 @@ reçoit le schéma, renvoie les décisions, puis reçoit le contexte du cycle 2 
 il ne mesure pas la qualité de jugement ni l'autonomie d'une IA réelle.
 La mission historique est conservée en pause ; aucun déploiement n'est déduit de
 ces contrôles. Voir le [plan de développement direct](../plans/engine-cursor-contract/developpement-direct-20261012.md).
+
+## Admission de l’état durable
+
+`validatePlanningState` contrôle le juge lorsqu’il existe : cycle positif, plafond non négatif (`0` sans plafond), plafond positif au moins égal à la consommation, verdict/fermeture cohérents et historique complet ordonné. Les cycles précédents doivent avoir un verdict `continue` et une date de renouvellement ; le verdict courant doit correspondre au dernier enregistrement. Un juge absent reste compatible avec les missions anciennes. L’import rejette un état incohérent avant toute écriture partielle ; cette validation ne certifie ni les preuves de candidat ni la fin métier.
+
+```mermaid
+flowchart LR
+    I[État ou archive reçue] --> V[Validation commune du juge et du plan]
+    V -->|Incohérent| R[Refus sans import partiel]
+    V -->|Cohérent ou juge ancien absent| P[État conservé]
+    P --> C[Contrôles de fraîcheur et autorité locale]
+    C --> S[Décision explicite du superviseur]
+```
