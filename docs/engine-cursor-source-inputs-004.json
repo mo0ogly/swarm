@@ -1,5 +1,20 @@
 [
   {
+    "path": "internal/engine/missing_report_recovery_test.go",
+    "kind": "test",
+    "sha256": "df6faa91af7b998b636354a815b2fbeb21042b5dddb1b60ea91b9afc74b5e2a6"
+  },
+  {
+    "path": "internal/engine/mission.go",
+    "kind": "source",
+    "sha256": "dacdf7fe36ce15ff76e2cbcc6e5075dae89afeff3c89bfda753213a3e1e8fe01"
+  },
+  {
+    "path": "internal/engine/mission_cli.go",
+    "kind": "source",
+    "sha256": "1fe0ffc56439b71c9c6e8fa88b2f4c5b175d302ffdef6e1bc7f94ee8362adc74"
+  },
+  {
     "path": "internal/engine/mission_closed_history_test.go",
     "kind": "test",
     "sha256": "7f93f9c16652653659ac9dd82e1cee501050de60e525398390209472d541b8b5"
@@ -682,7 +697,7 @@
   {
     "path": "internal/engine/recovered_result.go",
     "kind": "source",
-    "sha256": "23b7d819a2682b8eac734a72980e63cab086ae91a7a3e55f2290d40df959caf0"
+    "sha256": "a3935f8f83445aff256aba58899baf478ee284ff8e5fcc1423ea15f3792cd436"
   },
   {
     "path": "internal/engine/recovered_result_evidence_test.go",
@@ -1478,20 +1493,5 @@
     "path": "tests/supervision_r2_acceptance.py",
     "kind": "harness",
     "sha256": "7505c3acc05fb42ade0da1e569ff2794e1388907f457401fff44df7f7caea64d"
-  },
-  {
-    "path": "tests/supervision_r3_acceptance.py",
-    "kind": "harness",
-    "sha256": "b7528ab6d375279be19280645e0003f1cdd645ab9ba41ff470be8a242b6c2cf4"
-  },
-  {
-    "path": "tests/supervision_r4_acceptance.py",
-    "kind": "harness",
-    "sha256": "e8c1429b293c74582abed9ac32a78f7c8bcc3105e6bb6880f7008cc7b5bdd8ea"
-  },
-  {
-    "path": "tests/test_controlled_autonomy_campaign.py",
-    "kind": "harness",
-    "sha256": "1c9bd3fed8f148249ae2180a90b86d4b7c82eb1f5a5b441e44c528accf63bf26"
   }
 ]

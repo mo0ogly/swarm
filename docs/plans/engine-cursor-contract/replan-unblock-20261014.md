@@ -89,3 +89,20 @@ integrating pour la tentative courante completed, ou interrompue avec résultat
 récupéré attribué. Gardes d’intégration habituelles et relais original conservés.
 Rouge `completed-retry-red.jsonl` : statut blocked et0appel malgré décision reçue.
 Vérifier normalité, rejeu, budget, pause et remise inchangée avant livraison.
+
+## Autorisation locale du règlement manuel
+
+L’annonce initiale sur le mode manuel était trop large. Observation native en
+lecture seule : intention integrating mais événement `settle-error` : mission
+continue non autorisée. La garde d’intégration exigeait le mode autonome, qui
+relancerait ici la planification Claude. Aucun appel de revue dépensé.
+
+Solution bornée : un consentement local, jamais exporté avec Work, émis dans la
+transaction d’une reprise publique et lié au résultat, base, contrat, tentative
+et permission locale de mission. Le mode manuel reste tel quel ; aucune nouvelle
+production. Cette permission est contrôlée à l’entrée et dans la publication.
+Une revue a détecté l’utilisation du Work pré-revue à cette dernière frontière :
+rouge `planning-pause-red.jsonl`, puis capture de la planification actuelle de la
+transaction et contrôle de pause des callbacks ordinaires et par lots.
+Les versions7ff3a92 et précédentes restent historiques ; la nouvelle autorisation
+et son effet natif restent à observer après qualification et installation.

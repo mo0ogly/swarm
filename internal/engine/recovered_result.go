@@ -129,8 +129,8 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 	if err = reviewerLaunchGuard(w); err != nil {
 		return Work{}, err
 	}
-	if ok, reason := s.automaticValidationAuthorized(work); !ok {
-		return Work{}, fmt.Errorf("soumission suspendue : %s", reason)
+	if err := managedSettlementRequestGuard(s.db, w); err != nil {
+		return Work{}, err
 	}
 	repo, err := s.managedRepository(w)
 	if err != nil {
@@ -249,7 +249,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		}
 		task.Next = "Réparation externe remise ; contrôles et revue indépendante requis."
 		return nil
-	}, func(tx *sql.Tx, _ *Work) error {
+	}, func(tx *sql.Tx, current *Work) error {
 		var active int
 		if e := tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND task_id=? AND status IN ('queued','starting','running','stopping')", work, t.ID).Scan(&active); e != nil {
 			return e
@@ -268,7 +268,7 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 		if n != 1 {
 			return fmt.Errorf("résultat remplacé pendant la soumission")
 		}
-		return nil
+		return recordManagedSettlementConsent(tx, *current, a.ID, r.EventID)
 	})
 	if err != nil {
 		return Work{}, err

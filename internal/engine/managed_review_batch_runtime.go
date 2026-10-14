@@ -217,7 +217,7 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 				return false
 			}
 			cw, err := s.get(w.ID)
-			if err != nil || cw.Planning == nil || cw.Planning.Repository == nil || cw.Planning.Repository.Candidate != record.PreviousCandidate || managedReviewContract(cw, a.TaskID) != managedReviewContract(w, a.TaskID) || s.managedBatchProviderIntact(cw.Planning.Reviewer, record) != nil {
+			if err != nil || cw.Planning == nil || cw.Planning.Paused || cw.Planning.Repository == nil || cw.Planning.Repository.Candidate != record.PreviousCandidate || managedReviewContract(cw, a.TaskID) != managedReviewContract(w, a.TaskID) || s.managedBatchProviderIntact(cw.Planning.Reviewer, record) != nil {
 				return false
 			}
 			ct, err := cw.task(a.TaskID)

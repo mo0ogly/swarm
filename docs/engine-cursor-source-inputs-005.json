@@ -1,5 +1,20 @@
 [
   {
+    "path": "tests/supervision_r3_acceptance.py",
+    "kind": "harness",
+    "sha256": "b7528ab6d375279be19280645e0003f1cdd645ab9ba41ff470be8a242b6c2cf4"
+  },
+  {
+    "path": "tests/supervision_r4_acceptance.py",
+    "kind": "harness",
+    "sha256": "e8c1429b293c74582abed9ac32a78f7c8bcc3105e6bb6880f7008cc7b5bdd8ea"
+  },
+  {
+    "path": "tests/test_controlled_autonomy_campaign.py",
+    "kind": "harness",
+    "sha256": "1c9bd3fed8f148249ae2180a90b86d4b7c82eb1f5a5b441e44c528accf63bf26"
+  },
+  {
     "path": "tests/test_swarm_local.py",
     "kind": "test",
     "sha256": "9b3e844adf1b837339e14c5ecd73d477748d069fcb0605a8de001bc512734ab4"

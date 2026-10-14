@@ -455,7 +455,7 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		t.IndependentReview = nil
 		cfg.Failure = ""
 		return nil
-	}, func(tx *sql.Tx, _ *Work) error {
+	}, func(tx *sql.Tx, current *Work) error {
 		if managedProducer == "" {
 			return nil
 		}
@@ -467,7 +467,7 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		var result sql.Result
 		var e error
 		if unpaid {
-			result, e = tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND work_id=? AND task_id=? AND state='conflict' AND result_commit=? AND detail=?", managedProducer, work, r.Task, preflight.Item.Result, preflight.Item.Detail)
+			result, e = tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND work_id=? AND task_id=? AND state=? AND result_commit=? AND detail=?", managedProducer, work, r.Task, preflight.Item.State, preflight.Item.Result, preflight.Item.Detail)
 		} else {
 			result, e = tx.Exec("UPDATE managed_attempts SET state='integrating',detail='' WHERE agent_id=? AND state IN ('conflict','integrating') AND result_commit!=''", managedProducer)
 		}
@@ -481,7 +481,7 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 		if n != 1 {
 			return fmt.Errorf("candidat de reprise introuvable")
 		}
-		return nil
+		return recordManagedSettlementConsent(tx, *current, managedProducer, r.EventID)
 	})
 }
 

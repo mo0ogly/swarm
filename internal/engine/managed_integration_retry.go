@@ -215,7 +215,7 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 		task.IntegrationRetries = append(task.IntegrationRetries, retry)
 		task.Next = "Reprise du résultat conservé : contrôles cumulés puis nouvelle revue indépendante."
 		return nil
-	}, func(tx *sql.Tx, _ *Work) error {
+	}, func(tx *sql.Tx, current *Work) error {
 		if runtimeDigest != "" {
 			_, currentDigest, err := validationRuntimeLimitsWith(tx, work)
 			if err != nil {
@@ -224,9 +224,6 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 			if currentDigest != runtimeDigest {
 				return fmt.Errorf("budget de contrôle modifié avant réservation")
 			}
-		}
-		if err := automaticValidationGuard(tx, work); err != nil {
-			return err
 		}
 		var status string
 		if err := tx.QueryRow("SELECT status FROM agents WHERE id=?", a.ID).Scan(&status); err != nil {
@@ -246,7 +243,12 @@ func (s *Store) retryManagedIntegration(work string, r PlanningRequest) (Work, e
 		if n != 1 {
 			return fmt.Errorf("reprise déjà réservée ou résultat remplacé")
 		}
-		return nil
+		if err := recordManagedSettlementConsent(tx, *current, a.ID, r.EventID); err != nil {
+			return err
+		}
+		reservedItem := item
+		reservedItem.State = "integrating"
+		return managedSettlementGuard(tx, *current, a, reservedItem)
 	})
 }
 

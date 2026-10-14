@@ -145,10 +145,7 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 		record.Contract = managedReviewContract(*current, task.ID)
 		task.Requalifications = append(task.Requalifications, record)
 		return nil
-	}, func(tx *sql.Tx, _ *Work) error {
-		if e := automaticValidationGuard(tx, work); e != nil {
-			return e
-		}
+	}, func(tx *sql.Tx, current *Work) error {
 		var active int
 		if e := tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=? AND status IN ('queued','starting','running','stopping')", work).Scan(&active); e != nil {
 			return e
@@ -167,7 +164,12 @@ func (s *Store) requalifyHistorical(work string, r PlanningRequest) (Work, error
 		if n != 1 {
 			return fmt.Errorf("résultat déjà réservé ou remplacé")
 		}
-		return nil
+		if err := recordManagedSettlementConsent(tx, *current, a.ID, r.EventID); err != nil {
+			return err
+		}
+		reservedItem := item
+		reservedItem.State = "integrating"
+		return managedSettlementGuard(tx, *current, a, reservedItem)
 	})
 }
 

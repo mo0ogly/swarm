@@ -730,11 +730,28 @@ sequenceDiagram
     Note over E: Rejeu dédupliqué, aucune acceptation supposée
 ```
 
-La suspension reste opposable ; le mode manuel empêche de nouveaux départs de
-production et de planification, tout en permettant le règlement du résultat
-existant lorsque la suspension est levée. Les verrous de publication et de
+La suspension de mission **et** celle de planification restent opposables,
+y compris dans la transaction de publication. Le mode manuel empêche les nouveaux
+départs ; il n’autorise pas le règlement automatique d’un bilan ordinaire. Une
+reprise publique explicite (`retry-review`, réparation d’un résultat récupéré,
+`retry-integration` ou `requalify`) enregistre un consentement local pour le résultat
+courant : tâche, agent, tentative, commit résultat, base acceptée et contrat.
+Il est lié au consentement local de mission, conservé hors du Work exporté.
+Une révocation puis réautorisation de mission exige un nouveau consentement du
+résultat. Un changement de résultat, base, contrat ou tentative le périme.
+Les autres tâches gardent leur propre consentement ; aucun réglage d’autonomie
+ni budget n’est relevé par cette opération. Le conducteur recontrôle ces droits
+avant exécution et dans la publication ; contrôles et avis frais restent requis. Les verrous de publication et de
 revue, les checkpoints et les réservations protègent le rejeu. La recette
 `TestDurableCoordinatorExecutesAuthorizedReviewRetryAfterCompletedHandoff`
 reproduit l’intention ignorée, puis vérifie son effet et un second rejeu sans
 appel supplémentaire. Elle utilise un reviewer déterministe, pas un fournisseur
 réel ; les effets natifs sont consignés séparément dans le replan de mission.
+
+La recette `TestManagedReviewRetryIsExplicitlyAuthorizedInManualMode` vérifie la
+reprise publique sans nouveau worker ; `TestManagedManualSettlementRequiresFreshLocalResultSpecificConsent`
+couvre les refus sans dépense, et `TestManagedPlanningPauseDuringReviewPreventsPublication`
+interrompt la planification pendant une revue réelle de fixture. Les paquets
+ordinaires, par lots et fragmentés respectent la pause ; les appels déjà réservés
+ne sont jamais remboursés. Une intention impayée déjà en file peut recevoir une
+nouvelle autorisation publique après vérification de son checkpoint complet.

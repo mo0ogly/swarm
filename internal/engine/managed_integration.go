@@ -97,7 +97,16 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 	if err != nil {
 		return err
 	}
+	var publicationAuthority Work
 	_, err = s.mutateWithHook(w.ID, "managed.integrated", "integrated-"+managedProofKey(t, a), current.Revision, raw, func(current *Work) error {
+		// Capture the current transaction state before publication changes the
+		// candidate pointer. Local permission must never use the pre-review Work.
+		publicationAuthority = *current
+		planning := *current.Planning
+		repository := *planning.Repository
+		planning.Repository = &repository
+		publicationAuthority.Planning = &planning
+		publicationAuthority.Tasks = append([]Task(nil), current.Tasks...)
 		task, e := current.task(a.TaskID)
 		if e != nil {
 			return e
@@ -166,7 +175,7 @@ func (s *Store) integrateManagedAttempt(a Agent) error {
 		scope.State = "ready"
 		return nil
 	}, func(tx *sql.Tx, _ *Work) error {
-		if err := automaticValidationGuard(tx, w.ID); err != nil {
+		if err := managedSettlementGuard(tx, publicationAuthority, a, item); err != nil {
 			return err
 		}
 		var active int
@@ -248,8 +257,8 @@ func (s *Store) prepareManagedCandidate(w Work, t *Task, a Agent, item ManagedAt
 			return "", nil, fmt.Errorf("%s", "Un résultat antérieur exige une revue humaine avant nouvelle intégration")
 		}
 		for _, control := range task.ValidationPolicy.Controls {
-			if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
-				return "", nil, fmt.Errorf("contrôles suspendus : %s", reason)
+			if err := managedSettlementGuard(s.db, w, a, item); err != nil {
+				return "", nil, err
 			}
 			result, output, outputBytes := s.runConfiguredValidationControl(w.ID, filepath.Join(candidateDir, repo.Subdir), control)
 			results[task.ID] = append(results[task.ID], result)

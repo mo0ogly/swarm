@@ -683,10 +683,27 @@ sequenceDiagram
     Note over E: Deduplicated replay, no assumed acceptance
 ```
 
-Pause remains authoritative. Manual mode prevents new production and planning
-starts while allowing settlement of existing results after unpausing. Publication
+Mission **and** planning pause remain authoritative, including at publication.
+Manual mode prevents new starts; it does not automatically settle ordinary
+handoffs. An explicit public retry (`retry-review`, recovered-result repair,
+`retry-integration`, or `requalify`) records local consent for one current result:
+task, agent, attempt, result commit, accepted base and contract. Consent is tied
+to the local mission permission and retained outside exported Work authority.
+Revoking then reauthorizing a mission requires fresh result consent. Changed
+result, base, contract or attempt invalidates consent. Other tasks retain their
+own permissions; this operation raises neither autonomy nor budgets. The conductor
+checks permission before execution and atomically at publication; fresh checks
+and required independent review still apply. Publication
 and review locks, checkpoints and reservations protect replay. The regression
 `TestDurableCoordinatorExecutesAuthorizedReviewRetryAfterCompletedHandoff`
 reproduces ignored intent, then checks application and a second replay without
 another call. Its reviewer is deterministic, not a real provider; native effects
 are recorded separately in the mission replan.
+
+`TestManagedReviewRetryIsExplicitlyAuthorizedInManualMode` checks public recovery
+without a new producer; `TestManagedManualSettlementRequiresFreshLocalResultSpecificConsent`
+covers rejection without calls; `TestManagedPlanningPauseDuringReviewPreventsPublication`
+pauses planning during a real fixture reviewer process. Ordinary, batch and
+fragment reviews respect pause; spent reservations are never refunded. An unpaid
+intent already queued may receive fresh public authorization after its complete
+checkpoint has been verified.

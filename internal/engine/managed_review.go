@@ -476,7 +476,7 @@ func (s *Store) reviewManagedCandidate(w Work, a Agent, candidate, receiptPath s
 			return false
 		}
 		cw, e := s.get(w.ID)
-		if e != nil || s.paused(w.ID) || cw.Planning.Repository.Candidate != record.PreviousCandidate {
+		if e != nil || s.paused(w.ID) || cw.Planning == nil || cw.Planning.Paused || cw.Planning.Repository == nil || cw.Planning.Repository.Candidate != record.PreviousCandidate {
 			return false
 		}
 		ct, e := cw.task(a.TaskID)

@@ -73,11 +73,19 @@ func (s *Store) readManagedPreflight(work, task string, allowSourceCapacity, all
 	if a.Status != "completed" && !recoveredResultMatches(t, a, item) {
 		return nil, fmt.Errorf("résultat réparé attribuable requis pour une tentative interrompue")
 	}
+	// A previously authorized unpaid retry can still be awaiting settlement.
+	// Keep its actual state/detail for the CAS; inspect the retained task refusal
+	// only when integration is already queued. All checkpoint bindings below
+	// remain mandatory before issuing a fresh local result-specific consent.
+	failureDetail := item.Detail
+	if item.State == "integrating" && failureDetail == "" {
+		failureDetail = t.Blocker
+	}
 	// Historical cumulative file-count failures spent no review call either.
 	// Rebuild the complete immutable context below; never bypass its bounds.
-	historicalPlanRefusal := strings.HasPrefix(item.Detail, "base de revue non vérifiée : ") && strings.HasSuffix(item.Detail, " : plan ou méthode des lots modifié")
-	sizeRefusal := strings.HasPrefix(item.Detail, managedScopeRefusal+" : ") || item.Detail == managedReviewContextTooLarge || strings.HasPrefix(item.Detail, managedReviewContextTooLarge+" : tâche ") || reviewSourceCapacityReason(item.Detail)
-	if item.Work != work || item.Task != task || item.State != "conflict" || item.Result == "" || !(sizeRefusal || historicalPlanRefusal || item.Detail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != item.Detail {
+	historicalPlanRefusal := strings.HasPrefix(failureDetail, "base de revue non vérifiée : ") && strings.HasSuffix(failureDetail, " : plan ou méthode des lots modifié")
+	sizeRefusal := strings.HasPrefix(failureDetail, managedScopeRefusal+" : ") || failureDetail == managedReviewContextTooLarge || strings.HasPrefix(failureDetail, managedReviewContextTooLarge+" : tâche ") || reviewSourceCapacityReason(failureDetail)
+	if item.Work != work || item.Task != task || (item.State != "conflict" && item.State != "integrating") || item.Result == "" || !(sizeRefusal || historicalPlanRefusal || failureDetail == "revue retenue : modification binaire non examinable par ce vérificateur") || t.Blocker != failureDetail {
 		return nil, fmt.Errorf("aucun refus de taille attribuable au résultat courant")
 	}
 	repo := w.Planning.Repository

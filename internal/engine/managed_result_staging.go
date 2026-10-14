@@ -98,8 +98,8 @@ func (s *Store) managedIntegrationInput(a Agent) (Work, *Task, ManagedAttempt, b
 	if !currentTaskAttempt(t, a.Attempt) || (a.Status != "completed" && !recoveredResultMatches(t, a, item)) {
 		return Work{}, nil, item, false, fmt.Errorf("tentative non intégrable")
 	}
-	if ok, reason := s.automaticValidationAuthorized(w.ID); !ok {
-		return Work{}, nil, item, false, fmt.Errorf("intégration suspendue : %s", reason)
+	if err := managedSettlementGuard(s.db, w, a, item); err != nil {
+		return Work{}, nil, item, false, err
 	}
 	if t.ValidationPolicy == nil || t.ValidationPolicy.Mode != "automatic" {
 		return Work{}, nil, item, false, s.managedFailure(a, "Contrôles non autorisés pour cette tâche ; aucune validation supposée")
