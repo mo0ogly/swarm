@@ -51,3 +51,41 @@ Une erreur de recette comparait maps vides et nil : JSON persisté identique,
 aucune mutation moteur. La recette compare maintenant deux lectures persistées.
 Un processus de tests a été interrompu143 : preuve conservée, jamais PASS ;
 la reprise ciblée du cas interrompu passe. Aucun nouveau lancement de suite entière.
+
+## Livraison et premier effet natif
+
+47583ac est poussé et installé par le parcours natif supporté. Les quatre missions,
+leurs états de départ, compteurs, dépenses et candidats sont conservés ; santé ready,
+version injectée47583ac non modifiée. Recettes ciblées : packet10 tests principaux,
+reprise publique1 avec2 variantes, batches figés5 avec11 variantes, manifeste1 ;
+paquets PASS, race sur comportement. Vet et workflows passent. Admin FR/EN ×2 thèmes,
+390px, aperçu non mutateur, sauvegarde/réouverture et0 : PASS, aucun appel modèle.
+Revue source indépendante favorable après correction de trois P2 ; ceci ne vaut
+pas verdict natif de mission.
+
+Réglages publics :300 fichiers,196608 octets par source,524288 octets par contexte.
+Un premier seuil de32 sources restait insuffisant pour T2 : son manifeste valide
+28 se complète de la livraison, union35 sources /214328 octets /maximum49079.
+La mesure sur le candidat88e76a est conservée ; seuil40 persisté, consumption
+inchangée. Les aperçus scope T2/T3 ne requièrent plus de réduction ; capacité T2
+4 paquets +2 finaux et T3 7 paquets +2 finaux sous18 appels disponibles. Demande
+publique de reprise T2 reçue à r842, original et avis précédents conservés.
+Mode manuel pour les résultats conservés, aucun nouveau worker ni planificateur.
+La réception, l’exécution et le verdict natif restent des faits distincts à suivre.
+
+RETEX de méthode : lire le schéma producteur avant un POST ; la query GET utilise
+`task`, la requête PlanningRequest utilise `task_id`. Un POST malformé a été refusé
+avant mutation, puis corrigé selon le schéma. Calculer la déclaration complète,
+pas seulement le manifeste. Vérifier le dernier consommateur et le contexte figé,
+pas seulement le collecteur ou les consignes.
+
+## Replan du conducteur
+
+La reprise T2 reçue r842 ne produisait aucun effet. Cause reproduite : un producteur
+completed déjà relayé sort de settleAgentTask ; reconcileKnownMissionResult ne
+reprenait que les résultats récupérés d’agents interrompus. La nouvelle intention
+publique restait integrating sans contrôle ni appel. Correction générale : traiter
+integrating pour la tentative courante completed, ou interrompue avec résultat
+récupéré attribué. Gardes d’intégration habituelles et relais original conservés.
+Rouge `completed-retry-red.jsonl` : statut blocked et0appel malgré décision reçue.
+Vérifier normalité, rejeu, budget, pause et remise inchangée avant livraison.

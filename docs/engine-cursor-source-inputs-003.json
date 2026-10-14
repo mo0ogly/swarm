@@ -257,12 +257,12 @@
   {
     "path": "internal/engine/durable_coordinator.go",
     "kind": "source",
-    "sha256": "aabd170b2d42ae58c48f7d40ce583a4ea66b79a07abff981add4b284ab5fecc8"
+    "sha256": "2ef7900e5aa80cc7e152119005dc41fa173d05e97da5d092e2036706567a86a5"
   },
   {
     "path": "internal/engine/durable_coordinator_test.go",
     "kind": "test",
-    "sha256": "1b0398db918bd3cfb668ed844aa06ffd7101cce359a7d05fcb8147421d8400a3"
+    "sha256": "f5414bbca20830d51916c10575f1587bce9c1c7981dd72dc8bd302964d846021"
   },
   {
     "path": "internal/engine/durable_coordinator_unsupported.go",

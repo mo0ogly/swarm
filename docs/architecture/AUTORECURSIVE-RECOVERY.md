@@ -29,7 +29,7 @@ flowchart TD
     R -->|oui| P[Probleme lie : diagnostiquer aussi cet echec]
     P --> D
     R -->|non| O
-    V --> F[Decision du moteur et suite de l'objectif]
+    V --> F[Decision du superviseur puis application autorisee du moteur]
 ```
 
 ## Une itération doit faire progresser la preuve
@@ -704,3 +704,37 @@ Les reprises ordinaires et les lots de revue textuelle gardent leur refus binair
 Le responsable choisit ensuite une correction de périmètre explicite et tracée,
 ou un mode de revue adapté. L’inventaire n’est ni une acceptation ni une inspection
 visuelle du contenu. Les travaux hors périmètre restent conservés avec leur origine.
+
+## Reprise de revue après un bilan déjà transmis
+
+`planning retry-review` remet le résultat immuable courant en intégration après
+précontrôle et décision publique fraîche. Le conducteur doit appliquer cette
+intention même lorsque l’agent terminé a déjà relayé son bilan : le relais d’origine
+reste conservé et n’est pas envoyé une seconde fois. Un agent interrompu exige
+en plus un résultat récupéré attribuable. Une ancienne tentative n’autorise pas
+la reprise du résultat courant.
+
+```mermaid
+sequenceDiagram
+    participant O as Opérateur autorisé
+    participant E as Moteur
+    participant C as Conducteur
+    participant R as Reviewer indépendant
+    O->>E: retry-review, révision et cause corrigée
+    E->>E: Vérifier checkpoint, preuves et capacité
+    E->>C: Intention durable intégrating du résultat courant
+    C->>E: Intégration normale, même si bilan déjà relayé
+    E->>E: Identité, pause, contrôles et fraîcheur
+    E->>R: Revue requise du candidat exact
+    R-->>E: Avis conservé
+    Note over E: Rejeu dédupliqué, aucune acceptation supposée
+```
+
+La suspension reste opposable ; le mode manuel empêche de nouveaux départs de
+production et de planification, tout en permettant le règlement du résultat
+existant lorsque la suspension est levée. Les verrous de publication et de
+revue, les checkpoints et les réservations protègent le rejeu. La recette
+`TestDurableCoordinatorExecutesAuthorizedReviewRetryAfterCompletedHandoff`
+reproduit l’intention ignorée, puis vérifie son effet et un second rejeu sans
+appel supplémentaire. Elle utilise un reviewer déterministe, pas un fournisseur
+réel ; les effets natifs sont consignés séparément dans le replan de mission.

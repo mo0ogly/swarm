@@ -415,3 +415,45 @@ func TestDurableCoordinatorRejectsReconciliationByReplacedOwner(t *testing.T) {
 		t.Fatalf("current owner did not recover reservation: state=%s err=%v", state, err)
 	}
 }
+
+func TestDurableCoordinatorExecutesAuthorizedReviewRetryAfterCompletedHandoff(t *testing.T) {
+	s, w, a := unpaidReviewFixture(t)
+	a.Relay = "previous-handoff"
+	if err := s.saveAgent(a); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := s.managedAttempt(a.ID)
+	request := PlanningRequest{Schema: 1, EventID: "completed-review-retry", Revision: w.Revision, Task: a.TaskID, Reason: "Retry retained review after general transport correction"}
+	if _, err := s.planningChange(w.ID, "retry-review", request); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.pause(w.ID, true); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.reconcileKnownMissionResult(a, "paused-conductor"); err != nil {
+		t.Fatal(err)
+	}
+	pending, _ := s.managedAttempt(a.ID)
+	if pending.State != "integrating" || managedReviewCalls(t, s) != 0 {
+		t.Fatal("paused intent changed or consumed a call")
+	}
+	if err := s.pause(w.ID, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.reconcileKnownMissionResult(a, "retry-conductor"); err != nil {
+		t.Fatal(err)
+	}
+	after, _ := s.get(w.ID)
+	task, _ := after.task(a.TaskID)
+	if task.Status != "accepted" || managedReviewCalls(t, s) != 1 {
+		t.Fatal("authorized retry ignored after completed handoff", task.Status, task.Blocker)
+	}
+	if err := s.reconcileKnownMissionResult(a, "retry-conductor"); err != nil {
+		t.Fatal(err)
+	}
+	item, _ := s.managedAttempt(a.ID)
+	stored, _ := s.agent(a.ID)
+	if item.Result != before.Result || managedReviewCalls(t, s) != 1 || len(task.Attempts) != 1 || stored.Relay != a.Relay || stored.Ended != a.Ended {
+		t.Fatal("replay lost evidence or duplicated paid effects")
+	}
+}

@@ -112,11 +112,13 @@ func (s *Store) reconcileMissionAttempts(work, conductor string, launch func(Age
 }
 
 func (s *Store) reconcileKnownMissionResult(agent Agent, conductor string) error {
-	// Explicitly authorized external repairs keep their original stopped status.
-	// A retry-review queues integration without changing that process history.
+	// Public retries queue the current immutable result without changing process
+	// or relay history. Completed producers can already have relayed a handoff;
+	// settling that handoff again must not swallow the new authorized intent.
+	// Stopped producers additionally require an attributed recovered result.
 	if w, err := s.get(agent.WorkID); err == nil && w.Planning != nil && w.Planning.Repository != nil {
 		if task, err := w.task(agent.TaskID); err == nil {
-			if item, err := s.managedAttempt(agent.ID); err == nil && item.State == "integrating" && recoveredResultMatches(task, agent, item) {
+			if item, err := s.managedAttempt(agent.ID); err == nil && item.State == "integrating" && currentTaskAttempt(task, agent.Attempt) && (agent.Status == "completed" || recoveredResultMatches(task, agent, item)) {
 				return s.integrateManagedAttempt(agent)
 			}
 		}

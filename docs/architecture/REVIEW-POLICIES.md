@@ -9,7 +9,7 @@ Une session de planification détenue ou une revue en cours interdit la modifica
 | Champ JSON `limits` | Unité | Défaut historique |
 | --- | --- | --- |
 | `review_delivery_files` | Fichiers du diff et d'un lot coordonné | 100 |
-| `review_context_files` | Sources distinctes par tâche | 24 |
+| `review_context_files` | Sources distinctes par tâche (manifeste et livraison) | 24 |
 | `review_source_bytes` | Octets complets d'une source | 98304 |
 | `review_context_bytes` | Octets cumulés des sources par tâche | 131072 |
 
@@ -43,8 +43,11 @@ d'une revue payée : les validations historiques contrôlent leur intégrité.
 Une source absente ou malformée reste un défaut d'intégrité ; un manifeste valide
 qui dépasse le nombre configuré est un refus de capacité, pas un JSON invalide.
 
-Exemple : 28 sources de 175190 octets au total exigent au moins 28 sources et
-175190 octets de contexte ; le plafond individuel doit couvrir la plus grande.
+Compter l’union du manifeste et des pièces de livraison, sans doublons ; le
+rapport déjà joint n’est pas ajouté une deuxième fois. Exemple : un manifeste
+de28 sources peut produire35 sources distinctes avec la livraison, pour214328
+octets. Il faut couvrir35 sources et214328 octets, ainsi que la plus grande
+source au plafond individuel.
 Après aperçu puis sauvegarde, rouvrir la modale et consulter `quotas show`.
 Reprendre par `planning retry-review` uniquement lorsque le checkpoint impayé
 courant, son producteur terminé et ses contrôles restent attribuables. Si les

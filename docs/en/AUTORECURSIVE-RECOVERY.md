@@ -27,7 +27,7 @@ flowchart TD
     R -->|yes| P[Linked problem: diagnose this failure too]
     P --> D
     R -->|no| O
-    V --> F[Engine decision and objective continuation]
+    V --> F[Supervisor decision then authorized engine application]
 ```
 
 ## Meaningful progress
@@ -658,3 +658,35 @@ failed controls or replaced attribution are still rejected. Ordinary retry and
 text-review batches keep their binary refusal. The owner chooses an explicit,
 traceable scope repair or an appropriate review mode. Inventory is neither
 acceptance nor visual examination; deferred work and its origins remain intact.
+
+## Review retry after an already relayed handoff
+
+`planning retry-review` queues the current immutable result for integration after
+fresh public authorization and preflight. The conductor applies that intent even
+when a completed agent has already relayed its handoff. Original relay history
+remains intact; it is not sent again. Interrupted agents additionally need an
+attributable recovered result. An older attempt cannot resume the current result.
+
+```mermaid
+sequenceDiagram
+    participant O as Authorized operator
+    participant E as Engine
+    participant C as Conductor
+    participant R as Independent reviewer
+    O->>E: retry-review, revision and corrected cause
+    E->>E: Check checkpoint, evidence and capacity
+    E->>C: Durable integrating intent for current result
+    C->>E: Normal integration even after relayed handoff
+    E->>E: Identity, pause, controls and freshness
+    E->>R: Required exact-candidate review
+    R-->>E: Retained verdict
+    Note over E: Deduplicated replay, no assumed acceptance
+```
+
+Pause remains authoritative. Manual mode prevents new production and planning
+starts while allowing settlement of existing results after unpausing. Publication
+and review locks, checkpoints and reservations protect replay. The regression
+`TestDurableCoordinatorExecutesAuthorizedReviewRetryAfterCompletedHandoff`
+reproduces ignored intent, then checks application and a second replay without
+another call. Its reviewer is deterministic, not a real provider; native effects
+are recorded separately in the mission replan.

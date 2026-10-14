@@ -432,7 +432,7 @@
   {
     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
-    "sha256": "c1d8861be09ce4e9d7c2f73454188fe2b48d4fc5f9f6cd236ec1bb3f1cc4f3f4"
+    "sha256": "7b88cb199d8f9c3fab5c43d94aa29aecfd0503544b78dcbdee87f5f8b0a02078"
   },
   {
     "path": "docs/architecture/CALL-ACCOUNTING.md",
@@ -502,7 +502,7 @@
   {
     "path": "docs/architecture/REVIEW-POLICIES.md",
     "kind": "doc",
-    "sha256": "52bc1490406d635795a8ceb7f93caaf1a83105096eba9e9d44aa97057f453890"
+    "sha256": "7350ae22a09dd1a84360ac09ea2ae5dcef92e109122d7e8ebe5e18136ffeda8d"
   },
   {
     "path": "docs/architecture/RUN-SUPERVISION.md",
@@ -557,7 +557,7 @@
   {
     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
-    "sha256": "3dbd0e9b5bf1d6443b872b95930187d8bcb24bdff2a37f0fb7d49f17a06a8d79"
+    "sha256": "6e73f884e9e4d208822100bc4438fae24f2d13ca23fe834db3a4a7f7febbf7ba"
   },
   {
     "path": "docs/en/BUDGETS.md",
@@ -747,7 +747,7 @@
   {
     "path": "docs/en/REVIEW-POLICIES.md",
     "kind": "doc",
-    "sha256": "7a66602695aa36c44f69023f71b6c6e6da8c2fdcd1367a83918729b945102f73"
+    "sha256": "c2146496275da6526dae20e611f8b179b9081b06e73ba10783888e981cbf9741"
   },
   {
     "path": "docs/en/REVIEW-TIMEOUT.md",
@@ -817,7 +817,7 @@
   {
     "path": "docs/plans/engine-cursor-contract/replan-unblock-20261014.md",
     "kind": "doc",
-    "sha256": "f66a5af2a857d9db27fb11d59cc02391d500ce870bda9fd640d624e748f0b245"
+    "sha256": "f5aeb8b88fddb7e6fee1a04f97901fb9faccbd06b9c53d6566a0b1b9117bde65"
   },
   {
     "path": "docs/plans/engine-cursor-contract/suites-retex-20261013.md",

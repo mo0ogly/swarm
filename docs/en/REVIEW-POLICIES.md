@@ -8,7 +8,7 @@ remain intact. A held planning session or running review prevents changes.
 | `limits` JSON field | Unit | Legacy default |
 | --- | --- | --- |
 | `review_delivery_files` | Diff files and files per coordinated lot | 100 |
-| `review_context_files` | Distinct sources per task | 24 |
+| `review_context_files` | Distinct sources per task (manifest and delivery) | 24 |
 | `review_source_bytes` | Complete source bytes | 98304 |
 | `review_context_bytes` | Total source bytes per task | 131072 |
 
@@ -40,8 +40,10 @@ retroactively invalidate paid context: historical checks validate integrity.
 Missing or malformed sources remain integrity errors. A valid manifest exceeding
 the configured file count produces a capacity refusal, not an invalid-JSON error.
 
-Example: 28 sources totaling 175190 bytes need limits of at least 28 sources and
-175190 context bytes, plus an individual ceiling covering the largest source.
+Count the deduplicated union of manifest and delivery evidence; the report
+already included in full is not counted twice. Example: a28-source manifest
+can become35 distinct sources with delivery evidence, totaling214328 bytes.
+Limits must cover35 sources,214328 total bytes and the largest individual source.
 Preview, save, reopen Admin and inspect `quotas show`. Use public
 `planning retry-review` only for an attributable current unpaid checkpoint with
 an ended producer and valid controls. Changed evidence requires public recovered
