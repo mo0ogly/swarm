@@ -180,3 +180,44 @@ func TestFragmentRetryAssociationFeedbackMatchesCitationContract(t *testing.T) {
 		})
 	}
 }
+
+func TestFragmentRetryFeedbackDiagnosesRejectedQuoteOnlyCitation(t *testing.T) {
+	s := storeTest(t)
+	text := "+original operator > bound\n"
+	p := managedReviewFragmentPacket{Version: 4, DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, Candidate: "candidate", ContextDigest: "context", Artifacts: []managedReviewFragmentArtifact{{Kind: "diff", Name: "proof", Content: text, Digest: hash([]byte(text))}}}
+	packet, _ := json.Marshal(p)
+	reply := map[string]any{"candidate_commit": p.Candidate, "context_sha256": p.ContextDigest, "packet_sha256": hash(packet), "findings": map[string]any{"0": map[string]any{"v": "inspected", "r": "Code examined", "e": 0, "n": []string{}}}, "defects": []map[string]any{{"artifact": 0, "quote": "+original operator >= bound", "explanation": "The asserted operator differs from the actual supplied source.", "reproduction": "Compare original bytes and the exact quoted operator.", "expected": "Do not invent or normalize the original operator."}}}
+	raw, _ := json.Marshal(reply)
+	r := IndependentReview{Context: ".swarm/review/context.json"}
+	j := managedFragmentJournal{Entries: []managedFragmentJournalEntry{{Packet: 0, PacketDigest: hash(packet), CallID: "quote-only", State: "interrupted"}}}
+	path := filepath.Join(s.root, ".swarm/review", "quote-only-raw-"+hash(raw)+".json")
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := json.Marshal(j)
+	feedback := s.fragmentRetryFeedback(r, j, p)
+	if !strings.Contains(feedback, "quote absent") || !strings.Contains(feedback, "CITATION") {
+		t.Fatal("rejected quote-only citation lost before diagnostic", feedback)
+	}
+	after, _ := json.Marshal(j)
+	if string(before) != string(after) {
+		t.Fatal("feedback changed journal")
+	}
+	if _, _, err := parseManagedFragmentInspection(string(raw), p); err == nil {
+		t.Fatal("malformed citation promoted into verdict")
+	}
+	p.Candidate = "another-candidate"
+	if s.fragmentRetryFeedback(r, j, p) != "" {
+		t.Fatal("foreign diagnostic reused")
+	}
+	p.Candidate = "candidate"
+	if err := os.WriteFile(path, []byte("tampered"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if s.fragmentRetryFeedback(r, j, p) != "" {
+		t.Fatal("altered original trusted")
+	}
+}

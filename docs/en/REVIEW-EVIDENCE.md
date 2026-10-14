@@ -174,3 +174,5 @@ for commands, results and installation status.
 ### Defect association and protocol recovery
 
 A cited defect requires a `fail` finding for the same artifact. `inspected` or `unknown` with a defect remains an invalid reply, retained with its cost; the engine does not turn it into rejection or acceptance. Citation contract1 permits multiple distinct defects per failed artifact within the shared transport bound; the historical contract requires one entry. Retry diagnostics follow the packet version, retain identities and never write proof into the journal. An allegation can trigger an independent code diagnosis without manufacturing the missing verdict.
+
+An absent or ambiguous citation can fail decoding before findings are constructed. Recovery then separately verifies the candidate, context, packet and immutable original reply identities, and forwards bounded citation diagnostics. It does not fill a line, repair a quote or convert invalid JSON into a verdict. A different candidate, modified packet or altered reply does not authorize this diagnostic.
