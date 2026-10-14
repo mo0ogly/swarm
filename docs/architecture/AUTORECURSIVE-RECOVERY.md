@@ -346,13 +346,22 @@ après réception. Le message final complet est de nouveau mesuré sous le contr
 de transport en octets/tokens avant toute dépense. Une preuve nécessaire réellement
 trop grande reste `unknown`, sans omission ni approbation automatique.
 
-Le journal final version 2 attribue ce calcul aux nouveaux appels. La version 1
-reconstruit exactement le calcul historique pour vérifier ses anciens prompts,
-réponses et dépenses ; elle n'est jamais réécrite pour lui attribuer la nouvelle
-capacité. Une version inconnue ou un prompt attribué à la mauvaise version est
-refusé. Ce contrat de fichier ne change aucun champ du stockage des missions.
-Un ancien moteur ne sait pas traiter un journal final version 2 : installer le
-nouveau moteur sans appel interne ni producteur actif avant les nouvelles revues.
+Le journal final version 3 sépare les deux unités de transport : la capacité
+`selection_bytes_limit` est exprimée en octets UTF-8, tandis que
+`selection_tokens_limit` et les coûts associés utilisent le tokenizer attribué
+au plan. La sélection reçoit les coûts des originaux entiers et leur enveloppe
+JSON dans les deux unités. Les coûts guident la proposition ; le contrôle exact
+du message final reste obligatoire avant sa réservation. Les marges de transport
+existantes restent distinctes des politiques opérateur et aucune limite du modèle
+n'est relevée par cette correction.
+
+Les versions 1 et 2 reconstruisent exactement leurs anciens prompts, réponses et
+dépenses ; aucun journal payé n'est réécrit pour lui attribuer la nouvelle capacité.
+La version 2 mesure les inspections reçues mais convertit conservativement un token
+restant en un octet disponible ; elle peut donc sous-utiliser le contexte. Une
+version inconnue ou un prompt attribué à une autre version est refusé. Ce contrat
+de fichier ne change aucun champ du stockage des missions. Installer le nouveau
+moteur sans appel interne ni producteur actif avant les nouveaux journaux version 3.
 
 ```mermaid
 flowchart TD
@@ -379,13 +388,13 @@ toutes les classes d'incident, ni l'acceptation de la mission jusqu'au RETEX.
 
 ## Reprendre une ancienne sélection après correction générale de capacité
 
-`review_selection_capacity_changed` exige un journal final version 1 entièrement
+`review_selection_capacity_changed` exige un journal final version 1 ou 2 entièrement
 attesté, terminé à la phase de sélection `unknown`, sans verdict final de tâche,
 avec toutes ses inspections réutilisables et une augmentation calculée de la
 capacité sous le contrat courant. Le texte du motif ne crée pas cette autorité.
 Candidat, contrat, tentative, fournisseur, modèle, méthode et preuves restent
 attribués et intacts. Cette route ne reprend ni une sélection sous le contrat
-courant ni un refus ou un `unknown` final de tâche.
+version 3 ni un refus ou un `unknown` final de tâche.
 
 Une entrée fraîche fournit les faits avant/après et rattache l'avis exact, même
 déjà acquitté, à la réception persistée. Le superviseur propriétaire décide
@@ -395,7 +404,7 @@ La projection ne reprend pas une connexion au stockage qu'elle détient déjà.
 Aucune réservation n'est faite pendant cette projection ou décision.
 
 L'ancien journal, l'avis, l'acquittement et tous les appels consommés sont conservés.
-Un nouveau journal final version 2 reçoit la décision identifiée pour la sélection
+Un nouveau journal final version 3 reçoit la décision identifiée pour la sélection
 et le vérificateur final. Les inspections originales restent immuables ; aucune
 nouvelle production n'est engagée. Le parcours opérateur exige sa confirmation
 explicite. Une preuve remplacée ou une précondition inchangée refuse la reprise.
@@ -409,7 +418,7 @@ sequenceDiagram
     M->>S: Entree fraiche, original exact, capacite avant/apres
     S->>M: Decision review-retry avec correction motivee
     M->>M: Preuves, droits, budget, producteur termine dans la transaction
-    M->>M: Historique preserve et nouveau journal version 2
+    M->>M: Historique preserve et nouveau journal version 3
     M->>R: Selection avec decision recue et inspections originales
     R->>M: Pieces necessaires ou unknown
     M->>R: Message final complet controle avant reservation

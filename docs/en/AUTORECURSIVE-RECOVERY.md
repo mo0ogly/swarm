@@ -317,12 +317,19 @@ hide available space. The complete final message is measured again against its
 byte/token transport contract before spending. Genuinely oversized necessary
 evidence remains `unknown`, without omission or automatic approval.
 
-Final journal version 2 attributes this calculation to new calls. Version 1
-reconstructs historical calculations exactly to verify original prompts, replies
-and spending. Old journals are not rewritten with new capacity. Unknown versions
-and prompts attributed to another version are rejected. No mission storage field
-changes. Older engines cannot process final journal version 2: install the new
-engine with no active internal call or producer before new reviews begin.
+Final journal version 3 separates transport units: `selection_bytes_limit`
+is UTF-8 bytes, while `selection_tokens_limit` and associated costs use the
+plan's attributed tokenizer. Selection receives whole-original and JSON-envelope
+costs in both units. These costs guide the proposal; exact final-message validation
+remains mandatory before reservation. Existing transport margins remain distinct
+from operator policy. This correction does not raise any model limit.
+
+Versions 1 and 2 reconstruct their original prompts, replies and spending exactly.
+Paid journals are never rewritten with new capacity. Version 2 measures received
+inspections but conservatively treats each remaining token as one available byte,
+which can underuse context. Unknown versions and prompts attributed to another
+version are rejected. No mission storage field changes. Install the new engine
+with no active internal call or producer before creating version 3 journals.
 
 ```mermaid
 flowchart TD
@@ -348,11 +355,11 @@ native recovery for every incident class or mission acceptance through RETEX.
 
 ## Restart historical selection after a verified capacity correction
 
-`review_selection_capacity_changed` requires an attested version 1 final journal
+`review_selection_capacity_changed` requires an attested version 1 or 2 final journal
 ending at selection-stage `unknown`, with no final task verdict, all original
 inspections reusable and a calculated capacity increase under the current contract.
 Reason wording grants no authority. Candidate, contract, attempt, provider, model,
-review method and evidence remain intact. Current-contract selection uncertainty
+review method and evidence remain intact. Version 3 selection uncertainty
 and final task uncertainty or rejection cannot use this route.
 
 A fresh persisted delivery binds the exact original, including an acknowledged
@@ -363,7 +370,7 @@ the existing transaction connection. Delivery cannot reacquire the database
 connection it already holds. Projection and decision spend no reviewer calls.
 
 The old journal, unknown result, acknowledgement and spending remain unchanged.
-A new version 2 final journal receives the identified decision for selection and
+A new version 3 final journal receives the identified decision for selection and
 the final reviewer, using immutable inspections without further production.
 Operator recovery requires explicit confirmation through the public operation.
 Changed evidence and unchanged preconditions remain refused. An independent
@@ -377,7 +384,7 @@ sequenceDiagram
     M->>S: Fresh input, exact original, before/after capacity
     S->>M: Authorized review-retry with corrective instruction
     M->>M: Evidence, authority, budget, producer ended in transaction
-    M->>M: Preserve history and create version 2 final journal
+    M->>M: Preserve history and create version 3 final journal
     M->>R: Selection with received decision and original inspections
     R->>M: Necessary originals or unknown
     M->>R: Complete final message checked before reservation

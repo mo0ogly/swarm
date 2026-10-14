@@ -18,7 +18,7 @@ func finalJournalFixture(t *testing.T) (managedReviewContext, managedReviewFragm
 		j.Entries = append(j.Entries, managedFragmentJournalEntry{Packet: i, PacketDigest: hash(raw), CallID: fmt.Sprintf("inspection-%d", i), State: "inspected", Reply: replies[i], ReplyDigest: hash([]byte(replies[i]))})
 	}
 	raw, _ = json.Marshal(j)
-	f := managedFragmentFinalJournal{Version: 2, InspectionDigest: hash(raw)}
+	f := managedFragmentFinalJournal{Version: 3, InspectionDigest: hash(raw)}
 	raw, _ = json.Marshal(p)
 	request := managedFragmentFinalRequest{Candidate: c.Candidate, ContextDigest: p.ContextDigest, PlanDigest: hash(raw), State: "ready", Reason: "Existing original evidence supports final assessment", References: []managedFragmentEvidenceRef{}}
 	raw, _ = json.Marshal(request)
@@ -45,7 +45,7 @@ func finalJournalFixture(t *testing.T) (managedReviewContext, managedReviewFragm
 }
 
 func TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts(t *testing.T) {
-	for _, version := range []int{1, 2} {
+	for _, version := range []int{1, 2, 3} {
 		t.Run(fmt.Sprint(version), func(t *testing.T) {
 			c, p, j, f := finalJournalFixture(t)
 			replies := make([]string, len(j.Entries))
@@ -67,11 +67,11 @@ func TestManagedFragmentFinalJournalPreservesVersionedSelectionPrompts(t *testin
 			if string(before) != string(after) {
 				t.Fatal("historical journal rewritten")
 			}
-			f.Version = 3 - version
+			f.Version = version%3 + 1
 			if _, _, err := validateManagedFragmentFinalJournal(f, j, c, p, ""); err == nil {
 				t.Fatal("old paid prompt attributed to other capacity version")
 			}
-			f.Version = 3
+			f.Version = 4
 			if _, _, err := validateManagedFragmentFinalJournal(f, j, c, p, ""); err == nil {
 				t.Fatal("unknown final version accepted")
 			}

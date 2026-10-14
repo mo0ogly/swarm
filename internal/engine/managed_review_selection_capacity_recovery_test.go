@@ -364,3 +364,113 @@ func TestSelectionCapacityRecoveryRequiresHistoricalSelectionAndExplicitOperator
 		})
 	}
 }
+
+// Synthetic historical records in an isolated store qualify V2 tokenized
+// admission. This is not a native-provider capability or execution receipt.
+func TestSelectionCapacityRecoveryTokenizedVersion2OperatorQueuesVersion3(t *testing.T) {
+	s, w, a := selectionCapacityLegacyFixture(t, "root")
+	task, _ := w.task(a.TaskID)
+	r := *task.IndependentReview
+	p, j, err := s.readFragmentJournalAnchor(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f, c, prefix, err := s.readManagedFragmentFinal(r, p, j)
+	if err != nil {
+		t.Fatal(err)
+	}
+	budget := reviewTokenBudgetFixture()
+	budget.ProviderDigest = r.BatchProviderDigest
+	budget.ClientVersion = "isolated-historical-client"
+	budget.ClientStamp = strings.Repeat("c", 64)
+	budget.CapabilityDigest = strings.Repeat("d", 64)
+	p.Version = 4
+	p.InputBudget = &budget
+	for i := range p.Packets {
+		p.Packets[i].Version = 4
+		p.Packets[i].InputBudget = &budget
+	}
+	raw, _ := json.Marshal(p)
+	j.PlanDigest = hash(raw)
+	replies := make([]string, len(p.Packets))
+	for i := range j.Entries {
+		entry := &j.Entries[i]
+		packetRaw, _ := json.Marshal(p.Packets[entry.Packet])
+		entry.PacketDigest = hash(packetRaw)
+		var inspection managedFragmentInspection
+		if err := json.Unmarshal([]byte(entry.Reply), &inspection); err != nil {
+			t.Fatal(err)
+		}
+		inspection.PacketDigest = entry.PacketDigest
+		reply, _ := json.Marshal(inspection)
+		entry.Reply = string(reply)
+		entry.ReplyDigest = hash(reply)
+		replies[entry.Packet] = string(reply)
+	}
+	prompt, err := managedFragmentRequestPromptVersion(prefix, c, p, replies, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var request managedFragmentFinalRequest
+	json.Unmarshal([]byte(f.Calls[0].Reply), &request)
+	request.PlanDigest = j.PlanDigest
+	reply, _ := json.Marshal(request)
+	f.Version = 2
+	journalRaw, _ := json.Marshal(j)
+	f.InspectionDigest = hash(journalRaw)
+	f.Calls[0].PromptDigest = hash([]byte(prompt))
+	f.Calls[0].Reply = string(reply)
+	f.Calls[0].ReplyDigest = hash(reply)
+	anchor := *r.FragmentJournal
+	write := func(kind string, value any) (string, string) {
+		t.Helper()
+		raw, err := json.Marshal(value)
+		if err != nil {
+			t.Fatal(err)
+		}
+		name := filepath.ToSlash(filepath.Join(filepath.Dir(r.Context), "token-history-"+kind+"-"+hash(raw)+".json"))
+		if err = os.WriteFile(filepath.Join(s.root, name), raw, 0600); err != nil {
+			t.Fatal(err)
+		}
+		return name, hash(raw)
+	}
+	anchor.Plan, anchor.PlanDigest = write("plan", p)
+	anchor.Journal, anchor.JournalDigest = write("journal", j)
+	anchor.FinalJournal, anchor.FinalJournalDigest = write("final", f)
+	r.FragmentJournal = &anchor
+	r.ModelRoute = &ModelRoute{Model: budget.Model}
+	w, err = s.mutate(w.ID, "fixture.v2-token-history", "fixture-v2-token-history", w.Revision, []byte(`{}`), func(current *Work) error { task, _ := current.task(a.TaskID); task.IndependentReview = &r; return nil })
+	if err != nil {
+		t.Fatal(err)
+	}
+	original, err := os.ReadFile(filepath.Join(s.root, anchor.FinalJournal))
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ = w.task(a.TaskID)
+	prepared, err := s.prepareSelectionCapacityRestart(w, task)
+	if err != nil || prepared == nil || prepared.Facts.After <= prepared.Facts.Before || prepared.Facts.Required != 2 {
+		t.Fatal("valid V2 capacity change not routed", prepared, err)
+	}
+	req := PlanningRequest{Schema: 1, EventID: "operator-v2-capacity-retry", Revision: w.Revision, Task: a.TaskID, Reason: "Measured separate byte and token capacity; original source and spending preserved."}
+	if _, err = s.planningChange(w.ID, "retry-review", req); err == nil {
+		t.Fatal("missing operator confirmation accepted")
+	}
+	req.ConfirmReviewErrorRepair = true
+	after, err := s.planningChange(w.ID, "retry-review", req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	queued, _ := after.task(a.TaskID)
+	if queued.IndependentReview.State != "queued" || after.Planning.Reviewer.Calls != w.Planning.Reviewer.Calls || len(queued.Attempts) != len(task.Attempts) || queued.IndependentReview.FragmentJournal.JournalDigest != anchor.JournalDigest || len(queued.PreviousReviews) == 0 {
+		t.Fatal("V2 retry lost history or spent calls")
+	}
+	resumed, _, _, err := s.readManagedFragmentFinal(*queued.IndependentReview, p, j)
+	if err != nil || resumed.Version != 3 || len(resumed.Calls) != 0 {
+		t.Fatal("V3 final journal not applied", resumed.Version, err)
+	}
+	kept, err := os.ReadFile(filepath.Join(s.root, anchor.FinalJournal))
+	if err != nil || string(kept) != string(original) {
+		t.Fatal("original V2 journal changed", err)
+	}
+}

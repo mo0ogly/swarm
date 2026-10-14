@@ -56,7 +56,7 @@ func finalReservation(t *testing.T, c managedReviewContext, p managedReviewFragm
 	if e != nil {
 		t.Fatal(e)
 	}
-	return managedFragmentFinalJournal{Version: 2, InspectionDigest: hash(raw), Calls: []managedFragmentFinalCall{{Phase: "selection", CallID: "final-select", PromptDigest: hash([]byte(prompt)), State: "reserved"}}}
+	return managedFragmentFinalJournal{Version: 3, InspectionDigest: hash(raw), Calls: []managedFragmentFinalCall{{Phase: "selection", CallID: "final-select", PromptDigest: hash([]byte(prompt)), State: "reserved"}}}
 }
 func TestManagedFragmentFinalStoreReservationAndReply(t *testing.T) {
 	s, w, a, r, p, j, c, replies, prefix := finalStoreFixture(t)

@@ -45,7 +45,7 @@ func managedSelectionCapacity(prefix string, c managedReviewContext, p managedRe
 }
 
 // Only an independently verified transport-contract change can reopen a
-// historical selection-stage uncertainty. A final task unknown/fail, v2
+// historical selection-stage uncertainty. A final task unknown/fail, v3
 // selection, modified proof, active producer or unchanged capacity cannot.
 // This is read-only and spends nothing; the supervisor must still decide.
 func (s *Store) prepareSelectionCapacityRestart(w Work, task *Task) (*preparedSelectionCapacityRestart, error) {
@@ -70,7 +70,7 @@ func (s *Store) prepareSelectionCapacityRestart(w Work, task *Task) (*preparedSe
 	if err != nil {
 		return nil, err
 	}
-	if f.Version != 1 || len(f.Calls) == 0 || f.Calls[len(f.Calls)-1].Phase != "selection" {
+	if (f.Version != 1 && f.Version != 2) || len(f.Calls) == 0 || f.Calls[len(f.Calls)-1].Phase != "selection" {
 		return nil, nil
 	}
 	state, records, err := validateManagedFragmentFinalJournal(f, j, c, p, prefix)
@@ -97,11 +97,11 @@ func (s *Store) prepareSelectionCapacityRestart(w Work, task *Task) (*preparedSe
 	if err != nil {
 		return nil, err
 	}
-	before, err := managedSelectionCapacity(callPrefix, c, p, replies, 1)
+	before, err := managedSelectionCapacity(callPrefix, c, p, replies, f.Version)
 	if err != nil {
 		return nil, err
 	}
-	after, err := managedSelectionCapacity(callPrefix, c, p, replies, 2)
+	after, err := managedSelectionCapacity(callPrefix, c, p, replies, 3)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (s *Store) planningSelectionCapacityRecovery(w Work, events []PlanningEvent
 }
 
 // Apply only after a fresh, exact receipt and explicit authorized decision.
-// Keep the original terminal unknown in history. Start a new v2 final journal,
+// Keep the original terminal unknown in history. Start a new v3 final journal,
 // reuse unchanged inspected originals and reserve new calls only in the runner.
 func (s *Store) applySelectionCapacityRestart(w *Work, task *Task, prepared *preparedSelectionCapacityRestart, directive *ManagedReviewRetryDirective) error {
 	if prepared == nil || prepared.Revision != w.Revision {
@@ -198,7 +198,7 @@ func (s *Store) applySelectionCapacityRestart(w *Work, task *Task, prepared *pre
 	for i := range replies {
 		replies[i] = reusable[i]
 	}
-	capacity, err := managedSelectionCapacity(prefix, c, p, replies, 2)
+	capacity, err := managedSelectionCapacity(prefix, c, p, replies, 3)
 	if err != nil {
 		return err
 	}
@@ -210,7 +210,7 @@ func (s *Store) applySelectionCapacityRestart(w *Work, task *Task, prepared *pre
 		return err
 	}
 	journalRaw, _ := json.Marshal(j)
-	f := managedFragmentFinalJournal{Version: 2, InspectionDigest: hash(journalRaw), Calls: []managedFragmentFinalCall{}}
+	f := managedFragmentFinalJournal{Version: 3, InspectionDigest: hash(journalRaw), Calls: []managedFragmentFinalCall{}}
 	raw, err := json.Marshal(f)
 	if err != nil {
 		return err
@@ -228,7 +228,7 @@ func (s *Store) applySelectionCapacityRestart(w *Work, task *Task, prepared *pre
 	r.FailureCode = ""
 	r.Finished = ""
 	r.TimeoutSeconds = timeout
-	r.Reason = "Replan de sélection autorisé sous capacité vérifiée version2 ; avis original, inspections et dépenses conservés. Aucun verdict métier présumé."
+	r.Reason = "Replan de sélection autorisé sous capacité vérifiée version3 ; avis original, inspections et dépenses conservés. Aucun verdict métier présumé."
 	task.IndependentReview = &r
 	task.PlanningRetry = false
 	return nil

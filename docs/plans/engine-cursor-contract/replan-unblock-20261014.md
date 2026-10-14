@@ -130,3 +130,60 @@ RETEX de méthode : un contrôle de la copie conservée a été lancé une fois 
 Qualification canonique de cette deuxième boucle :34 tests principaux et53 variantes PASS14,423s ; import8cas sans mutation partielle, cycles produits par judge/renew, quota0 sans plafond et legacy nil conservés. Une ancienne fixture de quota injectait Cycle3 sans historique : son échec est conservé, puis fixture corrigée par deux transitions publiques. Une erreur de fermeture de test a causé un FAIL setup sans aucun test exécuté ; corrigée puis reçu qualified distinct. Vet du paquet, workflows12skills et diff check passent. Revue source indépendante favorable, sans verdict natif. Corrections critiques séparées :9e747fa feedback, a44dc5c admission du juge, fe3e04f aliases plats ; manifeste de livraison dépend de ces trois deltas.
 
 Un verrou Git temporaire a refusé les premiers ajouts/commits ; aucun verrou supprimé. Après observation de sa disparition, les index/diffs réels ont été vérifiés puis les commits manquants exécutés, sans répéter un état inchangé. Une séquence de mutation doit s’arrêter au premier échec pour éviter de poursuivre avec un index incomplet. Installation puis nouveau résultat T2 attribué et revue native restent nécessaires ; compteur88, six appels de réponses invalides conservés.
+
+
+## Sélection valide UNKNOWN : diagnostic de capacité et reprise version 3
+
+Après la remise corrective, la revue T2 `review-e5bd47ffef6aeaa4a5397982`
+termine en `unknown` à la sélection, avec un journal final version 2 intact,
+sans verdict de tâche. État public observé : révision 881, 93 appels de revue
+consommés, aucune nouvelle tentative ni activation, mode manuel. Ce résultat
+ne constitue ni un défaut de protocole ni une acceptation.
+
+Le premier oracle a échoué sur sa propre précondition : il comparait à tort
+l'empreinte du préfixe avec `WorkflowDigest`, qui attribue en réalité le descripteur
+et la méthode sérialisés ensemble. Après correction de ce contrôle, les entrées
+originales immuables reproduisent la sous-capacité : quatre parties du manifeste,
+201 860 octets encodés, tiennent dans un message final de 373 780 octets et
+135 652 tokens, avec 24 444 tokens restants ; le sélecteur version 2 annonce
+seulement 110 284 octets. Cette mesure ne prouve pas la suffisance métier du dossier.
+
+Décision : séparer les capacités en octets et tokens dans un nouveau protocole
+version 3 ; préserver le contrôle exact, les inspections payées et la reconstruction
+historique des versions 1/2. La route publique de reprise reste conditionnée à
+une augmentation mesurée, aux preuves intactes et à une décision autorisée ; elle
+ne reprend pas un verdict final défavorable ni une précondition inchangée.
+Alternative écartée : relever les limites techniques du modèle ou relancer toutes
+les inspections sans nouvelle preuve. Les demandes trop larges portant sur tous
+les 1 050 fichiers doivent être examinées par la revue selon les quatre critères T2 ;
+le moteur ne supprime aucune réserve et ne décide pas de leur pertinence métier.
+
+Qualification locale : reproducer portable et oracle sur copies immuables ;
+contrôles ciblés de prompts historiques, réception/décision/application, refus,
+pause, concurrence et dépenses. Les originaux sont dans la zone de vérification
+existante `replan-native-unblock-20261014-selection-*`. Déploiement et effet public
+restent à vérifier ; cette section ne clôt ni T2, ni T3, ni le RETEX.
+
+
+Complément de revue V3 : le comptage direct des pièces réutilisées pouvait contourner
+le garde lexical du tokenizer. Le reproducer historique échoue avant correction
+(aucun garde, erreur attendue absente), puis passe avec le comptage par `measure`.
+La pièce originale reste intacte. Revue indépendante finale du delta : approve
+(`replan-native-unblock-20261014-selection-v3-review-final.md`).
+
+Résultats attribués : premier lot ciblé 14 tests principaux/45 sous-cas PASS ;
+lot race 17 principaux/45 sous-cas PASS, 366,426 s, antérieur au petit correctif
+lexical ; qualification post-correctif des trois reproductions PASS, 7,552 s ;
+route publique V2 tokenisée→confirmation→journal V3 PASS, puis le même cas race
+PASS 25,316 s. Ce dernier utilise un historique synthétique en stockage isolé :
+il prouve l'admission et la conservation, pas la capacité d'un vrai fournisseur.
+Les assertions refusent confirmation absente, préconditions inchangées et limites
+réelles dépassées. Les gardes transactionnels et de concurrence déjà qualifiés
+restent inchangés. Aucune suite Go complète n'a été exécutée pour ce correctif.
+
+Le diagnostic indépendant distingue aussi quatre originaux réellement manquants :
+`agent_exchange.go`, `model.go`, `budgets.go`, `assist_guard.go`, total 50 948 octets
+bruts dans le candidat. Les trois premiers sont pertinents aux gardes de fraîcheur,
+tentative et réservation ; le dernier qualifie le contexte borné. Avant un nouvel
+appel, compléter ce dossier par une route publique attribuée, avec les anciennes
+preuves et dépenses conservées. La correction de transport seule ne clôt pas T2.

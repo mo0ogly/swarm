@@ -60,7 +60,7 @@ func (s *Store) readManagedFragmentFinal(r IndependentReview, p managedReviewFra
 		return empty, c, "", fmt.Errorf("ancrage final absent")
 	}
 	journalRaw, _ := json.Marshal(j)
-	f := managedFragmentFinalJournal{Version: 2, InspectionDigest: hash(journalRaw)}
+	f := managedFragmentFinalJournal{Version: 3, InspectionDigest: hash(journalRaw)}
 	if anchor.FinalJournalDigest != "" {
 		path, err = safeReport(s.root, anchor.FinalJournal)
 		if err != nil {
