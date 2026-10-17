@@ -347,7 +347,7 @@
   {
     "path": "docs/DENSE-TEXT.md",
     "kind": "doc",
-    "sha256": "604cd4ecf621d84e5dcc2d61f529dfc71518d85fff248ce710794adf966bd655"
+    "sha256": "370e5ad5896304ebaf557a09a1a3aa1ffbc74692852a72b76c4932be56ea676b"
   },
   {
     "path": "docs/ENGINE-BUSINESS-CONTROLS.md",
@@ -657,7 +657,7 @@
   {
     "path": "docs/en/DENSE-TEXT.md",
     "kind": "doc",
-    "sha256": "522654ddc99ebb45a4bacca2a8a8fd447f80a905567defb61e62a2c3115e871d"
+    "sha256": "40629b7c43034358b431bc3bad8dfcded32162dd3dc669e50efd385e8af151ca"
   },
   {
     "path": "docs/en/ENGINE-ACCEPTANCE.md",
@@ -1032,7 +1032,7 @@
   {
     "path": "docs/reports/window-identity-20261017.md",
     "kind": "doc",
-    "sha256": "bd7151893e359b5ca450edce4f449c197fb0b343052d2a295668e48d949fce32"
+    "sha256": "8d6cc0cc824542fa6c6cc4845e2643fc1c29f4c80621f7d34f2b2a4ceda9bfcc"
   },
   {
     "path": "docs/screenshots/graph-delivery-d01/en-etat-graph.png",

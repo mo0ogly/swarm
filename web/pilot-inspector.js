@@ -3,6 +3,42 @@ const tr_web_pilot_inspector_js = source => globalThis.SwarmI18n?.t(source) ?? s
 
 const PilotInspector={
  generation:0,key:'',loaded:null,opener:null,
+ row(label,value){const p=node('p',undefined,'pilot-info-row');p.append(node('strong',tr_web_pilot_inspector_js(label)+' : '),node('span',value));return p},
+ disclosure(label,id){const d=node('details'),s=node('summary',tr_web_pilot_inspector_js(label));d.id=id;s.dataset.inspectorAction=id;d.append(s);return d},
+ role(role){return tr_web_pilot_inspector_js({worker:'Réaliser le travail',planner:'Préparer le plan',subplanner:'Organiser une partie du plan',reviewer:'Vérifier le travail',supervisor:'Coordonner le travail',preparation:'Préparer le projet'}[role]||'Rôle non renseigné')},
+ blocker(original){
+  const box=node('div',undefined,'notice attention pilot-blocker');
+  // managedGitText prefixes failures with the operation. Do not infer a repair
+  // from an object hash, repository path or provider-specific stderr wording.
+  if(/^git\s+cat-file\s*:/.test(original)){
+   box.append(node('strong',tr_web_pilot_inspector_js('Lecture du dépôt Git impossible')),node('p',tr_web_pilot_inspector_js('Swarm ne peut pas lire une version du code nécessaire à cette tâche.')),node('p',tr_web_pilot_inspector_js('Faites vérifier ou restaurer le dépôt de cette tentative avant de relancer. Autoriser un essai supplémentaire ne répare pas le dépôt.')));
+   const d=this.disclosure('Message technique original','pilot-blocker-technical');d.append(node('pre',original));box.append(d);
+  }else box.append(this.row('Ce qui bloque',original));
+  return box;
+ },
+ agentSettings(t,a){
+  const d=this.disclosure('IA et consignes utilisées','pilot-agent-settings');
+  if(a){
+   d.append(this.row('IA choisie',a.provider+' · '+(a.model_route?.model||tr_web_pilot_inspector_js('Modèle non renseigné'))),this.row('Modèle confirmé par le fournisseur',a.reported_model?.model||tr_web_pilot_inspector_js('Non communiqué')));
+   if(a.workflow?.project)d.append(this.row('Consignes du projet',''),ProjectProfiles.badge(a.workflow));
+   else d.append(this.row('Consignes du projet',tr_web_pilot_inspector_js('Les consignes utilisées par cette tentative ne sont pas connues.')));
+  }else d.append(this.row('Choix pour le prochain lancement',TaskModels.text(t,null)));
+  d.append(Pilot.command(tr_web_pilot_inspector_js('Choisir l’IA pour cette tâche'),()=>TaskModels.open(t.id)));
+  return d;
+ },
+ dependencies(t){
+  const section=node('section',undefined,'pilot-section');section.id='pilot-task-dependencies';
+  const waiting=snapshot.pilotage?.tasks?.[t.id]?.waiting_on;
+  section.append(node('h4',tr_web_pilot_inspector_js('Avant de commencer')));
+  const list=(ids,prerequisite)=>{const ul=node('ul',undefined,'pilot-related-tasks');for(const id of ids){const related=snapshot.work.tasks.find(x=>x.id===id),li=node('li');if(related){const b=this.action(Pilot.taskTitle(related),()=>Pilot.inspect('task',id),'related:'+id);b.dataset.relatedTask=id;const state=snapshot.validation?.tasks?.[id]?.state||related.status;li.append(b,node('span',prerequisite&&state==='accepted'?tr_web_pilot_inspector_js('Validation à revérifier'):(labels[state]||state),'pilot-muted'))}else li.append(node('span',tr_web_pilot_inspector_js('Tâche absente du plan')));ul.append(li)}return ul};
+  if(!Array.isArray(waiting))section.append(node('p',tr_web_pilot_inspector_js('L’état des tâches préalables est indisponible. Actualisez avant de décider.')));
+  else if(waiting.length)section.append(node('p',tr_web_pilot_inspector_js('Ces tâches doivent être validées avant de lancer celle-ci. Ouvrez une tâche pour voir ce qui reste à faire.')),list(waiting,true));
+  else section.append(node('p',tr_web_pilot_inspector_js('Aucune tâche préalable à attendre.')));
+  const descendants=PilotGraph.descendants(snapshot.work.tasks,t.id);
+  if(descendants.length){const d=this.disclosure('Tâches qui dépendent de ce résultat','pilot-downstream-tasks');d.append(node('p',tr_web_pilot_inspector_js('Ces tâches utilisent ce résultat, directement ou via une autre tâche. Elles peuvent avoir d’autres conditions de démarrage.')),list(descendants,false));section.append(d)}
+  else section.append(node('p',tr_web_pilot_inspector_js('Aucune autre tâche ne dépend de ce résultat.')));
+  return section;
+ },
  mount(){
   if($('pilot-inspector'))return;
   const panel=node('dialog',undefined,'pilot-inspector');panel.id='pilot-inspector';panel.setAttribute('aria-labelledby','pilot-inspector-title');
@@ -51,11 +87,13 @@ const PilotInspector={
   if(signature===Pilot.inspectorKey&&!open)return;Pilot.inspectorKey=signature;const token=++this.generation;
   const body=$('pilot-inspector-body'),focusKey=document.activeElement?.dataset.inspectorAction;
   const readerFocus={key:document.activeElement?.closest('.text-reader')?.dataset.readerKey,action:document.activeElement?.dataset.readerAction};
-  const activityExpanded=body.querySelector('#pilot-activity-details')?.open===true;
+  const detailKey=work+'/'+selected.kind+'/'+selected.id;
+  const expanded=this.key===detailKey?[...body.querySelectorAll('details[id][open]')].map(d=>d.id):[];this.key=detailKey;
   SwarmTextReader.capture(body);
   body.replaceChildren();
   $('pilot-inspector-title').textContent=decision?tr_web_pilot_inspector_js('Intervention à examiner'):t?.status==='submitted'?tr_web_pilot_inspector_js('Résultat à examiner')+(a?' — '+a.provider:''):a?'Agent '+a.provider:Pilot.taskTitle(t);
-  const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);if(a)mission.append(ProjectProfiles.badge(a.workflow));if(t&&typeof TaskModels!=='undefined')mission.append(node('p',TaskModels.text(t,a)),Pilot.command(tr_web_pilot_inspector_js('Modèle de la tâche'),()=>TaskModels.open(t.id)));
+  const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);
+  let recovery=null;
   if(!t&&!decision){body.append(node('p',tr_web_pilot_inspector_js('Élément supprimé ou indisponible. Aucune commande ne sera exécutée.'),'notice attention'));this.queueFooter(body);return}
   if(t){
    mission.append(node('h3',Pilot.taskTitle(t)));
@@ -67,8 +105,8 @@ const PilotInspector={
    }
    const state=validation?.state||t.status;const badge=node('p',uncertain||(state==='running'?tr_web_pilot_inspector_js('Résultat de la tâche : pas encore validé'):tr_web_pilot_inspector_js('Validation actuelle : ')+(labels[state]||state)),'pilot-validation');badge.dataset.state=uncertain?'stale':state;mission.append(badge);
    if(t.status==='submitted')body.append(this.reviewControls(t,a?.id));
-   else if(!t.launch_held){const recovery=this.recoveryControls(t,a,h);if(recovery)body.append(recovery)}
-   body.append(node('p',snapshot.work.objective));
+   else if(!t.launch_held)recovery=this.recoveryControls(t,a,h);
+   if(typeof TaskModels!=='undefined')mission.append(this.agentSettings(t,a));
    const purpose=node('section',undefined,'pilot-section');purpose.classList.add('pilot-purpose');purpose.append(node('h4',tr_web_pilot_inspector_js('Ce qui était demandé')));
    const criteria=node('ul');for(const c of t.criteria||[])criteria.append(node('li',c));purpose.append(criteria);
    body.append(purpose);
@@ -83,14 +121,13 @@ const PilotInspector={
   if(a){
    body.append(this.action(['terminal','dialogue'].includes(a.mode)?tr_web_pilot_inspector_js('Ouvrir la session interactive'):tr_web_pilot_inspector_js('Voir la session de l’agent'),()=>AgentTerminal.open(a),'terminal'));
    const health=node('section',undefined,'pilot-section');health.id='pilot-current-activity';
-   health.append(node('h4',tr_web_pilot_inspector_js('Rôle, processus, activité et validation')));
+   health.append(node('h4',tr_web_pilot_inspector_js('Ce que fait l’agent')));
    const explanation=this.activityExplanation(a,h,uncertain);
    const identity=snapshot.pilotage?.tasks?.[tid]?.attempt||{};
-   health.append(node('p',tr_web_pilot_inspector_js('Rôle déclaré : ')+(identity.role||tr_web_pilot_inspector_js('Rôle à préciser'))),node('p',tr_web_pilot_inspector_js('Processus : ')+explanation.state),node('p',tr_web_pilot_inspector_js('Activité : ')+explanation.operation),node('p',tr_web_pilot_inspector_js('Prochaine action : ')+explanation.next),node('p',tr_web_pilot_inspector_js('Validation : ')+(labels[validation?.state||t?.status]||tr_web_pilot_inspector_js('inconnue'))));
-   if(t?.deliverable)health.append(node('p',tr_web_pilot_inspector_js('Résultat attendu : ')+t.deliverable));
-   health.append(node('p',typeof a.usage?.provider_reported_cost_usd==='number'?tr_web_pilot_inspector_js('Coût de cette tentative : ')+a.usage.provider_reported_cost_usd.toFixed(2)+' USD':tr_web_pilot_inspector_js('Coût inconnu : le fournisseur n’a pas transmis de montant à Swarm.')));
-   const details=node('details');details.id='pilot-activity-details';details.open=activityExpanded;
-   details.append(node('summary',tr_web_pilot_inspector_js('Voir la commande et les signaux techniques')));
+   health.append(this.row('Mission de l’agent',this.role(identity.role||a.role)),this.row('Exécution de l’agent',explanation.state),this.row('Dernière activité',explanation.operation),this.row('État du travail',(labels[validation?.state||t?.status]||tr_web_pilot_inspector_js('inconnue'))));
+   if(t?.deliverable)health.append(this.row('Résultat attendu',t.deliverable));
+   health.append(this.row('Coût de cette tentative',typeof a.usage?.provider_reported_cost_usd==='number'?a.usage.provider_reported_cost_usd.toFixed(2)+' USD':tr_web_pilot_inspector_js('Coût inconnu : le fournisseur n’a pas transmis de montant à Swarm.')));
+   const details=this.disclosure('Voir la commande et les signaux techniques','pilot-activity-details');
    details.append(node('p',tr_web_pilot_inspector_js('Validation actuelle de la tâche : ')+(t?.status==='running'?tr_web_pilot_inspector_js('pas encore validée'):labels[validation?.state||t?.status]||'inconnue')));
    for(const [title,text]of [[tr_web_pilot_inspector_js('Exécution'),uncertain||(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label)||tr_web_pilot_inspector_js('Observation indisponible')],[tr_web_pilot_inspector_js('Activité reçue'),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label)||tr_web_pilot_inspector_js('Non connue')]]){
     const row=node('p');row.append(node('strong',title+' : '),node('span',text));details.append(row);
@@ -104,25 +141,24 @@ const PilotInspector={
    if(a.parent||a.previous)body.append(this.relations(a));
   }
   if(t){
-   const descendants=PilotGraph.descendants(snapshot.work.tasks,t.id);
-   const blockers=snapshot.pilotage?.tasks[t.id]?.waiting_on||[];
-   const impacts=node('section',undefined,'pilot-section');
-   impacts.append(node('h4',tr_web_pilot_inspector_js('Dépendances et impact')),node('p',descendants.length?descendants.length+tr_web_pilot_inspector_js(' tâches en aval : ')+descendants.join(', ')+'. Elles peuvent avoir d’autres prérequis.':tr_web_pilot_inspector_js('Aucune tâche ne dépend de celle-ci.')));
-   if(blockers.length)impacts.append(node('p',tr_web_pilot_inspector_js('Prérequis manquants : ')+blockers.join(', ')));
+   const impacts=this.dependencies(t);
    for(const message of validation?.blockers||[])impacts.append(node('p',message,'notice attention'));
    body.append(impacts);
    const actions=node('section',undefined,'pilot-section');actions.id='pilot-inspector-commands';
    actions.append(node('h4',tr_web_pilot_inspector_js('Que faire maintenant ?')));
    if(t.status==='submitted')actions.append(node('p',tr_web_pilot_inspector_js('L’exécution a produit un résultat. Lisez le rapport et les preuves avant toute décision de validation.')));
    if(Pilot.queue&&selected.kind==='task'&&!['blocked','submitted'].includes(t.status))actions.append(node('p',tr_web_pilot_inspector_js('Cette tâche ne requiert plus cette intervention. Son état a changé.'),'notice info'));
-   if(t.status==='blocked')actions.append(node('p',t.blocker||tr_web_pilot_inspector_js('Examiner le motif de blocage avant toute reprise.')));
+   if(recovery)actions.append(recovery);
+   const waiting=snapshot.pilotage?.tasks?.[t.id]?.waiting_on;
+   if(waiting?.length)actions.append(node('p',tr_web_pilot_inspector_js('Commencez par les tâches indiquées dans « Avant de commencer ».')));
    const opts=snapshot.task_actions?.[t.id]||[];
    const primary=opts.find(x=>x.conseillee&&x.disponible);
    if(h?.stop_requested)actions.append(node('p',tr_web_pilot_inspector_js('Arrêt déjà demandé — confirmation attendue.'),'notice info'));
-   if(t.status!=='submitted'&&primary&&!(primary.kind==='stop'&&h?.stop_requested))actions.append(this.action(primary.kind==='report'?tr_web_pilot_inspector_js('Ouvrir les conclusions du rapport'):tr_web_pilot_inspector_js(primary.label),()=>this.taskAction(t.id,a?.id,primary.kind),'primary','primary'));
+   if(t.status!=='submitted'&&primary&&!recovery?.querySelector('[data-recovery-action="'+primary.kind+'"]')&&!(primary.kind==='stop'&&h?.stop_requested))actions.append(this.action(primary.kind==='report'?tr_web_pilot_inspector_js('Ouvrir les conclusions du rapport'):tr_web_pilot_inspector_js(primary.label),()=>this.taskAction(t.id,a?.id,primary.kind),'primary','primary'));
    actions.append(this.action(tr_web_pilot_inspector_js('Toutes les actions autorisées'),()=>taskDialog(t.id,a?.id),'actions'));
-   for(const x of opts.filter(x=>!x.disponible&&['start','retry','stop','accepted'].includes(x.kind)))actions.append(node('p',x.label+' : '+x.raison,'pilot-muted'));
-   body.append(actions);
+   const unavailable=opts.filter(x=>!x.disponible&&['start','retry','stop','accepted'].includes(x.kind));
+   if(unavailable.length){const d=this.disclosure('Pourquoi certaines actions sont indisponibles','pilot-unavailable-actions');for(const x of unavailable)d.append(this.row(globalThis.SwarmI18n?.engine(x.label)||x.label,globalThis.SwarmI18n?.engine(x.raison)||x.raison));actions.append(d)}
+   body.insertBefore(actions,mission.nextSibling);body.insertBefore(impacts,actions.nextSibling);
    const reports=node('section',undefined,'pilot-section');reports.id='pilot-reports';reports.dataset.review=String(t.status==='submitted');reports.append(node('h4',tr_web_pilot_inspector_js('Rapports et preuves de la tâche')),node('p',tr_web_pilot_inspector_js('Chargement des rapports disponibles…')));body.append(reports);
    api('/api/v1/task?'+new URLSearchParams({work,task:t.id})).then(data=>{
     if(token!==this.generation||work!==requestWork||!reports.isConnected)return;
@@ -137,7 +173,8 @@ const PilotInspector={
   const projectedAttempt=snapshot.pilotage?.tasks?.[tid]?.attempt||{};
   for(const [name,value]of [[tr_web_pilot_inspector_js('Tâche'),t?.id],[tr_web_pilot_inspector_js('Session agent'),a?.id||projectedAttempt.agent_id],[tr_web_pilot_inspector_js('Tentative métier'),a?.attempt_id||projectedAttempt.attempt_id],[tr_web_pilot_inspector_js('Espace de travail'),a?.workspace],[tr_web_pilot_inspector_js('Livrable attendu'),t?.deliverable]])if(value)technical.append(node('p',name+' : '+value));
   body.append(technical);
-  if(open)panel.scrollTop=0;
+  for(const id of expanded){const d=document.getElementById(id);if(d&&body.contains(d))d.open=true}
+  if(open)SwarmShell.focusWindowStart(panel);
   else if(focusKey)[...body.querySelectorAll('[data-inspector-action]')].find(n=>n.dataset.inspectorAction===focusKey)?.focus({preventScroll:true});
   else if(readerFocus.key&&readerFocus.action){const reader=[...body.querySelectorAll('.text-reader')].find(n=>n.dataset.readerKey===readerFocus.key);[...(reader?.querySelectorAll('[data-reader-action]')||[])].find(n=>n.dataset.readerAction===readerFocus.action)?.focus({preventScroll:true})}
  },
@@ -190,7 +227,7 @@ const PilotInspector={
  recoveryControls(t,a,h){
   const options=snapshot.task_actions?.[t.id]||[];
   if(!['running','blocked','todo'].includes(t.status))return null;
-  const section=node('section',undefined,'pilot-section pilot-review-controls');section.id='pilot-recovery';section.append(node('h4',tr_web_pilot_inspector_js('Agir sur cette tâche')));
+  const section=node('div',undefined,'pilot-review-controls');section.id='pilot-recovery';
   const add=(kind,label,primary=false)=>{const opt=options.find(x=>x.kind===kind);if(!opt?.disponible)return false;const b=this.action(label,()=>this.recoveryAction(t.id,a?.id,kind), 'recovery:'+kind,primary?'primary':'');b.dataset.recoveryAction=kind;section.append(b);return true};
   if(a&&active(a)){
    if(h?.can_cancel_pending){
@@ -203,10 +240,10 @@ const PilotInspector={
     else section.append(node('p',tr_web_pilot_inspector_js('Cette session ne peut pas vérifier les processus de la session d’origine. Vérifiez leur arrêt depuis cette session avant de libérer la tâche.'),'notice attention'));
    }
   }else{
-   section.append(node('p',t.status==='blocked'?(t.blocker||tr_web_pilot_inspector_js('La tentative est arrêtée. Vous pouvez préparer une nouvelle exécution.')):tr_web_pilot_inspector_js('Choisissez une exécution pour cette tâche.')));
+   section.append(t.status==='blocked'&&t.blocker?this.blocker(t.blocker):node('p',t.status==='blocked'?tr_web_pilot_inspector_js('La tentative est arrêtée. Examinez sa cause avant de préparer une nouvelle exécution.'):tr_web_pilot_inspector_js('Choisissez une exécution pour cette tâche.')));
    if(!add('resume-launch',tr_web_pilot_inspector_js('Reprendre le lancement préparé'),true)&&!add('authorize-recovery',tr_web_pilot_inspector_js('Préparer un essai correctif'),true)&&!add('extend-attempt',tr_web_pilot_inspector_js('Autoriser une tentative supplémentaire'),true)&&!add('retry',tr_web_pilot_inspector_js('Relancer cette tâche'),true))add('start',tr_web_pilot_inspector_js('Lancer cette tâche'),true);
    const refusal=options.find(x=>x.kind==='resume-launch'&&!x.disponible)||options.find(x=>x.kind==='retry'&&!x.disponible)||options.find(x=>x.kind==='start'&&!x.disponible);
-   if(!section.querySelector('button')&&refusal?.raison)section.append(node('p',refusal.raison,'notice attention'));
+   if(!section.querySelector('button')&&refusal?.raison&&!snapshot.pilotage?.tasks?.[t.id]?.waiting_on?.length)section.append(node('p',refusal.raison,'notice attention'));
   }
   const refreshButton=this.action(tr_web_pilot_inspector_js('Actualiser l’état'),async()=>{refreshButton.disabled=true;try{await refresh(true)}catch(e){notice(e.message,true)}finally{if(refreshButton.isConnected)refreshButton.disabled=false}},'recovery:refresh');section.append(refreshButton);
   return section;

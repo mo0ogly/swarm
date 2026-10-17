@@ -660,6 +660,121 @@
     "sha256": "61966fe334f2b9182b1684ded5db193c3cf584acd779a42794be407743558bc1"
   },
   {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/before-failure.png",
+    "kind": "capture",
+    "sha256": "001a886b6fc1f1ad92add503d7193837d0d9f425a012d95f72b4c0ff1bee8511"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/before-failure.txt",
+    "kind": "doc",
+    "sha256": "ab03868eea9a5131b2a625dedcf0977828d242e20deda17e7413fecebcf90d19"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/build-4.txt",
+    "kind": "doc",
+    "sha256": "bc16b3db5c94f774bbfe608a8e7e91239329658737e22995a8ef9456867751ad"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/build-5.txt",
+    "kind": "doc",
+    "sha256": "73898560238192805d523bf42b8245603b10a5e53a2139b101d8519a48dfa2bf"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/build-receipt.json",
+    "kind": "doc",
+    "sha256": "a67fecf92ae5fe5bfa37faa0845172800bb42c9acd5b67651df91cc9cabd3934"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/fixture-failure-excerpt.txt",
+    "kind": "doc",
+    "sha256": "3a46098722861baf058103c6d299a14903f5943804d619dee6fa84bf11cf0a8d"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/focus-failure.png",
+    "kind": "capture",
+    "sha256": "13ed707682a1723670609957847dcb0a2d3ef1e0c62c2c93f4065e2bfe521acd"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/focus-failure.txt",
+    "kind": "doc",
+    "sha256": "2b3219e5c64e5dee6bc9a507090072782145532dcea6160bf351e559778ae638"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/installation-result.json",
+    "kind": "doc",
+    "sha256": "9806db258ed9746e8c977f746d30283165bb1e809607808eab0440021debd55f"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/live-ui-result.json",
+    "kind": "doc",
+    "sha256": "6e14686f1eef58903302babb8007545ae8f38570fbd9f7fe13fe613e4f288547"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/receipt-failure.png",
+    "kind": "capture",
+    "sha256": "69ed4df3338ada34541b069bc2b45d0627fb384ab5268cc0607d329e8b05012e"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/receipt-failure.txt",
+    "kind": "doc",
+    "sha256": "a3f7d107ef17ba931341702d953779d9989861797eadf9839542c6569acefd64"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/restart.txt",
+    "kind": "doc",
+    "sha256": "2f61d77756026169e3cdc7a034e18bcfd329084f8269181f29c2e0f0df3f8551"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/result.json",
+    "kind": "doc",
+    "sha256": "6b6f8db33fb488d1a7882ab8df5e952eea97d592e57bab4aefc01c2aa6c794cf"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-etat-1440.png",
+    "kind": "capture",
+    "sha256": "4aa64c09ab2a6fa981f19fb34f5af33f4a9374d2c78d2d72a89c5e590da93981"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-etat-390.png",
+    "kind": "capture",
+    "sha256": "ae837f5cfc49790ea94028c081935f4160b93e8d8c99d6a187cd2ad9f06081de"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-sombre-1440.png",
+    "kind": "capture",
+    "sha256": "dfc078cd5d4dbb8e9eb6cf898eddf05d9022d76aa958c8eb0073ba1760fd32ad"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-en-sombre-390.png",
+    "kind": "capture",
+    "sha256": "ab3734d7eed17eb85afe9911e747373c4717fd7b14fb2cad0561e97651e831ed"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-etat-1440.png",
+    "kind": "capture",
+    "sha256": "1fba56b91fb7704045afc9a0dbaa2e0228b805070f6efd21e7a103c3f2a9ff9b"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-etat-390.png",
+    "kind": "capture",
+    "sha256": "92f83654bfc1b30eeebc14b9662b91aecb4d35e71998c6d50303ce11c6497f60"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-sombre-1440.png",
+    "kind": "capture",
+    "sha256": "ac6d634d0ad101384a3f9e0d180ea282d81d52ab653b21e79d909d84d7822177"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/task-fr-sombre-390.png",
+    "kind": "capture",
+    "sha256": "ec83a180643ee665baf46a3c491671fe312e546681a8d9a14950633e6e465695"
+  },
+  {
+    "path": "docs/screenshots/window-identity-20261017/task-reading/verification.json",
+    "kind": "doc",
+    "sha256": "cd3914f6dd17782d3c8dd6bd8a01953444a4cb49d0d435a3bc44b9333bbdb3f5"
+  },
+  {
     "path": "docs/screenshots/window-identity-20261017/terminal-result.json",
     "kind": "doc",
     "sha256": "907ec359a22408f2725552fdaedf41c1cb357d3e43b11abe79230542713c6832"
@@ -1178,130 +1293,5 @@
     "path": "docs/training/casa-pizza/tutoriels/frames/overview-02.png",
     "kind": "capture",
     "sha256": "463322185d7d99a21f08ac526e14571e55e0e58694ac10c7ca7dcbe355fac25f"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/overview-03.png",
-    "kind": "capture",
-    "sha256": "48293b6bdd30eaaaab1379428e61d16898d7aeeb75336bbe8bae6226f25d48e0"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/overview-04.png",
-    "kind": "capture",
-    "sha256": "ea3ca61d42242eef83d545600bcf3472b05a5d2e13c5b0f56a3470a4d32d7180"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/index.html",
-    "kind": "doc",
-    "sha256": "54e8d368f8a8e8e608544ed3d7da9302621eef386ce6477bf84db19c552c194c"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/manifest.json",
-    "kind": "doc",
-    "sha256": "07aec1197f332748a77b04af4766e322903db106f55739daae8a52d763b9624e"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg",
-    "kind": "doc",
-    "sha256": "8a1ff80ced9c9fb1ae232d92a26526a6b529e42974aa6bcfc0294522d8d63435"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.gif",
-    "kind": "doc",
-    "sha256": "c634d78c3a356d8d933306fd32e2cbd1f5dfbd9ae5a437fd635568a0cba37b0a"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
-    "kind": "doc",
-    "sha256": "61ea3a0e8e2049df308886f40a51de13379a310b27538ec1afcc80498bcbbc54"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.txt",
-    "kind": "doc",
-    "sha256": "c338a24b09e2e1f5b7e6ab788674e26c22261428881da11ec9b9abe1c0c08061"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.vtt",
-    "kind": "doc",
-    "sha256": "cedefebcc05ce9ca555750400d8972a207e2c35736d286d6b9d8b6303b39ab3e"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg",
-    "kind": "doc",
-    "sha256": "681e1e81762fdbe56d3c94887c920497701534f6c9a0ac372005adb83cca46fa"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif",
-    "kind": "doc",
-    "sha256": "48521b15a987941e4df56ec0e2168f96224b08c7695a32868cda5baf6c74b508"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
-    "kind": "doc",
-    "sha256": "f884fe92e34b578915f968f31edbe9387ca772932bd3c675bfc728c601d114e8"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.txt",
-    "kind": "doc",
-    "sha256": "477a1ef5fc6f75f014afcb9f9fdf67b0982df17bc79dca58f8107e161a3eb9b2"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.vtt",
-    "kind": "doc",
-    "sha256": "1ba0d1075e3c585aee6754790e2eceedd2f15cade1166a14c8c2db5deb327ba3"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg",
-    "kind": "doc",
-    "sha256": "07943470c61821de67b82a775952a403e6b41ae584112f704cf49fad0720f8bc"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.gif",
-    "kind": "doc",
-    "sha256": "38dd6cd4736454a06e0c08dc4c6bc811f42958519026cd33420bb99e47155dc0"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
-    "kind": "doc",
-    "sha256": "3d918c2623e74e1c57f90c6611dda24da9d701acbaddc213be31350ef10b2b75"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.txt",
-    "kind": "doc",
-    "sha256": "d555e8b09d902fe88689c1a0dc234eb42bcdc46f458efbe69db4ba32b743d216"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.vtt",
-    "kind": "doc",
-    "sha256": "d04d94bf0ff9dcfdc9cc2885d34cdfb62ddddb06f4d6d25cbe907e9c89ae211a"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg",
-    "kind": "doc",
-    "sha256": "a2fbfd2212f0ac23ffdc8bd96ee95d9f62d843cdd2a169d651813c0f0cbc7d34"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif",
-    "kind": "doc",
-    "sha256": "b63185fdd6429e4a98141aa0ca029855546df0ae3867e725aec16490726559f9"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
-    "kind": "doc",
-    "sha256": "72654ffbae275e5537aafcf49e078966401423fa789f43318e100b8bba4bb910"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.txt",
-    "kind": "doc",
-    "sha256": "0da2bd22faaf185158bba0a39e407d87f19c7bcb0711f0b4b38e926aa60e9e16"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.vtt",
-    "kind": "doc",
-    "sha256": "23ffcdfbe10b48b1d9b88a784c95ca5b54ebcd05514c0bceb7a34c8a8cb9e79d"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/media/03-client-en-poster.jpg",
-    "kind": "doc",
-    "sha256": "3937c8dd7731fde56cb77a387295094d2e9f979b49d1a08e249e7e9c3a3b276d"
   }
 ]

@@ -247,6 +247,20 @@ section.view>h2 { margin: 18px 0 10px; }
 .pilot-inspector-head { background: var(--wattson-carte); gap: 12px; }
 .pilot-inspector-head h2 { font-size: 18px; }
 .pilot-section { border: 0; border-top: 1px solid var(--wattson-ligne); border-radius: 0; background: transparent; padding: 14px 0; }
+@media (min-width: 761px) { .pilot-inspector { width: min(560px,calc(100vw - 40px)); } }
+.pilot-inspector :is(h2,h3,h4) { font-weight: 750; }
+.pilot-inspector-body :is(p,li) { font-size: 14px; }
+.pilot-info-row { margin: 10px 0; }
+.pilot-info-row > strong { display: block; color: var(--wattson-titre); }
+.pilot-info-row > span { display: block; }
+.pilot-inspector details { margin-block: 12px; }
+.pilot-blocker { padding: 12px 14px; }
+.pilot-blocker > strong { display: block; font-size: 15px; }
+.pilot-blocker pre { white-space: pre-wrap; overflow-wrap: anywhere; max-inline-size: 100%; font-size: 12px; }
+.pilot-related-tasks { list-style: none; padding: 0; }
+.pilot-related-tasks li { border-inline-start: 2px solid var(--wattson-ligne); padding: 4px 12px; margin-block: 8px; }
+.pilot-related-tasks button { display: block; text-align: start; max-width: 100%; overflow-wrap: anywhere; }
+
 dialog { border-radius: 8px; box-shadow: var(--wattson-ombre); border-top: 3px solid var(--swarm-gold); }
 dialog::backdrop { background: #031929b3; backdrop-filter: blur(3px); }
 /* Bind the decorative brand to the accessible title, including dynamic dialogs.

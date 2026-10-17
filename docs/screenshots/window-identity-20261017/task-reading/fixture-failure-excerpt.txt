@@ -1,0 +1,2 @@
+Original fixture failure excerpt from the first run (before reaching the browser):
+sqlite3.OperationalError: no such function: swarm_identity_plan_digest_v1

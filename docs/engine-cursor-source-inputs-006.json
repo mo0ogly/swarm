@@ -1,5 +1,145 @@
 [
   {
+    "path": "scripts/i18n/build.cjs",
+    "kind": "harness",
+    "sha256": "868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19"
+  },
+  {
+    "path": "scripts/processes/build.cjs",
+    "kind": "harness",
+    "sha256": "6ab3691a5e1e24be567fe1b7b94be9108c3b7c40845ee8f25bc639f79c640983"
+  },
+  {
+    "path": "swarm.sh",
+    "kind": "source",
+    "sha256": "6ed96747449305362b5bd1254d76ebdbc449d8e19eb77c03b7bf1671f8ad5cc6"
+  },
+  {
+    "path": "tests/actions_confiance_campaign.py",
+    "kind": "harness",
+    "sha256": "5efc1a419d6079c7b984247ce8e2aaf0d5943ae9c13be475718194a1c704694b"
+  },
+  {
+    "path": "tests/actions_confiance_connectors.py",
+    "kind": "harness",
+    "sha256": "f3004470105187e244d3e3aea0be2c364a5ce20825d747bfef7280c4c243c13a"
+  },
+  {
+    "path": "tests/actions_confiance_connectors_ui.cjs",
+    "kind": "harness",
+    "sha256": "b5bdb782eb2c0422a06ca3fad1c2f5ff30b7c30cd8a12498ad0f0e45453def4b"
+  },
+  {
+    "path": "tests/actions_confiance_controls.py",
+    "kind": "harness",
+    "sha256": "579de3ae2a3030dc5ebee94a239dcdfc439924034229db72214da4930796bdf7"
+  },
+  {
+    "path": "tests/actions_confiance_controls_ui.cjs",
+    "kind": "harness",
+    "sha256": "ec9cb0d3e56092b9940c537562a1a8c441ef8a4407756b594f76e40712749796"
+  },
+  {
+    "path": "tests/actions_confiance_data_policy_ui.cjs",
+    "kind": "harness",
+    "sha256": "4c876784c3db9554572c3134fafa84a8228cb7e26890daf02e5f32d7ce27b868"
+  },
+  {
+    "path": "tests/actions_confiance_delegation_ui.cjs",
+    "kind": "harness",
+    "sha256": "ac5650ba6e4e63f548bea0d138085a97b1a316543fcee3d69d8b5cf8aab11abb"
+  },
+  {
+    "path": "tests/actions_confiance_effect_proof.py",
+    "kind": "harness",
+    "sha256": "f3de799f039eb50e08fb0d557c34d27fb27dd8e3f67fd0a6d849968d0df07abb"
+  },
+  {
+    "path": "tests/actions_confiance_evidence.py",
+    "kind": "harness",
+    "sha256": "ea51a6ffaa310eb352e92e73d754c29a6096e1804ed2776d94c5451e37bf7c9b"
+  },
+  {
+    "path": "tests/actions_confiance_evidence_exact_test.cjs",
+    "kind": "harness",
+    "sha256": "1ebfe8e5090823c9625424960e801ca062f16a6585cbacdeca7f00cf4bfeb639"
+  },
+  {
+    "path": "tests/actions_confiance_evidence_ui.cjs",
+    "kind": "harness",
+    "sha256": "03d67719612d89765bd43fff4d4a87d0fc24b762e1efc7cef9fdd8febde41f53"
+  },
+  {
+    "path": "tests/actions_confiance_kernel.py",
+    "kind": "harness",
+    "sha256": "aa03accbaed86d5650b2044d117728841a9dace8ec2b3df783d529c793f89af9"
+  },
+  {
+    "path": "tests/actions_confiance_kernel_ui.cjs",
+    "kind": "harness",
+    "sha256": "a1da21670a8aed3fe287290299a10c8cc57c2536882afb73581ffb186fb236fd"
+  },
+  {
+    "path": "tests/actions_confiance_laboratory.py",
+    "kind": "harness",
+    "sha256": "d140a67186cff4df2aea5667c61cd7236952bacfc9ade4b2e0eebcbce9777e5d"
+  },
+  {
+    "path": "tests/actions_confiance_laboratory_ui.cjs",
+    "kind": "harness",
+    "sha256": "6fe4e82ffbbffe35654f784fe7f8d2280fe4bce2f6b994c6782bae573632c282"
+  },
+  {
+    "path": "tests/actions_confiance_observe_client_test.cjs",
+    "kind": "harness",
+    "sha256": "23716e59a3e22ac584b0ba644aebbb2f3aeaf2b47187e2abc686cde34a7fac1b"
+  },
+  {
+    "path": "tests/actions_confiance_observe_ui.cjs",
+    "kind": "harness",
+    "sha256": "50b021d497fc8bdfc307cfa5f3c73f6087f21f71ca6fe1775e26f74c645ad8b3"
+  },
+  {
+    "path": "tests/actions_confiance_oidc_logout_ui.cjs",
+    "kind": "harness",
+    "sha256": "aee0403c173d9d0ed18c11e917d8e603f5172e4fc0126d85d48982a6ef3712fa"
+  },
+  {
+    "path": "tests/actions_confiance_oidc_ui.cjs",
+    "kind": "harness",
+    "sha256": "8b3c273a6f3b97bdde48761f88c84fd7dc12a29633bf9d2d84c179ce6486034d"
+  },
+  {
+    "path": "tests/actions_confiance_process_ui.cjs",
+    "kind": "harness",
+    "sha256": "caebe0e76554779977b6c7a19bf206762f12f9c967f92f0396e25315d08bb71b"
+  },
+  {
+    "path": "tests/actions_confiance_recipe_timeout_test.py",
+    "kind": "harness",
+    "sha256": "1473d71f8cc854e8da33baf93c6e228839e5e3c172196ced968bbf858572b9d4"
+  },
+  {
+    "path": "tests/actions_confiance_remote.py",
+    "kind": "harness",
+    "sha256": "84797458c5bc3f50fc2cbe056953315e196ea72e17a4b940ddc90113492ec00c"
+  },
+  {
+    "path": "tests/actions_confiance_sealed_ui.cjs",
+    "kind": "harness",
+    "sha256": "199673093ef27fcfd8b57662e963c25b012d0b5d2c723de8d2131fd78ab87a74"
+  },
+  {
+    "path": "tests/actions_confiance_secret_data.py",
+    "kind": "harness",
+    "sha256": "925b2568eeb1f108c4d60d548b4c42fd76582998a837edebf684cc492137122d"
+  },
+  {
+    "path": "tests/actions_confiance_secret_data_reopen.cjs",
+    "kind": "harness",
+    "sha256": "bdce723bc5842f2678dc8fa3c5191a684051582e43c36bc3567099cc83a3ded4"
+  },
+  {
     "path": "tests/actions_confiance_secret_data_ui.cjs",
     "kind": "harness",
     "sha256": "b128940ae0ac6b5e90bc35d832883033c68546b78df8d078f0c5e275ca3e3247"
@@ -168,6 +308,11 @@
     "path": "tests/observable_validation_acceptance.py",
     "kind": "harness",
     "sha256": "a459da96c1797e203b314c9ed0172446361984ef72379716e69a10d43b999979"
+  },
+  {
+    "path": "tests/pilot_readability_ui.cjs",
+    "kind": "test",
+    "sha256": "9f34abfbcc356693dc2c9ca5eb41aa1dfc388557ed89dff627f34a4a9753c858"
   },
   {
     "path": "tests/preparation_editor_policy_ui.cjs",
@@ -402,7 +547,7 @@
   {
     "path": "tools/refresh_ui_source_manifest.py",
     "kind": "harness",
-    "sha256": "a9787cf625efba5dfc290a22814b435b222fe0a5e7fd7b684fa82bc23187a33f"
+    "sha256": "d58ca030d2bd8f0452442bdafffbadb924041216e559556b510885a2c05aa932"
   },
   {
     "path": "tools/swarm_local.py",
@@ -457,7 +602,7 @@
   {
     "path": "version_history.json",
     "kind": "source",
-    "sha256": "fba8f313754cad0abdf74f597201dc2b489b0bc24022999d8d1a8f978e7d758c"
+    "sha256": "829cc5295789cf57d943ab9c006d13e930dd1f294cf163cb327a9d40edc52f63"
   },
   {
     "path": "web/access.css",
@@ -597,7 +742,7 @@
   {
     "path": "web/i18n-en.js",
     "kind": "source",
-    "sha256": "6197368b1a3a896df06a4a015e008bc8e617c2441c5f382e203a24febd23ea66"
+    "sha256": "76a31d6c6f4a2c62bf76b523593d99ba851f79754c86a200325e31240e42d497"
   },
   {
     "path": "web/i18n.js",
@@ -787,7 +932,7 @@
   {
     "path": "web/pilot-inspector.js",
     "kind": "source",
-    "sha256": "f80868784977dcda43cabd615eeab59633e3d1fab5fb9be719f3c6674ceb3394"
+    "sha256": "0b199678919fd3563a64c5d68b50bd023625c16746f5f05e4be2621671e19733"
   },
   {
     "path": "web/pilotage.css",
@@ -1032,7 +1177,7 @@
   {
     "path": "web/swarm-design.css",
     "kind": "source",
-    "sha256": "368af3f66815af113ae4115f40d8996cdcde174f49f6c1ebfbd58047c7f1e760"
+    "sha256": "d16f095be28059d4cb9ec55073c41a57d15bf9ea612d1b556e66196757d188f7"
   },
   {
     "path": "web/swarm-logo.png",

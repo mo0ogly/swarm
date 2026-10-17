@@ -103,3 +103,27 @@ Run `node tests/text_reader_test.cjs`, then
 hidden-console, instruction/RETEX and design recipes. The
 [increment report](../reports/window-identity-20261017.md) distinguishes local
 checks, clipboard/log doubles and the running installation.
+
+## Task details: understand before acting
+
+The panel starts with the task and one **What should I do now?** area. Bold
+labels distinguish the agent’s assignment, execution, latest activity and work
+status. Completed execution does not mean the task is validated. **AI and
+instructions used** discloses the selected AI, reported model and known project
+instructions, with explicit unknown states.
+
+**Before starting** uses the engine’s unsatisfied prerequisites
+(`pilotage.tasks[id].waiting_on`). Related tasks appear by title and open their
+own details. Downstream tasks are disclosed separately; their presence promises
+no automatic start. Missing prerequisite observations are never shown as met.
+
+A failed `git cat-file` read operation, identified by the producer’s command
+prefix, receives a readable explanation and guidance to check the repository
+before retrying. Its exact technical original remains available in a disclosure.
+This presentation repairs no Git data and depends on no hash, repository path
+or English stderr wording. Unrecognized blockers retain their visible reason.
+Actions and refusals still come from the engine; reading executes no command.
+Disclosures and keyboard focus survive refresh of the same task, without forcing
+those disclosures open when navigating to another task.
+
+Recipe: `npm run test:task-reading`, isolated root with no provider.

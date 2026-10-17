@@ -27,6 +27,7 @@
     "test:window-identity": "node tests/window_identity_ui.cjs bin/swarm test-results/window-identity",
     "test:log-visibility": "node tests/log_console_visibility_ui.cjs bin/swarm test-results/log-visibility",
     "test:text-reader": "node tests/text_reader_test.cjs",
+    "test:task-reading": "node tests/pilot_readability_ui.cjs bin/swarm test-results/task-reading",
     "test:dense-text": "node tests/dense_text_ui.cjs bin/swarm test-results/dense-text",
     "test:training-ui": "node tests/training_design_ui.cjs bin/swarm test-results/training-design",
     "test:web-requests": "node tests/web_requests_test.cjs",

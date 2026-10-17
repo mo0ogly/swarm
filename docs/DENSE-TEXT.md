@@ -116,3 +116,28 @@ Recettes : `node tests/text_reader_test.cjs`, puis
 Journaux, console masquée, instructions/RETEX et design selon les consommateurs
 modifiés. Les preuves locales, doubles de logs/presse-papiers et absence
 d’installation sont distingués dans le [rapport](reports/window-identity-20261017.md).
+
+## Détail d’une tâche : comprendre avant d’agir
+
+Le panneau commence par la tâche et une seule zone **Que faire maintenant ?**.
+Les libellés en gras séparent mission de l’agent, exécution, dernière activité et
+état du travail. Une exécution terminée ne signifie pas que la tâche est validée.
+Le choix de l’IA, le modèle confirmé et les consignes connues sont accessibles
+dans **IA et consignes utilisées**, avec un état inconnu explicite.
+
+**Avant de commencer** utilise les prérequis non satisfaits du moteur
+(`pilotage.tasks[id].waiting_on`). Les tâches sont nommées et ouvrent leur propre
+détail. Les tâches qui dépendent du résultat sont dans un accordéon séparé ;
+leur existence ne promet pas un démarrage automatique. Les conditions absentes
+ne sont pas présentées comme satisfaites.
+
+Un refus de l’opération de lecture `git cat-file`, identifiée par le préfixe du
+producteur, reçoit une explication lisible et la consigne de vérifier le dépôt
+avant de relancer. Le message technique original reste exact dans un accordéon.
+Cette présentation ne répare pas Git et ne dépend d’aucun hash, chemin de dépôt
+ou formulation anglaise du stderr. Un blocage non reconnu conserve son motif
+visible. Les actions et leurs refus restent ceux du moteur ; rien n’est exécuté
+par la simple lecture. Les accordéons et leur focus survivent au rafraîchissement
+du même détail, sans imposer leur ouverture sur une autre tâche.
+
+Recette : `npm run test:task-reading`, racine isolée, sans fournisseur.

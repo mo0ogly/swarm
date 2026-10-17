@@ -30,6 +30,7 @@ def main():
         "web/text-reader.js": "source", "web/journal-console.js": "source",
         "web/log-console.css": "source", "web/instruction-revisions.js": "source",
         "tests/text_reader_test.cjs": "test", "tests/dense_text_ui.cjs": "test",
+        "tests/pilot_readability_ui.cjs": "test",
         "tests/instruction_retex_ui.cjs": "test",
         "tests/log_console_ui.cjs": "test",
         "tools/swarm_local.py": "source", "tools/swarm_version.py": "source",

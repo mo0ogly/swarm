@@ -1,5 +1,15 @@
 # IHM — logo et lisibilité des fenêtres
 
+## Dernière livraison — détail de tâche simplifié
+
+**Installé et observé sur le serveur réel en `v0.1.1-dev.5`.** Le panneau
+demandé par l’utilisateur est rouvert : une zone d’action, blocage Git expliqué,
+original repliable, libellés en gras et tâches liées nommées. Les quatre
+combinaisons FR/EN et thèmes passent aux cinq largeurs prévues.
+Preuves : [`task-reading/`](../screenshots/window-identity-20261017/task-reading/).
+Le défaut Git de la tentative métier reste à diagnostiquer/réparer séparément ;
+aucune relance métier ni acceptation n’est effectuée par cet incrément.
+
 ## Reprise demandée — numéro et redémarrage
 
 **État final : installé et vérifié sur le serveur géré en `v0.1.1-dev.3`,
@@ -490,3 +500,96 @@ indexées ; tous passent. Le reçu `local-delivery/staged-version-checks.txt`
 conserve les noms et sorties, y compris un test historique Version supplémentaire
 sélectionné par le préfixe. Cette preuve du candidat Git reste distincte des
 contrôles antérieurs du binaire installé construit dans l’arbre partagé.
+
+
+## Replan — rendre le détail d’une tâche compréhensible
+
+L’utilisateur observe le panneau réel et relève deux défauts : répétition des
+mêmes informations et vocabulaire technique sans geste compréhensible. Le panneau
+réel montre deux fois un refus de `git cat-file`, deux groupes d’actions, des
+noms de rôle internes et une liste de dépendances réduite à ses identifiants.
+
+| Exigence | Observable attendu | Vérification prévue |
+| --- | --- | --- |
+| CLR-1 | Libellés et titres en gras ; IA et consignes secondaires repliables | Navigateur FR/EN, deux thèmes, cinq largeurs |
+| CLR-2 | Une seule action principale, en premier ; fin d’exécution distincte de validation | Compter les groupes, boutons et messages ; actualisation et clavier |
+| CLR-3 | Tâches préalables et tâches concernées par leur titre, accessibles au clic | Navigation sans mutation, données `waiting_on` du moteur |
+| CLR-4 | Échec de lecture Git expliqué ; original exact accessible une seule fois | Variantes de lecture Git et blocage métier inconnu, HTML littéral |
+
+Décision : corriger le composant de détail, plutôt qu’ajouter des surcharges ou
+réécrire les états métier. L’explication de lecture Git se fonde sur le préfixe
+de commande produit par `managedGitText`, pas sur un identifiant, un hash ou une
+phrase anglaise d’erreur. Elle décrit une lecture impossible, sans prétendre
+diagnostiquer ou réparer automatiquement le dépôt. Les blocages inconnus gardent
+leur motif visible. Les droits et commandes disponibles viennent toujours du
+snapshot du moteur ; aucun lancement ou essai supplémentaire n’est demandé.
+
+Anomalie de recette initiale : une écriture directe de `works` par SQLite a été
+refusée avec `no such function: swarm_identity_plan_digest_v1`. Le binaire inclut
+un contrat de stockage supplémentaire ; le témoin n’atteignait donc pas l’IHM.
+La fixture emploie désormais `task update` public pour le statut et le blocage.
+Seule une ligne d’agent historique fictive reste injectée dans la racine de test
+isolée, sans processus ni fournisseur. Aucune protection n’est désactivée.
+
+Suite CLR-F1, propriétaire moteur/dépôts : le message observé dans la mission
+réelle signale un objet Git vide et un commit illisible. L’amélioration de lecture
+ne répare pas cette donnée. Reprise : identifier le dépôt effectivement employé
+par cette tentative, établir les sauvegardes et la source de récupération, puis
+vérifier le commit par l’opération de lecture Git avant toute nouvelle tentative.
+Ne pas supprimer d’objets ni autoriser une relance pour masquer cette erreur.
+
+
+Premier passage CLR : gras, lecture Git, original exact, tâches nommées et
+navigation sont vérifiés en FR/État. La fermeture Échap échoue après un clic vers
+une autre tâche puis redimensionnement : le bouton déclencheur a été remplacé,
+le focus revient au document et l’écouteur du panneau ne reçoit plus la touche.
+Le panneau place maintenant le focus sur son titre à chaque ouverture/navigation,
+par le helper commun, sans délai ajouté. Les prérequis remontent juste après
+l’action principale ; leur avertissement ne duplique plus un refus brut contenant
+les identifiants. Les refus complets restent dans leur accordéon dédié.
+
+
+Second passage CLR : les quatre combinaisons langue/thème et les cinq largeurs
+passent, puis la garde de recette refuse trois POST `/api/v1/visit` à la sortie
+des pages. Lecture du producteur et du consommateur : ce sont les reçus de lecture
+normaux (`markVisit`), distincts d’une mutation de tâche. La garde contrôle
+maintenant leur méthode, coordonnées de fixture et corps vide, les compte
+séparément et refuse toujours toute commande métier. La révision de la mission
+reste contrôlée inchangée. Aucun code produit ni délai n’est modifié pour ce refus.
+
+
+### Vérification finale CLR et RETEX
+
+CLR-1 à CLR-4 : PASS dans la recette isolée, FR/EN × État/sombre, cinq largeurs,
+avec originaux exacts, code littéral, navigation par titre, maintien des accordéons,
+focus et Échap. Les huit cas du lecteur et la parité i18n restent verts.
+Le contrôle ajouté du rendu complet puis de l’actualisation explicite passe.
+Une capture intermédiaire affichait un avertissement d’actualisation à la
+navigation ; la cause n’est pas établie et aucune réparation générale du
+rafraîchissement n’est revendiquée. Suite CLR-F2, propriétaire frontend : reprendre
+avec une trace du premier échec de refresh lors d’une navigation répétée ; garder
+les captures `focus-failure.png` et `receipt-failure.png` comme observations.
+
+Le lanceur prépare `dev.4`, puis `dev.5` après la correction de focus et d’ordre
+de lecture. La relance réutilise le candidat vérifié `dev.5`. HTTP confirme le
+numéro et l’empreinte du binaire installé ; cinq missions, trente-cinq tâches,
+trente agents, leurs révisions/états et les politiques de mission sont conservés.
+Les deux processus distincts observés sont encore présents. L’onglet navigateur
+initial étant devenu indisponible, un nouvel onglet de la même interface est
+ouvert ; il montre le panneau demandé et aucune erreur console reçue.
+La première mesure DOM utilisait `parseInt`, absent du contexte de lecture de
+l’outil ; la mesure corrigée reçoit les chaînes de poids CSS : treize valeurs
+`750`. Cela corrige la mesure, sans changement du produit.
+
+Limite CLR-F3, propriétaire frontend : les cartes du graphe conservent encore
+leur résumé technique historique. Une prochaine harmonisation doit partager
+le vocabulaire des diagnostics entre cartes et détail, avec une garde sur les
+libellés de carte et la conservation de leurs originaux dans le détail. Cet
+incrément vérifie le panneau explicitement signalé ; il ne prétend pas réécrire
+tout le vocabulaire des autres écrans.
+
+Apprentissage : hiérarchiser l’action avant les métadonnées ; décrire la commande
+qui a échoué sans prétendre connaître sa cause exacte ; conserver les originaux
+et faire venir les prérequis et les droits du moteur. Une ouverture depuis un
+élément remplacé doit replacer le focus. Les reçus de lecture ne sont pas des
+modifications métier, et doivent être comptés séparément dans les recettes.

@@ -1,5 +1,140 @@
 [
   {
+    "path": "internal/engine/planning_rejection_state.go",
+    "kind": "source",
+    "sha256": "fd192f643d76ff613108ce662719c2ca0afb6fe2e9a300f0b6b5f18cd9d3c400"
+  },
+  {
+    "path": "internal/engine/planning_rejection_test.go",
+    "kind": "test",
+    "sha256": "3e5717fe4e5e7abe27c9fa8448ecf157d6a4bf409f7ccb15291dedfe7eef5dcd"
+  },
+  {
+    "path": "internal/engine/planning_report_relay_test.go",
+    "kind": "test",
+    "sha256": "fa8f5e171de6503cf4c31866d65e397cd52afa1c1fc893411d568e99fe56e4a8"
+  },
+  {
+    "path": "internal/engine/planning_review_budget_test.go",
+    "kind": "test",
+    "sha256": "584faa64eec29a36bac0ad0692b6f16eb6fbd2d05da0b38bfff1eb828e7de2c5"
+  },
+  {
+    "path": "internal/engine/planning_review_retry.go",
+    "kind": "source",
+    "sha256": "ee6798382835ed1e777fb85a700725285523fe7966f1fefca2ffc6a62f2c44a5"
+  },
+  {
+    "path": "internal/engine/planning_runner.go",
+    "kind": "source",
+    "sha256": "cecd337116f456050c27029fd6ec540088fa76643372732b22cde35b5fd1a4fb"
+  },
+  {
+    "path": "internal/engine/planning_schema.go",
+    "kind": "source",
+    "sha256": "e743a39d1ac6ccb016528f09cb59ed8d4084980d11d54d2d3d0161a9f2541080"
+  },
+  {
+    "path": "internal/engine/planning_schema_events_test.go",
+    "kind": "test",
+    "sha256": "1b81e4fd16c3ee409a2ba6de939099bfc5a2ec54a8e3d5f648f87982a770ce11"
+  },
+  {
+    "path": "internal/engine/planning_scope_diagnostic_test.go",
+    "kind": "test",
+    "sha256": "ca7766d6b397b80ca52377e7a8548e5392c5540bd39224a6e93ae38d320c4668"
+  },
+  {
+    "path": "internal/engine/planning_scope_progress_test.go",
+    "kind": "test",
+    "sha256": "9b5b413644185346a94cfb697a95582ccec7a12da78bb8041bfbffd5ecac2544"
+  },
+  {
+    "path": "internal/engine/planning_scope_transport.go",
+    "kind": "source",
+    "sha256": "cf70293ff7f57ec4ec5631a5109953b3e147c7323679f476342b5a8563e2e3e8"
+  },
+  {
+    "path": "internal/engine/planning_scope_transport_test.go",
+    "kind": "test",
+    "sha256": "9ba2020150fcdab343783f64884698b6b97abc3ca591f84befeea2004ee93315"
+  },
+  {
+    "path": "internal/engine/planning_supervisor_completion_test.go",
+    "kind": "test",
+    "sha256": "79582197e3693b57466537fa1f62d5609b916d9027e2a91f3fb281a64dd817b2"
+  },
+  {
+    "path": "internal/engine/planning_task_preview_budget_test.go",
+    "kind": "test",
+    "sha256": "f7e5dcab2053b1818565fbc1fb33df37bd8593f8b0e811b1ea917f9ea5d9ecf6"
+  },
+  {
+    "path": "internal/engine/planning_test.go",
+    "kind": "test",
+    "sha256": "557085b15f2ad8a54cb649309e8b0ce362b35731f6eb1c719ae5746257ca9842"
+  },
+  {
+    "path": "internal/engine/planning_unresolved_review_recovery_test.go",
+    "kind": "test",
+    "sha256": "4085acc26687522b78465a3f52662ac454cd68bb87b7e6eaab8c93118908a471"
+  },
+  {
+    "path": "internal/engine/planning_validation.go",
+    "kind": "source",
+    "sha256": "7a46d88f5b1681dec4219983be4326cf568e17c2007260d6315b609a55146ee3"
+  },
+  {
+    "path": "internal/engine/post_delivery.go",
+    "kind": "source",
+    "sha256": "5ee4674beb6462189d7153692bc0a8bc6fb9ffc92f3919c4cf4469c04e1890a7"
+  },
+  {
+    "path": "internal/engine/post_delivery_test.go",
+    "kind": "test",
+    "sha256": "e1191bed2350966cf20ef05cfe505e5ddf3ba18f0b9aa71a9e4ce687bfe21e9c"
+  },
+  {
+    "path": "internal/engine/preflight.go",
+    "kind": "source",
+    "sha256": "f514435ab9c8227834ac4ac038d3adc9927af02111c2e517f5dfa0cba3ba0cba"
+  },
+  {
+    "path": "internal/engine/preflight_test.go",
+    "kind": "test",
+    "sha256": "552b0c47859e4daa0ad8d6e8cc74b49cd5236b457ef5c4e637ef6212dab19cc8"
+  },
+  {
+    "path": "internal/engine/preparation_subjects_test.go",
+    "kind": "test",
+    "sha256": "2fadcb4b145d89de8454c23351492d22e9126c08e917142d208a24b5dc8f0f67"
+  },
+  {
+    "path": "internal/engine/preparation_templates.go",
+    "kind": "source",
+    "sha256": "ad99c355a0ece0480f9d0cc12072d23e7a2b39a38250a2e6ebfa64a208eae02f"
+  },
+  {
+    "path": "internal/engine/preparation_templates_test.go",
+    "kind": "test",
+    "sha256": "0d35bb8488cd953da64462907422c5aa3e1e50e022ca694dae4a72508f76e5fc"
+  },
+  {
+    "path": "internal/engine/preparation_timeout_config.go",
+    "kind": "source",
+    "sha256": "e7f14e00b4c522e447a239a8300978ff78e92cd0ec292903464eb465497501bd"
+  },
+  {
+    "path": "internal/engine/preparation_work_model.go",
+    "kind": "source",
+    "sha256": "f41f190f91ac9d88cd744ad2d9cb4e428c7a1c13758570a01018f20edf35c1d1"
+  },
+  {
+    "path": "internal/engine/preparation_work_model_test.go",
+    "kind": "test",
+    "sha256": "6839cd514363f805bf3325e2e92288dc015e8a126fdc22d818709f3240a588dd"
+  },
+  {
     "path": "internal/engine/prepared_skill_refresh.go",
     "kind": "source",
     "sha256": "e3caa2c9b0f92514cf821848df144a69452fee5466401e5207f19c1ae9f95590"
@@ -1327,7 +1462,7 @@
   {
     "path": "locales/en.json",
     "kind": "source",
-    "sha256": "a4505d89d4c5b9295dd7f96e48e0e32c5b0e08d59f7928a63f3138879500df91"
+    "sha256": "abafab69a65a42595fb53a08e49d6f32293488af7b991c78cf93e6815316a531"
   },
   {
     "path": "locales/trust-actions-en.json",
@@ -1337,151 +1472,11 @@
   {
     "path": "package.json",
     "kind": "harness",
-    "sha256": "7bc32506f0c65c6c196f48905377411ed7ae75d1e4d0115e023332a6f7ec8b75"
+    "sha256": "60e930209b781418e3d5b6e1bdeaec9a0389a6e3e0b0f0d2ebdb345dcfba19fc"
   },
   {
     "path": "resources.go",
     "kind": "source",
     "sha256": "b5c75f94ab0176cb200e4717e9a818178b72111a48c7dadb7602ceb18416af13"
-  },
-  {
-    "path": "scripts/i18n/build.cjs",
-    "kind": "harness",
-    "sha256": "868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19"
-  },
-  {
-    "path": "scripts/processes/build.cjs",
-    "kind": "harness",
-    "sha256": "6ab3691a5e1e24be567fe1b7b94be9108c3b7c40845ee8f25bc639f79c640983"
-  },
-  {
-    "path": "swarm.sh",
-    "kind": "source",
-    "sha256": "6ed96747449305362b5bd1254d76ebdbc449d8e19eb77c03b7bf1671f8ad5cc6"
-  },
-  {
-    "path": "tests/actions_confiance_campaign.py",
-    "kind": "harness",
-    "sha256": "5efc1a419d6079c7b984247ce8e2aaf0d5943ae9c13be475718194a1c704694b"
-  },
-  {
-    "path": "tests/actions_confiance_connectors.py",
-    "kind": "harness",
-    "sha256": "f3004470105187e244d3e3aea0be2c364a5ce20825d747bfef7280c4c243c13a"
-  },
-  {
-    "path": "tests/actions_confiance_connectors_ui.cjs",
-    "kind": "harness",
-    "sha256": "b5bdb782eb2c0422a06ca3fad1c2f5ff30b7c30cd8a12498ad0f0e45453def4b"
-  },
-  {
-    "path": "tests/actions_confiance_controls.py",
-    "kind": "harness",
-    "sha256": "579de3ae2a3030dc5ebee94a239dcdfc439924034229db72214da4930796bdf7"
-  },
-  {
-    "path": "tests/actions_confiance_controls_ui.cjs",
-    "kind": "harness",
-    "sha256": "ec9cb0d3e56092b9940c537562a1a8c441ef8a4407756b594f76e40712749796"
-  },
-  {
-    "path": "tests/actions_confiance_data_policy_ui.cjs",
-    "kind": "harness",
-    "sha256": "4c876784c3db9554572c3134fafa84a8228cb7e26890daf02e5f32d7ce27b868"
-  },
-  {
-    "path": "tests/actions_confiance_delegation_ui.cjs",
-    "kind": "harness",
-    "sha256": "ac5650ba6e4e63f548bea0d138085a97b1a316543fcee3d69d8b5cf8aab11abb"
-  },
-  {
-    "path": "tests/actions_confiance_effect_proof.py",
-    "kind": "harness",
-    "sha256": "f3de799f039eb50e08fb0d557c34d27fb27dd8e3f67fd0a6d849968d0df07abb"
-  },
-  {
-    "path": "tests/actions_confiance_evidence.py",
-    "kind": "harness",
-    "sha256": "ea51a6ffaa310eb352e92e73d754c29a6096e1804ed2776d94c5451e37bf7c9b"
-  },
-  {
-    "path": "tests/actions_confiance_evidence_exact_test.cjs",
-    "kind": "harness",
-    "sha256": "1ebfe8e5090823c9625424960e801ca062f16a6585cbacdeca7f00cf4bfeb639"
-  },
-  {
-    "path": "tests/actions_confiance_evidence_ui.cjs",
-    "kind": "harness",
-    "sha256": "03d67719612d89765bd43fff4d4a87d0fc24b762e1efc7cef9fdd8febde41f53"
-  },
-  {
-    "path": "tests/actions_confiance_kernel.py",
-    "kind": "harness",
-    "sha256": "aa03accbaed86d5650b2044d117728841a9dace8ec2b3df783d529c793f89af9"
-  },
-  {
-    "path": "tests/actions_confiance_kernel_ui.cjs",
-    "kind": "harness",
-    "sha256": "a1da21670a8aed3fe287290299a10c8cc57c2536882afb73581ffb186fb236fd"
-  },
-  {
-    "path": "tests/actions_confiance_laboratory.py",
-    "kind": "harness",
-    "sha256": "d140a67186cff4df2aea5667c61cd7236952bacfc9ade4b2e0eebcbce9777e5d"
-  },
-  {
-    "path": "tests/actions_confiance_laboratory_ui.cjs",
-    "kind": "harness",
-    "sha256": "6fe4e82ffbbffe35654f784fe7f8d2280fe4bce2f6b994c6782bae573632c282"
-  },
-  {
-    "path": "tests/actions_confiance_observe_client_test.cjs",
-    "kind": "harness",
-    "sha256": "23716e59a3e22ac584b0ba644aebbb2f3aeaf2b47187e2abc686cde34a7fac1b"
-  },
-  {
-    "path": "tests/actions_confiance_observe_ui.cjs",
-    "kind": "harness",
-    "sha256": "50b021d497fc8bdfc307cfa5f3c73f6087f21f71ca6fe1775e26f74c645ad8b3"
-  },
-  {
-    "path": "tests/actions_confiance_oidc_logout_ui.cjs",
-    "kind": "harness",
-    "sha256": "aee0403c173d9d0ed18c11e917d8e603f5172e4fc0126d85d48982a6ef3712fa"
-  },
-  {
-    "path": "tests/actions_confiance_oidc_ui.cjs",
-    "kind": "harness",
-    "sha256": "8b3c273a6f3b97bdde48761f88c84fd7dc12a29633bf9d2d84c179ce6486034d"
-  },
-  {
-    "path": "tests/actions_confiance_process_ui.cjs",
-    "kind": "harness",
-    "sha256": "caebe0e76554779977b6c7a19bf206762f12f9c967f92f0396e25315d08bb71b"
-  },
-  {
-    "path": "tests/actions_confiance_recipe_timeout_test.py",
-    "kind": "harness",
-    "sha256": "1473d71f8cc854e8da33baf93c6e228839e5e3c172196ced968bbf858572b9d4"
-  },
-  {
-    "path": "tests/actions_confiance_remote.py",
-    "kind": "harness",
-    "sha256": "84797458c5bc3f50fc2cbe056953315e196ea72e17a4b940ddc90113492ec00c"
-  },
-  {
-    "path": "tests/actions_confiance_sealed_ui.cjs",
-    "kind": "harness",
-    "sha256": "199673093ef27fcfd8b57662e963c25b012d0b5d2c723de8d2131fd78ab87a74"
-  },
-  {
-    "path": "tests/actions_confiance_secret_data.py",
-    "kind": "harness",
-    "sha256": "925b2568eeb1f108c4d60d548b4c42fd76582998a837edebf684cc492137122d"
-  },
-  {
-    "path": "tests/actions_confiance_secret_data_reopen.cjs",
-    "kind": "harness",
-    "sha256": "bdce723bc5842f2678dc8fa3c5191a684051582e43c36bc3567099cc83a3ded4"
   }
 ]

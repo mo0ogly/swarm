@@ -1,5 +1,130 @@
 [
   {
+    "path": "docs/training/casa-pizza/tutoriels/frames/overview-03.png",
+    "kind": "capture",
+    "sha256": "48293b6bdd30eaaaab1379428e61d16898d7aeeb75336bbe8bae6226f25d48e0"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/overview-04.png",
+    "kind": "capture",
+    "sha256": "ea3ca61d42242eef83d545600bcf3472b05a5d2e13c5b0f56a3470a4d32d7180"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/index.html",
+    "kind": "doc",
+    "sha256": "54e8d368f8a8e8e608544ed3d7da9302621eef386ce6477bf84db19c552c194c"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/manifest.json",
+    "kind": "doc",
+    "sha256": "07aec1197f332748a77b04af4766e322903db106f55739daae8a52d763b9624e"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg",
+    "kind": "doc",
+    "sha256": "8a1ff80ced9c9fb1ae232d92a26526a6b529e42974aa6bcfc0294522d8d63435"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.gif",
+    "kind": "doc",
+    "sha256": "c634d78c3a356d8d933306fd32e2cbd1f5dfbd9ae5a437fd635568a0cba37b0a"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
+    "kind": "doc",
+    "sha256": "61ea3a0e8e2049df308886f40a51de13379a310b27538ec1afcc80498bcbbc54"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.txt",
+    "kind": "doc",
+    "sha256": "c338a24b09e2e1f5b7e6ab788674e26c22261428881da11ec9b9abe1c0c08061"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-en.vtt",
+    "kind": "doc",
+    "sha256": "cedefebcc05ce9ca555750400d8972a207e2c35736d286d6b9d8b6303b39ab3e"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg",
+    "kind": "doc",
+    "sha256": "681e1e81762fdbe56d3c94887c920497701534f6c9a0ac372005adb83cca46fa"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif",
+    "kind": "doc",
+    "sha256": "48521b15a987941e4df56ec0e2168f96224b08c7695a32868cda5baf6c74b508"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
+    "kind": "doc",
+    "sha256": "f884fe92e34b578915f968f31edbe9387ca772932bd3c675bfc728c601d114e8"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.txt",
+    "kind": "doc",
+    "sha256": "477a1ef5fc6f75f014afcb9f9fdf67b0982df17bc79dca58f8107e161a3eb9b2"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/01-plan-fr.vtt",
+    "kind": "doc",
+    "sha256": "1ba0d1075e3c585aee6754790e2eceedd2f15cade1166a14c8c2db5deb327ba3"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg",
+    "kind": "doc",
+    "sha256": "07943470c61821de67b82a775952a403e6b41ae584112f704cf49fad0720f8bc"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.gif",
+    "kind": "doc",
+    "sha256": "38dd6cd4736454a06e0c08dc4c6bc811f42958519026cd33420bb99e47155dc0"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
+    "kind": "doc",
+    "sha256": "3d918c2623e74e1c57f90c6611dda24da9d701acbaddc213be31350ef10b2b75"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.txt",
+    "kind": "doc",
+    "sha256": "d555e8b09d902fe88689c1a0dc234eb42bcdc46f458efbe69db4ba32b743d216"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-en.vtt",
+    "kind": "doc",
+    "sha256": "d04d94bf0ff9dcfdc9cc2885d34cdfb62ddddb06f4d6d25cbe907e9c89ae211a"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg",
+    "kind": "doc",
+    "sha256": "a2fbfd2212f0ac23ffdc8bd96ee95d9f62d843cdd2a169d651813c0f0cbc7d34"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif",
+    "kind": "doc",
+    "sha256": "b63185fdd6429e4a98141aa0ca029855546df0ae3867e725aec16490726559f9"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
+    "kind": "doc",
+    "sha256": "72654ffbae275e5537aafcf49e078966401423fa789f43318e100b8bba4bb910"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.txt",
+    "kind": "doc",
+    "sha256": "0da2bd22faaf185158bba0a39e407d87f19c7bcb0711f0b4b38e926aa60e9e16"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/02-controles-fr.vtt",
+    "kind": "doc",
+    "sha256": "23ffcdfbe10b48b1d9b88a784c95ca5b54ebcd05514c0bceb7a34c8a8cb9e79d"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/media/03-client-en-poster.jpg",
+    "kind": "doc",
+    "sha256": "3937c8dd7731fde56cb77a387295094d2e9f979b49d1a08e249e7e9c3a3b276d"
+  },
+  {
     "path": "docs/training/casa-pizza/tutoriels/media/03-client-en.gif",
     "kind": "doc",
     "sha256": "3818f1e45328073d4192bd89d41ca2fef600bd0faa6d42092325c1b120357765"
@@ -1313,140 +1438,5 @@
     "path": "internal/engine/kernel_backend_linux_amd64_test.go",
     "kind": "test",
     "sha256": "f7be30522e95f519f7873f4e4a8208246a833d52b953c773957ab42f01455d56"
-  },
-  {
-    "path": "internal/engine/kernel_backend_native_linux_amd64.go",
-    "kind": "source",
-    "sha256": "40bb1ba4204cdf4ef78e8fb64c3c15bbf40c184426bf14563cf17a2a88ce9d2c"
-  },
-  {
-    "path": "internal/engine/kernel_backend_resources_linux.go",
-    "kind": "source",
-    "sha256": "026436ce94a2677c7b4a302ef9d121579b907b1bc3d633a097d9d956bf925304"
-  },
-  {
-    "path": "internal/engine/kernel_fixed_helper_linux.go",
-    "kind": "source",
-    "sha256": "af1aea371ae332c8f0c7c1b0b086e64b899210a5312d6bf33fa82f667bd1f3e6"
-  },
-  {
-    "path": "internal/engine/kernel_observation_linux.go",
-    "kind": "source",
-    "sha256": "e14491229444c2dee403810bfc614754e8f567b081dce15b2411b196683562ab"
-  },
-  {
-    "path": "internal/engine/kernel_observation_linux_test.go",
-    "kind": "test",
-    "sha256": "c8aa369133f2c24f269556a81f8d19e5b8317d223093506a72f5064c9cf8568d"
-  },
-  {
-    "path": "internal/engine/kernel_observation_transport_linux.go",
-    "kind": "source",
-    "sha256": "34bdbfc7000bf5b6bebc804d2960598a06105f208720506c4470265e03b689f2"
-  },
-  {
-    "path": "internal/engine/kernel_observe_child_linux.go",
-    "kind": "source",
-    "sha256": "c8a37556e52c5b166bf276a1e734d5aa3676d788662838d2184f3f37bebe634f"
-  },
-  {
-    "path": "internal/engine/kernel_observe_cleanup_test.go",
-    "kind": "test",
-    "sha256": "afc3398aa47b9302119674d71576e1faddcac95ec9fff82c18b971f07a3a5add"
-  },
-  {
-    "path": "internal/engine/kernel_observe_native_linux_amd64.go",
-    "kind": "source",
-    "sha256": "6572a7f9400ed34c021fbf275c9d2bbcdffa4efd3ef6edef5059005bc3724dab"
-  },
-  {
-    "path": "internal/engine/kernel_observe_native_linux_amd64_test.go",
-    "kind": "test",
-    "sha256": "1273e3292247633c2187a4121fe5eb51cea9c62899e34e4fbe9ed229aefd7703"
-  },
-  {
-    "path": "internal/engine/kernel_observe_native_other.go",
-    "kind": "source",
-    "sha256": "8057c5c63766e0bae1a8d493015033c8cee6995f26e4e68ea90ef0daf643612d"
-  },
-  {
-    "path": "internal/engine/kernel_observe_process_linux.go",
-    "kind": "source",
-    "sha256": "934c9eb0cf8e7bd1a26d97bc728ec055c0aba0678bece532327067d27f368853"
-  },
-  {
-    "path": "internal/engine/kernel_observe_process_linux_test.go",
-    "kind": "test",
-    "sha256": "3656db2dd1384b00cd29e6c69ba7bbfdd52cb870de573122083b27d0826d18fd"
-  },
-  {
-    "path": "internal/engine/kernel_observe_protocol_linux.go",
-    "kind": "source",
-    "sha256": "6594f67aa4c24c144ab55b74ee51ab0e3f3a494f4fe28c4e838d68d137cf348b"
-  },
-  {
-    "path": "internal/engine/kernel_observe_public_linux_test.go",
-    "kind": "test",
-    "sha256": "cd89ce00ce4a6b1bd3970a129094d5f33d9aa4e4fe0cb4c41fb110c54e207562"
-  },
-  {
-    "path": "internal/engine/launch_writer_test.go",
-    "kind": "test",
-    "sha256": "d2417e2d4917f8599074648c38e177de507190b9a65929d6a58021ac923cf581"
-  },
-  {
-    "path": "internal/engine/lifecycle.go",
-    "kind": "source",
-    "sha256": "4937f7c7bb07cc30913ced91eb369117ba43743d663f758e79a0259efec4e96b"
-  },
-  {
-    "path": "internal/engine/lifecycle_test.go",
-    "kind": "test",
-    "sha256": "87dca773a4821ffd95f5d1034710d4b470d636324cf3580f50f4d8088d9f72a4"
-  },
-  {
-    "path": "internal/engine/log_query.go",
-    "kind": "source",
-    "sha256": "e84f96e8a2fead8fde09ea1ae416ae3e550dc34f2b6644a074252cc942a830a1"
-  },
-  {
-    "path": "internal/engine/loop_failures_test.go",
-    "kind": "test",
-    "sha256": "07c9976317ef9147a4376615ad909ef89ec1e69395588dcdcf90e6638b06b172"
-  },
-  {
-    "path": "internal/engine/loop_guard.go",
-    "kind": "source",
-    "sha256": "7c83e7b04f02da26128054703222ef8eb5a9bba418308738b18f185192203616"
-  },
-  {
-    "path": "internal/engine/loop_guard_test.go",
-    "kind": "test",
-    "sha256": "287a7bfeb8e655f3c8268b63d44b6d02d677ce42244f1b6226469211a4f6ed26"
-  },
-  {
-    "path": "internal/engine/main.go",
-    "kind": "source",
-    "sha256": "648dff6e6e19516dd1b03b35ab817015b825bf40d056c05dcdbdedd84bf95151"
-  },
-  {
-    "path": "internal/engine/managed_binary_preflight_inspection_test.go",
-    "kind": "test",
-    "sha256": "af3359990793dd9e2d929d0ebfaafd6bba10b194d2e51baebd75733060bec5d5"
-  },
-  {
-    "path": "internal/engine/managed_checkpoint_recovery_test.go",
-    "kind": "test",
-    "sha256": "3463d9bbe6a58d88c55a81662bce9d52998b7ee38864dbf415c53bf8ae014c80"
-  },
-  {
-    "path": "internal/engine/managed_cleanup.go",
-    "kind": "source",
-    "sha256": "fe41a0d11c7330db7ae6be03bab4980c6dfac44d9b09159e5cf9bbc504c72303"
-  },
-  {
-    "path": "internal/engine/managed_control_diagnostic_api.go",
-    "kind": "source",
-    "sha256": "adee0d146b55c7abcd803bc709c6da1ad35aa400ac31061ec5b4b903ae1caa73"
   }
 ]

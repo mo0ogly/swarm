@@ -21,6 +21,10 @@
       {
         "fr": "Le lanceur prépare une nouvelle version locale lorsque les sources changent, avant de remplacer le serveur ; la modale relie numéro, évolutions et commit réel.",
         "en": "The launcher prepares a new local version when sources change before replacing the server; the dialog connects its number, changes and actual commit."
+      },
+      {
+        "fr": "Détail de tâche simplifié : libellés en gras, une seule zone d’action, tâches liées par leur nom et erreurs Git expliquées avec leur message original accessible.",
+        "en": "Simpler task details: bold labels, one action area, related tasks by name and explained Git errors with their original message available."
       }
     ]
   },
