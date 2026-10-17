@@ -5,6 +5,11 @@ presents read-only data. Errors are red, warnings amber, activity cyan and
 explicitly recorded successes green. Written levels accompany colours in both
 themes, using Swarm's semantic tokens.
 
+The [dense reading contract](DENSE-TEXT.md) adds event selection, previous/next,
+next signal, spacing and wrapping. Manual navigation pauses live following
+through a verified frame message. JSON keys and values use theme tokens;
+original data, search, filters and export remain independent of presentation.
+
 Sources remain distinct: attempt output, engine activity, supervisor incidents
 and decisions. A recorded decision or acknowledged incident proves neither a
 successful correction nor completion. Reasons, identities, operations and
@@ -40,3 +45,10 @@ export, network refusal and text fallback. It calls no real model and does not
 prove autonomous supervisor recovery.
 
 A hidden console retains the received message page but defers Monaco rendering. A `ResizeObserver` resumes rendering once the host has positive width and height; content is neither discarded nor replayed. This avoids wrapping measurements on missing DOM ranges. The graph recipe covers five reloads with the console hidden; the console recipe covers opening and filtering.
+
+The same observer also owns resizing. Monaco's `automaticLayout` is disabled
+because its internal observer would measure wrapping ranges despite the
+`render()` guard. Accessibility and word wrapping remain enabled.
+`tests/log_console_visibility_ui.cjs` checks navigation away from logs, width
+changes while hidden, then return to a readable console with the original data
+and no console errors.

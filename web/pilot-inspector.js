@@ -50,7 +50,9 @@ const PilotInspector={
   const signature=JSON.stringify([work,selected,t,instructionFeedback,a?.progress,a?.status,a?.usage,a?.reported_model,(globalThis.SwarmI18n?.engine(h?.process_label) ?? h?.process_label),(globalThis.SwarmI18n?.engine(h?.activity_label) ?? h?.activity_label),validation,decision,masked,Pilot.queue,Pilot.interventions(),snapshot.task_actions?.[tid]]);
   if(signature===Pilot.inspectorKey&&!open)return;Pilot.inspectorKey=signature;const token=++this.generation;
   const body=$('pilot-inspector-body'),focusKey=document.activeElement?.dataset.inspectorAction;
+  const readerFocus={key:document.activeElement?.closest('.text-reader')?.dataset.readerKey,action:document.activeElement?.dataset.readerAction};
   const activityExpanded=body.querySelector('#pilot-activity-details')?.open===true;
+  SwarmTextReader.capture(body);
   body.replaceChildren();
   $('pilot-inspector-title').textContent=decision?tr_web_pilot_inspector_js('Intervention à examiner'):t?.status==='submitted'?tr_web_pilot_inspector_js('Résultat à examiner')+(a?' — '+a.provider:''):a?'Agent '+a.provider:Pilot.taskTitle(t);
   const mission=node('section',undefined,'pilot-mission');mission.append(node('p',snapshot.work.title,'pilot-eyebrow'));body.append(mission);if(a)mission.append(ProjectProfiles.badge(a.workflow));if(t&&typeof TaskModels!=='undefined')mission.append(node('p',TaskModels.text(t,a)),Pilot.command(tr_web_pilot_inspector_js('Modèle de la tâche'),()=>TaskModels.open(t.id)));
@@ -70,6 +72,7 @@ const PilotInspector={
    const purpose=node('section',undefined,'pilot-section');purpose.classList.add('pilot-purpose');purpose.append(node('h4',tr_web_pilot_inspector_js('Ce qui était demandé')));
    const criteria=node('ul');for(const c of t.criteria||[])criteria.append(node('li',c));purpose.append(criteria);
    body.append(purpose);
+   if(t.next){const instructions=node('section',undefined,'pilot-section pilot-instructions');instructions.append(node('h4',tr_web_pilot_inspector_js('Consigne de la tâche')),SwarmTextReader.render(t.next,{stateKey:work+'/'+t.id+'/next'}));body.append(instructions)}
    const additions=InstructionRevisions.render(t);if(additions)body.append(additions);
   }
   if(decision){
@@ -136,6 +139,7 @@ const PilotInspector={
   body.append(technical);
   if(open)panel.scrollTop=0;
   else if(focusKey)[...body.querySelectorAll('[data-inspector-action]')].find(n=>n.dataset.inspectorAction===focusKey)?.focus({preventScroll:true});
+  else if(readerFocus.key&&readerFocus.action){const reader=[...body.querySelectorAll('.text-reader')].find(n=>n.dataset.readerKey===readerFocus.key);[...(reader?.querySelectorAll('[data-reader-action]')||[])].find(n=>n.dataset.readerAction===readerFocus.action)?.focus({preventScroll:true})}
  },
  activityExplanation(a,h,uncertain=''){
   const progress=a.progress||{},detail=progress.detail||'',action=progress.action||'';

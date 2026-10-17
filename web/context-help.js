@@ -17,7 +17,7 @@ const tr_web_context_help_js = source => globalThis.SwarmI18n?.t(source) ?? sour
   const body=el('div');body.className='context-help-body';
   [tr_web_context_help_js('À quoi ça sert'),tr_web_context_help_js('Comment faire'),tr_web_context_help_js('Si vous hésitez')].forEach((label,i)=>{const section=el('section');section.append(el('h3',label),el('p',topic[i+1]));body.append(section)});
   const footer=el('footer'),close=el('button',tr_web_context_help_js('Fermer l’aide'));close.type='button';close.addEventListener('click',e=>{if(e.isTrusted)dialog.close()});footer.append(close);
-  dialog.replaceChildren(header,body,footer);dialog.showModal();close.focus();
+  dialog.replaceChildren(header,body,footer);dialog.showModal();SwarmShell.focusWindowStart(dialog);
  }
  document.addEventListener('click',e=>{const b=e.target.closest('[data-context-help]');if(!b||!e.isTrusted)return;e.preventDefault();open(b.dataset.contextHelp,b)});
 })();

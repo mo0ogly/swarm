@@ -1,0 +1,3 @@
+AssertionError [ERR_ASSERTION]: #modal-title has the canonical logo
+    at headingBrand (/home/fpizzi/Documents/ChatGPT/swarm/tests/window_identity_ui.cjs:16:9)
+    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/window_identity_ui.cjs:61:5

@@ -1,0 +1,18 @@
+{
+  "status": "INCOMPLETE",
+  "cause": "Projected entries replaced by normal asynchronous activity response before navigation controls. Harness must project the API response consistently.",
+  "state": {
+    "follow": true,
+    "view": "logs",
+    "coordinates": {
+      "work": "w-15b740eced930c4f1bafa9db",
+      "agent": "__mission__",
+      "q": "",
+      "kind": "",
+      "after": "0"
+    },
+    "received": 3,
+    "fixture": "object",
+    "displayed": "#e000000000001 2026-10-17T16:49:37.145909578Z [work.create] Travail · Lecture des consignes et des journaux\n#e000000000002 2026-10-17T16:49:37.244103929Z [task.add] Tâche ajoutée · Préparer une livraison vérifiable\n#c000000000001 2026-10-17T16:49:37.363302179Z [autonomy] Niveau d'autonomie · opérateur local : Manuel — départs et relais humains · 2 créneau(x) ; sans effet sur les tentatives déjà lancées"
+  }
+}

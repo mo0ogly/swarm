@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
-  "base_commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
-  "candidate_id": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642+sha256:205038604152fe2a81307e5688ad15dc5afab08453911544114b49b3bf6dce7f",
-  "candidate_digest": "205038604152fe2a81307e5688ad15dc5afab08453911544114b49b3bf6dce7f",
+  "base_commit": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6",
+  "candidate_id": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6+sha256:eea813178fd8a25820e43a1254cc398a37a5125d137d71674ffb197867afcaf7",
+  "candidate_digest": "eea813178fd8a25820e43a1254cc398a37a5125d137d71674ffb197867afcaf7",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/ui-redesign-source-manifest.json",
   "requirements": [
@@ -171,32 +171,32 @@
       "limit": "Previous reports and captures concern their original candidate; this path snapshot is not an independent requalification."
     }
   ],
-  "limits": "Current source integrity only. Historical R01-R18 acceptance remains pending requalification. Existing user edits are observed inputs, not claimed authorship. This snapshot is neither an executed test receipt nor an independent verdict. Research and runtime results are separate.",
-  "historical_manifest_sha256": "caa898e6a639becf4117bf8876a4e08a6f452eb2bf7a89eb3e44e52dd6bb9fa6",
+  "limits": "Current source integrity only. Historical R01-R18 acceptance remains pending requalification. Existing user edits are observed inputs, not claimed authorship. This snapshot is neither an executed test receipt nor an independent verdict. Research and runtime results are separate. Commit packaging uses the exact Git index; unrelated working-tree edits and unstaged new paths are excluded.",
+  "historical_manifest_sha256": "765a9162f1c98e70721aefeaa946e75785dd27f31cd7110ec8d1d09e793f6388",
   "input_parts": [
     {
       "path": "docs/engine-cursor-source-inputs-001.json",
-      "sha256": "e60232a1e73e1032182c5f463cfdf9ab3737c59fbd700074922bf5f383b333e6"
+      "sha256": "f45f7227503cebd2b359ff20034ad34c208c4f6466c8ffa1a6bd09cad9bbc48f"
     },
     {
       "path": "docs/engine-cursor-source-inputs-002.json",
-      "sha256": "8b9c809d9fc24a0b6da9e04f07f94846ee09d37b232427e9cdc5d6a765e326e8"
+      "sha256": "a31459a5b3f06e77d558f050d28769995fff0c5dab06dd17e0c34af8c0abc2c6"
     },
     {
       "path": "docs/engine-cursor-source-inputs-003.json",
-      "sha256": "066983d306227223cd0c9582c92da7ad1802b4de75e6baadbe5fe449679dcc97"
+      "sha256": "d7a31361a90337e4a6eae57e4a1cd42c3e04c157092031ce6f6d14be8a38ad97"
     },
     {
       "path": "docs/engine-cursor-source-inputs-004.json",
-      "sha256": "270f8a6ea8bd261b49ad20c09b9df1c20461058f44bc06d3bf70951814ca16e7"
+      "sha256": "3af8218ffa4bd8209cc84df7ee4a13f7899dbf4be2d3929530f58729c0443497"
     },
     {
       "path": "docs/engine-cursor-source-inputs-005.json",
-      "sha256": "b86155ac6d5b3fd19cc619672ef79e1ff96ce96addf9b92b0eb38585bcd5a364"
+      "sha256": "7626d907be132f5fb6be73f9bb0d01aa2c99195cb9b22e510a12b1a2f5ed1fe5"
     },
     {
       "path": "docs/engine-cursor-source-inputs-006.json",
-      "sha256": "acb9b768d0bf38b172b9c8735fb1d2f1a491e73d6fa4fcaae8503e3e1b2e6765"
+      "sha256": "c0c3249aa99166ed930c1c5bb95b12721981d96b2f8d7ce46dee89583f05c858"
     }
   ]
 }

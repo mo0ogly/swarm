@@ -35,7 +35,14 @@
   if(!button)return;
   button.hidden=!(count>0);button.querySelector('span').textContent=label||tr('Décisions à traiter');document.getElementById('nav-decision-count').textContent=String(count);
  }
- root.SwarmShell={navigate,updateDecisions};
+ // Long informational dialogs start with their title, not a footer button that
+ // scrolls the introduction out of view. Forms keep their native input focus.
+ function focusWindowStart(dialog){
+  const title=document.getElementById(dialog.getAttribute('aria-labelledby'));
+  if(!title||!dialog.contains(title))return;
+  title.tabIndex=-1;title.focus({preventScroll:true});dialog.scrollTop=0;
+ }
+ root.SwarmShell={navigate,updateDecisions,focusWindowStart};
  for(const detail of document.querySelectorAll('[data-nav-group]')){
   const key='swarm-nav:'+detail.dataset.navGroup,saved=get(key);
   if(saved!==null)detail.open=saved==='open';

@@ -1,35 +1,5 @@
 [
   {
-    "path": ".agents/skills/product-delivery/SKILL.md",
-    "kind": "source",
-    "sha256": "864bb09eb52c8fc0d70fb68ccce94380098f9813b4be1e14d986e9cfc18fedc5"
-  },
-  {
-    "path": ".agents/skills/product-delivery/agents/openai.yaml",
-    "kind": "source",
-    "sha256": "69667332179dd4a2e51fd1530e23332b66c00b1d249b2bede9626ad4db6f7626"
-  },
-  {
-    "path": ".agents/skills/product-planning/SKILL.md",
-    "kind": "source",
-    "sha256": "90457e484c240ebe04709ebddefdd87c73a64fbdbc9c786fd18fdc9a2555eeaa"
-  },
-  {
-    "path": ".agents/skills/product-planning/agents/openai.yaml",
-    "kind": "source",
-    "sha256": "61c260fe43de24133ecc34a8ed3aea2e096601a22666aa603dc0ee7dd77fa853"
-  },
-  {
-    "path": ".agents/skills/product-review/SKILL.md",
-    "kind": "source",
-    "sha256": "b7d3493730eac8f3d4082b2e7e1f275e8f6ffa859b388765b6613724c24815f5"
-  },
-  {
-    "path": ".agents/skills/product-review/agents/openai.yaml",
-    "kind": "source",
-    "sha256": "89505ced3ad0a690094186957af92c51d06356e1b5aaf61c0cc886b503c4d401"
-  },
-  {
     "path": ".claude/commands/ks-architect.md",
     "kind": "source",
     "sha256": "66589d8eff58cf04970113eae671253966e4dfe316e672d2d3592feedf375002"
@@ -157,7 +127,7 @@
   {
     "path": ".claude/skills/replan/SKILL.md",
     "kind": "source",
-    "sha256": "a496827ab164f790fb6961fc864a32e653cdef809e773eb6f4b035cf1f631a68"
+    "sha256": "49d31a2b45dc975e27dea2c037184742f59b7eebc95879cb82eae53a5e6918a2"
   },
   {
     "path": ".claude/skills/retex-analyzer/SKILL.md",
@@ -207,7 +177,7 @@
   {
     "path": "AGENTS.md",
     "kind": "doc",
-    "sha256": "141d089b0edc8df2105096262935c992b9e9e2fbb77c8dcf512d15f763d1fb1b"
+    "sha256": "eda4ec1d6a934885bebe422bc2354f4489376c35a72f2ee11648e4b185091436"
   },
   {
     "path": "CLAUDE.md",
@@ -217,7 +187,7 @@
   {
     "path": "INSTALL.md",
     "kind": "doc",
-    "sha256": "e4ea40e7cc8e04af96f0c73aa57ad872049980a517779baf6cb0be75829c0a01"
+    "sha256": "a5d55dcdebf094843819c68b8117776f38bc21aff2551dba4a1500442ab3cf9f"
   },
   {
     "path": "PREPARATION-UX.md",
@@ -227,12 +197,12 @@
   {
     "path": "README.en.md",
     "kind": "doc",
-    "sha256": "a1c483bb1564c8569b7db1924b5abafb5154f6c5c9b10e76fcac894920f02a60"
+    "sha256": "8fa4a6cf0960c7962244ddfe004910e91b36466b18101cb89d12ae2a04082e7b"
   },
   {
     "path": "README.md",
     "kind": "doc",
-    "sha256": "f89012b44a5fdee3ca2995061a23cc0eea21aa847b73e96ba153d26e62497a39"
+    "sha256": "968ad9d2b3424c18854c9046326a0f2e8532d9912ee2d0733228b5399ab55ec9"
   },
   {
     "path": "build.sh",
@@ -307,7 +277,7 @@
   {
     "path": "docs/AGENT-METHODS.md",
     "kind": "doc",
-    "sha256": "733bbda6d08f6414311d462651b3362e39f4b1870344171a48fb75e434fee45b"
+    "sha256": "a8ec2c257bad319267cba202abae9b7fb2cf6fd16f2a781f9ab1b94b4e6641dd"
   },
   {
     "path": "docs/B01.md",
@@ -375,6 +345,11 @@
     "sha256": "9bc40fd0a6a0467a743d859a7eeab0b0d1b1126e39f5ea8f3394d3a4419fcefc"
   },
   {
+    "path": "docs/DENSE-TEXT.md",
+    "kind": "doc",
+    "sha256": "604cd4ecf621d84e5dcc2d61f529dfc71518d85fff248ce710794adf966bd655"
+  },
+  {
     "path": "docs/ENGINE-BUSINESS-CONTROLS.md",
     "kind": "doc",
     "sha256": "83b535b38a1876dcf14055fa93d3bcb91f1c03ca1d8635ce7821866ed0ce442d"
@@ -417,7 +392,7 @@
   {
     "path": "docs/UI-DESIGN.md",
     "kind": "doc",
-    "sha256": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3"
+    "sha256": "35e21589310ddc275181957dc8881d772f6d82fb92dcf677a0d7217459edfe0d"
   },
   {
     "path": "docs/actions-confiance-T2.md",
@@ -462,12 +437,17 @@
   {
     "path": "docs/architecture/ACTIONS-CONFIANCE.md",
     "kind": "doc",
-    "sha256": "db2dd084bc211175dfa87bed7790706ca26983b4e14e9a31ee9c2ebdef140f7f"
+    "sha256": "0142758abdbdfceb2987eb089df37f0d5651349fd9a19a60116cec2a35e2be6c"
   },
   {
     "path": "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
     "kind": "doc",
     "sha256": "3d47b29e40df99d5a9c775e50e67e2c450b3d145fee7c9e3ab05b4d057fd66b3"
+  },
+  {
+    "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
+    "kind": "doc",
+    "sha256": "eddd6d9539718ed3bed8856c2797a2b1b18a4a957be895c970dd282bfd1f4ff7"
   },
   {
     "path": "docs/architecture/AGENT-PARALLELISM.md",
@@ -522,7 +502,7 @@
   {
     "path": "docs/architecture/LOG-CONSOLE.md",
     "kind": "doc",
-    "sha256": "a0c620849d0d9c10193e547adce0361069ac4ab50884fc1e4d5c0599e33d9b47"
+    "sha256": "3f786b9e3f9b5f01fe279df22944f3972d6ab006d2a67bf12818cf23d5a96477"
   },
   {
     "path": "docs/architecture/MANAGED-PLAN-GATES.md",
@@ -565,6 +545,11 @@
     "sha256": "ea8392e5fc4dc8634d4e80ba08591151f4fe10b50643dc45ffc41818ede213a9"
   },
   {
+    "path": "docs/architecture/WORK-ROW-CONTRACT.md",
+    "kind": "doc",
+    "sha256": "1b8782096305f4b98d49bbe69e304e6a2ec9793e1a947ebba02b7c0f17cf228a"
+  },
+  {
     "path": "docs/architecture/actions-confiance-controls-reference.json",
     "kind": "doc",
     "sha256": "4be9c47151f14d782e5bef98566593bc94fc0c99d3e54a818d5b9ea478cf464e"
@@ -572,7 +557,7 @@
   {
     "path": "docs/en/ACTIONS-CONFIANCE.md",
     "kind": "doc",
-    "sha256": "92d2cd9829c9d47083395abfd0260f276a21279f5604b265710a2349d5a074d4"
+    "sha256": "24571605442c0e42b0561206e7659c01338fa932bcaca17c9f0eb0767cece2a9"
   },
   {
     "path": "docs/en/AGENT-COMMUNICATION.md",
@@ -585,9 +570,14 @@
     "sha256": "2100048c67cf9cc7f69ea311deda33e25bcf3fb0f568d5bdeb8d4dd0e13cd960"
   },
   {
+    "path": "docs/en/AGENT-IDENTITY-CONTRACT.md",
+    "kind": "doc",
+    "sha256": "831966da4978373c6f5fc8d3530e9ff7d15ced312ddc7808d616621193c25e7b"
+  },
+  {
     "path": "docs/en/AGENT-METHODS.md",
     "kind": "doc",
-    "sha256": "b3c6cb254a834c588518235ccbbf1396886bfcf5ea813a8c1f873a06c9bb4fb7"
+    "sha256": "fabea125ca2c2e7dd98c99cd989afa0ae5f9c991b43d79305bcec59be1c4cecd"
   },
   {
     "path": "docs/en/AGENT-PARALLELISM.md",
@@ -665,6 +655,11 @@
     "sha256": "98049f624f8496ef28ee1ce7e1f2e376210639724a31cf5cd28cc9ab8bdcccdd"
   },
   {
+    "path": "docs/en/DENSE-TEXT.md",
+    "kind": "doc",
+    "sha256": "522654ddc99ebb45a4bacca2a8a8fd447f80a905567defb61e62a2c3115e871d"
+  },
+  {
     "path": "docs/en/ENGINE-ACCEPTANCE.md",
     "kind": "doc",
     "sha256": "09600b74d323ba6f85a3ee36a7aa2f47a439dc0d7df876e39f2ce403b14ad089"
@@ -712,7 +707,7 @@
   {
     "path": "docs/en/INSTALL.md",
     "kind": "doc",
-    "sha256": "c7f2cc09d89fbcef361795ebe69e5e4101a46393a8fac255ec4177ddf0ff0c96"
+    "sha256": "557ccb77f51a204078b772aa085fd1c32054ea7b88d2660eb36650f2128ea0d9"
   },
   {
     "path": "docs/en/INSTRUCTION-LEARNING.md",
@@ -732,7 +727,7 @@
   {
     "path": "docs/en/LOG-CONSOLE.md",
     "kind": "doc",
-    "sha256": "c97b401f330c10854281f27a7f4d5d91c77a92e0134182aef83efcdd6aa83347"
+    "sha256": "93f881f05d29fda7819a09bd9858e96c1fa4f2d83c320419475a13cc8e89e138"
   },
   {
     "path": "docs/en/MANAGED-PLAN-GATES.md",
@@ -757,7 +752,7 @@
   {
     "path": "docs/en/PROJECT-MEMORY.md",
     "kind": "doc",
-    "sha256": "b38504ac6fbabe5976fad868b457cd37ce477e7d2bc2bfaac491cc093b8792a4"
+    "sha256": "549e00ce60473852daf15b6eecad906a3d4c5a2bc396f0b5f4f57985c18da914"
   },
   {
     "path": "docs/en/PROJECT-PROFILE.md",
@@ -782,7 +777,7 @@
   {
     "path": "docs/en/REFERENCE.md",
     "kind": "doc",
-    "sha256": "eb9bdd1b809f1bd5a15c59c257261ae191cc7b6cff6e1156b9b47c4729c13cd7"
+    "sha256": "f6a0036cbb80bd4a769c3983146e9ca0fa6ceb31f106a349cd0420ef929e732f"
   },
   {
     "path": "docs/en/REPOSITORY-STRUCTURE.md",
@@ -825,6 +820,11 @@
     "sha256": "fd62b17a3f1bc2bc6269354bdcfdd5da07b7060cda0a90be1d739576f01584aa"
   },
   {
+    "path": "docs/en/SEMANTIC-SIGNALS.md",
+    "kind": "doc",
+    "sha256": "5f2c908b73f72800655e8809d18f9c2df3ec3c40b6b37b0bbde3271813685a4f"
+  },
+  {
     "path": "docs/en/TASK-MODELS.md",
     "kind": "doc",
     "sha256": "b4d63ab8c19b1040eefcebd19e83ef7ee45b39f6ebd333baeefa526ad8d90ffd"
@@ -843,6 +843,16 @@
     "path": "docs/en/WEB-REQUEST-POLICY.md",
     "kind": "doc",
     "sha256": "b8652c35583dd1ab9bb0c842bb2c570943f62dff032964a3d9b1591998bf93a1"
+  },
+  {
+    "path": "docs/en/WINDOW-IDENTITY.md",
+    "kind": "doc",
+    "sha256": "9a5f32785778d9847f69214b1af46cd7b798c1bc742e957f1070b7172a32261d"
+  },
+  {
+    "path": "docs/en/WORK-ROW-CONTRACT.md",
+    "kind": "doc",
+    "sha256": "13b936919238c4f17d18a55d168c591c72d6c1c74f1287f7d0d5a85d4925b7e9"
   },
   {
     "path": "docs/en/actions-confiance-T2.md",
@@ -932,7 +942,7 @@
   {
     "path": "docs/plans/fresh-install-methods-20261008.md",
     "kind": "doc",
-    "sha256": "f292d0c715694bfd1a1bc99aa46fc8803efbc9c5756edaf4a67b5d903bd23128"
+    "sha256": "6952c60ee201f658ad0b28f940e88f83c32fdc190492c9a611dbc898a823de3e"
   },
   {
     "path": "docs/plans/graphe-automatisation-20261005/CONTRACTS.md",
@@ -1478,10 +1488,5 @@
     "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
     "kind": "capture",
     "sha256": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
-    "kind": "capture",
-    "sha256": "4c2df9433e549879b59199f3f41a52b624493d722ac4ae4af08f68e81115aefe"
   }
 ]

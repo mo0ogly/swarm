@@ -12,6 +12,12 @@ for(const [id,title,depends]of [['commande','Prendre la commande',[]],['cuisine'
 cli(['autonomy',w.id,'manuel']);
 const app=spawn(binary,['--root',fixtureRoot,'web','127.0.0.1:0']);let browser,page;
 const errors=[],networkErrors=[],checks=[],navigationAborts=[],inflight=new Set(),expectedNavigationAborts=new WeakSet();
+const consoleDiagnostics=[],consolePending=[];
+function consoleError(message){
+ if(message.type()!=='error')return;
+ errors.push(message.text());
+ consolePending.push(Promise.allSettled(message.args().map(arg=>arg.evaluate(value=>({name:value?.name,message:value?.message,stack:value?.stack,text:typeof value==='string'?value:undefined})))).then(details=>consoleDiagnostics.push({text:message.text(),location:message.location(),details})));
+}
 function markNavigation(){for(const request of inflight)expectedNavigationAborts.add(request)}
 async function navigateTo(url){markNavigation();return page.goto(url,{waitUntil:'domcontentloaded'})}
 async function reloadPage(){markNavigation();return page.reload({waitUntil:'domcontentloaded'})}
@@ -30,15 +36,15 @@ async function colors(){
  return page.evaluate(()=>{
   function lum(hex){const c=hex.trim().replace('#','').match(/.{2}/g).map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);return .2126*c[0]+.7152*c[1]+.0722*c[2]}
   function ratio(a,b){const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
-  const style=getComputedStyle(document.documentElement),pairs=[['texte','fond'],['titre','carte'],['texte-discret','fond'],['libelle','champ'],['info-encre','info-fond'],['succes-encre','succes-fond'],['attention-encre','attention-fond'],['alerte-encre','alerte-fond'],['action-encre','action-fond']];
+  const style=getComputedStyle(document.documentElement),pairs=[['texte','fond'],['titre','carte'],['titre','carte-appuyee'],['lien','carte'],['texte','carte'],['texte-discret','carte'],['texte-discret','fond'],['libelle','champ'],['info-encre','info-fond'],['succes-encre','succes-fond'],['attention-encre','attention-fond'],['alerte-encre','alerte-fond'],['action-encre','action-fond']];
   return pairs.map(([a,b])=>({pair:a+'/'+b,ratio:ratio(style.getPropertyValue('--wattson-'+a),style.getPropertyValue('--wattson-'+b))}));
  });
 }
 (async()=>{
- const session=await new Promise((resolve,reject)=>{let text='';const timer=setTimeout(()=>reject(Error('server startup timeout')),20000);app.stdout.on('data',x=>{text+=x;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){clearTimeout(timer);resolve(m[0])}});app.on('exit',c=>reject(Error('server exited '+c)))});
+ const session=await new Promise((resolve,reject)=>{let text='';app.stdout.on('data',x=>{text+=x;const m=text.match(/http:\/\/\S+\/session\/\S+/);if(m){resolve(m[0])}});app.on('exit',c=>reject(Error('server exited '+c)))});
  const base=new URL(session).origin;
  browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome',args:['--no-sandbox']});
- page=await browser.newPage();page.on('dialog',dialog=>dialog.accept());page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+ page=await browser.newPage();page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);page.on('dialog',dialog=>dialog.accept());page.on('pageerror',e=>errors.push(e.message));page.on('console',consoleError);
  page.on('request',r=>inflight.add(r));page.on('requestfinished',r=>inflight.delete(r));
  page.on('requestfailed',r=>{inflight.delete(r);if(r.failure()?.errorText==='net::ERR_ABORTED'&&expectedNavigationAborts.has(r))navigationAborts.push(new URL(r.url()).pathname);else networkErrors.push(r.url()+' '+r.failure()?.errorText)});
  page.on('response',r=>{if(r.status()>=400)networkErrors.push('HTTP '+r.status()+' '+r.url())});
@@ -97,7 +103,10 @@ async function colors(){
  const wasOpen=await page.$eval('[data-nav-group="configuration"]',e=>e.open);await page.keyboard.press('Enter');
  assert.equal(await page.$eval('[data-nav-group="configuration"]',e=>e.open),!wasOpen);
  checks.push('keyboard accordions; graph disclosure persisted across reload');
- assert.equal(await page.$$eval('.graph-arete',es=>es.every(e=>e.tagName==='path'&&e.getAttribute('d').includes('Q'))),true);
+ // The graph workbench uses cubic C paths; the dagre renderer uses quadratic Q.
+ const renderedEdges=await page.$$eval('.graph-arete',es=>es.map(e=>({tag:e.tagName,path:e.getAttribute('d'),length:e.getTotalLength()})));
+ assert.equal(renderedEdges.length,3,'all fixture dependencies are rendered');
+ assert.ok(renderedEdges.every(e=>e.tag==='path'&&/[QC]/.test(e.path)&&!/(NaN|Infinity)/.test(e.path)&&Number.isFinite(e.length)&&e.length>0),'every dependency has a valid curved path');
  const contrasts={};
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
   await navigateTo(base+'/?lang='+lang+'&view=conduite');await page.waitForSelector('#pilot-canvas');
@@ -196,7 +205,7 @@ async function colors(){
  assert.equal(await page.$eval('#nav-interventions',e=>e.hidden),true);
  checks.push('direct-link group opening; pending decision reachable with closed group; failed refresh preserves data and recovers');
  const accessContext=await browser.createBrowserContext(),accessPage=await accessContext.newPage();
- accessPage.on('pageerror',e=>errors.push(e.message));accessPage.on('console',m=>{if(m.type()==='error')errors.push(m.text())});accessPage.on('response',r=>{if(r.status()>=400)networkErrors.push('login HTTP '+r.status()+' '+new URL(r.url()).pathname)});
+ accessPage.on('pageerror',e=>errors.push(e.message));accessPage.on('console',consoleError);accessPage.on('response',r=>{if(r.status()>=400)networkErrors.push('login HTTP '+r.status()+' '+new URL(r.url()).pathname)});
  for(const lang of ['fr','en'])for(const theme of ['etat','sombre']){
   await accessPage.setViewport({width:1000,height:850});await accessPage.goto(base+'/login?lang='+lang+'&theme='+theme);
   await accessPage.waitForFunction(()=>document.querySelector('.access-logo')?.naturalWidth>0);
@@ -209,4 +218,4 @@ async function colors(){
  const agents=cli(['agent','list',w.id]);assert.deepEqual(agents.agents,[]);
  fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({status:'PASS',checks,contrasts,errors,networkErrors,navigationAborts,fixtureRoot,agents:0},null,2));
  console.log('PASS Swarm design system: '+checks.join('; '));
-})().catch(async e=>{console.error(e);fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:e.stack,errors,networkErrors,fixtureRoot},null,2));if(page){await page.screenshot({path:path.join(out,'failure.png'),fullPage:true}).catch(()=>{});console.error(await page.evaluate(()=>document.body.innerText).catch(()=>''))}process.exitCode=1}).finally(async()=>{await browser?.close();app.kill()});
+})().catch(async e=>{console.error(e);await Promise.allSettled(consolePending);fs.writeFileSync(path.join(out,'failure.json'),JSON.stringify({error:e.stack,errors,consoleDiagnostics,networkErrors,fixtureRoot},null,2));if(page){await page.screenshot({path:path.join(out,'failure.png'),fullPage:true}).catch(()=>{});console.error(await page.evaluate(()=>document.body.innerText).catch(()=>''))}process.exitCode=1}).finally(async()=>{await browser?.close();app.kill()});

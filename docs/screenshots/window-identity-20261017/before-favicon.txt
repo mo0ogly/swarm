@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: / favicon
++ actual - expected
+
+  [
+    '/swarm-logo.png',
++   '/favicon.svg'
+  ]
+
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/window_identity_ui.cjs:54:11

@@ -21,7 +21,9 @@ globalThis.JournalConsole = (() => {
     send();
   }
   addEventListener('message', event => {
-    if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'swarm-log-ready') return;
+    if (event.origin !== location.origin || event.source !== frame?.contentWindow) return;
+    if(event.data?.type==='swarm-log-browse'){if(page)page.follow=false;if(typeof pauseLogFollowing==='function')pauseLogFollowing();return;}
+    if(event.data?.type!=='swarm-log-ready')return;
     ready = !!event.data.monaco;
     document.getElementById('journal-console-mode').dataset.diagnostic=event.data.diagnostic||'';
     frame.hidden = !ready;

@@ -8,7 +8,7 @@ const InstructionRevisions={
   const box=node('section',undefined,'instruction-revisions');box.setAttribute('aria-label',this.tr('Consignes améliorées'));box.append(node('h4',this.tr('Consignes améliorées')),node('p',this.tr('Ces ajouts préparent les prochaines tâches à partir des retours de l’équipe.')));
   for(const r of task.instruction_revisions){
    const card=node('article',undefined,'instruction-revision');card.dataset.instructionRevision=r.id;card.dataset.state=r.state;
-   card.append(node('strong',this.tr(r.state==='rejected'?'Rejetée':r.used_by_attempt?'Transmise à un agent':'Validée par défaut')),node('p',r.addition,'instruction-addition'));
+   card.append(node('strong',this.tr(r.state==='rejected'?'Rejetée':r.used_by_attempt?'Transmise à un agent':'Validée par défaut')),SwarmTextReader.render(r.addition,{className:'instruction-addition',stateKey:snapshot.work.id+'/'+task.id+'/'+r.id}));
    const details=node('details');details.append(node('summary',this.tr('Pourquoi cet ajout ?')),node('p',r.reason),node('p',this.tr('Responsable : ')+r.scope),node('p',this.tr('Date : ')+new Date(r.at).toLocaleString()));
    if(r.rejected_reason)details.append(node('p',r.rejected_reason));card.append(details);
    if(r.state==='applied'){
@@ -23,7 +23,7 @@ const InstructionRevisions={
  },
  feedbackNode(feedback){const p=node('p',feedback.text,'instruction-feedback');p.setAttribute('role',feedback.error?'alert':'status');if(feedback.error)p.classList.add('notice','alert');return p;},
  async reject(task,id,card){
-  const workID=snapshot.work.id,revision=snapshot.work.revision,button=card.querySelector('button');button.disabled=true;
+  const workID=snapshot.work.id,revision=snapshot.work.revision,button=card.querySelector('[data-inspector-action^="reject-instruction-"]');button.disabled=true;
   const key=this.key(workID,id);this.feedback.set(key,{text:this.tr('Rejet en cours…'),pending:true});card.querySelector('.instruction-feedback')?.remove();card.append(this.feedbackNode(this.feedback.get(key)));
   try{await api('/api/v1/planning?work='+encodeURIComponent(workID)+'&action=reject-instructions',{schema_version:1,event_id:crypto.randomUUID(),expected_revision:revision,task_id:task,instruction_revision_id:id,reason:this.tr('Ajout rejeté par l’utilisateur depuis le pilotage.')});this.feedback.delete(key);await refresh(true);if(snapshot.work.id===workID){Pilot.inspectorKey='';PilotInspector.render();const updated=document.querySelector(`[data-instruction-revision="${CSS.escape(id)}"]`);if(updated){updated.tabIndex=-1;updated.focus({preventScroll:true});}}}
   catch(e){

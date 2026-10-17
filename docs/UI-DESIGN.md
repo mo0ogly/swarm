@@ -26,6 +26,44 @@ avec quatre cartes colorées, grands dégradés et panneaux imbriqués.
   Les conserver pour les préférences, liens et tests existants.
 - Les préférences de présentation sont locales ; elles n’altèrent jamais une mission.
 
+### Logo des fenêtres et hiérarchie des textes
+
+Les consignes longues et les journaux ont un contrat de lecture propre :
+[textes denses](DENSE-TEXT.md), [English](en/DENSE-TEXT.md). Les contrôles de fenêtre
+ci-dessous ne suffisent pas à qualifier ce contenu.
+
+Le logo canonique accompagne les titres d’en-tête des dialogues, y compris ceux
+créés à la demande (version, aide, réglages). `swarm-design.css` le dessine dans
+le pseudo-élément décoratif du `h2` sous `dialog > header` ou `dialog > form > header`.
+Conserver ce contrat pour les nouveaux dialogues : titre nommé par
+`aria-labelledby`, en-tête, contenu, fermeture. Aucun texte du titre n’est remplacé
+et le logo n’ajoute pas de nom accessible redondant. Taille : 44 px, 34 px sur
+petit écran ; sa place est réservée pour éviter les collisions avec la fermeture.
+
+Les fenêtres Processus, Actions de confiance et Session affichent aussi la marque.
+Le cockpit la conserve dans l’en-tête mobile et quand le rail est replié sur
+ordinateur. Les onglets HTML utilisent uniquement `swarm-logo.png` comme icône ;
+la console embarquée conserve toute sa hauteur, l’identité étant portée par son
+cadre. La fenêtre transitoire OIDC conserve son message d’attente et le logo.
+
+Les titres des dialogues utilisent Georgia, les sous-titres le jeton de lien
+lisible, les textes un interligne de 1,65–1,7. Le gras, les citations, le code en
+ligne et les mises en évidence partagent les paires sémantiques existantes.
+Les notices gardent leur signification (information, succès, attention, erreur),
+leur libellé et leur bordure ; leurs titres héritent de la couleur de l’état.
+Ne pas colorer arbitrairement des mots utilisateur ni interpréter du HTML fourni
+par une réponse IA pour obtenir une mise en forme.
+
+Une fenêtre d’information longue commence au titre :
+`SwarmShell.focusWindowStart(dialog)` place un focus programmatique sur le titre
+nommé et remet le défilement au début. Les formulaires conservent le focus natif
+sur leur saisie ; Échap et les fermetures rendent le focus au déclencheur.
+
+Recette : `node tests/window_identity_ui.cjs CHEMIN_BINAIRE DOSSIER_PREUVES`, puis
+la recette design existante pour les états, formulaires et parcours complets.
+Rapport : `docs/reports/window-identity-20261017.md` ;
+[contrat en anglais](en/WINDOW-IDENTITY.md).
+
 Le choix d’une feuille commune évite quatre identités divergentes et une réécriture
 des composants métier. Les anciens styles par vue restent responsables de leurs
 comportements spécifiques. Ne pas ajouter une deuxième couche de surcharge : faire
@@ -160,12 +198,16 @@ le système graphique commun.
 Une compilation ne remplace pas la vérification du binaire effectivement servi.
 Une vérification locale de l’auteur n’est pas une revue indépendante.
 
-Le contrôle Go d’intégrité utilise `docs/ui-redesign-source-manifest.json` après
-les instantanés historiques. Après une évolution des sources et des preuves UI,
-`python3 tools/refresh_ui_source_manifest.py` recalcule cet instantané, puis
-`go test ./internal/engine -run TestGraphDeliveryD03QualificationManifest -count=1`
-vérifie son intégrité. Cette opération ne renouvelle aucune acceptation historique
-et ne remplace jamais l’exécution des recettes comportementales.
+Le contrôle Go d’intégrité choisit l’instantané courant après les instantanés
+historiques : `docs/ui-redesign-source-manifest.json`, puis
+`docs/engine-cursor-source-manifest.json` si ce dernier existe. Après une évolution
+des sources et des preuves UI, exécuter `python3 tools/refresh_ui_source_manifest.py`.
+Si le manifeste moteur est présent, exécuter ensuite
+`python3 tools/verification/refresh_engine_source_manifest.py` : il reprend les
+entrées UI et les sources moteur actuelles, en parties JSON sans perte.
+`go test ./internal/engine -run TestGraphDeliveryD03QualificationManifest -count=1 -timeout=0`
+vérifie alors le manifeste réellement sélectionné. Ces opérations ne renouvellent
+aucune acceptation historique et ne remplacent pas les recettes comportementales.
 
 ## Captures et formation embarquée
 
