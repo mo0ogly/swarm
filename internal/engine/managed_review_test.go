@@ -55,6 +55,25 @@ if '\nSWARM_MANAGED_REVIEW_TEXT_CONTEXT\n' in text:
    ctx[m[1]][int(m[2])][m[3]]=raw.decode()
 else:
  ctx=json.loads(text.split('\nSWARM_MANAGED_REVIEW_CONTEXT\n',1)[1])
+catalog=None
+if 'citation_catalog' in ctx:
+ import hashlib
+ payload=ctx;catalog=payload['citation_catalog'];ctx=payload['task_contracts_reports_controls']
+ quotes={row[0]:row[1] for row in catalog['quotes']}
+ def escape(value):
+  return json.dumps(value,ensure_ascii=False)[1:-1].replace('<',r'\u003c').replace('>',r'\u003e').replace('&',r'\u0026').replace('\u2028',r'\u2028').replace('\u2029',r'\u2029')
+ originals={}
+ for name,kind,digest,size,spans in catalog['originals']:
+  content=''.join(quotes[n] if n>=0 else escape(quotes[-1-n]) for n in spans)
+  assert len(content.encode())==size and hashlib.sha256(content.encode()).hexdigest()==digest
+  originals[name]=content
+ ctx['receipt']=json.loads(originals['candidate-receipt.json'])
+ ctx['diff']=originals.get('current-changes.diff','')
+ for source in ctx.get('sources',[]): source['content']=originals[source['path']]
+ for task in ctx['tasks']:
+  name=task['binding'].get('report') or 'report.md'
+  task['report']=originals['tasks/'+task['task']+'/'+name]
+  task['controls']=json.loads(originals['tasks/'+task['task']+'/controls.json'])
 folder=os.path.dirname(__file__)
 with open(os.path.join(folder,'calls'),'a') as f: f.write('call\n')
 with open(os.path.join(folder,'observed.json'),'w') as f: json.dump({'context':ctx,'prompt':text,'args':sys.argv[1:],'cwd':os.getcwd(),'pid':os.getpid()},f)
@@ -68,6 +87,16 @@ for task in ctx['tasks']:
  assert task['controls'] and all(c['executed'] and c['passed'] and c['exit_code']==0 for c in task['controls'])
  assert ctx['candidate_commit'] == ctx['receipt']['candidate_commit']
  reply['tasks'].append({'task':task['task'],'reason':'Examen fixture du rapport et du reçu Git fourni','criteria':[{'index':i+1,'verdict':mode if mode in ('fail','unknown') else 'pass','evidence':task['report'][:80]} for i,_ in enumerate(task['criteria'])]})
+if catalog is not None:
+ schema=json.loads(sys.argv[sys.argv.index('--json-schema')+1])
+ allowed=set(schema['$defs']['original-reference']['enum'])
+ for task in reply['tasks']:
+  source=next(t for t in ctx['tasks'] if t['task']==task['task'])
+  refs=next(o[4] for o in catalog['originals'] if o[0]=='tasks/'+task['task']+'/'+(source['binding'].get('report') or 'report.md'))
+  reference=next(n if n>=0 else -1-n for n in refs if (n if n>=0 else -1-n) in allowed)
+  for criterion in task['criteria']:
+   if criterion['verdict']=='pass': criterion.pop('evidence');criterion['evidence_ref']=reference
+ reply['catalog_sha256']=payload['catalog_sha256']
 if mode=='wrong-sha': reply['candidate_commit']='0'*40
 if mode=='missing-task': reply['tasks']=[]
 print(json.dumps({'type':'result','result':json.dumps(reply)}))
@@ -392,7 +421,7 @@ func TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation(t *
 				content = []byte{0, 1, 2, 3}
 			} else {
 				path = filepath.Join(a.CWD, "docs/first.md")
-				content = []byte(strings.Repeat("A long complete evidence record.\n", 10000))
+				content = []byte(managedBatchDistinctText("Unique complete evidence record.", 330000))
 			}
 			if e := os.WriteFile(path, content, 0600); e != nil {
 				t.Fatal(e)
@@ -408,6 +437,42 @@ func TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation(t *
 				t.Fatal(w.Tasks[0].Blocker)
 			}
 		})
+	}
+}
+
+func TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation(t *testing.T) {
+	s, w := managedFixture(t)
+	a := managedCompleted(t, s, w, "first", "reviewed\n")
+	original := strings.Repeat("A long complete evidence record.\n", 10000)
+	if err := os.WriteFile(filepath.Join(a.CWD, "docs/first.md"), []byte(original), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.integrateManagedAttempt(a); err != nil {
+		t.Fatal(err)
+	}
+	current, err := s.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := current.task(a.TaskID)
+	if task.Status != "accepted" || managedReviewCalls(t, s) != 1 {
+		t.Fatal("lossless compression was not used", task.Status, task.Blocker)
+	}
+	raw, err := os.ReadFile(filepath.Join(s.root, "review-fixture/observed.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var observed struct {
+		Context managedReviewContext `json:"context"`
+	}
+	if err = json.Unmarshal(raw, &observed); err != nil {
+		t.Fatal(err)
+	}
+	if len(observed.Context.Tasks) != 1 || observed.Context.Tasks[0].Report != original {
+		t.Fatalf("large repetitive original differs: expected_bytes=%d expected_sha256=%s observed_tasks=%d observed_report_bytes=%d observed_report_sha256=%s suffix=%q", len(original), hash([]byte(original)), len(observed.Context.Tasks), len(observed.Context.Tasks[0].Report), hash([]byte(observed.Context.Tasks[0].Report)), observed.Context.Tasks[0].Report[max(0, len(observed.Context.Tasks[0].Report)-90):])
+	}
+	if err = s.independentReviewGuard(&current, task); err != nil {
+		t.Fatal(err)
 	}
 }
 

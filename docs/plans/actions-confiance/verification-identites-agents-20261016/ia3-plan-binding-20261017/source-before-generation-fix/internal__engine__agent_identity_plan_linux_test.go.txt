@@ -1,0 +1,123 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/json"
+	"testing"
+)
+
+func TestAgentIdentityPlanDoesNotReactivateAfterChangeAndRevert(t *testing.T) {
+	f := registryFixture(t)
+	cp := registryPublish(t, f)
+	w, err := f.store.get(f.permit.scope.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	original := w.Objective
+	for i, objective := range []string{"temporary changed objective", original} {
+		w, err = f.store.mutate(w.ID, "work.update", []string{"change", "revert"}[i], w.Revision, []byte(`{}`), func(w *Work) error {
+			w.Objective = objective
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, _, err = f.store.readAgentIdentityRegistry(registryContext(t), cp); err == nil || commandFailure(err).Code != "agent_identity_plan_mismatch" {
+		t.Fatal("returning to old contents reactivated old authority: ", err)
+	}
+}
+
+func TestAgentIdentityPlanCanonicalObjectOrder(t *testing.T) {
+	f := registryFixture(t)
+	w, err := f.store.get(f.permit.scope.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err := json.Marshal(w)
+	if err != nil {
+		t.Fatal(err)
+	}
+	before, err := agentIdentityRecordedPlanDigest(raw, w.ID, w.Revision)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var unordered any
+	if err = json.Unmarshal(raw, &unordered); err != nil {
+		t.Fatal(err)
+	}
+	reordered, err := json.MarshalIndent(unordered, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	after, err := agentIdentityRecordedPlanDigest(reordered, w.ID, w.Revision)
+	if err != nil || before != after {
+		t.Fatal("JSON key order changed a supposedly canonical plan projection: ", err)
+	}
+}
+
+func TestAgentIdentityPlanRefusesArbitraryScope(t *testing.T) {
+	f := registryFixture(t)
+	f.permit.scope.PlanDigest = hash([]byte("not the recorded plan"))
+	for id, grant := range f.snapshot.Grants {
+		grant.Scope = f.permit.scope
+		f.snapshot.Grants[id] = grant
+	}
+	for id, instance := range f.snapshot.Instances {
+		instance.Scope = f.permit.scope
+		f.snapshot.Instances[id] = instance
+	}
+	registryApproveFixture(t, &f)
+	before := registryTrustBytes(t, f.store)
+	a, b := registryCounts(t, f.store)
+	_, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), trustRequesterToken, f.permit, nil)
+	if err == nil || commandFailure(err).Code != "agent_identity_plan_mismatch" {
+		t.Fatal("arbitrary plan digest did not produce the expected refusal: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, a, b)
+}
+
+func TestAgentIdentityPlanRefusesCurrentContractDrift(t *testing.T) {
+	f := registryFixture(t)
+	cp := registryPublish(t, f)
+	w, err := f.store.get(f.permit.scope.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = f.store.mutate(w.ID, "work.update", "plan-contract-drift", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Objective = "a changed objective"
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	before := registryTrustBytes(t, f.store)
+	a, b := registryCounts(t, f.store)
+	if _, _, err = f.store.readAgentIdentityRegistry(registryContext(t), cp); err == nil || commandFailure(err).Code != "agent_identity_plan_mismatch" {
+		t.Fatal("changed recorded contract remained usable: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, a, b)
+}
+
+func TestAgentIdentityPlanRefusesMissingRecordedPlan(t *testing.T) {
+	f := registryFixture(t)
+	w, err := f.store.get(f.permit.scope.WorkID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = f.store.mutate(w.ID, "fixture.clear-plan", "plan-absent", w.Revision, []byte(`{}`), func(w *Work) error {
+		w.Plans, w.Planning = nil, nil
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	before := registryTrustBytes(t, f.store)
+	a, b := registryCounts(t, f.store)
+	_, err = f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), trustRequesterToken, f.permit, nil)
+	if err == nil || commandFailure(err).Code != "agent_identity_plan_unavailable" {
+		t.Fatal("missing recorded plan did not produce the expected refusal: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, a, b)
+}

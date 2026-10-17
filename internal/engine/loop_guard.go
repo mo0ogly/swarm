@@ -107,7 +107,8 @@ func (g *loopGuard) result(id string, failed bool, technical ...string) {
 	context := g.contexts[id]
 	delete(g.contexts, id)
 	if len(technical) > 0 {
-		context.technical = operationText(technical[0], 600)
+		context.category = failureCategory(toolFailure{name: context.name, action: context.action, detail: context.detail, technical: technical[0]})
+		context.technical = boundedFailureText(technical[0], 600)
 	}
 	environment := failed && failureCategory(context) == "environment"
 	g.environmentBlocked = environment
@@ -269,7 +270,11 @@ func (g *loopGuard) loseVisibility(reason string) {
 	g.contexts = map[string]toolFailure{}
 }
 func (g *loopGuard) summary() AgentProgress {
-	output, tool, vitality := g.monitoring(time.Now())
+	return g.summaryAt(time.Now())
+}
+
+func (g *loopGuard) summaryAt(at time.Time) AgentProgress {
+	output, tool, vitality := g.monitoring(at)
 	lastOutput := ""
 	if g.outputSeen {
 		lastOutput = g.lastOutput.UTC().Format(time.RFC3339Nano)
@@ -277,7 +282,7 @@ func (g *loopGuard) summary() AgentProgress {
 	waitSeconds := 0
 	if g.degraded == "" {
 		for _, started := range g.pending {
-			if seconds := int(time.Since(started).Seconds()); seconds > waitSeconds {
+			if seconds := int(at.Sub(started).Seconds()); seconds > waitSeconds {
 				waitSeconds = seconds
 			}
 		}

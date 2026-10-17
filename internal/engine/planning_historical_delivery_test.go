@@ -247,7 +247,7 @@ func TestPlanningReviewRetryRestrictionTracksWholeReducedBatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, reduced, err := s.planningDeliveryContext(w, "root", len(raw)+20)
+	_, reduced, err := s.planningDeliveryContext(w, "root", len(raw)+256)
 	if err != nil || !reflect.DeepEqual(reduced.Events, []string{operator.ID}) || !reduced.ReviewRetryUnavailable {
 		t.Fatal("omitted current result still authorizes review retry", reduced, err)
 	}

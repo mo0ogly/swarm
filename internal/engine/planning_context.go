@@ -119,6 +119,10 @@ func planningContextLimit(w Work, id string, eventLimit int) ([]byte, error) {
 			continue
 		}
 		row := map[string]any{"id": task.ID, "title": task.Title, "status": task.Status, "requirements": task.Requirements, "dependencies": task.Depends, "next": guardBlock(task.Next, 1000), "review_coordination": task.ReviewCoordination, "instruction_revisions_count": len(task.InstructionRevisions), "attempts_used": len(task.Attempts), "attempts_max": task.PlanMaxAttempts, "blocker": guardBlock(task.Blocker, 1000)}
+		if len(task.MemorySelections) > 0 {
+			row["memory_selections"] = task.MemorySelections
+			row["memory_decision"] = task.MemoryDecision
+		}
 		if review := task.IndependentReview; review != nil {
 			row["current_review"] = map[string]any{"id": review.ID, "state": review.State, "candidate_commit": review.CandidateSHA, "reason": guardBlock(review.Reason, 1000)}
 			if task.Status == "blocked" && review.State == "error" && currentTaskAttempt(&task, review.Attempt) {

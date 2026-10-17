@@ -44,6 +44,57 @@ func managedFragmentDefectQuoteOnlySchema() map[string]any {
 	return schema
 }
 
+type managedNestedDefectClaim struct {
+	Quote        string `json:"quote"`
+	Explanation  string `json:"explanation"`
+	Reproduction string `json:"reproduction"`
+	Expected     string `json:"expected"`
+}
+
+func fragmentDefectCitationFailure(packet managedReviewFragmentPacket, artifact int, quote string, cause error) error {
+	matches := []int{}
+	originals := []map[string]any{}
+	count := 0
+	if strings.TrimSpace(quote) != "" {
+		for i, a := range packet.Artifacts {
+			if i == artifact || !strings.Contains(fragmentDefectText(a), quote) {
+				continue
+			}
+			count++
+			if len(matches) < managedFragmentDefectLimit {
+				matches = append(matches, i)
+				name := []rune(fragmentDiagnosticExcerpt(a.Name))
+				for !boundedFragmentFindingText(string(name)) {
+					name = name[:len(name)-1]
+				}
+				originals = append(originals, map[string]any{"artifact": i, "name_excerpt": string(name), "sha256": a.Digest})
+			}
+		}
+	}
+	facts := map[string]any{"packet": packet.Index, "artifact": artifact, "error": cause.Error(), "quote_field_empty": strings.TrimSpace(quote) == "", "quote_sha256": hash([]byte(quote)), "rejected_quote": fragmentDiagnosticExcerpt(quote), "literal_matches_elsewhere": matches, "matching_artifact_count": count, "other_originals": originals}
+	raw, _ := json.Marshal(facts)
+	return &CommandError{Code: reviewFragmentProtocolError, Message: fmt.Sprintf("citation de la pièce %d : texte cité invalide pour cette pièce ; ne pas confondre texte introuvable et champ JSON absent. Diagnostic non validant : %s", artifact, raw)}
+}
+
+func decodeManagedFragmentNestedDefects(raw json.RawMessage, artifact int, packet managedReviewFragmentPacket) ([]managedFragmentDefect, error) {
+	var supplied []managedNestedDefectClaim
+	if err := strict(raw, &supplied); err != nil {
+		return nil, err
+	}
+	if len(supplied) == 0 || len(supplied) > managedFragmentDefectLimit {
+		return nil, fmt.Errorf("constat fail sans détails bornés")
+	}
+	defects := make([]managedFragmentDefect, 0, len(supplied))
+	for _, d := range supplied {
+		line, err := fragmentDefectUniqueQuoteLine(fragmentDefectText(packet.Artifacts[artifact]), d.Quote)
+		if err != nil {
+			return nil, fragmentDefectCitationFailure(packet, artifact, d.Quote, err)
+		}
+		defects = append(defects, managedFragmentDefect{Artifact: artifact, Line: line, Quote: d.Quote, Explanation: d.Explanation, Reproduction: d.Reproduction, Expected: d.Expected})
+	}
+	return defects, nil
+}
+
 func decodeManagedFragmentDefectCitations(raw json.RawMessage, packet managedReviewFragmentPacket) ([]managedFragmentDefect, error) {
 	if !supportedFragmentDefectCitationContract(packet.DefectCitationContractVersion) {
 		return nil, fmt.Errorf("unsupported citation contract")
@@ -73,7 +124,7 @@ func decodeManagedFragmentDefectCitations(raw json.RawMessage, packet managedRev
 		}
 		line, err := fragmentDefectUniqueQuoteLine(fragmentDefectText(packet.Artifacts[*d.Artifact]), d.Quote)
 		if err != nil {
-			return nil, &CommandError{Code: reviewFragmentProtocolError, Message: fmt.Sprintf("citation de la pièce %d : %s", *d.Artifact, err)}
+			return nil, fragmentDefectCitationFailure(packet, *d.Artifact, d.Quote, err)
 		}
 		defects = append(defects, managedFragmentDefect{Artifact: *d.Artifact, Line: line, Quote: d.Quote, Explanation: d.Explanation, Reproduction: d.Reproduction, Expected: d.Expected})
 	}

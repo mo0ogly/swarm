@@ -282,8 +282,11 @@ func TestManagedIntegrationCeilingSuspensionNeverMasksMissingReport(t *testing.T
 		t.Fatal(e)
 	}
 	e := s.integrateManagedAttempt(a)
-	if e == nil || !strings.Contains(e.Error(), "intégration suspendue") {
-		t.Fatalf("expected suspended integration, got %v", e)
+	if e == nil {
+		t.Fatal("revoked mission executed integration")
+	}
+	if commandFailure(e).Code != "authorization_required" {
+		t.Fatalf("expected mission authorization refusal, got %s: %v", commandFailure(e).Code, e)
 	}
 	w2, _ := s.get(w.ID)
 	task, _ := w2.task("first")

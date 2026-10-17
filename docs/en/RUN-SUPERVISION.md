@@ -5,6 +5,26 @@ The owning supervisor judges useful progress and decides how work proceeds.
 The engine measures, routes observations, verifies rights and applies attributed
 decisions. Elapsed time proves neither completion, lack of progress nor acceptance.
 
+## Communication during recovery
+
+The user explicitly prohibits prolonged silent waits, hours of unmanaged
+blockage and claims of a fix without a verified outcome. During active interactive
+work, Codex gives a meaningful update at least every 60 seconds: observed state,
+cause or uncertainty, action and pending proof. Long response delays are also
+prohibited: acknowledge promptly, bound work steps and tool output, and communicate
+before an analysis or check finishes. A displayed reconnection does not establish
+its cause. Abnormal slowness triggers
+`replan` without a human reminder. Changed wording or a raised budget alone
+cannot justify repeating a failure.
+
+This obligation is recorded in personal instructions, `AGENTS.md` and the embedded
+shared contract. A tool-free native role retains its required JSON and routes
+the incident to its supervisor; it must not add chat prose to that protocol.
+Verify assembled contexts and identify the binary delivering them. Instructions,
+context delivery and scheduled wakeups alone prove neither repair nor effective
+supervision. Distinguish local tests, observed runtime effects and overall
+acceptance; failed or unverified criteria remain open.
+
 ## Incident and decision
 
 Attempt `a-a349f9134d355713576b7166`, agent `auto-f2abbcfe6bed66fd1a5e`,
@@ -128,6 +148,29 @@ See [AI/engine protocol](AGENT-ENGINE-PROTOCOL.md),
 [recursive recovery](AUTORECURSIVE-RECOVERY.md) and [parallelism](AGENT-PARALLELISM.md).
 
 ## Admin values actually received by a launch
+
+### Error diagnosis during each execution
+
+`tool_failure` routes ordinary tool, configuration and check failures to the
+exact scope owner during production, with attributed diagnostics and counters.
+`infrastructure` retains its separate environment count. Each new category
+count is delivered once; polling unchanged state creates no additional event.
+Ordinary failures retain the existing guards and spending limits. The owner must
+diagnose, correct or route, verify the effect, then resume the original need.
+Technical classification is neither a business decision nor acceptance.
+
+Classification examines original output before reducing it. Bounded traces keep
+their beginning and end, preserving a long traceback's final cause. Each category
+retains at most three traces, including the first and latest; original logs remain
+separate. Potentially sensitive values are masked in this projection. Diagnostics
+remain observations based on visible provider events.
+
+Stopped managed attempts retain sources as an attributed immutable checkpoint at
+settlement, before any retry. Source preservation failure stays in the public
+blocker and owner event. Environment recovery requires verified provider-context
+preflight and every declared capability; an operator narrative or manual stop
+cannot clear an observed environment failure. See [attempt recovery](ATTEMPT-RECOVERY.md)
+for protocol version 2 `ready` handoffs and their mandatory controls and review.
 
 Explicit Admin `tool_seconds` and `silence_seconds` values replace provider
 default observation thresholds and historical attempt thresholds for a new

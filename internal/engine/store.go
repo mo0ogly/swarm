@@ -14,11 +14,14 @@ import (
 )
 
 type Store struct {
-	db           *sql.DB
-	root         string
-	readReviews  map[string]error                     // request-local review guards; nil on live mutation paths
-	readDigests  map[string]string                    // request-local clone only; never retained by the live store
-	storageProbe func(string) (uint64, uint64, error) // immutable per store; nil uses the filesystem
+	evidenceRuntime *trustEvidenceRuntime
+	serviceRuntime  *trustServiceRuntime
+	serviceProof    *trustServiceProof
+	db              *sql.DB
+	root            string
+	readReviews     map[string]error                     // request-local review guards; nil on live mutation paths
+	readDigests     map[string]string                    // request-local clone only; never retained by the live store
+	storageProbe    func(string) (uint64, uint64, error) // immutable per store; nil uses the filesystem
 }
 
 func openStore(root string, init bool) (*Store, error) {
@@ -66,7 +69,7 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 		return nil, e
 	}
 	db.SetMaxOpenConns(1)
-	s := &Store{db: db, root: root}
+	s := &Store{db: db, root: root, evidenceRuntime: &trustEvidenceRuntime{}, serviceRuntime: &trustServiceRuntime{tokens: map[string]*trustServiceMaterial{}}}
 	fail := func(e error) (*Store, error) { db.Close(); return nil, e }
 	if _, e = db.Exec(`PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON; PRAGMA synchronous=FULL;`); e != nil {
 		return fail(e)
@@ -398,6 +401,64 @@ func openStoreWithMigration(root string, init, migrate bool) (*Store, error) {
 			return fail(e)
 		}
 	}
+	// Version 33 fences versioned project memory and task selection snapshots.
+	if version < 33 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v33-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=33"); e != nil {
+			return fail(e)
+		}
+	}
+	// v34 retains complete dialogue guard state at turn boundaries. Old
+	// processes must not confirm turns without this durable state.
+	if version < 34 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v34-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if e = migrateDialogueCheckpoints(db); e != nil {
+			return fail(e)
+		}
+	}
+	// v35 fences explicit conversation restoration. An older supervisor would
+	// otherwise launch the new execution without restoring its cumulative guard.
+	if version < 35 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v35-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if _, e = db.Exec("PRAGMA user_version=35"); e != nil {
+			return fail(e)
+		}
+	}
+	// v36 stores identity snapshots and publication receipts without granting
+	// authority to historical/imported rows. Trust anchors remain separate.
+	if version < 36 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v36-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if e = migrateAgentIdentityRegistry(db); e != nil {
+			return fail(e)
+		}
+	}
+	// Every Work writer shares this transactional plan-generation boundary.
+	if version < 37 {
+		if version != 0 {
+			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v37-")+".db")); e != nil {
+				return fail(e)
+			}
+		}
+		if e = migrateAgentIdentityPlanHeads(db); e != nil {
+			return fail(e)
+		}
+	}
 	if e = os.Chmod(path, 0600); e != nil {
 		return fail(e)
 	}
@@ -478,34 +539,10 @@ func migrateDecisionAuthorKind(db *sql.DB) error {
 }
 
 func (s *Store) get(id string) (Work, error) {
-	var b []byte
-	var w Work
-	e := s.db.QueryRow("SELECT body FROM works WHERE id=?", id).Scan(&b)
-	if e != nil {
-		return w, fmt.Errorf("travail %s : %w", id, e)
-	}
-	e = json.Unmarshal(b, &w)
-	return w, e
+	return readWorkRow(s.db, id)
 }
 func (s *Store) list() ([]Work, error) {
-	rs, e := s.db.Query("SELECT body FROM works ORDER BY rowid DESC")
-	if e != nil {
-		return nil, e
-	}
-	defer rs.Close()
-	out := []Work{}
-	for rs.Next() {
-		var b []byte
-		if e = rs.Scan(&b); e != nil {
-			return nil, e
-		}
-		var w Work
-		if e = json.Unmarshal(b, &w); e != nil {
-			return nil, e
-		}
-		out = append(out, w)
-	}
-	return out, rs.Err()
+	return listWorkRows(s.db)
 }
 func (s *Store) events(id string) ([]Event, error) {
 	rs, e := s.db.Query("SELECT id,work_id,revision,kind,at,payload FROM events WHERE work_id=? ORDER BY revision", id)
@@ -591,11 +628,7 @@ func (s *Store) mutateWithHookOnce(id, kind, event string, expected int, request
 		if (id != "" && oldID != id) || oldKind != kind || string(oldRequest) != string(request) {
 			return w, &CommandError{Code: "event_conflict", Message: "event_id déjà utilisé pour un contenu différent"}
 		}
-		var b []byte
-		if e = tx.QueryRow("SELECT body FROM works WHERE id=?", oldID).Scan(&b); e != nil {
-			return w, e
-		}
-		e = json.Unmarshal(b, &w)
+		w, e = readWorkRow(tx, oldID)
 		return w, e
 	}
 	if !errors.Is(e, sql.ErrNoRows) {
@@ -608,11 +641,8 @@ func (s *Store) mutateWithHookOnce(id, kind, event string, expected int, request
 		}
 		w = Work{Schema: 1, ID: newID("w-"), Created: now(), Tasks: []Task{}}
 	} else {
-		var b []byte
-		if e = tx.QueryRow("SELECT body FROM works WHERE id=?", id).Scan(&b); e != nil {
-			return w, e
-		}
-		if e = json.Unmarshal(b, &w); e != nil {
+		w, e = readWorkRow(tx, id)
+		if e != nil {
 			return w, e
 		}
 		if w.Revision != expected {

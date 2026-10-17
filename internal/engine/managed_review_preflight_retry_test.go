@@ -58,7 +58,7 @@ func unpaidReviewFixture(t *testing.T) (*Store, Work, Agent) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	c, e := s.managedReviewContext(w, a, cp.Candidate, receipt)
+	c, e := s.managedReviewContextAtCitationVersion(w, a, cp.Candidate, receipt, false, 1)
 	if e != nil {
 		t.Fatal(e)
 	}

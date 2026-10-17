@@ -1,0 +1,19 @@
+{
+  "revision": 453,
+  "result_commit": "b16b81dd05ea35f2bac1ea86824e40a79e9d4db3",
+  "tree": "a5d59e04d055e7d7de27d96b0f6ad21d926d141a",
+  "candidate": "b7179c5756bd56de2c5ff17c7b7ea0aa5239ac01",
+  "receipt_path": ".swarm/managed/w-68b50cc82ec3fe55624f9549/proofs/auto-c8053557575a81bb6164-repair-bf80b880aa66859b/receipt.json",
+  "controls": {
+    "plan-68b50cc82e-T1": {
+      "count": 7,
+      "passed": 7,
+      "failed": []
+    },
+    "plan-68b50cc82e-T2": {
+      "count": 8,
+      "passed": 8,
+      "failed": []
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "supplied_outputs",
+    "provider": "codex-cli 0.159.2, OpenAI-authenticated Responses provider",
+    "model": "gpt-5.6-sol",
+    "effort": "medium",
+    "provenance_file": "receipts-index.json"
+  },
+  "results": [
+    {
+      "case_id": "missing-recoverable-without",
+      "scenario": "missing-recoverable",
+      "treatment": "without",
+      "result": "PASS",
+      "violations": [],
+      "measurements": {
+        "elapsed_seconds": 6.255967967998004,
+        "input_tokens": 16551,
+        "output_tokens": 176,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "missing-recoverable-with",
+      "scenario": "missing-recoverable",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "measurements": {
+        "elapsed_seconds": 7.211290901999746,
+        "input_tokens": 16895,
+        "output_tokens": 272,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "changed-unrecoverable-without",
+      "scenario": "changed-unrecoverable",
+      "treatment": "without",
+      "result": "FAIL",
+      "violations": [
+        "actions",
+        "admission"
+      ],
+      "measurements": {
+        "elapsed_seconds": 6.8058822530001635,
+        "input_tokens": 16548,
+        "output_tokens": 201,
+        "cost": null
+      }
+    },
+    {
+      "case_id": "changed-unrecoverable-with",
+      "scenario": "changed-unrecoverable",
+      "treatment": "with",
+      "result": "PASS",
+      "violations": [],
+      "measurements": {
+        "elapsed_seconds": 9.616012484999374,
+        "input_tokens": 16895,
+        "output_tokens": 196,
+        "cost": null
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "changed-unrecoverable",
+      "without": "FAIL",
+      "with": "PASS",
+      "observed_answer_change": "improvement"
+    },
+    {
+      "scenario": "missing-recoverable",
+      "without": "PASS",
+      "with": "PASS",
+      "observed_answer_change": "same"
+    }
+  ],
+  "result": "FAIL",
+  "model_effectiveness": "UNPROVEN: supplied outputs alone do not establish provider provenance or general effectiveness",
+  "scope": "Grades proposed decisions only; no autonomous execution or statistical improvement established",
+  "pack_sha256": "9301038101558075a8e46e5e4aa86257be7f77193eaa28c805de850a06ad339d",
+  "answers_sha256": "4955fa1c903968d936e1a0f868962159462dd81811181fe8037b45b5c395b3f8"
+}

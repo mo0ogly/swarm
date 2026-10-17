@@ -13,6 +13,8 @@ import (
 // digests must remain unchanged. A caller must additionally establish the actual
 // provider/model/client configuration and anchor this object with the new plan.
 type managedReviewInputBudget struct {
+	DefaultContextTokens        int    `json:"default_context_tokens,omitempty"`
+	MaxContextTokens            int    `json:"max_context_tokens,omitempty"`
 	FinalReserveContractVersion int    `json:"final_reserve_contract_version,omitempty"`
 	ClientStamp                 string `json:"client_executable_stamp,omitempty"`
 	ProviderDigest              string `json:"provider_sha256,omitempty"`
@@ -33,12 +35,15 @@ const managedReviewTokenizer = "o200k_base/tiktoken-go-v0.6.2"
 // These are conservative ceilings for the observed Codex client, not an API
 // window upgrade. Reserves are explicit allowances, not measured hidden tokens.
 func (b managedReviewInputBudget) inputTokens() (int, error) {
-	if b.FinalReserveContractVersion < 0 || b.FinalReserveContractVersion > 1 || b.Version != 1 || b.Model != "gpt-5.6-sol" || b.Tokenizer != managedReviewTokenizer ||
-		b.ContextTokens <= 0 || b.ContextTokens > 272000 || b.EffectivePct <= 0 || b.EffectivePct > 95 ||
+	if b.FinalReserveContractVersion < 0 || b.FinalReserveContractVersion > 1 || (b.Version != 1 && b.Version != 2) || b.Model != "gpt-5.6-sol" || b.Tokenizer != managedReviewTokenizer ||
+		b.ContextTokens <= 0 || (b.Version == 1 && b.ContextTokens > 272000) || b.EffectivePct <= 0 || b.EffectivePct > 95 ||
 		b.ClientReserve < 32768 || b.ClientReserve > b.ContextTokens ||
 		b.OutputReserve < 65536 || b.OutputReserve > b.ContextTokens ||
 		b.MaxBytes <= 0 || b.MaxBytes > 1024*1024 {
 		return 0, fmt.Errorf("capacité de revue non reconnue ou réserves insuffisantes")
+	}
+	if b.Version == 2 && (b.DefaultContextTokens <= 0 || b.MaxContextTokens < b.DefaultContextTokens || b.ContextTokens > b.MaxContextTokens || b.MaxContextTokens > int(^uint(0)>>1)/100 || !citationHashValid(b.CapabilityDigest) || !citationHashValid(b.ClientStamp) || !citationHashValid(b.ProviderDigest) || b.ClientVersion == "") {
+		return 0, fmt.Errorf("fenêtre demandée hors capacité attribuée du client")
 	}
 	room := b.ContextTokens*b.EffectivePct/100 - b.ClientReserve - b.OutputReserve
 	if room <= 0 {

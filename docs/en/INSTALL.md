@@ -6,6 +6,51 @@ The supported installation path is Linux. Choose Docker for a dedicated runtime,
 or a native binary to use tools already installed on your machine. The installer
 does not request sudo, modify shell profiles or install Docker for you.
 
+## Identity authority — development and pilot
+
+The selected development and pilot target is a **local authority under a separate
+system account, with verified agent confinement**. An authority on a separate
+machine with separate administration is planned for future installations.
+Local/remote describes the authority; it is distinct from Swarm's Docker/native
+installation choice below.
+
+**This separation and its configuration flow are not delivered yet.** The current
+installer creates neither a dedicated authority account nor its service; the
+current container uses your UID/GID. Successful installation does not establish
+identity isolation or control of agent creation.
+
+The planned flow selects the mode at initial setup, then manages it in an Admin
+modal: persistent configuration, an explicitly approved trust root, a designated
+initial human principal, and effective status separate from the saved choice.
+The remote option will remain labelled as planned until implemented; it cannot
+be obtained by entering a cockpit URL or reusing the existing Trust client.
+Connection failure must never trigger permissive local fallback. See the
+[contract and limits](AGENT-IDENTITY-CONTRACT.md) and the
+[configuration and migration plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
+
+
+The persistence kernel for this configuration is verified in local fixtures;
+it is not connected to the installer or Admin modal yet. These checks establish
+neither an authority deployment nor agent confinement.
+
+The local coordinator now retains a witness in a separate directory and verifies
+interruption recovery in fixtures. This script does not install it. Restoring
+configuration and witness together can hide rollback: their protection and backup
+strategy remain to be qualified before deployment. See the identity contract above.
+
+A private control adapter now reuses the per-message attributed Linux channel
+and the coordinator; its exchanges and refusals can be tested in fixtures. It
+still provides neither an installation command nor a running service. Paths,
+pins and rights must come from protected bootstrap; no account, cockpit cookie
+or first caller automatically becomes the authority.
+
+The private client now verifies the service process from an independently
+supplied launcher pidfd and binds replies to a challenge and the exact request
+(transport version 2). This neither designates the initial human nor creates a
+system service or Admin setting. On-disk configuration retains schema 1; no
+history reset is required. See the identity contract for Linux prerequisites and
+transport limits.
+
 ## Included training resources and branding
 
 After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.

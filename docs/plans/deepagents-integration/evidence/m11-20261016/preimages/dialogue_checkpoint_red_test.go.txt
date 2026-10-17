@@ -1,0 +1,47 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"testing"
+)
+
+func TestDialogueBoundaryHasDurableStateBeforeHeartbeat(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "second question\n/fin\n"); err != nil {
+		t.Fatal(err)
+	}
+	assertDialoguePublicCheckpoint(t, s, a, true, 20)
+}
+
+func TestDialoguePendingBoundaryHasDurableUsage(t *testing.T) {
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"checkpoint-session"}`, `{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"fixture effect"}}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	if _, err := runDialogueReceiptWrapper(t, s, a, "/fin\n"); err == nil {
+		t.Fatal("pending result was confirmed")
+	}
+	assertDialoguePublicCheckpoint(t, s, a, false, 10)
+}
+
+func assertDialoguePublicCheckpoint(t *testing.T, s *Store, a Agent, confirmed bool, input int64) {
+	t.Helper()
+	var out, stderr bytes.Buffer
+	if code := run([]string{"--root", s.root, "--json", "agent", "show", a.ID}, &out, &stderr); code != 0 {
+		t.Fatal("public inspection failed", code, stderr.String())
+	}
+	var result struct {
+		Agent Agent `json:"agent"`
+		State *struct {
+			Available bool `json:"available"`
+			Confirmed bool `json:"boundary_confirmed"`
+			Usage *Usage `json:"usage"`
+		} `json:"dialogue"`
+	}
+	if err := json.Unmarshal(out.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.State == nil || !result.State.Available || result.State.Confirmed != confirmed || result.State.Usage == nil || result.State.Usage.Input != input {
+		t.Fatalf("dialogue boundary lost before supervisor heartbeat: checkpoint=%+v agent_usage=%+v", result.State, result.Agent.Usage)
+	}
+}

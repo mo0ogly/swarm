@@ -1,0 +1,9 @@
+{
+  "error": "règlement suspendu : mission ou planification en pause",
+  "failure": {
+    "code": "command_failed",
+    "message": "règlement suspendu : mission ou planification en pause",
+    "retryable": false
+  },
+  "schema_version": 1
+}

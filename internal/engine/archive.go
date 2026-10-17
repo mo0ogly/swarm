@@ -299,6 +299,15 @@ func (s *Store) importBundle(path string) (Work, error) {
 		return zero, e
 	}
 	w := bundle.Work
+	// Archives preserve history but cannot import a local admission decision.
+	for i := range w.ProjectMemory {
+		w.ProjectMemory[i].Imported = true
+	}
+	for i := range w.Tasks {
+		if len(w.Tasks[i].MemorySelections) > 0 {
+			w.Tasks[i].MemorySelectionImported = true
+		}
+	}
 	if (bundle.Schema != 1 && bundle.Schema != 2) || (bundle.Schema == 1 && len(bundle.Automation) > 0) || w.Schema != 1 || !safeName(w.ID) || w.Revision < 1 || len(bundle.Events) != w.Revision {
 		return zero, fmt.Errorf("manifeste/version/historique invalide")
 	}

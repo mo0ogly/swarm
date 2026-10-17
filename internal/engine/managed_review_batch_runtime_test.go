@@ -10,13 +10,21 @@ import (
 	"testing"
 )
 
+func managedBatchDistinctText(label string, size int) string {
+	var body strings.Builder
+	for i := 0; body.Len() < size; i++ {
+		body.WriteString(label + " " + hash([]byte(label+string(rune(i)))) + "\n")
+	}
+	return body.String()[:size]
+}
+
 func managedBatchRuntimeFixture(t *testing.T) (*Store, Work, Agent) {
 	t.Helper()
 	s := storeTest(t)
 	source := filepath.Join(s.root, "project")
 	os.MkdirAll(source, 0700)
 	gitTest(t, source, "init")
-	for name, content := range map[string]string{"value.txt": "initial\n", "one.go.txt": strings.Repeat("a", 60000), "two.go.txt": strings.Repeat("b", 60000)} {
+	for name, content := range map[string]string{"value.txt": "initial\n", "one.go.txt": managedBatchDistinctText("first original source", 60000), "two.go.txt": managedBatchDistinctText("second original source", 60000)} {
 		os.WriteFile(filepath.Join(source, name), []byte(content), 0600)
 	}
 	gitTest(t, source, "add", ".")
@@ -37,7 +45,8 @@ func managedBatchRuntimeFixture(t *testing.T) (*Store, Work, Agent) {
 		t.Fatal(err)
 	}
 	w = managedReviewFixture(t, s, w)
-	fixture := strings.Replace(managedReviewerFixture, "for task in ctx['tasks']:", `selected=None
+	fixture := strings.Replace(managedReviewerFixture, "reply={'candidate_commit':ctx['candidate_commit'],'tasks':[]}\nfor task in ctx['tasks']:", `reply={'candidate_commit':ctx['candidate_commit'],'tasks':[]}
+selected=None
 if 'LOT DE REVUE :' in text:
  import re
  selected=json.loads(re.search(r'retourne uniquement leurs verdicts : (\[[^\n]*\])\.',text).group(1))
@@ -49,7 +58,7 @@ for task in ctx['tasks']:
 		t.Fatal(err)
 	}
 	first := managedCompleted(t, s, w, "first", "one\n")
-	os.WriteFile(filepath.Join(first.CWD, "docs/first.md"), []byte(strings.Repeat("First report evidence.\n", 1800)), 0600)
+	os.WriteFile(filepath.Join(first.CWD, "docs/first.md"), []byte(managedBatchDistinctText("First report evidence.", 30000)), 0600)
 	os.WriteFile(filepath.Join(first.CWD, "docs/first.review-context.json"), []byte(`{"version":1,"files":["one.go.txt"]}`), 0600)
 	if err = s.integrateManagedAttempt(first); err != nil {
 		t.Fatal(err)
@@ -59,7 +68,7 @@ for task in ctx['tasks']:
 		t.Fatal(w.Tasks[0].Blocker)
 	}
 	second := managedCompleted(t, s, w, "second", "two\n")
-	os.WriteFile(filepath.Join(second.CWD, "docs/second.md"), []byte(strings.Repeat("Second report evidence.\n", 1800)), 0600)
+	os.WriteFile(filepath.Join(second.CWD, "docs/second.md"), []byte(managedBatchDistinctText("Second report evidence.", 30000)), 0600)
 	os.WriteFile(filepath.Join(second.CWD, "docs/second.review-context.json"), []byte(`{"version":1,"files":["two.go.txt"]}`), 0600)
 	w, _ = s.get(w.ID)
 	return s, w, second
@@ -276,73 +285,41 @@ func TestManagedBatchRuntimeProviderChangeInvalidatesPublication(t *testing.T) {
 	}
 }
 
-func TestManagedBatchCitationRetryReceivesDiagnostic(t *testing.T) {
-	for _, mode := range []string{"correct", "repeat", "tamper"} {
-		t.Run(mode, func(t *testing.T) {
-			s, w, a := managedBatchRuntimeFixture(t)
-			path := filepath.Join(s.root, "review-fixture/claude")
-			raw, e := os.ReadFile(path)
-			if e != nil {
-				t.Fatal(e)
-			}
-			injected := strings.Replace(string(raw), "if mode=='wrong-sha':", "if len(open(os.path.join(folder,'calls')).readlines())>=3 and ('SWARM_BATCH_CITATION_DIAGNOSTIC' not in text or os.path.exists(os.path.join(folder,'repeat-bad'))): reply['tasks'][-1]['criteria'][0]['evidence']='invented citation not present'\nif mode=='wrong-sha':", 1)
-			if e = os.WriteFile(path, []byte(injected), 0700); e != nil {
-				t.Fatal(e)
-			}
-			_ = s.integrateManagedAttempt(a)
-			before, _ := s.get(w.ID)
-			task, _ := before.task(a.TaskID)
-			old := *task.IndependentReview
-			if old.State != "error" || managedReviewCalls(t, s) != 3 {
-				t.Fatal("citation failure missing", task.Blocker)
-			}
-			if mode == "repeat" {
-				os.WriteFile(filepath.Join(s.root, "review-fixture/repeat-bad"), []byte("yes"), 0600)
-			}
-			if mode == "tamper" {
-				os.WriteFile(filepath.Join(s.root, old.Batches[1].ReplyPath), []byte("{}"), 0600)
-			}
-			reopened, e := openStore(s.root, false)
-			if e != nil {
-				t.Fatal(e)
-			}
-			defer reopened.db.Close()
-			_, e = reopened.planningChange(w.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "citation-retry", Revision: before.Revision, Task: a.TaskID, Reason: "Explicit correction of invalid citation format with diagnostic"})
-			if e != nil {
-				t.Fatal(e)
-			}
-			_ = reopened.reconcileKnownMissionResult(a, "fixture-conductor")
-			after, _ := reopened.get(w.ID)
-			task, _ = after.task(a.TaskID)
-			if mode == "tamper" {
-				if managedReviewCalls(t, s) != 3 || task.Status == "accepted" {
-					t.Fatal("altered reply consumed a call")
-				}
-				return
-			}
-			if managedReviewCalls(t, s) != 4 || len(task.Attempts) != 1 || task.IndependentReview.Batches[0].ID != old.Batches[0].ID || task.IndependentReview.BatchPlanDigest != old.BatchPlanDigest {
-				t.Fatal("duplicated work or changed plan")
-			}
-			feedback := task.IndependentReview.Batches[1].RetryFeedback
-			observed, e := os.ReadFile(filepath.Join(s.root, "review-fixture/observed.json"))
-			if e != nil {
-				t.Fatal(e)
-			}
-			var got struct {
-				Prompt string `json:"prompt"`
-			}
-			if e = json.Unmarshal(observed, &got); e != nil {
-				t.Fatal(e)
-			}
-			if feedback == "" || !strings.HasPrefix(got.Prompt, feedback) {
-				t.Fatal("persisted diagnostic not transmitted")
-			}
-			if mode == "correct" && task.Status != "accepted" {
-				t.Fatal(task.Blocker)
-			}
-			if mode == "repeat" && task.IndependentReview.State != "error" {
-				t.Fatal("invalid citation promoted")
-			}
-		})
+func TestManagedBatchReferenceFailureDoesNotRetryUnchanged(t *testing.T) {
+	s, w, a := managedBatchRuntimeFixture(t)
+	path := filepath.Join(s.root, "review-fixture/claude")
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	injected := strings.Replace(string(raw), "if mode=='wrong-sha':", "if len(open(os.path.join(folder,'calls')).readlines())>=3: reply['tasks'][-1]['criteria'][0]['evidence_ref']=-1\nif mode=='wrong-sha':", 1)
+	if injected == string(raw) {
+		t.Fatal("invalid batch reference fixture missing")
+	}
+	if err = os.WriteFile(path, []byte(injected), 0700); err != nil {
+		t.Fatal(err)
+	}
+	_ = s.integrateManagedAttempt(a)
+	before, err := s.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	task, _ := before.task(a.TaskID)
+	old := task.IndependentReview
+	if old == nil || old.State != "error" || old.FailureCode != reviewFragmentProtocolError || len(old.Batches) != 2 || old.Batches[0].State != "passed" || managedReviewCalls(t, s) != 3 {
+		t.Fatal("batch protocol failure not preserved", task.Status, task.Blocker)
+	}
+	reopened, err := openStore(s.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	_, err = reopened.planningChange(w.ID, "retry-review", PlanningRequest{Schema: 1, EventID: "unchanged-batch-reference", Revision: before.Revision, Task: a.TaskID, Reason: "Only wording changed; preserve all original batch evidence.", ConfirmReviewErrorRepair: true})
+	if err == nil || commandFailure(err).Code != "review_precondition_unchanged" {
+		t.Fatal("unchanged batch retry accepted", err)
+	}
+	after, _ := reopened.get(w.ID)
+	if after.Revision != before.Revision || managedReviewCalls(t, s) != 3 || after.Planning.Reviewer.Calls != before.Planning.Reviewer.Calls {
+		t.Fatal("rejected batch retry changed state or spending")
 	}
 }

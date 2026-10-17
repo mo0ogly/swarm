@@ -1,5 +1,95 @@
 [
   {
+    "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "4e5f3deaf5e80592d40137d763d2d0b6e6bc840c2fa4874b9aa17e867e397853"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-etat.png",
+    "kind": "capture",
+    "sha256": "179fe14ce98157407f4668e013a6e5ca317813a92316b2b9fdea8e8114376665"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "c38fa3d745ab2171af2c25abeb0fb76b1ccb7fd72a3df04ffd7dbfc2dc78feb5"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
+    "kind": "capture",
+    "sha256": "362a9d7ac5860c0e053cc5c0ef98aa63c26d414360838e3fe1e7f659c38603cf"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "ad3dda130c1053782ca27de5177f9128225959fee4e24cd86e3eff9a54175260"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
+    "kind": "capture",
+    "sha256": "63c8a1cd8400232f8f4ec2f97026e7f26ac8062244c35c74af9872f802e5b47f"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "b932ce091fbe5ffae966c3e3614a3193b0e4454446d8a07bba4f01beff787225"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
+    "kind": "capture",
+    "sha256": "574216c70777d524e6ccc981995160f972ec659d6ba069c8a23f62cf2b441343"
+  },
+  {
+    "path": "docs/screenshots/projects-home-20261010/result.json",
+    "kind": "doc",
+    "sha256": "dfc203fe428d2d01c4756e2a8370453c030c3ceb6e7dc7dc2cabfb638c9237e3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
+    "kind": "capture",
+    "sha256": "840c965748f6cf9bf2530adb6266cc5733c53dfa2a1e0be54abc21862fcc0bb1"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "00ce6a6875a472c3b744d51af6f5929e88df4101daaa3ba07371912b8a3ea607"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "39a95ab1ce7db37111a2e7baee259eadf57bd81e7ed253f1b607463848b516e3"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
+    "kind": "capture",
+    "sha256": "047ebfbdd1a3f794a4a8a04f548007bffd8584ac2b4b480f8db9ded585a48f3b"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
+    "kind": "capture",
+    "sha256": "9d4021def5970f8c39f27561a7c56c7a891167a8f81efb32849d18bb78f6929a"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
+    "kind": "capture",
+    "sha256": "c9f03bc3b92b3ba26d32c7c5365ee166cd386810cad358c72229a3c5f1a30b13"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "edd5e7d687d8153315682e4f526b7b051b5913e3a17d142a9b997be102c67647"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
+    "kind": "capture",
+    "sha256": "5e32034594e55f3c477a2d6f5659838c246c0690f9288c5b2d6780f10ac4ca9e"
+  },
+  {
+    "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
+    "kind": "capture",
+    "sha256": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46"
+  },
+  {
     "path": "docs/screenshots/projects-method-20261010/fr-etat-mobile-foundation.png",
     "kind": "capture",
     "sha256": "cd6125bf24de7fba786cf8ca028b6902a75dac31b069800e512197c027d0e184"
@@ -1022,12 +1112,12 @@
   {
     "path": "go.mod",
     "kind": "harness",
-    "sha256": "c8894ded99e6e8060f4183e70a3f3b2050c6fb1f038bd2b7b41bf05fa2e8a9b7"
+    "sha256": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb"
   },
   {
     "path": "go.sum",
     "kind": "harness",
-    "sha256": "6d49db237b4443f4102404a1c2cb976d95835d221a5e383935c958bf242d274e"
+    "sha256": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b"
   },
   {
     "path": "internal/engine/a8_path_test.go",
@@ -1152,7 +1242,7 @@
   {
     "path": "internal/engine/agent_workflow.go",
     "kind": "source",
-    "sha256": "237a24bba0ec5411939729cecf14ec9e81f422aea840a55b19800efecd5d97c2"
+    "sha256": "d623574c657a9a8152df596999655d7e40206986332eedb6cedbd2f7e238efc8"
   },
   {
     "path": "internal/engine/agent_workflow_test.go",
@@ -1172,12 +1262,12 @@
   {
     "path": "internal/engine/agents_process.go",
     "kind": "source",
-    "sha256": "2f93e0e653d24304912807830b4b80bf98fcc4148df2855a529f59a832accda8"
+    "sha256": "e23cf1cc816f9f229bf842bcb7275ac5312d1f76ea8cf5fea474e99ff8ff6537"
   },
   {
     "path": "internal/engine/agents_store.go",
     "kind": "source",
-    "sha256": "26dbb4d6bbddc016e1efbd7af85db57042418bc618c795b33cc07b6cc155629f"
+    "sha256": "9421457380bafcb4945bf30747204c5506e3dde2b0f255b0ba2a700e9d60caf8"
   },
   {
     "path": "internal/engine/agents_test.go",
@@ -1217,7 +1307,7 @@
   {
     "path": "internal/engine/archive.go",
     "kind": "source",
-    "sha256": "23a38bedd8a2990daeb2af27172973302ccbadd3ddb0af5660687cb9e941dc9f"
+    "sha256": "7affca0bbc15f4878497696ba7b0fdffe0d5ac440008ea2dd6f5d6c4225b63da"
   },
   {
     "path": "internal/engine/assist_action.go",
@@ -1273,110 +1363,5 @@
     "path": "internal/engine/assist_report_schema_test.go",
     "kind": "test",
     "sha256": "e4798d8645887f3181f9c0544894c27d370b53115bf30dcea6d9969d3d2bcf87"
-  },
-  {
-    "path": "internal/engine/assist_report_test.go",
-    "kind": "test",
-    "sha256": "e27096e5067befebb5afa94a77440b536e416df95bfebeadbca0430220f7ca62"
-  },
-  {
-    "path": "internal/engine/assist_run.go",
-    "kind": "source",
-    "sha256": "e9823ae05045a8717dbc967fccba2874e9b4885c8b404aaa8bc2011d7775aa4e"
-  },
-  {
-    "path": "internal/engine/assist_schema.go",
-    "kind": "source",
-    "sha256": "7f64f5c11e0da70683e5d9fa50ae741c3c179c193a9bf797635b0dfb5e0a0c34"
-  },
-  {
-    "path": "internal/engine/assist_store.go",
-    "kind": "source",
-    "sha256": "c8c520b1d7bbdabda0990794332ac867b688e96b790f89ba708061d94a2950a9"
-  },
-  {
-    "path": "internal/engine/assist_task_attempt.go",
-    "kind": "source",
-    "sha256": "83385f14cf144e96f4afceaffa9c2138dad7911e8c93f1609a4165e701f5f523"
-  },
-  {
-    "path": "internal/engine/assist_test.go",
-    "kind": "test",
-    "sha256": "851bb20599c55503685a17393fd3f049ad41a73aff36c99cbe17dcd9cbe0116e"
-  },
-  {
-    "path": "internal/engine/attempt_diagnostic.go",
-    "kind": "source",
-    "sha256": "0e1f855ab5c2606c82063d1c384be112904e6381e6fe01e19f0473d87d54485f"
-  },
-  {
-    "path": "internal/engine/attempt_diagnostic_test.go",
-    "kind": "test",
-    "sha256": "d22515296fd0fcb7613037f3accf2c8346d91f07aba083624217f4a66d9a7e44"
-  },
-  {
-    "path": "internal/engine/attempt_extension.go",
-    "kind": "source",
-    "sha256": "a16fae739d85ed23c6913b6d7426c3674ca23d5d8279f6ff08e87279ddea8cd5"
-  },
-  {
-    "path": "internal/engine/attempt_extension_test.go",
-    "kind": "test",
-    "sha256": "c68bb471020c7bb26228d3147507d4235c329e62264e9e3c4ede02c4173a47f5"
-  },
-  {
-    "path": "internal/engine/attempt_ledger_test.go",
-    "kind": "test",
-    "sha256": "a749c30b9bea46741604b34ca5c7dd1a1b87fa81bc4e71f6b2f3b19cf69f56c4"
-  },
-  {
-    "path": "internal/engine/automatic_validation.go",
-    "kind": "source",
-    "sha256": "5de144a8394c54d388324672c214eaabd62f785894f0e606e4957ecfadc95799"
-  },
-  {
-    "path": "internal/engine/automatic_validation_test.go",
-    "kind": "test",
-    "sha256": "e05a28dfa3a3b10efcd50a37279736bc9f748baa1eff506e155022aef18119a8"
-  },
-  {
-    "path": "internal/engine/automation_archive.go",
-    "kind": "source",
-    "sha256": "872a75bd3eca7fd72502703004ee0d1afa3f512972cb976574cb28c151e63595"
-  },
-  {
-    "path": "internal/engine/automation_cli.go",
-    "kind": "source",
-    "sha256": "626e3541009aa324bd59a36dfaf19dcddaf6abb2835f304140e4492683e5a8de"
-  },
-  {
-    "path": "internal/engine/automation_cli_test.go",
-    "kind": "test",
-    "sha256": "51f18b33451967207cbae96eb7b707bacd90187ba60d4844b5babca74d66efab"
-  },
-  {
-    "path": "internal/engine/automation_external.go",
-    "kind": "source",
-    "sha256": "d729ea65fa8f3120ab65bae629020c1d2995dad68aafc8a44e2fdc6afa92d1f0"
-  },
-  {
-    "path": "internal/engine/automation_external_test.go",
-    "kind": "test",
-    "sha256": "da8f32878baf36cf8c6297780bfdb85b33911566c3ab600d07be07672bbb5ee0"
-  },
-  {
-    "path": "internal/engine/automation_http.go",
-    "kind": "source",
-    "sha256": "bbdef88a4e6de2b22928411d2b6b11b79ebbc00cbddfc1a490a5b1a7a10c05cb"
-  },
-  {
-    "path": "internal/engine/automation_requests.go",
-    "kind": "source",
-    "sha256": "aa5791030237443cf5ff5f30d1575f82166c0a54a4664067407901e56a0f619f"
-  },
-  {
-    "path": "internal/engine/automation_requests_test.go",
-    "kind": "test",
-    "sha256": "d9b4827b3c8c52e846e01e8e00f304e24cf367f2c76ab5ad8e7621830964e4b6"
   }
 ]

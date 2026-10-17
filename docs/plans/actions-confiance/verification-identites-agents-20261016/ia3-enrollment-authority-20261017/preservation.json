@@ -1,0 +1,92 @@
+{
+  "internal/engine/agent_identity_contract.go": {
+    "before": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+    "after": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "internal/engine/model.go": {
+    "before": "42815893ce43f92ec652985ed96785e66fae89cae5fcfb6cf6cc9bf0da5c899c",
+    "after": "9b8f2f15d6af6c046cc3b7c909a4a8bf3155b9dd1e6c4ce04612758a763c9086",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "go.mod": {
+    "before": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "after": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "go.sum": {
+    "before": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "after": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentstate/recovery_test.go": {
+    "before": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "after": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentstate/journal_test.go": {
+    "before": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "after": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentstate/journal.go": {
+    "before": "c00ba0227f2a229ec4a66ff438e93ad4391124bdbe52ae4b627b71ab49503755",
+    "after": "13b4b7b94e5d1ee2df2a47a9810756eeffba724c07a37f1ba4ab425c5f6aca87",
+    "planned_change": true,
+    "unchanged": false
+  },
+  "internal/enrollmentproof/proof_test.go": {
+    "before": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "after": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/enrollmentproof/proof.go": {
+    "before": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "after": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_issuer_linux.go": {
+    "before": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+    "after": "7ee38e272c7ca66fae7d9962d159acac314ba1c868cea3e603973081e21a5a1d",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_registry_types.go": {
+    "before": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+    "after": "1f3a02411c92b57a1cce4b2f6c2a72e85a2e89e7ab4f2a7567844a102848ccd7",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_registry_publish.go": {
+    "before": "12cd527e6de9638d44ea761151d8571ed49e9ecaa2fbab17e51bc3dcc3c353bd",
+    "after": "12cd527e6de9638d44ea761151d8571ed49e9ecaa2fbab17e51bc3dcc3c353bd",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_registry_store.go": {
+    "before": "5caa3e567df9646ade66026bd1c3a0e46e85bb3b022e3f0dbff8490789d04609",
+    "after": "5caa3e567df9646ade66026bd1c3a0e46e85bb3b022e3f0dbff8490789d04609",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_receipt_linux.go": {
+    "before": "c1d1f50fcb1da0f987e77e8a583ce286762e09d10ebb35ec91c246ee789ee2e8",
+    "after": "c1d1f50fcb1da0f987e77e8a583ce286762e09d10ebb35ec91c246ee789ee2e8",
+    "planned_change": false,
+    "unchanged": true
+  },
+  "internal/engine/agent_identity_receipt_linux_test.go": {
+    "before": "4b739068d8dec888ce0134ac5aacc523db23029a7302e9c2998bfc90804cc041",
+    "after": "4b739068d8dec888ce0134ac5aacc523db23029a7302e9c2998bfc90804cc041",
+    "planned_change": false,
+    "unchanged": true
+  }
+}

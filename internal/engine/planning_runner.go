@@ -21,6 +21,8 @@ type PlanningProposal struct {
 	Operations []PlanningOperation `json:"operations"`
 }
 
+const structuredProviderReplyLimit = 64 * 1024
+
 // One bounded activation. The claim is durable before starting a possibly
 // billable process. Expired claims consume their budget even after a crash.
 func (s *Store) planningStep(work string) error {
@@ -323,6 +325,10 @@ func runStructuredProviderPolicyClock(provider Provider, route *ModelRoute, prom
 	if route != nil {
 		p = applyModelRoute(p, route)
 	}
+	p, err = appendStructuredContextWindow(p, provider.structuredContextTokens)
+	if err != nil {
+		return "", err
+	}
 	input, err := structuredReviewInput(&p, prompt, images)
 	if err != nil {
 		return "", err
@@ -357,7 +363,7 @@ func runStructuredProviderPolicyClock(provider Provider, route *ModelRoute, prom
 	output := make(chan assistOutput, 1)
 	activity := make(chan struct{}, 1)
 	go func() {
-		output <- readAssistOutputObserved(reader, func() {
+		output <- readStructuredProviderOutputObserved(reader, func() {
 			select {
 			case activity <- struct{}{}:
 			default:
@@ -483,10 +489,10 @@ func runStructuredProviderPolicyClock(provider Provider, route *ModelRoute, prom
 		return "", fmt.Errorf("%w ; %s ; diagnostic : %s", err, result.progressDiagnostic(), guardBlock(diagnostic.String(), 600))
 	}
 	if result.err != nil {
-		return "", result.err
+		return result.reply, result.err
 	}
-	if len(result.reply) > 65536 {
-		return "", fmt.Errorf("proposition supérieure à 64 Kio")
+	if len(result.reply) > structuredProviderReplyLimit {
+		return result.reply, fmt.Errorf("proposition supérieure à 64 Kio (%d octets)", len(result.reply))
 	}
 	return result.reply, nil
 }

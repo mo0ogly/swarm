@@ -25,7 +25,11 @@ func fragmentBeginFixture(t *testing.T) (*Store, Work, Agent, managedReviewConte
 	if e != nil {
 		t.Fatal(e)
 	}
-	return s, w, a, p.Context, filepath.ToSlash(rel), raw
+	legacy, e := s.managedReviewContextAtCitationVersion(w, a, p.Context.Candidate, raw, false, 1)
+	if e != nil {
+		t.Fatal(e)
+	}
+	return s, w, a, legacy, filepath.ToSlash(rel), raw
 }
 func TestManagedFragmentBeginNoSpendAndReopen(t *testing.T) {
 	s, w, a, c, path, receipt := fragmentBeginFixture(t)

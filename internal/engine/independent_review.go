@@ -12,19 +12,20 @@ import (
 // The reviewer is a separate, tool-free process. Its opinion never replaces
 // deterministic controls or an explicitly required human acceptance.
 type ReviewerConfig struct {
-	MaxContextFiles *int        `json:"max_context_files,omitempty"`
-	MaxSourceBytes  *int        `json:"max_source_bytes,omitempty"`
-	MaxContextBytes *int        `json:"max_context_bytes,omitempty"`
-	MaxFiles        *int        `json:"max_files,omitempty"`
-	ModelSelection  *RoleModel  `json:"model_selection,omitempty"`
-	TimeoutSeconds  int         `json:"timeout_seconds,omitempty"`
-	Failure         string      `json:"failure,omitempty"`
-	Provider        string      `json:"provider"`
-	ProviderDigest  string      `json:"provider_digest"`
-	ModelRoute      *ModelRoute `json:"model_route,omitempty"`
-	MaxCalls        int         `json:"max_calls"`
-	Calls           int         `json:"calls"`
-	Authorized      string      `json:"authorized"`
+	InputContextTokens int         `json:"input_context_tokens,omitempty"`
+	MaxContextFiles    *int        `json:"max_context_files,omitempty"`
+	MaxSourceBytes     *int        `json:"max_source_bytes,omitempty"`
+	MaxContextBytes    *int        `json:"max_context_bytes,omitempty"`
+	MaxFiles           *int        `json:"max_files,omitempty"`
+	ModelSelection     *RoleModel  `json:"model_selection,omitempty"`
+	TimeoutSeconds     int         `json:"timeout_seconds,omitempty"`
+	Failure            string      `json:"failure,omitempty"`
+	Provider           string      `json:"provider"`
+	ProviderDigest     string      `json:"provider_digest"`
+	ModelRoute         *ModelRoute `json:"model_route,omitempty"`
+	MaxCalls           int         `json:"max_calls"`
+	Calls              int         `json:"calls"`
+	Authorized         string      `json:"authorized"`
 }
 type IndependentReview struct {
 	ResultEvent         string                        `json:"result_event,omitempty"`
@@ -116,6 +117,9 @@ type ReviewCriterion struct {
 
 func reviewContract(t *Task) string {
 	b, _ := json.Marshal([]any{t.Title, t.Deliverable, t.Criteria, t.Depends, t.PlanBriefHash})
+	if len(t.MemorySelections) > 0 {
+		b, _ = json.Marshal([]any{hash(b), t.MemorySelections})
+	}
 	return hash(b)
 }
 func (s *Store) independentReviewGuard(w *Work, t *Task) error {
@@ -408,6 +412,20 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			cfg.Failure = ""
 			return nil
 		}
+		if v.FragmentJournal == nil && v.FailureCode == reviewFragmentProtocolError {
+			if methodRestartErr != nil {
+				return methodRestartErr
+			}
+			if methodRestart != nil {
+				if !r.ConfirmReviewErrorRepair {
+					return fmt.Errorf("méthode corrigée : confirmation explicite requise pour une revue complète")
+				}
+				return s.applyReviewMethodRestart(w, t, methodRestart, r.Reason)
+			}
+			if err := s.managedReviewProtocolPrecondition(*v); err != nil {
+				return err
+			}
+		}
 		if v.FragmentJournal != nil && fragmentReviewerChanged(*w, *v) {
 			if replacementErr != nil {
 				return replacementErr
@@ -444,8 +462,15 @@ func (s *Store) retryIndependentReview(work string, r PlanningRequest) (Work, er
 			if err := s.queueManagedFragmentResume(*w, t, r.EventID); err != nil {
 				return err
 			}
+			if v.FailureCode == reviewFragmentProtocolError {
+				directive := &ManagedReviewRetryDirective{Decision: r.EventID, Scope: t.ScopeID, ResultEvent: reviewPlanningEventID(v), Review: v.ID, Candidate: v.CandidateSHA, Attempt: v.Attempt, FailureCode: reviewFragmentProtocolError, Cause: v.Reason, Instruction: r.Reason}
+				if err := s.preflightReviewRetryDirective(*t.IndependentReview, directive); err != nil {
+					return err
+				}
+				t.IndependentReview.FragmentJournal.RetryDirective = directive
+			}
 			cfg.Failure = ""
-			t.PlanningRetry = false // Explicit review recovery supersedes a producer retry.
+			t.PlanningRetry = false
 			return nil
 		}
 		// The former record remains in the event history. Call reservations are never refunded.

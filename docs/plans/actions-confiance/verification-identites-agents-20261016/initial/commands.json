@@ -1,0 +1,67 @@
+[
+  {
+    "argv": [
+      "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+      "--root",
+      "/tmp/swarm-ia1-agents-f8u7xxnt",
+      "--json",
+      "init"
+    ],
+    "input": null,
+    "credential_supplied": false,
+    "started_unix": 1792183495.7631936,
+    "ended_unix": 1792183495.8523254,
+    "exit_code": 0,
+    "stdout": "{\n  \"root\": \"/tmp/swarm-ia1-agents-f8u7xxnt\",\n  \"schema_version\": 1,\n  \"state\": \".swarm/state.db\"\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/swarm-ia1-build-_bj_x21c/swarm",
+      "--root",
+      "/tmp/swarm-ia1-agents-f8u7xxnt",
+      "--json",
+      "trust",
+      "config-apply",
+      "--input",
+      "-"
+    ],
+    "input": {
+      "schema_version": 1,
+      "event_id": "4746d006-7b7c-438d-8c7e-fe435cbd09ef",
+      "expected_revision": 0,
+      "policy": {
+        "mandate_ttl_seconds": 3600,
+        "unknown_reconcile_seconds": 0,
+        "evidence_retention_days": 365,
+        "require_separation": true
+      },
+      "reason": "IA1 isolated identity suspension test",
+      "identities": [
+        {
+          "subject": "ia1-admin",
+          "token": "[private fixture credential]",
+          "integrity": 3,
+          "roles": [
+            "admin"
+          ]
+        },
+        {
+          "subject": "ia1-requester",
+          "token": "[private fixture credential]",
+          "integrity": 1,
+          "roles": [
+            "requester"
+          ],
+          "disabled": false
+        }
+      ]
+    },
+    "credential_supplied": false,
+    "started_unix": 1792183495.8532765,
+    "ended_unix": 1792183495.902477,
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"au moins trois identités séparées sont requises\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"au moins trois identités séparées sont requises\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+  }
+]

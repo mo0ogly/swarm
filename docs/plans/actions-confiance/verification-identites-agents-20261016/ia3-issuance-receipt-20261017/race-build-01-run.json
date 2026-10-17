@@ -1,0 +1,31 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-overlay=/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/overlay.json",
+    "-race",
+    "-c",
+    "-o",
+    "/tmp/swarm-identity-receipt-race-orjibt_m/engine.test",
+    "./internal/engine"
+  ],
+  "overlay": "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/overlay.json",
+  "start": "2026-10-17T09:03:59.630861+00:00",
+  "end": "2026-10-17T09:08:52.093042+00:00",
+  "elapsed_seconds": 292.4630062630167,
+  "exit": 0,
+  "input_count": 1064,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "binary_sha256": null,
+  "binary_unchanged": true
+}

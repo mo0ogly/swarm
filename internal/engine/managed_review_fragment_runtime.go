@@ -22,6 +22,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 	if !ok {
 		return "", nil, fmt.Errorf("fournisseur absent")
 	}
+	sourceProvider := provider
 	level := "auto"
 	if cfg.ModelRoute != nil {
 		level = cfg.ModelRoute.Level
@@ -30,11 +31,10 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 	if err != nil {
 		return "", nil, err
 	}
-	_, method, err := s.projectAgentWorkflow("reviewer")
+	prefix, err := s.managedFragmentWorkflowPrefix(r)
 	if err != nil {
 		return "", nil, err
 	}
-	prefix := managedReviewPrefix(method)
 	refresh := func() error {
 		current, e := s.get(w.ID)
 		if e != nil {
@@ -98,6 +98,19 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 	if err != nil {
 		return "", nil, err
 	}
+	expectedContext := 0
+	if p.InputBudget != nil && p.InputBudget.Version == 2 {
+		expectedContext = p.InputBudget.ContextTokens
+	}
+	if cfg.InputContextTokens != expectedContext {
+		return "", nil, fmt.Errorf("fenêtre de contexte configurée différente du plan ; aucune nouvelle dépense")
+	}
+	preparedProvider, err := prepareReviewContextProvider(sourceProvider, p.InputBudget)
+	if err != nil {
+		return "", nil, err
+	}
+
+	provider.structuredContextTokens = preparedProvider.structuredContextTokens
 	for i, packet := range p.Packets {
 		reusable, e := validateManagedFragmentJournal(j, p, a.Attempt, r.BatchProviderDigest)
 		if e != nil {
@@ -200,7 +213,7 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 		if state != "pending" && state != "ready" {
 			return state, nil, fmt.Errorf("appel final inachevé ; reprise explicite requise")
 		}
-		phase, schema := "selection", managedFragmentRequestSchema
+		phase, schema := "selection", managedFragmentSelectionSchema(p, f.Version)
 		callPrefix, prefixErr := managedReviewRecoveryPrefix(prefix, r.FragmentJournal.RetryDirective)
 		if prefixErr != nil {
 			return "", nil, prefixErr
@@ -215,7 +228,6 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 			if bundleErr != nil {
 				return "", nil, bundleErr
 			}
-			schema = fragmentDecisionSchema(bundle)
 			selectionReply := ""
 			for _, prior := range f.Calls {
 				if prior.Phase == "selection" && prior.State == "ready" {
@@ -227,6 +239,9 @@ func (s *Store) runManagedFragmentReview(w Work, a Agent, r IndependentReview) (
 				return "", nil, parseErr
 			}
 			prompt, visible, e = managedFragmentDecisionPrompt(callPrefix, c, p, replies, selection.References)
+			if e == nil {
+				schema, e = managedFragmentDecisionSchema(c, bundle, visible)
+			}
 		}
 		if e != nil {
 			return "", nil, e

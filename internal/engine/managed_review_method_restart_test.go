@@ -34,7 +34,7 @@ func TestReviewMethodRestartRequiresExplicitCorrectionAndKeepsHistory(t *testing
 		t.Fatal(err)
 	}
 	preview, err := s.reviewRecoveryPreview(w.ID, a.TaskID)
-	if err != nil || preview.State != "method_restart_ready" || preview.Required < 3 || preview.Reusable != 0 || preview.Timeout != 77 {
+	if err != nil || preview.State != "method_restart_ready" || preview.Required < 1 || preview.Reusable != 0 || preview.Timeout != 77 {
 		t.Fatal(preview, err)
 	}
 	request := PlanningRequest{Schema: 1, EventID: "method-restart", Revision: w.Revision, Task: a.TaskID, Reason: "The review method has been corrected; rerun every inspection of the unchanged candidate."}

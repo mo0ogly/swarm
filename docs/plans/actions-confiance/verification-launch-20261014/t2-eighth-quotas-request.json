@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "retain-authority-key-regressions-aba51016d9854547",
+  "expected_revision": 153,
+  "limits": {
+    "review_context_files": 24,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 278528,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 40,
+    "planning_decisions": 40,
+    "review_calls": 40
+  },
+  "reason": "Les 24 originaux complets mesurés représentent 274291 octets après corrections et régressions d’autorité/clé, au-delà de 256 Kio. Porter uniquement cette capacité à 272 Kio, selon l’autorité utilisateur existante ; conserver les 28 appels consommés, les deux tentatives et tous les autres plafonds."
+}

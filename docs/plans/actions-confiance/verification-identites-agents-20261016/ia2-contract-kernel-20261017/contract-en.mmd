@@ -1,0 +1,8 @@
+flowchart TD
+  R["Internal JSON request"] --> P["Strict schema: no asserted authority"]
+  P --> L["Shared Trust lock"]
+  L --> I["Resolve token against current state"]
+  A["Protected current authority frame<br/>IA2.3 producer still missing"] --> V
+  I --> V["Check plan, instance, grants and delegation"]
+  V --> D["Decision bound to exact request or refusal"]
+  D -. "IA2.3 / IA3: not connected" .-> E["Atomic commitment, launch and effects"]

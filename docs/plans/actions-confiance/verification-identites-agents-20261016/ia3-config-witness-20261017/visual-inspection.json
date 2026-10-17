@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-17T13:04:50.981973+00:00",
+  "method": "Both PNGs viewed with view_image during this increment",
+  "files": {
+    "witness-fr.png": "17fb096948a084e8494a953dd812f38f80cd550833d114afb7fe67923a9bab01",
+    "witness-en.png": "012ad0c464aeeb2de3aa7cd0427e3934354495a0f222b62aece86fc833407cae"
+  },
+  "result": "Complete and readable; normal path, pending recovery and already-confirmed barriers distinct; no observed clipping",
+  "scope": "Static documentation, no UI behavior acceptance"
+}

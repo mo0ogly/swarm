@@ -1,0 +1,66 @@
+=== RUN   TestActionsConfianceT4RemoteDestination
+--- PASS: TestActionsConfianceT4RemoteDestination (1.10s)
+=== RUN   TestActionsConfianceT4RemoteAuthenticatedPost
+--- PASS: TestActionsConfianceT4RemoteAuthenticatedPost (1.10s)
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/https://127.0.0.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://localhost:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://192.0.2.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:0
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:65536
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://user:password@127.0.0.1:1234
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/session/private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/?token=private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/#private
+=== RUN   TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/%2f
+--- PASS: TestActionsConfianceT4RemoteInvalidOrigins (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/https://127.0.0.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://localhost:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://192.0.2.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:0 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:65536 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://user:password@127.0.0.1:1234 (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/session/private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/?token=private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/#private (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteInvalidOrigins/http://127.0.0.1:1234/%2f (0.00s)
+=== RUN   TestActionsConfianceT4RemoteRefusals
+=== RUN   TestActionsConfianceT4RemoteRefusals/missing-session
+=== RUN   TestActionsConfianceT4RemoteRefusals/wrong-session
+=== RUN   TestActionsConfianceT4RemoteRefusals/missing-bearer
+=== RUN   TestActionsConfianceT4RemoteRefusals/wrong-bearer
+=== RUN   TestActionsConfianceT4RemoteRefusals/header-injection
+--- PASS: TestActionsConfianceT4RemoteRefusals (1.23s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/missing-session (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/wrong-session (0.01s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/missing-bearer (0.01s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/wrong-bearer (0.01s)
+    --- PASS: TestActionsConfianceT4RemoteRefusals/header-injection (0.00s)
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/html
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/empty
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/null
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/empty-object
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/array
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/trailing
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/unstructured-error
+=== RUN   TestActionsConfianceT4RemoteResponseBoundaries/structured-error
+--- PASS: TestActionsConfianceT4RemoteResponseBoundaries (0.04s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/html (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/empty (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/null (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/empty-object (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/array (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/trailing (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/unstructured-error (0.00s)
+    --- PASS: TestActionsConfianceT4RemoteResponseBoundaries/structured-error (0.00s)
+=== RUN   TestActionsConfianceT4RemoteNoRedirect
+--- PASS: TestActionsConfianceT4RemoteNoRedirect (0.01s)
+=== RUN   TestActionsConfianceT4RemoteCancellation
+--- PASS: TestActionsConfianceT4RemoteCancellation (0.00s)
+=== RUN   TestActionsConfianceT4RemoteUnavailableAndLocal
+--- PASS: TestActionsConfianceT4RemoteUnavailableAndLocal (1.31s)
+PASS
+ok  	swarm.local/companion/internal/engine	6.388s

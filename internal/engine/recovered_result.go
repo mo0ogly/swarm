@@ -46,6 +46,21 @@ func previousRecoveryReview(t *Task) *IndependentReview {
 	return nil
 }
 
+func recoveryRevisionReview(w Work, t *Task, request PlanningRequest) *IndependentReview {
+	if t.IndependentReview != nil {
+		return t.IndependentReview
+	}
+	if request.ReviewID == "" || t.RecoveredResult == nil || len(t.PreviousReviews) == 0 || w.Planning == nil || w.Planning.Repository == nil {
+		return nil
+	}
+	prior := &t.PreviousReviews[len(t.PreviousReviews)-1]
+	repair := t.RecoveredResult
+	if prior.ID != request.ReviewID || prior.Producer != request.Agent || prior.Attempt != request.Attempt || repair.Agent != request.Agent || repair.Attempt != request.Attempt || prior.Contract != reviewContract(t) || prior.PreviousCandidate != w.Planning.Repository.Candidate || prior.Finished == "" || prior.CandidateSHA == "" {
+		return nil
+	}
+	return prior
+}
+
 func recoveredResultMatches(t *Task, a Agent, item ManagedAttempt) bool {
 	r := t.RecoveredResult
 	return r != nil && r.Agent == a.ID && r.Attempt == a.Attempt && r.Result != "" && r.Result == item.Result && r.ProcessStatus == a.Status && (a.Status == "interrupted" || a.Status == "failed" || a.Status == "completed")
@@ -108,9 +123,13 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			return Work{}, fmt.Errorf("un résultat réparé est déjà enregistré ; aucune nouvelle soumission implicite")
 		}
 	}
-	refused := s.recoveredReviewAllowsCorrection(w, t.IndependentReview, r.ConfirmReviewErrorRepair)
-	unreviewedDelivery := revise && t.IndependentReview == nil && r.ReviewID == ""
-	if revise && !unreviewedDelivery && (t.IndependentReview == nil || t.IndependentReview.ID != r.ReviewID || t.IndependentReview.Attempt != r.Attempt || !refused) {
+	review := recoveryRevisionReview(w, t, r)
+	refused := s.recoveredReviewAllowsRequestedCorrection(w, review, r)
+	if t.IndependentReview == nil && review != nil {
+		refused = refused && s.managedReviewFilesIntact(*review) == nil && s.managedBatchPlanIntact(w, *review) == nil
+	}
+	unreviewedDelivery := revise && review == nil && r.ReviewID == ""
+	if revise && !unreviewedDelivery && (review == nil || review.ID != r.ReviewID || review.Attempt != r.Attempt || !refused) {
 		return Work{}, fmt.Errorf("révision corrective liée au dernier refus indépendant requise")
 	}
 	if w.Revision != r.Revision || t.Status != "blocked" || !currentTaskAttempt(t, r.Attempt) {
@@ -232,7 +251,8 @@ func (s *Store) recoverResult(work string, r PlanningRequest, revise bool) (Work
 			return e
 		}
 		prior := task.RecoveredResult
-		if (!revise && prior != nil && prior.Agent == a.ID && prior.Attempt == a.Attempt) || (revise && !unreviewedDelivery && (task.IndependentReview == nil || task.IndependentReview.ID != r.ReviewID || !s.recoveredReviewAllowsCorrection(*current, task.IndependentReview, r.ConfirmReviewErrorRepair))) || (unreviewedDelivery && task.IndependentReview != nil) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
+		review := recoveryRevisionReview(*current, task, r)
+		if (!revise && prior != nil && prior.Agent == a.ID && prior.Attempt == a.Attempt) || (revise && !unreviewedDelivery && (review == nil || review.ID != r.ReviewID || !s.recoveredReviewAllowsRequestedCorrection(*current, review, r))) || (unreviewedDelivery && task.IndependentReview != nil) || !currentTaskAttempt(task, a.Attempt) || task.Status != "blocked" {
 			return fmt.Errorf("tentative remplacée ou réparation déjà soumise")
 		}
 		task.RecoveredResult = &RecoveredResult{Event: r.EventID, RequestDigest: hash(raw), Agent: a.ID, Attempt: a.Attempt, Result: result, Tree: tree, Actor: operatorIdentity(), At: now(), Reason: r.Reason, ProcessStatus: a.Status}
@@ -322,11 +342,11 @@ func (s *Store) recoveredReviewAllowsCorrection(w Work, r *IndependentReview, co
 	if !confirmError || r == nil || r.State != "error" || r.Finished == "" || r.CandidateSHA == "" {
 		return false
 	}
-	if s.managedReviewFilesIntact(*r) != nil || s.managedBatchPlanIntact(w, *r) != nil {
+	if s.managedHistoricalReviewFilesIntact(*r) != nil || s.managedBatchPlanIntactVersion(w, *r, true) != nil {
 		return false
 	}
 	if r.FragmentJournal != nil {
-		_, j, err := s.readFragmentJournalAnchor(*r)
+		_, j, err := s.readFragmentJournalAnchorVersion(*r, true)
 		if err != nil {
 			return false
 		}
@@ -337,4 +357,29 @@ func (s *Store) recoveredReviewAllowsCorrection(w Work, r *IndependentReview, co
 		}
 	}
 	return true
+}
+
+// A valid selection-stage unknown is neither a transport error nor a business
+// rejection. Explicit correction supplies a changed, attributed result through
+// the ordinary source/control/review admission path; it never grants acceptance.
+func (s *Store) recoveredReviewAllowsRequestedCorrection(w Work, r *IndependentReview, request PlanningRequest) bool {
+	if s.recoveredReviewAllowsCorrection(w, r, request.ConfirmReviewErrorRepair) {
+		return true
+	}
+	if !request.ConfirmReviewUnknownCorrection || r == nil || r.State != "unknown" || r.Finished == "" || r.CandidateSHA == "" || len(r.ManagedTasks) != 0 || r.FragmentJournal == nil || r.FragmentJournal.FinalJournalDigest == "" {
+		return false
+	}
+	if s.managedReviewFilesIntact(*r) != nil || s.managedBatchPlanIntact(w, *r) != nil {
+		return false
+	}
+	p, j, err := s.readFragmentJournalAnchor(*r)
+	if err != nil {
+		return false
+	}
+	f, c, prefix, err := s.readManagedFragmentFinal(*r, p, j)
+	if err != nil {
+		return false
+	}
+	state, records, err := validateManagedFragmentFinalJournal(f, j, c, p, prefix)
+	return err == nil && state == "unknown" && len(records) == 0
 }

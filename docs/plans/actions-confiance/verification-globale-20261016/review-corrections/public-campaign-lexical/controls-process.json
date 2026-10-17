@@ -1,0 +1,25 @@
+{
+  "stage": "controls",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_controls.py",
+    "--root",
+    "/home/fpizzi/Documents/ChatGPT/swarm",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/controls",
+    "--timeout-seconds",
+    "180"
+  ],
+  "pid": 482971,
+  "start_ticks": "6982505",
+  "started_unix": 1792135400.9094713,
+  "status": "passed",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "exit_code": 0,
+  "ended_unix": 1792135407.3576803,
+  "stdout_sha256": "64e2adee412c76f10a3fd39c20011d42507d7489ca08e879f443e9540a690e63",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 13,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign-lexical/controls/mapping-public.json",
+  "result_sha256": "c5de89100771f984a8fe35634d60faf71f4ea15c42c0217380f8b1bb77a89a3a"
+}

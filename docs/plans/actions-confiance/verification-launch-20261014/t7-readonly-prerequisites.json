@@ -1,0 +1,17 @@
+{
+  "kernel": "6.17.0-41-generic",
+  "uid": 1001,
+  "effective_capabilities": {
+    "CAP_SYS_ADMIN": false,
+    "CAP_PERFMON": false,
+    "CAP_BPF": false
+  },
+  "unprivileged_bpf_disabled": "2",
+  "tools": {
+    "bpftool": "/usr/sbin/bpftool",
+    "bpftrace": "/usr/bin/bpftrace",
+    "clang": null,
+    "sudo": "/usr/bin/sudo"
+  },
+  "limits": "Read-only prerequisite inventory; no kernel program loaded, no collection performed, no task acceptance."
+}

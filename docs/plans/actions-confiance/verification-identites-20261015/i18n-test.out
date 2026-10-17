@@ -1,0 +1,2 @@
+PASS i18n locale, fallback, interpolation, engine formats and catalogue parity
+PASS i18n build check accepts current output and refuses stale output without mutation

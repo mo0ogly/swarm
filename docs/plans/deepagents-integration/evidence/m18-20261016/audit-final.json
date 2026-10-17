@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "at_utc": "2026-10-16T20:01:11.358319+00:00",
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "go_tests": 10,
+  "bridge_python_tests": 8,
+  "reference_regression_python_tests": 24,
+  "native_checks": 5,
+  "final_scripted_invocations": 2,
+  "all_retained_fixture_scripted_invocations": {
+    "native": 1,
+    "native-final": 2,
+    "native-flow": 2
+  },
+  "model_calls": 0,
+  "schema_migration_added": false,
+  "engine_summary_admission": "NOT IMPLEMENTED",
+  "model_effectiveness": "NOT TESTED",
+  "independent_review": "NOT TESTED",
+  "deployed": false,
+  "input_reuse": "input-reuse-assessment.json",
+  "runtime": {
+    "running": true,
+    "pid": 2186583,
+    "root": "/home/fpizzi/Documents/ChatGPT/swarm",
+    "url": "http://127.0.0.1:38433/",
+    "ready": true
+  },
+  "owned_files_sha256": {
+    "internal/engine/project_memory_public.go": "63188a921136b061166e4066dd7203ae509bd7fa3f9f3ef8847b9738fb52ccb7",
+    "internal/engine/main.go": "7a5728ba475d321d8fad4b60810c9c75052e6ca913c33a14a7e703164a4b2fa5",
+    "docs/PROJECT-MEMORY.md": "ad62a660d97458d9f438a630ec6566093977e65c011c51085b0a778f34653b5d",
+    "docs/en/PROJECT-MEMORY.md": "38d5dd9b3bc70c200b782bdabf9f2f2d0822306b99b9bdc43ae2045f06b9aba7",
+    "tools/memory-evaluation/README.md": "4326f3af253b092d7bc974186252ad062f3f0439b587b29373a2482f3f567ce1",
+    "docs/plans/deepagents-integration/PLAN.md": "313f8f408c1723a7b0d5cc3fade2ee2e773e5afa238a0a49a65d5da67571b107",
+    "docs/plans/deepagents-integration/cas-evaluation.json": "b5be61e62dfe7fee013b13cd48617457167d3681ac3dc064e8a589891204126a",
+    "internal/engine/storage_inspection.go": "2e384ffb72104ed32ab0bb1afbbde92fbe3162eebfe137cd3696a8332d0a6ff1",
+    "internal/engine/memory_summary_source.go": "750458d73f45f5be529dd483486bd92f19289913f8db74eb9dc425fc54d580e8",
+    "internal/engine/memory_summary_source_test.go": "75cd9da2655931ac592620ece5a8beccdb7fa2d22c19fe2fb15ef1965d4b7c68",
+    "tools/memory-evaluation/swarm_source.py": "9719e13624c5aacd348f9b8b9d3eeb646aa84d53821c9aadbe1213a00e15a256",
+    "tests/test_memory_swarm_source.py": "6d93db706d9d086653d93b48f7821f657c1a5150391dbb7ee767aee45521906f",
+    "tests/memory_summary_source.py": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1",
+    "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-14.md": "5297c2eecbcdc3d84f20db71be5d7a4c81f0b8df04899002ed8adce0b602bc73",
+    "docs/plans/deepagents-integration/RESULTATS-MEMOIRE-14.md": "374ae4dc3ed8859bd9f7ddaafb8c630a9c5a28e3ec3dbed8aa8787c6bb3de3ae"
+  },
+  "candidate_diff_sha256": "1900ec6202269eed62193d4df1d10b56b70c4eeb4617c34c45c1de446ba2adba",
+  "python": "3.13.7",
+  "go": "go version go1.24.3 linux/amd64"
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "supplied_outputs",
+    "provider": "TO_CHOOSE",
+    "model": "TO_CHOOSE"
+  },
+  "answers": [
+    {
+      "case_id": "storage-32-current-without",
+      "prompt_sha256": "97ef84314333c8e6c7c50b7ce0fc58920cd6c0ac3828853aaf65dae0b354ac23",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-32-current-with",
+      "prompt_sha256": "701d04e95cb456145f6a322946cc7ac9ef40e7c678acb4de0654e9727447de8f",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-32-changed-without",
+      "prompt_sha256": "00b2fce0cbf8cf6899d86ba219817fe94f602b475e27a648923c521d103326df",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-32-changed-with",
+      "prompt_sha256": "6bf8ab31d6a6a8a0c81780e8374beeccb14be049695061e2f3295613730825e0",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-33-current-without",
+      "prompt_sha256": "743f20b65dd1de2292e8aaa20fce55695d26db11f62a28193f6599dc3fbf6704",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-33-current-with",
+      "prompt_sha256": "0015157a12765b6e39dbca4ebb26d0bf21f48235c876d36aba5b29758d237c31",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-33-changed-without",
+      "prompt_sha256": "afd53c76229597bd44332622a064fe7058a8caf270a13515d6b1879ad3dfd85c",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-33-changed-with",
+      "prompt_sha256": "3878232fa8fc99db0ee47d8f20d2b543b7f949f07bba9f9f8631bc67f210e3a8",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-34-current-without",
+      "prompt_sha256": "09c1b1d8ff9609e9ee27e87fab4802df3b26ae2ea4d75903fdf63e7679589b24",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-34-current-with",
+      "prompt_sha256": "3fe9be604b25f849afff6e6d67a773919ec867247b676cb6e5917c07597fc36d",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-34-changed-without",
+      "prompt_sha256": "e73cb53f0f2fa43bb80f9273e48991f057caa2e60fc477c04b0ba150e8efdb59",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    {
+      "case_id": "storage-34-changed-with",
+      "prompt_sha256": "76596cb672f84ae071202b9e29d81c5e1268497fa756d30427ff461974c17c9d",
+      "response": null,
+      "elapsed_seconds": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    }
+  ]
+}

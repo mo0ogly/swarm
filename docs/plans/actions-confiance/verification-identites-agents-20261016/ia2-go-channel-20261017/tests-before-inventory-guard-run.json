@@ -1,0 +1,19 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^(TestAgentIdentity.*|TestLaunchAtomicIdempotentAndWorkspaceExclusive|TestLaunchRejectsEscapeAndUnsatisfiedDependencies|TestActionsConfianceT3IdentityContextPublicReadOnly|TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation|TestActionsConfianceT3OIDCLogoutSessionAndSubject)$",
+    "-count=1",
+    "-timeout",
+    "60s"
+  ],
+  "start": "2026-10-17T06:31:24.136881+00:00",
+  "end": "2026-10-17T06:32:00.204450+00:00",
+  "exit_code": 0,
+  "inputs": "inputs-final.json",
+  "input_files": 1046,
+  "changed_inputs": []
+}

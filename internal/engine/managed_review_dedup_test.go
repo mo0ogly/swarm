@@ -17,15 +17,6 @@ func TestAddedReviewSourceDedupIsLosslessAndConservative(t *testing.T) {
 	if !addedSourceInDiff(diff, source) {
 		t.Fatal("complete added source not recognized")
 	}
-	changed := source
-	changed.Content += "extra\n"
-	existing := source
-	existing.Path = "existing.go"
-	c := managedReviewContext{Diff: diff, Sources: []ReviewSource{source, changed, existing}}
-	deduplicateAddedReviewSources(&c)
-	if c.Diff != diff || len(c.Sources) != 2 || c.Sources[0].Content != changed.Content || c.Sources[1].Path != "existing.go" {
-		t.Fatal("evidence removed", c)
-	}
 	for _, bad := range []string{strings.Replace(diff, "new file mode", "old file mode", 1), strings.Replace(diff, source.Blob, strings.Repeat("b", 40), 1), strings.Replace(diff, "+last line", "+wrong line", 1), diff + "\n\\ No newline at end of file"} {
 		if addedSourceInDiff(bad, source) {
 			t.Fatal("non-equivalent source removed")
@@ -33,14 +24,15 @@ func TestAddedReviewSourceDedupIsLosslessAndConservative(t *testing.T) {
 	}
 }
 
-func TestAddedReviewDedupReservesInstructionBudget(t *testing.T) {
+func TestManagedReviewCompactionPreservesDeclaredOriginals(t *testing.T) {
 	dir := t.TempDir()
 	gitTest(t, dir, "init")
 	gitTest(t, dir, "config", "user.email", "fixture@example.invalid")
 	gitTest(t, dir, "config", "user.name", "Fixture")
 	gitTest(t, dir, "commit", "--allow-empty", "-m", "base")
 	base := gitTest(t, dir, "rev-parse", "HEAD")
-	content := strings.Repeat("x", 85*1024) + "\n"
+	quote := "func exactOriginal() {\n\tvalue := \"é + original\"\n\t_ = value\n}\n"
+	content := quote + strings.Repeat("padding line\n", 7254)
 	os.WriteFile(filepath.Join(dir, "new.txt"), []byte(content), 0600)
 	gitTest(t, dir, "add", ".")
 	gitTest(t, dir, "commit", "-m", "candidate")
@@ -48,13 +40,36 @@ func TestAddedReviewDedupReservesInstructionBudget(t *testing.T) {
 	diff := gitTest(t, dir, "diff", "--full-index", "--unified=3", base, candidate)
 	c := managedReviewContext{Candidate: candidate, Diff: diff, Sources: []ReviewSource{{Path: "new.txt", Blob: gitTest(t, dir, "rev-parse", "HEAD:new.txt"), Content: content}}}
 	raw, _ := json.Marshal(c)
-	if len(raw) <= 160*1024 || len(raw) >= 192*1024 {
+	if len(raw) <= 160*1024 {
 		t.Fatal("fixture outside instruction-reserve window", len(raw))
 	}
 	if err := compactManagedReviewContext(&c, dir, base); err != nil {
 		t.Fatal(err)
 	}
-	if len(c.Sources) != 0 || c.Diff != diff {
-		t.Fatal("duplicate left no room for instructions or diff changed")
+	if len(c.Sources) != 1 || c.Sources[0].Content != content || c.Diff != diff {
+		t.Fatal("declared original lost or altered during compaction")
+	}
+	c.Tasks = []managedReviewTaskContext{{Task: "original-source", Criteria: []string{"Inspect complete physical original"}}}
+	for _, tc := range []struct {
+		name, evidence string
+		pass           bool
+	}{
+		{"literal", quote, true},
+		{"mutated", strings.Replace(quote, "original", "changed", 1), false},
+		{"flattened", strings.ReplaceAll(quote, "\n", " "), false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			reply, err := json.Marshal(map[string]any{"candidate_commit": candidate, "tasks": []any{map[string]any{"task": c.Tasks[0].Task, "reason": "Exact declared physical source examined", "criteria": []any{map[string]any{"index": 1, "verdict": "pass", "evidence": tc.evidence}}}}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			state, _, err := parseManagedReview(string(reply), c)
+			if tc.pass && (err != nil || state != "passed") {
+				t.Fatal("literal original rejected", state, err)
+			}
+			if !tc.pass && err == nil {
+				t.Fatal("altered original accepted")
+			}
+		})
 	}
 }

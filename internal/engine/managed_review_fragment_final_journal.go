@@ -27,7 +27,7 @@ type managedFragmentFinalJournal struct {
 // review evidence only: publication still needs Store identities and controls.
 func validateManagedFragmentFinalJournal(f managedFragmentFinalJournal, j managedFragmentJournal, c managedReviewContext, p managedReviewFragmentPlan, prefix string) (string, []ManagedTaskReview, error) {
 	raw, _ := json.Marshal(j)
-	if (f.Version != 1 && f.Version != 2 && f.Version != 3) || f.InspectionDigest != hash(raw) || len(f.Calls) > p.ReservedFinalCalls+len(f.ResumeCalls) {
+	if (f.Version < 1 || f.Version > managedFragmentFinalProtocolVersion) || f.InspectionDigest != hash(raw) || len(f.Calls) > p.ReservedFinalCalls+len(f.ResumeCalls) {
 		return "", nil, fmt.Errorf("journal final périmé ou budget dépassé")
 	}
 	authorized := map[string]bool{}

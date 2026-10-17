@@ -27,13 +27,27 @@ func fragmentDecisionSchema(b managedFragmentFinalEvidence) string {
 	}
 	return `{"type":"object","additionalProperties":false,"properties":{"review":` + managedReviewSchema + `,"resolutions":{"type":"array","items":{"type":"object","additionalProperties":false,"properties":{"packet":{"type":"integer","minimum":0},"artifact":{"type":"integer","minimum":0},"need_index":{"type":"integer","minimum":0},"verdict":{"type":"string","enum":["resolved","unknown","fail"]},"reason":{"type":"string","minLength":8,"maxLength":1000},"evidence":{"type":"string","maxLength":4000}},"required":["packet","artifact","need_index","verdict","reason","evidence"]}}},"required":["review","resolutions"]}`
 }
-func parseManagedFragmentDecision(reply string, visible, c managedReviewContext, p managedReviewFragmentPlan, replies []string) (string, []ManagedTaskReview, error) {
+func parseManagedFragmentDecision(reply string, visible, c managedReviewContext, p managedReviewFragmentPlan, replies []string) (state string, records []ManagedTaskReview, err error) {
 	b, err := managedFragmentFinalBundle(c, p, replies)
 	if err != nil {
 		return "", nil, err
 	}
+	defer func() { err = reviewResponseProtocolError(err) }()
+	if len(reply) > managedFragmentReplyLimit {
+		return "", nil, fmt.Errorf("résolutions trop grandes")
+	}
+	if c.CitationContractVersion == 2 {
+		catalog, e := managedCitationCatalogForContext(visible, p.ContextDigest)
+		if e != nil {
+			return "", nil, e
+		}
+		reply, e = decodeManagedReferencedDecision(reply, catalog, c.Candidate, p.ContextDigest, len(b.Questions) > 0)
+		if e != nil {
+			return "", nil, e
+		}
+	}
 	if len(b.Questions) == 0 {
-		return parseManagedReview(reply, visible)
+		return parseManagedLiteralReview(reply, visible)
 	}
 	var response struct {
 		Review      json.RawMessage `json:"review"`
@@ -45,9 +59,6 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 			Reason   string `json:"reason"`
 			Evidence string `json:"evidence"`
 		} `json:"resolutions"`
-	}
-	if len(reply) > managedFragmentReplyLimit {
-		return "", nil, fmt.Errorf("résolutions trop grandes")
 	}
 	if err = strict([]byte(reply), &response); err != nil {
 		return "", nil, err
@@ -70,26 +81,9 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 		q := impact.Questions[0]
 		impactKeys[[3]int{q.Packet, q.Artifact, q.Need}] = true
 	}
-	originals := ""
-	for _, s := range visible.Sources {
-		originals += "\n" + s.Content
-	}
-	for _, t := range visible.Tasks {
-		controls, _ := json.Marshal(t.Controls)
-		originals += "\n" + t.Report + "\n" + string(controls)
-		// The final prompt also supplies these current, authoritative task
-		// contract fields. They can answer a question about assigned scope,
-		// but are deliberately not added to visible.Sources: parseManagedReview
-		// must still require implementation evidence for a business pass.
-		// Do not admit delivery claims, binding opinions or historical reviews
-		// merely because they occur elsewhere in the prompt metadata.
-		contract, _ := json.Marshal(struct {
-			Task        string   `json:"task"`
-			Title       string   `json:"title"`
-			Deliverable string   `json:"deliverable"`
-			Criteria    []string `json:"criteria"`
-		}{t.Task, t.Title, t.Deliverable, t.Criteria})
-		originals += "\n" + string(contract)
+	originals, originalErr := managedFragmentResolutionOriginals(visible)
+	if originalErr != nil {
+		return "", nil, originalErr
 	}
 	unresolved := false
 	for _, r := range response.Resolutions {
@@ -103,8 +97,16 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 			if impactKeys[key] && !fragmentCurrentChangeEvidence(b.ChangeDiff, r.Evidence) {
 				return "", nil, fmt.Errorf("impact historique sans citation d’un changement actuel")
 			}
-			if len(strings.TrimSpace(r.Evidence)) < 8 || !strings.Contains(originals, r.Evidence) {
-				return "", nil, fmt.Errorf("résolution sans preuve originale visible")
+			present := false
+			for _, original := range originals {
+				if strings.Contains(original.Content, r.Evidence) {
+					present = true
+					break
+				}
+			}
+			if len(strings.TrimSpace(r.Evidence)) < 8 || !present {
+				quote, _ := json.Marshal(fragmentDiagnosticExcerpt(r.Evidence))
+				return "", nil, fmt.Errorf("résolution sans preuve originale visible : packet=%d artifact=%d need_index=%d ; citation_sha256=%s citation_rejetée=%s ; le texte cité est absent, cela ne démontre pas l’absence du fichier", r.Packet, r.Artifact, r.Need, hash([]byte(r.Evidence)), quote)
 			}
 		case "unknown", "fail":
 			unresolved = true
@@ -112,7 +114,7 @@ func parseManagedFragmentDecision(reply string, visible, c managedReviewContext,
 			return "", nil, fmt.Errorf("verdict de résolution invalide")
 		}
 	}
-	state, records, err := parseManagedReview(string(response.Review), visible)
+	state, records, err = parseManagedLiteralReview(string(response.Review), visible)
 	if err != nil {
 		return "", nil, err
 	}

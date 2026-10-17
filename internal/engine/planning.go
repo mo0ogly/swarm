@@ -93,50 +93,51 @@ type PlanningOperation struct {
 	Next              string   `json:"next,omitempty"`
 }
 type PlanningRequest struct {
-	planningInputBudget      *managedReviewInputBudget
-	explorationInputs        map[string]*PlanningExploration
-	InstructionRevisionID    string `json:"instruction_revision_id,omitempty"`
-	methodRestarts           map[string]*preparedReviewMethodRestart
-	selectionRestarts        map[string]*preparedSelectionCapacityRestart
-	MissingReport            bool `json:"missing_report,omitempty"`
-	preparedReviewInputs     map[string]any
-	coordinationInputs       map[string]*preparedCoordination
-	ScopeFiles               []string                       `json:"scope_files,omitempty"`
-	ConfirmReviewErrorRepair bool                           `json:"confirm_review_error_repair,omitempty"`
-	MaxReviewCalls           int                            `json:"max_review_calls,omitempty"`
-	ResultCommit             string                         `json:"result_commit,omitempty"`
-	ExpectedCandidate        string                         `json:"expected_candidate,omitempty"`
-	ResultTree               string                         `json:"result_tree,omitempty"`
-	ConfirmRecovery          bool                           `json:"confirm_recovery,omitempty"`
-	ReviewID                 string                         `json:"review_id,omitempty"`
-	RecoveryInstruction      string                         `json:"recovery_instruction,omitempty"`
-	ReviewTimeoutSeconds     int                            `json:"review_timeout_seconds,omitempty"`
-	Level                    string                         `json:"level,omitempty"`
-	PolicyHash               string                         `json:"model_policy_hash,omitempty"`
-	Checks                   map[string][]ValidationControl `json:"checks,omitempty"`
-	Repository               *ManagedRepositoryRequest      `json:"repository,omitempty"`
-	Provider                 string                         `json:"provider,omitempty"`
-	MaxActivations           int                            `json:"max_activations,omitempty"`
-	Agent                    string                         `json:"agent_id,omitempty"`
-	Task                     string                         `json:"task_id,omitempty"`
-	Attempt                  string                         `json:"attempt_id,omitempty"`
-	Artifacts                []ExchangeArtifact             `json:"artifacts,omitempty"`
-	Schema                   int                            `json:"schema_version"`
-	EventID                  string                         `json:"event_id"`
-	Revision                 int                            `json:"expected_revision"`
-	Scope                    string                         `json:"scope,omitempty"`
-	ScopeRevision            int                            `json:"scope_revision,omitempty"`
-	Holder                   string                         `json:"holder,omitempty"`
-	Generation               int                            `json:"generation,omitempty"`
-	LeaseSeconds             int                            `json:"lease_seconds,omitempty"`
-	MaxTasks                 int                            `json:"max_tasks,omitempty"`
-	MaxDecisions             int                            `json:"max_decisions,omitempty"`
-	Inputs                   []string                       `json:"input_events,omitempty"`
-	Operations               []PlanningOperation            `json:"operations,omitempty"`
-	Reason                   string                         `json:"reason,omitempty"`
-	JudgeVerdict             string                         `json:"judge_verdict,omitempty"`
-	JudgeCycle               int                            `json:"judge_cycle,omitempty"`
-	MaxJudgeCycles           int                            `json:"max_judge_cycles,omitempty"`
+	planningInputBudget            *managedReviewInputBudget
+	explorationInputs              map[string]*PlanningExploration
+	InstructionRevisionID          string `json:"instruction_revision_id,omitempty"`
+	methodRestarts                 map[string]*preparedReviewMethodRestart
+	selectionRestarts              map[string]*preparedSelectionCapacityRestart
+	MissingReport                  bool `json:"missing_report,omitempty"`
+	preparedReviewInputs           map[string]any
+	coordinationInputs             map[string]*preparedCoordination
+	ScopeFiles                     []string                       `json:"scope_files,omitempty"`
+	ConfirmReviewUnknownCorrection bool                           `json:"confirm_review_unknown_correction,omitempty"`
+	ConfirmReviewErrorRepair       bool                           `json:"confirm_review_error_repair,omitempty"`
+	MaxReviewCalls                 int                            `json:"max_review_calls,omitempty"`
+	ResultCommit                   string                         `json:"result_commit,omitempty"`
+	ExpectedCandidate              string                         `json:"expected_candidate,omitempty"`
+	ResultTree                     string                         `json:"result_tree,omitempty"`
+	ConfirmRecovery                bool                           `json:"confirm_recovery,omitempty"`
+	ReviewID                       string                         `json:"review_id,omitempty"`
+	RecoveryInstruction            string                         `json:"recovery_instruction,omitempty"`
+	ReviewTimeoutSeconds           int                            `json:"review_timeout_seconds,omitempty"`
+	Level                          string                         `json:"level,omitempty"`
+	PolicyHash                     string                         `json:"model_policy_hash,omitempty"`
+	Checks                         map[string][]ValidationControl `json:"checks,omitempty"`
+	Repository                     *ManagedRepositoryRequest      `json:"repository,omitempty"`
+	Provider                       string                         `json:"provider,omitempty"`
+	MaxActivations                 int                            `json:"max_activations,omitempty"`
+	Agent                          string                         `json:"agent_id,omitempty"`
+	Task                           string                         `json:"task_id,omitempty"`
+	Attempt                        string                         `json:"attempt_id,omitempty"`
+	Artifacts                      []ExchangeArtifact             `json:"artifacts,omitempty"`
+	Schema                         int                            `json:"schema_version"`
+	EventID                        string                         `json:"event_id"`
+	Revision                       int                            `json:"expected_revision"`
+	Scope                          string                         `json:"scope,omitempty"`
+	ScopeRevision                  int                            `json:"scope_revision,omitempty"`
+	Holder                         string                         `json:"holder,omitempty"`
+	Generation                     int                            `json:"generation,omitempty"`
+	LeaseSeconds                   int                            `json:"lease_seconds,omitempty"`
+	MaxTasks                       int                            `json:"max_tasks,omitempty"`
+	MaxDecisions                   int                            `json:"max_decisions,omitempty"`
+	Inputs                         []string                       `json:"input_events,omitempty"`
+	Operations                     []PlanningOperation            `json:"operations,omitempty"`
+	Reason                         string                         `json:"reason,omitempty"`
+	JudgeVerdict                   string                         `json:"judge_verdict,omitempty"`
+	JudgeCycle                     int                            `json:"judge_cycle,omitempty"`
+	MaxJudgeCycles                 int                            `json:"max_judge_cycles,omitempty"`
 }
 
 func (p *PlanningState) scope(id string) (*PlanningScope, error) {
@@ -1039,6 +1040,9 @@ func validatePlanningState(w *Work) error {
 	}
 	if p.Version != 1 || len(p.Scopes) < 1 || p.MaxScopes < 0 || (p.MaxScopes > 0 && len(p.Scopes) > p.MaxScopes) || p.MaxDepth < 0 || p.MaxTasks < 1 || len(w.Tasks) > p.MaxTasks || p.MaxDecisions < 1 || p.MaxActivations < 1 || p.Activations < 0 || p.Activations > p.MaxActivations || p.Decisions < 0 || p.Decisions > p.MaxDecisions {
 		return fmt.Errorf("contrat de planification invalide")
+	}
+	if p.Reviewer != nil && p.Reviewer.InputContextTokens < 0 {
+		return fmt.Errorf("fenêtre de contexte de revue invalide")
 	}
 	if err := validateJudgeState(p.Judge); err != nil {
 		return err

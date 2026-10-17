@@ -147,6 +147,9 @@ func (s *Store) projectContext(role string) (*ProjectContext, string, error) {
 		if e != nil {
 			return nil, "", e
 		}
+		if e = s.memoryProfileSourceGuard(source.Path, string(b)); e != nil {
+			return nil, "", e
+		}
 		if projectSecret.Match(b) {
 			return nil, "", fmt.Errorf("secret reconnaissable dans une source de profil : %s ; aucun envoi", source.Path)
 		}

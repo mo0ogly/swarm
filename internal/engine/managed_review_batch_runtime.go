@@ -108,16 +108,8 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 			if err != nil {
 				return err
 			}
-			subset := batches[i].Context
-			subset.Tasks = nil
-			for _, id := range batches[i].Tasks {
-				for _, tc := range c.Tasks {
-					if tc.Task == id {
-						subset.Tasks = append(subset.Tasks, tc)
-					}
-				}
-			}
-			state, _, err := parseManagedReview(reply, subset)
+
+			state, _, err := parseManagedBatchReply(reply, batches[i])
 			if err != nil || state != "passed" {
 				return fmt.Errorf("avis acquis du lot %d invalide", i+1)
 			}
@@ -173,6 +165,10 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 		if record.Batches[i].State == "passed" {
 			continue
 		}
+		schema, schemaErr := managedReviewSchemaForBatch(b)
+		if schemaErr != nil {
+			return finish("error", schemaErr.Error())
+		}
 		child := ManagedReviewBatchVerdict{RetryFeedback: feedback[i], ID: newID("review-batch-"), Tasks: b.Tasks, State: "running", Started: now()}
 		contextData, _ := json.Marshal(b.Context)
 		child.Context = filepath.ToSlash(filepath.Join(filepath.Dir(receiptPath), child.ID+"-context.json"))
@@ -212,7 +208,7 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 			return finish("error", e.Error())
 		}
 		record.Batches[i] = child
-		reply, callErr := s.runStructuredProvider(provider, route, child.RetryFeedback+b.Prompt, managedReviewSchema, time.Duration(timeout)*time.Second, func() bool {
+		reply, callErr := s.runStructuredProvider(provider, route, child.RetryFeedback+b.Prompt, schema, time.Duration(timeout)*time.Second, func() bool {
 			if s.providerCooldownGuard(cfg.Provider) != nil || s.paused(w.ID) || s.managedReviewFilesIntact(record) != nil {
 				return false
 			}
@@ -231,20 +227,13 @@ func (s *Store) reviewManagedBatches(w Work, a Agent, receiptPath string, receip
 				callErr = err
 			}
 		}
-		subset := b.Context
-		subset.Tasks = nil
-		for _, id := range b.Tasks {
-			for _, tc := range c.Tasks {
-				if tc.Task == id {
-					subset.Tasks = append(subset.Tasks, tc)
-				}
-			}
-		}
+
 		if callErr == nil {
-			child.State, _, callErr = parseManagedReview(reply, subset)
+			child.State, _, callErr = parseManagedBatchReply(reply, b)
 		}
 		if callErr != nil {
 			child.State = "error"
+			record.FailureCode = commandFailure(callErr).Code
 		}
 		record.Batches[i] = child
 		current, err = s.get(w.ID)
@@ -333,7 +322,7 @@ func (s *Store) managedBatchProofsIntact(r IndependentReview) error {
 		}
 		expectedTasks, _ := json.Marshal(canonical.Tasks)
 		actualTasks, _ := json.Marshal(ctx.Tasks)
-		if !sameManagedBaseline(ctx.Baseline, canonical.Baseline) || ctx.Candidate != canonical.Candidate || ctx.Previous != canonical.Previous || ctx.Diff != canonical.Diff || string(ctx.Receipt) != string(canonical.Receipt) || string(expectedTasks) != string(actualTasks) {
+		if ctx.CitationContractVersion != canonical.CitationContractVersion || ctx.InspectionScopeVersion != canonical.InspectionScopeVersion || !sameManagedBaseline(ctx.Baseline, canonical.Baseline) || ctx.Candidate != canonical.Candidate || ctx.Previous != canonical.Previous || ctx.Diff != canonical.Diff || string(ctx.Receipt) != string(canonical.Receipt) || string(expectedTasks) != string(actualTasks) {
 			return fmt.Errorf("preuves globales du lot modifiées")
 		}
 		b := managedReviewBatch{Tasks: v.Tasks, Context: ctx}
@@ -376,7 +365,7 @@ func (s *Store) managedBatchPlanIntactVersion(w Work, r IndependentReview, histo
 		if hash(raw) != r.FragmentJournal.ModelConfigDigest {
 			return fmt.Errorf("modèle des fragments modifié")
 		}
-		_, _, err := s.readFragmentJournalAnchor(r)
+		_, _, err := s.readFragmentJournalAnchorVersion(r, historical)
 		return err
 	}
 	if len(r.Batches) == 0 {
@@ -408,7 +397,7 @@ func (s *Store) managedBatchPlanIntactVersion(w Work, r IndependentReview, histo
 	if e != nil {
 		return e
 	}
-	prefix := managedReviewPrefix(prompt)
+	prefix := managedReviewPrefixForContext(prompt, c)
 	batches, e := planManagedReviewBatches(prefix, c, owners)
 	if e != nil {
 		return e
@@ -470,16 +459,8 @@ func legacyManagedReviewPrefix(prefix string) string {
 // Feedback is diagnostic metadata persisted with the new counted call. It is
 // never added to the evidence context or accepted as a previous verdict.
 func managedBatchCitationFeedback(reply string, b managedReviewBatch) string {
-	subset := b.Context
-	subset.Tasks = nil
-	for _, id := range b.Tasks {
-		for _, tc := range b.Context.Tasks {
-			if tc.Task == id {
-				subset.Tasks = append(subset.Tasks, tc)
-			}
-		}
-	}
-	_, _, err := parseManagedReview(reply, subset)
+
+	_, _, err := parseManagedBatchReply(reply, b)
 	if err == nil || !strings.Contains(err.Error(), "citation exacte introuvable") {
 		return ""
 	}

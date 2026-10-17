@@ -107,7 +107,7 @@ func TestManagedFragmentResumePreservesUnknownQuestions(t *testing.T) {
 		}
 		inspection.Findings = append(inspection.Findings, managedFragmentFinding{Artifact: i, Digest: artifact.Digest, Verdict: "unknown", Reason: "Related context is still required", Evidence: excerpt, Needs: []string{"Read the caller before deciding"}})
 	}
-	rr, _ := json.Marshal(inspection)
+	rr, _ := marshalFragmentInspectionFixture(packet, inspection)
 	j.Entries = append(j.Entries, managedFragmentJournalEntry{Packet: 0, PacketDigest: hash(pr), CallID: "existing-unknown", State: "unknown", Reply: string(rr), ReplyDigest: hash(rr)})
 	raw, _ := json.Marshal(j)
 	if e := atomicWrite(s.root+"/"+r.FragmentJournal.Journal, raw); e != nil {

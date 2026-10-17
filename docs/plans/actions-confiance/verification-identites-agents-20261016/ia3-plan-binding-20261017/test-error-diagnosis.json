@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-17T07:43:11.543296+00:00",
+  "original": "generation-first-after.jsonl",
+  "cause": "The wait fixture called commandFailure(nil).Code on its successful initial read probe; commandFailure(nil) returns nil. This is a test harness panic, not a production authority decision.",
+  "correction": "Use a nil-safe error-code helper; prepare JSON outside the goroutine, assert Trust unchanged after the stale publication refusal.",
+  "owner": "Codex",
+  "status": "correction pending verification"
+}

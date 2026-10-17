@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "python3",
+    "tools/memory-evaluation/knowledge.py",
+    "--pack",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/pack",
+    "--answers",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/fixture-answers-correct.json",
+    "--output",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/fixture-results-correct.json"
+  ],
+  "cwd": "/home/fpizzi/Documents/ChatGPT/swarm",
+  "started_at_utc": "2026-10-16T07:46:50.925936+00:00",
+  "ended_at_utc": "2026-10-16T07:46:51.078992+00:00",
+  "exit_code": 0,
+  "expected_exit_code": 0,
+  "sources_sha256": {
+    "tools/memory-evaluation/compare.py": "176fa733e8e025a674d08e54a9ba01c01566b2a9c193deca0182775d72f22b63",
+    "tools/memory-evaluation/knowledge.py": "7f77ce0f88f709a7ad9070115cf6e6b4d8cff2f9c4237b460e6f883aeea9eea9",
+    "tools/memory-evaluation/run_codex.py": "113f90517bafa8efca19baf8f30ad6d4db2cf91d3c8cb63778272a0ac1562d1c",
+    "tests/test_memory_knowledge.py": "7155b3f08b7414d9573a0f4c4b45b767965285cd35043a3134b48b579d9e4eed",
+    "tests/test_memory_comparison.py": "b5805aeb7784e21764ead0983532653c0b02174cbe5d31698a6355f6a660fb7c",
+    "tests/test_memory_codex_events.py": "e3fa9796e444b620c0e29746b256c4db869a8514e4c2c517af4efd5ade0700ac"
+  },
+  "log_sha256": "84f0561b678ad224a383a5939053f5d55e97ad7b6b8093fd97a7d570da1a1416"
+}

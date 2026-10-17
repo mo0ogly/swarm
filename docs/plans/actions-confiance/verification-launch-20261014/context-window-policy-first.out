@@ -1,0 +1,5 @@
+=== RUN   TestReviewContextWindowPolicyPersistsWithoutSpending
+    managed_review_context_policy_test.go:59: sizes 164551 168226 22003 parts 1
+--- PASS: TestReviewContextWindowPolicyPersistsWithoutSpending (0.99s)
+PASS
+ok  	swarm.local/companion/internal/engine	1.025s

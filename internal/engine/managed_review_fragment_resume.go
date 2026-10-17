@@ -15,6 +15,9 @@ func (s *Store) queueManagedFragmentResume(w Work, task *Task, event string) err
 	if r.FragmentJournal == nil || event == "" {
 		return fmt.Errorf("reprise de fragments non attribuée")
 	}
+	if err := s.managedReviewProtocolPrecondition(r); err != nil {
+		return err
+	}
 	if err := s.managedBatchPlanIntact(w, r); err != nil {
 		return err
 	}
@@ -212,4 +215,51 @@ func repeatedFragmentInterruption(j managedFragmentJournal) (int, bool) {
 		}
 	}
 	return 0, false
+}
+
+func (s *Store) settleOrphanManagedReviewReservation(work string, a Agent, r IndependentReview) (IndependentReview, error) {
+	if r.FragmentJournal == nil {
+		return r, nil
+	}
+	p, j, err := s.readFragmentJournalAnchor(r)
+	if err != nil {
+		return r, err
+	}
+	event := "review-orphan-" + hash([]byte(r.ID+"\x00"+r.FragmentJournal.JournalDigest+"\x00"+r.FragmentJournal.FinalJournalDigest))
+	if r.FragmentJournal.FinalJournalDigest != "" {
+		f, _, _, err := s.readManagedFragmentFinal(r, p, j)
+		if err != nil {
+			return r, err
+		}
+		n := len(f.Calls)
+		if n == 0 || f.Calls[n-1].State != "reserved" {
+			return r, nil
+		}
+		f.Calls[n-1].State = "interrupted"
+		err = s.commitManagedFragmentFinal(work, a, r.ID, r.FragmentJournal.JournalDigest, r.FragmentJournal.FinalJournalDigest, event, f)
+		if err != nil {
+			return r, err
+		}
+	} else {
+		n := len(j.Entries)
+		if n == 0 || j.Entries[n-1].State != "reserved" {
+			return r, nil
+		}
+		j.Entries[n-1].State = "interrupted"
+		if err = s.commitFragmentJournal(work, a, r.ID, r.FragmentJournal.JournalDigest, event, j); err != nil {
+			return r, err
+		}
+	}
+	current, err := s.get(work)
+	if err != nil {
+		return r, err
+	}
+	task, err := current.task(a.TaskID)
+	if err != nil {
+		return r, err
+	}
+	if task.IndependentReview == nil || task.IndependentReview.ID != r.ID {
+		return r, fmt.Errorf("revue orpheline remplacée")
+	}
+	return *task.IndependentReview, nil
 }

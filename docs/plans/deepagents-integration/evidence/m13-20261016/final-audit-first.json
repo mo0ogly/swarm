@@ -1,0 +1,7 @@
+{
+  "exit_code": 1,
+  "original_error": "AssertionError: docs/PROJECT-MEMORY.md",
+  "cause": "Overbroad pending-status assertion rejected a legitimate existing sentence: Une compilation seule ne met pas à jour un serveur déjà en cours.",
+  "owner": "Codex verification method",
+  "changed_precondition": "Check the pending browser row only in the current result; retain the operational documentation"
+}

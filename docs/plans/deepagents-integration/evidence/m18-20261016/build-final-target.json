@@ -1,0 +1,7 @@
+{
+  "binary": "/tmp/swarm-m18-bin-y9nj4k1n/swarm-final",
+  "sha256": "1097db24113d8cedc2954813075623515b850b954f4ec5c3cc043da213ac79e1",
+  "build_record": "build-final.json",
+  "source_manifest": "build-final-inputs.json",
+  "native_record": "native-flow/result.json"
+}

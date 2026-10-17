@@ -74,6 +74,13 @@ unique et `expected_revision` (0 à la création, révision courante ensuite).
 La sortie contient le travail, l’historique, les gates recalculées et la fiche.
 Les dates sont UTC. Les identifiants utilisent lettres ASCII, chiffres, `_`, `-`.
 
+Les lecteurs communs de travaux persistés vérifient ensemble clé SQL, révision
+positive et corps UTF-8/JSON de schéma 1. `work show`, `work list` et la liste
+HTTP refusent une incohérence avec erreur, sans publier de résultat partiel.
+Mutation et rejeu communs appliquent aussi cette garde avant leurs callbacks.
+Cette concordance ne prouve aucun auteur ou droit et ne couvre pas tous les
+lecteurs SQL explicites : voir le [contrat des lignes Work](docs/architecture/WORK-ROW-CONTRACT.md).
+
 Création (`work.json`) :
 
 ```json

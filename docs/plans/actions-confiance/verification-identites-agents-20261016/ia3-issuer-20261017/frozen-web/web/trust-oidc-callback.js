@@ -1,0 +1,2 @@
+'use strict';
+const target=new URL('/trust-actions.html',location.origin),query=new URLSearchParams(location.search);for(const key of ['code','state','error'])if(query.has(key))target.searchParams.set(key,query.get(key));try{const saved=JSON.parse(sessionStorage.getItem('swarm-trust-oidc'));if(['fr','en'].includes(saved?.lang))target.searchParams.set('lang',saved.lang)}catch{}location.replace(target.pathname+target.search);

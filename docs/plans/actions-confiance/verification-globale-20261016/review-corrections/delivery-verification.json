@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "at": "2026-10-16T07:30:01.062705+00:00",
+  "status": "AGREED_SCOPE_DELIVERED_REVIEWED_RETEX_COMPLETE",
+  "candidate_packet_sha256": "2855f3bde6af869d97ca8293d15659e01fb47cdf71f7ed347e3b4e6c17aa97b3",
+  "binary_sha256": "5b9ce6f43d0498624d120c70ab72b8c6b3a66785f0d856df8a357115fedfd2c6",
+  "independent_verdict": "approve",
+  "independent_review_sha256": "9ae216d30e5c2016d8f0541b7b50544edae0ff290071fb297775365ba375250f",
+  "review_originals": {
+    "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/independent-final-originals/checks-receipt.json": "33557030623fb11fd22954fbdef35afb5c760b430b8fcd2f28ab185214881242",
+    "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/independent-final-originals/final-review.json": "9ae216d30e5c2016d8f0541b7b50544edae0ff290071fb297775365ba375250f",
+    "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/independent-final-originals/check_final.py": "468bf3b0a78a32199dc22c88d95806cb50cfbfbeaa44d5ad102790d8252b8034",
+    "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/independent-final-originals/integrity-receipt.json": "d65071e2b7ee29b6857caec8e5703e6604aa7e627279a5e5d0aa7ac4dfcb405d"
+  },
+  "candidate_inputs_unchanged": true,
+  "candidate_proofs_unchanged": true,
+  "retrospective": {
+    "path": "docs/plans/actions-confiance/RETEX-actions-confiance-20261016.md",
+    "sha256": "d6759ea478db874271e8f2ad2abce06ed6c077a4497b5fd66ebe75222d4cce5e",
+    "final_for_agreed_scope": true
+  },
+  "preview": {
+    "pid": 505619,
+    "start_ticks": "7013049",
+    "receipt_sha256": "bd87e3a71afa604ec02059b59dc44995824abe2cf8cfa7e5f28cd2d2b2a5ef4c",
+    "business_sha256": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+    "browser_reload_observed": false
+  },
+  "R20": "DEFERRED_BY_USER_NOT_QUALIFIED",
+  "native_kernel_qualified": false,
+  "global_business_acceptance": false,
+  "independent_external_certification": false,
+  "native_go_limit": "Two package PASS records; second command exit code unobserved after wrapper143",
+  "resumption": "R20 requires a newly authorized environment and native qualification recipe; no automatic privileged run"
+}

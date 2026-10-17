@@ -1,10 +1,72 @@
 package engine
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 )
+
+func (s *Store) attachPreparedOrganization(tx *sql.Tx, w *Work, p *Preparation, r PreparationRequest) error {
+	s.preparationFreshness(p)
+	if !p.PlanReady || r.Hash != p.Documents["plan"].Hash {
+		return preparationError("stale_plan", "Vérifier le plan courant avant de configurer son organisation.")
+	}
+	if p.Conversion.ReleasedAt != "" || w.Planning != nil || w.Profile != nil || len(w.Tasks) != len(p.Conversion.TaskIDs) {
+		return preparationError("already_created", "Configurer uniquement une préparation non démarrée et sans organisation ; les tâches existantes restent conservées.")
+	}
+	if w.Objective != p.Conversion.Spec.Objective || w.Scope != p.Brief.Text || !reflect.DeepEqual(w.Criteria, preparationWorkCriteria()) {
+		return preparationError("stale_plan", "Le contrat du travail a changé ; le réconcilier avec le plan avant configuration.")
+	}
+	var agents int
+	if err := tx.QueryRow("SELECT count(*) FROM agents WHERE work_id=?", w.ID).Scan(&agents); err != nil {
+		return err
+	}
+	if agents != 0 {
+		return preparationError("already_created", "Une tentative existe déjà ; aucune adoption d’historique implicite.")
+	}
+	expected := Work{Schema: 1, ID: w.ID, Tasks: []Task{}}
+	if err := s.materializePlan(&expected, PlanReview{Source: p.ID, BriefHash: p.Conversion.BriefHash, ResponseHash: p.Conversion.PlanHash, Spec: p.Conversion.Spec}); err != nil {
+		return err
+	}
+	for _, id := range p.Conversion.TaskIDs {
+		task, err := w.task(id)
+		if err != nil {
+			return err
+		}
+		original, err := expected.task(id)
+		if err != nil {
+			return err
+		}
+		original.LaunchHeld = true
+		if !reflect.DeepEqual(*task, *original) {
+			return preparationError("stale_plan", "Les tâches doivent correspondre au plan verrouillé sans tentative, décision, politique ou historique antérieur.")
+		}
+		var held int
+		if err := tx.QueryRow("SELECT count(*) FROM preparation_launch_locks WHERE work_id=? AND task_id=? AND preparation_id=? AND released=0", w.ID, id, p.ID).Scan(&held); err != nil {
+			return err
+		}
+		if held != 1 {
+			return preparationError("conflict", "Verrou du plan absent ; aucune organisation enregistrée.")
+		}
+	}
+	if err := s.configurePreparedOrganization(w, *p, *r.Organization, r.repositoryFinish); err != nil {
+		return err
+	}
+	encoded, err := json.Marshal(r.Organization)
+	if err != nil {
+		return err
+	}
+	p.Conversion.OrganizationDigest = hash(encoded)
+	if r.Action == "authorize-plan" {
+		p.Conversion.ReleasedAt = now()
+		for i := range w.Tasks {
+			w.Tasks[i].LaunchHeld = false
+		}
+	}
+	return nil
+}
 
 // Operator supplied configuration; never accepted from the model's plan JSON.
 type PreparationOrganization struct {
@@ -20,7 +82,7 @@ type PreparationOrganization struct {
 	MaxCalls       int                            `json:"max_calls"`
 }
 
-func (s *Store) configurePreparedOrganization(w *Work, p Preparation, config PreparationOrganization) error {
+func (s *Store) configurePreparedOrganization(w *Work, p Preparation, config PreparationOrganization, repositoryFinish *func(bool) error) error {
 	if w.Planning != nil {
 		return fmt.Errorf("organisation déjà configurée ; conserver sa politique lors de la révision")
 	}
@@ -116,7 +178,7 @@ func (s *Store) configurePreparedOrganization(w *Work, p Preparation, config Pre
 		if config.Validation != "automatic" {
 			return fmt.Errorf("dépôt géré : autoriser des contrôles automatiques explicites")
 		}
-		repository, err := s.configureManagedRepository(w.ID, *config.Repository)
+		repository, err := s.configurePreparedRepository(w.ID, *config.Repository, repositoryFinish)
 		if err != nil {
 			return err
 		}

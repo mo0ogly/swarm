@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 const agentMigration = `BEGIN;
@@ -25,6 +27,8 @@ PRAGMA user_version=2;
 COMMIT;`
 
 type Launch struct {
+	Summary              *MemorySummarySelection      `json:"summary_selection,omitempty"`
+	DialogueRestore      *DialogueRestoreChoice       `json:"dialogue_restore,omitempty"`
 	SkillRefresh         *PreparedSkillRefreshReceipt `json:"prepared_skill_refresh,omitempty"`
 	Skills               []ActionSkillSelection       `json:"skills,omitempty"`
 	PreconditionEvidence string                       `json:"precondition_evidence,omitempty"`
@@ -122,53 +126,55 @@ type DiagnosticItem struct {
 	Traces      []string `json:"traces"`
 }
 type Agent struct {
-	DeliveryVersion      int               `json:"delivery_version,omitempty"`
-	Workflow             *AgentWorkflow    `json:"workflow,omitempty"`
-	ProviderCooldown     *ProviderCooldown `json:"provider_cooldown,omitempty"`
-	Preflight            *PreflightResult  `json:"preflight,omitempty"`
-	PreconditionEvidence string            `json:"precondition_evidence,omitempty"`
-	Mode                 string            `json:"mode,omitempty"`
-	UnregisteredClaim    bool              `json:"-"`
-	ModelRoute           *ModelRoute       `json:"model_route,omitempty"`
-	ReportedModel        *ReportedModel    `json:"reported_model,omitempty"`
-	Context              *ContextManifest  `json:"context,omitempty"`
-	Brainstorm           bool              `json:"brainstorm,omitempty"`
-	Reply                string            `json:"reply,omitempty"`
-	Usage                *Usage            `json:"usage,omitempty"`
-	Progress             AgentProgress     `json:"progress"`
-	Diagnostic           AttemptDiagnostic `json:"diagnostic,omitempty"`
-	Recovery             RecoveryState     `json:"recovery"`
-	Limits               RunLimits         `json:"limits"`
-	ID                   string            `json:"id"`
-	WorkID               string            `json:"work_id"`
-	TaskID               string            `json:"task_id"`
-	Attempt              string            `json:"attempt_id"`
-	Origin               string            `json:"origin,omitempty"`
-	Relay                string            `json:"relay,omitempty"`
-	StopKind             string            `json:"stop_kind,omitempty"`
-	Provider             string            `json:"provider"`
-	Role                 string            `json:"role"`
-	Parent               string            `json:"parent,omitempty"`
-	Previous             string            `json:"previous,omitempty"`
-	CWD                  string            `json:"workspace"`
-	Status               string            `json:"status"`
-	Desired              string            `json:"desired,omitempty"`
-	Activity             string            `json:"activity"`
-	Started              string            `json:"started"`
-	Heartbeat            string            `json:"heartbeat,omitempty"`
-	Ended                string            `json:"ended,omitempty"`
-	ExitCode             *int              `json:"exit_code,omitempty"`
-	Supervisor           int               `json:"supervisor_pid,omitempty"`
-	SupervisorStamp      string            `json:"supervisor_identity,omitempty"`
-	Child                int               `json:"child_pid,omitempty"`
-	ChildStamp           string            `json:"child_identity,omitempty"`
-	Host                 string            `json:"host"`
-	Timeout              int               `json:"timeout_seconds"`
-	Capture              bool              `json:"capture_output"`
-	Prompt               string            `json:"prompt"`
-	Command              string            `json:"command"`
-	Args                 []string          `json:"args"`
-	Env                  []string          `json:"env_allow"`
+	DialogueRestore      *DialogueRestoreReceipt `json:"dialogue_restore,omitempty"`
+	DeliveryVersion      int                     `json:"delivery_version,omitempty"`
+	Workflow             *AgentWorkflow          `json:"workflow,omitempty"`
+	ProviderCooldown     *ProviderCooldown       `json:"provider_cooldown,omitempty"`
+	Preflight            *PreflightResult        `json:"preflight,omitempty"`
+	PreconditionEvidence string                  `json:"precondition_evidence,omitempty"`
+	Mode                 string                  `json:"mode,omitempty"`
+	UnregisteredClaim    bool                    `json:"-"`
+	ModelRoute           *ModelRoute             `json:"model_route,omitempty"`
+	ReportedModel        *ReportedModel          `json:"reported_model,omitempty"`
+	Context              *ContextManifest        `json:"context,omitempty"`
+	PreparedContext      *ContextManifest        `json:"prepared_context,omitempty"`
+	Brainstorm           bool                    `json:"brainstorm,omitempty"`
+	Reply                string                  `json:"reply,omitempty"`
+	Usage                *Usage                  `json:"usage,omitempty"`
+	Progress             AgentProgress           `json:"progress"`
+	Diagnostic           AttemptDiagnostic       `json:"diagnostic,omitempty"`
+	Recovery             RecoveryState           `json:"recovery"`
+	Limits               RunLimits               `json:"limits"`
+	ID                   string                  `json:"id"`
+	WorkID               string                  `json:"work_id"`
+	TaskID               string                  `json:"task_id"`
+	Attempt              string                  `json:"attempt_id"`
+	Origin               string                  `json:"origin,omitempty"`
+	Relay                string                  `json:"relay,omitempty"`
+	StopKind             string                  `json:"stop_kind,omitempty"`
+	Provider             string                  `json:"provider"`
+	Role                 string                  `json:"role"`
+	Parent               string                  `json:"parent,omitempty"`
+	Previous             string                  `json:"previous,omitempty"`
+	CWD                  string                  `json:"workspace"`
+	Status               string                  `json:"status"`
+	Desired              string                  `json:"desired,omitempty"`
+	Activity             string                  `json:"activity"`
+	Started              string                  `json:"started"`
+	Heartbeat            string                  `json:"heartbeat,omitempty"`
+	Ended                string                  `json:"ended,omitempty"`
+	ExitCode             *int                    `json:"exit_code,omitempty"`
+	Supervisor           int                     `json:"supervisor_pid,omitempty"`
+	SupervisorStamp      string                  `json:"supervisor_identity,omitempty"`
+	Child                int                     `json:"child_pid,omitempty"`
+	ChildStamp           string                  `json:"child_identity,omitempty"`
+	Host                 string                  `json:"host"`
+	Timeout              int                     `json:"timeout_seconds"`
+	Capture              bool                    `json:"capture_output"`
+	Prompt               string                  `json:"prompt"`
+	Command              string                  `json:"command"`
+	Args                 []string                `json:"args"`
+	Env                  []string                `json:"env_allow"`
 }
 type AgentLog struct {
 	Seq     int64  `json:"seq"`
@@ -178,20 +184,21 @@ type AgentLog struct {
 	Message string `json:"message"`
 }
 type Provider struct {
-	APIConnectionID   string       `json:"api_connection_id,omitempty"`
-	InteractiveArgs   []string     `json:"interactive_args,omitempty"`
-	PreflightRequired bool         `json:"preflight_required,omitempty"`
-	PreflightArgs     []string     `json:"preflight_args,omitempty"`
-	PreflightKind     string       `json:"preflight_kind,omitempty"`
-	PreflightCaps     []string     `json:"preflight_capabilities,omitempty"`
-	PreflightTimeout  int          `json:"preflight_timeout_seconds,omitempty"`
-	PreflightTTL      int          `json:"preflight_ttl_seconds,omitempty"`
-	ModelPolicy       *ModelPolicy `json:"model_policy,omitempty"`
-	AssistantTimeout  int          `json:"assistant_timeout_seconds,omitempty"`
-	Limits            RunLimits    `json:"limits,omitempty"`
-	Command           string       `json:"command"`
-	Args              []string     `json:"args"`
-	Env               []string     `json:"env_allow"`
+	structuredContextTokens int
+	APIConnectionID         string       `json:"api_connection_id,omitempty"`
+	InteractiveArgs         []string     `json:"interactive_args,omitempty"`
+	PreflightRequired       bool         `json:"preflight_required,omitempty"`
+	PreflightArgs           []string     `json:"preflight_args,omitempty"`
+	PreflightKind           string       `json:"preflight_kind,omitempty"`
+	PreflightCaps           []string     `json:"preflight_capabilities,omitempty"`
+	PreflightTimeout        int          `json:"preflight_timeout_seconds,omitempty"`
+	PreflightTTL            int          `json:"preflight_ttl_seconds,omitempty"`
+	ModelPolicy             *ModelPolicy `json:"model_policy,omitempty"`
+	AssistantTimeout        int          `json:"assistant_timeout_seconds,omitempty"`
+	Limits                  RunLimits    `json:"limits,omitempty"`
+	Command                 string       `json:"command"`
+	Args                    []string     `json:"args"`
+	Env                     []string     `json:"env_allow"`
 }
 type Providers struct {
 	Schema    int                 `json:"schema_version"`
@@ -493,6 +500,13 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if launchWork.Revision != r.Revision {
 		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
 	}
+	if _, _, err := memorySummaryAttachment(s.root, launchWork, r); err != nil {
+		return a, false, err
+	}
+	dialogueSource, err := s.prepareDialogueRestore(launchWork, r)
+	if err != nil {
+		return a, false, err
+	}
 	if task, taskErr := launchWork.task(r.TaskID); taskErr == nil && currentReviewProtocolFailure(task) {
 		return a, false, planningError("review_recovery_required", "réponse du vérificateur invalide ; reprendre la revue avant toute nouvelle production")
 	}
@@ -609,6 +623,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	if e != nil {
 		return a, false, e
 	}
+	if dialogueSource != nil && preflight.Verification != "verified" {
+		return a, false, fmt.Errorf("Reprise de conversation : capacités fournisseur non vérifiées par le précontrôle")
+	}
 	tx, e := s.db.Begin()
 	if e != nil {
 		return a, false, e
@@ -622,6 +639,13 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	// rejected launches roll back this no-op with all their other reservations.
 	if _, e = tx.Exec("UPDATE works SET revision=revision WHERE id=?", work); e != nil {
 		return a, false, e
+	}
+	var storageVersion int
+	if e = tx.QueryRow("PRAGMA user_version").Scan(&storageVersion); e != nil {
+		return a, false, e
+	}
+	if storageVersion != schemaVersion {
+		return a, false, &CommandError{Code: "storage_version_conflict", Message: "Stockage modifié : utiliser le programme du serveur actif"}
 	}
 	if e = tx.QueryRow("SELECT count(*) FROM mission_lifecycle WHERE work_id=?", work).Scan(&archivedCount); e != nil {
 		return a, false, e
@@ -654,7 +678,8 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	var body []byte
 	var w Work
-	if e = tx.QueryRow("SELECT body FROM works WHERE id=?", work).Scan(&body); e != nil {
+	var storedRevision int
+	if e = tx.QueryRow("SELECT revision,body FROM works WHERE id=?", work).Scan(&storedRevision, &body); e != nil {
 		return a, false, e
 	}
 	if e = json.Unmarshal(body, &w); e != nil {
@@ -662,6 +687,16 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 	}
 	if w.Revision != r.Revision {
 		return a, false, &CommandError{Code: "revision_conflict", Message: "révision périmée ; relire le travail", Retryable: true}
+	}
+	if r.Summary != nil && (!utf8.Valid(body) || w.ID != work || storedRevision != w.Revision) {
+		return a, false, fmt.Errorf("source extractive stockée invalide : identité, révision ou UTF-8 incohérent")
+	}
+	summaryBody, summaryReceipt, summaryErr := memorySummaryAttachment(s.root, w, r)
+	if summaryErr != nil {
+		return a, false, summaryErr
+	}
+	if e = s.recheckDialogueRestore(tx, w, r, dialogueSource); e != nil {
+		return a, false, e
 	}
 	if e = s.providerCooldownGuard(r.Provider); e != nil {
 		return a, false, e
@@ -797,6 +832,9 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 			return a, false, fmt.Errorf("Une reprise conserve le mode de la tentative précédente.")
 		}
 		if requiresEnvironmentVerification(previous) {
+			if preflight.Verification != "verified" || preflight.Verdict != "ready" {
+				return a, false, &CommandError{Code: "environment_verification_required", Message: "Reprise retenue : le précontrôle doit vérifier les capacités du contexte fournisseur ; une déclaration opérateur ou un contrôle hôte compatible ne suffit pas."}
+			}
 			evidence := strings.TrimSpace(r.PreconditionEvidence)
 			if len([]rune(evidence)) < 8 {
 				return a, false, fmt.Errorf("Reprise retenue : décrivez la vérification nouvelle des droits, du montage ou de la ressource avant de relancer.")
@@ -950,34 +988,72 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 			prompt += "Vérification des préconditions fournie par l'opérateur (à contrôler, ce n'est pas une validation du livrable) : " + r.PreconditionEvidence + "\n"
 		}
 	}
-	// Field guide index is explicit, bounded context, not an automatic transcript capture.
+	legacyMemoryPaths, e := s.memoryLegacyPaths(tx)
+	if e != nil {
+		return a, false, e
+	}
+	for _, path := range w.Memory {
+		path = filepath.ToSlash(filepath.Clean(path))
+		if legacyMemoryPaths[path] || (path == ".claude/field-guide/index.md" && len(legacyMemoryPaths) > 0) {
+			return a, false, fmt.Errorf("Pièce de reprise désormais gérée par la mémoire versionnée : refaire la sélection")
+		}
+	}
+	if t.MemorySelectionImported && len(t.MemorySelections) > 0 {
+		return a, false, fmt.Errorf("Sélection mémoire importée : choisir explicitement les versions locales avant départ")
+	}
+	memoryBody, e := s.memoryAttachments(tx, t.MemorySelections, r.Role)
+	if e != nil {
+		return a, false, e
+	}
+	prompt += memoryBody
+	if len(t.MemorySelections) > 0 && t.MemoryDecision != nil {
+		prompt += fmt.Sprintf("Décision de sélection mémoire : %s ; auteur : %s ; motif : %s\n", t.MemoryDecision.EventID, t.MemoryDecision.Actor, t.MemoryDecision.Reason)
+	}
+	// Managed lessons use explicit versioned selection, including after withdrawal.
 	if guidePath, e := localFile(s.root, ".claude/field-guide/index.md"); e == nil {
 		if b, e := os.ReadFile(guidePath); e == nil && len(b) <= 16000 {
-			prompt += "\nGuide de terrain (instructions de projet prioritaires):\n" + string(b)
+			prompt += "\nGuide de terrain (instructions de projet prioritaires):\n" + filteredMemoryGuide(string(b), legacyMemoryPaths)
 		}
 	}
 	attachments, err := dialogueAttachments(w, r.References)
 	if err != nil {
 		return a, false, err
 	}
-	prompt += attachments
+	prompt += attachments + summaryBody
 	manifest := contextManifest(w, t.ID, r.References, prompt)
-	if len(prompt) > 128000 {
-		return a, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
+	manifest.Summary = summaryReceipt
+	if summaryReceipt != nil {
+		manifest.Included, manifest.Excluded = []string{}, []string{}
+		manifest.References = append([]DialogueRef{}, r.Summary.Dialogues...)
+		if !previewOnly && r.ContextHash == "" {
+			return a, false, fmt.Errorf("Examiner le contexte extractif avant envoi : context_hash requis")
+		}
 	}
-	if r.ContextHash != "" && manifest.SHA256 != r.ContextHash {
-		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
+	manifest.Memory = append([]MemoryReference{}, t.MemorySelections...)
+	manifest.MemoryDecision = t.MemoryDecision
+	if len(prompt) > agentContextTransportBytes {
+		return a, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
 	}
 	p = synchronousAttemptProvider(p, r.Mode)
 	recovery := recoveryForLaunch(r, previous)
 	a = Agent{Preflight: &preflight, PreconditionEvidence: r.PreconditionEvidence, Mode: r.Mode, ModelRoute: route, Context: &manifest, Brainstorm: t.Brainstorm, Limits: limits, Recovery: recovery, ID: r.EventID, WorkID: work, TaskID: r.TaskID, Origin: launchOrigin(r), Attempt: t.Attempts[len(t.Attempts)-1].ID, Provider: r.Provider, Role: r.Role, Parent: r.Parent, Previous: r.Previous, CWD: cwd, Status: "queued", Activity: "Lancement demandé ; processus non confirmé", Started: now(), Host: hostIdentity(), Timeout: r.Timeout, Capture: r.Capture, Prompt: prompt, Command: p.Command, Args: p.Args, Env: p.Env}
+	if dialogueSource != nil {
+		source := dialogueSource.agent
+		if a.Limits != source.Limits || a.CWD != source.CWD || a.Command != source.Command || !reflect.DeepEqual(a.Args, source.Args) || !reflect.DeepEqual(a.Env, source.Env) || !reflect.DeepEqual(a.ModelRoute, source.ModelRoute) {
+			return a, false, fmt.Errorf("Reprise de conversation : contrat de lancement modifié ; examiner une nouvelle production")
+		}
+		a.DialogueRestore = dialogueSource.receipt(r.DialogueRestore, previewOnly)
+	}
 	a.Workflow = &workflow
 	if w.Planning != nil && w.Planning.Repository != nil && r.Role == "worker" && r.Mode == "" {
-		a.DeliveryVersion = 1
+		a.DeliveryVersion = 2
 		a.Prompt += managedDeliveryInstructions(t, a.Attempt)
-		if len(a.Prompt) > 128000 {
-			return Agent{}, false, fmt.Errorf("Contexte supérieur à 128000 octets : réduire les pièces jointes ou le brief.")
-		}
+	}
+	if err := bindAgentContext(&a); err != nil {
+		return Agent{}, false, err
+	}
+	if r.ContextHash != "" && a.Context.SHA256 != r.ContextHash {
+		return a, false, fmt.Errorf("Contexte modifié : examiner un nouvel aperçu avant envoi.")
 	}
 	if r.Mode == "terminal" {
 		if len(s.terminalSocket(a.ID)) >= 108 {
@@ -998,13 +1074,16 @@ func (s *Store) prepareLaunch(work string, r Launch, previewOnly bool) (Agent, b
 		}
 		return a, false, nil
 	}
+	if err := queueMemorySummary(s.root, w, &a); err != nil {
+		return a, false, err
+	}
 	if r.Origin == originConductor {
 		if e = claimWorkspaceTurn(tx, work, t.ID, cwd, a.ID); e != nil {
 			return a, false, e
 		}
 	}
 	if t.Brainstorm {
-		t.Contexts = append(t.Contexts, SavedContext{a.ID, a.Started, prompt, manifest})
+		t.Contexts = append(t.Contexts, SavedContext{a.ID, a.Started, a.Prompt, *a.Context})
 	}
 	b, _ := json.Marshal(a)
 	if _, e = tx.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,?)", a.ID, work, t.ID, cwd, a.Status, b, raw); e != nil {
@@ -1141,11 +1220,17 @@ func (s *Store) settleAgentTask(a Agent) error {
 		outcome = "interrupted"
 	}
 	var stopArtifacts []ExchangeArtifact
+	var preservationFailure string
 	if w.Planning != nil && (state == "failed" || state == "interrupted") {
 		if record, err := s.interruptionRecord(a); err != nil {
 			_ = s.log(a.ID, "warning", "Bilan d’arrêt non conservé : "+err.Error())
 		} else if record != nil {
 			stopArtifacts = append(stopArtifacts, *record)
+		}
+		if checkpoint, err := s.retainInterruptedSources(w, a); err != nil {
+			preservationFailure = "Conservation des sources interrompues impossible : " + err.Error() + " ; le responsable doit réconcilier la copie et son attribution avant reprise"
+		} else if checkpoint != nil {
+			stopArtifacts = append(stopArtifacts, *checkpoint)
 		}
 	}
 	// A crash after task.update(blocked) but before conduct leaves the exact
@@ -1163,12 +1248,23 @@ func (s *Store) settleAgentTask(a Agent) error {
 		return nil
 	}
 	r := Request{Schema: 1, EventID: newID("finish-"), Revision: w.Revision, ID: t.ID, Status: "blocked", Origin: conductorAuthor, Outcome: outcome, Blocker: a.Activity + " ; handoff et validation requis", Next: "Examiner logs/diff, puis soumettre ou relancer explicitement"}
+	if preservationFailure != "" {
+		r.Blocker += " ; " + preservationFailure
+		r.Next = preservationFailure
+	}
 	b, _ := json.Marshal(r)
 	_, e = s.mutate(w.ID, "task.update", r.EventID, r.Revision, b, func(w *Work) error {
 		if e := s.apply(w, "task.update", r); e != nil {
 			return e
 		}
 		planningAttemptEnded(w, a, outcome, stopArtifacts...)
+		if preservationFailure != "" {
+			for i := range w.Planning.Inbox {
+				if w.Planning.Inbox[i].ID == planningEventID("attempt-ended", a.Attempt) {
+					w.Planning.Inbox[i].Message += " ; " + preservationFailure
+				}
+			}
+		}
 		task, _ := w.task(a.TaskID)
 		if task.Brainstorm {
 			body, e := readBrainstormReport(s.root, task.ID)

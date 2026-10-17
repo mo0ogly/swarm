@@ -1,0 +1,14 @@
+{
+  "path": "internal/engine/trust_laboratory_service.go",
+  "before_sha256": "6a998fb0e37f69b0f8e030fd6715fd80e54c35563115743c5201e1657d84d5eb",
+  "replacements": [
+    {
+      "before": "func laboratoryRunView(v TrustLaboratoryRun) TrustLaboratoryRun {",
+      "after": "func laboratoryRunView(v TrustLaboratoryRun) TrustLaboratoryRun {\n if v.Status!=\"running\"{return v}"
+    },
+    {
+      "before": "return map[string]any{\"schema_version\": 1, \"policy\": laboratoryPolicy(st.Laboratory),",
+      "after": "stateBytes,_:=json.MarshalIndent(st,\"\",\"  \")\n return map[string]any{\"schema_version\": 1,\"command_bytes_max\":1<<20,\"result_bytes_max\":1<<20,\"shared_state_bytes\":len(stateBytes)+1,\"shared_state_bytes_max\":trustStateMaxBytes,\"seed_min\":\"0\",\"seed_max\":\"18446744073709551615\", \"policy\": laboratoryPolicy(st.Laboratory),"
+    }
+  ]
+}

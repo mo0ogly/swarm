@@ -1,0 +1,84 @@
+{
+  "model_calls": 4,
+  "repeated_cases": 0,
+  "tool_activity_count": 0,
+  "distinct_threads": 4,
+  "pack_sha256": "9301038101558075a8e46e5e4aa86257be7f77193eaa28c805de850a06ad339d",
+  "receipts": [
+    {
+      "case_id": "missing-recoverable-without",
+      "thread_id": "01a14378-1608-76b1-a5dd-d985d8882e50",
+      "receipt_sha256": "0159da64de6801221de38931e63320a564eec61589ed3d0b0053f3ac89eb48cc",
+      "answer_sha256": "4bb1fc7c8a48a645fd48d90552e0f361c37abe869cd8f8220f8b6293b0d6a3fd",
+      "events_sha256": "8f7f95435911558dbe8bf50347754bd2824ff32765213d1f81e51de92b480d06",
+      "usage": {
+        "input_tokens": 16551,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 176,
+        "reasoning_output_tokens": 66
+      },
+      "elapsed_seconds": 6.255967967998004,
+      "assessment": "docs/plans/deepagents-integration/evidence/m6-20261016/real-codex-02/missing-recoverable-without/assessment.json"
+    },
+    {
+      "case_id": "missing-recoverable-with",
+      "thread_id": "01a14379-6c9a-7143-980b-849393d5255e",
+      "receipt_sha256": "ccf11620a5ebb6e06be0129988a19068eaabd7206fc0971c622b880a25f6ca76",
+      "answer_sha256": "226223d4edddf5dd43152c0f3dde0eb94400be344e8da91e24fccffff59f6f0c",
+      "events_sha256": "a2741ac59ff39b8fb2f33b9288be0013866d05e1f699667fb5252cd31ee1b888",
+      "usage": {
+        "input_tokens": 16895,
+        "cached_input_tokens": 5888,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 272,
+        "reasoning_output_tokens": 162
+      },
+      "elapsed_seconds": 7.211290901999746,
+      "assessment": null
+    },
+    {
+      "case_id": "changed-unrecoverable-without",
+      "thread_id": "01a14379-f423-7991-88df-488ca09b0355",
+      "receipt_sha256": "a9d0164bbc81348fece11e73c2cbb54b7a992e8461b9756fc183c7aad6efade5",
+      "answer_sha256": "199a5e849a81851f715f73ad53901fda554a62e358cfe04cda5568c1eddc6840",
+      "events_sha256": "25c22e6309a8e5da90948b658d08bb6a3f01443568cbb1302d784f45d662d02c",
+      "usage": {
+        "input_tokens": 16548,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 201,
+        "reasoning_output_tokens": 97
+      },
+      "elapsed_seconds": 6.8058822530001635,
+      "assessment": null
+    },
+    {
+      "case_id": "changed-unrecoverable-with",
+      "thread_id": "01a14378-fee1-78b2-bda0-73bd3123c17e",
+      "receipt_sha256": "5751b2cd2cca9cfae9e2a37a8e0cbb2d2a7cf3f3601808d72b562278f12e1c38",
+      "answer_sha256": "4f12ae63cf70d41757cd1faa824ce8417d0415701ecb2861e785ebd6e9e7eb7e",
+      "events_sha256": "14efee730eabe3c191086294e00fe818fea2198913e0dc330cc08cd96307e6a9",
+      "usage": {
+        "input_tokens": 16895,
+        "cached_input_tokens": 5888,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 196,
+        "reasoning_output_tokens": 78
+      },
+      "elapsed_seconds": 9.616012484999374,
+      "assessment": null
+    }
+  ],
+  "totals": {
+    "input_tokens": 66889,
+    "cached_input_tokens": 11776,
+    "output_tokens": 845,
+    "reasoning_output_tokens": 403,
+    "elapsed_seconds_sum": 29.889153607997287,
+    "cost": null
+  },
+  "model_requested": "gpt-5.6-sol",
+  "model_reported": null,
+  "cost_note": "No monetary cost returned by CLI; token usage is not a billed cost."
+}

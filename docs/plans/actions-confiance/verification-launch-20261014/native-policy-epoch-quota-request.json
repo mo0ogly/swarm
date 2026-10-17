@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-policy-epoch-review-quota-20261015-1051",
+  "expected_revision": 446,
+  "limits": {
+    "review_context_tokens": 400000,
+    "review_context_files": 32,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 393216,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 60,
+    "planning_decisions": 40,
+    "review_calls": 92
+  },
+  "reason": "Replan après R20 : autorité périmée reproduite puis corrigée ; nouvelle remise et quatre appels frais requis, sans réutiliser les inspections interrompues. Consommation conservée : 88 appels ; plafond porté à 92. Les 32 originaux totalisent 392621 octets sous la limite existante 393216, fenêtre 400000 inchangée."
+}

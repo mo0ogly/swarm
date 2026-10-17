@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "python3",
+    "docs/plans/deepagents-integration/evidence/m17-20261016/cli-recipe.py"
+  ],
+  "started_at_utc": "2026-10-16T19:31:14.939187+00:00",
+  "duration_seconds": 1.138,
+  "exit_code": 0,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "8073ec8ae31012fc3c98a2f9855e6a23dd4c1dcf9feee57a85834d939ce945b5",
+  "model_calls": 0
+}

@@ -1,0 +1,23 @@
+{
+  "packages": {},
+  "command": [
+    "go",
+    "vet",
+    "./internal/enrollmentrequest"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T11:43:16.866437+00:00",
+  "end": "2026-10-17T11:43:17.140879+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 13
+}

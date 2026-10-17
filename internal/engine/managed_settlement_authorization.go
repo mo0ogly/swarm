@@ -5,6 +5,7 @@ package engine
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -80,11 +81,17 @@ func managedSettlementLiveAuthority(q settlementQuery, w Work) (string, string, 
 	}
 	var raw string
 	if err := q.QueryRow("SELECT message FROM cockpit_events WHERE work_id=? AND kind='mission-policy' ORDER BY rowid DESC LIMIT 1", w.ID).Scan(&raw); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", "", &CommandError{Code: "authorization_required", Message: "autorisation de mission absente ou révoquée"}
+		}
 		return "", "", err
 	}
 	var mission MissionPolicy
-	if err := json.Unmarshal([]byte(raw), &mission); err != nil || !mission.Enabled {
-		return "", "", fmt.Errorf("autorisation de mission absente ou révoquée")
+	if err := json.Unmarshal([]byte(raw), &mission); err != nil {
+		return "", "", fmt.Errorf("autorisation de mission illisible : %w", err)
+	}
+	if !mission.Enabled {
+		return "", "", &CommandError{Code: "authorization_required", Message: "autorisation de mission absente ou révoquée"}
 	}
 	return mode, hash([]byte(raw)), nil
 }

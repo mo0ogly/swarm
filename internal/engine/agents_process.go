@@ -353,6 +353,9 @@ func (s *Store) supervise(id string) error {
 			return s.finishAgent(a, "failed", e.Error(), nil)
 		}
 	}
+	if e = s.projectMemoryGuard(a); e != nil {
+		return s.finishAgent(a, "failed", e.Error(), nil)
+	}
 	if interactiveMode(a.Mode) {
 		return s.superviseTerminal(a)
 	}
@@ -364,7 +367,13 @@ func (s *Store) supervise(id string) error {
 		if contextErr != nil {
 			return s.finishAgent(a, "failed", "Contexte de reprise inaccessible : "+contextErr.Error(), nil)
 		}
-		a.Prompt += context
+		if contextErr = appendAgentRecoveryContext(&a, context); contextErr != nil {
+			return s.finishAgent(a, "failed", "Contexte de reprise refusé : "+contextErr.Error(), nil)
+		}
+		// The registered input must be durable before the provider can consume it.
+		if contextErr = s.saveAgent(a); contextErr != nil {
+			return s.finishAgent(a, "failed", "Enregistrement du contexte de reprise impossible : "+contextErr.Error(), nil)
+		}
 	}
 	environment, args, cacheErr := s.workerLaunchEnvironment(a)
 	if cacheErr != nil {
@@ -384,6 +393,9 @@ func (s *Store) supervise(id string) error {
 	cmd.Stderr = sink
 	// Bound wait if an orphaned descendant keeps stdout/stderr open after parent exits.
 	cmd.WaitDelay = 2 * time.Second
+	if e = s.checkMemorySummaryBeforeStart(&a); e != nil {
+		return s.finishAgent(a, "failed", e.Error(), nil)
+	}
 	if e = cmd.Start(); e != nil {
 		return s.finishAgent(a, "failed", "Échec de lancement : "+e.Error(), nil)
 	}

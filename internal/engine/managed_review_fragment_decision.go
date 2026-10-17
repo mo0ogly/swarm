@@ -29,6 +29,9 @@ func managedFragmentDecisionPrompt(prefix string, c managedReviewContext, p mana
 }
 
 func renderManagedFragmentDecision(prefix string, c managedReviewContext, bundle managedFragmentFinalEvidence, selection *managedFragmentEvidenceSelection) (string, managedReviewContext, error) {
+	if c.CitationContractVersion == 2 {
+		return renderManagedReferencedFragmentDecision(prefix, c, bundle, selection)
+	}
 	empty := managedReviewContext{}
 	metadata := c
 	metadata.Diff = ""
@@ -61,7 +64,14 @@ Pour pass, cite exactement une preuve originale visible dans ce message, jamais 
 	}
 	// Parser evidence is restricted to precisely the original bytes sent above.
 	// It cannot accept a quotation found only in the omitted canonical full diff.
-	visible := metadata
+	visible := managedFragmentVisibleOriginals(c, bundle, selection)
+	return prompt, visible, nil
+}
+
+func managedFragmentVisibleOriginals(c managedReviewContext, bundle managedFragmentFinalEvidence, selection *managedFragmentEvidenceSelection) managedReviewContext {
+	visible := c
+	visible.Diff = ""
+	visible.Sources = nil
 	if bundle.ChangeDiff != "" {
 		visible.Sources = append(visible.Sources, ReviewSource{Path: "current-changes.diff", Content: bundle.ChangeDiff, Bytes: len(bundle.ChangeDiff), Digest: hash([]byte(bundle.ChangeDiff))})
 	}
@@ -84,5 +94,5 @@ Pour pass, cite exactement une preuve originale visible dans ce message, jamais 
 			}
 		}
 	}
-	return prompt, visible, nil
+	return visible
 }

@@ -1,0 +1,871 @@
+--- a/docs/PROJECT-MEMORY.md
++++ b/docs/PROJECT-MEMORY.md
+@@ -321,13 +321,23 @@
+ plan et engagement atomique restent ouverts. Voir le
+ [rapport M24](plans/deepagents-integration/RESULTATS-MEMOIRE-20.md).
+ 
++M25 ajoute un verdict privé complet : tous les droits du demandeur et la lecture
++par le destinataire sont vérifiés, sans accord partiel si un contrôle échoue.
++Le réemploi reconstruit la sélection et réévalue les deux acteurs ; sa validité
++est limitée par la première expiration. Les ressources privées v2 incluent la
++tâche source : deux snapshots de tâches différentes ne partagent plus le même
++droit de lecture. La preuve d'identité et l'affectation du destinataire, ainsi
++que l'engagement réel, restent à fournir par le contrôle protégé. Aucun parcours
++public n'est activé. Voir le [rapport M25](plans/deepagents-integration/RESULTATS-MEMOIRE-21.md).
++
+ ```mermaid
+ flowchart LR
+   W["Work fourni au constructeur"] --> S["M19 : sources et attachement reconstruits"]
+-  S --> B["M24 : contenu, sélection et destination liés"]
++  S --> B["M25 : ressources source et proposition v2 liées"]
+   B --> R["Demandes séparées : lire, résumer, transmettre"]
+-  R -. "Raccord restant" .-> A["Identités et autorités courantes protégées"]
+-  A -. "À réaliser" .-> E["Engagement atomique puis effet et réception"]
++  R --> D["M25 : verdict pur du lot demandeur et destinataire"]
++  A["À réaliser : résolution protégée des acteurs et autorités"] -. "Cadre courant" .-> D
++  D -. "À réaliser" .-> E["Engagement atomique puis effet et réception"]
+ ```
+ 
+ La page mémoire charge la [bibliothèque de cachets et de repères](SEMANTIC-SIGNALS.md).
+--- a/docs/en/PROJECT-MEMORY.md
++++ b/docs/en/PROJECT-MEMORY.md
+@@ -291,13 +291,22 @@
+ and atomic commitment remain open. See the
+ [M24 report](../plans/deepagents-integration/RESULTATS-MEMOIRE-20.md) (French).
+ 
++M25 adds a complete private verdict: every requester right and the recipient's
++read access are checked, with no partial approval after any refusal. Reuse
++rebuilds the selection and reevaluates both actors; validity ends at the earliest
++expiry. Private v2 resources include the source task, so snapshots of different
++tasks no longer share the same read permission. Protected identity, recipient
++task assignment and actual commitment remain integration requirements. No public
++path is enabled. See the [M25 report](../plans/deepagents-integration/RESULTATS-MEMOIRE-21.md) (French).
++
+ ```mermaid
+ flowchart LR
+   W["Work supplied to the constructor"] --> S["M19: rebuilt sources and attachment"]
+-  S --> B["M24: bound content, selection and destination"]
++  S --> B["M25: bound source resources and v2 proposal"]
+   B --> R["Separate read, summarize and transmit requests"]
+-  R -. "Integration pending" .-> A["Protected current identities and authorities"]
+-  A -. "Not implemented" .-> E["Atomic commitment then effect and receipt"]
++  R --> D["M25: complete pure requester and recipient verdict"]
++  A["Pending: protected actor and authority resolution"] -. "Current frame" .-> D
++  D -. "Not implemented" .-> E["Atomic commitment then effect and receipt"]
+ ```
+ 
+ The memory page loads the [shared seal and signal library](SEMANTIC-SIGNALS.md).
+--- a/docs/plans/deepagents-integration/PLAN.md
++++ b/docs/plans/deepagents-integration/PLAN.md
+@@ -56,6 +56,7 @@
+ | M22 Cachets de contexte et repères | Composant et démonstration isolée vérifiés | Direction « cachet de cire au bas d'un parchemin », 29 repères FR/EN et descriptions, états inconnus par défaut. API réutilisable pour la session identité ; deux thèmes, cinq largeurs et contrastes vérifiés. Voir `RESULTATS-MEMOIRE-18.md` ; intégration aux écrans réels et droits moteur encore distincts. |
+ | M23 Cachets dans la page mémoire | Intégration frontend vérifiée sur API conservée | Deux types et transitions réelles, identités/droits inconnus, 11 groupes de contrôle et 20 configurations FR/EN/thèmes/largeurs. Assets générés communs ; voir `RESULTATS-MEMOIRE-19.md` pour l'embarquement, les preuves et la limite du serveur non redémarré. |
+ | M24 Liaison des usages du résumé | Vérification locale sur vue identité figée | 34 noms PASS dont 32 du nouveau contrat ; replan après changement concurrent des entrées. Ressources exactes et demandes séparées sur les sources réelles M19, contenu/sélection/destinataire liés ; aucun raccord public ni identité fabriquée. Statique/compilation et périmètre de preuve dans `RESULTATS-MEMOIRE-20.md`. M20.2 partiel, M20.3/4 ouverts. |
++| M25 Cloisonnement des sources et verdict complet | Vérifié localement, aucun raccord public | Alias v1 entre snapshots de tâches reproduit puis corrigé en v2 ; droits des deux acteurs vérifiés ensemble, aucun accord partiel. 12 tests principaux et 60 sous-cas PASS, watchdog global désactivé, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-21.md`. Autorité protégée, affectation, propriété/auteur et engagement courant restent ouverts. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -261,6 +262,18 @@
+ Persistance propriétaire/auteur, autorité protégée du demandeur et du destinataire,
+ avant-plan, engagement et effet restent les préconditions de M20.3/4. Les fichiers
+ identité et le serveur utilisateur sont préservés.
++
++Reprise « go next » avec la nouvelle règle sur les délais : M25 utilise
++`go test -timeout=0`, mesure les entrées et suit la progression. Le chantier
++identité a livré preuve et journal d'enrôlement isolés ; ses choix opérateur et
++son raccord public restent ouverts. Côté mémoire, une collision de ressource
++snapshot entre tâches est reproduite avant correction générale en v2. Le
++verdict pur vérifie tous les droits demandeur et la lecture destinataire avant
++de retourner un résultat complet, avec réévaluation intégrale au réemploi.
++Une fixture illégale d'octroi est corrigée avec validation réelle de transition.
++72 noms passent à sources stables, sans overlay ; voir `RESULTATS-MEMOIRE-21.md`.
++La prochaine activation dépend toujours de l'autorité, des attributions et du
++point d'engagement protégés ; aucun octroi ou effet n'est créé par ce résultat.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+--- a/docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md
++++ b/docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md
+@@ -130,10 +130,16 @@
+ paquet source, la sélection et les octets de l'attachement. Ces données ne sont
+ ni une authentification de la destination ni une adoption de plan.
+ 
+-Une ressource exacte vaut `memory:v1:` + SHA-256 du tuple JSON versionné
+-`swarm-memory-resource-v1`, `project_context_digest`, `work`, `id`, `kind`, `role`.
++Depuis la correction M25, une ressource exacte vaut `memory:v2:` + SHA-256 du
++tuple JSON versionné `swarm-memory-resource-v2`, `project_context_digest`, `work`,
++`task`, `id`, `kind`, `role`. `task` désigne la tâche source réelle : celle du
++snapshot pour l'instantané opérateur, celle de `DialogueRef` pour un dialogue.
++Deux tâches ne partagent donc pas leur ressource snapshot ; le même dialogue
++conserve sa ressource quand seule la tâche destinataire change. La v1 privée
++confondait les snapshots de tâches d'un même travail ; sa preuve d'échec reste
++dans M25. Aucun octroi v1 n'est converti ou autorisé implicitement.
+ Ce tuple utilise les IDs produits par `memorySummarySourceForWork`, sans accepter
+-une citation renommée. La proposition `swarm-memory-usage-v1` conserve les
++une citation renommée. La proposition `swarm-memory-usage-v2` conserve les
+ empreintes des contenus indépendamment du digest de plan. Le hash du chemin
+ projet reste une liaison locale ; il ne crée aucune racine de confiance.
+ 
+@@ -160,3 +166,33 @@
+ propriété/auteur persistés, avant-plan, révocation avant effet, transaction et
+ réception. Recettes et résultats : `INCREMENT-MEMOIRE-20.md` et
+ `RESULTATS-MEMOIRE-20.md`.
++
++## M25 — verdict complet et droit de lecture du destinataire
++
++`evaluateMemorySummaryUsage` reconstruit la liaison sur le `Work` fourni au
++moment du contrôle, puis évalue tous les droits du demandeur et le droit de
++lecture du destinataire sur les seules sources transmises. Son `memoryUsageFrame`
++privé contient instantané, autorité, deux appelants et instant de contrôle ; il
++doit provenir du futur consommateur protégé, jamais d'une déclaration JSON.
++Le principal et l'instance destinataire doivent correspondre exactement à la
++proposition ; le noyau vérifie ensuite octroi, instance/canal, portée et fraîcheur.
++
++Les événements de lecture destinataire utilisent un domaine distinct
++`swarm-memory-receive-event-v1`. Un seul refus renvoie une décision entièrement
++vide, même après plusieurs contrôles favorables. Aucun acteur absent ne devient
++un opérateur implicite. Le destinataire n'obtient ni snapshot opérateur ni source
++omise, et n'a pas besoin du droit de synthétiser pour simplement recevoir.
++
++La décision privée conserve tous les verdicts et l'expiration la plus proche
++des octrois ou sessions. Son réemploi reconstruit les sources et réévalue les
++deux acteurs avant de comparer l'ensemble de la preuve. Une preuve partielle,
++modifiée, réordonnée ou liée à une autre autorité est refusée. Les refus du noyau
++conservent leur cause. Ce verdict vaut pour l'instant fourni ; le consommateur
++devra encore contrôler le temps et l'autorité au point réel d'engagement.
++
++Il ne s'agit pas d'un engagement atomique : aucun texte libéré, reçu consommé,
++journal durable ou effet. La provenance protégée du cadre, l'affectation réelle
++du destinataire à la tâche, propriété/auteur persistés et l'autorité avant plan
++restent à raccorder. Aucun handler ou lanceur public ne consomme cet évaluateur.
++M20-U01–U10 restent ouverts pour la conformité applicative. Voir
++`INCREMENT-MEMOIRE-21.md` et `RESULTATS-MEMOIRE-21.md`.
+--- a/internal/engine/memory_usage_binding.go
++++ b/internal/engine/memory_usage_binding.go
+@@ -18,6 +18,7 @@
+ 
+ type memoryUsageSourceBinding struct {
+ 	ID       string `json:"id"`
++	Task     string `json:"source_task"`
+ 	Kind     string `json:"kind"`
+ 	Role     string `json:"role"`
+ 	Resource string `json:"resource"`
+@@ -74,7 +75,7 @@
+ 		}
+ 		received[id] = true
+ 	}
+-	projection := memoryUsageProjection{Protocol: "swarm-memory-usage-v1", Project: hash([]byte(root)), Work: w.ID, Revision: w.Revision, Target: target,
++	projection := memoryUsageProjection{Protocol: "swarm-memory-usage-v2", Project: hash([]byte(root)), Work: w.ID, Revision: w.Revision, Target: target,
+ 		SourceSHA: packet.SHA256, SelectionSHA: receipt.SelectionSHA, AttachmentSHA: receipt.AttachmentSHA, AttachmentBytes: receipt.AttachmentBytes}
+ 	seen := map[string]bool{}
+ 	for _, source := range sources {
+@@ -82,18 +83,27 @@
+ 			return empty, agentIdentityError("memory_usage_sources_invalid")
+ 		}
+ 		seen[source.ID] = true
++		sourceTask := r.TaskID
++		if source.Dialogue != nil {
++			sourceTask = source.Dialogue.Task
++		}
++		if !safeName(sourceTask) {
++			return empty, agentIdentityError("memory_usage_sources_invalid")
++		}
+ 		key, err := json.Marshal(struct {
+ 			Protocol string `json:"protocol"`
+ 			Project  string `json:"project_context_digest"`
+ 			Work     string `json:"work"`
++			Task     string `json:"task"`
+ 			ID       string `json:"id"`
+ 			Kind     string `json:"kind"`
+ 			Role     string `json:"role"`
+-		}{"swarm-memory-resource-v1", projection.Project, w.ID, source.ID, source.Kind, source.Role})
++		}{"swarm-memory-resource-v2", projection.Project, w.ID, sourceTask, source.ID, source.Kind, source.Role})
+ 		if err != nil {
+ 			return empty, err
+ 		}
+-		projection.Sources = append(projection.Sources, memoryUsageSourceBinding{source.ID, source.Kind, source.Role, "memory:v1:" + hash(key), source.SHA256, len(source.Text), received[source.ID]})
++		projection.Sources = append(projection.Sources, memoryUsageSourceBinding{ID: source.ID, Task: sourceTask, Kind: source.Kind, Role: source.Role,
++			Resource: "memory:v2:" + hash(key), SHA256: source.SHA256, Bytes: len(source.Text), Transmit: received[source.ID]})
+ 	}
+ 	for id := range received {
+ 		if !seen[id] {
+@@ -118,7 +128,7 @@
+ 		return nil, err
+ 	}
+ 	if !safeName(eventID) || !safeName(grantID) || !agentIdentityHashValid(b.digest) || digest != b.digest ||
+-		b.projection.Protocol != "swarm-memory-usage-v1" || !b.projection.Target.Scope.valid() || len(b.projection.Sources) == 0 {
++		b.projection.Protocol != "swarm-memory-usage-v2" || !b.projection.Target.Scope.valid() || len(b.projection.Sources) == 0 {
+ 		return nil, agentIdentityError("memory_usage_binding_invalid")
+ 	}
+ 	requests := []agentIdentityRequest{}
+--- a/internal/engine/memory_usage_binding_test.go
++++ b/internal/engine/memory_usage_binding_test.go
+@@ -107,7 +107,7 @@
+ 		rights[p] = true
+ 	}
+ 	for i, source := range b.projection.Sources {
+-		if !strings.HasPrefix(source.Resource, "memory:v1:") || strings.ContainsAny(source.Resource, "*?[]") {
++		if !strings.HasPrefix(source.Resource, "memory:v2:") || strings.ContainsAny(source.Resource, "*?[]") {
+ 			t.Fatal("non-exact source")
+ 		}
+ 		if !rights[agentIdentityPermission{"memory.read", source.Resource}] || !rights[agentIdentityPermission{"memory.summarize", source.Resource}] {
+--- /dev/null
++++ b/internal/engine/memory_usage_decision.go
+@@ -0,0 +1,103 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"slices"
++	"time"
++)
++
++// Private inputs from a future protected consumer, not an enrollment or an
++// attestation constructed by this evaluator. No public JSON admission exists.
++type memoryUsageFrame struct {
++	snapshot  agentIdentitySnapshot
++	authority agentIdentityAuthority
++	requester agentIdentityCaller
++	recipient agentIdentityCaller
++	at        time.Time
++}
++
++type memoryUsageDecisionIDs struct {
++	eventID        string
++	requesterGrant string
++	recipientGrant string
++}
++
++// A complete pure verdict, never a consumption receipt or permission to release
++// bytes after its authority/source frame has changed. No partial verdict escapes.
++type memoryUsageDecision struct {
++	bindingDigest string
++	requester     []agentIdentityDecision
++	recipient     []agentIdentityDecision
++	expiresAt     time.Time
++}
++
++func evaluateMemorySummaryUsage(root string, w Work, r Launch, target memoryUsageTarget, ids memoryUsageDecisionIDs, frame memoryUsageFrame, previous *memoryUsageDecision) (memoryUsageDecision, error) {
++	empty := memoryUsageDecision{}
++	binding, err := memorySummaryUsageBinding(root, w, r, target)
++	if err != nil {
++		return empty, err
++	}
++	if frame.authority.projectRoot != root {
++		return empty, agentIdentityError("memory_usage_project_mismatch")
++	}
++	if frame.recipient.actor != target.Recipient {
++		return empty, agentIdentityError("memory_usage_recipient_mismatch")
++	}
++	requester, err := binding.requests(ids.eventID, ids.requesterGrant)
++	if err != nil {
++		return empty, err
++	}
++	if !safeName(ids.recipientGrant) {
++		return empty, agentIdentityError("memory_usage_binding_invalid")
++	}
++	recipient := []agentIdentityRequest{}
++	for _, source := range binding.projection.Sources {
++		if !source.Transmit {
++			continue
++		}
++		key, err := json.Marshal([]string{"swarm-memory-receive-event-v1", ids.eventID, source.Resource})
++		if err != nil {
++			return empty, err
++		}
++		request := agentIdentityRequest{Schema: 1, EventID: "memory-receive-" + hash(key), Scope: target.Scope, GrantID: ids.recipientGrant,
++			Operation: "memory.read", Resource: source.Resource, ContentDigest: binding.digest}
++		if !request.valid() {
++			return empty, agentIdentityError("memory_usage_binding_invalid")
++		}
++		recipient = append(recipient, request)
++	}
++	if len(recipient) == 0 {
++		return empty, agentIdentityError("memory_usage_sources_invalid")
++	}
++	current := memoryUsageDecision{bindingDigest: binding.digest}
++	appendDecision := func(caller agentIdentityCaller, request agentIdentityRequest, out *[]agentIdentityDecision) error {
++		decision, err := evaluateAgentIdentity(frame.snapshot, frame.authority, caller, request, frame.at)
++		if err != nil {
++			return err
++		}
++		*out = append(*out, decision)
++		if current.expiresAt.IsZero() || decision.ExpiresAt.Before(current.expiresAt) {
++			current.expiresAt = decision.ExpiresAt
++		}
++		return nil
++	}
++	for _, request := range requester {
++		if err = appendDecision(frame.requester, request, &current.requester); err != nil {
++			return empty, err
++		}
++	}
++	for _, request := range recipient {
++		if err = appendDecision(frame.recipient, request, &current.recipient); err != nil {
++			return empty, err
++		}
++	}
++	// Authenticate and reevaluate both actors before comparing the previous proof.
++	// This preserves the kernel's refusal causes on revocation/expiry/denial.
++	if previous != nil && (previous.bindingDigest != current.bindingDigest || !previous.expiresAt.Equal(current.expiresAt) ||
++		!slices.Equal(previous.requester, current.requester) || !slices.Equal(previous.recipient, current.recipient)) {
++		return empty, agentIdentityError("memory_usage_decision_stale")
++	}
++	return current, nil
++}
+--- /dev/null
++++ b/internal/engine/memory_usage_decision_test.go
+@@ -0,0 +1,327 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"errors"
++	"path/filepath"
++	"reflect"
++	"slices"
++	"testing"
++	"time"
++)
++
++func TestMemoryUsageResourceSnapshotTaskBoundary(t *testing.T) {
++	root, w, r, target := memoryUsageFixture(t)
++	before, err := memorySummaryUsageBinding(root, w, r, target)
++	if err != nil {
++		t.Fatal(err)
++	}
++	r.TaskID = "other"
++	target.Task = "other"
++	refreshMemoryUsageSelection(t, root, w, &r)
++	after, err := memorySummaryUsageBinding(root, w, r, target)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if before.projection.Sources[0].Resource == after.projection.Sources[0].Resource {
++		t.Fatal("different task snapshots alias the same exact memory resource")
++	}
++	for i := 1; i < len(before.projection.Sources); i++ {
++		if before.projection.Sources[i].Resource != after.projection.Sources[i].Resource {
++			t.Fatal("same original dialogue was incorrectly scoped to the recipient task")
++		}
++	}
++}
++
++type memoryDecisionFixture struct {
++	root   string
++	work   Work
++	launch Launch
++	target memoryUsageTarget
++	ids    memoryUsageDecisionIDs
++	frame  memoryUsageFrame
++}
++
++func memoryDecisionSetup(t *testing.T) memoryDecisionFixture {
++	t.Helper()
++	root, w, r, target := memoryUsageFixture(t)
++	b, err := memorySummaryUsageBinding(root, w, r, target)
++	if err != nil {
++		t.Fatal(err)
++	}
++	requests, err := b.requests("decision-event", "reader-grant")
++	if err != nil {
++		t.Fatal(err)
++	}
++	snapshot, authority, requester, at := memoryUsageAuthority(t, root, b, requests)
++	rights := []agentIdentityPermission{}
++	for _, source := range b.projection.Sources {
++		if source.Transmit {
++			rights = append(rights, agentIdentityPermission{"memory.read", source.Resource})
++		}
++	}
++	recipient := agentIdentityGrant{ID: "recipient-grant", Issuer: requester.actor, Holder: target.Recipient, Scope: target.Scope, TrustRevision: requester.trustRevision,
++		Permissions: rights, NotBefore: at.Add(-time.Minute), ExpiresAt: at.Add(30 * time.Second)}
++	snapshot.Grants[recipient.ID] = recipient
++	snapshot.Instances[target.Recipient.InstanceID] = agentIdentityInstance{ID: target.Recipient.InstanceID, LogicalAgentID: "receiver-logical", Principal: target.Recipient.Principal, Scope: target.Scope, GrantID: recipient.ID, BindingID: "recipient-channel"}
++	authority.roots[recipient.ID] = true
++	f := memoryDecisionFixture{root, w, r, target, memoryUsageDecisionIDs{"decision-event", "reader-grant", "recipient-grant"},
++		memoryUsageFrame{snapshot, authority, requester, agentIdentityCaller{projectRoot: root, actor: target.Recipient, trustRevision: requester.trustRevision, bindingID: "recipient-channel", verifiedAt: at}, at}}
++	f.refresh(t)
++	return f
++}
++
++func (f *memoryDecisionFixture) refresh(t *testing.T) {
++	t.Helper()
++	digest, err := agentIdentityDigest(f.frame.snapshot)
++	if err != nil {
++		t.Fatal(err)
++	}
++	f.frame.authority.snapshotDigest = digest
++	f.frame.authority.snapshotRevision = f.frame.snapshot.Revision
++}
++
++func (f memoryDecisionFixture) clone(t *testing.T) memoryDecisionFixture {
++	t.Helper()
++	f.work, f.launch = memoryUsageClone(t, f.work, f.launch)
++	raw, err := json.Marshal(f.frame.snapshot)
++	if err != nil {
++		t.Fatal(err)
++	}
++	f.frame.snapshot = agentIdentitySnapshot{}
++	if err = json.Unmarshal(raw, &f.frame.snapshot); err != nil {
++		t.Fatal(err)
++	}
++	roots := map[string]bool{}
++	for id, v := range f.frame.authority.roots {
++		roots[id] = v
++	}
++	f.frame.authority.roots = roots
++	return f
++}
++
++func (f memoryDecisionFixture) evaluate(previous *memoryUsageDecision) (memoryUsageDecision, error) {
++	return evaluateMemorySummaryUsage(f.root, f.work, f.launch, f.target, f.ids, f.frame, previous)
++}
++
++func requireMemoryDecisionRefusal(t *testing.T, got memoryUsageDecision, err error, code string) {
++	t.Helper()
++	if err == nil || !reflect.DeepEqual(got, memoryUsageDecision{}) {
++		t.Fatal("refusal exposed a full or partial decision", err)
++	}
++	if code != "" {
++		var actual *CommandError
++		if !errors.As(err, &actual) || actual.Code != code {
++			t.Fatalf("want refusal %s, got %v", code, err)
++		}
++	}
++}
++
++func TestMemoryUsageDecisionChecksBothActorsBeforeReturning(t *testing.T) {
++	f := memoryDecisionSetup(t)
++	before := f.clone(t)
++	got, err := f.evaluate(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(got.requester) != 13 || len(got.recipient) != 3 {
++		t.Fatal("wrong complete decision shape")
++	}
++	if !got.expiresAt.Equal(f.frame.at.Add(30 * time.Second)) {
++		t.Fatal("aggregate outlived the recipient grant")
++	}
++	events := map[string]bool{}
++	for _, decision := range append(slices.Clone(got.requester), got.recipient...) {
++		if events[decision.EventID] {
++			t.Fatal("requester and recipient events alias")
++		}
++		events[decision.EventID] = true
++	}
++	for _, decision := range got.recipient {
++		if decision.Actor != f.target.Recipient {
++			t.Fatal("recipient decision lost actual actor")
++		}
++	}
++	if !reflect.DeepEqual(f, before) {
++		t.Fatal("evaluation mutated its input frame, Work or launch")
++	}
++	again, err := f.evaluate(&got)
++	if err != nil || !reflect.DeepEqual(got, again) {
++		t.Fatal("exact current reuse failed", err)
++	}
++}
++
++func TestMemoryUsageDecisionRejectsEveryIncompleteAuthority(t *testing.T) {
++	base := memoryDecisionSetup(t)
++	previous, err := base.evaluate(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	changeGrant := func(f *memoryDecisionFixture, id string, change func(*agentIdentityGrant)) {
++		g := f.frame.snapshot.Grants[id]
++		change(&g)
++		f.frame.snapshot.Grants[id] = g
++	}
++	cases := []struct {
++		name, code string
++		change     func(*memoryDecisionFixture)
++		unanchored bool
++	}{
++		{"last-requester-right", "agent_identity_permission_denied", func(f *memoryDecisionFixture) {
++			changeGrant(f, f.ids.requesterGrant, func(g *agentIdentityGrant) { g.Permissions = g.Permissions[:len(g.Permissions)-1] })
++		}, false},
++		{"last-recipient-right", "agent_identity_permission_denied", func(f *memoryDecisionFixture) {
++			changeGrant(f, f.ids.recipientGrant, func(g *agentIdentityGrant) { g.Permissions = g.Permissions[:len(g.Permissions)-1] })
++		}, false},
++		{"missing-recipient-caller", "memory_usage_recipient_mismatch", func(f *memoryDecisionFixture) { f.frame.recipient = agentIdentityCaller{} }, false},
++		{"other-recipient-subject", "memory_usage_recipient_mismatch", func(f *memoryDecisionFixture) { f.frame.recipient.actor.Principal.Subject = "another-subject" }, false},
++		{"other-recipient-instance", "memory_usage_recipient_mismatch", func(f *memoryDecisionFixture) { f.frame.recipient.actor.InstanceID = "another-instance" }, false},
++		{"missing-recipient-channel", "agent_identity_binding_mismatch", func(f *memoryDecisionFixture) { f.frame.recipient.bindingID = "" }, false},
++		{"unregistered-recipient", "agent_identity_binding_mismatch", func(f *memoryDecisionFixture) { delete(f.frame.snapshot.Instances, f.target.Recipient.InstanceID) }, false},
++		{"revoked-recipient-instance", "agent_identity_binding_mismatch", func(f *memoryDecisionFixture) {
++			i := f.frame.snapshot.Instances[f.target.Recipient.InstanceID]
++			i.RevokedAt = &f.frame.at
++			f.frame.snapshot.Instances[i.ID] = i
++		}, false},
++		{"revoked-recipient-grant", "agent_identity_grant_inactive", func(f *memoryDecisionFixture) {
++			changeGrant(f, f.ids.recipientGrant, func(g *agentIdentityGrant) { g.RevokedAt = &f.frame.at })
++		}, false},
++		{"expired-recipient-grant", "agent_identity_grant_inactive", func(f *memoryDecisionFixture) {
++			changeGrant(f, f.ids.recipientGrant, func(g *agentIdentityGrant) { g.ExpiresAt = f.frame.at })
++		}, false},
++		{"revoked-requester-grant", "agent_identity_grant_inactive", func(f *memoryDecisionFixture) {
++			changeGrant(f, f.ids.requesterGrant, func(g *agentIdentityGrant) { g.RevokedAt = &f.frame.at })
++		}, false},
++		{"stale-requester", "agent_identity_caller_stale", func(f *memoryDecisionFixture) { f.frame.requester.verifiedAt = f.frame.at.Add(-time.Second) }, false},
++		{"stale-recipient", "agent_identity_caller_stale", func(f *memoryDecisionFixture) { f.frame.recipient.verifiedAt = f.frame.at.Add(-time.Second) }, false},
++		{"expired-recipient-caller", "agent_identity_caller_stale", func(f *memoryDecisionFixture) { f.frame.recipient.expiresAt = &f.frame.at }, false},
++		{"invalid-event", "memory_usage_binding_invalid", func(f *memoryDecisionFixture) { f.ids.eventID = "" }, false},
++		{"missing-recipient-grant", "memory_usage_binding_invalid", func(f *memoryDecisionFixture) { f.ids.recipientGrant = "" }, false},
++		{"foreign-control-project", "memory_usage_project_mismatch", func(f *memoryDecisionFixture) { f.frame.authority.projectRoot = filepath.Join(f.root, "other-project") }, false},
++		{"missing-clock", "agent_identity_clock_required", func(f *memoryDecisionFixture) { f.frame.at = time.Time{} }, false},
++		{"unanchored-snapshot", "agent_identity_snapshot_changed", func(f *memoryDecisionFixture) {
++			changeGrant(f, f.ids.requesterGrant, func(g *agentIdentityGrant) {
++				g.Permissions = append(g.Permissions, agentIdentityPermission{"tool.invoke", "other-tool"})
++			})
++		}, true},
++	}
++	for _, test := range cases {
++		t.Run(test.name, func(t *testing.T) {
++			f := base.clone(t)
++			test.change(&f)
++			if !test.unanchored {
++				f.refresh(t)
++			}
++			original := f.clone(t)
++			got, err := f.evaluate(&previous)
++			requireMemoryDecisionRefusal(t, got, err, test.code)
++			if !reflect.DeepEqual(f, original) {
++				t.Fatal("refusal mutated its inputs")
++			}
++			valid, err := base.evaluate(&previous)
++			if err != nil || len(valid.recipient) != 3 {
++				t.Fatal("isolated refusal damaged subsequent valid use", err)
++			}
++		})
++	}
++}
++
++func TestMemoryUsageDecisionRejectsEditedOrPartialPrevious(t *testing.T) {
++	f := memoryDecisionSetup(t)
++	previous, err := f.evaluate(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	for name, change := range map[string]func(*memoryUsageDecision){
++		"missing-requester":   func(d *memoryUsageDecision) { d.requester = d.requester[:len(d.requester)-1] },
++		"missing-recipient":   func(d *memoryUsageDecision) { d.recipient = d.recipient[:len(d.recipient)-1] },
++		"reordered-recipient": func(d *memoryUsageDecision) { d.recipient[0], d.recipient[1] = d.recipient[1], d.recipient[0] },
++		"edited-binding":      func(d *memoryUsageDecision) { d.bindingDigest = hash([]byte("another binding")) },
++		"edited-expiration":   func(d *memoryUsageDecision) { d.expiresAt = d.expiresAt.Add(time.Second) },
++		"edited-actor":        func(d *memoryUsageDecision) { d.requester[0].Actor.Principal.Subject = "forged" },
++		"roles-swapped":       func(d *memoryUsageDecision) { d.requester, d.recipient = d.recipient, d.requester },
++		"empty":               func(d *memoryUsageDecision) { *d = memoryUsageDecision{} },
++	} {
++		t.Run(name, func(t *testing.T) {
++			candidate := previous
++			candidate.requester = slices.Clone(previous.requester)
++			candidate.recipient = slices.Clone(previous.recipient)
++			change(&candidate)
++			got, err := f.evaluate(&candidate)
++			requireMemoryDecisionRefusal(t, got, err, "memory_usage_decision_stale")
++		})
++	}
++	got, err := f.evaluate(&previous)
++	if err != nil || !reflect.DeepEqual(got, previous) {
++		t.Fatal("editing a copy damaged original proof", err)
++	}
++}
++
++func TestMemoryUsageDecisionRebuildsAndRechecksBeforeReuse(t *testing.T) {
++	base := memoryDecisionSetup(t)
++	previous, err := base.evaluate(nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Run("changed-selection", func(t *testing.T) {
++		f := base.clone(t)
++		f.launch.Summary.Reason = "Another exact selection"
++		got, err := f.evaluate(&previous)
++		requireMemoryDecisionRefusal(t, got, err, "memory_usage_decision_stale")
++	})
++	t.Run("stale-answer", func(t *testing.T) {
++		f := base.clone(t)
++		f.work.Tasks[2].Answers[0].Text = "Changed stored answer"
++		got, err := f.evaluate(&previous)
++		requireMemoryDecisionRefusal(t, got, err, "")
++	})
++	t.Run("other-task-snapshot", func(t *testing.T) {
++		f := base.clone(t)
++		f.launch.TaskID = "other"
++		f.target.Task = "other"
++		refreshMemoryUsageSelection(t, f.root, f.work, &f.launch)
++		got, err := f.evaluate(&previous)
++		requireMemoryDecisionRefusal(t, got, err, "agent_identity_permission_denied")
++	})
++	t.Run("new-authority", func(t *testing.T) {
++		f := base.clone(t)
++		f.frame.snapshot.Revision++
++		f.refresh(t)
++		got, err := f.evaluate(&previous)
++		requireMemoryDecisionRefusal(t, got, err, "memory_usage_decision_stale")
++		if _, err = f.evaluate(nil); err != nil {
++			t.Fatal("fresh evaluation under current authority failed", err)
++		}
++	})
++	t.Run("new-grant", func(t *testing.T) {
++		f := base.clone(t)
++		g := f.frame.snapshot.Grants[f.ids.requesterGrant]
++		g.ID = "new-requester-grant"
++		f.ids.requesterGrant = g.ID
++		f.frame.snapshot.Grants[g.ID] = g
++		f.frame.authority.roots[g.ID] = true
++		f.frame.snapshot.Revision++
++		if err := validateAgentIdentityTransition(base.frame.snapshot, f.frame.snapshot); err != nil {
++			t.Fatal("fixture proposed an illegal registry transition", err)
++		}
++		f.refresh(t)
++		got, err := f.evaluate(&previous)
++		requireMemoryDecisionRefusal(t, got, err, "memory_usage_decision_stale")
++	})
++	t.Run("reauthenticate-then-expire", func(t *testing.T) {
++		f := base.clone(t)
++		f.frame.at = f.frame.at.Add(time.Second)
++		f.frame.requester.verifiedAt = f.frame.at
++		f.frame.recipient.verifiedAt = f.frame.at
++		if _, err := f.evaluate(&previous); err != nil {
++			t.Fatal("fresh actors could not reuse still-current decision", err)
++		}
++		f.frame.at = base.frame.at.Add(31 * time.Second)
++		f.frame.requester.verifiedAt = f.frame.at
++		f.frame.recipient.verifiedAt = f.frame.at
++		got, err := f.evaluate(&previous)
++		requireMemoryDecisionRefusal(t, got, err, "agent_identity_grant_inactive")
++	})
++}
+--- /dev/null
++++ b/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-21.md
+@@ -0,0 +1,84 @@
++# M25 — décision complète pour demandeur et destinataire
++
++17 octobre 2026, reprise « go next ». Propriétaire : Codex mémoire, seul,
++`replan` et APEX borné. M24 est réutilisé à sources vérifiées. Le chantier
++identité a livré les paquets preuve et journal d'enrôlement, sans raccord public.
++Ses fichiers restent en lecture seule ; les choix opérateur et l'autorité
++avant plan ne sont ni supposés ni contournés.
++
++## Décision
++
++M24 produit les demandes exactes, mais aucun consommateur ne vérifie l'ensemble
++ni les droits propres du destinataire. Deux voies : laisser chaque futur appelant
++composer une boucle de décisions partielles, ou centraliser ce contrat mémoire.
++Retenir un évaluateur privé complet, reconstruit sur les vrais producteurs M19
++et le noyau identité existant, sans ajouter d'API, schéma persistant ou autorité.
++
++Le demandeur doit satisfaire tous les contrôles M24. Le destinataire doit aussi
++être le principal et l'instance liés à la proposition, avec un appelant frais
++et les droits `memory.read` sur les seules sources réellement transmises.
++Les contrôles utilisent un même instantané d'autorité et un même instant fourni
++par le futur consommateur protégé. Aucune source opérateur/omise n'est transmise.
++Une erreur renvoie une décision entièrement vide, sans sous-liste favorable.
++
++Le résultat reste une décision pure : aucune permission créée, aucun texte
++diffusé, aucun reçu consommé, aucun engagement ou effet atomique revendiqué.
++Le contrôle protégé doit encore attester le destinataire et son affectation
++réelle à la tâche, fournir la portée courante et garder les verrous jusqu'à
++l'engagement. Ni les structures privées ni les fixtures ne prouvent cela.
++
++## Critères
++
++| ID | Observable |
++| --- | --- |
++| M25-01 | Tous les contrôles demandeur et lecture destinataire réussissent avant tout résultat complet ; événements des deux rôles distincts. |
++| M25-02 | Un droit manquant, y compris le dernier contrôle, donne le refus exact et une décision vide, jamais un préfixe favorable. |
++| M25-03 | Principal/instance/canal/portée/projet/temps incompatibles refusés ; aucun destinataire absent ne devient opérateur implicite. |
++| M25-04 | Réemploi réévalue les deux acteurs ; contenu/destination/grant/autorité changés, décision éditée, incomplète ou réordonnée refusés. |
++| M25-05 | Expiration/révocation et appelants périmés sont pris en compte avant verdict ; décision antérieure et entrées restent inchangées. |
++| M25-06 | Tests ciblés nommés, statique, compilation, empreintes et docs FR/EN/RETEX ; aucune conformité publique inférée. |
++
++Plan : tests de contrat avant implémentation, évaluateur privé dans ses nouveaux
++fichiers, vérifications ciblées et revue locale. Gardes M24 conservées puisque
++le nouvel évaluateur les consomme. Sources testées gelées dans notre périmètre ;
++replan si les entrées réellement compilées changent. Aucun fichier identité édité.
++
++## Délais de vérification
++
++L'ancien `-timeout 90s` de M24 est une borne héritée sans contrat démontré pour
++ce lot. Ne pas la reprendre. `go test -timeout=0` désactive explicitement le
++watchdog global ; compilation et sortie structurée sont suivies, avec diagnostic
++si absence de progression. Les délais fonctionnels/produit et refus d'autorité
++restent inchangés. Les preuves M24 ne sont pas réécrites. Aucune augmentation
++de politique, budget, retry ou appel fournisseur.
++
++## Replan M25-I01 — ressource d'instantané confondue entre tâches
++
++Origine : lecture du tuple de ressource M24 pendant la préparation du contrôle
++destinataire. `current-task-snapshot` est un ID fixe ; son tuple v1 contient le
++travail mais pas la tâche. Deux instantanés de tâches du même travail obtiennent
++donc la même ressource, même si le digest complet de proposition change. Un
++octroi de lecture sur cette ressource ne distingue pas ces deux sources.
++
++Propriétaire : mémoire. Valeur : cloisonnement de la source au niveau du droit,
++sans confondre ce droit et la fraîcheur d'une décision. Reproduire d'abord avec
++deux vraies reconstructions M19 : ressources snapshot différentes attendues,
++ressources des dialogues originaux inchangées attendues.
++
++Comparer une règle spéciale sur l'ID courant à une ressource décrivant partout
++la tâche source réelle. Retenir le contrat général : tâche du snapshot pour
++l'instantané, tâche de `DialogueRef` pour les questions/réponses. Protocole de
++ressource v2 et proposition v2 explicites, sans accepter v1 par tolérance. Les
++preuves M24 restent historiques ; aucune permission persistée M24 n'est migrée
++ou créée puisque ces chemins privés ne sont raccordés à aucun service public.
++Mettre à jour le garde M24 et le contrat documentaire dans le même incrément.
++
++## Replan M25-I02 — fixture de changement d'octroi
++
++La première série passe, mais la revue détecte que sa variante « new-grant »
++réécrit `Instance.GrantID`, interdit par `validateAgentIdentityTransition`.
++Ce résultat pur ne prouve pas une transition applicable. Conserver la fixture
++originale et corriger le cas : nouvel octroi au demandeur sans instance, ancien
++octroi et instance destinataire intacts, révision suivante et validation réelle
++de transition avant évaluation. Rejouer ce garde avec les contrôles concernés.
++La correction ne modifie aucun code d'identité ou politique de publication.
+--- /dev/null
++++ b/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-21.md
+@@ -0,0 +1,134 @@
++# M25 — ressources cloisonnées et verdict complet des usages
++
++17 octobre 2026, Codex seul : reprise `replan`, APEX borné, revue locale et RETEX.
++Les résultats ne constituent ni revue indépendante, ni activation publique de
++M20, ni garantie du moteur d'identité global. Le serveur utilisateur est conservé.
++
++## Résultat
++
++Deux réalisations dans les seuls fichiers mémoire : correction du contrat de
++ressource privée M24 et évaluateur complet des usages du résumé extractif M19.
++
++La ressource v2 inclut la tâche **source**. Deux snapshots de tâches du même
++travail ont des ressources différentes ; un dialogue commun garde sa ressource
++quand le destinataire change. Le protocole de proposition est aussi v2. Les
++sources publiques M19, leurs IDs et leur paquet ne sont pas modifiés. Aucun
++octroi v1 n'est converti en droit v2, aucune migration ou tolérance publique.
++
++`evaluateMemorySummaryUsage` reconstruit les sources et l'attachement, vérifie
++tous les droits du demandeur puis la lecture de chaque source transmise par le
++destinataire. Son principal et son instance doivent correspondre à la proposition.
++Les décisions destinataire ont leurs propres événements, séparés du demandeur.
++La fixture vérifie treize contrôles demandeur et trois lectures destinataire,
++sans droit de synthèse exigé de ce dernier, ni lecture du snapshot opérateur ou
++d'une omission au titre de cette réception.
++
++Un seul refus, même au dernier contrôle, renvoie une décision entièrement vide.
++Le réemploi réévalue les deux acteurs avant de comparer l'intégralité du résultat.
++Une preuve éditée, partielle, réordonnée, liée à un autre octroi ou à une autre
++autorité est refusée. La validité du verdict est limitée par la première
++expiration des octrois/sessions. Les causes de refus du noyau restent conservées.
++
++Ce résultat reste **un verdict pur pour un instant fourni** : aucun octet libéré,
++octroi émis, reçu consommé, journal durable ou effet appliqué. Le cadre courant,
++la preuve d'identité et l'affectation réelle du destinataire doivent encore être
++fournis par le contrôle protégé au point d'engagement. Aucun handler ni lanceur
++public n'utilise cette brique. Les cachets ne deviennent donc pas « autorisés ».
++
++## Défauts observés et replan
++
++**M25-I01 — alias de source entre tâches.** Le tuple v1 utilisait l'ID fixe
++`current-task-snapshot` et le travail, sans tâche. Le test
++`TestMemoryUsageResourceSnapshotTaskBoundary` échoue avant correction : les
++deux snapshots ont la même ressource. La série `red` conserve 1 nom FAIL et
++l'échec de paquet, avec entrées inchangées. La différence du digest de contenu
++ne corrigeait pas la portée du droit. Correction générale : tâche source dans
++le tuple versionné, sans exception d'ID ou de mission ; le garde vérifie aussi
++que les dialogues communs ne sont pas relocalisés sur la tâche destinataire.
++
++**M25-I02 — fixture d'octroi incompatible avec l'immutabilité.** La première
++série candidat passe, mais sa variante de changement d'octroi réécrit
++`Instance.GrantID`. La revue constate que le contrat réel interdit cette mutation.
++La fixture initiale reste dans `decision-test-candidate.go.txt`. Le garde final
++ajoute un octroi au demandeur sans instance, conserve les anciens enregistrements,
++avance la révision et appelle `validateAgentIdentityTransition` avant d'évaluer
++le refus de l'ancienne décision. Aucune source identité ou règle d'autorité
++n'est modifiée pour rendre la fixture acceptable.
++
++**M25-I03 — lecture seule et fraîcheur des preuves distinctes.** Le premier
++audit exige à tort qu'un fichier identité soit inchangé depuis la reprise.
++L'autre chantier a extrait ses types/validateurs vers `internal/identitycontract`
++avant le reproducer. Les séries rouge, candidat et finale utilisent toutes la
++même nouvelle version, inchangée avant/après. La relecture confirme les champs,
++tags, validateurs et opérations pertinents ; `go list` inclut bien le nouveau
++paquet dans les manifestes. La correction de méthode compare les entrées
++réellement testées, conserve la différence depuis la reprise et respecte
++l'ownership. Aucune source identité n'est restaurée ni modifiée, aucun test
++inchangé n'est rejoué pour cette différence antérieure. Preuve :
++`read-only-contract-revalidation.json` et `audit-first-failure.json`.
++Une lecture d'artefact avait aussi été demandée avant la fin de l'audit en cours ;
++elle a constaté l'absence du résultat. La reprise attend la fin réelle avant
++de consommer le verdict. Une coquille de rédaction locale est corrigée à la
++relecture ; elle ne modifie aucun code ni résultat de test.
++
++## Vérification et limites
++
++Préimages et état sale : `evidence/m25-20261017/baseline.json`, `before/`,
++`status-before.txt`. Le lanceur `run_checks.py` inventorie les dépendances locales
++réelles via `go list`, lie sources Go, ressources embarquées, modules et recette
++aux résultats, refuse les sorties existantes et conserve stdout/stderr structurés.
++Il n'utilise aucun timeout Python et passe explicitement `go test -timeout=0`.
++Ce choix applique la nouvelle instruction utilisateur ; les preuves M24 et
++leurs anciennes commandes ne sont pas réécrites. Aucune limite fonctionnelle,
++expiration de droit, politique opérateur ou règle de consommation n'est supprimée.
++
++La série candidat donne 70 noms PASS et ses contrôles statique/compilation
++réussissent. Après correction de fixture, la série finale donne **72 noms PASS,
++zéro FAIL, zéro SKIP : 12 tests principaux et 60 sous-cas**. Elle couvre M24,
++les nouveaux cas M25 et deux gardes existantes du parcours source/sélection
++CLI/API. Toutes ses entrées sont inchangées ; aucun overlay n'est nécessaire
++dans ce lot. La compilation du candidat est réutilisable si les seules entrées
++modifiées ensuite sont les tests : la comparaison du manifeste final l'établit
++dans `audit-final.json`. L'analyse statique finale est enregistrée séparément.
++
++| Critère | État local | Preuve / limite |
++| --- | --- | --- |
++| M25-01 Lot complet | PASS | Treize contrôles demandeur, trois lectures destinataire ; événements uniques, aucune mutation des entrées. |
++| M25-02 Refus sans préfixe favorable | PASS | Dernier droit demandeur ou destinataire retiré : cause exacte et décision vide, puis utilisation valide à nouveau. |
++| M25-03 Correspondance et fraîcheur | PASS | Mauvais principal/instance/canal/projet, instance absente/révoquée, appelants périmés et horloge absente refusés. Cadres de fixture, sans attestation OS réelle. |
++| M25-04 Réemploi | PASS | Contenu, sélection, tâche source, octroi, autorité, preuve partielle/éditée/réordonnée refusés ; transition de fixture validée par le moteur. |
++| M25-05 Expiration et refus courants | PASS | Révocation, expiration et sessions périmées prises en compte ; réauthentification avant réemploi et fin de validité côté destinataire vérifiées. Aucun effet distribué. |
++| M25-06 Livraison | Voir audit final | Noms, entrées, formatage, diff, liens, statique, compilation et documentation. Revue de l'auteur, aucune acceptation indépendante. |
++
++Les commandes, dates et sorties originales figurent dans `red-*`, `candidate-*`,
++`final-*`. Les fixtures sont locales, sans base de mission réelle ni fournisseur.
++Pas de nouvel appel de modèle, de délégation, de mission native ou de message
++inter-chat. Pas de changement de synchronisation : contrôle `-race` non requis
++pour ces fonctions pures, sans état partagé ajouté. Aucun écran/API n'est changé ;
++les recettes navigateur M23 ne sont pas relancées. Schémas FR/EN mis à jour dans
++le Markdown ; leur rendu graphique n'est pas vérifié dans ce lot. Les nouvelles
++consignes ne sont pas présentées comme transmises à un processus déjà lancé.
++
++## RETEX et condition de reprise
++
++Une décision liée au contenu exact ne remplace pas une ressource correctement
++cloisonnée. Cette leçon est transmise par le garde à deux tâches et le contrat
++d'usages courant : source et destinataire sont deux dimensions distinctes.
++Une fixture verte doit aussi respecter les invariants de transition du vrai
++producteur ; le garde de changement d'octroi utilise désormais ce validateur.
++
++Les paquets preuve et journal d'enrôlement du chantier identité ont progressé,
++sans fournir encore le raccord public et le point d'engagement. Le choix d'une
++frontière indépendante (compte local distinct ou machine séparée), du principal
++humain initial et le bootstrap vérifié restent à décider/réaliser là-bas.
++M20-U01–U10 demeurent ouverts pour la conformité applicative : attribution
++propriétaire/auteur, identité et affectation du destinataire, autorité avant plan,
++engagement courant et chaîne décision/application/réception.
++
++Propriétaires : mémoire pour la persistance et les consommateurs, identité pour
++son service/autorité protégés, opérateur pour frontière et principal initial.
++Condition de reprise publique : ces contrats utilisables et vérifiés, puis garde
++du temps et des sources au point réel d'engagement, sans réentrée SQL ni droits
++implicites. Les codes privés de refus devront alors recevoir leur présentation
++FR/EN. Le présent lot n'enrôle aucune identité, ne redémarre pas le serveur et
++ne clôt pas IA4/IA5 ou le RETEX global.

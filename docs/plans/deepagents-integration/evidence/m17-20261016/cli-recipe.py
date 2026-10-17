@@ -1,0 +1,76 @@
+"""Actual evaluation-tool CLI, synthetic annotated sources, no Swarm runtime."""
+import copy
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path(__file__).resolve().parents[5]
+out = Path(__file__).resolve().parent / (sys.argv[1] if len(sys.argv) > 1 else "cli")
+out.mkdir(mode=0o700, exist_ok=False)
+sys.path.insert(0, str(root / "tests"))
+from test_memory_summarization import history
+
+records = []
+def save(name, value):
+    path = out / name
+    with path.open("x") as file:
+        json.dump(value, file, ensure_ascii=False, indent=2)
+    return path
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+def read(name):
+    return json.loads((out / name).read_text())
+def invoke(name, source, extra, code, status):
+    command = [sys.executable, "tools/memory-evaluation/summarization.py", "--history", str(source), *map(str, extra), "--output", str(out / (name + ".json"))]
+    result = subprocess.run(command, cwd=root, capture_output=True, text=True)
+    (out / (name + ".stdout")).write_text(result.stdout)
+    (out / (name + ".stderr")).write_text(result.stderr)
+    assert result.returncode == code, (name, result.returncode, result.stderr)
+    value = read(name + ".json")
+    assert value.get("result", "REFERENCE_CANDIDATE") == status, name
+    records.append({"name": name, "argv": command, "exit_code": code, "result": status, "output_sha256": sha(out / (name + ".json"))})
+    return value
+
+initial = save("history-initial.json", history())
+extended = save("history-extended.json", history(True))
+originals = {str(path.name): sha(path) for path in [initial, extended]}
+invoke("first-candidate", initial, ["--reference-cutoff", 6], 0, "REFERENCE_CANDIDATE")
+first = invoke("first", initial, ["--candidate", out / "first-candidate.json"], 0, "PASS")
+invoke("second-candidate", extended, ["--reference-cutoff", 9, "--previous", out / "first.json"], 0, "REFERENCE_CANDIDATE")
+second = invoke("second", extended, ["--candidate", out / "second-candidate.json", "--previous", out / "first.json"], 0, "PASS")
+assert len(first["summary_entries"]) == 4 and len(second["summary_entries"]) == 5
+assert second["summary_entries"][:4] == first["summary_entries"]
+assert second["parent_sha256"] == first["receipt_sha256"]
+assert second["recent_messages"] == history(True)["messages"][9:]
+assert {item["id"]: (item["kind"], item["state"], item["text"]) for item in second["summary_entries"]}["deployment"][1] == "future"
+baseline = read("first-candidate.json")
+mutations = {
+    "empty": lambda c: c.update(entries=[]),
+    "failed": lambda c: c.update(status="failed"),
+    "lost-incident": lambda c: c["entries"].pop(),
+    "future-became-done": lambda c: c["entries"][2].update(state="done"),
+    "historical-became-current": lambda c: c["entries"][1].update(state="current_verified"),
+    "invented-quote": lambda c: c["entries"][3].update(text="The incident is resolved."),
+    "stale-source": lambda c: c.update(source_sha256="0" * 64),
+    "negative-cutoff": lambda c: c.update(cutoff=-1),
+    "oversized-cutoff": lambda c: c.update(cutoff=99),
+    "split-tool-pair": lambda c: c.update(cutoff=5),
+}
+for name, mutate in mutations.items():
+    candidate = copy.deepcopy(baseline)
+    mutate(candidate)
+    path = save(name + "-candidate.json", candidate)
+    rejected = invoke(name, initial, ["--candidate", path], 1, "FALLBACK")
+    assert rejected["recent_messages"] == history()["messages"] and rejected["summary_entries"] == []
+    assert rejected["cutoff"] == 0 and rejected["omitted_message_ids"] == []
+
+for name, source_sha in originals.items():
+    assert sha(out / name) == source_sha, name
+full_bytes = len(json.dumps(history()["messages"], ensure_ascii=False).encode())
+effective_bytes = len(json.dumps({"summary_entries": first["summary_entries"], "recent_messages": first["recent_messages"]}, ensure_ascii=False).encode())
+assert effective_bytes < full_bytes
+result = {"status": "PASS", "cli_invocations": len(records), "refused_candidates": len(mutations), "progressive_summaries": 2, "source_files_sha256": originals, "first_reference_full_bytes": full_bytes, "first_reference_effective_bytes": effective_bytes, "model_calls": 0, "model_effectiveness": "NOT TESTED", "engine_integration": "NOT TESTED", "records": records}
+(out / "result.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+print(json.dumps({key: result[key] for key in ["status", "cli_invocations", "refused_candidates", "progressive_summaries", "model_calls"]}))

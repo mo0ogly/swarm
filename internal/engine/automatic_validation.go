@@ -143,8 +143,8 @@ func validationPolicyDigest(p ValidationPolicy) string {
 	return hash(b)
 }
 
-// Review output is opt-in and smaller than the diagnostic capture.
-const maxValidationReviewOutput = 8 * 1024
+// Opt-in review evidence retains the existing bounded diagnostic capture.
+const maxValidationReviewOutput = maxValidationOutput
 
 type limitedValidationOutput struct {
 	b bytes.Buffer

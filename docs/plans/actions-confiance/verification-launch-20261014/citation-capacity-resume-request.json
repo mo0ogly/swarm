@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-capacity-resume-c6006951d93c",
+  "expected_revision": 372,
+  "reason": "Counterexample reproduced and corrected: validate immutable final history with original directives, measure only the actual remaining selection/decision with exact originals. Targeted race tests cover operator/supervisor, reopen, completed inspection capacity, real final overflow and tamper refusal. Vet and method contexts pass. Preserve candidate, attempts and all spending."
+}

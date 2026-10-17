@@ -1,0 +1,16 @@
+{
+  "baseline_count": 8,
+  "changed": [
+    "internal/enrollmentconfig/config.go",
+    "internal/enrollmentconfig/store_linux.go"
+  ],
+  "unchanged": [
+    "go.mod",
+    "go.sum",
+    "internal/enrollmentconfig/config_test.go",
+    "internal/enrollmentconfig/store_linux_test.go",
+    "internal/identitycontract/contract.go",
+    "internal/identitycontract/contract_test.go"
+  ],
+  "scope": "config.go package comment and store_linux.go private file I/O extraction only; other baseline sources preserved"
+}

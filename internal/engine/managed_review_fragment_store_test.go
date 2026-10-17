@@ -17,6 +17,14 @@ func fragmentStoreFixture(t *testing.T) (*Store, Work, Agent, IndependentReview,
 	if e != nil {
 		t.Fatal(e)
 	}
+	receiptOriginal, e := os.ReadFile(filepath.Join(w.Planning.Repository.Storage, "proofs", a.ID, "receipt.json"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	prepared.Context, e = s.managedReviewContextAtCitationVersion(w, a, prepared.Context.Candidate, receiptOriginal, false, 1)
+	if e != nil {
+		t.Fatal(e)
+	}
 	p, e := planManagedReviewFragments(prepared.Context, 12, 2)
 	if e != nil {
 		t.Fatal(e)
@@ -175,7 +183,7 @@ func completedFragmentJournal(p managedReviewFragmentPlan, j managedFragmentJour
 		}
 		reply.Findings = append(reply.Findings, managedFragmentFinding{Artifact: i, Digest: a.Digest, Verdict: "inspected", Reason: "Fixture independent inspection", Evidence: string(excerpt), Needs: []string{}})
 	}
-	raw, _ = json.Marshal(reply)
+	raw, _ = marshalFragmentInspectionFixture(packet, reply)
 	j.Entries = append([]managedFragmentJournalEntry(nil), j.Entries...)
 	entry := &j.Entries[len(j.Entries)-1]
 	entry.State = "inspected"

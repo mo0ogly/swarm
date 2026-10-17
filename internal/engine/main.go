@@ -17,6 +17,7 @@ swarm version [--server URL_DE_SESSION] | swarm --version
 swarm init
 swarm skills list
 swarm project-profile show|check|list|select PROFILE|apply [--input profil.json]
+swarm memory list|admit-preview|admit|replace-preview|replace|withdraw-preview|withdraw|select-preview|select [--input demande.json]
 swarm doctor
 swarm role-model show|preview|apply <travail> [--input request.json]
 swarm task-model show|preview|apply <travail> [--input request.json]
@@ -27,6 +28,7 @@ swarm run-limits show|history <portée> <mission> <clé>
 swarm run-limits apply <portée> <mission> <clé> --input changement.json
 swarm run-limits rollback <portée> <mission> <clé> <révision_cible> --input requête.json
 swarm run-limits effective <mission> <rôle> <tâche>
+swarm trust confinement-check|identity-context|show|workload-login|workload-logout|oidc-start|oidc-finish|oidc-logout|oidc-session|oidc-backchannel-logout|config-preview|config-apply|mandate-create|mandate-revoke|request|approve|commit|reconcile|direct-write|elevate-integrity|export|anchor|verify
 swarm automation list|show|preview|create|enable|pause|archive|cancel|params
 swarm aide [sujet]
 swarm providers init|show
@@ -47,10 +49,12 @@ swarm control <travail> --input commande.json
 swarm agent start <travail> --input lancement.json
 swarm agent prepared <travail>
 swarm agent resume-launch <travail> --input reprise.json
+swarm agent context-preview <travail> --input lancement.json
 swarm agent preflight <travail> --input lancement.json
 swarm agent list <travail>
 swarm agent show|stop|reconcile <agent>
 swarm agent logs <agent> [après_seq] [--output nouveau.jsonl]
+swarm memory summary-source --input sources.json
 swarm exchange list <travail>
 swarm exchange send|consume <travail> --input requête.json
 swarm workspace status <travail>
@@ -124,6 +128,7 @@ func run(args []string, out, errOut io.Writer) int {
 	task := ""
 	phase := "delivery"
 	serverURL := ""
+	serverProvided := false
 	asJSON := false
 	pos := []string{}
 	for i := 0; i < len(args); i++ {
@@ -155,6 +160,7 @@ func run(args []string, out, errOut io.Writer) int {
 				phase = args[i]
 			case "--server":
 				serverURL = args[i]
+				serverProvided = true
 			}
 		default:
 			pos = append(pos, a)
@@ -180,13 +186,13 @@ func run(args []string, out, errOut io.Writer) int {
 			fmt.Fprintln(errOut, uiText("Erreur :"), uiEngineText(commandFailure(e).Message))
 		}
 		switch commandFailure(e).Code {
-		case "conflict", "revision_conflict", "preview_stale", "active_scope_conflict", "event_conflict", "idempotency_conflict", "terminal_target", "already_applied", "effect_started", "draft_conflict":
+		case "kernel_unavailable", "kernel_unqualified", "conflict", "revision_conflict", "preview_stale", "active_scope_conflict", "event_conflict", "idempotency_conflict", "terminal_target", "already_applied", "effect_started", "draft_conflict":
 			return 3
 		case "source_refused", "preparation_disabled", "authorization_required":
 			return 4
-		case "provider_unavailable", "method_unavailable", "workspace_wait":
+		case "containment_unavailable", "provider_unavailable", "method_unavailable", "workspace_wait":
 			return 5
-		case "interrupted", "uncertain_effect":
+		case "containment_timeout", "interrupted", "uncertain_effect":
 			return 6
 		case "operation_pending":
 			return 7
@@ -248,6 +254,21 @@ func run(args []string, out, errOut io.Writer) int {
 		if err := validateGraphDraftCLISyntax(pos); err != nil {
 			return fail(err)
 		}
+	}
+	if pos[0] == "trust" && len(pos) == 2 && strings.HasPrefix(pos[1], "secret-") && !serverProvided {
+		return fail(fmt.Errorf("courtier éphémère : --server requis ; aucun chargement dans le CLI local"))
+	}
+	if (pos[0] == "trust" || pos[0] == "process" || pos[0] == "evidence" || pos[0] == "laboratory") && serverProvided {
+		if e := runTrustRemoteCLI(pos, input, serverURL, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "evidence" && len(pos) == 2 && pos[1] == "verify" {
+		if e := runTrustEvidenceCLI(nil, pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
 	}
 	root, e := filepath.Abs(root)
 	if e != nil {
@@ -325,6 +346,36 @@ func run(args []string, out, errOut io.Writer) int {
 	}
 	if pos[0] == "run-limits" {
 		if e := s.runLimitsCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "laboratory" {
+		if e := s.laboratoryCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "evidence" {
+		if e := runTrustEvidenceCLI(s, pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "process" {
+		if err := s.trustProcessCLI(pos, input, out); err != nil {
+			return fail(err)
+		}
+		return 0
+	}
+	if pos[0] == "trust" {
+		if e := s.trustActionsCLI(pos, input, out); e != nil {
+			return fail(e)
+		}
+		return 0
+	}
+	if pos[0] == "memory" {
+		if e := s.projectMemoryCLI(pos, input, out); e != nil {
 			return fail(e)
 		}
 		return 0
@@ -618,6 +669,24 @@ func run(args []string, out, errOut io.Writer) int {
 
 // Main runs the Swarm command and exits with its CLI status.
 func Main() {
+	if len(os.Args) == 2 && os.Args[1] == "_kernel_observe" {
+		os.Exit(runKernelObserveChild(os.Stdin))
+	}
+	if len(os.Args) == 2 && os.Args[1] == "_kernel_fixture_exit" {
+		os.Exit(0)
+	}
+	if len(os.Args) == 2 && os.Args[1] == "_kernel_check" {
+		os.Exit(runTrustKernelCheckChild(os.Stdin))
+	}
+	if len(os.Args) == 2 && os.Args[1] == "_trust_laboratory" {
+		os.Exit(runLaboratoryChild(os.Stdin, os.Stdout))
+	}
+	if len(os.Args) == 2 && os.Args[1] == "_trust_secret" {
+		os.Exit(runTrustSecretChild(os.Stdin, os.Stdout))
+	}
+	if len(os.Args) == 2 && os.Args[1] == "_trust_sealed" {
+		os.Exit(runTrustSealedChild(os.Stdin, os.Stdout))
+	}
 	args, language, err := languageArgs(os.Args[1:])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

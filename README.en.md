@@ -6,7 +6,7 @@
 
 [Français](README.md) · [User guide](docs/en/USER-GUIDE.md) · [Installation](docs/en/INSTALL.md)
 
-Swarm is a local cockpit and CLI for organizing software work across AI agents.
+Swarm is a local cockpit and CLI for managing agentic workflows.
 It makes responsibilities, dependencies, attempts, evidence and blockers visible,
 so that several agents can collaborate without treating every completed process
 as a successful result.
@@ -59,7 +59,46 @@ The videos are sequences of real screenshots, with captions, rather than continu
 - Chain authorized tasks while enforcing dependencies, workspace reservations,
   budgets and validation policies.
 - Revise missions with a comparison and history rather than overwriting ongoing work.
+- Reuse verified experiences and procedures through explicit project memory selection.
 - Archive, restore, purge old logs or move mission data to recoverable trash.
+
+## Memory and identity
+
+An agentic workflow gains continuity when experience carries forward, and control
+when permissions are explicit. Swarm connects these dimensions to its
+**deterministic engine**: agents propose and perform work; the engine applies
+rules and retains decision history.
+
+**Project memory — available in the current sources.** An experience or procedure
+from verified lessons learned can be admitted, versioned and explicitly selected
+for a future task. The delivered context retains the lesson, its usage conditions
+and source references. Replacement and withdrawal preserve old versions and
+already delivered contexts. This makes verified knowledge reusable and explains
+why it was passed on, without granting the agent additional permissions.
+
+**Agent identity and authority — integration in progress.** The internal kernel
+checks the actor, its instance, the relevant plan, permissions and their
+delegation chain, including expiry and revocation. The goal is to reject
+impersonation and unauthorized agent creation, including creation by a legitimate
+agent. Integration with launchers, memory operations and protected human approval
+remains unfinished; these protections are not yet guaranteed across all public
+flows. Attested ownership and authorship, along with memory usage rights, are
+also part of that remaining work.
+
+**Value for workflow management:** carry learning across missions, make context
+handoffs reviewable and progressively govern who can act or delegate. Templates
+define the workflow; memory carries experience; identity and permissions delimit
+the intended actions. This approach serves development missions and the
+[business process target](docs/PRODUCT-ARCHITECTURE.md), where continuity,
+responsibilities and human approvals must remain explicit.
+
+For example, a verification procedure admitted after one mission can be selected
+for the next with its provenance. Its content does not grant an agent permission
+to create a worker or approve a business action.
+
+See [project memory](docs/en/PROJECT-MEMORY.md), the
+[identity contract and its limits](docs/en/AGENT-IDENTITY-CONTRACT.md) and the
+[memory integration plan](docs/plans/deepagents-integration/PLAN.md).
 
 ## From requirements to results
 
@@ -219,6 +258,8 @@ See the [repository map](docs/en/REPOSITORY-STRUCTURE.md) and the
 - [Authorize recovery and supply candidate sources to the reviewer](docs/en/ATTEMPT-RECOVERY.md)
 - [Storage diagnosis and exhausted attempts](docs/en/RUNTIME-RECOVERY.md)
 - [Methods: requirements, specifications, planning, audit, diagnosis and verification](docs/en/AGENT-METHODS.md)
+- [Project memory: experiences, procedures and selected versions](docs/en/PROJECT-MEMORY.md)
+- [Agent identity: authority, delegation and remaining integration](docs/en/AGENT-IDENTITY-CONTRACT.md)
 - [Agent reports, evidence delivery and linked decisions](docs/en/AGENT-COMMUNICATION.md)
 - [English interface validation](docs/en/I18N-VALIDATION.md)
 - [Technical reference](docs/en/REFERENCE.md)

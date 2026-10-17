@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-capacity-retry-9cd704fda16d",
+  "expected_revision": 373,
+  "task_id": "plan-68b50cc82e-T2",
+  "confirm_review_error_repair": true,
+  "reason": "Corriger uniquement la citation finale : les originaux qualifient le même candidat et restent inchangés. Lire le diagnostic attribué et copier exactement un extrait des originaux déjà visibles, y compris signes de patch et indentation ; distinguer le JSON capturé et une valeur interprétée. Garder unknown si une preuve reste insuffisante. Ne changer ni verdict pour contourner un défaut matériel, ni tentative, ni historique. Nouvelle reprise après correction vérifiée de la transmission des conventions et fenêtres exactes, opérateur et superviseur. Le précontrôle mesure désormais uniquement la sélection ou décision finale restante, après validation de tout l’historique ; le refus réel pour capacité est reproduit puis corrigé et testé, sans agrandir le transport."
+}

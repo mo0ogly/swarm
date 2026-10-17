@@ -1,0 +1,662 @@
+# Identité et autorité pendant tout le cycle de vie des agents
+
+Note de recherche du **16 octobre 2026, actualisée le 17 octobre**, préparatoire à un article et à un projet
+doctoral. Responsable du chantier : Codex, dans le développement direct autorisé.
+Ce document complète le programme scientifique existant ; il ne publie aucun
+article, ne lance aucune campagne et n'annonce aucune nouvelle protection livrée.
+
+## 1. Réponse et positionnement
+
+**Oui, des travaux portent déjà sur ce sujet, parfois très directement.**
+L'identité d'agent, la délégation vérifiable, le contrôle à chaque étape et la
+séparation entre raisonnement probabiliste et autorisation déterministe ont des
+antécédents scientifiques et industriels. Leur présence dans Swarm peut apporter
+une valeur opérationnelle importante ; elle ne suffit pas à établir une nouveauté
+scientifique.
+
+La question proposée est plus précise : **comment conserver et faire respecter
+la liaison entre principal, agent logique, instance exécutée, délégation,
+version du plan et action exacte, de la création à la reprise après incident,
+y compris pour les descendants, les accès mémoire et les effets incertains ?**
+Le bénéfice et l'originalité de cette composition restent à démontrer par
+comparaison, contre-exemples, analyse des hypothèses et mesures reproductibles.
+Un résultat négatif, une réplication ou une limite identifiée restent utiles.
+
+Trois formulations ont été comparées : « premier moteur déterministe » est
+contredit par les précédents ; « moteur dedans plutôt que dehors » confond
+placement et garantie ; **médiation vérifiable du cycle de vie, sous révocation,
+concurrence et reprise** fournit une question testable. C'est l'angle retenu ici,
+sans revendiquer à ce stade qu'aucun autre système ne le réalise.
+
+## 2. Ce que l'on compare réellement
+
+Un ordonnanceur organise dépendances, disponibilité, reprises et allocation.
+Une couche d'identité authentifie un principal et émet des moyens d'accès.
+Un point de décision évalue une politique ; un point d'application impose le
+résultat. Un même produit peut remplir plusieurs de ces rôles. Un workflow
+construit avec les mêmes contrôles doit être une condition de comparaison
+sérieuse, comme le dossier de facturation Swarm le reconnaît déjà.
+
+Le suivi visuel et les journaux fournissent de l'attribution ; ils ne bloquent
+pas à eux seuls une action. Un identifiant déclaré par un agent, un nom de rôle,
+un PID ou une empreinte de prompt ne prouve pas à lui seul qui exécute. Une
+identité authentifiée ne confère pas automatiquement le droit de créer un enfant,
+de déléguer, d'approuver une exception ou de transmettre une mémoire.
+
+Deux axes doivent rester distincts :
+
+| Axe | Question vérifiable |
+| --- | --- |
+| Placement | La décision vit-elle dans l'orchestrateur, une bibliothèque, un service ou une passerelle ? |
+| Médiation | Peut-on atteindre le lancement, le secret, la mémoire ou le système métier sans traverser un contrôle valide ? |
+| Continuité | Quel lien relie principal, instance, ancêtres, plan courant, preuve, décision et effet ? |
+| Temporalité | Que devient une décision après révocation, attente de verrou, redémarrage ou changement de candidat ? |
+| Intégrité | L'agent peut-il lire la clé de contrôle, modifier le registre ou restaurer un état ancien ? |
+| Preuve | S'agit-il d'une exigence, d'une annonce, d'un test local, d'une mesure runtime ou d'une reproduction indépendante ? |
+
+Un service extérieur au modèle peut être un passage obligatoire. Un moteur
+intégré reste contournable s'il laisse au fournisseur les clés, le registre ou
+une sortie réseau directe. Le placement ne démontre donc pas la supériorité.
+Une décision déterministe exige aussi des entrées authentifiées et versionnées ;
+elle ne rend ni le modèle ni le résultat du monde extérieur déterministes.
+
+## 3. Publications les plus proches
+
+Les statuts de lecture ci-dessous concernent cette actualisation. « Prépublication »
+signifie qu'aucune publication évaluée par les pairs n'a été vérifiée ici ; arXiv
+seul n'est pas une preuve de revue scientifique. Les résultats des auteurs n'ont
+pas été reproduits pendant cette recherche.
+
+| Référence primaire | Rapport précis avec le besoin | Lecture et statut vérifié |
+| --- | --- | --- |
+| South et al., **Authenticated Delegation and Authorized AI Agents**, 16 janvier 2025, [arXiv:2501.09674](https://arxiv.org/abs/2501.09674) | Autorité humaine déléguée à des agents, permissions bornées, attribution et identifiants d'instance ; extensions d'OAuth/OIDC et interactions entre agents. L'idée de filiation vérifiable existe déjà. | Résumé, introduction et sections de délégation du [texte v1](https://arxiv.org/html/2501.09674v1) consultés ; prépublication. |
+| Goswami, **Agentic JWT: A Secure Delegation Protocol for Autonomous AI Agents**, 16 septembre 2025, [arXiv:2509.13597](https://arxiv.org/abs/2509.13597) | Antécédent particulièrement proche : identité issue de la configuration, jetons d'intention, délégation chaînée, possession de clé par agent et liaison facultative à une étape du workflow. | [v1](https://arxiv.org/html/2509.13597v1), architecture et § VII consultés ; prépublication. L'auteur distingue prototype et évaluation complète future, et reconnaît notamment une difficulté TOCTOU pour les prompts dynamiques. Ni sa bibliothèque de confiance ni ses performances ne sont validées ici. |
+| Wang, Poskitt et Sun, **AgentSpec: Customizable Runtime Enforcement for Safe and Reliable LLM Agents**, prépublication du 24 mars 2025, [arXiv:2503.18666](https://arxiv.org/abs/2503.18666) | Règles à déclencheurs, prédicats et mécanismes d'application pendant l'exécution. Le contrôle déterministe des agents n'est pas nouveau. | Résumé consulté ; présence dans le [Research Track ICSE 2026](https://conf.researchr.org/details/icse-2026/icse-2026-research-track/29/AgentSpec-Customizable-Runtime-Enforcement-for-Safe-and-Reliable-LLM-Agents) vérifiée. |
+| Wang et al., **MI9: An Integrated Runtime Governance Framework for Agentic AI**, [arXiv:2508.03858](https://arxiv.org/abs/2508.03858) | Gouvernance pendant l'exécution : télémétrie, autorisation continue, conformité temporelle et confinement gradué. Contredit une opposition générale entre contrôle ponctuel existant et contrôle continu nouveau. | [v4 du 18 novembre 2025](https://arxiv.org/html/2508.03858v4), présentation et architecture consultées ; prépublication. Les traces synthétiques annoncées ne démontrent pas à elles seules le confinement d'un processus hostile réel. |
+| Kaptein, Khan et Podstavnychy, **Runtime Governance for AI Agents: Policies on Paths**, 17 mars 2026, [arXiv:2603.16586](https://arxiv.org/abs/2603.16586) | Formalise une politique dépendant de l'identité, du chemin partiel, de l'action proposée et de l'état organisationnel. La gouvernance du parcours a déjà une formulation explicite. | Résumé consulté ; prépublication. Reproduction de l'implémentation et lecture détaillée du modèle restent à faire. |
+| Debenedetti et al., **Defeating Prompt Injections by Design — CaMeL**, 24 mars 2025, [arXiv:2503.18813](https://arxiv.org/abs/2503.18813) | Séparation des flux de contrôle et de données, interprétation et capacités limitant les flux non autorisés. Antécédent pour les données et la mémoire ; périmètre différent de l'admission d'instances. | Résumé courant et [dépôt des auteurs](https://github.com/google-research/camel-prompt-injection) consultés. Aucun résultat chiffré recopié ici, aucune reproduction. |
+
+Il faut aussi lire les travaux déjà présents dans le dossier sur les effets
+compositionnels, le rejeu et la reprise : cette note n'en remplace pas les
+[fiches de lecture](fiches-lecture.md). Elle corrige surtout le risque de résumer
+les travaux voisins à des contrôles du seul dernier appel.
+
+### Recommandations collectives et standards
+
+Le document **Agentic Identity and Access Management** de
+[CoSAI](https://www.coalitionforsecureai.org/wp-content/uploads/2026/04/agentic-identity-and-access-control.pdf),
+approuvé le 20 mars 2026, recommande une identité par instance, des droits bornés
+et la visibilité des délégations. Il exige le contrôle à chaque saut et au dernier
+point d'application, plutôt qu'à la seule entrée. C'est un antécédent direct du
+besoin exprimé. Il s'agit d'un document de recommandations ; ses prescriptions
+ne constituent pas une mesure de l'efficacité d'un produit.
+
+Le [concept paper NCCoE/NIST de février 2026](https://www.nccoe.nist.gov/sites/default/files/2026-02/accelerating-the-adoption-of-software-and-ai-agent-identity-and-authorization-concept-paper.pdf)
+porte déjà sur identité et autorisation des agents. Une
+[mise à jour du 29 septembre 2026](https://www.nist.gov/news-events/news/2026/09/comments-software-and-agentic-ai-identity-concept-paper)
+annonce un premier cas d'usage de démonstration dans le développement logiciel.
+Ce cadrage et cette annonce ne sont ni une norme finale ni un résultat expérimental
+de Swarm.
+
+Les briques antérieures doivent être créditées :
+[RFC 8693, notamment § 4.1](https://www.rfc-editor.org/rfc/rfc8693)
+décrit l'échange de jetons et les acteurs délégués ;
+[RFC 9449](https://www.rfc-editor.org/rfc/rfc9449) définit DPoP.
+Une preuve de possession n'atteste pas à elle seule l'intégrité d'un processus
+compromis. Les mécanismes de protocole et leur bonne intégration restent deux
+objets de vérification distincts.
+
+## 4. Produits et infrastructures : comparaison prudente
+
+« Annoncé » décrit la documentation de l'éditeur ; **non établi** signifie que
+les sources consultées ne permettent pas de conclure, sans affirmer l'absence de
+la fonction. Aucun essai de ces produits, de leur API ou de leurs performances
+n'a été exécuté. Aucun score de sécurité comparatif n'est calculé.
+
+| Système identifié | Ce que la source primaire décrit | Ce qui reste non établi par cette recherche |
+| --- | --- | --- |
+| **TRUST OR**, [plateforme](https://www.trust-or.com/platform/) et [architecture](https://www.trust-or.com/architecture/) | Identités avec propriété et cycle de vie, contrôles d'autorité/contexte, politiques signées et application locale entre agent et système métier ; traces de décision et d'effet. Le site décrit aussi une boucle d'amélioration. | Admission de chaque processus fournisseur, ancrage instance/processus, création hors plan, courses de révocation, crash entre réservation et lancement, résistance au contournement par le fournisseur : non vérifiés. L'interruption immédiate est une annonce à éprouver, surtout pour un effet déjà engagé. |
+| **AgentRail**, domaine **agent-rail.dev**, [produit](https://agent-rail.dev/product) et [présentation](https://agent-rail.dev/what-is-agentrail) | Les pages indexées décrivent identité, graphe de délégation, atténuation des droits, autorisation par action et reçus signés. Elles indiquent une réévaluation à chaque requête. Révocation descendante et plusieurs réponses actives sont marquées « Roadmap » dans la version indexée consultée. | Les ouvertures directes renvoient un texte très réduit : détails obtenus par l'index de recherche, à reconfirmer sur une version datée exportable avant soumission. Les démonstrations et valeurs illustratives ne prouvent ni disponibilité ni performance. Aucun lien avec le dépôt homonyme `oxnw/agentrail` n'a été établi. |
+| **Microsoft Entra Agent ID**, [création de blueprint](https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/create-blueprint) et [création d'identité](https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/create-delete-agent-identities) | Blueprints, création d'identités d'agents, propriétaires/sponsors et autorisations de création. Autre antécédent concret de l'identité gouvernée et de la responsabilité. | Liaison obligatoire à chaque transition d'un plan Swarm, effets incertains et preuves liées à un candidat : non établis par ces pages. Statut des fonctions et modalités de déploiement à figer à la date d'une comparaison pratique. |
+| **SPIFFE/SPIRE**, [concepts et attestation](https://spiffe.io/docs/latest/spire-about/spire-concepts/) | Identité de workloads, attestation du nœud et du processus à partir de sélecteurs et émission de SVID. Antécédent et brique possible pour l'ancrage d'exécution. Les « SPIRE Agents » désignent ici un composant d'infrastructure. | Ne pas en déduire une autorité métier, une approbation humaine ou une conformité au plan : ce sont des contrôles à composer et à vérifier au-dessus. Aucun déploiement SPIRE testé ici. |
+| **Temporal**, [configuration du service](https://docs.temporal.io/references/service-configuration) et [sécurité](https://github.com/temporalio/documentation/blob/main/docs/production-deployment/self-hosted-guide/security.mdx) | L'orchestrateur dispose de mécanismes d'authentification et d'un `Authorizer` configurable. Il serait faux d'assimiler tous les workflows à une absence de contrôle d'accès. | Une décision sur l'API du service n'établit pas à elle seule le contrôle de tous les effets d'un worker ni l'identité de chaque agent LLM qu'il héberge. L'intégration complète doit faire partie de la comparaison. |
+
+Cette recherche trouve donc **des systèmes qui abordent déjà le sujet**, pas la
+preuve que Swarm serait seul à le faire. Une future comparaison commerciale
+devra solliciter des contrats techniques reproductibles, sans assimiler un
+silence documentaire à une faiblesse du concurrent.
+
+## 5. Architecture cible et schémas
+
+Les trois figures représentent une **cible**, pas l'état de sécurité actuel.
+Sources Mermaid versionnées et SVG exportables sont conservés ensemble dans
+[`figures/`](figures/identites-mediation.mmd). Le contrat sémantique demeure
+[IA2](../../../plans/actions-confiance/identites-agents-contrat-IA2.md).
+
+### Figure 1 — Médiation obligatoire et frontière de confiance
+
+![Architecture cible : les propositions passent par une autorité protégée et des points d'application.](figures/identites-mediation.svg)
+
+Le superviseur prend les décisions relevant de son mandat ; le moteur valide
+schéma, droits, fraîcheur et réservations, puis applique la décision autorisée.
+Une exception exige la personne habilitée et la proposition exacte. Le journal
+n'est pas une autorité indépendante : il conserve aussi les refus et incertitudes.
+Le trait pointillé désigne un accès direct à retirer puis à tester, pas un chemin
+autorisé. Une sonde fournisseur ne doit pas précéder l'admission de sa demande.
+Les clés, le registre et la configuration d'autorité restent hors d'atteinte de
+l'agent selon un modèle de menace explicite.
+
+### Figure 2 — Filiation logique, instances et autorité effective
+
+![Architecture cible : principal, délégation, agent logique, instances et enfant autorisé.](figures/identites-filiation.svg)
+
+L'agent logique survit à une tentative ; chaque nouvelle instance possède son
+ancrage et son histoire. Un descendant ne gagne pas de droits par son seul lien
+de parenté. Révoquer une délégation retire les droits qui en dérivent ; un mandat
+indépendant éventuel doit être explicitement vérifié. Une nouvelle instance ne
+récupère pas implicitement les accords de l'ancienne. La révocation peut bloquer
+les opérations contrôlées futures ; elle ne retire pas une connaissance déjà lue
+et n'annule pas magiquement un effet externe engagé.
+
+### Figure 3 — Amélioration autorécursive sous contrôle
+
+![Boucle cible : découverte, qualification, décision autorisée, vérification et transmission de l'apprentissage.](figures/identites-amelioration.svg)
+
+Cette boucle prend en charge les anomalies et les améliorations utiles, y compris
+celles de la méthode et du moteur. L'amélioration reste proposée, réalisée puis
+vérifiée : conserver une idée ne démontre pas son effet. Une correction peut
+créer un incident lié ; le diagnostic revient alors à la cause et au besoin initial.
+La boucle ne confère aucun droit de modifier sa propre autorité ou de dépasser
+les budgets. Les changements de politique suivent une version, une décision
+autorisée et des vérifications avant application.
+
+L'apprentissage par retour d'expérience a également des précédents :
+[Reflexion, NeurIPS 2023](https://papers.nips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf)
+utilise des retours verbaux mémorisés pour améliorer les essais suivants. Le
+point à étudier ici est la **sûreté de la modification et de sa transmission**,
+pas l'invention de l'auto-amélioration. Une comparaison avec les architectures
+autonomiques MAPE-K reste à compléter par une lecture primaire vérifiée avant
+d'en tirer une revendication détaillée.
+
+### Suivre une identité dans l'interface du workflow
+
+Une vue cible doit relier graphe de tâches et graphe d'autorité, avec une frise
+temporelle consultable pour chaque instance. Afficher : émetteur et sujet du
+principal, agent logique, instance, propriétaire responsable, auteur d'une
+contribution, parent vérifié, délégation et versions du plan/de la politique,
+création autorisée ou refusée, révocation, arrêt demandé/confirmé et effets en
+attente de réconciliation. Les secrets et jetons bruts sont exclus.
+
+Le propriétaire, l'auteur et le détenteur d'un droit d'usage peuvent être trois
+personnes ou entités différentes. Pour chaque mémoire : lecture, résumé et
+transmission sont des opérations distinctes à autoriser. Une trace historique
+ne prouve pas un droit présent ; l'interface doit montrer explicitement un lien
+absent ou non vérifié. Ce parcours et ces champs sont une proposition de
+recherche, **sans nouvel écran ni schéma de stockage livré ici**.
+
+## 6. Modèle minimal à formaliser
+
+Soient `p` un principal authentifié, `a` un agent logique, `i` une instance,
+`d` une délégation, `v` les versions applicables, `x` une opération exacte et
+`s` l'état observé au point d'engagement. Une condition nécessaire proposée est :
+
+```text
+Permettre(p,a,i,d,v,x,s) implique :
+  liaison authentique(p,a,i) et ancrage_exécution_valide(i)
+  et délégation_valide_et_non_révoquée(d,s)
+  et x dans les droits effectifs(p,a,i,d,v,s)
+  et (conforme_au_plan(x,v,s) ou exception_humaine_exacte_valide(x,v,s))
+  et preuves_fraîches_et_liées(x,i,v,s)
+  et contraintes_et_réservations_valides(x,s).
+```
+
+C'est un **schéma de spécification**, pas un protocole cryptographique ni une
+preuve de suffisance. Les vérifications doivent porter sur des faits de confiance,
+pas sur les affirmations du modèle. Une décision liée à une action doit borner
+ressources, paramètres, audience, durée, réutilisation et contexte applicable.
+
+Invariants candidats :
+
+1. **Admission complète.** Toute activation fournisseur concernée et toute
+   opération protégée ont un principal, une instance et une autorité vérifiés.
+2. **Atténuation.** Les opérations permises à un enfant sont incluses dans celles
+   explicitement déléguées, sous les politiques applicables ; le droit de déléguer
+   et celui de créer sont eux-mêmes contrôlés.
+3. **Exactitude et séparation.** Une exception humaine ne couvre que la proposition
+   approuvée ; un agent, service ou cookie partagé ne devient pas un humain habilité.
+4. **Révocation concurrente.** Après le point d'engagement autorisé de la révocation,
+   aucun nouvel engagement contrôlé ne consomme le droit retiré. Il faut définir
+   cet ordre pour le lancement OS et les systèmes externes, pas seulement SQLite.
+5. **Reprise fidèle.** Rejeu, redémarrage et réponse perdue ne créent ni instance
+   ni effet supplémentaire ; un effet incertain déclenche réconciliation avant
+   toute décision de reprise pouvant le répéter.
+6. **Intégrité de l'autorité.** Un fournisseur hostile ne peut altérer le registre,
+   les clés, les règles ou l'ancre de fraîcheur dans le modèle de menace retenu.
+
+Le périmètre minimal comprend injection de consignes, fournisseur hostile dans
+son confinement, copie de jeton valide, fausse filiation, restauration d'état,
+concurrence et crash. Un administrateur hôte tout-puissant reste hors garantie
+tant qu'aucune frontière externe appropriée n'est démontrée. Ni l'attestation
+ni la signature n'établissent l'intention réelle d'un modèle ou la véracité
+d'une donnée métier. Les transitions internes du raisonnement non observables
+ne sont pas promises comme médiatisées.
+
+## 7. Protocole scientifique proposé — non exécuté
+
+### Questions et hypothèses réfutables
+
+| ID | Question / hypothèse de travail | Ce qui la réfuterait ou limiterait |
+| --- | --- | --- |
+| QR-ID1 / H-ID1 | Une identité ancrée et une autorité vérifiée à la création et aux transitions réduisent les créations et opérations non autorisées par rapport à une garde finale seule. | Contournement à une frontière annoncée, ou résultat identique avec la garde finale pour les attaques réellement discriminantes. |
+| QR-ID2 / H-ID2 | La composition admission–révocation–reprise conserve les invariants en concurrence et après crash. | Départ après révocation linéarisée, ancien accord réactivé ou effet répété après une réponse perdue. |
+| QR-ID3 / H-ID3 | Un même dossier de preuves permet d'attribuer correctement demande, délégation, décision et effet, sans confondre auteur et propriétaire. | Liens erronés, événements manquants ou désaccord humain persistant sur l'attribution. |
+| QR-ID4 / H-ID4 | L'amélioration autorécursive conserve droits, besoin initial et preuves tout en corrigeant les incidents liés. | Auto-extension des droits, perte d'une exigence, répétition inchangée ou amélioration présentée comme vérifiée sans effet observé. |
+
+### Conditions à comparer
+
+| Condition | Construction et objet isolé |
+| --- | --- |
+| B0 — ordonnanceur instrumenté | Graphe et reprise avec authentification du service explicitement décrite, sans les contrôles d'agent ajoutés. Baseline expérimentale construite ; aucune assimilation à tous les produits. |
+| B1 — garde d'action | Même fournisseur et même métier, identité/autorisation au point d'action critique. Mesure de l'apport des contrôles antérieurs. |
+| B2 — autorisation à chaque opération | Identité et délégation vérifiées aux opérations exposées ; intégration et hypothèses documentées. Peut employer des standards existants. |
+| B3 — workflow avec contrôles équivalents | Même admission, atténuation, isolation, révocation, preuves et reprise que la proposition. Vérifie si la composition apporte plus qu'un workflow correctement sécurisé. |
+| S — cible Swarm | Composition décrite en § 5–6, seulement lorsque réalisée et qualifiée. Comparaison d'architecture, pas attribution de toutes les briques à Swarm. |
+
+Ablations sur S : retirer séparément l'ancrage d'instance, le contrôle de création,
+la propagation de révocation, le lien à la version exacte et la réconciliation.
+Une ablation retire une protection **uniquement dans des fixtures isolées**.
+Une intégration reproductible d'Agentic JWT ou d'un contrôle comparable serait
+un comparateur plus informatif qu'une réimplémentation volontairement faible.
+Les produits propriétaires sont comparés sur contrat public disponible ; aucun
+comportement ne leur est attribué par simulation.
+
+### Corpus, oracles et mesures
+
+Reprendre les **IDA-01–18** et variantes **COV-ID-01–06** du
+[contrôle de couverture](../../../plans/actions-confiance/verification-identites-agents-20261016/COUVERTURE-RISQUES.md).
+Associer chaque cas à un invariant, une attaque, un contrôle positif autorisé et
+un oracle externe au discours de l'agent. Ajouter des charges valides et invalides,
+un second domaine métier, les instants de crash et les deux ordres de course.
+
+Mesurer séparément : créations interdites effectivement lancées ; opérations et
+effets interdits observés ; refus de demandes légitimes ; descendants conservant
+un droit révoqué ; latence décision/engagement/arrêt observé ; doublons et effets
+incertains ; complétude et exactitude de l'attribution ; coût CPU/mémoire et durée
+de bout en bout. Pour la mémoire, tester lecture, résumé, exfiltration et
+transmission au véritable consommateur, y compris après reprise.
+
+Pré-enregistrer avant la campagne le modèle de menace, les scénarios, les
+exclusions, les oracles, les tailles d'échantillon justifiées par un pilote et
+les intervalles d'incertitude. Distinguer essais indépendants et exécutions d'un
+même template ; zéro succès d'attaque observé ne prouve pas l'absence universelle
+de vulnérabilité. Publier versions, empreintes, configurations non secrètes,
+sorties originales, échecs du banc et résultats par scénario, sans moyenne
+masquant un invariant en défaut.
+
+Commencer par fournisseurs scriptés et exploration déterministe des courses ;
+un modèle d'états exécutable peut ensuite explorer de petites instances.
+Les essais avec modèles réels, plusieurs fournisseurs et évaluation indépendante
+constituent une étape distincte à autoriser et budgéter. Aucun nombre d'essais
+ni coût nouveau n'est adopté par cette note.
+
+## 8. État réel de Swarm et preuve disponible
+
+| Élément | État documenté les 16 et 17 octobre 2026 | Limite |
+| --- | --- | --- |
+| Audit IA1 | [Rapport et recette reproductible](../../../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md) : sept constats F01–F07 sur fixtures CLI/API et fournisseur scripté. | Aucun des sept défauts n'est corrigé par ce travail documentaire. Les tests portent sur les sources/binaire identifiés dans leurs preuves. |
+| Couverture identité | 18 scénarios : 4 FAIL, 4 PARTIAL, 10 NOT TESTED dans la matrice historique IA1. | Titres et variantes ne constituent ni exhaustivité ni qualification complète. |
+| Contrat IA2 | [Contrat sémantique](../../../plans/actions-confiance/identites-agents-contrat-IA2.md), onze critères et cible de révocation des droits dérivés ; [contrat concret FR/EN](../../../architecture/AGENT-IDENTITY-CONTRACT.md). | Noyau privé réalisé ; source d'autorité protégée, protocole d'engagement et raccord aux consommateurs non réalisés. IA2 entier reste ouvert. |
+| Noyau Go IA2.2 | [Rapport et originaux](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/RAPPORT-IA2.2.md) : 16 tests racine et 84 sous-tests du noyau, plus 14 contrôles existants, soit 114 noms exécutés et réussis ; analyse statique et compilation réussies. Deux défauts introduits sont reproduits avant correction. | Contexte d'instance et cadre d'autorité de fixture ; aucun lanceur raccordé, aucun effet métier. Ces 114 noms ne sont pas 114 attaques ni 114 scénarios indépendants. |
+| Canal d'instance IA2.3 | [Expérience Linux et schéma](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md) : 13 contrôles réussis, dont transfert réel d'une connexion B à A, attribution du message à A et refus de l'identité B déclarée. | Programme Python séparé, deux cages, registre et révocation en mémoire. Aucun message transmis au noyau Go. Pas de fournisseur réel, de redémarrage, d'autorité persistante ou de garantie contre l'administrateur hôte. |
+| Essai d'isolation | [Résultats IA2](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-isolation-initial/results.json) : dix variantes bloquées dans une expérience Bubblewrap séparée ; écriture du workspace autorisée et contrôles inchangés. | Réseau coupé et programme de sonde ; pas de fournisseur réel, pas d'intégration au lanceur, pas de preuve de l'ensemble du contrat. F07 reste ouvert dans le moteur. |
+| Canal Go IA2.3a | [Rapport, schémas et originaux](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md) : attribution réelle raccordée au noyau interne, 133 noms de tests/sous-tests PASS dont 19 nouveaux ; les mêmes 19 passent sous `-race`. Une expiration pendant l'attente du registre est reproduite avant correction. | Table privée en mémoire, octrois et cadre d'autorité de fixture ; aucun lanceur ou serveur raccordé. Le portage ne ferme pas F01–F07 et ne constitue ni mesure comparative ni preuve d'originalité. |
+| Source durable IA2.3b | [Rapport et schémas](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md) : journal SQLite, tête Trust distincte, publication récupérable et révocation durable reliée à une cage réelle ; 181 noms ciblés réussis, dont 33 du registre, avec 52 répétitions sous `-race`. | Permis/checkpoint de contrôle émis par fixtures ; aucun témoin externe ou émetteur humain déployé, aucun lanceur public raccordé. Le protocole ne prouve ni atomicité d'un effet métier ni nouveauté scientifique. |
+| Liaison au plan IA3a | [Rapport et preuves](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-plan-binding-20261017/RAPPORT-IA3a.md) : contrat enregistré, projection v1 et génération transactionnelle ; retour au contenu ancien refusé ; course pendant le verrou runtime reproduite puis sérialisée. 232 noms ciblés réussis, dont 32 pour le plan. | Pas d’adoption humaine attestée, de preuve d’appartenance de la création ou de lancement public. Le témoin indépendant doit aussi couvrir le watermark du plan ; une tête d’identité seule ne le fait pas. Coût de sérialisation non mesuré. |
+| Amélioration autorécursive | Préférence persistée dans les consignes personnelles et communes, transmission aux contextes embarqués couverte par des tests locaux. | Une consigne et son test de construction ne démontrent ni réception par toute session future ni boucle autonome réparant effectivement tous les incidents. |
+| Mémoire | Dépendance IA4 vers le chantier mémoire conservée. | Propriété, auteur et droits de consultation/résumé/transmission ne sont pas livrés par cette note. |
+
+Les campagnes historiques de facturation du dossier existant restent dans leur
+périmètre. Leurs résultats ne prouvent pas la sécurité des identités. Cette
+actualisation ne redéploie pas de binaire et ne requalifie pas le serveur actif.
+
+### Apport expérimental local et portée scientifique
+
+Le cas de connexion transférée matérialise une limite précise : l'identité du
+pair à l'ouverture ne suffit pas à attribuer tous les messages ultérieurs.
+Dans cette expérience, `SO_PEERCRED` conserve B tandis que `SCM_CREDENTIALS`
+désigne l'émetteur A. Le contrôle par message, combiné aux namespaces PID/montage
+épinglés avant l'exécution, refuse cette usurpation. Cette distinction entre
+connexion et message est une propriété du mécanisme employé, pas une invention
+revendiquée. Son exploitation dans le futur protocole Swarm reste à vérifier.
+
+La sonde de bootstrap révèle aussi un namespace utilisateur différent entre
+le processus annoncé et le programme final. Le prototype utilise seulement
+les attributs PID/montage observés stables. Trois tentatives de rejoindre les
+namespaces de B depuis A, avec de vrais descripteurs copiés, échouent avec
+`EPERM` sur cet hôte. Cela ne prouve ni l'absence de toute autre évasion ni la
+portabilité de cette frontière.
+
+Ces contre-exemples et corrections fournissent du matériel de réplication et
+des obligations d'intégration. Ils ne démontrent encore ni supériorité sur
+Trust-OR, AgentRail ou les approches publiées, ni nouveauté scientifique, ni
+bénéfice mesuré sur une population de workflows. Le protocole de la section 7
+reste à exécuter ; aucun résultat de latence, de coût, de disponibilité ou
+d'amélioration autonome n'est déduit des contrôles de composant.
+
+## 9. Préparation de l'article et du projet doctoral
+
+**Titre de travail :** *Médiation de l'identité et de l'autorité dans le cycle de
+vie des agents : création, délégation, révocation et reprise vérifiables.*
+
+**Résumé de projet — sans résultats anticipés.** Les agents peuvent créer des
+descendants, partager des informations et reprendre une activité après incident.
+Ces transitions déplacent l'autorité avant même un appel métier critique. Des
+travaux existants fournissent identité, délégation et contrôle à l'exécution ;
+leur composition avec l'ancrage des instances et la reprise demeure un objet à
+évaluer sous un modèle de menace explicite. Ce projet étudie cette composition
+au moyen d'un modèle d'états, d'une implémentation traçable et d'un corpus
+d'attaques, de courses et de crashs. L'évaluation comparera garde finale,
+autorisation par opération et workflow avec contrôles équivalents. Les critères
+porteront sur les opérations réellement empêchées, les refus injustifiés,
+l'attribution, les effets incertains et le coût. Un audit initial de Swarm met
+en évidence des raccordements manquants ; il motive l'étude sans constituer la
+preuve de la solution.
+
+Structure conseillée : problème et menace ; travaux liés ; modèle et invariants ;
+architecture et frontières ; implémentation avec état réel ; protocole et ablations ;
+résultats à produire ; limites et réplication ; discussion. Le volet autorécursif
+peut constituer une deuxième étude du projet doctoral, pour éviter d'attribuer
+à une seule expérience des bénéfices d'identité et d'apprentissage non isolés.
+
+Les contributions candidates sont : un contrat de composition précisément
+délimité ; des contre-exemples et régressions reproductibles aux frontières ;
+une comparaison isolant les mécanismes, avec résultats négatifs et coûts.
+Une simple juxtaposition de briques connues ne suffit pas : il faut établir une
+propriété nouvelle, un problème d'intégration jusque-là mal caractérisé, ou une
+évaluation apportant une connaissance réutilisable.
+
+Avant une soumission : compléter les lectures intégrales prioritaires, rechercher
+les travaux plus récents et les citations croisées, figer les versions des
+sources et les contrats produits, réaliser les contrôles manquants, mener le
+protocole, puis obtenir une relecture scientifique indépendante. Aucun lieu,
+calendrier, auteur supplémentaire ou encadrement doctoral n'est présumé.
+
+## 10. Méthode de recherche, améliorations et suites
+
+Recherche exploratoire web le 16 octobre 2026, à partir des noms Trust-OR /
+AgentRail puis des expressions `agent identity workflow delegation`,
+`runtime governance`, `Agentic JWT`, `AgentSpec`, `CaMeL`, `MI9` et des sites
+CoSAI, NIST, Microsoft, SPIFFE, IETF et Temporal. Sélection : proximité avec
+identité/délégation/cycle de vie, source primaire accessible, apport distinct.
+Les résultats de recherche secondaires ont servi de pistes, pas de preuves
+techniques. Les homonymes ont été séparés. Ce n'est pas une revue systématique
+exhaustive ni une garantie d'absence d'un concurrent ou article plus proche.
+
+| ID | Origine et valeur attendue | Décision, propriétaire et critère observable | État / reprise |
+| --- | --- | --- | --- |
+| SCI-ID-01 | Demande utilisateur ; éviter une revendication de priorité fausse. | Codex : intégrer identité/délégation et gouvernance de parcours au dossier existant. Critère : sources primaires, limites et liens depuis le plan. | Réalisé par cette actualisation ; vérifications documentaires conservées. Originalité scientifique non établie. |
+| SCI-ID-02 | Recherche AgentRail : détail indexé différent du texte directement accessible. | Codex : conserver cette limite ; obtenir une documentation datée exportable avant comparaison de fonctions livrées. | Ouvert pour l'étude comparative ; aucune absence de fonction déduite. |
+| SCI-ID-03 | Besoin de suivi dans le workflow ; rendre visible filiation et autorité actuelle. | Codex pour le contrat identité, chantier mémoire pour les usages : définir un parcours et tester liens exacts, droits et révocation avec preuves runtime. | Cible décrite, développement et vérification non réalisés ; dépend de IA2/IA3/IA4. |
+| SCI-ID-04 | Lecture CaMeL : le chapitre et la fiche citaient 77 % / 84 % sans passage justificatif. | Codex : vérifier une version datée et corriger les deux consommateurs. Le résumé v1 du 24 mars 2025 confirme 67 % ; cause de l'ancienne citation non établie. | Correction documentaire vérifiée contre la source primaire ; ancienne formulation conservée ici et dans les préimages. Résultats Swarm inchangés, aucune expérience CaMeL reproduite. |
+| SCI-ID-05 | Demande d'amélioration autorécursive ; éviter l'auto-autorisation et la dérive de politique. | Codex : examiner les précédents, spécifier et tester modification, validation, application et transmission des apprentissages. | Figure et hypothèse QR-ID4 proposées ; effet autonome non démontré. Reprise après définition du protocole et des droits concernés. |
+| SCI-ID-06 / IA2-K01 | Test du noyau : contexte d'appelant mis en cache ; prévenir un rejeu avec identité périmée. | Codex : résolution fraîche sous verrou avant décision/rejeu. Critère : refus du contexte réutilisé et du rejeu après logout. | Correction vérifiée localement, échec initial conservé dans le rapport IA2.2 ; raccord applicatif restant. |
+| SCI-ID-07 / IA2-K02 | Deux projets aux mêmes noms/jetons de fixture ; empêcher le transfert d'un cadre ou reçu entre projets. | Codex : lier appelant, cadre et reçu au projet réellement ouvert. Critère : refus du cadre et du reçu de l'autre Store. | Correction vérifiée localement ; contexte par racine canonique, identité durable entre hôtes et migration restant à définir. |
+| SCI-ID-08 | Connexion B réellement copiée vers A ; conserver l'attribution malgré le transfert de descripteur. | Codex : distinguer pair de connexion et émetteur du message ; conserver cette attaque pour le futur courtier Go. Critère : refus attribué à A, sans faire confiance au nom déclaré. | Vérifié dans le prototype isolé ; intégration, persistance et qualification globale ouvertes. |
+| SCI-ID-09 | Sonde de bootstrap : attribut de namespace instable ; prévenir un rejet du programme légitime ou un ancrage choisi par l'agent. | Codex : épingler avant exécution des objets observés stables et tester les tentatives de rattachement. Critère : A/B légitimes reconnus et joins adverses refusés dans le périmètre annoncé. | Vérifié sur cet hôte pour PID/montage ; autres lanceurs/plateformes non qualifiés. |
+| SCI-ID-10 | Relecture du validateur : syntaxe des jokers appliquée à tort aux émetteurs/sujets opaques ; préserver les identités valides. | Codex : réserver cette interdiction aux ressources de permission. Critère : émetteur IPv6 et sujet avec crochets conservés. | Test après correction réussi ; pas de test rouge exécuté avant cette correction. Ne pas présenter la relecture comme une reproduction. |
+| SCI-ID-11 / IA2-K03 | Revue du canal Go : le temps lu avant l'attente du registre permet une décision après expiration ; préserver la fraîcheur à la vraie frontière de décision. | Codex : lire l'heure après les attentes et les lectures de namespaces. Critère : accord initial avec horloge réelle, refus si l'octroi expire pendant l'attente observée du registre. | Échec avant correction et réussite après conservés dans IA2.3a ; 19 contrôles du canal passent aussi sous `-race`. Engagement/effet et audit des autres frontières restent ouverts. |
+| SCI-ID-12 / IA2-D01 | Lecture du contrat durable : rename sans synchronisation du répertoire ; éviter une promesse de persistance insuffisante. | Codex : ouvrir le parent avant mutation et synchroniser après rename, erreurs explicites. Critère : refus sans mutation si parent non synchronisable ; remplacement correct et privé. | Échec initial et passages après conservés ; aucune panne électrique ou défaillance matérielle reproduite. |
+| SCI-ID-13 / IA2-D02 | Source durable : champ précédent absent conservé lors du décodage dans un objet réutilisé ; préserver chaque original indépendant. | Codex : décoder chaque maillon dans un objet neuf. Critère : chaîne à plusieurs versions, reprise et révocation restent lisibles. | Échecs initiaux puis contrôles réussis ; le décodeur commun garde son contrat, sans changement global de sémantique des champs absents. |
+| SCI-ID-14 / IA2-D03 | Revue du publiant : FK vérifié après intention, alors que le travail peut être absent ; éviter une intention irrécupérable sur entrée invalide. | Codex : vérifier le travail sous réservation avant décision durable. Critère : refus explicite sans mutation Trust/journal. | Contre-exemple avant correction et réussite après conservés. |
+| SCI-ID-15 / IA2-D04 | Lecture sur connexion ouverte après changement de version ; préserver le contrat de stockage au consommateur. | Codex : garde de version dans la transaction de lecture, avant production de cadre. Critère : version incompatible refusée avec motif exact. | Échec avant puis réussite après ; admission publique et engagement d'effet restent ouverts. |
+| SCI-ID-16 / IA3-P01 | Raccord du registre : scope arbitraire, absence de plan et contrat changé acceptés ; éviter qu’une empreinte déclarée tienne lieu de plan courant. | Codex : source commune des contrats enregistrés, publication et lecture dans le même instantané SQLite. Critère : trois refus exacts sans mutation. | Échecs avant correction et contrôles après conservés ; enregistrement ne prouve ni humanité de l’adoption ni appartenance d’une création. |
+| SCI-ID-17 / IA3-P02 | Première correction : modifier puis restituer le contenu réactive l’ancienne portée ; conserver la génération, pas seulement le hash présent. | Codex : stamp transactionnel à chaque écriture Work, rollback et retour au contenu ancien après réouverture. | Contre-exemple puis garde réussie ; une restauration physique de toute la base reste soumise au témoin indépendant. |
+| SCI-ID-18 / IA3-P03 | Les RawMessage gardent l’ordre imbriqué ; une projection annoncée canonique change selon la mise en forme. | Codex : trier récursivement les clés avec `UseNumber`, garder champs inconnus et grands entiers distincts. | Échec initial puis variantes réussies ; cela prouve la représentation testée, pas une normalisation universelle de tous les nombres JSON. |
+| SCI-ID-19 / IA3-P04 | Analyse de restauration : la tête d’identité peut rester inchangée pendant un amendement du plan. | Codex/opérateur : le futur témoin doit couvrir aussi le watermark du plan. Critère : ancien SQLite/stamp refusé même sans publication d’identité intermédiaire. | Exigence ouverte, déduite du modèle de reprise ; aucun témoin externe déployé ni essai de restauration physique présenté comme corrigé. |
+| SCI-ID-20 / IA3-P05 | Course sur cage réelle : plan changé après lecture SQL pendant l’attente runtime ; le temps frais ne rafraîchit pas le plan. | Codex : conserver la réservation d’écrivain SQLite pendant la décision pure sous ordre Trust → SQLite → runtime. Critère : modification sérialisée et ancienne portée refusée ensuite. | Échec observé puis garde réussie ; pas d’engagement de lancement, coût de concurrence et comparaison expérimentale restant à mesurer. |
+
+| SCI-ID-21 / IA3b-I01/I02 | Composition émetteur/publiant : permis transférable à une autre session du même humain et autorité expirée pendant SQL acceptée. | Codex : lier la session d'émission, borner l'échéance, revérifier après attente et avant intention ; garder la reprise historique exacte distincte. | Deux échecs initiaux et réussite après conservés ; OIDC local signé réellement exercé, enrôlement protégé encore de fixture. Aucun effet public qualifié. |
+| SCI-ID-22 / IA3b-I03 | Relecture du nouvel émetteur : présence du travail révélée avant vérification d'une identité absente, locale ou non enrôlée. | Codex : contrôle avant SQL puis réauthentification après attente, comparaison au plan courant et refus sans mutation. | Trois variantes reproduites avant correction ; résultat final et sources figées dans le rapport IA3b. La sécurité des API existantes reste ouverte. |
+| SCI-ID-23 / IA3b-I04 | Traçabilité : la tête garde le principal mais pas le reçu complet de l'enrôlement/émission, encore éphémère. | Codex : conserver le reçu vérifiable avec le futur témoin/enrôlement, avant raccord public ; aucun jeton brut. | Découverte par inspection, exigence ouverte ; une empreinte syntaxiquement valide ne prouve ni enrôlement ni non-révocation courante. |
+
+Les consignes permanentes portent déjà la boucle découvrir → qualifier →
+conserver → décider → réaliser/transmettre → vérifier → réexaminer → capitaliser.
+Les lignes ci-dessus en sont une application tracée dans cette session, pas une
+preuve qu'un moteur la réalise seul. Elles n'ajoutent aucun droit, appel payant
+ou suivi récurrent. Les prochains consommateurs doivent lire le contrat et ses
+limites ; la présence des fichiers ne prouve pas leur réception effective.
+
+La suite d'implémentation reste le [plan identité partagé](../../../plans/actions-confiance/identites-agents-replan.md),
+sans déplacer ses exigences ni annoncer IA3 terminé. La mise en forme de cette
+note clôt uniquement la demande de documentation et de positionnement initial.
+
+Les [contrôles documentaires et leurs limites](../dossier-recherche/revisions/evidence/20261016-identites-cycle-vie/verification.json)
+conservent empreintes, commandes de rendu, corrections de méthode et source
+primaire de la correction CaMeL. Les trois SVG ont été rendus puis inspectés
+visuellement ; les liens locaux et les espaces de fin de ligne sont vérifiés.
+Ces contrôles ne constituent pas une qualification du moteur ni une revue
+scientifique indépendante.
+
+Pour l'actualisation du 17 octobre, les preuves locales, sources figées, commandes,
+sorties et schémas sont reliés aux rapports IA2.2/IA2.3 ci-dessus. L'[index final de
+documentation](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/checks-documentation-final.json)
+lie cette version aux résultats réutilisés et conserve les limites. Les originaux
+du 16 octobre restent historiques ; leurs empreintes ne prétendent pas couvrir
+cette version augmentée.
+
+La tranche IA3a apporte des contre-exemples de composition et une frontière
+de décision concrète : sous Trust partagé, écrivain SQLite réservé puis verrou
+runtime, le contrat ne peut être amendé pendant la décision pure. Cela ne prouve
+ni l’authenticité d’un émetteur humain ni l’unicité d’un effet ultérieur. Cette
+propriété candidate doit encore être formalisée et comparée ; la découverte de
+ces courses locales n’établit aucune priorité scientifique. Un échec préexistant
+de test de reprise de revue, reproduit sur les sources initiales, est conservé
+ouvert séparément ; aucune suite globale verte n’est revendiquée.
+
+IA3b ajoute un producteur interne lié à l'identité OIDC et à une autorité
+explicitement fournie, avec refus aux frontières d'émission et de publication.
+Le [rapport IA3b](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md)
+sépare protocole OIDC réellement exercé sur fournisseur local, autorité simulée,
+source privée, publication durable et admission publique absente. Une session
+catégorisée humaine ne démontre pas une présence physique, un MFA ou l'accord
+d'un autre humain sur une création précise. Le nombre de contrôles ne représente
+ni des attaques distinctes ni une comparaison expérimentale. L'originalité, la
+formalisation et les coûts restent à établir ; les antériorités ne changent pas.
+
+Le diagnostic IA3b distingue aussi effet produit et méthode de vérification :
+les ressources web et les méthodes partagent un paquet embarqué, ce qui invalide
+des entrées de compilation pendant un autre chantier. Une vue compilateur figée
+préserve le checkout ; la réutilisation contrôlée des seules fixtures de refus
+réduit des migrations répétées. Ces facteurs combinés n'isolent pas un gain
+causal de performance. Le timeout instrumenté et l'échec de timing sous charge
+restent originaux ; ni un groupe partiel ni une compilation ne valent des tests
+réussis. Des liens de grants valides ne démontrent pas la réception et l'origine
+d'une délégation : F04/F06 et le raccord public restent leurs preuves nécessaires.
+
+
+### IA3c.1 — traçabilité durable de la décision d’émission
+
+L’incrément lie le reçu humain à la tête du journal, donc à l’instantané exact,
+aux racines, à l’événement et à son antécédent. Le reçu conserve le contexte
+d’autorité fourni, sa référence d’enrôlement, la session sous empreinte et les
+dates d’émission/expiration. Sa reprise réutilise le même historique sans nouvelle
+autorisation. Cette séparation entre preuve historique et autorité courante
+doit figurer dans le modèle de menaces : un reçu intact ne démontre pas qu’un
+enrôlement externe existe ou reste non révoqué. Les tests locaux du
+[rapport IA3c.1](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md)
+qualifient uniquement le candidat interne ; pas un déploiement ou une comparaison
+expérimentale. Ni priorité scientifique ni supériorité sur les travaux cités
+ne découle de cette implémentation. Le témoin indépendant et le confinement
+restent des hypothèses d’intégration à vérifier séparément.
+
+
+### IA3c.2a — origine d’un énoncé et actualité d’un droit
+
+Le nouveau [protocole d’enrôlement](../../../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
+permet de tester séparément signature, racine épinglée, contexte de demande et
+rejeu local. Une réponse signée peut encore décrire « actif » après révocation :
+un test conserve explicitement cette limite, sans le compter comme preuve de
+fraîcheur. Deux défauts du candidat sont reproduits puis corrigés : JSON null
+normalisé en chaîne vide et copie de valeur du challenge dupliquant sa consommation.
+Ces contrôles concernent le format local, pas un service déployé ou les lanceurs.
+Il s’agit de mécanismes d’authentification classiques ; l’originalité éventuelle
+du système intégré et ses effets comparatifs restent à établir. Les preuves
+sont dans le [rapport IA3c.2a](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-proof-20261017/RAPPORT-IA3c2a.md).
+
+
+### IA3c.2b — histoire authentique et observation courante locale
+
+Le [journal d’enrôlement isolé](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-state-20261017/RAPPORT-IA3c2b.md)
+ajoute une chaîne signée, une comparaison à un témoin fourni indépendamment et
+une réservation SQLite pendant la lecture active. Les tests distinguent rollback
+incohérent, restauration d’une ancienne histoire valide et restauration du témoin
+lui-même : dans ce dernier cas la garantie disparaît. Une réponse signée peut
+encore devenir ancienne après libération de la réservation ; la linéarisation
+avec l’usage moteur reste une question d’intégration, pas un résultat acquis.
+
+Le premier candidat échoue sous concurrence ; réservation immédiate et WAL
+passent ensuite les scénarios conservés, dont 32 fixtures à huit écrivains.
+La cause détaillée de l’échec original reste partiellement isolée faute d’erreurs
+individuelles dans sa première sortie. Les 42 noms normal/race finaux ne sont ni
+42 attaques distinctes, ni une preuve de tous les ordonnancements. Ni signature,
+journal transactionnel, chaîne de hachage ou CAS ne constituent seuls une nouveauté
+scientifique. Service protégé, témoin externe durable, schéma métier et effets
+publics restent ouverts. Cette séparation des garanties fournit un protocole
+expérimental possible ; aucune supériorité ou priorité n’est revendiquée.
+
+
+### IA3c.2c — validation symétrique et génération issue de l’événement
+
+Le [schéma d’autorité](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-authority-20261017/RAPPORT-IA3c2c.md)
+partage désormais les primitives de principal, portée et permission avec le moteur.
+Le producteur valide avant signature ; le consommateur compare un Statement
+aux attendus indépendants. La génération est dérivée de l’événement de création
+vérifié, puis confrontée au document : signer un nombre ne suffit pas à établir
+cette relation. Des tests couvrent événements ultérieurs, corps signé incohérent,
+réouverture et ancien témoin après révocation.
+
+Les 114 noms normal/race des paquets et les 173 noms moteur ciblés vérifient des
+contrats locaux, sans équivalence avec autant d’attaques. Une donnée valide n’est
+pas une capacité moteur. Le test conserve le cas où un ancien Expected accepte
+un ancien Statement : fraîcheur finale, protection de la source et point de
+linéarisation restent à prouver. Ces mécanismes classiques ne démontrent aucune
+priorité scientifique ou supériorité comparative. Le rapport distingue également
+collecte réelle des tests, inventaire du compilateur et modification concurrente
+du chantier mémoire : la reproductibilité exige les versions des sources, pas
+seulement un compte de tests ou une liste d’empreintes.
+
+
+### IA3c.2d — objet exact de la demande et origine de la référence de session
+
+Le [cadre de demande complet](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-request-20261017/RAPPORT-IA3c2d.md)
+lie les octets du candidat, son événement, les racines exactes, les deux checkpoints,
+le document d’enrôlement et le contexte humain/session/plan. Les tests changent
+chaque dimension et refusent un document authentique de même ID/génération ayant
+d’autres droits. La référence de session vient du résultat du résolveur Trust,
+pas d’un second token associé à un caller. L’authenticité du fournisseur OIDC
+local de test reste distincte d’un opérateur ou humain externe approuvé.
+
+62 noms du paquet passent en normal/race et 28 noms moteur ciblés passent. Ces
+comptes ne sont pas des attaques indépendantes. La projection pure ne lit pas
+la source courante ; un digest couvrant tout le contenu ne prouve ni l’actualité
+des faits ni une autorisation d’agir. Ce sont des techniques classiques de liaison
+de contexte, sans preuve de priorité ou de supériorité. L’expérience intégrée
+reste à construire autour de réception, état courant, décision, application et
+effet, sous les hypothèses de témoin et de confinement explicitement annoncées.
+
+
+### IA3c.2e — authenticité et sélection explicite du format
+
+Le [cadre de lecture versionné](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-enrollment-reply-20261017/RAPPORT-IA3c2e.md)
+permet de distinguer message authentique et format reconnu. Un ancien cadre sans
+version était accepté par le prototype ; le nouveau décodeur commun exige la
+version 1 et refuse les versions absentes ou inconnues, même signées. Les 197 noms
+normal/race ne sont pas autant d’attaques ; un seul contre-exemple antérieur est
+reproduit. Le premier essai ne compilant pas n’est pas une preuve comportementale.
+Cette évolution ne démontre pas une exploitation publique, une actualité de source
+ou une nouveauté scientifique. Interopérabilité réelle, absence de downgrade au
+raccord et état frais à l’usage restent leurs propres critères expérimentaux.
+
+### IA3c.2f — installation locale, témoin et limites de la preuve
+
+Le choix adopté est un service local sous compte distinct avec confinement pour
+le développement/pilote, et une autorité sur machine/administration séparées
+prévue pour l’avenir. Le besoin probable de clients est une hypothèse utilisateur,
+pas une observation de marché. Configuration initiale et Admin restent à livrer.
+Le [noyau de configuration](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-installation-config-20261017/RAPPORT-IA3c2f02a.md)
+vérifie format strict, CAS, droits fournis par callback et persistance Linux en
+fixtures ; ses trois défauts de candidat sont reproduits puis corrigés. Le
+[coordinateur avec témoin](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/RAPPORT-IA3c2f02b.md)
+ajoute intention durable avant config, confirmation et reprise de la base/cible
+exactes après nouvelle autorisation. 101 noms PASS normal/race incluent les 70
+précédents : ni 171 cas indépendants ni autant d’attaques démontrées.
+
+Une sortie réelle de processus enfant sans Close puis une reconstruction depuis
+fichiers vérifie une réception de l’état dans un nouveau contexte. Les fautes
+fsync sont injectées ; cela ne vérifie ni reboot/panne électrique, ni identité
+OIDC réelle, ni séparation de comptes ou sauvegardes. Le témoin local n’est pas
+un compteur matériel ou une signature. Restaurer config et témoin ensemble reste
+accepté dans le cas limite conservé : protection de l’hôte et administration
+restent des hypothèses à tester, même avec deux répertoires distincts.
+
+Valeur expérimentale : contre-exemples reproductibles, fenêtres de panne et
+limites explicitement séparées des garanties. Aucune priorité scientifique ou
+supériorité comparative n’est établie. Une expérience intégrée devra encore relier
+authentification, délégation, décision courante, application et effet, en comparant
+local/distant selon une menace et des métriques explicites, sans réécrire les
+preuves historiques ni assimiler la configuration souhaitée au service effectif.
+
+
+### IA3c.2f-03a — attribution du message et décision dans le processus
+
+Le [raccord privé de contrôle de configuration](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-service-20261017/RAPPORT-IA3c2f03a.md)
+réutilise le canal Linux IA2 : émetteur par message et pidfd fourni par le noyau,
+puis contrôle d’autorité sur la demande exacte pendant l’opération. Le créateur
+de la connexion, le compte Unix et le principal humain autorisé restent trois
+faits distincts. Les requêtes sont canoniques et limitées à read/preview/create/apply ;
+la réponse perdue après écriture ne provoque ni remise à zéro ni événement dupliqué
+au retry exact réautorisé. Les sources et critères sont dans le contrat FR/EN.
+
+Le témoin et le contrôle externe servent ici la configuration de l’installation ;
+ce raccord ne prouve pas encore un suivi d’identité sur tous les nœuds d’un
+workflow, une révocation finale linéarisée ou le confinement des fournisseurs.
+Le contrôleur réel, le client authentifiant le service, le compte séparé et les
+parcours publics restent à fournir. Les callbacks sont des doubles locaux.
+
+Apport expérimental à tester : distinguer attribution par connexion et par message
+quand un descripteur passe à un autre processus ; vérifier ensuite le refus d’un
+émetteur sans droit, même sous le même compte. Un échange entre processus et une
+fixture d’intention pendante sont des expériences différentes ; cette dernière
+ne constitue pas une panne réelle. Ces techniques et cette séparation de preuves
+ne démontrent aucune priorité scientifique ni supériorité sur un produit tiers.
+La comparaison d’état de l’art doit conserver ses sources et protocoles propres.
+
+
+### IA3c.2f-03b — vérifier aussi le retour et l’incertitude
+
+Le [client de contrôle local](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/RAPPORT-IA3c2f03b.md)
+vérifie l’émetteur du retour contre un descripteur serveur obtenu indépendamment,
+puis lie le résultat au challenge, aux pins et aux octets exacts de la demande.
+Le schéma transport passe à 2 sans changer le schéma 1 de persistance. Le contrat
+du processus et celui de la réponse restent distincts du contrôle humain.
+La comparaison pidfs vérifiée dans Linux 64 bits reste locale au démarrage hôte,
+pas une identité persistante d’agent ou une preuve de son code exécuté.
+
+La fixture de transport mesure SO_SNDBUF puis provoque une réponse EMSGSIZE après
+écriture confirmée ; le retry exact relit sans second événement. Cela sépare
+limite technique et seuil métier, ainsi que refus connu et résultat incertain.
+Un ancien paquet, un autre processus du même compte, une autre demande ou une
+réponse avec tête incohérente ne doivent produire aucun résultat valide. Les
+callbacks et processus enfants de fixture ne démontrent pas l’authentification
+humaine, la protection d’un fournisseur réel ou une révocation sur tous les
+nœuds d’un workflow. Aucun résultat de priorité ou de supériorité scientifique
+n’est déduit ; l’expérience intégrée et la comparaison restent à conduire.
+
+
+La revue du test a découvert qu’il fermait lui-même le canal après EMSGSIZE,
+masquant une responsabilité encore laissée à l’appelant. Une garde non bloquante
+échoue avant correction sur l’absence de POLLHUP ; l’adaptateur devient propriétaire
+d’un échange unique et ferme lui-même sur toute issue. Un second contre-exemple
+refuse la cause disque inventée pour une indisponibilité générale. Ces défauts
+du candidat et leurs gardes sont distingués de la valeur scientifique supposée :
+ils vérifient notre méthode et ce raccord, pas une propriété globale du moteur.

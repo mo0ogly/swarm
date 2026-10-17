@@ -23,7 +23,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	if hash(c.Receipt) != hash(receipt) {
 		return empty, fmt.Errorf("contexte et reçu de fragments différents")
 	}
-	canonical, err := s.managedReviewContext(w, a, c.Candidate, receipt)
+	canonical, err := s.managedReviewContextAtCitationVersion(w, a, c.Candidate, receipt, false, c.CitationContractVersion)
 	if err != nil {
 		return empty, err
 	}
@@ -41,7 +41,7 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	if err != nil {
 		return empty, err
 	}
-	if err = preflightManagedFragmentCalls(managedReviewPrefix(method), c, p); err != nil {
+	if err = preflightManagedFragmentCalls(managedReviewPrefixForContext(method, c), c, p); err != nil {
 		return empty, err
 	}
 	task, err := w.task(a.TaskID)
@@ -102,6 +102,10 @@ func (s *Store) beginManagedFragmentReview(w Work, a Agent, c managedReviewConte
 	anchor.WorkflowDigest = hash(raw)
 	raw, _ = json.Marshal(cfg.ModelRoute)
 	anchor.ModelConfigDigest = hash(raw)
+	anchor.WorkflowPrompt, anchor.WorkflowPromptDigest, err = write("workflow", managedReviewFrozenWorkflow{Version: 1, Workflow: workflow, Method: method, Prefix: managedReviewPrefixForContext(method, c)})
+	if err != nil {
+		return empty, err
+	}
 	r.FragmentJournal = anchor
 	for _, tc := range c.Tasks {
 		if hash([]byte(tc.Report)) != tc.Binding.ReportDigest {

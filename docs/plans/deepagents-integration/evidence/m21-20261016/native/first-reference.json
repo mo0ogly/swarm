@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "protocol": "swarm-extractive-summary-v1",
+  "result": "PASS",
+  "scope": {
+    "work": "w-721d716d9c0c6ae95e59fbcd",
+    "task": "t1"
+  },
+  "source_sha256": "f58176079de592f48ae2ea937073288570ac9d922748722a7c6945e1114332e3",
+  "source_message_count": 5,
+  "cutoff": 4,
+  "parent_sha256": null,
+  "covered_prefix_sha256": "272240d36e26b876b5e41473886d4d237591673b06baca1cfeaab0107cd77663",
+  "summary_entries": [
+    {
+      "id": "snapshot",
+      "message": "current-task-snapshot",
+      "kind": "evidence",
+      "state": "historical",
+      "source_sha256": "6e8f671aa56f5497253410b10abf2fe38f3365a4b1c8669ce9218c61573f724d",
+      "text": "{\"project_sha256\":\"f9308036446982ec87999f8d035b8d9bdbf99c5a3004247fa9a9715a550ff1dd\",\"work_title\":\"Summary source fixture\",\"work_objective\":\"Keep attributed history\",\"work_scope\":\"Owned fixture\",\"work_criteria\":[\"Sources remain available\"],\"task\":{\"plan_checks\":{\"plan-criterion-1\":\"validation\",\"plan-delivery\":\"delivery\",\"plan-entry\":\"entry\",\"plan-validation\":\"validation\"},\"id\":\"t1\",\"title\":\"Future worker\",\"owner\":\"\",\"deliverable\":\"report.txt\",\"criteria\":[\"Current contract changed; recheck before reuse\"],\"depends\":null,\"status\":\"todo\",\"blocker\":\"\",\"next\":\"Inspect sources\",\"attempts\":[]}}"
+    },
+    {
+      "id": "future",
+      "message": "dialogue-4277908c0f2ee663ec1452cbab7a18b23094193eb33f4377397745ca6f8dd29e-question",
+      "kind": "intention",
+      "state": "future",
+      "source_sha256": "3caf8b2c1fb04bbaeab925d45b531237de8f7566072f6ee56ad57af73bf1d9e9",
+      "text": "Intention future : vérifier avant de déployer."
+    },
+    {
+      "id": "incident",
+      "message": "dialogue-abb36841bf292b794a5e376d8dcbde4cd4ede2be81b9fb5185f5f9916d6882a8-question",
+      "kind": "incident",
+      "state": "open",
+      "source_sha256": "5634e48d7488a1359e8d397758f4e500a6426cdd5ddd609b1822d40e697c3d89",
+      "text": "Incident ouvert : effet incertain à examiner avant reprise."
+    }
+  ],
+  "recent_messages": [
+    {
+      "id": "dialogue-abb36841bf292b794a5e376d8dcbde4cd4ede2be81b9fb5185f5f9916d6882a8-answer",
+      "role": "assistant",
+      "content": "Réponse historique conservée <source> ; aucun succès courant déclaré."
+    }
+  ],
+  "omitted_message_ids": [
+    "dialogue-4277908c0f2ee663ec1452cbab7a18b23094193eb33f4377397745ca6f8dd29e-answer"
+  ],
+  "reasons": [],
+  "reference_only": true,
+  "model_effectiveness": "NOT TESTED",
+  "receipt_sha256": "88dbc72324b82c9b59b351ff9b23fb93c0641d5935bdbb3ec7b44a5afc635a6d"
+}

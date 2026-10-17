@@ -207,7 +207,7 @@
   {
     "path": "AGENTS.md",
     "kind": "doc",
-    "sha256": "5352753c841b2452f82b40a86ab44b99ba056fdf4943a9bcd6ce1b5c8b9b9956"
+    "sha256": "141d089b0edc8df2105096262935c992b9e9e2fbb77c8dcf512d15f763d1fb1b"
   },
   {
     "path": "CLAUDE.md",
@@ -392,7 +392,7 @@
   {
     "path": "docs/PREPARATION-TEMPLATES.md",
     "kind": "doc",
-    "sha256": "8d789011108ed74f7c62717e940e03cb8974d56450e28f1d9fd3352db4e88ac3"
+    "sha256": "fb90d36c15b12bd66b7a96c74ce6c49b199c5faeafd4616cb734f1b293b78583"
   },
   {
     "path": "docs/PRODUCT-ARCHITECTURE.md",
@@ -420,6 +420,51 @@
     "sha256": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3"
   },
   {
+    "path": "docs/actions-confiance-T2.md",
+    "kind": "doc",
+    "sha256": "ed306f7d2208d326b3a2e5197fad6971d6dbbb0ed4cae74e75fda36771bc36b9"
+  },
+  {
+    "path": "docs/actions-confiance-T4.md",
+    "kind": "doc",
+    "sha256": "90bd25bb292c906f3516df2b4fc77fdf5aefbee129effe0952bf623fc4e5a29d"
+  },
+  {
+    "path": "docs/actions-confiance-T5.md",
+    "kind": "doc",
+    "sha256": "befdb98b6258769c32722fe6b9c30ab2f1a36ed3818d517d3fd896307a7a8629"
+  },
+  {
+    "path": "docs/actions-confiance-T6.md",
+    "kind": "doc",
+    "sha256": "1e03399f1cb4693800d98d22b9134217ec60cf8010e1f9fba61df9e154051f1f"
+  },
+  {
+    "path": "docs/actions-confiance-T7.md",
+    "kind": "doc",
+    "sha256": "3f784f2d93808e43aa51eb2bd409351f3eb3ed59164a05497acd1ec59f12912d"
+  },
+  {
+    "path": "docs/actions-confiance-laboratoire.md",
+    "kind": "doc",
+    "sha256": "d23e33a656253019c0e045340695156a0dc0bce56d03cc2cb9dce4f7e40012ed"
+  },
+  {
+    "path": "docs/actions-confiance-qualification.md",
+    "kind": "doc",
+    "sha256": "3083724bdd80bfe2cd91ed8fecab438551e31e846f0248de675f3e588f2741a9"
+  },
+  {
+    "path": "docs/actions-confiance-referentiels.md",
+    "kind": "doc",
+    "sha256": "a1008ddd742637cebadab9e77c30327e2ae6f2ebfd57ffef89b583ccbdbebf20"
+  },
+  {
+    "path": "docs/architecture/ACTIONS-CONFIANCE.md",
+    "kind": "doc",
+    "sha256": "db2dd084bc211175dfa87bed7790706ca26983b4e14e9a31ee9c2ebdef140f7f"
+  },
+  {
     "path": "docs/architecture/AGENT-ENGINE-PROTOCOL.md",
     "kind": "doc",
     "sha256": "3d47b29e40df99d5a9c775e50e67e2c450b3d145fee7c9e3ab05b4d057fd66b3"
@@ -432,7 +477,7 @@
   {
     "path": "docs/architecture/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
-    "sha256": "a46bd23fbe7168983024328e3596b36f8922779b4729907e7bab48c575e6f657"
+    "sha256": "df49a8f0dd2bd4d78d0e9049ab01364601b1bfb67121296c2e3415d309102400"
   },
   {
     "path": "docs/architecture/CALL-ACCOUNTING.md",
@@ -497,7 +542,7 @@
   {
     "path": "docs/architecture/REVIEW-EVIDENCE.md",
     "kind": "doc",
-    "sha256": "bf587a8640b58d23bb040260f8dbb50a0ccf75ba705c66cba9ad1de441877508"
+    "sha256": "e6f7cc6b0fb87bbdc5f7664642bdfe871d3e6c69882d97afee5d978bec9194f7"
   },
   {
     "path": "docs/architecture/REVIEW-POLICIES.md",
@@ -507,7 +552,7 @@
   {
     "path": "docs/architecture/RUN-SUPERVISION.md",
     "kind": "doc",
-    "sha256": "7a2fba9d4f3f23a6f648521a00b46386b843845c288d090b98c694812c249a4a"
+    "sha256": "fd32e21469ab384776aa7b8525639f3ce24d91ab8c718ad4736b7e9cf0eaf6f6"
   },
   {
     "path": "docs/architecture/TRACEABILITY.md",
@@ -518,6 +563,16 @@
     "path": "docs/architecture/WEB-REQUEST-POLICY.md",
     "kind": "doc",
     "sha256": "ea8392e5fc4dc8634d4e80ba08591151f4fe10b50643dc45ffc41818ede213a9"
+  },
+  {
+    "path": "docs/architecture/actions-confiance-controls-reference.json",
+    "kind": "doc",
+    "sha256": "4be9c47151f14d782e5bef98566593bc94fc0c99d3e54a818d5b9ea478cf464e"
+  },
+  {
+    "path": "docs/en/ACTIONS-CONFIANCE.md",
+    "kind": "doc",
+    "sha256": "92d2cd9829c9d47083395abfd0260f276a21279f5604b265710a2349d5a074d4"
   },
   {
     "path": "docs/en/AGENT-COMMUNICATION.md",
@@ -542,7 +597,7 @@
   {
     "path": "docs/en/ATTEMPT-RECOVERY.md",
     "kind": "doc",
-    "sha256": "77d1499fd0e78459988a6126a2b5c4a6fdb9ed148a3917360ab732586925c76e"
+    "sha256": "ee22501e7c93b3184cf1739d34af95351a0a337d5f57aa1bfd39a3ef2ec93952"
   },
   {
     "path": "docs/en/AUTOMATION-PROGRAMS.md",
@@ -557,7 +612,7 @@
   {
     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
     "kind": "doc",
-    "sha256": "3710095d2f57f63f4976d43518f3e284f46f50ceeb0beb6f1c7aa2473061c094"
+    "sha256": "c33edddb850a2adf3427acb32ad2c3fe586cf20724be209febe962adb6a6db99"
   },
   {
     "path": "docs/en/BUDGETS.md",
@@ -687,7 +742,7 @@
   {
     "path": "docs/en/PREPARATION-TEMPLATES.md",
     "kind": "doc",
-    "sha256": "3e33c88c9be2ab12d115875a13105942357571cfc8decfc37aff5e86f86f1842"
+    "sha256": "afb447e9e7ab34c0634e7cc37cd0f871219e9a76d4c41ce9b4a195b3fdf18041"
   },
   {
     "path": "docs/en/PREPARATION-UX.md",
@@ -698,6 +753,11 @@
     "path": "docs/en/PRODUCT-WORKFLOW.md",
     "kind": "doc",
     "sha256": "f3acd1d5c1addb7a79f58c6060140903e623fdbde143df971e6b4a8105b62010"
+  },
+  {
+    "path": "docs/en/PROJECT-MEMORY.md",
+    "kind": "doc",
+    "sha256": "b38504ac6fbabe5976fad868b457cd37ce477e7d2bc2bfaac491cc093b8792a4"
   },
   {
     "path": "docs/en/PROJECT-PROFILE.md",
@@ -737,7 +797,7 @@
   {
     "path": "docs/en/REVIEW-EVIDENCE.md",
     "kind": "doc",
-    "sha256": "0a2c66a499bb471f194b1c9e4569b8650e1c9c8905e95c07849a5e7e3f16996d"
+    "sha256": "f890b75e6f781dd071f7c9b4fc9e77dc3077af94f2a94f38006c3426b0a5791c"
   },
   {
     "path": "docs/en/REVIEW-FRAGMENTS.md",
@@ -757,7 +817,7 @@
   {
     "path": "docs/en/RUN-SUPERVISION.md",
     "kind": "doc",
-    "sha256": "200029b11e2ea32c403728ab2f85170d01fcf76b6d8c85464dbd465f9965d878"
+    "sha256": "da3b4bb6bdb1b6655b7efe685b70b0b2e236485acb849c4e0aec1eea0280ef8e"
   },
   {
     "path": "docs/en/RUNTIME-RECOVERY.md",
@@ -785,6 +845,46 @@
     "sha256": "b8652c35583dd1ab9bb0c842bb2c570943f62dff032964a3d9b1591998bf93a1"
   },
   {
+    "path": "docs/en/actions-confiance-T2.md",
+    "kind": "doc",
+    "sha256": "4bb31fe66c45bf22a6f7bcefefac738b58f8350fccd33d0b6a190f8c2cf1d6ab"
+  },
+  {
+    "path": "docs/en/actions-confiance-T4.md",
+    "kind": "doc",
+    "sha256": "4ff578429f0f5572354129024f2485bbefbd2dd8ef0fdb1aedc8cb226a1f0fa9"
+  },
+  {
+    "path": "docs/en/actions-confiance-T5.md",
+    "kind": "doc",
+    "sha256": "dc90354c614b094e82fbfac1cc1c590cd900b428851029b084a05d9cf6a2bcc5"
+  },
+  {
+    "path": "docs/en/actions-confiance-T6.md",
+    "kind": "doc",
+    "sha256": "0702c63fe0788f4736d187c26d82c6e9a7852fb6a0044965fec51cc144ebe5ca"
+  },
+  {
+    "path": "docs/en/actions-confiance-T7.md",
+    "kind": "doc",
+    "sha256": "b3979ecee45bc4d82176faccb6e205b3a9ce490062cbdba29388eee0beed3073"
+  },
+  {
+    "path": "docs/en/actions-confiance-laboratoire.md",
+    "kind": "doc",
+    "sha256": "ef524a5753d5c3a8c547d2093bfcb2071ab9f0a5ceebafb3498ebbfc2c68f19b"
+  },
+  {
+    "path": "docs/en/actions-confiance-qualification.md",
+    "kind": "doc",
+    "sha256": "1a7bdf787dd4365f04a6604abcbd9a932b686c291aba5bd5d34cf93deefb0bb0"
+  },
+  {
+    "path": "docs/en/actions-confiance-referentiels.md",
+    "kind": "doc",
+    "sha256": "741b1ae8b4354d40f60670eaf0da24816a7013774cefe4137681fe69a85b2834"
+  },
+  {
     "path": "docs/en/e6-real.md",
     "kind": "doc",
     "sha256": "1ed7b6153f9f2c9f84c1ba4b07cbdb927ef53cd4a0cc8574eaa39df6b9a42b98"
@@ -803,6 +903,11 @@
     "path": "docs/graph-delivery-qualification-manifest.json",
     "kind": "doc",
     "sha256": "7f16ac09c204884e91c11eec172af2d68390ca90618bf250abea2a18b76a1def"
+  },
+  {
+    "path": "docs/plans/actions-confiance/verification-referentiels-20261016/nist-primary-catalog.json",
+    "kind": "doc",
+    "sha256": "01f37cf90ea99d92242c936cbfbdebcc338eef1f71454e2acac36cc56e9bc062"
   },
   {
     "path": "docs/plans/dev-launcher-20261010/PLAN.md",
@@ -1378,95 +1483,5 @@
     "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre.png",
     "kind": "capture",
     "sha256": "4c2df9433e549879b59199f3f41a52b624493d722ac4ae4af08f68e81115aefe"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/en-etat-mobile.png",
-    "kind": "capture",
-    "sha256": "4e5f3deaf5e80592d40137d763d2d0b6e6bc840c2fa4874b9aa17e867e397853"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/en-etat.png",
-    "kind": "capture",
-    "sha256": "179fe14ce98157407f4668e013a6e5ca317813a92316b2b9fdea8e8114376665"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/en-sombre-mobile.png",
-    "kind": "capture",
-    "sha256": "c38fa3d745ab2171af2c25abeb0fb76b1ccb7fd72a3df04ffd7dbfc2dc78feb5"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/en-sombre.png",
-    "kind": "capture",
-    "sha256": "362a9d7ac5860c0e053cc5c0ef98aa63c26d414360838e3fe1e7f659c38603cf"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/fr-etat-mobile.png",
-    "kind": "capture",
-    "sha256": "ad3dda130c1053782ca27de5177f9128225959fee4e24cd86e3eff9a54175260"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/fr-etat.png",
-    "kind": "capture",
-    "sha256": "63c8a1cd8400232f8f4ec2f97026e7f26ac8062244c35c74af9872f802e5b47f"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/fr-sombre-mobile.png",
-    "kind": "capture",
-    "sha256": "b932ce091fbe5ffae966c3e3614a3193b0e4454446d8a07bba4f01beff787225"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/fr-sombre.png",
-    "kind": "capture",
-    "sha256": "574216c70777d524e6ccc981995160f972ec659d6ba069c8a23f62cf2b441343"
-  },
-  {
-    "path": "docs/screenshots/projects-home-20261010/result.json",
-    "kind": "doc",
-    "sha256": "dfc203fe428d2d01c4756e2a8370453c030c3ceb6e7dc7dc2cabfb638c9237e3"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-etat-deliver.png",
-    "kind": "capture",
-    "sha256": "840c965748f6cf9bf2530adb6266cc5733c53dfa2a1e0be54abc21862fcc0bb1"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile-foundation.png",
-    "kind": "capture",
-    "sha256": "00ce6a6875a472c3b744d51af6f5929e88df4101daaa3ba07371912b8a3ea607"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-etat-mobile.png",
-    "kind": "capture",
-    "sha256": "39a95ab1ce7db37111a2e7baee259eadf57bd81e7ed253f1b607463848b516e3"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-etat-plan.png",
-    "kind": "capture",
-    "sha256": "047ebfbdd1a3f794a4a8a04f548007bffd8584ac2b4b480f8db9ded585a48f3b"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-sombre-deliver.png",
-    "kind": "capture",
-    "sha256": "9d4021def5970f8c39f27561a7c56c7a891167a8f81efb32849d18bb78f6929a"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile-foundation.png",
-    "kind": "capture",
-    "sha256": "c9f03bc3b92b3ba26d32c7c5365ee166cd386810cad358c72229a3c5f1a30b13"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-sombre-mobile.png",
-    "kind": "capture",
-    "sha256": "edd5e7d687d8153315682e4f526b7b051b5913e3a17d142a9b997be102c67647"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/en-sombre-plan.png",
-    "kind": "capture",
-    "sha256": "5e32034594e55f3c477a2d6f5659838c246c0690f9288c5b2d6780f10ac4ca9e"
-  },
-  {
-    "path": "docs/screenshots/projects-method-20261010/fr-etat-deliver.png",
-    "kind": "capture",
-    "sha256": "5548beeafe3644bfe934c0d767de9d49264cf43c340d1ed098f3db2f606f0e46"
   }
 ]

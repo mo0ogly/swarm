@@ -6,11 +6,11 @@
 
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
 
-Swarm est un outil local de coordination d’agents de développement, avec une **interface web en français et en anglais** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
+Swarm est un outil local de gestion de workflows agentiques, avec une **interface web en français et en anglais** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
 
 **Pourquoi Swarm ?** Quand plusieurs agents travaillent sur un projet, quelqu’un doit encore transmettre les consignes, gérer les dépendances, retrouver les rapports et décider si le résultat est réellement utilisable. Swarm organise ces passages de relais pour réduire cette coordination manuelle et rendre les blocages visibles.
 
-[Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
+[Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Mémoire et identité](#mémoire-et-identité) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
 
 ## Voir le graphe dès le départ
 
@@ -62,7 +62,48 @@ Swarm reste expérimental. Consultez les [essais réalisés et leurs limites](do
 | Comprendre ce qui se passe | Graphe avec flèches, rôles, états, journal de l’agent et rapports | Retrouver l’action en cours et la cause d’un arrêt |
 | Contrôler la livraison | Revue indépendante, contrôles configurés et suivi de la fraîcheur des preuves | Distinguer un agent qui a fini d’un résultat réellement accepté |
 | Reprendre plus tard | État local persistant, historique et commandes CLI | Conserver le contexte entre deux sessions |
+| Réutiliser une expérience | Leçons et procédures vérifiées, versionnées et sélectionnées explicitement | Transmettre les acquis utiles avec leur provenance et leurs conditions |
 | Choisir ses IA | Fournisseurs d’agents installés et connexions à des modèles API compatibles | Affecter des capacités adaptées à la préparation, à l’exécution et à la revue |
+
+## Mémoire et identité
+
+Un workflow agentique gagne en continuité quand l’expérience se transmet, et en
+maîtrise quand les autorisations sont explicites. Swarm relie ces deux dimensions
+à son **moteur déterministe** : les agents proposent et réalisent, le moteur
+applique les règles et conserve l’historique des décisions.
+
+**Mémoire du projet — disponible dans les sources actuelles.** Une expérience ou
+une procédure issue d’un retour d’expérience vérifié peut être admise, versionnée,
+puis sélectionnée explicitement pour une tâche future. Le contexte transmis garde
+la leçon, ses conditions d’usage et ses références sources. Remplacement et retrait
+préservent les anciennes versions et les contextes déjà reçus. Cela permet de
+réutiliser un acquis vérifié et de comprendre pourquoi il a été transmis, sans
+accorder de permissions supplémentaires à l’agent.
+
+**Identité et autorité des agents — intégration en cours.** Le noyau interne
+vérifie l’acteur, son instance, le plan concerné, les permissions et leur chaîne
+de délégation, avec expiration et révocation. L’objectif est de refuser un agent
+usurpé et la création d’un nouvel agent sans autorisation, même par un agent
+légitime. Le raccord aux lanceurs, aux usages mémoire et à une approbation humaine
+protégée reste à terminer ; ces protections ne sont pas encore garanties sur tous
+les parcours publics. L’attribution attestée du propriétaire et de l’auteur, ainsi
+que les droits d’usage de la mémoire, font partie de ce travail restant.
+
+**L’apport pour la gestion des workflows :** conserver les apprentissages entre
+missions, rendre les transmissions examinables et encadrer progressivement qui
+peut agir ou déléguer. Les modèles définissent le parcours ; la mémoire transmet
+l’expérience ; l’identité et les autorisations délimitent les actions attendues.
+Cette démarche sert les missions de développement et la
+[cible des processus métier](docs/PRODUCT-ARCHITECTURE.md), où continuité,
+responsabilités et validations humaines doivent rester explicites.
+
+Exemple : une procédure de vérification admise après une mission peut être
+sélectionnée pour la suivante avec sa provenance. Son contenu ne donne pas à
+l’agent le droit de créer un exécutant ou d’approuver une action métier.
+
+Voir la [mémoire du projet](docs/PROJECT-MEMORY.md), le
+[contrat d’identité et ses limites](docs/architecture/AGENT-IDENTITY-CONTRACT.md)
+et le [plan d’intégration mémoire](docs/plans/deepagents-integration/PLAN.md).
 
 ## Du besoin au résultat
 
@@ -269,6 +310,8 @@ Les clés des connexions API sont enregistrées localement dans `.swarm/ai-conne
 - [Autoriser une reprise et transmettre les sources au vérificateur](docs/ATTEMPT-RECOVERY.md)
 - [Diagnostic du stockage et tentatives épuisées](docs/RUNTIME-RECOVERY.md)
 - [Méthodes : besoin, spécification, planification, audit, diagnostic et vérification](docs/AGENT-METHODS.md)
+- [Mémoire du projet : expériences, procédures et versions sélectionnées](docs/PROJECT-MEMORY.md)
+- [Identité des agents : autorité, délégation et intégration restante](docs/architecture/AGENT-IDENTITY-CONTRACT.md)
 
 - [Référence technique complète et contrats CLI](REFERENCE.md)
 - [Cockpit : lancement, pilotage et supervision](COCKPIT.md)

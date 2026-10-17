@@ -1,0 +1,10 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/kernel_backend_linux_amd64_test.go:17:9: undefined: decodeKernelBackendRecord
+internal/engine/kernel_backend_linux_amd64_test.go:22:14: undefined: decodeKernelBackendRecord
+internal/engine/kernel_backend_linux_amd64_test.go:28:21: undefined: kernelBackendProbes
+internal/engine/kernel_backend_linux_amd64_test.go:29:12: undefined: kernelBackendInstructions
+internal/engine/kernel_backend_linux_amd64_test.go:32:17: undefined: kernelBackendFilterReachedMemory
+internal/engine/kernel_backend_linux_amd64_test.go:37:12: undefined: kernelBackendInstructions
+internal/engine/kernel_backend_linux_amd64_test.go:38:12: undefined: kernelBackendInstructions
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

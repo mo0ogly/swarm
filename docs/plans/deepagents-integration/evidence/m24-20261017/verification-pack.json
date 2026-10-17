@@ -1,0 +1,56 @@
+{
+  "steps": [
+    {
+      "name": "targeted-final",
+      "command": [
+        "go",
+        "test",
+        "./internal/engine",
+        "-run",
+        "^(TestMemoryUsage|TestMemorySummarySelectionPublicLaunchContract$|TestMemorySummarySourceCLIAPIParityAndSessionProtection$)",
+        "-count=1",
+        "-timeout",
+        "90s",
+        "-json"
+      ],
+      "start": "2026-10-17T09:00:38.774337+00:00",
+      "end": "2026-10-17T09:02:53.118486+00:00",
+      "exit_code": 0,
+      "log": "targeted-final.jsonl"
+    },
+    {
+      "name": "vet",
+      "command": [
+        "go",
+        "vet",
+        "./internal/engine"
+      ],
+      "start": "2026-10-17T09:02:53.255728+00:00",
+      "end": "2026-10-17T09:03:12.757312+00:00",
+      "exit_code": 0,
+      "log": "vet.log"
+    },
+    {
+      "name": "build",
+      "command": [
+        "go",
+        "build",
+        "-o",
+        "/tmp/swarm-m24-bin-diklwovl/swarm",
+        "./cmd/swarm"
+      ],
+      "start": "2026-10-17T09:03:12.768285+00:00",
+      "end": "2026-10-17T09:04:06.261825+00:00",
+      "exit_code": 0,
+      "log": "build.log"
+    }
+  ],
+  "inputs_unchanged": false,
+  "changed_inputs": [
+    "internal/engine/agent_identity_receipt_linux_test.go",
+    "internal/engine/agent_identity_registry_types.go",
+    "internal/engine/agent_identity_issuer_linux.go"
+  ],
+  "binary": "/tmp/swarm-m24-bin-diklwovl/swarm",
+  "binary_sha256": "079ceec695f907b2180c829c90746508749c54433a019e81eb5979deb86bab33"
+}

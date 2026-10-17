@@ -1,0 +1,24 @@
+import datetime,hashlib,json,subprocess
+from pathlib import Path
+repo=Path('/home/fpizzi/Documents/ChatGPT/swarm');p=Path(__file__).resolve().parent
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+read=lambda n:json.loads((p/n).read_text())
+go=read('archive-final-race.json');assert go['exit_code']==0 and go['sources_unchanged'];names=go['named_passed_cases'];assert len(names)==47 and len(set(names))==47
+for f,h in go['input_sha256'].items():assert sha(repo/f)==h,('native input changed',f)
+for stage in ['build','vet','i18n','contexts','diff']:
+ v=read('archive-confirmed-'+stage+'.json');assert v['exit_code']==0 and v['sources_unchanged'];assert all(sha(repo/f)==h for f,h in v['input_sha256'].items()),stage
+binary=repo/'bin/swarm-actions-confiance-archive-confirmed';assert sha(binary)==read('archive-confirmed-build.json')['binary_sha256']
+for stage in ['archive-public-confirmed','archive-browser-confirmed','archive-pilot-confirmed']:
+ v=read(stage+'.json');assert v['exit_code']==0 and v['sources_unchanged'];assert all(sha(repo/f)==h for f,h in v['input_sha256'].items()),stage
+public=read('archive-public-confirmed/evidence-public.json');ui=read('archive-browser-confirmed/evidence-ui.json');pilot=read('archive-pilot-confirmed.out');assert len(public['checks'])==18 and public['binary_sha256']==sha(binary);assert len(ui['checks'])==42 and ui['expected_denials']==8 and not ui['unexpected_diagnostics'];assert len(pilot['cases'])==7 and pilot['binary_sha256']==sha(binary) and pilot['cases'][-1]['assertions']==23
+manifest=read('archive-manifest-final-race.json');assert manifest['exit_code']==0 and manifest['sources_unchanged']and manifest['named_passed_cases']==['TestGraphDeliveryD03QualificationManifest']
+rows=[];snapshot=json.loads((repo/'docs/engine-cursor-source-manifest.json').read_text())
+for part in snapshot['input_parts']:
+ assert sha(repo/part['path'])==part['sha256'];rows+=json.loads((repo/part['path']).read_text())
+assert all(sha(repo/r['path'])==r['sha256']for r in rows)
+preview=read('archive-preview-process.json');proc=Path('/proc')/str(preview['pid']);assert preview['verification_status']=='verified';assert(proc/'stat').read_text().split(') ',1)[1].split()[19]==preview['proc_start_ticks'];assert[x.decode()for x in(proc/'cmdline').read_bytes().split(b'\0')if x]==preview['argv'];assert sha(Path(preview['argv'][0]))==preview['binary_sha256']==sha(binary);assert sha(Path(preview['fixture_root'])/'.swarm/trust-actions.json')==preview['state_sha256_unchanged']
+r=subprocess.run(['git','diff','--check'],cwd=repo,capture_output=True);(p/'archive-diff-current.out').write_bytes(r.stdout+r.stderr);assert r.returncode==0
+proofs={str(f.relative_to(repo)):sha(f)for f in p.rglob('*')if f.is_file()and f.name!='archive-verification.json'}
+inputs={r['path']:r['sha256']for r in rows if 'trust_'in r['path']or 'evidence'in r['path']or r['path']in['internal/engine/store.go','internal/engine/main.go','internal/engine/web_server.go','resources.go','go.mod','go.sum','build.sh','package.json','locales/trust-actions-en.json']}
+result={'version':1,'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':'local_R16_checkpoint_and_nondestructive_archive_verified_not_independent_acceptance','binary':str(binary),'binary_sha256':sha(binary),'go':{'group':'archive-final-race','cases':len(names),'main':sum('/'not in n for n in names),'sub':sum('/'in n for n in names),'reuse':'Go sources and inputs match current bytes exactly. Later changes only translate shared UI title/button; all public checks use rebuilt final binary. Earlier 33/9 groups overlap and are not added. Historical 326 unrelated regression branches are retained at their prior inputs without claiming a new combined run.'},'public':{'cli_api_checks':18,'pilot_scenarios':7},'browser':{'evidence_checkpoint_archive':42,'pilot':23,'responsive_contexts':20,'unexpected_diagnostics':[],'expected_evidence_denials':8},'source_manifest_paths':len(rows),'preview':preview,'input_sha256':inputs,'proof_sha256':proofs,'limits':['operator acquires and stores checkpoint separately; no third-party time, immutable storage or same-UID write protection claim','minimum retention from creation; explicit release deletes neither archive nor original; no automatic purge or physical deletion operation','archived/offline pins do not learn later revocations; current key state is separate from historical bytes','ephemeral protected signing keys; hardware vault, swap and privileged tracing remain unqualified','R17 laboratory, R18 SPI/connector, R19 mapping, T7/T8 and RETEX remain open; sensitive providers remain unqualified','self-review only; no independent/global acceptance']}
+(p/'archive-verification.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps({'go':result['go'],'public':result['public'],'browser':result['browser'],'sources':len(rows),'inputs':len(inputs),'proofs':len(proofs)}))

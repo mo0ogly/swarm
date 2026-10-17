@@ -7,6 +7,27 @@ Claude and Swarm preparation. User instructions and runtime permissions take pre
 Continue the authorized objective after status requests and intermediate milestones;
 apply the continuity and closure rules in section 3 of the shared contract.
 
+The user explicitly prohibits prolonged silent waits, hours of unmanaged blockage
+and repeated claims of a fix without verified results. The user also prohibits
+long response delays: acknowledge briefly on receipt, use bounded work steps and
+concise tool output, and communicate before an analysis or check finishes. During
+active work, provide
+a meaningful update at least every 60 seconds: observed state, established cause
+or uncertainty, current action and pending evidence. Abnormal slowness triggers
+`replan` immediately; do not wait for the user to reactivate supervision. Changed
+wording or a raised budget alone never justifies repeating the same failure.
+Claim a fix only after the expected outcome is verified through the affected
+flow; distinguish local tests, runtime effect and overall acceptance. Instructions
+and scheduled wakeups alone do not establish repair or effective supervision.
+
+The user considers every discovered improvement highly valuable. Apply the
+recursive improvement loop in section 3 of the shared contract to opportunities
+as well as anomalies, including our methods, context transmission and engine.
+Retain each useful discovery in the existing plan or follow-up with evidence,
+owner and an observable outcome; act within the authorized scope and preserve
+concrete resumption conditions for anything deferred. A documented improvement
+is not a verified effect and creates no extra authority or budget.
+
 ## Common quality standard — Codex and Claude
 
 These rules apply to both assistants. They adapt the development discipline in
@@ -77,6 +98,19 @@ business cutoff. Verify saving, reopening and use by the actual consumer.
 
 ### Verify outcomes, including silent failures
 
+- Be cautious with timeouts and other test guards while the code's limits are
+  not understood. Identify their origin, scope and protected risk; observe
+  progress and measure behavior before adding or tightening a bound. This also
+  covers attempt, iteration, volume and concurrency caps or other test stop
+  conditions. Distinguish slow progress, a real stall, functional limits and
+  limits of the verification method. Do not substitute an arbitrary threshold
+  for diagnosis or bypass existing protections; preserve evidence and authority.
+- Justify verification deadlines from an observable contract or measurements;
+  never inherit an arbitrary whole-test limit from an earlier recipe. Without
+  a justified bound, explicitly disable the test runner's global watchdog,
+  follow progress and diagnose stalls. A timeout is incomplete evidence, and
+  splitting a batch does not justify its original bound. This does not authorize
+  removing contractual deadlines, budgets or operator policies.
 - A behavioral correction needs a reproducer that fails for the observed defect
   before the fix and passes afterwards. For public interface changes, specify
   expected behavior in targeted tests first. Existing checks can cover an internal
@@ -97,6 +131,11 @@ business cutoff. Verify saving, reopening and use by the actual consumer.
   a concrete affected dependency, new failure or unresolved concern.
 
 ### Documentation and definition of done
+
+Every modification includes its relevant documentation in the same increment,
+without waiting for a reminder: code, configuration, methods and instructions.
+If no documentation change is needed, retain the concrete reason in the existing
+tracking record. Preserve actual behavior, evidence, limits and remaining work.
 
 A feature or behavioral fix includes implementation, targeted regression checks,
 current contract documentation and a recipe verifying the observable result,

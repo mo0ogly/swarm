@@ -1,0 +1,483 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func summarySelectionRequest(t *testing.T, s *Store, w Work, r Launch) []byte {
+	t.Helper()
+	refs := []DialogueRef{dialogueHits(w)[0].Ref, dialogueHits(w)[1].Ref}
+	q, _ := json.Marshal(MemorySummarySourceRequest{Schema: 1, Work: w.ID, Task: r.TaskID, Revision: w.Revision, Dialogues: refs})
+	packet, err := s.memorySummarySource(q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var payload struct {
+		Sources []struct {
+			ID string `json:"id"`
+		} `json:"sources"`
+	}
+	if err := json.Unmarshal([]byte(packet.Payload), &payload); err != nil {
+		t.Fatal(err)
+	}
+	base, _ := json.Marshal(r)
+	var request map[string]any
+	if err := json.Unmarshal(base, &request); err != nil {
+		t.Fatal(err)
+	}
+	request["summary_selection"] = map[string]any{"schema_version": 1, "source_sha256": packet.SHA256, "dialogues": refs, "cutoff": 4, "reason": "Keep attributed history and the remaining recent source", "protected": []map[string]any{
+		{"id": "snapshot", "message": payload.Sources[0].ID, "kind": "evidence", "state": "historical"},
+		{"id": "intention", "message": payload.Sources[1].ID, "kind": "intention", "state": "future"},
+		{"id": "incident", "message": payload.Sources[2].ID, "kind": "incident", "state": "open"},
+	}}
+	raw, err := json.Marshal(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return raw
+}
+
+func TestMemorySummarySelectionPublicLaunchContract(t *testing.T) {
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	w = memorySeed(t, s, w)
+	r.Revision = w.Revision
+	raw := summarySelectionRequest(t, s, w, r)
+	var launch Launch
+	if err := strict(raw, &launch); err != nil {
+		t.Fatalf("extractive selection absent from public launch contract: %v", err)
+	}
+	before := recoverySnapshotTest(t, s)
+	preview, created, err := s.prepareLaunch(w.ID, launch, true)
+	if err != nil || created {
+		t.Fatal("preview", created, err)
+	}
+	if !strings.Contains(preview.Prompt, "Réponse 0") || strings.Contains(preview.Prompt, "Décision numéro 1") || !strings.Contains(preview.Prompt, "Réponse 1") || strings.Contains(preview.Prompt, "work_criteria") {
+		t.Fatal("wrong selected sources or operator snapshot injected")
+	}
+	if recoverySnapshotTest(t, s) != before {
+		t.Fatal("preview mutated state")
+	}
+	launch.ContextHash = preview.Context.SHA256
+	agent, created, err := s.prepare(w.ID, launch)
+	if err != nil || !created || agent.Prompt != preview.Prompt {
+		t.Fatal("confirmed prompt", created, err)
+	}
+	if agent.Context.SHA256 != hash([]byte(agent.Prompt)) {
+		t.Fatal("selection absent from context receipt")
+	}
+}
+
+func summarySelectionFixture(t *testing.T) (*Store, Work, Launch) {
+	t.Helper()
+	s := storeTest(t)
+	w, r := setupAgent(t, s)
+	w = memorySeed(t, s, w)
+	r.Revision = w.Revision
+	if err := strict(summarySelectionRequest(t, s, w, r), &r); err != nil {
+		t.Fatal(err)
+	}
+	return s, w, r
+}
+
+func TestMemorySummarySelectionRejectsInvalidChoicesWithoutMutation(t *testing.T) {
+	for _, scenario := range []string{"schema", "hash", "empty", "cutoff-zero", "cutoff-end", "snapshot-missing", "no-dialogue", "duplicate-anchor", "unknown-message", "state", "duplicate-dialogue", "changed-ref", "full-references", "role", "mode", "origin", "parent", "previous", "hierarchy", "brainstorm"} {
+		t.Run(scenario, func(t *testing.T) {
+			s, w, r := summarySelectionFixture(t)
+			switch scenario {
+			case "schema":
+				r.Summary.Schema = 2
+			case "hash":
+				r.Summary.SourceSHA = "stale"
+			case "empty":
+				r.Summary.Reason = " "
+			case "cutoff-zero":
+				r.Summary.Cutoff = 0
+			case "cutoff-end":
+				r.Summary.Cutoff = 5
+			case "snapshot-missing":
+				r.Summary.Protected = r.Summary.Protected[1:]
+			case "no-dialogue":
+				r.Summary.Protected = r.Summary.Protected[:1]
+			case "duplicate-anchor":
+				r.Summary.Protected = append(r.Summary.Protected, r.Summary.Protected[1])
+			case "unknown-message":
+				r.Summary.Protected[1].Message = "unknown"
+			case "state":
+				r.Summary.Protected[1].State = "accepted"
+			case "duplicate-dialogue":
+				r.Summary.Dialogues = append(r.Summary.Dialogues, r.Summary.Dialogues[0])
+			case "changed-ref":
+				r.Summary.Dialogues[0].SHA256 = "changed"
+			case "full-references":
+				r.References = r.Summary.Dialogues
+			case "role":
+				r.Role = "planner"
+			case "mode":
+				r.Mode = "dialogue"
+			case "origin":
+				r.Origin = originConductor
+			case "parent":
+				r.Parent = "another-agent"
+			case "previous":
+				r.Previous = "another-agent"
+			case "hierarchy":
+				w.Planning = &PlanningState{}
+			case "brainstorm":
+				r.Brainstorm = true
+			}
+			before := recoverySnapshotTest(t, s)
+			if _, _, err := memorySummaryAttachment(s.root, w, r); err == nil {
+				t.Fatal("invalid selection accepted", scenario)
+			}
+			if recoverySnapshotTest(t, s) != before {
+				t.Fatal("refusal mutated state")
+			}
+		})
+	}
+}
+
+func TestMemorySummarySelectionFreshnessAndConfirmation(t *testing.T) {
+	for _, scenario := range []string{"missing-confirmation", "changed-confirmation", "changed-task", "changed-answer"} {
+		t.Run(scenario, func(t *testing.T) {
+			s, w, r := summarySelectionFixture(t)
+			preview, _, err := s.prepareLaunch(w.ID, r, true)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.ContextHash = preview.Context.SHA256
+			switch scenario {
+			case "missing-confirmation":
+				r.ContextHash = ""
+			case "changed-confirmation":
+				r.Summary.Protected[1].State = "historical"
+				r.Summary.Protected[1].Kind = "evidence"
+			case "changed-task", "changed-answer":
+				w, err = s.mutate(w.ID, "fixture.drift", newID("e-"), w.Revision, []byte(`{}`), func(w *Work) error {
+					if scenario == "changed-task" {
+						w.Tasks[0].Criteria = []string{"Changed contract"}
+					} else {
+						w.Tasks[1].Answers[0].Text = "Changed source"
+					}
+					return nil
+				})
+				if err != nil {
+					t.Fatal(err)
+				}
+				r.Revision = w.Revision
+			}
+			before := recoverySnapshotTest(t, s)
+			if _, _, err = s.prepare(w.ID, r); err == nil {
+				t.Fatal("unconfirmed or changed context admitted")
+			}
+			if recoverySnapshotTest(t, s) != before {
+				t.Fatal("failed admission mutated state")
+			}
+		})
+	}
+}
+
+func TestMemorySummarySelectionConfirmationBindsReason(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	preview, _, err := s.prepareLaunch(w.ID, r, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.ContextHash = preview.Context.SHA256
+	r.Summary.Reason = "Changed after examining the preview"
+	before := recoverySnapshotTest(t, s)
+	if _, _, err = s.prepare(w.ID, r); err == nil {
+		t.Fatal("changed decision reason escaped context confirmation")
+	}
+	if recoverySnapshotTest(t, s) != before {
+		t.Fatal("changed selection mutated state")
+	}
+}
+
+func TestMemorySummarySelectionRejectsInvalidStoredBoundary(t *testing.T) {
+	for _, scenario := range []string{"invalid-utf8", "column-revision"} {
+		t.Run(scenario, func(t *testing.T) {
+			s, w, r := summarySelectionFixture(t)
+			var err error
+			w, err = s.mutate(w.ID, "fixture.valid-replacement", newID("e-"), w.Revision, []byte(`{}`), func(w *Work) error { w.Tasks[0].Title = "Task �"; return nil })
+			if err != nil {
+				t.Fatal(err)
+			}
+			r.Revision = w.Revision
+			if err = strict(summarySelectionRequest(t, s, w, r), &r); err != nil {
+				t.Fatal(err)
+			}
+			if scenario == "invalid-utf8" {
+				var body []byte
+				if err = s.db.QueryRow("SELECT body FROM works WHERE id=?", w.ID).Scan(&body); err != nil {
+					t.Fatal(err)
+				}
+				body = bytes.Replace(body, []byte("�"), []byte{0xff}, 1)
+				_, err = s.db.Exec("UPDATE works SET body=? WHERE id=?", body, w.ID)
+			} else {
+				_, err = s.db.Exec("UPDATE works SET revision=revision+1 WHERE id=?", w.ID)
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			before := recoverySnapshotTest(t, s)
+			if _, _, err = s.prepareLaunch(w.ID, r, true); err == nil {
+				t.Fatal("invalid stored source became an admissible context")
+			}
+			if recoverySnapshotTest(t, s) != before {
+				t.Fatal("invalid source refusal mutated storage")
+			}
+		})
+	}
+}
+
+func summaryCaptureProvider(t *testing.T, s *Store) string {
+	t.Helper()
+	script := filepath.Join(s.root, "claude")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\ncat >\"$0.prompt\"\nprintf 'call\\n' >>\"$0.calls\"\nprintf '%s\\n' '{\"type\":\"result\",\"result\":\"Fixture complete\",\"usage\":{\"input_tokens\":10,\"output_tokens\":2}}'\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	raw, _ := json.Marshal(Providers{Schema: 1, Providers: map[string]Provider{"fixture": {Command: script}}})
+	if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	return script
+}
+
+func prepareSummaryAgent(t *testing.T, s *Store, w Work, r Launch) Agent {
+	t.Helper()
+	preview, _, err := s.prepareLaunch(w.ID, r, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.ContextHash = preview.Context.SHA256
+	a, created, err := s.prepare(w.ID, r)
+	if err != nil || !created {
+		t.Fatal(created, err)
+	}
+	return a
+}
+
+func TestMemorySummarySelectionActualProviderInputAndReopen(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	script := summaryCaptureProvider(t, s)
+	a := prepareSummaryAgent(t, s, w, r)
+	if err := s.supervise(a.ID); err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := openStore(s.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	stored, err := reopened.agent(a.ID)
+	if err != nil || stored.Status != "completed" {
+		t.Fatal(err, stored.Status)
+	}
+	input, err := os.ReadFile(script + ".prompt")
+	if err != nil || string(input) != stored.Prompt || stored.Context.SHA256 != hash(input) {
+		t.Fatal("actual input differs from receipt", err)
+	}
+	receipt := stored.Context.Summary
+	if receipt == nil || receipt.CheckedBeforeStart == "" || receipt.CheckedSourceSHA != receipt.QueuedSourceSHA || receipt.SnapshotInjected || len(receipt.Received) != 3 || len(receipt.Omitted) != 1 {
+		t.Fatal("selection or start check missing", receipt)
+	}
+	if stored.PreparedContext == nil || stored.PreparedContext.Summary.CheckedBeforeStart != "" || stored.PreparedContext.SHA256 != a.Context.SHA256 {
+		t.Fatal("prepared receipt rewritten")
+	}
+	current, err := reopened.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if current.Tasks[0].Status == "accepted" || current.Tasks[0].Profile == nil {
+		t.Fatal("implicit acceptance or missing normal profile")
+	}
+	profile, _ := json.Marshal(current.Tasks[0].Profile)
+	if bytes.Contains(profile, []byte("summary")) {
+		t.Fatal("one-off selection inherited by reusable profile")
+	}
+	for i := 1; i < len(w.Tasks); i++ {
+		before, _ := json.Marshal(w.Tasks[i])
+		after, _ := json.Marshal(current.Tasks[i])
+		if !bytes.Equal(before, after) {
+			t.Fatal("source rewritten")
+		}
+	}
+	if calls, err := os.ReadFile(script + ".calls"); err != nil || string(calls) != "call\n" {
+		t.Fatal("provider repeated", err)
+	}
+	again, created, err := s.prepare(w.ID, func() Launch { r.ContextHash = a.Context.SHA256; return r }())
+	if err != nil || created || again.ID != a.ID {
+		t.Fatal("replay duplicated launch", created, err)
+	}
+}
+
+func TestMemorySummarySelectionQueuedDriftPreventsProvider(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	script := summaryCaptureProvider(t, s)
+	a := prepareSummaryAgent(t, s, w, r)
+	w, err := s.get(w.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err = s.mutate(w.ID, "fixture.queued-drift", newID("e-"), w.Revision, []byte(`{}`), func(w *Work) error { w.Tasks[0].Criteria = []string{"Changed while queued"}; return nil })
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = s.supervise(a.ID); err != nil {
+		t.Fatal(err)
+	}
+	stored, err := s.agent(a.ID)
+	if err != nil || stored.Status != "failed" || stored.Child != 0 || !strings.Contains(stored.Activity, "périmée") {
+		t.Fatal("stale queued context executed", err, stored.Activity)
+	}
+	if _, err = os.Stat(script + ".calls"); !os.IsNotExist(err) {
+		t.Fatal("provider invoked after drift", err)
+	}
+}
+
+func TestMemorySummarySelectionPreviewCLIAPIAndOldStorage(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	raw, _ := json.Marshal(r)
+	path := filepath.Join(t.TempDir(), "request.json")
+	if err := os.WriteFile(path, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	before := recoverySnapshotTest(t, s)
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"--root", s.root, "--json", "agent", "context-preview", w.ID, "--input", path}, &stdout, &stderr); code != 0 {
+		t.Fatal(code, stderr.String())
+	}
+	var cli struct {
+		Agent Agent `json:"agent"`
+	}
+	if err := json.Unmarshal(stdout.Bytes(), &cli); err != nil {
+		t.Fatal(err)
+	}
+	request := webRequest{Kind: "agent-context-preview", Work: w.ID, Task: r.TaskID, Event: r.EventID, Revision: r.Revision, Provider: r.Provider, Summary: r.Summary, Capture: r.Capture}
+	api, err := s.webAction(request)
+	if err != nil || api.(Agent).Prompt != cli.Agent.Prompt {
+		t.Fatal("API/CLI preview differs", err)
+	}
+	request.Kind = "retry"
+	if _, err = s.webAction(request); err == nil {
+		t.Fatal("unsupported web action ignored selection")
+	}
+	if recoverySnapshotTest(t, s) != before {
+		t.Fatal("preview mutated storage")
+	}
+	if _, err = s.db.Exec(fmt.Sprintf("PRAGMA user_version=%d", schemaVersion-1)); err != nil {
+		t.Fatal(err)
+	}
+	stdout.Reset()
+	stderr.Reset()
+	code := run([]string{"--root", s.root, "--json", "agent", "context-preview", w.ID, "--input", path}, &stdout, &stderr)
+	var version int
+	if err = s.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
+		t.Fatal(err)
+	}
+	if code != 2 || version != schemaVersion-1 || !strings.Contains(stderr.String(), "storage_upgrade_required") {
+		t.Fatal("preview migrated old storage", code, version)
+	}
+}
+
+func TestMemorySummarySelectionAPIAuthentication(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	raw, _ := json.Marshal(webRequest{Kind: "agent-context-preview", Work: w.ID, Task: r.TaskID, Event: r.EventID, Revision: r.Revision, Provider: r.Provider, Summary: r.Summary})
+	for _, authenticated := range []bool{false, true} {
+		req := httptest.NewRequest("POST", "http://localhost:18787/api/v1/action", bytes.NewReader(raw))
+		if authenticated {
+			req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "fixture-token"})
+		}
+		response := httptest.NewRecorder()
+		newWebHandler(s, "localhost:18787", "fixture-token").ServeHTTP(response, req)
+		if response.Code != 403 {
+			t.Fatal("unprotected summary preview", response.Code)
+		}
+	}
+}
+
+func TestMemorySummarySelectionConcurrentConfirmationCreatesOnce(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	preview, _, err := s.prepareLaunch(w.ID, r, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.ContextHash = preview.Context.SHA256
+	type outcome struct {
+		agent   Agent
+		created bool
+		err     error
+	}
+	results := make(chan outcome, 2)
+	for i := 0; i < 2; i++ {
+		go func() { a, c, e := s.prepare(w.ID, r); results <- outcome{a, c, e} }()
+	}
+	created := 0
+	for i := 0; i < 2; i++ {
+		v := <-results
+		if v.err != nil {
+			if commandFailure(v.err).Code != "revision_conflict" {
+				t.Fatal("concurrent confirmation", v.err)
+			}
+		} else if v.agent.ID != r.EventID {
+			t.Fatal("wrong concurrent identity")
+		}
+		if v.created {
+			created++
+		}
+	}
+	replayed, repeated, replayErr := s.prepare(w.ID, r)
+	if replayErr != nil || repeated || replayed.ID != r.EventID {
+		t.Fatal("public replay did not resolve concurrent refusal", replayErr)
+	}
+	var count int
+	if err = s.db.QueryRow("SELECT count(*) FROM agents WHERE work_id=?", w.ID).Scan(&count); err != nil || created != 1 || count != 1 {
+		t.Fatal("duplicate launch", created, count, err)
+	}
+}
+
+func TestMemorySummarySelectionReceiptWriteFailurePreventsProvider(t *testing.T) {
+	s, w, r := summarySelectionFixture(t)
+	script := summaryCaptureProvider(t, s)
+	a := prepareSummaryAgent(t, s, w, r)
+	_, err := s.db.Exec(`CREATE TRIGGER summary_receipt_write_failure BEFORE UPDATE ON agents WHEN json_extract(NEW.body,'$.context.summary.checked_before_start_at') IS NOT NULL BEGIN SELECT RAISE(ABORT,'fixture summary receipt unavailable'); END`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.supervise(a.ID)
+	if err != nil {
+		t.Fatal("supervisor could not persist the failed start check", err)
+	}
+	stored, err := s.agent(a.ID)
+	if err != nil || stored.Status != "failed" || stored.Child != 0 || !strings.Contains(stored.Activity, "fixture summary receipt unavailable") || stored.Context.Summary.CheckedBeforeStart != "" {
+		t.Fatal("unrecorded start check became success", err, stored.Status, stored.Activity)
+	}
+	if _, err = os.Stat(script + ".calls"); !os.IsNotExist(err) {
+		t.Fatal("provider started without durable receipt", err)
+	}
+	// The supervisor has already recorded the failure without a false check
+	// stamp. Remove the fixture trigger and verify persistence after reopening.
+	if _, err = s.db.Exec("DROP TRIGGER summary_receipt_write_failure"); err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := openStore(s.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	stored, err = reopened.agent(a.ID)
+	if err != nil || stored.Status != "failed" || stored.Child != 0 || stored.Context.Summary.CheckedBeforeStart != "" {
+		t.Fatal("fixture recovery", err)
+	}
+}

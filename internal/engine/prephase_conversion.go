@@ -9,14 +9,15 @@ import (
 )
 
 type PreparationConversion struct {
-	WorkID     string     `json:"work_id"`
-	PlanHash   string     `json:"plan_hash"`
-	BriefHash  string     `json:"brief_hash"`
-	MethodHash string     `json:"method_hash"`
-	TaskIDs    []string   `json:"task_ids"`
-	Spec       ActionPlan `json:"spec"`
-	CreatedAt  string     `json:"created_at"`
-	ReleasedAt string     `json:"released_at,omitempty"`
+	OrganizationDigest string     `json:"organization_sha256,omitempty"`
+	WorkID             string     `json:"work_id"`
+	PlanHash           string     `json:"plan_hash"`
+	BriefHash          string     `json:"brief_hash"`
+	MethodHash         string     `json:"method_hash"`
+	TaskIDs            []string   `json:"task_ids"`
+	Spec               ActionPlan `json:"spec"`
+	CreatedAt          string     `json:"created_at"`
+	ReleasedAt         string     `json:"released_at,omitempty"`
 }
 type PreparationConversionReview struct {
 	Action       string                  `json:"action"`
@@ -27,6 +28,10 @@ type PreparationConversionReview struct {
 	WorkTitle    string                  `json:"work_title"`
 	WorkRevision int                     `json:"work_revision"`
 	Spec         ActionPlan              `json:"spec"`
+}
+
+func preparationWorkCriteria() []string {
+	return []string{"Chaque mission satisfait ses critères et sa gate delivery avec des preuves fraîches."}
 }
 
 func migratePreparationLocks(db *sql.DB, root string, backup bool) error {
@@ -102,21 +107,28 @@ func (s *Store) preparationConversionReview(id string) (PreparationConversionRev
 // Called inside the preparation command transaction: work, edges, lock, receipt
 // and provenance commit together. Never calls dispatch or changes autonomy.
 func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequest) error {
+	attachOrganization := false
 	if (r.Action == "create-missions" || r.Action == "authorize-plan") && p.Conversion != nil {
 		if r.Hash != p.Conversion.PlanHash {
 			return preparationError("already_created", "Cette préparation a déjà créé ses missions. Ouvrir leur pilotage ; un autre plan exige une nouvelle préparation.")
 		}
-		return nil // Semantic replay with a new event also keeps the same missions.
+		if r.Organization == nil {
+			return preparationError("already_created", "Missions déjà créées ; retrouver le reçu ou utiliser revise-missions et release-plan pour changer leur état.")
+		}
+		if p.Conversion.OrganizationDigest != "" {
+			return preparationError("already_created", "Organisation déjà configurée ; retrouver son reçu ou utiliser les opérations publiques de configuration et release-plan.")
+		}
+		attachOrganization = true
 	}
 	if r.Action == "revise-missions" && p.Conversion != nil && r.Hash == p.Conversion.PlanHash {
-		return nil
+		return preparationError("already_created", "Ce plan est déjà matérialisé ; aucune nouvelle révision à appliquer.")
 	}
 	if r.Action == "release-plan" {
 		if p.Conversion == nil || r.Hash != p.Conversion.PlanHash {
 			return preparationError("stale_plan", "Relire le plan matérialisé avant d’autoriser son démarrage.")
 		}
 		if p.Conversion.ReleasedAt != "" {
-			return nil
+			return preparationError("already_created", "Départ déjà autorisé ; retrouver le reçu de release-plan.")
 		}
 	}
 	var w Work
@@ -138,7 +150,11 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 			return preparationError("conflict", "Le travail cible a changé. Rouvrir la revue avant de confirmer.")
 		}
 	}
-	if r.Action == "revise-missions" {
+	if attachOrganization {
+		if e := s.attachPreparedOrganization(tx, &w, p, r); e != nil {
+			return e
+		}
+	} else if r.Action == "revise-missions" {
 		if e := s.revisePreparedMissions(tx, &w, p, r); e != nil {
 			return e
 		}
@@ -158,7 +174,7 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 			return e
 		}
 		if create {
-			if e := s.apply(&w, "work.create", Request{Title: p.Title, Objective: spec.Objective, Scope: p.Brief.Text, Criteria: []string{"Chaque mission satisfait ses critères et sa gate delivery avec des preuves fraîches."}}); e != nil {
+			if e := s.apply(&w, "work.create", Request{Title: p.Title, Objective: spec.Objective, Scope: p.Brief.Text, Criteria: preparationWorkCriteria()}); e != nil {
 				return e
 			}
 		}
@@ -166,12 +182,16 @@ func (s *Store) convertPreparation(tx *sql.Tx, p *Preparation, r PreparationRequ
 			return e
 		}
 		if r.Organization != nil {
-			if e := s.configurePreparedOrganization(&w, *p, *r.Organization); e != nil {
+			if e := s.configurePreparedOrganization(&w, *p, *r.Organization, r.repositoryFinish); e != nil {
 				return e
 			}
 		}
 		approved := w.Plans[len(w.Plans)-1]
 		p.Conversion = &PreparationConversion{WorkID: w.ID, PlanHash: r.Hash, BriefHash: p.Brief.Hash, MethodHash: p.MethodHash, TaskIDs: approved.TaskIDs, Spec: spec, CreatedAt: now()}
+		if r.Organization != nil {
+			encoded, _ := json.Marshal(r.Organization)
+			p.Conversion.OrganizationDigest = hash(encoded)
+		}
 		p.WorkID = w.ID
 		for _, id := range approved.TaskIDs {
 			t, _ := w.task(id)

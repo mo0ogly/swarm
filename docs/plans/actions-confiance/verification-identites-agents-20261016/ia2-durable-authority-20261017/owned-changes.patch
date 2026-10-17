@@ -1,0 +1,2103 @@
+--- before/internal/engine/agent_identity_authority.go
++++ after/internal/engine/agent_identity_authority.go
+@@ -185,6 +185,13 @@
+ 			return agentIdentityError("agent_identity_history_changed")
+ 		}
+ 	}
++	return validateAgentIdentitySnapshotRecords(next)
++}
++
++func validateAgentIdentitySnapshotRecords(next agentIdentitySnapshot) error {
++	if next.Schema != 1 || next.Revision <= 0 || next.Grants == nil || next.Instances == nil {
++		return agentIdentityError("agent_identity_transition_invalid")
++	}
+ 	for id, grant := range next.Grants {
+ 		permissions, valid := agentIdentityPermissionSet(grant.Permissions)
+ 		_, delegable := agentIdentityPermissionSet(grant.Delegable)
+--- before/internal/engine/model.go
++++ after/internal/engine/model.go
+@@ -11,7 +11,7 @@
+ 	"time"
+ )
+ 
+-const schemaVersion = 35
++const schemaVersion = 36
+ 
+ type ManualOverride struct {
+ 	Reason         string `json:"reason"`
+@@ -383,6 +383,13 @@
+ 	return resolved, nil
+ }
+ func atomicWrite(path string, data []byte) error {
++	// Open the parent before mutation: durable publication requires both the
++	// file contents and its renamed directory entry to be synchronized.
++	dir, e := os.Open(filepath.Dir(path))
++	if e != nil {
++		return e
++	}
++	defer dir.Close()
+ 	f, e := os.CreateTemp(filepath.Dir(path), ".swarm-write-")
+ 	if e != nil {
+ 		return e
+@@ -400,5 +407,10 @@
+ 	if e = f.Close(); e != nil {
+ 		return e
+ 	}
+-	return os.Rename(name, path)
+-}
++	if e = os.Rename(name, path); e != nil {
++		return e
++	}
++	// A failure here means publication is uncertain, not rolled back. Callers
++	// must reconcile the target rather than blindly retrying an effect.
++	return dir.Sync()
++}
+--- before/internal/engine/store.go
++++ after/internal/engine/store.go
+@@ -436,6 +436,18 @@
+ 			return fail(e)
+ 		}
+ 	}
++	// v36 stores identity snapshots and publication receipts without granting
++	// authority to historical/imported rows. Trust anchors remain separate.
++	if version < 36 {
++		if version != 0 {
++			if e = migrationBackup(db, filepath.Join(dir, newID("state-pre-v36-")+".db")); e != nil {
++				return fail(e)
++			}
++		}
++		if e = migrateAgentIdentityRegistry(db); e != nil {
++			return fail(e)
++		}
++	}
+ 	if e = os.Chmod(path, 0600); e != nil {
+ 		return fail(e)
+ 	}
+--- before/internal/engine/trust_actions.go
++++ after/internal/engine/trust_actions.go
+@@ -161,47 +161,48 @@
+ }
+ 
+ type trustState struct {
+-	KernelObservation     *TrustKernelObservePolicy       `json:"kernel_observation,omitempty"`
+-	KernelCheck           *TrustKernelCheckPolicy         `json:"kernel_check,omitempty"`
+-	AccessLedger          []TrustAccessEntry              `json:"access_ledger,omitempty"`
+-	Laboratory            *TrustLaboratoryPolicy          `json:"laboratory,omitempty"`
+-	LaboratoryRuns        *trustLaboratoryState           `json:"laboratory_runs,omitempty"`
+-	EvidenceSigning       *TrustEvidenceSigningPolicy     `json:"evidence_signing,omitempty"`
+-	PublicEvidence        *trustEvidenceRegistry          `json:"public_evidence,omitempty"`
+-	ProcessPolicy         *TrustProcessPolicy             `json:"process_policy,omitempty"`
+-	Processes             *trustProcessState              `json:"processes,omitempty"`
+-	serviceProof          *trustServiceProof              `json:"-"`
+-	WorkloadIntrospection *TrustIntrospectionPolicy       `json:"workload_introspection,omitempty"`
+-	SecretBroker          *TrustSecretPolicy              `json:"secret_broker,omitempty"`
+-	SecretGrants          map[string]TrustSecretGrant     `json:"secret_grants,omitempty"`
+-	SealedExecution       *TrustSealedPolicy              `json:"sealed_execution,omitempty"`
+-	DataPolicy            *TrustDataPolicy                `json:"data_policy,omitempty"`
+-	GroupMapping          *TrustGroupMapping              `json:"group_mapping,omitempty"`
+-	OIDCLogoutFences      map[string]trustOIDCLogoutFence `json:"oidc_logout_fences,omitempty"`
+-	OIDCLogout            *TrustOIDCLogoutPolicy          `json:"oidc_logout,omitempty"`
+-	OIDCLogoutUsed        map[string]time.Time            `json:"oidc_logout_used,omitempty"`
+-	StepUp                *TrustStepUpPolicy              `json:"step_up,omitempty"`
+-	Delegation            *TrustDelegationPolicy          `json:"delegation,omitempty"`
+-	Workloads             *TrustWorkloadConfig            `json:"workloads,omitempty"`
+-	WorkloadUsed          map[string]time.Time            `json:"workload_used,omitempty"`
+-	WorkloadSessions      map[string]trustOIDCSession     `json:"workload_sessions,omitempty"`
+-	OIDC                  *TrustOIDCConfig                `json:"oidc,omitempty"`
+-	OIDCPending           map[string]trustOIDCPending     `json:"oidc_pending,omitempty"`
+-	OIDCSessions          map[string]trustOIDCSession     `json:"oidc_sessions,omitempty"`
+-	Originals             map[string][]byte               `json:"originals,omitempty"`
+-	Schema                int                             `json:"schema_version"`
+-	Revision              int                             `json:"revision"`
+-	Policy                TrustPolicy                     `json:"policy"`
+-	Identities            []trustIdentity                 `json:"identities"`
+-	History               []trustConfigRevision           `json:"history"`
+-	Mandates              map[string]TrustMandate         `json:"mandates"`
+-	Actions               map[string]TrustAction          `json:"actions"`
+-	Receipts              map[string]trustReceipt         `json:"connector_receipts"`
+-	Ledger                []TrustLedgerEntry              `json:"ledger"`
+-	Evidence              []TrustEvidence                 `json:"evidence"`
+-	EventAuthorities      map[string]string               `json:"event_authorities,omitempty"`
+-	EventReplies          map[string]json.RawMessage      `json:"event_replies"`
+-	EventDigests          map[string]string               `json:"event_digests"`
++	AgentIdentities       map[string]agentIdentityPublicationState `json:"agent_identity_authorities,omitempty"`
++	KernelObservation     *TrustKernelObservePolicy                `json:"kernel_observation,omitempty"`
++	KernelCheck           *TrustKernelCheckPolicy                  `json:"kernel_check,omitempty"`
++	AccessLedger          []TrustAccessEntry                       `json:"access_ledger,omitempty"`
++	Laboratory            *TrustLaboratoryPolicy                   `json:"laboratory,omitempty"`
++	LaboratoryRuns        *trustLaboratoryState                    `json:"laboratory_runs,omitempty"`
++	EvidenceSigning       *TrustEvidenceSigningPolicy              `json:"evidence_signing,omitempty"`
++	PublicEvidence        *trustEvidenceRegistry                   `json:"public_evidence,omitempty"`
++	ProcessPolicy         *TrustProcessPolicy                      `json:"process_policy,omitempty"`
++	Processes             *trustProcessState                       `json:"processes,omitempty"`
++	serviceProof          *trustServiceProof                       `json:"-"`
++	WorkloadIntrospection *TrustIntrospectionPolicy                `json:"workload_introspection,omitempty"`
++	SecretBroker          *TrustSecretPolicy                       `json:"secret_broker,omitempty"`
++	SecretGrants          map[string]TrustSecretGrant              `json:"secret_grants,omitempty"`
++	SealedExecution       *TrustSealedPolicy                       `json:"sealed_execution,omitempty"`
++	DataPolicy            *TrustDataPolicy                         `json:"data_policy,omitempty"`
++	GroupMapping          *TrustGroupMapping                       `json:"group_mapping,omitempty"`
++	OIDCLogoutFences      map[string]trustOIDCLogoutFence          `json:"oidc_logout_fences,omitempty"`
++	OIDCLogout            *TrustOIDCLogoutPolicy                   `json:"oidc_logout,omitempty"`
++	OIDCLogoutUsed        map[string]time.Time                     `json:"oidc_logout_used,omitempty"`
++	StepUp                *TrustStepUpPolicy                       `json:"step_up,omitempty"`
++	Delegation            *TrustDelegationPolicy                   `json:"delegation,omitempty"`
++	Workloads             *TrustWorkloadConfig                     `json:"workloads,omitempty"`
++	WorkloadUsed          map[string]time.Time                     `json:"workload_used,omitempty"`
++	WorkloadSessions      map[string]trustOIDCSession              `json:"workload_sessions,omitempty"`
++	OIDC                  *TrustOIDCConfig                         `json:"oidc,omitempty"`
++	OIDCPending           map[string]trustOIDCPending              `json:"oidc_pending,omitempty"`
++	OIDCSessions          map[string]trustOIDCSession              `json:"oidc_sessions,omitempty"`
++	Originals             map[string][]byte                        `json:"originals,omitempty"`
++	Schema                int                                      `json:"schema_version"`
++	Revision              int                                      `json:"revision"`
++	Policy                TrustPolicy                              `json:"policy"`
++	Identities            []trustIdentity                          `json:"identities"`
++	History               []trustConfigRevision                    `json:"history"`
++	Mandates              map[string]TrustMandate                  `json:"mandates"`
++	Actions               map[string]TrustAction                   `json:"actions"`
++	Receipts              map[string]trustReceipt                  `json:"connector_receipts"`
++	Ledger                []TrustLedgerEntry                       `json:"ledger"`
++	Evidence              []TrustEvidence                          `json:"evidence"`
++	EventAuthorities      map[string]string                        `json:"event_authorities,omitempty"`
++	EventReplies          map[string]json.RawMessage               `json:"event_replies"`
++	EventDigests          map[string]string                        `json:"event_digests"`
+ }
+ 
+ type TrustCommand struct {
+@@ -355,6 +356,9 @@
+ 	if state.Schema != 1 || state.Revision != len(state.History) || state.Mandates == nil || state.Actions == nil || state.Receipts == nil || state.EventReplies == nil || state.EventDigests == nil {
+ 		return state, fmt.Errorf("état Actions de confiance incohérent")
+ 	}
++	if err = validateAgentIdentityPublicationStates(state.AgentIdentities); err != nil {
++		return state, err
++	}
+ 	if state.Originals == nil {
+ 		state.Originals = map[string][]byte{}
+ 	}
+@@ -474,13 +478,9 @@
+ 		return nil, err
+ 	}
+ 	if write {
+-		raw, marshalErr := json.MarshalIndent(state, "", "  ")
++		raw, marshalErr := encodeTrustState(state)
+ 		if marshalErr != nil {
+ 			return nil, marshalErr
+-		}
+-		raw = append(raw, '\n')
+-		if len(raw) > trustStateMaxBytes {
+-			return nil, fmt.Errorf("état Actions de confiance supérieur à 8 Mio")
+ 		}
+ 		if initial && state.Revision == 1 {
+ 			err = s.publishTrustInitialState(raw)
+@@ -504,6 +504,18 @@
+ 		b.mu.Unlock()
+ 	}
+ 	return result, nil
++}
++
++func encodeTrustState(state trustState) ([]byte, error) {
++	raw, err := json.MarshalIndent(state, "", "  ")
++	if err != nil {
++		return nil, err
++	}
++	raw = append(raw, '\n')
++	if len(raw) > trustStateMaxBytes {
++		return nil, fmt.Errorf("état Actions de confiance supérieur à 8 Mio")
++	}
++	return raw, nil
+ }
+ 
+ func trustPublicState(st *trustState) map[string]any {
+--- before/internal/engine/agent_identity_registry_schema.go
++++ after/internal/engine/agent_identity_registry_schema.go
+@@ -0,0 +1,21 @@
++package engine
++
++import "database/sql"
++
++func migrateAgentIdentityRegistry(db *sql.DB) error {
++	tx, err := db.Begin()
++	if err != nil {
++		return err
++	}
++	defer tx.Rollback()
++	for _, statement := range []string{
++		`CREATE TABLE IF NOT EXISTS agent_identity_snapshots(work_id TEXT NOT NULL REFERENCES works(id),revision INTEGER NOT NULL CHECK(revision>0),digest TEXT NOT NULL,body BLOB NOT NULL,PRIMARY KEY(work_id,revision))`,
++		`CREATE TABLE IF NOT EXISTS agent_identity_publications(event_id TEXT PRIMARY KEY,work_id TEXT NOT NULL REFERENCES works(id),head_digest TEXT NOT NULL UNIQUE,body BLOB NOT NULL)`,
++		`PRAGMA user_version=36`,
++	} {
++		if _, err = tx.Exec(statement); err != nil {
++			return err
++		}
++	}
++	return tx.Commit()
++}
+--- before/internal/engine/agent_identity_registry_types.go
++++ after/internal/engine/agent_identity_registry_types.go
+@@ -0,0 +1,157 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"path/filepath"
++)
++
++// The journal is data. Authority additionally requires the independent Trust
++// head AND a private checkpoint supplied by the controller, never reconstructed
++// from an imported database or untrusted request. Human minting belongs to IA3.
++type agentIdentityRegistryHead struct {
++	Schema         int                    `json:"schema_version"`
++	ProjectDigest  string                 `json:"project_context_digest"`
++	Scope          agentIdentityScope     `json:"scope"`
++	Revision       int                    `json:"snapshot_revision"`
++	SnapshotDigest string                 `json:"snapshot_digest"`
++	TrustRevision  int                    `json:"trust_configuration_revision"`
++	Roots          []string               `json:"root_grants"`
++	Publisher      agentIdentityPrincipal `json:"publisher"`
++	EventID        string                 `json:"event_id"`
++	Previous       string                 `json:"previous_head_digest,omitempty"`
++}
++
++type agentIdentityRegistryIntent struct {
++	Head     agentIdentityRegistryHead `json:"head"`
++	Snapshot json.RawMessage           `json:"snapshot"`
++}
++
++type agentIdentityPublicationState struct {
++	Head    *agentIdentityRegistryHead   `json:"head,omitempty"`
++	Pending *agentIdentityRegistryIntent `json:"pending,omitempty"`
++}
++
++// Neither private checkpoint nor publication permit can be populated by JSON.
++// The permit binds the exact next snapshot, roots, publisher and Trust revision.
++// A business role or token alone never constructs this capability.
++type agentIdentityRegistryCheckpoint struct {
++	projectRoot string
++	workID      string
++	headDigest  string
++}
++
++type agentIdentityRegistryPermit struct {
++	base          agentIdentityRegistryCheckpoint
++	nextDigest    string
++	roots         []string
++	publisher     agentIdentityPrincipal
++	trustRevision int
++	eventID       string
++	scope         agentIdentityScope
++}
++
++func (c agentIdentityRegistryCheckpoint) valid() bool {
++	return filepath.IsAbs(c.projectRoot) && filepath.Clean(c.projectRoot) == c.projectRoot && safeName(c.workID) &&
++		(c.headDigest == "" || agentIdentityHashValid(c.headDigest))
++}
++
++func (h agentIdentityRegistryHead) valid() bool {
++	if h.Schema != 1 || !agentIdentityHashValid(h.ProjectDigest) || !h.Scope.valid() || h.Revision <= 0 || !agentIdentityHashValid(h.SnapshotDigest) || h.TrustRevision <= 0 ||
++		!h.Publisher.valid() || !safeName(h.EventID) || (h.Previous != "" && !agentIdentityHashValid(h.Previous)) || len(h.Roots) == 0 {
++		return false
++	}
++	seen := map[string]bool{}
++	for _, id := range h.Roots {
++		if !safeName(id) || seen[id] {
++			return false
++		}
++		seen[id] = true
++	}
++	return true
++}
++
++func validateAgentIdentityPublicationStates(states map[string]agentIdentityPublicationState) error {
++	for id, state := range states {
++		if !safeName(id) || (state.Head == nil && state.Pending == nil) {
++			return agentIdentityError("agent_identity_registry_invalid")
++		}
++		previous := ""
++		if state.Head != nil {
++			if !state.Head.valid() || state.Head.Scope.WorkID != id {
++				return agentIdentityError("agent_identity_registry_invalid")
++			}
++			previous, _ = agentIdentityDigest(*state.Head)
++		}
++		if state.Pending != nil {
++			revision := 1
++			if state.Head != nil {
++				revision = state.Head.Revision + 1
++			}
++			if !state.Pending.Head.valid() || state.Pending.Head.Scope.WorkID != id || state.Pending.Head.Previous != previous || state.Pending.Head.Revision != revision || len(state.Pending.Snapshot) == 0 {
++				return agentIdentityError("agent_identity_registry_invalid")
++			}
++		}
++	}
++	return nil
++}
++
++func validateAgentIdentityRegistrySnapshot(snapshot agentIdentitySnapshot, head agentIdentityRegistryHead) error {
++	if !head.valid() || snapshot.Revision != head.Revision {
++		return agentIdentityError("agent_identity_registry_invalid")
++	}
++	if err := validateAgentIdentitySnapshotRecords(snapshot); err != nil {
++		return err
++	}
++	digest, err := agentIdentityDigest(snapshot)
++	if err != nil || digest != head.SnapshotDigest {
++		return agentIdentityError("agent_identity_snapshot_changed")
++	}
++	for _, id := range head.Roots {
++		grant, exists := snapshot.Grants[id]
++		if !exists || grant.ParentID != "" || grant.Scope != head.Scope || grant.TrustRevision != head.TrustRevision {
++			return agentIdentityError("agent_identity_root_untrusted")
++		}
++	}
++	visited := map[string]bool{}
++	for id, grant := range snapshot.Grants {
++		if grant.Scope.WorkID != head.Scope.WorkID {
++			return agentIdentityError("agent_identity_registry_invalid")
++		}
++		if grant.Holder.InstanceID != "" {
++			instance, exists := snapshot.Instances[grant.Holder.InstanceID]
++			if !exists || instance.Principal != grant.Holder.Principal || instance.GrantID != id || instance.Scope != grant.Scope {
++				return agentIdentityError("agent_identity_binding_mismatch")
++			}
++		}
++		path := map[string]bool{}
++		for currentID := id; currentID != "" && !visited[currentID]; {
++			if path[currentID] {
++				return agentIdentityError("agent_identity_delegation_invalid")
++			}
++			path[currentID] = true
++			current := snapshot.Grants[currentID]
++			if current.ParentID != "" {
++				parent, exists := snapshot.Grants[current.ParentID]
++				rights, valid := agentIdentityPermissionSet(parent.Delegable)
++				if !exists || !valid || current.Issuer != parent.Holder || current.Scope != parent.Scope || current.TrustRevision != parent.TrustRevision ||
++					current.NotBefore.Before(parent.NotBefore) || current.ExpiresAt.After(parent.ExpiresAt) ||
++					!agentIdentitySubset(current.Permissions, rights) || !agentIdentitySubset(current.Delegable, rights) {
++					return agentIdentityError("agent_identity_delegation_invalid")
++				}
++			}
++			currentID = current.ParentID
++		}
++		for currentID := range path {
++			visited[currentID] = true
++		}
++	}
++	for id, instance := range snapshot.Instances {
++		grant, exists := snapshot.Grants[instance.GrantID]
++		if !exists || instance.Scope.WorkID != head.Scope.WorkID || grant.Holder.InstanceID != id || grant.Holder.Principal != instance.Principal || grant.Scope != instance.Scope {
++			return agentIdentityError("agent_identity_binding_mismatch")
++		}
++	}
++	return nil
++}
+--- before/internal/engine/agent_identity_registry_store.go
++++ after/internal/engine/agent_identity_registry_store.go
+@@ -0,0 +1,204 @@
++//go:build linux
++
++package engine
++
++import (
++	"bytes"
++	"context"
++	"database/sql"
++	"encoding/json"
++	"fmt"
++	"time"
++)
++
++type agentIdentityRegistryQuery interface {
++	QueryRowContext(context.Context, string, ...any) *sql.Row
++}
++
++// Current authority never comes from SELECT max(revision). The private
++// checkpoint authenticates the independent Trust head; its exact snapshot is
++// then decoded into owned maps. Historical rows or imported data cannot advance
++// this checkpoint. A real external checkpoint issuer/recovery UI is still IA3.
++func loadAgentIdentityRegistry(ctx context.Context, query agentIdentityRegistryQuery, state *trustState, checkpoint agentIdentityRegistryCheckpoint) (agentIdentitySnapshot, agentIdentityRegistryHead, error) {
++	var snapshot agentIdentitySnapshot
++	var head agentIdentityRegistryHead
++	if ctx == nil || !checkpoint.valid() || checkpoint.headDigest == "" {
++		return snapshot, head, agentIdentityError("agent_identity_checkpoint_required")
++	}
++	current := state.AgentIdentities[checkpoint.workID]
++	if current.Pending != nil {
++		return snapshot, head, agentIdentityError("agent_identity_publication_pending")
++	}
++	if current.Head == nil {
++		return snapshot, head, agentIdentityError("agent_identity_authority_unavailable")
++	}
++	head = *current.Head
++	digest, err := agentIdentityDigest(head)
++	if err != nil || !head.valid() || digest != checkpoint.headDigest || head.ProjectDigest != hash([]byte(checkpoint.projectRoot)) || head.Scope.WorkID != checkpoint.workID {
++		return snapshot, head, agentIdentityError("agent_identity_checkpoint_mismatch")
++	}
++	var version int
++	if err = query.QueryRowContext(ctx, "PRAGMA user_version").Scan(&version); err != nil {
++		return snapshot, head, err
++	}
++	if version != schemaVersion {
++		return snapshot, head, agentIdentityError("storage_version_conflict")
++	}
++	var body []byte
++	var storedDigest string
++	var length int
++	err = query.QueryRowContext(ctx, `SELECT digest,length(body),CASE WHEN length(body)<=? THEN body ELSE NULL END FROM agent_identity_snapshots WHERE work_id=? AND revision=?`, trustStateMaxBytes, checkpoint.workID, head.Revision).Scan(&storedDigest, &length, &body)
++	if err != nil {
++		return snapshot, head, fmt.Errorf("instantané d'identité indisponible : %w", err)
++	}
++	if length <= 0 || length > trustStateMaxBytes || storedDigest != head.SnapshotDigest {
++		return snapshot, head, agentIdentityError("agent_identity_snapshot_changed")
++	}
++	snapshot, err = decodeAgentIdentitySnapshot(body)
++	if err != nil {
++		return snapshot, head, err
++	}
++	canonical, err := json.Marshal(snapshot)
++	if err != nil || !bytes.Equal(body, canonical) {
++		return snapshot, head, agentIdentityError("agent_identity_snapshot_changed")
++	}
++	if err = validateAgentIdentityRegistrySnapshot(snapshot, head); err != nil {
++		return snapshot, head, err
++	}
++	if err = verifyAgentIdentityRegistryChain(ctx, query, head); err != nil {
++		return snapshot, head, err
++	}
++	// No caller can mutate state/head roots by retaining a returned slice.
++	head.Roots = append([]string(nil), head.Roots...)
++	return snapshot, head, nil
++}
++
++func verifyAgentIdentityRegistryChain(ctx context.Context, query agentIdentityRegistryQuery, head agentIdentityRegistryHead) error {
++	current := head
++	for revision := head.Revision; revision > 0; revision-- {
++		if !current.valid() || current.Revision != revision || current.Scope.WorkID != head.Scope.WorkID || current.ProjectDigest != head.ProjectDigest {
++			return agentIdentityError("agent_identity_registry_history_changed")
++		}
++		expected, err := json.Marshal(current)
++		if err != nil {
++			return err
++		}
++		digest := hash(expected)
++		var body []byte
++		var event string
++		if err = query.QueryRowContext(ctx, `SELECT event_id,CASE WHEN length(body)<=? THEN body ELSE NULL END FROM agent_identity_publications WHERE work_id=? AND head_digest=?`, trustStateMaxBytes, head.Scope.WorkID, digest).Scan(&event, &body); err != nil {
++			return fmt.Errorf("journal d'identité incomplet : %w", err)
++		}
++		if !bytes.Equal(body, expected) || event != current.EventID {
++			return agentIdentityError("agent_identity_registry_history_changed")
++		}
++		if revision == 1 {
++			if current.Previous != "" {
++				return agentIdentityError("agent_identity_registry_history_changed")
++			}
++			return nil
++		}
++		if !agentIdentityHashValid(current.Previous) {
++			return agentIdentityError("agent_identity_registry_history_changed")
++		}
++		if err = query.QueryRowContext(ctx, `SELECT CASE WHEN length(body)<=? THEN body ELSE NULL END FROM agent_identity_publications WHERE work_id=? AND head_digest=?`, trustStateMaxBytes, head.Scope.WorkID, current.Previous).Scan(&body); err != nil {
++			return err
++		}
++		var previous agentIdentityRegistryHead
++		if hash(body) != current.Previous || strict(body, &previous) != nil {
++			return agentIdentityError("agent_identity_registry_history_changed")
++		}
++		current = previous
++	}
++	return agentIdentityError("agent_identity_registry_history_changed")
++}
++
++func agentIdentityRegistryAuthority(head agentIdentityRegistryHead, root string) agentIdentityAuthority {
++	roots := make(map[string]bool, len(head.Roots))
++	for _, id := range head.Roots {
++		roots[id] = true
++	}
++	return agentIdentityAuthority{projectRoot: root, snapshotDigest: head.SnapshotDigest, snapshotRevision: head.Revision, trustRevision: head.TrustRevision, scope: head.Scope, roots: roots}
++}
++
++// A deferred read transaction keeps schema/snapshot/journal reads together.
++// Release its connection before taking the runtime lock. No write is issued.
++func (s *Store) readAgentIdentityRegistrySnapshot(ctx context.Context, state *trustState, checkpoint agentIdentityRegistryCheckpoint) (agentIdentitySnapshot, agentIdentityRegistryHead, error) {
++	var snapshot agentIdentitySnapshot
++	var head agentIdentityRegistryHead
++	tx, err := s.db.BeginTx(ctx, nil)
++	if err != nil {
++		return snapshot, head, err
++	}
++	defer tx.Rollback()
++	snapshot, head, err = loadAgentIdentityRegistry(ctx, tx, state, checkpoint)
++	if err != nil {
++		return agentIdentitySnapshot{}, agentIdentityRegistryHead{}, err
++	}
++	if err = tx.Commit(); err != nil {
++		return agentIdentitySnapshot{}, agentIdentityRegistryHead{}, err
++	}
++	return snapshot, head, nil
++}
++
++// Normal reading/evaluation rejects pending publications and stale Trust
++// revisions. No snapshot or authority frame is accepted from the message.
++func (s *Store) evaluateAgentIdentityRegistryMessage(ctx context.Context, checkpoint agentIdentityRegistryCheckpoint, message *agentIdentityMessage, runtime *agentIdentityRuntime, previous *agentIdentityDecision, at time.Time) (agentIdentityDecision, error) {
++	var decision agentIdentityDecision
++	if ctx == nil || checkpoint.projectRoot != s.root || message == nil {
++		return decision, agentIdentityError("agent_identity_checkpoint_required")
++	}
++	request, err := decodeAgentIdentityRequest(message.raw)
++	if err != nil {
++		return decision, err
++	}
++	_, err = s.withTrustReadAvailable(func(state *trustState) (any, error) {
++		snapshot, head, err := s.readAgentIdentityRegistrySnapshot(ctx, state, checkpoint)
++		if err != nil {
++			return nil, err
++		}
++		if head.TrustRevision != state.Revision {
++			return nil, agentIdentityError("agent_identity_registry_stale")
++		}
++		authority := agentIdentityRegistryAuthority(head, s.root)
++		// SQL data has been copied and its connection released before runtime.
++		return nil, runtime.withCaller(message, s.root, state.Revision, at, func(caller agentIdentityCaller) error {
++			if err := ctx.Err(); err != nil {
++				return err
++			}
++			if previous != nil {
++				decision, err = reuseAgentIdentityDecision(*previous, snapshot, authority, caller, request, caller.verifiedAt)
++			} else {
++				decision, err = evaluateAgentIdentity(snapshot, authority, caller, request, caller.verifiedAt)
++			}
++			return err
++		})
++	})
++	return decision, err
++}
++
++// Source read for trusted controller inspection. This grants no business action.
++func (s *Store) readAgentIdentityRegistry(ctx context.Context, checkpoint agentIdentityRegistryCheckpoint) (agentIdentitySnapshot, agentIdentityAuthority, error) {
++	var snapshot agentIdentitySnapshot
++	var authority agentIdentityAuthority
++	if ctx == nil || checkpoint.projectRoot != s.root {
++		return snapshot, authority, agentIdentityError("agent_identity_checkpoint_required")
++	}
++	_, err := s.withTrustReadAvailable(func(state *trustState) (any, error) {
++		var head agentIdentityRegistryHead
++		var err error
++		snapshot, head, err = s.readAgentIdentityRegistrySnapshot(ctx, state, checkpoint)
++		if err != nil {
++			return nil, err
++		}
++		if head.TrustRevision != state.Revision {
++			return nil, agentIdentityError("agent_identity_registry_stale")
++		}
++		authority = agentIdentityRegistryAuthority(head, s.root)
++		return nil, nil
++	})
++	if err != nil {
++		return agentIdentitySnapshot{}, agentIdentityAuthority{}, err
++	}
++	return snapshot, authority, nil
++}
+--- before/internal/engine/agent_identity_registry_publish.go
++++ after/internal/engine/agent_identity_registry_publish.go
+@@ -0,0 +1,207 @@
++//go:build linux
++
++package engine
++
++import (
++	"context"
++	"database/sql"
++	"encoding/json"
++	"time"
++)
++
++// Test-only failure injection at completed durability boundaries. A production
++// caller uses nil. This cannot authorize, modify or execute a business effect.
++type agentIdentityPublicationFault func(string) error
++
++func (s *Store) publishAgentIdentityRegistry(ctx context.Context, raw []byte, token string, permit agentIdentityRegistryPermit, fault agentIdentityPublicationFault) (agentIdentityRegistryCheckpoint, error) {
++	return s.changeAgentIdentityRegistry(ctx, raw, token, permit, false, fault)
++}
++
++// Recovery requires the original private permit and exact snapshot. It can
++// only finish that already prepared/committed publication, never prepare a new
++// one. This controller capability is separate from a business/admin role.
++func (s *Store) recoverAgentIdentityRegistry(ctx context.Context, raw []byte, permit agentIdentityRegistryPermit) (agentIdentityRegistryCheckpoint, error) {
++	return s.changeAgentIdentityRegistry(ctx, raw, "", permit, true, nil)
++}
++
++func (s *Store) changeAgentIdentityRegistry(ctx context.Context, raw []byte, token string, permit agentIdentityRegistryPermit, recovering bool, fault agentIdentityPublicationFault) (agentIdentityRegistryCheckpoint, error) {
++	var result agentIdentityRegistryCheckpoint
++	if ctx == nil || !permit.base.valid() || permit.base.projectRoot != s.root || !permit.scope.valid() || permit.scope.WorkID != permit.base.workID ||
++		!permit.publisher.valid() || !safeName(permit.eventID) || permit.trustRevision <= 0 || !agentIdentityHashValid(permit.nextDigest) {
++		return result, agentIdentityError("agent_identity_publication_permit_required")
++	}
++	snapshot, err := decodeAgentIdentitySnapshot(raw)
++	if err != nil {
++		return result, err
++	}
++	head := agentIdentityRegistryHead{Schema: 1, ProjectDigest: hash([]byte(s.root)), Scope: permit.scope, Revision: snapshot.Revision, SnapshotDigest: permit.nextDigest,
++		TrustRevision: permit.trustRevision, Roots: append([]string(nil), permit.roots...), Publisher: permit.publisher, EventID: permit.eventID, Previous: permit.base.headDigest}
++	if err = validateAgentIdentityRegistrySnapshot(snapshot, head); err != nil {
++		return result, err
++	}
++	canonical, err := json.Marshal(snapshot)
++	if err != nil {
++		return result, err
++	}
++	headBytes, err := json.Marshal(head)
++	if err != nil {
++		return result, err
++	}
++	headDigest := hash(headBytes)
++	nextCheckpoint := agentIdentityRegistryCheckpoint{s.root, permit.base.workID, headDigest}
++	_, err = s.withTrustPublicationLockUsing(true, nil, true, func(state *trustState) (any, error) {
++		if err := ctx.Err(); err != nil {
++			return nil, err
++		}
++		tx, err := s.db.BeginTx(ctx, nil)
++		if err != nil {
++			return nil, err
++		}
++		defer tx.Rollback()
++		// Reserve SQLite before any reads and before sampling authorization time.
++		if _, err = tx.ExecContext(ctx, `UPDATE agent_identity_snapshots SET revision=revision WHERE work_id=?`, permit.base.workID); err != nil {
++			return nil, err
++		}
++		var version int
++		if err = tx.QueryRowContext(ctx, "PRAGMA user_version").Scan(&version); err != nil {
++			return nil, err
++		}
++		if version != schemaVersion {
++			return nil, agentIdentityError("storage_version_conflict")
++		}
++		if !recovering {
++			caller, err := resolveAgentIdentityCaller(s.root, state, token, time.Now().UTC())
++			if err != nil {
++				return nil, err
++			}
++			if caller.actor.Principal != permit.publisher || state.Revision != permit.trustRevision {
++				return nil, agentIdentityError("agent_identity_publication_permit_stale")
++			}
++		}
++		var workExists int
++		if err = tx.QueryRowContext(ctx, `SELECT count(*) FROM works WHERE id=?`, permit.base.workID).Scan(&workExists); err != nil {
++			return nil, err
++		}
++		if workExists != 1 {
++			return nil, agentIdentityError("agent_identity_work_missing")
++		}
++		current := state.AgentIdentities[permit.base.workID]
++		if current.Head != nil {
++			digest, _ := agentIdentityDigest(*current.Head)
++			if digest == headDigest && current.Pending == nil {
++				// Authenticate before this idempotent result on the normal path.
++				if _, _, err = loadAgentIdentityRegistry(ctx, tx, state, nextCheckpoint); err != nil {
++					return nil, err
++				}
++				return nextCheckpoint, nil
++			}
++		}
++		if recovering {
++			if current.Pending == nil {
++				return nil, agentIdentityError("agent_identity_recovery_not_prepared")
++			}
++			pendingDigest, _ := agentIdentityDigest(current.Pending.Head)
++			pendingSnapshot, e := decodeAgentIdentitySnapshot(current.Pending.Snapshot)
++			pendingContent, e2 := agentIdentityDigest(pendingSnapshot)
++			if e != nil || e2 != nil || pendingDigest != headDigest || pendingContent != permit.nextDigest {
++				return nil, agentIdentityError("agent_identity_recovery_conflict")
++			}
++		} else if current.Pending != nil {
++			return nil, agentIdentityError("agent_identity_publication_pending")
++		}
++		// Pending blocks ordinary readers; validate the previous head using an
++		// owned state projection that removes only this exact pending marker.
++		projection := *state
++		projection.AgentIdentities = map[string]agentIdentityPublicationState{permit.base.workID: {Head: current.Head}}
++		if current.Head == nil {
++			var rows int
++			if permit.base.headDigest != "" || snapshot.Revision != 1 {
++				return nil, agentIdentityError("agent_identity_checkpoint_mismatch")
++			}
++			if err = tx.QueryRowContext(ctx, `SELECT (SELECT count(*) FROM agent_identity_snapshots WHERE work_id=?)+(SELECT count(*) FROM agent_identity_publications WHERE work_id=?)`, permit.base.workID, permit.base.workID).Scan(&rows); err != nil {
++				return nil, err
++			}
++			if rows != 0 && !recovering {
++				return nil, agentIdentityError("agent_identity_import_not_authority")
++			}
++		} else {
++			previous, _, err := loadAgentIdentityRegistry(ctx, tx, &projection, permit.base)
++			if err != nil {
++				return nil, err
++			}
++			if err = validateAgentIdentityTransition(previous, snapshot); err != nil {
++				return nil, err
++			}
++		}
++		var existing string
++		err = tx.QueryRowContext(ctx, `SELECT head_digest FROM agent_identity_publications WHERE event_id=?`, permit.eventID).Scan(&existing)
++		if err != nil && err != sql.ErrNoRows {
++			return nil, err
++		}
++		if err == nil && (!recovering || existing != headDigest) {
++			return nil, agentIdentityError("agent_identity_publication_conflict")
++		}
++		if state.AgentIdentities == nil {
++			state.AgentIdentities = map[string]agentIdentityPublicationState{}
++		}
++		if !recovering {
++			// History validation may involve several reads. Reauthenticate at
++			// the durable decision boundary, not only after the writer wait.
++			caller, err := resolveAgentIdentityCaller(s.root, state, token, time.Now().UTC())
++			if err != nil {
++				return nil, err
++			}
++			if caller.actor.Principal != permit.publisher || state.Revision != permit.trustRevision {
++				return nil, agentIdentityError("agent_identity_publication_permit_stale")
++			}
++			current.Pending = &agentIdentityRegistryIntent{Head: head, Snapshot: canonical}
++			state.AgentIdentities[permit.base.workID] = current
++			prepared, err := encodeTrustState(*state)
++			if err != nil {
++				return nil, err
++			}
++			path, _, _ := s.trustPaths()
++			if err = atomicWrite(path, prepared); err != nil {
++				return nil, err
++			}
++			if fault != nil {
++				if err = fault("intent_persisted"); err != nil {
++					return nil, err
++				}
++			}
++		}
++		if existing == "" {
++			if _, err = tx.ExecContext(ctx, `INSERT INTO agent_identity_snapshots(work_id,revision,digest,body) VALUES(?,?,?,?)`, permit.base.workID, snapshot.Revision, permit.nextDigest, canonical); err != nil {
++				return nil, err
++			}
++			if _, err = tx.ExecContext(ctx, `INSERT INTO agent_identity_publications(event_id,work_id,head_digest,body) VALUES(?,?,?,?)`, permit.eventID, permit.base.workID, headDigest, headBytes); err != nil {
++				return nil, err
++			}
++		} else {
++			// The SQLite side was already committed before the interrupted
++			// finalization. Verify the entire target, never insert it twice.
++			target := *state
++			target.AgentIdentities = map[string]agentIdentityPublicationState{permit.base.workID: {Head: &head}}
++			if _, _, err = loadAgentIdentityRegistry(ctx, tx, &target, nextCheckpoint); err != nil {
++				return nil, err
++			}
++		}
++		if err = tx.Commit(); err != nil {
++			return nil, err
++		}
++		if fault != nil {
++			if err = fault("sqlite_committed"); err != nil {
++				return nil, err
++			}
++		}
++		// The enclosing Trust writer durably finalizes this head. A failure
++		// leaves either the prepared marker or this exact finalized head;
++		// recovery verifies both, with no process start or counter reset.
++		state.AgentIdentities[permit.base.workID] = agentIdentityPublicationState{Head: &head}
++		return nextCheckpoint, nil
++	})
++	if err != nil {
++		return result, err
++	}
++	return nextCheckpoint, nil
++}
+--- before/internal/engine/agent_identity_registry_test.go
++++ after/internal/engine/agent_identity_registry_test.go
+@@ -0,0 +1,578 @@
++//go:build linux
++
++package engine
++
++import (
++	"context"
++	"encoding/json"
++	"errors"
++	"os"
++	"path/filepath"
++	"reflect"
++	"sync"
++	"testing"
++	"time"
++)
++
++type agentIdentityRegistryFixture struct {
++	store    *Store
++	snapshot agentIdentitySnapshot
++	permit   agentIdentityRegistryPermit
++	request  agentIdentityRequest
++	actor    agentIdentityActor
++}
++
++func registryFixture(t *testing.T) agentIdentityRegistryFixture {
++	t.Helper()
++	s, _ := trustFixture(t)
++	w := createdWork(t, s)
++	f := agentIdentityAuthorityFixture(t)
++	scope := f.request.Scope
++	scope.WorkID = w.ID
++	f.request.Scope = scope
++	f.snapshot.Revision = 1
++	at := time.Now().UTC()
++	for id, grant := range f.snapshot.Grants {
++		grant.Scope, grant.NotBefore, grant.ExpiresAt = scope, at.Add(-time.Minute), at.Add(time.Hour)
++		f.snapshot.Grants[id] = grant
++	}
++	for id, instance := range f.snapshot.Instances {
++		instance.Scope = scope
++		f.snapshot.Instances[id] = instance
++	}
++	digest, err := agentIdentityDigest(f.snapshot)
++	if err != nil {
++		t.Fatal(err)
++	}
++	// Fixture stands in for the independent approval/checkpoint issuer. No
++	// human approval or production checkpoint service is claimed by this setup.
++	permit := agentIdentityRegistryPermit{base: agentIdentityRegistryCheckpoint{s.root, w.ID, ""}, nextDigest: digest, roots: []string{"grant-root"},
++		publisher: f.caller.actor.Principal, trustRevision: f.caller.trustRevision, eventID: "registry-initial", scope: scope}
++	return agentIdentityRegistryFixture{s, f.snapshot, permit, f.request, f.caller.actor}
++}
++
++func registryContext(t *testing.T) context.Context {
++	t.Helper()
++	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
++	t.Cleanup(cancel)
++	return ctx
++}
++
++func registryRaw(t *testing.T, snapshot agentIdentitySnapshot) []byte {
++	t.Helper()
++	raw, err := json.Marshal(snapshot)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return raw
++}
++
++func registryPublish(t *testing.T, f agentIdentityRegistryFixture) agentIdentityRegistryCheckpoint {
++	t.Helper()
++	checkpoint, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), trustRequesterToken, f.permit, nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return checkpoint
++}
++
++func registryNext(t *testing.T, f agentIdentityRegistryFixture, checkpoint agentIdentityRegistryCheckpoint) agentIdentityRegistryFixture {
++	t.Helper()
++	snapshot, err := decodeAgentIdentitySnapshot(registryRaw(t, f.snapshot))
++	if err != nil {
++		t.Fatal(err)
++	}
++	f.snapshot = snapshot
++	f.snapshot.Revision++
++	f.permit.base = checkpoint
++	f.permit.eventID = "registry-next"
++	return f
++}
++
++func registryApproveFixture(t *testing.T, f *agentIdentityRegistryFixture) {
++	t.Helper()
++	digest, err := agentIdentityDigest(f.snapshot)
++	if err != nil {
++		t.Fatal(err)
++	}
++	f.permit.nextDigest = digest
++}
++
++func registryCounts(t *testing.T, s *Store) (int, int) {
++	t.Helper()
++	var snapshots, publications int
++	if err := s.db.QueryRow(`SELECT count(*) FROM agent_identity_snapshots`).Scan(&snapshots); err != nil {
++		t.Fatal(err)
++	}
++	if err := s.db.QueryRow(`SELECT count(*) FROM agent_identity_publications`).Scan(&publications); err != nil {
++		t.Fatal(err)
++	}
++	return snapshots, publications
++}
++
++func registryTrustBytes(t *testing.T, s *Store) []byte {
++	t.Helper()
++	path, _, _ := s.trustPaths()
++	raw, err := os.ReadFile(path)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return raw
++}
++
++func registryAssertUnchanged(t *testing.T, s *Store, before []byte, snapshots, publications int) {
++	t.Helper()
++	a, b := registryCounts(t, s)
++	if string(before) != string(registryTrustBytes(t, s)) || a != snapshots || b != publications {
++		t.Fatalf("rejected operation changed authority/journal: snapshots=%d/%d publications=%d/%d", a, snapshots, b, publications)
++	}
++}
++
++func TestAgentIdentityRegistryPublicationPersistenceAndOwnedSource(t *testing.T) {
++	f := registryFixture(t)
++	checkpoint := registryPublish(t, f)
++	// Reopen the actual SQLite/Trust files; keep the control checkpoint outside
++	// the files being reopened. This is not an external witness service.
++	if err := f.store.db.Close(); err != nil {
++		t.Fatal(err)
++	}
++	s, err := openStore(f.store.root, false)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer s.db.Close()
++	snapshot, authority, err := s.readAgentIdentityRegistry(registryContext(t), checkpoint)
++	if err != nil || !reflect.DeepEqual(snapshot, f.snapshot) || authority.scope != f.request.Scope || !authority.roots["grant-root"] || authority.snapshotRevision != 1 {
++		t.Fatalf("durable source lost binding: snapshot=%+v authority=%+v err=%v", snapshot, authority, err)
++	}
++	delete(snapshot.Grants, "grant-root")
++	delete(authority.roots, "grant-root")
++	snapshot, authority, err = s.readAgentIdentityRegistry(registryContext(t), checkpoint)
++	if err != nil || len(snapshot.Grants) != 2 || !authority.roots["grant-root"] {
++		t.Fatal("returned maps alias persisted authority: ", err)
++	}
++	f.store = s
++	if again := registryPublish(t, f); again != checkpoint {
++		t.Fatal("exact authenticated replay changed checkpoint")
++	}
++	if a, b := registryCounts(t, s); a != 1 || b != 1 {
++		t.Fatal("replay duplicated publication: ", a, b)
++	}
++	var forged agentIdentityRegistryCheckpoint
++	if err := json.Unmarshal([]byte(`{"projectRoot":"/tmp","workID":"work","headDigest":"self-asserted"}`), &forged); err != nil {
++		t.Fatal(err)
++	}
++	if _, _, err = s.readAgentIdentityRegistry(registryContext(t), forged); err == nil {
++		t.Fatal("JSON minted a private checkpoint")
++	}
++	if _, _, err = s.readAgentIdentityRegistry(registryContext(t), f.permit.base); err == nil {
++		t.Fatal("empty bootstrap checkpoint adopted existing database authority")
++	}
++}
++
++func TestAgentIdentityRegistryRejectsUnauthorizedAndHistoricalRewrite(t *testing.T) {
++	for _, name := range []string{"missing-permit", "wrong-token", "wrong-publisher", "changed-content", "untrusted-root", "foreign-project", "event-reuse", "unrevoke", "cycle", "nil-context", "cancelled-context", "missing-work"} {
++		t.Run(name, func(t *testing.T) {
++			f := registryFixture(t)
++			checkpoint := registryPublish(t, f)
++			if name == "unrevoke" {
++				next := registryNext(t, f, checkpoint)
++				grant := next.snapshot.Grants["grant-child"]
++				at := time.Now().UTC()
++				grant.RevokedAt = &at
++				next.snapshot.Grants[grant.ID] = grant
++				registryApproveFixture(t, &next)
++				checkpoint = registryPublish(t, next)
++				f = next
++			}
++			next := registryNext(t, f, checkpoint)
++			registryApproveFixture(t, &next)
++			token := trustRequesterToken
++			ctx := registryContext(t)
++			switch name {
++			case "missing-permit":
++				next.permit = agentIdentityRegistryPermit{}
++			case "wrong-token":
++				token = "invented-credential-012345"
++			case "wrong-publisher":
++				token = trustAdminToken // business admin is not this independent permit's publisher
++			case "changed-content":
++				grant := next.snapshot.Grants["grant-child"]
++				grant.ExpiresAt = grant.ExpiresAt.Add(-time.Second)
++				next.snapshot.Grants[grant.ID] = grant
++			case "untrusted-root":
++				next.permit.roots = []string{"grant-child"}
++			case "foreign-project":
++				next.permit.base.projectRoot = t.TempDir()
++			case "event-reuse":
++				next.permit.eventID = "registry-initial"
++			case "unrevoke":
++				next.permit.eventID = "registry-third"
++				grant := next.snapshot.Grants["grant-child"]
++				grant.RevokedAt = nil
++				next.snapshot.Grants[grant.ID] = grant
++				registryApproveFixture(t, &next)
++			case "cycle":
++				grant := next.snapshot.Grants["grant-child"]
++				grant.ParentID = grant.ID
++				next.snapshot.Grants[grant.ID] = grant
++				registryApproveFixture(t, &next)
++			case "nil-context":
++				ctx = nil
++			case "cancelled-context":
++				cancelled, cancel := context.WithCancel(context.Background())
++				cancel()
++				ctx = cancelled
++			case "missing-work":
++				next.snapshot.Revision = 1
++				next.permit.base = agentIdentityRegistryCheckpoint{f.store.root, "absent-work", ""}
++				next.permit.scope.WorkID = "absent-work"
++				for id, grant := range next.snapshot.Grants {
++					grant.Scope = next.permit.scope
++					next.snapshot.Grants[id] = grant
++				}
++				for id, instance := range next.snapshot.Instances {
++					instance.Scope = next.permit.scope
++					next.snapshot.Instances[id] = instance
++				}
++				registryApproveFixture(t, &next)
++			}
++			before := registryTrustBytes(t, f.store)
++			a, b := registryCounts(t, f.store)
++			_, err := f.store.publishAgentIdentityRegistry(ctx, registryRaw(t, next.snapshot), token, next.permit, nil)
++			if err == nil {
++				t.Fatal("invalid publication succeeded")
++			}
++			if name == "unrevoke" && commandFailure(err).Code != "agent_identity_history_changed" {
++				t.Fatal("unrevocation guard masked by another failure: ", err)
++			}
++			if name == "missing-work" && commandFailure(err).Code != "agent_identity_work_missing" {
++				t.Fatal("missing-work guard masked by another failure: ", err)
++			}
++			registryAssertUnchanged(t, f.store, before, a, b)
++		})
++	}
++}
++
++func TestAgentIdentityRegistryRecoveryAtBothCommitBoundaries(t *testing.T) {
++	for _, bootstrap := range []bool{true, false} {
++		for _, phase := range []string{"intent_persisted", "sqlite_committed"} {
++			name := phase
++			if bootstrap {
++				name += "-bootstrap"
++			} else {
++				name += "-update"
++			}
++			t.Run(name, func(t *testing.T) {
++				f := registryFixture(t)
++				baseRows := 0
++				if !bootstrap {
++					checkpoint := registryPublish(t, f)
++					f = registryNext(t, f, checkpoint)
++					registryApproveFixture(t, &f)
++					baseRows = 1
++				}
++				injected := errors.New("fixture interruption at " + phase)
++				_, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), trustRequesterToken, f.permit, func(at string) error {
++					if at == phase {
++						return injected
++					}
++					return nil
++				})
++				if !errors.Is(err, injected) {
++					t.Fatal("fault boundary not reached: ", err)
++				}
++				wantedRows := baseRows
++				if phase == "sqlite_committed" {
++					wantedRows++
++				}
++				if a, b := registryCounts(t, f.store); a != wantedRows || b != wantedRows {
++					t.Fatal("wrong interrupted commit phase: ", a, b, wantedRows)
++				}
++				before := registryTrustBytes(t, f.store)
++				if _, _, err = f.store.readAgentIdentityRegistry(registryContext(t), f.permit.base); err == nil {
++					t.Fatal("pending state exposed authority")
++				}
++				if _, err = f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), trustRequesterToken, f.permit, nil); err == nil {
++					t.Fatal("normal retry bypassed required recovery")
++				}
++				wrong := f.permit
++				wrong.eventID = "different-recovery"
++				if _, err = f.store.recoverAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), wrong); err == nil {
++					t.Fatal("recovery accepted different intent")
++				}
++				registryAssertUnchanged(t, f.store, before, wantedRows, wantedRows)
++				f.store.db.Close()
++				reopened, err := openStore(f.store.root, false)
++				if err != nil {
++					t.Fatal(err)
++				}
++				defer reopened.db.Close()
++				checkpoint, err := reopened.recoverAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.permit)
++				if err != nil {
++					t.Fatal("prepared publication did not recover: ", err)
++				}
++				if a, b := registryCounts(t, reopened); a != baseRows+1 || b != baseRows+1 {
++					t.Fatal("recovery duplicated/lost journal: ", a, b)
++				}
++				if again, err := reopened.recoverAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.permit); err != nil || again != checkpoint {
++					t.Fatal("recovery replay was not exact: ", err)
++				}
++				got, _, err := reopened.readAgentIdentityRegistry(registryContext(t), checkpoint)
++				if err != nil || !reflect.DeepEqual(got, f.snapshot) {
++					t.Fatal("recovery published a different snapshot: ", err)
++				}
++			})
++		}
++	}
++}
++
++func TestAgentIdentityRegistryRecoveryPreservesChangedTrust(t *testing.T) {
++	f := registryFixture(t)
++	_, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), trustRequesterToken, f.permit, func(phase string) error {
++		if phase == "intent_persisted" {
++			return errors.New("fixture interrupted")
++		}
++		return nil
++	})
++	if err == nil {
++		t.Fatal("fixture interruption missed")
++	}
++	if _, err = f.store.trustConfig(lifecycleChange(t, "alice", true, 1), false); err != nil {
++		t.Fatal(err)
++	}
++	checkpoint, err := f.store.recoverAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.permit)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, _, err = f.store.readAgentIdentityRegistry(registryContext(t), checkpoint); commandFailure(err).Code != "agent_identity_registry_stale" {
++		t.Fatal("recovery revived old Trust rights: ", err)
++	}
++	_, err = f.store.withTrustLock(false, func(state *trustState) (any, error) {
++		if state.Revision != 2 || state.AgentIdentities[f.permit.base.workID].Pending != nil {
++			t.Fatal("recovery rolled back configuration or left pending state")
++		}
++		_, e := resolveAgentIdentityCaller(f.store.root, state, trustRequesterToken, time.Now().UTC())
++		if e == nil {
++			t.Fatal("recovery unsuspended the publisher")
++		}
++		return nil, nil
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++}
++
++func TestAgentIdentityRegistryRollbackAndTamperRequireCurrentWitness(t *testing.T) {
++	for _, mode := range []string{"sqlite-rollback", "joint-rollback", "snapshot-tamper", "journal-tamper", "oversized-row", "checkpoint-foreign-project", "storage-version-changed"} {
++		t.Run(mode, func(t *testing.T) {
++			f := registryFixture(t)
++			checkpoint := registryPublish(t, f)
++			backup := filepath.Join(t.TempDir(), "old.db")
++			if err := migrationBackup(f.store.db, backup); err != nil {
++				t.Fatal(err)
++			}
++			oldTrust := registryTrustBytes(t, f.store)
++			next := registryNext(t, f, checkpoint)
++			at := time.Now().UTC()
++			grant := next.snapshot.Grants["grant-child"]
++			grant.RevokedAt = &at
++			next.snapshot.Grants[grant.ID] = grant
++			registryApproveFixture(t, &next)
++			current := registryPublish(t, next)
++			s := f.store
++			switch mode {
++			case "sqlite-rollback", "joint-rollback":
++				if err := s.db.Close(); err != nil {
++					t.Fatal(err)
++				}
++				raw, err := os.ReadFile(backup)
++				if err != nil {
++					t.Fatal(err)
++				}
++				if err = atomicWrite(filepath.Join(s.root, ".swarm", "state.db"), raw); err != nil {
++					t.Fatal(err)
++				}
++				if mode == "joint-rollback" {
++					path, _, _ := s.trustPaths()
++					if err = atomicWrite(path, oldTrust); err != nil {
++						t.Fatal(err)
++					}
++				}
++				s, err = openStore(s.root, false)
++				if err != nil {
++					t.Fatal(err)
++				}
++				defer s.db.Close()
++			case "snapshot-tamper":
++				if _, err := s.db.Exec(`UPDATE agent_identity_snapshots SET body=? WHERE revision=2`, []byte(`{"schema_version":1}`)); err != nil {
++					t.Fatal(err)
++				}
++			case "journal-tamper":
++				if _, err := s.db.Exec(`UPDATE agent_identity_publications SET body=? WHERE event_id=?`, []byte(`{}`), f.permit.eventID); err != nil {
++					t.Fatal(err)
++				}
++			case "oversized-row":
++				if _, err := s.db.Exec(`UPDATE agent_identity_snapshots SET body=zeroblob(?) WHERE revision=2`, trustStateMaxBytes+1); err != nil {
++					t.Fatal(err)
++				}
++			case "checkpoint-foreign-project":
++				current.projectRoot = t.TempDir()
++			case "storage-version-changed":
++				if _, err := s.db.Exec(`PRAGMA user_version=37`); err != nil {
++					t.Fatal(err)
++				}
++			}
++			_, _, err := s.readAgentIdentityRegistry(registryContext(t), current)
++			if err == nil {
++				t.Fatal("rollback/import/tamper bypassed the independent current checkpoint")
++			}
++			if mode == "storage-version-changed" && commandFailure(err).Code != "storage_version_conflict" {
++				t.Fatal("storage fence masked by another failure: ", err)
++			}
++		})
++	}
++}
++
++func TestAgentIdentityRegistryConcurrentPublishersAndCancelledWait(t *testing.T) {
++	f := registryFixture(t)
++	checkpoint := registryPublish(t, f)
++	next := registryNext(t, f, checkpoint)
++	registryApproveFixture(t, &next)
++	raw := registryRaw(t, next.snapshot)
++	var group sync.WaitGroup
++	start := make(chan struct{})
++	results := make(chan agentIdentityRegistryCheckpoint, 2)
++	for _, id := range []string{"concurrent-A", "concurrent-B"} {
++		permit := next.permit
++		permit.eventID = id
++		group.Add(1)
++		go func() {
++			defer group.Done()
++			<-start
++			got, err := f.store.publishAgentIdentityRegistry(context.Background(), raw, trustRequesterToken, permit, nil)
++			if err == nil {
++				results <- got
++			}
++		}()
++	}
++	close(start)
++	group.Wait()
++	close(results)
++	if len(results) != 1 {
++		t.Fatal("concurrent publications did not have exactly one winner: ", len(results))
++	}
++	winner := <-results
++	if a, b := registryCounts(t, f.store); a != 2 || b != 2 {
++		t.Fatal("concurrent publications duplicated or lost history: ", a, b)
++	}
++	if _, _, err := f.store.readAgentIdentityRegistry(registryContext(t), winner); err != nil {
++		t.Fatal(err)
++	}
++	// Hold the only connection. A cancelled acquisition must release Trust
++	// without preparing or publishing any state.
++	connection, err := f.store.db.Conn(registryContext(t))
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer connection.Close()
++	next.permit.base = winner
++	next.snapshot.Revision++
++	next.permit.eventID = "cancelled-wait"
++	registryApproveFixture(t, &next)
++	before := registryTrustBytes(t, f.store)
++	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Millisecond)
++	defer cancel()
++	if _, err = f.store.publishAgentIdentityRegistry(ctx, registryRaw(t, next.snapshot), trustRequesterToken, next.permit, nil); !errors.Is(err, context.DeadlineExceeded) {
++		t.Fatal("connection wait ignored caller cancellation: ", err)
++	}
++	connection.Close()
++	registryAssertUnchanged(t, f.store, before, 2, 2)
++}
++
++func TestAgentIdentityRegistrySourceFeedsRealInstanceAndDurableRevocation(t *testing.T) {
++	f := registryFixture(t)
++	checkpoint := registryPublish(t, f)
++	runtime, err := newAgentIdentityRuntime(f.store.root)
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { runtime.Close() })
++	directory, err := os.MkdirTemp("", "swarm-registry-channel-")
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { os.RemoveAll(directory) })
++	if err = os.WriteFile(filepath.Join(directory, "worker.py"), []byte(agentIdentityChannelWorker), 0600); err != nil {
++		t.Fatal(err)
++	}
++	listener := agentIdentityTestListener(t, filepath.Join(directory, "broker.sock"))
++	control := agentIdentityTestListener(t, filepath.Join(directory, "control.sock"))
++	instance := f.snapshot.Instances[f.actor.InstanceID]
++	cage := startAgentIdentityTestCage(t, runtime, f.actor, instance.BindingID, f.permit.trustRevision, directory, listener, control)
++	exchange := func(checkpoint agentIdentityRegistryCheckpoint, allowed bool) {
++		cage.command(t, "send", f.request)
++		message, err := receiveAgentIdentityMessage(cage.connection, make([]byte, 65536))
++		if err != nil {
++			t.Fatal(err)
++		}
++		decision, decisionErr := f.store.evaluateAgentIdentityRegistryMessage(registryContext(t), checkpoint, message, runtime, nil, time.Time{})
++		message.Close()
++		if _, err = cage.connection.Write([]byte{1}); err != nil {
++			t.Fatal(err)
++		}
++		cage.completed(t)
++		if (decisionErr == nil) != allowed || (allowed && decision.Actor != f.actor) {
++			t.Fatalf("source-backed instance decision actor=%+v error=%v allowed=%v", decision.Actor, decisionErr, allowed)
++		}
++		if !allowed && commandFailure(decisionErr).Code != "agent_identity_grant_inactive" {
++			t.Fatal("durable revocation masked by another failure: ", decisionErr)
++		}
++	}
++	exchange(checkpoint, true)
++	next := registryNext(t, f, checkpoint)
++	grant := next.snapshot.Grants["grant-child"]
++	at := time.Now().UTC()
++	grant.RevokedAt = &at
++	next.snapshot.Grants[grant.ID] = grant
++	registryApproveFixture(t, &next)
++	current := registryPublish(t, next)
++	exchange(current, false)
++	var agents int
++	if err = f.store.db.QueryRow(`SELECT count(*) FROM agents`).Scan(&agents); err != nil || agents != 0 {
++		t.Fatal("registry publication/decision created a business agent: ", agents, err)
++	}
++}
++
++func TestAgentIdentityRegistryMigrationPreservesHistoryAndInspection(t *testing.T) {
++	f := registryFixture(t)
++	work, err := f.store.get(f.permit.base.workID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if _, err = f.store.db.Exec(`DROP TABLE agent_identity_publications; DROP TABLE agent_identity_snapshots; PRAGMA user_version=35`); err != nil {
++		t.Fatal(err)
++	}
++	f.store.db.Close()
++	if _, err = openStoreWithMigration(f.store.root, false, false); commandFailure(err).Code != "storage_upgrade_required" {
++		t.Fatal("inspection implicitly upgraded identity storage: ", err)
++	}
++	s, err := openStore(f.store.root, false)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer s.db.Close()
++	got, err := s.get(work.ID)
++	if err != nil || !reflect.DeepEqual(got, work) {
++		t.Fatal("identity migration changed legacy Work: ", err)
++	}
++	backups, err := filepath.Glob(filepath.Join(s.root, ".swarm", "state-pre-v36-*.db"))
++	if err != nil || len(backups) != 1 {
++		t.Fatal("migration backup missing: ", backups, err)
++	}
++	if a, b := registryCounts(t, s); a != 0 || b != 0 {
++		t.Fatal("migration granted authority to historical data: ", a, b)
++	}
++	f.store = s
++	registryPublish(t, f)
++}
+--- before/internal/engine/agent_identity_registry_atomic_test.go
++++ after/internal/engine/agent_identity_registry_atomic_test.go
+@@ -0,0 +1,51 @@
++//go:build linux
++
++package engine
++
++import (
++	"os"
++	"path/filepath"
++	"testing"
++)
++
++func TestAgentIdentityRegistryAtomicWriteRequiresSyncableDirectory(t *testing.T) {
++	if os.Geteuid() == 0 {
++		t.Fatal("this permission reproducer requires an unprivileged test account")
++	}
++	dir := t.TempDir()
++	path := filepath.Join(dir, "state.json")
++	if err := os.Chmod(dir, 0300); err != nil {
++		t.Fatal(err)
++	}
++	defer os.Chmod(dir, 0700)
++	// Creation/rename can succeed here, but opening the directory for fsync
++	// cannot. A successful durable write would therefore be an unsupported claim.
++	if err := atomicWrite(path, []byte("new-state")); err == nil {
++		t.Fatal("write reported success without opening a directory that can be synchronized")
++	}
++	if _, err := os.Stat(path); !os.IsNotExist(err) {
++		t.Fatalf("failed durability precondition mutated target: %v", err)
++	}
++}
++
++func TestAgentIdentityRegistryAtomicWritePreservesReplacementContract(t *testing.T) {
++	dir := t.TempDir()
++	path := filepath.Join(dir, "state.json")
++	for _, value := range []string{"initial", "replacement"} {
++		if err := atomicWrite(path, []byte(value)); err != nil {
++			t.Fatal(err)
++		}
++		raw, err := os.ReadFile(path)
++		if err != nil || string(raw) != value {
++			t.Fatalf("wrong durable replacement: %q %v", raw, err)
++		}
++		info, err := os.Stat(path)
++		if err != nil || info.Mode().Perm() != 0600 {
++			t.Fatalf("private file mode lost: %v %v", info, err)
++		}
++	}
++	entries, err := os.ReadDir(dir)
++	if err != nil || len(entries) != 1 || entries[0].Name() != "state.json" {
++		t.Fatalf("temporary files leaked: %v %v", entries, err)
++	}
++}
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -1,7 +1,7 @@
+ # Contrat interne d'identité et d'autorité des agents
+ 
+ 17 octobre 2026 — [English](../en/AGENT-IDENTITY-CONTRACT.md).
+-Périmètre : noyau IA2.2 en Go, interne et non raccordé aux lanceurs.
++Périmètre : noyau IA2.2, canal IA2.3a et source durable IA2.3b, internes et non raccordés aux lanceurs.
+ Les défauts de l'[audit IA1](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+ restent ouverts. Il n'existe aucun nouvel endpoint, commande, paramètre Admin,
+ bootstrap ou confinement fournisseur livré par ce contrat.
+@@ -18,7 +18,7 @@
+   R["Demande interne JSON"] --> P["Schéma strict : aucune autorité déclarée"]
+   P --> L["Verrou partagé Trust"]
+   L --> I["Résoudre le jeton dans l'état courant"]
+-  A["Référence d'autorité protégée<br/>producteur IA2.3 restant à réaliser"] --> V
++  A["Cadre fourni par le contrôle<br/>source durable IA2.3b ci-dessous"] --> V
+   I --> V["Vérifier plan, instance, octrois et délégation"]
+   V --> D["Décision liée à la demande exacte ou refus"]
+   D -. "IA2.3 / IA3 : non raccordé" .-> E["Engagement atomique, lancement et effets"]
+@@ -46,10 +46,11 @@
+ 
+ `agentIdentityAuthority` est un cadre privé, non sérialisable depuis JSON :
+ racine canonique du projet, empreinte et révision courantes de l'instantané, révision Trust, plan courant et
+-octrois racine explicitement reconnus. Le producteur protégé de ce cadre n'est
+-**pas implémenté**. Le recalculer depuis l'instantané à vérifier créerait une
+-autorité circulaire. Les tests construisent ce cadre comme fixture, sans prouver
+-un ancrage anti-altération ou anti-restauration sur l'hôte.
++octrois racine explicitement reconnus. Le producteur durable interne est décrit
++en IA2.3b ; les émetteurs protégés de permis/checkpoint restent à raccorder.
++Recalculer ce cadre depuis l'instantané à vérifier créerait une autorité circulaire.
++Les tests historiques IA2.2 construisent une fixture ; IA2.3b lit les données
++persistées sous un checkpoint de contrôle, sans déployer d'ancre externe.
+ 
+ Les empreintes sont des SHA-256 en hexadécimal minuscule. Les identifiants
+ réutilisent la syntaxe commune `safeName`. Les ressources sont comparées
+@@ -121,8 +122,8 @@
+ indépendante. Les régressions du contexte d'appelant réutilisé et du cadre échangé
+ entre projets sont conservées avant et après leurs corrections.
+ 
+-Restent à réaliser : bootstrap et cadre d'autorité protégés, stockage/ancre et
+-ordre d'engagement des verrous, intégration du canal d'instance, liaison au vrai plan et au
++Restent à réaliser : bootstrap et émetteurs protégés du cadre/checkpoint,
++engagement de l'admission dans les verrous, intégration du canal d'instance, liaison au vrai plan et au
+ contenu préparé, approbation humaine exacte, consommation unique, course
+ départ/révocation, réconciliation après panne et raccord de **tous** les
+ consommateurs CLI/API/fournisseur/mémoire. Les deux fichiers de stockage actuels
+@@ -161,7 +162,7 @@
+   P --> B["Comparer UID et objets épinglés ; refuser révocation"]
+   B --> H["Lire l'horloge après les attentes"]
+   H --> V["Vérifier IA2.2 ; décision ou refus"]
+-  A["Cadre d'autorité protégé<br/>producteur durable restant à réaliser"] -.-> V
++  A["Cadre privé d'autorité<br/>source durable IA2.3b ci-dessous"] -.-> V
+ ```
+ 
+ Le contrôle appelle `pin` à partir d'un bootstrap de lanceur tenu par une porte,
+@@ -196,6 +197,76 @@
+ Les instantanés et cadres d'autorité employés par les essais restent des fixtures.
+ 
+ Le verrou runtime protège les liaisons, pas les maps d'un instantané fourni par
+-un autre composant. Le producteur d'autorité restant doit posséder un état courant
+-immuable pendant l'évaluation, ou le protéger par son propre protocole. Le canal
+-ne sécurise pas des maps empruntées qu'un autre goroutine modifierait simultanément.
++un autre composant. IA2.3b fournit sa propre copie courante. Les consommateurs
++primitifs IA2.2/IA2.3a recevant encore un cadre et un instantané supposent que leur
++appelant respecte cette propriété et leur fraîcheur ; ils ne consultent pas le
++registre durable. Une opération publique devra utiliser le parcours durable.
++
++## Source durable et publication récupérable — IA2.3b
++
++Le registre privé est maintenant produit depuis SQLite et une tête Trust
++indépendante. La version de stockage est **36** :
++`agent_identity_snapshots` conserve les versions, `agent_identity_publications`
++les reçus chaînés. La migration sauvegarde le stockage et ne crée aucun droit
++pour les anciens travaux. La consultation refuse une migration implicite.
++Le [rapport IA2.3b](../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md)
++lie les sources, commandes et résultats ; les sections précédentes restent les
++étapes IA2.2/IA2.3a, avec leurs fixtures d'origine.
++
++```mermaid
++sequenceDiagram
++  participant C as Contrôle autorisé
++  participant T as Trust / fichier durable
++  participant S as SQLite
++  C->>T: Prendre Trust exclusif sans attente cachée
++  C->>S: Réserver transaction et vérifier version / travail
++  C->>C: Vérifier permission exacte, appelant frais et ancienne tête
++  C->>T: Persister intention et instantané cible
++  Note over T,S: Toute lecture identité refuse<br/>une intention en attente
++  C->>S: Insérer instantané et reçu, puis COMMIT
++  C->>T: Finaliser la tête et retirer le marqueur en attente
++  T-->>C: Checkpoint cible après publication réussie
++  Note over C,S: Après interruption, reprise exacte du permis initial, sans lancer de processus
++```
++
++La tête stocke contexte du projet, portée, révision et digest de l'instantané,
++révision Trust, racines reconnues, principal publiant, événement et lien vers la
++tête précédente. Elle provient d'un `agentIdentityRegistryPermit` privé liant
++le contenu exact, la portée et les racines autorisées. La voie normale résout
++le jeton courant sous Trust, après attente de SQLite et de nouveau avant
++l'intention. Un rôle métier ou un corps JSON ne construit pas ce permis.
++L'émetteur humain de ce permis reste à raccorder dans IA3.
++
++La publication prend Trust exclusif en mode non bloquant, puis réserve SQLite
++avant lecture. Elle vérifie le travail, la version et le checkpoint précédent,
++les liens, l'histoire non réécrite et le contenu approuvé. Elle persiste une
++intention dans `agent_identity_authorities` de Trust avant COMMIT, puis publie
++la nouvelle tête. Une panne après intention ou après COMMIT laisse une reprise
++exacte à effectuer. `recoverAgentIdentityRegistry` exige le permis et l'instantané
++initiaux ; il ne prépare pas une nouvelle opération. Une révision Trust changée
++est conservée : finaliser un historique ancien ne réactive pas ses droits.
++
++`atomicWrite` ouvre désormais le répertoire avant mutation, synchronise le
++fichier, renomme, puis synchronise le répertoire. Une erreur après renommage
++signifie un résultat incertain à réconcilier. Les tests ne simulent pas une
++coupure électrique ou un stockage qui ment sur `fsync`.
++
++La lecture exige un `agentIdentityRegistryCheckpoint` privé et courant, fourni
++par le contrôle, puis vérifie la tête Trust et la chaîne de reçus. Elle charge
++l'instantané exact dans une transaction de lecture avec garde de version,
++vérifie son contenu canonique et le copie. La connexion SQLite est libérée
++avant le verrou runtime. `evaluateAgentIdentityRegistryMessage` prend ainsi
++ses données dans le registre, sans recevoir de snapshot/cadre dans le message.
++Le temps réel est lu au moment de l'évaluation du rattachement d'instance.
++Aucun de ces chemins ne consomme un droit ni ne lance un effet métier.
++
++Le checkpoint n'est pas recalculé depuis une base importée ou le même ensemble
++de fichiers restaurés. Les tests le conservent hors de l'état restauré ; ils
++ne déploient aucun témoin externe. Si tous les fichiers et un ancien témoin sont
++restaurés ensemble, la fraîcheur n'est pas prouvée. L'émission et la conservation
++indépendantes du témoin restent une condition d'intégration ouverte. La portée
++est liée au permis du contrôle ; le producteur du vrai plan adopté reste à
++raccorder. La confidentialité du paquet Go ne protège pas à elle seule le compte
++hôte, les fichiers du contrôle ou une image SQLite hostile arbitraire. F01–F07
++restent ouverts, de même que l'admission publique, le confinement fournisseur,
++l'accord humain exact, la réservation/départ et les droits mémoire.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -1,7 +1,7 @@
+ # Internal agent identity and authority contract
+ 
+ 17 October 2026 — [Français](../architecture/AGENT-IDENTITY-CONTRACT.md).
+-Scope: the internal IA2.2 Go kernel, **not connected to launchers**.
++Scope: the IA2.2 kernel, IA2.3a channel and IA2.3b durable source, **not connected to launchers**.
+ The [IA1 findings](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+ remain open. This contract adds no public endpoint, CLI command, Admin setting,
+ bootstrap mechanism or provider confinement.
+@@ -18,7 +18,7 @@
+   R["Internal JSON request"] --> P["Strict schema: no asserted authority"]
+   P --> L["Shared Trust lock"]
+   L --> I["Resolve token against current state"]
+-  A["Protected current authority frame<br/>IA2.3 producer still missing"] --> V
++  A["Controller-supplied frame<br/>IA2.3b durable source below"] --> V
+   I --> V["Check plan, instance, grants and delegation"]
+   V --> D["Decision bound to exact request or refusal"]
+   D -. "IA2.3 / IA3: not connected" .-> E["Atomic commitment, launch and effects"]
+@@ -46,9 +46,11 @@
+ 
+ `agentIdentityAuthority` is a private frame with no JSON-populatable fields:
+ canonical project root, current snapshot digest/revision, Trust revision, current plan and explicitly
+-recognized root grants. Its protected producer is **not implemented**. Computing
+-this frame from the snapshot being checked would create circular authority.
+-Tests construct a fixture frame, proving no host integrity or rollback anchor.
++recognized root grants. Its internal durable producer is described in IA2.3b;
++protected permit/checkpoint issuers remain unconnected. Computing this frame from
++the snapshot being checked would create circular authority. Historical IA2.2
++tests use fixtures; IA2.3b reads persisted data under a controller checkpoint,
++without deploying an external anchor.
+ 
+ Digests use lowercase hexadecimal SHA-256. IDs reuse `safeName`. Resources match
+ exactly, without wildcards or implicit path-prefix rules. Recognized operations
+@@ -112,8 +114,8 @@
+ issuers. They prove neither a real provider boundary nor independent review.
+ The cached-caller and cross-project frame regressions retain before/after evidence.
+ 
+-Remaining: protected bootstrap/frame, storage/anchor and commitment lock order,
+-runtime channel integration, real adopted-plan and prepared-content binding, exact
++Remaining: protected bootstrap/frame/checkpoint issuers, admission commitment
++lock order, runtime channel integration, real adopted-plan and prepared-content binding, exact
+ human approval, single consumption, start/revocation races, crash reconciliation
+ and **all** CLI/API/provider/memory consumers. Adding this evaluator does not make
+ Trust JSON and mission SQLite atomic. IDA-01–18 and the retrospective remain
+@@ -151,7 +153,7 @@
+   P --> B["Match UID and pinned objects ; reject revocation"]
+   B --> H["Sample clock after coordination waits"]
+   H --> V["Evaluate IA2.2 ; decision or rejection"]
+-  A["Protected authority frame<br/>durable producer still missing"] -.-> V
++  A["Private authority frame<br/>IA2.3b durable source below"] -.-> V
+ ```
+ 
+ The controller calls `pin` using a gated launcher bootstrap and holds the resulting
+@@ -185,6 +187,71 @@
+ and snapshots used by the tests remain fixtures.
+ 
+ The runtime lock protects bindings, not maps in a snapshot supplied by another
+-component. The remaining authority producer must own a current immutable state
+-during evaluation or protect it through its own protocol. The channel does not
+-make borrowed maps safe against concurrent mutation by another goroutine.
++component. IA2.3b provides its own current copy. Low-level IA2.2/IA2.3a consumers
++still accepting caller-supplied snapshots/frames require their caller to preserve
++ownership and freshness; they do not consult the durable registry. Public
++operations must use the durable path.
++
++## Durable source and recoverable publication — IA2.3b
++
++The private registry is now produced from SQLite and an independent Trust head.
++Storage version **36** adds `agent_identity_snapshots` for versions and
++`agent_identity_publications` for chained receipts. Migration backs up storage
++and grants no authority to historical work. Inspection refuses implicit upgrades.
++The [IA2.3b report](../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md)
++binds sources, commands and results. Earlier sections describe the original
++IA2.2/IA2.3a slices and their fixtures.
++
++```mermaid
++sequenceDiagram
++  participant C as Authorized controller
++  participant T as Trust / durable file
++  participant S as SQLite
++  C->>T: Acquire exclusive Trust without a hidden wait policy
++  C->>S: Reserve transaction and check version / work
++  C->>C: Verify exact permit, fresh caller and prior head
++  C->>T: Persist intent and target snapshot
++  Note over T,S: Identity readers reject<br/>a pending intent
++  C->>S: Insert snapshot and receipt, then COMMIT
++  C->>T: Finalize head and remove pending marker
++  T-->>C: Target checkpoint after successful publication
++  Note over C,S: Interrupted publication requires the exact original permit, with no process start
++```
++
++The head records project context, scope, snapshot revision/digest, Trust revision,
++recognized roots, publishing principal, event and previous-head link. A private
++`agentIdentityRegistryPermit` independently binds the exact content, scope and
++approved roots. Normal publication resolves the current token under Trust after
++waiting for SQLite and again before preparing the intent. Business roles or JSON
++bodies do not mint this permit. Its human issuer remains an IA3 integration task.
++
++Publication takes a nonblocking exclusive Trust lock and reserves SQLite before
++reading. It checks work existence, version, prior checkpoint, links, preserved
++history and approved content. It persists an intent in Trust's
++`agent_identity_authorities` before COMMIT, then publishes the new head. Failure
++after intent or after COMMIT leaves an exact recovery to perform.
++`recoverAgentIdentityRegistry` requires the original permit and snapshot; it
++cannot prepare a new operation. Changed Trust configuration is preserved:
++finalizing old history does not reactivate its rights.
++
++`atomicWrite` now opens the parent before mutation, syncs the file, renames it,
++then syncs the directory. Failure after rename means an uncertain result to
++reconcile. Tests simulate neither power loss nor storage that lies about `fsync`.
++
++Reading requires a private current `agentIdentityRegistryCheckpoint` from the
++controller, then verifies the Trust head and receipt chain. It loads the exact
++canonical snapshot in a version-guarded read transaction and copies it. SQLite
++is released before the runtime lock. `evaluateAgentIdentityRegistryMessage`
++therefore obtains its snapshot/frame from the registry, not from the message.
++Real time is sampled when evaluating the instance binding. These paths neither
++consume a right nor start a business effect.
++
++A checkpoint is never recomputed from an imported database or the same restored
++files. Tests retain it outside the restored state and deploy no external witness.
++If all files and an old witness are restored together, freshness is unproven.
++Independent witness issuance/retention remains an open integration condition.
++Scope is bound to the controller's permit; the real adopted-plan producer is
++still missing. Go package privacy alone does not protect the host account,
++control files or an arbitrary hostile SQLite image. F01–F07 remain open, together
++with public admission, provider confinement, exact human approval,
++reservation/start and memory rights.
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -312,3 +312,72 @@
+ les opérations publiques et l'accord humain. Instantané/octrois/cadre sont encore
+ des fixtures dans ces essais. F01–F07, IDA et le RETEX restent ouverts. Ne pas
+ assimiler les 133 noms à 133 attaques ou ajouter les 19 répétitions `-race`.
++
++## IA2.3b — source durable et publication récupérable
++
++Reprise autorisée par « ok suite », Codex seul. Fichiers réservés : nouveaux
++`agent_identity_registry_*.go` et tests, migration dans `store.go`, version et
++écriture durable dans `model.go`, champ privé/validation Trust dans
++`trust_actions.go`, contrat FR/EN, plan et preuves
++`verification-identites-agents-20261016/ia2-durable-authority-20261017/`.
++Lanceurs et sources mémoire inchangés dans cette tranche.
++
++Choix comparés : tête d'autorité recalculée depuis SQLite importé, ou ancre
++Trust distincte de l'instantané et publication avec intention durable.
++La seconde est retenue : Trust exclusif → transaction SQLite réservée →
++intention Trust synchronisée → journal/instantané SQLite → ancre Trust finalisée.
++Une intention non finalisée bloque les lectures d'identité ; la récupération
++réapplique uniquement sa publication exacte, sans départ de processus.
++Le registre produit un instantané possédé, pas une map empruntée.
++
++La fraîcheur de reprise exige un checkpoint de contrôle privé indépendant du
++contenu à vérifier. Ni importer la base ni relire ensemble deux sauvegardes
++anciennes ne fournit cette autorité. Bootstrap et permission de publication
++sont des entrées privées exactes du contrôle, non des rôles Admin implicites ou
++une commande publique. Leur attribution humaine réelle reste dans IA3 ; une
++fixture de checkpoint ne sera pas présentée comme une ancre externe déployée.
++
++Préalable découvert : `atomicWrite` synchronise le fichier mais pas le répertoire
++après rename. Corriger ce contrat commun avec précondition de synchronisation
++vérifiable et erreurs explicites ; ne pas prétendre simuler une panne électrique.
++Migration version 36 : tables de snapshots et publications, sauvegarde, aucune
++attribution ajoutée aux données historiques.
++
++Critères locaux : publication/lecture après réouverture ; deux interruptions
++(intention écrite, SQLite engagé) puis reprise exacte sans doublon ; restauration
++ou falsification/import refusés face au checkpoint courant ; configuration Trust
++modifiée sans réactivation implicite ; écrivains concurrents et erreurs sans
++mutation non autorisée ; identité courante évaluée depuis la source durable.
++Tests ciblés, `-race`, statique et compilation liés au candidat exact. Les parcours
++publics, effets, confinement complet, qualification IDA et RETEX restent ouverts.
++
++### Résultat IA2.3b — module de source durable
++
++Le [rapport IA2.3b](verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md)
++conserve **181 noms de tests/sous-tests PASS**, dont 33 du registre ; 52 du
++registre/canal/runtime passent aussi sous `-race`. Statique et compilation
++réussies, 1 052 entrées inchangées. Schéma 36, tête Trust indépendante et
++checkpoint de contrôle, publication par intention → SQLite → finalisation,
++reprise exacte et lecture en copie possédée sont implémentés en interne.
++Une cage réelle passe puis est refusée après révocation durable de l'octroi.
++
++Découvertes traitées : D01 synchronisation de répertoire ; D02 décodage d'un
++maillon dans un objet neuf ; D03 travail absent vérifié avant intention ; D04
++garde de version dans la transaction de lecture. Les échecs avant correction
++et sources originales sont conservés. Les contextes mémoire ont été testés pour
++le changement partagé de stockage, sans modification de leurs sources.
++
++Ce résultat ne ferme pas tout IA2.3 : permis/checkpoint sont émis par le contrôle
++simulé, pas par un émetteur humain ou un témoin externe déployé. Une restauration
++conjointe est refusée avec le checkpoint courant indépendant ; restaurer aussi
++un ancien témoin ne prouve aucune fraîcheur. Codex doit raccorder les producteurs
++du vrai plan, permis et témoin ; l'opérateur assure leur enrôlement/déploiement
++lorsque le parcours sera concret et autorisé. Le contrat refuse l'absence de
++checkpoint, sans auto-adoption d'un import.
++
++La prochaine frontière est l'admission commune IA3 : rattacher les appelants et
++l'accord humain exact, réserver/consommer dans le vrai lancement et récupérer
++un départ incertain. Le raccord doit respecter Trust → SQLite et ne pas appeler
++le publiant depuis une transaction déjà tenue. Les primitives recevant un cadre
++fourni ne sont pas la voie publique fraîche. F01–F07, les scénarios IDA, les droits
++mémoire et le RETEX restent ouverts ; aucun binaire actif n'a été remplacé.
+--- before/docs/plans/actions-confiance/identites-agents-contrat-IA2.md
++++ after/docs/plans/actions-confiance/identites-agents-contrat-IA2.md
+@@ -327,3 +327,26 @@
+ `-race`. Source durable d'autorité, bootstrap réel, réserve/départ/révocation,
+ panne, décision humaine et consommateurs mémoire restent non livrés. Les preuves
+ locales renforcent C02/C06/C08 sans transformer leur qualification globale en PASS.
++
++## Source durable IA2.3b — préconditions conservées
++
++Le [rapport IA2.3b](verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md)
++détaille le journal en stockage 36 et le producteur interne de cadre. Le checkpoint
++courant et le permis exact du contrôle sont distincts de l'instantané et ne sont
++pas des champs acceptés d'un agent. L'émetteur réel de ces entrées reste à
++raccorder ; le test n'en fait pas une autorité externe opérationnelle.
++
++L'intention durable précède COMMIT SQLite ; une intention en attente bloque
++l'autorité normale. La reprise termine seulement la même publication et conserve
++les changements Trust intervenus. Le lecteur contrôle version et chaîne dans une
++transaction, copie l'instantané puis libère SQLite avant le verrou runtime.
++Une version incompatible, une altération ou un ancien état face au checkpoint
++courant sont refusés. Une copie des fichiers avec un ancien témoin exige une
++nouvelle preuve de fraîcheur indépendante, pas une validation circulaire.
++
++Les 181 contrôles ciblés, dont 33 du registre, et les 52 répétitions sous
++`-race` renforcent des sous-aspects C07/C09. Ils ne prouvent pas consommation ou
++départ atomique, émetteur humain, témoin externe, confinement réel ou tous les
++consommateurs. C01–C11 et IDA restent qualifiés globalement par leurs limites,
++pas par addition de ces nombres. Le vrai plan adopté doit encore alimenter
++l'admission publique ; aucune donnée historique ne reçoit de droit par migration.
+--- before/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
++++ after/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+@@ -310,6 +310,7 @@
+ | Canal d'instance IA2.3 | [Expérience Linux et schéma](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-runtime-binding-20261017/RAPPORT-IA2.3-CANAL.md) : 13 contrôles réussis, dont transfert réel d'une connexion B à A, attribution du message à A et refus de l'identité B déclarée. | Programme Python séparé, deux cages, registre et révocation en mémoire. Aucun message transmis au noyau Go. Pas de fournisseur réel, de redémarrage, d'autorité persistante ou de garantie contre l'administrateur hôte. |
+ | Essai d'isolation | [Résultats IA2](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-isolation-initial/results.json) : dix variantes bloquées dans une expérience Bubblewrap séparée ; écriture du workspace autorisée et contrôles inchangés. | Réseau coupé et programme de sonde ; pas de fournisseur réel, pas d'intégration au lanceur, pas de preuve de l'ensemble du contrat. F07 reste ouvert dans le moteur. |
+ | Canal Go IA2.3a | [Rapport, schémas et originaux](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-go-channel-20261017/RAPPORT-IA2.3a.md) : attribution réelle raccordée au noyau interne, 133 noms de tests/sous-tests PASS dont 19 nouveaux ; les mêmes 19 passent sous `-race`. Une expiration pendant l'attente du registre est reproduite avant correction. | Table privée en mémoire, octrois et cadre d'autorité de fixture ; aucun lanceur ou serveur raccordé. Le portage ne ferme pas F01–F07 et ne constitue ni mesure comparative ni preuve d'originalité. |
++| Source durable IA2.3b | [Rapport et schémas](../../../plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md) : journal SQLite, tête Trust distincte, publication récupérable et révocation durable reliée à une cage réelle ; 181 noms ciblés réussis, dont 33 du registre, avec 52 répétitions sous `-race`. | Permis/checkpoint de contrôle émis par fixtures ; aucun témoin externe ou émetteur humain déployé, aucun lanceur public raccordé. Le protocole ne prouve ni atomicité d'un effet métier ni nouveauté scientifique. |
+ | Amélioration autorécursive | Préférence persistée dans les consignes personnelles et communes, transmission aux contextes embarqués couverte par des tests locaux. | Une consigne et son test de construction ne démontrent ni réception par toute session future ni boucle autonome réparant effectivement tous les incidents. |
+ | Mémoire | Dépendance IA4 vers le chantier mémoire conservée. | Propriété, auteur et droits de consultation/résumé/transmission ne sont pas livrés par cette note. |
+ 
+@@ -403,6 +404,10 @@
+ | SCI-ID-09 | Sonde de bootstrap : attribut de namespace instable ; prévenir un rejet du programme légitime ou un ancrage choisi par l'agent. | Codex : épingler avant exécution des objets observés stables et tester les tentatives de rattachement. Critère : A/B légitimes reconnus et joins adverses refusés dans le périmètre annoncé. | Vérifié sur cet hôte pour PID/montage ; autres lanceurs/plateformes non qualifiés. |
+ | SCI-ID-10 | Relecture du validateur : syntaxe des jokers appliquée à tort aux émetteurs/sujets opaques ; préserver les identités valides. | Codex : réserver cette interdiction aux ressources de permission. Critère : émetteur IPv6 et sujet avec crochets conservés. | Test après correction réussi ; pas de test rouge exécuté avant cette correction. Ne pas présenter la relecture comme une reproduction. |
+ | SCI-ID-11 / IA2-K03 | Revue du canal Go : le temps lu avant l'attente du registre permet une décision après expiration ; préserver la fraîcheur à la vraie frontière de décision. | Codex : lire l'heure après les attentes et les lectures de namespaces. Critère : accord initial avec horloge réelle, refus si l'octroi expire pendant l'attente observée du registre. | Échec avant correction et réussite après conservés dans IA2.3a ; 19 contrôles du canal passent aussi sous `-race`. Engagement/effet et audit des autres frontières restent ouverts. |
++| SCI-ID-12 / IA2-D01 | Lecture du contrat durable : rename sans synchronisation du répertoire ; éviter une promesse de persistance insuffisante. | Codex : ouvrir le parent avant mutation et synchroniser après rename, erreurs explicites. Critère : refus sans mutation si parent non synchronisable ; remplacement correct et privé. | Échec initial et passages après conservés ; aucune panne électrique ou défaillance matérielle reproduite. |
++| SCI-ID-13 / IA2-D02 | Source durable : champ précédent absent conservé lors du décodage dans un objet réutilisé ; préserver chaque original indépendant. | Codex : décoder chaque maillon dans un objet neuf. Critère : chaîne à plusieurs versions, reprise et révocation restent lisibles. | Échecs initiaux puis contrôles réussis ; le décodeur commun garde son contrat, sans changement global de sémantique des champs absents. |
++| SCI-ID-14 / IA2-D03 | Revue du publiant : FK vérifié après intention, alors que le travail peut être absent ; éviter une intention irrécupérable sur entrée invalide. | Codex : vérifier le travail sous réservation avant décision durable. Critère : refus explicite sans mutation Trust/journal. | Contre-exemple avant correction et réussite après conservés. |
++| SCI-ID-15 / IA2-D04 | Lecture sur connexion ouverte après changement de version ; préserver le contrat de stockage au consommateur. | Codex : garde de version dans la transaction de lecture, avant production de cadre. Critère : version incompatible refusée avec motif exact. | Échec avant puis réussite après ; admission publique et engagement d'effet restent ouverts. |
+ 
+ Les consignes permanentes portent déjà la boucle découvrir → qualifier →
+ conserver → décider → réaliser/transmettre → vérifier → réexaminer → capitaliser.
+--- before/docs/publications/20261005-cursor-moteur/programme-recherche.md
++++ after/docs/publications/20261005-cursor-moteur/programme-recherche.md
+@@ -63,6 +63,13 @@
+ ces 19 sous `-race`. Le dossier identité lie le cas d'expiration durant l'attente
+ du registre à son échec initial et à sa correction. L'autorité demeure une fixture
+ dans ces essais ; les lanceurs et les effets métier ne sont pas raccordés.
++
++La source durable IA2.3b lit depuis SQLite sous une tête Trust et un checkpoint
++distincts ; une publication interrompue est reprise sans doublon. 181 noms de
++tests/sous-tests ciblés passent, dont 33 du registre, avec 52 répétitions sous
++`-race`. Le témoin courant et le permis restent émis par les fixtures. Ces
++résultats préparent la réplication du protocole ; ils ne qualifient ni l'admission
++publique, ni un témoin externe déployé, ni une contribution originale démontrée.
+ 
+ | Question | Énoncé | État |
+ |---|---|---|
+--- before/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md
++++ after/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/RAPPORT-IA2.3b.md
+@@ -0,0 +1,193 @@
++# IA2.3b — registre durable et publication récupérable
++
++17 octobre 2026, Codex seul, `replan` + APEX, auto-revue locale `code-reviewer`.
++Branche `codex/clear-product-method-names`, HEAD
++`4e58f7cbf8200a58f69f1f4d03d657c3313fb642` avec changements locaux conservés.
++**Module interne vérifié ; aucun lanceur, endpoint ou témoin externe déployé.**
++
++## Résultat et frontière de preuve
++
++Le cadre d'autorité peut maintenant être produit depuis un journal SQLite et
++une tête Trust distincte, sous un checkpoint courant fourni par le contrôle.
++Un consommateur interne relie cette source à l'attribution réelle d'instance
++IA2.3a et au noyau IA2.2. La révocation durable d'un octroi fait refuser le
++message suivant de la cage testée, sans révoquer sa liaison runtime en mémoire.
++Cette observation prouve le passage par la source persistée ; elle ne prouve
++ni arrêt du processus, ni admission publique ou effet métier.
++
++Le permis de publication et le checkpoint sont des entrées privées du contrôle,
++**émises par les fixtures dans ces essais**. Le jeton du publiant est réellement
++résolu dans Trust ; cela ne transforme pas son principal local en humain ou
++son rôle métier en droit de création. L'émission humaine de ces entrées, la
++fraîcheur d'un témoin externe et la protection hôte des fichiers restent ouvertes.
++
++## Choix, fichiers et compatibilité
++
++Options comparées : lire la plus grande révision SQLite et en déduire les racines,
++ou authentifier une tête indépendante avant d'en lire l'instantané exact. La
++première ferait d'un import une autorité. La seconde est retenue, avec intention
++durable et récupération explicite entre les deux stockages.
++
++Six nouveaux fichiers `agent_identity_registry_{schema,types,store,publish,test,atomic_test}.go`.
++Sources préexistantes modifiées : `model.go` (version 36 et écriture durable),
++`store.go` (migration), `trust_actions.go` (champ/validation et encodeur commun),
++`agent_identity_authority.go` (validation des enregistrements extraite sans changer
++les invariants de transition). Contrats FR/EN, plan et dossier scientifique mis
++à jour. [État initial](baseline.json), préimages et sources avant/après conservés.
++Aucun fichier mémoire ou lanceur préexistant modifié par cette tranche.
++
++La migration crée `agent_identity_snapshots` et `agent_identity_publications`
++dans `state.db`, avec FK vers le travail et unicité des événements/têtes.
++Une sauvegarde `state-pre-v36-*.db` est créée pour un stockage existant. Aucun
++snapshot, octroi ou principal n'est ajouté par la migration. Les consultations
++refusent une mise à niveau implicite ; la voie existante `swarm init` est celle
++de la migration, à utiliser dans le parcours de livraison autorisé. Aucun init
++ou changement du stockage vivant du dépôt n'a été exécuté ici.
++
++## Protocole et données
++
++1. Copier/décoder la proposition et vérifier le permis privé exact : projet,
++   portée, digest, racines, principal publiant, révision Trust et événement.
++2. Prendre Trust exclusif sans attente cachée ; un verrou occupé retourne
++   `workspace_wait`. Prendre une transaction SQLite avec le contexte du consommateur
++   et réserver l'écrivain avant lecture. Vérifier version et existence du travail.
++3. Résoudre le jeton courant après cette attente, vérifier le checkpoint précédent,
++   la chaîne, les racines, les liens et l'histoire non réécrite. Revalider le
++   publiant juste avant la décision durable.
++4. Persister dans Trust une intention contenant la tête et l'instantané exacts.
++   Fichier et entrée de répertoire sont synchronisés. Toute lecture normale
++   d'identité refuse une intention en attente.
++5. Insérer snapshot et reçu en une transaction SQLite, puis COMMIT.
++6. Finaliser la tête Trust et supprimer le marqueur en attente ; retourner le
++   checkpoint cible seulement après succès de cette écriture.
++
++La tête lie contexte de projet, portée, révisions/digest, racines, publiant,
++événement et digest de la tête précédente. Le lecteur ne fait pas de
++`SELECT max(revision)` pour choisir son autorité. Il exige le checkpoint,
++vérifie la tête et la chaîne, lit le snapshot canonique dans une transaction
++avec garde de version et en possède la copie. La connexion SQLite est libérée
++avant le verrou runtime, puis le temps d'évaluation est échantillonné après
++les attentes. Le message d'agent ne fournit ni le snapshot ni le cadre.
++
++`recoverAgentIdentityRegistry` exige le permis initial et son contenu exact.
++Il termine une intention existante ou vérifie sa finalisation déjà effectuée ;
++il ne prépare pas une nouvelle publication. Après COMMIT, une reprise n'insère
++pas une seconde fois les lignes. Si la configuration Trust a changé, elle est
++conservée : la publication ancienne est historique, et son usage reste refusé
++pour révision périmée. Aucun processus, consommation ou budget n'est recréé.
++
++Ce protocole rend la publication récupérable ; il ne rend pas les deux fichiers
++simultanément atomiques pour tous les usages. SQLite décrit ses propres
++transactions et hypothèses de synchronisation, qui ne couvrent pas à elles seules
++le fichier Trust. [Atomicité SQLite](https://www.sqlite.org/atomiccommit.html),
++[transactions](https://www.sqlite.org/lang_transaction.html).
++
++Schémas du contrat courant : [séquence FR](contract-fr-3.svg),
++[EN](contract-en-3.svg), [commandes de rendu](diagrams.json). Les six diagrammes
++FR/EN du contrat ont été rendus et inspectés visuellement dans cette zone.
++Une note rognée a été répartie sur deux lignes puis revérifiée ; les
++[quatre nouveaux rendus](diagrams-layout-fix.json) gardent la trace de cette
++correction de présentation, sans changement des sources Go ni effacement des
++commandes historiques.
++
++## Contrôles effectivement exécutés
++
++| Contrôle | Résultat | Originaux |
++| --- | --- | --- |
++| Sélection ciblée complète | **181 noms PASS / 181**, 42 tests racine, aucun FAIL/SKIP | [Commande/dates](tests-final-run.json), [JSONL](tests-final.jsonl), [résumé](tests-final-summary.json) |
++| Nouveau registre | **33 noms PASS / 33**, dont invalides, reprise, restauration et cage réelle | Inclus dans la même exécution ; ne pas additionner |
++| Concurrence registre/canal/runtime | **52 noms PASS / 52 sous `-race`**, aucun signalement | [Commande](race-final-run.json), [JSONL](race-final.jsonl), [résumé](race-final-summary.json) |
++| Statique / compilation | `go vet ./internal/engine`, `go build ./cmd/swarm` : codes zéro | [Sorties](static-build-final.json), [binaire isolé non déployé](binary-final.json) |
++| Candidat | **1 052 entrées** locales Go/tests/ressources embarquées, aucune modifiée pendant les checks | [Inventaire](inputs-final.json), `source-final/` |
++
++La sélection est élargie pour une raison concrète : le contrat commun
++`atomicWrite` et la version 36 touchent Trust, lancement, inspection/migration,
++reprise et contexte mémoire. Les 133 contrôles de l'étape précédente sont rejoués,
++avec les nouveaux tests et dépendances pertinentes. Les 52 sous `-race` répètent
++un sous-ensemble, pas 52 attaques supplémentaires. Pas de suite globale,
++fournisseur distant, revue indépendante ou déploiement revendiqué.
++
++Cas observés : publication, réouverture et lecture ; copie sans alias ; rejeu
++authentifié sans doublon ; refus du JSON forgeant un checkpoint, permis absent,
++jeton faux, publiant différent même admin, contenu changé, racine invalide,
++projet différent, événement réutilisé, effacement de révocation, cycle, contexte
++absent/annulé et travail absent. Quatre reprises couvrent bootstrap/mise à jour
++après intention et après COMMIT. Configuration modifiée préservée et droits
++anciens refusés. Restauration SQLite seule ou conjointe Trust/SQLite refusée
++**face au checkpoint courant gardé hors des fichiers restaurés**. Altérations
++du snapshot/journal, ligne trop grande et version changée refusées. Deux écrivains
++sur la même base n'obtiennent qu'une publication. Une attente annulée sur la
++connexion libère Trust sans préparer d'intention. Une cage réelle reçoit une
++décision, puis un refus d'octroi révoqué depuis la source durable ; aucun agent
++métier n'est créé par ces appels.
++
++## Défauts et améliorations conservés
++
++| ID | Cause observée | Correction / preuve |
++| --- | --- | --- |
++| IA2-D01 | `atomicWrite` synchronisait le fichier, pas le répertoire renommé. Une création pouvait être annoncée réussie sans capacité d'ouvrir/synchroniser son parent. | [Échec avant](atomic-before.jsonl), [passage après](atomic-after.jsonl). Ouverture du parent avant mutation, synchronisation après rename ; tests contenu, mode 0600 et temporaires. Une erreur post-rename reste incertaine. Aucune coupure électrique simulée. |
++| IA2-D02 | Décoder le précédent dans l'objet courant gardait son champ `previous_head_digest` lorsqu'il était absent du JSON précédent. Dès la révision 2, la chaîne était mal relue. | [Échecs initiaux](registry-initial.jsonl), [empreintes](registry-initial-run.json), `source-before-chain-fix/`. Décodage dans un objet neuf pour chaque enregistrement ; suites suivantes réussies. Le contrat générique de `strict` n'est pas changé en remplacement implicite. |
++| IA2-D03 | Le FK révélait un travail absent seulement après l'intention durable, laissant du Trust modifié malgré le refus. | [Échec avant](missing-work-before.jsonl), [sources/commande](missing-work-before-run.json). Vérifier existence sous réservation SQLite avant intention ; refus sans mutation et motif exact vérifiés. |
++| IA2-D04 | Un lecteur sur connexion ouverte acceptait encore un snapshot après passage du stockage à une version incompatible. | [Échec avant](version-before.jsonl), [sources/commande](version-before-run.json). Garde de version dans la transaction de lecture, motif `storage_version_conflict` vérifié. |
++
++Les checkpoints intermédiaires 30 et 180 PASS restent historiques, pas les
++preuves du candidat final. Les préimages originales et chaque source rouge
++sont conservées en `.txt` ; aucun faux package Go n'est créé dans les preuves.
++
++Le scan AST initial confondait des receveurs homonymes et des appels locaux avec
++le CLI, et ignorait les frontières COMMIT. Les [versions et limites](lock-inventory-summary.json)
++conservent l'amélioration : fichiers réellement compilés, receveurs/champs et
++fonctions locales distingués, puis examen manuel. Le résultat final inventorie
++1 938 fonctions et 83 fonctions à verrou/transaction, sans candidat restant
++dans ce modèle limité. **Ce n'est pas une preuve globale d'absence d'inversion** :
++callbacks et flot typé complet restent hors analyse. Ne pas appeler le nouveau
++publiant depuis une transaction SQLite déjà tenue ; le raccord des exécuteurs
++doit vérifier cette précondition.
++
++Le pilote d'affichage du scan a aussi rencontré `null` pour une slice Go vide
++et tenté `len(None)` ; JSON original et code de sortie Go conservés, résumé
++normalisé sans relancer le moteur. Des recherches initiales visaient des noms
++de fichiers absents ; l'inventaire/symbole réel a remplacé ces suppositions.
++Ces erreurs de méthode ne sont pas des tests de sécurité.
++
++L'index final a également révélé un comptage manuel erroné : le vérificateur
++attendait 16 archives, l'inventaire exact en contient 17, toutes identiques aux
++sources courantes. L'[échec original](verify-final-before-count-fix.json) et son
++script sont conservés. Le vérificateur compare désormais l'ensemble des chemins
++attendus et leurs octets, puis les 1 052 entrées du candidat. Propriétaire Codex,
++valeur : éviter qu'un dénominateur recopié invalide ou masque une preuve ; critère
++observable : concordance des chemins et empreintes, réalisée et vérifiée par
++l'index final. Aucun test Go ni résultat produit n'a été modifié pour ce correctif.
++Un ajout documentaire a d'abord été refusé pour un contexte de patch tronqué ;
++la ligne réelle a été relue avant application, sans mutation partielle.
++
++## Limites, droits et prochaine frontière
++
++Le checkpoint courant est une **précondition fournie par le contrôle**. Options
++examinées : signer un fichier voisin (n'empêche pas une restauration conjointe),
++utiliser un témoin monotone indépendant (enrôlement/protection à déployer), ou
++préparer une interface privée qui refuse l'absence de témoin sans activer les
++parcours publics. Cette troisième voie progressive est réalisée ici ; les
++fixtures fournissent le témoin. Restaurer tous les fichiers et aussi un ancien
++témoin n'est pas détecté par magie. Propriétaire Codex pour le contrat, opérateur
++pour l'enrôlement/déploiement ultérieur ; reprise après preuve de l'émetteur et
++de sa fraîcheur, pas après simple relecture d'un fichier local.
++
++Le permis exact n'a pas encore d'émetteur humain raccordé. La portée vient du
++permis : le producteur du vrai plan adopté, l'accord humain lié au lancement et
++sa consommation restent requis. La confidentialité des types Go n'est pas une
++frontière contre un compte contrôleur hôte compromis. Le confinement fournisseur
++et toutes les activations restent à raccorder. Les essais d'altération portent
++sur des lignes/états de fixtures, pas une certification d'une image SQLite
++hostile arbitraire, du matériel ou de tous les systèmes de fichiers.
++
++IA2.3 reste partiel pour l'admission : réservation/départ incertain, effets,
++processus redémarré et récupération complète non réalisés. Les consommateurs
++bas niveau IA2.2/IA2.3a prenant encore des snapshots/cadres restent des primitives
++à précondition de fraîcheur, pas des endpoints publics. IA3 devra employer le
++parcours durable et couvrir CLI/API, autres fournisseurs et activation hors plan.
++IA4 droits mémoire, IA5 qualification IDA et RETEX restent ouverts. F01–F07 ne
++sont pas requalifiés, aucun scénario global IDA ne devient PASS par ces tests.
++
++Index des contrôles et empreintes courantes : [vérification finale](checks-final.json).
++[Auto-revue finale locale, non indépendante](review-local-final.md).
+--- before/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/review-local-final.md
++++ after/docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/review-local-final.md
+@@ -0,0 +1,50 @@
++# Auto-revue finale IA2.3b — composant interne
++
++17 octobre 2026, Codex dans le contexte producteur. **Revue locale non indépendante.**
++La base de comparaison est celle de `baseline.json` et de `preimages/`, pas le
++HEAD Git : le checkout contenait déjà d'autres changements.
++
++Décision : **composant interne vérifié dans le périmètre des essais**. Cette
++décision ne vaut ni acceptation de l'identité globale ni activation en production.
++
++Les quatre changements de sources préexistantes ont été relus par rapport aux
++préimages. Les six nouveaux fichiers ont été examinés, en particulier le permis
++exact, la lecture versionnée, les refus sans mutation et la reprise après COMMIT.
++Le refus pour travail absent précède maintenant l'intention durable ; le lecteur
++vérifie la version dans sa transaction. Les contre-exemples originaux sont
++conservés, et leurs gardes passent dans le candidat final.
++
++Les 181 noms de tests passent, dont 33 pour le registre ; les 52 noms sous
++`-race` sont un sous-ensemble rejoué. Les 1 052 entrées inventoriées sont restées
++inchangées pendant ces vérifications. La sélection élargie couvre les dépendances
++du contrat commun d'écriture et de la migration, sans revendiquer une suite globale.
++
++Ordre examiné : publication Trust exclusif puis écrivain SQLite ; lecture Trust
++partagé puis transaction SQLite libérée avant le verrou runtime. Le contexte
++annulé pendant l'attente est testé. Le scan AST affiné n'est pas une preuve de
++tous les callbacks : le futur appelant ne doit pas entrer dans la publication
++avec une transaction SQLite déjà tenue. Un temps d'évaluation fourni pour un
++test ne constitue pas une horloge extérieure authentifiée.
++
++Les six diagrammes FR/EN ont été inspectés visuellement. Le texte rogné de la
++note du nouveau schéma français a déclenché une correction de mise en page,
++un nouveau rendu FR/EN puis une nouvelle inspection ; `diagrams-layout-fix.json`
++conserve ces quatre commandes. Aucune source Go n'a changé pour cette correction.
++
++Le vérificateur d'index a été corrigé après un comptage manuel faux (16 archives
++attendues, 17 présentes). Il exige maintenant l'ensemble exact des chemins et
++la concordance des octets. L'original rouge est conservé ; aucune garde ni
++empreinte n'a été supprimée pour obtenir le passage.
++
++Réserves maintenues : permis/checkpoint émis par fixtures, absence de témoin
++externe courant et protégé, producteur du vrai plan adopté absent, accord humain
++et consommation du lancement non raccordés, aucun lanceur public ni effet métier.
++Les types Go privés ne protègent pas d'un contrôleur hôte compromis. Les essais
++ne certifient pas une image SQLite hostile arbitraire, une panne électrique ou
++tous les systèmes de fichiers. Les primitives prenant un cadre fourni restent
++soumises à la fraîcheur de leur appelant.
++
++F01–F07, IA3, IA4, IA5 et RETEX global restent ouverts. Ces limites sont
++transmises dans le plan, le contrat FR/EN et le dossier scientifique ; leur
++documentation ne prouve pas leur résolution. Aucun critère public IDA n'est
++requalifié par cette auto-revue.

@@ -131,7 +131,16 @@ func (s *Store) preparationCommand(r PreparationRequest) (p Preparation, err err
 	if e != nil {
 		return p, e
 	}
-	defer tx.Rollback()
+	var repositoryFinish func(bool) error
+	r.repositoryFinish = &repositoryFinish
+	defer func() {
+		_ = tx.Rollback()
+		if repositoryFinish != nil {
+			if e := repositoryFinish(err == nil); e != nil {
+				err = errors.Join(err, e)
+			}
+		}
+	}()
 	var savedRequest, savedResponse []byte
 	e = tx.QueryRow("SELECT request,response FROM preparation_commands WHERE preparation_id=? AND event_id=?", id, r.Event).Scan(&savedRequest, &savedResponse)
 	if e == nil {

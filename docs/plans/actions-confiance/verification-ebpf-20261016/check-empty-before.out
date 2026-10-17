@@ -1,0 +1,6 @@
+=== RUN   TestKernelCheckCLIRejectsEmptyVerdict
+    trust_kernel_check_test.go:124: positive empty verdict accepted as CLI success
+--- FAIL: TestKernelCheckCLIRejectsEmptyVerdict (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.072s
+FAIL

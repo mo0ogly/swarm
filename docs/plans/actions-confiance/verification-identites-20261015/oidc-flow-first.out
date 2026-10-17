@@ -1,0 +1,30 @@
+=== RUN   TestActionsConfianceT3OIDCConfigurationRejectsUnsafeInputs
+--- PASS: TestActionsConfianceT3OIDCConfigurationRejectsUnsafeInputs (0.07s)
+=== RUN   TestActionsConfianceT3OIDCLoginBusinessPersistenceAndRevocation
+--- PASS: TestActionsConfianceT3OIDCLoginBusinessPersistenceAndRevocation (0.11s)
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/audience
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/nonce
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-iat
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/missing-iat
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-nbf
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/multiple-audiences-without-azp
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/expired
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/wrong-azp
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/unmapped-subject
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/signature
+=== RUN   TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/issuer
+--- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures (0.86s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/audience (0.08s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/nonce (0.09s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-iat (0.10s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/missing-iat (0.09s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/future-nbf (0.10s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/multiple-audiences-without-azp (0.07s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/expired (0.07s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/wrong-azp (0.07s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/unmapped-subject (0.06s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/signature (0.06s)
+    --- PASS: TestActionsConfianceT3OIDCRejectsInvalidClaimsAndSignatures/issuer (0.06s)
+PASS
+ok  	swarm.local/companion/internal/engine	1.113s

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // Inspection evidence cannot be used as ManagedTaskReview or an acceptance.
@@ -43,6 +44,12 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 	fail := func(reason string) (string, managedFragmentInspection, error) {
 		return "", managedFragmentInspection{}, &CommandError{Code: reviewFragmentProtocolError, Message: "inspection de fragment : " + reason}
 	}
+	if !supportedFragmentInspectionContract(packet.InspectionContractVersion) {
+		return fail("contrat d’inspection non pris en charge")
+	}
+	if packet.InspectionContractVersion == managedFragmentInspectionContractVersion && !utf8.ValidString(reply) {
+		return fail("réponse UTF-8 invalide")
+	}
 	if !supportedFragmentDefectCitationContract(packet.DefectCitationContractVersion) {
 		return fail("contrat de citation non pris en charge")
 	}
@@ -78,8 +85,12 @@ func parseManagedFragmentInspection(reply string, packet managedReviewFragmentPa
 			return fail("preuve ou justification invalide")
 		}
 		needs := map[string]bool{}
-		for _, need := range finding.Needs {
-			if len(strings.TrimSpace(need)) < 3 || len(need) > 240 || needs[need] {
+		for index, need := range finding.Needs {
+			minimum, maximum := fragmentNeedLength(need, packet.InspectionContractVersion)
+			if minimum < 3 || maximum > 240 || needs[need] {
+				if packet.InspectionContractVersion == managedFragmentInspectionContractVersion {
+					return fail(fmt.Sprintf("demande de preuve invalide : artifact=%d need_index=%d codepoints=%d utf8_bytes=%d ; 3 à 240 caractères Unicode distincts requis", finding.Artifact, index, utf8.RuneCountInString(need), len(need)))
+				}
 				return fail("demande de preuve invalide")
 			}
 			needs[need] = true
@@ -133,12 +144,16 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 	if err := strict(raw, &envelope); err != nil {
 		return err
 	}
+	nested := packet.FindingContractVersion == managedFragmentFindingContractVersion
+	if nested && (packet.Version < 2 || packet.DefectCitationContractVersion != managedFragmentDefectCitationContractVersion || len(envelope.Defects) != 0) {
+		return fmt.Errorf("constat2 exige citations liées au constat, sans defects global")
+	}
 	defects, err := decodeManagedFragmentDefectCitations(envelope.Defects, packet)
 	if err != nil {
 		return err
 	}
 	if strings.HasPrefix(strings.TrimSpace(string(envelope.Findings)), "[") {
-		if packet.InputBudget != nil && packet.InputBudget.FinalReserveContractVersion == 1 {
+		if nested || (packet.InputBudget != nil && packet.InputBudget.FinalReserveContractVersion == 1) {
 			return fmt.Errorf("nouveau contrat de réserve : constats indexés et ancres proposées requis")
 		}
 		var findings []managedFragmentFinding
@@ -166,9 +181,30 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 			Reason   string          `json:"r"`
 			Evidence json.RawMessage `json:"e"`
 			Needs    []string        `json:"n"`
+			Defects  json.RawMessage `json:"d"`
 		}
 		if err := strict(raw, &entry); err != nil {
 			return err
+		}
+		if nested {
+			var fields map[string]json.RawMessage
+			if err := strict(raw, &fields); err != nil {
+				return err
+			}
+			_, needs := fields["n"]
+			_, details := fields["d"]
+			if (entry.Verdict == "inspected" && (needs || details)) || (entry.Verdict == "unknown" && (!needs || len(entry.Needs) == 0 || details)) || (entry.Verdict == "fail" && (needs || !details)) {
+				return fmt.Errorf("champs incompatibles avec le verdict du constat %d", i)
+			}
+			if details {
+				claims, err := decodeManagedFragmentNestedDefects(entry.Defects, i, packet)
+				if err != nil {
+					return err
+				}
+				result.Defects = append(result.Defects, claims...)
+			}
+		} else if len(entry.Defects) != 0 {
+			return fmt.Errorf("défauts liés au constat exigent contrat2")
 		}
 		allowed := fragmentQuoteChoices(a.Content)
 		if len(allowed) == 0 {
@@ -179,6 +215,9 @@ func decodeManagedFragmentInspection(raw []byte, packet managedReviewFragmentPac
 		}
 		var excerpt string
 		if strings.HasPrefix(strings.TrimSpace(string(entry.Evidence)), "\"") {
+			if nested {
+				return fmt.Errorf("constat2 exige numéro d’ancre")
+			}
 			if err := json.Unmarshal(entry.Evidence, &excerpt); err != nil {
 				return err
 			}

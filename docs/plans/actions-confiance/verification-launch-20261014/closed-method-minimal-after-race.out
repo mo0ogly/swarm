@@ -1,0 +1,7 @@
+=== RUN   TestCorrectiveCandidateRetainsClosedFragmentMethodEvidence
+    managed_review_context_policy_test.go:286: sizes 164551 168226 22003 parts 1
+--- PASS: TestCorrectiveCandidateRetainsClosedFragmentMethodEvidence (17.97s)
+=== RUN   TestRecoveredResultCorrectionAfterPublicPolicyChange
+--- PASS: TestRecoveredResultCorrectionAfterPublicPolicyChange (1.95s)
+PASS
+ok  	swarm.local/companion/internal/engine	21.080s

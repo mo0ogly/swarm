@@ -201,3 +201,21 @@ Horodatages discrets, niveaux écrits et couleurs sémantiques accompagnent la
 recherche, le suivi débrayable, les pages et l'export original. Le cadre authentifié
 isole les styles de l'éditeur ; un repli texte conserve la lecture en cas d'échec.
 Voir [LOG-CONSOLE.md](architecture/LOG-CONSOLE.md) pour les frontières et preuves.
+
+## Cachets de contexte partagés
+
+Le [vocabulaire de cachets](SEMANTIC-SIGNALS.md) fournit des empreintes SVG
+inspirées d'un cachet de cire au bas d'une fiche : type de mémoire au centre,
+identité et protection de l'usage dans des libellés distincts. Les 29 repères
+et leurs descriptions existent en FR/EN ; [English](en/SEMANTIC-SIGNALS.md).
+Ils utilisent les jetons communs, avec formes et mots en plus des couleurs.
+
+Le composant canonique est `frontend/signals/signals.js` et sa feuille
+`signals.css`. Un catalogue interactif isolé démontre thèmes, états et variantes.
+La page mémoire le charge : cachet au pied de la fiche, état de version près de
+la sélection. Générer les deux assets `web/signals.*` avec
+`node frontend/embed-signals.mjs`, puis `--check`, avant compilation. Les autres
+vues, dont l'identité, peuvent consommer cette API ; vérifier chaque intégration
+sans dupliquer les icônes. Le catalogue de démonstration reste hors application.
+Sans données attestées, montrer identité/droits inconnus. Ni cachet, ni nom,
+ni version active ne constitue une signature ou une autorisation.

@@ -1,0 +1,64 @@
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+--- PASS: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (2.44s)
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/committed
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown
+=== RUN   TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled
+--- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState (0.72s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/committed (0.27s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/unknown (0.23s)
+    --- PASS: TestActionsConfianceT2ApprovalCannotRegressEffectState/reconciled (0.22s)
+=== RUN   TestActionsConfianceT2RevocationBindsUpdatedMandate
+--- PASS: TestActionsConfianceT2RevocationBindsUpdatedMandate (0.23s)
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink
+--- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey (0.43s)
+    --- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular (0.21s)
+    --- PASS: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink (0.22s)
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/expired
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/missing
+=== RUN   TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started
+--- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate (0.98s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/revoked (0.24s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/expired (0.22s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/missing (0.23s)
+    --- PASS: TestActionsConfianceT2ApprovalRequiresLiveMandate/not_started (0.29s)
+=== RUN   TestActionsConfianceT2InitialKeyPublicationFailure
+--- PASS: TestActionsConfianceT2InitialKeyPublicationFailure (1.37s)
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery/before_key
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery/after_key
+=== RUN   TestActionsConfianceT2InitialPublicationRecovery/after_state
+--- PASS: TestActionsConfianceT2InitialPublicationRecovery (1.01s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRecovery/before_key (0.30s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRecovery/after_key (0.27s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRecovery/after_state (0.22s)
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/state
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/key
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/digest
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/public
+=== RUN   TestActionsConfianceT2InitialPublicationRejectsReplacement/symlink
+--- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement (1.22s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/state (0.20s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/key (0.22s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/digest (0.20s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/public (0.20s)
+    --- PASS: TestActionsConfianceT2InitialPublicationRejectsReplacement/symlink (0.19s)
+=== RUN   TestActionsConfianceT2InitialPublicationConcurrent
+--- PASS: TestActionsConfianceT2InitialPublicationConcurrent (0.52s)
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired
+=== RUN   TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked
+--- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba (0.36s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/absent (0.03s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/expired (0.03s)
+    --- PASS: TestActionsConfianceT2IdentityMandateApprovalAndBiba/revoked (0.04s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+--- PASS: TestActionsConfianceT2IdempotencyRestartAndReconciliation (1.07s)
+PASS
+ok  	swarm.local/companion/internal/engine	11.522s

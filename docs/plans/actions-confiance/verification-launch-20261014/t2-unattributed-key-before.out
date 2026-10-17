@@ -1,0 +1,11 @@
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular
+    trust_actions_operator_regression_test.go:836: unattributed preexisting key adopted by initial configuration
+=== RUN   TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink
+    trust_actions_operator_regression_test.go:836: unattributed preexisting key adopted by initial configuration
+--- FAIL: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey (0.03s)
+    --- FAIL: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/regular (0.02s)
+    --- FAIL: TestActionsConfianceT2InitialConfigurationRejectsUnattributedKey/hardlink (0.01s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.049s
+FAIL

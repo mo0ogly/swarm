@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "manifest_status": "ENGINE_CURSOR_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
-  "base_commit": "f2be47a00def0cca32aecb3e1e31c624a65e37bf",
-  "candidate_id": "f2be47a00def0cca32aecb3e1e31c624a65e37bf+sha256:77f3395846ba7896fd58731cea1d21ad23da46ec38e6fc67cf693341334b238a",
-  "candidate_digest": "77f3395846ba7896fd58731cea1d21ad23da46ec38e6fc67cf693341334b238a",
+  "base_commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "candidate_id": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642+sha256:205038604152fe2a81307e5688ad15dc5afab08453911544114b49b3bf6dce7f",
+  "candidate_digest": "205038604152fe2a81307e5688ad15dc5afab08453911544114b49b3bf6dce7f",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/ui-redesign-source-manifest.json",
   "requirements": [
@@ -172,27 +172,31 @@
     }
   ],
   "limits": "Current source integrity only. Historical R01-R18 acceptance remains pending requalification. Existing user edits are observed inputs, not claimed authorship. This snapshot is neither an executed test receipt nor an independent verdict. Research and runtime results are separate.",
-  "historical_manifest_sha256": "b2fc32432a8c8b9852f9a909f7ac05ef81ee4161b1541242275386930442e2eb",
+  "historical_manifest_sha256": "caa898e6a639becf4117bf8876a4e08a6f452eb2bf7a89eb3e44e52dd6bb9fa6",
   "input_parts": [
     {
       "path": "docs/engine-cursor-source-inputs-001.json",
-      "sha256": "6a3e7c4d29306186935a5162fca086dee54310ce169a372652a9afee6abd4c64"
+      "sha256": "e60232a1e73e1032182c5f463cfdf9ab3737c59fbd700074922bf5f383b333e6"
     },
     {
       "path": "docs/engine-cursor-source-inputs-002.json",
-      "sha256": "b2ca7d9aee29f17049525750e04f1982cd2d5b9834f0b0d8944bdf0f84d6e29f"
+      "sha256": "8b9c809d9fc24a0b6da9e04f07f94846ee09d37b232427e9cdc5d6a765e326e8"
     },
     {
       "path": "docs/engine-cursor-source-inputs-003.json",
-      "sha256": "53e35bfc9494bc9cf2e155c90e07567115a79db52020a1c5770cf0f18a3aa0cb"
+      "sha256": "066983d306227223cd0c9582c92da7ad1802b4de75e6baadbe5fe449679dcc97"
     },
     {
       "path": "docs/engine-cursor-source-inputs-004.json",
-      "sha256": "5ed8be2dbcf17491e0027c07575d7067c19c93497f9cb0fadf320dbac23198ff"
+      "sha256": "270f8a6ea8bd261b49ad20c09b9df1c20461058f44bc06d3bf70951814ca16e7"
     },
     {
       "path": "docs/engine-cursor-source-inputs-005.json",
-      "sha256": "181f08f80ec3bfbdb5da5195c498c3393e7688e4e446302660e0ff65123f8f13"
+      "sha256": "b86155ac6d5b3fd19cc619672ef79e1ff96ce96addf9b92b0eb38585bcd5a364"
+    },
+    {
+      "path": "docs/engine-cursor-source-inputs-006.json",
+      "sha256": "acb9b768d0bf38b172b9c8735fb1d2f1a491e73d6fa4fcaae8503e3e1b2e6765"
     }
   ]
 }

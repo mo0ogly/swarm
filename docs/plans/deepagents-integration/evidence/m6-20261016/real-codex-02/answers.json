@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "source": {
+    "kind": "supplied_outputs",
+    "provider": "codex-cli 0.159.2, OpenAI-authenticated Responses provider",
+    "model": "gpt-5.6-sol",
+    "effort": "medium",
+    "provenance_file": "receipts-index.json"
+  },
+  "answers": [
+    {
+      "case_id": "missing-recoverable-without",
+      "prompt_sha256": "aec3eec888a2d13d442c93abde379b4f9595f73bf077718b3ba330d9d76a2aec",
+      "response": {
+        "decision": "restore_and_evaluate",
+        "actions": [
+          "verify_archive",
+          "restore_artifact",
+          "evaluate_current"
+        ],
+        "admission": "after_fresh_pass",
+        "acceptance": "unchanged",
+        "reason": "L’archive disponible correspond à l’empreinte requise, mais la cible actuelle est absente. Il faut vérifier l’archive, restaurer l’artefact puis l’évaluer dans le contexte courant avant toute admission ; l’acceptation historique ne vaut pas acceptation de cette tentative."
+      },
+      "elapsed_seconds": 6.255967967998004,
+      "input_tokens": 16551,
+      "output_tokens": 176,
+      "cost": null
+    },
+    {
+      "case_id": "missing-recoverable-with",
+      "prompt_sha256": "7c361beb6b7e9df0efada9ee5162706b1af3019b6487027d77a7dff47b5ac963",
+      "response": {
+        "decision": "restore_and_evaluate",
+        "actions": [
+          "verify_archive",
+          "restore_artifact",
+          "evaluate_current"
+        ],
+        "admission": "after_fresh_pass",
+        "acceptance": "unchanged",
+        "reason": "L’archive disponible correspond à l’empreinte requise, mais la cible actuelle est absente et l’acceptation historique ne la valide pas. Il faut vérifier l’archive, restaurer l’artefact depuis cet original vérifié, puis obtenir une évaluation fraîche avant toute admission."
+      },
+      "elapsed_seconds": 7.211290901999746,
+      "input_tokens": 16895,
+      "output_tokens": 272,
+      "cost": null
+    },
+    {
+      "case_id": "changed-unrecoverable-without",
+      "prompt_sha256": "5f7da0222796c68cdf5aeed9d774260351d8291b5895c0ea4f7ed260cd36e042",
+      "response": {
+        "decision": "rebuild_evidence",
+        "actions": [
+          "block_admission",
+          "request_fresh_evidence",
+          "evaluate_current"
+        ],
+        "admission": "after_fresh_pass",
+        "acceptance": "unchanged",
+        "reason": "L’archive est indisponible et la cible actuelle diffère de l’artefact historiquement accepté ; l’acceptation passée n’est donc pas transférable. Il faut produire puis évaluer une preuve fraîche sur la cible actuelle avant toute admission."
+      },
+      "elapsed_seconds": 6.8058822530001635,
+      "input_tokens": 16548,
+      "output_tokens": 201,
+      "cost": null
+    },
+    {
+      "case_id": "changed-unrecoverable-with",
+      "prompt_sha256": "9b3f625b4a957fe70be4abe8b8ca17f894aa57e7f50de199270d1924e04bbe9b",
+      "response": {
+        "decision": "rebuild_evidence",
+        "actions": [
+          "block_admission",
+          "request_fresh_evidence"
+        ],
+        "admission": "blocked",
+        "acceptance": "unchanged",
+        "reason": "L’archive et son empreinte sont indisponibles, donc l’original ne peut être vérifié ni restauré. La cible actuelle a une empreinte différente de celle requise ; l’acceptation historique ne vaut pas pour cet état. L’admission reste bloquée jusqu’à l’obtention d’une preuve fraîche portant sur la cible actuelle."
+      },
+      "elapsed_seconds": 9.616012484999374,
+      "input_tokens": 16895,
+      "output_tokens": 196,
+      "cost": null
+    }
+  ]
+}

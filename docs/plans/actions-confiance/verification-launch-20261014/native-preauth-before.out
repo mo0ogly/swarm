@@ -1,0 +1,128 @@
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/requester-token-012345
+    trust_actions_operator_regression_test.go:1339: business operation completed incomplete configuration
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions-proof.key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions-proof.key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions-proof.key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions-proof.key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/different_operator_request
+    trust_actions_operator_regression_test.go:1351: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/requester-token-012345
+    trust_actions_operator_regression_test.go:1339: business operation completed incomplete configuration
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/different_operator_request
+    trust_actions_operator_regression_test.go:1351: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/requester-token-012345
+    trust_actions_operator_regression_test.go:1339: business operation completed incomplete configuration
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json.initializing
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/invalid-token
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/requester-token-012345
+    trust_actions_operator_regression_test.go:1341: refused operation mutated initial publication: trust-actions.json
+=== RUN   TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/different_operator_request
+    trust_actions_operator_regression_test.go:1351: refused operation mutated initial publication: trust-actions.json
+--- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery (0.10s)
+    --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key (0.03s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-create/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/mandate-revoke/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/request/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/approve/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/commit/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/reconcile/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/before_key/different_operator_request (0.00s)
+    --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key (0.02s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-create/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/mandate-revoke/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/request/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/approve/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/commit/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/reconcile/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_key/different_operator_request (0.00s)
+    --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state (0.02s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-create/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/mandate-revoke/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/request/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/approve/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/commit/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/invalid-token (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/reconcile/requester-token-012345 (0.00s)
+        --- FAIL: TestActionsConfianceT2InitialPublicationRequiresExactOperatorRecovery/after_state/different_operator_request (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.129s
+FAIL

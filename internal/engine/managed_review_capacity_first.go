@@ -39,7 +39,7 @@ func planFreshTokenFragments(c managedReviewContext, groups [][]managedReviewFra
 	p := managedReviewFragmentPlan{Version: 4, InputBudget: &budget, Candidate: c.Candidate, ContextDigest: hash(canonical), AvailableCalls: available, ReservedFinalCalls: 2, Coordination: proposal, CoordinationFiles: files}
 	// Reject incomplete/tampered coverage before expensive prompt counting.
 	for i, group := range groups {
-		packet := managedReviewFragmentPacket{Version: 4, InputBudget: &budget, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: i, DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Artifacts: group}
+		packet := managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), Version: 4, InputBudget: &budget, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: i, DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Artifacts: group}
 		if proposal != nil {
 			packet.Lot = order[i]
 			packet.LotContract, packet.LotCriteria = coordinatedLotContract(c, *proposal, order[i])
@@ -70,7 +70,7 @@ func planFreshTokenFragments(c managedReviewContext, groups [][]managedReviewFra
 	p.Packets = nil
 	for i, group := range groups {
 		newPacket := func() managedReviewFragmentPacket {
-			packet := managedReviewFragmentPacket{Version: 4, InputBudget: &budget, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion}
+			packet := managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), Version: 4, InputBudget: &budget, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion}
 			if proposal != nil {
 				packet.Lot = order[i]
 				packet.LotContract, packet.LotCriteria = coordinatedLotContract(c, *proposal, order[i])
@@ -146,7 +146,7 @@ func (s *Store) planFreshCapacityFragments(w Work, a Agent, c managedReviewConte
 		if err != nil {
 			return empty, err
 		}
-		return planFreshTokenFragments(c, [][]managedReviewFragmentArtifact{pieces}, nil, nil, nil, *budget, managedReviewPrefix(method), available)
+		return planFreshTokenFragments(c, [][]managedReviewFragmentArtifact{pieces}, nil, nil, nil, *budget, managedReviewPrefixForContext(method, c), available)
 	}
 	record := task.ReviewCoordination
 	raw, _ := json.Marshal(record.Proposal)
@@ -167,5 +167,5 @@ func (s *Store) planFreshCapacityFragments(w Work, a Agent, c managedReviewConte
 	if !reflect.DeepEqual(order, record.Order) {
 		return empty, fmt.Errorf("ordre de revue altéré")
 	}
-	return planFreshTokenFragments(c, groups, order, &record.Proposal, scope.Files, *budget, managedReviewPrefix(method), available)
+	return planFreshTokenFragments(c, groups, order, &record.Proposal, scope.Files, *budget, managedReviewPrefixForContext(method, c), available)
 }

@@ -1,0 +1,25 @@
+{
+  "stage": "laboratory",
+  "argv": [
+    "python3",
+    "tests/actions_confiance_laboratory.py",
+    "--binary",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-effect-proof-qualified",
+    "--timeout-seconds",
+    "180",
+    "--evidence-dir",
+    "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign/laboratory"
+  ],
+  "pid": 442004,
+  "start_ticks": "6937658",
+  "started_unix": 1792134952.4346964,
+  "status": "passed",
+  "binary_sha256": "c0030271a0c2108a6d872b954b0be7556f69642463e28e3070f6bde1edfd8ec8",
+  "exit_code": 0,
+  "ended_unix": 1792134955.6867309,
+  "stdout_sha256": "f51e1f51c94f720f7c99b475d2c02fe63580fa75b0945651f582b6b15c380728",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed_results": 8,
+  "result_path": "docs/plans/actions-confiance/verification-globale-20261016/review-corrections/public-campaign/laboratory/laboratory-public.json",
+  "result_sha256": "3b7b51985029619262b123acd163da7e3ec8159cbe802acf347d7cff0fc4bc52"
+}

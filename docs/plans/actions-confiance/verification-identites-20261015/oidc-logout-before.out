@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3OIDCLogoutPolicySurface
+    trust_oidc_logout_test.go:21: provider logout policy absent json: unknown field "oidc_logout"
+--- FAIL: TestActionsConfianceT3OIDCLogoutPolicySurface (0.10s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.195s
+FAIL

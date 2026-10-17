@@ -1,0 +1,14 @@
+{
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "internal/engine/agent_identity_contract.go": "009643397dfb11afda7edb764d780758c207ce6047b917ad401efa7fc045840c",
+  "internal/engine/model.go": "9b8f2f15d6af6c046cc3b7c909a4a8bf3155b9dd1e6c4ce04612758a763c9086",
+  "internal/enrollmentauthority/authority.go": "4e8db4b72bd2c333c5b54cd71e6bc987158ae320b635946719556351e5d3c019",
+  "internal/enrollmentauthority/authority_test.go": "f22e0361c0788177fbdc04624bf4bf7a094d953676282b550a2e4c62c7b15eb2",
+  "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+  "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+  "internal/enrollmentstate/journal.go": "13b4b7b94e5d1ee2df2a47a9810756eeffba724c07a37f1ba4ab425c5f6aca87",
+  "internal/enrollmentstate/journal_test.go": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+  "internal/enrollmentstate/recovery_test.go": "648eaa86435154bd94b04740dad651433f5c84970417d1386a2850c12e88a51d",
+  "internal/identitycontract/contract.go": "5eb8c945536080d376285ac547aea421bc196f7fc446375cbe2d9327721b1dd8"
+}

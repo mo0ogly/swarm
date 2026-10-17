@@ -280,6 +280,26 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 		return printJSON(out, p)
 	case "agent":
 		switch arg(1) {
+		case "resume-dialogue", "resume-dialogue-preview":
+			b, e := readInput(input)
+			if e != nil {
+				return e
+			}
+			var request DialogueRestoreRequest
+			if e = strict(b, &request); e != nil {
+				return e
+			}
+			preview := arg(1) == "resume-dialogue-preview"
+			a, created, e := s.resumeDialogue(arg(2), request, preview)
+			if e != nil {
+				return e
+			}
+			if !preview && (created || a.Status == "queued") {
+				if e = s.spawnAgent(a); e != nil {
+					return e
+				}
+			}
+			return printJSON(out, map[string]any{"agent": a, "created": created, "preview": preview, "restoration_confirmed": false})
 		case "prepared":
 			w, e := s.get(arg(2))
 			if e != nil {
@@ -369,8 +389,16 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 				return e
 			}
 			d, _ := s.desired(a.ID)
-			return printJSON(out, map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d})
-		case "start":
+			boundary, e := s.dialogueBoundary(a)
+			if e != nil {
+				return e
+			}
+			result := map[string]any{"agent": a, "observed_status": observedAgent(a), "desired": d}
+			if boundary != nil {
+				result["dialogue"] = boundary
+			}
+			return printJSON(out, result)
+		case "start", "context-preview":
 			b, e := readInput(input)
 			if e != nil {
 				return e
@@ -378,6 +406,13 @@ func agentCLI(s *Store, pos []string, input, output string, asJSON bool, out io.
 			var r Launch
 			if e = strict(b, &r); e != nil {
 				return e
+			}
+			if arg(1) == "context-preview" {
+				a, _, err := s.prepareLaunch(arg(2), r, true)
+				if err != nil {
+					return err
+				}
+				return printJSON(out, map[string]any{"agent": a, "preview": true})
 			}
 			a, created, e := s.prepare(arg(2), r)
 			if e != nil {

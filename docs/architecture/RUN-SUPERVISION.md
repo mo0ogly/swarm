@@ -5,6 +5,27 @@ Le superviseur propriétaire juge l’avancement utile et décide de la conduite
 Le moteur mesure, transmet, vérifie les droits et applique une décision attribuée.
 Une durée écoulée ne prouve ni achèvement, ni absence de progrès, ni acceptation.
 
+## Communication pendant la reprise
+
+L’utilisateur interdit explicitement les attentes silencieuses prolongées, les
+heures de blocage sans prise en charge et les annonces « corrigé » sans résultat
+vérifié. Pendant le travail interactif actif, Codex donne au moins toutes les
+60 secondes un point utile : état observé, cause ou incertitude, action et preuve
+encore attendue. Les temps de réponse longs sont aussi interdits : réponse brève
+dès réception, étapes bornées et sorties d’outils concises, sans attendre la fin
+d’une analyse ou d’un contrôle. Une reconnexion affichée ne démontre pas sa cause.
+Une lenteur anormale déclenche `replan` sans relance humaine.
+Une reformulation ou un budget augmenté ne suffit pas à répéter un échec.
+
+Cette obligation figure dans les consignes personnelles, `AGENTS.md` et le
+contrat commun embarqué. Un rôle natif sans outils conserve son JSON imposé et
+remet l’incident à son superviseur ; il ne doit pas ajouter une conversation à
+son protocole. L’assemblage des contextes doit être vérifié, puis le binaire qui
+les remet identifié. La règle, sa présence dans un contexte et un réveil programmé
+ne prouvent ni réparation ni supervision effective. Distinguer les tests locaux,
+l’effet observé du parcours et l’acceptation globale ; les critères encore en
+échec ou non vérifiés restent ouverts.
+
 ## Incident et choix
 
 La tentative `a-a349f9134d355713576b7166`, agent
@@ -75,8 +96,11 @@ appels d’outils qu’il ne voit pas.
 
 Pour une tâche de plan actif, `run_observation` est enregistré dans la transaction
 travail/événement et adressé à son `scope_id`. Il contient agent, tentative,
-déclencheur (`elapsed_time`, `tool_wait`, `output_silence`), seuil et photographie
-des compteurs. Un déclencheur est enregistré une seule fois par tentative.
+déclencheur (`elapsed_time`, `tool_wait`, `output_silence`, `infrastructure` ou
+`tool_failure`), seuil et photographie des compteurs. Un seuil temporel est
+enregistré une seule fois par tentative. Les erreurs d'environnement et les
+autres erreurs d'outils sont remises une fois par nouveau compteur de leur
+catégorie ; une lecture répétée du même état ne crée aucun nouvel événement.
 Les compteurs continuent après le seuil. Le contexte réellement remis au
 planificateur et le schéma strict contiennent ces observations et opérations.
 Une production active ne bloque plus l’activation du responsable ; l’attente du
@@ -174,6 +198,19 @@ explicite conserve l’héritage et les plafonds historiques. Ce choix corrige l
 cas mesuré où Admin indiquait900s mais le nouveau prompt restait limité à300s.
 
 ## Incident d’infrastructure pendant une production
+
+Les erreurs ordinaires d'outil, de configuration ou de contrôle sont elles aussi
+remises au propriétaire exact par `tool_failure` pendant la production. Elles
+conservent les plafonds existants. Le responsable reçoit le diagnostic attribué
+et doit diagnostiquer, corriger ou transmettre, puis vérifier l'effet avant reprise.
+La classification technique n'est pas une décision métier ni une acceptation.
+
+La classification examine la sortie originale avant sa réduction. Les traces
+bornées conservent le début et la fin, afin qu'une longue pile d'appels ne masque
+pas sa cause finale. Chaque catégorie garde au plus trois traces, dont la première
+et la plus récente ; les journaux originaux restent distincts. Les données
+potentiellement sensibles sont masquées dans cette projection. Le diagnostic
+reste une observation fondée sur les événements visibles du fournisseur.
 
 Les échecs d’environnement reconnus par le diagnostic structuré sont conservés
 avec leurs compteurs et traces. Ils ne sont plus imputés au compteur d’erreurs

@@ -62,7 +62,7 @@ func (s *Store) managedReviewCostPreview(work, task string) (ManagedReviewCost, 
 	if methodErr != nil {
 		return out, methodErr
 	}
-	if check := preflightManagedFragmentCalls(managedReviewPrefix(method), c, p); check != nil {
+	if check := preflightManagedFragmentCalls(managedReviewPrefixForContext(method, c), c, p); check != nil {
 		out.TransportBlocker = check.Error()
 	} else {
 		out.TransportReady = true

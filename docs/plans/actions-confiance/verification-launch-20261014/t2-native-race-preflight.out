@@ -1,0 +1,9 @@
+go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/.swarm/managed/w-68b50cc82ec3fe55624f9549/copies/plan-68b50cc82e-T2-2/tests/actions_confiance_t2.py", line 8, in <module>
+    subprocess.run(['sh','build.sh',str(binary)],cwd=repo,check=True,stdout=subprocess.DEVNULL,timeout=a.timeout_seconds)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/subprocess.py", line 577, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['sh', 'build.sh', '/tmp/swarm-t2-recipe-81ue2y0_/swarm']' returned non-zero exit status 2.

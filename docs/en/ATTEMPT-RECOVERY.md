@@ -71,12 +71,108 @@ rejected result is neither published nor applied automatically. The packet stays
 in Git metadata, outside deliverable files. New checks, a delivery manifest and
 independent review remain required against the new candidate.
 
-If no immutable Git result was recorded, the packet explicitly says so; unsubmitted
-working files are not imported. Inconsistent attribution, a changed receipt or a
+If a failed or interrupted managed attempt has no submitted result, the engine
+confirms process termination and freezes its retained sources in a separate Git
+checkpoint at attempt settlement, even when no retry remains. The `attempt_ended`
+event supplies its attributed manifest and digest to the owner. A preservation
+failure remains in the blocker and event; the owner must reconcile the copy and
+its attribution. The packet provides `checkpoint.commit`, `checkpoint.base_commit` and
+`checkpoint.tree`; the same local reference exposes these sources. `result_commit`
+remains absent: this checkpoint is not a verified delivery. The previous attempt’s
+structured `diagnostic` is also supplied directly in the worker prompt so the
+observed cause can be examined before spending more calls.
+
+Historical attempts without confirmed termination retain an explicit limitation;
+the engine does not claim to recover their files. Inconsistent attribution, a changed receipt or a
 modified prepared packet prevents launch and preserves the copies. Packets are
 limited to 512 KiB without truncation. Handoff preparation makes no AI call and
 grants no additional attempt. It supports an authorized retry; it does not replace
 the operator's decision when the attempt limit has been reached.
+
+### Examine before rebuilding
+
+In the newly attributed copy, first check `pwd` and
+`git rev-parse --show-toplevel`. Read the packet from that Git root and use the
+identifiers it actually contains:
+
+```sh
+cat .git/swarm-recovery.json
+git ls-tree --name-only -r refs/swarm/recovery/previous
+git diff --stat BASE_COMMIT refs/swarm/recovery/previous
+git diff BASE_COMMIT refs/swarm/recovery/previous -- VERIFIED_PATH
+```
+
+`BASE_COMMIT` is `base_commit` for a submitted result or `checkpoint.base_commit`
+for a checkpoint. `VERIFIED_PATH` comes from the Git inventory, not a guessed path.
+Read a report with `git show` only after confirming it exists in that tree. Do not
+search a neighbouring copy.
+
+An existing checkpoint stays identical after the former copy changes. The shared
+Git lock refuses a concurrent operation; after release, a fresh read must find
+the same checkpoint. A reference without its manifest is incomplete evidence:
+retain it and route attribution reconciliation to the operator without deleting
+or overwriting the files.
+
+### Choose recovery from the observed cause
+
+| Observed fact | Useful action | Verifiable resumption condition |
+| --- | --- | --- |
+| Guessed file or interface absent | Inventory with `rg --files`, read producer and callers | Path and signature observed in the current copy |
+| Wrong `workdir` | Use the verified current directory; omit the inherited parameter | Command actually starts in its attributed copy |
+| Existing Go symbol declared again | Examine and reuse the compatible declaration | Compilation and named affected tests pass |
+| Sandbox denies transport | Retain error, sources and dependency; route to owner | Required capability demonstrated in the intended check environment |
+| Interrupted sources without delivery | Examine checkpoint and diagnostic | Sources readable in the new copy, cause received, checks still unvalidated |
+| Exhausted attempts | Examine external repair or explicit operator authorization | Admissible public operation; no counters cleared |
+
+This guidance reduces preparation mistakes; it does not intercept provider tools.
+Compilation errors may still occur but must not become accepted deliveries.
+Added instructions or checks in another environment do not establish autonomous
+prevention. See the [diagnosis contract and limitations](AUTORECURSIVE-RECOVERY.md).
+
+### Distinguish verification environments
+
+A browser recipe must start a real local server and control a real browser.
+Verify that capability in the intended environment before the recipe. Repeating
+`validation`, `delivery` and the criterion after the same permission denial supplies
+no new evidence; hand the blocker back to its owner.
+
+Worker, operator and engine controller may have different permissions. Record who
+ran each check, binary, revision and fixture. Operator success does not establish
+worker capabilities. An authorized external repair may use that success through
+the public flow below; it remains attributed to the operator and still requires
+checks and independent review. Network denial never authorizes disabling checks
+or implicitly widening permissions.
+
+### Hand over ready sources without inventing local success
+
+New managed attempts freeze `delivery_version: 2` and receive a version 2
+manifest template. `outcome: ready` hands over sources and recipes for engine
+checks when the producer environment cannot execute a control. Keep the criterion
+`status: not_tested`, its reason, complete source paths and the authorized
+automatic control IDs covering it. A known product failure remains `fail` and
+blocks this handoff. `ready` preserves evidence and review context limits.
+
+The engine executes all configured controls on the immutable candidate, then
+obtains independent review. A failing control prevents review; an adverse review
+prevents acceptance. Legacy version 1 attempts retain their contract: `complete`
+requires actual local verification. A running attempt's frozen protocol is not
+changed retroactively.
+
+### Resume after an environment incident
+
+A narrative claiming that the environment was corrected is insufficient. After
+a structured environment diagnosis on a terminal attempt, preflight must be
+`ready` with `verification: verified` using a configured probe in the actual
+provider context. Every declared capability, including extras such as
+`loopback_listen`, must be `verified`. A host-only `compatible/unverified` result
+retains `environment_verification_required`, without another attempt or
+reservation. The changed-precondition explanation is also required. An operator
+stop does not erase an already observed structured environment failure.
+
+The engine checks configured capabilities; it does not infer every resource a
+recipe needs or certify an incorrectly configured probe. A local-server recipe
+therefore needs its capability declared and actually checked in its intended
+environment. Legacy first launches with optional preflight retain compatibility.
 
 ## Supply candidate sources to the independent reviewer
 
@@ -259,6 +355,20 @@ used calls and their limit; it does not restart anything. After fixing the cause
 **Resume review** examines the existing result within the remaining budget, without
 starting another worker.
 
+### Complete a review that ended without a verdict
+
+Selection-stage `unknown` is neither a confirmed product defect nor a transport
+error. After examining original evidence, an external correction can submit a new
+tree through `revise-recovered-result`, with `review_id`, `confirm_recovery: true`
+and `confirm_review_unknown_correction: true`. The latter is an explicit choice
+to correct missing evidence or sources, never acceptance. It requires a terminal,
+attributed selection and intact journals, a blocked task and a changed tree.
+Active reviews, stale revisions, tampered evidence and unchanged trees are refused
+without mutation or additional spending. A complete delivery manifest remains
+mandatory. Old opinions and receipts are preserved; the new candidate repeats
+controls and independent review within existing budgets. This differs from
+resuming the same candidate after an actual selection-capacity correction.
+
 ## Checks before independent review
 
 For tasks with explicitly authorized automatic checks, the engine runs those
@@ -372,3 +482,127 @@ flowchart TD
   N --> F[Fresh controls and independent review]
   F --> P[Accept only valid fresh evidence]
 ```
+
+## Review reservation abandoned across restart
+
+After acquiring the attempt ownership lock exclusively, the engine recognizes
+a review left `running` by a previous conductor. It verifies originals and the
+anchored journal, then marks only the final reservation without a durable result
+`interrupted` in a new content-addressed journal. The initial journal, completed
+inspections and spent calls are retained. Reconciliation makes no provider call
+and grants no candidate acceptance.
+
+The `review_fragment_interrupted` incident reaches `reviewer_runtime`. A fresh
+`review-retry` decision can resume the same candidate within existing budgets;
+an explicit external repair can supply a changed tree with
+`revise-recovered-result` and `confirm_review_error_repair`. Both retain required
+attribution, controls and validation. Altered originals, a live owner or an
+incompatible client identity block recovery; operator narrative cannot bypass them.
+
+For a deliberate stop, pause through the public operation, await durable call
+settlement and subprocess exit, then stop the identified conductor. Stopping too
+early can leave a reservation without a result; restart retains that uncertainty.
+
+## Inspection contract change after an error
+
+A format error without a final decision can adopt a new citation or finding
+contract through an explicit complete restart. `planning recovery-preview`
+checks originals, attribution, provider, model and required budget before any
+call. A ready restart reports `method_restart_ready`; earlier inspections remain
+history and cannot supply opinions under the new contract. `planning retry-review`
+requires a fresh revision, rationale and `confirm_review_error_repair: true`, or
+a fresh `review-retry` decision by the authorized supervisor. The operation spends
+no call; the conductor subsequently runs the attributed review.
+
+A negative business verdict, live reservation, altered original or insufficient
+budget blocks this replacement. Correct that precondition through its public
+operation before resuming; never erase spending or edit an original reply to make
+it valid.
+
+The preview body uses `task_id`:
+
+```json
+{"schema_version":1,"task_id":"TASK_ID"}
+```
+
+Send it to `swarm --root ROOT --json planning recovery-preview WORK_ID
+--input request.json`. Preview neither replaces the owner decision nor restarts
+the conductor.
+
+```mermaid
+flowchart TD
+  E[Format error without final verdict] --> V{Intact originals and ended producer}
+  V -->|No| B[Reject without a call]
+  V -->|Yes| P[Method preview and complete cost]
+  P --> C{Available capacity and authority}
+  C -->|No| B
+  C -->|Yes| S[Fresh supervisor or authorized operator decision]
+  S --> A[Archive old review and attribute a new plan]
+  A --> I[Fresh inspections and strict validation]
+  I --> F[Independent final decision]
+  F --> R[Publish according to criteria and evidence]
+```
+
+The preview above covers inspections and complete method replacement. If a final
+decision has already started, inspect its journal: explicit final recovery keeps
+inspections and calls and still requires a fresh decision. Submitting a repaired
+tree with `revise-recovered-result` requires an active mission and plan. After a
+diagnostic pause, stop the identified conductor with no descendants, unpause
+publicly, submit the result, then resume the conductor; this avoids rerunning the
+old candidate during submission. A failed precondition grants no extra authority.
+
+## Check the actual denial reason
+
+New managed attempts receive delivery instructions to keep the scenario's other
+fields valid, assert the expected reason and verify no business mutation. After
+adding a mandatory field, revisit existing negative tests: a denial from another
+guard can hide removal of the claimed protection. For a critical guard, controlled
+removal in an isolated fixture must fail the named test. Keep the mutation out of
+the delivered candidate and never alter a mission database for that check.
+
+The prompt constructor and `ready` delivery checks verify local transmission
+of this instruction. They do not yet demonstrate a new native worker applying
+it; inspect the actual context and outcomes before claiming that effect.
+
+## Correction after changing validation controls
+
+A public `validation_policy` change archives the current opinion and invalidates
+its controls. This must not strand a rejected result. `revise-recovered-result`
+may name, through `review_id`, the last archived opinion for the same producer,
+attempt and external repair. Business contract and baseline must still match;
+originals, hashes, provider, method and eligible rejection are rechecked. Older,
+unrelated, unfinished or altered opinions confer no recovery authority.
+
+The operation still requires a fresh revision, a changed examined tree, a stopped
+attributed copy and the applicable rejection confirmations. All controls run under
+the current policy, followed by fresh independent review. The old opinion remains
+historical; its checks and verdict do not accept the new candidate. Attempts and
+consumption remain intact, apart from new calls actually executed.
+
+```mermaid
+flowchart TD
+    P[Public validation policy change] --> H[Archive opinion, invalidate evidence]
+    H --> C[Examined correction with explicit review_id]
+    C --> G{Latest bound opinion, intact originals, same contract and baseline?}
+    G -->|No| R[Refuse without call or new attempt]
+    G -->|Yes| T[Complete checks under current policy]
+    T --> V[Fresh independent review]
+    V --> D{Criteria and questions satisfied?}
+    D -->|No| B[Blocked result, diagnosis and recovery]
+    D -->|Yes| A[Accept new candidate]
+    H -.-> K[Retain old opinion and consumption]
+```
+
+Verify the path in an isolated fixture:
+
+```sh
+go test ./internal/engine -race -count=1 -v -run '^TestRecoveredResultCorrectionAfterPublicPolicyChange$'
+```
+
+This test previews and applies the public policy, submits a corrected tree and
+checks the current-policy receipt, new candidate and fresh opinion. It rejects
+an unrelated ID and altered receipt without spending a call and verifies replay
+does not repeat review. Contract, baseline, producer, attempt and latest-opinion
+variants are checked separately. A real mission additionally requires public
+reception, checks, decision and observed effect; a fixture does not replace these
+four proofs.

@@ -22,50 +22,58 @@ import (
 var cockpitWeb = resources.Web
 
 type webRequest struct {
-	Skills               []ActionSkillSelection `json:"skills,omitempty"`
-	PreconditionEvidence string                 `json:"precondition_evidence,omitempty"`
-	Turn                 string                 `json:"turn,omitempty"`
-	Step                 int                    `json:"step,omitempty"`
-	PlanHash             string                 `json:"plan_hash,omitempty"`
-	Mode                 string                 `json:"mode,omitempty"`
-	Level                string                 `json:"level,omitempty"`
-	ModelPolicyHash      string                 `json:"model_policy_hash,omitempty"`
-	PreviewToken         string                 `json:"preview_token,omitempty"`
-	PlanBriefHash        string                 `json:"plan_brief_hash,omitempty"`
-	Plan                 PlanReview             `json:"plan,omitempty"`
-	References           []DialogueRef          `json:"references,omitempty"`
-	ContextHash          string                 `json:"context_hash,omitempty"`
-	Retex                Retex                  `json:"retex,omitempty"`
-	Offset               int                    `json:"offset,omitempty"`
-	Capture              bool                   `json:"capture_output"`
-	Kind                 string                 `json:"kind"`
-	Work                 string                 `json:"work"`
-	Task                 string                 `json:"task"`
-	Agent                string                 `json:"agent"`
-	Event                string                 `json:"event_id"`
-	Revision             int                    `json:"expected_revision"`
-	Provider             string                 `json:"provider"`
-	Role                 string                 `json:"role"`
-	Workspace            string                 `json:"workspace"`
-	Instruction          string                 `json:"instruction"`
-	Path                 string                 `json:"path"`
-	Name                 string                 `json:"name"`
-	Note                 string                 `json:"note"`
-	Author               string                 `json:"author"`
-	Decision             string                 `json:"decision"`
-	Request              Request                `json:"request"`
-	RoleModel            RoleModelRequest       `json:"role_model"`
-	TaskModel            TaskModelRequest       `json:"task_model"`
-	Quotas               QuotaChange            `json:"quotas"`
-	Budget               Budget                 `json:"budget"`
-	ValidationPolicy     ValidationPolicyChange `json:"validation_policy,omitempty"`
-	Autonomy             string                 `json:"autonomy,omitempty"`
-	Slots                int                    `json:"slots,omitempty"`
-	LifecycleAction      string                 `json:"lifecycle_action,omitempty"`
-	RetentionDays        int                    `json:"retention_days,omitempty"`
+	Summary              *MemorySummarySelection `json:"summary_selection,omitempty"`
+	Skills               []ActionSkillSelection  `json:"skills,omitempty"`
+	PreconditionEvidence string                  `json:"precondition_evidence,omitempty"`
+	Turn                 string                  `json:"turn,omitempty"`
+	Step                 int                     `json:"step,omitempty"`
+	PlanHash             string                  `json:"plan_hash,omitempty"`
+	Mode                 string                  `json:"mode,omitempty"`
+	Level                string                  `json:"level,omitempty"`
+	ModelPolicyHash      string                  `json:"model_policy_hash,omitempty"`
+	PreviewToken         string                  `json:"preview_token,omitempty"`
+	PlanBriefHash        string                  `json:"plan_brief_hash,omitempty"`
+	Plan                 PlanReview              `json:"plan,omitempty"`
+	References           []DialogueRef           `json:"references,omitempty"`
+	ContextHash          string                  `json:"context_hash,omitempty"`
+	Retex                Retex                   `json:"retex,omitempty"`
+	Offset               int                     `json:"offset,omitempty"`
+	Capture              bool                    `json:"capture_output"`
+	Kind                 string                  `json:"kind"`
+	Work                 string                  `json:"work"`
+	Task                 string                  `json:"task"`
+	Agent                string                  `json:"agent"`
+	Event                string                  `json:"event_id"`
+	Revision             int                     `json:"expected_revision"`
+	Provider             string                  `json:"provider"`
+	Role                 string                  `json:"role"`
+	Workspace            string                  `json:"workspace"`
+	Instruction          string                  `json:"instruction"`
+	Path                 string                  `json:"path"`
+	Name                 string                  `json:"name"`
+	Note                 string                  `json:"note"`
+	Author               string                  `json:"author"`
+	Decision             string                  `json:"decision"`
+	Request              Request                 `json:"request"`
+	RoleModel            RoleModelRequest        `json:"role_model"`
+	TaskModel            TaskModelRequest        `json:"task_model"`
+	Quotas               QuotaChange             `json:"quotas"`
+	Budget               Budget                  `json:"budget"`
+	ValidationPolicy     ValidationPolicyChange  `json:"validation_policy,omitempty"`
+	Autonomy             string                  `json:"autonomy,omitempty"`
+	Slots                int                     `json:"slots,omitempty"`
+	LifecycleAction      string                  `json:"lifecycle_action,omitempty"`
+	RetentionDays        int                     `json:"retention_days,omitempty"`
 }
 
 func (s *Store) webAction(r webRequest) (any, error) {
+	if r.Summary != nil && r.Kind != "start" && r.Kind != "agent-context-preview" {
+		return nil, fmt.Errorf("sélection extractive incompatible avec cette opération")
+	}
+	if r.Kind == "agent-context-preview" {
+		a, _, err := s.prepareLaunch(r.Work, Launch{Summary: r.Summary, Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, References: r.References, ContextHash: r.ContextHash, Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture}, true)
+		return a, err
+	}
 	if r.Kind == "role-model-preview" || r.Kind == "role-model" {
 		q := r.RoleModel
 		q.Schema = 1
@@ -239,7 +247,7 @@ func (s *Store) webAction(r webRequest) (any, error) {
 		if r.Kind == "brainstorm" && r.ContextHash == "" {
 			return nil, fmt.Errorf("Examiner le contexte avant envoi.")
 		}
-		a, created, e := s.prepare(r.Work, Launch{Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
+		a, created, e := s.prepare(r.Work, Launch{Summary: r.Summary, Skills: r.Skills, Mode: r.Mode, Level: r.Level, ModelPolicyHash: r.ModelPolicyHash, PlanBriefHash: r.PlanBriefHash, References: r.References, ContextHash: r.ContextHash, Brainstorm: r.Kind == "brainstorm", Schema: 1, EventID: r.Event, Revision: r.Revision, TaskID: r.Task, Provider: r.Provider, Role: r.Role, Workspace: r.Workspace, Instruction: r.Instruction, Capture: r.Capture})
 		if e != nil {
 			return nil, e
 		}
@@ -397,6 +405,13 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 	registerGraphDraftHTTP(s, mux, send, fail)
 	registerAutomationHTTP(s, mux, send, fail)
 	registerAutomationExternalHTTP(s, mux, time.Now)
+	registerTrustActionsHTTP(s, mux, send, fail)
+	registerTrustSecretHTTP(s, mux, send, fail)
+	registerTrustProcessHTTP(s, mux, send, fail)
+	registerTrustEvidenceHTTP(s, mux, send, fail)
+	registerLaboratoryHTTP(s, mux, send, fail)
+	registerTrustOIDCLogoutHTTP(s, mux)
+	registerProjectMemoryHTTP(s, mux, send, fail)
 	s.registerPreparations(mux)
 	s.registerTerminals(mux, send, fail)
 	mux.HandleFunc("/api/v1/runtime-health", func(w http.ResponseWriter, r *http.Request) {
@@ -500,7 +515,16 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			return
 		}
 		desired, _ := s.desired(a.ID)
-		send(w, map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())})
+		boundary, e := s.dialogueBoundary(a)
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		result := map[string]any{"agent": a, "health": pilotAgentHealth(a, desired, now())}
+		if boundary != nil {
+			result["dialogue"] = boundary
+		}
+		send(w, result)
 	})
 	mux.HandleFunc("/api/v1/recovery-preview", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -514,6 +538,42 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 		}
 		send(w, p)
 	})
+	dialogueResumeHandler := func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "POST requis", 405)
+			return
+		}
+		var request DialogueRestoreRequest
+		raw, e := io.ReadAll(http.MaxBytesReader(w, r.Body, agentContextTransportBytes))
+		if e == nil {
+			e = strict(raw, &request)
+		}
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		source, e := s.agent(r.URL.Query().Get("agent"))
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		if source.WorkID != r.URL.Query().Get("work") {
+			http.Error(w, "tentative hors travail", 403)
+			return
+		}
+		preview := r.URL.Path == "/api/v1/dialogue-resume-preview"
+		a, created, e := s.resumeDialogue(source.ID, request, preview)
+		if e == nil && !preview && (created || a.Status == "queued") {
+			e = s.spawnAgent(a)
+		}
+		if e != nil {
+			fail(w, e)
+			return
+		}
+		send(w, map[string]any{"agent": a, "created": created, "preview": preview, "restoration_confirmed": false})
+	}
+	mux.HandleFunc("/api/v1/dialogue-resume", dialogueResumeHandler)
+	mux.HandleFunc("/api/v1/dialogue-resume-preview", dialogueResumeHandler)
 	mux.HandleFunc("/api/v1/task", func(w http.ResponseWriter, r *http.Request) {
 		work := r.URL.Query().Get("work")
 		id := r.URL.Query().Get("task")
@@ -843,11 +903,19 @@ func newWebHandler(s *Store, host, token string) http.Handler {
 			http.Error(w, "Configuration de session invalide", 500)
 			return
 		}
+		if (r.Method == "GET" || r.Method == "HEAD") && (r.URL.Path == "/trust-oidc-callback.html" || r.URL.Path == "/trust-oidc-callback.js") {
+			mux.ServeHTTP(w, r)
+			return
+		}
 		if r.URL.Path == "/login" {
 			webLogin(w, r, host, token, sessionMaxAge)
 			return
 		}
 		if (r.Method == "GET" || r.Method == "HEAD") && (r.URL.Path == "/access.css" || r.URL.Path == "/access.js" || r.URL.Path == "/wattson_themes.css" || r.URL.Path == "/swarm-design.css" || r.URL.Path == "/swarm-logo.png") {
+			mux.ServeHTTP(w, r)
+			return
+		}
+		if r.URL.Path == trustOIDCLogoutPath {
 			mux.ServeHTTP(w, r)
 			return
 		}

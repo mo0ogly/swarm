@@ -1,0 +1,6 @@
+=== RUN   TestCitationCatalogSharesCapturedJSONWithoutLosingOriginals
+    managed_review_citation_catalog_test.go:170: captured JSON repeats the same original output 8938 3025
+--- FAIL: TestCitationCatalogSharesCapturedJSONWithoutLosingOriginals (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.020s
+FAIL

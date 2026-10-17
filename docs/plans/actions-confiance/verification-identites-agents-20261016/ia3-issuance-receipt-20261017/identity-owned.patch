@@ -1,0 +1,97 @@
+--- before/agent_identity_issuer_linux.go
++++ candidate/agent_identity_issuer_linux.go
+@@ -24,9 +24,11 @@
+ }
+ 
+ type agentIdentityPublicationIssuerProof struct {
+-	authority       agentIdentityIssuerAuthority
+-	tokenDigest     string
+-	authorizedUntil time.Time
++	authority        agentIdentityIssuerAuthority
++	tokenDigest      string
++	issuedAt         time.Time
++	sessionExpiresAt time.Time
++	authorizedUntil  time.Time
+ }
+ 
+ func (a agentIdentityIssuerAuthority) owned() agentIdentityIssuerAuthority {
+@@ -204,7 +206,7 @@
+ 		}
+ 		result = agentIdentityRegistryPermit{base: base, nextDigest: digest, roots: roots, publisher: caller.actor.Principal,
+ 			trustRevision: state.Revision, eventID: eventID, scope: scope,
+-			issuer: &agentIdentityPublicationIssuerProof{authority: a, tokenDigest: trustTokenHash(token), authorizedUntil: until}}
++			issuer: &agentIdentityPublicationIssuerProof{authority: a, tokenDigest: trustTokenHash(token), issuedAt: at, sessionExpiresAt: *caller.expiresAt, authorizedUntil: until}}
+ 		return nil, tx.Commit()
+ 	})
+ 	if err != nil {
+@@ -221,7 +223,7 @@
+ 		// consumer must only receive permits from the human producer above.
+ 		return nil
+ 	}
+-	if proof.tokenDigest != trustTokenHash(token) || !at.Before(proof.authorizedUntil) {
++	if proof.tokenDigest != trustTokenHash(token) || at.Before(proof.issuedAt) || !at.Before(proof.authorizedUntil) {
+ 		return agentIdentityError("agent_identity_issuer_authority_stale")
+ 	}
+ 	return validateAgentIdentityIssuer(permit.base.projectRoot, caller, proof.authority, permit.scope, at)
+--- before/agent_identity_registry_publish.go
++++ candidate/agent_identity_registry_publish.go
+@@ -36,6 +36,9 @@
+ 	}
+ 	head := agentIdentityRegistryHead{Schema: 1, ProjectDigest: hash([]byte(s.root)), Scope: permit.scope, Revision: snapshot.Revision, SnapshotDigest: permit.nextDigest,
+ 		TrustRevision: permit.trustRevision, Roots: append([]string(nil), permit.roots...), Publisher: permit.publisher, EventID: permit.eventID, Previous: permit.base.headDigest}
++	if permit.issuer != nil {
++		head.Schema, head.Issuance = 2, permit.issuer.receipt()
++	}
+ 	if err = validateAgentIdentityRegistrySnapshot(snapshot, head); err != nil {
+ 		return result, err
+ 	}
+--- before/agent_identity_registry_store.go
++++ candidate/agent_identity_registry_store.go
+@@ -70,6 +70,7 @@
+ 	}
+ 	// No caller can mutate state/head roots by retaining a returned slice.
+ 	head.Roots = append([]string(nil), head.Roots...)
++	head.Issuance = head.Issuance.owned()
+ 	return snapshot, head, nil
+ }
+ 
+--- before/agent_identity_registry_types.go
++++ candidate/agent_identity_registry_types.go
+@@ -11,16 +11,17 @@
+ // head AND a private checkpoint supplied by the controller, never reconstructed
+ // from an imported database or untrusted request. Human minting belongs to IA3.
+ type agentIdentityRegistryHead struct {
+-	Schema         int                    `json:"schema_version"`
+-	ProjectDigest  string                 `json:"project_context_digest"`
+-	Scope          agentIdentityScope     `json:"scope"`
+-	Revision       int                    `json:"snapshot_revision"`
+-	SnapshotDigest string                 `json:"snapshot_digest"`
+-	TrustRevision  int                    `json:"trust_configuration_revision"`
+-	Roots          []string               `json:"root_grants"`
+-	Publisher      agentIdentityPrincipal `json:"publisher"`
+-	EventID        string                 `json:"event_id"`
+-	Previous       string                 `json:"previous_head_digest,omitempty"`
++	Schema         int                           `json:"schema_version"`
++	ProjectDigest  string                        `json:"project_context_digest"`
++	Scope          agentIdentityScope            `json:"scope"`
++	Revision       int                           `json:"snapshot_revision"`
++	SnapshotDigest string                        `json:"snapshot_digest"`
++	TrustRevision  int                           `json:"trust_configuration_revision"`
++	Roots          []string                      `json:"root_grants"`
++	Publisher      agentIdentityPrincipal        `json:"publisher"`
++	EventID        string                        `json:"event_id"`
++	Previous       string                        `json:"previous_head_digest,omitempty"`
++	Issuance       *agentIdentityIssuanceReceipt `json:"issuance_receipt,omitempty"`
+ }
+ 
+ type agentIdentityRegistryIntent struct {
+@@ -59,7 +60,8 @@
+ }
+ 
+ func (h agentIdentityRegistryHead) valid() bool {
+-	if h.Schema != 1 || !agentIdentityHashValid(h.ProjectDigest) || !h.Scope.valid() || h.Revision <= 0 || !agentIdentityHashValid(h.SnapshotDigest) || h.TrustRevision <= 0 ||
++	if (h.Schema != 1 && h.Schema != 2) || (h.Schema == 1 && h.Issuance != nil) || (h.Schema == 2 && !h.Issuance.valid(h)) ||
++		!agentIdentityHashValid(h.ProjectDigest) || !h.Scope.valid() || h.Revision <= 0 || !agentIdentityHashValid(h.SnapshotDigest) || h.TrustRevision <= 0 ||
+ 		!h.Publisher.valid() || !safeName(h.EventID) || (h.Previous != "" && !agentIdentityHashValid(h.Previous)) || len(h.Roots) == 0 {
+ 		return false
+ 	}

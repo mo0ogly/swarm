@@ -20,11 +20,15 @@ func managedFragmentDecisionCapacity(prefix string, c managedReviewContext, p ma
 		return managedFragmentMeasuredDecisionCapacity(prefix, c, p)
 	}
 	bundle := maximalManagedFragmentBundle(c, p)
-	prompt, _, err := renderManagedFragmentDecision(prefix, c, bundle, nil)
+	prompt, visible, err := renderManagedFragmentDecision(prefix, c, bundle, nil)
 	if err != nil {
 		return 0, err
 	}
-	remaining, err := fragmentInputRoom(p.InputBudget, prompt, fragmentDecisionSchema(bundle))
+	schema, err := managedFragmentDecisionSchema(c, bundle, visible)
+	if err != nil {
+		return 0, err
+	}
+	remaining, err := fragmentInputRoom(p.InputBudget, prompt, schema)
 	if err != nil {
 		return 0, err
 	}
@@ -136,11 +140,15 @@ func managedFragmentMeasuredDecisionCapacity(prefix string, c managedReviewConte
 		// is <=8192 bytes. Its final packet wrappers already remain in fixed syntax.
 		reserve += managedFragmentDefectReserve
 	}
-	prompt, _, err := renderManagedFragmentDecision(prefix, c, bundle, nil)
+	prompt, visible, err := renderManagedFragmentDecision(prefix, c, bundle, nil)
 	if err != nil {
 		return 0, err
 	}
-	m, err := p.InputBudget.measure(prompt, fragmentDecisionSchema(bundle))
+	schema, err := managedFragmentDecisionSchema(c, bundle, visible)
+	if err != nil {
+		return 0, err
+	}
+	m, err := p.InputBudget.measure(prompt, schema)
 	if err != nil {
 		return 0, err
 	}

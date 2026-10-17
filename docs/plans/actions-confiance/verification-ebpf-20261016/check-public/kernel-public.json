@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "checks": [
+    "inactive policy refuses without state mutation",
+    "preview is read-only; selected policy persists and reopens",
+    "caller targets and non-admin principals refuse without mutation",
+    "local public CLI reports unavailable with exit 3 and no synthetic events",
+    "remote CLI preserves API unavailability and exit 3 without local fallback",
+    "real API refuses wrong authority and arbitrary command without mutation"
+  ],
+  "binary_sha256": "17922d31fbf1f2a1f748822cf967e06d202093d874e39e8c2c5c4c81a6209a20",
+  "server_stopped": true,
+  "native_positive_qualified": false,
+  "public_unavailable_exit": 3,
+  "root": "/tmp/swarm-kernel-public-owz7l7eg"
+}

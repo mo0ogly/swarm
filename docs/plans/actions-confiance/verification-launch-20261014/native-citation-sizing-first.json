@@ -1,0 +1,80 @@
+{
+  "issues": 1,
+  "max_bytes": 1048576,
+  "originals": 1,
+  "rows": [
+    {
+      "error": "\u003cnil\u003e",
+      "measure": {
+        "prompt_tokens": 158575,
+        "schema_tokens": 367,
+        "utf8_bytes": 521088,
+        "remaining_text_tokens": 1154
+      },
+      "mode": "original",
+      "prefix_bytes": 23768,
+      "total_bytes": 521088
+    },
+    {
+      "error": "capacité en tokens dépassée après réserves",
+      "measure": {
+        "prompt_tokens": 163040,
+        "schema_tokens": 367,
+        "utf8_bytes": 534443,
+        "remaining_text_tokens": -3311
+      },
+      "mode": "duplicate-long",
+      "prefix_bytes": 37123,
+      "total_bytes": 534443
+    },
+    {
+      "error": "capacité en tokens dépassée après réserves",
+      "measure": {
+        "prompt_tokens": 162907,
+        "schema_tokens": 367,
+        "utf8_bytes": 533761,
+        "remaining_text_tokens": -3178
+      },
+      "mode": "duplicate-short",
+      "prefix_bytes": 36441,
+      "total_bytes": 533761
+    },
+    {
+      "error": "capacité en tokens dépassée après réserves",
+      "measure": {
+        "prompt_tokens": 160788,
+        "schema_tokens": 367,
+        "utf8_bytes": 527726,
+        "remaining_text_tokens": -1059
+      },
+      "mode": "single-short",
+      "prefix_bytes": 30406,
+      "total_bytes": 527726
+    },
+    {
+      "error": "\u003cnil\u003e",
+      "measure": {
+        "prompt_tokens": 159048,
+        "schema_tokens": 367,
+        "utf8_bytes": 522657,
+        "remaining_text_tokens": 681
+      },
+      "mode": "single-first",
+      "prefix_bytes": 25337,
+      "total_bytes": 522657
+    },
+    {
+      "error": "\u003cnil\u003e",
+      "measure": {
+        "prompt_tokens": 158968,
+        "schema_tokens": 367,
+        "utf8_bytes": 522416,
+        "remaining_text_tokens": 761
+      },
+      "mode": "single-96",
+      "prefix_bytes": 25096,
+      "total_bytes": 522416
+    }
+  ],
+  "source_reply": "5b9173ecb1dad1e1fbac2853d3c51360638ba447b890132137cadaae1eed5c33"
+}

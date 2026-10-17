@@ -1,0 +1,9 @@
+=== RUN   TestManagedFragmentReceiptResolvesBindingOnly
+    managed_review_fragment_contract_evidence_test.go:86: visible receipt binding refused:  résolution sans preuve originale visible
+--- FAIL: TestManagedFragmentReceiptResolvesBindingOnly (0.00s)
+=== RUN   TestManagedFragmentResolutionDiagnosticLocatesRejectedQuote
+    managed_review_fragment_contract_evidence_test.go:116: missing diagnostic "packet=0": résolution sans preuve originale visible
+--- FAIL: TestManagedFragmentResolutionDiagnosticLocatesRejectedQuote (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.019s
+FAIL

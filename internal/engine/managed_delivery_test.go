@@ -170,6 +170,9 @@ func TestManagedDeliveryPromptSeparatesLocalAndIndependentEvidence(t *testing.T)
 	if !strings.Contains(prompt, deliveryEvidenceBoundary) {
 		t.Fatal("worker evidence responsibilities absent")
 	}
+	if !strings.Contains(prompt, deliveryNegativeCheckBoundary) {
+		t.Fatal("new managed worker did not receive isolated negative-check responsibilities")
+	}
 	encoded, _ := json.MarshalIndent(task.ValidationPolicy.Controls, "", "  ")
 	if !strings.Contains(prompt, string(encoded)) {
 		t.Fatal("local check options absent")

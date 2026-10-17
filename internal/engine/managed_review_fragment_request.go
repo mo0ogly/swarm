@@ -21,14 +21,15 @@ const managedFragmentRequestSchema = `{"type":"object","additionalProperties":fa
 
 // Selection is an independent evidence request, never a task verdict. Return
 // ready only when the exact requested originals can enter the final message.
-func parseManagedFragmentFinalRequest(reply, prefix string, c managedReviewContext, p managedReviewFragmentPlan, replies []string) (managedFragmentFinalRequest, error) {
+func parseManagedFragmentFinalRequest(reply, prefix string, c managedReviewContext, p managedReviewFragmentPlan, replies []string) (request managedFragmentFinalRequest, err error) {
 	empty := managedFragmentFinalRequest{}
 	if len(reply) > managedFragmentReplyLimit {
-		return empty, fmt.Errorf("demande de preuves trop grande")
+		return empty, reviewResponseProtocolError(fmt.Errorf("demande de preuves trop grande"))
 	}
 	if _, err := managedFragmentFinalBundle(c, p, replies); err != nil {
 		return empty, err
 	}
+	defer func() { err = reviewResponseProtocolError(err) }()
 	var r managedFragmentFinalRequest
 	if err := strict([]byte(reply), &r); err != nil {
 		return empty, err
@@ -46,4 +47,39 @@ func parseManagedFragmentFinalRequest(reply, prefix string, c managedReviewConte
 		return empty, err
 	}
 	return r, nil
+}
+
+func managedFragmentSelectionSchema(p managedReviewFragmentPlan, version int) string {
+	if version < 5 {
+		return managedFragmentRequestSchema
+	}
+	var schema map[string]any
+	if err := json.Unmarshal([]byte(managedFragmentRequestSchema), &schema); err != nil {
+		panic(err)
+	}
+	properties := schema["properties"].(map[string]any)
+	raw, _ := json.Marshal(p)
+	for name, value := range map[string]string{"candidate_commit": p.Candidate, "context_sha256": p.ContextDigest, "plan_sha256": hash(raw)} {
+		properties[name] = map[string]any{"type": "string", "enum": []string{value}}
+	}
+	choices := []any{}
+	for i, packet := range p.Packets {
+		for j, artifact := range packet.Artifacts {
+			choices = append(choices, map[string]any{
+				"type": "object", "additionalProperties": false,
+				"required": []string{"packet", "artifact", "sha256"},
+				"properties": map[string]any{
+					"packet":   map[string]any{"type": "integer", "enum": []int{i}},
+					"artifact": map[string]any{"type": "integer", "enum": []int{j}},
+					"sha256":   map[string]any{"type": "string", "enum": []string{artifact.Digest}},
+				},
+			})
+		}
+	}
+	properties["references"].(map[string]any)["items"] = map[string]any{"anyOf": choices}
+	raw, err := json.Marshal(schema)
+	if err != nil {
+		panic(err)
+	}
+	return string(raw)
 }

@@ -8,6 +8,14 @@ spécification, revue du code, diagnostic, vérification, replanification et ret
 d’expérience. Elles partagent des critères explicites, des décisions tracées et
 des preuves observables, sans dépendance à une autre installation.
 
+La préférence permanente de l’utilisateur est une amélioration autorécursive :
+toute amélioration découverte a de la valeur et reste tracée, même sans panne.
+Qualifier son origine et son bénéfice attendu, décider dans les droits du rôle,
+réaliser ou transmettre, vérifier l’effet puis réexaminer le besoin et capitaliser
+les leçons vérifiées. Une anomalie déclenche `replan`. Un report conserve son
+propriétaire et sa condition de reprise. Ce contrat de méthode ne prouve pas une
+amélioration autonome du moteur installé et n’accorde aucun droit supplémentaire.
+
 ## Catalogue lisible
 
 Les noms destinés aux utilisateurs sont ceux du [catalogue du README](../README.md#communication-et-méthodes). Les méthodes de spécification couvrent la rédaction du besoin et l’examen du plan. Les identifiants historiques ci-dessous servent uniquement aux commandes natives et à la compatibilité ; ils ne sont pas les noms à afficher dans l’interface.
@@ -89,6 +97,11 @@ La préparation reste limitée à l’analyse et à la planification.
 
 ## Cadrage automatique des agents par le moteur
 
+Chaque modification inclut la documentation concernée dans le même incrément,
+y compris pour les méthodes et la configuration. Si aucune mise à jour ne
+s'applique, la raison figure dans le suivi existant. Versions FR/EN et schémas
+restent cohérents ; leur présence ne prouve pas l'effet ni l'acceptation.
+
 Pour les nouvelles tentatives, le moteur inclut les méthodes adaptées au rôle dans
 le contexte envoyé au fournisseur. Il ne dépend pas de la découverte des commandes
 par Codex ou Claude pour fournir ce cadrage.
@@ -132,9 +145,19 @@ Modifiez la source canonique, puis lancez :
 
 ```sh
 python3 tools/agent-workflows/check.py
-go test ./... -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1
+go test ./internal/engine -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1 -timeout=0
 git diff --check
 ```
+
+Le contrôleur vérifie les liens et les sources puis exécute le test réel
+TestAgentWorkflowRolesAreBounded. Il exige ses événements JSON run/pass et la fin
+du paquet, refuse les sélecteurs vides, skip, fail et formats invalides, et affiche
+le nombre observé de tests/sous-tests. Son watchdog global est explicitement
+désactivé (-timeout 0) : suivre la progression et diagnostiquer une absence
+anormale de progression ; aucun objectif temporel produit n’en découle.
+Ses gardes propres se vérifient avec `python3 -m unittest discover -s
+tools/agent-workflows -p test_check.py -v` (doubles de sorties Go, sans modèle).
+Un contrôleur réussi ne prouve ni déploiement ni acceptation des missions.
 
 Une modification des méthodes ou du contrat change leur empreinte. Une préparation
 ancienne doit appliquer la nouvelle version et refaire sa validation ; les preuves
@@ -251,3 +274,38 @@ respect effectif de la méthode ni la réussite d’un diagnostic.
 
 La version portable adapte la skill Debug installée localement, sans connecteurs
 obligatoires, chemins machine ou dépendance à une autre installation.
+
+### Vérification d'un moteur pendant un changement web parallèle
+
+Les ressources web et les méthodes embarquées partagent actuellement le paquet
+racine `resources.go` : une modification web peut invalider des entrées de
+compilation des tests moteur. Pour figer une preuve, un overlay de compilation
+peut conserver les ressources observées et leur liste explicite, sans modifier
+le checkout partagé. Déclarer cette vue et ses empreintes ; elle ne vérifie pas
+l'interface web en cours d'édition. Conserver un binaire de test compilé permet
+de répéter les contrôles ciblés sans relier le paquet à chaque commande.
+Distinguer compilation, tests collectés, résultats partiels et résultat final.
+Voir le [diagnostic IA3b](plans/actions-confiance/verification-identites-agents-20261016/ia3-issuer-20261017/RAPPORT-IA3b.md).
+
+
+### Justifier un délai de vérification
+
+Tant que les limites du code ne sont pas comprises, être prudent avec les
+timeouts temporels et les autres blocages ajoutés aux tests : tentatives,
+itérations, volume, concurrence ou conditions d’arrêt. Identifier origine,
+portée et risque protégé ; observer la progression et mesurer avant d’ajouter
+ou de durcir une borne. Distinguer lenteur, blocage réel, limite fonctionnelle
+et limite de la méthode. Un seuil arbitraire ne remplace pas un diagnostic ;
+aucune protection existante de sécurité, de droits ou de budget n’est contournée.
+
+Un watchdog de test doit être lié à une exigence observable et à un coût
+justifié ; ne pas reprendre un nombre par commodité d’une recette précédente.
+Le distinguer d’une politique du moteur et d’un objectif de performance. Sans
+borne justifiée, utiliser explicitement `-test.timeout=0` pour désactiver le
+délai global Go, suivre les événements nommés et diagnostiquer une absence de
+progression ; cela ne supprime pas les contrats des opérations individuelles.
+Un timeout est une exécution incomplète, pas la preuve d’une assertion métier
+fausse. Découper le lot peut aider le diagnostic mais ne justifie pas la borne.
+Conserver les échecs originaux et le lien aux mêmes sources/binaire. Le
+[replan IA3c.1](plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md)
+conserve l’objection utilisateur, le délai choisi sans preuve et sa suppression.

@@ -1,0 +1,6 @@
+# swarm.local/companion/internal/engine [swarm.local/companion/internal/engine.test]
+internal/engine/trust_remote_test.go:7:2: "context" imported and not used
+internal/engine/trust_remote_test.go:9:2: "net/http" imported and not used
+internal/engine/trust_remote_test.go:13:2: "strings" imported and not used
+FAIL	swarm.local/companion/internal/engine [build failed]
+FAIL

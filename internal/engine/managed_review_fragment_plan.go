@@ -20,6 +20,8 @@ type managedReviewFragmentArtifact struct {
 	Content string `json:"content"`
 }
 type managedReviewFragmentPacket struct {
+	InspectionContractVersion     int                             `json:"inspection_contract_version,omitempty"`
+	Scope                         *managedReviewInspectionScope   `json:"scope,omitempty"`
 	DefectCitationContractVersion int                             `json:"defect_citation_contract_version,omitempty"`
 	FindingContractVersion        int                             `json:"finding_contract_version,omitempty"`
 	LotContract                   *ReviewCoordinationLot          `json:"lot_contract,omitempty"`
@@ -50,8 +52,17 @@ type managedReviewFragmentPlan struct {
 const managedFragmentPromptReserve = 24 * 1024
 
 func managedFragmentArtifacts(c managedReviewContext) ([]managedReviewFragmentArtifact, error) {
+	if c.CitationContractVersion != 0 && c.CitationContractVersion != 1 && c.CitationContractVersion != 2 {
+		return nil, fmt.Errorf("version de contrat de citation finale inconnue")
+	}
+	if c.InspectionScopeVersion != 0 && c.InspectionScopeVersion != 1 {
+		return nil, fmt.Errorf("version de périmètre d’inspection inconnue")
+	}
 	if c.Candidate == "" || len(c.Tasks) == 0 || !strings.HasPrefix(c.Diff, "diff --git ") || !utf8.ValidString(c.Diff) || managedDiffHasBinary(c.Diff) {
 		return nil, fmt.Errorf("contexte de fragments incomplet ou diff non textuel")
+	}
+	if c.Baseline != nil && !supportedManagedReviewBaseline(c.Baseline.Version) {
+		return nil, fmt.Errorf("version de base acceptée non prise en charge")
 	}
 	artifacts := []managedReviewFragmentArtifact{}
 	appendArtifact := func(kind, name, content string) {
@@ -130,7 +141,7 @@ func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []man
 	empty := managedReviewFragmentPlan{}
 	canonical, _ := json.Marshal(c)
 	plan := managedReviewFragmentPlan{Version: 2, ContextDigest: hash(canonical), Candidate: c.Candidate, AvailableCalls: available, ReservedFinalCalls: finalCalls}
-	packet := managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
+	packet := managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: 0}
 	// New plans reserve workflow space in addition to the variable schema and
 	// anchor table. Historical packets keep their original validation contract.
 	fits := func(p managedReviewFragmentPacket) bool {
@@ -145,7 +156,7 @@ func packManagedFragmentArtifactsWithLot(c managedReviewContext, artifacts []man
 				return empty, &managedFragmentLegacyCapacityError{Name: artifact.Name}
 			}
 			plan.Packets = append(plan.Packets, packet)
-			packet = managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
+			packet = managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Lot: lot, LotContract: contract, LotCriteria: criteria, Version: 2, Candidate: c.Candidate, ContextDigest: plan.ContextDigest, Index: len(plan.Packets), Artifacts: []managedReviewFragmentArtifact{artifact}}
 			if !fits(packet) {
 				return empty, &managedFragmentLegacyCapacityError{Name: artifact.Name}
 			}
@@ -180,7 +191,7 @@ func validateManagedReviewFragments(c managedReviewContext, p managedReviewFragm
 	actual := []managedReviewFragmentArtifact{}
 	for i, packet := range p.Packets {
 		raw, err := json.Marshal(packet)
-		if err != nil || !supportedFragmentDefectCitationContract(packet.DefectCitationContractVersion) || !supportedFragmentFindingContract(packet.FindingContractVersion) || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
+		if err != nil || !supportedFragmentInspectionContract(packet.InspectionContractVersion) || !reflect.DeepEqual(packet.Scope, managedFragmentScope(c)) || !supportedFragmentDefectCitationContract(packet.DefectCitationContractVersion) || !supportedFragmentFindingContract(packet.FindingContractVersion) || packet.Version != p.Version || packet.Index != i || packet.Candidate != p.Candidate || packet.ContextDigest != p.ContextDigest || len(packet.Artifacts) == 0 || (p.Version < 4 && len(raw)+managedFragmentPromptReserve > managedReviewPromptLimit) || !reflect.DeepEqual(packet.InputBudget, p.InputBudget) {
 			return fmt.Errorf("paquet de revue modifié ou trop grand")
 		}
 		// Structural rechecks run inside journal/cancellation checks. Count the

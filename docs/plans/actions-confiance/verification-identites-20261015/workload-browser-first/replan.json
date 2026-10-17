@@ -1,0 +1,22 @@
+{
+  "fixture_root": "/tmp/swarm-workload-ui-XVAT86",
+  "observed": [
+    {
+      "kind": "request",
+      "result": "admitted",
+      "reason": "nouvel objet I2; original I1 conservé avec ses octets et son digest"
+    },
+    {
+      "kind": "approve",
+      "result": "denied",
+      "reason": "accord non exact"
+    },
+    {
+      "kind": "commit",
+      "result": "denied",
+      "reason": "accord absent"
+    }
+  ],
+  "cause": "browser recipe omitted exact approval fields, then checked commit without asserting approval",
+  "decision": "supply mandate/amount/currency/beneficiary/digest and assert approved before requesting service login"
+}

@@ -1,0 +1,28 @@
+--- before/internal/enrollmentauthority/authority.go
++++ internal/enrollmentauthority/authority.go
+@@ -11,6 +11,7 @@
+ 	"encoding/hex"
+ 	"encoding/json"
+ 	"errors"
++	"fmt"
+ 	"math"
+ 	"time"
+ 
+@@ -138,14 +139,9 @@
+ 	if r.ProjectDigest != expected.ProjectDigest || r.RequestDigest != expected.RequestDigest {
+ 		return Document{}, ErrBinding
+ 	}
+-	raw := statement.Payload()
+-	var active enrollmentstate.ActiveReply
+-	if err := json.Unmarshal(raw, &active); err != nil {
+-		return Document{}, ErrDocument
+-	}
+-	canonical, err := json.Marshal(active)
+-	if err != nil || !bytes.Equal(raw, canonical) {
+-		return Document{}, ErrDocument
++	active, err := enrollmentstate.DecodeActiveReply(statement.Payload())
++	if err != nil {
++		return Document{}, fmt.Errorf("%w: %w", ErrDocument, err)
+ 	}
+ 	if active.Head != expected.Head || active.Record.ID != expected.EnrollmentID || active.Record.EnrolledSequence != expected.Generation {
+ 		return Document{}, ErrBinding

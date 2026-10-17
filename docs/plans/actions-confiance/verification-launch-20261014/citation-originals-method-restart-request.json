@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "event_id": "adopt-verified-original-reference-contract",
+  "expected_revision": 403,
+  "task_id": "plan-68b50cc82e-T2",
+  "confirm_review_error_repair": true,
+  "reason": "Adopter le contrat de références version 2 avec lecture Git exacte, schémas bornés aux tâches et refus de reprises sans précondition corrigée. Revue complète du même candidat, sans réutiliser ni modifier les anciennes inspections, avis ou consommations. Qualification locale et aperçu public conservés dans docs/plans/actions-confiance/verification-launch-20261014 ; l’effet natif et l’acceptation restent à vérifier."
+}

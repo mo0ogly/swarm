@@ -1,0 +1,10 @@
+{
+  "pid": 2509628,
+  "proc_start_ticks": "4365906",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-checkpoint-browser.py",
+    "run"
+  ],
+  "at": "2026-10-16T00:07:14.913937+00:00"
+}

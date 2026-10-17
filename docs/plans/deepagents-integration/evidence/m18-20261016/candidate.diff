@@ -1,0 +1,1256 @@
+--- before/internal/engine/project_memory_public.go
++++ after/internal/engine/project_memory_public.go
+@@ -53,6 +53,10 @@
+ func registerProjectMemoryHTTP(s *Store, mux *http.ServeMux, send func(http.ResponseWriter, any), fail func(http.ResponseWriter, error)) {
+ 	mux.HandleFunc("/api/v1/project-memory", func(w http.ResponseWriter, r *http.Request) {
+ 		w.Header().Set("Cache-Control", "no-store")
++		if r.URL.Query().Get("action") == "summary-source" && r.Method != http.MethodPost {
++			http.Error(w, "POST requis", http.StatusMethodNotAllowed)
++			return
++		}
+ 		if r.Method == http.MethodGet {
+ 			v, e := s.projectMemoryCatalog(r.URL.Query().Get("q"))
+ 			if e != nil {
+@@ -69,6 +73,15 @@
+ 		raw, e := io.ReadAll(http.MaxBytesReader(w, r.Body, projectMemoryTransportBytes))
+ 		if e != nil {
+ 			fail(w, e)
++			return
++		}
++		if r.URL.Query().Get("action") == "summary-source" {
++			v, err := s.memorySummarySource(raw)
++			if err != nil {
++				fail(w, err)
++			} else {
++				send(w, v)
++			}
+ 			return
+ 		}
+ 		var q ProjectMemoryRequest
+@@ -94,11 +107,18 @@
+ 		return printJSON(out, v)
+ 	}
+ 	if len(pos) != 2 {
+-		return fmt.Errorf("swarm memory list|admit-preview|admit|replace-preview|replace|withdraw-preview|withdraw|select-preview|select --input demande.json")
++		return fmt.Errorf("swarm memory list|summary-source|admit-preview|admit|replace-preview|replace|withdraw-preview|withdraw|select-preview|select --input demande.json")
+ 	}
+ 	raw, e := readInput(input)
+ 	if e != nil {
+ 		return e
++	}
++	if pos[1] == "summary-source" {
++		v, err := s.memorySummarySource(raw)
++		if err != nil {
++			return err
++		}
++		return printJSON(out, v)
+ 	}
+ 	var q ProjectMemoryRequest
+ 	if e = strict(raw, &q); e != nil {
+--- before/internal/engine/main.go
++++ after/internal/engine/main.go
+@@ -53,6 +53,7 @@
+ swarm agent list <travail>
+ swarm agent show|stop|reconcile <agent>
+ swarm agent logs <agent> [après_seq] [--output nouveau.jsonl]
++swarm memory summary-source --input sources.json
+ swarm exchange list <travail>
+ swarm exchange send|consume <travail> --input requête.json
+ swarm workspace status <travail>
+--- before/docs/PROJECT-MEMORY.md
++++ after/docs/PROJECT-MEMORY.md
+@@ -278,6 +278,29 @@
+ La synthèse automatique, sa politique éventuelle dans Admin/API/CLI/Go et son
+ consommateur réel restent à intégrer et qualifier. Cette référence ne lance
+ aucun modèle ; elle ne purge pas les historiques et ne restaure pas une session.
++
++Pour préparer cette référence avec des sources du projet, utiliser
++`swarm --json memory summary-source --input requete.json`, ou POST authentifié
++`/api/v1/project-memory?action=summary-source`. Fournir travail, tâche cible,
++révision attendue et références explicites d'échanges de cadrage du même travail.
++La lecture refuse les sources modifiées et les révisions périmées ; elle ne migre
++pas un ancien stockage. Le paquet attribue son instantané de tâche et ses textes
++sources, sans rapports voisins ni reconstruction de l'historique fournisseur.
++
++`tools/memory-evaluation/swarm_source.py` vérifie le paquet et les annotations
++explicites, puis crée les fichiers privés de référence et de provenance dans un
++dossier nouveau. L'instantané de tâche doit rester protégé. Aucun état métier
++n'est inféré ni résumé admis ; la fraîcheur devra être recontrôlée avant un
++futur emploi moteur. Les détails et la recette isolée figurent dans la
++[documentation du convertisseur](../tools/memory-evaluation/README.md#préparer-la-référence-depuis-des-sources-swarm).
++
++```mermaid
++flowchart LR
++  A["Work persisté : tâche et cadrages choisis"] -->|"CLI/API, révision attendue"| B["Paquet source attribué"]
++  B --> C["Conversion locale et annotations explicites"]
++  C --> D["Historique et provenance"]
++  D --> E["Référence extractive hors moteur"]
++```
+ 
+ ## Fin confirmée d’un tour de dialogue
+ 
+--- before/docs/en/PROJECT-MEMORY.md
++++ after/docs/en/PROJECT-MEMORY.md
+@@ -249,6 +249,28 @@
+ Automatic summarization, any persisted Admin/API/CLI/Go policy and its actual
+ consumer still require integration and qualification. This reference calls no
+ model, purges no history and restores no provider session.
++
++Use `swarm --json memory summary-source --input request.json`, or authenticated
++POST `/api/v1/project-memory?action=summary-source`, to prepare the reference
++from project sources. Supply work, target task, expected revision and explicit
++same-work brainstorm references. Changed sources and stale revisions are refused;
++inspection never upgrades old storage implicitly. The packet attributes the task
++snapshot and selected stored texts without sibling reports or reconstructed
++provider history.
++
++`tools/memory-evaluation/swarm_source.py` checks the packet and explicit
++annotations, then creates private reference and provenance files in a new
++directory. The task snapshot must remain protected. It infers no business state
++and admits no summary; freshness must be rechecked before future engine use.
++See the [converter and isolated recipe](../../tools/memory-evaluation/README.md#préparer-la-référence-depuis-des-sources-swarm).
++
++```mermaid
++flowchart LR
++  A["Persisted Work: target task and selected brainstorms"] -->|"CLI/API, expected revision"| B["Attributed source packet"]
++  B --> C["Local conversion and explicit annotations"]
++  C --> D["History and provenance"]
++  D --> E["Extractive reference outside the engine"]
++```
+ 
+ ## Confirmed dialogue turn completion
+ 
+--- before/tools/memory-evaluation/README.md
++++ after/tools/memory-evaluation/README.md
+@@ -317,5 +317,80 @@
+ Cette version ne modélise pas la résolution ultérieure d'un incident ou l'abandon
+ autorisé d'une exigence ; ces transitions demanderont un contrat de conservation
+ des états historiques et de la décision, sans renoter les fixtures précédentes.
+-Le raccordement API/CLI/UI, les sources Swarm réellement autorisées, la décision
+-d'admission et la qualité LLM restent des travaux distincts au plan mémoire.
++La consultation CLI/API de sources Swarm pour l'opérateur est décrite ci-dessous.
++Leur admission dans le contexte d'un agent, l'interface de résumé et la qualité
++LLM restent des travaux distincts au plan mémoire.
++
++## Préparer la référence depuis des sources Swarm
++
++`swarm --json memory summary-source --input requete.json` consulte le stockage
++compatible du projet courant. La même lecture existe via POST authentifié
++`/api/v1/project-memory?action=summary-source`, avec origine et CSRF usuels.
++La requête porte `schema_version: 1`, `work`, `task`, `expected_revision` et
++`dialogues`, liste explicite de `DialogueRef {task, attempt, sha256}` du même travail.
++La cible est une tâche de travail ; chaque référence sélectionne une réponse de
++cadrage conservée. `sha256` porte sur `question + "\n" + texte` en UTF-8.
++Le champ `attempt` est la clé de réponse conservée : le producteur de cadrage
++actuel y écrit l'ID de l'agent, pas `Agent.attempt_id`. Utiliser la référence lue,
++sans reconstruire une identité de session ou de réservation.
++
++Une révision périmée donne `revision_conflict` (CLI 3, HTTP 409). Référence modifiée,
++doublon, tâche incorrecte, réponse vide et champ inconnu sont refusés. GET sur
++cette action donne HTTP 405. Session/origine/CSRF restent requis. La commande
++appartient aux consultations sans migration implicite : un ancien stockage
++est refusé avec `storage_upgrade_required` avant toute mise à niveau.
++
++Le paquet `swarm_summary_source_v1` comprend `payload` (chaîne JSON exacte) et
++son `sha256`, avec `schema_version: 1`. Vérifier les octets UTF-8 de cette chaîne,
++sans la resérialiser pour le calcul. Le contenu déclare projet, travail, tâche,
++révision et destinataire `local_operator`. Il inclut le cadrage du travail,
++l'instantané public complet de la seule tâche cible, puis les questions/réponses
++choisies dans l'ordre demandé. Chaque texte a sa propre empreinte et chaque
++paire conserve sa référence de dialogue. Le projet est aussi lié à l'instantané
++de tâche ; une relocalisation ne donne pas une continuité implicite de résumé.
++
++`provider_history_complete: false` est obligatoire : il s'agit des textes
++conservés dans Swarm, qui peuvent déjà être bornés par leur producteur, sans
++reconstruction de conversation fournisseur. Ni rapports des tâches voisines,
++ni résultats d'outils, ni gardes privées ne sont joints. Cet export d'opérateur
++n'est pas un contexte autorisé pour un agent délégué et ne prouve aucune fraîcheur
++de verdict historique présent dans l'instantané de tâche.
++
++Le convertisseur exige des annotations explicites liées au `sha256` du paquet :
++`{schema_version: 1, source_sha256: EMPREINTE, protected: [...]}`. Chaque protection
++utilise le format M17 et un identifiant de source lu dans le paquet ;
++`current-task-snapshot` doit être protégé. Aucun état sémantique n'est deviné.
++
++```sh
++python3 tools/memory-evaluation/swarm_source.py \
++  --source export.json --annotations annotations.json \
++  --output-dir /tmp/mon-essai-sources
++python3 tools/memory-evaluation/summarization.py \
++  --history /tmp/mon-essai-sources/history.json \
++  --reference-cutoff 2 --output /tmp/mon-candidat-sources.json
++```
++
++Choisir une frontière appropriée aux sources : le nombre ci-dessus illustre
++l'argument, pas une politique de résumé. Conserver l'export CLI dans un fichier
++nouveau privé ; la CLI l'écrit sur sa sortie standard. Le convertisseur crée un
++dossier nouveau en 0700 et quatre fichiers en 0600 : `history.json`, export
++original `source-packet.json`, annotations originales `annotations.json`, puis
++`provenance.json`. Ce dernier lie fichiers, projet, révision, paquet et empreinte
++du contexte M17 ; le reçu de référence doit citer cette empreinte d'historique.
++Code 0 : préparation réussie ; code 2 : paquet/annotations invalides ou périmés,
++sortie existante ou erreur d'écriture. Une interruption d'écriture peut laisser
++un dossier partiel ; ce n'est pas une préparation réussie. Aucun fichier source
++ou résultat existant n'est remplacé.
++
++Recette complète isolée : `python3 tests/memory_summary_source.py BINAIRE SORTIE_NOUVELLE`.
++Elle produit ses échanges par la vraie CLI avec un fournisseur scripté, compare
++CLI/API, prépare M17, change publiquement les critères et vérifie les refus.
++Les états des annotations restent à examiner ; les empreintes ne les valident
++pas sémantiquement. La révision doit être recontrôlée avant tout futur emploi
++moteur. Aucun résumé n'est admis, aucun modèle réel appelé et aucune politique
++Admin ajoutée par ces commandes de lecture/préparation.
++
++Pour étendre une commande d'inspection, vérifier aussi `cliStorageInspection` :
++le lecteur fonctionnel ne suffit pas à interdire une migration à l'ouverture du
++stockage. Conserver un test sur stockage ancien, avec refus explicite et version
++inchangée ; une recette sur un stockage déjà courant ne détecte pas cet effet.
+--- before/docs/plans/deepagents-integration/PLAN.md
++++ after/docs/plans/deepagents-integration/PLAN.md
+@@ -49,6 +49,7 @@
+ | M15 Retrait et mémoire héritée | Défauts reproduits, corrigés et vérifiés localement | Références des ancêtres suivies dans la garde et le catalogue, désélection incompatible refusée, fraîcheur après sonde ; 33 tests dont 4 avec `-race`, neuf contrôles navigateur, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-11.md`. Aucune purge ni qualification réelle. |
+ | M16 Projection et omissions attribuées | Défauts reproduits, corrigés et vérifiés localement | Cinq contre-exemples, 18 tests Go distincts et sept contrôles de la vraie CLI/supervision/API. Sources et pertes attribuées, originaux conservés, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-12.md`. Résumé automatique et séquences fournisseur restent ouverts. |
+ | M17 Contrat de résumé progressif et référence | Référence hors moteur réalisée et vérifiée | Quatre sondes amont, 24 tests Python et 14 invocations CLI finales ; deux synthèses extractives et dix refus avec originaux conservés. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-13.md`. Qualité LLM, sources applicatives et intégration moteur restent ouvertes. |
++| M18 Sources Swarm pour la référence | Réalisé et vérifié localement | Export commun CLI/API des échanges choisis et de la tâche courante, conversion avec annotations et provenance ; 10 tests Go, 32 tests Python et cinq contrôles applicatifs. Docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-14.md`. Aucun résumé admis dans le moteur ni modèle réel. |
+ 
+ **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
+ mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
+@@ -164,6 +165,20 @@
+ contrat courant inspectable, puis proposition, contrôle de fraîcheur et reçu
+ réellement consommé. Toute politique éventuelle doit suivre Admin/API/CLI/Go.
+ Le serveur, les acquis M3–M16 et les huit appels réels restent conservés.
++
++Après « next », M18 raccorde la référence à des sources réellement persistées
++par le cadrage Swarm. Une consultation commune CLI/API lie révision courante,
++tâche cible et échanges explicitement choisis ; un convertisseur préserve paquet,
++annotations et provenance. Lire `RESULTATS-MEMOIRE-14.md` et
++`evidence/m18-20261016/` : dix tests Go distincts, 32 tests Python et cinq contrôles
++CLI/API réussis avec fournisseur scripté. GET ne peut plus retourner un catalogue
++à la place des sources et l'inspection refuse une migration implicite ; les
++contre-exemples restent conservés. Un changement public des critères invalide
++annotations et parent de résumé. MEM-C16/MEM-C17 restent partiels : sources de
++cadrage pour l'opérateur, sans conversation fournisseur complète, admission ou
++consommation de résumé par un agent. Prochaine frontière : proposition/admission,
++fraîcheur au moment d'emploi et reçu du contexte réellement transmis. Aucun
++nouvel appel réel ni déploiement ; les huit essais M6/M7 restent intacts.
+ 
+ À chaque reprise, lire ce point, l’audit et le manifeste ; contrôler les empreintes
+ concernées, conserver les acquis et poursuivre le prochain travail autorisé.
+@@ -300,6 +315,7 @@
+ | 2026-10-16 | M15, reprise « next » : audit du retrait et de la filiation. | Deux contre-exemples reproduits ; références héritées contrôlées et attribuées, sélection courante requise. 33 tests distincts dont quatre avec `-race`, neuf contrôles du parcours compilé et documentation FR/EN. Retrait distinct d'une purge ; aucun modèle réel ni déploiement. |
+ | 2026-10-16 | M16, reprise « next » puis demande « replan et corrige ». | Cinq défauts de projection reproduits puis corrigés ; 18 tests Go et sept contrôles CLI/supervision/API, sources et consommations inchangées. Compilation de ressources impropre et collecteur incomplet diagnostiqués puis corrigés ; docs FR/EN et RETEX. Aucun modèle réel ni déploiement. |
+ | 2026-10-16 | M17, reprise « suite » : contrat et référence de résumé progressif. | Méthode amont sondée à SHA fixe, référence extractive et retour aux originaux vérifiés ; 24 tests Python et 14 invocations CLI finales. Deux défauts locaux reproduits puis corrigés, docs FR/EN et RETEX. Aucun appel modèle ou raccordement moteur. |
++| 2026-10-16 | M18, reprise « next » : sources de cadrage et contrat courant inspectables. | Lecture commune CLI/API, convertisseur lié aux annotations et à M17 ; dix tests Go, 32 tests Python et cinq contrôles applicatifs. Faux succès GET et migration implicite reproduits puis corrigés ; deux défauts de recette diagnostiqués. Docs FR/EN et RETEX. Aucun modèle réel ou résumé moteur activé. |
+ 
+ ## Réalisation M3 — décision technique et critères
+ 
+--- before/docs/plans/deepagents-integration/cas-evaluation.json
++++ after/docs/plans/deepagents-integration/cas-evaluation.json
+@@ -798,6 +798,25 @@
+           "scope": "Extractive annotated reference preserves future intention, historical evidence, open incident and requirement over two progressive receipts. Empty, contradictory, stale, invalid-JSON and failed candidates fall back to all originals; invalid sources are explicit errors. Oracle-generated references and typed full quotes do not establish paraphrase fidelity, annotation correctness, model effectiveness, admission or automatic runtime summarization."
+         }
+       ]
++    },
++    {
++      "id": "memory-14-swarm-summary-sources",
++      "date": "2026-10-16",
++      "report": "RESULTATS-MEMOIRE-14.md",
++      "environment": "Actual built Swarm CLI and authenticated API, two persisted brainstorm exchanges from a scripted provider in an isolated project; explicit current-task snapshot, packet-bound annotations and Python M17 bridge. Ten distinct Go tests, eight bridge and 24 reference Python tests, five final public-flow checks; user runtime preserved.",
++      "model_calls": 0,
++      "cases": [
++        {
++          "id": "MEM-C16",
++          "result": "PARTIAL",
++          "scope": "Explicit same-work dialogue references and current target task exported from one persisted Work snapshot; exact UTF-8 payload/text hashes, expected revision and read-only inspection verified. CLI/API parity, stale revision, GET rejection and old-storage refusal without migration exercised. Sources declare local_operator and incomplete provider history; no complete provider/tool-message sequence or delegated agent context is reconstructed."
++        },
++        {
++          "id": "MEM-C17",
++          "result": "PARTIAL",
++          "scope": "Actual Swarm source packet converts to annotated extractive reference with originals and provenance retained. Current-task change refuses old annotations and parent reuse, returning all five current originals. Historical evidence, future intention and open incident preserve their explicitly annotated states. Annotation correctness, paraphrase fidelity, model effectiveness, engine admission and actual agent consumption remain unqualified."
++        }
++      ]
+     }
+   ]
+ }
+--- before/internal/engine/storage_inspection.go
++++ after/internal/engine/storage_inspection.go
+@@ -8,7 +8,7 @@
+ 	if len(pos) < 2 {
+ 		return false
+ 	}
+-	if pos[0] == "memory" && (pos[1] == "list" || strings.HasSuffix(pos[1], "-preview")) {
++	if pos[0] == "memory" && (pos[1] == "list" || pos[1] == "summary-source" || strings.HasSuffix(pos[1], "-preview")) {
+ 		return true
+ 	}
+ 	switch pos[0] + " " + pos[1] {
+--- before/internal/engine/memory_summary_source.go
++++ after/internal/engine/memory_summary_source.go
+@@ -0,0 +1,131 @@
++//go:build linux
++
++package engine
++
++import (
++	"encoding/json"
++	"fmt"
++	"unicode/utf8"
++)
++
++type MemorySummarySourceRequest struct {
++	Schema    int           `json:"schema_version"`
++	Work      string        `json:"work"`
++	Task      string        `json:"task"`
++	Revision  int           `json:"expected_revision"`
++	Dialogues []DialogueRef `json:"dialogues"`
++}
++
++// Payload is a string so its exact Go-produced bytes can be verified by other
++// runtimes without assuming identical JSON serialization or escaping rules.
++type MemorySummarySourcePacket struct {
++	Schema  int    `json:"schema_version"`
++	Kind    string `json:"kind"`
++	Payload string `json:"payload"`
++	SHA256  string `json:"sha256"`
++}
++
++type memorySummarySource struct {
++	ID       string       `json:"id"`
++	Role     string       `json:"role"`
++	Kind     string       `json:"kind"`
++	Text     string       `json:"text"`
++	SHA256   string       `json:"sha256"`
++	Dialogue *DialogueRef `json:"dialogue,omitempty"`
++}
++
++func (s *Store) memorySummarySource(raw []byte) (MemorySummarySourcePacket, error) {
++	var empty MemorySummarySourcePacket
++	if len(raw) > projectMemoryTransportBytes {
++		return empty, fmt.Errorf("summary source request exceeds memory JSON transport capacity")
++	}
++	var q MemorySummarySourceRequest
++	if err := strict(raw, &q); err != nil {
++		return empty, err
++	}
++	if q.Schema != 1 || q.Revision < 1 || !safeName(q.Work) || !safeName(q.Task) || len(q.Dialogues) == 0 {
++		return empty, fmt.Errorf("summary source requires schema 1, work, task, expected revision and explicit dialogues")
++	}
++	// One row is the complete consistency boundary: task definition and selected
++	// answers are resolved from the same stored Work, never from separate reads.
++	var body []byte
++	var revision int
++	if err := s.db.QueryRow("SELECT revision,body FROM works WHERE id=?", q.Work).Scan(&revision, &body); err != nil {
++		return empty, err
++	}
++	if !utf8.Valid(body) {
++		return empty, fmt.Errorf("summary source work contains invalid UTF-8")
++	}
++	var w Work
++	if err := json.Unmarshal(body, &w); err != nil {
++		return empty, err
++	}
++	if w.ID != q.Work || w.Revision != revision {
++		return empty, fmt.Errorf("summary source stored work identity or revision mismatch")
++	}
++	if w.Revision != q.Revision {
++		return empty, &CommandError{Code: "revision_conflict", Message: "Le travail a changé ; actualiser puis confirmer.", Retryable: true}
++	}
++	t, err := w.task(q.Task)
++	if err != nil {
++		return empty, err
++	}
++	if t.Brainstorm {
++		return empty, fmt.Errorf("summary source target must be a work task, not a brainstorm exchange")
++	}
++	// This operator snapshot is deliberately not a delegated worker context.
++	// No sibling task/report, tool output or private guard is loaded.
++	contract, err := json.Marshal(struct {
++		Project   string   `json:"project_sha256"`
++		Title     string   `json:"work_title"`
++		Objective string   `json:"work_objective"`
++		Scope     string   `json:"work_scope"`
++		Criteria  []string `json:"work_criteria"`
++		Task      *Task    `json:"task"`
++	}{hash([]byte(s.root)), w.Title, w.Objective, w.Scope, w.Criteria, t})
++	if err != nil {
++		return empty, err
++	}
++	sources := []memorySummarySource{{ID: "current-task-snapshot", Role: "user", Kind: "task_snapshot", Text: string(contract), SHA256: hash(contract)}}
++	seen := map[DialogueRef]bool{}
++	for _, ref := range q.Dialogues {
++		if seen[ref] {
++			return empty, fmt.Errorf("summary source dialogue selected more than once")
++		}
++		seen[ref] = true
++		hit, err := resolveDialogue(w, ref)
++		if err != nil {
++			return empty, err
++		}
++		if !nonempty(hit.Question) || !nonempty(hit.Text) {
++			return empty, fmt.Errorf("summary source selected exchange has no stored question or answer")
++		}
++		refJSON, err := json.Marshal(ref)
++		if err != nil {
++			return empty, err
++		}
++		id := "dialogue-" + hash(refJSON)
++		questionRef, answerRef := ref, ref
++		sources = append(sources,
++			memorySummarySource{ID: id + "-question", Role: "user", Kind: "operator_question", Text: hit.Question, SHA256: hash([]byte(hit.Question)), Dialogue: &questionRef},
++			memorySummarySource{ID: id + "-answer", Role: "assistant", Kind: "historical_answer", Text: hit.Text, SHA256: hash([]byte(hit.Text)), Dialogue: &answerRef})
++	}
++	payload, err := json.Marshal(struct {
++		Scope struct {
++			Work string `json:"work"`
++			Task string `json:"task"`
++		} `json:"scope"`
++		Revision int                   `json:"work_revision"`
++		Project  string                `json:"project_sha256"`
++		Audience string                `json:"audience"`
++		Complete bool                  `json:"provider_history_complete"`
++		Sources  []memorySummarySource `json:"sources"`
++	}{Scope: struct {
++		Work string `json:"work"`
++		Task string `json:"task"`
++	}{w.ID, t.ID}, Revision: w.Revision, Project: hash([]byte(s.root)), Audience: "local_operator", Sources: sources})
++	if err != nil {
++		return empty, err
++	}
++	return MemorySummarySourcePacket{Schema: 1, Kind: "swarm_summary_source_v1", Payload: string(payload), SHA256: hash(payload)}, nil
++}
+--- before/internal/engine/memory_summary_source_test.go
++++ after/internal/engine/memory_summary_source_test.go
+@@ -0,0 +1,236 @@
++//go:build linux
++
++package engine
++
++import (
++	"bytes"
++	"encoding/json"
++	"fmt"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"path/filepath"
++	"strings"
++	"testing"
++)
++
++func summarySourceFixture(t *testing.T) (*Store, Work, map[string]any) {
++	t.Helper()
++	s := storeTest(t)
++	w := memorySeed(t, s, taskTest(t, s, createTest(t, s)))
++	q := map[string]any{"schema_version": 1, "work": w.ID, "task": "t1", "expected_revision": w.Revision, "dialogues": []DialogueRef{dialogueHits(w)[0].Ref}}
++	return s, w, q
++}
++
++func TestMemorySummarySourceWrongMethodDoesNotReturnCatalog(t *testing.T) {
++	s, _, _ := summarySourceFixture(t)
++	req := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/project-memory?action=summary-source", nil)
++	req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "fixture-token"})
++	response := httptest.NewRecorder()
++	newWebHandler(s, "localhost:18787", "fixture-token").ServeHTTP(response, req)
++	if response.Code != http.StatusMethodNotAllowed {
++		t.Fatalf("wrong method became a successful catalogue: %d %s", response.Code, response.Body.String())
++	}
++}
++
++func TestMemorySummarySourceInspectionNeverMigratesOldStore(t *testing.T) {
++	s, _, q := summarySourceFixture(t)
++	old := schemaVersion - 1
++	if _, err := s.db.Exec("PRAGMA user_version=" + fmt.Sprint(old)); err != nil {
++		t.Fatal(err)
++	}
++	code, out, stderr := summarySourceCLI(t, s, q)
++	var version int
++	if err := s.db.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
++		t.Fatal(err)
++	}
++	if code != 2 || !strings.Contains(string(out)+stderr, "storage_upgrade_required") || version != old {
++		t.Fatalf("source inspection migrated old store: code=%d version=%d want=%d out=%s stderr=%s", code, version, old, out, stderr)
++	}
++}
++
++func TestMemorySummarySourceCLIAPIParityAndSessionProtection(t *testing.T) {
++	s, _, q := summarySourceFixture(t)
++	before := recoverySnapshotTest(t, s)
++	code, cli, stderr := summarySourceCLI(t, s, q)
++	if code != 0 {
++		t.Fatal(code, stderr)
++	}
++	api := projectMemoryHTTP(t, s, "summary-source", q, 200)
++	var value map[string]any
++	if err := json.Unmarshal(cli, &value); err != nil {
++		t.Fatal(err)
++	}
++	a, _ := json.Marshal(api)
++	b, _ := json.Marshal(value)
++	if !bytes.Equal(a, b) {
++		t.Fatal("CLI/API source packets differ")
++	}
++	for _, auth := range []bool{false, true} {
++		raw, _ := json.Marshal(q)
++		req := httptest.NewRequest(http.MethodPost, "http://localhost:18787/api/v1/project-memory?action=summary-source", bytes.NewReader(raw))
++		if auth {
++			req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "fixture-token"})
++		}
++		response := httptest.NewRecorder()
++		newWebHandler(s, "localhost:18787", "fixture-token").ServeHTTP(response, req)
++		if response.Code != 403 || strings.Contains(response.Body.String(), "Réponse 0") {
++			t.Fatal("session/origin protection lost", response.Code)
++		}
++	}
++	if recoverySnapshotTest(t, s) != before {
++		t.Fatal("API source read mutated state")
++	}
++}
++
++func TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection(t *testing.T) {
++	for _, scenario := range []string{"schema", "revision", "stale", "task", "brainstorm-target", "empty", "duplicate", "changed-ref", "foreign-work", "unknown-field"} {
++		t.Run(scenario, func(t *testing.T) {
++			s, w, q := summarySourceFixture(t)
++			switch scenario {
++			case "schema":
++				q["schema_version"] = 2
++			case "revision":
++				q["expected_revision"] = 0
++			case "stale":
++				q["expected_revision"] = w.Revision - 1
++			case "task":
++				q["task"] = "absent"
++			case "brainstorm-target":
++				q["task"] = "old-0"
++			case "empty":
++				q["dialogues"] = []DialogueRef{}
++			case "duplicate":
++				q["dialogues"] = []DialogueRef{dialogueHits(w)[0].Ref, dialogueHits(w)[0].Ref}
++			case "changed-ref":
++				ref := dialogueHits(w)[0].Ref
++				ref.SHA256 = strings.Repeat("0", 64)
++				q["dialogues"] = []DialogueRef{ref}
++			case "foreign-work":
++				q["work"] = "foreign-work"
++			case "unknown-field":
++				q["automatic"] = true
++			}
++			before := recoverySnapshotTest(t, s)
++			code, out, _ := summarySourceCLI(t, s, q)
++			if code == 0 || len(out) != 0 {
++				t.Fatal("invalid selection became source packet", code)
++			}
++			if recoverySnapshotTest(t, s) != before {
++				t.Fatal("rejected request mutated state")
++			}
++		})
++	}
++}
++
++func TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork(t *testing.T) {
++	for _, scenario := range []string{"changed-answer", "empty-answer", "identity", "revision-column", "invalid-utf8"} {
++		t.Run(scenario, func(t *testing.T) {
++			s, w, q := summarySourceFixture(t)
++			if scenario == "changed-answer" {
++				w.Tasks[1].Answers[0].Text = "changed"
++			}
++			if scenario == "empty-answer" {
++				w.Tasks[1].Answers[0].Text = ""
++				q["dialogues"] = []DialogueRef{dialogueHits(w)[0].Ref}
++			}
++			if scenario == "identity" {
++				w.ID = "other-work"
++			}
++			if scenario == "revision-column" {
++				w.Revision++
++			}
++			raw, _ := json.Marshal(w)
++			if scenario == "invalid-utf8" {
++				raw = []byte{0xff}
++			}
++			if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, q["work"]); err != nil {
++				t.Fatal(err)
++			}
++			before := recoverySnapshotTest(t, s)
++			code, out, _ := summarySourceCLI(t, s, q)
++			if code == 0 || len(out) != 0 {
++				t.Fatal("invalid stored source exported", code)
++			}
++			if recoverySnapshotTest(t, s) != before {
++				t.Fatal("source rejection mutated state")
++			}
++		})
++	}
++}
++
++func summarySourceCLI(t *testing.T, s *Store, q map[string]any) (int, []byte, string) {
++	t.Helper()
++	raw, err := json.Marshal(q)
++	if err != nil {
++		t.Fatal(err)
++	}
++	path := filepath.Join(t.TempDir(), "request.json")
++	if err := os.WriteFile(path, raw, 0600); err != nil {
++		t.Fatal(err)
++	}
++	var out, stderr bytes.Buffer
++	code := run([]string{"--root", s.root, "--json", "memory", "summary-source", "--input", path}, &out, &stderr)
++	return code, out.Bytes(), stderr.String()
++}
++
++func TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation(t *testing.T) {
++	s, w, q := summarySourceFixture(t)
++	before := recoverySnapshotTest(t, s)
++	code, raw, stderr := summarySourceCLI(t, s, q)
++	if code != 0 {
++		t.Fatalf("source export unavailable: code=%d stderr=%s body=%s", code, stderr, raw)
++	}
++	var packet struct {
++		Schema  int    `json:"schema_version"`
++		Kind    string `json:"kind"`
++		Payload string `json:"payload"`
++		SHA256  string `json:"sha256"`
++	}
++	if err := json.Unmarshal(raw, &packet); err != nil {
++		t.Fatal(err)
++	}
++	if packet.Schema != 1 || packet.Kind != "swarm_summary_source_v1" || packet.SHA256 != hash([]byte(packet.Payload)) {
++		t.Fatal("source packet lacks exact-byte binding")
++	}
++	var value struct {
++		Scope struct {
++			Work string `json:"work"`
++			Task string `json:"task"`
++		} `json:"scope"`
++		Revision int    `json:"work_revision"`
++		Project  string `json:"project_sha256"`
++		Complete bool   `json:"provider_history_complete"`
++		Audience string `json:"audience"`
++		Sources  []struct {
++			ID     string `json:"id"`
++			Role   string `json:"role"`
++			Kind   string `json:"kind"`
++			Text   string `json:"text"`
++			SHA256 string `json:"sha256"`
++		} `json:"sources"`
++	}
++	if err := json.Unmarshal([]byte(packet.Payload), &value); err != nil {
++		t.Fatal(err)
++	}
++	if value.Scope.Work != w.ID || value.Scope.Task != "t1" || value.Revision != w.Revision || value.Project != hash([]byte(s.root)) || value.Complete || value.Audience != "local_operator" || len(value.Sources) != 3 {
++		t.Fatalf("wrong scope or completeness: %+v", value)
++	}
++	for _, source := range value.Sources {
++		if source.SHA256 != hash([]byte(source.Text)) {
++			t.Fatal("source text hash mismatch")
++		}
++	}
++	if value.Sources[0].ID != "current-task-snapshot" || value.Sources[0].Kind != "task_snapshot" || !strings.Contains(value.Sources[0].Text, "tests PASS") {
++		t.Fatal("current task snapshot missing")
++	}
++	if value.Sources[1].Text != dialogueHits(w)[0].Question || value.Sources[2].Text != dialogueHits(w)[0].Text || value.Sources[2].Role != "assistant" {
++		t.Fatal("selected question/answer not copied exactly")
++	}
++	if strings.Contains(packet.Payload, "Réponse 5") || strings.Contains(packet.Payload, "old-5") {
++		t.Fatal("unselected sibling exchange leaked")
++	}
++	if recoverySnapshotTest(t, s) != before {
++		t.Fatal("read-only source export mutated state")
++	}
++}
+--- before/tools/memory-evaluation/swarm_source.py
++++ after/tools/memory-evaluation/swarm_source.py
+@@ -0,0 +1,89 @@
++#!/usr/bin/env python3
++"""Prepare M17 history from an explicit Swarm source export, without model calls."""
++import argparse
++import copy
++import json
++import os
++from pathlib import Path
++import sys
++
++from compare import digest, load_json, unique_object
++import summarization as S
++
++
++def require(condition, message):
++    if not condition:
++        raise ValueError(message)
++
++
++def parse(text):
++    def invalid(_):
++        raise ValueError("Non-finite JSON value")
++    return json.loads(text, object_pairs_hook=unique_object, parse_constant=invalid)
++
++
++def prepare(packet, annotations):
++    require(S.exact(packet, ["schema_version", "kind", "payload", "sha256"]) and type(packet["schema_version"]) is int and packet["schema_version"] == 1 and packet["kind"] == "swarm_summary_source_v1", "Invalid Swarm source envelope")
++    require(isinstance(packet["payload"], str) and packet["sha256"] == digest(packet["payload"].encode()), "Source payload hash mismatch")
++    payload = parse(packet["payload"])
++    require(S.exact(payload, ["scope", "work_revision", "project_sha256", "audience", "provider_history_complete", "sources"]), "Invalid source payload fields")
++    require(type(payload["work_revision"]) is int and payload["work_revision"] > 0 and S.hash_reference(payload["project_sha256"]), "Invalid source revision/project")
++    require(payload["audience"] == "local_operator" and payload["provider_history_complete"] is False, "Unsupported source audience or completeness claim")
++    scope = payload["scope"]
++    require(S.exact(scope, ["work", "task"]) and all(S.label(v) for v in scope.values()), "Invalid source scope")
++    sources = payload["sources"]
++    require(isinstance(sources, list) and len(sources) >= 3 and len(sources) % 2 == 1, "Explicit task snapshot and selected exchange pairs required")
++    ids, messages = set(), []
++    for index, source in enumerate(sources):
++        expected = ["id", "role", "kind", "text", "sha256"] + (["dialogue"] if index else [])
++        require(S.exact(source, expected) and S.label(source["id"]) and source["id"] not in ids and S.label(source["text"]), "Invalid or duplicate source item")
++        require(source["sha256"] == digest(source["text"].encode()), "Source text hash mismatch")
++        ids.add(source["id"])
++        kind, role = ("task_snapshot", "user") if index == 0 else (("operator_question", "user") if index % 2 else ("historical_answer", "assistant"))
++        require(source["kind"] == kind and source["role"] == role, "Source role/kind mismatch")
++        messages.append({"id": source["id"], "role": source["role"], "content": source["text"]})
++    require(sources[0]["id"] == "current-task-snapshot", "Task snapshot source missing")
++    snapshot = parse(sources[0]["text"])
++    require(S.exact(snapshot, ["project_sha256", "work_title", "work_objective", "work_scope", "work_criteria", "task"]) and isinstance(snapshot["task"], dict), "Invalid task snapshot")
++    require(snapshot["project_sha256"] == payload["project_sha256"] and snapshot["task"].get("id") == scope["task"] and snapshot["task"].get("brainstorm", False) is False, "Task snapshot scope mismatch")
++    for index in range(1, len(sources), 2):
++        question, answer = sources[index:index+2]
++        ref = question["dialogue"]
++        require(S.exact(ref, ["task", "attempt", "sha256"]) and S.label(ref["task"]) and isinstance(ref["attempt"], str) and S.hash_reference(ref["sha256"]), "Invalid stored dialogue reference")
++        require(ref == answer["dialogue"] and ref["sha256"] == digest((question["text"] + "\n" + answer["text"]).encode()), "Selected dialogue changed or pair mismatched")
++    require(S.exact(annotations, ["schema_version", "source_sha256", "protected"]) and type(annotations["schema_version"]) is int and annotations["schema_version"] == 1 and annotations["source_sha256"] == packet["sha256"], "Annotations missing or stale for this source packet")
++    history = {"schema_version": 1, "scope": copy.deepcopy(scope), "messages": messages, "protected": copy.deepcopy(annotations["protected"])}
++    S.validate_history(history)
++    require(any(anchor["message"] == "current-task-snapshot" for anchor in history["protected"]), "Current task snapshot must be protected explicitly")
++    provenance = {"schema_version": 1, "kind": "swarm_summary_source_binding_v1", "scope": copy.deepcopy(scope), "project_sha256": payload["project_sha256"], "work_revision": payload["work_revision"], "source_payload_sha256": packet["sha256"], "history_sha256": S.checksum(history), "annotations_sha256": S.checksum(annotations), "provider_history_complete": False, "audience": "local_operator", "model_effectiveness": "NOT TESTED", "engine_admission": False}
++    return history, provenance
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--source", type=Path, required=True)
++    parser.add_argument("--annotations", type=Path, required=True)
++    parser.add_argument("--output-dir", type=Path, required=True)
++    args = parser.parse_args(argv)
++    try:
++        source_raw, annotations_raw = args.source.read_bytes(), args.annotations.read_bytes()
++        # Parse the exact bytes that will be retained, with no second file read.
++        packet, annotations = parse(source_raw.decode()), parse(annotations_raw.decode())
++        history, provenance = prepare(packet, annotations)
++        files = {"source-packet.json": source_raw, "annotations.json": annotations_raw,
++                 "history.json": (json.dumps(history, ensure_ascii=False, indent=2) + "\n").encode()}
++        provenance["files_sha256"] = {name: digest(raw) for name, raw in files.items()}
++        args.output_dir.mkdir(mode=0o700, exist_ok=False)
++        for name, raw in [*files.items(), ("provenance.json", (json.dumps(provenance, ensure_ascii=False, indent=2) + "\n").encode())]:
++            fd = os.open(args.output_dir / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
++            with os.fdopen(fd, "wb") as file:
++                file.write(raw)
++        print(json.dumps({"result": "PASS", "sources": len(history["messages"]), "history_sha256": provenance["history_sha256"], "model_calls": 0, "engine_admission": False}))
++        return 0
++    except (OSError, ValueError, TypeError, KeyError) as error:
++        print("Swarm summary source error: " + str(error), file=sys.stderr)
++        return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- before/tests/test_memory_swarm_source.py
++++ after/tests/test_memory_swarm_source.py
+@@ -0,0 +1,122 @@
++"""Swarm source bridge and exact M17 quotes, without a model or private database."""
++import copy
++import json
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT / "tools/memory-evaluation"))
++import summarization as S
++import swarm_source as B
++
++
++def packet():
++    snapshot = {"project_sha256": "a" * 64, "work_title": "Source fixture", "work_objective": "Keep evidence", "work_scope": "Owned fixture", "work_criteria": ["Verified sources"], "task": {"id": "t1", "criteria": ["Recheck current evidence"], "status": "todo"}}
++    question, answer = "Vérifier avant de déployer <source>.", "Résultat historique, pas preuve courante."
++    ref = {"task": "b1", "attempt": "a1", "sha256": B.digest((question + "\n" + answer).encode())}
++    sources = [{"id": "current-task-snapshot", "kind": "task_snapshot", "role": "user", "text": json.dumps(snapshot, ensure_ascii=False)}]
++    for suffix, kind, role, text in [("q", "operator_question", "user", question), ("a", "historical_answer", "assistant", answer)]:
++        sources.append({"id": suffix, "kind": kind, "role": role, "text": text, "dialogue": ref})
++    for source in sources:
++        source["sha256"] = B.digest(source["text"].encode())
++    payload = {"scope": {"work": "w1", "task": "t1"}, "work_revision": 4, "project_sha256": "a" * 64, "audience": "local_operator", "provider_history_complete": False, "sources": sources}
++    raw = json.dumps(payload, ensure_ascii=False)
++    value = {"schema_version": 1, "kind": "swarm_summary_source_v1", "payload": raw, "sha256": B.digest(raw.encode())}
++    annotations = {"schema_version": 1, "source_sha256": value["sha256"], "protected": [{"id": "task", "message": "current-task-snapshot", "kind": "requirement", "state": "open"}, {"id": "intent", "message": "q", "kind": "intention", "state": "future"}]}
++    return value, annotations
++
++
++class SwarmSummarySource(unittest.TestCase):
++    def setUp(self):
++        self.packet, self.annotations = packet()
++
++    def mutate_payload(self, mutate):
++        payload = json.loads(self.packet["payload"])
++        mutate(payload)
++        self.packet["payload"] = json.dumps(payload, ensure_ascii=False)
++        self.packet["sha256"] = B.digest(self.packet["payload"].encode())
++        self.annotations["source_sha256"] = self.packet["sha256"]
++
++    def test_preserves_exact_quotes_scope_and_provenance_for_reference(self):
++        history, provenance = B.prepare(self.packet, self.annotations)
++        result = S.project(history, S.reference_candidate(history, 2))
++        self.assertEqual(result["result"], "PASS")
++        self.assertEqual(result["summary_entries"][1]["text"], "Vérifier avant de déployer <source>.")
++        self.assertEqual(provenance["history_sha256"], result["source_sha256"])
++        self.assertEqual(provenance["work_revision"], 4)
++        self.assertFalse(provenance["engine_admission"])
++
++    def test_rejects_payload_and_text_tampering(self):
++        self.packet["payload"] += " "
++        with self.assertRaises(ValueError): B.prepare(self.packet, self.annotations)
++        self.packet, self.annotations = packet()
++        self.mutate_payload(lambda p: p["sources"][2].update(text="changed"))
++        with self.assertRaises(ValueError): B.prepare(self.packet, self.annotations)
++
++    def test_rejects_changed_dialogue_pair_even_after_text_rehash(self):
++        def change(p):
++            p["sources"][2]["text"] = "changed"
++            p["sources"][2]["sha256"] = B.digest(b"changed")
++        self.mutate_payload(change)
++        with self.assertRaises(ValueError): B.prepare(self.packet, self.annotations)
++
++    def test_requires_annotations_bound_to_packet_and_current_task(self):
++        for mutation in [lambda a: a.update(source_sha256="b" * 64), lambda a: a["protected"].pop(0), lambda a: a.update(protected=[])]:
++            value = copy.deepcopy(self.annotations)
++            mutation(value)
++            with self.assertRaises(ValueError): B.prepare(self.packet, value)
++
++    def test_refuses_wrong_scope_roles_duplicates_and_completeness(self):
++        for mutate in [lambda p: p["scope"].update(task="other"), lambda p: p["sources"][2].update(role="user"), lambda p: p["sources"][2].update(id="q"), lambda p: p.update(provider_history_complete=True), lambda p: p.update(work_revision=True)]:
++            self.packet, self.annotations = packet()
++            self.mutate_payload(mutate)
++            with self.assertRaises(ValueError): B.prepare(self.packet, self.annotations)
++
++    def test_new_current_task_snapshot_invalidates_previous_reference(self):
++        history, _ = B.prepare(self.packet, self.annotations)
++        parent = S.project(history, S.reference_candidate(history, 2))
++        def change(p):
++            snapshot = json.loads(p["sources"][0]["text"])
++            snapshot["task"]["criteria"] = ["Changed current contract"]
++            p["sources"][0]["text"] = json.dumps(snapshot)
++            p["sources"][0]["sha256"] = B.digest(p["sources"][0]["text"].encode())
++        self.mutate_payload(change)
++        current, _ = B.prepare(self.packet, self.annotations)
++        result = S.project(current, S.reference_candidate(current, 2, parent), parent)
++        self.assertEqual(result["result"], "FALLBACK")
++        self.assertEqual(result["recent_messages"], current["messages"])
++
++    def test_does_not_mutate_inputs(self):
++        before = copy.deepcopy((self.packet, self.annotations))
++        history, provenance = B.prepare(self.packet, self.annotations)
++        history["protected"][0]["state"] = "changed"
++        history["scope"]["work"] = "changed"
++        self.assertEqual(provenance["scope"]["work"], "w1")
++        self.assertEqual(before, (self.packet, self.annotations))
++
++    def test_cli_writes_new_private_bundle_and_preserves_sources(self):
++        with tempfile.TemporaryDirectory() as name:
++            root = Path(name)
++            source, annotations = root / "source.json", root / "annotations.json"
++            source.write_text(json.dumps(self.packet)); annotations.write_text(json.dumps(self.annotations))
++            before = (source.read_bytes(), annotations.read_bytes())
++            command = [sys.executable, str(ROOT / "tools/memory-evaluation/swarm_source.py"), "--source", str(source), "--annotations", str(annotations), "--output-dir", str(root / "prepared")]
++            result = subprocess.run(command, capture_output=True, text=True)
++            self.assertEqual(result.returncode, 0, result.stderr)
++            provenance = json.loads((root / "prepared/provenance.json").read_text())
++            for filename, sha in provenance["files_sha256"].items():
++                path = root / "prepared" / filename
++                self.assertEqual(B.digest(path.read_bytes()), sha)
++                self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
++            self.assertEqual(os.stat(root / "prepared").st_mode & 0o777, 0o700)
++            replay = subprocess.run(command, capture_output=True, text=True)
++            self.assertEqual(replay.returncode, 2)
++            self.assertEqual(before, (source.read_bytes(), annotations.read_bytes()))
++
++
++if __name__ == "__main__":
++    unittest.main(verbosity=2)
+--- before/tests/memory_summary_source.py
++++ after/tests/memory_summary_source.py
+@@ -0,0 +1,151 @@
++#!/usr/bin/env python3
++"""Real Swarm CLI/API -> stored brainstorm -> M17, scripted provider only."""
++import argparse
++import hashlib
++import http.cookiejar
++import json
++import os
++from pathlib import Path
++import re
++import select
++import subprocess
++import sys
++import tempfile
++import time
++import traceback
++import urllib.error
++import urllib.request
++import uuid
++
++
++def main():
++    parser=argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("binary",type=Path);parser.add_argument("output",type=Path)
++    args=parser.parse_args(); binary=args.binary.resolve(); out=args.output.resolve()
++    out.mkdir(mode=0o700,parents=True,exist_ok=False)
++    root=Path(tempfile.mkdtemp(prefix="swarm-summary-source-")); repo=Path(__file__).resolve().parents[1]
++    commands=[];checks=[];server=None;active=None
++    def sha(raw):return hashlib.sha256(raw).hexdigest()
++    def save(name,value):
++        raw=value if isinstance(value,bytes) else (json.dumps(value,ensure_ascii=False,indent=2)+"\n").encode()
++        with (out/name).open('xb') as file:os.chmod(file.name,0o600);file.write(raw)
++    def cli(argv,payload=None,code=0):
++        command=[str(binary),'--root',str(root),'--json',*argv]+(['--input','-'] if payload is not None else [])
++        result=subprocess.run(command,input=json.dumps(payload) if payload is not None else None,text=True,capture_output=True,timeout=20)
++        commands.append({'argv':argv,'exit_code':result.returncode})
++        assert result.returncode==code,(argv,result.returncode,result.stderr)
++        return json.loads(result.stdout if code==0 else result.stderr)
++    def request(w,**kw):return dict(schema_version=1,event_id=str(uuid.uuid4()),expected_revision=w['revision'],**kw)
++    def wait(check):
++        until=time.monotonic()+20
++        while time.monotonic()<until:
++            value=check()
++            if value:return value
++            time.sleep(.1)
++        raise AssertionError('Owned fixture did not settle')
++    def tool(argv,code=0):
++        result=subprocess.run([sys.executable,*map(str,argv)],cwd=repo,text=True,capture_output=True,timeout=20)
++        commands.append({'argv':list(map(str,argv)),'exit_code':result.returncode})
++        assert result.returncode==code,(argv,result.returncode,result.stderr)
++    def annotation(packet):
++        sources=json.loads(packet['payload'])['sources']
++        states=[('snapshot','evidence','historical'),('future','intention','future'),('prior','evidence','historical'),('incident','incident','open')]
++        return {'schema_version':1,'source_sha256':packet['sha256'],'protected':[{'id':name,'message':sources[i]['id'],'kind':kind,'state':state} for i,(name,kind,state) in enumerate(states)]}
++    save('fixture.json',{'root':str(root),'binary':str(binary)})
++    try:
++        cli(['init'])
++        provider=root/'claude'
++        provider.write_text('#!'+sys.executable+'\n'+'''import json,pathlib,sys
++p=pathlib.Path(__file__)
++if "--swarm-preflight" in sys.argv:
++ print(json.dumps({"schema_version":1,"capabilities":{"process":"verified","workspace_read":"verified","workspace_write":"verified"}}));sys.exit(0)
++sys.stdin.read()
++with p.with_suffix(".calls").open("a") as f:f.write("call\\n")
++print(json.dumps({"type":"result","result":"Réponse historique conservée <source> ; aucun succès courant déclaré.","usage":{"input_tokens":10,"output_tokens":2}}))
++''');provider.chmod(0o700)
++        (root/'.swarm/providers.json').write_text(json.dumps({'schema_version':1,'providers':{'fixture':{'command':str(provider),'preflight_args':['--swarm-preflight'],'preflight_kind':'provider-context','preflight_capabilities':['process','workspace_read','workspace_write']}}}))
++        work=cli(['work','create'],request({'revision':0},title='Summary source fixture',objective='Keep attributed history',scope='Owned fixture',criteria=['Sources remain available'],next='Inspect'))['work']
++        work=cli(['task','add',work['id']],request(work,id='t1',title='Future worker',deliverable='report.txt',criteria=['Recheck current evidence'],next='Inspect sources'))['work']
++        refs=[]; agents=[]
++        for question in ['Intention future : vérifier avant de déployer.','Incident ouvert : effet incertain à examiner avant reprise.']:
++            active=cli(['agent','start',work['id']],request(work,provider='fixture',role='worker',brainstorm=True,workspace='.',instruction=question,capture_output=True,timeout_seconds=30))['agent']
++            def answer():
++                a=cli(['agent','show',active['id']])['agent']
++                w=cli(['work','show',work['id']])['work']
++                hits=[t for t in w['tasks'] if t.get('brainstorm') and any(v['attempt']==a['id'] for v in t.get('answers',[]))]
++                return (a,w,hits[0]) if a['status']=='completed' and hits else None
++            a,work,dialogue=wait(answer);agents.append(a)
++            stored=next(v for v in dialogue['answers'] if v['attempt']==a['id'])
++            refs.append({'task':dialogue['id'],'attempt':stored['attempt'],'sha256':sha((dialogue['question']+'\n'+stored['text']).encode())})
++        before=json.dumps(work,sort_keys=True);save('work-before.json',work);save('agents-before.json',agents)
++        q={'schema_version':1,'work':work['id'],'task':'t1','expected_revision':work['revision'],'dialogues':refs}
++        source=cli(['memory','summary-source'],q);save('source-cli.json',source);save('request.json',q)
++        payload=json.loads(source['payload']);assert payload['provider_history_complete'] is False and len(payload['sources'])==5
++        assert source['sha256']==sha(source['payload'].encode())
++        checks.append('Two actual brainstorm launches persist selected question/answer references; CLI exports exact scoped sources')
++        server=subprocess.Popen([str(binary),'--root',str(root),'web','127.0.0.1:0'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
++        announced=b'';match=None;deadline=time.monotonic()+15
++        while match is None and time.monotonic()<deadline:
++            assert server.poll() is None
++            ready,_,_=select.select([server.stdout],[],[],.1)
++            if ready:announced+=os.read(server.stdout.fileno(),4096);match=re.search(r'http://\S+/session/\S+',announced.decode())
++        assert match,'No fixture session address'
++        address=match.group();base=address.split('/session/',1)[0]
++        opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
++        opener.open(address,timeout=10).read()
++        csrf=json.load(opener.open(base+'/api/v1/session',timeout=10))['csrf']
++        def api_request(payload=None,method='POST',want=200):
++            headers={'Origin':base,'X-Swarm-CSRF':csrf,'Content-Type':'application/json'}
++            req=urllib.request.Request(base+'/api/v1/project-memory?action=summary-source',data=json.dumps(payload).encode() if payload else None,headers=headers,method=method)
++            try:
++                response=opener.open(req,timeout=10);status=response.status;raw=response.read()
++            except urllib.error.HTTPError as error:status=error.code;raw=error.read()
++            assert status==want,(status,raw.decode())
++            return json.loads(raw) if want!=405 else None
++        api=api_request(q);assert api==source;save('source-api.json',api);api_request(method='GET',want=405)
++        checks.append('Reopened authenticated API matches CLI byte-bound payload; GET refuses a catalogue-shaped false success')
++        annotations=annotation(source);save('annotations.json',annotations)
++        tool(['tools/memory-evaluation/swarm_source.py','--source',out/'source-cli.json','--annotations',out/'annotations.json','--output-dir',out/'prepared'])
++        tool(['tools/memory-evaluation/summarization.py','--history',out/'prepared/history.json','--reference-cutoff',4,'--output',out/'candidate.json'])
++        tool(['tools/memory-evaluation/summarization.py','--history',out/'prepared/history.json','--candidate',out/'candidate.json','--output',out/'reference.json'])
++        reference=json.loads((out/'reference.json').read_text());provenance=json.loads((out/'prepared/provenance.json').read_text())
++        assert reference['result']=='PASS' and reference['source_sha256']==provenance['history_sha256']
++        assert reference['summary_entries'][1]['state']=='future' and reference['summary_entries'][3]['state']=='open'
++        checks.append('Actual Go export converts with explicit packet-bound annotations; M17 preserves snapshot, future intention and open incident')
++        after=cli(['work','show',work['id']])['work'];assert json.dumps(after,sort_keys=True)==before
++        assert [cli(['agent','show',a['id']])['agent'] for a in agents]==agents
++        assert provider.with_suffix('.calls').read_text()=='call\ncall\n'
++        save('work-after-reads.json',after)
++        checks.append('Export, API and conversion leave work, source agents, usage and invocation count unchanged')
++        changed=cli(['task','update',work['id']],request(work,id='t1',criteria=['Current contract changed; recheck before reuse']))['work']
++        assert cli(['memory','summary-source'],q,3)['failure']['code']=='revision_conflict';api_request(q,want=409)
++        q['expected_revision']=changed['revision'];fresh=cli(['memory','summary-source'],q);save('source-current.json',fresh)
++        tool(['tools/memory-evaluation/swarm_source.py','--source',out/'source-current.json','--annotations',out/'annotations.json','--output-dir',out/'stale-annotations'],2)
++        assert not (out/'stale-annotations').exists()
++        save('annotations-current.json',annotation(fresh))
++        tool(['tools/memory-evaluation/swarm_source.py','--source',out/'source-current.json','--annotations',out/'annotations-current.json','--output-dir',out/'current'])
++        tool(['tools/memory-evaluation/summarization.py','--history',out/'current/history.json','--reference-cutoff',4,'--previous',out/'reference.json','--output',out/'candidate-current.json'],2)
++        old_candidate=json.loads((out/'candidate.json').read_text());old_candidate['source_sha256']=json.loads((out/'current/provenance.json').read_text())['history_sha256'];old_candidate['parent_sha256']=reference['receipt_sha256'];save('stale-parent-candidate.json',old_candidate)
++        tool(['tools/memory-evaluation/summarization.py','--history',out/'current/history.json','--candidate',out/'stale-parent-candidate.json','--previous',out/'reference.json','--output',out/'fallback.json'],1)
++        fallback=json.loads((out/'fallback.json').read_text());assert fallback['result']=='FALLBACK' and fallback['reasons']==['parent_or_sources_changed'] and fallback['recent_messages']==json.loads((out/'current/history.json').read_text())['messages']
++        assert provider.with_suffix('.calls').read_text()=='call\ncall\n'
++        checks.append('Public task update makes old CLI/API revision stale; annotations refuse and changed contract prevents parent reuse with all current originals retained')
++        save('result.json',{'status':'PASS','root':str(root),'checks':checks,'scripted_provider_invocations':2,'model_calls':0,'binary_sha256':sha(binary.read_bytes()),'script_sha256':sha(Path(__file__).read_bytes())})
++        print(json.dumps({'status':'PASS','checks':len(checks),'scripted_provider_invocations':2,'model_calls':0}))
++    except Exception:
++        save('failure.json',{'error':re.sub(r'/session/[^\s/]+','/session/[private]',traceback.format_exc()),'root':str(root),'checks':checks})
++        raise
++    finally:
++        save('commands.json',commands)
++        if server:
++            server.terminate()
++            try:server.wait(timeout=5)
++            except subprocess.TimeoutExpired:server.kill();server.wait(timeout=5)
++        if active:
++            a=cli(['agent','show',active['id']])['agent']
++            if a['status'] in ['queued','starting','running','stopping']:
++                subprocess.run([str(binary),'--root',str(root),'agent','stop',a['id']],check=True,capture_output=True,timeout=10)
++                wait(lambda:cli(['agent','show',a['id']])['agent']['status'] not in ['queued','starting','running','stopping'])
++
++
++if __name__=='__main__':main()
+--- before/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-14.md
++++ after/docs/plans/deepagents-integration/INCREMENT-MEMOIRE-14.md
+@@ -0,0 +1,51 @@
++# M18 — sources Swarm inspectables pour la référence de résumé
++
++16 octobre 2026, reprise « next ». Codex seul ; `replan` et APEX.
++MEM-U08/U13, MEM-C16/C17 ; M17 conservé sans renotation.
++
++## Décision et frontière
++
++Les tables de tours du dialogue interactif conservent question, session, statut
++et checkpoint, pas toutes les réponses. Les reconstruire depuis des journaux
++bornés inventerait une complétude. Les échanges de cadrage dans `Work` conservent
++question et réponse, résolus par `DialogueRef`. Cette seconde source est retenue.
++
++Un export SQLite brut ajouterait un lecteur privé concurrent de l'autorité Go.
++Le choix est une consultation publique commune CLI/API : révision attendue,
++tâche cible et références explicites du même travail, lues dans un seul instantané.
++La sortie contient le cadrage courant du travail, l'instantané de la seule tâche
++cible et les questions/réponses choisies, avec empreintes et limites explicites.
++Elle vise l'opérateur local ; ce n'est pas le contexte d'un exécutant délégué.
++
++Une conversion Python vérifie le paquet, exige des annotations liées à son
++empreinte et protège au moins l'instantané de tâche. Elle prépare le format M17
++et conserve paquet, annotations et provenance dans un dossier nouveau. Aucun
++état sémantique n'est inféré du texte. Les empreintes identifient les documents,
++sans authentification ou autorisation d'admettre leur contenu.
++
++| Lot | Propriétaire / dépendance | Critère vérifiable |
++| --- | --- | --- |
++| M18.1 | Codex ; M17 | Schéma de source, origine réellement persistée, critères ci-dessous et tests d'interface avant réalisation. |
++| M18.2 | Codex ; M18.1 | `memory summary-source`, API locale commune, révision/scope/références contrôlées ; refus sans écriture, aucune source par défaut. |
++| M18.3 | Codex ; M18.2 | Convertisseur avec citations exactes, paquet/annotations conservés et empreintes vérifiées ; annotations périmées, manquantes et paquet corrompu refusés. |
++| M18.4 | Codex ; précédents | Vraies CLI/API et référence M17 dans une racine isolée, source réellement produite par le parcours de cadrage avec fournisseur scripté ; persistance et absence de nouvelle invocation vérifiées. Docs FR/EN, revue locale et RETEX. |
++
++L'export ne joint ni rapports des tâches voisines, ni sorties d'outils, ni état
++privé des gardes. Il ne promet pas un historique fournisseur complet ou un texte
++plus complet que les réponses conservées. Il n'admet aucun résumé et ne modifie
++ni contexte, révision, réservations ni compteurs. Pas de politique, migration,
++interface nouvelle ou appel de modèle réel. Le consommateur moteur et la qualité
++LLM restent ouverts ; les huit appels M6/M7 restent consommés.
++
++## Résultat local
++
++M18.1–M18.4 vérifiés : dix tests Go distincts, huit tests du convertisseur,
++24 tests de non-régression M17 et cinq contrôles du parcours CLI/API réel dans
++une racine isolée. Une modification publique des critères invalide les anciennes
++annotations et le parent de résumé ; les originaux courants restent disponibles.
++Deux contre-exemples produit (GET retournant le catalogue, ouverture d'inspection
++migrante) et deux défauts de recette sont diagnostiqués et vérifiés après correction.
++Voir [résultats et RETEX](RESULTATS-MEMOIRE-14.md). Codex seul, aucune revue
++indépendante, aucun appel réel, résumé admis ou déploiement. Les critères globaux
++MEM-C16/MEM-C17 restent partiels ; proposition/admission et consommation effective
++constituent la frontière suivante.
+--- before/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-14.md
++++ after/docs/plans/deepagents-integration/RESULTATS-MEMOIRE-14.md
+@@ -0,0 +1,170 @@
++# M18 — sources Swarm liées à la référence de résumé
++
++16 octobre 2026, reprise « next ». Les quatre lots de
++[l'incrément 14](INCREMENT-MEMOIRE-14.md) sont réalisés et vérifiés localement.
++La vraie CLI et l'API Swarm produisent des sources consultables par l'opérateur ;
++un convertisseur les relie à la référence extractive M17. Aucun résumé n'est
++admis dans un contexte d'agent et aucun appel de modèle réel n'est ajouté.
++
++## État observé et décision
++
++Le dialogue interactif conserve questions, sessions, statuts et checkpoints dans
++`agent_dialogue_turns`, mais pas toutes les réponses. Les journaux bornés ne
++permettent donc pas de promettre une conversation complète. Les échanges de
++cadrage possèdent question et réponses dans `Work.Tasks`, produits par
++`agents_store.go` et consultés par `dialogueHits` / `resolveDialogue` dans
++`dialogue_context.go`. Cette source effectivement persistée est retenue.
++
++Lire SQLite directement en Python aurait créé un second lecteur du contrat
++privé. Le choix est une opération commune Go, exposée par CLI/API, puis une
++conversion explicite hors moteur. Ni reconstruction des messages du fournisseur,
++ni admission automatique ne sont nécessaires pour ce lot. Codex reste seul
++responsable de l'implémentation et des contrôles, sans revue indépendante.
++
++## Contrat livré
++
++`memory summary-source --input requete.json` et POST authentifié
++`/api/v1/project-memory?action=summary-source` partagent le même lecteur : schéma 1,
++travail, tâche cible, révision attendue et `DialogueRef` explicitement choisies.
++Une seule ligne SQLite fournit révision et `Work`, afin que contrat courant et
++échanges appartiennent au même instantané. Identité et révision de la ligne sont
++comparées au corps conservé. Une tâche de cadrage ne peut pas être la cible.
++
++Le paquet `swarm_summary_source_v1` contient une chaîne JSON `payload` et le
++SHA-256 de ses octets UTF-8 exacts. Son contenu comprend le projet, la portée,
++la révision, le cadrage du travail, l'instantané complet de la seule tâche cible,
++puis les questions/réponses choisies et leurs références. Chaque texte possède
++une empreinte. L'identité du projet est aussi incluse dans le texte de
++`current-task-snapshot` : changer de projet ne donne pas une filiation implicite.
++La révision générale reste hors de ce texte ; un changement sans effet sur les
++sources choisies ne change pas artificiellement ce préfixe.
++
++Le destinataire est `local_operator`, avec `provider_history_complete: false`.
++L'instantané peut contenir des références et verdicts historiques de cette tâche,
++sans leur attribuer une validité actuelle. Aucun rapport voisin, résultat d'outil
++ou checkpoint privé n'est chargé. Les textes peuvent déjà avoir été bornés par
++leur producteur ; l'export ne les raccourcit pas davantage. Il ne remplace pas le
++contrat de construction d'un contexte exécutant.
++
++Une révision périmée donne `revision_conflict` (CLI 3, HTTP 409). Référence
++modifiée, doublon, réponse vide, tâche incorrecte et entrée mal formée sont
++refusés sans écriture. GET sur cette action donne 405, sans retourner le catalogue.
++Session, origine et CSRF du serveur restent requis. La commande d'inspection
++refuse un stockage ancien avec `storage_upgrade_required`, sans le migrer.
++La capacité de transport existante de la mémoire reste 1 Mio ; aucune politique
++de déclenchement, taille de résumé ou rétention n'est créée.
++
++`tools/memory-evaluation/swarm_source.py` vérifie paquet, textes, paires,
++références et portée. Les annotations sont obligatoires, liées à l'empreinte du
++paquet et protègent explicitement l'instantané de tâche. Les états sémantiques
++restent choisis par l'opérateur ; leur justesse n'est pas déduite des empreintes.
++Le convertisseur crée un nouveau dossier 0700 avec quatre fichiers 0600 : paquet
++original, annotations originales, historique M17 et provenance. Il parse les
++mêmes octets que ceux qu'il conserve. La provenance lie les fichiers et le
++SHA-256 de l'historique cité par le reçu M17. Les sorties existantes sont refusées ;
++une interruption d'écriture peut laisser un dossier partiel, sans préparation
++réussie. L'outil de résumé M17 reste inchangé.
++
++## Vérification et preuves
++
++Les preuves sont conservées sous [`evidence/m18-20261016/`](evidence/m18-20261016/).
++Les préimages distinguent ce lot des nombreux changements préexistants du dépôt.
++
++| Critère | Résultat / preuve |
++| --- | --- |
++| M18.1 origine et schéma avant réalisation | PASS local ; premier test public rouge dans `source-red.json/.log`, choix et limites dans l'incrément. |
++| M18.2 lecteur public et refus sans écriture | PASS ; six tests Go de source, dont quinze sous-cas de refus, parité CLI/API, session/origine et empreintes de l'état inchangées. `source-final.json/.log`. |
++| M18.2 compatibilité de stockage | PASS ; l'inspection d'une fixture 34 conserve 34 et refuse l'ouverture. Contre-exemple avant correction dans `inspection-red.json/.log`. |
++| M18.3 conversion, citations et provenance | PASS ; huit tests Python, dont vraie CLI, modes privés, sortie existante conservée, annotations périmées et sources altérées. `bridge-final.json/.log`. |
++| Référence M17 inchangée | PASS ; ses 24 tests Python distincts restent verts. `reference-regression.json/.log`. |
++| M18.4 parcours applicatif | PASS ; cinq contrôles de la vraie CLI/API et des outils Python, deux échanges de cadrage réellement produits par un fournisseur scripté. `native-flow/result.json` et originaux voisins. |
++| Construction et contrôles | PASS ; `build-final.json`, `static-final.json` (`go vet ./internal/engine`), `config-final.json` et `audit-final.json` (diff, sources, liens, environnement). |
++
++**10 tests Go distincts** passent : six tests de la fonctionnalité et quatre
++contrôles existants des contrats mémoire/contexte/inspection. Les quinze sous-cas
++de refus ne sont pas comptés comme quinze tests supplémentaires. **32 tests
++Python distincts** passent : huit du convertisseur et 24 de la référence.
++Les essais préliminaires ne s'ajoutent pas à ces nombres.
++
++La recette finale construit son propre projet, lance deux cadrages via la vraie
++CLI avec un fournisseur local scripté, ferme puis rouvre les lectures et compare
++le paquet API authentifié au paquet CLI. Les cinq sources obtenues sont
++l'instantané de tâche et deux paires question/réponse. La référence M17 conserve
++la citation de l'intention future et l'incident ouvert avec leurs états déclarés.
++Travail, agents, usages et nombre d'invocations restent inchangés par les lectures
++et la conversion. Une modification des critères par `task update` rend la requête
++ancienne périmée en CLI/API ; les anciennes annotations sont refusées avant
++création du dossier de sortie. Le changement du contrat empêche la réutilisation
++du parent avec la cause vérifiée `parent_or_sources_changed`. FALLBACK conserve
++les cinq messages courants complets.
++
++Le binaire de recette provient de `go build ... ./cmd/swarm`, empreinte
++`1097db24113d8cedc2954813075623515b850b954f4ec5c3cc043da213ac79e1`.
++La recette finale compte **deux invocations de script et zéro modèle réel**.
++Deux recettes échouées, conservées et diagnostiquées, ont produit trois autres
++invocations scriptées : cinq au total pour ce lot, toujours zéro modèle réel.
++Le collecteur consigne les entrées et leur stabilité pendant chaque contrôle.
++L'évaluation finale distingue les changements ultérieurs du seul script de
++recette des entrées Go/Python réellement consommées ; les tests restés valides
++ne sont pas relancés pour un changement documentaire ou un script non chargé.
++
++Pas de nouvel état partagé mutable introduit : un seul instantané SQL, une
++conversion locale et la classification d'ouverture existante. Aucun nouveau
++résultat `-race` n'est revendiqué. Aucun écran modifié : pas de recette navigateur
++ni de qualification visuelle nouvelle. Pas de test global Go, de fournisseur
++réel, de migration réelle ou de déploiement. Le serveur utilisateur reste
++inchangé, au PID 2186583 et à son adresse initiale.
++
++Les docs [FR](../../PROJECT-MEMORY.md), [EN](../../en/PROJECT-MEMORY.md) et la
++[recette](../../../tools/memory-evaluation/README.md#préparer-la-référence-depuis-des-sources-swarm)
++décrivent commandes, format, refus, propriétaires et limites. La consultation
++ne crée pas une politique d'exécution à ajouter dans Admin.
++
++## Replan et RETEX
++
++Trois frontières ont nécessité un diagnostic lié au besoin initial :
++
++1. GET avec la nouvelle action renvoyait le catalogue 200. Le contre-exemple
++   `method-red.json/.log` est conservé ; le garde commun refuse désormais cette
++   méthode avant la branche catalogue. Le test et la vraie API vérifient 405.
++2. L'ouverture CLI migrante intervenait avant le lecteur. Le nouveau nom de
++   commande manquait dans `cliStorageInspection` : sur une fixture 34, le test
++   rouge observait sortie 0 et version 35. Le classement commun d'inspection
++   corrige cette cause ; le même test vérifie refus explicite et version 34.
++   Aucun identifiant de mission ou contournement de migration n'est ajouté.
++3. La première recette attendait une réponse avec `Agent.attempt_id`. Le producteur
++   stocke `Agent.id` dans `BrainstormAnswer.attempt` ; l'agent avait terminé.
++   Les originaux `native/failed-agent.json`, `failed-work.json`, l'identité de
++   fixture et la préimage du script sont conservés. Le consommateur suit
++   maintenant la clé réellement produite. La seconde recette échoue ensuite
++   avant l'API : sa fonction locale `http` masque le module `http.cookiejar`.
++   `native-final/failure.json` et sa préimage conservent cet échec de méthode.
++   Le renommage en `api_request` corrige la précondition. La recette finale
++   vérifie ensuite l'API et la chaîne entière ; aucun échec inchangé n'est relancé.
++
++Les premiers fichiers supposés pour une lecture de résultat ou une recherche
++de type étaient absents ; l'inventaire et la recherche des symboles ont fourni
++les chemins réels. Ces erreurs d'inspection ne sont pas des défauts produit ni
++des contrôles réussis. Les originaux d'échec sont conservés sans renotation.
++
++Apprentissage réutilisable consigné dans la recette commune : suivre la référence
++du producteur et tester l'ouverture d'une nouvelle inspection sur un stockage
++ancien. Un corps de lecteur sans écriture ne prouve pas que son ouverture reste
++sans migration. La documentation est destinée au mainteneur et à l'opérateur,
++sans ajout de consignes aux agents ni prétention de changement de leur contexte.
++La revue locale porte sur l'instantané SQL, les consommateurs, la provenance,
++les refus, les copies et l'absence d'invocation induite ; elle n'est pas indépendante.
++
++## Critères encore ouverts
++
++MEM-C16 et MEM-C17 restent **PARTIAL** : les sources de cadrage Swarm sont
++raccordées à une référence extractive, sans historique fournisseur complet,
++proposition LLM, admission, remplacement de contexte ou consommation d'un reçu
++par un agent. Les huit appels M6/M7 restent consommés et leurs résultats intacts.
++La fidélité d'une paraphrase et la justesse des annotations restent non qualifiées.
++
++La prochaine frontière est le contrat de proposition/admission et son consommateur
++réel : autorité, sources revérifiées au moment d'usage, reçu lié au contexte
++effectivement transmis, refus conservant les originaux. L'évolution devra définir
++ses contrôles et éventuelles politiques Admin/API/CLI/Go avant activation ; aucun
++droit ni nouvel appel réel n'est inféré du présent raccordement en lecture seule.

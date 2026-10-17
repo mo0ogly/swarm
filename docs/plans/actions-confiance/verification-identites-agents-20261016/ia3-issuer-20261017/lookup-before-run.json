@@ -1,0 +1,35 @@
+{
+  "command": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup$",
+    "-count=1",
+    "-timeout",
+    "30s",
+    "-json"
+  ],
+  "executor": "Codex alone; isolated fixture stores; local OIDC signed-token fixture, no real provider",
+  "start": "2026-10-17T08:18:03.028312+00:00",
+  "end": "2026-10-17T08:19:26.599345+00:00",
+  "elapsed_seconds": 83.5709810089902,
+  "exit": 1,
+  "input_count": 1058,
+  "changed_inputs": [],
+  "counts": {
+    "pass": 0,
+    "fail": 4,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup",
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup/local-admin",
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup/missing-token",
+      "TestAgentIdentityIssuerAuthenticatesBeforeWorkLookup/unenrolled-human"
+    ],
+    "skip": []
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentstate",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T11:10:53.051351+00:00",
+  "end": "2026-10-17T11:10:54.763105+00:00",
+  "counts": {
+    "pass": 14,
+    "fail": 1,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestActiveReadAndRevocationSerializeLocally",
+      "TestDurableEnrollmentRevocationAndExactRetry",
+      "TestInvalidChangesAndCanceledReadsDoNotMutate",
+      "TestInvalidChangesAndCanceledReadsDoNotMutate/enroll-duplicate",
+      "TestInvalidChangesAndCanceledReadsDoNotMutate/revoke-missing",
+      "TestJournalRejectsTamperAndForeignContext",
+      "TestJournalRejectsTamperAndForeignContext/bad-signature",
+      "TestJournalRejectsTamperAndForeignContext/changed-body",
+      "TestJournalRejectsTamperAndForeignContext/foreign-key",
+      "TestJournalRejectsTamperAndForeignContext/foreign-project",
+      "TestJournalRejectsTamperAndForeignContext/missing-event",
+      "TestJournalRejectsTamperAndForeignContext/noncanonical",
+      "TestJournalRejectsTamperAndForeignContext/rolled-back-head",
+      "TestSignedActiveReplyAndRevocation"
+    ],
+    "fail": [
+      "TestConcurrentIdenticalChangeHasOneEvent"
+    ],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 6
+}

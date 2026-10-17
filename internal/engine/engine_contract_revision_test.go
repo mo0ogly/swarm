@@ -23,7 +23,7 @@ import (
 const slowManagedReviewerFixture = `#!/usr/bin/env python3
 import json, os, sys, time
 text=sys.stdin.read()
-ctx=json.loads(text.split('\nSWARM_MANAGED_REVIEW_CONTEXT\n',1)[1])
+payload=json.loads(text.split('\nSWARM_MANAGED_REVIEW_CONTEXT\n',1)[1]);ctx=payload.get('task_contracts_reports_controls',payload)
 folder=os.path.dirname(__file__)
 with open(os.path.join(folder,'calls'),'a') as f: f.write('call\n')
 with open(os.path.join(folder,'started'),'w') as f: f.write('1')

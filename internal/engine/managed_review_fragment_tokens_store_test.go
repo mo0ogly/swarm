@@ -108,7 +108,7 @@ func TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift(t *testing.T) {
 					for j := range packet.Artifacts {
 						findings[fmt.Sprint(j)] = map[string]any{"v": "inspected", "r": "Content examined", "e": 0}
 					}
-					reply, _ := json.Marshal(map[string]any{"candidate_commit": packet.Candidate, "context_sha256": packet.ContextDigest, "packet_sha256": hash(raw), "findings": findings, "defects": []any{}})
+					reply, _ := json.Marshal(map[string]any{"candidate_commit": packet.Candidate, "context_sha256": packet.ContextDigest, "packet_sha256": hash(raw), "findings": findings})
 					replies[i] = string(reply)
 				}
 				if _, e = managedFragmentFinalBundle(c, p, replies); e != nil {

@@ -1,0 +1,287 @@
+{
+  "original_retained": "callers.json",
+  "false_matches": [
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agents_store.go",
+      "line": 875,
+      "function": "prepareLaunch",
+      "kind": "literal_sql",
+      "value": "SELECT id FROM workspace_integrations WHERE state='running' AND (canonical_workspace=? OR instr(canonical_workspace, ? || '/')=1 OR instr(?, canonical_workspace || '/')=1) LIMIT 1"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 88,
+      "function": "workspaceTurns",
+      "kind": "literal_sql",
+      "value": "SELECT seq,work_id,task_id,workspace,state,agent_id,requested_at,acquired_at,released_at\n\t\tFROM workspace_turns ORDER BY seq"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 139,
+      "function": "claimWorkspaceTurn",
+      "kind": "literal_sql",
+      "value": "SELECT seq,work_id,task_id,workspace,state,agent_id,requested_at,acquired_at,released_at\n\t\tFROM workspace_turns WHERE work_id=? AND task_id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 145,
+      "function": "claimWorkspaceTurn",
+      "kind": "literal_sql",
+      "value": "SELECT seq,work_id,task_id,workspace,state,agent_id,requested_at,acquired_at,released_at\n\t\t\tFROM workspace_turns WHERE work_id=? AND task_id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 155,
+      "function": "claimWorkspaceTurn",
+      "kind": "literal_sql",
+      "value": "SELECT work_id,task_id FROM workspace_turns\n\t\tWHERE seq<? AND state IN ('waiting','acquired')\n\t\tAND (workspace=? OR instr(workspace, ? || '/')=1 OR instr(?, workspace || '/')=1)\n\t\tORDER BY seq LIMIT 1"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 188,
+      "function": "releaseWorkspaceTurn",
+      "kind": "literal_sql",
+      "value": "SELECT state,agent_id FROM workspace_turns WHERE work_id=? AND task_id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 295,
+      "function": "integrationReceipt",
+      "kind": "literal_sql",
+      "value": "SELECT request_hash,work_id,exchange_id,canonical_workspace,state,requested_at,finished_at,detail\n\t\tFROM workspace_integrations WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 306,
+      "function": "workspaceIntegrationReceipts",
+      "kind": "literal_sql",
+      "value": "SELECT detail FROM workspace_integrations WHERE work_id=? ORDER BY rowid"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 404,
+      "function": "integrateWorkspace",
+      "kind": "literal_sql",
+      "value": "SELECT id FROM workspace_integrations WHERE state='running'\n\t\t\tAND (canonical_workspace=? OR instr(canonical_workspace, ? || '/')=1 OR instr(?, canonical_workspace || '/')=1)\n\t\t\tORDER BY rowid LIMIT 1"
+    }
+  ],
+  "original_exact_works_sites": [
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_exchange.go",
+      "line": 335,
+      "function": "sendExchangeOnce",
+      "kind": "literal_sql",
+      "value": "SELECT revision FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_plan_linux.go",
+      "line": 164,
+      "function": "readAgentIdentityRecordedPlan",
+      "kind": "literal_sql",
+      "value": "SELECT w.revision,w.body,p.generation,p.digest,p.projection_version FROM works w LEFT JOIN agent_identity_plan_heads p ON p.work_id=w.id WHERE w.id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agent_identity_registry_publish.go",
+      "line": 88,
+      "function": "changeAgentIdentityRegistry",
+      "kind": "literal_sql",
+      "value": "SELECT count(*) FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/agents_store.go",
+      "line": 682,
+      "function": "prepareLaunch",
+      "kind": "literal_sql",
+      "value": "SELECT revision,body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/archive.go",
+      "line": 44,
+      "function": "export",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/archive.go",
+      "line": 352,
+      "function": "importBundle",
+      "kind": "literal_sql",
+      "value": "SELECT count(*) FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_requests.go",
+      "line": 154,
+      "function": "automationPolicyTx",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_requests.go",
+      "line": 250,
+      "function": "automationWorkspaceBusyTx",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/automation_schedule.go",
+      "line": 662,
+      "function": "recoverAutomationRequestCausally",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft.go",
+      "line": 214,
+      "function": "saveGraphDraft",
+      "kind": "literal_sql",
+      "value": "SELECT revision FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft.go",
+      "line": 455,
+      "function": "previewGraphDraft",
+      "kind": "literal_sql",
+      "value": "SELECT revision,body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/graph_draft.go",
+      "line": 541,
+      "function": "applyGraphDraft",
+      "kind": "literal_sql",
+      "value": "SELECT revision,body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+      "line": 113,
+      "function": "lifecycleMissions",
+      "kind": "literal_sql",
+      "value": "SELECT w.id,w.body,w.revision,l.archived_at\n\t\tFROM works w LEFT JOIN mission_lifecycle l ON l.work_id=w.id\n\t\tORDER BY w.rowid DESC"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+      "line": 421,
+      "function": "checkLifecycleCurrent",
+      "kind": "literal_sql",
+      "value": "SELECT revision FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+      "line": 766,
+      "function": "applyRestore",
+      "kind": "literal_sql",
+      "value": "SELECT count(*) FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/lifecycle.go",
+      "line": 778,
+      "function": "applyRestore",
+      "kind": "literal_sql",
+      "value": "SELECT revision FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_settlement_authorization.go",
+      "line": 65,
+      "function": "managedSettlementLiveAuthority",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/memory_summary_source.go",
+      "line": 53,
+      "function": "memorySummarySource",
+      "kind": "literal_sql",
+      "value": "SELECT revision,body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/memory_work.go",
+      "line": 42,
+      "function": "memoryWork",
+      "kind": "literal_sql",
+      "value": "SELECT id,revision,body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/memory_work.go",
+      "line": 48,
+      "function": "memoryWorks",
+      "kind": "literal_sql",
+      "value": "SELECT id,revision,body FROM works ORDER BY rowid DESC"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/organization.go",
+      "line": 124,
+      "function": "organizationGuardTx",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/planning.go",
+      "line": 1003,
+      "function": "revokePlanningTx",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/prephase_conversion.go",
+      "line": 143,
+      "function": "convertPreparation",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/prephase_store.go",
+      "line": 182,
+      "function": "preparationCommand",
+      "kind": "literal_sql",
+      "value": "SELECT id FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/project_memory.go",
+      "line": 441,
+      "function": "memoryLegacyPaths",
+      "kind": "literal_sql",
+      "value": "SELECT id,revision,body FROM works"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go",
+      "line": 544,
+      "function": "get",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go",
+      "line": 552,
+      "function": "list",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works ORDER BY rowid DESC"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go",
+      "line": 656,
+      "function": "mutateWithHookOnce",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/store.go",
+      "line": 673,
+      "function": "mutateWithHookOnce",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/worker_recovery_focus.go",
+      "line": 33,
+      "function": "recoveryTaskFocus",
+      "kind": "literal_sql",
+      "value": "SELECT body FROM works WHERE id=?"
+    },
+    {
+      "file": "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/workspace_coordination.go",
+      "line": 422,
+      "function": "integrateWorkspace",
+      "kind": "literal_sql",
+      "value": "SELECT revision FROM works WHERE id=?"
+    }
+  ]
+}

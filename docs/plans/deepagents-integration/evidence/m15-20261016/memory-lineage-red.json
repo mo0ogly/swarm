@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueRestoreMemoryDeselectionCannotForgetHistory|TestProjectMemoryDialogueInheritedUseAndWithdrawal)$",
+    "-count=1",
+    "-v",
+    "-timeout=90s"
+  ],
+  "started_at_utc": "2026-10-16T18:17:06.742563+00:00",
+  "duration_seconds": 97.361,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestDialogueRestoreMemoryDeselectionCannotForgetHistory",
+    "TestProjectMemoryDialogueInheritedUseAndWithdrawal"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "0e2a86bd567076d4a1837c055d4155f85a29d4f4ecb999055214a0be1ab8d70e",
+  "real_model_calls": 0
+}

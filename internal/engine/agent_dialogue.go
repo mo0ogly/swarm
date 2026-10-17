@@ -32,12 +32,15 @@ func dialogueProvider(p Provider) error {
 	}
 	return nil
 }
+func validDialogueSession(session string) bool {
+	return preparationKey(session) && !strings.HasPrefix(session, "-")
+}
 func dialogueResumeArgs(a Agent, session string) ([]string, error) {
 	args := append([]string{}, a.Args...)
 	if session == "" {
 		return args, nil
 	}
-	if !preparationKey(session) || strings.HasPrefix(session, "-") {
+	if !validDialogueSession(session) {
 		return nil, fmt.Errorf("Identité de session fournisseur invalide")
 	}
 	switch filepath.Base(a.Command) {
@@ -91,8 +94,16 @@ func (s *Store) runAgentDialogue(id string) error {
 	input := bufio.NewScanner(os.Stdin)
 	input.Buffer(make([]byte, 4096), 16001)
 	session := ""
+	priorTurns := 0
+	if a.DialogueRestore != nil {
+		c, _, err := s.loadDialogueRestore(a)
+		if err != nil {
+			return err
+		}
+		session, priorTurns = c.Session, a.DialogueRestore.PriorTurns
+	}
 	question := a.Prompt
-	for turn := 0; turn < 20; turn++ {
+	for turn := 0; turn+priorTurns < 20; turn++ {
 		if turn > 0 {
 			fmt.Fprint(os.Stdout, "\nVous > ")
 			if !input.Scan() {
@@ -107,7 +118,8 @@ func (s *Store) runAgentDialogue(id string) error {
 				continue
 			}
 		}
-		args, err := dialogueResumeArgs(a, session)
+		previousSession := session
+		args, err := dialogueResumeArgs(a, previousSession)
 		if err != nil {
 			return err
 		}
@@ -166,7 +178,7 @@ func (s *Store) runAgentDialogue(id string) error {
 				candidate, _ = d["session_id"].(string)
 			}
 			if candidate != "" {
-				if !preparationKey(candidate) || strings.HasPrefix(candidate, "-") || (observed != "" && candidate != observed || session != "" && candidate != session) {
+				if !validDialogueSession(candidate) || (observed != "" && candidate != observed || session != "" && candidate != session) {
 					parseErr = fmt.Errorf("Identité de session fournisseur modifiée")
 					break
 				}
@@ -197,11 +209,19 @@ func (s *Store) runAgentDialogue(id string) error {
 			return fmt.Errorf("Aucune identité de conversation reçue ; reprise refusée")
 		}
 		session = observed
-		if _, e = s.db.Exec("UPDATE agent_dialogue_turns SET status='answered',session_id=? WHERE id=?", session, turnID); e != nil {
+		if e = enc.Encode(dialogueEvent{Kind: "end", Turn: turnID, Data: map[string]any{"session_id": session}}); e != nil {
 			return e
 		}
-		if e = enc.Encode(dialogueEvent{Kind: "end", Turn: turnID}); e != nil {
-			return e
+		if _, e = io.ReadFull(authorization, ack[:]); e != nil || ack[0] != 1 {
+			return fmt.Errorf("Le superviseur refuse la confirmation de fin ; tour non répondu")
+		}
+		result, err := s.db.Exec("UPDATE agent_dialogue_turns SET status='answered',session_id=? WHERE id=? AND agent_id=? AND status='running' AND session_id=?", session, turnID, a.ID, previousSession)
+		if err != nil {
+			return err
+		}
+		updated, err := result.RowsAffected()
+		if err != nil || updated != 1 {
+			return fmt.Errorf("Trace de dialogue modifiée ; réponse non enregistrée")
 		}
 	}
 	return fmt.Errorf("Limite de 20 échanges atteinte")
@@ -210,17 +230,24 @@ func (s *Store) runAgentDialogue(id string) error {
 // One sink and one guard for the entire attempt. Namespace tool ids per turn:
 // Codex can reuse item_0 on each exec resume.
 type dialogueMonitor struct {
-	authorize io.Writer
-	mu        sync.Mutex
-	sink      *outputSink
-	active    bool
-	turn      string
-	usage     *Usage
-	failure   string
+	agent        Agent
+	authorize    io.Writer
+	mu           sync.Mutex
+	sink         *outputSink
+	active       bool
+	turn         string
+	usage        *Usage
+	runUsage     *Usage
+	baseProgress *AgentProgress
+	failure      string
+	provider     string
+	session      string
+	seenTurns    map[string]bool
+	outcome      dialogueTurnOutcome
 }
 
 func newDialogueMonitor(s *Store, a Agent) *dialogueMonitor {
-	return &dialogueMonitor{sink: &outputSink{s: s, id: a.ID, guard: newLoopGuard(a.Limits), capture: a.Capture}}
+	return &dialogueMonitor{agent: a, provider: filepath.Base(a.Command), seenTurns: map[string]bool{}, sink: &outputSink{s: s, id: a.ID, provider: a.Provider, guard: newLoopGuard(a.Limits), capture: a.Capture}}
 }
 func namespaceDialogueTools(d map[string]any, prefix string) {
 	if item, ok := d["item"].(map[string]any); ok {
@@ -254,27 +281,22 @@ func (m *dialogueMonitor) consume(r io.Reader) {
 			m.mu.Unlock()
 			return
 		}
+		acknowledge, allowed, checkpoint := false, false, false
 		switch event.Kind {
 		case "start":
+			acknowledge = true
 			desired, err := m.sink.s.desired(m.sink.id)
-			allowed := !m.active && m.failure == "" && m.sink.guard.reason == "" && err == nil && desired != "stop"
-			if m.authorize != nil {
-				ack := byte(0)
-				if allowed {
-					ack = 1
-				}
-				if _, err = m.authorize.Write([]byte{ack}); err != nil {
-					m.failure = "Canal d’autorisation indisponible"
-					allowed = false
-				}
-			}
+			allowed = !m.active && !m.seenTurns[event.Turn] && m.failure == "" && m.sink.guard.reason == "" && err == nil && desired != "stop"
 			if !allowed {
 				if m.failure == "" {
 					m.failure = "Nouvel échange refusé : arrêt demandé ou limite atteinte"
 				}
 			} else {
+				checkpoint = true
 				m.active = true
 				m.turn = event.Turn
+				m.seenTurns[event.Turn] = true
+				m.outcome = dialogueTurnOutcome{provider: m.provider}
 				m.sink.guard.lastOutput = time.Now()
 				m.sink.usage = nil
 			}
@@ -282,31 +304,52 @@ func (m *dialogueMonitor) consume(r io.Reader) {
 			if !m.active || m.turn != event.Turn {
 				m.failure = "Événement hors échange"
 			} else {
+				m.outcome.observe(event.Data)
+				if m.failure == "" && m.outcome.failure != "" {
+					m.failure = m.outcome.failure
+				}
 				if event.Data["type"] == "item.started" || event.Data["type"] == "item.completed" {
 					if item, ok := event.Data["item"].(map[string]any); ok {
 						switch item["type"] {
 						case "command_execution", "mcp_tool_call", "agent_message", "reasoning", "todo_list", "file_change", "web_search":
 						default:
-							m.failure = "Type d’activité fournisseur non pris en charge ; dialogue arrêté"
+							if m.failure == "" {
+								m.failure = "Type d’activité fournisseur non pris en charge ; dialogue arrêté"
+							}
 						}
 					}
 				}
 				namespaceDialogueTools(event.Data, event.Turn)
 				b, _ := json.Marshal(event.Data)
+				m.sink.mu.Lock()
 				m.sink.line(b)
+				m.sink.mu.Unlock()
 				m.sink.guard.lastOutput = time.Now()
-				if m.sink.guard.degraded != "" {
+				if m.failure == "" && m.sink.guard.degraded != "" {
 					m.failure = "Visibilité des outils perdue"
 				}
 			}
 		case "end":
+			acknowledge = true
 			if !m.active || m.turn != event.Turn {
 				m.failure = "Fin d’échange incohérente"
 			} else {
+				checkpoint = true
 				m.active = false
 				m.addUsage()
-				if len(m.sink.guard.pending) > 0 && m.sink.guard.reason == "" {
+				if m.failure == "" && len(m.sink.guard.pending) > 0 {
 					m.failure = "Résultats d’outils manquants ; reprise refusée"
+				}
+				if m.failure == "" && m.sink.guard.reason != "" {
+					m.failure = m.sink.guard.reason
+				}
+				session, _ := event.Data["session_id"].(string)
+				if m.failure == "" {
+					m.failure = m.outcome.confirmation(session, m.session)
+				}
+				allowed = m.failure == ""
+				if allowed {
+					m.session = session
 				}
 			}
 		default:
@@ -315,12 +358,32 @@ func (m *dialogueMonitor) consume(r io.Reader) {
 		if err := m.sink.persist(); err != nil {
 			m.failure = "Persistance du dialogue indisponible"
 		}
+		if checkpoint {
+			if err := m.persistCheckpoint(); err != nil {
+				m.failure = "Persistance de l’état du dialogue indisponible"
+			}
+		}
+		if acknowledge && m.authorize != nil {
+			ack := byte(0)
+			if allowed && m.failure == "" {
+				ack = 1
+			}
+			if n, err := m.authorize.Write([]byte{ack}); err != nil || n != 1 {
+				m.failure = "Canal d’autorisation indisponible"
+			}
+		}
 		m.mu.Unlock()
 	}
 	m.mu.Lock()
 	if m.active {
 		m.addUsage()
 		m.active = false
+		if m.failure == "" {
+			m.failure = "Canal fermé avant confirmation de fin ; tour interrompu"
+		}
+		if err := m.persistCheckpoint(); err != nil {
+			m.failure = "Persistance de l’état du dialogue indisponible"
+		}
 	}
 	m.mu.Unlock()
 	if scan.Err() != nil {
@@ -334,36 +397,16 @@ func (m *dialogueMonitor) addUsage() {
 	if u == nil {
 		return
 	}
-	if m.usage == nil {
-		m.usage = &Usage{Source: "Événements fournisseur du dialogue", Scope: "Somme des usages rapportés par échange ; couverture partielle si un échange n’en fournit pas"}
-	}
-	for _, pair := range []struct {
-		dst **int64
-		src *int64
-	}{{&m.usage.CacheRead, u.CacheRead}, {&m.usage.CacheCreation, u.CacheCreation}, {&m.usage.CachedInput, u.CachedInput}} {
-		if pair.src != nil {
-			if *pair.dst == nil {
-				v := int64(0)
-				*pair.dst = &v
-			}
-			**pair.dst += *pair.src
-		}
-	}
-	m.usage.Input += u.Input
-	m.usage.Output += u.Output
-	m.usage.At = u.At
-	if u.ReportedCost != nil {
-		if m.usage.ReportedCost == nil {
-			n := 0.0
-			m.usage.ReportedCost = &n
-		}
-		*m.usage.ReportedCost += *u.ReportedCost
-	}
+	m.usage = addDialogueUsage(m.usage, u)
+	m.runUsage = addDialogueUsage(m.runUsage, u)
 	m.sink.usage = nil
 }
 func (m *dialogueMonitor) snapshot() (AgentProgress, *Usage, string, string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	return m.snapshotLocked()
+}
+func (m *dialogueMonitor) snapshotLocked() (AgentProgress, *Usage, string, string) {
 	reason := m.failure
 	if reason == "" {
 		reason = m.sink.guard.reason
@@ -375,20 +418,5 @@ func (m *dialogueMonitor) snapshot() (AgentProgress, *Usage, string, string) {
 	if m.active {
 		activity = "Échange fournisseur en cours"
 	}
-	var usage *Usage
-	if m.usage != nil {
-		u := *m.usage
-		for _, dst := range []**int64{&u.CacheRead, &u.CacheCreation, &u.CachedInput} {
-			if *dst != nil {
-				n := **dst
-				*dst = &n
-			}
-		}
-		if u.ReportedCost != nil {
-			n := *u.ReportedCost
-			u.ReportedCost = &n
-		}
-		usage = &u
-	}
-	return m.sink.guard.summary(), usage, reason, activity
+	return m.sink.guard.summary(), cloneDialogueUsage(m.usage), reason, activity
 }

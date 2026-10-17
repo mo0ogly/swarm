@@ -57,10 +57,23 @@ func (s *Store) observeRun(a Agent) (string, error) {
 			break
 		}
 	}
+	ordinaryErrors := 0
+	for _, item := range a.Diagnostic.Items {
+		if item.Category != "environment" && item.Category != "limit" {
+			ordinaryErrors += item.Count
+		}
+	}
+	if ordinaryErrors > 0 {
+		diagnostic := a.Diagnostic
+		observations = append(observations, RunObservation{Agent: a.ID, Trigger: "tool_failure", Progress: a.Progress, Diagnostic: &diagnostic})
+	}
 	for _, observation := range observations {
 		id := planningEventID("run-observation", a.ID, a.Attempt, observation.Trigger)
 		if observation.Trigger == "infrastructure" {
 			id = planningEventID("run-observation", a.ID, a.Attempt, observation.Trigger, fmt.Sprint(infrastructureErrorCount(*observation.Diagnostic)))
+		}
+		if observation.Trigger == "tool_failure" {
+			id = planningEventID("run-observation", a.ID, a.Attempt, observation.Trigger, fmt.Sprint(ordinaryErrors))
 		}
 		exists := false
 		for _, event := range w.Planning.Inbox {
@@ -75,6 +88,9 @@ func (s *Store) observeRun(a Agent) (string, error) {
 		message := "Seuil de durée observé ; processus actif, décision du responsable requise. Aucune preuve de fin ou de non-progrès."
 		if observation.Trigger == "infrastructure" {
 			message = "Incident d’environnement transmis au superviseur ; résultat conservé, décision de conduite requise. Les détails techniques sont disponibles dans la console."
+		}
+		if observation.Trigger == "tool_failure" {
+			message = "Échec d’outil transmis au responsable de la tentative ; diagnostiquer la cause et vérifier toute correction avant reprise. Ce constat ne valide aucun critère."
 		}
 		raw, _ := json.Marshal(observation)
 		w, err = s.mutate(a.WorkID, "planning.run-observation", id, w.Revision, raw, func(current *Work) error {

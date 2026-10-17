@@ -45,6 +45,13 @@ translation. Common work mutations require `schema_version: 1`, a unique
 Preparation has a distinct `version: 1` envelope; see its dedicated guide.
 Dates are UTC. Identifiers use ASCII letters, digits, `_` and `-`.
 
+Shared persisted work readers check the SQL key, positive revision and schema 1
+UTF-8/JSON body together. `work show`, `work list` and the HTTP list reject
+inconsistency with an error and no partial result. Common mutation and replay
+apply the same guard before their callbacks. Consistency proves no author or
+rights and does not cover every explicit SQL reader; see the
+[Work row contract](WORK-ROW-CONTRACT.md).
+
 ```json
 {
   "schema_version": 1,

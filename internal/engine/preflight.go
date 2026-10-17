@@ -220,11 +220,21 @@ func (s *Store) runProviderPreflight(provider string, p Provider, cwd string, la
 			if err = json.Unmarshal([]byte(strings.TrimSpace(output.b.String())), &receipt); err != nil || receipt.Schema != 1 {
 				return preflightFailure(result, "intervention", "provider_context", "reçu structuré de l’adaptateur absent ou invalide", started)
 			}
-			for _, capability := range requiredProviderCapabilities {
+			capabilities := append([]string{}, requiredProviderCapabilities...)
+			for _, capability := range p.PreflightCaps {
+				if !safeName(capability) {
+					return preflightFailure(result, "intervention", "provider_context", "identifiant de capacité invalide", started)
+				}
+				if !containsString(capabilities, capability) {
+					capabilities = append(capabilities, capability)
+				}
+			}
+			for _, capability := range capabilities {
 				if !declared[capability] {
 					return preflightFailure(result, "intervention", "provider_context", "adaptateur incomplet : capacité requise non démontrée : "+capability, started)
 				}
 				if receipt.Capabilities[capability] != "verified" {
+					result.Capabilities[capability] = "unverified"
 					return preflightFailure(result, "intervention", "provider_context", "reçu adaptateur incomplet : capacité requise non vérifiée : "+capability, started)
 				}
 				result.Capabilities[capability] = "verified"

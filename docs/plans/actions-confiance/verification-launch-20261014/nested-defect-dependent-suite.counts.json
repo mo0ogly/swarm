@@ -1,0 +1,12 @@
+{
+  "passed_main": 107,
+  "passed_subcases": 164,
+  "failed_main": [
+    "TestManagedFragmentResumePreservesUnknownQuestions",
+    "TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift"
+  ],
+  "failed_subcases": [
+    "TestManagedFragmentTokenStoreRuntimeAndCapabilityDrift/fresh-capacity"
+  ],
+  "exit_code": 1
+}

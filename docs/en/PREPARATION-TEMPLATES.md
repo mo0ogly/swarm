@@ -44,6 +44,14 @@ merge is preauthorised.
 The catalogue contains four general structures and six embedded subjects. Importing, editing and
 saving custom templates are not yet available.
 
+## Configure a team after creating tasks
+
+In the CLI, a preparation whose tasks remain launch-held can receive its organisation through `prepare create-missions ID --input request.json`. The request preserves the current plan, task identities and evidence, and adds `organization` to the existing contract with `version`, `action`, a unique `event_id`, `expected_revision`, `preparation_id`, `sha256` and `expected_work_revision`. Read the preparation and work again before constructing this request.
+
+The engine requires a fresh validated plan, a work definition matching its brief without a pre-existing launch profile, unchanged tasks and no prior attempt. Invalid organisation, missing locks and implicit historical adoption are rejected without partial mutation. This operation cannot replace an organisation already applied; use the dedicated configuration operations. Replay applies only to the same event_id; a new creation without an organisation, an identical revision or an already authorised release is explicitly rejected. Replaying the same event_id returns its receipt; a new configuration request is rejected, even with the same organisation.
+
+`create-missions` keeps launch locks. A first configuration through `authorize-plan` can also release them; for an already configured team, use `release-plan`. These operations start no provider: actual launch still requires the profile, controls, budgets, review and `mission start`.
+
 ## Guided preparation and proposed team
 
 Each template has eight questions: outcome or reproducible defect, audience,

@@ -15,6 +15,9 @@ func finalBundleFixture(t *testing.T) (managedReviewContext, managedReviewFragme
 	if e != nil {
 		t.Fatal(e)
 	}
+	for i := range p.Packets {
+		p.Packets[i].FindingContractVersion = 1
+	}
 	replies := []string{}
 	for _, packet := range p.Packets {
 		raw, _ := json.Marshal(packet)

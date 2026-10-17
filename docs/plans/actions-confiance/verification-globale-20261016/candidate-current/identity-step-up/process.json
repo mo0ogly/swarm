@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "node",
+    "tests/actions_confiance_step_up_ui.cjs",
+    "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-secret-data-qualified",
+    "docs/plans/actions-confiance/verification-globale-20261016/candidate-current/identity-step-up"
+  ],
+  "pid": 4092691,
+  "start_ticks": "6295371",
+  "started_unix": 1792128529.5661488,
+  "binary_sha256": "7de055bcfff8b030828aab87b7ed8744a1a1cffeee2d32f458098e1105da0e79",
+  "status": "passed",
+  "exit_code": 0,
+  "ended_unix": 1792128546.2878342,
+  "checks": 20,
+  "report_sha256": "d44e0474c2f70938b6c3421fbf6a1242acc73e89a5a89885b160ba9c6f4ff100"
+}

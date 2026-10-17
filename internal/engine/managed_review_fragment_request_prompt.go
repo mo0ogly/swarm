@@ -7,8 +7,10 @@ import (
 	"fmt"
 )
 
+const managedFragmentFinalProtocolVersion = 5
+
 func managedFragmentRequestPrompt(prefix string, c managedReviewContext, p managedReviewFragmentPlan, replies []string) (string, error) {
-	return managedFragmentRequestPromptVersion(prefix, c, p, replies, 3)
+	return managedFragmentRequestPromptVersion(prefix, c, p, replies, managedFragmentFinalProtocolVersion)
 }
 
 func managedFragmentRequestPromptVersion(prefix string, c managedReviewContext, p managedReviewFragmentPlan, replies []string, version int) (string, error) {
@@ -19,28 +21,32 @@ func managedFragmentRequestPromptVersion(prefix string, c managedReviewContext, 
 	return renderManagedFragmentRequestVersion(prefix, c, p, b, version)
 }
 func renderManagedFragmentRequest(prefix string, c managedReviewContext, p managedReviewFragmentPlan, b managedFragmentFinalEvidence) (string, error) {
-	return renderManagedFragmentRequestVersion(prefix, c, p, b, 3)
+	return renderManagedFragmentRequestVersion(prefix, c, p, b, managedFragmentFinalProtocolVersion)
 }
 
 func renderManagedFragmentRequestVersion(prefix string, c managedReviewContext, p managedReviewFragmentPlan, b managedFragmentFinalEvidence, version int) (string, error) {
-	if version != 1 && version != 2 && version != 3 {
+	if version < 1 || version > managedFragmentFinalProtocolVersion {
 		return "", fmt.Errorf("version de sélection finale inconnue")
 	}
 	// Partial replies are now immutable and validated. Measure their actual full
 	// encoding (including unresolved needs), rather than retaining reserves for
 	// hypothetical future findings/defects. Preflight still checks the maximal
 	// shape before the first paid inspection; final transport is checked again.
-	actualPrompt, _, actualErr := renderManagedFragmentDecision(prefix, c, b, nil)
+	actualPrompt, visible, actualErr := renderManagedFragmentDecision(prefix, c, b, nil)
 	if actualErr != nil {
 		return "", actualErr
 	}
-	room, err := fragmentInputRoom(p.InputBudget, actualPrompt, fragmentDecisionSchema(b))
+	schema, err := managedFragmentDecisionSchema(c, b, visible)
+	if err != nil {
+		return "", err
+	}
+	room, err := fragmentInputRoom(p.InputBudget, actualPrompt, schema)
 	if err != nil {
 		return "", err
 	}
 	tokenRoom := 0
-	if version == 3 && p.InputBudget != nil {
-		measured, err := p.InputBudget.measure(actualPrompt, fragmentDecisionSchema(b))
+	if version >= 3 && p.InputBudget != nil {
+		measured, err := p.InputBudget.measure(actualPrompt, schema)
 		if err != nil {
 			return "", err
 		}
@@ -63,14 +69,39 @@ func renderManagedFragmentRequestVersion(prefix string, c managedReviewContext, 
 	metadata := c
 	metadata.Diff = ""
 	metadata.Sources = nil
+	var suppliedOriginals []managedFragmentEvidenceRef
+	var metadataOriginal string
+	if version >= 4 {
+		raw, err := json.Marshal(metadata)
+		if err != nil {
+			return "", err
+		}
+		metadataOriginal = string(raw)
+	}
 	// Each cost includes the artifact and its reference, as encoded in the exact
 	// selection object. Add commas separately for arrays with multiple entries.
 	costs := [][]int{}
 	for i, packet := range p.Packets {
 		for j, a := range packet.Artifacts {
+			if version >= 4 && a.Kind == "context" && a.Content == metadataOriginal && a.Digest == hash([]byte(a.Content)) {
+				suppliedOriginals = append(suppliedOriginals, managedFragmentEvidenceRef{i, j, a.Digest})
+				continue
+			}
 			ar, _ := json.Marshal(a)
 			ref, _ := json.Marshal(managedFragmentEvidenceRef{i, j, a.Digest})
 			row := []int{i, j, len(ar) + len(ref) + 2}
+			if c.CitationContractVersion == 2 {
+				bytes, tokens, err := managedReferencedArtifactCost(prefix, c, b, a, actualPrompt, schema)
+				if err != nil {
+					return "", err
+				}
+				row[2] = bytes + len(ref) + 2
+				if tokenRoom > 0 {
+					row = append(row, tokens+len(ref)+2)
+				}
+				costs = append(costs, row)
+				continue
+			}
 			if tokenRoom > 0 {
 				// Reused byte-only originals did not pass a tokenized inspection.
 				// Apply the same UTF-8/lexical/memory guards before any codec count.
@@ -87,7 +118,7 @@ func renderManagedFragmentRequestVersion(prefix string, c managedReviewContext, 
 	overhead, _ := json.Marshal(empty)
 	columns := []string{"packet", "artifact", "encoded_bytes_including_reference_and_commas"}
 	fixedTokens := 0
-	if version == 3 && p.InputBudget != nil {
+	if version >= 3 && p.InputBudget != nil {
 		if tokenRoom <= 0 {
 			return "", fmt.Errorf("aucune capacité en tokens pour les preuves finales")
 		}
@@ -106,7 +137,8 @@ func renderManagedFragmentRequestVersion(prefix string, c managedReviewContext, 
 		Costs                [][]int                       `json:"cost_rows"`
 		SelectionTokens      int                           `json:"selection_tokens_limit,omitempty"`
 		SelectionFixedTokens int                           `json:"selection_fixed_tokens,omitempty"`
-	}{metadata, compactManagedFragmentFinalEvidence(b), room, len(overhead), columns, costs, tokenRoom, fixedTokens}
+		SuppliedOriginals    []managedFragmentEvidenceRef  `json:"already_supplied_originals,omitempty"`
+	}{metadata, compactManagedFragmentFinalEvidence(b), room, len(overhead), columns, costs, tokenRoom, fixedTokens, suppliedOriginals}
 	raw, err := json.Marshal(payload)
 	if err != nil {
 		return "", err
@@ -117,14 +149,31 @@ Examine les contrats, contrôles et inspections partielles. rows suit la légend
 	if version == 3 {
 		instructions += "Protocole de sélection version3 : limites distinctes, contrôle exact du message final.\n"
 	}
+	if version >= 4 && c.CitationContractVersion != 2 {
+		instructions += "Protocole de sélection version4 : already_supplied_originals identifie les pièces originales dont le contenu intégral est déjà fourni, octet pour octet, dans task_contracts_reports_controls. Le moteur a vérifié leur empreinte et cette égalité. Ces pièces sont exclues de cost_rows : ne pas les redemander dans references. Leurs rapports, contrats et sorties de contrôles ne sont ni des extraits ni des résumés et restent visibles dans le message de décision finale. Sélectionner tous les autres originaux nécessaires ; si un original réellement absent est indispensable, conserver unknown. Cette identité de transport ne démontre aucun critère.\n"
+	}
+	if c.CitationContractVersion == 2 {
+		instructions += "already_supplied_originals désigne le contexte intégral visible dans cette sélection ; ne pas le redemander. Dans la décision, ses contrats, rapports et contrôles sont fournis sans perte par les métadonnées attribuées et citation_catalog, avec les sorties originales partagées. Cela ne démontre aucun critère. cost_rows mesure cet encodage et son schéma pour les autres pièces entières ; sélectionner toutes celles nécessaires. Aucun verdict n’est demandé dans cette sélection.\n"
+	}
+	if version >= 5 {
+		instructions += "Protocole de sélection version5 : le schéma lie chaque référence autorisée à ses index et à son empreinte exacte ; choisir ces valeurs dans l’inventaire, sans recalculer ni corriger une empreinte. Le parseur vérifie toujours identités, associations et capacité.\n"
+	}
 	if tokenRoom > 0 {
 		instructions += "Les octets et les tokens sont deux limites distinctes : respecter aussi selection_tokens_limit avec la somme des coûts en tokens et selection_fixed_tokens. Le moteur compte à nouveau le message final complet avant tout appel.\n"
 	}
 	if len(b.Questions) > 0 {
 		instructions += "Les unresolved_questions sont des obligations non résolues : sélectionner les pièces nécessaires pour répondre à chacune, ou retourner unknown. Aucune réserve ne peut être omise.\n"
 	}
-	prompt := prefix + "\n" + instructions + "\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n" + string(raw)
-	if err := fragmentInputFits(p.InputBudget, prompt, managedFragmentRequestSchema); err != nil {
+	selectionPrefix := prefix
+	if c.CitationContractVersion == 1 || c.InspectionScopeVersion == 1 || (c.Baseline != nil && c.Baseline.Version == managedReviewBaselineContractVersion) {
+		selectionContext := c
+		if c.CitationContractVersion == 2 {
+			selectionContext.CitationContractVersion = 0
+		}
+		selectionPrefix = incrementalReviewPrefix(prefix, selectionContext)
+	}
+	prompt := selectionPrefix + "\n" + instructions + "\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n" + string(raw)
+	if err := fragmentInputFits(p.InputBudget, prompt, managedFragmentSelectionSchema(p, version)); err != nil {
 		return "", fmt.Errorf("demande finale trop grande avant appel ; aucune preuve tronquée")
 	}
 	return prompt, nil

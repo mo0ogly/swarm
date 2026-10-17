@@ -2,10 +2,23 @@ package engine
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
 )
 
 const reviewFragmentProtocolError = "review_fragment_protocol"
+const reviewFragmentInterruptedError = "review_fragment_interrupted"
+
+func reviewResponseProtocolError(err error) error {
+	if err == nil {
+		return nil
+	}
+	var existing *CommandError
+	if errors.As(err, &existing) && existing.Code == reviewFragmentProtocolError {
+		return err
+	}
+	return &CommandError{Code: reviewFragmentProtocolError, Message: err.Error()}
+}
 
 func reviewPlanningEventID(r *IndependentReview) string {
 	if r.ResultEvent != "" {
@@ -28,7 +41,7 @@ func currentReviewProtocolFailure(t *Task) bool {
 		return false
 	}
 	if r.FailureCode != "" {
-		return r.FailureCode == reviewFragmentProtocolError
+		return r.FailureCode == reviewFragmentProtocolError || r.FailureCode == reviewFragmentInterruptedError
 	}
 	// Compatibility with immutable records written before failure_code existed.
 	return r.FragmentJournal != nil && strings.HasPrefix(r.Reason, "inspection de fragment : ")
@@ -56,7 +69,11 @@ func planningReviewFailureRouting(w Work, events []PlanningEvent) map[string]rev
 			continue
 		}
 		r := t.IndependentReview
-		result[t.ID] = reviewFailureRouting{ResultEvent: event.ID, Review: r.ID, Attempt: r.Attempt, Candidate: r.CandidateSHA, Code: reviewFragmentProtocolError, Owner: "reviewer_protocol", Operation: "review-retry", ProducerCorrection: false}
+		code, owner := reviewFragmentProtocolError, "reviewer_protocol"
+		if r.FailureCode == reviewFragmentInterruptedError {
+			code, owner = reviewFragmentInterruptedError, "reviewer_runtime"
+		}
+		result[t.ID] = reviewFailureRouting{ResultEvent: event.ID, Review: r.ID, Attempt: r.Attempt, Candidate: r.CandidateSHA, Code: code, Owner: owner, Operation: "review-retry", ProducerCorrection: false}
 	}
 	return result
 }

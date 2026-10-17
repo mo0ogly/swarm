@@ -1,0 +1,400 @@
+// Package enrollmentstate stores signed, project-bound enrollment events. Its
+// records are opaque: an active record is not a business permission. Callers
+// must protect the root key and supply an independently retained current Head.
+// SQLite serialization is local; a signed reply can become stale before use.
+package enrollmentstate
+
+import (
+	"bytes"
+	"context"
+	"crypto/ed25519"
+	"crypto/sha256"
+	"database/sql"
+	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"math"
+	"net/url"
+	"path/filepath"
+
+	_ "modernc.org/sqlite"
+	"swarm.local/companion/internal/enrollmentproof"
+)
+
+const protocol = "swarm-enrollment-change-v1"
+
+var (
+	ErrContext = errors.New("enrollment state: pinned authority or project mismatch")
+	ErrHead    = errors.New("enrollment state: trusted head does not match history")
+	ErrChange  = errors.New("enrollment state: invalid signed change or history")
+	ErrExists  = errors.New("enrollment state: identifier already enrolled")
+	ErrMissing = errors.New("enrollment state: identifier not enrolled")
+	ErrRevoked = errors.New("enrollment state: identifier revoked")
+)
+
+// Head is a trusted controller checkpoint, not authority obtained from an
+// imported database or an agent. Zero is only the explicit genesis checkpoint.
+type Head struct {
+	Sequence int64  `json:"sequence"`
+	Digest   string `json:"digest"`
+}
+
+type Record struct {
+	ID               string `json:"id"`
+	Body             []byte `json:"body"`
+	EnrolledSequence int64  `json:"enrolled_sequence"`
+}
+
+type change struct {
+	Protocol  string `json:"protocol"`
+	Authority string `json:"authority_key_id"`
+	Project   string `json:"project_digest"`
+	Sequence  int64  `json:"sequence"`
+	Previous  string `json:"previous"`
+	Operation string `json:"operation"`
+	ID        string `json:"id"`
+	Body      string `json:"body"`
+	Signature string `json:"signature"`
+}
+
+type entry struct {
+	record  Record
+	revoked bool
+}
+
+// Journal owns no private signing key. Open does not establish an OS boundary.
+type Journal struct {
+	db      *sql.DB
+	key     ed25519.PublicKey
+	keyID   string
+	project string
+}
+
+func digest(raw []byte) string {
+	sum := sha256.Sum256(raw)
+	return hex.EncodeToString(sum[:])
+}
+
+func validDigest(s string) bool {
+	b, err := hex.DecodeString(s)
+	return err == nil && len(b) == sha256.Size && hex.EncodeToString(b) == s
+}
+
+func validHead(h Head) bool {
+	return h.Sequence == 0 && h.Digest == "" || h.Sequence > 0 && validDigest(h.Digest)
+}
+
+func signedBytes(c change) []byte {
+	c.Signature = ""
+	raw, _ := json.Marshal(c)
+	return append([]byte(protocol+"\x00change\x00"), raw...)
+}
+
+func validChange(c change) bool {
+	if c.Protocol != protocol || !validDigest(c.Authority) || !validDigest(c.Project) || c.Sequence <= 0 ||
+		!validHead(Head{c.Sequence - 1, c.Previous}) || !validEnrollmentID(c.ID) {
+		return false
+	}
+	body, err := base64.RawURLEncoding.Strict().DecodeString(c.Body)
+	return err == nil && base64.RawURLEncoding.EncodeToString(body) == c.Body &&
+		(c.Operation == "enroll" || c.Operation == "revoke" && c.Body == "")
+}
+
+// SignChange signs a proposal, never enrollment acceptance. base must come from
+// the trusted checkpoint. Sequence overflow is a storage representation error.
+func SignChange(key ed25519.PrivateKey, project [sha256.Size]byte, base Head, operation, id string, body []byte) ([]byte, error) {
+	if len(key) != ed25519.PrivateKeySize || !validHead(base) || base.Sequence == math.MaxInt64 {
+		return nil, ErrChange
+	}
+	c := change{Protocol: protocol, Authority: digest(key.Public().(ed25519.PublicKey)), Project: hex.EncodeToString(project[:]),
+		Sequence: base.Sequence + 1, Previous: base.Digest, Operation: operation, ID: id, Body: base64.RawURLEncoding.EncodeToString(body)}
+	if !validChange(c) {
+		return nil, ErrChange
+	}
+	c.Signature = base64.RawURLEncoding.EncodeToString(ed25519.Sign(key, signedBytes(c)))
+	return json.Marshal(c)
+}
+
+func (j *Journal) decode(raw []byte) (change, error) {
+	var c change
+	if err := json.Unmarshal(raw, &c); err != nil {
+		return c, ErrChange
+	}
+	canonical, _ := json.Marshal(c)
+	// Exact canonical encoding also rejects duplicate, unknown, folded and null
+	// keys, whitespace and trailing JSON instead of normalizing hostile input.
+	if !bytes.Equal(canonical, raw) || !validChange(c) {
+		return c, ErrChange
+	}
+	if c.Authority != j.keyID || c.Project != j.project {
+		return c, ErrContext
+	}
+	sig, err := base64.RawURLEncoding.Strict().DecodeString(c.Signature)
+	if err != nil || len(sig) != ed25519.SignatureSize || base64.RawURLEncoding.EncodeToString(sig) != c.Signature || !ed25519.Verify(j.key, signedBytes(c), sig) {
+		return c, ErrChange
+	}
+	return c, nil
+}
+
+// Open uses a dedicated SQLite file. Its path and pins must be controlled by
+// the trusted bootstrap. The caller, not Open, persists the independent Head.
+// No busy timeout or automatic retry is installed; contention is an error.
+func Open(ctx context.Context, path string, key ed25519.PublicKey, project [sha256.Size]byte) (*Journal, error) {
+	if len(key) != ed25519.PublicKeySize || path == "" {
+		return nil, ErrContext
+	}
+	absolute, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	dsn := (&url.URL{Scheme: "file", Path: absolute, RawQuery: "_txlock=immediate"}).String()
+	db, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return nil, err
+	}
+	j := &Journal{db: db, key: append(ed25519.PublicKey(nil), key...), keyID: digest(key), project: hex.EncodeToString(project[:])}
+	// WAL prevents transient readers from blocking the reserved writer's COMMIT.
+	// This dedicated local store requires WAL support; never silently fall back.
+	var mode string
+	if err = db.QueryRowContext(ctx, `PRAGMA journal_mode=WAL`).Scan(&mode); err != nil || mode != "wal" {
+		db.Close()
+		if err != nil {
+			return nil, err
+		}
+		return nil, fmt.Errorf("enrollment state: WAL unavailable (%q)", mode)
+	}
+	conn, tx, err := j.begin(ctx)
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+	defer conn.Close()
+	defer tx.Rollback()
+	_, err = tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS enrollment_meta (
+		singleton INTEGER PRIMARY KEY CHECK(singleton=1), schema_version INTEGER NOT NULL,
+		authority_key_id TEXT NOT NULL, project_digest TEXT NOT NULL,
+		sequence INTEGER NOT NULL CHECK(sequence>=0), digest TEXT NOT NULL);
+		CREATE TABLE IF NOT EXISTS enrollment_events (sequence INTEGER PRIMARY KEY CHECK(sequence>0), body BLOB NOT NULL)`)
+	if err == nil {
+		_, err = tx.ExecContext(ctx, `INSERT INTO enrollment_meta(singleton,schema_version,authority_key_id,project_digest,sequence,digest)
+			VALUES(1,1,?,?,0,'') ON CONFLICT(singleton) DO NOTHING`, j.keyID, j.project)
+	}
+	if err == nil {
+		_, _, _, err = j.load(ctx, tx)
+	}
+	if err == nil {
+		err = tx.Commit()
+	}
+	if err != nil {
+		tx.Rollback()
+		conn.Close()
+		db.Close()
+		return nil, err
+	}
+	return j, nil
+}
+
+func (j *Journal) Close() error { return j.db.Close() }
+
+func (j *Journal) begin(ctx context.Context) (*sql.Conn, *sql.Tx, error) {
+	conn, err := j.db.Conn(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	// synchronous is per connection. FULL is durability, not execution policy.
+	if _, err = conn.ExecContext(ctx, `PRAGMA synchronous=FULL`); err != nil {
+		conn.Close()
+		return nil, nil, err
+	}
+	tx, err := conn.BeginTx(ctx, nil)
+	if err != nil {
+		if tx != nil {
+			tx.Rollback()
+		}
+		conn.Close()
+		return nil, nil, err
+	}
+	return conn, tx, nil
+}
+
+func advance(records map[string]entry, c change) error {
+	current, exists := records[c.ID]
+	if c.Operation == "enroll" {
+		if exists {
+			return ErrExists
+		}
+		body, _ := base64.RawURLEncoding.Strict().DecodeString(c.Body)
+		records[c.ID] = entry{record: Record{ID: c.ID, Body: body, EnrolledSequence: c.Sequence}}
+		return nil
+	}
+	if !exists {
+		return ErrMissing
+	}
+	if current.revoked {
+		return ErrRevoked
+	}
+	current.revoked = true
+	records[c.ID] = current
+	return nil
+}
+
+// load validates all rows, including history beyond the declared head. Neither
+// a mutable projection nor SELECT max(sequence) may invent current authority.
+func (j *Journal) load(ctx context.Context, tx *sql.Tx) (Head, map[string]entry, []byte, error) {
+	var declared Head
+	var version int
+	var keyID, project string
+	err := tx.QueryRowContext(ctx, `SELECT schema_version,authority_key_id,project_digest,sequence,digest FROM enrollment_meta WHERE singleton=1`).Scan(&version, &keyID, &project, &declared.Sequence, &declared.Digest)
+	if err != nil {
+		return Head{}, nil, nil, err
+	}
+	if version != 1 || keyID != j.keyID || project != j.project {
+		return Head{}, nil, nil, ErrContext
+	}
+	rows, err := tx.QueryContext(ctx, `SELECT sequence,body FROM enrollment_events ORDER BY sequence`)
+	if err != nil {
+		return Head{}, nil, nil, err
+	}
+	defer rows.Close()
+	var head Head
+	var last []byte
+	records := map[string]entry{}
+	for rows.Next() {
+		var sequence int64
+		var raw []byte
+		if err = rows.Scan(&sequence, &raw); err != nil {
+			return Head{}, nil, nil, err
+		}
+		c, err := j.decode(raw)
+		if err != nil {
+			return Head{}, nil, nil, err
+		}
+		if head.Sequence == math.MaxInt64 || sequence != head.Sequence+1 || c.Sequence != sequence || c.Previous != head.Digest {
+			return Head{}, nil, nil, ErrChange
+		}
+		if err := advance(records, c); err != nil {
+			return Head{}, nil, nil, fmt.Errorf("%w: %w", ErrChange, err)
+		}
+		head = Head{sequence, digest(raw)}
+		last = raw
+	}
+	if err = rows.Err(); err != nil {
+		return Head{}, nil, nil, err
+	}
+	if head != declared {
+		return Head{}, nil, nil, ErrHead
+	}
+	return head, records, last, nil
+}
+
+// Apply is a compare-and-append against an independent checkpoint. An exact
+// retry returns the current matching event after response loss; it never ignores
+// a newer event, including a subsequent revocation. Errors never imply success.
+func (j *Journal) Apply(ctx context.Context, base Head, raw []byte) (Head, error) {
+	if !validHead(base) || base.Sequence == math.MaxInt64 {
+		return Head{}, ErrHead
+	}
+	c, err := j.decode(raw)
+	if err != nil {
+		return Head{}, err
+	}
+	if c.Sequence != base.Sequence+1 || c.Previous != base.Digest {
+		return Head{}, ErrHead
+	}
+	conn, tx, err := j.begin(ctx)
+	if err != nil {
+		return Head{}, err
+	}
+	defer conn.Close()
+	defer tx.Rollback()
+	head, records, last, err := j.load(ctx, tx)
+	if err != nil {
+		return Head{}, err
+	}
+	next := Head{c.Sequence, digest(raw)}
+	if head == next && bytes.Equal(last, raw) {
+		if err := tx.Commit(); err != nil {
+			return Head{}, err
+		}
+		return head, nil
+	}
+	if head != base {
+		return Head{}, ErrHead
+	}
+	if err = advance(records, c); err != nil {
+		return Head{}, err
+	}
+	if _, err = tx.ExecContext(ctx, `INSERT INTO enrollment_events(sequence,body) VALUES(?,?)`, c.Sequence, raw); err != nil {
+		return Head{}, err
+	}
+	if _, err = tx.ExecContext(ctx, `UPDATE enrollment_meta SET sequence=?,digest=? WHERE singleton=1`, next.Sequence, next.Digest); err != nil {
+		return Head{}, err
+	}
+	if err = tx.Commit(); err != nil {
+		return Head{}, err
+	}
+	return next, nil
+}
+
+// WithActive holds a writer reservation through fn. fn must not reenter this
+// journal or wait for another journal writer. It may receive a later storage
+// error after running, so irreversible external effects do not belong in fn.
+// This is a local serialization primitive, not a distributed action permit.
+func (j *Journal) WithActive(ctx context.Context, expected Head, id string, fn func(Record) error) error {
+	if !validHead(expected) {
+		return ErrHead
+	}
+	if fn == nil {
+		return ErrChange
+	}
+	conn, tx, err := j.begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	defer tx.Rollback()
+	head, records, _, err := j.load(ctx, tx)
+	if err != nil {
+		return err
+	}
+	if head != expected {
+		return ErrHead
+	}
+	current, exists := records[id]
+	if !exists {
+		return ErrMissing
+	}
+	if current.revoked {
+		return ErrRevoked
+	}
+	if err = ctx.Err(); err != nil {
+		return err
+	}
+	if err = fn(current.record); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// SignActive prepares a challenge-bound reply while holding the local current
+// view. It returns no bytes if the transaction or signer fails. The private key
+// is supplied for this call only; its protection is the service's responsibility.
+func (j *Journal) SignActive(ctx context.Context, expected Head, id string, request enrollmentproof.Request, key ed25519.PrivateKey) ([]byte, error) {
+	if len(key) != ed25519.PrivateKeySize || !bytes.Equal(key.Public().(ed25519.PublicKey), j.key) || request.ProjectDigest != j.project {
+		return nil, ErrContext
+	}
+	var reply []byte
+	err := j.WithActive(ctx, expected, id, func(record Record) error {
+		payload, err := json.Marshal(ActiveReply{Schema: ActiveReplySchema, Head: expected, Record: record})
+		if err == nil {
+			reply, err = enrollmentproof.SignResponse(request, payload, key)
+		}
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return reply, nil
+}

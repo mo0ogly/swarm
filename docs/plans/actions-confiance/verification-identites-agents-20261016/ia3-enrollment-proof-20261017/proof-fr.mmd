@@ -1,0 +1,10 @@
+flowchart TD
+  B["Bootstrap indépendant<br/>cible : choix opérateur en attente"] -.-> K["Clé publique épinglée<br/>NewVerifier"]
+  K --> Q["Challenge local neuf<br/>clé, projet, demande complète, nonce"]
+  S["Service protégé courant<br/>cible : non raccordée"] -.-> R["SignResponse<br/>format testé avec clé de fixture"]
+  Q --> R
+  R --> V["Verify<br/>signature, contexte et enveloppe stricte"]
+  K --> V
+  V --> P["Statement : octets authentifiés<br/>une consommation locale"]
+  P -.-> C["Schéma métier, fraîcheur et révocation<br/>contrôles consommateurs à réaliser"]
+  C -.-> E["Admission et publication moteur<br/>raccord absent"]

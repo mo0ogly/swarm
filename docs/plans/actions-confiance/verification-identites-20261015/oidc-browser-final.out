@@ -1,0 +1,12 @@
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert(dimensions.every(b=>b.height>=44&&b.width>=44))
+
+    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_oidc_ui.cjs:32:374 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

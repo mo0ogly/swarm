@@ -124,6 +124,9 @@ func terminalPeerAllowed(c *net.UnixConn) bool {
 	return e == nil && allowed
 }
 func (s *Store) superviseTerminal(a Agent) error {
+	if e := s.dialogueRestoreStartGuard(a); e != nil {
+		return s.finishAgent(a, "failed", e.Error(), nil)
+	}
 	master, slave, e := openAgentPTY()
 	if e != nil {
 		return s.finishAgent(a, "failed", "Pseudo-terminal indisponible : "+e.Error(), nil)
@@ -222,7 +225,10 @@ func (s *Store) superviseTerminal(a Agent) error {
 		defer authReader.Close()
 		defer authWriter.Close()
 		cmd.ExtraFiles = []*os.File{dialogueWriter, authReader}
-		monitor = newDialogueMonitor(s, a)
+		monitor, e = s.restoredDialogueMonitor(a)
+		if e != nil {
+			return s.finishAgent(a, "failed", e.Error(), nil)
+		}
 		monitor.authorize = authWriter
 		monitorDone = make(chan struct{})
 		go func() { monitor.consume(dialogueReader); close(monitorDone) }()
@@ -328,7 +334,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 					dialogueReader.Close()
 				}
 				var guardReason string
-				a.Progress, a.Usage, guardReason, a.Activity = monitor.snapshot()
+				a.Progress, a.Usage, guardReason, a.Activity = monitor.executionSnapshot()
 				a.ReportedModel = monitor.sink.reportedModelSnapshot()
 				if guardReason != "" {
 					stop(guardReason, "garde")
@@ -368,7 +374,7 @@ func (s *Store) superviseTerminal(a Agent) error {
 		case <-ticker.C:
 			if monitor != nil {
 				var guardReason string
-				a.Progress, a.Usage, guardReason, a.Activity = monitor.snapshot()
+				a.Progress, a.Usage, guardReason, a.Activity = monitor.executionSnapshot()
 				a.ReportedModel = monitor.sink.reportedModelSnapshot()
 				if guardReason != "" {
 					stop(guardReason, "garde")

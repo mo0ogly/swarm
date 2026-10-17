@@ -19,7 +19,8 @@ func reviewReply(raw string, t *Task, report string) (string, string, []ReviewCr
 	return reviewReplyWithEvidence(raw, t, []managedReviewFragmentArtifact{{Name: "report.md", Kind: "source", Content: report}})
 }
 
-func reviewReplyWithEvidence(raw string, t *Task, originals []managedReviewFragmentArtifact) (string, string, []ReviewCriterion, error) {
+func reviewReplyWithEvidence(raw string, t *Task, originals []managedReviewFragmentArtifact) (state string, reason string, criteria []ReviewCriterion, err error) {
+	defer func() { err = reviewResponseProtocolError(err) }()
 	var reply struct {
 		Reason   string            `json:"reason"`
 		Criteria []ReviewCriterion `json:"criteria"`
@@ -31,7 +32,7 @@ func reviewReplyWithEvidence(raw string, t *Task, originals []managedReviewFragm
 		return "", "", nil, fmt.Errorf("avis incomplet : justification et tous les critères requis")
 	}
 	seen := map[int]bool{}
-	state := "passed"
+	state = "passed"
 	for _, c := range reply.Criteria {
 		if c.Index < 1 || c.Index > len(t.Criteria) || seen[c.Index] || len(strings.TrimSpace(c.Evidence)) < 8 || len(c.Evidence) > 4000 {
 			return "", "", nil, fmt.Errorf("critère absent, dupliqué ou preuve insuffisante")

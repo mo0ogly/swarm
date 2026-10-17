@@ -1,0 +1,7 @@
+{
+  "contract": "actual trustAPI over explicit transport fixture",
+  "source_integer": "9007199254740993",
+  "observed_integer": "9007199254740992",
+  "bytes_preserved": false,
+  "node_raw_json": "function"
+}

@@ -151,7 +151,7 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 	if e != nil {
 		return nil, e
 	}
-	batches, e := planManagedReviewBatches(managedReviewPrefix(workflow), c, owners)
+	batches, e := planManagedReviewBatches(managedReviewPrefixForContext(workflow, c), c, owners)
 	calls := len(batches)
 	if coordinated || errors.Is(e, errManagedReviewBatchSize) {
 		cfg := w.Planning.Reviewer
@@ -159,7 +159,7 @@ func (s *Store) prepareManagedPreflightRetry(work, task string) (*managedPreflig
 		if err != nil {
 			return nil, err
 		}
-		if err = preflightManagedFragmentCalls(managedReviewPrefix(workflow), c, plan); err != nil {
+		if err = preflightManagedFragmentCalls(managedReviewPrefixForContext(workflow, c), c, plan); err != nil {
 			return nil, err
 		}
 		calls = fragmentPaidInspections(plan) + plan.ReservedFinalCalls

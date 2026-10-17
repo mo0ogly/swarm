@@ -92,7 +92,8 @@ func TestLoopProvider(t *testing.T) {
 	case strings.Contains(string(prompt), "INFRASTRUCTURE_LIVE"):
 		for i := 0; i < 3; i++ {
 			fmt.Printf(`{"type":"item.started","item":{"id":"infra%d","type":"command_execution","command":"go test ./... %d"}}`+"\n", i, i)
-			fmt.Printf(`{"type":"item.completed","item":{"id":"infra%d","type":"command_execution","exit_code":1,"aggregated_output":"bwrap: Can't bind mount /oldroot on /newroot: Unable to apply mount flags: No such device"}}`+"\n", i)
+			raw, _ := json.Marshal(map[string]any{"type": "item.completed", "item": map[string]any{"id": fmt.Sprintf("infra%d", i), "type": "command_execution", "exit_code": 1, "aggregated_output": strings.Repeat("Traceback framework frame without cause\n", 60) + "bwrap: Can't bind mount /oldroot on /newroot: Unable to apply mount flags: No such device"}})
+			fmt.Println(string(raw))
 		}
 		for {
 			fmt.Println(`{"type":"system"}`)

@@ -13,20 +13,22 @@ import (
 )
 
 type ManagedFragmentJournalAnchor struct {
-	RetryDirective     *ManagedReviewRetryDirective  `json:"retry_directive,omitempty"`
-	ReplannedFrom      *ManagedFragmentJournalAnchor `json:"replanned_from,omitempty"`
-	ResumeCalls        []string                      `json:"resume_calls,omitempty"`
-	InspectionTask     string                        `json:"inspection_task,omitempty"`
-	InspectionAttempt  string                        `json:"inspection_attempt,omitempty"`
-	InspectionProducer string                        `json:"inspection_producer,omitempty"`
-	FinalJournal       string                        `json:"final_journal,omitempty"`
-	FinalJournalDigest string                        `json:"final_journal_sha256,omitempty"`
-	WorkflowDigest     string                        `json:"workflow_sha256"`
-	ModelConfigDigest  string                        `json:"model_config_sha256"`
-	Plan               string                        `json:"plan"`
-	PlanDigest         string                        `json:"plan_sha256"`
-	Journal            string                        `json:"journal"`
-	JournalDigest      string                        `json:"journal_sha256"`
+	WorkflowPrompt       string                        `json:"workflow_prompt,omitempty"`
+	WorkflowPromptDigest string                        `json:"workflow_prompt_sha256,omitempty"`
+	RetryDirective       *ManagedReviewRetryDirective  `json:"retry_directive,omitempty"`
+	ReplannedFrom        *ManagedFragmentJournalAnchor `json:"replanned_from,omitempty"`
+	ResumeCalls          []string                      `json:"resume_calls,omitempty"`
+	InspectionTask       string                        `json:"inspection_task,omitempty"`
+	InspectionAttempt    string                        `json:"inspection_attempt,omitempty"`
+	InspectionProducer   string                        `json:"inspection_producer,omitempty"`
+	FinalJournal         string                        `json:"final_journal,omitempty"`
+	FinalJournalDigest   string                        `json:"final_journal_sha256,omitempty"`
+	WorkflowDigest       string                        `json:"workflow_sha256"`
+	ModelConfigDigest    string                        `json:"model_config_sha256"`
+	Plan                 string                        `json:"plan"`
+	PlanDigest           string                        `json:"plan_sha256"`
+	Journal              string                        `json:"journal"`
+	JournalDigest        string                        `json:"journal_sha256"`
 }
 
 func (s *Store) readFragmentJournalAnchor(r IndependentReview) (managedReviewFragmentPlan, managedFragmentJournal, error) {
@@ -64,8 +66,11 @@ func (s *Store) readFragmentJournalAnchorVersion(r IndependentReview, historical
 		return p, j, err
 	}
 	methodRaw, _ := json.Marshal([]any{workflow, prompt})
-	if len(anchor.WorkflowDigest) != 64 || (!historical && anchor.WorkflowDigest != hash(methodRaw)) {
+	if len(anchor.WorkflowDigest) != 64 || (!historical && !(r.State == "passed" && anchor.WorkflowPrompt != "") && anchor.WorkflowDigest != hash(methodRaw)) {
 		return p, j, fmt.Errorf("méthode de revue des fragments modifiée")
+	}
+	if _, err = s.managedFragmentWorkflowPrefix(r); err != nil {
+		return p, j, err
 	}
 	path, e := safeReport(s.root, anchor.Plan)
 	if e != nil {

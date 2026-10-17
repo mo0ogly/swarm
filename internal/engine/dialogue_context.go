@@ -24,12 +24,15 @@ type SavedContext struct {
 }
 
 type ContextManifest struct {
-	SHA256     string        `json:"sha256"`
-	Bytes      int           `json:"bytes"`
-	Included   []string      `json:"included"`
-	Excluded   []string      `json:"excluded"`
-	References []DialogueRef `json:"references"`
-	Paths      []string      `json:"paths"`
+	Summary        *MemorySummaryReceipt    `json:"summary,omitempty"`
+	Memory         []MemoryReference        `json:"memory,omitempty"`
+	MemoryDecision *MemorySelectionDecision `json:"memory_decision,omitempty"`
+	SHA256         string                   `json:"sha256"`
+	Bytes          int                      `json:"bytes"`
+	Included       []string                 `json:"included"`
+	Excluded       []string                 `json:"excluded"`
+	References     []DialogueRef            `json:"references"`
+	Paths          []string                 `json:"paths"`
 }
 
 func dialogueHits(w Work) []DialogueHit {
@@ -89,7 +92,7 @@ func contextManifest(w Work, current string, refs []DialogueRef, prompt string) 
 	if cut < 0 {
 		cut = 0
 	}
-	return ContextManifest{hash([]byte(prompt)), len(prompt), ids[cut:], ids[:cut], refs, w.Memory}
+	return ContextManifest{SHA256: hash([]byte(prompt)), Bytes: len(prompt), Included: ids[cut:], Excluded: ids[:cut], References: refs, Paths: w.Memory}
 }
 func foldDialogue(s string) string {
 	return strings.NewReplacer("é", "e", "è", "e", "ê", "e", "ë", "e", "à", "a", "â", "a", "ä", "a", "î", "i", "ï", "i", "ô", "o", "ö", "o", "ù", "u", "û", "u", "ü", "u", "ç", "c", "œ", "oe").Replace(strings.ToLower(s))

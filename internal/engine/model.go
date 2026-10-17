@@ -9,9 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"swarm.local/companion/internal/identitycontract"
 )
 
-const schemaVersion = 32
+const schemaVersion = 37
 
 type ManualOverride struct {
 	Reason         string `json:"reason"`
@@ -97,6 +99,9 @@ type AutomaticValidation struct {
 }
 
 type Task struct {
+	MemorySelections        []MemoryReference           `json:"memory_selections,omitempty"`
+	MemoryDecision          *MemorySelectionDecision    `json:"memory_decision,omitempty"`
+	MemorySelectionImported bool                        `json:"memory_selection_imported,omitempty"`
 	InstructionBase         *string                     `json:"instruction_base,omitempty"`
 	InstructionOperatorBase *string                     `json:"instruction_operator_base,omitempty"`
 	InstructionRevisions    []InstructionRevision       `json:"instruction_revisions,omitempty"`
@@ -204,6 +209,7 @@ type Work struct {
 	Profile                  *LaunchProfile      `json:"launch_profile,omitempty"`
 	Plans                    []ApprovedPlan      `json:"plans,omitempty"`
 	Retex                    []Retex             `json:"retex,omitempty"`
+	ProjectMemory            []ProjectMemory     `json:"project_memory,omitempty"`
 	PlanningBrief            *PlanningBrief      `json:"planning_brief,omitempty"`
 	Schema                   int                 `json:"schema_version"`
 	ID                       string              `json:"id"`
@@ -290,17 +296,7 @@ func (w *Work) task(id string) (*Task, error) {
 	}
 	return nil, fmt.Errorf("tâche inconnue : %s", id)
 }
-func safeName(s string) bool {
-	if s == "" || len(s) > 100 {
-		return false
-	}
-	for _, r := range s {
-		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '_') {
-			return false
-		}
-	}
-	return true
-}
+func safeName(s string) bool { return identitycontract.Name(s) }
 
 // Resolve the authorized root and targets in the same physical namespace.
 // A retained alias after a project move must not make its own files outsiders.
@@ -379,6 +375,13 @@ func localFile(root, name string) (string, error) {
 	return resolved, nil
 }
 func atomicWrite(path string, data []byte) error {
+	// Open the parent before mutation: durable publication requires both the
+	// file contents and its renamed directory entry to be synchronized.
+	dir, e := os.Open(filepath.Dir(path))
+	if e != nil {
+		return e
+	}
+	defer dir.Close()
 	f, e := os.CreateTemp(filepath.Dir(path), ".swarm-write-")
 	if e != nil {
 		return e
@@ -396,5 +399,10 @@ func atomicWrite(path string, data []byte) error {
 	if e = f.Close(); e != nil {
 		return e
 	}
-	return os.Rename(name, path)
+	if e = os.Rename(name, path); e != nil {
+		return e
+	}
+	// A failure here means publication is uncertain, not rolled back. Callers
+	// must reconcile the target rather than blindly retrying an effect.
+	return dir.Sync()
 }

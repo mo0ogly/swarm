@@ -1,0 +1,6 @@
+=== RUN   TestStructuredCitationContractRequiresOriginalReferences
+    managed_review_citation_catalog_test.go:15: structured original references are required before another native review version de contrat de citation finale inconnue
+--- FAIL: TestStructuredCitationContractRequiresOriginalReferences (0.01s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.027s
+FAIL

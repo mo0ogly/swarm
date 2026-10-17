@@ -49,24 +49,25 @@ type PreparationVerdict struct {
 }
 
 type PreparationRequest struct {
-	Organization *PreparationOrganization `json:"organization,omitempty"`
-	Source       *PreparationSourceRef    `json:"source,omitempty"`
-	Budget       *Budget                  `json:"budget,omitempty"`
-	AdoptBrief   bool                     `json:"adopt_brief,omitempty"`
-	WorkRevision *int                     `json:"expected_work_revision,omitempty"`
-	Decisions    []PlanQuestion           `json:"decisions,omitempty"`
-	Turn         string                   `json:"turn_id,omitempty"`
-	Version      int                      `json:"version"`
-	ID           string                   `json:"preparation_id,omitempty"`
-	Event        string                   `json:"event_id"`
-	Action       string                   `json:"action"`
-	Revision     *int                     `json:"expected_revision"`
-	WorkID       string                   `json:"work_id,omitempty"`
-	Title        string                   `json:"title,omitempty"`
-	Method       string                   `json:"method,omitempty"`
-	Document     string                   `json:"document,omitempty"`
-	Text         string                   `json:"text,omitempty"`
-	Hash         string                   `json:"sha256,omitempty"`
+	repositoryFinish *func(bool) error
+	Organization     *PreparationOrganization `json:"organization,omitempty"`
+	Source           *PreparationSourceRef    `json:"source,omitempty"`
+	Budget           *Budget                  `json:"budget,omitempty"`
+	AdoptBrief       bool                     `json:"adopt_brief,omitempty"`
+	WorkRevision     *int                     `json:"expected_work_revision,omitempty"`
+	Decisions        []PlanQuestion           `json:"decisions,omitempty"`
+	Turn             string                   `json:"turn_id,omitempty"`
+	Version          int                      `json:"version"`
+	ID               string                   `json:"preparation_id,omitempty"`
+	Event            string                   `json:"event_id"`
+	Action           string                   `json:"action"`
+	Revision         *int                     `json:"expected_revision"`
+	WorkID           string                   `json:"work_id,omitempty"`
+	Title            string                   `json:"title,omitempty"`
+	Method           string                   `json:"method,omitempty"`
+	Document         string                   `json:"document,omitempty"`
+	Text             string                   `json:"text,omitempty"`
+	Hash             string                   `json:"sha256,omitempty"`
 }
 
 type PreparationError struct{ Code, Message string }

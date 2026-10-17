@@ -1,0 +1,38 @@
+=== RUN   TestIncrementalHistoricalPrefixRemainsStable
+--- PASS: TestIncrementalHistoricalPrefixRemainsStable (0.00s)
+=== RUN   TestRecoveryPrefixCarriesLiteralCitationConventions
+--- PASS: TestRecoveryPrefixCarriesLiteralCitationConventions (0.00s)
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries/indentation
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries/encoded_output
+--- PASS: TestCitationDiagnosticPreservesLiteralBoundaries (0.05s)
+    --- PASS: TestCitationDiagnosticPreservesLiteralBoundaries/indentation (0.04s)
+    --- PASS: TestCitationDiagnosticPreservesLiteralBoundaries/encoded_output (0.01s)
+=== RUN   TestCitationDiagnosticRejectsInvalidWireAndKeepsHistoricalPrefix
+--- PASS: TestCitationDiagnosticRejectsInvalidWireAndKeepsHistoricalPrefix (0.00s)
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/operator
+    managed_review_citation_feedback_test.go:196: sizes 164551 168226 21899 parts 1
+=== RUN   TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/supervisor
+    managed_review_citation_feedback_test.go:196: sizes 164551 168226 21899 parts 1
+--- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen (53.38s)
+    --- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/operator (27.11s)
+    --- PASS: TestFinalCitationRecoveryDeliversExactDiagnosticAfterReopen/supervisor (26.27s)
+=== RUN   TestCurrentReviewCitationConventionsBeforeFirstCall
+--- PASS: TestCurrentReviewCitationConventionsBeforeFirstCall (1.46s)
+=== RUN   TestCitationDiagnosticCapturedReplyIntegrityBlocksRecovery
+    managed_review_citation_feedback_test.go:288: sizes 164551 168226 21899 parts 1
+--- PASS: TestCitationDiagnosticCapturedReplyIntegrityBlocksRecovery (18.00s)
+=== RUN   TestFinalCitationRetryMeasuresRemainingMessage
+    managed_review_citation_feedback_test.go:329: sizes 164551 168226 21899 parts 1
+--- PASS: TestFinalCitationRetryMeasuresRemainingMessage (16.97s)
+=== RUN   TestManagedFragmentResolutionUsesLiteralControlOutputBoundaries
+--- PASS: TestManagedFragmentResolutionUsesLiteralControlOutputBoundaries (0.01s)
+=== RUN   TestManagedFragmentReceiptResolvesBindingOnly
+=== RUN   TestManagedFragmentReceiptResolvesBindingOnly/missing
+=== RUN   TestManagedFragmentReceiptResolvesBindingOnly/altered
+--- PASS: TestManagedFragmentReceiptResolvesBindingOnly (0.01s)
+    --- PASS: TestManagedFragmentReceiptResolvesBindingOnly/missing (0.00s)
+    --- PASS: TestManagedFragmentReceiptResolvesBindingOnly/altered (0.00s)
+PASS
+ok  	swarm.local/companion/internal/engine	91.041s

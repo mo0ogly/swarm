@@ -11,6 +11,38 @@ import (
 	"testing"
 )
 
+func TestCandidateFragmentsUseObservedCapacityWhenLegacyPacketsFit(t *testing.T) {
+	s, w, a, c, _, _ := fragmentBeginFixture(t)
+	command := filepath.Join(t.TempDir(), "codex")
+	script := "#!/usr/bin/env python3\nimport json,sys\nif sys.argv[1:]==['--version']:\n print('codex-cli fixture-capacity')\nelif sys.argv[1:]==['debug','models','--bundled']:\n print(json.dumps({'models':[{'slug':'gpt-5.6-sol','context_window':272000,'effective_context_window_percent':95}]}))\nelse:\n raise SystemExit('provider invocation forbidden')\n"
+	if err := os.WriteFile(command, []byte(script), 0700); err != nil {
+		t.Fatal(err)
+	}
+	ps, err := s.providers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ps.Providers["managed-review-fixture"] = Provider{Command: command}
+	raw, _ := json.Marshal(ps)
+	if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	w.Planning.Reviewer, err = s.reviewerConfig("managed-review-fixture", "standard", 8)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := planManagedReviewFragments(c, 100, 2); err != nil {
+		t.Fatal("fixture must fit the legacy path", err)
+	}
+	p, err := s.planCandidateFragments(w, a, c, 8)
+	if err != nil || p.InputBudget == nil || p.InputBudget.CapabilityDigest == "" {
+		t.Fatal("legacy path ignored verified provider capacity", err)
+	}
+	if managedReviewCalls(t, s) != 0 {
+		t.Fatal("capacity discovery spent a model call")
+	}
+}
+
 func TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal(t *testing.T) {
 	s, w, a, c, _, _ := fragmentBeginFixture(t)
 	catalog := filepath.Join(t.TempDir(), "models_cache.json")

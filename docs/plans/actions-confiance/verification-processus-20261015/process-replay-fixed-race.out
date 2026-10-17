@@ -1,0 +1,30 @@
+=== RUN   TestActionsConfianceT5PublicNamespace
+--- PASS: TestActionsConfianceT5PublicNamespace (1.28s)
+=== RUN   TestActionsConfianceT5VersionPinningAndApproval
+--- PASS: TestActionsConfianceT5VersionPinningAndApproval (1.40s)
+=== RUN   TestActionsConfianceT5ReplayRechecksDataAdmission
+--- PASS: TestActionsConfianceT5ReplayRechecksDataAdmission (1.30s)
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/cycle
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/no-start
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-approval
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-exception
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/script
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/missing-node
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/no-terminal
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/empty-roles
+=== RUN   TestActionsConfianceT5InvalidDefinitionsNoMutation/null-terminal
+--- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation (9.23s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/cycle (1.35s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/no-start (0.92s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-approval (1.05s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/weak-exception (0.88s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/script (0.99s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/missing-node (0.95s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/no-terminal (1.13s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/empty-roles (0.92s)
+    --- PASS: TestActionsConfianceT5InvalidDefinitionsNoMutation/null-terminal (1.05s)
+=== RUN   TestActionsConfianceT5PolicyPublicPreviewPersistence
+--- PASS: TestActionsConfianceT5PolicyPublicPreviewPersistence (0.84s)
+PASS
+ok  	swarm.local/companion/internal/engine	15.568s

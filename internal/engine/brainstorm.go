@@ -91,7 +91,7 @@ func brainstormHistory(w Work, current string) string {
 }
 
 // Only public final answer events, never reasoning/tool output.
-func providerReply(d map[string]any) string {
+func providerOriginalReply(d map[string]any) string {
 	text := ""
 	if d["type"] == "result" || d["subtype"] == "success" {
 		text, _ = d["result"].(string)
@@ -104,6 +104,11 @@ func providerReply(d map[string]any) string {
 	if !utf8.ValidString(text) {
 		return ""
 	}
+	return text
+}
+
+func providerReply(d map[string]any) string {
+	text := providerOriginalReply(d)
 	if len(text) > 16000 {
 		text = text[:16000]
 		for !utf8.ValidString(text) {

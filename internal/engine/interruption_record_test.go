@@ -45,7 +45,7 @@ func TestStoppedManagedAttemptHasEngineHandoffWithoutWorkerReport(t *testing.T) 
 			events = append(events, e)
 		}
 	}
-	if len(events) != 1 || len(events[0].Artifacts) != 1 {
+	if len(events) != 1 || len(events[0].Artifacts) != 2 {
 		t.Fatal("owner did not receive interruption evidence", events)
 	}
 	f, err := localFile(s.root, events[0].Artifacts[0].Path)

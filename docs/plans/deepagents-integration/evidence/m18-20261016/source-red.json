@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestMemorySummarySourceCLIExports",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:47:08.652809+00:00",
+  "duration_seconds": 16.739,
+  "exit_code": 1,
+  "named_tests_ran": [
+    "TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "fe569623a36f8ef7408cbfbb3859c04916bd5bfcdf134cb69f4531b7780ea53e",
+  "real_model_calls": 0
+}

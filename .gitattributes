@@ -16,3 +16,9 @@ docs/**/evidence/**/*.out whitespace=-blank-at-eol,-blank-at-eof
 docs/**/evidence/**/*.stdout whitespace=-blank-at-eol,-blank-at-eof
 docs/**/evidence/**/*.txt whitespace=-blank-at-eol,-blank-at-eof
 docs/**/evidence/**/*.patch whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab
+
+# Qualification archives also retain exact source preimages, command output
+# and diff context as data. Keep those historical bytes; application sources
+# and editorial documents outside these evidence roots retain normal checks.
+docs/plans/actions-confiance/verification-*/** whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab
+docs/plans/deepagents-integration/evidence/** whitespace=-blank-at-eol,-blank-at-eof,-space-before-tab

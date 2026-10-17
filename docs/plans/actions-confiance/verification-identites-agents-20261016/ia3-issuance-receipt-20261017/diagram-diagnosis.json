@@ -1,0 +1,7 @@
+{
+  "first_attempt": "mmdc receipt-fr.svg",
+  "exit": 1,
+  "cause": "assumed /usr/bin/chromium absent",
+  "correction": "reuse verified project diagram-browser.json and diagram-mermaid.json",
+  "owner": "Codex/method"
+}

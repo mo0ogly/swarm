@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-policy-epoch-repair-20261015-1051",
+  "expected_revision": 447,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-d72990dcae28daba8c80b86c",
+  "result_tree": "a5d59e04d055e7d7de27d96b0f6ad21d926d141a",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "reason": "Replan R20 : retrait du demandeur reproduit avant correction sur approbation et premier engagement. Le mandat exige désormais la révision de configuration courante pour demande, accord et premier effet ; les effets engagés restent réconciliables. 83 tests Go race, sept cas publics et 21 contrôles navigateur passent. Remise opérateur conservant les deux tentatives, les 88 appels et les avis historiques ; contrôles et revue frais requis."
+}

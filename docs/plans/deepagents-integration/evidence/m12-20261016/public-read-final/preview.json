@@ -1,0 +1,129 @@
+{
+  "dialogue": {
+    "boundary": {
+      "available": true,
+      "turn": "dt-1fb4ce566ebbf359d186f366",
+      "status": "answered",
+      "phase": "confirmed",
+      "boundary_confirmed": true,
+      "restart_supported": false,
+      "session_id": "private-fixture-session",
+      "at": "2026-10-16T14:19:23.501385634Z",
+      "sha256": "af033349a3454e48983bee9e04c8f7dc74dabc84c14229e228a3b4fd38ee5509",
+      "scope": "État observé à cette frontière ; aucune autorisation de redémarrage",
+      "progress": {
+        "tool_calls": 0,
+        "tool_results": 0,
+        "pending_tools": 0,
+        "output_state": "none",
+        "tool_state": "idle",
+        "provider_vitality": "unknown",
+        "metrics_version": 1
+      },
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 2,
+        "source": "Événements fournisseur du dialogue",
+        "scope": "Somme des usages rapportés par échange ; couverture partielle si un échange n’en fournit pas",
+        "at": "2026-10-16T14:19:23.50067604Z"
+      }
+    },
+    "recommended_path": "review_boundary",
+    "recommendation": "Frontière confirmée à examiner ; la session et la décision de reprise restent à vérifier.",
+    "resume_supported": false,
+    "decision_recorded": false,
+    "decision_owner": "responsible_supervisor_or_local_operator",
+    "observed_at": "2026-10-16T14:19:23.529615663Z",
+    "facts_sha256": "681a25fbdf4446f08511626064cdb42f44372890cc319ebc2e5a139dd938525d",
+    "checks": [
+      {
+        "code": "latest_attempt",
+        "status": "pass",
+        "message": "La tentative sélectionnée est la dernière de cette tâche."
+      },
+      {
+        "code": "process_ended",
+        "status": "pass",
+        "message": "La fin du processus fournisseur est confirmée."
+      },
+      {
+        "code": "confirmed_boundary",
+        "status": "pass",
+        "message": "La fin du tour et son statut répondu sont confirmés."
+      },
+      {
+        "code": "effects_observed",
+        "status": "pass",
+        "message": "Les résultats des outils observés sont reçus à cette frontière."
+      },
+      {
+        "code": "historical_guards",
+        "status": "pass",
+        "message": "Les gardes historiques sont conservées sans remise à zéro."
+      },
+      {
+        "code": "launch_configuration",
+        "status": "pass",
+        "message": "Les paramètres de commande, de modèle et d’environnement autorisé correspondent au lancement conservé."
+      },
+      {
+        "code": "current_caps",
+        "status": "pass",
+        "message": "Les plafonds historiques restent compatibles avec les réglages courants."
+      },
+      {
+        "code": "memory_sources",
+        "status": "pass",
+        "message": "Les références mémoire sélectionnées restent valides à cette lecture."
+      },
+      {
+        "code": "provider_wait",
+        "status": "pass",
+        "message": "Aucune attente fournisseur enregistrée ne bloque cette lecture ; cela ne prouve pas sa disponibilité."
+      },
+      {
+        "code": "launch_preflight",
+        "status": "unknown",
+        "message": "Session fournisseur, accès actuels et réservations non vérifiés par cet aperçu."
+      },
+      {
+        "code": "supervisor_decision",
+        "status": "unknown",
+        "message": "Le responsable doit décider de la suite sur des preuves fraîches ; cet aperçu n’enregistre aucune autorisation."
+      }
+    ]
+  },
+  "work": "w-feb1e85667bdada43bd60d63",
+  "task": "t1",
+  "revision": 4,
+  "agent": "agent-d9b7e19126b96ac6b2c036f5",
+  "kept": [
+    "Historique des tentatives, rapports et avis précédents.",
+    "Critères et dépendances du plan.",
+    "Fournisseur et espace de la tentative sélectionnée, sous réserve des règles du lancement.",
+    "État de dialogue conservé avec sa portée, ses gardes et les usages reçus."
+  ],
+  "redone": [
+    "Vérification des conditions de lancement et du candidat courant.",
+    "Contrôles et revue requis pour la nouvelle tentative.",
+    "Une nouvelle tentative d’agent ; l’ancienne reste dans l’historique.",
+    "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu."
+  ],
+  "correction": "Examiner logs/diff, puis soumettre ou relancer explicitement",
+  "criteria": [
+    "tests PASS"
+  ],
+  "limits": "Aucun budget ni plafond n’est augmenté. Ce résumé n’autorise aucun départ et ne valide aucun résultat.",
+  "since_refusal": {
+    "from_revision": 4,
+    "to_revision": 4,
+    "first_visit": false,
+    "more": false,
+    "items": []
+  },
+  "remaining_criteria": [
+    "tests PASS"
+  ],
+  "refusal_note": "Changements enregistrés depuis le dernier refus de cette tâche.",
+  "evidence_note": "Seules les preuves liées au dernier avis sont comparées, au plus 64 fichiers et 32 Mio ; aucun inventaire du dépôt. Une preuve inchangée ne vaut ni avis favorable ni validation."
+}

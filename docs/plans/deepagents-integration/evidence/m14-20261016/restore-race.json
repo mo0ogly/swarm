@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^TestDialogue(RestoreKeepsSessionGuardsAndSeparatesExecutionUsage|RestoreRechecksSourceAfterPreflight|RestoreConcurrentRequestsCreateOneExecution|RestoreCumulativeToolLimitCannotReset|RestoreHTTPPreviewAuthenticationScopeAndNoMutation|RestoreStartupRejectsChangedContractAndReceipt|ConfirmationDoesNotOverwriteChangedSession|CheckpointRestoresCumulativeGuardsWithoutAliasing)$",
+    "-count=1",
+    "-v",
+    "-timeout=180s"
+  ],
+  "started_at_utc": "2026-10-16T17:50:41.509622+00:00",
+  "duration_seconds": 412.133,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+    "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+    "TestDialogueRestoreKeepsSessionGuardsAndSeparatesExecutionUsage",
+    "TestDialogueRestoreRechecksSourceAfterPreflight",
+    "TestDialogueRestoreConcurrentRequestsCreateOneExecution",
+    "TestDialogueRestoreCumulativeToolLimitCannotReset",
+    "TestDialogueRestoreStartupRejectsChangedContractAndReceipt",
+    "TestDialogueRestoreHTTPPreviewAuthenticationScopeAndNoMutation"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "cbb8b58111e5da78e2e8fcdd733302a161700c207685fa71653408c8450b1094",
+  "real_model_calls": 0
+}

@@ -1,0 +1,6 @@
+{
+  "message": "The expression evaluated to a falsy value:\n\n  assert(!await page.$eval('#connector-status',e=>e.classList.contains('alert')))\n",
+  "stack": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(!await page.$eval('#connector-status',e=>e.classList.contains('alert')))\n\n    at submit (/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_connectors_ui.cjs:9:150)\n    at async /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_connectors_ui.cjs:13:354",
+  "checks": [],
+  "errors": []
+}

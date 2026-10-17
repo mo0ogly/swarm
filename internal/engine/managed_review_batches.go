@@ -21,14 +21,18 @@ type managedReviewBatch struct {
 	Prompt  string               `json:"prompt"`
 }
 
-func boundedManagedReviewPrompt(prefix string, c managedReviewContext) string {
+func boundedManagedReviewPrompt(prefix string, c managedReviewContext) (string, error) {
+	if c.CitationContractVersion == 2 {
+		prompt, _, err := managedReferencedReviewPrompt(prefix, c)
+		return prompt, err
+	}
 	prefix = incrementalReviewPrefix(prefix, c)
 	data, _ := json.Marshal(c)
 	prompt := prefix + "\nSWARM_MANAGED_REVIEW_CONTEXT\n" + string(data)
 	if len(prompt) > managedReviewPromptLimit {
 		prompt = prefix + managedReviewTextPacket(c)
 	}
-	return prompt
+	return prompt, nil
 }
 
 // sourceOwners comes from the immutable per-task context manifests, not a model
@@ -45,15 +49,18 @@ func planManagedReviewBatches(prefix string, c managedReviewContext, sourceOwner
 }
 
 func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, sourceOwners map[string][]string, reuseHunks bool) ([]managedReviewBatch, error) {
-	bounded := func(prefix string, c managedReviewContext) string {
-		prompt := boundedManagedReviewPrompt(prefix, c)
-		if reuseHunks && len(prompt) > managedReviewPromptLimit {
+	bounded := func(prefix string, c managedReviewContext) (string, error) {
+		prompt, err := boundedManagedReviewPrompt(prefix, c)
+		if err != nil {
+			return "", err
+		}
+		if c.CitationContractVersion != 2 && reuseHunks && len(prompt) > managedReviewPromptLimit {
 			alternative := incrementalReviewPrefix(prefix, c) + managedReviewPacket(c, true)
 			if len(alternative) < len(prompt) {
-				return alternative
+				return alternative, nil
 			}
 		}
-		return prompt
+		return prompt, nil
 	}
 	if len(c.Tasks) == 0 {
 		return nil, fmt.Errorf("revue sans tâche")
@@ -95,14 +102,23 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 		}
 	}
 	// Preserve the ordinary single-context transport and instructions exactly.
-	if prompt := bounded(prefix, c); len(prompt) <= managedReviewPromptLimit {
-		ids := []string{}
-		for _, t := range c.Tasks {
-			ids = append(ids, t.Task)
-		}
-		return []managedReviewBatch{{Tasks: ids, Context: c, Prompt: prompt}}, nil
+	prompt, err := bounded(prefix, c)
+	if err != nil {
+		return nil, err
 	}
-	makeBatch := func(ids []string) managedReviewBatch {
+	all := managedReviewBatch{Context: c, Prompt: prompt}
+	for _, task := range c.Tasks {
+		all.Tasks = append(all.Tasks, task.Task)
+	}
+	inputBytes, err := managedReviewBatchInputBytes(all)
+	if err != nil {
+		return nil, err
+	}
+	if inputBytes <= managedReviewPromptLimit {
+		return []managedReviewBatch{all}, nil
+	}
+
+	makeBatch := func(ids []string) (managedReviewBatch, error) {
 		selected := map[string]bool{}
 		for _, id := range ids {
 			for _, p := range sourceOwners[id] {
@@ -118,20 +134,40 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 		}
 		names, _ := json.Marshal(ids)
 		instruction := prefix + "\nLOT DE REVUE : examine uniquement les tâches de cette liste JSON et retourne uniquement leurs verdicts : " + string(names) + ". Tous les rapports, critères, contrôles et le diff cumulatif restent présents pour le contexte global. Les autres tâches seront examinées séparément ; ne présume pas leur validation. Les sources annexes jointes sont celles déclarées pour les tâches affectées. Si une source absente est nécessaire, retourne unknown, jamais pass par défaut.\n"
-		return managedReviewBatch{Tasks: append([]string(nil), ids...), Context: subset, Prompt: bounded(instruction, subset)}
+		prompt, err := bounded(instruction, subset)
+		return managedReviewBatch{Tasks: append([]string(nil), ids...), Context: subset, Prompt: prompt}, err
 	}
 	batches := []managedReviewBatch{}
 	ids := []string{}
 	for _, t := range c.Tasks {
 		next := append(append([]string(nil), ids...), t.Task)
-		b := makeBatch(next)
-		if len(b.Prompt) > managedReviewPromptLimit {
+		b, err := makeBatch(next)
+		if err != nil {
+			return nil, err
+		}
+		inputBytes, err := managedReviewBatchInputBytes(b)
+		if err != nil {
+			return nil, err
+		}
+		if inputBytes > managedReviewPromptLimit {
 			if len(ids) == 0 {
 				return nil, fmt.Errorf("%w : tâche %s", errManagedReviewBatchSize, t.Task)
 			}
-			batches = append(batches, makeBatch(ids))
+			previous, err := makeBatch(ids)
+			if err != nil {
+				return nil, err
+			}
+			batches = append(batches, previous)
 			ids = []string{t.Task}
-			if len(makeBatch(ids).Prompt) > managedReviewPromptLimit {
+			single, err := makeBatch(ids)
+			if err != nil {
+				return nil, err
+			}
+			singleBytes, err := managedReviewBatchInputBytes(single)
+			if err != nil {
+				return nil, err
+			}
+			if singleBytes > managedReviewPromptLimit {
 				return nil, fmt.Errorf("%w : tâche %s", errManagedReviewBatchSize, t.Task)
 			}
 		} else {
@@ -139,7 +175,11 @@ func planManagedReviewBatchesTransport(prefix string, c managedReviewContext, so
 		}
 	}
 	if len(ids) > 0 {
-		batches = append(batches, makeBatch(ids))
+		last, err := makeBatch(ids)
+		if err != nil {
+			return nil, err
+		}
+		batches = append(batches, last)
 	}
 	return batches, nil
 }
@@ -212,7 +252,7 @@ func parseManagedReviewBatchReplies(c managedReviewContext, batches []managedRev
 	state := "passed"
 	for i, b := range batches {
 		actual, _ := json.Marshal(b.Context.Tasks)
-		if !sameManagedBaseline(b.Context.Baseline, c.Baseline) || b.Context.Candidate != c.Candidate || b.Context.Previous != c.Previous || b.Context.Diff != c.Diff || string(b.Context.Receipt) != string(c.Receipt) || string(actual) != string(canonical) {
+		if b.Context.CitationContractVersion != c.CitationContractVersion || b.Context.InspectionScopeVersion != c.InspectionScopeVersion || !sameManagedBaseline(b.Context.Baseline, c.Baseline) || b.Context.Candidate != c.Candidate || b.Context.Previous != c.Previous || b.Context.Diff != c.Diff || string(b.Context.Receipt) != string(c.Receipt) || string(actual) != string(canonical) {
 			return "", nil, fmt.Errorf("preuves globales différentes dans un lot")
 		}
 		subset := b.Context
@@ -237,7 +277,7 @@ func parseManagedReviewBatchReplies(c managedReviewContext, batches []managedRev
 			supplied[s.Path] = true
 			seenSources[s.Path] = true
 		}
-		verdict, entries, err := parseManagedReview(replies[i], subset)
+		verdict, entries, err := parseManagedBatchReply(replies[i], b)
 		if err != nil {
 			return "", nil, fmt.Errorf("lot %d : %w", i+1, err)
 		}

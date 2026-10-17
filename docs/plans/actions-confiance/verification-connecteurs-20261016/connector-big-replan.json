@@ -1,0 +1,12 @@
+{
+  "observed": "UI approval of 9007199254740993 refused as accord non exact",
+  "cause": "form copied amount from parsed JavaScript Number instead of exact server text",
+  "originals": [
+    "connector-big-before/connector-ui-failure.json",
+    "connector-big-discrimination/connector-ui-failure.json"
+  ],
+  "owner": "Codex",
+  "decision": "encode validated int64 decimal text without Number conversion; retain backend exact comparison",
+  "scope": "new connector approval form; no Go change",
+  "resumption_condition": "same browser scenario approves exact amount and keeps access workflows"
+}

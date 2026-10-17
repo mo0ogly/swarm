@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "at": "2026-10-15T21:02:54.623521+00:00",
+  "status": "LOCAL_SEALED_HELPER_VERIFIED_SECRET_BROKER_PENDING",
+  "owner": "Codex",
+  "go": {
+    "groups": [
+      {
+        "receipt": "sealed-lock-final-race.json",
+        "raw_named_passes": 46
+      },
+      {
+        "receipt": "sealed-timeout-witness-final-race.json",
+        "raw_named_passes": 2
+      }
+    ],
+    "meaningful_distinct_cases": 45,
+    "main": 16,
+    "subcases": 29,
+    "subprocess_fixture_excluded_from_coverage": "TestActionsConfianceT4SealedHelper",
+    "reuse": "Primary 46 raw named passes include one subprocess fixture with no assertion in parent. Only process disappearance witness changed afterwards; cancellation and descendant timeout cases reran on final test source. Production source unchanged. This is not a single run of 45 meaningful cases."
+  },
+  "public": {
+    "receipt": "sealed-final-public-delivery.out",
+    "cases": 7,
+    "binary_sha256": "77e92112aca0dec7e031388ad804d21bdfdaeb5ae5a5c9b323f507c609e403c8",
+    "same_binary": true
+  },
+  "browser": [
+    {
+      "receipt": "sealed-final-public-evidence/browser/ui.json",
+      "count": 22
+    },
+    {
+      "receipt": "sealed-final-human-browser/oidc-ui.json",
+      "count": 26
+    },
+    {
+      "receipt": "sealed-final-services-browser/workload-ui.json",
+      "count": 14
+    },
+    {
+      "receipt": "sealed-final-delegation-browser/delegation-ui.json",
+      "count": 10
+    },
+    {
+      "receipt": "sealed-final-step-up-browser/step-up-ui.json",
+      "count": 20
+    },
+    {
+      "receipt": "sealed-final-logout-browser/oidc-logout-ui.json",
+      "count": 18
+    },
+    {
+      "receipt": "sealed-final-data-browser/data-policy-ui.json",
+      "count": 14
+    },
+    {
+      "receipt": "sealed-browser-final/sealed-ui.json",
+      "count": 13
+    }
+  ],
+  "browser_total": 137,
+  "kernel_assertions_per_check": 14,
+  "static_checks": {
+    "build": "sealed-final-build.json",
+    "vet": "sealed-final-vet.json",
+    "i18n": "sealed-final-i18n.json",
+    "contexts": "sealed-final-contexts.json",
+    "diff": "sealed-final-diff.json",
+    "manifest": "sealed-manifest-final-race.json"
+  },
+  "manifest_paths": 1395,
+  "engine_manifest_sha256": "c87fac163c90b0ea244556d5a44f13ebadb7e4f3603fd09b7dd82034931758c6",
+  "preview": {
+    "pid": 1587745,
+    "proc_start_ticks": "3250095",
+    "argv": [
+      "/home/fpizzi/Documents/ChatGPT/swarm/bin/swarm-actions-confiance-sealed",
+      "--root",
+      "/tmp/swarm-actions-preview-g81kfiuh",
+      "web",
+      "127.0.0.1:36525"
+    ],
+    "binary_sha256": "77e92112aca0dec7e031388ad804d21bdfdaeb5ae5a5c9b323f507c609e403c8",
+    "origin": "http://127.0.0.1:36525",
+    "fixture_root": "/tmp/swarm-actions-preview-g81kfiuh",
+    "old_process": {
+      "pid": 1391647,
+      "identity_verified": true,
+      "stopped": true
+    },
+    "actions": 2,
+    "ledger_entries": 1,
+    "state_sha256_unchanged": "d3b01d34c5c750ca91cbe1591ccd1c978ecb3a52a6416ffbbb0d610cfddd48c1",
+    "delegation_admin_present": true,
+    "delegation_max_depth": 0,
+    "step_up_admin_present": true,
+    "step_up_enabled": false,
+    "oidc_logout_enabled": false,
+    "oidc_logout_admin_present": true,
+    "oidc_enabled": false,
+    "workloads_enabled": false,
+    "group_mapping_enabled": false,
+    "group_mapping_admin_present": true,
+    "sealed_execution": {
+      "enabled": false,
+      "timeout_seconds": 15
+    },
+    "sealed_check_ui_present": true,
+    "data_policy_admin_present": true,
+    "data_policy_enabled": false,
+    "data_capabilities": {
+      "classifications": [
+        "public",
+        "internal"
+      ],
+      "destination": "local-ledger",
+      "external_containment_verified": false,
+      "provider": "swarm",
+      "secret_grants_supported": false,
+      "tool": "simulated-settlement"
+    },
+    "identity_context_ui_present": true,
+    "public_api_and_html_verified": true,
+    "browser_reload_observed": false,
+    "private_startup_log": "/tmp/swarm-sealed-preview-eunycci3.log",
+    "created_at_utc": "2026-10-15T21:01:17.232051+00:00"
+  },
+  "input_sha256": {
+    "internal/engine/trust_oidc.go": "264601f0935f9c7df9420b89642736e25f439633df83bb2b3333df3952bbf655",
+    "internal/engine/trust_workload_test.go": "93af01a38f889c916b76b47b99d4bae855272c6806cdebce2fb6c4f2e0284994",
+    "internal/engine/trust_step_up_test.go": "055cfd824992f1eb23d495b77549db6e70c76344745c6848b16347051eece034",
+    "internal/engine/trust_actions.go": "9cac6a36456d08b916de9fd295ec812aeacbb25420dc423a15acc8e1f1d21a02",
+    "internal/engine/trust_actions_test.go": "6f0c10ea5748f71781023df2a17eb56a6c3ef5ea2b0ee63a4ca799c24c6a0af2",
+    "internal/engine/trust_actions_init.go": "70d55fe26cbc6b9d5edf772b8e060710d6ca7e55aeee5e8f6dff07bdda7e1903",
+    "internal/engine/trust_identity_lifecycle_test.go": "b2d30723fa0681bd47f0b5f679370457586e4daab1343bda44ca19149097c84d",
+    "internal/engine/trust_delegation.go": "1e94ba28c817037b50a334083abe12e040d96346871ccb65931557a673d54501",
+    "internal/engine/trust_data_policy_test.go": "d63451528dc478cc68324d928ee2ca647cbe24778d81187de68575386ead411a",
+    "internal/engine/trust_actions_http.go": "4526cf102f0054c81866f5c3d8ecb183f71fe152e3726bfba3a023f94a3f7870",
+    "internal/engine/trust_group_mapping.go": "e14cc6909a1c5bd55818437fd9e3b6bffd90a2bcc1a1a485134286db3f41d920",
+    "internal/engine/trust_oidc_logout.go": "af93468275f656293f51be6db33f4e9a07e04329eacf3751354ce44e112b2953",
+    "internal/engine/trust_oidc_test.go": "a61f3f7c99d11bc128ccca21347eae56c67fa225ffb446ac4a30887404c6ae44",
+    "internal/engine/trust_sealed_linux_amd64.go": "94df1144ea34782bcd00705807ec92837ec39ae12b8cfdff2747572e995a0e0d",
+    "internal/engine/trust_actions_originals.go": "dd207a2582467e2b3b83a5fe189e7ed594be2421bf91379066eead8d838cbf1f",
+    "internal/engine/trust_oidc_logout_test.go": "109b9f54349afc38a8f1f714457996f29e321b917a6b57aeb7a7b82c743f51c6",
+    "internal/engine/trust_data_policy.go": "e3d216c083d644ead7ab061bea5357b3e8fd8a42f66bb9d562c409e4cd008f04",
+    "internal/engine/trust_step_up.go": "b426deac6927a8b56db849babd5fed6a2a219bf7f24db0775957b4fe7bddf1a4",
+    "internal/engine/trust_sealed.go": "3308f6eafd2e3c8f92e331be03c9c81a4e23999203d5c26c0b7bc1bffbc540c7",
+    "internal/engine/trust_group_mapping_test.go": "da6b375444a53db7cb16e891783e80e99054ee98f541ac0b914309a59a6e8f17",
+    "internal/engine/trust_delegation_test.go": "8ba2d7204316ccd0614271f4630685dbd6c9b20eb719e19677cacb7790dedf5f",
+    "internal/engine/trust_identity_context.go": "6caa9236429b8210f2a4abb31278e58d69852c114d0175608d2fa080a51d393f",
+    "internal/engine/trust_actions_operator_regression_test.go": "160ac7cba1d13ec2f8c85260777ce0d3801285b5e1e19e1fb46a5f9839f5bd56",
+    "internal/engine/trust_sealed_other.go": "bf84484f9403de56e6a1f65681ace2c89109725bf24a2ae84175e0ca5e7ca4f4",
+    "internal/engine/trust_identity_context_test.go": "06e483677d5a2c681eb425628d60cbf2603fe8345c170fdced94b1c52533e3b3",
+    "internal/engine/trust_actions_cli.go": "4ef9e969924961d838a4df097870bdd854e36f2ba8e397ac7291a06a22836b32",
+    "internal/engine/trust_workload.go": "20c10d4b53836f6492eac6262a852052ef53825a459d88fc67ec8a7b2d175ab2",
+    "internal/engine/trust_sealed_test.go": "974b23f11dca8c2a7a7f07d676140b27959506c7b1ce6e7c3b536ee7c5adce4f",
+    "internal/engine/trust_identity.go": "6d38e348c69d24ccf026e87a3412f4f45b7cbf7739bbbac502c57374daab97bd",
+    "internal/engine/main.go": "96476270545f2cc4bbcb65f5f205fdb688476e30bc3db3c888656ba41e87b73b",
+    "internal/engine/web_server.go": "8be96a4116bb93029ea45a8527cdce2a1f56354e317ac2035c4c9070ce1377f4",
+    "resources.go": "b5c75f94ab0176cb200e4717e9a818178b72111a48c7dadb7602ceb18416af13",
+    "web/trust-actions.js": "b57df2af16dd1891f443066d2a10f546140af6b58941886ef7489be2ff31ee6e",
+    "web/trust-actions.html": "2018714038e406b495252b800ed7dd7e50ca94d57d9978639efd06aaf5a1cdef",
+    "web/trust-actions.css": "5eae89a6e3bdf6babb54cd597c9ebda6e31e71ed34a9d10fa0d63ea2363da88b",
+    "web/trust-actions-en.js": "28a4e562e8277639847a44a98cfa923ef6d2ff1aa9ade41a8752f632106ffd8e",
+    "locales/trust-actions-en.json": "87195daed2c0d4ae4186d39dcb4871e34fb4968cdf216003d47e993902592819",
+    "tests/actions_confiance_sealed_ui.cjs": "199673093ef27fcfd8b57662e963c25b012d0b5d2c723de8d2131fd78ab87a74",
+    "tests/actions_confiance_t2.py": "70c68059fcfadcc1dfd115c29daee6eea38995f404548cad84e85c80bb1a1d53",
+    "tests/actions_confiance_recipe_timeout_test.py": "1473d71f8cc854e8da33baf93c6e228839e5e3c172196ced968bbf858572b9d4",
+    "docs/actions-confiance-T4.md": "48904f8c9fc7835b8b2213f8686f02bc6ccacfd955f78dcb586a90e9dc64823f",
+    "docs/en/actions-confiance-T4.md": "e218a8411ed74ff1b32195a8d95efa427f20bd70cd61d8f780859a5203368ac7",
+    "tools/verification/refresh_engine_source_manifest.py": "88c11651102f2e802725d6e9f9129c98871c98a559221d2bf3c14da286708252",
+    "tools/agent-workflows/CONTRACT.md": "0ec9baef679dbff833167a0dfbfcbf73014d0e4b7f7b85711d8768d6b3e75386",
+    "go.mod": "cfe933eb08fd50f5fcadc26ad849594b0bfa9de4cdb1879c28142a0e65ff8eb2",
+    "go.sum": "7fb5a679d594c0cbc5f93dff2253bfb5e55a63e8759c15624e804f3817ab3f5f"
+  },
+  "evidence_sha256": {
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-lock-before.json": "91a29a85a0618dd04bf0a3e98ce9299563df10601ada53e065cd65f3a23282fd",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-before-runner.json": "0b116c4f7e68e9510e85d72a858003846f47579283ae040607d1b512bbbe5134",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-step-up-delivery.json": "6e45352a378267f13f266b73fa76844f63980fe6af2b0c4cbf7ebe31c3c14508",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-race.json": "4550b4bc3126a88730da0b94aa3ff5e8b61a83e743e8d61aa752d073015b9c7a",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-i18n.json": "227cc25f174e35b7ce3cef3c33aa031b0b97a6e83c6509f5c47addd8a045b5e4",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-first-race.json": "f1dc8ab14976bc01d89780490d0970635db3feb8a009c97b0b9c7ddd093bef41",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-public-delivery.json": "639774c3faac43526c61645465557390d74c80a922551c956aeb8d08e32a256f",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-diff.json": "073c3468ed6eb4f0c0741e5aa7b8e47053774a2b79e33097026d143cae3fe2be",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-delegation-delivery.json": "908788680a55d9fa413c275e778d7687db6b6afc6c9eb875b3499b45363a96ed",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-runner.json": "fdd75f436f4022c640ef0f86df1104c79943c6e17b07968c7909be3c0daa9a03",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-baseline-build.json": "4f4c6a9db9100729b7e3127ef7e029e6d356909e7ddd4c6371c9f0a08b921e13",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-data-delivery.json": "e90b543bccba28f7086c20f1897df084fcdf3585bb426b449d610fee23fdf31f",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-logout-delivery.json": "6b81978d6a66cdb3360f26430b2cb67a2793dba611bdecf106a0be6baf5377e3",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-timeout-witness-final-race.json": "e97e031895cd1f199045d7b8cb1833fe7d196688bebcba1d5f1d5706135bf92e",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-build.json": "91fbce0ffdce8c79c4dadd558a0b504a3aa70442ebf702943718764b44031441",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-services-delivery.json": "17db7e94fe6a09af503b30eb62f8184e86455d2f3c9b3b3d69144c1431339da9",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-human-delivery.json": "93ddf34eb6d88d706672b9749f56ecfaf2598cdde4052c1be55dbcdf08dad4a3",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-preview-process.json": "8a102ed17bd6d8271cbb5b17d79e5041a039afa5610d8c23d4b8f62cf90b22c4",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-contexts.json": "fcaca8a5f0b6e0b469dd14993c30f04305302505c2f651645d42b7d76c000d58",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-manifest-final-race.json": "2af96563a96391baf02ca9cc2df18cf527739aca8549baa01d6a866efa638f43",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-lock-final-runner.json": "fd391fa74d9f151a13cde42f932d68b0ede7b956f2c4e3aec1bf5192c93709f1",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-first-runner.json": "81a19f14459f9d05fc841e4627e5e7fd62b7d9056fafa135bf81018e0a0ea97a",
+    "docs/plans/actions-confiance/verification-confinement-20261015/recipe-timeout-process-race-before.json": "fcf4c551042d69cafb1768f820fe1bbc1d09b62a9bc3a2bf16993b52a8751dc3",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-vet.json": "c5b87baada601ada93c274692605eeaedc9b50151b8e8035ee11647af7e7820f",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-manifest-final-runner.json": "a43b68258031de089cf23670628eeb07c375d07464de68b34b21fc0e4ea5a878",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-before-race.json": "4baa6a8418f63c35585c4ff878e9dc32d5b35ebdee50b6758e7c785ef574641a",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-timeout-witness-final-runner.json": "ea257d8b0ef57cc32cd82de6f3ff8a5d85e1aec94d0002c9ddd322b0221157a7",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-lock-final-race.json": "dab9f4348eefb465a5ae19206d86dc62c10d2c931ef4dd819ff902a8fb8b19dc",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-lock-after.json": "7f1e5ecd976411fb7a9b071aeb2e87b91da2082d15a4d46bf61bb909bacfb836",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-before-runner.out": "eda6997b18f6177cc60b71d775c823f9ba811eb08fc20ce8b2fef9d36228fd96",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-manifest-final-runner.out": "06c67db7d57515286ec93785a962a384c4cee73da9fc07541de14a1e37b5efe2",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-race.out": "fbe72c7a3a06f08b9331e67d64abdfc80e9d93b0dd7cd0d6405e796d6c4fa61b",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-vet.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-public-delivery.out": "763ced78c9c8ebee064dfbcd1619b79abf2bc44847b610ef744a3fe6d0b653a9",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-step-up-delivery.out": "f44e2026d64227d41ecae008c5ab1625f4f4daaf0f47c428bf65527d85bc8c66",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-lock-final-race.out": "2214c1a419b045d238e696686e60848bff815e61ae4792cf6ac481e49c092f80",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-baseline-build-runner.out": "a1d362367d1374ff8000fd75351c58e957a1f511e0d50689ca4832bb3a284162",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-manifest-final-race.out": "7c1eeb8bfb041faf8810e0006209c3ef37759b566d4997df6b258d1b8d7cde13",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-before-race.out": "1811477f57fb4112ebc7011a560933b2ca1d769a4ea926de14f5e9fc438a7862",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-i18n.out": "23d0852b273fc311a94c30acddc4f7e897ac4e8f2782cabdb417754737419987",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-baseline-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-first-runner.out": "a47e887150be7d9e5a0d2d85598ef0e1f759400d36a06bf778aeb23781be64b8",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-contexts.out": "419e9614a488bc5d8d7c80f57b481163cde2c4cb0ca521458b8267adaf85a595",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-public-runner.out": "1744026dd9a48f8157a7e5ff3ebd4c328ac0450b2a7626a0ee1af10c5cef69cf",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-logout-delivery.out": "6fc0cf7bfd41ff92ed9beb65acf8920b89d696ed04d44dd06fcb2534b68791ea",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-lock-final-runner.out": "96ba3b0e5ac177aa4f59087db32170838722ed13343e1ab8d93dd8e7a82bcda1",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-build.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-timeout-witness-final-runner.out": "1c257717e57aebb44fb7eb655a229e2e3ffb6c58f4f4de7aaa626e816ebdfb0b",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-browser-final.out": "88153830317a1316ec260b99fb05da786b94a8520cd881efefd8d7244172d44c",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-first-race.out": "054752a7016e237de1a40fd530b154246c3c5d404cb5a132cf5f49309a6a2f16",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-services-delivery.out": "5eb69cf2ddc50a743f7b361014b6b0dea93852674381e3c3a941f0eff4bb3d1f",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-build-runner.out": "4fb74988ba5fa265c30e4a19528c03ab01ed667dd8935668db41eb7bcf7551db",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-diff.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-data-delivery.out": "675eb389bca847eb6c6065d240bdc34e2d34b1257c2b76fca05f693f6ed4c347",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-runner.out": "64acf611dc164876dc7a7b76947f9faf58e132bb41933396b09ec1cc008b9981",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-timeout-witness-final-race.out": "685bb58115beb2780e6bd0d11eeb4faeb18e3f1d6983af883f4122ebf3bdc1c9",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-delegation-delivery.out": "4b6ad62e27b348adf65beb2cb890ede33f4d4d4e396a4b832c2357c4d08ba75a",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-human-delivery.out": "ca9b0fb321c33f8305e937c7cd56eeee4a291a1f91784195eb37ecd2f1272dd3",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-browser-first.out": "88153830317a1316ec260b99fb05da786b94a8520cd881efefd8d7244172d44c",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-public-evidence/browser/ui.json": "56ba02dbc9affbb2e86cfbada76d28f2d7041795dbe5d8f134b7f94578a58471",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-human-browser/oidc-ui.json": "23321da2203abc79eb2dab5c8ce40d174ca2b59d23216b7efdc4fd6f09ba5b1c",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-services-browser/workload-ui.json": "9b2e5f341e50bd08615b180a00c9136455152098379490a6884eb0261390a88f",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-delegation-browser/delegation-ui.json": "7129189fcfd1a5f7776a7b1c25cc9f200e5c396b16d152104bd09bc01cea585f",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-step-up-browser/step-up-ui.json": "92d573b42a390b61c82d0adcbf09439855086a4621f50966836fafd8870ac7a3",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-logout-browser/oidc-logout-ui.json": "bdbdc683a40d7a51b7645550cf1f411175de25cce3a649ceba4905ffde6dc1d8",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-final-data-browser/data-policy-ui.json": "377e62c52b87eda6496a289ec767e4cf216a651d3ecff6e587f5ea3dc24f5c9a",
+    "docs/plans/actions-confiance/verification-confinement-20261015/sealed-browser-final/sealed-ui.json": "0112d78ec40dc8834783a9863bb84fa0f60d44baeeb0b8f20d2b38edf36e3540"
+  },
+  "original_failures": [
+    "sealed-before-race.out",
+    "sealed-lock-before.json",
+    "recipe-timeout-process-race-before.json"
+  ],
+  "limits": [
+    "R14 partial: fixed built-in helper only, locked filesystem operation thread and process-wide synchronized seccomp; no arbitrary code or connector goroutine",
+    "Existing providers remain unqualified; secret grants and in-memory secret broker not implemented",
+    "No confidential/restricted action enabled, no external account, payment or deployment",
+    "R13 remote service revocation and remaining lots through RETEX stay open",
+    "No independent review or global acceptance",
+    "Preview API/HTML verified with business bytes unchanged; IAB reload not observed",
+    "Original Admin screenshots private; final capture scopes controls without fixture credentials"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "exit_code": 1,
+  "runs": 200,
+  "passes": 198,
+  "top_level": 56,
+  "plan_named_passes": 30,
+  "fails": [
+    "TestAgentIdentityPlanWaitReadsCommittedContract",
+    "TestPlanningReviewRetryDeliversSupervisorCorrectionAfterReopen",
+    null
+  ],
+  "skips": [],
+  "stderr": "",
+  "errors": [
+    "managed_review_retry_delivery_test.go:16: sizes 164551 168226 22090 parts 1",
+    "panic: runtime error: invalid memory address or nil pointer dereference [recovered]",
+    "panic: runtime error: invalid memory address or nil pointer dereference",
+    "/usr/local/go/src/testing/testing.go:1734 +0x21c",
+    "/usr/local/go/src/testing/testing.go:1737 +0x35e",
+    "panic({0x1549cc0?, 0x54e6370?})",
+    "/usr/local/go/src/runtime/panic.go:792 +0x132",
+    "/home/fpizzi/Documents/ChatGPT/swarm/internal/engine/managed_review_retry_delivery_test.go:44 +0x93a",
+    "/usr/local/go/src/testing/testing.go:1792 +0xf4",
+    "/usr/local/go/src/testing/testing.go:1851 +0x413"
+  ]
+}

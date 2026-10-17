@@ -1,0 +1,5 @@
+{
+  "status": "failed diagnostic",
+  "cause": "proc entry disappeared between exists and read; cleanup itself not disproved",
+  "correction": "FileNotFoundError treated as process gone; guard rerun"
+}

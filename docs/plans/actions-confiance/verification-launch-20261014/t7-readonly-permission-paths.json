@@ -1,0 +1,13 @@
+{
+  "collector_file_capabilities": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "sudo_readonly_listing": {
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "sudo-rs: interactive authentication is required\n"
+  },
+  "limits": "Read-only account permission inventory; no privileged collection or configuration executed."
+}

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "tests/semantic_signals_ui.cjs",
+    "docs/plans/deepagents-integration/evidence/m22-20261017/browser-verified"
+  ],
+  "started_at": "2026-10-17T08:20:23.557449+00:00",
+  "finished_at": "2026-10-17T08:20:41.870548+00:00",
+  "exit_code": 0,
+  "reason": "verify rejected inherited object keys after reproduced failure, and bind final sources/screenshots",
+  "chrome_version": "Google Chrome 130.0.6723.116",
+  "replacement_exit_code": 1,
+  "original_receipt_preserved": true
+}

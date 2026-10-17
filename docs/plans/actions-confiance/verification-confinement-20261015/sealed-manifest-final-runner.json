@@ -1,0 +1,10 @@
+{
+  "pid": 1579792,
+  "proc_start_ticks": "3239999",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-sealed-manifest-check.py",
+    "run"
+  ],
+  "at": "2026-10-15T20:59:35.847124+00:00"
+}

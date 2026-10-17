@@ -148,7 +148,7 @@ func differentialFragmentPlan(c managedReviewContext, old managedReviewContext, 
 	for _, r := range reused {
 		r.Packet = len(p.Packets)
 		p.Reused = append(p.Reused, r)
-		p.Packets = append(p.Packets, managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 3, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: r.Packet, Artifacts: r.Original.Artifacts})
+		p.Packets = append(p.Packets, managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 3, Candidate: c.Candidate, ContextDigest: p.ContextDigest, Index: r.Packet, Artifacts: r.Original.Artifacts})
 	}
 	if err = validateManagedReviewFragments(c, p); err != nil {
 		return managedReviewFragmentPlan{}, err
@@ -178,11 +178,11 @@ func (s *Store) planLegacyCandidateFragments(w Work, a Agent, c managedReviewCon
 	if err != nil || r.FragmentJournal == nil || (r.State != "changes_requested" && r.State != "error") || r.Contract != reviewContract(t) || r.Producer != a.ID || r.Attempt != a.Attempt || s.managedBatchProviderIntact(w.Planning.Reviewer, r) != nil {
 		return planManagedReviewFragments(c, available, 2)
 	}
-	changed, _, err := s.fragmentReviewMethodChanged(&r)
+	changed, workflowDigest, err := s.fragmentReviewMethodChanged(&r)
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
 	}
-	if changed {
+	if changed || r.FragmentJournal.WorkflowDigest != workflowDigest {
 		// A full new inspection uses current candidate evidence, not historical
 		// opinions. A changed method forbids reuse, not fresh bounded review.
 		return planManagedReviewFragments(c, available, 2)
@@ -248,7 +248,7 @@ func (s *Store) planLegacyCandidateFragments(w Work, a Agent, c managedReviewCon
 	}
 	bare := filepath.Join(w.Planning.Repository.Storage, "repository.git")
 	// Recovered candidates may be siblings: compare exact trees, never claim ancestry.
-	delta, err := managedGit(bare, "diff", "--no-ext-diff", "--no-textconv", "--full-index", "--unified=40", r.CandidateSHA, c.Candidate, "--")
+	delta, err := managedReviewGit(c.CitationContractVersion, bare, "diff", "--no-ext-diff", "--no-textconv", "--full-index", "--unified=40", r.CandidateSHA, c.Candidate, "--")
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
 	}
@@ -327,7 +327,7 @@ func (s *Store) validateFragmentReuseSources(parent IndependentReview, c managed
 		if strict(raw, &old) != nil || fragmentScope(old) != fragmentScope(c) {
 			return fmt.Errorf("historical task contract changed")
 		}
-		delta, err := managedGit(bare, "diff", "--no-ext-diff", "--no-textconv", "--full-index", "--unified=40", origin.CandidateSHA, c.Candidate, "--")
+		delta, err := managedReviewGit(c.CitationContractVersion, bare, "diff", "--no-ext-diff", "--no-textconv", "--full-index", "--unified=40", origin.CandidateSHA, c.Candidate, "--")
 		if err != nil {
 			return err
 		}

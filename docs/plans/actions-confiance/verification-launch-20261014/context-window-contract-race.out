@@ -1,0 +1,34 @@
+=== RUN   TestCandidateFragmentsUseObservedCapacityWhenLegacyPacketsFit
+    managed_review_capacity_first_test.go:15: sizes 164551 168226 22003 parts 1
+--- PASS: TestCandidateFragmentsUseObservedCapacityWhenLegacyPacketsFit (5.78s)
+=== RUN   TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal
+    managed_review_capacity_first_test.go:47: sizes 164551 168226 22003 parts 1
+--- PASS: TestCandidateFragmentsUseObservedCapacityBeforeLegacyIndivisibleRefusal (4.72s)
+=== RUN   TestReviewContextWindowPolicyPersistsWithoutSpending
+    managed_review_context_policy_test.go:62: sizes 164551 168226 22003 parts 1
+--- PASS: TestReviewContextWindowPolicyPersistsWithoutSpending (1.71s)
+=== RUN   TestReviewContextWindowReachesToolFreeClient
+    managed_review_context_policy_test.go:121: sizes 164551 168224 22003 parts 1
+=== RUN   TestReviewContextWindowReachesToolFreeClient/digest
+=== RUN   TestReviewContextWindowReachesToolFreeClient/stamp
+=== RUN   TestReviewContextWindowReachesToolFreeClient/capacity
+=== RUN   TestReviewContextWindowReachesToolFreeClient/provider
+--- PASS: TestReviewContextWindowReachesToolFreeClient (1.28s)
+    --- PASS: TestReviewContextWindowReachesToolFreeClient/digest (0.00s)
+    --- PASS: TestReviewContextWindowReachesToolFreeClient/stamp (0.00s)
+    --- PASS: TestReviewContextWindowReachesToolFreeClient/capacity (0.00s)
+    --- PASS: TestReviewContextWindowReachesToolFreeClient/provider (0.00s)
+=== RUN   TestReviewInputTokensMatchIndependentPythonVectors
+--- PASS: TestReviewInputTokensMatchIndependentPythonVectors (0.35s)
+=== RUN   TestReviewInputTokensKeepIndependentMemoryAndTokenLimits
+--- PASS: TestReviewInputTokensKeepIndependentMemoryAndTokenLimits (5.36s)
+=== RUN   TestReviewInputTokensRejectUnsupportedOrUnderreservedContract
+--- PASS: TestReviewInputTokensRejectUnsupportedOrUnderreservedContract (0.00s)
+=== RUN   TestReviewInputTokensConcurrentCodecsAndImmutableContract
+--- PASS: TestReviewInputTokensConcurrentCodecsAndImmutableContract (0.00s)
+=== RUN   TestQuotasPublicParityPersistenceAndNoRefund
+--- PASS: TestQuotasPublicParityPersistenceAndNoRefund (0.33s)
+=== RUN   TestQuotasRejectActivePlannerAndInvalidBudgets
+--- PASS: TestQuotasRejectActivePlannerAndInvalidBudgets (0.28s)
+PASS
+ok  	swarm.local/companion/internal/engine	20.985s

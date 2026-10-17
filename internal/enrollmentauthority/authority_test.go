@@ -1,0 +1,374 @@
+package enrollmentauthority
+
+import (
+	"bytes"
+	"context"
+	"crypto/ed25519"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+
+	"swarm.local/companion/internal/enrollmentproof"
+	"swarm.local/companion/internal/enrollmentstate"
+	"swarm.local/companion/internal/identitycontract"
+)
+
+func example() Document {
+	return Document{Schema: 1, EnrollmentID: "enrollment-1", Generation: 1, ProjectDigest: strings.Repeat("a", 64),
+		Principal: identitycontract.Principal{ID: "alice", Kind: "human", Issuer: "https://[::1]/issuer", Subject: "employee[eu]"},
+		Scope:     identitycontract.Scope{WorkID: "work-1", PlanVersion: 3, PlanDigest: strings.Repeat("b", 64)}, TrustRevision: 2,
+		Permissions: []identitycontract.Permission{{Operation: "agent.create", Resource: "task/child"}, {Operation: "memory.read", Resource: "memory/team"}},
+		Delegable:   []identitycontract.Permission{{Operation: "memory.read", Resource: "memory/team"}},
+		NotBefore:   time.Date(2026, 10, 17, 8, 0, 0, 0, time.UTC), ExpiresAt: time.Date(2026, 10, 17, 9, 0, 0, 0, time.UTC)}
+}
+
+func TestAuthorityRoundTripAndOwnedData(t *testing.T) {
+	d := example()
+	raw, err := Encode(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := Decode(raw)
+	if err != nil || !reflect.DeepEqual(got, d) {
+		t.Fatal("lost explicit authority", got, err)
+	}
+	got.Permissions[0].Resource = "changed"
+	again, err := Decode(raw)
+	if err != nil || again.Permissions[0].Resource != "task/child" {
+		t.Fatal("decoded data aliases another reader", err)
+	}
+	d.Delegable = nil
+	raw, err = Encode(d)
+	if err != nil || !bytes.Contains(raw, []byte(`"delegable":[]`)) {
+		t.Fatal("producer omitted explicit empty ceiling", err)
+	}
+	if _, err = Decode(raw); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAuthorityRejectsMalformedSchemaAndExpandedRights(t *testing.T) {
+	mutations := map[string]func(*Document){
+		"schema": func(d *Document) { d.Schema = 2 }, "id": func(d *Document) { d.EnrollmentID = " " }, "generation": func(d *Document) { d.Generation = 0 },
+		"project": func(d *Document) { d.ProjectDigest = "unverified" }, "local": func(d *Document) {
+			d.Principal.Kind = "local"
+			d.Principal.Issuer = "urn:swarm:local"
+			d.Principal.Subject = d.Principal.ID
+		},
+		"service": func(d *Document) { d.Principal.Kind = "service" }, "principal-id": func(d *Document) { d.Principal.ID = "../alice" },
+		"issuer": func(d *Document) { d.Principal.Issuer = " https://issuer" }, "subject": func(d *Document) { d.Principal.Subject = "employee\x00" },
+		"work": func(d *Document) { d.Scope.WorkID = "../work" }, "plan-version": func(d *Document) { d.Scope.PlanVersion = 0 }, "plan-digest": func(d *Document) { d.Scope.PlanDigest = "" },
+		"trust": func(d *Document) { d.TrustRevision = 0 }, "no-rights": func(d *Document) { d.Permissions = nil },
+		"wildcard": func(d *Document) { d.Permissions[0].Resource = "task/*" }, "unknown-operation": func(d *Document) { d.Permissions[0].Operation = "admin.all" },
+		"duplicate-right":     func(d *Document) { d.Permissions = append(d.Permissions, d.Permissions[0]) },
+		"duplicate-delegable": func(d *Document) { d.Delegable = append(d.Delegable, d.Delegable[0]) },
+		"expanded-delegation": func(d *Document) {
+			d.Delegable = []identitycontract.Permission{{Operation: "memory.transmit", Resource: "memory/team"}}
+		},
+		"zero-date": func(d *Document) { d.NotBefore = time.Time{} }, "empty-window": func(d *Document) { d.ExpiresAt = d.NotBefore },
+		"reversed-window": func(d *Document) { d.ExpiresAt = d.NotBefore.Add(-time.Second) },
+	}
+	for name, mutate := range mutations {
+		t.Run(name, func(t *testing.T) {
+			d := example()
+			mutate(&d)
+			if raw, err := Encode(d); !errors.Is(err, ErrDocument) || len(raw) != 0 {
+				t.Fatal("invalid authority encoded", err)
+			}
+			raw, _ := json.Marshal(d)
+			if got, err := Decode(raw); !errors.Is(err, ErrDocument) || !reflect.DeepEqual(got, Document{}) {
+				t.Fatal("invalid authority decoded", err)
+			}
+		})
+	}
+	raw, _ := Encode(example())
+	for name, bad := range map[string][]byte{
+		"unknown":          []byte(strings.Replace(string(raw), `{`, `{"active":true,`, 1)),
+		"duplicate":        []byte(strings.Replace(string(raw), `{`, `{"schema_version":1,`, 1)),
+		"nested-duplicate": []byte(strings.Replace(string(raw), `"principal_id":"alice"`, `"principal_id":"alice","principal_id":"alice"`, 1)),
+		"folded":           []byte(strings.Replace(string(raw), `"issuer"`, `"Issuer"`, 1)),
+		"null":             []byte(strings.Replace(string(raw), `"principal_id":"alice"`, `"principal_id":null`, 1)),
+		"null-delegable":   []byte(strings.Replace(string(raw), `"delegable":[{"operation":"memory.read","resource":"memory/team"}]`, `"delegable":null`, 1)),
+		"wrong-type":       []byte(strings.Replace(string(raw), `"generation":1`, `"generation":"1"`, 1)),
+		"trailing":         append(append([]byte(nil), raw...), []byte(`{}`)...), "whitespace": append([]byte(" "), raw...),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if got, err := Decode(bad); !errors.Is(err, ErrDocument) || !reflect.DeepEqual(got, Document{}) {
+				t.Fatal("noncanonical authority accepted", err)
+			}
+		})
+	}
+}
+
+type fixture struct {
+	key      ed25519.PrivateKey
+	journal  *enrollmentstate.Journal
+	verifier *enrollmentproof.Verifier
+	doc      Document
+	head     enrollmentstate.Head
+	expected Expected
+	at       time.Time
+	path     string
+}
+
+func setup(t *testing.T) fixture {
+	t.Helper()
+	pub, key, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	project := sha256.Sum256([]byte("explicit isolated project"))
+	d := example()
+	d.ProjectDigest = hex.EncodeToString(project[:])
+	path := filepath.Join(t.TempDir(), "enroll.sqlite")
+	j, err := enrollmentstate.Open(context.Background(), path, pub, project)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { j.Close() })
+	raw, err := SignEnrollment(key, project, enrollmentstate.Head{}, d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	head, err := j.Apply(context.Background(), enrollmentstate.Head{}, raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, err := enrollmentproof.NewVerifier(pub, project)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return fixture{key, j, v, d, head, Expected{Head: head, EnrollmentID: d.EnrollmentID, Generation: d.Generation, ProjectDigest: d.ProjectDigest, Principal: d.Principal, Scope: d.Scope, TrustRevision: d.TrustRevision, RequestDigest: strings.Repeat("c", 64)}, d.NotBefore, path}
+}
+func (f fixture) statement(t *testing.T, payload []byte) enrollmentproof.Statement {
+	t.Helper()
+	var requestDigest [32]byte
+	rawDigest, _ := hex.DecodeString(f.expected.RequestDigest)
+	copy(requestDigest[:], rawDigest)
+	ch, err := f.verifier.NewChallenge(requestDigest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var raw []byte
+	if payload == nil {
+		raw, err = f.journal.SignActive(context.Background(), f.head, f.doc.EnrollmentID, ch.Request(), f.key)
+	} else {
+		raw, err = enrollmentproof.SignResponse(ch.Request(), payload, f.key)
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	statement, err := f.verifier.Verify(ch, raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return statement
+}
+
+func TestTypedEnrollmentAndAuthenticatedConsumer(t *testing.T) {
+	f := setup(t)
+	statement := f.statement(t, nil)
+	got, err := DecodeActive(statement, f.expected, f.at)
+	if err != nil || !reflect.DeepEqual(got, f.doc) {
+		t.Fatal("authentic exact authority rejected", got, err)
+	}
+	if _, err = DecodeActive(statement, f.expected, f.doc.ExpiresAt); !errors.Is(err, ErrInactive) {
+		t.Fatal("expiry boundary accepted", err)
+	}
+	if _, err = DecodeActive(statement, f.expected, f.doc.NotBefore.Add(-time.Nanosecond)); !errors.Is(err, ErrInactive) {
+		t.Fatal("not-before boundary accepted", err)
+	}
+	if _, err = DecodeActive(statement, f.expected, time.Time{}); !errors.Is(err, ErrInactive) {
+		t.Fatal("missing observation time accepted", err)
+	}
+	// Decoding an authentic historical statement is not a source recheck.
+	projectBytes, _ := hex.DecodeString(f.doc.ProjectDigest)
+	var project [32]byte
+	copy(project[:], projectBytes)
+	revoke, _ := enrollmentstate.SignChange(f.key, project, f.head, "revoke", f.doc.EnrollmentID, nil)
+	revoked, err := f.journal.Apply(context.Background(), f.head, revoke)
+	if err != nil {
+		t.Fatal(err)
+	}
+	newExpected := f.expected
+	newExpected.Head = revoked
+	if _, err = DecodeActive(statement, newExpected, f.at); !errors.Is(err, ErrBinding) {
+		t.Fatal("old statement accepted against current witness", err)
+	}
+	if _, err = DecodeActive(statement, f.expected, f.at); err != nil {
+		t.Fatal("historical validity guard failed", err)
+	}
+}
+
+func TestConsumerBindsEveryExpectedDimension(t *testing.T) {
+	f := setup(t)
+	statement := f.statement(t, nil)
+	for name, mutate := range map[string]func(*Expected){
+		"head": func(e *Expected) { e.Head.Digest = strings.Repeat("d", 64) }, "id": func(e *Expected) { e.EnrollmentID = "other" }, "generation": func(e *Expected) { e.Generation++ },
+		"project": func(e *Expected) { e.ProjectDigest = strings.Repeat("d", 64) }, "principal": func(e *Expected) { e.Principal.ID = "bob" }, "issuer": func(e *Expected) { e.Principal.Issuer += "/" }, "subject": func(e *Expected) { e.Principal.Subject += "x" },
+		"scope": func(e *Expected) { e.Scope.WorkID = "other" }, "plan-version": func(e *Expected) { e.Scope.PlanVersion++ }, "plan-digest": func(e *Expected) { e.Scope.PlanDigest = strings.Repeat("d", 64) }, "trust": func(e *Expected) { e.TrustRevision++ }, "request": func(e *Expected) { e.RequestDigest = strings.Repeat("d", 64) },
+	} {
+		t.Run(name, func(t *testing.T) {
+			e := f.expected
+			mutate(&e)
+			if got, err := DecodeActive(statement, e, f.at); !errors.Is(err, ErrBinding) || !reflect.DeepEqual(got, Document{}) {
+				t.Fatal("foreign authority accepted", err)
+			}
+		})
+	}
+}
+
+func TestConsumerRejectsAuthenticMalformedPayload(t *testing.T) {
+	f := setup(t)
+	body, _ := Encode(f.doc)
+	for _, kind := range []string{"body-schema", "body-id", "body-generation", "record-sequence", "record-id", "extra-field", "empty", "null"} {
+		t.Run(kind, func(t *testing.T) {
+			r := enrollmentstate.ActiveReply{Schema: enrollmentstate.ActiveReplySchema, Head: f.head, Record: enrollmentstate.Record{ID: f.doc.EnrollmentID, Body: body, EnrolledSequence: 1}}
+			switch kind {
+			case "body-schema":
+				r.Record.Body = []byte(`{"active":true}`)
+			case "body-id":
+				d := f.doc
+				d.EnrollmentID = "other"
+				r.Record.Body, _ = Encode(d)
+			case "body-generation":
+				d := f.doc
+				d.Generation++
+				r.Record.Body, _ = Encode(d)
+			case "record-sequence":
+				r.Record.EnrolledSequence++
+			case "record-id":
+				r.Record.ID = "other"
+			}
+			payload, _ := json.Marshal(r)
+			if kind == "extra-field" {
+				payload = []byte(strings.Replace(string(payload), `{`, `{"active":true,`, 1))
+			}
+			if kind == "empty" {
+				payload = []byte{}
+			}
+			if kind == "null" {
+				payload = []byte("null")
+			}
+			if got, err := DecodeActive(f.statement(t, payload), f.expected, f.at); err == nil || !reflect.DeepEqual(got, Document{}) {
+				t.Fatal("signed malformed payload accepted", err)
+			}
+		})
+	}
+}
+
+func TestProducerRejectsInconsistentGenerationAndProject(t *testing.T) {
+	f := setup(t)
+	var project [32]byte
+	raw, _ := hex.DecodeString(f.doc.ProjectDigest)
+	copy(project[:], raw)
+	for _, kind := range []string{"generation", "project", "rights"} {
+		t.Run(kind, func(t *testing.T) {
+			d := example()
+			d.ProjectDigest = f.doc.ProjectDigest
+			switch kind {
+			case "generation":
+				d.Generation = 2
+			case "project":
+				d.ProjectDigest = strings.Repeat("e", 64)
+			case "rights":
+				d.Permissions = nil
+			}
+			if raw, err := SignEnrollment(f.key, project, enrollmentstate.Head{}, d); err == nil || len(raw) != 0 {
+				t.Fatal("inconsistent producer signed", err)
+			}
+		})
+	}
+}
+
+func TestGenerationRemainsCreationSequenceAfterOtherEvents(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	var project [32]byte
+	b, _ := hex.DecodeString(f.doc.ProjectDigest)
+	copy(project[:], b)
+	other := f.doc
+	other.EnrollmentID = "other-enrollment"
+	other.Generation = 2
+	raw, err := SignEnrollment(f.key, project, f.head, other)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.head, err = f.journal.Apply(ctx, f.head, raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.expected.Head = f.head
+	if got, err := DecodeActive(f.statement(t, nil), f.expected, f.at); err != nil || got.Generation != 1 {
+		t.Fatal("current head replaced creation generation", err)
+	}
+	// The generic journal deliberately permits opaque data. A trusted signer
+	// bypassing the typed producer still cannot make a declared generation pass
+	// this consumer when it differs from the journal-derived creation sequence.
+	forged := other
+	forged.EnrollmentID = "malformed-generation"
+	forged.Generation = 999
+	body, err := Encode(forged)
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err = enrollmentstate.SignChange(f.key, project, f.head, "enroll", forged.EnrollmentID, body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.head, err = f.journal.Apply(ctx, f.head, raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.doc = forged
+	f.expected.Head = f.head
+	f.expected.EnrollmentID = forged.EnrollmentID
+	f.expected.Generation = 3
+	if got, err := DecodeActive(f.statement(t, nil), f.expected, f.at); !errors.Is(err, ErrBinding) || !reflect.DeepEqual(got, Document{}) {
+		t.Fatal("declared generation overrode verified event", err)
+	}
+}
+
+func TestCanonicalDatesHaveNoDefaultDuration(t *testing.T) {
+	d := example()
+	d.NotBefore = d.NotBefore.In(time.FixedZone("fixture", 2*60*60))
+	d.ExpiresAt = d.ExpiresAt.In(time.FixedZone("fixture", 2*60*60))
+	raw, err := Encode(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := Decode(raw)
+	if err != nil || !got.NotBefore.Equal(d.NotBefore) || !got.ExpiresAt.Equal(d.ExpiresAt) || got.NotBefore.Location() != time.UTC {
+		t.Fatal("explicit instants changed", err)
+	}
+	noncanonical, _ := json.Marshal(d)
+	if _, err = Decode(noncanonical); !errors.Is(err, ErrDocument) {
+		t.Fatal("noncanonical time zone accepted", err)
+	}
+}
+
+func TestDerivedGenerationSurvivesReopen(t *testing.T) {
+	f := setup(t)
+	if err := f.journal.Close(); err != nil {
+		t.Fatal(err)
+	}
+	var project [32]byte
+	raw, _ := hex.DecodeString(f.doc.ProjectDigest)
+	copy(project[:], raw)
+	j, err := enrollmentstate.Open(context.Background(), f.path, f.key.Public().(ed25519.PublicKey), project)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer j.Close()
+	f.journal = j
+	if got, err := DecodeActive(f.statement(t, nil), f.expected, f.at); err != nil || got.Generation != 1 {
+		t.Fatal("reopen lost derived creation sequence", err)
+	}
+}

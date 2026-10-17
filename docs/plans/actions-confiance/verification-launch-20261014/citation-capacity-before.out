@@ -1,0 +1,7 @@
+=== RUN   TestFinalCitationRetryMeasuresRemainingMessage
+    managed_review_citation_feedback_test.go:315: sizes 164551 168226 21899 parts 1
+    managed_review_citation_feedback_test.go:350: open /tmp/TestFinalCitationRetryMeasuresRemainingMessage2942977910/001/citation-capacity/.swarm-write-1543988808: no such file or directory
+--- FAIL: TestFinalCitationRetryMeasuresRemainingMessage (0.93s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.957s
+FAIL

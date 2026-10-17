@@ -1,0 +1,56 @@
+{
+  "result": "PASS",
+  "at_unix": 1792185488.7265089,
+  "head": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+  "branch": "codex/clear-product-method-names",
+  "scope": "IA2.1 semantic specification and first standalone IA2.3 host experiment; not full IA2 or engine integration",
+  "criteria": 11,
+  "ida_covered_in_spec": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+  ],
+  "isolation_variants_observed": 10,
+  "links": "PASS",
+  "python_ast": "PASS",
+  "model_calls": 0,
+  "git_diff_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "source_sha256": {
+    "docs/plans/actions-confiance/identites-agents-contrat-IA2.md": "4cb8c0b4b5aee9b96099ce43702ae0e70fc28f0c74ad7fb5e7e85c4ee626861b",
+    "docs/plans/actions-confiance/identites-agents-replan.md": "5a4eeb867b511a0438194c16cf9c22981a6d25b7bbe545d2a4e375e827570334",
+    "docs/plans/actions-confiance/verification-identites-agents-20261016/ia2_isolation.py": "ba0bcec55e2bfdc4d2a56acde2b85c0621ccb9060139a7e958b3647acb92cc8b",
+    "internal/engine/trust_identity_context.go": "50b47484d70a857a21a88a19d87a80e999c700d1eb9376aa8e1e1509d3090807",
+    "internal/engine/trust_actions.go": "e73e91cd406eff822d06333f58997b4d681102f0eeff63ecd6f5a6d1b3f9d58a",
+    "internal/engine/trust_step_up.go": "b426deac6927a8b56db849babd5fed6a2a219bf7f24db0775957b4fe7bddf1a4",
+    "internal/engine/store.go": "85ddbecfcbfb4a9554eee520d6e78fdd65904b711525eb4b37879d9d3531940a",
+    "internal/engine/agents_store.go": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21",
+    "internal/engine/agents_process.go": "00d74a35555c8c4fb2f2ac56d5482bc3b8a8ca0bbb97755a14f5cb02dfec256f",
+    "internal/engine/planning.go": "7c556f7bd17f968489c07ba41c10b70f8ccea40419e18f50e6e1d296567d9f29"
+  },
+  "open": [
+    "IA2.2 concrete schema and validators",
+    "Protected authenticated control channel and administration bootstrap",
+    "Provider-compatible authenticated egress",
+    "Departure/revocation protocol and consumer integration",
+    "IA4 memory rights and IA5 qualification/RETEX"
+  ]
+}

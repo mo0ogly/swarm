@@ -1,0 +1,16 @@
+=== RUN   TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview
+=== RUN   TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/pass
+=== RUN   TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/control-fails
+=== RUN   TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/review-fails
+=== RUN   TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/known-local-failure
+=== RUN   TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/no-declared-control
+--- PASS: TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview (2.99s)
+    --- PASS: TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/pass (0.84s)
+    --- PASS: TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/control-fails (0.58s)
+    --- PASS: TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/review-fails (0.71s)
+    --- PASS: TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/known-local-failure (0.41s)
+    --- PASS: TestManagedDeliveryReadyRequiresActualControlsAndIndependentReview/no-declared-control (0.45s)
+=== RUN   TestManagedDeliveryPromptSeparatesLocalAndIndependentEvidence
+--- PASS: TestManagedDeliveryPromptSeparatesLocalAndIndependentEvidence (0.30s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.443s

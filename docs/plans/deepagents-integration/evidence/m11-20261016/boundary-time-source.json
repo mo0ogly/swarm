@@ -1,0 +1,7 @@
+{
+  "source_sha256": {
+    "dialogue_boundary_time_red_test.go.txt": "9b6bfb700992232fee2be4e43af36db85b05e2b4eb65741b0ce8f149ba84cb71",
+    "dialogue_checkpoint_store_before_time_fix.go.txt": "08230d3769f25dfaaf2972e9ea7fdff48b11ae583c0acb8075121539ced0bafd"
+  },
+  "red_receipt_sha256": "11295f2d6770fc5ba55a2de20395835f9594c79b16adee0cb484cc9f6643ca35"
+}

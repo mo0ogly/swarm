@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^(TestDialogueUsageSnapshotDoesNotMutate|TestDialogueBoundaryHasDurableStateBeforeHeartbeat|TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing|TestDialogueCheckpointWriteFailureStopsBeforeNextProvider|TestDialogueCheckpointAPIReadAndForeignWorkRefusal|TestDialogueCheckpointRejectsInvalidOrForeignState|TestDialogueCheckpointMigrationPreservesLegacyAndBackup|TestDialogueCheckpointSurvivesLifecycleDeleteRestore|TestDialoguePendingBoundaryHasDurableUsage|TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed|TestDialogueStartCheckpointDoesNotDescribeLaterEffects|TestDialogueIncompleteTurnCannotBeAnswered|TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions|TestDialogueConfirmationStorageFailureBlocksContinuation|TestDialogueProtocolRejectsReplayAndUnconfirmedEOF|TestDialogueCheckpointProgressUsesStoredBoundaryTime)$",
+    "-count=1",
+    "-v",
+    "-timeout=180s"
+  ],
+  "started_at_utc": "2026-10-16T12:00:44.598260+00:00",
+  "ended_at_utc": "2026-10-16T12:02:04.894766+00:00",
+  "elapsed_seconds": 80.29651540100167,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueUsageSnapshotDoesNotMutate",
+    "TestDialogueBoundaryHasDurableStateBeforeHeartbeat",
+    "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+    "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+    "TestDialogueCheckpointAPIReadAndForeignWorkRefusal",
+    "TestDialogueCheckpointRejectsInvalidOrForeignState",
+    "TestDialogueCheckpointMigrationPreservesLegacyAndBackup",
+    "TestDialogueCheckpointSurvivesLifecycleDeleteRestore",
+    "TestDialoguePendingBoundaryHasDurableUsage",
+    "TestDialogueCheckpointWithoutAnsweredStatusIsUnconfirmed",
+    "TestDialogueStartCheckpointDoesNotDescribeLaterEffects",
+    "TestDialogueCheckpointProgressUsesStoredBoundaryTime",
+    "TestDialogueIncompleteTurnCannotBeAnswered",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions",
+    "TestDialogueConfirmationStorageFailureBlocksContinuation",
+    "TestDialogueProtocolRejectsReplayAndUnconfirmedEOF"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "e7c7ffd58380ea7e6449eccb3c196bb0b4ed5db787dc2ade96b2ad81ffeeca47",
+  "real_model_calls": 0
+}

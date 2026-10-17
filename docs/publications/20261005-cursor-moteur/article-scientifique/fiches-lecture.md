@@ -80,7 +80,7 @@ chiffre hors résumé : lire le texte avant de l'écrire dans l'article.
 
 ### CaMeL
 - Debenedetti, Shumailov, Fan, Hayes, Carlini, Fabian, Kern, Shi, Terzis, Tramèr. *Defeating Prompt Injections by Design*. arXiv:2503.18813, 2025. [arXiv](https://arxiv.org/abs/2503.18813) — **résumé**.
-- Extraction des flux de contrôle et de données depuis la requête de confiance ; capacités appliquées à l'appel d'outil ; 77 % des tâches AgentDojo résolues avec sécurité prouvable contre 84 % sans défense.
+- Extraction des flux de contrôle et de données depuis la requête de confiance ; contrôle par capacités. Correction du 16 octobre 2026 : le [résumé de la v1 du 24 mars 2025](https://arxiv.org/html/2503.18813v1) annonce **67 %** des tâches AgentDojo résolues avec sécurité prouvable. L'ancien couple 77 % / 84 % était sans passage ni version justificatifs et est retiré ; voir SCI-ID-04 dans la [note identité](identites-autorite-cycle-vie.md).
 - **Position** : même principe que notre invariant I7 (aucun texte de modèle interprété comme commande) et que la séparation préparation / règlement.
 
 ### Design Patterns for Securing LLM Agents

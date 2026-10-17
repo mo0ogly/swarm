@@ -1,0 +1,245 @@
+{
+  "status": "PASS",
+  "cli_invocations": 14,
+  "refused_candidates": 10,
+  "progressive_summaries": 2,
+  "source_files_sha256": {
+    "history-initial.json": "7a3c7f8db089d971f2b00e727713ae9902f1ca00b8e894d84e2a70e6e5eef2ba",
+    "history-extended.json": "707cf1177022cac6c2c24f670f95b46bc56ebadd5ff2a9a2a1b22686fdd70193"
+  },
+  "first_reference_full_bytes": 11655,
+  "first_reference_effective_bytes": 1236,
+  "model_calls": 0,
+  "model_effectiveness": "NOT TESTED",
+  "engine_integration": "NOT TESTED",
+  "records": [
+    {
+      "name": "first-candidate",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--reference-cutoff",
+        "6",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/first-candidate.json"
+      ],
+      "exit_code": 0,
+      "result": "REFERENCE_CANDIDATE",
+      "output_sha256": "ae65d870c75a64e39072a7c886fd5e5f1a23cf3580dcba81b70346be96d5006f"
+    },
+    {
+      "name": "first",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/first-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/first.json"
+      ],
+      "exit_code": 0,
+      "result": "PASS",
+      "output_sha256": "761c3a70ce24294c1cf92fc89072c1d9720a666b3fcd97fd1b538dc1ec577d12"
+    },
+    {
+      "name": "second-candidate",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-extended.json",
+        "--reference-cutoff",
+        "9",
+        "--previous",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/first.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/second-candidate.json"
+      ],
+      "exit_code": 0,
+      "result": "REFERENCE_CANDIDATE",
+      "output_sha256": "c0d4ac47902188540e6e5112f95cecde55457ddc768623ab47c79471d305ec2c"
+    },
+    {
+      "name": "second",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-extended.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/second-candidate.json",
+        "--previous",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/first.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/second.json"
+      ],
+      "exit_code": 0,
+      "result": "PASS",
+      "output_sha256": "e75d7e3c2b3c02a6478370c8913a5059df8aa5ab9eff319f418abcd76fbbe436"
+    },
+    {
+      "name": "empty",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/empty-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/empty.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "762826478817641e70d64a700557c8fbbefb298fc008a6f46484a9008f2dea5d"
+    },
+    {
+      "name": "failed",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/failed-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/failed.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "d339171e7972f8ab623f0b524f45e83ef8d1e87ccd1b2bbb82d6768fb499250d"
+    },
+    {
+      "name": "lost-incident",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/lost-incident-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/lost-incident.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "762826478817641e70d64a700557c8fbbefb298fc008a6f46484a9008f2dea5d"
+    },
+    {
+      "name": "future-became-done",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/future-became-done-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/future-became-done.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "762826478817641e70d64a700557c8fbbefb298fc008a6f46484a9008f2dea5d"
+    },
+    {
+      "name": "historical-became-current",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/historical-became-current-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/historical-became-current.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "762826478817641e70d64a700557c8fbbefb298fc008a6f46484a9008f2dea5d"
+    },
+    {
+      "name": "invented-quote",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/invented-quote-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/invented-quote.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "762826478817641e70d64a700557c8fbbefb298fc008a6f46484a9008f2dea5d"
+    },
+    {
+      "name": "stale-source",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/stale-source-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/stale-source.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "7f37cc7bde946b913684fa9fd0d28546e2c6c52a007741db5937da85037d9cc8"
+    },
+    {
+      "name": "negative-cutoff",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/negative-cutoff-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/negative-cutoff.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "a236d78d4d96ac48aabc525637e5a368fddda2d39f2647871f71c353f0d2c15c"
+    },
+    {
+      "name": "oversized-cutoff",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/oversized-cutoff-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/oversized-cutoff.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "a236d78d4d96ac48aabc525637e5a368fddda2d39f2647871f71c353f0d2c15c"
+    },
+    {
+      "name": "split-tool-pair",
+      "argv": [
+        "/usr/bin/python3",
+        "tools/memory-evaluation/summarization.py",
+        "--history",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/history-initial.json",
+        "--candidate",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/split-tool-pair-candidate.json",
+        "--output",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m17-20261016/cli/split-tool-pair.json"
+      ],
+      "exit_code": 1,
+      "result": "FALLBACK",
+      "output_sha256": "a236d78d4d96ac48aabc525637e5a368fddda2d39f2647871f71c353f0d2c15c"
+    }
+  ]
+}

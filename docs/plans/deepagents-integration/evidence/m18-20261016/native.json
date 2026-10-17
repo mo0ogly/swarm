@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "python3",
+    "tests/memory_summary_source.py",
+    "/tmp/swarm-m18-bin-y9nj4k1n/swarm",
+    "docs/plans/deepagents-integration/evidence/m18-20261016/native"
+  ],
+  "started_at_utc": "2026-10-16T19:52:47.971973+00:00",
+  "duration_seconds": 20.824,
+  "exit_code": 1,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "7c327c14b26cfee8f21460943d439337c7f4b61df3a4c4df2ccad0e992842a4d",
+  "real_model_calls": 0
+}

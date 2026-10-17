@@ -1,0 +1,14 @@
+=== RUN   TestRecoveryPrefixCarriesLiteralCitationConventions
+    managed_review_citation_feedback_test.go:42: diagnostic serialized more than once
+--- FAIL: TestRecoveryPrefixCarriesLiteralCitationConventions (0.00s)
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries/indentation
+    managed_review_citation_feedback_test.go:89: diagnostic must identify the first rejected citation without dropping other review questions <nil>
+=== RUN   TestCitationDiagnosticPreservesLiteralBoundaries/encoded_output
+    managed_review_citation_feedback_test.go:89: diagnostic must identify the first rejected citation without dropping other review questions <nil>
+--- FAIL: TestCitationDiagnosticPreservesLiteralBoundaries (0.00s)
+    --- FAIL: TestCitationDiagnosticPreservesLiteralBoundaries/indentation (0.00s)
+    --- FAIL: TestCitationDiagnosticPreservesLiteralBoundaries/encoded_output (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.023s
+FAIL

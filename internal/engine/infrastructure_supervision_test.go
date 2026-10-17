@@ -124,13 +124,24 @@ func TestInfrastructureObservationDoesNotRepeatForUnrelatedFailure(t *testing.T)
 		t.Fatal(err)
 	}
 	w, _ = s.get(w.ID)
-	revision := w.Revision
 	a.Diagnostic = buildAttemptDiagnostic(a.ID, a.Attempt, []toolFailure{{technical: "mount failed: permission denied"}, {technical: "invalid tool option"}}, "", 3)
 	if _, err := s.observeRun(a); err != nil {
 		t.Fatal(err)
 	}
 	w, _ = s.get(w.ID)
-	if w.Revision != revision {
-		t.Fatal("unrelated error duplicated old infrastructure incident")
+	infrastructure, tools := 0, 0
+	for _, event := range w.Planning.Inbox {
+		if event.RunObservation == nil {
+			continue
+		}
+		switch event.RunObservation.Trigger {
+		case "infrastructure":
+			infrastructure++
+		case "tool_failure":
+			tools++
+		}
+	}
+	if infrastructure != 1 || tools != 1 {
+		t.Fatal("infrastructure duplicated or new ordinary failure lost", infrastructure, tools)
 	}
 }

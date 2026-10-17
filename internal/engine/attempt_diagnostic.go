@@ -10,11 +10,15 @@ import (
 
 type toolFailure struct {
 	name, action, detail, technical string
+	category                        string
 }
 
 var diagnosticOrder = map[string]int{"configuration": 0, "environment": 1, "tool": 2, "check": 3, "limit": 4, "unknown": 5}
 
 func failureCategory(f toolFailure) string {
+	if f.category != "" {
+		return f.category
+	}
 	text := strings.ToLower(strings.Join([]string{f.name, f.action, f.detail, f.technical}, " "))
 	for _, marker := range []string{"permission denied", "operation not permitted", "read-only file system", "sandbox denied", "sandbox violation", "mount failed", "bwrap: can't bind mount", "unable to apply mount flags", "mount: permission denied", "cifs error", "socket: operation not permitted", "network is unreachable"} {
 		if strings.Contains(text, marker) {
@@ -80,9 +84,13 @@ func buildAttemptDiagnostic(agent, attempt string, failures []toolFailure, reaso
 		item := diagnosticTemplate(category, len(entries), "")
 		for _, entry := range entries {
 			trace := strings.TrimSpace(strings.Join([]string{entry.action, entry.detail, entry.technical}, " · "))
-			trace = operationText(trace, 600)
-			if trace != "" && len(item.Traces) < 3 {
-				item.Traces = append(item.Traces, trace)
+			trace = boundedFailureText(trace, 600)
+			if trace != "" {
+				if len(item.Traces) < 3 {
+					item.Traces = append(item.Traces, trace)
+				} else {
+					item.Traces[len(item.Traces)-1] = trace
+				}
 			}
 		}
 		d.Items = append(d.Items, item)
@@ -161,13 +169,22 @@ func requiresEnvironmentVerification(a Agent) bool {
 	if a.Status != "failed" && a.Status != "interrupted" {
 		return false
 	}
-	if a.Status == "interrupted" && a.StopKind == originOperator {
-		return false
-	}
 	for _, item := range fallbackAttemptDiagnostic(a).Items {
 		if item.Category == "environment" {
 			return true
 		}
 	}
 	return false
+}
+
+func boundedFailureText(value string, limit int) string {
+	text := operationText(value, len(value)+1)
+	runes := []rune(text)
+	if len(runes) <= limit {
+		return text
+	}
+	marker := " … "
+	remaining := limit - len([]rune(marker))
+	head := remaining / 2
+	return string(runes[:head]) + marker + string(runes[len(runes)-(remaining-head):])
 }

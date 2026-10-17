@@ -66,7 +66,7 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
 	}
 	p := managedReviewFragmentPlan{Coordination: previous.Coordination, CoordinationFiles: previous.CoordinationFiles, Version: 4, InputBudget: &budget, Candidate: previous.Candidate, ContextDigest: previous.ContextDigest, AvailableCalls: available, ReservedFinalCalls: 2, ChangeDiff: previous.ChangeDiff}
 	packet := func() managedReviewFragmentPacket {
-		return managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets)}
+		return managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: len(p.Packets)}
 	}
 	current := packet()
 	for i, old := range previous.Packets {
@@ -103,7 +103,7 @@ func planTokenManagedFragments(c managedReviewContext, previous managedReviewFra
 	for _, ref := range previous.Reused {
 		ref.Packet = len(p.Packets)
 		p.Reused = append(p.Reused, ref)
-		p.Packets = append(p.Packets, managedReviewFragmentPacket{DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: ref.Packet, Artifacts: ref.Original.Artifacts})
+		p.Packets = append(p.Packets, managedReviewFragmentPacket{InspectionContractVersion: managedFragmentInspectionContractVersion, Scope: managedFragmentScope(c), DefectCitationContractVersion: managedFragmentDefectCitationContractVersion, FindingContractVersion: managedFragmentFindingContractVersion, Version: 4, InputBudget: &budget, Candidate: p.Candidate, ContextDigest: p.ContextDigest, Index: ref.Packet, Artifacts: ref.Original.Artifacts})
 	}
 	if required := fragmentPaidInspections(p) + p.ReservedFinalCalls; required > available {
 		return empty, fmt.Errorf("budget insuffisant : %d inspections et %d appels finaux pour %d disponibles", fragmentPaidInspections(p), p.ReservedFinalCalls, available)

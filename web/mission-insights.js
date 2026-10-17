@@ -74,6 +74,13 @@ Object.assign(Mission,{
  spending(){this.readOnly(trMissionInsights('Où vont les appels et les coûts ?'),trMissionInsights('Appels IA, outils et contrôles sont présentés séparément.')).append(this.spendingView(snapshot.mission.spending))},
  recoveryPreviewView(p){
   const box=node('section',undefined,'field-wide');box.dataset.recoveryPreview=p.task;box.append(node('h3',trMissionInsights('Avant une relance')));
+  if(p.dialogue){
+   const dialogue=node('section',undefined,'mission-current field-wide');dialogue.dataset.dialogueRecovery=p.dialogue.recommended_path;
+   dialogue.append(node('h4',trMissionInsights('Reprise de conversation')),node('p',missionText(p.dialogue.recommendation),'notice attention'),node('p',trMissionInsights(p.dialogue.resume_supported?'Une reprise explicite crée une nouvelle tentative avec la même conversation ; cet aperçu ne lance aucun agent.':'La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent.')));
+   const labels={pass:'Vérifié',fail:'Bloquant',unknown:'Non vérifié'},checks=node('ul'),passed=node('ul');
+   for(const check of p.dialogue.checks||[]){const row=node('li',trMissionInsights(labels[check.status]||'Non vérifié')+' · '+missionText(check.message));row.dataset.dialogueCheck=check.code;row.dataset.checkStatus=check.status;(check.status==='pass'?passed:checks).append(row)}
+   dialogue.append(checks);if(passed.children.length){const verified=node('details');verified.dataset.dialogueVerified='';verified.append(node('summary',trMissionInsights('Voir les contrôles vérifiés')),passed);dialogue.append(verified)}if(p.dialogue.resume_supported)dialogue.append(this.dialogueRestoreForm(p));box.append(dialogue);
+  }
   box.append(node('h4',trMissionInsights('Depuis le refus')),node('p',missionText(p.refusal_note||'Historique du refus indisponible ; aucun changement n’est supposé.')));
   if(p.since_refusal){const list=node('ul');for(const item of p.since_refusal.items||[])list.append(node('li','r'+item.revision+' · '+item.at+' · '+missionText(item.label)));box.append(list);if(p.since_refusal.more)box.append(node('p',trMissionInsights('Historique partiel : d’autres événements restent à examiner.'),'notice attention'))}
   box.append(node('h4',trMissionInsights('Preuves à reprendre')),node('p',missionText(p.evidence_note||'Aucune preuve liée à un avis disponible ; réutilisation non démontrée.')));
@@ -86,7 +93,25 @@ Object.assign(Mission,{
   for(const [label,items]of [['Ce qui sera conservé',p.kept],['Ce qui sera refait',p.redone],['Critères inchangés',p.criteria]]){box.append(node('h4',trMissionInsights(label)));const list=node('ul');for(const item of items||[])list.append(node('li',label==='Critères inchangés'?item:missionText(item)));box.append(list)}
   box.append(node('h4',trMissionInsights('Correction attendue')),node('p',p.correction||trMissionInsights('À préciser avant confirmation.')),node('p',missionText(p.limits),'notice info'));return box;
  },
- async recoveryPreview(id){const requested=work,host=this.readOnly(trMissionInsights('Avant une relance'),trMissionInsights('Relisez la correction et les critères ; aucune action n’est exécutée ici.')),context=modalContext;host.append(node('p',trMissionInsights('Chargement de l’aperçu de reprise…')));try{const p=await api('/api/v1/recovery-preview?'+new URLSearchParams({work:requested,task:id}));if(modalContext===context&&work===requested&&host.isConnected)host.replaceChildren(this.recoveryPreviewView(p))}catch(e){if(modalContext===context&&host.isConnected)host.replaceChildren(node('p',trMissionInsights('Aperçu de reprise indisponible : ')+e.message,'notice attention'))}},
+ dialogueRestoreForm(p){
+  const details=node('details');details.dataset.dialogueResumeForm='';details.append(node('summary',trMissionInsights('Demander une reprise de conversation')),node('p',trMissionInsights('Les plafonds de tentatives et le budget restent applicables. Les gardes sont cumulées ; la consommation antérieure reste conservée.'),'notice attention'));
+  const reason=node('textarea'),instruction=node('textarea'),confirmation=node('input'),state=node('p');reason.rows=2;instruction.rows=4;confirmation.type='checkbox';state.setAttribute('role','status');
+  reason.id='dialogue-resume-reason-'+p.agent;instruction.id='dialogue-resume-instruction-'+p.agent;confirmation.id='dialogue-resume-confirm-'+p.agent;
+  reason.dataset.dialogueResumeReason='';instruction.dataset.dialogueResumeInstruction='';confirmation.dataset.dialogueResumeConfirm='';state.dataset.dialogueResumeState='';
+  for(const [input,text]of [[reason,'Motif de la reprise'],[instruction,'Nouvelle consigne'],[confirmation,'Je confirme la nouvelle tentative sur cette frontière examinée.']]){const label=node('label',trMissionInsights(text),'field-wide');label.htmlFor=input.id;label.append(input);details.append(label)}
+  const event=crypto.randomUUID(),context=modalContext;
+  const submit=Pilot.command(trMissionInsights('Confirmer et reprendre'),async()=>{
+   if(context!==modalContext||work!==p.work||!details.isConnected)return;
+   if(!confirmation.checked){state.textContent=trMissionInsights('Confirmez la reprise après examen de cette frontière.');state.className='notice attention';confirmation.focus();return}
+   submit.disabled=true;state.textContent=trMissionInsights('Vérification et demande de reprise…');state.className='notice info';
+   try{const reply=await api('/api/v1/dialogue-resume?'+new URLSearchParams({work:p.work,agent:p.agent}),{schema_version:1,event_id:event,expected_revision:p.revision,checkpoint_sha256:p.dialogue.boundary.sha256,facts_sha256:p.dialogue.facts_sha256,confirm:confirmation.checked,reason:reason.value,instruction:instruction.value});
+    if(context!==modalContext||!details.isConnected)return;reason.disabled=true;instruction.disabled=true;confirmation.disabled=true;
+    state.textContent=trMissionInsights('Reprise demandée ; attendre la confirmation de session. Nouvelle tentative : ')+reply.agent.id;state.dataset.dialogueResumeAgent=reply.agent.id;
+    details.append(Pilot.command(trMissionInsights('Voir la tâche et ses tentatives'),()=>{closeModal();Pilot.inspect('task',p.task)}));
+   }catch(e){if(context===modalContext&&details.isConnected){state.textContent=e.message;state.className='notice attention';submit.disabled=false}}
+  });submit.dataset.dialogueResumeSubmit='';details.append(state,submit);return details;
+ },
+ async recoveryPreview(id){const requested=work,host=this.readOnly(trMissionInsights('Avant une relance'),trMissionInsights('Examinez le diagnostic. Une reprise exige une confirmation explicite.')),context=modalContext;host.append(node('p',trMissionInsights('Chargement de l’aperçu de reprise…')));try{const p=await api('/api/v1/recovery-preview?'+new URLSearchParams({work:requested,task:id}));if(modalContext===context&&work===requested&&host.isConnected)host.replaceChildren(this.recoveryPreviewView(p))}catch(e){if(modalContext===context&&host.isConnected)host.replaceChildren(node('p',trMissionInsights('Aperçu de reprise indisponible : ')+e.message,'notice attention'))}},
  insightButtons(controls){for(const [label,action,id]of [['Depuis votre dernière visite',()=>this.changes(),'changes'],['Pourquoi cette tâche attend ?',()=>this.waits(),'waits'],['Où vont les appels et les coûts ?',()=>this.spending(),'spending']]){const b=Pilot.command(trMissionInsights(label),action);b.dataset.missionAction=id;controls.append(b)}},
  taskInsightButtons(row,t){if(t.waiting_on?.length||t.state==='waiting'){const b=Pilot.command(trMissionInsights('Pourquoi cette tâche attend ?'),()=>this.waits(t.id));b.dataset.missionAction='waits-'+t.id;row.append(b)}if(['intervention','review','manual','ready'].includes(t.state)){const b=Pilot.command(trMissionInsights('Avant une relance'),()=>this.recoveryPreview(t.id));b.dataset.missionAction='recovery-preview-'+t.id;row.append(b)}}
 });

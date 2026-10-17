@@ -1,0 +1,13 @@
+{
+  "sha256": {
+    "docs/engine-cursor-source-manifest.json": "62f1287de6fab3cccbafdb029901fa2ba1cf6d757720fffba561a9e68abc36e3",
+    "docs/ui-redesign-source-manifest.json": "b4494daccd1485237c917e5ba0680bd854d3db6056c605568ae902851304c7b2",
+    "docs/engine-cursor-source-inputs-001.json": "828b7fd02be3b8f20c817adca6faa43e370f4041b620f978f142b2febd5ed818",
+    "docs/engine-cursor-source-inputs-002.json": "036985663178e2e3aeed67becb9d2e7cb2a86a645aeac8ab33fe009ff155ba4d",
+    "docs/engine-cursor-source-inputs-003.json": "b1d1d0f15654c0b6b04c7afbad46f2698de07d8186d362d5d2669116e3b71b36",
+    "docs/engine-cursor-source-inputs-004.json": "ba8be7331990b5842470d6da2edee17cd0fe03c93da03fa38c1974b1b4928b5d",
+    "docs/engine-cursor-source-inputs-005.json": "207dadc0f613029e2d60bef45c0d3d31034ba9eb08cb61bfed57ef44c3b48eb1"
+  },
+  "unchanged_during_test": true,
+  "reason": "final verification after manifest generation completed"
+}

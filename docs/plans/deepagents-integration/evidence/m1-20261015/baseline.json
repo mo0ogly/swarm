@@ -1,0 +1,214 @@
+{
+  "started_at_utc": "2026-10-15T19:05:18.352776+00:00",
+  "executor": "Codex direct audit",
+  "selected_sources": {
+    "swarm": {
+      "commit": "4e58f7cbf8200a58f69f1f4d03d657c3313fb642",
+      "files": [
+        {
+          "path": "GUIDE-UTILISATEUR.md",
+          "bytes": 40664,
+          "sha256": "6b315d2beccfa9571859dced80db56b54994741779196fcd690c1c7b6d2ba7df",
+          "sha256_at_start": "6b315d2beccfa9571859dced80db56b54994741779196fcd690c1c7b6d2ba7df"
+        },
+        {
+          "path": "docs/AGENT-METHODS.md",
+          "bytes": 16125,
+          "sha256": "733bbda6d08f6414311d462651b3362e39f4b1870344171a48fb75e434fee45b",
+          "sha256_at_start": "733bbda6d08f6414311d462651b3362e39f4b1870344171a48fb75e434fee45b"
+        },
+        {
+          "path": "docs/architecture/INSTRUCTION-LEARNING.md",
+          "bytes": 5660,
+          "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038",
+          "sha256_at_start": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+        },
+        {
+          "path": "docs/PRODUCT-ARCHITECTURE.md",
+          "bytes": 7930,
+          "sha256": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d",
+          "sha256_at_start": "e3d946e78513bfd500d6dcf6e1fb153369efd1e0ecf7bb62e45408c5548bfe5d"
+        },
+        {
+          "path": "docs/UI-DESIGN.md",
+          "bytes": 12249,
+          "sha256": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3",
+          "sha256_at_start": "f3d1cd28781054fa862d30d1a8144938ef5dd2c587aa19cbc9b9cc964ea03ba3"
+        },
+        {
+          "path": "internal/engine/retex.go",
+          "bytes": 9724,
+          "sha256": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec",
+          "sha256_at_start": "0112c6e2b1d31de4f7d8c829f046cbe86c4cb2588123b8bfa13b6ff9f2b3f0ec"
+        },
+        {
+          "path": "internal/engine/agents_store.go",
+          "bytes": 55917,
+          "sha256": "b9bbcceccd835be1237c3b45ead0b00b2235a75bf8a6dc846853c096d04c0cc5",
+          "sha256_at_start": "b9bbcceccd835be1237c3b45ead0b00b2235a75bf8a6dc846853c096d04c0cc5"
+        },
+        {
+          "path": "internal/engine/project_profile.go",
+          "bytes": 9744,
+          "sha256": "9682ba15292dd5ed91a93394e3e353a01ff9f17f01820cc26b87e2a80c9b1824",
+          "sha256_at_start": "9682ba15292dd5ed91a93394e3e353a01ff9f17f01820cc26b87e2a80c9b1824"
+        },
+        {
+          "path": "internal/engine/project_profile_catalog.go",
+          "bytes": 3719,
+          "sha256": "a4e58896353360e78db771f75a160bebbc507bc76657b55ff4d3806c69409b25",
+          "sha256_at_start": "a4e58896353360e78db771f75a160bebbc507bc76657b55ff4d3806c69409b25"
+        },
+        {
+          "path": "internal/engine/dialogue_context.go",
+          "bytes": 3367,
+          "sha256": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab",
+          "sha256_at_start": "b8885e9d6e6f7681307cf42b10dc76cca7774df43319974a8fbb521a2970e2ab"
+        },
+        {
+          "path": "internal/engine/worker_context.go",
+          "bytes": 3247,
+          "sha256": "972a8be5eb8bfc19ede1300f19e0843c4499e2e2a5b2c90e2250075f15a84857",
+          "sha256_at_start": "972a8be5eb8bfc19ede1300f19e0843c4499e2e2a5b2c90e2250075f15a84857"
+        },
+        {
+          "path": "internal/engine/store.go",
+          "bytes": 27269,
+          "sha256": "31fea4b7f69f932b28354a9605cfe05e11b4335e918e504f4dad361435317502",
+          "sha256_at_start": "31fea4b7f69f932b28354a9605cfe05e11b4335e918e504f4dad361435317502"
+        },
+        {
+          "path": "internal/engine/archive.go",
+          "bytes": 11287,
+          "sha256": "23a38bedd8a2990daeb2af27172973302ccbadd3ddb0af5660687cb9e941dc9f",
+          "sha256_at_start": "23a38bedd8a2990daeb2af27172973302ccbadd3ddb0af5660687cb9e941dc9f"
+        },
+        {
+          "path": "internal/engine/memory_test.go",
+          "bytes": 8336,
+          "sha256": "6d344f9ba09eb7448221016610ceb69c99219b886a37d9198e831bb1ddc5f557",
+          "sha256_at_start": "6d344f9ba09eb7448221016610ceb69c99219b886a37d9198e831bb1ddc5f557"
+        },
+        {
+          "path": "internal/engine/instruction_revision_test.go",
+          "bytes": 7090,
+          "sha256": "e6a3c4d1869b2c8fdb235d5d111912f3b07a266e24f35df9f96cfa86b0b7bc08",
+          "sha256_at_start": "e6a3c4d1869b2c8fdb235d5d111912f3b07a266e24f35df9f96cfa86b0b7bc08"
+        },
+        {
+          "path": "web/instruction-revisions.js",
+          "bytes": 3683,
+          "sha256": "afa5c9e894b1b9aaf63c4ed1347cca44a5a3589bc45db3205cf03fd669fd3893",
+          "sha256_at_start": "afa5c9e894b1b9aaf63c4ed1347cca44a5a3589bc45db3205cf03fd669fd3893"
+        },
+        {
+          "path": "web/retex.js",
+          "bytes": 6597,
+          "sha256": "2bb1a9ecbf8b70b65b765988fb4beffb1b92698ddfa8c301d0d4a1d58d631ee9",
+          "sha256_at_start": "2bb1a9ecbf8b70b65b765988fb4beffb1b92698ddfa8c301d0d4a1d58d631ee9"
+        }
+      ]
+    },
+    "upstream": {
+      "commit": "29d646fd2d832a44c476964333eddecb0ec1c0cd",
+      "files": [
+        {
+          "path": "README.md",
+          "bytes": 7043,
+          "sha256": "24666c576b54e1e1ed9793b97971f8cb0e16ebb9d0ab9a887989c6e4dfece4ac",
+          "sha256_at_start": "24666c576b54e1e1ed9793b97971f8cb0e16ebb9d0ab9a887989c6e4dfece4ac"
+        },
+        {
+          "path": "libs/ARCHITECTURE.md",
+          "bytes": 11326,
+          "sha256": "a2657562c0c28a61c0b8c1ff335b29c714b31f601558d92abcfc8977a987bb2c",
+          "sha256_at_start": "a2657562c0c28a61c0b8c1ff335b29c714b31f601558d92abcfc8977a987bb2c"
+        },
+        {
+          "path": "libs/deepagents/pyproject.toml",
+          "bytes": 6555,
+          "sha256": "81eb9f1a4799be75691ee6e4ad73d4475a31a416afc5ab62397b5c96855b4aaa",
+          "sha256_at_start": "81eb9f1a4799be75691ee6e4ad73d4475a31a416afc5ab62397b5c96855b4aaa"
+        },
+        {
+          "path": "libs/deepagents/LICENSE",
+          "bytes": 1067,
+          "sha256": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478",
+          "sha256_at_start": "4ec67e4ca6e6721dba849b2ca82261597c86a61ee214bbf21416006b7b2d0478"
+        },
+        {
+          "path": "libs/deepagents/deepagents/graph.py",
+          "bytes": 49903,
+          "sha256": "7622719323a9909aa35d71c60d9396b3c102a3dfe2561d1ec73868ce387d9a16",
+          "sha256_at_start": "7622719323a9909aa35d71c60d9396b3c102a3dfe2561d1ec73868ce387d9a16"
+        },
+        {
+          "path": "libs/deepagents/deepagents/middleware/memory.py",
+          "bytes": 18047,
+          "sha256": "425d9927a0874a0ea55a23182875eb1f3dc1b7452e0a74feb7ca3f994d37a1ee",
+          "sha256_at_start": "425d9927a0874a0ea55a23182875eb1f3dc1b7452e0a74feb7ca3f994d37a1ee"
+        },
+        {
+          "path": "libs/deepagents/deepagents/backends/state.py",
+          "bytes": 14413,
+          "sha256": "85860ab208714ae20adff7fc308bebb5707fa54c006ae89eef6dbc0dd4bcecef",
+          "sha256_at_start": "85860ab208714ae20adff7fc308bebb5707fa54c006ae89eef6dbc0dd4bcecef"
+        },
+        {
+          "path": "libs/deepagents/deepagents/backends/store.py",
+          "bytes": 26424,
+          "sha256": "506eced5ca748713996cd7a576b6233e0e805b39446e1052473c489d916ca342",
+          "sha256_at_start": "506eced5ca748713996cd7a576b6233e0e805b39446e1052473c489d916ca342"
+        },
+        {
+          "path": "libs/deepagents/deepagents/backends/filesystem.py",
+          "bytes": 71904,
+          "sha256": "bb08bac99d188cd7da1a55d53ce14f6beb1856d178ea815220df4e0533ba9b08",
+          "sha256_at_start": "bb08bac99d188cd7da1a55d53ce14f6beb1856d178ea815220df4e0533ba9b08"
+        },
+        {
+          "path": "libs/deepagents/deepagents/backends/composite.py",
+          "bytes": 42183,
+          "sha256": "13b9852b4a6b6b414cb57a72a4977844e0437259ed366214434aa51e543880a5",
+          "sha256_at_start": "13b9852b4a6b6b414cb57a72a4977844e0437259ed366214434aa51e543880a5"
+        },
+        {
+          "path": "libs/deepagents/tests/unit_tests/middleware/test_memory_middleware.py",
+          "bytes": 44942,
+          "sha256": "1bd531c447d053747ceaafa37e226993c056ced5ff84636d139bcaf6d6f764a8",
+          "sha256_at_start": "1bd531c447d053747ceaafa37e226993c056ced5ff84636d139bcaf6d6f764a8"
+        },
+        {
+          "path": "libs/deepagents/tests/unit_tests/middleware/test_memory_middleware_async.py",
+          "bytes": 14214,
+          "sha256": "eff943f07bb2847036a999686e10bffc7787d85bc2fd9834d888a9d03eb10152",
+          "sha256_at_start": "eff943f07bb2847036a999686e10bffc7787d85bc2fd9834d888a9d03eb10152"
+        },
+        {
+          "path": "libs/code/deepagents_code/agent.py",
+          "bytes": 153227,
+          "sha256": "7b3ea2e9a9f9f797aa56dbceb21bdab7eb3b26b0c5934d31a9e8fb4c8b9b5042",
+          "sha256_at_start": "7b3ea2e9a9f9f797aa56dbceb21bdab7eb3b26b0c5934d31a9e8fb4c8b9b5042"
+        },
+        {
+          "path": "libs/code/deepagents_code/memory_guard.py",
+          "bytes": 19743,
+          "sha256": "2b008b41e9bfe70b71ad30ad46701d22bcc519795bacf7329225b8bc8b95f1f6",
+          "sha256_at_start": "2b008b41e9bfe70b71ad30ad46701d22bcc519795bacf7329225b8bc8b95f1f6"
+        },
+        {
+          "path": "libs/code/examples/extensions/memory_store.py",
+          "bytes": 530,
+          "sha256": "36352ef356df445dabfc087a4974cb1cc223bd90ea24e063e02e67be3d0c7d77",
+          "sha256_at_start": "36352ef356df445dabfc087a4974cb1cc223bd90ea24e063e02e67be3d0c7d77"
+        },
+        {
+          "path": "openwiki/concepts/backends.md",
+          "bytes": 20993,
+          "sha256": "84fd76779c56166f8ffd19ee113899c980586eae1593eef4c9fd9370d3cee3e1",
+          "sha256_at_start": "84fd76779c56166f8ffd19ee113899c980586eae1593eef4c9fd9370d3cee3e1"
+        }
+      ]
+    }
+  }
+}

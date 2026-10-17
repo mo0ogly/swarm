@@ -1,0 +1,187 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Imported history does not certify current files; fixture evidence restored and checked through the public CLI evaluator",
+    "Empty catalogue and authenticated loading",
+    "Admission preview, Escape/focus, application and text-only rendering",
+    "Real admitted procedure has one footer seal, active version and unknown rights/identity without invented attribution",
+    "Selected source, exact content and conditions received by a real local provider process",
+    "Replacement retains the first version",
+    "Withdrawal prevents new selection while retaining the original received context",
+    "Real replacement changes procedure to experience; withdrawal updates the badge while retaining historical context and disabling selection",
+    "FR/EN, both themes, 1440/1024/760/390/320 widths and rendered text contrast >= 4.5:1; user text unchanged",
+    "Synthetic unavailable/future-kind transport stays unavailable/unknown; historical actor is rendered only as text",
+    "Stale preview rejected visibly without losing input or adding a lesson"
+  ],
+  "errors": [],
+  "failed": [],
+  "responses": [
+    {
+      "url": "http://127.0.0.1:35405/api/v1/project-memory?action=admit",
+      "status": 409
+    }
+  ],
+  "navigationCancelled": [
+    {
+      "url": "http://127.0.0.1:35405/log-console.html?lang=fr",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:35405/"
+    },
+    {
+      "url": "http://127.0.0.1:35405/api/v1/runtime-health",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:35405/"
+    },
+    {
+      "url": "http://127.0.0.1:35405/api/v1/snapshot?work=w-8e03e13f2d73fa6ec2c9cab3",
+      "error": "net::ERR_ABORTED",
+      "origin": "http://127.0.0.1:35405/"
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 409 (Conflict)"
+  ],
+  "rendering": [
+    {
+      "language": "fr",
+      "theme": "etat",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "etat",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "etat",
+      "width": 760,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "etat",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "etat",
+      "width": 320,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "width": 760,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "language": "fr",
+      "theme": "sombre",
+      "width": 320,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "width": 760,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "etat",
+      "width": 320,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "width": 1440,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "width": 1024,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "width": 760,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "width": 390,
+      "noOverflow": true
+    },
+    {
+      "language": "en",
+      "theme": "sombre",
+      "width": 320,
+      "noOverflow": true
+    }
+  ],
+  "inputs": {
+    "binary": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+    "bundle": "584dc34ca387930f7a4296edfcb97fe09133a7b39a71f6d06cdb5aae4b1a4dce",
+    "recipe": "8f12b3c68a4fb021042c3ace9b6f3f77bf2d333b0247930adc832626ad492759",
+    "assets": {
+      "project-memory.html": "26bc72ba4551db35d89ecfe4e617f2fb7063763d2e59e8f68435be357e3a217a",
+      "project-memory.js": "644c51f5cef3b18118c004446925c2de4814177c245d315ad47a7ceb31fe2b18",
+      "project-memory.css": "32404c65ddd6075386cb9ab1a72a30865d7ef2b69f667ad70616258045e04fdd",
+      "signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+      "signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a"
+    }
+  },
+  "input_unchanged": true,
+  "served_candidate_assets": [
+    "project-memory.html",
+    "signals.css",
+    "project-memory.css",
+    "signals.js",
+    "project-memory.js"
+  ],
+  "model_calls": 0
+}

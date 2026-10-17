@@ -1,0 +1,179 @@
+//go:build linux
+
+package engine
+
+import (
+	"context"
+	"encoding/json"
+	"reflect"
+	"testing"
+	"time"
+)
+
+type agentIdentityIssuerFixture struct {
+	agentIdentityRegistryFixture
+	oidc      *oidcFixture
+	token     string
+	authority agentIdentityIssuerAuthority
+}
+
+func issuerFixture(t *testing.T) agentIdentityIssuerFixture {
+	t.Helper()
+	f := registryFixture(t)
+	oidc := newOIDCFixture(t)
+	change := lifecycleChange(t, "alice", false, 1)
+	change.OIDC = &TrustOIDCConfig{Enabled: true, Issuer: oidc.server.URL, ClientID: "swarm", RedirectURI: "http://127.0.0.1/trust-oidc-callback.html", RequestTimeoutSeconds: 5, LoginTTLSeconds: 300, SessionTTLSeconds: 600, Mappings: []TrustOIDCMapping{{ExternalSubject: "employee-1", Subject: "alice"}}}
+	if _, err := f.store.trustConfig(change, false); err != nil {
+		t.Fatal(err)
+	}
+	value, err := f.store.trustOIDCFinish(context.Background(), oidcAuthorize(t, f.store))
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := value.(map[string]any)["session_token"].(string)
+	var caller agentIdentityCaller
+	_, err = f.store.withTrustLock(false, func(st *trustState) (any, error) {
+		var err error
+		caller, err = resolveAgentIdentityCaller(f.store.root, st, token, time.Now().UTC())
+		return nil, err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for id, grant := range f.snapshot.Grants {
+		grant.Issuer.Principal, grant.Holder.Principal = caller.actor.Principal, caller.actor.Principal
+		grant.TrustRevision = caller.trustRevision
+		f.snapshot.Grants[id] = grant
+	}
+	for id, instance := range f.snapshot.Instances {
+		instance.Principal = caller.actor.Principal
+		f.snapshot.Instances[id] = instance
+	}
+	f.actor.Principal, f.permit.publisher, f.permit.trustRevision = caller.actor.Principal, caller.actor.Principal, caller.trustRevision
+	registryApproveFixture(t, &f)
+	at := time.Now().UTC()
+	permission := agentIdentityPermission{f.request.Operation, f.request.Resource}
+	// Explicit fixture of the protected enrollment authority. The OIDC session
+	// above is real protocol execution against a local signed-token fixture;
+	// enrollment itself is neither an operator action nor an external service.
+	a := agentIdentityIssuerAuthority{projectRoot: f.store.root, principal: caller.actor.Principal, scope: f.permit.scope, trustRevision: caller.trustRevision,
+		enrollmentDigest: hash([]byte("explicit-controller-enrollment-fixture")), permissions: []agentIdentityPermission{permission}, delegable: []agentIdentityPermission{permission},
+		notBefore: at.Add(-2 * time.Minute), expiresAt: at.Add(2 * time.Hour)}
+	return agentIdentityIssuerFixture{f, oidc, token, a}
+}
+
+func issuerMint(t *testing.T, f agentIdentityIssuerFixture) agentIdentityRegistryPermit {
+	t.Helper()
+	permit, err := f.store.mintAgentIdentityRegistryPermit(registryContext(t), registryRaw(t, f.snapshot), f.token, f.authority, f.permit.base, f.permit.eventID, f.permit.roots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return permit
+}
+
+func TestAgentIdentityIssuerAuthenticatedHumanExactPermit(t *testing.T) {
+	f := issuerFixture(t)
+	before := registryTrustBytes(t, f.store)
+	permit := issuerMint(t, f)
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+	if permit.issuer == nil || permit.publisher.Kind != "human" || permit.publisher != f.authority.principal || permit.nextDigest != f.permit.nextDigest ||
+		permit.scope != f.permit.scope || permit.trustRevision != 2 || permit.issuer.authorizedUntil.After(f.authority.expiresAt) {
+		t.Fatal("issued permit lost verified human, exact content or scope")
+	}
+	// Authority data is owned by the permit, not aliased to controller slices.
+	f.authority.permissions[0].Resource = "mutated-after-issuance"
+	f.authority.delegable[0].Resource = "mutated-after-issuance"
+	if permit.issuer.authority.permissions[0].Resource == "mutated-after-issuance" || permit.issuer.authority.delegable[0].Resource == "mutated-after-issuance" {
+		t.Fatal("controller retained a mutable alias into the issued permit")
+	}
+	cp, err := f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), f.token, permit, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reopened, err := openStore(f.store.root, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reopened.db.Close()
+	snapshot, _, err := reopened.readAgentIdentityRegistry(registryContext(t), cp)
+	if err != nil || !reflect.DeepEqual(snapshot, f.snapshot) {
+		t.Fatal("human permit did not publish exact durable snapshot: ", err)
+	}
+}
+
+func TestAgentIdentityIssuerPublicationRejectsDifferentHumanSession(t *testing.T) {
+	f := issuerFixture(t)
+	permit := issuerMint(t, f)
+	value, err := f.store.trustOIDCFinish(context.Background(), oidcAuthorize(t, f.store))
+	if err != nil {
+		t.Fatal(err)
+	}
+	other := value.(map[string]any)["session_token"].(string)
+	if other == f.token {
+		t.Fatal("fixture did not create a distinct authenticated session")
+	}
+	before := registryTrustBytes(t, f.store)
+	_, err = f.store.publishAgentIdentityRegistry(registryContext(t), registryRaw(t, f.snapshot), other, permit, nil)
+	if identityPlanFailure(err).Code != "agent_identity_issuer_authority_stale" {
+		t.Fatal("permit transferred to another session of the same human: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+}
+
+func TestAgentIdentityIssuerExpirationDuringPublicationWait(t *testing.T) {
+	f := issuerFixture(t)
+	f.authority.expiresAt = time.Now().UTC().Add(time.Second)
+	for id, grant := range f.snapshot.Grants {
+		grant.ExpiresAt = f.authority.expiresAt
+		f.snapshot.Grants[id] = grant
+	}
+	permit := issuerMint(t, f)
+	connection, err := f.store.db.Conn(registryContext(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	released := false
+	defer func() {
+		if !released {
+			connection.Close()
+		}
+	}()
+	before := registryTrustBytes(t, f.store)
+	waits := f.store.db.Stats().WaitCount
+	raw := registryRaw(t, f.snapshot)
+	done := make(chan error, 1)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	go func() {
+		_, err := f.store.publishAgentIdentityRegistry(ctx, raw, f.token, permit, nil)
+		done <- err
+	}()
+	for f.store.db.Stats().WaitCount == waits {
+		if ctx.Err() != nil {
+			t.Fatal("publication did not wait for SQLite: ", ctx.Err())
+		}
+		time.Sleep(time.Millisecond)
+	}
+	if wait := time.Until(f.authority.expiresAt); wait > 0 {
+		time.Sleep(wait)
+	}
+	if err = connection.Close(); err != nil {
+		t.Fatal(err)
+	}
+	released = true
+	err = <-done
+	if identityPlanFailure(err).Code != "agent_identity_issuer_authority_stale" {
+		t.Fatal("publication accepted issuer authority expired during SQLite wait: ", err)
+	}
+	registryAssertUnchanged(t, f.store, before, 0, 0)
+}
+
+func TestAgentIdentityIssuerAuthorityCannotComeFromJSON(t *testing.T) {
+	var authority agentIdentityIssuerAuthority
+	if err := json.Unmarshal([]byte(`{"projectRoot":"/tmp","principal":{"principal_kind":"human"},"enrollmentDigest":"self-asserted"}`), &authority); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(authority, agentIdentityIssuerAuthority{}) {
+		t.Fatal("JSON populated the private enrollment authority")
+	}
+}

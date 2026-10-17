@@ -1,0 +1,137 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-actions-confiance-launch/context-window-admin-ui/isolated-store",
+  "work": "w-6d73db2336a8836853ddc5d8",
+  "checks": [
+    {
+      "lang": "fr",
+      "theme": "etat",
+      "preview_read_only": true,
+      "save_reopen_300": true,
+      "unlimited_persisted": true,
+      "no_hidden_input_max": true,
+      "consumption_preserved": true,
+      "mobile": true,
+      "escape_focus": true
+    },
+    {
+      "lang": "fr",
+      "theme": "sombre",
+      "preview_read_only": true,
+      "save_reopen_300": true,
+      "unlimited_persisted": true,
+      "no_hidden_input_max": true,
+      "consumption_preserved": true,
+      "mobile": true,
+      "escape_focus": true
+    },
+    {
+      "lang": "en",
+      "theme": "etat",
+      "preview_read_only": true,
+      "save_reopen_300": true,
+      "unlimited_persisted": true,
+      "no_hidden_input_max": true,
+      "consumption_preserved": true,
+      "mobile": true,
+      "escape_focus": true
+    },
+    {
+      "lang": "en",
+      "theme": "sombre",
+      "preview_read_only": true,
+      "save_reopen_300": true,
+      "unlimited_persisted": true,
+      "no_hidden_input_max": true,
+      "consumption_preserved": true,
+      "mobile": true,
+      "escape_focus": true
+    }
+  ],
+  "errors": [],
+  "no_provider_calls": true,
+  "final": {
+    "review_manifest_transport_bytes": 8192,
+    "bounds": {
+      "planning_activations": 0,
+      "planning_decisions": 0,
+      "review_calls": null
+    },
+    "revision": 10,
+    "limits": {
+      "review_context_tokens": 0,
+      "review_context_files": 0,
+      "review_source_bytes": 0,
+      "review_context_bytes": 0,
+      "review_delivery_files": 0,
+      "planning_scopes": 0,
+      "delegation_depth": 0,
+      "planning_tasks": 4,
+      "judge_cycles": 0,
+      "planning_activations": 10,
+      "planning_decisions": 10,
+      "review_calls": 10
+    },
+    "consumed": {
+      "planning_scopes": 1,
+      "delegation_depth": 1,
+      "planning_tasks": 0,
+      "judge_cycles": 1,
+      "planning_activations": 0,
+      "planning_decisions": 0,
+      "review_calls": 0
+    },
+    "remaining": {
+      "planning_tasks": 4,
+      "planning_activations": 10,
+      "planning_decisions": 10,
+      "review_calls": 10
+    },
+    "last_authorization": {
+      "before": {
+        "review_context_tokens": 400000,
+        "review_context_files": 32,
+        "review_source_bytes": 196608,
+        "review_context_bytes": 524288,
+        "review_delivery_files": 300,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 4,
+        "judge_cycles": 0,
+        "planning_activations": 10,
+        "planning_decisions": 10,
+        "review_calls": 10
+      },
+      "after": {
+        "review_context_tokens": 0,
+        "review_context_files": 0,
+        "review_source_bytes": 0,
+        "review_context_bytes": 0,
+        "review_delivery_files": 0,
+        "planning_scopes": 0,
+        "delegation_depth": 0,
+        "planning_tasks": 4,
+        "judge_cycles": 0,
+        "planning_activations": 10,
+        "planning_decisions": 10,
+        "review_calls": 10
+      },
+      "actor": "fpizzi/uid:1001",
+      "at": "2026-10-15T10:16:06.812265016Z",
+      "reason": "Unlimited files does not waive evidence or provider capacity"
+    },
+    "scopes": [
+      {
+        "activations": 0,
+        "id": "root",
+        "objective": "Verify configurable review delivery policy",
+        "requirements": [
+          "req-1"
+        ],
+        "revision": 1,
+        "generation": 0,
+        "state": "ready"
+      }
+    ]
+  }
+}

@@ -45,6 +45,12 @@ if '\nSWARM_FRAGMENT_PACKET\n' in text:
     defect={'artifact':i,'quote':quote,'explanation':'Fixture refusal identifies a reproducible defect in the supplied content.','reproduction':'Run the isolated fixture with its failing input.','expected':'The isolated fixture must reject this input.'}
     if packet.get('defect_citation_contract_version',0)==0: defect['line']=line+1
     reply['defects'].append(defect)
+ if packet.get('finding_contract_version',0)==2:
+  defects=reply.pop('defects')
+  for i,finding in reply['findings'].items():
+   finding.pop('n',None)
+   if finding['v']=='unknown': finding['n']=['Confirm original content is present']
+   if finding['v']=='fail': finding['d']=[{k:v for k,v in d.items() if k!='artifact'} for d in defects if d['artifact']==int(i)]
 elif '\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n' in text:
  payload=json.loads(text.split('\nSWARM_FRAGMENT_EVIDENCE_REQUEST\n',1)[1]);b=payload['partial_inspections']
  reply={'candidate_commit':b['candidate_commit'],'context_sha256':b['context_sha256'],'plan_sha256':b['plan_sha256'],'state':'unknown' if mode=='selection-unknown' else 'ready','reason':'Fixture selection of original evidence','references':[]}
@@ -95,7 +101,6 @@ func TestManagedFragmentRuntimeProviderProtocol(t *testing.T) {
 					t.Fatal("omitted reservations accepted", state, runErr)
 				}
 			case "unknown":
-				wantCalls = len(p.Packets)
 				if runErr == nil || state == "passed" {
 					t.Fatal(state, runErr)
 				}

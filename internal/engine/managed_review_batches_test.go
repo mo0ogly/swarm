@@ -112,7 +112,8 @@ func TestManagedBatchSingleContextKeepsLegacyPrompt(t *testing.T) {
 	c, owners := batchFixture()
 	c.Diff = "small diff"
 	plan, err := planManagedReviewBatches("prefix", c, owners)
-	if err != nil || len(plan) != 1 || plan[0].Prompt != boundedManagedReviewPrompt("prefix", c) || !reflect.DeepEqual(plan[0].Context, c) {
+	expectedPrompt, promptErr := boundedManagedReviewPrompt("prefix", c)
+	if err != nil || promptErr != nil || len(plan) != 1 || plan[0].Prompt != expectedPrompt || !reflect.DeepEqual(plan[0].Context, c) {
 		t.Fatal("single-context compatibility lost", err)
 	}
 }

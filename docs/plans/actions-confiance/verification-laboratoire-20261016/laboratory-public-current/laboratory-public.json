@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "disabled policy and fixed corpus visible through authenticated remote client without local root",
+    "Admin preview does not mutate; non-default timeout/concurrency persist and exact policy replay is idempotent",
+    "production connector, caller path, numeric seed and wrong version digest refuse before mutation",
+    "requester cannot run laboratory; current I3 authority required",
+    "five native corpus scenarios and fourteen actual OS boundary assertions pass in isolated helper",
+    "same command returns historical result without new simulation or duplicate attempt",
+    "explicit replay creates attributed separate attempt with identical deterministic result",
+    "reopen retains inputs, corpus, policy and results; attempts preserved without raw credentials or local client fallback"
+  ],
+  "binary_sha256": "ec5058fc823b25a6faf515e454a8132048ad384456d78120bfa82a9a15feec05",
+  "at": 1792111622.8184614,
+  "simulation": true
+}

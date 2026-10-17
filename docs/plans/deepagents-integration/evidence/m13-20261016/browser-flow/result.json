@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-dr-ui-2RNbOc",
+  "checks": [
+    "Actual provider boundary and stopped process inspected through recovery-preview; no provider restart",
+    "FR/EN, both themes, 1440/760/390/320 widths, Escape and semantic action focus restoration",
+    "Two unknown checks remain visible, verified checks expand on demand and confirmation is hidden",
+    "Rendered diagnostic text contrast is at least 4.5:1",
+    "Untrusted diagnostic text is rendered as text without executable nodes",
+    "Inconsistent answered session rejected through the actual button: HTTP 400, FR/EN error, both themes, desktop/mobile, Escape/focus, no confirmation, no read mutation; exact isolated fixture repaired for positive reread"
+  ],
+  "errors": [],
+  "failures": [],
+  "expectedFailures": [
+    {
+      "url": "http://127.0.0.1:38061/api/v1/recovery-preview?work=w-cbe01272d374700f5bec6e14&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:38061/api/v1/recovery-preview?work=w-cbe01272d374700f5bec6e14&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:38061/api/v1/recovery-preview?work=w-cbe01272d374700f5bec6e14&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    },
+    {
+      "url": "http://127.0.0.1:38061/api/v1/recovery-preview?work=w-cbe01272d374700f5bec6e14&task=t1",
+      "status": 400
+    },
+    {
+      "console": "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+    }
+  ],
+  "navigationAborts": [],
+  "provider_invocations": 1,
+  "model_calls": 0
+}

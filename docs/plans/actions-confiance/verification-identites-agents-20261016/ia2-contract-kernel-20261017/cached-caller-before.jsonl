@@ -1,0 +1,9 @@
+{"Time":"2026-10-17T07:43:37.005515018+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T07:43:37.044278241+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRejectsCachedCaller"}
+{"Time":"2026-10-17T07:43:37.044378329+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRejectsCachedCaller","Output":"=== RUN   TestAgentIdentityRejectsCachedCaller\n"}
+{"Time":"2026-10-17T07:43:37.111795907+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRejectsCachedCaller","Output":"    agent_identity_authority_test.go:115: a previously resolved caller was reused at a later decision without fresh authentication\n"}
+{"Time":"2026-10-17T07:43:37.113821339+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRejectsCachedCaller","Output":"--- FAIL: TestAgentIdentityRejectsCachedCaller (0.07s)\n"}
+{"Time":"2026-10-17T07:43:37.113918301+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentIdentityRejectsCachedCaller","Elapsed":0.07}
+{"Time":"2026-10-17T07:43:37.114188559+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-17T07:43:37.123914358+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.118s\n"}
+{"Time":"2026-10-17T07:43:37.124008975+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.119}

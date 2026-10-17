@@ -1,0 +1,14 @@
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service
+=== RUN   TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin
+--- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation (1.40s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/alice (0.34s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/bob (0.36s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/effect-service (0.32s)
+    --- PASS: TestActionsConfianceT3IdentitySuspensionPersistsAndRejectsWithoutMutation/admin (0.37s)
+=== RUN   TestActionsConfianceT3IdentitySuspensionPreviewDoesNotApply
+--- PASS: TestActionsConfianceT3IdentitySuspensionPreviewDoesNotApply (0.38s)
+PASS
+ok  	swarm.local/companion/internal/engine	3.026s

@@ -31,7 +31,8 @@
     "test:call-ledger": "node tests/call_ledger_test.cjs",
     "test:call-ledger-ui": "node tests/call_ledger_ui.cjs",
     "test:retex-contract": "python3 tests/retex_campaign_contract_test.py",
-    "test:review-policies": "node tests/review_file_policy_ui.cjs"
+    "test:review-policies": "node tests/review_file_policy_ui.cjs",
+    "build:processes": "node scripts/processes/build.cjs"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

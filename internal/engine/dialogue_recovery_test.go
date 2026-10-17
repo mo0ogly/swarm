@@ -1,0 +1,310 @@
+//go:build linux
+
+package engine
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+func dialogueRecoveryFixture(t *testing.T, events []string) (*Store, Agent, string) {
+	t.Helper()
+	s, a, provider := dialogueReceiptFixture(t, "codex", events)
+	m, err := runDialogueReceiptWrapper(t, s, a, "/fin\n")
+	a.Progress, a.Usage, _, _ = m.snapshot()
+	state := "completed"
+	if err != nil {
+		state = "interrupted"
+	}
+	if err := s.finishAgent(a, state, "fixture ended without task acceptance", nil); err != nil {
+		t.Fatal(err)
+	}
+	a, err = s.agent(a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return s, a, provider
+}
+
+func TestDialogueRecoveryPreviewKeepsBoundaryAndUnknownAuthority(t *testing.T) {
+	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"recovery-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw, err := json.Marshal(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var result struct {
+		Dialogue *struct {
+			Path      string               `json:"recommended_path"`
+			Supported bool                 `json:"resume_supported"`
+			Boundary  DialogueBoundaryView `json:"boundary"`
+			Checks    []any                `json:"checks"`
+		} `json:"dialogue"`
+	}
+	if err := json.Unmarshal(raw, &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.Dialogue == nil || !result.Dialogue.Boundary.Confirmed || !result.Dialogue.Supported || len(result.Dialogue.Checks) == 0 || result.Dialogue.Path != "review_boundary" {
+		t.Fatal("recovery preview ignores the retained conversation boundary and missing authorization")
+	}
+	for _, check := range p.Dialogue.Checks {
+		want := "pass"
+		if check.Code == "launch_preflight" || check.Code == "supervisor_decision" {
+			want = "unknown"
+		}
+		if check.Status != want {
+			t.Fatal("wrong qualification", check)
+		}
+	}
+	if p.Dialogue.DecisionRecorded || p.Dialogue.FactsSHA256 == "" {
+		t.Fatal("preview invented a decision or lacks attribution")
+	}
+}
+
+func recoverySnapshotTest(t *testing.T, s *Store) string {
+	t.Helper()
+	all := map[string][][]any{}
+	for _, table := range []string{"works", "agents", "agent_dialogue_turns", "reservations", "events", "agent_logs", "cockpit_events"} {
+		rows, err := s.db.Query("SELECT * FROM " + table + " ORDER BY rowid")
+		if err != nil {
+			t.Fatal(err)
+		}
+		cols, err := rows.Columns()
+		if err != nil {
+			rows.Close()
+			t.Fatal(err)
+		}
+		for rows.Next() {
+			values := make([]any, len(cols))
+			refs := make([]any, len(cols))
+			for i := range values {
+				refs[i] = &values[i]
+			}
+			if err := rows.Scan(refs...); err != nil {
+				rows.Close()
+				t.Fatal(err)
+			}
+			all[table] = append(all[table], values)
+		}
+		if err := rows.Err(); err != nil {
+			rows.Close()
+			t.Fatal(err)
+		}
+		rows.Close()
+	}
+	raw, err := json.Marshal(all)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(raw)
+}
+
+func TestDialogueRecoveryCLIAPIReadOnlyAndScoped(t *testing.T) {
+	s, a, script := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"private-fixture-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`})
+	foreign := taskTest(t, s, createTest(t, s))
+	before := recoverySnapshotTest(t, s)
+	callsBefore, err := os.ReadFile(script + ".calls")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out, stderr bytes.Buffer
+	if code := run([]string{"--root", s.root, "--json", "mission", "recovery", a.WorkID, a.TaskID, a.ID}, &out, &stderr); code != 0 {
+		t.Fatal(code, stderr.String())
+	}
+	var cli RecoveryPreview
+	if err := json.Unmarshal(out.Bytes(), &cli); err != nil {
+		t.Fatal(err)
+	}
+	handler := newWebHandler(s, "localhost:18787", "recovery-fixture-token")
+	for _, auth := range []bool{false, true} {
+		req := httptest.NewRequest(http.MethodGet, "http://localhost:18787/api/v1/recovery-preview?work="+a.WorkID+"&task="+a.TaskID+"&agent="+a.ID, nil)
+		if auth {
+			req.AddCookie(&http.Cookie{Name: "swarm_session", Value: "recovery-fixture-token"})
+		}
+		rr := httptest.NewRecorder()
+		handler.ServeHTTP(rr, req)
+		if !auth {
+			if rr.Code != http.StatusForbidden || strings.Contains(rr.Body.String(), "private-fixture-session") {
+				t.Fatal("unauthenticated response violates the session contract", rr.Code)
+			}
+			continue
+		}
+		var api RecoveryPreview
+		if rr.Code != http.StatusOK || json.Unmarshal(rr.Body.Bytes(), &api) != nil || api.Dialogue == nil || cli.Dialogue == nil || api.Dialogue.FactsSHA256 != cli.Dialogue.FactsSHA256 || !reflect.DeepEqual(api.Dialogue.Checks, cli.Dialogue.Checks) {
+			t.Fatal("public views differ", rr.Code, rr.Body.String())
+		}
+		if strings.Contains(rr.Body.String(), "SignatureCounts") {
+			t.Fatal("private guards exposed")
+		}
+	}
+	if _, err := s.recoveryPreview(foreign.ID, "t1", a.ID); err == nil {
+		t.Fatal("foreign agent accepted")
+	}
+	if before != recoverySnapshotTest(t, s) {
+		t.Fatal("refused preview mutated storage")
+	}
+	if before != recoverySnapshotTest(t, s) {
+		t.Fatal("preview changed attempts, counters, reservations or history")
+	}
+	callsAfter, err := os.ReadFile(script + ".calls")
+	if err != nil || !bytes.Equal(callsBefore, callsAfter) {
+		t.Fatal("preview invoked provider", err)
+	}
+	var plain bytes.Buffer
+	printRecoveryPreview(&plain, cli)
+	if !strings.Contains(plain.String(), "Reprise de conversation") || !strings.Contains(plain.String(), "Non vérifié") || !strings.Contains(plain.String(), "aucun agent") {
+		t.Fatal("plain CLI hides qualification")
+	}
+	if dir := os.Getenv("SWARM_DIALOGUE_RECOVERY_OUT"); dir != "" {
+		if !filepath.IsAbs(dir) {
+			t.Fatal("output must be absolute")
+		}
+		if err := os.MkdirAll(dir, 0700); err != nil {
+			t.Fatal(err)
+		}
+		f, err := os.OpenFile(filepath.Join(dir, "preview.json"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err = f.Write(out.Bytes()); err != nil {
+			f.Close()
+			t.Fatal(err)
+		}
+		f.Close()
+	}
+}
+
+func TestDialogueRecoveryQualifiesIncompleteAndChangedContracts(t *testing.T) {
+	for _, kind := range []string{"pending_tool", "missing_end", "legacy", "corrupt", "active", "provider_changed", "caps_tightened", "memory_missing"} {
+		t.Run(kind, func(t *testing.T) {
+			events := []string{`{"type":"thread.started","thread_id":"recovery-session"}`, `{"type":"turn.completed","usage":{"input_tokens":10,"output_tokens":2}}`}
+			if kind == "pending_tool" {
+				events = append(events[:1], `{"type":"item.started","item":{"id":"pending","type":"command_execution","command":"fixture effect"}}`, events[1])
+			}
+			if kind == "missing_end" {
+				events = events[:1]
+			}
+			s, a, _ := dialogueRecoveryFixture(t, events)
+			wantPath, wantCode, wantStatus := "reconcile_effects", "effects_observed", "fail"
+			switch kind {
+			case "missing_end":
+				wantStatus = "unknown"
+			case "legacy":
+				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint='' WHERE agent_id=?", a.ID); err != nil {
+					t.Fatal(err)
+				}
+				wantPath, wantCode, wantStatus = "inspect_history", "confirmed_boundary", "unknown"
+			case "corrupt":
+				if _, err := s.db.Exec("UPDATE agent_dialogue_turns SET checkpoint='private malformed input' WHERE agent_id=?", a.ID); err != nil {
+					t.Fatal(err)
+				}
+			case "active":
+				a.Status = "running"
+				a.Ended = ""
+				if err := s.saveAgent(a); err != nil {
+					t.Fatal(err)
+				}
+				wantPath, wantCode = "wait_for_stop", "process_ended"
+			case "provider_changed":
+				ps, err := s.providersFile()
+				if err != nil {
+					t.Fatal(err)
+				}
+				p := ps.Providers[a.Provider]
+				p.Args = append(p.Args, "--unexpected")
+				ps.Providers[a.Provider] = p
+				raw, _ := json.Marshal(ps)
+				if err := os.WriteFile(filepath.Join(s.root, ".swarm/providers.json"), raw, 0600); err != nil {
+					t.Fatal(err)
+				}
+				wantPath, wantCode = "review_current_contract", "launch_configuration"
+			case "caps_tightened":
+				if _, err := s.configureRunLimits(RunLimitsConfigChange{Schema: 1, EventID: "tighten-for-diagnosis", Scope: ScopeProject, Values: RunLimits{MaxToolCalls: 1}, Reason: "Fixture restriction"}); err != nil {
+					t.Fatal(err)
+				}
+				wantPath, wantCode = "review_current_contract", "current_caps"
+			case "memory_missing":
+				a.Context.Memory = []MemoryReference{{Work: "missing-work", ID: "missing-memory", Version: 1, SHA256: strings.Repeat("a", 64)}}
+				if err := s.saveAgent(a); err != nil {
+					t.Fatal(err)
+				}
+				wantPath, wantCode = "review_current_contract", "memory_sources"
+			}
+			before := recoverySnapshotTest(t, s)
+			p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
+			if kind == "corrupt" {
+				if err == nil {
+					t.Fatal("corrupt state became empty success")
+				}
+				if before != recoverySnapshotTest(t, s) {
+					t.Fatal("corrupt read mutated state")
+				}
+				return
+			}
+			if err != nil || p.Dialogue == nil || p.Dialogue.Path != wantPath || p.Dialogue.ResumeSupported || p.Dialogue.DecisionRecorded {
+				t.Fatal("wrong recovery path", p.Dialogue, err)
+			}
+			found := false
+			for _, check := range p.Dialogue.Checks {
+				if check.Code == wantCode {
+					found = check.Status == wantStatus
+				}
+			}
+			if !found {
+				t.Fatal("missing qualification", wantCode, wantStatus, p.Dialogue.Checks)
+			}
+			if before != recoverySnapshotTest(t, s) {
+				t.Fatal("diagnosis changed stored state")
+			}
+		})
+	}
+}
+
+func TestDialogueRecoverySelectionIgnoresRecentHistoryWindow(t *testing.T) {
+	s, a, _ := dialogueRecoveryFixture(t, []string{`{"type":"thread.started","thread_id":"retained-session"}`, `{"type":"turn.completed"}`})
+	for i := 0; i < 201; i++ {
+		other := Agent{ID: fmt.Sprintf("retained-padding-%d", i), WorkID: a.WorkID, TaskID: "other-task", CWD: s.root, Status: "completed"}
+		raw, _ := json.Marshal(other)
+		if _, err := s.db.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,'{}')", other.ID, other.WorkID, other.TaskID, other.CWD, other.Status, raw); err != nil {
+			t.Fatal(err)
+		}
+	}
+	recent, err := s.agents(a.WorkID)
+	if err != nil || len(recent) != 200 {
+		t.Fatal("fixture did not exceed history window", len(recent), err)
+	}
+	for _, item := range recent {
+		if item.ID == a.ID {
+			t.Fatal("target still in recent history")
+		}
+	}
+	for _, id := range []string{"", a.ID} {
+		p, err := s.recoveryPreview(a.WorkID, a.TaskID, id)
+		if err != nil || p.Agent != a.ID || p.Dialogue == nil || p.Dialogue.Path != "review_boundary" {
+			t.Fatal("retained attempt hidden by recent window", id, err)
+		}
+	}
+	later := a
+	later.ID = "later-agent"
+	later.Attempt = "later-attempt"
+	later.Mode = ""
+	raw, _ := json.Marshal(later)
+	if _, err := s.db.Exec("INSERT INTO agents(id,work_id,task_id,cwd,status,body,request) VALUES(?,?,?,?,?,?,'{}')", later.ID, later.WorkID, later.TaskID, later.CWD, later.Status, raw); err != nil {
+		t.Fatal(err)
+	}
+	p, err := s.recoveryPreview(a.WorkID, a.TaskID, a.ID)
+	if err != nil || p.Dialogue == nil || p.Dialogue.Path != "select_latest_attempt" {
+		t.Fatal("explicit older attempt became current", err)
+	}
+}

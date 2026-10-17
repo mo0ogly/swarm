@@ -1,0 +1,9 @@
+flowchart TD
+  J["Journal sous réservation locale<br/>tête et enregistrement courants"] --> S["SignActive<br/>ActiveReply schema_version = 1"]
+  S --> V["Signature et challenge<br/>enrollmentproof.Verify"]
+  V --> D["DecodeActiveReply commun<br/>version et JSON canonique stricts"]
+  D --> R["Format reconnu<br/>Head et Record cohérents, octets possédés"]
+  D --> F["Version absente ou inconnue<br/>refus sans donnée ni repli"]
+  R --> A["DecodeActive puis CheckActive<br/>attendus, document et dates"]
+  A --> O["Donnée validée<br/>aucun permis d’exécuter"]
+  O -.-> E["Source protégée et état frais à l’usage<br/>raccord restant à réaliser"]

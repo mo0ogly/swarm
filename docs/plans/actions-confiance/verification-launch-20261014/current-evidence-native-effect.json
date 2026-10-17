@@ -1,0 +1,11 @@
+{
+  "revision": 287,
+  "work_id": "w-68b50cc82ec3fe55624f9549",
+  "candidate": "9fecfc8acb9cddefd30b629f4bda8ff49900cb60",
+  "review_id": "review-4b43f0d3a78a3c830eac85ce",
+  "state": "changes_requested",
+  "reason": "Deux défauts matériels sont démontrés dans l’original complet : l’approbation ne vérifie aucune empreinte fournie par l’approbateur, et une même clé d’idempotence peut créer plusieurs actions avant que le conflit ne soit détecté au commit. Le digest de rejeu inclut aussi actor/integrity bien que déclarés ignorés. Les preuves de configuration/preuves et d’interface sont substantielles, mais la tâche doit retourner en ACT pour correction et nouveaux contrôles/revue.",
+  "consumed_review_calls": 55,
+  "planning_activations": 25,
+  "two_attempts_retained": 2
+}

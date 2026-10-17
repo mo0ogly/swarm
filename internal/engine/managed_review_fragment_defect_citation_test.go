@@ -4,6 +4,7 @@ package engine
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -211,6 +212,63 @@ func TestDefectCitationNewSchemasKeepHistoricalShape(t *testing.T) {
 }
 
 func TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence(t *testing.T) {
+	testFragmentContractRestartKeepsEvidence(t, false)
+}
+
+func TestFragmentNestedDefectRestartKeepsMethodAndOldEvidence(t *testing.T) {
+	testFragmentContractRestartKeepsEvidence(t, true)
+}
+
+func TestDefectCitationCrossArtifactDiagnosticPreservesOpinion(t *testing.T) {
+	for _, version := range []int{1, 2} {
+		t.Run(fmt.Sprint(version), func(t *testing.T) {
+			packet, reply := nestedDefectFixture()
+			packet.FindingContractVersion = version
+			raw, _ := json.Marshal(packet)
+			reply["packet_sha256"] = hash(raw)
+			first := reply["findings"].(map[string]any)["0"].(map[string]any)
+			claim := first["d"].([]any)[0].(map[string]any)
+			quote := "second original source"
+			claim["quote"] = quote
+			if version == 1 {
+				claim["artifact"] = 0
+				reply["defects"] = []any{claim}
+				delete(first, "d")
+				first["n"] = []string{}
+			}
+			raw, _ = json.Marshal(reply)
+			original := string(raw)
+			state, inspection, err := parseManagedFragmentInspection(original, packet)
+			if err == nil || state != "" || len(inspection.Defects) != 0 {
+				t.Fatal("wrong attribution repaired into an opinion", state, err)
+			}
+			for _, fact := range []string{"texte cité", `"literal_matches_elsewhere":[1]`, hash([]byte(quote)), quote} {
+				if !strings.Contains(err.Error(), fact) {
+					t.Fatalf("missing attribution diagnostic %q: %v", fact, err)
+				}
+			}
+			raw, _ = json.Marshal(reply)
+			if string(raw) != original {
+				t.Fatal("original reply changed")
+			}
+		})
+	}
+}
+
+func TestDefectCitationDiagnosticFitsOwnerContext(t *testing.T) {
+	p, _ := nestedDefectFixture()
+	quote := strings.Repeat("<", 256)
+	for range 6 {
+		p.Artifacts = append(p.Artifacts, managedReviewFragmentArtifact{Name: strings.Repeat("<", 2000), Content: quote})
+	}
+	err := fragmentDefectCitationFailure(p, 0, quote, fmt.Errorf("quote absent"))
+	if len(err.Error()) > 4000 || !strings.Contains(err.Error(), `"matching_artifact_count":6`) || !strings.Contains(err.Error(), hash([]byte(quote))) {
+		t.Fatal("diagnostic cannot reach its owner intact", len(err.Error()))
+	}
+}
+
+func testFragmentContractRestartKeepsEvidence(t *testing.T, finding bool) {
+	t.Helper()
 	s, w, a := planningProtocolReviewFixture(t)
 	task, _ := w.task(a.TaskID)
 	old := *task.IndependentReview
@@ -219,7 +277,11 @@ func TestDefectCitationProtocolRestartKeepsMethodAndOldEvidence(t *testing.T) {
 		t.Fatal(err)
 	}
 	for i := range plan.Packets {
-		plan.Packets[i].DefectCitationContractVersion = 0
+		if finding {
+			plan.Packets[i].FindingContractVersion = 1
+		} else {
+			plan.Packets[i].DefectCitationContractVersion = 0
+		}
 	}
 	raw, _ := json.Marshal(plan)
 	planName := filepath.Join(filepath.Dir(old.FragmentJournal.Plan), "citation-legacy-plan.json")

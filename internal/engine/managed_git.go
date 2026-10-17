@@ -5,11 +5,13 @@ package engine
 import (
 	"context"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"syscall"
 	"time"
@@ -44,6 +46,14 @@ type ManagedAttempt struct {
 }
 
 func managedGit(dir string, args ...string) (string, error) {
+	return managedGitText(dir, false, args...)
+}
+
+func managedReviewGit(version int, dir string, args ...string) (string, error) {
+	return managedGitText(dir, version == 2, args...)
+}
+
+func managedGitText(dir string, exact bool, args ...string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "git", append([]string{"-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false", "-c", "protocol.file.allow=always"}, args...)...)
@@ -57,9 +67,24 @@ func managedGit(dir string, args ...string) (string, error) {
 	cmd.WaitDelay = time.Second
 	cmd.Dir = dir
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0", "GIT_AUTHOR_NAME=Swarm", "GIT_AUTHOR_EMAIL=swarm@localhost", "GIT_COMMITTER_NAME=Swarm", "GIT_COMMITTER_EMAIL=swarm@localhost")
-	out, err := cmd.CombinedOutput()
+	var out []byte
+	var err error
+	if exact {
+		out, err = cmd.Output()
+	} else {
+		out, err = cmd.CombinedOutput()
+	}
 	if err != nil {
+		if failure, ok := err.(*exec.ExitError); exact && ok {
+			out = append(out, failure.Stderr...)
+		}
+		if exact {
+			return "", fmt.Errorf("git %s : %w : %s", args[0], err, guardBlock(string(out), 2000))
+		}
 		return "", fmt.Errorf("git %s : %s", args[0], guardBlock(string(out), 2000))
+	}
+	if exact {
+		return string(out), nil
 	}
 	return strings.TrimSpace(string(out)), nil
 }
@@ -93,6 +118,10 @@ func (s *Store) configureManagedRepository(work string, r ManagedRepositoryReque
 		return nil, err
 	}
 	defer unlock()
+	return s.configureManagedRepositoryLocked(work, r)
+}
+
+func (s *Store) configureManagedRepositoryLocked(work string, r ManagedRepositoryRequest) (*ManagedRepository, error) {
 	source, err := resolveWorkspace(s.root, r.Path)
 	if err != nil {
 		return nil, err
@@ -112,29 +141,43 @@ func (s *Store) configureManagedRepository(work string, r ManagedRepositoryReque
 	digest := hash(encoded)
 	storage := filepath.Join(s.root, ".swarm", "managed", work)
 	manifest := filepath.Join(storage, "repository.json")
-	if raw, err := os.ReadFile(manifest); err == nil {
-		var prior ManagedRepository
-		if err = json.Unmarshal(raw, &prior); err != nil {
+	var retained *ManagedRepository
+	var retainedRaw, canonical []byte
+	finalPresent := false
+	for i, path := range []string{manifest, manifest + ".pending"} {
+		raw, err := os.ReadFile(path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
 			return nil, err
 		}
-		if prior.RequestDigest != digest {
-			return nil, fmt.Errorf("la base de mission est déjà figée avec une autre sélection")
-		}
-		if _, e := managedGit(filepath.Join(prior.Storage, "repository.git"), "cat-file", "-e", prior.Base+"^{commit}"); e != nil {
-			return nil, e
-		}
-		return &prior, nil
-	}
-	if raw, e := os.ReadFile(manifest + ".pending"); e == nil {
 		var prior ManagedRepository
-		if json.Unmarshal(raw, &prior) == nil && prior.RequestDigest == digest {
-			if _, e = managedGit(filepath.Join(storage, "repository.git"), "cat-file", "-e", prior.Base+"^{commit}"); e == nil {
-				if e = atomicWrite(manifest, raw); e != nil {
-					return nil, e
-				}
-				return &prior, nil
+		if err = json.Unmarshal(raw, &prior); err != nil {
+			return nil, fmt.Errorf("manifeste préparé invalide, conservé pour diagnostic : %w", err)
+		}
+		if err = validatePreparedRepository(prior, storage, source, subdir, digest, r.Include); err != nil {
+			return nil, fmt.Errorf("preuve du dépôt préparé conservée sans réécriture : %w", err)
+		}
+		encoded, err := json.Marshal(prior)
+		if err != nil {
+			return nil, err
+		}
+		if retained != nil && string(canonical) != string(encoded) {
+			return nil, fmt.Errorf("manifestes final et préparé divergents ; conserver les originaux et réconcilier avant reprise")
+		}
+		if retained == nil {
+			retained, retainedRaw, canonical = &prior, raw, encoded
+		}
+		finalPresent = finalPresent || i == 0
+	}
+	if retained != nil {
+		if !finalPresent {
+			if err = atomicWrite(manifest, retainedRaw); err != nil {
+				return nil, err
 			}
 		}
+		return retained, nil
 	}
 	base, err := managedGit(source, "rev-parse", "HEAD")
 	if err != nil {
@@ -259,6 +302,29 @@ func (s *Store) configureManagedRepository(work string, r ManagedRepositoryReque
 	}
 	return repo, nil
 }
+func validatePreparedRepository(prior ManagedRepository, storage, source, subdir, digest string, include []string) error {
+	if prior.RequestDigest != digest || prior.Storage != storage || prior.Source != source || prior.Subdir != subdir || !slices.Equal(prior.Included, include) {
+		return fmt.Errorf("manifeste du dépôt incompatible avec la sélection et ses chemins canoniques ; réconcilier avant reprise")
+	}
+	snapshot, err := hex.DecodeString(prior.Snapshot)
+	if err != nil || len(snapshot) != 32 {
+		return fmt.Errorf("empreinte SHA-256 du dépôt préparé absente ou invalide")
+	}
+	for _, oid := range []string{prior.Base, prior.Candidate} {
+		if oid == "" {
+			return fmt.Errorf("identité Git du dépôt préparé absente")
+		}
+		resolved, err := managedGit(filepath.Join(storage, "repository.git"), "rev-parse", "--verify", oid+"^{commit}")
+		if err != nil {
+			return fmt.Errorf("objet Git préparé absent : %w", err)
+		}
+		if resolved != oid {
+			return fmt.Errorf("identité Git préparée non canonique")
+		}
+	}
+	return nil
+}
+
 func managedCopyPath(repo *ManagedRepository, task string, attempt int) string {
 	return filepath.Join(managedCopyRoot(repo, task, attempt), repo.Subdir)
 }
@@ -280,7 +346,7 @@ func (s *Store) ensureManagedAttempt(w Work, r Launch) (string, error) {
 		return "", err
 	}
 	defer unlock()
-	recovery, err := s.managedRecoveryHandoff(w, taskForPreparation(w, r.TaskID))
+	recovery, err := s.managedRecoveryHandoffLocked(w, taskForPreparation(w, r.TaskID))
 	if err != nil {
 		return "", err
 	}

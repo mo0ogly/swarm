@@ -1,0 +1,30 @@
+{
+  "executor": "Codex direct audit",
+  "argv": [
+    "/tmp/swarm-deepagents-memory-env-944lMS/bin/python",
+    "-m",
+    "pytest",
+    "-p",
+    "pytest_asyncio.plugin",
+    "-p",
+    "pytest_socket",
+    "--disable-socket",
+    "--allow-unix-socket",
+    "-vv",
+    "tests/unit_tests/middleware/test_memory_middleware.py",
+    "tests/unit_tests/middleware/test_memory_middleware_async.py"
+  ],
+  "cwd": "/tmp/swarm-deepagents-audit-944lMS/libs/deepagents",
+  "environment_keys": [
+    "HOME",
+    "LANGCHAIN_TRACING_V2",
+    "LANGSMITH_TRACING",
+    "PATH",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD",
+    "PYTHONPATH"
+  ],
+  "started_at_utc": "2026-10-15T19:05:51.755509+00:00",
+  "ended_at_utc": "2026-10-15T19:05:55.184842+00:00",
+  "exit_code": 1,
+  "log_sha256": "f53eaad6eb4531d64e6ee38e6d1e2a536d2610c7f070d79f85137a9519e71311"
+}

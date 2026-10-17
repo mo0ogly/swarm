@@ -83,6 +83,48 @@ sequenceDiagram
 
 ## Audit the method and handoff too
 
+### Sources from an interrupted attempt
+
+At settlement of a failed or interrupted managed attempt without a submitted
+result, the engine confirms process termination and copy ownership. Even without
+a remaining attempt, it retains
+the Git tree in an immutable checkpoint separate from a delivery result. The new
+worker’s `.git/swarm-recovery.json` contains `checkpoint.commit` and the attributed
+diagnostic; sources are available at `refs/swarm/recovery/previous`. The diagnostic
+is also supplied directly in the recovery prompt. The accepted candidate and
+usage counters stay unchanged. The worker examines preserved changes before
+reusing them and must supply fresh checks and a new handoff.
+The owner receives the manifest and digest through `attempt_ended`. Preservation
+failure remains a public blocker to reconcile, not proven recovery.
+
+An existing checkpoint is verified and reused even if the former copy later changes.
+Changed attribution, references, trees or redirected paths block recovery. A
+reference without its manifest is retained as incomplete evidence for operator
+reconciliation rather than overwritten by a new snapshot. Historical attempts
+without confirmed termination keep their explicit limitation.
+
+Execution guidance requires a real file/interface inventory, the verified current
+directory without rebuilding `workdir`, and checking required transport before a
+browser recipe. After a permission denial, hand back the blocker and sources
+without repeating several gates against the same precondition. These are supplied
+instructions, not interception of provider tools or a guarantee against model errors.
+
+```mermaid
+flowchart LR
+    I[Interrupted attempt] --> P{Termination and ownership confirmed?}
+    P -->|yes| C[Immutable checkpoint without acceptance]
+    P -->|no| B[Recovery refused, evidence retained]
+    C --> D[Recovery packet and diagnostic in the new copy]
+    D --> E[Examine and repair preserved sources]
+    E --> V[Fresh checks and review required]
+```
+
+`TestManagedInterruptedRecoveryRetainsSourcesAndDiagnostic` reproduces lost
+sources and verifies reception in the next copy and prompt without adopting the
+checkpoint. Variants cover tampering, missing manifests, redirected paths, live
+processes and concurrent creation. Deterministic fixtures alone do not demonstrate
+a real agent’s correct decision.
+
 At each boundary, verify exact arguments/exit code, original attachment, supplied
 projection, role rights, supported operation, persisted state and published
 candidate. A path is not supplied content; an event is not demonstrated use;

@@ -23,6 +23,11 @@ func fragmentContractQuestionFixture(t *testing.T, criterion string, sources ...
 			Binding:  ManagedTaskReview{Reason: "Prior review opinion must not resolve a question"},
 		}},
 	}
+	return fragmentContractQuestionFromContext(t, c)
+}
+
+func fragmentContractQuestionFromContext(t *testing.T, c managedReviewContext) (managedReviewContext, managedReviewFragmentPlan, []string, string, managedReviewContext) {
+	t.Helper()
 	p, err := planManagedReviewFragments(c, 12, 2)
 	if err != nil {
 		t.Fatal(err)
@@ -43,7 +48,7 @@ func fragmentContractQuestionFixture(t *testing.T, criterion string, sources ...
 			}
 			r.Findings = append(r.Findings, finding)
 		}
-		encoded, _ = json.Marshal(r)
+		encoded, _ = marshalFragmentInspectionFixture(packet, r)
 		replies = append(replies, string(encoded))
 	}
 	prompt, visible, err := managedFragmentDecisionPrompt("", c, p, replies, nil)
@@ -68,6 +73,49 @@ func fragmentContractDecision(t *testing.T, c managedReviewContext, quote, imple
 		t.Fatal(err)
 	}
 	return string(raw)
+}
+
+func TestManagedFragmentReceiptResolvesBindingOnly(t *testing.T) {
+	c, p, replies, prompt, visible := fragmentContractQuestionFixture(t, "Bind controls to the current candidate before judging implementation.")
+	quote := `"candidate_commit":"` + c.Candidate + `"`
+	if !strings.Contains(prompt, quote) {
+		t.Fatal("receipt binding was not actually visible")
+	}
+	state, records, err := parseManagedFragmentDecision(fragmentContractDecision(t, c, quote, c.Tasks[0].Report), visible, c, p, replies)
+	if err != nil || state != "passed" || len(records) != 1 {
+		t.Fatalf("visible receipt binding refused: %s %v", state, err)
+	}
+	if _, _, err = parseManagedFragmentDecision(fragmentContractDecision(t, c, quote, quote), visible, c, p, replies); err == nil || strings.Contains(err.Error(), "résolution sans preuve") {
+		t.Fatalf("receipt must not prove implementation: %v", err)
+	}
+	for _, variant := range []string{"missing", "altered"} {
+		t.Run(variant, func(t *testing.T) {
+			v := visible
+			q := quote
+			if variant == "missing" {
+				v.Receipt = nil
+			} else {
+				q = strings.ReplaceAll(q, c.Candidate, strings.Repeat("f", 40))
+			}
+			if _, _, err := parseManagedFragmentDecision(fragmentContractDecision(t, c, q, c.Tasks[0].Report), v, c, p, replies); err == nil {
+				t.Fatal("unprovided receipt admitted")
+			}
+		})
+	}
+}
+
+func TestManagedFragmentResolutionDiagnosticLocatesRejectedQuote(t *testing.T) {
+	c, p, replies, _, visible := fragmentContractQuestionFixture(t, "Preserve a precise diagnostic without repairing an independent opinion.")
+	quote := "Original quote deliberately absent from this fixture"
+	_, _, err := parseManagedFragmentDecision(fragmentContractDecision(t, c, quote, c.Tasks[0].Report), visible, c, p, replies)
+	if err == nil {
+		t.Fatal("invalid quote admitted")
+	}
+	for _, field := range []string{"packet=0", "artifact=0", "need_index=0", quote, hash([]byte(quote))} {
+		if !strings.Contains(err.Error(), field) {
+			t.Fatalf("missing diagnostic %q: %v", field, err)
+		}
+	}
 }
 
 func TestManagedFragmentResolutionAcceptsVisibleTaskContract(t *testing.T) {

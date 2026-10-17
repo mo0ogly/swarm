@@ -1,0 +1,17 @@
+=== RUN   TestKernelCheckHelper
+    trust_kernel_check_test.go:39: owned helper fixture only
+--- SKIP: TestKernelCheckHelper (0.00s)
+=== RUN   TestKernelCheckRealProcessProtocol
+--- PASS: TestKernelCheckRealProcessProtocol (0.06s)
+=== RUN   TestKernelCheckPolicyInvalid
+--- PASS: TestKernelCheckPolicyInvalid (0.00s)
+=== RUN   TestKernelCheckFreshAuthorityAndRevision
+    trust_kernel_check_test.go:111: stale result accepted état Actions de confiance incohérent
+--- FAIL: TestKernelCheckFreshAuthorityAndRevision (0.07s)
+=== RUN   TestKernelCheckPolicy
+--- PASS: TestKernelCheckPolicy (0.06s)
+=== RUN   TestKernelCheckInactiveRefusesBeforeRunner
+--- PASS: TestKernelCheckInactiveRefusesBeforeRunner (0.06s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.314s
+FAIL

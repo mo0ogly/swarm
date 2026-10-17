@@ -6,6 +6,52 @@ Swarm propose deux installations **sous Linux** : Docker pour un environnement d
 
 Après installation, suivre le [guide utilisateur](GUIDE-UTILISATEUR.md) pour connecter une IA, préparer une mission et lire ses résultats.
 
+## Autorité d’identité — développement et pilote
+
+Le mode retenu pour le développement et le pilote est une **autorité locale sous
+compte système distinct, avec confinement vérifié des agents**. Une autorité sur
+machine et administration séparées est prévue pour les installations futures.
+Ce choix local/distant concerne l’autorité ; il est distinct du choix Docker/natif
+de Swarm décrit ci-dessous.
+
+**Cette séparation et son parcours de configuration ne sont pas encore livrés.**
+L’installateur actuel ne crée pas le compte ni le service d’autorité dédiés ; le
+conteneur actuel utilise votre UID/GID. Il ne faut pas interpréter une installation
+réussie comme une preuve d’isolation de l’identité ou de contrôle des créations.
+
+Le parcours prévu propose le mode à l’installation initiale, puis sa gestion dans
+un modal Admin : configuration persistante, racine de confiance explicitement
+approuvée, principal humain initial désigné et état effectif distinct du choix
+enregistré. L’option distante restera indiquée comme prévue jusqu’à sa livraison ;
+elle ne réutilise pas simplement une URL du cockpit ou le client Trust existant.
+Aucun échec de connexion ne devra déclencher une bascule permissive vers le local.
+Voir le [contrat et les limites](docs/architecture/AGENT-IDENTITY-CONTRACT.md) et
+le [plan de configuration et de migration](docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md).
+
+
+Le noyau de persistance de cette configuration est vérifié en fixtures locales ;
+il n’est pas encore raccordé à l’installateur ni au modal Admin. Ces vérifications
+ne constituent pas une installation de l’autorité ou une preuve de confinement.
+
+Le coordinateur local conserve désormais un témoin dans un répertoire distinct
+et vérifie la reprise après interruption en fixtures. Il n’est pas installé par
+ce script. Restaurer configuration et témoin ensemble peut masquer un retour
+arrière : leur protection et leur stratégie de sauvegarde restent à qualifier
+avant déploiement. Voir le contrat d’identité lié ci-dessus.
+
+Un adaptateur interne de contrôle réutilise maintenant le canal Linux attribué
+par message et le coordinateur ; ses échanges et refus sont testables en fixtures.
+Il ne fournit encore ni commande d’installation ni service lancé. Les chemins,
+pins et droits doivent venir du bootstrap protégé ; aucun compte, cookie cockpit
+ou premier appelant ne devient automatiquement l’autorité.
+
+Le client interne vérifie maintenant le processus serveur depuis un pidfd fourni
+indépendamment par le lanceur et lie la réponse à un challenge et à la demande
+exacte (transport version 2). Cette étape ne désigne pas l’humain initial et ne
+crée toujours aucun service système ni réglage Admin. La configuration sur disque
+reste au schéma 1 ; aucune réinitialisation d’historique n’est nécessaire. Voir
+le contrat d’identité pour les préconditions Linux et les limites de transport.
+
 ## Formation embarquée et identité visuelle
 
 Une fois le cockpit ouvert, choisissez **Aide du cockpit → Formation Casa Pizza**. Le lecteur propose vidéos, aperçus GIF, transcriptions, PDF de 38 pages et kit hors ligne téléchargeable. La langue choisie dans le cockpit sélectionne les ressources françaises ou anglaises ; le sélecteur du lecteur actualise tous les liens. Les fichiers Word restent les sources éditables.

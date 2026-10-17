@@ -30,7 +30,7 @@ func finalStoreFixture(t *testing.T) (*Store, Work, Agent, IndependentReview, ma
 			}
 			response.Findings = append(response.Findings, managedFragmentFinding{Artifact: k, Digest: artifact.Digest, Verdict: "inspected", Reason: "Independent inspection", Evidence: string(excerpt), Needs: []string{}})
 		}
-		raw, _ = json.Marshal(response)
+		raw, _ = marshalFragmentInspectionFixture(packet, response)
 		replies = append(replies, string(raw))
 		entry := &j.Entries[len(j.Entries)-1]
 		entry.State = "inspected"
@@ -56,7 +56,7 @@ func finalReservation(t *testing.T, c managedReviewContext, p managedReviewFragm
 	if e != nil {
 		t.Fatal(e)
 	}
-	return managedFragmentFinalJournal{Version: 3, InspectionDigest: hash(raw), Calls: []managedFragmentFinalCall{{Phase: "selection", CallID: "final-select", PromptDigest: hash([]byte(prompt)), State: "reserved"}}}
+	return managedFragmentFinalJournal{Version: managedFragmentFinalProtocolVersion, InspectionDigest: hash(raw), Calls: []managedFragmentFinalCall{{Phase: "selection", CallID: "final-select", PromptDigest: hash([]byte(prompt)), State: "reserved"}}}
 }
 func TestManagedFragmentFinalStoreReservationAndReply(t *testing.T) {
 	s, w, a, r, p, j, c, replies, prefix := finalStoreFixture(t)

@@ -46,8 +46,19 @@ func (s *Store) reviewRecoveryPreview(work, id string) (ReviewRecovery, error) {
 		return ReviewRecovery{}, err
 	}
 	r := task.IndependentReview
-	if r == nil || r.FragmentJournal == nil || w.Planning == nil || w.Planning.Reviewer == nil {
+	if r == nil || w.Planning == nil || w.Planning.Reviewer == nil {
 		return ReviewRecovery{}, fmt.Errorf("reprise de revue fragmentée indisponible pour cette tâche")
+	}
+	if r.FragmentJournal == nil {
+		if restart, err := s.prepareReviewMethodRestart(w, task); err != nil {
+			return ReviewRecovery{}, err
+		} else if restart != nil {
+			return restart.Preview, nil
+		}
+		if err := s.managedReviewProtocolPrecondition(*r); err != nil {
+			return ReviewRecovery{Revision: w.Revision, Task: id, Review: r.ID, Candidate: r.CandidateSHA, State: "change_required", Cause: r.Reason, Actor: "operator", Next: err.Error()}, nil
+		}
+		return ReviewRecovery{}, fmt.Errorf("aucune reprise de contrat corrigé disponible pour cette revue")
 	}
 	if r.State != "error" {
 		prepared, err := s.prepareSelectionCapacityRestart(w, task)

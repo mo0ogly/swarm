@@ -1,0 +1,21 @@
+{
+  "review": "review-2d04785fe3141f8224439317",
+  "candidate": "aee4912e14c203077e9906f56644d5f29708ad0e",
+  "state": "running",
+  "root_activations": 12,
+  "root_decisions": 11,
+  "directive": {
+    "decision": "planning-claim-97f71bb14793f503271ee723-decision",
+    "scope": "root",
+    "result_event": "review-2d04785fe3141f8224439317-result-bb5530753e2c25a2",
+    "review": "review-2d04785fe3141f8224439317",
+    "candidate_commit": "aee4912e14c203077e9906f56644d5f29708ad0e",
+    "attempt": "a-b4669e24bbfb91f7a9686499",
+    "failure_code": "review_fragment_protocol",
+    "cause": "inspection de fragment : citation de la pièce 2 : quote absent",
+    "instruction": "Reprendre la revue indépendante du candidat inchangé aee4912e14c203077e9906f56644d5f29708ad0e en conservant la réponse invalide, la tentative, les réservations et toute la dépense. La correction de protocole consiste à réexaminer les originaux complets déjà fournis et à former les citations de diff avec leurs préfixes exacts, notamment les « + » omis dans les citations multilignes des pièces 2 et 4. Pour la pièce 17, confronter les quatre hypothèses fondées sur height>44 à l’original exact « assert(value.height>=44&&value.width>=44,theme+' touch target '+JSON.stringify(value)); » ainsi qu’aux résultats natifs fournis, sans inventer d’opérateur, sans modifier le candidat pour satisfaire une hypothèse de revue et sans convertir les contrôles locaux en acceptation. Réexaminer également chaque constat au regard de son original exact, conserver tous les critères, puis rendre une nouvelle décision indépendante et attribuée sur ce même candidat."
+  },
+  "resume_calls": [
+    "fragment-call-293b546c46822b67c2341d3b"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "tools/memory-evaluation/summarization.py": "afd798a44cc78a78d3baf2bdc2d8e9b8e58a9a29240a1c0dc6276572429834a2",
+  "tests/test_memory_summarization.py": "72a66efc299f312fc7505314f14cb657ed95f05282f2f9e93a980b2187b79c9c",
+  "tools/memory-evaluation/compare.py": "4d54142fcd36d9f81cc0965e35b60dd5754a2ea4e8064e61f0dfdf642afe861e",
+  "tools/memory-evaluation/README.md": "53a485bfb6cc2934da9a6d868867989f0d1c4e00c809724cb84057c87212ac83",
+  "docs/PROJECT-MEMORY.md": "7eedf2c01a01db018dd618567a818158ed825740a56bb6840df3d0e3d14f8df1",
+  "docs/en/PROJECT-MEMORY.md": "d65fc3f3a9222e93f3b2a730852723725a2799faa19546214905b5f43aa5a597",
+  "docs/plans/deepagents-integration/INCREMENT-MEMOIRE-13.md": "0c1286786c97b9558542fe52b76a292b9a536ca9cb438336e534b4741ce7a3a8",
+  "docs/plans/deepagents-integration/evidence/m17-20261016/run-check.py": "77ab024e0363dbf71a94bd8c185cc5023599ef3ec7f07badfbc61dd7e12bdd78"
+}

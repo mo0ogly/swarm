@@ -1,0 +1,8 @@
+{
+  "exit": 1,
+  "stdout": "",
+  "stderr": "Preserve existing run receipt-before-02; diagnose and select a new run identifier.\n",
+  "original_sha256": "f6004583b59e183bca204555e360161a1a37364c1cae9c23ffd001f94f2254ea",
+  "original_unchanged": true,
+  "no_new_test_execution": true
+}

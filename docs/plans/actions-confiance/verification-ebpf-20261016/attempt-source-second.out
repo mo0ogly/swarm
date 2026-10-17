@@ -1,0 +1,54 @@
+=== RUN   TestKernelAttemptSourceRegisteredInput
+--- PASS: TestKernelAttemptSourceRegisteredInput (0.14s)
+=== RUN   TestKernelAttemptSourceInvalid
+=== RUN   TestKernelAttemptSourceInvalid/mode
+=== RUN   TestKernelAttemptSourceInvalid/provider
+=== RUN   TestKernelAttemptSourceInvalid/prompt
+=== RUN   TestKernelAttemptSourceInvalid/context
+=== RUN   TestKernelAttemptSourceInvalid/workflow
+=== RUN   TestKernelAttemptSourceInvalid/status
+=== RUN   TestKernelAttemptSourceInvalid/desired
+=== RUN   TestKernelAttemptSourceInvalid/host
+=== RUN   TestKernelAttemptSourceInvalid/pid
+=== RUN   TestKernelAttemptSourceInvalid/start
+=== RUN   TestKernelAttemptSourceInvalid/agent
+=== RUN   TestKernelAttemptSourceInvalid/work
+=== RUN   TestKernelAttemptSourceInvalid/task
+=== RUN   TestKernelAttemptSourceInvalid/attempt
+=== RUN   TestKernelAttemptSourceInvalid/paused
+=== RUN   TestKernelAttemptSourceInvalid/missing
+--- PASS: TestKernelAttemptSourceInvalid (2.60s)
+    --- PASS: TestKernelAttemptSourceInvalid/mode (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/provider (0.17s)
+    --- PASS: TestKernelAttemptSourceInvalid/prompt (0.18s)
+    --- PASS: TestKernelAttemptSourceInvalid/context (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/workflow (0.14s)
+    --- PASS: TestKernelAttemptSourceInvalid/status (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/desired (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/host (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/pid (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/start (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/agent (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/work (0.18s)
+    --- PASS: TestKernelAttemptSourceInvalid/task (0.17s)
+    --- PASS: TestKernelAttemptSourceInvalid/attempt (0.16s)
+    --- PASS: TestKernelAttemptSourceInvalid/paused (0.15s)
+    --- PASS: TestKernelAttemptSourceInvalid/missing (0.18s)
+=== RUN   TestKernelAttemptSourceActualSupervisor
+--- PASS: TestKernelAttemptSourceActualSupervisor (1.17s)
+=== RUN   TestKernelAttemptReceiverFreshSource
+=== RUN   TestKernelAttemptReceiverFreshSource/none
+=== RUN   TestKernelAttemptReceiverFreshSource/prompt
+=== RUN   TestKernelAttemptReceiverFreshSource/stop
+=== RUN   TestKernelAttemptReceiverFreshSource/pause
+=== RUN   TestKernelAttemptReceiverFreshSource/superseded
+=== RUN   TestKernelAttemptReceiverFreshSource/wrong-digest
+--- PASS: TestKernelAttemptReceiverFreshSource (0.90s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/none (0.13s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/prompt (0.16s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/stop (0.15s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/pause (0.14s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/superseded (0.16s)
+    --- PASS: TestKernelAttemptReceiverFreshSource/wrong-digest (0.15s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.876s

@@ -1,0 +1,11 @@
+{
+  "at_utc": "2026-10-16T08:02:30.095912+00:00",
+  "scope": "Read-only chat-side status observation; not the runner or provider",
+  "original_observation": "NotADirectoryError: [Errno 20] Not a directory: 'docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01/contract-changed-with.command.log/reservation.json'",
+  "cause": "glob(contract-*) selected both per-case directories and outer command log files",
+  "correction": "Filter paths with is_dir() before reading reservation.json",
+  "verification": "Corrected status observation successfully read the first completed case and the in-progress second case; execution-receipt.json then records all four cases complete",
+  "provider_interrupted": false,
+  "case_repeated": false,
+  "additional_model_calls": 0
+}

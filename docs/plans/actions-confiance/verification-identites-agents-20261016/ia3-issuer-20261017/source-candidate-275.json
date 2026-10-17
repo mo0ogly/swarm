@@ -1,0 +1,23 @@
+{
+  "internal/engine/agent_identity_plan_schema_linux.go": "1e25bd7910c2a5c037caa2eb63248a1ce7045aab2f4531af287d11b39cc1f4b0",
+  "internal/engine/agent_identity_registry_schema.go": "62e2e666cecd49740bf07275836f2542529adaa80a9cfa2c027928c2ecf42516",
+  "internal/engine/agent_identity_registry_atomic_test.go": "cdc32524318d093ca7da41bf05c5d3706e89ff03665129ca1bdfe77a249691eb",
+  "internal/engine/agent_identity_authority.go": "464b7b450c6f9eea4917eaf27c6e3949a53d2bc7c3944ef05a4bb92e3324ab53",
+  "internal/engine/agent_identity_registry_types.go": "20f04785449e42af3e1715c955cb9d7fd1de782c372c669b93030c694d2a153e",
+  "internal/engine/agent_identity_plan_linux.go": "d4c19975145926a24b7e60df731034f92d52474fd7a8aac7baaba8730b916381",
+  "internal/engine/agent_identity_registry_publish.go": "a81f304ec3c42044c6536a2311cee58954151feeecd370024aa7a4a4aea18a65",
+  "internal/engine/agent_identity_authority_test.go": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808",
+  "internal/engine/agent_identity_contract_test.go": "942cb255b11065db4b47b5cd1a50820d663566256cf68baff9d292a1b1c2e4e9",
+  "internal/engine/agent_identity_contract.go": "b3a3e134c354f7bd98b3451ae29543b8bbbf8a37d0426d664d4bdf9e1cab8e55",
+  "internal/engine/agent_identity_runtime_linux_test.go": "8ff373547cd9ce2be571b258c44df6cd0ee3d41e499c85500cff609ba5a8bcf0",
+  "internal/engine/agent_identity_plan_linux_test.go": "1cbddc400c18f06913240798b207becc1cbe6c854d2ff014ca8e07f7c1063762",
+  "internal/engine/agent_identity_issuer_linux_test.go": "82d107858e68155b08368bee0b2125da74bcb4edd752b47b5d719dcf5b1f8a8a",
+  "internal/engine/agent_identity_issuer_linux.go": "fb97e80daf0fddad8ce3606a78f01e4ef16c6e4c9be8cff54b81a03605008b22",
+  "internal/engine/agent_identity_runtime_linux.go": "74ccc6b2c91aecf0c9fe87c818eca43c23e79c14c133dae07574f0232241c2e7",
+  "internal/engine/agent_identity_registry_test.go": "b47f101b511d2cbd020bcb47317f4f1698598874f8f9e1d42230ad501749eb45",
+  "internal/engine/agent_identity_channel_linux_test.go": "d4a0eb6debdb63ae5f795a8e58015d66926b09519a23644fdc58d6b998c3dab8",
+  "internal/engine/agent_identity_plan_freshness_linux_test.go": "31f929d94514faa1b7eb50674e0b63a89ffcd59ae825d0e492e7f3dac8669692",
+  "internal/engine/agent_identity_channel_linux.go": "3528f0eed5ce77171d4e5506c387f50936314b8f24296c566e16c7045f2a91e3",
+  "internal/engine/agent_identity_registry_store.go": "28b3ea847f75b80945b6167c389397401b1ee7d203dc76d215776f5db27a5bfd",
+  "tools/agent-workflows/CONTRACT.md": "d56566d6e767537e29e23472e3bd7e25f3c322f4a4929a39280a621792c429de"
+}

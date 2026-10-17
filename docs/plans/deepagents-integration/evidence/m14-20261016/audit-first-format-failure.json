@@ -1,0 +1,8 @@
+{
+  "check": "gofmt on all owned Go files",
+  "listed": [
+    "internal/engine/agent_terminal_process.go"
+  ],
+  "result": "FAIL",
+  "effect": "No sources changed; compare original preimages before deciding"
+}

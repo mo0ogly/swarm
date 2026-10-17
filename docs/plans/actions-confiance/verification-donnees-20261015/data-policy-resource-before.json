@@ -1,0 +1,9 @@
+{
+  "observed": "uncatalogued resource admitted using caller classification",
+  "expected": "resource must have a trusted classification rule",
+  "state": "pending_approval",
+  "resource": "uncatalogued-resource",
+  "fixture_root": "/tmp/swarm-resource-policy-before-g3kxlg4k",
+  "binary_sha256": "c3cabbc584913c54542c9564f65c1013b43d1f9b69e309691db82533d80058b8",
+  "at": "2026-10-15T20:11:14.820376+00:00"
+}

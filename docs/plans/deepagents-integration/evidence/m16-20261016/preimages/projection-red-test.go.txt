@@ -1,0 +1,136 @@
+//go:build linux
+
+package engine
+
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+)
+
+// Decode the public prompt representation, independently of its producer's types.
+func recoveryProjectionJSON(t *testing.T, prompt string) map[string]json.RawMessage {
+	t.Helper()
+	const marker = "MÉMOIRE DE REPRISE FOURNIE PAR LE MOTEUR :\n"
+	_, rest, ok := strings.Cut(prompt, marker)
+	if !ok {
+		t.Fatal("recovery projection absent")
+	}
+	line, _, _ := strings.Cut(rest, "\n")
+	var value map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(line), &value); err != nil {
+		t.Fatal(err)
+	}
+	return value
+}
+
+func recoveryProjectionForFixture(t *testing.T, s *Store, w Work, a Agent) map[string]json.RawMessage {
+	t.Helper()
+	tx, err := s.db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	prompt, err := workerRecoveryContext(tx, a, w.ID, a.TaskID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return recoveryProjectionJSON(t, prompt)
+}
+
+func TestRecoveryProjectionSignalsTruncatedOperation(t *testing.T) {
+	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+	if err := s.log(a.ID, "activity", "Read · "+strings.Repeat("long-path/", 35)); err != nil {
+		t.Fatal(err)
+	}
+	v := recoveryProjectionForFixture(t, s, w, a)
+	if string(v["bounded_excerpt"]) != "true" {
+		t.Fatal("shortened activity presented as unbounded", string(v["observed_operations"]))
+	}
+}
+
+func TestRecoveryProjectionSignalsEveryTruncatedFocusField(t *testing.T) {
+	for _, field := range []string{"next_action", "blocker", "criteria.1.expected", "historical_report"} {
+		t.Run(field, func(t *testing.T) {
+			s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+			task, _ := w.task(a.TaskID)
+			long := strings.Repeat("界", 320)
+			switch field {
+			case "next_action":
+				task.Next = long
+			case "blocker":
+				task.Blocker = long
+			case "criteria.1.expected":
+				task.Criteria = []string{long}
+			case "historical_report":
+				task.IndependentReview = &IndependentReview{ID: "review-projection", Producer: a.ID, Attempt: a.Attempt, Report: long}
+			}
+			raw, _ := json.Marshal(w)
+			if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+				t.Fatal(err)
+			}
+			v := recoveryProjectionForFixture(t, s, w, a)
+			var focus struct {
+				Bounded bool `json:"bounded_excerpt"`
+			}
+			if err := json.Unmarshal(v["task_focus"], &focus); err != nil {
+				t.Fatal(err)
+			}
+			if !focus.Bounded || string(v["bounded_excerpt"]) != "true" {
+				t.Fatalf("shortened %s presented as unbounded: focus=%t whole=%s", field, focus.Bounded, v["bounded_excerpt"])
+			}
+		})
+	}
+}
+
+func TestRecoveryProjectionRetainsDistinctLongOperations(t *testing.T) {
+	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+	for _, suffix := range []string{"first.go", "second.go"} {
+		if err := s.log(a.ID, "activity", "Read · "+strings.Repeat("common/", 40)+suffix); err != nil {
+			t.Fatal(err)
+		}
+	}
+	v := recoveryProjectionForFixture(t, s, w, a)
+	var operations []string
+	if err := json.Unmarshal(v["observed_operations"], &operations); err != nil {
+		t.Fatal(err)
+	}
+	if len(operations) != 2 {
+		t.Fatalf("different long operations collapsed after shortening: %d retained", len(operations))
+	}
+}
+
+func TestRecoveryProjectionPropagatesCriterionOmission(t *testing.T) {
+	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+	task, _ := w.task(a.TaskID)
+	// Retained legacy/corrupt fixture: public task updates currently admit at most 12.
+	task.Criteria = make([]string, 13)
+	for i := range task.Criteria {
+		task.Criteria[i] = "Still requires verification"
+	}
+	raw, _ := json.Marshal(w)
+	if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+		t.Fatal(err)
+	}
+	v := recoveryProjectionForFixture(t, s, w, a)
+	if string(v["bounded_excerpt"]) != "true" {
+		t.Fatal("criterion omission absent from overall marker")
+	}
+}
+
+func TestRecoveryProjectionRejectsMissingTask(t *testing.T) {
+	s, w, a, _ := automaticValidationFixture(t, automaticPolicy("go", "version"), false)
+	w.Tasks = nil
+	raw, _ := json.Marshal(w)
+	if _, err := s.db.Exec("UPDATE works SET body=? WHERE id=?", raw, w.ID); err != nil {
+		t.Fatal(err)
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	if context, err := workerRecoveryContext(tx, a, w.ID, a.TaskID); err == nil || context != "" {
+		t.Fatal("missing current task became a successful projection")
+	}
+}

@@ -48,7 +48,7 @@ func fragmentHistoricalReplies(t *testing.T, p managedReviewFragmentPlan) []stri
 			}
 			inspection.Findings = append(inspection.Findings, managedFragmentFinding{Artifact: k, Digest: a.Digest, Verdict: "inspected", Reason: "Current original evidence inspected", Evidence: evidence, Needs: []string{}})
 		}
-		raw, _ = json.Marshal(inspection)
+		raw, _ = marshalFragmentInspectionFixture(packet, inspection)
 		replies[i] = string(raw)
 	}
 	return replies

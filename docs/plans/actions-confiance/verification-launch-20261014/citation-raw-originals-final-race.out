@@ -1,0 +1,51 @@
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-reply
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-batch
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/duplicate-task
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/foreign-sha
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-diff
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-report
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-source
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-criteria
+=== RUN   TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/extra-task
+--- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence (2.37s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-reply (0.23s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-batch (0.28s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/duplicate-task (0.26s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/foreign-sha (0.25s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-diff (0.23s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-report (0.27s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/changed-source (0.29s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/missing-criteria (0.28s)
+    --- PASS: TestManagedBatchVerdictsRejectMissingAndTamperedEvidence/extra-task (0.29s)
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/pass
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-resolved
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-open
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-invalid
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+=== RUN   TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-stale
+    managed_review_citation_runtime_test.go:51: sizes 164551 168226 22007 parts 1
+--- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard (100.82s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/pass (25.28s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-resolved (23.61s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/questions-open (18.06s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-invalid (17.00s)
+    --- PASS: TestReferencedCitationRuntimeReopenAndUnchangedRetryGuard/reference-stale (16.85s)
+=== RUN   TestManagedReviewGitPreservesOriginalBoundaryBytes
+--- PASS: TestManagedReviewGitPreservesOriginalBoundaryBytes (0.09s)
+=== RUN   TestManagedIndependentReviewRechecksPreviouslyAcceptedTasksOnNewSHA
+--- PASS: TestManagedIndependentReviewRechecksPreviouslyAcceptedTasksOnNewSHA (1.43s)
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/binary
+=== RUN   TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/oversize
+--- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation (4.54s)
+    --- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/binary (0.70s)
+    --- PASS: TestManagedIndependentReviewRefusesUnreviewableContextWithoutTruncation/oversize (3.84s)
+=== RUN   TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation
+--- PASS: TestManagedIndependentReviewPreservesRepetitiveOriginalWithoutTruncation (2.12s)
+PASS
+ok  	swarm.local/companion/internal/engine	112.567s

@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-race",
+    "./internal/engine",
+    "-run",
+    "^TestDialogue(BoundaryRejectsInconsistentTurnAcrossConsumers|ConfirmationDoesNotOverwriteChangedSession|BoundaryAllowsUnconfirmedEndBeforeAnswer|CheckpointRestoresCumulativeGuardsWithoutAliasing|ConfirmedTurnsKeepSessionUsageAndPermissions|CheckpointWriteFailureStopsBeforeNextProvider)$",
+    "-v",
+    "-count=1",
+    "-timeout=120s"
+  ],
+  "started_at_utc": "2026-10-16T17:19:41.484787+00:00",
+  "duration_seconds": 91.727,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestDialogueBoundaryRejectsInconsistentTurnAcrossConsumers",
+    "TestDialogueConfirmationDoesNotOverwriteChangedSession",
+    "TestDialogueBoundaryAllowsUnconfirmedEndBeforeAnswer",
+    "TestDialogueCheckpointRestoresCumulativeGuardsWithoutAliasing",
+    "TestDialogueCheckpointWriteFailureStopsBeforeNextProvider",
+    "TestDialogueConfirmedTurnsKeepSessionUsageAndPermissions"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "4b3728a18dd4df1ae81d94a85419cfa516e897de01267d45c840d168bdda6cf9",
+  "real_model_calls": 0
+}

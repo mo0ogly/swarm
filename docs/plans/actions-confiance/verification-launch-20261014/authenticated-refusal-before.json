@@ -1,0 +1,9 @@
+{
+  "fixture_root": "/tmp/swarm-authenticated-refusal-7o3u08y5",
+  "binary_sha256": "2a547753015186876cfac034ec1e7cf56f5c48d8452b4df84046c235f9091ccc",
+  "authenticated_invalid_exit": 2,
+  "before_evidence_count": 0,
+  "after_evidence_count": 0,
+  "business_unchanged": true,
+  "observed_missing_audit": true
+}

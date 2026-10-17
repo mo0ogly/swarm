@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "event_id": "operator-preauth-publication-pause-20261015-1056",
+  "expected_revision": 455,
+  "reason": "Replan immédiat : premier constat R21 signale une publication de configuration avant authentification. Suspendre les nouveaux appels et reproduire ce nouveau contre-exemple ; aucun avis final ni acceptation."
+}

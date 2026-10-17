@@ -50,8 +50,10 @@ irréversible et souligne que le blocage modifie lui-même la suite de l'exécut
 
 Une seconde famille sépare par conception ce que le modèle décide de ce qu'il exécute. CaMeL
 extrait les flux de contrôle et de données de la requête de confiance, de sorte que des données
-non fiables ne modifient jamais le flux du programme ; il résout 77 % des tâches d'AgentDojo avec
-une sécurité prouvable, contre 84 % sans défense [Debenedetti 2025]. Beurer-Kellner et al.
+non fiables ne modifient jamais le flux du programme ; le résumé de la v1 annonce
+67 % des tâches d'AgentDojo avec sécurité prouvable [Debenedetti 2025]. Ce chiffre
+corrige le 16 octobre une citation antérieure non justifiée, voir § 2.7.
+Beurer-Kellner et al.
 recensent six motifs de conception, dont « planifier puis exécuter », où le modèle formule une
 liste fixe d'actions exécutée ensuite [Beurer-Kellner 2025]. Notre séparation entre la préparation
 d'un lot et son règlement déterministe relève de ce motif. Ces travaux visent l'injection de
@@ -111,9 +113,11 @@ qualifie pas leur efficacité, qui relève de leurs propres évaluations.
 | Workflow fidelity [Huang 2026] | Trajectoire d'exécution | Métrique ; gardes déterministes | Non | 18 modèles, 90 000 tâches |
 | **Ce travail** | Cycle de vie de la tentative et exécution de l'effet | Moteur et exécutant déterministes | Oui | Banc synthétique, 8 types de fautes, 9 000 exécutions scriptées et 90 avec agent réel |
 
-Le manque que ce travail vise est donc précis : aucun des travaux recensés ne combine la
-médiation du cycle de vie des tentatives (lancement, reprise, acceptation), le lien entre la
-preuve et le candidat exécuté, et une évaluation sous fautes ordinaires avec et sans médiation.
+La question de composition visée relie le cycle de vie des tentatives (lancement,
+reprise, acceptation), la preuve liée au candidat et l'évaluation sous fautes avec
+et sans médiation. Ce tableau historique restreint ne suffit pas à prouver
+l'absence d'un travail équivalent. L'actualisation identité ci-dessous ajoute
+des antécédents directs à examiner avant toute revendication de nouveauté.
 
 
 ## 2.6 Actualisation du corpus moteur — 10 octobre 2026
@@ -130,3 +134,28 @@ pas une certification de Swarm. Les fiches distinguent mécanismes décrits, lim
 La [comparaison détaillée et le protocole](../article-scientifique/fiches-lecture.md#5-moteur-swarm--sources-industrielles-actualisées-au-10-octobre-2026)
 portent sur coordination, mémoire, jugement, contrôle du flux, débit et coût. Leur ajout est
 une actualisation documentaire ; il ne modifie pas les résultats expérimentaux des sections suivantes.
+
+## 2.7 Identité, délégation et gouvernance du parcours — 16 octobre 2026
+
+La [note dédiée](../article-scientifique/identites-autorite-cycle-vie.md)
+complète ce corpus par South et al. (délégation authentifiée, 2025), Agentic JWT
+(identité, délégation et étape du workflow, 2025), MI9 (gouvernance continue,
+v4 de 2025), les recommandations CoSAI et le projet NCCoE/NIST de 2026.
+Elle relit Policies on Paths sous l'angle identité/parcours et compare les
+annonces de TRUST OR et AgentRail aux documentations Entra Agent ID,
+SPIFFE/SPIRE et Temporal. Sources primaires, versions consultées et limites
+figurent dans cette note ; les fonctions commerciales n'ont pas été testées.
+
+Les formulations anciennes de ce chapitre centrées sur l'appel d'outil ne
+doivent donc pas être étendues à tout l'état de l'art. La nouveauté de
+l'identité tout au long du workflow et du contrôle continu **n'est pas établie**.
+La contribution candidate porte sur une composition précisément définie et
+évaluée : admission, ancrage d'instance, délégation, révocation, preuves et reprise.
+La comparaison doit inclure un workflow doté de contrôles équivalents.
+
+Correction bibliographique SCI-ID-04 : le résumé CaMeL de la
+[v1 du 24 mars 2025](https://arxiv.org/html/2503.18813v1), vérifié le 16 octobre,
+annonce 67 %. Le couple 77 % / 84 % précédemment cité sans justification est
+retiré de § 2.2 et de la fiche de lecture. L'origine exacte de l'ancienne erreur
+n'est pas établie. Les formulations antérieures restent consignées dans la note
+et ses preuves ; les résultats historiques de Swarm ne changent pas.

@@ -212,6 +212,14 @@ func readAssistOutput(r io.Reader, observers ...func(*ProviderCooldown) error) a
 }
 
 func readAssistOutputObserved(r io.Reader, activity func(), observers ...func(*ProviderCooldown) error) assistOutput {
+	return readProviderOutputObserved(r, activity, providerReply, observers...)
+}
+
+func readStructuredProviderOutputObserved(r io.Reader, activity func(), observers ...func(*ProviderCooldown) error) assistOutput {
+	return readProviderOutputObserved(r, activity, providerOriginalReply, observers...)
+}
+
+func readProviderOutputObserved(r io.Reader, activity func(), extract func(map[string]any) string, observers ...func(*ProviderCooldown) error) assistOutput {
 	out := assistOutput{}
 	counted := &assistCountingReader{Reader: r}
 	limited := &io.LimitedReader{R: counted, N: assistReplyLimit + 1}
@@ -264,7 +272,7 @@ func readAssistOutputObserved(r io.Reader, activity func(), observers ...func(*P
 		if failure := structuredProviderFailure(data); failure != nil {
 			out.err = failure
 		}
-		if reply := providerReply(data); reply != "" {
+		if reply := extract(data); reply != "" {
 			out.reply = reply
 		}
 		if structured, ok := data["structured_output"].(map[string]any); ok && data["type"] == "result" {

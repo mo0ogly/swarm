@@ -1,0 +1,66 @@
+{
+  "before": {
+    "review": "running",
+    "failure_code": null,
+    "inspection_calls": [
+      [
+        "fragment-call-2a761fa4434f94f902a7d783",
+        "interrupted"
+      ],
+      [
+        "fragment-call-16d087f96e9a358f27ed96e3",
+        "inspected"
+      ],
+      [
+        "fragment-call-2ce4efbf2241c20d42e629e6",
+        "unknown"
+      ]
+    ],
+    "journal_sha256": "886879a13728116940c091a12836ac202f649c01cd39a6a1ea1a241e293b438c",
+    "final_calls": [
+      [
+        "fragment-final-82f58a2851887ed1f1b2d1a7",
+        "selection",
+        "ready"
+      ],
+      [
+        "fragment-final-f2ab79f789fb417c5f7f71d8",
+        "decision",
+        "reserved"
+      ]
+    ],
+    "final_journal_sha256": "43699e9efc665fb4bd0d5c73b9abf75e81fe527386d27fbd533aba622c08c862"
+  },
+  "after": {
+    "review": "error",
+    "failure_code": "review_fragment_interrupted",
+    "inspection_calls": [
+      [
+        "fragment-call-2a761fa4434f94f902a7d783",
+        "interrupted"
+      ],
+      [
+        "fragment-call-16d087f96e9a358f27ed96e3",
+        "inspected"
+      ],
+      [
+        "fragment-call-2ce4efbf2241c20d42e629e6",
+        "unknown"
+      ]
+    ],
+    "journal_sha256": "886879a13728116940c091a12836ac202f649c01cd39a6a1ea1a241e293b438c",
+    "final_calls": [
+      [
+        "fragment-final-82f58a2851887ed1f1b2d1a7",
+        "selection",
+        "ready"
+      ],
+      [
+        "fragment-final-f2ab79f789fb417c5f7f71d8",
+        "decision",
+        "interrupted"
+      ]
+    ],
+    "final_journal_sha256": "8fc46befb36f73c4d4135fdab70bf0cda8eb046b6fdb266b6d60166d20df5306"
+  }
+}

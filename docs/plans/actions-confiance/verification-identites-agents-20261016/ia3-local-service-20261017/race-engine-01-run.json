@@ -1,0 +1,72 @@
+{
+  "packages": {
+    "swarm.local/companion/internal/engine": 40
+  },
+  "command": [
+    "go",
+    "test",
+    "-race",
+    "-json",
+    "./internal/engine",
+    "-run",
+    "^TestAgentIdentity(ConfigService|Channel)",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T13:17:34.378122+00:00",
+  "end": "2026-10-17T13:18:22.702195+00:00",
+  "counts": {
+    "pass": 40,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [
+      "TestAgentIdentityChannelReceivesKernelProcessHandle",
+      "TestAgentIdentityChannelRejectsMissingTruncatedAndInjectedMetadata",
+      "TestAgentIdentityChannelRejectsMissingTruncatedAndInjectedMetadata/empty",
+      "TestAgentIdentityChannelRejectsMissingTruncatedAndInjectedMetadata/many-rights",
+      "TestAgentIdentityChannelRejectsMissingTruncatedAndInjectedMetadata/payload-truncated",
+      "TestAgentIdentityChannelRejectsMissingTruncatedAndInjectedMetadata/rights-injected",
+      "TestAgentIdentityChannelRejectsMissingTruncatedAndInjectedMetadata/unconfigured",
+      "TestAgentIdentityChannelRequiresPacketSocket",
+      "TestAgentIdentityConfigServiceAttributesSendingChild",
+      "TestAgentIdentityConfigServiceCanonicalRequests",
+      "TestAgentIdentityConfigServiceCanonicalRequests/actor",
+      "TestAgentIdentityConfigServiceCanonicalRequests/apply",
+      "TestAgentIdentityConfigServiceCanonicalRequests/create",
+      "TestAgentIdentityConfigServiceCanonicalRequests/duplicate",
+      "TestAgentIdentityConfigServiceCanonicalRequests/folded",
+      "TestAgentIdentityConfigServiceCanonicalRequests/missing-change",
+      "TestAgentIdentityConfigServiceCanonicalRequests/nested-extra",
+      "TestAgentIdentityConfigServiceCanonicalRequests/null",
+      "TestAgentIdentityConfigServiceCanonicalRequests/null-change",
+      "TestAgentIdentityConfigServiceCanonicalRequests/preview",
+      "TestAgentIdentityConfigServiceCanonicalRequests/read",
+      "TestAgentIdentityConfigServiceCanonicalRequests/trailing",
+      "TestAgentIdentityConfigServiceCanonicalRequests/unknown-op",
+      "TestAgentIdentityConfigServiceCanonicalRequests/unknown-schema",
+      "TestAgentIdentityConfigServiceChild",
+      "TestAgentIdentityConfigServiceLostReplyReopensWithoutDuplicate",
+      "TestAgentIdentityConfigServicePreviewSaveReadCASAndReplay",
+      "TestAgentIdentityConfigServiceReadIsAuthorized",
+      "TestAgentIdentityConfigServiceRejectsTransportDamage",
+      "TestAgentIdentityConfigServiceRejectsTransportDamage/rights",
+      "TestAgentIdentityConfigServiceRejectsTransportDamage/truncated",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/absent",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/after-execute",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/deny",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/double-execute",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/no-execute",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/request-mutation",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/swallowed-error",
+      "TestAgentIdentityConfigServiceRequiresScopedAuthority/wrong-human"
+    ],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 816
+}

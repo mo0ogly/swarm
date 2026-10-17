@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "source_binary_sha256": "8ee6463f481cd1264fd008c137e985a336b014db54572022d9bfffeb3dbb992f",
+  "substituted_image_executed": false,
+  "fixture_material_captured": false,
+  "real_attestation_matches": true,
+  "state": "consumed",
+  "provider_account_used": false,
+  "real_secret_used": false,
+  "sealed_helper_after_path_replacement": true
+}

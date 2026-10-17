@@ -1,0 +1,7 @@
+{
+  "pid": 3900313,
+  "start": "6075151",
+  "root": "/tmp/swarm-trust-remote-recipe-yjtm4tua/server",
+  "server_image": "/tmp/swarm-trust-remote-recipe-yjtm4tua/server/server-image",
+  "source_binary_sha256": "215b2c02bfeb9aed48508cce5f47837d874e2d5cb75ecd36b1f38c86de4d16c1"
+}

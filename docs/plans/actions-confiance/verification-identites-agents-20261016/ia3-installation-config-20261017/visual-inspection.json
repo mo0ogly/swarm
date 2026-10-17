@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-17T12:50:30.614972+00:00",
+  "method": "Both PNGs viewed with view_image in this increment",
+  "files": {
+    "config-fr.png": "89173d22f793ce8c62ef31122f7deca772a8cc49250a17fbaa86b92f652bec9b",
+    "config-en.png": "b86308ac07838018c50ae7b114ef66238c05aab0b3d06c97dbd598ad430583dd"
+  },
+  "result": "Readable labels and complete diagrams, no observed clipping; exact retry points to directory fsync rather than a second rename",
+  "scope": "Static documentation only"
+}

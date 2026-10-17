@@ -1,0 +1,12 @@
+flowchart TD
+  C["Authorized control<br/>explicit principal and rights: prerequisite"] -.-> D["Version 1 document<br/>human, project, plan, rights and dates"]
+  P["Shared identitycontract<br/>principal, scope, permission, name"] --> D
+  D --> S["SignEnrollment<br/>valid schema and generation = next event"]
+  S --> J["Signed journal: Apply<br/>CAS, unique creation, revocation"]
+  J --> R["SignActive: current head<br/>chain-derived creation sequence"]
+  R --> V["enrollmentproof.Verify<br/>challenge and signature"]
+  E["Independent Expected<br/>head, identity, generation, request, scope"] --> A["DecodeActive<br/>strict envelope and document, observation time"]
+  V --> A
+  P --> A
+  A --> O["Validated document<br/>no engine capability created"]
+  O -.-> M["Engine adapter and final-use freshness<br/>target: not implemented"]

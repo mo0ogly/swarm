@@ -152,7 +152,44 @@ func fragmentRejectedCitationFeedback(raw []byte, packet managedReviewFragmentPa
 		Reproduction string `json:"reproduction"`
 		Expected     string `json:"expected"`
 	}
-	if strict(envelope.Defects, &defects) != nil || len(defects) > managedFragmentDefectLimit {
+	if packet.FindingContractVersion == managedFragmentFindingContractVersion {
+		var findings map[string]json.RawMessage
+		if len(envelope.Defects) != 0 || strict(envelope.Findings, &findings) != nil {
+			return ""
+		}
+		for i := range packet.Artifacts {
+			var entry struct {
+				Verdict  string          `json:"v"`
+				Reason   string          `json:"r"`
+				Evidence json.RawMessage `json:"e"`
+				Needs    []string        `json:"n"`
+				Defects  json.RawMessage `json:"d"`
+			}
+			if strict(findings[fmt.Sprint(i)], &entry) != nil {
+				return ""
+			}
+			if len(entry.Defects) == 0 {
+				continue
+			}
+			var supplied []managedNestedDefectClaim
+			if strict(entry.Defects, &supplied) != nil || len(supplied) > managedFragmentDefectLimit {
+				return ""
+			}
+			for _, d := range supplied {
+				index := i
+				defects = append(defects, struct {
+					Artifact     *int   `json:"artifact"`
+					Quote        string `json:"quote"`
+					Explanation  string `json:"explanation"`
+					Reproduction string `json:"reproduction"`
+					Expected     string `json:"expected"`
+				}{&index, d.Quote, d.Explanation, d.Reproduction, d.Expected})
+			}
+		}
+	} else if strict(envelope.Defects, &defects) != nil {
+		return ""
+	}
+	if len(defects) > managedFragmentDefectLimit {
 		return ""
 	}
 	diagnostics := []map[string]any{}

@@ -64,7 +64,7 @@ func agentWorkflow(role string) (AgentWorkflow, string, error) {
 	}
 	body.WriteString("\nFIN DES MÉTHODES — rappel des limites du rôle : " + closingBoundary + "\n")
 	if body.Len() > 32000 {
-		return w, "", fmt.Errorf("cadrage des méthodes supérieur à 32000 octets ; aucun envoi tronqué")
+		return w, "", fmt.Errorf("cadrage des méthodes supérieur à 32000 octets : %d octets mesurés ; aucun envoi tronqué", body.Len())
 	}
 	w.SHA256 = hash([]byte(body.String()))
 	metadata, _ := json.Marshal(w)

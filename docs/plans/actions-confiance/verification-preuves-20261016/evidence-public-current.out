@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_evidence.py", line 48, in <module>
+    case=process('case-create',command('proof-process-case',definition_id=d['id'],definition_version=d['version'],definition_digest=d['content_digest'],participants=['bob'],resource='invoice/acme',data_context={'classification':'internal','destination':'local-process-state','provider':'swarm','tool':'process-workflow'},title='Evidence consumer fixture',reference='PROOF-CASE-001'),'alice')
+                                                                          ~^^^^^^
+KeyError: 'id'

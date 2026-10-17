@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "root": "/tmp/swarm-summary-source-fli_r03v",
+  "checks": [
+    "Two actual brainstorm launches persist selected question/answer references; CLI exports exact scoped sources",
+    "Reopened authenticated API matches CLI byte-bound payload; GET refuses a catalogue-shaped false success",
+    "Actual Go export converts with explicit packet-bound annotations; M17 preserves snapshot, future intention and open incident",
+    "Export, API and conversion leave work, source agents, usage and invocation count unchanged",
+    "Public task update makes old CLI/API revision stale; annotations refuse and changed contract prevents parent reuse with all current originals retained"
+  ],
+  "scripted_provider_invocations": 2,
+  "model_calls": 0,
+  "binary_sha256": "1097db24113d8cedc2954813075623515b850b954f4ec5c3cc043da213ac79e1",
+  "script_sha256": "68b8de79ee70adda022edcb9d81a19b356a4159a27817c64f12e6febf44175d1"
+}

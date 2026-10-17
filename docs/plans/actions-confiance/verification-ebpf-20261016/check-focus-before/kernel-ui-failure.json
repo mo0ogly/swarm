@@ -1,0 +1,10 @@
+{
+  "message": "queued dialog close stole focus from the next credential field",
+  "stack": "AssertionError [ERR_ASSERTION]: queued dialog close stole focus from the next credential field\n    at /home/fpizzi/Documents/ChatGPT/swarm/tests/actions_confiance_kernel_ui.cjs:15:329",
+  "checks": [
+    "inactive diagnostic is explained and cannot launch"
+  ],
+  "errors": [],
+  "root": "/tmp/swarm-kernel-ui-nkjE79",
+  "kernelDiagnostic": {}
+}

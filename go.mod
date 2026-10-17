@@ -3,13 +3,17 @@ module swarm.local/companion
 go 1.24.0
 
 require (
+	github.com/coreos/go-oidc/v3 v3.17.0
+	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/rivo/uniseg v0.4.7
 	github.com/tiktoken-go/tokenizer v0.6.2
+	golang.org/x/oauth2 v0.28.0
 	golang.org/x/sys v0.31.0
 	modernc.org/sqlite v1.36.3
 )
 
 require (
+	github.com/cilium/ebpf v0.19.0
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect

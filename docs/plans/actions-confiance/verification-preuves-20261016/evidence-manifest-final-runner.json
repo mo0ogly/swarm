@@ -1,0 +1,10 @@
+{
+  "pid": 2456385,
+  "proc_start_ticks": "4300814",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-evidence-manifest-final.py",
+    "run"
+  ],
+  "at": "2026-10-15T23:56:23.994464+00:00"
+}

@@ -1,0 +1,30 @@
+{
+  "files": 24,
+  "bytes": 274291,
+  "sizes": {
+    "tools/actions-confiance/verify.py": 6179,
+    "internal/engine/trust_actions.go": 36857,
+    "internal/engine/trust_actions_cli.go": 1521,
+    "internal/engine/trust_actions_http.go": 2089,
+    "internal/engine/trust_actions_test.go": 14840,
+    "tests/actions_confiance_t2.py": 12480,
+    "tests/actions_confiance_t2_ui.cjs": 15245,
+    "web/trust-actions.html": 4186,
+    "web/trust-actions.css": 2763,
+    "web/trust-actions.js": 6841,
+    "docs/actions-confiance-T2.md": 13793,
+    "docs/en/actions-confiance-T2.md": 9689,
+    "locales/trust-actions-en.json": 4322,
+    "web/trust-actions-en.js": 4363,
+    "scripts/i18n/build.cjs": 1348,
+    "web/i18n.js": 4230,
+    "internal/engine/trust_actions_operator_regression_test.go": 31637,
+    "docs/plan-68b50cc82e-T2.operator-verification.json": 16793,
+    "package.json": 3096,
+    "internal/engine/main.go": 18242,
+    "internal/engine/web_server.go": 31551,
+    "web/swarm-design.css": 26601,
+    "internal/engine/trust_actions_originals.go": 1496,
+    "tests/i18n_test.cjs": 4129
+  }
+}

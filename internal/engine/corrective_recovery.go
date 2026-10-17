@@ -88,7 +88,7 @@ func (s *Store) authorizeCorrectiveRecovery(work string, r PlanningRequest) (Wor
 			if why := correctiveRecoveryReasonFor(&current, task, nil, true); why != "" {
 				return Work{}, fmt.Errorf("%s", why)
 			}
-			h, err := s.managedRecoveryHandoff(current, task)
+			h, err := s.managedRecoveryHandoffLocked(current, task)
 			if err != nil {
 				return Work{}, err
 			}

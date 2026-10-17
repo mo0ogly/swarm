@@ -1,0 +1,1 @@
+{"argv": ["bin/swarm-actions-confiance-nested", "--root", "/home/fpizzi/Documents/ChatGPT/swarm", "--json", "planning", "recovery-preview", "w-68b50cc82ec3fe55624f9549", "--input", "/tmp/swarm-actions-confiance-launch/nested-recovery-preview-v2-request.json"], "exit_code": 2}

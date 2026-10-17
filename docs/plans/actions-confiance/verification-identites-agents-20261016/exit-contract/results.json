@@ -1,0 +1,116 @@
+{
+  "execution_result": "PASS",
+  "security_result": "FAIL",
+  "security_failures": [
+    {
+      "id": "IA1-F01",
+      "scenario": "CLI without an identity token",
+      "security_result": "FAIL",
+      "observed": {
+        "agent": "6cd5bb9a-eb1e-4ef7-ba83-73f6a203004b",
+        "status": "completed"
+      },
+      "expected": "Authenticate requester before creating or starting an agent"
+    },
+    {
+      "id": "IA1-F02",
+      "scenario": "Invalid token rejected by Trust but accepted for agent start",
+      "security_result": "FAIL",
+      "observed": {
+        "identity_failure": "authorization_required",
+        "agent": "41c7711b-fb54-4e96-bf5c-a41cc46c9be7"
+      },
+      "expected": "Same identity refusal at agent admission"
+    },
+    {
+      "id": "IA1-F03",
+      "scenario": "Identity suspended after preview still starts a process",
+      "security_result": "FAIL",
+      "observed": {
+        "agent": "968d6ee5-7a20-479a-bb61-70d7d192f094",
+        "preview_without_mutation": true,
+        "trust_denied": true
+      },
+      "expected": "Revalidate current identity at admission and before process start"
+    },
+    {
+      "id": "IA1-F04",
+      "scenario": "Unrelated local caller declares another agent as parent",
+      "security_result": "FAIL",
+      "observed": {
+        "agent": "50fa97f8-1f9e-42a5-a071-dbe859e9e3f0",
+        "parent": "6cd5bb9a-eb1e-4ef7-ba83-73f6a203004b"
+      },
+      "expected": "Verify parent principal and delegable creation authority, beyond same-work existence"
+    },
+    {
+      "id": "IA1-F05",
+      "scenario": "Shared cockpit session starts agents without individual principal, including suspended bearer",
+      "security_result": "FAIL",
+      "observed": {
+        "api_no_principal": true,
+        "api_suspended_bearer": true
+      },
+      "expected": "Bind individual verified authority to both API and CLI admission"
+    },
+    {
+      "id": "IA1-F06",
+      "scenario": "Running scripted agent creates a new task and launches its own child through public CLI",
+      "security_result": "FAIL",
+      "observed": {
+        "child": "ia1-pivot-child",
+        "task_absent_before": true,
+        "token_inherited": false,
+        "parent": "ia1-pivot-parent"
+      },
+      "expected": "Refuse unplanned creation; retain motivated request pending authenticated human decision"
+    },
+    {
+      "id": "IA1-F07",
+      "scenario": "Scripted provider reads control registry and key, opens them read/write and changes private canary",
+      "security_result": "FAIL",
+      "observed": {
+        "same_uid": true,
+        "control_access": {
+          ".swarm/trust-actions.json": {
+            "read": true,
+            "read_write_open": true
+          },
+          ".swarm/trust-actions-proof.key": {
+            "read": true,
+            "read_write_open": true
+          }
+        },
+        "canary_changed": true,
+        "registry_and_key_unchanged": true
+      },
+      "expected": "Protect control registry and key from provider processes at the host boundary"
+    }
+  ],
+  "existing_controls": [
+    {
+      "id": "IA1-C01",
+      "result": "PASS",
+      "control": "Identical event replay has one effect; changed content refuses without mutation",
+      "limit": "The replay still does not authenticate the caller"
+    },
+    {
+      "id": "IA1-C02",
+      "result": "PASS",
+      "control": "HTTP without cockpit session refuses without work or process mutation"
+    }
+  ],
+  "model_calls": 0,
+  "scripted_processes": 8,
+  "root": "/tmp/swarm-ia1-agents-v02zm3c3",
+  "binary_sha256": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+  "ended_unix": 1792183549.0038974,
+  "limits": [
+    "No real provider or deployed server tested",
+    "No live mission read or modified",
+    "No registry/key corruption attempted",
+    "No human OIDC bootstrap tested",
+    "This fixture is non-hierarchical; existing hierarchical parent guards are not bypassed",
+    "Prepared launches, import, concurrency, crash/recovery and all role processes need separate qualification"
+  ]
+}

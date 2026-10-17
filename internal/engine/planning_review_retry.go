@@ -46,7 +46,12 @@ func (s *Store) applyPlanningReviewRetry(w *Work, scope string, op PlanningOpera
 		received, exists := owner.Delivery.UnresolvedReviews[t.ID]
 		matched = fresh && exists && received == expected
 	}
-	if !matched || r.Contract != reviewContract(t) || r.CandidateSHA == "" || r.PreviousCandidate != w.Planning.Repository.Candidate || r.FragmentJournal == nil {
+	if matched && r.FragmentJournal == nil && request.methodRestarts[op.ID] == nil {
+		if err := s.managedReviewProtocolPrecondition(*r); err != nil {
+			return err
+		}
+	}
+	if !matched || r.Contract != reviewContract(t) || r.CandidateSHA == "" || r.PreviousCandidate != w.Planning.Repository.Candidate || (r.FragmentJournal == nil && request.methodRestarts[op.ID] == nil) {
 		return fmt.Errorf("preuve, contrat ou candidat de reprise remplacé")
 	}
 	if len(op.Next) < 8 || len(op.Next) > 2000 || !nonempty(op.Next) || op.Next == t.Next {
@@ -73,7 +78,7 @@ func (s *Store) applyPlanningReviewRetry(w *Work, scope string, op PlanningOpera
 	if err := s.queueManagedFragmentResume(*w, t, request.EventID); err != nil {
 		return err
 	}
-	directive := &ManagedReviewRetryDirective{Decision: request.EventID, Scope: scope, ResultEvent: reviewPlanningEventID(r), Review: r.ID, Candidate: r.CandidateSHA, Attempt: r.Attempt, FailureCode: reviewFragmentProtocolError, Cause: r.Reason, Instruction: op.Next}
+	directive := &ManagedReviewRetryDirective{Decision: request.EventID, Scope: scope, ResultEvent: reviewPlanningEventID(r), Review: r.ID, Candidate: r.CandidateSHA, Attempt: r.Attempt, FailureCode: expected.Code, Cause: r.Reason, Instruction: op.Next}
 	if err := s.preflightReviewRetryDirective(*t.IndependentReview, directive); err != nil {
 		return fmt.Errorf("consigne de reprise non transmissible avant réservation : %w", err)
 	}

@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-17T08:28:26.291121+00:00",
+  "go_process_snapshot": "    PID    PPID     ELAPSED COMMAND\n",
+  "command": [
+    "node",
+    "frontend/embed-signals.mjs"
+  ],
+  "result": {
+    "mode": "generate",
+    "assets": {
+      "signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+      "signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a"
+    }
+  },
+  "stage_matches_web": true
+}

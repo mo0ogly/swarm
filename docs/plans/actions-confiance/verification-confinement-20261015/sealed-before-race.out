@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT4SealedPublicPolicy
+    trust_sealed_test.go:33: sealed execution contract missing json: unknown field "sealed_execution"
+--- FAIL: TestActionsConfianceT4SealedPublicPolicy (1.04s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.551s
+FAIL

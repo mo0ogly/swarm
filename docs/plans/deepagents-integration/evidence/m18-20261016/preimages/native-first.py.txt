@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""Real Swarm CLI/API -> stored brainstorm -> M17, scripted provider only."""
+import argparse
+import hashlib
+import http.cookiejar
+import json
+import os
+from pathlib import Path
+import re
+import select
+import subprocess
+import sys
+import tempfile
+import time
+import urllib.error
+import urllib.request
+import uuid
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("binary",type=Path);parser.add_argument("output",type=Path)
+    args=parser.parse_args(); binary=args.binary.resolve(); out=args.output.resolve()
+    out.mkdir(mode=0o700,parents=True,exist_ok=False)
+    root=Path(tempfile.mkdtemp(prefix="swarm-summary-source-")); repo=Path(__file__).resolve().parents[1]
+    commands=[];checks=[];server=None;active=None
+    def sha(raw):return hashlib.sha256(raw).hexdigest()
+    def save(name,value):
+        raw=value if isinstance(value,bytes) else (json.dumps(value,ensure_ascii=False,indent=2)+"\n").encode()
+        with (out/name).open('xb') as file:os.chmod(file.name,0o600);file.write(raw)
+    def cli(argv,payload=None,code=0):
+        command=[str(binary),'--root',str(root),'--json',*argv]+(['--input','-'] if payload is not None else [])
+        result=subprocess.run(command,input=json.dumps(payload) if payload is not None else None,text=True,capture_output=True,timeout=20)
+        commands.append({'argv':argv,'exit_code':result.returncode})
+        assert result.returncode==code,(argv,result.returncode,result.stderr)
+        return json.loads(result.stdout if code==0 else result.stderr)
+    def request(w,**kw):return dict(schema_version=1,event_id=str(uuid.uuid4()),expected_revision=w['revision'],**kw)
+    def wait(check):
+        until=time.monotonic()+20
+        while time.monotonic()<until:
+            value=check()
+            if value:return value
+            time.sleep(.1)
+        raise AssertionError('Owned fixture did not settle')
+    def tool(argv,code=0):
+        result=subprocess.run([sys.executable,*map(str,argv)],cwd=repo,text=True,capture_output=True,timeout=20)
+        commands.append({'argv':list(map(str,argv)),'exit_code':result.returncode})
+        assert result.returncode==code,(argv,result.returncode,result.stderr)
+    def annotation(packet):
+        sources=json.loads(packet['payload'])['sources']
+        states=[('snapshot','evidence','historical'),('future','intention','future'),('prior','evidence','historical'),('incident','incident','open')]
+        return {'schema_version':1,'source_sha256':packet['sha256'],'protected':[{'id':name,'message':sources[i]['id'],'kind':kind,'state':state} for i,(name,kind,state) in enumerate(states)]}
+    try:
+        cli(['init'])
+        provider=root/'claude'
+        provider.write_text('#!'+sys.executable+'\n'+'''import json,pathlib,sys
+p=pathlib.Path(__file__)
+if "--swarm-preflight" in sys.argv:
+ print(json.dumps({"schema_version":1,"capabilities":{"process":"verified","workspace_read":"verified","workspace_write":"verified"}}));sys.exit(0)
+sys.stdin.read()
+with p.with_suffix(".calls").open("a") as f:f.write("call\\n")
+print(json.dumps({"type":"result","result":"Réponse historique conservée <source> ; aucun succès courant déclaré.","usage":{"input_tokens":10,"output_tokens":2}}))
+''');provider.chmod(0o700)
+        (root/'.swarm/providers.json').write_text(json.dumps({'schema_version':1,'providers':{'fixture':{'command':str(provider),'preflight_args':['--swarm-preflight'],'preflight_kind':'provider-context','preflight_capabilities':['process','workspace_read','workspace_write']}}}))
+        work=cli(['work','create'],request({'revision':0},title='Summary source fixture',objective='Keep attributed history',scope='Owned fixture',criteria=['Sources remain available'],next='Inspect'))['work']
+        work=cli(['task','add',work['id']],request(work,id='t1',title='Future worker',deliverable='report.txt',criteria=['Recheck current evidence'],next='Inspect sources'))['work']
+        refs=[]; agents=[]
+        for question in ['Intention future : vérifier avant de déployer.','Incident ouvert : effet incertain à examiner avant reprise.']:
+            active=cli(['agent','start',work['id']],request(work,provider='fixture',role='worker',brainstorm=True,workspace='.',instruction=question,capture_output=True,timeout_seconds=30))['agent']
+            def answer():
+                a=cli(['agent','show',active['id']])['agent']
+                w=cli(['work','show',work['id']])['work']
+                hits=[t for t in w['tasks'] if t.get('brainstorm') and any(v['attempt']==a['attempt_id'] for v in t.get('answers',[]))]
+                return (a,w,hits[0]) if a['status']=='completed' and hits else None
+            a,work,dialogue=wait(answer);agents.append(a)
+            stored=next(v for v in dialogue['answers'] if v['attempt']==a['attempt_id'])
+            refs.append({'task':dialogue['id'],'attempt':stored['attempt'],'sha256':sha((dialogue['question']+'\n'+stored['text']).encode())})
+        before=json.dumps(work,sort_keys=True);save('work-before.json',work);save('agents-before.json',agents)
+        q={'schema_version':1,'work':work['id'],'task':'t1','expected_revision':work['revision'],'dialogues':refs}
+        source=cli(['memory','summary-source'],q);save('source-cli.json',source);save('request.json',q)
+        payload=json.loads(source['payload']);assert payload['provider_history_complete'] is False and len(payload['sources'])==5
+        assert source['sha256']==sha(source['payload'].encode())
+        checks.append('Two actual brainstorm launches persist selected question/answer references; CLI exports exact scoped sources')
+        server=subprocess.Popen([str(binary),'--root',str(root),'web','127.0.0.1:0'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        announced=b'';match=None;deadline=time.monotonic()+15
+        while match is None and time.monotonic()<deadline:
+            assert server.poll() is None
+            ready,_,_=select.select([server.stdout],[],[],.1)
+            if ready:announced+=os.read(server.stdout.fileno(),4096);match=re.search(r'http://\S+/session/\S+',announced.decode())
+        assert match,'No fixture session address'
+        address=match.group();base=address.split('/session/',1)[0]
+        opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+        opener.open(address,timeout=10).read()
+        csrf=json.load(opener.open(base+'/api/v1/session',timeout=10))['csrf']
+        def http(payload=None,method='POST',want=200):
+            headers={'Origin':base,'X-Swarm-CSRF':csrf,'Content-Type':'application/json'}
+            req=urllib.request.Request(base+'/api/v1/project-memory?action=summary-source',data=json.dumps(payload).encode() if payload else None,headers=headers,method=method)
+            try:
+                response=opener.open(req,timeout=10);status=response.status;raw=response.read()
+            except urllib.error.HTTPError as error:status=error.code;raw=error.read()
+            assert status==want,(status,raw.decode())
+            return json.loads(raw) if want!=405 else None
+        api=http(q);assert api==source;save('source-api.json',api);http(method='GET',want=405)
+        checks.append('Reopened authenticated API matches CLI byte-bound payload; GET refuses a catalogue-shaped false success')
+        annotations=annotation(source);save('annotations.json',annotations)
+        tool(['tools/memory-evaluation/swarm_source.py','--source',out/'source-cli.json','--annotations',out/'annotations.json','--output-dir',out/'prepared'])
+        tool(['tools/memory-evaluation/summarization.py','--history',out/'prepared/history.json','--reference-cutoff',4,'--output',out/'candidate.json'])
+        tool(['tools/memory-evaluation/summarization.py','--history',out/'prepared/history.json','--candidate',out/'candidate.json','--output',out/'reference.json'])
+        reference=json.loads((out/'reference.json').read_text());provenance=json.loads((out/'prepared/provenance.json').read_text())
+        assert reference['result']=='PASS' and reference['source_sha256']==provenance['history_sha256']
+        assert reference['summary_entries'][1]['state']=='future' and reference['summary_entries'][3]['state']=='open'
+        checks.append('Actual Go export converts with explicit packet-bound annotations; M17 preserves snapshot, future intention and open incident')
+        after=cli(['work','show',work['id']])['work'];assert json.dumps(after,sort_keys=True)==before
+        assert [cli(['agent','show',a['id']])['agent'] for a in agents]==agents
+        assert provider.with_suffix('.calls').read_text()=='call\ncall\n'
+        save('work-after-reads.json',after)
+        checks.append('Export, API and conversion leave work, source agents, usage and invocation count unchanged')
+        changed=cli(['task','update',work['id']],request(work,id='t1',criteria=['Current contract changed; recheck before reuse']))['work']
+        assert cli(['memory','summary-source'],q,3)['failure']['code']=='revision_conflict';http(q,want=409)
+        q['expected_revision']=changed['revision'];fresh=cli(['memory','summary-source'],q);save('source-current.json',fresh)
+        tool(['tools/memory-evaluation/swarm_source.py','--source',out/'source-current.json','--annotations',out/'annotations.json','--output-dir',out/'stale-annotations'],2)
+        assert not (out/'stale-annotations').exists()
+        save('annotations-current.json',annotation(fresh))
+        tool(['tools/memory-evaluation/swarm_source.py','--source',out/'source-current.json','--annotations',out/'annotations-current.json','--output-dir',out/'current'])
+        tool(['tools/memory-evaluation/summarization.py','--history',out/'current/history.json','--reference-cutoff',4,'--previous',out/'reference.json','--output',out/'candidate-current.json'],2)
+        old_candidate=json.loads((out/'candidate.json').read_text());old_candidate['source_sha256']=json.loads((out/'current/provenance.json').read_text())['history_sha256'];old_candidate['parent_sha256']=reference['receipt_sha256'];save('stale-parent-candidate.json',old_candidate)
+        tool(['tools/memory-evaluation/summarization.py','--history',out/'current/history.json','--candidate',out/'stale-parent-candidate.json','--previous',out/'reference.json','--output',out/'fallback.json'],1)
+        fallback=json.loads((out/'fallback.json').read_text());assert fallback['result']=='FALLBACK' and fallback['recent_messages']==json.loads((out/'current/history.json').read_text())['messages']
+        assert provider.with_suffix('.calls').read_text()=='call\ncall\n'
+        checks.append('Public task update makes old CLI/API revision stale; annotations refuse and changed contract prevents parent reuse with all current originals retained')
+        save('result.json',{'status':'PASS','root':str(root),'checks':checks,'scripted_provider_invocations':2,'model_calls':0,'binary_sha256':sha(binary.read_bytes()),'script_sha256':sha(Path(__file__).read_bytes())})
+        print(json.dumps({'status':'PASS','checks':len(checks),'scripted_provider_invocations':2,'model_calls':0}))
+    finally:
+        save('commands.json',commands)
+        if server:
+            server.terminate()
+            try:server.wait(timeout=5)
+            except subprocess.TimeoutExpired:server.kill();server.wait(timeout=5)
+        if active:
+            a=cli(['agent','show',active['id']])['agent']
+            if a['status'] in ['queued','starting','running','stopping']:
+                subprocess.run([str(binary),'--root',str(root),'agent','stop',a['id']],check=True,capture_output=True,timeout=10)
+                wait(lambda:cli(['agent','show',a['id']])['agent']['status'] not in ['queued','starting','running','stopping'])
+
+
+if __name__=='__main__':main()

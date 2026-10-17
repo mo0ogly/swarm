@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT3IdentityContextPublicReadOnly
+    trust_identity_context_test.go:33: identity context expected 200, got 400: schema_version=1 et event_id requis
+--- FAIL: TestActionsConfianceT3IdentityContextPublicReadOnly (1.20s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	1.794s
+FAIL

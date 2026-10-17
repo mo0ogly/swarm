@@ -1,0 +1,35 @@
+{
+  "revision": 28,
+  "event_id": "recurrence-1ac34a7218c643b3bba3db9bff29c1cc",
+  "kind": "operator_resume",
+  "scope": "root",
+  "decision": {
+    "id": "planning-claim-4fa94415bf108c3ab949a5f2-decision",
+    "work_id": "w-68b50cc82ec3fe55624f9549",
+    "revision": 30,
+    "kind": "planning.decide",
+    "at": "2026-10-14T20:45:05.637789985Z",
+    "payload": {
+      "schema_version": 1,
+      "event_id": "planning-claim-4fa94415bf108c3ab949a5f2-decision",
+      "expected_revision": 29,
+      "scope": "root",
+      "scope_revision": 5,
+      "holder": "planner-1934a09c7e6423d263e61be8",
+      "generation": 10,
+      "input_events": [
+        "recurrence-1ac34a7218c643b3bba3db9bff29c1cc"
+      ],
+      "operations": [
+        {
+          "kind": "revise-instructions",
+          "id": "plan-68b50cc82e-T3",
+          "title": "",
+          "requirements": null,
+          "next": "Ajout préventif issu de l’incident T2 : avant tout travail dépendant d’une recette locale ou navigateur, faire vérifier par l’exécutant la capacité effective de l’environnement prévu à ouvrir le transport requis. En cas de refus de permission, conserver l’erreur originale, ne pas répéter le même contrôle sans précondition modifiée et distinguer explicitement contrôle opérateur, contrôle fournisseur et critère navigateur. Avant la fin de chaque tentative, remettre les sources produites et leurs sorties originales par le parcours public supporté, avec révision candidate ou constat explicite d’absence ; vérifier que la remise est reçue avant toute reconstruction. Une reconstruction, une consigne ou un test effectué dans un autre environnement ne prouve ni la correction ni le critère initial."
+        }
+      ],
+      "reason": "La reprise apporte deux preuves nouvelles : la première tentative T2 diverge à la frontière d’ouverture d’une socket loopback dans l’environnement fournisseur, tandis que la seconde a reçu une copie propre sans les sources ni les sorties originales conservées dans la première. Les deux tentatives sont consommées, la reprise de production est indisponible et aucune permission ou tentative supplémentaire n’est accordée ; T2 ne peut donc être déclaré corrigé, validé ou rejoué. Les dépendances de T3–T8 ne doivent pas être affaiblies : elles restent bloquées par T2. L’action encore autorisée est de transmettre aux futures tâches une prévention générale sur le contrôle préalable des capacités et la remise vérifiée des artefacts ; elle ne résout pas rétroactivement T2. La reprise de T2 exige du propriétaire du moteur un parcours public capable de récupérer/importer la copie conservée avec ses originaux, ou un environnement fournisseur autorisant le transport requis, puis un contrôle frais du critère navigateur sur le même candidat."
+    }
+  }
+}

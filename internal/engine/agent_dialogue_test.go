@@ -3,30 +3,21 @@
 package engine
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 	"time"
 )
 
 func TestDialogueCumulativeToolsAndIdle(t *testing.T) {
-	s := storeTest(t)
-	w, r := setupAgent(t, s)
-	a, _, e := s.prepare(w.ID, r)
-	if e != nil {
-		t.Fatal(e)
-	}
+	s, a, _ := dialogueReceiptFixture(t, "codex", []string{`{"type":"thread.started","thread_id":"fixture-session"}`, `{"type":"item.started","item":{"id":"item_0","type":"command_execution","command":"pwd"}}`, `{"type":"item.completed","item":{"id":"item_0","type":"command_execution","status":"completed"}}`, `{"type":"turn.completed"}`})
 	a.Limits, _ = (RunLimits{MaxToolCalls: 2}).normalized()
-	m := newDialogueMonitor(s, a)
-	var stream strings.Builder
-	enc := json.NewEncoder(&stream)
-	for _, turn := range []string{"turn-one", "turn-two"} {
-		enc.Encode(dialogueEvent{Kind: "start", Turn: turn})
-		enc.Encode(dialogueEvent{Kind: "event", Turn: turn, Data: map[string]any{"type": "item.started", "item": map[string]any{"id": "item_0", "type": "command_execution", "command": "pwd"}}})
-		enc.Encode(dialogueEvent{Kind: "event", Turn: turn, Data: map[string]any{"type": "item.completed", "item": map[string]any{"id": "item_0", "type": "command_execution", "status": "completed"}}})
-		enc.Encode(dialogueEvent{Kind: "end", Turn: turn})
+	if err := s.saveAgent(a); err != nil {
+		t.Fatal(err)
 	}
-	m.consume(strings.NewReader(stream.String()))
+	m, err := runDialogueReceiptWrapper(t, s, a, "second question\n/fin\n")
+	if err == nil {
+		t.Fatal("cumulative tool limit did not refuse continuation")
+	}
 	p, _, reason, _ := m.snapshot()
 	if p.ToolCalls != 2 || reason == "" {
 		t.Fatal(p, reason)

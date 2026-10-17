@@ -1,0 +1,4 @@
+{"stage": "evidence-regression-t2", "exit_code": 0, "passed_cases": 126}
+{"stage": "evidence-regression-t5", "exit_code": 0, "passed_cases": 23}
+{"stage": "evidence-regression-t3", "exit_code": 0, "passed_cases": 60}
+{"stage": "evidence-regression-t4", "exit_code": 0, "passed_cases": 117}

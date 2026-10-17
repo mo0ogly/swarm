@@ -17,7 +17,17 @@ import (
 // Query the configured executable’s bundled catalog, not a cache belonging to
 // another Codex version. Only local metadata commands, no provider/model request.
 // The executable stamp is rechecked without subprocesses during review polling.
-func observedReviewInputBudget(provider Provider, route *ModelRoute, providerDigest string) (*managedReviewInputBudget, error) {
+func observedReviewInputBudget(provider Provider, route *ModelRoute, providerDigest string, requested ...int) (*managedReviewInputBudget, error) {
+	desired := 0
+	if len(requested) > 1 {
+		return nil, fmt.Errorf("plusieurs fenêtres de contexte demandées")
+	}
+	if len(requested) == 1 {
+		desired = requested[0]
+	}
+	if desired < 0 {
+		return nil, fmt.Errorf("fenêtre négative")
+	}
 	if providerAdapter(provider) != "codex" || route == nil || route.Model != "gpt-5.6-sol" || len(providerDigest) != 64 {
 		return nil, fmt.Errorf("capacité du fournisseur de revue non établie")
 	}
@@ -35,9 +45,10 @@ func observedReviewInputBudget(provider Provider, route *ModelRoute, providerDig
 	}
 	var cache struct {
 		Models []struct {
-			Model   string `json:"slug"`
-			Context int    `json:"context_window"`
-			Percent int    `json:"effective_context_window_percent"`
+			Model      string `json:"slug"`
+			Context    int    `json:"context_window"`
+			MaxContext int    `json:"max_context_window"`
+			Percent    int    `json:"effective_context_window_percent"`
 		} `json:"models"`
 	}
 	clientVersion := strings.TrimSpace(string(version))
@@ -53,11 +64,23 @@ func observedReviewInputBudget(provider Provider, route *ModelRoute, providerDig
 			return nil, fmt.Errorf("capacité modèle dupliquée")
 		}
 		b := &managedReviewInputBudget{Version: 1, Model: m.Model, Tokenizer: managedReviewTokenizer, ContextTokens: m.Context, EffectivePct: m.Percent, ClientReserve: 32768, OutputReserve: 65536, MaxBytes: 1024 * 1024, ProviderDigest: providerDigest, ClientVersion: clientVersion, ClientStamp: stamp}
+		if desired > 0 {
+			if m.MaxContext <= 0 {
+				m.MaxContext = m.Context
+			}
+			if desired > m.MaxContext {
+				return nil, fmt.Errorf("fenêtre demandée : %d tokens ; maximum du client : %d ; défaut : %d", desired, m.MaxContext, m.Context)
+			}
+			b.Version, b.DefaultContextTokens, b.MaxContextTokens, b.ContextTokens = 2, m.Context, m.MaxContext, desired
+			b.CapabilityDigest = managedReviewCapacityDigest(*b)
+		}
 		if _, err := b.inputTokens(); err != nil {
 			return nil, err
 		}
 		capability, _ := json.Marshal([]any{clientVersion, stamp, m.Model, m.Context, m.Percent})
-		b.CapabilityDigest = hash(capability)
+		if b.Version == 1 {
+			b.CapabilityDigest = hash(capability)
+		}
 		found = b
 	}
 	if found == nil {
@@ -78,6 +101,10 @@ func (s *Store) reviewInputBudget(cfg *ReviewerConfig) (*managedReviewInputBudge
 	if !ok {
 		return nil, fmt.Errorf("fournisseur de revue absent")
 	}
+	rawProvider, _ := json.Marshal(p)
+	if hash(rawProvider) != cfg.ProviderDigest {
+		return nil, fmt.Errorf("configuration fournisseur remplacée")
+	}
 	level := "auto"
 	if cfg.ModelRoute != nil {
 		level = cfg.ModelRoute.Level
@@ -86,7 +113,7 @@ func (s *Store) reviewInputBudget(cfg *ReviewerConfig) (*managedReviewInputBudge
 	if err != nil {
 		return nil, err
 	}
-	return observedReviewInputBudget(p, route, cfg.ProviderDigest)
+	return observedReviewInputBudget(p, route, cfg.ProviderDigest, cfg.InputContextTokens)
 }
 
 func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, available int) (managedReviewFragmentPlan, error) {
@@ -103,19 +130,22 @@ func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, 
 		if err != nil {
 			return managedReviewFragmentPlan{}, err
 		}
-		prefix := managedReviewPrefix(method)
+		prefix := managedReviewPrefixForContext(method, c)
 		transportErr := preflightManagedFragmentCalls(prefix, c, p)
 		remaining := available
 		if w.Planning != nil && w.Planning.Reviewer != nil {
 			remaining = min(remaining, max(0, w.Planning.Reviewer.MaxCalls-w.Planning.Reviewer.Calls))
 		}
+		budget, capacityErr := s.reviewInputBudget(w.Planning.Reviewer)
+		if capacityErr != nil && w.Planning.Reviewer.InputContextTokens > 0 {
+			return managedReviewFragmentPlan{}, capacityErr
+		}
+		if capacityErr == nil {
+			return planTokenManagedFragments(c, p, *budget, prefix, available)
+		}
 		if transportErr == nil && len(p.Packets)+2 <= remaining {
 			p.AvailableCalls = available
 			return p, nil
-		}
-		budget, capacityErr := s.reviewInputBudget(w.Planning.Reviewer)
-		if capacityErr == nil {
-			return planTokenManagedFragments(c, p, *budget, prefix, available)
 		}
 		if transportErr != nil {
 			return managedReviewFragmentPlan{}, transportErr
@@ -135,18 +165,21 @@ func (s *Store) planCandidateFragments(w Work, a Agent, c managedReviewContext, 
 	if err != nil {
 		return managedReviewFragmentPlan{}, err
 	}
-	prefix := managedReviewPrefix(method)
+	prefix := managedReviewPrefixForContext(method, c)
 	remaining := available
 	if w.Planning != nil && w.Planning.Reviewer != nil {
 		remaining = min(remaining, max(0, w.Planning.Reviewer.MaxCalls-w.Planning.Reviewer.Calls))
 	}
+	b, capacityErr := s.reviewInputBudget(w.Planning.Reviewer)
+	if capacityErr != nil && w.Planning.Reviewer.InputContextTokens > 0 {
+		return managedReviewFragmentPlan{}, capacityErr
+	}
+	if capacityErr == nil {
+		return planTokenManagedFragments(c, p, *b, prefix, available)
+	}
 	if fragmentPaidInspections(p)+2 <= remaining && preflightManagedFragmentCalls(prefix, c, p) == nil {
 		p.AvailableCalls = available
 		return p, nil
-	}
-	b, capacityErr := s.reviewInputBudget(w.Planning.Reviewer)
-	if capacityErr == nil {
-		return planTokenManagedFragments(c, p, *b, prefix, available)
 	}
 	// Preserve legacy failure behavior and estimates for unsupported providers.
 	return s.planLegacyCandidateFragments(w, a, c, available)

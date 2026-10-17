@@ -75,14 +75,14 @@ func TestFragmentFindingContractNativeInspectedNeeds(t *testing.T) {
 	}
 
 	current := packet
-	current.FindingContractVersion = managedFragmentFindingContractVersion
+	current.FindingContractVersion = 1
 	uncertain := rebindFindingFixture(t, current, original, true)
 	encoded, _ := json.Marshal(uncertain)
 	state, _, err := parseManagedFragmentInspection(string(encoded), current)
 	if err != nil || state != "unknown" {
 		t.Fatalf("uncertainty must remain unknown: %s %v", state, err)
 	}
-	current.FindingContractVersion++
+	current.FindingContractVersion = managedFragmentFindingContractVersion + 1
 	if _, _, err = parseManagedFragmentInspection(string(encoded), current); err == nil {
 		t.Fatal("unregistered finding contract accepted")
 	}
@@ -95,7 +95,7 @@ func TestFragmentFindingContractSchemaOracle(t *testing.T) {
 	packet, original := nativeInspectedNeedsFixture(t)
 	legacySchema := managedFragmentPacketSchema(packet)
 	current := packet
-	current.FindingContractVersion = managedFragmentFindingContractVersion
+	current.FindingContractVersion = 1
 	currentSchema := managedFragmentPacketSchema(current)
 	if legacySchema == currentSchema {
 		t.Fatal("finding contract has no effect on schema")

@@ -1,0 +1,23 @@
+{
+  "review_kind": "same-session self-review",
+  "independent": false,
+  "scope": "internal receiver only",
+  "checked": [
+    "authoritative Agent status/desired and host/start identity",
+    "strict canonical integers, duplicates, nulls, unknown/oversize/invalid UTF8",
+    "fresh PID identity and exact mission/task/attempt/resource attribution",
+    "loss/sequence/overflow, no state advance on refusal",
+    "actual Unix peer UID/PID/start and cancellation",
+    "legacy source and running preview unchanged by this slice"
+  ],
+  "open": [
+    "live launcher/backend and atomic registration",
+    "kernel filter, real kernel events, native cleanup and overhead",
+    "public unavailable contract and persisted execution policy before activation"
+  ],
+  "source_sha256": {
+    "internal/engine/kernel_observation_linux.go": "e14491229444c2dee403810bfc614754e8f567b081dce15b2411b196683562ab",
+    "internal/engine/kernel_observation_transport_linux.go": "34bdbfc7000bf5b6bebc804d2960598a06105f208720506c4470265e03b689f2",
+    "internal/engine/kernel_observation_linux_test.go": "c8aa369133f2c24f269556a81f8d19e5b8317d223093506a72f5064c9cf8568d"
+  }
+}

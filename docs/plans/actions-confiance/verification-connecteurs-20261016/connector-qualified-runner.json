@@ -1,0 +1,10 @@
+{
+  "pid": 2879703,
+  "proc_start_ticks": "4817781",
+  "argv": [
+    "/usr/bin/python3",
+    "/tmp/swarm-connector-qualified.py",
+    "run"
+  ],
+  "at": "2026-10-16T01:22:33.671944+00:00"
+}

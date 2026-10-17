@@ -104,11 +104,9 @@ func TestPreparationConversionAtomicLocksRelease(t *testing.T) {
 		t.Fatal(e)
 	}
 	r = conversionRequest(t, s, p, "create-missions")
-	again, e = s.preparationCommand(r)
-	if e != nil || again.Conversion.TaskIDs[0] != ids[0] {
-		t.Fatal(e)
+	if _, e = s.preparationCommand(r); e == nil {
+		t.Fatal("fresh event silently replayed conversion")
 	}
-	p = again
 	current, _ := s.get(w.ID)
 	if current.Revision != w.Revision {
 		t.Fatal("duplicate work mutation")

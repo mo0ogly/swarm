@@ -47,6 +47,14 @@ contrats existants. Il ne préautorise ni budget, acceptation, publication ou me
 Le catalogue contient quatre structures générales et six sujets embarqués. L’import, l’édition et
 la sauvegarde de modèles personnalisés ne sont pas encore proposés.
 
+## Configurer une équipe après la création des tâches
+
+En CLI, une préparation dont les tâches restent verrouillées peut recevoir son organisation par `prepare create-missions ID --input requete.json`. La demande conserve le plan courant, ses identifiants et ses preuves ; elle ajoute `organization` au contrat existant avec `version`, `action`, un `event_id` unique, `expected_revision`, `preparation_id`, `sha256` et `expected_work_revision`. Relire la préparation et le travail avant de construire cette demande.
+
+Le moteur exige un plan validé et frais, un travail conforme à son brief sans profil préexistant, des tâches inchangées et aucune tentative antérieure. Il refuse une organisation invalide, un verrou absent ou une adoption implicite d’historique sans mutation partielle. Une configuration déjà appliquée ne peut pas être remplacée par cette opération ; utiliser les opérations de configuration dédiées. Le rejeu ne vaut que pour le même event_id ; une nouvelle création sans organisation, une révision identique ou un départ déjà autorisé sont refusés explicitement. Le rejeu du même event_id restitue le reçu ; une nouvelle demande de configuration est refusée, même avec la même organisation.
+
+`create-missions` conserve le départ verrouillé. Une première configuration avec `authorize-plan` peut aussi autoriser le départ ; pour une équipe déjà configurée, utiliser `release-plan`. Ces opérations ne lancent pas de fournisseur : le départ réel reste soumis au profil, aux contrôles, aux budgets, à la revue et à `mission start`.
+
 ## Préparation guidée et équipe proposée
 
 Chaque modèle expose huit questions : résultat ou défaut reproductible, public,

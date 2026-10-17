@@ -1,6 +1,6 @@
 ---
 name: replan
-description: "Revise an existing Swarm plan after a concrete failure, invalid assumption or changed requirement. Use to recover blocked coordination without resetting attempts, losing task history or repeating the same failing action."
+description: "Recover a Swarm plan after an anomaly, changed assumption or improvement; preserve history, authority and verified outcomes."
 ---
 
 # Replan without hiding the failure

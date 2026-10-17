@@ -1,0 +1,4 @@
+=== RUN   TestActionsConfianceT6EvidenceConcurrentPrepare
+--- PASS: TestActionsConfianceT6EvidenceConcurrentPrepare (1.28s)
+PASS
+ok  	swarm.local/companion/internal/engine	2.820s

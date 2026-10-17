@@ -1,0 +1,76 @@
+{
+  "started_at_utc": "2026-10-16T07:59:04.897994+00:00",
+  "ended_at_utc": "2026-10-16T08:00:11.861148+00:00",
+  "cases": [
+    {
+      "case_id": "contract-current-without",
+      "argv": [
+        "python3",
+        "tools/memory-evaluation/run_codex.py",
+        "--pack",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/pack-safe",
+        "--out",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01",
+        "--case",
+        "contract-current-without"
+      ],
+      "started_at_utc": "2026-10-16T07:59:04.898119+00:00",
+      "ended_at_utc": "2026-10-16T07:59:29.028809+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 24.13071594599751
+    },
+    {
+      "case_id": "contract-changed-with",
+      "argv": [
+        "python3",
+        "tools/memory-evaluation/run_codex.py",
+        "--pack",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/pack-safe",
+        "--out",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01",
+        "--case",
+        "contract-changed-with"
+      ],
+      "started_at_utc": "2026-10-16T07:59:29.029461+00:00",
+      "ended_at_utc": "2026-10-16T07:59:45.140082+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 16.110667900997214
+    },
+    {
+      "case_id": "contract-current-with",
+      "argv": [
+        "python3",
+        "tools/memory-evaluation/run_codex.py",
+        "--pack",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/pack-safe",
+        "--out",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01",
+        "--case",
+        "contract-current-with"
+      ],
+      "started_at_utc": "2026-10-16T07:59:45.140994+00:00",
+      "ended_at_utc": "2026-10-16T07:59:54.526196+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 9.385230836996925
+    },
+    {
+      "case_id": "contract-changed-without",
+      "argv": [
+        "python3",
+        "tools/memory-evaluation/run_codex.py",
+        "--pack",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/pack-safe",
+        "--out",
+        "/home/fpizzi/Documents/ChatGPT/swarm/docs/plans/deepagents-integration/evidence/m7-20261016/real-codex-v2-01",
+        "--case",
+        "contract-changed-without"
+      ],
+      "started_at_utc": "2026-10-16T07:59:54.526942+00:00",
+      "ended_at_utc": "2026-10-16T08:00:11.860333+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 17.333411694999086
+    }
+  ],
+  "retries": 0,
+  "result": "COMPLETE"
+}

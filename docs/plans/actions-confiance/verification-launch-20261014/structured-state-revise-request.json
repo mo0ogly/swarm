@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "repair-state-and-unclipped-json-1792038132180748450",
+  "expected_revision": 302,
+  "task_id": "plan-68b50cc82e-T2",
+  "agent_id": "auto-c8053557575a81bb6164",
+  "attempt_id": "a-b4669e24bbfb91f7a9686499",
+  "review_id": "review-ccf9e3a44811222ac65d2748",
+  "confirm_recovery": true,
+  "confirm_review_error_repair": true,
+  "result_tree": "5a0820cb475291be2fa87c2fb9191395d6effa4b",
+  "reason": "R14 a terminé en erreur car le moteur coupait la réponse structurée à 16000 octets avant son contrôle 64 Kio. La capture tronquée historique et les 60 appels restent conservés ; aucune fin reconstruite. Le lecteur structuré conserve maintenant les octets UTF-8 entiers, refuse explicitement au-delà de64Kio en gardant le diagnostic, avec 11 tests principaux/17 sous-cas race. Les refus métier partiels sont aussi traités : état lu par un seul descripteur NOFOLLOW/NONBLOCK, fstat et lecture bornée ; refus d’approbation isolent la garde visée avec empreinte et motif corrects. Avant FAIL reproduits ;24 tests principaux/34 sous-cas race, validation publique58 noms Go et trois mutations de garde détectées. Nouveaux arbre, contrôles et revue indépendante requis ; ni tentative ni consommation effacée."
+}

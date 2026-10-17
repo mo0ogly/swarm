@@ -1,0 +1,137 @@
+/* Local presentation vocabulary. No identity, permission or signature is issued here. */
+(function (root, factory) {
+ 'use strict';
+ const api = factory();
+ if (typeof module === 'object' && module.exports) module.exports = api;
+ else root.SwarmSignals = api;
+})(globalThis, function () {
+ 'use strict';
+ const paths = Object.freeze({
+  book: ['M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4z', 'M12 6v15M7 8h2M7 11h2M15 8h2M15 11h2'],
+  flow: ['M9 3h6v5H9zM3 16h6v5H3zM15 16h6v5h-6z', 'M12 8v4H6v4M12 12h6v4'],
+  dialogue: ['M3 4h15v11H9l-5 4v-4H3z', 'M18 8h3v12h-3l-4 2v-4M6 8h9M6 11h6'],
+  summary: ['M6 3h12v18H6zM9 7h6M9 11h6M9 15h3', 'M2 9l3 3-3 3M22 9l-3 3 3 3'],
+  bulb: ['M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8zM9 19h6M10 22h4', 'M12 5v7M9 8l3 4 3-4'],
+  layers: ['M12 3 2 8l10 5 10-5zM3 13l9 5 9-5M3 18l9 5 9-5'],
+  clock: ['M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z', 'M12 7v6l4 2'],
+  question: ['M4 4h16v16H4z', 'M9 8a3 3 0 1 1 5 2c-2 1-2 2-2 3M12 17h.01'],
+  check: ['M4 12l5 5L20 6'],
+  cross: ['M6 6l12 12M18 6 6 18'],
+  minus: ['M4 12h16'],
+  shield: ['M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6z'],
+  person: ['M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM4 22v-3a8 8 0 0 1 16 0v3'],
+  agent: ['M5 6h14v13H5zM9 10h.01M15 10h.01M9 15h6M12 3v3M2 10h3M19 10h3M2 15h3M19 15h3'],
+  service: ['M3 3h18v7H3zM3 14h18v7H3zM6 6h.01M6 17h.01M10 6h7M10 17h7M12 10v4'],
+  pen: ['m4 16 12-12 4 4L8 20l-5 1zM13 7l4 4'],
+  key: ['M11 8a5 5 0 1 1-10 0 5 5 0 0 1 10 0zM10 11l10 10M15 16l3-3M18 19l3-3'],
+  eye: ['M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z', 'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z'],
+  send: ['m3 3 19 9-19 9 4-9zM7 12h15'],
+  pause: ['M8 4v16M16 4v16']
+ });
+ const definitions = Object.create(null);
+ function add(id, family, glyph, tone, fr, en, detailFr, detailEn) {
+  definitions[id] = Object.freeze({id, family, glyph, tone,
+   label: Object.freeze({fr, en}), description: Object.freeze({fr: detailFr, en: detailEn})});
+ }
+ add('memory-unknown','memory','question','neutral','Type inconnu','Unknown type','La catégorie de mémoire n’est pas renseignée.','The memory category has not been supplied.');
+ add('memory-experience','memory','book','info','Expérience','Experience','Une expérience passée, à revalider avant réemploi.','A past experience to recheck before reuse.');
+ add('memory-procedure','memory','flow','info','Procédure','Procedure','Une méthode réutilisable avec ses conditions et limites.','A reusable method with conditions and limits.');
+ add('memory-dialogue','memory','dialogue','info','Cadrage','Framing','Une question et une réponse conservées dans leur contexte.','A question and answer retained in context.');
+ add('memory-summary','memory','summary','info','Résumé extractif','Extractive summary','Des extraits attribués ; les sources restent distinctes du résumé.','Attributed excerpts; sources remain distinct from the summary.');
+ add('memory-knowledge','concept','bulb','neutral','Faits · repère conceptuel','Facts · conceptual marker','Repère de mémoire sémantique ; ce n’est pas un nouveau type persistant disponible.','A semantic-memory marker, not a newly available persisted type.');
+ add('version-active','version','layers','info','Version active','Active version','Version courante du catalogue ; ce statut ne donne pas de droit d’usage.','Current catalogue version; this status grants no usage right.');
+ add('version-historical','version','clock','neutral','Historique','Historical','Version conservée pour comprendre le passé, sans actualité présumée.','Retained to explain the past, with no presumed current validity.');
+ add('version-withdrawn','version','minus','warning','Retirée','Withdrawn','Retirée du réemploi ; les textes et réceptions historiques sont conservés.','Withdrawn from reuse; historical text and receipts remain retained.');
+ add('version-unavailable','version','cross','danger','Indisponible','Unavailable','La source ne peut pas être utilisée dans ce contexte.','The source cannot be used in this context.');
+ add('version-unknown','version','question','neutral','État inconnu','Unknown state','Aucun état de version exploitable n’a été fourni.','No usable version state has been supplied.');
+ add('protection-unknown','protection','shield-question','neutral','Droits non établis','Rights not established','Aucun contrôle courant fourni ; aucune autorisation ne peut être déduite.','No current check supplied; no permission can be inferred.');
+ add('protection-pending','protection','shield-clock','warning','Décision attendue','Decision pending','L’usage attend une décision ; l’attente n’autorise pas l’action.','Use awaits a decision; waiting does not authorize the action.');
+ add('protection-allowed','protection','shield-check','success','Usage autorisé','Use authorized','Autorisation pour le contenu, le destinataire et la durée contrôlés, à vérifier dans la preuve.','Permission for the checked content, recipient and duration; consult its evidence.');
+ add('protection-denied','protection','shield-cross','danger','Usage refusé','Use denied','Le contrôle refuse cet usage ; le motif doit rester visible.','The check denies this use; its reason must remain visible.');
+ add('protection-revoked','protection','shield-minus','danger','Autorisation révoquée','Permission revoked','Un ancien accord ne permet plus un nouvel usage.','An earlier permission no longer permits new use.');
+ add('identity-unknown','identity','question','neutral','Identité non attestée','Identity not attested','Un nom ou un fournisseur ne prouve pas l’identité de l’intervenant.','A name or provider does not prove the actor’s identity.');
+ add('identity-pending','identity','clock','warning','Identité à vérifier','Identity check pending','La vérification est attendue ; ne pas afficher une identité attestée.','Verification is pending; do not show an attested identity.');
+ add('identity-verified','identity','person-check','success','Identité attestée','Attested identity','Identité attestée par le contrôle concerné ; aucun droit implicite.','Attested by the relevant check; no implicit rights follow.');
+ add('identity-suspended','identity','person-pause','danger','Identité suspendue','Identity suspended','Les droits courants sont suspendus ; l’auteur historique reste conservé.','Current rights are suspended; historical authorship is preserved.');
+ add('identity-revoked','identity','person-minus','danger','Identité révoquée','Identity revoked','La liaison ne peut plus autoriser de nouveaux usages.','The binding can no longer authorize new uses.');
+ add('actor-human','actor','person','info','Personne','Person','Catégorie d’acteur ; ce pictogramme ne prouve pas l’authentification.','Actor category; this icon does not prove authentication.');
+ add('actor-agent','actor','agent','info','Agent','Agent','Instance d’agent, à distinguer du fournisseur et de ses droits.','An agent instance, distinct from its provider and rights.');
+ add('actor-service','actor','service','info','Service','Service','Identité de service ; elle ne remplace pas un accord humain.','A service identity cannot substitute for human approval.');
+ add('usage-read','usage','eye','info','Consulter','Read','Droit de lecture ; il ne permet pas de rediffuser.','Read permission does not permit redistribution.');
+ add('usage-summarize','usage','summary','info','Résumer','Summarize','Droit de synthèse distinct de la consultation et de la transmission.','Summarization is distinct from reading and transmission.');
+ add('usage-transmit','usage','send','info','Transmettre','Transmit','Droit de transmettre au destinataire précisément autorisé.','Permission to transmit to the specifically authorized recipient.');
+ add('attribution-owner','attribution','key','info','Propriétaire','Owner','Responsabilité et autorité de gestion, distinctes de l’auteur.','Responsibility and management authority, distinct from authorship.');
+ add('attribution-author','attribution','pen','info','Auteur','Author','Origine de l’intervention ; elle ne donne pas tous les droits d’usage.','Origin of the contribution; it does not grant all usage rights.');
+ Object.freeze(definitions);
+ const words = Object.freeze({
+  fr: Object.freeze({seal:'Cachet de contexte',owner:'Propriétaire',author:'Auteur',unknown:'Non renseigné',reference:'Référence'}),
+  en: Object.freeze({seal:'Context seal',owner:'Owner',author:'Author',unknown:'Not supplied',reference:'Reference'})
+ });
+ function options(value = {}) {
+  const lang = value.lang || 'fr';
+  if (!Object.hasOwn(words,lang)) throw new RangeError('Unsupported signal language');
+  const doc = value.document || globalThis.document;
+  if (!doc?.createElementNS) throw new TypeError('A DOM document is required');
+  return {...value, lang, document: doc};
+ }
+ function element(doc, tag, className, text) {
+  const node = doc.createElement(tag); node.className = className;
+  if (text !== undefined) node.textContent = String(text);
+  return node;
+ }
+ function svgNode(doc, tag, attributes) {
+  const node = doc.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+  return node;
+ }
+ function glyph(doc, name) {
+  const group = svgNode(doc,'g',{}), [base, mark] = name.split('-');
+  for (const d of paths[base]) group.append(svgNode(doc,'path',{d}));
+  if (mark) {
+   const overlay = svgNode(doc,'g',{transform:'translate(10 11) scale(.58)'});
+   for (const d of paths[mark]) overlay.append(svgNode(doc,'path',{d}));
+   group.append(overlay);
+  }
+  return group;
+ }
+ function icon(doc, name) {
+  const svg = svgNode(doc,'svg',{viewBox:'0 0 24 24',fill:'none',stroke:'currentColor','stroke-width':'1.7','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',focusable:'false',class:'swarm-signal__icon'});
+  svg.append(glyph(doc,name));return svg;
+ }
+ function badge(id, config) {
+  const o = options(config), item = definitions[id];
+  if (!item) throw new RangeError('Unknown semantic signal');
+  const span = element(o.document,'span','swarm-signal swarm-signal--'+item.tone);
+  span.dataset.signal = id;span.title = item.description[o.lang];span.append(icon(o.document,item.glyph));
+  if (o.iconOnly) {span.setAttribute('role','img');span.setAttribute('aria-label',item.label[o.lang]);}
+  else span.append(element(o.document,'span','swarm-signal__label',item.label[o.lang]));
+  return span;
+ }
+ function state(family, value, config) {
+  if (!['identity','protection','version'].includes(family)) throw new RangeError('Unknown state family');
+  return badge(family+'-'+(value == null || value === '' ? 'unknown' : value),config);
+ }
+ function memory(kind, config) {
+  const id = 'memory-'+kind;
+  return badge(definitions[id]?.family === 'memory' || definitions[id]?.family === 'concept' ? id : 'memory-unknown',config);
+ }
+ function seal(config = {}) {
+  const o = options(config), doc = o.document, w = words[o.lang];
+  const memoryBadge = memory(o.memory,o), protection = state('protection',o.protection,o), identity = state('identity',o.identity,o);
+  const footer = element(doc,'footer','swarm-context-seal');
+  const mark = svgNode(doc,'svg',{viewBox:'0 0 80 80',fill:'none',stroke:'currentColor','stroke-width':'1.15','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true',focusable:'false',class:'swarm-context-seal__wax'});
+  const points = Array.from({length:72},(_,i)=>{const a=i*Math.PI/36,r=34+1.6*Math.sin(i*2.4)+.7*Math.cos(i*1.2);return (40+Math.cos(a)*r).toFixed(2)+','+(40+Math.sin(a)*r).toFixed(2)}).join(' ');
+  mark.append(svgNode(doc,'polygon',{points,fill:'currentColor','fill-opacity':'.12'}));
+  mark.append(svgNode(doc,'circle',{cx:'40',cy:'40',r:'28'}));
+  mark.append(svgNode(doc,'circle',{cx:'40',cy:'40',r:'24','stroke-dasharray':'1 3'}));
+  const imprint = svgNode(doc,'g',{transform:'translate(25 25) scale(1.25)'});
+  imprint.append(glyph(doc,definitions[memoryBadge.dataset.signal].glyph));mark.append(imprint);
+  const content = element(doc,'div','swarm-context-seal__content');
+  content.append(element(doc,'p','swarm-context-seal__title',w.seal));
+  const signals = element(doc,'div','swarm-context-seal__signals');signals.append(memoryBadge,protection,identity);content.append(signals);
+  content.append(element(doc,'p','swarm-context-seal__attribution',w.owner+' : '+(o.owner || w.unknown)+' · '+w.author+' : '+(o.author || w.unknown)));
+  if (o.reference) content.append(element(doc,'p','swarm-context-seal__reference',w.reference+' : '+o.reference));
+  footer.append(mark,content);return footer;
+ }
+ return Object.freeze({definitions,badge,state,memory,seal});
+});

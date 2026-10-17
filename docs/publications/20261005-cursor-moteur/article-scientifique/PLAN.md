@@ -3,6 +3,13 @@
 Statut : plan de travail, 5 octobre 2026. Aucun résultat chiffré n'existe encore ;
 les sections marquées « À PRODUIRE » conditionnent la rédaction.
 
+Actualisation du 16 octobre 2026 : le statut ci-dessus décrit le cadrage initial,
+pas les campagnes ultérieures conservées dans le dossier. Le nouveau volet
+[identité, autorité et cycle de vie](identites-autorite-cycle-vie.md) contient
+les références proches, trois schémas, les hypothèses et le protocole doctoral.
+Ses résultats expérimentaux restent à produire ; les campagnes de facturation
+antérieures ne démontrent pas la sécurité des identités.
+
 ---
 
 ## 0. Positionnement
@@ -109,9 +116,12 @@ version soumise.
 - Debenedetti et al., *Defeating Prompt Injections by Design* (CaMeL), arXiv:2503.18813 — résumé lu.
 - Beurer-Kellner et al., *Design Patterns for Securing LLM Agents*, arXiv:2506.08837 — résumé lu.
 
-**Différenciation à démontrer** : ces travaux médiatisent l'*appel d'outil* ;
-nous médiatisons le *cycle de vie de la tentative* (lancement, reprise, preuve,
-acceptation) et nous mesurons les fautes du moniteur lui-même.
+**Différenciation à démontrer** : comparer les frontières effectivement
+médiatisées, les hypothèses de confiance, la reprise, les preuves et les fautes
+du moniteur. Ne pas réduire tous les travaux voisins à l'appel d'outil :
+Agentic JWT traite identité/délégation et étapes du workflow ; MI9 et Policies
+on Paths abordent déjà des séquences et le contrôle continu. Voir
+[l'actualisation et les comparaisons équivalentes](identites-autorite-cycle-vie.md).
 
 ### 3.3 Exécution durable et transactions
 

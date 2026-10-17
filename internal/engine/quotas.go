@@ -9,17 +9,18 @@ import (
 )
 
 type QuotaValues struct {
-	ReviewContextFiles *int `json:"review_context_files,omitempty"`
-	ReviewSourceBytes  *int `json:"review_source_bytes,omitempty"`
-	ReviewContextBytes *int `json:"review_context_bytes,omitempty"`
-	ReviewFiles        *int `json:"review_delivery_files,omitempty"`
-	Scopes             *int `json:"planning_scopes,omitempty"`
-	Depth              *int `json:"delegation_depth,omitempty"`
-	Tasks              *int `json:"planning_tasks,omitempty"`
-	JudgeCycles        *int `json:"judge_cycles,omitempty"`
-	Planning           int  `json:"planning_activations"`
-	Decisions          int  `json:"planning_decisions"`
-	Reviews            *int `json:"review_calls"`
+	ReviewContextTokens *int `json:"review_context_tokens,omitempty"`
+	ReviewContextFiles  *int `json:"review_context_files,omitempty"`
+	ReviewSourceBytes   *int `json:"review_source_bytes,omitempty"`
+	ReviewContextBytes  *int `json:"review_context_bytes,omitempty"`
+	ReviewFiles         *int `json:"review_delivery_files,omitempty"`
+	Scopes              *int `json:"planning_scopes,omitempty"`
+	Depth               *int `json:"delegation_depth,omitempty"`
+	Tasks               *int `json:"planning_tasks,omitempty"`
+	JudgeCycles         *int `json:"judge_cycles,omitempty"`
+	Planning            int  `json:"planning_activations"`
+	Decisions           int  `json:"planning_decisions"`
+	Reviews             *int `json:"review_calls"`
 }
 type QuotaAuthorization struct {
 	BeforeScopes map[string]int `json:"before_scope_activations,omitempty"`
@@ -63,6 +64,8 @@ func quotaValues(p *PlanningState) (QuotaValues, QuotaValues) {
 		limits.ReviewFiles = &files
 		source := effectiveReviewSourcePolicy(p.Reviewer)
 		limits.ReviewContextFiles, limits.ReviewSourceBytes, limits.ReviewContextBytes = &source.Files, &source.SourceBytes, &source.TotalBytes
+		tokens := p.Reviewer.InputContextTokens
+		limits.ReviewContextTokens = &tokens
 		used.Reviews = &b
 	}
 	if p.Judge != nil {
@@ -143,6 +146,9 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 			return fmt.Errorf("limite de contexte de revue invalide : vérificateur requis, 0 sans plafond ou entier positif")
 		}
 	}
+	if r.Limits.ReviewContextTokens != nil && (p.Reviewer == nil || *r.Limits.ReviewContextTokens < 0) {
+		return fmt.Errorf("fenêtre de contexte de revue invalide : 0 pour le défaut du client ou un nombre positif de tokens")
+	}
 	if r.Limits.ReviewFiles != nil && (p.Reviewer == nil || *r.Limits.ReviewFiles < 0) {
 		return fmt.Errorf("limite de fichiers de revue invalide : vérificateur requis, 0 sans plafond ou entier positif")
 	}
@@ -216,6 +222,9 @@ func applyQuotaChange(w *Work, r QuotaChange) error {
 	}
 	if p.Reviewer != nil {
 		p.Reviewer.MaxCalls = *r.Limits.Reviews
+		if r.Limits.ReviewContextTokens != nil {
+			p.Reviewer.InputContextTokens = *r.Limits.ReviewContextTokens
+		}
 		for _, field := range []struct {
 			value  *int
 			target **int
@@ -275,6 +284,9 @@ func (s *Store) previewQuotas(work string, r QuotaChange) (any, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err = s.validateReviewContextQuota(w, r); err != nil {
+		return nil, err
+	}
 	// get returns a detached Work; never persist this preview.
 	if err = applyQuotaChange(&w, r); err != nil {
 		return nil, err
@@ -290,7 +302,12 @@ func (s *Store) configureQuotas(work string, r QuotaChange) (Work, error) {
 	if err != nil {
 		return Work{}, err
 	}
-	return s.mutate(work, "quotas.configure", r.EventID, r.Revision, raw, func(w *Work) error { return applyQuotaChange(w, r) })
+	return s.mutate(work, "quotas.configure", r.EventID, r.Revision, raw, func(w *Work) error {
+		if err := s.validateReviewContextQuota(*w, r); err != nil {
+			return err
+		}
+		return applyQuotaChange(w, r)
+	})
 }
 func (s *Store) quotasCLI(pos []string, input string, out io.Writer) error {
 	if len(pos) != 3 {
@@ -330,4 +347,17 @@ func (s *Store) quotasCLI(pos []string, input string, out io.Writer) error {
 		return err
 	}
 	return printJSON(out, w)
+}
+
+func (s *Store) validateReviewContextQuota(w Work, r QuotaChange) error {
+	if r.Limits.ReviewContextTokens == nil || *r.Limits.ReviewContextTokens == 0 {
+		return nil
+	}
+	if *r.Limits.ReviewContextTokens < 0 || w.Planning == nil || w.Planning.Reviewer == nil {
+		return fmt.Errorf("fenêtre de contexte de revue invalide")
+	}
+	cfg := *w.Planning.Reviewer
+	cfg.InputContextTokens = *r.Limits.ReviewContextTokens
+	_, err := s.reviewInputBudget(&cfg)
+	return err
 }

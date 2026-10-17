@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT2ConfigProofAndInvalidInputs
+    trust_actions_test.go:483: empty proof and invalid anchor accepted with key length 0: map[string]interface {}{"sequence":0, "simulation":true, "verified":true}
+--- FAIL: TestActionsConfianceT2ConfigProofAndInvalidInputs (0.00s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.024s
+FAIL

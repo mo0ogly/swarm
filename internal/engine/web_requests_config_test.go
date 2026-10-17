@@ -97,7 +97,7 @@ func TestWebRequestsInvalidAuthenticationAndConcurrentRevision(t *testing.T) {
 	for _, values := range []map[string]any{
 		{"general_ms": -1, "snapshot_ms": 0, "connection_test_ms": 0},
 		{"general_ms": 1.5, "snapshot_ms": 0, "connection_test_ms": 0},
-		{"general_ms": 9007199254740992, "snapshot_ms": 0, "connection_test_ms": 0},
+		{"general_ms": int64(9007199254740992), "snapshot_ms": 0, "connection_test_ms": 0},
 		{"general_ms": 1, "snapshot_ms": 2},
 		{"general_ms": 1, "snapshot_ms": 2, "connection_test_ms": 3, "unknown": 4},
 	} {

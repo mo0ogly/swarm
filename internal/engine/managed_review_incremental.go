@@ -13,7 +13,14 @@ import (
 // This is an accepted baseline, not a verdict on the new candidate. Original
 // contexts/replies remain immutable and are recursively checked through their
 // hashes. Every current criterion still needs a NEW independent verdict.
+const managedReviewBaselineContractVersion = 2
+
+func supportedManagedReviewBaseline(version int) bool {
+	return version == 0 || version == 1 || version == managedReviewBaselineContractVersion
+}
+
 type ManagedReviewBaseline struct {
+	Version   int                 `json:"version,omitempty"`
 	Candidate string              `json:"candidate_commit"`
 	Reviews   []IndependentReview `json:"accepted_reviews"`
 }
@@ -23,21 +30,20 @@ func (s *Store) incrementalManagedReviewFallback(w Work, a Agent, c managedRevie
 	if e != nil {
 		return c, e
 	}
-	prefix := managedReviewPrefix(workflow)
+	prefix := managedReviewPrefixForContext(workflow, c)
 	owners, e := managedReviewSourceOwners(w, c)
 	if e != nil {
 		return c, e
 	}
 	_, e = planManagedReviewBatches(prefix, c, owners)
-	// Keep every already-fitting historical context/plan byte-for-byte.
-	if !errors.Is(e, errManagedReviewBatchSize) {
+	if e != nil && !errors.Is(e, errManagedReviewBatchSize) {
 		return c, e
 	}
 	repo := w.Planning.Repository
 	if repo.Candidate == repo.Base {
 		return c, nil
 	}
-	baseline := &ManagedReviewBaseline{Candidate: repo.Candidate}
+	baseline := &ManagedReviewBaseline{Version: managedReviewBaselineContractVersion, Candidate: repo.Candidate}
 	seen := map[string]bool{}
 	for i := range w.Tasks {
 		task := &w.Tasks[i]
@@ -72,7 +78,7 @@ func (s *Store) incrementalManagedReviewFallback(w Work, a Agent, c managedRevie
 	if _, e = managedGit(bare, "merge-base", "--is-ancestor", repo.Candidate, c.Candidate); e != nil {
 		return c, fmt.Errorf("candidat non descendant de la base acceptée")
 	}
-	delta, e := managedGit(bare, "diff", "--no-ext-diff", "--no-textconv", "--full-index", "--unified=40", repo.Candidate, c.Candidate, "--")
+	delta, e := managedReviewGit(c.CitationContractVersion, bare, "diff", "--no-ext-diff", "--no-textconv", "--full-index", "--unified=40", repo.Candidate, c.Candidate, "--")
 	if e != nil {
 		return c, e
 	}
@@ -98,10 +104,23 @@ func sameManagedBaseline(a, b *ManagedReviewBaseline) bool {
 }
 
 func incrementalReviewPrefix(prefix string, c managedReviewContext) string {
+	if c.CitationContractVersion == 2 {
+		prefix += "\n" + managedReferencedCitationGuidance + "\n"
+	}
+	if c.CitationContractVersion == 1 {
+		prefix += managedReviewCitationConventions
+	}
+	if c.InspectionScopeVersion == 1 {
+		prefix += managedFragmentScopeDecisionInstructions
+	}
 	if c.Baseline == nil {
 		return prefix
 	}
-	return prefix + "\nREVUE INCRÉMENTALE : accepted_baseline désigne uniquement la base précédente déjà acceptée. Le moteur a vérifié les empreintes des contextes, reçus et réponses conservés de ces avis. Le diff contient TOUS les changements de cette base vers candidate_commit ; les rapports, critères et contrôles joints concernent TOUS les résultats sur le nouveau candidat. Examiner les régressions et interactions du delta avec les tâches anciennes, avec les sources courantes jointes. Les avis antérieurs ne valent PAS avis sur le nouveau candidat. Réévaluer CHAQUE critère : pass seulement si les preuves actuelles et la base vérifiée suffisent, sinon unknown ou fail. Ne pas inventer le contenu des fichiers historiques non joints. Les citations doivent provenir du diff actuel, du rapport actuel ou des contrôles actuels, jamais d'un ancien avis seul.\n"
+	result := prefix + "\nREVUE INCRÉMENTALE : accepted_baseline désigne uniquement la base précédente déjà acceptée. Le moteur a vérifié les empreintes des contextes, reçus et réponses conservés de ces avis. Le diff contient TOUS les changements de cette base vers candidate_commit ; les rapports, critères et contrôles joints concernent TOUS les résultats sur le nouveau candidat. Examiner les régressions et interactions du delta avec les tâches anciennes, avec les sources courantes jointes. Les avis antérieurs ne valent PAS avis sur le nouveau candidat. Réévaluer CHAQUE critère : pass seulement si les preuves actuelles et la base vérifiée suffisent, sinon unknown ou fail. Ne pas inventer le contenu des fichiers historiques non joints. Les citations doivent provenir du diff actuel, du rapport actuel ou des contrôles actuels, jamais d'un ancien avis seul.\n"
+	if c.Baseline.Version == managedReviewBaselineContractVersion {
+		result += "\nDIFF CANONIQUE ET TRANSPORT : le delta Git canonique couvre la base accepted_baseline vers candidate_commit. Dans les messages fragmentés de sélection et décision, task_contracts_reports_controls.diff est omis du transport sous la valeur vide : cela ne signifie pas un diff Git vide. Les rows de type diff dans partial_inspections recensent exhaustivement ses sections avec noms et empreintes ; leurs extraits et opinions ne remplacent pas les pièces entières. Seules les pièces demandées dans requested_original_evidence sont fournies intégralement au décideur. changes_since_observations concerne exclusivement les observations partielles réutilisées d’un ancien candidat, pas ce delta depuis la base acceptée ; son absence ne signifie pas absence de changement. Choisir les sections entières nécessaires aux interactions et critères concernés, y compris ceux des tâches anciennes. Ne pas exiger de reconstituer toute la base inchangée par la seule présence du champ diff vidé ; si une section nécessaire manque réellement, préciser laquelle et le lien au critère puis rester unknown. Aucun avis ni inventaire ne vaut preuve d’implémentation ou acceptation.\n"
+	}
+	return result
 }
 
 // Historical evidence may be checked against its original reviewer identity.

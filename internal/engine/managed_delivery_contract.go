@@ -32,10 +32,14 @@ type DeliveryCriterion struct {
 
 const deliveryEvidenceBoundary = "Le bilan décrit les vérifications locales du producteur, pas une validation future du moteur. Le producteur exécute les vérifications autorisées dans sa copie et consigne commande, résultat observé et fichiers de preuve. status=pass signifie uniquement que ses vérifications locales couvrent réellement ce critère ; outcome=complete signifie que sa livraison locale est complète, jamais que la tâche est acceptée. Ne pas attendre la revue indépendante pour rendre ce bilan. Si une vérification locale manque ou échoue, conserver not_tested ou fail et expliquer la limite. Le moteur exécutera ensuite ses propres contrôles sur la révision candidate, puis demandera une revue indépendante ; lui seul peut accepter la tâche. Le planificateur ne doit pas demander au producteur de certifier un contrôle du moteur qui n'a pas encore eu lieu."
 
+const deliveryReadyBoundary = "Bilan version 2 : outcome=ready signifie que les sources et recettes sont prêtes pour les contrôles obligatoires du moteur, sans acceptation ni certification locale inventée. Si une capacité de votre environnement empêche une vérification, conserver status=not_tested et son motif ; déclarer les sources complètes et les identifiants des contrôles autorisés qui vérifieront ce critère. ready exige une politique automatique couvrant chaque critère ; un échec produit connu reste fail et bloque la remise. Ne pas relancer un contrôle sur une permission inchangée. Le moteur doit exécuter ses contrôles dans son contexte sur ce candidat puis obtenir la revue indépendante avant toute acceptation."
+
+const deliveryNegativeCheckBoundary = "Pour un test de refus, garder valides tous les autres champs que la variation visée et vérifier le motif attendu ainsi que l’absence de mutation métier. Après ajout d’une règle obligatoire, réexaminer les anciens cas négatifs : un refus déclenché par une autre garde ne démontre pas la protection annoncée. Pour une garde critique, un retrait contrôlé dans une fixture isolée doit faire échouer le cas nommé ; conserver cette preuve et ne jamais livrer la mutation."
+
 const reviewSourceBoundary = "Le vérificateur est sans outils. Les fichiers déclarés dans delivery.criteria[].evidence sont joints intégralement depuis le candidat Git testé, même inchangés, avec blob et SHA256 ; le rapport est déjà fourni intégralement. Déclarer les originaux nécessaires, pas seulement un rapport qui les cite. docs/TASK-ID.review-context.json (version 1, files de chemins relatifs Git) ajoute des sources complémentaires. Les limites de contexte restent applicables : une source invalide, absente, non textuelle ou trop grande bloque avant l'appel payant, sans troncature. Pour un refus unknown, distinguer résultat incorrect et pièce non fournie ; une reprise doit nommer le manque, l'original à déclarer et la vérification attendue. Ajouter seulement des citations ou des numéros de ligne ne remplace pas l'original. Ne pas modifier artificiellement une source inchangée pour la faire entrer dans le diff. Une source transmise n'est ni une lecture comprise ni une acceptation."
 
 func managedDeliveryInstructions(t *Task, attempt string) string {
-	manifest := ManagedDelivery{Version: 1, Task: t.ID, Attempt: attempt, Contract: reviewContract(t), Outcome: "partial"}
+	manifest := ManagedDelivery{Version: 2, Task: t.ID, Attempt: attempt, Contract: reviewContract(t), Outcome: "partial"}
 	for i := range t.Criteria {
 		ids := []string{}
 		if t.ValidationPolicy != nil {
@@ -56,7 +60,7 @@ func managedDeliveryInstructions(t *Task, attempt string) string {
 		checks, _ := json.MarshalIndent(t.ValidationPolicy.Controls, "", "  ")
 		controls = "\nContrôles configurés à reproduire localement avec leurs options, dans les permissions de la copie. Ne pas modifier leur définition pour obtenir un succès. Leur exécution locale ne remplace pas celle du moteur :\n" + string(checks) + "\n"
 	}
-	return "\n" + deliveryEvidenceBoundary + "\n" + reviewSourceBoundary + controls + "\nBILAN DE LIVRAISON REQUIS : écrire docs/" + t.ID + ".delivery.json dans cette copie, en plus du rapport Markdown. Le moteur contrôle ce bilan avant la revue payante. Garder task/attempt/contract et un élément par critère. outcome=complete seulement si TOUS les critères sont démontrés localement ; sinon partial ou blocked. status=pass, fail, not_tested ou not_applicable ; expliquer chaque résultat dans reason. controls référence uniquement les identifiants de contrôles autorisés pour ce critère, jamais une commande libre ; evidence référence des fichiers suivis de cette copie (chemins relatifs à la racine Git). Une preuve absente ou une non-applicabilité conserve un résultat incomplet à examiner. Ne pas réduire un critère au test le plus facile : traiter toutes ses obligations, y compris les interactions navigateur demandées. Ne pas inventer de preuve ni transformer un non-testé en pass. Ce bilan n’est pas une acceptation.\n" + string(data) + "\n"
+	return "\n" + deliveryEvidenceBoundary + "\n" + deliveryReadyBoundary + "\n" + deliveryNegativeCheckBoundary + "\n" + reviewSourceBoundary + controls + "\nBILAN DE LIVRAISON REQUIS : écrire docs/" + t.ID + ".delivery.json dans cette copie, en plus du rapport Markdown. Le moteur contrôle ce bilan avant la revue payante. Garder task/attempt/contract et un élément par critère. outcome=complete seulement si TOUS les critères sont démontrés localement ; ready si les sources et recettes sont prêtes à être contrôlées conformément au contrat version 2 ; sinon partial ou blocked. status=pass, fail, not_tested ou not_applicable ; expliquer chaque résultat dans reason. controls référence uniquement les identifiants de contrôles autorisés pour ce critère, jamais une commande libre ; evidence référence des fichiers suivis de cette copie (chemins relatifs à la racine Git). Une preuve absente ou une non-applicabilité conserve un résultat incomplet à examiner. Ne pas réduire un critère au test le plus facile : traiter toutes ses obligations, y compris les interactions navigateur demandées. Ne pas inventer de preuve ni transformer un non-testé en pass. Ce bilan n’est pas une acceptation.\n" + string(data) + "\n"
 }
 
 func deliveryIncomplete(reason string) error {
@@ -81,14 +85,18 @@ func (s *Store) managedDelivery(w Work, t *Task, a Agent, candidate string) (*Ma
 	if e = strict([]byte(source.Content), &d); e != nil {
 		return nil, deliveryIncomplete("bilan de livraison invalide : " + e.Error())
 	}
-	if d.Version != 1 || d.Task != t.ID || d.Attempt != a.Attempt || d.Contract != reviewContract(t) {
+	if (d.Version != 1 && d.Version != 2) || (d.Version == 2 && a.DeliveryVersion != 2) || d.Task != t.ID || d.Attempt != a.Attempt || d.Contract != reviewContract(t) {
 		return nil, deliveryIncomplete("bilan attribué à une autre tâche, tentative ou consigne")
 	}
-	if d.Outcome != "complete" && d.Outcome != "partial" && d.Outcome != "blocked" {
+	ready := d.Version == 2 && d.Outcome == "ready"
+	if d.Outcome != "complete" && d.Outcome != "partial" && d.Outcome != "blocked" && !ready {
 		return nil, deliveryIncomplete("état de livraison inconnu")
 	}
 	if len(d.Criteria) != len(t.Criteria) || t.ValidationPolicy == nil {
 		return nil, deliveryIncomplete("critères ou contrôles manquants")
+	}
+	if ready && t.ValidationPolicy.Mode != "automatic" {
+		return nil, deliveryIncomplete("la remise ready exige des contrôles automatiques autorisés")
 	}
 	seen := map[int]bool{}
 	for _, c := range d.Criteria {
@@ -96,7 +104,7 @@ func (s *Store) managedDelivery(w Work, t *Task, a Agent, candidate string) (*Ma
 			return nil, deliveryIncomplete("critère inconnu ou dupliqué")
 		}
 		seen[c.Index] = true
-		if c.Status != "pass" || strings.TrimSpace(c.Reason) == "" {
+		if (c.Status != "pass" && !(ready && c.Status == "not_tested")) || strings.TrimSpace(c.Reason) == "" {
 			return nil, deliveryIncomplete(fmt.Sprintf("critère %d non démontré (%s) : %s. %s", c.Index, c.Status, guardBlock(c.Reason, 300), deliveryEvidenceBoundary))
 		}
 		if len(c.Controls) == 0 || len(c.Evidence) == 0 || len(c.Evidence) > 24 {
@@ -131,7 +139,7 @@ func (s *Store) managedDelivery(w Work, t *Task, a Agent, candidate string) (*Ma
 			}
 		}
 	}
-	if d.Outcome != "complete" {
+	if d.Outcome != "complete" && !ready {
 		return nil, deliveryIncomplete("le producteur déclare un résultat partiel ou bloqué")
 	}
 	return &d, nil

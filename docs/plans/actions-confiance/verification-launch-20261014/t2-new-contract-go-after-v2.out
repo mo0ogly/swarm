@@ -1,0 +1,8 @@
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+--- PASS: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (2.08s)
+=== RUN   TestActionsConfianceT2ReplayBindsAuthenticatedAuthority
+--- PASS: TestActionsConfianceT2ReplayBindsAuthenticatedAuthority (0.44s)
+=== RUN   TestActionsConfianceT2IdempotencyRestartAndReconciliation
+--- PASS: TestActionsConfianceT2IdempotencyRestartAndReconciliation (1.01s)
+PASS
+ok  	swarm.local/companion/internal/engine	4.699s

@@ -1,0 +1,6 @@
+{
+  "original_error": "KeyError: inputs while comparing previous run manifest",
+  "cause": "old run stores a count, its input hashes are in a separate inputs-final.json; format assumed without producer inspection",
+  "correction": "inspected actual keys and manifest inventory, used explicit 1056-entry inputs-final.json",
+  "check": "only two existing Go files and shared contract differ outside web/virtual resources, two new Go inputs; unrelated review fixtures preserved"
+}

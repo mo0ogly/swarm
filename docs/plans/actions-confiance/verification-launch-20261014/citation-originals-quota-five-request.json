@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "event_id": "citation-reference-contract-qualified-five-calls",
+  "expected_revision": 402,
+  "limits": {
+    "review_context_files": 31,
+    "review_source_bytes": 98304,
+    "review_context_bytes": 368640,
+    "review_delivery_files": 100,
+    "planning_scopes": 0,
+    "delegation_depth": 0,
+    "planning_tasks": 20,
+    "planning_activations": 40,
+    "planning_decisions": 40,
+    "review_calls": 85
+  },
+  "reason": "Reprise du même candidat sous le contrat de références version 2 et lecture Git exacte, qualifiée par les contre-exemples, contrôles race et parcours publics isolés. Aperçu public : trois inspections et deux appels finaux requis, zéro avis réutilisé. Autorisation utilisateur existante de relever les budgets nécessaires au projet ; 80 appels consommés et toutes les tentatives conservés. Cette hausse ne qualifie ni le pilote ni sa diffusion."
+}

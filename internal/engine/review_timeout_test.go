@@ -19,8 +19,17 @@ func TestReviewTimeoutConfigurationPreservesBudgetAndHistory(t *testing.T) {
 	if seconds, err := reviewTimeoutSeconds(w.Planning.Reviewer); err != nil || seconds != 0 {
 		t.Fatal(seconds, err)
 	}
-	for _, seconds := range []int{-1, int(int64(^uint64(0)>>1)/int64(time.Second)) + 1} {
-		if _, err := s.planningChange(w.ID, "review-timeout", PlanningRequest{Schema: 1, EventID: newID("invalid-"), Revision: w.Revision, ReviewTimeoutSeconds: seconds, Reason: "Explicit fixture configuration"}); err == nil {
+	for _, seconds := range []int64{-1, int64(^uint64(0)>>1)/int64(time.Second) + 1} {
+		raw, err := json.Marshal(map[string]any{"schema_version": 1, "event_id": newID("invalid-"), "expected_revision": w.Revision, "review_timeout_seconds": seconds, "reason": "Explicit fixture configuration"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var request PlanningRequest
+		err = strict(raw, &request)
+		if err == nil {
+			_, err = s.planningChange(w.ID, "review-timeout", request)
+		}
+		if err == nil {
 			t.Fatalf("invalid timeout accepted: %d", seconds)
 		}
 	}

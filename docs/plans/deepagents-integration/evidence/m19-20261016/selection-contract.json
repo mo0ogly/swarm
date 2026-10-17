@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestMemorySummarySelection.*|TestMemorySummarySource.*|TestContextPreviewFreezesAndRejectsDrift|TestMemoryRuntimeRecoveryContextMatchesProviderAndPersists|TestLaunchAtomicIdempotentAndWorkspaceExclusive)$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T20:10:09.506225+00:00",
+  "duration_seconds": 2.149,
+  "exit_code": 1,
+  "named_tests_ran": [],
+  "changed_inputs": [],
+  "log_sha256": "80916c767af7363c90b8c8a66a8d2174aa92c27f7c9601a5228da43e4f805607",
+  "real_model_calls": 0
+}

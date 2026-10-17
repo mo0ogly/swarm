@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"01a14379-6c9a-7143-980b-849393d5255e"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Code Mode is unavailable because code-mode host is disabled. Code mode will fail closed; enable `features.code_mode_host` and install `codex-code-mode-host`."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"{\"decision\":\"restore_and_evaluate\",\"actions\":[\"verify_archive\",\"restore_artifact\",\"evaluate_current\"],\"admission\":\"after_fresh_pass\",\"acceptance\":\"unchanged\",\"reason\":\"L’archive disponible correspond à l’empreinte requise, mais la cible actuelle est absente et l’acceptation historique ne la valide pas. Il faut vérifier l’archive, restaurer l’artefact depuis cet original vérifié, puis obtenir une évaluation fraîche avant toute admission.\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":16895,"cached_input_tokens":5888,"cache_write_input_tokens":0,"output_tokens":272,"reasoning_output_tokens":162}}

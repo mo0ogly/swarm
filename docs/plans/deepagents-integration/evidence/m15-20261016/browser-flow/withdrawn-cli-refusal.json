@@ -1,0 +1,9 @@
+{
+  "error": "Reprise de conversation : faits modifiés ou frontière non confirmée ; relire le diagnostic",
+  "failure": {
+    "code": "preview_stale",
+    "message": "Reprise de conversation : faits modifiés ou frontière non confirmée ; relire le diagnostic",
+    "retryable": false
+  },
+  "schema_version": 1
+}

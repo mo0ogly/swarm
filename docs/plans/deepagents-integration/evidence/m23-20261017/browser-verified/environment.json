@@ -1,0 +1,20 @@
+{
+  "root": "/tmp/swarm-memory-ui-G3U6is",
+  "binary": "/tmp/swarm-m19-bin-o0uuhvjr/swarm",
+  "bundle": "/tmp/swarm-memory-m3-jdee3kwu/source.zip",
+  "url": "http://127.0.0.1:41927/session/session-1e3f68bf8ea1aea6c98a8ef2",
+  "mode": "candidate frontend over retained real API",
+  "assets": "/home/fpizzi/Documents/ChatGPT/swarm/web",
+  "inputs": {
+    "binary": "026fcf377d64cd43951e5c7fc3a6d20ee5ea42c9323e3ffeaf65b1566895f7e2",
+    "bundle": "584dc34ca387930f7a4296edfcb97fe09133a7b39a71f6d06cdb5aae4b1a4dce",
+    "recipe": "8cf581e5abbd55c209dfe42cb94b6e282711fec9b7dc1dd90a6cb7d7291d2500",
+    "assets": {
+      "project-memory.html": "26bc72ba4551db35d89ecfe4e617f2fb7063763d2e59e8f68435be357e3a217a",
+      "project-memory.js": "644c51f5cef3b18118c004446925c2de4814177c245d315ad47a7ceb31fe2b18",
+      "project-memory.css": "32404c65ddd6075386cb9ab1a72a30865d7ef2b69f667ad70616258045e04fdd",
+      "signals.js": "38fa9e333b2b874d165f33436823ce6bb6dc4fe37e04a80637239d961c39cb99",
+      "signals.css": "69136aecc40063438ace306231d1e1b5aa18a059be8b79503828e1ae58f51c8a"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^(TestMemorySummarySource.*|TestProjectMemoryPublicLifecycle|TestContextPreviewFreezesAndRejectsDrift)$",
+    "-count=1",
+    "-v"
+  ],
+  "started_at_utc": "2026-10-16T19:50:14.090342+00:00",
+  "duration_seconds": 17.827,
+  "exit_code": 0,
+  "named_tests_ran": [
+    "TestMemorySummarySourceWrongMethodDoesNotReturnCatalog",
+    "TestMemorySummarySourceCLIAPIParityAndSessionProtection",
+    "TestMemorySummarySourceRejectsInvalidStaleAndIncompleteSelection",
+    "TestMemorySummarySourceRejectsChangedStoredAnswerAndInvalidWork",
+    "TestMemorySummarySourceCLIExportsExactSelectedSourcesWithoutMutation",
+    "TestContextPreviewFreezesAndRejectsDrift",
+    "TestProjectMemoryPublicLifecycle"
+  ],
+  "changed_inputs": [],
+  "log_sha256": "048fa5d58cd32bc4c985c07a60fafb99b5b259767adcc3e44b1bd80bb404cb58",
+  "real_model_calls": 0
+}

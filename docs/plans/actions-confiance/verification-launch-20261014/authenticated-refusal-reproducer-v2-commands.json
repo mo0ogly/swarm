@@ -1,0 +1,62 @@
+[
+  {
+    "argv": [
+      "/tmp/swarm-actions-confiance-launch/t2-final-authority-key-binary",
+      "--root",
+      "/tmp/swarm-authenticated-refusal-7o3u08y5",
+      "--json",
+      "trust",
+      "config-apply",
+      "--input",
+      "-"
+    ],
+    "input_sha256": "43ad2f980506dd57b616e09b86f6e66e2f3aa42797ad931513bb2c2d8fd374f3",
+    "exit_code": 0,
+    "stdout": "{\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"evidence_count\": 0,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect-service\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {},\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/swarm-actions-confiance-launch/t2-final-authority-key-binary",
+      "--root",
+      "/tmp/swarm-authenticated-refusal-7o3u08y5",
+      "--json",
+      "trust",
+      "show"
+    ],
+    "input_sha256": null,
+    "exit_code": 0,
+    "stdout": "{\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"evidence_count\": 0,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect-service\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {},\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/tmp/swarm-actions-confiance-launch/t2-final-authority-key-binary",
+      "--root",
+      "/tmp/swarm-authenticated-refusal-7o3u08y5",
+      "--json",
+      "trust",
+      "mandate-create",
+      "--input",
+      "-"
+    ],
+    "input_sha256": "811f46b4b7eb551becf2679faa735aff879659ba1e609596d3a23158c827d6b4",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "{\n  \"error\": \"mandat invalide\",\n  \"failure\": {\n    \"code\": \"command_failed\",\n    \"message\": \"mandat invalide\",\n    \"retryable\": false\n  },\n  \"schema_version\": 1\n}\n"
+  },
+  {
+    "argv": [
+      "/tmp/swarm-actions-confiance-launch/t2-final-authority-key-binary",
+      "--root",
+      "/tmp/swarm-authenticated-refusal-7o3u08y5",
+      "--json",
+      "trust",
+      "show"
+    ],
+    "input_sha256": null,
+    "exit_code": 0,
+    "stdout": "{\n  \"actions\": {},\n  \"amount_minor_text\": {},\n  \"evidence_count\": 0,\n  \"identities\": [\n    {\n      \"integrity\": 3,\n      \"roles\": [\n        \"admin\"\n      ],\n      \"subject\": \"admin\"\n    },\n    {\n      \"integrity\": 1,\n      \"roles\": [\n        \"requester\"\n      ],\n      \"subject\": \"alice\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"approver\"\n      ],\n      \"subject\": \"bob\"\n    },\n    {\n      \"integrity\": 2,\n      \"roles\": [\n        \"effect\"\n      ],\n      \"subject\": \"effect-service\"\n    }\n  ],\n  \"ledger\": [],\n  \"limits\": [\n    \"aucun paiement réel\",\n    \"jetons du pilote local\",\n    \"preuve locale non ancrée par un tiers\"\n  ],\n  \"mandates\": {},\n  \"originals_missing\": 0,\n  \"policy\": {\n    \"mandate_ttl_seconds\": 3600,\n    \"unknown_reconcile_seconds\": 0,\n    \"evidence_retention_days\": 365,\n    \"require_separation\": true\n  },\n  \"policy_bounds\": {\n    \"evidence_retention_days\": {\n      \"max\": 9007199254740991,\n      \"min\": 1\n    },\n    \"mandate_ttl_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    },\n    \"unknown_reconcile_seconds\": {\n      \"max\": 9223372036,\n      \"min\": 0\n    }\n  },\n  \"revision\": 1,\n  \"schema_version\": 1,\n  \"simulation\": true\n}\n",
+    "stderr": ""
+  }
+]

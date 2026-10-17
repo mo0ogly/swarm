@@ -20,20 +20,21 @@ type MissionWait struct {
 	Reason string `json:"reason"`
 }
 type RecoveryPreview struct {
-	Work         string             `json:"work"`
-	Task         string             `json:"task"`
-	Revision     int                `json:"revision"`
-	Agent        string             `json:"agent,omitempty"`
-	Kept         []string           `json:"kept"`
-	Redone       []string           `json:"redone"`
-	Correction   string             `json:"correction"`
-	Criteria     []string           `json:"criteria"`
-	Limits       string             `json:"limits"`
-	SinceRefusal *MissionChanges    `json:"since_refusal,omitempty"`
-	Evidence     []RecoveryEvidence `json:"evidence,omitempty"`
-	Remaining    []string           `json:"remaining_criteria"`
-	RefusalNote  string             `json:"refusal_note"`
-	EvidenceNote string             `json:"evidence_note"`
+	Dialogue     *DialogueRecoveryPreview `json:"dialogue,omitempty"`
+	Work         string                   `json:"work"`
+	Task         string                   `json:"task"`
+	Revision     int                      `json:"revision"`
+	Agent        string                   `json:"agent,omitempty"`
+	Kept         []string                 `json:"kept"`
+	Redone       []string                 `json:"redone"`
+	Correction   string                   `json:"correction"`
+	Criteria     []string                 `json:"criteria"`
+	Limits       string                   `json:"limits"`
+	SinceRefusal *MissionChanges          `json:"since_refusal,omitempty"`
+	Evidence     []RecoveryEvidence       `json:"evidence,omitempty"`
+	Remaining    []string                 `json:"remaining_criteria"`
+	RefusalNote  string                   `json:"refusal_note"`
+	EvidenceNote string                   `json:"evidence_note"`
 }
 
 // RecoveryEvidence (REQ-QW4): one entry per report/artifact bound to the task's
@@ -238,24 +239,18 @@ func (s *Store) recoveryPreview(work, task, agent string) (RecoveryPreview, erro
 	if e != nil {
 		return RecoveryPreview{}, e
 	}
-	agents, e := s.agents(work)
+	a, e := s.recoveryAgent(work, task, agent)
 	if e != nil {
 		return RecoveryPreview{}, e
 	}
-	var p RecoveryPreview
-	found := false
-	for i := range agents {
-		a := &agents[i]
-		if a.TaskID == task && (agent == "" || a.ID == agent) {
-			p, found = recoveryPreviewFor(w, t, a), true
-			break
-		}
+	p := recoveryPreviewFor(w, t, a)
+	p.Dialogue, e = s.dialogueRecovery(w, t, a)
+	if e != nil {
+		return RecoveryPreview{}, e
 	}
-	if !found {
-		if agent != "" {
-			return RecoveryPreview{}, fmt.Errorf("tentative hors tâche ou introuvable")
-		}
-		p = recoveryPreviewFor(w, t, nil)
+	if p.Dialogue != nil {
+		p.Kept = append(p.Kept, "État de dialogue conservé avec sa portée, ses gardes et les usages reçus.")
+		p.Redone = append(p.Redone, "Restauration de conversation distincte d’une nouvelle tentative ; aucune restauration autorisée par cet aperçu.")
 	}
 	if v, at, ok, err := s.lastRefusalRevision(w, task); err != nil {
 		p.RefusalNote = "Historique du refus indisponible ; aucun changement n’est supposé."
@@ -857,6 +852,18 @@ func printAttemptLedgers(out io.Writer, rows []AttemptLedger) {
 }
 func printRecoveryPreview(out io.Writer, p RecoveryPreview) {
 	fmt.Fprintln(out, uiText("Avant une relance"))
+	if p.Dialogue != nil {
+		fmt.Fprintln(out, uiText("Reprise de conversation"))
+		fmt.Fprintln(out, uiText(p.Dialogue.Recommendation))
+		if p.Dialogue.ResumeSupported {
+			fmt.Fprintln(out, uiText("Une reprise explicite crée une nouvelle tentative avec la même conversation ; cet aperçu ne lance aucun agent."))
+		} else {
+			fmt.Fprintln(out, uiText("La restauration de conversation n’est pas disponible ; cet aperçu ne lance aucun agent."))
+		}
+		for _, check := range p.Dialogue.Checks {
+			fmt.Fprintln(out, "- "+uiText(dialogueRecoveryCheckLabel(check.Status))+" · "+uiEngineText(check.Message))
+		}
+	}
 	for _, section := range []struct {
 		label string
 		items []string

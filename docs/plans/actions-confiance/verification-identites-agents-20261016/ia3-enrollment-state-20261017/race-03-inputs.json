@@ -1,0 +1,9 @@
+{
+  "go.mod": "32f98f0eedcf5844d634b6f18d2a3fff8950ab103b3f52d372687959e2012fdb",
+  "go.sum": "83310c9e6518e7cdfd6519e79ff4d880e25adc3199f1949a579d6d31af2caf7b",
+  "internal/enrollmentproof/proof.go": "0b7b1976be1f34f64e9233e769acb084988fbf5df593442e9b69fcfb8217440f",
+  "internal/enrollmentproof/proof_test.go": "15898ca8835dc11be94a4f747045e2bdd5c4373ed9c104b861e64f2d64243530",
+  "internal/enrollmentstate/journal.go": "c00ba0227f2a229ec4a66ff438e93ad4391124bdbe52ae4b627b71ab49503755",
+  "internal/enrollmentstate/journal_test.go": "6794264e8eae25b8cb05dcf4c59f3a698395a073079a55f1e0ab4142a497c32a",
+  "internal/enrollmentstate/recovery_test.go": "273fedf3f495bba58c314737047038aa030530f92adfdf87ac32591dd44d68aa"
+}

@@ -91,6 +91,49 @@ sequenceDiagram
 
 ## Vérifier aussi la méthode et la transmission
 
+### Sources d’une tentative interrompue
+
+Au règlement d'une tentative gérée interrompue ou en échec sans résultat remis,
+le moteur confirme la fin du processus et vérifie l’attribution de sa copie.
+Même sans tentative restante, il conserve son arbre Git dans un checkpoint immuable séparé du
+résultat de livraison. Le dossier `.git/swarm-recovery.json` du nouvel exécutant
+contient `checkpoint.commit` et le diagnostic attribué ; les sources sont
+accessibles sous `refs/swarm/recovery/previous`. Le diagnostic est aussi joint
+directement au prompt de reprise. Le candidat accepté et les compteurs restent
+inchangés. Le nouvel exécutant examine les changements conservés avant de les
+réutiliser et doit fournir de nouveaux contrôles et une nouvelle remise.
+Le responsable reçoit le manifeste et son empreinte dans `attempt_ended`. Un
+échec de conservation reste un blocage public à réconcilier, pas une reprise prouvée.
+
+Un checkpoint existant est vérifié et réutilisé, même si l’ancienne copie change
+ensuite. Une attribution, une référence, un arbre ou un chemin redirigé bloque
+la reprise. Une référence sans manifeste est conservée comme preuve incomplète
+à réconcilier par l’opérateur ; elle n’est pas écrasée par un nouveau snapshot.
+Les tentatives historiques sans fin confirmée gardent leur limite explicite.
+
+Les directives d’exécution demandent l’inventaire réel des fichiers et interfaces,
+l’utilisation du répertoire courant vérifié sans reconstruire `workdir`, et un
+contrôle du transport nécessaire avant une recette navigateur. Après un refus de
+permission, remettre le blocage et les sources sans rejouer plusieurs gates sur
+la même précondition. Ce sont des consignes transmises, pas une interception
+des outils internes du fournisseur ni une garantie d’absence d’erreur du modèle.
+
+```mermaid
+flowchart LR
+    I[Tentative interrompue] --> P{Fin et copie attribuées ?}
+    P -->|oui| C[Checkpoint immuable sans acceptation]
+    P -->|non| B[Reprise refusée, preuves conservées]
+    C --> D[Dossier et diagnostic dans la nouvelle copie]
+    D --> E[Examen et correction des sources conservées]
+    E --> V[Nouveaux contrôles et revue requis]
+```
+
+`TestManagedInterruptedRecoveryRetainsSourcesAndDiagnostic` reproduit la perte
+des sources puis vérifie leur réception dans la copie et le prompt suivants,
+sans adoption du checkpoint. Les variantes couvrent altération, manifeste absent,
+chemin redirigé, processus encore vivant et créations concurrentes. Ces fixtures
+déterministes ne démontrent pas, à elles seules, la bonne décision d’un agent réel.
+
 Examiner à chaque frontière ce qui est réellement disponible : commande et code
 de retour, original joint, projection reçue, droits du décideur, opération prise
 en charge, état persistant et candidat effectivement publié. Un chemin inscrit

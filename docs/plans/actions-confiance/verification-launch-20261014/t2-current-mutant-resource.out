@@ -1,0 +1,6 @@
+=== RUN   TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource
+    trust_actions_operator_regression_test.go:207: contradictory approval resource admitted: engine.TrustAction{ID:"act-d7b0fdffba9e24be5725", MandateID:"exact-resource", Requester:"alice", Approver:"bob", Resource:"invoice/acme", Amount:100, Currency:"EUR", Beneficiary:"ACME", IdempotencyKey:"resource-key", ContentHash:"d7b0fdffba9e24be5725faa755dcdca01d44030ece190d4e98cc5da90c785d12", OriginalHash:"4d7f46c9574c1f73afa31746c942d3a8150e16a95b1e3faf28bf3643d5424a5b", State:"approved", Reason:"", NextAction:"engager le connecteur simulé", CreatedAt:"2026-10-14T12:00:00Z", UpdatedAt:"2026-10-14T12:00:00Z"}
+--- FAIL: TestActionsConfianceT2ApprovalRejectsContradictoryProtectedResource (0.26s)
+FAIL
+FAIL	swarm.local/companion/internal/engine	0.296s
+FAIL

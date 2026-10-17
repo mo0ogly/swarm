@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/engine",
+    "-run",
+    "^TestDialogueCheckpointProgressUsesStoredBoundaryTime$",
+    "-count=1",
+    "-v",
+    "-timeout=60s"
+  ],
+  "at_utc": "2026-10-16T12:00:18.211650+00:00",
+  "exit_code": 1,
+  "log_sha256": "34c65857da5d6fa5f4afe8b7d61ba3dc08fea953710b200c2097e1e5b760a655",
+  "loop_guard_sha256": "86e719adcbeda313b2d1912370347d03574e4a70acd7cc6911bd67cf5c132ac6",
+  "state_reader_sha256": "08230d3769f25dfaaf2972e9ea7fdff48b11ae583c0acb8075121539ced0bafd",
+  "real_model_calls": 0
+}

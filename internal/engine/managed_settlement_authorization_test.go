@@ -3,6 +3,7 @@
 package engine
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -190,4 +191,51 @@ func TestManagedManualRepairAndIntegrationUseBoundedConsent(t *testing.T) {
 			t.Fatal("manual integration did not apply exact authorized result", after.Tasks[0].Status, after.Tasks[0].Blocker, managedReviewCalls(t, s), before)
 		}
 	})
+}
+
+func TestManagedSettlementAuthorityRefusalRetainsItsCause(t *testing.T) {
+	for _, kind := range []string{"absent", "revoked", "malformed"} {
+		t.Run(kind, func(t *testing.T) {
+			s, w := managedFixture(t)
+			switch kind {
+			case "absent":
+				if _, err := s.db.Exec("DELETE FROM cockpit_events WHERE work_id=? AND kind='mission-policy'", w.ID); err != nil {
+					t.Fatal(err)
+				}
+			case "revoked":
+				if err := s.setMission(w.ID, false); err != nil {
+					t.Fatal(err)
+				}
+			case "malformed":
+				if err := s.controlEvent(w.ID, "mission-policy", "not-json"); err != nil {
+					t.Fatal(err)
+				}
+			}
+			before, err := s.get(w.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			calls := managedReviewCalls(t, s)
+			_, _, err = managedSettlementLiveAuthority(s.db, w)
+			if err == nil {
+				t.Fatal("absent, revoked or malformed authority became permission")
+			}
+			if kind == "malformed" {
+				if commandFailure(err).Code == "authorization_required" || !strings.Contains(err.Error(), "illisible") {
+					t.Fatal("malformed authority lost its parse cause", err)
+				}
+			} else if commandFailure(err).Code != "authorization_required" {
+				t.Fatal("authorization refusal became a generic error", err)
+			}
+			after, err := s.get(w.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			a, _ := json.Marshal(before)
+			b, _ := json.Marshal(after)
+			if string(a) != string(b) || managedReviewCalls(t, s) != calls {
+				t.Fatal("refused authority mutated work or consumed a call")
+			}
+		})
+	}
 }

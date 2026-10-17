@@ -1,0 +1,18 @@
+{
+  "uid": 1001,
+  "kernel": "6.17.0-41-generic",
+  "architecture": "x86_64",
+  "CapEff": "0000000000000000",
+  "CapBnd": "000001ffffffffff",
+  "unprivileged_bpf_disabled": "2",
+  "btf_available": true,
+  "tools": {
+    "bpftool": "/usr/sbin/bpftool",
+    "bpftrace": "/usr/bin/bpftrace",
+    "clang": null,
+    "llc": null,
+    "cc": "/usr/bin/cc"
+  },
+  "collection_started": false,
+  "foreign_processes_observed": false
+}
