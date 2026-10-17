@@ -1,5 +1,140 @@
 [
   {
+    "path": "internal/engine/prepared_skill_refresh.go",
+    "kind": "source",
+    "sha256": "e3caa2c9b0f92514cf821848df144a69452fee5466401e5207f19c1ae9f95590"
+  },
+  {
+    "path": "internal/engine/prepared_skill_refresh_test.go",
+    "kind": "test",
+    "sha256": "525294e022e30a3c20e2f3ad23af074348222085f80944e942ed9ac27f8caab3"
+  },
+  {
+    "path": "internal/engine/prephase_answer_test.go",
+    "kind": "test",
+    "sha256": "d6be5024b89c11c82f7bbee8c33435ceaaf4f3abf91200ae5d4f2e8071ff4b29"
+  },
+  {
+    "path": "internal/engine/prephase_budget.go",
+    "kind": "source",
+    "sha256": "ccf1a1424b45bd6437e60697dd88bd4cd639a017732a00d0874bb5a2488cef7c"
+  },
+  {
+    "path": "internal/engine/prephase_budget_test.go",
+    "kind": "test",
+    "sha256": "fdaafa3c312c2074be6476b4b938fd477c648729f4ee51b55b281dfc67481e7c"
+  },
+  {
+    "path": "internal/engine/prephase_bundled_methods_test.go",
+    "kind": "test",
+    "sha256": "d5fd7fdba1c9353b706367b4b01606c3f7a6a0a9f9bc8ee10b4900c3d5296b3c"
+  },
+  {
+    "path": "internal/engine/prephase_cli.go",
+    "kind": "source",
+    "sha256": "3439976fff1310a280d4b9233fb6481a987dc41e1f9611ac45669b66ee2bab46"
+  },
+  {
+    "path": "internal/engine/prephase_context_test.go",
+    "kind": "test",
+    "sha256": "7457b820bbd3c3cdfe3ce9d9e27b571be093a397db0bd4c2e9ac1cbddf577531"
+  },
+  {
+    "path": "internal/engine/prephase_contract.go",
+    "kind": "source",
+    "sha256": "07cd35ad5d554cfc501c627ab4159a0156d5bf6b8a3721bd2a4818055afddbf5"
+  },
+  {
+    "path": "internal/engine/prephase_conversion.go",
+    "kind": "source",
+    "sha256": "2129488a6c22418cd404dc21042305b255c9b5821062885f0b534c0290040112"
+  },
+  {
+    "path": "internal/engine/prephase_conversion_test.go",
+    "kind": "test",
+    "sha256": "a1320824b880d5b0ec75acaddfb3a63ad664b7ac59c1a56d0ac704ebd5848b16"
+  },
+  {
+    "path": "internal/engine/prephase_decisions_test.go",
+    "kind": "test",
+    "sha256": "d19a57185278ca68511d146a28b9f4978340ea7ba02bea61bd02fa61e9dfe3cb"
+  },
+  {
+    "path": "internal/engine/prephase_dialogue.go",
+    "kind": "source",
+    "sha256": "f0fb1f836d1942b0c48eeaf2c3bd8bcbac7cb665b47d4ff302cf3aa62d77ab5f"
+  },
+  {
+    "path": "internal/engine/prephase_dialogue_test.go",
+    "kind": "test",
+    "sha256": "3d6485a976e9a9316a47a2f8073b734940f25e6c312a2d3ed1daaa685d461542"
+  },
+  {
+    "path": "internal/engine/prephase_external_editor.go",
+    "kind": "source",
+    "sha256": "c87793f7fdb7d674963c5688b2bfe974215fab150de487d57ea3e876063d9791"
+  },
+  {
+    "path": "internal/engine/prephase_method_sources.go",
+    "kind": "source",
+    "sha256": "92fb7ba29534802ea0ae8cc45233075edd7fd27240bb4fabe3fdccc4db16b734"
+  },
+  {
+    "path": "internal/engine/prephase_methods.go",
+    "kind": "source",
+    "sha256": "5eb53355efcf1700a84d70859cfcfab98216f57237b76ab2de275724d1b9b0d9"
+  },
+  {
+    "path": "internal/engine/prephase_organization.go",
+    "kind": "source",
+    "sha256": "ae6bdb7ee1faa2da05ef294337f3b6df66f75498d89454031a40fede6e77672a"
+  },
+  {
+    "path": "internal/engine/prephase_organization_test.go",
+    "kind": "test",
+    "sha256": "2bc7d936ac0ff0b44f5d051147726192887b6e8b4d9a773b9938bc950c9a9020"
+  },
+  {
+    "path": "internal/engine/prephase_plan.go",
+    "kind": "source",
+    "sha256": "f7a29e727091f4db7af7b2a93cbcb056763ea4f403363ae0c4d4c4d17922e672"
+  },
+  {
+    "path": "internal/engine/prephase_plan_test.go",
+    "kind": "test",
+    "sha256": "85c2b84e77e109368505315e8263996245ea4010569d99732c285f99089a32bf"
+  },
+  {
+    "path": "internal/engine/prephase_release_active_test.go",
+    "kind": "test",
+    "sha256": "8794fd8c034e0e064603ea4bafd31b7e9c763ac4f2b94d2d1ba50cd79d74331a"
+  },
+  {
+    "path": "internal/engine/prephase_repository.go",
+    "kind": "source",
+    "sha256": "e386c133b695a2f4e4aa7fd727748e296bb66f51b0c1fa1cb5fee7d2984057b7"
+  },
+  {
+    "path": "internal/engine/prephase_repository_methods_test.go",
+    "kind": "test",
+    "sha256": "0b6f609f764370250939bf69dee303a45b43b25fea296bc5f129c0909fb95b70"
+  },
+  {
+    "path": "internal/engine/prephase_revision.go",
+    "kind": "source",
+    "sha256": "4b6db32b7e7dd86dcb42a6c0cb8315c782053a4b8212a6333db8f8b8f99632c4"
+  },
+  {
+    "path": "internal/engine/prephase_runtime.go",
+    "kind": "source",
+    "sha256": "6bf95c470320c8fbb6ffd4c867c58f2880feb25ad45bde8679ce0d1d6a5e4989"
+  },
+  {
+    "path": "internal/engine/prephase_sources.go",
+    "kind": "source",
+    "sha256": "73a50109365e64b215ec0b1e1b9633c990a4c2172cdb45c53ffc64c73786db58"
+  },
+  {
     "path": "internal/engine/prephase_sources_test.go",
     "kind": "test",
     "sha256": "1ab41314f16c3b03a0d32a61f90591e2084867df56b2b8e05e3cc94004e2a302"
@@ -1007,7 +1142,12 @@
   {
     "path": "internal/engine/version_history.go",
     "kind": "source",
-    "sha256": "343ffb6630225dce1bfdb0233d713270c0895d70e291254694ae702ff9a3f12e"
+    "sha256": "291be0ab44add644f6152c5bcd7420981e4d23efe2aab0ea11a2b770e5d338c2"
+  },
+  {
+    "path": "internal/engine/version_local_changes_test.go",
+    "kind": "test",
+    "sha256": "fa320a35d3248511379d1c0f22253ef054e1093f5f0ef5b2e9d92098c380788c"
   },
   {
     "path": "internal/engine/version_test.go",
@@ -1187,7 +1327,7 @@
   {
     "path": "locales/en.json",
     "kind": "source",
-    "sha256": "77c3b4a4e3d6580fd00ff23289cc920b015be4ca2f7731772ac88d6fbc5b3740"
+    "sha256": "a4505d89d4c5b9295dd7f96e48e0e32c5b0e08d59f7928a63f3138879500df91"
   },
   {
     "path": "locales/trust-actions-en.json",
@@ -1343,150 +1483,5 @@
     "path": "tests/actions_confiance_secret_data_reopen.cjs",
     "kind": "harness",
     "sha256": "bdce723bc5842f2678dc8fa3c5191a684051582e43c36bc3567099cc83a3ded4"
-  },
-  {
-    "path": "tests/actions_confiance_secret_data_ui.cjs",
-    "kind": "harness",
-    "sha256": "b128940ae0ac6b5e90bc35d832883033c68546b78df8d078f0c5e275ca3e3247"
-  },
-  {
-    "path": "tests/actions_confiance_secret_image.py",
-    "kind": "harness",
-    "sha256": "3cd84367b0857f2e9ef20fabe13b1d919f66fdf0fd002c76396548978d48452c"
-  },
-  {
-    "path": "tests/actions_confiance_secret_readiness.py",
-    "kind": "harness",
-    "sha256": "f894f3603fbffbd74445eeeb2804890d39b1a6e7b0e56ad532552b63c05e83a5"
-  },
-  {
-    "path": "tests/actions_confiance_secret_ui.cjs",
-    "kind": "harness",
-    "sha256": "c43832cf9d10ff8241fb227f8d904ecc231b14a5b866f1ade4db21d1b5824c29"
-  },
-  {
-    "path": "tests/actions_confiance_step_up_ui.cjs",
-    "kind": "harness",
-    "sha256": "f82eb939289dadac0e3954a5ccf2ca05041a33d4dfa610765214f4754f86b653"
-  },
-  {
-    "path": "tests/actions_confiance_t2.py",
-    "kind": "harness",
-    "sha256": "70c68059fcfadcc1dfd115c29daee6eea38995f404548cad84e85c80bb1a1d53"
-  },
-  {
-    "path": "tests/actions_confiance_t2_ui.cjs",
-    "kind": "harness",
-    "sha256": "adb38ef648422ff9fa7c0bfe2b3e646f544ef5c2bfab5abbbeae96cc454c8c7c"
-  },
-  {
-    "path": "tests/actions_confiance_t5.py",
-    "kind": "harness",
-    "sha256": "3b284f7cf3ce8fe9a564791fc74b5b91bc2f504a1e0f0da82ef98d376dc3f819"
-  },
-  {
-    "path": "tests/actions_confiance_workload_ui.cjs",
-    "kind": "harness",
-    "sha256": "f4cbfa0d2ec0a6309cbaeba055b510c5d978b7e4f006c390c6b761e6761d83ce"
-  },
-  {
-    "path": "tests/agent_terminal_ui.cjs",
-    "kind": "test",
-    "sha256": "fecd99cd039b48d9423a9fdf560dd961867f3d6699d5d351c3372ec1df276093"
-  },
-  {
-    "path": "tests/ai_connections_response_test.cjs",
-    "kind": "test",
-    "sha256": "2dce270a348d9550b963152a1c42b5d7247a1b19f31b0e60f71e026c637773a9"
-  },
-  {
-    "path": "tests/api_wait_admin_ui.cjs",
-    "kind": "harness",
-    "sha256": "293359b67270290d3e7031d7c7e6ab478e4c1d71d5fedac36fa060794c642c6f"
-  },
-  {
-    "path": "tests/asset_loading_policy_test.cjs",
-    "kind": "harness",
-    "sha256": "54dcd1a9cea1708b5fb1891069cabc8b810488e76cf5f16ed106571349564165"
-  },
-  {
-    "path": "tests/audit_acceptance.cjs",
-    "kind": "harness",
-    "sha256": "1ac8a5d7036060f0fa3c1bd0075e84e2584e079dbf960c97e33e39c75faa2666"
-  },
-  {
-    "path": "tests/call_ledger_test.cjs",
-    "kind": "harness",
-    "sha256": "f4e2d24c9c8ab8d4b341ce33f01dc9d6817b5079a64b34aa466b1421f6c04b5b"
-  },
-  {
-    "path": "tests/call_ledger_ui.cjs",
-    "kind": "harness",
-    "sha256": "9178383ac51aa1e34564528be82b96df358e63382127e4632179271291a5f490"
-  },
-  {
-    "path": "tests/context_help_ui.cjs",
-    "kind": "test",
-    "sha256": "065a425e57675a62926ccd5cfe11c49d4f5d9f12c1dfaa438b17aafec1581f0e"
-  },
-  {
-    "path": "tests/dense_text_ui.cjs",
-    "kind": "test",
-    "sha256": "4673fd9e2075932b1046e4f3c76df98164a769f4ac683351363545dc87fc8fca"
-  },
-  {
-    "path": "tests/design_system_ui.cjs",
-    "kind": "test",
-    "sha256": "d3728a57a2c4dab63c23a197165dd61c7d537c38aeb2d221d3e2de110173642b"
-  },
-  {
-    "path": "tests/engine_acceptance.cjs",
-    "kind": "harness",
-    "sha256": "19c685b28ff043eb8e8257cf617fe247f3b9656f36acc69a1a0d421d30c07869"
-  },
-  {
-    "path": "tests/final_acceptance.cjs",
-    "kind": "harness",
-    "sha256": "c91f34bf5ac9deb4c1624c6a391fb4b885713745ac21b7e305538c1158e51e13"
-  },
-  {
-    "path": "tests/graph_automation_e2e.cjs",
-    "kind": "test",
-    "sha256": "c30c9e7d8fc998da75428bffd71175172decd47f61ee3827e399b294a68ef85f"
-  },
-  {
-    "path": "tests/graph_delivery_docs.py",
-    "kind": "test",
-    "sha256": "c7708bf7dc7ea6b93d3a92be23d3a5fd5925bcd7c579e0b73cc0f5fc6892980a"
-  },
-  {
-    "path": "tests/graph_layout_cache_test.cjs",
-    "kind": "test",
-    "sha256": "1dc5a1e7f1c6ef4a92e451cdff44c1cc1941dbd4ae29c6766344b51ca7004c22"
-  },
-  {
-    "path": "tests/graph_performance_adapter_test.cjs",
-    "kind": "harness",
-    "sha256": "0874aa166b477b8a9f36d3d35fdbe398a06a7193b2ef587a9a03da001b642732"
-  },
-  {
-    "path": "tests/graph_performance_admin_ui.cjs",
-    "kind": "harness",
-    "sha256": "156f31780f171eaf250d5903b24276e8594bf481ab04e8ea688e4d3d320f3d1d"
-  },
-  {
-    "path": "tests/graph_performance_ui.cjs",
-    "kind": "harness",
-    "sha256": "e12c19c03eea5d747fb037f197e10a985acd7085048498f2bf8ad70ff3c91ecd"
-  },
-  {
-    "path": "tests/graph_studio_test.cjs",
-    "kind": "harness",
-    "sha256": "cbf25c1d25cd5069b6104403f03ed2fe457383749a5eed0a23e3512acf48226b"
-  },
-  {
-    "path": "tests/graph_studio_ui.cjs",
-    "kind": "harness",
-    "sha256": "1516be5c6c3769e655b9fb6b128eddd934416e460abff368f15e8d7cbdf2e97f"
   }
 ]

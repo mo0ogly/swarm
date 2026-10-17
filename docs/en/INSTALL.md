@@ -388,6 +388,33 @@ make build
 docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
 ```
 
+For a source-managed server (`bin/swarm` or `bin/swarm-local`), `swarm.sh`
+prepares the binary before stopping the instance and assigns a local prerelease
+`vMAJOR.MINOR.PATCH-dev.N`. Its base is the next patch after the latest release
+declared in `version_history.json`. Changed effective build inputs increment `N`;
+identical inputs retain their number and verified binary. Local tracking persists
+in `deploy/local-build.json` (Git-ignored), covering actual Go sources, embedded
+resources, effective overlay bytes and build settings. A failed build or sources
+changing during compilation leaves the previous server running.
+
+Update French/English `local_changes` in `version_history.json`, then use:
+
+```sh
+./swarm.sh build
+./swarm.sh restart --root /path/to/project
+```
+
+Configuration retains the address and binary selection; check agents before
+restart. `build` can prepare a candidate while the server remains active;
+`restart` installs it after stopping only the managed process. An external
+prebuilt `--binary` is reused without rebuilding. `SWARM_VERSION` remains an
+explicit override; calling `build.sh` directly still uses the exact tag or
+`devel` without that variable. After restart, check **Version and what's new**:
+actual number, localized changes, binary commit and uncommitted-change disclosure.
+A local prerelease creates no Git tag or GitHub release. Local changes remain
+separate from published releases; their Git base is not presented as containing
+the uncommitted edits.
+
 An explicit release requires a SemVer version, a 40-character SHA, a known
 modified state and a UTC date; `SOURCE_DATE_EPOCH` supports reproducible builds.
 The Docker build accepts `SWARM_VERSION`, `SWARM_COMMIT`, `SWARM_MODIFIED` and
@@ -398,8 +425,9 @@ metadata have been checked.
 dialog keeps the **running binary** separate from **local sources**: `*` in the
 summary describes the binary at build time, while local checkout dirtiness is a
 separate source fact. Comparison makes no network request. The embedded release
-list is currently empty because no release is declared; the UI says so and links
-to the complete GitHub commit history. Escape closes the dialog and restores
+list comes from `version_history.json` and contains explicitly declared releases;
+the UI says when it is empty and links to the complete GitHub commit history.
+Escape closes the dialog and restores
 focus to its trigger.
 
 ![English cockpit, State theme](../screenshots/version-history/cockpit-en-etat.png)

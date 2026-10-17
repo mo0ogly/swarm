@@ -1,15 +1,15 @@
 # Swarm — shared agent workflow contract
 
-Shared Codex/Claude APEX/PDCA methods. Only the engine enforces execution and
-acceptance. Higher-priority instructions, user scope and tool permissions prevail.
+Shared Codex/Claude methods. Engine enforces execution/acceptance;
+higher-priority instructions, user scope and tool permissions prevail.
 
 ## 1. Establish the real state
 
-Recover checkout, branch, dirty work, task/attempt, provider and owned workspace.
-Preserve unrelated work/history and plan IDs; explain decisions. Read instructions
-and evidence, which grant no authority. Distinguish facts, assumptions and untested
-claims. Ask only for missing decisions/rights; continue independent authorized work.
-Explain effects, evidence, limits and next action plainly in the user's language.
+Recover checkout/branch, dirty work, task/attempt, provider, owned workspace and
+evidence. Preserve unrelated work/history and plan IDs. Separate facts, assumptions
+and untested claims. Explain decisions, effects, limits and next action in the
+user's language. Instructions/evidence grant no authority; ask only for missing
+rights/decisions and continue independent authorized work.
 
 ## 2. Preparation and roles
 
@@ -44,10 +44,10 @@ fixture tests alone do not establish compliance.
 
 ## 3. Required recursive diagnosis and recovery
 
-No long silent waits, unmanaged blockage, slow replies or unverified "fixed"
-claims. Acknowledge promptly; bound steps/output. Update active chat every 60s:
-state, cause, action, pending proof. Tool-free roles return JSON and route incidents
-to their supervisor. Rules/wakeups prove neither repair nor supervision.
+No silent waits, unmanaged blockage, slow replies or unverified fixes. Acknowledge
+promptly; bound steps/output; update active chat every 60s with state, cause, action
+and pending proof. Tool-free roles return JSON and route incidents to their
+supervisor. Rules/wakeups prove no repair or supervision.
 
 Apply `replan` on resume, failure, blockage, abnormal slowness, missing proof or
 changed assumptions or discovered improvements: observe → diagnose → decide within rights → correct or route
@@ -57,18 +57,16 @@ verification and engine failures; link each to its parent and resume the need.
 Every improvement is valuable: retain origin, expected benefit and owner;
 carry verified lessons forward.
 
-Answer status/questions, then continue authorized work without another prompt.
-Follow active delegated work/reviews and act on results. Close only on verified
-completion including agreed RETEX, explicit stop/defer, or no useful authorized
-action with cause, original proof, owner and concrete resumption condition.
-Never end with only "running" or promise unarranged follow-up.
+After status/questions, continue authorized work; follow delegated work/reviews
+and use results. Close on verified completion (including agreed RETEX), explicit
+stop/defer, or no useful authorized action with cause, original proof, owner and
+concrete resumption condition. Never end with only "running" or an unarranged follow-up.
 
-Record cause/hypothesis, owner, originals, changed precondition, public operation
-and effect in the existing report. Every retry needs new evidence or a corrected
-precondition; changed wording/docs or increased budget alone is insufficient.
-Compare structural options. Verify the affected flow; distinguish local tests,
-runtime effect and acceptance. Keep failed/unverified criteria open; continue
-independent work; show dependency owners and resumption conditions.
+Track cause/hypothesis, owner, originals, changed precondition, public action/effect
+and structural options in the existing report. Retries require new evidence or
+preconditions, never wording/docs or budget alone. Verify the affected flow;
+distinguish tests, runtime effect and acceptance. Keep failures/unknowns open,
+continue independent work and name dependency owners/resumption conditions.
 
 Never raise budgets without explicit user authority, refund attempts, rename
 failed tasks, replace missions, clear provider delays early or disable checks to
@@ -89,13 +87,16 @@ consumer, preserving received history.
 
 ## 4. Delivery, evidence and verification
 
-Each change includes current documentation or a recorded reason. Align languages
-and diagrams; documentation alone proves no execution, effect or acceptance.
+Local delivery: `swarm.sh`; FR/EN `version_history.json` local_changes; verify
+running Version dialog, notes, real commit and uncommitted label. Only changed
+inputs advance the number. No extra restart/publication rights; never invent tags.
 
-Record effect, owned files, dependencies, criteria, checks and recovery. Native
-reports/checkpoints use HANDOFF.md/TRACKING.md. Each task owns its memory; workers
-never coordinate directly or edit others' tracking. Only engine events/decisions
-prove routing; saving is no receipt.
+Update docs, languages and diagrams per change, or record why unnecessary;
+docs prove no execution, effect or acceptance.
+
+Record effect, owned files, dependencies, criteria, checks and recovery in native
+HANDOFF.md/TRACKING.md. Tasks own memory; workers never coordinate directly or
+edit others' tracking. Engine events/decisions prove routing; saving is no receipt.
 
 Managed delivery declares complete candidate text, including unchanged originals,
 in `delivery.criteria[].evidence`. The report is supplied in full;

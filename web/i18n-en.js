@@ -4392,5 +4392,8 @@ globalThis.SwarmEnglish = {
   "Important": "Important",
   "Code": "Code",
   "Précédent": "Previous",
-  "Suivant": "Next"
+  "Suivant": "Next",
+  "Voir le commit du binaire sur GitHub": "View the binary commit on GitHub",
+  "Évolutions de ce binaire": "Changes in this binary",
+  "Ce binaire inclut des modifications non commitées. Le commit lié identifie sa base Git ; ces évolutions locales ne sont pas une release publiée.": "This binary includes uncommitted changes. The linked commit identifies its Git base; these local changes are not a published release."
 };

@@ -469,6 +469,36 @@ make build
 docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
 ```
 
+Pour le serveur source géré (`bin/swarm` ou `bin/swarm-local`), `swarm.sh`
+prépare le binaire avant d’arrêter l’instance et attribue une préversion locale
+`vMAJEUR.MINEUR.PATCH-dev.N`. La base est le patch suivant la dernière release
+déclarée dans `version_history.json`. Des entrées de build modifiées incrémentent
+`N` ; des entrées identiques conservent le numéro et le binaire vérifié. Le suivi
+local persiste dans `deploy/local-build.json` (ignoré par Git). Il couvre les
+sources Go réelles, les ressources embarquées, les substitutions d’overlay et
+les paramètres effectifs du build. Un build en échec ou des sources modifiées
+pendant la compilation laissent le serveur précédent en service.
+
+Mettre à jour `local_changes` en français et en anglais dans
+`version_history.json`, puis utiliser le lanceur :
+
+```sh
+./swarm.sh build
+./swarm.sh restart --root /chemin/du/projet
+```
+
+La configuration conserve l’adresse et le choix du binaire ; vérifier les agents
+avant la relance. `build` peut préparer un candidat pendant que le serveur reste
+actif ; `restart` l’installe après l’arrêt du seul processus géré. Un binaire
+externe désigné par `--binary` est réutilisé sans reconstruction. `SWARM_VERSION`
+reste disponible pour une version explicite ; `build.sh` appelé directement
+conserve son comportement tag exact ou `devel` sans cette variable.
+Contrôler **Version et nouveautés** après relance : numéro réel, évolutions FR/EN,
+commit du binaire et mention des modifications non commitées. Une préversion locale
+ne crée ni tag ni release GitHub. Les évolutions locales restent séparées des
+releases publiées et leur commit de base n’est pas présenté comme contenant les
+modifications non commitées.
+
 Une release explicite exige une version SemVer, un SHA de 40 caractères, un état
 modifié connu et une date UTC ; `SOURCE_DATE_EPOCH` permet un build reproductible.
 Le build Docker accepte les arguments `SWARM_VERSION`, `SWARM_COMMIT`,
@@ -479,8 +509,9 @@ Le bouton **Version et nouveautés** existe dans le cockpit et la préparation. 
 fenêtre distingue le **binaire lancé** des **sources locales** : un `*` sur le
 résumé décrit le binaire modifié au build, tandis que l’état sale du checkout est
 une donnée source séparée. La comparaison ne fait aucune requête réseau. La liste
-embarquée est actuellement vide faute de release déclarée et l’interface le dit
-explicitement ; le lien GitHub donne accès à l’historique complet des commits.
+embarquée vient de `version_history.json` et ne contient que les releases
+explicitement déclarées ; si elle est vide, l’interface le dit. Le lien GitHub
+donne accès à l’historique complet des commits.
 Échap ferme la fenêtre et rend le focus au bouton.
 
 ![Cockpit français, thème État](docs/screenshots/version-history/cockpit-fr-etat.png)

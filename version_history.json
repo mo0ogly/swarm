@@ -1,5 +1,29 @@
 {
   "schema_version": 1,
+  "local_changes": {
+    "summary": {
+      "fr": "Lecture enrichie des instructions et des journaux, identité visuelle des fenêtres et livraison locale numérotée.",
+      "en": "Richer instruction and log reading, consistent window identity and numbered local delivery."
+    },
+    "items": [
+      {
+        "fr": "Instructions structurées avec titres, sommaire, alertes, tableaux, code et copie du texte source exact ; focus et position de lecture conservés.",
+        "en": "Structured instructions with headings, an outline, warnings, tables, code and exact source copying; keyboard focus and reading position are preserved."
+      },
+      {
+        "fr": "Journaux avec navigation par événement et signal, lecture aérée, retour à la ligne mémorisé, recherche et export original conservés.",
+        "en": "Logs offer event and signal navigation, comfortable reading and remembered line wrapping, while preserving search and original exports."
+      },
+      {
+        "fr": "Logo, typographie et couleurs cohérents dans les fenêtres, en français et en anglais, sur ordinateur et mobile.",
+        "en": "Consistent logos, typography and colours across windows, in French and English, on desktop and mobile."
+      },
+      {
+        "fr": "Le lanceur prépare une nouvelle version locale lorsque les sources changent, avant de remplacer le serveur ; la modale relie numéro, évolutions et commit réel.",
+        "en": "The launcher prepares a new local version when sources change before replacing the server; the dialog connects its number, changes and actual commit."
+      }
+    ]
+  },
   "releases": [
     {
       "version": "v0.1.0",

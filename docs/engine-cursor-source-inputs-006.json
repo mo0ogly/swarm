@@ -1,5 +1,150 @@
 [
   {
+    "path": "tests/actions_confiance_secret_data_ui.cjs",
+    "kind": "harness",
+    "sha256": "b128940ae0ac6b5e90bc35d832883033c68546b78df8d078f0c5e275ca3e3247"
+  },
+  {
+    "path": "tests/actions_confiance_secret_image.py",
+    "kind": "harness",
+    "sha256": "3cd84367b0857f2e9ef20fabe13b1d919f66fdf0fd002c76396548978d48452c"
+  },
+  {
+    "path": "tests/actions_confiance_secret_readiness.py",
+    "kind": "harness",
+    "sha256": "f894f3603fbffbd74445eeeb2804890d39b1a6e7b0e56ad532552b63c05e83a5"
+  },
+  {
+    "path": "tests/actions_confiance_secret_ui.cjs",
+    "kind": "harness",
+    "sha256": "c43832cf9d10ff8241fb227f8d904ecc231b14a5b866f1ade4db21d1b5824c29"
+  },
+  {
+    "path": "tests/actions_confiance_step_up_ui.cjs",
+    "kind": "harness",
+    "sha256": "f82eb939289dadac0e3954a5ccf2ca05041a33d4dfa610765214f4754f86b653"
+  },
+  {
+    "path": "tests/actions_confiance_t2.py",
+    "kind": "harness",
+    "sha256": "70c68059fcfadcc1dfd115c29daee6eea38995f404548cad84e85c80bb1a1d53"
+  },
+  {
+    "path": "tests/actions_confiance_t2_ui.cjs",
+    "kind": "harness",
+    "sha256": "adb38ef648422ff9fa7c0bfe2b3e646f544ef5c2bfab5abbbeae96cc454c8c7c"
+  },
+  {
+    "path": "tests/actions_confiance_t5.py",
+    "kind": "harness",
+    "sha256": "3b284f7cf3ce8fe9a564791fc74b5b91bc2f504a1e0f0da82ef98d376dc3f819"
+  },
+  {
+    "path": "tests/actions_confiance_workload_ui.cjs",
+    "kind": "harness",
+    "sha256": "f4cbfa0d2ec0a6309cbaeba055b510c5d978b7e4f006c390c6b761e6761d83ce"
+  },
+  {
+    "path": "tests/agent_terminal_ui.cjs",
+    "kind": "test",
+    "sha256": "fecd99cd039b48d9423a9fdf560dd961867f3d6699d5d351c3372ec1df276093"
+  },
+  {
+    "path": "tests/ai_connections_response_test.cjs",
+    "kind": "test",
+    "sha256": "2dce270a348d9550b963152a1c42b5d7247a1b19f31b0e60f71e026c637773a9"
+  },
+  {
+    "path": "tests/api_wait_admin_ui.cjs",
+    "kind": "harness",
+    "sha256": "293359b67270290d3e7031d7c7e6ab478e4c1d71d5fedac36fa060794c642c6f"
+  },
+  {
+    "path": "tests/asset_loading_policy_test.cjs",
+    "kind": "harness",
+    "sha256": "54dcd1a9cea1708b5fb1891069cabc8b810488e76cf5f16ed106571349564165"
+  },
+  {
+    "path": "tests/audit_acceptance.cjs",
+    "kind": "harness",
+    "sha256": "1ac8a5d7036060f0fa3c1bd0075e84e2584e079dbf960c97e33e39c75faa2666"
+  },
+  {
+    "path": "tests/call_ledger_test.cjs",
+    "kind": "harness",
+    "sha256": "f4e2d24c9c8ab8d4b341ce33f01dc9d6817b5079a64b34aa466b1421f6c04b5b"
+  },
+  {
+    "path": "tests/call_ledger_ui.cjs",
+    "kind": "harness",
+    "sha256": "9178383ac51aa1e34564528be82b96df358e63382127e4632179271291a5f490"
+  },
+  {
+    "path": "tests/context_help_ui.cjs",
+    "kind": "test",
+    "sha256": "065a425e57675a62926ccd5cfe11c49d4f5d9f12c1dfaa438b17aafec1581f0e"
+  },
+  {
+    "path": "tests/dense_text_ui.cjs",
+    "kind": "test",
+    "sha256": "4673fd9e2075932b1046e4f3c76df98164a769f4ac683351363545dc87fc8fca"
+  },
+  {
+    "path": "tests/design_system_ui.cjs",
+    "kind": "test",
+    "sha256": "d3728a57a2c4dab63c23a197165dd61c7d537c38aeb2d221d3e2de110173642b"
+  },
+  {
+    "path": "tests/engine_acceptance.cjs",
+    "kind": "harness",
+    "sha256": "19c685b28ff043eb8e8257cf617fe247f3b9656f36acc69a1a0d421d30c07869"
+  },
+  {
+    "path": "tests/final_acceptance.cjs",
+    "kind": "harness",
+    "sha256": "c91f34bf5ac9deb4c1624c6a391fb4b885713745ac21b7e305538c1158e51e13"
+  },
+  {
+    "path": "tests/graph_automation_e2e.cjs",
+    "kind": "test",
+    "sha256": "c30c9e7d8fc998da75428bffd71175172decd47f61ee3827e399b294a68ef85f"
+  },
+  {
+    "path": "tests/graph_delivery_docs.py",
+    "kind": "test",
+    "sha256": "c7708bf7dc7ea6b93d3a92be23d3a5fd5925bcd7c579e0b73cc0f5fc6892980a"
+  },
+  {
+    "path": "tests/graph_layout_cache_test.cjs",
+    "kind": "test",
+    "sha256": "1dc5a1e7f1c6ef4a92e451cdff44c1cc1941dbd4ae29c6766344b51ca7004c22"
+  },
+  {
+    "path": "tests/graph_performance_adapter_test.cjs",
+    "kind": "harness",
+    "sha256": "0874aa166b477b8a9f36d3d35fdbe398a06a7193b2ef587a9a03da001b642732"
+  },
+  {
+    "path": "tests/graph_performance_admin_ui.cjs",
+    "kind": "harness",
+    "sha256": "156f31780f171eaf250d5903b24276e8594bf481ab04e8ea688e4d3d320f3d1d"
+  },
+  {
+    "path": "tests/graph_performance_ui.cjs",
+    "kind": "harness",
+    "sha256": "e12c19c03eea5d747fb037f197e10a985acd7085048498f2bf8ad70ff3c91ecd"
+  },
+  {
+    "path": "tests/graph_studio_test.cjs",
+    "kind": "harness",
+    "sha256": "cbf25c1d25cd5069b6104403f03ed2fe457383749a5eed0a23e3512acf48226b"
+  },
+  {
+    "path": "tests/graph_studio_ui.cjs",
+    "kind": "harness",
+    "sha256": "1516be5c6c3769e655b9fb6b128eddd934416e460abff368f15e8d7cbdf2e97f"
+  },
+  {
     "path": "tests/install_smoke.py",
     "kind": "test",
     "sha256": "1b4a86a8bb45c285321d0cc259ff57bdac48ac7f0da78a5110c8e140cfb0ab43"
@@ -127,7 +272,12 @@
   {
     "path": "tests/test_swarm_local.py",
     "kind": "test",
-    "sha256": "9b3e844adf1b837339e14c5ecd73d477748d069fcb0605a8de001bc512734ab4"
+    "sha256": "858137cc7d2f70a8f865007541f9401d884367f29e714e6508bcdf3a085250e4"
+  },
+  {
+    "path": "tests/test_swarm_version.py",
+    "kind": "test",
+    "sha256": "d0f28037b0e201d83210da5f1c4fbc40919befee45cec729ecdce038b0e3b511"
   },
   {
     "path": "tests/text_reader_test.cjs",
@@ -142,7 +292,7 @@
   {
     "path": "tests/version_ui.cjs",
     "kind": "test",
-    "sha256": "95ba7c09e5272090b1a3d177bc4f246702eaba3e37b69d030aa7816318c1577e"
+    "sha256": "6fdc63a7f25f52bdca501e273428f563514d1cdd57d930d862a79fae43cf9347"
   },
   {
     "path": "tests/web_requests_admin_ui.cjs",
@@ -172,7 +322,7 @@
   {
     "path": "tools/agent-workflows/CONTRACT.md",
     "kind": "doc",
-    "sha256": "d56566d6e767537e29e23472e3bd7e25f3c322f4a4929a39280a621792c429de"
+    "sha256": "407e82d5150d2770d7ebbb5913c96434f57fb3c728fc19109887a3ac2f4220e7"
   },
   {
     "path": "tools/agent-workflows/check.py",
@@ -252,12 +402,17 @@
   {
     "path": "tools/refresh_ui_source_manifest.py",
     "kind": "harness",
-    "sha256": "7ba32025640e8808bdf072a13c99ad1ad964dd3c80920dfe5af509697243114c"
+    "sha256": "a9787cf625efba5dfc290a22814b435b222fe0a5e7fd7b684fa82bc23187a33f"
   },
   {
     "path": "tools/swarm_local.py",
     "kind": "source",
-    "sha256": "69a7de970c5c8160706277c416772f7826ce232b85c1592a6bd7597f1c449df5"
+    "sha256": "15c9fd46ac83fdc2b9a03d5541616c34a46fb9c0624478081eb5c4f6259e02f3"
+  },
+  {
+    "path": "tools/swarm_version.py",
+    "kind": "source",
+    "sha256": "712140f641da0ef06d4cd20e1e71596dcd84071e5c9ef8b5838a6eb6175568a1"
   },
   {
     "path": "tools/verification/refresh_engine_source_manifest.py",
@@ -302,7 +457,7 @@
   {
     "path": "version_history.json",
     "kind": "source",
-    "sha256": "678b4e1599e009205311b82199aeaee625e7aa4b6c4755c12b56907db91fb502"
+    "sha256": "fba8f313754cad0abdf74f597201dc2b489b0bc24022999d8d1a8f978e7d758c"
   },
   {
     "path": "web/access.css",
@@ -442,7 +597,7 @@
   {
     "path": "web/i18n-en.js",
     "kind": "source",
-    "sha256": "1e1651a9bd995a68f892ea4001f44497de5bc40ae6f55b22c85add95ea59c310"
+    "sha256": "6197368b1a3a896df06a4a015e008bc8e617c2441c5f382e203a24febd23ea66"
   },
   {
     "path": "web/i18n.js",
@@ -852,7 +1007,7 @@
   {
     "path": "web/runtime-health.js",
     "kind": "source",
-    "sha256": "8b356f3bc111c5a1be99a420e1e770fdebc5acb56012783194718f4960c212fc"
+    "sha256": "fb1290f6c7512e273064e56fda39a0280162ebc2e0ffca436a85d43055d18e17"
   },
   {
     "path": "web/session-console.js",

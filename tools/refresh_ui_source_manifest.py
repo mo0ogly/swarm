@@ -27,6 +27,26 @@ def main():
     inputs = {row["path"]: dict(row) for row in manifest["inputs"]}
     additions = {
         "web/swarm-design.css": "source", "web/swarm-shell.js": "source",
+        "web/text-reader.js": "source", "web/journal-console.js": "source",
+        "web/log-console.css": "source", "web/instruction-revisions.js": "source",
+        "tests/text_reader_test.cjs": "test", "tests/dense_text_ui.cjs": "test",
+        "tests/instruction_retex_ui.cjs": "test",
+        "tests/log_console_ui.cjs": "test",
+        "tools/swarm_local.py": "source", "tools/swarm_version.py": "source",
+        "tests/test_swarm_version.py": "test", "tests/test_swarm_local.py": "test",
+        "tests/version_ui.cjs": "test", "web/runtime-health.js": "source",
+        "version_history.json": "source", "internal/engine/version_history.go": "source",
+        "internal/engine/version_local_changes_test.go": "test",
+        "docs/DENSE-TEXT.md": "doc", "docs/en/DENSE-TEXT.md": "doc",
+        "web/log-console.html": "source", "web/log-console.js": "source",
+        "web/processes.html": "source", "web/trust-actions.html": "source",
+        "web/trust-oidc-callback.html": "source",
+        "tests/window_identity_ui.cjs": "test",
+        "tests/log_console_visibility_ui.cjs": "test",
+        "tests/context_help_ui.cjs": "test", "tests/agent_terminal_ui.cjs": "test",
+        "docs/en/WINDOW-IDENTITY.md": "doc",
+        "docs/architecture/LOG-CONSOLE.md": "doc", "docs/en/LOG-CONSOLE.md": "doc",
+        "docs/reports/window-identity-20261017.md": "doc",
         "frontend/terminal.js": "source", "tests/design_system_ui.cjs": "test",
         "tests/graph_layout_cache_test.cjs": "test",
         "tests/training_design_ui.cjs": "test",
@@ -67,6 +87,9 @@ def main():
         for path in (ROOT / directory).iterdir():
             if path.is_file():
                 additions[path.relative_to(ROOT).as_posix()] = "capture" if path.suffix == ".png" else "doc"
+    for path in (ROOT / "docs/screenshots/window-identity-20261017").rglob("*"):
+        if path.is_file():
+            additions[path.relative_to(ROOT).as_posix()] = "capture" if path.suffix == ".png" else "doc"
     for name, kind in additions.items():
         inputs[name] = {"path": name, "kind": kind}
     for name, row in inputs.items():

@@ -39,15 +39,23 @@ type VersionRelease struct {
 	ReleaseURL string           `json:"release_url"`
 }
 
+// Local changes describe the embedded candidate, never a fabricated publication.
+type LocalVersionChanges struct {
+	Summary LocalizedSummary   `json:"summary"`
+	Items   []LocalizedSummary `json:"items"`
+}
+
 type versionHistoryManifest struct {
-	Schema   int              `json:"schema_version"`
-	Releases []VersionRelease `json:"releases"`
+	Schema       int                  `json:"schema_version"`
+	Releases     []VersionRelease     `json:"releases"`
+	LocalChanges *LocalVersionChanges `json:"local_changes,omitempty"`
 }
 
 type VersionHistory struct {
-	Schema    int              `json:"schema_version"`
-	Available bool             `json:"available"`
-	Releases  []VersionRelease `json:"releases"`
+	Schema       int                  `json:"schema_version"`
+	Available    bool                 `json:"available"`
+	Releases     []VersionRelease     `json:"releases"`
+	LocalChanges *LocalVersionChanges `json:"local_changes,omitempty"`
 }
 
 func loadVersionHistory() VersionHistory {
@@ -55,7 +63,7 @@ func loadVersionHistory() VersionHistory {
 	if err != nil {
 		return VersionHistory{Schema: 1, Available: false, Releases: []VersionRelease{}}
 	}
-	return VersionHistory{Schema: manifest.Schema, Available: true, Releases: manifest.Releases}
+	return VersionHistory{Schema: manifest.Schema, Available: true, Releases: manifest.Releases, LocalChanges: manifest.LocalChanges}
 }
 
 func parseVersionHistory(raw []byte) (versionHistoryManifest, error) {
@@ -87,6 +95,19 @@ func parseVersionHistory(raw []byte) (versionHistoryManifest, error) {
 			return history, fmt.Errorf("release %d: %w", i, err)
 		}
 		seen[history.Releases[i].Version] = true
+	}
+	if local := history.LocalChanges; local != nil {
+		if len(local.Items) == 0 {
+			return history, fmt.Errorf("local changes must contain at least one evolution")
+		}
+		for _, text := range append([]LocalizedSummary{local.Summary}, local.Items...) {
+			if err := validateSummary(text.FR); err != nil {
+				return history, fmt.Errorf("invalid local French summary: %w", err)
+			}
+			if err := validateSummary(text.EN); err != nil {
+				return history, fmt.Errorf("invalid local English summary: %w", err)
+			}
+		}
 	}
 	return history, nil
 }

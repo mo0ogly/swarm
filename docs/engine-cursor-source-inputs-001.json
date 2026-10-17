@@ -172,12 +172,12 @@
   {
     "path": ".gitignore",
     "kind": "source",
-    "sha256": "df290d1d2950317f43e5e5fa583b9dfef33db258d7135c05f9a98ccd1c9e0ee1"
+    "sha256": "c793a432f26cd08060a3c667fc4ea14c8fc6ea1147ba9a635050cc7a26637fde"
   },
   {
     "path": "AGENTS.md",
     "kind": "doc",
-    "sha256": "eda4ec1d6a934885bebe422bc2354f4489376c35a72f2ee11648e4b185091436"
+    "sha256": "b97fdb4687c52d90d63cb1fa799a39d1a4f0840e01206ef3b714fd3ac32c2a36"
   },
   {
     "path": "CLAUDE.md",
@@ -187,7 +187,7 @@
   {
     "path": "INSTALL.md",
     "kind": "doc",
-    "sha256": "a5d55dcdebf094843819c68b8117776f38bc21aff2551dba4a1500442ab3cf9f"
+    "sha256": "b8a2b3d47a684155c5188f521f313cec63602486405feee8a4b9edb969f2eb3f"
   },
   {
     "path": "PREPARATION-UX.md",
@@ -707,7 +707,7 @@
   {
     "path": "docs/en/INSTALL.md",
     "kind": "doc",
-    "sha256": "557ccb77f51a204078b772aa085fd1c32054ea7b88d2660eb36650f2128ea0d9"
+    "sha256": "c7b2f31ed38b10bb656cadb93685a537e7cbe04b275d7c250669d3ba2571247e"
   },
   {
     "path": "docs/en/INSTRUCTION-LEARNING.md",
@@ -1028,6 +1028,11 @@
     "path": "docs/reports/ui-redesign-20261010.md",
     "kind": "doc",
     "sha256": "b67fb8e5aac24145ad953bef18d31c029649d6039553e56ba84466916c10b79e"
+  },
+  {
+    "path": "docs/reports/window-identity-20261017.md",
+    "kind": "doc",
+    "sha256": "bd7151893e359b5ca450edce4f449c197fb0b343052d2a295668e48d949fce32"
   },
   {
     "path": "docs/screenshots/graph-delivery-d01/en-etat-graph.png",
@@ -1483,10 +1488,5 @@
     "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
     "kind": "capture",
     "sha256": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
-    "kind": "capture",
-    "sha256": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db"
   }
 ]

@@ -183,6 +183,21 @@ why. Use the configured Git identity, never invent attribution or add
 `Co-Authored-By` lines, including inherited messages. Do not rewrite published
 history or force-push without explicit authority.
 
+## Local delivery version and release notes
+
+Every delivered change must have an identifiable running version and current
+French/English evolution notes in `version_history.json` (`local_changes`).
+Use `./swarm.sh build` / `./swarm.sh restart` for a source-managed local server:
+the launcher numbers changed effective build inputs before stopping the previous
+server, and preserves the number for unchanged inputs. Do not leave an old
+configured source binary running while claiming the delivery is installed.
+After an authorized restart, verify the actual server identity and the **Version
+and what's new** dialog: number, evolution notes, actual Git commit link and
+uncommitted-change disclosure. Keep local deliveries distinct from published
+releases; never invent a commit/tag or publish automatically. An external
+prebuilt binary selected with `--binary` stays external and is not rebuilt.
+The rule does not authorize a restart, commit, push or publication by itself.
+
 ## Methods
 
 Project skills are in `.agents/skills/`. They link to the canonical files under

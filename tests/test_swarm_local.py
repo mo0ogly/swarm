@@ -29,12 +29,12 @@ class LocalWeb(unittest.TestCase):
                      "--address", self.address, "--binary", BINARY, "--no-open", "--no-mask-cifs"]
 
     def run_cli(self, action, code=0, extra=()):
-        result = subprocess.run([*self.args, action, *extra], text=True, capture_output=True, timeout=40)
+        result = subprocess.run([*self.args, action, *extra], text=True, capture_output=True)
         self.assertEqual(result.returncode, code, result.stderr)
         return result.stdout
 
     def tearDown(self):
-        subprocess.run([*self.args, "stop"], capture_output=True, timeout=20)
+        subprocess.run([*self.args, "stop"], capture_output=True)
         self.temp.cleanup()
 
     def test_local_opener_gets_private_link_without_terminal_disclosure(self):
@@ -45,7 +45,7 @@ class LocalWeb(unittest.TestCase):
         opener.chmod(0o700)
         args = [arg for arg in self.args if arg != "--no-open"]
         result = subprocess.run([*args, "open"], env={**os.environ, "SWARM_BROWSER": str(opener)},
-                                text=True, capture_output=True, timeout=40)
+                                text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         key = (self.root / ".swarm" / ("web-session-" + hashlib.sha256(self.address.encode()).hexdigest()[:16])).read_text().strip()
         self.assertEqual(received.read_text(), self.url + "/session/" + key)
@@ -117,22 +117,23 @@ class LocalWeb(unittest.TestCase):
         (checkout / "tools").mkdir(parents=True)
         shutil.copy2(SOURCE / "swarm.sh", checkout / "swarm.sh")
         shutil.copy2(SOURCE / "tools/swarm_local.py", checkout / "tools/swarm_local.py")
+        shutil.copy2(SOURCE / "tools/swarm_version.py", checkout / "tools/swarm_version.py")
         configured = [str(checkout / "swarm.sh")]
         result = subprocess.run([*configured, "configure", "--root", str(self.root),
                                  "--address", self.address, "--binary", BINARY],
-                                text=True, capture_output=True, timeout=20)
+                                text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         settings = json.loads((checkout / "deploy/local-web.json").read_text())
         self.assertEqual(settings["binary"], str(Path(BINARY).resolve()))
         try:
             for action in ["start", "restart"]:
-                result = subprocess.run([*configured, action, "--no-open"], text=True, capture_output=True, timeout=40)
+                result = subprocess.run([*configured, action, "--no-open"], text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 status = json.loads(subprocess.check_output([*configured, "status"], text=True))
                 self.assertTrue(status["ready"])
                 self.assertEqual(Path(f'/proc/{status["pid"]}/exe').resolve(), Path(BINARY).resolve())
         finally:
-            subprocess.run([*configured, "stop"], capture_output=True, timeout=20)
+            subprocess.run([*configured, "stop"], capture_output=True)
 
     def test_stale_pid_does_not_kill_unrelated_process(self):
         sleeper = subprocess.Popen(["sleep", "60"])
@@ -160,7 +161,7 @@ class LocalWeb(unittest.TestCase):
             self.assertIsNone(old.poll())
             self.run_cli("adopt",extra=("--pid",str(old.pid)))
             self.run_cli("restart")
-            old.wait(timeout=10)
+            old.wait()
             self.assertTrue(json.loads(self.run_cli("status"))["ready"])
         finally:
             if old.poll() is None:

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "manifest_status": "UI_REDESIGN_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
-  "base_commit": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6",
-  "candidate_id": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6+sha256:0d2e2cbc5a4500dcf06c8d1ca2e5d2de5a000a3d88fe16b51664c62965895237",
-  "candidate_digest": "0d2e2cbc5a4500dcf06c8d1ca2e5d2de5a000a3d88fe16b51664c62965895237",
+  "base_commit": "5657599cb7512e5199361ed212bc0fad37a57c1f",
+  "candidate_id": "5657599cb7512e5199361ed212bc0fad37a57c1f+sha256:01e055a18673f8945d3df270872fb189d6251ac87ef321fa45ae4b58ef20179d",
+  "candidate_digest": "01e055a18673f8945d3df270872fb189d6251ac87ef321fa45ae4b58ef20179d",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/training-delivery-source-manifest.json",
   "requirements": [
@@ -300,12 +300,12 @@
     {
       "path": ".gitignore",
       "kind": "source",
-      "sha256": "df290d1d2950317f43e5e5fa583b9dfef33db258d7135c05f9a98ccd1c9e0ee1"
+      "sha256": "c793a432f26cd08060a3c667fc4ea14c8fc6ea1147ba9a635050cc7a26637fde"
     },
     {
       "path": "AGENTS.md",
       "kind": "doc",
-      "sha256": "eda4ec1d6a934885bebe422bc2354f4489376c35a72f2ee11648e4b185091436"
+      "sha256": "b97fdb4687c52d90d63cb1fa799a39d1a4f0840e01206ef3b714fd3ac32c2a36"
     },
     {
       "path": "CLAUDE.md",
@@ -315,7 +315,7 @@
     {
       "path": "INSTALL.md",
       "kind": "doc",
-      "sha256": "a5d55dcdebf094843819c68b8117776f38bc21aff2551dba4a1500442ab3cf9f"
+      "sha256": "b8a2b3d47a684155c5188f521f313cec63602486405feee8a4b9edb969f2eb3f"
     },
     {
       "path": "PREPARATION-UX.md",
@@ -515,7 +515,7 @@
     {
       "path": "docs/en/INSTALL.md",
       "kind": "doc",
-      "sha256": "557ccb77f51a204078b772aa085fd1c32054ea7b88d2660eb36650f2128ea0d9"
+      "sha256": "c7b2f31ed38b10bb656cadb93685a537e7cbe04b275d7c250669d3ba2571247e"
     },
     {
       "path": "docs/en/LOG-CONSOLE.md",
@@ -646,6 +646,11 @@
       "path": "docs/reports/ui-redesign-20261010.md",
       "kind": "doc",
       "sha256": "b67fb8e5aac24145ad953bef18d31c029649d6039553e56ba84466916c10b79e"
+    },
+    {
+      "path": "docs/reports/window-identity-20261017.md",
+      "kind": "doc",
+      "sha256": "bd7151893e359b5ca450edce4f449c197fb0b343052d2a295668e48d949fce32"
     },
     {
       "path": "docs/screenshots/graph-delivery-d01/en-etat-graph.png",
@@ -1636,6 +1641,116 @@
       "path": "docs/screenshots/window-identity-20261017/help-mobile-fr-sombre.png",
       "kind": "capture",
       "sha256": "a06abde220c21398fbd2be748d75bb2f0b3669bd877623813d3c3a3edd5546d0"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/build-receipt.json",
+      "kind": "doc",
+      "sha256": "1b6d1ee02bebbac14ec4b984a6f195410cbee5672af9a76d83e581060794bd0f"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/changed-inputs.txt",
+      "kind": "doc",
+      "sha256": "c36b019b87b87ad968bc136f210e7a662b5813aec87ad7b13819f2ed06058ffc"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/contrast-fr-etat.json",
+      "kind": "doc",
+      "sha256": "e2cb5dc93c86868c03fa55c9e8280ee405c5129563cd359025366198566ede58"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/contrast-original-failure.txt",
+      "kind": "doc",
+      "sha256": "e0ab817b887bcc20dc4b5094567beff6c4da938bc8a5d375bd372b025b2eec1a"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/dense-ui-result.json",
+      "kind": "doc",
+      "sha256": "85d919e76baa9ef42e1b9e6b8d11a57935495cf92cb0d4a413ec91cc2cbc4559"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/final-build.txt",
+      "kind": "doc",
+      "sha256": "535288ae42c352d07b994e0dfc6748a3d2f0c7ab964857d0468c3741556e1f83"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/installation-result.json",
+      "kind": "doc",
+      "sha256": "20580107c5d6537bb7ebd365b25073dbdc3cbebe570f1fd67ca406bfe4335357"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/launcher-tests.txt",
+      "kind": "doc",
+      "sha256": "988aa08e97c2f7c3989b016ed43513172f54b767b4b22f61962d5975232a0922"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/live-result.json",
+      "kind": "doc",
+      "sha256": "bc668e508b9dd894fe1d3b372f8e5ef28f030028970cda7176851c88958d3b09"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/numbering-tests.txt",
+      "kind": "doc",
+      "sha256": "d9e08586bf0054430b7c2aeaac5ab6320790f59d21ed80c2a5743137924a0081"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/post-cli-original-failure.json",
+      "kind": "doc",
+      "sha256": "4bc3824d16de896ff5dd235e5fffe275ea41bc9aa036722dd398f713aad99cc3"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/restart.txt",
+      "kind": "doc",
+      "sha256": "b691829c92801db3947f2b8cfa99919d1396f523e7b22d2cd84b7da15425fdc8"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/staged-version-checks.txt",
+      "kind": "doc",
+      "sha256": "e2b0abbbc4e5f1aef75b5bf5e0d73dbac3edf769d02fcd93134c6f284a981f47"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/unchanged-inputs.txt",
+      "kind": "doc",
+      "sha256": "a7e3de00052da7826b4f3adf43631693a8bf688042507b64431790df9a62fdeb"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/verify-live.cjs",
+      "kind": "doc",
+      "sha256": "27bd1a080788b6f9d904cd3b2dbdcdafd29366f871dbb71bc28e9b230a8967e0"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/version-en-sombre.png",
+      "kind": "capture",
+      "sha256": "72409556d253601bc9a26c5b6efdb21de5a7c7a9b76ef80757dd9961f54fdb57"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/version-go.txt",
+      "kind": "doc",
+      "sha256": "d056b75133e72bcfa95bb4f48394c9b13c6eeb9ef06e292ab769b6c7d8285d0f"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/version-live.png",
+      "kind": "capture",
+      "sha256": "56aa4ecbace976c101a0ac7e410d74ec2c36162f213e965c8bec888adf8a81b1"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/version-ui-result.json",
+      "kind": "doc",
+      "sha256": "75933db9395b7cca3730de7b831193c5fd404354604e1aeacce624f7a2bd0f24"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/workflow-final.txt",
+      "kind": "doc",
+      "sha256": "3093e83007021db28cf55d5f0b6a3e6b161477bea52f4ec8e18a001e1e8975ef"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/workflow-intermediate-failure.txt",
+      "kind": "doc",
+      "sha256": "819a0aceb35e4818c8ffedf2ee04e295d203b3a6efa905d5fd5ea551bacf6d7f"
+    },
+    {
+      "path": "docs/screenshots/window-identity-20261017/local-delivery/workflow-original-failure.txt",
+      "kind": "doc",
+      "sha256": "6f1238916ce3430928574ce0d6e7003d71bba4003f5af7906d2f238125272b40"
     },
     {
       "path": "docs/screenshots/window-identity-20261017/log-visibility-result.json",
@@ -4865,7 +4980,12 @@
     {
       "path": "internal/engine/version_history.go",
       "kind": "source",
-      "sha256": "343ffb6630225dce1bfdb0233d713270c0895d70e291254694ae702ff9a3f12e"
+      "sha256": "291be0ab44add644f6152c5bcd7420981e4d23efe2aab0ea11a2b770e5d338c2"
+    },
+    {
+      "path": "internal/engine/version_local_changes_test.go",
+      "kind": "test",
+      "sha256": "fa320a35d3248511379d1c0f22253ef054e1093f5f0ef5b2e9d92098c380788c"
     },
     {
       "path": "internal/engine/version_test.go",
@@ -5010,7 +5130,7 @@
     {
       "path": "locales/en.json",
       "kind": "source",
-      "sha256": "77c3b4a4e3d6580fd00ff23289cc920b015be4ca2f7731772ac88d6fbc5b3740"
+      "sha256": "a4505d89d4c5b9295dd7f96e48e0e32c5b0e08d59f7928a63f3138879500df91"
     },
     {
       "path": "package.json",
@@ -5185,7 +5305,12 @@
     {
       "path": "tests/test_swarm_local.py",
       "kind": "test",
-      "sha256": "9b3e844adf1b837339e14c5ecd73d477748d069fcb0605a8de001bc512734ab4"
+      "sha256": "858137cc7d2f70a8f865007541f9401d884367f29e714e6508bcdf3a085250e4"
+    },
+    {
+      "path": "tests/test_swarm_version.py",
+      "kind": "test",
+      "sha256": "d0f28037b0e201d83210da5f1c4fbc40919befee45cec729ecdce038b0e3b511"
     },
     {
       "path": "tests/text_reader_test.cjs",
@@ -5200,7 +5325,7 @@
     {
       "path": "tests/version_ui.cjs",
       "kind": "test",
-      "sha256": "95ba7c09e5272090b1a3d177bc4f246702eaba3e37b69d030aa7816318c1577e"
+      "sha256": "6fdc63a7f25f52bdca501e273428f563514d1cdd57d930d862a79fae43cf9347"
     },
     {
       "path": "tests/window_identity_ui.cjs",
@@ -5275,12 +5400,17 @@
     {
       "path": "tools/refresh_ui_source_manifest.py",
       "kind": "harness",
-      "sha256": "7ba32025640e8808bdf072a13c99ad1ad964dd3c80920dfe5af509697243114c"
+      "sha256": "a9787cf625efba5dfc290a22814b435b222fe0a5e7fd7b684fa82bc23187a33f"
     },
     {
       "path": "tools/swarm_local.py",
       "kind": "source",
-      "sha256": "69a7de970c5c8160706277c416772f7826ce232b85c1592a6bd7597f1c449df5"
+      "sha256": "15c9fd46ac83fdc2b9a03d5541616c34a46fb9c0624478081eb5c4f6259e02f3"
+    },
+    {
+      "path": "tools/swarm_version.py",
+      "kind": "source",
+      "sha256": "712140f641da0ef06d4cd20e1e71596dcd84071e5c9ef8b5838a6eb6175568a1"
     },
     {
       "path": "tools/verification/t4_admin.py",
@@ -5315,7 +5445,7 @@
     {
       "path": "version_history.json",
       "kind": "source",
-      "sha256": "678b4e1599e009205311b82199aeaee625e7aa4b6c4755c12b56907db91fb502"
+      "sha256": "fba8f313754cad0abdf74f597201dc2b489b0bc24022999d8d1a8f978e7d758c"
     },
     {
       "path": "web/access.css",
@@ -5450,7 +5580,7 @@
     {
       "path": "web/i18n-en.js",
       "kind": "source",
-      "sha256": "1e1651a9bd995a68f892ea4001f44497de5bc40ae6f55b22c85add95ea59c310"
+      "sha256": "6197368b1a3a896df06a4a015e008bc8e617c2441c5f382e203a24febd23ea66"
     },
     {
       "path": "web/i18n.js",
@@ -5815,7 +5945,7 @@
     {
       "path": "web/runtime-health.js",
       "kind": "source",
-      "sha256": "8b356f3bc111c5a1be99a420e1e770fdebc5acb56012783194718f4960c212fc"
+      "sha256": "fb1290f6c7512e273064e56fda39a0280162ebc2e0ffca436a85d43055d18e17"
     },
     {
       "path": "web/session-console.js",

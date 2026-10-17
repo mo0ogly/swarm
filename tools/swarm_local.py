@@ -1,5 +1,6 @@
 """Linux local server lifecycle with identity-checked process ownership."""
 import argparse
+import contextlib
 import fcntl
 import hashlib
 import json
@@ -12,6 +13,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from swarm_version import prepare as prepare_versioned_build
 
 SOURCE = Path(__file__).resolve().parent.parent
 
@@ -112,7 +114,7 @@ def main():
     binary = Path(args.binary).resolve() if args.binary else SOURCE / "bin" / "swarm-local"
     state_path = runtime / "server.json"
     log_path = runtime / "server.log"
-    with (runtime / "lifecycle.lock").open("a") as lock:
+    with contextlib.ExitStack() as stack, (runtime / "lifecycle.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         state = json.loads(state_path.read_text()) if state_path.exists() else None
         running = owned(state)
@@ -141,6 +143,13 @@ def main():
             for line in log_path.read_text().splitlines()[-80:] if log_path.exists() else []:
                 print(line.split("/session/")[0] + "/session/[private]" if "/session/" in line else line)
             return 0
+        source_binary = binary in (SOURCE / "bin/swarm", SOURCE / "bin/swarm-local")
+        prepared = None
+        if args.action == "build" or source_binary and (args.action == "restart" or args.action == "start" and not running):
+            (SOURCE / "deploy").mkdir(parents=True, exist_ok=True)
+            build_lock = stack.enter_context((SOURCE / "deploy/.local-build.lock").open("a"))
+            fcntl.flock(build_lock, fcntl.LOCK_EX)
+            prepared, _ = prepare_versioned_build(SOURCE, binary)
         if args.action in ("stop", "restart"):
             stop(state, args.stop_timeout, args.address)
             state_path.unlink(missing_ok=True)
@@ -149,9 +158,10 @@ def main():
                 return 0
             running = False
         if args.action == "build":
-            if running:
-                raise RuntimeError("Arrêtez cette instance avant de remplacer son binaire.")
-            subprocess.run(["sh", str(SOURCE / "build.sh"), str(binary)], cwd=SOURCE, check=True)
+            if not running and prepared != binary:
+                prepared.replace(binary)
+            elif running:
+                print("Candidat prêt ; restart l’installera après arrêt du seul serveur géré.")
             return 0
         if args.action == "open" and not running:
             raise RuntimeError("Serveur absent : ./swarm.sh start")
@@ -164,8 +174,8 @@ def main():
                 # authoritative and also rejects a listener appearing afterwards.
                 if sock.connect_ex((host, int(port))) == 0:
                     raise RuntimeError("Port occupé par une instance non gérée ; aucun processus arrêté. Utilisez --address ou arrêtez explicitement cette instance.")
-            if not args.binary:
-                subprocess.run(["sh", str(SOURCE / "build.sh"), str(binary)], cwd=SOURCE, check=True)
+            if prepared and prepared != binary:
+                prepared.replace(binary)
             subprocess.run([str(binary), "--root", str(root), "init"], cwd=SOURCE,
                            check=True, stdout=subprocess.DEVNULL)
             server_command = [str(binary), "--root", str(root), "web", args.address]
