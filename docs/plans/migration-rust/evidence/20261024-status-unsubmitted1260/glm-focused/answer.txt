@@ -1,0 +1,27 @@
+## Selection outcomes, reasons, priority (Go `provenReport` analogue)
+
+For real read-only historical status attribution, the docs walk must map each candidate to exactly one outcome, in this priority order:
+
+1. **Refused error** — the existing Rust `task_reports` contract wins: invalid task name, outside-root/nonregular target, NOFOLLOW/open faults, metadata IO, child-race detection (`directory-changed`), and explicit close failure all propagate their causes. These are never downgraded to "skip" or "empty".
+2. **Stale (excluded, counted)** — regular non-empty file with `ModTime().Before(since − skew)`; recorded as `stale++`, never silently dropped.
+3. **Fresh candidate** — regular, non-empty, `ModTime ≥ since − skew`; appended.
+4. **Legitimate absence** — `docs` missing (NOENT on open) yields an empty listing: this is a successful empty result, not an error, and must be preserved (no fallback fabrication, no error invention).
+
+Then exactly one terminal reason:
+- one fresh → selected report path, no reason;
+- multiple fresh → refuse with the joined candidate list;
+- zero fresh with `stale > 0` → refuse "no report produced by this attempt; N earlier report(s) ignored";
+- zero fresh, zero stale → refuse "no readable, non-empty report under docs" (including successful-empty case).
+
+Multiple candidates are **ambiguous**, never auto-selected — selection substitutes the operator's designation.
+
+## Failure classification
+
+- **Retained errors:** open (non-NOENT), stat, walk, symlink_metadata, directory-identity drift, close (both `artifact-close` and close-after-error carrying `cleanup`), path/local_file mapping, regular-file-required refusals. Close failures are terminal even when the primary result succeeded.
+- **Legitimate absence:** NOENT on `docs` (empty listing), zero-size files and stale files (counted, excluded), NOENT on the artifact itself if the caller's semantics treat it as absent. Empty-but-successful results are valid outcomes, not errors to swallow.
+
+## Go completed branch scope
+
+The Go code shown reads only `docs/` under `s.root` (`safeReport(s.root, rel)`, `task_reports(task)` on the store's root). **Nothing in the provided Go excerpt consumes an agent cwd** in the completed branch — but the Go caller that invokes `provenReport` (and whether `Store.root` equals the Rust root or is per-agent) is **missing context**; I cannot confirm scope equivalence from this excerpt alone.
+
+Margin: use persisted `EngineSettingsValues::report_clock_skew_seconds` only; no constant is evidenced. No tests were run; no implementation approved.

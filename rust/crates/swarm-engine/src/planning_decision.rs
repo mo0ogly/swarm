@@ -606,6 +606,8 @@ fn current_native_review_input(
 /// acknowledgement only. Budget/revision/generation overflows, unsupported
 /// operations and any failed preparation preserve the input Work. Caller owns
 /// settings/Work reservations, replay before invocation, final fence and commit.
+/// Managed repositories admit only acknowledgement, delegation and new tasks
+/// after original copy/commit observation; other managed operations still refuse.
 /// Holder equality is a concurrency fence, not authenticated agent authority.
 pub(crate) fn decide(
     root: &Path,
@@ -628,7 +630,13 @@ pub(crate) fn decide(
         .as_deref()
         .ok_or(E::Refused("planning-not-enabled"))?;
     if p.repository.is_some() {
-        return Err(E::Refused("planning-decision-repository-unported"));
+        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task")) {
+            return Err(E::Refused("planning-decision-managed-operation-unported"));
+        }
+        #[cfg(target_os="linux")]
+        crate::managed_repository::observe(root,w,settings)?;
+        #[cfg(not(target_os="linux"))]
+        return Err(E::Refused("planning-managed-platform-unported"));
     }
     if p.decisions >= p.max_decisions {
         return Err(E::Refused("planning-decision-budget-exhausted"));

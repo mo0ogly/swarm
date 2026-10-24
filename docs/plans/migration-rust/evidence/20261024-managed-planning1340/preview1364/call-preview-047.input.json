@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "event_id": "preview-renew",
+  "expected_revision": 3,
+  "scope": "root",
+  "scope_revision": 1,
+  "holder": "fixture-planner",
+  "generation": 1,
+  "lease_seconds": 120
+}

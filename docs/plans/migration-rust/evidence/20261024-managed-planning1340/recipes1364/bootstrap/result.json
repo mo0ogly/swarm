@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "managed-repository-bootstrap",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "committed-source-copy-replay-and-recovery",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='managed-bootstrap-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_managed_repository_bootstrap.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 3.7527907519834116,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "b37d0fd99fa83810c770f33814d77cf238e6d9f2d500dd08f32b59f91e96472b",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "081dcb46bbc6fd534eadda42811d102ce227d11534c7afec42d042203a5e6a86",
+    "declared-inputs.tar.gz": "ebd4bde5f770f8e94c3c15247b075fd67931aa7e9600058ae465debb4cfeb25f",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "ee6def330c1b558e1bdcb42bc4e6ec01597034529f8201df1e31b890f36e5cca",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "f7adb502eb8c65cbdac509f90e98f9b3192b76eaec3f0c72d3cbbd218356e335",
+    "inputs.after.json": "081dcb46bbc6fd534eadda42811d102ce227d11534c7afec42d042203a5e6a86"
+  }
+}

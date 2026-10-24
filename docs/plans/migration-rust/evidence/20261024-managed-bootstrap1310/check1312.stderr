@@ -1,0 +1,72 @@
+    Checking swarm-engine v0.1.0 (/home/fpizzi/Documents/ChatGPT/swarm/rust/crates/swarm-engine)
+error[E0433]: cannot find `AtomicStorageFault` in `crate`
+   --> crates/swarm-engine/src/managed_repository.rs:101:187
+    |
+101 | ...epository.json",&raw,crate::AtomicStorageFault::None).map_err(|e|E::caused("managed-manifest-publish",e))?;}
+    |                                ^^^^^^^^^^^^^^^^^^ could not find `AtomicStorageFault` in the crate root
+    |
+note: found an item that was configured out
+   --> crates/swarm-engine/src/lib.rs:298:24
+    |
+297 | #[cfg(all(unix, feature = "test-fixtures"))]
+    |                 ------------------------- the item is gated behind the `test-fixtures` feature
+298 | pub use local_storage::AtomicStorageFault;
+    |                        ^^^^^^^^^^^^^^^^^^
+help: consider importing this enum
+    |
+  3 + use crate::local_storage::AtomicStorageFault;
+    |
+help: if you import `AtomicStorageFault`, refer to it directly
+    |
+101 -         if final_manifest.is_none(){let raw=dir.read("repository.json.pending").map_err(|e|E::caused("managed-pending-read",e))?;dir.publish_new_with_fault("repository.json",&raw,crate::AtomicStorageFault::None).map_err(|e|E::caused("managed-manifest-publish",e))?;}
+101 +         if final_manifest.is_none(){let raw=dir.read("repository.json.pending").map_err(|e|E::caused("managed-pending-read",e))?;dir.publish_new_with_fault("repository.json",&raw,AtomicStorageFault::None).map_err(|e|E::caused("managed-manifest-publish",e))?;}
+    |
+
+error[E0433]: cannot find `AtomicStorageFault` in `crate`
+   --> crates/swarm-engine/src/managed_repository.rs:122:78
+    |
+122 | ...y.json.pending",&raw,crate::AtomicStorageFault::None).map_err(|e|E::caused("managed-pending-publish",e))?;
+    |                                ^^^^^^^^^^^^^^^^^^ could not find `AtomicStorageFault` in the crate root
+    |
+note: found an item that was configured out
+   --> crates/swarm-engine/src/lib.rs:298:24
+    |
+297 | #[cfg(all(unix, feature = "test-fixtures"))]
+    |                 ------------------------- the item is gated behind the `test-fixtures` feature
+298 | pub use local_storage::AtomicStorageFault;
+    |                        ^^^^^^^^^^^^^^^^^^
+help: consider importing this enum
+    |
+  3 + use crate::local_storage::AtomicStorageFault;
+    |
+help: if you import `AtomicStorageFault`, refer to it directly
+    |
+122 -             dir.publish_new_with_fault("repository.json.pending",&raw,crate::AtomicStorageFault::None).map_err(|e|E::caused("managed-pending-publish",e))?;
+122 +             dir.publish_new_with_fault("repository.json.pending",&raw,AtomicStorageFault::None).map_err(|e|E::caused("managed-pending-publish",e))?;
+    |
+
+error[E0433]: cannot find `AtomicStorageFault` in `crate`
+   --> crates/swarm-engine/src/managed_repository.rs:124:70
+    |
+124 | ...epository.json",&raw,crate::AtomicStorageFault::None).map_err(|e|E::caused("managed-manifest-publish",e))?;
+    |                                ^^^^^^^^^^^^^^^^^^ could not find `AtomicStorageFault` in the crate root
+    |
+note: found an item that was configured out
+   --> crates/swarm-engine/src/lib.rs:298:24
+    |
+297 | #[cfg(all(unix, feature = "test-fixtures"))]
+    |                 ------------------------- the item is gated behind the `test-fixtures` feature
+298 | pub use local_storage::AtomicStorageFault;
+    |                        ^^^^^^^^^^^^^^^^^^
+help: consider importing this enum
+    |
+  3 + use crate::local_storage::AtomicStorageFault;
+    |
+help: if you import `AtomicStorageFault`, refer to it directly
+    |
+124 -             dir.publish_new_with_fault("repository.json",&raw,crate::AtomicStorageFault::None).map_err(|e|E::caused("managed-manifest-publish",e))?;
+124 +             dir.publish_new_with_fault("repository.json",&raw,AtomicStorageFault::None).map_err(|e|E::caused("managed-manifest-publish",e))?;
+    |
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `swarm-engine` (lib) due to 3 previous errors

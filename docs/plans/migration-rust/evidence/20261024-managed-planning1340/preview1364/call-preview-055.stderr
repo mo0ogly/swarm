@@ -1,0 +1,13 @@
+{
+  "error": "planning-claim-provider-changed",
+  "failure": {
+    "causes": [
+      "planning-claim-provider-changed",
+      "planning-claim-provider-changed"
+    ],
+    "code": "planning-claim-provider-changed",
+    "message": "planning-claim-provider-changed",
+    "retryable": false
+  },
+  "schema_version": 1
+}

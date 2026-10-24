@@ -48,9 +48,8 @@ fn choose(db: &rusqlite::Connection, work: &Work, at: &str) -> Result<Option<Cho
     if !p.failure.is_empty() {
         return Err(A::Refused("planning-stopped"));
     }
-    if p.repository.is_some() {
-        return Err(A::Refused("planning-claim-repository-unported"));
-    }
+    // Repository source proof is rechecked by authoritative claim preparation;
+    // this read-only choice neither grants a managed worker nor touches Git.
     let now =
         swarm_wire_json::go_rfc3339::parse(at).map_err(|e| A::caused("planning-step-clock", e))?;
     let mut seen = BTreeSet::new();

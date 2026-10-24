@@ -301,16 +301,11 @@ pub(crate) struct TerminalObservation {
     pub output_complete: bool,
     pub provider_may_have_started: bool,
 }
-/// Verify actual terminal native observations in the caller transaction without
-/// invoking recovery or mutating history. Requires known reap/release and gate
-/// disposition, matching full Agent/ownership/reservation and native snapshot.
-/// Explicit logical output failure can be observed for correction, never quality
-/// acceptance; unknown wait/drain/owner remains refusal regardless of PID/lease.
-/// Reads the complete original under the existing store contract; no aggregate
-/// memory bound or hostile same-UID writer protection is established.
-pub(crate) fn observe_terminal(db: &rusqlite::Connection, directory: &LocalDirectory, id: &str) -> Result<TerminalObservation, RootStoreError> {
-    if db.is_autocommit() { return Err(RootStoreError::Refused("agent-completion-observation-transaction-required")); }
-    let (journal, bytes) = read_journal(directory, id)?;
+/// Validate original kernel reap, workspace release, private gate and native
+/// provenance independently of the current SQL terminal projection. Recovery uses
+/// the same proof BEFORE any settlement; observation additionally checks terminal
+/// rows. Malformed/unknown facts refuse, even if the original owner is still live.
+fn verify_original_facts(journal: &Journal) -> Result<WaitFacts, RootStoreError> {
     let facts: WaitFacts = swarm_wire_json::decode(journal.details.0.get().as_bytes()).map_err(|e|
         RootStoreError::Launch(Box::new(AgentLaunchError::caused("agent-completion-wait-format", e))))?;
     if facts.schema_version != 1 || facts.kernel_reaped != Some(true) || facts.workspace_release_confirmed != Some(true)
@@ -335,6 +330,19 @@ pub(crate) fn observe_terminal(db: &rusqlite::Connection, directory: &LocalDirec
         || journal.may_have_started && snapshot.phase != crate::AgentExecutionPhase::PermissionRecorded {
         return Err(RootStoreError::Refused("agent-completion-native-origin-changed"));
     }
+    Ok(facts)
+}
+/// Verify actual terminal native observations in the caller transaction without
+/// invoking recovery or mutating history. Requires known reap/release and gate
+/// disposition, matching full Agent/ownership/reservation and native snapshot.
+/// Explicit logical output failure can be observed for correction, never quality
+/// acceptance; unknown wait/drain/owner remains refusal regardless of PID/lease.
+/// Reads the complete original under the existing store contract; no aggregate
+/// memory bound or hostile same-UID writer protection is established.
+pub(crate) fn observe_terminal(db: &rusqlite::Connection, directory: &LocalDirectory, id: &str) -> Result<TerminalObservation, RootStoreError> {
+    if db.is_autocommit() { return Err(RootStoreError::Refused("agent-completion-observation-transaction-required")); }
+    let (journal, bytes) = read_journal(directory, id)?;
+    let facts = verify_original_facts(&journal)?;
     let current = crate::read_agent(db, id).map_err(RootStoreError::Agent)?;
     verify_terminal(db, &journal, &current)?;
     Ok(TerminalObservation { agent: current, receipt_sha256: format!("{:x}", Sha256::digest(&bytes)),
@@ -354,6 +362,46 @@ pub(crate) fn recover(
     id: &str,
 ) -> Result<Agent, RootStoreError> {
     let (journal, _) = read_journal(directory, id)?;
+    recover_original(db, root, directory, id, journal, None)
+}
+
+/// Observe an original completion for a registered automatic worker, then recover
+/// only after actual owner departure and a current transaction-local mission fence.
+/// Missing original or a still-live owner is explicit waiting with its typed cause,
+/// never a terminal/permission claim. Invalid originals and all other errors refuse.
+/// No queued cancellation, provider invocation, process signal or new attempt occurs.
+pub(crate) fn recover_under_mission(
+    db: &mut rusqlite::Connection, root: &Path, directory: &LocalDirectory,
+    id: &str, fence: &dyn crate::work_engine::MutationFence,
+) -> Result<crate::MissionWorkerRecovery, RootStoreError> {
+    let journal=match read_journal(directory,id) {
+        Ok((journal,_))=>journal,
+        Err(error) if matches!(&error,RootStoreError::Launch(cause)
+            if matches!(cause.as_ref(),AgentLaunchError::Cause{code:"agent-completion-journal-missing",..})) => {
+                return Ok(crate::MissionWorkerRecovery::Waiting { reason:"completion-original-pending",cause:error });
+            }
+        Err(error)=>return Err(error),
+    };
+    verify_original_facts(&journal)?;
+    match departed(&journal.expected) {
+        Ok(())=>{},
+        Err(error @ AgentLaunchError::Refused("agent-completion-supervisor-still-live"))=>{
+            return Ok(crate::MissionWorkerRecovery::Waiting { reason:"completion-owner-still-live",cause:RootStoreError::Launch(Box::new(error)) });
+        }
+        Err(error)=>return Err(RootStoreError::Launch(Box::new(error))),
+    }
+    recover_original(db,root,directory,id,journal,Some(fence))
+        .map(|agent|crate::MissionWorkerRecovery::Finalized { agent: Box::new(agent) })
+}
+
+/// Share journal decoding/settlement across explicit manual and mission recovery.
+/// The optional live fence applies inside each SQL snapshot/settlement, not merely
+/// before callback admission. Original terminal replay stays idempotent; every
+/// failure retains its cause and any uncertain/recorded effect through retry/close.
+fn recover_original(
+    db: &mut rusqlite::Connection, root: &Path, directory: &LocalDirectory,
+    id: &str, journal: Journal, fence: Option<&dyn crate::work_engine::MutationFence>,
+) -> Result<Agent, RootStoreError> {
     if journal.incomplete_output {
         return Err(RootStoreError::Refused(
             "agent-completion-output-recovery-required",
@@ -379,8 +427,13 @@ pub(crate) fn recover(
         ) {
             // The settings reservation does not open a SQL transaction. Reread
             // Agent and all terminal/FIFO proof in one explicit read snapshot.
-            let mut tx = db.transaction().map_err(RootStoreError::Sql)?;
+            let behavior=if fence.is_some(){rusqlite::TransactionBehavior::Immediate}else{rusqlite::TransactionBehavior::Deferred};
+            let mut tx = db.transaction_with_behavior(behavior).map_err(RootStoreError::Sql)?;
             let observed = (|| {
+                if let Some(fence)=fence {
+                    let now=crate::system_timestamp().map_err(|e|RootStoreError::Runtime(crate::RuntimeError::new(crate::RuntimeOperation::Platform,e)))?;
+                    fence.check(&tx,&journal.expected.work_id,&now).map_err(RootStoreError::Mutation)?;
+                }
                 let current = crate::read_agent(&tx, id).map_err(RootStoreError::Agent)?;
                 verify_terminal(&tx, &journal, &current)?;
                 Ok(current)
@@ -388,8 +441,10 @@ pub(crate) fn recover(
             tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
             return crate::root_store::finished(observed, tx.rollback().map_err(RootStoreError::Sql));
         }
-        store::complete_recovered(db, root, settings, &journal.expected, &receipt)
-            .map_err(|e| RootStoreError::Launch(Box::new(e)))
+        match fence {
+            Some(fence)=>store::complete_recovered_fenced(db,root,settings,&journal.expected,&receipt,fence),
+            None=>store::complete_recovered(db, root, settings, &journal.expected, &receipt),
+        }.map_err(|e| RootStoreError::Launch(Box::new(e)))
     })
 }
 

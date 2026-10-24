@@ -1,0 +1,35 @@
+{
+  "exit": 0,
+  "events": [
+    {
+      "event": "mission-watch-started",
+      "generation": 2,
+      "mission_complete": false,
+      "observation_is_permission": false,
+      "poll_interval_ms": "2000",
+      "schema_version": 1,
+      "settings_revision": "1",
+      "work": "w-bafc8cc3dc9f29c239b9f66a"
+    },
+    {
+      "agent_id": "watch-93fc66cd4b016e163d5fdce0",
+      "causes": [
+        "agent-completion-journal-missing",
+        "agent-completion-journal-missing",
+        "storage-operation:OpenFile",
+        "os-errno:2"
+      ],
+      "event": "mission-watch-blocked",
+      "mission_complete": false,
+      "observation_is_permission": false,
+      "reason": "completion-original-pending",
+      "schema_version": 1,
+      "work": "w-bafc8cc3dc9f29c239b9f66a"
+    }
+  ],
+  "expected": [
+    "mission-watch-blocked",
+    "completion-original-pending"
+  ],
+  "global_watchdog": null
+}

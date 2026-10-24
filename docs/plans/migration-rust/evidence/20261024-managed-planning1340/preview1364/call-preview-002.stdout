@@ -1,0 +1,85 @@
+{
+  "work": {
+    "schema_version": 1,
+    "id": "w-dca975b4d0a818a527bbec45",
+    "revision": 1,
+    "title": "Requested model fixture",
+    "objective": "Observe route",
+    "scope": "Owned local program",
+    "criteria": [
+      "Observed, not accepted"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-24T11:43:18.738107195Z",
+    "updated": "2026-10-24T11:43:18.755707611Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": []
+  },
+  "validation": {
+    "state": "open",
+    "label": "OUVERT",
+    "validated": 0,
+    "historical": 0,
+    "stale": 0,
+    "tasks": {}
+  },
+  "events": [
+    {
+      "id": "create",
+      "work_id": "w-dca975b4d0a818a527bbec45",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-24T11:43:18.755707611Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "create",
+        "expected_revision": 0,
+        "title": "Requested model fixture",
+        "objective": "Observe route",
+        "scope": "Owned local program",
+        "criteria": [
+          "Observed, not accepted"
+        ]
+      }
+    }
+  ],
+  "current_gates": {},
+  "current_git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "resume_markdown": "# Requested model fixture\n\nTravail : w-dca975b4d0a818a527bbec45 | révision 1 | OUVERT\nDernière activité : 2026-10-24T11:43:18.755707611Z\n\n## Objectif et résultat attendu\nObserve route\nPérimètre : Owned local program\n- Observed, not accepted\n\n## Situation actuelle\nnon renseigné\nHEAD enregistré : non renseigné\nBranche enregistrée : non renseigné\nHEAD courant : non renseigné\nBranche courante : non renseigné\nMétadonnée Git indisponible (HEAD) : git-command-failed.\nMétadonnée Git indisponible (branch) : git-command-failed.\nMétadonnée Git indisponible (changes) : git-command-failed.\n\n## Tâches actives et résultats attendus\nAucune tâche active déclarée.\n\n## Travail validé\nTâches acceptées (preuves ou dérogation) : 0/0.\nCe ratio est distinct de la progression des critères d’une gate.\n\n## Travail restant et blocages\n\n## Gates, qualité et progression vérifiée\n\n## Prochaine action du travail\nà définir\n\n## Décisions OODA et mémoire utile\nMémoire spécifique : non renseignée.\n\nLes tentatives enregistrées ne prouvent pas qu’un processus tourne encore.\nUne gate ne remplace pas une autorisation de publication.\n",
+  "git_diagnostics": [
+    {
+      "field": "head",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "branch",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "changes",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    }
+  ]
+}

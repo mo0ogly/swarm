@@ -1,0 +1,4069 @@
+{
+  "roots": [
+    "/tmp/swarm-model83-lw_6ha0c",
+    "/tmp/swarm-model83-rmijwz4p",
+    "/tmp/swarm-model83-s9lbqsaj",
+    "/tmp/swarm-model83-sjbl7y39",
+    "/tmp/swarm-model83-vhdlaym9"
+  ],
+  "outputs": [
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+    "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5"
+  ],
+  "files": [
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/001-review-passed.command.json",
+      "sha256": "e5e5fc9b085d8ca1628f0131ca838fa9c5a92ed54ec9383c08e048478ce8a4c8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/001-review-passed.exit.json",
+      "sha256": "b5b5bd798f127989c6bcaf64ec517972a851e8df48d1fd860f2e8c7d17723686"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/001-review-passed.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/001-review-passed.stdout",
+      "sha256": "10cccd0f7ff8dd24940bd940f7f0a81191da09c94f647190fd8451abcfc224e6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/002-review-accepted.command.json",
+      "sha256": "bb1184a27fd3e67f0ebe85f8794e388277dbf53bed0321691c93bf1a0ba13bee"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/002-review-accepted.exit.json",
+      "sha256": "54003ae2201a8298ac86a0eab52c58710f27fc68583e0a7e9a9396d3b88fbd1d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/002-review-accepted.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/002-review-accepted.stdout",
+      "sha256": "da623a0aed900c7beb22104a4cb397b41e8222a126838e2832115e02676b8ee7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/003-review-stale.command.json",
+      "sha256": "950338674f518feae385dc1fbc329e9250380c460d87bbb6d12f1a1211609b02"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/003-review-stale.exit.json",
+      "sha256": "22d160e154bbae8c47eba16f8ad15c30580b18f3cce02b63eb376c58a8f70cfc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/003-review-stale.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/003-review-stale.stdout",
+      "sha256": "b53c6237a906aebc10e757c3afdc212f18ce5620739e6c7680c8ee1b4ca6c4f3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/004-review-restored.command.json",
+      "sha256": "84bf2ab7fac3f0e0e6099555b56ce06b021e83c85502e2b95e2335b29ec4e6fa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/004-review-restored.exit.json",
+      "sha256": "4c2a8157563ade217c02e67d31b136ee8170a24a6499b233ccc1636179b38e4a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/004-review-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/004-review-restored.stdout",
+      "sha256": "9cf8e43e44904c24dd6aee86b86d13b99d26995b633dcbe4fd188dc2d90650b1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/001-negative-review.command.json",
+      "sha256": "a69912bb262b32539d3236fe319c59bce8bae5070d432b777ecefd329df559d4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/001-negative-review.exit.json",
+      "sha256": "386f3c5a7ad435cee5787a3d62c059ed6c336083b64454c85a5ff067fc72fb32"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/001-negative-review.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/001-negative-review.stdout",
+      "sha256": "b0283e49f914450093b793288966d6469c671951720a188262c818c0a0bf6254"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/002-negative-stale.command.json",
+      "sha256": "e9bd5781706e6cac642415e84fa7290b017ee4ebf1032ed22b34a7e1af301037"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/002-negative-stale.exit.json",
+      "sha256": "7f32ae25d05e179b78644ead28eb646c81a7d0b6ef726d75dafce7bb7ea904c4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/002-negative-stale.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/002-negative-stale.stdout",
+      "sha256": "76b4547831b3f98cfef1e6a10ffe464624d0f66e456d6b2fa15ce92acbe85621"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/003-negative-restored.command.json",
+      "sha256": "ab0a407a19ec45b3794796db983f78f3325819065ef4b58a13fd9e7ca4772546"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/003-negative-restored.exit.json",
+      "sha256": "7472b7c141c819e3d8ff88bda9b8ad6fbe2d2acfcd00ecddb9728663e8d57c1e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/003-negative-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/003-negative-restored.stdout",
+      "sha256": "acd22c38f7f7790c23c80fd5896378556d9ee6f11a3bee40bfdc2d1b7c09f4e7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/negative-restored.after.json",
+      "sha256": "9eb36b2cede0f3af79e6c748065e15f6f31016c4ebe46589828bf13d557fcd3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/negative-restored.before.json",
+      "sha256": "9eb36b2cede0f3af79e6c748065e15f6f31016c4ebe46589828bf13d557fcd3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/negative-review.after.json",
+      "sha256": "9eb36b2cede0f3af79e6c748065e15f6f31016c4ebe46589828bf13d557fcd3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/negative-review.before.json",
+      "sha256": "9eb36b2cede0f3af79e6c748065e15f6f31016c4ebe46589828bf13d557fcd3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/negative-stale.after.json",
+      "sha256": "9eb36b2cede0f3af79e6c748065e15f6f31016c4ebe46589828bf13d557fcd3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/negative-stale.before.json",
+      "sha256": "9eb36b2cede0f3af79e6c748065e15f6f31016c4ebe46589828bf13d557fcd3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/report.original",
+      "sha256": "d0a6d9f8a631e11ab98237d08627426bf542b058b7d54c64f06bc3d5dc64a464"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/review-source.json",
+      "sha256": "e7621eb383dc4fe1ed4c79c3250e64f7327675e89f03956a1f3f49513e6a1326"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-missing.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-missing.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-missing.stdout",
+      "sha256": "c8889a9bf470030fef85f69af17bac26675a7799a609ea6e15e314f0c219df24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-private-refusal.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-private-refusal.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-private-refusal.stdout",
+      "sha256": "c8889a9bf470030fef85f69af17bac26675a7799a609ea6e15e314f0c219df24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-replay.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-replay.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after-replay.stdout",
+      "sha256": "c8889a9bf470030fef85f69af17bac26675a7799a609ea6e15e314f0c219df24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/after.stdout",
+      "sha256": "c8889a9bf470030fef85f69af17bac26675a7799a609ea6e15e314f0c219df24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/before.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/before.stdout",
+      "sha256": "aec090c8166e910bc62b9a119b2a348b2e9e4b34d94b3ce82833d18387def3ef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs-after.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs-after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs-after.stdout",
+      "sha256": "aec090c8166e910bc62b9a119b2a348b2e9e4b34d94b3ce82833d18387def3ef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs-before.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs-before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs-before.stdout",
+      "sha256": "aec090c8166e910bc62b9a119b2a348b2e9e4b34d94b3ce82833d18387def3ef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs.command.json",
+      "sha256": "c1a22b8b8943d4ff7ba9a472a64b0e0c51bc41d97f4619b3cd17a246c33f2ba3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs.input.json",
+      "sha256": "fc6e27626606a219029ced2beb259dc8a846384f99c802ede26409443419dd31"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/complete-inputs.stdout",
+      "sha256": "4703aee7ee664442d7aa8fdb28ab4800b90d1400ab81a3a506abfa652e91c52c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/fixture.json",
+      "sha256": "a973d1a352214a7a5355bea0455eedd8273aae7b206ab83c1446b68382f0788b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/missing-recovery.command.json",
+      "sha256": "508c95a1e84b41439b916abfca62ca1104a62d2f5e0638783c731a2df0c96ab3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/missing-recovery.stderr",
+      "sha256": "e20298714e7297fc739d713ef0d51b25eb0b3f242c0458a53e845ec053a8377a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/missing-recovery.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/originals/certificate.json",
+      "sha256": "b7364c03f243fa458196f959f4a436203559b6e415dfd998a677b0158e240b8e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/originals/configured-reply.json",
+      "sha256": "c95f0b137f73142a124247b55124cee780b7b42e6b28e3cabdb36ef67bf5ec47"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/originals/inert-provider.py",
+      "sha256": "3d469e2dec0741eaa85ee38a6e5186ddf46fd934efcbc5bc781b08dcfc4b77d4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/originals/invocation.json",
+      "sha256": "330e44103cb357b5b2aea0dca8af8f203095bf98d7eadcc9647491b45a944c2b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/originals/original.frame",
+      "sha256": "f5cf74d8741ff4e1a7168f68196b238793f7aa88303119362030457d1dbf3ad8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/originals/retention.json",
+      "sha256": "90412c270944192a05316283d1548e848cba32fa8e0c71ef6daf6fdca4970d56"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-corrupted.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-corrupted.stderr",
+      "sha256": "54776e8035749226a47c202344308d60a8df10aeadc9fab3f3e0171ea3c57e0b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-corrupted.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-restored.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-restored.stdout",
+      "sha256": "b6114d9319d5c95a651accb435ad735dba3aab67123261e2053f218568caf8ea"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-unchanged.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-unchanged.stdout",
+      "sha256": "c8889a9bf470030fef85f69af17bac26675a7799a609ea6e15e314f0c219df24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-valid.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-valid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/private-valid.stdout",
+      "sha256": "b6114d9319d5c95a651accb435ad735dba3aab67123261e2053f218568caf8ea"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-corrupted.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-corrupted.stderr",
+      "sha256": "a6129dde15bcffe07cb8ca2a9765cf983e5a91df7dde9c0018e5dc3fcdaa08d5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-corrupted.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-restored.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-restored.stdout",
+      "sha256": "b6114d9319d5c95a651accb435ad735dba3aab67123261e2053f218568caf8ea"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-unchanged.command.json",
+      "sha256": "9c998e42cec685640c733f209936f603d29f1909617da3aa97b17d4ea62bb459"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-unchanged.stdout",
+      "sha256": "c8889a9bf470030fef85f69af17bac26675a7799a609ea6e15e314f0c219df24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-valid.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-valid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/public-valid.stdout",
+      "sha256": "b6114d9319d5c95a651accb435ad735dba3aab67123261e2053f218568caf8ea"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/reconcile.command.json",
+      "sha256": "1c6208ff75876360b41c99ce2c8fb9b44b4cd1de9fdb04202e0a5e99180de32a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/reconcile.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/reconcile.stdout",
+      "sha256": "b6114d9319d5c95a651accb435ad735dba3aab67123261e2053f218568caf8ea"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/regular-gate.stderr",
+      "sha256": "9accbd3e6dde904469ce37d37b5d56e7226b478743f6c264787489c82e3f3dae"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/regular-gate.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/regular-stdin",
+      "sha256": "7b19514a36104e2e4dd6855d62c86299187d015e1b098ee645c5c38ff63eb5f6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review-replay.command.json",
+      "sha256": "cc145f92a1970c319e9415cc830a9e397c7b4fc80f02eec797fa80bb38845d44"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review-replay.input.json",
+      "sha256": "283e051626132060b0ea662e2dc3cc12be3cdb6a9d627d3357a0143e4ebcc60f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review-replay.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review-replay.stdout",
+      "sha256": "b6114d9319d5c95a651accb435ad735dba3aab67123261e2053f218568caf8ea"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review.command.json",
+      "sha256": "786ff87ce7041338f947f5c6d19852ae0e5f1a0f3f2f5cb58ae27e9a8308170e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review.input.json",
+      "sha256": "283e051626132060b0ea662e2dc3cc12be3cdb6a9d627d3357a0143e4ebcc60f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/review.stdout",
+      "sha256": "359a06b7cebca1855f4d12be219d344f1813e3938ab97fbfa565f4fbea3877eb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/controls.command.json",
+      "sha256": "c71cbe2fc1b6f885c35a63015ea4b26b38287f358f909db345fac566abe664e4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/controls.input.json",
+      "sha256": "6cd78ac775c1e51fd4aa9674c81ea2687ef562180d9bf4d859031a2f77e9c997"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/controls.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/controls.stdout",
+      "sha256": "8219a5e938f1c3db223613930869e4099dbd0b5a54eb7558842475e81dc98cf9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/owned-root-259a530e5604c9829c62ca36f8d36335e638127102131f5dbe3d0bf8f6f6a835.json",
+      "sha256": "da6b9daff83ce4c0130c14fc381543d1adfaa1acbc1b9b3e118dbf194a74185e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-001.stdout",
+      "sha256": "0b42594c96ac4914fcc83e63221d18964709989ba2bc5e70cbbaf6995e86c578"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-002.stdout",
+      "sha256": "ad65188f7ea5f7d53f47b1946a61b8dc8004f0a97afb54b11d61aa6341ec8114"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-003.stdout",
+      "sha256": "d57dacd8a82542de3ebe063e8d7c33f6e4abbc9d2eb2358eb3ccf7081b1b70ee"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-004.stdout",
+      "sha256": "1e6f7542ea5d62a29790c75548f8e75fa146c8b9f64294cd6f1183c9984057fa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-005.stdout",
+      "sha256": "fab03dcbbbfb927de58cec33aa104fc748cdeac248f72da00225dfb89cc07e9a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-006.input.json",
+      "sha256": "24d108fadb2e3b4311ad75c16b8c8552f514659d9c35cdef1af24310a92bbbd6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-006.stdout",
+      "sha256": "9df2782f996896a76b6e9b2919424eae184a0fef838fed9081a0446a4aa2d229"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-007.stdout",
+      "sha256": "fa2c6fb2386d6c959f8711c08084663a6afbc61b4455a841db0a5ad3c92416c9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-008.stdout",
+      "sha256": "ef0a812b23b14a51f76d99501c2a020870b8d46cf8eeb87d3e044c10da457b13"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-009.stdout",
+      "sha256": "55904e2717d4003b8a7c92d344937e8460f7f21cb15f01a09ddf1589fb9ad35e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-010.input.json",
+      "sha256": "b2a54e194eb094e9df7e815bc790c2bd0df76c0569c17f9e34d37748f1869acf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-010.stdout",
+      "sha256": "0ea32ce7967c79f89b9bd7d9d2474697f64980a0a0906aefffe2327bed642617"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-011.input.json",
+      "sha256": "0a3df284405394de993d80a3e49aca0ddea5edf5425d6ec15fa33c8bc85b8b9e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-011.stdout",
+      "sha256": "3b0db5e7e2bc5c4c2557858340a4d4b7a632cd444b29c1f62fd83a077012e002"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-012.stdout",
+      "sha256": "198613f07e90d4e8adf3757777fa33dc6fd8d8ef4b7bbcd47e88e57d22da6764"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-013.stdout",
+      "sha256": "c1401c85112790d205912d3ea4ce27b8e78615b0721f5c7aae67c737a03a0709"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-014.stdout",
+      "sha256": "6658f6033fd2e8287a8b01d078f9001507e0c7b3adb6d092e7f792b41576c517"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-015.stdout",
+      "sha256": "c1401c85112790d205912d3ea4ce27b8e78615b0721f5c7aae67c737a03a0709"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-016.stdout",
+      "sha256": "c1401c85112790d205912d3ea4ce27b8e78615b0721f5c7aae67c737a03a0709"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-017.input.json",
+      "sha256": "f3048dd2a9f5eb3b25533fdce272eab9688ba88d4da42fdca45257e49380e7e8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-017.stdout",
+      "sha256": "a6bdce10c254e77554f47f0dcce62c1d2c8d9159a24e7a0186186ad1922387ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-018.stdout",
+      "sha256": "a6bdce10c254e77554f47f0dcce62c1d2c8d9159a24e7a0186186ad1922387ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-019.stdout",
+      "sha256": "a6bdce10c254e77554f47f0dcce62c1d2c8d9159a24e7a0186186ad1922387ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-020.stdout",
+      "sha256": "236566d705faa9f97ef973ab3958c5a67bd62d750fd13fd051ad1030f1509d5f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-commands.json",
+      "sha256": "4ff59be15a5d84e788b2a2f9a4b8c71721f408b3cd27fe5d71fe13a494f34da8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/changes-requested/reviewer/source/public-worker-flow-fixture.json",
+      "sha256": "853fff97609679c2324c9b321c23c3fbd5fda5063c12260da325ad3948831dd7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/001-negative-review.command.json",
+      "sha256": "81434615a5678619323d352509f01ce171e216cdd8824827f6a02cd25aae3497"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/001-negative-review.exit.json",
+      "sha256": "11c3a3740facdf2698ebd3c552c3a1d1108c609114a4f1c80776793468b53023"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/001-negative-review.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/001-negative-review.stdout",
+      "sha256": "20c22137d048edb9f50ed6ac8f29d77f46ce9760517e6c2ef8f3934ae8023617"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/002-negative-stale.command.json",
+      "sha256": "052b05416dfcea558c2f39fb3332d64e53242ac040720e06a13dfde267262663"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/002-negative-stale.exit.json",
+      "sha256": "d3d644369c5b49a151018a11fab3e80bbac3ca7c2f0444c200fdea6509a94b69"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/002-negative-stale.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/002-negative-stale.stdout",
+      "sha256": "430f3dfa8c7434c78ae79806092bce4c8fbddde65156be26e8f86ae979f1cee1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/003-negative-restored.command.json",
+      "sha256": "a21eac7b68b7ccb1b8fa00b106d47e1fc2433276f46f0805fd3e1ac1aefca8bf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/003-negative-restored.exit.json",
+      "sha256": "217ac8c80f41ec0f4519d1dfa99633fb11c3c4eb7f100db43e4d50ae7ecd35d1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/003-negative-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/003-negative-restored.stdout",
+      "sha256": "f686626372094c5382600f80c99b0278ad059f15655ba2685aa7f0d4afb35cb0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/negative-restored.after.json",
+      "sha256": "855b47b9ac09a24fd45f4f9830e17a58374c5d002010c6c55d42deac91f6c535"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/negative-restored.before.json",
+      "sha256": "855b47b9ac09a24fd45f4f9830e17a58374c5d002010c6c55d42deac91f6c535"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/negative-review.after.json",
+      "sha256": "855b47b9ac09a24fd45f4f9830e17a58374c5d002010c6c55d42deac91f6c535"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/negative-review.before.json",
+      "sha256": "855b47b9ac09a24fd45f4f9830e17a58374c5d002010c6c55d42deac91f6c535"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/negative-stale.after.json",
+      "sha256": "855b47b9ac09a24fd45f4f9830e17a58374c5d002010c6c55d42deac91f6c535"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/negative-stale.before.json",
+      "sha256": "855b47b9ac09a24fd45f4f9830e17a58374c5d002010c6c55d42deac91f6c535"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/report.original",
+      "sha256": "871ba7d0579e848b6d119e3620a3551e02b1ac282fe2f9ab3e5181f084f4d474"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/review-source.json",
+      "sha256": "08aada7e7b55048495fb2c531d5fa847ef2e19d1476ead628acbec31933bb070"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-missing.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-missing.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-missing.stdout",
+      "sha256": "bfd02fdef36fc6e6a51fc416c95899474e8f0f66087affd35be4ab01b0789322"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-private-refusal.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-private-refusal.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-private-refusal.stdout",
+      "sha256": "bfd02fdef36fc6e6a51fc416c95899474e8f0f66087affd35be4ab01b0789322"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-replay.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-replay.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after-replay.stdout",
+      "sha256": "bfd02fdef36fc6e6a51fc416c95899474e8f0f66087affd35be4ab01b0789322"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/after.stdout",
+      "sha256": "bfd02fdef36fc6e6a51fc416c95899474e8f0f66087affd35be4ab01b0789322"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/before.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/before.stdout",
+      "sha256": "4dc32eec562b472a7c79bfde9a5687e8ed070b14ec2de372f6310676848654c8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs-after.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs-after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs-after.stdout",
+      "sha256": "4dc32eec562b472a7c79bfde9a5687e8ed070b14ec2de372f6310676848654c8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs-before.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs-before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs-before.stdout",
+      "sha256": "4dc32eec562b472a7c79bfde9a5687e8ed070b14ec2de372f6310676848654c8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs.command.json",
+      "sha256": "2df9acb3dcef68b98728342cd9a8f1a2e36277841ef27f7e84cc68fd3a07e72f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs.input.json",
+      "sha256": "fc6e27626606a219029ced2beb259dc8a846384f99c802ede26409443419dd31"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/complete-inputs.stdout",
+      "sha256": "f229b69a086023847590e69589de0d355e7819c02357c63929ba98eaf52eeb40"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/fixture.json",
+      "sha256": "949473fe9759776be01f7d255f6752ce60a0e5493ecd0b5ba0e393d63f1f5290"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/missing-recovery.command.json",
+      "sha256": "2fbab93c5ebbd4c83577c49c482d28bf2e853f0d767df99bd9c682b8e5102580"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/missing-recovery.stderr",
+      "sha256": "e20298714e7297fc739d713ef0d51b25eb0b3f242c0458a53e845ec053a8377a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/missing-recovery.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/originals/certificate.json",
+      "sha256": "aabf35c0812fb80419fb510bcabab8bab6a2073a7bf94714568db2ca7ba8e7bc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/originals/configured-reply.json",
+      "sha256": "39b2b40de1d4520660f0ef24abaa536740956717a27af6d14871266fc6a26982"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/originals/inert-provider.py",
+      "sha256": "b5e83c21d32453addcc19adb92a660a430a273744daa8a0d30aa98bb54491b90"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/originals/invocation.json",
+      "sha256": "e8bcaf9deed67a004f723b2d14a8c91a7cf83ee55c1ce95d6fa3ea644b929866"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/originals/original.frame",
+      "sha256": "52757743abbfc20b21e0914dd7b8b572a408dea60c1c267316cebabd5a49db6c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/originals/retention.json",
+      "sha256": "0aa80c3639e249a407fe90ab9a97276406ff06bbd0e80fc6a1421952773941cc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-corrupted.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-corrupted.stderr",
+      "sha256": "54776e8035749226a47c202344308d60a8df10aeadc9fab3f3e0171ea3c57e0b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-corrupted.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-restored.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-restored.stdout",
+      "sha256": "838e52a0dd1fb2d50d7a44fde5cc130a91e3747dec8696c75d6cebacb0be7adf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-unchanged.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-unchanged.stdout",
+      "sha256": "bfd02fdef36fc6e6a51fc416c95899474e8f0f66087affd35be4ab01b0789322"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-valid.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-valid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/private-valid.stdout",
+      "sha256": "838e52a0dd1fb2d50d7a44fde5cc130a91e3747dec8696c75d6cebacb0be7adf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-corrupted.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-corrupted.stderr",
+      "sha256": "a6129dde15bcffe07cb8ca2a9765cf983e5a91df7dde9c0018e5dc3fcdaa08d5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-corrupted.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-restored.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-restored.stdout",
+      "sha256": "838e52a0dd1fb2d50d7a44fde5cc130a91e3747dec8696c75d6cebacb0be7adf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-unchanged.command.json",
+      "sha256": "eb2b14a0222406356ef0cff9ee0444deb0c2b056aafdabb2753e65b0c790993e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-unchanged.stdout",
+      "sha256": "bfd02fdef36fc6e6a51fc416c95899474e8f0f66087affd35be4ab01b0789322"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-valid.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-valid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/public-valid.stdout",
+      "sha256": "838e52a0dd1fb2d50d7a44fde5cc130a91e3747dec8696c75d6cebacb0be7adf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/reconcile.command.json",
+      "sha256": "705d26171e18eb5991d8dcdb22b271d6da728e2ce45219931e27f19e6070e2ce"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/reconcile.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/reconcile.stdout",
+      "sha256": "838e52a0dd1fb2d50d7a44fde5cc130a91e3747dec8696c75d6cebacb0be7adf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/regular-gate.stderr",
+      "sha256": "9accbd3e6dde904469ce37d37b5d56e7226b478743f6c264787489c82e3f3dae"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/regular-gate.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/regular-stdin",
+      "sha256": "7b19514a36104e2e4dd6855d62c86299187d015e1b098ee645c5c38ff63eb5f6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review-replay.command.json",
+      "sha256": "97b8f99af5c193ec08d124ab8d7fa373dd0fb7f0048e64ff8782363d97be9a59"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review-replay.input.json",
+      "sha256": "283e051626132060b0ea662e2dc3cc12be3cdb6a9d627d3357a0143e4ebcc60f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review-replay.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review-replay.stdout",
+      "sha256": "838e52a0dd1fb2d50d7a44fde5cc130a91e3747dec8696c75d6cebacb0be7adf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review.command.json",
+      "sha256": "234e49e58984dbe8c033301b77095686d247f0aa4efdec49532f0e586f69b742"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review.input.json",
+      "sha256": "283e051626132060b0ea662e2dc3cc12be3cdb6a9d627d3357a0143e4ebcc60f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review.stderr",
+      "sha256": "8b72beb68bbcf926bc98a048694a791cfa2b19ecb50b395f289dd8ec62b1ff99"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/review.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/controls.command.json",
+      "sha256": "73ed090264f7c98373c7a8def229dedce0d5c4d4e034256a17666e0903843c40"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/controls.input.json",
+      "sha256": "6cd78ac775c1e51fd4aa9674c81ea2687ef562180d9bf4d859031a2f77e9c997"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/controls.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/controls.stdout",
+      "sha256": "72015bf9f4124b83798faed8fa17c3c5b125b8bff1e6e0d9fd6959089ca61531"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/owned-root-a87441b3895e1f58d252ec0ebd0c7d1df85e334b21d855c8852472acf31b08b9.json",
+      "sha256": "3ccbd2576dcd8380bb0bc1d7b47155765549b3000d79644a37063d90d102cb32"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-001.stdout",
+      "sha256": "6dab3bdbc93c9557de5f35e277d8e0030996aa80363149c6939f6b8fd6ef6aef"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-002.stdout",
+      "sha256": "3d1fda96cfea0bf381dcdf3c53e0f0be3a2991583f8dd9f0da96a809189c49fe"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-003.stdout",
+      "sha256": "467b72e3e66fb5380b8f5b916ffcc371d739aaf43041707dfb25fb7f1dd5f772"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-004.stdout",
+      "sha256": "16b579c0549533501fa29d142cd37340b3b27c6d39e3c8fbb2bef128172369a6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-005.stdout",
+      "sha256": "d6308076b10234cebc6ac141a979fbc130099a87d9d7889489bebe6e51c7097e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-006.input.json",
+      "sha256": "24d108fadb2e3b4311ad75c16b8c8552f514659d9c35cdef1af24310a92bbbd6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-006.stdout",
+      "sha256": "ad6bcf5fa5a2e1205f552c9dbe68224fba173e83b6ee8808122512dacea5cce8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-007.stdout",
+      "sha256": "4f549ebf2a68dd140423c6ec9bf38b6f45a73ec5ca2d552422fb81c5bdb36615"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-008.stdout",
+      "sha256": "445e73ba3847165d739e1adca1c76ea176d588c586218e786ac9715820a16722"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-009.stdout",
+      "sha256": "fcb7702070b368c7936c0afe195f86e29d6daf5d402cdabf5b446f45df9c69be"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-010.input.json",
+      "sha256": "b2a54e194eb094e9df7e815bc790c2bd0df76c0569c17f9e34d37748f1869acf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-010.stdout",
+      "sha256": "c3183a1fe0e498fedf5e58ae46663a53caaf61c37bec6b44b6253f84b6d4fa13"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-011.input.json",
+      "sha256": "0a3df284405394de993d80a3e49aca0ddea5edf5425d6ec15fa33c8bc85b8b9e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-011.stdout",
+      "sha256": "c80fb294cfaa40049babe3157f7ce554a5b22d98413457202058e40cc74467dc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-012.stdout",
+      "sha256": "75ecada8cb2c789cd0a583c7a28165c771117d603c09eab74c0965dad5dfa074"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-013.stdout",
+      "sha256": "11486b474377fe01587042a7a9daf90e61d98d1c4e6e47c539c809171b07ea0d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-014.stdout",
+      "sha256": "a9ba5662146125cb31004672ecc8535f37f71d0955b6ee54b1e5278e4c365f70"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-015.stdout",
+      "sha256": "11486b474377fe01587042a7a9daf90e61d98d1c4e6e47c539c809171b07ea0d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-016.stdout",
+      "sha256": "11486b474377fe01587042a7a9daf90e61d98d1c4e6e47c539c809171b07ea0d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-017.input.json",
+      "sha256": "be5a861c482f09e30aaddae7c447d93527f60339f504b651447fffeb3c9316fb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-017.stdout",
+      "sha256": "9c8ee077c106b9d0764de453679242ddd6fe04a487ab97c86c812141b289e684"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-018.stdout",
+      "sha256": "9c8ee077c106b9d0764de453679242ddd6fe04a487ab97c86c812141b289e684"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-019.stdout",
+      "sha256": "9c8ee077c106b9d0764de453679242ddd6fe04a487ab97c86c812141b289e684"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-020.stdout",
+      "sha256": "c8dbff3134a4dfc45199530028f8d93b8c7d54fe3d0c8f8af88f7bdf8f022ab1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-commands.json",
+      "sha256": "b922892cd8b2f90bc360c8980d7ec20355f6bbabb2d5d28d8ad02872a1309dfc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/domain-invalid/reviewer/source/public-worker-flow-fixture.json",
+      "sha256": "7aee33442df6a629644bd8e39fc556a1ee2b064917d310ce8f42cb346e9e21ca"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/method.py",
+      "sha256": "1974bdd54c64cd1e64363542636f233b9e065e49f5c70876d1ee6b4f9759b078"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/profile.json",
+      "sha256": "51222b41261c3c46ad953bb4352fa088b61048c55ebbabf74f9a5073b3abfc5a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/report.original",
+      "sha256": "6c5d91a6c8e1068d945327d4f0b233eb38b1e2b8512438944988e4d0fd512c46"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/result.json",
+      "sha256": "8edd5dd7604816cb45f77c655126f69dd3deed4cca07d78fc47f81628dd96bd8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-accepted.after.json",
+      "sha256": "bdf2714d6e2334f84a4910f15b7ccef507d58c865acb8b429aa4eb18fed8beff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-accepted.before.json",
+      "sha256": "bdf2714d6e2334f84a4910f15b7ccef507d58c865acb8b429aa4eb18fed8beff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-passed.after.json",
+      "sha256": "6cfa4fa27a36a426d80b7010316aaa3877f955e92c8289149d3b7a38f3213415"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-passed.before.json",
+      "sha256": "6cfa4fa27a36a426d80b7010316aaa3877f955e92c8289149d3b7a38f3213415"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-restored.after.json",
+      "sha256": "bdf2714d6e2334f84a4910f15b7ccef507d58c865acb8b429aa4eb18fed8beff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-restored.before.json",
+      "sha256": "bdf2714d6e2334f84a4910f15b7ccef507d58c865acb8b429aa4eb18fed8beff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-source.json",
+      "sha256": "f3661f8c52c83c195ae0284ad2af071bbe78481120d6afe2a807c2c41c1c7489"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-stale.after.json",
+      "sha256": "bdf2714d6e2334f84a4910f15b7ccef507d58c865acb8b429aa4eb18fed8beff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/review-stale.before.json",
+      "sha256": "bdf2714d6e2334f84a4910f15b7ccef507d58c865acb8b429aa4eb18fed8beff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-missing.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-missing.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-missing.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-private-refusal.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-private-refusal.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-private-refusal.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-replay.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-replay.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after-replay.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/after.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/before.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/before.stdout",
+      "sha256": "4f0521da7ba877521a0ed2f00d4e7e7baca7f16fa235930cc341c1edaa9459e3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs-after.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs-after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs-after.stdout",
+      "sha256": "4f0521da7ba877521a0ed2f00d4e7e7baca7f16fa235930cc341c1edaa9459e3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs-before.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs-before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs-before.stdout",
+      "sha256": "4f0521da7ba877521a0ed2f00d4e7e7baca7f16fa235930cc341c1edaa9459e3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs.command.json",
+      "sha256": "a76e09c656ddaa3d728c91f5a5d4ea8092b65938718867324475f29b57d9dfaf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs.input.json",
+      "sha256": "fc6e27626606a219029ced2beb259dc8a846384f99c802ede26409443419dd31"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/complete-inputs.stdout",
+      "sha256": "2a07d33fe8e36665a7757b510f59fab05df5949704fabd68c4c6e331404bde60"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/fixture.json",
+      "sha256": "f7c6f6075ac64eec080feebb017840d08171bc65ef17031bb25d4a027c808a8a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/missing-recovery.command.json",
+      "sha256": "c5f8dd4cb99c36b42531870d61ad418e9600a7694cd9c5eaf59e12a080fd85b2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/missing-recovery.stderr",
+      "sha256": "e20298714e7297fc739d713ef0d51b25eb0b3f242c0458a53e845ec053a8377a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/missing-recovery.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/originals/certificate.json",
+      "sha256": "34713704cd6dc3846378c43e66cdcda5b6f7e419f7d1e6e7e8bb026de5832ac4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/originals/configured-reply.json",
+      "sha256": "39b2b40de1d4520660f0ef24abaa536740956717a27af6d14871266fc6a26982"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/originals/inert-provider.py",
+      "sha256": "3d469e2dec0741eaa85ee38a6e5186ddf46fd934efcbc5bc781b08dcfc4b77d4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/originals/invocation.json",
+      "sha256": "ee321faf1a2845faa1b8c22f4058c4a4ccd504efee32babe4b58a818f24f8692"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/originals/original.frame",
+      "sha256": "c0835b298a4cdc15c8834a54c5e7397d344559c0fa39617b7b32919e88b474d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/originals/retention.json",
+      "sha256": "3d0da879074ee40d7de56f85faf545e52d107798289ea4c41f90770cb68b0b76"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-corrupted.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-corrupted.stderr",
+      "sha256": "54776e8035749226a47c202344308d60a8df10aeadc9fab3f3e0171ea3c57e0b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-corrupted.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-restored.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-restored.stdout",
+      "sha256": "9148fbe7297c619829f34b30db6859e4f7a02221da1cabda6aa3f16dae991228"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-unchanged.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-unchanged.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-valid.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-valid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/private-valid.stdout",
+      "sha256": "9148fbe7297c619829f34b30db6859e4f7a02221da1cabda6aa3f16dae991228"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-corrupted.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-corrupted.stderr",
+      "sha256": "a6129dde15bcffe07cb8ca2a9765cf983e5a91df7dde9c0018e5dc3fcdaa08d5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-corrupted.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-restored.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-restored.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-restored.stdout",
+      "sha256": "9148fbe7297c619829f34b30db6859e4f7a02221da1cabda6aa3f16dae991228"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-unchanged.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-unchanged.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-unchanged.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-valid.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-valid.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/public-valid.stdout",
+      "sha256": "9148fbe7297c619829f34b30db6859e4f7a02221da1cabda6aa3f16dae991228"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/reconcile.command.json",
+      "sha256": "c4e2f9385330f7c788a778e002ecf3b638257d52df9a561beeb1ae1a53e814d6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/reconcile.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/reconcile.stdout",
+      "sha256": "9148fbe7297c619829f34b30db6859e4f7a02221da1cabda6aa3f16dae991228"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/regular-gate.stderr",
+      "sha256": "9accbd3e6dde904469ce37d37b5d56e7226b478743f6c264787489c82e3f3dae"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/regular-gate.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/regular-stdin",
+      "sha256": "7b19514a36104e2e4dd6855d62c86299187d015e1b098ee645c5c38ff63eb5f6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review-replay.command.json",
+      "sha256": "49ef652d4ad9ed549520233f5af1b7c333f69777b9e8fb946329f08a94fc4903"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review-replay.input.json",
+      "sha256": "283e051626132060b0ea662e2dc3cc12be3cdb6a9d627d3357a0143e4ebcc60f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review-replay.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review-replay.stdout",
+      "sha256": "9148fbe7297c619829f34b30db6859e4f7a02221da1cabda6aa3f16dae991228"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review.command.json",
+      "sha256": "5cb9d09c9ad457f04a88276ac3e94439623ac49fd5fed0990d383cdd6dfc6ab1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review.input.json",
+      "sha256": "283e051626132060b0ea662e2dc3cc12be3cdb6a9d627d3357a0143e4ebcc60f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/review.stdout",
+      "sha256": "c63d9db5c13b06dfb9c652890fc9764862c3e0a48b5a4454d2bb4654cb5c395c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/controls.command.json",
+      "sha256": "5d5e10f01edb0403b748796cc13149a9919c146b76065ad947fae711d1840072"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/controls.input.json",
+      "sha256": "6cd78ac775c1e51fd4aa9674c81ea2687ef562180d9bf4d859031a2f77e9c997"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/controls.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/controls.stdout",
+      "sha256": "e59c102965bf643f9ee74bd812dac6315b8e9e022158c8bfc92dfa55ac26d8b9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/owned-root-14a2c3a30b4d80613fff5525020e8bc2d4207a091931c9e40e491ab1999a04f5.json",
+      "sha256": "a33800c781c1294aa2dbaa6be0fb9306909c7c6cdf9d9e9ecec9a436b09f67a4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-001.stdout",
+      "sha256": "a09c42cf46c1e6680ca9745ef3183ed7f86f75e870389c5107241c51d1566236"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-002.stdout",
+      "sha256": "ade01c0dd3d0e8794d1cb2db033cc598262980e82795cb0b9f4652edf5fd1a16"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-003.stdout",
+      "sha256": "58e2294f7a3325b9ca94120592a82a2d374e235891138b2d40651656aa66a4fa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-004.stdout",
+      "sha256": "fe72fbeaf908a9c514ada503fc46b61de46f53a1f38b814db8bb585347995ecb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-005.stdout",
+      "sha256": "b34b334de0ebed2b5b2b2c3ea0da8172460a5a1c7a1e65d5f1cfd143dd0d044c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-006.input.json",
+      "sha256": "24d108fadb2e3b4311ad75c16b8c8552f514659d9c35cdef1af24310a92bbbd6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-006.stdout",
+      "sha256": "4dc60aba06376846b2e36e9ea4cc192a11f2687dfc2cd0b444b9bdf6a87191a9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-007.stdout",
+      "sha256": "07353dafd4566f9fbd27c439248c3ac8edf58369abda4b5f7e968d136b3dba8e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-008.stdout",
+      "sha256": "7dc5373d04ccfc4d60d662b541d8963e55e45084508ef0a9d83ac4c577cc910b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-009.stdout",
+      "sha256": "ac5c4e653811c1023ef71881671deb064cd4d047afbb34badebbe5ab1f1ae136"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-010.input.json",
+      "sha256": "b2a54e194eb094e9df7e815bc790c2bd0df76c0569c17f9e34d37748f1869acf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-010.stdout",
+      "sha256": "9f5407eec4a52684cd4f727009e23691787e76e703320d135d5b8959d3a11690"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-011.input.json",
+      "sha256": "0a3df284405394de993d80a3e49aca0ddea5edf5425d6ec15fa33c8bc85b8b9e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-011.stdout",
+      "sha256": "6b5811f0c45875208af912a21470a01c46a4253d51d641d03234ae5a459a6eb0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-012.stdout",
+      "sha256": "33e9268ec5b3e6324720f9319fa31b0b7745afa56633838d97af058a9d78ae84"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-013.stdout",
+      "sha256": "aeaabf7aca80ea90fb388736b5fec9a8f0c20d75c1ae130ac565dde91418b609"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-014.stdout",
+      "sha256": "59778ee2e582be779b3abaec0bd42e4a2de90a8e2bc0543e566d87749fcc2409"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-015.stdout",
+      "sha256": "aeaabf7aca80ea90fb388736b5fec9a8f0c20d75c1ae130ac565dde91418b609"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-016.stdout",
+      "sha256": "aeaabf7aca80ea90fb388736b5fec9a8f0c20d75c1ae130ac565dde91418b609"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-017.input.json",
+      "sha256": "e1022f7966bfdb83cd1e77fed27fc7432f284e4877d33a34d03f8fdfef5a8b71"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-017.stdout",
+      "sha256": "e12e753434829a607d7fc77ad776a3a9fa81b600986bb2e4a9a99ae5ea4a73be"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-018.stdout",
+      "sha256": "e12e753434829a607d7fc77ad776a3a9fa81b600986bb2e4a9a99ae5ea4a73be"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-019.stdout",
+      "sha256": "e12e753434829a607d7fc77ad776a3a9fa81b600986bb2e4a9a99ae5ea4a73be"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-020.stdout",
+      "sha256": "8573c4455ad6e3a64ee3d24547877642f30083a707c0b453a9ed366f7eb882dd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-commands.json",
+      "sha256": "ee39202aab89a2b27d8cf6ed5a478ce0175f939e67bae5bfae232b277da748bb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/source/public-worker-flow-fixture.json",
+      "sha256": "59f1446f039b11cbb77af7d08bc81c84b9363ca5e51111fac07b0da2be6c7c3f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept-after.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept-after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept-after.stdout",
+      "sha256": "dc0710658f597a76b0141bcf65caa63db3bae719db0fc8e04db1c6bae7ac1be9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept-before.command.json",
+      "sha256": "35c981cc50bd9927548747742ffc30ee0315d2fd6f9821c02dc23b0bfdda39c1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept-before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept-before.stdout",
+      "sha256": "c5e3f91a9c333e527638f3bac4a22bdd2ab9fa7fc0d01ad084e44d1e0a5876b8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept.command.json",
+      "sha256": "893cc1c8add6f5ed96f538ab82aedec2e32fc63f8c3f187237e79f2bb2a1178f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept.input.json",
+      "sha256": "3a63e580b2b79b722070fffb8e7442ecde535e327ef49d73a4b2dc4ec415665e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/status-review-0zhkfwh5",
+      "path": "run/reviewer/status-explicit-accept.stdout",
+      "sha256": "dc0710658f597a76b0141bcf65caa63db3bae719db0fc8e04db1c6bae7ac1be9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/completion-refused.json",
+      "sha256": "2f75cb13fa1cf4604ccd6479201f98687b3e590f711f22dbc1a1fa50238e0eaa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/fixture.json",
+      "sha256": "319f4bb65ffaa2680535a17318c71e49953550d26a7805ce03cae8526b6563d7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/granted-original.json",
+      "sha256": "34bc61500e28f97e1efa5bea9698d1b58517b54f56e99b438269fad05b9ba5b4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/historical-status-cases.json",
+      "sha256": "c414450971f94d51cf7fb9c0607777c55f3c4b9ce846217faa74acddd6aa4b25"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/incomplete-output/argv.json",
+      "sha256": "056cbf2255e445f8b3a6c794a5757b9ce9de964bea575affb06a804b6b4892ff"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/incomplete-output/result.json",
+      "sha256": "5b9577f8429f958ed001fc86b33bade632096b9e59598e8fc4376b8d964073cf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/incomplete-output/watch.stderr",
+      "sha256": "96b051344752669d8e90f800e409a09d4171fa66eb2fff2c3bd7871574f3611d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/incomplete-output/watch.stdout",
+      "sha256": "8c731507a6b91e929eefbf45fde4c18aaa64e6aa5f3be395fa926266164ff126"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/kernel-not-reaped/argv.json",
+      "sha256": "5820ff7afb301c6555a1abb2cc62a1147dc0adcf0ded013a9191fe57e12311b3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/kernel-not-reaped/result.json",
+      "sha256": "ca1ff17c97ea16e2de37bccf57c498df31859f85bf7c9ffcd59c1982b4169297"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/kernel-not-reaped/watch.stderr",
+      "sha256": "96b051344752669d8e90f800e409a09d4171fa66eb2fff2c3bd7871574f3611d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/kernel-not-reaped/watch.stdout",
+      "sha256": "b54132db1710d74ab2d22effa05ea559e7b7a94eb80c8119b1537be1808f0106"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/missing/argv.json",
+      "sha256": "938e0c622595481153c3bf02ada7db7569acdd91c0a35d8a8fdbf1d348a2e37f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/missing/result.json",
+      "sha256": "62172d9069ee111a06c186536f7bdfee5e987705a675e2b46acf94bfea5b412c"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/missing/watch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/missing/watch.stdout",
+      "sha256": "a1249d4a1066248c789831747aa3a6d192ba570e0c0c99a28b1fcdfd74bc3996"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/original-completion.json",
+      "sha256": "76407818d91d51fba2d2b35853918eacb1ee73acf756dfc821dc6a83b2af5103"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/outside-status-report",
+      "sha256": "486f8f78e52713b49fa6238a7e1e993afc6987496c92217f6edbd0eed2dde3b6"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/owner-process.json",
+      "sha256": "e3e3865e3180e1e92bafc282dfbe8d060ea7f7889a0d76b171c97a7a56042a47"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/owner-records.json",
+      "sha256": "80a17f2c31d701fe463e2cef8eac699ced9b27a6cfb352f62290657ea22c4d4b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/owner-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/owned-root-3ec0ddc92dedf1a3249b346b9bdbbe2eeb7e9cd2b0777a96799fffd7b98d86d8.json",
+      "sha256": "628173cccf43f396680a43e37199801d07c8f85d1a47c71e088fef3b715e597f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-001.stdout",
+      "sha256": "906a4ef68526226fdbecb0d633921122370fb2270ea5105757aa848ef976c788"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-002.stdout",
+      "sha256": "3a5b0a31264deb3d3c43363edf844a752d91dffaf29ad121a388ec4eeeed2702"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-003.stdout",
+      "sha256": "16ffffbe19e89abbf1742313f725caf03e1eaacd47aa3e7fa5d10fcc3ceec742"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-004.stdout",
+      "sha256": "31b71d144f426d49e0ebcb47aa96a3732f6a332966c1afc3d89ca15a56705dcf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-005.stdout",
+      "sha256": "5106a59a9f7b5f348c859103f4d0f89a8da4ab466391aacd67090a7ca032ec44"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-006.input.json",
+      "sha256": "15aa99832e883e0a6a3a071b715bc705af59e793467e3479ee9a3d758cce7c31"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-006.stdout",
+      "sha256": "865f2ca09621a612bdc3f48f97d7e3e94a7dc4d4289aea3ccfd5d55fb36b4d91"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-007.stdout",
+      "sha256": "46cf5a3c368b9e45026494fdbb3d34711a971291b7e6341578309944af098bb9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-008.stdout",
+      "sha256": "d9d74ec5d4b4b46ca450cecbe9ee5d64dcb4a512071b636aedc7310cf82beb24"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-009.stdout",
+      "sha256": "61c540fabebc645338800c93de252b11d8d2804bf88fb6f5a720c3da9170e267"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-010.stdout",
+      "sha256": "ca08e7e1c4db564eea066a7462e4a4294112dd2a60079759387a1eb55b81e5ee"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-011.stdout",
+      "sha256": "a75316e5de058973a6a1b60615cb3ede09c4050de5a2737fd4c76398824f760f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-012.stdout",
+      "sha256": "9feac20cdd25daa6ff9a007d00e5b056f4a90c2b1584f5c658e6a38f4c1ef193"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-013.stdout",
+      "sha256": "d09706a677a2fa3a4690684439b435b43661e47c8cdd362a2ef5b1f25d39f3db"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-014.input.json",
+      "sha256": "390f7627d1d882f6b6e79718b876379b072068c744e6285bc2cf5b9f7ec24246"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-014.stdout",
+      "sha256": "68a39f743a6c4ed0a036933cdd8ca265625df3cc52f846a3749114cd1c5adba3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-015.stdout",
+      "sha256": "ba788dffea2cd9a5e1c2a85a40ff10e0d7f8d67ac6717236266a1c8702b0ee9e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-016.stdout",
+      "sha256": "103898d3a248b0cddde0c58afe652c4ee4b5e9e58e1595bfab341fda79eff6b2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-017.stdout",
+      "sha256": "4202c617dbe727a6ded43f8b44c70518c277a0020c995958235b00f9c86c81f1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-018.stdout",
+      "sha256": "cee78ea4c2dcbaf505c913f7eed5da315cad95515bd77c3fa090c2928f0a6640"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-019.stdout",
+      "sha256": "caf21de7f11a34b06cba1158f996e445207a32981856aefec9f9754b9a376f32"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-020.stdout",
+      "sha256": "e655125fe90bf36b0fae01a320d156fdedb8fa40cc2d38d2fc89b5fb92eb8e0e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-021.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-021.stdout",
+      "sha256": "103898d3a248b0cddde0c58afe652c4ee4b5e9e58e1595bfab341fda79eff6b2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-022.input.json",
+      "sha256": "bab2eb79279ac37a76e50f03d9379646c66927914d68205803ef0dab755c2358"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-022.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-022.stdout",
+      "sha256": "9a1c619d86a30a18d4913f79c0c28ab9de247848868ec6d5e90f63aee51fefb8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-023.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-023.stdout",
+      "sha256": "79cb62ff2bad05b96a17496dd8866377efd541a2fed9c881bdbf5415960a22d9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-024.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-024.stdout",
+      "sha256": "fbffccf6ac762e482862e7e4fad39d3500b0f0c1a10a8ce3aca8029aa8181386"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-025.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-025.stdout",
+      "sha256": "77b32da5297125b99fc612589d0c3a58c1429c2f2eafe8761825ad4a348beaf4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-026.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-026.stdout",
+      "sha256": "0fcb366dcf74bf6300aeec1947e8725168ec3a06e0a871f864cd31e6e4140ff7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-027.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-027.stdout",
+      "sha256": "a1db32cc672d9d26896d07207a7cf5aeacaa1e8cd38e6e3d008c40ff21eecd26"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-028.input.json",
+      "sha256": "b5f69bf610f84ff025109d06d1500200c76e0db24b30a2dc39dde73237c4f2b1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-028.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-028.stdout",
+      "sha256": "cbcd22a7f6a990fa80a31c9a4c69bef3d1bbf39f98ae895fee248cd2d3ffdb7f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-029.input.json",
+      "sha256": "fbfc7e449cb1ac70d31e0e9f8c218f66a08e09890a0d922c16523409cee70f7d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-029.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-029.stdout",
+      "sha256": "c9208b854afa0fa928dcffb328f1ae7f696cbcdbedc663abc96f0b2e61de4e2a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-030.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-030.stdout",
+      "sha256": "6b3e7fac0745283e2fb4e757dc659fc9752cc1cb7321e4f9617471f4c6ebe008"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-031.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-031.stdout",
+      "sha256": "d7ca9db48ba4fd57c06b46b026109515fcabe08a64a1466e934ef64a9da1384a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-032.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-032.stdout",
+      "sha256": "6b3e7fac0745283e2fb4e757dc659fc9752cc1cb7321e4f9617471f4c6ebe008"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-033.input.json",
+      "sha256": "6ce4aaf4ae8f9663d06af9b628447459a02c8229b07bb7f7a09440c749286f48"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-033.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-033.stdout",
+      "sha256": "c89a2392acc7f2045f3c7374aebfd4952d799f78de060a392291bf7f859e4c2b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-034.input.json",
+      "sha256": "0b10c2e051f0b2f132ba443a25d0eb9406af6d5fa0a0e0d321253a7b78445306"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-034.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-034.stdout",
+      "sha256": "316766703bfe23ff6cb5561e25b29ef65240b0ad5e2cc372c6c424c2cdd91363"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-035.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-035.stdout",
+      "sha256": "5f4a5d83a5678d17473a40eceb9baa72680d498a6b02920e47bf0c1da851334d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-036.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-036.stdout",
+      "sha256": "127c8be1a852dc3c42126f003cdb1b4b97e968d60689e097672b932871968240"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-037.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-037.stdout",
+      "sha256": "e5a9fcf3bbbbc520079142dc8d4d6ada8ae826102ede258348b6ff4cb73a4fc1"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-038.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-038.stdout",
+      "sha256": "357dffa3aaced671b8434fb979e09bf21511f7bfcc17e1c7ec340a99dd118376"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-039.stderr",
+      "sha256": "345815806dcf106af12134dcb9c49c0b93e7ff50d2c4726ba822dc39ca3d308d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-039.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-040.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-040.stdout",
+      "sha256": "2278f62d10978008e5c1502f67de01397e6fd5393c656c23219e2ec65f6ca219"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-041.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-041.stdout",
+      "sha256": "f923ce3d9fb8fe6d65e6f4cccd07c3998d71465b5bf86bcd2632d556d764a0dc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-042.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-042.stdout",
+      "sha256": "a6ae272991de68820a568aa8d178cc3e6d63ee6925dad60a309111346ce599e7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-043.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-043.stdout",
+      "sha256": "a6ae272991de68820a568aa8d178cc3e6d63ee6925dad60a309111346ce599e7"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-commands.json",
+      "sha256": "8ca4467a175d64ead1437533694179e70dacee7def728da95430d44d82fd9a57"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/planning/public-worker-flow-fixture.json",
+      "sha256": "e8e2aeecac6d5ba57b7e8f3a71652a785b47a078d8bb0bfffd301407923c9763"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/recovered/argv.json",
+      "sha256": "da166479808aaa17ee5611519e119222d7682a5e13e677e2b17ca61a20a0667e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/recovered/result.json",
+      "sha256": "b6c9918bfc04144224df263bfcaf6762ce97d1478154957749e84737e4279ef2"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/recovered/watch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/recovered/watch.stdout",
+      "sha256": "41380b9aa2aa72acf8008012a70eb83c27ecaae454eaab219d8266f23cc3e2fd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/reopened-process.json",
+      "sha256": "37e2b658b769d6e6a17a6913b3ab495f2434a516eb479f829e40f61f6a99991d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/reopened-records.json",
+      "sha256": "bf628a1b1e41e0f8fb50bbaed54bb8dc6a24812bf73377503db560aad73dbe9f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/reopened-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/result.json",
+      "sha256": "0ada6e1b20c0c1605ddeeee2536e6fea419aadd43494650f79f05b429a2eb0e5"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/unknown-version/argv.json",
+      "sha256": "2fb264050b58473683210fd79ec5f7459d1823917aa429a7f53bb710c3feccaa"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/unknown-version/result.json",
+      "sha256": "4b1d2d44efd3805a7c095077e1dee33f3c01743736f0b76cb8a09fa74d2a7a30"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/unknown-version/watch.stderr",
+      "sha256": "2eb629f35d8f7ebdfaabecb6ca183a1d16522f8d2d94ad5ffde09611bb2b7d0e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/unknown-version/watch.stdout",
+      "sha256": "fec9969a79eb34509423ea2cfd58d758cf2ea9cbfc78e9ac549568c8ba10247b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/wrong-agent/argv.json",
+      "sha256": "ffd866b2766d55e3fccde1c1ef27d1e49bd5bb1cc77fccffd8f9560ff4a69401"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/wrong-agent/result.json",
+      "sha256": "c481a0f246f23ff482ededd800b51a982a308e5305fa303de1679de7937cdc9b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/wrong-agent/watch.stderr",
+      "sha256": "2eb629f35d8f7ebdfaabecb6ca183a1d16522f8d2d94ad5ffde09611bb2b7d0e"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/fault/wrong-agent/watch.stdout",
+      "sha256": "99b9e2709c1c2a7b469532880239ee71a4651174b1a679a0bf37a62e7aacdfb3"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/native-completion-67c17916d3d7beae1ed0e61d35017e806c4a93553e8d01e561a942eaf99421f1.json",
+      "sha256": "10c9b0904ee707e68524f836e48d315488d897a7634a817df57a7ad6f183fa01"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/native-completion-evidence.json",
+      "sha256": "102256783b042615faef3d58373d1d0fe1425e579d4335b1d7ed0337d732cf3a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/native-status-active.json",
+      "sha256": "856b0ffcf8e228533e5753e2afe6a7ef1ddc5f5dd71ef218a40f7559475010c8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/native-status-after.json",
+      "sha256": "b3742bf166d5e61846e7646e8f934eeb246931e15c78257ffd05649fe77480c0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/native-status-before.json",
+      "sha256": "9a6db4c8db4aca779103d033a2e6475fd7439951542f395f019ab503d811b6b4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/owned-root-509adf2fba2a4d3e5b29a320812d37f42e75fa3d83d1e754e23cf41fc3fb93e5.json",
+      "sha256": "6e44c0d8c5a44c8cb5321b0dd4793af63ba606c42ec4f90be7bee36724968149"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-001.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-001.stdout",
+      "sha256": "492c445d5fe48cbfcf3d06fa248926a57dbf17d33231589a85f705762dfb5e38"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-002.input.json",
+      "sha256": "535f32c49df5d59662ee2694dbaab4704ec59003c84e1844f74ec4e59e833817"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-002.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-002.stdout",
+      "sha256": "bf3f36acab3c0d1cd61a5620e7eef80664b7a513ba2303f8999195c21b2e8065"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-003.input.json",
+      "sha256": "b3de678baeb2ba4b253f9fe1386815902d847492fe0e3f8d4dd6a7faacaf7fbf"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-003.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-003.stdout",
+      "sha256": "a008908631226232c2514c0d8ef1a4209de663574bade5206d82020a46a3b778"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-004.input.json",
+      "sha256": "b26c05d07e255069c8a78ac8767eb3642ff2794e2a701db3f131e0c9d9a4fdbc"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-004.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-004.stdout",
+      "sha256": "8ed56506da2cd92d96f5267f76137ad42fce2e52d1759208988df85eaaf14ebe"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-005.input.json",
+      "sha256": "7ad4e6ce777890b0dc1ae5133693076ba0f980db4012c56802ff2c3e26309f65"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-005.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-005.stdout",
+      "sha256": "6140ac7d32fb74b5f58528a148196c77a0e1247a5cff51a43de0df63f0b8dbfb"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-006.input.json",
+      "sha256": "15aa99832e883e0a6a3a071b715bc705af59e793467e3479ee9a3d758cce7c31"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-006.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-006.stdout",
+      "sha256": "7494819e35e3b81f1afab5f5dc5cdce98e77fd47a6afc8f6c38dbf5d5f02f160"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-007.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-007.stdout",
+      "sha256": "4267a024e07349e71599e3a4fb5fe2d704de735b3bb5554c43427ead00af9e12"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-008.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-008.stdout",
+      "sha256": "e5ef56c495d4b9206e223f4fa575742a8295c7161ad7b6ceed395eca1f65ffe8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-009.input.json",
+      "sha256": "3ae1a669aacbb47786c9ba7ee51481e5506872a40233708f561eec6e061f747d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-009.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-009.stdout",
+      "sha256": "a97632dd941b9e2ae841f0ab68d98e48a4aa99bfdb1fd2692d06195a6294afbe"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-010.input.json",
+      "sha256": "302e95cdfa409e2d363be16ed774ea825ad992f46afbe552ad368d2cfe172a30"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-010.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-010.stdout",
+      "sha256": "7937f628bf157c7b08f4de228fa8155e7712bdd1721dc323d8f482529ee1076a"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-011.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-011.stdout",
+      "sha256": "9a6db4c8db4aca779103d033a2e6475fd7439951542f395f019ab503d811b6b4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-012.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-012.stdout",
+      "sha256": "7a7cec10271680159c4acdf362dd00f2e51332870f79117fd1bf7a3edef57880"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-013.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-013.stdout",
+      "sha256": "ab8f1bfda953ef91b2dee0ef496bc9588118d64896ec14a5ef510c8166217bd4"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-014.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-014.stdout",
+      "sha256": "856b0ffcf8e228533e5753e2afe6a7ef1ddc5f5dd71ef218a40f7559475010c8"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-015.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-015.stdout",
+      "sha256": "7314e3cdee2a247ac4552cddf30fced8d6dad100a12d93d72fd7f05a45303692"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-016.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-016.stdout",
+      "sha256": "7314e3cdee2a247ac4552cddf30fced8d6dad100a12d93d72fd7f05a45303692"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-017.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-017.stdout",
+      "sha256": "de3c253ad52aafdaf137fb98877794ed6aa4b237fd564613bfce524f27333167"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-018.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-018.stdout",
+      "sha256": "5b4243c62368f97dbebcfb349284020e7fed19d35ad0d8c6682c82d007c662dd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-019.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-019.stdout",
+      "sha256": "43fb85bd3d9c652b3907c4b6a4d50a76e1b01a3b9a141d797af89eec80fc74d9"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-020.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-020.stdout",
+      "sha256": "b3742bf166d5e61846e7646e8f934eeb246931e15c78257ffd05649fe77480c0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-021.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-021.stdout",
+      "sha256": "5b4243c62368f97dbebcfb349284020e7fed19d35ad0d8c6682c82d007c662dd"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-022.input.json",
+      "sha256": "509e12dde5322ed89163f5cd2bc9501925a75930bda3369585cc05b531aea765"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-022.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-022.stdout",
+      "sha256": "3770dd14da9f7166830b7dc0da233ed8d34bd14054d14f6a4ff743580f2f24df"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-023.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-023.stdout",
+      "sha256": "624df36ad3092989d1e8b261195ebdd6f303c18c9622bf9c9ce0f4b399748369"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-024.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-024.stdout",
+      "sha256": "0d6128101f903169594493e1823c42e45da438a84154d494ba21c8321e8c7a56"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-commands.json",
+      "sha256": "050d7df3515606a9f693c0f567a9be67fbee8744233b5a22ffa49738eba18c98"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/planning/public-worker-flow-fixture.json",
+      "sha256": "8cd78d9aedc5754046fe2b1333c70893bb07b521735bb21205bfcd5720f8a566"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/result.json",
+      "sha256": "c880c4a8614793db3fd8ba0b762635e6b1985d9f74048da06804d62516d27fa0"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/survival.json",
+      "sha256": "9ce65a7c04caaf728d14e5dbac5b6d0d75a279b63e9537d1b85b6c449949519b"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/watch-command.json",
+      "sha256": "c4ac8b1bebd0398a5330d8be2c92acef93723a879410e549f3d1fc02ac2e604f"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/watch-exit.json",
+      "sha256": "7103335fdd6890e990b871cfeaae71ac72fd1d1a4e17b8de7e778358053d9e93"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/watch.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/healthy/watch.stdout",
+      "sha256": "41969d72a8e1ea8d05d3e779ab155bc2a1805fc4a75579c281001563609fe81d"
+    },
+    {
+      "root": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/worker-recovery-sey7ax46",
+      "path": "run/result.json",
+      "sha256": "c00064c615db45b00e9f80f7796720d1c5e1d514b6fe0d0169dc13d981abe6e4"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "df800d542ebd6d3ca917f3b0e6dc948403bca8a5be67e4ab910d9c7a9007f851"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/native-completion-67c17916d3d7beae1ed0e61d35017e806c4a93553e8d01e561a942eaf99421f1.json",
+      "sha256": "10c9b0904ee707e68524f836e48d315488d897a7634a817df57a7ad6f183fa01"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/native-planning-0f9fbaf85cdf63839fe00a4762909f75b07b4fdfa25b1ef56872ec6547b88318.receipt",
+      "sha256": "f939e0cc03b8ce413aba64ba9915377419f496b83dcb6d4196f9998c7e22b5b9"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/native-planning-d52ae25ff727e2a735cd7f3388376e8530167f4ec10f588224e476187c54b509.receipt",
+      "sha256": "ca9ee65bce5fc87be3354643f9afbfe596d2b9cc0245d5200be6bcdfd0cbd2bd"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/providers.json",
+      "sha256": "9775797b5b2956b218e01b5e32d7af8089724cc5c4b19e25a043d3b24f3d0c7f"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/state.db",
+      "sha256": "5e41b2adac03869a3ef8b4ca1810785bf97a8483727cd80a984b8d9bd7fe8fff"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/views/w-2ee68eb551ccb87e3087de8c.md",
+      "sha256": "6ec48a97412944130ffe69309c576a093afed49fb962bca0953763a648621abd"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": ".swarm/views/w-5f1fc572233b9941ea8217b5.md",
+      "sha256": "b2e6dc662cb17bd2ddaf75954dd73f76a84a665e493e2ca7e14c6c77749a84e3"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "codex",
+      "sha256": "80ae54e4c2595ea223c553895e90e9494141414b4a4588257bafbe9b4d939938"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "fixture-prompt-3420572.bin",
+      "sha256": "a653c82c96c4d1515c47361bbeab07cdc27b0047f1b87be60d2af2db0b70199a"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "fixture-prompt-3420600.bin",
+      "sha256": "53469b2ff033b838e37c92dcf4c46335000bec735675d9c57a105917a689e0a2"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "model-received-3420572.json",
+      "sha256": "fbffdd3324fe84f1745ffcaa95c32e1ed8f887f64ce05928f28c006fd280a260"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "model-received-3420600.json",
+      "sha256": "6bb80a1e7a88120b49e9357a0557e222decda31de14f7b433364214e59a352b7"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "planning-proposal.json",
+      "sha256": "8639d2981150f5df29513c950a2a3014048ca85aaad20046a5af0971cd544c36"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "watch-worker/handoff.md",
+      "sha256": "deb62d22c424800c4dd59fd8ec9289457f9f94695c4a3b563fd6a4ab55f457a0"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "watch-worker/model-received.json",
+      "sha256": "b8b3ef2951d149a0933d071933097adc9821ab808ecabea0317fbe67d31c2017"
+    },
+    {
+      "root": "/tmp/swarm-model83-lw_6ha0c",
+      "path": "watch-worker/release-worker.json",
+      "sha256": "9b32777844e265f82ca1cf33f27ca472daad6db8ec919fcf079df568d8083fd7"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "083c82012ae18592b1b5d1876750b3508e1145931b1343e6d7ff3644ddfe1bdc"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-completion-3f3af1ecebbd1410ab417ec0d27bbfcb5d340e177ae159b59fc8626c2dfd9175.json",
+      "sha256": "899cc592aa763f33165a8d7578710d89f52e7cedc55c07bf0014e10deef0caca"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-planning-2e7edb1d4e1fd650e9e5c9b127f91c0968a8b364412c9ef91c52c143c11dd2cc.receipt",
+      "sha256": "d9f48d5051a378a1ecc70994bca6f99600078326b433b9491d78c46ed9f2799e"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-planning-94125ffb55f3991e328ef7f2f4b759419156a42b8f03620702012b7be086cf06.receipt",
+      "sha256": "3b8f2f2ce8b38810dfee02f11951bd5ff301fc44ee255b3a241c52507a96b552"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-planning-a8ddaf60c28c2aa99a14ff93be00caf013bea7a8e29e9a9d82055583f0a00a14.receipt",
+      "sha256": "e77286cd76d19f4cd31444b24fed6aafe903d135d863978ad83563c902840a2d"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-review-adfe5fdc7ee36b953eb4eeb50870a77022f6c645220365bce559689d7ebad0aa.receipt",
+      "sha256": "52757743abbfc20b21e0914dd7b8b572a408dea60c1c267316cebabd5a49db6c"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-review-public-v2-aabf35c0812fb80419fb510bcabab8bab6a2073a7bf94714568db2ca7ba8e7bc.json",
+      "sha256": "aabf35c0812fb80419fb510bcabab8bab6a2073a7bf94714568db2ca7ba8e7bc"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-validation-job-3e1592892ccc6df0badd74cc4bae3ae7d580024136d59fc6df8b971b50a4e803.receipt",
+      "sha256": "105efe0d5199938c641b042e74e107ce5e526667f1524bf584277e5384a9daea"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-validation-public-3e1592892ccc6df0badd74cc4bae3ae7d580024136d59fc6df8b971b50a4e803.json",
+      "sha256": "ad165fde014b3f15a7be107631bdb2675b132220413d2fc07dbdf05c08f7fdeb"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/native-validation-step-0fe8625a85120615a9126811ae413d7a9c2e89d357c7c0e2e2106f5ddf332390.receipt",
+      "sha256": "3c9ac1c59d267e037e31e43dc2ec7c376719c9817e860fe6571d1ae022e09a86"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/providers.json",
+      "sha256": "eeda6bc73d440f9dc28ac3b1cc8dee4952db29f793855baf97e2be2d8cb1d6c5"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/state.db",
+      "sha256": "e32f1e7ebf94bf5c7424ef01ecdffe82491c063e562af9ac1c1b955317a8f510"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/views/w-352dc8b73d64ee008042bdf3.md",
+      "sha256": "0d872df52c0a7c24557150f7b7cc93979f84587a7dfadf9b860c22311e7f7300"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": ".swarm/views/w-522885e7d1c0a2983f1f1d03.md",
+      "sha256": "3066a2fc8fb0ae9a8ec43fa74c348dd0e06a8db9b95da29eed0e6c3db0c91fcc"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "codex",
+      "sha256": "b5e83c21d32453addcc19adb92a660a430a273744daa8a0d30aa98bb54491b90"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "fixture-prompt-3422064.bin",
+      "sha256": "4154d9f3aab9f38251a945d2f151d4309628b2865d670cde56f78dfe53094599"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "fixture-prompt-3422128.bin",
+      "sha256": "ff31300bc3018fd0876c5bfbb2de2d1a2016fb06c34b97bb8e08add93f99b45d"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "fixture-prompt-3422551.bin",
+      "sha256": "b0ee052b9d399c7dd6f248b99b4ae8eef86aa5091f77de92c959a81582f07ea4"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "fixture-review-reply.json",
+      "sha256": "39b2b40de1d4520660f0ef24abaa536740956717a27af6d14871266fc6a26982"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "handoff.md",
+      "sha256": "871ba7d0579e848b6d119e3620a3551e02b1ac282fe2f9ab3e5181f084f4d474"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "model-received-3422064.json",
+      "sha256": "4944054a02a9522e8bebd602386b6986aa437ee9d073ed3180caa12e7b60d93c"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "model-received-3422128.json",
+      "sha256": "6a96e390ad768f8b9108e8927ab4faf56478a393bce9f3652641dd6a02a2d5c0"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "model-received-3422551.json",
+      "sha256": "92a5ec6911057ebe81d23275c3a4e99e3e8af6a77bdc810c8dec7dcc957d09d1"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "model-received.json",
+      "sha256": "4342c7a89d0a2d474fb5f63522c8fb663d1249d55f0bf5e55ec7aab82fe49ef6"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "planning-proposal.json",
+      "sha256": "f1a213172cb0a4bb01fd0ccdbf50070096a3489efc37a80126851a5886449a24"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "reviewer-invoked.json",
+      "sha256": "e8bcaf9deed67a004f723b2d14a8c91a7cf83ee55c1ce95d6fa3ea644b929866"
+    },
+    {
+      "root": "/tmp/swarm-model83-rmijwz4p",
+      "path": "validation-executed.json",
+      "sha256": "2a67149b70c76dc6d28c1a1119a62a42054c45805d7c7462165b0ae836761471"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "9fecc9dd279c61d512aa2506c8a1bf33335330cb96f717f6fba78f1e03a21f82"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-completion-3f3af1ecebbd1410ab417ec0d27bbfcb5d340e177ae159b59fc8626c2dfd9175.json",
+      "sha256": "8cc3be454350398513529b4514ed4032ba519897b4c31d75493b70d69fd75bc6"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-planning-214c05ff649a7569d43548fafcc96776f6387079e3f5516744be5e50570079f2.receipt",
+      "sha256": "37ba6e20a57b45161e2c7c2b16de83ffac596578bb568e933f1c78b883c13a11"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-planning-a5632d24c528d3ac67dc8905f94d5944a2c22ca42e675b190f7c356287fa3268.receipt",
+      "sha256": "5608f61ceb21d92b5ffbf48d3308ab5a233581a14466542ca277a67a3d1bbdce"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-planning-c45d20e96f9394c0941c27faaa9c0072b88216c8bf9192e4d23862a0b4df6c25.receipt",
+      "sha256": "6e157eb7fdddc9059bf67af7178d0d6f8ddd322e35a577730670eaa85e475438"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-review-6250241debcce93e6547aa7df3d5cebb9b36de39b86db6a2363d3a4129d471c8.receipt",
+      "sha256": "f5cf74d8741ff4e1a7168f68196b238793f7aa88303119362030457d1dbf3ad8"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-review-public-v2-b7364c03f243fa458196f959f4a436203559b6e415dfd998a677b0158e240b8e.json",
+      "sha256": "b7364c03f243fa458196f959f4a436203559b6e415dfd998a677b0158e240b8e"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-validation-job-2fcad0a2165ff17aaf06597f5d0d71dfd0f3096b399b67c79b117525a6b9bad6.receipt",
+      "sha256": "4288ca0ab4ea73ef17fa39f39dfe8149b1e905a97bff7a9761b6639cd9f4799b"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-validation-public-2fcad0a2165ff17aaf06597f5d0d71dfd0f3096b399b67c79b117525a6b9bad6.json",
+      "sha256": "49a84d9919b161994f215fa37056aaa1656fd2d1ff808f2da5f9fa98c2b26d63"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/native-validation-step-10d15dcd61a4f8fa6fd8327a182d587e7656f510f9f9af1ffead2a296c858777.receipt",
+      "sha256": "ae6a233bdf23979800500d84ec9b8855e192daabb87217eb7b9d998c55476b75"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/providers.json",
+      "sha256": "8c78a8396f558d30b4277698164d72f8603088150d0cb700f325098e20a1f50f"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/state.db",
+      "sha256": "781d2fdd94bbbfd3f30c63e98cd376cca448299c0840c3b52792d0c46194511c"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/views/w-22eecf8ba4648272ae719255.md",
+      "sha256": "2e5721d599f2d7bfec3a34463c3f44f811ea430d2b411bc3e774fae1a082a1f4"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": ".swarm/views/w-6c1f7ed6b9f09f82f20ab0ca.md",
+      "sha256": "31a26a8e3628a1042d7ebd7db12c896a1e26d799f0f3aa14de1dadf2c49e1776"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "codex",
+      "sha256": "3d469e2dec0741eaa85ee38a6e5186ddf46fd934efcbc5bc781b08dcfc4b77d4"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "fixture-prompt-3421331.bin",
+      "sha256": "fd12b0f64fa8eb63ccb136b393a7f2c668766673a96051f1142a15453f67f07e"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "fixture-prompt-3421358.bin",
+      "sha256": "d96cd0cc141558b7d7263c9c4a4f85fe990b83e8207f72a7590196322b2c94b5"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "fixture-prompt-3421522.bin",
+      "sha256": "4a7eaa5a0e8a3a1a8253439ffe40a1794e33b95e677769866d0de222cccd9832"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "fixture-review-reply.json",
+      "sha256": "c95f0b137f73142a124247b55124cee780b7b42e6b28e3cabdb36ef67bf5ec47"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "handoff.md",
+      "sha256": "d0a6d9f8a631e11ab98237d08627426bf542b058b7d54c64f06bc3d5dc64a464"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "model-received-3421331.json",
+      "sha256": "5a104d8a7d2af9a5cc86836df84ba4e30e1ff7c209879d0994a16ed3466e35ad"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "model-received-3421358.json",
+      "sha256": "30ddfad5806d07669654650e41ffe06c608faace28f50b7501a449966bc22e30"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "model-received-3421522.json",
+      "sha256": "9b9e507851451075fa3b50af52c7acb48945184857c66bfeb5bdcc996f114156"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "model-received.json",
+      "sha256": "ad9d20164bc37eae8808e10736089e389289e2e1b01cd647b2743f3674aa3133"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "planning-proposal.json",
+      "sha256": "c9ae516c6eca40a767a9ebbbe5404b4c2c11495af9dba5e7d0573b6cce386d63"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "reviewer-invoked.json",
+      "sha256": "330e44103cb357b5b2aea0dca8af8f203095bf98d7eadcc9647491b45a944c2b"
+    },
+    {
+      "root": "/tmp/swarm-model83-s9lbqsaj",
+      "path": "validation-executed.json",
+      "sha256": "a1f45e34961dcc7ef595e1d199ffd48af569bd3e99676cff7dd2eb06a427e363"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "3ed9bdb19ec9333d334e3c718db21d6fb7e3a000f0ec54dedfce6542188c1186"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-completion-3f3af1ecebbd1410ab417ec0d27bbfcb5d340e177ae159b59fc8626c2dfd9175.json",
+      "sha256": "1ba6f40ac19deb0c966179050e6887ed40f312ce823437aec62fc5b9000a71fa"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-planning-67a0a89e525af5ccbdd5ebd310d148133c13401fc80ffff6f9ddff84966d0e07.receipt",
+      "sha256": "58d33c4f75bc92ed3dfec678cfa72c599db291a8173e25f19055aa2a584d09b5"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-planning-6b42c27fc54117497fecc34332f3d8b177c665dcff0f554bdd631ecbfa7de113.receipt",
+      "sha256": "f488c1b448217b84de436038b049a8666be478f1e3b7accf88c61af4d0acebb1"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-planning-d5696bd407db22d91496ef3f28766819cfc016d3b00bcd254e348a4b7f85bfc6.receipt",
+      "sha256": "73d8945cfbe8a2db8cc1ca30c3901a5aec55c3ffce818c1a912b8efe906bb366"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-review-c1f11d48c285cff2032116a57177eca6325eed4738113b3e83045cbae3192385.receipt",
+      "sha256": "c0835b298a4cdc15c8834a54c5e7397d344559c0fa39617b7b32919e88b474d6"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-review-public-v2-34713704cd6dc3846378c43e66cdcda5b6f7e419f7d1e6e7e8bb026de5832ac4.json",
+      "sha256": "34713704cd6dc3846378c43e66cdcda5b6f7e419f7d1e6e7e8bb026de5832ac4"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-validation-job-878375457c6fcdcbe39032206cd714dd5343bc75e5ea25509f6bfbcc2c742498.receipt",
+      "sha256": "8ccb8fa98fc4b395940c4312a053bbbae38a8f917f04f6ca18af60597418313d"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-validation-public-878375457c6fcdcbe39032206cd714dd5343bc75e5ea25509f6bfbcc2c742498.json",
+      "sha256": "1fd4b41e4442306cd35e5e535a71b8d34b10d9ff3b8c95b8fcdf644ca33ae5fb"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/native-validation-step-eea72a61aaeedea1d2b151b6eec0930ff309a485c73250b93dfc8bf1d200e964.receipt",
+      "sha256": "63a7d54f23919230e0955c6eb77e85cc6adbf21e715087bb52b9688bd66fd3e3"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/providers.json",
+      "sha256": "6e1715b464a8b26d824a3178000ca00d65a09a3b8b83c42b7576cb7ec4d6acd5"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/state.db",
+      "sha256": "4800796d53859034a0739661faa712b8e3275f21b0093c25eb4cce05d369c538"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/views/w-7f36f3ff664b9f9ff94ed225.md",
+      "sha256": "7c45470241d04204e92d75253e3a6e04391796212bf1944e7de64b43c3024380"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": ".swarm/views/w-92913caf9b30707979aaeca5.md",
+      "sha256": "f88e4e89c973ae4099ecaab176dc49c44a9c93d81b58c33bf0ea9822b4899172"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "codex",
+      "sha256": "3d469e2dec0741eaa85ee38a6e5186ddf46fd934efcbc5bc781b08dcfc4b77d4"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "fixture-prompt-3420563.bin",
+      "sha256": "de47c72b3de063964f869f039c300020cd627cbff06098562cbfb3e6292b9d7d"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "fixture-prompt-3420576.bin",
+      "sha256": "809b731f74eaf965bf5b910c1043037e3161a646cf4d8fffc64b96818fad5a3d"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "fixture-prompt-3420841.bin",
+      "sha256": "935b7aa830a844b2ee3649f5e9016dfca25548f6e8e1d86b17aeb6e5d31ef2d6"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "fixture-review-reply.json",
+      "sha256": "39b2b40de1d4520660f0ef24abaa536740956717a27af6d14871266fc6a26982"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "handoff.md",
+      "sha256": "6c5d91a6c8e1068d945327d4f0b233eb38b1e2b8512438944988e4d0fd512c46"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "model-received-3420563.json",
+      "sha256": "d4eb74469e3eda870aa2b9f07e74b32bf1403d4b694709fb634e1a859d95f3c9"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "model-received-3420576.json",
+      "sha256": "5d007d8f558a777bb6c907930b0a9181a32bb278530e67a03b2c52a2232ed473"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "model-received-3420841.json",
+      "sha256": "bddcee44b70f5988b57136347342e36bcf7f04f2746978e1da990a20eeb04faf"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "model-received.json",
+      "sha256": "8ca025a2a076952ea505089612ca33926a04315aec00d035a7645aaa2d3a6d6c"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "planning-proposal.json",
+      "sha256": "013f43209e4ed84d388bd3477a95e595a6bf491de690f9987c76f80a7116085e"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "reviewer-invoked.json",
+      "sha256": "ee321faf1a2845faa1b8c22f4058c4a4ccd504efee32babe4b58a818f24f8692"
+    },
+    {
+      "root": "/tmp/swarm-model83-sjbl7y39",
+      "path": "validation-executed.json",
+      "sha256": "575efbc95b7ac42279817f689ea4449454ff908f58b15e6116f42be182c2bc33"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/.engine-settings.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/.gitignore",
+      "sha256": "cdbcae15105d6b781e620813c79c7e868740d4e9cc53ce6f5fcbbc12387adf4b"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/engine-settings.json",
+      "sha256": "b98c1a746c77a6a6186893145a6bc5f420da589c1ec9f058beffc3ce3396bfb2"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/native-completion-379341ef3f0c79c479cefa7405e0df3bb41cc16b553ef44a6646b08dea3565c0.json",
+      "sha256": "76407818d91d51fba2d2b35853918eacb1ee73acf756dfc821dc6a83b2af5103"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/native-planning-4a957cad0d633282ba89127b869aedf3aa71190816605341db6e64cd087d3fa0.receipt",
+      "sha256": "4f2245422ea7dd90315eda73cba8772d9a33b175cadc9e2b8021c177bd7a7953"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/native-planning-76da877d4ccf28aeda52ea0818df4a087d7df70adaba0050d5895ab6b92e03c0.receipt",
+      "sha256": "6afdeb1706add339ad092af25e0fc7a52f9a942eb1e27aeaeafa39b514ff41fe"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/providers.json",
+      "sha256": "0050f36cd492a7f84e8a612ecdfc37cc18dc307e12165d62d41f8c045c2290ce"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/providers.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/state.db",
+      "sha256": "9c1952fd07369cf3dd424aba026d5b55fe64333928a719eb093b5deedeefbce7"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/views/w-5901376a78ed8c95f3ab3f20.md",
+      "sha256": "2f7aebdac019c4fe918ec9bd956fd3dd3cb5fdd8dcf0dac64db179c7128270b5"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": ".swarm/views/w-f58da29fef211958d95633ad.md",
+      "sha256": "ea67b111fc19755eb52a94d38178879a89e55d0390594e54dea3281b904eff4e"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "codex",
+      "sha256": "810d24933c45c9bbc3b5c69bf075941c2ab52da90beddaa6b5fc06d1606f74e0"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "codex-home/models_cache.json",
+      "sha256": "ffa10bbf7c6542e441608a1b4c3f4ac1410652360f269f51c6640f660a7c766c"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "fixture-prompt-3421081.bin",
+      "sha256": "8c812a169277c680570ee98c5ba97124c5958a9d6bad1947a45e62cc2e05182c"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "fixture-prompt-3421105.bin",
+      "sha256": "af8644a6cdd341e499c047b43b87c5c16df9a80edf2488f221701596d117e7ff"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "model-received-3421081.json",
+      "sha256": "1001ecbb2e742d6b056afeae371b511e63d1c0589840d9ccb16db1dac9eb8473"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "model-received-3421105.json",
+      "sha256": "e3be04079b41369c7e68b5692ebcd380ae0e4ea4d34bb6616cb093f291d6593e"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "planning-proposal.json",
+      "sha256": "11e901b21fa6798c92af5efca0604b0ddb77ad5846b9cdc4876336c55af10c35"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "watch-worker/handoff.md",
+      "sha256": "e49a600eec1f5201bc8499e3823606b7e622800eeef4a2c405c6318edb244090"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "watch-worker/model-received.json",
+      "sha256": "f513154d8fedcff3f9e31dbe79509daff72dbb5e4022ef33c0c2bd4ca9148d0e"
+    },
+    {
+      "root": "/tmp/swarm-model83-vhdlaym9",
+      "path": "watch-worker/release-worker.json",
+      "sha256": "e00279952ef7f6a7efff36d93357b5047c3fca936cdb43f9b8c2fe83567dee5a"
+    }
+  ],
+  "excluded_credential_paths": [
+    "/tmp/swarm-model83-vhdlaym9/.swarm/web-session-06591dd09183367e",
+    "/tmp/swarm-model83-vhdlaym9/.swarm/web-session-d7cd5d2373bf8ed9"
+  ]
+}

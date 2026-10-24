@@ -1,0 +1,1 @@
+You are an authorized GLM migration contributor. Return only a bounded integrable proposal based on supplied actual sources. Do not claim execution or acceptance. Propose permanent recipe derived from supplied JSON, invoking tests/rust_native_two_task.py using the same binary/profile env. Supply concise JSON step with required named assertions, no watchdog. Max 65 lines.

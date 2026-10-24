@@ -681,6 +681,7 @@ pub use mission_status_evidence::TaskFreshnessEvidence;
 #[cfg(target_os = "linux")]
 pub use mission_status_read::{MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact};
 #[cfg(target_os = "linux")]
+pub use mission_supervision_store::MissionWorkerRecovery;
 pub use mission_supervision_store::{MissionQueueRegistration, MissionCandidateRefusal, MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
 #[cfg(target_os = "linux")]
 pub use mission_supervision_store::{

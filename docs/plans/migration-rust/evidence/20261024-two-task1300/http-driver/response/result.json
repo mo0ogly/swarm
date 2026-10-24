@@ -1,0 +1,18 @@
+{
+  "usable_response": true,
+  "requested_model": "glm-5.2",
+  "started_at_unix": 1792839959.584453,
+  "automatic_retries": 0,
+  "reported_model": "glm-5.2",
+  "usage": {
+    "completion_tokens": 1298,
+    "prompt_tokens": 14699,
+    "total_tokens": 15997,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1,
+      "text_tokens": 1297
+    }
+  },
+  "finish_reason": "stop",
+  "elapsed_seconds": 9.745
+}

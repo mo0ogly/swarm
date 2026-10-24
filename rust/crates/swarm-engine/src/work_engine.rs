@@ -276,7 +276,11 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
     /// Planning controls use their complete Go DTO/intent and pretransaction
     /// guards; replay precedes candidate policy/clock/lease edits. Enablement
     /// consumes explicit v12 request/requirement policy and observes provider/
-    /// reviewer metadata. v24 claims freeze owned workflow/context and leases;
+    /// reviewer metadata. On Linux, committed-only repository enablement retains
+    /// a private bare copy and pending/final manifests before SQL publication;
+    /// filesystem preparation survives a SQL rollback for checked recovery.
+    /// Dirty snapshots and managed claims/execution/settlement remain unported.
+    /// v24 claims freeze owned workflow/context and leases;
     /// v25 decisions apply task/delegation, same-task native production retry
     /// or exclusive scoped closure atomically.
     /// Explicit lease-renew preserves generation/consumption and rechecks the
@@ -287,7 +291,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
     /// Recorded replay neither rechecks a new admission nor reserves a second call.
     /// Current native-review input is verified through its original chain: passed
     /// supports ordinary actions; changes_requested supports only same-task retry.
-    /// repository/exploration/run-observation decisions remain unported. Closure
+    /// Managed integration, exploration and run-observation decisions remain unported. Closure
     /// requires fresh accepted descendants and internal physical ownership guards.
     /// This boundary starts
     /// no agent process; native execution has separate Root operations.
@@ -828,10 +832,14 @@ fn apply<E: WorkEnvironment>(
                 }
                 candidate = prepared;
             } else {
+                // Keep the original request in mutation intent/replay. Only this
+                // trusted Root adapter may attach source-observed repository data.
+                let mut local_request=request.clone();
+                if action==crate::PlanningControlAction::Enable {local_request.repository=None;}
                 let provider = if action == crate::PlanningControlAction::Enable
                     && !request.provider.is_empty()
                 {
-                    crate::planning_control::validate_planning_enable_target(&candidate, request)
+                    crate::planning_control::validate_planning_enable_target(&candidate, &local_request)
                         .map_err(WorkEngineError::PlanningControl)?;
                     #[cfg(target_os = "linux")]
                     {
@@ -850,12 +858,25 @@ fn apply<E: WorkEnvironment>(
                 candidate = crate::planning_control::apply_planning_control_prepared(
                     &candidate,
                     action,
-                    request,
+                    &local_request,
                     &at,
                     settings,
                     provider.as_ref(),
                 )
                 .map_err(WorkEngineError::PlanningControl)?;
+                if action==crate::PlanningControlAction::Enable {
+                    if let Some(repository)=request.repository.as_deref(){
+                        #[cfg(target_os = "linux")]
+                        {
+                            let prepared=crate::managed_repository::prepare(root,&candidate.id,repository,settings)
+                                .map_err(|e|WorkEngineError::PlanningBootstrap(Box::new(e)))?;
+                            candidate.planning.as_mut().ok_or(WorkEngineError::UnportedStatus)?.repository=Some(Box::new(prepared));
+                            crate::validate_planning_state(&candidate).map_err(|e|WorkEngineError::PlanningControl(crate::PlanningControlError::State(e)))?;
+                        }
+                        #[cfg(not(target_os = "linux"))]
+                        return Err(WorkEngineError::UnportedStatus);
+                    }
+                }
             }
         }
         "work.create" | "checkpoint" => {

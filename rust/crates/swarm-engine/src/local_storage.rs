@@ -173,6 +173,51 @@ fn privatize_database(file: &File) -> Result<(), LocalStorageError> {
 }
 
 impl LocalDirectory {
+    /// Open/create one private child relative to this retained descriptor.
+    /// Names cannot traverse; existing symlinks/nonprivate directories refuse.
+    /// Creation is durable before return; ownership/open/close errors survive.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn child(&self, name: &str, create: bool) -> Result<Self, LocalStorageError> {
+        Self::name(name)?;
+        if create {
+            match fs::mkdirat(&self.file, name, Mode::RWXU) {
+                Ok(()) => self.file.sync_all().map_err(|e|LocalStorageError::new(LocalStorageOperation::SyncDirectory,e))?,
+                Err(e) if e==rustix::io::Errno::EXIST => {},
+                Err(e) => return Err(LocalStorageError::new(LocalStorageOperation::CreateDirectory,e)),
+            }
+        }
+        let file:File=fs::openat(&self.file,name,OFlags::RDONLY|OFlags::DIRECTORY|OFlags::NOFOLLOW|OFlags::CLOEXEC,Mode::empty())
+            .map_err(|e|LocalStorageError::new(LocalStorageOperation::OpenDirectory,e))?.into();
+        if let Err(e)=owned(&file,true) { return close_after(Err(e),file); }
+        Ok(Self{file})
+    }
+    /// Procfs reference to OUR retained directory for subprocess cwd/arguments.
+    /// Caller keeps this descriptor alive until the process has been reaped.
+    /// No caller-supplied PID/FD, pathname reopen or actor authentication occurs.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn process_path(&self) -> std::path::PathBuf {
+        use std::os::fd::AsRawFd;
+        std::path::PathBuf::from(format!("/proc/{}/fd/{}",std::process::id(),self.file.as_raw_fd()))
+    }
+    /// Move one retained source child into this directory without replacement.
+    /// Both simple names are validated; fsync both parents after visible rename.
+    /// A sync failure retains publication uncertainty; no rollback/deletion claim.
+    #[cfg(target_os = "linux")]
+    pub(crate) fn rename_from(&self, source:&Self, from:&str, to:&str)->Result<(),LocalStorageError>{
+        Self::name(from)?;Self::name(to)?;
+        fs::renameat_with(&source.file,from,&self.file,to,fs::RenameFlags::NOREPLACE)
+            .map_err(|e|LocalStorageError::new(LocalStorageOperation::Rename,e))?;
+        let a=self.file.sync_all();let b=source.file.sync_all();
+        let mut error=None;
+        for result in [a,b] {
+            if let Err(cause)=result {
+                let mut e=LocalStorageError::new(LocalStorageOperation::SyncDirectory,cause);
+                e.publication=PublicationState::RenamedDurabilityUnknown;
+                if let Some(primary)=error.as_mut(){LocalStorageError::append_cleanup(primary,e);}else{error=Some(e);}
+            }
+        }
+        if let Some(error)=error {Err(error)}else{Ok(())}
+    }
     /// Borrow the retained directory only for the private gate transport. No
     /// pathname reopen, duplicate ownership or execution permission is created.
     #[cfg(all(test, target_os = "linux"))]

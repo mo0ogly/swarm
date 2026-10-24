@@ -1,0 +1,9 @@
+test_pidfd_refusal_reaps_only_the_actual_owned_watch (test_rust_registered_observer_resources.ObserverResources.test_pidfd_refusal_reaps_only_the_actual_owned_watch)
+A real idle Python child witnesses pidfd support before its injected refusal. ... ok
+test_setup_refusal_closes_notify_and_already_opened_spool (test_rust_registered_observer_resources.ObserverResources.test_setup_refusal_closes_notify_and_already_opened_spool)
+Keep the primary failure and close partial resources before propagating it. ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.088s
+
+OK

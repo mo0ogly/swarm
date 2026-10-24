@@ -1,0 +1,8 @@
+{
+  "original": "recipe1269/step-0001.stderr",
+  "cause": "historical aggregate detects advancing owned supervision heartbeat during status read; exact retained cause mission-status-supervision-changed",
+  "observed": "absence/fresh/ambiguity/restoration already reached; failure at saved zero margin read",
+  "decision": "Separate status selection test from live writer: public mission stop after recovery and before fresh web server, preserved consent revocation; no retry or snapshot guard weakening",
+  "owner": "Codex G1/G3",
+  "scope_limit": "Does not establish all reads during a concurrent heartbeat; existing fail-closed coherence contract preserved"
+}

@@ -1,0 +1,14 @@
+{
+  "error": "managed-manifest-binding-mismatch",
+  "failure": {
+    "causes": [
+      "managed-manifest-binding-mismatch",
+      "managed-manifest-binding-mismatch",
+      "managed-manifest-binding-mismatch"
+    ],
+    "code": "managed-manifest-binding-mismatch",
+    "message": "managed-manifest-binding-mismatch",
+    "retryable": false
+  },
+  "schema_version": 1
+}

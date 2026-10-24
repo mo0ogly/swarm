@@ -1,0 +1,228 @@
+{
+  "work": {
+    "planning": {
+      "reviewer_required": true,
+      "reviewer": {
+        "max_context_files": 24,
+        "max_source_bytes": 98304,
+        "max_context_bytes": 131072,
+        "max_files": 100,
+        "provider": "fixture",
+        "provider_digest": "1c9882b66ad69efd2b9a6b4e70712554dab421b99c590032352374317f6a7c78",
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "max_calls": 2,
+        "calls": 0,
+        "authorized": "2026-10-24T11:34:55.656195312Z"
+      },
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "provider": "fixture",
+      "provider_digest": "1c9882b66ad69efd2b9a6b4e70712554dab421b99c590032352374317f6a7c78",
+      "activations": 1,
+      "max_activations": 3,
+      "version": 1,
+      "paused": false,
+      "max_tasks": 10,
+      "max_decisions": 10,
+      "decisions": 0,
+      "scopes": [
+        {
+          "last_model": {
+            "provider": "fixture",
+            "provider_digest": "1c9882b66ad69efd2b9a6b4e70712554dab421b99c590032352374317f6a7c78",
+            "route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "actor": "",
+            "at": "2026-10-24T11:34:55.717156564Z"
+          },
+          "delivery": {
+            "judge_available": true,
+            "judge_cycle": 1,
+            "task_budget": 10,
+            "activation_budget": 3,
+            "closure_unavailable": true,
+            "review_retry_unavailable": true,
+            "production_retry_unavailable": true,
+            "context_sha256": "f00fa060baf6482d00f8d78c4245aa79e6e1876ea85a3750a5e02d6a5d9dd2a9",
+            "events": [
+              "preview-enable"
+            ]
+          },
+          "workflow": {
+            "version": 1,
+            "role": "planner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug",
+              "product-planning"
+            ],
+            "sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb"
+          },
+          "activations": 1,
+          "id": "root",
+          "objective": "Scoped fixture planning",
+          "requirements": [
+            "req-1"
+          ],
+          "revision": 1,
+          "generation": 1,
+          "holder": "fixture-planner",
+          "lease_until": "2026-10-24T11:35:55.717156564Z",
+          "state": "ready"
+        }
+      ],
+      "inbox": [
+        {
+          "id": "preview-enable",
+          "scope": "root",
+          "kind": "brief",
+          "message": "Scoped fixture planning",
+          "at": "2026-10-24T11:34:55.656195312Z"
+        }
+      ],
+      "judge": {
+        "cycle": 1,
+        "max_cycles": 0,
+        "closed": false
+      }
+    },
+    "schema_version": 1,
+    "id": "w-a52113ea02ad279fb0be1be8",
+    "revision": 3,
+    "title": "Public planning bootstrap",
+    "objective": "Scoped fixture planning",
+    "scope": "Owned local bootstrap",
+    "criteria": [
+      "Configuration is persisted without model execution"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-24T11:34:55.571451159Z",
+    "updated": "2026-10-24T11:34:55.726127279Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": []
+  },
+  "validation": {
+    "state": "open",
+    "label": "OUVERT",
+    "validated": 0,
+    "historical": 0,
+    "stale": 0,
+    "tasks": {}
+  },
+  "events": [
+    {
+      "id": "preview-create",
+      "work_id": "w-a52113ea02ad279fb0be1be8",
+      "revision": 1,
+      "kind": "work.create",
+      "at": "2026-10-24T11:34:55.58874704Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "preview-create",
+        "expected_revision": 0,
+        "title": "Public planning bootstrap",
+        "objective": "Scoped fixture planning",
+        "scope": "Owned local bootstrap",
+        "criteria": [
+          "Configuration is persisted without model execution"
+        ]
+      }
+    },
+    {
+      "id": "preview-enable",
+      "work_id": "w-a52113ea02ad279fb0be1be8",
+      "revision": 2,
+      "kind": "planning.enable",
+      "at": "2026-10-24T11:34:55.659619251Z",
+      "payload": {
+        "max_review_calls": 2,
+        "level": "standard",
+        "provider": "fixture",
+        "max_activations": 3,
+        "schema_version": 1,
+        "event_id": "preview-enable",
+        "expected_revision": 1,
+        "max_tasks": 10,
+        "max_decisions": 10
+      }
+    },
+    {
+      "id": "preview-claim",
+      "work_id": "w-a52113ea02ad279fb0be1be8",
+      "revision": 3,
+      "kind": "planning.claim",
+      "at": "2026-10-24T11:34:55.726127279Z",
+      "payload": {
+        "schema_version": 1,
+        "event_id": "preview-claim",
+        "expected_revision": 2,
+        "scope": "root",
+        "scope_revision": 1,
+        "holder": "fixture-planner",
+        "lease_seconds": 60
+      }
+    }
+  ],
+  "current_gates": {},
+  "current_git": {
+    "head": "",
+    "branch": "",
+    "changes": ""
+  },
+  "resume_markdown": "# Public planning bootstrap\n\nTravail : w-a52113ea02ad279fb0be1be8 | révision 3 | OUVERT\nDernière activité : 2026-10-24T11:34:55.726127279Z\n\n## Objectif et résultat attendu\nScoped fixture planning\nPérimètre : Owned local bootstrap\n- Configuration is persisted without model execution\n\n## Situation actuelle\nnon renseigné\nHEAD enregistré : non renseigné\nBranche enregistrée : non renseigné\nHEAD courant : non renseigné\nBranche courante : non renseigné\nMétadonnée Git indisponible (HEAD) : git-command-failed.\nMétadonnée Git indisponible (branch) : git-command-failed.\nMétadonnée Git indisponible (changes) : git-command-failed.\n\n## Tâches actives et résultats attendus\nAucune tâche active déclarée.\n\n## Travail validé\nTâches acceptées (preuves ou dérogation) : 0/0.\nCe ratio est distinct de la progression des critères d’une gate.\n\n## Travail restant et blocages\n\n## Gates, qualité et progression vérifiée\n\n## Prochaine action du travail\nà définir\n\n## Décisions OODA et mémoire utile\nMémoire spécifique : non renseignée.\n\nLes tentatives enregistrées ne prouvent pas qu’un processus tourne encore.\nUne gate ne remplace pas une autorisation de publication.\n",
+  "git_diagnostics": [
+    {
+      "field": "head",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "branch",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    },
+    {
+      "field": "changes",
+      "reason": "git-command-failed",
+      "exit_code": 128,
+      "timed_out": false,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c4dfc721cc7f91d3ec67d99446d3c46f79c764fc96d6f9ba52e69cc669d686c1"
+    }
+  ]
+}

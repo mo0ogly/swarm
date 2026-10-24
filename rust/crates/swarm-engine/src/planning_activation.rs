@@ -170,6 +170,8 @@ pub(crate) fn validate_publication(work: &Work, scope: &str, at: &str) -> Result
 /// without changing input. Expired claims keep prior consumption and get a new
 /// generation. Complete workflow/context snapshots are bound before counters
 /// advance; no event is acknowledged and no process or automatic dispatch starts.
+/// Managed repositories require their original prepared copy/commit observations;
+/// only planning is enabled, not managed workers or source exploration.
 /// Checked integer/timestamp limits are technical representation, not extra policy.
 #[cfg(target_os = "linux")]
 pub(crate) fn prepare_claim(
@@ -199,9 +201,6 @@ pub(crate) fn prepare_claim(
     }
     if !p.failure.is_empty() {
         return Err(E::Refused("planning-stopped"));
-    }
-    if p.repository.is_some() {
-        return Err(E::Refused("planning-claim-repository-unported"));
     }
     let scopes = p.scopes.as_deref().unwrap_or_default();
     let index = scopes
@@ -277,6 +276,9 @@ pub(crate) fn prepare_claim(
         &limits,
     )
     .map_err(|e| E::caused("planning-claim-workflow-invalid", e))?;
+    if p.repository.is_some() {
+        crate::managed_repository::observe(root,work,settings)?;
+    }
     let context = crate::planning_scope_context::observe(root, work, scope, settings)?;
     let total = workflow
         .prompt

@@ -47,9 +47,9 @@ identifiés ; source Go précompilée non qualifiée, aucune acceptation globale
 
 | Groupe | Prochaine unité de livraison | État de vérification/acceptation |
 |---|---|---|
-| G1 Cockpit | suivre mission et décisions | lectures/logs/status final, avis négatifs et acceptation explicite localement vérifiés555/556/558/560/563, revue bornée601 ; retry/closed/managed/cockpit/revue globale ouverts |
+| G1 Cockpit | suivre mission et décisions | lectures/logs/status, avis négatifs/acceptation explicite555–563, résultat terminé/bloqué1283 et tâches managed initiales1378 localement vérifiés ; retry/closed/exécution managed/cockpit/revue globale ouverts |
 | G2 Terminal | session et contrôle autorisé | ouvert |
-| G3 Supervision | conduire planner→worker→contrôles→reviewer | phases asynchrones ordonnées : six signaux/progression main1067 sur1066 ; reprise registered1067, manual/refus/révocations1070–1071 PASS ; concurrence Go complète, managed/web/fin/revue indépendante globales ouverts | Pont HTTP1170 et conducteur serveur1218 localement vérifiés ; managed/multi-tâches et revue globale ouverts.
+| G3 Supervision | conduire planner→worker→contrôles→reviewer | conducteur CLI/web1218, reprise/journal1256, statut1283, deux tâches séquentielles1304 et bootstrap repository commit seul1330 et planification managed1365 localement vérifiés ; concurrence complète, copies/règlement managed et acceptation globale ouverts |
 | G4 Planification | préparer le plan de mission | ouvert ; composants natifs, parcours global à qualifier |
 | G5 Préparations | préparation jusqu'au démarrage | ouvert ; dépend G4 |
 | G6 Fournisseurs | configurer/résoudre/tester connexion | ouvert ; contrats secrets et budgets requis |
@@ -1919,3 +1919,174 @@ course pause/révision corrigées avec RED originaux ; même event_id/cadence.
 Revue indépendante du candidat et acceptation globale ouvertes. Suite G3 :
 récupération managed et parcours multi-tâches, puis autres groupes/R6/R7/RETEX.
 Aucun Go/LIVE-UX modifié ; aucun restart/installation/commit/push.
+
+###1220 — huit GLM autorisés après commit174b8910
+Récupération terminale sous bail, sélection registered, raccord conducteur,
+recette de recovery, fixture deux tâches, FIFO/budgets, revue du candidat réel
+et carte Go sont séparés. Deux HTTP simultanés,2000low,0retry ; aucun watchdog
+global. Textes/propositions seulement, aucun writer GLM. Racine réserve suivi
+et evidence/20261024-wave1220-managed/ ; aucune modification Rust/LIVE/UX.
+La récupération réelle et le parcours multi-tâches ne sont pas encore livrés.
+
+###1221 — vague1220 terminée et propositions qualifiées
+8/8réponses complètes,67618tokens déclarés,0retry. Source review Root
+écarte les API inventées, le pré-pass sans bail et start+task_id. RegisteredObserved
+ne signifie pas absence de reçu : original possible après échec SQL. Suite G3 :
+entrée spécialisée de finalisation sous bail, ancien superviseur parti et reçu
+lié, sans annulation queued ni nouveau provider ; puis profils/budgets deux tâches.
+[Avis/arbitrages](evidence/20261024-wave1220-managed/ASSESSMENT.md),
+[8reçus/empreintes](evidence/20261024-wave1220-managed/result.json).
+Aucun code produit/build/test/restart/commit ajouté par cette vague.
+
+###1230–1256 — reprise du reçu de fin natif sous bail, vérifiée localement
+Worker automatique réellement lancé, ancien conducteur fermé, refus SQL fixture
+et helper récolté en échec : nouveau watch finalise le même Agent sans provider
+supplémentaire. Original absent attendu, quatre mutants refusés sans mutation ;
+réservation estimée conservée, FIFO libéré une fois, finish lié au nouveau bail.
+202tests Rust PASS/1optionnel ignoré, Clippy et Rustdoc moteur/CLI/web PASS ;
+3recettes recovery/registered/web PASS et intégrité vérifiée. Normal1249 :339entrées,
+110artefacts/4cores sans fixture, binaire7292e5…0ca6b non installé.
+[Preuves/limites](evidence/20261024-worker-recovery1230/decision1253/result.json),
+[revue locale](evidence/20261024-worker-recovery1230/decision1253/review-notes.md),
+[historique](evidence/20261024-worker-recovery1230/decision1253/execution-history.md).
+RED1246 ancien watch à première synchronisation ; échecs méthode1240/1242 et
+Clippy1243 conservés. Aucun nouveau GLM, Go/LIVE/UX, restart, commit ou push.
+Revue indépendante, variantes publiques supplémentaires et acceptation globale ouvertes.
+Suite G1/G3 : status HTTP completed/blocked sans revue (refus réel1244 ;
+planned_pair puis result_inputs_with_review, pas scope closed), règlement
+planning.repository et parcours multi-tâches ; R6/R7/RETEX restent au plan.
+Apprentissage : discriminer le RED sur progression contractuelle (synchronisation),
+pas durée ; lire scopes/tâches réels avant d'attribuer la cause d'un refus générique.
+
+###1260–1283 — statut historique terminé/bloqué, vérifié avec appui GLM
+CLI/HTTP lisibles après vraie reprise : rapport Root absent/frais/ambigu/ancien/
+vide/restauré ; marge persistée0→2 consommée ; chemin externe refusé puis repris.
+Dix lectures sans mutation/soumission/acceptation ; revues existantes préservées.
+105tests moteur+44CLI,Clippy,Rustdoc moteur/CLI/web et2recettes PASS/intégrité.
+Normal1279 :339entrées/110artefacts/4cores sans fixture ; binaire61f08c…0796,
+non installé. [Preuves](evidence/20261024-status-unsubmitted1260/decision1281/result.json),
+[revue locale](evidence/20261024-status-unsubmitted1260/decision1281/review-notes.md),
+[historique](evidence/20261024-status-unsubmitted1260/decision1281/execution-history.md).
+GLM :2appels/1complet/1tronqué,46135tokens déclarés,0retry automatique ;
+[arbitrages](evidence/20261024-status-unsubmitted1260/ASSESSMENT.md).
+RED1262,concurrence1269,anciennes attentes1268 etClippy1274 conservés ; aucune
+garde affaiblie. Revue indépendante/globale ouverte ; pas de Go/LIVE/UX/restart/commit.
+Suite : règlement planning.repository et parcours multi-tâches, autres branches
+de statut/G1–G12,R6/R7/RETEX. [Apprentissage de méthode](evidence/20261024-status-unsubmitted1260/METHOD-RETEX.md) : contexte GLM ciblé avec vrai caller,
+Clippy avant recette finale, distinguer attribution au repos et snapshot concurrent.
+
+###1290–1291 — horde GLM : huit appels terminés et arbitrés
+7textes complets/1tronqué,71601tokens déclarés,2HTTP simultanés,0retry ;
+[8reçus/hashes](evidence/20261024-wave1290-horde/result.json),
+[arbitrages et suite](evidence/20261024-wave1290-horde/ASSESSMENT.md).
+Fausses hypothèses écartées : profil parent nécessite prepare manuel, bail unique
+limite à1worker, pause expire le bail, observer Git finalise, tout journal est chaud.
+Contre-exemple SQLite PERSIST fermé/restauration exact PASS ; contexte review
+tronqué au cfg(test) intermédiaire reproduit, copie complétée validée hors appel.
+Garde lexicale validate_packets.py à consommer AVANT prochaine vague ; aucune
+preuve que le modèle ait reçu la correction, aucune revue indépendante acquise.
+Suite Root/G3 :2tâches publiques avec budget enfant2 et profil parent via start,
+preuve séquentielle des2cycles/réservations/FIFO, puis nécessité d'overrides pour
+le simultané ; règlement Git/conservation distincts. Pas de patch/recette produit
+par cette vague, pas de Go/LIVE/UX/restart/commit/push ; bilan offline seulement.
+
+1292 — demande utilisateur : inscrire la correction de méthode dans skynet-agents.
+Skill personnelle et copie Claude dremio synchronisées : parcours livré avant
+répartition, propositions intégrables, intégration/tests/docs par racine après
+réponses ; aucun arrêt au rapport de vague pour une demande d'implémentation.
+Contrôle du contexte réel (pas de coupe au premier cfg(test)), autorité/budget
+et demandes limitées à analyse/revue préservés. Originaux/hashes sous
+evidence/20261024-wave1290-horde/skill1292 ; changement de consigne, pas preuve
+de comportement futur ni transmission aux sessions/agents déjà lancés.
+
+
+###1300–1304 — huit GLM et parcours public Rust de deux tâches
+Besoin : dépasser les rapports de horde et vérifier deux cycles de bout en bout.
+Huit appels HTTP GLM terminés (deux simultanés, zéro retry), propositions arbitrées
+sans application aveugle ; Codex intègre le test et la recette permanents
+native-two-task-mission. Deux tâches publiques déléguées (budget enfant2), profil
+parent sauvegardé, un slot et workspace commun, planning en pause. HTTP start
+puis pause/arrêt/release/réouverture/resume produisent deux vrais workers distincts.
+Une tentative par tâche, Agent completed/tâche blocked, réservations estimated1,
+FIFO libéré une fois, originaux liés aux Agent/tâche/tentative/bail vérifiés ;
+autre tâche todo avant resume, générations distinctes, pas de troisième Agent.
+run1301 PASS ; recette finale1303 PASS/intégrité VERIFIED ; FR/EN et schéma à jour.
+Revue politiques/docstrings/erreurs liée aux hashes dans decision1304/source-review.
+Binaire normal1279 réutilisé, entrées effectives inchangées ; aucun produit livré,
+version/restart/Go/commit/push. Ni parallélisme, règlement Git géré ni acceptation.
+Amélioration de méthode : paquet commun trop large et sans candidat nouveau ni
+Rust effectif ; plusieurs réponses hors cible ou fausses, toutes arbitrées.
+Prochaine vague : extraits exacts par rôle avec candidat/producer/consumer/guards,
+critère observable avant appel ; avis GLM non assimilé à revue indépendante.
+Suite : règlement des dépôts gérés et préconditions du simultané restent ouverts.
+Preuves, usage exact et limites : evidence/20261024-two-task1300/decision1304/result.json
+et ASSESSMENT.md ; originaux de fixtures archivés/hachés, secrets exclus.
+
+
+###1310–1330 — activation publique du dépôt géré, commit enregistré uniquement
+Cause : enable repository refusait avant tout lancement ; régler directement la
+complétion aurait omis la source/copie. Choix : porter cette entrée publique,
+puis les copies de workers ; intégration/review/acceptation restent ouvertes.
+CLI/HTTP enable prépare un bare privé et manifestes pending/final sans modifier
+source/index/fichiers sales ; profil parent/contrat pur et gardes managed conservés.
+Préparation sous descripteurs/verrou, publication NOREPLACE, timeout Git sauvegardé,
+erreurs typées et fermetures conservées ; effets FS survivent au rollback SQL.
+RED1316 ancien binaire ; check1312 export fixture corrigé en import privé normal.
+1320 trigger refusé par schéma avant préparation ;1323 wrapper non sélectionné par
+PATH ; preuves conservées,1324 et recette finale1327 PASS/intégrité VERIFIED.
+7assertions CLI/HTTP : copie/replay, dirty refusé, preuves/orphelins/objets manquants,
+reprise après refus FS, sous-projet et claim managed toujours refusé.
+2tests stockage+6planning, ancien bootstrap fournisseur, Clippy/Rustdoc PASS.
+Normal1319 :340entrées/110artefacts/4cores sans fixture ;886352…8320 non installé.
+8GLM,7complets/1tronqué,0retry ; arbitrages et usage dans evidence/20261024-managed-bootstrap1310.
+Revue des5entrées effectives modifiées : decision1330/source-review.json ; FR/EN,
+Rustdoc et notes de version candidat à jour. Aucune modification Go/LIVE/UX,
+restart/commit/push ou acceptation. Suite : copies de workers, puis claims/conduite
+managed, règlement et contrôles/revue ; snapshots dirty et G1–G12/R6/R7/RETEX ouverts.
+Apprentissage : une injection doit atteindre la frontière visée ; ne pas confondre
+refus de schéma à l’ouverture avec rollback après préparation. Vérifier aussi
+le PATH réellement exercé avant de qualifier un double. L’avis GLM exige ses
+définitions request/erreurs réelles ; propositions erronées non intégrées aveuglément.
+
+
+###1340–1365 — planner natif géré et reprise des listes vides
+Suite sans relance après1330 : claims/décisions gérés bloquaient la création de
+vraies tâches, préalable aux copies workers. Port bounded : acquittement, delegate
+et task uniquement ; originaux Git réobservés au claim/avant permission/décision.
+Candidat/sous-projet/capacités dans contexte et comparaison de fraîcheur, sans
+chemins privés ni outils source inexistants. Deux vrais planners inertes délèguent
+puis créent2todo ; absence copie refusée sans dépense/provider, restauration reprend.
+Preview worker et autres décisions managed toujours refusés, acquittement repris.
+RED1344 ancien binaire ;2défauts de fixture1349/1352 corrigés après lecture du Drop ;
+refus de parent recette1355 conservé. Nouveau défaut1330 : Option(empty)/None
+comparés malgré JSON Go identique ; RED1358 sur original valide, correction
+partagée1359, GREEN1363 même Root/événement/manifeste, octets préservés.
+Recettes finales1364 :14assertions PASS/intégrité VERIFIED ;8tests Rust,
+preview non géré,Clippy,Rustdoc PASS. Normal1361 :340entrées/110artefacts/4cores
+sans fixture,47004d…0dc0e non installé. Revue8entrées effectives, FR/EN/Rustdoc/notes
+candidat à jour ; aucun GLM supplémentaire, Go/LIVE/UX/restart/commit/push.
+Suite G3 :copies workers/provenance puis exécution→résultat Git immuable→règlement
+→contrôles/revue/publication ; pas d’API copie seule laissant une réservation bloquée.
+Dirty et adoption des copies Go (permissions/verrou) ouverts ; managed_attempts
+existe déjà dans initial_schema_37.sql, ne pas inventer une table absente.
+Preuves/portée : evidence/20261024-managed-planning1340/decision1365/result.json,
+revue locale/legacy ; aucune acceptation indépendante/globale, R6/R7/RETEX ouverts.
+Apprentissage vérifié : comparer les sélections selon la sémantique wire Go, pas
+l’égalité structurelle Option<Vec> ; ne pas réécrire les octets historiques pour
+normaliser. Contre-exemple original, garde permanente et reprise même événement
+conservés. Vérifier aussi propriétaire Drop/close avant ajout d’un nettoyage.
+
+###1370–1378 — statut public de deux tâches managed initiales
+Reprise1365 : refus reproduit1371 sur la mission réellement planifiée.
+Projection Go profileFor : workspace futur copies/<task>-1/<subdir>, profil tâche avant Work ; aucun copier/lanceur activé.
+Deux tests nouveaux et13existants passent sur octets finaux1375. Recette native existante étendue :8assertions passent1374, verify conserve les originaux.
+La même commande sur le Root/Work original1376 passe, dump SQL complet inchangé ; aucune mission de remplacement.
+Profil normal1373 :340entrées effectives stables, aucun feature fixture ; Clippy et Rustdoc passent1377.
+Revue locale exacte :3entrées compilées,4axes,0déclaration ouverte ; aucune acceptation indépendante.
+Documentation FR/EN, Rustdoc et notes de version candidat à jour ; runtime propre archivé1378. Aucun restart/commit/push.
+Reste G3 : copier/provenance worker, exécution et fin/règlement, résultat immuable, contrôles/revue/publication ; compatibilité Go legacy et acceptation globale ouvertes.
+Prochaine unité : aller jusqu’à un worker managed terminé avec ressources réglées et copie conservée ; ne pas retirer seulement le refus d’admission.
+Amélioration conservée : distinguer workspace du profil et workspace effectif, avec témoins parent/voisin/sous-projet avant raccordement du vrai lancement (propriétaire racine).
+Preuves/limites : [résultat1378](evidence/20261024-managed-status1370/result.json).
+
+Commit demandé explicitement par l’utilisateur après1378 : sources Rust dépendantes depuis174b89106, tests/recettes et preuves textuelles des parcours1230–1378 regroupés sur l’état qualifié. Exports partagés et documentation FR/EN rendent cet état cohérent ; aucune modification du Go supprimé/stagé, de LIVE/UX ou des autres travaux partagés. Archives ignorées conservées localement, sans forcer leur ajout. Aucun nouveau build requis pour l’acte Git : sources effectives1373 inchangées ; le commit ne prouve pas une installation.

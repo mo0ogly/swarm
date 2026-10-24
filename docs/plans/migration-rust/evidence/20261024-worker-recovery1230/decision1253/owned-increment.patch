@@ -1,0 +1,365 @@
+--- originals/rust/crates/swarm-cli/src/mission_watch.rs
++++ rust/crates/swarm-cli/src/mission_watch.rs
+@@ -505,23 +505,25 @@
+     failure.map_or(Ok(()), Err)
+ }
+ /// Observe before every dispatch/adoption without grant or cancellation. Return
+-/// old-generation queued candidate IDs and whether any automatic worker still
+-/// retains an active context; the actual adoption API validates
++/// old-generation queued candidate IDs, whether any automatic worker retains an
++/// active context, then unowned registered IDs. The actual adoption API validates
+ /// ownership, receipt and current controls. All semantic sibling refusals survive.
+ fn continuation(
+     store: &RootStore,
+     lease: &MissionLease,
+     children: &[Worker],
+-) -> Result<(Vec<String>, bool), RootError> {
++) -> Result<(Vec<String>, bool, Vec<String>), RootError> {
+     let observed = store
+         .observe_mission_worker_continuation(lease)
+         .map_err(|error| phase("mission-watch-continuation", *error))?;
+     let mut failure = None;
+     let mut candidates = Vec::new();
++    let mut registered = Vec::new();
+     let mut active_context = false;
+     for entry in observed.entries {
+         active_context |= planning_context_pending(&entry.state);
+         let known = children.iter().any(|child| child.agent == entry.agent_id);
++        if !known && matches!(entry.state, State::RegisteredObserved) { registered.push(entry.agent_id.clone()); }
+         if adoption_candidate(known, &entry.state) {
+             candidates.push(entry.agent_id.clone());
+         }
+@@ -533,7 +535,44 @@
+             failure = Some(join(failure, error));
+         }
+     }
+-    failure.map_or(Ok((candidates, active_context)), Err)
++    failure.map_or(Ok((candidates, active_context, registered)), Err)
++}
++
++/// Finalize only unowned registered observations after all continuation siblings
++/// passed validation. Missing original/live owner stays visible waiting; invalid
++/// evidence is fatal. A terminal result is verified/replayed, never new permission
++/// or task acceptance. Preserve known lifecycle/Work through every later read/output
++/// failure; observations are deduplicated per Agent/reason, not retained forever.
++fn recover_registered(
++    store: &mut RootStore, lease: &MissionLease, work: &str, agents: Vec<String>,
++    waiting: &mut std::collections::BTreeMap<String,&'static str>,
++    recorded: &mut Option<(String,i64)>, out: &mut dyn Write,
++) -> Result<bool,RootError> {
++    let mut terminal=false;
++    for agent_id in agents {
++        match store.recover_mission_worker(lease,&agent_id)? {
++            swarm_engine::MissionWorkerRecovery::Waiting{reason,cause}=>{
++                if waiting.get(&agent_id).copied()!=Some(reason) {
++                    let event=json!({"schema_version":1,"event":"mission-watch-blocked","work":work,
++                        "agent_id":agent_id,"reason":reason,"causes":crate::safe_causes(&cause),
++                        "mission_complete":false,"observation_is_permission":false});
++                    if let Err(publication)=emit(out,&event) { return Err(join(Some(cause),publication)); }
++                    waiting.insert(agent_id,reason);
++                }
++            }
++            swarm_engine::MissionWorkerRecovery::Finalized{agent}=>{
++                terminal=true;waiting.remove(&agent_id);
++                let current=store.read_work(work).map_err(|e|preserve_admission(true,e))?;
++                *recorded=Some((current.id.clone(),current.revision));
++                let event=json!({"schema_version":1,"event":"mission-worker-completion-recovered","work":work,
++                    "agent_id":agent.id,"status":agent.status,"work_revision":current.revision,
++                    "terminal_verified":true,"new_commit_proven":false,"provider_started_by_recovery":false,
++                    "task_accepted":false,"mission_complete":false,"observation_is_permission":false});
++                emit(out,&event).map_err(|e|preserve_planning(recorded.as_ref(),preserve_admission(true,e)))?;
++            }
++        }
++    }
++    Ok(terminal)
+ }
+ 
+ /// Classify retained automatic context conservatively, without inferring exec
+@@ -892,6 +931,7 @@
+     let mut last_blocked = None;
+     let mut pending_dispatch: Option<swarm_engine::MissionWorkerDispatchRequest> = None;
+     let mut waiting_reports = std::collections::BTreeMap::new();
++    let mut recovery_waiting = std::collections::BTreeMap::new();
+     std::thread::scope(|scope| {
+         let mut job = None;
+         let mut role = role_job::Role::Controls;
+@@ -920,7 +960,12 @@
+             &mut waiting_reports,
+             planning_recorded,
+         )?;
+-        let (candidates, active_context) = continuation(store, lease, children)?;
++        let (candidates, active_context, registered) = continuation(store, lease, children)?;
++        if recover_registered(store,lease,work,registered,&mut recovery_waiting,planning_recorded,out)? {
++            // Verified settlement changed the observed context. Discard this old
++            // snapshot before any planning/adoption/dispatch; same lease/IDs remain.
++            continue;
++        }
+         // Deferral is an observation of retained worker state, not a role job.
+         // Keep it visible before dispatch regardless of the current async phase.
+         if active_context {
+--- originals/rust/crates/swarm-engine/src/agent_completion_journal.rs
++++ rust/crates/swarm-engine/src/agent_completion_journal.rs
+@@ -301,6 +301,37 @@
+     pub output_complete: bool,
+     pub provider_may_have_started: bool,
+ }
++/// Validate original kernel reap, workspace release, private gate and native
++/// provenance independently of the current SQL terminal projection. Recovery uses
++/// the same proof BEFORE any settlement; observation additionally checks terminal
++/// rows. Malformed/unknown facts refuse, even if the original owner is still live.
++fn verify_original_facts(journal: &Journal) -> Result<WaitFacts, RootStoreError> {
++    let facts: WaitFacts = swarm_wire_json::decode(journal.details.0.get().as_bytes()).map_err(|e|
++        RootStoreError::Launch(Box::new(AgentLaunchError::caused("agent-completion-wait-format", e))))?;
++    if facts.schema_version != 1 || facts.kernel_reaped != Some(true) || facts.workspace_release_confirmed != Some(true)
++        || facts.recovery_required != Some(false) || journal.incomplete_output || facts.output_complete.is_none() {
++        return Err(RootStoreError::Refused("agent-completion-wait-not-confirmed"));
++    }
++    if facts.private_gate_eof != Some(true) || facts.private_gate_invalid != Some(false)
++        || facts.provider_may_have_started != Some(journal.may_have_started)
++        || if journal.may_have_started { facts.gate_release_attempted != Some(true) || facts.pre_exec_failure.is_some() }
++           else { facts.pre_exec_failure.is_none() } {
++        return Err(RootStoreError::Refused("agent-completion-gate-not-confirmed"));
++    }
++    let original = &journal.expected;
++    if original.role != "worker" || original.child_pid < 1 || original.supervisor_pid < 1
++        || original.child_identity.is_empty() || original.supervisor_identity.is_empty() || original.host.is_empty() {
++        return Err(RootStoreError::Refused("agent-completion-physical-origin-required"));
++    }
++    let snapshot = original.native_execution.as_ref().ok_or(RootStoreError::Refused("agent-completion-native-origin-required"))?;
++    let snapshot = crate::decode_agent_execution_snapshot(snapshot.0.get().as_bytes()).map_err(|e|
++        RootStoreError::Launch(Box::new(AgentLaunchError::caused("agent-completion-native-origin", e))))?;
++    if snapshot.context_sha256 != crate::provider_configuration::configuration_digest(original.prompt.as_bytes())
++        || journal.may_have_started && snapshot.phase != crate::AgentExecutionPhase::PermissionRecorded {
++        return Err(RootStoreError::Refused("agent-completion-native-origin-changed"));
++    }
++    Ok(facts)
++}
+ /// Verify actual terminal native observations in the caller transaction without
+ /// invoking recovery or mutating history. Requires known reap/release and gate
+ /// disposition, matching full Agent/ownership/reservation and native snapshot.
+@@ -311,30 +342,7 @@
+ pub(crate) fn observe_terminal(db: &rusqlite::Connection, directory: &LocalDirectory, id: &str) -> Result<TerminalObservation, RootStoreError> {
+     if db.is_autocommit() { return Err(RootStoreError::Refused("agent-completion-observation-transaction-required")); }
+     let (journal, bytes) = read_journal(directory, id)?;
+-    let facts: WaitFacts = swarm_wire_json::decode(journal.details.0.get().as_bytes()).map_err(|e|
+-        RootStoreError::Launch(Box::new(AgentLaunchError::caused("agent-completion-wait-format", e))))?;
+-    if facts.schema_version != 1 || facts.kernel_reaped != Some(true) || facts.workspace_release_confirmed != Some(true)
+-        || facts.recovery_required != Some(false) || journal.incomplete_output || facts.output_complete.is_none() {
+-        return Err(RootStoreError::Refused("agent-completion-wait-not-confirmed"));
+-    }
+-    if facts.private_gate_eof != Some(true) || facts.private_gate_invalid != Some(false)
+-        || facts.provider_may_have_started != Some(journal.may_have_started)
+-        || if journal.may_have_started { facts.gate_release_attempted != Some(true) || facts.pre_exec_failure.is_some() }
+-           else { facts.pre_exec_failure.is_none() } {
+-        return Err(RootStoreError::Refused("agent-completion-gate-not-confirmed"));
+-    }
+-    let original = &journal.expected;
+-    if original.role != "worker" || original.child_pid < 1 || original.supervisor_pid < 1
+-        || original.child_identity.is_empty() || original.supervisor_identity.is_empty() || original.host.is_empty() {
+-        return Err(RootStoreError::Refused("agent-completion-physical-origin-required"));
+-    }
+-    let snapshot = original.native_execution.as_ref().ok_or(RootStoreError::Refused("agent-completion-native-origin-required"))?;
+-    let snapshot = crate::decode_agent_execution_snapshot(snapshot.0.get().as_bytes()).map_err(|e|
+-        RootStoreError::Launch(Box::new(AgentLaunchError::caused("agent-completion-native-origin", e))))?;
+-    if snapshot.context_sha256 != crate::provider_configuration::configuration_digest(original.prompt.as_bytes())
+-        || journal.may_have_started && snapshot.phase != crate::AgentExecutionPhase::PermissionRecorded {
+-        return Err(RootStoreError::Refused("agent-completion-native-origin-changed"));
+-    }
++    let facts = verify_original_facts(&journal)?;
+     let current = crate::read_agent(db, id).map_err(RootStoreError::Agent)?;
+     verify_terminal(db, &journal, &current)?;
+     Ok(TerminalObservation { agent: current, receipt_sha256: format!("{:x}", Sha256::digest(&bytes)),
+@@ -354,6 +362,46 @@
+     id: &str,
+ ) -> Result<Agent, RootStoreError> {
+     let (journal, _) = read_journal(directory, id)?;
++    recover_original(db, root, directory, id, journal, None)
++}
++
++/// Observe an original completion for a registered automatic worker, then recover
++/// only after actual owner departure and a current transaction-local mission fence.
++/// Missing original or a still-live owner is explicit waiting with its typed cause,
++/// never a terminal/permission claim. Invalid originals and all other errors refuse.
++/// No queued cancellation, provider invocation, process signal or new attempt occurs.
++pub(crate) fn recover_under_mission(
++    db: &mut rusqlite::Connection, root: &Path, directory: &LocalDirectory,
++    id: &str, fence: &dyn crate::work_engine::MutationFence,
++) -> Result<crate::MissionWorkerRecovery, RootStoreError> {
++    let journal=match read_journal(directory,id) {
++        Ok((journal,_))=>journal,
++        Err(error) if matches!(&error,RootStoreError::Launch(cause)
++            if matches!(cause.as_ref(),AgentLaunchError::Cause{code:"agent-completion-journal-missing",..})) => {
++                return Ok(crate::MissionWorkerRecovery::Waiting { reason:"completion-original-pending",cause:error });
++            }
++        Err(error)=>return Err(error),
++    };
++    verify_original_facts(&journal)?;
++    match departed(&journal.expected) {
++        Ok(())=>{},
++        Err(error @ AgentLaunchError::Refused("agent-completion-supervisor-still-live"))=>{
++            return Ok(crate::MissionWorkerRecovery::Waiting { reason:"completion-owner-still-live",cause:RootStoreError::Launch(Box::new(error)) });
++        }
++        Err(error)=>return Err(RootStoreError::Launch(Box::new(error))),
++    }
++    recover_original(db,root,directory,id,journal,Some(fence))
++        .map(|agent|crate::MissionWorkerRecovery::Finalized { agent: Box::new(agent) })
++}
++
++/// Share journal decoding/settlement across explicit manual and mission recovery.
++/// The optional live fence applies inside each SQL snapshot/settlement, not merely
++/// before callback admission. Original terminal replay stays idempotent; every
++/// failure retains its cause and any uncertain/recorded effect through retry/close.
++fn recover_original(
++    db: &mut rusqlite::Connection, root: &Path, directory: &LocalDirectory,
++    id: &str, journal: Journal, fence: Option<&dyn crate::work_engine::MutationFence>,
++) -> Result<Agent, RootStoreError> {
+     if journal.incomplete_output {
+         return Err(RootStoreError::Refused(
+             "agent-completion-output-recovery-required",
+@@ -379,8 +427,13 @@
+         ) {
+             // The settings reservation does not open a SQL transaction. Reread
+             // Agent and all terminal/FIFO proof in one explicit read snapshot.
+-            let mut tx = db.transaction().map_err(RootStoreError::Sql)?;
++            let behavior=if fence.is_some(){rusqlite::TransactionBehavior::Immediate}else{rusqlite::TransactionBehavior::Deferred};
++            let mut tx = db.transaction_with_behavior(behavior).map_err(RootStoreError::Sql)?;
+             let observed = (|| {
++                if let Some(fence)=fence {
++                    let now=crate::system_timestamp().map_err(|e|RootStoreError::Runtime(crate::RuntimeError::new(crate::RuntimeOperation::Platform,e)))?;
++                    fence.check(&tx,&journal.expected.work_id,&now).map_err(RootStoreError::Mutation)?;
++                }
+                 let current = crate::read_agent(&tx, id).map_err(RootStoreError::Agent)?;
+                 verify_terminal(&tx, &journal, &current)?;
+                 Ok(current)
+@@ -388,8 +441,10 @@
+             tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
+             return crate::root_store::finished(observed, tx.rollback().map_err(RootStoreError::Sql));
+         }
+-        store::complete_recovered(db, root, settings, &journal.expected, &receipt)
+-            .map_err(|e| RootStoreError::Launch(Box::new(e)))
++        match fence {
++            Some(fence)=>store::complete_recovered_fenced(db,root,settings,&journal.expected,&receipt,fence),
++            None=>store::complete_recovered(db, root, settings, &journal.expected, &receipt),
++        }.map_err(|e| RootStoreError::Launch(Box::new(e)))
+     })
+ }
+ 
+--- originals/rust/crates/swarm-engine/src/agent_execution_store.rs
++++ rust/crates/swarm-engine/src/agent_execution_store.rs
+@@ -481,7 +481,7 @@
+     expected: &Agent,
+     receipt: &Completion<'_>,
+ ) -> Result<Agent, AgentLaunchError> {
+-    complete_with_owner(db, root, settings, expected, receipt, false)
++    complete_with_owner(db, root, settings, expected, receipt, false, None)
+ }
+ /// Replay only a durable receipt whose original owner is no longer live. The
+ /// caller validates journal binding; transaction rechecks the current Agent and
+@@ -494,7 +494,19 @@
+     expected: &Agent,
+     receipt: &Completion<'_>,
+ ) -> Result<Agent, AgentLaunchError> {
+-    complete_with_owner(db, root, settings, expected, receipt, true)
++    complete_with_owner(db, root, settings, expected, receipt, true, None)
++}
++/// Recover the same durable completion under an additional current mission fence.
++/// The fence is checked inside the existing settlement writer transaction before
++/// owner/task/reservation changes and after final readback. Stages the current
++/// conductor link for a newly recorded task event in that transaction. It adds
++/// no launch, consent or cancellation;
++/// original and independent transaction/cleanup errors remain retained.
++pub(crate) fn complete_recovered_fenced(
++    db: &mut Connection, root: &Path, settings: &EngineSettingsDocument,
++    expected: &Agent, receipt: &Completion<'_>, fence: &dyn crate::work_engine::MutationFence,
++) -> Result<Agent, AgentLaunchError> {
++    complete_with_owner(db, root, settings, expected, receipt, true, Some(fence))
+ }
+ /// Share identical atomic settlement semantics across live owner and durable
+ /// replay. Recovery changes only the owner proof, never task/budget validation.
+@@ -511,8 +523,14 @@
+     expected: &Agent,
+     receipt: &Completion<'_>,
+     recovering: bool,
++    fence: Option<&dyn crate::work_engine::MutationFence>,
+ ) -> Result<Agent, AgentLaunchError> {
+     transaction(db, |tx| {
++        if let Some(fence)=fence {
++            let now=crate::system_timestamp().map_err(|e|AgentLaunchError::caused("agent-recovery-clock",e))?;
++            fence.check(tx,&expected.work_id,&now)
++                .map_err(|e|AgentLaunchError::caused("agent-recovery-mission-fence",e))?;
++        }
+         let (before, raw) = if recovering {
+             crate::agent_completion_journal::recovery_owner(tx, expected)?
+         } else {
+@@ -625,6 +643,12 @@
+             if !matches!(staged, crate::RecordedChangeOutcome::Staged) {
+                 return Err(AgentLaunchError::Refused("agent-execution-event-conflict"));
+             }
++            if let Some(fence) = fence {
++                fence.stage_receipt(tx, crate::work_engine::MutationFenceReceipt {
++                    work: &a.work_id, event: &event, kind: "task.update",
++                    work_revision: work.revision, command_settings: settings,
++                }).map_err(|e| AgentLaunchError::caused("agent-recovery-mission-receipt", e))?;
++            }
+         }
+         let reservation = query(
+             tx,
+@@ -737,6 +761,12 @@
+         }
+         crate::agent_store::verify_agent_ownership(tx, &a)
+             .map_err(|e| AgentLaunchError::caused(e.code(), e))?;
++        if let Some(fence) = fence {
++            let now = crate::system_timestamp()
++                .map_err(|e| AgentLaunchError::caused("agent-recovery-clock", e))?;
++            fence.check(tx, &a.work_id, &now)
++                .map_err(|e| AgentLaunchError::caused("agent-recovery-mission-fence", e))?;
++        }
+         Ok(a)
+     })
+ }
+--- originals/rust/crates/swarm-engine/src/lib.rs
++++ rust/crates/swarm-engine/src/lib.rs
+@@ -93,7 +93,7 @@
+     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
+     MissionWorkspaceQueue, MissionWorkspaceTurn, MissionWorkspaceBlocker,
+     MissionQueueRegistration, MissionCandidateRefusal,
+-    MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome,
++    MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome, MissionWorkerRecovery,
+     MissionWorkerDispatchRequest, MissionWorkerDispatchOutcome, MissionWorkerDispatchFailure,
+     MissionDispatchCause, MissionDispatchQueueEffect, MissionDispatchPreparationEffect,
+     MissionDispatchResourceRefusal,
+--- originals/rust/crates/swarm-engine/src/mission_supervision_store.rs
++++ rust/crates/swarm-engine/src/mission_supervision_store.rs
+@@ -9,6 +9,9 @@
+ 
+ #[path = "mission_worker_adoption.rs"]
+ mod worker_adoption;
++#[path = "mission_worker_recovery.rs"]
++mod worker_recovery;
++pub use worker_recovery::MissionWorkerRecovery;
+ pub use worker_adoption::{MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
+ 
+ // Representation schema, not an operator policy. No FK: generations survive work
+--- originals/rust/crates/swarm-engine/src/root_store.rs
++++ rust/crates/swarm-engine/src/root_store.rs
+@@ -681,6 +681,7 @@
+ #[cfg(target_os = "linux")]
+ pub use mission_status_read::{MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact};
+ #[cfg(target_os = "linux")]
++pub use mission_supervision_store::MissionWorkerRecovery;
+ pub use mission_supervision_store::{MissionQueueRegistration, MissionCandidateRefusal, MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
+ #[cfg(target_os = "linux")]
+ pub use mission_supervision_store::{
+--- originals/version_history.json
++++ version_history.json
+@@ -6,6 +6,10 @@
+       "en": "Richer instruction and log reading, consistent window identity and numbered local delivery."
+     },
+     "items": [
++      {
++        "fr": "Candidat Rust : récupération sous bail du reçu de fin d’un worker enregistré après départ de son superviseur ; sans relancement ni annulation queued, qualification en cours.",
++        "en": "Rust candidate: lease-fenced recovery of registered worker completion receipts after supervisor departure; no relaunch or queued cancellation, qualification pending."
++      },
+       {
+         "fr": "Candidat Rust : start HTTP peut déclencher le conducteur possédé par le serveur ; premier parcours inerte local vérifié, refus et arrêt conservés, aucune installation ni acceptation globale.",
+         "en": "Rust candidate: HTTP start can trigger the server-owned conductor; first local inert journey verified, preserving refusals and shutdown, no installation or global acceptance."

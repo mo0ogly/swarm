@@ -1,0 +1,13 @@
+{
+  "error": "planning-call-current-context-policy",
+  "failure": {
+    "causes": [
+      "planning-call-current-context-policy",
+      "planning-call-current-context-policy"
+    ],
+    "code": "planning-call-current-context-policy",
+    "message": "planning-call-current-context-policy",
+    "retryable": false
+  },
+  "schema_version": 1
+}

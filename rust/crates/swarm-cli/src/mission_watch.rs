@@ -505,23 +505,25 @@ fn reap(
     failure.map_or(Ok(()), Err)
 }
 /// Observe before every dispatch/adoption without grant or cancellation. Return
-/// old-generation queued candidate IDs and whether any automatic worker still
-/// retains an active context; the actual adoption API validates
+/// old-generation queued candidate IDs, whether any automatic worker retains an
+/// active context, then unowned registered IDs. The actual adoption API validates
 /// ownership, receipt and current controls. All semantic sibling refusals survive.
 fn continuation(
     store: &RootStore,
     lease: &MissionLease,
     children: &[Worker],
-) -> Result<(Vec<String>, bool), RootError> {
+) -> Result<(Vec<String>, bool, Vec<String>), RootError> {
     let observed = store
         .observe_mission_worker_continuation(lease)
         .map_err(|error| phase("mission-watch-continuation", *error))?;
     let mut failure = None;
     let mut candidates = Vec::new();
+    let mut registered = Vec::new();
     let mut active_context = false;
     for entry in observed.entries {
         active_context |= planning_context_pending(&entry.state);
         let known = children.iter().any(|child| child.agent == entry.agent_id);
+        if !known && matches!(entry.state, State::RegisteredObserved) { registered.push(entry.agent_id.clone()); }
         if adoption_candidate(known, &entry.state) {
             candidates.push(entry.agent_id.clone());
         }
@@ -533,7 +535,44 @@ fn continuation(
             failure = Some(join(failure, error));
         }
     }
-    failure.map_or(Ok((candidates, active_context)), Err)
+    failure.map_or(Ok((candidates, active_context, registered)), Err)
+}
+
+/// Finalize only unowned registered observations after all continuation siblings
+/// passed validation. Missing original/live owner stays visible waiting; invalid
+/// evidence is fatal. A terminal result is verified/replayed, never new permission
+/// or task acceptance. Preserve known lifecycle/Work through every later read/output
+/// failure; observations are deduplicated per Agent/reason, not retained forever.
+fn recover_registered(
+    store: &mut RootStore, lease: &MissionLease, work: &str, agents: Vec<String>,
+    waiting: &mut std::collections::BTreeMap<String,&'static str>,
+    recorded: &mut Option<(String,i64)>, out: &mut dyn Write,
+) -> Result<bool,RootError> {
+    let mut terminal=false;
+    for agent_id in agents {
+        match store.recover_mission_worker(lease,&agent_id)? {
+            swarm_engine::MissionWorkerRecovery::Waiting{reason,cause}=>{
+                if waiting.get(&agent_id).copied()!=Some(reason) {
+                    let event=json!({"schema_version":1,"event":"mission-watch-blocked","work":work,
+                        "agent_id":agent_id,"reason":reason,"causes":crate::safe_causes(&cause),
+                        "mission_complete":false,"observation_is_permission":false});
+                    if let Err(publication)=emit(out,&event) { return Err(join(Some(cause),publication)); }
+                    waiting.insert(agent_id,reason);
+                }
+            }
+            swarm_engine::MissionWorkerRecovery::Finalized{agent}=>{
+                terminal=true;waiting.remove(&agent_id);
+                let current=store.read_work(work).map_err(|e|preserve_admission(true,e))?;
+                *recorded=Some((current.id.clone(),current.revision));
+                let event=json!({"schema_version":1,"event":"mission-worker-completion-recovered","work":work,
+                    "agent_id":agent.id,"status":agent.status,"work_revision":current.revision,
+                    "terminal_verified":true,"new_commit_proven":false,"provider_started_by_recovery":false,
+                    "task_accepted":false,"mission_complete":false,"observation_is_permission":false});
+                emit(out,&event).map_err(|e|preserve_planning(recorded.as_ref(),preserve_admission(true,e)))?;
+            }
+        }
+    }
+    Ok(terminal)
 }
 
 /// Classify retained automatic context conservatively, without inferring exec
@@ -892,6 +931,7 @@ fn drive(
     let mut last_blocked = None;
     let mut pending_dispatch: Option<swarm_engine::MissionWorkerDispatchRequest> = None;
     let mut waiting_reports = std::collections::BTreeMap::new();
+    let mut recovery_waiting = std::collections::BTreeMap::new();
     std::thread::scope(|scope| {
         let mut job = None;
         let mut role = role_job::Role::Controls;
@@ -920,7 +960,12 @@ fn drive(
             &mut waiting_reports,
             planning_recorded,
         )?;
-        let (candidates, active_context) = continuation(store, lease, children)?;
+        let (candidates, active_context, registered) = continuation(store, lease, children)?;
+        if recover_registered(store,lease,work,registered,&mut recovery_waiting,planning_recorded,out)? {
+            // Verified settlement changed the observed context. Discard this old
+            // snapshot before any planning/adoption/dispatch; same lease/IDs remain.
+            continue;
+        }
         // Deferral is an observation of retained worker state, not a role job.
         // Keep it visible before dispatch regardless of the current async phase.
         if active_context {

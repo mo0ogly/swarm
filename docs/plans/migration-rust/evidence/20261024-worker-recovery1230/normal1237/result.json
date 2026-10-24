@@ -1,0 +1,36 @@
+{
+  "native_build_metadata": {
+    "present": false,
+    "sha256": null
+  },
+  "status": "VERIFIED_DEFAULT_NATIVE_PROFILE",
+  "binary": ".cache/rust-migration-binaries/swarm-rust-486ba49a66b50b52ab84b7c92d3093fadeeb0cae0a3b61af9758ab2b06c84b56",
+  "sha256": "486ba49a66b50b52ab84b7c92d3093fadeeb0cae0a3b61af9758ab2b06c84b56",
+  "artifacts_observed": 110,
+  "selected_core_artifacts": 4,
+  "all_core_features_empty": true,
+  "all_core_test_false": true,
+  "no_fixture_feature": true,
+  "ambient_override_presence": {
+    "RUSTFLAGS": false,
+    "CARGO_ENCODED_RUSTFLAGS": false,
+    "RUSTC_WRAPPER": false,
+    "RUSTC_WORKSPACE_WRAPPER": false,
+    "CARGO_BUILD_TARGET": false,
+    "RUSTUP_TOOLCHAIN": false,
+    "CARGO_HOME": false
+  },
+  "actual_dependencies_stable": true,
+  "cargo_config_inputs": {
+    ".cargo/config.toml": "ced712ed94313257a11d93f311445bad70e7c1e6b60c57d4486113af2c481691"
+  },
+  "configuration_scope": "Checkout config bytes and declared pre-Cargo environment; not observed C flags or runtime capability",
+  "effective_sources_archived": {
+    "inputs": 339,
+    "sha256": "c48c91a471cd846e139aae5bb3df110965c4e8b6f5c7387409faff1641a0ea21",
+    "all_members_verified": true,
+    "source_stable_after_archive": true
+  },
+  "installed": false,
+  "global_watchdog": null
+}

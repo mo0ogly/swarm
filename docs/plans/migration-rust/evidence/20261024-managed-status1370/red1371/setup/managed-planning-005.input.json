@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "event_id": "managed-planning-create",
+  "expected_revision": 0,
+  "title": "Public planning bootstrap",
+  "objective": "Scoped fixture planning",
+  "scope": "Owned local bootstrap",
+  "criteria": [
+    "Configuration is persisted without model execution"
+  ]
+}

@@ -18,6 +18,23 @@ mod tests {
     };
     use sha2::{Digest, Sha256};
 
+    /// Candidate/capability metadata is part of the frozen freshness projection;
+    /// absolute private paths never enter the scoped contract. No source IO here.
+    #[test]
+    fn managed_candidate_changes_the_scoped_contract_without_private_paths() {
+        let mut f=Fixture::new();
+        f.work.planning.as_mut().unwrap().repository=Some(Box::new(crate::ManagedRepository{
+            source:"PRIVATE_SOURCE".into(),storage:"PRIVATE_STORAGE".into(),candidate_commit:"a".repeat(40),project_subdir:"subproject".into(),..Default::default()
+        }));
+        let value=|w:&Work|serde_json::to_value(contract(w,w.planning.as_ref().unwrap().scopes.as_ref().unwrap().iter().find(|s|s.id=="child").unwrap()).unwrap()).unwrap();
+        let before=value(&f.work);
+        assert_eq!(before["repository"],serde_json::json!({"candidate_commit":"a".repeat(40),"project_subdir":"subproject","operations":["delegate","task"]}));
+        assert!(!serde_json::to_string(&before).unwrap().contains("PRIVATE_SOURCE"));
+        assert!(!serde_json::to_string(&before).unwrap().contains("PRIVATE_STORAGE"));
+        f.work.planning.as_mut().unwrap().repository.as_mut().unwrap().candidate_commit="b".repeat(40);
+        assert_ne!(before["repository"],value(&f.work)["repository"]);
+    }
+
     /// Owned projection-only fixture; no SQL, provider, account or native process.
     struct Fixture {
         root: std::path::PathBuf,
@@ -393,11 +410,21 @@ struct Task<'a> {
     independent_review: &'a Option<Box<crate::IndependentReview>>,
 }
 
-/// Canonical context bytes use explicit owned requirements and pending events.
-/// Other scope details and the full Work are deliberately absent.
+/// Scoped managed metadata; operation labels describe implemented protocol only.
+/// No source paths, content, exploration tools or worker launch grant is exposed.
+#[derive(Serialize)]
+pub(crate) struct Repository<'a> {
+    candidate_commit: &'a str,
+    project_subdir: &'a str,
+    operations: [&'static str;2],
+}
+
+/// Canonical scoped context omits unrelated scope details and the full Work.
 #[derive(Serialize)]
 struct Context<'a> {
     work: &'a str,
+    #[serde(skip_serializing_if="Option::is_none")]
+    repository: Option<Repository<'a>>,
     scope: Scope<'a>,
     requirements: BTreeMap<String, String>,
     events: Vec<&'a PlanningEvent>,
@@ -437,12 +464,15 @@ struct Context<'a> {
 
 /// Current scoped context contract, excluding pending-batch selection. Used by
 /// initial context observation and later freshness verification so both compare
-/// identical rendered task/requirement fields. This is not every Task field;
+/// identical rendered task/requirement fields and managed candidate metadata.
+/// This is not every Task field;
 /// Root additionally carries its complete judge contract; child projections
 /// contain none of that history. No provider, policy or ownership grant.
 #[derive(Serialize)]
 pub(crate) struct ScopeContract<'a> {
     work: &'a str,
+    #[serde(skip_serializing_if="Option::is_none")]
+    repository: Option<Repository<'a>>,
     scope: Scope<'a>,
     requirements: BTreeMap<String, String>,
     tasks: Vec<Task<'a>>,
@@ -494,6 +524,7 @@ pub(crate) fn contract<'a>(
         }
     }
     Ok(ScopeContract {
+        repository:work.planning.as_deref().and_then(|p|p.repository.as_deref()).map(|r|Repository{candidate_commit:&r.candidate_commit,project_subdir:&r.project_subdir,operations:["delegate","task"]}),
         judge: if scope.id == "root" { work.planning.as_deref().and_then(|p| p.judge.as_deref()) } else { None },
         work: &work.id,
         scope: Scope {
@@ -560,7 +591,7 @@ fn native_review_reference(work: &Work, event: &PlanningEvent) -> bool {
 /// Current inputs precede historical attempts; the latest operator resumption
 /// is delivered first so an older incident cannot hide a changed precondition.
 /// Events beyond the configured batch remain pending, never acknowledged here.
-/// Specialized exploration/run/managed or legacy review coordination refuses.
+/// Specialized exploration/run events and managed/legacy review coordination refuse.
 /// Selected native ordinary review events require original publication proofs
 /// and complete report text for verdicts. Verified failed calls explicitly mark
 /// their report inapplicable instead; none becomes generic unverified narrative.
@@ -786,6 +817,7 @@ pub(crate) fn observe(
     let (judge_available, renew_available) = if decision_available { crate::planning_judge::availability(work, &scope.id) } else { (false, false) };
     let context = Context {
         work: &work.id,
+        repository: contract.repository,
         scope: contract.scope,
         requirements: contract.requirements,
         events: selected,

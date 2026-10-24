@@ -7,6 +7,30 @@
     },
     "items": [
       {
+        "fr": "Candidat Rust : statut initial de deux tâches sur dépôt géré, occupation calculée sur les futures copies par tâche ; lecture sans création de copie, lancement ni dépense.",
+        "en": "Rust candidate: initial status of managed tasks uses prospective per-task copy paths for occupancy; reads create no copy, worker or spending."
+      },
+      {
+        "fr": "Candidat Rust : reprise de dépôt préparé corrigée pour include_dirty vide ou absent ; manifestes originaux conservés et comparaison compatible avec le JSON Go.",
+        "en": "Rust candidate: prepared repository recovery handles empty or absent include_dirty consistently; original manifests retained and comparison matches Go JSON semantics."
+      },
+      {
+        "fr": "Candidat Rust : planner géré limité à la délégation et à la création de tâches, avec copie Git réobservée et révision candidate liée au contexte ; lancement des workers et intégration encore refusés.",
+        "en": "Rust candidate: managed planner limited to delegation and task creation, reobserving the Git copy and binding candidate metadata to context; worker launch and integration still refuse."
+      },
+      {
+        "fr": "Candidat Rust : configuration publique d’un dépôt géré depuis le commit enregistré, copie privée et manifestes de reprise ; instantanés non commités et exécution gérée encore refusés. Qualification locale en cours.",
+        "en": "Rust candidate: public managed repository configuration from the recorded commit, private copy and recovery manifests; dirty snapshots and managed execution still refuse. Local qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : statut historique des tâches planifiées bloquées avec processus terminé ; attribution du rapport depuis docs/ et marge persistée, sans soumission ni validation implicite. Qualification en cours.",
+        "en": "Rust candidate: historical status for blocked planned tasks with completed processes; report attribution from Root docs and saved margin, without implicit submission or validation. Qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : récupération sous bail du reçu de fin d’un worker enregistré après départ de son superviseur ; sans relancement ni annulation queued, qualification en cours.",
+        "en": "Rust candidate: lease-fenced recovery of registered worker completion receipts after supervisor departure; no relaunch or queued cancellation, qualification pending."
+      },
+      {
         "fr": "Candidat Rust : start HTTP peut déclencher le conducteur possédé par le serveur ; premier parcours inerte local vérifié, refus et arrêt conservés, aucune installation ni acceptation globale.",
         "en": "Rust candidate: HTTP start can trigger the server-owned conductor; first local inert journey verified, preserving refusals and shutdown, no installation or global acceptance."
       },

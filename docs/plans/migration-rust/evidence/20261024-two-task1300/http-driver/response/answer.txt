@@ -1,0 +1,74 @@
+# Bounded Proposal: Two-Turn Server-Owned Sequential Journey
+
+Based on supplied sources in `tests/rust_native_web_conductor.py`, `tests/rust_mission_watch_public.py`, `tests/rust_mission_watch_worker.py`, `tests/rust_planning_worker_public_flow.py`, and `tests/rust_workspace_fifo_completion.py`.
+
+## Proposal
+
+Add a third case function to `tests/rust_native_web_conductor.py` (called from `main()`'s `cases()` after `held_planner`, in a fresh output root). No new module, no product code changes, no opaque task ordering — turn order is observed from the public queue DTO, never assumed.
+
+```python
+def two_turn_release(binary, out):
+    """Second turn only after first server stop, lease release and helper reap."""
+    out.mkdir(parents=True, mode=0o700, exist_ok=False)
+    ready, f = planning.flow(binary, out/'planning', before_worker=True, return_fixture=True)
+    nonce = fixture.digest(str(f.root).encode())
+    (f.root/'codex').write_bytes(worker.provider_program(nonce).encode());(f.root/'codex').chmod(0o700)
+    (f.root/'watch-worker').mkdir(mode=0o700)
+    listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server = connection = supervisor = provider = None; server_fd = None
+    primary = None; errors = []
+    def control(action, event, **extra):
+        value = f.ok(['work','show',f.work])['work']
+        return request(server,'POST','/api/v1/mission?'+urlencode(dict(work=f.work,action=action)),
+            dict(schema_version=1,event_id=event,expected_revision=value['revision'],
+                 reason='Owned two-turn control',**extra), csrf)
+    try:
+        listener.bind(str(f.root/'watch-provider.sock'));os.chmod(f.root/'watch-provider.sock',0o600);listener.listen(1)
+        server = native.Server(binary, f.root, out, 'turn-one', environment=f.environment)
+        identity = worker.observation(server.process.pid);server_fd = worker.attach(identity)
+        csrf = server.request('/api/v1/native-session')['csrf_token']
+        # TURN ONE: reuse the run() start pattern — emit via public.attach_provider,
+        # wait_running, then control('stop'). Assert supervision stopped_at != '',
+        # ppid of helper reparented to this pid, then reap via public.reap_cleanup_helper
+        # and release via fixture.publish(release-worker.json) + waitpid. Task 'task'
+        # remains 'blocked' per run() evidence; agent status 'completed'.
+        ...
+        # TURN TWO: reopen a fresh native.Server over the SAME root; consent is False
+        # after turn-one stop (run() reopen evidence). Assert the completed agent is
+        # retained via f.ok(['agent','show',agent_id]) and no duplicate agent appears
+        # in f.ok(['mission','status-native',f.work])['agents'] before a new start.
+        # Only then issue a new authenticated 'start' and await a second provider
+        # frame whose nonce differs by construction (fresh digest root marker).
+        ...
+    except BaseException as error:
+        primary = error
+        worker.retain_failure(errors, lambda: fixture.publish(out/'failure.json',
+            dict(status='FAIL', cause=''.join(traceback.format_exception(error)))))
+    finally:
+        if server is not None: worker.retain_failure(errors, lambda: native.finish(server, primary))
+        for item in [connection, listener]:
+            if item is not None: worker.retain_failure(errors, item.close)
+        if server_fd is not None: worker.retain_failure(errors, lambda: os.close(server_fd))
+        if primary is not None:
+            worker.retain_failure(errors, lambda: public.cleanup_owned_children(binary, f.root, out))
+    if primary is not None or errors:
+        raise BaseExceptionGroup('Two-turn sequential journey', ([primary] if primary else [])+errors)
+    fixture.publish(out/'result.json', dict(status='PASS', two_turn=True, task_accepted=False,
+        paid_provider=False, installed=False, global_watchdog=None))
+```
+
+## Turn ordering (observed, not guessed)
+
+1. **Turn one start**: `before_worker=True` flow with `return_fixture=True` gives a ready task (`status='READY_FOR_NATIVE_WORKER'`) — same as `run()`.
+2. **Hold**: helper admitted via `public.attach_provider`; `worker.supervision(f)['stopped_at']==''`.
+3. **Stop**: authenticated HTTP `stop` (`control('stop', ...)`); assert `stopped_at != ''` and helper reparented (`observation(ppid)==os.getpid()`) — exactly `run()`'s shutdown evidence.
+4. **Release/reap**: publish `release-worker.json`, `waitpid` the helper to exit 0; optionally `public.reap_cleanup_helper` on failure cleanup only.
+5. **Turn two reopen**: fresh `native.Server` on same root; consent already False and prior completed agent retained (per `run()`'s reopen and `identity-recovered` cases). A new start then admits a second independent worker.
+
+## Missing evidence (not claimed)
+
+- No execution or test run performed; proposal is integrable scaffolding, not acceptance.
+- Whether `csrf` is refreshable after reopen is not evidenced in supplied sources; `run()` reuses the pre-stop `csrf` only on the *same* server. A new server likely requires a fresh `/api/v1/native-session` — the integration must fetch it.
+- Whether a second `start` on a work with one `blocked` task is accepted (vs. requiring new planning steps via `planning.flow`'s proposal mechanics) is **not evidenced**. The safe variant is running `planning.flow`-equivalent proposal emission between turns; the stub above marks this with `...` rather than guessing.
+- Exact failure-receipt semantics for turn two inherit `held_planner` only if that case is composed in; it is independent here.
+- No git settlement, no parallel execution, no global watchdog, no paid provider, no acceptance — consistent with delivery constraints.

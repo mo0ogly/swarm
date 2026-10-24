@@ -1,0 +1,46 @@
+--- originals/rust/crates/swarm-engine/src/root_store/mission_status_historical.rs
++++ rust/crates/swarm-engine/src/root_store/mission_status_historical.rs
+@@ -945,10 +945,14 @@
+             let mut invalid=agent.clone();invalid.status=state.into();
+             assert!(supported(&work,&[invalid]).is_err(),"{state}");
+         }
+-        for state in ["todo","blocked","abandoned"] {
++        for state in ["todo","abandoned"] {
+             let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].status=state.into();
+             assert!(supported(&invalid,std::slice::from_ref(&agent)).is_err(),"{state}");
+         }
++        let mut blocked=work.clone();blocked.tasks.as_mut().unwrap()[0].status="blocked".into();
++        supported(&blocked,std::slice::from_ref(&agent)).unwrap();
++        blocked.tasks.as_mut().unwrap()[0].blocker="Livraison incomplète : evidence missing".into();
++        assert!(supported(&blocked,std::slice::from_ref(&agent)).is_err());
+         let mut invalid=agent.clone();invalid.task_id="other".into();
+         assert!(supported(&work,&[invalid]).is_err());
+         supported(&work,&[agent]).unwrap();
+@@ -1043,7 +1047,8 @@
+         assert!(supported(&invalid,std::slice::from_ref(&agent)).is_err());
+         supported(&work,&[agent]).unwrap();
+     }
+-    /// Failed/interrupted owned rows remain unvalidated and need an Agent in view.
++    /// Failed/interrupted/completed blocked rows need an Agent in view; completed
++    /// shape alone does not supply attribution or establish validation.
+     /// Pairing and review/recovery gates preserve refusal before any projection.
+     #[test]
+     fn mission_status_planned_terminal_pairs_preserve_view_and_review_refusals() {
+@@ -1051,7 +1056,7 @@
+         let supported=super::super::mission_status_reports::supported;
+         let view=super::super::mission_status_reports::supported_view;
+         work.tasks.as_mut().unwrap()[0].status="blocked".into();
+-        for status in ["failed","interrupted"] {
++        for status in ["failed","interrupted","completed"] {
+             agent.status=status.into();
+             supported(&work,std::slice::from_ref(&agent)).unwrap();
+             view(&work,std::slice::from_ref(&agent)).unwrap();
+@@ -1061,7 +1066,7 @@
+             let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].independent_review=Some(Default::default());
+             assert!(supported(&invalid,std::slice::from_ref(&agent)).is_err());
+         }
+-        for status in ["queued","starting","running","stopping","completed","unknown"] {
++        for status in ["queued","starting","running","stopping","unknown"] {
+             agent.status=status.into();assert!(supported(&work,std::slice::from_ref(&agent)).is_err());
+         }
+         assert!(supported(&work,&[]).is_err());

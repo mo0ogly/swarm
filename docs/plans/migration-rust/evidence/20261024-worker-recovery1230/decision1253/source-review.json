@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "reviewer": "Root semantic self-review, not independent acceptance",
+  "baseline_sha256": "c51d6dd34e4bac95fad556d399e582bbd3a8c3d330958c9d80faf94df4690ce5",
+  "current_sha256": "afd20c617d2a4472ee232eebb055cbbdf3132a969667d682fd44aeaa1d387ff1",
+  "files": {
+    "rust/crates/swarm-cli/src/mission_watch.rs": {
+      "sha256": "9f624bcf78d2d2da02ab91805a46a9c3434e36494b8cc8d6c33c38e8835cb62b",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs": {
+      "sha256": "8a639e21ba931f974d1d21ec85a4ceb4bdbdfb30abe1efbac13224a20d9c0763",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/agent_execution_store.rs": {
+      "sha256": "92eec97c96e3b16528cc4822217ec853a8dd97d9348d0e807693abb8bb1f65a7",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/lib.rs": {
+      "sha256": "f538245869124990cc25e9952a3a149cd17cfff7b424befcb648cc2c844b6ce8",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs": {
+      "sha256": "35c6379d41a531a3f45c8728bf98ce6b6e54087c209290f58a9c415edea71667",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/mission_worker_recovery.rs": {
+      "sha256": "38e798796c8de40d75f18c1aa232d593c5de8129c0c47a70d27ed36480f0cf1a",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "rust/crates/swarm-engine/src/root_store.rs": {
+      "sha256": "89397b066182d8549a380962f411e746075094eda7dbf7326f3199ab32608b52",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    },
+    "version_history.json": {
+      "sha256": "e79c5b324ebef191933c1fe308484f496bf1633702f06d7cd4638e6252c09a43",
+      "axes": {
+        "policies": {
+          "state": "reviewed",
+          "reason": "policies: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "functions": {
+          "state": "reviewed",
+          "reason": "functions: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "errors": {
+          "state": "reviewed",
+          "reason": "errors: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        },
+        "documentation": {
+          "state": "reviewed",
+          "reason": "documentation: exact changed source examined in file-specific function/error/configuration inventory; scope and untested variants explicitly retained.",
+          "evidence": [
+            {
+              "path": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/decision1253/review-notes.md",
+              "sha256": "e5d226da9a07711247eb69ac5443de941ba55a460934e6f56759a76ac395672d"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

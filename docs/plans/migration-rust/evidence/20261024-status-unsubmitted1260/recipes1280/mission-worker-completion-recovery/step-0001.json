@@ -1,0 +1,13 @@
+{
+  "id": "real-native-worker-completion-recovery",
+  "command": [
+    "/usr/bin/python3",
+    "-c",
+    "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='worker-recovery-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_worker_recovery.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+  ],
+  "expected_exit": 0,
+  "exit": 0,
+  "seconds": 35.315329414996086,
+  "executable": "/usr/bin/python3.13",
+  "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+}

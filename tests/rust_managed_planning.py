@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+"""Exercise native managed planning from actual committed copy to two todo tasks.
+
+Two inert planner processes delegate and create tasks; no worker, managed source
+exploration, SQL seeding, acceptance, paid model or global watchdog. Actual copy
+absence must refuse before spending or a provider marker; original restoration
+resumes the same owning child scope. Context binds candidate/capabilities without
+source/storage paths. Historical status observes the two initial tasks under saved automatic consent,
+without a conductor or copy creation. Every failure keeps original output.
+"""
+import argparse
+import json
+from pathlib import Path
+import traceback
+import rust_agent_model_route as fixture
+import rust_managed_repository_bootstrap as repository
+import rust_planning_rejection_recovery as feedback
+from rust_planning_worker_public_flow import proposal
+from rust_planning_bootstrap import fresh_work,request
+from rust_planning_budget import ledger
+from rust_planning_activation import claim_request
+from rust_planning_call_preview import preview_request
+from rust_planning_decision import decision
+from rust_mission_report_relay import rows
+
+
+def run(binary,profile,out):
+    """Plan under public budgets/fences on a prepared real Git commit, never launch.
+
+    Source commit uses the checkout's configured identity. Missing-copy injection
+    only renames an owned directory and restores the original before retry. Work,
+    financial ledger and provider markers must remain unchanged on refusal.
+    Reports here prove actual local processes and context receipt, not model or
+    agent authenticity, successful delivery, controls, review or acceptance.
+    """
+    out.mkdir(parents=True,mode=0o700,exist_ok=False)
+    qualified=json.loads(profile.read_bytes());assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes())==qualified['sha256']
+    f=fixture.Fixture(binary,out/'setup','managed-planning')
+    fixture.publish(out/'fixture.json',dict(root=str(f.root),binary_sha256=qualified['sha256']))
+    source=f.root/'source';source.mkdir(mode=0o700);repository.git(source,'init','--quiet')
+    checkout=Path(__file__).resolve().parents[1]
+    name=repository.git(checkout,'config','user.name').decode().strip();email=repository.git(checkout,'config','user.email').decode().strip();assert name and email
+    fixture.publish(source/'tracked.txt',b'Committed planning input\n');repository.git(source,'add','tracked.txt')
+    repository.git(source,'-c','user.name='+name,'-c','user.email='+email,'-c','core.hooksPath=/dev/null','-c','commit.gpgsign=false','commit','--quiet','-m','Owned managed planning fixture')
+    base=repository.git(source,'rev-parse','HEAD').decode().strip();fixture.publish(source/'tracked.txt',b'PRIVATE dirty source excluded\n')
+    original=repository.inventory(source)
+    fixture.publish(f.root/'codex',feedback.PROGRAM.encode());(f.root/'codex').chmod(0o700)
+    f.work=fresh_work(f,'managed-planning-create')
+    checks={'req-1':[dict(id='actual-handoff',command=['python3','-c',"from pathlib import Path; assert Path('handoff.md').read_text().strip()"],criteria=[1],inputs=['handoff.md'],justification='Check owned handoff content') ]}
+    work=f.ok(['planning','enable',f.work],request(event='managed-planning-enable',max_activations=6,max_tasks=2,repository=dict(path='source',committed_only=True),checks=checks))
+    proposal(f,work,'root',[dict(kind='delegate',id='child',title='Owned child scope',next='Plan the owned requirement',requirements=['req-1'],max_tasks=2,max_activations=3)])
+    first=f.ok(['planning','step',f.work]);assert first['run']['decision_applied']
+    work=first['run']['work'];assert not work.get('tasks')
+    assert any(s['id']=='child' and s['parent']=='root' for s in work['planning']['scopes'])
+    checks_passed=[]
+    def passed(label):
+        """Publish named checks after their actual process/state conditions hold."""
+        checks_passed.append(label);print('PASS '+label,flush=True)
+    passed('managed-native-planner-delegates-without-worker')
+    state=f.snapshot();money=ledger(f);markers=set(f.root.glob('model-received-*.json'))
+    assert len(markers)==1
+    bare=Path(work['planning']['repository']['storage'])/'repository.git'
+    bare.rename(bare.with_name('repository.retained'))
+    try:
+        code,response=f.call(['planning','step',f.work])
+        fixture.publish(out/'missing-copy-refusal.json',dict(exit=code,response=response))
+        assert code!=0 and 'managed-repository-open' in json.dumps(response)
+        assert f.snapshot()==state and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
+    finally:bare.with_name('repository.retained').rename(bare)
+    passed('managed-missing-copy-refuses-without-spend-or-provider')
+    proposal(f,work,'child',[dict(kind='task',id=task,title='Owned '+task,next='Produce handoff',requirements=['req-1'],deliverable='handoff.md',criteria=['Owned handoff']) for task in ['task','task-2']])
+    second=f.ok(['planning','step',f.work]);assert second['run']['decision_applied']
+    work=second['run']['work'];tasks=work['tasks']
+    assert {t['id'] for t in tasks}=={'task','task-2'}
+    assert all(t['scope_id']=='child' and t['status']=='todo' and not t.get('attempts') for t in tasks)
+    assert len(set(f.root.glob('model-received-*.json')))==2 and repository.inventory(source)==original
+    passed('managed-restored-copy-resumes-child-and-creates-two-todo-tasks')
+    for result in [first,second]:
+        actual=rows(f,'SELECT context_json FROM native_planning_claims WHERE claim_id=?',(result['run']['claim_id'],));assert len(actual)==1
+        context=json.loads(actual[0][0]);meta=context['repository']
+        assert meta==dict(candidate_commit=base,project_subdir='',operations=['delegate','task'])
+        assert 'PRIVATE' not in json.dumps(context)
+    passed('managed-candidate-capabilities-delivered-without-source-paths')
+    before=f.snapshot();money=ledger(f)
+    code,response=f.call(['agent','preview',f.work],dict(schema_version=1,event_id='managed-worker-preview',expected_revision=work['revision'],task_id='task',provider='fixture',capture_output=True))
+    fixture.publish(out/'worker-still-refused.json',dict(exit=code,response=response))
+    assert code!=0 and 'agent-launch-work-branch-unported' in json.dumps(response)
+    assert f.snapshot()==before and ledger(f)==money and len(set(f.root.glob('model-received-*.json')))==2
+    passed('managed-worker-launch-still-refuses-without-mutation')
+    # Saving consent through CLI never starts a conductor. Historical status
+    # must project the future managed copy, without creating it or spending.
+    work=f.ok(['mission','start',f.work],dict(schema_version=1,event_id='managed-status-start',expected_revision=work['revision'],reason='Observe prepared managed tasks only',slots=1,profile=dict(provider='fixture',role='worker',workspace='source',level='standard',capture_output=True)))
+    before=f.snapshot();money=ledger(f);markers=set(f.root.glob('model-received-*.json'))
+    status=f.ok(['mission','status',f.work])
+    fixture.publish(out/'managed-status.json',status)
+    assert {t['id'] for t in status['tasks']}=={'task','task-2'}
+    assert all(t['state']=='waiting' and 'aucun conducteur actif' in t['reason'] for t in status['tasks'])
+    assert status['total']==2 and status['running']==0 and status['validated']==0
+    assert not (Path(work['planning']['repository']['storage'])/'copies').exists()
+    assert f.snapshot()==before and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
+    assert rows(f,'SELECT COUNT(*) FROM agents WHERE work_id=?',(f.work,))==[(0,)]
+    passed('managed-status-two-unstarted-tasks-without-copy-spend-or-worker')
+    # A distinct owned Work exercises prepermission observation without inference.
+    planned_work=f.work;f.work=fresh_work(f,'managed-preview-create')
+    enabled=f.ok(['planning','enable',f.work],request(event='managed-preview-enable',repository=dict(path='source',committed_only=True)))
+    claimed=f.ok(['planning','claim',f.work],claim_request(enabled,'managed-preview-claim'))
+    value=preview_request(claimed,'managed-preview-claim')
+    before=f.snapshot();money=ledger(f);markers=set(f.root.glob('model-received-*.json'))
+    healthy=f.ok(['planning','call-preview',f.work],value)
+    assert healthy['prepared_inputs_verified'] and healthy['process_started'] is False
+    assert f.snapshot()==before and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
+    bare=Path(enabled['planning']['repository']['storage'])/'repository.git';bare.rename(bare.with_name('repository.retained'))
+    try:
+        code,response=f.call(['planning','call-preview',f.work],value)
+        fixture.publish(out/'prepermission-missing-copy.json',dict(exit=code,response=response))
+        assert code!=0 and 'managed-repository-open' in json.dumps(response)
+        assert f.snapshot()==before and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
+    finally:bare.with_name('repository.retained').rename(bare)
+    assert f.ok(['planning','call-preview',f.work],value)['prepared_inputs_verified']
+    passed('managed-prepermission-reobserves-copy-without-mutation-or-inference')
+    code,response=f.call(['planning','decide',f.work],decision(claimed,'managed-close-refusal',operations=[dict(kind='close')]))
+    fixture.publish(out/'unported-operation-refusal.json',dict(exit=code,response=response))
+    assert code!=0 and 'planning-decision-managed-operation-unported' in json.dumps(response)
+    assert f.snapshot()==before and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
+    acknowledged=f.ok(['planning','decide',f.work],decision(claimed,'managed-ack'))
+    assert not acknowledged.get('tasks') and acknowledged['planning']['decisions']==1
+    passed('managed-unported-decision-refuses-and-acknowledgement-recovers')
+    result=dict(status='PASS',assertions=checks_passed,binary_sha256=qualified['sha256'],actual_inert_planners=2,manual_claims_without_inference=1,planned_work=planned_work,worker_started=False,accepted=False,installed=False,global_watchdog=None)
+    fixture.publish(out/'result.json',result);print('MANAGED_PLANNING_PASS',flush=True)
+    return result
+
+
+def main():
+    """Use exact explicit normal profile and preserve fresh original failure output."""
+    parser=argparse.ArgumentParser(description=__doc__)
+    for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
+    args=parser.parse_args()
+    try:run(args.binary.resolve(),args.profile.resolve(),args.output.resolve())
+    except BaseException as error:
+        if args.output.is_dir():fixture.publish(args.output/'failure.json',dict(status='FAIL',cause=''.join(traceback.format_exception(error))))
+        raise
+
+
+if __name__=='__main__':main()

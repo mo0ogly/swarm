@@ -481,7 +481,7 @@ pub(crate) fn complete(
     expected: &Agent,
     receipt: &Completion<'_>,
 ) -> Result<Agent, AgentLaunchError> {
-    complete_with_owner(db, root, settings, expected, receipt, false)
+    complete_with_owner(db, root, settings, expected, receipt, false, None)
 }
 /// Replay only a durable receipt whose original owner is no longer live. The
 /// caller validates journal binding; transaction rechecks the current Agent and
@@ -494,7 +494,19 @@ pub(crate) fn complete_recovered(
     expected: &Agent,
     receipt: &Completion<'_>,
 ) -> Result<Agent, AgentLaunchError> {
-    complete_with_owner(db, root, settings, expected, receipt, true)
+    complete_with_owner(db, root, settings, expected, receipt, true, None)
+}
+/// Recover the same durable completion under an additional current mission fence.
+/// The fence is checked inside the existing settlement writer transaction before
+/// owner/task/reservation changes and after final readback. Stages the current
+/// conductor link for a newly recorded task event in that transaction. It adds
+/// no launch, consent or cancellation;
+/// original and independent transaction/cleanup errors remain retained.
+pub(crate) fn complete_recovered_fenced(
+    db: &mut Connection, root: &Path, settings: &EngineSettingsDocument,
+    expected: &Agent, receipt: &Completion<'_>, fence: &dyn crate::work_engine::MutationFence,
+) -> Result<Agent, AgentLaunchError> {
+    complete_with_owner(db, root, settings, expected, receipt, true, Some(fence))
 }
 /// Share identical atomic settlement semantics across live owner and durable
 /// replay. Recovery changes only the owner proof, never task/budget validation.
@@ -511,8 +523,14 @@ fn complete_with_owner(
     expected: &Agent,
     receipt: &Completion<'_>,
     recovering: bool,
+    fence: Option<&dyn crate::work_engine::MutationFence>,
 ) -> Result<Agent, AgentLaunchError> {
     transaction(db, |tx| {
+        if let Some(fence)=fence {
+            let now=crate::system_timestamp().map_err(|e|AgentLaunchError::caused("agent-recovery-clock",e))?;
+            fence.check(tx,&expected.work_id,&now)
+                .map_err(|e|AgentLaunchError::caused("agent-recovery-mission-fence",e))?;
+        }
         let (before, raw) = if recovering {
             crate::agent_completion_journal::recovery_owner(tx, expected)?
         } else {
@@ -624,6 +642,12 @@ fn complete_with_owner(
             .map_err(|e| AgentLaunchError::caused("agent-execution-event-recording", e))?;
             if !matches!(staged, crate::RecordedChangeOutcome::Staged) {
                 return Err(AgentLaunchError::Refused("agent-execution-event-conflict"));
+            }
+            if let Some(fence) = fence {
+                fence.stage_receipt(tx, crate::work_engine::MutationFenceReceipt {
+                    work: &a.work_id, event: &event, kind: "task.update",
+                    work_revision: work.revision, command_settings: settings,
+                }).map_err(|e| AgentLaunchError::caused("agent-recovery-mission-receipt", e))?;
             }
         }
         let reservation = query(
@@ -737,6 +761,12 @@ fn complete_with_owner(
         }
         crate::agent_store::verify_agent_ownership(tx, &a)
             .map_err(|e| AgentLaunchError::caused(e.code(), e))?;
+        if let Some(fence) = fence {
+            let now = crate::system_timestamp()
+                .map_err(|e| AgentLaunchError::caused("agent-recovery-clock", e))?;
+            fence.check(tx, &a.work_id, &now)
+                .map_err(|e| AgentLaunchError::caused("agent-recovery-mission-fence", e))?;
+        }
         Ok(a)
     })
 }

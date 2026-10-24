@@ -163,7 +163,9 @@ fn dispatch_context(store: &RootStore, work: &str) -> Result<DispatchContext, E>
 /// Missing controls remain absence of an automatic mode, not invented saved
 /// values. A configured profile is recorded data, never verified provider health.
 /// Initial unstarted automatic tasks use saved slots, full Agent observations,
-/// lexical workspace overlap and budget/brief assistance. Managed copies/history refuse. No probe, SQL write, default, reservation or grant.
+/// lexical workspace overlap and budget/brief assistance. Initial managed tasks
+/// use prospective copy paths only; history still refuses. No copy, probe, SQL
+/// write, default, reservation or grant.
 /// Typed cost/SQL/policy failures propagate; the exact threshold refusal retains
 /// its cause beside the visible intervention. Caller owes final coherence checks.
 fn readiness(
@@ -452,7 +454,8 @@ fn changes(input: &super::MissionStatusInputs, limit: Option<usize>) -> Result<M
 
 impl RootStore {
     /// Read the Go 21-key historical aggregate for supported ordinary Work and
-    /// nonmanaged ready/waiting planning trees. Initial tasks consume real saved
+    /// ready/waiting planning trees, including unstarted managed tasks. Initial
+    /// tasks consume real saved
     /// readiness/slots/budget; abandoned no-Agent decisions stay nonvalidated.
     /// Actual queued/active/failed/interrupted/completed attempts are observed
     /// without launching or reconciling them. Frozen process identity/heartbeat
@@ -464,7 +467,8 @@ impl RootStore {
     /// Display windows affect presentation only, not full-history accounting or
     /// eligibility. Hidden running/blocked Agents refuse rather than invent state.
     /// Review/validation events resolve only persisted review/attempt ownership.
-    /// Previous review/retry/recovery, managed copies and closed scopes remain
+    /// Managed copy paths are prospective metadata, never physical readiness.
+    /// Previous review/retry/recovery, managed executions and closed scopes remain
     /// explicit port boundaries. Missing policy/evidence and unknown IO refuse,
     /// preserving typed semantic/cleanup causes beyond the material guard.
     /// Work/settings/controls/Agents and selected reports are compared before and
@@ -945,10 +949,14 @@ mod tests {
             let mut invalid=agent.clone();invalid.status=state.into();
             assert!(supported(&work,&[invalid]).is_err(),"{state}");
         }
-        for state in ["todo","blocked","abandoned"] {
+        for state in ["todo","abandoned"] {
             let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].status=state.into();
             assert!(supported(&invalid,std::slice::from_ref(&agent)).is_err(),"{state}");
         }
+        let mut blocked=work.clone();blocked.tasks.as_mut().unwrap()[0].status="blocked".into();
+        supported(&blocked,std::slice::from_ref(&agent)).unwrap();
+        blocked.tasks.as_mut().unwrap()[0].blocker="Livraison incomplète : evidence missing".into();
+        assert!(supported(&blocked,std::slice::from_ref(&agent)).is_err());
         let mut invalid=agent.clone();invalid.task_id="other".into();
         assert!(supported(&work,&[invalid]).is_err());
         supported(&work,&[agent]).unwrap();
@@ -1043,7 +1051,8 @@ mod tests {
         assert!(supported(&invalid,std::slice::from_ref(&agent)).is_err());
         supported(&work,&[agent]).unwrap();
     }
-    /// Failed/interrupted owned rows remain unvalidated and need an Agent in view.
+    /// Failed/interrupted/completed blocked rows need an Agent in view; completed
+    /// shape alone does not supply attribution or establish validation.
     /// Pairing and review/recovery gates preserve refusal before any projection.
     #[test]
     fn mission_status_planned_terminal_pairs_preserve_view_and_review_refusals() {
@@ -1051,7 +1060,7 @@ mod tests {
         let supported=super::super::mission_status_reports::supported;
         let view=super::super::mission_status_reports::supported_view;
         work.tasks.as_mut().unwrap()[0].status="blocked".into();
-        for status in ["failed","interrupted"] {
+        for status in ["failed","interrupted","completed"] {
             agent.status=status.into();
             supported(&work,std::slice::from_ref(&agent)).unwrap();
             view(&work,std::slice::from_ref(&agent)).unwrap();
@@ -1061,7 +1070,7 @@ mod tests {
             let mut invalid=work.clone();invalid.tasks.as_mut().unwrap()[0].independent_review=Some(Default::default());
             assert!(supported(&invalid,std::slice::from_ref(&agent)).is_err());
         }
-        for status in ["queued","starting","running","stopping","completed","unknown"] {
+        for status in ["queued","starting","running","stopping","unknown"] {
             agent.status=status.into();assert!(supported(&work,std::slice::from_ref(&agent)).is_err());
         }
         assert!(supported(&work,&[]).is_err());

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "native-two-task-mission",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "public-two-sequential-worker-cycles",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nb=Path(tempfile.mkdtemp(prefix='two-task-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_native_two_task.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(b/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(b))\n"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 11.313715919008246,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "a9c1c8e9ffdb2f632f4187bb6caf96ff459829fc29d76c057260fbfa64fb37c6",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "717ddbdc4428585090eaa5d91989edcafaeb66fa2142b0427e3d60e22fb85e71",
+    "declared-inputs.tar.gz": "7fc0bd5d03f7ec87a0d7377865d88bd5198e804516a8e94e52b65eb42edb8f6d",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "28953c46fafe3597736b05fd4058fdb558e29abbac09684124f4324655aeec97",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "94577953cda90c149a482f3cab40e2a0cb345645562c0a2d9962806ecab98329",
+    "inputs.after.json": "717ddbdc4428585090eaa5d91989edcafaeb66fa2142b0427e3d60e22fb85e71"
+  }
+}

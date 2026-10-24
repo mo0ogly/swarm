@@ -34,20 +34,44 @@ fn root_overlaps(root: &str, cwd: &str) -> bool {
     cwd == root || cwd.starts_with(&format!("{root}/")) || root.starts_with(&format!("{cwd}/"))
 }
 
+/// Select the initial task's prospective workspace, mirroring Go profileFor.
+/// Ordinary tasks retain the selected profile; managed tasks use the stored
+/// repository/copies/<task>-1/<subdir>. The ordinal is the first attempt, not a
+/// retry policy: observe refuses all attempt history before calling this helper.
+/// Require canonical stored path components and a protocol task name rather than
+/// projecting an escaping/ambiguous path. UTF-8/shape failures refuse; no path is
+/// opened, canonicalized, created or claimed, and no Git object is verified.
+fn prospective_workspace(work: &crate::Work, task: &crate::Task, profile: &crate::LaunchProfile) -> Result<String, E> {
+    let Some(repo) = work.planning.as_deref().and_then(|p|p.repository.as_deref()) else {
+        return Ok(profile.workspace.clone());
+    };
+    use std::path::{Component, Path};
+    let storage = Path::new(&repo.storage);
+    let subdir = Path::new(&repo.project_subdir);
+    if !storage.is_absolute()
+        || storage.components().any(|c|!matches!(c, Component::RootDir | Component::Normal(_)))
+        || subdir.components().any(|c|!matches!(c, Component::Normal(_)))
+        || !swarm_identity_contract::name(task.id.as_bytes())
+    {
+        return Err(E::Refused("mission-status-managed-workspace-invalid"));
+    }
+    let copy = storage.join("copies").join(format!("{}-1",task.id));
+    let workspace = if repo.project_subdir.is_empty() { copy } else { copy.join(subdir) };
+    workspace.to_str().map(str::to_owned).ok_or(E::Refused("mission-status-managed-workspace-utf8"))
+}
+
 /// Project automatic readiness after caller's dependency/cost/profile/pause gates.
 /// Requires an initial todo without attempts or matching Agent, saved positive
-/// slots, and a real profile (task takes precedence). Managed copies and
-/// history refuse rather than inventing producers. Counts full active Work Agents
+/// slots, and a real profile (task takes precedence). Managed initial tasks use
+/// their prospective copy path, without opening or creating it; history still
+/// refuses. Counts full active Work Agents
 /// for slots and global recorded cwd for workspace before assist checks, as Go.
 /// Brief mismatch and insufficient estimated budget hold assistance; the pure
 /// task consumer turns that into intervention. Invalid inputs/count/UTF8 refuse.
 /// No persisted state or external process changes; ready remains classification.
 pub(super) fn observe(input: AutomaticInputs<'_>) -> Result<ReadinessObservation, E> {
     let AutomaticInputs { work, task, slots, budget, occupied, agents, root } = input;
-    if let Some(planning) = work.planning.as_deref() {
-        if planning.repository.is_some() {
-            return Err(E::Refused("mission-status-managed-automatic-readiness-unported"));
-        }
+    if work.planning.is_some() {
         crate::validate_mission_organization(work).map_err(|cause| {
             E::Mutation(crate::WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Cause {
                 code:cause.code(),cause:Box::new(cause),
@@ -72,7 +96,8 @@ pub(super) fn observe(input: AutomaticInputs<'_>) -> Result<ReadinessObservation
             format!("Aucun départ automatique : {busy} créneau(x) occupé(s) sur {slots}"),
             AssistObservation::NotObserved, WorkspaceObservation::NotObserved));
     }
-    if occupied.iter().any(|cwd| overlaps(cwd, &profile.workspace)) {
+    let workspace = prospective_workspace(work, task, profile)?;
+    if occupied.iter().any(|cwd| overlaps(cwd, &workspace)) {
         return Ok(observed(DispatchDisposition::Waiting,
             format!("{} : espace de travail déjà occupé par une tentative active", task.id),
             AssistObservation::NotObserved, WorkspaceObservation::Occupied));
@@ -113,6 +138,37 @@ mod tests {
     fn allowed(o:ReadinessObservation) -> bool {
         matches!(o,ReadinessObservation::Observed {disposition:DispatchDisposition::Ready,
             assistance:AssistObservation::Allowed,workspace:WorkspaceObservation::Free,..})
+    }
+    /// Prospective names are metadata only: no copy exists or launch is admitted.
+    #[test] fn managed_workspace_uses_copy_and_subproject_not_profile() {
+        let (mut w,mut t,_)=fixture();
+        w.planning=Some(Box::new(crate::PlanningState { repository:Some(Box::new(crate::ManagedRepository {
+            storage:"/root/.swarm/managed/w".into(), project_subdir:"app".into(), ..Default::default()
+        })), ..Default::default() }));
+        let profile=w.launch_profile.as_deref().unwrap();
+        let path=prospective_workspace(&w,&t,profile).unwrap();
+        assert_eq!(path,"/root/.swarm/managed/w/copies/t-1/app");
+        assert!(!overlaps(&path,&profile.workspace));
+        assert!(!overlaps(&path,"/root/.swarm/managed/w/copies/other-1/app"));
+        assert!(overlaps(&path,"/root/.swarm/managed/w/copies/t-1"));
+        t.id="other".into();assert_ne!(path,prospective_workspace(&w,&t,profile).unwrap());
+        w.planning.as_mut().unwrap().repository.as_mut().unwrap().project_subdir.clear();
+        assert_eq!(prospective_workspace(&w,&t,w.launch_profile.as_deref().unwrap()).unwrap(),"/root/.swarm/managed/w/copies/other-1");
+    }
+    /// Malformed metadata refuses without interpreting an absolute/parent subdir.
+    #[test] fn managed_workspace_rejects_escaping_or_ambiguous_metadata() {
+        let (mut w,mut t,_)=fixture();
+        w.planning=Some(Box::new(crate::PlanningState { repository:Some(Box::new(crate::ManagedRepository {
+            storage:"/root/.swarm/managed/w".into(), ..Default::default()
+        })), ..Default::default() }));
+        for bad in ["../outside","/outside","./app"] {
+            w.planning.as_mut().unwrap().repository.as_mut().unwrap().project_subdir=bad.into();
+            assert_eq!(prospective_workspace(&w,&t,w.launch_profile.as_deref().unwrap()).unwrap_err().code(),"mission-status-managed-workspace-invalid");
+        }
+        w.planning.as_mut().unwrap().repository.as_mut().unwrap().project_subdir.clear();
+        t.id="../other".into();assert!(prospective_workspace(&w,&t,w.launch_profile.as_deref().unwrap()).is_err());
+        t.id="t".into();w.planning.as_mut().unwrap().repository.as_mut().unwrap().storage="relative".into();
+        assert!(prospective_workspace(&w,&t,w.launch_profile.as_deref().unwrap()).is_err());
     }
     #[test] fn equal_paths_overlap() { assert!(overlaps("/w/a","/w/a")); }
     #[test] fn child_of_other_overlaps() { assert!(overlaps("/w/a","/w/a/b")); }

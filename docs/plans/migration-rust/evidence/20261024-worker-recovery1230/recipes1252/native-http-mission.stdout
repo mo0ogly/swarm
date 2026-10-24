@@ -1,0 +1,5 @@
+{"state": "RUN", "step": "owned-fixture-restoration-guards"}
+{"state": "PASS", "step": "owned-fixture-restoration-guards"}
+{"state": "RUN", "step": "native-web-conductor-public-contract"}
+{"state": "PASS", "step": "native-web-conductor-public-contract"}
+{"status": "PASS", "evidence": "docs/plans/migration-rust/evidence/20261024-worker-recovery1230/recipes1252/native-http-mission", "steps": 2}

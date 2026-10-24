@@ -1,0 +1,11 @@
+[
+  "/home/fpizzi/Documents/ChatGPT/swarm/.cache/rust-migration-binaries/swarm-rust-71a5150d60be6b4139884e7e0cdab0ee146e858072f92bd563ad085b6a048917",
+  "planning",
+  "enable",
+  "w-3faae251c4cb1dfd9dd1e78f",
+  "--root",
+  "/tmp/swarm-model83-ve37jk33",
+  "--json",
+  "--input",
+  "/home/fpizzi/Documents/ChatGPT/swarm/.cache/managed-bootstrap-l5p0o67d/run/setup/managed-bootstrap-027.input.json"
+]

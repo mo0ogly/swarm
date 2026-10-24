@@ -55,6 +55,8 @@ mod agent_supervision;
 #[cfg(target_os = "linux")]
 pub use agent_supervision::AgentExecutionOutcome;
 mod reviewer_bootstrap;
+#[cfg(target_os = "linux")]
+mod managed_repository;
 mod reviewer_creation_policy;
 pub use reviewer_creation_policy::ReviewerCreationDefaults;
 mod mission_dispatch_policy;
@@ -93,7 +95,7 @@ pub use root_store::{
     MissionStatusInputs, MissionStatusVisit, MissionStatusPlanningCall, MissionStatusExchange, MissionStatusExchangeArtifact,
     MissionWorkspaceQueue, MissionWorkspaceTurn, MissionWorkspaceBlocker,
     MissionQueueRegistration, MissionCandidateRefusal,
-    MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome,
+    MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome, MissionWorkerRecovery,
     MissionWorkerDispatchRequest, MissionWorkerDispatchOutcome, MissionWorkerDispatchFailure,
     MissionDispatchCause, MissionDispatchQueueEffect, MissionDispatchPreparationEffect,
     MissionDispatchResourceRefusal,

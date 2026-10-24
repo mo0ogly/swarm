@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "event_id": "managed-status-start",
+  "expected_revision": 6,
+  "reason": "Observe prepared managed tasks only",
+  "slots": 1,
+  "profile": {
+    "provider": "fixture",
+    "role": "worker",
+    "workspace": "source",
+    "level": "standard",
+    "capture_output": true
+  }
+}

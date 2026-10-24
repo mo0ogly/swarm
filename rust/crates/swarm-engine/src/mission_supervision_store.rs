@@ -9,6 +9,9 @@ use rusqlite::{params, Connection, Params, Row};
 
 #[path = "mission_worker_adoption.rs"]
 mod worker_adoption;
+#[path = "mission_worker_recovery.rs"]
+mod worker_recovery;
+pub use worker_recovery::MissionWorkerRecovery;
 pub use worker_adoption::{MissionWorkerAdoptionRequest, MissionWorkerAdoptionOutcome};
 
 // Representation schema, not an operator policy. No FK: generations survive work

@@ -1,0 +1,8 @@
+{
+  "tests/rust_mission_worker_recovery.py": "6ed2053182e018be4f36b19801045ae3ebb6531ba056b032435e17ae8f7e5679",
+  "tools/verification/recipes/mission-worker-completion-recovery.json": "2efa308739acc2cf38183960ebf7e82035e9404ad859ce42c439fa924b46b283",
+  "docs/architecture/NATIVE-WORKER-RECOVERY.md": "feeca94ec8f5e0f574cf4433af0708f88d555a14630059fb37fbc802d1869c92",
+  "docs/en/NATIVE-WORKER-RECOVERY.md": "7f12b8ef588c1cf2de9539bb450813a11700f5f4b053e0cb70c52913a6fb534d",
+  "docs/plans/migration-rust/REPLAYS.md": "a1378ccd256f03e58b77d34eaeddc3882cc63e852fba9385812ce66c3d02f6b3",
+  "docs/plans/migration-rust/PLAN.md": "281884ed3129831561b128ef38c1d466b58d0099b414d669fc1b4b84cda27a2f"
+}

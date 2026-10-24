@@ -1,0 +1,545 @@
+{
+  "agent": {
+    "activity": "Supervision native active ; vitalité fournisseur non établie",
+    "args": [
+      "exec",
+      "--json",
+      "--safe-fixture",
+      "--model",
+      "fixture-standard",
+      "-c",
+      "model_reasoning_effort=\"fixture-medium\"",
+      "-"
+    ],
+    "attempt_id": "a-6068d77af8d269c73899e0f1",
+    "capture_output": true,
+    "child_identity": "13975749",
+    "child_pid": 3582409,
+    "command": "/tmp/swarm-model83-yi65jsud/codex",
+    "context": {
+      "bytes": 34425,
+      "excluded": null,
+      "included": [
+        "task-2"
+      ],
+      "paths": null,
+      "references": null,
+      "sha256": "904cd291441f3bac19fb099fa4084f06d9f05dbf9fb2d595147fdc79749b9833"
+    },
+    "diagnostic": {
+      "agent_id": "",
+      "attempt_id": "",
+      "consecutive_error_limit": 0,
+      "consecutive_error_limit_reached": false,
+      "items": null,
+      "limit_reached": false,
+      "observed_errors": 0,
+      "summary": ""
+    },
+    "env_allow": [
+      "PATH",
+      "HOME",
+      "USER",
+      "LOGNAME",
+      "LANG",
+      "LC_ALL",
+      "TERM",
+      "TMPDIR",
+      "XDG_CONFIG_HOME",
+      "XDG_CACHE_HOME",
+      "CODEX_HOME",
+      "SSL_CERT_FILE",
+      "SSL_CERT_DIR",
+      "NODE_EXTRA_CA_CERTS",
+      "HTTPS_PROXY",
+      "HTTP_PROXY",
+      "NO_PROXY"
+    ],
+    "heartbeat": "2026-10-24T11:07:05.518283143Z",
+    "host": "fpizzi:c133560e-f1dd-46b2-93b3-1e84068f4a07:pid:[4026531836]",
+    "id": "watch-41e277b16427812cb1a10379",
+    "limits": {
+      "max_consecutive_errors": 3,
+      "max_repeated_calls": 4,
+      "max_tool_calls": 100,
+      "silence_seconds": 180,
+      "tool_seconds": 300
+    },
+    "model_route": {
+      "billing": "external",
+      "effort": "fixture-medium",
+      "level": "standard",
+      "model": "fixture-standard",
+      "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+      "reason": "Politique fournisseur enregistrée · work · sans montée en gamme automatique ; annonce non authentifiée"
+    },
+    "native_execution": {
+      "context_sha256": "904cd291441f3bac19fb099fa4084f06d9f05dbf9fb2d595147fdc79749b9833",
+      "phase": "permission_recorded",
+      "policy": {
+        "capture_max_bytes": "1048576",
+        "capture_max_lines": "1000",
+        "event_max_bytes": "1048576",
+        "heartbeat_stale_ms": "10000",
+        "log_message_max_bytes": "2048",
+        "output_drain_ms": "2000",
+        "poll_interval_ms": "1000",
+        "public_message_max_bytes": "1048576",
+        "term_grace_ms": "3000"
+      },
+      "schema_version": 1,
+      "settings_revision": "1",
+      "work_revision": 14
+    },
+    "native_mission": {
+      "claim_settings_revision": "1",
+      "command_settings_revision": "1",
+      "conductor": "mission-d7fc37e7d126f0af17e083ad",
+      "consent_sequence": 3,
+      "event_id": "launch-58cf0813dcd9a5dee6c016c1",
+      "generation": 2,
+      "parent_profile_sha256": "d2d6f32268d4bc20364ef05aeb17bb68fe7882a7df0d5e4ee5cf4e98a9ce9f92",
+      "profile_sha256": "d2d6f32268d4bc20364ef05aeb17bb68fe7882a7df0d5e4ee5cf4e98a9ce9f92",
+      "root_instance": {
+        "database": [
+          52,
+          136895
+        ],
+        "directory": [
+          52,
+          136894
+        ]
+      },
+      "schema_version": 4,
+      "work_revision": 14,
+      "workspace_turn_seq": "2"
+    },
+    "native_provider_facts": {
+      "first_model_error": null,
+      "first_usage_error": null,
+      "invalid_model_events": 0,
+      "invalid_usage_events": 0,
+      "last_valid_reported_model": null,
+      "last_valid_usage": null,
+      "model_state": "not_reported",
+      "reported_model": null,
+      "schema_version": 1,
+      "source": "provider_declared_unverified",
+      "usage": null,
+      "usage_state": "not_reported"
+    },
+    "native_tool_guard_policy": {
+      "lookback_multiplier": "4",
+      "schema_version": 1,
+      "settings_revision": "1"
+    },
+    "origin": "conducteur",
+    "preflight": {
+      "capabilities": {},
+      "checked_at": "2026-10-24T11:07:04.215413247Z",
+      "checks": [
+        {
+          "detail": "Host read/write/resources observed; provider capabilities remain unverified",
+          "name": "host_observations",
+          "status": "ready"
+        },
+        {
+          "detail": "ba64e5e664f7a3273421ec8e130ba89ada77535476871ddeecbae734986f0fbe",
+          "name": "model_route_sources",
+          "status": "declared_unverified"
+        }
+      ],
+      "duration_ms": 0,
+      "provider": "fixture",
+      "schema_version": 1,
+      "scope": "fc0fb7df12cde9581e54910eb9e75c4b533ee8ea0d6de039bf3a5669da25b5dd",
+      "valid_until": "2026-10-24T11:07:34.215413247Z",
+      "verdict": "compatible",
+      "verification": "unverified",
+      "workspace": "/tmp/swarm-model83-yi65jsud/watch-worker"
+    },
+    "progress": {
+      "elapsed_seconds": 1,
+      "metrics_version": 1,
+      "output_state": "none",
+      "pending_tools": 0,
+      "provider_vitality": "unknown",
+      "tool_calls": 0,
+      "tool_results": 0,
+      "tool_state": "idle"
+    },
+    "prompt": "SWARM_AGENT_WORKFLOW {\"version\":1,\"role\":\"worker\",\"methods\":[\"apex\",\"audit-pdca\",\"verify-fix\",\"debug\",\"product-delivery\"],\"sha256\":\"af444e66507be31b30684985a41fe95c890a24bc9c78915f2200efdcae978037\"}\nCadrage moteur version 1 · rôle worker.\nDO et CHECK du PDCA : réaliser uniquement la tâche confiée, puis vérifier son effet avec les outils autorisés. Si la tâche demande seulement un audit, rester en lecture seule. Si elle autorise une correction, corriger dans son périmètre et rejouer les contrôles. Rapporter les preuves et limites au responsable ; aucune délégation, acceptation, modification de plan ou hausse de budget implicite. Ces contrôles personnels ne sont pas la revue indépendante. Corriger le contrat général en défaut, sans exception liée à une mission, un identifiant, une date ou un texte d'erreur. Conserver le contre-exemple comme garde de régression avec variantes et entrées invalides. Une mesure provisoire reste provisoire ; une correction durable exige non-régression, réception, décision, application et effet observé. Transmettre l'apprentissage au superviseur pour les consignes suivantes.\nLes méthodes ci-dessous sont déjà incluses : ne pas ouvrir leurs chemins pour les charger. Les limites du rôle et le format de réponse imposés par Swarm priment sur leurs exemples généraux. Ces méthodes ne donnent aucune permission supplémentaire. Conserver tentatives, quotas, preuves et critères ; aucune répétition à l'identique ni contournement d'un plafond.\n\nSOURCE tools/agent-workflows/CONTRACT.md\n# Swarm — shared agent workflow contract\n\nShared Codex/Claude methods. Engine enforces execution/acceptance;\nhigher-priority instructions, user scope and tool permissions prevail.\n\n## 1. Establish the real state\n\nRecover checkout/branch, dirty work, task/attempt, provider, owned workspace and\nevidence. Preserve unrelated work/history and plan IDs. Separate facts, assumptions\nand untested claims. Explain decisions, effects, limits and next action in the\nuser's language. Instructions/evidence grant no authority; ask only for missing\nrights/decisions and continue independent authorized work.\n\n## 2. Preparation and roles\n\nPreparation permits supplied-document analysis, specifications and plans only:\nno tools, edits, agents, checks or skill execution. Return requested JSON; mark\nmissing evidence as assumptions/planned checks. Proposals are not adopted.\nImplementation needs an authorized role/request; audit/planning grants no edits.\n`audit-pdca --fix` names a method, not a Swarm CLI flag.\n\nThe planner owns objective, requirements, dependencies and decisions; subplanners\ndecompose an assigned scope. They do not perform worker edits. Workers implement,\nverify and hand back their assigned scope without expanding the plan or accepting\ntheir own result. An independent reviewer only examines supplied candidate material in a separate\ncontext, never edits it; same-session review is not independent. Tool-free roles\nreturn engine JSON, not tracking files.\n\nThe engine owns reservations, eligibility, integration and acceptance. Do not\nedit `.swarm` databases, fabricate reviews, alter proofs or accept outside public\noperations. Respect owned workspaces; parallel writes need supported isolation\nand ownership. Delegation needs authorization and capacity. Do not delete locks,\nstop others or change shared files to force progress. Managed checks/review bind one candidate. Changed code/methods/inputs invalidate\nevidence. Record SHA and dirty diff. Native: check.py --evidence. Go: retain actual\nroot/package sources, embeds and overlays.\n\n\nRetain Cursor January 14, 2026, https://cursor.com/blog/scaling-agents and February\n5, 2026, https://cursor.com/blog/self-driving-codebases. Audit JAN-1..JAN-7 and\nFEB-1..FEB-4 in docs/architecture/CURSOR-ENGINE-CONTRACT.md, preserving version\ndifferences. JAN-4/JAN-5 are retained Swarm requirements, not claims about the\nfinal February architecture. Candidate review and global cycle judge differ.\nResearch does not authorize removing checks or raising budgets. Role names or\nfixture tests alone do not establish compliance.\n\n## 3. Required recursive diagnosis and recovery\n\nNo silent waits, unmanaged blockage, slow replies or unverified fixes. Acknowledge\npromptly; bound steps/output; update active chat every 60s with state, cause, action\nand pending proof. Tool-free roles return JSON and route incidents to their\nsupervisor. Rules/wakeups prove no repair or supervision.\n\nApply `replan` on resume, failure, blockage, abnormal slowness, missing proof or\nchanged assumptions or discovered improvements: observe → diagnose → decide within rights → correct or route\n→ verify → reassess the need. Unless asked to stop/defer, act beyond reporting.\nFind the first failed boundary and testable cause, including method, transmission,\nverification and engine failures; link each to its parent and resume the need.\nEvery improvement is valuable: retain origin, expected benefit and owner;\ncarry verified lessons forward.\n\nAfter status/questions, continue authorized work; follow delegated work/reviews\nand use results. Close on verified completion (including agreed RETEX), explicit\nstop/defer, or no useful authorized action with cause, original proof, owner and\nconcrete resumption condition. Never end with only \"running\" or an unarranged follow-up.\n\nTrack cause/hypothesis, owner, originals, changed precondition, public action/effect\nand structural options in the existing report. Retries require new evidence or\npreconditions, never wording/docs or budget alone. Verify the affected flow;\ndistinguish tests, runtime effect and acceptance. Keep failures/unknowns open,\ncontinue independent work and name dependency owners/resumption conditions.\n\nNever raise budgets without explicit user authority, refund attempts, rename\nfailed tasks, replace missions, clear provider delays early or disable checks to\nmanufacture success. Delay expiry proves no provider health. Recursion grants no\nextra calls, tasks, delegation or monitoring. Route cross-scope decisions to the\nroot; request only missing authority with a concrete diagnosis.\n\nFor review `unknown`, distinguish defects from missing context using\n`review_evidence_inventory` (supplied sources, not understanding). Name missing\noriginal, declaration and check; a quote is not the original. Verify received\ncontext, routed decision and public effect; put diagnosis/action first in bounded\nprojections, with attributed originals. See docs/architecture/{AUTORECURSIVE-RECOVERY,AGENT-ENGINE-PROTOCOL}.md\n(EN available). Methods/docs prove no runtime autonomy.\n\nFor versioned knowledge, plans must trace all loaders (legacy indexes, profiles,\nrecovery pieces), normalize references and test replacement/withdrawal at the\nconsumer, preserving received history.\n\n## 4. Delivery, evidence and verification\n\nLocal delivery: `swarm.sh`; FR/EN `version_history.json` local_changes; verify\nrunning Version dialog, notes, real commit and uncommitted label. Only changed\ninputs advance the number. No extra restart/publication rights; never invent tags.\n\nUpdate docs, languages and diagrams per change, or record why unnecessary;\ndocs prove no execution, effect or acceptance.\n\nRecord effect, owned files, dependencies, criteria, checks and recovery in native\nHANDOFF.md/TRACKING.md. Tasks own memory; workers never coordinate directly or\nedit others' tracking. Engine events/decisions prove routing; saving is no receipt.\n\nManaged delivery declares complete candidate text, including unchanged originals,\nin `delivery.criteria[].evidence`. The report is supplied in full;\n`docs/TASK-ID.review-context.json` (version 1, relative Git paths) adds sources.\nMissing/non-text/oversized input blocks paid review without truncation. Check all\nattachments together and engine-built role contexts before handoff. Reuse engine\nchecks/bounds and supported coordination. Reception is not acceptance.\n\nUse stable IDs and a small evidence matrix:\n\n| Requirement | Observable | Check/environment | Revision/inputs | Result | Evidence/limit |\n| --- | --- | --- | --- | --- | --- |\n\nResults: PASS, FAIL, PARTIAL, NOT TESTED, NOT APPLICABLE (reason required).\nEstablish a valid control before each fault injection.\nTest normal, invalid, failure, recovery and promised persistence/concurrency;\nassert behavior, beyond labels/HTTP 200. Retain command, executor, revision,\nstart/end, exit, original stdout/stderr, hashes and output limits. Distinguish\nlocal checks, controller receipts, independent verdicts, doubles, real providers\nand operator interventions. Fixtures prove no autonomy. Route missing evidence\nto its owner; map TR-1..TR-6 in docs/architecture/TRACEABILITY.md (EN available).\nRequirements alone prove no implementation.\n\nCheck UI themes, FR/EN, keyboard/focus, loading/errors, console/failed requests;\nuse existing tokens/translations. Report failed/untested criteria, review context,\nartifacts and limits. Exclude secrets/private runtime state. Use established\nreports or agreed temporary paths, not large tracking trees.\n\nProcess exit, a written report or a green build is not acceptance. Close only\nwith applicable evidence; declare partial/blocked delivery and match the public\nengine state. Commit, push, publication, deployment and destructive cleanup need\nuser/session authority; this contract grants none.\n\n\nSOURCE .claude/skills/apex/SKILL.md\n---\nname: apex\ndescription: \"Analyze, plan, implement and verify a bounded Swarm change using APEX. Use when asked for APEX, a substantial feature, engine hardening or end-to-end delivery with explicit acceptance evidence. In Swarm preparation, stop at analysis and planning.\"\n---\n\n# APEX for Swarm\n\nRead `tools/agent-workflows/CONTRACT.md` from the project root. It is included in\nSwarm preparation contexts. Use the user's scope and requested depth; do not turn\na small fix into a large program. Arguments such as `--plan-only` and `--resume`\nare requests interpreted by this skill, not executable CLI flags.\n\n## Analyze\n\n1. Identify the mode: planning only, authorized implementation, or resume.\n   In Swarm preparation, analysis and planning are the entire permitted workflow.\n2. Read the current requirement, source boundaries, public entry points, tests,\n   existing plan and evidence. Establish the actual checkout/runtime relationship.\n3. Define the user-visible effect, exclusions, constraints, failures and observable\n   success criteria. Keep stable requirement IDs. Surface unknowns without inventing\n   behavior. Inspect web, CLI and engine parity when the change crosses them.\n4. For an architectural choice, compare at least two feasible approaches using\n   correctness, recovery, effort and compatibility; record the decision.\n\n## Plan\n\nCreate a small dependency-aware sequence. Each task names its requirement IDs,\nowner role, scope/files, inputs, deliverable, acceptance checks and recovery route.\nInclude planning and independent verification responsibilities when the mission\nrequires them; a list of workers is not a complete coordination design.\n\nCheck prerequisites, cycles, write ownership, review, providers and budgets.\nUse existing engine formats and public validation. Preserve the canonical plan\non resume; planning-only ends with a reviewable plan and unresolved questions,\nnever an execution claim.\n\n## Execute within the assigned role\n\nFor each authorized task: observe current state, orient on evidence, decide one\nbounded action, implement it, then observe its effect. First reproduce a reported\ndefect with a meaningful failing case where feasible. Make the smallest coherent\nchange; preserve unrelated work. Maintain short decision and evidence notes.\n\nApply `replan` on resume, failure, blockage, insufficient evidence or changed\nassumptions. Diagnose and correct the cause before retrying; revise structural\nobstacles. Preserve attempts, originals and budgets; never replace a mission to\nescape a ceiling. Delegate only with existing authorization.\n\nAfter each result, apply the shared contract's recursive diagnosis and recovery\nloop to the engine, context handoff and your own assumptions. Preserve original\nproofs, verify receipt and decision, then return to the initial requirement.\n\n## Verify and close\n\nRun checks proportionate to the change and verify the affected public behavior.\nUse `verify-fix` for an actual web/CLI/API journey and `code-reviewer` for review.\nDo not call a same-session self-review independent. For managed integration, bind\ntests and independent review to the same candidate SHA before engine acceptance.\n\nDeliver: result in plain language; requirements/evidence matrix; revision and dirty\nstate; commands and outcomes; report/artifact paths; remaining limits and next action.\nA critical failed or untested criterion means incomplete delivery. Report it plainly.\n\n\n## Go → Rust migration\n\nFor migration work, read and apply [the adopted method](references/rust-migration.md).\nTool-free roles need this reference supplied in context; report its absence.\n\n\nSOURCE .claude/skills/audit-pdca/SKILL.md\n---\nname: audit-pdca\ndescription: \"Run an evidence-based PDCA audit of Swarm's engine, CLI, web, provider integration or agent coordination. Use for audit-pdca/audit_pdca, a reliability audit, or a measured audit-and-fix cycle; do not substitute it for a simple diff review.\"\n---\n\n# Audit PDCA for Swarm\n\nRead `tools/agent-workflows/CONTRACT.md`. Default to **audit-only**: inspect and\nwrite the requested report, without changing application code or runtime state.\nUse **fix** mode only when the user authorizes corrections (including `--fix`).\n`--score-only` requests measurement, not remediation. Arguments are skill requests.\nIn Swarm preparation, only the PLAN phase is permitted.\n\n## PLAN — define what is being measured\n\nRead the previous audit for the same scope. Fix the baseline revision, exclusions,\ncritical behaviors, rubric and available evidence before evaluating results.\nInventory the public operations and expected effects, not just existing tests.\n\n| ID | Trigger / inputs | Preconditions | Expected effect | Observable | Failure cases | Criticality |\n| --- | --- | --- | --- | --- | --- | --- |\n\nFor coordination audits, include role admission, worker ownership, independent\nreview, dependency freshness, restart/recovery, quota and attempt limits, partial\nreports, acceptance and equivalent CLI/web paths. Verify claims against actual\nengine entry points. A missing test or unavailable environment is not compliance.\n\n## DO — collect and, when authorized, correct\n\nCollect reproducible findings: location or public operation, preconditions, observed\nresult, expected result and impact. Separate facts from hypotheses. Avoid flags\nfrom another project, destructive real-data tests and unrelated automatic changes.\n\nIn fix mode, compare alternatives for a major finding, implement a bounded repair\nand keep a regression-sensitive test. Preserve the original failing evidence.\nWithout fix authority, supply an actionable correction proposal and continue the audit.\n\n## CHECK — replay the behavior\n\nRun applicable static, security, behavioral, boundary and regression checks. Exercise\nnormal, invalid and failure/recovery paths, and persistence/isolation where relevant.\nCapture runtime diagnostics, exact command/options, exit status, environment and\nrevision. UI checks include both themes, languages and keyboard interactions.\nTests must cross the boundary where the defect occurs, with assertions on its effect.\n\nUse `PASS`, `FAIL`, `PARTIAL`, `NOT TESTED`, `NOT APPLICABLE` with reasons.\nMissing tools or unavailable providers mean NOT TESTED. Compilation or a label's\npresence is structural evidence, not a behavioral PASS.\n\nIf a score is requested, define weights and partial-credit rules before checking,\npublish evidence coverage alongside the score and make the calculation reproducible.\nCritical failures cannot be compensated by high scores elsewhere. Never change the\nrubric after observing results or invent a precision unsupported by evidence.\n\n## ACT — decide the next useful action\n\nCompare compatible baselines; identify fixed, unchanged and new findings by stable ID.\nContinue authorized remediation while it can improve the result within the agreed\nbudget. Stop repeated unchanged failures; diagnose and replan. Preserve limits and\nquotas. A blocked critical check prevents a compliance claim, even if the audit\nreport itself is finished.\n\nProduce a concise report with scope/baseline, behavioral matrix, prioritized findings,\ncommands/artifacts, before/after evidence, optional score and coverage, interventions,\nlimits and next actions. Distinguish **audit completed** from **system compliant**.\n\n\nSOURCE .claude/skills/verify-fix/SKILL.md\n---\nname: verify-fix\ndescription: \"Verify that a Swarm fix works through the affected web, CLI or API flow with observable assertions and diagnostics. Use after a repair or when asked to reproduce a regression; a build alone is not a verification.\"\n---\n\n# Verify the actual behavior\n\nRead `tools/agent-workflows/CONTRACT.md`. Identify the reported scenario, expected\neffect, candidate revision and actual runtime. Use an isolated fixture root when\nan operation changes missions, files or state. Respect the session's tool permissions.\nIn preparation, specify this recipe without executing it.\n\n1. Before execution, write the trigger, preconditions, inputs, expected observable\n   and which assertion would fail if the repair disappeared. Reproduce the original\n   failure on a safe baseline when practical; never damage real mission data.\n2. Select the boundary: CLI with exit code/stdout/stderr and state readback; HTTP\n   with response and persisted effect; browser with the real interaction and DOM.\n   Verify the process serves the candidate being tested, not an older installed binary.\n3. Attach diagnostics before the first action. For web, collect page exceptions,\n   console errors, failed requests and unexpected HTTP errors. For CLI/engine,\n   collect stderr, exit status and the relevant structured event/error output.\n4. Execute the full affected path, relevant negative input and failure/recovery\n   path. Verify persistence after reopening when promised, and no forbidden effects\n   after a rejection. Include both themes, languages and keyboard/focus for UI changes.\n5. Treat unexpected diagnostics as failures to investigate. Do not add broad\n   allowlists, hide errors, disable a guard or replace the behavior under test with\n   a mock. Clearly label any external provider double and its proof limitations.\n6. Save the precise commands/interactions, revision, environment, assertions,\n   outcomes and small evidence artifacts. Do not expose tokens or private data.\n\nReport PASS, FAIL, PARTIAL or NOT TESTED per criterion and list residual limits.\nIf browser/provider/authentication is unavailable, say which flow was not verified;\ndo not substitute source inspection for runtime proof. A passing recipe still\ndoes not substitute for required independent review and engine acceptance.\n\n\nSOURCE .claude/skills/debug/SKILL.md\n---\nname: debug\ndescription: \"Diagnose unexpected behavior, test failures or repeated blocked attempts by reproducing, isolating and testing a cause before a scoped correction. In preparation, plan the diagnosis only; this method does not authorize execution or retries.\"\n---\n\n# Diagnostiquer et corriger un problème\n\nAdaptation portable de la méthode locale Debug : reproduire, isoler, diagnostiquer,\ncorriger. Appliquer le contrat partagé de Swarm et répondre dans la langue demandée.\nUtiliser cette méthode lorsqu’un défaut ou un blocage est à expliquer ; ne pas\najouter une investigation à une tâche sans anomalie.\n\n## Limites du rôle\n\n- En préparation, proposer les hypothèses, preuves manquantes et contrôles à\n  prévoir à partir des documents fournis. Aucun outil, test, correction ou départ.\n- Planificateur et sous-planificateur : analyser les retours fournis et découper\n  le diagnostic en tâches bornées ; ne pas réaliser les contrôles ou corrections.\n- Exécutant : diagnostiquer avec les outils permis. Corriger seulement si sa tâche\n  l’autorise ; une demande de diagnostic seul reste en lecture seule.\n- Vérificateur : examiner les preuves fournies sans outil ni correction. Une\n  hypothèse plausible n’est pas une cause démontrée ni une validation.\n\n## Investigation utile\n\n1. Distinguer résultat attendu et résultat observé. Consigner le déclencheur,\n   les entrées, la révision, l’environnement et la trace exacte, sans secrets.\n   Reproduire sur un cas sûr si autorisé ; sinon écrire NON REPRODUIT et pourquoi.\n2. Isoler la première frontière où le comportement diverge : interface, CLI,\n   moteur, stockage, fournisseur ou espace de travail. Comparer avec un cas qui\n   fonctionne et les changements récents pertinents. Lire les fichiers ciblés ;\n   élargir seulement si une observation le justifie, sans relire tout le dépôt.\n3. Formuler une hypothèse falsifiable et le contrôle minimal qui la départage.\n   Conserver le résultat, y compris négatif. Une nouvelle action doit apporter\n   une preuve ou tester une hypothèse différente ; ne pas répéter à l’identique.\n4. Une cause corroborée permet une correction ciblée si elle est autorisée.\n   Garder le scénario qui échouait, rejouer le même contrôle après correction\n   puis les régressions pertinentes. Distinguer défaut corrigé et obstacle externe.\n\n## Sortie et reprise\n\nRapporter : symptôme, reproduction, cause démontrée ou hypothèse restante,\nobservations qui éliminent les alternatives, correction éventuelle, contrôles\navec résultats et limites, prochaine action et responsable. Utiliser le format\nimposé par Swarm ; en session native, un rapport court suffit. Ne pas créer un\narbre de suivi supplémentaire ni changer le format JSON requis.\n\nSi une opération échoue à nouveau sans preuve nouvelle, expliquer la précondition\nà changer et transmettre au responsable plutôt que relancer. Des causes multiples\nou un périmètre trop large justifient un découpage proposé, pas de nouvelles tâches\ncréées hors du moteur. Respecter budgets et tentatives ; aucune hausse implicite,\nsuppression de verrou, modification de base ou acceptation pour forcer un résultat.\nLes preuves de vérification personnelle ne remplacent pas la revue indépendante.\n\n\nSOURCE .claude/skills/product-delivery/SKILL.md\n---\nname: product-delivery\ndescription: \"Evidence based research, design and implementation per story\"\n---\n\n# Product delivery for Swarm\n\nRead `tools/agent-workflows/CONTRACT.md`. Work only on the assigned task and stage.\nA planning/documentation task never authorises application code, scaffolding,\npublishing, merge, extra agents or scope expansion. Return evidence to the planner.\n\n## Research and architecture tasks\nRead project instructions and inspect current manifests, source, symbols/signatures,\ncall sites, tests, persistence and operations. Cite paths and locations actually\nopened. Classify active/dead/prototype only from callers or runtime evidence.\nRecord blast radius, reproducible verification commands and open questions. Research\nproduces verified context, not an implementation plan. Existing architecture comes\nfirst; preserve stack/patterns and immutable ADRs. For greenfield, require supplied\nPRD, stories and an explicit stack decision before any separately authorised scaffold.\n\n## Design system and UI tasks\nRequire the existing component system or an explicit visual direction. Capture\ncolour, typography, spacing/radius, available components, interaction patterns,\nempty/loading/error/success and do/don't rules. Never invent an unrelated system.\nFor screen design, require that system and the target story. Use only its tokens\nand components. Cover exact content, fields/actions, responsive layouts, focus,\nkeyboard, validation feedback and the four states. List system gaps and stop on\nan unresolved required component rather than freelancing a replacement.\nIf external design was chosen, deliver a self-contained brief with the copied system\nconstraints and await its returned design. Do not silently switch to agent design.\nA static mockup is a reference, never production code to paste into the app.\n\n## Implementation\nRequire the current adopted task/plan and supplied research/design decisions. For\nUI tasks implement the screen intent using actual application components. Preserve\nunrelated changes; use the assigned isolated workspace/branch and engine integration\nrather than switching or deleting another task's branch. Cover frontend/backend/\npersistence only when assigned; deliver the user's end-to-end slice across its tasks.\nFor behavioural changes, demonstrate a failing regression/acceptance check where\nfeasible, implement the change, then rerun it. Follow repository-specific checks.\nDo not add a test that merely mirrors code or claim an unexecuted test passed.\nAfter each step compare scope, dependencies, architecture and acceptance with the\nadopted plan. If invalidated, stop and report a plan-revision requirement. Existing\ncritical/major review findings take priority on a corrective run, within its limits.\nRecord changed files, exact commands, candidate SHA/diff, outcomes and blockers.\n\n## Verification and handoff\nExercise observable criteria, invalid inputs, failures/recovery and relevant\npersistence. UI checks cover languages/themes, keyboard, loading/errors and console/\nnetwork failures. Verify the actual build/runtime, not just a source label.\nSubmit evidence and remaining limits; self-checks are not independent review and a\nprocess exiting is not acceptance. Require the engine's fresh review/integration\nchecks for the same candidate. Never edit a verdict, state DB, history or quota.\n\n## Delivery\nPrepare a PR only when explicitly authorised, with problem/result, scope, checks,\nreview and limits. Check an existing PR to avoid duplicates. Respect project branch\nprotection and manual merge/deploy policy; green tests do not grant publication.\nConfirm the actual merge/deployment before reporting delivery. Clean a branch only\nwhen explicitly authorised and proven merged; never use force deletion to conceal\nunfinished work. In Swarm, supported managed integration owns candidate application;\na markdown `Ship allowed: yes` is evidence to assess, not engine acceptance.\n\n\nSOURCE tools/agent-workflows/templates/HANDOFF.md\n# Task result — <task ID>\n\nUse the assigned report in your owned workspace. Fill placeholders with facts;\nput critical limits first. Never edit another worker's report or shared coordination.\n\n## Outcome in two sentences\n\n<What changed and its useful effect. What remains failed, untested or blocked.>\n\n## Identity and scope\n\n- Work / task / attempt / producer: <supplied identifiers, or explicitly unknown>\n- Role and assigned scope: <scope>\n- Base / candidate revision and dirty changes: <observed references>\n- State: <completed implementation / partial / blocked; not engine acceptance>\n\n## Findings the responsible planner must know\n\n<Discoveries, deviations, concerns, affected tasks/scopes and proposed next action.\nRoute cross-scope issues to the responsible planner; do not contact other workers.>\n\n## Changes and verification\n\n| Requirement | Change / file | Exact check and environment | Observed effect | Result | Evidence |\n| --- | --- | --- | --- | --- | --- |\n| <ID> | <path> | <command/options or interaction> | <assertion> | <PASS/FAIL/PARTIAL/NOT TESTED/N/A with reason> | <artifact> |\n\nDeclare whole original text in `delivery.criteria[].evidence` (tested candidate,\nincluding unchanged files), with extra sources in `docs/<task ID>.review-context.json`.\nQuotes do not replace originals. Recovery names the missing input, declaration\nand resolving check; inspect the supplied inventory. Receipt is not understanding.\n\nRecord exit codes, unexpected diagnostics and negative/recovery checks.\nDistinguish fixtures from real providers; test claims need execution records.\n\n| Execution | Executor / source revision | Exact arguments | Start / end | Exit | Original stdout / stderr and SHA256 | Retention limit |\n| --- | --- | --- | --- | --- | --- | --- |\n| <ID> | <worker / operator / controller; candidate and dirty inputs> | <argv> | <dates> | <code> | <paths and digests> | <complete / explicit bound> |\n\nAttribute local runs, controller receipts and independent verdicts separately.\nParallel agents retain owned artifacts; route gaps to owners and preserve history.\n\n## APEX / PDCA checkpoint\n\n- Analysis / PLAN: <criterion and hypothesis addressed>\n- Execution / DO: <bounded action actually performed>\n- Verification / CHECK: <observable result and evidence above>\n- Adjustment / ACT: <correction performed or proposal to the responsible planner>\n- Recovery limits: <attempts/budget or quota relevant to the next action; unknown if unavailable>\n\n## Next action and limits\n\n<Who should act, on what evidence, and what precondition must change first.>\n<Independent review and its evidence. The supervisor decides completion under\nrequired checks; the engine validates admissibility. Saving is not receipt.>\n\n\nSOURCE tools/agent-workflows/templates/TRACKING.md\n# Local action checkpoint — <task / attempt>\n\nUse in the owning task's report, never for cross-agent notifications. Update current\nstate; retain significant decisions/evidence in the handoff, without raw transcripts.\nTool-free roles return their required JSON instead of writing files.\n\n## Current state\n\n- Requirement and expected observable: <ID and effect>\n- Known state / hypothesis: <separate fact from assumption>\n- Current action / next action: <one bounded action each>\n- Blocker and changed precondition needed: <cause, owner, evidence>\n- Remaining limits: <observed attempts/budget or unknown>\n- Linked problem / parent: <original requirement or failing diagnostic/control>\n- Iteration progress: <new discriminating fact or changed precondition; no unchanged retry>\n- Reassessment: <original requirement now proved, still blocked or requiring another bounded check>\n\n## Significant actions and decisions\n\n| ID | Time / revision | APEX phase / PDCA phase | Action or alternatives | Observed result / evidence | Decision / next owner |\n| --- | --- | --- | --- | --- | --- |\n| <stable ID> | <observed> | <Analyze/Plan/Execute/Verify; PLAN/DO/CHECK/ACT> | <bounded> | <result> | <decision> |\n\n## Interactions\n\n| Source / attempt | Event or report reference and digest | Intended recipient | State proven by the engine | Required response |\n| --- | --- | --- | --- | --- |\n| <identity> | <public reference> | <owning scope> | <pending/delivered/decision recorded/unknown> | <action> |\n\nSaving, event emission, receipt and decision are separate observations. ACK proves\nthe recorded operation, not understanding. Use public statuses; never edit the database.\n\n\nSOURCE tools/agent-workflows/templates/QUALITY.md\n# Authorized implementation quality\nStay within assigned role, rights and scope.\nFor every increment, review exact changed bytes:\n- Policies: classify literals/defaults/fallbacks (test, protocol, technical, operator). Persist operator choices; trace Admin/API/CLI to real use.\n- Docs: update FR/EN docs and public/nontrivial function contracts: purpose, inputs/preconditions, outputs, errors, side effects, limits.\n- Errors: keep causes and safe diagnostics; check state, close/flush, cancellation, recovery. Refusal must not become empty success.\nVerify actual profiles/features/binary; separate production and fixtures. Bind proofs to inputs; missing checks stay open. On anomaly, replan, correct within rights, verify and resume. Keep history and improvements.\n\n\nFIN DES MÉTHODES — rappel des limites du rôle : Tâche confiée et outils autorisés seulement ; remettre preuves et limites au responsable. Aucun droit de délégation, acceptation ou hausse de budget implicite.\n\nPérimètre affecté: child\nObjectif du périmètre: OWN-SCOPE\nProduce only the owned requirement\nRôle: worker\nTâche task-2: SECOND-OWN-TASK\nLivrable: second/handoff.md\nCritères: OWN-REQUIREMENT\nProchaine action: Produce the second owned handoff\nPrécisions de réalisation proposées : OWN-CRITERION\nInstructions complémentaires: \nRacine de cette tentative: /tmp/swarm-model83-yi65jsud/watch-worker\nLimites figées: silence=180s, outil=300s, appels=100, répétitions=4, erreurs=3, observation=0\nLa durée seule ne déclenche aucun arrêt. Respecter les droits natifs du fournisseur. Ne pas modifier .swarm/state.db, ne pas accepter la tâche. Produire un handoff avec changements, tests, preuves, risques et prochaine action.\n\nIDENTITÉ COURANTE FOURNIE PAR LE MOTEUR : mission w-32ec0b728851684bad4cbf71 ; tâche task-2 ; agent watch-41e277b16427812cb1a10379 ; tentative a-6068d77af8d269c73899e0f1 ; départ 1/2 ; révision du travail 14.\nLes identités, limites et conclusions des rapports antérieurs sont historiques. Elles ne remplacent pas cette identité ni le contrat courant ci-dessous. Le contrat courant prévaut sur les consignes historiques recopiées dans un profil. Un ancien rapport ne prouve pas la réussite de cette tentative. Les identifiants affichés ne prouvent ni authentification cryptographique ni droits supplémentaires.\nCONTRAT COURANT AFFECTÉ PAR LE SCOPE (déclaration, pas preuve de réussite) :\n{\"criteria\":[\"OWN-REQUIREMENT\"],\"deliverable\":\"second/handoff.md\",\"depends\":null,\"id\":\"task-2\",\"max_attempts\":2,\"max_tool_calls\":0,\"requirements\":[\"req-1\"],\"role\":\"worker\",\"scope_id\":\"child\",\"title\":\"SECOND-OWN-TASK\"}\nLes limites effectives figées restent celles du moteur ; ce contrat ne crée ni résultat de contrôle ni acceptation.\nPérimètre courant déclaré : child ; parent déclaré : root.\nObjectif du périmètre courant : OWN-SCOPE\nProduce only the owned requirement\nExigence assignée req-1 : OWN-REQUIREMENT\nPolitique de détection figée : fenêtre d'échecs entrelacés 4 × le plafond de répétitions, en résultats terminés ; configuration 1. Ces observations ne prouvent ni l'exécution d'un outil ni l'acceptation du travail.\n\nRequested model route (unverified): level=standard, model=fixture-standard, effort=fixture-medium, billing=external, policy_sha256=e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db. This request establishes no actual model, account right, price or execution authority.\n",
+    "provider": "fixture",
+    "recovery": {
+      "automatic_attempts_max": 0,
+      "automatic_attempts_used": 0,
+      "budget_remaining": 0
+    },
+    "role": "worker",
+    "started": "2026-10-24T11:07:04.244375319Z",
+    "status": "running",
+    "supervisor_identity": "13975740",
+    "supervisor_pid": 3582408,
+    "task_id": "task-2",
+    "timeout_seconds": 1800,
+    "work_id": "w-32ec0b728851684bad4cbf71",
+    "workflow": {
+      "methods": [
+        "apex",
+        "audit-pdca",
+        "verify-fix",
+        "debug",
+        "product-delivery"
+      ],
+      "role": "worker",
+      "sha256": "af444e66507be31b30684985a41fe95c890a24bc9c78915f2200efdcae978037",
+      "version": 1
+    },
+    "workspace": "/tmp/swarm-model83-yi65jsud/watch-worker"
+  },
+  "work": {
+    "planning": {
+      "reviewer_required": true,
+      "reviewer": {
+        "max_context_files": 24,
+        "max_source_bytes": 98304,
+        "max_context_bytes": 131072,
+        "max_files": 100,
+        "provider": "fixture",
+        "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+        "model_route": {
+          "level": "standard",
+          "model": "fixture-standard",
+          "effort": "fixture-medium",
+          "billing": "external",
+          "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+          "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+        },
+        "max_calls": 2,
+        "calls": 0,
+        "authorized": "2026-10-24T11:06:56.118144887Z"
+      },
+      "model_route": {
+        "level": "standard",
+        "model": "fixture-standard",
+        "effort": "fixture-medium",
+        "billing": "external",
+        "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+        "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+      },
+      "checks": {
+        "req-1": [
+          {
+            "inputs": [
+              "handoff.md"
+            ],
+            "id": "actual-handoff",
+            "command": [
+              "python3",
+              "-c",
+              "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+            ],
+            "criteria": [
+              1
+            ],
+            "justification": "Check actual owned fixture handoff input digest",
+            "timeout_seconds": 60
+          }
+        ]
+      },
+      "provider": "fixture",
+      "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+      "activations": 2,
+      "max_activations": 6,
+      "version": 1,
+      "paused": true,
+      "max_tasks": 10,
+      "max_decisions": 10,
+      "decisions": 2,
+      "scopes": [
+        {
+          "last_model": {
+            "provider": "fixture",
+            "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+            "route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "actor": "",
+            "at": "2026-10-24T11:06:56.199701498Z"
+          },
+          "delivery": {
+            "judge_available": true,
+            "judge_cycle": 1,
+            "task_budget": 10,
+            "activation_budget": 6,
+            "closure_unavailable": true,
+            "review_retry_unavailable": true,
+            "production_retry_unavailable": true,
+            "context_sha256": "6ac6f6e58acddca7a8f5e8ba9752205d2372fd4375e5608260e52e7fedb56147",
+            "events": [
+              "public-flow-enable"
+            ],
+            "decision": "planning-decision-12488bce1181045e47da7a59"
+          },
+          "workflow": {
+            "version": 1,
+            "role": "planner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug",
+              "product-planning"
+            ],
+            "sha256": "97edc37b630828c58fd907ec7cf8597fdef78f5344bcf6cabcafc82eae80dccb"
+          },
+          "activations": 2,
+          "id": "root",
+          "objective": "ROOT-PRIVATE-OBJECTIVE",
+          "requirements": [],
+          "revision": 2,
+          "generation": 5,
+          "state": "waiting"
+        },
+        {
+          "last_model": {
+            "provider": "fixture",
+            "provider_digest": "ac5a9e1f9299197999d0465d3a9c65798b11423f03a9310ee08db006c8943655",
+            "route": {
+              "level": "standard",
+              "model": "fixture-standard",
+              "effort": "fixture-medium",
+              "billing": "external",
+              "policy_hash": "e6a87203cd1e492e6045404c0d5d00d5d02636093e78e268260052f3a8e7b9db",
+              "reason": "Politique fournisseur enregistrée · planning · demande non authentifiée"
+            },
+            "actor": "",
+            "at": "2026-10-24T11:06:56.513405667Z"
+          },
+          "delivery": {
+            "task_budget": 10,
+            "activation_budget": 6,
+            "closure_unavailable": true,
+            "review_retry_unavailable": true,
+            "production_retry_unavailable": true,
+            "context_sha256": "e8d090c01ac2b7437d1daaa49175fe4abd53692dc8a0639a8315449528fade2c",
+            "events": [
+              "plan-1a1296a153f70ada9d6a8ab2d72396a0e39b2833c558b5a0ec61807d4df47c95"
+            ],
+            "decision": "planning-decision-e63d57c533c6e749d7b6261b"
+          },
+          "workflow": {
+            "version": 1,
+            "role": "subplanner",
+            "methods": [
+              "apex",
+              "audit-pdca",
+              "spec-builder",
+              "spec-audit",
+              "replan",
+              "debug",
+              "product-planning"
+            ],
+            "sha256": "1b0360fa92e0d1f1a0903650bd2fb1cd47915945b3f195eb09cd9ccbe073a39c"
+          },
+          "max_tasks": 2,
+          "max_activations": 3,
+          "activations": 1,
+          "id": "child",
+          "parent": "root",
+          "objective": "OWN-SCOPE\nProduce only the owned requirement",
+          "requirements": [
+            "req-1"
+          ],
+          "revision": 2,
+          "generation": 5,
+          "state": "ready"
+        }
+      ],
+      "inbox": [
+        {
+          "id": "public-flow-enable",
+          "scope": "root",
+          "kind": "brief",
+          "message": "ROOT-PRIVATE-OBJECTIVE",
+          "decision": "planning-decision-12488bce1181045e47da7a59",
+          "at": "2026-10-24T11:06:56.118144887Z"
+        },
+        {
+          "id": "plan-1a1296a153f70ada9d6a8ab2d72396a0e39b2833c558b5a0ec61807d4df47c95",
+          "scope": "child",
+          "kind": "delegation",
+          "message": "OWN-SCOPE",
+          "decision": "planning-decision-e63d57c533c6e749d7b6261b",
+          "at": "2026-10-24T11:06:56.421506213Z"
+        },
+        {
+          "id": "plan-5b6ad53dd28a73830b58b87ecaddbb17b4e9e80b6f3c10705e18fc6a30296d2a",
+          "scope": "child",
+          "kind": "attempt_ended",
+          "task": "task",
+          "attempt": "a-ac5fb830e83f38ab967e6681",
+          "message": "completed : processus récolté ; validation requise",
+          "at": "2026-10-24T11:07:01.425305742Z"
+        },
+        {
+          "id": "plan-ba1f3543bf3181e55cc9b2fcf175962f751d7e8f190196a0f47c5fdc8025e940",
+          "scope": "child",
+          "kind": "attempt_ended",
+          "task": "task-2",
+          "attempt": "a-6068d77af8d269c73899e0f1",
+          "message": "completed : processus récolté ; validation requise",
+          "at": "2026-10-24T11:07:05.81098671Z"
+        }
+      ],
+      "judge": {
+        "cycle": 1,
+        "max_cycles": 0,
+        "closed": false
+      }
+    },
+    "launch_profile": {
+      "provider": "fixture",
+      "role": "worker",
+      "workspace": "/tmp/swarm-model83-yi65jsud/watch-worker",
+      "level": "standard",
+      "capture_output": true,
+      "updated": "2026-10-24T11:06:57.446947731Z",
+      "actor": "fpizzi/uid:1001"
+    },
+    "schema_version": 1,
+    "id": "w-32ec0b728851684bad4cbf71",
+    "revision": 16,
+    "title": "ROOT-PRIVATE-TITLE",
+    "objective": "ROOT-PRIVATE-OBJECTIVE",
+    "scope": "ROOT-PRIVATE-BRIEF",
+    "criteria": [
+      "OWN-REQUIREMENT"
+    ],
+    "next": "",
+    "summary": "",
+    "memory": null,
+    "created": "2026-10-24T11:06:55.993670174Z",
+    "updated": "2026-10-24T11:07:05.81098671Z",
+    "git": {
+      "head": "",
+      "branch": "",
+      "changes": ""
+    },
+    "tasks": [
+      {
+        "scope_id": "child",
+        "requirements": [
+          "req-1"
+        ],
+        "validation_policy": {
+          "mode": "automatic",
+          "controls": [
+            {
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "check-ccc6d5834ae3a4e245f553b7",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Check actual owned fixture handoff input digest",
+              "timeout_seconds": 60
+            }
+          ],
+          "authorized_at": "2026-10-24T11:06:56.741732777Z",
+          "actor": "autorisation initiale de la mission"
+        },
+        "plan_checks": {
+          "check-ccc6d5834ae3a4e245f553b7": "delivery"
+        },
+        "plan_role": "worker",
+        "plan_max_attempts": 2,
+        "id": "task",
+        "title": "OWN-TASK",
+        "owner": "fixture",
+        "deliverable": "handoff.md",
+        "criteria": [
+          "OWN-REQUIREMENT"
+        ],
+        "depends": null,
+        "status": "blocked",
+        "blocker": "Processus terminé ; handoff, preuves et validation requis",
+        "next": "Examiner les preuves puis reprendre explicitement",
+        "attempts": [
+          {
+            "id": "a-ac5fb830e83f38ab967e6681",
+            "status": "completed",
+            "started": "2026-10-24T11:06:59.603195377Z",
+            "ended": "2026-10-24T11:07:01.427057187Z"
+          }
+        ]
+      },
+      {
+        "scope_id": "child",
+        "requirements": [
+          "req-1"
+        ],
+        "validation_policy": {
+          "mode": "automatic",
+          "controls": [
+            {
+              "inputs": [
+                "handoff.md"
+              ],
+              "id": "check-ccc6d5834ae3a4e245f553b7",
+              "command": [
+                "python3",
+                "-c",
+                "from pathlib import Path; import re; text=Path('handoff.md').read_text(); assert re.search(r'Input SHA256: [0-9a-f]{64}',text)"
+              ],
+              "criteria": [
+                1
+              ],
+              "justification": "Check actual owned fixture handoff input digest",
+              "timeout_seconds": 60
+            }
+          ],
+          "authorized_at": "2026-10-24T11:06:56.741732777Z",
+          "actor": "autorisation initiale de la mission"
+        },
+        "plan_checks": {
+          "check-ccc6d5834ae3a4e245f553b7": "delivery"
+        },
+        "plan_role": "worker",
+        "plan_max_attempts": 2,
+        "id": "task-2",
+        "title": "SECOND-OWN-TASK",
+        "owner": "fixture",
+        "deliverable": "second/handoff.md",
+        "criteria": [
+          "OWN-REQUIREMENT"
+        ],
+        "depends": null,
+        "status": "blocked",
+        "blocker": "Processus terminé ; handoff, preuves et validation requis",
+        "next": "Examiner les preuves puis reprendre explicitement",
+        "attempts": [
+          {
+            "id": "a-6068d77af8d269c73899e0f1",
+            "status": "completed",
+            "started": "2026-10-24T11:07:04.244335183Z",
+            "ended": "2026-10-24T11:07:05.812241818Z"
+          }
+        ]
+      }
+    ]
+  }
+}

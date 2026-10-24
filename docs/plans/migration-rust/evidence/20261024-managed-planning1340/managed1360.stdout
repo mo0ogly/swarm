@@ -1,0 +1,8 @@
+
+running 3 tests
+test managed_repository::tests::directories_pin_inodes_and_refuse_symlink_children ... ok
+test managed_repository::tests::repository_rename_never_replaces_a_prior_target ... ok
+test managed_repository::tests::manifest_empty_list_matches_omission_without_rewriting_original_bytes ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 454 filtered out; finished in 0.00s
+

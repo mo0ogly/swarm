@@ -375,10 +375,16 @@ fn verified_with_funding(
     // The immutable input hash alone does not establish current task contracts.
     // Compare the same complete owned projection used to build initial context;
     // unrelated events/revisions can advance without rewriting the delivered batch.
+    // Managed candidate metadata is compared too, and its original objects are
+    // reobserved before permission; this never grants a managed worker launch.
+    #[cfg(target_os="linux")]
+    if w.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+        crate::managed_repository::observe(root,&w,settings)?;
+    }
     let current_contract =
         serde_json::to_value(crate::planning_scope_context::contract(&w, scope)?)
             .map_err(|e| E::caused("planning-call-contract-encoding", e))?;
-    for key in ["work", "scope", "requirements", "tasks", "judge"] {
+    for key in ["work", "scope", "requirements", "tasks", "judge", "repository"] {
         if value.get(key) != current_contract.get(key) {
             return Err(E::Refused("planning-call-scope-contract-changed"));
         }
