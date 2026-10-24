@@ -8610,3 +8610,12 @@ numeric lexemes. Retained HTML capture counterexample, codec test and public CLI
 journey cover this fix; older incomplete receipts are not automatically repaired.
 Reading history does not require another capability’s calculated mission status;
 observe that status on its relevant view and keep any refusal visible.
+
+Slice1474 connects the existing typed transcript to Logs through an explicit
+Work/agent-bound Root read, retaining capture flags and omitting content.
+Independent Live files stay untouched. Contract/diagram: RUNTIME-RECOVERY; proof: plan.
+
+Lesson1474: check actual emitted keys, including nulls and required flags.
+An omitted Option does not satisfy a DTO promising null. Stored receipt failures
+belong to server reads, not client input; follow actual error types through HTTP
+classification. A missing historical receipt never justifies invented provenance.

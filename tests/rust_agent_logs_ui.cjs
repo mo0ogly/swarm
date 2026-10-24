@@ -17,6 +17,7 @@ function check(name,value){assert(value,name);assert(!checks.includes(name),'dup
   await page.select('#log-agent','session');await page.waitForFunction(()=>!document.querySelector('#logs').hasAttribute('aria-busy')&&!document.querySelector('#log-prev').disabled);
   const expected=cfg.latest.rows.map(r=>'#'+r.seq+' '+r.at+' ['+r.kind+'] '+r.message).join('\n');
   check(label+'-exact-latest-CLI-text',await page.$eval('#log-lines',(e,v)=>e.textContent===v,expected));check(label+'-literal-reader-no-markup',await page.$eval('#log-lines',e=>!e.querySelector('*')));
+  await require('./rust_agent_transcript_flow.cjs')({page,cfg,label,check});
   await page.focus('#log-lines');check(label+'-keyboard-named-focus',await page.$eval('#log-lines',e=>e===document.activeElement&&!!e.getAttribute('aria-label')));
   check(label+'-no-automatic-live',await page.$eval('#log-live',e=>e.disabled&&e.getAttribute('aria-pressed')==='false'));
   await page.type('#log-search','Processus récolté');check(label+'-filter-loaded-page',await page.$eval('#log-lines',e=>e.textContent.includes('Processus récolté')&&!e.textContent.includes('Départ autorisé')));

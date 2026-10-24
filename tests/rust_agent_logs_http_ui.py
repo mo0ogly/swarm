@@ -19,8 +19,9 @@ def main():
     binary=Path(a.binary).resolve();out=Path(a.output).resolve();out.mkdir(parents=True,exist_ok=False)
     owned=fixture.Fixture(binary,out,'logs-web')
     program=fixture.PROGRAM.replace("print(json.dumps({'type':'result'", "for i in range(230):\n    print(json.dumps({'type':'assistant','message':{'model':model,'content':[{'type':'text','text':'log witness '+str(i)+' <b>literal</b>'}]}}),flush=True)\nprint(json.dumps({'type':'result'")
+    program=program.replace("'model':model,'content'","'model':model,'usage':{'input_tokens':3,'output_tokens':2},'content'",1)
     fixture.publish(owned.root/'codex',program.encode());os.chmod(owned.root/'codex',0o700)
-    prepared=owned.prepare();owned.run_and_assert(prepared)
+    prepared=owned.prepare()
     other=owned.ok(['work','create'],dict(schema_version=1,event_id='empty-work',expected_revision=0,title='Empty log mission',objective='Read only',scope='Owned fixture',criteria=['No agents']))['work']['id']
     def stored_agent():
         """Read exact persisted body/status/desired through a read-only connection.
@@ -40,6 +41,9 @@ def main():
         assert value,name
         checks.append(name);print('PASS logs-http-'+name,flush=True)
     try:
+        import rust_agent_transcript_http
+        rust_agent_transcript_http.before_execution(server,owned.work)
+        owned.run_and_assert(prepared)
         before=owned.ok(['work','show',owned.work]);agent_before=owned.ok(['agent','show','session']);agent_bytes=stored_agent();budget=server.request('/api/v1/work-budget?work='+owned.work,observe=False)
         base='/api/v1/agent-logs?work='+owned.work+'&agent=session&after='
         pages={}
@@ -64,7 +68,8 @@ def main():
                 check(method+'-body-contract',response.status==expected and (raw==b'' if method=='HEAD' else json.loads(raw)['failure']['code']=='agent-logs-query-invalid'))
             finally:connection.close()
         check('read-after-refusals',server.request(base+'0',observe=False)==pages['0'])
-        config=dict(address=server.address,key=server.key,root=str(owned.root),output=str(out),work=owned.work,other=other,first=pages['-1'],latest=pages['0'])
+        transcript=rust_agent_transcript_http.verify(server,owned.work,other,csrf)
+        config=dict(transcript=transcript,address=server.address,key=server.key,root=str(owned.root),output=str(out),work=owned.work,other=other,first=pages['-1'],latest=pages['0'])
         with (out/'browser.stdout').open('xb') as stdout,(out/'browser.stderr').open('xb') as stderr:
             result=subprocess.run(['node','tests/rust_agent_logs_ui.cjs'],input=json.dumps(config).encode(),stdout=stdout,stderr=stderr)
         assert result.returncode==0,('logs-browser-failed',str(out/'browser.stderr'))

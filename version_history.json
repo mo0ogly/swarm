@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Journaux : transcript typé consultable sur demande dans un accordéon, sans contenu des messages ni des outils. Captures absentes, vides, partielles et erreurs sont distinguées ; un changement de source ignore les réponses retardées.",
+        "en": "Logs: typed transcript available on request in a disclosure, without message or tool content. Missing, empty and partial captures remain distinct from errors; source changes discard delayed replies."
+      },
+      {
         "fr": "Journaux : lecteur existant raccordé aux pages historiques Rust des agents, choix explicite de la source, début/suite, filtres locaux et export des lignes visibles. Aucun suivi automatique ni droit d’exécution déduit. Correction de la sauvegarde des reçus d’exécution contenant des caractères HTML, avec comparaison stricte conservée.",
         "en": "Logs: existing reader connected to Rust agent history pages, explicit source selection, first/next pages, local filters and export of visible rows. No automatic following or inferred execution rights. Execution receipts containing HTML characters now use their persisted wire spelling while retaining strict readback."
       },

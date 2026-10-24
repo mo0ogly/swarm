@@ -17,6 +17,7 @@ mod cockpit_read;
 mod work_budget;
 mod work_resume;
 mod agent_logs;
+mod agent_transcript;
 mod pricing;
 #[cfg(target_os = "linux")]
 mod admin_budget;
@@ -734,6 +735,7 @@ impl NativeHttpService {
             "/api/v1/pricing/estimate" => self.pricing_route(pricing::PricingOperation::Estimate, request),
             "/api/v1/work-resume" => self.work_resume(work_resume::Operation::Calculated, request),
             "/api/v1/work-recorded-resume" => self.work_resume(work_resume::Operation::Recorded, request),
+            "/api/v1/agent-transcript" => self.agent_transcript(request),
             "/api/v1/agent-logs" => self.agent_logs(request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
             "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),

@@ -11,6 +11,23 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## État livré1474 — transcript typé raccordé à Journaux, dev43
+Accordéon existant du lecteur : agent explicite → bouton → métadonnées dérivées
+par typed_transcript, sans contenu assistant/outils, identité ou activité déduites.
+Absence, capture vide, partielle, erreur et reprise distinctes ; réponses tardives
+ignorées. Aucun fichier Live de Claude modifié, aucun terminal ou polling activé.
+404assertions cockpit +95journaux dont35transcript,22HTTP logs/14transcript PASS ;
+3tests unitaires ciblés PASS. Recette unique finale/intégrité VERIFIED. Profil
+normal sans fixture, binaire réel=candidatdev43,46assets/notesFR-EN comparés.
+Lecture réelle40assertions et Version14 PASS ; agents historiques échantillonnés
+sans reçu natif : absence explicitement affichée. Disponible prouvé sur fixture
+Rust234événements, pas inventé sur données anciennes. Missions suspendues/budgets
+inchangés. GLM1appel complet3662tokens déclarés, pas de retry ni gain chiffré.
+Owner Codex ; restent1472-BATCH/STATUS, branche terminale status et qualification
+des sources legacy de transcript. Aucun commit/push ou acceptation globale.
+Preuves : [résultat](evidence/20261024-transcript1474/result.json),
+[replan et suite legacy](evidence/20261024-transcript1474/INCIDENTS.json).
+
 ## État livré1473 — Journaux historiques raccordés, dev42
 Parcours existant mission → Journaux → agent explicite → pages CLI Rust, filtres
 sur page et export NDJSON visible. Journaux ne demande pas status ; une autre

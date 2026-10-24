@@ -1871,3 +1871,23 @@ ce refus explicite, sans le masquer comme succès. Lectures installées par
 `tests/rust_installed_agent_logs_read.cjs`, cookie/messages uniquement stdin privé,
 preuves limitées à comptes/empreintes sans texte des journaux réels.
 Preuves : evidence/20261024-logs1473 ; historique d’échecs et avis GLM conservés.
+
+### Transcript typé1474
+Recette `existing-cockpit-rust.json`, même binaire identifié, entrées figées.
+`tests/rust_agent_transcript_http.py` vérifie l’agent queued sans reçu avant
+l’exécution publique locale inerte, puis les234événements typés (231messages
+masqués,1appel avec tokens déclarés, début/result) après capture230sorties.
+`tests/rust_agent_transcript_flow.cjs` ajoute35assertions au lecteur existant :
+lecture explicite, omission du contenu, vide/absent/partiel/malformed/reprise et
+réponse tardive réellement consommée après changement de source. Variantes
+malformed/partielles navigateur sont des injections client déclarées, pas des
+corruptions SQL de données réelles. Les erreurs de reçu stocké sont vérifiées
+par le helper Rust de décodage et sa vraie classification HTTP500.
+Commandes unitaires : `cargo test --manifest-path rust/Cargo.toml --offline
+--locked -p swarm-web --lib service::agent_transcript::tests -- --nocapture`
+et `cargo test --manifest-path rust/Cargo.toml --offline --locked -p swarm-engine
+--lib agent_transcript::tests -- --nocapture`. Profil test distinct du produit,
+sans watchdog global. Les40assertions installées couvrent les journaux réels et
+l’absence explicite de reçu sur2agents historiques (4cas Work/langue), pas une
+lecture disponible sur ces anciens agents. Aucun texte réel retenu dans preuves.
+Preuves : evidence/20261024-transcript1474 ; échec compilation original conservé.

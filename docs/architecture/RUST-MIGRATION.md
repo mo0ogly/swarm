@@ -9094,3 +9094,13 @@ ou lexèmes numériques. Contre-exemple capture HTML, test codec et parcours CLI
 retenus au lot1473 ; anciens reçus incomplets ne sont pas automatiquement réparés.
 La lecture de journaux n’exige pas un statut calculé d’une autre capacité ;
 observer ce dernier seulement sur la vue concernée, garder son refus visible.
+
+Lot1474 : transcript typé existant raccordé à Journaux par lecture explicite
+Work/agent liée au Root ; flags de capture conservés, contenu masqué. Fichiers Live
+indépendants inchangés. Contrat et schéma dans RUNTIME-RECOVERY, preuves au plan.
+
+Apprentissage1474 : vérifier les clés réellement émises, y compris les nulls et
+indicateurs requis. Une Option sérialisée avec omission ne satisfait pas un DTO
+qui promet null. Les erreurs d’un reçu stocké appartiennent à la lecture serveur,
+pas à l’entrée du client ; suivre leur type réel jusqu’au statut HTTP. L’absence
+de reçu historique ne justifie aucune reconstruction fictive de provenance.

@@ -302,3 +302,58 @@ de l’agent ; la capture des sorties du programme et le transcript sont distinc
 et ne sont pas exposés par cette route. La page Journaux ne demande pas le
 statut calculé de la mission. Ouvrir une autre vue le demande normalement et
 conserve ses refus, notamment les branches terminales encore non portées.
+
+## Transcript typé depuis Journaux — Rust
+
+Après le choix d’un agent, ouvrir **Transcript typé — contenu masqué** puis
+**Lire le transcript typé**. Le lecteur réutilise `typed_transcript`, déjà utilisé
+par Live, sans modifier cette interface indépendante. Il affiche les types
+d’événements, noms/identifiants d’outils, nombres d’octets omis et tokens déclarés.
+Aucun message d’assistant, prompt, entrée/sortie d’outil ou capture brute n’est
+renvoyé. Les métadonnées d’identifiants restent des données enregistrées, pas
+une authentification, une preuve d’activité ou une autorisation. Le format
+Claude/Codex vient de la forme des événements, pas du nom du fournisseur configuré.
+
+`GET /api/v1/agent-transcript?work=ID&agent=ID` (HEAD aussi) exige les deux clés
+uniques, identifiants sûrs et corps vide. Session, Host, capacité et descripteur
+du Root restent contrôlés ; l’agent doit appartenir à la mission explicite.
+DTO : `schema_version:1`, `observation:recorded`, `work_id`, `agent_id`,
+`recorded_status`, `state`, `reason`, `capture_truncated`, `capture_invalid_utf8`,
+`output_complete`, `transcript`. Un reçu absent (`receipt-absent`) ou une capture
+non retenue (`capture-not-retained`) donne `unavailable`, transcript/indicateurs
+explicitement null. Une capture vide valide donne `available` avec zéro événement.
+
+Le reçu native_execution_result v1 exige ses indicateurs réels ; absence, mauvais
+type, doublon connu ou version non prise en charge restent des erreurs serveur,
+jamais des valeurs false implicites. Les requêtes invalides restent HTTP400,
+méthode405, accès refusé403. Lecture/encodage/fermeture conservent leurs causes.
+Une capture tronquée, UTF8 remplacé, sortie incomplète ou flux JSON tronqué
+affiche un avertissement de lecture partielle. Les notes du parseur existant
+conservent les événements inconnus/queues non JSON ; elles ne prouvent pas que
+tout le flux était reconnu. Aucune borne d’exécution ni rétention n’est ajoutée :
+la capture existante reste soumise à sa politique Admin `agent_capture_max_bytes`.
+
+Lecture uniquement sur bouton, sans polling, visite, lancement ou modification
+Work/agent/budget. Le contenu est littéral, défilant et accessible au clavier.
+Changer de mission/source efface le transcript et invalide les réponses en vol.
+Erreur et absence ne réutilisent jamais le contenu précédent ; le bouton permet
+une reprise explicite. Cette projection ne fournit pas le terminal interactif
+ni l’export des contenus masqués. Le journal de cycle de vie conserve son propre
+lecteur/curseur/export, indépendant du transcript.
+
+```mermaid
+sequenceDiagram
+ participant U as Utilisateur
+ participant J as Journaux existants
+ participant H as HTTP Rust protégé
+ participant R as RootStore lecture
+ participant T as typed_transcript existant
+ U->>J: Choisir agent puis Lire transcript
+ J->>H: GET agent-transcript (work, agent)
+ H->>R: Liaison Root et association Work/agent
+ R-->>H: Reçu de capture enregistré ou absence
+ H->>T: Flux retenu et indicateurs réels
+ T-->>H: Métadonnées seulement
+ H-->>J: Observation / absence / erreur
+ J-->>U: Texte littéral et avertissement si partiel
+```

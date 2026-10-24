@@ -277,3 +277,55 @@ Returned pages contain historical agent lifecycle/command records; program
 output capture and transcripts are separate and are not exposed by this route.
 The Logs page does not request calculated mission status. Opening another view
 requests it normally and preserves refusals, including unported terminal branches.
+
+## Typed transcript from Logs — Rust
+
+Select an agent, open **Typed transcript — content hidden**, then **Read typed
+transcript**. This reuses `typed_transcript`, already consumed by Live, without
+modifying that independent interface. It shows event kinds, tool names/IDs, byte
+lengths of omitted content and declared tokens. No assistant text, prompt, tool
+input/output or raw capture is returned. Recorded identifiers establish neither
+authenticated identity, liveness nor authority. Claude/Codex format is inferred
+from event shapes, not the configured provider name.
+
+`GET /api/v1/agent-transcript?work=ID&agent=ID` (also HEAD) requires both keys
+exactly once, safe IDs and an empty body. Session, Host, capacity and owned Root
+binding remain checked; the agent must belong to the explicit Work. DTO fields:
+`schema_version:1`, `observation:recorded`, `work_id`, `agent_id`, `recorded_status`,
+`state`, `reason`, `capture_truncated`, `capture_invalid_utf8`, `output_complete`,
+`transcript`. Missing receipt (`receipt-absent`) or missing capture
+(`capture-not-retained`) yields `unavailable` with explicit null transcript/flags.
+A valid empty capture yields `available` with zero events.
+
+The v1 native_execution_result receipt requires its actual completeness flags.
+Missing/wrong-type/duplicate known fields or unsupported versions stay server
+errors, never implicit false defaults. Invalid requests remain HTTP400, methods405
+and denied access403. Read/encode/close causes survive. Retention truncation,
+replaced UTF8, incomplete output or truncated JSON produce a partial-read warning.
+The existing parser’s notes retain unknown events/non-JSON tails; they do not
+establish that all input was understood. No execution/retention bound is added;
+the existing capture remains subject to Admin `agent_capture_max_bytes`.
+
+Only an explicit click reads metadata: no polling, visit, launch or Work/agent/
+budget mutation. Text is literal, scrollable and keyboard accessible. Mission/
+source changes clear it and invalidate in-flight replies. Missing/error states
+never retain prior content; the button allows explicit recovery. This projection
+does not expose the interactive terminal or export hidden content. Lifecycle logs
+keep their separate reader, cursor and export.
+
+```mermaid
+sequenceDiagram
+ participant U as User
+ participant J as Existing Logs
+ participant H as Protected Rust HTTP
+ participant R as Read-only RootStore
+ participant T as Existing typed_transcript
+ U->>J: Choose agent then Read transcript
+ J->>H: GET agent-transcript (work, agent)
+ H->>R: Root binding and Work/agent association
+ R-->>H: Recorded capture receipt or absence
+ H->>T: Retained stream and actual flags
+ T-->>H: Metadata only
+ H-->>J: Observation / absence / failure
+ J-->>U: Literal text and partial warning
+```

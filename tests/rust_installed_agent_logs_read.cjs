@@ -1,7 +1,8 @@
 'use strict';
 /** Read-only installed Journaux checks. Cookie and actual log samples arrive
  * only on private stdin, are never printed or persisted. Retain digests/counts,
- * not raw messages. No POST/provider/export/download or global watchdog. */
+ * not raw messages. Optional transcript samples check real absence or metadata
+ * counts, no capture content retained. No POST/provider/export/download/watchdog. */
 const fs=require('node:fs'),assert=require('node:assert/strict'),crypto=require('node:crypto'),puppeteer=require('puppeteer');
 const cfg=JSON.parse(fs.readFileSync(0,'utf8')),checks=[],observations=[],errors=[],failed=[],httpErrors=[],writes=[];let browser;
 /** Unique assertions describe installed behavior, not observations/digests. */
@@ -14,6 +15,14 @@ function check(name,value){assert(value,name);assert(!checks.includes(name),'dup
   await page.select('#log-agent',sample.agent_id);await page.waitForFunction(()=>!document.querySelector('#logs').hasAttribute('aria-busy')&&!document.querySelector('#log-prev').disabled);
   const text=await page.$eval('#log-lines',e=>e.textContent),expected=sample.rows.map(r=>'#'+r.seq+' '+r.at+' ['+r.kind+'] '+r.message).join('\n');
   check(label+'-exact-installed-history',text===expected);check(label+'-literal-text',await page.$eval('#log-lines',e=>!e.querySelector('*')));await page.focus('#log-lines');check(label+'-keyboard-focus',await page.$eval('#log-lines',e=>e===document.activeElement&&!!e.getAttribute('aria-label')));check(label+'-live-disabled',await page.$eval('#log-live',e=>e.disabled));
+  if(sample.transcript){
+   await page.$eval('#native-agent-transcript',e=>e.open=true);check(label+'-transcript-explicitly-empty-before-read',await page.$eval('#native-transcript-text',e=>e.textContent===''));
+   await page.click('#native-transcript-read');await page.waitForFunction(()=>!document.querySelector('#native-agent-transcript').hasAttribute('aria-busy')&&!document.querySelector('#native-transcript-read').disabled);
+   const actual=await page.$eval('#native-transcript-text',e=>e.textContent),status=await page.$eval('#native-transcript-status',e=>e.textContent);
+   if(sample.transcript.state==='unavailable')check(label+'-transcript-actual-absence',actual===''&&status.includes(sample.language==='en'?'No transcript retained':'Aucun transcript retenu'));
+   else check(label+'-transcript-actual-event-count',actual.split('\n').filter(Boolean).length===sample.transcript.transcript.entries.length);
+   check(label+'-transcript-no-markup',await page.$eval('#native-transcript-text',e=>!e.querySelector('*')));await page.focus('#native-transcript-text');check(label+'-transcript-keyboard',await page.$eval('#native-transcript-text',e=>e===document.activeElement&&!!e.getAttribute('aria-label')));
+  }
   observations.push({work_id:sample.work_id,language:sample.language,rows:sample.rows.length,text_sha256:crypto.createHash('sha256').update(text).digest('hex')});await context.close();
  }
  check('no-read-HTTP-errors',httpErrors.length===0);check('no-browser-errors',errors.length===0);check('no-failed-requests',failed.length===0);check('no-writes',writes.length===0);fs.writeFileSync(cfg.result,JSON.stringify({status:'PASS',checks,observations,errors,failed,httpErrors,writes},null,2));console.log('INSTALLED_AGENT_LOGS_PASS '+checks.length+' assertions');
