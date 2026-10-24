@@ -1,0 +1,25 @@
+{
+  "role": "Bounded Rust resume route proposal, no tools/repository/acceptance authority",
+  "result": {
+    "usable_response": true,
+    "requested_model": "glm-5.2",
+    "started_at_unix": 1792866531.0790098,
+    "automatic_retries": 0,
+    "reported_model": "glm-5.2",
+    "usage": {
+      "completion_tokens": 1517,
+      "prompt_tokens": 1346,
+      "total_tokens": 2863,
+      "completion_tokens_details": {
+        "reasoning_tokens": 84,
+        "text_tokens": 1433
+      }
+    },
+    "finish_reason": "stop",
+    "elapsed_seconds": 7.082
+  },
+  "integration": "Principal reused route/query/closure structure, replaced invented helper/enum and bool is_some, added GET-body refusal and real encode_model/WorkViewLanguage. Implemented UI, typed501, separate recorded reader, tests and docs directly.",
+  "model": "GLM5.3 per user, requested/reported API glm-5.2 not backend attestation",
+  "token_economy": "2863 measured declared tokens for a targeted context. No comparative saving established against a different task.",
+  "automatic_retry": false
+}

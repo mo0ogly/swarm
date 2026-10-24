@@ -6,7 +6,7 @@
  * commands and automatic visit writes stay unavailable, visibly, in this profile. */
 (()=>{
  const $=id=>document.getElementById(id),tr=s=>globalThis.SwarmI18n?.t(s)??s;
- let works=[],selected='',generation=0,current=null,budgetEditor=null;const views=new Set([...document.querySelectorAll('#tabs [data-view]')].map(b=>b.dataset.view));
+ let works=[],selected='',generation=0,current=null,budgetEditor=null,resumePanel=null;const views=new Set([...document.querySelectorAll('#tabs [data-view]')].map(b=>b.dataset.view));
  /** Only safe error families reach the UI; original causes remain on rejection.
   * A transport/JSON/HTTP failure never becomes an empty successful document. */
  function failure(code,cause){const error=new Error(code,{cause});error.code=code;return error}
@@ -23,7 +23,7 @@
  /** Reuse original sections/navigation. Unconnected sections remain reachable,
   * with visible limitations and disabled commands, never silently empty success. */
  function showView(name,focus=false){if(!views.has(name))name='conduite';for(const section of document.querySelectorAll('.view'))section.hidden=section.id!==name;for(const button of document.querySelectorAll('#tabs [data-view]')){if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')}
-  $('assistant').hidden=true;globalThis.SwarmShell?.navigate(name);const u=new URL(location.href);u.searchParams.set('view',name);history.replaceState(null,'',u);if(focus)$('main-content').focus();if(name==='manage')renderManager();
+  $('assistant').hidden=true;globalThis.SwarmShell?.navigate(name);const u=new URL(location.href);u.searchParams.set('view',name);history.replaceState(null,'',u);if(focus)$('main-content').focus();if(name==='manage')renderManager();if(name==='resume')resumePanel?.refresh();
  }
  /** Filter the original mission manager with actual Work rows. No lifecycle
   * state is inferred from this list, so only the all-missions filter is enabled. */
@@ -31,10 +31,11 @@
   for(const work of shown){const button=document.createElement('button');button.type='button';button.textContent=work.title+' · '+work.id;button.addEventListener('click',()=>{$('work').value=work.id;select(work.id);showView('conduite',true)});list.append(button)}
   $('manage-status').textContent=tr(shown.length?'Choisissez une mission pour consulter ses tâches.':'Aucune mission ne correspond à votre recherche.');
  }
- /** Read two independent observations for an explicit selected Work. A generation
+ /** Read mission/control/panel observations for an explicit Work, and notify the
+  * separately observed lazy resume panel. A generation
   * prevents delayed responses replacing newer selection. Errors are visible and
   * data is read-only; controls do not establish conductor/process liveness. */
- async function select(id){const ticket=++generation;selected=id;const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
+ async function select(id){const ticket=++generation;selected=id;resumePanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
   if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan','graph'])$(id).replaceChildren();$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
   $('title').textContent=work.title;$('objective').textContent=work.objective;$('connection').textContent=tr('Lecture de la mission…');$('main-content').setAttribute('aria-busy','true');
   // Clear the previous mission before starting a potentially failing read.
@@ -66,7 +67,7 @@
   * an HTTP request, records a visit, mutates a mission or starts an agent. */
  function setup(){for(const section of document.querySelectorAll('.view')){
    for(const control of section.querySelectorAll('button,input,select,textarea'))control.disabled=true;
-   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
+   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
   $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=false;
@@ -74,6 +75,7 @@
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link)continue;const target=new URL(a.href);if(target.pathname!=='/'){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
   $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin')});
+  resumePanel=SwarmNativeResume.mount();
   SwarmNativePricing.enable();
   SwarmCockpitQuotas.mount({opener:$('quotas-open'),selectedWork:()=>selected});
   budgetEditor=SwarmNativeWorkBudget.mount({reload:async()=>{if(!await load())throw Error('web-native-budget-cockpit-refresh-failed')}});

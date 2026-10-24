@@ -15,6 +15,7 @@ mod planning;
 mod mission;
 mod cockpit_read;
 mod work_budget;
+mod work_resume;
 mod pricing;
 #[cfg(target_os = "linux")]
 mod admin_budget;
@@ -274,6 +275,7 @@ impl HttpServiceError {
                 "budget-invalid" if matches!(*operation,"budget-input"|"budget-apply")
                     && matches!(cause.as_ref(),RootStoreError::Mutation(swarm_engine::WorkEngineError::Budget(
                         swarm_engine::BudgetError::Decode(_) | swarm_engine::BudgetError::Date(_) | swarm_engine::BudgetError::Refused(_)))) => StatusCode::BAD_REQUEST,
+                "command_not_ported" if *operation == "resume-read" && matches!(cause.as_ref(), RootStoreError::Projection(_)) => StatusCode::NOT_IMPLEMENTED,
                 "pricing-version-unknown" if *operation == "pricing-quote" => StatusCode::NOT_FOUND,
                 _ if matches!(*operation,"pricing-input" | "pricing-quote-input" | "pricing-quote")
                     && matches!(cause.as_ref(), RootStoreError::Pricing(swarm_engine::PricingError::Decode(_) | swarm_engine::PricingError::Date(_) | swarm_engine::PricingError::Refused(_))) => StatusCode::BAD_REQUEST,
@@ -729,6 +731,8 @@ impl NativeHttpService {
             "/api/v1/mission" => self.mission(request),
             "/api/v1/pricing" => self.pricing_route(if request.method() == Method::POST { pricing::PricingOperation::Save } else { pricing::PricingOperation::Show }, request),
             "/api/v1/pricing/estimate" => self.pricing_route(pricing::PricingOperation::Estimate, request),
+            "/api/v1/work-resume" => self.work_resume(work_resume::Operation::Calculated, request),
+            "/api/v1/work-recorded-resume" => self.work_resume(work_resume::Operation::Recorded, request),
             "/api/v1/cockpit-read" => self.cockpit_read(request),
             "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),
             "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),

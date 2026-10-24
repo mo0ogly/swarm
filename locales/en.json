@@ -5427,5 +5427,11 @@
   "Budget et plafonds sont réglables ici. Les autres commandes restent à raccorder.": "Budget and quotas can be edited here. Other commands remain to connect.",
   "Appliquer": "Apply",
   "Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.": "Budget, quotas and prices can be edited here. Other commands remain to connect.",
-  "Sources locales non examinées par cette vue.": "Local sources have not been examined by this view."
+  "Sources locales non examinées par cette vue.": "Local sources have not been examined by this view.",
+  "Résumé actuel du moteur. Aucune comparaison de visites ni décision n’est enregistrée ici.": "Current engine summary. No visit comparison or decision is recorded here.",
+  "Résumé calculé depuis les données enregistrées.": "Summary calculated from recorded data.",
+  "Résumé disponible en ouvrant cette page.": "Open this page to read the summary.",
+  "Lire uniquement les données enregistrées": "Read recorded data only",
+  "Données enregistrées uniquement — validation non recalculée.": "Recorded data only — validation has not been recalculated.",
+  "Résumé calculé indisponible pour ce contrat. La lecture des données enregistrées ne recalcule pas la validation.": "Calculated summary is unavailable for this contract. Reading recorded data does not recalculate validation."
 }

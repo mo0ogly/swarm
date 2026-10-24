@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Reprendre le travail : résumé Rust calculé à la demande dans la page existante, en français ou anglais, sans publier de fichier ni marquer une visite. Les réponses tardives ne remplacent pas la mission sélectionnée. Si le calcul est non porté, lecture séparée des données enregistrées sur demande, avec avertissement explicite.",
+        "en": "Resume work: Rust summary calculated on demand in the existing page, in French or English, without publishing a file or marking a visit. Late responses cannot replace the selected mission. When calculation is unported, recorded data can be read through a separate explicit gesture with a visible warning."
+      },
+      {
         "fr": "Version et nouveautés : le dialogue existant affiche le binaire Rust actif, sa base Git et ses modifications non commitées, avec notes FR/EN ; aucune comparaison de sources ou du CLI n’est supposée.",
         "en": "Version and news: the existing dialog shows the active Rust binary, its Git base and uncommitted changes, with FR/EN notes; no source or CLI comparison is assumed."
       },

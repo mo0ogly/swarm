@@ -38,6 +38,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/graph.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/graph.js"))),
         "/cockpit-native-graph.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-graph.js"))),
         "/cockpit-native-budget.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-budget.js"))),
+        "/cockpit-native-resume.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-resume.js"))),
         "/runtime-health.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/runtime-health.js"))),
         "/cockpit-native-version.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-version.js"))),
         "/pricing.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/pricing.js"))),
@@ -125,7 +126,7 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     if source.matches("</head>").count() != 1 {
         return Err(HttpServiceError::Refused("web-cockpit-template-invalid"));
     }
-    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
+    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
     source = source.replacen("</head>", scripts, 1);
     let tag = "<html lang=\"fr\" data-theme=\"etat\">";
     if source.matches(tag).count() != 1 {

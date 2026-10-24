@@ -44,6 +44,139 @@ compilation reconstruisibles peuvent être nettoyés par leurs outils. Les rappo
 bases, copies de travail en échec et historiques ne sont jamais assimilés à des
 caches. Après une écriture interrompue, examiner l’état public avant toute reprise.
 
+## Lecture impossible par le conducteur
+
+Une erreur de lecture de l’inventaire ou de l’occupation des agents interrompt
+le cycle : aucune liste partielle n’autorise un départ. Le conducteur rapporte
+la cause sur stderr à son apparition ou changement, puis la reprise du cycle
+une fois l’erreur levée ; il ne répète pas une erreur identique à chaque poll.
+Le serveur utilise ce même parcours. Un `mission watch TRAVAIL` lit seulement
+le Work ciblé : une enveloppe étrangère invalide ne bloque pas ce watch.
+Le conducteur global exige toujours un inventaire complet valide.
+
+Pour les baux qu’il possède déjà, le conducteur publie `supervision.state=error`,
+`last_error` et la prochaine vérification dans `mission status` et le snapshot
+HTTP du cockpit, si le Work ciblé reste lisible. Sinon ces lectures publiques
+retournent elles-mêmes l’erreur du Work, sans fabriquer un statut exploitable. Il ne prend aucun bail pour diagnostiquer une mission illisible
+et ne réactive pas un bail arrêté ou remplacé. Si l’échec précède toute acquisition,
+il reste dans stderr ; aucun diagnostic persistant n’est inventé. Si le stockage
+est bloqué, aucune écriture de diagnostic n’est tentée par le cycle. Si SQLite
+refuse ce diagnostic, l’erreur retournée conserve aussi cette cause ; un ancien
+état en base peut rester visible jusqu’à expiration du bail.
+
+Une erreur au message vide ou limité aux contrôles reste un échec explicite.
+Une première vérification en échec ne renseigne pas `reconciled_at`. Une
+réconciliation antérieure reste historique pendant l’erreur. À la reprise,
+`last_error` est vidé ; les transitions `cycle-error` et `cycle-recovered` sont
+ajoutées au journal de coordination dans la même transaction que le diagnostic,
+une seule fois par changement. Un refus d’écriture du journal annule ce contrôle.
+Ces traces de santé ne sont pas des actions métier du conducteur. Une reprise
+ne répare pas les données, ne réautorise aucune tâche et ne prouve pas la clôture.
+L’arrêt d’un bail retourne ses erreurs à la boucle au lieu de les absorber.
+
+```mermaid
+flowchart TD
+  R[Lecture du cycle] --> V{Lecture valide}
+  V -->|Oui| C[Réconciliation sous bail détenu]
+  V -->|Non| E[Cause transmise et cache invalidé]
+  E --> S[stderr au changement]
+  E --> B{Bail détenu et stockage disponible}
+  B -->|Oui| T[Transaction diagnostic et trace erreur]
+  B -->|Non| A[Aucune acquisition pour diagnostiquer]
+  T --> P[Prochain cycle au rythme existant]
+  P --> R
+  C --> H[Contrôle réussi et trace reprise si nécessaire]
+```
+
+Voir les [preuves et limites M31](plans/deepagents-integration/RESULTATS-MEMOIRE-27.md).
+La fiabilité de tous les autres callbacks de lecture reste à qualifier dans MEM-P1.
+
+## Fraîcheur pendant une revue ou une planification
+
+Les appels structurés de planification, revue simple, revue de candidat, lots,
+fragments et diagnostic relisent l’enveloppe Work avant leur contrôle spécifique.
+Une erreur de lecture reste une erreur avec sa cause ; elle n’est plus réduite à
+un booléen « activation révoquée ». Le lanceur vérifie avant le départ, au poll
+existant pendant l’appel et après une fin normale, avant de rendre une réponse
+exploitable. Une réponse rapide n’évite donc pas le dernier contrôle.
+
+Un contrôle absent refuse l’appel sans panic. Avant le départ, aucun processus
+n’est lancé en cas de refus. Pendant l’appel, l’arrêt utilise le même groupe de
+processus que précédemment. Une erreur de fraîcheur ne fournit aucune réponse
+exploitable au consommateur. Le lanceur remet les observations d’usage d’un processus déjà lancé
+au recorder existant ; il ne supprime ni ne rembourse réservations, activations
+ou historique. Une panne d’écriture de ce recorder n’est pas qualifiée ici. Les délais et politiques Admin existants restent applicables.
+
+Pause, remplacement de tentative ou de bail et preuves changées restent des
+refus. Pour ces cinq chemins qui consultaient déjà la pause, une valeur illisible
+est une erreur explicite ; la cause reste accessible sans exposer la valeur.
+Le début, la réservation et la finalisation des fragments ainsi que les gardes
+transactionnelles de planification utilisent le même lecteur contrôlé.
+Les erreurs Work, fichiers et fournisseur conservent leur cause au travers
+du contrôle. Un cooldown simultané ne remplace plus la cause initiale : les deux
+peuvent être conservés. La persistance métier relit encore l’état courant ; si
+le Work reste illisible, elle retourne cette erreur et ne fabrique pas un avis
+passé, une tâche acceptée ou un diagnostic exploitable.
+
+Les fonctions historiques à callback booléen sont adaptées pour compatibilité ;
+elles peuvent signaler une révocation, mais ne disposent pas d’une cause de
+lecture à transmettre. Les six consommateurs ci-dessus utilisent le contrat
+avec erreur. Ce contrôle ne crée aucun droit d’usage mémoire ou d’identité.
+
+```mermaid
+flowchart TD
+  A[Work relu et contrôle spécifique] --> B{Contrôle valide}
+  B -->|Non| R[Cause retournée sans réponse exploitable]
+  B -->|Oui| P[Processus local du fournisseur]
+  P --> C[Contrôle pendant appel]
+  C -->|Erreur| S[Arrêt du groupe et observations transmises]
+  S --> R
+  P --> F[Fin normale et usage observé]
+  F --> D[Dernier contrôle de fraîcheur]
+  D -->|Erreur| R
+  D -->|Valide| E[Réponse puis validation du consommateur]
+```
+
+Preuves et limites de cette tranche : [M32](plans/deepagents-integration/RESULTATS-MEMOIRE-28.md).
+
+## Pause illisible dans les opérations et les vues
+
+Le lecteur booléen qui ignorait les erreurs de pause est supprimé. Les opérations
+et les 19 appels concernés relisent la pause par le même lecteur contrôlé : une
+absence historique signifie non pausé ; une valeur illisible est une erreur,
+sans réparation implicite. Les transactions de lancement, modèle de responsable,
+révision de contrat, contrôle automatique, règlement et automation conservent
+leur propre validation et propagent la cause sûre. Une lecture invalide ne devient
+ni autorisation de départ, ni réussite vide, ni simple « autorisation absente ».
+
+Les snapshots CLI/HTTP refusent cette lecture plutôt que publier paused=false.
+Les vues texte montrent le diagnostic. Dans le contexte partiel de la page des
+tâches, le fait suspension_departs est omis, la donnée manquante est attribuée
+au travail dans Missing et le départ devient indisponible avec sa raison.
+Un prédicat d’éligibilité booléen peut donc refuser ; il n’est pas un lecteur SQL
+qui prétend connaître la pause. Une erreur du cycle conserve son empreinte
+précédente et rejoint son chemin de diagnostic existant.
+
+La réparation utilise l’opération publique de pause, après diagnostic. Elle ne
+rembourse pas les appels ou réservations et ne confère aucun droit supplémentaire.
+Les chemins qui ne consultaient pas la pause quand leur option était désactivée
+conservent ce contrat. Les lectures jointes d’observation noyau et le prédicat SQL
+de supervision restent à qualifier avec leurs enveloppes liées ; MEM-P1 demeure
+ouvert. L’UI courante et le serveur existant ne sont pas qualifiés par une fixture
+backend avec des ressources embarquées figées.
+
+```mermaid
+flowchart TD
+  A[Lecture de pause contrôlée] --> B{Lecture valide}
+  B -->|Oui| C[Pause réelle ou absence historique]
+  B -->|Erreur| D[Opération refusée et cause conservée]
+  B -->|Erreur| E[Vue texte avec diagnostic]
+  B -->|Erreur| F[Contexte partiel et départ indisponible]
+  G[Réparation publique après diagnostic] --> A
+```
+
+Recette, preuves et limites : [M33](plans/deepagents-integration/RESULTATS-MEMOIRE-29.md).
+
 ## Tentatives épuisées
 
 Le cockpit affiche **Mission bloquée — tentatives épuisées** lorsqu’aucune tâche
@@ -64,3 +197,46 @@ une revue absente ou en cours, ou un budget de revue épuisé ne sont pas contou
 
 Cette possibilité de reprise ne démontre pas, à elle seule, qu’une mission réelle
 aboutira. La clôture dépend de la correction effective et de ses preuves.
+
+## Résumé de reprise dans le cockpit Rust
+La page **Reprendre le travail** lit le résumé actuel calculé par le moteur pour
+la mission sélectionnée, en FR ou EN. Le texte est affiché littéralement dans le
+bloc existant. Cette lecture n’établit ni différence depuis la visite précédente,
+ni identité d’agent, ni validation nouvelle ; OODA et marquage de visite restent
+indisponibles dans ce raccord. Un résumé peut mentionner des preuves conservées
+et leur état courant sans autoriser une action ultérieure.
+GET/HEAD `/api/v1/work-resume?work=ID&lang=fr|en` exige les deux paramètres explicites,
+sans doublon/inconnu, derrière session/Host/capacité et Root lié. Le moteur utilise
+`inspect_work_view` : lecture des données, politiques, événements et observations
+fichiers/Git ; aucun fichier de vue n’est publié (contrairement à `render_work_view`).
+Les politiques Git déjà enregistrées restent applicables. Aucun appel IA, commande
+de contrôle, départ, visite ou changement de budget n’est déclenché.
+L’ouverture ou une actualisation explicite relit le texte ; la sélection d’une autre
+mission efface l’ancienne lecture. Une réponse tardive est ignorée, une erreur ou
+une réponse invalide affiche un diagnostic avec reprise explicite, sans retry/polling.
+
+```mermaid
+sequenceDiagram
+    actor U as Utilisateur
+    participant I as Page Reprendre existante
+    participant H as API Rust protégée
+    participant R as Root et preuves conservées
+    U->>I: Ouvrir ou actualiser la mission sélectionnée
+    I->>H: GET work-resume, Work et langue explicites
+    H->>R: inspect_work_view, sans publication
+    R-->>I: Révision, langue, Markdown calculé
+    Note over I: Texte littéral ; réponse ancienne ignorée après sélection
+    Note over R: Aucun fichier de vue, visite ou OODA enregistré
+```
+
+Si la projection calculée n’est pas portée (HTTP501), le refus reste visible.
+**Lire uniquement les données enregistrées** déclenche explicitement la lecture
+protégée distincte `/api/v1/work-recorded-resume`, avec les mêmes Work/langue explicites.
+Le DTO indique `observation: recorded`, et le texte précise que la validation n’a
+pas été recalculée. La garde de projection complète demeure ; aucune acceptation
+n’est déduite. La projection de revues managées en lots reste à porter. Aucun
+fallback ni retry automatique n’est déclenché.
+
+Le bloc de résumé défilant est nommé pour les lecteurs d’écran et reçoit le focus clavier explicitement ; cette propriété ne dépend pas de l’auto-focus des conteneurs du navigateur.
+
+Limite connue de migration : le statut de missions historiques peut encore refuser avec `mission-root-unavailable` enveloppant `agent-mission-provenance` / `mission-agent-binding-required`. Cette enveloppe ne prouve ni panne du stockage ni absence du rôle Root. Le résumé ne répare pas ce binding et n’autorise aucun départ ; adoption de provenance native/legacy à qualifier séparément.

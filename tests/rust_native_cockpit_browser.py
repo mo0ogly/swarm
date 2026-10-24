@@ -59,6 +59,8 @@ def main():
             server.request(path,body={},status=403,observe=False)
             assert server.request(path,observe=False)==observed
             csrf=server.request('/api/v1/native-session',observe=False)['csrf_token']
+            import rust_resume_http_contract
+            rust_resume_http_contract.verify(server,binary,root,works[0],csrf)
             import rust_pricing_http_contract
             rust_pricing_http_contract.verify(server,binary,root,works[0],csrf)
             base='/api/v1/work-budget?work='+works[0];before=server.request(base,observe=False)
@@ -89,7 +91,7 @@ def main():
         assert run.returncode==0,'Cockpit browser failed; inspect retained stderr'
         result=json.loads((browser/'result.json').read_text());assert result['status']=='PASS' and result['checks'];assert not (root/'unexpected-provider-execution').exists()
         server.process.send_signal(signal.SIGINT);server.stop_sent=True;t.join();assert not collector_errors
-        inputs=[binary,Path('tests/rust_native_cockpit_browser.py'),Path('tests/rust_native_cockpit_ui.cjs'),Path('web/native-cockpit.js'),Path('web/native-quotas.js'),Path('web/pricing.js'),Path('web/runtime-health.js'),Path('web/cockpit-native-version.js'),Path('tests/rust_existing_version_flow.cjs'),Path('web/cockpit-native-pricing.js'),Path('tests/rust_existing_pricing_flow.cjs'),Path('tests/rust_pricing_http_contract.py'),Path('web/cockpit-native-quotas.js'),Path('web/native-runtime.js'),Path('web/native-runtime.css'),Path('web/native-runtime.html'),Path('web/i18n-en.js'),Path('web/index.html'),Path('web/cockpit-native.js'),Path('web/cockpit-native-read.js'),Path('web/cockpit-native-panels.js'),Path('web/cockpit-native-budget.js'),Path('web/cockpit-native-graph.js'),Path('web/graph.js'),Path('web/lib/dagre.min.js'),Path('tests/rust_existing_cockpit_ui.cjs')]
+        inputs=[binary,Path('tests/rust_native_cockpit_browser.py'),Path('tests/rust_native_cockpit_ui.cjs'),Path('web/native-cockpit.js'),Path('web/native-quotas.js'),Path('web/pricing.js'),Path('web/runtime-health.js'),Path('web/cockpit-native-resume.js'),Path('tests/rust_existing_resume_flow.cjs'),Path('tests/rust_resume_http_contract.py'),Path('web/cockpit-native-version.js'),Path('tests/rust_existing_version_flow.cjs'),Path('web/cockpit-native-pricing.js'),Path('tests/rust_existing_pricing_flow.cjs'),Path('tests/rust_pricing_http_contract.py'),Path('web/cockpit-native-quotas.js'),Path('web/native-runtime.js'),Path('web/native-runtime.css'),Path('web/native-runtime.html'),Path('web/i18n-en.js'),Path('web/index.html'),Path('web/cockpit-native.js'),Path('web/cockpit-native-read.js'),Path('web/cockpit-native-panels.js'),Path('web/cockpit-native-budget.js'),Path('web/cockpit-native-graph.js'),Path('web/graph.js'),Path('web/lib/dagre.min.js'),Path('tests/rust_existing_cockpit_ui.cjs')]
         retained.publish(out/'result.json',dict(status='PASS',checks=result['checks'],inputs={str(n):hashlib.sha256(n.read_bytes()).hexdigest() for n in inputs},root=str(root),global_watchdog=None,provider_started=False,global_acceptance=False))
         print(('NATIVE_EXISTING_COCKPIT_PASS ' if a.existing else 'NATIVE_COCKPIT_PASS ')+str(len(result['checks']))+' named assertions',flush=True)
     except BaseException as error:primary=error

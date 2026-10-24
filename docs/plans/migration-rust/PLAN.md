@@ -11,6 +11,41 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## État livré1472 — Reprendre le travail raccordé, dev39
+Résumé calculé readonlyFR/EN (CLI identique) ; projection non portée reste501,
+lecture distincte de données enregistrées sur geste explicite, sans validation
+recalculée. Portail réel : mode enregistré ; Actions confiance : calculé. Deux
+missions suspendues/budgets inchangés.404assertions navigateur dont38reprise,
+16resumeHTTP/10tarifsHTTP +13budgetAPI/9lectureAPI,13identifiants/cachegraph PASS ;
+intégrité VERIFIED. Profil normal sans fixture, binaire=candidatdev39,45assets
+et notesFR/EN comparés.21assertions sur reprise réelle (4cas Work/langue),14dialogue
+Version réel PASS. Défaut focus reproduit puis tabindex/nom accessible vérifiés.
+GLM1appel2863tokens déclarés, aucun retry. Originaux et replans conservés.
+Restent1472-BATCH (projection des revues en lots) et1472-STATUS (provenance des
+anciens agents : mission-agent-binding-required rend status indisponible). Aucune
+garde levée, aucun binding inventé. Source de l’erreur « Root » : enveloppe de
+provenance d’agent, pas preuve d’une panne disque ou d’absence du rôle Root.
+Propriétaire Codex ; conditions de reprise ci-dessous et historical-status-open.json.
+G11/acceptation globale restent ouverts ; aucun commit/push de ce lot.
+Preuves : evidence/20261024-resume1472.
+
+## Raccord1472 — résumé de reprise avec GLM, livré
+Propriétaire Codex. Dev36 livré ; page Reprendre non raccordée, producteur Rust existe.
+Parcours : mission sélectionnée → page existante → GET explicite Work/lang →
+inspect_work_view → résumé littéral. Alternative écartée : render_work_view qui
+publie un fichier, inutile pour une lecture web. Aucun snapshot complet fabriqué.
+GLM propose route ; principal corrige helper/enum inventés et name bool, ajoute
+refus du corps GET, utilise vrai WorkViewLanguage et encode_model existants.
+Fichiers : service.rs/work_resume.rs/native_admin.rs, nouvel adapter/bootstrap,
+tests/recettes permanentes, notes/catalogue/docsFR-EN et schéma.
+Critères : MarkdownFR/EN égal CLI readonly, fichier vue/Work/événements/budget
+inchangés ; ambiguïtés/CSRF refusées, vide/malformed visibles, sélection/réponse
+retardée/reprise, FR-EN/deux thèmes/mobile. Visites/OODA restent désactivés.
+Seule la page visible déclenche le calcul ; fraîcheur/identité non déduites.
+Git utilise sa politique persistée actuelle, aucune borne locale ajoutée.
+Paquet GLM ciblé2863tokens déclarés ; réduction de contexte réalisée et mesurée,
+sans conclure à une économie comparative (tâche différente du lot1471).
+
 ## État livré1471 — Version et nouveautés raccordé, dev36
 366assertions navigateur dont45Version PASS,10tarifsHTTP +13budgetAPI/9lectureAPI,
 13identifiants/cachegraph ; intégrité VERIFIED. Profil normal sans fixture.
@@ -2633,3 +2668,50 @@ Focus : fermeture/restauration désormais synchrones sur Échap/boutons ; un év
 close retardé ne doit pas effacer un contexte rouvert. Retex : contrôler aussi
 les branchements de bord de fichier, pas seulement les méthodes extraites.
 Propriétaire Codex, nouvelle condition : source modifiée puis même recette complète.
+
+Replan1472a — preuve de concurrence : première recette PASS mais contrôle de
+réponse tardive pouvait observer le DOM avant consommation du corps JSON. Le test
+attend désormais cette consommation réelle avant son assertion ; aucune pause ou
+borne ajoutée, source produit inchangée. Propriétaire Codex ; refaire même recette
+avec ce témoin plus discriminant. Premier résultat conservé, non effacé.
+
+Replan1472b — contrôle sur données réelles : binaire servi dev37 identique au
+candidat ; assertion SHA du script défectueuse (ancienne empreinte dev36 remplacée
+par nom supposé, pas par valeur réelle). Fixer le contrôleur depuis le résultat du
+build explicitement identifié. Aucun défaut d’installation établi.
+Actions confiance : résumé calculé200/CLIreadonly0. Portail : HTTP500/CLI2,
+command_not_ported: managed-review-batch-protocol-not-ported. Cause existante :
+work_projection refuse les revues en lots managés. Ne retirer aucune garde.
+Options : port complet de la projection de revues en lots (contrat de preuves
+transversal, prochain chantier) ; lecture progressive de champs enregistrés sans
+validation (bornée, autorisée) ; erreur générique seule (pas utile au portail).
+Décision : projection complète reste refusée et classée501 par type/opération.
+Lecture séparée /work-recorded-resume seulement sur geste explicite, DTO observation
+recorded et avertissement validation non recalculée. Aucun fallback automatique,
+aucun refus converti silencieusement en succès ou acceptation. Tous Work concernés.
+Propriétaire Codex ; reste1472-BATCH : porter projection historique en lots avec
+preuve complète/fraîcheur, témoin batch valide/invalide et parité CLI avant retrait
+normal du refus. État non réalisé ; portail peut consulter ses données sans ce port.
+La suite des étapes dépendantes s’arrête désormais sur précondition échouée ; les
+originaux des deux échecs de contrôle sont conservés, pas relancés à l’identique.
+
+Replan1472c — lecture réelle calculée Actions confiance et partielle Portail
+réussies, puis contrôle clavier FAIL : pre sans tabindex explicite ne prend pas
+fiablement le focus. Original .cache/skynet-resume1472/installed-ui.stderr conservé.
+Amélioration générale : focus clavier explicite et nom accessible du bloc défilant,
+sans changer contenu ni validation. Garde ajoutée à la recette permanente, labels
+installés rendus uniques par Work/langue ; candidat suivant puis même recette et
+lecture réelle. Propriétaire Codex, clavier pas annoncé vérifié avant ces reprises.
+
+Suite1472-STATUS : lectures réelles mission status500, CLI2 sur les deux missions ;
+causes imbriquées agent-mission-provenance → mission-agent-binding-required.
+Options : fabriquer/adopter automatiquement un binding (écarté, autorité non prouvée),
+traiter honnêtement le statut legacy en lecture ou migrer par un contrat public
+explicite (à qualifier avec fixtures avant action). Source/consommateur à auditer,
+témoin natif valide et agents legacy/manuels sans binding ; préserver le refus
+d’exécution sans provenance et obtenir une observation utile sans attribution fictive.
+Ce défaut préexistant n’est pas résolu par le résumé ; lectures partielles visibles,
+missions suspendues et historique conservés pendant cette reprise. Owner Codex.
+Compteur installé relu :4empreintes étaient des observations, pas des assertions ;
+retirées du compte (25annoncées par le script initial →21assertions uniques), preuve
+initiale conservée et parcours réel rejoué. Aucun total de tests inventé au bilan.
