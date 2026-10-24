@@ -5427,5 +5427,6 @@ globalThis.SwarmEnglish = {
   "Lecture ou prévisualisation refusée. Corrigez les valeurs ou rouvrez le réglage.": "Read or preview refused. Correct the values or reopen settings.",
   "Enregistrement refusé. Fermez puis rouvrez le réglage pour relire la révision avant de réessayer.": "Save refused. Close and reopen settings to read the revision before trying again.",
   "Budget et plafonds sont réglables ici. Les autres commandes restent à raccorder.": "Budget and quotas can be edited here. Other commands remain to connect.",
-  "Appliquer": "Apply"
+  "Appliquer": "Apply",
+  "Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.": "Budget, quotas and prices can be edited here. Other commands remain to connect."
 };

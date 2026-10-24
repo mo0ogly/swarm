@@ -294,7 +294,7 @@ dialog blockquote { margin-inline: 0; padding: 12px 16px; border-inline-start: 3
 .modal-header { border-top: 0; }
 .modal-header > button { flex-shrink: 0; white-space: nowrap; }
 .modal-header,.modal-footer,dialog>header,dialog>footer { background: var(--wattson-carte); }
-#modal-fields>label { border: 0; border-left: 2px solid var(--wattson-ligne); border-radius: 0; background: transparent; }
+:is(#modal-fields,#pricing-modal-fields)>label { border: 0; border-left: 2px solid var(--wattson-ligne); border-radius: 0; background: transparent; }
 pre { border-radius: 4px; font-size: 12px; }
 /* Preparation uses the same identity and keeps the editor central. */
 .prep-header { border: 0; background: #062338; padding: 16px 28px; color: #e5edf0; }

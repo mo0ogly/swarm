@@ -1846,3 +1846,5 @@ No full Go snapshot/graph/actions parity or global acceptance implied.
 provenait d’une organisation de fixture sans contrôle ; second refus de programme
 traité avec programme déjà autorisé, sans lever de limite. Originaux, capture initiale269,
 traduction Apply et candidat final : evidence/20261024-quotas1469. Aucun fournisseur.
+
+Raccord1470 : existing-cockpit-rust inclut le catalogue tarifaire natif et les helpers permanents rust_pricing_http_contract.py/rust_existing_pricing_flow.cjs. Écritures sur Root isolé, aucune facture/appel fournisseur ; dev34 :321assertions navigateur et10HTTP tarifs PASS ; original FAIL .cache/existing-cockpit1470-first, correction PASS .cache/existing-cockpit1470-corrected, intégrité VERIFIED. Originaux/effectifs/GLM archivés dans evidence/20261024-pricing1470 ; aucune acceptation globale.

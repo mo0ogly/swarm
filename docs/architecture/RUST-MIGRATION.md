@@ -9073,3 +9073,5 @@ route moteur nouvelle. Les styles Admin locaux sont chargés pour ces dialogues.
 Prévisualisation sans écriture, apply CAS/rejeu et relecture restent ceux du moteur.
 Aucune mission réelle n’est activée/modifiée par la recette ; configuration inerte
 et planification d’un troisième Work de fixture par les opérations publiques.
+
+Raccord1470 : catalogue tarifaire natif, rendu pricing.js partagé via hooks. Trois opérations protégées réutilisent rate_catalogue/save_rate/quote ; validation avant ouverture writable, digest concurrent, métadonnées moteur, erreurs après publication conservées. Aucun nouveau plafond/default ou budget modifié. Recette permanente étendue ; livraison locale dev34 vérifiée :321assertions navigateur,10HTTP tarifs et non-régression budget/plafonds/graphe ;42assets servis et binaire comparés. Preuves1470, acceptation globale ouverte.

@@ -1,0 +1,22 @@
+{
+  "status": "DELIVERED_LOCAL_EXISTING_PRICING",
+  "version": "v0.1.1-dev.34",
+  "browser_assertions": 321,
+  "pricing_browser_assertions": 48,
+  "pricing_HTTP_assertions": 10,
+  "budget_API_checks": 13,
+  "read_API_checks": 9,
+  "graph_identifier_assertions": 13,
+  "recipe_integrity": "VERIFIED",
+  "archive_sha256": "33e545119bfa987c2be54763eb849deb6d7a288d3154ffa8319acefc1424b3b0",
+  "GLM_calls": 1,
+  "declared_GLM_tokens": 11787,
+  "automatic_retry": false,
+  "actual_provider_execution": false,
+  "live_pricing_or_mission_or_budget_mutation": false,
+  "limits": [
+    "No independent/global acceptance",
+    "Original Version dialog remains unconnected",
+    "Other migration journeys remain open"
+  ]
+}

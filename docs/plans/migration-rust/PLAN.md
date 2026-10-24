@@ -11,6 +11,32 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## État livré1470 — catalogue tarifaire raccordé, dev34
+Rendu existant partagé Budget/Admin : lecture, ajout par empreinte, historique,
+estimation explicite et relecture. GLM :1proposition backend intégrée après
+corrections,11787tokens déclarés, aucun retry.321assertions navigateur dont48tarifs,
+10assertionsHTTP tarifs,13budgetAPI/9lectureAPI,13identifiants/cachegraph PASS ;
+intégrité VERIFIED. Premier échec focus/global`$` conservé et corrigé, même parcours
+rejoué. Profil normal sans fixture vérifié, binaire réel=candidatdev34,42assets
+protégés et notesFR/EN comparés. Deux missions historiques suspendues, budgets
+inchangés ; catalogue réel lu seulement. Dialog Version d’origine toujours non
+raccordé : métadonnées/notes compilées vérifiées via API. G11 global reste ouvert.
+Preuves : evidence/20261024-pricing1470. Aucun commit/push de ce lot.
+
+## Raccord1470 — tarifs existants avec GLM, livré localement
+Propriétaire Codex. Dev31 livré ; catalogue déjà porté CLI, bouton web déconnecté.
+Réutiliser le rendu pricing.js via hooks plutôt que reconstruire ses champs ;
+fenêtre canonique clonée avec IDs distincts pour isoler le formulaire du budget.
+Alternative rejetée : brancher globals legacy complets, qui consommeraient un faux snapshot.
+GLM propose service/pricing.rs ; principal corrige validation préalable writable,
+imports inutiles et classifications HTTP basées sur opération/causes réelles.
+Fichiers : service.rs/pricing.rs/native_admin.rs, pricing.js/adapter/bootstrap,
+styles canoniques (sélecteurs additifs), tests/recettes, traductions/notes/docsFR-EN.
+Critères : lire/ajouter/relecture/version conservée, CAS/refus/CSRF/date, devis explicite,
+inconnu≠gratuit, aucune mutation budget, réponse perdue sans retry, FR/EN/thèmes/mobile.
+Toutes écritures sur Root fixture ; missions historiques suspendues préservées.
+Aucun commit/push automatique ; état livré précédent conservé, G11 global ouvert.
+
 ## État livré1469 — plafonds raccordés dans l’UX existante, dev31
 Bouton canonique → dialogue partagé → choix/préselection explicite → preview/apply
 moteur → relecture. Aucun nouveau plafond/default, backend inchangé. Admin sans
@@ -2566,3 +2592,12 @@ restent distinctes. Les déclarations de contrôle ne prouvent aucune exécution
 validation. La lecture visuelle a détecté une traduction manquante malgré269assertions ;
 ajout de garde, recette273et capture finale31 conservées. Diagnostics/contrats
 organisationnels incomplets restent une suite produit explicite, pas un succès vide.
+
+Replan1470a : première recette dev33 FAIL après10assertionsHTTP PASS ;
+pricing-escape-focus échoue, console `$ is not defined` conservée dans
+.cache/existing-cockpit1470-first et journey existing-cockpit-hx8yb4v9.
+Cause : deux branchements globaux legacy hors factory ; remplacés par DOM explicite.
+Focus : fermeture/restauration désormais synchrones sur Échap/boutons ; un événement
+close retardé ne doit pas effacer un contexte rouvert. Retex : contrôler aussi
+les branchements de bord de fichier, pas seulement les méthodes extraites.
+Propriétaire Codex, nouvelle condition : source modifiée puis même recette complète.

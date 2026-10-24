@@ -1,7 +1,8 @@
 'use strict';
 /** End-of-slice verification of the existing product HTML/CSS on real Rust HTTP.
  * Private fixture Work/task reads precede marked client-response faults. Browser
- * issues only explicit budget preview/apply requests on owned fixtures, no provider/visit; global/CDP/page watchdogs disabled.
+ * issues explicit budget/quota edits, price appends and simulations on owned
+ * fixtures, no provider/visit; global/CDP/page watchdogs disabled.
  * Only supplied credentials in stdin are used, never logged or persisted here. */
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto'),puppeteer=require('puppeteer');
 const cfg=JSON.parse(fs.readFileSync(0,'utf8')),checks=[],errors=[],failedRequests=[],consoleErrors=[],httpErrors=[];let browser;
@@ -18,7 +19,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
   check(label+'-actual-work-title',await page.$eval('#title',e=>e.textContent)===cfg.title);check(label+'-actual-task-from-CLI',await page.$eval('#tasks-body',e=>e.textContent.includes('Task <b>plain</b>')));check(label+'-no-user-html',!(await page.$('#tasks-body b'))&&!(await page.$('#title img')));
   if(lang==='en')check(label+'-engine-message-translated',await page.$eval('#conduite-plan',e=>e.textContent.includes('Initial configuration needed before first start')));
   check(label+'-actual-task-count',await page.$eval('#task-count',e=>e.textContent)==='2');check(label+'-missing-decisions-not-zero',await page.$eval('#decision-count',e=>e.textContent)==='—');
-  check(label+'-native-scripts-only',await page.evaluate(()=>[...document.scripts].every(s=>['/i18n-en.js','/i18n.js','/swarm-shell.js','/cockpit-native-read.js','/cockpit-native-panels.js','/cockpit-native-budget.js','/native-runtime/quotas.js','/cockpit-native-quotas.js','/lib/dagre.min.js','/graph.js','/cockpit-native-graph.js','/cockpit-native.js'].includes(new URL(s.src).pathname))));
+  check(label+'-native-scripts-only',await page.evaluate(()=>[...document.scripts].every(s=>['/i18n-en.js','/i18n.js','/swarm-shell.js','/cockpit-native-read.js','/cockpit-native-panels.js','/cockpit-native-budget.js','/native-runtime/quotas.js','/cockpit-native-quotas.js','/cockpit-native-pricing.js','/pricing.js','/lib/dagre.min.js','/graph.js','/cockpit-native-graph.js','/cockpit-native.js'].includes(new URL(s.src).pathname))));
   for(const view of ['tasks','agents','decisions','budget','providers','admin','conduite']){await page.$eval('[data-view="'+view+'"]',e=>{e.closest('details').open=true;e.click()});check(label+'-existing-navigation-'+view,await page.$eval('#'+view,e=>!e.hidden));}
   check(label+'-actual-graph-tasks',await page.$$eval('#graph .graph-noeud',nodes=>nodes.length===2&&nodes.some(n=>n.dataset.task==='ux-dependent')&&nodes.some(n=>n.getAttribute('aria-label').includes('Task <b>plain</b>'))));
   check(label+'-actual-prerequisite-direction',await page.$eval('#graph .graph-arete',e=>e.dataset.from==='ux-task'&&e.dataset.to==='ux-dependent'&&e.getAttribute('marker-end').includes('recorded-dependency-arrow')));
@@ -32,6 +33,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
    await page.$eval('[data-view="conduite"]',e=>e.click());if(width===1440||width===390)await page.screenshot({path:path.join(cfg.output,label+'-'+width+'.png'),fullPage:true});if(width===390){await page.focus('#graph .pilot-canvas');await page.keyboard.press('ArrowRight');await page.waitForFunction(()=>document.querySelector('#graph .pilot-canvas').scrollLeft>0);check(label+'-graph-keyboard-scroll',await page.$eval('#graph .pilot-canvas',e=>e.scrollLeft>0));}}
   check(label+'-shared-shell-collapse',await page.$eval('#nav-collapse',e=>!!e));check(label+'-translated-theme',await page.$eval('#theme',e=>e.textContent)===(lang==='en'?(theme==='etat'?'Switch to dark theme':'Switch to light theme'):(theme==='etat'?'Passer au thème sombre':'Passer au thème clair')));
   await page.$eval('[data-view="budget"]',e=>{e.closest('details').open=true;e.click()});
+  await require('./rust_existing_pricing_flow.cjs')({page,cfg,label,lang,theme,check});
   /** Exercise only the existing dialog in an owned Root; all writes are explicit
    * browser gestures. Positive preview precedes invalid/lost-response variants. */
   async function openBudget(){await page.click('#budget-edit');await page.waitForFunction(()=>document.querySelector('#modal').open&&!document.querySelector('#confirm').disabled&&document.querySelector('#native-budget-limit_usd'));}
@@ -114,7 +116,7 @@ function check(name,value){assert(value,name);checks.push(name);console.log('PAS
    check('fixture-malformed-budget-rejected',await page.evaluate(()=>{try{SwarmRustCockpitPanels.render({schema_version:1,work_id:'a',budget:{},agents:[]});return false}catch(e){return e.message==='web-native-observation-invalid'}}));
    check('actual-selection-does-not-keep-old-task',await page.$eval('#tasks-body',e=>!e.textContent.includes('ux-task')));
   }
-  check(label+'-only-explicit-budget-quota-writes-no-visits-providers',posts.length>0&&posts.every(p=>['/api/v1/work-budget/preview','/api/v1/work-budget/apply','/api/v1/quotas/preview','/api/v1/quotas/apply'].includes(p)));await context.close();
+  check(label+'-only-explicit-budget-quota-writes-no-visits-providers',posts.length>0&&posts.every(p=>['/api/v1/work-budget/preview','/api/v1/work-budget/apply','/api/v1/quotas/preview','/api/v1/quotas/apply','/api/v1/pricing','/api/v1/pricing/estimate'].includes(p)));await context.close();
  }
  check('no-script-errors',errors.length===0);check('no-failed-resources',failedRequests.length===0);check('no-console-errors',consoleErrors.length===0);check('no-http-errors',httpErrors.length===0);
  fs.writeFileSync(path.join(cfg.output,'result.json'),JSON.stringify({status:'PASS',checks,errors,failedRequests,consoleErrors,httpErrors,browser:await browser.version(),scope:'Canonical existing product DOM/styles and protected Rust reads; graph advanced/actions/full snapshot and global acceptance unproven; explicit budget edits on owned Root; malformed client DTO explicitly simulated',watchdogs:null},null,2)+'\n');

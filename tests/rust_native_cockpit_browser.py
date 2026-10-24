@@ -11,8 +11,10 @@ import rust_agent_model_route as retained
 
 
 def main():
-    """Create two fixtures via public CLI, exercise the selected native pilot or existing product DOM through real HTTP reads and isolated
-    UI faults, then close only the owned server. Preserve primary/cleanup causes,
+    """Create private Work/task fixtures via public CLI (plus one planning Work in
+    existing mode). Exercise real reads and explicit isolated budget/quota/price
+    operations and marked client faults, then close only the owned server.
+    Preserve primary/cleanup causes,
     exact binary/source hashes and browser outputs; never start a provider."""
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--binary',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--existing',action='store_true');a=p.parse_args();binary=a.binary.resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     root=native.owned_root(binary);works=[];title='Alpha <img src=x onerror=alert(1)>'
@@ -57,6 +59,8 @@ def main():
             server.request(path,body={},status=403,observe=False)
             assert server.request(path,observe=False)==observed
             csrf=server.request('/api/v1/native-session',observe=False)['csrf_token']
+            import rust_pricing_http_contract
+            rust_pricing_http_contract.verify(server,binary,root,works[0],csrf)
             base='/api/v1/work-budget?work='+works[0];before=server.request(base,observe=False)
             assert before['budget']['limit_usd']==37.25 and before['work_id']==works[0]
             proposal=dict(schema_version=1,event_id='budget-http-proof',expected_revision=before['revision'],budget=dict(limit_usd=37.25,reserve_per_launch_usd=1.5,estimate_source='Explicit inert UX fixture',reference_date='2026-10-24',actor='supplied-not-authority',updated='supplied-not-time'))
@@ -85,7 +89,7 @@ def main():
         assert run.returncode==0,'Cockpit browser failed; inspect retained stderr'
         result=json.loads((browser/'result.json').read_text());assert result['status']=='PASS' and result['checks'];assert not (root/'unexpected-provider-execution').exists()
         server.process.send_signal(signal.SIGINT);server.stop_sent=True;t.join();assert not collector_errors
-        inputs=[binary,Path('tests/rust_native_cockpit_browser.py'),Path('tests/rust_native_cockpit_ui.cjs'),Path('web/native-cockpit.js'),Path('web/native-quotas.js'),Path('web/cockpit-native-quotas.js'),Path('web/native-runtime.js'),Path('web/native-runtime.css'),Path('web/native-runtime.html'),Path('web/i18n-en.js'),Path('web/index.html'),Path('web/cockpit-native.js'),Path('web/cockpit-native-read.js'),Path('web/cockpit-native-panels.js'),Path('web/cockpit-native-budget.js'),Path('web/cockpit-native-graph.js'),Path('web/graph.js'),Path('web/lib/dagre.min.js'),Path('tests/rust_existing_cockpit_ui.cjs')]
+        inputs=[binary,Path('tests/rust_native_cockpit_browser.py'),Path('tests/rust_native_cockpit_ui.cjs'),Path('web/native-cockpit.js'),Path('web/native-quotas.js'),Path('web/pricing.js'),Path('web/cockpit-native-pricing.js'),Path('tests/rust_existing_pricing_flow.cjs'),Path('tests/rust_pricing_http_contract.py'),Path('web/cockpit-native-quotas.js'),Path('web/native-runtime.js'),Path('web/native-runtime.css'),Path('web/native-runtime.html'),Path('web/i18n-en.js'),Path('web/index.html'),Path('web/cockpit-native.js'),Path('web/cockpit-native-read.js'),Path('web/cockpit-native-panels.js'),Path('web/cockpit-native-budget.js'),Path('web/cockpit-native-graph.js'),Path('web/graph.js'),Path('web/lib/dagre.min.js'),Path('tests/rust_existing_cockpit_ui.cjs')]
         retained.publish(out/'result.json',dict(status='PASS',checks=result['checks'],inputs={str(n):hashlib.sha256(n.read_bytes()).hexdigest() for n in inputs},root=str(root),global_watchdog=None,provider_started=False,global_acceptance=False))
         print(('NATIVE_EXISTING_COCKPIT_PASS ' if a.existing else 'NATIVE_COCKPIT_PASS ')+str(len(result['checks']))+' named assertions',flush=True)
     except BaseException as error:primary=error

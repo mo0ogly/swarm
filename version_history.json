@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Tarifs : dialogue existant raccordé à Rust depuis Budget et Administration, versions conservées, ajout contrôlé par empreinte et estimation explicite sans modifier les budgets.",
+        "en": "Pricing: existing dialog connected to Rust from Budget and Admin, preserved versions, digest-checked append and explicit estimates without changing budgets."
+      },
+      {
         "fr": "Cockpit : le bouton des plafonds de planification et de vérification ouvre le dialogue natif partagé, avec mission explicite, prévisualisation sans effet, sauvegarde et relecture. Montage Admin conservé.",
         "en": "Cockpit: planning and review limits open the shared native dialog, with explicit mission, preview without effects, save and read-back. Admin mounting preserved."
       },

@@ -66,7 +66,7 @@
   * an HTTP request, records a visit, mutates a mission or starts an agent. */
  function setup(){for(const section of document.querySelectorAll('.view')){
    for(const control of section.querySelectorAll('button,input,select,textarea'))control.disabled=true;
-   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='budget'?tr('Budget et plafonds sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
+   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
   $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=true;
@@ -74,6 +74,7 @@
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link)continue;const target=new URL(a.href);if(target.pathname!=='/'){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
   $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin')});
+  SwarmNativePricing.enable();
   SwarmCockpitQuotas.mount({opener:$('quotas-open'),selectedWork:()=>selected});
   budgetEditor=SwarmNativeWorkBudget.mount({reload:async()=>{if(!await load())throw Error('web-native-budget-cockpit-refresh-failed')}});
   $('theme').textContent=tr(document.documentElement.dataset.theme==='etat'?'Passer au thème sombre':'Passer au thème clair');showView(new URL(location.href).searchParams.get('view')||'conduite');load();

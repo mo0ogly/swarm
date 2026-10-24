@@ -8590,3 +8590,5 @@ No quota default, new policy or engine route. Local Admin styles serve these dia
 Preview without writes, CAS/replay apply and read-back remain engine operations.
 Recipes enable only their own third inert fixture Work through public operations;
 no live mission is enabled or changed.
+
+Connection1470: native pricing catalogue reuses pricing.js through hooks. Three protected operations reuse rate_catalogue/save_rate/quote; admission before writable open, concurrent digest, engine metadata and post-publication errors preserved. No new policy/default or budget mutation. Permanent recipe extended; local dev34 verified:321browser assertions,10pricingHTTP checks and budget/quotas/graph regressions;42served assets and running binary compared. Evidence1470, global acceptance open.

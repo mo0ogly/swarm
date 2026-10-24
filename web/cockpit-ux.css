@@ -44,36 +44,36 @@ button.primary:hover{background:var(--wattson-action-fond);color:var(--wattson-a
 /* The modal is a fixed shell: only its body scrolls, actions remain reachable. */
 dialog{width:min(920px,95vw);max-height:94dvh;border-radius:18px;box-shadow:0 24px 80px color-mix(in srgb,var(--wattson-titre) 22%,transparent)}
 dialog::backdrop{background:color-mix(in srgb,var(--wattson-fond) 78%,transparent);backdrop-filter:blur(3px)}
-#action-form{display:flex;flex-direction:column;max-height:92dvh;min-height:0}
+:is(#action-form,#pricing-action-form){display:flex;flex-direction:column;max-height:92dvh;min-height:0}
 .modal-header,.modal-footer{flex-shrink:0;padding:20px 26px;gap:18px}
 .modal-header{border-top:4px solid var(--wattson-info-encre)}
 .modal-header>div{min-width:0}
 .modal-header h2{font-size:23px;line-height:1.35;overflow-wrap:anywhere;margin:6px 0 0}
 .modal-header .eyebrow{margin:0;max-width:70ch;overflow-wrap:anywhere}
-#close{flex-shrink:0;background:var(--wattson-carte);color:var(--wattson-texte)}
+:is(#close,#pricing-close){flex-shrink:0;background:var(--wattson-carte);color:var(--wattson-texte)}
 .modal-body{min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain;padding:24px 26px}
-#modal-description{line-height:1.65;color:var(--wattson-texte);max-width:78ch}
-#modal-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
-#modal-fields>label{min-width:0;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:10px;padding:14px;align-content:start}
-#modal-fields>.field-wide{grid-column:1/-1}
-#modal-fields textarea,#modal-fields input,#modal-fields select{font-weight:400;min-width:0;line-height:1.5;background:var(--wattson-champ);color:var(--wattson-texte)}
-#modal-fields textarea{min-height:110px}
+:is(#modal-description,#pricing-modal-description){line-height:1.65;color:var(--wattson-texte);max-width:78ch}
+:is(#modal-fields,#pricing-modal-fields){grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
+:is(#modal-fields,#pricing-modal-fields)>label{min-width:0;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:10px;padding:14px;align-content:start}
+:is(#modal-fields,#pricing-modal-fields)>.field-wide{grid-column:1/-1}
+:is(#modal-fields,#pricing-modal-fields) textarea,:is(#modal-fields,#pricing-modal-fields) input,:is(#modal-fields,#pricing-modal-fields) select{font-weight:400;min-width:0;line-height:1.5;background:var(--wattson-champ);color:var(--wattson-texte)}
+:is(#modal-fields,#pricing-modal-fields) textarea{min-height:110px}
 .field-hint{font-size:12px;font-weight:400;line-height:1.5;color:var(--wattson-texte-discret);margin-top:2px}
-#preview{margin:20px 0 0;max-height:44vh;border-inline-start:3px solid var(--wattson-info-encre);font-size:13px}
-#modal-error{margin:18px 0 0}
-#modal-help-toggle{background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-ligne);font-size:13px;margin-top:4px}
-#modal-help{margin:14px 0;padding:18px;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:12px}
-#modal-help h3{font-size:16px;margin:0 0 10px;color:var(--wattson-titre)}
-#modal-help li{margin-block:6px}
-#modal-steps{display:flex;gap:6px;list-style:none;margin:0;padding:12px 26px;border-bottom:1px solid var(--wattson-ligne);background:var(--wattson-carte);flex-shrink:0;counter-reset:phase}
-#modal-steps li{flex:1;display:flex;gap:8px;align-items:center;padding:9px 10px;border-radius:8px;font-size:12px;background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret)}
-#modal-steps li::before{counter-increment:phase;content:counter(phase);font-weight:750}
-#modal-steps li[aria-current=step]{background:var(--wattson-info-fond);color:var(--wattson-info-encre);font-weight:750}
-#modal-steps li.step-done{background:var(--wattson-succes-fond);color:var(--wattson-succes-encre)}
+:is(#preview,#pricing-preview){margin:20px 0 0;max-height:44vh;border-inline-start:3px solid var(--wattson-info-encre);font-size:13px}
+:is(#modal-error,#pricing-modal-error){margin:18px 0 0}
+:is(#modal-help-toggle,#pricing-modal-help-toggle){background:var(--wattson-info-fond);color:var(--wattson-info-encre);border-color:var(--wattson-ligne);font-size:13px;margin-top:4px}
+:is(#modal-help,#pricing-modal-help){margin:14px 0;padding:18px;background:var(--wattson-carte-appuyee);border:1px solid var(--wattson-ligne);border-radius:12px}
+:is(#modal-help,#pricing-modal-help) h3{font-size:16px;margin:0 0 10px;color:var(--wattson-titre)}
+:is(#modal-help,#pricing-modal-help) li{margin-block:6px}
+:is(#modal-steps,#pricing-modal-steps){display:flex;gap:6px;list-style:none;margin:0;padding:12px 26px;border-bottom:1px solid var(--wattson-ligne);background:var(--wattson-carte);flex-shrink:0;counter-reset:phase}
+:is(#modal-steps,#pricing-modal-steps) li{flex:1;display:flex;gap:8px;align-items:center;padding:9px 10px;border-radius:8px;font-size:12px;background:var(--wattson-carte-appuyee);color:var(--wattson-texte-discret)}
+:is(#modal-steps,#pricing-modal-steps) li::before{counter-increment:phase;content:counter(phase);font-weight:750}
+:is(#modal-steps,#pricing-modal-steps) li[aria-current=step]{background:var(--wattson-info-fond);color:var(--wattson-info-encre);font-weight:750}
+:is(#modal-steps,#pricing-modal-steps) li.step-done{background:var(--wattson-succes-fond);color:var(--wattson-succes-encre)}
 .modal-footer .primary{min-width:170px}
-#modal[data-tone=attention] .modal-header{border-top-color:var(--wattson-attention-encre)}
-#modal[data-tone=alert] .modal-header{border-top-color:var(--wattson-alerte-encre)}
-#modal[data-tone=success] .modal-header{border-top-color:var(--wattson-succes-encre)}
+:is(#modal,#pricing-modal)[data-tone=attention] .modal-header{border-top-color:var(--wattson-attention-encre)}
+:is(#modal,#pricing-modal)[data-tone=alert] .modal-header{border-top-color:var(--wattson-alerte-encre)}
+:is(#modal,#pricing-modal)[data-tone=success] .modal-header{border-top-color:var(--wattson-succes-encre)}
 .help-search{margin:16px 0}
 .help-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .help-card{border:1px solid var(--wattson-ligne);border-radius:12px;padding:18px;background:var(--wattson-carte-appuyee)}
@@ -88,13 +88,13 @@ dialog::backdrop{background:color-mix(in srgb,var(--wattson-fond) 78%,transparen
  .section-heading{align-items:flex-start;flex-direction:column;gap:10px}
  .metric{min-height:100px;padding:14px}.metric strong{font-size:30px}
  .brain-turn{padding:16px}.brain-turn>button{margin-inline:0!important;width:100%}
- dialog{width:96vw;border-radius:14px;max-height:96dvh}#action-form{max-height:94dvh}
+ dialog{width:96vw;border-radius:14px;max-height:96dvh}:is(#action-form,#pricing-action-form){max-height:94dvh}
  .modal-header,.modal-footer{padding:14px;gap:10px}.modal-header h2{font-size:19px}
- .modal-body{padding:16px}#modal-fields,.help-grid{grid-template-columns:minmax(0,1fr)}
- #modal-fields>label{grid-column:1;padding:12px}#modal-steps{padding:10px;gap:4px}
- #modal-steps li{padding:7px 5px;font-size:11px;gap:4px}
+ .modal-body{padding:16px}:is(#modal-fields,#pricing-modal-fields),.help-grid{grid-template-columns:minmax(0,1fr)}
+ :is(#modal-fields,#pricing-modal-fields)>label{grid-column:1;padding:12px}:is(#modal-steps,#pricing-modal-steps){padding:10px;gap:4px}
+ :is(#modal-steps,#pricing-modal-steps) li{padding:7px 5px;font-size:11px;gap:4px}
  .modal-footer .primary{min-width:0;flex:1}.modal-footer button{white-space:normal}
- #preview{max-height:38vh}#brain-form{padding:14px}
+ :is(#preview,#pricing-preview){max-height:38vh}#brain-form{padding:14px}
 }
 @media(prefers-reduced-motion:reduce){button,nav button{transition:none}button:active:not(:disabled){transform:none}}
 /* Preparation is a first-class navigation entry in both themes. */

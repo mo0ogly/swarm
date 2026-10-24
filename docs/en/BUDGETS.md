@@ -203,9 +203,9 @@ UI pagination. Read failures refuse the budget view as
 `reported_cost_unavailable`, preserving an internal cause excluded from public
 JSON rather than pretending the cost is absent.
 
-The HTTP/Admin journey belongs to the Go engine. Native Rust catalogue and quote
+The historical HTTP/Admin journey belongs to the Go engine. Native Rust catalogue and quote
 commands now provide `pricing list|save|estimate` on an initialized private native
-root; native HTTP/Admin and Go-root cutover remain outstanding. Compatible pricing
+root; native HTTP/cockpit is described below; Go-root cutover remains outstanding. Compatible pricing
 JSON does not authorize live root sharing between engines. The skill establishes
 neither installed delivery nor authenticated actors. Financial reservations remain
 separate.
@@ -235,7 +235,7 @@ intermediate product is rescaled; a nonfinite total refuses. A retained actual
 legacy-Go witness pins this behavior rather than comparing only two changed ports.
 
 Evidence71:445Rust tests,46default CLI tests,18targeted Go tests and101comparisons
-on8476stable inputs. Catalogue/CLI verified; native HTTP/Admin remain unported.
+on8476stable inputs. Catalogue/CLI verified at that historical stage, before connection1470.
 Same-session Codex review; no server replacement.
 
 ## Editing in the local Rust cockpit
@@ -244,8 +244,8 @@ without writes, then a second confirmation. Saving uses the current revision and
 engine journal without changing reservations, consumption or active agents. A zero
 cap means unlimited; missing policy leaves blank fields and adopts no amounts.
 Known refusal, lost response and known save with failed read-back are distinguished.
-These cases require a fresh read; no save is automatically retried. Price catalogue
-and other commands remain separate connections. See the
+These cases require a fresh read; no save is automatically retried. The price catalogue is described below;
+other commands remain separate connections. See the
 [Rust route contract](RUST-MIGRATION.md#connection1468--actual-mission-budget-editing).
 
 ```mermaid
@@ -288,4 +288,36 @@ flowchart LR
     E --> F[Preview without writes]
     F --> G[Confirm, engine guards and revision]
     G --> H[Read back saved values]
+```
+
+## Pricing catalogue in the Rust cockpit
+The Budget and Admin pricing buttons reuse the existing renderer, in a window
+separate from mission budget editing. GET/HEAD `/api/v1/pricing` reads versions;
+POST appends with `expected_digest`; POST `/api/v1/pricing/estimate` simulates
+explicit volumes. Shared session, Host, CSRF, capacity and bound Root admission
+remain authoritative. No price, provider, budget or launch right is adopted.
+A blank rate means unknown; explicit zero means free. Previous versions remain.
+The engine supplies version, local actor and timestamp without authenticating
+textual provenance. Conflicts refuse. Lost responses may conceal a completed
+append: close/reopen to read before another intent, with no automatic retry.
+Malformed reads never become successful empty catalogues. Estimates are neither
+invoices nor recorded spending.
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant I as Existing pricing dialog
+    participant H as Protected Rust API
+    participant R as Bound Root and catalogue
+    U->>I: Open prices
+    I->>H: GET catalogue
+    H->>R: Read versions and digest
+    U->>I: Save explicit rate
+    I->>H: POST intent and digest
+    H->>R: Check digest, append atomically
+    I->>H: GET read-back before success
+    U->>I: Estimate explicit volumes
+    I->>H: POST estimate, selected version
+    H-->>I: Amount or required unknown rate
+    Note over I,R: No budget or spending counters changed
 ```

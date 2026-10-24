@@ -236,10 +236,10 @@ sans pagination de l'affichage récent. Une erreur de lecture refuse la vue budg
 avec `reported_cost_unavailable` ; elle ne devient pas un coût absent. La cause
 reste accessible en interne sans sérialisation dans l'erreur publique.
 
-Le parcours HTTP et Admin est celui du moteur Go. Le catalogue et le devis
+Le parcours historique HTTP et Admin appartient au moteur Go. Le catalogue et le devis
 natifs Rust disposent maintenant de `pricing list|save|estimate` sur une racine
-native privée initialisée ; HTTP/Admin natifs et bascule de racines Go restent
-ouverts. Le schéma tarifaire est compatible, ce qui n'autorise pas le partage
+native privée initialisée ; Le raccord HTTP/cockpit est décrit ci-dessous ; la bascule de racines Go reste
+ouverte. Le schéma tarifaire est compatible, ce qui n'autorise pas le partage
 d'une racine active entre moteurs. La skill ne vaut ni livraison installée ni
 authentification de l'acteur. Le contrat de réservation financière reste distinct.
 
@@ -271,7 +271,7 @@ Seul un produit intermédiaire infini est rééchelonné ; un total non fini est
 Le témoin conservé contre la source Go antérieure fixe ce comportement.
 
 Preuves71 :445testsRust,46CLI profil défaut,18Go ciblés et101comparaisons
-sur8476entrées stables ; catalogue/CLI vérifiés, HTTP/Admin natifs non portés.
+sur8476entrées stables ; catalogue/CLI vérifiés à cette étape historique, avant le raccord1470.
 Revue Codex même session, aucun serveur remplacé.
 
 ## Réglage dans le cockpit Rust local
@@ -282,7 +282,7 @@ les réservations, consommations ni les agents actifs. Zéro de plafond signifie
 illimité ; une politique absente laisse les champs vides, aucun montant n’est adopté.
 Un refus connu est distingué d’une réponse perdue et d’un enregistrement connu dont
 la relecture échoue. Dans ces cas le formulaire exige une nouvelle lecture ; aucune
-sauvegarde n’est répétée automatiquement. Le catalogue des tarifs et les autres
+sauvegarde n’est répétée automatiquement. Le catalogue des tarifs est décrit ci-dessous ; les autres
 commandes restent des raccords distincts. Voir le contrat de routes et limites dans
 [Rust — raccord1468](architecture/RUST-MIGRATION.md#raccord1468--réglage-réel-des-budgets-de-mission).
 
@@ -328,4 +328,37 @@ flowchart LR
     E --> F[Prévisualiser sans écrire]
     F --> G[Confirmer, gardes moteur et révision]
     G --> H[Relire les valeurs enregistrées]
+```
+
+## Catalogue tarifaire dans le cockpit Rust
+Le bouton « Tarifs des modèles » de Budget et celui d’Administration réutilisent
+le rendu existant, avec une fenêtre distincte du budget de mission. GET/HEAD
+`/api/v1/pricing` lit les versions ; POST ajoute une version avec `expected_digest` ;
+POST `/api/v1/pricing/estimate` simule des volumes explicites. Session, Host, CSRF,
+capacité et Root lié restent vérifiés par le serveur. Aucun prix, fournisseur,
+budget ou droit de lancement n’est adopté automatiquement.
+Une case de tarif vide signifie inconnu ; zéro explicite signifie gratuit. Les
+anciennes versions restent conservées. Le moteur fournit version, acteur local
+et date d’enregistrement, sans authentifier la provenance textuelle. Un conflit
+refuse ; une réponse perdue peut masquer une sauvegarde déjà faite : fermer puis
+rouvrir pour relire, sans relance automatique. Une lecture invalide ne devient
+jamais un catalogue vide réussi. Les estimations ne sont ni factures ni dépenses.
+
+```mermaid
+sequenceDiagram
+    actor U as Utilisateur
+    participant I as Dialogue tarifaire existant
+    participant H as API Rust protégée
+    participant R as Root lié et catalogue
+    U->>I: Ouvrir tarifs
+    I->>H: GET catalogue
+    H->>R: Lire versions et empreinte
+    U->>I: Enregistrer un tarif explicite
+    I->>H: POST intention et empreinte
+    H->>R: Vérifier empreinte, ajouter atomiquement
+    I->>H: GET relecture avant succès
+    U->>I: Estimer volumes explicites
+    I->>H: POST estimate, version choisie
+    H-->>I: Montant ou tarif nécessaire inconnu
+    Note over I,R: Aucun budget ou compteur de dépenses modifié
 ```
