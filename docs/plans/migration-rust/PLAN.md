@@ -11,6 +11,38 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## État livré1471 — Version et nouveautés raccordé, dev36
+366assertions navigateur dont45Version PASS,10tarifsHTTP +13budgetAPI/9lectureAPI,
+13identifiants/cachegraph ; intégrité VERIFIED. Profil normal sans fixture.
+Installation dev35 : binaire=candidat,44assets protégés/notesFR-EN comparés ;
+dialogue réel FR/EN vérifié par14assertions, aucun POST. Deux missions suspendues,
+budgets inchangés. GLM1appel complet24977tokens, version5.3 selon utilisateur,
+identifiant API demandé/déclaréglm-5.2 ; aucun retry automatique. Préparation
+refusée avant HTTP conservée séparément. Revue doc finale ajoute seulement un
+commentaire de contrat à paintDialog ; delta octet exact conservé. Dev36 livré
+avec même logique vérifiée : profil normal,44assets et identité/notes comparés,
+14assertions sur dialogue réel FR/EN rejouées. Aucun POST ou commit/push de ce lot.
+Preuves : evidence/20261024-version1471 ; acceptation globale/CLI/source non établies.
+
+## Raccord1471 — Version et nouveautés, GLM, vérifié
+Propriétaire Codex. Dev34 livré ; API native-version existe, entrée désactivée.
+Réutiliser VersionHistoryPanel/HTML/CSS existants via hook validé ; alternative
+écartée : charger le polling/diagnostic stockage Go, dont le producteur Rust manque.
+Montrer identité réelle compilée, notesFR/EN, lien baseGit/modified ; sources/CLI
+explicitement non examinés, aucun diagnostic identique ou de santé inventé.
+GLM propose hook ; principal préserve causes HTTP/IO/JSON, garde liensGithub,
+conditionne démarrage/lecture native et reprise sur ouverture explicite.
+Fichiers : runtime-health.js, nouvel adapter, bootstrap/allowlist, tests/recettes,
+notes/catalogue et docsFR/EN. Aucun budget/provider/mission modifié.
+Critères : version/commit réels, notes actuelles, dirty, clavier/focus, FR/EN/thèmes,
+mobile, loading/erreur/malformed/reprise, aucune requête runtime-health Go.
+Préparation : chemin version.rs supposé refusé avant appel ; corrigé vers
+version_identity.rs. Puis script helper tronqué refusé avant tests ; helper explicite
+remplacé, aucun effet produit accepté sur ces échecs. Originaux outils conservés.
+Amélioration méthode : paquet GLM envoyé trop large (catalogue notes complet).
+Prochain contexte à limiter aux DTO/producteurs et exemple réel de note ; propriétaire
+Codex, critère : contrat complet conservé et usage mesuré, gain non établi ici.
+
 ## État livré1470 — catalogue tarifaire raccordé, dev34
 Rendu existant partagé Budget/Admin : lecture, ajout par empreinte, historique,
 estimation explicite et relecture. GLM :1proposition backend intégrée après

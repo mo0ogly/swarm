@@ -69,7 +69,7 @@
    const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
-  $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=true;
+  $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=false;
   const link=document.createElement('a');link.href=url('/native-runtime.html?view=admin');link.textContent=tr('Ouvrir les réglages Rust');$('admin-title').after(link);
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link)continue;const target=new URL(a.href);if(target.pathname!=='/'){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);

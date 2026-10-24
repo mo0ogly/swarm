@@ -8592,3 +8592,5 @@ Recipes enable only their own third inert fixture Work through public operations
 no live mission is enabled or changed.
 
 Connection1470: native pricing catalogue reuses pricing.js through hooks. Three protected operations reuse rate_catalogue/save_rate/quote; admission before writable open, concurrent digest, engine metadata and post-publication errors preserved. No new policy/default or budget mutation. Permanent recipe extended; local dev34 verified:321browser assertions,10pricingHTTP checks and budget/quotas/graph regressions;42served assets and running binary compared. Evidence1470, global acceptance open.
+
+Connection1471: existing Version dialog uses a validated native-version hook. Compiled identity/notes only; sources and CLI unexamined, no runtime-health probe/polling. Every open rereads; failed/malformed reads clear old identity and allow explicit recovery. 366browser assertions including45Version PASS; installed actual dialog checked FR/EN,14assertions without POST. Normal profile and44assets compared; no global acceptance or CLI/source comparison.

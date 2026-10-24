@@ -16,6 +16,7 @@
     "tests/rust_agent_model_route.py",
     "tests/rust_existing_cockpit_ui.cjs",
     "tests/rust_existing_pricing_flow.cjs",
+    "tests/rust_existing_version_flow.cjs",
     "tests/rust_native_cockpit_browser.py",
     "tests/rust_native_cockpit_ui.cjs",
     "tests/rust_native_http_cli.py",
@@ -29,6 +30,7 @@
     "web/cockpit-native-pricing.js",
     "web/cockpit-native-quotas.js",
     "web/cockpit-native-read.js",
+    "web/cockpit-native-version.js",
     "web/cockpit-native.js",
     "web/cockpit-ux.css",
     "web/cockpit.css",
@@ -55,6 +57,7 @@
     "web/product-views.css",
     "web/project-profile-settings.css",
     "web/providers.css",
+    "web/runtime-health.js",
     "web/swarm-design.css",
     "web/swarm-shell.js"
   ],

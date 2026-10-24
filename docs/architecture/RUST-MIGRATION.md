@@ -9075,3 +9075,5 @@ Aucune mission réelle n’est activée/modifiée par la recette ; configuration
 et planification d’un troisième Work de fixture par les opérations publiques.
 
 Raccord1470 : catalogue tarifaire natif, rendu pricing.js partagé via hooks. Trois opérations protégées réutilisent rate_catalogue/save_rate/quote ; validation avant ouverture writable, digest concurrent, métadonnées moteur, erreurs après publication conservées. Aucun nouveau plafond/default ou budget modifié. Recette permanente étendue ; livraison locale dev34 vérifiée :321assertions navigateur,10HTTP tarifs et non-régression budget/plafonds/graphe ;42assets servis et binaire comparés. Preuves1470, acceptation globale ouverte.
+
+Raccord1471 : dialogue Version existant connecté au hook native-version validé. Identité/notes compilées seulement, sources et CLI non examinés, aucune sonde runtime-health/polling. Chaque ouverture relit ; échec/malformed efface l’identité précédente, reprise explicite. Recette366assertions dont45Version PASS ; dialogue réel installé vérifié FR/EN,14assertions sans POST. Profil normal et44assets comparés ; acceptation globale et comparaison CLI/source non établies.

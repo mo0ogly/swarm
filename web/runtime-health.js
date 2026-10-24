@@ -3,6 +3,8 @@ const VersionHistoryPanel={
  value:null,diagnostic:null,error:null,pending:null,returnFocus:null,
  t(source){return globalThis.SwarmI18n?.t(source)??source},
  short(commit){return typeof commit==='string'&&/^[0-9a-f]{40}$/.test(commit)?commit.slice(0,12):this.t('inconnu')},
+ /** Normalize legacy/full-runtime projections; native input is already validated
+  * by its read hook. Missing source comparison remains unknown, never identical. */
  normalize(raw){
   if(!raw||typeof raw!=='object')return null;
   if(raw.binary)return {binary:raw.binary,source:raw.source||{},history:raw.history||{available:false,releases:[]}};
@@ -10,12 +12,14 @@ const VersionHistoryPanel={
   const sourceCommit=typeof raw.source_revision==='string'&&/^[0-9a-f]{40}$/.test(raw.source_revision)?raw.source_revision:null;
   return {binary:{version:'devel',commit,modified:raw.available?!!raw.modified:null,build_date:null,provenance:'legacy'},source:{available:!!sourceCommit,commit:sourceCommit,modified:null,compared:!!raw.compared&&!!sourceCommit,matches_binary:raw.compared&&sourceCommit?!!raw.current:null},history:{available:false,releases:[]}};
  },
+ /** Reuse the shared accessible version dialog; close restores the actual
+  * opener. A delayed close event must not clear a newly opened dialog context. */
  ensureDialog(){
   let dialog=document.getElementById('version-dialog');if(dialog)return dialog;
   dialog=document.createElement('dialog');dialog.id='version-dialog';dialog.setAttribute('aria-labelledby','version-dialog-title');
   const header=document.createElement('header'),title=document.createElement('h2'),close=document.createElement('button'),body=document.createElement('section'),footer=document.createElement('footer'),done=document.createElement('button');
   title.id='version-dialog-title';title.textContent=this.t('Version et nouveautés');close.type='button';close.textContent=this.t('Fermer');close.dataset.versionClose='';body.id='version-dialog-content';body.setAttribute('aria-live','polite');done.type='button';done.textContent=this.t('Fermer');done.dataset.versionClose='';header.append(title,close);footer.append(done);dialog.append(header,body,footer);document.body.append(dialog);
-  dialog.addEventListener('close',()=>{const target=this.returnFocus;this.returnFocus=null;if(target?.isConnected)target.focus()});
+  dialog.addEventListener('close',()=>{if(dialog.open)return;const target=this.returnFocus;this.returnFocus=null;if(target?.isConnected)target.focus()});
   dialog.addEventListener('click',event=>{if(event.target.closest('[data-version-close]'))dialog.close()});
   return dialog;
  },
@@ -34,6 +38,9 @@ const VersionHistoryPanel={
    const modified=binary?.modified===true?'*':'';summary.textContent=(binary?.version||'devel')+' · '+this.short(binary?.commit)+modified;
   }
  },
+ /** Render only observed identity, notes and optional comparison. Native source
+  * observation stays explicitly absent; loading/errors replace stale content.
+  * Text rendering and restricted links never execute producer strings. */
  paintDialog(){
   const host=document.getElementById('version-dialog-content');if(!host)return;host.replaceChildren();
   if(this.error){const p=document.createElement('p');p.className='notice alert';p.textContent=this.t('Version et historique indisponibles. Réessayez lorsque le serveur répond.');host.append(p);return}
@@ -47,19 +54,27 @@ const VersionHistoryPanel={
   const diagnostic=this.diagnostic;
   if(diagnostic){const box=document.createElement('section'),title=document.createElement('h3'),values=document.createElement('dl'),state=document.createElement('p');title.textContent=this.t('Diagnostic comparatif');values.append(this.line(this.t('CLI installée'),this.observation(diagnostic.installed_cli)),this.line(this.t('Serveur actif'),this.observation(diagnostic.active_server)),this.line(this.t('Candidat'),this.observation(diagnostic.candidate)));state.className='notice '+(diagnostic.state==='divergent'?'alert':diagnostic.state==='unknown'?'attention':'info');state.textContent=this.t('État')+' : '+this.t({identical:'identique',divergent:'divergent',unknown:'inconnu'}[diagnostic.state]||'inconnu');box.append(title,values,state);for(const difference of diagnostic.differences||[]){const p=document.createElement('p');p.textContent=this.t('Divergence')+' : '+this.role(difference.left)+' / '+this.role(difference.right);box.append(p)}if(diagnostic.next_step){const next=document.createElement('p');next.textContent=(globalThis.SwarmI18n?.engine(diagnostic.next_step)??diagnostic.next_step);box.append(next)}host.append(box)}
   const sourceBox=document.createElement('section'),sourceTitle=document.createElement('h3'),sourceText=document.createElement('p');sourceTitle.textContent=this.t('Sources locales');
-  sourceText.textContent=!source?.available?this.t('Copie locale non détectée.'):!source.compared?this.t('Comparaison avec le binaire indisponible.'):source.matches_binary?this.t('Les sources et le binaire utilisent le même commit. Les modifications locales ne sont pas comparées.'):this.t('Le commit des sources diffère de celui du binaire.');sourceBox.append(sourceTitle,sourceText);host.append(sourceBox);
+  sourceText.textContent=source?.observed===false?this.t('Sources locales non examinées par cette vue.'):!source?.available?this.t('Copie locale non détectée.'):!source.compared?this.t('Comparaison avec le binaire indisponible.'):source.matches_binary?this.t('Les sources et le binaire utilisent le même commit. Les modifications locales ne sont pas comparées.'):this.t('Le commit des sources diffère de celui du binaire.');sourceBox.append(sourceTitle,sourceText);host.append(sourceBox);
   const news=document.createElement('section'),newsTitle=document.createElement('h3');newsTitle.textContent=this.t('Nouveautés');news.append(newsTitle);
   if(!history?.available){const p=document.createElement('p');p.className='notice attention';p.textContent=this.t('Historique des versions indisponible dans ce binaire.');news.append(p)}
   else if(!Array.isArray(history.releases)||history.releases.length===0){const p=document.createElement('p');p.className='notice info';p.textContent=this.t('Aucune version publiée n’est encore déclarée.');news.append(p)}
   else for(const release of history.releases){const article=document.createElement('article'),h=document.createElement('h4'),summary=document.createElement('p'),links=document.createElement('p');h.textContent=release.version+' · '+release.date;summary.textContent=globalThis.SwarmI18n?.language==='en'?release.summary?.en:release.summary?.fr;const releaseLink=this.safeLink(release.release_url,this.t('Voir la version sur GitHub'));if(releaseLink)links.append(releaseLink);for(const commit of release.commits||[]){const link=this.safeLink(commit.url,this.short(commit.sha));if(link){if(links.childNodes.length)links.append(document.createTextNode(' · '));links.append(link)}}article.append(h,summary,links);news.append(article)}
   const complete=this.safeLink('https://github.com/mo0ogly/swarm/commits/main/',this.t('Voir l’historique complet des commits sur GitHub'));if(complete){const p=document.createElement('p');p.append(complete);news.append(p)}host.append(news);
  },
+ /** Coalesce pending reads. Native reads use the actual compiled API, clear
+  * stale displayed identity, preserve failures and add no runtime-health poll.
+  * Legacy callers keep their original health/diagnostic producer. */
  async load(){
-  if(this.pending)return this.pending;this.error=null;this.paintSummary();this.paintDialog();
-  this.pending=SwarmWebRequests.json('/api/v1/runtime-health').then(({response,value:health})=>{if(!response.ok)throw new Error(String(response.status));const value=this.normalize(health.version);if(!value)throw new Error('version contract');this.value=value;this.diagnostic=health.version_diagnostic||null;this.paintSummary();this.paintDialog();return health}).catch(error=>{this.error=error;this.paintSummary();this.paintDialog();throw error}).finally(()=>{this.pending=null});return this.pending;
+  if(this.pending)return this.pending;if(globalThis.SwarmNativeVersionHooks){this.value=null;this.diagnostic=null}this.error=null;this.paintSummary();this.paintDialog();
+  const request=globalThis.SwarmNativeVersionHooks?globalThis.SwarmNativeVersionHooks.read().then(version=>({version})):SwarmWebRequests.json('/api/v1/runtime-health').then(({response,value})=>{if(!response.ok)throw new Error(String(response.status));return value});
+  this.pending=request.then(health=>{const value=this.normalize(health.version);if(!value)throw new Error('version contract');this.value=value;this.diagnostic=health.version_diagnostic||null;this.paintSummary();this.paintDialog();return health}).catch(error=>{this.error=error;this.paintSummary();this.paintDialog();throw error}).finally(()=>{this.pending=null});return this.pending;
  },
- open(button){this.returnFocus=button;const dialog=this.ensureDialog();this.paintDialog();dialog.showModal();if(!this.value&&!this.pending)this.load().catch(()=>{})},
- start(){for(const button of document.querySelectorAll('[data-version-open]'))button.addEventListener('click',()=>this.open(button));this.paintSummary();this.load().then(health=>RuntimeHealthPanel.render(health)).catch(()=>RuntimeHealthPanel.renderFailure())}
+ /** Explicit native open rereads active identity/notes; no cached build is
+  * presented as a fresh comparison. Failed reads can recover by closing/reopening. */
+ open(button){this.returnFocus=button;const dialog=this.ensureDialog();this.paintDialog();dialog.showModal();if((globalThis.SwarmNativeVersionHooks||!this.value)&&!this.pending)this.load().catch(()=>{});globalThis.SwarmShell?.focusWindowStart(dialog)},
+ /** Bind the existing entry and initial summary read. Native mode never
+  * invokes storage health rendering, periodic checks or CLI/source diagnostics. */
+ start(){for(const button of document.querySelectorAll('[data-version-open]'))button.addEventListener('click',()=>this.open(button));this.paintSummary();if(globalThis.SwarmNativeVersionHooks)this.load().catch(()=>{});else this.load().then(health=>RuntimeHealthPanel.render(health)).catch(()=>RuntimeHealthPanel.renderFailure())}
 };
 const RuntimeHealthPanel={
  value:null,signature:'',
@@ -81,4 +96,4 @@ const RuntimeHealthPanel={
  start(){VersionHistoryPanel.start();if(document.getElementById('runtime-health'))setInterval(()=>{if(!document.hidden)this.check()},5000)}
 };
 globalThis.VersionHistoryPanel=VersionHistoryPanel;
-document.addEventListener('DOMContentLoaded',()=>RuntimeHealthPanel.start());
+document.addEventListener('DOMContentLoaded',()=>globalThis.SwarmNativeVersionHooks?VersionHistoryPanel.start():RuntimeHealthPanel.start());

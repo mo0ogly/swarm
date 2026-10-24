@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Version et nouveautés : le dialogue existant affiche le binaire Rust actif, sa base Git et ses modifications non commitées, avec notes FR/EN ; aucune comparaison de sources ou du CLI n’est supposée.",
+        "en": "Version and news: the existing dialog shows the active Rust binary, its Git base and uncommitted changes, with FR/EN notes; no source or CLI comparison is assumed."
+      },
+      {
         "fr": "Tarifs : dialogue existant raccordé à Rust depuis Budget et Administration, versions conservées, ajout contrôlé par empreinte et estimation explicite sans modifier les budgets.",
         "en": "Pricing: existing dialog connected to Rust from Budget and Admin, preserved versions, digest-checked append and explicit estimates without changing budgets."
       },
