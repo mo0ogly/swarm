@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "agent-workflows-native",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/swarm-engine/config/*.json",
+    "tools/rust-migration/generate_agent_models.py",
+    "tools/rust-migration/test_generate_agent_models.py",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/i18n/build.cjs",
+    "package.json",
+    "package-lock.json",
+    "tools/agent-workflows/check.py",
+    ".gitignore",
+    "tools/verification/verify_npm_archive.py",
+    "tools/verification/recipes/agent-native-runtime.json",
+    "tools/verification/test_recipe.py",
+    "version_history.json",
+    "docs/architecture/ADMIN-AI-ADVICE.md",
+    "docs/en/ADMIN-AI-ADVICE.md",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUST-MIGRATION.md",
+    "tools/verification/recipes/native-task-validation.json",
+    "tools/agent-workflows/check.py",
+    "tools/agent-workflows/test_check.py",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/agent-workflows-native.json",
+    "docs/AGENT-METHODS.md",
+    "docs/en/AGENT-METHODS.md",
+    "tools/verification/README.md",
+    "contracts/agent-wire-layout.v1.json"
+  ],
+  "environment": {
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "checker-negative-and-signal-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/agent-workflows",
+        "-p",
+        "test_check.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 8 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "actual-native-role-contexts",
+      "command": [
+        "python3",
+        "tools/agent-workflows/check.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 native roles, 9 named native tests",
+        "frozen_role_planner_contract ... ok",
+        "frozen_role_subplanner_contract ... ok",
+        "frozen_role_worker_contract ... ok",
+        "frozen_role_reviewer_contract ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

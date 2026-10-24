@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+"""Verify the actual native CLI HTTP process on private ephemeral Roots.
+
+Normal binary required; no provider, live mission, Go restart, global watchdog or
+silent retry. Success requires protected HTTP content, actual saved consumer/state,
+owner records, graceful SIGINT and BrokenPipe recovery. stdout backpressure that
+never returns is not covered. Keys/CSRF/preview tokens stay out of proof streams.
+Failed Roots survive; successful ones are removed only after owned processes exit.
+"""
+import argparse,hashlib,http.client,json,os,shutil,signal,subprocess,tempfile,time,traceback
+from pathlib import Path
+import rust_agent_model_route as retained
+
+
+def clean(value):
+    """Redact private access/proposal tokens from fixture command/HTTP artifacts."""
+    if isinstance(value,dict):return {k:('<redacted>' if k in ['csrf_token','preview_token'] else clean(v)) for k,v in value.items()}
+    if isinstance(value,list):return [clean(v) for v in value]
+    return value
+
+
+class Server:
+    """Own exactly one CLI process and its pipes; no arbitrary PID/root selected."""
+    def __init__(self,binary,root,output,label,*,environment=None):
+        """Start the owned CLI with an explicit optional inherited environment.
+
+        Existing callers retain subprocess inheritance. A fixture supplying its
+        own catalogue must pass its actual environment, as CLI and HTTP model
+        admission consume the same CODEX_HOME. Do not serialize environment
+        contents: they may contain credentials. Startup/cleanup errors propagate.
+        """
+        self.binary=binary;self.root=root;self.output=output;self.label=label;self.records=[];self.requests=[];self.stop_sent=False
+        self.argv=[str(binary),'web','--root',str(root),'--json','--lang','en']
+        self.start=time.time();self.process=subprocess.Popen(self.argv,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=environment)
+        self.stdout_open=True;self.stderr=b''
+        retained.publish(output/(label+'-process.json'),dict(argv=self.argv,pid=self.process.pid,start=self.start,global_watchdog=None,owned=True))
+        print(json.dumps(dict(state='RUN',case=label,phase='waiting-bound')),flush=True)
+        try:
+            bound=self.record();assert bound['event']=='web-bound' and bound['runtime_ready'] is False
+            address=bound['address'];host,port=address.rsplit(':',1);assert host=='127.0.0.1' and int(port)>0
+            self.host=host;self.port=int(port);self.address=address
+            digest=hashlib.sha256(address.encode()).hexdigest()
+            self.key=(root/'.swarm'/('web-session-'+digest[:16])).read_text()
+            assert self.key.startswith('session-') and len(self.key)==32
+            self.cookie='swarm_session_'+digest[:12]+'='+self.key
+        except BaseException as primary:
+            try:self.cleanup()
+            except BaseException as secondary:raise BaseExceptionGroup('Bootstrap and owned cleanup failed',[primary,secondary])
+            raise
+
+    def record(self):
+        """Read one actual compact protocol frame, with no terminal watchdog."""
+        raw=self.process.stdout.readline();assert raw,'CLI stdout ended before required frame'
+        value=json.loads(raw);assert value['schema_version']==1
+        self.records.append(clean(value));return value
+
+    def request(self,path,body=None,csrf=None,authorized=True,status=200,observe=True):
+        """Use actual HTTP and exact Host-scoped cookie/CSRF; retain redacted content.
+
+        Observer frames follow completed jobs only; pre-Root access refusals appear
+        in final summary. Unknown client response after output failure is not success.
+        """
+        headers={'Origin':'http://'+self.address}
+        if authorized:headers['Cookie']=self.cookie
+        if csrf is not None:headers['X-Swarm-CSRF']=csrf
+        data=None if body is None else json.dumps(body,ensure_ascii=False,separators=(',',':')).encode()
+        if data is not None:headers['Content-Type']='application/json'
+        connection=http.client.HTTPConnection(self.host,self.port,timeout=None)
+        try:
+            connection.request('GET' if body is None else 'POST',path,body=data,headers=headers)
+            response=connection.getresponse();raw=response.read();actual=response.status;content_type=response.getheader('Content-Type','')
+        finally:connection.close()
+        if content_type.split(';',1)[0]=='application/json':parsed=json.loads(raw)
+        else:
+            # Native pre-Root refusal is a public fixed text code, never JSON.
+            assert status==403 and actual==403 and raw==b'web-access-refused',(actual,content_type)
+            parsed=raw.decode('ascii')
+        self.requests.append(dict(path=path,method='GET' if body is None else 'POST',status=actual,content_type=content_type,response=clean(parsed)))
+        assert actual==status,(path,actual,clean(parsed))
+        if observe:
+            frame=self.record();assert frame['event']=='web-outcome' and frame['outcome']['status']==status
+            assert self.key not in json.dumps(frame)
+        return parsed
+
+    def prepare(self,event):
+        """Positive protected witnesses precede output failure; preview remains read-only."""
+        session=self.request('/api/v1/native-session');csrf=session['csrf_token'];assert csrf!=self.key
+        doc=self.request('/api/v1/native-settings');before=(self.root/'.swarm/engine-settings.json').read_bytes()
+        values=doc['values'];values['review_delivery_max_bytes']='3'
+        change=dict(schema_version=doc['schema_version'],event_id=event,expected_revision=doc['revision'],values=values,reason='Owned native CLI HTTP proof',preview_token='')
+        preview=self.request('/api/v1/native-settings/preview',change,csrf);assert (self.root/'.swarm/engine-settings.json').read_bytes()==before
+        change['preview_token']=preview['preview_token'];return csrf,change
+
+    def stop(self):
+        """SIGINT only this owned child, then require the actual drained-stop summary."""
+        self.process.send_signal(signal.SIGINT);self.stop_sent=True
+        frame=self.record();assert frame['event']=='web-stopped'
+        self.stderr=self.process.stderr.read();code=self.process.wait();assert code==0,(code,clean(json.loads(self.stderr)) if self.stderr else None)
+        return frame
+
+    def cleanup(self):
+        """Attempt owned signal/drain/wait/pipe closes and retain failures independently.
+
+        No kill timeout or retry is invented. A stall remains observable in driver
+        stage/process records and must be diagnosed by the active test controller.
+        """
+        errors=[]
+        if self.process.poll() is None and not self.stop_sent:
+            try:self.process.send_signal(signal.SIGINT);self.stop_sent=True
+            except BaseException as error:errors.append(error)
+        if self.stdout_open:
+            try:
+                remainder=self.process.stdout.read()
+                if remainder:retained.publish(self.output/(self.label+'-remaining-stdout.bin'),remainder)
+            except BaseException as error:errors.append(error)
+        try:
+            tail=self.process.stderr.read()
+            if tail:self.stderr+=tail
+        except BaseException as error:errors.append(error)
+        try:self.process.wait()
+        except BaseException as error:errors.append(error)
+        for stream in [self.process.stdout,self.process.stderr]:
+            if stream is not None and not stream.closed:
+                try:stream.close()
+                except BaseException as error:errors.append(error)
+        try:
+            # CLI output contracts exclude credentials; assert before publication.
+            if hasattr(self,'key'):assert self.key.encode() not in self.stderr
+            retained.publish(self.output/(self.label+'-records.json'),dict(records=self.records,requests=self.requests,exit=self.process.returncode,start=self.start,end=time.time()))
+            retained.publish(self.output/(self.label+'-stderr.bin'),self.stderr)
+        except BaseException as error:errors.append(error)
+        if errors:raise BaseExceptionGroup('Owned CLI cleanup/evidence failed',errors)
+
+
+class NativeCliFailure(RuntimeError):
+    """Safe helper failure; result/argv hold originals without rendering their data.
+
+    evidence_directory is a new owned0700directory outside the tested Root. It
+    preserves stdout/stderr/argv privately, including uncertain saved-state data.
+    Nothing here retries, repairs Root, stops a process or grants provider access.
+    """
+    def __init__(self,argv,result):
+        super().__init__('Native CLI contract failed; exit code '+str(result.returncode))
+        self.argv=argv;self.result=result;self.evidence_directory=None
+
+
+def cli_failure(argv,result):
+    """Preserve exact command diagnostics privately, never in public traceback text.
+
+    Failure of diagnostic publication retains both original CLI failure and the
+    publication cause. The caller separately chains a parse error when relevant.
+    """
+    error=NativeCliFailure(argv,result)
+    try:
+        directory=Path(tempfile.mkdtemp(prefix='swarm-native-cli-failure-'))
+        assert directory.stat().st_mode&0o777==0o700 and directory.stat().st_uid==os.getuid()
+        error.evidence_directory=directory
+        error.add_note('Original private CLI diagnostics retained at '+str(directory))
+        retained.publish(directory/'stdout.bin',result.stdout);retained.publish(directory/'stderr.bin',result.stderr)
+        retained.publish(directory/'command.json',dict(argv=argv,exit=result.returncode,scope='Private original evidence; may contain sensitive fixture data'))
+    except BaseException as secondary:raise BaseExceptionGroup('CLI contract and private diagnostic publication failed',[error,secondary])
+    return error
+
+
+def cli(binary,root,arguments):
+    """Actual supported CLI; no shell/provider or fixture write into the tested Root.
+
+    Exit/JSON failures retain exact originals in a separate private owned directory;
+    malformed successful output never becomes an empty success. Launch failures
+    propagate as their original OS error. No repeated operation or watchdog.
+    """
+    argv=[str(binary),*arguments,'--root',str(root),'--json','--lang','en']
+    result=subprocess.run(argv,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    if result.returncode:raise cli_failure(argv,result)
+    try:return json.loads(result.stdout)
+    except (json.JSONDecodeError,UnicodeDecodeError) as cause:raise cli_failure(argv,result) from cause
+
+
+def owned_root(binary):
+    """Create private disposable fixture and explicitly initialize it through CLI."""
+    root=Path(tempfile.mkdtemp(prefix='swarm-cli-http97-'));assert root.stat().st_mode&0o777==0o700
+    try:cli(binary,root,['init'])
+    except BaseException as error:
+        error.add_note('Owned initialization fixture retained at '+str(root));raise
+    return root
+
+
+def finish(server,primary):
+    """Keep the primary and every owned cleanup failure without masking either."""
+    try:server.cleanup()
+    except BaseException as error:
+        if primary is not None:raise BaseExceptionGroup('Scenario and cleanup failed',[primary,error])
+        raise
+    if primary is not None:raise primary
+
+
+def normal(binary,output):
+    """Protected API, saved state, exact replay, expected403 and actual SIGINT close."""
+    root=owned_root(binary);server=Server(binary,root,output,'normal');primary=None
+    try:
+        csrf,change=server.prepare('cli-http97')
+        capability=server.request('/api/v1/native-capabilities');assert capability['profile']=='rust-native-http1-observed'
+        server.request('/api/v1/works',authorized=False,status=403,observe=False)
+        applied=server.request('/api/v1/native-settings/apply',change,csrf);assert applied['replayed'] is False and applied['document']['revision']=='2'
+        receipt=server.records[-1]['outcome']['recorded_configuration'];assert receipt['event_id']=='cli-http97' and receipt['event_revision']=='2' and receipt['replayed'] is False
+        saved=(root/'.swarm/engine-settings.json').read_bytes()
+        replay=server.request('/api/v1/native-settings/apply',change,csrf);assert replay['replayed'] is True and (root/'.swarm/engine-settings.json').read_bytes()==saved
+        assert server.request('/api/v1/works')==[]
+        shown=cli(binary,root,['engine-settings','show']);assert shown['revision']=='2' and shown['values']['review_delivery_max_bytes']=='3'
+        summary=server.stop();assert summary['completed_jobs']==7 and summary['observed_outcomes']==7 and summary['configuration_outcomes']==2 and summary['rejected_requests']==1
+        assert summary['first_request_failure']=='web-session-required';assert summary['last_recorded_configuration']['event_id']=='cli-http97'
+        assert (root/'.swarm/engine-settings.json').read_bytes()==saved
+    except BaseException as error:primary=error
+    finish(server,primary);shutil.rmtree(root)
+    return dict(case='normal',status='PASS',scope='actual normal CLI/protected HTTP/owner stream/SIGINT; no UI or durable journal')
+
+
+def broken_stdout(binary,output):
+    """Close real stdout only after valid witnesses; verify post-commit owner error,
+    safe stderr and explicit same-event replay after public readback/restart.
+    """
+    root=owned_root(binary);server=Server(binary,root,output,'broken-stdout');primary=None
+    try:
+        csrf,change=server.prepare('cli-broken97')
+        server.process.stdout.close();server.stdout_open=False
+        connection=http.client.HTTPConnection(server.host,server.port,timeout=None)
+        try:
+            connection.request('POST','/api/v1/native-settings/apply',body=json.dumps(change).encode(),headers={'Cookie':server.cookie,'Origin':'http://'+server.address,'X-Swarm-CSRF':csrf,'Content-Type':'application/json'})
+            response=connection.getresponse();raw=response.read();assert response.status!=200
+        except (http.client.RemoteDisconnected,ConnectionResetError,BrokenPipeError):pass
+        finally:connection.close()
+        server.stderr=server.process.stderr.read();assert server.process.wait()==2
+        diagnostic=json.loads(server.stderr);assert diagnostic['failure']['code']=='web-outcome-observation-failed'
+        assert diagnostic['configuration_may_be_recorded'] is True and diagnostic['web_session_may_be_recorded'] is True
+        assert diagnostic['recorded_configuration']['event_id']=='cli-broken97' and diagnostic['recorded_configuration']['event_revision']=='2'
+        assert any('BrokenPipe' in item for item in diagnostic['failure']['causes'])
+        assert diagnostic['pending_outcomes'][0]['configuration_may_be_recorded'] is True
+        shown=cli(binary,root,['engine-settings','show']);assert shown['revision']=='2' and shown['values']['review_delivery_max_bytes']=='3'
+        assert sum(entry['change']['event_id']=='cli-broken97' for entry in shown['history'])==1
+        saved=(root/'.swarm/engine-settings.json').read_bytes()
+    except BaseException as error:primary=error
+    finish(server,primary)
+    recovered=Server(binary,root,output,'recovered');primary=None
+    try:
+        session=recovered.request('/api/v1/native-session');csrf=session['csrf_token']
+        replay=recovered.request('/api/v1/native-settings/apply',change,csrf);assert replay['replayed'] is True
+        assert (root/'.swarm/engine-settings.json').read_bytes()==saved
+        summary=recovered.stop();assert summary['configuration_outcomes']==1 and summary['completed_jobs']==2
+    except BaseException as error:primary=error
+    finish(recovered,primary);shutil.rmtree(root)
+    return dict(case='broken-stdout',status='PASS',scope='real EPIPE after actual TCP commit, native stderr preserves state; explicit replay without duplication')
+
+
+def main():
+    """Preserve exact driver/helper/binary hashes and original failures; no source mutation."""
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--binary',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
+    args=parser.parse_args();binary=args.binary.resolve();output=args.output.resolve();output.mkdir(parents=True,exist_ok=False)
+    before=retained.digest(binary.read_bytes());source=Path(__file__).read_bytes();helper=Path(retained.__file__).read_bytes()
+    retained.publish(output/'driver.py',source);retained.publish(output/'rust_agent_model_route.py',helper);retained.publish(output/'inputs.json',dict(binary=str(binary),binary_sha256=before,source_sha256=retained.digest(source),helper_sha256=retained.digest(helper),global_watchdog=None,scope='owned normal CLI HTTP, no real provider/UI/Go restart'))
+    checks=[]
+    try:
+        for scenario in [normal,broken_stdout]:
+            checks.append(scenario(binary,output));print('PASS native-http-cli-'+checks[-1]['case'],flush=True)
+        assert retained.digest(binary.read_bytes())==before
+        retained.publish(output/'result.json',dict(status='PASS',checks=checks,binary_unchanged=True,global_watchdog=None,private_tokens_redacted=True))
+    except BaseException as error:
+        retained.publish(output/'failure.json',dict(status='FAIL',type=type(error).__name__,message=str(error),traceback=traceback.format_exc(),checks=checks));raise
+
+
+if __name__=='__main__':main()

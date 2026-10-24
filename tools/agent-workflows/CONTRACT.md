@@ -30,9 +30,10 @@ The engine owns reservations, eligibility, integration and acceptance. Do not
 edit `.swarm` databases, fabricate reviews, alter proofs or accept outside public
 operations. Respect owned workspaces; parallel writes need supported isolation
 and ownership. Delegation needs authorization and capacity. Do not delete locks,
-stop others or change shared files to force progress. Managed checks and review
-must cover the same candidate; changed code, methods or relevant inputs invalidate
-old evidence. Record commit SHA and dirty diff for uncommitted work.
+stop others or change shared files to force progress. Managed checks/review bind one candidate. Changed code/methods/inputs invalidate
+evidence. Record SHA and dirty diff. Native: check.py --evidence. Go: retain actual
+root/package sources, embeds and overlays.
+
 
 Retain Cursor January 14, 2026, https://cursor.com/blog/scaling-agents and February
 5, 2026, https://cursor.com/blog/self-driving-codebases. Audit JAN-1..JAN-7 and
@@ -111,6 +112,7 @@ Use stable IDs and a small evidence matrix:
 | --- | --- | --- | --- | --- | --- |
 
 Results: PASS, FAIL, PARTIAL, NOT TESTED, NOT APPLICABLE (reason required).
+Establish a valid control before each fault injection.
 Test normal, invalid, failure, recovery and promised persistence/concurrency;
 assert behavior, beyond labels/HTTP 200. Retain command, executor, revision,
 start/end, exit, original stdout/stderr, hashes and output limits. Distinguish

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "native-version-public",
+  "inputs": [
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-cli/src/version.rs",
+    "rust/crates/swarm-engine/src/version_identity.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/mission_status_runtime.rs",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/verify_native_profile.py",
+    "tests/native_build_metadata_test.py",
+    "tests/rust_version_public.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "metadata-label-and-environment-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "native_build_metadata_test.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_metadata_presence_hash_and_private_values",
+        "test_release_label_matches_legacy_prerelease_rules",
+        "Ran 2 tests",
+        "\nOK\n"
+      ]
+    },
+    {
+      "id": "qualified-native-cold-version-journey",
+      "command": [
+        "python3",
+        "tests/rust_version_public.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "VERSION_PUBLIC_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

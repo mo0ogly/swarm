@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "native-agent-runtime-prerequisites",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r25",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "engine-agent-runtime",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "agent_runtime",
+        "--test",
+        "supervisor_claim",
+        "--test",
+        "agent_cancellation"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "agent_contract_preserves_struct_nulls_and_authoritative_lifecycle ... ok",
+        "agent_history_keeps_all_attempts_and_refuses_corruption_then_recovers ... ok",
+        "agent_stop_is_idempotent_atomic_and_recovers_without_termination_claim ... ok",
+        "agent_stop_refuses_silent_sql_noops_and_recovers ... ok",
+        "4 passed; 0 failed",
+        "supervisor_identity_observes_current_kernel_process_without_empty_fallback ... ok",
+        "supervisor_claim_registers_once_and_preserves_stop_and_reservation ... ok",
+        "supervisor_claim_refuses_inconsistent_registration_without_mutation ... ok",
+        "supervisor_claim_refuses_silent_sql_noops_then_recovers ... ok",
+        "root_supervisor_claim_single_winner_and_readonly_refusal ... ok",
+        "queued_cancellation_atomically_settles_task_agent_and_reservation ... ok",
+        "queued_cancellation_refuses_silent_sql_failures_and_recovers_all_state ... ok",
+        "queued_cancellation_preserves_newer_task_attempt ... ok",
+        "queued_cancellation_preserves_registered_agents_and_handles_legacy_stop_gap ... ok",
+        "queued_cancellation_repairs_partial_historical_settlement ... ok",
+        "queued_cancellation_and_supervisor_claim_have_one_consistent_winner ... ok",
+        "5 passed; 0 failed",
+        "6 passed; 0 failed"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "cli-agent-and-common-output",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--offline",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "agent_runtime",
+        "--test",
+        "pricing",
+        "--test",
+        "cli"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "agent_cli_show_and_stop_preserve_intent_without_claiming_termination ... ok",
+        "agent_cli_output_failures_preserve_recorded_stop_and_private_diagnostics ... ok",
+        "pricing_cli_output_failures_report_preserved_configuration ... ok",
+        "4 passed; 0 failed",
+        "3 passed; 0 failed",
+        "agent_cli_reconcile_cancels_unregistered_launch_once_and_refuses_registered ... ok",
+        "agent_cli_cancel_output_failures_preserve_settlement_and_replay ... ok",
+        "17 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

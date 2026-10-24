@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "launch-profile-level",
+  "inputs": [
+    "tests/rust_launch_profile_level.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/task_model.rs",
+    "rust/crates/swarm-engine/src/provider_model_route.rs",
+    "rust/crates/swarm-engine/src/agent_store.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-profile-levels-preview-admission-replay",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\nbinary=Path(os.environ['SWARM_PROFILE_LEVEL_BINARY']).resolve()\nif not binary.is_file():raise ValueError('profile-level-binary-missing')\nbase=Path(tempfile.mkdtemp(prefix='profile-level-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_launch_profile_level.py','--binary',str(binary),'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS reusable-profile-level-inherited",
+        "PASS reusable-profile-level-explicit",
+        "PASS reusable-profile-level-task-choice",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

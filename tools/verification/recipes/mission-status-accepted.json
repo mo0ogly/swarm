@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "mission-status-accepted",
+  "inputs": [
+    "tests/rust_status_accepted.py",
+    "tests/rust_mission_status_contract.py",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/task_lifecycle.rs",
+    "version_history.json",
+    "tools/verification/recipes/mission-status-accepted.json",
+    "rust/crates/swarm-engine/src/root_store/mission_status_activity.rs",
+    "rust/crates/swarm-engine/src/agent_heartbeat.rs",
+    "rust/crates/swarm-engine/src/supervisor_identity.rs",
+    "tests/rust_status_submitted_window.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_results.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_evidence.rs",
+    "rust/crates/swarm-engine/src/mission_cost_guard.rs",
+    "rust/crates/swarm-engine/src/mission_controls.rs",
+    "rust/crates/swarm-engine/src/mission_organization.rs",
+    "rust/crates/swarm-engine/src/planning_control.rs",
+    "rust/crates/swarm-engine/src/mission_status_insights.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/agent_models.rs",
+    "rust/crates/swarm-engine/src/planning_activation.rs",
+    "rust/crates/swarm-engine/src/planning_decision.rs",
+    "rust/crates/swarm-engine/src/planning_state.rs",
+    "rust/crates/swarm-engine/src/planning_budget.rs",
+    "rust/crates/swarm-engine/src/review_evidence.rs",
+    "rust/crates/swarm-engine/src/work_engine.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_readiness.rs",
+    "rust/crates/swarm-engine/src/financial_budget.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "tests/rust_manual_mission.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-accepted-freshness",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='status-accepted-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_status_accepted.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS accepted freshness, saved profile manual/pause, dependencies and initial planning",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

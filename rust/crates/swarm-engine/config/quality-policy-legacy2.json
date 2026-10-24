@@ -1,0 +1,7 @@
+{
+  "quality_delivery_min_percent": "70",
+  "quality_domain_min_percent": "50",
+  "quality_band_ok_min_percent": "80",
+  "quality_band_warn_min_percent": "70",
+  "quality_band_blocked_min_percent": "50"
+}

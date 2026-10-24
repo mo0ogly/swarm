@@ -1,0 +1,48 @@
+{
+  "_lisez-moi": "Clé = surface:élément (cli:<opération>, http:<chemin>, page:<fichier>). Valeur = liste de fichiers result.json (chemins depuis la racine du dépôt) qui doivent exister et déclarer status PASS. Un élément n'est « vérifié » que si toutes ses preuves le sont. Ajouter une entrée à chaque lot qui livre une preuve ; ne jamais citer une preuve non lue.",
+  "cli:mission watch": [
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/watch-public213/result.json",
+    "docs/plans/migration-rust/evidence/20261022-g3-watch-restart/public224/result.json",
+    "docs/plans/migration-rust/evidence/20261022-g3-watch-planning/public244/result.json",
+    "docs/plans/migration-rust/evidence/20261023-g1-status-contract/recipe657-controls/result.json",
+    "docs/plans/migration-rust/evidence/20261023-g1-status-contract/recipe658-revocation/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe696-mission-review-refusal/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe697-mission-report-once/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe698-mission-controls-revocation/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe907-manual-automatic-controls/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe908-review-refusal/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1006-foreground-signals/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1007-manual-controls/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1007-review-refusal/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1028-registered-observer/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1054-async-planner/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1054-registered-observer/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1055-manual-controls/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1055-review-refusal/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1067-async-roles/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1067-registered-observer/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1070-manual-controls/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1070-review-refusal/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1071-controls-revocation/result.json",
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe1071-reviewer-revocation/result.json"
+  ],
+  "cli:mission status": [
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/watch-public213/result.json"
+  ],
+  "cli:agent logs": [
+    "docs/plans/migration-rust/evidence/20261023-g1-status-contract/decision563-logs/result.json"
+  ],
+  "cli:work list": [
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/differential-public194/bench/result.json"
+  ],
+  "cli:work show": [
+    "docs/plans/migration-rust/evidence/20261022-root-instance-201/differential-public194/bench/result.json"
+  ],
+  "_portee_watch": "Phases controls/reviewer/planner asynchrones ordonnées : six rôles/signaux et progression main1067 sur1066 ; registered1067 et manual/refus/révocations1070–1071 PASS. Deux échecs originaux conservés1064/1067, corrections1065/1069. Un seul job de rôle ; concurrence Go complète, managed/web, fin/revue globale ouvertes. Aucun déploiement.",
+  "cli:version": [
+    "docs/plans/migration-rust/evidence/20261024-g3-auto-review/recipe906-native-version/result.json"
+  ],
+  "_portee_R6": "Fixture froide schema37 :50tables et9entrées restaurées924, budget/réglages etnouvelleécriturepublique. NiGo/anciensschémas, niRootactif/autoritéexistante, niR6global.",
+  "_native_http_mission": "Extension native mission1170,4lectures/6writers CLI,public1165 sur1156 PASS ; ne compte pas comme route Go historique portée ou conducteur web. Preuve docs/plans/migration-rust/evidence/20261024-eight-waves-1080/decision1170/result.json",
+  "_native_web_conductor": "Native extension1218 locally verified: web-owned consented sessions,13public assertions,44CLI tests,3CLI journeys and6role signal cases. Not historical Go route parity or global acceptance. Proof docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/result.json"
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "mission-task-profile",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-engine/src/**/*.rs",
+    "rust/crates/swarm-engine/config/*.json",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/examples/mission_task_profile.rs",
+    "tools/verification/recipe.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_task_profile.py",
+    "tests/rust_native_production_retry.py",
+    "tests/rust_native_review_acceptance.py",
+    "tests/rust_native_review_decision.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_reviewer.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_native_worker_failure_retry.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-configured-task-profile-and-automatic-retry",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-task-profile-',dir='.cache')).resolve()\nargs=['python3','tests/rust_mission_task_profile.py']\nfor key,var in [('binary','SWARM_TASK_PROFILE_NORMAL_BINARY'),('profile','SWARM_TASK_PROFILE_NORMAL_PROFILE'),('sdk-binary','SWARM_TASK_PROFILE_SDK_BINARY'),('sdk-profile','SWARM_TASK_PROFILE_SDK_PROFILE')]:\n value=Path(os.environ[var]).resolve()\n if not value.is_file():raise ValueError('task-profile-input-missing:'+var)\n args+=['--'+key,str(value)]\nsubprocess.run(args+['--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base),flush=True)\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS actual task profile precedence, model choice, parent and task fencing, automatic retry",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

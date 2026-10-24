@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "mission-worker-dispatch",
+  "inputs": [
+    "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+    "rust/crates/swarm-engine/src/mission_workspace_fifo.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_store.rs",
+    "rust/crates/swarm-engine/src/agent_launch.rs",
+    "rust/crates/swarm-engine/src/mission_agent.rs",
+    "rust/crates/swarm-cli/examples/mission_worker_dispatch.rs",
+    "tests/rust_mission_worker_dispatch.py",
+    "tests/rust_*.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-public-dispatch-selection-replay-capacity-permission",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-worker-dispatch-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_worker_dispatch.py','--binary',os.environ['SWARM_DISPATCH_BINARY'],'--profile',os.environ['SWARM_DISPATCH_PROFILE'],'--sdk-binary',os.environ['SWARM_DISPATCH_SDK_BINARY'],'--sdk-profile',os.environ['SWARM_DISPATCH_SDK_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS public dispatch selection replay capacity and permission with no provider launch",
+        "PASS three original replay conflicts preserve all SQL before synchronization",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,1092 @@
+{
+  "schema_version": 4,
+  "fields": [
+    {
+      "name": "task_max_attempts",
+      "label": "Tentatives par tâche",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond de définition d’une tâche. Modifier ce plafond ne remet aucune tentative consommée à zéro.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "task_max_tool_calls",
+      "label": "Appels d’outils par tâche",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond de définition, distinct de la consommation et des limites figées d’une tentative.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "task_max_criteria",
+      "label": "Critères par tâche",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de critères dans une définition de tâche.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_controls",
+      "label": "Contrôles par politique",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de contrôles déclarés ; zéro interdit d’en déclarer.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_arguments",
+      "label": "Arguments par contrôle",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal d’arguments ; zéro n’admet aucun argument.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_inputs",
+      "label": "Entrées par contrôle",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de fichiers déclarés en entrée ; zéro n’admet aucune entrée.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_min_justification_chars",
+      "label": "Justification minimale (caractères)",
+      "unit": "characters",
+      "nullable": false,
+      "help": "Longueur minimale de justification, distincte d’une autorisation d’exécution.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_justification_chars",
+      "label": "Justification maximale (caractères)",
+      "unit": "characters",
+      "nullable": true,
+      "help": "Longueur maximale de justification ; doit permettre le minimum configuré.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_default_timeout_seconds",
+      "label": "Durée par défaut d’un contrôle (secondes)",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Durée utilisée lorsqu’un contrôle n’en déclare pas ; valeur strictement positive.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_timeout_seconds",
+      "label": "Durée maximale par contrôle (secondes)",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Doit permettre la durée par défaut. Sans plafond n’annule pas les durées explicitement déclarées.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_total_timeout_seconds",
+      "label": "Durée totale des contrôles (secondes)",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Somme maximale des durées déclarées dans une politique ; valeur positive ou sans plafond.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_allowed_programs",
+      "label": "Programmes admissibles pour les contrôles",
+      "unit": "programs",
+      "nullable": false,
+      "help": "Un programme par ligne. Une liste vide interdit tous les programmes. Cette liste n’autorise pas un contrôle à elle seule.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "storage_busy_timeout_ms",
+      "label": "Attente SQLite par tentative (millisecondes)",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Zéro renvoie immédiatement en cas de contention. La représentation SQLite exige au plus 2147483647 ms.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "storage_busy_retries",
+      "label": "Reprises de stockage supplémentaires",
+      "unit": "count",
+      "nullable": true,
+      "help": "Zéro signifie une seule tentative. Sans plafond peut attendre indéfiniment. SQLite et, pour le cycle natif des agents, contention du verrou des réglages ; aucun fournisseur ni agent n’est relancé.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "storage_busy_retry_delay_ms",
+      "label": "Délai entre reprises de stockage (millisecondes)",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Zéro signifie aucune attente entre reprises ; une valeur élevée retarde la réponse.",
+      "introduced_schema_version": 1
+    },
+    {
+      "name": "validation_max_output_bytes",
+      "label": "Sortie conservée par contrôle (octets)",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond partagé de sortie stdout/stderr conservée. Zéro conserve seulement le compte ; sans plafond peut épuiser la mémoire. Ne raccourcit pas la durée du contrôle.",
+      "introduced_schema_version": 2
+    },
+    {
+      "name": "quality_delivery_min_percent",
+      "label": "Qualité globale minimale pour livraison (points sur 100)",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Zéro n’ajoute aucun blocage de score global ; les preuves, contrôles obligatoires et revues restent requis.",
+      "introduced_schema_version": 3
+    },
+    {
+      "name": "quality_domain_min_percent",
+      "label": "Qualité minimale par domaine (points sur 100)",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Seuil de chaque domaine pour livraison ; le modifier impose une nouvelle génération de politique.",
+      "introduced_schema_version": 3
+    },
+    {
+      "name": "quality_band_ok_min_percent",
+      "label": "Bande OK : seuil minimal (points sur 100)",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Seuil de classement OK, supérieur ou égal au seuil d’avertissement. Ne remplace pas l’autorisation de livraison.",
+      "introduced_schema_version": 3
+    },
+    {
+      "name": "quality_band_warn_min_percent",
+      "label": "Bande avertissement : seuil minimal (points sur 100)",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Seuil de classement avertissement, compris entre les seuils OK et blocage.",
+      "introduced_schema_version": 3
+    },
+    {
+      "name": "quality_band_blocked_min_percent",
+      "label": "Bande blocage : seuil minimal (points sur 100)",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Les scores inférieurs sont classés STOP. Le classement et l’autorisation sont des décisions distinctes.",
+      "introduced_schema_version": 3
+    },
+    {
+      "name": "project_profile_max_name_bytes",
+      "label": "Taille du nom de profil",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond en octets UTF-8 du nom du profil ; zéro refuse tout nom non vide.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "project_profile_max_sources",
+      "label": "Sources de profil",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre de sources configurées dans un profil ; zéro empêche le chargement d’un profil non vide.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "project_profile_max_path_bytes",
+      "label": "Taille du chemin de source",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond en octets UTF-8 du chemin relatif d’une source ; les contrôles de chemin restent obligatoires.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "project_profile_max_document_bytes",
+      "label": "Document de profil",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Taille maximale du document JSON de profil ; un dépassement refuse la lecture sans troncature.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "project_context_max_bytes",
+      "label": "Contexte de projet",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Volume cumulé des sources et de leurs en-têtes pour un rôle autre qu’exécutant ; aucun contexte tronqué.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "project_worker_context_max_bytes",
+      "label": "Contexte de projet des exécutants",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Volume cumulé du contexte de projet des exécutants ; sans plafond peut consommer beaucoup de mémoire.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "review_delivery_max_bytes",
+      "label": "Livrable documentaire de revue",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Taille maximale du livrable documentaire attaché à une revue ; cela ne prouve ni qualité ni autorisation.",
+      "introduced_schema_version": 4
+    },
+    {
+      "name": "git_command_timeout_seconds",
+      "label": "Délai des commandes Git",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Durée maximale, par commande, des lectures de rapports et métadonnées Git. Le défaut initial de 90 s était celui des lectures de rapports Go. Zéro expire immédiatement ; sans plafond désactive ce délai, avec un risque d’attente sans fin. Les erreurs et le nettoyage du groupe de processus restent vérifiés. Ce réglage ne donne aucun droit d’exécution.",
+      "introduced_schema_version": 5
+    },
+    {
+      "name": "managed_review_max_baseline_depth",
+      "label": "Profondeur des bases de revue",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de liens de bases historiques sous la revue courante, de profondeur zéro. Le défaut initial de 128 reprend le Go : 129 contextes sur une chaîne. Zéro refuse tout ancêtre ; sans plafond supprime cette borne et peut augmenter le travail et les lectures. Chaque preuve reste vérifiée ; ce réglage ne donne aucun droit ni acceptation.",
+      "introduced_schema_version": 6
+    },
+    {
+      "name": "review_reply_min_text_bytes",
+      "label": "Texte minimal des avis",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Minimum d’octets UTF-8 après retrait des espaces de bord, pour la justification et chaque preuve. Zéro retire ce minimum ; des textes vides peuvent alors être admis.",
+      "introduced_schema_version": 7
+    },
+    {
+      "name": "review_reply_max_text_bytes",
+      "label": "Texte maximal des avis",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Maximum d’octets UTF-8 bruts par justification ou preuve. Illimité retire ce plafond ; la mémoire suit les données lues. Ce n’est pas la limite de caractères du schéma fournisseur.",
+      "introduced_schema_version": 7
+    },
+    {
+      "name": "review_quote_min_normalized_bytes",
+      "label": "Citation normalisée minimale",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Minimum d’octets après normalisation de la prose Markdown, sans effet sur une citation exacte. Zéro retire ce minimum et affaiblit le contrôle des extraits normalisés.",
+      "introduced_schema_version": 7
+    },
+    {
+      "name": "evidence_longest_measured_count",
+      "label": "Contrôles mesurés affichés",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre de contrôles les plus longs affichés, sans supprimer les reçus. Zéro masque la liste ; sans plafond affiche toutes les durées mesurées.",
+      "introduced_schema_version": 8
+    },
+    {
+      "name": "work_view_recent_decisions",
+      "label": "Décisions récentes affichées",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre de décisions OODA récentes affichées, sans modifier le journal. Zéro masque la liste ; sans plafond affiche toutes les décisions.",
+      "introduced_schema_version": 8
+    },
+    {
+      "name": "work_view_wrap_characters",
+      "label": "Largeur des fiches texte",
+      "unit": "characters",
+      "nullable": true,
+      "help": "Caractères Unicode après expansion des tabulations. Valeur positive ; sans plafond désactive le découpage des lignes, sans supprimer le contenu.",
+      "introduced_schema_version": 8
+    },
+    {
+      "name": "task_manual_required_gate_phases",
+      "label": "Contrôles de phase proposés aux nouvelles tâches manuelles",
+      "unit": "phases",
+      "nullable": false,
+      "help": "Les phases cochées ajoutent des contrôles obligatoires aux nouvelles tâches manuelles. Aucune phase cochée conserve les contrôles de critères. Les tâches existantes gardent leurs exigences ; changer ces valeurs ne valide aucun travail.",
+      "introduced_schema_version": 9,
+      "choices": [
+        {
+          "value": "entry",
+          "label": "Contrôle à l’entrée"
+        },
+        {
+          "value": "validation",
+          "label": "Contrôle de validation"
+        },
+        {
+          "value": "delivery",
+          "label": "Contrôle de livraison"
+        }
+      ]
+    },
+    {
+      "name": "managed_receipt_max_bytes",
+      "label": "Taille maximale des reçus gérés",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du reçu machine avant vérification du SHA et décodage, distincts du livrable texte. Zéro refuse tout reçu non vide ; illimité autorise une consommation mémoire sans plafond. Les anciens journaux exigent une adoption explicite.",
+      "introduced_schema_version": 10
+    },
+    {
+      "name": "planning_resume_max_reason_bytes",
+      "label": "Taille maximale du motif de reprise",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du motif non blanc ajouté lors d’une reprise de planification. Zéro refuse ce motif ; sans plafond autorise un historique plus volumineux. La pause et la reprise sans motif restent possibles. Ce réglage ne stoppe aucun processus et ne réinitialise aucun budget.",
+      "introduced_schema_version": 11
+    },
+    {
+      "name": "planning_request_max_bytes",
+      "label": "Taille maximale des requêtes de planification",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du JSON canonique de toute nouvelle mutation de planification, après sérialisation et échappement. Zéro refuse les nouvelles mutations ; sans plafond conserve la borne de transport distincte. Les rejeux déjà enregistrés restent disponibles. Un ancien journal nécessite une adoption explicite.",
+      "introduced_schema_version": 12
+    },
+    {
+      "name": "planning_max_requirements",
+      "label": "Nombre maximal d’exigences à l’activation",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre d’exigences lors de l’activation d’une hiérarchie neuve. Zéro refuse l’activation ; sans plafond autorise un arbre et un contexte plus volumineux. Les budgets, contrôles, droits et limites de tâches restent distincts. Ne modifie pas les hiérarchies existantes.",
+      "introduced_schema_version": 12
+    },
+    {
+      "name": "agent_workflow_max_body_bytes",
+      "label": "Taille maximale du corps des consignes embarquées",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du corps des méthodes figées du rôle, avant métadonnées et contexte projet. Zéro refuse le cadrage ; sans plafond autorise un corps plus volumineux. Les limites du contexte projet et la capacité du modèle restent distinctes. Aucun texte tronqué et aucun droit ou agent créé par cette lecture.",
+      "introduced_schema_version": 13
+    },
+    {
+      "name": "planning_report_max_bytes",
+      "label": "Taille maximale du rapport de planification",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Octets du rapport complet vérifié par empreinte avant ajout au contexte de planification. Zéro refuse tout rapport ; sans plafond retire cette limite. Un rapport vide, altéré ou invalide reste refusé. Aucun texte tronqué. Les limites du contexte et la capacité du modèle sont distinctes ; les identités déclarées ne sont pas authentifiées par cette lecture.",
+      "introduced_schema_version": 14
+    },
+    {
+      "name": "runtime_silence_seconds_default",
+      "label": "Silence — défaut initial",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Valeur héritée par les nouvelles tentatives lorsque le fournisseur laisse zéro ; strictement positive. Aucun compteur existant n’est modifié.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_silence_seconds_ceiling",
+      "label": "Silence — plafond de définition",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Plafond des valeurs configurées pour une nouvelle tentative. Sans plafond retire cette borne, sans supprimer le budget propre de la tentative ni réinitialiser la consommation.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_tool_seconds_default",
+      "label": "Durée outil — défaut initial",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Valeur héritée par les nouvelles tentatives lorsque le fournisseur laisse zéro ; strictement positive. Aucun compteur existant n’est modifié.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_tool_seconds_ceiling",
+      "label": "Durée outil — plafond de définition",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Plafond des valeurs configurées pour une nouvelle tentative. Sans plafond retire cette borne, sans supprimer le budget propre de la tentative ni réinitialiser la consommation.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_max_tool_calls_default",
+      "label": "Appels outils — défaut initial",
+      "unit": "count",
+      "nullable": false,
+      "help": "Valeur héritée par les nouvelles tentatives lorsque le fournisseur laisse zéro ; strictement positive. Aucun compteur existant n’est modifié.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_max_tool_calls_ceiling",
+      "label": "Appels outils — plafond de définition",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond des valeurs configurées pour une nouvelle tentative. Sans plafond retire cette borne, sans supprimer le budget propre de la tentative ni réinitialiser la consommation.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_max_repeated_calls_default",
+      "label": "Appels répétés — défaut initial",
+      "unit": "count",
+      "nullable": false,
+      "help": "Valeur héritée par les nouvelles tentatives lorsque le fournisseur laisse zéro ; strictement positive. Aucun compteur existant n’est modifié.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_max_repeated_calls_ceiling",
+      "label": "Appels répétés — plafond de définition",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond des valeurs configurées pour une nouvelle tentative. Sans plafond retire cette borne, sans supprimer le budget propre de la tentative ni réinitialiser la consommation.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_max_consecutive_errors_default",
+      "label": "Erreurs consécutives — défaut initial",
+      "unit": "count",
+      "nullable": false,
+      "help": "Valeur héritée par les nouvelles tentatives lorsque le fournisseur laisse zéro ; strictement positive. Aucun compteur existant n’est modifié.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "runtime_max_consecutive_errors_ceiling",
+      "label": "Erreurs consécutives — plafond de définition",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond des valeurs configurées pour une nouvelle tentative. Sans plafond retire cette borne, sans supprimer le budget propre de la tentative ni réinitialiser la consommation.",
+      "introduced_schema_version": 15
+    },
+    {
+      "name": "agent_launch_timeout_seconds_default",
+      "label": "Observation de durée — défaut du lancement",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Seuil positif de durée observée pour les nouvelles préparations, en secondes. Son franchissement ne décide jamais seul un arrêt. Aucun compteur ni seuil déjà figé n’est réécrit.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_launch_timeout_seconds_ceiling",
+      "label": "Observation de durée — plafond de définition",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Plafond de définition du seuil de durée, au moins égal au défaut configuré. Sans plafond retire seulement cette borne de définition, pas les droits ni les décisions du superviseur. Aucun arrêt automatique lié à la durée.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_launch_instruction_max_bytes",
+      "label": "Consignes supplémentaires — taille maximale",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Choix persistant pour les nouvelles préparations. Aucun compteur consommé ni contexte déjà enregistré n’est réécrit. Sans plafond retire la borne de définition ou de taille ; zéro octet refuse tout contenu non vide.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_provider_config_max_bytes",
+      "label": "Configuration fournisseur — taille maximale",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Taille maximale par fichier de configuration fournisseur ou de catalogue local de modèles. La même valeur encadre providers.json et models_cache.json ; aucune seconde borne cachée. Sans plafond retire cette limite ; zéro refuse tout contenu non vide. Les valeurs installées et les tentatives existantes sont conservées.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_launch_context_max_bytes",
+      "label": "Contexte complet du lancement — taille maximale",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Choix persistant pour les nouvelles préparations. Aucun compteur consommé ni contexte déjà enregistré n’est réécrit. Sans plafond retire la borne de définition ou de taille ; zéro octet refuse tout contenu non vide.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_preflight_ttl_seconds_default",
+      "label": "Précontrôle — durée de validité initiale",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Choix persistant pour les nouvelles préparations. Aucun compteur consommé ni contexte déjà enregistré n’est réécrit. Sans plafond retire la borne de définition ou de taille ; zéro octet refuse tout contenu non vide.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_preflight_ttl_seconds_ceiling",
+      "label": "Précontrôle — plafond de durée de validité",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Choix persistant pour les nouvelles préparations. Aucun compteur consommé ni contexte déjà enregistré n’est réécrit. Sans plafond retire la borne de définition ou de taille ; zéro octet refuse tout contenu non vide.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_preflight_min_free_bytes",
+      "label": "Précontrôle — espace libre minimal",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Choix persistant pour les nouvelles préparations. Aucun compteur consommé ni contexte déjà enregistré n’est réécrit. Sans plafond retire la borne de définition ou de taille ; zéro octet refuse tout contenu non vide.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_environment_allow",
+      "label": "Variables d’environnement héritées par défaut",
+      "unit": "programs",
+      "nullable": false,
+      "help": "Une variable par ligne ; seuls les noms sont persistés. Les valeurs restent dans le processus et leur empreinte lie le contexte préparé. Une liste vide interdit cet héritage de base.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_allow_unverified_provider_context",
+      "label": "Contexte fournisseur non vérifié — compatibilité (0/1)",
+      "unit": "count",
+      "nullable": false,
+      "help": "1 conserve la compatibilité historique pour les fournisseurs sans précontrôle obligatoire ; aucune capacité n’est déclarée vérifiée. 0 exige un contexte fournisseur vérifié. Une exigence explicite du fournisseur reste obligatoire.",
+      "introduced_schema_version": 16
+    },
+    {
+      "name": "agent_interleaved_failure_lookback_multiplier",
+      "label": "Échecs entrelacés — multiplicateur de fenêtre",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre de résultats terminés conservés : ce facteur multiplié par le plafond de répétitions figé dans la tentative. Facteur positif ; sans plafond retire l’expiration. Ce choix est figé dans les nouveaux départs, sans changer les tentatives existantes ni effacer leurs compteurs.",
+      "introduced_schema_version": 17
+    },
+    {
+      "name": "agent_supervision_poll_interval_ms",
+      "label": "Supervision — intervalle de contrôle",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Intervalle strictement positif entre les contrôles de stockage et les heartbeats du superviseur, en millisecondes. Il ne limite pas la durée du fournisseur.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_supervision_heartbeat_stale_ms",
+      "label": "Supervision — fraîcheur du heartbeat",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Âge strictement positif au-delà duquel un heartbeat est signalé périmé. Observation seulement : cela ne prouve pas la mort du processus et ne déclenche pas d’arrêt.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_supervision_term_grace_ms",
+      "label": "Arrêt — grâce après TERM",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Délai non négatif avant escalade vers KILL après une demande d’arrêt. Zéro demande une escalade immédiate. Aucun arrêt n’est décidé sur la seule durée du fournisseur.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_supervision_output_drain_ms",
+      "label": "Sorties — attente après fin du leader",
+      "unit": "milliseconds",
+      "nullable": true,
+      "help": "Attente maximale des flux après fin du leader, en millisecondes. Zéro n’attend pas un flux encore ouvert ; sans plafond peut bloquer indéfiniment. Un drain incomplet reste un incident et ne prouve pas la clôture sûre de la mission.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_provider_event_max_bytes",
+      "label": "Fournisseur — octets par événement",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond d’un événement fournisseur. Zéro rend les événements non vides inobservables ; sans plafond retire la limite mémoire de ce canal. Un dépassement dégrade la visibilité, sans arrêter le drainage ni prouver un résultat d’outil.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_capture_max_bytes",
+      "label": "Capture — octets retenus",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond cumulé de capture brute lorsque la tentative l’active. Zéro ne retient aucun contenu ; sans plafond peut augmenter fortement mémoire et stockage. Le processus et les compteurs continuent après troncature explicite.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_capture_max_lines",
+      "label": "Capture — lignes retenues",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond cumulé des lignes de capture brute. Zéro ne retient aucune ligne ; sans plafond retire cette limite. Ce choix ne borne ni les appels d’outils ni les lignes effectivement produites.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_public_message_max_bytes",
+      "label": "Messages publics — octets retenus",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond cumulé des messages assistant explicitement publics. Zéro ne retient pas leur contenu ; sans plafond retire cette limite. Raisonnement et données d’outils ne deviennent pas des messages publics.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_log_message_max_bytes",
+      "label": "Journal — octets par détail",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond UTF-8 d’un détail de journal, après nettoyage. Zéro retire le détail, pas le code d’incident ou l’état bloquant ; sans plafond conserve tout le détail autorisé. La troncature respecte les frontières UTF-8.",
+      "introduced_schema_version": 18
+    },
+    {
+      "name": "agent_model_automatic_levels",
+      "label": "Modèles — niveaux automatiques autorisés",
+      "unit": "strings",
+      "nullable": false,
+      "help": "Niveaux proposés sans choix explicite : une valeur par ligne parmi simple, standard et exigeant. Liste vide interdit le choix automatique. Autoriser exigeant peut permettre un modèle plus coûteux ; aucun tarif ni droit fournisseur n’est déduit.",
+      "introduced_schema_version": 19
+    },
+    {
+      "name": "agent_model_restricted_levels",
+      "label": "Modèles signalés — niveaux autorisés",
+      "unit": "strings",
+      "nullable": false,
+      "help": "Niveaux autorisés aux modèles qui correspondent aux règles ci-dessous : simple, standard ou exigeant, une valeur par ligne. Liste vide refuse tous les niveaux pour ces modèles. La règle ne prouve ni modèle exécuté ni tarif.",
+      "introduced_schema_version": 19
+    },
+    {
+      "name": "agent_model_restriction_rules",
+      "label": "Modèles — règles de signalement",
+      "unit": "strings",
+      "nullable": false,
+      "help": "Une règle littérale par ligne : exact:nom, prefix:début ou contains:fragment. La casse est conservée ; ni expression régulière ni recherche distante. Liste vide désactive le signalement, sans changer les autres validations. Les modifications concernent les nouvelles décisions, pas les preuves historiques.",
+      "introduced_schema_version": 19
+    },
+    {
+      "name": "web_bind_address",
+      "label": "Adresse HTTP locale",
+      "unit": "address",
+      "nullable": false,
+      "help": "Adresse canonique 127.0.0.1:PORT ou [::1]:PORT uniquement. Port0 demande un port éphémère et change l’adresse au redémarrage ; un port fixe conserve l’adresse si disponible. Aucun accès distant ou TLS accordé.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_http_header_max_bytes",
+      "label": "HTTP — taille des en-têtes",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Taille maximale des en-têtes avec la ligne de requête, en octets. Positive ; dépassement refusé avant traitement. La réservation minimale interne du transport reste distincte de cette limite.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_http_max_headers",
+      "label": "HTTP — nombre d’en-têtes",
+      "unit": "count",
+      "nullable": false,
+      "help": "Nombre maximal positif de champs d’en-tête par requête. La représentation du conteneur impose le maximum technique indiqué ; ce maximum ne constitue pas le défaut opérateur.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_http_header_timeout_ms",
+      "label": "HTTP — délai des en-têtes et attente",
+      "unit": "milliseconds",
+      "nullable": true,
+      "help": "Délai de lecture des en-têtes, en millisecondes, incluant l’attente entre requêtes keep-alive. Null désactive ce délai ; zéro est invalide. Ce délai ne remplace pas la durée du traitement Root.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_http_body_max_bytes",
+      "label": "HTTP — taille du corps",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond du corps en octets. Zéro refuse les corps non vides ; null supprime la borne opérateur mais conserve le framing natif indiqué dans les contraintes de transport. Pas de troncature.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_http_body_timeout_ms",
+      "label": "HTTP — délai du corps",
+      "unit": "milliseconds",
+      "nullable": true,
+      "help": "Délai de lecture du corps après réception des en-têtes, en millisecondes. Null le désactive ; zéro est invalide. Ne coupe ni validation métier, ni commit, ni fermeture Root.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_http_max_connections",
+      "label": "HTTP — connexions",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de connexions. Zéro désactive le démarrage HTTP ; null retire la borne opérateur, sous les ressources et limites techniques du système. Les nouvelles connexions au-delà du plafond sont refusées.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_root_worker_threads",
+      "label": "HTTP — workers Root",
+      "unit": "count",
+      "nullable": false,
+      "help": "Workers généraux pour opérations Root bloquantes. Au moins un ; capacité saturée refusée sans file cachée. La somme avec les workers Admin respecte le maximum technique des permis.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_admin_worker_threads",
+      "label": "HTTP — workers Admin réservés",
+      "unit": "count",
+      "nullable": false,
+      "help": "Workers réservés aux réglages Admin, au moins un, distincts des workers généraux. Leur capacité doit rester disponible pour la reprise ; la somme des deux voies respecte la contrainte technique.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_worker_idle_keep_alive_ms",
+      "label": "HTTP — rétention des workers inactifs",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Conservation d’un worker inactif en millisecondes. Zéro désactive ce cache ; ne limite pas la durée d’une opération en cours et n’autorise aucune annulation Root.",
+      "introduced_schema_version": 20
+    },
+    {
+      "name": "web_cookie_max_age_seconds",
+      "label": "HTTP — durée demandée du cookie",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Durée du cookie demandée au navigateur en secondes, positive. Null crée un cookie de session navigateur, sans Max-Age ; cela n’expire ni ne révoque la clé bearer persistée côté serveur. Pas de plafond métier d’un an implicite.",
+      "introduced_schema_version": 20,
+      "null_label": "Cookie de session"
+    },
+    {
+      "name": "mission_supervision_poll_interval_ms",
+      "label": "Intervalle de supervision des missions",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Cadence strictement positive en millisecondes, figée à la prise du bail. Modifier ce réglage ne redémarre pas un conducteur déjà actif.",
+      "introduced_schema_version": 21
+    },
+    {
+      "name": "mission_supervision_stale_after_ms",
+      "label": "Péremption du bail de mission",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Âge strictement positif en millisecondes. À égalité le bail reste présent ; au-delà un nouveau conducteur peut le remplacer. Ce seuil ne prouve ni mort du processus ni identité.",
+      "introduced_schema_version": 21
+    },
+    {
+      "name": "mission_supervision_future_tolerance_ms",
+      "label": "Tolérance future du bail de mission",
+      "unit": "milliseconds",
+      "nullable": false,
+      "help": "Écart futur maximal non négatif en millisecondes. Zéro refuse toute avance. Au-delà le bail est déclaré invalide ; aucune horloge ni identité authentifiée ne sont prouvées.",
+      "introduced_schema_version": 21
+    },
+    {
+      "name": "mission_dispatch_default_slots",
+      "label": "Créneaux initiaux des missions",
+      "unit": "count",
+      "nullable": false,
+      "help": "Créneaux utilisés si aucun réglage de mission n’est enregistré, strictement positifs. Ce défaut ne crée ni mode autonome ni consentement. Les contrôles existants restent inchangés.",
+      "introduced_schema_version": 22
+    },
+    {
+      "name": "mission_dispatch_max_slots",
+      "label": "Plafond de créneaux par mission",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond opérateur strictement positif, au moins égal au défaut initial. Null retire cette borne ; les budgets, capacités fournisseur et espaces de travail restent requis. Un contrôle existant hors plafond refuse, sans réduction ni réécriture.",
+      "introduced_schema_version": 22
+    },
+    {
+      "name": "reviewer_default_delivery_files",
+      "label": "Vérificateur — fichiers de remise initiaux",
+      "unit": "count",
+      "nullable": false,
+      "help": "Valeur copiée uniquement lors de la configuration d’un agent vérificateur ; ne modifie pas les missions existantes. Zéro retire ce plafond et peut augmenter volume, mémoire et coût. Une configuration enregistrée ne prouve pas une revue exécutée ni l’application de ses limites.",
+      "introduced_schema_version": 23
+    },
+    {
+      "name": "reviewer_default_context_files",
+      "label": "Vérificateur — sources initiales du contexte",
+      "unit": "count",
+      "nullable": false,
+      "help": "Valeur copiée uniquement lors de la configuration d’un agent vérificateur ; ne modifie pas les missions existantes. Zéro retire ce plafond et peut augmenter volume, mémoire et coût. Une configuration enregistrée ne prouve pas une revue exécutée ni l’application de ses limites.",
+      "introduced_schema_version": 23
+    },
+    {
+      "name": "reviewer_default_source_bytes",
+      "label": "Vérificateur — octets initiaux par source",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Valeur copiée uniquement lors de la configuration d’un agent vérificateur ; ne modifie pas les missions existantes. Zéro retire ce plafond et peut augmenter volume, mémoire et coût. Une configuration enregistrée ne prouve pas une revue exécutée ni l’application de ses limites.",
+      "introduced_schema_version": 23
+    },
+    {
+      "name": "reviewer_default_context_bytes",
+      "label": "Vérificateur — octets initiaux du contexte",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Valeur copiée uniquement lors de la configuration d’un agent vérificateur ; ne modifie pas les missions existantes. Zéro retire ce plafond et peut augmenter volume, mémoire et coût. Une configuration enregistrée ne prouve pas une revue exécutée ni l’application de ses limites.",
+      "introduced_schema_version": 23
+    },
+    {
+      "name": "planning_scope_lease_min_seconds",
+      "label": "Planification — bail minimal du périmètre",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Durée demandée minimale, strictement positive, des nouvelles réservations de périmètre ; distincte du bail du superviseur. La préparation consomme une partie de cette durée ; une échéance déjà dépassée avant écriture est refusée. Modifier les bornes ne change pas une échéance enregistrée. Le renouvellement explicite utilise les bornes courantes et peut raccourcir l’échéance ; il ne recrée pas un bail expiré.",
+      "introduced_schema_version": 24
+    },
+    {
+      "name": "planning_scope_lease_max_seconds",
+      "label": "Planification — bail maximal du périmètre",
+      "unit": "seconds",
+      "nullable": true,
+      "help": "Plafond au moins égal au minimum. Null retire le plafond opérateur, pas les limites de représentation des horodatages. Les nouvelles opérations utilisent les bornes courantes.",
+      "introduced_schema_version": 24
+    },
+    {
+      "name": "planning_context_max_events",
+      "label": "Planification — événements par activation",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal d’événements en attente réellement fournis dans une activation. Zéro refuse une activation vide ; null retire le plafond. Le reste demeure en attente, sans acquittement implicite.",
+      "introduced_schema_version": 24
+    },
+    {
+      "name": "planning_context_max_bytes",
+      "label": "Planification — octets du contexte livré",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond du contexte de périmètre sérialisé ; zéro interdit un contexte non vide, null retire ce plafond. Aucun découpage de document ni troncature silencieuse. Le workflow et la capacité du modèle restent des contrôles distincts.",
+      "introduced_schema_version": 24
+    },
+    {
+      "name": "planning_decision_max_inputs",
+      "label": "Planification — événements d’entrée",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_decision_max_operations",
+      "label": "Planification — opérations par décision",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_decision_max_reason_bytes",
+      "label": "Planification — octets de justification",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_decision_max_title_characters",
+      "label": "Planification — caractères du titre proposé",
+      "unit": "characters",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_decision_max_instruction_bytes",
+      "label": "Planification — octets de consigne et livrable",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_decision_max_dependencies",
+      "label": "Planification — dépendances d’une tâche proposée",
+      "unit": "count",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_decision_max_criterion_bytes",
+      "label": "Planification — octets par critère proposé",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond des décisions nouvelles, contrôlé avant modification. Zéro interdit un contenu non vide ; null retire ce plafond opérateur. Les limites de transport et les droits restent distincts.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_worker_default_attempts",
+      "label": "Planification — tentatives initiales du worker",
+      "unit": "count",
+      "nullable": false,
+      "help": "Valeur strictement positive copiée uniquement aux nouvelles tâches issues d’une décision. Ne réinitialise aucune consommation et n’autorise ni lancement ni reprise.",
+      "introduced_schema_version": 25
+    },
+    {
+      "name": "planning_response_max_bytes",
+      "label": "Planification — octets de réponse structurée",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond de chaque texte candidat et de la réponse JSON complète du planner, en octets UTF8. Un dépassement refuse la proposition ; aucune troncature ne devient une décision. Zéro interdit les réponses non vides ; sans plafond augmente le risque mémoire. Les réservations et observations de consommation restent conservées. Ne constitue ni autorisation de lancement ni acceptation.",
+      "introduced_schema_version": 26
+    },
+    {
+      "name": "planning_provider_silence_seconds",
+      "label": "Planification — silence du fournisseur",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Plafond de silence de transport, en secondes : les octets reçus du fournisseur relancent ce compteur. Zéro désactive ce délai. Ne prouve ni réflexion utile, ni décès, ni annulation de la facturation distante. Le contrôle effectif dépend des réveils et de la terminaison du processus possédé.",
+      "introduced_schema_version": 27
+    },
+    {
+      "name": "planning_provider_max_duration_seconds",
+      "label": "Planification — durée maximale du fournisseur",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Durée totale explicite, en secondes ; zéro ne fixe aucune durée maximale. Indépendante du silence et du bail renouvelable. Le futur runner doit inclure la suspension de la machine dans ses mesures ; ce réglage seul ne prouve pas un arrêt effectif.",
+      "introduced_schema_version": 27
+    },
+    {
+      "name": "planning_default_lease_seconds",
+      "label": "Planification — bail par défaut",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Durée de coordination des nouvelles réservations automatiques, dans les bornes minimum/maximum du bail. Un propriétaire actif peut renouveler ce bail ; ce n’est pas la durée maximale du modèle. Les appels CLI explicites gardent la durée demandée. Modifier ensemble les bornes et ce défaut si nécessaire ; aucune adoption implicite de provider-wait.json.",
+      "introduced_schema_version": 27
+    },
+    {
+      "name": "planning_lease_renew_after_percent",
+      "label": "Planification — renouveler après cette part du bail",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Pourcentage entier du bail réellement accordé écoulé avant son renouvellement : 1 à 99 pour renouveler avant expiration, zéro désactive le maintien automatique. Initialement 50, explicite depuis le demi-bail Go ; aucune nouvelle activation ni remise à zéro. Un bail expiré n’est jamais ressuscité. Le runner et sa reprise restent à qualifier.",
+      "introduced_schema_version": 27
+    },
+    {
+      "name": "planning_quota_reason_min_bytes",
+      "label": "Plafonds de mission — minimum du motif",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Minimum d’octets UTF-8 après suppression des espaces externes pour autoriser un changement de plafonds. Zéro retire ce minimum supplémentaire ; un motif non vide reste requis. Valeur initiale 8 depuis le contrat Go, persistée et modifiable ; aucune consommation n’est remise à zéro.",
+      "introduced_schema_version": 28
+    },
+    {
+      "name": "planning_quota_reason_max_bytes",
+      "label": "Plafonds de mission — maximum du motif",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Maximum d’octets UTF-8 du motif original, espaces compris. Null retire ce plafond ; zéro refuse tout motif non vide et exige un minimum également nul. Valeur initiale 2000 depuis le contrat Go ; la borne de transport reste distincte et aucun texte n’est tronqué.",
+      "null_label": "Sans plafond",
+      "introduced_schema_version": 28
+    },
+    {
+      "name": "review_response_max_bytes",
+      "label": "Revue — octets de réponse structurée",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond indépendant du planner pour chaque texte candidat et la réponse JSON complète du reviewer, en octets UTF8. Zéro interdit les réponses non vides ; sans plafond est le choix initial explicite et augmente le risque mémoire. Les limites des événements et des processus restent distinctes et conservées. Un dépassement refuse sans troncature réussie, sans annuler les consommations ni autoriser un autre appel. Une ancienne installation doit adopter cette valeur explicitement ; aucun héritage du plafond planner.",
+      "introduced_schema_version": 29
+    },
+    {
+      "name": "agent_telemetry_providers",
+      "label": "Télémétrie — fournisseurs instrumentés",
+      "unit": "strings",
+      "nullable": false,
+      "help": "Un fournisseur par ligne ; claude et codex sont pris en charge (codex : réglages -c otel.* ajoutés au lancement, jeton par l’environnement). Chaque lancement reçoit alors un jeton d’ingestion OTLP propre à la tentative et l’adresse du serveur web local, s’il est démarré. Liste vide désactive la télémétrie. Les valeurs reçues restent des déclarations du fournisseur, sans contenu de prompt ; elles ne prouvent ni coût ni travail.",
+      "introduced_schema_version": 30
+    },
+    {
+      "name": "agent_cache_miss_ratio_percent",
+      "label": "Santé du cache — part relue minimale",
+      "unit": "percent",
+      "nullable": false,
+      "help": "Un appel modèle est signalé « contexte relu » quand la part de son entrée lue depuis le cache est sous ce pourcentage. Affichage de la console uniquement : rien n’est bloqué. 50 % reprend la valeur de LangWatch.",
+      "introduced_schema_version": 31
+    },
+    {
+      "name": "agent_cache_min_input_tokens",
+      "label": "Santé du cache — entrée minimale jugée",
+      "unit": "count",
+      "nullable": false,
+      "help": "Jetons d’entrée totaux (entrée, cache lu et cache créé) à partir desquels un appel est jugé. Zéro juge tous les appels. 1000 reprend la valeur de LangWatch.",
+      "introduced_schema_version": 31
+    },
+    {
+      "name": "mission_dispatch_cost_reserve_percent",
+      "label": "Seuil de coût rapporté par tâche (% de la réserve)",
+      "unit": "percent",
+      "nullable": true,
+      "help": "Refuse un nouveau worker automatique si le coût rapporté cumulé de sa tâche dépasse ce pourcentage de la réserve par lancement. 200 signifie deux fois la réserve ; égalité autorisée. Zéro refuse tout coût positif. Null désactive seulement ce seuil. Sans budget ou avec une réserve nulle, aucun seuil dérivé. Les coûts absents restent inconnus ; ce contrôle ne remplace ni budget ni facture authentifiée. Effet aux admissions avant départ, sans arrêter les workers déjà libérés.",
+      "introduced_schema_version": 32
+    },
+    {
+      "name": "agent_telemetry_retention_days",
+      "label": "Télémétrie — conservation (jours)",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Conserver sans limite",
+      "help": "Nombre de jours pendant lesquels la console garde dans .swarm/telemetry.db les points reçus des agents, les alertes résolues et les empreintes de jetons révoqués. La purge a lieu lors des écritures de la console (ingestion, évaluation des alertes), jamais lors d'une lecture. Null conserve sans limite. Zéro est refusé. 30 est un choix d'installation, modifiable.",
+      "introduced_schema_version": 33
+    },
+    {
+      "name": "agent_telemetry_max_events_per_attempt",
+      "label": "Télémétrie — points par tentative",
+      "unit": "count",
+      "nullable": true,
+      "null_label": "Sans plafond",
+      "help": "Nombre maximal de points de télémétrie conservés pour une tentative d'agent. Au-delà, les points sont refusés et comptés (réponse OTLP partialSuccess), jamais tronqués en silence. Null : aucun plafond opérateur, la limite de corps HTTP reste appliquée. Zéro est refusé.",
+      "introduced_schema_version": 33
+    },
+    {
+      "name": "agent_usage_mismatch_percent",
+      "label": "Télémétrie — écart d’usage toléré (%)",
+      "unit": "percent",
+      "nullable": true,
+      "null_label": "Règle désactivée",
+      "help": "Écart toléré, en pourcentage des jetons de sortie déclarés par le fournisseur en fin de tentative, avec la somme des jetons de sortie reçus par télémétrie. Au-delà, l’alerte superviseur « écart d’usage » s’ouvre pour la dernière tentative d’une tâche non acceptée. Seuls les jetons de sortie sont comparés : le sens de l’entrée diffère selon le fournisseur. Un écart signale une télémétrie incomplète ou une déclaration divergente ; il ne dit pas laquelle est juste. Null désactive la règle. 10 est un choix d’installation, modifiable.",
+      "introduced_schema_version": 34
+    },
+    {
+      "name": "agent_alert_evaluation_seconds",
+      "label": "Alertes — évaluation par le serveur (s)",
+      "unit": "seconds",
+      "nullable": true,
+      "null_label": "Seulement console ouverte",
+      "help": "Cadence, en secondes, à laquelle le serveur web évalue lui-même les alertes superviseur (marques moteur, écart d’usage, budget) et garde leur historique, même sans console ouverte. Null : évaluation seulement quand une console est ouverte. Lue au démarrage du serveur et à chaque cycle : une nouvelle cadence s’applique après l’attente en cours ; repasser à null arrête la boucle jusqu’au prochain démarrage. Zéro est refusé. 60 est un choix d’installation, modifiable.",
+      "introduced_schema_version": 35
+    },
+    {
+      "name": "work_budget_warning_percent",
+      "label": "Budget — seuil d’avertissement (%)",
+      "unit": "percent",
+      "nullable": true,
+      "null_label": "Avertissement désactivé",
+      "help": "Part du plafond de budget d’une mission (plafond positif seulement) à partir de laquelle l’alerte « seuil de budget » s’ouvre : montants engagés (estimations réservées des agents, assistances, préparations et appels de planification) ou coût déclaré par les fournisseurs, le plus élevé des deux. De 1 à 100. Null désactive l’avertissement ; l’alerte « budget dépassé » (coût déclaré supérieur au plafond) reste active. 80 est un choix d’installation, modifiable.",
+      "introduced_schema_version": 35
+    },
+    {
+      "name": "annotation_note_max_chars",
+      "label": "Annotations — longueur maximale de la note",
+      "unit": "characters",
+      "nullable": true,
+      "null_label": "Limite du corps HTTP seulement",
+      "help": "Nombre maximal de caractères de la note qu’un opérateur écrit en annotant une tentative d’agent (verdict bon, mauvais ou incertain). Une note plus longue est refusée, jamais tronquée. Null : seule la limite de corps HTTP s’applique. Zéro est refusé. 2000 est un choix d’installation, modifiable.",
+      "introduced_schema_version": 36
+    },
+    {
+      "name": "agent_evaluation_sample_percent",
+      "label": "Évaluations — part des tentatives évaluées (%)",
+      "unit": "percent",
+      "nullable": true,
+      "null_label": "Évaluations désactivées",
+      "help": "Part des tentatives terminées que les évaluateurs déterministes mesurent (issue, limites, fiabilité des outils, réutilisation du cache, cohérence d’usage), choisie par une empreinte stable de l’identifiant de tentative : le même échantillon d’un serveur à l’autre. Une tentative est évaluée une seule fois, lors de l’évaluation des alertes (serveur ou console). De 1 à 100. Null désactive les évaluations. Aucun modèle n’est appelé. 100 est un choix d’installation, modifiable.",
+      "introduced_schema_version": 37
+    },
+    {
+      "name": "runtime_storage_stop_bytes",
+      "label": "Stockage runtime — seuil bloquant (octets)",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Octets disponibles sous lesquels le diagnostic stockage bloque les départs. Zéro désactive ce seuil seulement ; une mesure indisponible bloque toujours. Choix d’installation : 256 Mio. Prend effet au prochain diagnostic, sans réservation de capacité.",
+      "introduced_schema_version": 38
+    },
+    {
+      "name": "runtime_storage_warning_bytes",
+      "label": "Stockage runtime — seuil d’avertissement (octets)",
+      "unit": "bytes",
+      "nullable": false,
+      "help": "Octets disponibles sous lesquels un avertissement apparaît, sans bloquer. Doit être supérieur ou égal au seuil bloquant. Zéro désactive les deux seuils octets. Choix d’installation : 1 Gio.",
+      "introduced_schema_version": 38
+    },
+    {
+      "name": "runtime_storage_stop_inodes",
+      "label": "Stockage runtime — seuil bloquant (inodes)",
+      "unit": "count",
+      "nullable": false,
+      "help": "Inodes disponibles sous lesquels le diagnostic bloque les départs. Zéro désactive ce seuil seulement. Un volume sans limite inode est observé comme illimité ; une mesure inconnue bloque toujours. Choix d’installation : 256.",
+      "introduced_schema_version": 38
+    },
+    {
+      "name": "work_view_status_recent_agents",
+      "label": "Statut — agents récents affichés",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre de lignes d’agents récentes utilisées pour présenter le statut, dans l’ordre enregistré. Ne limite ni l’historique conservé ni les dépenses, qui utilisent toutes les tentatives. Zéro masque les agents ; null inclut tout l’historique. Choix d’installation : 200, comme la vue Go. Les branches de préparation non portées restent refusées.",
+      "introduced_schema_version": 39
+    },
+    {
+      "name": "work_view_status_change_events",
+      "label": "Statut — événements récents examinés",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre d’événements récents examinés depuis la dernière visite, avant filtrage des catégories visibles. Le statut indique s’il reste des événements plus anciens. Zéro affiche une liste vide ; null examine tous les événements. Ne modifie ni la visite ni l’historique. Choix d’installation : 200, comme la vue Go.",
+      "introduced_schema_version": 39
+    },
+    {
+      "name": "agent_report_clock_skew_seconds",
+      "label": "Rapport worker — marge d’horloge (secondes)",
+      "unit": "seconds",
+      "nullable": false,
+      "help": "Marge soustraite au départ de la tentative pour sélectionner son rapport par date de modification. Zéro exige un rapport modifié au départ ou après ; une marge plus grande peut admettre un rapport plus ancien. Un seul rapport courant non vide est transmis, sans validation ni acceptation. Choix initial : 2 secondes, comme le moteur Go. Les installations anciennes doivent adopter explicitement ce réglage.",
+      "introduced_schema_version": 40
+    }
+  ]
+}

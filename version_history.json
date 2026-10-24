@@ -7,6 +7,142 @@
     },
     "items": [
       {
+        "fr": "Candidat Rust : start HTTP peut déclencher le conducteur possédé par le serveur ; premier parcours inerte local vérifié, refus et arrêt conservés, aucune installation ni acceptation globale.",
+        "en": "Rust candidate: HTTP start can trigger the server-owned conductor; first local inert journey verified, preserving refusals and shutdown, no installation or global acceptance."
+      },
+      {
+        "fr": "Candidat Rust : lecture et commandes mission HTTP protégées, statut dégradé et diagnostics conservés ; sans conducteur web ni installation, qualification en cours.",
+        "en": "Rust candidate: protected mission HTTP reads/commands with degraded status and retained diagnostics; no web conductor or installation, qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : contrôles, reviewer et planner en phases scoped asynchrones et ordonnées ; qualification en cours, sans installation.",
+        "en": "Rust candidate: controls, reviewer and planner in ordered asynchronous scoped phases; qualification pending, no installation."
+      },
+      {
+        "fr": "Candidat Rust : reprise de watch avec un worker déjà enregistré vérifiée sans adoption, relancement ni modification de ses ressources ; aucune installation.",
+        "en": "Rust candidate: resumed watch with an already registered worker verified without adoption, relaunch or changes to its resources; no installation."
+      },
+      {
+        "fr": "Candidat Rust : arrêt SIGINT/SIGTERM des trois rôles foreground vérifié sur six parcours réels, reçus d’échec et causes conservés ; aucune installation.",
+        "en": "Rust candidate: SIGINT/SIGTERM stop for all three foreground roles verified in six real journeys, retaining failed receipts and causes; no installation."
+      },
+      {
+        "fr": "Candidat Rust : identité compilée consultable en texte/JSON, observations Git sous politique persistée et préparation du build natif ; qualification en cours, sans installation.",
+        "en": "Rust candidate: compiled identity in text/JSON, Git observations under saved policy and native build preparation; qualification pending, no installation."
+      },
+      {
+        "fr": "Candidat Rust : provenance physique du worker natif conservée avant permission pour permettre sa revue automatique même après un lancement manuel ; qualification en cours.",
+        "en": "Rust candidate: native worker physical provenance retained before permission to support automatic review after manual launch; qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : reviewer automatique après contrôles, avec bail et consentement courants, budget et réservations conservés ; vérification en cours.",
+        "en": "Rust candidate: automatic reviewer after controls with current lease and consent, preserving budget and reservations; verification pending."
+      },
+      {
+        "fr": "Candidat Rust : contrôles automatiques après rapport worker, sous bail et consentement revérifiés ; receipts sans acceptation, qualification en cours.",
+        "en": "Rust candidate: automatic controls after worker report, rechecking lease and consent; receipts without acceptance, qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : relais automatique du rapport worker sous bail, avec marge d’horloge persistée et réglable dans Admin ; vérification en cours.",
+        "en": "Rust candidate: lease-fenced automatic worker report relay with persisted Admin clock tolerance; verification pending."
+      },
+      {
+        "fr": "Candidat Rust : statut des avis indépendants non favorables, preuves de rapport périmées et événements reliés à leur vraie tâche, sans acceptation implicite.",
+        "en": "Rust candidate: unfavorable independent review status, stale report evidence and events bound to their owning task, without implicit acceptance."
+      },
+      {
+        "fr": "Candidat Rust : statut après avis favorable d’un reviewer délégué et acceptation explicite, avec relecture des preuves actuelles ; qualification en cours.",
+        "en": "Rust candidate: status after a delegated reviewer’s favorable opinion and explicit acceptance, rechecking current evidence; qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : lecture historique agent logs, pagination compatible et export NDJSON exclusif sans écrasement ; qualification en cours.",
+        "en": "Rust candidate: historical agent logs, compatible pagination and exclusive NDJSON export without overwriting; qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : suivi du worker délégué pendant une exécution réellement observée, après annulation publique ou échec local, sans validation implicite.",
+        "en": "Rust candidate: delegated-worker status during an actually observed execution, after public cancellation or local failure, without implicit validation."
+      },
+      {
+        "fr": "Candidat Rust : tentative déléguée préparée affichée comme non confirmée, rapport précoce non validé et refus explicite si la fenêtre masque un Agent nécessaire.",
+        "en": "Rust candidate: prepared delegated attempt shown as unconfirmed, early report remains unvalidated, and explicit refusal when the view hides a required Agent."
+      },
+      {
+        "fr": "Candidat Rust : statut du rapport réellement soumis par un worker délégué, en attente de revue, avec historique complet conservé hors fenêtre d’affichage.",
+        "en": "Rust candidate: status of a real delegated worker’s submitted report awaiting review, retaining full history outside the display window."
+      },
+      {
+        "fr": "Candidat Rust : statut automatique des tâches ordinaires avant première tentative, avec créneaux, espaces occupés et refus budgétaire observés sans départ implicite.",
+        "en": "Rust candidate: automatic status for ordinary tasks before their first attempt, observing slots, occupied workspaces and budget holds without implicit launches."
+      },
+      {
+        "fr": "Candidat Rust : abandon et réouverture publics des tâches hiérarchiques sans tentative, statut non validé et dépendances en attente, sans remise à zéro ni nouveau droit de lancement.",
+        "en": "Rust candidate: public abandonment and reopening of unstarted hierarchical tasks, nonvalidated status and waiting dependencies, without resetting consumption or granting launch rights."
+      },
+      {
+        "fr": "Candidat Rust : statut des périmètres délégués et de leurs premières tâches, contrôle de chaque bail et validation de l’arbre, sans autorité ni exécution implicite.",
+        "en": "Rust candidate: delegated scopes and first tasks are readable, with every lease and tree structure checked, without implicit authority or execution."
+      },
+      {
+        "fr": "Candidat Rust : lecture des premières tâches hiérarchiques et dépendances avant lancement, sans revue ni acceptation implicite ; configuration manquante et attente des prérequis visibles.",
+        "en": "Rust candidate: first hierarchical tasks and dependencies are readable before launch, without implicit review or acceptance; missing setup and prerequisite waits remain visible."
+      },
+      {
+        "fr": "Candidat Rust : statut du planning avant première tâche après prise/renouvellement du bail, décisions vides et plafond sauvegardé, sans confondre bail et conducteur actif.",
+        "en": "Rust candidate: taskless planning status after lease claim/renewal, empty decisions and saved activation cap; planner leases never imply an active conductor."
+      },
+      {
+        "fr": "Candidat Rust : attente fournisseur des missions hiérarchiques initiales, échéance UTC ou intervention explicite, sans levée de quota ni relance implicite.",
+        "en": "Rust candidate: initial hierarchical missions show provider waits with UTC expiry or explicit intervention, without clearing quotas or implicit retries."
+      },
+      {
+        "fr": "Candidat Rust : statut des missions hiérarchiques avant première activation ; configuration, autorisation et pauses distinguées sans exécution ni revue implicite.",
+        "en": "Rust candidate: hierarchical mission status before its first activation; configuration, authorization and pauses are distinct without implicit execution or review."
+      },
+      {
+        "fr": "Candidat Rust : consultation des tâches non démarrées avec profil enregistré en mode manuel ou en pause ; seuil de coût sauvegardé appliqué sans autorisation implicite de lancement.",
+        "en": "Rust candidate: unstarted tasks with saved profiles are visible in manual or paused mode; the saved cost threshold applies without implicit launch permission."
+      },
+      {
+        "fr": "Candidat Rust : le statut relit les preuves des résultats acceptés et des dépendances ; une preuve modifiée exige une revalidation, sans modifier la décision enregistrée.",
+        "en": "Rust candidate: status rechecks accepted result and dependency evidence; changed proof requires revalidation without altering the recorded decision."
+      },
+      {
+        "fr": "Candidat Rust : observation des lancements en attente et des agents actifs ordinaires, avec identité de processus et heartbeat sauvegardé ; rapports précoces non validés.",
+        "en": "Rust candidate: ordinary queued and active Agent observations use process identity and saved heartbeat policy; early reports remain unverified."
+      },
+      {
+        "fr": "Candidat Rust : le statut présente les décisions d’abandon sans Agent et leur réouverture, sans exécution ni validation implicite.",
+        "en": "Rust candidate: status presents no-Agent abandonment decisions and reopening without implicit execution or validation."
+      },
+      {
+        "fr": "Candidat Rust : démarrage du fournisseur local et arrêt opérateur vérifiés ; les écritures heartbeat attendent la fin de la phase helper privée.",
+        "en": "Rust candidate: local provider startup and operator stop verified; heartbeat writes wait until the private helper phase ends."
+      },
+      {
+        "fr": "Candidat Rust : résultat soumis hors fenêtre des agents vérifié en CLI, processus inconnu, dernière tentative de la tâche et comptabilité conservées.",
+        "en": "Rust candidate: submitted result outside the agent window verified through CLI, with unknown process, retained last task attempt and complete accounting."
+      },
+      {
+        "fr": "Candidat Rust : fenêtres du statut configurables dans Présentation et preuves, pagination signalée et comptabilité complète ; vérification ciblée en cours.",
+        "en": "Rust candidate: configurable status windows in Presentation and evidence, explicit pagination and complete accounting; targeted verification pending."
+      },
+      {
+        "fr": "Candidat Rust : le statut conserve les anciennes tentatives terminées et projette la plus récente sans assouplir les validations ; vérification ciblée en cours.",
+        "en": "Rust candidate: status retains earlier completed attempts while projecting the latest without weakening validation; targeted checks pending."
+      },
+      {
+        "fr": "Candidat Rust : clipping des diagnostics en cellules et graphèmes Unicode15 selon le Go, sans nouvelle dépendance ; vérification différentielle ciblée en cours.",
+        "en": "Rust candidate: diagnostic clipping in Unicode15 terminal cells and graphemes matching Go, without a new dependency; targeted differential checks pending."
+      },
+      {
+        "fr": "Candidat Rust : observation des baux natifs du conducteur dans le statut, cadence persistée et échéances sans inférence de vie du processus ; qualification en cours.",
+        "en": "Rust candidate: conductor native lease observation in status, using persisted cadence and deadlines without inferring process liveness; qualification pending."
+      },
+      {
+        "fr": "Candidat Rust : le statut historique présente les cooldowns actifs sélectionnés avec le lecteur validé de l’admission, sans autoriser le lancement ; qualification en cours.",
+        "en": "Rust candidate: historical status presents selected active cooldowns through the validated admission reader without permitting launch; qualification pending."
+      },
+      {
         "fr": "Instructions structurées avec titres, sommaire, alertes, tableaux, code et copie du texte source exact ; focus et position de lecture conservés.",
         "en": "Structured instructions with headings, an outline, warnings, tables, code and exact source copying; keyboard focus and reading position are preserved."
       },
@@ -25,6 +161,494 @@
       {
         "fr": "Détail de tâche simplifié : libellés en gras, une seule zone d’action, tâches liées par leur nom et erreurs Git expliquées avec leur message original accessible.",
         "en": "Simpler task details: bold labels, one action area, related tasks by name and explained Git errors with their original message available."
+      },
+      {
+        "fr": "Mémoire et état des missions : une pause illisible refuse les départs et opérations concernés, garde un diagnostic sûr et ne devient plus un faux état « départs autorisés ».",
+        "en": "Memory and mission state: an unreadable pause refuses affected launches and operations, retains a safe diagnostic and no longer becomes a false “launches allowed” state."
+      },
+      {
+        "fr": "Revue des preuves : fermeture des blocs de code vérifiée avant normalisation des citations Markdown ; correction de source en qualification, service existant conservé.",
+        "en": "Evidence review: code-fence closure is checked before Markdown quote normalization; source correction under qualification, existing service preserved."
+      },
+      {
+        "fr": "Migration Rust en qualification : lecture structurée des avis et trois limites UTF-8 persistantes réglables dans Admin, sans acceptation implicite ni remplacement du serveur.",
+        "en": "Rust migration under qualification: structured review reply parsing and three persisted UTF-8 limits editable in Admin, without implicit acceptance or server replacement."
+      },
+      {
+        "fr": "Migration Rust en qualification : historique des contrôles Work lu sans masquer les erreurs SQL ou les reçus illisibles ; le parcours CLI complet reste à raccorder.",
+        "en": "Rust migration under qualification: Work control history reads preserve SQL and unreadable-receipt failures; complete CLI integration remains pending."
+      },
+      {
+        "fr": "Migration Rust : commande publique work list --json raccordée en lecture seule ; autres projections Work en cours, service existant conservé.",
+        "en": "Rust migration: public work list --json connected through read-only storage; other Work projections pending, existing service preserved."
+      },
+      {
+        "fr": "Migration Rust en qualification : garde des reçus de validation courants reliée aux fichiers et à la limite Admin persistée, sans acceptation implicite.",
+        "en": "Rust migration under qualification: current validation receipt guard checks actual files and the persisted Admin cap without implicit acceptance."
+      },
+      {
+        "fr": "Preuves de revue : une politique sans contrôles ne tente plus d’indexer les résultats historiques d’un reçu ; correction de source en qualification, sans redémarrage du service.",
+        "en": "Review evidence: a policy without controls no longer indexes historical receipt results; source repair under qualification, without service restart."
+      },
+      {
+        "fr": "Migration Rust en qualification : projections des preuves et validations Work, avec trois réglages de présentation persistés dans Admin v8 ; rendu public complet encore en cours.",
+        "en": "Rust migration under qualification: Work evidence/validation projections with three presentation settings persisted in Admin v8; complete public rendering remains in progress."
+      },
+      {
+        "fr": "Migration Rust en qualification : lectures Git communes sans exécution de filtres externes, délai Admin transmis aux métadonnées Root et créations/checkpoints ; service Go conservé.",
+        "en": "Rust migration under qualification: shared Git reads disable external filters and Root metadata/creation/checkpoints consume the Admin deadline; Go service preserved."
+      },
+      {
+        "fr": "Migration Rust en qualification : commandes Work natives, fiches FR/EN atomiques et reprise sans doublon après erreur de rendu ; migration complète et installation non achevées.",
+        "en": "Rust migration under qualification: native Work commands, atomic FR/EN views and duplicate-free replay after rendering failure; full migration and installation remain incomplete."
+      },
+      {
+        "fr": "Migration Rust en qualification : commande gate native, liaison task_id, résultat refusé enregistré avec code1 et reprise sans doublon ; bascule finale encore ouverte.",
+        "en": "Rust migration under qualification: native gate command, task_id binding, recorded denials with exit1 and duplicate-free replay; final cutover remains open."
+      },
+      {
+        "fr": "Sources Go/Rust en qualification : critères obligatoires liés dès task.add, refus des critères blancs et limite Admin consommée à la création Rust ; adoption des tâches historiques encore ouverte.",
+        "en": "Go/Rust sources under qualification: required criterion bindings from task.add, blank criteria refused and Admin limit consumed by Rust creation; historical task adoption remains open."
+      },
+      {
+        "fr": "Migration Rust : revue continue des politiques, fonctions, erreurs et documentation, avec contrôle des empreintes et preuves dans les qualifications. Cette méthode ne prouve pas une conformité sémantique exhaustive ni une mise en service.",
+        "en": "Rust migration: continuous policy, function, error and documentation review, with hash/evidence checks in qualification. This method does not establish exhaustive semantic correctness or deployment."
+      },
+      {
+        "fr": "Migration Rust : phases de contrôle par défaut configurables et persistées, avec choix Admin FR/EN ; les critères et exigences des tâches existantes sont conservés. Adoption explicite des anciens réglages, erreurs sûres et reprise vérifiées par périmètre ; preuves documentées par périmètre, installation et bascule restent distinctes.",
+        "en": "Rust migration: persisted configurable default check phases with FR/EN Admin choices; existing task requirements and criteria remain protected. Explicit legacy-setting adoption, safe errors and recovery verified by scope; verification evidence is scoped, while installation and cutover remain separate."
+      },
+      {
+        "fr": "Candidat Go/Rust : refus des paramètres non applicables aux mutations Work, anciens reçus préservés et causes JSON conservées, vérifiés par composant sans installation.",
+        "en": "Go/Rust candidate: reject inapplicable Work mutation parameters, preserve old receipts and JSON causes, component verified without installation."
+      },
+      {
+        "fr": "Candidat Go/Rust : alignement des critères Work non blancs entre création et édition, en vérification sans bascule du service.",
+        "en": "Go/Rust candidate: align nonblank Work criteria at creation and update, under verification without service cutover."
+      },
+      {
+        "fr": "Candidat Rust : raccord des contrôles communs et du rapport Git pour la revue gérée simple, réglages persistés et causes préservées ; vérification en cours, sans autorité ni bascule implicite.",
+        "en": "Rust candidate: compose common bindings and Git report checks for simple managed reviews using saved settings and retained causes; verification ongoing, with no implicit authority or cutover."
+      },
+      {
+        "fr": "Candidat Rust : projection hiérarchique ordinaire combinant revue, gate et dépendances ; péremption typée et erreurs avec causes, en vérification sans bascule.",
+        "en": "Rust candidate: ordinary hierarchical projection combines review, gate and dependencies; typed staleness and retained error causes, under verification without cutover."
+      },
+      {
+        "fr": "Candidat Rust : lecture des reçus gérés avec limite persistée v10, réglable dans l’Admin partagé ; refus explicites des preuves incomplètes ou corrompues. Projection gérée complète et installation encore en cours.",
+        "en": "Rust candidate: managed receipt reads use a persisted v10 cap editable through shared Admin; incomplete or corrupt evidence is explicitly refused. Complete managed projection and installation remain in progress."
+      },
+      {
+        "fr": "Candidat Rust : composition de la projection gérée simple, contrôles de reçu affichés sans réparer la fraîcheur ni accorder une acceptation ; protocoles batch/fragment explicitement refusés. Vérification en cours.",
+        "en": "Rust candidate: simple managed projection composition displays receipt controls without repairing freshness or granting acceptance; batch/fragment protocols explicitly refuse. Verification in progress."
+      },
+      {
+        "fr": "Planification : les contrôles Go pause/reprise ne déclenchent plus les hooks réservés aux décisions. Candidat Rust : codec complet et politique de motif v11, raccord transactionnel/CLI en construction.",
+        "en": "Planning: Go pause/resume controls no longer dispatch decision-only hooks. Rust candidate: complete request codec and v11 reason policy; transaction/CLI integration under construction."
+      },
+      {
+        "fr": "Candidat Rust : activation locale de la planification et politiques v12 persistées pour la taille canonique des requêtes et le nombre d’exigences. Préparations fournisseur/dépôt géré explicitement non portées ; qualification en cours, sans bascule.",
+        "en": "Rust candidate: local planning enablement and persisted v12 policies for canonical request bytes and requirement count. Provider/managed repository preparations explicitly remain unported; qualification in progress without cutover."
+      },
+      {
+        "fr": "Candidat Rust : lecture du cadrage figé des rôles, empreintes et contexte projet, avec politique v13 du corps des méthodes. Aucun agent ou droit créé ; qualification en cours.",
+        "en": "Rust candidate: frozen role framing, digests and project context reads with a persisted v13 method-body policy. Creates no agent or authority; qualification in progress."
+      },
+      {
+        "fr": "Cadrage worker : règles de politiques, documentation des fonctions et gestion d’erreurs transmises dans une source canonique embarquée. Aucun droit ajouté, aucune limite augmentée ; vérification en cours.",
+        "en": "Worker framing: policy, function documentation and error-handling rules are delivered as a canonical embedded source. No extra rights or raised limits; verification in progress."
+      },
+      {
+        "fr": "Migration Rust en développement : lecteur intégral des rapports de planification avec empreinte vérifiée, refus sans troncature et limite v14 persistée éditable dans Admin. Données déclarées sans authentification implicite ; capacité et claim restent à porter.",
+        "en": "Rust migration in development: complete digest-verified planning report reader, refusal without truncation and persisted v14 cap editable in Admin. Declared data grants no implicit authentication; capacity and claim remain to be ported."
+      },
+      {
+        "fr": "Migration Rust : les validateurs Go/Rust refusent les consommations et limites de périmètre négatives avant acceptation persistée. Zéro conserve son sens hérité et l’historique positif déjà consommé reste représentable ; aucun compteur remis à zéro.",
+        "en": "Rust migration: Go/Rust validators refuse negative scope consumption and limits before durable acceptance. Zero retains inheritance semantics and positive consumed history remains representable; no counter is reset."
+      },
+      {
+        "fr": "Migration Rust en développement : contrôles numériques des budgets globaux et des ancêtres, avec toutes les tâches descendantes comptées et refus explicite des états invalides. Ces calculs ne créent ni droit, ni bail, ni réservation ; raccordement à claim encore à terminer.",
+        "en": "Rust migration in development: numeric global and ancestor budget checks count every descendant task and explicitly refuse invalid state. These calculations create no permission, lease or reservation; integration into claim remains unfinished."
+      },
+      {
+        "fr": "Outil permanent de recettes et de vérification des preuves locales, avec règle commune Claude/Codex ; sources déclarées et résultats historiques conservés séparément.",
+        "en": "Permanent recipe runner and local-evidence verifier with a shared Claude/Codex rule; declared sources and historical results remain separate."
+      },
+      {
+        "fr": "Rust : empreinte des préconditions de refus portée avec attente inchangée, erreurs typées et parité Go ; baux et compteurs seuls ne constituent pas une correction. Intégration claim encore à terminer.",
+        "en": "Rust: rejected-proposal precondition fingerprints and unchanged waits ported with typed errors and Go parity; leases/counters alone do not count as correction. Claim integration remains unfinished."
+      },
+      {
+        "fr": "Rust : configuration atomique du budget estimatif par CLI, acteur/horloge du moteur et rejeu préservant les réservations ; admission financière commune aux quatre registres, sans arrondi implicite. Vues et intégration claim encore à porter.",
+        "en": "Rust: atomic estimated-budget configuration through CLI, engine actor/time and replay preserving reservations; financial admission includes all four ledgers without implicit rounding. Views and claim integration remain unported."
+      },
+      {
+        "fr": "Tarifs accessibles depuis Admin, découverte sourcée par skill et suppression des plafonds tarifaires arbitraires ; les coûts rapportés couvrent toutes les tentatives conservées et une erreur de lecture refuse le budget. Parcours HTTP/Admin Rust encore à réaliser.",
+        "en": "Pricing is available from Admin, with sourced discovery guidance and arbitrary price/count ceilings removed; reported costs include all retained attempts and budget reads refuse unreadable cost data. Rust HTTP/Admin pricing path remains outstanding."
+      },
+      {
+        "fr": "Rust : catalogue tarifaire versionné et commandes pricing list/save/estimate, sans tarifs embarqués, avec contrôle de concurrence, devis explicites et erreurs de stockage/sortie conservées. HTTP/Admin natifs encore ouverts.",
+        "en": "Rust: versioned pricing catalogue and list/save/estimate commands, with no bundled rates, stale-write protection, explicit quotes and preserved storage/output errors. Native HTTP/Admin remain outstanding."
+      },
+      {
+        "fr": "Migration Rust en développement : contrats agents, lecture de l’état SQL et demande d’arrêt idempotente ; le lancement et la supervision natifs restent à porter, aucun arrêt effectif prétendu.",
+        "en": "Rust migration in development: agent contracts, SQL-state reading and idempotent stop intention; native launch/supervision remain pending, with no claimed effective termination."
+      },
+      {
+        "fr": "Migration Rust en développement : un seul superviseur Linux réel peut prendre en charge atomiquement un agent en attente ; PID/stamp/heartbeat cohérents, aucun droit ni lancement fournisseur implicite. Annulation manuelle non enregistrée atomique avec tentative/réservation et rejeu ; supervision des processus enregistrés encore ouverte.",
+        "en": "Rust migration in development: one actual Linux supervisor can atomically claim a queued agent; consistent PID/starttime/heartbeat, with no implicit authority or provider launch. Unregistered manual cancellation atomically settles the attempt and estimate with replay; registered-process supervision remains open."
+      },
+      {
+        "fr": "Migration Rust : limites d’exécution par défaut et plafonds persistés dans les réglages Admin v15 ; prévisualisation CLI sur les surcharges SQL, sans lancement ni remise à zéro de consommation.",
+        "en": "Rust migration: runtime defaults and ceilings persisted in v15 Admin settings; CLI preview uses SQL overrides without launch or consumption reset."
+      },
+      {
+        "fr": "Migration Rust en qualification : préparation manuelle native sans enfant, politique v16 persistée et relecture atomique des effets ; refus explicite des branches non portées, aucune installation.",
+        "en": "Rust migration under qualification: native manual preparation without a child, persisted v16 policy and atomic effect readback; unported branches explicitly refuse, no installation."
+      },
+      {
+        "fr": "Recettes Admin : les états de refus visibles remontent hors du polling, avec régressions conservées et sans timeout global arbitraire ; les essais restent distincts du service installé.",
+        "en": "Admin recipes: visible refusal states propagate outside polling, with retained regression checks and no arbitrary global timeout; verification remains distinct from the installed service."
+      },
+      {
+        "fr": "Migration Rust en qualification : identité courante et contrat propre reconstruits dans le contexte des nouvelles préparations ; mappings incohérents et aperçu périmé refusés sans mutation, sans authentification ni exécution implicite.",
+        "en": "Rust migration under qualification: current identity and own contract reconstructed in new preparation contexts; inconsistent mappings and stale previews refuse without mutation, with no implicit authentication or execution."
+      },
+      {
+        "fr": "Migration Rust, composant vérifié : politique Admin de fenêtre des échecs entrelacés figée par tentative, rejeu diagnostique CLI et reprises SQLite communes vérifiées ; supervision réelle et bascule restent ouvertes, aucun processus activé.",
+        "en": "Rust migration, verified component: per-attempt frozen Admin failure-window policy, diagnostic CLI replay and shared SQLite retries verified; actual supervision and cutover remain open, no process enabled."
+      },
+      {
+        "fr": "Migration Rust, parcours manuel vérifié localement : départ contrôlé, prompt exact, arrêt opérateur et gardes, budget conservé et incident actif si sortie incomplète ; neuf réglages de supervision relus dans Admin. Modèles réels, reprise après crash et bascule restent ouverts, aucun serveur remplacé.",
+        "en": "Rust migration, locally verified manual path: controlled startup, exact prompt, operator stop and guards, preserved budget and active incident on incomplete output; nine supervision settings saved and reopened in Admin. Real models, crash recovery and cutover remain open, no server replaced."
+      },
+      {
+        "fr": "Migration Rust : parcours manuel agent run avec helper privé, execve sans repli shell, prompt scellé, gardes de flux et clôture sans acceptation. Durée observable sans arrêt automatique ; vérification et recette natives en cours. Aucun service redémarré.",
+        "en": "Rust migration: manual agent run with private helper, execve without shell fallback, sealed prompt, stream guards and settlement without acceptance. Elapsed duration is observation only; native verification and replay recipe in progress. No service restarted."
+      },
+      {
+        "fr": "Migration Rust, observations fournisseur vérifiées localement : usage, caches et modèle déclarés avec états inconnus et diagnostic actif ; erreurs de garde/fermeture préservées sans texte privé. Aucun coût facturé, authentification ou serveur installé n’est déduit.",
+        "en": "Rust migration, locally verified provider observations: declared usage, caches and model with unknown states and live diagnostics; guard/cleanup causes remain visible without private text. No invoiced cost, authentication or installed server is inferred."
+      },
+      {
+        "fr": "Candidat Rust : compilation pure des arguments de modèle et d’effort, refus sûr des formes ambiguës ; routage natif complet encore en cours, sans installation.",
+        "en": "Rust candidate: pure model/effort argument compilation with safe ambiguous-input refusal; full native routing remains in progress, not installed."
+      },
+      {
+        "fr": "Candidat Rust vérifié par composant : règles de niveau et de signalement des modèles persistées, listes explicites dans Admin et contrôle CLI sans mutation ; lancement routé encore en cours, sans installation.",
+        "en": "Rust candidate verified by component: persisted model level/flagging rules, explicit Admin lists and read-only CLI checks; routed launch remains in progress, not installed."
+      },
+      {
+        "fr": "Candidat Rust : refus des efforts ressemblant à des options CLI, vérifié par tests et contre-exemple public avant/après ; raccordement natif en cours, sans installation.",
+        "en": "Rust candidate: refuse flag-like CLI effort values, verified by tests and the public before/after reproducer; native integration in progress, not installed."
+      },
+      {
+        "fr": "Candidat Rust en vérification : routage depuis une politique enregistrée et un catalogue déclaré, règles Admin et sources relues avant permission ; aucun modèle payant testé ni installation.",
+        "en": "Rust candidate under verification: routing from saved policy and declared catalogue, Admin rules and source rereads before permission; no paid model tested or installation."
+      },
+      {
+        "fr": "Candidat Rust non installé : routage natif explicite vérifié sur huit parcours locaux, avec sources relues avant exécution, format modèle v1, limites Admin et reprises ; 566 tests workspace et quatre parcours Admin passent. Migration globale encore partielle.",
+        "en": "Uninstalled Rust candidate: explicit native routing verified in eight local journeys, with sources reread before execution, v1 model format, Admin limits and recovery; 566 workspace tests and four Admin journeys pass. Overall migration remains partial."
+      },
+      {
+        "fr": "Candidat Rust non installé : coexistence d’une CLI et du catalogue API vérifiée sur neuf parcours locaux ; collisions et API non portée restent refusées, secrets protégés et reprises vérifiées. Migration globale partielle.",
+        "en": "Uninstalled Rust candidate: CLI/API-catalogue coexistence verified in nine local journeys; conflicts and unported APIs still refuse, with secret redaction and recovery checked. Overall migration stays partial."
+      },
+      {
+        "fr": "Candidat Rust non installé : création et lecture fournisseur par CLI vérifiées sans écrasement ; courses, erreurs de stockage/durabilité/sortie et reprises couvertes. 140 tests de recette, 593 tests workspace tous features et dix parcours natifs passent. Migration globale partielle.",
+        "en": "Uninstalled Rust candidate: provider-file CLI create/readback verified without overwrite; creation races, storage/durability/output errors and recovery covered. 140 recipe tests, 593 all-features workspace tests and ten native journeys pass. Overall migration stays partial."
+      },
+      {
+        "fr": "Candidat Rust86 non installé : édition et restauration fournisseur vérifiées avec aperçu lié au Root, CAS, sauvegardes exactes et reprise. 151 tests Rust, 13 parcours natifs, Clippy et Rustdoc passent ; migration globale partielle.",
+        "en": "Uninstalled Rust86 candidate: provider update/restore verified with Root-bound preview, CAS, exact snapshots and recovery. 151 Rust tests, 13 native journeys, Clippy and Rustdoc pass; overall migration partial."
+      },
+      {
+        "fr": "Candidat Rust87 non installé : choix de modèle par tâche conservé/rejoué et réellement appliqué au processus, avec refus des divergences et reprise. Compatibilité JSON Go et erreurs de transaction/sortie vérifiées. 155 tests de recette, 10 transactionnels et 14 parcours natifs passent ; migration partielle.",
+        "en": "Uninstalled Rust87 candidate: task model choice persists/replays and reaches actual process argv, with conflict refusals and recovery. Go JSON compatibility and transaction/output failures verified. 155 recipe tests, 10 transaction tests and 14 native journeys pass; overall migration partial."
+      },
+      {
+        "fr": "Candidat Rust88 non installé : import/export de politiques explicites avec sauvegarde et refus/reprise ; confirmation UI liée au Root, choix par défaut conservé et règles Admin appliquées. 161 tests Rust et 15 parcours natifs, 4 parcours navigateur passent. Aucun modèle implicite ajouté ; migration globale partielle.",
+        "en": "Uninstalled Rust88 candidate: explicit policy import/export with snapshots/refusal/recovery; Root-bound UI confirmation, preserved default choice and saved Admin rules. 161 Rust tests, 15 native and 4 browser journeys pass. No implicit named model added; overall migration partial."
+      },
+      {
+        "fr": "Candidat Rust89 non installé : mission manuelle worker/rapport/soumission/gate/validation opérateur vérifiée ; identités SQL/corps incohérentes refusées par les lecteurs. 169 tests Rust de recette, 15 parcours de routage et 4 missions passent. Migration globale partielle.",
+        "en": "Uninstalled Rust89 candidate: verified manual worker/report/submission/gate/operator acceptance; readers refuse inconsistent SQL/body identities. 169 Rust recipe tests, 15 routing and 4 mission journeys pass. Overall migration partial."
+      },
+      {
+        "fr": "Candidat Rust90–91 non installé : garde HTTP local et routage typé partiel vers le vrai Root ; datastore lié par descripteur, refus des chemins remplacés, état conservé après échecs tardifs. Session locale persistante qualifiée :202tests Rust, Clippy/Rustdoc et parcours CLI vérifiés ; transport réseau et serveur Go inchangés.",
+        "en": "Uninstalled Rust90–91 candidate: local HTTP gate and limited typed routing into actual Root; descriptor-bound datastore, replacement-path refusal, retained state after late failures. Persistent local session qualified:202Rust tests, Clippy/Rustdoc and CLI journeys verified; network transport and Go server unchanged."
+      },
+      {
+        "fr": "Candidat Rust92 non installé : conservation de la configuration après échec de sortie/fermeture init ou réglages apply/rejeu ; refus sans faux marqueur. Qualification locale206tests Rust, Clippy/Rustdoc et parcours CLI vérifiés.",
+        "en": "Uninstalled Rust92 candidate: retained configuration after init/settings apply/replay output or close failure; refusals without false publication markers. Local qualification206Rust tests, Clippy/Rustdoc and CLI journeys verified."
+      },
+      {
+        "fr": "Candidat Rust93 non installé : routes natives de réglages Admin vers le Root, état connu conservé hors du corps HTTP et erreur interne distinguée d’un refus client. Qualification locale211tests Rust, Clippy/Rustdoc et profils vérifiés ; transport réseau non livré.",
+        "en": "Uninstalled Rust93 candidate: native Admin settings routes into Root, known state retained outside HTTP body, internal failure distinguished from client refusal. Local qualification211Rust tests, Clippy/Rustdoc and profiles verified; network transport not delivered."
+      },
+      {
+        "fr": "Candidat Rust94 non installé : politiques réseau v20 persistées, catalogue v4 et Admin FR/EN, null Cookie de session et maxima techniques distincts. Qualification configuration/Admin220tests Rust et4parcours navigateur vérifiés ; transport/valeurs actives non livrés.",
+        "en": "Uninstalled Rust94 candidate: persisted network policy v20, catalogue v4 and FR/EN Admin, Session-cookie null and separate technical maxima. Configuration/Admin qualification220Rust tests and4browser cases verified; transport/active enforcement not delivered."
+      },
+      {
+        "fr": "Rust95 : transport HTTP1 de lecture, bootstrap du même Root et CSRF dédié vérifiés localement ; limites sauvegardées, saturation/reprise et capacités annoncées exactes. Mutations réseau/login/bascule restent ouverts ; serveur Go inchangé.",
+        "en": "Rust95: read-only HTTP1 transport, same-Root bootstrap and dedicated CSRF locally verified; saved limits, saturation/recovery and truthful capabilities. Network mutations/login/cutover remain open; serving Go unchanged."
+      },
+      {
+        "fr": "Rust96 : mutations TCP task/settings et effets connus conservés hors réponse ; observation explicite, refus des jobs non démarrés à l’arrêt, erreurs de sortie/déconnexion et rejeu sans doublon vérifiés localement240tests Rust. CLIweb/login/Admin et bascule encore ouverts, serveur Go inchangé.",
+        "en": "Rust96: TCP task/settings mutations retain known effects outside response bytes; explicit observation, queued-stop refusal, output/disconnect failures and exact replay locally verified with240Rust tests. CLIweb/login/Admin and cutover remain open; serving Go unchanged."
+      },
+      {
+        "fr": "Rust97 : commande web native, sauvegarde/rejeu HTTP et arrêt SIGINT vérifiés ; rupture stdout après commit conserve les effets connus et permet une reprise sans doublon.244tests Rust et2parcours publics passent. Login/Admin et bascule encore ouverts, serveur Go inchangé.",
+        "en": "Rust97: native web CLI, HTTP save/replay and SIGINT verified; broken stdout after commit retains known effects and supports exact recovery.244Rust tests and2public journeys pass. Login/Admin and cutover remain open, serving Go unchanged."
+      },
+      {
+        "fr": "Rust98 : connexion web native et durée de cookie persistée vérifiées ; mêmes réglages de démarrage pour cookie et transport.53tests web,10CLI et4parcours navigateur FR/EN clair/sombre passent. Accueil/Admin complets et bascule ouverts, serveur Go inchangé.",
+        "en": "Rust98: native web login/saved cookie lifetime verified; cookie and transport share startup settings.53web tests,10CLI and4FR/EN light/dark browser journeys pass. Full landing/Admin and cutover remain open, serving Go unchanged."
+      },
+      {
+        "fr": "Rust99 : accueil de développement et modale Admin natifs vérifiés via API réelle ; paramètres persistés, accusés corrélés et reprise sans doublon. Les ressources fonctionnent avec un worker Root sans relever le plafond. Bascule globale encore ouverte, serveur Go inchangé.",
+        "en": "Rust99: native development landing/shared Admin verified through actual APIs, with persisted settings, correlated acknowledgements and exact recovery. Resources work with one Root worker without raising capacity. Global cutover remains open, serving Go unchanged."
+      },
+      {
+        "fr": "Migration Rust100 : bail natif de mission avec génération persistée et3réglages Admin v21 vérifiés sur fixtures et API natives. Conduite autonome, fencing métier et bascule globale encore ouverts ; serveur Go conservé.",
+        "en": "Rust migration100: native mission lease with persistent generation and3v21 Admin settings verified through fixtures and native APIs. Autonomous conductor, business transaction fencing and global cutover remain open; serving Go preserved."
+      },
+      {
+        "fr": "Migration Rust101 : lecteur de reprise du bail vérifié en lecture seule, erreurs de schéma/horloge explicites et provenance inconnue conservée. Fencing métier et conduite autonome encore ouverts ; serveur Go conservé.",
+        "en": "Rust migration101: verified readonly mission lease recovery reader, explicit schema/clock failures and preserved unknown provenance. Business fencing and autonomous conductor remain open; serving Go preserved."
+      },
+      {
+        "fr": "Migration Rust102 : commandes Work sous bail vérifiées dans la transaction et avant commit, rollback budgétaire sur expiration et reprise de tests sans timeout arbitraire. Journal, conduite complète et bascule globale restent ouverts ; serveur Go conservé.",
+        "en": "Rust migration102: Work commands lease-checked inside the transaction and before commit, budget rollback on expiry and recovered verification without arbitrary timeout. Journal, complete conductor and global cutover remain open; serving Go preserved."
+      },
+      {
+        "fr": "Migration Rust103 : provenance persistée des prises et reçus transactionnels des commandes Work ; cohérence des réglages, rejeu et ancien format vérifiés localement.299tests sélectionnés et2parcours HTTP passent. Boucle complète et bascule restent ouvertes.",
+        "en": "Rust migration103: persisted claims and transactional Work command receipts; settings consistency, replay and legacy format locally verified.299selected tests and2HTTP flows pass. Complete conductor and cutover remain open."
+      },
+      {
+        "fr": "Migration Rust104 : journal des erreurs de cycle et reprises, contrôle propriétaire partagé, rollback sur échec du journal.48tests ciblés et2parcours HTTP passent. Boucle complète et bascule restent ouvertes.",
+        "en": "Rust migration104: cycle error/recovery journal, shared owner checks and rollback on journal failure.48targeted tests and2HTTP flows pass. Complete conductor and cutover remain open."
+      },
+      {
+        "fr": "Migration Rust105 : admission manuelle sous bail, reçu agent.start et garde transactionnelle du rejeu ; rollback sur expiration ou reçu invalide.305tests sélectionnés et2parcours HTTP passent. Consentement automatique, exécution sous bail et bascule restent ouverts.",
+        "en": "Rust migration105:lease-bound manual admission, agent.start receipt and transaction-fenced replay; rollback on expiry/invalid receipt.305selected tests and2HTTP flows pass. Automatic consent, lease-fenced execution and cutover remain open."
+      },
+      {
+        "fr": "Migration Rust106 : consentement, révocation, pause et autonomie lus sans fallback ; corruption refusée sans mutation, reprise SQL vérifiée.33tests ciblés et2parcours HTTP passent. Configuration et départ automatique restent ouverts.",
+        "en": "Rust migration106:consent, revocation, pause and autonomy read without fallback; corruption refused without mutation and SQL recovery verified.33targeted tests and2HTTP flows pass. Configuration and automatic launch remain open."
+      },
+      {
+        "fr": "Vérification : conservation des sources Go effectivement compilées et des ressources embarquées, archives réutilisables par différences et contrôle des quatre sous-tests de rôles. Le profil de preuve refuse les entrées instables ou les overlays non pris en charge.",
+        "en": "Verification: retain actual Go project sources and embedded assets, reuse verified source archives through deltas, and require all four named role subtests. The evidence profile refuses unstable inputs or unsupported overlays."
+      },
+      {
+        "fr": "Migration Rust108 : garde-fous distincts pour organisation hiérarchique et capacité de revue, avec causes typées et échecs privés conservés. La fabrique signale les prérequis sans lever le refus des branches non portées ; aucun départ automatique ajouté.",
+        "en": "Rust migration108: separate hierarchical-organization and reviewer-capacity guards, retaining typed causes and private failures. Admission reports prerequisites while preserving unported-branch refusal; no automatic launch added."
+      },
+      {
+        "fr": "Rust : créneaux initiaux et plafond par mission enregistrés dans les réglages Admin/API/CLI ; lecture sans réduction cachée des contrôles existants, sans autorisation automatique.",
+        "en": "Rust: initial slots and per-mission ceiling saved through Admin/API/CLI settings; existing controls read without hidden clamping or automatic authorization."
+      },
+      {
+        "fr": "Rust : composition vérifiable du fragment d’identité et de contrat des workers hiérarchiques, limité au scope assigné ; lancement hiérarchique encore refusé.",
+        "en": "Rust: verifiable identity/contract fragment composition for hierarchical workers, limited to assigned scope; hierarchical launch remains refused."
+      },
+      {
+        "fr": "Rust111 : lancement explicite d’un worker dans son scope, contrôles reviewer, signaux de fin et rapport SHA sans acceptation automatique ; reçu durable et reprise après refus SQLite sans relancer le fournisseur. Qualification locale, application Go non remplacée.",
+        "en": "Rust111: explicit worker launch within its scope, reviewer guards, terminal signals and SHA-bound handoff without automatic acceptance; durable completion and recovery after SQLite refusal without provider replay. Local qualification; the Go application is not replaced."
+      },
+      {
+        "fr": "Rust112 en qualification : configuration publique du plan et du vérificateur sans lancement ; quatre valeurs initiales persistées et réglables dans Admin FR/EN, reprise explicite v22→v23, configurations existantes préservées. Application en service inchangée.",
+        "en": "Rust112 under qualification: public plan and reviewer configuration without launch; four persisted initial values editable in FR/EN Admin, explicit v22→v23 recovery, existing configurations preserved. The running application is unchanged."
+      },
+      {
+        "fr": "Candidat Rust113/114 vérifié localement : réservation et décisions task/delegate, refus atomiques et adoption explicite v24→v25 ; réglages Admin FR/EN réellement consommés. Conduite complète et bascule restent ouvertes ; application en service inchangée.",
+        "en": "Rust113/114 locally verified candidate: scope claims and task/delegate decisions, atomic refusal and explicit v24→v25 adoption; FR/EN Admin settings consumed by actual operations. Complete orchestration and cutover remain open; the running application is unchanged."
+      },
+      {
+        "fr": "Candidat Rust115 : renouvellement explicite d’un bail vivant sans activation supplémentaire, pause mission vérifiée dans la transaction et diagnostics distincts pour boîte vide ou batch interdit. Qualification locale en cours, sans bascule.",
+        "en": "Rust115 candidate: explicit live-lease renewal without another activation, transactional mission-pause guard and distinct empty-inbox/disabled-batch diagnostics. Local qualification in progress without cutover."
+      },
+      {
+        "fr": "Candidat Rust116 en qualification : pause/archive mission contrôlées pour les activations et décisions, cooldown au claim et réservation financière atomique, sans doublon au rejeu. Contre-exemples et garde de rollback conservés ; aucune bascule.",
+        "en": "Rust116 candidate under qualification: mission pause/archive checked for activations and decisions, claim cooldown and atomic financial reservation without replay duplication. Counterexamples and rollback guard retained; no cutover."
+      },
+      {
+        "fr": "Candidat Rust117 : entrées de claim liées à work/scope/génération et sauvegardées sans écrasement dans la transaction ; garde financier de départ contre double comptage et politique devenue incompatible. Aucun démarrage planner ni bascule.",
+        "en": "Rust117 candidate: claim inputs bound to work/scope/generation and saved without overwrite in the transaction; planning-start funding guard prevents double counting and incompatible current policy. No planner start or cutover."
+      },
+      {
+        "fr": "Candidat Rust : prévisualisation pure des entrées figées du planner, refus des sources et réservations devenues incompatibles ; exécution du planner et bascule toujours non livrées.",
+        "en": "Rust candidate: read-only preview of frozen planner inputs, rejecting changed sources and incompatible reservations; planner execution and cutover remain undelivered."
+      },
+      {
+        "fr": "Candidat Rust : décodage strict des propositions du planner sans champs d’autorité ; raccordement au processus réel encore à porter.",
+        "en": "Rust candidate: strict planner proposal decoding without authority fields; real-process integration remains unported."
+      },
+      {
+        "fr": "Candidat Rust : la préparation du planner revalide les instructions et exigences courantes de son scope, en plus des empreintes historiques.",
+        "en": "Rust candidate: planner preparation rechecks current scoped instructions and requirements alongside historical hashes."
+      },
+      {
+        "fr": "Candidat Rust : plafond de réponse structurée du planner sauvegardé et éditable dans Admin ; aucune adoption implicite des anciens journaux.",
+        "en": "Rust candidate: persisted planner structured response ceiling editable in Admin; no implicit adoption for historical journals."
+      },
+      {
+        "fr": "Candidat Rust : lecteur de réponse JSONL complet, terminal requis et refus des réponses tronquées ou ambiguës ; branchement au processus planner encore à porter.",
+        "en": "Rust candidate: complete JSONL response reader with required terminal and refusal of truncated or ambiguous replies; planner process integration remains unported."
+      },
+      {
+        "fr": "Préparation locale de la bascule : références Go embarquées retirées de l’index et ignorées, preuves physiques conservées ; publication et bascule encore non effectuées.",
+        "en": "Local cutover preparation: embedded Go references untracked and ignored with physical evidence retained; publication and cutover remain pending."
+      },
+      {
+        "fr": "Candidat Rust : le leader fournisseur est lié par le noyau à la vie de son superviseur ; crash ne signifie ni succès de tâche ni remboursement.",
+        "en": "Rust candidate: provider leader lifetime is kernel-bound to its supervisor; a crash implies neither task success nor refund."
+      },
+      {
+        "fr": "Migration Rust : fraîcheur du contexte planificateur étendue aux essais, révisions et coordination de revue ; qualification locale, sans bascule du serveur.",
+        "en": "Rust migration: planner context freshness includes attempts, instruction revisions and review coordination; local qualification, no server cutover."
+      },
+      {
+        "fr": "Migration Rust : transport natif partagé avec entrée scellée et execve explicite ; gate worker conservée, planificateur encore non branché.",
+        "en": "Rust migration: shared native transport with sealed input and explicit execve; worker gate preserved, planner not yet connected."
+      },
+      {
+        "fr": "Migration Rust : attente structurée et renouvellement du bail déclarés en réglages persistants Admin ; le bail ne devient pas une limite de durée du modèle, runner encore en chantier.",
+        "en": "Rust migration: structured-provider waiting and ownership renewal declared as persisted Admin settings; the lease does not become a model-duration limit, runner still in progress."
+      },
+      {
+        "fr": "Primitive Rust d’horloge CLOCK_BOOTTIME et de réveil timerfd absolu, sans repli ni nouveau délai produit ; raccord au planificateur encore en cours.",
+        "en": "Rust CLOCK_BOOTTIME clock and absolute timerfd wake primitive, without fallback or new product timeout; planner integration remains in progress."
+      },
+      {
+        "fr": "Le contrôleur Rust peut réveiller le poll du processus possédé via un descripteur noyau ; vérification locale en cours, sans nouveau timeout global ni raccord planner implicite.",
+        "en": "The Rust controller can wake the owned-process poll via a kernel descriptor; local verification in progress, with no new global timeout or implicit planner integration."
+      },
+      {
+        "fr": "Canal privé Rust : refus snake_case conservés et projection sûre des causes natives composées partagée avec le CLI ; chemin du planificateur encore en construction.",
+        "en": "Rust private channel preserves snake_case refusals and shares safe compound native cause projection with the CLI; planner execution remains under construction."
+      },
+      {
+        "fr": "Candidat Rust129 : refus explicite des échéances noyau saturées, quatre tests ciblés vérifiés ; raccordement du planificateur réel en cours, non livré.",
+        "en": "Rust candidate129: explicit refusal of kernel-saturated deadlines, four targeted tests verified; actual planner integration remains in progress and undelivered."
+      },
+      {
+        "fr": "Candidat Rust129 : premier planning run réel sur fournisseur inerte vérifié ; registre/gate privés et receipt durable raccordés. Reprise et renouvellement en qualification, aucune bascule installée.",
+        "en": "Rust candidate129: first real planning run verified with an inert provider; private registry/gate and durable receipt connected. Recovery and renewal remain under qualification; no installed cutover."
+      },
+      {
+        "fr": "Candidat Rust129 vérifié sur fixtures : appel planificateur réel protégé, bail renouvelé, refus précis, reprise SQL sans nouvel appel et Admin FR/EN. Migration globale et bascule encore inachevées.",
+        "en": "Rust candidate129 verified with fixtures: protected planner process, lease renewal, precise refusals, SQL recovery without inference and FR/EN Admin. Global migration and cutover remain unfinished."
+      },
+      {
+        "fr": "Rust130 : activation native vérifiée avec bail Admin et ordre inbox, claim concurrent refusé même après expiration, pause/reprise et refus sans réinférence ; quatre scénarios inertes, migration globale encore partielle.",
+        "en": "Rust130: verified native activation using the Admin lease and inbox order, concurrent claim refused even after expiry, pause/resume and refusal without reinference; four inert scenarios, overall migration still partial."
+      },
+      {
+        "fr": "Rust131 : reprise locale après refus métier vérifiée : diagnostic complet, correction appliquée, répétition et pièce altérée bloquées ; migration globale et bascule encore ouvertes. Rust132 : reprise locale des échecs reapés vérifiée, reçus conservés sous refus Admin et renouvellement séquencé après le helper ; aucune bascule. Rust133 : retrait d’admission sans grant et transmission des causes sûres vérifiés localement ; ancien reçu inconnu toujours bloqué, sans reap inventé. Rust134 : parcours public délégué vers worker et rapport vérifié sur binaire final ; aide FR/EN Rust actualisée et invocation des outils symboliques corrigée. Rust135 : raisons précises des refus d’organisation transmises sans texte privé ; refus et état inchangés, parcours public vérifié. Rust136 en cours : aperçu natif des contrôles préautorisés, sans exécution ; raccord protégé encore incomplet.",
+        "en": "Rust131: locally verified business-refusal recovery: complete diagnostic, applied correction, blocked repetition and tampered artifact; global migration and cutover remain open. Rust132: locally verified reaped-failure recovery, retained receipts on Admin refusal and renewal sequenced after helper reads; no cutover. Rust133: locally verified withdrawal before grant and safe cause delivery; unknown legacy receipt stays blocked, no invented reap. Rust134: public delegated worker/report flow verified on final binary; current FR/EN Rust help and corrected symlink launcher invocation. Rust135: precise organization refusal reasons delivered without private text; unchanged refusal/state and verified public flow. Rust136 in progress: native preauthorized-control preview without execution; protected execution integration remains incomplete."
+      },
+      {
+        "fr": "Admin : paramètres regroupés en accordéons, aides modales et préparation de contexte IA avec import contrôlé des propositions ; appel fournisseur direct encore à raccorder.",
+        "en": "Admin: settings grouped in accordions, modal help and AI context preparation with checked proposal import; direct provider calls still need connection."
+      },
+      {
+        "fr": "Budget Admin dédié : montants exacts, historique SQL, prévisualisation et confirmation, réservations natives conservées et rejouables ; fournisseur IA direct encore en cours de raccordement.",
+        "en": "Dedicated Admin budget: exact amounts, SQL history, preview/confirmation and retained replayable native reservations; direct AI provider connection remains in progress."
+      },
+      {
+        "fr": "Migration Rust : parseur de réponse fournisseur partagé, interface du planificateur conservée ; refus des flux incomplets ou ambigus et limites explicites, sans autorisation implicite de conseil Admin.",
+        "en": "Rust migration: shared provider response parser with the planner interface preserved; incomplete or ambiguous streams refuse under explicit caps, without implicit Admin advice permission."
+      },
+      {
+        "fr": "Migration Rust : raccord CLI des contrôles de tâche autorisés, aperçu et reprise depuis les reçus ; aucun contrôle réussi ne vaut revue indépendante ou acceptation. Qualification en cours.",
+        "en": "Rust migration: CLI wiring for authorized task controls, preview and receipt recovery; successful controls do not imply independent review or acceptance. Qualification in progress."
+      },
+      {
+        "fr": "Migration Rust : abandon explicite des observations de contrôle après fin de processus prouvée ; clôture sans résultat périmé ni acceptation, et refus de tout wait inconnu même sans grant.",
+        "en": "Rust migration: explicit retirement of control observations after proven process completion; closure without stale-result adoption or acceptance, refusing unknown waits even without a grant."
+      },
+      {
+        "fr": "Migration Rust : vérificateur des méthodes et contextes d’agents raccordé aux tests natifs nommés, sans exécution Go ; preuves complètes Rust et refus des collectes vides/incomplètes.",
+        "en": "Rust migration: method and agent-context checker now uses named native tests without Go execution; full Rust evidence and rejection of empty/incomplete collections."
+      },
+      {
+        "fr": "Migration Rust : contrôles natifs des tâches ordinaires et distinction human/automatic, sans scope fictif ; les contrôles humains conservent les gates manuels et restent en attente de validation. Qualification en cours.",
+        "en": "Rust migration: ordinary native task controls and separate human/automatic paths without a fabricated scope; human controls preserve manual gates and await human validation. Qualification in progress."
+      },
+      {
+        "fr": "Méthodes natives : preuve Rust dans le contrat embarqué, sans dépendance Go de la recette native ; les contextes déjà émis restent historiques et les nouveaux demandent une reconstruction.",
+        "en": "Native methods: embedded contract uses Rust evidence and the native recipe no longer requires Go; issued contexts remain historical and new ones require rebuilding."
+      },
+      {
+        "fr": "Migration Rust : contrat de génération des modèles indépendant de Go ; la planification refuse les déclarations d’outils connues au lieu d’appliquer leur réponse. Vérifications locales, installation utilisateur non effectuée.",
+        "en": "Rust migration: Go-independent model-generation contract; planning refuses known tool declarations instead of applying their reply. Local checks, no user installation."
+      },
+      {
+        "fr": "Migration Rust : adaptateur de réponse reviewer avec critères et citations vérifiés, refus des doublons natifs et faits fournisseur conservés après erreur ; cycle Root de revue encore à raccorder.",
+        "en": "Rust migration: reviewer response adapter checks criteria and quotes, refuses ambiguous native fields and retains provider facts after errors; Root review lifecycle still to connect."
+      },
+      {
+        "fr": "Migration Rust : preview CLI de revue lié aux contrôles natifs enregistrés et à leur publication ; observation sans appel reviewer ni acceptation.",
+        "en": "Rust migration: review CLI preview binds registered native controls and publication; observation only, no reviewer invocation or acceptance."
+      },
+      {
+        "fr": "Rust en développement : plafonds de mission, politique de motif persistée v28, transaction et rejeu communs, parcours CLI/API et fenêtre native avec aperçu. Aucun reviewer ni service utilisateur lancé.",
+        "en": "Development Rust: mission quotas, saved v28 reason policy, common transaction/replay, CLI/API routes and a native preview modal. No reviewer or user service started."
+      },
+      {
+        "fr": "Rust : préparation en lecture seule des originaux du reviewer, limites sauvegardées et motifs précis des erreurs de contexte ; invocation du reviewer encore non migrée.",
+        "en": "Rust: read-only reviewer original inputs, saved limits and precise context error reasons; reviewer invocation remains unported."
+      },
+      {
+        "fr": "Rust : plafond de réponse du reviewer indépendant du planner, configurable dans les réglages ; adoption explicite des anciens journaux, lancement natif encore en migration.",
+        "en": "Rust: reviewer response cap independent of the planner and configurable in settings; explicit legacy journal adoption, native reviewer launch still being migrated."
+      },
+      {
+        "fr": "Rust : admission du reviewer réutilisable dans une transaction Root et délai total éditable dans les plafonds de mission ; lancement protégé encore en développement.",
+        "en": "Rust: reviewer admission reusable inside a Root transaction and total duration editable in mission limits; protected launch remains under development."
+      },
+      {
+        "fr": "Reviewer Rust candidat : transactions Root sous politique de stockage sauvegardée, contrôle Unix et exécution avec prompt scellé ; budget réservé et rejeu protégés. Commande produit et publication encore en développement.",
+        "en": "Rust reviewer candidate: Root transactions under saved storage policy, Unix admission and sealed-prompt execution; protected reserved budget and replay. Production command and publication remain under development."
+      },
+      {
+        "fr": "Candidat CLI Rust : premier conducteur worker mission watch et état natif vérifiés avec fournisseurs fictifs ; reprise historique, rôles automatiques et intégration web encore ouverts, sans installation du serveur.",
+        "en": "Rust CLI candidate: initial mission watch worker conductor and native status verified with inert providers; historical recovery, automatic roles and web integration remain open; no server installation."
+      },
+      {
+        "fr": "Candidat Rust : reprise queued sous nouveau conducteur sans nouvelle admission, avec historique d'adoption, contrôles API et parcours fictifs vérifiés ; contexte périmé, rôles automatiques et serveur web restent ouverts. Aucun serveur remplacé.",
+        "en": "Rust candidate: queued restart under a new conductor without readmission, with adoption history, verified API checks and inert public journeys; stale context, automatic roles and web server remain open. No server replaced."
+      },
+      {
+        "fr": "Rust en développement : watch raccorde les activations de planification au lancement worker ; liaison du planner à la base SQLite physique et refus/reprise vérifiés sur fixtures isolées. Traitement séquentiel, reviewer/validation et serveur web encore à raccorder ; serveur installé inchangé.",
+        "en": "Rust development: watch connects planning activations to worker launch; planner binding to the physical SQLite database and refusal/recovery verified on isolated fixtures. Sequential processing; reviewer/validation and web server still pending; installed server unchanged."
+      },
+      {
+        "fr": "Migration Rust : lecteurs du bilan de mission, projections tâches/dépenses et association du chemin des preuves au datastore vérifiés sur fixture isolée. Le JSON mission status complet reste à assembler ; serveur installé inchangé.",
+        "en": "Rust migration: mission-report readers, task/spending projections and material-path/datastore association checked on an isolated fixture. Complete mission status JSON still awaits assembly; installed server unchanged."
+      },
+      {
+        "fr": "Lectures Rust des preuves : contrôle partagé du lien entre chemin du projet et base ouverte, vérifié sur fixtures isolées avec refus sans effet et reprise ; défaut lecteur reproduit sur profil normal, service installé inchangé.",
+        "en": "Rust evidence readers: shared project-path/opened-database association checks verified on isolated fixtures with no-effect refusal and recovery; reader defect reproduced on normal profile, installed service unchanged."
+      },
+      {
+        "fr": "Bilan Rust : lecture des résultats de tâches ordinaires sans historique Agent, avec cohérence et causes de preuve périmée conservées jusque dans les erreurs de sortie ; parcours isolé valide/périmé/ENOSPC/reprise vérifié, bilan CLI complet encore ouvert.",
+        "en": "Rust mission report: ordinary task-result reader for tasks without Agent history, with consistency and stale-evidence causes retained through output failures; isolated current/stale/ENOSPC/recovery flow verified, complete CLI report still open."
+      },
+      {
+        "fr": "Rust : raccord JSON historique de mission status pour les missions ordinaires sans profil, Agent ni planification ; santé stockage réelle et seuils persistés dans Admin (schéma réglages 38). Qualification du parcours en cours, aucune installation revendiquée.",
+        "en": "Rust: historical mission status JSON wired for ordinary missions without profiles, Agents or planning; actual storage health and persisted Admin thresholds (settings schema 38). Journey qualification in progress; no installation claimed."
+      },
+      {
+        "fr": "Rust pilote : bilan historique après annulation manuelle avant départ, identité de l’Agent interrompu, mesures de tentative distinctes des réservations et observation réelle des rapports partiels ; refus explicites des autres branches.",
+        "en": "Rust pilot: historical status after manual cancellation before launch, original interrupted Agent identity, attempt measurements separate from reservations and real partial-report observation; other branches refuse explicitly."
+      },
+      {
+        "fr": "Migration Rust en qualification : lecture JSON d’un worker terminé et de son rapport réellement soumis, en attente de revue sans acceptation implicite.",
+        "en": "Rust migration under qualification: JSON observation of a completed worker and its actually submitted report, pending review without implicit acceptance."
       }
     ]
   },

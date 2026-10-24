@@ -1,0 +1,27 @@
+[package]
+name = "swarm-enrollment-authority"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+test-fixtures = ["swarm-enrollment-proof/test-fixtures"]
+
+[dependencies]
+base64 = "=0.22.1"
+sha2 = "=0.10.9"
+swarm-identity-contract = { path = "../swarm-identity-contract", features = ["serde"] }
+swarm-enrollment-proof = { path = "../swarm-enrollment-proof" }
+swarm-enrollment-state = { path = "../swarm-enrollment-state" }
+swarm-wire-json = { path = "../swarm-wire-json", features = ["timestamp"] }
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.150"
+ed25519-dalek = "=2.2.0"
+time = { version = "=0.3.55", features = ["formatting", "parsing"] }
+
+[dev-dependencies]
+tempfile = "=3.27.0"
+
+[[example]]
+name = "authority_probe"
+required-features = ["test-fixtures"]

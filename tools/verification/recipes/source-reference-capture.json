@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "source-reference-capture",
+  "inputs": [
+    "tools/rust-migration/capture_source_reference.py",
+    "tools/rust-migration/build_behavior_matrix.py",
+    "tests/test_source_reference_capture.py",
+    "cmd/**/*.go",
+    "internal/**/*.go",
+    "resources.go",
+    "go.mod",
+    "go.sum"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "source-addition-refusal-and-recovery",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_source_reference_capture.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_valid_added_source_refusal_and_same_tree_recovery",
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "retained-archive-members-and-current-source-equality",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,tarfile\nfrom pathlib import Path\ne=Path(os.environ['SWARM_SOURCE_REFERENCE_EVIDENCE']);v=json.loads((e/'result.json').read_bytes());a=e/'application-sources.tar.gz'\nassert hashlib.sha256(a.read_bytes()).hexdigest()==v['archive_sha256']\nexpected={name:r['sha256'] for name,r in v['files'].items()};expected.update(v['additional_inputs'])\nwith tarfile.open(a,'r:gz') as t:\n names=t.getnames();assert len(names)==len(set(names))==v['archive_members'] and set(names)==set(expected)\n for name,sha in expected.items():\n  member=t.getmember(name);assert member.isfile()\n  assert hashlib.sha256(t.extractfile(member).read()).hexdigest()==sha\n  assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==sha\nassert hashlib.sha256((e/'publisher.py').read_bytes()).hexdigest()==v['publisher_sha256']\nassert v['source_names_rechecked'] and not v['reference_approved'] and not v['compiler_graph'] and not v['embedded_assets']\nprint('PASS exact retained source archive and current-source equality, baseline approval open')"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS exact retained source archive and current-source equality, baseline approval open"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

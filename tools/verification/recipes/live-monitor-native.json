@@ -1,0 +1,602 @@
+{
+  "schema_version": 1,
+  "id": "live-monitor-native",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    "web/live.html",
+    "web/live.js",
+    "web/live.css",
+    "web/live-common.js",
+    "web/live-session.html",
+    "web/live-session.js",
+    "web/i18n.js",
+    "web/i18n-en.js",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "web/swarm-logo.png",
+    "web/access.html",
+    "web/access.css",
+    "web/access.js",
+    "locales/en.json",
+    "scripts/i18n/build.cjs",
+    "tests/rust_native_live_browser.py",
+    "tests/rust_native_live_ui.cjs",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_agent_model_route.py",
+    "package.json",
+    "package-lock.json",
+    "frontend/live-terminal.js",
+    "frontend/build-live-terminal.mjs",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "web/lib/terminal/live-terminal.js",
+    "web/lib/terminal/xterm.css",
+    ".claude/skills/apex/SKILL.md",
+    ".claude/skills/audit-pdca/SKILL.md",
+    ".claude/skills/code-reviewer/SKILL.md",
+    ".claude/skills/debug/SKILL.md",
+    ".claude/skills/product-delivery/SKILL.md",
+    ".claude/skills/product-planning/SKILL.md",
+    ".claude/skills/product-review/SKILL.md",
+    ".claude/skills/replan/SKILL.md",
+    ".claude/skills/spec-audit/SKILL.md",
+    ".claude/skills/spec-builder/SKILL.md",
+    ".claude/skills/verify-fix/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "frontend/engine-settings/admin.css",
+    "frontend/engine-settings/admin.js",
+    "internal/engine/testdata/legacy-blank-work-56.json",
+    "internal/engine/testdata/legacy-ignored-request-55.json",
+    "tests/fixtures/terminal_clip_go047.json",
+    "version_history.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/HANDOFF.md",
+    "tools/agent-workflows/templates/QUALITY.md",
+    "tools/agent-workflows/templates/TRACKING.md",
+    "web/native-quotas.js",
+    "web/native-runtime.css",
+    "web/native-runtime.html",
+    "web/native-runtime.js",
+    "web/processes.css",
+    "locales/trust-actions-en.json",
+    "web/trust-actions-en.js",
+    "web/live-metrics.js",
+    "tools/verification/snapshot.py",
+    "tools/verification/test_snapshot.py",
+    "tests/rust_native_telemetry_launch.py",
+    "tests/rust_native_login_browser.py",
+    "tests/rust_telemetry_settings_ui.cjs",
+    "tests/rust_native_admin_ui.cjs",
+    "tests/helpers/*.cjs",
+    "tools/verification/verify_npm_archive.py",
+    "tests/rust_native_login_ui.cjs",
+    "tests/rust_native_quotas_ui.cjs",
+    "tests/admin_budget_http_ui.cjs",
+    "tests/rust_review_response_ui.cjs",
+    "tests/fixtures/native-review-public-v1.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/rust-build-live",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "snapshot-tool-unit",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "tools/verification/test_snapshot.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK",
+        "test_end_to_end_run_passes_in_snapshot_and_fails_on_undeclared_read"
+      ]
+    },
+    {
+      "id": "xterm-bundle-reproducible",
+      "command": [
+        "node",
+        "frontend/build-live-terminal.mjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"nonce_patches\":3"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "i18n-generated",
+      "command": [
+        "node",
+        "scripts/i18n/build.cjs",
+        "--check"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"mode\":\"check\"",
+        "\"status\":\"pass\""
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-live-read-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "agent_"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "fingerprint_changes_with_displayed_state_only ... ok",
+        "verified_processes_are_read_with_descendants ... ok",
+        "wrong_identity_or_host_reads_nothing ... ok",
+        "claude_stream_is_typed_without_content ... ok",
+        "codex_stream_and_truncated_or_garbage_tails ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-live-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "live"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "witness_change_then_saturated_lane_is_a_busy_comment_not_a_queue ... ok",
+        "refused_probe_and_stopped_owner_end_the_stream_explicitly ... ok",
+        "agent_query_accepts_a_witness_then_refuses_ambiguity ... ok",
+        "plan_view_reports_the_reviewed_candidate_or_null ... ok",
+        "estimated_cost_prices_only_undeclared_calls_with_a_matching_rate ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-live-integration",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "live"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+        "refusals_are_explicit_after_a_valid_witness ... ok",
+        "agent_route_pages_logs_and_terminal_by_cursor ... ok",
+        "plan_graph_links_planned_tasks_to_live_agents ... ok",
+        "alerts_fire_once_resolve_and_refuse_bad_shapes ... ok",
+        "usage_gap_alert_compares_declared_and_telemetry_output_tokens ... ok",
+        "review_and_planning_runs_show_their_telemetry ... ok",
+        "budget_alerts_warn_at_the_saved_share_then_flag_overspend ... ok",
+        "annotations_queue_create_change_and_refuse_bad_requests ... ok",
+        "dataset_exports_recorded_facts_by_selection_without_content ... ok",
+        "finished_attempts_are_evaluated_once_and_shown_in_the_harness ... ok",
+        "task_scenarios_are_saved_judged_on_recorded_facts_and_refused_when_invalid ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-live-events-tcp",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "live_events"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+        "live_events_push_changes_resume_by_id_refuse_bad_shapes_and_end_on_shutdown ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-telemetry-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "telemetry"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test result: ok.",
+        "passed; 0 failed;",
+        "claude_events_keep_only_allowlisted_fields_and_drop_content ... ok",
+        "tokens_are_digest_only_and_revocable ... ok",
+        "failed_transaction_keeps_nothing_and_purge_is_observable ... ok",
+        "totals_respect_temporality_and_never_mix ... ok",
+        "publish_read_retract_and_stale_or_unsafe_records ... ok",
+        "launch_environment_is_opt_in_needs_a_live_server_and_issues_a_token ... ok",
+        "alerts_fire_once_resolve_and_migrate_from_v1 ... ok",
+        "cap_refuses_and_counts_and_retention_purges_in_the_same_transaction ... ok",
+        "codex_completed_response_is_the_call_and_content_never_kept ... ok",
+        "codex_histograms_give_latency_quantiles_and_token_sums ... ok",
+        "codex_spans_keep_the_run_tree_and_drop_internal_noise ... ok",
+        "saved_retention_applies_once_and_needs_no_store ... ok",
+        "claude_spans_keep_outcome_and_tokens_but_drop_prompt_and_program ... ok",
+        "annotations_create_change_conflict_and_stay_per_work ... ok",
+        "evaluations_are_recorded_once_per_attempt ... ok",
+        "scenarios_save_with_revisions_and_read_per_work ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-alert-rules",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "live_alerts"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "rules_read_engine_marks_only ... ok",
+        "retried_or_accepted_tasks_clear_terminal_alerts ... ok",
+        "usage_gap_compares_output_tokens_of_finished_current_attempts ... ok",
+        "budget_rules_warn_at_the_saved_share_and_flag_overspend ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-langwatch-lots",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "--",
+        "failure_groups",
+        "attempt_evaluations",
+        "task_scenarios"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "failures_group_by_the_most_specific_recorded_cause ... ok",
+        "evaluators_measure_and_judge_only_with_a_mark_or_saved_policy ... ok",
+        "sampling_is_stable_and_bounded ... ok",
+        "scenarios_judge_recorded_facts_and_never_guess ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-telemetry-settings",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "telemetry_settings_policy"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+        "telemetry_providers_default_off_accept_claude_and_refuse_others ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-cache-health",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "cache_health_policy"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+        "cache_health_thresholds_default_validate_and_refuse_partial_or_out_of_range ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-telemetry-retention",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "telemetry_retention_policy"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "telemetry_bounds_default_validate_and_refuse_partial_zero_or_orphan ... ok",
+        "alert_policy_v35_defaults_validate_and_refuse_partial_zero_range_or_orphan ... ok",
+        "annotation_note_bound_v36_defaults_validate_and_refuse_zero_or_orphan ... ok",
+        "evaluation_sample_v37_defaults_validate_and_refuse_range_or_orphan ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-telemetry-subjects",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "telemetry_subjects"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "2 passed; 0 failed",
+        "subjects_are_active_only_while_their_run_is_live ... ok",
+        "runs_of_a_work_list_both_kinds_and_tolerate_missing_tables ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "engine-exec-environment",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "native_provider_exec"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "added_environment_appends_and_never_overrides_inherited_names ... ok",
+        "0 failed",
+        "leading_arguments_follow_the_program_and_refuse_nul ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-otel-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--lib",
+        "otel"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "head_checks_accept_a_witness_then_refuse_each_variant ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "web-otel-tcp",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-web",
+        "--test",
+        "otel"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out",
+        "otel_ingest_attaches_to_token_agent_is_idempotent_and_refuses_each_variant ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "clippy-live-crates",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "-p",
+        "swarm-web",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "web-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "--no-deps",
+        "-p",
+        "swarm-web",
+        "-p",
+        "swarm-engine"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Generated"
+      ]
+    },
+    {
+      "id": "binary-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--bin",
+        "swarm-rust"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "token-fixture-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--features",
+        "test-fixtures",
+        "--example",
+        "telemetry_token_fixture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "browser-live",
+      "command": [
+        "python3",
+        "tests/rust_native_live_browser.py",
+        "--binary",
+        "{root}/.cache/rust-build-live/debug/swarm-rust",
+        "--output-parent",
+        "{root}/.cache/live-monitor-browser-evidence",
+        "--token-fixture",
+        "{root}/.cache/rust-build-live/debug/examples/telemetry_token_fixture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"status\": \"PASS\", \"checks\": 2"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "telemetry-launch-e2e",
+      "command": [
+        "python3",
+        "-c",
+        "import tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='telemetry-launch-',dir='.cache')).resolve(); r=subprocess.run([sys.executable,'tests/rust_native_telemetry_launch.py','--binary','.cache/rust-build-live/debug/swarm-rust','--output',str(base/'run')]); print('EVIDENCE '+str(base)); sys.exit(r.returncode)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "\"status\": \"PASS\", \"checks\": [\"alert_task_blocked\", \"attempt_cap\", \"codex\", \"disabled\", \"enabled\", \"endpoint_retracted\", \"server_alert_loop\"]"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "telemetry-admin-browser",
+      "command": [
+        "python3",
+        "-c",
+        "import tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='telemetry-admin-',dir='.cache')).resolve(); r=subprocess.run([sys.executable,'tests/rust_native_login_browser.py','--binary','.cache/rust-build-live/debug/swarm-rust','--output',str(base/'run'),'--scenario','telemetry-settings']); print('EVIDENCE '+str(base)); sys.exit(r.returncode)"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native-telemetry-settings-browser FR/EN etat/sombre actual TCP"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

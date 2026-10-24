@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="swarm-style-nonce" content="">
+<title>Swarm — harnais d’agent</title><link rel="icon" href="/swarm-logo.png" type="image/png">
+<link rel="stylesheet" href="/live/themes.css"><link rel="stylesheet" href="/live/swarm-design.css"><link rel="stylesheet" href="/live/xterm.css"><link rel="stylesheet" href="/live/live.css">
+<script src="/live/live-common.js"></script><script src="/live/live-metrics.js"></script>
+<script src="/live/english.js" defer></script><script src="/live/i18n.js" defer></script><script src="/live/live-terminal.js" defer></script><script src="/live/live-session.js" defer></script>
+</head>
+<body class="live-page live-harness">
+<header class="live-rail">
+ <div class="live-brand"><img src="/swarm-logo.png" width="44" height="44" alt=""><div><p class="live-kicker" id="h-kicker">Harnais · lecture seule</p><h1 id="h-title">Agent</h1></div></div>
+ <nav class="live-tools" aria-label="Affichage">
+  <label class="live-check"><input type="checkbox" id="h-follow" checked> Suivre le direct</label>
+  <button type="button" id="h-resume" hidden>Reprendre le suivi</button>
+  <button type="button" id="h-theme">Changer de thème</button>
+ </nav>
+</header>
+<main>
+ <section class="live-load" aria-labelledby="h-state-title">
+  <h2 id="h-state-title">État</h2>
+  <dl id="h-facts" class="live-facts"></dl>
+  <p id="h-status" class="live-status" role="status">Chargement…</p>
+ </section>
+ <div class="live-panels">
+  <section class="live-panel" aria-labelledby="h-res-title"><h2 id="h-res-title">Ressources</h2><div id="h-res"></div></section>
+  <section class="live-panel" aria-labelledby="h-tools-title"><h2 id="h-tools-title">Outils et contexte</h2><div id="h-tools"></div></section>
+  <section class="live-panel" aria-labelledby="h-tok-title"><h2 id="h-tok-title">Jetons</h2><div id="h-tok"></div></section>
+ </div>
+ <section class="live-panel" aria-labelledby="h-plan-title"><h2 id="h-plan-title">Tâche prévue</h2><div id="h-plan" class="live-tel"></div></section>
+ <section class="live-panel" aria-labelledby="h-tr-title"><h2 id="h-tr-title">Transcript typé</h2><div id="h-tr-filters" class="live-tr-filters" role="group" aria-label="Filtrer par type"></div><ol id="h-tr" class="live-tr"></ol><p id="h-tr-state" class="live-res-states"></p></section>
+ <section class="live-panel" aria-labelledby="h-tel-title" id="h-tel-panel" tabindex="-1" aria-keyshortcuts="m"><h2 id="h-tel-title">Télémétrie fournisseur <kbd class="live-key" title="Raccourci clavier">m</kbd></h2><p id="h-tel-state" class="live-res-states" role="status"></p><div id="h-tel" class="live-tel"></div></section>
+ <section class="live-panel" aria-labelledby="h-scn-title" id="h-scn-panel"><h2 id="h-scn-title">Scénario de la tâche</h2>
+  <div id="h-scn-results" class="live-tel"></div>
+  <form id="h-scn" class="live-ann" novalidate>
+   <ol id="h-scn-rows" class="live-scn-rows" aria-label="Attentes"></ol>
+   <div class="live-scn-actions"><button type="button" id="h-scn-add">Ajouter une attente</button><button type="submit" id="h-scn-save">Enregistrer le scénario</button></div>
+   <p id="h-scn-state" class="live-res-states" role="status"></p>
+  </form>
+ </section>
+ <section class="live-panel" aria-labelledby="h-eval-title"><h2 id="h-eval-title">Évaluations</h2><div id="h-eval" class="live-tel"></div></section>
+ <section class="live-panel" aria-labelledby="h-ann-title" id="h-ann-panel"><h2 id="h-ann-title">Annotation</h2>
+  <form id="h-ann" class="live-ann" novalidate>
+   <fieldset><legend>Verdict</legend>
+    <label class="live-check"><input type="radio" name="verdict" value="good"> Bon</label>
+    <label class="live-check"><input type="radio" name="verdict" value="bad"> Mauvais</label>
+    <label class="live-check"><input type="radio" name="verdict" value="unsure"> Incertain</label>
+   </fieldset>
+   <label for="h-ann-note">Note de l’opérateur</label>
+   <textarea id="h-ann-note" rows="3"></textarea>
+   <p id="h-ann-count" class="live-res-states" aria-live="polite"></p>
+   <button type="submit" id="h-ann-save">Enregistrer l’annotation</button>
+   <p id="h-ann-state" class="live-res-states" role="status"></p>
+  </form>
+ </section>
+ <section class="live-panel" aria-labelledby="h-frise-title"><h2 id="h-frise-title">Frise d’activité</h2><svg id="h-frise" class="live-frise" viewBox="0 0 600 40" preserveAspectRatio="none" role="img" aria-label="Événements du journal dans le temps"></svg><ul id="h-frise-legend" class="live-legend"></ul></section>
+ <section class="live-panel" aria-labelledby="h-term-title" id="h-term-panel" hidden>
+  <h2 id="h-term-title">Terminal</h2>
+  <div id="h-xterm" class="live-xterm" role="log" aria-label="Terminal enregistré" hidden></div>
+  <pre id="h-terminal" class="live-terminal" tabindex="0" aria-live="off"></pre>
+ </section>
+ <section class="live-panel" aria-labelledby="h-log-title">
+  <h2 id="h-log-title">Journal</h2>
+  <div class="live-logtools"><label>Filtrer <input id="h-filter" type="search" placeholder="type ou texte (/)" autocomplete="off"></label><button type="button" id="h-copy">Copier le journal</button><button type="button" id="h-last-error" disabled>Dernière erreur</button><span id="h-copy-status" role="status"></span></div>
+  <ol id="h-log" class="live-log" tabindex="0" aria-live="off"></ol>
+  <p id="h-log-empty" class="live-empty">Aucune entrée de journal enregistrée.</p>
+ </section>
+ <section class="live-panel" aria-labelledby="h-reply-title" id="h-reply-panel" hidden>
+  <h2 id="h-reply-title">Dernière réponse</h2>
+  <pre id="h-reply" class="live-reply" tabindex="0"></pre>
+ </section>
+</main>
+</body>
+</html>

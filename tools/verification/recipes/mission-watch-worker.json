@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "mission-watch-worker",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission_worker_entry.rs",
+    "rust/crates/swarm-cli/examples/mission_watch_worker.rs",
+    "rust/crates/swarm-engine/src/mission_worker_dispatch.rs",
+    "rust/crates/swarm-engine/src/agent_supervision.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/mission_supervision_receipts.rs",
+    "rust/crates/swarm-engine/src/agent_completion_journal.rs",
+    "tests/rust_mission_watch_worker.py",
+    "tests/test_rust_mission_watch_worker_guards.py",
+    "tests/rust_*.py",
+    "docs/architecture/NATIVE-MISSION-WORKER.md",
+    "docs/en/NATIVE-MISSION-WORKER.md",
+    "rust/crates/swarm-engine/src/mission_worker_continuation.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "peer-ordering-and-publication-cleanup-guards",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_rust_mission_watch_worker_guards.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_supervisor_pending_then_independent_requires_same_stamp",
+        "test_helper_refusals_use_only_invalid_isolated_subprocesses",
+        "test_actual_case_publication_failure_still_closes_listener",
+        "test_wrong_parent_refused_before_frame_or_attach",
+        "test_subreaper_primary_publication_restore_failures_retained",
+        "test_receipt_details_preserve_json_types",
+        "Ran 15 tests",
+        "OK",
+        "test_continuation_requires_typed_nonempty_scoped_queued_evidence"
+      ]
+    },
+    {
+      "id": "actual-independent-supervisor-graceful-then-conductor-SIGTERM",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\nbase=Path(tempfile.mkdtemp(prefix='mission-watch-worker-',dir='.cache')).resolve()\nsubprocess.run(['python3','tests/rust_mission_watch_worker.py','--binary',os.environ['SWARM_WATCH_BINARY'],'--profile',os.environ['SWARM_WATCH_PROFILE'],'--sdk-binary',os.environ['SWARM_WATCH_SDK_BINARY'],'--sdk-profile',os.environ['SWARM_WATCH_SDK_PROFILE'],'--output',str(base/'run')],check=True)\nprint('REPLAY_EVIDENCE '+str(base))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS malformed private bootstrap refuses without Root or file mutation",
+        "PASS actual granted worker survives graceful conductor exit and completes independently",
+        "PASS actual granted worker survives conductor SIGTERM and completes independently",
+        "REPLAY_EVIDENCE",
+        "PASS actual queued continuation public projections verified before spawn; reservation rows unverified"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

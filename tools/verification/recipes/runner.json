@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "permanent-recipe-runner-regressions",
+  "inputs": [
+    "tools/verification/*.py",
+    "tools/verification/README.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "six-runner-regressions",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/verification",
+        "-p",
+        "test_recipe.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "test_exit_failure_retains_cause_and_stops_then_recovers",
+        "test_invalid_manifests_refuse_before_output",
+        "test_pass_verify_and_exclusive_history",
+        "test_relative_executable_is_bound_to_fixture_root",
+        "test_tampering_and_missing_hash_table_refuse",
+        "test_zero_tests_and_source_mutation_cannot_pass",
+        "Ran 6 tests",
+        "\nOK\n"
+      ]
+    }
+  ]
+}

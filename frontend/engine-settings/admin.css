@@ -1,0 +1,37 @@
+.engine-settings-table{overflow-x:auto;max-width:100%}
+.engine-settings-table :is(th,td){overflow-wrap:anywhere;white-space:pre-wrap;vertical-align:top}
+.engine-settings-dialog{width:min(64rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem)}
+.engine-settings-dialog[open]{display:flex;flex-direction:column;overflow:hidden}
+.engine-settings-dialog form{display:flex;flex:1;min-height:0;flex-direction:column;max-height:none;overflow:hidden}
+.engine-settings-dialog .modal-body{flex:1;min-height:0;overflow:auto;max-height:none}
+.engine-settings-dialog :is(.modal-header,.modal-footer){flex-shrink:0}
+.engine-settings-dialog .modal-header h2{margin:0;min-width:0;overflow-wrap:anywhere}
+.engine-settings-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:1rem}
+.engine-settings-field{min-width:0}
+.engine-settings-field :is(input,textarea){max-width:100%;width:100%}
+.engine-settings-unlimited{display:flex;align-items:center;gap:.5rem}
+.engine-settings-unlimited input{width:auto}
+.engine-settings-dialog .modal-footer{flex-wrap:wrap}
+.engine-settings-dialog .modal-footer button{min-width:0;white-space:normal;flex:1}
+
+.engine-settings-phase-list{min-width:0;margin:0;border-color:var(--wattson-ligne)}
+.engine-settings-phase-list legend{font-weight:700}
+
+/* Accordion sections own field grids; their inputs remain mounted when closed. */
+.engine-settings-dialog .modal-body > .engine-settings-fields{display:block}
+.engine-settings-group{margin-block:1rem;border:1px solid var(--wattson-ligne);padding:.75rem;border-radius:5px}
+.engine-settings-group > summary{cursor:pointer;font-weight:700;min-height:44px;overflow-wrap:anywhere}
+.engine-settings-group > .toolbar{margin-block:.5rem 1rem;flex-wrap:wrap}
+.engine-settings-help .modal-body{display:grid;gap:1rem}
+.engine-settings-help label{display:grid;gap:.5rem;min-width:0}
+.engine-settings-help textarea{width:100%;min-height:8rem;resize:vertical;box-sizing:border-box;font:inherit}
+.engine-settings-help [data-advice-prompt]{min-height:14rem}
+.engine-settings-help .engine-settings-unlimited{display:flex}
+.engine-settings-group button,.engine-settings-help button{min-height:44px;white-space:normal}
+
+.engine-settings-budget{margin-block:1.5rem;padding-block:1rem;border-top:1px solid var(--wattson-ligne)}
+.engine-settings-budget > button{margin:.25rem}
+.engine-settings-dialog[data-admin-budget] .modal-body > label{display:grid;gap:.5rem;margin-block:1rem}
+.engine-settings-dialog[data-admin-budget] .modal-body > .engine-settings-unlimited{display:flex}
+.engine-settings-dialog[data-admin-budget] :is(input:not([type=checkbox]),textarea){width:100%;min-width:0;box-sizing:border-box;font:inherit}
+.engine-settings-dialog[data-admin-budget] textarea{min-height:5rem}

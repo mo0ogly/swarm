@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "id": "native-review-preview",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/**/*",
+    ".claude/skills/*/SKILL.md",
+    "contracts/work-request-fields.v1.json",
+    "internal/engine/testdata/*.json",
+    "locales/en.json",
+    "tools/agent-workflows/CONTRACT.md",
+    "tools/agent-workflows/templates/*.md",
+    "rust/crates/swarm-engine/config/*.json",
+    "tools/rust-migration/generate_agent_models.py",
+    "tools/rust-migration/test_generate_agent_models.py",
+    "frontend/engine-settings/admin.js",
+    "web/i18n-en.js",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "tests/rust_web_policy_admin_ui.cjs",
+    "tests/helpers/browser_verification_runtime.cjs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "tests/helpers/verification_cleanup.cjs",
+    "tests/verification_cleanup_test.cjs",
+    "tests/rust_native_http_cli.py",
+    "web/access.html",
+    "web/access.css",
+    "web/access.js",
+    "web/wattson_themes.css",
+    "web/swarm-design.css",
+    "web/swarm-logo.png",
+    "tests/rust_native_login_browser.py",
+    "tests/rust_native_login_ui.cjs",
+    "web/native-runtime.html",
+    "web/native-runtime.css",
+    "web/native-runtime.js",
+    "web/i18n.js",
+    "web/processes.css",
+    "frontend/engine-settings/admin.css",
+    "scripts/i18n/build.cjs",
+    "package.json",
+    "package-lock.json",
+    "tests/i18n_test.cjs",
+    "web/pilot-graph.js",
+    "tests/engine_settings_apply_ack_test.cjs",
+    "tests/native_settings_http_adapter_test.cjs",
+    "tests/rust_native_admin_ui.cjs",
+    "tests/rust_native_fixture_failures.py",
+    "tools/agent-workflows/check.py",
+    "tests/rust_native_completion_recovery.py",
+    "tests/rust_scoped_worker.py",
+    ".gitignore",
+    "tools/verification/verify_npm_archive.py",
+    "tests/browser_verification_runtime_test.cjs",
+    "tests/browser_npm_baseline_test.cjs",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_lease.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_provider_guard.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_call_contract.py",
+    "tests/rust_planning_output.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_planning_context_evolution.py",
+    "tests/rust_planning_wait.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_step.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_decision.py",
+    "tools/verification/recipes/agent-native-runtime.json",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_unadmitted_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tools/verification/test_recipe.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_native_task_validation_preview.py",
+    "tests/admin_settings_groups_ui.cjs",
+    "tests/rust_native_admin_ui.cjs",
+    "web/native-runtime.js",
+    "frontend/engine-settings/admin.css",
+    "version_history.json",
+    "tests/admin_budget_ui_test.cjs",
+    "tests/admin_budget_http_ui.cjs",
+    "docs/architecture/ADMIN-AI-ADVICE.md",
+    "docs/en/ADMIN-AI-ADVICE.md",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUST-MIGRATION.md",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_native_task_validation_output.py",
+    "tools/verification/recipes/native-task-validation.json",
+    "tests/rust_native_task_validation_ordinary.py",
+    "tests/rust_native_task_validation_source_compat.py",
+    "tests/rust_native_task_validation_batch.py",
+    "contracts/agent-wire-layout.v1.json",
+    "tests/rust_native_review_preview.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/rust/target/r97",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "task-validation-unit",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "task_validation",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "wait_required_after_every_primitive_attempt_even_without_tuple_or_grant ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "normal-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--message-format=json"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "compiler-artifact"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-task-validation",
+      "command": [
+        "python3",
+        "-c",
+        "import json,sys,subprocess,tempfile,hashlib,os; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-task-validation-',dir='.cache')).resolve(); scripts=[('happy','tests/rust_native_task_validation.py'),('recovery','tests/rust_native_task_validation_failures.py'),('output','tests/rust_native_task_validation_output.py'),('preview','tests/rust_native_task_validation_preview.py'),('ordinary','tests/rust_native_task_validation_ordinary.py'),('batch','tests/rust_native_task_validation_batch.py')]; source=Path('rust/target/r97/debug/swarm-rust').resolve(); raw=source.read_bytes(); sha=hashlib.sha256(raw).hexdigest(); binary=base/'swarm-rust'; stream=binary.open('xb'); stream.write(raw); stream.flush(); os.fsync(stream.fileno()); stream.close(); binary.chmod(0o700); assert hashlib.sha256(binary.read_bytes()).hexdigest()==sha; results={};\nfor name,script in scripts:\n out=base/name; subprocess.run([sys.executable,script,'--binary',str(binary),'--output',str(out)],check=True); result=json.loads((out/'result.json').read_text()); assert result['status']=='PASS'; results[name]=result\n(base/'result.json').write_text(json.dumps(dict(status='PASS',binary=str(binary),binary_sha256=sha,results=results),indent=2)+'\\n'); print('NATIVE_TASK_VALIDATION_PUBLIC_PASS '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_TASK_VALIDATION_PUBLIC_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-review-preview",
+      "command": [
+        "python3",
+        "-c",
+        "import tempfile,subprocess,sys; from pathlib import Path; base=Path(tempfile.mkdtemp(prefix='native-review-preview-',dir='.cache')).resolve(); subprocess.run([sys.executable,'tests/rust_native_review_preview.py','--binary',str(Path('rust/target/r97/debug/swarm-rust').resolve()),'--output',str(base/'public')],check=True); print('NATIVE_REVIEW_PREVIEW_RECIPE_PASS '+str(base))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_REVIEW_PREVIEW_PUBLIC_PASS",
+        "NATIVE_REVIEW_PREVIEW_RECIPE_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "clippy-native-cli",
+      "command": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--bin",
+        "swarm-rust",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "native-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "-p",
+        "swarm-cli",
+        "--no-deps"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    }
+  ]
+}

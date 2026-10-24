@@ -1,0 +1,52 @@
+{
+  "status": "LOCAL_WEB_CONDUCTOR_VERIFIED_INDEPENDENT_REVIEW_OPEN",
+  "binary": ".cache/rust-migration-binaries/swarm-rust-9e565a05988f7a2b3843b730645f47421a71f4afdfa7475e605a6f86f5ade8db",
+  "sha256": "9e565a05988f7a2b3843b730645f47421a71f4afdfa7475e605a6f86f5ade8db",
+  "effective_inputs": 338,
+  "changed_compiler_inputs": 7,
+  "artifacts": 110,
+  "no_fixture_feature": true,
+  "public_named_assertions": [
+    "protected-mission-reads-before-start",
+    "http-start-alone-launches-real-inert-worker",
+    "http-status-responds-during-active-session",
+    "competing-cli-watch-refused-without-duplicate-agent",
+    "second-web-server-remains-usable-without-owning-or-releasing-first-lease",
+    "invalid-and-unauthorized-controls-refuse-without-work-mutation-and-read-recovers",
+    "all-six-http-writers-remain-responsive-and-stop-revokes-consent",
+    "server-shutdown-releases-lease-and-granted-worker-survives",
+    "reopen-preserves-revocation-and-no-duplicate-agent",
+    "independent-worker-completes-after-server-without-fake-acceptance",
+    "foreign-datastore-stops-coordinator-and-preserves-original",
+    "restored-original-reopens-with-retained-completion-and-revocation",
+    "web-owned-held-planner-shutdown-retains-actual-TERM-failed-receipt"
+  ],
+  "python_guards": 4,
+  "cli_rust_tests": 44,
+  "cli_public_cases": 3,
+  "role_signal_cases": 6,
+  "held_web_planner_TERM_receipt": true,
+  "recipe_evidence": [
+    "docs/plans/migration-rust/evidence/20261024-web-conductor1190/recipes1217/native-http-mission",
+    "docs/plans/migration-rust/evidence/20261024-web-conductor1190/replay1212/mission-watch-public",
+    "docs/plans/migration-rust/evidence/20261024-web-conductor1190/recipes1214/mission-async-planner"
+  ],
+  "review": "Root self-review; not independent",
+  "glm_calls": 8,
+  "glm_complete": 7,
+  "glm_incomplete": 1,
+  "glm_declared_tokens": 69840,
+  "automatic_web_conductor": true,
+  "paid_provider": false,
+  "installed": false,
+  "independent_candidate_acceptance": false,
+  "global_migration_complete": false,
+  "remaining": [
+    "managed recovery",
+    "multi-task journey",
+    "independent candidate/global review",
+    "remaining G1\u2013G12 groups",
+    "R6/R7 and final RETEX"
+  ],
+  "global_watchdog": null
+}
