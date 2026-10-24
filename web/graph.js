@@ -9,8 +9,11 @@ const graphTonalites = {
   accepted: 'validee', waived: 'validee', abandoned: 'neutre', stale: 'attention'
 };
 
+/** Group actual active recorded attempts by literal task ID. A null-prototype
+ * index preserves every legal name, including object prototype keys. Reads the
+ * current snapshot/active predicate; no IO, permission or liveness proof added. */
 function graphAgentsParTache() {
-  const parTache = {};
+  const parTache = Object.create(null);
   for (const item of snapshot.agents) {
     const a = item.agent;
     if (!active(a)) continue;
@@ -121,6 +124,17 @@ function scalePilotGraph(svg,zoom){
  // Keep arrowheads readable in the overview; task geometry still follows zoom.
  for(const marker of svg.querySelectorAll('marker')){marker.setAttribute('markerUnits','userSpaceOnUse');marker.setAttribute('markerWidth',9/zoom);marker.setAttribute('markerHeight',9/zoom)}
 }
+/** Injectively namespace a literal source identifier for dagre's object maps.
+ * Presentation only: no identifier is changed in Work, DOM, cache shape, authority
+ * or commands. Avoids prototype-key collisions without rejecting valid names.
+ * Accepts source string IDs; returns an internal string, no IO or policy. */
+function graphNodeKey(id){return 'swarm-node:'+id}
+/** Render the canonical interactive pilot from its already supplied snapshot.
+ * Requires Pilot/ProductViews/dagre and legacy inspector/action helpers. Updates
+ * SVG, geometry cache, scroll/focus and handlers; drawing grants no engine action.
+ * Literal task/responsibility IDs cross graphNodeKey only at dagre calls, keeping
+ * source IDs on DOM/actions. Invalid dependencies/helper failures propagate to the
+ * existing caller. This renderer is not invoked by the native read-only profile. */
 function drawPilotGraph(){
  const canvas=$('pilot-canvas'),state=Pilot.state,tasks=snapshot.work.tasks;
  const tasksByID=new Map(tasks.map(task=>[task.id,task])),selectedTask=Pilot.selectedTask();
@@ -137,13 +151,13 @@ function drawPilotGraph(){
   const focus=document.activeElement?.dataset.task,foldFocus=document.activeElement?.classList.contains('graph-fold'),goFocus=document.activeElement?.classList.contains('graph-go');
   const x=canvas.scrollLeft,y=canvas.scrollTop;
   const g=new dagre.graphlib.Graph();g.setGraph({rankdir:state.orientation,ranker:'tight-tree',nodesep:28,ranksep:70,marginx:20,marginy:20});g.setDefaultEdgeLabel(()=>({}));
-  for(const t of kept)g.setNode(t.id,{width,height});
-  for(const e of links)g.setEdge(e.from_task_id,e.to_task_id);
-  for(const n of organization.nodes)g.setNode(n.id,{width,height:155});
-  for(const e of organization.edges)g.setEdge(e.from,e.to);
+  for(const t of kept)g.setNode(graphNodeKey(t.id),{width,height});
+  for(const e of links)g.setEdge(graphNodeKey(e.from_task_id),graphNodeKey(e.to_task_id));
+  for(const n of organization.nodes)g.setNode(graphNodeKey(n.id),{width,height:155});
+  for(const e of organization.edges)g.setEdge(graphNodeKey(e.from),graphNodeKey(e.to));
   graphLayout(g,shape);
   // Independent tasks have no ranks: respect the explicitly chosen orientation.
-  if(!links.length&&!organization.nodes.length)kept.forEach((t,i)=>g.setNode(t.id,{width,height,x:20+width/2+(state.orientation==='LR'?i*(width+28):0),y:20+height/2+(state.orientation==='TB'?i*(height+28):0)}));
+  if(!links.length&&!organization.nodes.length)kept.forEach((t,i)=>g.setNode(graphNodeKey(t.id),{width,height,x:20+width/2+(state.orientation==='LR'?i*(width+28):0),y:20+height/2+(state.orientation==='TB'?i*(height+28):0)}));
   const totalWidth=links.length||organization.nodes.length?g.graph().width:state.orientation==='LR'?kept.length*(width+28)+12:width+40;
   const totalHeight=links.length||organization.nodes.length?g.graph().height:state.orientation==='TB'?kept.length*(height+28)+12:height+40;
   const svg=svgNode('svg',{viewBox:'0 0 '+Math.max(1,totalWidth)+' '+Math.max(1,totalHeight),class:'graph-svg',role:'group','aria-label':tr_web_graph_js('Dépendances : du prérequis vers la tâche')});
@@ -155,12 +169,12 @@ function drawPilotGraph(){
   }
   svg.append(defs);
   for(const e of links){
-   const data=g.edge(e.from_task_id,e.to_task_id);
+   const data=g.edge(graphNodeKey(e.from_task_id),graphNodeKey(e.to_task_id));
    const edge=svgNode('path',{d:graphEdgePath(data.points),class:'graph-arete'});
    edge.dataset.from=e.from_task_id;edge.dataset.to=e.to_task_id;svg.append(edge);
   }
-  for(const e of organization.edges){const data=g.edge(e.from,e.to),edge=svgNode('path',{d:graphEdgePath(data.points),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'});edge.dataset.from=e.from;edge.dataset.to=e.to;svg.append(edge)}
-  for(const n of organization.nodes){const pos=g.node(n.id),left=pos.x-width/2,top=pos.y-77.5;
+  for(const e of organization.edges){const data=g.edge(graphNodeKey(e.from),graphNodeKey(e.to)),edge=svgNode('path',{d:graphEdgePath(data.points),class:'graph-organisation-link','marker-end':'url(#pilot-arrow-role)'});edge.dataset.from=e.from;edge.dataset.to=e.to;svg.append(edge)}
+  for(const n of organization.nodes){const pos=g.node(graphNodeKey(n.id)),left=pos.x-width/2,top=pos.y-77.5;
    const group=svgNode('g',{class:'graph-responsibility',tabindex:0,role:'button','aria-label':n.title});group.dataset.responsibility=n.id;group.id='graph-role-'+encodeURIComponent(n.id);group.dataset.tone=n.tone;group.dataset.agentRole=n.role||n.kind;
    group.append(svgNode('rect',{x:left,y:top,width,height:155,rx:12}));
    for(let i=0;i<5;i++)group.append(svgNode('text',{x:left+14,y:top+28+i*25,'data-role-line':i}));
@@ -168,7 +182,7 @@ function drawPilotGraph(){
   }
   const children=PilotGraph.children(tasks);
   for(const t of kept){
-   const n=g.node(t.id),left=n.x-width/2,top=n.y-height/2;
+   const n=g.node(graphNodeKey(t.id)),left=n.x-width/2,top=n.y-height/2;
    const group=svgNode('g',{class:'graph-noeud',tabindex:0,role:'button','aria-label':t.title+tr_web_graph_js(' — examiner la tâche')});
    group.dataset.task=t.id;
    group.append(svgNode('rect',{x:left,y:top,width,height,rx:12,class:'graph-cadre'}));

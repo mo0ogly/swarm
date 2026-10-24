@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "existing-cockpit-rust",
+  "inputs": [
+    "frontend/engine-settings/admin.css",
+    "frontend/engine-settings/admin.js",
+    "locales/en.json",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/cockpit_read.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "rust/crates/swarm-web/src/service/work_budget.rs",
+    "tests/graph_identifiers_test.cjs",
+    "tests/graph_layout_cache_test.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_existing_cockpit_ui.cjs",
+    "tests/rust_native_cockpit_browser.py",
+    "tests/rust_native_http_cli.py",
+    "version_history.json",
+    "web/agent-terminal.css",
+    "web/assistant.css",
+    "web/cockpit-native-budget.js",
+    "web/cockpit-native-graph.js",
+    "web/cockpit-native-panels.js",
+    "web/cockpit-native-quotas.js",
+    "web/cockpit-native-read.js",
+    "web/cockpit-native.js",
+    "web/cockpit-ux.css",
+    "web/cockpit.css",
+    "web/conduite.css",
+    "web/context-help.css",
+    "web/graph.css",
+    "web/graph.js",
+    "web/i18n-en.js",
+    "web/i18n.js",
+    "web/index.html",
+    "web/lib/dagre.min.js",
+    "web/log-console.css",
+    "web/mission.css",
+    "web/native-cockpit.js",
+    "web/native-quotas.js",
+    "web/native-runtime.css",
+    "web/native-runtime.html",
+    "web/native-runtime.js",
+    "web/pilotage.css",
+    "web/plan.css",
+    "web/preparation-timeout-admin.css",
+    "web/processes.css",
+    "web/product-views.css",
+    "web/project-profile-settings.css",
+    "web/providers.css",
+    "web/swarm-shell.js"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "graph-identifier-regression",
+      "command": [
+        "node",
+        "tests/graph_identifiers_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS placement-preserves-__proto__",
+        "PASS agent-index-preserves-__proto__",
+        "PASS injective-source-identifier-boundary"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "canonical-graph-cache-regression",
+      "command": [
+        "node",
+        "tests/graph_layout_cache_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS graph geometry cache:"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "existing-product-cockpit",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='existing-cockpit-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_native_cockpit_browser.py','--existing','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)\nprint('REPLAY_EVIDENCE '+str(p))\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_EXISTING_COCKPIT_PASS",
+        "REPLAY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

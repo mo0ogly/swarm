@@ -13,6 +13,8 @@ mod observation;
 mod settings;
 mod planning;
 mod mission;
+mod cockpit_read;
+mod work_budget;
 #[cfg(target_os = "linux")]
 mod admin_budget;
 #[cfg(target_os = "linux")]
@@ -223,7 +225,7 @@ impl HttpServiceError {
             ) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            Self::Refused("web-root-binding-changed") => StatusCode::CONFLICT,
+            Self::Refused("web-root-binding-changed" | "budget-revision-conflict") => StatusCode::CONFLICT,
             Self::Refused("web-route-unported" | "live-agent-unknown" | "live-run-unknown" | "live-task-unknown") => StatusCode::NOT_FOUND,
             Self::Refused(
                 "web-operation-unported"
@@ -266,6 +268,11 @@ impl HttpServiceError {
                 | "quota-scope-missing"
                 | "quota-review-timeout-invalid"
                 | "quota-review-timeout-unrepresentable" => StatusCode::BAD_REQUEST,
+                // Only typed caller budget validation is a 400; stored corrupt
+                // policy, SQL/cleanup and clock/runtime failures remain server errors.
+                "budget-invalid" if matches!(*operation,"budget-input"|"budget-apply")
+                    && matches!(cause.as_ref(),RootStoreError::Mutation(swarm_engine::WorkEngineError::Budget(
+                        swarm_engine::BudgetError::Decode(_) | swarm_engine::BudgetError::Date(_) | swarm_engine::BudgetError::Refused(_)))) => StatusCode::BAD_REQUEST,
                 "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
                 "admin-budget-input-invalid"|"admin-budget-policy-invalid"|"admin-budget-intent-invalid"=>StatusCode::BAD_REQUEST,
@@ -652,12 +659,28 @@ impl NativeHttpService {
     }
     /// Exact limited route dispatch; no client path becomes a file/Root or shell
     /// command. GET/HEAD remain observational; POST action/settings apply can mutate.
+    /// Native version returns compiled identity and embedded release notes only;
+    /// malformed declarations preserve typed causes without borrowing live Git.
+    /// Shared session/Host admission still precedes this read-only route.
     fn route(
         &self,
         request: &Request<Vec<u8>>,
         profile: DispatchProfile,
     ) -> Result<RouteBody, HttpServiceError> {
         match request.uri().path() {
+            "/api/v1/native-version" => {
+                if request.method() != Method::GET && request.method() != Method::HEAD {
+                    return Err(HttpServiceError::Method("GET, HEAD"));
+                }
+                // Compiled declarations and embedded notes; no source HEAD is borrowed.
+                let binary = swarm_engine::binary_version().map_err(|cause| root(
+                    "version", swarm_engine::RootStoreError::Runtime(swarm_engine::RuntimeError::new(
+                        swarm_engine::RuntimeOperation::Platform, cause))))?;
+                let history: serde_json::Value = serde_json::from_slice(include_bytes!("../../../../version_history.json"))
+                    .map_err(HttpServiceError::Json)?;
+                serde_json::to_vec(&serde_json::json!({"schema_version":1,"binary":binary,"history":history}))
+                    .map(RouteBody::plain).map_err(HttpServiceError::Json)
+            }
             "/api/v1/native-session" => {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
@@ -700,6 +723,10 @@ impl NativeHttpService {
             }
             "/api/v1/planning" => self.planning(request),
             "/api/v1/mission" => self.mission(request),
+            "/api/v1/cockpit-read" => self.cockpit_read(request),
+            "/api/v1/work-budget" => self.work_budget_route(work_budget::Operation::Show,request),
+            "/api/v1/work-budget/preview" => self.work_budget_route(work_budget::Operation::Preview,request),
+            "/api/v1/work-budget/apply" => self.work_budget_route(work_budget::Operation::Apply,request),
             "/api/v1/action" => {
                 if request.method() != Method::POST {
                     return Err(HttpServiceError::Method("POST"));

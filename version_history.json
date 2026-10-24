@@ -7,6 +7,46 @@
     },
     "items": [
       {
+        "fr": "Cockpit : le bouton des plafonds de planification et de vérification ouvre le dialogue natif partagé, avec mission explicite, prévisualisation sans effet, sauvegarde et relecture. Montage Admin conservé.",
+        "en": "Cockpit: planning and review limits open the shared native dialog, with explicit mission, preview without effects, save and read-back. Admin mounting preserved."
+      },
+      {
+        "fr": "Budget de mission : réglage raccordé à la fenêtre existante, prévisualisation financière sans écriture, sauvegarde contrôlée par révision et relecture. Réponse perdue signalée sans nouvelle tentative automatique.",
+        "en": "Mission budget: existing dialog connected to financial preview without writes, revision-checked save and read-back. Lost responses are reported without automatic retries."
+      },
+      {
+        "fr": "Graphe existant : lecture des tâches et dépendances enregistrées avec les helpers SVG, le placement et les styles canoniques ; cycles refusés, dépendances inconnues visibles. Commandes et filtres avancés restent à raccorder.",
+        "en": "Existing graph: recorded tasks and dependencies use canonical SVG helpers, layout and styles; cycles refuse and unknown dependencies stay visible. Commands and advanced filters remain to connect."
+      },
+      {
+        "fr": "Cockpit existant : budgets de mission, estimations engagées, coûts déclarés et tentatives avec liens parent/précédent raccordés en lecture à Rust. Absence de plafond et coûts inconnus distingués ; commandes inchangées.",
+        "en": "Existing cockpit: mission budgets, committed estimates, declared costs and attempts with parent/previous links connected to Rust reads. Missing caps and unknown costs remain distinct; commands unchanged."
+      },
+      {
+        "fr": "UX existante : le cockpit HTML/CSS canonique est de nouveau servi par Rust, avec navigation conservée et lecture explicite des missions/tâches ; graphe, commandes et parcours non raccordés signalés. Administration native conservée à une adresse distincte.",
+        "en": "Existing UX: Rust serves the canonical HTML/CSS cockpit again, preserving navigation with explicit mission/task reads; graph, commands and unconnected journeys are indicated. Native administration remains at a separate address."
+      },
+      {
+        "fr": "Cockpit Rust : accueil par missions avec recherche, objectif, tâches et identité des tentatives ; administration séparée, lecture dégradée explicite et actualisation manuelle.",
+        "en": "Rust cockpit: mission home with search, objective, tasks and attempt identity; separate administration, explicit degraded reads and manual refresh."
+      },
+      {
+        "fr": "Rust : premier parcours managed automatique raccordé au conducteur et à la FIFO, copies privées et provenance native conservées ; publication Git et acceptation restent distinctes. Rapports managed maintenus en attente explicite de publication Git, sans arrêt du conducteur.",
+        "en": "Rust: first automatic managed journey connected to the conductor and FIFO, preserving private copies and native provenance; Git publication and acceptance remain separate. Managed reports explicitly wait for Git publication without stopping the conductor."
+      },
+      {
+        "fr": "Rust : statut des premiers workers managed manuels, identité et fin/annulation visibles sans copie mutable ; résultat explicitement non démontré tant que sa publication Git manque.",
+        "en": "Rust: first manual managed workers show identity and completion/cancellation without the mutable copy; results remain explicitly unproven until Git publication is connected."
+      },
+      {
+        "fr": "Lanceur local exclusivement Rust : construction Cargo qualifiée, numéro fondé sur les dépendances effectives, connexion native et arrêt propre par SIGINT. Refus des baux historiques non migrés avant disponibilité HTTP. Consignes embarquées compactées en conservant les obligations et la limite initiale.",
+        "en": "Rust-only local launcher: qualified Cargo build, numbering from effective dependencies, native login and graceful SIGINT shutdown. Unmigrated historical leases refuse before HTTP readiness. Embedded instructions compacted while preserving obligations and the initial limit."
+      },
+      {
+        "fr": "Rust : première copie worker managed manuelle attribuée, préflight, fin bloquée et annulation vérifiés localement ; intégration Git et lancement managed automatique encore indisponibles.",
+        "en": "Rust: first attributed manual managed worker copy, preflight, blocked completion and cancellation verified locally; Git integration and automatic managed launch remain unavailable."
+      },
+      {
         "fr": "Candidat Rust : statut initial de deux tâches sur dépôt géré, occupation calculée sur les futures copies par tâche ; lecture sans création de copie, lancement ni dépense.",
         "en": "Rust candidate: initial status of managed tasks uses prospective per-task copy paths for occupancy; reads create no copy, worker or spending."
       },

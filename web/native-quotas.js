@@ -17,13 +17,15 @@
  function exact(value){if(typeof value==='number'&&!Number.isSafeInteger(value))throw Error('quota-browser-integer-unrepresentable');if(value&&typeof value==='object')for(const v of Object.values(value))exact(v);return value}
  /** Mount once on a supplied host. Required hooks return actual protected API
   * replies or reject with safe causes; no failure becomes an empty successful list.
+  * Optional opener reuses a canonical caller button; selectedWork is evaluated
+  * only on explicit open and only an actually listed planning Work is selected.
   * Dialog close restores the opener, including Escape. Pending writes prevent
   * closing only until their actual response; no hidden time bound is introduced. */
- function mount(host,api,{translate=String}={}){
+ function mount(host,api,{translate=String,opener=null,selectedWork=()=>''}={}){
   const tr=translate,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=tr(text);if(cls)n.className=cls;return n};
-  const open=el('button','Plafonds des missions');open.type='button';open.dataset.quotaOpen='';host.append(open);
+  const open=opener||el('button','Plafonds des missions');open.type='button';open.dataset.quotaOpen='';if(!opener)host.append(open);
   const dialog=el('dialog',undefined,'modal engine-settings-dialog native-quotas-dialog');dialog.dataset.nativeQuotas='';dialog.setAttribute('aria-labelledby','native-quotas-title');
-  const header=el('div',undefined,'modal-header'),title=el('h2','Plafonds des missions');title.id='native-quotas-title';const close=el('button','Fermer');close.type='button';header.append(title,close);
+  const header=el('header',undefined,'modal-header'),title=el('h2','Plafonds des missions');title.id='native-quotas-title';const close=el('button','Fermer');close.type='button';header.append(title,close);
   const body=el('div',undefined,'modal-body'),status=el('p',undefined,'notice info');status.role='status';status.dataset.quotaStatus='';
   const label=el('label','Mission'),select=el('select');select.dataset.quotaWork='';label.append(select);
   const help=el('button','Comprendre les plafonds');help.type='button';const fields=el('div'),reasonLabel=el('label','Motif de la modification'),reason=el('textarea');reason.dataset.quotaReason='';reasonLabel.append(reason);
@@ -69,7 +71,11 @@
   /** Display actual/proposed quotas and native duration with their labeled units.
    * The preview is evidence of validation at that instant, not a reservation. */
   function showPreview(value){exact(value);comparison.replaceChildren();const table=el('table'),head=el('tr');for(const text of ['Paramètre','Avant','Après'])head.append(el('th',text));table.append(head);for(const [,entries] of groups)for(const [key,text] of entries){if(valueOf(value.before,key)===undefined&&valueOf(value.after,key)===undefined)continue;const row=el('tr');row.append(el('th',text),el('td',String(valueOf(value.before,key)??'—')),el('td',String(valueOf(value.after,key)??'—')));table.append(row)}for(const [id] of scopeInputs){const old=value.before.scopes.find(s=>s.id===id),next=value.after.scopes.find(s=>s.id===id);if(old.max_activations===next.max_activations)continue;const row=el('tr');row.append(el('th',id),el('td',String(old.max_activations??0)),el('td',String(next.max_activations??0)));table.append(row)}comparison.append(table)}
-  open.addEventListener('click',()=>{dialog.showModal();select.replaceChildren();current=null;fields.replaceChildren();reason.value='';invalidate();run(async()=>{const works=await api.list();if(!Array.isArray(works))throw Error('quota-work-list-invalid');const initial=el('option','Choisir une mission');initial.value='';select.append(initial);for(const work of works.filter(w=>w.planning)){const option=el('option');option.value=work.id;option.textContent=work.title+' — '+work.id;select.append(option)}status.textContent=tr(select.options.length>1?'Choisir une mission':'Aucune mission avec planification');status.className='notice info'})});
+  /** Reuse the real list and optional explicit selected Work on user open.
+   * All options are built before one read; no default Work/planning is adopted.
+   * Failed list/getter/show leaves current null and confirmation unavailable. */
+  async function loadWorks(){const works=await api.list();if(!Array.isArray(works))throw Error('quota-work-list-invalid');const initial=el('option','Choisir une mission');initial.value='';select.append(initial);const eligible=works.filter(w=>w.planning);for(const work of eligible){const option=el('option');option.value=work.id;option.textContent=work.title+' — '+work.id;select.append(option)}const requested=selectedWork();if(requested&&eligible.some(w=>w.id===requested)){select.value=requested;render(await api.show(requested))}else{status.textContent=tr(eligible.length?'Choisir une mission':'Aucune mission avec planification');status.className='notice info'}}
+  open.addEventListener('click',()=>{dialog.showModal();select.replaceChildren();current=null;fields.replaceChildren();reason.value='';invalidate();run(loadWorks)});
   select.addEventListener('change',()=>{current=null;preview.disabled=true;fields.replaceChildren();invalidate();if(select.value)run(async()=>render(await api.show(select.value)))});
   fields.addEventListener('input',invalidate);reason.addEventListener('input',invalidate);
   preview.addEventListener('click',()=>run(async()=>{const value=prepare(),reply=await api.preview(select.value,value);showPreview(reply);proposal=value;status.className='notice info';status.textContent=tr('Prévisualisation validée. La sauvegarde revérifiera la révision et les plafonds.')}));

@@ -1,5 +1,7 @@
 # Replacing the Go engine with Rust
 
+Current local launcher: [Rust-only build/version/service](NATIVE-LOCAL-LAUNCHER.md), installed for development; this does not close global migration journeys or acceptance criteria.
+
 [Français](../architecture/RUST-MIGRATION.md). User decision on 17 October 2026:
 complete replacement with **one final cutover**, without a deployed hybrid engine.
 The [plan and evidence](../plans/migration-rust/PLAN.md) retain scope, dependencies,
@@ -8453,3 +8455,138 @@ retained state. The permanent recipe is native-http-mission.json; no-conductor
 proofs remain historical. Root reviewed the7changed compiler inputs by hash.
 Independent candidate review, managed/multi-task recovery and global acceptance
 remain open. No installation or UI/browser acceptance is inferred.
+
+
+### First manual managed worker status
+
+`mission status` observes a first manual managed attempt while queued/active or blocked after completion/cancellation. Before and after projection the reader checks the original request, private manifest and `managed_attempts` row; it changes neither budget nor task and does not require the mutable copy. Process identity uses existing native observations, never SQL state alone. A completed process remains an unproven result: Root reports are not attributed to its copy and no Git result is accepted. The complementary automatic journey is described below; multiple attempts/retries and managed submission/review/integration remain refused. Missing/altered manifests or divergent SQL attribution refuse with the retained cause; restore original evidence rather than manufacture attribution. Permanent recipe: `managed-manual-worker`; original witness and recovery belong to lot1443.
+
+
+### Managed conductor: first automatic attempt
+
+The native conductor may register an initial managed task in FIFO with a validated future path, then prepare its private copy under the actual engine lease. Synchronization checks the retained candidate and provider/model guards without creating the copy or write-probing a nonexistent path; it guarantees neither host readiness nor permission. Admission creates the copy, observes the host and reserves resources after control/profile/budget/slot/lease/FIFO checks. Binding4 and the action receipt retain the original intention. At Record the receipt does not exist yet: only the engine-created shape is checked; after receipt staging and before commit, the full original chain is verified. Claim/grant retain current instance and authority checks. Completion/cancellation/status reread the original and managed row without requiring a mutable copy. Process completion establishes no managed Git publication, review or acceptance; the task stays blocked and its result unproven. Managed retries and historical lease adoption remain refused. Permanent recipe: `managed-auto-worker`, actual HTTP server with two copies, pause/resume and independent completion.
+
+
+```mermaid
+flowchart LR
+  A[Consent and native lease] --> B[Task / budget / model guards]
+  B --> C[FIFO: validated future path]
+  C --> D[Attributed private copy under fence]
+  D --> E[Host / receipt / Binding4 / reservation]
+  E --> F[Private grant and worker]
+  F --> G[Completion: settlement and FIFO release]
+  G --> H[Status: unproven result]
+  H -. Not connected .-> I[Git publication / review / acceptance]
+```
+
+The internal managed dispatch resource observation differs from full user preview (still refused). Under a settings reservation and rolled-back transaction it rechecks lease, revision, profiles, candidate, overlaps and budget, without fabricating an Agent. A FIFO intention may wait without creating its copy; only actual admission prepares the copy and observes its host.
+
+After checking the completed producer, receipt and original managed attribution, relay returns `managed-result-publication-required` until immutable Git publication is connected. A report in the mutable copy never reaches ordinary submission; the conductor remains available and no acceptance follows. Corrupt proof and SQL/cleanup failures still refuse with their cause. The recipe exercises this continuation with actual report files in both copies.
+
+## Native cockpit — UX journey,24October2026
+
+The Rust landing separates **My missions** from **Administration**. **Live agents**
+remains a separate destination. `GET /api/v1/works` supplies the mission list;
+search filters names, objectives and IDs locally. Selecting a mission retains its
+ID in the `work` query parameter without storing mission data in browser storage.
+`view=admin` opens settings directly; language/theme follow the Live link.
+User content is neither translated nor interpreted as HTML.
+
+The detail reads existing controls and status through
+`GET /api/v1/mission?work=…` and `action=status`. It shows the objective, tasks,
+explanations, agent/attempt identity and requested/observed models when supplied.
+A refused detailed status remains visible: recorded tasks may be shown but do not
+prove execution or validation. Missing observations remain unavailable; no zero
+counter or completed state is invented. Controls do not prove that a conductor is
+running. Separate reads are not an atomic snapshot; the displayed time records
+browser receipt.
+
+Refresh is manual, without polling or mission commands. An older reply cannot
+replace a later mission selection. Empty search, empty list, loading, refusal and
+manual recovery have distinct messages. Task details are expandable; errors remain
+visible. Administration reuses existing dialogs, groups and validation. This slice
+adds no mission creation/start, graph or Git integration. Implementation precedes
+final verification by user decision; file presence alone is not acceptance.
+
+## Existing cockpit connection —1462
+The `/` landing reuses canonical `web/index.html`, its stylesheets and shared
+i18n/swarm-shell scripts. The server explicitly selects `cockpit-native-read.js`
+and `cockpit-native.js`: historical scripts require a complete Go snapshot, which
+is not simulated. The DOM and five navigation groups remain those of the existing
+UX. Real works and mission show/status reads provide data; failures remain visible
+and missing metrics remain unknown. Stored tasks prove neither current execution
+nor acceptance. Separate observations are not an atomic snapshot; revisions belong
+to their respective producers.
+
+This first connection is read-only with manual refresh. It records no visit or
+command. Connections1466–1467 below add budget, agent and dependency reads.
+Preparation, AI dialogues, decisions, writes other than budget and advanced graph interactions
+remain unconnected; existing sections retain navigation with explicit limitations
+and disabled commands. This profile uses same-origin GET without introducing a
+browser deadline, retry or polling; server transport/resource policies remain
+unchanged. It establishes neither Go snapshot nor Go client-policy compatibility.
+The transitional native Admin remains at `/native-runtime.html?view=admin` rather
+than replacing the product landing. Claude’s Live interfaces are unchanged.
+
+### Connection1466 — existing cockpit budgets and attempts
+The cockpit uses protected `GET /api/v1/cockpit-read?work=ID` with shared
+session/Host admission and Root binding. An explicit existing Work is required;
+duplicate/unknown keys and unsafe names refuse. Narrow attempt projections omit
+prompts, commands, environment, workspaces and contexts. Recorded IDs, parent/previous
+links and states establish neither authenticity, current liveness nor task approval.
+USD figures distinguish cap (zero means unlimited), per-launch reserve, committed
+estimates and unauthenticated provider-declared costs. Missing cost counts identify
+partial totals. Missing policy stays `null`: unlimited budget and unknown amounts,
+never invented zeros. Read failures refuse the observation; the browser clears old
+data, displays a safe cause and offers manual refresh. Reads across producers are
+not one transactional snapshot. No write, visit or provider execution is added.
+Budget editing is connected in1468 below. Catalogue, advanced graph interactions and other commands remain to connect; native Admin
+remains available at its separate address.
+
+### Graph1467 — recorded projection
+`cockpit-native-graph.js` reuses `graph.js` SVG helpers, local dagre and canonical
+graph classes; other legacy functions are not called. Actual Work data supplies
+prerequisite → task edges, full accessible title/ID and recorded state. Duplicate IDs
+and cycles refuse rendering; missing dependencies are visibly reported, never invented.
+SVG captions are abbreviated for readability, full titles stay accessible. Geometry
+values are presentation, not engine policy. Local keyboard scrolling, no action,
+approval or live activity inferred. Filters, inspector, editing, launch and responsibility
+organization remain to connect. Failures stay visible; manual refresh permits recovery.
+
+Canonical placement now namespaces every literal identifier with `graphNodeKey`
+before dagre, preserving valid names such as `__proto__` in its object indexes.
+Agent grouping uses a prototype-free index. Persisted, DOM and command identifiers
+stay unchanged; changed geometry signatures invalidate prior caches. Permanent
+`graph_identifiers_test.cjs` exercises the actual vendor, plus a browser variant.
+
+### Connection1468 — actual mission budget editing
+The Budget button opens the canonical `modal` dialog without a Go snapshot. Fields
+read the saved USD cap/reserve, source and reference date. Missing policy leaves
+blank fields instead of adopting amounts; a zero cap means unlimited per engine contract.
+Protected `/api/v1/work-budget`, `/preview`, `/apply` routes bind an explicit Work
+using shared session/Host/CSRF, Root identity and configured Root capacity. GET/HEAD
+observe; POST preview validates money/date/revision without writes, reservations or
+launch permission. Separate reads are not an atomic snapshot. POST apply reuses
+`budget.configure` final validation, CAS, event replay and engine-owned actor/time.
+Editing invalidates the proposal; saving requires a second gesture and matching
+read-back before success. Preview refusals preserve values. Lost apply responses or
+failed read-back remain explicitly uncertain, with no automatic retry; reopening
+reads the authoritative state before another edit. Known publication stays in HTTP/UI
+`recorded_work` error metadata. Reservations, consumption, history and active agents
+are preserved; no provider, launch or mission resume occurs. Catalogue and other
+cockpit commands remain separate. Recipes write only their own isolated fixture Roots.
+
+At the budget bridge, typed monetary/date input refusals are HTTP400 and stale
+preview revisions HTTP409. Corrupt stored policy, storage, cleanup and clock causes
+remain server failures; no global error-text reclassification. A caught refresh must
+expose its outcome to the save consumer, preserving known-but-not-read-back effects.
+
+### Connection1469 — cockpit quotas
+`native-quotas.js` remains shared: optional existing opener and selectedWork getter
+are evaluated only on explicit click. Default Admin mounting keeps its button and
+explicit selection. `cockpit-native-quotas.js` supplies existing protected routes,
+serializes requests/CSRF and validates actual QuotaView/QuotaPreview DTOs before display.
+No quota default, new policy or engine route. Local Admin styles serve these dialogs.
+Preview without writes, CAS/replay apply and read-back remain engine operations.
+Recipes enable only their own third inert fixture Work through public operations;
+no live mission is enabled or changed.

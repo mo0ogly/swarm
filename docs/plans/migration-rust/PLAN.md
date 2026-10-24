@@ -6,9 +6,186 @@ Préserver les modifications de Claude, les missions suspendues et les preuves.
 Méthode : [APEX](../../../.claude/skills/apex/SKILL.md),
 [prompt adopté le 22 octobre 2026](PROMPT-METHODE-CODEX.md).
 L'option de service Rust anticipé en lecture seule attend une confirmation.
-Ni commit/push, installation, restart ni fournisseur payant autorisés ici.
+Autorisation actuelle (24 octobre) : construire/installer/redémarrer par défaut
+le seul service local géré après vérification, en préservant données/missions.
+Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
+Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
-## Priorité opérationnelle — cadence corrigée du23octobre
+## État livré1469 — plafonds raccordés dans l’UX existante, dev31
+Bouton canonique → dialogue partagé → choix/préselection explicite → preview/apply
+moteur → relecture. Aucun nouveau plafond/default, backend inchangé. Admin sans
+options toujours opérationnel. GLM : une proposition intégrée après corrections,
+5143tokens déclarés, aucun retry automatique. Recette273assertions navigateur PASS,
+13budget API/9lecture API,13identifiants et cachegraph ; intégrité VERIFIED.
+Échecs de préconditions fixture conservés (organisation sans contrôle, programme
+non autorisé), corrigés sans lever de garde. Traduction Apply/en-tête vérifiés.
+Dev31 réel/candidat identiques,40assets servis comparés et notes compilées FR/EN
+actuelles ; deux missions historiques toujours suspendues, budgets inchangés.
+Preuves : evidence/20261024-quotas1469. Pas de commit/push ni acceptation globale.
+
+## Raccord1469 — plafonds dans l’UX existante avec GLM
+Propriétaire Codex. Réutiliser native-quotas.js et les routes Rust quotas existantes,
+bouton quotas-open canonique et styles Admin partagés, aucun second dialogue reconçu.
+Option de montage pour bouton existant et présélection de la mission explicite
+seulement si elle figure dans la liste réelle avec planification. Sans cela : choix
+explicite, pas d’activation implicite. Toutes les écritures de recette sur Root isolé.
+GLM propose adaptation composant ; principal corrige double gestionnaire de clic,
+préselection après liste complète, getter unique puis adapter protégé/sérialisé.
+Fichiers : native-quotas.js, nouveau cockpit-native-quotas.js, bootstrap/asset allowlist,
+recette existante/tests, notes et docs FR/EN. Index/Live/Claude conservés.
+Critères : choix mission, champs réels, preview sans effet, apply/relecture,
+consommations préservées, absence/malformed/refus/reprise, aide/focus/FR-EN/mobile,
+non-régression du montage Admin sans options. Aucun fournisseur ni budget réel modifié.
+
+## État livré1468 — budget modifiable dans l’UX existante, dev29
+Candidat dev29 : dialogue budget canonique, preview financier sans écriture,
+sauvegarde CAS/journal et relecture. Pas de défaut montant/source/date ni retry.
+GLM : un pont HTTP intégré après corrections de types/null/erreurs,2971tokens déclarés.
+Recette corrigée229assertions navigateur +13budget HTTP +9lecture HTTP,13noms/indices
+et cachegraph PASS ; intégrité VERIFIED. Témoin date invalide→500 initial conservé,
+classification corrigée400. Variantes réponse perdue après apply et relecture UI
+invalide après apply vérifiées, effet inconnu/effet connu distincts. DocFR/EN +schéma.
+Installation locale vérifiée : binaire réel identique au candidat,39assets servis et
+notes FR/EN comparés. Deux missions toujours suspendues, politiques absentes conservées.
+Preuves : evidence/20261024-budget1468. Autres parcours et acceptation globale ouverts.
+
+## Raccord1468 — réglage du budget dans le dialogue existant
+Reprise dev26 : lectures budgets/agents/graphe déjà livrées, aucune refonte UX.
+Parcours : bouton budget-edit → modal existante → lecture politique/révision →
+prévisualisation financière sans écriture → enregistrement CAS/replay moteur → relecture.
+GLM propose le pont HTTP ; Codex vérifie types/null/erreurs, raccorde formulaire et teste.
+Fichiers réservés : service/work_budget.rs, service.rs mod/routes/statut additifs,
+native_admin.rs asset/script, nouveau cockpit-native-budget.js et bootstrap,
+recette existante/tests, traductions, notes et docs FR/EN. Live/Claude et index inchangés.
+Aucun budget réel modifié par développement : écritures sur Roots de recette seulement.
+Critères : provenance conservée, invalides/stale/CSRF refusés, preview sans effet,
+apply puis relecture/persistance, absence de politique sans montants implicites,
+échec réseau après apply explicitement incertain, aucune répétition automatique.
+Réservations/consommations/historiques conservés ; aucun départ/levée de pause.
+Pas de token de prévisualisation simulé : validation finale reste budget.configure.
+Installation locale après recette de fin de tranche et revue des octets réels.
+
+## État livré1467 — UX existante, dev26 local
+Trois surfaces raccordées en lecture avec GLM : budgets, agents/tentatives et
+liens parent/précédent, graphe des dépendances Work (helpers/styles canoniques).
+Deux contributions GLM intégrées,11203tokens déclarés, aucun retry automatique.
+185assertions navigateur FR/EN/deux thèmes/cinq largeurs +13identifiants/index,
+régression cache et9contrôles HTTP PASS ; intégrité de recette vérifiée.
+Binaire réel identique au candidat,38assets servis vérifiés, notes FR/EN identiques.
+Deux missions historiques toujours suspendues. Aucun fournisseur métier/commit/push.
+Correction partagée : clés internes de placement injectives et index agent sans
+prototype, reproduction `__proto__` conservée. Pas de validation/activité déduite.
+Restent : filtres/inspecteur/édition/lancement du graphe, écritures budgets, décisions,
+journaux, préparation, connexions et autres parcours complets ; G11 reste ouvert.
+Preuves : evidence/20261024-cockpit1467 ; non-acceptation globale explicite.
+
+## Raccord1466 — budgets et agents existants avec GLM
+Besoin : raccorder les vues existantes, sans reconstruire leur UX. Propriétaire Codex.
+Tranche : budgets enregistrés, estimations engagées/coûts déclarés, tentatives et
+liens parent/précédent ; lecture protégée uniquement, sans preuve de vie/identité.
+Fichiers réservés : service/cockpit_read.rs, service.rs (mod/route additifs),
+native_admin.rs (asset/script), cockpit-native*.js, recette existante, traductions,
+notes et documentation FR/EN. Fichiers Live/Claude et index/CSS inchangés.
+GLM propose le renderer ; principal vérifie types/null/docstrings/erreurs et intègre.
+Critère : valeurs d’une fixture publique visibles, absence de politique explicite,
+rejet malformed/Work incohérent, changement de sélection sans données antérieures.
+Recette en fin de tranche puis build/installation par le lanceur, données préservées.
+Écritures budget, graphe et autres écrans restent ouverts ; pas de faux snapshot.
+
+## Raccord existant1462 — lecture du cockpit avec GLM
+Parcours : servir le HTML/CSS canonique index.html et ses5groupes de navigation,
+réutiliser i18n/swarm-shell, adapter la lecture Work/mission aux conteneurs existants.
+Aucune copie/reconception d’écran, aucun faux snapshot Go, aucune écriture de visite.
+GLM : renderer borné cockpit-native-read.js ; racine : bootstrap, allowlist assets
+native_admin.rs, HTML rendu (scripts explicitement sélectionnés), notes et docs FR/EN.
+Fichiers Live/Claude et markup canonique conservés. Fonctions non raccordées
+signalées, métriques absentes inconnues ; graphe/actions pas prétendus fonctionnels.
+Recette en fin de tranche, installation locale. Profil native-runtime conservé
+comme outil Admin transitoire, distinct de l’UX produit existante réouverte.
+
+## Correction utilisateur1461 — réutiliser l’UX existante
+
+Le cockpit historique est déjà présent : web/index.html, cockpit.js, mission.js,
+conduite.js, pilotage.js, swarm-shell.js, écrans projets/préparation et Admin.
+Ne pas reconstruire ces parcours dans une seconde UX native. Priorité : conserver
+les écrans et comportements adoptés, migrer/raccorder leurs contrats au serveur Rust.
+Le pilote natif dev19 reste accessible comme outil transitoire ; il ne remplace
+pas la cible produit et son développement parallèle de commandes est arrêté.
+Premier raccord à traiter : bootstrap session/works puis snapshot consommé par
+cockpit.refresh/render ; les lectures native-session/mission ne sont pas des DTO
+snapshot compatibles. Ne pas fabriquer collections, décisions ou autorisations
+vides pour ouvrir la page. Les écritures de visite au changement de mission sont
+à préserver/refuser explicitement selon le contrat, pas à simuler.
+GLM1460 : réponse tronquée,10050tokens déclarés ; aucun patch de ce module intégré.
+Ébauches3fichiers conservées .cache/skynet-ux-controls1460 ; retrait vérifié par SHA
+identiques aux sources dev19 livrées. Aucun changement runtime ni redémarrage.
+Prochain paquet GLM : adaptateur/contrat existant précis avec consommateurs fournis,
+pas création d’un nouvel écran. Tests conservés pour la fin du parcours raccordé.
+
+## Historique1460 — proposition de commandes dans le pilote (supplantée)
+Propriétaire Codex ; un appel SKYNET borné propose native-mission-controls.js.
+Racine intègre cockpit/adapter/asset/FR-EN/CSS et recette navigateur permanente.
+Fichiers réservés : web/native-{mission-controls,cockpit,runtime}*, service/native_admin.rs,
+locales/en.json et généré, version_history.json, tests/recette cockpit et docs FR/EN.
+Confirmation nom/motif/révision avant pause/unpause/stop/resume/start avec profil
+existant seulement ; pas de politique ni profil inventé. Écriture incertaine :
+rejeu explicite du même événement ; erreur de relecture distincte du refus initial.
+Sélection bloquée pendant dialogue/pending, aucun lancement sur lecture.
+Tests regroupés en fin de tranche ; fixtures isolées, missions historiques en pause.
+
+## Priorité utilisateur — UX, tests regroupés à la fin (24 octobre)
+
+Décision utilisateur : travailler l’UX maintenant, exécuter les tests à la fin.
+G1/G11, propriétaire Codex : cockpit natif de lecture, sélection/recherche des
+missions, objectif, état et tâches issus des API existantes ; administration
+séparée et accès à la console Live conservés. Pas de mutation mission nouvelle.
+Fichiers réservés : web/native-runtime.{html,js,css}, nouveau web/native-cockpit.js,
+asset additif service/native_admin.rs, locales/en.json et catalogue généré,
+version_history.json, documentation UX FR/EN. Aucun fichier Live/télémétrie modifié.
+Fin de ce parcours UX : états chargement/vide/erreur/reprise, sélection sans course,
+lecture dégradée explicitement signalée, FR/EN, thèmes et mobile. Implémenter
+ensemble, puis contrôles ciblés et navigateur consolidés, build/installation locale.
+Tests finaux non exécutés ≠ acceptation. Le cycle Git reste ouvert et différé
+par cette priorité explicite ; la migration complète conserve son périmètre.
+
+## Situation actuelle — 24 octobre, correction de pilotage1454
+
+Cette section prévaut sur les états historiques conservés ci-dessous.
+Besoin : application complète migrée, pas seulement un conducteur pilote.
+Responsable : Codex. Aucun nouvel appel GLM pendant ce diagnostic demandé.
+
+| Parcours/livrable | Fait vérifié | Reste observable avant clôture |
+|---|---|---|
+| Installation locale | Rust dev16 actif, empreinte du processus vérifiée par `./swarm.sh status` ; [installation](evidence/20261024-managed-auto1447/installed.json) | dialogue Version historique et parcours navigateur complets |
+| Premier cycle managed | conducteur HTTP → FIFO → copie privée → worker → fin/règlement/statut ;4workers sur2scénarios ; [résultat](evidence/20261024-managed-auto1447/result.json) | ne démontre pas le cycle de livraison complet |
+| Résultat du worker (priorité suivante) | rapport réel détecté ; attente explicite `managed-result-publication-required` | figer le résultat Git → contrôles → revue → intégration, avec refus et reprise du même candidat |
+| Reprise du cycle | pause/reprise et fin hors serveur éprouvées dans le pilote | retry managed, concurrence complète et reprise des anciens baux ; deux missions réelles restent suspendues |
+| Application G2/G4–G12 | composants partiels, voir groupes ci-dessous | compléter/qualifier préparations, configuration fournisseurs/coûts, confiance/mémoire, terminal/automatisation et interface ; aucune absence globale déduite de l'absence de recette |
+| Données/bascule globale | installation locale faite ; restauration froide limitée documentée | compatibilité historique, migration/restauration et rollback complets, recette finale/revue/RETEX |
+
+**Charge restante : non chiffrée de façon fiable.** Les12groupes sont encore
+ouverts à l'échelle de leur acceptation complète ; cela ne signifie ni12groupes
+non commencés ni un pourcentage de charge. Les comptes de noms CLI/routes et
+les projections de AVANCEMENT ne mesurent pas une durée de migration.
+
+Diagnostic de méthode : matrice196 datée annonçant encore watch non porté,
+états R7/installation obsolètes recopiés dans AVANCEMENT, et preuves locales
+non consolidées en fermeture du parcours complet. Ces contradictions sont
+observées ; leur part dans le temps total de la semaine n'est pas mesurée.
+Dernier lot :4appels GLM,133293tokens déclarés, dont1réponse tronquée ; aucun
+total Codex ni coût financier connu. Ne pas annoncer d'économie ou de délai
+sur cette base. Le volume de code défensif et les intégrations successives
+sont des pistes de surcoût, pas une comptabilité reconstituée.
+
+Correction retenue : une seule chaîne de livraison prioritaire, résultat Git
+jusqu'à intégration ; tests ciblés pendant le code, recette consolidée à sa fin,
+réutilisation seulement des preuves dont les entrées restent inchangées. Toute
+délégation suivante doit nommer un raccordement concret, ses fichiers et le
+critère de sortie ; les vagues d'agents et nombres de tests ne comptent pas
+comme livraisons. Mesurer la clôture de ce parcours avant d'extrapoler une cadence.
+Les autres groupes gardent leurs critères ; pas de suppression implicite de périmètre.
+
+## Historique — priorité opérationnelle du23octobre
 
 Décision confirmée par l’utilisateur le 23 octobre 2026 ; règles applicables à la suite de la migration.
 
@@ -47,9 +224,9 @@ identifiés ; source Go précompilée non qualifiée, aucune acceptation globale
 
 | Groupe | Prochaine unité de livraison | État de vérification/acceptation |
 |---|---|---|
-| G1 Cockpit | suivre mission et décisions | lectures/logs/status, avis négatifs/acceptation explicite555–563, résultat terminé/bloqué1283 et tâches managed initiales1378 localement vérifiés ; retry/closed/exécution managed/cockpit/revue globale ouverts |
+| G1 Cockpit | suivre mission et décisions | lectures/logs/status, avis négatifs/acceptation explicite555–563, résultat terminé/bloqué1283, tâches managed initiales1378 et premiers workers manuels/automatiques1446–1451 localement vérifiés ; retry/closed/résultat Git/cockpit/revue globale ouverts |
 | G2 Terminal | session et contrôle autorisé | ouvert |
-| G3 Supervision | conduire planner→worker→contrôles→reviewer | conducteur CLI/web1218, reprise/journal1256, statut1283, deux tâches séquentielles1304 et bootstrap repository commit seul1330 et planification managed1365 localement vérifiés ; concurrence complète, copies/règlement managed et acceptation globale ouverts |
+| G3 Supervision | conduire planner→worker→contrôles→reviewer | conducteur CLI/web1218, reprise1256, statut1283, deux tâches1304, bootstrap1330, planification managed1365 et premier worker managed manuel1409 vérifiés localement ; lanceur local Rustdev16 installé/vérifié1451 ; premiers workers managed automatiques/FIFO/statut et attente de publication vérifiés1451 ; retry managed, règlement Git, concurrence complète et acceptation globale ouverts |
 | G4 Planification | préparer le plan de mission | ouvert ; composants natifs, parcours global à qualifier |
 | G5 Préparations | préparation jusqu'au démarrage | ouvert ; dépend G4 |
 | G6 Fournisseurs | configurer/résoudre/tester connexion | ouvert ; contrats secrets et budgets requis |
@@ -57,7 +234,7 @@ identifiés ; source Go précompilée non qualifiée, aucune acceptation globale
 | G8 Projet/mémoire | éditer et partager avec provenance | ouvert |
 | G9 Coûts/limites | configurer et observer consommation | ouvert ; réservations/refus contractuels |
 | G10 Automatisation | déclencher et suivre un parcours | ouvert ; dépend G1/G3 |
-| G11 Pages | compléter les parcours des groupes servis | ouvert ; FR/EN, thèmes, clavier et ressources réelles |
+| G11 Pages | compléter les parcours des groupes servis | cockpit canonique dev29 : missions/tâches, budgets, agents et dépendances lus ; réglages budget/plafonds CAS/relecture vérifiés ; autres commandes/graphique avancé/parcours complets ouverts |
 | G12 Divers CLI | recheck, aide et complétude | version/alias/texte/JSON906 vérifiés sur905 ; --server et complétude ouverts |
 
 Ordre : G3/G1 → G4/G5 → G6/G9 → G8/G7 → G2/G10 → complétude G11/G12.
@@ -136,7 +313,8 @@ Clippy PASS du lot Codex. `snapshot.py` refuse désormais tout `include_str!` no
   migration APEX ; recette213 prouve planning/worker fictifs. Les références
   conditionnelles doivent être fournies aux rôles sans outils, pas supposées reçues.
 - Schéma37 accepté côté Rust ; migrations1..36 non portées. Bundle Work Go ≠
-  snapshot complet Root. Build/install historiques encore Go ; aucune bascule faite.
+  snapshot complet Root. Rust dev16 installé localement ; cette installation
+  ne qualifie pas la migration historique ni la bascule globale des missions.
 - Retenir les durcissements supplémentaires dans AFTER-CUTOVER, avec provenance,
   propriétaire, état réel et condition de reprise, sauf défaut réel/contrat requis.
 
@@ -154,8 +332,8 @@ revue, recette globale et RETEX. Tous restent ouverts à l'échelle de la migrat
 | R1/R2 | partiels | données et migrations complètes |
 | R3/R4 | partiels | moteur, supervision et autorités complets |
 | R5 | partiel | CLI/API/UX complets et vérifiés |
-| R6 | préparation commencée, recette non exécutée | migration/restauration et qualification globale |
-| R7 | préparation commencée, aucune installation | livraison/rollback et RETEX sous autorité |
+| R6 | restauration froide limitée vérifiée924 ; global ouvert | migration historique, restauration et qualification globale |
+| R7 | installation locale dev16 vérifiée ; global ouvert | livraison autonome complète, rollback et RETEX |
 
 Les18 livrables P01–P18 restent détaillés dans
 [PILOTAGE-CHARGE](PILOTAGE-CHARGE.md) ; leur présence n'est pas une mesure de charge.
@@ -2090,3 +2268,301 @@ Amélioration conservée : distinguer workspace du profil et workspace effectif,
 Preuves/limites : [résultat1378](evidence/20261024-managed-status1370/result.json).
 
 Commit demandé explicitement par l’utilisateur après1378 : sources Rust dépendantes depuis174b89106, tests/recettes et preuves textuelles des parcours1230–1378 regroupés sur l’état qualifié. Exports partagés et documentation FR/EN rendent cet état cohérent ; aucune modification du Go supprimé/stagé, de LIVE/UX ou des autres travaux partagés. Archives ignorées conservées localement, sans forcer leur ajout. Aucun nouveau build requis pour l’acte Git : sources effectives1373 inchangées ; le commit ne prouve pas une installation.
+
+###1380 — nouvelle vague de8GLM, reprise d’intégration requise
+8appels directs achevés (2simultanés,0retry) :5réponses complètes,3tronquées ;297581tokens déclarés. API glm-5.2, service GLM5.3 selon utilisateur, backend non attesté.
+Aucun patch intégré : copie/procfd/fermeture incorrects, variante ordinaire cassée, assertions vides et champs inventés. Le code produit et les gardes ne changent pas.
+La vague n’a donc pas livré le worker managed. Annulation queued ajoutée explicitement au périmètre indispensable avec admission/préflight/fin et copie attribuée ; propriétaire racine.
+Skill personnelle SKYNET synchronisée avec la copie Claude : reprise par interface effective et distinction complétude/intégrabilité. Effet futur non vérifié, aucun retry supplémentaire.
+[Résultats/usage](evidence/20261024-managed-workers1380/result.json) et [diagnostic/reprise](evidence/20261024-managed-workers1380/ASSESSMENT.md). Aucun build/installation/acceptation nouvelle revendiqué.
+
+Correction utilisateur après1380 : interdiction explicite d’une clôture par bilan GLM sans code livré, inscrite et synchronisée dans la skill SKYNET personnelle/Claude ; principal responsable de reprendre directement l’implémentation. Reprise1390 en cours avec un cas public écrit, pas encore une preuve de fonctionnement.
+
+###1390–1409 — premier worker managed manuel réellement exécuté
+Après refus des propositions1380, raccordement direct par le principal,0nouvel appel GLM.
+Copie privée/proof originale→admission/SQL→préflight aux frontières natives→processus réel→fin blocked/estimation ; seconde tâche annulée sans provider et réserve libérée.
+Refus1391 reproduit surancien binaire ; copie originale, attribution, staging et requête effective liés, aucun écrasement inconnu.
+1397 : .git renommé par worker bloquait à tort la fin ; corrigé par phase, même Root/Agent repris1404 sur1401 sans relancer ni restaurerGit ; périmètre exact dans result.json.
+Recette finale1407 :23assertions publiques nommées PASS/intégrité VERIFIED,2parcours (normal et sous-projet/refus/reprise/Git absent/annulationworkspace absent).
+6tests Rust PASS, nonrégression fin/reprise ordinaire1408 PASS ; Clippy/Rustdoc PASS.
+Profil normal1406 :341entrées effectives, aucun feature fixture, non installé. Revue locale7entrées/4axes/0déclaration ouverte ; aucune acceptation indépendante.
+Doc FR/EN, schémas, Rustdoc et recette permanente managed-manual-worker à jour ; runtime propre1409archivé, originaux d’échec conservés.
+Suite : automatique/FIFO managed, retry, résultatGitimmuable puis contrôles/revue/publication et statut avecAgents. CompatibilitéGo/R6/R7/RETEX globaux restent ouverts.
+La skill interdit maintenant explicitement la clôture par bilan de vague sans livraison ; effet local observé ici par reprise directe jusqu’au parcours réel, pas garantie future.
+[Résultat et limites](evidence/20261024-managed-manual1390/result.json). Aucun restart/commit/push.
+
+### 1410 — installation locale par défaut : décision et raccordement restant
+
+Décision utilisateur du 24 octobre 2026 : les avancées vérifiées doivent être installées et activées localement par défaut ; démarrage/redémarrage du seul service local identifié autorisé, sans nouvelle confirmation. Préférence transmise aux consignes personnelles communes, AGENTS, CLAUDE, contrat partagé et méthodes FR/EN. Aucun droit nouveau de commit/push/publication externe.
+
+Diagnostic source : `tools/swarm_version.py::source_identity/prepare` et `build.sh` compilent encore Go ; le contrôle candidat exige `/session/...` et `/api/v1/runtime-health`. Rust utilise `/login` et ne porte pas cette route de version HTTP. `tools/swarm_local.py::ready` attend l’ancien fichier/cookie de session. Le service local configuré était absent au contrôle. Ces incompatibilités empêchent d’affirmer que le candidat1406 est installé par ce lanceur ; ne pas reconstruire Go ni substituer un binaire sans contrôle. Propriétaire : Codex ; reprise : raccordement versionné Rust du lanceur et vérification sur Root isolé avant activation locale, avec contrat de session, contrôle de version et préservation de la mission suspendue. L’installation par défaut ne lève aucun refus de schéma ni consentement moteur. État : règle persistée ; produit non installé à ce stade.
+
+Revue de cet incrément : consignes/documentation seules ; aucun choix opérateur moteur, fonction produit ou chemin d’erreur modifié. Aucun test produit ajouté pour une décision de méthode. Les fichiers persistants s’appliquent aux prochaines lectures ; les contextes d’agents déjà démarrés ne sont pas mis à jour implicitement. Contrôler cohérence des règles et `git diff --check` ; l’exécution et l’acceptation restent distinctes.
+
+### 1411 — lanceur local exclusivement Rust (en cours)
+
+Besoin : `swarm.sh build/start/restart/status/open/stop` utilise le moteur Rust, sans compilation ni fallback Go. Propriétaire : Codex, fichiers annoncés : build.sh, tools/swarm_version.py, tools/swarm_local.py, tests correspondants, route native de version et doc FR/EN. Préserver checkout partagé, Root et mission suspendue. Critères : profil Cargo normal sans fixture, numéro stable sur entrées effectives identiques, candidat qualifié avant arrêt, cookie privé + API native, version/notes réellement servies, SIGINT et identité kernel, refus listener étranger. Vérifier isolément avant activation locale ; les protections moteur et consentements restent applicables. Aucun appel GLM/provider ni commit/push prévu.
+
+1412–1424 : recette native14 tests PASS et intégrité VERIFIED ; connexion corrigée selon Origin + champ token réels, originaux403/401 conservés. Source-managed build et probe isolé Rustdev6 PASS ; activation réelle d’abord refusée faute de configuration native (OpenFile/ENOENT, trace1418), puis initialisation publique après sauvegarde SQLite privée, contrôles/Works/événements/fournisseurs/session inchangés1420. Deux missions automatiques portaient des baux historiques non adoptables : refus moteur conservé ; découverte d’une fenêtre de faux succès du lanceur avant fermeture HTTP par le conducteur1421–1422. Correction générale : même garde d’éligibilité au préflight et à la découverte continue, lecture legacy avant service HTTP, sans mutation de baux. Fixture de non-régression/récupération ajoutée ; qualification en cours.
+
+Décision utilisateur explicite : suspendre les deux missions historiques Portail client et Actions de confiance puis activer Rust. Pauses publiques Rust1423 relues, consentement/mode et empreintes des tables de financement inchangés ; aucun SQL de mutation directe. L’utilisateur demande ensuite la reprise via GLM/SKYNET et souligne la priorité du Portail. Codex reprend par une tranche livrable issue du plan existant après installation du lanceur ; les pauses moteur ne seront pas annulées implicitement et aucun ancien bail ne sera falsifié.
+
+1438–1439 : contrôle natif de transmission :1/9PASS,8/9FAIL (agent-workflow-body-limit-exceeded), sources et canaux conservés. Mesure initiale : planner32229/subplanner32232/worker32229 contrecap32000. Plusieurs réductions textuelles de notre propre section se sont révélées encore trop longues ; mesure du candidat complet en mémoire avant publication retenue. Règle conservée, répétitions retirées, limite non relevée : planner/worker31992, subplanner31995, reviewer18851. Marge faible : toute évolution ultérieure doit passer par le précontrôle de tailles, puis la vérification native ; consignes Codex/Claude et méthodes FR/EN actualisées. Les échecs originaux restent historiques, reprise fonctionnelle à qualifier. Cette défaillance concerne la méthode de transmission, pas une preuve d’échec HTTP.
+
+### 1440–1442 — lanceur Rust installé, suite portail à décider
+
+Production locale Rust `v0.1.1-dev.9` active, binaire/processus,341 entrées effectives, version/notes FR/EN et trois ressources protégées vérifiés ; aucun fallback/compile Go. Recette permanente1441 :16 tests nommés PASS/intégrité VERIFIED. Contextes réellement construits :9 tests natifs PASS1440, plafond initial32000 inchangé. Clippy/Rustdoc1427 réutilisés seulement pour les mêmes sources Rust ; instruction/notes compilées ont leur vérification fraîche. Revue incrémentale exacte1437→1442 :2 entrées, déclarations locales complètes, pas acceptation indépendante. Dialogue Version historique, examen visuel navigateur, baux anciens et acceptation globale de migration restent ouverts. [Preuves et limites](evidence/20261024-native-launcher1411/result.json).
+
+RETEX borné : qualifier Cargo avant arrêt ; distinguer HTTP lié/prêt/conducteur ; initialiser publiquement la configuration native manquante après sauvegarde ; conserver les refus de baux et obtenir la décision avant suspension d’autres missions ; mesurer les contextes avant Cargo. Corriger les fixtures selon leurs producteurs (Origin/token/champsSQL), et conserver les faux témoins comme tels. Les notes de revue1430 ont été restaurées exactement après ajout temporaire d’un fait récent ; l’addendum1437 est séparé, anciennes empreintes conservées. Erreur d’option verify corrigée avant installation, intégrité attestée ; aucune preuve erronée n’est déclarée PASS.
+
+GLM/SKYNET1431 :2 contributions reçues et examinées, priorité portail confirmée ; API demandée/rapportée glm-5.2, backendGLM5.3 selon utilisateur non attesté. Fondations portail10 fichiers restaurés depuis reçu/candidat643c8a8 vérifiés ; prochain incrément FR/EN concret dans docs/portal-client-swarm/NEXT-INCREMENT.md, choix A/B demandé et encore en attente, aucun scaffold/compte/adoption implicite. Actions de confiance : objet attendu non résolu dans canonique,3copies et11index locaux ; aucune source saine trouvée. [Plan de reprise](../actions-confiance/reprise-stockage-20261024.md), propriétaireCodex/source de sauvegarde à identifier ; pas de suppression d’objet ni remise à zéro. Les deux pauses publiques restent effectives. Ces documents de reprise ne sont pas des changements de runtime ; pas de rebuild exigé pour leur seule restitution. Aucun commit/push/publication.
+
+### 1443 — reprise GLM : statut du premier worker managed
+Besoin G3/G1 : voir le worker queued puis terminé/annulé via mission status.
+Propriétaire Codex ; fichiers réservés : mission_status_historical/reports, managed_repository_worker, test/recette managed-manual-worker et documentation FR/EN. LIVE/télémétrie exclus.
+Deux appels SKYNET HTTP, sans retry : revue reçue, patch tronqué ; originaux privés .cache/skynet-managed-status1443. Identifiant API glm-5.2, GLM5.3 selon utilisateur, backend non attesté. Première invocation CLI refusée avant réseau (--summary inexistant), argument supprimé.
+Décision : preuve originale + SQL avant/après, aucun besoin de copie mutable pour observer la fin. Rapports Root non attribuables à une copie : ne pas intégrer cette proposition GLM.
+Critères : identité/état/coûts et non-validation visibles, refus preuve altérée sans mutation puis récupération, copie absente sans perte du statut, annulation réglée.
+Automatique/FIFO/retry, soumission managed/revue/intégration restent ouverts. Témoin avant correction puis parcours public en fixture, revue des octets, notes FR/EN et installation locale.
+
+1444–1445 : témoin public rouge conservé (planning-unported), puis recette managed-manual-worker PASS et intégrité VERIFIED sur candidat dev10,107 tests status natifs PASS. Clippy a refusé huit arguments dans le helper modifié ; interface corrigée par Option<&Path> (absence de lecteur Root pour managed), aucun allow/limite relevée. Clippy corrigé PASS. Ce changement invalide le candidat/profil précédent : nouvelle construction/recette avant activation ; preuves originales et revue initiale conservées.
+
+### 1446 — statut managed livré localement en Rust
+`mission status` affiche désormais le premier worker managed manuel queued puis terminé/annulé, avec identité et registre de consommation, sans attribuer les rapports Root à sa copie. Requête/manifeste/ligne managed relus avant/après ; lecture de fin indépendante de la copie mutable. Refus/reprise de preuve altérée et copie absente vérifiés. Publication Git manquante reste résultat non démontré.
+Dev11 installé/actif : binaire kernel et métadonnées protégées concordants, notes FR/EN embarquées et3ressources protégées conformes aux entrées effectives ; deux missions historiques toujours paused via opérations publiques. Dialogue Version historique/visuel non vérifié.
+Recette finale :2scénarios/30assertions nommées PASS, intégrité VERIFIED ;107tests Rust status, Clippy et Rustdoc PASS. Revue exacte :5entrées de compilation changées, déclaration locale complète, pas acceptation indépendante. Reproducteurs/échecs originaux/usage GLM conservés ; aucune relance payante, aucun commit/push. [Résultat/preuves](evidence/20261024-managed-status1443/result.json).
+RETEX borné : contrôle GLM favorable à attribuer les rapports Root rejeté après lecture du consommateur ; intégration réelle proof/SQL et rapports non observés. Paquets GLM initiaux trop larges (~50k tokens chacun) : prochain paquet borné aux gardes/interfaces effectivement nécessaires, sans longs tests historiques sans rapport ; propriétaire Codex, mesurer baisse du contexte et intégrabilité, sans annoncer d’économie non mesurée.
+Suite G3/G1 : automatique/FIFO managed, retry, résultat Git immutable puis contrôles/revue/publication. Baux historiques/R6/R7/RETEX global restent ouverts, sans relancer les missions en pause.
+
+###1447 — vague GLM : conducteur managed et FIFO
+Parcours visé G3 : serveur Rust → intention FIFO prospective → copie première tentative sous bail → worker réel → fin/règlement/lecture conservée. Deux propositions GLM bornées : attribution native automatique et chemin prospectif read-only ; Codex intègre et teste. Fichiers réservés : managed_repository(_worker), agent_launch, statut managed et recette dédiée ; aucune modification LIVE/télémétrie. Critères : preuve Binding4/FIFO réelle, source inchangée, pas de création par synchronisation seule, refus pause/provenance sans provider, exécution et libération après fin/annulation. Retry/intégration Git restent hors de ce raccordement et refusés.
+
+1448 :2réponses GLM complètes (36112jetons déclarés, sans retry). Patches corrigés avant intégration : inspect Original à Record précédait le reçu, champ Task.attempt_id inventé et premier todo arbitraire ; remplacés par Binding4 moteur à Record + chaîne complète après staging, attempts réels et sélection par identifiant. Témoin watch dev11 : refus FIFO sans création/agent. Dev12 : premier parcours réel refuse workspace-turn-candidate-invalid avant tout Agent ; cause reproduite dans candidate_worker, join("") ajoutait un slash terminal rejeté par la grammaire FIFO. Correction par assemblage des composants normaux, aucune protection retirée. Sources et refus originaux conservés .cache/skynet-managed-auto1447 ; même parcours à rejouer sur nouveau candidat.
+
+1449 : le défaut de chemin corrigé permet la synchronisation FIFO ; l’essai dev13 atteint resource-preview puis refuse la prévisualisation managed physique non portée. Ce n’est pas un retry inchangé : premier verrou levé, deuxième frontière établie. Raccordement interne dédié preview_mission_worker_resources : même fence/gardes ressources/politique sous réservation, rollback, aucun faux Agent/copie/hostprobe ; prévisualisation utilisateur complète reste refusée, admission réelle inchangée. Fichiers partagés mission_supervision_store et mission_worker_dispatch annoncés, ajouts bornés. Clippy relève deux négations is_some_and non minimales dans les nouveaux lecteurs ; remplacées par is_none_or, aucun allow. Rejeu après nouvelle construction.
+
+1450 : dev14 exécute réellement le premier worker automatique (Binding4/copie/source inchangée), prouve la seconde intention FIFO sans copie puis sa fin et règlement hors serveur. Le statut terminal refuse workspace-turn-history-input-invalid : le lecteur Original consomme le journal FIFO qui exige une transaction, contrairement au seul manifeste manuel. Correction dans le consommateur statut : lecture DEFERRED/rollback explicite existante autour de chaque contrôle managed, causes opération/cleanup conservées ; aucun assouplissement du journal ni modification de données. Nouveau replay requis.
+
+1451 : parcours serveur2workers PASS sans/sous-projet ; manuel non-régression PASS. Nouvelle vérification nécessaire après découverte code : un rapport réel dans docs/<task>.md de chaque copie entre dans le submit ordinaire et stoppe watch (témoin dev15 report-red : task-report-managed-unported). Correction bornée générale du relais, fichier réservé annoncé : après producteur/reçu/attribution originaux vérifiés, Waiting managed-result-publication-required au lieu d’appeler une soumission non portée. Pas de faux succès de soumission/acceptation, erreurs de preuve/SQL toujours propagées ; publication Git reste ouverte. Nouveau parcours de continuation ajouté à la recette, originaux conservés, build/rejeu requis.
+
+###1452 — pilote managed automatique installé
+Dev16 actif :4workers réels sur2parcours HTTP (racine/sous-projet), chaque copie liée à Binding4/FIFO original, départs par conducteur sans préparation manuelle. Seconde intention waiting sans copie ; pause/reprise, fin hors serveur, libération/règlement uniques, statut et corruption/refus/reprise de preuve vérifiés. Rapports réels : reprise watch reste disponible et attend managed-result-publication-required, aucune soumission ni acceptation fabriquée.
+Recettes auto/manuelle finales :32+30assertions nommées PASS, intégrités VERIFIED, même binaire f2edb1eb ; Clippy/Rustdoc finaux PASS ;6tests relais finaux PASS.6managed+3dispatch+107status conservés sur sources/contrats concernés inchangés après l’ajout final du seul relais ; ne pas les attribuer à un nouveau binaire de tests non exécuté. Revue incrémentale locale :9entrées effectives changées, déclarations complètes. Revue GLM finale en contexte séparé demandée, verdict à conserver avant clôture de l’incrément. Dialogue Version visuel et acceptation globale restent non établis.
+Binaire exécuté/341entrées/notes FR/EN et3ressources protégées conformes ; deux missions historiques restent en pause. Pas de commit/push ni fournisseur métier appelé. Plan d’autorité initial devenu obsolète corrigé selon décision utilisateur24octobre, sans nouvel accord implicite. [Preuves du pilote](evidence/20261024-managed-auto1447/installed.json).
+Suite de capacité : publier un résultat Git managed immuable puis contrôler/revoir/intégrer ; retry managed et adoption des baux historiques restent ouverts. R6/R7 et RETEX globaux non clos.
+
+1453 : revue finale SKYNET séparée complète : approve, aucun défaut matériel démontré, réserves de couverture explicites (modèle sans outils). Première réponse finale tronquée non recevable conservée ; reprise après correction du paquet (aliases E/imports et fonctions/gardes nécessaires), pas simple hausse de sortie. Collation principale des corps absents et des types réels dans evidence/20261024-managed-auto1447/review-collation.md ; pas acceptation globale ni exécution indépendante prétendue.4appels GLM dans le lot :3complets/1tronqué,133293tokens déclarés, sans retry automatique ; aucune économie ni facture inférée. Hypothèse de divergence preview/modèle non reproduite (effective_profile prend déjà model_selection) : garde de différentiel G6/G9 à considérer sur changement de policy, propriétaireCodex.
+
+###1454 — replan du pilotage demandé par l’utilisateur
+Les anciennes lignes watch/installation contredisaient les preuves récentes.
+Synthèse courante remontée en tête, états installation/R6/R7 corrigés et anciens
+rapports explicitement datés. Originaux dans evidence/20261024-pilotage1454.
+Revue : documentation seulement ; aucune fonction, politique produit, configuration
+ou gestion d’erreur runtime modifiée. Les projections de présence ne sont pas
+un devis de charge ; générateur/matrice restent à requalifier avant tout nouveau
+taux. Aucun test applicatif ni rebuild pour ces seules notes de pilotage, hors
+entrées effectives du binaire dev16. Ce diagnostic ne clôt pas la migration.
+
+###1455 — UX prioritaire, première recette finale
+Cockpit de lecture et administration séparée assemblés, traductions et mobile
+implémentés avant les tests. Construction dev17 faite ; recette finale : parcours
+FR sombre, recherche,5largeurs, Admin/Échap passent, puis réponse statut vide {}
+acceptée indûment. Origine : tasks==null assimilait propriété absente et null ;
+correction : présence explicite de tasks + summary/next typés, null reste admis.
+Échec/DOM/capture conservés .cache/native-cockpit1455-final ; navigateur de cette
+seule fixture fermé après diagnostic, aucun timeout ajouté. Reproducteur attend
+la fin réelle de lecture puis assert son contenu, au lieu d'attendre un message
+qui pourrait manquer indéfiniment. Nouvelle construction requise avant livraison.
+
+1456 : reconstruction refusée native-build-git-observation-changed : les scripts
+de recette ont été ajoutés pendant Cargo, modifiant l’observation Git globale.
+Pas un échec des contrats moteur ; candidat non livré, refus conservé dans
+.cache/local-delivery. Précondition corrigée : recette et manifestes terminés,
+gel de toutes les sources/documentations pendant la reconstruction et la recette.
+
+###1457 — première tranche UX installée, tests regroupés à la fin
+Accueil Rust : Mes missions/recherche/sélection, objectif, contrôles/statut, tâches
+dépliables et identité de tentative quand produite ; Administration séparée et
+lien Live conservé. Lecture refusée signalée, tâches stockées explicitement non
+confirmées ; génération contre réponses tardives. Aucune nouvelle commande mission.
+Recette finale70assertions nommées PASS,4combinaisons langue/thème et5largeurs ; refus de statut
+vide, course de sélection, liste invalide/vide et reprise couverts par fixtures
+client distinctes des lectures HTTP réelles. Syntaxe/i18n PASS, intégrité VERIFIED.
+Dev18 réellement actif, empreinte recette/processus identique, notes FR/EN et5assets
+protégés concordants. Revue locale politiques/fonctions/erreurs liée aux SHA ; pas
+revue indépendante ni conformité globale. Captures desktop/mobile inspectées.
+Aucun appel GLM, commit ou push. Docs FR/EN et recette permanente mises à jour.
+[Résultat et limites](evidence/20261024-native-cockpit1455/result.json).
+Suite UX : création/préparation et commandes mission, graphe, budgets/fournisseurs
+et parcours complets restent ouverts ; cycle Git moteur différé sur instruction
+UX prioritaire. Ce pilote de lecture ne clôt ni G1/G11 ni la migration complète.
+
+1458 : inspection de la capture mobile finale : flex-basis14rem appliqué à un
+titre dans un conteneur devenu colonne créait un vide vertical ; flex:none
+limité au mobile. Bouton Sombre absent du catalogue anglais : ajout Dark.
+Les captures/recettes dev18 restent conservées. Reconstruction puis recette finale
+sur les octets corrigés ; aucun effet moteur attendu ou protection modifiée.
+
+###1459 — UX finale dev19 installée
+Retouches mobile et traduction Dark vérifiées sur captures réelles finales ;
+recette70assertions PASS/intégrité VERIFIED sur dev19, i18n et diff-check PASS.
+Empreinte du processus = binaire de la recette, notes FR/EN et5assets protégés
+concordants. Revues/captures/échec dev17 et installation dev18 restent historiques ;
+[preuve finale](evidence/20261024-native-cockpit1455/final1459/result.json).
+Pas de nouveau parcours moteur, pas d’appel GLM ni de commit/push.
+
+1461 : rappel utilisateur que l’UX était déjà réalisée. Relecture effective de
+index.html (navigation5groupes, tâches/agents/décisions/journaux/budgets/Admin),
+cockpit.js (session/works puis snapshot ; effets visit), fichiers projets/préparation.
+Le plan de raccordement remplace l’ajout d’un dialogue parallèle ; draft retiré
+sans toucher aux sources historiques/Claude. Revue : aucune fonction/politique
+ou erreur runtime livrée dans cette reprise, sources du pilote restaurées aux SHA
+dev19. Documentation de pilotage seulement ; pas de nouvelle recette applicative.
+
+1463 : contribution GLM complète intégrée,2012tokens déclarés,0retry ; identifiant
+API glm-5.2, GLM5.3 selon utilisateur non attesté par le service. Corrections
+principales : Number.isSafeInteger, libellés FR au lieu de clés inventées, classes
+notice existantes, refus d’entrée renderer absente au lieu de zéro fabriqué.
+Serveur sélectionne le bootstrap de lecture sur l’index canonique, conserve17CSS
+et la navigation ; profils snapshot/commandes non simulés. Sources gelées avant
+construction et recette finale ; Live et index.html d’origine inchangés.
+
+1464 : dev20 construit ; recette UX existante103assertions PASS/intégrité VERIFIED,
+régression Admin70assertions PASS. Inspection mobile anglaise : motif initial
+resté français (renderer GLM String au lieu d’engine). Correction du consommateur :
+label moteur et reason/summary/next par i18n.engine, titres utilisateur conservés.
+Assertion de traduction réelle ajoutée. Originaux dev20 conservés, reconstruction
+puis recette finale requises sur les octets corrigés. Revue GLM séparée tronquée
+(7954tokens,1500raisonnement/0texte) : aucune approbation déduite ni retry identique.
+
+###1465 — UX existante raccordée en lecture et installée sous Rust
+Accueil `/` : index.html canonique,17CSS et5scripts sélectionnés dont renderer
+GLM intégré ;5groupes de navigation conservés. Missions/tâches réelles, métriques
+absentes inconnues ; graphe/écritures/visites/autres parcours explicitement non
+raccordés. Outil Admin transitoire conservé à native-runtime.html?view=admin.
+Dev21 actif et empreinte recette/processus concordante ; rendu HTML canonique
+transformé et22ressources protégées conformes aux sources, notes FR/EN actuelles.
+Deux missions historiques toujours paused. Recette finale105assertions PASS et
+intégrité VERIFIED ; syntaxe/i18n/diff-check PASS ; captures desktop/mobile lues.
+Régression Admin70assertions dev20 PASS/intégrité VERIFIED, réutilisée seulement
+pour ses composants inchangés après la retouche de traduction du seul renderer
+produit ; pas annoncée comme exécutée sous dev21.2appels GLM,9966tokens déclarés,
+1renderer intégré/1revue sans texte utile,0retry. Revue locale SHA explicite,
+aucune approbation indépendante ou globale prétendue. [Preuves et limites](evidence/20261024-existing-ux1462/result.json).
+Suite : raccorder le graphe puis les commandes de l’UX existante avec leurs vrais
+producteurs, sans reconstituer un snapshot fictif ni reconstruire les écrans.
+
+### Résultat1466 avant installation
+Candidat dev22 construit, profil natif sans feature fixture qualifié. GLM : un appel,
+2180tokens déclarés, code renderer intégré après correction du conteneur inventé,
+des clés de traduction et de la politique absente/null ; aucun retry automatique.
+Recette initiale122assertions conservée ; extension ciblée aux nouvelles surfaces
+mobile et au refus/reprise observation :164assertions navigateur +9contrôles route,
+PASS, intégrité vérifiée. Quatre langues/thèmes, cinq largeurs ; capture budget
+EN/sombre390 inspectée. Tentatives non vides : fixture client explicite, pas une
+création/identité réelle. Sources/profil/revue locale : evidence/20261024-cockpit1466.
+Graphe, écritures et autres vues restent ouverts. Aucun commit ni appel métier.
+
+### Installation1466 vérifiée
+Dev22 réellement en service, empreinte process identique au candidat testé ;35assets
+natifs/partagés vérifiés et notes compilées FR/EN identiques. Les deux missions
+historiques sont toujours suspendues ; leurs projections réelles comptent5et3
+tentatives, sans copier prompts/contextes dans les preuves. Contrôle d’inventaire
+initial incomplet : regex mono-ligne puis omission du producteur login ; originaux
+conservés, inventaire corrigé selon les deux producteurs réels, vérification PASS.
+Dialogue Version historique encore non raccordé ; métadonnées/notes protégées vérifiées.
+
+## Raccord1467 — dépendances du graphe existant
+Suite demandée : réutiliser graph.js, ses helpers SVG, dagre local et les classes
+canoniques. Adapter en lecture les tâches/dépendances Work réelles, sans faux
+snapshot ni chargement des commandes legacy. Propriétaire Codex ; GLM propose le
+rendu borné. Fichiers réservés : nouvel adaptateur graphe, native_admin assets/scripts,
+cockpit-native-read.js, tests/recette, traductions et documentation FR/EN.
+Validation : direction réelle des liens, cycle/ID dupliqué refusé, dépendance inconnue
+visible, titres littéraux, vide, sélection et vues FR/EN/mobile. Pas de lancement,
+édition, hiérarchie des responsabilités ou preuve de validation par cette tranche.
+
+### Replan1467 — identifiant légal perdu dans dagre
+Témoin ordinary conservé ; `__proto__` produit nodeCount1 mais nodes[] vide dans
+la bibliothèque réelle. Cause : index objet de dagre ; regroupement agent `{}`
+a aussi un risque de collision à la même frontière. Correction générale dans
+les consommateurs graphiques : clé interne injective, ID source inchangé et index
+agent sans prototype. Codex propriétaire ; sources originales/reproducteur gardés.
+Défaut partagé avec le graphe historique : adaptation des deux consommateurs,
+sans déclarer tous les contrats du pilotage legacy réacceptés. Dev23 construit
+avant découverte, non installé ; candidat corrigé à vérifier. Aucun retry inchangé.
+
+### Capitalisation1467 et suites concrètes
+Correction vérifiée des collisions de noms sur les deux consommateurs du placement ;
+13assertions permanentes couvrent bibliothèque réelle et index agent, sans prétendre
+à la réacceptation de tous les parcours legacy. Hypothèse visuelle conservée : les
+captions limitées en caractères peuvent dépasser un nœud avec glyphes très larges ;
+Codex propriétaire, témoin à reproduire puis ajustement mesuré au rendu visible.
+Titres complets déjà accessibles ; aucun plafond métier proposé. Hypothèse aria-busy
+1465 conservée. Vérifier les propositions complètes, leurs dictionnaires et les
+helpers avant la première construction : les corrections sémantiques successives ont
+produit des candidats dev23–25 non installés ; dev26 est seul livré après dev22.
+Ce constat de méthode ne prouve pas encore une économie de temps ou de tokens.
+
+### Replan1468 — refus financier et effet connu après relecture
+Recette originale .cache/existing-cockpit1468-final : FAIL, date impossible refusée
+mais HTTP500 budget-invalid. Cause : classification commune ne reconnaissait pas
+le nouveau chemin budget-input. Correction limitée aux variantes typées entrée/date/
+refus financier en input/apply ; erreurs SQL/cleanup/clock et politique stockée restent
+serveur. Aucun refus métier changé. Reproducteur public conservé, pas de retry identique.
+Lecture de la chaîne UI : load avalait les erreurs, donc un consumer de sauvegarde
+pouvait ensuite annoncer succès. Source originale conservée ; load retourne désormais
+la preuve de panneaux relus, consumer conserve recorded_work et laisse la fenêtre en
+état connu/non relu. Variante réelle apply puis réponse client malformed sur cockpit-read
+ajoutée, sans prétendre à une exécution de ce second contre-exemple sur ancien binaire.
+
+### Résultat1468 installé et capitalisation
+Dev29 installé sur le seul service local géré. Processus/candidat SHA identiques,
+39ressources protégées/partagées comparées aux sources et notes compilées actuelles.
+Les deux missions historiques restent suspendues et sans politique budgétaire
+comme avant ; aucune écriture de recette sur leur Root. Sources, preuves originales
+et variantes conservées sous evidence/20261024-budget1468. Aucun commit/push.
+Leçon partagée : ajouter un pont moteur exige de suivre ses erreurs typées jusqu’au
+statut HTTP, en séparant entrée invalide, politique stockée corrompue et stockage ;
+une erreur capturée par un loader doit aussi rester observable par ses consommateurs
+de mutation. Un callback résolu ne prouve pas un rafraîchissement réussi.
+La variante relecture après apply est vérifiée sur candidat ; pas présentée comme
+reproduction exécutée sur l’ancien code. Aucune garantie de dépense ou fin de migration.
+Suite ouverte : catalogue, plafonds dans l’UX existante, autres commandes du cockpit.
+
+### Replan1469 — précondition de la mission quota de recette
+Original .cache/existing-cockpit1469-final : parcours quota tous exécutés, fin FAIL
+sur4HTTP500 mission status. Reproduction CLI sur Root conservé :
+mission-status-organization-invalid → organization-requirement-controls-missing.
+La nouvelle fixture avait planification/reviewer mais aucune déclaration de contrôle
+pour req-1 ; le statut hiérarchique exige cette structure. Précondition corrigée
+par planning enable public avec contrôle déclaré inerte, aucun contrôle exécuté,
+aucune validation/facture/droit fabriqué. Autres données/binaire dev30 inchangés.
+Ce correctif de fixture ne prétend pas rendre tous les statuts incomplets lisibles ;
+le refus organisationnel du produit reste conservé. Console/réseau de la seconde
+page Admin ajoutés au collecteur explicite avant reprise, sans filtrer ces500.
+
+### Replan1469 lié — validation de la déclaration du contrôle
+Seconde tentative arrêtée avant serveur : policy-program-or-arguments-invalid,
+programme absolu du helper absent de la liste de validation. Sources de garde
+validation_policy.rs105–132 : allowed_programs distinct des programmes fournisseur.
+Correction de fixture : python3 autorisé avec helper inerte en argument ; aucune
+liste de programmes, limite ou autorisation n’est relevée. Contrôle non exécuté,
+marqueur d’exécution reste une assertion négative. Diagnostic CLI original conservé
+/tmp/swarm-native-cli-failure-qaafggeb puis dans l’archive du lot.
+
+### Replan1469 — lecture visuelle après269assertions
+Recette finale-fixture PASS, sources et échecs précédents conservés. Capture mobile
+EN/sombre révèle Appliquer non traduit dans le composant partagé : clé absente du
+catalogue. Ajout explicite Appliquer→Apply et assertion navigateur FR/EN. En-tête
+quota div→header pour reprendre le crochet d’identité des dialogues partagés, sans
+nouvelle feuille de style ni commande. Nouveau candidat à vérifier, dev30 non installé.
+
+### Capitalisation1469
+Réutiliser un composant suppose de vérifier ses deux montages et leur véritable
+état initial, pas seulement son nouveau bouton. Un Work valable pour quotas ne
+satisfait pas nécessairement les préconditions du statut hiérarchique : les gardes
+restent distinctes. Les déclarations de contrôle ne prouvent aucune exécution ni
+validation. La lecture visuelle a détecté une traduction manquante malgré269assertions ;
+ajout de garde, recette273et capture finale31 conservées. Diagnostics/contrats
+organisationnels incomplets restent une suite produit explicite, pas un succès vide.

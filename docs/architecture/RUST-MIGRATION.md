@@ -1,5 +1,7 @@
 # Remplacement du moteur Go par Rust
 
+Lanceur local actuel : [construction/version/service exclusivement Rust](NATIVE-LOCAL-LAUNCHER.md), installé en développement ; cela ne clôt pas les parcours et critères globaux de migration.
+
 [English](../en/RUST-MIGRATION.md). Décision utilisateur du 17 octobre 2026 :
 remplacement complet avec **une seule bascule finale**, sans moteur hybride déployé.
 Le [plan et les preuves](../plans/migration-rust/PLAN.md) conservent périmètre,
@@ -8920,3 +8922,154 @@ le coordinateur ; restauration de l'original et nouveau serveur récupèrent les
 sans conducteur restent historiques. Revue Root aux octets7entrées modifiées ;
 revue indépendante du candidat, managed/multi-tâches et acceptation globale
 restent ouverts. Aucune installation ni vérification UI/browser déduite.
+
+
+### Statut du premier worker managed manuel
+
+`mission status` sait observer la première tentative manuelle managed queued/active ou bloquée après fin/annulation. Le lecteur vérifie avant/après la requête originale, le manifeste privé et la ligne `managed_attempts` ; il ne modifie ni budget ni tâche et ne requiert pas la copie mutable. L’identité du processus vient des observations natives existantes, jamais du seul état SQL. Un processus terminé conserve « résultat non démontré » : aucun rapport de la racine n’est attribué à sa copie et aucun résultat Git n’est accepté. Le parcours automatique complémentaire est décrit ci-dessous ; tentatives multiples/retry et soumission/revue/intégration managed restent refusés. Un manifeste absent/altéré ou une attribution SQL divergente refuse la lecture avec sa cause ; restaurer la preuve originale, jamais fabriquer une nouvelle attribution. Recette permanente : `managed-manual-worker`, témoin antérieur et reprise conservés au lot1443.
+
+
+### Conducteur managed : première tentative automatique
+
+Le conducteur natif peut inscrire une tâche managed initiale en FIFO avec un chemin futur validé, puis préparer sa copie privée sous son bail moteur. La synchronisation vérifie le candidat conservé et les gardes fournisseur/modèle, sans copie ni sondage d’écriture d’un chemin inexistant ; elle ne garantit pas la disponibilité de l’hôte et ne donne aucune permission. L’admission crée la copie, sonde l’hôte et réserve les ressources après vérification des contrôles, profils, budget, créneaux, bail et FIFO. Binding4 et le reçu d’action sont conservés avec l’intention originale. À Record le reçu n’existe pas encore : seule la forme moteur est vérifiée ; après son staging et avant commit, la chaîne originale complète est vérifiée. Claim/grant conservent leurs vérifications d’instance et d’autorité actuelles. Fin/annulation/statut relisent l’original et la ligne managed sans exiger une copie mutable. Aucune publication Git, revue ou acceptation managed ne découle de la fin d’un processus ; la tâche reste bloquée et le résultat non démontré. Les retries managed et la reprise des anciens baux restent refusés. Recette permanente : `managed-auto-worker`, serveur HTTP réel avec deux copies, pause/reprise et fin hors conducteur.
+
+
+```mermaid
+flowchart LR
+  A[Consentement et bail natif] --> B[Garde tâche / budget / modèle]
+  B --> C[FIFO : chemin futur validé]
+  C --> D[Copie privée attribuée sous fence]
+  D --> E[Hôte / reçu / Binding4 / réservation]
+  E --> F[Grant privé et worker]
+  F --> G[Fin : règlement et libération FIFO]
+  G --> H[Statut : résultat non démontré]
+  H -. Non raccordé .-> I[Publication Git / revue / acceptation]
+```
+
+Le contrôle interne de ressources du dispatch managed est distinct de la prévisualisation utilisateur complète (toujours refusée). Sous réservation des réglages et transaction annulée, il revalide bail, révision, profils, candidat, chevauchements et budget, sans fabriquer d’Agent. Une intention FIFO peut rester en attente sans créer sa copie ; seule l’admission réelle la prépare et vérifie l’hôte.
+
+Après vérification du producteur terminé, du reçu et de l’attribution originale managed, le relais retourne `managed-result-publication-required` tant que la publication Git immuable n’est pas raccordée. Un rapport présent dans la copie ne passe jamais à la soumission ordinaire ; le conducteur reste disponible et aucune acceptation n’est déduite. Une preuve altérée ou une erreur SQL/cleanup continue de refuser avec sa cause. La recette exerce cette continuation avec de vrais fichiers de rapport dans les deux copies.
+
+## Cockpit natif — parcours UX du24octobre2026
+
+L’accueil Rust distingue **Mes missions** et **Administration**. La console
+**Agents en direct** reste une destination séparée. La liste est lue par
+`GET /api/v1/works` ; rechercher filtre localement nom, objectif et identifiant.
+L’utilisateur choisit une mission : son identifiant reste dans le paramètre
+`work`, sans sauvegarde des données mission dans le stockage du navigateur.
+`view=admin` ouvre directement les réglages ; langue et thème accompagnent le
+lien Live. Les données utilisateur ne sont ni traduites ni interprétées en HTML.
+
+Le détail lit les contrôles puis le statut par les opérations existantes
+`GET /api/v1/mission?work=…` et `action=status`. Objectif, tâches, explications,
+agent/tentative et modèles demandés/observés sont montrés lorsqu’ils sont fournis.
+Un refus du statut reste visible : les tâches enregistrées peuvent être affichées
+mais ne prouvent pas leur exécution ni leur validation. Une donnée absente reste
+indisponible ; aucun compteur nul ou état terminé n’est inventé. Les contrôles
+ne prouvent pas que le conducteur tourne. Les lectures séparées ne sont pas un
+instantané atomique ; l’heure affichée est celle de réception dans le navigateur.
+
+Actualisation manuelle, aucune boucle de polling ni commande mission. Une réponse
+ancienne ne remplace pas la mission sélectionnée ensuite. La recherche sans
+résultat, la liste vide, le chargement, le refus et la reprise manuelle ont des
+messages distincts. Les tâches sont dépliables ; les erreurs restent visibles.
+L’administration réutilise ses dialogues, groupes et validations existants.
+Cette tranche n’ajoute ni création/démarrage de mission, ni graphe, ni intégration
+Git. L’implémentation précède la recette finale, conformément à la décision
+utilisateur ; ne pas déduire son acceptation de la seule présence des fichiers.
+
+## Raccord du cockpit existant —1462
+L’accueil `/` réutilise désormais le HTML canonique `web/index.html`, ses feuilles
+de style et les scripts partagés i18n/swarm-shell. Le rendu serveur sélectionne
+explicitement les adaptateurs `cockpit-native-read.js` et `cockpit-native.js` :
+les scripts historiques exigent un snapshot Go complet qui n’est pas simulé.
+Le DOM et les5groupes de navigation restent ceux de l’UX existante, sans nouvelle
+page de remplacement. La lecture utilise works puis mission show/status réels,
+avec erreurs visibles et métriques inconnues sans producteur. Les tâches stockées
+ne prouvent ni exécution actuelle ni acceptation. Les lectures sont séparées,
+pas un instantané atomique ; la révision est celle de chaque producteur.
+
+Ce premier raccord est en lecture, à actualisation manuelle. Il n’enregistre pas
+de visite et n’exécute pas de commande. Les raccords1466–1467 ci-dessous ajoutent
+les lectures budgets, agents et dépendances. Préparation, dialogues IA, décisions,
+écritures hors budget et graphique avancé restent à raccorder ; leurs sections conservent leur
+navigation avec indisponibilité explicite et commandes désactivées. Le transport
+du profil de lecture utilise GET même origine sans ajouter de délai navigateur,
+de retry ou de polling ; politiques transport/ressources du serveur inchangées.
+Ce profil n’établit pas la compatibilité du snapshot ni des politiques client Go.
+L’outil Admin transitoire reste à `/native-runtime.html?view=admin`, hors accueil
+produit. Les interfaces Live de Claude sont conservées sans modification.
+
+### Raccord1466 — budgets et tentatives du cockpit existant
+Le cockpit utilise `GET /api/v1/cockpit-read?work=ID`, protégé par les mêmes
+session/Host et liaison Root que les autres lectures. Une mission explicite
+existante est requise ; clés dupliquées/inconnues et identifiants invalides refusés.
+La projection étroite des tentatives exclut prompts, commandes, environnement,
+copies et contextes. Identifiants, liens parent/précédent et états enregistrés
+ne prouvent ni authenticité ni activité actuelle ni validation d’une tâche.
+Les montants sont en USD : plafond (zéro = illimité), réserve, estimations engagées
+et coûts déclarés non authentifiés. Le nombre de coûts manquants indique un total
+partiel. Une politique absente reste `null` : budget illimité et montants inconnus,
+sans faux zéro. Une erreur de lecture refuse l’observation ; le navigateur efface
+les données précédentes, affiche la cause sûre et permet l’actualisation manuelle.
+Ces lectures ne forment pas un snapshot transactionnel entre tous producteurs.
+Ce raccord de lecture n’ajoute aucune écriture, visite ou exécution fournisseur.
+Le réglage du budget est raccordé au1468 ci-dessous ; catalogue,
+graphique avancé et autres commandes restent à raccorder ; l’Admin natif reste disponible.
+La projection des dépendances est décrite au raccord1467 ci-dessous.
+
+### Graphe1467 — projection enregistrée
+`cockpit-native-graph.js` réutilise les helpers SVG de `graph.js`, dagre local et
+les classes graphiques canoniques ; les autres fonctions legacy ne sont pas appelées.
+La projection vient du Work réel : prérequis → tâche, titre/ID/état enregistrés.
+Les cycles et ID dupliqués refusent le rendu ; les dépendances absentes du Work
+sont signalées, jamais inventées. Titres complets accessibles, libellés SVG abrégés
+pour la lisibilité. Valeurs géométriques = présentation, aucune politique moteur.
+Défilement local au clavier ; aucune action, validation ou activité vivante déduite.
+Cette tranche ne raccorde pas encore filtres, inspecteur, édition, lancement ou
+organisation des responsabilités. Erreur visible puis reprise à l’actualisation.
+
+Le placement canonique namespace désormais chaque identifiant littéral via
+`graphNodeKey` avant dagre : les noms légaux tels que `__proto__` ne disparaissent
+plus dans ses index objet. Le regroupement des agents utilise un index sans
+prototype. Identifiants persistés, DOM et commandes restent inchangés ; cache
+invalide automatiquement par sa signature géométrique. Recette permanente
+`graph_identifiers_test.cjs` sur la bibliothèque réelle, plus variante navigateur.
+
+### Raccord1468 — réglage réel des budgets de mission
+Le bouton de l’écran Budget ouvre la fenêtre canonique `modal`, sans charger le
+snapshot Go. Les champs reprennent la politique enregistrée (plafond/réserve USD,
+source et date de référence) ; si elle est absente ils restent vides, sans adopter
+de montant implicite. Zéro de plafond signifie illimité, selon le contrat moteur.
+Les routes protégées `/api/v1/work-budget`, `/preview`, `/apply` utilisent un Work
+explicite, les mêmes session/Host/CSRF, la liaison Root et la capacité Root configurée.
+GET/HEAD observe ; POST preview vérifie montants/date/révision sans écrire, sans
+réservation ni autorisation de départ. Les lectures ne sont pas un snapshot atomique.
+POST apply réutilise `budget.configure` (validation finale, CAS, événement/rejeu,
+acteur/date moteur). Changer un champ invalide la proposition. L’enregistrement
+requiert une seconde action et une relecture concordante avant succès affiché.
+Un refus de prévisualisation laisse les valeurs ; une réponse apply perdue ou une
+relecture impossible garde un état explicitement incertain, sans répétition automatique.
+Le formulaire exige une fermeture/réouverture et une nouvelle lecture avant édition.
+Une publication connue reste portée par `recorded_work` dans les erreurs HTTP et UI.
+Les réservations/consommations/historiques et agents actifs sont préservés ; aucun
+fournisseur ni lancement ni reprise de mission. Ce raccord ne porte pas le catalogue
+ni les autres commandes du cockpit. Aucune politique financière réelle n’est modifiée
+par la recette, qui écrit seulement dans ses propres Roots isolés.
+
+Au pont budget, les variantes typées d’entrée monétaire/date refusées sont HTTP400,
+la révision de prévisualisation périmée HTTP409. Corruption de politique lue,
+stockage, nettoyage et horloge gardent leurs causes serveur ; pas de reclassification
+globale par texte d’erreur. Un rafraîchissement capturé doit rendre son résultat
+observable au consumer de sauvegarde pour ne pas masquer un effet connu/non relu.
+
+### Raccord1469 — plafonds du cockpit
+`native-quotas.js` reste le composant partagé : option opener pour le bouton
+canonique et getter selectedWork évalué seulement au clic. L’Admin sans options
+conserve son bouton et son choix explicite. `cockpit-native-quotas.js` fournit
+les routes protégées existantes, sérialise les requêtes/CSRF et valide les vrais DTO
+QuotaView/QuotaPreview avant affichage. Aucune limite par défaut, politique ni
+route moteur nouvelle. Les styles Admin locaux sont chargés pour ces dialogues.
+Prévisualisation sans écriture, apply CAS/rejeu et relecture restent ceux du moteur.
+Aucune mission réelle n’est activée/modifiée par la recette ; configuration inerte
+et planification d’un troisième Work de fixture par les opérations publiques.

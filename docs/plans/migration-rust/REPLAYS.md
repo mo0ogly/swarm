@@ -1778,3 +1778,71 @@ start HTTP seul, worker inerte réel, CLI/second serveur concurrents, six writer
 refus/reprise, drain avec worker survivant et changement de datastore/refus puis
 restauration et nouveau serveur. Aucun watchdog global. Les mesures1156/1170
 restent historiques ; leurs assertions no-conductor ne sont pas reconduites.
+
+##1230 — reprise du journal natif sous bail
+`mission-worker-completion-recovery.json` utilise les variables
+SWARM_STATUS_CONTRACT_BINARY et SWARM_STATUS_CONTRACT_PROFILE (profil normal
+qualifié correspondant). Témoin réel avant refus SQL fixture ; journal absent
+attendu, quatre mutants refusés, original restauré finalisé par mission watch
+sous génération nouvelle, réservation estimée/FIFO libéré, un seul agent/provider.
+Reopen HTTP show et status-native CLI lisibles ; status HTTP historique reste
+explicitement refusé500 pour blocked/completed sans revue courante. Cette limite
+reste ouverte : aucun succès de récupération ne prouve sa parité. Pas de watchdog,
+provider payant, seed SQL positif, installation ou acceptation implicite.
+Le mode --baseline-probe du script exige la reprise à la première synchronisation
+sur l'ancien binaire ; sa défaillance est un RED, jamais une recette PASS.
+
+1266 : la recette recovery exige désormais status CLI/HTTP lisible après reprise.
+Elle remplace l'assertion de refus historique1256 par dix lectures de résultat
+absent/frais/ambigu/ancien/vide/restauré, marge persistée0→2 et refus hors Root.
+Chaque lecture compare Agent/Work/réservation/FIFO/financement/provider avant/après.
+Le binaire7292e5 reste le témoin RED1262 ; ne pas rejouer ce manifeste courant en
+attendant PASS sur cet ancien profil. Sources/profil actuels requis ; aucun watchdog.
+
+### Cockpit natif / Native cockpit UX
+`tools/verification/recipes/native-cockpit-ux.json` : variable
+`SWARM_STATUS_CONTRACT_BINARY` = binaire Rust normal identifié. Une recette en fin
+de tranche, Root isolé, lectures HTTP réelles ; réponses client invalides/retardées
+explicitement simulées. Aucun fournisseur, écriture de mission par le navigateur
+ou watchdog global.70assertions pour le candidat dev18 ; le nombre courant est
+produit par le runner, pas un critère à reconduire après évolution.
+Final UX-slice recipe on an isolated Root; real HTTP reads and separately marked
+client-response fixtures, no provider, browser mission writes or global watchdog.
+No global migration, independent acceptance or actual network-fault claim.
+
+### Raccord de l’UX existante / Existing UX connection
+`recipes/existing-cockpit-rust.json` : binaire normal identifié via
+`SWARM_STATUS_CONTRACT_BINARY`, Root privé, vrais Work/tâche créés par CLI,
+lecture navigateur du HTML/CSS canonique sous Rust. Refus client malformé
+identifié ; aucune écriture de visite/mission ni fournisseur. Les parcours
+non raccordés ne sont pas déclarés compatibles par cette recette de lecture.
+Normal Rust binary, isolated Root, canonical existing UI and actual native reads.
+No full Go snapshot/graph/actions parity or global acceptance implied.
+
+- 24octobre2026, raccord1466 budgets/agents : recette `existing-cockpit-rust` étendue,
+ 164 assertions navigateur et9contrôles HTTP (budget CLI réel, null, refus, reprise),
+ profil natif dev22. Agent non vide et malformed DTO : fixtures client explicites.
+ Sources et résultats retenus sous `evidence/20261024-cockpit1466`; pas d’acceptation globale.
+
+- 24octobre2026, raccord1467, installé dev26 : même recette permanente avec3étapes,
+ 185assertions navigateur (dont défilement clavier),13assertions noms/indices sur
+ dagre réel et régression cache canonique ;9contrôles HTTP. Intégrité VERIFIED.
+ Projection graphique en lecture, pas parité du pilotage interactif ni acceptation
+ globale. Reproduction prototype/candidats intermédiaires conservés,38assets servis
+ comparés aux sources réelles ; evidence/20261024-cockpit1467.
+
+- 24octobre2026, budget1468 : même recette complète,229assertions navigateur,
+ 13contrôles budget HTTP (preview sans effet, CAS/replay, invalides/stale/CSRF et reprise),
+ 9lectures protégées,13identifiants et cachegraph. UI écrit uniquement ses fixtures.
+ Échec initial HTTP500 sur date invalide conservé ; correction typée et reprise.
+ Réponse client perdue après vrai apply, relecture UI malformed après apply et refus
+ client simulé restent explicitement localisés. Preuves evidence/20261024-budget1468.
+
+- 24octobre2026, raccord1469 installé dev31 : recette existante273assertions navigateur,
+ lecture/preview/apply/relecture de quotas sur troisième Work isolé, montage par
+ bouton existant et montage Admin par défaut, malformed client/reprise, FR/EN,
+ thèmes, clavier/aide/focus et390/1440pour nouveaux dialogues ; cockpit5largeurs.
+13contrôles budget HTTP,9lecture,13identifiants/cache conservés. Premier500de statut
+provenait d’une organisation de fixture sans contrôle ; second refus de programme
+traité avec programme déjà autorisé, sans lever de limite. Originaux, capture initiale269,
+traduction Apply et candidat final : evidence/20261024-quotas1469. Aucun fournisseur.

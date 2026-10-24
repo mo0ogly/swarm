@@ -51,7 +51,7 @@ existing authorizations.
 
 ## Versioned model pricing
 
-Choose **Model pricing** in **AI budgets and costs**. Add a provider, model,
+Choose **Model pricing** in **Admin** or **AI budgets and costs**. Add a provider, model,
 three-letter currency, source, reference date and prices per million tokens.
 The catalogue is project-wide. Blank means unknown; explicit zero means free.
 No prices are prefilled or fetched automatically.
@@ -89,7 +89,13 @@ This catalogue does not automatically price historical provider events or alter
 per-launch reservations. Verify the rates you enter. Subscriptions, tiers, cache
 retention durations and discounts require appropriately selected rates; they are
 not inferred. Prior versions cannot be deleted through this interface; further
-writes are refused after 1,000 versions.
+writes have no version-count policy. No business price or volume ceiling is
+imposed. Amounts must be finite and unrepresentable calculations are refused.
+CLI/API counts use nonnegative signed 64-bit integers; the browser requires exact
+JavaScript integers. Existing format guards remain: 2 MiB catalogue files and
+12,000-byte HTTP requests, refused without truncating or deleting history. These
+are technical guards, not budgets or retention policy; paginated storage remains
+outstanding before the catalogue reaches its format guard.
 
 ## Engine settings
 
@@ -167,3 +173,119 @@ The **Browser request waiting time** Admin dialog configures general API calls,
 snapshots and connection tests. `0` disables interface expiry; agent budgets and
 server execution deadlines remain separate. Preview, save, history and CLI use
 the shared Go contract. See [units, effects and limits](WEB-REQUEST-POLICY.md).
+
+## Assisted discovery and distinct evidence
+
+The [pricing-discovery skill](../../.claude/skills/pricing-discovery/SKILL.md)
+prepares a proposal from opened official pages, recording retrieval date, units,
+currency and applicability (platform, tier, cache, region). It bundles no prices
+and schedules no refresh. Authorized application appends through Admin/API/CLI
+and checks read-back; research alone does not mutate the catalogue. Sources and
+conditions remain text in the current schema, without automatic authenticity or
+applicability validation.
+
+```mermaid
+flowchart LR
+    S[Opened official sources] --> P[Dated proposal and conditions]
+    P --> V[Authorized application in Admin]
+    V --> C[Versioned project catalogue]
+    C --> Q[Simulation with explicit volumes]
+    Q -. currently no automatic coupling .-> R[Estimated mission reservation]
+    U[Provider-reported usage] --> T[All retained agent attempts]
+    T --> B[Budget read]
+    E[Read failure] --> F[Refusal with preserved cause]
+```
+
+The flat per-launch reserve is not automatically recalculated from a price.
+An estimate is not an invoice; other currencies are not implicitly converted to
+USD. Reported agent costs include all retained attempts, independently of recent
+UI pagination. Read failures refuse the budget view as
+`reported_cost_unavailable`, preserving an internal cause excluded from public
+JSON rather than pretending the cost is absent.
+
+The HTTP/Admin journey belongs to the Go engine. Native Rust catalogue and quote
+commands now provide `pricing list|save|estimate` on an initialized private native
+root; native HTTP/Admin and Go-root cutover remain outstanding. Compatible pricing
+JSON does not authorize live root sharing between engines. The skill establishes
+neither installed delivery nor authenticated actors. Financial reservations remain
+separate.
+
+```sh
+swarm-rust pricing list --root NATIVE_ROOT --json
+swarm-rust pricing save --root NATIVE_ROOT --input price.json --json
+swarm-rust pricing estimate --root NATIVE_ROOT --input volumes.json --json
+```
+
+Requests use the same fields as the Go examples above. List returns the exact file
+digest; supply it in `expected_digest` when appending. The engine replaces submitted
+version/actor/time. CLI resources close before checked output/flush. Failure after
+publication remains nonzero: re-read before recovery. Pre-rename storage failures
+preserve the original; post-rename durability failures report
+`local-publication-uncertain`, never rollback. Fault injection is absent from the
+production profile. Source/applicability remain unauthenticated text.
+
+Rust preserves the actual Go producer's initialized values: `{}` or `null` are
+empty schema1 catalogues; `rates:null` preserves JSON null. These are decode rules,
+not default prices. An empty file, invalid document or invalid retained price
+refuses reads. Floating simulations follow Go and do not guarantee invoice-grade
+decimal precision. See [migration evidence and limits](RUST-MIGRATION.md).
+
+Finite quotes preserve the legacy Go floating evaluation order. Only an overflowing
+intermediate product is rescaled; a nonfinite total refuses. A retained actual
+legacy-Go witness pins this behavior rather than comparing only two changed ports.
+
+Evidence71:445Rust tests,46default CLI tests,18targeted Go tests and101comparisons
+on8476stable inputs. Catalogue/CLI verified; native HTTP/Admin remain unported.
+Same-session Codex review; no server replacement.
+
+## Editing in the local Rust cockpit
+“Set budget” uses the existing dialog: USD amounts, source/date, a financial preview
+without writes, then a second confirmation. Saving uses the current revision and
+engine journal without changing reservations, consumption or active agents. A zero
+cap means unlimited; missing policy leaves blank fields and adopts no amounts.
+Known refusal, lost response and known save with failed read-back are distinguished.
+These cases require a fresh read; no save is automatically retried. Price catalogue
+and other commands remain separate connections. See the
+[Rust route contract](RUST-MIGRATION.md#connection1468--actual-mission-budget-editing).
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant I as Existing dialog
+    participant H as Protected budget API
+    participant E as Engine and bound Root
+    U->>I: Open settings
+    I->>H: GET policy and revision
+    H->>E: Read without mutation
+    E-->>I: Nullable policy and revision
+    U->>I: Preview
+    I->>H: POST preview
+    H-->>I: Financial validation without writes
+    U->>I: Confirm
+    I->>H: POST apply, revision and event
+    H->>E: budget.configure, CAS and journal
+    E-->>I: Recorded Work
+    I->>H: GET read-back
+    H-->>I: Current state
+    Note over I: Lost response or failed read-back: diagnostic and fresh read, no automatic replay
+```
+
+## Quotas in the Rust cockpit
+The existing button opens the same grouped component and help as native Admin.
+The selected mission is preselected only when actually listed with planning;
+otherwise selection is explicit. The dialog never enables planning. Saved limits
+and consumption come from `/api/v1/quotas`; preview/apply reuse existing engine guards.
+Edits invalidate confirmation; reason, revision, usage and ancestor limits remain
+engine-controlled. No automatic launch. Malformed views refuse before fields become
+editable. Errors stay visible, without automatic retry; reselecting rereads the Work.
+
+```mermaid
+flowchart LR
+    A[Existing quota button] --> B[Actual Work list]
+    B --> C{Work has planning}
+    C -->|No| D[Explicit selection, no activation]
+    C -->|Yes| E[Read limits and consumption]
+    E --> F[Preview without writes]
+    F --> G[Confirm, engine guards and revision]
+    G --> H[Read back saved values]
+```
