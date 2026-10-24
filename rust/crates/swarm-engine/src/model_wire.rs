@@ -61,6 +61,18 @@ fn float_text(value: f64) -> Option<String> {
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(transparent)]
 pub struct GoRaw(pub Box<RawValue>);
+/// Encode an engine-produced opaque observation in its persisted wire spelling.
+/// Go-compatible HTML/separator escaping and whitespace compaction must happen
+/// before an exact Agent/receipt readback comparison. This preserves duplicate
+/// keys, number lexemes and the existing strict GoRaw equality; it validates no
+/// identity, freshness or authority. Encoding/decoding failures preserve WorkError
+/// causes. No IO or mutation occurs; callers still owe their persistence guards.
+pub(crate) fn persisted_raw(value: &impl Serialize) -> Result<GoRaw, crate::WorkError> {
+    let bytes = crate::encode_model(value)?;
+    swarm_wire_json::decode::<Box<RawValue>>(&compact(&bytes))
+        .map(GoRaw)
+        .map_err(crate::WorkError::Json)
+}
 impl PartialEq for GoRaw {
     fn eq(&self, other: &Self) -> bool {
         self.0.get() == other.0.get()
@@ -549,4 +561,31 @@ pub(crate) fn project_mode_from(
 /// Ordinary Go model decoding ignores unknown fields, preserving its historical contract.
 pub(crate) fn project(raw: &[u8], shape: Fields) -> Result<Vec<u8>, Error> {
     project_mode(raw, shape, false)
+}
+
+#[cfg(test)]
+mod persisted_observation_tests {
+    use super::*;
+    /// Persisted opaque observations retain duplicate keys/number lexemes and
+    /// exact readback even when Go wire escaping changes literal source strings.
+    /// This is pure codec evidence, not a process, permission or DB proof.
+    #[test]
+    fn persisted_observation_escaping_and_lexemes() {
+        for text in ["plain", "<b>&</b>\u{2028}\u{2029}"] {
+            let value = serde_json::json!({"capture":text});
+            let raw = persisted_raw(&value).unwrap();
+            let agent = crate::Agent { native_execution_result:Some(raw), ..Default::default() };
+            let bytes = crate::encode_model(&agent).unwrap();
+            let decoded = crate::decode_agent(&bytes).unwrap();
+            assert!(agent == decoded);
+        }
+        let original = RawValue::from_string(r#"{ "n":9007199254740993,"n":1.00,"text":"<>&" }"#.into()).unwrap();
+        let frozen = persisted_raw(&original).unwrap();
+        assert_eq!(frozen.0.get(),r#"{"n":9007199254740993,"n":1.00,"text":"\u003c\u003e\u0026"}"#);
+        assert!(persisted_raw(&frozen).unwrap() == frozen);
+        // Strict equality itself remains lexical; no semantic/numeric fallback.
+        let integer = GoRaw(RawValue::from_string("1".into()).unwrap());
+        let decimal = GoRaw(RawValue::from_string("1.0".into()).unwrap());
+        assert!(integer != decimal);
+    }
 }

@@ -351,6 +351,9 @@ impl OwnedProcessControl for Control<'_> {
 /// ownership stays active for explicit recovery. Provider exit never accepts the
 /// task. No paid fixture/model request is introduced by this API itself.
 /// The embedding executable MUST implement `_agent_gate` as Swarm CLI does.
+/// Engine-produced completion captures are frozen in their persisted wire
+/// spelling before journal/Agent comparisons; literal output is never a reason
+/// to relax ownership, exact readback or replay guards. Encoding causes survive.
 pub(crate) fn run(
     db: &mut Connection,
     root: &Path,
@@ -534,10 +537,10 @@ pub(crate) fn run(
             "public_messages_truncated":stream.public_truncated,"first_event_error":stream.first_event_error.as_ref().map(|e|e.code()),
             "event_source":"provider_declared_unverified","provider_facts":&provider_facts,"stop_kind":control.stop_kind,"observation":stream.observation().map_err(RootStoreError::Guard)?
         });
-        let raw = crate::GoRaw(
-            serde_json::value::to_raw_value(&facts)
-                .map_err(|e| root_error("agent-execution-result-encoding", e))?,
-        );
+        // Freeze the same escaped wire bytes that exact persistence/replay will
+        // read, including literal provider capture text. Never relax readback.
+        let raw = crate::model_wire::persisted_raw(&facts)
+            .map_err(|e| root_error("agent-execution-result-encoding", e))?;
         let reply = stream.public_messages.join("\n");
         let completion_facts =
             crate::agent_completion_journal::CompletionFacts::observe(&provider_facts)

@@ -8598,3 +8598,9 @@ Connection1471: existing Version dialog uses a validated native-version hook. Co
 Connection1472: existing Resume page uses inspect_work_view through strict Work/lang GET. Calculated summary, no file/visit/OODA publication, generation rejects late responses; no new Git/control policy. Dev39:404browser assertions including38resume and16dedicated HTTP checks PASS;21actual resume assertions +14Version,45assets/normal profile compared. Full batch projection and historical agent status without bindings remain open.
 
 1472: unported managed batch projection stays a typed501; explicit separate recorded-data read cannot grant recalculated validation. Full batch projection remains open.
+
+Lesson1473: freeze engine-produced opaque observations in their actual persisted
+wire spelling before lexical receipt comparison. Escape/compact at the producer;
+do not replace readback with semantic JSON equality that loses duplicate keys or
+numeric lexemes. Retained HTML capture counterexample, codec test and public CLI
+journey cover this fix; older incomplete receipts are not automatically repaired.

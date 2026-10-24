@@ -240,3 +240,10 @@ fallback ni retry automatique n’est déclenché.
 Le bloc de résumé défilant est nommé pour les lecteurs d’écran et reçoit le focus clavier explicitement ; cette propriété ne dépend pas de l’auto-focus des conteneurs du navigateur.
 
 Limite connue de migration : le statut de missions historiques peut encore refuser avec `mission-root-unavailable` enveloppant `agent-mission-provenance` / `mission-agent-binding-required`. Cette enveloppe ne prouve ni panne du stockage ni absence du rôle Root. Le résumé ne répare pas ce binding et n’autorise aucun départ ; adoption de provenance native/legacy à qualifier séparément.
+
+Les observations opaques produites par le moteur (capture finale et faits
+fournisseur) sont encodées dans leur représentation persistée avant comparaison
+stricte et journalisation. Les caractères HTML et séparateurs Unicode sont
+échappés selon le contrat Go JSON, sans perte des clés dupliquées ni des lexèmes
+numériques. Cela corrige un refus de sauvegarde après exécution ; cela ne répare
+pas automatiquement un ancien reçu incomplet et ne desserre aucun garde.

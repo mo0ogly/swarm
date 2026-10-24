@@ -412,16 +412,18 @@ fn replace(
 }
 /// Apply only an engine-owned observation projection, preserving codec causes.
 /// Missing/invalid/incomplete channels clear canonical fields; diagnostic history
-/// stays explicit in opaque metadata. This never prices, authenticates or grants.
+/// stays explicit in opaque metadata. Opaque facts use their persisted wire spelling
+/// before exact readback, including escaped provider strings. Encoding errors
+/// preserve causes. This never prices, authenticates or grants.
 fn provider_facts(
     agent: &mut Agent,
     facts: &crate::agent_provider_facts::ProviderFactsSnapshot,
 ) -> Result<(), AgentLaunchError> {
-    let raw = serde_json::value::to_raw_value(facts)
+    let raw = crate::model_wire::persisted_raw(facts)
         .map_err(|e| AgentLaunchError::caused("agent-provider-facts-encoding", e))?;
     agent.usage = facts.usage.clone().map(Box::new);
     agent.reported_model = facts.reported_model.clone().map(Box::new);
-    agent.native_provider_facts = Some(crate::GoRaw(raw));
+    agent.native_provider_facts = Some(raw);
     Ok(())
 }
 /// Persist cumulative progress, declared metadata and the real supervisor heartbeat. Provider

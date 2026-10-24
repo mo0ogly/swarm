@@ -21,17 +21,16 @@ pub(crate) struct CompletionFacts {
 }
 impl CompletionFacts {
     /// Freeze actual stream facts before final persistence. Encoding failures
-    /// retain their cause; this does not deserialize public Agent assertions.
+    /// retain their cause; opaque data uses its persisted wire spelling before exact
+    /// Agent/journal replay comparison. This does not deserialize public Agent assertions.
     pub(crate) fn observe(
         facts: &crate::agent_provider_facts::ProviderFactsSnapshot,
     ) -> Result<Self, AgentLaunchError> {
         Ok(Self {
             usage: facts.usage.clone().map(Box::new),
             reported_model: facts.reported_model.clone().map(Box::new),
-            raw: GoRaw(
-                serde_json::value::to_raw_value(facts)
-                    .map_err(|e| AgentLaunchError::caused("agent-provider-facts-encoding", e))?,
-            ),
+            raw: crate::model_wire::persisted_raw(facts)
+                .map_err(|e| AgentLaunchError::caused("agent-provider-facts-encoding", e))?,
         })
     }
     /// Restore the frozen provider projection, including absent canonical facts.

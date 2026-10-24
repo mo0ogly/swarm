@@ -9081,3 +9081,10 @@ Raccord1471 : dialogue Version existant connecté au hook native-version validé
 Raccord1472 : page Reprendre existante raccordée à inspect_work_view via GET strict Work/lang. Résumé calculé, aucune publication de fichier/visite/OODA, génération anti-réponse tardive ; pas de nouvelle politique Git/contrôle. Dev39 :404assertions navigateur dont38reprise et16HTTP dédiées PASS ;21assertions reprise réelle +14Version,45assets/profil normal comparés. Projection batch complète et statut des agents historiques sans binding restent ouverts.
 
 1472 : projection managée en lots non portée conservée en refus typé501 ; lecture séparée des données enregistrées sur geste explicite, sans validation recalculée. Port de projection complète en lots ouvert.
+
+Apprentissage1473 : les observations opaques produites en mémoire doivent avoir
+la représentation qui sera effectivement persistée avant toute comparaison
+lexicale de reçu. Échapper/compacter à l’entrée producteur ; ne pas remplacer
+une garde de readback par une égalité JSON sémantique qui perdrait clés dupliquées
+ou lexèmes numériques. Contre-exemple capture HTML, test codec et parcours CLI
+retenus au lot1473 ; anciens reçus incomplets ne sont pas automatiquement réparés.

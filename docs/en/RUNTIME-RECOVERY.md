@@ -223,3 +223,9 @@ fallback or retry occurs.
 The scrollable summary is explicitly keyboard-focusable and labeled for screen readers; it does not rely on browser automatic scroll-container focus.
 
 Known migration limit: historical mission status may still refuse with `mission-root-unavailable` wrapping `agent-mission-provenance` / `mission-agent-binding-required`. This wrapper does not establish missing Root storage or a missing Root role. The new summary does not repair that binding or authorize execution; native/legacy provenance adoption remains a separate verified contract.
+
+Engine-produced opaque observations (final capture and provider facts) use their
+persisted wire spelling before strict comparison and journaling. HTML characters
+and Unicode separators follow Go JSON escaping while duplicate keys and numeric
+lexemes remain intact. This fixes a post-execution persistence refusal; it does
+not automatically repair older incomplete receipts or loosen any guard.
