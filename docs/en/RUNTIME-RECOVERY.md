@@ -224,8 +224,56 @@ The scrollable summary is explicitly keyboard-focusable and labeled for screen r
 
 Known migration limit: historical mission status may still refuse with `mission-root-unavailable` wrapping `agent-mission-provenance` / `mission-agent-binding-required`. This wrapper does not establish missing Root storage or a missing Root role. The new summary does not repair that binding or authorize execution; native/legacy provenance adoption remains a separate verified contract.
 
+## Historical agent logs — Rust cockpit
+
+The **Logs** page keeps its existing controls and plain-text reader. Select a
+mission, open the page, then explicitly choose an agent. Recorded state and
+messages establish neither authenticated identity, current liveness nor execution
+rights. This read does not depend on legacy missions’ calculated status.
+
+`GET /api/v1/agent-logs?work=ID&agent=ID&after=0` (also HEAD) requires all three
+parameters exactly once, safe identifiers and a canonical signed i64 cursor.
+Bodies, unknown/duplicate keys, ambiguous cursors and cross-Work agents refuse.
+Session, Host, capacity and physical Root binding remain enforced. Read-only
+Root access changes no visit, mission, business reservation, provenance, budget
+or provider command. Read/encoding/close errors never become empty success.
+
+The DTO contains `schema_version`, `work_id`, `agent_id`, `after`, `rows`. Rows
+match `agent logs ID CURSOR --json`: zero selects the latest200 ascending; negative
+selects the first200; positive continues strictly after that sequence. This
+existing transport pagination is neither retention nor execution policy.
+**From the beginning** then **Next page** traverse history; empty pages are stated
+explicitly. The browser refuses sequence numbers outside JavaScript’s exact
+integer representation; use the i64 CLI for those histories, without rounding.
+
+Exact text and kind filters apply only to the loaded page. NDJSON export contains
+only visible rows. Content remains literal text; no remote console or automatic
+following starts. Errors clear old text and disable export; explicit reselection
+or **From the beginning** retries a read. Mission changes reset the source and
+discard delayed responses. Supervision journals and live following remain open.
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant J as Existing Logs page
+  participant H as Protected Rust HTTP
+  participant R as Read-only RootStore
+  U->>J: Mission then explicit agent choice
+  J->>H: GET agent-logs (work, agent, after)
+  H->>R: Check Root binding and Work/agent association
+  R-->>H: historical_agent_logs (CLI contract)
+  H-->>J: DTO or typed failure
+  J-->>U: Literal text, local filters, visible export
+  Note over J,R: No launch, adoption, validation or automatic following
+```
+
 Engine-produced opaque observations (final capture and provider facts) use their
 persisted wire spelling before strict comparison and journaling. HTML characters
 and Unicode separators follow Go JSON escaping while duplicate keys and numeric
 lexemes remain intact. This fixes a post-execution persistence refusal; it does
 not automatically repair older incomplete receipts or loosen any guard.
+
+Returned pages contain historical agent lifecycle/command records; program
+output capture and transcripts are separate and are not exposed by this route.
+The Logs page does not request calculated mission status. Opening another view
+requests it normally and preserves refusals, including unported terminal branches.

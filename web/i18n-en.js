@@ -5435,5 +5435,16 @@ globalThis.SwarmEnglish = {
   "Résumé disponible en ouvrant cette page.": "Open this page to read the summary.",
   "Lire uniquement les données enregistrées": "Read recorded data only",
   "Données enregistrées uniquement — validation non recalculée.": "Recorded data only — validation has not been recalculated.",
-  "Résumé calculé indisponible pour ce contrat. La lecture des données enregistrées ne recalcule pas la validation.": "Calculated summary is unavailable for this contract. Reading recorded data does not recalculate validation."
+  "Résumé calculé indisponible pour ce contrat. La lecture des données enregistrées ne recalcule pas la validation.": "Calculated summary is unavailable for this contract. Reading recorded data does not recalculate validation.",
+  "Journaux enregistrés de l’agent": "Recorded agent logs",
+  "Depuis le début": "From the beginning",
+  "Filtrer cette page": "Filter this page",
+  "Historique enregistré · filtres sur la page chargée · aucun suivi automatique.": "Recorded history · filters apply to the loaded page · no automatic following.",
+  "Lignes affichées": "Displayed rows",
+  "Lecture des journaux…": "Reading logs…",
+  "Page historique reçue.": "Historical page received.",
+  "Aucune ligne enregistrée pour cette page.": "No recorded rows for this page.",
+  "Choisissez un agent pour lire son historique.": "Choose an agent to read its history.",
+  "Choisissez un agent": "Choose an agent",
+  "Aucun agent enregistré pour cette mission.": "No recorded agent for this mission."
 };

@@ -11,6 +11,22 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## État livré1473 — Journaux historiques raccordés, dev42
+Parcours existant mission → Journaux → agent explicite → pages CLI Rust, filtres
+sur page et export NDJSON visible. Journaux ne demande pas status ; une autre
+vue le demande et garde ses refus. Capture/transcript et direct restent distincts.
+Correction réelle : observations opaques moteur normalisées avant sauvegarde,
+sans assouplir GoRaw, propriété, reçus, readback ou gardes de reprise.
+404assertions cockpit +60journaux et22HTTP PASS ; test codec1PASS après contre-
+exemples conservés. Profil normal sans fixture, binaire réel=candidatdev42,
+46assets/notesFR-EN comparés ; lecture réelle24 et dialogue Version14 PASS.
+Deux missions historiques suspendues et budgets inchangés. GLM3appels,2réponses
+utilisables,8605tokens déclarés ; avis pur limité au codec,1revue tronquée conservée.
+Propriétaire Codex ; 1472-BATCH,1472-STATUS et branche terminale de status ouverts.
+Aucune acceptation globale/indépendante du moteur, aucun commit/push automatique.
+Preuves : [résultat](evidence/20261024-logs1473/result.json),
+[replans détaillés](evidence/20261024-logs1473/INCIDENTS.md), revue d’octets associée.
+
 ## État livré1472 — Reprendre le travail raccordé, dev39
 Résumé calculé readonlyFR/EN (CLI identique) ; projection non portée reste501,
 lecture distincte de données enregistrées sur geste explicite, sans validation

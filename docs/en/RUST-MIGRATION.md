@@ -8599,8 +8599,14 @@ Connection1472: existing Resume page uses inspect_work_view through strict Work/
 
 1472: unported managed batch projection stays a typed501; explicit separate recorded-data read cannot grant recalculated validation. Full batch projection remains open.
 
+Slice1473 connects existing Logs to historical_agent_logs through protected
+Work/agent-bound Root reads. Existing CLI200 pagination is unchanged; no rights
+are inferred. See RUNTIME-RECOVERY for the contract and limits, plan for evidence.
+
 Lesson1473: freeze engine-produced opaque observations in their actual persisted
 wire spelling before lexical receipt comparison. Escape/compact at the producer;
 do not replace readback with semantic JSON equality that loses duplicate keys or
 numeric lexemes. Retained HTML capture counterexample, codec test and public CLI
 journey cover this fix; older incomplete receipts are not automatically repaired.
+Reading history does not require another capability’s calculated mission status;
+observe that status on its relevant view and keep any refusal visible.

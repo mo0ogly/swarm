@@ -241,9 +241,64 @@ Le bloc de résumé défilant est nommé pour les lecteurs d’écran et reçoit
 
 Limite connue de migration : le statut de missions historiques peut encore refuser avec `mission-root-unavailable` enveloppant `agent-mission-provenance` / `mission-agent-binding-required`. Cette enveloppe ne prouve ni panne du stockage ni absence du rôle Root. Le résumé ne répare pas ce binding et n’autorise aucun départ ; adoption de provenance native/legacy à qualifier séparément.
 
+## Journaux historiques d’agents — cockpit Rust
+
+La page **Journaux** conserve ses contrôles et son lecteur texte existants.
+Sélectionner une mission, ouvrir la page, puis choisir explicitement un agent.
+La liste provient des données enregistrées ; ni son état ni ses messages ne
+prouvent son identité authentifiée, sa présence actuelle ou un droit d’exécution.
+Cette lecture ne dépend pas du statut calculé des anciennes missions.
+
+`GET /api/v1/agent-logs?work=ID&agent=ID&after=0` (HEAD aussi) exige les trois
+paramètres exactement une fois, des identifiants sûrs et un entier i64 canonique.
+Corps, clés inconnues, doublons, curseurs ambigus et association agent/mission
+incorrecte sont refusés. Session, Host, capacité et liaison physique du Root
+restent contrôlés. Le Root est ouvert sans écriture ; aucune visite, mission,
+réservation métier, provenance, budget ou commande fournisseur n’est modifié.
+Les causes de lecture/encodage/fermeture restent des erreurs, jamais une liste vide.
+
+Le DTO porte `schema_version`, `work_id`, `agent_id`, `after`, `rows`. Les lignes
+sont exactement celles de `agent logs ID CURSOR --json` : zéro demande les
+200 dernières en ordre croissant ; un entier négatif les 200 premières ; un
+entier positif les suivantes strictement après ce numéro. Ce découpage hérité
+est une pagination de transport, pas une rétention ni une politique d’exécution.
+**Depuis le début** puis **Page suivante** parcourent l’historique. Une page vide
+est explicitement annoncée ; aucune extrapolation sur la présence d’un agent.
+Le navigateur refuse les numéros hors de la représentation entière exacte de
+JavaScript ; utiliser la CLI i64 pour ces historiques, sans arrondi silencieux.
+
+Les filtres texte exact et type exact portent uniquement sur la page chargée.
+L’export NDJSON contient uniquement ses lignes visibles. Le texte est rendu
+littéralement ; aucune coloration/console distante ni suivi automatique n’est
+activé. Une erreur efface les anciens messages et désactive l’export ; une
+sélection explicite ou **Depuis le début** permet une nouvelle lecture. Changer
+de mission efface la source et ignore les réponses retardées déjà en vol.
+Les autres journaux de supervision et le direct restent à raccorder.
+
+```mermaid
+sequenceDiagram
+  participant U as Utilisateur
+  participant J as Journaux existants
+  participant H as HTTP Rust protégé
+  participant R as RootStore en lecture
+  U->>J: Mission puis choix explicite d’un agent
+  J->>H: GET agent-logs (work, agent, after)
+  H->>R: Vérifier liaison Root et association Work/agent
+  R-->>H: historical_agent_logs (contrat CLI)
+  H-->>J: DTO ou erreur typée
+  J-->>U: Texte littéral, filtres locaux, export visible
+  Note over J,R: Aucun lancement, adoption, validation ou suivi automatique
+```
+
 Les observations opaques produites par le moteur (capture finale et faits
 fournisseur) sont encodées dans leur représentation persistée avant comparaison
 stricte et journalisation. Les caractères HTML et séparateurs Unicode sont
 échappés selon le contrat Go JSON, sans perte des clés dupliquées ni des lexèmes
 numériques. Cela corrige un refus de sauvegarde après exécution ; cela ne répare
 pas automatiquement un ancien reçu incomplet et ne desserre aucun garde.
+
+Les pages retournées sont les entrées historiques du cycle de vie/commandes
+de l’agent ; la capture des sorties du programme et le transcript sont distincts
+et ne sont pas exposés par cette route. La page Journaux ne demande pas le
+statut calculé de la mission. Ouvrir une autre vue le demande normalement et
+conserve ses refus, notamment les branches terminales encore non portées.

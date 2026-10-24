@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Journaux : lecteur existant raccordé aux pages historiques Rust des agents, choix explicite de la source, début/suite, filtres locaux et export des lignes visibles. Aucun suivi automatique ni droit d’exécution déduit. Correction de la sauvegarde des reçus d’exécution contenant des caractères HTML, avec comparaison stricte conservée.",
+        "en": "Logs: existing reader connected to Rust agent history pages, explicit source selection, first/next pages, local filters and export of visible rows. No automatic following or inferred execution rights. Execution receipts containing HTML characters now use their persisted wire spelling while retaining strict readback."
+      },
+      {
         "fr": "Reprendre le travail : résumé Rust calculé à la demande dans la page existante, en français ou anglais, sans publier de fichier ni marquer une visite. Les réponses tardives ne remplacent pas la mission sélectionnée. Si le calcul est non porté, lecture séparée des données enregistrées sur demande, avec avertissement explicite.",
         "en": "Resume work: Rust summary calculated on demand in the existing page, in French or English, without publishing a file or marking a visit. Late responses cannot replace the selected mission. When calculation is unported, recorded data can be read through a separate explicit gesture with a visible warning."
       },

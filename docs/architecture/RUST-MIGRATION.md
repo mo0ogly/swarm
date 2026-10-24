@@ -9082,9 +9082,15 @@ Raccord1472 : page Reprendre existante raccordée à inspect_work_view via GET s
 
 1472 : projection managée en lots non portée conservée en refus typé501 ; lecture séparée des données enregistrées sur geste explicite, sans validation recalculée. Port de projection complète en lots ouvert.
 
+Lot1473 : lecteur Journaux existant raccordé à historical_agent_logs par route
+protégée liée au Work/agent et au Root ; pagination CLI200 inchangée, aucun droit
+déduit. Voir RUNTIME-RECOVERY pour contrat et limites ; preuves dans le plan.
+
 Apprentissage1473 : les observations opaques produites en mémoire doivent avoir
 la représentation qui sera effectivement persistée avant toute comparaison
 lexicale de reçu. Échapper/compacter à l’entrée producteur ; ne pas remplacer
 une garde de readback par une égalité JSON sémantique qui perdrait clés dupliquées
 ou lexèmes numériques. Contre-exemple capture HTML, test codec et parcours CLI
 retenus au lot1473 ; anciens reçus incomplets ne sont pas automatiquement réparés.
+La lecture de journaux n’exige pas un statut calculé d’une autre capacité ;
+observer ce dernier seulement sur la vue concernée, garder son refus visible.

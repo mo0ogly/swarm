@@ -1852,3 +1852,22 @@ Raccord1470 : existing-cockpit-rust inclut le catalogue tarifaire natif et les h
 Raccord1471 : recette existing-cockpit-rust étendue au dialogue Version réel, helper permanent rust_existing_version_flow.cjs ; identité/notes comparées au GET compilé, loading/malformed/reprise explicites et absence de sonde Go, aucun POST nouveau. Recette .cache/existing-cockpit1471-first PASS366assertions dont45Version ; intégrité VERIFIED. Vérification réelle après installation : tests/rust_installed_version_read.cjs reçoit uniquement via stdin privé base/cookie/expected/output et vérifie14assertions, aucun POST. Originaux et source/profile archivés dans evidence/20261024-version1471. Recette fonctionnelle dev35, seul commentaire ajouté ensuite (patch conservé), livraison dev36 et dialogue réel14assertions PASS ; aucune logique fonctionnelle modifiée après la recette.
 
 Raccord1472 : existing-cockpit-rust étend les contrôles à rust_resume_http_contract.py et rust_existing_resume_flow.cjs. Comparaison CLI readonly et hashes des vues avant/après, refus et anti-réponse tardive ; aucun Root réel utilisé en écriture. Premier PASS398 .cache/existing-cockpit1472-first, réponse drainée PASS398 .cache/existing-cockpit1472-drained, mode explicite enregistré PASS400 .cache/existing-cockpit1472-recorded, clavier final PASS404 .cache/existing-cockpit1472-keyboard, intégrité VERIFIED. Dev39 livré ; lectures réelles21assertions, Version14, limites batch/provenance historiques conservées dans evidence/20261024-resume1472.
+
+### Journaux historiques1473
+`existing-cockpit-rust.json` ajoute le parcours permanent
+`tests/rust_agent_logs_http_ui.py` / `tests/rust_agent_logs_ui.cjs` : fixture CLI
+propre, un exécutable local inerte (aucun compte modèle), pages HTTP=CLI, curseurs,
+association/refus, octets Agent/Work/budget inchangés, FR/EN/thèmes/mobile, filtres,
+NDJSON produit et réponses retardées. La capture230sorties est distincte des
+4entrées de cycle de vie : ne pas en déduire230lignes de journal. Pagination200
+reste couverte par `historical_pagination_and_isolation` existant. L’export est
+vérifié comme Blob NDJSON exact ; l’écriture finale par le gestionnaire de
+téléchargements du navigateur n’est pas attestée par ce contrôle.
+Test codec ciblé : `cargo test --manifest-path rust/Cargo.toml --offline --locked
+-p swarm-engine --lib persisted_observation_escaping_and_lexemes -- --nocapture`
+(profil de test distinct du binaire servi ; aucune feature fixture de production).
+La branche terminale de status reste refusée ; le retour depuis Journaux vérifie
+ce refus explicite, sans le masquer comme succès. Lectures installées par
+`tests/rust_installed_agent_logs_read.cjs`, cookie/messages uniquement stdin privé,
+preuves limitées à comptes/empreintes sans texte des journaux réels.
+Preuves : evidence/20261024-logs1473 ; historique d’échecs et avis GLM conservés.
