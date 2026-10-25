@@ -2,6 +2,13 @@
 
 <img src="web/swarm-logo.png" alt="Swarm" width="96">
 
+**Rust migration in progress.** The CLI and local server use Rust.
+Local dev78 includes preparation writes, refusals and replay; full parity and
+global acceptance remain open. Historical descriptions and demonstrations below
+do not establish Rust availability. See the [active plan](docs/plans/migration-rust/PLAN.md),
+[native port](docs/en/RUST-MIGRATION.md) and
+[verification recipes](docs/en/RUST-MIGRATION-REPLAYS.md).
+
 ### Give an AI team an objective. See who does what. Verify what it delivers.
 
 [Français](README.md) · [User guide](docs/en/USER-GUIDE.md) · [Installation](docs/en/INSTALL.md)
@@ -194,7 +201,7 @@ Web and CLI share project state when they use the same `--root`.
 ```sh
 swarm --lang en --root /path/to/project work list
 swarm --lang en --root /path/to/project mission status WORK_ID
-swarm --lang en help management
+swarm --lang en --help
 ```
 
 `SWARM_LANG=en` sets the CLI default. JSON keys, commands and stored user content
@@ -246,8 +253,9 @@ preparation commands in [`.claude/commands/`](.claude/commands/).
 
 ## Repository layout
 
-The CLI entry point is in `cmd/swarm`, the Go engine and its unit tests in
-`internal/engine`, the interface in `web` and `frontend`, and guides in `docs`.
+The Rust CLI/server entry point is in `rust/crates/swarm-cli`, the engine in
+`rust/crates/swarm-engine`, the web in `rust/crates/swarm-web`, `web` and
+`frontend`, and guides in `docs`. Historical Go sources are no longer distributed.
 See the [repository map](docs/en/REPOSITORY-STRUCTURE.md) and the
 [pizza training guides](docs/training/casa-pizza/README.md).
 

@@ -2,6 +2,14 @@
 
 <img src="web/swarm-logo.png" alt="Swarm" width="96">
 
+**Migration Rust en cours.** Le CLI et le serveur local utilisent Rust.
+La livraison locale dev78 couvre notamment les écritures de préparation,
+leurs refus et leur rejeu ; la parité complète et l’acceptation globale restent
+ouvertes. Les descriptions et démonstrations historiques ci-dessous ne prouvent
+pas la disponibilité d’un parcours Rust. Voir le [plan actif](docs/plans/migration-rust/PLAN.md),
+[le portage](docs/architecture/RUST-MIGRATION.md) et
+[les recettes](docs/plans/migration-rust/REPLAYS.md).
+
 [English](README.en.md) · Français
 
 ### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
@@ -225,7 +233,7 @@ Ouvrez le lien de session affiché. Le projet et les missions persistent sur vot
 
 ## Démarrer en local
 
-**Périmètre actuellement testé : Linux, Go 1.24 ou plus récent.** Git et Make sont utilisés ci-dessous. Les ressources web sont embarquées dans le binaire ; Node.js n’est pas requis pour simplement le construire et le lancer.
+**Périmètre actuellement testé : Linux, Rust/Cargo et Python 3.** Git et Make sont utilisés ci-dessous. Les ressources web sont embarquées dans le binaire ; Node.js n’est pas requis pour simplement le construire et le lancer.
 
 ```sh
 git clone https://github.com/mo0ogly/swarm.git
@@ -327,9 +335,10 @@ et les commandes de préparation dans [`.claude/commands/`](.claude/commands/).
 
 ## Structure du dépôt
 
-Le point d’entrée de la CLI se trouve dans `cmd/swarm`, le moteur Go et ses tests
-unitaires dans `internal/engine`, l’interface dans `web` et `frontend`, et les
-guides dans `docs`. Voir la [carte du dépôt](docs/REPOSITORY-STRUCTURE.md), dont
+La CLI et le serveur Rust sont dans `rust/crates/swarm-cli`, le moteur dans
+`rust/crates/swarm-engine`, le web dans `rust/crates/swarm-web`, `web` et
+`frontend`, les guides dans `docs`. Les sources Go historiques ne font plus partie
+de la distribution. Voir la [carte du dépôt](docs/REPOSITORY-STRUCTURE.md), dont
 les [guides de formation pizza](docs/training/casa-pizza/README.md).
 
 ## Développer et vérifier

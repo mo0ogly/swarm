@@ -11,6 +11,7 @@ import tempfile
 import threading
 import unittest
 import urllib.request
+import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 SOURCE = Path(__file__).resolve().parent.parent
@@ -37,7 +38,7 @@ class LocalWeb(unittest.TestCase):
         subprocess.run([*self.args, "stop"], capture_output=True)
         self.temp.cleanup()
 
-    def test_local_opener_gets_private_link_without_terminal_disclosure(self):
+    def test_local_opener_gets_native_login_without_terminal_disclosure(self):
         self.run_cli("start")
         received = Path(self.temp.name) / "opener-url"
         opener = Path(self.temp.name) / "browser-opener"
@@ -48,7 +49,7 @@ class LocalWeb(unittest.TestCase):
                                 text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         key = (self.root / ".swarm" / ("web-session-" + hashlib.sha256(self.address.encode()).hexdigest()[:16])).read_text().strip()
-        self.assertEqual(received.read_text(), self.url + "/session/" + key)
+        self.assertEqual(received.read_text(), self.url + "/login?next=/live.html")
         self.assertNotIn(key, result.stdout + result.stderr)
         self.assertIn(self.url + "/", result.stdout)
 
@@ -64,7 +65,8 @@ class LocalWeb(unittest.TestCase):
         page = client.open(self.url + "/").read().decode()
         self.assertIn("Connexion à Swarm", page)
         self.assertNotIn(key, page)
-        client.open(self.url + "/session/" + key).close()
+        login=urllib.request.Request(self.url+'/login',data=urllib.parse.urlencode({'token':key,'next':'/'}).encode(),headers={'Origin':self.url})
+        client.open(login).close()
         cookie = list(jar)[0]
         self.assertIsNotNone(cookie.expires)
         self.assertTrue(cookie.has_nonstandard_attr("HttpOnly"))
@@ -84,6 +86,58 @@ class LocalWeb(unittest.TestCase):
         self.run_cli("stop")
         self.run_cli("status", 1)
         self.assertTrue((self.root / ".swarm").is_dir())
+
+    def test_native_version_is_protected_and_matches_compiled_cli(self):
+        """Read compiled metadata/FR+EN notes with a cookie; no launch/mutation."""
+        self.run_cli("start")
+        key=(self.root/'.swarm'/('web-session-'+hashlib.sha256(self.address.encode()).hexdigest()[:16])).read_text().strip()
+        import urllib.error
+        with self.assertRaises(urllib.error.HTTPError):urllib.request.urlopen(self.url+'/api/v1/native-version')
+        headers={'Cookie':'swarm_session_'+hashlib.sha256(self.address.encode()).hexdigest()[:12]+'='+key}
+        request=urllib.request.Request(self.url+'/api/v1/native-version',headers=headers)
+        actual=json.load(urllib.request.urlopen(request))
+        cold=Path(self.temp.name)/'absent-root'
+        cli=json.loads(subprocess.check_output([BINARY,'--root',str(cold),'--json','version']))
+        self.assertEqual(actual['binary'],cli['binary'])
+        notes=json.loads((SOURCE/'version_history.json').read_text())['local_changes']
+        self.assertEqual(actual['history']['local_changes'],notes)
+        self.assertFalse(cold.exists())
+        head=urllib.request.Request(request.full_url,headers=headers,method='HEAD')
+        self.assertEqual(urllib.request.urlopen(head).read(),b'')
+        self.assertNotIn(key,self.run_cli('logs'))
+
+    def test_existing_root_requires_explicit_native_initialization(self):
+        """Missing native config refuses; public init repairs fixture without reset."""
+        self.run_cli('start');self.assertTrue(json.loads(self.run_cli('status'))['ready'])
+        self.run_cli('stop')
+        settings=self.root/'.swarm/engine-settings.json';lock=self.root/'.swarm/.engine-settings.lock'
+        settings.unlink();lock.unlink()
+        self.run_cli('start',2)
+        self.assertFalse(settings.exists());self.assertFalse(lock.exists())
+        subprocess.run([BINARY,'--root',str(self.root),'init'],check=True,capture_output=True)
+        self.run_cli('start');self.assertTrue(json.loads(self.run_cli('status'))['ready'])
+
+    def test_legacy_automatic_lease_refuses_before_http_success(self):
+        """Owned SQL fault after valid control; public pause preserves legacy rows."""
+        self.run_cli('start');self.assertTrue(json.loads(self.run_cli('status'))['ready']);self.run_cli('stop')
+        request=self.root/'legacy-create.json'
+        request.write_text(json.dumps(dict(schema_version=1,event_id='legacy-create',expected_revision=0,title='Legacy startup fixture',objective='Refuse unsafe adoption',scope='Owned fixture',criteria=['No false readiness'])))
+        created=json.loads(subprocess.check_output([BINARY,'--root',str(self.root),'--json','work','create','--input',str(request)]))['work']
+        import sqlite3,datetime
+        now=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00','Z')
+        connection=sqlite3.connect(self.root/'.swarm/state.db')
+        connection.execute("INSERT INTO cockpit_controls(work_id,paused,autonomy,slots) VALUES(?,0,'autonome',1)",[created['id']])
+        connection.execute("INSERT INTO cockpit_events(work_id,at,kind,message) VALUES(?,?,'mission-policy',?)",[created['id'],now,json.dumps(dict(enabled=True,actor='owned-fixture',at=now))])
+        connection.execute("INSERT INTO mission_supervision(work_id,conductor_id,source,started_at,heartbeat_at,reconciled_at,last_check_at,last_error,next_check_at,stopped_at) VALUES(?,'legacy-fixture','owned-fixture',?,?,'','','','','')",[created['id'],now,now]);connection.commit()
+        original=connection.execute('SELECT * FROM mission_supervision').fetchall()
+        self.run_cli('start',2)
+        self.assertFalse(json.loads(self.run_cli('status',1))['running'])
+        self.assertIn('mission-legacy-lease-requires-migration',self.run_cli('logs'))
+        control=json.loads(subprocess.check_output([BINARY,'--root',str(self.root),'--json','mission','show',created['id']]))
+        pause=self.root/'legacy-pause.json';pause.write_text(json.dumps(dict(schema_version=1,event_id='legacy-pause',expected_revision=control['revision'],reason='Explicit fixture operator pause')))
+        subprocess.run([BINARY,'--root',str(self.root),'--json','mission','pause',created['id'],'--input',str(pause)],check=True,capture_output=True)
+        self.run_cli('start');self.assertTrue(json.loads(self.run_cli('status'))['ready'])
+        self.assertEqual(original,connection.execute('SELECT * FROM mission_supervision').fetchall());connection.close()
 
     def test_foreign_listener_is_not_stopped(self):
         class Handler(BaseHTTPRequestHandler):
@@ -165,7 +219,7 @@ class LocalWeb(unittest.TestCase):
             self.assertTrue(json.loads(self.run_cli("status"))["ready"])
         finally:
             if old.poll() is None:
-                old.terminate(); old.wait()
+                old.send_signal(__import__("signal").SIGINT); old.wait()
 
     @unittest.skipUnless(shutil.which("bwrap"), "bwrap not installed")
     def test_mount_safe_restart_releases_listener(self):

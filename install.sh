@@ -16,7 +16,7 @@ Installation de Swarm depuis ce dépôt (Linux).
   ./install.sh --mode native [--bin-dir ~/.local/bin] [--project /chemin/projet]
 
 Docker est le mode par défaut. --no-start construit sans démarrer le cockpit.
-Le mode native compile avec Go 1.24+ et installe le binaire sans lancer de serveur.
+Le mode native compile avec Rust/Cargo et un compilateur C et installe le binaire sans lancer de serveur.
 --agent-home DOSSIER choisit le stockage persistant des outils et connexions agents.
 Les fournisseurs IA s'installent et s'authentifient séparément. Voir INSTALL.md.
 HELP
@@ -46,7 +46,11 @@ if [ -n "$project_dir" ]; then
     [ -w "$project_dir" ] || fail "Projet non accessible en écriture : $project_dir"
 fi
 if [ "$mode" = native ]; then
-    command -v go >/dev/null || fail 'Go 1.24+ est requis pour le mode native.'
+    for tool in cargo rustc cc python3 git; do
+        command -v "$tool" >/dev/null || fail "Outil requis pour le mode native : $tool (Rust/Cargo, C, Python 3, Git)."
+    done
+    # Fetch pinned dependencies explicitly; the qualified build itself is offline.
+    (cd "$repo_dir" && cargo fetch --locked --manifest-path rust/Cargo.toml)
     mkdir -p -- "$bin_dir"
     bin_dir=$(cd -- "$bin_dir" && pwd -P)
     stage_file=$(mktemp "$bin_dir/.swarm-install.XXXXXXXX")
@@ -84,11 +88,12 @@ mv -- "$config_tmp" "$config_file"
 "${compose[@]}" config --quiet
 "${compose[@]}" build
 if [ "$start" = yes ]; then
-    if ! "${compose[@]}" up -d --wait --wait-timeout 60; then
+    if ! "${compose[@]}" up -d --wait; then
         "${compose[@]}" logs --no-color --tail 20 swarm >&2
         fail "Le cockpit n’a pas démarré. Vérifiez le port, les droits et INSTALL.md."
     fi
-    printf '\nLien de session (les journaux suivants restent privés) :\n'
+    printf '\nCockpit Rust : http://127.0.0.1:%s/login\n' "$port"
+    printf 'La clé locale est dans le dossier privé .swarm du projet ; les journaux ne fournissent aucun lien secret. Voir INSTALL.md.\n'
     "${compose[@]}" logs --no-color --tail 15 swarm
 else
     printf 'Image construite. Démarrer depuis ce dépôt :\n  docker compose --env-file deploy/install.env up -d\n'

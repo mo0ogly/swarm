@@ -1,5 +1,8 @@
 # Installer Swarm
 
+**Installation Rust — 24 octobre 2026.** La CLI native, le serveur géré et l’image Docker utilisent exclusivement Rust. Aucun compilateur Go ni repli Go. Toolchain validée : Rust/Cargo 1.96.0 et compilateur C pour SQLite embarqué ; l’installation native récupère explicitement les dépendances Cargo.lock avant le build qualifié hors ligne. Docker fournit son environnement de compilation. Un build Docker direct sans métadonnées fournies indique honnêtement `devel` et un commit inconnu, sans inventer une release. Le plan de migration actif précise les commandes disponibles ; les capacités historiques décrites plus bas ne prouvent pas leur disponibilité Rust.
+
+
 [English installation guide](docs/en/INSTALL.md).
 
 Swarm propose deux installations **sous Linux** : Docker pour un environnement dédié, ou un binaire natif pour utiliser les outils déjà installés sur votre machine. Le script ne demande pas `sudo`, ne modifie pas votre profil shell et n’installe pas Docker à votre place.
@@ -13,6 +16,18 @@ compte système distinct, avec confinement vérifié des agents**. Une autorité
 machine et administration séparées est prévue pour les installations futures.
 Ce choix local/distant concerne l’autorité ; il est distinct du choix Docker/natif
 de Swarm décrit ci-dessous.
+
+**Parcours d’authentification retenu, encore à implémenter :** aucun fournisseur
+d’identité externe n’est nécessaire. Le premier lancement proposera par défaut
+la création d’un compte humain local personnel, puis le démarrage du workflow
+après vérification du compte et des prérequis de protection. Aucun compte ou
+mot de passe partagé ne sera préinstallé. L’amorçage devra vérifier une preuve
+d’installation indépendante ; le premier visiteur ne devient pas administrateur.
+Le réglage « Authentification humaine » sera accessible dans l’assistant puis
+Admin, avec un fournisseur d’entreprise optionnel. Il reste distinct du réglage
+« Hébergement de l’autorité » et du fournisseur du modèle IA. Une configuration
+illisible ne devra jamais réactiver le parcours initial. Ce comportement décrit
+la cible ; l’installateur actuel ne le fournit pas encore.
 
 **Cette séparation et son parcours de configuration ne sont pas encore livrés.**
 L’installateur actuel ne crée pas le compte ni le service d’autorité dédiés ; le
@@ -52,6 +67,28 @@ crée toujours aucun service système ni réglage Admin. La configuration sur di
 reste au schéma 1 ; aucune réinitialisation d’historique n’est nécessaire. Voir
 le contrat d’identité pour les préconditions Linux et les limites de transport.
 
+La remise privée du canal est maintenant testable avec deux processus locaux :
+le lanceur épingle l’image, vérifie un démarrage attribué avant la demande métier
+et recueille la fin de son enfant. Ce helper interne ne lance aucun service via
+l’installateur ; ses fixtures utilisent le même compte. L’humain initial, le
+compte dédié, le confinement et le parcours Admin restent à fournir. Aucun secret
+ou cookie de session n’est transmis par ce protocole de démarrage.
+
+Le code fournit maintenant un précontrôle de bootstrap, sans ouvrir de projet :
+
+```sh
+swarm identity bootstrap-check EMPREINTE_APPROUVEE --input /chemin/absolu/bootstrap.json --json
+```
+
+Lancer ce contrôle sous l’UID prévu du service, sur des objets déjà provisionnés
+par un parcours autorisé. L’empreinte attendue doit venir d’une approbation
+indépendante ; la calculer depuis le fichier à accepter ne constitue pas cette
+approbation. Le manifeste V1 et ses répertoires privés sont décrits dans le
+contrat d’identité. Cette commande ne crée aucun compte/service/lock et ne valide
+pas l’humain déclaré : storage_verified est séparé des trois états false
+human_authentication_verified, confinement_verified et service_started. Le
+bootstrap humain réel et le provisionnement du compte restent à raccorder.
+
 ## Formation embarquée et identité visuelle
 
 Une fois le cockpit ouvert, choisissez **Aide du cockpit → Formation Casa Pizza**. Le lecteur propose vidéos, aperçus GIF, transcriptions, PDF de 38 pages et kit hors ligne téléchargeable. La langue choisie dans le cockpit sélectionne les ressources françaises ou anglaises ; le sélecteur du lecteur actualise tous les liens. Les fichiers Word restent les sources éditables.
@@ -82,9 +119,9 @@ mkdir -p "$HOME/projets/mon-projet"
 ./install.sh --project "$HOME/projets/mon-projet"
 ```
 
-Le script construit l’image, initialise le projet si nécessaire et démarre le cockpit. Il affiche ensuite **le lien de session à ouvrir dans votre navigateur**. Ce lien donne accès à votre cockpit : ne le publiez pas.
+Le script construit l’image, initialise le projet si nécessaire et démarre le cockpit. Il affiche l’adresse locale et sa page `/login`. Rust n’imprime aucun lien contenant la clé. La clé privée se trouve dans `.swarm/web-session-<empreinte-adresse>` du projet (16 premiers caractères hexadécimaux du SHA-256 de l’adresse exacte `hôte:port`). La lire localement puis la saisir dans le formulaire de connexion ; ne jamais la publier.
 
-Pour retrouver ce lien :
+Pour lire le diagnostic de démarrage :
 
 ```sh
 docker compose --env-file deploy/install.env logs --tail 20 swarm
@@ -108,9 +145,9 @@ Pour le développement natif sous Linux, le dépôt fournit un point d’entrée
 
 `configure` mémorise le projet, l’adresse et le choix du masquage dans `deploy/local-web.json`, ignoré par Git : les commandes suivantes n’ont plus besoin de répéter ces options. Pour reprendre une instance antérieure connue, `adopt --pid PID --root PROJET --binary BINAIRE --address ADRESSE` exige une correspondance exacte avant tout arrêt ; il ne recherche ni ne tue les processus par leur nom. Les données ne sont jamais effacées lors d’un redémarrage.
 
-L’adresse par défaut est `http://127.0.0.1:18792/`. Les options `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--no-open` et `--mask-cifs` sont disponibles ; les variables `SWARM_PROJECT_ROOT`, `SWARM_WEB_ADDRESS`, `SWARM_BINARY` et `SWARM_BROWSER` permettent de conserver les choix. `--mask-cifs` nécessite `bwrap` et masque uniquement ce montage dans l’espace du serveur, sans réparer le partage hôte. Le lanceur demande Linux, Python 3, Go pour la compilation et `xdg-open` pour ouvrir le navigateur. `build` construit sans démarrer.
+L’adresse par défaut est `http://127.0.0.1:18792/`. Les options `--root`, `--address`, `--binary`, `--startup-timeout`, `--stop-timeout`, `--no-open` et `--mask-cifs` sont disponibles ; les variables `SWARM_PROJECT_ROOT`, `SWARM_WEB_ADDRESS`, `SWARM_BINARY` et `SWARM_BROWSER` permettent de conserver les choix. `--mask-cifs` nécessite `bwrap` et masque uniquement ce montage dans l’espace du serveur, sans réparer le partage hôte. Le lanceur demande Linux, Python 3, Rust/Cargo et un compilateur C pour la compilation et `xdg-open` pour ouvrir le navigateur. `build` construit sans démarrer.
 
-L’authentification reste active. Le lanceur transmet la clé privée au navigateur sans l’imprimer ; le cookie est HttpOnly, SameSite strict et persistant. Sans cookie, l’adresse normale affiche une page de connexion FR/EN, sombre/État, plutôt qu’un texte d’erreur. `open` reconnecte automatiquement le navigateur local. La durée du cookie est configurable dans `.swarm/web-session.json` : `{"schema_version":1,"cookie_max_age_seconds":2592000}` (30 jours par défaut, de 1 seconde à 365 jours). Changer ce réglage exige un redémarrage et une nouvelle connexion pour renouveler le cookie. Supprimer la clé privée quand le serveur est arrêté révoque les sessions ; un redémarrage ordinaire ne la change pas. Les commandes modifiant l’état gardent les contrôles Origin et CSRF.
+L’authentification reste active. `open` ouvre la page de connexion native ; il ne transmet pas automatiquement la clé privée. La durée du cookie est le réglage Admin persistant `web_cookie_max_age_seconds` dans `.swarm/engine-settings.json` (choix initial30jours), et non l’ancien `.swarm/web-session.json`. Redémarrer et se reconnecter après changement de politique serveur. La clé privée du dossier `.swarm` est sélectionnée par l’adresse exacte d’écoute. La supprimer serveur arrêté révoque ce secret ; les redémarrages ordinaires la conservent. Les contrôles Origin et CSRF restent actifs. Les fichiers du lanceur restent sous `.swarm/local-web/` ; il arrête son serveur, pas les agents. Docker conserve son cycle distinct.
 
 Les logs et le registre PID se trouvent dans `.swarm/local-web/`, hors Git. `logs` masque les liens privés. Le lanceur gère le serveur, pas l’arrêt des agents ; vérifiez l’activité avant de remplacer le binaire d’une mission en cours. Les commandes Docker ci-dessus restent une installation distincte.
 
@@ -151,7 +188,7 @@ Sur une machine distante, ouvrez un tunnel depuis votre poste :
 ssh -L 18787:127.0.0.1:18787 utilisateur@serveur
 ```
 
-Puis ouvrez le lien de session avec `127.0.0.1:18787` dans votre navigateur local. Si ce port local est déjà occupé, adaptez les deux côtés du tunnel et le port Swarm pour conserver un accès cohérent avec l’adresse du serveur.
+Puis ouvrez `http://127.0.0.1:18787/login` dans votre navigateur local avec la clé privée correspondant à cette adresse. Si ce port local est déjà occupé, adaptez les deux côtés du tunnel et le port Swarm pour conserver un accès cohérent avec l’adresse du serveur.
 
 ## 2. Configurer les IA dans Docker
 
@@ -183,13 +220,13 @@ Pour un agent distribué par npm, le modèle de commande est `npm install -g NOM
 
 Les composants système supplémentaires doivent être ajoutés dans une image dérivée. Ils ne persistent pas après recréation s’ils sont installés seulement dans la couche d’un conteneur.
 
-Swarm découvre les CLI connues présentes au **premier** `providers init`. Si vous ajoutez un fournisseur après le premier lancement, conservez le fichier existant et ajoutez ou adaptez sa définition dans `/workspace/.swarm/providers.json`. `providers init` ne l’écrase pas. Consultez le [contrat des fournisseurs](REFERENCE.md) pour les arguments et la transmission des variables d’environnement.
+Swarm découvre les CLI connues présentes au **premier** `providers config init`. Si vous ajoutez un fournisseur après le premier lancement, conservez le fichier existant et ajoutez ou adaptez sa définition dans `/workspace/.swarm/providers.json`. `providers config init` ne l’écrase pas. Consultez le [contrat des fournisseurs](REFERENCE.md) pour les arguments et la transmission des variables d’environnement.
 
 Vérifier la configuration depuis le dépôt, sur l’hôte :
 
 ```sh
 docker compose --env-file deploy/install.env exec swarm \
-  swarm --root /workspace providers show
+  swarm --root /workspace providers config show
 ```
 
 Dans les profils de tâches, utilisez les chemins **visibles dans le conteneur**, notamment `/workspace`. Les chemins absolus d’une ancienne installation native ne sont pas automatiquement réécrits.
@@ -250,13 +287,13 @@ Ne faites pas fonctionner deux serveurs Swarm sur la même base de mission. Un r
 
 ## 5. Installation native
 
-Prérequis : Linux, Git, Bash, Go 1.24+ et un accès réseau pour les dépendances Go. Node.js n’est pas nécessaire pour compiler le binaire avec les ressources web déjà présentes.
+Prérequis : Linux, Git, Bash, Python 3, Rust/Cargo (toolchain validée : 1.96.0), un compilateur C et un accès réseau pour les dépendances Cargo verrouillées. Node.js n’est pas nécessaire pour compiler le binaire avec les ressources web déjà présentes.
 
 ```sh
 git clone https://github.com/mo0ogly/swarm.git
 cd swarm
 ./install.sh --mode native --project "$HOME/projets/mon-projet"
-"$HOME/.local/bin/swarm" --root "$HOME/projets/mon-projet" providers init
+"$HOME/.local/bin/swarm" --root "$HOME/projets/mon-projet" providers config init
 "$HOME/.local/bin/swarm" --root "$HOME/projets/mon-projet" web 127.0.0.1:18787
 ```
 
@@ -276,7 +313,7 @@ Le script compile dans un fichier temporaire du dossier cible, puis remplace le 
 | --- | --- |
 | Docker inaccessible | `docker info` et permissions de votre utilisateur |
 | Port déjà occupé | Choisir `--port 18788` ou arrêter l’autre service après avoir vérifié son rôle |
-| Aucun lien de session | `docker compose --env-file deploy/install.env ps` puis `logs --tail 30 swarm` |
+| Connexion refusée | Ouvrir `/login`, vérifier la clé privée correspondant exactement à l’adresse ; lire `compose ps` et les journaux pour un défaut de démarrage. Aucun lien secret n’est imprimé. |
 | Permission refusée sur le projet | UID/GID dans `deploy/install.env`, droits des dossiers sur l’hôte |
 | Fournisseur absent | Installation dans le conteneur, PATH et `.swarm/providers.json` |
 | Agent installé mais appel refusé | Authentification, variables autorisées et capacités de sandbox |
@@ -287,17 +324,15 @@ Le Dockerfile compile les sources présentes localement. Il n’existe pas ici d
 
 ## Recette de l’installateur
 
-Dans une copie du dépôt sans `deploy/install.env`, `make test-install` exécute une recette isolée. Elle compile le binaire natif, construit l’image, ouvre une session web, crée une mission depuis le CLI et vérifie sa conservation après recréation du conteneur. Elle contrôle aussi la propriété des fichiers et le refus de réinstaller un service actif. Aucun modèle IA n’est appelé.
+`make test-install` lance deux recettes isolées : installation native réelle, puis build et exécution Docker. Elles vérifient l’identité compilée, les méthodes embarquées, la persistance d’un travail entre processus/conteneurs, les permissions, l’API protégée et l’absence de Go dans l’image d’exécution. Aucun modèle IA n’est appelé. Les dossiers de preuve frais restent dans `.cache` ; aucune configuration `deploy/install.env` partagée n’est modifiée.
 
-Le test nécessite un moteur Docker local ayant accès aux mêmes chemins que le shell, ainsi que Go et Python 3. Il crée puis retire uniquement son projet, son conteneur et sa configuration temporaires. Les images construites restent disponibles dans Docker. Il ne vérifie pas les authentifications ni les sandboxes de tous les fournisseurs.
+Il faut Docker accessible sur les mêmes chemins que le shell, Rust/Cargo, un compilateur C et Python 3. Les conteneurs temporaires sont retirés ; les images, données et preuves isolées sont conservées. Le chemin shell/arguments Compose est couvert par des doubles de régression, distincts de la recette réelle de l’image : le cycle Compose complet, le formulaire de connexion Docker, les authentifications et sandboxes fournisseurs ne sont pas qualifiés par ces seuls tests. Aucun délai global arbitraire de build/recette n’est ajouté ; `compose up --wait` conserve les contrôles de santé du service.
 
 ### SQLite : initialisation et migration
 
-Aucune base n’est livrée dans Git ou l’image Docker. `swarm init` crée
-`PROJET/.swarm/state.db` avec des permissions `0600`. Le serveur applique les
-migrations prévues au démarrage ; les commandes de consultation refusent de
-migrer implicitement une ancienne base. Pour une utilisation CLI sans serveur,
-après arrêt des anciens processus et sauvegarde :
+Aucune base n’est livrée dans Git ou l’image Docker. `swarm init` crée une racine neuve et sa base privée `PROJET/.swarm/state.db` avec les permissions `0600`. Rust vérifie actuellement le schéma37 ; un schéma ancien ou incompatible est refusé, sans invoquer Go ni réexécuter implicitement ses anciennes migrations. `init` n’est pas une commande de conversion générale des missions Go. Préserver une sauvegarde complète et suivre une procédure de migration explicitement qualifiée pour le schéma concerné.
+
+Pour initialiser une racine neuve uniquement :
 
 ```sh
 docker compose --env-file deploy/install.env run --rm --no-deps swarm init
@@ -475,8 +510,7 @@ prépare le binaire avant d’arrêter l’instance et attribue une préversion 
 déclarée dans `version_history.json`. Des entrées de build modifiées incrémentent
 `N` ; des entrées identiques conservent le numéro et le binaire vérifié. Le suivi
 local persiste dans `deploy/local-build.json` (ignoré par Git). Il couvre les
-sources Go réelles, les ressources embarquées, les substitutions d’overlay et
-les paramètres effectifs du build. Un build en échec ou des sources modifiées
+entrées réelles du compilateur Rust, les features/dépendances Cargo effectives, les ressources embarquées et les paramètres du build. Un build en échec ou des sources modifiées
 pendant la compilation laissent le serveur précédent en service.
 
 Mettre à jour `local_changes` en français et en anglais dans
@@ -636,7 +670,7 @@ Pour une reprise ou un conflit de révision, consultez les [conditions du moteur
 
 Après installation, configurez les règles transmises aux agents depuis la racine du projet cible : [profil par rôle](docs/PROJECT-PROFILE.md). Cette configuration ne lance aucune mission.
 
-## Cache Go des agents — correctif en cours de livraison
+## Cache Go historique des agents — non utilisé par le moteur Rust
 
 Un agent peut lire le cache Go global sans pouvoir y écrire dans son bac à sable.
 Une erreur `read-only file system` visant ce cache ne signifie donc pas que le
@@ -670,7 +704,7 @@ La recette fraîche du 6 octobre lie le candidat produit aux captures [graphe cl
 
 ## Lanceur natif Linux
 
-Le dépôt fournit `swarm.sh` avec `tools/swarm_local.py`. Python 3 et Go sont
+Le dépôt fournit `swarm.sh` avec `tools/swarm_local.py`. Python 3, Rust/Cargo et un compilateur C sont
 requis pour construire ; `xdg-open` ouvre le navigateur. Depuis la racine :
 
 ```sh
@@ -691,8 +725,10 @@ du navigateur ; `--binary /chemin/swarm` utilise un binaire déjà construit.
 identifié dans son registre. Un autre processus occupant le port est refusé.
 Les missions et les clés du projet sont conservées. Le lanceur ne termine pas
 les agents : vérifiez l’activité avant de redémarrer. L’authentification reste
-active ; `open` transmet le lien privé au navigateur sans l’imprimer.
+active ; `open` ouvre la page de connexion sans transmettre de clé dans l’URL.
 
 Pour Docker, utilisez Docker Compose, pas ce lanceur. Voir le
 [guide des overrides et des IA sur site](docs/ON-PREMISE-AI.md) pour les
 certificats internes, DNS, proxies, montages et la conservation des connexions.
+
+Un projet sans Git peut consulter l’identité compilée du binaire : le candidat source optionnel est explicitement indisponible. Des marqueurs de dépôt existants ou endommagés restent soumis à la sonde Git ; ses erreurs ne deviennent pas une absence.
