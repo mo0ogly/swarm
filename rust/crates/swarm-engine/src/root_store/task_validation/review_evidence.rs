@@ -100,7 +100,7 @@ fn recorded(
         || job.work_id != work.id
         || job.task_id != task.id
         || match origin {
-            Origin::CurrentSource(source) => job.source_sha256 != super::mission_authority::source(&root.db,&job,source).map_err(launch)?,
+            Origin::CurrentSource(source) => job.source_sha256 != super::managed_execution::bound_source(&root.db,&job,source,receipt.managed_candidate.as_ref()).map_err(launch)?,
             Origin::ReviewedReceipt(expected) => hash != expected,
             Origin::PriorReview { sha256, attempt, producer } => hash != sha256 || receipt.attempt_id != attempt || receipt.producer_agent_id != producer,
         }

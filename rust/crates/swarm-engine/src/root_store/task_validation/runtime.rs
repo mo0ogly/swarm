@@ -28,12 +28,28 @@ pub struct TaskValidationOutcome {
 }
 /// Private complete original observations before public artifact/SQL. Embedded
 /// per-slot bodies and hashes permit exact recovery, never a replacement process.
+/// Ordinary body version2 requires source_origin; historical version1 omits it
+/// and keeps its original encoding. Actual managed execution produces version3
+/// with the complete candidate/cohort preimage; final managed review stays guarded.
+/// These are protocol versions, not policy knobs.
 /// No raw kernel/owner fields are copied to the public validation artifact.
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct Receipt {
     pub schema_version: i64,
     pub job: Job,
+    /// Absent on historical originals only; a new origin must match its scalar
+    /// SQL row. Omission preserves historical canonical receipt bytes.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_origin: Option<super::source_origin::Origin>,
+    /// Ordinary v2 only: exact normalized commands hashed in source_origin.
+    /// Schema3 omits this field and binds the full candidate cohort instead.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub effective_policy: Option<crate::ValidationPolicy>,
+    /// Private schema3 only: complete candidate/cohort preimage, never a grant.
+    /// Ordinary v1/v2 must omit this field so historical canonical bytes survive.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub managed_candidate: Option<crate::managed_repository::ManagedCandidate>,
     pub steps: Vec<(StepReceipt, String)>,
     pub policy: crate::ValidationPolicy,
     pub artifacts: std::collections::BTreeMap<String, String>,
@@ -45,6 +61,7 @@ pub(super) struct Receipt {
 }
 struct Fresh {
     job: Job,
+    source_origin: super::source_origin::Origin,
     steps: Vec<Step>,
     prepared: Prepared,
     work: Work,
@@ -70,7 +87,7 @@ fn intent(r: &Request) -> Result<Vec<u8>, E> {
 /// later saved-settings release failure; unknown commit is never relabeled PASS.
 /// Exact terminal replay is readback without fresh execution authority; a live
 /// or uncertain original remains refused by publication, never relaunched.
-fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Option<&crate::MissionLease>) -> Result<Claim, E> {
+fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Option<&crate::MissionLease>, managed: Option<&super::managed_execution::Session>, managed_job: Option<&str>) -> Result<Claim, E> {
     let directory = &store.directory;
     let root = &store.root;
     let mut known = None;
@@ -93,7 +110,10 @@ fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Opti
                 if store::active(tx, work, &r.task_id)?.is_some() {
                     return Err(A::Refused("task-validation-controller-active"));
                 }
-                let prepared = super::prepare(tx, root, settings, work, r)?;
+                let prepared = match managed {
+                    Some(session) => super::managed_execution::prepare(tx, directory, root, settings, work, r, &session.data)?,
+                    None => super::prepare(tx, root, settings, work, r)?,
+                };
                 let mut w = crate::read_recorded_work(tx, work)
                     .map_err(|e| caused("task-validation-work", e))?;
                 let task = w
@@ -108,14 +128,14 @@ fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Opti
                 let identity = directory
                     .identity()
                     .map_err(|e| caused("task-validation-directory-observation", e))?;
-                let controls = prepared
-                    .policy
-                    .controls
-                    .as_deref()
-                    .ok_or(A::Refused("task-validation-controls-required"))?;
+                let controls = prepared.controls()?;
                 let mut j = Job {
-                    id: crate::generate_identifier("validation-")
-                        .map_err(|e| caused("task-validation-id", e))?,
+                    id: match managed_job {
+                        Some(id) if managed.is_some() => id.into(),
+                        None if managed.is_none() => crate::generate_identifier("validation-")
+                            .map_err(|e| caused("task-validation-id", e))?,
+                        _ => return Err(A::Refused("task-validation-managed-job-binding")),
+                    },
                     work_id: work.into(),
                     task_id: r.task_id.clone(),
                     event_id: r.event_id.clone(),
@@ -134,19 +154,21 @@ fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Opti
                     receipt_sha256: None,
                     published_revision: None,
                 };
+                let source_origin = prepared.origin(&j.id)?;
+                j.source_sha256 = super::source_origin::digest(&source_origin)?;
                 let binding = lease.map(|lease| super::mission_authority::claim(tx,directory,lease,&w,&prepared.preview.producer_agent_id,settings,&j.id)).transpose()?;
                 j.source_sha256=super::mission_authority::digest(&j.source_sha256,binding.as_ref())?;
                 let steps = controls
                     .iter()
                     .enumerate()
-                    .map(|(i, c)| {
+                    .map(|(i, (transport, _control))| {
                         Ok(Step {
                             id: crate::generate_identifier("validation-step-")
                                 .map_err(|e| caused("task-validation-id", e))?,
                             job_id: j.id.clone(),
                             ordinal: i64::try_from(i)
                                 .map_err(|e| caused("task-validation-slot-index", e))?,
-                            control_id: c.id.clone(),
+                            control_id: (*transport).into(),
                             phase: StepPhase::Prepared,
                             permission: 0,
                             child_pid: None,
@@ -181,6 +203,7 @@ fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Opti
                     },
                     |db, _| {
                         store::claim(db, &j, &steps)
+                            .and_then(|()| super::source_origin::stage(db, &source_origin))
                             .and_then(|()| match binding.as_ref() {Some(b)=>super::mission_authority::stage(db,b),None=>Ok(())})
                             .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)
                     },
@@ -191,6 +214,7 @@ fn claim(store: &mut RootStore, work: &str, r: &Request, raw: &[u8], lease: Opti
                 }
                 Ok(Claim::Fresh(Box::new(Fresh {
                     job: j,
+                    source_origin,
                     steps,
                     prepared,
                     work: w,
@@ -228,7 +252,38 @@ pub(super) fn run(
 pub(super) fn run_using(store:&mut RootStore,work:&str,raw:&[u8],lease:Option<&crate::MissionLease>)->Result<TaskValidationOutcome,E>{
     let r = super::decode(raw).map_err(|e| E::Launch(Box::new(e)))?;
     let canonical = intent(&r)?;
-    let f = match claim(store, work, &r, &canonical, lease)? {
+    // Preserve exact-event readback before any candidate Git or frame creation.
+    let exists = store::event(&store.db, &r.event_id).map_err(|e| E::Launch(Box::new(e)))?.is_some();
+    let managed = if exists { None } else { super::managed_execution::acquire_fresh(store, work, &r, true)? };
+    let result = (|| {
+        let id = match managed.as_ref() {
+            Some(session) => {
+                let id = crate::generate_identifier("validation-").map_err(E::Runtime)?;
+                super::managed_execution::persist(store, &id, session)?;
+                Some(id)
+            }
+            None => None,
+        };
+        run_prepared(store, work, &r, &canonical, lease, managed.as_ref(), id.as_deref())
+    })();
+    let known = match &result {
+        Ok(outcome) => Some((outcome.work.id.clone(), outcome.work.revision)),
+        Err(error) => error.recorded_work().map(|(work, rev)| (work.to_owned(), rev)),
+    };
+    let close = managed.map_or(Ok(()), |session| session.close());
+    crate::root_store::finished(result, close).map_err(|error| {
+        match known {
+            Some((work, revision)) if error.recorded_work().is_none() => E::WorkRecorded { primary: Box::new(error), work, revision },
+            _ => error,
+        }
+    })
+}
+/// Run one prepared batch while its external owner retains candidate custody.
+/// Claim revalidates Root under the writer; replay owns no new process permit.
+/// Original commands, slot journals and known Work metadata remain authoritative.
+fn run_prepared(store: &mut RootStore, work: &str, r: &Request, canonical: &[u8], lease: Option<&crate::MissionLease>,
+    managed: Option<&super::managed_execution::Session>, managed_job: Option<&str>) -> Result<TaskValidationOutcome, E> {
+    let f = match claim(store, work, r, canonical, lease, managed, managed_job)? {
         Claim::Replay(j) => return publication::replay(store, &j),
         Claim::Fresh(f) => *f,
     };
@@ -238,17 +293,12 @@ pub(super) fn run_using(store:&mut RootStore,work:&str,raw:&[u8],lease:Option<&c
         let mut failure = None;
         let mut stop = false;
         let mut local_stop_transport_complete=false;
-        let controls = f
-            .prepared
-            .policy
-            .controls
-            .as_deref()
-            .ok_or(E::Refused("task-validation-controls-required"))?;
-        for (slot, control) in f.steps.iter().zip(controls) {
+        let controls = f.prepared.controls().map_err(|e| E::Launch(Box::new(e)))?;
+        for (slot, (_transport, control)) in f.steps.iter().zip(controls) {
             let (receipt, primary) = if stop {
                 (journal::unattempted(&f.job, slot, failure.as_ref()), None)
             } else {
-                match process::run(store, &f.job, slot, control, lease) {
+                match process::run(store, &f.job, slot, control, lease, managed) {
                     Ok(observed)=>{
                         let observed=journal::observe(&f.job,observed);
                         local_stop_transport_complete|=observed.local_stop_transport_complete;
@@ -275,9 +325,13 @@ pub(super) fn run_using(store:&mut RootStore,work:&str,raw:&[u8],lease:Option<&c
             records.push((receipt, hash));
         }
         let published = (|| {
+            let candidate = f.prepared.managed.as_ref().map(|m| m.candidate.clone());
             let record = Receipt {
-                schema_version: 1,
+                schema_version: if candidate.is_some() { 3 } else { 2 },
+                effective_policy: if candidate.is_some() { None } else { Some(f.prepared.policy) },
+                managed_candidate: candidate,
                 job: f.job,
+                source_origin: Some(f.source_origin),
                 steps: records,
                 policy: f.prepared.original_policy,
                 artifacts: f.prepared.preview.artifacts,

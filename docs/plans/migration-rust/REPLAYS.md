@@ -1849,7 +1849,7 @@ traduction Apply et candidat final : evidence/20261024-quotas1469. Aucun fournis
 
 Raccord1470 : existing-cockpit-rust inclut le catalogue tarifaire natif et les helpers permanents rust_pricing_http_contract.py/rust_existing_pricing_flow.cjs. Écritures sur Root isolé, aucune facture/appel fournisseur ; dev34 :321assertions navigateur et10HTTP tarifs PASS ; original FAIL .cache/existing-cockpit1470-first, correction PASS .cache/existing-cockpit1470-corrected, intégrité VERIFIED. Originaux/effectifs/GLM archivés dans evidence/20261024-pricing1470 ; aucune acceptation globale.
 
-Raccord1471 : recette existing-cockpit-rust étendue au dialogue Version réel, helper permanent rust_existing_version_flow.cjs ; identité/notes comparées au GET compilé, loading/malformed/reprise explicites et absence de sonde Go, aucun POST nouveau. Recette .cache/existing-cockpit1471-first PASS366assertions dont45Version ; intégrité VERIFIED. Vérification réelle après installation : tests/rust_installed_version_read.cjs reçoit uniquement via stdin privé base/cookie/expected/output et vérifie14assertions, aucun POST. Originaux et source/profile archivés dans evidence/20261024-version1471. Recette fonctionnelle dev35, seul commentaire ajouté ensuite (patch conservé), livraison dev36 et dialogue réel14assertions PASS ; aucune logique fonctionnelle modifiée après la recette.
+Raccord1471 : recette existing-cockpit-rust étendue au dialogue Version réel, helper permanent rust_existing_version_flow.cjs ; identité/notes comparées au GET compilé, loading/malformed/reprise explicites et absence de sonde Go, aucun POST nouveau. Recette .cache/existing-cockpit1471-first PASS366 assertions dont45Version ; intégrité VERIFIED. Vérification réelle après installation : tests/rust_installed_version_read.cjs reçoit uniquement via stdin privé base/cookie/expected/output et vérifie14assertions, aucun POST. Originaux et source/profile archivés dans evidence/20261024-version1471. Recette fonctionnelle dev35, seul commentaire ajouté ensuite (patch conservé), livraison dev36 et dialogue réel14assertions PASS ; aucune logique fonctionnelle modifiée après la recette.
 
 Raccord1472 : existing-cockpit-rust étend les contrôles à rust_resume_http_contract.py et rust_existing_resume_flow.cjs. Comparaison CLI readonly et hashes des vues avant/après, refus et anti-réponse tardive ; aucun Root réel utilisé en écriture. Premier PASS398 .cache/existing-cockpit1472-first, réponse drainée PASS398 .cache/existing-cockpit1472-drained, mode explicite enregistré PASS400 .cache/existing-cockpit1472-recorded, clavier final PASS404 .cache/existing-cockpit1472-keyboard, intégrité VERIFIED. Dev39 livré ; lectures réelles21assertions, Version14, limites batch/provenance historiques conservées dans evidence/20261024-resume1472.
 
@@ -1891,3 +1891,102 @@ sans watchdog global. Les40assertions installées couvrent les journaux réels e
 l’absence explicite de reçu sur2agents historiques (4cas Work/langue), pas une
 lecture disponible sur ces anciens agents. Aucun texte réel retenu dans preuves.
 Preuves : evidence/20261024-transcript1474 ; échec compilation original conservé.
+
+## Statut ordinaire après terminaison1475
+Recette existing-cockpit-rust, preuve .cache/existing-cockpit1475-corrected :
+PASS, intégrité VERIFIED. Original FAIL .cache/existing-cockpit1475-final conservé.
+Test permanent tests/rust_status_completion.py : lectures CLI/HTTP et pureté
+Work/Agent/réservations, rapport absent/attribuable/ambigu/reprise. Les deux
+observed_at sont les seules différences admises, validées puis neutralisées ;
+originaux JSON conservés.11tests mission_status_reports PASS après RED réel.
+dev44 : binaire noyau égal au candidat,46assets/notesFR-EN,40lectures et14Version.
+Sources/échecs/GLM/recette archivés localement dans evidence/20261024-status1475 ;
+aucune acceptation globale ni statut legacy complet établi.
+
+## Livraison ordinaire incomplète1476
+Recette existing-cockpit-rust, .cache/existing-cockpit1476-final : PASS et VERIFIED.
+Code de régression tests/rust_status_incomplete.py et _ui.cjs : public task.update,
+comparaison CLI/HTTP sauf deux heures validées, état non validé/rapport absent,
+stabilité des lectures, FR/EN/deux thèmes/mobile, restauration publique.
+12tests Rust,64HTTP logs/completion/incomplete,14transcript et513navigateur PASS.
+Installation dev45 : identité noyau/SHA candidat,46ressources protégées et notes,
+40lectures historiques/14Version. Les anciens agents restent sans reçu natif,
+les missions restent suspendues ; aucune écriture métier sur l’instance réelle.
+
+## Abandon ordinaire avec historique1477
+Recette existing-cockpit-rust, .cache/existing-cockpit1477-final : PASS/VERIFIED.
+verify_abandoned dans tests/rust_status_incomplete.py vient de GLM avec DTO réel,
+normalisation des deux horloges seulement ; commandes publiques, agent/tentative
+conservés, comparaison CLI/HTTP et pureté des lectures.14assertions navigateur
+FR/EN/deux thèmes/mobile sur abandon, en plus des14incomplete.13tests du lecteur
+et1historique PASS ;527navigateur,84HTTP logs/completion/incomplete/abandon et
+14transcript. dev46 : binaire noyau=candidat,46assets/notes,40lectures/14Version.
+Les preuves n’établissent pas la qualification complète du SDK results séparé.
+
+## Lot1478 — lectures Préparations et mesures de statut
+
+Recette `tools/verification/recipes/preparation-reads-rust.json` :
+`SWARM_STATUS_CONTRACT_BINARY=/chemin/binaire` puis `recipe.py run --recipe
+tools/verification/recipes/preparation-reads-rust.json --output /dossier/neuf`,
+puis `recipe.py verify --evidence /dossier/neuf`. Le fixture SQL historique explicite
+prouve les lecteurs, pas un writer Rust.58assertionsCLI/API+40Admin navigateur.
+`agent-logs-status-rust.json` réutilise le parcours permanent de journaux seul :
+102HTTP+14transcript/123navigateur après validation des mesures statvfs volatiles ;
+identités/états/décisions/budgets restent comparés strictement. Cockpit404vérifié
+séparément par `existing-cockpit-rust.json`, entrées produit inchangées ensuite.
+Preuves1478 : défaillances originales, archives et revue d’octets ; binaire dev48
+c60770468fdca72698b8f98d2fa102d95c6f9f5aa69534bf4e39dce6eb4b1ce2.
+Installation locale distincte : quatre préparations/cinq méthodes réelles relues,
+politiques explicitement adoptées par CLI, aucun lancement ni conversion.
+Aucun watchdog global, fournisseur métier ou acceptation globale/indépendante.
+
+## Lot1479 — distribution Rust
+
+Recettes : distribution-native-rust (gardes/liens/install native),
+distribution-docker-rust (image CLI/API et persistance),
+distribution-rust-docs (gardes/liens sur documentation finale).
+Utiliser recipe.py run avec --recipe tools/verification/recipes/NOM.json et
+--output /dossier/neuf, puis recipe.py verify --evidence /dossier/neuf.
+Le natif peut réutiliser SWARM_RUST_TARGET_DIR sans concurrence sur le target.
+Docker demande un moteur local ; aucune publication ou appel fournisseur.
+Sources persistantes : tests/rust_native_install.py, rust_docker_install.py,
+test_rust_distribution.py et rust/crates/swarm-cli/tests/version_no_repository.rs.
+Voir evidence/20261024-install1479/AUDIT.md pour preuves, réutilisations bornées
+et limites. Les échecs initiaux ne sont ni écrasés ni transformés en acceptation.
+
+
+##1480 — Changements et dépenses en CLI Rust
+
+Recette permanente : `tools/verification/recipes/mission-insights-rust.json`.
+Fournir `SWARM_INSIGHTS_BINARY` avec le binaire qualifié ; sortie de recette neuve.
+Chaque rejeu crée une fixture distincte, conserve argv/canaux/empreinte et43assertions
+nommées : DTO historiques, FR/EN, lectures/refus sans mutation, visite malformée et
+reprise. Les6tests ciblés du module CLI vérifient aussi sortie/flush et causes.
+Preuves : `evidence/20261024-insights1480/`. La base figée dev50 exclut le portage
+Biba concurrent ; ces résultats ne qualifient pas le checkout commun ni son
+installation, les missions configurées ou une parité globale Go.
+
+
+##1481 — budget historique show/preview
+
+Recette permanente : `tools/verification/recipes/budget-history-rust.json`, avec
+SWARM_BUDGET_HISTORY_BINARY explicite et sortie neuve. Init/Work/budget/settings
+par opérations publiques ; registres de planification explicitement injectés dans
+une fixture inactive seulement. Montants, coûts absents/zéro, révision, refus sans
+mutation et reprise ; seuil Admin persistant lu par le consommateur. Deux tests
+Rust `budget_history::tests` couvrent les quatre registres et JSON/JSONB corrompu.
+Aucun fournisseur réel, acceptation indépendante ou parité globale déduits.
+
+## Préparations : création/sauvegarde et adoption des réglages v42
+
+`tools/verification/recipes/preparation-writes-rust.json` : fournir
+`SWARM_PREPARATION_WRITES_BINARY` (binaire Rust exact), sortie neuve et sources
+figées.49 assertions CLI/API,8 identifiants historiques, deux tests SDK (transaction et reçu)
+(deux injections SQL et cohérence du reçu courant après ouverture valide) ;45 contrôles Admin FR/EN par parcours.
+`preparation-upgrade-rust.json` demande en plus
+`SWARM_PREPARATION_BASELINE_BINARY` : ancien binaire réel créant une Root v41.
+Il prouve le refus avant adoption explicite, l’historique préservé et l’écriture
+après adoption via Admin ; il ne migre jamais une base live.
+Exécuter `recipe.py verify --evidence DOSSIER` après chaque recette. Résultats et
+limites : [lot25 octobre](PREPARATION-WRITES-20261025.md). Les binaires de preuve
+et fixtures privées ne constituent pas une livraison ou une acceptation indépendante.

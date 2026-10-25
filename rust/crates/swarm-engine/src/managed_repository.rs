@@ -1,10 +1,22 @@
-//! Committed-only managed repository bootstrap; no worker or publication grant.
+//! Committed-only managed bootstrap/copies; attribution is no publication grant.
 #![cfg(target_os = "linux")]
 use crate::agent_launch_error::finish;
 use crate::local_storage::LocalDirectory;
 use crate::{
     AgentLaunchError as E, EngineSettingsDocument, ManagedRepository, ManagedRepositoryRequest,
 };
+#[path = "managed_repository_worker.rs"]
+mod worker;
+#[path = "managed_repository_candidate.rs"]
+mod candidate;
+#[path = "managed_repository_index.rs"]
+mod index;
+#[path = "managed_repository_source.rs"]
+mod source;
+#[path = "managed_repository_controls.rs"]
+mod controls;
+pub(crate) use controls::{ControlPlan as ManagedControlPlan, plan as managed_control_plan};
+pub(crate) use worker::{candidate_worker, prepare_worker, prepare_candidate, verify_candidate, pin_candidate, CandidateWitness, ManagedCandidate, retain_result, verify_result, verify_worker, WorkerCheck};
 use sha2::{Digest, Sha256};
 use std::os::unix::fs::PermissionsExt;
 use std::{

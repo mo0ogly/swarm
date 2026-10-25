@@ -158,6 +158,27 @@ pub struct EngineSettingsValues {
         deserialize_with = "present_cap"
     )]
     pub project_context_max_bytes: Option<SettingCap>,
+    /// v42: saved draft editing policy; absence requires explicit adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_count")]
+    pub preparation_write_enabled: Option<SettingCount>,
+    /// v42: saved draft editing policy; absence requires explicit adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_document_max_bytes: Option<SettingCap>,
+    /// v42: saved draft editing policy; absence requires explicit adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_title_max_bytes: Option<SettingCap>,
+    /// v42: saved draft editing policy; absence requires explicit adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_string")]
+    pub preparation_default_method: Option<String>,
+    /// v41: explicit preparation read policy; absence requires adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_list_limit: Option<SettingCap>,
+    /// v41: explicit preparation read policy; absence requires adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_history_limit: Option<SettingCap>,
+    /// v41: explicit preparation read policy; absence requires adoption.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_method_max_bytes: Option<SettingCap>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -896,6 +917,14 @@ fn present_cap<'de, D: Deserializer<'de>>(d: D) -> Result<Option<SettingCap>, D:
 fn required_cap<'de, D: Deserializer<'de>>(d: D) -> Result<Option<SettingCount>, D::Error> {
     Option::<SettingCount>::deserialize(d)
 }
+/// Persisted read bounds, never execution or conversion authority.
+/// None is unlimited; row zero hides rows without deleting history.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PreparationReadPolicy {
+    pub list_limit: Option<usize>,
+    pub history_limit: Option<usize>,
+    pub method_max_bytes: Option<usize>,
+}
 pub enum EngineSettingsError {
     WebAddress(std::net::AddrParseError),
     WebCount(std::num::TryFromIntError),
@@ -984,11 +1013,18 @@ impl EngineSettingsValues {
     /// missing groups. Returns a safe typed format/policy error; no IO or state
     /// changes occur, and legacy absence never becomes implicit current defaults.
     /// Validate supplied values, technical representation and complete versioned
-    /// policy groups through v40. Historical absence remains absent; network20
+    /// policy groups through v42. Historical absence remains absent; network20
     /// requires prior groups and never adopts defaults, opens sockets, changes
     /// Work/history or establishes active-server state. Typed validation causes
     /// survive rejection; caller still owes authority and publication freshness.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
+        if self.has_preparation_write_policy() { self.preparation_write_policy()?; self.preparation_read_policy()?; }
+        if self.preparation_list_limit.is_some() || self.preparation_history_limit.is_some() || self.preparation_method_max_bytes.is_some() {
+            self.preparation_read_policy()?;
+            if self.agent_report_clock_skew_seconds.is_none() {
+                return Err(refuse("settings-preparation-requires-report-clock-policy"));
+            }
+        }
         if self.agent_report_clock_skew_seconds.is_some() { self.report_clock_skew_seconds()?; }
         if self.work_view_status_recent_agents.is_some() || self.work_view_status_change_events.is_some() {
             self.mission_status_view_limits()?;
@@ -1284,10 +1320,41 @@ impl EngineSettingsValues {
         if warning_bytes < stop_bytes { return Err(refuse("settings-runtime-storage-warning-below-stop")); }
         Ok(RuntimeStoragePolicy { stop_bytes, warning_bytes, stop_inodes })
     }
+    /// Read all persisted preparation bounds; missing, negative or unrepresentable
+    /// values refuse. Null is unlimited; zero rows hides history without deleting
+    /// it, zero bytes refuses nonempty method text. No adoption, IO or authority.
+    pub fn preparation_read_policy(&self) -> Result<PreparationReadPolicy, EngineSettingsError> {
+        let read = |value: Option<SettingCap>| {
+            value.ok_or_else(|| refuse("settings-preparation-read-not-configured"))?
+                .0.map(|value| size(Some(value))).transpose()
+        };
+        Ok(PreparationReadPolicy { list_limit: read(self.preparation_list_limit)?,
+            history_limit: read(self.preparation_history_limit)?,
+            method_max_bytes: read(self.preparation_method_max_bytes)? })
+    }
+    /// Whether any v42 editing field was supplied, without adopting defaults.
+    fn has_preparation_write_policy(&self) -> bool {
+        self.preparation_write_enabled.is_some() || self.preparation_document_max_bytes.is_some() || self.preparation_title_max_bytes.is_some() || self.preparation_default_method.is_some()
+    }
+    /// Require the complete saved draft editing group. Enabled is exactly 0/1;
+    /// null size caps mean unlimited and zero rejects nonempty input. The default
+    /// method must name a supported capability. No IO/adoption/launch occurs.
+    pub fn preparation_write_policy(&self) -> Result<PreparationWritePolicy, EngineSettingsError> {
+        let missing = || refuse("settings-preparation-write-not-configured");
+        let enabled = self.preparation_write_enabled.ok_or_else(missing)?.0;
+        if !matches!(enabled,0|1) { return Err(refuse("settings-preparation-write-enabled-invalid")); }
+        let cap = |v: Option<SettingCap>| v.ok_or_else(missing)?.0.map(|n|size(Some(n))).transpose();
+        let method = self.preparation_default_method.as_deref().ok_or_else(missing)?;
+        if !matches!(method,"apex"|"debug"|"audit-pdca"|"ks-feature"|"ks-product") { return Err(refuse("settings-preparation-default-method-invalid")); }
+        Ok(PreparationWritePolicy { enabled: enabled==1, document_max_bytes: cap(self.preparation_document_max_bytes)?, title_max_bytes: cap(self.preparation_title_max_bytes)?, default_method: method.into() })
+    }
     /// Return the complete declared settings version, preserving historical
     /// absence. This does not adopt defaults, mutate history or grant authority.
     pub fn schema_version(&self) -> i64 {
-        if self.agent_report_clock_skew_seconds.is_some() {
+        if self.has_preparation_write_policy() { return 42; }
+        if self.preparation_list_limit.is_some() || self.preparation_history_limit.is_some() || self.preparation_method_max_bytes.is_some() {
+            41
+        } else if self.agent_report_clock_skew_seconds.is_some() {
             40
         } else if self.work_view_status_recent_agents.is_some() || self.work_view_status_change_events.is_some() {
             39
@@ -2134,12 +2201,12 @@ fn entry_digest(entry: &EngineSettingsEntry) -> Result<String, EngineSettingsErr
         &entry.previous_digest,
     ))
 }
-/// Validate a complete schema1–29 change envelope before preview or application.
+/// Validate a supported versioned change envelope before preview or application.
 /// Reject invalid event/revision/reason or incomplete policy values, retaining
 /// typed validation causes. This reads supplied values only; publication,
 /// preview freshness and actor authority remain caller responsibilities.
 fn validate_change(r: &EngineSettingsChange) -> Result<(), EngineSettingsError> {
-    if !matches!(r.schema_version, 1..=40)
+    if !matches!(r.schema_version, 1..=42)
         || r.schema_version != r.values.schema_version()
         || !swarm_identity_contract::name(r.event_id.as_bytes())
         || r.expected_revision.0 < 0
@@ -2191,7 +2258,7 @@ impl EngineSettingsDocument {
     /// Return typed format/policy errors without adoption, publication or IO.
     /// Logical integrity does not establish authentication or rollback protection.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
-        if !matches!(self.schema_version, 1..=40) || self.revision.0 < 1 || self.history.is_empty()
+        if !matches!(self.schema_version, 1..=42) || self.revision.0 < 1 || self.history.is_empty()
         {
             return Err(refuse("settings-document-envelope"));
         }
@@ -2310,3 +2377,7 @@ impl EngineSettingsDocument {
         Ok((doc, false))
     }
 }
+
+/// Validated saved draft editing policy, independent of execution authority.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PreparationWritePolicy { pub enabled: bool, pub document_max_bytes: Option<usize>, pub title_max_bytes: Option<usize>, pub default_method: String }

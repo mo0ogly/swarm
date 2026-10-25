@@ -88,9 +88,12 @@ consumer, preserving received history.
 
 ## 4. Delivery, evidence and verification
 
-Local delivery: `swarm.sh`; FR/EN `version_history.json` local_changes; verify
-running Version dialog, notes, real commit and uncommitted label. Only changed
-inputs advance the number. No extra restart/publication rights; never invent tags.
+Local delivery: `swarm.sh`; verify live Version dialog, FR/EN
+`version_history.json`, commit and dirty flag. Changed inputs advance version.
+By user decision, build/install/start/restart verified authorized work locally
+by default, without asking again; only owned service, preserving data, missions
+and others' processes. Candidate != installed; missing path: replan with proof/resumption condition.
+No commit/push/publication, external/production deployment, or invented tags.
 
 Update docs, languages and diagrams per change, or record why unnecessary;
 docs prove no execution, effect or acceptance.

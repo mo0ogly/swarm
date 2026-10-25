@@ -125,6 +125,11 @@ impl RootStore {
     ) -> Result<PreparedReview, E> {
         let launch = |e| E::Launch(Box::new(e));
         let current = crate::read_recorded_work(tx, work).map_err(E::Work)?;
+        // Full managed cohort/provider context and protected candidate acceptance
+        // remain unported. New control admission must not unlock target-only review.
+        if current.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
+            return Err(E::Refused("review-managed-candidate-unported"));
+        }
         let recovery = self.review_recovery(tx, &current, &request.task_id, review, &settings)?;
         let source = match (review, recovery.as_ref()) {
             (None, Some(recovery)) => task_validation::prepare_reviewer_retry_preview(

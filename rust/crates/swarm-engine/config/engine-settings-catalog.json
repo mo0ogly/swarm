@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "fields": [
     {
       "name": "task_max_attempts",
@@ -1087,6 +1087,62 @@
       "nullable": false,
       "help": "Marge soustraite au départ de la tentative pour sélectionner son rapport par date de modification. Zéro exige un rapport modifié au départ ou après ; une marge plus grande peut admettre un rapport plus ancien. Un seul rapport courant non vide est transmis, sans validation ni acceptation. Choix initial : 2 secondes, comme le moteur Go. Les installations anciennes doivent adopter explicitement ce réglage.",
       "introduced_schema_version": 40
+    },
+    {
+      "name": "preparation_list_limit",
+      "label": "Préparations affichées",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de préparations retournées, dans l’ordre enregistré ; zéro masque les lignes, sans plafond lit toutes les préparations.",
+      "introduced_schema_version": 41
+    },
+    {
+      "name": "preparation_history_limit",
+      "label": "Versions de document affichées",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de versions antérieures retournées par page ; zéro masque les versions sans supprimer l’historique.",
+      "introduced_schema_version": 41
+    },
+    {
+      "name": "preparation_method_max_bytes",
+      "label": "Source de méthode de préparation",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Taille maximale par fichier de méthode local ou embarqué ; un dépassement rend la méthode indisponible, sans troncature ni repli caché.",
+      "introduced_schema_version": 41
+    },
+    {
+      "name": "preparation_write_enabled",
+      "label": "Écriture des préparations",
+      "unit": "count",
+      "nullable": false,
+      "help": "1 autorise la création et la sauvegarde ; 0 les refuse, y compris les rejeux. Les lectures restent disponibles. Ne lance aucun agent.",
+      "introduced_schema_version": 42
+    },
+    {
+      "name": "preparation_document_max_bytes",
+      "label": "Taille du document de préparation",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Limite du texte UTF-8 en octets, sans troncature. Zéro refuse tout texte non vide ; null est sans plafond. Valeur initiale héritée du Go : 16 000.",
+      "introduced_schema_version": 42
+    },
+    {
+      "name": "preparation_title_max_bytes",
+      "label": "Taille du titre de préparation",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Limite du titre fourni avant nettoyage en octets UTF-8. Zéro accepte seulement un titre vide ; null est sans plafond. Le libellé automatique « Nouvelle préparation » est exempt. Valeur initiale : 240.",
+      "introduced_schema_version": 42
+    },
+    {
+      "name": "preparation_default_method",
+      "label": "Méthode initiale de préparation",
+      "unit": "text",
+      "nullable": false,
+      "help": "Méthode utilisée lorsque la création ne la précise pas : apex, debug, audit-pdca, ks-feature ou ks-product. Valeur initiale : apex. Aucun appel IA ni autorisation de plan.",
+      "introduced_schema_version": 42
     }
   ]
 }

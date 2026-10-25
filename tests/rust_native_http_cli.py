@@ -7,7 +7,7 @@ owner records, graceful SIGINT and BrokenPipe recovery. stdout backpressure that
 never returns is not covered. Keys/CSRF/preview tokens stay out of proof streams.
 Failed Roots survive; successful ones are removed only after owned processes exit.
 """
-import argparse,hashlib,http.client,json,os,shutil,signal,subprocess,tempfile,time,traceback
+import argparse,hashlib,http.client,json,os,shutil,signal,subprocess,tempfile,time,traceback,threading
 from pathlib import Path
 import rust_agent_model_route as retained
 
@@ -32,7 +32,8 @@ class Server:
         self.binary=binary;self.root=root;self.output=output;self.label=label;self.records=[];self.requests=[];self.stop_sent=False
         self.argv=[str(binary),'web','--root',str(root),'--json','--lang','en']
         self.start=time.time();self.process=subprocess.Popen(self.argv,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=environment)
-        self.stdout_open=True;self.stderr=b''
+        self.stdout_open=True;self.stderr=b'';self.capture_thread=None;self.capture_errors=[];self.capture_bytes=0;self.capture_capacity=None
+        self.capture_changed=threading.Event();self.capture_done=False
         retained.publish(output/(label+'-process.json'),dict(argv=self.argv,pid=self.process.pid,start=self.start,global_watchdog=None,owned=True))
         print(json.dumps(dict(state='RUN',case=label,phase='waiting-bound')),flush=True)
         try:
@@ -48,8 +49,67 @@ class Server:
             except BaseException as secondary:raise BaseExceptionGroup('Bootstrap and owned cleanup failed',[primary,secondary])
             raise
 
+    def capture_async(self,path):
+        """Continuously retain stdout when a browser owns the HTTP conversation.
+
+        Opt-in relinquishes synchronous record()/observed request()/stop(); use
+        cleanup() to signal, join the reader and close owned pipes. A fresh private
+        file inside this fixture's output retains exact bytes. Invalid frames and
+        IO/close errors survive and fail cleanup. No retry, time/volume cap or Root
+        mutation; pipe capacity is diagnostic data, not an execution policy.
+        """
+        if self.capture_thread is not None:raise ValueError('capture already active')
+        path=Path(path).resolve()
+        if not path.is_relative_to(self.output.resolve()):raise ValueError('capture outside fixture output')
+        stream=path.open('xb');os.chmod(path,0o600)
+        try:
+            import fcntl
+            if hasattr(fcntl,'F_GETPIPE_SZ'):self.capture_capacity=fcntl.fcntl(self.process.stdout.fileno(),fcntl.F_GETPIPE_SZ)
+        except ImportError:pass  # Capacity remains explicitly unknown off POSIX.
+        except BaseException as primary:
+            try:stream.close()
+            except BaseException as secondary:raise BaseExceptionGroup('Capture setup and close failed',[primary,secondary])
+            raise
+        def drain():
+            """Consume to actual EOF; retain malformed originals while reporting failure."""
+            try:
+                for raw in self.process.stdout:
+                    stream.write(raw);stream.flush();self.capture_bytes+=len(raw);self.capture_changed.set()
+                    try:
+                        value=json.loads(raw)
+                        if value.get('schema_version')!=1:raise ValueError('capture protocol schema')
+                        self.records.append(clean(value))
+                    except BaseException as error:self.capture_errors.append(error)
+            except BaseException as error:self.capture_errors.append(error)
+            finally:
+                try:stream.close()
+                except BaseException as error:self.capture_errors.append(error)
+                self.capture_done=True;self.capture_changed.set()
+        self.capture_thread=threading.Thread(target=drain,name='owned-web-output',daemon=True)
+        try:self.capture_thread.start()
+        except BaseException as primary:
+            self.capture_thread=None
+            try:stream.close()
+            except BaseException as secondary:raise BaseExceptionGroup('Capture start and close failed',[primary,secondary])
+            raise
+
+    def wait_capture_progress(self,previous):
+        """Wait for actual additional bytes or a retained failure/EOF, no deadline.
+
+        Only async capture owns the stream. Recheck after clearing the event to
+        avoid a lost wakeup; no iteration/byte ceiling or automatic retry applies.
+        """
+        if self.capture_thread is None:raise ValueError('capture required')
+        while self.capture_bytes<=previous and not self.capture_done:
+            self.capture_changed.clear()
+            if self.capture_bytes>previous or self.capture_done:break
+            self.capture_changed.wait()
+        if self.capture_errors:raise BaseExceptionGroup('Capture failed',self.capture_errors)
+        if self.capture_bytes<=previous:raise ValueError('capture ended before observation')
+
     def record(self):
         """Read one actual compact protocol frame, with no terminal watchdog."""
+        if self.capture_thread is not None:raise ValueError('synchronous observer unavailable during capture')
         raw=self.process.stdout.readline();assert raw,'CLI stdout ended before required frame'
         value=json.loads(raw);assert value['schema_version']==1
         self.records.append(clean(value));return value
@@ -60,6 +120,7 @@ class Server:
         Observer frames follow completed jobs only; pre-Root access refusals appear
         in final summary. Unknown client response after output failure is not success.
         """
+        if observe and self.capture_thread is not None:raise ValueError('observed request unavailable during capture')
         headers={'Origin':'http://'+self.address}
         if authorized:headers['Cookie']=self.cookie
         if csrf is not None:headers['X-Swarm-CSRF']=csrf
@@ -93,6 +154,7 @@ class Server:
 
     def stop(self):
         """SIGINT only this owned child, then require the actual drained-stop summary."""
+        if self.capture_thread is not None:raise ValueError('use cleanup during asynchronous capture')
         self.process.send_signal(signal.SIGINT);self.stop_sent=True
         frame=self.record();assert frame['event']=='web-stopped'
         self.stderr=self.process.stderr.read();code=self.process.wait();assert code==0,(code,clean(json.loads(self.stderr)) if self.stderr else None)
@@ -103,11 +165,17 @@ class Server:
 
         No kill timeout or retry is invented. A stall remains observable in driver
         stage/process records and must be diagnosed by the active test controller.
+        Opt-in capture is joined after signaling so stdout cannot backpressure
+        browser completion; protocol/IO failures remain cleanup failures.
         """
         errors=[]
         if self.process.poll() is None and not self.stop_sent:
             try:self.process.send_signal(signal.SIGINT);self.stop_sent=True
             except BaseException as error:errors.append(error)
+        if self.capture_thread is not None:
+            try:self.capture_thread.join()
+            except BaseException as error:errors.append(error)
+            errors.extend(self.capture_errors)
         if self.stdout_open:
             try:
                 remainder=self.process.stdout.read()

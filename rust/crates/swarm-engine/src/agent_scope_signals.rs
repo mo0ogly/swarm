@@ -28,7 +28,7 @@ pub(crate) fn ended(
         },
     )
 }
-/// Bind an explicit operator handoff's checked report bytes to its owning scope.
+/// Bind a checked worker handoff to its owning scope (manual or lease-fenced relay).
 /// No synthetic attempt, reviewer call or accepted quality is created. Caller
 /// verifies actual native completion/path/hash and commits the enclosing event.
 pub(crate) fn handoff(
@@ -47,7 +47,7 @@ pub(crate) fn handoff(
         PlanningEvent {
             id: format!("plan-{:x}", Sha256::digest(bytes)),
             kind: "handoff".into(),
-            message: "Rapport remis explicitement par l’opérateur ; preuves et validation requises"
+            message: "Rapport du worker remis au propriétaire ; preuves et validation requises"
                 .into(),
             handoff: Some(Box::new(report.clone())),
             artifacts: Some(vec![report]),

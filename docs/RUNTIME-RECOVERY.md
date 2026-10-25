@@ -6,6 +6,33 @@ ne prouvent pas cette clôture.
 
 ## Stockage indisponible
 
+Dans le moteur Rust, le délai SQLite `storage_busy_timeout_ms` enregistré dans
+Admin s'applique dès la première vérification de l'identité du datastore. Le
+moteur lit d'abord les réglages validés par son descripteur de répertoire, sans
+SQL ; il ne retombe sur les valeurs d'installation que si le fichier est absent.
+Un document invalide ou illisible refuse l'ouverture. Ce délai remplace celui du
+constructeur SQLite et ne change ni les tentatives ni les droits. Zéro est une
+décision opérateur de refus immédiat sous contention ; l'expiration d'un délai
+non nul reste un refus, jamais un succès vide ou une preuve d'absence d'effet.
+Les lectures d'identité suivantes conservent le réglage courant de la connexion.
+
+Si une permission opérateur est retirée pendant la synchronisation, un aperçu de départ ou la lecture
+initiale d'un rapport, avant son écriture, un refus
+propre du garde peut arrêter la seule surveillance de cette mission avec la raison
+`permission-withdrawn`. L'événement `mission-watch-blocked` conserve les effets de
+file déjà enregistrés, les refus des autres candidats et la cause du preview.
+Une synchronisation refusée reste explicitement enregistrée : une révision
+concurrente ne la transforme pas en opération sans effet. Son Work, sa permission
+et l'absence de préparation sont contrôlés avant l'arrêt de cette session.
+Pour un rapport, il conserve aussi le dernier Work déjà enregistré et indique
+qu'aucune nouvelle écriture de rapport n'a été tentée par cette lecture refusée.
+Ce n'est ni une réussite de départ, ni un nettoyage de file démontré. Le serveur
+continue ; les workers déjà autorisés conservent leur cycle propre. Les rôles
+encore possédés par cette surveillance sont drainés par l'arrêt de son contrôleur.
+Un échec de publication, une admission tentée ou un effet incertain reste une
+erreur avec ses causes. La reprise exige les permissions courantes et une nouvelle
+session propriétaire, sans remboursement ni rejeu automatique de l'admission.
+
 Le cockpit affiche un bandeau global et un bouton **Diagnostic du stockage**.
 Cette lecture locale ne consomme aucun appel IA et ne dépend pas de SQLite :
 elle reste accessible si la lecture des missions échoue. **Vérifier à nouveau**
@@ -357,3 +384,101 @@ sequenceDiagram
  H-->>J: Observation / absence / erreur
  J-->>U: Texte littéral et avertissement si partiel
 ```
+
+## Statut après terminaison ordinaire — Rust
+
+Après un agent terminé sur une tâche bloquée, hors livraison incomplète ou reprise
+non portée, `mission status` et Conduite exposent le résultat sans le valider.
+Sans rapport attribuable : `completed_unproven`. Un rapport non vide sous `docs/`,
+dans la fenêtre du réglage persistant de décalage d’horloge, devient
+`attributable_unsubmitted` et reste à vérifier. Plusieurs candidats sont ambigus.
+Les erreurs de lecture restent des erreurs ; aucune identité ou autorisation de
+relance ne découle de cette lecture. Les anciens agents sans binding natif et
+les revues en lots non portées peuvent encore refuser le statut calculé.
+
+Pour une tâche ordinaire sans planification, un agent terminé et un blocage
+« Livraison incomplète : » produisent `delivery_incomplete`, `not_validated`,
+rapport absent. Le moteur ne cherche pas de rapport incomplet dans `docs/` :
+le producteur historique de ce rapport concerne seulement les dépôts managed.
+Ce raccord ne porte pas encore cette branche managed et n’autorise pas de reprise.
+
+Une décision d’abandon ordinaire reste consultable si des agents terminés
+(completed/failed/interrupted) sont conservés. Le statut montre l’abandon non
+validé, l’agent et la tentative historiques, sans lire ou attribuer un nouveau
+rapport. Un agent encore actif sur cette tâche conserve le refus de cohérence.
+Les dérogations et les historiques managed non portés restent distincts.
+
+## Lectures de préparations — Rust
+
+`prepare list`, `prepare show ID`, `prepare history ID besoin|brief|plan [avant_revision]`
+et `prepare methods` lisent la Root courante sans écrire ni adopter un plan.
+Les routes GET/HEAD protégées correspondantes sont `/api/v1/preparations`,
+`/api/v1/preparations/show?id=ID`, `/api/v1/preparations/history?id=ID&document=plan&before=REV`
+et `/api/v1/preparations/methods`. Les requêtes ambiguës, corps ou champs inconnus
+sont refusés ; une préparation absente reste404, un enregistrement malformé500.
+
+`plan_ready` est recalculé avec les hash déclarés des documents et les octets
+courants de la méthode. Ce drapeau ne vaut ni adoption humaine, ni validation
+d’un résultat, ni autorisation de lancement. Une méthode indisponible garde un
+motif visible dans le catalogue et rend ce drapeau faux. Un fichier local absent
+utilise le pack embarqué ; un lien, accès refusé ou contenu invalide ne le fait pas.
+
+Dans Admin → Préparations et documents, les trois paramètres v41 sont persistés :
+`preparation_list_limit` (défaut livré100), `preparation_history_limit` (50),
+`preparation_method_max_bytes` (131072octets par fichier). Null signifie sans
+plafond ; zéro masque les lignes/versions sans les supprimer, ou refuse une
+méthode non vide pour la limite d’octets. Les anciennes installations sans ce
+groupe doivent l’adopter explicitement via prévisualisation/application Admin ou
+CLI ; aucune valeur de repli ne s’applique à leur lecture. Les limites actives
+sont relues à chaque opération, sans redémarrage. Les grands compteurs restent
+exacts en configuration ; les consommateurs JSON doivent préserver les entiers.
+
+L’historique utilise une révision `before` positive exclusive ; son absence
+reprend le sentinelle i64max du contrat Go. Le tri de liste suit rowid décroissant,
+pas l’ordre lexical d’un identifiant opaque. Les données et les historiques de
+préparation restent inchangés. Les écritures, le dialogue et la conversion de
+préparations ainsi que l’éditeur web complet restent non portés.
+
+Le lecteur de réglages Rust utilise aussi les tentatives/délais de contention stockés : une réservation Admin occupée et libérée proprement peut être réessayée avant lecture, sans relancer de mission ou de fournisseur. Zéro tentative supplémentaire refuse immédiatement ; null peut attendre sans plafond. Les erreurs de fermeture, de politique ou composées restent fatales.
+
+
+### Brouillons de préparation : écriture Rust (v42)
+
+La création et la sauvegarde sont raccordées au même stockage que les lectures :
+`prepare create --input requete.json`, `prepare save ID --input requete.json`,
+ou POST protégé `/api/v1/preparations/command`. Fournir version1, action,
+event_id et expected_revision ; save exige preparation_id identique à ID et
+document besoin/brief/plan. Création : identifiant absent et révision0.
+Une sauvegarde ne valide ni n’exécute le plan.
+
+Si `settings-preparation-write-not-configured` apparaît sur une ancienne
+installation, ouvrir Admin → Régler le moteur et adopter les nouvelles valeurs
+par prévisualisation/enregistrement, ou utiliser engine-settings describe/show/
+preview/apply avec le schéma du catalogue. Ne pas réinitialiser le journal.
+L’interrupteur0/1, les tailles UTF-8 (null sans plafond) et la méthode initiale
+sont persistés et partagés entre Admin, API et CLI. L’ancien interrupteur
+SWARM_PREPARATION_DISABLED Go ne remplace pas ce réglage Rust.
+
+Même événement et même intention : reçu d’origine, sans nouvelle sauvegarde.
+Un reçu historique porte receipt_historical=true. Après un résultat incertain,
+relire puis rejouer le même événement inchangé ; ne pas inventer un autre ID.
+Les erreurs après un reçu connu conservent recorded_preparation(id,revision),
+distinct du Work ; absence de métadonnées ne garantit pas un rollback. CLI :
+conflit3, écriture désactivée4, méthode inconnue5, autres erreurs ordinaires2.
+Les diagnostics structurés Rust conservent leurs familles préfixées et les causes ;
+les textes d’erreur Go ne constituent pas un oracle octet pour octet.
+Une méthode indisponible permet un brouillon sans empreinte fraîche ; consulter
+prepare methods pour son diagnostic, sans autorisation implicite d’exécution.
+
+La recette preparation-writes-rust couvre les parcours publics et le test Rust
+retained-Root des insertions enfants. Un déclencheur SQL ajouté avant ouverture
+est correctement refusé par le contrôle de schéma : cette fixture ne prouve pas
+le rollback du writer. Le test d’atomicité injecte après ouverture valide d’une
+Root isolée, supprime le défaut, rejoue et rouvre. Aucun éditeur de préparation,
+dialogue IA, adoption de plan ni migration globale achevée n’est revendiqué ici.
+
+Un refus `preparation-receipt-identity-mismatch` signale une incohérence de reçu,
+pas un conflit normal de révision : conserver les preuves et diagnostiquer avec
+le propriétaire du stockage. Aucun rejeu identique ne répare un reçu corrompu.
+Le contrôle compare le contenu courant avant projection ; un reçu historique
+reste explicitement historique et n’acquiert aucune autorité d’exécution.

@@ -13,7 +13,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from swarm_version import prepare as prepare_versioned_build
+from swarm_version import prepare as prepare_versioned_build, session_request
 
 SOURCE = Path(__file__).resolve().parent.parent
 
@@ -35,7 +35,11 @@ def owned(state):
 
 
 def server_identity(pid, expected):
-    """Track the actual Go server, not a mount-wrapper that can leave it alive."""
+    """Track the exact native server argv behind an optional mount wrapper.
+
+    Kernel start time/executable/argv prove local ownership only, not confinement.
+    Missing/exited process returns None; no process is signalled here.
+    """
     actual = identity(pid)
     if actual and bytes.fromhex(actual["cmd"]).split(b"\0")[:-1] == [a.encode() for a in expected]:
         return actual
@@ -51,9 +55,14 @@ def server_identity(pid, expected):
 
 
 def stop(state, timeout, address):
+    """Drain the owned Rust server with SIGINT; refuse a stale PID or stuck stop.
+
+    Timeout is the caller-selected lifecycle policy, not a mission deadline.
+    Never escalate to killing unknown processes or discard their state.
+    """
     if not owned(state):
         return
-    os.kill(state["pid"], signal.SIGTERM)
+    os.kill(state["pid"], signal.SIGINT)
     end = time.monotonic() + timeout
     while owned(state) and time.monotonic() < end:
         time.sleep(.1)
@@ -74,18 +83,44 @@ def stop(state, timeout, address):
 
 
 def ready(address, root):
+    """Require protected observed-native capabilities, never a public login 200.
+
+    One existing local HTTP probe deadline bounds status latency, not test/work
+    execution. Absent/private-key, HTTP, encoding and DTO failures mean unready;
+    no credential is printed and no Root data/settings are changed.
+    """
     try:
-        key_path = root / ".swarm" / ("web-session-" + hashlib.sha256(address.encode()).hexdigest()[:16])
-        token = key_path.read_text().strip()
-        request = urllib.request.Request(f"http://{address}/", headers={
-            "Cookie": "swarm_session_" + hashlib.sha256(address.encode()).hexdigest()[:12] + "=" + token})
-        with urllib.request.urlopen(request, timeout=1) as response:
-            return response.status == 200
-    except (OSError, urllib.error.HTTPError):
+        request=session_request(address,root,'/api/v1/native-capabilities')
+        with urllib.request.urlopen(request,timeout=1) as response:
+            value=json.load(response)
+        return isinstance(value,dict) and value.get('schema_version')==1 and value.get('profile')=='rust-native-http1-observed'
+    except (OSError,ValueError,urllib.error.HTTPError):
         return False
 
 
+def running_version(address,root,pid):
+    """Read protected compiled declarations and hash the actual kernel executable.
+
+    Caller verifies process ownership before/after the probe. This is local
+    observation, not cryptographic server authentication. HTTP/JSON/IO errors
+    refuse instead of returning a fabricated version or hashing a replacement.
+    """
+    request=session_request(address,root,'/api/v1/native-version')
+    with urllib.request.urlopen(request,timeout=1) as response:value=json.load(response)
+    if not isinstance(value,dict) or value.get('schema_version')!=1 or not isinstance(value.get('binary'),dict):
+        raise ValueError('Native compiled version response invalid')
+    with Path(f'/proc/{pid}/exe').open('rb') as stream:sha=hashlib.file_digest(stream,'sha256').hexdigest()
+    return value,sha
+
+
 def main():
+    """Manage one configured local Rust service through locked public operations.
+
+    Build and isolated qualification precede any owned stop. Existing Roots are
+    opened by Rust without implicit init; new Roots use public init. Failures keep
+    data/history and never select Go. Browser opening uses the native login page,
+    without a secret URL. Source binaries are built; external binaries stay external.
+    """
     config_path = SOURCE / "deploy" / "local-web.json"
     settings = json.loads(config_path.read_text()) if config_path.exists() else {}
     parser = argparse.ArgumentParser(description="Swarm local : start, stop, restart, status, logs, open, build")
@@ -121,7 +156,7 @@ def main():
         if args.action == "configure":
             config_path.parent.mkdir(parents=True, exist_ok=True)
             temporary = config_path.with_suffix(".tmp")
-            temporary.write_text(json.dumps({"root":str(root), "address":args.address, "mask_cifs":args.mask_cifs,
+            temporary.write_text(json.dumps({**settings, "root":str(root), "address":args.address, "mask_cifs":args.mask_cifs,
                                              "binary":str(binary) if args.binary else ""}))
             temporary.replace(config_path)
             print("Configuration locale enregistrée (projet et adresse stables).")
@@ -135,8 +170,11 @@ def main():
             print("Ancienne instance identifiée et adoptée ; aucune donnée modifiée.")
             return 0
         if args.action == "status":
+            version,sha=running_version(args.address,root,state['pid']) if running else (None,None)
+            if running and not owned(state):raise RuntimeError('Server identity changed during version observation')
             print(json.dumps({"running": bool(running), "pid": state["pid"] if running else None,
-                              "root": str(root), "url": f"http://{args.address}/", "ready": ready(args.address, root) if running else False}))
+                              "root": str(root), "url": f"http://{args.address}/", "ready": ready(args.address, root) if running else False,
+                              "engine":"rust", "binary":version['binary'] if version else None,"binary_sha256":sha}))
             return 0 if running else 1
         if args.action == "logs":
             # The underlying server prints a bearer URL. Never expose that credential.
@@ -176,8 +214,9 @@ def main():
                     raise RuntimeError("Port occupé par une instance non gérée ; aucun processus arrêté. Utilisez --address ou arrêtez explicitement cette instance.")
             if prepared and prepared != binary:
                 prepared.replace(binary)
-            subprocess.run([str(binary), "--root", str(root), "init"], cwd=SOURCE,
-                           check=True, stdout=subprocess.DEVNULL)
+            if not (root / ".swarm/state.db").exists():
+                subprocess.run([str(binary), "--root", str(root), "init"], cwd=SOURCE,
+                               check=True, stdout=subprocess.DEVNULL)
             server_command = [str(binary), "--root", str(root), "web", args.address]
             command = server_command
             if args.mask_cifs:
@@ -196,28 +235,32 @@ def main():
             else:
                 actual = server_identity(process.pid, server_command)
                 if actual:
-                    os.kill(actual["pid"], signal.SIGTERM)
-                process.terminate()
+                    os.kill(actual["pid"], signal.SIGINT)
+                process.send_signal(signal.SIGINT)
                 process.wait(timeout=args.stop_timeout)
                 raise RuntimeError("Délai de démarrage dépassé.")
             actual = server_identity(process.pid, server_command)
             if not actual:
-                process.terminate()
+                process.send_signal(signal.SIGINT)
                 raise RuntimeError("Identité du serveur indisponible ; démarrage non adopté.")
-            state = {"pid": actual["pid"], "identity": actual}
+            try:
+                version,sha=running_version(args.address,root,actual['pid'])
+                with binary.open('rb') as stream:expected_sha=hashlib.file_digest(stream,'sha256').hexdigest()
+                if sha!=expected_sha or identity(actual['pid'])!=actual:
+                    raise RuntimeError('Started native executable differs from the prepared candidate')
+            except BaseException:
+                # Signal only the process still matching our exact owned identity.
+                if identity(actual['pid'])==actual:os.kill(actual['pid'],signal.SIGINT)
+                raise
+            state = {"pid": actual["pid"], "identity": actual,"binary_sha256":sha,"version":version['binary']}
             temporary = state_path.with_suffix(".tmp")
             temporary.write_text(json.dumps(state))
             temporary.replace(state_path)
         print(f"Swarm : http://{args.address}/")
         if not args.no_open:
-            key_path = root / ".swarm" / ("web-session-" + hashlib.sha256(args.address.encode()).hexdigest()[:16])
-            info = key_path.lstat()
-            if key_path.is_symlink() or info.st_mode & 0o077:
-                raise RuntimeError("Clé de session non privée.")
-            token = key_path.read_text().strip()
-            # Authentication stays enabled. Only the local opener receives the private URL.
+            # Native login accepts a POSTed key; no credential-bearing URL exists.
             opener = os.environ.get("SWARM_BROWSER", "xdg-open")
-            subprocess.run([opener, f"http://{args.address}/session/{token}"], check=True,
+            subprocess.run([opener, f"http://{args.address}/login?next=/live.html"], check=True,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return 0
 

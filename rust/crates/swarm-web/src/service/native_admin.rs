@@ -14,6 +14,13 @@ pub(super) fn resource<B>(r: &Request<B>) -> bool {
 /// not a public directory, credential-bearing runtime file or external resource.
 fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
     match path {
+        "/paea.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea.html"))),
+        "/paea.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea.js"))),
+        "/paea.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/paea.css"))),
+        "/trust-actions.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/trust-native.html"))),
+        "/trust-native.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/trust-native.js"))),
+        "/trust-native.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/trust-native.css"))),
+
         "/cockpit.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/cockpit.css"))),
         "/cockpit-ux.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/cockpit-ux.css"))),
         "/agent-terminal.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/agent-terminal.css"))),
@@ -33,6 +40,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/i18n.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/i18n.js"))),
         "/swarm-shell.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/swarm-shell.js"))),
         "/cockpit-native-read.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-read.js"))),
+        "/cockpit-native-instructions.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-instructions.js"))),
         "/cockpit-native-panels.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/cockpit-native-panels.js"))),
         "/lib/dagre.min.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/lib/dagre.min.js"))),
         "/graph.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/graph.js"))),
@@ -114,7 +122,7 @@ fn page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
 }
 /// Reopen the canonical product HTML, retaining its existing structure/styles.
 /// Legacy scripts require the full Go snapshot and mutation contracts; select
-/// explicit native read adapters instead, never feed them fabricated snapshots.
+/// explicit native adapters instead, never feed them fabricated snapshots.
 /// Only trusted source tags are parsed. Missing/unterminated tags refuse the
 /// entire page; no filesystem lookup, user HTML or command is involved.
 fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
@@ -127,7 +135,8 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
     if source.matches("</head>").count() != 1 {
         return Err(HttpServiceError::Refused("web-cockpit-template-invalid"));
     }
-    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
+    source=source.replacen("</nav>","<a href=\"/trust-actions.html\" data-i18n>Biba — Actions de confiance</a><a href=\"/paea.html\" data-i18n>Vérifications PAEA</a></nav>",1);
+    let scripts = "<link rel=\"stylesheet\" href=\"/native-runtime/admin.css\"><script src=\"/i18n-en.js\" defer></script><script src=\"/i18n.js\" defer></script><script src=\"/swarm-shell.js\" defer></script><script src=\"/lib/dagre.min.js\" defer></script><script src=\"/graph.js\" defer></script><script src=\"/cockpit-native-graph.js\" defer></script><script src=\"/cockpit-native-read.js\" defer></script><script src=\"/cockpit-native-panels.js\" defer></script><script src=\"/cockpit-native-budget.js\" defer></script><script src=\"/native-runtime/quotas.js\" defer></script><script src=\"/cockpit-native-quotas.js\" defer></script><script src=\"/cockpit-native-pricing.js\" defer></script><script src=\"/pricing.js\" defer></script><script src=\"/cockpit-native-version.js\" defer></script><script src=\"/runtime-health.js\" defer></script><script src=\"/cockpit-native-resume.js\" defer></script><script src=\"/cockpit-native-logs.js\" defer></script><script src=\"/cockpit-native-instructions.js\" defer></script><script src=\"/cockpit-native.js\" defer></script></head>";
     source = source.replacen("</head>", scripts, 1);
     let tag = "<html lang=\"fr\" data-theme=\"etat\">";
     if source.matches(tag).count() != 1 {
@@ -142,8 +151,9 @@ fn cockpit_page(r: &Request<Vec<u8>>) -> Result<Vec<u8>, HttpServiceError> {
 /// Respond only after the caller checks the scoped cookie/exact Host and CSRF for
 /// non-GET/HEAD methods. Assets cannot mutate Root; unsupported methods return405.
 /// Shared CSP/no-store/HEAD behavior applies. The page truthfully hosts only native
-/// mission reads and settings, not complete cockpit/provider/workflow parity.
-/// The cockpit uses existing protected APIs and adds no mission-write operation.
+/// mission reads, settings and unused-instruction rejection, not complete parity.
+/// Explicit writes reuse protected Root APIs and their revision/ownership checks;
+/// asset delivery itself grants no mutation or complete workflow authority.
 pub(super) fn reply(r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError> {
     if !matches!(*r.method(), Method::GET | Method::HEAD) {
         return Err(HttpServiceError::Method("GET, HEAD"));

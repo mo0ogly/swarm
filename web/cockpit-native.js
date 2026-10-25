@@ -6,7 +6,7 @@
  * commands and automatic visit writes stay unavailable, visibly, in this profile. */
 (()=>{
  const $=id=>document.getElementById(id),tr=s=>globalThis.SwarmI18n?.t(s)??s;
- let works=[],selected='',generation=0,current=null,budgetEditor=null,resumePanel=null,logsPanel=null;const views=new Set([...document.querySelectorAll('#tabs [data-view]')].map(b=>b.dataset.view));
+ let works=[],selected='',generation=0,current=null,budgetEditor=null,resumePanel=null,logsPanel=null,instructions=null;const views=new Set([...document.querySelectorAll('#tabs [data-view]')].map(b=>b.dataset.view));
  /** Only safe error families reach the UI; original causes remain on rejection.
   * A transport/JSON/HTTP failure never becomes an empty successful document. */
  function failure(code,cause){const error=new Error(code,{cause});error.code=code;return error}
@@ -36,7 +36,7 @@
   * mission status; opening another view observes it then, with its refusal intact. A generation
   * prevents delayed responses replacing newer selection. Errors are visible and
   * data is read-only; controls do not establish conductor/process liveness. */
- async function select(id){const ticket=++generation;selected=id;resumePanel?.setWork(id);logsPanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
+ async function select(id){const ticket=++generation,changedContext=selected!==id;selected=id;resumePanel?.setWork(id);logsPanel?.setWork(id);const work=works.find(w=>w.id===id);budgetEditor?.setWork(work?id:'');current=null;if(instructions){if(changedContext)SwarmNativeInstructions.clear(instructions);else instructions.replaceChildren()}SwarmRustCockpitPanels.clear(tr(id?'Lecture de la mission…':'Aucune mission sélectionnée.'));const u=new URL(location.href);if(id)u.searchParams.set('work',id);else u.searchParams.delete('work');history.replaceState(null,'',u);
   if(!work){$('title').textContent=tr('Choisissez une mission');$('objective').textContent='';for(const id of ['task-count','accepted-count','active-count','decision-count'])$(id).textContent='—';for(const id of ['tasks-body','conduite-plan','graph'])$(id).replaceChildren();$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr('Aucune mission sélectionnée.');return}
   $('title').textContent=work.title;$('objective').textContent=work.objective;$('connection').textContent=tr('Lecture de la mission…');$('main-content').setAttribute('aria-busy','true');
   // Clear the previous mission before starting a potentially failing read.
@@ -49,7 +49,32 @@
   }else error='web-native-status-not-observed';
   if(ticket!==generation)return;
   try{const observation=await read('/api/v1/cockpit-read?'+new URLSearchParams({work:id}));if(ticket!==generation)return;if(observation?.work_id!==id)throw failure('web-native-observation-invalid');SwarmRustCockpitPanels.render(observation);panelsObserved=true}catch(cause){if(ticket!==generation)return;error=cause.code||'web-native-observation-invalid';SwarmRustCockpitPanels.clear(tr('Lecture impossible. Actualisez pour reprendre.')+' ('+error+')')}
-  current={work,mission,missionError:error,control,panelsObserved,statusObserved};SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':'Lecture reçue — actualisation manuelle.');
+  current={work,mission,missionError:error,control,panelsObserved,statusObserved};SwarmNativeInstructions.render(instructions,work,rejectInstruction,true);SwarmRustCockpitRead.render(current);$('main-content').removeAttribute('aria-busy');$('connection').textContent=tr(error?'Lecture partielle — actualisez pour reprendre.':'Lecture reçue — actualisation manuelle.');
+ }
+ /** Reject only the explicitly selected, observed instruction revision. CSRF
+  * is freshly read; the server owns authorization/CAS/active-task checks. Lost
+  * responses are uncertain and never retried. Success requires a protected Work
+  * readback showing the rejection before the cockpit is refreshed. A concurrent
+  * refresh of the same Work cannot replace this readback with an older cache;
+  * another Work or a newer revision is preserved. */
+ async function rejectInstruction(id,revision,task,addition,reason){
+  const ticket=generation;if(selected!==id||current?.work.revision!==revision)throw failure('web-native-instruction-context-changed');
+  const session=await read('/api/v1/native-session');if(typeof session?.csrf_token!=='string'||!/^[0-9a-f]{64}$/.test(session.csrf_token))throw failure('web-native-session-invalid');
+  if(ticket!==generation||selected!==id)throw failure('web-native-instruction-context-changed');
+  let response,value;try{response=await fetch('/api/v1/planning?'+new URLSearchParams({work:id,action:'reject-instructions'}),{method:'POST',credentials:'same-origin',headers:{Accept:'application/json','Content-Type':'application/json','X-Swarm-CSRF':session.csrf_token},body:JSON.stringify({schema_version:1,event_id:'instruction-reject-'+crypto.randomUUID(),expected_revision:revision,task_id:task,instruction_revision_id:addition,reason})});value=await response.json()}catch(cause){throw failure('web-native-instruction-response-unknown',cause)}
+  if(!response.ok){const raw=value?.failure?.code||value?.error;const cause=failure(typeof raw==='string'&&/^[a-z][a-z0-9_.-]*$/.test(raw)?raw:'web-native-instruction-refused');cause.outcome=!value?.recorded_work&&[400,403,409].includes(response.status)?'refused':'unknown';throw cause}
+  if(value?.id!==id||value.revision!==revision+1)throw failure('web-native-instruction-response-invalid');
+  const observed=await read('/api/v1/planning?'+new URLSearchParams({work:id}));const changed=observed?.tasks?.find(t=>t.id===task)?.instruction_revisions?.find(r=>r.id===addition);
+  if(observed?.id!==id||!Number.isSafeInteger(observed.revision)||observed.revision<value.revision||changed?.state!=='rejected')throw failure('web-native-instruction-readback-unconfirmed');
+  // A same-Work refresh can advance generation while this POST is in flight.
+  // The acknowledged readback supersedes older cached data; a newer observation
+  // is retained. Selecting again also invalidates an older unfinished load.
+  works=works.map(w=>w.id===id&&(!Number.isSafeInteger(w.revision)||w.revision<=observed.revision)?observed:w);
+  if(selected===id&&(!current||current.work.id!==id||current.work.revision<=observed.revision)){
+   await select(id);
+   if(selected===id&&(current?.work.id!==id||!Number.isSafeInteger(current.work.revision)||current.work.revision<observed.revision))throw failure('web-native-instruction-cockpit-refresh-failed');
+  }
+  return selected===id&&current?.work.id===id&&current.work.revision>=observed.revision?current.work:observed;
  }
  /** Bootstrap reads only. Empty/malformed lists and missing selected IDs are
   * distinguished; a missing explicit Work never falls back to another mission.
@@ -70,7 +95,7 @@
   * an HTTP request, records a visit, mutates a mission or starts an agent. */
  function setup(){for(const section of document.querySelectorAll('.view')){
    for(const control of section.querySelectorAll('button,input,select,textarea'))control.disabled=true;
-   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
+   const note=document.createElement('p');note.className='notice info';note.textContent=section.id==='conduite'?tr('Les consignes attribuées sont consultables et rejetables avant transmission. Les autres commandes restent à raccorder.'):section.id==='budget'?tr('Budget, plafonds et tarifs sont réglables ici. Les autres commandes restent à raccorder.'):tr(['tasks','conduite','manage','budget','agents','resume','logs'].includes(section.id)?'Lecture Rust des données enregistrées. Les commandes restent à raccorder.':'Ce parcours de l’interface existante n’est pas encore raccordé au moteur Rust.');section.prepend(note);
   }
   $('manage-search').disabled=false;$('manage-search').addEventListener('input',renderManager);$('manage-state').value='all';
   $('assistant').hidden=true;$('mode').disabled=true;$('help').disabled=true;$('version-open').disabled=false;
@@ -78,6 +103,7 @@
   for(const a of document.querySelectorAll('a[href^="/"]')){if(a===link)continue;const target=new URL(a.href);if(target.pathname!=='/'){a.addEventListener('click',event=>{event.preventDefault();$('message').hidden=false;$('message').className='notice info';$('message').textContent=tr('Cette destination reste à raccorder au moteur Rust.');$('message').scrollIntoView({block:'nearest'})})}}
   $('tabs').addEventListener('click',event=>{const button=event.target.closest('[data-view]');if(button)showView(button.dataset.view,true)});$('work').addEventListener('change',()=>select($('work').value));$('refresh').addEventListener('click',load);
   $('theme').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='etat'?'sombre':'etat';document.documentElement.dataset.theme=theme;$('theme').textContent=tr(theme==='etat'?'Passer au thème sombre':'Passer au thème clair');link.href=url('/native-runtime.html?view=admin')});
+  instructions=document.createElement('div');instructions.id='native-instruction-history';$('conduite-plan').after(instructions);
   resumePanel=SwarmNativeResume.mount();
   logsPanel=SwarmNativeLogs.mount();
   SwarmNativePricing.enable();

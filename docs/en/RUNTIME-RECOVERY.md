@@ -5,6 +5,31 @@ the work. A running server or passing engine tests do not prove mission completi
 
 ## Storage unavailable
 
+In Rust, the Admin `storage_busy_timeout_ms` setting applies from the first
+datastore identity check. The engine first reads validated settings through its
+owned directory descriptor, without SQL; installation defaults are used only
+when the file is absent. Invalid/unreadable settings refuse opening. This replaces
+the SQLite constructor handler without adding retries or rights. Zero is an
+operator choice to refuse immediately under contention; expiry of a nonzero
+timeout still refuses, never an empty success or proof that no effect occurred.
+Later identity reads preserve the connection's current policy.
+
+When operator permission is withdrawn during synchronization, a launch preview or initial report
+discovery before its write, a clean fence
+refusal can end only that mission's watch with reason `permission-withdrawn`.
+The `mission-watch-blocked` observation retains committed queue effects, other
+candidate refusals and the preview cause. A refused report read also retains the
+last already-recorded Work and states that this read attempted no new report write.
+A refused synchronization remains explicitly committed; a concurrent revision
+does not turn it into a no-effect operation. Its Work, permission and absence of
+preparation are checked before ending this session.
+This establishes neither a successful
+launch nor completed queue cleanup. The server continues; already-authorized
+workers retain their own lifecycle. Roles still owned by this watch are drained
+under its controller shutdown. Publication failure, attempted admission or
+uncertain effects remain errors with causes. Recovery requires current permission
+and a newly owned session, without refund or automatic admission replay.
+
 The cockpit displays a global alert with **Storage diagnosis**. This local check
 makes no AI call and does not query SQLite, so it remains available when mission
 reads fail. **Check again** refreshes measurements without deleting any files.
@@ -329,3 +354,97 @@ sequenceDiagram
  H-->>J: Observation / absence / failure
  J-->>U: Literal text and partial warning
 ```
+
+## Status after ordinary completion — Rust
+
+After a completed agent on a blocked task, outside incomplete delivery or unported
+recovery, `mission status` and Control expose the result without validating it.
+Without an attributable report: `completed_unproven`. A nonempty report under
+`docs/`, within the persisted clock-skew setting, becomes
+`attributable_unsubmitted` and still needs review. Multiple candidates are ambiguous.
+Read errors remain errors; this read establishes no identity or relaunch permission.
+Legacy agents without native bindings and unported batch reviews can still refuse
+computed status.
+
+For an ordinary task without planning, a completed agent and a blocker prefixed
+“Livraison incomplète :” produce `delivery_incomplete`, `not_validated`, and no
+report. The engine does not scan `docs/` for an incomplete report: the historical
+producer applies only to managed repositories. This connection does not port the
+managed branch or authorize recovery.
+
+An ordinary abandonment decision remains readable when terminal agents
+(completed/failed/interrupted) are retained. Status shows unvalidated abandonment
+and historical agent/attempt identifiers without reading or attributing a new
+report. An active agent on this task still triggers the consistency refusal.
+Unported waivers and managed histories remain separate.
+
+## Preparation reads — Rust
+
+`prepare list`, `prepare show ID`, `prepare history ID besoin|brief|plan [before_revision]`
+and `prepare methods` read the current Root without writing or adopting a plan.
+Their protected GET/HEAD routes are `/api/v1/preparations`,
+`/api/v1/preparations/show?id=ID`, `/api/v1/preparations/history?id=ID&document=plan&before=REV`
+and `/api/v1/preparations/methods`. Ambiguous queries, bodies and unknown fields
+refuse; a missing preparation remains404 and malformed stored data500.
+
+`plan_ready` is recalculated from declared document hashes and current method
+bytes. It establishes neither human adoption, result validation nor permission
+to launch. Unavailable methods retain a visible catalogue reason and make this
+flag false. Missing local files use the bundled pack; symlinks, access refusals
+and invalid contents never select that fallback.
+
+Admin → Preparations and documents persists three v41 settings:
+`preparation_list_limit` (shipped default100), `preparation_history_limit` (50),
+and `preparation_method_max_bytes` (131072bytes per file). Null is unlimited; zero
+hides rows/versions without deleting them, or refuses nonempty method text for
+the byte cap. Older installations without this group must explicitly adopt it
+through Admin or CLI preview/apply; reads use no hidden fallback. Effective bounds
+are re-read per operation without restarting. Configuration counts stay exact;
+JSON consumers must preserve large integers.
+
+History uses positive exclusive `before`; absence follows Go’s i64max sentinel.
+Lists use descending rowid, never lexical opaque-ID order. Stored preparations
+and histories remain unchanged. Preparation writes, dialogue, conversion and the
+full web editor remain unported.
+
+The Rust settings reader also uses the saved storage contention retry budget/delay: a clean busy Admin reservation may be retried before reading, without retrying a mission or provider. Zero additional attempts refuses immediately; null may wait without a limit. Close, policy and compound failures remain fatal.
+
+
+### Preparation draft writes in Rust (v42)
+
+Create/save use the same storage as reads: `prepare create --input request.json`,
+`prepare save ID --input request.json`, or protected POST
+`/api/v1/preparations/command`. Supply version1, action, event_id and
+expected_revision; save also requires preparation_id matching ID and document
+besoin/brief/plan. Creation requires no ID and revision0. Saving neither approves
+nor executes a plan.
+
+For settings-preparation-write-not-configured on a historical installation,
+open Admin → Engine settings and explicitly preview/save the new values, or use
+engine-settings describe/show/preview/apply with the catalogue's document schema.
+Never reset history. The0/1 editing switch, UTF-8 caps (null unlimited) and default
+method persist and are shared by Admin/API/CLI. The old Go environment switch
+SWARM_PREPARATION_DISABLED does not replace this saved Rust setting.
+
+The same event/intention returns its original receipt without another save;
+a historical receipt has receipt_historical=true. After uncertainty, reread and
+replay the unchanged event rather than inventing another ID. Failures following
+a known receipt retain recorded_preparation(id,revision), distinct from Work;
+missing metadata never guarantees rollback. CLI: conflict3, editing disabled4,
+unknown method5, other ordinary failures2. Structured Rust diagnostics retain
+namespaced families and causes; Go error wording is not a byte-exact oracle.
+An unavailable method permits a draft without a fresh method hash; inspect
+prepare methods for its diagnostic. No execution authority follows.
+
+The preparation-writes-rust recipe covers public flows and the retained-Root
+Rust child-insert atomicity test. A SQL trigger injected before opening is
+correctly refused by schema verification and does not test writer rollback.
+The atomicity fixture injects after a valid isolated Root open, removes the fault,
+replays and reopens. No preparation editor, AI dialogue, plan adoption or global
+migration completion is claimed.
+
+`preparation-receipt-identity-mismatch` indicates receipt inconsistency, rather than
+a normal revision conflict. Preserve evidence and diagnose with the storage owner;
+unchanged replay cannot repair corruption. Current content is compared before
+projection. Historical receipts remain explicitly historical and grant no execution
+authority.

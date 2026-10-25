@@ -575,6 +575,7 @@ fn wire_failure(
     if let Some((work, revision)) = &outcome.recorded_work {
         value["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
+    if let Some(publication)=outcome.trust_publication{value["trust_publication"]=publication.into();value["trust_state_may_be_recorded"]=true.into();}
     if outcome.configuration_may_be_recorded {
         value["configuration_may_be_recorded"] = true.into();
     }
@@ -711,6 +712,8 @@ fn reject_queued(
     }
     let head = message.request.method() == Method::HEAD;
     let outcome = NativeJobOutcome {
+        recorded_preparation:None,
+        trust_publication:None,
         status: StatusCode::SERVICE_UNAVAILABLE,
         failure: Some(HttpServiceError::Refused("web-server-stopping")),
         observation_causes: Vec::new(),

@@ -77,7 +77,8 @@ impl NativeHttpService {
                     encode_model(&quote).map_err(E::Model)?
                 }
             };
-            Ok(RouteBody {
+            Ok(RouteBody { preparation_receipt:None,
+                trust_publication:None,
                 observation_causes: Vec::new(),
                 bytes,
                 recorded_work: None,

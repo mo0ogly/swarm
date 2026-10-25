@@ -73,7 +73,7 @@ impl NativeHttpService {
                 }
             }
             .map_err(E::Model)?;
-            Ok(RouteBody { observation_causes: Vec::new(),
+            Ok(RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
                 bytes,
                 recorded_work: recorded.clone(),
                 configuration_recorded: false,

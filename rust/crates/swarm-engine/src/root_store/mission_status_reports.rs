@@ -231,6 +231,13 @@ fn unsubmitted_pair(task: &crate::Task, agent: &Agent) -> bool {
     task.id == agent.task_id && task.status == "blocked" && agent.status == "completed"
         && !task.blocker.starts_with("Livraison incomplète :")
 }
+/// Go has no incomplete-report source outside managed planning. Restrict this
+/// port to ordinary Work: no planning, completed matching Agent, explicit blocked
+/// incomplete delivery. This pure selector grants no acceptance or launch.
+fn ordinary_incomplete(work: &crate::Work, task: &crate::Task, agent: &Agent) -> bool {
+    work.planning.is_none() && task.id == agent.task_id && agent.status == "completed"
+        && task.status == "blocked" && task.blocker.starts_with("Livraison incomplète :")
+}
 /// Go operationText masking and terminal-cell clipping for fallback traces.
 /// Sanitization and sensitivity masking precede the Go-compatible 600-cell
 /// representation bound. Whole clusters are preserved; checked width overflow
@@ -513,14 +520,26 @@ fn review_shape(work:&crate::Work,task:&crate::Task,agents:&[Agent])->bool {
 /// Running tasks may retain queued/starting/running/stopping Agents; blocked
 /// tasks may retain failed/interrupted Agents. Actual process observation stays
 /// mandatory before a live classification, never inferred from these rows.
-/// Completed blocked nonmanaged planned tasks may display actual Root-scoped
-/// attribution without a current review. Incomplete delivery, other unsubmitted
-/// shapes, recovery/managed execution and closed scopes still refuse here. Full Agent history is required;
+/// Completed blocked ordinary or nonmanaged planned tasks may display actual Root-scoped
+/// attribution without a current review. Ordinary incomplete delivery uses an
+/// explicit absent report source, never Root report attribution. Ordinary abandoned
+/// decisions retain terminal history without consuming report/review observations. Other unsubmitted
+/// shapes, recovery and closed scopes still refuse here. Managed workers require
+/// supported_observed with real request/proof/SQL verification by Root; this
+/// entry point keeps them refused. Full Agent history is required;
 /// callers must validate before applying display windows. Root, parent,
 /// ownership and depth invariants come from structural validation, not scope count.
 /// Original validation causes survive; configuration establishes no executed review.
 /// No Agent state, review, recovery or permission is inferred from missing data.
 pub(super) fn supported(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {
+    supported_observed(work, agents, false)
+}
+/// Check projection shapes after the caller has verified each managed worker's
+/// retained request/proof/SQL row. This flag is an internal prerequisite, not an
+/// operator policy or proof by itself. Only first verified running/blocked attempts
+/// without review are supported; submitted/accepted/retry branches still refuse.
+/// No IO, state change, liveness, attribution or permission follows from this check.
+pub(super) fn supported_observed(work: &crate::Work, agents: &[Agent], managed_verified: bool) -> Result<(), E> {
     if agents.iter().any(|a| {
         a.is_active()
             && !work
@@ -536,7 +555,13 @@ pub(super) fn supported(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {
         // Only the initial ready/waiting tree lifecycle is assembled. These shape
         // checks delimit the port, never a new execution policy or saved cap.
         let scopes = planning.scopes.as_deref().unwrap_or_default();
-        if (planning.repository.is_some() && !agents.is_empty())
+        if (planning.repository.is_some() && !agents.is_empty() && (!managed_verified ||
+            agents.iter().any(|agent| !((agent.origin == "operateur" && agent.native_mission.is_none())
+                    || (agent.origin == "conducteur" && agent.native_mission.is_some()))
+                || !work.tasks.iter().flatten().any(|task| task.id == agent.task_id
+                    && matches!(task.status.as_str(), "running" | "blocked")
+                    && task.independent_review.is_none()
+                    && task.attempts.as_deref().is_some_and(|attempts| attempts.len() == 1 && attempts[0].id == agent.attempt_id)))))
             || agents.iter().any(|agent|
                 !work.tasks.iter().flatten().any(|task| planned_pair(task,agent)))
             || scopes.iter().any(|scope| !matches!(scope.state.as_str(), "ready" | "waiting"))
@@ -590,9 +615,13 @@ pub(super) fn supported(work: &crate::Work, agents: &[Agent]) -> Result<(), E> {
     for task in work.tasks.as_deref().unwrap_or(&[]) {
         let agent = agents.iter().find(|a| a.task_id == task.id);
         if agent.is_some() || matches!(task.status.as_str(), "submitted" | "abandoned" | "accepted") {
-            let supported_state = match agent.map(|a| a.status.as_str()) {
+            // A saved ordinary abandonment precedes Agent reports in Go.
+            // Only terminal history is admitted; active/task mismatch still refuses.
+            let ordinary_abandoned = work.planning.is_none() && task.status == "abandoned"
+                && agent.is_some_and(|a| matches!(a.status.as_str(), "completed" | "failed" | "interrupted"));
+            let supported_state = ordinary_abandoned || match agent.map(|a| a.status.as_str()) {
                 Some("queued" | "starting" | "running" | "stopping") => task.status == "running",
-                Some("completed") => matches!(task.status.as_str(), "submitted" | "accepted") || (task.status=="blocked" && agent.is_some_and(|a|matching_review(task,a) || (work.planning.is_some() && unsubmitted_pair(task,a)))),
+                Some("completed") => matches!(task.status.as_str(), "submitted" | "accepted") || (task.status=="blocked" && agent.is_some_and(|a|matching_review(task,a) || unsubmitted_pair(task,a) || ordinary_incomplete(work,task,a))),
                 Some("failed" | "interrupted") => task.status == "blocked",
                 None => matches!(task.status.as_str(), "submitted" | "abandoned" | "accepted"),
                 _ => false,
@@ -670,21 +699,57 @@ pub(super) fn agent_observations<'a>(
         )
         .collect())
 }
-/// Observe the real current review before building result facts. Complete Work,
+/// Observe only applicable result facts, including current review when consumed. Complete Work,
 /// settings and full-history/view eligibility must already be checked by Root.
 /// Semantic causes stay in the supplied sidecar; facts causes are also retained.
 /// Completed/blocked fallthrough obtains attribution from Root docs and the
-/// saved clock margin only after an observed NotApplicable review. Other branches
+/// saved clock margin only after an observed NotApplicable review. A verified
+/// first verified managed worker instead retains explicit unavailable attribution:
+/// its mutable copy is never inferred from Root reports or accepted content.
+/// Managed reports retain PublicationUnavailable; actual managed review remains unsupported. Other branches
 /// do not scan for attribution. No new authority, defaults, launch or mutation follows. Unknown read/close
 /// errors refuse, and caller still verifies its enclosing material snapshot.
+/// Ordinary incomplete delivery observes an absent incomplete-report source;
+/// ordinary abandonment consumes neither report nor review facts. Both preserve
+/// incoming gate/freshness and original causes, never grant execution/acceptance.
 pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::Task,agent:Option<&Agent>,settings:&crate::EngineSettingsDocument,causes:&mut Vec<E>,mut facts:super::TaskFreshnessEvidence)->Result<crate::mission_status_tasks::ResultObservation,E> {
     causes.append(&mut facts.causes);
+    // Contract: abandoned tasks without planning return NotObserved observations;
+    // the existing decision consumer terminates on these statuses, so these fields stay unconsumed.
+    if work.planning.is_none() && task.status == "abandoned" {
+        return Ok(crate::mission_status_tasks::ResultObservation {
+            freshness: facts.freshness,
+            gate: facts.gate,
+            reports: crate::mission_status_tasks::ReportListing::NotObserved,
+            attribution: crate::mission_status_tasks::ReportAttribution::NotObserved,
+            incomplete_report: crate::mission_status_tasks::IncompleteReport::NotObserved,
+            review: crate::mission_status_tasks::ReviewObservation::NotObserved,
+        });
+    }
+    if agent.is_some_and(|a| ordinary_incomplete(work, task, a)) {
+        // Go returns no incompleteDeliveryReport outside managed planning and
+        // projects this branch before review/ordinary report attribution.
+        return Ok(crate::mission_status_tasks::ResultObservation {
+            freshness: facts.freshness,
+            gate: facts.gate,
+            reports: crate::mission_status_tasks::ReportListing::NotObserved,
+            attribution: crate::mission_status_tasks::ReportAttribution::NotObserved,
+            incomplete_report: crate::mission_status_tasks::IncompleteReport::Observed(None),
+            review: crate::mission_status_tasks::ReviewObservation::NotObserved,
+        });
+    }
+    let managed = work.planning.as_deref().is_some_and(|p| p.repository.is_some());
     let review=match agent {
+        Some(_) if managed => Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
         Some(agent) if task.status!="accepted"=>Some(super::mission_status_review::observe(root,work,task,agent,settings,causes)?),
         Some(_)=>Some(crate::mission_status_tasks::ReviewObservation::NotApplicable),
         None=>None,
     };
     let attribution = match agent {
+        Some(agent) if managed && unsubmitted_pair(task, agent) =>
+            Some(crate::mission_status_tasks::ReportAttribution::Unavailable {
+                reason: "la publication d’un résultat Git managed attribuable n’est pas encore raccordée".into(),
+            }),
         Some(agent) if unsubmitted_pair(task, agent)
             && matches!(&review, Some(crate::mission_status_tasks::ReviewObservation::NotApplicable)) => {
                 Some(proven_report(root, agent, settings.values.report_clock_skew_seconds()
@@ -692,14 +757,16 @@ pub(super) fn observed_result_inputs(root:&Path,work:&crate::Work,task:&crate::T
             }
         _ => None,
     };
-    result_inputs_with_review(root,task,agent,facts.freshness,facts.gate,review,attribution)
+    let mut result = result_inputs_with_review((!managed).then_some(root),task,agent,facts.freshness,facts.gate,review,attribution)?;
+    if managed { result.reports = crate::mission_status_tasks::ReportListing::PublicationUnavailable; }
+    Ok(result)
 }
 
 /// Test-only constructor adapter: unsupported non-passed opinions still refuse
 /// without a real producer. Supplied facts establish no actual Root evidence.
 #[cfg(test)]
 pub(super) fn result_inputs(root:&Path,task:&crate::Task,agent:Option<&Agent>,freshness:crate::mission_status_tasks::FreshnessObservation,gate:crate::mission_status_tasks::GateObservation)->Result<crate::mission_status_tasks::ResultObservation,E> {
-    result_inputs_with_review(root,task,agent,freshness,gate,None,None)
+    result_inputs_with_review(Some(root),task,agent,freshness,gate,None,None)
 }
 
 /// Observe only facts consumed by the applicable ordinary terminal result branch.
@@ -719,8 +786,10 @@ pub(super) fn result_inputs(root:&Path,task:&crate::Task,agent:Option<&Agent>,fr
 /// opinions require the actual supplied projection.
 /// This is no verdict check. Accepted freshness separately checks native originals;
 /// no IO or permission is inferred from skipping the review presentation.
+/// None for root means no applicable Root report reader (managed copy); the
+/// caller must attach PublicationUnavailable before a consuming projection.
 fn result_inputs_with_review(
-    root: &Path,
+    root: Option<&Path>,
     task: &crate::Task,
     agent: Option<&Agent>,
     freshness: crate::mission_status_tasks::FreshnessObservation,
@@ -748,12 +817,11 @@ fn result_inputs_with_review(
     Ok(ResultObservation {
         freshness,
         gate,
-        reports: if agent.is_some_and(|agent| {
-            agent.is_active() || matches!(agent.status.as_str(), "failed" | "interrupted")
-        }) {
-            ReportListing::Observed(task_reports(root, &task.id)?)
-        } else {
-            ReportListing::NotObserved
+        reports: match root {
+            Some(root) if agent.is_some_and(|agent| {
+                agent.is_active() || matches!(agent.status.as_str(), "failed" | "interrupted")
+            }) => ReportListing::Observed(task_reports(root, &task.id)?),
+            _ => ReportListing::NotObserved,
         },
         attribution: attribution.unwrap_or(ReportAttribution::NotObserved),
         incomplete_report: IncompleteReport::NotObserved,
@@ -1281,7 +1349,8 @@ mod tests {
         agents[0].status = "completed".into();
         supported(&work, &agents).unwrap();
         work.tasks.as_mut().unwrap()[0].status = "blocked".into();
-        assert!(supported(&work, &agents).is_err());
+        // Ordinary completion now has its separate observed attribution reader.
+        supported(&work, &agents).unwrap();
         work.tasks.as_mut().unwrap()[0].status = "submitted".into();
         supported(&work, &agents).unwrap();
         work.tasks.as_mut().unwrap()[0].independent_review = Some(Box::default());
@@ -1392,11 +1461,90 @@ mod tests {
         agents[1].status = "completed".into();
         supported(&work, &agents).unwrap();
         agents[0].status = "completed".into();
-        assert!(supported(&work, &agents).is_err());
+        supported(&work, &agents).unwrap();
         work.tasks.as_mut().unwrap()[0].status = "submitted".into();
         supported(&work, &agents).unwrap();
         agents[1].status = "failed".into();
         supported(&work, &agents).unwrap();
+    }
+    /// Submitted control precedes ordinary completed/blocked attribution eligibility.
+    /// Ordinary incomplete delivery is admitted; recovery/review remain refused. This pure
+    /// admission test grants no launch or acceptance and never reads runtime state.
+    #[test]
+    fn mission_status_ordinary_completed_blocked_admission() {
+        let mut work = crate::Work::default();
+        let mut task = crate::Task { id: "task".into(), status: "submitted".into(), ..Default::default() };
+        let agent = Agent { task_id: "task".into(), status: "completed".into(), ..Default::default() };
+        work.tasks = Some(vec![task.clone()]);
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        task.status = "blocked".into();
+        work.tasks = Some(vec![task.clone()]);
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        task.blocker = "Livraison incomplète : missing criterion".into();
+        work.tasks = Some(vec![task.clone()]);
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        task.blocker.clear(); task.planning_retry = true;
+        work.tasks = Some(vec![task.clone()]);
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
+        task.planning_retry = false; task.independent_review = Some(Box::default());
+        work.tasks = Some(vec![task.clone()]);
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
+        task.independent_review = None; work.tasks = Some(vec![task]);
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        assert_eq!(agent.status, "completed");
+    }
+    /// Incomplete ordinary delivery has no applicable report source in Go.
+    /// A nonexistent Root proves this branch does not scan or attribute docs;
+    /// its explicit absent report is consumed before review, without validation.
+    #[test]
+    fn mission_status_ordinary_incomplete_observation() {
+        use crate::mission_status_tasks::*;
+        let fixture = Fixture::new();
+        let root = fixture.0.join("absent-root");
+        let task = crate::Task { id: "task".into(), status: "blocked".into(),
+            blocker: "Livraison incomplète : missing evidence".into(), ..Default::default() };
+        let work = crate::Work { tasks: Some(vec![task.clone()]), ..Default::default() };
+        let agent = Agent { task_id: "task".into(), status: "completed".into(), ..Default::default() };
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        let settings = crate::EngineSettingsDocument { schema_version: 1, revision: crate::SettingCount(0),
+            values: crate::EngineSettingsValues::installation_defaults().unwrap(), history: Vec::new() };
+        let mut causes = Vec::new();
+        let facts = observed_result_inputs(&root, &work, &task, Some(&agent), &settings, &mut causes,
+            super::super::TaskFreshnessEvidence { freshness: FreshnessObservation::NotObserved,
+                gate: GateObservation::NotObserved, causes: Vec::new() }).unwrap();
+        assert!(matches!(facts.incomplete_report, IncompleteReport::Observed(None)));
+        assert!(matches!(facts.review, ReviewObservation::NotObserved));
+        let diagnostic = crate::AttemptDiagnostic::default();
+        let observation = AgentObservation { agent: &agent, observed_state: "completed",
+            fallback_diagnostic: &diagnostic, environment_recovery: false };
+        let result = result_presentation(&task, Some(&observation), &facts).unwrap();
+        assert_eq!(result.state, "delivery_incomplete");
+        assert_eq!(result.validation_state, "not_validated");
+        assert_eq!(result.report_state, "absent");
+        assert!(causes.is_empty());
+    }
+    /// Ordinary abandoned decisions keep terminal Agent history without granting
+    /// validation. Active mismatches, planning and prior opinions remain refused.
+    #[test]
+    fn mission_status_ordinary_abandoned_admission() {
+        let mut work = crate::Work { tasks: Some(vec![crate::Task {
+            id: "task".into(), status: "abandoned".into(), ..Default::default()
+        }]), ..Default::default() };
+        let mut agent = Agent { task_id: "task".into(), ..Default::default() };
+        supported(&work, &[]).unwrap();
+        for state in ["completed", "failed", "interrupted"] {
+            agent.status = state.into();
+            supported(&work, std::slice::from_ref(&agent)).unwrap();
+        }
+        agent.status = "running".into();
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
+        agent.status = "completed".into();
+        work.tasks.as_mut().unwrap()[0].previous_reviews = Some(vec![Default::default()]);
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
+        work.tasks.as_mut().unwrap()[0].previous_reviews = None;
+        supported(&work, std::slice::from_ref(&agent)).unwrap();
+        work.planning = Some(Box::default());
+        assert!(supported(&work, std::slice::from_ref(&agent)).is_err());
     }
     /// Real filesystem control precedes stale/empty/ambiguous/invalid variants.
     /// Boundary equality uses an explicit test margin, never a product default.

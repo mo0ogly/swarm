@@ -21,9 +21,31 @@ fn unavailable(provenance: &str, hint: &str) -> VersionObservation {
         hint: hint.into(),
     }
 }
+/// Observe whether Git discovery has any repository marker to inspect. Walk
+/// canonical ancestors for .git (worktrees/submodules) or HEAD (bare repositories).
+/// Marker presence never proves validity: existing Git probes must still verify
+/// it. Missing markers mean source identity unavailable at this observation only,
+/// not a clean repository or a filesystem snapshot. Permission/path errors stay
+/// fatal; no error text/exit-code heuristic or project mutation is used.
+#[cfg(target_os = "linux")]
+fn has_repository_marker(root: &str) -> Result<bool, std::io::Error> {
+    let canonical = std::fs::canonicalize(root)?;
+    for parent in canonical.ancestors() {
+        for name in [".git", "HEAD"] {
+            match std::fs::symlink_metadata(parent.join(name)) {
+                Ok(_) => return Ok(true),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => return Err(error),
+            }
+        }
+    }
+    Ok(false)
+}
 /// Observe current Root Git only with its actual persisted settings. Missing
 /// datastore is an explicit cold-start limitation and creates nothing. Present
 /// Root/protection/Git failures refuse, preserving every cause and close error.
+/// A genuine absence of repository markers leaves only source identity unknown;
+/// it does not invalidate the separately decoded compiled binary identity.
 /// Fixed Git commands inherit the authoritative saved policy, not a new timeout.
 #[cfg(target_os = "linux")]
 fn candidate(root: &str) -> Result<VersionObservation, CliError> {
@@ -42,6 +64,9 @@ fn candidate(root: &str) -> Result<VersionObservation, CliError> {
     let wrap = |error| CliError::Root(Box::new(error));
     let store = RootStore::open(std::path::Path::new(root), false).map_err(wrap)?;
     let result = (|| {
+        if !has_repository_marker(root).map_err(CliError::Input)? {
+            return Ok(unavailable("git", "Aucun dépôt Git observé : identité des sources indisponible."));
+        }
         let git = store.inspect_git_metadata().map_err(wrap)?;
         let mut errors = git
             .issues

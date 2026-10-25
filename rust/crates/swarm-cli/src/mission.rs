@@ -9,6 +9,8 @@ use std::io::{self, Write};
 /// requires existing consent. Watch delegates to the incremental native conductor;
 /// status is a facts-only text view, status-native a distinct versioned JSON DTO.
 /// Historical JSON reads supported ordinary/hierarchical facts; missing producers refuse.
+/// Changes/spending expose their historical subdocuments under the same guards;
+/// they never mark a visit or replace an unsupported status with native facts.
 /// Control documents are bounded and validated before Root open; common Root
 /// owns replay/revision, settings and atomic SQL/Work/event updates. Controls and
 /// status do not spawn; delegated watch alone performs admission and bootstrap.
@@ -26,7 +28,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     }
     let op = a.pos[1].as_str();
     if op == "watch" { return super::mission_watch::execute(a, out); }
-    if matches!(op, "status" | "status-native") {
+    if matches!(op, "status" | "status-native" | "changes" | "spending") {
         return super::mission_status::execute(a, out);
     }
     if !matches!(op, "show" | "order" | "queue" | "priority" | "pause" | "unpause" | "stop" | "start" | "resume") {

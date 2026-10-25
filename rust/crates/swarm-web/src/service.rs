@@ -11,6 +11,8 @@ mod transport;
 pub use transport::{NativeOutcomeObserver, NativeRequestError, NativeServerReport};
 mod observation;
 mod settings;
+mod trust;
+mod paea;
 mod planning;
 mod mission;
 mod cockpit_read;
@@ -54,6 +56,8 @@ pub struct RecordedConfiguration {
 /// Safe typed service failures; no raw body/header/credential appears in diagnostics.
 /// Original causes and known recorded Work survive response/close aggregation.
 pub enum HttpServiceError {
+    /// A known preparation receipt preceded a later response/close failure.
+    PreparationRecorded { primary: Box<Self>, id: String, revision: i64 },
     ConfigurationRecorded {
         primary: Box<Self>,
         configuration: RecordedConfiguration,
@@ -67,6 +71,8 @@ pub enum HttpServiceError {
     },
     Access(WebAccessError),
     Input(swarm_engine::CommandInputError),
+    /// Pure PAEA input/binding/lifecycle refusal, preserving its typed cause.
+    Protection(swarm_protection_contract::Error),
     Projection(projection::Error),
     Json(serde_json::Error),
     LoginEncoding(std::str::Utf8Error),
@@ -98,6 +104,14 @@ pub enum HttpServiceError {
     TelemetryInput(swarm_engine::TelemetryInputError),
 }
 impl HttpServiceError {
+    /// Retain trust outcomes through primary/secondary Root close and response
+    /// encoding errors. None is unknown, never proof of rollback or retry safety.
+    pub fn trust_publication(&self)->Option<&'static str>{match self{
+      Self::Root{cause,..}=>cause.trust_publication(),
+      Self::Close{primary,cleanup}=>primary.as_deref().and_then(Self::trust_publication).or_else(||cleanup.trust_publication()),
+      Self::ResponseEncoding{primary,..}|Self::Recorded{primary,..}|Self::ConfigurationState{primary}|Self::ConfigurationRecorded{primary,..}|Self::SessionState{primary}=>primary.trust_publication(),_=>None,
+    }}
+
     /// Stable family only; it grants neither retry nor any business authority.
     pub fn code(&self) -> &'static str {
         match self {
@@ -110,12 +124,14 @@ impl HttpServiceError {
             Self::SessionState { .. } => "web-session-state-preserved",
             Self::Access(e) => e.code(),
             Self::Input(e) => e.code(),
+            Self::Protection(e) => e.code(),
             Self::Projection(_) | Self::Json(_) => "web-document-invalid",
             Self::Model(_) => "web-model-encoding",
             Self::Request(_) => "web-request-encoding",
             Self::Root { cause, .. } => cause.code(),
             Self::Close { .. } => "web-root-close",
             Self::Recorded { .. } => "work-state-preserved",
+            Self::PreparationRecorded { .. } => "preparation-state-preserved",
             Self::ResponseEncoding { .. } => "web-response-encoding",
             Self::Method(_) => "web-method-refused",
             Self::Refused(code) => code,
@@ -177,8 +193,25 @@ impl HttpServiceError {
             _ => None,
         }
     }
-    /// Observe known state only; None does not prove rollback after an uncertain
-    /// commit. No reread, refund, mutation or automatic retry occurs.
+    /// Known preparation receipt through original/cleanup errors, independently
+    /// of Work/configuration. None is unknown, never a rollback guarantee.
+    pub fn recorded_preparation(&self) -> Option<(&str, i64)> {
+        match self {
+            Self::PreparationRecorded { id, revision, .. } => Some((id, *revision)),
+            Self::Root { cause, .. } => cause.recorded_preparation(),
+            Self::Close { primary, cleanup } => primary
+                .as_deref()
+                .and_then(Self::recorded_preparation)
+                .or_else(|| cleanup.recorded_preparation()),
+            Self::Recorded { primary, .. } | Self::ResponseEncoding { primary, .. }
+            | Self::SessionState { primary }
+            | Self::ConfigurationState { primary }
+            | Self::ConfigurationRecorded { primary, .. } => primary.recorded_preparation(),
+            _ => None,
+        }
+    }
+    /// Observe known Work state only; None does not prove rollback after an
+    /// uncertain commit. No reread, refund, mutation or automatic retry occurs.
     pub fn recorded_work(&self) -> Option<(&str, i64)> {
         match self {
             Self::Recorded { work, revision, .. } => Some((work, *revision)),
@@ -201,7 +234,10 @@ impl HttpServiceError {
     /// revision/owners use409, invalid proposals400 and unsupported windows501.
     /// No retry, rollback or authentication decision is inferred from this code.
     fn status(&self) -> StatusCode {
-        if self.recorded_work().is_some() || self.configuration_may_be_recorded() {
+        if self.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
+        if let Self::Root{cause,..}=self {if cause.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
+
+        if self.recorded_preparation().is_some() || self.recorded_work().is_some() || self.configuration_may_be_recorded() {
             return StatusCode::INTERNAL_SERVER_ERROR;
         }
         match self {
@@ -221,6 +257,7 @@ impl HttpServiceError {
                 otel::status(e.code()).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
             }
             Self::TelemetryInput(_) => StatusCode::BAD_REQUEST,
+            Self::Protection(_) => StatusCode::BAD_REQUEST,
             Self::Refused(
                 "web-login-template-invalid"
                 | "web-native-template-invalid"
@@ -281,7 +318,10 @@ impl HttpServiceError {
                 "pricing-version-unknown" if *operation == "pricing-quote" => StatusCode::NOT_FOUND,
                 _ if matches!(*operation,"pricing-input" | "pricing-quote-input" | "pricing-quote")
                     && matches!(cause.as_ref(), RootStoreError::Pricing(swarm_engine::PricingError::Decode(_) | swarm_engine::PricingError::Date(_) | swarm_engine::PricingError::Refused(_))) => StatusCode::BAD_REQUEST,
-                "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
+                "preparation-request-invalid" | "preparation-method-unavailable" => StatusCode::BAD_REQUEST,
+                "preparation-event-conflict" | "preparation-revision-conflict" => StatusCode::CONFLICT,
+                "preparation-write-disabled" => StatusCode::FORBIDDEN,
+                "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
                 "admin-budget-input-invalid"|"admin-budget-policy-invalid"|"admin-budget-intent-invalid"=>StatusCode::BAD_REQUEST,
                 "storage_unavailable" => StatusCode::INSUFFICIENT_STORAGE,
@@ -327,10 +367,12 @@ impl Error for HttpServiceError {
             Self::ConfigurationState { primary } | Self::ConfigurationRecorded { primary, .. } => {
                 Some(primary.as_ref())
             }
+            Self::PreparationRecorded { primary, .. } => Some(primary.as_ref()),
             Self::Session(e) => Some(e),
             Self::SessionState { primary } => Some(primary.as_ref()),
             Self::Access(e) => Some(e),
             Self::Input(e) => Some(e),
+            Self::Protection(e) => Some(e),
             Self::Projection(e) => Some(e),
             Self::Json(e) => Some(e),
             Self::LoginEncoding(e) => Some(e),
@@ -383,6 +425,8 @@ impl HttpReply {
 /// Internal encoded route result and known effects. Plain data has no claimed
 /// operation effect; it never establishes rollback after an unknown failure.
 struct RouteBody {
+    trust_publication:Option<&'static str>,
+    preparation_receipt: Option<(String,i64)>,
     observation_causes: Vec<RootStoreError>,
     bytes: Vec<u8>,
     recorded_work: Option<(String, i64)>,
@@ -394,6 +438,8 @@ impl RouteBody {
     fn plain(bytes: Vec<u8>) -> Self {
         Self {
             bytes,
+            trust_publication:None,
+            preparation_receipt:None,
             observation_causes: Vec::new(),
             recorded_work: None,
             configuration_recorded: false,
@@ -414,10 +460,10 @@ impl DispatchProfile {
     fn capabilities(self) -> serde_json::Value {
         match self {
             Self::Typed => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
             Self::ObservedHttp1 => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
         }
     }
@@ -653,11 +699,13 @@ impl NativeHttpService {
         match result {
             Ok(body) => {
                 let mut response = response(StatusCode::OK, body.bytes, head, None);
+                if let Some(publication)=body.trust_publication{response.extensions_mut().insert(observation::TrustPublication(publication));}
                 if !body.observation_causes.is_empty() {
                     response.extensions_mut().insert(observation::ObservationCauses(
                         body.observation_causes.into_iter().map(std::sync::Arc::new).collect()
                     ));
                 }
+                if let Some(receipt)=body.preparation_receipt { response.extensions_mut().insert(observation::PreparationReceipt(receipt)); }
                 Ok(HttpReply { response, failure: None, recorded_work: body.recorded_work,
                     configuration_may_be_recorded: body.configuration_recorded,
                     recorded_configuration: body.recorded_configuration })
@@ -703,6 +751,8 @@ impl NativeHttpService {
                     .map(RouteBody::plain)
                     .map_err(HttpServiceError::Json)
             }
+            "/api/v1/preparations/command" => self.preparation_command(request),
+            "/api/v1/preparations" | "/api/v1/preparations/methods" | "/api/v1/preparations/show" | "/api/v1/preparations/history" => self.preparations(request),
             "/api/v1/works" => {
                 if request.method() != Method::GET && request.method() != Method::HEAD {
                     return Err(HttpServiceError::Method("GET, HEAD"));
@@ -760,6 +810,8 @@ impl NativeHttpService {
             "/api/v1/quotas/preview" => self.quotas(quotas::Operation::Preview,request),
             #[cfg(target_os = "linux")]
             "/api/v1/quotas/apply" => self.quotas(quotas::Operation::Apply,request),
+            "/api/v1/trust-actions" => self.trust_actions(request),
+            "/api/v1/protection/receipt-report" => paea::receipt_report(request),
             "/api/v1/native-settings" => self.engine_settings(SettingsOperation::Show, request),
             "/api/v1/native-settings/describe" => {
                 self.engine_settings(SettingsOperation::Describe, request)
@@ -817,7 +869,7 @@ impl NativeHttpService {
             let work = outcome.result.work;
             recorded = Some((work.id.clone(), work.revision));
             swarm_engine::encode_model(&work)
-                .map(|bytes| RouteBody { observation_causes: Vec::new(),
+                .map(|bytes| RouteBody { trust_publication:None, preparation_receipt:None, observation_causes: Vec::new(),
                     bytes,
                     recorded_work: recorded.clone(),
                     configuration_recorded: false,
@@ -844,6 +896,7 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
     if let Some((work, revision)) = error.recorded_work() {
         document["recorded_work"] = serde_json::json!({"id":work,"revision":revision});
     }
+    if let Some(publication)=error.trust_publication(){document["trust_publication"]=publication.into();document["trust_state_may_be_recorded"]=true.into();}
     let configuration_may_be_recorded = error.configuration_may_be_recorded();
     if configuration_may_be_recorded {
         document["configuration_may_be_recorded"] = true.into();
@@ -851,6 +904,8 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
     let recorded_work = error
         .recorded_work()
         .map(|(id, revision)| (id.to_owned(), revision));
+    let preparation_receipt=error.recorded_preparation().map(|(id,revision)|(id.to_owned(),revision));
+    if let Some((id,revision))=&preparation_receipt {document["recorded_preparation"]=serde_json::json!({"id":id,"revision":revision});}
     let recorded_configuration = error.recorded_configuration().cloned();
     if let Some(configuration) = &recorded_configuration {
         match serde_json::to_value(configuration) {
@@ -876,8 +931,10 @@ fn error_reply(error: HttpServiceError, head: bool) -> Result<HttpReply, HttpSer
         HttpServiceError::Method(allow) => Some(*allow),
         _ => None,
     };
+    let mut response=response(error.status(),body,head,allow);
+    if let Some(receipt)=preparation_receipt {response.extensions_mut().insert(observation::PreparationReceipt(receipt));}
     Ok(HttpReply {
-        response: response(error.status(), body, head, allow),
+        response,
         failure: Some(error),
         recorded_work,
         configuration_may_be_recorded,
@@ -1208,3 +1265,5 @@ mod tests {
         assert!(value.get("recorded_work").is_none());
     }
 }
+
+mod preparations;

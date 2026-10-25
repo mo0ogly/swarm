@@ -607,7 +607,8 @@ fn current_native_review_input(
 /// operations and any failed preparation preserve the input Work. Caller owns
 /// settings/Work reservations, replay before invocation, final fence and commit.
 /// Managed repositories admit only acknowledgement, delegation and new tasks
-/// after original copy/commit observation; other managed operations still refuse.
+/// after original copy/commit observation; future-task instruction additions also
+/// preserve that repository observation. Other managed operations still refuse.
 /// Holder equality is a concurrency fence, not authenticated agent authority.
 pub(crate) fn decide(
     root: &Path,
@@ -630,7 +631,7 @@ pub(crate) fn decide(
         .as_deref()
         .ok_or(E::Refused("planning-not-enabled"))?;
     if p.repository.is_some() {
-        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task")) {
+        if r.operations.iter().flatten().any(|op|!matches!(op.kind.as_str(),"delegate"|"task"|"revise-instructions")) {
             return Err(E::Refused("planning-decision-managed-operation-unported"));
         }
         #[cfg(target_os="linux")]
@@ -751,6 +752,10 @@ pub(crate) fn decide(
             close_scope(root, &mut next, op, r, at, settings, &policy)?;
         } else if op.kind == "review-retry" {
             retry_review(root, &mut next, op, r, settings, &policy)?;
+        } else if op.kind == "revise-instructions" {
+            P::check(policy.max_instruction_bytes, op.next.len(), "planning-operation-instruction-limit")?;
+            let task=next.tasks.iter_mut().flatten().find(|t|t.id==op.id).ok_or(E::Refused("instruction-task-not-found"))?;
+            crate::instruction_learning::revise(task, &r.scope, op, r, at)?;
         } else if op.kind == "retry" {
             retry_task(root, &mut next, op, r, settings, &policy)?;
         } else {

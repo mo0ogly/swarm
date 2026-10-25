@@ -220,6 +220,9 @@ fn process_boundary(agent: &Agent, stage: ExecutionStage) -> Result<(), AgentLau
 /// current defaults. Host observations are compatibility only, not provider or
 /// actor authentication. May make/remove a temporary write probe, starts no child.
 /// Every supplied-data/kernel/IO/SQL/codec failure keeps its typed safe cause.
+/// A first manual managed worker reobserves original copy attribution, SQL row,
+/// private Git/workspace identity and base at every boundary; the original launch
+/// bytes remain unchanged while host checks use the effective copy workspace.
 pub(crate) fn inspect(
     tx: &Transaction<'_>,
     root: &Path,
@@ -270,6 +273,10 @@ pub(crate) fn inspect(
         .ok_or(AgentLaunchError::Refused("agent-execution-task-missing"))?;
     crate::task_model::bind_launch(&work, &mut request)?;
     launch::supported_work(&work, index)?;
+    crate::memory_files::check(root, tx, &work)?;
+    if work.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+        request.workspace=crate::managed_repository::verify_worker(root,tx,&work,&agent,settings,crate::managed_repository::WorkerCheck::BeforeExecution)?;
+    }
     let task = &work
         .tasks
         .as_ref()
@@ -323,6 +330,9 @@ pub(crate) fn inspect(
         return Err(AgentLaunchError::Refused(
             "agent-execution-context-mismatch",
         ));
+    }
+    if context.paths.as_deref().unwrap_or_default() != work.memory.as_deref().unwrap_or_default() {
+        return Err(AgentLaunchError::Refused("agent-execution-memory-paths-changed"));
     }
     launch::field_guide(root)?;
     let (source_provider, provider_raw) = launch::provider(dir, &request, &policy)?;

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea.js" defer></script>
+</head>
+<body>
+  <a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+  <header>
+    <a href="/">Swarm</a>
+    <h1 data-i18n>Vérifications PAEA</h1>
+    <nav aria-label="Navigation PAEA">
+      <a href="/trust-actions.html" data-i18n>Actions de confiance</a>
+      <button id="paea-theme" type="button" data-i18n>Changer de thème</button>
+    </nav>
+  </header>
+  <main id="paea-main" tabindex="-1">
+    <p data-i18n>Vérifier qu’un reçu correspond à une action, pour un règlement fictif ou une promotion Git.</p>
+    <p id="paea-limits" class="paea-notice" data-i18n>Contrôle de cohérence des fichiers fournis. Autorisation, authenticité du reçu et effet réel non établis.</p>
+    <form id="paea-form" aria-describedby="paea-limits">
+      <fieldset id="paea-inputs">
+        <legend data-i18n>Documents à vérifier</legend>
+        <label for="paea-document" data-i18n>Document de l’action — JSON UTF-8</label>
+        <input id="paea-document" type="file" accept=".json,application/json" required>
+        <label for="paea-receipt" data-i18n>Reçu — JSON UTF-8</label>
+        <input id="paea-receipt" type="file" accept=".json,application/json" required>
+        <label for="paea-sink" data-i18n>Identifiant du service attendu</label>
+        <input id="paea-sink" type="text" autocomplete="off" spellcheck="false" required>
+        <label for="paea-state" data-i18n>État précédent déclaré</label>
+        <select id="paea-state" required>
+          <option value="" data-i18n>Choisir un état</option>
+          <option>PROPOSED</option><option>ADMITTED</option><option>APPROVAL_PENDING</option>
+          <option>AUTHORIZED</option><option>COMMIT_REQUESTED</option><option>COMMITTED</option>
+          <option>DENIED</option><option>UNKNOWN</option><option>RECONCILED_COMMITTED</option>
+          <option>RECONCILED_NOT_COMMITTED</option>
+        </select>
+      </fieldset>
+      <button id="paea-check" class="paea-primary" type="submit" disabled data-i18n>Vérifier la correspondance</button>
+    </form>
+    <p id="paea-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement de la session…</p>
+    <section aria-labelledby="paea-result-title">
+      <h2 id="paea-result-title" data-i18n>Résultat de la vérification</h2>
+      <p id="paea-summary"></p>
+      <dl id="paea-identities"></dl>
+      <button id="paea-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+      <details><summary data-i18n>Rapport technique</summary><pre id="paea-report"></pre></details>
+    </section>
+  </main>
+</body>
+</html>

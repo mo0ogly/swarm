@@ -1,5 +1,12 @@
 //! Native engine construction. Request data is not authority or a running engine.
 #![forbid(unsafe_code)]
+mod biba;
+pub use biba::{Integrity, BibaAccess, BibaDenied, check_biba};
+mod trust_types;
+#[cfg(unix)]
+mod trust;
+#[cfg(unix)]
+pub use trust::{TrustError,TrustReply,verify_trust};
 #[cfg(target_os = "linux")]
 mod agent_launch;
 #[cfg(target_os = "linux")]
@@ -323,6 +330,8 @@ mod identity_plan;
 mod identity_plan_rules;
 mod identity_plan_upgrade;
 mod instruction;
+mod instruction_learning;
+mod memory_files;
 mod local_path;
 mod model_wire;
 mod models;
@@ -539,6 +548,8 @@ pub use managed_review_git::{inspect_managed_review_git, ManagedReviewGitObserva
 mod managed_review_files;
 pub use managed_review_files::{check_managed_review_files, ManagedReviewFilesObservation};
 mod managed_review_context;
+mod managed_review_citations;
+mod managed_review_reply;
 pub use managed_review_context::{
     decode_managed_review_context, DeliveryCriterion, ManagedDelivery, ManagedReviewBaseline,
     ManagedReviewContext, ManagedReviewTaskContext,
@@ -613,7 +624,7 @@ pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_g
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskReviewPreview, TaskReviewInputs, ReviewInputSource, NativeValidationEvidence};
+pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, ReviewInputSource, NativeValidationEvidence};
 
 #[cfg(target_os = "linux")]
 pub use root_store::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
@@ -626,3 +637,25 @@ mod workspace_turn_write;
 
 #[cfg(target_os = "linux")]
 pub use root_store::MissionReportRelayOutcome;
+
+mod preparation_models;
+pub use preparation_models::{Preparation, PreparationDocument, PreparationSource, PreparationVerdict, PreparationConversion};
+pub use engine_settings::{PreparationReadPolicy, PreparationWritePolicy};
+pub use root_store::{PreparationReadError, PreparationReadObservation};
+pub use preparation_models::PreparationMethod;
+pub use root_store::PreparationList;
+
+pub use root_store::{HistoricalBudgetView, HistoricalBudgetShow, HistoricalBudgetPreview};
+
+mod preparation_command;
+pub use preparation_command::PreparationCommand;
+/// Decode the supported draft command without accessing storage or adopting a
+/// plan. Unknown fields/actions remain refused by the writer; codec causes are
+/// retained under a safe preparation boundary. Caller owes policy and identity.
+pub fn decode_preparation_command(raw:&[u8])->Result<PreparationCommand,RootStoreError>{
+    preparation_command::decode(raw).map_err(|e|root_store::preparation_read::cause("preparation-request-invalid",e))
+}
+
+/// Validate a preparation/event protocol key (1..=128 ASCII alphanumeric, dash
+/// or underscore). Pure syntax; it grants no identity, ownership or authority.
+pub fn valid_preparation_key(value:&str)->bool{preparation_command::key(value)}

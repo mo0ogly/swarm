@@ -172,5 +172,12 @@
   "runtime_storage_stop_inodes": "256",
   "work_view_status_recent_agents": "200",
   "work_view_status_change_events": "200",
-  "agent_report_clock_skew_seconds": "2"
+  "agent_report_clock_skew_seconds": "2",
+  "preparation_list_limit": "100",
+  "preparation_history_limit": "50",
+  "preparation_method_max_bytes": "131072",
+  "preparation_write_enabled": "1",
+  "preparation_document_max_bytes": "16000",
+  "preparation_title_max_bytes": "240",
+  "preparation_default_method": "apex"
 }

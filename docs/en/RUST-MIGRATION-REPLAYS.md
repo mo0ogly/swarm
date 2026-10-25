@@ -1375,3 +1375,18 @@ retains100+100 files without a DB. `/dev/full` is Linux fixture transport, not a
 timeout or engine policy; its retained stdout witness is empty by construction.
 Evidence consists of argv/transport, actual error and before/after state. No
 provider call, fabricated Agent, acceptance or complete CLI status is involved.
+
+## Preparations: create/save and explicit v42 settings adoption
+
+`tools/verification/recipes/preparation-writes-rust.json` requires the exact
+`SWARM_PREPARATION_WRITES_BINARY`, frozen sources and a fresh output directory.
+It covers 44 public CLI/API assertions, 8 historical-key cases and two SDK tests
+covering two transaction fault variants and current-receipt consistency, after a valid Root has opened.
+Each Admin journey has 45 FR/EN browser assertions.
+`preparation-upgrade-rust.json` also requires
+`SWARM_PREPARATION_BASELINE_BINARY`, a retained real binary creating v41 Roots.
+It checks refusal before explicit adoption, preserved history, and writing after
+Admin adoption. No live database is used. Run `recipe.py verify --evidence DIR`.
+[Evidence and limitations](../plans/migration-rust/PREPARATION-WRITES-20261025.md):
+private fixtures and verification binaries establish neither installation nor
+independent acceptance.

@@ -60,6 +60,8 @@ pub enum PlanningControlAction {
     Judge,
     /// Root operator cycle renewal, distinct from renewal of a leased claim.
     CycleRenew,
+    /// Operator rejection of a future, unused attributed instruction addition.
+    RejectInstructions,
     Pause,
     Resume,
 }
@@ -71,7 +73,7 @@ impl PlanningControlAction {
     pub(crate) fn requires_active_mission(self) -> bool {
         match self {
             Self::Claim | Self::Decide | Self::LeaseRenew | Self::Judge | Self::CycleRenew => true,
-            Self::Enable | Self::Pause | Self::Resume => false,
+            Self::Enable | Self::Pause | Self::Resume | Self::RejectInstructions => false,
         }
     }
     /// Select the exact supported recorded operation; unknown kinds remain unported.
@@ -85,6 +87,7 @@ impl PlanningControlAction {
             "planning.renew" => Some(Self::CycleRenew),
             "planning.pause" => Some(Self::Pause),
             "planning.resume" => Some(Self::Resume),
+            "planning.reject-instructions" => Some(Self::RejectInstructions),
             _ => None,
         }
     }
@@ -163,11 +166,18 @@ pub fn validate_planning_control_request(
     validate_control_fields(request, false)
 }
 /// Action-aware envelope validation permits a positive review budget only for
-/// provider enablement. This is wire applicability, not a role/caller grant.
+/// provider enablement; only RejectInstructions accepts its revision ID. The
+/// Root writer separately validates the operator intent, task and active owners.
+/// This is wire applicability, not a role/caller grant.
 pub(crate) fn validate_planning_control_action(
     request: &crate::PlanningRequest,
     action: PlanningControlAction,
 ) -> Result<(), PlanningControlError> {
+    if action == PlanningControlAction::RejectInstructions {
+        let mut envelope=request.clone();
+        envelope.instruction_revision_id.clear();
+        return validate_control_fields(&envelope, false);
+    }
     validate_control_fields(
         request,
         action == PlanningControlAction::Enable && !request.provider.is_empty(),
@@ -245,6 +255,7 @@ pub(crate) fn apply_planning_control_prepared(
     let root_reason = match action {
         PlanningControlAction::Claim => Some("planning-claim-requires-root"),
         PlanningControlAction::Decide => Some("planning-decision-requires-root"),
+        PlanningControlAction::RejectInstructions => Some("instruction-rejection-requires-root"),
         PlanningControlAction::LeaseRenew => Some("planning-lease-renew-requires-root"),
         PlanningControlAction::Judge | PlanningControlAction::CycleRenew => Some("planning-judge-operator-requires-root"),
         _ => None,

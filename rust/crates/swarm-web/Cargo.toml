@@ -10,6 +10,7 @@ cookie = { version = "=0.18.2", default-features = false }
 sha2 = "=0.10.9"
 subtle = "=2.6.1"
 swarm-identity-contract = { path = "../swarm-identity-contract" }
+swarm-protection-contract = { path = "../swarm-protection-contract" }
 swarm-engine = { path = "../swarm-engine" }
 swarm-wire-json = { path = "../swarm-wire-json" }
 serde = { version = "=1.0.228", features = ["derive"] }

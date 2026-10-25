@@ -17,6 +17,15 @@ pub enum MissionReportRelayOutcome {
 /// One contained, nonempty report observed after applying the saved clock margin.
 #[derive(Debug, PartialEq, Eq)]
 struct Report { path: String, sha256: String }
+/// Discovery and retention are separate: the read transaction never writes Git.
+enum Selection { Report(Report), Waiting(&'static str), Managed }
+/// Read a retained immutable handoff, repeating SQL/original attribution first.
+/// No copy access, repair, candidate publication or acceptance occurs.
+fn managed_report(root: &Path, db: &Connection, work: &Work, agent: &Agent, settings: &EngineSettingsDocument) -> Result<Report, E> {
+    crate::managed_repository::verify_worker(root, db, work, agent, settings, crate::managed_repository::WorkerCheck::Observe).map_err(|e| E::Launch(Box::new(e)))?;
+    let value = crate::managed_repository::verify_result(root, work, agent, settings).map_err(|e| E::Launch(Box::new(e)))?;
+    Ok(Report { path: value.report_path, sha256: value.report_sha256 })
+}
 /// Keep original file/clock/codec errors, including nested cleanup failures.
 fn caused(code: &'static str, error: impl Error + Send + Sync + 'static) -> E {
     E::Mutation(WorkEngineError::Mission(Box::new(crate::MissionSupervisionError::Cause {
@@ -98,8 +107,11 @@ impl MutationFence for RelayFence<'_> {
                     return Err(E::Refused("mission-report-already-submitted"));
                 }
             }
-            let observed = report(self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?)?
-                .map_err(E::Refused)?;
+            let observed = if saved.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+                managed_report(self.root, db, &saved, &row, &settings)?
+            } else {
+                report(self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?)?.map_err(E::Refused)?
+            };
             if &observed != self.report { return Err(E::Refused("mission-report-selection-changed")); }
             Ok(())
         })();
@@ -114,7 +126,13 @@ impl RootStore {
     /// watch generations may finish; manual/active/nonblocked/dialogue work is
     /// not relayed. An existing canonical submission by this producer is not
     /// repeated after quality blocks the task, even across watch generations.
-    /// Missing/stale/ambiguous first reports wait without mutation.
+    /// Missing/stale/ambiguous first reports wait without mutation. Verified
+    /// managed first workers freeze a changed report and complete Git result before
+    /// the canonical handoff. Existing result refs recover without the mutable
+    /// copy; late errors may leave retained evidence and never imply rollback.
+    /// Candidate publication and independent validation remain separate.
+    /// Producer/terminal/original attribution checks still precede this waiting
+    /// result; corrupt proof or SQL remains an error, not an empty success.
     /// Typed errors retain causes and known recorded Work after late cleanup;
     /// no retry, provider, validation, acceptance or author authentication occurs.
     pub fn relay_mission_report(&mut self, lease: &MissionLease, agent_id: &str) -> Result<MissionReportRelayOutcome, E> {
@@ -138,12 +156,33 @@ impl RootStore {
                     // New watch generations cannot resubmit the same producer,
                     // even if its old report bytes later change.
                     if super::task_validation::latest_submission(&self.db,&current,&row.task_id).map_err(|e|E::Launch(Box::new(e)))?.is_some_and(|r|r.agent_id==agent_id){return Ok(None);}
-                    report(&self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?).map(Some)
+                    if current.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+                        // Verify attribution in the coherent read. Retention runs
+                        // after this read closes; the writer repeats all guards.
+                        crate::managed_repository::verify_worker(&self.root,&self.db,&current,&row,&settings,
+                            crate::managed_repository::WorkerCheck::Observe).map_err(|e|E::Launch(Box::new(e)))?;
+                        return Ok(Some(Selection::Managed));
+                    }
+                    report(&self.root, &row, settings.values.report_clock_skew_seconds().map_err(E::Settings)?)
+                        .map(|value| Some(match value { Ok(report)=>Selection::Report(report), Err(reason)=>Selection::Waiting(reason) }))
                 })();
                 observation.map_err(|e| crate::MissionSupervisionError::Root(Box::new(e)))
             }).map_err(|e| caused("mission-report-observation", e))
         })?;
-        let chosen = match chosen { None=>return Ok(MissionReportRelayOutcome::NotApplicable),Some(Ok(v))=>v,Some(Err(reason))=>return Ok(MissionReportRelayOutcome::Waiting { reason }) };
+        let chosen = match chosen {
+            None=>return Ok(MissionReportRelayOutcome::NotApplicable),
+            Some(Selection::Report(value))=>value,
+            Some(Selection::Waiting(reason))=>return Ok(MissionReportRelayOutcome::Waiting { reason }),
+            Some(Selection::Managed)=> {
+                // The snapshot is inert evidence, not permission or Work mutation.
+                // Git must not hold the Root read reservation or SQLite snapshot.
+                let value = crate::managed_repository::retain_result(&self.root, &work, &row, &settings).map_err(|e| E::Launch(Box::new(e)))?;
+                match value {
+                    Ok(value)=>Report { path:value.report_path, sha256:value.report_sha256 },
+                    Err(reason)=>return Ok(MissionReportRelayOutcome::Waiting { reason }),
+                }
+            },
+        };
         let event = format!("relay-{}", crate::provider_configuration::configuration_digest(format!("{agent_id}/{}/{}",row.attempt_id,chosen.sha256).as_bytes()));
         let request = crate::TaskReportRequest { schema_version: 1, event_id: event, expected_revision: work.revision, id: task.id.clone(), agent_id: agent_id.into(), report_path: chosen.path.clone(), report_sha256: chosen.sha256.clone(), status: "submitted".into() };
         let raw = serde_json::to_vec(&request).map_err(|e| caused("mission-report-request", e))?;

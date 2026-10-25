@@ -4,7 +4,8 @@ use std::io::{self, Write};
 
 /// Route bounded explicit requests to Root's authoritative validation contract.
 /// Control/reviewer previews have no mutation or reviewer invocation grant;
-/// validate runs only the task's saved authorized controls;
+/// validation-candidate retains a managed Git candidate outside Root locks and
+/// grants no control job, review or acceptance; validate runs only the task's saved authorized controls;
 /// validation-reconcile applies fresh original receipts; validation-retire explicitly
 /// abandons original observations after known process completion, without a command.
 /// No caller-supplied command, default timeout, retry or acceptance is introduced.
@@ -26,6 +27,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         action,
         "review-preview" | "review-inputs"
             | "validation-preview"
+            | "validation-candidate"
             | "validate"
             | "validation-reconcile"
             | "validation-retire"
@@ -57,6 +59,10 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
                     .map_err(root_error)?,
             )
             .map_err(CliError::Output);
+        }
+        if action == "validation-candidate" {
+            return json_bytes(&store.prepare_task_validation_candidate(&a.pos[2], &raw)
+                .map_err(root_error)?).map_err(CliError::Output);
         }
         if action == "validation-preview" {
             return json_bytes(

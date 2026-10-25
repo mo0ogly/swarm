@@ -863,6 +863,7 @@ dependencies = [
  "swarm-enrollment-bootstrap",
  "swarm-enrollment-config",
  "swarm-identity-contract",
+ "swarm-protection-contract",
  "swarm-web",
  "tempfile",
  "tokio",
@@ -872,7 +873,9 @@ dependencies = [
 name = "swarm-engine"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "getrandom 0.2.17",
+ "hmac",
  "nix",
  "rusqlite",
  "rustix",
@@ -880,6 +883,8 @@ dependencies = [
  "serde_json",
  "serde_stacker",
  "sha2 0.10.9",
+ "sha2 0.11.1",
+ "subtle",
  "swarm-enrollment-config",
  "swarm-enrollment-state",
  "swarm-identity-contract",
@@ -975,6 +980,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "swarm-protection-contract"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "swarm-identity-contract",
+]
+
+[[package]]
 name = "swarm-web"
 version = "0.1.0"
 dependencies = [
@@ -994,6 +1009,7 @@ dependencies = [
  "subtle",
  "swarm-engine",
  "swarm-identity-contract",
+ "swarm-protection-contract",
  "swarm-wire-json",
  "tokio",
 ]

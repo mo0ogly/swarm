@@ -8048,7 +8048,7 @@ identité du superviseur sont conservés, ainsi que rollback et causes d’erreu
 Après EOF du canal, les écritures heartbeat reprennent. EOF ne prouve ni exec
 ni bonne santé ; les règles de signal, de budget et de refus restent inchangées.
 Aucune temporisation ni tentative de fournisseur supplémentaire n’est ajoutée.
-La politique bootstrap0reste intacte. Cela évite les écritures de ce parent
+La fenêtre du helper évite les écritures de ce parent
 pendant son propre helper ; une concurrence externe peut toujours refuser.
 Témoin369 valide puis écriture indue pendant canal pending reproduite ;370
 4tests contrôleur/3contention et Clippy/Rustdoc PASS. Parcours public373 terminé
@@ -9104,3 +9104,195 @@ indicateurs requis. Une Option sérialisée avec omission ne satisfait pas un DT
 qui promet null. Les erreurs d’un reçu stocké appartiennent à la lecture serveur,
 pas à l’entrée du client ; suivre leur type réel jusqu’au statut HTTP. L’absence
 de reçu historique ne justifie aucune reconstruction fictive de provenance.
+
+Lot1475 : statut completed/blocked ordinaire raccordé au lecteur réel de rapports,
+sans acceptation ; absence, attribution, ambiguïté et reprise comparées CLI/HTTP.
+Les refus de provenance legacy et de revues batch restent distincts.
+
+Lot1476 : ordinary_incomplete exige Work sans planning ; faits explicites
+IncompleteReport::Observed(None), avant revue/attribution, suivant l’ordre Go.
+Ne pas confondre garde de sélection d’un rapport et présentation d’un résultat :
+currentTaskAttempt ne conditionne que le chemin managed du rapport incomplet,
+pas la présentation Go delivery_incomplete ni son absence de rapport ordinaire.
+
+Lot1477 : admission de l’abandon ordinaire avec agents terminaux ; producteur GLM
+retourne les observations non consommées avant rapport/revue, consumer existant
+conservé pour préserver les états réels de processus et la décision non validée.
+Les gardes active-task-mismatch, planning et historiques de revue restent en place.
+
+Lot1478 : port vertical des lectures Préparations, CLI/API et paramètres Admin.
+Modèles Go conservés par le codec commun ; aucune création/adoption revendiquée.
+Les fixtures historiques SQL prouvent les lecteurs, pas un écrivain Rust.
+
+```mermaid
+flowchart LR
+  C[CLI prepare / protected API] --> G[Root descriptor and settings guard]
+  G --> P[Persisted read policy v41]
+  P --> T[Read transaction and retained Go DTO]
+  T --> M[Current method bytes]
+  M --> L[Local descriptor read]
+  L -->|ENOENT only| B[Bundled source]
+  L -->|refusal or invalid text| U[Unavailable reason and original causes]
+  M --> F[Recompute plan_ready]
+  U --> F
+  B --> F
+  F --> O[Close and publish readonly observation]
+```
+
+
+## Lectures CLI des changements et dépenses
+
+`swarm mission changes WORK --root ROOT --json` et
+`swarm mission spending WORK --root ROOT --json` renvoient respectivement les
+sous-documents `changes_since_visit` et `spending` de `mission status WORK --json`, calculés
+avec le même producteur historique et ses mêmes refus. Les mesures inconnues
+restent inconnues ; la date d’observation est propre à chaque lecture.
+Sans `--json`, un titre FR/EN précède le JSON structuré complet. Cette lecture
+ne marque aucune visite, ne réserve aucun budget et ne lance aucun agent.
+Une mission non prise en charge reste refusée : ces commandes ne remplacent
+pas le calcul par une liste vide. Un échec de lecture, fermeture ou sortie est
+propagé ; des octets déjà écrits peuvent avoir atteint le consommateur.
+Recette : `tools/verification/recipes/mission-insights-rust.json`. Elle couvre
+un Root isolé, les DTO, les refus et la reprise ; elle ne qualifie ni Biba ni
+les missions historiques configurées ni la parité globale avec un binaire Go.
+
+```sh
+SWARM_INSIGHTS_BINARY=/absolute/path/to/qualified/swarm-rust python3 tools/verification/recipe.py run --recipe tools/verification/recipes/mission-insights-rust.json --output .cache/insights-NEW
+python3 tools/verification/recipe.py verify --evidence .cache/insights-NEW
+```
+
+
+## Budget historique en CLI Rust
+
+`budget show WORK` renvoie l’enveloppe historique revision/budget/coverage ;
+`budget preview WORK --input changement.json` calcule l’effet financier indicatif
+sans écrire. `budget apply` conserve son contrôle atomique existant. Les lectures
+valident et additionnent exécution, assistance, préparation et planification ;
+les coûts rapportés agents/planificateurs restent distincts et null si absents.
+Un zéro rapporté reste zéro. Une réservation n’est pas un coût réel.
+Le seuil warning vient de `work_budget_warning_percent` dans Admin/API/CLI :
+valeur en chaîne décimale de1à100, null désactive. Le défaut persistant80reproduit
+le seuil Go ; aucune constante .8 supplémentaire n’est introduite. Un ancien
+réglage sans ce champ doit être configuré explicitement, sans fallback caché.
+La révision périmée, les montants invalides et les lignes corrompues refusent ;
+actor/updated proposés sont effacés. Un aperçu monétaire admis n’autorise pas
+le lancement : droits, limites et réservation transactionnelle restent applicables.
+Un snapshot SQL réunit les données ; le réglage externe est lu avant cette
+transaction, sans prétendre à une atomicité entre fichier et SQL. Close/rollback,
+encodage, écriture et flush conservent leurs erreurs. Aucun fournisseur n’est appelé.
+Recette : `tools/verification/recipes/budget-history-rust.json`, binaire explicite
+via SWARM_BUDGET_HISTORY_BINARY. Les fixtures de registres ne prouvent pas un
+fournisseur réel, un paiement ni une parité globale.
+
+## Apprentissage attribué des consignes — FPA-03
+
+`planning decide` accepte `revise-instructions` pour une tâche future du périmètre
+actuellement remis au planificateur. L’ajout conserve la base originale, la base
+opérateur, les autres apprentissages, le responsable, la génération, les entrées,
+la décision et les empreintes avant/après. Il ne change ni les critères d’origine,
+ni la politique de validation humaine, ni les droits. Les Work managed gardent
+l’observation du dépôt avant cette modification de métadonnées.
+
+`planning reject-instructions WORK --input demande.json --json` et le POST protégé
+`/api/v1/planning?work=WORK&action=reject-instructions` partagent la transaction Root :
+`schema_version`, `event_id`, `expected_revision`, `task_id`,
+`instruction_revision_id`, `reason` ; `scope` facultatif doit correspondre.
+Le rejet opérateur ne porte ni holder, ni opérations, ni événements d’entrée.
+La tâche doit être `todo`, l’ajout appliqué, jamais transmis et sans nouvelle
+tentative. La transaction exclut aussi les agents, contrôles ou revues actifs.
+Une réservation fige les apprentissages transmis. Historique et base ne sont jamais
+supprimés ; le rejet produit `instruction_rejected`, remis au superviseur suivant.
+Un même événement se rejoue ; un contenu différent ou une révision périmée refuse.
+
+Le cockpit affiche ces ajouts dans Conduite, leur détail et le rejet avant
+transmission. Une réponse positive est relue ; une réponse perdue reste incertaine
+et impose une actualisation manuelle. La navigation n’écrit rien. FR/EN et les deux
+thèmes utilisent les composants existants. Les bornes de compatibilité Go sont
+8–2000 octets UTF-8 pour un ajout et 4000 octets pour le motif du rejet : elles
+conservent le contrat historique, sans nouvelle politique de tentatives ou délais.
+Ce mécanisme est un apprentissage de consignes attribué ; il ne prouve ni mémoire
+permanente versionnée complète, ni confinement, ni immunité aux injections.
+
+Vérification maintenue : `tools/verification/recipes/instruction-learning-rust.json`.
+Les preuves et le statut de livraison sont dans le plan de migration ; l’audit du
+24 octobre reste une observation historique de dev50.
+
+Le prompt natif annonce aussi cette opération et la conduite à tenir après un
+rejet. Le contexte managed publie les trois opérations actuellement acceptées :
+`delegate`, `task`, `revise-instructions`. Le plafond sauvegardé du prompt reste
+calculé sur ses octets complets. Les anciens contextes déjà figés ne sont pas
+réécrits : leur fraîcheur doit être rétablie par les parcours existants. La recette
+vérifie trois processus planificateur factices et les prompts réellement reçus,
+sans modèle payant ni preuve d’identité humaine.
+
+Le plafond Admin `planning_decision_max_instruction_bytes` s’applique aussi
+aux ajouts : zéro les refuse, null reste illimité sous les bornes du contrat Go.
+La recette modifie puis restaure ce réglage par les opérations publiques, sans
+réinitialiser la consommation ni réécrire le journal des réglages.
+
+Une actualisation de la même mission pendant le POST ne peut pas réafficher
+une révision antérieure à la relecture acquittée. Le host conserve une révision
+plus récente, invalide une lecture ancienne encore en vol et laisse intacte la
+sélection d’une autre mission. La recette retient une promesse de POST réelle,
+actualise puis libère l’écriture ; elle attend le rappel, sans délai global.
+
+## Mémoire historique — FPA-02a
+
+Le consommateur natif `Work.memory` remet les chemins de reprise au worker et
+les conserve dans `ContextManifest.paths`. Leur présentation JSON distingue les
+noms de fichiers du texte d'instructions ; leur contenu n'est pas injecté.
+Le garde `memory_files` réutilise le lecteur général des enveloppes Work sur
+le même snapshot SQL que le départ. Il conserve la protection de toutes les
+sources locales déjà gérées par une version, y compris retirée, puis vérifie
+chemins contenus, fichiers réguliers et alias physiques. Les refus conservent
+la cause ; une erreur d'inventaire ne devient pas une absence de mémoire.
+La validation se répète avant publication de l'intention et aux frontières
+d'exécution, avec concordance des chemins actuels et du manifeste enregistré.
+
+Ce contrôle n'est ni une empreinte des fichiers, ni un droit d'usage mémoire,
+ni un confinement OS. Les bornes existantes du contexte s'appliquent au prompt
+complet. Les gardes sur mémoire versionnée, profils du guide et restauration de
+conversation restent actifs. La recette `memory-files-rust` distingue unité,
+prédicat historique Go avec lecteur factice, parcours CLI/HTTP et processus natif
+factice ; ces preuves ne clôturent pas FPA-01 ni l'ensemble FPA-02.
+
+
+### Préparations : création et sauvegarde Rust (v42)
+
+`prepare create --input requete.json` et `prepare save ID --input requete.json`
+partagent `POST /api/v1/preparations/command` et le stockage des lectures
+`show`/`history`. Le document doit préciser version1, action, event_id et
+expected_revision ; save exige aussi preparation_id identique à ID et document
+besoin/brief/plan. Création : identifiant absent et révision0. Les autres opérations
+restent refusées. Les champs étrangers sont refusés ; les champs Go connus à leur valeur zéro
+conservent leur omission canonique dans le reçu.
+
+Le moteur enregistre préparation, version de document et reçu dans une transaction
+immédiate, vérifie leur relecture et conserve les erreurs de rollback/commit.
+Même événement et même intention : reçu d’origine, sans nouvelle version ; si la
+préparation a avancé, receipt_historical=true. Une intention différente sous le même
+événement ou une révision périmée refuse sans mutation. La sauvegarde invalide le
+verdict, sans autoriser ni lancer une mission. Une méthode indisponible ne bloque pas le brouillon : son empreinte reste vide,
+avec causes annexes conservées, sans prétendre le brouillon frais.
+
+Admin → Préparations et documents expose l’interrupteur persisté0/1 (désactivé :
+rejeux également refusés), les limites de document et titre en octets UTF-8 (null
+sans plafond ; zéro refuse le non-vide), et la méthode initiale. Choix initiaux :
+1,16000,240,apex ; une ancienne installation doit les adopter explicitement. Le
+catalogue v5 ajoute l’unité texte ; les documents antérieurs restent lisibles.
+Aucun plafond de transport supplémentaire : les bornes publiées du transport
+restent indépendantes de ces politiques. L’ancien SWARM_PREPARATION_DISABLED Go
+n’est pas un second mécanisme Rust ; utiliser l’interrupteur Admin.
+
+Si la fermeture ou la sortie échoue après un reçu connu, la CLI/API et l’observateur
+HTTP conservent recorded_preparation (id,revision), distinct d’un Work et des
+réglages. Une erreur de commit incertaine reste explicite ; absence de métadonnées
+ne prouve jamais un rollback. Relire puis rejouer le même événement inchangé.
+Pas d’éditeur de préparation raccordé par ce lot, ni dialogue fournisseur, adoption
+ou preuve de droits métier. Recette permanente : preparation-writes-rust.
+
+Le plafond du titre porte sur l’entrée avant nettoyage ; le libellé automatique
+« Nouvelle préparation » est exempt. À révision courante égale, un reçu doit
+correspondre au contenu stocké avant projection, sinon refus d’intégrité
+`preparation-receipt-identity-mismatch`. La ligne courante seule ne prouve pas le
+contenu d’un reçu historique. Cette garde n’établit pas un confinement du stockage.

@@ -218,7 +218,10 @@ impl RootStore {
     /// Replay lookup/fencing occurs BEFORE synchronization or new selection; a
     /// changed historical profile refuses without starting a replacement intent.
     /// All readiness contenders synchronize before slots/occupancy/FIFO filtering.
-    /// Only then does actual common preview probe resource admission. Clean direct
+    /// Only then does the common resource preview probe admission. Managed tasks
+    /// use rollback-only resource observation on the future path, creating no
+    /// copy/Agent and probing no nonexistent host workspace; actual admission
+    /// repeats these guards and performs full copy/host inspection. Clean direct
     /// occupancy refusals can yield to a disjoint lower-ranked candidate; any
     /// compound/unknown failure stops with all earlier committed effects retained.
     /// A direct capacity refusal stops the whole pass instead of trying other tasks.
@@ -335,7 +338,7 @@ impl RootStore {
                 expected_revision: request.expected_revision,
                 task_id: task.clone(),
             };
-            match self.prepare_mission_worker(lease, &chosen, true, environment) {
+            match self.preview_mission_worker_resources(lease, &chosen, environment) {
                 Ok(_) => {}
                 Err(cause) if clean_capacity_refusal(&cause) => {
                     resources.push(MissionDispatchResourceRefusal::Capacity {

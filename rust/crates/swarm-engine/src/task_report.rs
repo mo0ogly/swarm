@@ -1,4 +1,4 @@
-//! Manual handoff submission binds current native agent/attempt and report bytes.
+//! Handoff submission binds current native agent/attempt and report bytes.
 //! Stored consistency is not actor/model authentication or independent acceptance.
 use crate::{
     model_wire::{Fields, Kind},
@@ -124,10 +124,7 @@ pub(crate) fn apply<Ev: crate::WorkEnvironment>(
     settings: &crate::EngineSettingsDocument,
     environment: &mut Ev,
 ) -> Result<(), E> {
-    if let Some(planning) = &w.planning {
-        if planning.repository.is_some() {
-            return Err(E::Refused("task-report-managed-unported"));
-        }
+    if w.planning.is_some() {
         crate::validate_planning_state(w).map_err(|e| E::caused("task-report-scope-invalid", e))?;
     }
     let mut indices = w
@@ -159,6 +156,13 @@ pub(crate) fn apply<Ev: crate::WorkEnvironment>(
         return Err(E::Refused("task-report-review-recovery-unported"));
     }
     let agent = completed_producer(db, &w.id, task, &r.agent_id)?;
+    if w.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+        crate::managed_repository::verify_worker(root, db, w, &agent, settings, crate::managed_repository::WorkerCheck::Observe)?;
+        let retained = crate::managed_repository::verify_result(root, w, &agent, settings)?;
+        if retained.report_path != r.report_path || retained.report_sha256 != r.report_sha256 {
+            return Err(E::Refused("task-report-managed-result-mismatch"));
+        }
+    }
     let limits = settings
         .values
         .context_policy_limits()

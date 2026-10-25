@@ -267,8 +267,9 @@ impl LocalDirectory {
         Ok(Self { file })
     }
     /// Open a standalone resource directory owned by this user without requiring
-    /// private directory permissions. Reserved for telemetry's existing 0755
-    /// parent contract; contained files still require private mode. Root bindings
+    /// private directory permissions. Telemetry parents and managed source walks
+    /// may retain ordinary 0755 modes; private-file reads still enforce their
+    /// separate mode contract. Root bindings
     /// continue to use open(), and this is not same-UID OS confinement.
     pub(crate) fn open_owned(path: &Path) -> Result<Self, LocalStorageError> {
         let file: File = fs::open(path,
@@ -375,6 +376,18 @@ impl LocalDirectory {
             .map_err(|e| LocalStorageError::new(LocalStorageOperation::Read, e));
         close_after(result, file)
     }
+    /// Historical trust-actions.lock, shared/exclusive blocking flock. This is
+    /// the existing serialization protocol, no retry, timeout or operator cap.
+    /// The owned directory descriptor rejects path/symlink substitution; unlock
+    /// and close remain explicit and preserve their original causes.
+    pub(crate) fn reserve_trust(&self, exclusive: bool) -> Result<LocalReservation, LocalStorageError> {
+        let file=self.open_file("trust-actions.lock",OFlags::RDWR|OFlags::CREATE)?;
+        if let Err(error)=fs::flock(&file,if exclusive {FlockOperation::LockExclusive}else{FlockOperation::LockShared}) {
+            return close_after(Err(LocalStorageError::new(LocalStorageOperation::Lock,error)),file);
+        }
+        Ok(LocalReservation{file})
+    }
+
     /// Reserve the actual Go pricing lock with its blocking exclusive semantics.
     /// No timeout, retries or alternative lock name is invented. Open/flock/close
     /// failures preserve causes; callers must close the returned reservation.

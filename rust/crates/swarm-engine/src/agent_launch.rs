@@ -153,8 +153,10 @@ pub(crate) fn supported_branch(r:&Launch,conductor:Option<&str>)->Result<(),Agen
     Ok(())
 }
 /// Validate persisted manual or scoped operator-worker branches before transition.
-/// Hierarchy requires structural organization/reviewer capacity; managed repository,
-/// memory and recovery branches remain refused. Actual provider availability and
+/// Hierarchy requires structural organization/reviewer capacity. Managed manual
+/// copies require separate attribution at admission and every execution boundary;
+/// versioned memory and conversation recovery branches remain refused. Historical
+/// Work.memory paths require the separate current memory_files check. Actual provider availability and
 /// fresh prerequisite review/gates are separate mandatory caller checks. A
 /// blocked/submitted worker cannot bypass the persisted scoped retry gate;
 /// only native current changes_requested with the retry signal reaches the
@@ -176,10 +178,8 @@ pub(crate) fn supported_work(w: &Work, index: usize) -> Result<(), AgentLaunchEr
         crate::task_lifecycle::require_scoped_worker_restart(task)
             .map_err(|e| AgentLaunchError::caused(e.reason(), e))?;
     }
-    if w.planning.as_ref().is_some_and(|p| p.repository.is_some())
-        || (w.planning.is_none() && w.planning_brief.is_some())
+    if (w.planning.is_none() && w.planning_brief.is_some())
         || w.project_memory.as_ref().is_some_and(|v| !v.is_empty())
-        || w.memory.as_ref().is_some_and(|v| !v.is_empty())
         || task
             .memory_selections
             .as_ref()
@@ -216,6 +216,9 @@ pub(crate) fn supported_work(w: &Work, index: usize) -> Result<(), AgentLaunchEr
 /// SQL write runs. This observation is not a launch permit and must be repeated
 /// by the real factory. Missing policy/files, unsupported route and host errors
 /// retain their causes; canonical UTF-8 workspace is returned only on success.
+/// Managed initial tasks return a validated future-copy path without host probing
+/// or creating it. This is a standing intention only: the real fenced factory
+/// creates and host-checks the copy before admission and execution permission.
 pub(crate) fn candidate_workspace(
     root: &Path,
     directory: &LocalDirectory,
@@ -245,6 +248,9 @@ pub(crate) fn candidate_workspace(
     cooldown(root, &request.provider)?;
     let model = crate::provider_model_route::resolve(&provider, &request, &settings.values, &policy)?;
     crate::task_model::check_resolved(work, task, model.route())?;
+    if work.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
+        return crate::managed_repository::candidate_worker(root, work, task, settings);
+    }
     let host = agent_launch_preflight::observe(root, &request.provider, &model, &request, &policy)?;
     host.workspace.to_str().map(str::to_owned)
         .ok_or(AgentLaunchError::Refused("agent-workspace-not-utf8"))
@@ -534,7 +540,8 @@ fn reserve(
     Ok(())
 }
 /// Compose currently supported manual context and a byte-bound manifest. Existing
-/// workflow/project rules are included. No selected memory, dialogue or unported
+/// workflow/project rules and historical recovery-file references are included.
+/// No versioned selected memory, dialogue or unported
 /// authority is silently dropped. Prompt digests prove bytes only, not receipt.
 struct PromptContext<'a> {
     request: &'a Launch,
@@ -602,6 +609,7 @@ fn prompt(w: &Work, index: usize, context: PromptContext<'_>) -> Result<String, 
         index,
         &r.event_id,
     )?);
+    text.push_str(&crate::memory_files::prompt(w)?);
     text.push_str(
         &guard_snapshot
             .context()
@@ -748,6 +756,7 @@ fn stage<E: WorkEnvironment>(
     }
     crate::task_model::check_resolved(&w, &r.task_id, model.route())?;
     supported_work(&w, index)?;
+    crate::memory_files::check(root, tx, &w)?;
     let runtime_policy = settings
         .values
         .runtime_limit_policy()
@@ -949,6 +958,7 @@ fn stage<E: WorkEnvironment>(
         bytes: i64::try_from(agent.prompt.len())
             .map_err(|e| AgentLaunchError::caused("agent-launch-context-length", e))?,
         included: Some(vec![r.task_id.clone()]),
+        paths: w.memory.clone(),
         ..Default::default()
     }));
     let event = environment.identifier("launch-")
@@ -963,7 +973,13 @@ fn stage<E: WorkEnvironment>(
     if !inserted {
         return Err(AgentLaunchError::Refused("agent-launch-agent-not-recorded"));
     }
+    if w.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+        crate::managed_repository::verify_worker(root,tx,&w,&agent,settings,crate::managed_repository::WorkerCheck::Record)?;
+    }
     a.recheck()?;
+    // Reobserve paths after callbacks before publishing this intention. Source
+    // versions are read on the same transaction snapshot, not a second Root.
+    crate::memory_files::check(root, tx, &w)?;
     let outcome = crate::stage_recorded_change(
         tx,
         crate::RecordedChange {
@@ -1074,6 +1090,9 @@ fn stage<E: WorkEnvironment>(
             )
             .map_err(|e| AgentLaunchError::caused("agent-launch-mission-receipt", e))?;
     }
+    if w.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+        crate::managed_repository::verify_worker(root,tx,&w,&agent,settings,crate::managed_repository::WorkerCheck::BeforeExecution)?;
+    }
     Ok(AgentLaunchOutcome {
         agent,
         created: true,
@@ -1147,6 +1166,37 @@ pub(crate) fn with_fenced_replay<E: WorkEnvironment, T>(
     finish(result, tx.rollback().map_err(|e| AgentLaunchError::caused("agent-launch-replay-rollback", e)))
 }
 
+/// Observe managed admission resources under the actual automatic fence and
+/// settings reservation, rolling back the writer pulse. No Agent is fabricated,
+/// copy created or host probe performed. Current Work revision, saved profile,
+/// provider/model/candidate, overlap and financial/slot/lease guards are read;
+/// actual admission must repeat all checks and observe the physical copy/host.
+/// Typed operation/rollback causes survive; observation is no execution grant.
+pub(crate) fn preview_managed_resources<E: WorkEnvironment>(
+    db: &mut Connection, source: PreparationRoot<'_>, work: &str,
+    request: &Launch, environment: &mut E,
+) -> Result<(), AgentLaunchError> {
+    let PreparationRoot {root,dir,settings,fence} = source;
+    let fence = fence.ok_or(AgentLaunchError::Refused("mission-agent-fence-required"))?;
+    supported_branch(request, fence.mission_conductor())?;
+    let profile = fence.mission_profile().ok_or(AgentLaunchError::Refused("mission-profile-required"))?;
+    with_fenced_replay(db, work, fence, settings, environment, |tx, _| {
+        let actual = crate::read_recorded_work(tx,work)
+            .map_err(|e| AgentLaunchError::caused("agent-launch-work-invalid",e))?;
+        if actual.revision != request.expected_revision { return Err(AgentLaunchError::Refused("revision_conflict")); }
+        if actual.planning.as_deref().is_none_or(|p| p.repository.is_none()) {
+            return Err(AgentLaunchError::Refused("managed-repository-required"));
+        }
+        let index=actual.tasks.iter().flatten().position(|t|t.id==request.task_id)
+            .ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?;
+        supported_work(&actual,index)?;
+        let workspace=candidate_workspace(root,dir,&actual,&request.task_id,profile,settings)?;
+        guards(tx,work,request,&workspace)?;
+        crate::financial_budget::admission_budget(tx,work)
+            .map_err(|e| AgentLaunchError::caused(e.code(),e))?;
+        Ok(())
+    })
+}
 /// Observe a strict stored original inside the caller's writer snapshot.
 /// None requires absence of both Agent and its canonical event namespace; an
 /// orphan event/reservation refuses. JSON SQL errors remain errors, not absence.
@@ -1235,6 +1285,8 @@ pub(crate) fn replay_observed_dispatch<E: WorkEnvironment>(
 /// writer transaction. Host checks occur outside the writer; admission rechecks
 /// scope/config/workflow and stages all database effects atomically. Preview
 /// rolls back staging; it may exercise/remove a temporary host write probe.
+/// First manual or native-fenced managed admission retains an attributed private Git copy even
+/// on later SQL rollback; preview refuses before creating any managed copy.
 /// Commit failure returns uncertainty plus rollback cause, never an ownership or
 /// execution receipt. No provider subprocess, paid call or automatic acceptance.
 pub(crate) struct PreparationRoot<'a> {
@@ -1322,12 +1374,27 @@ pub(crate) fn prepare<E: WorkEnvironment>(
         ));
     }
     field_guide(root)?;
+    crate::memory_files::check(root, db, &chosen_work)?;
     let (original_provider, provider_raw) = provider(dir, &r, &policy)?;
     cooldown(root, &r.provider)?;
     let model =
         crate::provider_model_route::resolve(&original_provider, &r, &settings.values, &policy)?;
     crate::task_model::check_resolved(&chosen_work, &r.task_id, model.route())?;
     let p = model.provider();
+    let managed=chosen_work.planning.as_deref().is_some_and(|p|p.repository.is_some());
+    if managed {
+        if preview { return Err(AgentLaunchError::Refused("agent-launch-work-branch-unported")); }
+        let index=chosen_work.tasks.iter().flatten().position(|t|t.id==r.task_id).ok_or(AgentLaunchError::Refused("agent-launch-task-missing"))?;
+        supported_work(&chosen_work,index)?;
+        // Revalidate the actual automatic fence before any retained copy effect.
+        if fence.and_then(|f| f.mission_conductor()).is_some() {
+            let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+                .map_err(|e| AgentLaunchError::caused("managed-worker-fence-writer",e))?;
+            let checked = check_fence(fence,&tx,work,settings,environment);
+            finish(checked,tx.rollback().map_err(|e| AgentLaunchError::caused("managed-worker-fence-rollback",e)))?;
+        }
+        r.workspace=crate::managed_repository::prepare_worker(root,&chosen_work,&r,&raw,settings,fence.and_then(|f|f.mission_conductor()))?;
+    }
     let host = agent_launch_preflight::observe(root, &r.provider, &model, &r, &policy)?;
     let workflow = crate::read_agent_workflow(
         root,

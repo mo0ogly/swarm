@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recipe": "preparation-upgrade-rust",
+  "status": "PASS",
+  "scope": "Declared recipe checks only; not independent/effective-graph qualification or acceptance",
+  "global_watchdog": null,
+  "source_stable": true,
+  "steps": [
+    {
+      "id": "explicit-historical-configuration-adoption",
+      "command": [
+        "/usr/bin/python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-upgrade-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_upgrade.py','--old-binary',os.environ['SWARM_PREPARATION_BASELINE_BINARY'],'--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_UPGRADE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "exit": 0,
+      "seconds": 26.42574669601163,
+      "executable": "/usr/bin/python3.13",
+      "launcher_sha256": "efb29ce53d36ebaeee80e3aa44fd6c7f9d71bbded5fe1665240b2ed8ecaeee0e"
+    }
+  ],
+  "failure": null,
+  "artifacts": {
+    "recipe.original.json": "2eeb60b2865d4f80ed1a34da8d475b3695b86c9626d8cb2e45fc7aeab7145ab3",
+    "runner.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f",
+    "inputs.before.json": "a4e5c72ae5bf2fac0050e9c810cd16c0c84183a1d20503b14e3316d8764dc2ba",
+    "declared-inputs.tar.gz": "2b801f62e7f1c23b5b3d9ae69af6644f7ec941410aaa1936ea497274a5cab46f",
+    "environment.json": "cf71d79c4f6e8538f8e8c696b87074e1ef7856c324eb47d6c6a6c0d9d18f75fd",
+    "step-0001.stdout": "9bb45aeb99dfbf8f3021ddbaa542629b66f4b219e1ec87da1f49e6edd756fbdd",
+    "step-0001.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "step-0001.json": "5a4ce1567f79236fe1fbb2562eb3bcfdf8ae19b738bd57c22e4a268e8ed67c08",
+    "inputs.after.json": "a4e5c72ae5bf2fac0050e9c810cd16c0c84183a1d20503b14e3316d8764dc2ba"
+  }
+}

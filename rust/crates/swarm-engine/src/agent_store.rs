@@ -589,7 +589,7 @@ fn reservation_snapshot(
 
 /// Cancel a queued, unregistered launch and settle its matching manual attempt
 /// in one caller-policy transaction. The legacy starting/body-queued gap requires
-/// durable desired=stop. Registered agents, managed/hierarchical work and corrupt
+/// durable desired=stop. Registered agents, unattributed managed work and corrupt
 /// row ownership refuse without mutation; no PID is signalled. Reserved estimates
 /// become released, never spent costs; a newer task attempt remains unchanged.
 /// Replaying a prior unregistered cancellation preserves terminal bytes and repairs
@@ -697,18 +697,20 @@ pub(crate) fn cancel_queued_agent_with_settings<E: crate::WorkEnvironment>(
         let verified_mission = verified_binding.is_some();
         #[cfg(not(target_os="linux"))]
         let verified_mission=false;
-        if (work.planning.is_some()
-            && (settings.is_none()
-                || work
-                    .planning
-                    .as_ref()
-                    .is_some_and(|p| p.repository.is_some())))
+        if (work.planning.is_some() && settings.is_none())
             || (agent.origin == "conducteur" && !verified_mission)
             || agent.delivery_version != 0
         {
             return Err(AgentStoreError::Refused(
                 "agent-managed-cancellation-unported",
             ));
+        }
+        if work.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+            #[cfg(target_os="linux")]
+            crate::managed_repository::verify_worker(context.root,tx,&work,&agent,settings.ok_or(AgentStoreError::Refused("agent-managed-cancellation-settings-required"))?,crate::managed_repository::WorkerCheck::Cancel)
+                .map_err(|e|AgentStoreError::ScopeSignal(Box::new(e)))?;
+            #[cfg(not(target_os="linux"))]
+            return Err(AgentStoreError::Refused("agent-managed-cancellation-unported"));
         }
         let index = work
             .tasks
@@ -874,6 +876,11 @@ pub(crate) fn cancel_queued_agent_with_settings<E: crate::WorkEnvironment>(
             ));
         }
         verify_agent_ownership(tx, &stored)?;
+        if work.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+            #[cfg(target_os="linux")]
+            crate::managed_repository::verify_worker(context.root,tx,&work,&stored,settings.ok_or(AgentStoreError::Refused("agent-managed-cancellation-settings-required"))?,crate::managed_repository::WorkerCheck::Cancel)
+                .map_err(|e|AgentStoreError::ScopeSignal(Box::new(e)))?;
+        }
         Ok(stored)
     })
 }

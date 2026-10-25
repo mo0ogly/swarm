@@ -120,6 +120,8 @@ pub(super) enum Stop {
     Terminate,
     /// Owned server lifetime ended; never described as an OS signal.
     ControllerShutdown,
+    /// Current operator permission was withdrawn during a clean preview.
+    PermissionWithdrawn,
 }
 impl Stop {
     /// Closed protocol vocabulary, never a user-supplied phase string.
@@ -128,6 +130,7 @@ impl Stop {
             Self::Interrupt => "sigint",
             Self::Terminate => "sigterm",
             Self::ControllerShutdown => "controller-shutdown",
+            Self::PermissionWithdrawn => "permission-withdrawn",
         }
     }
 }
@@ -274,7 +277,7 @@ impl Signals {
                                 Stop::Terminate => {
                                     swarm_engine::ExecutionInterruptReason::Terminate
                                 }
-                                Stop::ControllerShutdown => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
+                                Stop::ControllerShutdown | Stop::PermissionWithdrawn => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
                             })
                             .map_err(|e| phase("mission-watch-interruption-publish", e))?;
                     }
@@ -721,6 +724,11 @@ fn dispatch_record(outcome: &Dispatch, work: &str) -> Value {
             queue, resources, ..
         } => (queue.as_ref(), resources),
     };
+    dispatch_parts(queue, resources, work)
+}
+/// Project borrowed original queue/resources for an outcome or a refused preview.
+/// No cause, committed effect or task attribution is replaced by an empty result.
+fn dispatch_parts(queue: Option<&swarm_engine::MissionQueueRegistration>, resources: &[swarm_engine::MissionDispatchResourceRefusal], work: &str) -> Value {
     let permission = queue
         .and_then(|queue| queue.permission_refusal.as_ref())
         .map(|error| crate::safe_causes(error));
@@ -902,6 +910,102 @@ fn stale_dispatch_observation(error: &swarm_engine::MissionWorkerDispatchFailure
             if matches!(cause.as_ref(), swarm_engine::MissionSupervisionError::Refused("revision_conflict")))
 }
 
+/// Recognize only a clean rolled-back resource preview denied by the actual
+/// mission fence after permission withdrawal. Preserve its committed queue and
+/// original causes; no admission, replay, cleanup/commit uncertainty, generic
+/// source traversal or formatted-message match is eligible. This authorizes
+/// stopping this watch session only, never another launch or a hidden retry.
+fn withdrawn_dispatch(error: &swarm_engine::MissionWorkerDispatchFailure) -> Option<&'static str> {
+    use swarm_engine::{MissionDispatchCause as C, MissionDispatchPreparationEffect as P,
+        MissionDispatchQueueEffect as Q, AgentLaunchError as A, WorkEngineError as W,
+        MissionSupervisionError as M};
+    if error.phase != "resource-preview" || !matches!(error.queue,Q::Committed(_))
+        || !matches!(error.preparation,P::PreviewAttempted{..}) { return None; }
+    let C::Root(root) = &error.cause else { return None; };
+    let RootError::Launch(launch) = root.as_ref() else { return None; };
+    let A::Cause{code:"agent-launch-mission-fence",cause} = launch.as_ref() else { return None; };
+    let Some(W::Mission(mission)) = cause.downcast_ref::<W>() else { return None; };
+    match mission.as_ref() {
+        M::Refused(code @ ("planning-mission-paused" | "mission_archived" | "mission-controls-required" | "mission-autonomy-required" | "mission-consent-required")) => Some(*code),
+        _ => None,
+    }
+}
+
+/// Bind withdrawal to this actual Work. Besides a clean preview, accept only a
+/// committed empty synchronization with no preparation/resources, a direct
+/// revision conflict and its independently observed known permission refusal.
+/// Preserve that committed effect: this is not a no-effect stale read or retry.
+fn withdrawn_dispatch_for_work(error: &swarm_engine::MissionWorkerDispatchFailure, work: &str) -> Option<&'static str> {
+    use swarm_engine::{MissionDispatchCause as C, MissionDispatchPreparationEffect as P,
+        MissionDispatchQueueEffect as Q, MissionSupervisionError as M};
+    let Q::Committed(queue)=&error.queue else {return None;};
+    if queue.work!=work || queue.revision<1 {return None;}
+    if let Some(reason)=withdrawn_dispatch(error) {return Some(reason);}
+    if error.phase!="synchronized-revision" || !matches!(error.preparation,P::NotAttempted)
+        || !error.resources.is_empty() || !queue.ready.is_empty() || !queue.refused.is_empty() {return None;}
+    if !matches!(&error.cause,C::Mission(cause) if matches!(cause.as_ref(),M::Refused("revision_conflict"))) {return None;}
+    match queue.permission_refusal.as_ref() {
+        Some(M::Refused(code @ ("planning-mission-paused" | "mission_archived" | "mission-controls-required" | "mission-autonomy-required" | "mission-consent-required"))) => Some(*code),
+        _=>None,
+    }
+}
+
+/// Publish the complete clean withdrawal observation, then end only this watch.
+/// Revalidate the closed classifier before consuming the failure. Output failure
+/// retains both the original committed queue/causes and publication error. No
+/// retry, queue cleanup claim, cancellation, refund or mission acceptance occurs.
+fn stop_withdrawn_dispatch(error: Box<swarm_engine::MissionWorkerDispatchFailure>, work: &str, event: &str, out: &mut dyn Write) -> Result<Stop, RootError> {
+    let Some(reason) = withdrawn_dispatch_for_work(&error, work) else { return Err(phase("mission-watch-dispatch", *error)); };
+    let queue = match &error.queue {
+        swarm_engine::MissionDispatchQueueEffect::Committed(queue) => Some(queue),
+        _ => None,
+    };
+    let mut record = dispatch_parts(queue, &error.resources, work);
+    let preview=matches!(error.preparation,swarm_engine::MissionDispatchPreparationEffect::PreviewAttempted{..});
+    record["reason"] = json!(if preview {"permission-withdrawn-during-preview"} else {"permission-withdrawn-during-synchronization"});
+    if preview {record["preview_permission_refusal"] = json!(reason);}
+    record["phase"] = json!(error.phase);
+    record["preparation_attempted"] = json!(preview);
+    record["admission_attempted"] = json!(false);
+    record["event_id"] = json!(event);
+    let cause = phase("mission-watch-dispatch", *error);
+    record["causes"] = json!(crate::safe_causes(&cause));
+    if let Err(publication) = emit(out, &record) { return Err(join(Some(cause), publication)); }
+    Ok(Stop::PermissionWithdrawn)
+}
+
+/// Recognize only the report discovery read's exact clean permission refusal.
+/// The material/SQL readers return this shape only after successful rollback,
+/// association checks and descriptor release. Any compound/recorded/write error
+/// or unknown typed cause stays fatal; no arbitrary source walk or text match.
+fn withdrawn_report(error: &RootError) -> Option<&'static str> {
+    use swarm_engine::{WorkEngineError as W, MissionSupervisionError as M};
+    let RootError::Mutation(W::Mission(outer)) = error else { return None; };
+    let M::Cause{code:"mission-report-observation",cause} = outer.as_ref() else { return None; };
+    let Some(M::Root(inner)) = cause.downcast_ref::<M>() else { return None; };
+    if matches!(inner.as_ref(),RootError::Refused("mission-report-automatic-consent-required")) {
+        return Some("mission-report-automatic-consent-required");
+    }
+    let RootError::Mutation(W::Mission(inner)) = inner.as_ref() else { return None; };
+    let M::Cause{code:"mission-report-controls",cause} = inner.as_ref() else { return None; };
+    match cause.downcast_ref::<M>() {
+        Some(M::Refused(code @ ("planning-mission-paused" | "mission_archived" | "mission-controls-required" | "mission-autonomy-required" | "mission-consent-required"))) => Some(*code),
+        _ => None,
+    }
+}
+/// Publish a clean report-read withdrawal and preserve any earlier recorded Work.
+/// End this watch without attempting a new report write, retry or queue cleanup.
+/// A publication error retains original and output causes, never a clean stop.
+fn stop_withdrawn_report(error: RootError, work: &str, recorded: &Option<(String,i64)>, out: &mut dyn Write) -> Result<Stop,RootError> {
+    let Some(reason)=withdrawn_report(&error) else { return Err(error); };
+    let record=json!({"schema_version":1,"event":"mission-watch-blocked","work":work,
+        "reason":"permission-withdrawn-during-report-read","phase":"report-observation",
+        "permission_refusal":reason,"causes":crate::safe_causes(&error),"recorded_work":recorded,
+        "report_write_attempted":false,"mission_complete":false,"observation_is_permission":false});
+    if let Err(publication)=emit(out,&record) {return Err(join(Some(error),publication));}
+    Ok(Stop::PermissionWithdrawn)
+}
+
 /// The heartbeat stays active for the entire gate/loop, not just the admission.
 /// Worker work begins only through dispatch or queued-v4 adoption plus the private CLI
 /// bootstrap. Each iteration re-observes retained state without changing Binding4. Missing reviewer/validation roles produce a visible blocked
@@ -952,14 +1056,16 @@ fn drive(
             role = role.next(produced);
         }
         reap(store, work, children, out)?;
-        relay_reports(
+        if let Err(error) = relay_reports(
             store,
             lease,
             work,
             out,
             &mut waiting_reports,
             planning_recorded,
-        )?;
+        ) {
+            return stop_withdrawn_report(error, work, planning_recorded, out);
+        }
         let (candidates, active_context, registered) = continuation(store, lease, children)?;
         if recover_registered(store,lease,work,registered,&mut recovery_waiting,planning_recorded,out)? {
             // Verified settlement changed the observed context. Discard this old
@@ -1044,6 +1150,9 @@ fn drive(
         };
         let outcome = match store.dispatch_mission_worker(lease, &request, &mut SystemEnvironment) {
             Ok(outcome) => outcome,
+            Err(error) if withdrawn_dispatch_for_work(&error,work).is_some() => {
+                return stop_withdrawn_dispatch(error, work, &request.event_id, out);
+            }
             Err(error) if stale_dispatch_observation(&error) => {
                 let error = phase("mission-watch-dispatch", *error);
                 let observation=json!({"schema_version":1,"event":"mission-watch-blocked","work":work,
@@ -1342,6 +1451,113 @@ fn session(root: &Path, executable: &Path, work: &str, mut signals: Signals,
 
 #[cfg(test)]
 mod tests {
+    /// Fresh permission cleanup remains a committed queue effect. A revision
+    /// error alone, wrong Work, preparation or missing refusal never authorizes it.
+    #[test]
+    fn synchronized_withdrawal_stops_only_its_work_and_keeps_commit() {
+        use swarm_engine::{MissionWorkerDispatchFailure as F,MissionDispatchQueueEffect as Q,
+            MissionDispatchPreparationEffect as P,MissionDispatchCause as C,MissionSupervisionError as M};
+        let clean=||F{phase:"synchronized-revision",queue:Q::Committed(swarm_engine::MissionQueueRegistration {
+            work:"work".into(),revision:7,ready:Vec::new(),refused:Vec::new(),
+            permission_refusal:Some(M::Refused("planning-mission-paused"))}),
+            preparation:P::NotAttempted,resources:Vec::new(),cause:C::Mission(Box::new(M::Refused("revision_conflict")))};
+        assert_eq!(super::withdrawn_dispatch_for_work(&clean(),"work"),Some("planning-mission-paused"));
+        assert!(!super::stale_dispatch_observation(&clean()));
+        assert!(super::withdrawn_dispatch_for_work(&clean(),"other").is_none());
+        let mut error=clean();let Q::Committed(q)=&mut error.queue else {panic!()};q.permission_refusal=None;
+        assert!(super::withdrawn_dispatch_for_work(&error,"work").is_none());
+        let mut error=clean();error.preparation=P::AdmissionAttempted{event_id:"event".into(),task_id:"task".into()};
+        assert!(super::withdrawn_dispatch_for_work(&error,"work").is_none());
+        let mut error=clean();error.queue=Q::OutcomeUnknown;assert!(super::withdrawn_dispatch_for_work(&error,"work").is_none());
+        let mut error=clean();let Q::Committed(q)=&mut error.queue else {panic!()};q.ready.push("task".into());
+        assert!(super::withdrawn_dispatch_for_work(&error,"work").is_none());
+        let mut bytes=Vec::new();assert_eq!(super::stop_withdrawn_dispatch(Box::new(clean()),"work","event",&mut bytes).unwrap(),super::Stop::PermissionWithdrawn);
+        let record:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(record["reason"],"permission-withdrawn-during-synchronization");
+        assert_eq!(record["synchronization_committed"],true);assert_eq!(record["work_revision"],7);
+        assert_eq!(record["preparation_attempted"],false);assert_eq!(record["admission_attempted"],false);
+        assert!(record["permission_refusal"].as_array().unwrap().iter().any(|v|v=="planning-mission-paused"));
+        assert!(record["causes"].as_array().unwrap().iter().any(|v|v=="revision_conflict"));
+    }
+    /// Exact read-only report withdrawal preserves prior Work and rejects every
+    /// output/cleanup/recorded wrapper, so an uncertain write cannot look clean.
+    #[test]
+    fn report_read_withdrawal_preserves_prior_work_and_output_causes() {
+        use swarm_engine::{WorkEngineError as W,MissionSupervisionError as M,RootStoreError as R};
+        let clean=|| R::Mutation(W::Mission(Box::new(M::Cause{code:"mission-report-observation",
+            cause:Box::new(M::Root(Box::new(R::Mutation(W::Mission(Box::new(M::Cause{code:"mission-report-controls",
+                cause:Box::new(M::Refused("planning-mission-paused"))}))))))})));
+        assert_eq!(super::withdrawn_report(&clean()),Some("planning-mission-paused"));
+        let revoked=R::Mutation(W::Mission(Box::new(M::Cause{code:"mission-report-observation",
+            cause:Box::new(M::Root(Box::new(R::Refused("mission-report-automatic-consent-required"))))})));
+        assert_eq!(super::withdrawn_report(&revoked),Some("mission-report-automatic-consent-required"));
+        let R::Mutation(W::Mission(outer))=clean() else {panic!()};
+        let M::Cause{code,cause}=*outer else {panic!()};
+        let rollback=R::Mutation(W::Mission(Box::new(M::Cause{code,cause:Box::new(M::Cleanup {
+            primary:cause.downcast::<M>().unwrap(),cleanup:Box::new(M::Refused("fixture-rollback"))})})));
+        assert!(super::withdrawn_report(&rollback).is_none());
+        assert!(super::withdrawn_report(&R::LifecycleRecorded{primary:Box::new(clean())}).is_none());
+        assert!(super::withdrawn_report(&R::Cleanup{primary:Some(Box::new(clean())),cleanup:Box::new(R::Refused("fixture-close"))}).is_none());
+        assert!(super::withdrawn_report(&R::WorkRecorded{primary:Box::new(clean()),work:"work".into(),revision:18}).is_none());
+        assert!(super::withdrawn_report(&R::Refused("planning-mission-paused")).is_none());
+        let mut bytes=Vec::new();let recorded=Some(("work".into(),17));
+        assert_eq!(super::stop_withdrawn_report(clean(),"work",&recorded,&mut bytes).unwrap(),super::Stop::PermissionWithdrawn);
+        let value:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(value["recorded_work"],serde_json::json!(["work",17]));
+        assert_eq!(value["report_write_attempted"],false);assert_eq!(value["mission_complete"],false);
+        struct Broken;
+        impl std::io::Write for Broken {
+            fn write(&mut self,_:&[u8])->std::io::Result<usize>{Err(std::io::ErrorKind::BrokenPipe.into())}
+            fn flush(&mut self)->std::io::Result<()>{Ok(())}
+        }
+        let error=super::stop_withdrawn_report(clean(),"work",&recorded,&mut Broken).unwrap_err();
+        let causes=crate::safe_causes(&error);
+        assert!(causes.iter().any(|s|s=="planning-mission-paused"));
+        assert!(causes.iter().any(|s|s=="io-kind:BrokenPipe"));
+    }
+    /// A real typed clean fence refusal is distinct from admission, replay,
+    /// missing queue effects, unrelated failures and secondary cleanup errors.
+    #[test]
+    fn withdrawn_preview_stops_session_without_hiding_effects_or_cleanup() {
+        use swarm_engine::{MissionWorkerDispatchFailure as F, MissionDispatchQueueEffect as Q,
+            MissionDispatchPreparationEffect as P, MissionDispatchCause as C, MissionSupervisionError as M,
+            AgentLaunchError as A, WorkEngineError as W, RootStoreError as R};
+        let clean=|| F {phase:"resource-preview",queue:Q::Committed(swarm_engine::MissionQueueRegistration {
+            work:"work".into(),revision:7,ready:vec!["task".into()],refused:Vec::new(),permission_refusal:None}),
+            preparation:P::PreviewAttempted{event_id:"event".into(),task_id:"task".into()},resources:Vec::new(),
+            cause:C::Root(Box::new(R::Launch(Box::new(A::Cause{code:"agent-launch-mission-fence",
+                cause:Box::new(W::Mission(Box::new(M::Refused("planning-mission-paused"))))}))))};
+        assert_eq!(super::withdrawn_dispatch(&clean()),Some("planning-mission-paused"));
+        let mut error=clean();error.phase="admission";assert!(super::withdrawn_dispatch(&error).is_none());
+        let mut error=clean();error.preparation=P::AdmissionAttempted{event_id:"event".into(),task_id:"task".into()};assert!(super::withdrawn_dispatch(&error).is_none());
+        let mut error=clean();error.preparation=P::ReplayAttempted{event_id:"event".into()};assert!(super::withdrawn_dispatch(&error).is_none());
+        let mut error=clean();error.queue=Q::OutcomeUnknown;assert!(super::withdrawn_dispatch(&error).is_none());
+        let mut error=clean();let C::Root(root)=error.cause else {panic!()};error.cause=C::Root(Box::new(R::LifecycleRecorded{primary:root}));assert!(super::withdrawn_dispatch(&error).is_none());
+        let mut error=clean();error.cause=C::Root(Box::new(R::Launch(Box::new(A::Cleanup {
+            primary:Box::new(A::Refused("planning-mission-paused")),cleanup:Box::new(A::Refused("fixture-close"))}))));assert!(super::withdrawn_dispatch(&error).is_none());
+        let mut error=clean();error.cause=C::Root(Box::new(R::Launch(Box::new(A::Cause{code:"agent-launch-mission-fence",
+            cause:Box::new(W::Mission(Box::new(M::Refused("mission-lease-lost"))))}))));assert!(super::withdrawn_dispatch(&error).is_none());
+        let error=clean();let Q::Committed(queue)=&error.queue else {panic!()};
+        let record=super::dispatch_parts(Some(queue),&error.resources,"work");
+        assert_eq!(record["synchronization_committed"],true);assert_eq!(record["work_revision"],7);assert_eq!(record["ready_count"],1);
+        assert_eq!(super::Stop::PermissionWithdrawn.name(),"permission-withdrawn");
+        let mut bytes=Vec::new();
+        assert_eq!(super::stop_withdrawn_dispatch(Box::new(clean()),"work","event",&mut bytes).unwrap(),super::Stop::PermissionWithdrawn);
+        let record:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(record["reason"],"permission-withdrawn-during-preview");
+        assert_eq!(record["synchronization_committed"],true);assert_eq!(record["work_revision"],7);
+        assert_eq!(record["preparation_attempted"],true);assert_eq!(record["admission_attempted"],false);
+        assert_eq!(record["mission_complete"],false);assert_eq!(record["observation_is_permission"],false);
+        struct Broken;
+        impl std::io::Write for Broken {
+            fn write(&mut self,_:&[u8])->std::io::Result<usize>{Err(std::io::ErrorKind::BrokenPipe.into())}
+            fn flush(&mut self)->std::io::Result<()>{Ok(())}
+        }
+        let error=super::stop_withdrawn_dispatch(Box::new(clean()),"work","event",&mut Broken).unwrap_err();
+        let causes=crate::safe_causes(&error);
+        assert!(causes.iter().any(|s|s=="planning-mission-paused"));
+        assert!(causes.iter().any(|s|s=="io-kind:BrokenPipe"));
+    }
     /// Valid no-effect revision refusal precedes unknown effects, attempted replay,
     /// secondary/root causes and unrelated phases; none may be silently reobserved.
     #[test]

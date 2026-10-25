@@ -11,6 +11,8 @@
   'admin-budget-preview-stale':'Le budget ou sa consommation a changé. Prévisualisez à nouveau avant d’enregistrer.',
   'admin-budget-exhausted':'Le budget Admin ne permet pas de réserver un autre conseil.',
   'admin-budget-not-configured':'Configurez le budget Admin avant de demander un conseil direct.',
+  'settings-preparation-read-not-configured':'Adoptez les trois réglages de lecture des préparations.',
+  'settings-preparation-requires-report-clock-policy':'Adoptez les politiques précédentes avant les limites de lecture des préparations.',
   'admin-budget-money-invalid':'Saisissez un montant USD positif ou nul avec au plus six décimales, sans exposant.',
   'admin-budget-response-invalid':'Réponse du budget Admin incompatible.',
   'admin-budget-apply-ack-invalid':'Enregistrement du budget non confirmé. Vérifiez l’historique avant de reprendre.',
@@ -116,6 +118,7 @@
   ['tasks','Tâches et contrôles',/^(task_|validation_)/u],
   ['quality','Qualité et revue',/^(quality_|review_|reviewer_|managed_)/u],
   ['context','Contexte et mémoire',/^project_/u],
+  ['preparations','Préparations et documents',/^preparation_/u],
   ['planning','Planification et délégation',/^(planning_|mission_)/u],
   ['models','Modèles et fournisseurs',/^agent_(model_|provider_|allow_unverified)/u],
   ['agents','Agents, exécution et reprise',/^(agent_|runtime_)/u],
@@ -125,14 +128,14 @@
   ['other','Autres paramètres',/.*/u]
  ];
  // Related families supply dependency context, not new permission or defaults.
- const relatedGroups={tasks:['quality','agents','planning'],quality:['tasks','context','storage','planning'],context:['quality','agents','models','planning'],planning:['tasks','agents','models','context'],models:['agents','planning','context'],agents:['models','planning','tasks','storage'],storage:['tasks','quality','agents','network'],network:['storage','agents'],display:['quality','context'],other:[]};
+ const relatedGroups={preparations:['context','quality','planning'],tasks:['quality','agents','planning'],quality:['tasks','context','storage','planning'],context:['quality','agents','models','planning'],planning:['tasks','agents','models','context'],models:['agents','planning','context'],agents:['models','planning','tasks','storage'],storage:['tasks','quality','agents','network'],network:['storage','agents'],display:['quality','context'],other:[]};
  /** Check flat catalogue wire types, exact decimal strings and known phase
   * choices before touching controls. This is not semantic policy validation;
   * Root preview owns bounds, dependencies, freshness and normalization. Pure. */
  function wireValue(field,value){
   if(value===null)return field.nullable===true;
   if(['strings','programs','phases'].includes(field.unit))return Array.isArray(value)&&value.every(v=>typeof v==='string'&&(field.unit!=='phases'||field.choices.some(c=>c.value===v)))&&new Set(value).size===value.length;
-  return typeof value==='string'&&(field.unit==='address'||/^(0|[1-9][0-9]*)$/u.test(value));
+  return typeof value==='string'&&(['address','text'].includes(field.unit)||/^(0|[1-9][0-9]*)$/u.test(value));
  }
  /** Return exactly one presentation family, retaining unknown fields. Pure. */
  function groupFor(field){return groups.find(group=>group[2].test(field.name))}
@@ -202,11 +205,11 @@
    if(!alive||loading)return;loading=true;edit.disabled=reload.disabled=true;status.className='notice info';status.textContent=tr('Chargement…');
    try {
     const [nextCatalog,nextDocument]=await Promise.all([transport.describe(),transport.show()]);if(!alive)return;
-    if(![1,2,3,4].includes(nextCatalog.schema_version)||!Array.isArray(nextCatalog.supported_document_versions)||!nextCatalog.supported_document_versions.includes(nextDocument.schema_version)||!nextCatalog.supported_document_versions.includes(nextCatalog.document_schema_version)||typeof nextDocument.revision!=='string'||!Array.isArray(nextCatalog.fields))throw Error(tr('Format des réglages incompatible.'));
+    if(![1,2,3,4,5].includes(nextCatalog.schema_version)||!Array.isArray(nextCatalog.supported_document_versions)||!nextCatalog.supported_document_versions.includes(nextDocument.schema_version)||!nextCatalog.supported_document_versions.includes(nextCatalog.document_schema_version)||typeof nextDocument.revision!=='string'||!Array.isArray(nextCatalog.fields))throw Error(tr('Format des réglages incompatible.'));
     const names=nextCatalog.fields.map(f=>f.name);if(new Set(names).size!==names.length||Object.keys(nextDocument.values).some(k=>!names.includes(k))||nextCatalog.fields.some(f=>!nextCatalog.supported_document_versions.includes(f.introduced_schema_version)||Object.hasOwn(nextDocument.values,f.name)!==(f.introduced_schema_version<=nextDocument.schema_version)))throw Error(tr('Format des réglages incompatible.'));
     if(nextCatalog.fields.some(f=>f.unit==='phases'&&(nextCatalog.schema_version<2||!Array.isArray(f.choices)||!f.choices.length||f.choices.some(c=>!c||typeof c.value!=='string'||!c.value||typeof c.label!=='string'||!c.label.trim())||new Set(f.choices.map(c=>c.value)).size!==f.choices.length)))throw Error(tr('Format des réglages incompatible.'));
-    const units=['address','count','characters','seconds','milliseconds','bytes','percent','programs','phases','strings'];
-    if(nextCatalog.fields.some(f=>!units.includes(f.unit)||(f.unit==='strings'&&nextCatalog.schema_version<3)))throw Error(tr('Format des réglages incompatible.'));
+    const units=['text','address','count','characters','seconds','milliseconds','bytes','percent','programs','phases','strings'];
+    if(nextCatalog.fields.some(f=>!units.includes(f.unit)||(f.unit==='text'&&nextCatalog.schema_version<5)||(f.unit==='strings'&&nextCatalog.schema_version<3)))throw Error(tr('Format des réglages incompatible.'));
     if(nextCatalog.fields.some(f=>(f.unit==='address'&&nextCatalog.schema_version<4)||(f.technical_maximum!==undefined&&(nextCatalog.schema_version<4||typeof f.technical_maximum!=='string'||!/^(0|[1-9][0-9]*)$/u.test(f.technical_maximum)))||(f.null_label!==undefined&&(nextCatalog.schema_version<4||!f.nullable||typeof f.null_label!=='string'||!f.null_label.trim()))||(f.application!==undefined&&(nextCatalog.schema_version<4||f.application!=='server_restart'))))throw Error(tr('Format des réglages incompatible.'));
     if(nextCatalog.schema_version>=4&&(!nextCatalog.network_transport||['max_header_fields','minimum_connection_buffer_bytes','max_header_bytes','native_body_max_bytes','max_semaphore_permits'].some(k=>typeof nextCatalog.network_transport[k]!=='string'||!/^(0|[1-9][0-9]*)$/u.test(nextCatalog.network_transport[k]))))throw Error(tr('Format des réglages incompatible.'));
 
@@ -253,7 +256,7 @@
      for(const choice of field.choices){const check=element('input');check.type='checkbox';check.value=choice.value;check.dataset.phaseChoice=choice.value;check.checked=current.values[field.name].includes(choice.value);const label=element('label',undefined,'engine-settings-unlimited');label.append(check,document.createTextNode(tr(choice.label)));input.append(label)}
      container.append(input,element('p',tr('Les contrôles des critères restent obligatoires. Les tâches existantes gardent leurs exigences.'),'assist-meta'));
     }else{
-     if(!['programs','strings','address'].includes(field.unit)){input.type='text';input.inputMode='numeric';input.pattern='0|[1-9][0-9]*'}else{input.spellcheck=false;input.setAttribute('autocapitalize','off');input.setAttribute('autocomplete','off')}
+     if(!['programs','strings','address','text'].includes(field.unit)){input.type='text';input.inputMode='numeric';input.pattern='0|[1-9][0-9]*'}else{input.spellcheck=false;input.setAttribute('autocapitalize','off');input.setAttribute('autocomplete','off')}
      input.value=current.values[field.name]===null?'':Array.isArray(current.values[field.name])?current.values[field.name].join('\n'):current.values[field.name];
      input.required=!['programs','strings'].includes(field.unit)&&current.values[field.name]!==null;
      const label=element('label',tr(field.label));label.htmlFor=input.id;label.append(input);container.append(label);

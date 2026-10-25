@@ -2,10 +2,130 @@
   "schema_version": 1,
   "local_changes": {
     "summary": {
-      "fr": "Lecture enrichie des instructions et des journaux, identité visuelle des fenêtres et livraison locale numérotée.",
-      "en": "Richer instruction and log reading, consistent window identity and numbered local delivery."
+      "fr": "Références mémoire historiques et consignes attribuées, avec contrôles avant lancement et rejet humain.",
+      "en": "Historical memory references and attributed instructions, with pre-launch checks and human rejection."
     },
     "items": [
+      {
+        "fr": "Contrôles natifs sur candidat géré : job de cohorte, créneaux de transport, helper avec répertoires détenus et origine liée à la base réelle. Reçus privés v3, publication/récupération et rejeu sans réexécution ; validateur final géré encore protégé.",
+        "en": "Native managed-candidate controls: cohort job, transport slots, helper-held directories and source bound to the actual database. Private v3 receipts, publication/recovery and replay without reexecution; complete final managed review remains guarded."
+      },
+      {
+        "fr": "Actions de confiance en sources : boutons Exécuter/Enregistrer reliés à la paire de couleurs d’action commune pour les deux thèmes. Vérification navigateur des états normal, survol et clavier ; aucune compilation ni installation effectuée ici.",
+        "en": "Trusted actions source change: Execute/Save use the shared action color pair in both themes. Browser checks cover normal, hover and keyboard states; no compilation or installation performed here."
+      },
+      {
+        "fr": "PAEA en sources : entrée Vérifications PAEA dans le menu natif et Actions de confiance, formulaire action/reçu et rapport v2 téléchargeable via API de cohérence sans effet. Composant navigateur à API simulée ; raccord Rust non compilé, non exécuté et non installé selon consigne.",
+        "en": "PAEA source development: PAEA checks entry in the native menu and Trusted actions, action/receipt form and downloadable v2 report through a data-only API. Browser component uses an HTTP double; Rust integration remains uncompiled, unexecuted and uninstalled under the active instruction."
+      },
+      {
+        "fr": "Préparation native du candidat géré : nouvelle commande validation-candidate reliant soumission et vrai worker terminé à un candidat Git conservé, hors verrous Root, avec relecture de fraîcheur. Aucun job, contrôle ou revue finale lancé à cette étape.",
+        "en": "Native managed-candidate preparation: new validation-candidate command connects the submission and actual completed worker to a retained Git candidate outside Root locks, with freshness readback. This stage starts no job, controls or final review."
+      },
+      {
+        "fr": "PAEA en sources : rapport receipt-report v2 liant les octets exacts du document et du reçu par SHA-256, distinct du format check-receipt v1 conservé. Sept tests écrits, non exécutés ; aucune compilation, installation, autorité ou preuve d’effet créée.",
+        "en": "PAEA source development: receipt-report v2 binds exact document and receipt bytes by SHA-256, separate from preserved check-receipt v1 output. Seven tests written, unexecuted; no compilation, installation, authority or effect proof created."
+      },
+      {
+        "fr": "Journal natif : lecteur de reçus cumulatifs privés v3 liant candidat complet et plan ; résultats publics par tâche, échec d’une tâche antérieure bloquant. Reçus ordinaires v1/v2 conservés ; hash candidat opaque et commandes vides refusés. Le lancement géré et la revue finale restent à raccorder.",
+        "en": "Native journal: private cumulative v3 reader binds the full candidate and plan; public results stay task-specific while a prior task failure blocks the outcome. Ordinary v1/v2 originals retained; opaque candidate hashes and empty commands refuse. Managed launch and final review remain unwired."
+      },
+      {
+        "fr": "PAEA en sources : commande Rust hors ligne protection check-receipt reliant un reçu à l’action canonique et au cycle déclarés, sans authenticité ni effet établi. Quatre tests écrits, non exécutés ; aucune compilation, installation ou activation.",
+        "en": "PAEA source development: offline Rust protection check-receipt command binds receipt-shaped data to the supplied canonical action and lifecycle, without established authenticity or effect. Four tests written, unexecuted; no compilation, installation or activation."
+      },
+      {
+        "fr": "Préparations Rust : création/sauvegarde CLI et API protégée, historique et rejeu, réglages Admin persistés. Un reçu à révision courante doit correspondre au contenu stocké ; incohérence refusée sans nouvelle écriture. Le plafond du titre porte sur l’entrée fournie, avec libellé automatique exempt. Aucun lancement ni adoption de plan.",
+        "en": "Rust preparations: create/save through CLI and protected API, history and replay, persisted Admin settings. A current-revision receipt must match stored content; inconsistency refuses without another write. The title cap applies to supplied input, exempting the automatic label. No launch or plan adoption."
+      },
+      {
+        "fr": "Candidat Rust : garde des vrais descripteurs copie/Git/workspace après libération de la lane Git ; fermeture explicite et causes conservées, y compris acquisition partielle. Les contrôles cumulatifs natifs et le validateur final restent à raccorder.",
+        "en": "Rust candidate: retain actual copy/Git/workspace descriptors after releasing the Git lane; explicit close preserves causes, including partial acquisition. Cumulative native controls and final review remain unwired."
+      },
+      {
+        "fr": "Candidat Rust : plan cumulatif complet figé dans le checkpoint privé v2 ; changement des contrôles effectifs refusé sans remplacer l’original. Anciens candidats sans plan conservés et refusés explicitement. Le parcours natif cumulatif et le validateur final restent à raccorder. Empreinte du checkpoint complet vérifiée, sans droit implicite.",
+        "en": "Rust candidate: complete cumulative plan frozen in private v2 checkpoint; effective-control drift refuses without replacing the original. Old candidates without a plan remain preserved and explicitly refuse. Cumulative native execution and final review remain unwired. Complete-checkpoint digest verified, with no implicit permission."
+      },
+      {
+        "fr": "Contrôles natifs : origine des sources et politique effective enregistrées avec le job, puis vérifiées avant permission, publication et lecture pour revue. Nouveaux reçus privés v2 ; anciens v1 conservés sans migration à la lecture. Le candidat cumulatif S2 reste à raccorder.",
+        "en": "Native controls: source origin and effective policy recorded with each job, then checked before permission, publication and review evidence readback. New private v2 receipts; historical v1 originals retained without read-time migration. S2 cumulative candidate wiring remains open."
+      },
+      {
+        "fr": "Reçus de contrôles natifs : correspondance exacte entre politique, créneau du job et résultat avant publication ou rejeu. Un résultat d’une autre commande refuse ; les échecs cohérents restent conservés. Le raccordement cumulatif S2 et le validateur final restent ouverts.",
+        "en": "Native control receipts: exact policy, job-slot and result mapping before publication or replay. A foreign command result refuses; consistent failures remain retained. S2 cumulative wiring and final review remain open."
+      },
+      {
+        "fr": "Candidat Rust : préflight de toutes les politiques de contrôle, tâche courante et tâches acceptées. Politiques conservées séparément, contrôles homonymes distingués et refus avant création si une politique manque. Les agents gardent leurs tâches ; le raccordement au job natif et au validateur final reste ouvert.",
+        "en": "Rust candidate: preflight every control policy for the current and accepted tasks. Policies remain separate, same-named controls are distinguished and missing policies refuse before candidate creation. Agents retain their tasks; native-job and final-validator wiring remain open."
+      },
+      {
+        "fr": "Candidat Rust : vérification des octets bruts sans diff Git exécutable ; filtres clean/textconv non invoqués, altérations suivies refusées et reprise du même original après restauration. Le raccordement des contrôles natifs et du validateur final reste en cours.",
+        "en": "Rust candidate: raw-byte verification without executable Git diff; clean/textconv filters are not invoked, tracked changes refuse and restoring bytes recovers the same original. Native controls and final-validator wiring remain in progress."
+      },
+      {
+        "fr": "Dépôt géré : la conservation neutralise les filtres Git pendant add et write-tree dans les copies workers, sans modifier leur configuration. La vérification brute du candidat et le validateur final restent en cours de raccordement.",
+        "en": "Managed repository: retention neutralizes Git filters during add and write-tree in worker copies without changing their configuration. Raw candidate verification and the final validator remain under integration."
+      },
+      {
+        "fr": "PAEA : outil CLI hors ligne protection canonicalize pour les contrats de facturation fictive et de promotion Git, avec contenu exact, identité d’intention métier et refus des JSON ambigus. Aucune autorité, protection active ou qualification E2/E3 n’est créée.",
+        "en": "PAEA: offline protection canonicalize CLI for fictitious billing and Git-promotion data contracts, with exact content, business-intent identity and ambiguous-JSON refusal. No authority, active protection or E2/E3 qualification is created."
+      },
+      {
+        "fr": "Pause concurrente : les refus propres pendant la synchronisation, l'aperçu ou la lecture initiale d'un rapport arrêtent seulement la surveillance de la mission concernée, en conservant effets, révisions connues et causes. Les écritures incertaines et erreurs de nettoyage restent bloquantes.",
+        "en": "Concurrent pause: clean refusals during synchronization, preview or initial report discovery end only the affected mission's watch, preserving effects, known revisions and causes. Uncertain writes and cleanup errors remain blocking."
+      },
+      {
+        "fr": "SQLite : le délai de stockage Admin s'applique aussi à la première vérification d'identité du datastore. Une lecture sous contention ne subit plus un délai caché de zéro ; les refus et leurs causes restent explicites.",
+        "en": "SQLite: the Admin storage timeout also applies to the first datastore identity check. Reads under contention no longer face a hidden zero timeout; refusals and their causes remain explicit."
+      },
+      {
+        "fr": "Dépôt géré : résultats et rapports immuables conservés puis remis au scope propriétaire, sans confondre soumission, publication du candidat et acceptation.",
+        "en": "Managed repository: immutable results and reports are retained and handed to the owning scope, keeping submission, candidate publication and acceptance distinct."
+      },
+      {
+        "fr": "Mémoire historique : les pièces Work.memory sont conservées dans le manifeste et le contexte Rust. Fichiers absents, hors projet ou désormais gérés par une version locale : refus avant exécution, y compris après retrait. Les admissions et sélections versionnées restent en cours de portage.",
+        "en": "Historical memory: Work.memory recovery references are retained in the Rust manifest and context. Missing, outside-project or locally version-managed files refuse before execution, including after withdrawal. Versioned admission and selection remain under porting."
+      },
+      {
+        "fr": "Conduite : actualiser la même mission pendant un rejet de consigne conserve la révision relue après écriture. Le cache ancien ne réaffiche plus un ajout déjà rejeté.",
+        "en": "Control: refreshing the same mission during instruction rejection preserves the post-write revision. Older cached data no longer redisplays an already rejected addition."
+      },
+      {
+        "fr": "Consignes : apprentissages attribués et historisés, rejet humain avant transmission depuis Conduite, CLI et API ; base, validation humaine et tentatives préservées. Relecture après écriture et refus des révisions périmées.",
+        "en": "Instructions: attributed learning with history, human rejection before delivery from Control, CLI and API; original base, human validation and attempts preserved. Writes are reread and stale revisions refuse."
+      },
+      {
+        "fr": "Budget CLI : show et preview historiques raccordés à Rust, estimations de quatre activités et coûts rapportés séparés. Aperçu sans écriture, révision contrôlée ; avertissement piloté par le seuil Admin existant, null pour désactiver.",
+        "en": "Budget CLI: historical show and preview connected to Rust, with four activity estimate ledgers and separate declared costs. Readonly preview with revision checks; warnings use the existing Admin threshold, null to disable."
+      },
+      {
+        "fr": "Biba en Rust : identités locales authentifiées, mandat I3, accord exact I2, refus d’écriture et d’invocation non autorisées, effets simulés uniques et réconciliation. Nouvelle page Actions de confiance FR/EN et réglages Admin persistés. Les politiques avancées non portées restent fermées. L’audit compte les originaux réellement manquants.",
+        "en": "Biba in Rust: authenticated local identities, I3 mandates, exact I2 approval, denied unauthorized writes/invocations, unique simulated effects and reconciliation. New FR/EN Trusted actions page with persisted Admin settings. Unported advanced policies remain closed. The audit reports the actual missing-original count."
+      },
+      {
+        "fr": "CLI Rust : mission changes et mission spending raccordées au même calcul historique que mission status. JSON des changements et dépenses conservé, mesures inconnues explicites, refus existants préservés ; aucune visite ni dépense créée par la lecture.",
+        "en": "Rust CLI: mission changes and mission spending now use the same historical calculation as mission status. Change and spending JSON is preserved, unknown measurements stay explicit and existing refusals remain; reads create no visit or expenditure."
+      },
+      {
+        "fr": "Distribution Rust : prérequis natifs, Dockerfile, contexte Docker, CI et cibles Make corrigés ; guides FR/EN et carte du dépôt mis à jour. Références Go historiques identifiées, sans repli Go. Le diagnostic de version conserve l’identité du binaire dans un projet sans dépôt Git ; un dépôt endommagé reste un échec explicite.",
+        "en": "Rust distribution: corrected native prerequisites, Dockerfile/context, CI and Make targets; updated FR/EN installation guides and repository map. Historical Go references are identified, with no Go fallback. Version diagnostics retain compiled identity in a project without a Git repository; damaged repositories remain explicit failures."
+      },
+      {
+        "fr": "Préparations : lectures Rust en CLI/API de la liste, du détail, des versions et des méthodes. Fraîcheur recalculée ; limites de lecture et de taille des méthodes persistées dans le groupe Admin Préparations et documents, avec aide et contexte IA. Édition, dialogue et conversion restent à porter. Le lecteur de réglages respecte les tentatives de contention stockées au lieu d’arrêter immédiatement le conducteur sur un verrou Admin occupé.",
+        "en": "Preparations: Rust CLI/API reads for the list, details, versions and methods. Freshness is recalculated; read and method-size limits persist in the Admin Preparations and documents group with help and AI context. Editing, dialogue and conversion remain to be ported. The settings reader honors saved contention retries instead of immediately stopping the conductor on a busy Admin lock."
+      },
+      {
+        "fr": "Conduite : une décision d’abandon ordinaire reste consultable avec son historique d’agents terminés et leurs tentatives. Elle ne devient ni une validation ni un droit de reprise.",
+        "en": "Control: an ordinary abandonment decision remains readable with its terminal agent history and attempts. It becomes neither validation nor recovery permission."
+      },
+      {
+        "fr": "Conduite : une livraison ordinaire explicitement incomplète reste lisible, non validée et sans rapport attribué. Les livraisons managed et reprises non portées restent refusées.",
+        "en": "Control: an explicitly incomplete ordinary delivery remains readable, unvalidated and without an attributed report. Unported managed deliveries and recovery still refuse."
+      },
+      {
+        "fr": "Conduite : statut lisible après une terminaison ordinaire, même sans rapport relayé. Rapport absent, attribuable ou ambigu distingué ; aucune validation ni relance automatique.",
+        "en": "Control: readable status after ordinary completion, even without a relayed report. Missing, attributable and ambiguous reports remain distinct; no validation or automatic relaunch."
+      },
       {
         "fr": "Journaux : transcript typé consultable sur demande dans un accordéon, sans contenu des messages ni des outils. Captures absentes, vides, partielles et erreurs sont distinguées ; un changement de source ignore les réponses retardées.",
         "en": "Logs: typed transcript available on request in a disclosure, without message or tool content. Missing, empty and partial captures remain distinct from errors; source changes discard delayed replies."

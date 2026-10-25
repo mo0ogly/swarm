@@ -518,6 +518,8 @@ pub(crate) fn complete_recovered_fenced(
 /// Binding3 releases its exact owned FIFO generation in this same settlement;
 /// a journal failure rolls back SQL, not already observed provider effects.
 /// Uncertain/quarantined execution uses its separate retained-ownership path.
+/// First manual managed workers require canonical copy attribution; completion
+/// retains their mutable copy and blocks the task without Git integration.
 fn complete_with_owner(
     db: &mut Connection,
     root: &Path,
@@ -550,14 +552,8 @@ fn complete_with_owner(
         };
         let mut work = crate::read_recorded_work(tx, &a.work_id)
             .map_err(|e| AgentLaunchError::caused("agent-execution-work-read", e))?;
-        if work
-            .planning
-            .as_ref()
-            .is_some_and(|p| p.repository.is_some())
-        {
-            return Err(AgentLaunchError::Refused(
-                "agent-execution-managed-settlement-unported",
-            ));
+        if work.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+            crate::managed_repository::verify_worker(root,tx,&work,&a,settings,crate::managed_repository::WorkerCheck::AfterExecution)?;
         }
         let index = work
             .tasks
@@ -768,6 +764,9 @@ fn complete_with_owner(
                 .map_err(|e| AgentLaunchError::caused("agent-recovery-clock", e))?;
             fence.check(tx, &a.work_id, &now)
                 .map_err(|e| AgentLaunchError::caused("agent-recovery-mission-fence", e))?;
+        }
+        if work.planning.as_deref().is_some_and(|p|p.repository.is_some()) {
+            crate::managed_repository::verify_worker(root,tx,&work,&a,settings,crate::managed_repository::WorkerCheck::AfterExecution)?;
         }
         Ok(a)
     })

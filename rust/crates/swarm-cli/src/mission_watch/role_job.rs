@@ -177,7 +177,7 @@ pub(super) fn finish(
     let reason = match main.as_ref() {
         Ok(Stop::Interrupt) => swarm_engine::ExecutionInterruptReason::Interrupt,
         Ok(Stop::Terminate) => swarm_engine::ExecutionInterruptReason::Terminate,
-        Ok(Stop::ControllerShutdown) => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
+        Ok(Stop::ControllerShutdown | Stop::PermissionWithdrawn) => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
         Err(_) => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
     };
     if let Err(wake) = signals.source.request(reason) {
@@ -220,6 +220,7 @@ mod tests {
             (None, false),
             (Some(Stop::Interrupt), true),
             (Some(Stop::Terminate), false),
+            (Some(Stop::PermissionWithdrawn), true),
         ] {
             let mut signals = Signals::new().unwrap();
             signals.stopped = stop;
@@ -266,11 +267,11 @@ mod tests {
                     None => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
                     Some(Stop::Interrupt) => swarm_engine::ExecutionInterruptReason::Interrupt,
                     Some(Stop::Terminate) => swarm_engine::ExecutionInterruptReason::Terminate,
-                    Some(Stop::ControllerShutdown) => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
+                    Some(Stop::ControllerShutdown | Stop::PermissionWithdrawn) => swarm_engine::ExecutionInterruptReason::ControllerShutdown,
                 })
             );
             if interrupted {
-                assert_eq!(result.unwrap(), Stop::Interrupt);
+                assert_eq!(result.unwrap(), stop.unwrap());
             } else {
                 let error = result.unwrap_err();
                 assert_eq!(error.recorded_work(), Some(("work", 3)));

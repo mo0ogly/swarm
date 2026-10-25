@@ -557,7 +557,7 @@ impl<'a, E: WorkEnvironment> WorkEngine<'a, E> {
     }
 }
 /// Exclude conflicting registered worker/control/review ownership in the same
-/// transaction as closure or retry. Runtime statuses are protocol, not a policy
+/// transaction as closure, retry or instruction learning/rejection. Runtime statuses are protocol, not a policy
 /// ceiling; unknown/unresolved ownership is never released by time or PID data.
 /// Safe caller-owned refusal labels and original SQL/cleanup causes propagate.
 #[cfg(target_os = "linux")]
@@ -743,7 +743,8 @@ fn apply<E: WorkEnvironment>(
         | "planning.judge"
         | "planning.renew"
         | "planning.pause"
-        | "planning.resume" => {
+        | "planning.resume"
+        | "planning.reject-instructions" => {
             let (request, action) = planning.ok_or(WorkEngineError::UnportedStatus)?;
             let settings = planning_settings.ok_or(WorkEngineError::PlanningControl(
                 crate::PlanningControlError::Refused("planning-policy-not-supplied"),
@@ -803,6 +804,14 @@ fn apply<E: WorkEnvironment>(
                 let kind = if action == crate::PlanningControlAction::Judge { "judge" } else { "renew" };
                 candidate = crate::planning_judge::operator_candidate(&candidate, request, kind, &at, settings)
                     .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;
+            } else if action == crate::PlanningControlAction::RejectInstructions {
+                let prepared=crate::instruction_learning::reject_candidate(&candidate,request,&at)
+                    .map_err(|e|WorkEngineError::PlanningActivation(Box::new(e)))?;
+                #[cfg(target_os="linux")]
+                require_native_task_idle(tx,&candidate.id,&request.task_id,"instruction-worker-active")?;
+                #[cfg(not(target_os="linux"))]
+                return Err(WorkEngineError::UnportedStatus);
+                candidate=prepared;
             } else if action == crate::PlanningControlAction::Decide {
                 let prepared = crate::planning_decision::decide(root, &candidate, request, &at, settings)
                     .map_err(|e| WorkEngineError::PlanningActivation(Box::new(e)))?;
@@ -827,7 +836,7 @@ fn apply<E: WorkEnvironment>(
                     }
                 }
                 #[cfg(target_os = "linux")]
-                for op in request.operations.iter().flatten().filter(|op| matches!(op.kind.as_str(), "retry" | "review-retry")) {
+                for op in request.operations.iter().flatten().filter(|op| matches!(op.kind.as_str(), "retry" | "review-retry" | "revise-instructions")) {
                     require_native_task_idle(tx, &candidate.id, &op.id, "planning-retry-worker-active")?;
                 }
                 candidate = prepared;

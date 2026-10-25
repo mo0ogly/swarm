@@ -54,6 +54,37 @@ fn web(error: E) -> NativeServerError {
     })
 }
 
+/// Existing consent/mode/archive gates, shared by startup and ongoing discovery.
+/// This read-only classification grants no lease, provider or future admission.
+fn automatic(control: &swarm_engine::MissionControlView) -> bool {
+    !control.archived
+        && control.paused == Some(false)
+        && control.consent_enabled == Some(true)
+        && control.autonomy == Some("autonome")
+}
+/// Reject known unadoptable legacy leases before HTTP can report readiness.
+/// Read-only snapshots preserve every legacy row and do not acquire a lease.
+/// Current controls are rechecked by ongoing discovery and engine admission;
+/// this startup check is neither future liveness nor business authorization.
+/// Clock/read/close causes propagate; paused/manual missions stay untouched.
+fn preflight(store: &RootStore) -> Result<(), E> {
+    let now = swarm_engine::system_timestamp().map_err(|e| cause("web-conductor-clock", e))?;
+    for work in store.list_works()? {
+        let control = store
+            .mission_control_view(&work.id)
+            .map_err(|e| E::Mutation(swarm_engine::WorkEngineError::Mission(Box::new(e))))?;
+        if automatic(&control)
+            && store
+                .read_mission_supervision(&work.id, &now)
+                .map_err(|e| E::Mutation(swarm_engine::WorkEngineError::Mission(Box::new(e))))?
+                .is_some_and(|v| v.state == swarm_engine::MissionSupervisionState::LegacyUnverified)
+        {
+            return Err(E::Refused("mission-legacy-lease-requires-migration"));
+        }
+    }
+    Ok(())
+}
+
 /// One owned join and its local wakeup, never another process's signal authority.
 struct Session<'scope> {
     source: ExecutionInterrupt,
@@ -139,11 +170,7 @@ fn run(
                     let control = store.mission_control_view(&work.id).map_err(|e| {
                         E::Mutation(swarm_engine::WorkEngineError::Mission(Box::new(e)))
                     })?;
-                    if control.archived
-                        || control.paused != Some(false)
-                        || control.consent_enabled != Some(true)
-                        || control.autonomy != Some("autonome")
-                    {
+                    if !automatic(&control) {
                         continue;
                     }
                     let source =
@@ -214,6 +241,8 @@ fn run(
 /// Serve HTTP while a separate owned coordinator discovers consented missions.
 /// Caller shutdown, HTTP failure or conductor failure closes admission; both owners
 /// drain their own jobs, then checked Root/binding close preserves every failure.
+/// Read-only initial discovery refuses known legacy leases before serving HTTP;
+/// later state changes/failures still close the service through normal supervision.
 /// No synchronous request waits on a mission session. This does not kill granted
 /// workers, install the binary, accept a mission or recover managed processes.
 pub(super) fn serve<'a, F: Future<Output = ()>>(
@@ -234,6 +263,19 @@ pub(super) fn serve<'a, F: Future<Output = ()>>(
             })
         }
     };
+    if let Err(error) = preflight(&store) {
+        let error = match store.close() {
+            Ok(()) => error,
+            Err(close) => join(Some(error), close),
+        };
+        return Err(match server.close() {
+            Ok(()) => web(error),
+            Err(cleanup) => NativeServerError::Cleanup {
+                primary: Box::new(web(error)),
+                cleanup: Box::new(cleanup),
+            },
+        });
+    }
     let binding = match store.bind_root() {
         Ok(binding) => binding,
         Err(error) => {
@@ -328,13 +370,19 @@ mod tests {
     /// known Work inside its cause, and every secondary cleanup failure.
     #[test]
     fn late_conductor_failure_keeps_http_report_and_typed_effects() {
-        let report = swarm_web::NativeServerReport { completed_jobs: 3, ..Default::default() };
+        let report = swarm_web::NativeServerReport {
+            completed_jobs: 3,
+            ..Default::default()
+        };
         let failure = E::WorkRecorded {
             primary: Box::new(E::Refused("fixture-late")),
             work: "late-work".into(),
             revision: 4,
         };
-        let native = match merge(Ok(report), Err(failure)) { Err(error)=>error, Ok(_)=>panic!("late error lost") };
+        let native = match merge(Ok(report), Err(failure)) {
+            Err(error) => error,
+            Ok(_) => panic!("late error lost"),
+        };
         match &native {
             NativeServerError::StoppedOutput { report, .. } => assert_eq!(report.completed_jobs, 3),
             _ => panic!("report lost"),

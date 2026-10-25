@@ -6,6 +6,8 @@ use std::collections::BTreeSet;
 #[serde(rename_all = "snake_case")]
 pub enum SettingUnit {
     Count,
+    /// Validated operator text, with its domain checked by the consumer policy.
+    Text,
     /// Canonical loopback socket address, validated by the saved network policy.
     Address,
     Characters,
@@ -109,7 +111,7 @@ impl EngineSettingsCatalog {
             .as_object()
             .ok_or(EngineSettingsError::Refused("settings-catalog-values"))?;
         let names: BTreeSet<_> = descriptor.fields.iter().map(|f| f.name.as_str()).collect();
-        if descriptor.schema_version != 4
+        if descriptor.schema_version != 5
             || names.len() != descriptor.fields.len()
             || names != object.keys().map(String::as_str).collect()
             || descriptor.fields.iter().any(|f| {
@@ -163,7 +165,7 @@ impl EngineSettingsCatalog {
             }
         }
         Ok(Self {
-            schema_version: 4,
+            schema_version: 5,
             document_schema_version: defaults.schema_version(),
             // Document history is contiguous from protocol v1; derive its range
             // from actual validated installation values, not a second ceiling.

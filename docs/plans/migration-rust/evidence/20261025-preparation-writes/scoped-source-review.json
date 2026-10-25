@@ -1,0 +1,2283 @@
+{
+  "kind": "scoped-semantic-review-not-global-qualification",
+  "baseline": ".cache/local-delivery/rust-dxzwqrsr/build/profile/after.json",
+  "profile": "private/frozen-profile8",
+  "effective_input_count": 432,
+  "binary_sha256": "bde7da26821e20958766a9aeba122350757e1cba68c9668f66ebe31d14166072",
+  "reviewer": "Codex principal",
+  "independent_review": "GLM static review received on pre-fix code; see independent-review-assessment.json and before/after D1 regression. No independent runtime acceptance.",
+  "excluded_other_owner_files": [
+    "rust/crates/swarm-engine/src/managed_repository.rs",
+    "rust/crates/swarm-engine/src/managed_repository_candidate_store.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/managed_receipt.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/publication.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/runtime.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/source_origin.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-cli/src/protection.rs"
+  ],
+  "mixed_shared_files": "lib.rs/root_store.rs/service.rs/version_history may include retained unrelated changes; this review does not approve those hunks",
+  "entries": [
+    {
+      "path": "frontend/engine-settings/admin.js",
+      "sha256": "a5a050a81d1296940f7e78189b0bcc0ba0749fadd2a9898703aa1bf343ab2f0c",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "locales/en.json",
+      "sha256": "fdf8840bbdeef33930544f0cdfddffbf1a182fb7af10db687b45efe52403e9c5",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps. Raw-title cap and editorial-default exemption explicitly clarified in both languages."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/lib.rs",
+      "sha256": "3bda26fd9a371f9a6547304cb99a3df9083efb2af02f18e6b42295e74469959c",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "typed_causes",
+          ""
+        ],
+        [
+          "trust_publication",
+          ""
+        ],
+        [
+          "recorded_preparation",
+          ""
+        ],
+        [
+          "recorded_work",
+          ""
+        ],
+        [
+          "configuration_may_be_recorded",
+          ""
+        ],
+        [
+          "code",
+          ""
+        ],
+        [
+          "message",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "write_output",
+          ""
+        ],
+        [
+          "json_bytes",
+          ""
+        ],
+        [
+          "parse",
+          ""
+        ],
+        [
+          "execute",
+          ""
+        ],
+        [
+          "execute_pricing",
+          ""
+        ],
+        [
+          "execute_planning_output",
+          ""
+        ],
+        [
+          "execute_planning_call_preview",
+          ""
+        ],
+        [
+          "execute_planning_call_preview",
+          ""
+        ],
+        [
+          "execute_control",
+          ""
+        ],
+        [
+          "execute_work",
+          ""
+        ],
+        [
+          "execute_work_list",
+          ""
+        ],
+        [
+          "evaluation_bytes",
+          ""
+        ],
+        [
+          "execute_evaluation",
+          ""
+        ],
+        [
+          "execute_root",
+          ""
+        ],
+        [
+          "run_detailed",
+          ""
+        ],
+        [
+          "safe_causes",
+          ""
+        ],
+        [
+          "report",
+          ""
+        ],
+        [
+          "run",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "run_os_detailed",
+          ""
+        ],
+        [
+          "recorded_cli_control_metadata_reaches_json_without_a_web_error",
+          ""
+        ],
+        [
+          "unsupported_commands_keep_typed_code_and_both_languages",
+          ""
+        ],
+        [
+          "nested_guard_causes_are_classified_without_private_text",
+          ""
+        ],
+        [
+          "cli_compound_cleanup_retains_primary_and_secondary_causes",
+          ""
+        ],
+        [
+          "typed_same_address_source_is_not_mistaken_for_a_cycle",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "cli_configuration_marker_survives_own_io_and_cleanup_wrappers",
+          ""
+        ],
+        [
+          "cli_retains_root_recorded_work_through_compound_cleanup",
+          ""
+        ],
+        [
+          "cli_settings_publication_survives_late_close_in_json_and_text",
+          ""
+        ],
+        [
+          "cli_preserved_state_wrapped_in_io_keeps_work_and_config_markers",
+          ""
+        ],
+        [
+          "cli_native_commit_projection_retains_both_causes_without_private_text",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/preparation.rs",
+      "sha256": "ba35f6256bcba54c407ee83bb19e69e3f5fedfe331756445d2ee8516daddc1dd",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "bytes",
+          ""
+        ],
+        [
+          "execute",
+          ""
+        ],
+        [
+          "write",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+      "sha256": "a3718aeb4075c0bfe3dae0e968560fc87de3e002f50bd63dbd9704cc2de1a712",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps. Raw-title cap and editorial-default exemption explicitly clarified in both languages."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/config/engine-settings.json",
+      "sha256": "23c612c9bc4528a6d22f01623b09fe0fc3a9306cf196335d05f0a94be2226feb",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/engine_settings.rs",
+      "sha256": "fa1428a26eb8bc687301d986aca8da3a977b056ff167e6958942db5c58bb0981",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "serialize",
+          ""
+        ],
+        [
+          "deserialize",
+          ""
+        ],
+        [
+          "present_gate_phases",
+          ""
+        ],
+        [
+          "present_string_array",
+          ""
+        ],
+        [
+          "present_string",
+          ""
+        ],
+        [
+          "present_count",
+          ""
+        ],
+        [
+          "present_cap",
+          ""
+        ],
+        [
+          "required_cap",
+          ""
+        ],
+        [
+          "reason",
+          ""
+        ],
+        [
+          "code",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "refuse",
+          ""
+        ],
+        [
+          "nonnegative",
+          ""
+        ],
+        [
+          "cap",
+          ""
+        ],
+        [
+          "size",
+          ""
+        ],
+        [
+          "installation_defaults",
+          ""
+        ],
+        [
+          "decode",
+          ""
+        ],
+        [
+          "validate",
+          ""
+        ],
+        [
+          "mission_status_view_limits",
+          ""
+        ],
+        [
+          "report_clock_skew_seconds",
+          ""
+        ],
+        [
+          "has_runtime_storage_policy",
+          ""
+        ],
+        [
+          "runtime_storage_policy",
+          ""
+        ],
+        [
+          "preparation_read_policy",
+          ""
+        ],
+        [
+          "has_preparation_write_policy",
+          ""
+        ],
+        [
+          "preparation_write_policy",
+          ""
+        ],
+        [
+          "schema_version",
+          ""
+        ],
+        [
+          "has_quota_reason_policy",
+          ""
+        ],
+        [
+          "quota_reason_policy",
+          ""
+        ],
+        [
+          "has_work_view_policy",
+          ""
+        ],
+        [
+          "work_view_limits",
+          ""
+        ],
+        [
+          "has_review_reply_policy",
+          ""
+        ],
+        [
+          "review_reply_limits",
+          ""
+        ],
+        [
+          "git_command_timeout",
+          ""
+        ],
+        [
+          "managed_review_baseline_depth",
+          ""
+        ],
+        [
+          "managed_receipt_limit",
+          ""
+        ],
+        [
+          "planning_resume_reason_limit",
+          ""
+        ],
+        [
+          "planning_request_limit",
+          ""
+        ],
+        [
+          "planning_requirement_limit",
+          ""
+        ],
+        [
+          "agent_workflow_body_limit",
+          ""
+        ],
+        [
+          "planning_report_limit",
+          ""
+        ],
+        [
+          "has_runtime_limit_policy",
+          ""
+        ],
+        [
+          "runtime_limit_policy",
+          ""
+        ],
+        [
+          "has_agent_launch_policy",
+          ""
+        ],
+        [
+          "agent_launch_policy",
+          ""
+        ],
+        [
+          "tool_guard_policy",
+          ""
+        ],
+        [
+          "has_planning_wait_policy",
+          ""
+        ],
+        [
+          "planning_wait_policy",
+          ""
+        ],
+        [
+          "planning_response_limit",
+          ""
+        ],
+        [
+          "review_response_limit",
+          ""
+        ],
+        [
+          "usage_mismatch_percent",
+          ""
+        ],
+        [
+          "alert_evaluation_seconds",
+          ""
+        ],
+        [
+          "evaluation_sample_percent",
+          ""
+        ],
+        [
+          "annotation_note_limit",
+          ""
+        ],
+        [
+          "budget_warning_percent",
+          ""
+        ],
+        [
+          "telemetry_retention_policy",
+          ""
+        ],
+        [
+          "cache_health_policy",
+          ""
+        ],
+        [
+          "telemetry_providers",
+          ""
+        ],
+        [
+          "has_planning_decision_policy",
+          ""
+        ],
+        [
+          "planning_decision_policy",
+          ""
+        ],
+        [
+          "has_planning_action_policy",
+          ""
+        ],
+        [
+          "planning_action_policy",
+          ""
+        ],
+        [
+          "has_reviewer_creation_policy",
+          ""
+        ],
+        [
+          "reviewer_creation_defaults",
+          ""
+        ],
+        [
+          "has_mission_dispatch_policy",
+          ""
+        ],
+        [
+          "mission_dispatch_policy",
+          ""
+        ],
+        [
+          "has_mission_supervision_policy",
+          ""
+        ],
+        [
+          "mission_supervision_policy",
+          ""
+        ],
+        [
+          "has_web_transport_policy",
+          ""
+        ],
+        [
+          "web_transport_policy",
+          ""
+        ],
+        [
+          "has_agent_model_routing_policy",
+          ""
+        ],
+        [
+          "agent_model_routing_policy",
+          ""
+        ],
+        [
+          "has_agent_execution_policy",
+          ""
+        ],
+        [
+          "agent_execution_policy",
+          ""
+        ],
+        [
+          "validation_output_limit",
+          ""
+        ],
+        [
+          "mutation_limits",
+          ""
+        ],
+        [
+          "hash",
+          ""
+        ],
+        [
+          "entry_digest",
+          ""
+        ],
+        [
+          "validate_change",
+          ""
+        ],
+        [
+          "initial",
+          ""
+        ],
+        [
+          "decode",
+          ""
+        ],
+        [
+          "validate",
+          ""
+        ],
+        [
+          "preview",
+          ""
+        ],
+        [
+          "replay",
+          ""
+        ],
+        [
+          "apply",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/engine_settings_catalog.rs",
+      "sha256": "485b5bd7488237b3ba0b3900bc2bb65e8e6b964f25ee7d11e57df00dcaf27537",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "installation",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/lib.rs",
+      "sha256": "ace34fae5b2f60b52b725408a2f5eb79f82040d5a92553c3adbb0ea5f99b372d",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "code",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "request_fields",
+          ""
+        ],
+        [
+          "decode_request",
+          ""
+        ],
+        [
+          "encode_request",
+          ""
+        ],
+        [
+          "decode_external_request",
+          ""
+        ],
+        [
+          "decode_preparation_command",
+          ""
+        ],
+        [
+          "valid_preparation_key",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/preparation_command.rs",
+      "sha256": "52e247e68f74adc420bd4e7aca7502be5f1075c4f95b61ad1dd51f89b0faced6",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "shape",
+          ""
+        ],
+        [
+          "decode",
+          ""
+        ],
+        [
+          "validate",
+          ""
+        ],
+        [
+          "checked",
+          ""
+        ],
+        [
+          "glm_go_codec_canonical_order_and_merge",
+          ""
+        ],
+        [
+          "glm_refuses_missing_null_revision_types_and_foreign_fields",
+          ""
+        ],
+        [
+          "glm_exact_byte_caps_and_protocol_keys",
+          ""
+        ],
+        [
+          "is_false",
+          ""
+        ],
+        [
+          "empty_decisions",
+          ""
+        ],
+        [
+          "key",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Method vocabulary, action/document names, v1 wire identity and 128-byte ASCII keys are protocol. ID SHA256 prefix24 preserves Go format; checked i64 arithmetic is representation. Text/title caps and enabled/default method only from complete saved v42 settings; no second fallback. Existing saved SQLite retry/transport caps remain separate.",
+        "functions": "apply + RootStore::preparation_command: intent canonicalization, exact replay, CAS, explicit transaction finalize, readback, root-instance binding; Rustdoc describes errors/effects and excludes adoption/launch.",
+        "errors": "Each SQL/query error remains typed. Rollback/commit/lease/binding close preserve compound causes. Commit uncertainty does not imply rollback; known receipt survives late failure. Public ENOSPC/output witness and SDK history/receipt fault variants cover refusal and recovery, not all OS fault possibilities.",
+        "documentation": "FR/EN migration/recovery docs and permanent recipes reflect draft-only writes and explicit historical adoption."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store.rs",
+      "sha256": "67bc0b996dd7e3be4308ed0d724a2113bfa6c5d2a730598a94034156de5495a4",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "absent",
+          ""
+        ],
+        [
+          "initial_values",
+          ""
+        ],
+        [
+          "recorded_planner_interruption",
+          ""
+        ],
+        [
+          "recorded_execution_interruption",
+          ""
+        ],
+        [
+          "configuration_may_be_recorded",
+          ""
+        ],
+        [
+          "recorded_preparation",
+          ""
+        ],
+        [
+          "recorded_work",
+          ""
+        ],
+        [
+          "trust_publication",
+          ""
+        ],
+        [
+          "trust_failure",
+          ""
+        ],
+        [
+          "code",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "finished",
+          ""
+        ],
+        [
+          "io_error",
+          ""
+        ],
+        [
+          "local_regular",
+          ""
+        ],
+        [
+          "database_identity_error",
+          ""
+        ],
+        [
+          "observe_instance",
+          ""
+        ],
+        [
+          "opening_values",
+          ""
+        ],
+        [
+          "bootstrap_instance",
+          ""
+        ],
+        [
+          "gate_descriptors",
+          ""
+        ],
+        [
+          "adopt_gate_descriptors",
+          ""
+        ],
+        [
+          "directory",
+          ""
+        ],
+        [
+          "matches",
+          ""
+        ],
+        [
+          "close",
+          ""
+        ],
+        [
+          "instance",
+          ""
+        ],
+        [
+          "work_finished",
+          ""
+        ],
+        [
+          "settings_finished",
+          ""
+        ],
+        [
+          "with_execution_interrupt",
+          ""
+        ],
+        [
+          "open",
+          ""
+        ],
+        [
+          "open_mode",
+          ""
+        ],
+        [
+          "initialize",
+          ""
+        ],
+        [
+          "telemetry_subject_active",
+          ""
+        ],
+        [
+          "telemetry_runs",
+          ""
+        ],
+        [
+          "telemetry_runs_marker",
+          ""
+        ],
+        [
+          "work_budget_state",
+          ""
+        ],
+        [
+          "work_budget",
+          ""
+        ],
+        [
+          "rate_catalogue",
+          ""
+        ],
+        [
+          "save_rate",
+          ""
+        ],
+        [
+          "fixture_save_rate",
+          ""
+        ],
+        [
+          "save_rate_impl",
+          ""
+        ],
+        [
+          "preview_planning_call",
+          ""
+        ],
+        [
+          "run_agent",
+          ""
+        ],
+        [
+          "prepare_agent_gate",
+          ""
+        ],
+        [
+          "read_agent",
+          ""
+        ],
+        [
+          "replay_agent_guard",
+          ""
+        ],
+        [
+          "claim_agent",
+          ""
+        ],
+        [
+          "preview_agent_limits",
+          ""
+        ],
+        [
+          "prepare_agent_launch",
+          ""
+        ],
+        [
+          "prepare_agent_launch_with_fence",
+          ""
+        ],
+        [
+          "cancel_queued_agent",
+          ""
+        ],
+        [
+          "reconcile_agent",
+          ""
+        ],
+        [
+          "list_agents",
+          ""
+        ],
+        [
+          "agent_logs_after",
+          ""
+        ],
+        [
+          "live_fingerprint",
+          ""
+        ],
+        [
+          "terminal_events_after",
+          ""
+        ],
+        [
+          "stop_agent",
+          ""
+        ],
+        [
+          "check_planning_output",
+          ""
+        ],
+        [
+          "settings",
+          ""
+        ],
+        [
+          "read_settings",
+          ""
+        ],
+        [
+          "read_settings_from",
+          ""
+        ],
+        [
+          "preview_settings",
+          ""
+        ],
+        [
+          "apply_settings",
+          ""
+        ],
+        [
+          "preview_task_model",
+          ""
+        ],
+        [
+          "bind_root",
+          ""
+        ],
+        [
+          "instance",
+          ""
+        ],
+        [
+          "web_session",
+          ""
+        ],
+        [
+          "read_work",
+          ""
+        ],
+        [
+          "list_works",
+          ""
+        ],
+        [
+          "events",
+          ""
+        ],
+        [
+          "with_context_policy",
+          ""
+        ],
+        [
+          "project_context",
+          ""
+        ],
+        [
+          "planning_report",
+          ""
+        ],
+        [
+          "agent_workflow",
+          ""
+        ],
+        [
+          "check_agent_workflow",
+          ""
+        ],
+        [
+          "review_delivery",
+          ""
+        ],
+        [
+          "check_project_context",
+          ""
+        ],
+        [
+          "inspect_review_evidence",
+          ""
+        ],
+        [
+          "inspect_managed_receipt",
+          ""
+        ],
+        [
+          "inspect_control_history",
+          ""
+        ],
+        [
+          "inspect_validation_evidence",
+          ""
+        ],
+        [
+          "inspect_work_validation",
+          ""
+        ],
+        [
+          "inspect_review_reply",
+          ""
+        ],
+        [
+          "work_view_inner",
+          ""
+        ],
+        [
+          "inspect_work_view",
+          ""
+        ],
+        [
+          "render_work_view",
+          ""
+        ],
+        [
+          "inspect_work_list_text",
+          ""
+        ],
+        [
+          "inspect_git_metadata",
+          ""
+        ],
+        [
+          "inspect_git_report",
+          ""
+        ],
+        [
+          "inspect_managed_review_git",
+          ""
+        ],
+        [
+          "inspect_managed_review_anchor",
+          ""
+        ],
+        [
+          "inspect_gate_evidence",
+          ""
+        ],
+        [
+          "execute_external",
+          ""
+        ],
+        [
+          "execute_with_fence",
+          ""
+        ],
+        [
+          "close",
+          ""
+        ],
+        [
+          "work_outer_release_retains_known_recorded_state",
+          ""
+        ],
+        [
+          "settings_outer_release_retains_known_recorded_configuration",
+          ""
+        ],
+        [
+          "drop",
+          ""
+        ],
+        [
+          "planning_lease_renewal_respects_persisted_mission_pause_and_recovers",
+          ""
+        ],
+        [
+          "planning_guard_case",
+          ""
+        ],
+        [
+          "planning_transaction_hooks_pause_archive_and_corrupt_controls_are_atomic",
+          ""
+        ],
+        [
+          "planning_claim_input_schema_refuses_atomically_then_recovers",
+          ""
+        ],
+        [
+          "refuse_busy",
+          ""
+        ],
+        [
+          "new",
+          ""
+        ],
+        [
+          "drop",
+          ""
+        ],
+        [
+          "acquire",
+          ""
+        ],
+        [
+          "drop",
+          ""
+        ],
+        [
+          "root_bootstrap_clears_constructor_handler_before_identity_sql",
+          ""
+        ],
+        [
+          "root_binding_preserves_saved_admin_busy_timeout",
+          ""
+        ],
+        [
+          "root_bootstrap_consumes_saved_timeout_at_first_sql",
+          ""
+        ],
+        [
+          "migration_review_error_latest_known_revision_survives_older_wrapper",
+          ""
+        ],
+        [
+          "interruption_marker_rejects_cleanup_and_other_failures",
+          ""
+        ],
+        [
+          "interruption_role_marker_preserves_original_and_rejects_outer_failure",
+          ""
+        ],
+        [
+          "interruption_scope_restores_nested_state_and_unwind",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_methods.rs",
+      "sha256": "da14249c69884e8b0f0f54d02a65fcb517b3dd3ed32d46d02c70438886fc81c1",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "known",
+          ""
+        ],
+        [
+          "bundled",
+          ""
+        ],
+        [
+          "catalogue",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Method vocabulary, action/document names, v1 wire identity and 128-byte ASCII keys are protocol. ID SHA256 prefix24 preserves Go format; checked i64 arithmetic is representation. Text/title caps and enabled/default method only from complete saved v42 settings; no second fallback. Existing saved SQLite retry/transport caps remain separate.",
+        "functions": "apply + RootStore::preparation_command: intent canonicalization, exact replay, CAS, explicit transaction finalize, readback, root-instance binding; Rustdoc describes errors/effects and excludes adoption/launch.",
+        "errors": "Each SQL/query error remains typed. Rollback/commit/lease/binding close preserve compound causes. Commit uncertainty does not imply rollback; known receipt survives late failure. Public ENOSPC/output witness and SDK history/receipt fault variants cover refusal and recovery, not all OS fault possibilities.",
+        "documentation": "FR/EN migration/recovery docs and permanent recipes reflect draft-only writes and explicit historical adoption."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+      "sha256": "8e4b0e99cf2f10dea2f6bfd6d5e226e1a0376426b33474ece312f70f635a130d",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "code",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "cause",
+          ""
+        ],
+        [
+          "body",
+          ""
+        ],
+        [
+          "preparation",
+          ""
+        ],
+        [
+          "stored",
+          ""
+        ],
+        [
+          "sql_limit",
+          ""
+        ],
+        [
+          "needs_method",
+          ""
+        ],
+        [
+          "preparation_observed",
+          ""
+        ],
+        [
+          "preparation_project",
+          ""
+        ],
+        [
+          "preparation_methods",
+          ""
+        ],
+        [
+          "preparation_list",
+          ""
+        ],
+        [
+          "preparation_show",
+          ""
+        ],
+        [
+          "preparation_history",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Method vocabulary, action/document names, v1 wire identity and 128-byte ASCII keys are protocol. ID SHA256 prefix24 preserves Go format; checked i64 arithmetic is representation. Text/title caps and enabled/default method only from complete saved v42 settings; no second fallback. Existing saved SQLite retry/transport caps remain separate.",
+        "functions": "apply + RootStore::preparation_command: intent canonicalization, exact replay, CAS, explicit transaction finalize, readback, root-instance binding; Rustdoc describes errors/effects and excludes adoption/launch.",
+        "errors": "Each SQL/query error remains typed. Rollback/commit/lease/binding close preserve compound causes. Commit uncertainty does not imply rollback; known receipt survives late failure. Public ENOSPC/output witness and SDK history/receipt fault variants cover refusal and recovery, not all OS fault possibilities.",
+        "documentation": "FR/EN migration/recovery docs and permanent recipes reflect draft-only writes and explicit historical adoption."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+      "sha256": "4550c9284d72a79fdcdec9753b58655c994d659da477e7b5c9fdc50bd0fb3975",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "encode",
+          ""
+        ],
+        [
+          "apply",
+          ""
+        ],
+        [
+          "preparation_command",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Method vocabulary, action/document names, v1 wire identity and 128-byte ASCII keys are protocol. ID SHA256 prefix24 preserves Go format; checked i64 arithmetic is representation. Text/title caps and enabled/default method only from complete saved v42 settings; no second fallback. Existing saved SQLite retry/transport caps remain separate.",
+        "functions": "apply + RootStore::preparation_command: intent canonicalization, exact replay, CAS, explicit transaction finalize, readback, root-instance binding; Rustdoc describes errors/effects and excludes adoption/launch.",
+        "errors": "Each SQL/query error remains typed. Rollback/commit/lease/binding close preserve compound causes. Commit uncertainty does not imply rollback; known receipt survives late failure. Public ENOSPC/output witness and SDK history/receipt fault variants cover refusal and recovery, not all OS fault possibilities. Reproduced current-receipt content corruption now refuses before projection/known receipt; historical replay stays historical. This is a shared integrity invariant, not a configurable policy.",
+        "documentation": "FR/EN migration/recovery docs and permanent recipes reflect draft-only writes and explicit historical adoption."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/tests/engine_settings_catalog.rs",
+      "sha256": "6fff0deeb7ce487049568919141d61e78dc1261ed998332999962a7d7914f4a7",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation",
+          ""
+        ],
+        [
+          "reported_cost_policy_preserves_legacy_absence_null_and_exact_counts",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-engine/tests/preparation_writes.rs",
+      "sha256": "7a5f3b4908eb31e24e53a2bfabba69d0eb14deb99faaed9e94e874ef38c04443",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "preparation_child_insert_failure_rolls_back_and_same_event_recovers",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "e9dd5c342158454df530bd8bba49f212650653f3e47b666fa7a73ea94fac823e",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "trust_publication",
+          ""
+        ],
+        [
+          "code",
+          ""
+        ],
+        [
+          "session_state_may_be_recorded",
+          ""
+        ],
+        [
+          "configuration_may_be_recorded",
+          ""
+        ],
+        [
+          "recorded_configuration",
+          ""
+        ],
+        [
+          "recorded_preparation",
+          ""
+        ],
+        [
+          "recorded_work",
+          ""
+        ],
+        [
+          "status",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "observation_causes",
+          ""
+        ],
+        [
+          "plain",
+          ""
+        ],
+        [
+          "capabilities",
+          ""
+        ],
+        [
+          "open_local",
+          ""
+        ],
+        [
+          "from_open_store",
+          ""
+        ],
+        [
+          "open",
+          ""
+        ],
+        [
+          "cookie_age",
+          ""
+        ],
+        [
+          "browser_resource",
+          ""
+        ],
+        [
+          "root_login",
+          ""
+        ],
+        [
+          "authorize_head",
+          ""
+        ],
+        [
+          "close",
+          ""
+        ],
+        [
+          "handle",
+          ""
+        ],
+        [
+          "handle_observed_transport",
+          ""
+        ],
+        [
+          "handle_profile",
+          ""
+        ],
+        [
+          "route",
+          ""
+        ],
+        [
+          "list",
+          ""
+        ],
+        [
+          "check_binding",
+          ""
+        ],
+        [
+          "task",
+          ""
+        ],
+        [
+          "error_reply",
+          ""
+        ],
+        [
+          "task_action",
+          ""
+        ],
+        [
+          "root",
+          ""
+        ],
+        [
+          "close",
+          ""
+        ],
+        [
+          "response",
+          ""
+        ],
+        [
+          "quota_status_preserves_client_conflict_and_internal_failures",
+          ""
+        ],
+        [
+          "native_cookie_policy_keeps_the_server_snapshot_when_saved_values_change",
+          ""
+        ],
+        [
+          "root_runtime_failure_is_server_error",
+          ""
+        ],
+        [
+          "settings_recorded_state_survives_http_close_json_and_delivery_metadata",
+          ""
+        ],
+        [
+          "persisted_session_marker_survives_startup_close_and_error_rendering",
+          ""
+        ],
+        [
+          "root_recorded_state_survives_http_close_and_json_response",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/admin_budget.rs",
+      "sha256": "5c6a5d2885dc5c3410115fa6bd267b07b4680f917c1d83cb5eef59b663ef2020",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "admin_budget",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/mission.rs",
+      "sha256": "c7dbcf0927885f24ed8a2600437e91487f83a58b9351fcb3579dde81a1b13204",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "query",
+          ""
+        ],
+        [
+          "capabilities",
+          ""
+        ],
+        [
+          "write_input",
+          ""
+        ],
+        [
+          "mission_error",
+          ""
+        ],
+        [
+          "retain_observation_error",
+          ""
+        ],
+        [
+          "mission",
+          ""
+        ],
+        [
+          "mission_query_has_no_ambiguous_work_or_action_fallback",
+          ""
+        ],
+        [
+          "mission_write_admission_uses_actual_action_specific_cli_decoders",
+          ""
+        ],
+        [
+          "mission_observation_causes_retain_primary_and_cleanup",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/observation.rs",
+      "sha256": "8da92d9b84f72e7bd7a897f666c5e37a5a8824181fac9f8311a6348d681c3180",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "from_reply",
+          ""
+        ],
+        [
+          "from_error",
+          ""
+        ],
+        [
+          "record",
+          ""
+        ],
+        [
+          "observe",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "code",
+          ""
+        ],
+        [
+          "defer",
+          ""
+        ],
+        [
+          "configuration_may_be_recorded",
+          ""
+        ],
+        [
+          "recorded_configuration",
+          ""
+        ],
+        [
+          "recorded_work",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "ancillary_read_causes_survive_reply_and_failed_owner_observation",
+          ""
+        ],
+        [
+          "preparation_receipt_survives_owner_failure",
+          ""
+        ],
+        [
+          "observer_panic_and_deferred_outcomes_preserve_causes_without_retry",
+          ""
+        ],
+        [
+          "late_service_error_retains_configuration_without_upgrading_refusal",
+          ""
+        ],
+        [
+          "late_error_correlation_survives_response_encoding_and_owner_failure",
+          ""
+        ],
+        [
+          "native_server_failure_remains_a_typed_send_sync_io_cause",
+          ""
+        ],
+        [
+          "trust_publication_survives_owner_failure_and_root_cleanup",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/planning.rs",
+      "sha256": "859802ebdcf925842e8c488b22285c53866cb286b8854da9859b383508c9d4ac",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "query",
+          ""
+        ],
+        [
+          "kind",
+          ""
+        ],
+        [
+          "capabilities",
+          ""
+        ],
+        [
+          "planning",
+          ""
+        ],
+        [
+          "strict_query_has_no_mission_or_action_fallback",
+          ""
+        ],
+        [
+          "supported_control_kinds_are_explicit",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/preparations.rs",
+      "sha256": "1744b604820085222376056fd2608a43ce61394bd308af9b77012d785213ebaa",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "query",
+          ""
+        ],
+        [
+          "encode",
+          ""
+        ],
+        [
+          "preparations",
+          ""
+        ],
+        [
+          "preparation_command",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/pricing.rs",
+      "sha256": "1c9d95273de641df45873a9f96e29428be10c938093bd5baa1342da583f3bbfd",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "pricing_route",
+          ""
+        ],
+        [
+          "pricing_input",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/quotas.rs",
+      "sha256": "8198729107afb6bef2bcae63cd9ad3ffed3f7eb8830ff3a16404b7cc87d4bdcd",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "work_query",
+          ""
+        ],
+        [
+          "quotas",
+          ""
+        ],
+        [
+          "quota_work_query_refuses_ambiguity_without_default",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/settings.rs",
+      "sha256": "4919e754ff7ec78170180be182074ccb1e477fae8da17f912da3664e996d97da",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "engine_settings",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/transport.rs",
+      "sha256": "8e8c9817513728c4250506f153d0aeafb1f93fb658e2c56a463671c4e4a9bbef",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "code",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "fmt",
+          ""
+        ],
+        [
+          "source",
+          ""
+        ],
+        [
+          "fail",
+          ""
+        ],
+        [
+          "observe",
+          ""
+        ],
+        [
+          "acquire_lane",
+          ""
+        ],
+        [
+          "refusal",
+          ""
+        ],
+        [
+          "count",
+          ""
+        ],
+        [
+          "dispatch",
+          ""
+        ],
+        [
+          "request",
+          ""
+        ],
+        [
+          "serve_until",
+          ""
+        ],
+        [
+          "spawn_job",
+          ""
+        ],
+        [
+          "run",
+          ""
+        ],
+        [
+          "wire_failure",
+          ""
+        ],
+        [
+          "complete_job",
+          ""
+        ],
+        [
+          "reject_queued",
+          ""
+        ],
+        [
+          "complete_connection",
+          ""
+        ],
+        [
+          "reject",
+          ""
+        ],
+        [
+          "record_rejection",
+          ""
+        ],
+        [
+          "browser_resources_wait_for_existing_lane_and_cancel_without_capacity_leak",
+          ""
+        ],
+        [
+          "closed_worker_admission_retains_original_causes_without_saturation_fallback",
+          ""
+        ],
+        [
+          "queued_diagnostic_retains_connection_reservation_until_owner_consumes_it",
+          ""
+        ],
+        [
+          "departed_read_receiver_is_counted_and_typed_service_failure_retained",
+          ""
+        ],
+        [
+          "failed_observer_retains_all_completed_effects_without_retry_or_early_permit_release",
+          ""
+        ],
+        [
+          "queued_job_is_refused_and_observed_before_permit_release_without_root_execution",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/work_budget.rs",
+      "sha256": "2bcefd86c498864d139922b40a9d01a3d3e92631da6704a46d3da5f7762800a8",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "work_query",
+          ""
+        ],
+        [
+          "budget_input",
+          ""
+        ],
+        [
+          "work_budget_route",
+          ""
+        ],
+        [
+          "budget_work_query_refuses_ambiguity_without_default",
+          ""
+        ]
+      ],
+      "axes": {
+        "policies": "Positional action/ID and POST route names are protocol; no inferred preparation identity. HTTP auth/CSRF and command transport bounds reused. New RouteBody defaults None are absence of preparation effect, not an execution permission.",
+        "functions": "CLI execute/write, failure JSON/exit mapping; HTTP command, error receipt traversal and owner observation: known receipt separated from response delivery. Existing other routes add only None to new field.",
+        "errors": "Root close before response; unavailable-method ancillary causes retained. Conflict3/409, disabled4/403, unknown method5/400; malformed400, recorded late failure500. New error metadata is distinct from Work/config/trust. Owner failure test and stdout/dev/full preserve receipt.",
+        "documentation": "CLI help/Rustdoc and FR/EN runtime recovery explain explicit JSON intent, preserved effects and reread/replay. Dispatch docstring corrected and current binary requalified."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tests/rust_preparation_admin_ui.cjs",
+      "sha256": "75210c277b6d40ac3b1d66fd1f03506cfc21a0186455c7efe4869c07dea4a863",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tests/rust_preparation_keys.py",
+      "sha256": "79e996c948aa3f4eab374d7b5e244590c5ebb9b3e998228100601368acff3aff",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "",
+          "main"
+        ]
+      ],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tests/rust_preparation_reads.py",
+      "sha256": "d328db8df027860ead8780a2b2bf1ecc6e2c875e66e60e2745990617b6a3aaaa",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "",
+          "main"
+        ]
+      ],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tests/rust_preparation_upgrade.py",
+      "sha256": "95e20184e890f52471e77ee09dd90296c23196632c00df24573867f9eb5af69c",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "",
+          "main"
+        ]
+      ],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tests/rust_preparation_writes.py",
+      "sha256": "baa96032d8a3e78bdea02181ff8c464c7dabd7c1833fd2301b1beb94927f0027",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [
+        [
+          "",
+          "main"
+        ],
+        [
+          "",
+          "verify_glm_boundaries"
+        ]
+      ],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tools/verification/recipes/preparation-upgrade-rust.json",
+      "sha256": "2eeb60b2865d4f80ed1a34da8d475b3695b86c9626d8cb2e45fc7aeab7145ab3",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "tools/verification/recipes/preparation-writes-rust.json",
+      "sha256": "c9669475e9ae3cfce8847c7029e3bc40a32ca18710e2ac8c6835fe081910cd4f",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "Only named fixture inputs, requested viewports and protocol boundaries; no provider, live Root, global watchdog or new product policy.",
+        "functions": "Permanent scripts/SDK test describe owned roots, valid witness, specific failure and recovery. Cargo target explicit; browser checks assert settings content and actual consumer.",
+        "errors": "Invalid trigger-before-reopen original FAIL retained; corrected fault injection happens after valid held Root. Recipe integrity verifies result and exact declared inputs; zero tests not accepted.",
+        "documentation": "Permanent recipe manifests and FR/EN replay guides state binary prerequisites, scope and failures."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "version_history.json",
+      "sha256": "575692a4e8f7f6615c866904ed2d3427dcbede6428fbbf08d136dfb6ceb200c6",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "web/i18n-en.js",
+      "sha256": "6835d3c95fec2eefbe918bbc162ff1fdd4951314dcf82fa6e76461376db30f5f",
+      "scope": "preparation delta only; concurrent unrelated hunks excluded",
+      "functions_lexical_candidates": [],
+      "axes": {
+        "policies": "v42 and catalog5 are schema versions. Persisted initial1/16000/240/apex operator choices are exposed and validated in shared Admin/API/CLI path; null unlimited and zero nonempty refusal. Five supported default names are capability vocabulary, not an operator ceiling.",
+        "functions": "has_preparation_write_policy, preparation_write_policy, schema validation/document version, text-unit catalogue and frontend parsing/editing reviewed; new string type is server validated.",
+        "errors": "Partial/missing/invalid policy refuses, historical Root unchanged until explicit preview/apply. No implicit read-to-write adoption or success-empty fallback.",
+        "documentation": "Catalog label/help/unit FR and EN translations regenerated. Upgrade6+45 asserts explicit adoption and real default-method consumption; writes45 checks save/reopen and caps."
+      },
+      "review": "principal semantic review; independent review assessment retained"
+    },
+    {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "sha256": "e055db4cde577419b6ba9f0e7fa271d5d105adb5b7182165cc0e30ec56a5a149",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION.md",
+      "sha256": "b4786164f3fce6e7b6c6aae2c0d3da7cedd9554e724c9dc4e510fd7d481e911c",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/RUNTIME-RECOVERY.md",
+      "sha256": "50b26c5655b44dc11a09f319b7ca29027c6b7733d157ff6985f4b5fc626591c0",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/en/RUNTIME-RECOVERY.md",
+      "sha256": "fa40916116199d9fd81a8bc1e8de1ec49924c5f02b7f3b1342c05a098724b204",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/plans/migration-rust/REPLAYS.md",
+      "sha256": "3e4b323d506ca586547f62c4bbf45dddd5df2f2629f187e7de35d8360aacc3a9",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION-REPLAYS.md",
+      "sha256": "f87b671bce5db82103a4d4a602a64fb0728bbe1c6d8dcc9dc9c91a643de0baa5",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/plans/migration-rust/PLAN.md",
+      "sha256": "94f1a014292bd2b7980d82ded66af252f81199b0dfcb60bf239ed95e2e6f5b6f",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    },
+    {
+      "path": "docs/plans/migration-rust/PREPARATION-WRITES-20261025.md",
+      "sha256": "398fa68b1e391e08098fae3f7558e2007d69ef2147ec0aebe66d9b872155eba5",
+      "scope": "new preparation documentation increment only; historical/unrelated text excluded",
+      "axes": {
+        "policies": "Documents actual persisted group and raw UTF8 caps; no new execution policy.",
+        "functions": "No runtime functions changed; describes new public draft contracts.",
+        "errors": "Distinguishes known receipt, integrity refusal, conflict, unknown outcome and actual installation. Original failures retained.",
+        "documentation": "FR/EN migration/recovery/replay pair updated; report includes Mermaid and RETEX, scopes/limits and resumption. Links checked."
+      },
+      "review": "principal semantic review; documentation not acceptance"
+    }
+  ],
+  "global_qualification": "OPEN; unrelated owner changes, installation of final D1 fix and global/native acceptance not established. D4 follow-up hypothesis retained.",
+  "document_corrections": "CLI read-only dispatcher comment and HTTP Work-effect comment corrected; current Rustdoc compiled separately."
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build an explicit native candidate with observed Git facts, without Go/install.
 
-Root and Cargo target must be owned and stable. The default launcher is unchanged.
+Root and Cargo target must be owned and stable. The local launcher uses this builder.
 Git HEAD/status are observations before/after compilation, not atomic source or
 actor authentication. Effective compiler inputs are independently archived by the
 native profile collector. No retry, network, global timeout, restart or publication.
@@ -102,9 +102,29 @@ def build(root,out,target,version):
 
 
 def main():
-    """Build only explicitly selected source/output/target, defaulting to devel."""
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,default=Path.cwd());p.add_argument('--output',type=Path,required=True);p.add_argument('--target-dir',type=Path,required=True);p.add_argument('--version',default='devel');a=p.parse_args()
-    print(json.dumps(build(a.root.resolve(),a.output.resolve(),a.target_dir.resolve(),a.version)),flush=True)
+    """Build a frozen native candidate, optionally emit it for canonical build.sh.
+
+    --install-candidate names a build output, not a running-service installation.
+    Explicit qualification paths remain supported. Build failures precede output
+    publication. Publication/chmod/durability errors may leave new output visible;
+    inspect it before retrying. No service is stopped/started by this command.
+    """
+    import tempfile
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--root',type=Path,default=Path.cwd());p.add_argument('--output',type=Path)
+    p.add_argument('--target-dir',type=Path);p.add_argument('--version')
+    p.add_argument('--install-candidate',type=Path);a=p.parse_args();root=a.root.resolve()
+    if a.install_candidate:
+        base=root/'.cache/local-delivery';base.mkdir(parents=True,exist_ok=True)
+        parent=Path(tempfile.mkdtemp(prefix='build-sh-',dir=base))
+        target=a.target_dir or Path(os.environ.get('SWARM_RUST_TARGET_DIR',str(root/'.cache/rust-build-local')))
+        result=build(root,parent/'build',target.resolve(),a.version or os.environ.get('SWARM_VERSION','devel'))
+        output=a.install_candidate.resolve();output.parent.mkdir(parents=True,exist_ok=True)
+        profile.publish(output,Path(result['binary']).read_bytes());output.chmod(0o700)
+    else:
+        if a.output is None or a.target_dir is None:p.error('--output and --target-dir required')
+        result=build(root,a.output.resolve(),a.target_dir.resolve(),a.version or 'devel')
+    print(json.dumps(result),flush=True)
 
 
 if __name__=='__main__':main()

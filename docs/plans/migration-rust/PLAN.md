@@ -11,6 +11,268 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — préparation create/save Rust, GLM,25 octobre
+Owner Codex ; dev78 actif, candidat testé et processus SHA bef3310c… concordants.
+CLI/API → writer commun → préparation/historique/reçu atomiques ; Admin v42 FR/EN.
+Revue GLM instruite : corruption du reçu reproduite, garde générale vérifiée.
+49 assertions publiques + 8 identifiants + 2 tests SDK ; reprise v41→42 : 6 assertions,
+45 contrôles Admin par parcours de fixture ; 14 Version FR/EN + 11 HTTP sur l’instance.
+Deux missions toujours suspendues, révisions 50/469 conservées ; réglages inchangés.
+Premier78 refusé pour écritures SCALING ; nouvelle précondition de stabilité puis
+build qualifié 439 entrées. Pas de contournement ni message inter-conversation.
+[Livraison et erreurs liées](DELIVERY-PREPARATIONS-20261025.md),
+[rapport initial/RETEX](PREPARATION-WRITES-20261025.md),
+[preuves](evidence/20261025-preparation-writes/README.md).
+Ancien bin/swarm-local Go inutilisé identifié : suivi d’installation, sans suppression.
+Transitions préparation restantes et acceptation globale de migration ouvertes.
+Aucun commit/push, adoption de plan ou qualification Biba/SCALING déduits du lot.
+
+## Livré localement — FPA-02a et reprise SQLite, APEX + GLM, 25 octobre
+Reprise liée vérifiée en dev65 : trois retraits d'autorisation concurrents
+(synchronisation, aperçu, lecture du rapport) pouvaient arrêter le serveur entier.
+Les échecs originaux après dev62 et les candidats non activés63/64 sont conservés.
+Le watch termine maintenant sa seule session avec effets/causes conservés ;
+admissions, écritures et nettoyages incertains restent des erreurs. Aucun retry
+implicite. La matrice réduite puis la recette publique complète passent en65.
+Reprise demandée « portes avec glm » ; owner/intégration Codex, GLM sans outils.
+Installé dev65 : Work.memory → aperçu CLI/lecture API → manifeste → worker réel
+factice. Inventaire cohérent, chemins contenus et sources gérées/retirées contrôlés
+avant admission et permissions ; aucune donnée historique vidée pour démarrer.
+Replan commun : bootstrap SQLite forçait0 avant de lire le délai Admin. Échec0/173
+reproduit, valeur persistée désormais consommée avant la première requête d'identité.
+SCALING-S1 conservé et qualifié sur le même candidat : résultat immuable → remise
+au scope, sans acceptation. Recette corrigée pour blocked puis submitted.
+7tests moteur inchangés réutilisés,21tests de supervision et44 assertions mémoire
+sur65,32S1 sur2Roots ;55consignes +36navigateur restent la preuve dev62 distincte.
+Recettes/intégrité VERIFIED, Rustdoc PASS ; revues12+3entrées,14distinctes depuis60.
+45 ressources installées comparées, Version FR/EN14assertions,2missions suspendues.
+Onze appels GLM réels,10réponses exploitables et1sortie épuisée conservée ;
+revues statiques distinctes, aucun verdict moteur fabriqué.
+[Rapport/RETEX](FPA02A-MEMOIRE-20261025.md),
+[revue complémentaire](evidence/20261025-memory-files-zjficbf1/REVIEW-COMPLETE.md),
+[installation](evidence/20261025-memory-files-zjficbf1/installed-complete-summary.json).
+Les échecs restent originaux. FPA-01 et le reste FPA-02 attendent le raccord des
+sources RETEX fraîches et de leurs consommateurs ; M20 et AC-02 restent futurs.
+Suite S1 : défaut disque sur le nouveau chemin de publication à qualifier par son
+owner. Fichiers mémoire/supervision libérés ; réservations SCALING/Biba préservées.
+
+## Livré localement — FPA-03, consignes attribuées, APEX + GLM, 25 octobre
+Dev60, empreinte `81eafe6f9925cfb77d7dc23497b10ae027e239d3e469147a643bdf0a41b93587`.
+Parcours : décision revise-instructions → base/source conservées → rejet humain
+avant transmission, CLI/API/Conduite → notification reçue par le planificateur natif.
+Plafond Admin, CAS, scope, bail, rejeu et réservation conservés. Actualiser pendant
+le rejet ne réaffiche plus l’ancien cache. Collecteur de preuves drainé en continu.
+5 tests Rust,67 assertions publiques/collecte,36 navigateur ;3 planners factices.
+Profil normal sans fixture ; revue initiale15 fichiers + reprise2 entrées,
+45 assets installés comparés,Version FR/EN14 assertions ;2 missions suspendues.
+[Rapport et RETEX](FPA03-CONSIGNES-20261025.md),
+[preuves/revue](evidence/20261025-instruction-learning-371v38up/REVIEW-RACE.md).
+Échecs originaux conservés ; activation60 après revue/recette réussies, identité
+réelle vérifiée. Revues GLM statiques bornées, aucune acceptation globale fabriquée.
+Fichiers de tranche libérés ; préserver Trust/Biba, budget/insights et leurs preuves.
+Suite : FPA-01/02 mémoire et autres écarts ; gardes mémoire conservés avant portage
+du consommateur protégé. AC-02 futur et droits M20 non démarrés ; migration ouverte.
+
+## Livré localement — BIBA-RUST (G7, R09/T2), 25 octobre Paris
+Demande utilisateur : implémenter Biba Rust, GLM SKYNET autorisés sans outils.
+Moniteur Read/Write/Invoke I0–I3 + admission attribuée nouvel objet I2 ; identité
+locale courante, mandat/accord exact, deux effets simulés, idempotence/reprise,
+originaux/chaîne/HMAC conservés. CLI/API/page et Admin FR/EN raccordés.
+RisqueA : aucune preuve Go héritée annoncée Rust ; vérification croisée exécutée.
+Politiques avancées actives/mappings non portés ferment ; scope trust-actions,
+pas toutes les missions, pas confinement OS ni acceptation indépendante/globale.
+58 tests Rust distincts en cinq groupes,56 assertions publiques,52 navigateur,
+14 Version installée ; unités séparées. Recette permanente trust-biba-rust VERIFIED.
+Revue locale liée aux octets des fichiers déclarés dans le reçu courant,
+quatre axes, aucun élément ouvert dans ce périmètre. Originaux conservés.
+Installé ./swarm.sh : v0.1.1-dev.53, PID1938839, empreinte/processus/ressources/notes
+FR/EN vérifiés. Aucune activation d’identité/politique ni mission réelle créée.
+[Preuves et RETEX](evidence/20261024-biba-rust/RETEX.md), delivery.json et recette.
+Suite : autres surfaces trust dans leurs lots ; aucune généralisation implicite.
+
+## Livré1481 — budget historique CLI, dev54, 25 octobre Paris
+Utilisateur : reste de migration avec GLM, Biba réservé à l’autre session.
+Budget show/preview JSON historique : quatre registres, coûts inconnus/zéro,
+révision et métadonnées, avertissement lié au seuil Admin persistant existant.
+Défaut JSONB réel reproduit puis corrigé : valider les octets JSON conservés avant
+extraction SQL ; aucun coût inconnu transformé en zéro. Source de la politique
+warning tracée/sauvegardée/relue et consommée40/90/null, aucun .8 caché ajouté.
+2tests moteur,6tests CLI communs,33assertions publiques et43insights PASS ; recettes
+installées/integrité VERIFIED, Rustdoc PASS. Revue6entrées effectives,4axes,
+liée aux octets ; aucune acceptation indépendante ni globale déduite.
+Installé ./swarm.sh dev54, image/processus=candidat qualifié sans fixture,
+44assets statiques/notes actuelles et14assertions Version FR/EN vérifiés.
+Budgets des deux missions réelles lisibles, missions toujours suspendues.
+[Résultat](evidence/20261025-budget1481/result.json),
+[revue/replans](evidence/20261025-budget1481/REVIEW.md), RETEX et archives privées.
+Owner Codex ; aucun fournisseur métier, identité activée, commit/push/publication.
+
+### Replan1481 GLM — dépendance réseau ouverte
+3contributions code préparées ;6tentatives réseau, zéro réponse exploitable.
+DNS interne chat/api.skynet.cossi.internet échoue. Diagnostic initial de clé
+erroné : changer de clé n’avait pas corrigé le DNS, deuxième vague injustifiée.
+Implémentation et vérification faites par le principal, aucun résultat GLM intégré
+ni économie/facture inventée. Question réseau/VPN adressée à l’utilisateur.
+Pour reprendre GLM : route interne de nouveau résoluble/accessible ; ne pas renvoyer
+les prompts de génération historiques puisque le code existe maintenant. Relire
+la source courante pour revue bornée ou prochain contrat. Aucun suivi récurrent
+organisé, aucune nouvelle vague inchangée. Propriétaire accès réseau : utilisateur.
+Les autres parcours de migration restent ouverts, pas de fin globale annoncée.
+
+## Livré1480 — changements/dépenses CLI ; historique de base figée conservé
+État courant25 octobre : installé dev54 avec1481,43assertions publiques sur l’image
+réellement activée, recette/intégrité VERIFIED. La limite d’installation ci-dessous
+est historique ; preuve additive installed-dev54.json, originaux non réécrits.
+
+Historique du24octobre :
+Utilisateur : Biba réservé à l’autre session ; reste de migration confié ici.
+Owner Codex, cette session. Réservés CLI mission.rs/mission_status.rs et recette
+mission-insights-rust ; aide lib.rs/notes/docs : ajouts ponctuels, sans trust/identité.
+Deux commandes historiques raccordées au même calcul que status, DTO exacts
+changes_since_visit/spending, refus/causes/readonly conservés ; texte FR/EN + JSON.
+6tests Rust PASS,43assertions publiques et intégrité recette VERIFIED, Rustdoc
+PASS ; profil natif sans fixture qualifié et sources effectives archivées.
+[Preuves](evidence/20261024-insights1480/result.json),
+[audit/replans](evidence/20261024-insights1480/AUDIT.md), revue des octets associée.
+Premier build vivant impropre : graphes/manifests modifiés par Biba en parallèle ;
+pas de diagnostic sur son état actuel. Test initial a aussi dérivé pendant ce run.
+Reprise sur archive qualifiée dev50 + seuls overlaysCLI, contrôles finaux figés.
+Serveur dev50 inchangé. Installation attend graphe commun stable avec BIBA-RUST,
+build pris en charge, même recette sur cette image puis restart/Version FR/EN.
+Aucun commit/push, fournisseur métier, mission réelle ou acceptation globale.
+
+Replan du suivi hors Biba : agent list Go produit le cockpit complet, pas la liste
+Rust réduite ; portage ouvert, pas d’alias incompatible. Matrice196 :83références,
+explicitement non exhaustive. Aide Go historique retenue :152noms candidats,
+23réservés trust/identity à l’autre session ; hors ces23,46homonymes annoncés et
+83non annoncés dans l’aide du candidat1480. Ce sont des candidats de recherche,
+pas83fonctionnalités absentes, une mesure de charge ou une certification des46.
+Comparaisons/empreintes/limites dans remaining-cli-*-candidates.json des preuves.
+Ancien avancement reste historique : ./swarm est désormais Rust et ne doit plus
+servir de référence Go. Priorité suivante : raccord cockpit complet et managed
+batch/fragments, avec contrats des producteurs et témoins avant retrait des refus.
+Préparations complètes, mémoire/projet, fournisseurs, terminal/automatisation,
+migrations/restauration/rollback et acceptation globale restent ouverts.
+
+## Livré1479 — distribution/docs sans dépendance Go, dev50
+README/INSTALLFR-EN, install.sh, Dockerfile/contexte, entrypoint, Make/CI,
+contribution/cartes/fresh-install corrigés. Swarm.sh déjà Rust, vérifié inchangé.
+Références Go datées conservées ; aucun .go/manifeste suivi.
+Défaut découvert : version sur Root sans Git ; absence observée distincte des
+erreurs Git, marqueur cassé refusé.4tests Rust RED→GREEN, Rustdoc PASS.
+4gardes Python PASS ;8assertions installation native réelle ;12Docker réel dont
+Go absent, CLI/API identiques, arrêt/recréation et données persistées. Recettes
+intactes VERIFIED. Watchdogs hérités CI/Compose retirés ; santé conservée.
+dev50 installé : empreinte=candidat,46assets/notesFR-EN,40lectures+14Version PASS ;
+CLI/HTTP normal/EPIPE/reprise vérifiés. Deux missions toujours suspendues.
+Doubles shell Compose distincts de l’image réelle ; cycle Compose complet et
+GitHub CI non exécutés, aucun fournisseur métier/publication/commit/push.
+Originaux conservés, métadonnées Docker sans injection devel/inconnues.
+Owner Codex ; [audit](evidence/20261024-install1479/AUDIT.md),
+[résultat](evidence/20261024-install1479/result.json). Portage global/RETEX ouverts.
+
+## Livré1478 — Préparations en lecture, dev48, vagues GLM
+CLI prepare list/methods/show/history et quatreAPI protégées : données/historique
+Go, fraîcheur plan_ready recalculée ; aucune édition/dialogue/conversion/adoption.
+Trois politiques explicites schema41, groupe Admin FR/EN avec aide/contexte IA ;
+anciens réglages sans groupe refusent, null/0/entiers exacts testés, aucun fallback.
+12tests Rust ciblés PASS (5préparations,3contention,4catalogue/évolution), Rustdoc
+compile ;58assertionsCLI/API+40Admin navigateur PASS, recette/intégrité VERIFIED.
+Cockpit404 +journaux/statuts102HTTP/14transcript et123navigateur PASS ; recettes
+finales/intégrité VERIFIED. Mesures live séparées, originaux/fautes conservés.
+Installé dev48, empreinte processus=candidat,46assets/notesFR-EN,40lectures+14Version
+réelles PASS ;4préparations/5méthodes réelles CLI=API. Adoption publique des3champs,
+autres valeurs conservées, missions toujours suspendues. Refus initial verrou
+conservé, adoption après arrêt bref du seul service géré puis redémarrage vérifié.
+GLM : modèles/fraîcheur/tests intégrés après revue ; lectureunsafe/troncature et
+revue sans réponse rejetées. Aucun gain tokens ni acceptation indépendante/global
+revendiqués. Sources Live de Claude et1037chemins préindexés préservés.
+Owner Codex ; [preuves](evidence/20261024-preparations1478/result.json). Go : aucun
+.go ni manifeste suivi,927suppressions indexées ; copies ignorées de référence,
+GitHub inchangé jusqu’à commit/push autorisés. Prochaine tranche : parcours UI.
+
+### Replan1478c — recette Admin, navigation réelle
+Lectures CLI/API passent jusqu’aux politiques null/0/entier exact. Navigateur
+bloqué avant première assertion : la vue Admin existante contient un lien vers
+native-runtime.html, pas les réglages intégrés. DOM/URL conservés dans la preuve
+ciblée originale ; navigateur fixture fermé explicitement, aucune mission réelle.
+Correction de recette : cliquer le lien pris en charge avant attente Admin ;
+aucun délai ajouté, aucune modification produit. Owner Codex, relecture à vérifier.
+Second défaut de recette isolé par témoin DOM : le sélecteur d’aide prenait le
+dialogue Plafonds fermé déjà présent. Cibler uniquement le dialogue [open] ;
+le texte/label observés sont conservés, pas de relance inchangée.
+
+### Replan1478d — contention réelle réglages/conducteur
+Recette permanente préparation échouée après40connexions : conducteur arrêté,
+web-conductor-after-http → local-storage/Lock/EAGAIN. Original intact dans
+.cache/preparation-reads1478-final et fixture preparation-reads-xi9w6s96.
+RootStore::settings réserve immédiatement, malgré politique storage_busy_retries
+persistée3/25ms ; le conducteur l’appelle à chaque découverte. Les lectures métier
+et la recette cockpit4étapes passent, ce qui ne clôt pas la contention.
+Décision : relier le lecteur public de réglages à la boucle commune existante de
+contention, sans nouveau plafond/délai ni retry de mission/fournisseur. Témoin,
+refus budget0/1 et reprise conservés dans test existant ; RED avant correction.
+Owner Codex ; installation différée jusqu’à recette publique corrigée vérifiée.
+GLM revueHTTP bornée reçue : suggestion de qualification E::Close pour causes
+observées, pas de faille accès établie. Sérialisation DTO impossible non reproduite ;
+convention héritée mission.rs à réexaminer séparément, pas de faux avis d’acceptation.
+
+### Replan1478e — différentiel de faits volatils
+Préparations corrigées58CLI/API+40navigateur PASS, intégrité VERIFIED. Sur dev48,
+cockpit404PASS mais journaux échoue au différentiel completion : différences
+uniquement horloges et disponible disque/inodes statvfs (4096octets/1inode entre
+lectures). Observations originales agent-logs-_adeocrs conservées ; aucune différence
+Work/résultat/budget/identité/état de volume. Correction recette permanente : valider
+chaque fait live entier positif dans la capacité statvfs réelle puis comparer les
+champs stables, y compris chemins/types/états ; originaux non modifiés. Propriétaire
+Codex, étend la limite de preuve1475 « deux horloges seulement » sans la réécrire.
+
+## Livré1477 — abandon ordinaire avec historique d’agents, dev46
+Décision consultable avec agents completed/failed/interrupted, agent/tentative
+préservés ; aucun rapport/revue attribué ni résultat validé. Agents actifs sur
+une tâche abandonnée, planning/reprise/revue non portés gardent leurs refus.
+Contre-exemple public dev45 CLI2, puis13tests du lecteur et1historique PASS.
+84assertionsHTTP logs/completion/incomplete/abandon +14transcript et527navigateur
+PASS ; recette finale/intégrité VERIFIED. dev46 installé : binaire réel=candidat,
+46assets/notesFR-EN,40lectures et14Version réelles PASS ; missions suspendues.
+GLM : gros diff tronqué9983tokens rejeté ; producteur borné924tokens intégré
+pour abandoned ; test2967tokens intégré sur vrais DTO et sauvegarde stricte.
+Waived reste non porté, pas de production publique inventée. SDK result séparé
+à requalifier/documenter ; aucune acceptation globale/indépendante revendiquée.
+Owner Codex ; [preuves](evidence/20261024-abandoned1477/result.json). Vague1478
+Préparations engagée ; pas de commit/push automatique, travail poursuivi.
+
+## Livré1476 — livraison ordinaire incomplète lisible, dev45
+Sans planning, tâche blocked/Livraison incomplète et agent completed : résultat
+delivery_incomplete/not_validated, aucun rapport attribué ni revue déduite.
+Ordre Go conservé ; managed/reprise/revues non portés gardent leurs refus.
+Témoin public task.update puis CLI2 avant correction conservé.12tests Rust PASS ;
+64assertionsHTTP logs/completion/incomplete +14transcript,513navigateur PASS
+(404cockpit,95journaux,14incompleteFR-EN/deux thèmes/mobile). Lectures sans mutation,
+retour public à completed_unproven. Recette/intégrité VERIFIED ; dev45 installé,
+binaire=candidat,46assets/notesFR-EN,40lectures et14Version réelles PASS.
+GLM :1appel sans réponse complète conservé,1avis non retenu après lecture Go,
+1module de parcours adapté aux vrais champs/helpers ; aucun succès vide admis.
+Pas de gain économique ni acceptation indépendante/globale revendiqués.
+Owner Codex ; [preuves](evidence/20261024-incomplete1476/result.json), incidents
+associés. Vague1477 déjà engagée, travail poursuivi sans commit/push automatique.
+
+## Livré1475 — statut après terminaison ordinaire, dev44
+Journaux → Conduite/CLI status : processus terminé, résultat non démontré ou
+rapport attribuable non soumis, jamais accepté. Raccord de la garde GLM au lecteur
+existant ; absence, attribution, ambiguïté et reprise comparées CLI/HTTP, seules
+les deux heures d’observation sont distinguées. Work/Agent/réservations inchangés.
+11tests du lecteur PASS,404assertions cockpit et95journaux PASS ;48assertions logs
+HTTP dont26completion,14transcript. Recette finale/intégrité VERIFIED.
+Profil normal, dev44 installé, binaire réel=candidat,46assets/notesFR-EN comparés ;
+40lectures réelles et14Version PASS. Les missions historiques restent suspendues.
+GLM1proposition adoptée32109tokens ; contexte trop large conservé comme défaut de
+méthode. Vague1476 suivante :7052tokens de raisonnement seul, aucune proposition ;
+pas de retry identique, principal reprend. Aucun gain économique revendiqué.
+Restent provenance legacy, batch et livraisons incomplètes. Owner Codex.
+Preuves [résultat](evidence/20261024-status1475/result.json), incidents associés.
+Pas d’acceptation globale ni commit/push automatique ; travail autorisé poursuivi.
+
 ## État livré1474 — transcript typé raccordé à Journaux, dev43
 Accordéon existant du lecteur : agent explicite → bouton → métadonnées dérivées
 par typed_transcript, sans contenu assistant/outils, identité ou activité déduites.
@@ -80,7 +342,7 @@ Paquet GLM ciblé2863tokens déclarés ; réduction de contexte réalisée et me
 sans conclure à une économie comparative (tâche différente du lot1471).
 
 ## État livré1471 — Version et nouveautés raccordé, dev36
-366assertions navigateur dont45Version PASS,10tarifsHTTP +13budgetAPI/9lectureAPI,
+366 assertions navigateur dont45Version PASS,10tarifsHTTP +13budgetAPI/9lectureAPI,
 13identifiants/cachegraph ; intégrité VERIFIED. Profil normal sans fixture.
 Installation dev35 : binaire=candidat,44assets protégés/notesFR-EN comparés ;
 dialogue réel FR/EN vérifié par14assertions, aucun POST. Deux missions suspendues,
@@ -2748,3 +3010,148 @@ missions suspendues et historique conservés pendant cette reprise. Owner Codex.
 Compteur installé relu :4empreintes étaient des observations, pas des assertions ;
 retirées du compte (25annoncées par le script initial →21assertions uniques), preuve
 initiale conservée et parcours réel rejoué. Aucun total de tests inventé au bilan.
+
+Replan1475a : test nouveau RED sur le refus attendu ; première vérification du
+module :10PASS/1FAIL, ancien test exigeant ce même refus à sa ligne1312.
+Cause : assertion de périmètre devenu obsolète, pas attribution erronée observée.
+Actualisation de cette assertion ; refus incomplete/review/recovery gardés et
+parcours public absence/attribution/ambiguïté/reprise exigé avant clôture.
+Original .cache/skynet-status1475/green.stdout/stderr conservé. Owner Codex.
+
+Replan1475b : cockpit404PASS, nouveau témoin CLI/HTTP échoue sur égalité totale.
+Lecture discriminante conservée dans .cache/skynet-status1475/diff-observation :
+seuls runtime.observed_at et spending.observed_at diffèrent, chaque lecture ayant
+son horloge réelle. Comparaison explicitement limitée à ces deux horloges,
+validées et conservées ; tous les autres champs doivent rester identiques.
+Pas de défaut produit établi. Rejouer le parcours ciblé avant recette finale.
+
+Replan1475c : vérificateur installé hérité attendait encore dev43. Erreur de
+notre méthode, pas du service. Source attendue désormais delivery-build.json
+pour version ET SHA ; contrôle corrigé PASS avec dev44. Originaux conservés.
+Replan1475d : avancement.py refuse go0/rust92 car ./swarm est maintenant le
+lanceur Rust ; ancienne matrice de pourcentages non actuelle. Owner Codex ;
+reprendre le référentiel historique Go explicitement avant de recalculer les taux.
+Aucun nouveau pourcentage ou délai publié depuis ce refus.
+
+Replan1476a : avis GLM de revue propose une garde currentTaskAttempt. Source Go
+result_presentation.go159 montre que delivery_incomplete ne dépend pas de cette
+garde ; review_dialog.go137 la réserve au choix du rapport managed, toujours
+absent ici. Claim non retenu, aucune attribution ancienne fabriquée ; pas de
+durcissement au-delà du contrat. Test ordinaire absent-root PASS et12tests du
+lecteur PASS. Nouveau GLM chargé du code de parcours public, contexte réduit.
+
+Replan1477a : revue sémantique repère une assertion historique attendant encore
+le refus des terminaux abandoned ; mise à jour bornée de ce test, branche active
+toujours refusée. Rustdoc observed_result_inputs restait trop étroit en1476 :
+remplacement textuel initial sans assertion n’avait pas trouvé sa ligne. Contrat
+maintenant relu et corrigé sur octets réels ; preuves1476 non réécrites. Aucun
+changement de comportement1476, nouvelle doc à transmettre dans le prochain build.
+
+Replan1478a : script de réglages refusé à l’analyse Python (point-virgule en
+début de ligne), donc aucune édition exécutée par cet essai. Scripts conservés,
+py_compile puis exécution séquentielle. Premier cargo check refuse un doublon
+pub pub(crate) dans le helper GLM rendu public ; corrigé sur signature réelle.
+Originaux .cache/skynet-preparations1478/check.stderr conservés ; tests dépendants
+non lancés. Reader GLM tronqué/inventions IO rejeté ; principal implémente avec
+descripteurs possédés et enveloppe Cleanup existante. Owner Codex.
+
+Replan1478b : tests du catalogue échouent sur deux attentes schema39 héritées ;
+profil antérieur contient déjà agent_report_clock_skew_seconds (schema40), le
+profil courant ajoute41. Actualisation des attentes de version et commentaire,
+sans changer les assertions de compatibilité des anciens historiques. Original
+settings-unit.stdout/stderr conservé ; settings_evolution non lancé après l’échec
+du prérequis.5tests préparation PASS et vérification CLI/web compilée PASS.
+
+## En cours — SCALING-S1, retour immuable des workers, APEX + GLM, 25 octobre
+Owner Codex ; GLM propose sans outils. Réservés : managed_repository_worker.rs,
+nouveau managed_repository_result.rs, mission_report_relay.rs, task_report.rs,
+agent_scope_signals.rs, test/recette managed-auto-worker et docs scaling FR/EN.
+Parcours : worker terminé → commit/report conservés → task.submit → inbox du scope
+propriétaire. Remise distincte de publication du candidat et acceptation ; S2/S3
+restent ouverts, validateur final maintenu. Comparaison : réutiliser le writer
+task.submit protégé plutôt que créer un writer parallèle ou relayer la copie mutable.
+Risque A : original/consentement/bail, identité physique, refus, rejeu après perte
+de copie, revue de sources figées ; ni missions réelles ni fournisseur métier.
+Preuves : evidence/20261025-scaling-s1-9_ym7ok9. Reprise S0 conservée dans SCALING-AGENTS-20261025.md ;
+sa disparition du plan partagé ne signifie pas annulation. Préserver FPA/Trust.
+Intégration racine FPA-02a : parcours S1 vérifié racine/sous-projet et installé
+dev62, revue commune12entrées. Rapports/proofs ci-dessus et FPA02A-MEMOIRE ;
+suite de défaut disque conservée, sans clôture de S2/S3 ni libération des sources réservées.
+
+## Vérifié — SCALING-S1 refus de chemin et reprise, APEX + GLM, 25 octobre
+S1 dev65 conservé ; profil normal exact411entrées, aucune différence de production.
+Deux Roots témoins/refus puis recette finale sous-projet : même commit/rapport
+reçu sans copie ni nouveau worker, aucune publication/acceptation du candidat.
+5 tests nommés ; reprise/restauration, stdout brut et gros stderr corrigés après
+contre-exemples. Recette recipe-closure PASS/VERIFIED,4axes sur10fichiers,
+25liens locaux et2Mermaid rendus/inspectés. Aucun build/redémarrage justifié pour
+ce seul incrément tests/docs. GLM : injecteur intégré après corrections, revue
+indépendante ciblée utile ; refus de verdict pour sortie épuisée, faits vérifiés.
+[Rapport/RETEX](evidence/20261025-scaling-recovery-tl7d1g71/RESULT.md).
+Limite : refus de forme avant écriture finale ; ENOSPC/mid-write restent ouverts
+owner Codex S1. S2/S3/S4 restent ouverts, docs FR/EN actualisées sans effacer S0.
+Fichiers tests/recettes de reprise libérés ; futurs changements invalident leurs
+preuves correspondantes. Missions réelles et travaux mémoire/Biba préservés.
+
+## En cours — SCALING-S2, candidat cumulatif et validateur, APEX + GLM
+Owner Codex ; S1 dev65 et recipe-closure conservés, ENOSPC/mid-write encore ouvert.
+Parcours visé : résultat remis → candidat cumulatif courant → contrôles et avis
+indépendant sur ce même SHA → publication autorisée, sans fin métier implicite.
+Réservés : nouveau managed_repository_candidate.rs, ajouts managed_repository*,
+raccord task_validation/reviewer seulement après lecture de leurs producteurs.
+GLM propose le producteur Git borné ; principal intègre, teste et garde les gardes
+managed avant raccord complet. Modèle sans outils, pas de mission réelle reprise.
+Preuves : evidence/20261025-scaling-s2-oi9dgo_e. Aucun producteur interne seul
+ne clôt le parcours public ; profil/revue/installation requis pour livraison.
+
+Replan S2/Git : dev65 reproduit en parcours natif un filter.clean local exécuté
+pendant la conservation S1 (native-callback-before, original conservé). Réservés
+aussi managed_repository_index/source/candidate_store et protocole citations/reply.
+Neutralisation par invocation et empreintes brutes retenues plutôt qu’interdiction
+de toute config locale ; S2 reste non raccordé. Revue GLM ciblée sans défaut démontré,
+réserves casse/priorité à vérifier par Git réel. Contrôles ciblés en cours ; aucun
+correctif installé. Voir git-transform-replan.md dans les preuves S2.
+
+Replan build S2 : première qualification refusée car notre recette a été ajoutée
+après lancement (diff exact conservé).31tests managed PASS sur sources stables.
+Gel des sources/notes/recette avant nouveau build ; aucune suppression du contrôle
+de stabilité. Revue GLM des lectures brutes sans défaut démontré, variantes symlink
+encore ouvertes S2. Dev65 conservé jusqu’à recette native du nouveau binaire.
+
+Replan Git confirmé : write-tree réactive clean sur index racy après add protégé.
+Contre-exemple CLI20/20 et recette native dev66 conservés, aucun restart. Le même
+ensemble d’overrides couvre désormais add ET write-tree. Commentaire du helper
+owned-directory actualisé pour le nouveau lecteur S2 sans changer sa garde.
+Tests ciblés, revue GLM du diff et nouveau profil/recette requis avant installation.
+
+SCALING-S1/Git livré dev67 : snapshot_tree protège add et write-tree ensemble.
+15tests Git actuels PASS,16protocole réutilisés,5helper, recette native index racy
+forcé PASS/VERIFIED. Profil normal424entrées sans fixture, même SHA exécuté ;
+14assertions Version FR/EN et ressources servies vérifiées, Works inchangés.
+Revue GLM bornée reçue ; 4axes propres12sources, limites S2 explicites.
+[Résultat/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/S1-GIT-RESULT.md).
+S2 candidat/cohorte/contrôles/validateur/publication encore en cours, gardes conservées.
+
+SCALING-S2 reprise GLM : vérificateur candidat sans diff worktree exécutable ;
+contre-exemple filter.clean conservé, trois tests ciblés et recette PASS/VERIFIED.
+Originals/reprise vérifiés ; contrôles natifs/cohorte/revue/publication restent ouverts.
+Preuves : evidence/20261025-scaling-s2-oi9dgo_e/resume-glm-candidate/.
+
+SCALING-S2 contrôles : préflight des politiques courante+acceptées avant candidat ;
+normalisation séparée sans plafond agrégé, slots transport distincts sans renommer
+les commandes. Témoin Git du défaut et reprise ; vingt tests ciblés attendus,
+revue GLM bornée reçue. Job natif/cohorte/revue/publication toujours non raccordés.
+Preuves : evidence/20261025-scaling-s2-oi9dgo_e/native-controls-glm/.
+
+SCALING-S2/job : contre-exemple du calcul succès sur résultat étranger reproduit.
+Mapping politique/créneau/résultat ajouté aux conversions, originaux et rejeu ;
+échecs cohérents conservés. Deux tests ciblés et recette publique native à qualifier.
+Le lien complet candidat/job/cohorte demeure ouvert ; aucun garde retiré.
+Preuves : evidence/20261025-scaling-s2-oi9dgo_e/native-job-binding/.
+
+SCALING-S2/origine : claim natif lié à source + politique normalisée, ligne SQL
+atomique et reçu privé v2 conservant leur contenu ; lecture vérifie préimage et
+domaine du Job. Version1 sans origine conserve ses octets, aucune backfill.
+21 tests ciblés passent ; recette native/legacy/auto-revue et livraison à qualifier.
+Candidat physique et cohorte S2 restent gardés, pas de validation finale prétendue.
+Preuves : evidence/20261025-scaling-s2-oi9dgo_e/native-source-origin/.

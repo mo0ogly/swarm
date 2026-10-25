@@ -46,8 +46,11 @@ pub(super) fn digest(base: &str, binding: Option<&Binding>) -> Result<String, E>
 /// Compare a current base source to the original automatic/manual domain. This
 /// pure read binds history and is also used for terminal/review evidence; it does
 /// not require a still-running mission merely to inspect a completed receipt.
+/// New jobs first bind the recorded source origin; historical absence retains
+/// the original base. A deleted/replaced new origin cannot reproduce its digest.
 pub(super) fn source(db: &Connection, job: &Job, base: &str) -> Result<String, E> {
-    digest(base, read(db, &job.id)?.as_ref())
+    let origin = super::source_origin::source(db, &job.id, base)?;
+    digest(&origin, read(db, &job.id)?.as_ref())
 }
 /// Current canonical consent/mode/archive; exact sequence prevents withdrawal
 /// then restoration from reviving an older automatic control claim.
@@ -105,7 +108,7 @@ pub(super) fn observe(db:&Connection,directory:&LocalDirectory,job:&Job,work:&Wo
 /// Recheck actual owning handle and frozen binding in the permission writer.
 /// Automatic rows without an actual lease refuse; manual rows cannot receive
 /// one by accident. Replay/EOF/serialized rows never manufacture a capability.
-pub(super) fn permission(db:&Connection,directory:&LocalDirectory,lease:Option<&MissionLease>,job:&Job,root:&std::path::Path,settings:&EngineSettingsDocument)->Result<(),E> {
+pub(super) fn permission(db:&Connection,directory:&LocalDirectory,lease:Option<&MissionLease>,job:&Job,root:&std::path::Path,settings:&EngineSettingsDocument,managed:Option<&super::managed_execution::Captured>)->Result<(),E> {
     let binding=read(db,&job.id)?;
     match (binding.as_ref(),lease) {
         (None,None)=>Ok(()),
@@ -113,8 +116,11 @@ pub(super) fn permission(db:&Connection,directory:&LocalDirectory,lease:Option<&
             lease.check(db,&job.work_id,&crate::system_timestamp().map_err(caused)?).map_err(caused)?;
             let work=crate::read_recorded_work(db,&job.work_id).map_err(caused)?;
             let request=super::Request{schema_version:1,event_id:job.event_id.clone(),expected_revision:work.revision,task_id:job.task_id.clone()};
-            let prepared=super::prepare(db,root,settings,&job.work_id,&request)?;
-            if source(db,job,&prepared.preview.source_sha256)? != job.source_sha256 { return Err(E::Refused("mission-validation-source-changed")); }
+            let prepared=match managed {
+                Some(data)=>super::managed_execution::prepare(db,directory,root,settings,&job.work_id,&request,data)?,
+                None=>super::prepare(db,root,settings,&job.work_id,&request)?,
+            };
+            if super::managed_execution::bound_source(db,job,&prepared.preview.source_sha256,prepared.managed.as_ref().map(|m| &m.candidate))? != job.source_sha256 { return Err(E::Refused("mission-validation-source-changed")); }
             observe(db,directory,job,&work,&prepared.preview.producer_agent_id,settings)
         },
         _=>Err(E::Refused("mission-validation-owning-lease-required")),

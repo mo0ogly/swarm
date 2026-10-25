@@ -611,6 +611,41 @@ impl RootStore {
             }).map_err(|e| RootStoreError::Launch(Box::new(e)))
         })
     }
+    /// Observe dispatch resources without manufacturing a managed preview Agent.
+    /// Ordinary tasks retain their full common preview. Managed tasks require the
+    /// actual owning lease, current saved profiles/settings and rollback-only
+    /// resource reader; no copy/host probe/provider/reservation is created.
+    /// The later admission repeats all guards and must inspect the physical copy.
+    /// This internal observation grants nothing; typed lock/SQL/rollback failures
+    /// propagate, including settings-reservation cleanup and safe causes.
+    pub(super) fn preview_mission_worker_resources<Ev:crate::WorkEnvironment>(
+        &mut self, lease:&MissionLease, request:&super::MissionWorkerRequest, environment:&mut Ev,
+    )->Result<(),RootStoreError>{
+        if !self.writable { return Err(RootStoreError::Refused("root-read-only")); }
+        let work=self.read_work(&lease.work)?;
+        if work.planning.as_deref().is_none_or(|p|p.repository.is_none()) {
+            return self.prepare_mission_worker(lease,request,true,environment).map(|_|());
+        }
+        let error=|e:E|RootStoreError::Launch(Box::new(crate::AgentLaunchError::caused("mission-worker-admission",e)));
+        bound(self,lease).map_err(error)?;
+        if request.schema_version!=1 || request.expected_revision<1
+            || [&request.event_id,&request.task_id].iter().any(|v|!swarm_identity_contract::name(v.as_bytes())) {
+            return Err(error(E::Refused("mission-worker-request-invalid")));
+        }
+        let parent_profile=work.launch_profile.as_deref().ok_or_else(||error(E::Refused("mission-profile-required")))?;
+        let profile=super::mission_agent::effective_profile(&work,&request.task_id).map_err(error)?;
+        if parent_profile.role!="worker" || profile.role!="worker" {
+            return Err(error(E::Refused("mission-worker-profile-role-unported")));
+        }
+        let launch=crate::Launch{schema_version:1,event_id:request.event_id.clone(),expected_revision:request.expected_revision,task_id:request.task_id.clone(),provider:profile.provider.clone(),role:"worker".into(),workspace:profile.workspace.clone(),instruction:profile.instruction.clone(),level:profile.level.clone(),timeout_seconds:profile.timeout_seconds,capture_output:profile.capture_output,limits:profile.limits.clone(),skills:profile.skills.clone(),origin:"conducteur".into(),conductor_id:lease.conductor.clone(),..Default::default()};
+        let fence=super::mission_agent::AutomaticFence{lease,profile:&profile,parent_profile,conductor:&lease.conductor,agent:&request.event_id,task:&request.task_id};
+        let root=self.root.clone();
+        crate::agent_storage_retry::execute(&mut self.db,&self.directory,false,|db,settings| {
+            crate::agent_launch::preview_managed_resources(db,crate::agent_launch::PreparationRoot {
+                root:&root,dir:&self.directory,settings,fence:Some(&fence),
+            },&lease.work,&launch,environment).map_err(|e|RootStoreError::Launch(Box::new(e)))
+        })
+    }
     /// Prepare or preview an automatic worker under this actual native lease.
     /// Provider/model/workspace/limits come from the authoritative saved profile,
     /// not caller-supplied identity labels. The current transaction rechecks lease,

@@ -16,17 +16,28 @@ use std::{
 #[derive(Clone)]
 pub(super) struct ObservationCauses(pub Vec<Arc<swarm_engine::RootStoreError>>);
 
+/// Typed trust publication retained independently of response delivery.
+#[derive(Clone)]
+pub(super) struct TrustPublication(pub &'static str);
+
+/// Known draft receipt, retained independently of response delivery/Work effects.
+#[derive(Clone)]
+pub(super) struct PreparationReceipt(pub (String,i64));
+
 /// Trusted service outcome and known state, separated from response ownership.
 /// Construct from actual NativeHttpService results; this representation neither
 /// authenticates a supplied in-process claim nor proves receipt/acceptance.
 #[must_use = "Observe the outcome and preserve known effects before delivering its response"]
 pub struct NativeJobOutcome {
+    /// Recorded/replayed/uncertain trust state; never client receipt or retry permission.
+    pub trust_publication:Option<&'static str>,
     pub status: StatusCode,
     pub failure: Option<HttpServiceError>,
     /// Ancillary diagnostics for a valid degraded read. Owner retains them through
     /// late output failures; they are distinct from a refused business operation.
     pub observation_causes: Vec<Arc<swarm_engine::RootStoreError>>,
     pub recorded_work: Option<(String, i64)>,
+    pub recorded_preparation: Option<(String,i64)>,
     pub configuration_may_be_recorded: bool,
     pub recorded_configuration: Option<RecordedConfiguration>,
 }
@@ -35,8 +46,10 @@ impl NativeJobOutcome {
     /// cause and known/replayed state. Error metadata is retained even if an
     /// adapter omitted redundant reply metadata. None/false never proves rollback.
     pub fn from_reply(mut reply: HttpReply) -> (Self, Response<Vec<u8>>) {
+        let trust_publication=reply.response.extensions_mut().remove::<TrustPublication>().map(|p|p.0).or_else(||reply.failure.as_ref().and_then(HttpServiceError::trust_publication));
         let observation_causes = reply.response.extensions_mut().remove::<ObservationCauses>()
             .map_or_else(Vec::new, |causes| causes.0);
+        let recorded_preparation=reply.response.extensions_mut().remove::<PreparationReceipt>().map(|p|p.0).or_else(||reply.failure.as_ref().and_then(HttpServiceError::recorded_preparation).map(|(id,r)|(id.to_owned(),r)));
         let error_work = reply.failure.as_ref().and_then(|e| {
             e.recorded_work()
                 .map(|(id, revision)| (id.to_owned(), revision))
@@ -56,10 +69,12 @@ impl NativeJobOutcome {
                 .is_some_and(HttpServiceError::configuration_may_be_recorded);
         (
             Self {
+                trust_publication,
                 status: reply.response.status(),
                 observation_causes,
                 failure: reply.failure,
                 recorded_work: reply.recorded_work.or(error_work),
+                recorded_preparation,
                 configuration_may_be_recorded: configuration,
                 recorded_configuration,
             },
@@ -71,6 +86,8 @@ impl NativeJobOutcome {
     /// or automatic retry is performed; transport still owes explicit delivery.
     pub fn from_error(error: HttpServiceError) -> Self {
         Self {
+            trust_publication:error.trust_publication(),
+            recorded_preparation:error.recorded_preparation().map(|(id,r)|(id.to_owned(),r)),
             status: error.status(),
             observation_causes: Vec::new(),
             recorded_work: error
@@ -87,6 +104,8 @@ impl NativeJobOutcome {
     /// persistence nor HTTP peer receipt. It is not a signed audit attestation.
     pub fn record(&self) -> NativeOutcomeRecord<'_> {
         NativeOutcomeRecord {
+            trust_publication:self.trust_publication,
+            recorded_preparation:self.recorded_preparation.as_ref().map(|(id,r)|RecordedPreparation{id,revision:*r}),
             schema_version: 1,
             status: self.status.as_u16(),
             error: self.failure.as_ref().map(HttpServiceError::code),
@@ -142,18 +161,24 @@ impl fmt::Debug for NativeJobOutcome {
 /// The underlying in-process outcome still requires trusted service provenance.
 #[derive(serde::Serialize)]
 pub struct NativeOutcomeRecord<'a> {
+    #[serde(skip_serializing_if="Option::is_none")]
+    trust_publication:Option<&'static str>,
     schema_version: u8,
     status: u16,
     error: Option<&'static str>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     observation_causes: Vec<&'static str>,
     recorded_work: Option<RecordedWork<'a>>,
+    #[serde(skip_serializing_if="Option::is_none")]
+    recorded_preparation: Option<RecordedPreparation<'a>>,
     configuration_may_be_recorded: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     recorded_configuration: Option<&'a RecordedConfiguration>,
 }
 /// Named Work metadata avoids an ambiguous positional tuple on the wire. It is
 /// known/replayed state from the service, never a new execution authorization.
+#[derive(serde::Serialize)]
+struct RecordedPreparation<'a> { id: &'a str, revision: i64 }
 #[derive(serde::Serialize)]
 struct RecordedWork<'a> {
     work: &'a str,
@@ -275,6 +300,18 @@ mod tests {
         assert_eq!(failure.pending[0].observation_causes.len(),2);
         assert!(matches!(failure.pending[0].observation_causes[1].as_ref(),swarm_engine::RootStoreError::Refused("fixture-two")));
     }
+    /// A valid draft receipt survives actual owner IO refusal; Work and settings
+    /// metadata remain absent. Receipt is historical knowledge, never approval.
+    #[test]
+    fn preparation_receipt_survives_owner_failure(){
+        let mut response=Response::new(Vec::new());response.extensions_mut().insert(PreparationReceipt(("prep-test".into(),7)));
+        let reply=HttpReply{response,failure:None,recorded_work:None,configuration_may_be_recorded:false,recorded_configuration:None};
+        let (outcome,_)=NativeJobOutcome::from_reply(reply);
+        let outcome=outcome.observe(&mut |_|Ok(())).unwrap();
+        let failed=outcome.observe(&mut |_|Err(io::Error::from_raw_os_error(28))).unwrap_err();
+        let pending=&failed.pending[0];assert_eq!(pending.recorded_preparation,Some(("prep-test".into(),7)));
+        let record=serde_json::to_value(pending.record()).unwrap();assert_eq!(record["recorded_preparation"]["id"],"prep-test");assert!(record["recorded_work"].is_null());assert!(!pending.configuration_may_be_recorded);
+    }
     /// A valid observer witness precedes panic. Retain payload/effect, then keep
     /// later admitted outcomes without retrying a possibly partially changed observer.
     #[test]
@@ -293,10 +330,12 @@ mod tests {
             matches!(&failed.cause,NativeObservationCause::Panic(p) if p.lock().unwrap().downcast_ref::<&str>()==Some(&"owned observer panic"))
         );
         failed.defer(NativeJobOutcome {
+            trust_publication:None,
             status: StatusCode::OK,
             failure: None,
             observation_causes: Vec::new(),
             recorded_work: Some(("owned-work".into(), 3)),
+            recorded_preparation:None,
             configuration_may_be_recorded: true,
             recorded_configuration: None,
         });
@@ -389,4 +428,20 @@ mod io_compatibility_tests {
             "owned-io-cause"
         );
     }
+}
+
+#[cfg(test)]
+mod trust_tests{
+ use super::*;
+ /// Known trust publication survives an observer IO failure and secondary Root
+ /// close; it never becomes a configuration write or a successful empty reply.
+ #[test]fn trust_publication_survives_owner_failure_and_root_cleanup(){
+  let mut response=Response::new(Vec::new());response.extensions_mut().insert(TrustPublication("recorded"));
+  let reply=HttpReply{response,failure:None,recorded_work:None,configuration_may_be_recorded:false,recorded_configuration:None};
+  let (outcome,_)=NativeJobOutcome::from_reply(reply);assert_eq!(outcome.trust_publication,Some("recorded"));
+  let failed=outcome.observe(&mut|_:&NativeJobOutcome|Err(io::Error::other("owned observer"))).unwrap_err();
+  assert_eq!(serde_json::to_value(failed.pending[0].record()).unwrap()["trust_publication"],"recorded");assert!(!failed.configuration_may_be_recorded());
+  let e=HttpServiceError::Close{primary:None,cleanup:Box::new(swarm_engine::RootStoreError::TrustPublished{primary:Box::new(swarm_engine::RootStoreError::Refused("owned-close")),publication:"replayed"})};
+  let outcome=NativeJobOutcome::from_error(e);assert_eq!(outcome.trust_publication,Some("replayed"));assert_eq!(outcome.status,StatusCode::INTERNAL_SERVER_ERROR);
+ }
 }

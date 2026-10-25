@@ -277,16 +277,18 @@ fn retain_observation_causes(
     })
 }
 
-/// Read historical `mission status WORK --json`, native text, or the explicit
+/// Read historical status/changes/spending JSON, native status text, or the explicit
 /// `status-native WORK --json` extension. Historical unsupported branches refuse
 /// without substituting native facts. Operator identity comes from the local OS;
 /// it selects a visit window and does not authenticate authority. Root is opened
 /// read-only and closed before output; observation causes survive encode, close,
 /// write and flush failures. No SQL mutation, provider, signal or lease claim occurs.
+/// Changes/spending without --json render a localized heading then the complete
+/// pretty JSON subdocument, preserving unknown measurements and stored text.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos.len() != 3
         || a.pos[0] != "mission"
-        || !matches!(a.pos[1].as_str(), "status" | "status-native")
+        || !matches!(a.pos[1].as_str(), "status" | "status-native" | "changes" | "spending")
         || !a.input.is_empty()
         || !a.output.is_empty()
         || a.server
@@ -305,7 +307,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         ))
     };
     let store = RootStore::open(std::path::Path::new(&a.root), false).map_err(root)?;
-    if a.pos[1] == "status" && a.json {
+    if (a.pos[1] == "status" && a.json) || matches!(a.pos[1].as_str(), "changes" | "spending") {
         let mut causes = Vec::new();
         let result = (|| {
             let operator = swarm_engine::operator_identity()
@@ -313,7 +315,11 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
             let mut observation = store.mission_status_historical(&a.pos[2], &operator)
                 .map_err(root)?;
             causes.append(&mut observation.causes);
-            json_bytes(&observation.status).map_err(CliError::Output)
+            match a.pos[1].as_str() {
+                "changes" => insight_bytes(&observation.status.changes, a, "Depuis votre dernière visite", "Since your last visit"),
+                "spending" => insight_bytes(&observation.status.spending, a, "Appels et dépenses observés", "Observed calls and spending"),
+                _ => json_bytes(&observation.status).map_err(CliError::Output),
+            }
         })();
         return retain_observation_causes(finish(result, store.close(), out), causes);
     }
@@ -336,10 +342,50 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     finish(result, store.close(), out)
 }
 
+/// Serialize one historical subdocument without flattening absent/unknown fields.
+/// Human output adds only a localized heading; JSON escaping prevents retained
+/// terminal controls from executing. No IO, policy default or mutation occurs;
+/// serialization failures propagate through the caller's close/cause handling.
+fn insight_bytes<T: Serialize>(value: &T, a: &Arguments, french: &str, english: &str) -> Result<Vec<u8>, CliError> {
+    let bytes = json_bytes(value).map_err(CliError::Output)?;
+    if a.json { return Ok(bytes); }
+    let mut text = if a.language == "en" { english } else { french }.as_bytes().to_vec();
+    text.push(b'\n');
+    text.extend_from_slice(&bytes);
+    Ok(text)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::io;
+
+    /// Both new operations reject invalid transport before Root IO. Human
+    /// serialization keeps nulls and terminal controls escaped in either locale.
+    #[test]
+    fn insight_transport_and_safe_rendering() -> Result<(), CliError> {
+        for operation in ["changes", "spending"] {
+            for language in ["fr", "en"] {
+                let mut a = crate::parse(&["mission".into(), operation.into(), "owned-work".into(),
+                    "--root".into(), "/missing-insight-fixture".into(), "--json".into()], language)?;
+                let value = serde_json::json!({"unknown":null,"literal":"\u{1b}[31m"});
+                let machine = insight_bytes(&value, &a, "Titre", "Title")?;
+                assert_eq!(serde_json::from_slice::<serde_json::Value>(&machine).unwrap(), value);
+                a.json = false;
+                let text = insight_bytes(&value, &a, "Titre", "Title")?;
+                assert!(!text.contains(&27));
+                let rendered = String::from_utf8(text).unwrap();
+                let (heading, body) = rendered.split_once('\n').unwrap();
+                assert_eq!(heading, if language == "en" { "Title" } else { "Titre" });
+                assert_eq!(serde_json::from_str::<serde_json::Value>(body).unwrap(), value);
+                a.input = "must-refuse-before-open".into();
+                let mut out = Vec::new();
+                assert!(matches!(execute(&a, &mut out), Err(CliError::Usage)));
+                assert!(out.is_empty());
+            }
+        }
+        Ok(())
+    }
 
     /// Actual absence remains null; this helper creates no Root or permission.
     fn controls() -> MissionControlView {

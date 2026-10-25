@@ -58,6 +58,9 @@ pub enum GateObservation {
 pub enum ReportListing {
     NotObserved,
     Observed(Vec<String>),
+    /// The selected producer cannot publish reports yet (managed Git results).
+    /// This is not an empty scan or evidence that no report exists.
+    PublicationUnavailable,
 }
 /// A report attributable to this attempt, or the actual refusal explanation.
 /// The pure consumer performs no mtime/skew check or search of its own.
@@ -217,10 +220,13 @@ fn blockers(value: &FreshnessObservation) -> Result<&[String], E> {
         FreshnessObservation::NotObserved => Err(E::Refused("mission-status-freshness-unobserved")),
     }
 }
-/// Read only an observed report list, retaining the producer's ordering.
+/// Read an observed list in producer order. PublicationUnavailable deliberately
+/// yields no candidate; its consumer must retain report_state=unobserved. This
+/// represents an unsupported producer, never an empty successful scan.
 fn first_report(value: &ReportListing) -> Result<Option<&str>, E> {
     match value {
         ReportListing::NotObserved => Err(E::Refused("mission-status-reports-unobserved")),
+        ReportListing::PublicationUnavailable => Ok(None),
         ReportListing::Observed(paths) => {
             if paths.iter().any(String::is_empty) {
                 return Err(E::Refused("mission-status-report-empty"));
@@ -322,7 +328,9 @@ pub fn result_presentation(
         state: "not_started".into(),
         label: "Pas encore commencé".into(),
         process_state: "not_started".into(),
-        report_state: "absent".into(),
+        report_state: if matches!(facts.reports, ReportListing::PublicationUnavailable) {
+            "unobserved".into()
+        } else { "absent".into() },
         validation_state: "not_started".into(),
         reason: "Aucune tentative terminée ni validation actuelle n’est établie.".into(),
         next_step: "Lancer la tâche lorsque ses conditions sont réunies.".into(),

@@ -164,7 +164,7 @@ fn dispatch_context(store: &RootStore, work: &str) -> Result<DispatchContext, E>
 /// values. A configured profile is recorded data, never verified provider health.
 /// Initial unstarted automatic tasks use saved slots, full Agent observations,
 /// lexical workspace overlap and budget/brief assistance. Initial managed tasks
-/// use prospective copy paths only; history still refuses. No copy, probe, SQL
+/// use prospective copy paths only; worker history requires separate attribution checks. No copy, probe, SQL
 /// write, default, reservation or grant.
 /// Typed cost/SQL/policy failures propagate; the exact threshold refusal retains
 /// its cause beside the visible intervention. Caller owes final coherence checks.
@@ -453,6 +453,25 @@ fn changes(input: &super::MissionStatusInputs, limit: Option<usize>) -> Result<M
 }
 
 impl RootStore {
+    /// Recheck original first-worker attribution without requiring its mutable
+    /// copy or invoking Git/provider operations. Errors retain launch causes;
+    /// caller holds the material read and rechecks Work/Agents/settings. Observe
+    /// performs no INSERT or reservation change; its deferred read transaction
+    /// and rollback preserve operation/cleanup causes. Sequential checks are not an
+    /// atomic filesystem snapshot or protection from same-UID tampering.
+    fn status_managed_workers(&self, work: &crate::Work, agents: &[crate::Agent], settings: &crate::EngineSettingsDocument) -> Result<(), E> {
+        // Original native provenance includes the FIFO journal, whose coherent
+        // history reader requires an explicit read transaction. Close it before
+        // the enclosing status performs other independent read transactions.
+        super::mission_supervision_store::read_transaction(&self.db, || {
+            for agent in agents {
+                crate::managed_repository::verify_worker(&self.root, &self.db, work, agent, settings,
+                    crate::managed_repository::WorkerCheck::Observe).map_err(|e|
+                        crate::MissionSupervisionError::Root(Box::new(E::Launch(Box::new(e)))))?;
+            }
+            Ok(())
+        }).map_err(mission)
+    }
     /// Read the Go 21-key historical aggregate for supported ordinary Work and
     /// ready/waiting planning trees, including unstarted managed tasks. Initial
     /// tasks consume real saved
@@ -468,7 +487,7 @@ impl RootStore {
     /// eligibility. Hidden running/blocked Agents refuse rather than invent state.
     /// Review/validation events resolve only persisted review/attempt ownership.
     /// Managed copy paths are prospective metadata, never physical readiness.
-    /// Previous review/retry/recovery, managed executions and closed scopes remain
+    /// Previous review/retry/recovery, managed submitted/accepted results and closed scopes remain
     /// explicit port boundaries. Missing policy/evidence and unknown IO refuse,
     /// preserving typed semantic/cleanup causes beyond the material guard.
     /// Work/settings/controls/Agents and selected reports are compared before and
@@ -488,7 +507,13 @@ impl RootStore {
             let controls = self.read_mission_controls(work).map_err(mission)?;
             let now = crate::system_timestamp().map_err(E::Runtime)?;
             let result = (|| {
-                super::mission_status_reports::supported(&input.work, &input.agents)?;
+                let managed = input.work.planning.as_deref().is_some_and(|p| p.repository.is_some());
+                if managed { self.status_managed_workers(&input.work, &input.agents, &settings)?; }
+                if managed {
+                    super::mission_status_reports::supported_observed(&input.work, &input.agents, true)?;
+                } else {
+                    super::mission_status_reports::supported(&input.work, &input.agents)?;
+                }
                 let (agent_limit, event_limit) = settings.values.mission_status_view_limits().map_err(E::Settings)?;
                 let agents = recent_agents(&input.agents, agent_limit);
                 super::mission_status_reports::supported_view(&input.work, agents)?;
@@ -614,6 +639,7 @@ impl RootStore {
                 if super::mission_status_reports::active_cooldowns(&self.root, &input.work, cooldown_at)? != cooldowns {
                     return Err(E::Refused("mission-status-provider-cooldowns-changed"));
                 }
+                if managed { self.status_managed_workers(&input.work, &input.agents, &settings)?; }
                 Ok(status)
             })();
             let work_check = self.read_work(work).and_then(|w| {
@@ -1273,7 +1299,8 @@ mod tests {
         }
         for state in ["completed", "failed", "interrupted", "running"] {
             let agent = crate::Agent { task_id: "task".into(), status: state.into(), ..Default::default() };
-            assert!(super::super::mission_status_reports::supported(&abandoned, &[agent]).is_err());
+            let observed = super::super::mission_status_reports::supported(&abandoned, &[agent]);
+            if state == "running" { assert!(observed.is_err()); } else { observed.unwrap(); }
         }
         let mut candidate = abandoned.clone();
         candidate.tasks.as_mut().unwrap()[0].planning_retry = true;

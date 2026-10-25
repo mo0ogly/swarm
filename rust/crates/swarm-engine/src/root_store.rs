@@ -49,7 +49,7 @@ pub use planning_native::{execute_planning_gate, PlanningRunOutcome};
 #[cfg(target_os = "linux")]
 pub use planning_step::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, NativeValidationEvidence};
+pub use task_validation::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, NativeValidationEvidence};
 #[cfg(target_os = "linux")]
 pub(crate) use task_validation::require_validation_idle;
 #[cfg(target_os = "linux")]
@@ -57,6 +57,7 @@ mod admin_budget;
 #[cfg(target_os = "linux")]
 pub use admin_budget::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
 mod material_path;
+mod trust_store;
 mod quotas;
 pub use quotas::QuotaPreview;
 const SETTINGS: &str = "engine-settings.json";
@@ -102,6 +103,11 @@ pub enum RootStoreError {
     /// Boxed cause retains the identity component's operation and cleanup causes.
     #[cfg(target_os = "linux")]
     DatabaseIdentity(Box<dyn Error + Send + Sync>),
+    /// Content-free Biba/codec refusal; original typed cause retained.
+    Trust(Box<crate::TrustError>),
+    /// Recorded trust reply or visibly uncertain file publication. No rollback
+    /// is inferred; consumer must expose this marker through close/output errors.
+    TrustPublished { primary: Box<Self>, publication: &'static str },
     Input(crate::CommandInputError),
     Path(LocalPathError),
     Storage(LocalStorageError),
@@ -109,6 +115,11 @@ pub enum RootStoreError {
     Sql(rusqlite::Error),
     Settings(EngineSettingsError),
     Pricing(crate::PricingError),
+    /// Preparation codec/IO boundary, including draft writes; cause retained.
+    Preparation(Box<preparation_read::PreparationReadError>),
+    /// Known preparation receipt survived a later close/encoding/output failure.
+    /// Reread this event; no rollback, new mutation or plan approval is implied.
+    PreparationRecorded { primary: Box<Self>, id: String, revision: i64 },
     Agent(crate::AgentStoreError),
     /// Read-only declared-event contract failure; original safe typed cause retained.
     Guard(crate::AgentGuardError),
@@ -228,6 +239,34 @@ impl RootStoreError {
         }
         false
     }
+    /// Find known preparation receipt metadata through every established error
+    /// wrapper. None means unknown, never rollback; historical receipts grant no
+    /// approval. No IO or implicit retry occurs.
+    pub fn recorded_preparation(&self) -> Option<(&str, i64)> {
+        let mut pending: Vec<&(dyn Error + 'static)> = vec![self];
+        let mut seen: Vec<*const dyn Error> = vec![];
+        let mut recorded: Option<(&str, i64)> = None;
+        while let Some(error) = pending.pop() {
+            let pointer = error as *const dyn Error;
+            if seen.iter().any(|prior| std::ptr::eq(*prior, pointer)) {
+                continue;
+            }
+            seen.push(pointer);
+            if let Some(Self::PreparationRecorded { id: work, revision, .. }) = error.downcast_ref::<Self>() {
+                match recorded.as_mut() {
+                    Some((known, latest)) if *known == work.as_str() => {
+                        *latest = (*latest).max(*revision);
+                    }
+                    None => recorded = Some((work.as_str(), *revision)),
+                    _ => {}
+                }
+            }
+            for (_, child) in crate::native_error_links(error).children.into_iter().rev() {
+                pending.push(child);
+            }
+        }
+        recorded
+    }
     /// Inspect all typed causes for known recorded Work metadata without IO.
     /// Keep the first known Work identity and its greatest explicitly recorded
     /// revision, including nested launch/custom-IO/cleanup causes. Revisions of
@@ -260,11 +299,32 @@ impl RootStoreError {
         }
         recorded
     }
+    /// Find known/uncertain trust publication across the common wrapper graph,
+    /// including custom IO and secondary cleanup causes. None means unknown,
+    /// never rollback; this performs no IO, retry or authority transition.
+    pub fn trust_publication(&self)->Option<&'static str>{
+        let mut pending:Vec<&(dyn Error+'static)>=vec![self];let mut seen:Vec<*const dyn Error>=vec![];
+        while let Some(error)=pending.pop(){let pointer=error as *const dyn Error;if seen.iter().any(|p|std::ptr::eq(*p,pointer)){continue}seen.push(pointer);
+            if let Some(Self::TrustPublished{publication,..})=error.downcast_ref::<Self>(){return Some(publication)}
+            for (_,child) in crate::native_error_links(error).children.into_iter().rev(){pending.push(child);}
+        }None
+    }
+    /// Recover the typed trust refusal for historical CLI status selection.
+    /// Walk every established wrapper without printing private cause strings.
+    pub fn trust_failure(&self)->Option<&crate::TrustError>{
+        let mut pending:Vec<&(dyn Error+'static)>=vec![self];let mut seen:Vec<*const dyn Error>=vec![];
+        while let Some(error)=pending.pop(){let pointer=error as *const dyn Error;if seen.iter().any(|p|std::ptr::eq(*p,pointer)){continue}seen.push(pointer);
+            if let Some(cause)=error.downcast_ref::<crate::TrustError>(){return Some(cause)}
+            for (_,child) in crate::native_error_links(error).children.into_iter().rev(){pending.push(child);}
+        }None
+    }
     /// Stable safe failure family for CLI/API consumers, without supplied data.
     /// Classification changes no state and does not imply rollback, termination
     /// or acceptance; inspect retained commit/cleanup variants when applicable.
     pub fn code(&self) -> &'static str {
         match self {
+            Self::Trust(e)=>e.code(),
+            Self::TrustPublished{..}=>"trust-state-preserved",
             Self::Schema(e) => e.code(),
             #[cfg(target_os = "linux")]
             Self::DatabaseIdentity(_) => "root-database-identity",
@@ -274,6 +334,8 @@ impl RootStoreError {
             Self::Providers(e) => e.code(),
             Self::Settings(e) => e.reason(),
             Self::Pricing(e) => e.code(),
+            Self::Preparation(e) => e.code(),
+            Self::PreparationRecorded { .. } => "preparation-state-preserved",
             Self::Agent(e) => e.code(),
             Self::Guard(e) => e.code(),
             Self::AgentStorageBusy { .. } => "agent-storage-busy",
@@ -339,6 +401,7 @@ impl fmt::Display for RootStoreError {
             Self::LifecycleRecorded { .. } => {
                 f.write_str("agent state recorded; cleanup failed; re-read before retrying")
             }
+            Self::PreparationRecorded { id, revision, .. } => write!(f,"preparation-state-preserved ({id}, revision {revision}); re-read the same event before retrying"),
             Self::WorkRecorded { work, revision, .. } => write!(f,"work state recorded ({work}, revision {revision}); operation refused or failed; re-read before retrying"),
             Self::Published { .. } => {
                 f.write_str("root-state-preserved; re-read recorded configuration before retrying")
@@ -372,6 +435,8 @@ impl Error for RootStoreError {
     /// does not establish successful rollback or a completed lifecycle effect.
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
+            Self::Trust(e)=>Some(e.as_ref()),
+            Self::TrustPublished{primary,..}=>Some(primary.as_ref()),
             Self::Schema(e) => Some(e.as_ref()),
             #[cfg(target_os = "linux")]
             Self::DatabaseIdentity(e) => Some(e.as_ref()),
@@ -382,6 +447,8 @@ impl Error for RootStoreError {
             Self::Sql(e) => Some(e),
             Self::Settings(e) => Some(e),
             Self::Pricing(e) => Some(e),
+            Self::Preparation(e) => Some(e.as_ref()),
+            Self::PreparationRecorded { primary, .. } => Some(primary.as_ref()),
             Self::Agent(e) => Some(e),
             Self::Guard(e) => Some(e),
             Self::AgentStorageBusy { cause, .. } => Some(cause.as_ref()),
@@ -523,15 +590,29 @@ pub(crate) fn observe_instance(db: &Connection, directory: &LocalDirectory)
     })();
     finished(result, database.close().map_err(database_identity_error))
 }
-/// Establish the explicit bootstrap busy policy before the first diagnostic SQL.
-/// This applies only to a freshly opened connection; later instance observations
-/// must preserve the effective persisted Admin policy. Failures retain their
-/// original SQL/identity causes; the connection owner owes checked cleanup.
+/// Read operator values through the owned directory, without SQL. Only genuine
+/// absence uses initialization defaults/legacy import. Invalid settings and
+/// storage/close failures retain their causes; no binding or right follows.
+#[cfg(target_os = "linux")]
+fn opening_values(directory: &LocalDirectory) -> Result<EngineSettingsValues, RootStoreError> {
+    match directory.read(SETTINGS) {
+        Ok(raw) => Ok(EngineSettingsDocument::decode(&raw)
+            .map_err(RootStoreError::Settings)?.values),
+        Err(error) if absent(&error) => initial_values(directory),
+        Err(error) => Err(RootStoreError::Storage(error)),
+    }
+}
+/// Apply the saved timeout before the first identity SELECT, using only the
+/// already-owned settings directory. Initialization uses the same validated
+/// defaults as open_mode. No rights follow; SQL/format/storage/close causes
+/// survive. Later observations preserve policy; caller closes the connection.
 #[cfg(target_os = "linux")]
 fn bootstrap_instance(db: &Connection, directory: &LocalDirectory)
     -> Result<RootInstanceIdentity, RootStoreError>
 {
-    db.busy_timeout(Duration::ZERO).map_err(RootStoreError::Sql)?;
+    let values = opening_values(directory)?;
+    db.busy_timeout(Duration::from_millis(values.storage_busy_timeout_ms.0 as u64))
+        .map_err(RootStoreError::Sql)?;
     observe_instance(db, directory)
 }
 // Component qualification only. Production gates retain their historical wire
@@ -1602,16 +1683,16 @@ impl RootStore {
             decision_applied: false,
         })
     }
-    /// Read the current validated saved document/history under a shared local
-    /// reservation, preserving read/release causes. No default adoption, mutation,
-    /// network application or identity grant; saved values are not active state.
+    /// Read validated saved settings/history under the shared reservation and
+    /// the existing saved storage contention budget/delay. Only a clean lock
+    /// conflict retries before reading; zero retries refuses immediately with
+    /// its typed cause/budget, null may wait indefinitely. Release, malformed
+    /// policy and compound failures do not retry. No default adoption, history
+    /// mutation, mission/provider retry or authority grant; saved is not active.
     pub fn settings(&self) -> Result<EngineSettingsDocument, RootStoreError> {
-        let reservation = self
-            .directory
-            .reserve(false, false)
-            .map_err(RootStoreError::Storage)?;
-        let result = self.read_settings();
-        finished(result, reservation.close().map_err(RootStoreError::Storage))
+        crate::agent_storage_retry::execute_borrowed(
+            &self.db, &self.directory, false, |_, settings| Ok(settings.clone()),
+        )
     }
     /// Read this root's validated saved settings without adopting defaults.
     /// Owned-directory IO, syntax/history/policy errors retain typed causes.
@@ -3310,6 +3391,20 @@ mod bootstrap_busy_tests {
     #[test]
     fn root_bootstrap_clears_constructor_handler_before_identity_sql() {
         let fixture = Fixture::new();
+        // Zero is now an explicit saved operator input for this refusal case,
+        // rather than an unconditional bootstrap policy hidden in production.
+        let store = RootStore::open(&fixture.0, true).unwrap();
+        let document = store.settings().unwrap();
+        let mut values = document.values.clone();
+        values.storage_busy_timeout_ms = SettingCount(0);
+        let mut change = EngineSettingsChange {
+            schema_version: document.schema_version, event_id:"zero-bootstrap-fixture".into(),
+            expected_revision:document.revision, values,
+            reason:"Explicit zero-timeout contention witness".into(), preview_token:String::new(),
+        };
+        change.preview_token = store.preview_settings(&change).unwrap().preview_token;
+        store.apply_settings(&change, &mut crate::SystemEnvironment).unwrap();
+        store.close().unwrap();
         let path = fixture.0.join(".swarm/state.db");
         let directory = LocalDirectory::open(&fixture.0.join(".swarm")).unwrap();
         let db = Connection::open_with_flags(&path,
@@ -3368,6 +3463,36 @@ mod bootstrap_busy_tests {
         assert_eq!(timeout(), 173);
         binding.close().unwrap();
         store.close().unwrap();
+    }
+
+    /// Cold first-SQL identity capture must consume the saved operator timeout,
+    /// not only restore it after capture. Values are fixture inputs, not policy.
+    #[test]
+    fn root_bootstrap_consumes_saved_timeout_at_first_sql() {
+        let fixture = Fixture::new();
+        let store = RootStore::open(&fixture.0, true).unwrap();
+        let document = store.settings().unwrap();
+        let mut values = document.values.clone();
+        values.storage_busy_timeout_ms = SettingCount(173);
+        let mut change = EngineSettingsChange {
+            schema_version: document.schema_version,
+            event_id: "cold-bootstrap-timeout".into(),
+            expected_revision: document.revision,
+            values,
+            reason: "Verify saved policy before first identity SELECT".into(),
+            preview_token: String::new(),
+        };
+        change.preview_token = store.preview_settings(&change).unwrap().preview_token;
+        store.apply_settings(&change, &mut crate::SystemEnvironment).unwrap();
+        store.close().unwrap();
+        let directory = LocalDirectory::open(&fixture.0.join(".swarm")).unwrap();
+        let db = Connection::open_with_flags(fixture.0.join(".swarm/state.db"),
+            OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_NOFOLLOW
+            | OpenFlags::SQLITE_OPEN_NO_MUTEX).unwrap();
+        bootstrap_instance(&db, &directory).unwrap();
+        assert_eq!(db.query_row("PRAGMA busy_timeout", [], |r| r.get::<_, i64>(0)).unwrap(),173);
+        db.close().unwrap();
+        directory.close().unwrap();
     }
 }
 
@@ -3445,3 +3570,16 @@ mod interruption_scope_tests {
         assert!(root.interruption.is_none());root.close().unwrap();std::fs::remove_dir_all(path).unwrap();
     }
 }
+
+pub(crate) mod preparation_read;
+#[cfg(target_os = "linux")]
+mod preparation_source;
+#[cfg(target_os = "linux")]
+mod preparation_methods;
+pub use preparation_read::{PreparationReadError, PreparationReadObservation, PreparationList};
+
+mod budget_history;
+pub use budget_history::{HistoricalBudgetView, HistoricalBudgetShow, HistoricalBudgetPreview};
+
+#[cfg(target_os = "linux")]
+mod preparation_write;

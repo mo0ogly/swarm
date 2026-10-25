@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "preparation-writes-rust",
+  "inputs": [
+    ".cargo/config.toml",
+    "docs/RUNTIME-RECOVERY.md",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUNTIME-RECOVERY.md",
+    "docs/en/RUST-MIGRATION.md",
+    "docs/plans/migration-rust/PREPARATION-WRITES-20261025.md",
+    "frontend/engine-settings/admin.js",
+    "locales/en.json",
+    "rust/Cargo.lock",
+    "rust/Cargo.toml",
+    "rust/crates/*/Cargo.toml",
+    "rust/crates/swarm-cli/src/budget_history.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/config/engine-settings*.json",
+    "rust/crates/swarm-engine/src/engine_settings*.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/root_store/budget_history.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_*.rs",
+    "rust/crates/swarm-engine/tests/preparation_writes.rs",
+    "rust/crates/swarm-web/src/service*.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "tests/helpers/engine_settings_admin_state.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_budget_history.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_preparation*.py",
+    "tests/rust_preparation_admin_ui.cjs",
+    "tests/rust_preparation_reads.py",
+    "version_history.json",
+    "web/i18n-en.js"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/preparation-writes-tests",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0"
+  },
+  "steps": [
+    {
+      "id": "public-preparation-writes",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-writes-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_writes.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_WRITES_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_WRITES_PASS",
+        "PASS api-writes-shared-store",
+        "PASS output-failure-known-receipt"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "historical-preparation-key-contract",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-keys-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_keys.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_KEYS_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_KEYS_PASS",
+        "PASS preparation-key-128"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "atomic-retained-root-refusal-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "preparation_writes"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "preparation_child_insert_failure_rolls_back_and_same_event_recovers ... ok",
+        "2 passed; 0 failed;",
+        "preparation_current_receipt_content_must_match_stored_state ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

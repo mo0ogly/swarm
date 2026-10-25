@@ -40,6 +40,7 @@ fn kind(action: Option<&str>) -> Result<&'static str, E> {
         Some("renew") => Ok("planning.renew"),
         Some("pause") => Ok("planning.pause"),
         Some("resume") => Ok("planning.resume"),
+        Some("reject-instructions") => Ok("planning.reject-instructions"),
         _ => Err(E::Refused("web-operation-unported")),
     }
 }
@@ -48,7 +49,7 @@ fn kind(action: Option<&str>) -> Result<&'static str, E> {
 /// particular Work or platform. Root still validates policy, ownership, schema
 /// and current state; no model launch or managed preview is promised.
 /// Allocation is proportional to this fixed protocol vocabulary, with no IO.
-pub(super) fn capabilities() -> [&'static str; 9] {
+pub(super) fn capabilities() -> [&'static str; 10] {
     [
         "show",
         "enable",
@@ -59,6 +60,7 @@ pub(super) fn capabilities() -> [&'static str; 9] {
         "renew",
         "pause",
         "resume",
+        "reject-instructions",
     ]
 }
 
@@ -104,7 +106,7 @@ impl NativeHttpService {
                 store.read_work(&query.work).map_err(|e| root("read", e))?
             };
             let bytes = swarm_engine::encode_model(&work).map_err(E::Model)?;
-            Ok(RouteBody { observation_causes: Vec::new(),
+            Ok(RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
                 bytes,
                 recorded_work: recorded.clone(),
                 configuration_recorded: false,

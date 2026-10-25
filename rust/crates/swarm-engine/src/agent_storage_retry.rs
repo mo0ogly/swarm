@@ -441,6 +441,8 @@ mod tests {
     /// older schema. Valid callback precedes real exclusive-lock injection. Zero/one saved
     /// retries mean one/two acquisition attempts, no callback while blocked;
     /// checked lock release recovers without sleeps or a global test watchdog.
+    /// The public settings reader must use that same saved budget and recover
+    /// without changing settings/history; a raw immediate EAGAIN is insufficient.
     #[test]
     fn real_settings_lock_budget_refuses_without_callback_then_recovers() {
         use std::{fs, os::unix::fs::DirBuilderExt};
@@ -474,6 +476,8 @@ mod tests {
             })
             .unwrap();
             assert_eq!(calls, 1);
+            let reader = RootStore::open(&root, false).unwrap();
+            let settings_witness = reader.settings().unwrap();
             let lock = directory.reserve(true, false).unwrap();
             calls = 0;
             let result = fixture_execute(borrowed, &mut db, &directory, false, |_, _| {
@@ -490,6 +494,13 @@ mod tests {
                 e => panic!("wrong refusal: {e}"),
             };
             assert_eq!(calls, 0);
+            match reader.settings().unwrap_err() {
+                RootStoreError::AgentStorageBusy { cause, attempts, .. } => {
+                    assert_eq!(attempts, retries as u64 + 1);
+                    assert!(matches!(*cause, RootStoreError::Storage(ref e) if lock_busy(e)));
+                }
+                e => panic!("public settings reader ignored saved lock policy: {e}"),
+            }
             lock.close().unwrap();
             fixture_execute(borrowed, &mut db, &directory, false, |_, _| {
                 calls += 1;
@@ -497,6 +508,8 @@ mod tests {
             })
             .unwrap();
             assert_eq!(calls, 1);
+            assert_eq!(reader.settings().unwrap(), settings_witness);
+            reader.close().unwrap();
             db.close().unwrap();
             directory.close().unwrap();
             fs::remove_dir_all(root).unwrap();

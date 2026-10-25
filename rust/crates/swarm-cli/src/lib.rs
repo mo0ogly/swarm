@@ -6,10 +6,12 @@ use std::{
     io::{self, Write},
 };
 use swarm_enrollment_bootstrap as bootstrap;
-const USAGE:&str="swarm-rust init --root ROOT | work list --json --root ROOT | work show ID | resume ID | planning show|enable|claim|lease-renew|decide|judge|renew|pause|resume ID | mission show|order|queue|priority|start|resume|pause|unpause|stop ID --input FILE | mission watch|status ID | mission status-native ID --json | costs show ID | budget apply ID --input FILE | task add|update|submit|validation-preview ID --input FILE | task-model show|preview|apply ID | providers config show|init|inspect|backups|preview|apply --root ROOT [--input FILE] | providers policies export|preview|apply --root ROOT [--input FILE] | pricing list|save|estimate --input FILE | engine-settings show|preview|apply|model-check --root ROOT [--input FILE] | admin-budget show|preview|apply --root ROOT [--input FILE] | identity bootstrap-check SHA256 --input FILE";
-const HELP_FR:&str="swarm-rust — développement : migration partielle\nCommandes disponibles :\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget apply ID --root ROOT --input FILE [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|validation-preview|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity bootstrap-check EMPREINTE_SHA256 --input FILE [--json]\nLangue : --lang fr|en. init initialise sans service ; web lance l’API native de développement.\nMigration partielle : seules les commandes Rust listées sont actuellement disponibles.\n";
-const HELP_EN:&str="swarm-rust — development: partial migration\nAvailable commands:\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget apply ID --root ROOT --input FILE [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|validation-preview|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]\nLanguage: --lang fr|en. init starts no service; web starts the native development API.\nPartial migration: only the listed Rust commands are currently available.\n";
+const USAGE:&str="swarm-rust init --root ROOT | work list --json --root ROOT | work show ID | resume ID | planning show|enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions ID | mission show|order|queue|priority|start|resume|pause|unpause|stop ID --input FILE | mission watch|status|changes|spending ID | mission status-native ID --json | costs show ID | budget show|preview|apply ID [--input FILE] | task add|update|submit|validation-preview|validation-candidate ID --input FILE | task-model show|preview|apply ID | providers config show|init|inspect|backups|preview|apply --root ROOT [--input FILE] | providers policies export|preview|apply --root ROOT [--input FILE] | pricing list|save|estimate --input FILE | engine-settings show|preview|apply|model-check --root ROOT [--input FILE] | admin-budget show|preview|apply --root ROOT [--input FILE] | identity bootstrap-check SHA256 --input FILE";
+const HELP_FR:&str="swarm-rust — développement : migration partielle\nCommandes disponibles :\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify --root RACINE [--input FICHIER|-]\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust prepare create|save [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods --root ROOT [--json]\n  swarm-rust prepare show ID --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity bootstrap-check EMPREINTE_SHA256 --input FILE [--json]\nLangue : --lang fr|en. init initialise sans service ; web lance l’API native de développement.\nMigration partielle : seules les commandes Rust listées sont actuellement disponibles.\n";
+const HELP_EN:&str="swarm-rust — development: partial migration\nAvailable commands:\n  swarm-rust trust show|config-preview|config-apply|mandate-create|request|approve|commit|reconcile|export|anchor|verify --root ROOT [--input FILE|-]\n  swarm-rust version [--json] [--root ROOT]\n  swarm-rust --version [--json]\n  swarm-rust init --root ROOT [--json]\n  swarm-rust web [ADDRESS] --root ROOT [--json]\n  swarm-rust prepare create|save [ID] --root ROOT --input FILE [--json]\n  swarm-rust prepare list|methods --root ROOT [--json]\n  swarm-rust prepare show ID --root ROOT [--json]\n  swarm-rust prepare history ID besoin|brief|plan [BEFORE] --root ROOT [--json]\n  swarm-rust work list --root ROOT [--json]\n  swarm-rust work show ID --root ROOT [--json]\n  swarm-rust resume ID --root ROOT [--json]\n  swarm-rust planning show ID --root ROOT\n  swarm-rust costs show ID --root ROOT [--json]\n  swarm-rust budget show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust pricing list|save|estimate --root ROOT [--input FILE] [--json]\n  swarm-rust providers config show --root ROOT [--json]\n  swarm-rust providers config init --root ROOT --input FILE [--json]\n  swarm-rust providers config inspect [SNAPSHOT] --root ROOT [--json]\n  swarm-rust providers policies export|preview|apply --root ROOT [--input FILE] --json\n  swarm-rust providers config backups --root ROOT [--json]\n  swarm-rust providers config preview|apply --root ROOT --input FILE [--json]\n  swarm-rust task review-reconcile|review-retire-stale REVIEW_ID --root ROOT [--json]\n  swarm-rust task review|review-preview|review-inputs|validation-preview|validation-candidate|validate|validation-reconcile|validation-retire ID --root ROOT --input FILE [--json]\n  swarm-rust agent run ID --root ROOT [--json]\n  swarm-rust agent show|stop|reconcile ID --root ROOT [--json]\n  swarm-rust agent logs ID [AFTER] --root ROOT [--json] [--output FILE]\n  swarm-rust agent preview|prepare WORK --root ROOT --input FILE [--json]\n  swarm-rust agent guard ID --root ROOT --input FILE [--json]\n  swarm-rust agent limits WORK ROLE TASK --root ROOT --input FILE [--json]\n  swarm-rust planning enable|claim|lease-renew|decide|judge|renew|pause|resume|reject-instructions|call-preview|run ID --root ROOT --input FILE\n  swarm-rust planning step WORK --root ROOT [--json]\n  swarm-rust planning reconcile CLAIM --root ROOT [--json]\n  swarm-rust work create|update [ID] --root ROOT --input FILE [--json]\n  swarm-rust task add|update|submit ID --root ROOT --input FILE [--json]\n  swarm-rust quotas show|preview|apply ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission show|order|queue|priority|start|resume|pause|unpause|stop ID --root ROOT [--input FILE] [--json]\n  swarm-rust mission watch ID --root ROOT [--json]\n  swarm-rust mission changes|spending ID --root ROOT [--json]\n  swarm-rust mission status ID --root ROOT [--json]\n  swarm-rust mission status-native ID --root ROOT --json\n  swarm-rust task-model show|preview|apply ID --root ROOT [--input FILE] --json\n  swarm-rust ooda|checkpoint ID --root ROOT --input FILE [--json]\n  swarm-rust gate ID --root ROOT --input FILE [--task TASK] [--json]\n  swarm-rust project-context ROLE --root ROOT [--json]\n  swarm-rust agent-workflow ROLE --root ROOT [--json]\n  swarm-rust planning-output check --root ROOT --input FILE [--json]\n  swarm-rust planning-report --root ROOT --input FILE [--json]\n  swarm-rust evaluate --root ROOT --input FILE [--phase entry|validation|delivery|audit] [--json]\n  swarm-rust admin-budget show|preview|apply --root ROOT [--input FILE] [--json]\n  swarm-rust engine-settings show|describe|quality-profile --root ROOT [--json]\n  swarm-rust engine-settings preview|apply|model-check --root ROOT --input FILE [--json]\n  swarm-rust identity bootstrap-check SHA256_DIGEST --input FILE [--json]\nLanguage: --lang fr|en. init starts no service; web starts the native development API.\nPartial migration: only the listed Rust commands are currently available.\n";
 pub enum CliError {
+    Trust(Box<swarm_engine::TrustError>),
+    TrustPublication { primary:Box<Self>, publication: &'static str },
     AgentExecutionPreserved {
         primary: Box<Self>,
         english: bool,
@@ -70,6 +72,8 @@ pub enum CliError {
     Root(Box<swarm_engine::RootStoreError>),
     Evaluation(Box<swarm_engine::GateEvaluationError>),
     SettingsInput(serde_json::Error),
+    /// Offline PAEA data failure, with no opened Root or effect authority.
+    Protection(swarm_protection_contract::Error),
     Input(io::Error),
     CommandInput(swarm_engine::CommandInputError),
     RootCleanup {
@@ -143,6 +147,17 @@ impl CliError {
         }
         causes
     }
+    /// Recover retained trust outcome through all supported error wrappers.
+    fn trust_publication(&self)->Option<&'static str>{self.typed_causes().into_iter().find_map(|e|{if let Some(Self::TrustPublication{publication,..})=e.downcast_ref::<Self>(){Some(*publication)}else{e.downcast_ref::<swarm_engine::RootStoreError>().and_then(|e|e.trust_publication())}})}
+    /// Find known preparation receipts through CLI/Root/IO cleanup wrappers.
+    /// No reread or retry occurs; historical revision is not current authority.
+    fn recorded_preparation(&self)->Option<(&str,i64)>{
+        for error in self.typed_causes(){
+            if let Some(root)=error.downcast_ref::<swarm_engine::RootStoreError>(){if let Some(receipt)=root.recorded_preparation(){return Some(receipt);}}
+            #[cfg(target_os="linux")]
+            if let Some(web)=error.downcast_ref::<swarm_web::HttpServiceError>(){if let Some(receipt)=web.recorded_preparation(){return Some(receipt);}}
+        }None
+    }
     /// Recover known Work metadata from explicit CLI state-preservation wrappers
     /// and typed Root/native outcomes, including nested cleanup failures. Never
     /// parse human messages or infer revision from an output error. None means
@@ -193,6 +208,8 @@ impl CliError {
         match self {
             Self::OutputFile { primary, close, .. } => primary.as_ref().or(close.as_ref()).map_or("command_failed", |e| e.code()),
             Self::Output(e) if e.raw_os_error() == Some(28) => "storage_unavailable",
+            Self::Trust(e)=>e.code(),
+            Self::TrustPublication{primary,..}=>primary.code(),
             Self::Root(e) => e.code(),
             #[cfg(target_os = "linux")]
             Self::NativeWeb { cause, .. } => cause.code(),
@@ -212,6 +229,7 @@ impl CliError {
             Self::StatePreserved { primary, .. } => primary.code(),
             Self::Evaluation(e) => e.code(),
             Self::SettingsInput(_) => "settings-request-invalid",
+            Self::Protection(e) => e.code(),
             Self::Input(_) => "input-unavailable",
             Self::CommandInput(e) => e.code(),
             Self::RootCleanup { .. } => "root-cleanup",
@@ -257,6 +275,8 @@ impl CliError {
                 "path" => "enrollment bootstrap: protected service-owned storage required".into(),
                 _ => e.to_string(),
             },
+            Self::Trust(e)=>e.to_string(),
+            Self::TrustPublication{primary,publication}=>format!("trust publication {publication}; inspect recorded state: {primary}"),
             Self::Root(e) => e.to_string(),
             #[cfg(target_os="linux")]
             Self::NativeWeb{cause,english}=>if *english{format!("Native HTTP API stopped or refused ({}); inspect saved state before replay.",cause.code())}else{format!("API HTTP native arrêtée ou refusée ({}) ; vérifier l’état sauvegardé avant rejeu.",cause.code())},
@@ -268,6 +288,7 @@ impl CliError {
             } else {format!("Travail {work} révision {revision} enregistré ; échec de fiche/sortie : {primary}. Vérifier l’état enregistré avant de relancer la mutation.")},
             Self::Evaluation(e) => e.to_string(),
             Self::SettingsInput(_) => "engine settings: invalid request document".into(),
+            Self::Protection(e) => e.to_string(),
             Self::Input(e) => format!("input failed ({:?}, errno {:?})",e.kind(),e.raw_os_error()),
             Self::CommandInput(e)=>e.to_string(),
             Self::RootCleanup{..}=>"root cleanup failed; inspect the current state before recovery".into(),
@@ -293,6 +314,8 @@ impl std::error::Error for CliError {
             Self::AgentExecutionPreserved { primary, .. } => Some(primary.as_ref()),
             Self::AgentLaunchPreserved { primary, .. } => Some(primary.as_ref()),
             Self::Bootstrap(e) => Some(e),
+            Self::Trust(e)=>Some(e.as_ref()),
+            Self::TrustPublication{primary,..}=>Some(primary.as_ref()),
             Self::Root(e) => Some(e.as_ref()),
             #[cfg(target_os = "linux")]
             Self::NativeWeb { cause, .. } => Some(cause.as_ref()),
@@ -305,6 +328,7 @@ impl std::error::Error for CliError {
             Self::TaskValidationStatePreserved { primary, .. } => Some(primary.as_ref()),
             Self::Evaluation(e) => Some(e.as_ref()),
             Self::SettingsInput(e) => Some(e),
+            Self::Protection(e) => Some(e),
             Self::Input(e) => Some(e),
             Self::CommandInput(e) => Some(e),
             Self::RootCleanup { primary, .. } => Some(primary.as_ref()),
@@ -429,6 +453,8 @@ fn parse(args: &[String], environment_language: &str) -> Result<Arguments, CliEr
     Ok(result)
 }
 mod version;
+mod trust;
+mod protection;
 mod agent;
 mod agent_logs;
 #[cfg(target_os = "linux")]
@@ -483,9 +509,16 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
                 HELP_FR.as_bytes()
             },
         )?;
+        write_output(out, if a.language == "en" {
+            b"  swarm-rust protection canonicalize --input FILE|- --json (offline data only; no authority)\n  swarm-rust protection compare BEFORE AFTER --json (two files; no authority)\n  swarm-rust protection check-receipt ACTION RECEIPT SINK PREVIOUS_STATE --json (two files; no authenticity or effect established)\n  swarm-rust protection receipt-report ACTION RECEIPT SINK PREVIOUS_STATE --json (schema v2; exact input hashes; no authenticity or effect established)\n"
+        } else {
+            b"  swarm-rust protection canonicalize --input FICHIER|- --json (donnees hors ligne ; aucun droit)\n  swarm-rust protection compare AVANT APRES --json (deux fichiers ; aucun droit)\n  swarm-rust protection check-receipt ACTION RECU SERVICE ETAT_PRECEDENT --json (deux fichiers ; authenticite et effet non etablis)\n  swarm-rust protection receipt-report ACTION RECU SERVICE ETAT_PRECEDENT --json (schema v2 ; empreintes des entrees ; authenticite et effet non etablis)\n"
+        })?;
         return Ok(0);
     }
     if a.pos[0] == "version" { return version::execute(a,out); }
+    #[cfg(target_os = "linux")]
+    if a.pos[0] == "prepare" { return preparation::execute(a,out); }
     #[cfg(target_os = "linux")]
     if a.pos[0] == "web" {
         return native_web::execute(a, out);
@@ -550,12 +583,13 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
     if a.pos[0] == "planning-output" {
         return execute_planning_output(a, out);
     }
+    if a.pos[0] == "budget" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), "show" | "preview")) { return budget_history::execute(a,out); }
     if matches!(a.pos[0].as_str(), "planning" | "budget") {
         return execute_control(a, out);
     }
     #[cfg(target_os = "linux")]
     if a.pos[0]=="task" && a.pos.get(1).is_some_and(|v|matches!(v.as_str(),"review"|"review-reconcile"|"review-retire-stale")) {return task_review::execute(a,out);}
-    if a.pos[0] == "task" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), "review-preview" | "review-inputs" | "validation-preview" | "validate" | "validation-reconcile" | "validation-retire")) {
+    if a.pos[0] == "task" && a.pos.get(1).is_some_and(|v| matches!(v.as_str(), "review-preview" | "review-inputs" | "validation-preview" | "validation-candidate" | "validate" | "validation-reconcile" | "validation-retire")) {
         return task_validation::execute(a, out);
     }
     if matches!(
@@ -630,6 +664,8 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
         write_output(out, &observed)?;
         return Ok(0);
     }
+    if a.pos[0] == "trust" { return trust::execute(a,out); }
+    if a.pos[0] == "protection" { return protection::execute(a,out); }
     if a.pos[0] == "evaluate" {
         return execute_evaluation(a, out);
     }
@@ -881,7 +917,9 @@ fn execute_planning_call_preview(a: &Arguments, out: &mut dyn Write) -> Result<u
 fn execute_planning_call_preview(_: &Arguments, _: &mut dyn Write) -> Result<u8, CliError> {
     Err(CliError::Unsupported)
 }
-/// Execute native planning show/enable/claim/lease-renew/decide/judge/renew/pause/resume or budget apply as Work JSON.
+/// Execute supported planning controls, including unused-instruction rejection,
+/// or budget apply as Work JSON. Operator rejection retains event/revision replay
+/// and active-task guards; response/close/flush failure preserves known publication.
 /// Enable records provider/reviewer metadata without a process. Repository flows
 /// remain unported; native verdict/retry/protocol decisions use Root proof. Bounded input goes to
 /// RootStore's atomic policy/event/revision/replay contract; submitted actor/time
@@ -919,6 +957,7 @@ fn execute_control(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
             "renew" => Some("planning.renew"),
             "pause" => Some("planning.pause"),
             "resume" => Some("planning.resume"),
+            "reject-instructions" => Some("planning.reject-instructions"),
             _ => {
                 return Err(CliError::PlanningUnsupported {
                     english: a.language == "en",
@@ -1489,7 +1528,8 @@ fn safe_causes(error: &(dyn std::error::Error + 'static)) -> Vec<String> {
 }
 /// Write a plain or JSON failure and explicitly flush the diagnostic stream.
 /// Parser/language failures remain plain; JSON projects only classified causes.
-/// Returns failure exit2 with both the original error and any encode/write/flush
+/// Returns the protocol failure exit (preparation conflicts3, disabled4, unknown
+/// method5; other ordinary failures2), with the original and any encode/write/flush
 /// error, so a failed diagnostic cannot hide a recorded state or authorize retry.
 /// Render a nonzero CLI failure with safe typed causes and known Work metadata
 /// on every platform, independently of web-specific fields. Unknown effects are
@@ -1521,9 +1561,11 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
     } else { error.message() };
     let bytes = if as_json {
         let mut document = serde_json::json!({"schema_version":1,"error":message,"failure":Failure{code:error.code(),message:&message,retryable:false,causes:safe_causes(&error)}});
+        if let Some(publication)=error.trust_publication(){document["trust_publication"]=serde_json::json!(publication);document["trust_state_may_be_recorded"]=serde_json::json!(true);}
         if let Some((id, revision)) = error.recorded_work() {
             document["recorded_work"] = serde_json::json!({"id":id,"revision":revision});
         }
+        if let Some((id,revision))=error.recorded_preparation(){document["recorded_preparation"]=serde_json::json!({"id":id,"revision":revision});}
         #[cfg(target_os = "linux")]
         native_web::details(&error, &mut document);
         json_bytes(&document)
@@ -1542,8 +1584,9 @@ fn report(error: CliError, json_mode: bool, english: bool, err: &mut dyn Write) 
         Ok(bytes) => err.write_all(&bytes).and_then(|()| err.flush()).err(),
         Err(e) => Some(e),
     };
+    let code=if error.typed_causes().iter().any(|e|e.is::<swarm_engine::TrustError>()){match error.code(){"authorization_required"=>4,"revision_conflict"|"event_conflict"|"idempotency_conflict"=>3,_=>2}}else{match error.code(){"preparation-event-conflict"|"preparation-revision-conflict"=>3,"preparation-write-disabled"=>4,"preparation-method-unavailable"=>5,_=>2}};
     RunOutcome {
-        code: 2,
+        code,
         error: Some(error),
         diagnostic_error,
     }
@@ -1908,3 +1951,8 @@ mod recorded_work_tests {
         assert!(!String::from_utf8(stderr).unwrap().contains("PRIVATE"));
     }
 }
+
+#[cfg(target_os = "linux")]
+mod preparation;
+
+mod budget_history;

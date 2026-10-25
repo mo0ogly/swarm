@@ -28,7 +28,7 @@ mod tests {
         }));
         let value=|w:&Work|serde_json::to_value(contract(w,w.planning.as_ref().unwrap().scopes.as_ref().unwrap().iter().find(|s|s.id=="child").unwrap()).unwrap()).unwrap();
         let before=value(&f.work);
-        assert_eq!(before["repository"],serde_json::json!({"candidate_commit":"a".repeat(40),"project_subdir":"subproject","operations":["delegate","task"]}));
+        assert_eq!(before["repository"],serde_json::json!({"candidate_commit":"a".repeat(40),"project_subdir":"subproject","operations":["delegate","task","revise-instructions"]}));
         assert!(!serde_json::to_string(&before).unwrap().contains("PRIVATE_SOURCE"));
         assert!(!serde_json::to_string(&before).unwrap().contains("PRIVATE_STORAGE"));
         f.work.planning.as_mut().unwrap().repository.as_mut().unwrap().candidate_commit="b".repeat(40);
@@ -416,7 +416,7 @@ struct Task<'a> {
 pub(crate) struct Repository<'a> {
     candidate_commit: &'a str,
     project_subdir: &'a str,
-    operations: [&'static str;2],
+    operations: [&'static str;3],
 }
 
 /// Canonical scoped context omits unrelated scope details and the full Work.
@@ -524,7 +524,7 @@ pub(crate) fn contract<'a>(
         }
     }
     Ok(ScopeContract {
-        repository:work.planning.as_deref().and_then(|p|p.repository.as_deref()).map(|r|Repository{candidate_commit:&r.candidate_commit,project_subdir:&r.project_subdir,operations:["delegate","task"]}),
+        repository:work.planning.as_deref().and_then(|p|p.repository.as_deref()).map(|r|Repository{candidate_commit:&r.candidate_commit,project_subdir:&r.project_subdir,operations:["delegate","task","revise-instructions"]}),
         judge: if scope.id == "root" { work.planning.as_deref().and_then(|p| p.judge.as_deref()) } else { None },
         work: &work.id,
         scope: Scope {

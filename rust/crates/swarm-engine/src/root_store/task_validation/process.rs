@@ -48,7 +48,8 @@ fn owner(job: &Job) -> Result<(), E> {
 /// relevant execution-policy generation and planning-control epoch bind authority.
 /// This starts no command and grants no permission; sequential file reads are
 /// not a filesystem snapshot or protection from a malicious same-UID writer.
-pub(super) fn source(store: &RootStore, job: &Job) -> Result<Prepared, E> {
+pub(super) fn source(store: &RootStore, job: &Job, managed: Option<&super::managed_execution::Session>) -> Result<Prepared, E> {
+    if let Some(session) = managed { session.observe(&store.root)?; }
     let launch = |e| E::Launch(Box::new(e));
     let lock = store.directory.reserve(false, false).map_err(E::Storage)?;
     let result = (|| {
@@ -68,11 +69,13 @@ pub(super) fn source(store: &RootStore, job: &Job) -> Result<Prepared, E> {
                 expected_revision: w.revision,
                 task_id: job.task_id.clone(),
             };
-            let p =
-                super::prepare(&tx, &store.root, &settings, &job.work_id, &r).map_err(launch)?;
+            let p = match managed {
+                Some(session) => super::managed_execution::prepare(&tx, &store.directory, &store.root, &settings, &job.work_id, &r, &session.data),
+                None => super::prepare(&tx, &store.root, &settings, &job.work_id, &r),
+            }.map_err(launch)?;
             let identity = store.directory.identity().map_err(E::Storage)?;
             super::mission_authority::observe(&tx,&store.directory,job,&w,&p.preview.producer_agent_id,&settings).map_err(launch)?;
-            if super::mission_authority::source(&tx,job,&p.preview.source_sha256).map_err(launch)? != job.source_sha256
+            if super::managed_execution::bound_source(&tx,job,&p.preview.source_sha256,p.managed.as_ref().map(|m| &m.candidate)).map_err(launch)? != job.source_sha256
                 || identity.0.to_string() != job.directory_device
                 || identity.1.to_string() != job.directory_inode
             {
@@ -87,7 +90,7 @@ pub(super) fn source(store: &RootStore, job: &Job) -> Result<Prepared, E> {
 /// Prepare exact policy argv for this actual registered helper and committed
 /// slot. Peer/parent PID, starttime, process group, host and source are checked
 /// before returning the command; the caller must close Root before exec.
-fn gate_command(store: &RootStore, id: &str, peer: i64) -> Result<Command, E> {
+fn gate_command(store: &RootStore, id: &str, peer: i64, managed: &mut Option<super::managed_execution::Session>) -> Result<Command, E> {
     let (job, step) = store::step(&store.db, id).map_err(|e| E::Launch(Box::new(e)))?;
     let current = crate::SupervisorIdentity::current()
         .map_err(|e| caused("task-validation-child-observation", e))?;
@@ -112,14 +115,9 @@ fn gate_command(store: &RootStore, id: &str, peer: i64) -> Result<Command, E> {
     {
         return Err(E::Refused("task-validation-gate-parent-or-group"));
     }
-    let prepared = source(store, &job)?;
-    let control = prepared
-        .policy
-        .controls
-        .as_deref()
-        .and_then(|c| usize::try_from(step.ordinal).ok().and_then(|i| c.get(i)))
-        .filter(|c| c.id == step.control_id)
-        .ok_or(E::Refused("task-validation-control-source-changed"))?;
+    *managed = super::managed_execution::for_helper(store, &job)?;
+    let prepared = source(store, &job, managed.as_ref())?;
+    let control = prepared.control(step.ordinal, &step.control_id).map_err(|e| E::Launch(Box::new(e)))?;
     let args = control
         .command
         .as_deref()
@@ -127,10 +125,17 @@ fn gate_command(store: &RootStore, id: &str, peer: i64) -> Result<Command, E> {
         .ok_or(E::Refused("task-validation-command-required"))?;
     let mut command = Command::new(&args[0]);
     command.args(&args[1..]);
-    command.current_dir(
-        crate::local_directory(&store.root, &control.dir)
+    command.current_dir(match managed.as_ref() {
+        Some(session) => {
+            // Verify physical containment first, then keep cwd holder-anchored
+            // through exec. Same-UID path mutation is not OS confinement.
+            crate::local_directory(&session.workspace(), &control.dir)
+                .map_err(|e| caused("task-validation-gate-directory", e))?;
+            session.workspace().join(&control.dir)
+        }
+        None => crate::local_directory(&store.root, &control.dir)
             .map_err(|e| caused("task-validation-gate-directory", e))?,
-    );
+    });
     command.stdin(Stdio::null());
     Ok(command)
 }
@@ -148,6 +153,7 @@ pub(super) fn execute_gate(root: &Path, id: &str) -> Result<Infallible, E> {
     let fd = rustix::io::fcntl_dupfd_cloexec(io::stdin(), 3)
         .map_err(|e| caused("task-validation-channel-duplicate", e))?;
     let mut channel = UnixStream::from(fd);
+    let mut managed = None;
     let operation: Result<Infallible, E> = (|| {
         channel
             .peer_addr()
@@ -168,11 +174,14 @@ pub(super) fn execute_gate(root: &Path, id: &str) -> Result<Infallible, E> {
         }
         let store = RootStore::open(root, false)?;
         let mut command = finished(
-            gate_command(&store, id, i64::from(peer.pid.as_raw_pid())),
+            gate_command(&store, id, i64::from(peer.pid.as_raw_pid()), &mut managed),
             store.close(),
         )?;
         Err(caused("task-validation-command-exec", command.exec()))
     })();
+    // The outer owner survives Root close and helper exec. On an exec/Root
+    // failure, preserve every candidate release cause before diagnostic output.
+    let operation = finished(operation, managed.map_or(Ok(()), |session| session.close()));
     let error = match operation {
         Ok(never) => match never {},
         Err(e) => e,
@@ -210,6 +219,7 @@ struct Control<'a> {
     store: &'a mut RootStore,
     job: &'a Job,
     lease: Option<&'a crate::MissionLease>,
+    managed: Option<&'a super::managed_execution::Session>,
     step: Step,
     channel: Option<UnixStream>,
     bytes: Vec<u8>,
@@ -265,7 +275,7 @@ impl Control<'_> {
             false,
             |db, settings| {
                 let committed = crate::agent_execution_store::transaction(db, |tx| {
-                    super::mission_authority::permission(tx,&self.store.directory,self.lease,self.job,&self.store.root,settings)?;
+                    super::mission_authority::permission(tx,&self.store.directory,self.lease,self.job,&self.store.root,settings,self.managed.map(|s| &s.data))?;
                     store::change_step(tx, &old, &new)
                 });
                 if committed.is_ok() {
@@ -284,7 +294,7 @@ impl OwnedProcessControl for Control<'_> {
     fn started(&mut self, pid: u32) -> io::Result<()> {
         (|| {
             owner(self.job)?;
-            source(self.store, self.job)?;
+            source(self.store, self.job, self.managed)?;
             let child = crate::observe_linux_process(pid)
                 .map_err(|e| caused("task-validation-child-observation", e))?;
             if i64::from(child.parent_pid()) != self.job.owner_pid
@@ -299,7 +309,7 @@ impl OwnedProcessControl for Control<'_> {
             registered.group_id = Some(i64::from(pid));
             registered.child_stamp = Some(child.process_stamp().into());
             self.transition(registered)?;
-            source(self.store, self.job)?;
+            source(self.store, self.job, self.managed)?;
             let mut permitted = self.step.clone();
             permitted.phase = StepPhase::Permitted;
             permitted.permission = 1;
@@ -366,7 +376,7 @@ impl OwnedProcessControl for Control<'_> {
                 self.next = after(now, self.policy.poll_interval_ms.0)?;
                 if !self.leader_done && self.interruption.is_none() {
                     if let Err(e) =
-                        owner(self.job).and_then(|_| source(self.store, self.job).map(|_| ()))
+                        owner(self.job).and_then(|_| source(self.store, self.job, self.managed).map(|_| ()))
                     {
                         self.interruption = Some(e);
                         self.kill = Some(after(now, self.policy.term_grace_ms.0)?);
@@ -393,18 +403,15 @@ pub(super) fn run(
     step: &Step,
     control: &crate::ValidationControl,
     lease: Option<&crate::MissionLease>,
+    managed: Option<&super::managed_execution::Session>,
 ) -> Result<Observation, E> {
     owner(job)?;
-    let prepared = source(store, job)?;
-    let actual = prepared
-        .policy
-        .controls
-        .as_deref()
-        .and_then(|c| usize::try_from(step.ordinal).ok().and_then(|i| c.get(i)));
+    if let Some(session) = managed { session.refresh(store, job)?; }
+    let prepared = source(store, job, managed)?;
+    let actual = prepared.control(step.ordinal, &step.control_id).map_err(|e| E::Launch(Box::new(e)))?;
     let (stored_job, stored_step) =
         store::step(&store.db, &step.id).map_err(|e| E::Launch(Box::new(e)))?;
-    if actual != Some(control)
-        || step.control_id != control.id
+    if actual != control
         || stored_job != *job
         || stored_step != *step
         || step.phase != StepPhase::Prepared
@@ -438,6 +445,7 @@ pub(super) fn run(
         store,
         job,
         lease,
+        managed,
         step: step.clone(),
         channel: Some(left),
         bytes: Vec::new(),
@@ -452,8 +460,9 @@ pub(super) fn run(
         interruption: None,
     };
     let mut reaped_status = None;
+    let control_root = managed.map(|s| s.workspace()).unwrap_or_else(|| root.clone());
     let mut result =
-        run_validation_control_using(&root, control, &settings, |_, deadline, output| {
+        run_validation_control_using(&control_root, control, &settings, |_, deadline, output| {
             let observed = run_controlled_command(
                 command,
                 Stdio::from(std::os::fd::OwnedFd::from(right)),

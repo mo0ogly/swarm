@@ -6,8 +6,9 @@
 //! diagnostics and docs report scans. Completed/submitted results reuse actual
 //! stored report paths without a scan. Completed/accepted history also consumes
 //! actual gate/dependency freshness; terminal completion never implies acceptance.
-//! Active/completed-outside-submitted-or-accepted/non-passed-review
-//! branches refuse. No SQL writes, provider, retry or policy is added.
+//! Ordinary completed/blocked results consume actual attribution or explicit
+//! incomplete-delivery absence. Ordinary abandonment retains terminal history
+//! without report/review consumption. Active/non-passed-review branches refuse. No SQL writes, provider, retry or policy is added.
 //! The initial/final Agent ownership checks reuse the retained-input reader's
 //! shared authoritative verifier. The public fixture tests here contain no Agent;
 //! they do not establish corrupt-Agent rejection or an Agent admission path.
@@ -64,8 +65,10 @@ impl RootStore {
     /// Accepted tasks with a completed or absent Agent consume actual freshness;
     /// stale evidence never becomes validated from the retained status alone.
     /// Earlier failed/interrupted/completed history remains visible. Active,
-    /// completed outside submitted/accepted, non-passed current-review and hierarchical/
-    /// managed branches refuse.
+    /// non-passed current-review and hierarchical/managed branches refuse.
+    /// Ordinary completed/blocked and abandoned history share the aggregate
+    /// admission/observation contract; their separate SDK qualification remains
+    /// distinct from public mission status journey evidence.
     /// Current gate/dependency/review evidence uses the existing freshness reader;
     /// known stale causes survive beyond the outer material guard in the
     /// nonserialized sidecar (or final error tree on late refusal), while unknown IO,

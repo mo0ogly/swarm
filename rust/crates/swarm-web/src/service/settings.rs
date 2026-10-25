@@ -100,7 +100,7 @@ impl NativeHttpService {
                         replayed,
                     });
                     swarm_engine::encode_model(&AppliedSettings { document, replayed })
-                        .map(|bytes| RouteBody { observation_causes: Vec::new(),
+                        .map(|bytes| RouteBody { preparation_receipt:None, trust_publication:None, observation_causes: Vec::new(),
                             bytes,
                             recorded_work: None,
                             configuration_recorded: true,

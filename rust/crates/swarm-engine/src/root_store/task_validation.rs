@@ -5,6 +5,12 @@ mod gate;
 mod journal;
 mod process;
 mod publication;
+mod managed_receipt;
+mod managed_execution;
+mod observation;
+use observation::{observe_submission, Observation, RepositoryPurpose};
+mod candidate_preparation;
+pub use candidate_preparation::TaskValidationCandidate;
 mod retirement;
 mod review_evidence;
 pub(super) use review_evidence::{recorded_evidence, recorded_evidence_for_review_result, recorded_evidence_for_prior_review};
@@ -13,6 +19,7 @@ mod runtime;
 mod mission_authority;
 mod source_authority;
 mod source_policy;
+mod source_origin;
 mod store;
 use super::{finished, RootStore, RootStoreError};
 use crate::{
@@ -90,6 +97,40 @@ struct Prepared {
     settings: crate::EngineSettingsDocument,
     original_policy: crate::ValidationPolicy,
     producer_delivery_version: i64,
+    managed: Option<managed_execution::Captured>,
+}
+impl Prepared {
+    /// Ordered transport IDs and original normalized control contracts. Managed
+    /// cohorts preserve per-task names; no aggregate policy is constructed.
+    fn controls(&self) -> Result<Vec<(&str, &crate::ValidationControl)>, E> {
+        let controls: Vec<_> = match &self.managed {
+            Some(data) => data.candidate.control_plan.as_ref()
+                .ok_or(E::Refused("task-validation-managed-plan-required"))?.slots.iter()
+                .map(|s| (s.transport_id.as_str(), &s.control)).collect(),
+            None => self.policy.controls.as_ref().ok_or(E::Refused("task-validation-controls-required"))?
+                .iter().map(|c| (c.id.as_str(), c)).collect(),
+        };
+        if controls.is_empty() { return Err(E::Refused("task-validation-controls-required")); }
+        Ok(controls)
+    }
+    /// Resolve one checked global ordinal and transport ID without renaming the
+    /// original control/result. Negative, missing or changed coordinates refuse.
+    fn control(&self, ordinal: i64, transport: &str) -> Result<&crate::ValidationControl, E> {
+        let i = usize::try_from(ordinal).map_err(|e| E::caused("task-validation-slot-index", e))?;
+        let values = self.controls()?;
+        values.get(i).filter(|(id, _)| *id == transport).map(|(_, c)| *c)
+            .ok_or(E::Refused("task-validation-control-source-changed"))
+    }
+    /// Bind the actual complete managed candidate/plan or ordinary policy into
+    /// the existing origin domain; no permission or row is created here.
+    fn origin(&self, id: &str) -> Result<source_origin::Origin, E> {
+        match &self.managed {
+            Some(data) => source_origin::Origin::new(id, &self.preview.source_sha256,
+                data.candidate.control_plan.as_ref().ok_or(E::Refused("task-validation-managed-plan-required"))?,
+                Some(&data.candidate.binding_digest()?)),
+            None => source_origin::Origin::new(id, &self.preview.source_sha256, &self.policy, None),
+        }
+    }
 }
 /// Reuse authoritative source preparation inside the caller's settings/SQL
 /// snapshot. The decoded opaque request cannot supply commands or identity.
@@ -220,101 +261,11 @@ fn prepare_source(
     r: &Request,
     review_source: ReviewSource<'_>,
 ) -> Result<Prepared, E> {
-    super::require_planning_mission_active(db, work)
-        .map_err(|e| E::caused("task-validation-mission-inactive", e))?;
-    let w =
-        crate::read_recorded_work(db, work).map_err(|e| E::caused("task-validation-work", e))?;
-    if w.revision != r.expected_revision {
-        return Err(E::Refused("task-validation-revision-conflict"));
-    }
-    if let Some(planning) = w.planning.as_deref() {
-        if planning.repository.is_some() {
-            return Err(E::Refused("task-validation-managed-repository-unported"));
-        }
-        if planning.paused {
-            return Err(E::Refused("task-validation-planning-paused"));
-        }
-        if !planning.failure.is_empty() {
-            return Err(E::Refused("task-validation-planning-stopped"));
-        }
-        crate::validate_mission_organization(&w)
-            .map_err(|e| E::caused("task-validation-organization", e))?;
-    }
-    let mut matches = w.tasks.iter().flatten().filter(|t| t.id == r.task_id);
-    let task = matches
-        .next()
-        .ok_or(E::Refused("task-validation-task-missing"))?;
-    if matches.next().is_some() {
-        return Err(E::Refused("task-validation-task-duplicate"));
-    }
-    if task.status != "submitted" {
-        return Err(E::Refused("task-validation-submitted-required"));
-    }
-    if task.independent_review.as_deref() != review_source.record()
-        || !review_source.applicable()
-        || task.corrective_recovery.is_some()
-        || task.recovered_result.is_some()
-        || task.review_coordination.is_some()
-        || task.batch_review_resume.is_some()
-    {
-        return Err(E::Refused("task-validation-review-recovery-unported"));
-    }
-    let (scope_generation, authority) = if let Some(planning) = w.planning.as_deref() {
-        let scope = planning
-            .scopes
-            .iter()
-            .flatten()
-            .find(|v| v.id == task.scope_id)
-            .ok_or(E::Refused("task-validation-scope-inactive"))?;
-        if scope.state == "closed" {
-            return Err(E::Refused("task-validation-scope-inactive"));
-        }
-        (
-            Some(crate::SettingCount(scope.generation)),
-            Some(source_authority::read(db, &w)?),
-        )
-    } else {
-        if !task.scope_id.is_empty() || !task.plan_role.is_empty() {
-            return Err(E::Refused(
-                "task-validation-ordinary-task-scope-inconsistent",
-            ));
-        }
-        (None, None)
-    };
-    let submitted = submission(db, &w, &task.id)?;
-    let producer = crate::task_report::completed_producer(db, &w.id, task, &submitted.agent_id)?;
-    let policy = task
-        .validation_policy
-        .as_deref()
-        .ok_or(E::Refused("task-validation-policy-required"))?;
-    if policy.authorized_at.is_empty() || policy.actor.is_empty() {
-        return Err(E::Refused("task-validation-policy-unauthorized"));
-    }
-    let limits = settings
-        .values
-        .mutation_limits()
-        .map_err(|e| E::caused("task-validation-policy-settings", e))?;
-    let normalized = crate::normalize_validation_policy(policy.clone(), &limits.policy)
-        .map_err(|e| E::caused("task-validation-policy-invalid", e))?;
-    crate::validation_policy_covers_task(&normalized, task)
-        .map_err(|e| E::caused("task-validation-coverage", e))?;
-    let controls = normalized
-        .controls
-        .as_deref()
-        .filter(|c| !c.is_empty())
-        .ok_or(E::Refused("task-validation-controls-required"))?;
-    let context = settings
-        .values
-        .context_policy_limits()
-        .map_err(|e| E::caused("task-validation-context-policy", e))?;
-    let report = crate::read_review_delivery(root, &submitted.report_path, &context)
-        .map_err(|e| E::caused("task-validation-report", e))?;
-    if report.trim().is_empty()
-        || crate::provider_configuration::configuration_digest(report.as_bytes())
-            != submitted.report_sha256
-    {
-        return Err(E::Refused("task-validation-report-changed"));
-    }
+    let Observation { work: w, task, producer, submitted, policy, normalized,
+        scope_generation, authority } = observe_submission(
+            db, root, settings, work, r, review_source, RepositoryPurpose::Ordinary)?;
+    let controls = normalized.controls.as_deref()
+        .filter(|c| !c.is_empty()).ok_or(E::Refused("task-validation-controls-required"))?;
     let mut artifacts = BTreeMap::from([(
         submitted.report_path.clone(),
         submitted.report_sha256.clone(),
@@ -339,7 +290,7 @@ fn prepare_source(
         }
     }
     let contract =
-        crate::task_review_contract(task).map_err(|e| E::caused("task-validation-contract", e))?;
+        crate::task_review_contract(&task).map_err(|e| E::caused("task-validation-contract", e))?;
     let execution_policy = source_policy::binding(settings)?;
     let source = digest(&(
         "native-task-validation-source/2",
@@ -349,7 +300,7 @@ fn prepare_source(
         &authority,
         &task.requirements,
         contract,
-        policy,
+        &policy,
         &normalized,
         &submitted,
         digest(&producer)?,
@@ -387,12 +338,16 @@ fn prepare_source(
         settings: settings.clone(),
         original_policy: policy.clone(),
         producer_delivery_version: producer.delivery_version,
+        managed: None,
     })
 }
 impl RootStore {
     /// Execute an ordinary or scoped task's currently authorized controls in a foreground CLI host
-    /// implementing the private helper. Reads actual native producer/report and
-    /// saved policies; starts local commands behind recorded identity/permission.
+    /// implementing the private helper. Managed tasks execute the current and
+    /// accepted-task cohort against one pinned single-parent candidate, with
+    /// Git inspection outside Root locks and private schema3 originals. Reads
+    /// actual native producer/report and saved per-task policies; starts local
+    /// commands behind recorded identity/permission, without aggregate policy.
     /// Journals precede publication, exact replay never executes again. Original
     /// errors/unknown ownership stay nonzero and retain known Work metadata.
     /// This operator route grants no automatic mission consent, authenticated
@@ -427,8 +382,10 @@ impl RootStore {
         retirement::run(self, work, raw)
     }
     /// Preview task controls against current saved authority, producer and files
-    /// under a shared settings reservation and one read-only SQL transaction.
-    /// Starts no process and writes no task/event/controller/receipt. The returned
+    /// under short saved-settings/SQL snapshots. Managed preview pins only an
+    /// existing candidate outside Root locks; it never prepares a new stage.
+    /// Starts no control and writes no task/event/controller/receipt; managed
+    /// inspection can run read-only Git subprocesses outside the snapshots. The returned
     /// digest grants no execution permit and may become stale immediately. Invalid
     /// requests, mission/planning pause or stop, closed scope, archived work,
     /// missing/stale native producer, policy/input
@@ -440,6 +397,25 @@ impl RootStore {
     ) -> Result<TaskValidationPreview, RootStoreError> {
         let launch = |e| RootStoreError::Launch(Box::new(e));
         let r = decode(raw).map_err(launch)?;
+        let managed = managed_execution::acquire_fresh(self, work, &r, false)?;
+        if let Some(session) = managed {
+            let reservation = self.directory.reserve(false, false).map_err(RootStoreError::Storage);
+            let result = match reservation {
+                Ok(reservation) => {
+                    let result = (|| {
+                        let settings = self.read_settings()?;
+                        let tx = self.db.unchecked_transaction().map_err(RootStoreError::Sql)?;
+                        let result = managed_execution::prepare(&tx, &self.directory, &self.root, &settings, work, &r, &session.data)
+                            .map(|p| p.preview).map_err(launch);
+                        finished(result, tx.rollback().map_err(RootStoreError::Sql))
+                    })();
+                    finished(result, reservation.close().map_err(RootStoreError::Storage))
+                }
+                Err(error) => Err(error),
+            };
+            return finished(result, session.close());
+        }
+
         let reservation = self
             .directory
             .reserve(false, false)
