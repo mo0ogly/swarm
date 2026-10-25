@@ -7,32 +7,28 @@
     },
     "items": [
       {
+        "fr": "PAEA : vérifications de correspondance action/reçu dans le cockpit, API native et rapport v2 téléchargeable lié aux octets exacts. Retour autonome au cockpit ; autorité, authenticité et effet réel restent non établis.",
+        "en": "PAEA: action/receipt correspondence checks in the cockpit, native API and downloadable v2 report bound to exact bytes. Independent return to the cockpit; authority, authenticity and actual effect remain unestablished."
+      },
+      {
+        "fr": "PAEA : outils CLI de canonicalisation, comparaison et contrôle de reçu ; laboratoire isolé règlement fictif/Git avec observation séparée, reprise après réponse perdue et révocation. Ce laboratoire ne constitue pas un service protégé.",
+        "en": "PAEA: CLI canonicalization, comparison and receipt checking; isolated fictitious-payment/Git lab with separate observation, lost-reply recovery and revocation. This lab is not a protected service."
+      },
+      {
         "fr": "Contrôles natifs sur candidat géré : job de cohorte, créneaux de transport, helper avec répertoires détenus et origine liée à la base réelle. Reçus privés v3, publication/récupération et rejeu sans réexécution ; validateur final géré encore protégé.",
         "en": "Native managed-candidate controls: cohort job, transport slots, helper-held directories and source bound to the actual database. Private v3 receipts, publication/recovery and replay without reexecution; complete final managed review remains guarded."
       },
       {
-        "fr": "Actions de confiance en sources : boutons Exécuter/Enregistrer reliés à la paire de couleurs d’action commune pour les deux thèmes. Vérification navigateur des états normal, survol et clavier ; aucune compilation ni installation effectuée ici.",
-        "en": "Trusted actions source change: Execute/Save use the shared action color pair in both themes. Browser checks cover normal, hover and keyboard states; no compilation or installation performed here."
-      },
-      {
-        "fr": "PAEA en sources : entrée Vérifications PAEA dans le menu natif et Actions de confiance, formulaire action/reçu et rapport v2 téléchargeable via API de cohérence sans effet. Composant navigateur à API simulée ; raccord Rust non compilé, non exécuté et non installé selon consigne.",
-        "en": "PAEA source development: PAEA checks entry in the native menu and Trusted actions, action/receipt form and downloadable v2 report through a data-only API. Browser component uses an HTTP double; Rust integration remains uncompiled, unexecuted and uninstalled under the active instruction."
+        "fr": "Actions de confiance : Exécuter et Enregistrer utilisent la paire sémantique d’action dans les deux thèmes. Contraste vérifié dans le composant ; la feuille de style est incluse dans le build Rust local.",
+        "en": "Trusted actions: Execute and Save use the shared action color pair in both themes. Contrast verified in the component; the stylesheet is included in the local Rust build."
       },
       {
         "fr": "Préparation native du candidat géré : nouvelle commande validation-candidate reliant soumission et vrai worker terminé à un candidat Git conservé, hors verrous Root, avec relecture de fraîcheur. Aucun job, contrôle ou revue finale lancé à cette étape.",
         "en": "Native managed-candidate preparation: new validation-candidate command connects the submission and actual completed worker to a retained Git candidate outside Root locks, with freshness readback. This stage starts no job, controls or final review."
       },
       {
-        "fr": "PAEA en sources : rapport receipt-report v2 liant les octets exacts du document et du reçu par SHA-256, distinct du format check-receipt v1 conservé. Sept tests écrits, non exécutés ; aucune compilation, installation, autorité ou preuve d’effet créée.",
-        "en": "PAEA source development: receipt-report v2 binds exact document and receipt bytes by SHA-256, separate from preserved check-receipt v1 output. Seven tests written, unexecuted; no compilation, installation, authority or effect proof created."
-      },
-      {
         "fr": "Journal natif : lecteur de reçus cumulatifs privés v3 liant candidat complet et plan ; résultats publics par tâche, échec d’une tâche antérieure bloquant. Reçus ordinaires v1/v2 conservés ; hash candidat opaque et commandes vides refusés. Le lancement géré et la revue finale restent à raccorder.",
         "en": "Native journal: private cumulative v3 reader binds the full candidate and plan; public results stay task-specific while a prior task failure blocks the outcome. Ordinary v1/v2 originals retained; opaque candidate hashes and empty commands refuse. Managed launch and final review remain unwired."
-      },
-      {
-        "fr": "PAEA en sources : commande Rust hors ligne protection check-receipt reliant un reçu à l’action canonique et au cycle déclarés, sans authenticité ni effet établi. Quatre tests écrits, non exécutés ; aucune compilation, installation ou activation.",
-        "en": "PAEA source development: offline Rust protection check-receipt command binds receipt-shaped data to the supplied canonical action and lifecycle, without established authenticity or effect. Four tests written, unexecuted; no compilation, installation or activation."
       },
       {
         "fr": "Préparations Rust : création/sauvegarde CLI et API protégée, historique et rejeu, réglages Admin persistés. Un reçu à révision courante doit correspondre au contenu stocké ; incohérence refusée sans nouvelle écriture. Le plafond du titre porte sur l’entrée fournie, avec libellé automatique exempt. Aucun lancement ni adoption de plan.",
@@ -65,10 +61,6 @@
       {
         "fr": "Dépôt géré : la conservation neutralise les filtres Git pendant add et write-tree dans les copies workers, sans modifier leur configuration. La vérification brute du candidat et le validateur final restent en cours de raccordement.",
         "en": "Managed repository: retention neutralizes Git filters during add and write-tree in worker copies without changing their configuration. Raw candidate verification and the final validator remain under integration."
-      },
-      {
-        "fr": "PAEA : outil CLI hors ligne protection canonicalize pour les contrats de facturation fictive et de promotion Git, avec contenu exact, identité d’intention métier et refus des JSON ambigus. Aucune autorité, protection active ou qualification E2/E3 n’est créée.",
-        "en": "PAEA: offline protection canonicalize CLI for fictitious billing and Git-promotion data contracts, with exact content, business-intent identity and ambiguous-JSON refusal. No authority, active protection or E2/E3 qualification is created."
       },
       {
         "fr": "Pause concurrente : les refus propres pendant la synchronisation, l'aperçu ou la lecture initiale d'un rapport arrêtent seulement la surveillance de la mission concernée, en conservant effets, révisions connues et causes. Les écritures incertaines et erreurs de nettoyage restent bloquantes.",

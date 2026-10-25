@@ -1,0 +1,638 @@
+{
+  "status": "STATIC_ONLY_UNQUALIFIED",
+  "commands": [
+    {
+      "id": "rustfmt-version",
+      "argv": [
+        "rustfmt",
+        "--version"
+      ],
+      "start": "2026-10-25T21:28:45.547590+00:00",
+      "end": "2026-10-25T21:28:45.589112+00:00",
+      "exit": 0,
+      "stdout_sha256": "58e77f09cbe97eb2d0ab9174e5523494d03814f2879c8e187ed66370320abc7c",
+      "stdout_retained": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "rustfmt-check",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--check",
+        "rust/crates/swarm-cli/src/protection.rs",
+        "rust/crates/swarm-cli/tests/protection_receipt.rs"
+      ],
+      "start": "2026-10-25T21:28:45.589155+00:00",
+      "end": "2026-10-25T21:28:45.641376+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_retained": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cli-root-syntax",
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2021",
+        "--config",
+        "skip_children=true",
+        "--emit",
+        "stdout",
+        "rust/crates/swarm-cli/src/lib.rs"
+      ],
+      "start": "2026-10-25T21:28:45.641435+00:00",
+      "end": "2026-10-25T21:28:45.737591+00:00",
+      "exit": 0,
+      "stdout_sha256": "67c35978e397368d5d5915e616a57eced50e649a6e3e489846f269372f44660a",
+      "stdout_retained": false,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "git-diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-10-25T21:28:45.737792+00:00",
+      "end": "2026-10-25T21:28:46.106732+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_retained": true,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "schema": {
+    "metaschema": "valid",
+    "output_fields_match_source": true,
+    "state_enum_matches_source": true,
+    "synthetic_shape_accepts_valid_and_rejects_8_invalid_cases": true,
+    "limit": "No Rust behavior/type/lifecycle or independent authenticity check executed"
+  },
+  "recipe": {
+    "target": "protection_receipt",
+    "selected_tests": [
+      "protection_receipt_both_domains_and_reconciliation_are_offline",
+      "protection_receipt_invalid_inputs_and_bindings_refuse_then_recover",
+      "protection_receipt_runtime_options_and_framing_refuse_before_reads",
+      "protection_receipt_write_and_flush_failures_keep_cause_and_recover"
+    ],
+    "executed": false,
+    "global_watchdog_added": false
+  },
+  "local_links": [
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../en/PAEA-CONTRACT.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/PAEA-APEX.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/paea/INCREMENT-02.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/paea/INCREMENT-03.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "PAEA-CANONICAL-VERIFIER.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/paea/INCREMENT-05.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/paea/INCREMENT-06.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/paea/INCREMENT-07.md"
+    },
+    {
+      "file": "docs/architecture/PAEA-CONTRACT.md",
+      "target": "../plans/actions-confiance/paea/INCREMENT-08.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "../architecture/PAEA-CONTRACT.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/PAEA-APEX.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/paea/INCREMENT-02.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/paea/INCREMENT-03.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "PAEA-CANONICAL-VERIFIER.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/paea/INCREMENT-05.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/paea/INCREMENT-06.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/paea/INCREMENT-07.md"
+    },
+    {
+      "file": "docs/en/PAEA-CONTRACT.md",
+      "target": "plans/actions-confiance/paea/INCREMENT-08.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "../../en/plans/actions-confiance/PAEA-APEX.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "../FILE-APEX.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "securite-execution-apex.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/E3-PROTOCOL.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/evidence/20261025-contract-qekt2uwo/recipe-01/result.json"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-01.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-02.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-03.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-04.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-05.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-06.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-07.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-08.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "../../../plans/actions-confiance/PAEA-APEX.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "../../APEX-QUEUE.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "securite-execution-apex.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/E3-PROTOCOL.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "../../../plans/actions-confiance/paea/evidence/20261025-contract-qekt2uwo/recipe-01/result.json"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-01.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-02.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-03.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-04.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-05.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-06.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-07.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/PAEA-APEX.md",
+      "target": "paea/INCREMENT-08.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "../en/APEX-QUEUE.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "../../.claude/skills/apex/SKILL.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/PAEA-APEX.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "migration-rust/PLAN.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/identites-agents-replan.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "deepagents-integration/PLAN.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "telemetrie-agents/SPEC.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "langwatch-feuille-de-route/SPEC.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/qualification-globale-replan.md#décision-utilisateur-du16octobre--revue-autorisée-ebpf-reporté"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "graphe-automatisation-20261005/PLAN.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/securite-execution-apex.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "telemetrie-agents/JUGE-L4-SPEC.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "migration-rust/AFTER-CUTOVER.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "clear-launch-recovery/RETEX-CLOTURE.md#quick-wins-proposés--4-octobre-2026"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/securite-execution-apex.md#9-dépendances-et-livrables-partagés-précisés"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/qualification-globale-replan.md#16octobre0729utc--verdict-et-clôture-du-périmètre-convenu"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "actions-confiance/RETEX-actions-confiance-20261016.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "engine-cursor-contract/suites-retex-20261013.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "engine-cursor-contract/RETEX-suites-20261013.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "review-efficiency-apex/PLAN.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "review-efficiency-apex/EVIDENCE.md#29-septembre--reprise-dun-avis-périmé-et-arrêt-demandé"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "clear-launch-recovery/RETEX-CLOTURE.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "cloture-observable/RETEX-final.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "supervision-fiable/RETEX-suivi.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "supervision-fiable/T5-diagnostic-superviseur.md#clôture-publique-vérifiée"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "budgets-preuves-effort/T6-consolidation-superviseur.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "version-history/V4-handoff.md#qualification-native-du-responsable--postérieure-au-rapport-worker"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "install-launcher-onprem/HANDOFF.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "ai-connection-debug-20261008/HANDOFF.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "dev-launcher-20261010/PLAN.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "ks-product-views.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "fresh-install-methods-20261008.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "repository-organization-20261008.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "commit-general-20261017.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "migration-rust/AUDIT-FONCTIONNEL-20261024.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "../en/plans/migration-rust/AUDIT-FONCTIONNEL-20261024.md"
+    },
+    {
+      "file": "docs/plans/FILE-APEX.md",
+      "target": "migration-rust/FPA02A-MEMOIRE-20261025.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/FILE-APEX.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../../.claude/skills/apex/SKILL.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "plans/actions-confiance/PAEA-APEX.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/migration-rust/PLAN.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/actions-confiance/identites-agents-replan.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/deepagents-integration/PLAN.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/telemetrie-agents/SPEC.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/langwatch-feuille-de-route/SPEC.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/actions-confiance/qualification-globale-replan.md#décision-utilisateur-du16octobre--revue-autorisée-ebpf-reporté"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/graphe-automatisation-20261005/PLAN.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "plans/actions-confiance/securite-execution-apex.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/telemetrie-agents/JUGE-L4-SPEC.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/migration-rust/AFTER-CUTOVER.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/clear-launch-recovery/RETEX-CLOTURE.md#quick-wins-proposés--4-octobre-2026"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "plans/actions-confiance/securite-execution-apex.md#9-clarified-dependencies-and-shared-deliverables"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/actions-confiance/qualification-globale-replan.md#16octobre0729utc--verdict-et-clôture-du-périmètre-convenu"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/actions-confiance/RETEX-actions-confiance-20261016.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/engine-cursor-contract/suites-retex-20261013.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/engine-cursor-contract/RETEX-suites-20261013.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/review-efficiency-apex/PLAN.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/review-efficiency-apex/EVIDENCE.md#29-septembre--reprise-dun-avis-périmé-et-arrêt-demandé"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/clear-launch-recovery/RETEX-CLOTURE.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/cloture-observable/RETEX-final.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/supervision-fiable/RETEX-suivi.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/supervision-fiable/T5-diagnostic-superviseur.md#clôture-publique-vérifiée"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/budgets-preuves-effort/T6-consolidation-superviseur.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/version-history/V4-handoff.md#qualification-native-du-responsable--postérieure-au-rapport-worker"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/install-launcher-onprem/HANDOFF.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/ai-connection-debug-20261008/HANDOFF.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/dev-launcher-20261010/PLAN.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/ks-product-views.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/fresh-install-methods-20261008.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/repository-organization-20261008.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/commit-general-20261017.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "plans/migration-rust/AUDIT-FONCTIONNEL-20261024.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "../plans/migration-rust/AUDIT-FONCTIONNEL-20261024.md"
+    },
+    {
+      "file": "docs/en/APEX-QUEUE.md",
+      "target": "plans/migration-rust/FPA02A-MEMORY-20261025.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../../../en/plans/actions-confiance/paea/INCREMENT-08.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../PAEA-APEX.md"
+    },
+    {
+      "file": "docs/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "evidence/20261025-receipt-cli-xnl00wiz/source-review.json"
+    },
+    {
+      "file": "docs/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "evidence/20261025-receipt-cli-xnl00wiz/"
+    },
+    {
+      "file": "docs/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "evidence/20261025-receipt-cli-xnl00wiz/static-checks.json"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../../../../plans/actions-confiance/paea/INCREMENT-08.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../PAEA-APEX.md"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../../../../plans/actions-confiance/paea/evidence/20261025-receipt-cli-xnl00wiz/source-review.json"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../../../../plans/actions-confiance/paea/evidence/20261025-receipt-cli-xnl00wiz/"
+    },
+    {
+      "file": "docs/en/plans/actions-confiance/paea/INCREMENT-08.md",
+      "target": "../../../../plans/actions-confiance/paea/evidence/20261025-receipt-cli-xnl00wiz/static-checks.json"
+    }
+  ],
+  "current_inputs": {
+    "rust/crates/swarm-cli/src/protection.rs": "1cf422d57f08f1e58c8b44c3f503e1dc9373d04dd8c8e0adf07934b5b520aa8c",
+    "rust/crates/swarm-cli/src/lib.rs": "71925fe50bdcaf070a85131c0e2807d7bdeffaca5c08b3309e5a8a0748403146",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs": "a19ebcf0ef4e2ae3274ed37f1e1c38442b1b1a8f58b64fb26726ed4647a0b20c",
+    "schemas/paea/receipt-check-v1.schema.json": "7125fb34aa989572f972ee5af34518b6010f59435f0a35d34dc4456871c4efc3",
+    "tools/verification/recipes/paea-contract.json": "7af3d87e1d2e85f048e112849a370eca55f54254104c252cd775707bf515cd9b",
+    "docs/architecture/PAEA-CONTRACT.md": "fb577c0756c30cec11ecfcc71fcec2a50155cc95fb2a9e732cf7c0c0afa3ad6b",
+    "docs/en/PAEA-CONTRACT.md": "09f3b9462c5b29a4a68b481199790c377c3cea01795249e8a6c93cd3cb8d1b9c",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "ff8b219f8c753bc46e8d7dc276b9ce4eb63ccec75542acea4031b5fbd4170747",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "818d3e0a916efe64801a1b220773dff03a110dde81d9debf19a46955b2dac375",
+    "docs/plans/FILE-APEX.md": "29bf47b5d1af2cd9293bf5941a9354b14a55401c821fcd78745444d418b396ab",
+    "docs/en/APEX-QUEUE.md": "763e8a109857d64193738da9e2996d355bf8b97bbebf8b7adb76f7b76ec2a0ed",
+    "docs/plans/actions-confiance/paea/INCREMENT-08.md": "82691c1a53877fb729539a51997b5b292d1b2fc160edfab21f267685c175d23b",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-08.md": "774046d44f4a3d180e1d978fcc726102c68bd3130047b383d465fc4a6d5f0a7f",
+    "version_history.json": "adf6199cb0e87155690ee5349263af08c51897593d8541133331087bfe35be66"
+  },
+  "untracked_source_whitespace_check": "all explicit changed inputs checked",
+  "concurrent_change": "Root CLI recorded_work Rustdoc moved by another session; preserved and excluded from owned behavior review",
+  "method_incidents": [
+    {
+      "cause": "Documentation patch expected a different English final sentence",
+      "observed_error": "apply_patch verification failed: Failed to find expected lines in docs/en/plans/actions-confiance/PAEA-APEX.md: PA-01/03/09 and PA-02/AC-02 dependencies remain open. No project activated.",
+      "recovery": "Read the actual suffix; confirmed no partial application, applied patch against actual text; links checked on final files"
+    }
+  ],
+  "not_executed": [
+    "Cargo",
+    "Rustdoc",
+    "Rust behavioral tests",
+    "permanent PAEA recipe",
+    "build/install/restart",
+    "provider calls"
+  ],
+  "acceptance": "NOT_ESTABLISHED",
+  "previous_static_pass": "static-01/static-checks.json",
+  "source_stable_during_checks": true,
+  "function_inventory_count": 13,
+  "scope": "Static source checks only; no compiler, behavioral test, effective profile/binary graph, installation or acceptance"
+}

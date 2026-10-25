@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-10-25T18:20:51.931910+00:00",
+  "scope": "PA-00/01 offline data/CLI self-review only; not migration source qualification, independent review, full effective compiler graph, installation or E2/E3",
+  "authority": "User requested avoiding compilation while another session is active; no new Cargo/rustdoc/build/restart in this static review",
+  "reviewer": "Root Codex, author/integrator; not independent",
+  "inputs": {
+    "docs/architecture/PAEA-CONTRACT.md": "f90bf11b99e309f21f01bbe9b02ec4dfd6230c1da859fc48e395fe7d841f85a7",
+    "docs/en/APEX-QUEUE.md": "acc9a620bffa721a9a5d5a9698dc6bfb141b959c806ef8e711ab840b9a54f548",
+    "docs/en/PAEA-CONTRACT.md": "3979a14a225ab60cf2139519b01c39e195dfaa267af34f79b2e2822d75e1c91e",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "1fe679ed96700e2ed64bcad3f12aa657d175fcf8d8d3281ecbf722fbccb8c7a2",
+    "docs/en/plans/actions-confiance/paea/E3-PROTOCOL.md": "26f0752b122a7c38d7f2647d18fb018d8a9e767408e8ce85a5499f5966f77173",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-01.md": "ca1592ada9ea5d2627b5ba9b4fe9715a8f87ec477e7b8ca8da551abfb0df56c6",
+    "docs/plans/FILE-APEX.md": "0cb3234f0b72596443f06ba58ec8c3580cdb9e13e2b585d642965ac71baed12b",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "46f270c500e1bd506a5bf2661ab19a0e45e036a91a180e2b91d256219b125f7a",
+    "docs/plans/actions-confiance/paea/E3-PROTOCOL.md": "5fe57d0ac4314e56dace5c12f69879e9c5c66b5006a1d07bd68eda33de442e9c",
+    "docs/plans/actions-confiance/paea/INCREMENT-01.md": "ae5e91111559fd9700dd41eb25046f42089d84f98a7a209bcad70982edf92583",
+    "rust/Cargo.lock": "aa38912569baadb99c168ecb4dbdc6be878482e9c98908955f295294cc9df346",
+    "rust/Cargo.toml": "0c60e737fe580f1cfbe7ffd44ef1125dd400c592664d1c82acbed2ef944d66a4",
+    "rust/crates/swarm-cli/Cargo.toml": "b52a7826314b7b4bb5b8b5ee1fc19e6a4a9598ab7731a6168ade7a3c6dcbf816",
+    "rust/crates/swarm-cli/src/lib.rs": "efda8fd632fcb072999c568894a9332083cf738f428d88ddf6031a588ec57486",
+    "rust/crates/swarm-cli/src/protection.rs": "76fe7de23fefd85fd6417fa8f716d476089ba1520e0dbf5fc7c2b4374936c775",
+    "rust/crates/swarm-cli/tests/protection.rs": "a9e73877163a6e08d5428e499fba235d3f0f02ed37d12b5fa82c9b5838859b2f",
+    "rust/crates/swarm-protection-contract/Cargo.toml": "cc2f4aa17b70f5f3827fdb90bad6c5c8866ffa5d473223c8db79e69668aea192",
+    "rust/crates/swarm-protection-contract/src/canonical.rs": "5e9bad76b65a7fdbbd2a3966fdebbba59480d80c2e2337498ac5d0bd2a9092f0",
+    "rust/crates/swarm-protection-contract/src/lib.rs": "b6c3e9adeb66a47d651357805e5961ba9adce82b98a7aa2eca396dd591e437d5",
+    "rust/crates/swarm-protection-contract/src/strict_json.rs": "9edc35078e857e321efa432d2839c35a554ac2632165058688798d87cece87bd",
+    "rust/crates/swarm-protection-contract/src/types.rs": "4cf2a9869422eff1d9aaf8bc9d019600b8ef179ac9132e6fbbba3101cbf76c42",
+    "rust/crates/swarm-protection-contract/tests/contract.rs": "eefa6dc1f64ac744567a5a1d64e507eb06cabd42c4db14fb32ad3fcfc7ca8799",
+    "schemas/paea/contract-v1.schema.json": "1a5c6e4ee0363eac26fd8c1cbdfe2ac3ecdec77e2f6e662cdcfa4e4ce03d41f8",
+    "tests/fixtures/paea/contract-v1.json": "cd02fa4b14bdef9b4542c8e547c417c2bb52ad0829d779bbb7ed0d7830a3d16b",
+    "tests/paea_contract_schema_test.py": "8d2ca79a4c9b106e404699668e96a4ca405c3832a05b787a6d29f6cb8a4ec231",
+    "tools/paea/make_contract_vectors.py": "83981277cee76d369cfe86d42a241369d1718f245555660250012d57cb11116f",
+    "tools/verification/recipes/paea-contract.json": "6badb3ceafab402aa226637fa7b57f5dfaf3040aaf2cd0008d2e935d7d2e361b",
+    "version_history.json": "524e85f61f4f60c4e98d62c8840b615e9b81276d17a90059db97a4f412a319c0"
+  },
+  "archive_sha256": "e8251f855c67da454e30141412c156b9c80e3264c6b3b631310051659c63d0cc",
+  "shared_cli_delta": "static-review-01/cli-versus-dev65.patch",
+  "retained_recipe": {
+    "path": "recipe-01/result.json",
+    "sha256": "eebd878773381155e9aeb2ab813d08dab5aea3e5fd784bbf2d12df54dc53880e",
+    "status": "PASS",
+    "named_tests": {
+      "python": 5,
+      "rust_contract": 17,
+      "public_cli": 4
+    },
+    "total_named_tests": 26,
+    "vector_inputs": 14,
+    "declared_inputs_changed_since_recipe": [
+      "docs/architecture/PAEA-CONTRACT.md",
+      "docs/en/PAEA-CONTRACT.md"
+    ],
+    "executable_declared_inputs_unchanged": true,
+    "note": "Changed documentation reviewed statically; original recipe archives not rewritten. Transitive engine input graph not qualified."
+  },
+  "paea_originals_unchanged": {
+    "docs/security/PAEA_v0.2_Profil_Assurance_Execution_Agentique_Revision_Scientifique.docx": true,
+    "docs/security/PAEA_v0.2_Profil_Assurance_Execution_Agentique_Revision_Scientifique.pdf": true
+  },
+  "review_axes": {
+    "policies": {
+      "status": "reviewed for offline data scope",
+      "record": "INCREMENT-01 Hardcoded-policy review; protocol/representation/fixture/default categories, no new operator policy"
+    },
+    "functions": {
+      "status": "reviewed for offline data scope",
+      "inventory": [
+        {
+          "path": "rust/crates/swarm-protection-contract/src/types.rs",
+          "line": 95,
+          "name": "oid",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/types.rs",
+          "line": 106,
+          "name": "branch",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/types.rs",
+          "line": 123,
+          "name": "validate",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/types.rs",
+          "line": 186,
+          "name": "validate",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/types.rs",
+          "line": 229,
+          "name": "validate",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/types.rs",
+          "line": 244,
+          "name": "validate",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 14,
+          "name": "deserialize",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 21,
+          "name": "expecting",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 24,
+          "name": "visit_bool",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 27,
+          "name": "visit_i64",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 30,
+          "name": "visit_u64",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 33,
+          "name": "visit_f64",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 36,
+          "name": "visit_str",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 39,
+          "name": "visit_string",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 42,
+          "name": "visit_none",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 45,
+          "name": "visit_unit",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 48,
+          "name": "visit_seq",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 55,
+          "name": "visit_map",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/strict_json.rs",
+          "line": 72,
+          "name": "decode",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 37,
+          "name": "code",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 47,
+          "name": "fmt",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 52,
+          "name": "source",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 64,
+          "name": "decode_proposal",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 74,
+          "name": "decode_context",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 91,
+          "name": "decode_document",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 100,
+          "name": "decode_receipt",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 108,
+          "name": "decode_approval",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/lib.rs",
+          "line": 170,
+          "name": "transition",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/canonical.rs",
+          "line": 19,
+          "name": "bytes",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/canonical.rs",
+          "line": 23,
+          "name": "digest",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/canonical.rs",
+          "line": 29,
+          "name": "intent_id",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/canonical.rs",
+          "line": 34,
+          "name": "matches_approval",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/canonical.rs",
+          "line": 43,
+          "name": "write",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-protection-contract/src/canonical.rs",
+          "line": 84,
+          "name": "canonicalize",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "rust/crates/swarm-cli/src/protection.rs",
+          "line": 14,
+          "name": "execute",
+          "review": "semantic review in INCREMENT-01; inventory candidate is not scanner proof"
+        },
+        {
+          "path": "tools/paea/make_contract_vectors.py",
+          "line": 19,
+          "name": "canonical",
+          "docstring": true
+        },
+        {
+          "path": "tools/paea/make_contract_vectors.py",
+          "line": 28,
+          "name": "vector",
+          "docstring": true
+        },
+        {
+          "path": "tools/paea/make_contract_vectors.py",
+          "line": 59,
+          "name": "main",
+          "docstring": true
+        },
+        {
+          "path": "tests/paea_contract_schema_test.py",
+          "line": 23,
+          "name": "setUpClass",
+          "docstring": true
+        },
+        {
+          "path": "tests/paea_contract_schema_test.py",
+          "line": 32,
+          "name": "test_schema_and_fourteen_both_domain_vectors",
+          "docstring": true
+        },
+        {
+          "path": "tests/paea_contract_schema_test.py",
+          "line": 40,
+          "name": "test_retained_canonical_bytes_and_digest_are_reproducible",
+          "docstring": true
+        },
+        {
+          "path": "tests/paea_contract_schema_test.py",
+          "line": 48,
+          "name": "test_unknown_authority_claims_and_malformed_shapes_refuse",
+          "docstring": true
+        },
+        {
+          "path": "tests/paea_contract_schema_test.py",
+          "line": 60,
+          "name": "test_label_duplicates_and_identifier_controls_refuse",
+          "docstring": true
+        },
+        {
+          "path": "tests/paea_contract_schema_test.py",
+          "line": 71,
+          "name": "test_approval_and_receipt_definitions_keep_observations_distinct",
+          "docstring": true
+        }
+      ],
+      "shared_cli_affected": [
+        "CliError::code",
+        "CliError::message",
+        "CliError::source",
+        "execute (help/dispatch)"
+      ],
+      "limits": "Existing handler contracts retained; no whole-engine function audit"
+    },
+    "errors": {
+      "status": "reviewed for offline data scope",
+      "record": "INCREMENT-01 Function and error review; typed causes, safe diagnostics, immutable transitions, output/flush failure",
+      "limits": "Not all IO failures or distributed service closure tested"
+    },
+    "documentation": {
+      "status": "reviewed FR/EN",
+      "record": "Contract, plan, E3 draft and increment report; static links verified separately",
+      "limits": "No embedded contexts rebuilt, no runtime assets changed or checked"
+    }
+  },
+  "open_criteria": [
+    {
+      "id": "PA-00",
+      "owner": "Root Codex/integration",
+      "condition": "Complete protected-producer/storage/consumer inventory and real valid controls after prerequisite handoffs; current selection is bounded"
+    },
+    {
+      "id": "PA-01",
+      "owner": "Identity/Trust/managed repository/integration",
+      "condition": "Finalize authenticated mandate/approval/receipt/error/service interfaces with authoritative producers; no supplied context as authority"
+    },
+    {
+      "id": "PA-02..10",
+      "owner": "Relevant plan owners",
+      "condition": "Retained Rust/IA3/AC-02 preconditions and qualified effect boundaries; no activation here"
+    },
+    {
+      "id": "local-delivery",
+      "owner": "User/local integration",
+      "condition": "No-compilation instruction lifted and concurrent checkout available, then full candidate review and supported delivery verification"
+    },
+    {
+      "id": "PA-11..13",
+      "owner": "Sponsor/independent evaluator/third-party team",
+      "condition": "Independent resources appointed and protocol preregistered, E2 candidate then independent campaigns/corrections/final retrospective"
+    }
+  ]
+}

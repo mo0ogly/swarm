@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "paea-canonical-verifier",
+  "inputs": [
+    "tools/paea/verify_canonical.py",
+    "tools/paea/make_contract_vectors.py",
+    "tests/paea_canonical_verifier_test.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "schemas/paea/contract-v1.schema.json",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CANONICAL-VERIFIER.md",
+    "docs/en/PAEA-CANONICAL-VERIFIER.md"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "canonical-export-correspondence",
+      "command": [
+        "python3",
+        "tests/paea_canonical_verifier_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 9 tests",
+        "OK",
+        "test_existing_binary_exports_match_frozen_oracle_and_verifier",
+        "test_public_cli_safe_refusal_io_and_recovery",
+        "test_public_output_failure_is_nonzero_and_recovers",
+        "PAEA_VERIFIER_BINARY_STABLE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

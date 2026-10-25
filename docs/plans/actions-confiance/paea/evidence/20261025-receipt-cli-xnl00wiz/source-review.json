@@ -1,0 +1,816 @@
+{
+  "status": "STATIC_ONLY_UNQUALIFIED",
+  "reviewer": "Codex root, same implementation context; not independent",
+  "owned_inputs": {
+    "rust/crates/swarm-cli/src/protection.rs": "1cf422d57f08f1e58c8b44c3f503e1dc9373d04dd8c8e0adf07934b5b520aa8c",
+    "rust/crates/swarm-cli/src/lib.rs": "71925fe50bdcaf070a85131c0e2807d7bdeffaca5c08b3309e5a8a0748403146",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs": "a19ebcf0ef4e2ae3274ed37f1e1c38442b1b1a8f58b64fb26726ed4647a0b20c",
+    "schemas/paea/receipt-check-v1.schema.json": "7125fb34aa989572f972ee5af34518b6010f59435f0a35d34dc4456871c4efc3",
+    "tools/verification/recipes/paea-contract.json": "7af3d87e1d2e85f048e112849a370eca55f54254104c252cd775707bf515cd9b",
+    "docs/architecture/PAEA-CONTRACT.md": "fb577c0756c30cec11ecfcc71fcec2a50155cc95fb2a9e732cf7c0c0afa3ad6b",
+    "docs/en/PAEA-CONTRACT.md": "09f3b9462c5b29a4a68b481199790c377c3cea01795249e8a6c93cd3cb8d1b9c",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "ff8b219f8c753bc46e8d7dc276b9ce4eb63ccec75542acea4031b5fbd4170747",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "818d3e0a916efe64801a1b220773dff03a110dde81d9debf19a46955b2dac375",
+    "docs/plans/FILE-APEX.md": "29bf47b5d1af2cd9293bf5941a9354b14a55401c821fcd78745444d418b396ab",
+    "docs/en/APEX-QUEUE.md": "763e8a109857d64193738da9e2996d355bf8b97bbebf8b7adb76f7b76ec2a0ed",
+    "docs/plans/actions-confiance/paea/INCREMENT-08.md": "82691c1a53877fb729539a51997b5b292d1b2fc160edfab21f267685c175d23b",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-08.md": "774046d44f4a3d180e1d978fcc726102c68bd3130047b383d465fc4a6d5f0a7f",
+    "version_history.json": "adf6199cb0e87155690ee5349263af08c51897593d8541133331087bfe35be66"
+  },
+  "observed_dependencies": {
+    "rust/crates/swarm-protection-contract/src/lib.rs": "d2ec9462574d1f3c324498dd26c989bd2db9aba5ad7426d0f48f8cbef3f6f3bc",
+    "rust/crates/swarm-protection-contract/src/receipt.rs": "863100afee29a52a95e922c92cf2226b0e44a1515d8739f296a3190453d87383",
+    "rust/crates/swarm-protection-contract/src/canonical.rs": "5e9bad76b65a7fdbbd2a3966fdebbba59480d80c2e2337498ac5d0bd2a9092f0",
+    "rust/crates/swarm-protection-contract/src/types.rs": "4cf2a9869422eff1d9aaf8bc9d019600b8ef179ac9132e6fbbba3101cbf76c42",
+    "rust/crates/swarm-protection-contract/src/strict_json.rs": "9edc35078e857e321efa432d2839c35a554ac2632165058688798d87cece87bd",
+    "rust/crates/swarm-identity-contract/src/lib.rs": "e1257094aac54c52738dcfd1c0471139c196d5571de2662aaa32a751e4c0a1af",
+    "rust/crates/swarm-engine/src/command_input.rs": "891a00b25f0e7f0ae126466286c4328bedc136aa5423fa233e42e075615a82b8",
+    "tests/fixtures/paea/contract-v1.json": "cd02fa4b14bdef9b4542c8e547c417c2bb52ad0829d779bbb7ed0d7830a3d16b",
+    "rust/crates/swarm-cli/Cargo.toml": "b52a7826314b7b4bb5b8b5ee1fc19e6a4a9598ab7731a6168ade7a3c6dcbf816",
+    "rust/crates/swarm-protection-contract/Cargo.toml": "cc2f4aa17b70f5f3827fdb90bad6c5c8866ffa5d473223c8db79e69668aea192",
+    "rust/Cargo.toml": "0c60e737fe580f1cfbe7ffd44ef1125dd400c592664d1c82acbed2ef944d66a4",
+    "rust/Cargo.lock": "aa38912569baadb99c168ecb4dbdc6be878482e9c98908955f295294cc9df346",
+    ".cargo/config.toml": "ced712ed94313257a11d93f311445bad70e7c1e6b60c57d4486113af2c481691",
+    "tools/verification/recipe.py": "35b9b0f1288ee97d16878712bd637169cc612be866ad6573a600b35ab170b41f"
+  },
+  "owned_scopes": {
+    "rust/crates/swarm-cli/src/lib.rs": "two help strings only; concurrent recorded_work Rustdoc move preserved, not owned",
+    "version_history.json": "one FR/EN local_changes item; foreign changes preserved"
+  },
+  "lexical_candidates": {
+    "rust/crates/swarm-cli/src/protection.rs": {
+      "policies": [
+        {
+          "line": 27,
+          "text": "    if a.pos.len() == 6 && a.pos[1] == \"check-receipt\" && a.input.is_empty() {"
+        },
+        {
+          "line": 30,
+          "text": "    if a.pos.len() == 4 && a.pos[1] == \"compare\" && a.input.is_empty() {"
+        },
+        {
+          "line": 33,
+          "text": "        if a.pos[2] == \"-\" || a.pos[3] == \"-\" {"
+        },
+        {
+          "line": 36,
+          "text": "        let before = swarm_engine::read_command_file(Path::new(&a.pos[2]))"
+        },
+        {
+          "line": 38,
+          "text": "        let after = swarm_engine::read_command_file(Path::new(&a.pos[3]))"
+        },
+        {
+          "line": 47,
+          "text": "        return Ok(0);"
+        },
+        {
+          "line": 49,
+          "text": "    if a.pos.len() != 2 || a.pos[1] != \"canonicalize\" || a.input.is_empty() {"
+        },
+        {
+          "line": 71,
+          "text": "    Ok(0)"
+        },
+        {
+          "line": 86,
+          "text": "    if a.pos[2] == \"-\" || a.pos[3] == \"-\" {"
+        },
+        {
+          "line": 89,
+          "text": "    let previous: State = serde_json::from_value(serde_json::Value::String(a.pos[5].clone()))"
+        },
+        {
+          "line": 92,
+          "text": "        swarm_engine::read_command_file(Path::new(&a.pos[2])).map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 94,
+          "text": "        swarm_engine::read_command_file(Path::new(&a.pos[3])).map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 99,
+          "text": "    let proposed = check_receipt_transition(&action, &receipt, &a.pos[4], previous)"
+        },
+        {
+          "line": 111,
+          "text": "    Ok(0)"
+        }
+      ],
+      "functions": [
+        {
+          "line": 18,
+          "text": "pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        },
+        {
+          "line": 85,
+          "text": "fn check_receipt(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 25,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 34,
+          "text": "            return Err(CliError::Usage);"
+        },
+        {
+          "line": 37,
+          "text": "            .map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 39,
+          "text": "            .map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 40,
+          "text": "        let comparison = compare_documents(&before, &after).map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 45,
+          "text": "            .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;"
+        },
+        {
+          "line": 46,
+          "text": "        write_output(out, &bytes)?;"
+        },
+        {
+          "line": 50,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 57,
+          "text": "    .map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 58,
+          "text": "    let document = decode_document(&raw).map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 60,
+          "text": "        canonicalize(&document.proposal, &document.context).map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 62,
+          "text": "        .map_err(|e| CliError::Input(io::Error::new(io::ErrorKind::InvalidData, e)))?;"
+        },
+        {
+          "line": 69,
+          "text": "        .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;"
+        },
+        {
+          "line": 70,
+          "text": "    write_output(out, &bytes)?;"
+        },
+        {
+          "line": 87,
+          "text": "        return Err(CliError::Usage);"
+        },
+        {
+          "line": 90,
+          "text": "        .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;"
+        },
+        {
+          "line": 92,
+          "text": "        swarm_engine::read_command_file(Path::new(&a.pos[2])).map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 94,
+          "text": "        swarm_engine::read_command_file(Path::new(&a.pos[3])).map_err(CliError::CommandInput)?;"
+        },
+        {
+          "line": 95,
+          "text": "    let document = decode_document(&raw_action).map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 97,
+          "text": "        canonicalize(&document.proposal, &document.context).map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 98,
+          "text": "    let receipt = decode_receipt(&raw_receipt).map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 100,
+          "text": "        .map_err(CliError::Protection)?;"
+        },
+        {
+          "line": 109,
+          "text": "        .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;"
+        },
+        {
+          "line": 110,
+          "text": "    write_output(out, &bytes)?;"
+        }
+      ]
+    },
+    "rust/crates/swarm-cli/src/lib.rs": {
+      "policies": [],
+      "functions": [],
+      "errors": []
+    },
+    "rust/crates/swarm-cli/tests/protection_receipt.rs": {
+      "policies": [
+        {
+          "line": 22,
+          "text": "            \"schema_version\": 1, \"action_digest\": vector[\"action_digest\"],"
+        },
+        {
+          "line": 23,
+          "text": "            \"intent_id\": vector[\"intent_id\"], \"sink_id\": \"sink-1\", \"outcome\": outcome,"
+        },
+        {
+          "line": 24,
+          "text": "            \"observation_digest\": \"d\".repeat(64)"
+        },
+        {
+          "line": 44,
+          "text": "/// Exercise the actual CLI binary on an owned temporary directory, with no timeout policy."
+        },
+        {
+          "line": 56,
+          "text": "    assert_eq!(output.status.code(), Some(2));"
+        },
+        {
+          "line": 79,
+          "text": "        for index in [0, 8] {"
+        },
+        {
+          "line": 96,
+          "text": "                let output = call(dir.path(), language, \"sink-1\", previous, &[]);"
+        },
+        {
+          "line": 100,
+          "text": "                assert_eq!(report[\"schema_version\"], 1);"
+        },
+        {
+          "line": 131,
+          "text": "    for index in [0, 8] {"
+        },
+        {
+          "line": 138,
+          "text": "            assert!(call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[])"
+        },
+        {
+          "line": 154,
+          "text": "            unknown[\"private-CANARY\"] = json!(true);"
+        },
+        {
+          "line": 162,
+          "text": "            \"\\\"sink_id\\\":\\\"sink-1\\\"\","
+        },
+        {
+          "line": 163,
+          "text": "            \"\\\"sink_id\\\":\\\"sink-1\\\",\\\"sink_\\\\u0069d\\\":\\\"sink-CANARY\\\"\","
+        },
+        {
+          "line": 164,
+          "text": "            1,"
+        },
+        {
+          "line": 177,
+          "text": "                json!(\"e\".repeat(64))"
+        },
+        {
+          "line": 192,
+          "text": "        let (changed, _) = inputs(if index == 0 { 2 } else { 10 }, \"COMMITTED\");"
+        },
+        {
+          "line": 202,
+          "text": "                call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[]),"
+        },
+        {
+          "line": 218,
+          "text": "            (\"sink-1\", \"state-CANARY\", \"protection-document-invalid\"),"
+        },
+        {
+          "line": 219,
+          "text": "            (\"sink-1\", \"commit_requested\", \"protection-document-invalid\"),"
+        },
+        {
+          "line": 222,
+          "text": "                \"sink-1\\n\","
+        },
+        {
+          "line": 226,
+          "text": "            (\"SINK-1\", \"COMMIT_REQUESTED\", \"protection-receipt-binding\"),"
+        },
+        {
+          "line": 227,
+          "text": "            (\"sink-1\", \"UNKNOWN\", \"protection-transition-invalid\"),"
+        },
+        {
+          "line": 228,
+          "text": "            (\"sink-1\", \"COMMITTED\", \"protection-transition-invalid\"),"
+        },
+        {
+          "line": 229,
+          "text": "            (\"sink-1\", \"DENIED\", \"protection-transition-invalid\"),"
+        },
+        {
+          "line": 231,
+          "text": "                \"sink-1\","
+        },
+        {
+          "line": 236,
+          "text": "                \"sink-1\","
+        },
+        {
+          "line": 249,
+          "text": "                call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[]),"
+        },
+        {
+          "line": 272,
+          "text": "    let (action, receipt) = inputs(8, \"COMMITTED\");"
+        },
+        {
+          "line": 284,
+          "text": "        assert!(call(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\", &[])"
+        },
+        {
+          "line": 293,
+          "text": "        vec![\"--task\", \"task-1\"],"
+        },
+        {
+          "line": 299,
+          "text": "            call(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\", &extra),"
+        },
+        {
+          "line": 303,
+          "text": "        let mut invalid = args(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 304,
+          "text": "        invalid[2] = \"missing-action.json\".into();"
+        },
+        {
+          "line": 305,
+          "text": "        invalid[3] = \"missing-receipt.json\".into();"
+        },
+        {
+          "line": 315,
+          "text": "    for position in [2, 3] {"
+        },
+        {
+          "line": 317,
+          "text": "        let mut invalid = args(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 330,
+          "text": "    let mut missing_state = args(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 331,
+          "text": "    missing_state.remove(5);"
+        },
+        {
+          "line": 350,
+          "text": "    // run_detailed uses the process cwd for its default Root. Keep even an"
+        },
+        {
+          "line": 397,
+          "text": "    let (action, receipt) = inputs(0, \"COMMITTED\");"
+        },
+        {
+          "line": 402,
+          "text": "    let argv = args(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 403,
+          "text": "    for flush_only in [false, true] {"
+        },
+        {
+          "line": 406,
+          "text": "        assert_eq!(swarm_cli::run(&argv, \"en\", &mut good, &mut diagnostic), 0);"
+        },
+        {
+          "line": 413,
+          "text": "        assert_eq!(failure.code, 2);"
+        },
+        {
+          "line": 427,
+          "text": "            0"
+        }
+      ],
+      "functions": [
+        {
+          "line": 12,
+          "text": "fn inputs(index: usize, outcome: &str) -> (Value, Value) {"
+        },
+        {
+          "line": 30,
+          "text": "fn args(root: &Path, language: &str, sink: &str, previous: &str) -> Vec<String> {"
+        },
+        {
+          "line": 45,
+          "text": "fn call(root: &Path, language: &str, sink: &str, previous: &str, extra: &[&str]) -> Output {"
+        },
+        {
+          "line": 55,
+          "text": "fn refused(output: Output, code: &str) {"
+        },
+        {
+          "line": 67,
+          "text": "fn protection_receipt_both_domains_and_reconciliation_are_offline() {"
+        },
+        {
+          "line": 129,
+          "text": "fn protection_receipt_invalid_inputs_and_bindings_refuse_then_recover() {"
+        },
+        {
+          "line": 270,
+          "text": "fn protection_receipt_runtime_options_and_framing_refuse_before_reads() {"
+        },
+        {
+          "line": 349,
+          "text": "fn protection_receipt_write_and_flush_failures_keep_cause_and_recover() {"
+        },
+        {
+          "line": 384,
+          "text": "        fn write(&mut self, raw: &[u8]) -> io::Result<usize> {"
+        },
+        {
+          "line": 392,
+          "text": "        fn flush(&mut self) -> io::Result<()> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 4,
+          "text": "    error::Error as _,"
+        },
+        {
+          "line": 17,
+          "text": "    .unwrap();"
+        },
+        {
+          "line": 34,
+          "text": "        root.join(\"action.json\").to_str().unwrap().into(),"
+        },
+        {
+          "line": 35,
+          "text": "        root.join(\"receipt.json\").to_str().unwrap().into(),"
+        },
+        {
+          "line": 51,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 58,
+          "text": "    let diagnostic = String::from_utf8(output.stderr).unwrap();"
+        },
+        {
+          "line": 59,
+          "text": "    let failure: Value = serde_json::from_str(&diagnostic).unwrap();"
+        },
+        {
+          "line": 68,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 74,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 77,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 92,
+          "text": "                let action_bytes = serde_json::to_vec(&action).unwrap();"
+        },
+        {
+          "line": 93,
+          "text": "                let receipt_bytes = serde_json::to_vec(&receipt).unwrap();"
+        },
+        {
+          "line": 94,
+          "text": "                fs::write(dir.path().join(\"action.json\"), &action_bytes).unwrap();"
+        },
+        {
+          "line": 95,
+          "text": "                fs::write(dir.path().join(\"receipt.json\"), &receipt_bytes).unwrap();"
+        },
+        {
+          "line": 97,
+          "text": "                assert!(output.status.success(), \"{:?}\", output.stderr);"
+        },
+        {
+          "line": 99,
+          "text": "                let report: Value = serde_json::from_slice(&output.stdout).unwrap();"
+        },
+        {
+          "line": 113,
+          "text": "                    fs::read(dir.path().join(\"action.json\")).unwrap(),"
+        },
+        {
+          "line": 117,
+          "text": "                    fs::read(dir.path().join(\"receipt.json\")).unwrap(),"
+        },
+        {
+          "line": 130,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 133,
+          "text": "        let good_action = serde_json::to_vec(&action).unwrap();"
+        },
+        {
+          "line": 134,
+          "text": "        let good_receipt = serde_json::to_vec(&receipt).unwrap();"
+        },
+        {
+          "line": 135,
+          "text": "        fs::write(dir.path().join(\"action.json\"), &good_action).unwrap();"
+        },
+        {
+          "line": 136,
+          "text": "        fs::write(dir.path().join(\"receipt.json\"), &good_receipt).unwrap();"
+        },
+        {
+          "line": 157,
+          "text": "                serde_json::to_vec(&unknown).unwrap(),"
+        },
+        {
+          "line": 161,
+          "text": "        let duplicate = String::from_utf8(good_receipt.clone()).unwrap().replacen("
+        },
+        {
+          "line": 181,
+          "text": "                serde_json::to_vec(&bad).unwrap(),"
+        },
+        {
+          "line": 189,
+          "text": "            serde_json::to_vec(&wrong_outcome).unwrap(),"
+        },
+        {
+          "line": 195,
+          "text": "            serde_json::to_vec(&changed).unwrap(),"
+        },
+        {
+          "line": 200,
+          "text": "            fs::write(dir.path().join(file), &invalid).unwrap();"
+        },
+        {
+          "line": 205,
+          "text": "            assert_eq!(fs::read(dir.path().join(file)).unwrap(), invalid);"
+        },
+        {
+          "line": 214,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 247,
+          "text": "            fs::remove_file(dir.path().join(file)).unwrap();"
+        },
+        {
+          "line": 260,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 271,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 275,
+          "text": "        serde_json::to_vec(&action).unwrap(),"
+        },
+        {
+          "line": 277,
+          "text": "    .unwrap();"
+        },
+        {
+          "line": 280,
+          "text": "        serde_json::to_vec(&receipt).unwrap(),"
+        },
+        {
+          "line": 282,
+          "text": "    .unwrap();"
+        },
+        {
+          "line": 311,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 324,
+          "text": "                .unwrap(),"
+        },
+        {
+          "line": 337,
+          "text": "            .unwrap(),"
+        },
+        {
+          "line": 354,
+          "text": "        let isolated = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 355,
+          "text": "        let output = Command::new(std::env::current_exe().unwrap())"
+        },
+        {
+          "line": 364,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 367,
+          "text": "            \"{:?} {:?}\","
+        },
+        {
+          "line": 374,
+          "text": "    let current = std::env::current_dir().unwrap();"
+        },
+        {
+          "line": 375,
+          "text": "    assert_eq!(current, Path::new(&std::env::var_os(CHILD_ROOT).unwrap()));"
+        },
+        {
+          "line": 377,
+          "text": "    /// Fail before publication or after complete JSON; fixture error text stays private."
+        },
+        {
+          "line": 386,
+          "text": "                return Err(io::Error::new(io::ErrorKind::BrokenPipe, \"IO_CANARY\"));"
+        },
+        {
+          "line": 393,
+          "text": "            Err(io::Error::new(io::ErrorKind::BrokenPipe, \"IO_CANARY\"))"
+        },
+        {
+          "line": 396,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 398,
+          "text": "    let action_bytes = serde_json::to_vec(&action).unwrap();"
+        },
+        {
+          "line": 399,
+          "text": "    let receipt_bytes = serde_json::to_vec(&receipt).unwrap();"
+        },
+        {
+          "line": 400,
+          "text": "    fs::write(dir.path().join(\"action.json\"), &action_bytes).unwrap();"
+        },
+        {
+          "line": 401,
+          "text": "    fs::write(dir.path().join(\"receipt.json\"), &receipt_bytes).unwrap();"
+        },
+        {
+          "line": 414,
+          "text": "        let error = failure.error.unwrap();"
+        },
+        {
+          "line": 415,
+          "text": "        let cause = error.source().unwrap().downcast_ref::<io::Error>().unwrap();"
+        },
+        {
+          "line": 419,
+          "text": "        let text = String::from_utf8(diagnostic).unwrap();"
+        },
+        {
+          "line": 420,
+          "text": "        let report: Value = serde_json::from_str(&text).unwrap();"
+        },
+        {
+          "line": 430,
+          "text": "            fs::read(dir.path().join(\"action.json\")).unwrap(),"
+        },
+        {
+          "line": 434,
+          "text": "            fs::read(dir.path().join(\"receipt.json\")).unwrap(),"
+        }
+      ]
+    }
+  },
+  "function_inventory": [
+    {
+      "file": "rust/crates/swarm-cli/src/protection.rs",
+      "line": 18,
+      "function": "execute",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/src/protection.rs",
+      "line": 85,
+      "function": "check_receipt",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/src/lib.rs",
+      "line": 496,
+      "function": "execute",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 12,
+      "function": "inputs",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 30,
+      "function": "args",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 45,
+      "function": "call",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 55,
+      "function": "refused",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 67,
+      "function": "protection_receipt_both_domains_and_reconciliation_are_offline",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 129,
+      "function": "protection_receipt_invalid_inputs_and_bindings_refuse_then_recover",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 270,
+      "function": "protection_receipt_runtime_options_and_framing_refuse_before_reads",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 349,
+      "function": "protection_receipt_write_and_flush_failures_keep_cause_and_recover",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 384,
+      "function": "write",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    },
+    {
+      "file": "rust/crates/swarm-cli/tests/protection_receipt.rs",
+      "line": 392,
+      "function": "flush",
+      "doc_contract_review": "source reviewed, not Rustdoc compiled"
+    }
+  ],
+  "semantic_review": {
+    "policies": {
+      "new_operator_policy": false,
+      "protocol": "six positional tokens, no stdin ambiguity, shared State serialization, schema v1 and explicit not-established markers",
+      "technical": "existing command_input 16 MiB regular-file transport, symlinks to regular documents follow existing behavior; no ownership/confinement guarantee; no added aggregate/time/retry limit",
+      "test_only": "frozen vector indices, digests, outcome matrix, IO BrokenPipe canary, isolated child cwd/env; no product consumer",
+      "default": "root/phase retain existing value-based compatibility; no default previous state or effect outcome added"
+    },
+    "functions": {
+      "production": "protection execute guard dispatch; check_receipt documents its guarded arity, supplied state/sink, sequential reads, typed failures, potential partial output and absence of authorization; root execute only adds FR/EN help",
+      "tests": "10 helper/test/Write functions documented; new 4-test target selected exactly; root/cwd isolation in child prevents accidental live project fixture",
+      "rustdoc": "NOT EXECUTED, user forbids compilation"
+    },
+    "errors": {
+      "state": "shared serde enum from Value::String; serde JSON error cause preserved via Protection(Json); diagnostics expose static code",
+      "input": "shared reader open/metadata/size/read/close and secondary cleanup propagated as CommandInput; no empty-success fallback; input values are not authority",
+      "contract": "strict decode_document, canonicalize, strict decode_receipt and existing checker; no transition success until all return Ok",
+      "output": "serialize complete Value, shared write_output write_all+flush; failure retains IO cause and exit2, possible emitted bytes; no Root/state/effect mutation",
+      "tests": "exact JSON code assertions, empty stdout on refusal, canary secrecy, valid controls/recovery; write/flush original source checks are prepared, NOT EXECUTED"
+    },
+    "documentation": {
+      "updated": "FR/EN architecture, plan, queue, local source-only notes, output schema and recipe; history 01-07 intact",
+      "limits": "no type/behavior/install/authority/authenticity/effect/E2/E3/RETEX acceptance established",
+      "future_context": "next chat reads canonical plan/INCREMENT-08 and permanent recipe; existing embedded contexts/processes not changed"
+    }
+  },
+  "findings": [
+    {
+      "id": "PAEA-08-VERIFY",
+      "state": "OPEN",
+      "owner": "Codex root after user lifts no-compilation instruction",
+      "observable": "affected Rust targets and full recipe then verify pass on stable sources; profile/Rustdoc/delivery separately qualify"
+    },
+    {
+      "id": "PAEA-08-IO-ISOLATION",
+      "state": "IMPLEMENTED_NOT_EXECUTED",
+      "owner": "Codex CLI tests",
+      "origin": "review found default Root points to calling cwd in in-process output test",
+      "observable": "valid control/write failure/flush failure/recovery in child with no .swarm created in either fixture directory",
+      "resumption": "execute protection_receipt target after compilation is authorized"
+    },
+    {
+      "id": "PAEA-PROTECTED-PRODUCERS",
+      "state": "OPEN",
+      "owner": "PA-02 Identity/integration and AC-02 owners",
+      "observable": "authenticated current authority, protected service/observation and ordered commit; pure offline checker cannot supply them"
+    }
+  ],
+  "qualification": "NOT ESTABLISHED; no SWARM_MIGRATION_REVIEW_BASELINE/effective inventory generated under no-compilation restriction"
+}

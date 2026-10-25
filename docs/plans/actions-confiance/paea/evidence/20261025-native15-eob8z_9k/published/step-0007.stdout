@@ -1,0 +1,9 @@
+
+running 4 tests
+test receipt_report_binds_observation_and_raw_bytes_without_authorizing ... ok
+test receipt_report_transport_and_whitespace_do_not_change_business_identity ... ok
+test receipt_report_rejects_bad_documents_and_receipts_then_recovers ... ok
+test receipt_report_keeps_binding_and_lifecycle_refusals ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

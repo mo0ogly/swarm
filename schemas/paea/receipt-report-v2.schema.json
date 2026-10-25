@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:receipt-report:v2",
+  "title": "PAEA exact-input receipt correspondence report v2",
+  "description": "Offline report shape binding supplied document and receipt bytes. Hashes are not signatures, approval, freshness or evidence of an effect. Runtime binding/lifecycle checks and provenance must be established separately. Input document and receipt schemas remain v1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scope", "document", "receipt_sha256", "previous_state", "proposed_state", "authority", "receipt_authenticity", "effect"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 2},
+    "scope": {"const": "offline-data-only"},
+    "document": {"$ref": "#/$defs/document"},
+    "receipt_sha256": {"$ref": "#/$defs/digest"},
+    "previous_state": {"enum": ["PROPOSED", "ADMITTED", "APPROVAL_PENDING", "AUTHORIZED", "COMMIT_REQUESTED", "COMMITTED", "DENIED", "UNKNOWN", "RECONCILED_COMMITTED", "RECONCILED_NOT_COMMITTED"]},
+    "proposed_state": {"enum": ["COMMITTED", "DENIED", "UNKNOWN", "RECONCILED_COMMITTED", "RECONCILED_NOT_COMMITTED"]},
+    "authority": {"const": "not-established"},
+    "receipt_authenticity": {"const": "not-established"},
+    "effect": {"const": "not-established"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "minLength": 64, "maxLength": 64, "not": {"pattern": "[^a-f0-9]"}},
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_sha256", "action_digest", "intent_id"],
+      "properties": {
+        "document_sha256": {"$ref": "#/$defs/digest"},
+        "action_digest": {"$ref": "#/$defs/digest"},
+        "intent_id": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

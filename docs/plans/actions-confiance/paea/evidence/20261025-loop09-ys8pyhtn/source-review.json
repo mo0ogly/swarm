@@ -1,0 +1,1398 @@
+{
+  "status": "PUBLIC_BEHAVIOR_OBSERVED_WITH_OPEN_REQUIREMENTS",
+  "reviewer": "Codex root, same context; no independent acceptance",
+  "owned_inputs": {
+    "tests/paea_public_contract_test.py": "9dc12a194a3b63d08785a78e80494bb1115ba30418583ef2157d46f71011760f",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs": "e5929a78856da8b6f2e7570cb632b7726744779036a1183274301652083a9950",
+    "tools/verification/recipes/paea-public-existing-binary.json": "71120141893c9630815e8dd649dc6f7d2c5fd22b94b4308dfa7e40b7d668f0d4",
+    "schemas/paea/comparison-v1.schema.json": "1ed75ef23511ce6e47edafe548ea130b5688abd10c90646747dc24dc2de235c2",
+    "schemas/paea/receipt-check-v1.schema.json": "1fb0eac36336a8fd466b3b8ddeaf1cb4f1f2e1cb54130c56478b34c9fbee5a95",
+    "docs/architecture/PAEA-CONTRACT.md": "ec22effc8c6b70b840973797cf6f3f1f616b071a8de364a70431ad94d973c0af",
+    "docs/en/PAEA-CONTRACT.md": "fb8d86eb122f8c023686cb1344c1e40e6744b96d127a3948da79794c433c759e",
+    "docs/plans/actions-confiance/PAEA-APEX.md": "b2336c5e8581656eac06a9c19d9fd1a29a0bcbfc935abe7d7674adc2a88d60e5",
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": "85114a385c30738976679fbac9851422cf05b8cbea7d40344708da7c9cc97d99",
+    "docs/plans/FILE-APEX.md": "b2728ccf4674f12ca1b2e19dbb2af6dfda55a9cffa77ff3e31090f452e4285e7",
+    "docs/en/APEX-QUEUE.md": "812a762ccbfd38f15761297bae6dc4623f9c0734463fc05f9c1de7e8e4f8ff4a",
+    "docs/plans/actions-confiance/paea/INCREMENT-09.md": "dbd3d0e06080a6ef3cc7ebeb355011434349260614b737fa27d3e855f05f44fb",
+    "docs/en/plans/actions-confiance/paea/INCREMENT-09.md": "d3c17f0d044da8a8c443ccba106f4eb89578d5c1d154780163c6907d108c7aa1"
+  },
+  "changed_python_functions": [
+    "PublicContract.invoke_files",
+    "PublicContract.compared",
+    "PublicContract.compared.identity",
+    "PublicContract.receipt",
+    "PublicContract.received",
+    "PublicContract.test_comparison_exact_reports_both_domains_and_transport_equivalence",
+    "PublicContract.test_comparison_invalid_either_file_refuses_then_recovers",
+    "PublicContract.test_comparison_runtime_options_and_stdin_refuse_then_recovers",
+    "PublicContract.test_comparison_public_writer_failure_recovers",
+    "PublicContract.test_receipt_exact_correspondence_both_domains_and_languages",
+    "PublicContract.test_receipt_malformed_and_mismatched_data_refuse_then_recovers",
+    "PublicContract.test_receipt_state_sink_and_runtime_refusals_then_recovery",
+    "PublicContract.test_receipt_public_writer_failure_recovers",
+    "main"
+  ],
+  "changed_rust_functions": [
+    "refused",
+    "protection_receipt_write_and_flush_failures_keep_cause_and_recover"
+  ],
+  "lexical_candidates": {
+    "tests/paea_public_contract_test.py": {
+      "policies": [
+        {
+          "line": 11,
+          "text": "There is no global watchdog or automatic retry. Missing prerequisites fail before"
+        },
+        {
+          "line": 25,
+          "text": "ROOT = Path(__file__).resolve().parents[1]"
+        },
+        {
+          "line": 30,
+          "text": "    return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()"
+        },
+        {
+          "line": 36,
+          "text": "    if raw.count(old) != 1:"
+        },
+        {
+          "line": 38,
+          "text": "    return raw.replace(old, new, 1)"
+        },
+        {
+          "line": 48,
+          "text": "        if len(cls.vectors) != 14:"
+        },
+        {
+          "line": 62,
+          "text": "    def invoke(self, raw, language='en', named=False, stdout=None,"
+        },
+        {
+          "line": 93,
+          "text": "    def accepted(self, raw, index, language='en', named=False, extra=()):"
+        },
+        {
+          "line": 96,
+          "text": "        self.assertEqual(result.returncode, 0, result.stderr)"
+        },
+        {
+          "line": 101,
+          "text": "            'schema_version': 1, 'canonicalization': 'paea-json-v1',"
+        },
+        {
+          "line": 117,
+          "text": "        payment = encode(self.document(0))"
+        },
+        {
+          "line": 118,
+          "text": "        git = encode(self.document(8))"
+        },
+        {
+          "line": 121,
+          "text": "            ('duplicate-root', 0, replace_once(payment, '\"proposal\":{', '\"proposal\":{},\"proposal\":{'), document_error),"
+        },
+        {
+          "line": 122,
+          "text": "            ('duplicate-nested', 0, replace_once(payment, '\"kind\":\"payment.settle\"', '\"kind\":\"payment.settle\",\"kind\":\"payment.settle\"'), document_error),"
+        },
+        {
+          "line": 123,
+          "text": "            ('unicode-equivalent-key', 0, replace_once(payment, '\"kind\":\"payment.settle\"', '\"kind\":\"payment.settle\",\"ki\\\\u006ed\":\"payment.settle\"'), document_error),"
+        },
+        {
+          "line": 124,
+          "text": "            ('float', 0, replace_once(payment, '\"schema_version\":1', '\"schema_version\":1.0'), document_error),"
+        },
+        {
+          "line": 125,
+          "text": "            ('exponent', 0, replace_once(payment, '\"schema_version\":1', '\"schema_version\":1e0'), document_error),"
+        },
+        {
+          "line": 126,
+          "text": "            ('huge-exponent', 0, replace_once(payment, '\"schema_version\":1', '\"schema_version\":1e999'), document_error),"
+        },
+        {
+          "line": 127,
+          "text": "            ('revision-overflow', 0, replace_once(payment, '\"mandate_revision\":1', '\"mandate_revision\":9223372036854775808'), document_error),"
+        },
+        {
+          "line": 128,
+          "text": "            ('numeric-money', 0, replace_once(payment, '\"amount_minor\":\"420000\"', '\"amount_minor\":420000'), document_error),"
+        },
+        {
+          "line": 129,
+          "text": "            ('leading-zero-money', 0, replace_once(payment, '\"amount_minor\":\"420000\"', '\"amount_minor\":\"0420000\"'), 'protection-amount-representation'),"
+        },
+        {
+          "line": 130,
+          "text": "            ('unpaired-surrogate', 0, replace_once(payment, 'invoice-17', 'invoice-\\\\ud800'), document_error),"
+        },
+        {
+          "line": 131,
+          "text": "            ('invalid-utf8', 0, payment + b'\\xff', document_error),"
+        },
+        {
+          "line": 132,
+          "text": "            ('second-document', 0, payment + b' {\"x\":1}', document_error),"
+        },
+        {
+          "line": 133,
+          "text": "            ('forged-authority', 0, replace_once(payment, '\"proposal\":{', '\"PRIVATE-CANARY-NOT-A-PERMISSION\":\"approved\",\"proposal\":{'), document_error),"
+        },
+        {
+          "line": 134,
+          "text": "            ('git-alias', 8, replace_once(git, 'refs/heads/candidate', 'HEAD'), 'protection-repository-target'),"
+        },
+        {
+          "line": 135,
+          "text": "            ('git-mixed-algorithm', 8, replace_once(git, '\"candidate_oid\":\"' + '2' * 40 + '\"', '\"candidate_oid\":\"' + '3' * 64 + '\"'), 'protection-git-oid'),"
+        },
+        {
+          "line": 136,
+          "text": "            ('git-noop', 8, replace_once(git, '\"candidate_oid\":\"' + '2' * 40 + '\"', '\"candidate_oid\":\"' + '1' * 40 + '\"'), 'protection-git-no-change'),"
+        },
+        {
+          "line": 143,
+          "text": "                self.assertEqual(refused.returncode, 2)"
+        },
+        {
+          "line": 151,
+          "text": "        for index in (0, 8):"
+        },
+        {
+          "line": 154,
+          "text": "            self.accepted(json.dumps(self.document(index), indent=2).encode(), index)"
+        },
+        {
+          "line": 156,
+          "text": "            document['context']['sources'][0]['confidentiality_labels'].reverse()"
+        },
+        {
+          "line": 158,
+          "text": "            if index == 0:"
+        },
+        {
+          "line": 159,
+          "text": "                self.accepted(replace_once(valid, 'invoice-17', 'invoice-\\\\u0031\\\\u0037'), index)"
+        },
+        {
+          "line": 164,
+          "text": "        self.assertEqual(result.returncode, 2)"
+        },
+        {
+          "line": 168,
+          "text": "        self.assertIs(failure['retryable'], False)"
+        },
+        {
+          "line": 176,
+          "text": "        Explicit default root/phase remain accepted. No server is started."
+        },
+        {
+          "line": 186,
+          "text": "        for index in (0, 8):"
+        },
+        {
+          "line": 204,
+          "text": "        for index in (0, 8):"
+        },
+        {
+          "line": 208,
+          "text": "                    ('missing', valid, False, str(self.root / 'absent.json'), 'input-document-io'),"
+        },
+        {
+          "line": 209,
+          "text": "                    ('directory', valid, False, str(self.root), 'input-regular-file-required'),"
+        },
+        {
+          "line": 210,
+          "text": "                    ('empty-stdin', b'', False, None, 'protection-document-invalid'),"
+        },
+        {
+          "line": 211,
+          "text": "                    ('empty-file', b'', True, None, 'protection-document-invalid'),"
+        },
+        {
+          "line": 220,
+          "text": "        valid = encode(self.document(8))"
+        },
+        {
+          "line": 221,
+          "text": "        self.accepted(valid, 8)"
+        },
+        {
+          "line": 222,
+          "text": "        with Path('/dev/full').open('wb', buffering=0) as full:"
+        },
+        {
+          "line": 224,
+          "text": "        self.assertEqual(refused.returncode, 2)"
+        },
+        {
+          "line": 226,
+          "text": "        self.accepted(valid, 8)"
+        },
+        {
+          "line": 235,
+          "text": "        after each call. IO errors propagate; no timeout/retry policy is introduced."
+        },
+        {
+          "line": 274,
+          "text": "        self.assertEqual(result.returncode, 0, result.stderr)"
+        },
+        {
+          "line": 282,
+          "text": "            'schema_version': 1, 'scope': 'offline-data-only', 'comparison': {"
+        },
+        {
+          "line": 283,
+          "text": "                'schema_version': 1, 'authority': 'not-established', 'effect': 'not-established',"
+        },
+        {
+          "line": 297,
+          "text": "        return {'schema_version': 1, 'action_digest': vector['action_digest'],"
+        },
+        {
+          "line": 298,
+          "text": "                'intent_id': vector['intent_id'], 'sink_id': 'sink-1', 'outcome': outcome,"
+        },
+        {
+          "line": 299,
+          "text": "                'observation_digest': 'd' * 64}"
+        },
+        {
+          "line": 305,
+          "text": "                                   suffix=('sink-1', previous))"
+        },
+        {
+          "line": 306,
+          "text": "        self.assertEqual(result.returncode, 0, result.stderr)"
+        },
+        {
+          "line": 309,
+          "text": "            'schema_version': 1, 'scope': 'offline-data-only',"
+        },
+        {
+          "line": 322,
+          "text": "            for before, after, path in ((0, 2, '/action/amount_minor'),"
+        },
+        {
+          "line": 323,
+          "text": "                                        (8, 10, '/action/candidate_oid')):"
+        },
+        {
+          "line": 325,
+          "text": "            for index in (0, 8):"
+        },
+        {
+          "line": 326,
+          "text": "                self.compared(index, index + 1, language)"
+        },
+        {
+          "line": 328,
+          "text": "                labels['context']['sources'][0]['confidentiality_labels'].reverse()"
+        },
+        {
+          "line": 333,
+          "text": "        for index in (0, 8):"
+        },
+        {
+          "line": 337,
+          "text": "            for side in (0, 1):"
+        },
+        {
+          "line": 357,
+          "text": "            good = encode(self.document(8))"
+        },
+        {
+          "line": 361,
+          "text": "                self.compared(8, 8, language)"
+        },
+        {
+          "line": 364,
+          "text": "                self.compared(8, 8, language)"
+        },
+        {
+          "line": 366,
+          "text": "                self.compared(8, 8, language)"
+        },
+        {
+          "line": 369,
+          "text": "                self.compared(8, 8, language)"
+        },
+        {
+          "line": 373,
+          "text": "        good = encode(self.document(0))"
+        },
+        {
+          "line": 374,
+          "text": "        self.compared(0, 0)"
+        },
+        {
+          "line": 375,
+          "text": "        with Path('/dev/full').open('wb', buffering=0) as full:"
+        },
+        {
+          "line": 377,
+          "text": "        self.assertEqual(result.returncode, 2)"
+        },
+        {
+          "line": 379,
+          "text": "        self.compared(0, 0)"
+        },
+        {
+          "line": 388,
+          "text": "        for index in (0, 8):"
+        },
+        {
+          "line": 395,
+          "text": "        for index in (0, 8):"
+        },
+        {
+          "line": 398,
+          "text": "            for side in (0, 1):"
+        },
+        {
+          "line": 401,
+          "text": "            cases.append((1, replace_once(receipt, '\"sink_id\":\"sink-1\"',"
+        },
+        {
+          "line": 402,
+          "text": "                          '\"sink_id\":\"sink-1\",\"sink_\\\\u0069d\":\"sink-1\"'),"
+        },
+        {
+          "line": 404,
+          "text": "            for key, value in (('action_digest', 'e' * 64), ('intent_id', 'f' * 64),"
+        },
+        {
+          "line": 408,
+          "text": "                cases.append((1, encode(bad), 'protection-receipt-binding'))"
+        },
+        {
+          "line": 410,
+          "text": "            cases.append((1, encode(bad), 'protection-effect-receipt'))"
+        },
+        {
+          "line": 411,
+          "text": "            cases.append((0, encode(self.document(2 if index == 0 else 10)), 'protection-receipt-binding'))"
+        },
+        {
+          "line": 417,
+          "text": "                             suffix=('sink-1', 'COMMIT_REQUESTED')), code)"
+        },
+        {
+          "line": 421,
+          "text": "        \"\"\"UNKNOWN/terminals cannot relabel or replay; syntax never chooses a default.\"\"\""
+        },
+        {
+          "line": 423,
+          "text": "            action, receipt = encode(self.document(8)), encode(self.receipt(8))"
+        },
+        {
+          "line": 425,
+          "text": "                ('sink-1', 'PRIVATE-CANARY-NOT-A-PERMISSION', 'protection-document-invalid'),"
+        },
+        {
+          "line": 427,
+          "text": "                ('SINK-1', 'COMMIT_REQUESTED', 'protection-receipt-binding'),"
+        },
+        {
+          "line": 428,
+          "text": "                *[('sink-1', state, 'protection-transition-invalid') for state in"
+        },
+        {
+          "line": 431,
+          "text": "                self.received(8, language=language)"
+        },
+        {
+          "line": 434,
+          "text": "                self.received(8, language=language)"
+        },
+        {
+          "line": 438,
+          "text": "                self.received(8, language=language)"
+        },
+        {
+          "line": 440,
+          "text": "                             suffix=('sink-1', 'COMMIT_REQUESTED'), extra=extra), 'command_failed')"
+        },
+        {
+          "line": 441,
+          "text": "                self.received(8, language=language)"
+        },
+        {
+          "line": 442,
+          "text": "            for paths, suffix in ((('-', 'right.json'), ('sink-1', 'COMMIT_REQUESTED')),"
+        },
+        {
+          "line": 443,
+          "text": "                                  (('left.json', '-'), ('sink-1', 'COMMIT_REQUESTED')),"
+        },
+        {
+          "line": 444,
+          "text": "                                  (('left.json', 'right.json'), ('sink-1',))):"
+        },
+        {
+          "line": 445,
+          "text": "                self.received(8, language=language)"
+        },
+        {
+          "line": 448,
+          "text": "                self.received(8, language=language)"
+        },
+        {
+          "line": 452,
+          "text": "        action, receipt = encode(self.document(0)), encode(self.receipt(0))"
+        },
+        {
+          "line": 453,
+          "text": "        self.received(0)"
+        },
+        {
+          "line": 454,
+          "text": "        with Path('/dev/full').open('wb', buffering=0) as full:"
+        },
+        {
+          "line": 456,
+          "text": "                                       suffix=('sink-1', 'COMMIT_REQUESTED'), stdout=full)"
+        },
+        {
+          "line": 457,
+          "text": "        self.assertEqual(result.returncode, 2)"
+        },
+        {
+          "line": 459,
+          "text": "        self.received(0)"
+        },
+        {
+          "line": 467,
+          "text": "    Return 2 for missing prerequisites or failed checks, 0 only for an executed pass."
+        },
+        {
+          "line": 473,
+          "text": "        return 2"
+        },
+        {
+          "line": 474,
+          "text": "    expected = os.environ[required[1]]"
+        },
+        {
+          "line": 475,
+          "text": "    destination = Path(os.environ[required[2]])"
+        },
+        {
+          "line": 477,
+          "text": "        binary = Path(os.environ[required[0]]).resolve(strict=True)"
+        },
+        {
+          "line": 481,
+          "text": "        return 2"
+        },
+        {
+          "line": 482,
+          "text": "    if (len(expected) != 64 or any(c not in '0123456789abcdef' for c in expected)"
+        },
+        {
+          "line": 486,
+          "text": "        return 2"
+        },
+        {
+          "line": 489,
+          "text": "    result = unittest.TextTestRunner(stream=sys.stdout, verbosity=2).run("
+        },
+        {
+          "line": 496,
+          "text": "        'schema_version': 1, 'scope': 'existing binary, offline fixture observations only',"
+        },
+        {
+          "line": 502,
+          "text": "    return 0 if stable and result.wasSuccessful() and result.testsRun == 14 else 2"
+        }
+      ],
+      "functions": [
+        {
+          "line": 28,
+          "text": "def encode(value):"
+        },
+        {
+          "line": 33,
+          "text": "def replace_once(raw, old, new):"
+        },
+        {
+          "line": 45,
+          "text": "    def setUpClass(cls):"
+        },
+        {
+          "line": 51,
+          "text": "    def setUp(self):"
+        },
+        {
+          "line": 57,
+          "text": "    def document(self, index):"
+        },
+        {
+          "line": 62,
+          "text": "    def invoke(self, raw, language='en', named=False, stdout=None,"
+        },
+        {
+          "line": 93,
+          "text": "    def accepted(self, raw, index, language='en', named=False, extra=()):"
+        },
+        {
+          "line": 107,
+          "text": "    def test_all_frozen_vectors_match_public_bytes_in_both_languages(self):"
+        },
+        {
+          "line": 115,
+          "text": "    def test_raw_ambiguities_refuse_between_valid_control_and_recovery(self):"
+        },
+        {
+          "line": 149,
+          "text": "    def test_equivalent_input_encodings_preserve_exact_content(self):"
+        },
+        {
+          "line": 162,
+          "text": "    def refused(self, result, code):"
+        },
+        {
+          "line": 171,
+          "text": "    def test_active_operations_and_runtime_options_refuse_then_recover(self):"
+        },
+        {
+          "line": 197,
+          "text": "    def test_input_failures_refuse_without_mutation_then_recover(self):"
+        },
+        {
+          "line": 218,
+          "text": "    def test_output_failure_is_nonzero_after_valid_control_then_recovers(self):"
+        },
+        {
+          "line": 228,
+          "text": "    def invoke_files(self, operation, left, right, language='en', suffix=(),"
+        },
+        {
+          "line": 265,
+          "text": "    def compared(self, before, after, language='en', changed_paths=(), left=None, right=None):"
+        },
+        {
+          "line": 277,
+          "text": "        def identity(raw, vector):"
+        },
+        {
+          "line": 294,
+          "text": "    def receipt(self, index, outcome='COMMITTED'):"
+        },
+        {
+          "line": 301,
+          "text": "    def received(self, index, previous='COMMIT_REQUESTED', outcome='COMMITTED', language='en'):"
+        },
+        {
+          "line": 317,
+          "text": "    def test_comparison_exact_reports_both_domains_and_transport_equivalence(self):"
+        },
+        {
+          "line": 331,
+          "text": "    def test_comparison_invalid_either_file_refuses_then_recovers(self):"
+        },
+        {
+          "line": 354,
+          "text": "    def test_comparison_runtime_options_and_stdin_refuse_then_recovers(self):"
+        },
+        {
+          "line": 371,
+          "text": "    def test_comparison_public_writer_failure_recovers(self):"
+        },
+        {
+          "line": 381,
+          "text": "    def test_receipt_exact_correspondence_both_domains_and_languages(self):"
+        },
+        {
+          "line": 393,
+          "text": "    def test_receipt_malformed_and_mismatched_data_refuse_then_recovers(self):"
+        },
+        {
+          "line": 420,
+          "text": "    def test_receipt_state_sink_and_runtime_refusals_then_recovery(self):"
+        },
+        {
+          "line": 450,
+          "text": "    def test_receipt_public_writer_failure_recovers(self):"
+        },
+        {
+          "line": 462,
+          "text": "def main():"
+        }
+      ],
+      "errors": [
+        {
+          "line": 37,
+          "text": "        raise ValueError('fixture-substitution-is-not-unique')"
+        },
+        {
+          "line": 49,
+          "text": "            raise ValueError('frozen-vector-set-changed')"
+        },
+        {
+          "line": 64,
+          "text": "        \"\"\"Run only offline canonicalize, record original bytes and assert no project IO."
+        },
+        {
+          "line": 238,
+          "text": "            raise ValueError('non-offline-test-operation')"
+        },
+        {
+          "line": 479,
+          "text": "    except OSError as error:"
+        },
+        {
+          "line": 480,
+          "text": "        print(f'PRECONDITION_REFUSED: binary IO errno={error.errno}')"
+        },
+        {
+          "line": 506,
+          "text": "    raise SystemExit(main())"
+        }
+      ]
+    },
+    "rust/crates/swarm-cli/tests/protection_receipt.rs": {
+      "policies": [
+        {
+          "line": 22,
+          "text": "            \"schema_version\": 1, \"action_digest\": vector[\"action_digest\"],"
+        },
+        {
+          "line": 23,
+          "text": "            \"intent_id\": vector[\"intent_id\"], \"sink_id\": \"sink-1\", \"outcome\": outcome,"
+        },
+        {
+          "line": 24,
+          "text": "            \"observation_digest\": \"d\".repeat(64)"
+        },
+        {
+          "line": 44,
+          "text": "/// Exercise the actual CLI binary on an owned temporary directory, with no timeout policy."
+        },
+        {
+          "line": 57,
+          "text": "    assert_eq!(output.status.code(), Some(2));"
+        },
+        {
+          "line": 80,
+          "text": "        for index in [0, 8] {"
+        },
+        {
+          "line": 97,
+          "text": "                let output = call(dir.path(), language, \"sink-1\", previous, &[]);"
+        },
+        {
+          "line": 101,
+          "text": "                assert_eq!(report[\"schema_version\"], 1);"
+        },
+        {
+          "line": 132,
+          "text": "    for index in [0, 8] {"
+        },
+        {
+          "line": 139,
+          "text": "            assert!(call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[])"
+        },
+        {
+          "line": 155,
+          "text": "            unknown[\"private-CANARY\"] = json!(true);"
+        },
+        {
+          "line": 163,
+          "text": "            \"\\\"sink_id\\\":\\\"sink-1\\\"\","
+        },
+        {
+          "line": 164,
+          "text": "            \"\\\"sink_id\\\":\\\"sink-1\\\",\\\"sink_\\\\u0069d\\\":\\\"sink-CANARY\\\"\","
+        },
+        {
+          "line": 165,
+          "text": "            1,"
+        },
+        {
+          "line": 178,
+          "text": "                json!(\"e\".repeat(64))"
+        },
+        {
+          "line": 193,
+          "text": "        let (changed, _) = inputs(if index == 0 { 2 } else { 10 }, \"COMMITTED\");"
+        },
+        {
+          "line": 203,
+          "text": "                call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[]),"
+        },
+        {
+          "line": 219,
+          "text": "            (\"sink-1\", \"state-CANARY\", \"protection-document-invalid\"),"
+        },
+        {
+          "line": 220,
+          "text": "            (\"sink-1\", \"commit_requested\", \"protection-document-invalid\"),"
+        },
+        {
+          "line": 223,
+          "text": "                \"sink-1\\n\","
+        },
+        {
+          "line": 227,
+          "text": "            (\"SINK-1\", \"COMMIT_REQUESTED\", \"protection-receipt-binding\"),"
+        },
+        {
+          "line": 228,
+          "text": "            (\"sink-1\", \"UNKNOWN\", \"protection-transition-invalid\"),"
+        },
+        {
+          "line": 229,
+          "text": "            (\"sink-1\", \"COMMITTED\", \"protection-transition-invalid\"),"
+        },
+        {
+          "line": 230,
+          "text": "            (\"sink-1\", \"DENIED\", \"protection-transition-invalid\"),"
+        },
+        {
+          "line": 232,
+          "text": "                \"sink-1\","
+        },
+        {
+          "line": 237,
+          "text": "                \"sink-1\","
+        },
+        {
+          "line": 250,
+          "text": "                call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[]),"
+        },
+        {
+          "line": 273,
+          "text": "    let (action, receipt) = inputs(8, \"COMMITTED\");"
+        },
+        {
+          "line": 285,
+          "text": "        assert!(call(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\", &[])"
+        },
+        {
+          "line": 294,
+          "text": "        vec![\"--task\", \"task-1\"],"
+        },
+        {
+          "line": 300,
+          "text": "            call(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\", &extra),"
+        },
+        {
+          "line": 304,
+          "text": "        let mut invalid = args(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 305,
+          "text": "        invalid[2] = \"missing-action.json\".into();"
+        },
+        {
+          "line": 306,
+          "text": "        invalid[3] = \"missing-receipt.json\".into();"
+        },
+        {
+          "line": 316,
+          "text": "    for position in [2, 3] {"
+        },
+        {
+          "line": 318,
+          "text": "        let mut invalid = args(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 331,
+          "text": "    let mut missing_state = args(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 332,
+          "text": "    missing_state.remove(5);"
+        },
+        {
+          "line": 351,
+          "text": "    // run_detailed uses the process cwd for its default Root. Keep even an"
+        },
+        {
+          "line": 398,
+          "text": "    let (action, receipt) = inputs(0, \"COMMITTED\");"
+        },
+        {
+          "line": 403,
+          "text": "    let argv = args(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\");"
+        },
+        {
+          "line": 404,
+          "text": "    for flush_only in [false, true] {"
+        },
+        {
+          "line": 407,
+          "text": "        assert_eq!(swarm_cli::run(&argv, \"en\", &mut good, &mut diagnostic), 0);"
+        },
+        {
+          "line": 414,
+          "text": "        assert_eq!(failure.code, 2);"
+        },
+        {
+          "line": 428,
+          "text": "            0"
+        }
+      ],
+      "functions": [
+        {
+          "line": 12,
+          "text": "fn inputs(index: usize, outcome: &str) -> (Value, Value) {"
+        },
+        {
+          "line": 30,
+          "text": "fn args(root: &Path, language: &str, sink: &str, previous: &str) -> Vec<String> {"
+        },
+        {
+          "line": 45,
+          "text": "fn call(root: &Path, language: &str, sink: &str, previous: &str, extra: &[&str]) -> Output {"
+        },
+        {
+          "line": 56,
+          "text": "fn refused(output: Output, code: &str) {"
+        },
+        {
+          "line": 68,
+          "text": "fn protection_receipt_both_domains_and_reconciliation_are_offline() {"
+        },
+        {
+          "line": 130,
+          "text": "fn protection_receipt_invalid_inputs_and_bindings_refuse_then_recover() {"
+        },
+        {
+          "line": 271,
+          "text": "fn protection_receipt_runtime_options_and_framing_refuse_before_reads() {"
+        },
+        {
+          "line": 350,
+          "text": "fn protection_receipt_write_and_flush_failures_keep_cause_and_recover() {"
+        },
+        {
+          "line": 385,
+          "text": "        fn write(&mut self, raw: &[u8]) -> io::Result<usize> {"
+        },
+        {
+          "line": 393,
+          "text": "        fn flush(&mut self) -> io::Result<()> {"
+        }
+      ],
+      "errors": [
+        {
+          "line": 4,
+          "text": "    error::Error as _,"
+        },
+        {
+          "line": 17,
+          "text": "    .unwrap();"
+        },
+        {
+          "line": 34,
+          "text": "        root.join(\"action.json\").to_str().unwrap().into(),"
+        },
+        {
+          "line": 35,
+          "text": "        root.join(\"receipt.json\").to_str().unwrap().into(),"
+        },
+        {
+          "line": 51,
+          "text": "        .unwrap()"
+        },
+        {
+          "line": 58,
+          "text": "    assert!(output.stdout.is_empty());"
+        },
+        {
+          "line": 59,
+          "text": "    let diagnostic = String::from_utf8(output.stderr).unwrap();"
+        },
+        {
+          "line": 60,
+          "text": "    let failure: Value = serde_json::from_str(&diagnostic).unwrap();"
+        },
+        {
+          "line": 62,
+          "text": "    assert!(!diagnostic.contains(\"CANARY\"));"
+        },
+        {
+          "line": 69,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 75,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 76,
+          "text": "        assert!(help.status.success());"
+        },
+        {
+          "line": 77,
+          "text": "        assert!(String::from_utf8(help.stdout)"
+        },
+        {
+          "line": 78,
+          "text": "            .unwrap()"
+        },
+        {
+          "line": 93,
+          "text": "                let action_bytes = serde_json::to_vec(&action).unwrap();"
+        },
+        {
+          "line": 94,
+          "text": "                let receipt_bytes = serde_json::to_vec(&receipt).unwrap();"
+        },
+        {
+          "line": 95,
+          "text": "                fs::write(dir.path().join(\"action.json\"), &action_bytes).unwrap();"
+        },
+        {
+          "line": 96,
+          "text": "                fs::write(dir.path().join(\"receipt.json\"), &receipt_bytes).unwrap();"
+        },
+        {
+          "line": 98,
+          "text": "                assert!(output.status.success(), \"{:?}\", output.stderr);"
+        },
+        {
+          "line": 99,
+          "text": "                assert!(output.stderr.is_empty());"
+        },
+        {
+          "line": 100,
+          "text": "                let report: Value = serde_json::from_slice(&output.stdout).unwrap();"
+        },
+        {
+          "line": 111,
+          "text": "                assert!(report.get(\"approved\").is_none());"
+        },
+        {
+          "line": 112,
+          "text": "                assert!(report.get(\"verified\").is_none());"
+        },
+        {
+          "line": 114,
+          "text": "                    fs::read(dir.path().join(\"action.json\")).unwrap(),"
+        },
+        {
+          "line": 118,
+          "text": "                    fs::read(dir.path().join(\"receipt.json\")).unwrap(),"
+        },
+        {
+          "line": 121,
+          "text": "                assert!(!dir.path().join(\".swarm\").exists());"
+        },
+        {
+          "line": 131,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 134,
+          "text": "        let good_action = serde_json::to_vec(&action).unwrap();"
+        },
+        {
+          "line": 135,
+          "text": "        let good_receipt = serde_json::to_vec(&receipt).unwrap();"
+        },
+        {
+          "line": 136,
+          "text": "        fs::write(dir.path().join(\"action.json\"), &good_action).unwrap();"
+        },
+        {
+          "line": 137,
+          "text": "        fs::write(dir.path().join(\"receipt.json\"), &good_receipt).unwrap();"
+        },
+        {
+          "line": 139,
+          "text": "            assert!(call(dir.path(), \"en\", \"sink-1\", \"COMMIT_REQUESTED\", &[])"
+        },
+        {
+          "line": 158,
+          "text": "                serde_json::to_vec(&unknown).unwrap(),"
+        },
+        {
+          "line": 162,
+          "text": "        let duplicate = String::from_utf8(good_receipt.clone()).unwrap().replacen("
+        },
+        {
+          "line": 182,
+          "text": "                serde_json::to_vec(&bad).unwrap(),"
+        },
+        {
+          "line": 190,
+          "text": "            serde_json::to_vec(&wrong_outcome).unwrap(),"
+        },
+        {
+          "line": 196,
+          "text": "            serde_json::to_vec(&changed).unwrap(),"
+        },
+        {
+          "line": 201,
+          "text": "            fs::write(dir.path().join(file), &invalid).unwrap();"
+        },
+        {
+          "line": 206,
+          "text": "            assert_eq!(fs::read(dir.path().join(file)).unwrap(), invalid);"
+        },
+        {
+          "line": 215,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 248,
+          "text": "            fs::remove_file(dir.path().join(file)).unwrap();"
+        },
+        {
+          "line": 261,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 264,
+          "text": "        assert!(!dir.path().join(\".swarm\").exists());"
+        },
+        {
+          "line": 272,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 276,
+          "text": "        serde_json::to_vec(&action).unwrap(),"
+        },
+        {
+          "line": 278,
+          "text": "    .unwrap();"
+        },
+        {
+          "line": 281,
+          "text": "        serde_json::to_vec(&receipt).unwrap(),"
+        },
+        {
+          "line": 283,
+          "text": "    .unwrap();"
+        },
+        {
+          "line": 285,
+          "text": "        assert!(call(dir.path(), \"fr\", \"sink-1\", \"COMMIT_REQUESTED\", &[])"
+        },
+        {
+          "line": 312,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 325,
+          "text": "                .unwrap(),"
+        },
+        {
+          "line": 338,
+          "text": "            .unwrap(),"
+        },
+        {
+          "line": 342,
+          "text": "    assert!(!dir.path().join(\"forbidden-root\").exists());"
+        },
+        {
+          "line": 343,
+          "text": "    assert!(!dir.path().join(\"forbidden-output\").exists());"
+        },
+        {
+          "line": 344,
+          "text": "    assert!(!dir.path().join(\".swarm\").exists());"
+        },
+        {
+          "line": 355,
+          "text": "        let isolated = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 356,
+          "text": "        let output = Command::new(std::env::current_exe().unwrap())"
+        },
+        {
+          "line": 365,
+          "text": "            .unwrap();"
+        },
+        {
+          "line": 366,
+          "text": "        assert!("
+        },
+        {
+          "line": 368,
+          "text": "            \"{:?} {:?}\","
+        },
+        {
+          "line": 372,
+          "text": "        assert!(!isolated.path().join(\".swarm\").exists());"
+        },
+        {
+          "line": 375,
+          "text": "    let current = std::env::current_dir().unwrap();"
+        },
+        {
+          "line": 376,
+          "text": "    assert_eq!(current, Path::new(&std::env::var_os(CHILD_ROOT).unwrap()));"
+        },
+        {
+          "line": 377,
+          "text": "    assert!(!current.join(\".swarm\").exists());"
+        },
+        {
+          "line": 378,
+          "text": "    /// Fail before publication or after complete JSON; fixture error text stays private."
+        },
+        {
+          "line": 387,
+          "text": "                return Err(io::Error::new(io::ErrorKind::BrokenPipe, \"IO_CANARY\"));"
+        },
+        {
+          "line": 394,
+          "text": "            Err(io::Error::new(io::ErrorKind::BrokenPipe, \"IO_CANARY\"))"
+        },
+        {
+          "line": 397,
+          "text": "    let dir = tempfile::tempdir().unwrap();"
+        },
+        {
+          "line": 399,
+          "text": "    let action_bytes = serde_json::to_vec(&action).unwrap();"
+        },
+        {
+          "line": 400,
+          "text": "    let receipt_bytes = serde_json::to_vec(&receipt).unwrap();"
+        },
+        {
+          "line": 401,
+          "text": "    fs::write(dir.path().join(\"action.json\"), &action_bytes).unwrap();"
+        },
+        {
+          "line": 402,
+          "text": "    fs::write(dir.path().join(\"receipt.json\"), &receipt_bytes).unwrap();"
+        },
+        {
+          "line": 408,
+          "text": "        assert!(diagnostic.is_empty());"
+        },
+        {
+          "line": 415,
+          "text": "        let error = failure.error.unwrap();"
+        },
+        {
+          "line": 416,
+          "text": "        let cause = error.source().unwrap().downcast_ref::<io::Error>().unwrap();"
+        },
+        {
+          "line": 419,
+          "text": "        assert!(failure.diagnostic_error.is_none());"
+        },
+        {
+          "line": 420,
+          "text": "        let text = String::from_utf8(diagnostic).unwrap();"
+        },
+        {
+          "line": 421,
+          "text": "        let report: Value = serde_json::from_str(&text).unwrap();"
+        },
+        {
+          "line": 423,
+          "text": "        assert!(!text.contains(\"CANARY\"));"
+        },
+        {
+          "line": 431,
+          "text": "            fs::read(dir.path().join(\"action.json\")).unwrap(),"
+        },
+        {
+          "line": 435,
+          "text": "            fs::read(dir.path().join(\"receipt.json\")).unwrap(),"
+        },
+        {
+          "line": 438,
+          "text": "        assert!(!dir.path().join(\".swarm\").exists());"
+        },
+        {
+          "line": 439,
+          "text": "        assert!(!current.join(\".swarm\").exists());"
+        }
+      ]
+    }
+  },
+  "axes": {
+    "policies": {
+      "assessment": "No product policy/default/timeout/retry/budget added. Literal 14 is exact maintained test inventory; 14 vectors/domain indices/canary digests are test inputs; closed compare/check-receipt operation list is test safety, not operator permission. Existing transport bounds unchanged. No global watchdog."
+    },
+    "functions": {
+      "assessment": "14 new/modified Python functions and 2 Rust test functions reviewed against actual bodies/docstrings; Python harness invokes only frozen binary on temporary roots, retains input/output bytes and propagates process/IO failures. No product runtime function changed.",
+      "documented_python_changed": 14,
+      "Rustdoc": "NOT EXECUTED under user compilation ban"
+    },
+    "errors": {
+      "assessment": "Actual producer report() wraps failure.code; both new Rust assertions corrected and public missing-file control/refusal/recovery retained. Other canonical verifier root code matches its separate producer and remains unchanged. All 167 expected CLI refusals match safe nonretryable codes with empty successful stdout. /dev/full public write failure verified; Rust injected flush remains NOT TESTED. Spawn/fixture/read/publication errors propagate into nonzero unittest/runner outcomes, without empty-success fallback."
+    },
+    "documentation": {
+      "assessment": "FR/EN operational contract, source plan/queue and increment updated together. Schema descriptions are timeless, constraints unchanged and absent from observed compiler inputs. Prior recipe PASS remains tied to its original declared bytes; metadata change reviewed separately, unchanged tested binary/test/producer source reused. No new delivered behavior or version-note update needed; no install/restart authorized. Historical proofs and original failures preserved."
+    }
+  },
+  "per_file_review": {
+    "tests/paea_public_contract_test.py": {
+      "sha256": "9dc12a194a3b63d08785a78e80494bb1115ba30418583ef2157d46f71011760f",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "documented test methods reviewed",
+      "errors": "reviewed against actual CLI producer and harness failure propagation",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "rust/crates/swarm-cli/tests/protection_receipt.rs": {
+      "sha256": "e5929a78856da8b6f2e7570cb632b7726744779036a1183274301652083a9950",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "documented test methods reviewed",
+      "errors": "reviewed against actual CLI producer and harness failure propagation",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "tools/verification/recipes/paea-public-existing-binary.json": {
+      "sha256": "71120141893c9630815e8dd649dc6f7d2c5fd22b94b4308dfa7e40b7d668f0d4",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "schemas/paea/comparison-v1.schema.json": {
+      "sha256": "1ed75ef23511ce6e47edafe548ea130b5688abd10c90646747dc24dc2de235c2",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "schemas/paea/receipt-check-v1.schema.json": {
+      "sha256": "1fb0eac36336a8fd466b3b8ddeaf1cb4f1f2e1cb54130c56478b34c9fbee5a95",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/architecture/PAEA-CONTRACT.md": {
+      "sha256": "ec22effc8c6b70b840973797cf6f3f1f616b071a8de364a70431ad94d973c0af",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/en/PAEA-CONTRACT.md": {
+      "sha256": "fb8d86eb122f8c023686cb1344c1e40e6744b96d127a3948da79794c433c759e",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/plans/actions-confiance/PAEA-APEX.md": {
+      "sha256": "b2336c5e8581656eac06a9c19d9fd1a29a0bcbfc935abe7d7674adc2a88d60e5",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/en/plans/actions-confiance/PAEA-APEX.md": {
+      "sha256": "85114a385c30738976679fbac9851422cf05b8cbea7d40344708da7c9cc97d99",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/plans/FILE-APEX.md": {
+      "sha256": "b2728ccf4674f12ca1b2e19dbb2af6dfda55a9cffa77ff3e31090f452e4285e7",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/en/APEX-QUEUE.md": {
+      "sha256": "812a762ccbfd38f15761297bae6dc4623f9c0734463fc05f9c1de7e8e4f8ff4a",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/plans/actions-confiance/paea/INCREMENT-09.md": {
+      "sha256": "dbd3d0e06080a6ef3cc7ebeb355011434349260614b737fa27d3e855f05f44fb",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    },
+    "docs/en/plans/actions-confiance/paea/INCREMENT-09.md": {
+      "sha256": "d3c17f0d044da8a8c443ccba106f4eb89578d5c1d154780163c6907d108c7aa1",
+      "policies": "reviewed as test fixture/protocol metadata or documentation; no product operator policy",
+      "functions": "no function changed",
+      "errors": "no new execution failure path",
+      "documentation": "FR/EN or language-independent test/schema/recipe contract updated"
+    }
+  },
+  "public_evidence": {
+    "tests_run": 14,
+    "successful": true,
+    "binary_stable": true,
+    "invocations": 618,
+    "by_operation": {
+      "canonicalize": 232,
+      "commit": 4,
+      "approve": 4,
+      "config-apply": 4,
+      "mandate-create": 4,
+      "compare": 163,
+      "check-receipt": 207
+    },
+    "by_exit": {
+      "0": 451,
+      "2": 167
+    },
+    "refusal_codes": {
+      "command_failed": 76,
+      "protection-document-invalid": 40,
+      "input-document-io": 12,
+      "input-regular-file-required": 8,
+      "storage_unavailable": 3,
+      "protection-amount-representation": 1,
+      "protection-repository-target": 1,
+      "protection-git-oid": 1,
+      "protection-git-no-change": 1,
+      "protection-receipt-binding": 10,
+      "protection-effect-receipt": 2,
+      "protection-receipt-expected-sink": 2,
+      "protection-transition-invalid": 10
+    }
+  },
+  "binary_profile": "retained-existing-build/profile/result.json; provenance-verification.json independently rechecks archived bytes within this context",
+  "declared_recipe_metadata_after_run": "schema descriptions only changed; no claimed current-byte rerun",
+  "open": [
+    {
+      "id": "RUST-TESTS",
+      "owner": "Codex after explicit lifting of no-compilation instruction",
+      "criterion": "corrected protection/comparison/receipt targets and Rustdoc execute successfully on stable inputs"
+    },
+    {
+      "id": "PROTECTED-EFFECTS",
+      "owner": "PA-02/Identity integration, then PA-03/AC-02",
+      "criterion": "authenticated current authority, protected sink and independent effect observation at commitment"
+    },
+    {
+      "id": "E3",
+      "owner": "sponsor/evaluator/third-party team",
+      "criterion": "independent means supplied and preregistered campaigns executed"
+    },
+    {
+      "id": "PAEA-OBS-01",
+      "owner": "PA-09/Codex",
+      "criterion": "versioned standalone exact input-byte binding or mandatory evidence bundle; transcript mitigation already applied"
+    }
+  ],
+  "method_incidents": [
+    {
+      "cause": "large harness insertion initially displaced the existing canonical output-failure tail",
+      "recovery": "retained harness-before-scope-correction.py; read real boundaries and restored the method before any execution; 14 public tests passed afterwards"
+    },
+    {
+      "cause": "documentation patch assumed a line prefix absent in actual French suffix",
+      "recovery": "patch refused before writes; reread actual suffix and patched exact text; final links checked"
+    },
+    {
+      "cause": "dependency features incorrectly assumed empty",
+      "recovery": "original refusal retained; Cargo producers explain serde; exact feature sets and source archive verified"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "scope": "qualified PAEA correspondence tooling and isolated operational laboratory; not protected effects or independent acceptance",
+  "authority": "user: fini push compile, lifting prior compilation/restart ban",
+  "published_base": "ba581aec6e37d850a4838e20841f53b3e63824be",
+  "checks": {
+    "schema_tests": 5,
+    "rust_tests": 45,
+    "public_cli_tests": 18,
+    "public_cli_invocations": 973,
+    "laboratory_tests": 7,
+    "native_browser_assertions": 237,
+    "native_browser_cases": 12,
+    "expected_native_refusals": 24,
+    "browser_errors": [],
+    "clippy": "PASS",
+    "rustdoc": "PASS"
+  },
+  "production_candidate": {
+    "version": "v0.1.1-dev.79",
+    "sha256": "bed3dfbf70c7c558aa4b1459e04efc34b55863ecfc322ed890594d5c3f267cc7",
+    "effective_inputs": 439,
+    "profile": "VERIFIED_DEFAULT_NATIVE_PROFILE",
+    "all_core_test_false": true,
+    "no_fixture_feature": true,
+    "all_core_features_empty": true,
+    "effective_inventory_sha256": "c664e96ae210a167ba3801cd2143465ddb2c5476d6e08f9c78d7fafe754c41e4"
+  },
+  "retention": "Selected named outputs and screenshots published. Full immutable profile, source archive, raw fixtures and private sessions retained locally, excluded by scoped gitignore. Remote users can rerun maintained recipes; this subset is not a complete recipe archive.",
+  "post_activation": "local delivery-result.json records remote commit, actual active PID/hash/version and read-only live checks",
+  "open": [
+    "protected PA-02/03 and debt registry",
+    "IA3/Rust/AC-02 gates",
+    "laboratory campaign UI",
+    "E2/E3/independent review/program RETEX"
+  ],
+  "global_invariants_demonstrated": 0
+}

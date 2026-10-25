@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "paea-native-ux",
+  "inputs": [
+    "tests/paea_native_ui_test.cjs",
+    "tests/fixtures/paea/contract-v1.json",
+    "web/paea.*",
+    "web/i18n*.js",
+    "web/swarm-design.css",
+    "web/wattson_themes.css",
+    "web/swarm-logo.png",
+    "version_history.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-native-browser-flow",
+      "command": ["node", "tests/paea_native_ui_test.cjs"],
+      "expected_exit": 0,
+      "required_stdout": ["all-twelve-native-browser-cases", "no-unexpected-browser-diagnostics", "PAEA_NATIVE_UI_PASS"],
+      "required_stderr": []
+    }
+  ]
+}

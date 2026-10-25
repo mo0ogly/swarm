@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "source": "User-provided PAEA_v0.2_Guide_Operationnel.docx",
+  "canonical_file": "docs/security/PAEA_v0.2_Guide_Operationnel.docx",
+  "sha256": "e621efa0953ff056cf12b318236849764feeff16f9e2d2f3c5b4016d75774298",
+  "bytes": 1846968,
+  "status": "reference for implementation planning; proposed framework, no authority or deployment proof",
+  "original_preserved": true,
+  "read_scope": "all288textblocks, tables,2embeddedfigures;34page render produced; selected relevant pages inspected",
+  "integration": "docs/plans/actions-confiance/paea/GUIDE-INTEGRATION.md"
+}

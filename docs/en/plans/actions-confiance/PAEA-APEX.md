@@ -1,0 +1,363 @@
+# PAEA — adopted APEX plan and execution record
+
+[Français](../../../plans/actions-confiance/PAEA-APEX.md) ·
+APEX queue (`../../APEX-QUEUE.md`, local tracking outside this publication) · AC-02 (`securite-execution-apex.md`, local tracking outside this publication)
+
+## Authority and objective
+
+October26 update: “fini push compile” authorizes compilation, scoped PAEA
+commit/push and local delivery under standing authority. The compilation ban is
+lifted; business authority and protected prerequisites remain unchanged.
+See [increment 15](paea/INCREMENT-15.md).
+
+On October 25, 2026 the user requested implementation of PA-00 through PA-13.
+Root Codex owns integration. No implicit delegation or parallel execution.
+Rust migration priority and prerequisites remain applicable. No commit, push,
+real payment, external deployment or resumption of paused missions is granted.
+
+Demonstrate for BOTH fictitious billing and software development that each
+observed protected effect matches an authorization still valid for its exact
+content at commitment. Activation is per project; missing required protection
+denies the affected operation. The final target is experimental E3 with an
+independent evaluator, a second implementation and preregistered comparison.
+This is neither certification nor C3/C4 deployment authority.
+
+The original PAEA v0.2 DOCX/PDF under `docs/security/` remain historical and
+unchanged. Contract, code, local tests, installation and independent evaluation
+must retain separate states.
+
+The subsequently supplied [operational guide](../../../security/PAEA_v0.2_Guide_Operationnel.docx)
+is a working implementation reference with [mapping and clarifications](paea/GUIDE-INTEGRATION.md).
+Its examples replace neither versioned schemas nor session authority.
+
+## Architecture and shared contracts
+
+Reusing only in-process checks cannot protect control files/secrets from an
+agent with the same UID. Retain existing kernels but separate agent execution,
+protected control, effect services and observation under distinct trust boundaries.
+
+```mermaid
+flowchart LR
+  U[Project / Business UX and CLI] --> A[Authenticated API]
+  A --> C[Protected control]
+  C --> L[Verified launch]
+  L --> G[Confined agent and descendants]
+  G --> W[Assigned workspace]
+  G --> B[Broker]
+  B --> C
+  C --> F[Fictitious settlement service]
+  C --> R[Fixture Git service]
+  F --> O[Effect observer]
+  R --> O
+  C --> P[Attributed evidence]
+  O --> P
+```
+
+Target architecture, not evidence of implementation. Control and keys stay
+outside the agent domain under a distinct account. The first Linux profile covers
+namespaces, mounts, privileges, FDs, processes and network. Authenticated peer UID
+alone establishes no mandate. Bind the opened project instance, principal,
+workload, scope and current authority. AC-02 policies retain SQLite persistence
+and YAML exchange; existing global JSON settings are not silently relocated.
+Admin/API/CLI share authoritative validation and effective values.
+
+- Proposals are non-authoritative; control supplies admission context.
+- Version schemas/canonicalization; reject duplicate/ambiguous/unknown fields.
+- Derive business intent independently of transport request keys.
+- Payment binds invoice ID/version, exact integer amount, currency and resolved
+  account. Git binds assigned repository, direct ref, expected old OID, immutable
+  candidate and existing checks/review/engine decision.
+- Bind exact action, ordered sources and control versions. Relevant changes
+  invalidate approval.
+- Serialize current authority/revocation with effect commitment. Git/SQLite are
+  not made atomic by an API call: retain durable intent and reconcile CAS updates.
+- UNKNOWN is neither no-effect failure nor success; block potentially duplicating
+  commitments until compatible reconciliation. Preserve prior effects/consumption.
+- Legacy Trust paths must use protected control or explicitly refuse in protected
+  projects. Errors preserve causes, safe codes and known/uncertain publication.
+
+```text
+PROPOSED → ADMITTED → APPROVAL_PENDING → AUTHORIZED → COMMIT_REQUESTED
+COMMIT_REQUESTED → COMMITTED | DENIED | UNKNOWN
+UNKNOWN → RECONCILED_COMMITTED | RECONCILED_NOT_COMMITTED
+```
+
+### PAEA-ERR-01
+
+PAEA v0.2 §6.2 option (b): a content-bound single-use token can still be consumed
+for the FIRST time after local revocation when the effect service does not check
+that revocation. Uniqueness alone does not prove I17. Also require current
+status/epoch under commitment order or disclose/prove propagation limits and
+suspend uncovered critical use. Owner: PAEA author/effect control. Observable:
+issue token → effective revocation → first redemption denied without effect.
+Specified erratum; distributed evidence remains in PA-03/PA-12.
+
+## Work packages and acceptance
+
+| Package | Owner and dependencies | Work and observable output |
+|---|---|---|
+| PA-00 Baseline | Root Codex; current plans/source | Inventory Git/runtime, reservations, 17 invariants, evidence/resources and both controls. Bind exact bytes; never inherit Rust qualification from Go. |
+| PA-01 Contracts | Codex; PA-00 | Schemas, canonicalization/vectors, business intents, commit order, errors, public operations, migration and bilingual diagrams. Testable contracts for both domains; data library grants nothing. |
+| PA-02 Authority | Identity/integration; PA-01 + required IA3 output | Reuse enrollment/instances; separate control/keys, bind opened project, current mandates/approvals/revocation and shared Admin/API/CLI settings. Valid admission and attributed denials; missing protection fails closed. |
+| PA-03 Effect services | Trust/managed repository; PA-01/02 | Separate fictitious ledger and conditional Git promotion, immutable candidate/checks/review, last-use authority, semantic uniqueness, durable intent and reconciliation. T04/05/06 in both journeys; new request keys never duplicate effects. |
+| PA-04 Confinement | AC-02/A3; PA-02 + AC-02 prerequisites | Every launch/recovery/descendant; mounts/FS/FD/env/signals/detached processes, before untrusted code. Valid control and bypass test for each inventoried path. |
+| PA-05 Network/secrets | AC-02/A4; PA-04 + AC-02/A2 | Mandatory broker, IPv4/6/DNS/redirects/sockets/persistent connections, control-side secrets, effective destination/labels, model/dependency/artifact flows. Valid traffic and zero observed forbidden sensitive bytes. |
+| PA-06 Composition | Identity/Memory; PA-02/05 + required MEM-P2…P4 | Preserve instruction/data separation, provenance/versions/integrity/confidentiality over read/summary/transmission/compaction. Attenuated delegation and authenticated peers. No instruction/authority promotion in the defined scenarios. |
+| PA-07 Tools/time | Launch/catalogue; PA-01/02/04 | Bind effective binary/schema/config, readmission on mutation, monotonic local leases and epochs/generations across restart. Inventory and ACS mapping only claim actual coverage. |
+| PA-08 UX/approval | UX/integration; PA-02…07 interfaces | Admin with each policy; exact consequences/content/approver, visible denial/UNKNOWN, configured/applied/observed distinction, separate UX builds and measured vigilance. Both public journeys, FR/EN/themes/mobile/keyboard/focus/error/recovery. |
+| PA-09 Evidence | Verification; PA-02…08, collect from first increment | Link proposal/admission/approval/commit/observation, preserve originals, separate key acquisition, detect tampering/omission/replay/rollback. Independent verification without believing agent reports. |
+| PA-10 Local E2 | Codex + separate-context required review; PA-03…09 | Same candidate, actual no-fixture profiles, isolated CLI/API/browser, legacy bypass denial, supported build/install, process/hash/assets/version/FR-EN notes. Bounded E2 statement, not E3 closure. |
+| PA-11 Prepare E3 | Sponsor + third-party team + evaluator | Designate independent roles; second effect boundary without Swarm control code, common schemas/vectors, preregister corpus/models/budgets/faults/metrics, B2/ablations and reserved attacks. Accepted resources and protocol before campaigns. |
+| PA-12 E3 campaigns | Evaluator; PA-10/11 | T01…22/adaptive, direct effect oracles, equal-condition Swarm/B2/second implementation, ablations, authorized harmless human trials, full report and acknowledged defect handoff. |
+| PA-13 Corrections/RETEX | Codex + evaluator; PA-12 | Reproduce, fix shared contracts, requalify affected earlier packages/verdicts, deliver verified candidate, final retrospective and learning transmission. Any required unresolved criterion keeps the program open. |
+
+AC-02 retains Rust qualification prerequisites. Independent contract/protocol
+preparation can proceed. Preserve IA3 → protected memory use → IA4 handoffs;
+whole IA5/MEM-P5 closure is not an added circular dependency.
+
+## Assurance and experimental protocol
+
+| Invariant | Packages | Tests | Required observation |
+|---|---|---|---|
+| I01 Model non-authority | 01/02/06 | T01/T02 | Hostile contents cannot create permission. |
+| I02 Identity/delegation | 02/06 | T03/T14 | Attributed principal and attenuated child rights. |
+| I03 Provenance/flows | 05/06 | T02/T18 | Actual received context retains labels and versions. |
+| I04 Exact approval | 01/03/08 | T04/T20 | Approved canonical content equals consumed action. |
+| I05 Last-use authority | 02/03 | T05/T17 | Current authority at ordered commitment. |
+| I06 Mediation | 04/05 | T07/T19 | Closed path inventory with actual enforcement. |
+| I07 Secrets | 02/05 | T08/T17 | No critical unbounded effect credential in agent domain. |
+| I08 Business uniqueness | 01/03 | T06/T09 | Same derived intent cannot repeat with a new key. |
+| I09 UNKNOWN/recovery | 03/09 | T06/T21 | Reconcile service state without duplication/fabricated success. |
+| I10 Human supervision | 08/12 | T10/T22 | Attributed qualified decisions and evaluated vigilance limits. |
+| I11 Independent evidence | 09/12 | T12/T21 | Separate observer/anchors and attributable bounded proof. |
+| I12 Safe failure | 03/04/05 | T10/T16 | No new sensitive effect without required preconditions; C4 excluded. |
+| I13 Egress/confidentiality | 05/06 | T13/T19 | Effective destination and actually received bytes. |
+| I14 A2A | 06 | T14/T18 | Peer, mandate, audience and reception linked. |
+| I15 Tool qualification | 07 | T15/T20 | Changed effective tool requires readmission. |
+| I16 Time/order | 02/03/07 | T16/T05 | Control clock/epochs, never agent-declared time. |
+| I17 Sink revocation | 02/03/05 | T17/T21 | First redemption of pre-issued token fails after effective revocation. |
+
+T11 additionally covers changed policy/source/candidate and stale proof. T09
+includes split/cumulative effects across agents. Establish a valid control before
+each injection. Read before/after service state; HTTP200/exit0/PASS labels alone
+are insufficient. PA-01 local cases are not executed T01…T22 campaigns.
+
+Keep forbidden effects, business/software success, false refusals, recovery/UNKNOWN,
+p50/p95/p99 latency, cost/consumption/operator load and coverage separate.
+Preregister volumes and budgets without universal magic numbers. Statistical
+intervals require their assumptions. Publish low/no benefit against B2 honestly.
+
+## Delivery and current state
+
+Every increment retains exact inputs/candidate, policy/function-doc/error/document
+reviews, actual compiler/features/binary/assets, permanent recipes and fresh
+integrity-verified evidence. Changed inputs invalidate affected proofs. No arbitrary
+global watchdog, erased history, fabricated acceptance or implicit paid calls.
+Use replan with original cause, changed precondition, authorized action and observed
+effect, then resume the objective.
+
+Milestones: M0 baseline; M1 both controlled effects; M2 mediation; M3 composition;
+M4 installed local E2; M5 independent E3 campaigns; M6 re-evaluated corrections and
+final retrospective. Program remains open after M4. Disabling project protection
+requires an authorized decision; no automatic permissive fallback.
+
+October 25: PA-00 and PA-01 are partially implemented. The
+`swarm-protection-contract` library, schema, fourteen vectors and public offline
+`protection canonicalize` command cover data for both domains. This command
+grants no authority and activates no protection. Complete authenticated mandate,
+authority, approval and receipt contracts, and active CLI/API operations, remain
+to be finalized with their protected producers. The [PA-11/E3 protocol](paea/E3-PROTOCOL.md)
+is drafted, not preregistered. The user confirmed having no independent evaluator
+or third-party team. No GLM/SKYNET call or delegation occurred in this increment.
+
+The [retained recipe](../../../plans/actions-confiance/paea/evidence/20261025-contract-qekt2uwo/recipe-01/result.json)
+ran 5 Python tests, 17 Rust contract tests and 4 CLI tests: 26 passed, zero failed.
+Evidence integrity was verified. Clippy and Rustdoc also passed for the library
+alone. These results establish no T01…T22 campaign, effect service, confinement or
+E2/E3 qualification. The recipe inventory is declarative, not the full effective
+compiler graph. Later documentation corrections are reviewed separately; original
+evidence and corresponding executable inputs remain preserved.
+
+### Replan: concurrent session and no compilation
+
+The user is working in another session and requested avoiding compilation. No new
+Cargo, Rustdoc, build, installation or restart will be launched by this conversation
+under that instruction. Its last Rustdoc check had completed. Inspection found the
+concurrent SCALING-S2 work in the Rust plan and effective managed-repository changes;
+they remain with their owner. No other session's process is interrupted.
+
+The instance observed before this instruction ran `v0.1.1-dev.65`; this PAEA
+increment is not declared installed. Local integration owns delivery. Resume after
+the instruction is lifted and the shared checkout is available, with full candidate
+review and the supported delivery path. Global migration and required IA3 handoffs
+remain open in inspected plans; AC-02 prerequisites remain in force. This foundation
+starts no account, privilege, confinement or effect-service changes.
+
+Owned files: this bilingual plan/contract, isolated library, schema/vectors/tests/
+recipe, CLI `protection` module, targeted `swarm-cli/src/lib.rs` connections,
+Cargo dependencies, bilingual `version_history.json` note, queue entry and own
+evidence. No engine Trust, launch, supervision, active policy or live mission file
+is reserved here. Preserve unrelated changes in shared files.
+
+The [increment review](paea/INCREMENT-01.md) retains tested scope, all three review
+axes, limits and resumption conditions. PA-00…PA-13 and its final retrospective
+remain open.
+
+### Increment 02 — authorized GLM contribution, without compilation
+
+The user's “go next avec glm” authorizes targeted internal GLM contribution.
+The no-compilation instruction remains active. The
+[new public recipe](paea/INCREMENT-02.md) ran four tests and 88 invocations against
+the existing binary: 16 document refusals and one output failure, with valid
+controls/recovery. Evidence PASS/VERIFIED; no Rust edits or installation.
+The usable GLM contribution covers the raw decoder only. Exhausted first call
+and failed first recipe remain preserved with verified recovery. PA-00/01 and
+previous resumption conditions stay open.
+
+### Increment 03 — routing refusals with GLM
+
+[Two tests added](paea/INCREMENT-03.md): six public tests total, 248 invocations,
+69 expected refusals with exact recovery in both domains and FR/EN. Existing
+binary stable, no compilation or restart. GLM proposal corrected before execution,
+originals retained. PA-00/01 partial; IA3/Rust/AC-02/E3 dependencies unchanged.
+No full program lot closed.
+
+### Increment 04 — export consumer and corrected GLM method
+
+[Correspondence tool implemented](paea/INCREMENT-04.md): nine named tests,
+42 CLI observations across both domains, no compilation or installation.
+No semantic admission/authority/effect established; PA-09 only started.
+User correction removes default GLM client cap: nine local HTTP tests and actual
+request without limit fields retained. PA-00/01 and Rust/IA3/AC-02/E3 prerequisites
+remain open.
+
+### Increment 05 — Rust comparison, not qualified
+
+[Rust sources and three tests written](paea/INCREMENT-05.md), no compilation or
+Rust test execution. New Python extension withdrawn after explicit user correction,
+originals preserved. No CLI/API integration, installation or authority verdict.
+PA-01/08/09 remain partial; qualification and IA3/AC-02 prerequisites open.
+
+### Increment 06 — Rust CLI integration, not qualified
+
+[Compare command and four CLI tests written](paea/INCREMENT-06.md), without
+compilation or execution. Existing reader, two named files, output schema and
+FR/EN help; recipe updated, not run. No project/effect/approval activated.
+No-compilation persists; PA-01/08/09 and qualification remain open.
+
+### Increment 07 — receipt/action/lifecycle source contract
+
+[Rust checker and four tests written](paea/INCREMENT-07.md), uncompiled/unexecuted.
+Reuses action/intent digests, expected sink and UNKNOWN/reconciliation lifecycle;
+no authenticated receipt or effect service delivered. PA-01/03/09 and PA-02/AC-02
+prerequisites stay open. No project activated.
+
+### Increment 08 — receipt checker CLI consumer
+
+The user resumed the program and explicitly reconfirmed **no compilation or
+restart**. [Rust CLI adapter and four tests written](paea/INCREMENT-08.md),
+uncompiled/unexecuted: two files, explicit sink/prior state, canonical recomputation
+and binding/lifecycle checks. FR/EN help, schema, recipe and contract updated;
+authority, authenticity and effect remain unestablished. No GLM call or service
+started. Output-error tests are isolated outside the caller checkout; their effect
+is unverified. PA-01/03/09, qualification, installation, protected dependencies and
+RETEX remain open. Next proof: affected targets and recipe on frozen inputs after
+explicit lifting of the instruction.
+
+### Increment 09 — verification loop on an existing candidate
+
+[14 public tests passed, 618 invocations](paea/INCREMENT-09.md), 167 expected
+refusals, recipe PASS and integrity VERIFIED. Existing dev75 candidate from
+another session frozen without compilation/restart here. All 432 effective input
+archive members verified; eight PAEA inputs match observed sources. Two
+increment-08 Rust assertions corrected to `failure.code`, unexecuted by Cargo.
+Second loop: justified transitive Identity `serde`, removed temporal schema
+descriptions and reexamined earlier lots without rewriting originals. PAEA-OBS-01
+retains standalone report limitations with the applied transcript mitigation.
+Six invariants have local structural observations; **0/17 demonstrated end to end**.
+Protected PA-02/03/08/09, installation, E2/E3 and RETEX remain open. No-compilation/
+restart instruction stays active: Rust tests after explicit lifting, effects after
+protected IA3/PA-02 output, E3 with required third parties.
+
+### Increment 10 — PAEA-OBS-01 implemented in source
+
+[Standalone v2 report and seven tests written](paea/INCREMENT-10.md): exact raw
+document/receipt hashes, canonicalization and the same binding/lifecycle checker.
+New `receipt-report` command; v1 `check-receipt` shape retained in source, v1 inputs
+unchanged. No new right, effect or dependency. FR/EN help/schema/recipe/local notes/
+contract updated. **Uncompiled/unexecuted/uninstalled** under the active instruction.
+Existing dev75 witness records v1 control, absent new route and recovery without
+a build. PAEA-OBS-01 remains functionally unverified; increment-09 proofs retain
+their archived source scope and do not qualify new code. PA-01/09/program open.
+
+
+### Increment 11 — explicit UX request
+
+After asking how to use the tests, the user explicitly requested adding UX access.
+PA-08 now explicitly includes a menu entry. [First journey written](paea/INCREMENT-11.md):
+**PAEA checks** in the native cockpit and Trusted actions; select action/receipt,
+explicit service/state, correspondence check, visible refusal/UNKNOWN and v2 report.
+Authenticated API uses the shared pure checker with no effect or activated
+protection. Browser component is separately verifiable; native route, actual
+binary assets and installation remain unqualified under no compilation/restart.
+Two HTTP Rust tests written and permanent browser recipe added. PA-08 remains
+partial: protected approvals/configured-applied-observed, both UX products and
+vigilance still require PA-02…07 interfaces and the planned experiments.
+
+
+### Increment 12 — qualification on an existing candidate
+
+[Public and actual-CLI screen evidence](paea/INCREMENT-12.md): dev77 candidate
+built by the other session, frozen without compilation/restart here. 434 effective
+archive members verified, seven PAEA inputs match. 18 public tests passed, 973
+invocations including 268 expected refusals; local v2 OBS-01 distinction verified,
+v1 preserved. Screen: 174 assertions and 48 actual CLI calls through an HTTP fixture
+bridge, FR/EN and both domains; no fabricated checker response. After another
+session changed the catalogue, component replay passed 219 assertions/40 simulated
+requests. Three recipes PASS, integrity VERIFIED. This bridge is not native HTTP: its two Rust tests, served
+assets, installation and protected approvals remain open. Original 09…11 proofs
+are preserved; no seventeen-invariant/E2/E3/RETEX closure.
+
+
+### Increment 13 — operational guide and UX journey
+
+The user supplied the operational guide to inform implementation.
+[Complete mapping](paea/GUIDE-INTEGRATION.md) retains the original, maps chapters
+to owners/plan/proofs and defines three dossiers plus target UX. Existing file
+checking stays partial. Functional priority: effect card/owner/boundary/oracle
+and three recipes in both pilots, preserving PA-02/03 and Rust/AC-02 prerequisites.
+ERR-01 also applies to guide7.1; pedagogical JSON/figures do not replace schemas;
+project+invoice intent requires protected project-unique debt resolution before
+the sink. IAM/industrial execution remains out of scope. The [increment record](paea/INCREMENT-13.md)
+also retains bounded PAEA-UX-02 contrast work, normal/hover/keyboard tests and
+component-versus-installed-binary distinction.
+
+### Increment 14 — two laboratory effects and separate observation
+
+[Operational dossier](paea/OPERATIONAL-PILOT.md): payment/Git cards, missing
+authorities, access graph and three executable recipes without a build.
+SQLite and Git branch+canonical-marker transactions produce effects in 26
+isolated roots; separate oracle process reads no receipt/decision journal.
+**7 tests PASS, 132 subprocesses, recipe PASS/integrity VERIFIED**. T04, lost reply
+and revocation before first use exercised in both domains with controls/recovery;
+these are fixture orders, not distributed evidence. Git negative witness:
+context-ignoring replay guard triggers the expected failing assertion.
+PAEA-GUIDE-03 reproduces two entries for raw aliases without a business registry;
+counterexample retained, protected debt resolution required before PA-03.
+[Record and limits](paea/INCREMENT-14.md). Common UID/simulated authority: **0/17
+end-to-end invariants**, protected PA-02/03, campaign menu, native qualification,
+installation/E2/E3/RETEX open. No build or restart.
+
+### Increment 15 — native qualification and authorized delivery
+
+The user lifts the compilation ban. Checkout and targeted worktree on the
+published base: **5 Python and45 Rust tests PASS**, including the two previously
+unrun HTTP tests. Normal dev79 build prepared before any stop; real executable
+and embedded assets in the browser: **237 assertions/12 configurations**,24
+expected refusals, no unexpected diagnostics. Eight protected assets match
+sources; FR/EN/themes/mobile, Version dialog, Git link and focus verified.
+PAEA returns to the cockpit independently of Biba.
+[Evidence, publication scope and delivery](paea/INCREMENT-15.md); generated local
+result retains actual remote commit and active version/PID/hash. Correspondence
+menu is qualified; lab campaigns remain outside UX. This delivery closes neither
+protected PA-02/03, the **17 invariants**, nor program E2/E3/RETEX.
