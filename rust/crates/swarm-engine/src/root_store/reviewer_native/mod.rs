@@ -14,6 +14,8 @@ mod gate;
 mod guard;
 mod journal;
 mod material;
+mod sources;
+mod reply;
 mod mission_authority;
 mod process;
 mod publication;
@@ -1378,7 +1380,7 @@ mod tests {
             } else {
                 crate::ReviewReplyState::Passed
             };
-            assert_eq!(reply.unwrap().review.state, expected);
+            assert_eq!(reply.unwrap().state, expected);
         } else {
             assert!(reply.is_err());
             if matches!(case, "source" | "duration") {

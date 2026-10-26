@@ -968,3 +968,74 @@ sequenceDiagram
     R-->>U: Donnees seulement, sans verdict applicable
     Note over U,D: Aucun appel fournisseur ni acceptation
 ```
+
+
+## Lancement natif du reviewer géré et reprise des originaux
+
+Le parcours CLI `task review ID` raccorde le candidat géré aux étapes existantes
+de réservation, enregistrement de l’enfant, permission, transport sans outils
+et publication de l’avis. Le candidat est acquis hors des verrous Root/réglages/SQL
+et conservé par le contrôleur jusqu’au résultat. Les étapes ultérieures et
+l’enfant reprennent un témoin sur le même job de contrôles, avec égalité complète
+de la revue courante « running » ; aucune entrée JSON ne peut fournir cette
+permission interne. Git ne s’exécute pas sous les snapshots SQL. Les fermetures
+explicites préservent les causes primaires et secondaires.
+
+La préparation interne conserve les mêmes réglages Admin, réservations, droits
+de mission, fournisseur/modèle, empreinte exécutable et durée de validité initiale.
+Son contrôle d’environnement crée puis retire un fichier de sonde : ce parcours
+n’est pas une simple lecture. Le mode d’entrée natif annonce son support du
+transport et de l’enregistrement ; l’inspection `review-inputs` reste sans grant.
+Ces faits de protocole ne sont pas des politiques opérateur. Aucun délai, essai,
+plafond ou repli vers le parseur d’une tâche isolée n’est ajouté.
+
+Chaque tâche du plan canonique (tâche sélectionnée et antécédents acceptés) doit
+figurer dans la réponse. Le parseur vérifie candidat, catalogue, critères et
+citations de toute la cohorte. Le journal privé conserve le protocole original,
+les limites de réponse/texte réellement enregistrées, le SHA du prompt, les octets
+de réponse et les observations du processus. La publication compare aussi les
+entrées et réglages courants ; un ancien plafond ne vaut pas permission courante.
+Le contexte canonique public est adressé par son contenu ; certificat et événement
+conservent les attributs existants `managed_tasks`, `candidate_commit`,
+`previous_candidate`, `context` et `context_sha256`. La raison agrégée suit le
+contrat Go ; seul le résultat de la tâche sélectionnée est enregistré sur elle.
+
+Une cohorte partielle ou un transport invalide produit une erreur explicite avec
+original conservé. Une publication refusée après un appel terminé garde le job
+et sa réservation : après réparation de la cause, `task review-reconcile REVIEW`
+applique l’original, sans nouvel appel. Un rejeu exact de `task review` ne réexécute
+pas le fournisseur. Les corruptions du contexte/certificat/journal refusent ; une
+restauration exacte permet la reprise. Aucune consommation n’est effacée et aucune
+usage fournisseur déclarée n’est assimilée à une facture ou à un coût nul.
+
+**Limite d’autorité conservée :** il s’agit d’un avis natif sur le candidat courant,
+jamais d’une acceptation de tâche. Les verdicts historiques de baseline ne sont
+pas vérifiés par ce contexte `inspection_only`. Le consommateur d’autorité
+`verify_current_native_review` refuse encore les usages gérés d’acceptation/reprise
+de production tant que ce contrat n’est pas porté ; la lecture du résultat pour
+le contexte superviseur ne lève pas ce refus. Un avis `passed`, un certificat ou
+`verdict_applicable` ne clôt donc ni tâche ni mission. Le superviseur conserve la
+décision métier, sous les preuves requises par le moteur.
+
+```mermaid
+sequenceDiagram
+    participant U as CLI task review
+    participant C as Candidat retenu
+    participant R as Root et reglages
+    participant H as Enfant prive
+    participant P as Fournisseur sans outils
+    U->>C: Retenir le candidat hors verrous
+    U->>R: Claim, debit et reservation atomiques
+    U->>R: Enfant observe puis permission distincte
+    R-->>H: Canal prive, identite noyau et grant
+    H->>C: Reprendre le meme candidat avant snapshot
+    H->>R: Verifier revue running et entrees completes
+    H->>P: Executer avec le prompt scelle
+    P-->>U: JSONL de toute la cohorte
+    U->>U: Attendre, decoder, conserver journal et politique
+    U->>C: Reinspecter les sources avant publication
+    U->>R: Contexte adresse par contenu et avis atomique
+    R-->>U: Avis enregistre, aucune acceptation
+    U->>R: Reconcile ou rejeu exact
+    R-->>U: Original verifie sans appel fournisseur
+```

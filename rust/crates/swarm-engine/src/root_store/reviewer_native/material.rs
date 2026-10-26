@@ -4,7 +4,7 @@ use crate::{
     agent_launch_error::finish,
     agent_launch_preflight::HostPreparation,
     provider_model_route::ModelRoutePreparation,
-    root_store::{review_preview, task_validation, RootStore, RootStoreError as E},
+    root_store::{task_validation, RootStore, RootStoreError as E},
     AgentLaunchError as A, AgentLaunchPolicy, AgentWorkflow, EngineSettingsDocument, Launch,
     ReviewerConfig, TaskReportRequest, TaskReviewInputs, Work,
 };
@@ -41,6 +41,7 @@ fn launch(error: A) -> E {
 /// missing/stale/unsupported/IO/codec/release causes survive without empty success.
 /// No Work, ledger, budget or provider process is changed here. Host preparation
 /// creates/syncs/removes a workspace probe; failures include its cleanup causes.
+#[cfg(test)]
 pub(super) fn prepare(
     store: &RootStore,
     tx: &Transaction<'_>,
@@ -55,6 +56,7 @@ pub(super) fn prepare(
 /// snapshot/lock and must compare original hashes/TTL before any permission.
 /// Like prepare, this performs a temporary workspace write/sync/remove probe;
 /// its cleanup failure refuses rather than promising a side-effect-free read.
+#[cfg(test)]
 pub(super) fn prepare_for_job(
     store: &RootStore,
     tx: &Transaction<'_>,
@@ -63,8 +65,18 @@ pub(super) fn prepare_for_job(
     request: &task_validation::Request,
     review: Option<&crate::IndependentReview>,
 ) -> Result<Material, E> {
+    prepare_for_job_using(store,tx,settings,work,request,review,None)
+}
+/// Borrow externally held candidate custody inside this snapshot. All ordinary
+/// provider/host/budget/settings guards remain; no descriptor ownership transfers.
+/// Missing managed custody retains the existing refusal, never an ordinary fallback.
+pub(super) fn prepare_for_job_using(
+    store:&RootStore, tx:&Transaction<'_>,settings:EngineSettingsDocument,
+    work:&str,request:&task_validation::Request,review:Option<&crate::IndependentReview>,
+    candidate:Option<&task_validation::ReviewCandidate>,
+)->Result<Material,E>{
     require_native_wait(store)?;
-    let prepared = store.prepare_review_snapshot_for_job(tx, settings, work, request, review)?;
+    let prepared = store.prepare_review_snapshot_using(tx,settings,work,request,review,candidate)?;
     let config = prepared
         .work
         .planning
@@ -81,7 +93,7 @@ pub(super) fn prepare_for_job(
     let submitted =
         task_validation::submission(tx, &current, &prepared.preview.task_id).map_err(launch)?;
     let recovery = prepared.recovery.clone();
-    let inputs = review_preview::inputs::assemble(&store.root, prepared, &submitted)?;
+    let inputs = store.assemble_review_inputs_using(tx,prepared,candidate,true)?;
     if inputs.response_limit_bytes == Some(0) {
         return Err(E::Refused("review-call-response-disabled"));
     }

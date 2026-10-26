@@ -235,6 +235,7 @@ pub(super) fn bound_inputs_match(db:&rusqlite::Connection,inputs:&crate::TaskRev
 /// original prompt must agree. This reads bounded materials and mutates no Work,
 /// ledger or workspace probe. Failure is revocation data for the owned controller,
 /// never automatic acceptance, retry or refund. Legacy wait adoption still refuses.
+#[cfg(test)]
 pub(super) fn observe_sources(
     root: &RootStore,
     tx: &Transaction<'_>,
@@ -249,6 +250,7 @@ pub(super) fn observe_sources(
 /// renewal, host probe, new grant, Work mutation or business publication occurs.
 /// This is an observation, not a filesystem lease. Caller owns SQL/settings
 /// snapshots and must recheck immediately before staging any publication.
+#[cfg(test)]
 pub(super) fn publication_inputs(
     root: &RootStore,
     tx: &Transaction<'_>,
@@ -265,13 +267,14 @@ pub(super) fn publication_inputs(
 /// without declaring equality to the old source/prompt. Used by non-verdict
 /// preparation to compare actual typed data, never to catch an arbitrary error.
 /// Assembly errors retain cause. No new permission, IO mutation or publication.
+#[cfg(test)]
 pub(super) fn publication_dependencies(
     root: &RootStore,
     tx: &Transaction<'_>,
     settings: EngineSettingsDocument,
     job: &Job,
 ) -> Result<(crate::Work, crate::TaskReviewInputs), E> {
-    dependencies(root, tx, settings, job, FundingBoundary::Prospective)
+    dependencies(root, tx, settings, job, FundingBoundary::Prospective,None)
 }
 /// Observe complete current dependencies for application of a known original.
 /// Current sources/settings remain exact; future-start reserve/limit does not
@@ -283,11 +286,12 @@ pub(super) fn result_dependencies(
     settings: EngineSettingsDocument,
     job: &Job,
 ) -> Result<(crate::Work, crate::TaskReviewInputs), E> {
-    dependencies(root, tx, settings, job, FundingBoundary::KnownResult)
+    dependencies(root, tx, settings, job, FundingBoundary::KnownResult,None)
 }
 /// Require the full unchanged result dependencies plus its authoritative stored
 /// reservation. This is result-only observation, not authorization of any new exec.
 /// Source/IO/shape/financial errors retain causes; no ledger/Work mutation occurs.
+#[cfg(test)]
 pub(super) fn result_inputs(
     root: &RootStore,
     tx: &Transaction<'_>,
@@ -308,6 +312,7 @@ fn dependencies(
     settings: EngineSettingsDocument,
     job: &Job,
     funding: FundingBoundary,
+    source:Option<&task_validation::ReviewCandidate>,
 ) -> Result<(crate::Work, crate::TaskReviewInputs), E> {
     material::require_native_wait(root)?;
     let (work, request) = match funding {
@@ -322,11 +327,8 @@ fn dependencies(
         .and_then(|t| t.independent_review.as_deref())
         .ok_or(E::Refused("review-guard-record-required"))?;
     let prepared =
-        root.prepare_review_snapshot_for_job(tx, settings, &job.work_id, &request, Some(review))?;
-    let submitted = task_validation::submission(tx, &work, &job.task_id)
-        .map_err(|error| E::Launch(Box::new(error)))?;
-    let inputs =
-        crate::root_store::review_preview::inputs::assemble(&root.root, prepared, &submitted)?;
+        root.prepare_review_snapshot_using(tx, settings, &job.work_id, &request, Some(review),source)?;
+    let inputs=root.assemble_review_inputs_using(tx,prepared,source,true)?;
     Ok((work, inputs))
 }
 /// Rebuild complete material from a checked current ledger/Work/settings snapshot,
@@ -338,12 +340,18 @@ fn dependencies(
 /// preparation writes/removes its workspace compatibility probe; it mutates no
 /// Work/ledger and preserves probe errors.
 /// Typed failures and original expiry refuse; no new budget/call is reserved.
+#[cfg(test)]
 pub(super) fn fresh(
     root: &RootStore,
     tx: &Transaction<'_>,
     settings: EngineSettingsDocument,
     job: &Job,
 ) -> Result<Material, E> {
+    fresh_using(root,tx,settings,job,None)
+}
+/// Source-aware native observation: borrow an external holder while preserving
+/// exact frame, consent, funding, original TTL and provider/host guards.
+pub(super) fn fresh_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job,source:Option<&task_validation::ReviewCandidate>)->Result<Material,E>{
     let (work, request) = frame(root, tx, &settings, job)?;
     super::mission_authority::observe(root,tx,job,&settings).map_err(|e|E::Launch(Box::new(e)))?;
     original_fresh(&job.preflight_until)?;
@@ -355,7 +363,7 @@ pub(super) fn fresh(
         .and_then(|t| t.independent_review.as_deref())
         .ok_or(E::Refused("review-guard-record-required"))?;
     let material =
-        material::prepare_for_job(root, tx, settings, &job.work_id, &request, Some(review))?;
+        material::prepare_for_job_using(root, tx, settings, &job.work_id, &request, Some(review),source)?;
     if !bound_inputs_match(tx,&material.inputs, job)? {
         return Err(E::Refused("review-guard-preparation-changed"));
     }
@@ -369,6 +377,15 @@ pub(super) fn fresh(
         .map_err(|error| E::Launch(Box::new(error)))?;
     original_fresh(&job.preflight_until)?;
     Ok(material)
+}
+
+/// Rebuild complete currently held inputs for source polling/publication without
+/// reacquiring Git custody under SQL/settings locks. No grant or mutation.
+pub(super) fn held_inputs(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job,source:Option<&task_validation::ReviewCandidate>,result:bool)->Result<(crate::Work,crate::TaskReviewInputs),E>{
+    let boundary=if result{FundingBoundary::KnownResult}else{FundingBoundary::Prospective};
+    let (work,inputs)=dependencies(root,tx,settings,job,boundary,source)?;
+    if !bound_inputs_match(tx,&inputs,job)?{return Err(E::Refused("review-guard-preparation-changed"));}
+    Ok((work,inputs))
 }
 
 #[cfg(test)]

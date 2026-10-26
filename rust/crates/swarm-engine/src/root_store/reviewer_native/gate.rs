@@ -44,6 +44,7 @@ fn child(job: &Job) -> Result<(), E> {
 /// rechecks. Caller must commit and retain the tuple before any permission stage.
 /// No socket byte, exec, budget change or task acceptance occurs. Errors require
 /// rollback; observation failure never yields an empty child or successful row.
+#[cfg(test)]
 pub(super) fn register(
     root: &RootStore,
     tx: &Transaction<'_>,
@@ -51,8 +52,13 @@ pub(super) fn register(
     job: &Job,
     pid: u32,
 ) -> Result<Job, E> {
+register_using(root,tx,settings,job,pid,None)
+}
+/// Source-aware stage under caller snapshot; custody stays external and all
+/// owner/child/current-input checks precede the unchanged ledger transition.
+pub(super) fn register_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job, pid: u32,source:Option<&crate::root_store::task_validation::ReviewCandidate>)->Result<Job,E>{
     guard::owner(job)?;
-    guard::fresh(root, tx, settings, job)?;
+    guard::fresh_using(root,tx,settings,job,source)?;
     if job.phase != Phase::Claimed || job.permission != 0 {
         return Err(E::Refused("review-gate-registration-state"));
     }
@@ -72,14 +78,20 @@ pub(super) fn register(
 /// checks. Caller must successfully commit before releasing its private channel;
 /// this method never sends a byte, launches a provider or accepts a task. Any
 /// failure requires rollback and owned process cleanup, without refunding calls.
+#[cfg(test)]
 pub(super) fn permit(
     root: &RootStore,
     tx: &Transaction<'_>,
     settings: EngineSettingsDocument,
     job: &Job,
 ) -> Result<Job, E> {
+permit_using(root,tx,settings,job,None)
+}
+/// Source-aware stage under caller snapshot; custody stays external and all
+/// owner/child/current-input checks precede the unchanged ledger transition.
+pub(super) fn permit_using(root:&RootStore,tx:&Transaction<'_>,settings:EngineSettingsDocument,job:&Job,source:Option<&crate::root_store::task_validation::ReviewCandidate>)->Result<Job,E>{
     guard::owner(job)?;
-    guard::fresh(root, tx, settings, job)?;
+    guard::fresh_using(root,tx,settings,job,source)?;
     child(job)?;
     if job.phase != Phase::Registered || job.permission != 0 {
         return Err(E::Refused("review-gate-permission-state"));
@@ -120,6 +132,10 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
     }
     let store = RootStore::open(root, false)?;
     let result = (|| {
+    let selected=store::job(&store.db,id).map_err(|e|E::Launch(Box::new(e)))?
+        .ok_or(E::Refused("review-gate-job-required"))?;
+    super::sources::job(&store,&selected,|source| {
+
         let lock = store.directory.reserve(false, false).map_err(E::Storage)?;
         let operation = (|| {
             let settings = store.read_settings()?;
@@ -149,11 +165,12 @@ fn admit_with_job(root: &Path, id: &str, channel: &mut UnixStream) -> Result<(Ma
                 if parent.process_stamp() != job.owner_stamp {
                     return Err(E::Refused("review-gate-parent-changed"));
                 }
-                guard::fresh(&store, &tx, settings, &job).map(|material| (material, job))
+                guard::fresh_using(&store, &tx, settings, &job,source).map(|material| (material, job))
             })();
             finished(result, tx.rollback().map_err(E::Sql))
         })();
         finished(operation, lock.close().map_err(E::Storage))
+    })
     })();
     finished(result, store.close())
 }
@@ -248,22 +265,23 @@ pub(super) fn execute_reported(
 fn transition(
     root: &RootStore,
     job: &mut Job,
-    prepare: impl Fn(&RootStore, &Transaction<'_>, EngineSettingsDocument, &Job) -> Result<Job, E>,
+    prepare: impl Fn(&RootStore, &Transaction<'_>, EngineSettingsDocument, &Job,Option<&crate::root_store::task_validation::ReviewCandidate>) -> Result<Job, E>,
 ) -> Result<(), E> {
-    crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
+    let original=job.clone();
+    super::sources::job(root,&original,|source|crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
         let next = super::transaction::apply(root, |tx| {
-            prepare(root, tx, settings.clone(), job).map(super::transaction::Change::Mutate)
+            prepare(root, tx, settings.clone(), job,source).map(super::transaction::Change::Mutate)
         })?;
         *job = next;
         Ok(())
-    })
+    }))
 }
 /// Record this actual owned PID under fresh saved storage policy. A known child
 /// commit survives later settings-release failure in the caller's job value.
 /// No socket release or provider execution occurs; failure requires owned cleanup.
 pub(super) fn register_recorded(root: &RootStore, job: &mut Job, pid: u32) -> Result<(), E> {
-    transition(root, job, |root, tx, settings, job| {
-        register(root, tx, settings, job, pid)
+    transition(root, job, |root, tx, settings, job,source| {
+        register_using(root, tx, settings, job, pid,source)
     })
 }
 /// Record permission separately from registration under fresh saved storage
@@ -276,8 +294,8 @@ pub(super) fn permit_recorded(root: &RootStore, job: &mut Job) -> Result<(), E> 
 /// existing transition. No socket grant, fresh budget or acceptance occurs;
 /// commit uncertainty and actual caller job observations remain unchanged.
 pub(super) fn permit_recorded_using(root:&RootStore,job:&mut Job,lease:Option<&crate::MissionLease>)->Result<(),E>{
-    transition(root,job,|root,tx,settings,job|{
+    transition(root,job,|root,tx,settings,job,source|{
         super::mission_authority::permission(root,tx,lease,job,&settings).map_err(|e|E::Launch(Box::new(e)))?;
-        permit(root,tx,settings,job)
+        permit_using(root,tx,settings,job,source)
     })
 }

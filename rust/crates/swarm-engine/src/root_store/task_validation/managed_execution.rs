@@ -112,6 +112,11 @@ fn inputs(
     request: &Request,
     job: Option<&store::Job>,
 ) -> Result<Option<Inputs>, E> {
+    inputs_using(store,work,request,job,None)
+}
+/// Internal reviewer observation may name only the exact current running record;
+/// the shared submission guard compares it in full. This is no exec allowance.
+fn inputs_using(store:&RootStore,work:&str,request:&Request,job:Option<&store::Job>,review:Option<&crate::IndependentReview>)->Result<Option<Inputs>,E>{
     let reservation = store.directory.reserve(false, false).map_err(E::Storage)?;
     let result = (|| {
         let settings = store.read_settings()?;
@@ -153,7 +158,7 @@ fn inputs(
                 &settings,
                 work,
                 &request,
-                ReviewSource::Fresh,
+                review.map_or(ReviewSource::Fresh,ReviewSource::Claimed),
                 RepositoryPurpose::Candidate,
             )
             .map_err(launch)?;
@@ -333,6 +338,15 @@ pub(super) fn acquire_job(
         .ok_or(E::Refused("task-validation-managed-repository-required"))?;
     acquire(store, input, false, Some(candidate))
 }
+/// Pin an existing completed control job for an internally selected current
+/// running reviewer. Full submission equality and immutable checkpoint guards
+/// remain; fresh public controls still use None and cannot name this allowance.
+pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate,review:Option<&crate::IndependentReview>)->Result<Session,E>{
+    let request=Request{schema_version:1,event_id:job.event_id.clone(),expected_revision:job.work_revision,task_id:job.task_id.clone()};
+    let input=inputs_using(store,&job.work_id,&request,Some(job),review)?
+        .ok_or(E::Refused("task-validation-managed-repository-required"))?;
+    acquire(store,input,false,Some(candidate))
+}
 /// Persist one candidate preimage before SQL claim. A later failed claim can
 /// leave this immutable orphan; it grants nothing and never replaces an original.
 pub(super) fn persist(store: &RootStore, id: &str, session: &Session) -> Result<(), E> {
@@ -381,6 +395,11 @@ pub(super) fn prepare(
     request: &Request,
     data: &Captured,
 ) -> Result<Prepared, A> {
+    prepare_for_review(db,directory,root,settings,work,request,data,None)
+}
+/// Borrow a checked reviewer record while recomputing the same complete source.
+/// No descriptor, Git operation, mutation or process grant is created.
+pub(super) fn prepare_for_review(db:&rusqlite::Connection,directory:&crate::root_store::LocalDirectory,root:&Path,settings:&crate::EngineSettingsDocument,work:&str,request:&Request,data:&Captured,review:Option<&crate::IndependentReview>)->Result<Prepared,A>{
     let actual_instance = crate::root_store::observe_instance(db, directory)
         .map_err(|e| A::caused("task-validation-managed-root-instance", e))?;
     if actual_instance != data.root_instance {
@@ -392,7 +411,7 @@ pub(super) fn prepare(
         settings,
         work,
         request,
-        ReviewSource::Fresh,
+        review.map_or(ReviewSource::Fresh,ReviewSource::Claimed),
         RepositoryPurpose::Candidate,
     )?;
     let limits = settings

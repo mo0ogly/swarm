@@ -62,17 +62,18 @@ fn startup_due(until: &str, now: At) -> Result<At, E> {
 /// permit, Work change or process retry occurs; original/cleanup causes survive.
 pub(super) fn observe(root: &RootStore, job: &Job, admission: bool) -> Result<Option<Material>, E> {
     guard::owner(job)?;
-    crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
+    super::sources::job(root,job,|source|crate::agent_storage_retry::execute_borrowed(&root.db, &root.directory, false, |_, settings| {
         transaction::apply(root, |tx| {
             let material = if admission {
-                Some(guard::fresh(root, tx, settings.clone(), job)?)
+                Some(guard::fresh_using(root, tx, settings.clone(), job,source)?)
             } else {
-                guard::observe_sources(root, tx, settings.clone(), job)?;
+                super::mission_authority::observe(root,tx,job,settings).map_err(|e|E::Launch(Box::new(e)))?;
+                guard::held_inputs(root,tx,settings.clone(),job,source,false)?;
                 None
             };
             Ok(Change::Observe(material))
         })
-    })
+    }))
 }
 /// Saved-policy state only. No signals, sleeps, source authority or process
 /// completion are inferred by these coordinates. All At values share this boot.

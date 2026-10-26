@@ -6,8 +6,10 @@
 //! originals, and a descriptive JSON Schema for complete citation-v2 cohort
 //! replies. The principal includes the protocol in the public managed inputs
 //! and the complete prompt; ordinary outputs are unchanged. The existing native
-//! invocation/publication/acceptance guard stays outside this module and is not
-//! altered: nothing here performs IO, provider calls, publication, reservation
+//! invocation/publication/acceptance guards stay outside this module. Native
+//! invocation now requires externally held sources and its complete private
+//! lifecycle; this packaged data alone grants nothing. Nothing here performs
+//! IO, provider calls, publication, reservation
 //! or acceptance, and no packaged data authenticates a reviewer, a worker or
 //! any supplied byte's origin, freshness or permission.
 //!

@@ -81,6 +81,14 @@ impl RootStore {
         &self, tx: &rusqlite::Transaction<'_>, prepared: PreparedReview,
         candidate: Option<&task_validation::ReviewCandidate>,
     ) -> Result<TaskReviewInputs,E> {
+            self.assemble_review_inputs_using(tx,prepared,candidate,false)
+    }
+    /// Share exact source assembly with engine-owned native invocation framing;
+    /// the flag conveys a supported transport fact, never a grant or policy.
+    fn assemble_review_inputs_using(
+        &self, tx:&rusqlite::Transaction<'_>,prepared:PreparedReview,
+        candidate:Option<&task_validation::ReviewCandidate>,invocation:bool,
+    )->Result<TaskReviewInputs,E>{
             let submitted = task_validation::submission(tx, &prepared.work, &prepared.preview.task_id)
                 .map_err(|e| E::Launch(Box::new(e)))?;
             match candidate {
@@ -88,7 +96,7 @@ impl RootStore {
                     let plan=candidate.candidate().control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
                     let reports=plan.policies.iter().map(|policy|task_validation::submission(tx,&prepared.work,&policy.task_id)
                         .map_err(|e|E::Launch(Box::new(e)))).collect::<Result<Vec<_>,E>>()?;
-                    inputs::assemble_managed(&self.root,prepared,candidate,&reports)
+                    inputs::assemble_managed_using(&self.root,prepared,candidate,&reports,invocation)
                 }
                 None => inputs::assemble(&self.root, prepared, &submitted),
             }
@@ -150,6 +158,7 @@ impl RootStore {
     /// the actual current error as a fresh call (not reserved funding); original
     /// controls stay separately bound while fresh source authority is recomputed.
     /// An already claimed retry reobserves its immediate archived original.
+    #[cfg(test)]
     pub(super) fn prepare_review_snapshot_for_job(
         &self,
         tx: &rusqlite::Transaction<'_>,
@@ -161,8 +170,9 @@ impl RootStore {
         self.prepare_review_snapshot_using(tx,settings,work,request,review,None)
     }
     /// Build observations for a readonly managed inspector with actual external
-    /// candidate custody. Native invocation passes None and retains its guard;
-    /// this parameter is never a JSON permission or a relaxed provider admission.
+    /// candidate custody. Native invocation supplies the same borrowed holder;
+    /// missing custody retains its refusal. This parameter is never a JSON
+    /// permission or a relaxed provider admission.
     /// Caller owns snapshot/settings, final source refresh and explicit custody.
     fn prepare_review_snapshot_using(
         &self, tx:&rusqlite::Transaction<'_>,settings:crate::EngineSettingsDocument,
@@ -171,15 +181,15 @@ impl RootStore {
     )->Result<PreparedReview,E>{
         let launch = |e| E::Launch(Box::new(e));
         let current = crate::read_recorded_work(tx, work).map_err(E::Work)?;
-        // Full managed cohort/provider context and protected candidate acceptance
-        // remain unported. New control admission must not unlock target-only review.
+        // Managed review requires the external complete candidate holder. A
+        // new control receipt alone never unlocks an ordinary target-only review.
         if current.planning.as_deref().is_some_and(|p| p.repository.is_some()) && candidate.is_none() {
             return Err(E::Refused("review-managed-candidate-unported"));
         }
         let recovery = self.review_recovery(tx, &current, &request.task_id, review, &settings)?;
         let source = if let Some(candidate)=candidate {
-            if review.is_some() || recovery.is_some(){return Err(E::Refused("review-managed-recovery-unported"));}
-            candidate.preview(self,tx,&settings,work,request)
+            if recovery.is_some(){return Err(E::Refused("review-managed-recovery-unported"));}
+            candidate.preview(self,tx,&settings,work,request,review)
         }else{match (review, recovery.as_ref()) {
             (None, Some(recovery)) => task_validation::prepare_reviewer_retry_preview(
                 tx, &self.root, &settings, work, request, recovery),

@@ -923,3 +923,69 @@ sequenceDiagram
     R-->>U: Data only, no applicable verdict
     Note over U,D: No provider call or acceptance
 ```
+
+
+## Managed native reviewer invocation and original recovery
+
+CLI `task review ID` connects the managed candidate to the existing claim, call
+debit/reservation, child registration, separate permission, tool-free transport
+and opinion publication. Candidate custody is acquired outside Root/settings/SQL
+locks and retained by the owner through the outcome. Later boundaries and the
+child reacquire the same actual control-job candidate, requiring complete equality
+with the current running review; no public JSON can supply that internal allowance.
+Git stays outside SQL snapshots. Explicit close preserves primary/cleanup causes.
+
+Preparation preserves actual saved Admin settings, financial reservations, mission
+rights, provider/model/executable bindings and original admission TTL. Its host
+check creates/removes a probe file: this is not a read-only operation. Internal
+provider input declares transport/recording support; `review-inputs` remains a
+non-grant inspection. These protocol facts are not operator policies. No timeout,
+retry, ceiling or ordinary single-task decoder fallback is introduced.
+
+Every canonical cohort task (selected task plus accepted predecessors) must appear
+in the reply. Candidate/catalogue/criteria/citations are checked for the complete
+cohort. The private journal freezes actual original protocol, saved reply/text
+limits, prompt digest, reply bytes and process observations. Publication separately
+compares current complete inputs/settings; an old cap never grants current authority.
+Public canonical context is content-addressed; certificate/event retain existing
+`managed_tasks`, `candidate_commit`, `previous_candidate`, `context`,
+`context_sha256` fields. Aggregate rationale follows Go; only the selected task's
+review field is changed.
+
+Partial cohort or invalid transport records an explicit failed call with retained
+originals. If publication refuses after known completion, job/reservation remain:
+repair the cause and use `task review-reconcile REVIEW` to apply the original
+without another provider call. Exact `task review` replay never reruns the provider.
+Corrupt context/certificate/journal refuses; exact restoration permits recovery.
+Consumption is never reset and declared usage is neither an invoice nor zero cost.
+
+**Authority limit remains:** this is a native opinion on the current candidate,
+never task acceptance. Accepted-baseline historical verdicts are not verified by
+this `inspection_only` context. `verify_current_native_review` still refuses managed
+acceptance/production-retry authority until that consumer contract is ported;
+reading a result into supervisor context does not remove this guard. A passed
+opinion, certificate or `verdict_applicable` closes no task or mission. The
+supervisor owns business decisions subject to required engine evidence.
+
+```mermaid
+sequenceDiagram
+    participant U as CLI task review
+    participant C as Held candidate
+    participant R as Root and saved settings
+    participant H as Private child
+    participant P as Tool-free provider
+    U->>C: Acquire outside locks
+    U->>R: Atomic claim, call debit and reserve
+    U->>R: Observed child then separate permission
+    R-->>H: Private channel, kernel identity and grant
+    H->>C: Reacquire same candidate before snapshot
+    H->>R: Verify running review and complete inputs
+    H->>P: Execute with sealed prompt
+    P-->>U: Complete cohort JSONL
+    U->>U: Wait, decode, retain journal and frozen policy
+    U->>C: Reinspect sources before publication
+    U->>R: Content-addressed context and atomic opinion
+    R-->>U: Recorded opinion, no acceptance
+    U->>R: Reconcile or exact replay
+    R-->>U: Verified original, no provider call
+```

@@ -14,6 +14,10 @@ use std::os::unix::process::ExitStatusExt;
 #[serde(deny_unknown_fields)]
 pub(super) struct Receipt {
     pub schema_version: i64,
+    /// Present only for an actual managed invocation; exact frozen input/limits
+    /// remain private original evidence, never authenticated authority.
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub managed_review: Option<crate::managed_review_record::Snapshot>,
     pub job: Job,
     pub finished_at: String,
     pub process_attempted: bool,
@@ -62,6 +66,10 @@ fn validate(value: &Receipt) -> Result<(), E> {
         || (value.schema_version == 2 && value.raw_capture.is_none())
     {
         return Err(E::Refused("review-receipt-schema-or-id"));
+    }
+    if let Some(managed)=&value.managed_review {
+        managed.validate().map_err(|e|caused("review-managed-original-invalid",e))?;
+        if value.schema_version!=2 || managed.prompt_sha256!=value.job.prompt_sha256{return Err(E::Refused("review-managed-original-binding"));}
     }
     if let Some(raw) = &value.raw_capture {
         raw.validate()
@@ -172,6 +180,7 @@ pub(super) fn observe(
         });
     let value = Receipt {
         schema_version: 2,
+        managed_review: None,
         job: observation.job.clone(),
         finished_at,
         process_attempted: true,

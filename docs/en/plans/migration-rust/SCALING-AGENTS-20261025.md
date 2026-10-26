@@ -315,3 +315,38 @@ opinion is not global independent acceptance. Both large calls remain retained
 HTTP504 failures, consumption unknown. Concurrent later release notes and two
 preparation help lines are not claimed installed by this lot. Delivered and tested
 review-check code is unchanged.
+
+
+### Managed native reviewer — cohort invocation, journal and recovery
+
+`task review` now connects externally held candidate custody to reservation,
+child checks, tool-free transport and complete-cohort publication. The journal
+retains original protocol, limits and reply; content-addressed public context,
+opinion and event bind checked bytes. No opinion accepts a task. Historical
+managed result reading is wired; managed acceptance/production-retry authority
+and accepted-baseline proof remain explicitly guarded, so global S2 stays open.
+
+Actual counterexample: after provider completion, publication compared a typed
+protocol with a differently ordered JSON projection. Generic fix compares two
+canonical typed models while retaining context/policy/prompt checks. The same
+original was then applied through review-reconcile without another invocation
+or debit. Running-source observation uses the exact internal review record,
+never a JSON-supplied permission.
+
+Six journeys verified: ordinary reviewer, fresh managed invocation, rejected
+partial cohort, publication refusal/recovery, live source drift, and review-check
+compatibility. Three retained functional results are reused; three remaining
+journeys pass. The original recipe wrapper remains FAIL: an arbitrary minimum
+of five assertions rejected a complete four-assertion case. The maintained
+recipe now checks named requirements per case. Two journal tests, nine capture
+tests and the canonical regression pass. GLM contributed borrowed-custody design
+and reviewed supplied boundaries: no direct confirmed defect, excerpt limits
+preserved. Report, actual installation state and retrospective:
+[evidence](../../../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-launch-xxnx8icj/RESULT.md).
+
+Next-context lessons: target the exact constructor when changing cfg(test) and
+qualify the production profile; compare the same representation before declaring
+source drift; recover the same original after publication refusal; assert named
+case obligations. No commit/push or suspended-mission restart is implied.
+
+This increment is verified locally: **dev.101** activated through the supported launcher; actual executable matches the default profile without fixtures, protected assets match, 14 FR/EN UI assertions pass and Works are preserved. A fresh complete native flow on this same binary passes five named assertions, including context corruption/refusal/restoration and replay without another call/debit. Isolated inert provider; no task acceptance or global S2 closure. Evidence and increment RETEX are in the report linked above.

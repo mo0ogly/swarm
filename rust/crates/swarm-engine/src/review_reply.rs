@@ -8,7 +8,7 @@ use std::{collections::BTreeSet, error::Error, fmt};
 
 /// Explicit operator values: trimmed minimum, raw maximum and normalized fallback minimum.
 /// Zero removes a minimum; None removes the maximum. No implicit installation default.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ReviewReplyLimits {
     pub min_text_bytes: usize,

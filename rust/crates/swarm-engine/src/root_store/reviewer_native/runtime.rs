@@ -107,7 +107,7 @@ fn recover(root: &RootStore, id: &str, action: Recovery) -> Result<TaskReviewOut
 /// projected into a receipt. No status0/EOF/empty response is made successful.
 fn invocation_errors(
     observed: process::Observation,
-    reply: Result<crate::ReviewProviderOutput, A>,
+    reply: Result<super::reply::Output, A>,
     facts_error: Option<A>,
 ) -> Option<E> {
     let mut errors = None;
@@ -163,10 +163,13 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
             content: &s.content,
         })
         .collect();
-    let decoder = crate::ReviewOutputStream::from_saved_settings(
+    let managed_snapshot=crate::managed_review_record::Snapshot::capture(&staged.material.inputs,&staged.material.settings.values)
+        .map_err(|e|E::Launch(Box::new(e)))?;
+    let protocol=super::reply::protocol(&staged.material.inputs)?;
+    let decoder = super::reply::Stream::new(
         &staged.material.settings.values,
         staged.material.inputs.preview.criterion_count,
-        &originals,
+        &originals,protocol.as_ref(),
     )
     .map_err(|e| E::Launch(Box::new(e)))?;
     let policy = staged
@@ -175,7 +178,7 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
         .values
         .agent_execution_policy()
         .map_err(E::Settings)?;
-    let transport = capture::Transport::new(policy, decoder).map_err(|e| E::Launch(Box::new(e)))?;
+    let transport = capture::Transport::new_domain(policy, decoder).map_err(|e| E::Launch(Box::new(e)))?;
     let mut command = Command::new(helper);
     command
         .arg("_reviewer_gate")
@@ -230,6 +233,7 @@ fn execute_using(root:&RootStore,staged:claim::Staged,helper:std::path::PathBuf,
         crate::system_timestamp().map_err(E::Runtime)?,
         raw,
     )?;
+    receipt.managed_review=managed_snapshot;
     if reply.is_err() {
         if let Some(e) = &facts_error {
             receipt.causes.extend(crate::native_diagnostics::project(e));
@@ -271,7 +275,10 @@ impl RootStore {
     /// Execute the configured native reviewer after genuine current worker/control
     /// evidence. The bounded request has the task-validation envelope, never argv,
     /// PID, actor or grant. Claim/call/estimate commit before spawn; exact event replay
-    /// only reads/reconciles an original. The host binary must provide the native
+    /// only reads/reconciles an original. Managed execution retains actual
+    /// candidate custody outside snapshots, validates the full cohort and freezes
+    /// its protocol/policy in the original journal. No accepted baseline or task
+    /// acceptance is inferred. The host binary must provide the native
     /// private helper entry. Failed calls record explicit error only with known
     /// wait/grant evidence and still return an error; no acceptance/refund/extra exec.
     /// Every later failure retains the known claim Work and original typed causes.
@@ -287,23 +294,27 @@ impl RootStore {
         }
         let request = task_validation::decode(raw).map_err(|e| E::Launch(Box::new(e)))?;
         let helper = std::env::current_exe().map_err(|e| caused("review-runtime-self-image", e))?;
-        let staged=match lease {None=>claim::record(self,work,&request)?,Some(lease)=>claim::record_using(self,work,&request,Some(lease))?};
+        let mut known=None;
+        let result=super::sources::request(self,work,&request,|source| {
+        let staged=claim::record_using_candidate(self,work,&request,lease,source)?;
         let (job_work, revision) = match &staged {
             claim::Recorded::New(v) => (v.work.id.clone(), v.work.revision),
             claim::Recorded::Replay(j) => (j.work_id.clone(), j.work_revision),
         };
-        let result = match staged {
+        known=Some((job_work,revision));
+        match staged {
             claim::Recorded::New(v) => match lease {None=>execute(self,*v,helper),Some(lease)=>execute_using(self,*v,helper,Some(lease))},
             claim::Recorded::Replay(j) => recover(self, &j.id, Recovery::ApplyOriginal),
-        };
+        }
+        });
         result.map_err(|primary| {
-            if primary.recorded_work().is_some() {
+            if primary.recorded_work().is_some() || known.is_none() {
                 primary
             } else {
                 E::WorkRecorded {
                     primary: Box::new(primary),
-                    work: job_work,
-                    revision,
+                    work: known.as_ref().unwrap().0.clone(),
+                    revision: known.as_ref().unwrap().1,
                 }
             }
         })

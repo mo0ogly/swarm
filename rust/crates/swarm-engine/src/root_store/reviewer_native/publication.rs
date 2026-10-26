@@ -70,6 +70,7 @@ pub(super) fn quiescent(job: &Job, owner: OwnerBoundary) -> Result<(), E> {
 /// receipts refuse instead of fabricating terminal events or zero usage. The
 /// original admission TTL is deliberately not reused as result expiry. Does no
 /// mutation, host probe, provider call, signal, file publication or settlement.
+#[cfg(test)]
 fn prepare(
     root: &RootStore,
     tx: &Transaction<'_>,
@@ -77,6 +78,11 @@ fn prepare(
     id: &str,
     owner: OwnerBoundary,
 ) -> Result<Ready, E> {
+    prepare_using(root,tx,settings,id,owner,None)
+}
+/// Revalidate a waited original against current complete inputs under borrowed
+/// candidate custody. All ledger/policy/owner/source checks remain mandatory.
+fn prepare_using(root:&RootStore,tx:&Transaction<'_>,settings:&crate::EngineSettingsDocument,id:&str,owner:OwnerBoundary,source:Option<&crate::root_store::task_validation::ReviewCandidate>)->Result<Ready,E>{
     let (r, hash) = journal::read(root, id)?;
     let job = store::job(tx, id)
         .map_err(|e| E::Launch(Box::new(e)))?
@@ -102,7 +108,7 @@ fn prepare(
     if raw.failed || raw.policy != policy {
         return Err(E::Refused("review-publication-capture-policy-changed"));
     }
-    let (work, inputs) = guard::result_inputs(root, tx, settings.clone(), &job)?;
+    let (work, inputs) = guard::held_inputs(root, tx, settings.clone(), &job,source,true)?;
     let originals: Vec<_> = inputs
         .materials
         .iter()
@@ -116,13 +122,6 @@ fn prepare(
         .original_reply
         .as_deref()
         .ok_or(E::Refused("review-publication-reply-required"))?;
-    let decoded = crate::review_output::decode_retained_review(
-        reply,
-        &settings.values,
-        inputs.preview.criterion_count,
-        &originals,
-    )
-    .map_err(|e| E::Launch(Box::new(e)))?;
     let mut review = work
         .tasks
         .iter()
@@ -137,13 +136,36 @@ fn prepare(
     if parse(&r.finished_at)? < parse(&review.started)? {
         return Err(E::Refused("review-publication-clock-order"));
     }
+    match (&inputs.managed_protocol,&r.managed_review) {
+        (Some(_),Some(original))=>{
+            // Reconstruct the same typed model before comparing canonical bytes:
+            // JSONValue sorts object keys differently from struct field order.
+            let current=crate::managed_review_record::Snapshot::capture(&inputs,&settings.values)
+                .map_err(|e|E::Launch(Box::new(e)))?.ok_or(E::Refused("review-managed-original-required"))?;
+            if !original.same_inputs(&current).map_err(|e|E::Launch(Box::new(e)))? || original.prompt_sha256!=job.prompt_sha256 {
+                return Err(E::Refused("review-managed-original-context-changed"));
+            }
+            current.apply(reply,&mut review,&job.task_id).map_err(|e|E::Launch(Box::new(e)))?;
+            if !original.matches(reply,&review,&job.task_id).map_err(|e|E::Launch(Box::new(e)))? {return Err(E::Refused("review-managed-original-reply-changed"));}
+            let (name,bytes)=original.context().map_err(|e|E::Launch(Box::new(e)))?;
+            public_file(root,&name,&bytes)?;
+        }
+        (None,None)=>{
+    let decoded = crate::review_output::decode_retained_review(
+        reply,
+        &settings.values,
+        inputs.preview.criterion_count,
+        &originals,
+    )
+    .map_err(|e| E::Launch(Box::new(e)))?;
     review.state = match decoded.state {
         crate::ReviewReplyState::Passed => "passed",
         crate::ReviewReplyState::ChangesRequested => "changes_requested",
+    }.into();
+    review.reason=decoded.reason;review.criteria=decoded.criteria;
+        }
+        _=>return Err(E::Refused("review-managed-original-domain-mismatch")),
     }
-    .into();
-    review.reason = decoded.reason;
-    review.criteria = decoded.criteria;
     review.finished = r.finished_at.clone();
     review.result_event = format!("{}-result", job.id);
     review.reply_sha256 = crate::provider_configuration::configuration_digest(reply);
@@ -267,6 +289,17 @@ fn recorded_artifact(
     }
     let record: serde_json::Value = serde_json::from_slice(&request)
         .map_err(|e| caused("review-publication-recorded-event-json", e))?;
+    if let Some(managed)=&r.managed_review {
+        let typed:crate::IndependentReview=serde_json::from_slice(&request).map_err(|e|caused("review-managed-recorded-event-json",e))?;
+        if job.phase==Phase::Recorded {
+            let raw=r.original_reply.as_deref().ok_or(E::Refused("review-managed-original-reply-required"))?;
+            if !managed.matches(raw,&typed,&job.task_id).map_err(|e|E::Launch(Box::new(e)))? {return Err(E::Refused("review-managed-recorded-event-changed"));}
+            let (name,bytes)=managed.context().map_err(|e|E::Launch(Box::new(e)))?;
+            let actual=root.directory.read_bounded(&name,bytes.len()).map_err(E::Storage)?;
+            if actual!=bytes{return Err(E::Refused("review-managed-recorded-context-changed"));}
+        }
+    }
+
     // Empty omitted digest means unknown original reply, never malformed data.
     let recorded_digest = match record.get("reply_sha256") {
         None => "",
@@ -465,7 +498,9 @@ pub(super) fn record_mode(
         return Err(E::Refused("root-read-only"));
     }
     let mut known = None;
-    let result = crate::agent_storage_retry::execute_borrowed(
+    let selected=store::job(&root.db,id).map_err(|e|E::Launch(Box::new(e)))?
+        .ok_or(E::Refused("review-publication-job-required"))?;
+    let mut operation=|source:Option<&crate::root_store::task_validation::ReviewCandidate>|crate::agent_storage_retry::execute_borrowed(
         &root.db,
         &root.directory,
         false,
@@ -492,7 +527,7 @@ pub(super) fn record_mode(
                     }));
                 }
                 let mut ready = match mode {
-                    Mode::Verdict => prepare(root, tx, settings, id, owner)?,
+                    Mode::Verdict => prepare_using(root, tx, settings, id, owner,source)?,
                     Mode::FailedOriginal => super::failure::prepare(root, tx, id, owner)?,
                     Mode::StaleOriginal => super::stale::prepare(root, tx, settings, id, owner)?,
                 };
@@ -530,7 +565,7 @@ pub(super) fn record_mode(
                 quiescent(&job, owner)?;
                 match mode {
                     Mode::Verdict => {
-                        guard::result_inputs(root, tx, settings.clone(), &job)?;
+                        guard::held_inputs(root, tx, settings.clone(), &job,source,true)?;
                     }
                     Mode::StaleOriginal => {
                         let fresh = super::stale::prepare(root, tx, settings, id, owner)?;
@@ -595,6 +630,7 @@ pub(super) fn record_mode(
             Ok(outcome)
         },
     );
+    let result=if matches!(mode,Mode::Verdict){super::sources::job(root,&selected,operation)}else{operation(None)};
     result.map_err(|primary| match known {
         Some((work, revision)) => E::WorkRecorded {
             primary: Box::new(primary),

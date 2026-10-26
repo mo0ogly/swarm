@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Reviewer natif géré : appel de cohorte avec candidat retenu, protocole et limites d’origine conservés, contexte adressé par contenu et reprise sans nouvel appel ; aucune acceptation de tâche.",
+        "en": "Managed native reviewer: cohort invocation under retained candidate custody, original protocol/limits, content-addressed context and recovery without another call; no task acceptance."
+      },
+      {
         "fr": "PAEA : exemples fictifs téléchargeables depuis les trois écrans pour essayer la correspondance de reçu, la résolution de facture et la comparaison d’actions. Sélection et vérification explicites ; aucun accord ni effet réel.",
         "en": "PAEA: download fictional examples from all three pages to try receipt correspondence, invoice resolution and action comparison. Selection and checks remain explicit; no approval or actual effect."
       },

@@ -160,6 +160,8 @@ struct Row {
 #[derive(serde::Deserialize)]
 struct Original {
     schema_version: u32,
+    #[serde(default)]
+    managed_review:Option<crate::managed_review_record::Snapshot>,
     failed: bool,
     process_attempted: bool,
     waited: bool,
@@ -184,6 +186,8 @@ struct Capture {
 }
 #[derive(serde::Deserialize)]
 struct OriginalJob {
+    #[serde(default)]
+    prompt_sha256:Option<String>,
     id: String,
     work_id: String,
     task_id: String,
@@ -493,14 +497,23 @@ impl RootStore {
         }
         let review: IndependentReview = serde_json::from_slice(&request)
             .map_err(|e| caused("native-review-context-record-json", e))?;
-        if review.managed_tasks.is_some()
-            || review.fragment_journal.is_some()
-            || review.batches.is_some()
-            || !review.git_report.is_empty()
-            || !review.candidate_commit.is_empty()
-            || !review.context.is_empty()
-        {
-            return Err(E::Refused("native-review-context-managed-unported"));
+        let managed_fields=review.managed_tasks.is_some() || !review.candidate_commit.is_empty()
+            || !review.previous_candidate.is_empty() || !review.context.is_empty() || !review.context_sha256.is_empty();
+        if review.fragment_journal.is_some() || review.batches.is_some() || !review.git_report.is_empty(){return Err(E::Refused("native-review-context-managed-unported"));}
+        match &original.managed_review {
+            Some(managed)=>{
+                managed.validate().map_err(|e|caused("native-managed-context-original",e))?;
+                if original.job.prompt_sha256.as_deref()!=Some(managed.prompt_sha256.as_str()){return Err(E::Refused("native-managed-context-prompt-changed"));}
+                if verdict_applicable {
+                    let raw=original.original_reply.as_deref().ok_or(E::Refused("native-managed-context-reply-required"))?;
+                    if !managed.matches(raw,&review,&row.task).map_err(|e|caused("native-managed-context-record",e))?{return Err(E::Refused("native-managed-context-record-changed"));}
+                    let (name,bytes)=managed.context().map_err(|e|caused("native-managed-context-original",e))?;
+                    let actual=self.directory.read_bounded(&name,bytes.len()).map_err(E::Storage)?;
+                    if actual!=bytes{return Err(E::Refused("native-managed-context-file-changed"));}
+                }else if managed_fields{return Err(E::Refused("native-managed-nonverdict-has-verdict"));}
+            }
+            None if managed_fields=>return Err(E::Refused("native-review-context-managed-unported")),
+            None=>{},
         }
         let reply_digest = original
             .original_reply
@@ -595,6 +608,9 @@ impl RootStore {
                 }
                 let review = task.independent_review.as_deref()
                     .ok_or(E::Refused("native-review-current-result-required"))?;
+                if review.managed_tasks.is_some() || !review.candidate_commit.is_empty(){
+                    return Err(E::Refused("native-managed-current-review-unported"));
+                }
                 let observed = store.recorded_native_review(&tx, &work.id, &review.id)?;
                 let applicable = match purpose {
                     crate::review_evidence::CurrentReviewUse::ReviewerRetry => observed.retry_failure.is_some(),

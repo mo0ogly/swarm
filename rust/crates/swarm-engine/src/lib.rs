@@ -552,6 +552,7 @@ mod managed_review_citations;
 mod managed_review_reply;
 mod managed_review_protocol;
 mod managed_review_output;
+mod managed_review_record;
 pub use managed_review_context::{
     decode_managed_review_context, DeliveryCriterion, ManagedDelivery, ManagedReviewBaseline,
     ManagedReviewContext, ManagedReviewTaskContext,

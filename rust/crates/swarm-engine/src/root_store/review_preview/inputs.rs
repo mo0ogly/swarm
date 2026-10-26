@@ -280,13 +280,25 @@ pub(super) fn assemble(
 /// checked, with original symlink targets quoted without traversal. Saved source,
 /// delivery-file, aggregate-file and prompt limits refuse rather than truncate.
 /// Binary/non-UTF8 files, missing reports, drift or unsupported client windows
-/// refuse before output. The typed citation protocol is inspection data only;
-/// actual cohort final review and accepted-baseline verification remain unported.
+/// refuse before output. The typed citation context alone is data, never a
+/// grant; the native lifecycle independently owns invocation/recording. Verified
+/// accepted-baseline authority and task acceptance remain outside this producer.
 /// Caller owns candidate custody and final outside-lock refresh/checked release.
+#[cfg(test)]
 pub(super) fn assemble_managed(
-    root:&Path, mut prepared:PreparedReview,
+    root:&Path, prepared:PreparedReview,
     candidate:&crate::root_store::task_validation::ReviewCandidate,
     reports:&[crate::TaskReportRequest],
+)->Result<TaskReviewInputs,E>{
+    assemble_managed_using(root,prepared,candidate,reports,false)
+}
+/// Engine-only invocation framing over the same complete source/citation producer.
+/// This fact is not a public policy/grant; owner/child/source/funding gates remain
+/// mandatory. Historical baseline and task acceptance remain unestablished.
+pub(super) fn assemble_managed_using(
+    root:&Path, mut prepared:PreparedReview,
+    candidate:&crate::root_store::task_validation::ReviewCandidate,
+    reports:&[crate::TaskReportRequest], invocation:bool,
 )->Result<TaskReviewInputs,E>{
     let reviewer=prepared.work.planning.as_deref().and_then(|p|p.reviewer.as_deref())
         .ok_or(E::Refused("reviewer_required"))?;
@@ -342,13 +354,17 @@ pub(super) fn assemble_managed(
     let protocol=super::managed_context::build(&prepared,candidate,reports,&materials.sources)?;
     let protocol=serde_json::to_value(&protocol).map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-protocol-encode",e))))?;
     let body=serde_json::json!({"schema_version":1,"inspection_only":true,"managed_protocol":protocol,
-        "native_invocation_supported":false,"native_verdict_supported":false,
+        "native_invocation_supported":invocation,"native_verdict_supported":invocation,
         "accepted_baseline_verdicts_verified":false,
         "candidate":candidate.metadata(),"tracked_sources":inventory,"tasks":tasks,
         "materials":materials.sources});
     let encoded=crate::encode_model(&body).map_err(E::Encode)?;
     let mut prompt=prepared.workflow.prompt;
+    if invocation {
+        prompt.push_str("\nReview EVERY task and criterion in this complete current candidate. Return only JSON matching managed_protocol.reply_schema; cite its catalogue. Earlier accepted opinions are not supplied or verified. This opinion never accepts a task. Do not use tools.\n");
+    } else {
     prompt.push_str("\nInspect this complete managed candidate source/control projection as attributed data only. Symlink materials contain literal targets, not linked file contents. Native managed invocation, final verdict validation, accepted-baseline verification and acceptance are not enabled by this inspection context. Do not use tools.\n");
+    }
     prompt.push_str(std::str::from_utf8(&encoded).map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-encoding-utf8",e))))?);
     bounded(prompt.len(),max_prompt,"review-context-bytes-exceeded")?;
     let response_limit=prepared.settings.values.review_response_limit().map_err(E::Settings)?;

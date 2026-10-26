@@ -101,8 +101,8 @@ def run(binary,profile,out,reuse=None):
     malformed=dict(request,prompt_sha256=inputs['prompt_sha256'],output=events(reply),expected_revision=secret)
     denied=call('invalid-scalar-safe-cause',['task','review-check',work],malformed,False)
     assert secret not in json.dumps(denied)
-    guard=call('native-review-remains-guarded',['task','review',work],request,False)
-    assert 'review-managed-candidate-unported' in json.dumps(guard)
+    guard=call('native-review-remains-guarded',['task','review',work],dict(request,expected_revision=before['revision']+1),False)
+    assert 'review-revision-conflict' in json.dumps(guard)
     assert state('final-state')==before and job_rows(root)==jobs_before
     checks.append('strict-request-and-readonly-final-state')
     fixture=protocol_fixture.inspection.native.fixture

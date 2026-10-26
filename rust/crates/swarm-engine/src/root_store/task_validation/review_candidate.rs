@@ -10,13 +10,15 @@ pub(in crate::root_store) struct ReviewCandidate {
     session: managed_execution::Session,
     job: store::Job,
     metadata: serde_json::Value,
+    review:Option<crate::IndependentReview>,
 }
 impl ReviewCandidate {
     /// Recompute current Root source using held observations, without Git inside
     /// the caller's snapshot. Exact native evidence is checked by its consumer.
     pub(in crate::root_store) fn preview(&self, root: &RootStore, tx: &rusqlite::Connection,
-        settings: &crate::EngineSettingsDocument, work: &str, request: &Request) -> Result<TaskValidationPreview, A> {
-        managed_execution::prepare(tx,&root.directory,&root.root,settings,work,request,&self.session.data).map(|p|p.preview)
+        settings: &crate::EngineSettingsDocument, work: &str, request: &Request,review:Option<&crate::IndependentReview>) -> Result<TaskValidationPreview, A> {
+        if review!=self.review.as_ref(){return Err(A::Refused("review-managed-held-record-changed"));}
+        managed_execution::prepare_for_review(tx,&root.directory,&root.root,settings,work,request,&self.session.data,review).map(|p|p.preview)
     }
     /// Borrow the complete checkpoint; a digest or DTO alone grants no access.
     pub(in crate::root_store) fn candidate(&self) -> &crate::managed_repository::ManagedCandidate { &self.session.data.candidate }
@@ -30,7 +32,11 @@ impl ReviewCandidate {
     pub(in crate::root_store) fn link(&self, name:&str) -> Result<String,E> { self.session.review_link(name) }
     /// Reinspect complete raw tracked sources/checkpoint outside Root locks after
     /// materialization, refusing drift. This runs no provider and grants no lease.
-    pub(in crate::root_store) fn refresh(&self,root:&RootStore)->Result<(),E>{self.session.refresh(root,&self.job)}
+    pub(in crate::root_store) fn refresh(&self,root:&RootStore)->Result<(),E>{
+        let fresh=managed_execution::acquire_for_review(root,&self.job,self.candidate(),self.review.as_ref())?;
+        let result=if fresh.data==self.session.data{Ok(())}else{Err(E::Refused("task-validation-managed-inputs-changed"))};
+        finished(result,fresh.close())
+    }
     /// Release every held candidate descriptor and preserve explicit close errors.
     pub(in crate::root_store) fn close(self)->Result<(),E>{self.session.close()}
 }
@@ -40,6 +46,11 @@ impl ReviewCandidate {
 /// only then pin its existing candidate after checked snapshot/lock release.
 /// No preparation, file/SQL write, reviewer call or capacity reservation occurs.
 pub(in crate::root_store) fn acquire(root:&RootStore,work:&str,request:&Request)->Result<Option<ReviewCandidate>,E>{
+    acquire_using(root,work,request,None)
+}
+/// Internal registered-review variant. Callers select the actual immutable job;
+/// this borrowed record only enables exact running-record equality, no permission.
+pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Request,review:Option<&crate::IndependentReview>)->Result<Option<ReviewCandidate>,E>{
     let reservation=root.directory.reserve(false,false).map_err(E::Storage)?;
     let observed=(||{
         let tx=root.db.unchecked_transaction().map_err(E::Sql)?;
@@ -73,8 +84,8 @@ pub(in crate::root_store) fn acquire(root:&RootStore,work:&str,request:&Request)
     })();
     let observed=finished(observed,reservation.close().map_err(E::Storage))?;
     observed.map(|(job,candidate,metadata)|{
-        let session=managed_execution::acquire_job(root,&job,&candidate)?;
-        Ok(ReviewCandidate{session,job,metadata})
+        let session=managed_execution::acquire_for_review(root,&job,&candidate,review)?;
+        Ok(ReviewCandidate{session,job,metadata,review:review.cloned()})
     }).transpose()
 }
 /// Retain a typed launch cause behind the actual Root error family.

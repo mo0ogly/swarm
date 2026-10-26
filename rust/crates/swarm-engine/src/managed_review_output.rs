@@ -7,7 +7,7 @@ use std::{collections::BTreeSet, io::{self, Write}};
 /// Recheck internal context/catalogue identity before consuming supplied bytes.
 /// Only the currently supported inspection-v1/citation-v2 scope is admitted;
 /// these versions are wire invariants, not saved operator cutoffs. No IO occurs.
-fn protocol_valid(protocol: &ManagedReviewProtocol) -> Result<(), E> {
+pub(crate) fn protocol_valid(protocol: &ManagedReviewProtocol) -> Result<(), E> {
     let context = &protocol.context;
     if context.citation_contract_version != 2 || context.inspection_scope_version != 1
         || !context.inspection_only || context.accepted_baseline.is_some() {
@@ -70,7 +70,7 @@ pub(crate) fn decode_retained_managed_review(raw: &[u8], values: &EngineSettings
 
 /// Shared exact domain validation after the caller freezes saved policy. Typed
 /// errors propagate; no stream state or externally observed effect is inferred.
-fn decode(raw:&[u8], protocol:&ManagedReviewProtocol, limits:crate::ReviewReplyLimits,
+pub(crate) fn decode(raw:&[u8], protocol:&ManagedReviewProtocol, limits:crate::ReviewReplyLimits,
     cap:Option<usize>) -> Result<ParsedManagedReview,E> {
     protocol_valid(protocol)?;
     if cap.is_some_and(|cap| raw.len()>cap) {
@@ -120,6 +120,9 @@ impl<'a> ManagedReviewOutputStream<'a> {
     /// Borrow exact bounded original even after rejection; success transfers it.
     #[allow(dead_code)]
     pub(crate) fn retained_reply(&self)->Option<&[u8]> { self.stream.retained_reply() }
+    /// Test-only observation of the same unverified shared transport facts.
+    #[cfg(test)]
+    pub(crate) fn facts_snapshot(&self)->crate::agent_provider_facts::ProviderFactsSnapshot {self.stream.facts_snapshot()}
     /// Retain current unverified usage/model facts, including failure quality.
     /// Encoding errors preserve causes; no invoice, refund or debit is implied.
     #[allow(dead_code)]

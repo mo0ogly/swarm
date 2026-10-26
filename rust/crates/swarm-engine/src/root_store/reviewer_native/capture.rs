@@ -257,7 +257,7 @@ pub(super) struct Transport<'a> {
 }
 struct TransportState<'a> {
     capture: Capture,
-    reply: crate::ReviewOutputStream<'a>,
+    reply: super::reply::Stream<'a>,
     failed: bool,
 }
 /// Borrowed single-channel adapter for the owned runner's synchronous Write
@@ -270,9 +270,15 @@ impl<'a> Transport<'a> {
     /// Validate explicit capture policy before returning any sink. Reply policy
     /// and source binding remain the caller's obligation. No IO, default policy,
     /// process, ledger mutation or implicit completion occurs.
+    #[cfg(test)]
     pub(super) fn new(
+        policy:AgentExecutionPolicy,reply:crate::ReviewOutputStream<'a>,
+    )->Result<Self,E>{Self::new_domain(policy,super::reply::Stream::Ordinary(reply))}
+    /// Same capture budget for either actual reply domain; selection grants no
+    /// provider permission and capture/parser failures remain latched together.
+    pub(super) fn new_domain(
         policy: AgentExecutionPolicy,
-        reply: crate::ReviewOutputStream<'a>,
+        reply: super::reply::Stream<'a>,
     ) -> Result<Self, E> {
         Ok(Self {
             state: std::cell::RefCell::new(TransportState {
@@ -300,7 +306,7 @@ impl<'a> Transport<'a> {
     /// This does not finish/validate the reply: the owner must first establish
     /// actual EOF/wait and invalidate transport on runner/drain failures.
     /// Raw capture or parser failure has already latched decoder incompleteness.
-    pub(super) fn into_parts(self) -> (Snapshot, crate::ReviewOutputStream<'a>) {
+    pub(super) fn into_parts(self) -> (Snapshot, super::reply::Stream<'a>) {
         let state = self.state.into_inner();
         (state.capture.snapshot(), state.reply)
     }

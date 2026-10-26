@@ -345,3 +345,40 @@ globale. Les deux appels larges restent des HTTP504 conservés, consommation inc
 Des notes et deux lignes d’aide des préparations ajoutées en parallèle après
 livraison ne sont pas déclarées installées par ce lot. Le code du parcours
 review-check livré et testé est inchangé.
+
+
+### Reviewer natif géré — appel, journal et reprise de cohorte
+
+`task review` raccorde désormais le candidat retenu hors verrous à la réservation,
+au contrôle de l’enfant, au transport sans outils et à la publication de toute
+la cohorte. Le journal conserve protocole, limites et réponse d’origine ; contexte
+public adressé par contenu, avis et événement sont liés aux octets contrôlés.
+Un avis n’accepte aucune tâche. La lecture historique gérée est raccordée ;
+le consommateur d’autorité d’acceptation/reprise de production et la preuve de
+baseline acceptée restent explicitement protégés, donc S2 global demeure ouvert.
+
+Contre-exemple réel : après un appel terminé, la publication comparait le
+protocole typé à une projection JSON dont l’ordre des clés différait. Correction
+générale par comparaison de deux modèles typés canoniques, sans retirer les
+contrôles de contexte, limites et prompt. Le même original a ensuite été appliqué
+par `review-reconcile`, sans nouvel appel ni débit. Les sources running utilisent
+le record interne exact, jamais une permission fournie par JSON.
+
+Six parcours sont vérifiés : reviewer ordinaire, nouvel appel géré, cohorte
+partielle refusée, publication refusée puis reprise, source modifiée pendant
+l’appel, et compatibilité review-check. Trois résultats fonctionnels conservés
+sont réutilisés, trois parcours complémentaires passent. Le premier wrapper de
+recette reste FAIL : son seuil arbitraire de cinq assertions rejetait un cas
+complet à quatre assertions ; la recette maintenue vérifie les exigences nommées.
+Deux tests du journal, neuf de capture et la régression canonique passent.
+GLM a contribué au design de l’emprunt et revu les frontières fournies : aucun
+défaut direct confirmé, limites des extraits conservées. Rapport, état réel de
+l’installation et RETEX : [preuves](evidence/20261025-scaling-s2-oi9dgo_e/native-review-launch-xxnx8icj/RESULT.md).
+
+Apprentissages transmis : cibler le constructeur exact lors d’un changement de
+`cfg(test)`, toujours qualifier le profil produit ; comparer des modèles de même
+représentation avant d’inférer une dérive ; préserver et reprendre le même original
+après refus de publication ; vérifier des obligations nommées par cas. Aucun
+commit/push ni redémarrage de la mission suspendue n’est implicite.
+
+Livraison de cet incrément vérifiée : **dev.101** active par le lanceur pris en charge ; empreinte réelle conforme au profil normal sans fixture, ressources protégées conformes, 14 assertions UI FR/EN et travaux conservés. Un nouveau parcours natif complet sur ce même binaire passe cinq assertions nommées, dont refus/restauration du contexte et rejeu sans appel/débit supplémentaire. Prestataire inerte isolé ; aucune acceptation de tâche ni clôture S2 globale. Détails et RETEX dans le rapport lié ci-dessus.
