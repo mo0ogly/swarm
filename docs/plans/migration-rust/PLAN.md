@@ -3273,3 +3273,17 @@ ancien worker lisible après plusieurs publications, vraie copie sur nouveau SHA
 puis raccordement au superviseur, S3/S4 et RETEX final. Refus initial explicite
 conservé jusqu’à ces preuves, pas de limite de cohorte cachée.
 Voir [rapport/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-first-publication-ytg974j3/RESULT.md) et SCALING-AGENTS-20261025.md.
+
+
+## Préparation — commit et relance dev118, 26 octobre
+
+Commit `122afc517` créé sans push ; 108 entrées indexées étrangères préservées.
+`swarm.sh restart` terminé ; binaire actif vérifié, version `v0.1.1-dev.118`,
+commit et SHA concordants. 16 contrôles livraison +14 Version FR/EN +6 préparation
+en lecture seule passent ; paramètres et missions suspendues inchangés.
+Échec initial du comparateur de métadonnées conservé et diagnostiqué ; reprise
+vérifiée sur projection explicite reçu/API. Pas de conformité globale déduite.
+GLM `glm-5.2` a analysé `release-plan` (29 681 tokens mesurés) : snapshot converti,
+CAS Work/préparation, rejeu et readback final à préserver. Analyse conservée,
+implémentation et recette du parcours encore ouvertes, owner Codex ; aucune
+autorisation de départ appliquée. Voir [rapport](PREPARATION-CONVERSION-20261026.md).

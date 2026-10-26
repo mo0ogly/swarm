@@ -173,3 +173,51 @@ preparation_conversion est désormais déclaré sous la même condition. Cette
 correction de déclaration conserve le parcours Linux testé et évite de consommer
 une interface Linux sur les autres cibles. Aucune compilation Windows n’est
 revendiquée. La relance suivante reconstruit le profil livré et vérifie son identité.
+
+## Reprise : commit et relance vérifiée — dev118
+
+Le commit `122afc517d3afdd280eab3845d59747583127295` conserve ce lot
+(30 fichiers). Un index temporaire a isolé ses changements : les 108 entrées
+indexées étrangères ont conservé leurs modes et blobs exacts. Aucun push.
+Le raccord Linux de `preparation_conversion` est inclus ; aucune compilation
+Windows n'est revendiquée. Le service local a été reconstruit et relancé par
+`./swarm.sh restart`, puis observé prêt en `v0.1.1-dev.118`.
+SHA256 du processus réellement servi :
+`ab9a285dae2dcbc40ca972d1cee041378161786157410ff6ea011881a218f113`.
+Le commit déclaré correspond ; `modified=true` signale les travaux non committés
+du dépôt partagé. Cela ne constitue pas une qualification des changements d'autrui.
+
+Vérifications : 16 contrôles HTTP/processus/ressources, 14 assertions Version
+FR/EN, 6 assertions de préparation en lecture seule. Les paramètres et les deux
+missions suspendues ont conservé leur état ; aucun POST n'a été émis par cette
+recette sur l'instance locale. Les versions FR/EN et les six ressources protégées
+contrôlées correspondent au reçu des entrées effectives de livraison.
+Ces contrôles de relance réutilisent les preuves fonctionnelles conservées du lot ;
+ils ne constituent ni une nouvelle recette complète de migration ni une acceptation globale.
+
+Le premier contrôle a refusé la comparaison brute des métadonnées : le reçu
+contient `schema_version`, l'API expose `provenance=injected`. Les valeurs communes
+(version, commit, modification, date) et la provenance attendue sont maintenant
+comparées explicitement, sans ignorer un écart réel. Échec original et reprise
+sont conservés dans `evidence/20261026-preparation-conversion/private/resume-commit118/`.
+42 fichiers ont été copiés avec vérification SHA256, dont les résultats et
+captures ; le contenu privé n'est pas suivi par Git.
+
+### Suite qualifiée par GLM, pas encore implémentée
+
+L'appel HTTP direct SKYNET a demandé et reçu `glm-5.2` : 129,708 secondes,
+13 317 tokens d'entrée, 16 364 de sortie, total 29 681. Il s'agit d'une analyse
+sans outils/dépôt, pas de huit workers ni d'une validation indépendante du code.
+Sa réponse et les entrées exactes sont conservées dans le même dossier privé.
+
+Prochain besoin : autoriser explicitement le départ des tâches déjà matérialisées
+(`release-plan`), avec snapshot converti et révision courante du Work. Les gardes
+à vérifier sont le rejeu avant mutation, les deux CAS, les verrous, le verdict
+préservé, le readback final après reçu et la récupération des issues incertaines.
+L'autorisation peut débloquer un conducteur déjà configuré : ne pas promettre
+qu'aucun agent ne pourra ensuite démarrer. L'opération n'appelle pas elle-même
+un fournisseur. L'organisation, la révision de missions et les gardes de dérive
+supplémentaires doivent garder un périmètre et une décision explicites.
+Owner : Codex ; critère : parcours CLI/API/UI sur Root isolé avec refus sans
+mutation, rejeu, état des verrous et livraison réelle. État : analyse conservée,
+aucun patch `release-plan`, aucune autorisation appliquée aux missions locales.
