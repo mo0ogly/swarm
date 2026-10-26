@@ -314,3 +314,34 @@ pour le prochain contexte : fournir dès le premier paquet review_quote.rs
 avec producteur et vrai parseur ; leur absence avait créé un constat conditionnel
 superflu. Le refus partagé sur diff commençant par une ligne vide reste dormant,
 propriétaire du futur support diff ; le contexte natif courant n’invente aucun diff.
+
+
+### Contrôle public de sortie fournie — dépendance du lancement natif
+
+`task review-check` reconstruit le protocole sous témoins du candidat, exige
+l’empreinte du prompt original et vérifie le JSONL fourni par le vrai transport
+sans outils puis le parseur de cohorte complète. Réglages Admin persistés, noms
+canoniques uniques, indices et citations sont appliqués. Résultat : données
+d’opinion uniquement ; aucun fournisseur lancé, débit, verdict enregistré ni
+acceptation. Le lancement natif géré reste protégé.
+
+Cinq tests unitaires ciblés passent, dont deux tâches, erreur de transport et
+conservation des originaux refusés. Le premier parcours CLI réel passe neuf
+assertions de sortie, en plus des douze assertions d’inspection et quatre du
+protocole ; la recette consolidée et l’installation sont suivies dans le
+[rapport d’incrément](evidence/20261025-scaling-s2-oi9dgo_e/native-review-check-vtinqwfv/RESULT.md).
+L’appel de proposition GLM initial a échoué HTTP504 après600.063s sans code ;
+l’implémentation a été reprise directement et une revue distincte, plus courte,
+est demandée à GLM. Ne pas compter cet échec comme une contribution intégrée
+ni comme une consommation nulle. S2 global et le RETEX final restent ouverts.
+
+Clôture locale de ce parcours : dev94 installée, trois parcours consolidés PASS
+et intégrité vérifiée ; cinq assertions CLI sur le vrai exécutable actif et
+quatorze contrôles Version FR/EN passent. La revue GLM réduite répond après496.183s :
+aucun défaut direct dans les deux nouveaux modules, avec des limites explicites
+sur les corps de fonctions inchangés non transmis. Les preuves locales associées
+sont reliées dans le rapport ; cet avis n’est pas une acceptation indépendante
+globale. Les deux appels larges restent des HTTP504 conservés, consommation inconnue.
+Des notes et deux lignes d’aide des préparations ajoutées en parallèle après
+livraison ne sont pas déclarées installées par ce lot. Le code du parcours
+review-check livré et testé est inchangé.

@@ -2,6 +2,8 @@
 //! Complete text inputs are observations; no invocation grant or publication.
 pub(super) mod inputs;
 mod managed_context;
+mod check;
+pub use check::TaskReviewCheck;
 pub use inputs::{TaskReviewInputs, ReviewInputSource};
 use super::{finished, task_validation, RootStore, RootStoreError as E};
 use serde::Serialize;
@@ -68,6 +70,17 @@ impl RootStore {
     /// Returned text is private input data, never authority or an execution lease.
     pub fn materialize_task_review(&self, work: &str, raw: &[u8]) -> Result<TaskReviewInputs, E> {
         self.with_prepared_review(work, raw, |tx, prepared, candidate| {
+            self.assemble_review_inputs(tx, prepared, candidate)
+        })
+    }
+
+    /// Share complete ordinary/managed assembly within the caller's current
+    /// snapshot and external candidate custody. Typed source/codec/limit causes
+    /// propagate; no process, reservation, write or future permission is created.
+    fn assemble_review_inputs(
+        &self, tx: &rusqlite::Transaction<'_>, prepared: PreparedReview,
+        candidate: Option<&task_validation::ReviewCandidate>,
+    ) -> Result<TaskReviewInputs,E> {
             let submitted = task_validation::submission(tx, &prepared.work, &prepared.preview.task_id)
                 .map_err(|e| E::Launch(Box::new(e)))?;
             match candidate {
@@ -79,7 +92,6 @@ impl RootStore {
                 }
                 None => inputs::assemble(&self.root, prepared, &submitted),
             }
-        })
     }
 
     /// Keep source admission and caller assembly inside one settings/SQL read

@@ -551,6 +551,7 @@ mod managed_review_context;
 mod managed_review_citations;
 mod managed_review_reply;
 mod managed_review_protocol;
+mod managed_review_output;
 pub use managed_review_context::{
     decode_managed_review_context, DeliveryCriterion, ManagedDelivery, ManagedReviewBaseline,
     ManagedReviewContext, ManagedReviewTaskContext,
@@ -625,7 +626,7 @@ pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_g
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, ReviewInputSource, NativeValidationEvidence};
+pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence};
 
 #[cfg(target_os = "linux")]
 pub use root_store::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};

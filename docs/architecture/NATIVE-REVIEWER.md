@@ -920,3 +920,51 @@ sequenceDiagram
     U->>R: Demande native task review distincte
     R-->>U: Refus tant que protocole final non raccorde
 ```
+
+
+## Vérifier une sortie de cohorte fournie
+
+`task review-check ID --root ROOT --input FILE --json` reprend les quatre champs
+de `review-inputs` (`schema_version`, `event_id`, `expected_revision`, `task_id`)
+et exige `prompt_sha256`, empreinte du prompt original, ainsi que `output`, chaîne
+UTF-8 contenant les événements JSONL fournis. Les champs inconnus ou répétés
+sont refusés. La limite technique d’entrée de commande reste celle du lecteur
+commun ; aucun plafond métier supplémentaire n’est introduit.
+
+Le moteur reconstruit les entrées complètes avec les réglages persistés courants,
+garde les témoins du candidat pendant le décodage puis réinspecte et ferme
+explicitement ces témoins avant de retourner. Une empreinte de prompt périmée,
+un candidat ordinaire, une cohorte incomplète, des indices répétés, des citations
+invalides, un outil déclaré ou un flux sans fin explicite refusent. Les limites
+Admin de réponse, d’événement et de texte sont réellement consommées ; un refus
+conserve sa cause et ne produit aucun résultat partiel sur la sortie CLI.
+
+Le résultat contient l’opinion parsée et les empreintes du contexte, du catalogue
+et de la réponse. `supplied_output_checked=true` décrit seulement les octets
+fournis. `provider_started`, `review_recorded`, `native_execution_proven`,
+`reviewer_authenticated`, `verdict_applicable` et `task_accepted` restent faux.
+Même un avis `pass` ne prouve ni l’exécution du fournisseur, ni son identité,
+ni la vérité des critères. Aucun débit, réservation, verdict enregistré ou
+changement du Work n’a lieu. Aucun endpoint HTTP ou écran supplémentaire n’est
+ajouté. Le lancement natif géré et sa publication restent à raccorder ;
+`task review` conserve son refus de protection.
+
+La recette permanente `native-managed-review-check.json` distingue les cas
+positifs, les refus et l’absence de mutation. Les tests unitaires du décodeur
+contrôlent séparément la conservation des octets et causes après échec.
+
+```mermaid
+sequenceDiagram
+    participant U as CLI review-check
+    participant R as Root et reglages persistants
+    participant C as Candidat retenu
+    participant D as Decodeur sans outils
+    U->>R: Revision, tache, SHA du prompt et JSONL fourni
+    R->>C: Retenir et lire les originaux
+    R->>R: Reconstruire protocole et verifier SHA
+    R->>D: Limites Admin et cohorte complete
+    D-->>R: Opinion ou refus avec cause
+    R->>C: Reinspecter puis fermer les temoins
+    R-->>U: Donnees seulement, sans verdict applicable
+    Note over U,D: Aucun appel fournisseur ni acceptation
+```

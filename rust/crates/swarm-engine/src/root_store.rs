@@ -43,7 +43,7 @@ mod review_recovery;
 #[cfg(target_os = "linux")]
 pub(crate) use native_worker_retry::WorkerCompletionInput;
 #[cfg(target_os = "linux")]
-pub use review_preview::{TaskReviewPreview, TaskReviewInputs, ReviewInputSource, TaskReviewOutcome, execute_review_gate};
+pub use review_preview::{TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, TaskReviewOutcome, execute_review_gate};
 #[cfg(target_os = "linux")]
 pub use planning_native::{execute_planning_gate, PlanningRunOutcome};
 #[cfg(target_os = "linux")]

@@ -286,3 +286,32 @@ context: include review_quote.rs (exact vs Markdown fallback) and model_wire.rs
 the first packet; caller-only observations produced an unnecessary conditional
 finding. A leading-newline Git diff remains a dormant shared-producer refusal,
 owner future diff support; current native context explicitly has no diff.
+
+
+### Public supplied-output check — native invocation dependency
+
+`task review-check` rebuilds the protocol under candidate custody, requires the
+original prompt digest and checks supplied JSONL through the actual tool-free
+transport and complete-cohort parser. Saved Admin limits, unique canonical names,
+indices and citations apply. Its result is opinion data only: no provider start,
+debit, recorded verdict or acceptance. Managed native invocation remains guarded.
+
+Five targeted unit tests pass, including two tasks, transport failure and retained
+rejected originals. The first actual CLI journey passes nine output assertions
+in addition to twelve inspection and four protocol assertions; consolidated
+recipe and installation are tracked in the
+[increment report](../../../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-check-vtinqwfv/RESULT.md).
+The initial GLM implementation request failed HTTP504 after600.063s without code;
+implementation resumed directly and GLM received a separate shorter review task.
+Do not count the failure as an integrated contribution or zero consumption.
+Global S2 and final project RETEX remain open.
+
+Local journey closure: dev94 installed, three consolidated journeys PASS with
+verified retained integrity; five actual-running-executable CLI assertions and
+fourteen Version FR/EN checks pass. The focused GLM review answered after496.183s:
+no direct defect in the two new modules, with explicit limits concerning unchanged
+callee bodies not supplied. Related local evidence is linked in the report; this
+opinion is not global independent acceptance. Both large calls remain retained
+HTTP504 failures, consumption unknown. Concurrent later release notes and two
+preparation help lines are not claimed installed by this lot. Delivered and tested
+review-check code is unchanged.

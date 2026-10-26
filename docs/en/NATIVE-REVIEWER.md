@@ -877,3 +877,49 @@ sequenceDiagram
     U->>R: Separate native task review request
     R-->>U: Refuse until final protocol is wired
 ```
+
+
+## Check supplied cohort output
+
+`task review-check ID --root ROOT --input FILE --json` takes the four
+`review-inputs` fields (`schema_version`, `event_id`, `expected_revision`,
+`task_id`) plus `prompt_sha256`, the original prompt digest, and `output`, a
+UTF-8 string containing supplied JSONL events. Unknown and duplicate fields
+refuse. The existing shared command reader's technical input limit remains;
+no additional business cutoff is introduced.
+
+The engine rebuilds complete inputs with current saved settings, holds candidate
+witnesses throughout decoding, then refreshes and explicitly closes them before
+returning. A stale prompt digest, ordinary candidate, incomplete cohort, duplicate
+indices, invalid citations, declared tool or missing terminal event refuses.
+Actual saved Admin reply/event/text limits apply; refusal preserves its cause
+and emits no partial CLI result.
+
+The result contains parsed opinion data and context/catalogue/response digests.
+`supplied_output_checked=true` describes supplied bytes only. `provider_started`,
+`review_recorded`, `native_execution_proven`, `reviewer_authenticated`,
+`verdict_applicable` and `task_accepted` remain false. Even a `pass` opinion proves
+neither provider execution, identity nor criterion truth. No debit, reservation,
+recorded verdict or Work mutation occurs. No new HTTP endpoint or UI is added.
+Managed native invocation and publication still need wiring; `task review`
+retains its protection refusal.
+
+The permanent `native-managed-review-check.json` recipe separates positive cases,
+refusals and unchanged Work state. Decoder unit tests separately cover retained
+original bytes and causes after failure.
+
+```mermaid
+sequenceDiagram
+    participant U as CLI review-check
+    participant R as Root and saved settings
+    participant C as Held candidate
+    participant D as Tool-free decoder
+    U->>R: Revision, task, original prompt SHA and supplied JSONL
+    R->>C: Hold and read originals
+    R->>R: Rebuild protocol and verify SHA
+    R->>D: Saved Admin limits and full cohort
+    D-->>R: Opinion or refusal with cause
+    R->>C: Refresh then close witnesses
+    R-->>U: Data only, no applicable verdict
+    Note over U,D: No provider call or acceptance
+```

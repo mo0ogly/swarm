@@ -21,7 +21,7 @@
 
 use std::collections::{BTreeSet, HashSet};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::managed_review_citations::{build_catalog, CitationCatalog, CitationSource};
 use crate::{
@@ -40,7 +40,8 @@ fn refused(message: &'static str) -> E {
 /// `catalog_sha256` is the catalog's canonical JSON digest that every reply
 /// must cite; `reply_schema` is descriptive guidance whose consts bind both
 /// identities. Serialized into the managed inputs; private text has no `Debug`.
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct ManagedReviewProtocol {
     pub(crate) context: ManagedReviewContext,
     pub(crate) context_sha256: String,

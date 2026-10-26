@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Vérification de sortie de cohorte fournie : commande native review-check, prompt courant et citations sous limites Admin ; lecture seule, sans appel fournisseur ni verdict appliqué.",
+        "en": "Supplied cohort output check: native review-check command, current prompt and citations under Admin limits; read-only, without provider invocation or applied verdict."
+      },
+      {
         "fr": "Préparations Rust : validation explicite du plan, contrôles des dépendances et de la structure produit, verdict lié aux empreintes courantes. Quatre limites de plan configurables dans Admin v43 ; aucune conversion ni mission lancée. Les empreintes incohérentes avec les textes stockés bloquent le verdict ; reprise par sauvegarde/adoption publiques.",
         "en": "Rust preparations: explicit plan validation, dependency/product checks and a verdict bound to current fingerprints. Four plan caps configurable in Admin v43; no conversion or mission launch. Fingerprints inconsistent with stored text block verdicts; public save/adopt operations permit recovery."
       },

@@ -14,7 +14,7 @@ use std::{
 /// Allowed keys are native reply protocol vocabulary, not an operator policy.
 /// Go-compatible domain parsing runs afterwards; private keys/values never enter
 /// diagnostics and original boundary causes remain behind the protocol family.
-fn canonical_fields<'a>(
+pub(crate) fn canonical_fields<'a>(
     raw: &'a [u8],
     boundaries: &crate::model_wire::Boundaries,
     allowed: &[&str],
