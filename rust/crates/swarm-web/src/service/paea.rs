@@ -2,7 +2,9 @@
 use super::{HttpServiceError, RouteBody};
 use http::{header::CONTENT_TYPE, Method, Request};
 use serde::Deserialize;
-use swarm_protection_contract::{check_receipt_documents, resolve_payment_documents, State};
+use swarm_protection_contract::{
+    check_receipt_documents, compare_documents, resolve_payment_documents, State,
+};
 
 /// The JSON envelope transports original UTF-8 strings without parsing their
 /// numbers. Every field is required; duplicate/unknown keys and invalid states
@@ -25,6 +27,16 @@ struct PaymentCheck {
     schema_version: u32,
     registry: String,
     request: String,
+}
+
+/// Closed comparison transport; exact document strings, never server paths.
+/// Version 1 describes framing only and supplies no approval/current authority.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ComparisonCheck {
+    schema_version: u32,
+    before: String,
+    after: String,
 }
 
 /// Check two supplied UTF-8 documents after outer Host/session/CSRF admission.
@@ -69,6 +81,28 @@ pub(super) fn resolve_payment(r: &Request<Vec<u8>>) -> Result<RouteBody, HttpSer
     serde_json::to_vec(&report)
         .map(RouteBody::plain)
         .map_err(HttpServiceError::Json)
+}
+
+/// Compare two exact document strings after outer native admission. Shared
+/// POST/JSON/no-query/transport guards run before strict inner JSON validation.
+/// Return the existing CLI v1 envelope with raw hashes, fixed field paths and
+/// change flags, omitting field values. Typed decoding/contract/encoding causes
+/// survive refusal with no partial report. No Root IO, policy, authentication of
+/// supplied context, approval validation or effect occurs; equality grants nothing.
+pub(super) fn compare(r: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceError> {
+    require_json(r)?;
+    let input: ComparisonCheck =
+        serde_json::from_slice(r.body()).map_err(HttpServiceError::Json)?;
+    if input.schema_version != 1 {
+        return Err(HttpServiceError::Refused("protection-envelope-version"));
+    }
+    let comparison = compare_documents(input.before.as_bytes(), input.after.as_bytes())
+        .map_err(HttpServiceError::Protection)?;
+    serde_json::to_vec(&serde_json::json!({
+        "schema_version":1, "scope":"offline-data-only", "comparison":comparison
+    }))
+    .map(RouteBody::plain)
+    .map_err(HttpServiceError::Json)
 }
 
 /// Shared POST/JSON/no-query technical transport contract. Caller must already

@@ -180,7 +180,7 @@ strictement validés, chemins modifiés sans valeurs, identités des octets et
 distinctions contenu/intention/transport. Aucun accord ou effet n’est établi.
 Trois tests Rust sont écrits et non exécutés dans ce chantier. Le raccord CLI
 est présent dans un candidat préconstruit ; ses observations publiques sans
-nouvelle compilation sont suivies dans l’incrément 09. API/UX ouvertes. Voir
+nouvelle compilation sont suivies dans l’incrément 09. API/UX ouvertes à cet incrément ; raccord actuel décrit en incrément 19. Voir
 [l’incrément 05](../plans/actions-confiance/paea/INCREMENT-05.md).
 
 ### Commande de comparaison en sources (non qualifiée)
@@ -195,7 +195,7 @@ Les fichiers sont lus successivement, sans preuve d’instantané ni de fraîche
 Les erreurs IO/fermeture/validation/écriture/flush conservent les contrats existants.
 Quatre tests CLI Rust sont écrits et non exécutés ; nouveau build et Rustdoc
 restent différés. La recette publique utilise un candidat préconstruit, sans
-installation revendiquée. API/UX non raccordées. Voir
+installation revendiquée. API/UX non raccordées à cet incrément ; raccord actuel décrit en incrément 19. Voir
 [l’incrément 06](../plans/actions-confiance/paea/INCREMENT-06.md).
 
 ### Liaison des reçus au cycle — sources non qualifiées
@@ -472,3 +472,46 @@ Une révision au-delà d’i64 refuse, sans arrondi. Un BOM initial n’est pas 
 par le navigateur : transporté tel quel, il est refusé par le décodeur JSON.
 Les recettes `paea-glm-regressions.json` et `paea-invoice-encoding.json` gardent
 ces cas, leurs témoins valides et leurs reprises ; voir [incrément 18](../plans/actions-confiance/paea/INCREMENT-18.md).
+
+
+## Comparer deux actions dans Vérifications PAEA — incrément 19
+
+Depuis le cockpit : **Vérifications PAEA → Comparer deux actions** ouvre
+`/paea-compare.html`. Choisir deux documents JSON UTF-8, chacun contenant une
+proposition v1 et son contexte, puis **Comparer les actions**. L'aide repliée
+précise le format ; les liens gardent langue et thème. Le résultat affiche les
+noms des champs modifiés (jamais leurs valeurs), les identités avant/après et
+les indicateurs de changement du contenu canonique, de l'intention et de la clé
+de tentative. Le bouton de téléchargement conserve le rapport JSON original.
+
+`POST /api/v1/protection/compare` exige les gardes natives Host/session/origin/CSRF,
+POST JSON, aucune query et la borne technique de transport commune. L'enveloppe
+fermée `{schema_version:1,before:String,after:String}` transporte les deux textes
+originaux ; aucun chemin serveur ni objet JSON déjà parsé. Schéma d'admission :
+`schemas/paea/http-comparison-check-v1.schema.json`. La sortie est exactement
+celle de `protection compare AVANT APRES --json` : enveloppe v1,
+`scope:"offline-data-only"`, puis `comparison` v1. Le comparateur pur commun ne
+lit ni ne modifie Root et n'ajoute aucune politique opérateur.
+
+Chaque côté conserve le SHA256 des octets bruts, l'empreinte d'action et l'ID
+d'intention. Espaces et ordre des clés peuvent changer le hash brut sans changer
+le contenu canonique ; l'ordre des sources est significatif. Une autre clé de
+tentative ne modifie pas à elle seule le contenu canonique ni l'intention. Les
+marqueurs autorité, effet et validité d'accord restent `not-established` : une
+égalité ne valide aucun accord, identité, origine ou effet.
+
+Le navigateur conserve les octets UTF-8 et les entiers d'entrée sans les parser.
+Avant affichage/export, il vérifie la forme fermée du rapport, ses versions et
+marqueurs, les identités SHA256, les champs connus triés et uniques, la cohérence
+des indicateurs et les hashes des deux fichiers. Les noms de champs sont rendus
+comme texte traduit. Un refus conserve les fichiers sélectionnés, efface tout
+résultat précédent et exige une nouvelle action explicite ; pas de retry ni de
+persistance des documents. Les erreurs JSON/sémantiques conservent leur cause
+interne et un code public sûr ; aucun résultat partiel n'est présenté comme succès.
+
+La recette `paea-comparison-http.json` couvre deux tests de schéma et les sept
+tests du parcours HTTP partagé. `paea-native-ux.json` qualifie séparément les
+trois vues sur un binaire natif identifié, en FR/EN, deux thèmes et trois largeurs.
+Les injections de réponses corrompues côté navigateur restent distinctes des
+réponses réelles du service. Résultats, livraison et limites :
+[incrément 19](../plans/actions-confiance/paea/INCREMENT-19.md).

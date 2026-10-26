@@ -542,3 +542,223 @@ fn paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover() {
         }
     }
 }
+
+/// Reuse a frozen valid action/context document as exact comparison strings.
+/// Inner numbers remain JSON integer text; no Root path or authority is supplied.
+fn comparison_input(index: usize) -> Value {
+    let document = input(index)["document"].as_str().unwrap().to_owned();
+    json!({"schema_version":1,"before":document,"after":document})
+}
+
+/// Existing receipt admission controls the fixture before the new comparison
+/// route. Both domains cover equality, transport-only, terms, context and formatting;
+/// require exact shared v1/CLI envelope, raw hashes and no Root mutation/effect.
+#[test]
+fn paea_comparison_http_matches_shared_report_and_preserves_root() {
+    let fixture = Fixture::new();
+    let control = fixture.call(fixture.request(
+        "POST",
+        "/api/v1/protection/receipt-report",
+        serde_json::to_vec(&input(0)).unwrap(),
+    ));
+    assert_eq!(control.response.status(), StatusCode::OK);
+    assert!(control.failure.is_none());
+    println!("VALID_RECEIPT_CONTROL_BEFORE_COMPARISON");
+    let before_root = snapshot(&fixture.root);
+    for index in [0, 8] {
+        for variation in ["same", "request", "terms", "context", "formatting"] {
+            let mut body = comparison_input(index);
+            let mut before: Value = serde_json::from_str(body["before"].as_str().unwrap()).unwrap();
+            before["context"]["mandate_revision"] = json!(i64::MAX);
+            let mut after = before.clone();
+            match variation {
+                "request" => after["proposal"]["request_id"] = json!("comparison-attempt-2"),
+                "terms" if index == 0 => {
+                    after["proposal"]["action"]["amount_minor"] = json!("420001")
+                }
+                "terms" => {
+                    let oid = after["proposal"]["action"]["candidate_oid"]
+                        .as_str()
+                        .unwrap();
+                    let replacement = if oid.chars().all(|c| c == 'e') {
+                        "d"
+                    } else {
+                        "e"
+                    }
+                    .repeat(oid.len());
+                    after["proposal"]["action"]["candidate_oid"] = json!(replacement);
+                }
+                "context" => after["context"]["policy_revision"] = json!(17),
+                _ => {}
+            }
+            body["before"] = json!(serde_json::to_string(&before).unwrap());
+            body["after"] = json!(if variation == "formatting" {
+                serde_json::to_string_pretty(&after).unwrap()
+            } else {
+                serde_json::to_string(&after).unwrap()
+            });
+            let comparison = swarm_protection_contract::compare_documents(
+                body["before"].as_str().unwrap().as_bytes(),
+                body["after"].as_str().unwrap().as_bytes(),
+            )
+            .unwrap();
+            assert_eq!(
+                comparison.canonical_content_changed,
+                matches!(variation, "terms" | "context")
+            );
+            assert_eq!(comparison.transport_request_changed, variation == "request");
+            assert!(!comparison.intent_changed);
+            let expected = serde_json::to_vec(
+                &json!({"schema_version":1,"scope":"offline-data-only","comparison":comparison}),
+            )
+            .unwrap();
+            let reply = fixture.call(fixture.request(
+                "POST",
+                "/api/v1/protection/compare",
+                serde_json::to_vec(&body).unwrap(),
+            ));
+            assert_eq!(
+                reply.response.status(),
+                StatusCode::OK,
+                "{index} {variation}; fixture {}",
+                fixture.root.display()
+            );
+            assert!(reply.failure.is_none());
+            assert_eq!(reply.response.body(), &expected);
+            assert_eq!(snapshot(&fixture.root), before_root);
+        }
+    }
+}
+
+/// Each actual comparison refusal follows a matching admission control and is
+/// followed by exact recovery. Preserve safe diagnostics and original typed causes,
+/// all Root bytes and the private embedded-page boundary; no live state/effect.
+#[test]
+fn paea_comparison_http_refusals_recover_without_root_mutation() {
+    let fixture = Fixture::new();
+    let path = "/api/v1/protection/compare";
+    let raw = serde_json::to_vec(&comparison_input(0)).unwrap();
+    let before = snapshot(&fixture.root);
+    for fault in [
+        "cookie",
+        "csrf",
+        "host",
+        "origin",
+        "method",
+        "query",
+        "type",
+        "version",
+        "duplicate",
+        "unknown",
+        "wrong-type",
+        "invalid-before",
+        "invalid-after",
+        "inner-duplicate",
+        "inner-float",
+    ] {
+        let control = fixture.call(fixture.request("POST", path, raw.clone()));
+        assert_eq!(control.response.status(), StatusCode::OK, "control {fault}");
+        assert!(control.failure.is_none());
+        let mut request = fixture.request("POST", path, raw.clone());
+        match fault {
+            "cookie" => {
+                request.headers_mut().remove(COOKIE);
+            }
+            "csrf" => {
+                request.headers_mut().remove("x-swarm-csrf");
+            }
+            "host" => {
+                request
+                    .headers_mut()
+                    .insert(HOST, "outside.invalid".parse().unwrap());
+            }
+            "origin" => {
+                request
+                    .headers_mut()
+                    .insert(ORIGIN, "http://outside.invalid".parse().unwrap());
+            }
+            "method" => *request.method_mut() = http::Method::GET,
+            "query" => {
+                *request.uri_mut() = format!("{path}?root=PRIVATE_COMPARISON_CANARY")
+                    .parse()
+                    .unwrap()
+            }
+            "type" => {
+                request.headers_mut().remove("content-type");
+            }
+            "duplicate" => {
+                *request.body_mut() = format!(
+                    "{{\"schema_version\":2,{}",
+                    &std::str::from_utf8(&raw).unwrap()[1..]
+                )
+                .into_bytes()
+            }
+            _ => {
+                let mut body = comparison_input(0);
+                match fault {
+                    "version" => body["schema_version"] = json!(2),
+                    "unknown" => body["PRIVATE_COMPARISON_CANARY"] = json!(true),
+                    "wrong-type" => body["schema_version"] = json!("PRIVATE_COMPARISON_CANARY"),
+                    "invalid-before" => body["before"] = json!("PRIVATE_COMPARISON_CANARY"),
+                    "invalid-after" => body["after"] = json!("PRIVATE_COMPARISON_CANARY"),
+                    "inner-duplicate" => {
+                        let value = body["before"].as_str().unwrap();
+                        let changed = value.replacen(
+                            "\"schema_version\":1",
+                            "\"schema_version\":1,\"schema_version\":2",
+                            1,
+                        );
+                        assert_ne!(value, changed);
+                        body["before"] = json!(changed);
+                    }
+                    "inner-float" => {
+                        let mut value: Value =
+                            serde_json::from_str(body["after"].as_str().unwrap()).unwrap();
+                        value["context"]["policy_revision"] = json!(1.5);
+                        body["after"] = json!(serde_json::to_string(&value).unwrap());
+                    }
+                    _ => unreachable!(),
+                }
+                *request.body_mut() = serde_json::to_vec(&body).unwrap();
+            }
+        }
+        let reply = fixture.call(request);
+        assert!(!reply.response.status().is_success(), "{fault}");
+        let error = reply.failure.as_ref().unwrap();
+        assert!(!error.to_string().contains("PRIVATE_COMPARISON_CANARY"));
+        assert!(!format!("{error:?}").contains("PRIVATE_COMPARISON_CANARY"));
+        assert!(
+            !String::from_utf8_lossy(reply.response.body()).contains("PRIVATE_COMPARISON_CANARY")
+        );
+        if [
+            "duplicate",
+            "unknown",
+            "wrong-type",
+            "invalid-before",
+            "invalid-after",
+            "inner-duplicate",
+            "inner-float",
+        ]
+        .contains(&fault)
+        {
+            assert!(error.source().is_some(), "{fault}");
+        }
+        assert_eq!(snapshot(&fixture.root), before);
+        let recovery = fixture.call(fixture.request("POST", path, raw.clone()));
+        assert_eq!(recovery.response.status(), StatusCode::OK);
+        assert_eq!(recovery.response.body(), control.response.body());
+        assert_eq!(snapshot(&fixture.root), before);
+    }
+    let mut denied = fixture.request("GET", "/paea-compare.html", Vec::new());
+    denied.headers_mut().remove(COOKIE);
+    assert!(!fixture.call(denied).response.status().is_success());
+    let page = fixture.call(fixture.request("GET", "/paea-compare.html", Vec::new()));
+    assert_eq!(page.response.status(), StatusCode::OK);
+    assert_eq!(
+        page.response.body(),
+        include_bytes!("../../../../web/paea-compare.html")
+    );
+    let menu = fixture.call(fixture.request("GET", "/paea.html", Vec::new()));
+    assert!(String::from_utf8_lossy(menu.response.body()).contains("href=\"/paea-compare.html\""));
+    assert_eq!(snapshot(&fixture.root), before);
+}

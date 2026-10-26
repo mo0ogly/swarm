@@ -160,8 +160,8 @@ Library sources expose `compare_documents`: two strictly validated documents,
 value-free changed paths, byte identities and separate content/intent/transport
 observations. No approval or effect established. Three Rust tests written, not
 executed in this workstream. The CLI adapter exists in an already built candidate;
-public observations without a new build are tracked in increment 09. API/UX remain
-open. See [increment 05](plans/actions-confiance/paea/INCREMENT-05.md).
+public observations without a new build are tracked in increment 09. API/UX remained
+open at that increment; the current connection is described in increment 19. See [increment 05](plans/actions-confiance/paea/INCREMENT-05.md).
 
 ### CLI comparison in source (not qualified)
 
@@ -174,7 +174,7 @@ Sequential reads establish neither atomic snapshot nor freshness. Read/close/
 validation/write/flush failures preserve existing error contracts. Four new CLI
 Rust tests are written, unexecuted; new build/Rustdoc remain deferred. The public
 recipe uses an already built candidate without claiming installation. API/UX not
-connected. See [increment 06](plans/actions-confiance/paea/INCREMENT-06.md).
+connected at that increment; the current connection is described in increment 19. See [increment 06](plans/actions-confiance/paea/INCREMENT-06.md).
 
 ### Receipt/lifecycle binding — unqualified source
 
@@ -436,3 +436,42 @@ received values. A revision beyond i64 refuses without rounding. The browser
 does not strip an initial BOM: transported unchanged, it is refused by the JSON
 decoder. `paea-glm-regressions.json` and `paea-invoice-encoding.json` retain these
 cases, valid controls and recovery; see [increment 18](plans/actions-confiance/paea/INCREMENT-18.md).
+
+
+## Compare two actions in PAEA checks — increment 19
+
+From the cockpit: **PAEA checks → Compare two actions** opens
+`/paea-compare.html`. Choose two UTF-8 JSON documents, each containing a v1
+proposal and its context, then **Compare actions**. Collapsed help describes the
+format; links retain language and theme. Results show changed field names (never
+their values), before/after identities, and canonical-content, intent and request-key
+change flags. The download button preserves the original JSON report.
+
+`POST /api/v1/protection/compare` requires native Host/session/origin/CSRF guards,
+POST JSON, no query and the shared technical transport bound. Its closed envelope
+`{schema_version:1,before:String,after:String}` carries the original texts, never
+server paths or parsed JSON objects. Admission schema:
+`schemas/paea/http-comparison-check-v1.schema.json`. Output is exactly
+`protection compare BEFORE AFTER --json`: v1 envelope, `scope:"offline-data-only"`
+and v1 `comparison`. The shared pure comparator neither reads nor mutates Root
+and adds no operator policy.
+
+Each side retains the raw-byte SHA256, action digest and intent ID. Whitespace
+and key order may change the raw hash without changing canonical content; source
+order is significant. A different request key alone changes neither canonical
+content nor intent. Authority, effect and approval-validity markers remain
+`not-established`: equality validates no approval, identity, origin or effect.
+
+The browser preserves UTF-8 bytes and input integers without parsing them.
+Before rendering/export it validates closed report shape, versions/markers,
+SHA256 identities, known sorted unique paths, flag consistency and both uploaded
+file hashes. Field names render as translated text. Refusal retains selections,
+clears stale output and requires an explicit new gesture; no retry or document
+persistence. JSON/semantic errors retain their internal cause and a safe public
+code; partial output is never displayed as success.
+
+`paea-comparison-http.json` covers two schema tests and the seven shared HTTP
+tests. `paea-native-ux.json` separately qualifies all three views on an identified
+native binary, FR/EN, both themes and three widths. Browser-only corrupt-response
+injections stay distinct from actual service responses. Results, delivery and
+limits: [increment 19](plans/actions-confiance/paea/INCREMENT-19.md).

@@ -1,14 +1,15 @@
 'use strict';
-/** PAEA receipt/debt file UI. Inputs stay exact UTF-8 strings, never parsed as
+/** PAEA receipt/debt/comparison file UI. Inputs stay exact UTF-8 strings, never parsed as
  * JavaScript numbers. No approval, effect, automatic retry or local storage of
  * documents/receipts; one submit sends them to the authenticated local service.
  */
 (() => {
   const $ = id => document.getElementById(id), t = text => globalThis.SwarmI18n?.t(text) || text;
   const operation = document.body.dataset.paeaOperation;
-  if (!['receipt-report','resolve-payment'].includes(operation)) throw Error('paea-operation-invalid');
+  if (!['receipt-report','resolve-payment','compare'].includes(operation)) throw Error('paea-operation-invalid');
   const payment = operation === 'resolve-payment';
-  const emptyMessage = payment ? 'Sélectionner le registre des dettes et la demande de facture.' : 'Sélectionner les fichiers puis renseigner le service et l’état précédent.';
+  const comparison = operation === 'compare', receiptView = operation === 'receipt-report';
+  const emptyMessage = comparison ? 'Sélectionner les deux documents d’action.' : payment ? 'Sélectionner le registre des dettes et la demande de facture.' : 'Sélectionner les fichiers puis renseigner le service et l’état précédent.';
   let csrf = '', busy = false, reportRaw = null;
   const states = new Set(['PROPOSED','ADMITTED','APPROVAL_PENDING','AUTHORIZED','COMMIT_REQUESTED',
     'COMMITTED','DENIED','UNKNOWN','RECONCILED_COMMITTED','RECONCILED_NOT_COMMITTED']);
@@ -90,6 +91,66 @@
       throw Error(t('Rapport invalide ou différent des fichiers fournis.'));
     }
   }
+  /** Fixed v1 serializer fields; labels contain no supplied values or operator
+   * policy. This catalogue must evolve with the shared comparison schema. */
+  const comparisonFields = {
+    "/action/kind": "Type d’action",
+    "/action/invoice_id": "Objet de dette",
+    "/action/invoice_version": "Version de facture",
+    "/action/amount_minor": "Montant entier — unités mineures",
+    "/action/currency": "Devise",
+    "/action/beneficiary_account_id": "Compte bénéficiaire",
+    "/action/repository_id": "Dépôt",
+    "/action/target_ref": "Référence Git cible",
+    "/action/expected_old_oid": "Ancien objet Git attendu",
+    "/action/candidate_oid": "Objet Git candidat",
+    "/context/project_id": "Projet",
+    "/context/principal_id": "Principal déclaré",
+    "/context/instance_id": "Instance déclarée",
+    "/context/mandate_id": "Mandat déclaré",
+    "/context/mandate_revision": "Révision du mandat",
+    "/context/policy_revision": "Révision de la politique",
+    "/context/policy_digest": "Empreinte de la politique",
+    "/context/tool_manifest_digest": "Empreinte du manifeste d’outil",
+    "/context/sources": "Sources — collection ordonnée"
+};
+  /** Validate a closed existing v1 comparison and bind both raw input byte sets.
+   * Fixed paths must be unique/sorted; change flags must agree with the producer.
+   * Hash equality alone is not used to prove identical canonical bytes. No input
+   * JSON numbers are parsed, and a matching report authenticates no approval or
+   * context. Refuse before rendering/download; no IO beyond local byte hashing. */
+  async function validateComparison(value, before, after) {
+    const c = value?.comparison, invalid = () => Error(t('Rapport invalide ou différent des fichiers fournis.'));
+    if (!exact(value,['schema_version','scope','comparison']) || value.schema_version !== 1 || value.scope !== 'offline-data-only' ||
+      !exact(c,['schema_version','authority','effect','approval_validity','before','after','changed_paths','canonical_content_changed','intent_changed','transport_request_changed']) ||
+      c.schema_version !== 1 || ['authority','effect','approval_validity'].some(key=>c[key]!=='not-established') ||
+      !['before','after'].every(side=>exact(c[side],['document_sha256','action_digest','intent_id'])&&Object.values(c[side]).every(hash)) ||
+      !['canonical_content_changed','intent_changed','transport_request_changed'].every(key=>typeof c[key]==='boolean') ||
+      !Array.isArray(c.changed_paths) || !c.changed_paths.every((path,index)=>typeof path==='string'&&Object.hasOwn(comparisonFields,path)&&(index===0||c.changed_paths[index-1]<path))) throw invalid();
+    if (c.canonical_content_changed !== (c.changed_paths.length>0) ||
+      c.intent_changed !== (c.before.intent_id!==c.after.intent_id) ||
+      (!c.canonical_content_changed&&(c.before.action_digest!==c.after.action_digest||c.intent_changed)) ||
+      c.before.document_sha256 !== await digest(before.bytes) || c.after.document_sha256 !== await digest(after.bytes)) throw invalid();
+  }
+  /** Render validated field names, flags and byte identities as text only; field
+   * values remain absent. Validity grants no approval or effect. Caller has cleared
+   * old results; this enables only exact raw-report download after validation. */
+  function renderComparison(value, raw) {
+    const c=value.comparison;
+    $('paea-summary').textContent=t(c.canonical_content_changed?'Contenu canonique modifié.':'Contenu canonique identique.');
+    const pairs=[
+      [t('Champs modifiés'),c.changed_paths.length?c.changed_paths.map(path=>t(comparisonFields[path])).join(' · '):t('Aucun champ modifié')],
+      [t('Contenu canonique modifié'),t(c.canonical_content_changed?'Oui':'Non')],
+      [t('Intention métier modifiée'),t(c.intent_changed?'Oui':'Non')],
+      [t('Clé de tentative modifiée'),t(c.transport_request_changed?'Oui':'Non')],
+      [t('Avant — empreinte du document'),c.before.document_sha256],[t('Après — empreinte du document'),c.after.document_sha256],
+      [t('Avant — empreinte de l’action'),c.before.action_digest],[t('Après — empreinte de l’action'),c.after.action_digest],
+      [t('Avant — identité de l’intention'),c.before.intent_id],[t('Après — identité de l’intention'),c.after.intent_id]
+    ];
+    for(const [label,text]of pairs){const term=document.createElement('dt'),description=document.createElement('dd');term.textContent=label;description.textContent=text;$('paea-identities').append(term,description)}
+    $('paea-report').textContent=raw;reportRaw=raw;$('paea-download').disabled=false;
+    status('success','Comparaison structurelle vérifiée. Aucun accord validé.');
+  }
   /** Render only bounded textual terms from a validated data report. The integer
    * amount is displayed in minor units, without inventing a currency scale. */
   function renderPayment(value, raw) {
@@ -126,10 +187,10 @@
     busy = true; clearReport(); $('paea-check').disabled = true; $('paea-inputs').disabled = true;
     status('loading', 'Vérification en cours…');
     try {
-      const previous = payment ? null : $('paea-state').value;
-      if (!payment && !states.has(previous)) throw Error(t('Choisir un état précédent.'));
-      const [document, receipt] = await Promise.all(payment ? [readFile('paea-registry'),readFile('paea-request')] : [readFile('paea-document'),readFile('paea-receipt')]);
-      const body = payment ? {schema_version:1,registry:document.text,request:receipt.text} :
+      const previous = receiptView ? $('paea-state').value : null;
+      if (receiptView && !states.has(previous)) throw Error(t('Choisir un état précédent.'));
+      const [document, receipt] = await Promise.all(comparison ? [readFile('paea-before'),readFile('paea-after')] : payment ? [readFile('paea-registry'),readFile('paea-request')] : [readFile('paea-document'),readFile('paea-receipt')]);
+      const body = comparison ? {schema_version:1,before:document.text,after:receipt.text} : payment ? {schema_version:1,registry:document.text,request:receipt.text} :
         {schema_version:1,document:document.text,receipt:receipt.text,expected_sink:$('paea-sink').value,previous_state:previous};
       const response = await fetch('/api/v1/protection/'+operation, {method:'POST',cache:'no-store',
         headers:{'Content-Type':'application/json','X-Swarm-CSRF':csrf},
@@ -144,6 +205,7 @@
         throw Error(t('Vérification refusée') + (typeof code === 'string' && /^[a-z0-9_-]+$/.test(code) ? ' · ' + code : ''));
       }
       if (payment) { await validatePayment(value,document,receipt); renderPayment(value,raw); }
+      else if (comparison) { await validateComparison(value,document,receipt); renderComparison(value,raw); }
       else { await validate(value,document,receipt,previous); render(value,raw); }
     } catch (error) {
       clearReport(); status('error', error instanceof TypeError ? 'Connexion interrompue ; relancer la vérification.' : error.message);
@@ -153,7 +215,7 @@
   function download() {
     if (reportRaw === null || busy) return;
     const url = URL.createObjectURL(new Blob([reportRaw], {type:'application/json'}));
-    const link = document.createElement('a'); link.href = url; link.download = payment ? 'paea-payment-resolution.json' : 'paea-receipt-report.json';
+    const link = document.createElement('a'); link.href = url; link.download = comparison ? 'paea-comparison.json' : payment ? 'paea-payment-resolution.json' : 'paea-receipt-report.json';
     link.click(); URL.revokeObjectURL(url);
   }
   /** Bootstrap the existing protected native session. Failure keeps submit blocked
@@ -173,7 +235,7 @@
   $('paea-download').addEventListener('click', download);
   const theme = new URL(location.href).searchParams.get('theme');
   if (['etat','sombre'].includes(theme)) document.documentElement.dataset.theme = theme;
-  /** Keep language/theme on links between the two PAEA data views; these are
+  /** Keep language/theme on links between the PAEA data views; these are
    * presentation choices only, without storing documents or changing authority. */
   function navigation() {
     for (const link of document.querySelectorAll('[data-paea-link]')) {

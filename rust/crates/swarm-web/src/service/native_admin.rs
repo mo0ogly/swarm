@@ -16,6 +16,7 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
     match path {
         "/paea.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea.html"))),
         "/paea-payment.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-payment.html"))),
+        "/paea-compare.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-compare.html"))),
         "/paea.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea.js"))),
         "/paea.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/paea.css"))),
         "/trust-actions.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/trust-native.html"))),

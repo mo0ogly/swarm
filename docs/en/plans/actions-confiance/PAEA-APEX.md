@@ -403,3 +403,24 @@ Increment 18 verified: one complete GLM contribution, two new exact Rust tests
 PASS on stable frozen inputs, 28 native encoding assertions PASS. Four recipe
 inventories corrected; no established product defect, product change or new
 installation attributed to this slice. Full suites/protected guarantees stay open.
+
+### Increment 19 — menu comparison with GLM
+
+[Slice, criteria and evidence](paea/INCREMENT-19.md): expose the existing shared
+comparator through native API/PAEA page, both domains, value-free report and exact
+export. GLM proposes validation/rendering; Codex integrates/verifies existing and
+new journeys and delivers locally. Protected authority remains unchanged.
+
+
+Increment 19 installed locally as **dev95**: menu comparison, shared API/CLI,
+report without values. Two schema/seven HTTP tests PASS; 1,310 browser assertions,
+12 configurations × three views, 62 actual native refusals/recovery; 34 real live
+delivery checks PASS. GLM returned HTTP 504 with no usable contribution; Codex
+implemented and verified the connection. [Slice result and retrospective](paea/INCREMENT-19.md)
+retain build refusals, qualified normal-candidate reuse, hashes and limits.
+No commit/push. IA3/AC-02/human authorities, E2/E3 and protected acceptance remain open.
+
+
+Next decision: the user authorizes committing increment 19, then continuing
+directly with Codex, **without GLM**. Preserve protected prerequisites, rights
+and budgets; select the next slice from the plan's actual state.

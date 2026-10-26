@@ -436,3 +436,25 @@ Rust exactes PASS sur instantané stable, 28 assertions d’encodage natif PASS.
 Quatre inventaires de recettes corrigés ; aucun défaut produit établi, aucune
 modification du produit ni nouvelle installation attribuée à cette tranche.
 Les suites complètes et les garanties protégées ne sont pas déclarées closes.
+
+### Incrément 19 — comparaison depuis le menu avec GLM
+
+[Tranche, critères et preuves](paea/INCREMENT-19.md) : exposer le comparateur
+existant via API/page commune PAEA, deux domaines, rapport sans valeurs et export
+exact. Contribution GLM au validateur/rendu ; Codex intègre et qualifie les
+parcours existants/ajouté puis livre localement. Autorité protégée inchangée.
+
+
+Tranche 19 livrée localement en **dev95** : comparaison accessible par le menu,
+API/CLI communes, rapport sans valeurs. Deux tests de schéma et sept HTTP PASS,
+1 310 assertions sur 12 configurations × trois vues PASS, 62 refus natifs/reprises,
+puis 34 contrôles de livraison réels PASS. GLM a échoué HTTP 504, sans contribution
+exploitable ; Codex a réalisé et vérifié le raccord. [Résultats et RETEX de la
+tranche](paea/INCREMENT-19.md) conservent les refus de build, la réutilisation du
+candidat normal, les empreintes et les limites. Aucun commit/push effectué.
+IA3/AC-02/autorités humaines, E2/E3 et acceptation protégée restent ouverts.
+
+
+Décision suivante : l'utilisateur autorise le commit de la tranche 19 puis la
+continuation directe par Codex, **sans GLM**. Préserver les prérequis protégés,
+les droits et les budgets ; choisir la prochaine tranche sur l'état réel du plan.

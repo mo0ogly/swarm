@@ -11,7 +11,9 @@
     "web/swarm-logo.png",
     "version_history.json",
     "web/paea-payment.html",
-    "tests/fixtures/paea/payment-*.json"
+    "tests/fixtures/paea/payment-*.json",
+    "web/paea-compare.html",
+    "schemas/paea/comparison-v1.schema.json"
   ],
   "environment": {
     "SWARM_PAEA_NATIVE_SCOPE": "full"
@@ -37,8 +39,11 @@
         "payment-registry-bom-native-recovery",
         "payment-request-bom-preserved-and-native-refused",
         "payment-request-bom-native-recovery",
-        "exactly-thirty-eight-native-refusals",
-        "PAEA_NATIVE_UI_PASS 458 assertions"
+        "exactly-sixty-two-native-refusals",
+        "all-twelve-comparison-browser-cases",
+        "en-sombre-320-comparison-repository.promote-real-download-exact",
+        "comparison-client-rejects-unordered-path",
+        "comparison-client-native-recovery"
       ],
       "required_stderr": []
     },

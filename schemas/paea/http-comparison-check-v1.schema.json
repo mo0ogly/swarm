@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:http-comparison-check:v1",
+  "title": "PAEA HTTP data-only action comparison request",
+  "description": "Two exact UTF-8 document strings. No server paths, Root IO, approval or effect. Returns comparison-v1, identical to the existing shared CLI comparison envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "before",
+    "after"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "before": {
+      "type": "string"
+    },
+    "after": {
+      "type": "string"
+    }
+  }
+}

@@ -18,18 +18,22 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 assert.equal(sha(fs.readFileSync(binary)),expected);fs.mkdirSync(output);
 const root=path.resolve(output,'root');fs.mkdirSync(root);
 const vectors=JSON.parse(fs.readFileSync('tests/fixtures/paea/contract-v1.json')).vectors;
-const checks=[],errors=[],responses=[],cases=[],paymentCases=[],serverErrors=[];let browser,server,closed,token='',address='',expectRefusal=false,abort,stopping=false;
+const checks=[],errors=[],responses=[],cases=[],paymentCases=[],comparisonCases=[],serverErrors=[];let browser,server,closed,token='',address='',expectRefusal=false,abort,stopping=false;
 const observedFailure=new Promise((resolve,reject)=>{abort=reject});
 /** Preserve unexpected browser failures and reject pending DOM waits without a
  * deadline. Expected native 400 refusals remain separately recorded. */
 function browserFailure(value){errors.push(value);abort(Error('unexpected-native-browser-diagnostic'))}
 /** Retain uniquely named observable assertions; zero-case runs cannot pass. */
 function check(name,value){assert(value,name);assert(!checks.includes(name));checks.push(name);console.log('PASS '+name)}
-/** Capture a finite supported CLI operation without shell, truncation or timeout. */
-async function command(args){
- const child=spawn(binary,args,{stdio:['ignore','pipe','pipe']}),out=[],err=[];
+/** Capture one supported CLI operation without shell, truncation or timeout.
+ * Optional internal evidenceName retains argv/both streams; cwd, when supplied,
+ * is an owned fixture directory. Failures propagate; start callers stay unchanged. */
+async function command(args,evidenceName,cwd){
+ if(evidenceName)assert(/^[A-Za-z0-9_.-]+$/.test(evidenceName));
+ const child=spawn(binary,args,{cwd,stdio:['ignore','pipe','pipe']}),out=[],err=[];
  child.stdout.on('data',b=>out.push(b));child.stderr.on('data',b=>err.push(b));
  const result=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('close',(code,signal)=>resolve({code,signal}))});
+ if(evidenceName){fs.writeFileSync(path.join(output,evidenceName+'.argv.json'),JSON.stringify([binary,...args]));fs.writeFileSync(path.join(output,evidenceName+'.stdout'),Buffer.concat(out));fs.writeFileSync(path.join(output,evidenceName+'.stderr'),Buffer.concat(err))}
  assert.equal(result.signal,null);assert.equal(result.code,0,Buffer.concat(err).toString());return Buffer.concat(out);
 }
 /** Start only the owned fixture server; early exit rejects listener readiness. */
@@ -182,6 +186,95 @@ async function paymentClientFaults(page,label){
  await fillPayment(page,registry,request);check('payment-utf8-recovery',(await submitPayment(page,200))===good);
  page.off('request',intercept);await page.setRequestInterception(false);
 }
+/** Upload named original action documents via actual controls; no JS number parsing. */
+async function fillComparison(page,before,after){await(await page.$('#paea-before')).uploadFile(before);await(await page.$('#paea-after')).uploadFile(after)}
+/** Observe native completion then assert its terminal DOM state; a wrong state
+ * fails immediately after completion instead of waiting forever for expected text. */
+async function submitComparison(page,status){
+ expectRefusal=status===400;
+ const pending=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/protection/compare'&&r.request().method()==='POST');
+ await page.click('#paea-check');const response=await pending;assert.equal(response.status(),status);const raw=await response.text();
+ await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
+ assert.equal(await page.$eval('#paea-status',e=>e.dataset.state),status===200?'success':'error');expectRefusal=false;return raw;
+}
+/** Exercise the new menu on both domains, exact i64 input strings, CLI/API parity,
+ * changes/equality, real downloads, refusal/recovery and existing presentation
+ * matrix. All generated documents/reports stay in owned fixture directories. */
+async function comparisonCase(page,context,label,lang,theme){
+ await page.goto('http://'+address+'/paea.html?'+new URLSearchParams({lang,theme}),{waitUntil:'domcontentloaded'});
+ await page.waitForSelector('a[href^="/paea-compare.html"]');
+ await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.click('a[href^="/paea-compare.html"]')]);
+ await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
+ check(label+'-comparison-menu-presentation',await page.evaluate((l,t)=>location.pathname==='/paea-compare.html'&&document.documentElement.lang===l&&document.documentElement.dataset.theme===t,lang,theme));
+ check(label+'-comparison-primary-translated',await page.$eval('#paea-check',(e,l)=>e.textContent.trim()===(l==='en'?'Compare actions':'Comparer les actions'),lang));
+ check(label+'-comparison-empty-and-limits',await page.$eval('#paea-before',e=>e.files.length===0)&&await page.$eval('#paea-after',e=>e.files.length===0)&&await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-limits',(e,l)=>e.textContent.includes(l==='en'?'validates no approval':'ne valide aucun accord'),lang));
+ const embedded=await page.evaluate(async()=>{const r=await fetch('/paea-compare.html');if(!r.ok)throw Error('comparison page unavailable');return Array.from(new Uint8Array(await r.arrayBuffer()))});check(label+'-comparison-embedded-page',sha(Buffer.from(embedded))===sha(fs.readFileSync('web/paea-compare.html')));
+ await page.focus('#paea-format-help summary');await page.keyboard.press('Enter');check(label+'-comparison-help-keyboard',await page.$eval('#paea-format-help',(e,l)=>e.open&&e.textContent.includes(l==='en'?'sources remain ordered':'sources restent ordonnées'),lang));await page.keyboard.press('Enter');
+ for(const kind of ['payment.settle','repository.promote']){
+  const prefix=label+'-comparison-'+kind,directory=path.resolve(output,prefix);fs.mkdirSync(directory);
+  const vector=vectors.find(v=>v.proposal.action.kind===kind),beforeDoc=structuredClone({proposal:vector.proposal,context:vector.context});beforeDoc.context.mandate_revision=1;
+  const exact=(value,pretty=false)=>JSON.stringify(value,null,pretty?2:undefined).replace(/"mandate_revision":\s*1([,}])/,'"mandate_revision":9223372036854775807$1');
+  const rawBefore=exact(beforeDoc);assert(rawBefore.includes('9223372036854775807'));
+  const before=path.join(directory,'before.json');fs.writeFileSync(before,rawBefore);
+  let goodTerms;
+  for(const variant of ['same','request','terms','intent','source','formatting']){
+   const afterDoc=structuredClone(beforeDoc);
+   if(variant==='request')afterDoc.proposal.request_id='comparison-attempt-two';
+   if(variant==='terms'){
+    if(kind==='payment.settle'){afterDoc.proposal.action.amount_minor='9223372036854775807';afterDoc.proposal.action.beneficiary_account_id='comparison-account'}
+    else{const a=afterDoc.proposal.action;const candidate=['e','d','c'].map(c=>c.repeat(a.candidate_oid.length)).find(v=>v!==a.candidate_oid&&v!==a.expected_old_oid);assert(candidate);a.candidate_oid=candidate}
+   }
+   if(variant==='intent'){if(kind==='payment.settle')afterDoc.proposal.action.invoice_id='comparison-other-debt';else afterDoc.proposal.action.target_ref='refs/heads/comparison-other'}
+   if(variant==='source'){assert(!afterDoc.context.sources.some(v=>v.source_id==='comparison-source'));afterDoc.context.sources.push({source_id:'comparison-source',version:'v1',digest:'e'.repeat(64),integrity:1,confidentiality_labels:[]})}
+   const rawAfter=exact(afterDoc,variant==='formatting'),after=path.join(directory,'after-'+variant+'.json');fs.writeFileSync(after,rawAfter);
+   await fillComparison(page,before,after);check(prefix+'-'+variant+'-edit-clears',await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-report',e=>e.textContent===''));
+   const raw=await submitComparison(page,200),report=JSON.parse(raw),c=report.comparison;
+   fs.writeFileSync(path.join(directory,'native-'+variant+'-report.json'),raw);
+   const cli=(await command(['protection','compare',before,after,'--json'],prefix+'-'+variant+'-cli',directory)).toString();
+   check(prefix+'-'+variant+'-exact-cli-api',raw===cli&&c.before.document_sha256===sha(rawBefore)&&c.after.document_sha256===sha(rawAfter));
+   check(prefix+'-'+variant+'-flags',c.canonical_content_changed===['terms','intent','source'].includes(variant)&&c.intent_changed===(variant==='intent')&&c.transport_request_changed===(variant==='request'));
+   check(prefix+'-'+variant+'-non-authority',report.scope==='offline-data-only'&&['authority','effect','approval_validity'].every(k=>c[k]==='not-established')&&await page.$eval('#paea-report',(e,r)=>e.textContent===r,raw));
+   if(variant==='formatting')check(prefix+'-formatting-raw-identity',c.before.document_sha256!==c.after.document_sha256&&c.before.action_digest===c.after.action_digest);
+   if(variant==='terms'){
+    goodTerms=raw;check(prefix+'-changed-field-names',c.changed_paths.includes(kind==='payment.settle'?'/action/amount_minor':'/action/candidate_oid')&&await page.$eval('#paea-identities',(e,l)=>e.textContent.includes(l),kind==='payment.settle'?(lang==='en'?'Integer amount':'Montant entier'):(lang==='en'?'Candidate Git object':'Objet Git candidat')));
+    await page.focus('#paea-check');await page.keyboard.press('Tab');check(prefix+'-download-keyboard',await page.evaluate(()=>document.activeElement.id==='paea-download'));
+    const cdp=await page.createCDPSession();await cdp.send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:directory,browserContextId:context.id,eventsEnabled:true});
+    const completed=new Promise((resolve,reject)=>cdp.on('Browser.downloadProgress',e=>{if(e.state==='completed')resolve();if(e.state==='canceled')reject(Error('comparison-download-canceled'))}));
+    await page.click('#paea-download');await completed;await cdp.detach();check(prefix+'-real-download-exact',fs.readFileSync(path.join(directory,'paea-comparison.json'),'utf8')===raw);
+   }
+  }
+  const terms=path.join(directory,'after-terms.json'),invalid=path.join(directory,'invalid.json');fs.writeFileSync(invalid,'PRIVATE_COMPARISON_BROWSER_CANARY');
+  await fillComparison(page,before,terms);check(prefix+'-refusal-valid-control',(await submitComparison(page,200))===goodTerms);
+  await fillComparison(page,before,invalid);const refused=await submitComparison(page,400);check(prefix+'-native-refusal-clears',JSON.parse(refused).failure.code==='protection-document-invalid'&&await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-report',e=>e.textContent===''));
+  await fillComparison(page,before,terms);check(prefix+'-native-recovery',(await submitComparison(page,200))===goodTerms);
+  check(prefix+'-no-overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await page.screenshot({path:path.join(directory,'result.png'),fullPage:true});
+ }
+ comparisonCases.push(label);
+}
+/** Alter only browser responses after actual native controls; never count these
+ * synthetic reports as server/sink evidence. Wrong closed shapes/flags/hashes
+ * must invalidate output immediately; recovery uses the real native response. */
+async function comparisonClientFaults(page,label){
+ const directory=path.resolve(output,label+'-comparison-payment.settle'),before=path.join(directory,'before.json'),after=path.join(directory,'after-terms.json'),good=fs.readFileSync(path.join(directory,'native-terms-report.json'),'utf8');
+ await fillComparison(page,before,after);let replacement=null;
+ await page.setRequestInterception(true);
+ const intercept=r=>{if(new URL(r.url()).pathname==='/api/v1/protection/compare'&&r.method()==='POST'&&replacement!==null)r.respond({status:200,contentType:'application/json',body:replacement}).catch(e=>browserFailure({kind:'comparison-response',message:e.message}));else r.continue().catch(e=>browserFailure({kind:'comparison-interception',message:e.message}))};page.on('request',intercept);
+ const mutate=fn=>{const v=JSON.parse(good);fn(v.comparison,v);return JSON.stringify(v)};
+ for(const [name,raw]of [
+  ['before-hash',mutate(c=>c.before.document_sha256='0'.repeat(64))],['after-hash',mutate(c=>c.after.document_sha256='0'.repeat(64))],
+  ['approval',mutate(c=>c.approval_validity='established')],['unknown-path',mutate(c=>c.changed_paths=['/action/PRIVATE_COMPARISON_BROWSER_CANARY'])],
+  ['duplicate-path',mutate(c=>c.changed_paths.push(c.changed_paths[0]))],['unordered-path',mutate(c=>c.changed_paths.reverse())],
+  ['wrong-flag',mutate(c=>c.canonical_content_changed=false)],['wrong-intent',mutate(c=>c.intent_changed=true)],
+  ['flag-type',mutate(c=>c.transport_request_changed='false')],['extra',mutate((c,v)=>v.extra=true)],['malformed','{']]){
+  replacement=null;check('comparison-client-'+name+'-native-control',(await submitComparison(page,200))===good);
+  replacement=raw;fs.writeFileSync(path.join(directory,'synthetic-'+name+'.json'),raw);
+  const pending=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/protection/compare'&&r.request().method()==='POST');await page.click('#paea-check');assert.equal((await pending).status(),200);
+  await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
+  check('comparison-client-rejects-'+name,await page.$eval('#paea-status',e=>e.dataset.state==='error')&&await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-report',e=>e.textContent===''));
+ }
+ replacement=null;check('comparison-client-native-recovery',(await submitComparison(page,200))===good);page.off('request',intercept);await page.setRequestInterception(false);
+}
 (async()=>{let failed;
  try{await Promise.race([(async()=>{
   await start();check('actual-default-profile-executable',true);
@@ -193,8 +286,8 @@ async function paymentClientFaults(page,label){
    await context.setCookie({name:'swarm_session_'+sha(address).slice(0,12),value:token,url:'http://'+address,httpOnly:true,sameSite:'Strict'});
    page.on('pageerror',e=>browserFailure({kind:'pageerror',message:e.message}));
    page.on('requestfailed',r=>browserFailure({kind:'requestfailed',path:new URL(r.url()).pathname}));
-   page.on('response',r=>{if(r.status()>=400){const p=new URL(r.url()).pathname;responses.push({path:p,status:r.status()});if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment'].includes(p)&&r.status()===400))browserFailure({kind:'http',path:p,status:r.status()})}});
-   page.on('console',m=>{if(m.type()==='error'){const p=m.location().url?new URL(m.location().url).pathname:'';if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment'].includes(p)&&m.text().includes('400')))browserFailure({kind:'console',message:m.text()})}});
+   page.on('response',r=>{if(r.status()>=400){const p=new URL(r.url()).pathname;responses.push({path:p,status:r.status()});if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment','/api/v1/protection/compare'].includes(p)&&r.status()===400))browserFailure({kind:'http',path:p,status:r.status()})}});
+   page.on('console',m=>{if(m.type()==='error'){const p=m.location().url?new URL(m.location().url).pathname:'';if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment','/api/v1/protection/compare'].includes(p)&&m.text().includes('400')))browserFailure({kind:'console',message:m.text()})}});
    if(scope==='payment-encoding'){
     await paymentCase(page,context,label,lang,theme);
     const script=await page.evaluate(async()=>{const r=await fetch('/paea.js');if(!r.ok)throw Error('PAEA script unavailable');return Array.from(new Uint8Array(await r.arrayBuffer()))});
@@ -245,17 +338,18 @@ async function paymentClientFaults(page,label){
     await page.keyboard.press('Escape');await page.evaluate(()=>globalThis.closedVersion);
     check(label+'-version-focus-restored',await page.evaluate(()=>document.activeElement.id==='version-open'));
    }
-   await paymentCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await paymentClientFaults(page,label);await context.close();
+   await paymentCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await paymentClientFaults(page,label);
+   await comparisonCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await comparisonClientFaults(page,label);await context.close();
   }
   if(scope==='payment-encoding'){check('one-native-payment-encoding-case',cases.length===0&&paymentCases.length===1);check('exactly-three-native-encoding-refusals',responses.length===3)}
-  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('exactly-thirty-eight-native-refusals',responses.length===38)}
+  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('all-twelve-comparison-browser-cases',comparisonCases.length===12);check('exactly-sixty-two-native-refusals',responses.length===62)}
   check('no-unexpected-browser-diagnostics',errors.length===0);check('binary-stable',sha(fs.readFileSync(binary))===expected);
  })(),observedFailure]);}catch(e){failed=e;console.error(e.stack)}
  finally{
   try{if(browser)await browser.close()}catch(e){errors.push({kind:'browser-close',message:e.message});failed??=e}
   if(server){stopping=true;server.kill('SIGINT');const stopped=await closed;if(!failed&&stopped.code!==0)failed=Error('owned native fixture did not stop cleanly')}
   fs.writeFileSync(path.join(root,'server.stderr'),Buffer.concat(serverErrors),{mode:0o600});
-  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,checks,errors,responses,success:!failed},null,2));
+  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,comparisonCases,checks,errors,responses,success:!failed},null,2));
  }
  if(failed)process.exitCode=1;else console.log('PAEA_NATIVE_UI_PASS '+checks.length+' assertions');
 })();

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea.js" defer></script>
+</head>
+<body data-paea-operation="compare">
+  <a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+  <header>
+    <a href="/">Swarm</a>
+    <h1 data-i18n>Comparaison de deux actions</h1>
+    <nav aria-label="Navigation PAEA">
+      <a href="/" data-i18n>Cockpit</a>
+      <a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a>
+      <button id="paea-theme" type="button" data-i18n>Changer de thème</button>
+    </nav>
+  </header>
+  <main id="paea-main" tabindex="-1">
+    <p data-i18n>Comparer deux documents pour un règlement fictif ou une promotion Git, sans afficher les valeurs des champs.</p>
+    <p id="paea-limits" class="paea-notice" data-i18n>Les fichiers fournis ne sont pas authentifiés. Cette comparaison ne valide aucun accord et ne produit aucun effet.</p>
+    <details id="paea-format-help"><summary data-i18n>Préparer les fichiers</summary><p data-i18n>Chaque fichier contient une proposition et son contexte. Le résultat indique les champs modifiés sans en afficher les valeurs. Les espaces et l’ordre des clés JSON ne modifient pas le contenu canonique ; les sources restent ordonnées.</p></details>
+    <form id="paea-form" aria-describedby="paea-limits">
+      <fieldset id="paea-inputs">
+        <legend data-i18n>Documents à comparer</legend>
+        <label for="paea-before" data-i18n>Avant — document de l’action (JSON UTF-8)</label>
+        <input id="paea-before" type="file" accept=".json,application/json" required>
+        <label for="paea-after" data-i18n>Après — document de l’action (JSON UTF-8)</label>
+        <input id="paea-after" type="file" accept=".json,application/json" required>
+      </fieldset>
+      <button id="paea-check" class="paea-primary" type="submit" disabled data-i18n>Comparer les actions</button>
+    </form>
+    <p id="paea-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement de la session…</p>
+    <section aria-labelledby="paea-result-title">
+      <h2 id="paea-result-title" data-i18n>Résultat de la comparaison</h2>
+      <p id="paea-summary"></p>
+      <dl id="paea-identities"></dl>
+      <button id="paea-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+      <details><summary data-i18n>Rapport technique</summary><pre id="paea-report"></pre></details>
+    </section>
+  </main>
+</body>
+</html>

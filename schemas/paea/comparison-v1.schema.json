@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:swarm:paea:comparison:v1",
   "title": "PAEA offline document comparison v1",
-  "description": "Offline Rust CLI output shape. Structural comparison establishes no approval, current authority or effect. Build and execution provenance must be established separately.",
+  "description": "Offline Rust CLI and native HTTP output shape. Structural comparison establishes no approval, current authority or effect. Build and execution provenance must be established separately.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "scope", "comparison"],

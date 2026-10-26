@@ -815,6 +815,7 @@ impl NativeHttpService {
             "/api/v1/trust-actions" => self.trust_actions(request),
             "/api/v1/protection/receipt-report" => paea::receipt_report(request),
             "/api/v1/protection/resolve-payment" => paea::resolve_payment(request),
+            "/api/v1/protection/compare" => paea::compare(request),
             "/api/v1/native-settings" => self.engine_settings(SettingsOperation::Show, request),
             "/api/v1/native-settings/describe" => {
                 self.engine_settings(SettingsOperation::Describe, request)

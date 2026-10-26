@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "PAEA : comparaison de deux actions depuis le menu, champs modifiés et identités avant/après, distinction contenu/intention/clé de tentative et rapport téléchargeable. Une égalité ne valide aucun accord et ne produit aucun effet.",
+        "en": "PAEA: compare two actions from the menu, changed fields and before/after identities, distinct content/intent/attempt-key indicators and downloadable report. Equality validates no approval and produces no effect."
+      },
+      {
         "fr": "Vérification de sortie de cohorte fournie : commande native review-check, prompt courant et citations sous limites Admin ; lecture seule, sans appel fournisseur ni verdict appliqué.",
         "en": "Supplied cohort output check: native review-check command, current prompt and citations under Admin limits; read-only, without provider invocation or applied verdict."
       },

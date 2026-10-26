@@ -7,7 +7,8 @@
  * propagate; unexpected network/console/page failures abort pending DOM waits
  * through an event-driven rejection, with no polling or arbitrary deadline.
  * The recipe retains diagnostics, and the browser is closed in finally.
- * Verifies current FR/EN note content rather than a hardcoded item count.
+ * Verifies current FR/EN notes, both linked data pages and eleven asset byte sets;
+ * empty comparison/invoice fields are checked without submitting any live data.
  * --fault-version-script blocks only this browser's runtime-health.js GET and
  * must fail; the recipe runs a valid control first. No server is interrupted.
  */
@@ -34,9 +35,13 @@ try{await Promise.race([(async()=>{
   await page.setRequestInterception(true);page.on('request',request=>{if(!['GET','HEAD'].includes(request.method())){browserFailure('refused non-read request:'+new URL(request.url()).pathname);request.abort().catch(e=>browserFailure('request-abort:'+e.message))}else if(fault&&new URL(request.url()).pathname==='/runtime-health.js'){console.log('INJECTED_VERSION_SCRIPT_FAILURE');request.abort('failed').catch(e=>browserFailure('request-abort:'+e.message))}else request.continue().catch(e=>browserFailure('request-continue:'+e.message))});
   const response=await page.goto(cfg.url+'paea.html?'+new URLSearchParams({lang,theme:lang==='fr'?'etat':'sombre'}),{waitUntil:'domcontentloaded'});check(lang+'-authenticated-PAEA-page',response.status()===200&&new URL(page.url()).pathname==='/paea.html');
   await page.waitForFunction(()=>['empty','error'].includes(document.getElementById('paea-status')?.dataset.state));check(lang+'-live-session-ready',await page.$eval('#paea-check',e=>!e.disabled));
-  const assets=await page.evaluate(async()=>{const data={};for(const p of ['/paea.html','/paea-payment.html','/paea.js','/paea.css','/i18n-en.js','/i18n.js','/swarm-design.css','/wattson_themes.css','/swarm-logo.png','/trust-native.css']){const r=await fetch(p);if(!r.ok)throw Error('asset refused');data[p]=Array.from(new Uint8Array(await r.arrayBuffer()))}return data});
+  const assets=await page.evaluate(async()=>{const data={};for(const p of ['/paea.html','/paea-payment.html','/paea-compare.html','/paea.js','/paea.css','/i18n-en.js','/i18n.js','/swarm-design.css','/wattson_themes.css','/swarm-logo.png','/trust-native.css']){const r=await fetch(p);if(!r.ok)throw Error('asset refused');data[p]=Array.from(new Uint8Array(await r.arrayBuffer()))}return data});
   check(lang+'-live-protected-asset-bytes',Object.entries(assets).every(([p,bytes])=>sha(Buffer.from(bytes))===sha(fs.readFileSync(path.join(root,'web',p==='/trust-native.css'?'trust-native.css':p.slice(1))))));
   const version=await page.evaluate(async()=>{const r=await fetch('/api/v1/native-version');if(!r.ok)throw Error('version refused');return r.json()});check(lang+'-live-version-identity',version.binary.version===cfg.binary.version&&version.binary.commit===cfg.binary.commit&&version.binary.modified===cfg.binary.modified);check(lang+'-current-evolution-notes',require('node:util').isDeepStrictEqual(version.history.local_changes,notes));
+  await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.click('a[href^="/paea-compare.html"]')]);await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
+  check(lang+'-live-comparison-menu-and-fields',new URL(page.url()).pathname==='/paea-compare.html'&&await page.$eval('#paea-before',e=>e.type==='file'&&e.files.length===0)&&await page.$eval('#paea-after',e=>e.type==='file'&&e.files.length===0));
+  check(lang+'-live-comparison-limits-no-submission',await page.$eval('#paea-limits',(e,l)=>e.textContent.includes(l==='en'?'validates no approval':'ne valide aucun accord'),lang)&&await page.$eval('#paea-download',e=>e.disabled));
+  await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.click('a[data-paea-link]')]);await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
   await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.click('a[data-paea-link]')]);await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
   check(lang+'-live-payment-menu-and-fields',new URL(page.url()).pathname==='/paea-payment.html'&&await page.$eval('#paea-registry',e=>e.type==='file'&&e.files.length===0)&&await page.$eval('#paea-request',e=>e.type==='file'&&e.files.length===0));
   check(lang+'-live-payment-limits-no-submission',await page.$eval('#paea-limits',(e,l)=>e.textContent.includes(l==='en'?'unauthenticated':'pas authentifié'),lang)&&await page.$eval('#paea-download',e=>e.disabled));

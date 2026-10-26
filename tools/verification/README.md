@@ -1289,9 +1289,9 @@ retained two-effect counterexample and resolved aliases as one cooperative effec
 `paea-local-delivery.json` reads the identified managed instance only. Set
 `SWARM_PAEA_LIVE_STATUS` to a retained `./swarm.sh status` JSON and
 `SWARM_PAEA_LIVE_EVIDENCE` to a fresh browser-output directory, then run/verify
-through `recipe.py`. It checks PID/executable hash, ten authenticated asset byte
+through `recipe.py`. It checks PID/executable hash, eleven authenticated asset byte
 sets, current notes and Version dialog FR/EN, actual commit/dirty disclosure, focus
-and browser diagnostics (30 assertions, FR light/EN dark). It refuses non-GET/HEAD requests, never
+and browser diagnostics (34 assertions, FR light/EN dark). It refuses non-GET/HEAD requests, never
 restarts the service and does not use a live mission database as a fixture.
 Private session material is read through an owned no-follow descriptor and never
 logged. Private browser profiles remain excluded from publication. A fixed note
@@ -1345,8 +1345,8 @@ after valid receipt controls and expects a diagnostic exit 1; event-driven
 rejection interrupts DOM waits, without restarting the fixture server or using a
 watchdog. Owned child exits are failures until deliberate teardown.
 
-`paea-local-delivery.json` verifies 30 read-only assertions on the managed
-instance: menu-to-invoice empty inputs, explicit limits, ten unique asset byte
+`paea-local-delivery.json` now verifies 34 read-only assertions on the managed
+instance: menu-to-invoice empty inputs, explicit limits, eleven unique asset byte
 sets, exact FR/EN notes, actual version/commit/dirty disclosure and focus. The
 valid control still precedes its browser-only script failure. No live data POST.
 The old component recipe remains a labelled HTTP double; its cockpit navigation
@@ -1429,3 +1429,30 @@ structural schema checks (tested with the version retained in the increment's
 verification-environment.json). It is a verification dependency only, with no
 new runtime/provider dependency. Rust parser tests remain the authority for the
 actual byte, unique-cohort and quote-membership contract.
+
+
+### PAEA comparison UI / Comparaison depuis le menu (increment 19)
+
+`paea-comparison-http.json` runs two schema tests, then seven named native HTTP
+tests, including both existing PAEA routes. Both action domains cover equality,
+request-only changes, changed terms/context, formatting, i64 maximum values,
+closed-envelope refusal, safe causes, exact CLI report parity and unchanged Root.
+The schema test also binds all 19 translated UI field paths to the report schema.
+`paea-contract.json` and `paea-payment-http.json` use the same seven-test HTTP
+target; older increment counts above describe their historical results.
+
+The complete `paea-native-ux.json` requires **12 cases per view, three views**,
+FR/EN × light/dark × 1440/390/320 px, and **62 actual expected native refusals**.
+Comparison checks both domains, six canonical/intent/request/source/formatting
+variants, exact CLI/API bytes, completed downloads, stale-output clearing and
+recovery. Eleven browser-only corrupt-response cases follow actual native
+controls; their refusal establishes client validation only. A separate step
+still requires the expected browser-script failure after successful controls.
+No provider, live mission fixture, retry or global watchdog is introduced.
+
+`paea-local-delivery.json` now checks **34** read-only assertions and **11**
+protected asset byte sets, including menu-to-comparison empty inputs and visible
+limits in both languages. It does not submit business documents on the live
+instance. Candidate qualification, isolated browser proof, actual installation
+and protected approval remain distinct. Run in a fresh evidence directory, then
+use `recipe.py verify`; source inventory alone never proves the executable graph.
