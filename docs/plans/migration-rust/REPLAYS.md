@@ -1996,3 +1996,5 @@ Préparations : la recette `preparation-writes-rust` inclut désormais la sélec
 Le parcours `public-brief-adoption` ajoute adoption CLI/API, hash/besoin périmés, reçu historique, défaut sortie et reprise, sans compte fournisseur ni base vivante.
 
 La recette préparations ajoute public-plan-validation et atomic-plan-verdict ; preparation-plan-upgrade-rust vérifie refus sans politique v43, adoption Admin et consommation des valeurs par la CLI.
+
+Réponses aux questions du plan : `preparation-answers-rust`, `SWARM_PREPARATION_WRITES_BINARY` = binary normal qualifié ; CLI/API, CAS/hash, provenance, limites, rollback, rejeu et sortie.

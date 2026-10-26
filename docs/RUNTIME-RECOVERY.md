@@ -586,3 +586,32 @@ Sauvegarder le document cible correct ou réadopter le brief courant cohérent
 permet la reprise publique ; aucun accès SQL de réparation n’est requis. Cela
 vérifie une cohérence de contenu, pas l’authenticité contre un auteur arbitraire
 de la base. Les anciennes preuves sont conservées ; aucun historique n’est effacé.
+
+### Réponses explicites aux questions du plan
+
+`prepare answer-questions ID --root ROOT --input intention.json --json` et
+`POST /api/v1/preparations/command` partagent le writer transactionnel. L’intention
+porte version1, action answer-questions, preparation_id, event_id,
+expected_revision, sha256 du plan et decisions : le tableau complet et ordonné
+`[{"question":"Question exacte","answer":"Réponse"}]`. Un titre de question
+modifié ou déplacé refuse avec stale-document ; une liste incomplète ou un champ
+inconnu refuse avec request-invalid. CAS/hash protègent la version relue.
+
+Les réponses peuvent rester vides : enregistrer une décision partielle ne valide
+pas le plan. La validation explicite refuse toujours les questions sans réponse.
+Le plan original doit être structurellement valide sous les plafonds Admin v43
+courants, les limites de tâche existantes et le plafond de document ; les réponses
+ne contournent pas ces contrôles. Aucun plafond caché par réponse n’est ajouté.
+Une réponse produit une version historique du plan, une révision de préparation
+et un reçu ; tout ancien verdict est retiré. Les autres documents et les empreintes
+need/brief/méthode/source du plan sont conservés, même périmés. Une incohérence entre
+texte et empreinte stockée refuse avant écriture. Sauvegarder le plan cohérent
+permet la reprise ; répondre ne réadopte ni brief ni méthode.
+
+Le rejeu exact reste sans écriture ; un événement réutilisé avec une autre intention
+refuse. Un refus SQL annule document, historique et reçu ensemble. Une erreur de
+sortie après commit expose le reçu connu pour vérifier la reprise. Les réglages
+actifs, session/CSRF et liaison physique Root continuent à s’appliquer. Ni identité
+humaine vérifiée, ni conversion, ni agent lancé ne découlent de ces réponses.
+Le formulaire de décisions existant utilise cette intention ; son exposition dans
+le serveur Rust et les autres services de la page restent une qualification distincte.

@@ -160,6 +160,16 @@ pub(crate) fn validate(
     policy: &PreparationPlanPolicy,
     task: &TaskDefinitionLimits,
 ) -> Result<ActionPlan, crate::RootStoreError> {
+    validate_inner(raw, method, policy, task, true)
+}
+
+/// Shared structural check. `require_answers=false` permits partial decisions,
+/// but never creates a verdict; task/product rules and saved caps still apply.
+/// Only final validation requires the method-specific complete product contract.
+fn validate_inner(
+    raw: &[u8], method: &str, policy: &PreparationPlanPolicy,
+    task: &TaskDefinitionLimits, require_answers: bool,
+) -> Result<ActionPlan, E> {
     let plan =
         crate::work::decode_mode::<ActionPlan>(raw, crate::models::shape_action_plan(), true)
             .map_err(|err| cause("preparation-invalid-plan", err))?;
@@ -203,8 +213,8 @@ pub(crate) fn validate(
         return Err(rule("too many questions"));
     }
     for q in questions {
-        // Questions must be answered: the Go caller passes requireAnswers=true.
-        if !nonempty(&q.question) || !nonempty(&q.answer) {
+        // Saving answers allows incomplete decisions; verdicts do not.
+        if !nonempty(&q.question) || (require_answers && !nonempty(&q.answer)) {
             return Err(rule("unresolved decision: question and answer are required"));
         }
     }
@@ -283,7 +293,7 @@ pub(crate) fn validate(
     let product = match plan.product.as_deref() {
         Some(product) => product,
         None => {
-            if method == PRODUCT_METHOD {
+            if require_answers && method == PRODUCT_METHOD {
                 return Err(rule(
                     "the full application journey method requires the product structure",
                 ));
@@ -382,4 +392,43 @@ pub(crate) fn validate(
     }
 
     Ok(plan)
+}
+
+/// Replace only answers in an exact ordered question list. Strict-decode both
+/// plan and decisions, enforce current plan/task/document caps, and emit Go-shaped
+/// indented JSON with HTML/JS escaping. Partial answers remain valid drafts.
+/// This pure helper changes no stored provenance, receipt, history or verdict.
+/// Malformed inputs retain safe causes; changed questions refuse as stale data.
+pub(super) fn answer_questions(
+    raw: &[u8], decisions: &[serde_json::Value], method: &str,
+    policy: &PreparationPlanPolicy, task: &TaskDefinitionLimits,
+    document_cap: Option<usize>,
+) -> Result<String, E> {
+    use serde::Serialize;
+    let mut plan=validate_inner(raw,method,policy,task,false)?;
+    let questions=plan.questions.as_mut().ok_or(E::Refused("preparation-invalid-plan"))?;
+    if decisions.len()!=questions.len() {return Err(E::Refused("preparation-request-invalid"));}
+    for (question,decision) in questions.iter_mut().zip(decisions) {
+        if !decision.is_object() {return Err(E::Refused("preparation-request-invalid"));}
+        let encoded=crate::encode_model(decision).map_err(|e|cause("preparation-request-invalid",e))?;
+        let supplied=crate::work::decode_mode::<crate::PlanQuestion>(
+            &encoded,crate::models::shape_plan_question(),true)
+            .map_err(|e|cause("preparation-request-invalid",e))?;
+        if supplied.question!=question.question {return Err(E::Refused("preparation-stale-document"));}
+        question.answer=supplied.answer;
+    }
+    let mut pretty=Vec::new();
+    plan.serialize(serde_stacker::Serializer::new(&mut serde_json::Serializer::pretty(&mut pretty)))
+        .map_err(|e|cause("preparation-encode",e))?;
+    // RawValue keeps typed field order/pretty whitespace while encode_model
+    // applies the established Go string escaping, including U+2028/U+2029.
+    let pretty=String::from_utf8(pretty).map_err(|e|cause("preparation-encode",e))?;
+    let value=serde_json::value::RawValue::from_string(pretty)
+        .map_err(|e|cause("preparation-encode",e))?;
+    let encoded=crate::encode_model(&value).map_err(|e|cause("preparation-encode",e))?;
+    if document_cap.is_some_and(|cap|encoded.len()>cap) {
+        return Err(E::Refused("preparation-request-invalid"));
+    }
+    validate_inner(&encoded,method,policy,task,false)?;
+    String::from_utf8(encoded).map_err(|e|cause("preparation-encode",e))
 }

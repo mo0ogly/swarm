@@ -1,4 +1,4 @@
-//! Transactional draft creation/save/method selection and explicit brief adoption, without conversion or agent execution.
+//! Transactional draft creation/save/method selection and explicit brief adoption/plan answers, without conversion or agent execution.
 use super::{
     finished,
     preparation_read::{cause, stored},
@@ -41,7 +41,8 @@ fn current_method_hash(root: &RootStore, method: &str, policy: &crate::Preparati
 /// receipts must equal stored content before projection; historical receipts
 /// have no corresponding current-content witness. Brief adoption copies only
 /// the current nonblank document matching the requested hash and need hash. It
-/// appends no history; plan approval and OS confinement are not established.
+/// appends no history. Answers append one plan revision while retaining provenance
+/// and invalidating verdicts; no conversion or OS confinement is established.
 fn apply(
     context: &WriteContext<'_>,
     db: &Connection,
@@ -158,6 +159,31 @@ fn apply(
         p.adopted_brief = Some(Box::new(brief.clone()));
     }
     let mut document = None;
+    if r.action == "answer-questions" {
+        let original=p.documents.as_ref().and_then(|docs|docs.get("plan"))
+            .ok_or(E::Refused("preparation-stale-document"))?;
+        if r.sha256.is_empty() || r.sha256!=original.sha256 {
+            return Err(E::Refused("preparation-stale-document"));
+        }
+        if !crate::preparation_models::document_digest_matches(original) {
+            return Err(E::Refused("preparation-document-digest-mismatch"));
+        }
+        let limits=context.settings.preparation_plan_policy().map_err(E::Settings)?;
+        let task=context.settings.mutation_limits().map_err(E::Settings)?.task;
+        let edit=context.settings.preparation_write_policy().map_err(E::Settings)?;
+        let text=super::preparation_plan::answer_questions(original.text.as_bytes(),
+            r.decisions.as_deref().ok_or(E::Refused("preparation-request-invalid"))?,
+            &p.method,&limits,&task,edit.document_max_bytes)?;
+        // Do not derive new source hashes: answers never rebase an obsolete plan.
+        let mut doc=original.clone();
+        doc.revision=doc.revision.checked_add(1).filter(|n|*n>0)
+            .ok_or(E::Refused("preparation-revision-overflow"))?;
+        doc.sha256=format!("{:x}",Sha256::digest(text.as_bytes()));
+        doc.text=text;doc.at=at.into();
+        p.documents.as_mut().ok_or(E::Refused("preparation-stale-document"))?
+            .insert("plan".into(),doc.clone());
+        document=Some(doc);
+    }
     if r.action == "save" || !r.text.is_empty() {
         let kind = if r.action == "create" {
             "besoin"
@@ -263,7 +289,7 @@ fn apply(
 }
 
 impl RootStore {
-    /// Create/save/select a method/adopt a brief or replay its immutable event receipt on this opened
+    /// Create/save/select a method/adopt a brief/answer a plan or replay its immutable event receipt on this opened
     /// Root. Requires writable Root, complete enabled saved v42 policy, bounded
     /// valid request and exact revision. Stable settings and retained physical
     /// Root association guard an immediate transaction. Original rollback/commit,

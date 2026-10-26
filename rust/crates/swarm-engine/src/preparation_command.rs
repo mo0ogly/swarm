@@ -83,9 +83,9 @@ pub(crate) fn validate(
         || r.budget.is_some()
         || r.adopt_brief
         || r.expected_work_revision.is_some()
-        || r.decisions.is_some()
+        || (r.action != "answer-questions" && r.decisions.is_some())
         || !r.turn_id.is_empty()
-        || (!matches!(r.action.as_str(), "adopt-brief"|"validate-plan") && !r.sha256.is_empty())
+        || (!matches!(r.action.as_str(), "adopt-brief"|"validate-plan"|"answer-questions") && !r.sha256.is_empty())
         || r.version != 1
         || !key(&r.event_id)
         || r.expected_revision.is_none_or(|n| n < 0)
@@ -116,6 +116,17 @@ pub(crate) fn validate(
             if key(&r.preparation_id)
                 && r.work_id.is_empty()
                 && r.title.is_empty()
+                && r.document.is_empty()
+                && r.text.is_empty() =>
+        {
+            Ok(())
+        }
+        "answer-questions"
+            if key(&r.preparation_id)
+                && r.decisions.is_some()
+                && r.work_id.is_empty()
+                && r.title.is_empty()
+                && r.method.is_empty()
                 && r.document.is_empty()
                 && r.text.is_empty() =>
         {
@@ -208,7 +219,7 @@ mod tests {
 fn is_false(value: &bool) -> bool {
     !*value
 }
-/// Go omitempty for absent/empty decisions; nonempty decisions are unsupported.
+/// Go omitempty for absent/empty decisions; the answer writer validates nonempty decisions.
 fn empty_decisions(value: &Option<Vec<serde_json::Value>>) -> bool {
     value.as_ref().is_none_or(Vec::is_empty)
 }

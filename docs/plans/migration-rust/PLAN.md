@@ -11,6 +11,23 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — réponses au plan,26 octobre ; revue GLM ouverte
+Owner Codex ; dev95 actif,449 entrées qualifiées ; SHA processus = candidat testé.
+answer-questions CLI/API : réponses partielles, liste exacte/CAS/hash, historique et
+reçu atomiques, provenance conservée même périmée ; verdict retiré, aucun lancement.
+35contrôles réponses +98plan +50écritures PASS ; recette/intégrité vérifiées.
+13installation et14Version FR/EN PASS ; réglages41/missions pause50/469 conservés.
+Replan : candidat déplacé par installation concurrente, mêmes octets figés/retestés.
+GLM5.2 :3appels HTTP504 à600s, y compris contexte3286octets ; aucun patch/revue reçu.
+Métadonnées répondent0.111s ; cause génération/usage inconnus. Pas de quatrième appel.
+Revue externe non obtenue : owner SKYNET/outillage ; reprise après réponse complète
+sur route visée et revue du candidat, sans prétendre une acceptation indépendante.
+[Rapport/RETEX](PREPARATION-ANSWERS-20261026.md),
+[preuves/revue bornée](evidence/20261026-preparation-answers/README.md).
+Diff ciblé PASS ; deux blancs finaux hors lot conservés, pas de conformité globale.
+Suite : page existante/services (maxlength4000 à retirer), conversion sans lancement
+avec politiques courantes et ordre topologique. Biba/SCALING/PAEA préservés.
+
 ## Livré localement — validation de plan Rust,26 octobre, GLM5.2
 Owner Codex ; dev92 actif,446 entrées qualifiées et processus = candidat testé.
 validate-plan CLI/API : fraîcheur méthode/brief/plan, JSON strict, graphes et produit ;

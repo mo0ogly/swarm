@@ -8893,3 +8893,37 @@ but never project ready or rewrite rows. Publicly saving coherent replacement
 bytes or readopting the coherent current brief permits recovery without SQL
 repair. This checks content consistency, not authenticity against an arbitrary
 database writer. Historical evidence and recorded versions are never erased.
+
+### Explicit answers to plan questions
+
+`prepare answer-questions ID --root ROOT --input intent.json --json` and
+`POST /api/v1/preparations/command` share the transactional writer. The intent
+supplies version1, action answer-questions, preparation_id, event_id,
+expected_revision, the plan sha256 and decisions: the complete ordered array
+`[{"question":"Exact question","answer":"Answer"}]`. Changed/reordered questions
+refuse with stale-document; incomplete lists and unknown fields refuse with
+request-invalid. CAS/hash bind the answers to the reviewed version.
+
+Answers may stay empty: partial decisions do not validate the plan. Explicit
+validation still requires all answers. The original plan must be structurally
+valid under current Admin v43 plan caps, existing task limits and the document
+cap. No hidden per-answer cap is introduced. Answers append a plan history row,
+a preparation revision and a receipt, while removing any previous verdict.
+Other documents and the plan's need/brief/method/source fingerprints stay intact,
+even when stale. Inconsistent stored text/hash refuses before writing; publicly
+saving a consistent plan permits recovery. Answers never readopt a brief/method.
+
+Exact replay never writes; conflicting event reuse refuses. SQL failure rolls
+back the document, history and receipt together. An output error after commit
+retains the known receipt for public recovery. Saved enabled policy, session/CSRF
+and physical Root binding continue to apply. Answers grant no verified human
+identity, conversion or agent launch. The existing decisions form emits this
+intent; serving that page and its other services in Rust remains separate work.
+
+Shared delivery evidence: another checkout user can install a local candidate,
+moving its temporary candidate path. Tests must use the profile's frozen binary
+(`.cache/rust-migration-binaries/…`) or a private SHA-verified copy, rather than
+assuming `bin/swarm.candidate-*` remains present. A moved path does not invalidate
+checks already bound to identical bytes: verify the installed process, preserve
+the failure and resume. Binary identity establishes neither independent review
+nor global acceptance.

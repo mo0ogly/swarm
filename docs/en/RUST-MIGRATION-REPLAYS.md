@@ -1396,3 +1396,5 @@ Preparations: `preparation-writes-rust` now includes CLI/API method selection, r
 `public-brief-adoption` adds CLI/API adoption, stale brief/need, historical receipt, output failure and recovery, without provider accounts or live datastores.
 
 Preparations add public-plan-validation and atomic-plan-verdict; preparation-plan-upgrade-rust checks missing-v43 refusal, explicit Admin adoption and actual CLI cap consumption.
+
+Plan-question answers: `preparation-answers-rust`; set `SWARM_PREPARATION_WRITES_BINARY` to the qualified normal binary. CLI/API, CAS/hash, provenance, caps, rollback, replay and output recovery.
