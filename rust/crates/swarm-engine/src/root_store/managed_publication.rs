@@ -1,12 +1,29 @@
-//! Current native cohort publication observation, never an acceptance permit.
+//! Current native cohort observation and explicit protected first publication.
 use super::{finished, material_path, task_validation, RootStore, RootStoreError as E};
 use crate::{AgentLaunchError as A, IndependentReview, ManagedReviewContext, Work};
 use serde::Serialize;
+mod writer;
+#[cfg(test)]
+mod tests;
+pub use writer::ManagedPublicationOutcome;
+pub(super) use writer::current as verify_published_current;
+
+/// Unforgeable within other modules: only the authoritative publication reader
+/// constructs this traversal-local evidence after checking originals and custody.
+/// It grants no future action and is bound to the exact borrowed Work/settings.
+pub(crate) struct PrecheckedAcceptance<'a> { work: &'a Work, settings: &'a crate::EngineSettingsDocument, task: &'a str }
+impl PrecheckedAcceptance<'_> {
+    /// Match exact in-transaction inputs; no serialized permit or boolean bypass.
+    pub(crate) fn matches(&self, work: &Work, settings: &crate::EngineSettingsDocument, task: &str) -> bool {
+        std::ptr::eq(self.work, work) && std::ptr::eq(self.settings, settings) && self.task == task
+    }
+}
+
 
 /// Exact current candidate and original-opinion coordinates. Verification means
 /// the named observations passed during this read, not criterion truth, identity,
-/// a future lease or permission to accept. Missing publication/baseline consumers
-/// remain explicit blockers even when the original opinion says passed.
+/// a future lease or permission to accept. Writer admission and unsupported
+/// cumulative-baseline consumers stay explicit even with a passed opinion.
 #[derive(Serialize)]
 pub struct ManagedPublicationPreview {
     pub schema_version: u32,
@@ -142,7 +159,7 @@ impl RootStore {
     /// the event ID is input syntax only and is never persisted. Source pin/refresh
     /// runs outside Root locks, with descriptors retained across both snapshots
     /// and explicitly closed on every result. Current saved policies are rechecked.
-    /// Returns verified observations and explicit unsupported-publication blockers,
+    /// Returns verified observations and explicit write-admission/baseline blockers,
     /// never a ready/accepted result. Stale/incomplete/ordinary/non-verdict originals,
     /// task/report/candidate drift, malformed inputs and cleanup errors refuse with
     /// causes. No provider, debit, new checkpoint, Work or Git ref mutation occurs.
@@ -165,7 +182,11 @@ impl RootStore {
             if after.work != checked.work || after.settings_sha256 != checked.settings_sha256 {
                 return Err(E::Refused("publication-preview-inputs-changed"));
             }
-            let mut blockers = vec!["managed-protected-publication-unported", "managed-accepted-baseline-authority-unported"];
+            let initial = !checked.work.tasks.iter().flatten().any(|t|t.status == "accepted")
+                && checked.work.planning.as_deref().and_then(|p|p.repository.as_deref())
+                    .is_some_and(|r|r.candidate_commit == r.base_commit);
+            let mut blockers = if initial { vec!["managed-publication-write-admission-required"] }
+                else { vec!["managed-accepted-baseline-authority-unported"] };
             if checked.review.state != "passed" { blockers.push("managed-passed-opinion-required"); }
             Ok(ManagedPublicationPreview { schema_version: 1, work_id: work.into(),
                 work_revision: checked.work.revision, settings_revision: checked.settings_revision,
@@ -176,7 +197,7 @@ impl RootStore {
                 context_sha256: checked.review.context_sha256,
                 cohort_tasks: checked.context.tasks.unwrap_or_default().into_iter().map(|t| t.task).collect(),
                 validation: checked.validation, native_original_verified: true, current_candidate_verified: true,
-                publication_supported: false, publication_ready: false, blockers,
+                publication_supported: initial, publication_ready: false, blockers,
                 provider_started: false, task_accepted: false })
         })();
         finished(result, candidate.close())

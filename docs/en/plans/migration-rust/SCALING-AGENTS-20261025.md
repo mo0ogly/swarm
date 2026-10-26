@@ -358,3 +358,49 @@ This increment is verified locally: **dev.101** activated through the supported 
 Observed dev106 delivery: passed and changes-requested native originals inspected on the actual serving executable; no provider, debit or Work change. Twelve favorable-flow cases and four complementary assertions pass; original and complementary recipe integrity verified separately. The actual blocked-task refusal was reproduced and corrected only for `RecordedOpinion` observation. Fourteen FR/EN UI assertions, protected assets, default profile without fixtures and exact Works preservation since dev101 verified. Focused GLM review found no confirmed defect in supplied boundaries; no task acceptance or global S2 conformance. [Report/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-review-accept-e1j5v2ic/RESULT.md).
 
 Current instance rechecked after another local delivery: **dev107**, identical Rust bytes for this increment, qualified profile, two public branches and14 FR/EN UI assertions verified again. Dev106 evidence remains historical and intact; see `activation2/` in the report.
+
+### S2 — first protected publication, v0.1.1-dev.115, October 26
+
+The preceding increment was committed as `a3be338b4`. Explicit `task publish`
+atomically publishes the checked candidate, accepts its task, settles the worker
+row and records a canonical SQL receipt. Replay invokes no provider/control and
+adds no debit. Originals stay unchanged. The operator/supervisor explicitly
+requests the decision; passing controls never finish the work by themselves.
+This slice exposes CLI/Root, not a new autonomous conductor route or web button.
+
+Four temporary SQL faults leave no partial write. The complete flow on the actual
+serving binary verifies ten obligations, including integrated-worker recovery,
+publication, replay and evidence refusal/restoration. Three additional canonical
+corruptions refuse and recover: binding, cohort contract and result commit. The
+last also changes the worker row to prove that mutually matching SQL data cannot
+replace the private original. The unbound-field defect was reproduced before its
+fix and retained. Permanent recipes and integrity verify; Rustdoc builds; fourteen
+FR/EN Version assertions pass. Default native profile excludes fixtures; protected
+assets match and Works remain unchanged. Installed hash `3635bd296a419b7d7c8f5c845a5caa87efea689b028358ec228c43c36d9fae62`; declared commit
+`079635b295b68c9422c1276f31f87488aa849c50`, with dirty changes visibly disclosed.
+
+Two focused GLM/SKYNET static-review requests yielded no final verdict. The first
+packet became stale; the second produced private reasoning fragments only. Owned
+clients were stopped and evidence retained; final consumption is unknown. No client
+cap or reduced reasoning effort was introduced. This proves neither general service
+failure nor completed independent review.
+
+Concrete S2 continuation: cumulative baseline proof must bind every accepted task
+to the new whole-cohort opinion and controls rerun on that same candidate, retaining
+previous originals and historical worker provenance. Today's reader deliberately
+requires the exact initial pointer. A status-only change or reassigned review ID
+is insufficient. Then verify an actual new worker copy from the published pointer;
+its SQL value alone does not establish that copy. Cumulative projections,
+autonomous supervisor integration, S3/S4 and the final project RETEX remain open.
+[Increment report and RETEX](../../../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-first-publication-ytg974j3/RESULT.md).
+
+```mermaid
+flowchart TD
+    A[Original controls and candidate] --> B[Passed native cohort opinion]
+    B --> C[Explicit task publish request]
+    C --> D[Transaction: candidate, accepted task, worker, receipt]
+    D --> E[Current reader: private original and Git blobs]
+    E --> F[Initial publication verified locally]
+    F -. Unported .-> G[Cumulative proof and cohort projection]
+    G -. Unverified .-> H[New worker copy and supervisor loop]
+```

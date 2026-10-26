@@ -47,8 +47,8 @@ def run(binary,profile,out,reuse=None):
         assert value['cohort_tasks']==[t['task'] for t in review['managed_tasks']]
         assert value['validation']['receipt_sha256'] and value['candidate_binding_sha256']
         assert value['previous_candidate']==before['planning']['repository']['candidate_commit']
-        assert value['blockers']==['managed-protected-publication-unported','managed-accepted-baseline-authority-unported']
-        assert not any(value[k] for k in ['publication_supported','publication_ready','provider_started','task_accepted'])
+        assert value['blockers']==['managed-publication-write-admission-required']
+        assert value['publication_supported'] and not any(value[k] for k in ['publication_ready','provider_started','task_accepted'])
         serialized=json.dumps(value)
         assert str(root) not in serialized and 'owner_pid' not in serialized and 'stdin' not in serialized
         unchanged(label)
@@ -81,7 +81,7 @@ def run(binary,profile,out,reuse=None):
     acceptance=dict(schema_version=1,event_id='still-unported-'+uuid.uuid4().hex,
         expected_revision=before['revision'],id=task['id'],status='accepted')
     refused=call('acceptance-still-refused',['task','update',work],acceptance,False)
-    assert 'native-managed-current-review-unported' in refused['failure']['causes'];unchanged('acceptance-still-refused')
+    assert 'managed-publication-record-required' in refused['failure']['causes'];unchanged('acceptance-still-refused')
     checks.append('verified-preview-never-unlocks-task-acceptance')
     # A new review event after a completed opinion must still refuse; the internal
     # observed-record source purpose is not a fresh invocation allowance.

@@ -67,7 +67,10 @@
     "rust/crates/swarm-engine/src/root_store/managed_publication.rs",
     "rust/crates/swarm-engine/src/root_store/material_path.rs",
     "tests/rust_native_publication_preview.py",
-    "tests/rust_native_publication_opinion.py"
+    "tests/rust_native_publication_opinion.py",
+    "rust/crates/swarm-engine/src/root_store/native_transaction.rs",
+    "rust/crates/swarm-engine/src/root_store/managed_publication/*.rs",
+    "rust/crates/swarm-engine/src/managed_publication_record.rs"
   ],
   "environment": {},
   "steps": [

@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Première publication gérée native : publier le candidat contrôlé et accepter la tâche atomiquement, avec reçu canonique, rejeu sans nouvel appel et refus explicite des baselines cumulatives non portées. Les empreintes et le commit résultat sont rapprochés du candidat contenu dans l’original privé des contrôles.",
+        "en": "First native managed publication: atomically publish the checked candidate and accept its task, with a canonical receipt, replay without another call and explicit refusal of unported cumulative baselines. Binding and result commit are matched to the candidate held in the private control original."
+      },
+      {
         "fr": "PAEA : menu Campagnes de laboratoire, commande explicite sur binaire figé et lecture locale du rapport des huit scénarios. Contre-exemple des aliases visible ; aucune exécution web, autorité protégée ou évaluation indépendante.",
         "en": "PAEA: Laboratory campaigns menu, explicit command with a pinned binary and local reading of the eight-scenario report. Visible alias counterexample; no web execution, protected authority or independent evaluation."
       },

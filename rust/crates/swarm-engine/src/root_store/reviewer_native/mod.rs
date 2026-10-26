@@ -29,7 +29,7 @@ mod stale_sdk;
 mod runtime;
 pub use runtime::{execute_review_gate, TaskReviewOutcome};
 mod store;
-mod transaction;
+use crate::root_store::native_transaction as transaction;
 
 impl crate::RootStore {
     /// Exclude registered live/unresolved review work during scoped closure.

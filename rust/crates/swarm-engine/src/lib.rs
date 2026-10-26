@@ -627,7 +627,7 @@ pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_g
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview};
+pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview, ManagedPublicationOutcome};
 
 #[cfg(target_os = "linux")]
 pub use root_store::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};
@@ -662,3 +662,6 @@ pub fn decode_preparation_command(raw:&[u8])->Result<PreparationCommand,RootStor
 /// Validate a preparation/event protocol key (1..=128 ASCII alphanumeric, dash
 /// or underscore). Pure syntax; it grants no identity, ownership or authority.
 pub fn valid_preparation_key(value:&str)->bool{preparation_command::key(value)}
+
+#[cfg(target_os = "linux")]
+mod managed_publication_record;

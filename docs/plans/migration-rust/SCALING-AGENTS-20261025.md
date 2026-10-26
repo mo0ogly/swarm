@@ -390,3 +390,51 @@ Livraison de cet incrément vérifiée : **dev.101** active par le lanceur pris 
 Livraison constatée en dev106 : original natif favorable et avis demandant des corrections observés sur le binaire réellement servi ; aucun appel, débit ou changement de Work. Douze cas du parcours favorable et quatre assertions complémentaires passent ; la recette initiale et le complément sont conservés et leur intégrité vérifiée séparément. Le refus réel sur tâche bloquée a été reproduit puis corrigé pour la seule lecture `RecordedOpinion`. Quatorze assertions UI FR/EN, ressources protégées, profil normal sans fixture et conservation exacte des travaux depuis dev101 vérifiés. Revue GLM ciblée sans défaut confirmé dans les frontières fournies ; aucune acceptation ni conformité S2 globale. [Rapport/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-review-accept-e1j5v2ic/RESULT.md).
 
 Instance courante recontrôlée après une autre livraison locale : **dev107**, mêmes octets Rust de cet incrément, profil qualifié, deux branches publiques et14 assertions UI FR/EN de nouveau vérifiées. La preuve dev106 reste historique et intacte ; voir `activation2/` dans le rapport.
+
+### S2 — première publication protégée, v0.1.1-dev.115, 26 octobre
+
+L’incrément précédent est committé `a3be338b4`. Le nouveau parcours explicite
+`task publish` publie le candidat vérifié et accepte sa tâche dans la même
+transaction : pointeur Git canonique, ligne worker intégrée et reçu SQL. Le rejeu
+ne relance ni fournisseur ni contrôle et ne débite rien. Les originaux restent
+inchangés. La décision explicite vient de l’opérateur/superviseur ; aucun succès de
+contrôle ne termine seul le travail. Cette tranche est CLI/Root, pas une nouvelle
+action autonome du conducteur ou un bouton d’acceptation web.
+
+Quatre injections SQL temporaires passent sans écriture partielle. Le parcours
+complet sur le binaire réellement servi vérifie dix obligations, dont récupération
+du worker intégré, publication, rejeu et refus/restauration des preuves. Trois
+altérations canoniques supplémentaires sont refusées puis restaurées : empreinte,
+contrat de cohorte et commit résultat. Le dernier cas altère aussi la ligne worker
+pour vérifier qu’un accord SQL interne ne remplace pas l’original privé. Le défaut
+de liaison est reproduit avant correctif et conservé. Recettes permanentes et
+intégrité vérifiées ; Rustdoc compile ; 14 assertions Version FR/EN passent.
+Profil natif normal sans fixture, ressources protégées et travaux conservés.
+Empreinte installée : `3635bd296a419b7d7c8f5c845a5caa87efea689b028358ec228c43c36d9fae62` ; commit déclaré `079635b295b68c9422c1276f31f87488aa849c50`, modifications non committées visibles.
+
+GLM/SKYNET a reçu deux revues statiques bornées par leur sujet : aucun verdict
+final reçu. Le premier paquet est devenu périmé ; le second n’a produit que des
+fragments privés de raisonnement. Les clients ont été arrêtés, preuves conservées,
+consommation finale inconnue ; aucun plafond client ni effort réduit ajouté.
+Cela ne démontre ni une panne générale du service ni une revue indépendante obtenue.
+
+Suite S2 concrète : porter une preuve de baseline cumulative qui rapproche chaque
+tâche acceptée de la nouvelle revue de cohorte et des contrôles réexécutés sur le
+même candidat, tout en conservant les originaux précédents et la provenance des
+anciens workers. Le lecteur actuel exige intentionnellement le pointeur initial
+exact. Une simple modification de statut ou une réaffectation d’identifiant de
+revue ne suffit pas. Vérifier ensuite une vraie nouvelle copie worker depuis le
+pointeur publié ; cette copie n’est pas déduite de sa seule valeur SQL. Les
+projections cumulatives, raccordement autonome du superviseur, S3/S4 et RETEX final
+du projet restent ouverts. [Rapport et RETEX de cet incrément](evidence/20261025-scaling-s2-oi9dgo_e/native-first-publication-ytg974j3/RESULT.md).
+
+```mermaid
+flowchart TD
+    A[Originaux contrôles et candidat] --> B[Revue native de cohorte passée]
+    B --> C[Commande explicite task publish]
+    C --> D[Transaction : candidat, tâche acceptée, worker, reçu]
+    D --> E[Lecture courante : original privé et blobs Git]
+    E --> F[Publication initiale vérifiée en local]
+    F -. À porter .-> G[Preuve cumulative et projection de cohorte]
+    G -. À vérifier .-> H[Nouvelle copie worker et boucle superviseur]
+```

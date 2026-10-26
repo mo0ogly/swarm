@@ -39,7 +39,11 @@ mod native_review_context;
 #[cfg(target_os = "linux")]
 mod managed_publication;
 #[cfg(target_os = "linux")]
-pub use managed_publication::ManagedPublicationPreview;
+mod native_transaction;
+#[cfg(target_os = "linux")]
+pub(crate) use managed_publication::PrecheckedAcceptance;
+#[cfg(target_os = "linux")]
+pub use managed_publication::{ManagedPublicationPreview, ManagedPublicationOutcome};
 #[cfg(target_os = "linux")]
 mod native_worker_retry;
 #[cfg(target_os = "linux")]

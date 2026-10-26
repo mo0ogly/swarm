@@ -413,6 +413,27 @@ pub(crate) fn transition_scoped_reviewed_task<E: WorkEnvironment>(
     settings: &crate::EngineSettingsDocument,
     environment: &mut E,
 ) -> Result<Task> {
+    transition_reviewed(w, r, c, settings, environment, None)
+}
+/// Prepare the same accepted transition using current managed originals checked
+/// by the publication writer in this transaction. Opaque evidence must match the
+/// exact inputs; all scope, prerequisite and deterministic gate guards remain.
+#[cfg(target_os = "linux")]
+pub(crate) fn transition_managed_publication<E: WorkEnvironment>(
+    w: &Work, r: &Request, c: &TaskLifecycleContext<'_>,
+    settings: &crate::EngineSettingsDocument, environment: &mut E,
+    proof: &crate::root_store::PrecheckedAcceptance<'_>,
+) -> Result<Task> {
+    if !proof.matches(w, settings, &r.id) { return Err(fail("managed-publication-inputs-changed")); }
+    transition_reviewed(w, r, c, settings, environment, Some(()))
+}
+/// Shared admission mechanics. The internal discriminator is never supplied by
+/// requests; only the matching opaque-proof wrapper may select managed evidence.
+fn transition_reviewed<E: WorkEnvironment>(
+    w: &Work, r: &Request, c: &TaskLifecycleContext<'_>,
+    settings: &crate::EngineSettingsDocument, environment: &mut E,
+    managed: Option<()>,
+) -> Result<Task> {
     validate_work_request("task.update", r)
         .map_err(|e| TaskLifecycleError::Definition(crate::TaskDefinitionError::Request(e)))?;
     if r.status != "accepted" || crate::mutation_guard::edits_definition(r)
@@ -435,13 +456,15 @@ pub(crate) fn transition_scoped_reviewed_task<E: WorkEnvironment>(
     let scope = planning.scopes.iter().flatten().find(|s| s.id == task.scope_id)
         .ok_or_else(|| fail("task-scope-missing"))?;
     if scope.state == "closed" { return Err(fail("task-scope-closed")); }
-    crate::check_current_review_evidence(c.root, w, &r.id, settings)
-        .map_err(TaskLifecycleError::Review)?
-        .ok_or_else(|| fail("task-independent-review-missing"))?;
+    if managed.is_none() {
+        crate::check_current_review_evidence(c.root, w, &r.id, settings)
+            .map_err(TaskLifecycleError::Review)?.ok_or_else(|| fail("task-independent-review-missing"))?;
+    }
     let next = transition_task(w, r, c, Some(settings), environment)?;
-    crate::check_current_review_evidence(c.root, w, &r.id, settings)
-        .map_err(TaskLifecycleError::Review)?
-        .ok_or_else(|| fail("task-independent-review-missing"))?;
+    if managed.is_none() {
+        crate::check_current_review_evidence(c.root, w, &r.id, settings)
+            .map_err(TaskLifecycleError::Review)?.ok_or_else(|| fail("task-independent-review-missing"))?;
+    }
     Ok(next)
 }
 /// Shared mechanics keep manual byte/status behavior; optional settings are an

@@ -3238,3 +3238,20 @@ domaine du Job. Version1 sans origine conserve ses octets, aucune backfill.
 21 tests ciblés passent ; recette native/legacy/auto-revue et livraison à qualifier.
 Candidat physique et cohorte S2 restent gardés, pas de validation finale prétendue.
 Preuves : evidence/20261025-scaling-s2-oi9dgo_e/native-source-origin/.
+
+## S2 — première publication atomique installée, 26 octobre, v0.1.1-dev.115
+
+Owner Codex, APEX/replan direct ; commit précédent a3be338b4 conservé, aucun push.
+Publication initiale CLI/Root + reçu canonique + acceptation + worker atomiques ;
+rejeu sans appel/débit et lecture courante liée au candidat de l’original privé.
+Quatre pannes transactionnelles, dix obligations sur le binaire servi, trois
+altérations canoniques avec restauration et14assertions Version FR/EN vérifiées.
+Default profile sans fixtures, ressources protégées et Works conservés.
+GLM : deux appels SSE sans verdict final, clients arrêtés, consommation inconnue ;
+aucune acceptation indépendante déduite. 112→113 : revue formelle de4fichiers,
+portée initiale revue séparément ; pas de conformité globale déduite du delta.
+Suite : preuve de baseline cumulative/projections sans réécrire les originaux,
+ancien worker lisible après plusieurs publications, vraie copie sur nouveau SHA,
+puis raccordement au superviseur, S3/S4 et RETEX final. Refus initial explicite
+conservé jusqu’à ces preuves, pas de limite de cohorte cachée.
+Voir [rapport/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-first-publication-ytg974j3/RESULT.md) et SCALING-AGENTS-20261025.md.

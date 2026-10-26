@@ -45,6 +45,18 @@ pub(super) fn with_material_read<T>(
     root: &RootStore,
     read: impl FnOnce() -> Result<T, RootStoreError>,
 ) -> Result<T, RootStoreError> {
+    with_material_operation(root, read)
+}
+
+/// Keep the saved-settings reservation and physical Root association around an
+/// already authorized operation. This wrapper grants no write authority: its
+/// callback owns admission and transaction finalization. Checks after a committed
+/// write and explicit cleanup can fail; callers must preserve known recorded
+/// state separately. No filesystem lease or additional retry policy is created.
+pub(super) fn with_material_operation<T>(
+    root: &RootStore,
+    read: impl FnOnce() -> Result<T, RootStoreError>,
+) -> Result<T, RootStoreError> {
     let reservation = root
         .directory
         .reserve(false, false)

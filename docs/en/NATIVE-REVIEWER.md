@@ -1009,18 +1009,20 @@ revision, changed source or incomplete original refuses. Unknown failures never
 become successful empty observations.
 
 Successful reads expose `native_original_verified`, `current_candidate_verified`,
-identifiers/digests and cohort task IDs. `publication_supported`,
-`publication_ready`, `provider_started` and `task_accepted` remain false:
-protected publication and accepted-baseline authority remain unported and named
-in `blockers`. These flags describe implemented capabilities, not operator
-policy or a cohort cutoff. Effective policies still come from saved Admin values.
+identifiers/digests and cohort task IDs. `publication_supported` describes the
+initial protocol without an accepted baseline; `publication_ready`,
+`provider_started` and `task_accepted` stay false. `blockers` distinguishes final
+writer admission from the unported cumulative baseline. These describe product
+capabilities, not operator policies or cohort ceilings. Effective values still
+come from saved Admin settings.
 The CLI closes Root before checked output/flush; output failure grants no new
 call. No reviewer identity, criterion truth, permission or later freshness lease
 is established. Existing acceptance remains refused.
 
 Managed acceptance must also atomically publish the candidate pointer and coherent
 cohort evidence. A status-only change could accept code absent from the next
-worker copy. Go `managed_integration.go` remains the reference for this boundary.
+worker copy. The initial protocol is implemented below; Go `managed_integration.go` remains
+the reference for the cumulative baseline still to be ported.
 
 ```mermaid
 sequenceDiagram
@@ -1034,5 +1036,79 @@ sequenceDiagram
     R->>R: Compare cohort and current state
     R->>C: Refresh then explicitly close
     R-->>U: Verified observations and explicit blockers
-    Note over R,U: Publication and acceptance remain unavailable
+    Note over R,U: Preview alone never publishes or accepts
 ```
+
+## First native managed publication — protected transaction
+
+`swarm task publish WORK --input REQUEST --root ROOT --json` consumes the strict
+native envelope (`schema_version`, `event_id`, `expected_revision`, `task_id`).
+`RootStore::publish_managed_candidate` publishes the first verified candidate and
+accepts its submitted task in **one SQL transaction**: repository candidate
+pointer, task, integrated worker row and `managed.publication` event. Its canonical
+command contains the accepted Work; request and payload intentionally store the
+same bytes under the existing storage contract. No advisory Git branch changes.
+
+Candidate custody and refresh occur outside SQL locks. The writer requires passed
+native originals, the full cohort, completed producers/attempts, current saved
+policies, actual committed Git reports, artifacts, project context, gate and
+prerequisites. Live worker/control/review ownership excludes publication. An
+opaque internal proof binds the shared lifecycle transition to these exact inputs;
+no request boolean bypasses admission. Artifact names `candidate/`,
+`candidate-link/` and `cohort/` refer to Git blobs, literal Git symlink targets and
+attributed cohort reports, rather than ordinary files beneath Root.
+
+This initial protocol requires no previously accepted task and a candidate pointer
+still equal to the repository base. Cumulative baselines explicitly refuse with
+`managed-publication-accepted-baseline-unported`: a porting boundary, not an
+operator ceiling or an implicit one-task-per-job rule. `publication-preview` now
+reports first-publication support through `publication_supported`; readiness stays
+false with `managed-publication-write-admission-required` because final admission
+belongs to the protected writer. Preview alone never grants publication permission.
+
+Exact replay verifies the canonical receipt, normalized worker row, originals
+and current accepted state without a provider call, control or debit. Collisions,
+missing evidence and drift refuse. Current native managed review evidence requires
+a real publication and actual Git blobs; generic task update cannot accept a
+merely previewed candidate. Historical worker readers may observe an integrated
+row only with its receipt; physical execution still requires the original ready
+row. Commit and cleanup failures retain causes and known recorded Work coordinates;
+an error does not always establish rollback.
+
+The `native-managed-first-publication` recipe uses isolated inert fixtures only.
+Temporary SQL injection lives in the explicitly invoked Rust test
+`first_publication_sql_rollback_preserves_all_state` on a real retained fixture.
+An unexpected permanent trigger is rejected while opening Root and would not
+establish the intended rollback. Local tests, GLM static review, build-profile
+qualification and installed delivery remain separate evidence. Mission acceptance,
+the global judge and cumulative baselines remain open.
+
+```mermaid
+sequenceDiagram
+    participant S as Supervisor / operator
+    participant R as Native Root
+    participant C as Retained candidate
+    participant D as Canonical SQL
+    S->>R: task publish (task, revision, event)
+    R->>C: Retain and refresh outside SQL
+    R->>D: BEGIN IMMEDIATE, current state/settings
+    R->>R: Originals, cohort, Git, gate, prerequisites, idle owners
+    alt Missing proof or inconsistent write
+        R->>D: Explicit ROLLBACK, retain causes
+        R-->>S: Refusal, no empty success
+    else Admission and writes verified
+        R->>D: Candidate + accepted task + integrated worker + receipt
+        R->>D: COMMIT
+        R-->>S: Recorded publication, no mission acceptance
+    end
+    S->>R: Exact event replay
+    R->>D: Verify receipt and current state
+    R-->>S: Replay without provider or debit
+```
+
+The current reader also matches the full binding, cohort contract, result commit,
+producer and attempt to the actual candidate reread from the private control
+original. A canonical SQL receipt and matching worker row alone are insufficient:
+changing both coordinates still refuses. The retained counterexample exposed an
+unmatched declared binding; `native-managed-publication-current` covers these
+changes and exact restoration.

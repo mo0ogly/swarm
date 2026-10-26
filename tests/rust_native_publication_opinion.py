@@ -61,7 +61,10 @@ def run(binary,profile,out,reuse=None,expected_refusal=False):
         print('MANAGED_NEGATIVE_PREVIEW_REPRODUCED',flush=True);return
     assert value['opinion_state']=='changes_requested' and value['native_original_verified'] and value['current_candidate_verified']
     assert not value['publication_ready'] and not value['task_accepted'] and not value['provider_started']
-    assert value['blockers']==['managed-protected-publication-unported','managed-accepted-baseline-authority-unported','managed-passed-opinion-required']
+    assert value['blockers']==['managed-publication-write-admission-required','managed-passed-opinion-required']
+    denied=call('adverse-publication-refused',['task','publish',work],dict(request,event_id='adverse-publication-'+uuid.uuid4().hex),False)
+    assert 'managed-publication-passed-submission-required' in denied.get('failure',{}).get('causes',[]),denied
+    assert shown('adverse-after-publication')==before and native.finance(root,work)==money and (root/'managed-negative-invoked.json').read_bytes()==marker
     denied=call('adverse-new-review-refused',['task','review',work],dict(request,event_id='adverse-new-review-'+uuid.uuid4().hex),False)
     assert denied.get('failure',{}).get('causes')
     assert shown('adverse-after-new-review')==before and native.finance(root,work)==money and (root/'managed-negative-invoked.json').read_bytes()==marker
@@ -72,7 +75,7 @@ def run(binary,profile,out,reuse=None,expected_refusal=False):
     assert 'publication-preview-managed-repository-required' in denied['failure']['causes']
     assert call('ordinary-after',['work','show',ordinary['id']])['work']==ordinary
     assert shown('managed-after-ordinary')==before and native.finance(root,work)==money and (root/'managed-negative-invoked.json').read_bytes()==marker
-    fixture.publish(out/'result.json',dict(status='PASS',checks=['actual-changes-requested-opinion-observed-with-extra-blocker','adverse-observation-preserves-original-and-consumption','ordinary-work-refuses-without-fallback-or-mutation','adverse-source-observation-never-grants-a-new-review'],root=str(root),work=work,accepted=False,provider_started=False,paid_provider=False,global_watchdog=None))
+    fixture.publish(out/'result.json',dict(status='PASS',checks=['actual-changes-requested-opinion-observed-with-extra-blocker','adverse-observation-preserves-original-and-consumption','ordinary-work-refuses-without-fallback-or-mutation','adverse-source-observation-never-grants-a-new-review','actual-adverse-opinion-never-grants-publication'],root=str(root),work=work,accepted=False,provider_started=False,paid_provider=False,global_watchdog=None))
     print('MANAGED_PUBLICATION_OPINION_PASS',flush=True)
 
 

@@ -1061,19 +1061,19 @@ Aucune erreur inconnue ne devient un résultat vide.
 
 Un succès de lecture expose `native_original_verified` et
 `current_candidate_verified`, les identifiants/empreintes et les tâches de la
-cohorte. `publication_supported`, `publication_ready`, `provider_started` et
-`task_accepted` restent faux : la publication protégée et la preuve d’autorité de
-baseline acceptée restent non portées et sont nommées dans `blockers`. Ces valeurs
-sont des faits de capacité du produit, pas une politique opérateur ou une limite
-de cohorte. Les politiques effectives restent celles enregistrées dans Admin.
+cohorte. `publication_supported` indique le protocole initial sans baseline
+acceptée ; `publication_ready`, `provider_started` et `task_accepted` restent faux.
+`blockers` distingue l’admission finale réservée au writer de la baseline
+cumulative non portée. Ce sont des capacités du produit, pas des politiques
+opérateur ni des plafonds de cohorte. Les valeurs effectives restent celles d’Admin.
 La CLI referme Root avant sa sortie/flush ; une sortie refusée n’autorise aucun
 nouvel appel. Ni identité de reviewer, ni vérité des critères, ni permission ou
 bail de fraîcheur ultérieur ne sont établis. L’acceptation existante reste refusée.
 
 L’acceptation gérée doit aussi publier atomiquement le pointeur candidat et les
 preuves cohérentes de la cohorte ; modifier seulement le statut reproduirait une
-acceptation que la prochaine copie worker ne contient pas. Le contrat Go
-`managed_integration.go` reste la référence de cette frontière à porter.
+acceptation que la prochaine copie worker ne contient pas. Le protocole initial est porté ci-dessous ; le contrat Go
+`managed_integration.go` reste la référence de la baseline cumulative à porter.
 
 ```mermaid
 sequenceDiagram
@@ -1087,5 +1087,83 @@ sequenceDiagram
     R->>R: Comparer cohorte et état courant
     R->>C: Rafraîchir puis fermer explicitement
     R-->>U: Observations vérifiées et blocages explicites
-    Note over R,U: Publication et acceptation restent indisponibles
+    Note over R,U: La prévisualisation seule ne publie ni accepte
 ```
+
+## Première publication native gérée — transaction protégée
+
+`swarm task publish WORK --input REQUEST --root ROOT --json` utilise la même
+ enveloppe native stricte (`schema_version`, `event_id`, `expected_revision`,
+`task_id`). `RootStore::publish_managed_candidate` publie le premier candidat
+vérifié et accepte la tâche soumise dans **une même transaction SQL** : pointeur
+`repository.candidate_commit`, tâche, ligne worker `integrated` et événement
+`managed.publication`. L’événement conserve une requête canonique contenant le
+travail accepté ; `request` et `payload` portent les mêmes octets conformément au
+contrat de stockage existant. Aucun branchement Git consultatif n’est modifié.
+
+Le moteur retient et rafraîchit le candidat hors des verrous SQL, puis exige les
+originaux natifs passés, la cohorte complète, les producteurs/tentatives terminés,
+les politiques courantes, les rapports Git réellement committés, les artefacts,
+le contexte projet, la gate et les prérequis. Il exclut les workers, contrôles et
+revues encore actifs. Une preuve opaque interne lie la transition commune aux
+entrées vérifiées ; aucun booléen de requête ne contourne les contrôles.
+Les noms `candidate/`, `candidate-link/` et `cohort/` désignent des sources typées :
+blobs Git, cible littérale de lien Git et rapports de cohorte attribués. Ils ne
+sont pas interprétés comme des fichiers ordinaires sous la racine.
+
+Le premier protocole exige une baseline initiale sans tâche déjà acceptée et un
+pointeur candidat égal au commit de base. Une baseline cumulative refuse avec
+`managed-publication-accepted-baseline-unported` : c’est une frontière de portage,
+pas un plafond opérateur ni une acceptation implicite d’une seule tâche par job.
+La lecture `publication-preview` annonce désormais `publication_supported` pour
+cette frontière initiale ; `publication_ready` reste faux et le blocage
+`managed-publication-write-admission-required` rappelle que seule la transaction
+protégée réalise l’admission finale. La prévisualisation seule ne constitue jamais une permission de publication.
+
+Un rejeu exact vérifie le reçu canonique, la ligne normalisée, les originaux et
+l’état accepté courant, sans appel fournisseur, contrôle ou débit. Une collision,
+une preuve absente ou une dérive refuse. La lecture d’une preuve de revue native
+gérée exige maintenant la publication réelle et les blobs Git ; `task update`
+ne peut pas accepter directement un candidat seulement prévisualisé. Les
+lecteurs historiques de workers peuvent observer une ligne intégrée uniquement
+avec son reçu ; une nouvelle exécution exige toujours la ligne `ready` originale.
+Les erreurs de commit ou de fermeture conservent leur cause et, lorsqu’il est
+connu, le travail enregistré ; une erreur ne signifie pas toujours rollback.
+
+La recette `native-managed-first-publication` utilise uniquement des fixtures
+inertes isolées. Les injections SQL temporaires résident dans le test Rust nommé
+`first_publication_sql_rollback_preserves_all_state`, lancé explicitement avec
+une fixture réelle ; un trigger permanent étranger serait refusé dès l’ouverture
+et ne prouverait pas le rollback visé. Tests locaux, revue statique GLM,
+qualification du profil et livraison installée restent des preuves distinctes.
+L’acceptation de mission, le juge global et les baselines cumulatives restent ouverts.
+
+```mermaid
+sequenceDiagram
+    participant S as Superviseur / opérateur
+    participant R as Root natif
+    participant C as Candidat retenu
+    participant D as SQL canonique
+    S->>R: task publish (tâche, révision, événement)
+    R->>C: Retenir et rafraîchir hors transaction
+    R->>D: BEGIN IMMEDIATE, état et réglages courants
+    R->>R: Originaux, cohorte, Git, gate, prérequis, propriétaires inactifs
+    alt Preuve manquante ou écriture incohérente
+        R->>D: ROLLBACK explicite, causes conservées
+        R-->>S: Refus, aucun succès vide
+    else Admission et écritures vérifiées
+        R->>D: Candidat + tâche acceptée + worker intégré + reçu
+        R->>D: COMMIT
+        R-->>S: Publication enregistrée, aucune mission acceptée
+    end
+    S->>R: Rejeu du même événement
+    R->>D: Vérifier reçu et état courant
+    R-->>S: Rejeu sans fournisseur ni débit
+```
+
+Le lecteur rapproche aussi empreinte complète, contrat de cohorte, commit résultat,
+producteur et tentative avec le candidat relu dans l’original privé des contrôles.
+Un reçu SQL canonique et une ligne worker cohérents entre eux ne suffisent pas :
+modifier leurs coordonnées ensemble reste refusé. Le contre-exemple conservé
+montrait une empreinte déclarée non rapprochée ; la recette
+`native-managed-publication-current` couvre les altérations et leur restauration.

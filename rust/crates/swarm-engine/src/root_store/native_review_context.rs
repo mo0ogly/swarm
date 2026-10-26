@@ -593,6 +593,7 @@ impl RootStore {
         work: &Work,
         task_id: &str,
         purpose: crate::review_evidence::CurrentReviewUse,
+        settings: &crate::EngineSettingsDocument,
     ) -> Result<(), E> {
         let store = Self::open(root, false)?;
         let result = (|| {
@@ -612,8 +613,11 @@ impl RootStore {
                 }
                 let review = task.independent_review.as_deref()
                     .ok_or(E::Refused("native-review-current-result-required"))?;
-                if review.managed_tasks.is_some() || !review.candidate_commit.is_empty(){
-                    return Err(E::Refused("native-managed-current-review-unported"));
+                if review.managed_tasks.is_some() || !review.candidate_commit.is_empty() {
+                    if purpose != crate::review_evidence::CurrentReviewUse::Acceptance {
+                        return Err(E::Refused("native-managed-current-review-unported"));
+                    }
+                    super::managed_publication::verify_published_current(&store,&tx,&current,task,settings)?;
                 }
                 let observed = store.recorded_native_review(&tx, &work.id, &review.id)?;
                 let applicable = match purpose {

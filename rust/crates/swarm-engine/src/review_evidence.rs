@@ -213,7 +213,7 @@ fn check_review_evidence_policy(
     if native_receipt_reference(&review.receipt) {
         let _settings = settings.ok_or(E::Refused("native-review-current-root-required"))?;
         #[cfg(target_os = "linux")]
-        crate::RootStore::verify_current_native_review(root, work, task_id, purpose)
+        crate::RootStore::verify_current_native_review(root, work, task_id, purpose, _settings)
             .map_err(|e| E::Native(Box::new(e)))?;
         #[cfg(not(target_os = "linux"))]
         return Err(E::Refused("native-review-platform-unported"));
@@ -234,7 +234,7 @@ fn check_review_evidence_policy(
     if review.attempt != latest.id || review.contract != contract {
         return Err(E::Refused("review-attempt-or-contract-stale"));
     }
-    let digest = if planning.repository.is_some() {
+    let digest = if planning.repository.is_some() && !native_receipt_reference(&review.receipt) {
         let settings = settings.ok_or(E::Refused("managed-review-not-ported"))?;
         #[cfg(target_os = "linux")]
         {
@@ -247,6 +247,10 @@ fn check_review_evidence_policy(
             let _ = settings;
             return Err(E::Refused("managed-review-platform-not-ported"));
         }
+    } else if planning.repository.is_some() && native_receipt_reference(&review.receipt) {
+        // The authoritative native publication reader above verified actual Git
+        // blobs, cohort reports and Root artifacts under current saved policy.
+        review.sha256.clone()
     } else {
         for (name, expected) in review.report_artifacts.iter().flatten() {
             let (_, actual) =

@@ -614,18 +614,12 @@ pub(crate) fn verify_worker(
             let row=rows.next()?.ok_or(E::Refused("managed-worker-row-missing"))?;
             (0..7).map(|i|row.get::<_,String>(i).map_err(Into::into)).collect::<Result<Vec<_>,E>>()
         })?;
-        if actual
-            != [
-                work.id.clone(),
-                p.task.clone(),
-                p.base.clone(),
-                p.path.clone(),
-                "ready".into(),
-                String::new(),
-                String::new(),
-            ]
-        {
-            return Err(E::Refused("managed-worker-row-mismatch"));
+        let ready = actual == [work.id.clone(),p.task.clone(),p.base.clone(),p.path.clone(),"ready".into(),String::new(),String::new()];
+        if !ready {
+            if physical || actual[..4] != [work.id.clone(),p.task.clone(),p.base.clone(),p.path.clone()] || actual[4] != "integrated" {
+                return Err(E::Refused("managed-worker-row-mismatch"));
+            }
+            crate::managed_publication_record::integrated(db,work,&agent.id,&p.task,&p.base,&actual[5],&actual[6])?;
         }
         if physical {
             repository(dir, work, settings)?;
