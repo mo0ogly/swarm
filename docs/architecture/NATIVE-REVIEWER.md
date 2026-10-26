@@ -870,6 +870,38 @@ refuse. Les quotas publics persistés/réouverts et leurs validations existantes
 sont utilisés ; aucune constante ou deuxième plafond n'est ajouté. Un refus ou
 une erreur de fermeture conserve ses causes et ne vaut jamais permission.
 
+
+
+## Protocole de citations du candidat en lecture seule
+
+Pour un candidat géré, `task review-inputs` inclut `managed_protocol` dans sa
+réponse et dans le prompt complet. Les entrées ordinaires conservent leur JSON
+sans ce champ. Le protocole contient le contexte typé de la cohorte, son empreinte,
+le catalogue complet de citations, l’empreinte du catalogue et `reply_schema`.
+La version de citations2 et la portée d’inspection1 sont des formats de protocole,
+non des réglages opérateur. Rapports canoniques, dernier essai enregistré,
+producteur de soumission, contrats/politiques et observations du vrai job sont
+attribués à chaque tâche. Leur présence n’authentifie pas un verdict antérieur.
+
+Le catalogue utilise le même producteur d’originaux que le parseur de réponse.
+Chaque source reste reconstituable octet pour octet, y compris les cibles
+littérales des liens. Les métadonnées de cohorte/contrôles restent dans les matériaux attribués et le reçu ; elles ne deviennent pas des preuves sources d’implémentation. Les références proposées au modèle sont filtrées par les
+limites de texte persistées dans Admin/API/CLI ; les originaux ne sont jamais
+tronqués ou retirés du catalogue. Sans référence admissible, le schéma permet
+encore `fail` ou `unknown`, mais pas un `pass` sans preuve. Les limites restent
+exprimées en octets UTF-8, pas en caractères JSON Schema. Le parseur contrôle
+également unicité des tâches/indices, couverture et appartenance des citations ;
+un schéma seul ne prouve ni ces propriétés ni la vérité d’un critère. Pour une tâche sans critère, le schéma demande explicitement une liste vide, tandis que le parseur accepte aussi son absence : une représentation plus stricte, sans autorité supplémentaire. Le minimum de citation normalisée concerne seulement le repli Markdown ; les références du catalogue résolvent d’abord les extraits exacts des originaux.
+
+Le plafond enregistré du prompt comprend le contexte, le catalogue et le schéma,
+avec leur échappement JSON. `source_bytes` conserve son sens : somme des matériaux
+originaux ; les duplications de représentation sont comptées dans le prompt.
+Le contexte indique `inspection_only=true`, sans baseline acceptée fabriquée,
+sans diff Git inventé et sans identifiant de blob déduit d’une empreinte SHA-256.
+Le lancement natif géré, la vérification des verdicts des antécédents acceptés,
+la publication et l’acceptation restent protégés. Une réponse syntaxiquement valide
+reste une donnée, pas une permission ni une acceptation.
+
 ```mermaid
 sequenceDiagram
     participant U as CLI inspection
@@ -880,10 +912,10 @@ sequenceDiagram
     U->>C: Epingle existante et sources brutes
     U->>R: Source courante et cohorte sous snapshot
     U->>C: Textes complets et cibles de liens litterales
-    U->>U: Empreintes et limites persistees sans troncature
+    U->>U: Catalogue commun au parseur et limites persistees
     R-->>U: Snapshot et reglages fermes
     U->>C: Reinspection finale puis fermeture des temoins
-    U-->>U: Projection inspection_only et SHA
+    U-->>U: Protocole inspection_only et SHA
     Note over U,R: Aucun appel reviewer ni acceptation
     U->>R: Demande native task review distincte
     R-->>U: Refus tant que protocole final non raccorde

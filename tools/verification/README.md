@@ -1392,3 +1392,40 @@ notes change during a recipe.
 Les inventaires des quatre recettes Rust PAEA sont complétés sans réécrire les
 preuves antérieures. Le précontrôle et l’instantané figé réparent la méthode de
 vérification ; ils ne prouvent ni installation ni conformité globale.
+
+### Complete managed citation protocol (readonly)
+
+`native-managed-review-protocol.json` retains four public journeys: ordinary
+inputs, ordinary inert reviewer, full managed protocol and nontext refusal. The
+managed protocol helper first runs the12 maintained inspection assertions, then
+four named context/catalogue/schema/saved-Admin-policy assertions. The catalogue
+is reconstructed byte-for-byte; schema shape is checked with jsonschema separately
+from actual parser tests. A public minimum-quote mutation removes all admissible
+pass references without dropping originals; restoration recovers the same prompt.
+Use an immutable normal binary/profile via `SWARM_STATUS_CONTRACT_BINARY` and
+`SWARM_STATUS_CONTRACT_PROFILE`. No paid model, SQL write, global watchdog,
+managed reviewer call, final verdict or acceptance. New saved-quota fixture
+intents use fresh UUID event namespaces when reusing an actual retained Root;
+historical event conflict is a correct product refusal, not a reason to erase it.
+
+La recette complète vérifie le protocole exposé par `task review-inputs`, ses
+empreintes, les originaux reconstitués, les formes de réponse et la consommation
+des réglages Admin avec restauration. Le parseur impose toujours les contraintes
+d’octets et d’unicité ; la projection reste sans autorité de lancement/acceptation.
+Les tests Rust ciblés du module sont exécutés séparément et leur preuve inchangée
+est réutilisée, sans nouvelle compilation dans les quatre parcours publics.
+
+The protocol fixture explicitly configures reviewer prompt quota0 through the
+public API because complete context/catalogue/schema representation bytes count
+against it. Original131072-byte refusal is preserved; no product default changed.
+Saved Admin count requests use their actual decimal-string wire format. The
+no-admissible-reference witness measures both literal and Go-escaped quote bytes
+before choosing its minimum; a decoded quote length alone is insufficient.
+Engine metadata remains in full materials/receipt, outside implementation-source
+originals. Seven targeted protocol tests and the metadata regression run separately.
+
+The managed protocol helper requires Python `jsonschema` for the explicitly
+structural schema checks (tested with the version retained in the increment's
+verification-environment.json). It is a verification dependency only, with no
+new runtime/provider dependency. Rust parser tests remain the authority for the
+actual byte, unique-cohort and quote-membership contract.

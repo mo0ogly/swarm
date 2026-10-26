@@ -24,6 +24,11 @@ pub struct ReviewInputSource {
 pub struct TaskReviewInputs {
     pub preview: super::TaskReviewPreview,
     pub materials: Vec<ReviewInputSource>,
+    /// Managed-only inspection protocol: exact typed context, complete catalogue
+    /// and saved-limit schema. Never permission, historical acceptance or verdict.
+    /// Absent on ordinary inputs to preserve their public wire representation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub managed_protocol: Option<serde_json::Value>,
     pub source_bytes: usize,
     /// Saved v29 transport reply cap; None is explicit unlimited, never absent policy.
     pub response_limit_bytes: Option<usize>,
@@ -261,6 +266,7 @@ pub(super) fn assemble(
     Ok(TaskReviewInputs {
         preview: prepared.preview,
         materials: materials.sources,
+        managed_protocol: None,
         source_bytes: materials.bytes,
         response_limit_bytes: response_limit,
         prompt,
@@ -274,7 +280,7 @@ pub(super) fn assemble(
 /// checked, with original symlink targets quoted without traversal. Saved source,
 /// delivery-file, aggregate-file and prompt limits refuse rather than truncate.
 /// Binary/non-UTF8 files, missing reports, drift or unsupported client windows
-/// refuse before output. No native verdict/reply protocol or invocation is enabled;
+/// refuse before output. The typed citation protocol is inspection data only;
 /// actual cohort final review and accepted-baseline verification remain unported.
 /// Caller owns candidate custody and final outside-lock refresh/checked release.
 pub(super) fn assemble_managed(
@@ -332,8 +338,10 @@ pub(super) fn assemble_managed(
     }
     materials.add("candidate-cohort.json".into(),"engine_controls",serde_json::to_string(candidate.metadata())
         .map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-context-encode",e))))?)?;
-    materials.add("engine-controls.json".into(),"engine_controls",prepared.controls.receipt_json)?;
-    let body=serde_json::json!({"schema_version":1,"inspection_only":true,
+    materials.add("engine-controls.json".into(),"engine_controls",prepared.controls.receipt_json.clone())?;
+    let protocol=super::managed_context::build(&prepared,candidate,reports,&materials.sources)?;
+    let protocol=serde_json::to_value(&protocol).map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-protocol-encode",e))))?;
+    let body=serde_json::json!({"schema_version":1,"inspection_only":true,"managed_protocol":protocol,
         "native_invocation_supported":false,"native_verdict_supported":false,
         "accepted_baseline_verdicts_verified":false,
         "candidate":candidate.metadata(),"tracked_sources":inventory,"tasks":tasks,
@@ -345,7 +353,7 @@ pub(super) fn assemble_managed(
     bounded(prompt.len(),max_prompt,"review-context-bytes-exceeded")?;
     let response_limit=prepared.settings.values.review_response_limit().map_err(E::Settings)?;
     prepared.preview.invocation_context_materialized=true;
-    Ok(TaskReviewInputs{preview:prepared.preview,materials:materials.sources,source_bytes:materials.bytes,
+    Ok(TaskReviewInputs{preview:prepared.preview,materials:materials.sources,managed_protocol:Some(protocol),source_bytes:materials.bytes,
         response_limit_bytes:response_limit,prompt_sha256:crate::provider_configuration::configuration_digest(prompt.as_bytes()),
         prompt,admission_source_sha256:prepared.admission_source_sha256})
 }

@@ -7,17 +7,19 @@ use public operations. A committed link is quoted literally, never traversed;
 Root/untracked private sources stay absent. Optional old-binary refusal records a
 reusable actual fixture. No SQL writes, paid reviewer, acceptance or watchdog.
 """
-import argparse,json,os,traceback
+import argparse,json,os,traceback,uuid
 from pathlib import Path
 import rust_native_managed_validation as native
 import rust_native_review_inputs as ordinary
 from rust_native_task_validation import invoke
 
 
-def run(binary,profile,out,*,reuse=None,before=False,binary_source=False):
+def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context_bytes=None):
     """Run one complete readonly inspection or an explicitly unsupported source.
 
     Existing setup reuse retains actual Root/control originals, not copied state.
+    An explicit context_bytes fixture argument is persisted through public quotas;
+    None keeps its actual saved value, zero means no additional prompt cap.
     Every injected refusal follows a valid applicable witness and restores exact
     bytes/settings. A successful read grants no provider call or verdict.
     """
@@ -31,6 +33,12 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False):
         native.managed.worker.subreaper_scope(lambda:native.managed.run(binary,profile,out/'workers',project_subdir='app',controls=native.CONTROLS,source_entries=entries),lambda error:None,native.managed.parent_death.subreaper)
         birth=json.loads((out/'workers/fixture.json').read_bytes());root=Path(birth['root']);work=birth['work']
     environment=dict(os.environ);environment['CODEX_HOME']=str(root/'codex-home');checks=[]
+    # A reused actual Root retains old quota event IDs; each new journey needs
+    # a fresh fixture namespace, never a replay with changed revision/intent.
+    namespace=uuid.uuid4().hex
+    def set_quotas(label,**patch):
+        """Persist a fresh fixture quota intent without conflicting with history."""
+        return ordinary.quotas(binary,root,out,label+'-'+namespace,work,**patch)
     def call(label,args,value=None):return invoke(binary,root,out,label,args,value,environment=environment)
     def ok(label,args,value=None):
         code,value=call(label,args,value);assert code==0,(label,value);return value
@@ -62,6 +70,7 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False):
         refused=inspect('prior-managed-input-refusal',expected=False)
         assert 'review-managed-candidate-unported' in json.dumps(refused),refused
         fixture.publish(out/'result.json',dict(status='BASELINE_REFUSAL',actual_controls_passed=True,root=str(root),work=work,task_accepted=False));print('MANAGED_REVIEW_BASELINE_REFUSAL');return
+    if context_bytes is not None:set_quotas('explicit-fixture-prompt-cap',review_context_bytes=context_bytes)
     inspect('valid-preview',action='review-preview')
     if binary_source:
         refused=inspect('nontext-refusal',expected=False);assert 'source-utf8-required' in json.dumps(refused),refused
@@ -83,9 +92,9 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False):
         assert not any(n.startswith('cohort/task-2/') for n in sources)
         checks+=['complete-tracked-candidate-and-full-control-cohort','literal-symlink-target-without-traversal','no-root-or-untracked-source-scan','read-only-source-and-control-context']
         for field,reason in [('review_context_files','review-context-files-exceeded'),('review_source_bytes','source-exceeds-configured-cap'),('review_context_bytes','review-context-bytes-exceeded'),('review_delivery_files','review-delivery-files-exceeded')]:
-            inspect(field+'-witness');old=ordinary.quotas(binary,root,out,field+'-save',work,**{field:1})
+            inspect(field+'-witness');old=set_quotas(field+'-save',**{field:1})
             refused=inspect(field+'-refused',expected=False);assert reason in json.dumps(refused),(field,refused)
-            ordinary.quotas(binary,root,out,field+'-restore',work,**{field:old[field]})
+            set_quotas(field+'-restore',**{field:old[field]})
             restored=inspect(field+'-restored');assert restored['prompt_sha256']==inputs['prompt_sha256']
             checks.append(field+'-persisted-refusal-and-restoration')
         saved=(workspace/'tracked.txt').read_bytes();(workspace/'tracked.txt').write_bytes(b'Changed tracked bytes\n')
@@ -97,7 +106,7 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False):
         try:inspect('missing-report',expected=False)
         finally:parked.rename(report)
         assert inspect('report-restored')['prompt_sha256']==inputs['prompt_sha256'];checks.append('missing-report-refuses-and-restores')
-        zero_fields=['review_context_files','review_source_bytes','review_context_bytes','review_delivery_files'];old=ordinary.quotas(binary,root,out,'zero-caps',work,**dict.fromkeys(zero_fields,0));assert inspect('zero-caps-read')['prompt_sha256']==inputs['prompt_sha256'];ordinary.quotas(binary,root,out,'restore-caps',work,**{k:old[k] for k in zero_fields});inspect('caps-restored');checks.append('saved-zero-caps-mean-no-additional-limit')
+        zero_fields=['review_context_files','review_source_bytes','review_context_bytes','review_delivery_files'];old=set_quotas('zero-caps',**dict.fromkeys(zero_fields,0));assert inspect('zero-caps-read')['prompt_sha256']==inputs['prompt_sha256'];set_quotas('restore-caps',**{k:old[k] for k in zero_fields});inspect('caps-restored');checks.append('saved-zero-caps-mean-no-additional-limit')
     state=show('before-native-guard');code,wire=call('actual-review-guard',['task','review',work],dict(schema_version=1,event_id='native-review-still-guarded',expected_revision=state['revision'],task_id='task'));assert code!=0 and 'review-managed-candidate-unported' in json.dumps(wire),wire
     after=show('after-native-guard');assert after==state and after['planning']['reviewer'].get('calls',0)==0 and not any(t.get('independent_review') for t in after['tasks'])
     checks.append('actual-native-review-remains-guarded-without-call-or-acceptance')
@@ -109,10 +118,10 @@ def main():
     """Retain exact helper/normal-profile inputs and original failure channels."""
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ['binary','profile','output']:parser.add_argument('--'+name,type=Path,required=True)
-    parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before',action='store_true');parser.add_argument('--binary-source',action='store_true');a=parser.parse_args();binary=a.binary.resolve();profile=a.profile.resolve();out=a.output.resolve()
+    parser.add_argument('--review-context-bytes',type=int);parser.add_argument('--reuse-from',type=Path);parser.add_argument('--before',action='store_true');parser.add_argument('--binary-source',action='store_true');a=parser.parse_args();binary=a.binary.resolve();profile=a.profile.resolve();out=a.output.resolve()
     inputs=dict(binary=str(binary),binary_sha256=native.fixture.digest(binary.read_bytes()),profile_sha256=native.fixture.digest(profile.read_bytes()),helpers=native.helper_inputs(Path(__file__)),global_watchdog=None)
     try:
-        run(binary,profile,out,reuse=a.reuse_from.resolve() if a.reuse_from else None,before=a.before,binary_source=a.binary_source)
+        run(binary,profile,out,reuse=a.reuse_from.resolve() if a.reuse_from else None,before=a.before,binary_source=a.binary_source,context_bytes=a.review_context_bytes)
         assert native.fixture.digest(binary.read_bytes())==inputs['binary_sha256'] and native.fixture.digest(profile.read_bytes())==inputs['profile_sha256'] and all(native.fixture.digest(Path(n).read_bytes())==h for n,h in inputs['helpers'].items())
         native.fixture.publish(out/'inputs.json',inputs)
     except BaseException:

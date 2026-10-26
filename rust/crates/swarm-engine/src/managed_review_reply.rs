@@ -171,7 +171,11 @@ fn unique_json(raw: &[u8]) -> Result<(), E> {
 /// Preserve actual original kinds and per-task report/control boundaries. A task
 /// contract or engine receipt is not silently relabeled implementation evidence.
 /// Complete diff sections and declared sources remain available across criteria.
-fn originals(
+/// Enumerate every quote original used by the task parser. Protocol assembly
+/// shares this producer so catalogue references and actual task membership use
+/// identical evidence semantics. Reads supplied data only; typed encoding errors
+/// survive and no actor, file, freshness or acceptance is authenticated.
+pub(crate) fn originals(
     context: &ManagedReviewContext,
     task: &ManagedReviewTaskContext,
 ) -> Result<Vec<CitationSource>, E> {

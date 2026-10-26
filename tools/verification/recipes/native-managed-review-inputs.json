@@ -78,7 +78,7 @@
       "command": [
         "python3",
         "-c",
-        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='review-inspection-managed-text-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_native_managed_review_inputs.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE']]\nargs+=[]\nsubprocess.run(args,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS'\nassert len(r['checks'])==12 and not r['accepted'] and not r['reviewer_started']\nprint('INSPECTION_MANAGED_TEXT_PASS '+str(p))"
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='review-inspection-managed-text-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_native_managed_review_inputs.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE']]\nargs+=['--review-context-bytes','0']\nsubprocess.run(args,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS'\nassert len(r['checks'])==12 and not r['accepted'] and not r['reviewer_started']\nprint('INSPECTION_MANAGED_TEXT_PASS '+str(p))"
       ],
       "expected_exit": 0,
       "required_stdout": [

@@ -538,6 +538,10 @@ Le producteur v3, les permissions réelles, les commandes dans le candidat, la r
 
 Le contexte géré en lecture seule est raccordé aux vrais contrôles natifs réussis et au candidat suivi complet. Limites persistées du reviewer, rapports canoniques de cohorte et cibles littérales des liens sont vérifiés sans troncature ni appel fournisseur. Verdict final géré, validité des verdicts des antécédents acceptés, acceptation et publication du pointeur candidat restent ouverts. Voir le [contrat opérationnel](NATIVE-REVIEWER.md#inspection-native-du-candidat-complet-avant-revue-finale) et les [preuves dev84](../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-context-ekf9ibrv/RESULT.md). Le diagramme suivant décrit les contrôles seulement.
 
+### Protocole du validateur en lecture seule
+
+L’inspection gérée expose le contexte typé de cohorte, le catalogue complet des originaux citables et le schéma de réponse v2 sous limites Admin persistées. Les métadonnées moteur gardent leur rôle de données ; elles ne deviennent pas des sources d’implémentation. Les tests du vrai parseur couvrent cette frontière et l’aller-retour JSON public. Le schéma reste un guide : invocation finale native, validité des verdicts des antécédents acceptés, publication et acceptation restent protégées. [Preuves et reprise restante](../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-protocol-2vxq_rki/RESULT.md).
+
 ```mermaid
 sequenceDiagram
     participant O as CLI / conducteur

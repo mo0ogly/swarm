@@ -1,6 +1,7 @@
 //! Read-only native control provenance and reviewer configuration observations.
 //! Complete text inputs are observations; no invocation grant or publication.
 pub(super) mod inputs;
+mod managed_context;
 pub use inputs::{TaskReviewInputs, ReviewInputSource};
 use super::{finished, task_validation, RootStore, RootStoreError as E};
 use serde::Serialize;

@@ -829,6 +829,36 @@ missing/negative values or exceeded limits refuse. Existing public persisted
 quotas/validation are consumed; no constant or second ceiling is added. Refusal
 and close errors retain causes, never permission.
 
+
+
+## Readonly candidate citation protocol
+
+For a managed candidate, `task review-inputs` includes `managed_protocol` in its
+response and complete prompt. Ordinary inputs retain their JSON without this
+field. The protocol contains the typed cohort context and digest, complete
+citation catalogue and digest, and `reply_schema`. Citation version2 and inspection
+scope1 are protocol formats, not operator settings. Each task is attributed to its
+canonical report, latest recorded attempt, submitting producer, task/policy
+contracts and actual job observations. Presence does not authenticate a historical
+verdict.
+
+The catalogue shares the reply parser's original producer. Every source remains
+byte-for-byte reconstructible, including literal symlink targets. Engine cohort/control metadata remains in the attributed materials and receipt; it is not relabeled as implementation source evidence. Proposed
+references are filtered by saved Admin/API/CLI reply text limits; originals are
+never clipped or removed from the catalogue. With no admissible reference the
+schema still permits `fail` or `unknown`, but no unsupported `pass`. Limits remain
+UTF-8 bytes, not JSON Schema characters. The parser also enforces unique tasks and
+criterion indices, coverage and quote membership; a schema alone establishes
+neither those properties nor criterion truth. For a zero-criterion task the schema requires an explicit empty criteria array, while the parser also accepts an omitted array. This is a stricter response representation, without additional acceptance authority. The normalized-quote minimum governs Markdown fallback only; catalogue references resolve exact original excerpts first.
+
+The saved prompt cap includes context, catalogue, schema and JSON escaping.
+`source_bytes` remains the original-material byte sum; representation duplicates
+count in the complete prompt. Context declares `inspection_only=true`, without
+invented accepted baseline, Git diff or blob identifier inferred from SHA-256.
+Native managed invocation, accepted-predecessor verdict applicability, publication
+and acceptance remain guarded. A syntactically valid response remains data, never
+permission or acceptance.
+
 ```mermaid
 sequenceDiagram
     participant U as Inspection CLI
@@ -839,10 +869,10 @@ sequenceDiagram
     U->>C: Pin existing candidate and raw sources
     U->>R: Current source and cohort in snapshot
     U->>C: Complete texts and literal link targets
-    U->>U: Hashes and saved limits without clipping
+    U->>U: Shared parser catalogue and saved limits
     R-->>U: Snapshot and settings closed
     U->>C: Final reinspection then checked custody release
-    U-->>U: inspection_only projection and digest
+    U-->>U: inspection_only protocol and digest
     Note over U,R: No reviewer call or acceptance
     U->>R: Separate native task review request
     R-->>U: Refuse until final protocol is wired

@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Inspection du validateur : contexte typé de cohorte, catalogue complet de citations et schéma de réponse sous limites Admin persistées ; aucun lancement géré ni verdict appliqué.",
+        "en": "Reviewer inspection: typed cohort context, complete citation catalogue and reply schema under saved Admin limits; no managed invocation or applied verdict."
+      },
+      {
         "fr": "Préparations Rust : adoption explicite du brief par CLI/API protégée, contrôle des empreintes brief/besoin, reçus rejouables et historique conservé ; aucune validation du plan ni mission lancée.",
         "en": "Rust preparations: explicit brief adoption through CLI/protected API, matching brief/need fingerprints, replayable receipts and preserved history; no plan approval or mission launch."
       },

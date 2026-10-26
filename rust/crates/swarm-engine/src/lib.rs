@@ -550,6 +550,7 @@ pub use managed_review_files::{check_managed_review_files, ManagedReviewFilesObs
 mod managed_review_context;
 mod managed_review_citations;
 mod managed_review_reply;
+mod managed_review_protocol;
 pub use managed_review_context::{
     decode_managed_review_context, DeliveryCriterion, ManagedDelivery, ManagedReviewBaseline,
     ManagedReviewContext, ManagedReviewTaskContext,

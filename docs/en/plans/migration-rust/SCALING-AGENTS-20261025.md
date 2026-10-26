@@ -249,3 +249,40 @@ pointer publication. Next owner: native controller/reviewer, binding these proof
 to actual reservation, permission, invocation, reply, recovery and authorized
 application. Global S2, S3/S4 and final project RETEX remain open; this increment's
 RETEX does not close them.
+
+
+### Complete citation protocol — validator sources and schema
+
+`task review-inputs` now prepares typed context/digest, the complete catalogue of
+quotable originals/digest, and a citation-v2 whole-cohort reply schema. Saved quote
+limits and the parser share source producers; without an admissible reference,
+fail/unknown remain possible without fabricated pass evidence. Ordinary input
+JSON is preserved.
+
+GLM review: promotion of engine metadata to source evidence was reproduced after
+a valid witness and fixed at the material-role boundary. All metadata bytes remain
+in materials/receipts without becoming implementation evidence. Seven protocol
+tests and one material-boundary test pass, including the real opaque-receipt JSON
+roundtrip. Zero-criterion tasks require an explicit empty array in the schema;
+the parser also accepts absence. Normalized minimum applies only to Markdown
+fallback, not exact literal references.
+
+Public recipe, delivered profile, installation and limits: [report](../../../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-protocol-2vxq_rki/RESULT.md).
+The initial saved131072-byte prompt refusal and recipe defects are retained.
+Fixtures explicitly persist prompt quota0 via the public API; no product default
+or operator cap is silently replaced. The protocol remains inspection_only:
+managed invocation, applicable final reply, historical verdict applicability,
+acceptance/publication and global S2 remain open. Next owner: native controller/
+reviewer, binding protocol to actual reservation/permission/call/reply/recovery
+without removing guards merely because the catalogue can be read.
+
+Verified local delivery: dev91, eight targeted Rust tests, four public recipe
+journeys with verified retained integrity, and12 inspection+4 protocol assertions
+rechecked on the installed binary. Fourteen FR/EN Version checks and preserved
+logical Works/numeric forms. Dev90->dev91 differs only in release notes/metadata;
+unchanged ordinary-flow evidence is reused explicitly. Review lesson for the next
+context: include review_quote.rs (exact vs Markdown fallback) and model_wire.rs
+(GoRaw/canonical serialization) with the context producer and actual parser from
+the first packet; caller-only observations produced an unnecessary conditional
+finding. A leading-newline Git diff remains a dormant shared-producer refusal,
+owner future diff support; current native context explicitly has no diff.

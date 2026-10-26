@@ -276,3 +276,41 @@ suivant appartient au contrôleur/reviewer natif : lier ces preuves au cycle ré
 réservation, permission, appel, réponse, reprise et application autorisée. S2
 global, S3/S4 et RETEX final restent ouverts ; le RETEX de cet incrément ne les
 clôt pas.
+
+
+### Protocole complet de citations — sources et schéma du validateur
+
+`task review-inputs` prépare maintenant le contexte typé et son empreinte, le
+catalogue complet des originaux citables et son empreinte, ainsi que le schéma
+de réponse v2 de toute la cohorte. Limites de citations persistées et parseur
+partagent les mêmes producteurs ; sans référence admissible, fail/unknown restent
+possibles sans preuve pass inventée. Les sources ordinaires gardent leur JSON.
+
+Revue GLM : promotion de métadonnées moteur en sources reproduite après témoin
+valide, puis corrigée sur le rôle des matériaux. Leurs octets restent dans les
+matériaux/reçus, sans devenir des preuves d’implémentation. Sept tests du protocole
+et un test de cette frontière passent, dont le vrai aller-retour JSON avec reçu
+opaque. Le schéma impose une liste vide explicite aux tâches sans critère ; le
+parseur accepte aussi son absence. Le minimum normalisé ne vise que le repli
+Markdown, pas les citations littérales exactes.
+
+Recette publique, profil livré, installation et limites : [rapport](evidence/20261025-scaling-s2-oi9dgo_e/native-review-protocol-2vxq_rki/RESULT.md).
+Le premier refus sous plafond131072 et les défauts de recette restent conservés.
+Pour les fixtures, le quota de prompt est explicitement mis à0 par l’API publique ;
+aucun défaut produit ni plafond opérateur ne disparaît par une constante locale.
+Le protocole demeure inspection_only : invocation gérée, réponse finale applicable,
+preuve des verdicts antérieurs, acceptation/publication et S2 global restent ouverts.
+Prochain propriétaire : contrôleur/reviewer natif ; raccorder ce protocole à toute
+la chaîne de réservation/permission/appel/réponse/reprise sans retirer les gardes
+sur la seule base d’un catalogue lisible.
+
+Livraison locale vérifiée : dev91, huit tests Rust ciblés, quatre parcours de
+recette/intégrité vérifiée et12 assertions d’inspection+4 de protocole revérifiées
+sur le binaire installé. Quatorze contrôles Version FR/EN, Works logiques et formes
+numériques conservés. Dev90->dev91 ne change que notes de version/métadonnées ;
+les preuves ordinaires inchangées sont explicitement réutilisées. Apprentissage
+pour le prochain contexte : fournir dès le premier paquet review_quote.rs
+(citation exacte/repli Markdown) et model_wire.rs (GoRaw/sérialisation canonique),
+avec producteur et vrai parseur ; leur absence avait créé un constat conditionnel
+superflu. Le refus partagé sur diff commençant par une ligne vide reste dormant,
+propriétaire du futur support diff ; le contexte natif courant n’invente aucun diff.

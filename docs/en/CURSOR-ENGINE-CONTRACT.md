@@ -571,6 +571,10 @@ The v3 producer, actual permissions, commands in the candidate, original recover
 
 The readonly managed inspection context is now wired to actual passed native controls and the complete tracked candidate. Saved reviewer limits, canonical cohort reports and literal symlink targets are checked without clipping or provider invocation. Final managed verdicts, accepted-baseline verdict applicability, acceptance and candidate-pointer publication remain open. See the [operational contract](NATIVE-REVIEWER.md#native-complete-candidate-inspection-before-final-review) and [dev84 evidence](../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-context-ekf9ibrv/RESULT.md). The following execution diagram describes controls only.
 
+### Readonly final-review protocol
+
+The managed inspection now exposes typed cohort context, complete quotable-source catalogue and citation-v2 reply schema under saved Admin limits. Engine metadata retains its data role, never relabeled as implementation source; actual parser tests cover this boundary and the public JSON roundtrip. The schema remains guidance: final native invocation, historical accepted-verdict applicability, publication and acceptance stay guarded. [Evidence and remaining work](../plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-protocol-2vxq_rki/RESULT.md).
+
 ```mermaid
 sequenceDiagram
     participant O as CLI / conductor
