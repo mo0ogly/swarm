@@ -3,7 +3,7 @@ use super::{HttpServiceError, RouteBody};
 use http::{header::CONTENT_TYPE, Method, Request};
 use serde::Deserialize;
 use swarm_protection_contract::{
-    check_receipt_documents, compare_documents, resolve_payment_documents, State,
+    check_receipt_documents, compare_documents, inspect_document, resolve_payment_documents, State,
 };
 
 /// The JSON envelope transports original UTF-8 strings without parsing their
@@ -37,6 +37,15 @@ struct ComparisonCheck {
     schema_version: u32,
     before: String,
     after: String,
+}
+
+/// Closed single-document transport; original UTF-8 JSON is a string, never a
+/// server path or authority-bearing object. Version1 is framing only.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct InspectionCheck {
+    schema_version: u32,
+    document: String,
 }
 
 /// Check two supplied UTF-8 documents after outer Host/session/CSRF admission.
@@ -103,6 +112,21 @@ pub(super) fn compare(r: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceErro
     }))
     .map(RouteBody::plain)
     .map_err(HttpServiceError::Json)
+}
+
+/// Inspect one original document after outer native admission and shared
+/// POST/JSON/no-query/input guards. Emit the CLI's exact shared data report with
+/// raw input identity and canonical content, preserving integer text and typed
+/// JSON/representation/encoding causes. No Root IO, policy/clock read, context
+/// authentication, approval validation or effect; nothing is applied or persisted.
+pub(super) fn inspect(r: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceError> {
+    require_json(r)?;
+    let input: InspectionCheck = serde_json::from_slice(r.body()).map_err(HttpServiceError::Json)?;
+    if input.schema_version != 1 {
+        return Err(HttpServiceError::Refused("protection-envelope-version"));
+    }
+    let report = inspect_document(input.document.as_bytes()).map_err(HttpServiceError::Protection)?;
+    serde_json::to_vec(&report).map(RouteBody::plain).map_err(HttpServiceError::Json)
 }
 
 /// Shared POST/JSON/no-query technical transport contract. Caller must already

@@ -445,3 +445,18 @@ resumption](paea/INCREMENT-20.md). No protected assurance added.
 The user then requests committing installed increment20. Isolated Git recording,
 without push or another delivery; dev96 results/limits remain in the
 [increment20 record](paea/INCREMENT-20.md).
+
+
+### Increment21 — exact action inspection
+
+[Direct slice](paea/INCREMENT-21.md): byte-bound shared report, CLI/API and readable
+terms/context/sources from the menu. No approval/effect; preserve canonical
+contracts and qualify all four views.
+
+
+Increment21 installed as **dev101**: **Inspect an action** in the PAEA menu, common
+CLI/API report, exact terms/context/sources/revisions. Nine targeted tests,2,265
+native assertions (four views),48 example journeys/144 downloads,87 native refusals
+and46 live checks/20 assets PASS. [Slice result and retrospective](paea/INCREMENT-21.md)
+retain initial freshness refusal, dev100/dev101 profiles/hashes and review scope.
+No GLM, commit or push. IA3/AC02/humans, E2/E3 and0/17 protected invariants stay open.

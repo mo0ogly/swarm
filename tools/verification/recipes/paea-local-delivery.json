@@ -12,7 +12,9 @@
     "web/trust-native.css",
     "web/paea-payment.html",
     "web/paea-compare.html",
-    "web/paea-examples/v1/*.json"
+    "web/paea-examples/v1/*.json",
+    "web/paea-inspect.html",
+    "schemas/paea/inspection-v1.schema.json"
   ],
   "environment": {},
   "steps": [
@@ -24,7 +26,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "LIVE_PAEA_DELIVERY_VERIFIED 40",
+        "LIVE_PAEA_DELIVERY_VERIFIED 46",
         "fr-dialog-current-PAEA-evolutions",
         "en-dialog-current-PAEA-evolutions",
         "no-browser-errors-or-writes",
@@ -34,7 +36,10 @@
         "en-live-comparison-limits-no-submission",
         "fr-live-receipt-example-links",
         "en-live-comparison-example-links",
-        "en-live-payment-example-links"
+        "en-live-payment-example-links",
+        "en-live-inspection-menu-fields",
+        "fr-live-inspection-limits-no-submission",
+        "en-live-inspection-example-links"
       ],
       "required_stderr": []
     },

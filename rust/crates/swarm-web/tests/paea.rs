@@ -816,3 +816,98 @@ fn paea_example_assets_are_private_exact_and_semantically_usable() {
     assert_eq!(snapshot(&fixture.root), baseline);
     println!("PAEA_EIGHT_PRIVATE_EXAMPLES_USABLE");
 }
+
+/// Inspect both complete domains using the pure shared report, maximum integer
+/// text and empty provenance; exact bytes and all Root files remain unchanged.
+/// An existing receipt control precedes the new operation, without any effect.
+#[test]
+fn paea_inspection_http_matches_shared_exact_content_without_root_mutation() {
+    let fixture = Fixture::new();
+    let baseline = snapshot(&fixture.root);
+    assert_eq!(fixture.call(fixture.request("POST", "/api/v1/protection/receipt-report", serde_json::to_vec(&input(0)).unwrap())).response.status(), StatusCode::OK);
+    for index in [0, 8] {
+        let mut value: Value = serde_json::from_str(input(index)["document"].as_str().unwrap()).unwrap();
+        value["context"]["mandate_revision"] = json!(i64::MAX);
+        value["context"]["policy_revision"] = json!(i64::MAX);
+        for empty in [false, true] {
+            if empty { value["context"]["sources"] = json!([]); }
+            let raw = serde_json::to_string_pretty(&value).unwrap();
+            let expected = swarm_protection_contract::inspect_document(raw.as_bytes()).unwrap();
+            let body = serde_json::to_vec(&json!({"schema_version":1,"document":raw})).unwrap();
+            let reply = fixture.call(fixture.request("POST", "/api/v1/protection/inspect", body));
+            assert_eq!(reply.response.status(), StatusCode::OK);
+            assert!(reply.failure.is_none());
+            assert_eq!(reply.response.body(), &serde_json::to_vec(&expected).unwrap());
+            assert!(expected.canonical.contains("\"mandate_revision\":9223372036854775807"));
+            assert_eq!(expected.effect, "not-established");
+            assert_eq!(expected.approval_validity, "not-established");
+            assert_eq!(snapshot(&fixture.root), baseline);
+        }
+    }
+}
+
+/// Matching valid controls precede admission/framing/strict-document faults;
+/// reject with safe codes and retained typed causes, then recover exact bytes.
+/// The new page remains private and embedded; no file or authority is persisted.
+#[test]
+fn paea_inspection_http_refusals_recover_and_preserve_private_assets() {
+    let fixture = Fixture::new();
+    let baseline = snapshot(&fixture.root);
+    let path = "/api/v1/protection/inspect";
+    let document = input(0)["document"].as_str().unwrap().to_owned();
+    let original = json!({"schema_version":1,"document":document});
+    let raw = serde_json::to_vec(&original).unwrap();
+    for fault in ["cookie","csrf","host","origin","method","query","type","version","duplicate","escaped-duplicate","unknown","wrong-type","invalid-document","inner-float","outer-utf8"] {
+        let control = fixture.call(fixture.request("POST", path, raw.clone()));
+        assert_eq!(control.response.status(), StatusCode::OK, "{fault}");
+        let mut request = fixture.request("POST", path, raw.clone());
+        match fault {
+            "cookie" => {request.headers_mut().remove(COOKIE);},
+            "csrf" => {request.headers_mut().remove("x-swarm-csrf");},
+            "host" => {request.headers_mut().insert(HOST,"outside.invalid".parse().unwrap());},
+            "origin" => {request.headers_mut().insert(ORIGIN,"http://outside.invalid".parse().unwrap());},
+            "method" => {*request.method_mut()=http::Method::GET;},
+            "query" => {*request.uri_mut()=format!("{path}?root=INSPECTION_PRIVATE_CANARY").parse().unwrap();},
+            "type" => {request.headers_mut().remove("content-type");},
+            "duplicate"|"escaped-duplicate" => {
+                let key=if fault=="duplicate"{"schema_version"}else{"\\u0073chema_version"};
+                *request.body_mut()=format!("{{\"{key}\":2,{}",&std::str::from_utf8(&raw).unwrap()[1..]).into_bytes();
+            },
+            "outer-utf8" => {*request.body_mut()=vec![0xff];},
+            _ => {
+                let mut changed=original.clone();
+                match fault {
+                    "version" => changed["schema_version"]=json!(2),
+                    "unknown" => changed["INSPECTION_PRIVATE_CANARY"]=json!(true),
+                    "wrong-type" => changed["document"]=json!({"INSPECTION_PRIVATE_CANARY":true}),
+                    "invalid-document" => changed["document"]=json!("INSPECTION_PRIVATE_CANARY"),
+                    "inner-float" => {
+                        let mut value:Value=serde_json::from_str(&document).unwrap();
+                        value["context"]["policy_revision"]=json!(1.5);
+                        changed["document"]=json!(serde_json::to_string(&value).unwrap());
+                    },
+                    _=>unreachable!(),
+                }
+                *request.body_mut()=serde_json::to_vec(&changed).unwrap();
+            },
+        }
+        let refused=fixture.call(request);
+        let expected=match fault {"cookie"|"csrf"|"host"|"origin"=>StatusCode::FORBIDDEN,"method"=>StatusCode::METHOD_NOT_ALLOWED,_=>StatusCode::BAD_REQUEST};
+        assert_eq!(refused.response.status(),expected,"{fault}");
+        let error=refused.failure.as_ref().unwrap();
+        assert!(!error.to_string().contains("INSPECTION_PRIVATE_CANARY"));
+        assert!(!format!("{error:?}").contains("INSPECTION_PRIVATE_CANARY"));
+        assert!(!String::from_utf8_lossy(refused.response.body()).contains("INSPECTION_PRIVATE_CANARY"));
+        if ["duplicate","escaped-duplicate","unknown","wrong-type","invalid-document","inner-float","outer-utf8"].contains(&fault) {assert!(error.source().is_some(),"{fault}");}
+        assert_eq!(snapshot(&fixture.root),baseline);
+        let recovered=fixture.call(fixture.request("POST",path,raw.clone()));
+        assert_eq!(recovered.response.status(),StatusCode::OK);
+        assert_eq!(recovered.response.body(),control.response.body());
+    }
+    let mut denied=fixture.request("GET","/paea-inspect.html",vec![]);denied.headers_mut().remove(COOKIE);
+    assert_eq!(fixture.call(denied).response.status(),StatusCode::FORBIDDEN);
+    let page=fixture.call(fixture.request("GET","/paea-inspect.html",vec![]));
+    assert_eq!(page.response.status(),StatusCode::OK);
+    assert_eq!(page.response.body(),include_bytes!("../../../../web/paea-inspect.html"));
+    assert_eq!(snapshot(&fixture.root),baseline);
+}

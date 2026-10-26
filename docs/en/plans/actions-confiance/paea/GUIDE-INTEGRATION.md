@@ -136,3 +136,10 @@ All three views provide versioned fictional file pairs to download and explicitl
 select. Help explains receipt sink/state and expected data results; [evidence and
 limits](INCREMENT-20.md). The link triggers no laboratory campaign, project data
 operation or native protection.
+
+
+### Read exact terms — increment21
+
+The menu offers Inspect an action: exact terms, declared context, ordered sources,
+i64 values and shared CLI/API report. [Evidence/limits](INCREMENT-21.md): reading
+prepares an approval request without creating an approver, approval or effect.

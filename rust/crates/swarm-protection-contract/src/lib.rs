@@ -10,6 +10,7 @@
 
 mod canonical;
 mod comparison;
+mod inspection;
 mod payment_registry;
 mod receipt;
 mod strict_json;
@@ -17,6 +18,7 @@ mod types;
 
 pub use canonical::{canonicalize, CanonicalAction};
 pub use comparison::{compare_documents, DocumentComparison, DocumentIdentity};
+pub use inspection::{inspect_document, InspectionReport};
 pub use payment_registry::{resolve_payment_documents, PaymentResolution};
 pub use receipt::{check_receipt_documents, check_receipt_transition, ReceiptReport};
 pub use types::{Action, AdmissionContext, ApprovalBinding, EffectReceipt, Proposal, SourceRef};

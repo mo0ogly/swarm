@@ -507,3 +507,56 @@ not across all eight. After interruption, regenerate and check before building.
 `paea-example-assets.json` checks generation, shapes/links and native admission;
 `paea-native-ux.json` checks completed downloads then actual uploads/checks.
 Results and limits are separate in [increment 20](plans/actions-confiance/paea/INCREMENT-20.md).
+
+
+## Inspect an action — increment21
+
+**PAEA checks → Inspect an action** opens `/paea-inspect.html`. Select one
+`{proposal,context}` document then **Inspect action**. Results expose exact terms,
+declared context and ordered sources. Mandate/policy revisions retain exact i64
+text; amounts stay integer minor-unit strings, with no currency scale inferred.
+Empty sources are explicit. Help/examples stay collapsed; existing fictional
+examples for both domains are reused without implicit loading.
+
+The shared pure `inspect_document` report is consumed by `protection inspect
+--input FILE|- --json` and `POST /api/v1/protection/inspect`. Closed HTTP envelope:
+`{schema_version:1,document:String}`; native Host/session/origin/CSRF, POST JSON,
+no query and the common technical transport bound. CLI keeps incompatible
+Root/server/output/task/phase refusals and opens no Root. Schemas:
+`http-inspection-check-v1.schema.json` and `inspection-v1.schema.json`.
+
+Closed v1 output: `schema_version`, `scope:"offline-data-only"`, `document`
+(raw file SHA256/action digest/intent ID), `canonicalization:"paea-json-v1"`,
+`canonical` (exact UTF-8 text), plus `authority`, `effect`, `approval_validity`
+all `not-established`. RawValue validates text without number conversion; its
+technical crate feature is explicit and introduces no fixture. Canonical bytes,
+action/intent preimages and existing canonicalize output stay unchanged. Request
+key stays outside canonical content while changing raw file identity.
+
+The browser never parses the supplied document. It validates closed report shape,
+markers, uploaded-byte hash and canonical-text hash, then its structured shape.
+Canonical revisions use JSON numeric lexemes for exact display; incapable readers
+refuse and offer CLI. Terms/context/sources render as text, never HTML. Canonical
+content/raw report use separate disclosures; `paea-inspection.json` preserves raw
+report bytes. Editing/refusal clears old terms/sources/canonical/export, retains
+selected files and requires a new explicit gesture.
+
+Decoding/semantic/read/write/flush/HTTP failures preserve existing causes and safe
+public diagnostics; partial output never becomes success. No operator policy,
+retry, current authority, human approval or effect is added. Values may be
+sensitive: a report/hash does not authorize a recipient or authenticate context.
+`paea-inspection.json`, four-view native journeys and actual local evidence:
+[increment21](plans/actions-confiance/paea/INCREMENT-21.md).
+
+Delivered flow:
+
+```mermaid
+flowchart LR
+  File["UTF-8 action document"] --> CLI["protection inspect"]
+  File --> UI["PAEA inspection page"]
+  UI --> API["Native admission + closed envelope"]
+  CLI --> Pure["inspect_document: strict decode + v1 canonical bytes"]
+  API --> Pure
+  Pure --> Report["Raw document hash + canonical text + action/intent identities"]
+  Report --> Output["JSON / readable terms / report download"]
+```

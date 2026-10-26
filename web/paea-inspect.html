@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea.js" defer></script>
+</head>
+<body data-paea-operation="inspect">
+  <a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+  <header>
+    <a href="/">Swarm</a>
+    <h1 data-i18n>Détail d’une action</h1>
+    <nav aria-label="Navigation PAEA">
+      <a href="/" data-i18n>Cockpit</a>
+      <a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a>
+      <button id="paea-theme" type="button" data-i18n>Changer de thème</button>
+    </nav>
+  </header>
+  <main id="paea-main" tabindex="-1">
+    <p data-i18n>Examiner le contenu exact d’une action et son contexte déclaré avant toute demande d’accord.</p>
+    <p id="paea-limits" class="paea-notice" data-i18n>Le document et son contexte ne sont pas authentifiés. Cette inspection ne valide aucun accord et ne produit aucun effet.</p>
+    <details id="paea-format-help"><summary data-i18n>Préparer les fichiers</summary><p data-i18n>Choisir un document contenant une proposition et son contexte. Les termes et les révisions sont affichés exactement ; les sources gardent leur ordre. L’identité et les politiques restent des déclarations non authentifiées.</p></details>
+    <details id="paea-example-help">
+      <summary data-i18n>Exemples fictifs à télécharger</summary>
+      <p data-i18n>Télécharger les fichiers d’un exemple, les sélectionner dans le formulaire, puis lancer la vérification. Aucun fichier n’est chargé et aucune vérification n’est lancée automatiquement.</p>
+      <p data-i18n>Télécharger le document d’action du domaine souhaité, puis le choisir dans le formulaire. Le contenu est fictif ; aucune opération n’est exécutée.</p>
+      <ul>
+        <li><a href="/paea-examples/v1/payment-document.json" download="payment-document.json" data-i18n>Document de l’action — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/git-document.json" download="git-document.json" data-i18n>Document de l’action — promotion Git</a></li>
+      </ul>
+      <p data-i18n>Ces fichiers publics de démonstration ne contiennent aucune donnée de votre projet. Ils ne constituent ni accord authentifié ni preuve d’un effet réel.</p>
+    </details>
+    <form id="paea-form" aria-describedby="paea-limits">
+      <fieldset id="paea-inputs">
+        <legend data-i18n>Document à examiner</legend>
+        <label for="paea-document" data-i18n>Document de l’action — JSON UTF-8</label>
+        <input id="paea-document" type="file" accept=".json,application/json" required>
+      </fieldset>
+      <button id="paea-check" class="paea-primary" type="submit" disabled data-i18n>Examiner l’action</button>
+    </form>
+    <p id="paea-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement de la session…</p>
+    <section aria-labelledby="paea-result-title">
+      <h2 id="paea-result-title" data-i18n>Résultat de l’inspection</h2>
+      <p id="paea-summary"></p>
+      <div id="paea-inspected-content" hidden>
+        <h3 data-i18n>Termes de l’action</h3><dl id="paea-terms"></dl>
+        <h3 data-i18n>Contexte déclaré</h3><dl id="paea-context"></dl>
+        <h3 data-i18n>Sources dans l’ordre</h3><p id="paea-source-empty" hidden data-i18n>Aucune source déclarée.</p><ol id="paea-sources"></ol>
+      </div>
+      <dl id="paea-identities"></dl>
+      <button id="paea-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+      <details><summary data-i18n>Contenu canonique exact</summary><pre id="paea-canonical"></pre></details>
+      <details><summary data-i18n>Rapport technique</summary><pre id="paea-report"></pre></details>
+    </section>
+  </main>
+</body>
+</html>

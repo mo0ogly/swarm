@@ -1,15 +1,15 @@
 'use strict';
-/** PAEA receipt/debt/comparison file UI. Inputs stay exact UTF-8 strings, never parsed as
+/** PAEA receipt/debt/comparison/inspection file UI. Inputs stay exact UTF-8 strings, never parsed as
  * JavaScript numbers. No approval, effect, automatic retry or local storage of
  * documents/receipts; one submit sends them to the authenticated local service.
  */
 (() => {
   const $ = id => document.getElementById(id), t = text => globalThis.SwarmI18n?.t(text) || text;
   const operation = document.body.dataset.paeaOperation;
-  if (!['receipt-report','resolve-payment','compare'].includes(operation)) throw Error('paea-operation-invalid');
-  const payment = operation === 'resolve-payment';
+  if (!['receipt-report','resolve-payment','compare','inspect'].includes(operation)) throw Error('paea-operation-invalid');
+  const payment = operation === 'resolve-payment', inspection = operation === 'inspect';
   const comparison = operation === 'compare', receiptView = operation === 'receipt-report';
-  const emptyMessage = comparison ? 'Sélectionner les deux documents d’action.' : payment ? 'Sélectionner le registre des dettes et la demande de facture.' : 'Sélectionner les fichiers puis renseigner le service et l’état précédent.';
+  const emptyMessage = inspection ? 'Sélectionner le document d’action à examiner.' : comparison ? 'Sélectionner les deux documents d’action.' : payment ? 'Sélectionner le registre des dettes et la demande de facture.' : 'Sélectionner les fichiers puis renseigner le service et l’état précédent.';
   let csrf = '', busy = false, reportRaw = null;
   const states = new Set(['PROPOSED','ADMITTED','APPROVAL_PENDING','AUTHORIZED','COMMIT_REQUESTED',
     'COMMITTED','DENIED','UNKNOWN','RECONCILED_COMMITTED','RECONCILED_NOT_COMMITTED']);
@@ -20,16 +20,17 @@
     reportRaw = null; $('paea-download').disabled = true;
     $('paea-summary').textContent = ''; $('paea-report').textContent = '';
     $('paea-identities').replaceChildren();
+    if(inspection){$('paea-inspected-content').hidden=true;for(const id of ['paea-terms','paea-context','paea-sources','paea-canonical'])$(id).replaceChildren()}
   }
   /** Publish a visible translated state without treating UNKNOWN as success of an effect. */
   function status(kind, message) {
     $('paea-status').dataset.state = kind; $('paea-status').textContent = t(message);
   }
   /** Require exactly one valid UTF-8 file. Fatal decoding prevents byte replacement;
-   * ignoreBOM preserves BOM bytes. JSON is decoded only by the authoritative checker. */
+   * ignoreBOM preserves BOM bytes. Input JSON is decoded only by the authoritative checker. */
   async function readFile(id) {
     const file = $(id).files[0];
-    if (!file) throw Error(t('Sélectionner les deux fichiers JSON.'));
+    if (!file) throw Error(t(inspection?'Sélectionner le fichier JSON.':'Sélectionner les deux fichiers JSON.'));
     const bytes = new Uint8Array(await file.arrayBuffer());
     try { return {text: new TextDecoder('utf-8', {fatal:true, ignoreBOM:true}).decode(bytes), bytes}; }
     catch { throw Error(t('Fichier UTF-8 invalide ; choisir un fichier valide.')); }
@@ -151,6 +152,47 @@
     $('paea-report').textContent=raw;reportRaw=raw;$('paea-download').disabled=false;
     status('success','Comparaison structurelle vérifiée. Aucun accord validé.');
   }
+  /** Validate the closed data report and exact original/canonical byte hashes.
+   * Canonical revisions are read from numeric lexemes for display, never rounded.
+   * Schema/shape checks establish no authenticity; unsupported exact-number reading
+   * refuses before rendering/export and directs the user to CLI inspection. */
+  async function validateInspection(value, document) {
+    const invalid=()=>Error(t('Rapport invalide ou différent des fichiers fournis.'));
+    if(!exact(value,['schema_version','scope','document','canonicalization','canonical','authority','effect','approval_validity'])||value.schema_version!==1||value.scope!=='offline-data-only'||value.canonicalization!=='paea-json-v1'||typeof value.canonical!=='string'||
+      !exact(value.document,['document_sha256','action_digest','intent_id'])||!Object.values(value.document).every(hash)||['authority','effect','approval_validity'].some(k=>value[k]!=='not-established'))throw invalid();
+    if(value.document.document_sha256!==await digest(document.bytes)||value.document.action_digest!==await digest(new TextEncoder().encode(value.canonical)))throw invalid();
+    const data=JSON.parse(value.canonical,(key,number,context)=>{
+      if(!['mandate_revision','policy_revision'].includes(key))return number;
+      if(typeof number!=='number')throw invalid();
+      if(!context?.source)throw Error(t('Ce navigateur ne conserve pas exactement les nombres de cette preuve. Utilisez le CLI.'));
+      if(!/^[1-9][0-9]*$/.test(context.source)||BigInt(context.source)>9223372036854775807n)throw invalid();
+      return context.source;
+    });
+    if(!exact(data,['schema_version','canonicalization','action','context'])||data.schema_version!==1||data.canonicalization!=='paea-json-v1')throw invalid();
+    const a=data.action,c=data.context,keys=a?.kind==='payment.settle'?['kind','invoice_id','invoice_version','amount_minor','currency','beneficiary_account_id']:a?.kind==='repository.promote'?['kind','repository_id','target_ref','expected_old_oid','candidate_oid']:null;
+    if(!keys||!exact(a,keys)||!Object.values(a).every(v=>typeof v==='string')||!keys.every(k=>Object.hasOwn(comparisonFields,'/action/'+k))||
+      !exact(c,['project_id','principal_id','instance_id','mandate_id','mandate_revision','policy_revision','policy_digest','tool_manifest_digest','sources'])||
+      !['project_id','principal_id','instance_id','mandate_id','mandate_revision','policy_revision'].every(k=>typeof c[k]==='string')||!hash(c.policy_digest)||!hash(c.tool_manifest_digest)||!Array.isArray(c.sources)||
+      !c.sources.every(s=>exact(s,['source_id','version','digest','integrity','confidentiality_labels'])&&typeof s.source_id==='string'&&typeof s.version==='string'&&hash(s.digest)&&Number.isInteger(s.integrity)&&s.integrity>=0&&s.integrity<=3&&Array.isArray(s.confidentiality_labels)&&s.confidentiality_labels.every((v,i)=>typeof v==='string'&&(i===0||s.confidentiality_labels[i-1]<v))))throw invalid();
+    return data;
+  }
+  /** Render validated exact terms/context and ordered sources as text, with the
+   * untouched canonical string and raw report behind disclosures. Revision text
+   * remains exact; this enables only download, never approval or execution. */
+  function renderInspection(value, raw, data) {
+    const add=(id,label,text)=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t(label);dd.textContent=text;$(id).append(dt,dd)};
+    const kind=data.action.kind==='payment.settle'?'Règlement fictif':'Promotion Git';
+    $('paea-summary').textContent=t(kind);
+    for(const [key,text]of Object.entries(data.action))add('paea-terms',comparisonFields['/action/'+key],key==='kind'?t(kind):text);
+    for(const [key,text]of Object.entries(data.context))if(key!=='sources')add('paea-context',comparisonFields['/context/'+key],text);
+    $('paea-source-empty').hidden=data.context.sources.length!==0;$('paea-sources').hidden=data.context.sources.length===0;
+    for(const source of data.context.sources){const li=document.createElement('li');li.textContent=source.source_id+' · '+source.version+'\n'+source.digest+'\n'+t('Intégrité déclarée')+' : '+source.integrity+'\n'+t('Labels de confidentialité déclarés')+' : '+(source.confidentiality_labels.length?source.confidentiality_labels.join(' · '):t('Aucun label déclaré'));$('paea-sources').append(li)}
+    for(const [label,text]of [['Empreinte du document',value.document.document_sha256],['Empreinte de l’action',value.document.action_digest],['Identité de l’intention',value.document.intent_id]])add('paea-identities',label,text);
+    $('paea-canonical').textContent=value.canonical;$('paea-inspected-content').hidden=false;
+    $('paea-report').textContent=raw;reportRaw=raw;$('paea-download').disabled=false;
+    status('success','Contenu structurel vérifié. Aucun accord validé.');
+  }
+
   /** Render only bounded textual terms from a validated data report. The integer
    * amount is displayed in minor units, without inventing a currency scale. */
   function renderPayment(value, raw) {
@@ -189,8 +231,8 @@
     try {
       const previous = receiptView ? $('paea-state').value : null;
       if (receiptView && !states.has(previous)) throw Error(t('Choisir un état précédent.'));
-      const [document, receipt] = await Promise.all(comparison ? [readFile('paea-before'),readFile('paea-after')] : payment ? [readFile('paea-registry'),readFile('paea-request')] : [readFile('paea-document'),readFile('paea-receipt')]);
-      const body = comparison ? {schema_version:1,before:document.text,after:receipt.text} : payment ? {schema_version:1,registry:document.text,request:receipt.text} :
+      const [document, receipt] = await Promise.all(inspection ? [readFile('paea-document')] : comparison ? [readFile('paea-before'),readFile('paea-after')] : payment ? [readFile('paea-registry'),readFile('paea-request')] : [readFile('paea-document'),readFile('paea-receipt')]);
+      const body = inspection ? {schema_version:1,document:document.text} : comparison ? {schema_version:1,before:document.text,after:receipt.text} : payment ? {schema_version:1,registry:document.text,request:receipt.text} :
         {schema_version:1,document:document.text,receipt:receipt.text,expected_sink:$('paea-sink').value,previous_state:previous};
       const response = await fetch('/api/v1/protection/'+operation, {method:'POST',cache:'no-store',
         headers:{'Content-Type':'application/json','X-Swarm-CSRF':csrf},
@@ -204,7 +246,8 @@
         const code = value?.failure?.code;
         throw Error(t('Vérification refusée') + (typeof code === 'string' && /^[a-z0-9_-]+$/.test(code) ? ' · ' + code : ''));
       }
-      if (payment) { await validatePayment(value,document,receipt); renderPayment(value,raw); }
+      if (inspection) { const content=await validateInspection(value,document); renderInspection(value,raw,content); }
+      else if (payment) { await validatePayment(value,document,receipt); renderPayment(value,raw); }
       else if (comparison) { await validateComparison(value,document,receipt); renderComparison(value,raw); }
       else { await validate(value,document,receipt,previous); render(value,raw); }
     } catch (error) {
@@ -215,7 +258,7 @@
   function download() {
     if (reportRaw === null || busy) return;
     const url = URL.createObjectURL(new Blob([reportRaw], {type:'application/json'}));
-    const link = document.createElement('a'); link.href = url; link.download = comparison ? 'paea-comparison.json' : payment ? 'paea-payment-resolution.json' : 'paea-receipt-report.json';
+    const link = document.createElement('a'); link.href = url; link.download = inspection ? 'paea-inspection.json' : comparison ? 'paea-comparison.json' : payment ? 'paea-payment-resolution.json' : 'paea-receipt-report.json';
     link.click(); URL.revokeObjectURL(url);
   }
   /** Bootstrap the existing protected native session. Failure keeps submit blocked

@@ -5,12 +5,12 @@ use std::{
     path::Path,
 };
 use swarm_protection_contract::{
-    canonicalize, check_receipt_documents, check_receipt_transition, compare_documents,
+    canonicalize, check_receipt_documents, check_receipt_transition, compare_documents, inspect_document,
     decode_document, decode_receipt, resolve_payment_documents, State, SCHEMA_VERSION,
 };
 
 /// Read bounded documents through the existing CLI input mechanism and emit
-/// canonical bytes/digests, a comparison, payment resolution, proposed receipt transition or exact-input report. All
+/// canonical bytes/digests, exact action inspection, a comparison, payment resolution, proposed receipt transition or exact-input report. All
 /// supplied context/receipt/state/sink data remain untrusted, explicitly marked
 /// in output. Reject incompatible runtime/root/server/output options; no Root is opened,
 /// no credential is read and no policy is saved. Input/parse/encode/output/flush
@@ -52,7 +52,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         write_output(out, &bytes)?;
         return Ok(0);
     }
-    if a.pos.len() != 2 || a.pos[1] != "canonicalize" || a.input.is_empty() {
+    if a.pos.len() != 2 || !matches!(a.pos[1].as_str(), "canonicalize" | "inspect") || a.input.is_empty() {
         return Err(CliError::Usage);
     }
     let raw = (if a.input == "-" {
@@ -61,6 +61,13 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         swarm_engine::read_command_file(Path::new(&a.input))
     })
     .map_err(CliError::CommandInput)?;
+    if a.pos[1] == "inspect" {
+        let report = inspect_document(&raw).map_err(CliError::Protection)?;
+        let bytes = serde_json::to_vec(&report)
+            .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;
+        write_output(out, &bytes)?;
+        return Ok(0);
+    }
     let document = decode_document(&raw).map_err(CliError::Protection)?;
     let action =
         canonicalize(&document.proposal, &document.context).map_err(CliError::Protection)?;

@@ -44,7 +44,10 @@
     "internal/engine/testdata/*.json",
     "tests/fixtures/*.json",
     "web/lib/**/*",
-    "web/paea-examples/v1/*.json"
+    "web/paea-examples/v1/*.json",
+    "web/paea-inspect.html",
+    "rust/crates/swarm-cli/tests/protection_inspection.rs",
+    "tests/paea_inspection_schema_test.py"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
@@ -80,7 +83,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "8 passed; 0 failed",
+        "10 passed; 0 failed",
         "paea_http_exact_both_domains_and_unknown_are_data_only",
         "paea_http_refusal_recovery_and_private_menu_assets",
         "paea_payment_http_exact_resolution_and_integer_bytes_are_data_only",
@@ -88,7 +91,9 @@
         "paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover",
         "paea_comparison_http_matches_shared_report_and_preserves_root",
         "paea_comparison_http_refusals_recover_without_root_mutation",
-        "paea_example_assets_are_private_exact_and_semantically_usable"
+        "paea_example_assets_are_private_exact_and_semantically_usable",
+        "paea_inspection_http_matches_shared_exact_content_without_root_mutation",
+        "paea_inspection_http_refusals_recover_and_preserve_private_assets"
       ],
       "required_stderr": []
     }

@@ -13,7 +13,7 @@ button{min-height:44px;padding:.65rem;font:inherit;border:1px solid var(--wattso
 button:disabled{opacity:.65;cursor:default}
 :focus-visible{outline:3px solid var(--wattson-accent);outline-offset:3px}
 .paea-notice{padding:.8rem;border-inline-start:4px solid var(--wattson-lien);background:var(--wattson-carte)}
-#paea-status,#paea-summary,dt,dd,pre{overflow-wrap:anywhere;white-space:pre-wrap}
+#paea-status,#paea-summary,dt,dd,pre,#paea-sources li{overflow-wrap:anywhere;white-space:pre-wrap}
 dt{font-weight:600;margin-block-start:.75rem}dd{margin:.25rem 0;font-family:monospace}
 pre{max-height:28rem;overflow:auto}
 summary{cursor:pointer;min-height:44px;padding-block:.7rem}

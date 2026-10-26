@@ -550,3 +550,61 @@ interruption, régénérer puis vérifier avant build. La recette
 `paea-example-assets.json` vérifie génération, schémas/liens et admission native ;
 les téléchargements puis uploads/vérifications réels sont dans `paea-native-ux.json`.
 Les résultats et limites restent séparés dans [l’incrément 20](../plans/actions-confiance/paea/INCREMENT-20.md).
+
+
+## Examiner une action — incrément21
+
+**Vérifications PAEA → Examiner une action** ouvre `/paea-inspect.html`. Choisir
+un document `{proposal,context}` puis **Examiner l’action**. Le résultat expose les
+termes exacts, le contexte déclaré et les sources dans leur ordre. Les révisions
+de mandat/politique gardent leur entier i64 exact, le montant reste une chaîne en
+unités mineures. Aucun facteur monétaire n’est déduit de la devise. Des sources
+absentes sont indiquées explicitement. L’aide et les exemples restent repliés ;
+les exemples existants des deux domaines sont réutilisés, sans chargement implicite.
+
+Le rapport v1 de `inspect_document` est commun à `protection inspect --input
+FICHIER|- --json` et `POST /api/v1/protection/inspect`. Enveloppe HTTP fermée :
+`{schema_version:1,document:String}`, gardes Host/session/origin/CSRF natives,
+POST JSON, aucune query et borne technique partagée. La CLI garde les refus des
+options Root/server/output/task/phase incompatibles et ne crée pas de Root.
+Schémas : `http-inspection-check-v1.schema.json` et `inspection-v1.schema.json`.
+
+La sortie fermée contient `schema_version`, `scope:"offline-data-only"`,
+`document` (SHA256 du fichier brut, empreinte d’action, ID d’intention),
+`canonicalization:"paea-json-v1"`, `canonical` (texte UTF-8 exact) et les trois
+marqueurs `authority`, `effect`, `approval_validity` à `not-established`.
+`RawValue` vérifie le texte sans conversion numérique ; sa feature technique est
+explicitement déclarée dans le crate, sans fixture. Les octets canoniques, les
+préimages action/intention et l’ancien résultat `canonicalize` ne changent pas.
+La clé de tentative reste hors du canonique, mais modifie le hash du fichier brut.
+
+Le navigateur ne parse pas le document fourni. Il vérifie la forme fermée du
+rapport, les marqueurs, le hash des octets fournis et celui du texte canonique,
+puis sa forme structurée. Il lit les révisions canoniques par leur lexème JSON
+pour les afficher sans arrondi ; un navigateur sans cette capacité refuse et
+propose la CLI. Termes/contexte/sources sont rendus comme texte, jamais comme HTML.
+Le canonique et le rapport brut sont accessibles derrière des aides distinctes ;
+le téléchargement `paea-inspection.json` conserve le rapport original. Une erreur
+ou modification efface termes, sources, canonique et export antérieurs ; les
+fichiers restent sélectionnés et une nouvelle tentative exige un geste explicite.
+
+Décodage, sémantique, lecture/écriture/flush et livraison HTTP gardent les causes
+existantes et un diagnostic public sûr ; aucun rapport partiel n’est présenté
+comme succès. Pas de politique opérateur, retry, autorité courante, accord humain
+ou effet ajouté. Les valeurs peuvent être sensibles : la lecture d’un rapport et
+ses hashes ne remplacent pas l’autorisation de son destinataire ni l’attribution
+du contexte. Recette `paea-inspection.json`, parcours natif à quatre vues et preuve
+locale : [incrément21](../plans/actions-confiance/paea/INCREMENT-21.md).
+
+Flux livré :
+
+```mermaid
+flowchart LR
+  File["Document d’action UTF-8"] --> CLI["protection inspect"]
+  File --> UI["Page d’inspection PAEA"]
+  UI --> API["Admission native + enveloppe fermée"]
+  CLI --> Pure["inspect_document : décodage strict + octets canoniques v1"]
+  API --> Pure
+  Pure --> Report["Hash du document brut + canonique + identités action/intention"]
+  Report --> Output["JSON / termes lisibles / téléchargement du rapport"]
+```

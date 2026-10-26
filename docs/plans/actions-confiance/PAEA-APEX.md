@@ -478,3 +478,19 @@ compilation du reviewer parallèle (`Capture::new`, tentative dev97) reste ouver
 L’utilisateur demande ensuite le commit de la tranche20 livrée. Enregistrement
 Git isolé, sans push ni nouvelle livraison ; les résultats dev96 et les limites
 restent ceux du [suivi20](paea/INCREMENT-20.md).
+
+
+### Incrément 21 — inspection exacte d’une action
+
+[Tranche directe](paea/INCREMENT-21.md) : rapport commun lié aux octets, CLI/API
+et lecture des termes/contexte/sources depuis le menu. Aucun accord ni effet ;
+contrats canoniques antérieurs conservés et quatre vues à qualifier.
+
+
+Incrément21 installé en **dev101** : **Examiner une action** depuis le menu PAEA,
+rapport CLI/API commun, termes/contexte/sources et révisions exactes. Neuf tests
+ciblés, 2 265 assertions natives (quatre vues),48 parcours exemples/144 téléchargements,
+87 refus natifs et46 contrôles réels/20 ressources PASS. [Résultats et RETEX du lot](paea/INCREMENT-21.md)
+conservent refus de fraîcheur initial, profils/hashes dev100/dev101 et portée de la
+revue. Sans GLM, commit ou push. IA3/AC-02/humains, E2/E3 et0/17 invariants protégés
+restent ouverts.

@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "PAEA : examiner une action depuis le menu, lire ses termes exacts, son contexte déclaré et ses sources ordonnées ; empreintes et rapport commun CLI/API téléchargeable, sans accord ni effet.",
+        "en": "PAEA: inspect an action from the menu, read exact terms, declared context and ordered sources; hashes and shared CLI/API report download, without approval or effect."
+      },
+      {
         "fr": "Reviewer natif géré : appel de cohorte avec candidat retenu, protocole et limites d’origine conservés, contexte adressé par contenu et reprise sans nouvel appel ; aucune acceptation de tâche.",
         "en": "Managed native reviewer: cohort invocation under retained candidate custody, original protocol/limits, content-addressed context and recovery without another call; no task acceptance."
       },

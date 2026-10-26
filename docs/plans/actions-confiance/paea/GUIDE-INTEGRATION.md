@@ -147,3 +147,10 @@ Les trois vues proposent des paires de fichiers fictifs versionnés, à téléch
 puis sélectionner explicitement. L’aide précise le service/état du reçu et les
 résultats attendus ; [preuves et limites](INCREMENT-20.md). Aucune campagne de
 laboratoire, donnée de projet ou protection native n’est déclenchée par le lien.
+
+
+### Lire les termes exacts — incrément21
+
+Le menu propose Examiner une action : termes, contexte déclaré et sources ordonnées,
+i64 exacts et rapport commun CLI/API. [Preuves/limites](INCREMENT-21.md) : cette
+lecture prépare la demande d’accord, sans créer d’approbateur, d’accord ou d’effet.

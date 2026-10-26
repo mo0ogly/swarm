@@ -1476,3 +1476,26 @@ empty inputs until explicit selection, actual successful uploads and no authorit
 protected asset byte sets, with translated example links in all three views.
 No live document submission, automatic form fill, paid call, retry or watchdog.
 Run/verify in fresh evidence; snapshots retain their actual declared inputs.
+
+### PAEA exact action inspection / Inspection exacte (increment21)
+
+`paea-inspection.json` selects two schema tests, three pure core tests, two public
+CLI tests and two exact native HTTP inspection tests on an isolated declared-input
+snapshot. All frozen canonical identities, exact i64, source order/empty state,
+strict refusals, safe original causes, recovery and unchanged Root are asserted.
+The existing canonicalize seven-field output stays unchanged. Technical
+serde_json raw_value is explicit; no fixture or authority is introduced.
+
+Complete HTTP manifests now expect **10** tests, without rewriting earlier runs.
+`paea-native-ux.json` requires **12 configurations per view, four views**, **48
+example journeys** and **87 real expected native refusals** (old62 +24 inspection
+JSON refusals +1 original BOM refusal). Inspection checks exact CLI/API/download
+bytes, i64 terms/context, ordered/empty sources, stale-output clearing and recovery.
+Browser-only corruption/unsupported-reader cases are separate from native evidence;
+invalid UTF8 must never be sent. Valid controls precede faults. Existing script-loss
+supervision stays required; no global watchdog or live business fixture.
+
+`paea-local-delivery.json` now requires **46 read-only assertions** and **20 exact
+protected asset sets**, including the empty inspection/menu/examples/limits in
+FR/EN and actual Version/notes/commit/dirty/focus. It submits no business document.
+Results remain in increment21, distinct from protected assurance or acceptance.

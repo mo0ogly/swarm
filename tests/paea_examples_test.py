@@ -58,11 +58,11 @@ class Examples(unittest.TestCase):
                 schema = {'$schema': parent['$schema'], '$defs': parent['$defs'], '$ref': schema['$ref']}
             Draft202012Validator(schema).validate(value)
 
-    def test_all_three_disclosures_link_only_exact_versioned_downloads_with_english(self):
+    def test_all_four_disclosures_link_only_exact_versioned_downloads_with_english(self):
         """No live data URL, path selection or missing labels in example download help."""
         seen = set()
         translations = json.loads((ROOT / 'locales/en.json').read_text())
-        for page, count in [('paea.html', 4), ('paea-payment.html', 2), ('paea-compare.html', 4)]:
+        for page, count in [('paea.html', 4), ('paea-payment.html', 2), ('paea-compare.html', 4), ('paea-inspect.html', 2)]:
             parser = ExampleLinks()
             parser.feed((ROOT / 'web' / page).read_text())
             self.assertEqual(len(parser.links), count)
