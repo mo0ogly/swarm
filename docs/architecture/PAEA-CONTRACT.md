@@ -461,3 +461,14 @@ documents dans le navigateur, réglage opérateur ou nouveau plafond métier.
 
 Ce raccord ne livre pas un registre protégé : authentification, continuité des
 IDs, fraîcheur, approbateur humain et engagement effectif restent PA-02/03.
+
+### Refus JSON et octets d’entrée — vérifications maintenues
+
+La version d’enveloppe doit être un entier ; les champs dupliqués sont refusés
+même si leurs valeurs divergent ou si la clé utilise un échappement JSON. Les
+messages publics et corps de refus gardent un code sûr ; la cause JSON typée
+reste disponible au consommateur interne, sans exposer les valeurs reçues.
+Une révision au-delà d’i64 refuse, sans arrondi. Un BOM initial n’est pas retiré
+par le navigateur : transporté tel quel, il est refusé par le décodeur JSON.
+Les recettes `paea-glm-regressions.json` et `paea-invoice-encoding.json` gardent
+ces cas, leurs témoins valides et leurs reprises ; voir [incrément 18](../plans/actions-confiance/paea/INCREMENT-18.md).

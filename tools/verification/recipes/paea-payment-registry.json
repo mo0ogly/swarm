@@ -38,7 +38,12 @@
     ".claude/skills/**/*",
     "version_history.json",
     "rust/crates/swarm-cli/tests/protection_payment.rs",
-    "tests/paea_payment_schema_test.py"
+    "tests/paea_payment_schema_test.py",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
@@ -74,13 +79,14 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "6 passed; 0 failed",
+        "7 passed; 0 failed",
         "aliases_converge_and_supplier_references_remain_distinct",
         "corrected_terms_preserve_intent_and_change_content",
         "ambiguous_ids_and_supplier_aliases_refuse_then_recover",
         "project_staleness_unknown_and_empty_registry_refuse",
         "invalid_registry_and_request_values_never_produce_a_proposal",
-        "strict_raw_bytes_and_non_authority_markers_are_preserved"
+        "strict_raw_bytes_and_non_authority_markers_are_preserved",
+        "strict_i64_overflow_and_bom_refuse_with_causes_then_recover"
       ],
       "required_stderr": []
     },

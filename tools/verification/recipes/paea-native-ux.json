@@ -13,7 +13,9 @@
     "web/paea-payment.html",
     "tests/fixtures/paea/payment-*.json"
   ],
-  "environment": {},
+  "environment": {
+    "SWARM_PAEA_NATIVE_SCOPE": "full"
+  },
   "steps": [
     {
       "id": "real-native-browser-flow",
@@ -30,7 +32,13 @@
         "payment-unsupported-number-reader-refuses",
         "payment-invalid-utf8-never-sent",
         "payment-no-duplicate-gesture",
-        "en-sombre-320-payment-primary-contrast-AA"
+        "en-sombre-320-payment-primary-contrast-AA",
+        "payment-registry-bom-preserved-and-native-refused",
+        "payment-registry-bom-native-recovery",
+        "payment-request-bom-preserved-and-native-refused",
+        "payment-request-bom-native-recovery",
+        "exactly-thirty-eight-native-refusals",
+        "PAEA_NATIVE_UI_PASS 458 assertions"
       ],
       "required_stderr": []
     },

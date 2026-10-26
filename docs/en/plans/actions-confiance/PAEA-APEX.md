@@ -391,3 +391,15 @@ PAEA changes remain uncommitted; protected registries/approvals and E2/E3 open.
 Publication requested on 26 October: isolated increments-16/17 commit, without
 push or a new delivery; see the publication follow-up at the end of report 17.
 The precommit statements above retain their historical scope.
+
+### Increment 18 — GLM resumed
+
+“reprends glm” authorizes a targeted internal contribution on delivered invoice
+resolution/API/UI contracts. [Criteria and follow-up](paea/INCREMENT-18.md): each
+finding must be reproduced or refuted, then corrected/verified when justified.
+Protected handoffs and assurance limits remain open.
+
+Increment 18 verified: one complete GLM contribution, two new exact Rust tests
+PASS on stable frozen inputs, 28 native encoding assertions PASS. Four recipe
+inventories corrected; no established product defect, product change or new
+installation attributed to this slice. Full suites/protected guarantees stay open.

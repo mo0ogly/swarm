@@ -1280,9 +1280,9 @@ l'assemblage ; aucune sortie de processus ni preuve d'acceptation n'est inventé
 
 ### PAEA debt resolution and local delivery
 
-`paea-payment-registry.json` checks four schema cases, six pure resolution tests,
+`paea-payment-registry.json` checks four schema cases, seven pure resolution tests,
 three public CLI tests (including write/flush causes), and the existing 17 v1
-contract/eight CLI regressions: 38 named tests, without a global watchdog.
+contract/eight CLI regressions: 39 named tests, without a global watchdog.
 `paea-pilot-lab.json` now checks eight cases, including unresolved aliases as a
 retained two-effect counterexample and resolved aliases as one cooperative effect.
 
@@ -1352,3 +1352,43 @@ valid control still precedes its browser-only script failure. No live data POST.
 The old component recipe remains a labelled HTTP double; its cockpit navigation
 expectation now matches the independently verified increment-15 change. Native
 UI and local-delivery proofs remain distinct from component tests and protection.
+
+### PAEA GLM follow-up / Suite de revue GLM (increment 18)
+
+`paea-glm-regressions.json` selects two exact named Rust integration tests:
+canary/type and divergent/escaped duplicate envelope fields on both protected
+PAEA routes, then i64 overflow and original BOM refusal on registry/request.
+Valid controls precede each mutation, safe Display/Debug/HTTP bodies retain the
+original typed cause, recovery returns exact previous data and Root bytes stay
+unchanged. This checks existing behavior; no product fix or authority is implied.
+The complete HTTP recipes now require five tests; the registry target has seven.
+The full browser recipe requires 12 cases per view and 38 real expected refusals
+(including the two BOM cases); prior increment results retain their old counts.
+
+`paea-invoice-encoding.json` explicitly selects `payment-encoding` in the same
+maintained native browser test. Supply `SWARM_PAEA_TEST_BINARY`, its observed
+`SWARM_PAEA_TEST_BINARY_SHA256`, and a fresh `SWARM_PAEA_UI_EVIDENCE`. It starts
+an isolated Root with that existing normal-profile binary, checks the embedded
+PAEA script against current exact bytes, exercises one actual menu/download
+journey, then proves both uploaded BOMs survive transport and receive native
+refusals followed by recovery. It does not qualify all receipt/presentation
+cases or unrelated asset changes. The ordinary full recipe explicitly selects
+`full`; a caller's encoding selection cannot turn it into a partial pass.
+No live POST, build, provider call, retry or global watchdog is added.
+
+La revue GLM propose ; Codex reproduit ou réfute. Ces recettes conservent les
+contre-épreuves, les causes typées et les reprises. La recette d’encodage observe
+les octets reçus par l’API réelle du Root isolé ; elle ne remplace pas la matrice
+complète FR/EN/thèmes/tailles. Les évolutions de tests/documentation ne changent
+aucun octet produit et ne justifient pas de réinstaller des travaux étrangers.
+
+The four broad Rust PAEA manifests now declare command-document, contract/fixture
+families and nested `web/lib` assets referenced by current literal includes.
+`snapshot.py` preflight refuses missing inputs before copying/Cargo; its lexical
+check is conservative and is not effective build/profile qualification. Earlier
+proofs keep their original inventories; use a fresh snapshot when shared version
+notes change during a recipe.
+
+Les inventaires des quatre recettes Rust PAEA sont complétés sans réécrire les
+preuves antérieures. Le précontrôle et l’instantané figé réparent la méthode de
+vérification ; ils ne prouvent ni installation ni conformité globale.

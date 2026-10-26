@@ -38,7 +38,12 @@
     ".claude/skills/**/*",
     "version_history.json",
     "tests/paea_payment_schema_test.py",
-    "web/paea-payment.html"
+    "web/paea-payment.html",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
@@ -74,11 +79,12 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "4 passed; 0 failed",
+        "5 passed; 0 failed",
         "paea_http_exact_both_domains_and_unknown_are_data_only",
         "paea_http_refusal_recovery_and_private_menu_assets",
         "paea_payment_http_exact_resolution_and_integer_bytes_are_data_only",
-        "paea_payment_http_refusals_recover_without_mutation"
+        "paea_payment_http_refusals_recover_without_mutation",
+        "paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover"
       ],
       "required_stderr": []
     }

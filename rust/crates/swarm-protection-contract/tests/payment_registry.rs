@@ -243,3 +243,61 @@ fn strict_raw_bytes_and_non_authority_markers_are_preserved() {
     assert_ne!(compact.registry_sha256, report.registry_sha256);
     assert_ne!(compact.request_sha256, report.request_sha256);
 }
+
+/// Preserve i64 representation limits and exact BOM bytes, not a monetary policy.
+/// Each invalid registry/request has a valid maximum-revision control and recovery;
+/// the original JSON cause survives without a proposal, IO or authority claim.
+#[test]
+fn strict_i64_overflow_and_bom_refuse_with_causes_then_recover() {
+    use std::error::Error as _;
+    let (mut registry, mut request) = inputs();
+    registry["revision"] = json!(i64::MAX);
+    request["expected_registry_revision"] = json!(i64::MAX);
+    let good_registry = serde_json::to_vec(&registry).unwrap();
+    let good_request = serde_json::to_vec(&request).unwrap();
+    for (label, registry_side, bom) in [
+        ("registry-overflow", true, false),
+        ("request-overflow", false, false),
+        ("registry-bom", true, true),
+        ("request-bom", false, true),
+    ] {
+        let control = resolve_payment_documents(&good_registry, &good_request).unwrap();
+        assert_eq!(control.registry_revision, i64::MAX);
+        let changed = if bom {
+            let mut bytes = vec![0xef, 0xbb, 0xbf];
+            bytes.extend(if registry_side {
+                &good_registry
+            } else {
+                &good_request
+            });
+            bytes
+        } else if registry_side {
+            let mut bad = registry.clone();
+            bad["revision"] = json!((i64::MAX as u64) + 1);
+            serde_json::to_vec(&bad).unwrap()
+        } else {
+            let mut bad = request.clone();
+            bad["expected_registry_revision"] = json!((i64::MAX as u64) + 1);
+            serde_json::to_vec(&bad).unwrap()
+        };
+        let error = if registry_side {
+            resolve_payment_documents(&changed, &good_request)
+        } else {
+            resolve_payment_documents(&good_registry, &changed)
+        }
+        .unwrap_err();
+        assert_eq!(error.code(), "protection-document-invalid", "{label}");
+        assert!(
+            error
+                .source()
+                .unwrap()
+                .downcast_ref::<serde_json::Error>()
+                .is_some(),
+            "{label}"
+        );
+        let recovery = resolve_payment_documents(&good_registry, &good_request).unwrap();
+        assert_eq!(recovery.proposal, control.proposal);
+        assert_eq!(recovery.registry_sha256, control.registry_sha256);
+        assert_eq!(recovery.request_sha256, control.request_sha256);
+    }
+}

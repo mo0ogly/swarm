@@ -4,11 +4,15 @@
  * reply injections are separately named. No provider/live mission mutation.
  * The caller supplies an exact existing binary/hash and a fresh evidence path.
  * No build, retry or watchdog; readiness is observed from the real listener/UI.
+ * Default full scope retains 12 presentation cases per view. Explicit encoding
+ * scope exercises one real invoice/BOM journey and exact current PAEA script;
+ * it does not qualify receipt/presentation matrices or unrelated changed assets.
  */
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {spawn}=require('node:child_process'),assert=require('node:assert/strict'),puppeteer=require('puppeteer');
 const output=process.argv[2]||process.env.SWARM_PAEA_UI_EVIDENCE,binary=process.env.SWARM_PAEA_TEST_BINARY,expected=process.env.SWARM_PAEA_TEST_BINARY_SHA256;
 const faultMode=process.env.SWARM_PAEA_NATIVE_FAULT;assert([undefined,'script'].includes(faultMode));
+const scope=process.env.SWARM_PAEA_NATIVE_SCOPE||'full';assert(['full','payment-encoding'].includes(scope));assert(scope==='full'||faultMode===undefined);
 assert(output&&process.argv.length<=3&&binary&&/^[a-f0-9]{64}$/.test(expected||''),'explicit binary/hash/fresh output required');
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 assert.equal(sha(fs.readFileSync(binary)),expected);fs.mkdirSync(output);
@@ -114,9 +118,27 @@ async function paymentCase(page,context,label,lang,theme){
  const colorsL=colors.map(luminance);check(label+'-payment-primary-contrast-AA',(Math.max(...colorsL)+.05)/(Math.min(...colorsL)+.05)>=4.5);
  await page.screenshot({path:path.join(directory,'result.png'),fullPage:true});paymentCases.push(label);
 }
+/** Exercise original BOM bytes through the actual protected file-upload route.
+ * Each side has a valid control, typed native refusal, empty stale result and
+ * exact recovery. No substituted response, live Root or effect is involved.
+ * Requires paymentCase fixtures for label; writes only owned BOM copies.
+ * Returns after recovery; IO, DOM and assertion failures propagate to cleanup. */
+async function paymentBomFiles(page,label){
+ const directory=path.resolve(output,label+'-resolution'),registry=path.join(directory,'registry.json'),request=path.join(directory,'request.json'),good=fs.readFileSync(path.join(directory,'native-report.json'),'utf8');
+ for(const side of ['registry','request']){
+  check('payment-'+side+'-bom-valid-control',(await submitPayment(page,200))===good);
+  const file=path.join(directory,side+'-bom.json');fs.writeFileSync(file,Buffer.concat([Buffer.from([239,187,191]),fs.readFileSync(side==='registry'?registry:request)]));
+  await fillPayment(page,side==='registry'?file:registry,side==='request'?file:request);
+  const sent=page.waitForRequest(r=>new URL(r.url()).pathname==='/api/v1/protection/resolve-payment'&&r.method()==='POST');
+  const refused=await submitPayment(page,400),body=JSON.parse((await sent).postData());
+  check('payment-'+side+'-bom-preserved-and-native-refused',body[side].codePointAt(0)===0xfeff&&JSON.parse(refused).failure.code==='protection-document-invalid'&&await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-report',e=>e.textContent===''));
+  await fillPayment(page,registry,request);check('payment-'+side+'-bom-native-recovery',(await submitPayment(page,200))===good);
+ }
+}
 /** Browser-only faults follow real native controls. Response substitution tests
  * the client boundary only; these synthetic reports never count as sink evidence.
- * Hold/release uses an observed request event, no sleep/watchdog or retry. */
+ * Hold/release uses an observed request event, no sleep/watchdog or retry.
+ * BOM cases retain original upload bytes through the real API and then recover. */
 async function paymentClientFaults(page,label){
  const directory=path.resolve(output,label+'-resolution'),registry=path.join(directory,'registry.json'),request=path.join(directory,'request.json');
  const good=fs.readFileSync(path.join(directory,'native-report.json'),'utf8'),max='9223372036854775807';
@@ -153,6 +175,7 @@ async function paymentClientFaults(page,label){
  await page.click('#paea-check');assert.equal((await noLexeme).status(),200);await page.waitForFunction(()=>document.getElementById('paea-status').dataset.state==='error');
  check('payment-unsupported-number-reader-refuses',await page.$eval('#paea-status',e=>e.textContent.includes('CLI'))&&await page.$eval('#paea-download',e=>e.disabled));
  await page.evaluate(()=>{JSON.parse=originalPaeaParse;delete globalThis.originalPaeaParse});check('payment-number-reader-recovery',(await submitPayment(page,200))===good);
+ await paymentBomFiles(page,label);
  const invalid=path.join(directory,'invalid-utf8.json');fs.writeFileSync(invalid,Buffer.from([255]));await fillPayment(page,invalid,request);const prior=posts;await page.click('#paea-check');
  await page.waitForFunction(()=>document.getElementById('paea-status').dataset.state==='error'&&!document.getElementById('paea-check').disabled);
  check('payment-invalid-utf8-never-sent',posts===prior&&await page.$eval('#paea-download',e=>e.disabled));
@@ -163,7 +186,8 @@ async function paymentClientFaults(page,label){
  try{await Promise.race([(async()=>{
   await start();check('actual-default-profile-executable',true);
   browser=await puppeteer.launch({headless:true,executablePath:process.env.CHROME_BIN||'/opt/google/chrome/chrome',timeout:0,protocolTimeout:0,args:['--no-sandbox'],userDataDir:path.resolve(output,'browser')});
-  for(const lang of ['fr','en'])for(const theme of ['etat','sombre'])for(const width of [1440,390,320]){
+  const matrix=scope==='payment-encoding'?[['fr','etat',1440]]:['fr','en'].flatMap(lang=>['etat','sombre'].flatMap(theme=>[1440,390,320].map(width=>[lang,theme,width])));
+  for(const [lang,theme,width]of matrix){
    const label=lang+'-'+theme+'-'+width,context=await browser.createBrowserContext(),page=await context.newPage();
    page.setDefaultTimeout(0);page.setDefaultNavigationTimeout(0);await page.setViewport({width,height:1000});
    await context.setCookie({name:'swarm_session_'+sha(address).slice(0,12),value:token,url:'http://'+address,httpOnly:true,sameSite:'Strict'});
@@ -171,6 +195,12 @@ async function paymentClientFaults(page,label){
    page.on('requestfailed',r=>browserFailure({kind:'requestfailed',path:new URL(r.url()).pathname}));
    page.on('response',r=>{if(r.status()>=400){const p=new URL(r.url()).pathname;responses.push({path:p,status:r.status()});if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment'].includes(p)&&r.status()===400))browserFailure({kind:'http',path:p,status:r.status()})}});
    page.on('console',m=>{if(m.type()==='error'){const p=m.location().url?new URL(m.location().url).pathname:'';if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment'].includes(p)&&m.text().includes('400')))browserFailure({kind:'console',message:m.text()})}});
+   if(scope==='payment-encoding'){
+    await paymentCase(page,context,label,lang,theme);
+    const script=await page.evaluate(async()=>{const r=await fetch('/paea.js');if(!r.ok)throw Error('PAEA script unavailable');return Array.from(new Uint8Array(await r.arrayBuffer()))});
+    check('payment-encoding-exact-current-script',sha(Buffer.from(script))===sha(fs.readFileSync('web/paea.js')));
+    await paymentBomFiles(page,label);await context.close();continue;
+   }
    await page.goto('http://'+address+'/paea.html?'+new URLSearchParams({lang,theme}),{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
    check(label+'-explicit-empty-inputs',await page.$eval('#paea-state',e=>e.value==='')&&await page.$eval('#paea-download',e=>e.disabled));
@@ -217,13 +247,15 @@ async function paymentClientFaults(page,label){
    }
    await paymentCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await paymentClientFaults(page,label);await context.close();
   }
-  check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('exactly-thirty-six-native-refusals',responses.length===36);check('no-unexpected-browser-diagnostics',errors.length===0);check('binary-stable',sha(fs.readFileSync(binary))===expected);
+  if(scope==='payment-encoding'){check('one-native-payment-encoding-case',cases.length===0&&paymentCases.length===1);check('exactly-three-native-encoding-refusals',responses.length===3)}
+  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('exactly-thirty-eight-native-refusals',responses.length===38)}
+  check('no-unexpected-browser-diagnostics',errors.length===0);check('binary-stable',sha(fs.readFileSync(binary))===expected);
  })(),observedFailure]);}catch(e){failed=e;console.error(e.stack)}
  finally{
   try{if(browser)await browser.close()}catch(e){errors.push({kind:'browser-close',message:e.message});failed??=e}
   if(server){stopping=true;server.kill('SIGINT');const stopped=await closed;if(!failed&&stopped.code!==0)failed=Error('owned native fixture did not stop cleanly')}
   fs.writeFileSync(path.join(root,'server.stderr'),Buffer.concat(serverErrors),{mode:0o600});
-  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',binary,binary_sha256:expected,cases,paymentCases,checks,errors,responses,success:!failed},null,2));
+  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,checks,errors,responses,success:!failed},null,2));
  }
  if(failed)process.exitCode=1;else console.log('PAEA_NATIVE_UI_PASS '+checks.length+' assertions');
 })();

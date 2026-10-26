@@ -459,3 +459,86 @@ fn paea_http_refusal_recovery_and_private_menu_assets() {
     assert!(String::from_utf8_lossy(reply.response.body()).contains("href=\"/paea.html\""));
     assert_eq!(snapshot(&fixture.root), before);
 }
+
+/// Distinguish JSON decoding from admission failures on both public data routes.
+/// A valid control precedes each canary/type or conflicting-version mutation;
+/// public Display/Debug/body redact input while the original typed cause survives.
+/// Recovery preserves the exact response and all Root bytes; no effect is tested.
+#[test]
+fn paea_envelope_type_and_conflicting_duplicates_are_redacted_and_recover() {
+    let fixture = Fixture::new();
+    let before = snapshot(&fixture.root);
+    const CANARY: &str = "GLM_PAEA_PRIVATE_CANARY";
+    for (path, body) in [
+        ("/api/v1/protection/receipt-report", input(0)),
+        ("/api/v1/protection/resolve-payment", payment_input()),
+    ] {
+        let raw = serde_json::to_vec(&body).unwrap();
+        let text = std::str::from_utf8(&raw).unwrap();
+        let mut wrong_type = body.clone();
+        wrong_type["schema_version"] = json!(CANARY);
+        let mut unknown = body.clone();
+        unknown[CANARY] = json!(true);
+        let invalid_version = text.replacen("\"schema_version\":1", "\"schema_version\":2", 1);
+        assert_ne!(invalid_version, text);
+        for (fault, changed, reflected_cause) in [
+            ("type", serde_json::to_vec(&wrong_type).unwrap(), true),
+            ("unknown", serde_json::to_vec(&unknown).unwrap(), true),
+            (
+                "invalid-first",
+                format!("{{\"schema_version\":2,{}", &text[1..]).into_bytes(),
+                false,
+            ),
+            (
+                "invalid-last",
+                format!("{{\"schema_version\":1,{}", &invalid_version[1..]).into_bytes(),
+                false,
+            ),
+            (
+                "escaped-duplicate",
+                format!("{{\"\\u0073chema_version\":2,{}", &text[1..]).into_bytes(),
+                false,
+            ),
+        ] {
+            let control = fixture.call(fixture.request("POST", path, raw.clone()));
+            assert_eq!(control.response.status(), StatusCode::OK, "{path} {fault}");
+            assert!(control.failure.is_none());
+            let refused = fixture.call(fixture.request("POST", path, changed));
+            assert_eq!(
+                refused.response.status(),
+                StatusCode::BAD_REQUEST,
+                "{path} {fault}"
+            );
+            let error = refused.failure.as_ref().unwrap();
+            assert!(
+                matches!(error, swarm_web::HttpServiceError::Json(_)),
+                "{path} {fault}"
+            );
+            assert_eq!(error.code(), "web-document-invalid");
+            let cause = error
+                .source()
+                .unwrap()
+                .downcast_ref::<serde_json::Error>()
+                .unwrap();
+            assert!(cause.is_data(), "{path} {fault}");
+            if reflected_cause {
+                assert!(cause.to_string().contains(CANARY), "{path} {fault}");
+            } else {
+                assert!(
+                    cause.to_string().contains("duplicate field"),
+                    "{path} {fault}"
+                );
+            }
+            assert!(!error.to_string().contains(CANARY));
+            assert!(!format!("{error:?}").contains(CANARY));
+            assert!(!String::from_utf8_lossy(refused.response.body()).contains(CANARY));
+            assert!(!String::from_utf8_lossy(refused.response.body()).contains("duplicate field"));
+            assert_eq!(snapshot(&fixture.root), before);
+            let recovery = fixture.call(fixture.request("POST", path, raw.clone()));
+            assert_eq!(recovery.response.status(), StatusCode::OK);
+            assert!(recovery.failure.is_none());
+            assert_eq!(recovery.response.body(), control.response.body());
+            assert_eq!(snapshot(&fixture.root), before);
+        }
+    }
+}

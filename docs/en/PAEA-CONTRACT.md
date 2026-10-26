@@ -426,3 +426,13 @@ setting or additional business ceiling is introduced.
 
 This does not deliver a protected registry: authenticity, ID continuity, freshness,
 human approver and actual commitment remain PA-02/03.
+
+### JSON refusals and original input bytes — maintained checks
+
+Envelope version must be an integer; duplicate fields refuse even when values
+conflict or JSON escapes spell the key. Public error messages and refusal bodies
+retain a safe code; internal consumers keep the typed JSON cause without exposing
+received values. A revision beyond i64 refuses without rounding. The browser
+does not strip an initial BOM: transported unchanged, it is refused by the JSON
+decoder. `paea-glm-regressions.json` and `paea-invoice-encoding.json` retain these
+cases, valid controls and recovery; see [increment 18](plans/actions-confiance/paea/INCREMENT-18.md).

@@ -423,3 +423,16 @@ Sources PAEA non commitées ; registres/accords protégés et E2/E3 restent ouve
 Publication demandée le 26 octobre : commit isolé des incréments 16/17, sans
 push ni nouvelle livraison ; voir le suivi de publication en fin du rapport 17.
 Les mentions précommit ci-dessus conservent leur portée historique.
+
+### Incrément 18 — reprise GLM
+
+« reprends glm » autorise une contribution interne ciblée sur les contrats
+de résolution/API/UX livrés. [Suivi et critères](paea/INCREMENT-18.md) : chaque
+constat doit être reproduit ou réfuté, puis corrigé/vérifié lorsqu’il est fondé.
+Les remises protégées et les limites d’assurance restent ouvertes.
+
+Reprise 18 vérifiée : une contribution GLM complète, deux nouvelles régressions
+Rust exactes PASS sur instantané stable, 28 assertions d’encodage natif PASS.
+Quatre inventaires de recettes corrigés ; aucun défaut produit établi, aucune
+modification du produit ni nouvelle installation attribuée à cette tranche.
+Les suites complètes et les garanties protégées ne sont pas déclarées closes.
