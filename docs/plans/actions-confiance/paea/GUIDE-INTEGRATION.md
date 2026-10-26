@@ -162,3 +162,11 @@ Le consommateur du contrat d’accord fourni compare contenu/politique exacts, d
 CLI/API/menu, avec refus des entrées invalides et rapport négatif sur différence.
 [Preuves/limites](INCREMENT-22.md) : aucun approbateur authentifié, droit courant,
 attention humaine ou accord protégé établi. Ce raccord ne clôt pas IA3/AC-02.
+
+
+### Campagnes accessibles — incrément23
+
+Le menu propose la commande du laboratoire et la lecture locale de son rapport.
+Huit scénarios/oracles réels,506assertions natives et56contrôles d’installation
+dev109 PASS ; contre-exemple des aliases explicitement conservé. Aucun lancement
+web, accord humain ou invariant protégé établi. [Résultats et reprise](INCREMENT-23.md).

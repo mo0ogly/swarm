@@ -151,3 +151,11 @@ CLI/API/menu now consume exact supplied content/policy binding data; invalid inp
 refuse and mismatches yield explicit negative reports. [Evidence/limits](INCREMENT-22.md):
 no authenticated approver,current rights,human attention or protected approval is
 established. IA3/AC02 prerequisites remain open.
+
+
+### Campaign access — increment23
+
+The menu exposes the laboratory command and local report reading. Eight real
+scenarios/oracles,506nativeassertions and56installeddev109checks PASS; the raw
+alias counterexample remains explicit. No browser execution,human approval or
+protected invariant established. [Results and recovery](INCREMENT-23.md).

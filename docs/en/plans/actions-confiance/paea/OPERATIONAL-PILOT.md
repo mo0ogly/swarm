@@ -122,11 +122,9 @@ hashes, argv, original CLI bytes, outputs, before/after states and sink roots.
 Integrity VERIFIED preserves evidence and cannot turn an expected counterexample
 into conformance.
 
-The current **PAEA checks** screen retains file-correspondence scope. This lab
-has no menu action yet. The future laboratory journey must expose campaigns,
-oracles and dossiers separately from human approval and business execution;
-PA-08 remains a dependency. Nothing here establishes embedded assets or native
-served UI.
+The **PAEA checks → Laboratory campaigns** menu now exposes the explicit command
+and local report reader. It does not start campaigns from the browser or grant
+human approval. Native evidence and limits are in [increment23](INCREMENT-23.md).
 
 Three distinct dossiers: **design** = this document; **realization** = exact
 sources, frozen binary, retained profile and laboratory state; **qualification**
@@ -148,3 +146,28 @@ exports the raw report. Versioned examples are
 `tests/fixtures/paea/payment-registry-v1.json` and `payment-request-v1.json`.
 This menu runs no laboratory campaigns, stores no registry and provides no human
 approval. [Journey and evidence](INCREMENT-17.md).
+
+
+### Laboratory campaigns — increment23
+
+Verification menu → Laboratory campaigns exposes scenarios and this explicit
+repository command (Python/Git, existing exact binary, fresh output with existing parent):
+
+```sh
+python3 tools/paea/run_pilot.py --binary /PATH/BINARY --sha256 SHA256 --output /FRESH/DIRECTORY
+```
+
+No hidden build, provider, retry or watchdog. Live storage and source trees are
+refused. The maintained recipe must PASS and verify before `paea-lab-report.json`
+is exported. Failure retains originals and produces no success report; correct
+the cause and resume in another fresh directory. Verify originals with
+`python3 tools/verification/recipe.py verify --evidence /FRESH/DIRECTORY/recipe`.
+
+The page reads an explicitly selected report locally and exports its exact bytes,
+without upload or business request. Closed shape/eight named tests are checked;
+authenticity and original evidence are not. Hashes link the binary, recipe result,
+declared source inventory and call/oracle index, without signing them. The raw
+alias test passes by observing two effects: uniqueness is refuted. Simulated
+authority, same UID and separate oracle process with the same author establish no
+protected guarantee.0/17invariants,E2/E3 and browser-triggered execution remain open.
+[Slice results and limits](INCREMENT-23.md).

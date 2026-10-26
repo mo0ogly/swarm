@@ -508,3 +508,19 @@ commun CLI/API lié aux deux fichiers, correspondance/différence/refus explicit
 reproduit puis corrigé sur le composant commun aux cinq vues ;36observations
 minimum9,096:1. [Résultats/RETEX](paea/INCREMENT-22.md) conservent échecs et reprises,
 profils et hashes. Sans GLM/commit22/push. IA3/AC-02/humains,E2/E3 et0/17ouverts.
+
+
+### Incrément23 — campagnes de laboratoire dans le menu
+
+Commit22 `51a3ac828`,42fichiers,108entrées préparées d’autrui préservées, sans push.
+[Tranche23](paea/INCREMENT-23.md) : commande de reproduction explicite et lecture
+du rapport de campagne depuis le menu ; huit scénarios, contre-exemple conservé.
+Aucune exécution web ni activation protégée attribuée à cette tranche.
+
+
+Incrément23 installé en **dev109** : menu Campagnes de laboratoire,commande
+explicite et lecture locale du rapport. Huit tests réels,506assertions natives,
+12téléchargements et56contrôles réels/25assets PASS. Installation ponctuelle du
+candidat normal exact,configuration source conservée ; compilation du moteur
+concurrent reste ouverte. [RETEX/preuves](paea/INCREMENT-23.md). Aucun commit23/push ;
+PA-02/03protégés,exécution web de campagnes,E2/E3 et0/17invariants ouverts.

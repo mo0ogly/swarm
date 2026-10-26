@@ -1522,3 +1522,29 @@ The primary-control regression observes every real theme-transition frame (both
 directions) and AA contrast, with no sleep or test-side animation disabling. A
 reproduced1.28:1 intermediate frame required a shared PAEA primary CSS correction;
 the original failed browser run is retained separately from its full replay.
+
+### PAEA laboratory report reader / Lecteur laboratoire (increment23)
+
+`python3 tools/paea/run_pilot.py --binary /ABS/BINARY --sha256 SHA256 --output /FRESH/DIR`
+runs the maintained eight-case laboratory recipe, verifies its retained evidence,
+and exports `paea-lab-report.json` only after PASS. No hidden build, provider,
+watchdog or live Root. Wrong hash/existing output refuse without overwriting;
+failed runs retain originals. The source checkout needs Python/Git.
+
+`paea-laboratory-reader.json` first exercises that public command and refusal
+paths, then the real protected native laboratory page on12FR/EN/theme/width
+configurations and a script-loss negative check after the valid control. Supply
+explicit `SWARM_PAEA_TEST_BINARY`, `_SHA256`, `SWARM_PAEA_LAB_EVIDENCE` and
+`SWARM_PAEA_LAB_UI_EVIDENCE` fresh paths with existing parents. The report reader
+checks shape/closed case names, never evidence authenticity or protected effect.
+The alias counterexample is displayed as a refutation. Actual evidence and scope
+are retained in increment23. `paea-local-delivery.json` now expects56read-only
+checks and25protectedassetsets, including the empty laboratory reader/menu.
+
+
+Increment23 results: real8-case campaigns and506nativebrowserassertions PASS,
+12configurations/downloads;56read-onlylivechecks/25protectedassets PASS ondev109.
+The earlier422-assertion component run used four explicit workspace browser
+overlays and is not native evidence. Normal build/restart source failures remain
+retained; the tested qualified normal dev109 was installed with the launcher's
+supported one-shot `--binary`, preserving source configuration.

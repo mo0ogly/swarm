@@ -658,3 +658,30 @@ de couleurs simultané entre thèmes. Leur transition croisée héritée provoqu
 contraste transitoire1,28:1 ; elle est supprimée sur le composant primaire commun
 aux cinq vues. La recette observe les frames réelles de deux changements de thème,
 sans désactiver les animations dans le test ni introduire d’attente temporelle.
+
+
+### Campagnes de laboratoire — incrément23
+
+Le menu Vérifications PAEA → Campagnes de laboratoire expose les scénarios et
+la commande de reproduction. Depuis le dépôt :
+
+```sh
+python3 tools/paea/run_pilot.py --binary /CHEMIN/BINAIRE --sha256 SHA256 --output /DOSSIER/NEUF
+```
+
+Python/Git et un binaire existant exact sont requis ; parent existant, dossier neuf
+hors stockage vivant et sources. Aucun build implicite, provider, retry ou watchdog.
+La commande réutilise la recette maintenue, vérifie son intégrité et exporte
+`paea-lab-report.json` seulement après huit tests PASS. En échec, preuves conservées,
+pas de rapport de réussite ; corriger la cause et reprendre dans un dossier neuf.
+
+La page lit ce fichier explicitement choisi, sans upload ni requête métier, et
+permet son export exact. Elle vérifie sa structure fermée et les huit noms de test,
+pas son authenticité ni ses originaux. Les empreintes relient binaire, résultat de
+recette, inventaire déclaré et index des appels/oracles ; elles ne constituent pas
+une signature. Vérifier aussi `python3 tools/verification/recipe.py verify --evidence
+/DOSSIER/NEUF/recipe` sur les originaux conservés. Le test des aliases bruts passe
+en constatant deux effets : la prétention d’unicité est réfutée. Autorité simulée,
+même UID, oracles de processus distinct mais auteur commun ;0/17invariants
+protégés, E2/E3 et exécution de campagnes depuis le navigateur restent ouverts.
+[Résultats et limites de la tranche](../plans/actions-confiance/paea/INCREMENT-23.md).

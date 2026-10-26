@@ -22,6 +22,8 @@ fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
         "/paea-compare.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-compare.html"))),
         "/paea-inspect.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-inspect.html"))),
         "/paea-approval.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-approval.html"))),
+        "/paea-lab.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-lab.html"))),
+        "/paea-lab.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea-lab.js"))),
         "/paea.js"=>Some(("application/javascript; charset=utf-8",include_bytes!("../../../../../web/paea.js"))),
         "/paea.css"=>Some(("text/css; charset=utf-8",include_bytes!("../../../../../web/paea.css"))),
         "/paea-examples/v1/payment-document.json"=>Some(("application/json; charset=utf-8",include_bytes!("../../../../../web/paea-examples/v1/payment-document.json"))),

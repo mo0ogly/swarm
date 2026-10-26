@@ -474,3 +474,19 @@ CLI/API two-file-bound report,explicit match/mismatch/invalid refusal.11namedtes
 on the shared five-view component;36observations,min9.096:1. [Results/retrospective](paea/INCREMENT-22.md)
 retain failures,recovery,profiles/hashes. No GLM/commit22/push; IA3/AC02/humans,
 E2/E3 and0/17remainopen.
+
+
+### Increment23 — laboratory campaigns in the menu
+
+Commit22 `51a3ac828`,42files,108foreign staged paths preserved, no push.
+[Slice23](paea/INCREMENT-23.md): explicit reproduction command and campaign
+report reader from the menu; eight scenarios and preserved counterexample.
+No web execution or protected activation is attributed to this slice.
+
+
+Increment23 installed **dev109**: Laboratory campaigns menu,explicit command
+and local report reader. Eight real tests,506nativeassertions,12downloads and
+56livechecks/25assets PASS. Exact qualified normal candidate activated once,
+source configuration preserved; concurrent engine compilation remains open.
+[RETEX/evidence](paea/INCREMENT-23.md). No commit23/push; protected PA-02/03,
+browser campaign execution,E2/E3 and0/17invariants stay open.

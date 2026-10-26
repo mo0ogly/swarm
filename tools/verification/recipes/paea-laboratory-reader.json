@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "paea-laboratory-reader",
+  "inputs": [
+    "tools/paea/run_pilot.py",
+    "tools/verification/recipes/paea-pilot-lab.json",
+    "tools/verification/recipe.py",
+    "tests/paea_lab_runner_test.py",
+    "tests/paea_lab_ui_test.cjs",
+    "web/paea-lab.html",
+    "web/paea-lab.js",
+    "web/paea.html",
+    "web/paea.css",
+    "web/i18n*.js",
+    "schemas/paea/laboratory-report-v1.schema.json",
+    "tools/paea/pilot_lab.py",
+    "tools/paea/pilot_oracle.py",
+    "tests/paea_pilot_lab_test.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "docs/plans/actions-confiance/paea/PILOTE-OPERATIONNEL.md",
+    "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-cli/src/protection.rs",
+    "tests/fixtures/paea/payment-*.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "real-campaign-and-command-refusals",
+      "command": [
+        "python3",
+        "tests/paea_lab_runner_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_LAB_COMMAND_EXPORT_AND_REFUSALS_PASS",
+        "\"tests\": 8",
+        "\"integrity\": \"VERIFIED\""
+      ],
+      "required_stderr": [
+        "Ran 1 test",
+        "OK"
+      ]
+    },
+    {
+      "id": "native-laboratory-reader",
+      "command": [
+        "node",
+        "tests/paea_lab_ui_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_LAB_NATIVE_UI_PASS",
+        "en-sombre-320-exact-completed-download",
+        "no-browser-errors-or-business-writes"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "reader-script-failure",
+      "command": [
+        "env",
+        "SWARM_PAEA_LAB_UI_FAULT=script",
+        "node",
+        "tests/paea_lab_ui_test.cjs"
+      ],
+      "expected_exit": 1,
+      "required_stdout": [
+        "INJECTED_LAB_SCRIPT_FAILURE"
+      ],
+      "required_stderr": [
+        "unexpected-lab-browser-diagnostic"
+      ]
+    }
+  ]
+}

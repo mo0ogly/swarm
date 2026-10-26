@@ -16,7 +16,9 @@
     "web/paea-inspect.html",
     "schemas/paea/inspection-v1.schema.json",
     "web/paea-approval.html",
-    "schemas/paea/approval-report-v1.schema.json"
+    "schemas/paea/approval-report-v1.schema.json",
+    "web/paea-lab.html",
+    "web/paea-lab.js"
   ],
   "environment": {},
   "steps": [
@@ -28,7 +30,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "LIVE_PAEA_DELIVERY_VERIFIED 52",
+        "LIVE_PAEA_DELIVERY_VERIFIED 56",
         "fr-dialog-current-PAEA-evolutions",
         "en-dialog-current-PAEA-evolutions",
         "no-browser-errors-or-writes",
@@ -44,7 +46,9 @@
         "en-live-inspection-example-links",
         "fr-live-approval-menu-fields",
         "en-live-approval-limits-no-submission",
-        "en-live-approval-example-links"
+        "en-live-approval-example-links",
+        "fr-live-laboratory-menu-and-command",
+        "en-live-laboratory-limits-no-execution"
       ],
       "required_stderr": []
     },

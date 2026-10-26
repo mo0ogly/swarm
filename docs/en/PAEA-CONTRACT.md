@@ -606,3 +606,28 @@ together across themes. The inherited crossed transition produced a temporary
 1.28:1 contrast; it is removed on the common primary component in all five views.
 The recipe observes actual frames for two theme changes, without disabling
 animation in the test or adding a timed wait.
+
+
+### Laboratory campaigns — increment23
+
+Verification menu → Laboratory campaigns exposes scenarios and this explicit
+repository command (Python/Git, existing exact binary, fresh output with existing parent):
+
+```sh
+python3 tools/paea/run_pilot.py --binary /PATH/BINARY --sha256 SHA256 --output /FRESH/DIRECTORY
+```
+
+No hidden build, provider, retry or watchdog. Live storage and source trees are
+refused. The maintained recipe must PASS and verify before `paea-lab-report.json`
+is exported. Failure retains originals and produces no success report; correct
+the cause and resume in another fresh directory. Verify originals with
+`python3 tools/verification/recipe.py verify --evidence /FRESH/DIRECTORY/recipe`.
+
+The page reads an explicitly selected report locally and exports its exact bytes,
+without upload or business request. Closed shape/eight named tests are checked;
+authenticity and original evidence are not. Hashes link the binary, recipe result,
+declared source inventory and call/oracle index, without signing them. The raw
+alias test passes by observing two effects: uniqueness is refuted. Simulated
+authority, same UID and separate oracle process with the same author establish no
+protected guarantee.0/17invariants,E2/E3 and browser-triggered execution remain open.
+[Slice results and limits](plans/actions-confiance/paea/INCREMENT-23.md).
