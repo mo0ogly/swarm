@@ -989,3 +989,50 @@ sequenceDiagram
     U->>R: Reconcile or exact replay
     R-->>U: Verified original, no provider call
 ```
+
+## Native managed prepublication — current observation
+
+`swarm task publication-preview WORK --input REQUEST --root ROOT --json`
+uses the same strict native envelope: `schema_version: 1`, `event_id`,
+`expected_revision`, `task_id`. The event is a read input coordinate, never a
+persisted event. The Root API is `preview_managed_publication`.
+
+The read verifies the framed private original, review job/event/certificate,
+public context and original controls. It then retains the actual candidate
+outside Root/SQL reservations and verifies current cohort policies, attempts,
+completed producers, contracts and canonical reports. Sources are refreshed,
+state/settings rechecked and descriptors explicitly closed, including on error.
+A submitted task, or one blocked by that exact adverse opinion, is observed
+without retry rights. A `changes_requested` opinion can be observed but additionally reports
+`managed-passed-opinion-required`; a failed protocol without a verdict, stale
+revision, changed source or incomplete original refuses. Unknown failures never
+become successful empty observations.
+
+Successful reads expose `native_original_verified`, `current_candidate_verified`,
+identifiers/digests and cohort task IDs. `publication_supported`,
+`publication_ready`, `provider_started` and `task_accepted` remain false:
+protected publication and accepted-baseline authority remain unported and named
+in `blockers`. These flags describe implemented capabilities, not operator
+policy or a cohort cutoff. Effective policies still come from saved Admin values.
+The CLI closes Root before checked output/flush; output failure grants no new
+call. No reviewer identity, criterion truth, permission or later freshness lease
+is established. Existing acceptance remains refused.
+
+Managed acceptance must also atomically publish the candidate pointer and coherent
+cohort evidence. A status-only change could accept code absent from the next
+worker copy. Go `managed_integration.go` remains the reference for this boundary.
+
+```mermaid
+sequenceDiagram
+    participant U as Operator / supervisor
+    participant R as Root / CLI
+    participant O as Native originals
+    participant C as Retained candidate
+    U->>R: publication-preview (task, revision)
+    R->>O: Verify opinion, controls, context and certificate
+    R->>C: Retain and refresh outside SQL locks
+    R->>R: Compare cohort and current state
+    R->>C: Refresh then explicitly close
+    R-->>U: Verified observations and explicit blockers
+    Note over R,U: Publication and acceptance remain unavailable
+```

@@ -1039,3 +1039,53 @@ sequenceDiagram
     U->>R: Reconcile ou rejeu exact
     R-->>U: Original verifie sans appel fournisseur
 ```
+
+## Prépublication native gérée — observation courante
+
+`swarm task publication-preview WORK --input REQUEST --root ROOT --json`
+consomme la même enveloppe stricte que les contrôles natifs :
+`schema_version: 1`, `event_id`, `expected_revision`, `task_id`. L’événement est
+une coordonnée syntaxique de lecture ; aucune ligne d’événement n’est créée.
+L’API Root correspondante est `preview_managed_publication`.
+
+La lecture vérifie l’original privé encadré, le job/événement/certificat de revue,
+le contexte public et les originaux des contrôles. Elle retient ensuite le vrai
+candidat hors des réservations Root/SQL, recontrôle sa cohorte, ses politiques,
+les tentatives/producteurs, contrats et rapports canoniques, puis rafraîchit les
+sources et revalide l’état et les réglages. Les descripteurs sont fermés
+explicitement, même après erreur. La tâche soumise, ou bloquée par ce même avis défavorable, est observée sans
+droit de relance. Un avis `changes_requested` peut être observé
+mais porte aussi `managed-passed-opinion-required` ; un échec de protocole sans
+verdict, une source altérée, une révision périmée ou une preuve incomplète refuse.
+Aucune erreur inconnue ne devient un résultat vide.
+
+Un succès de lecture expose `native_original_verified` et
+`current_candidate_verified`, les identifiants/empreintes et les tâches de la
+cohorte. `publication_supported`, `publication_ready`, `provider_started` et
+`task_accepted` restent faux : la publication protégée et la preuve d’autorité de
+baseline acceptée restent non portées et sont nommées dans `blockers`. Ces valeurs
+sont des faits de capacité du produit, pas une politique opérateur ou une limite
+de cohorte. Les politiques effectives restent celles enregistrées dans Admin.
+La CLI referme Root avant sa sortie/flush ; une sortie refusée n’autorise aucun
+nouvel appel. Ni identité de reviewer, ni vérité des critères, ni permission ou
+bail de fraîcheur ultérieur ne sont établis. L’acceptation existante reste refusée.
+
+L’acceptation gérée doit aussi publier atomiquement le pointeur candidat et les
+preuves cohérentes de la cohorte ; modifier seulement le statut reproduirait une
+acceptation que la prochaine copie worker ne contient pas. Le contrat Go
+`managed_integration.go` reste la référence de cette frontière à porter.
+
+```mermaid
+sequenceDiagram
+    participant U as Opérateur / superviseur
+    participant R as Root / CLI
+    participant O as Originaux natifs
+    participant C as Candidat retenu
+    U->>R: publication-preview (tâche, révision)
+    R->>O: Vérifier avis, contrôles, contexte et certificat
+    R->>C: Retenir et rafraîchir hors verrous SQL
+    R->>R: Comparer cohorte et état courant
+    R->>C: Rafraîchir puis fermer explicitement
+    R-->>U: Observations vérifiées et blocages explicites
+    Note over R,U: Publication et acceptation restent indisponibles
+```

@@ -627,7 +627,7 @@ pub use root_store::{execute_planning_gate, PlanningRunOutcome, execute_review_g
 #[cfg(target_os = "linux")]
 pub use root_store::PlanningStepOutcome;
 #[cfg(target_os = "linux")]
-pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence};
+pub use root_store::{execute_validation_gate, TaskValidationPreview, TaskValidationOutcome, TaskValidationCandidate, TaskReviewPreview, TaskReviewInputs, TaskReviewCheck, ReviewInputSource, NativeValidationEvidence, ManagedPublicationPreview};
 
 #[cfg(target_os = "linux")]
 pub use root_store::{AdminBudgetPolicy,AdminBudgetChange,AdminBudgetEntry,AdminBudgetView,AdminBudgetOutcome,AdminBudgetReservationRequest,AdminBudgetReservation};

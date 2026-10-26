@@ -3,6 +3,8 @@ use crate::{json_bytes, write_output, Arguments, CliError};
 use std::io::{self, Write};
 
 /// Route bounded explicit requests to Root's authoritative validation contract.
+/// publication-preview checks an original managed opinion and current candidate,
+/// and reports that protected publication remains unsupported; it grants no acceptance.
 /// Control/reviewer previews have no mutation or reviewer invocation grant;
 /// review-check validates supplied managed JSONL against fresh held sources and
 /// saved limits, without authenticating its sender, recording a review or exec;
@@ -27,7 +29,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let action = a.pos[1].as_str();
     if !matches!(
         action,
-        "review-preview" | "review-inputs" | "review-check"
+        "review-preview" | "review-inputs" | "review-check" | "publication-preview"
             | "validation-preview"
             | "validation-candidate"
             | "validate"
@@ -45,11 +47,15 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     let root_error = |error| CliError::Root(Box::new(error));
     let mut store = swarm_engine::RootStore::open(
         std::path::Path::new(&a.root),
-        !matches!(action, "validation-preview" | "review-preview" | "review-inputs" | "review-check"),
+        !matches!(action, "validation-preview" | "review-preview" | "review-inputs" | "review-check" | "publication-preview"),
     )
     .map_err(root_error)?;
     let mut known = None;
     let result = (|| {
+        if action == "publication-preview" {
+            return json_bytes(&store.preview_managed_publication(&a.pos[2], &raw).map_err(root_error)?)
+                .map_err(CliError::Output);
+        }
         if action == "review-check" {
             return json_bytes(&store.check_task_review_output(&a.pos[2], &raw).map_err(root_error)?)
                 .map_err(CliError::Output);

@@ -239,17 +239,20 @@ pub(super) fn prepare_claimed_review_preview(
 pub(super) fn prepare_reviewer_retry_preview(db: &rusqlite::Connection, root: &Path, settings: &crate::EngineSettingsDocument, work: &str, request: &Request, recovery: &super::review_recovery::Recovery) -> Result<TaskValidationPreview, E> {
     prepare_source(db, root, settings, work, request, ReviewSource::ReviewerRetry(&recovery.previous)).map(|p| p.preview)
 }
-/// Internal source purpose only. Actual Root provenance is checked by callers;
+/// Internal source purpose only. RecordedOpinion permits source observation of
+/// an exact completed opinion, never a new job or acceptance. Actual original
+/// provenance is separately checked by the publication preview.
+/// Actual Root provenance is checked by callers;
 /// none of these data coordinates can be deserialized into a process permit.
-enum ReviewSource<'a> { Fresh, Claimed(&'a crate::IndependentReview), ReviewerRetry(&'a crate::IndependentReview) }
+enum ReviewSource<'a> { Fresh, Claimed(&'a crate::IndependentReview), ReviewerRetry(&'a crate::IndependentReview), RecordedOpinion(&'a crate::IndependentReview) }
 impl<'a> ReviewSource<'a> {
     /// Exact record that must already occupy the actual task, without substitution.
     fn record(&self) -> Option<&'a crate::IndependentReview> {
-        match self { Self::Fresh => None, Self::Claimed(r) | Self::ReviewerRetry(r) => Some(r) }
+        match self { Self::Fresh => None, Self::Claimed(r) | Self::ReviewerRetry(r) | Self::RecordedOpinion(r) => Some(r) }
     }
     /// Purpose-specific structural state, never proof or permission by itself.
     fn applicable(&self) -> bool {
-        match self { Self::Fresh => true, Self::Claimed(r) => r.state == "running", Self::ReviewerRetry(r) => r.state == "error" }
+        match self { Self::Fresh => true, Self::Claimed(r) => r.state == "running", Self::ReviewerRetry(r) => r.state == "error", Self::RecordedOpinion(r) => matches!(r.state.as_str(), "passed" | "changes_requested") }
     }
 }
 /// Shared source observation with an exact optional internal review allowance.

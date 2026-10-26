@@ -7,6 +7,9 @@ use rusqlite::{params, Connection};
 /// private journal, provider facts, PID/host or future execution right is exposed.
 pub(crate) struct NativeReviewObservation {
     pub review: IndependentReview,
+    /// Verified original managed context for internal current-source comparison.
+    /// Private attributed data, not serialized in public DTOs or an acceptance permit.
+    pub(super) managed_context: Option<crate::ManagedReviewContext>,
     pub certificate: ExchangeArtifact,
     /// Recorded verdict versus failed/stale observation; never an execution right.
     pub verdict_applicable: bool,
@@ -565,6 +568,7 @@ impl RootStore {
             retry_failure,
             original_receipt_sha256: row.hash,
             validation_receipt_sha256: row.validation,
+            managed_context: original.managed_review.map(|value| value.protocol.context),
             task: row.task,
             revision: row.revision,
             review,

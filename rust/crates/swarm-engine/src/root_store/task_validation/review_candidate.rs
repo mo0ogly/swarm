@@ -48,8 +48,9 @@ impl ReviewCandidate {
 pub(in crate::root_store) fn acquire(root:&RootStore,work:&str,request:&Request)->Result<Option<ReviewCandidate>,E>{
     acquire_using(root,work,request,None)
 }
-/// Internal registered-review variant. Callers select the actual immutable job;
-/// this borrowed record only enables exact running-record equality, no permission.
+/// Internal retained-review variant. Native job callers still require their
+/// exact running record; publication inspection may select a completed opinion
+/// only after verifying its actual original. Source equality grants no permission.
 pub(in crate::root_store) fn acquire_using(root:&RootStore,work:&str,request:&Request,review:Option<&crate::IndependentReview>)->Result<Option<ReviewCandidate>,E>{
     let reservation=root.directory.reserve(false,false).map_err(E::Storage)?;
     let observed=(||{

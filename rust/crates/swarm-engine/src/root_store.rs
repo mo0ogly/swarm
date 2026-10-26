@@ -37,6 +37,10 @@ mod review_preview;
 #[cfg(target_os = "linux")]
 mod native_review_context;
 #[cfg(target_os = "linux")]
+mod managed_publication;
+#[cfg(target_os = "linux")]
+pub use managed_publication::ManagedPublicationPreview;
+#[cfg(target_os = "linux")]
 mod native_worker_retry;
 #[cfg(target_os = "linux")]
 mod review_recovery;

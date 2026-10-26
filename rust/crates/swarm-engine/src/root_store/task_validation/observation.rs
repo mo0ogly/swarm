@@ -22,7 +22,8 @@ pub(super) struct Observation {
 }
 /// Read actual completed producer, canonical submission, active authority, saved
 /// per-task policy and report hash under the caller's snapshot. Candidate purpose
-/// admits only managed work; ordinary/reviewer purpose keeps its original managed
+/// admits only managed work; RecordedOpinion may observe the exact blocked
+/// changes-requested task without any retry admission. Ordinary/reviewer purpose keeps its original managed
 /// refusal. No Git, command, grant, mutation or candidate path is touched. Errors
 /// retain their existing typed causes; observations are not future authority.
 pub(super) fn observe_submission(
@@ -69,7 +70,12 @@ pub(super) fn observe_submission(
     if matches.next().is_some() {
         return Err(E::Refused("task-validation-task-duplicate"));
     }
-    if task.status != "submitted" {
+    // A recorded adverse opinion has already blocked this same submitted
+    // producer. Only readonly source observation may inspect that exact record;
+    // fresh controls, new reviewer claims and retry authority stay separate.
+    let adverse_observation = task.status == "blocked"
+        && matches!(&review_source, ReviewSource::RecordedOpinion(r) if r.state == "changes_requested");
+    if task.status != "submitted" && !adverse_observation {
         return Err(E::Refused("task-validation-submitted-required"));
     }
     if task.independent_review.as_deref() != review_source.record()

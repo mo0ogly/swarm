@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Prépublication gérée : contrôle explicite de l’avis natif, des originaux de contrôle et du candidat courant ; blocages de publication et de baseline affichés, sans acceptation ni nouvel appel.",
+        "en": "Managed prepublication: explicit native-opinion, original-control and current-candidate checks; publication and baseline blockers remain visible, without acceptance or another call."
+      },
+      {
         "fr": "PAEA : examiner une action depuis le menu, lire ses termes exacts, son contexte déclaré et ses sources ordonnées ; empreintes et rapport commun CLI/API téléchargeable, sans accord ni effet.",
         "en": "PAEA: inspect an action from the menu, read exact terms, declared context and ordered sources; hashes and shared CLI/API report download, without approval or effect."
       },

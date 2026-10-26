@@ -102,6 +102,17 @@ struct Inputs {
 fn launch(error: A) -> E {
     E::Launch(Box::new(error))
 }
+/// Select only a source-observation purpose from an internally read record.
+/// Completed opinion observation is not admission: native job consumers still
+/// require their exact running record and publication verifies original custody.
+/// Fresh/public controls retain their absent-review check; no DTO grants a mode.
+fn review_source(review:Option<&crate::IndependentReview>)->ReviewSource<'_>{
+    match review {
+        Some(r) if matches!(r.state.as_str(),"passed"|"changes_requested")=>ReviewSource::RecordedOpinion(r),
+        Some(r)=>ReviewSource::Claimed(r),
+        None=>ReviewSource::Fresh,
+    }
+}
 /// Read actual managed submission and owner/phase under a short reservation and
 /// SQL snapshot. None means genuinely ordinary Work only, never a failed read.
 /// Fresh requires idle task; existing jobs require exact current scalar equality.
@@ -114,7 +125,8 @@ fn inputs(
 ) -> Result<Option<Inputs>, E> {
     inputs_using(store,work,request,job,None)
 }
-/// Internal reviewer observation may name only the exact current running record;
+/// Internal reviewer observation names the exact current running record or a
+/// completed opinion for readonly source inspection;
 /// the shared submission guard compares it in full. This is no exec allowance.
 fn inputs_using(store:&RootStore,work:&str,request:&Request,job:Option<&store::Job>,review:Option<&crate::IndependentReview>)->Result<Option<Inputs>,E>{
     let reservation = store.directory.reserve(false, false).map_err(E::Storage)?;
@@ -158,7 +170,7 @@ fn inputs_using(store:&RootStore,work:&str,request:&Request,job:Option<&store::J
                 &settings,
                 work,
                 &request,
-                review.map_or(ReviewSource::Fresh,ReviewSource::Claimed),
+                review_source(review),
                 RepositoryPurpose::Candidate,
             )
             .map_err(launch)?;
@@ -339,7 +351,7 @@ pub(super) fn acquire_job(
     acquire(store, input, false, Some(candidate))
 }
 /// Pin an existing completed control job for an internally selected current
-/// running reviewer. Full submission equality and immutable checkpoint guards
+/// running reviewer or readonly completed opinion. Full submission equality and immutable checkpoint guards
 /// remain; fresh public controls still use None and cannot name this allowance.
 pub(super) fn acquire_for_review(store:&RootStore,job:&store::Job,candidate:&ManagedCandidate,review:Option<&crate::IndependentReview>)->Result<Session,E>{
     let request=Request{schema_version:1,event_id:job.event_id.clone(),expected_revision:job.work_revision,task_id:job.task_id.clone()};
@@ -411,7 +423,7 @@ pub(super) fn prepare_for_review(db:&rusqlite::Connection,directory:&crate::root
         settings,
         work,
         request,
-        review.map_or(ReviewSource::Fresh,ReviewSource::Claimed),
+        review_source(review),
         RepositoryPurpose::Candidate,
     )?;
     let limits = settings
