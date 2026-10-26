@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Falsifiable PAEA laboratory recipes, using real fixture effects and dev77 CLI.
+"""Falsifiable PAEA laboratory recipes, using real effects and a pinned native CLI.
 
 No build, provider, live Root, authority boundary or independent evaluation.
 Every injected fault has a valid control first. Raw subprocess outputs, exact
@@ -293,6 +293,64 @@ class PilotLab(unittest.TestCase):
             'owner': 'PA-02/03 business registry integration', 'resolution': 'resolve project-unique debt objects before admission; version schema if unavailable'}
         (root / 'counterexample.json').write_text(json.dumps(counterexample, indent=2) + '\n')
         print('PAEA_GUIDE_03_COUNTEREXAMPLE_RETAINED two effects for unresolved raw aliases', flush=True)
+
+    def test_resolved_invoice_aliases_converge_on_one_effect(self):
+        """Actual public resolver plus sink/oracle: aliases replay one debt effect.
+
+        This cooperative snapshot is NOT protected. Correction preserves intent
+        but cannot be attributed to a prior exact grant or duplicate its effect.
+        The original unresolved two-row counterexample remains a separate test.
+        """
+        self.witness('payment')
+        root, doc, _, _ = self.prepare('payment')
+        registry = json.loads((ROOT / 'tests/fixtures/paea/payment-registry-v1.json').read_bytes())
+        request = json.loads((ROOT / 'tests/fixtures/paea/payment-request-v1.json').read_bytes())
+        registry['project_id'] = request['project_id'] = doc['context']['project_id']
+
+        def resolved():
+            """Retain both raw inputs and invoke the same pinned public executable.
+
+            Failures are recorded before assertions; no fallback proposal is used.
+            A successful report establishes data correspondence only.
+            """
+            left = root / 'registry.json'
+            right = root / 'request.json'
+            left.write_text(json.dumps(registry))
+            right.write_text(json.dumps(request))
+            result = self.run_process([self.binary, 'protection', 'resolve-payment', left, right, '--json'])
+            self.assertEqual(result.returncode, 0, result.stderr)
+            value = json.loads(result.stdout)
+            self.assertEqual(value['registry_sha256'], hashlib.sha256(left.read_bytes()).hexdigest())
+            self.assertEqual(value['request_sha256'], hashlib.sha256(right.read_bytes()).hexdigest())
+            self.assertEqual(value['registry_authenticity'], 'not-established')
+            return value['proposal']
+
+        doc['proposal'] = resolved()
+        first = self.report(doc)
+        lab.authority(root, 'approve', first)
+        self.assertEqual(self.commit(root, doc).returncode, 0)
+        self.assert_effect(self.oracle(root, 'payment'), 'payment', first)
+        request['invoice_reference'] = 'legacy-12'
+        request['request_id'] = 'attempt-alias'
+        doc['proposal'] = resolved()
+        alias = self.report(doc)
+        self.assertEqual(alias['intent_id'], first['intent_id'])
+        self.assertEqual(alias['action_digest'], first['action_digest'])
+        self.assertEqual(self.commit(root, doc).returncode, 0)
+        self.assert_effect(self.oracle(root, 'payment'), 'payment', first, count=1)
+        registry['revision'] = request['expected_registry_revision'] = 2
+        registry['debts'][0]['invoice_version'] = request['expected_invoice_version'] = 'v8'
+        registry['debts'][0]['amount_minor'] = '420001'
+        doc['proposal'] = resolved()
+        corrected = self.report(doc)
+        self.assertEqual(corrected['intent_id'], first['intent_id'])
+        self.assertNotEqual(corrected['action_digest'], first['action_digest'])
+        self.assertNotEqual(self.commit(root, doc).returncode, 0)
+        self.assert_effect(self.oracle(root, 'payment'), 'payment', first, count=1)
+        lab.authority(root, 'approve', corrected)
+        self.assertNotEqual(self.commit(root, doc).returncode, 0)
+        self.assert_effect(self.oracle(root, 'payment'), 'payment', first, count=1)
+        print('PAEA_GUIDE_03_RESOLVED_FIXTURE one effect for two resolved aliases; authority unestablished', flush=True)
 
 
 if __name__ == '__main__':

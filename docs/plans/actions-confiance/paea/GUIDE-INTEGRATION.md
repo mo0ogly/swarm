@@ -123,3 +123,19 @@ processus oracle séparé et contre-exemple des IDs bruts de dette. Sept tests
 PASS et intégrité VERIFIED ; le garde Git affaibli est détecté par contre-épreuve.
 Autorité simulée/même UID, aucun menu de campagne ni protection native livré.
 Ces preuves préparent PA-02/03 ; **0/17 invariants de bout en bout** reste inchangé.
+
+### Suite GUIDE-03 — incrément 16
+
+Le résolveur pur et la CLI `protection resolve-payment` traitent désormais un
+mapping explicite fournisseur/référence → objet de dette stable. Collisions et
+versions périmées refusent ; deux fournisseurs peuvent partager une référence.
+[Contrat](../../../architecture/PAEA-CONTRACT.md) et [incrément 16](INCREMENT-16.md).
+Le producteur protégé, la continuité des IDs entre snapshots et leur fraîcheur
+au point d’engagement restent ouverts ; GUIDE-03 n’est pas clos globalement.
+
+### Parcours opérateur — incrément 17
+
+Le menu Vérifications PAEA donne désormais accès à la résolution de référence
+de facture par registre/demande, via le même résolveur API/CLI. Montant et
+révision exacts, marqueurs non autorisants et export brut ; [preuve et limites](INCREMENT-17.md).
+Cela n’active ni registre protégé ni campagnes de laboratoire dans l’UX.

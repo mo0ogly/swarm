@@ -9,16 +9,22 @@
     "docs/plans/actions-confiance/paea/PILOTE-OPERATIONNEL.md",
     "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
     "rust/crates/swarm-protection-contract/src/*.rs",
-    "rust/crates/swarm-cli/src/protection.rs"
+    "rust/crates/swarm-cli/src/protection.rs",
+    "tests/fixtures/paea/payment-*.json"
   ],
-  "environment": {"PYTHONDONTWRITEBYTECODE": "1"},
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
   "steps": [
     {
       "id": "isolated-effect-scenarios",
-      "command": ["python3", "tests/paea_pilot_lab_test.py"],
+      "command": [
+        "python3",
+        "tests/paea_pilot_lab_test.py"
+      ],
       "expected_exit": 0,
       "required_stdout": [
-        "Ran 7 tests",
+        "Ran 8 tests",
         "OK",
         "test_t04_substitution_then_equivalent_json_recovery",
         "test_t06_t21_crash_new_attempt_exact_marker_and_reconciliation",
@@ -28,7 +34,9 @@
         "test_output_failure_after_effect_is_unknown_and_reconciles",
         "test_invoice_alias_is_a_counterexample_without_authoritative_registry",
         "PAEA_GUIDE_03_COUNTEREXAMPLE_RETAINED",
-        "PAEA_PILOT_BINARY_STABLE"
+        "PAEA_PILOT_BINARY_STABLE",
+        "test_resolved_invoice_aliases_converge_on_one_effect",
+        "PAEA_GUIDE_03_RESOLVED_FIXTURE"
       ],
       "required_stderr": []
     }

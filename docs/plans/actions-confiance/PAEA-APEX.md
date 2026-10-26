@@ -393,3 +393,33 @@ local généré conserve commit distant, version/PID/hash réellement activés.
 Le menu de correspondance est qualifié ; les campagnes de laboratoire restent
 hors UX. Cette livraison ne clôt ni PA-02/03 protégés, ni les **17 invariants**,
 ni E2/E3/RETEX du programme.
+
+### Incrément 16 — identité de dette explicite
+
+[Décision et critères](paea/INCREMENT-16.md) : préserver le hash v1 et résoudre
+fournisseur/référence vers un objet de dette stable avant admission. Bibliothèque
+pure et CLI hors ligne, rejet des collisions et versions périmées ; observation
+d’un seul effet de fixture pour deux aliases. Le registre fourni reste non
+authentifié ; continuité inter-révisions et autorité protégée restent ouvertes.
+
+Incrément 16 vérifié et installé **dev82** : 37 tests de contrat, 2 tests publics
+(33 appels), 8 scénarios à effets de fixture et 26 contrôles de l’instance PASS ;
+garde réseau de la recette vérifiée par échec attendu après témoin. Sources non
+commitées ; aucune nouvelle garantie protégée ni clôture E2/E3.
+
+### Incrément 17 — résolution de facture dans le menu
+
+[Contrat, décision et preuves](paea/INCREMENT-17.md) : PA-08 expose le résolveur
+commun depuis Vérifications PAEA, sur une page dédiée avec aide et téléchargement.
+API native fermée, nombres i64 exacts, erreurs/reprises et marqueurs non autorisants.
+Le parcours action/reçu est conservé ; aucune activation de registre protégé.
+
+Incrément 17 livré sur **dev87** : 4 tests schéma/4 HTTP, 219 assertions composant,
+452 assertions natives sur dev86 aux 448 entrées identiques, 30 contrôles de
+l’instance dev87 PASS. Numéros/commit/date distingués ; rapport de réutilisation
+conservé. Clippy/Rustdoc PASS ; gardes de perte de script vérifiées après témoins.
+Sources PAEA non commitées ; registres/accords protégés et E2/E3 restent ouverts.
+
+Publication demandée le 26 octobre : commit isolé des incréments 16/17, sans
+push ni nouvelle livraison ; voir le suivi de publication en fin du rapport 17.
+Les mentions précommit ci-dessus conservent leur portée historique.

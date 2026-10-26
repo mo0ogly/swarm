@@ -6,11 +6,11 @@ use std::{
 };
 use swarm_protection_contract::{
     canonicalize, check_receipt_documents, check_receipt_transition, compare_documents,
-    decode_document, decode_receipt, State, SCHEMA_VERSION,
+    decode_document, decode_receipt, resolve_payment_documents, State, SCHEMA_VERSION,
 };
 
 /// Read bounded documents through the existing CLI input mechanism and emit
-/// canonical bytes/digests, a comparison, proposed receipt transition or exact-input report. All
+/// canonical bytes/digests, a comparison, payment resolution, proposed receipt transition or exact-input report. All
 /// supplied context/receipt/state/sink data remain untrusted, explicitly marked
 /// in output. Reject incompatible runtime/root/server/output options; no Root is opened,
 /// no credential is read and no policy is saved. Input/parse/encode/output/flush
@@ -29,6 +29,9 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         && a.input.is_empty()
     {
         return check_receipt(a, out);
+    }
+    if a.pos.len() == 4 && a.pos[1] == "resolve-payment" && a.input.is_empty() {
+        return resolve_payment(a, out);
     }
     if a.pos.len() == 4 && a.pos[1] == "compare" && a.input.is_empty() {
         // Two named files avoid ambiguous ownership/framing of a shared stdin.
@@ -69,6 +72,26 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         "authority":"not-established", "scope":"offline-data-only"
     });
     let bytes = serde_json::to_vec(&value)
+        .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;
+    write_output(out, &bytes)?;
+    Ok(0)
+}
+
+/// Read registry/request from two named regular files after the common runtime
+/// option gate. Stdin is excluded to avoid ambiguous framing. All strict parsing
+/// and resolution precede output; reads/serialization/write/flush retain causes.
+/// Sequential reads establish no atomic snapshot or freshness. No Root, protected
+/// registry or effect is opened; partial output after IO failure grants no rights.
+fn resolve_payment(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+    if a.pos[2] == "-" || a.pos[3] == "-" {
+        return Err(CliError::Usage);
+    }
+    let registry =
+        swarm_engine::read_command_file(Path::new(&a.pos[2])).map_err(CliError::CommandInput)?;
+    let request =
+        swarm_engine::read_command_file(Path::new(&a.pos[3])).map_err(CliError::CommandInput)?;
+    let report = resolve_payment_documents(&registry, &request).map_err(CliError::Protection)?;
+    let bytes = serde_json::to_vec(&report)
         .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;
     write_output(out, &bytes)?;
     Ok(0)

@@ -30,9 +30,9 @@ Les commandes `protection commit`, `approve` ou `config-apply` refusent.
 
 La bibliothèque Rust `swarm-protection-contract` est partagée par cette commande.
 Elle ne dépend pas du moteur, n’a aucun accès OS et ne modifie aucun format Trust.
-La commande a été vérifiée sur le candidat de test ; sa disponibilité dans
-l’instance installée n’est pas établie. La consigne utilisateur de ne plus compiler
-pendant son autre session diffère la construction et l’installation.
+La livraison 15 a qualifié ces commandes sur le profil natif et installé dev80.
+La restriction historique de compilation a été levée ; les preuves des étapes
+antérieures restent conservées avec leur portée d’origine.
 
 ## Représentations
 
@@ -389,3 +389,75 @@ consigne sans compilation/redémarrage. Après un changement concurrent du catal
 (hors libellés PAEA), le composant a été rejoué séparément sur les octets courants :
 219 assertions et 40 requêtes simulées PASS. Le pont garde son catalogue archivé ;
 voir [incrément 12](../plans/actions-confiance/paea/INCREMENT-12.md).
+
+## Résolution hors ligne des dettes — incrément 16
+
+`swarm protection resolve-payment REGISTRE DEMANDE --json --lang fr` utilise
+le même module Rust pur que les autres commandes. Deux fichiers réguliers nommés
+sont requis ; stdin et options de runtime incompatibles sont refusés avant lecture.
+Exemples versionnés : `tests/fixtures/paea/payment-registry-v1.json` et
+`payment-request-v1.json`. Schéma : `schemas/paea/payment-resolution-v1.schema.json`.
+
+Le registre contient `schema_version:1`, `project_id`, `revision` positive i64 et
+`debts`. Chaque dette fournit `debt_id`, `supplier_id`, `invoice_references` non
+vide, `invoice_version`, `amount_minor`, `currency`, `beneficiary_account_id`.
+La demande fournit `schema_version:1`, `request_id`, `project_id`, `supplier_id`,
+`invoice_reference`, `expected_registry_revision`, `expected_invoice_version`.
+Tous les objets sont fermés ; doublons JSON et nombres flottants sont refusés.
+La grammaire des identifiants et des termes est celle du contrat v1, sans nouveau
+plafond opérateur. Le snapshot entier est vérifié avant sélection : identifiant
+de dette unique, couple fournisseur/référence unique, y compris les autres lignes.
+Aucune recherche approximative, normalisation ou fusion automatique.
+
+Le rapport v1 contient `proposal` (proposition v1 dont `invoice_id=debt_id`),
+`registry_revision`, SHA256 exacts `registry_sha256`/`request_sha256`,
+`scope:"offline-data-only"` et les trois mentions `authority`,
+`registry_authenticity`, `effect` à `"not-established"`. La proposition n’inclut
+pas le contexte : le futur producteur protégé doit vérifier le projet et lier
+l’observation du registre au contexte avant canonicalisation/accord. Les hashes
+ne prouvent ni signature ni fraîcheur. Une correction conserve `debt_id`, change
+le contenu exact et conserve l’intention v1. Aucune migration du hash v1.
+
+Codes sûrs : `protection-registry-identifier`, `protection-registry-ambiguous`,
+`protection-registry-project-mismatch`, `protection-registry-stale`,
+`protection-registry-reference-unknown`, `protection-invoice-stale`, plus les
+erreurs de représentation communes. Aucune proposition après refus ; récupérer
+les données courantes attribuées, corriger puis refaire explicitement le contrôle.
+Lecture/écriture/flush gardent leurs causes ; une erreur de sortie peut exposer
+un JSON partiel/complet, jamais un règlement. Les snapshots indépendants ne
+prouvent ni continuité des IDs ni absence de dettes sémantiquement dupliquées
+avec des références disjointes. PA-02/03 protégés restent ouverts.
+
+## Résolution de facture dans Vérifications PAEA — incrément 17
+
+Depuis le cockpit : **Vérifications PAEA → Résoudre une référence de facture**
+ouvre `/paea-payment.html`. Choisir les fichiers registre et demande décrits plus
+haut, puis **Résoudre la référence**. L’aide repliée précise leur rôle. Le résultat
+affiche dette, version, montant entier en unités mineures/devise, compte, révision
+et hashes. Le rapport brut peut être téléchargé ; il ne crée ni contexte
+d’admission, ni accord, ni règlement. Les liens entre ces vues gardent langue et
+thème. Le contrôle action/reçu reste disponible par retour explicite.
+
+`POST /api/v1/protection/resolve-payment` exige Host/session/origin/CSRF natifs,
+JSON, aucun paramètre de query et la borne de transport existante. Enveloppe
+fermée : `{schema_version:1, registry:String, request:String}`. Les chaînes sont
+les JSON UTF-8 originaux, pas des objets parsés ni des chemins serveur. Schéma :
+`schemas/paea/http-payment-check-v1.schema.json`. La route renvoie exactement le
+rapport `payment-resolution-v1`, par le même résolveur que la CLI. Les erreurs de
+transport/JSON/résolution gardent leur cause typée et un code sûr ; aucun rapport
+partiel ni mutation Root par cette opération.
+
+Le navigateur décode les fichiers en UTF-8 fatal, conserve BOM et nombres des
+entrées. Pour la révision i64 du rapport, il conserve le lexème numérique exact
+via le contexte du décodeur JSON ; ce texte est interne à l’affichage. Un
+navigateur sans cette capacité refuse et propose la CLI. Le téléchargement
+conserve le JSON original, dont `registry_revision` reste un entier. Le montant
+reste une chaîne entière ; aucune échelle monétaire n’est déduite de la devise.
+Forme fermée, bornes de représentation v1, marqueurs non autorisants et hashes
+des deux fichiers sont vérifiés avant affichage/téléchargement. Les fichiers
+restent sélectionnés après refus, le résultat antérieur est effacé et une
+nouvelle vérification exige un geste explicite. Aucun retry, stockage des
+documents dans le navigateur, réglage opérateur ou nouveau plafond métier.
+
+Ce raccord ne livre pas un registre protégé : authentification, continuité des
+IDs, fraîcheur, approbateur humain et engagement effectif restent PA-02/03.

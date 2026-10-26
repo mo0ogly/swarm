@@ -9,16 +9,47 @@
     "web/swarm-design.css",
     "web/wattson_themes.css",
     "web/swarm-logo.png",
-    "version_history.json"
+    "version_history.json",
+    "web/paea-payment.html",
+    "tests/fixtures/paea/payment-*.json"
   ],
   "environment": {},
   "steps": [
     {
       "id": "real-native-browser-flow",
-      "command": ["node", "tests/paea_native_ui_test.cjs"],
+      "command": [
+        "node",
+        "tests/paea_native_ui_test.cjs"
+      ],
       "expected_exit": 0,
-      "required_stdout": ["all-twelve-native-browser-cases", "no-unexpected-browser-diagnostics", "PAEA_NATIVE_UI_PASS"],
+      "required_stdout": [
+        "all-twelve-native-browser-cases",
+        "no-unexpected-browser-diagnostics",
+        "PAEA_NATIVE_UI_PASS",
+        "all-twelve-payment-browser-cases",
+        "payment-unsupported-number-reader-refuses",
+        "payment-invalid-utf8-never-sent",
+        "payment-no-duplicate-gesture",
+        "en-sombre-320-payment-primary-contrast-AA"
+      ],
       "required_stderr": []
+    },
+    {
+      "id": "script-loss-aborts-pending-wait",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess; e=dict(os.environ);e['SWARM_PAEA_NATIVE_FAULT']='script';e['SWARM_PAEA_UI_EVIDENCE']=os.environ['SWARM_PAEA_UI_EVIDENCE']+'-script-fault'; raise SystemExit(subprocess.run(['node','tests/paea_native_ui_test.cjs'],env=e).returncode)"
+      ],
+      "expected_exit": 1,
+      "required_stdout": [
+        "actual-default-profile-executable",
+        "fr-etat-1440-payment.settle-recovery",
+        "INJECTED_NATIVE_PAEA_SCRIPT_FAILURE"
+      ],
+      "required_stderr": [
+        "unexpected-native-browser-diagnostic"
+      ]
     }
   ]
 }

@@ -235,7 +235,8 @@ impl HttpServiceError {
     /// No retry, rollback or authentication decision is inferred from this code.
     fn status(&self) -> StatusCode {
         if self.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
-        if let Self::Root{cause,..}=self {if cause.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
+        if let Self::Root{cause,..}=self {if cause.trust_publication().is_some(){return StatusCode::INTERNAL_SERVER_ERROR;}
+        if let Some(e)=cause.trust_failure(){return match e{swarm_engine::TrustError::Authorization=>StatusCode::FORBIDDEN,swarm_engine::TrustError::Conflict(_)|swarm_engine::TrustError::Integrity(_)=>StatusCode::CONFLICT,swarm_engine::TrustError::Unsupported(_)=>StatusCode::NOT_IMPLEMENTED,_=>StatusCode::BAD_REQUEST};}}
 
         if self.recorded_preparation().is_some() || self.recorded_work().is_some() || self.configuration_may_be_recorded() {
             return StatusCode::INTERNAL_SERVER_ERROR;
@@ -813,6 +814,7 @@ impl NativeHttpService {
             "/api/v1/quotas/apply" => self.quotas(quotas::Operation::Apply,request),
             "/api/v1/trust-actions" => self.trust_actions(request),
             "/api/v1/protection/receipt-report" => paea::receipt_report(request),
+            "/api/v1/protection/resolve-payment" => paea::resolve_payment(request),
             "/api/v1/native-settings" => self.engine_settings(SettingsOperation::Show, request),
             "/api/v1/native-settings/describe" => {
                 self.engine_settings(SettingsOperation::Describe, request)

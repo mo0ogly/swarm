@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "paea-local-delivery",
+  "inputs": [
+    "tests/paea_local_delivery_test.cjs",
+    "version_history.json",
+    "web/paea.*",
+    "web/i18n*.js",
+    "web/swarm-design.css",
+    "web/wattson_themes.css",
+    "web/swarm-logo.png",
+    "web/trust-native.css",
+    "web/paea-payment.html"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "read-only-local-browser",
+      "command": [
+        "node",
+        "tests/paea_local_delivery_test.cjs"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "LIVE_PAEA_DELIVERY_VERIFIED 30",
+        "fr-dialog-current-PAEA-evolutions",
+        "en-dialog-current-PAEA-evolutions",
+        "no-browser-errors-or-writes",
+        "fr-live-payment-menu-and-fields",
+        "en-live-payment-limits-no-submission"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "failed-script-aborts-wait",
+      "command": [
+        "node",
+        "tests/paea_local_delivery_test.cjs",
+        "--fault-version-script"
+      ],
+      "expected_exit": 1,
+      "required_stdout": [
+        "INJECTED_VERSION_SCRIPT_FAILURE"
+      ],
+      "required_stderr": [
+        "unexpected-browser-diagnostic"
+      ]
+    }
+  ]
+}

@@ -1278,6 +1278,36 @@ La recette couvre la reconstruction d'un global absent à partir de tous les
 créneaux réels, et ses refus/restaurations. L'heure conservée est celle de
 l'assemblage ; aucune sortie de processus ni preuve d'acceptation n'est inventée.
 
+### PAEA debt resolution and local delivery
+
+`paea-payment-registry.json` checks four schema cases, six pure resolution tests,
+three public CLI tests (including write/flush causes), and the existing 17 v1
+contract/eight CLI regressions: 38 named tests, without a global watchdog.
+`paea-pilot-lab.json` now checks eight cases, including unresolved aliases as a
+retained two-effect counterexample and resolved aliases as one cooperative effect.
+
+`paea-local-delivery.json` reads the identified managed instance only. Set
+`SWARM_PAEA_LIVE_STATUS` to a retained `./swarm.sh status` JSON and
+`SWARM_PAEA_LIVE_EVIDENCE` to a fresh browser-output directory, then run/verify
+through `recipe.py`. It checks PID/executable hash, ten authenticated asset byte
+sets, current notes and Version dialog FR/EN, actual commit/dirty disclosure, focus
+and browser diagnostics (30 assertions, FR light/EN dark). It refuses non-GET/HEAD requests, never
+restarts the service and does not use a live mission database as a fixture.
+Private session material is read through an owned no-follow descriptor and never
+logged. Private browser profiles remain excluded from publication. A fixed note
+count is not content verification; compare the current catalogue and actual text.
+Select binaries from observed service/build identity, not a historical pathname.
+None of these recipes establishes a protected business registry or E2/E3.
+
+The live recipe runs a successful control before `--fault-version-script`: this
+blocks one script GET only in the owned browser and expects exit 1 with the
+original diagnostic. Event-driven rejection interrupts pending DOM waits; no
+server restart, sleep or global deadline is injected. Actual service PID changes
+make an earlier observation incomplete, even with identical binary bytes.
+`paea-payment-public.json` checks the production executable through 33 recorded
+calls/two named tests, retaining the exercised binary hash and all fixture bytes.
+
+
 ### Managed candidate inspection before native final review
 
 `native-managed-review-inputs.json` runs actual ordinary input/privacy and reviewer
@@ -1301,3 +1331,24 @@ pas suivis ; le binaire refuse avant appel. Le lancement géré reste protégé.
 The targeted Rust input-coherence unit is selected separately with `--lib` and its
 existing successful proof is reused while relevant executable inputs remain
 unchanged; this public-journey recipe does not repeat that compilation.
+
+### PAEA invoice resolution UI (increment 17)
+
+`paea-payment-http.json` runs four schema/four HTTP tests, including the original
+receipt boundary. `paea-native-ux.json` now covers both pages on an exact normal
+binary: 12 receipt and 12 invoice-resolution configurations, FR/EN, both themes,
+1440/390/320 px, protected embedded bytes, i64 maximum values, real completed
+downloads and native refusals/recovery. Browser-only corrupt-response injections
+are named separately and never establish server/sink correctness. Each follows a
+real native control. A second recipe step blocks the script in its owned browser
+after valid receipt controls and expects a diagnostic exit 1; event-driven
+rejection interrupts DOM waits, without restarting the fixture server or using a
+watchdog. Owned child exits are failures until deliberate teardown.
+
+`paea-local-delivery.json` verifies 30 read-only assertions on the managed
+instance: menu-to-invoice empty inputs, explicit limits, ten unique asset byte
+sets, exact FR/EN notes, actual version/commit/dirty disclosure and focus. The
+valid control still precedes its browser-only script failure. No live data POST.
+The old component recipe remains a labelled HTTP double; its cockpit navigation
+expectation now matches the independently verified increment-15 change. Native
+UI and local-delivery proofs remain distinct from component tests and protection.

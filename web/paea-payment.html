@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr" data-theme="etat">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Swarm — PAEA</title>
+  <link rel="icon" href="/swarm-logo.png">
+  <link rel="stylesheet" href="/wattson_themes.css">
+  <link rel="stylesheet" href="/swarm-design.css">
+  <link rel="stylesheet" href="/paea.css">
+  <script src="/i18n-en.js" defer></script>
+  <script src="/i18n.js" defer></script>
+  <script src="/paea.js" defer></script>
+</head>
+<body data-paea-operation="resolve-payment">
+  <a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
+  <header>
+    <a href="/">Swarm</a>
+    <h1 data-i18n>Résolution de facture</h1>
+    <nav aria-label="Navigation PAEA">
+      <a href="/" data-i18n>Cockpit</a>
+      <a href="/paea.html" data-paea-link data-i18n>Vérifications PAEA</a>
+      <button id="paea-theme" type="button" data-i18n>Changer de thème</button>
+    </nav>
+  </header>
+  <main id="paea-main" tabindex="-1">
+    <p data-i18n>Retrouver l’objet de dette et ses conditions à partir d’un registre et d’une demande de facture.</p>
+    <p id="paea-limits" class="paea-notice" data-i18n>Le registre fourni n’est pas authentifié. Ce contrôle ne donne aucun droit et ne déclenche aucun règlement.</p>
+    <details id="paea-format-help"><summary data-i18n>Préparer les fichiers</summary><p data-i18n>Utiliser deux fichiers du même projet. La demande indique le fournisseur, la référence et les versions attendues. Le registre associe les références à une dette stable et fournit le montant entier, la devise et le compte bénéficiaire. Une référence absente, ambiguë ou périmée est refusée.</p></details>
+    <form id="paea-form" aria-describedby="paea-limits">
+      <fieldset id="paea-inputs">
+        <legend data-i18n>Documents à résoudre</legend>
+        <label for="paea-registry" data-i18n>Registre des dettes — JSON UTF-8</label>
+        <input id="paea-registry" type="file" accept=".json,application/json" required>
+        <label for="paea-request" data-i18n>Demande de facture — JSON UTF-8</label>
+        <input id="paea-request" type="file" accept=".json,application/json" required>
+      </fieldset>
+      <button id="paea-check" class="paea-primary" type="submit" disabled data-i18n>Résoudre la référence</button>
+    </form>
+    <p id="paea-status" role="status" aria-live="polite" data-state="loading" data-i18n>Chargement de la session…</p>
+    <section aria-labelledby="paea-result-title">
+      <h2 id="paea-result-title" data-i18n>Résultat de la résolution</h2>
+      <p id="paea-summary"></p>
+      <dl id="paea-identities"></dl>
+      <button id="paea-download" type="button" disabled data-i18n>Télécharger le rapport</button>
+      <details><summary data-i18n>Rapport technique</summary><pre id="paea-report"></pre></details>
+    </section>
+  </main>
+</body>
+</html>

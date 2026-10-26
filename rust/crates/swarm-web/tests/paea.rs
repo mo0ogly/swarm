@@ -113,6 +113,192 @@ fn input(index: usize) -> Value {
             "intent_id":vector["intent_id"],"sink_id":"sink-1","outcome":"COMMITTED","observation_digest":"d".repeat(64)})).unwrap(),
         "expected_sink":"sink-1","previous_state":"COMMIT_REQUESTED"})
 }
+
+/// Transport frozen registry/request as exact strings, never caller authority.
+fn payment_input() -> Value {
+    json!({"schema_version":1,
+        "registry":include_str!("../../../../tests/fixtures/paea/payment-registry-v1.json"),
+        "request":include_str!("../../../../tests/fixtures/paea/payment-request-v1.json")})
+}
+
+/// A valid existing receipt control precedes the new route. Require exact shared
+/// resolver bytes, full i64 revision and no Root mutation; not browser/effect proof.
+#[test]
+fn paea_payment_http_exact_resolution_and_integer_bytes_are_data_only() {
+    let fixture = Fixture::new();
+    assert_eq!(
+        fixture
+            .call(fixture.request(
+                "POST",
+                "/api/v1/protection/receipt-report",
+                serde_json::to_vec(&input(0)).unwrap()
+            ))
+            .response
+            .status(),
+        StatusCode::OK
+    );
+    let before = snapshot(&fixture.root);
+    let mut body = payment_input();
+    for revision in [1_i64, i64::MAX] {
+        let mut registry: Value = serde_json::from_str(body["registry"].as_str().unwrap()).unwrap();
+        let mut request: Value = serde_json::from_str(body["request"].as_str().unwrap()).unwrap();
+        registry["revision"] = json!(revision);
+        request["expected_registry_revision"] = json!(revision);
+        body["registry"] = json!(serde_json::to_string(&registry).unwrap());
+        body["request"] = json!(serde_json::to_string(&request).unwrap());
+        let expected = swarm_protection_contract::resolve_payment_documents(
+            body["registry"].as_str().unwrap().as_bytes(),
+            body["request"].as_str().unwrap().as_bytes(),
+        )
+        .unwrap();
+        let reply = fixture.call(fixture.request(
+            "POST",
+            "/api/v1/protection/resolve-payment",
+            serde_json::to_vec(&body).unwrap(),
+        ));
+        assert_eq!(
+            reply.response.status(),
+            StatusCode::OK,
+            "owned fixture: {}",
+            fixture.root.display()
+        );
+        assert_eq!(
+            reply.response.body(),
+            &serde_json::to_vec(&expected).unwrap()
+        );
+        assert_eq!(snapshot(&fixture.root), before);
+    }
+}
+
+/// Matching controls bracket transport/admission/semantic refusals; preserve
+/// safe typed causes, no success/Root mutation and recovery. New assets stay private.
+#[test]
+fn paea_payment_http_refusals_recover_without_mutation() {
+    let fixture = Fixture::new();
+    let path = "/api/v1/protection/resolve-payment";
+    let raw = serde_json::to_vec(&payment_input()).unwrap();
+    let before = snapshot(&fixture.root);
+    for fault in [
+        "cookie",
+        "csrf",
+        "host",
+        "origin",
+        "method",
+        "query",
+        "type",
+        "version",
+        "duplicate",
+        "unknown",
+        "inner-type",
+        "inner-duplicate",
+        "project",
+        "stale",
+        "invalid-json",
+    ] {
+        assert_eq!(
+            fixture
+                .call(fixture.request("POST", path, raw.clone()))
+                .response
+                .status(),
+            StatusCode::OK
+        );
+        let mut request = fixture.request("POST", path, raw.clone());
+        match fault {
+            "cookie" => {
+                request.headers_mut().remove(COOKIE);
+            }
+            "csrf" => {
+                request.headers_mut().remove("x-swarm-csrf");
+            }
+            "host" => {
+                request
+                    .headers_mut()
+                    .insert(HOST, "outside.invalid".parse().unwrap());
+            }
+            "origin" => {
+                request
+                    .headers_mut()
+                    .insert(ORIGIN, "http://outside.invalid".parse().unwrap());
+            }
+            "method" => *request.method_mut() = http::Method::GET,
+            "query" => *request.uri_mut() = format!("{path}?root=PRIVATE_CANARY").parse().unwrap(),
+            "type" => {
+                request.headers_mut().remove("content-type");
+            }
+            "duplicate" => {
+                *request.body_mut() = format!(
+                    "{{\"schema_version\":1,{}",
+                    &String::from_utf8(raw.clone()).unwrap()[1..]
+                )
+                .into_bytes()
+            }
+            "invalid-json" => *request.body_mut() = b"PRIVATE_CANARY".to_vec(),
+            _ => {
+                let mut body = payment_input();
+                match fault {
+                    "version" => body["schema_version"] = json!(2),
+                    "unknown" => body["PRIVATE_CANARY"] = json!(true),
+                    "inner-type" => body["registry"] = json!({}),
+                    "inner-duplicate" => {
+                        body["request"] = json!(body["request"].as_str().unwrap().replace(
+                            "\"schema_version\": 1",
+                            "\"schema_version\": 1, \"schema_version\": 1"
+                        ))
+                    }
+                    _ => {
+                        let mut inner: Value =
+                            serde_json::from_str(body["request"].as_str().unwrap()).unwrap();
+                        if fault == "project" {
+                            inner["project_id"] = json!("PRIVATE_CANARY");
+                        } else {
+                            inner["expected_registry_revision"] = json!(2);
+                        }
+                        body["request"] = json!(serde_json::to_string(&inner).unwrap());
+                    }
+                }
+                *request.body_mut() = serde_json::to_vec(&body).unwrap();
+            }
+        }
+        let reply = fixture.call(request);
+        assert!(!reply.response.status().is_success(), "{fault}");
+        let error = reply.failure.as_ref().unwrap();
+        assert!(!error.to_string().contains("PRIVATE_CANARY"));
+        assert!(!String::from_utf8_lossy(reply.response.body()).contains("PRIVATE_CANARY"));
+        if [
+            "duplicate",
+            "unknown",
+            "inner-type",
+            "inner-duplicate",
+            "project",
+            "stale",
+            "invalid-json",
+        ]
+        .contains(&fault)
+        {
+            assert!(error.source().is_some(), "{fault}");
+        }
+        assert_eq!(snapshot(&fixture.root), before);
+        assert_eq!(
+            fixture
+                .call(fixture.request("POST", path, raw.clone()))
+                .response
+                .status(),
+            StatusCode::OK
+        );
+    }
+    let mut private = fixture.request("GET", "/paea-payment.html", Vec::new());
+    private.headers_mut().remove(COOKIE);
+    assert!(!fixture.call(private).response.status().is_success());
+    let page = fixture.call(fixture.request("GET", "/paea-payment.html", Vec::new()));
+    assert_eq!(page.response.status(), StatusCode::OK);
+    assert_eq!(
+        page.response.body(),
+        include_bytes!("../../../../web/paea-payment.html")
+    );
+    let entry = fixture.call(fixture.request("GET", "/paea.html", Vec::new()));
+    assert!(String::from_utf8_lossy(entry.response.body()).contains("href=\"/paea-payment.html\""));
+    assert_eq!(snapshot(&fixture.root), before);
+}
 /// Require exact common-library report, explicitly no authority or Root mutation.
 #[test]
 fn paea_http_exact_both_domains_and_unknown_are_data_only() {

@@ -31,6 +31,14 @@
         "en": "PAEA: CLI canonicalization, comparison and receipt checking; isolated fictitious-payment/Git lab with separate observation, lost-reply recovery and revocation. This lab is not a protected service."
       },
       {
+        "fr": "PAEA : résolution de facture accessible depuis Vérifications PAEA, avec registre/demande, révision et montant exacts, refus visibles et rapport téléchargeable. Les fichiers fournis ne constituent ni autorité ni règlement.",
+        "en": "PAEA: invoice resolution from PAEA checks, with registry/request files, exact revision and amount, visible refusals and downloadable report. Supplied files establish neither authority nor settlement."
+      },
+      {
+        "fr": "PAEA : résolution hors ligne des références fournisseur/facture vers un objet de dette stable, avec refus des collisions et versions périmées. Le registre fourni reste non authentifié ; aucun règlement ni droit accordé.",
+        "en": "PAEA: offline supplier/invoice references resolve to a stable debt object, rejecting collisions and stale versions. The supplied registry remains unauthenticated; no settlement or authority granted."
+      },
+      {
         "fr": "Contrôles natifs sur candidat géré : job de cohorte, créneaux de transport, helper avec répertoires détenus et origine liée à la base réelle. Reçus privés v3, publication/récupération et rejeu sans réexécution ; validateur final géré encore protégé.",
         "en": "Native managed-candidate controls: cohort job, transport slots, helper-held directories and source bound to the actual database. Private v3 receipts, publication/recovery and replay without reexecution; complete final managed review remains guarded."
       },

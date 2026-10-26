@@ -26,9 +26,9 @@ Caller-supplied context stays unauthenticated. Protection API, effect services
 and activation are not implemented by this increment. `protection commit`,
 `approve` and `config-apply` refuse. The shared `swarm-protection-contract` Rust
 crate has no engine dependency or OS access and changes no historical Trust bytes.
-The command was verified on the test candidate; availability in the installed
-instance is not established. The user's instruction to stop compiling while
-another session is active defers building and installation.
+Delivery 15 qualified these commands on the native profile and installed dev80.
+The historical build restriction was lifted; earlier evidence retains its
+original scope.
 
 ## Representation and validation
 
@@ -357,3 +357,72 @@ under no compilation/restart. After a concurrent catalogue change outside PAEA
 labels, the component was separately replayed on current bytes: 219 assertions
 and 40 simulated requests PASS. The bridge retains its archived catalogue; see
 [increment 12](plans/actions-confiance/paea/INCREMENT-12.md).
+
+## Offline debt resolution — increment 16
+
+`swarm protection resolve-payment REGISTRY REQUEST --json --lang en` uses the
+shared pure Rust module. Two named regular files are required; stdin and
+incompatible runtime options refuse before reads. Versioned examples are
+`tests/fixtures/paea/payment-registry-v1.json` and `payment-request-v1.json`.
+Schema: `schemas/paea/payment-resolution-v1.schema.json`.
+
+The registry contains `schema_version:1`, `project_id`, positive i64 `revision`,
+and `debts`. Each debt supplies `debt_id`, `supplier_id`, nonempty
+`invoice_references`, `invoice_version`, `amount_minor`, `currency` and
+`beneficiary_account_id`. The request supplies `schema_version:1`, `request_id`,
+`project_id`, `supplier_id`, `invoice_reference`, `expected_registry_revision` and
+`expected_invoice_version`. All objects are closed; duplicate JSON keys and floats
+refuse. Names and settlement terms use the existing v1 grammar with no new
+operator ceiling. The entire snapshot is validated before selection: unique debt
+IDs and supplier/reference pairs, including unrelated rows. No fuzzy lookup,
+normalization or automatic merging.
+
+The v1 report contains `proposal` (v1 proposal with `invoice_id=debt_id`),
+`registry_revision`, exact SHA256 `registry_sha256`/`request_sha256`,
+`scope:"offline-data-only"`, and `authority`, `registry_authenticity`, `effect`
+all set to `"not-established"`. The proposal has no context: a protected producer
+must check the project and bind its registry observation into context before
+canonicalization/approval. Hashes establish neither signatures nor freshness.
+Corrected terms retain `debt_id`, change exact content and preserve v1 intent.
+The v1 hash is unchanged.
+
+Safe codes: `protection-registry-identifier`, `protection-registry-ambiguous`,
+`protection-registry-project-mismatch`, `protection-registry-stale`,
+`protection-registry-reference-unknown`, `protection-invoice-stale`, plus shared
+representation errors. Refusal yields no proposal; obtain attributed current data,
+correct and explicitly rerun. Read/write/flush retain their causes; output failure
+may expose partial/complete JSON, never a settlement. Independent snapshots prove
+neither ID continuity nor absence of semantic duplicates with disjoint references.
+Protected PA-02/03 remain open.
+
+## Invoice resolution in PAEA checks — increment 17
+
+From the cockpit: **PAEA checks → Resolve an invoice reference** opens
+`/paea-payment.html`. Select the registry/request files above, then **Resolve
+reference**. Collapsed help explains their roles. Results show debt, invoice
+version, integer amount in minor units/currency, beneficiary account, revision
+and hashes. Downloading the raw report creates no admission context, approval
+or settlement. Links between these views preserve language/theme; an explicit
+return keeps receipt correspondence available.
+
+`POST /api/v1/protection/resolve-payment` requires native Host/session/origin/CSRF,
+JSON, no query and the existing transport bound. Closed envelope:
+`{schema_version:1, registry:String, request:String}`. Strings are original UTF-8
+JSON, never parsed objects or server paths. Schema:
+`schemas/paea/http-payment-check-v1.schema.json`. The route returns the exact
+`payment-resolution-v1` report from the same resolver as the CLI. Transport/JSON/
+resolution failures preserve typed causes and safe codes; no partial report or
+per-operation Root mutation.
+
+The browser uses fatal UTF-8, preserving BOM/input numbers. For the report i64
+revision it retains the numeric lexeme through JSON decoding context; this text
+is internal to presentation. Incapable browsers refuse and suggest the CLI.
+Downloads preserve original JSON, with integer `registry_revision`. Amounts stay
+integer strings; no currency scale is inferred. Closed shape, v1 representation
+bounds, non-authority markers and both raw file hashes are checked before
+rendering/downloading. Refusal retains file selections, clears stale results and
+requires a new explicit gesture. No retry, browser document persistence, operator
+setting or additional business ceiling is introduced.
+
+This does not deliver a protected registry: authenticity, ID continuity, freshness,
+human approver and actual commitment remain PA-02/03.

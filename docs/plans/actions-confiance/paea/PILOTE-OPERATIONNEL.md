@@ -23,9 +23,9 @@ et ses droits ne sont pas indépendants. Aucun E2/E3 ou invariant global démont
 
 Ces manques sont des préconditions de réalisation, pas des décisions à remplir
 automatiquement depuis l’exemple F-12/4200 EUR. L’implémentation protégée et
-l’installation restent bloquées sur leurs dépendances et sur la consigne active
-**sans compilation ni redémarrage**. Le laboratoire est un travail indépendant
-autorisé ; il ne remplace pas ces dépendances.
+l’activation protégée restent conditionnées par leurs dépendances. La restriction
+de compilation a été levée et dev80 installé à l’incrément 15. Le laboratoire
+reste indépendant ; sa séparation de processus ne remplace pas ces dépendances.
 
 ## Fiches d’effet
 
@@ -50,7 +50,7 @@ Admin/API/CLI selon le contrat du projet.
 
 ```mermaid
 flowchart LR
-  T[Recette isolée] --> C[CLI dev77 figée : canonicalisation de données]
+  T[Recette isolée] --> C[CLI native figée par SHA256 : données hors ligne]
   T --> A[Grant et epoch simulés : SQLite]
   C --> S[Processus de service de fixture]
   A --> S
@@ -108,7 +108,7 @@ migration explicites. Le contrat v1 n’est pas changé implicitement.
 ## Exécution, preuves et accès UX
 
 Recette maintenue : `tools/verification/recipes/paea-pilot-lab.json`.
-Elle exécute sept tests nommés, dont les trois familles sur les deux domaines.
+Elle exécute huit tests nommés, dont les trois familles sur les deux domaines.
 Variables requises : binaire existant exact, son SHA256 et **nouveau** dossier
 `SWARM_PAEA_PILOT_EVIDENCE`. Aucun build caché.
 
@@ -135,3 +135,19 @@ Trois dossiers distincts : **conception** = ce document ; **réalisation** = sou
 binaire figé, profil retenu et état exact du laboratoire ; **qualification** =
 recette/observations/contre-exemple/revue locale, avec critères protégés ouverts.
 Les résultats réels et les limites de reprise sont dans [l’incrément 14](INCREMENT-14.md).
+
+## Suite 16 — résolution explicite avant effet de fixture
+
+La recette compte désormais huit tests. Le huitième appelle la CLI publique
+`resolve-payment`, puis le sink et son oracle séparé : deux aliases convergent
+vers un seul effet ; une correction conserve l’intention et refuse sa réattribution
+à l’ancien contenu. Le contre-exemple sans registre reste conservé. Snapshot
+coopérant, même UID : aucune autorité protégée ni continuité inter-révisions.
+
+## Suite 17 — accès opérateur au résolveur
+
+**Vérifications PAEA → Résoudre une référence de facture** donne accès au contrôle
+de fichiers registre/demande et au rapport brut. Les exemples versionnés sont
+`tests/fixtures/paea/payment-registry-v1.json` et `payment-request-v1.json`.
+Ce menu n’exécute pas les campagnes de laboratoire, ne stocke pas de registre
+et ne donne pas d’accord humain. [Parcours et preuves](INCREMENT-17.md).

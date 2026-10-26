@@ -510,9 +510,9 @@ fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
             },
         )?;
         write_output(out, if a.language == "en" {
-            b"  swarm-rust protection canonicalize --input FILE|- --json (offline data only; no authority)\n  swarm-rust protection compare BEFORE AFTER --json (two files; no authority)\n  swarm-rust protection check-receipt ACTION RECEIPT SINK PREVIOUS_STATE --json (two files; no authenticity or effect established)\n  swarm-rust protection receipt-report ACTION RECEIPT SINK PREVIOUS_STATE --json (schema v2; exact input hashes; no authenticity or effect established)\n"
+            b"  swarm-rust protection canonicalize --input FILE|- --json (offline data only; no authority)\n  swarm-rust protection compare BEFORE AFTER --json (two files; no authority)\n  swarm-rust protection resolve-payment REGISTRY REQUEST --json (offline debt resolution; no authority)\n  swarm-rust protection check-receipt ACTION RECEIPT SINK PREVIOUS_STATE --json (two files; no authenticity or effect established)\n  swarm-rust protection receipt-report ACTION RECEIPT SINK PREVIOUS_STATE --json (schema v2; exact input hashes; no authenticity or effect established)\n"
         } else {
-            b"  swarm-rust protection canonicalize --input FICHIER|- --json (donnees hors ligne ; aucun droit)\n  swarm-rust protection compare AVANT APRES --json (deux fichiers ; aucun droit)\n  swarm-rust protection check-receipt ACTION RECU SERVICE ETAT_PRECEDENT --json (deux fichiers ; authenticite et effet non etablis)\n  swarm-rust protection receipt-report ACTION RECU SERVICE ETAT_PRECEDENT --json (schema v2 ; empreintes des entrees ; authenticite et effet non etablis)\n"
+            b"  swarm-rust protection canonicalize --input FICHIER|- --json (donnees hors ligne ; aucun droit)\n  swarm-rust protection compare AVANT APRES --json (deux fichiers ; aucun droit)\n  swarm-rust protection resolve-payment REGISTRE DEMANDE --json (resolution de dette hors ligne ; aucun droit)\n  swarm-rust protection check-receipt ACTION RECU SERVICE ETAT_PRECEDENT --json (deux fichiers ; authenticite et effet non etablis)\n  swarm-rust protection receipt-report ACTION RECU SERVICE ETAT_PRECEDENT --json (schema v2 ; empreintes des entrees ; authenticite et effet non etablis)\n"
         })?;
         return Ok(0);
     }

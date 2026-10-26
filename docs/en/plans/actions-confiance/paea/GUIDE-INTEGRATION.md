@@ -113,3 +113,18 @@ process and raw debt-ID counterexample. Seven tests PASS, integrity VERIFIED;
 negative witness detects the weakened Git guard. Simulated authority/common UID,
 no campaign menu or protected native delivery. These proofs prepare PA-02/03;
 **0/17 end-to-end invariants** remains unchanged.
+
+### GUIDE-03 follow-up — increment 16
+
+The pure resolver and `protection resolve-payment` CLI now implement an explicit
+supplier/reference → stable debt mapping. Collisions and stale versions refuse;
+two suppliers may share a reference. [Contract](../../../PAEA-CONTRACT.md) and
+[increment 16](INCREMENT-16.md). Protected production, ID continuity across
+snapshots and freshness at commitment remain open; GUIDE-03 is not globally closed.
+
+### Operator journey — increment 17
+
+PAEA checks now links to invoice-reference resolution using registry/request
+files and the shared API/CLI resolver. Exact amount/revision, non-authority
+markers and raw export; [evidence and limits](INCREMENT-17.md). This activates
+neither a protected registry nor UX laboratory campaigns.

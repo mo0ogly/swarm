@@ -12,7 +12,7 @@
   <script src="/i18n.js" defer></script>
   <script src="/paea.js" defer></script>
 </head>
-<body>
+<body data-paea-operation="receipt-report">
   <a class="paea-skip" href="#paea-main" data-i18n>Aller aux vérifications</a>
   <header>
     <a href="/">Swarm</a>
@@ -24,6 +24,7 @@
   </header>
   <main id="paea-main" tabindex="-1">
     <p data-i18n>Vérifier qu’un reçu correspond à une action, pour un règlement fictif ou une promotion Git.</p>
+    <p><a href="/paea-payment.html" data-paea-link data-i18n>Résoudre une référence de facture</a></p>
     <p id="paea-limits" class="paea-notice" data-i18n>Contrôle de cohérence des fichiers fournis. Autorisation, authenticité du reçu et effet réel non établis.</p>
     <form id="paea-form" aria-describedby="paea-limits">
       <fieldset id="paea-inputs">

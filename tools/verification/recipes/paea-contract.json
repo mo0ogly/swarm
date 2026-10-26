@@ -246,9 +246,11 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "2 passed; 0 failed",
+        "4 passed; 0 failed",
         "paea_http_exact_both_domains_and_unknown_are_data_only",
-        "paea_http_refusal_recovery_and_private_menu_assets"
+        "paea_http_refusal_recovery_and_private_menu_assets",
+        "paea_payment_http_exact_resolution_and_integer_bytes_are_data_only",
+        "paea_payment_http_refusals_recover_without_mutation"
       ],
       "required_stderr": []
     }

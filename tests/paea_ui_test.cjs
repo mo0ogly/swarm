@@ -109,8 +109,8 @@ async function submit(page, expected) {
       check(`${lang}-${theme}-${width}-heading`, (await page.$eval('h1', element => element.textContent)) ===
         (lang === 'fr' ? 'Vérifications PAEA' : 'PAEA checks'));
       check(`${lang}-${theme}-${width}-theme`, await page.$eval('html', (element, value) => element.dataset.theme === value, theme));
-      check(`${lang}-${theme}-${width}-translated-navigation`, (await page.$eval('nav a', element => element.textContent)) ===
-        (lang === 'fr' ? 'Actions de confiance' : 'Trusted actions'));
+      check(`${lang}-${theme}-${width}-independent-cockpit-navigation`, await page.$eval('nav a', element =>
+        element.textContent === 'Cockpit' && element.getAttribute('href') === '/'));
       await selectInputs(page, documentPath, receiptPath);
       scenario = 'valid'; await submit(page, 'success');
       const colors = await page.$eval('#paea-check', element => ({text:getComputedStyle(element).color,background:getComputedStyle(element).backgroundColor}));

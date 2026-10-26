@@ -361,3 +361,33 @@ PAEA returns to the cockpit independently of Biba.
 result retains actual remote commit and active version/PID/hash. Correspondence
 menu is qualified; lab campaigns remain outside UX. This delivery closes neither
 protected PA-02/03, the **17 invariants**, nor program E2/E3/RETEX.
+
+### Increment 16 — explicit debt identity
+
+[Decision and criteria](paea/INCREMENT-16.md): preserve the v1 hash and resolve
+supplier/reference to a stable debt object before admission. Pure library and
+offline CLI reject collisions/stale versions; a separate fixture observation
+checks one effect for two aliases. Supplied snapshots remain unauthenticated;
+revision continuity and protected authority remain open.
+
+Increment 16 verified and installed as **dev82**: 37 contract tests, 2 public tests
+(33 calls), 8 fixture-effect scenarios and 26 live-instance checks PASS; browser
+failure guard verified with an expected failure after a valid control. Sources
+remain uncommitted; no new protected assurance or E2/E3 closure.
+
+### Increment 17 — invoice resolution from the menu
+
+[Contract, decision and evidence](paea/INCREMENT-17.md): PA-08 exposes the shared
+resolver from PAEA checks, with a dedicated help/download page. Closed native API,
+exact i64 values, refusal/recovery and explicit non-authority markers. Receipt
+correspondence remains available; no protected registry activation.
+
+Increment 17 delivered on **dev87**: 4 schema/4 HTTP tests, 219 component checks,
+452 native assertions on dev86 with 448 identical delivery inputs, 30 actual
+dev87 checks PASS. Build version/commit/date differences and bounded proof reuse
+are retained. Clippy/Rustdoc PASS; script-loss guards verified after controls.
+PAEA changes remain uncommitted; protected registries/approvals and E2/E3 open.
+
+Publication requested on 26 October: isolated increments-16/17 commit, without
+push or a new delivery; see the publication follow-up at the end of report 17.
+The precommit statements above retain their historical scope.

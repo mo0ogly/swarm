@@ -22,9 +22,9 @@ privileges. It is not independent evaluation. No global invariant or E2/E3 prove
 | Independent evaluator | **Absent** | E3 designation/rights, second implementation and preregistered B2. |
 
 Missing assignments are realization prerequisites, never values to infer from
-the F-12/4200 EUR example. Protected realization/installation remain subject to
-their dependencies and the active **no compilation or restart** instruction.
-The laboratory is independent authorized work and cannot replace those gates.
+the F-12/4200 EUR example. Protected realization/activation remain subject to
+their dependencies. The build restriction was lifted and increment 15 installed
+dev80. The laboratory remains separate and cannot replace those gates.
 
 ## Effect cards
 
@@ -48,7 +48,7 @@ persisted, validated and editable through Admin/API/CLI under the shared contrac
 
 ```mermaid
 flowchart LR
-  T[Isolated recipe] --> C[Frozen dev77 CLI: data canonicalization]
+  T[Isolated recipe] --> C[SHA256-pinned native CLI: offline data]
   T --> A[Simulated grant and epoch: SQLite]
   C --> S[Fixture service process]
   A --> S
@@ -104,7 +104,7 @@ explicit schema version and migration. No implicit v1 hash change is made.
 
 ## Execution, evidence and UX access
 
-Maintained recipe: `tools/verification/recipes/paea-pilot-lab.json`, seven named
+Maintained recipe: `tools/verification/recipes/paea-pilot-lab.json`, eight named
 tests including all three families in both domains. Required environment: exact
 existing binary, SHA256 and a **fresh** `SWARM_PAEA_PILOT_EVIDENCE` directory.
 No implicit build.
@@ -132,3 +132,19 @@ Three distinct dossiers: **design** = this document; **realization** = exact
 sources, frozen binary, retained profile and laboratory state; **qualification**
 = recipe/observations/counterexample/local review with protected criteria open.
 Actual results and resumption limits are in [increment 14](INCREMENT-14.md).
+
+## Increment 16 — explicit resolution before fixture commitment
+
+The recipe now contains eight tests. The new test invokes public CLI
+`resolve-payment`, then the sink and separate oracle: two aliases converge on one
+effect; corrected terms retain intent and refuse attribution to the prior content.
+The unresolved counterexample remains retained. Cooperative same-UID snapshots
+provide neither protected authority nor continuity across revisions.
+
+## Increment 17 — operator access to the resolver
+
+**PAEA checks → Resolve an invoice reference** checks registry/request files and
+exports the raw report. Versioned examples are
+`tests/fixtures/paea/payment-registry-v1.json` and `payment-request-v1.json`.
+This menu runs no laboratory campaigns, stores no registry and provides no human
+approval. [Journey and evidence](INCREMENT-17.md).

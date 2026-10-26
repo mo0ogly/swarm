@@ -4,9 +4,13 @@ use http::{Method, Request};
 use serde::Serialize;
 use swarm_engine::{PreparationReadObservation, RootStore, RootStoreError};
 
+/// Optional preparation ID, document kind and exclusive history cursor.
+/// This alias changes no query validation, representation or policy.
+type PreparationQuery = (Option<String>, Option<String>, Option<i64>);
+
 /// Parse the exact path-specific query before IO. IDs are names, not paths;
 /// before is an exclusive positive i64. Duplicate/unknown/empty fields refuse.
-fn query(request: &Request<Vec<u8>>) -> Result<(Option<String>, Option<String>, Option<i64>), E> {
+fn query(request: &Request<Vec<u8>>) -> Result<PreparationQuery, E> {
     let mut id = None; let mut document = None; let mut before = None;
     let path = request.uri().path();
     for (key, value) in form_urlencoded::parse(request.uri().query().unwrap_or("").as_bytes()) {
