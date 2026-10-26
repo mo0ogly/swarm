@@ -1390,3 +1390,5 @@ Admin adoption. No live database is used. Run `recipe.py verify --evidence DIR`.
 [Evidence and limitations](../plans/migration-rust/PREPARATION-WRITES-20261025.md):
 private fixtures and verification binaries establish neither installation nor
 independent acceptance.
+
+Preparations: `preparation-writes-rust` now includes CLI/API method selection, refusal without mutation, preserved history and same-event recovery after repairing only fixture sources.

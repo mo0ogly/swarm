@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Préparations : sélection explicite de méthode par CLI/API Rust, empreinte courante, documents conservés et validation du plan retirée ; refus et rejeu atomiques.",
+        "en": "Preparations: explicit Rust CLI/API method selection, current fingerprint, preserved documents and withdrawn plan approval; atomic refusals and replay."
+      },
+      {
         "fr": "PAEA : vérifications de correspondance action/reçu dans le cockpit, API native et rapport v2 téléchargeable lié aux octets exacts. Retour autonome au cockpit ; autorité, authenticité et effet réel restent non établis.",
         "en": "PAEA: action/receipt correspondence checks in the cockpit, native API and downloadable v2 report bound to exact bytes. Independent return to the cockpit; authority, authenticity and actual effect remain unestablished."
       },

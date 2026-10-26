@@ -104,11 +104,13 @@ def main():
 def verify_glm_boundaries(d,create,pid,check):
     """GLM-proposed boundary/cross-Root cases adapted to the actual Go contract.
     The original proposal's automatic ID fill, unconditional historical marker
-    and mandatory Work were rejected against actual producers. No SQL here.
+    and mandatory Work were rejected against actual producers. Explicit empty
+    decisions differ from null/absent in Go validation and must refuse. No SQL here.
     """
     before=d.database()
-    replay=d.ok(['prepare','create'],{**create,'organization':None,'source':None,'budget':None,'adopt_brief':False,'expected_work_revision':None,'decisions':[],'turn_id':'','sha256':''})
+    replay=d.ok(['prepare','create'],{**create,'organization':None,'source':None,'budget':None,'adopt_brief':False,'expected_work_revision':None,'decisions':None,'turn_id':'','sha256':''})
     check('legacy-zero-fields-same-receipt',replay['revision']==1 and replay['receipt_historical'] and d.database()==before)
+    before=d.database();code,out,err=d.call(['prepare','create'],{**create,'event_id':'empty-decisions-refused','decisions':[]});check('explicit-empty-decisions-refused',code==2 and not out and json.loads(err)['failure']['code']=='preparation-request-invalid' and d.database()==before)
     d.settings(preparation_title_max_bytes='3')
     intent=dict(version=1,action='create',event_id='glm-title-boundary',expected_revision=0,title='éé',method='apex')
     before=d.database();code,out,err=d.call(['prepare','create'],intent);check('glm-title-utf8-refusal',code==2 and not out and bool(err) and d.database()==before)

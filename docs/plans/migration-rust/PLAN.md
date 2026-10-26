@@ -11,6 +11,23 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — sélection de méthode préparation,26 octobre, GLM
+Owner Codex ; dev82 actif, processus SHA2a328c56… et441 entrées qualifiées.
+CLI `prepare method ID` / API commune : sources disponibles exigées, CAS/reçu,
+documents/historique conservés et verdict retiré, y compris resélection.
+Écart Go décisions vides reproduit sur80, corrigé et gardé en recette permanente.
+50 écritures +37 méthode +8 identifiants +3 SDK ;45 Admin inclus,3 unités codec,
+3 lanceur ;10 HTTP et14 Version FR/EN. Recette complète et intégrité vérifiées.
+Missions suspendues50/469 et réglages inchangés ; aucun fournisseur métier.
+Replans : collisions concurrentes conservées ; terminaison collecteur historique
+sans cause établie, nouveau code/signal retenu avant refus et testé. Pas de contournement.
+[Rapport/RETEX](PREPARATION-METHOD-20261026.md),
+[preuves/revue](evidence/20261026-preparation-method/README.md).
+Biba/SCALING préservés ; éditeur graphique et autres transitions préparation ouverts.
+Aucun commit/push ni acceptation globale de migration déduits du lot.
+Suite bornée : adoption du brief via le même writer, empreintes besoin/brief,
+refus document périmé sans mutation et conservation des reçus ; owner Codex.
+
 ## Livré localement — préparation create/save Rust, GLM,25 octobre
 Owner Codex ; dev78 actif, candidat testé et processus SHA bef3310c… concordants.
 CLI/API → writer commun → préparation/historique/reçu atomiques ; Admin v42 FR/EN.

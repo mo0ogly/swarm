@@ -1990,3 +1990,5 @@ après adoption via Admin ; il ne migre jamais une base live.
 Exécuter `recipe.py verify --evidence DOSSIER` après chaque recette. Résultats et
 limites : [lot25 octobre](PREPARATION-WRITES-20261025.md). Les binaires de preuve
 et fixtures privées ne constituent pas une livraison ou une acceptation indépendante.
+
+Préparations : la recette `preparation-writes-rust` inclut désormais la sélection de méthode CLI/API, refus sans mutation, conservation historique et reprise du même événement après réparation des seules sources de fixture.

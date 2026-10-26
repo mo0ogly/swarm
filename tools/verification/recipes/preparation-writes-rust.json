@@ -58,6 +58,21 @@
       "required_stderr": []
     },
     {
+      "id": "public-preparation-method",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-method-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_method.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_METHOD_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_METHOD_PASS",
+        "PASS method-history-after-reopen",
+        "PASS method-same-event-recovery"
+      ],
+      "required_stderr": []
+    },
+    {
       "id": "historical-preparation-key-contract",
       "command": [
         "python3",
@@ -88,8 +103,9 @@
       "expected_exit": 0,
       "required_stdout": [
         "preparation_child_insert_failure_rolls_back_and_same_event_recovers ... ok",
-        "2 passed; 0 failed;",
-        "preparation_current_receipt_content_must_match_stored_state ... ok"
+        "3 passed; 0 failed;",
+        "preparation_current_receipt_content_must_match_stored_state ... ok",
+        "preparation_method_receipt_failure_rolls_back_and_recovers ... ok"
       ],
       "required_stderr": []
     }

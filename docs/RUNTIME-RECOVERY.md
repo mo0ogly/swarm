@@ -482,3 +482,21 @@ pas un conflit normal de révision : conserver les preuves et diagnostiquer avec
 le propriétaire du stockage. Aucun rejeu identique ne répare un reçu corrompu.
 Le contrôle compare le contenu courant avant projection ; un reçu historique
 reste explicitement historique et n’acquiert aucune autorité d’exécution.
+
+### Sélection de méthode d’une préparation Rust
+
+`prepare method ID --input intention.json --root ROOT --json` et
+`POST /api/v1/preparations/command` utilisent le writer transactionnel commun.
+L’intention explicite contient version1, action `method`, preparation_id, event_id,
+expected_revision et method. Le CLI exige le même ID dans ses deux entrées.
+La méthode doit être disponible ; `audit_pdca` désigne `audit-pdca`. Une méthode
+vide est refusée : le défaut Admin reste propre à la création. Chaque nouvel
+événement, même pour la méthode courante, actualise son empreinte, incrémente
+la révision et retire le verdict/plan_ready. Documents, brief adopté et historique
+restent intacts. Aucun agent, adoption ni conversion n’est déclenché.
+Le reçu exact est rejoué avant la nouvelle lecture des sources ; les conflits
+CAS/événement et sources indisponibles ne modifient aucune ligne. L’interrupteur
+Admin reste applicable aussi aux rejeux. Une erreur de source conserve sa cause ;
+le consommateur reçoit un refus sûr, sans texte privé. Recette permanente
+`preparation-writes-rust`, étape `public-preparation-method`. Ce parcours CLI/API
+ne prouve pas un raccordement de l’éditeur graphique des préparations.

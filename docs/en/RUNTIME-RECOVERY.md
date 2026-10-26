@@ -448,3 +448,20 @@ a normal revision conflict. Preserve evidence and diagnose with the storage owne
 unchanged replay cannot repair corruption. Current content is compared before
 projection. Historical receipts remain explicitly historical and grant no execution
 authority.
+
+### Selecting a Rust preparation method
+
+`prepare method ID --input intent.json --root ROOT --json` and
+`POST /api/v1/preparations/command` use the shared transactional writer.
+The explicit intent contains version1, action `method`, preparation_id, event_id,
+expected_revision and method. The CLI requires matching positional/document IDs.
+The selected method must be available; `audit_pdca` aliases `audit-pdca`. An empty
+method refuses: the Admin default applies only to creation. Each new event, even
+selecting the current method, refreshes its fingerprint, increments the revision
+and clears verdict/plan_ready. Documents, adopted brief and history remain intact.
+No agent, adoption or conversion is triggered. Exact receipts replay before new
+source validation; CAS/event conflicts and unavailable sources change no rows.
+The Admin write switch also applies to replay. Source failures retain their cause
+with safe diagnostics. Permanent recipe: `preparation-writes-rust`, step
+`public-preparation-method`. This CLI/API journey does not establish a connected
+graphical preparation editor.

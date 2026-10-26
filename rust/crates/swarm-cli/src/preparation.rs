@@ -1,4 +1,4 @@
-//! Go-compatible preparation reads and draft create/save; no dialogue/adoption.
+//! Go-compatible preparation reads and draft create/save/method; no dialogue/adoption.
 use crate::{json_bytes, write_output, Arguments, CliError};
 use serde::Serialize;
 use std::io::Write;
@@ -12,15 +12,15 @@ fn bytes<T: Serialize>(read: Result<PreparationReadObservation<T>, RootStoreErro
     causes.append(&mut observation.causes);
     json_bytes(&observation.value).map_err(CliError::Output)
 }
-/// Dispatch create/save to the writer or list/methods/show/history to readonly
+/// Dispatch create/save/method to the writer or list/methods/show/history to readonly
 /// storage, using the historical positional syntax and JSON
-/// envelope. Read operations open Root readonly; create/save use the writable
+/// envelope. Read operations open Root readonly; create/save/method use the writable
 /// path below. Close before publishing and preserve every failure cause. before
 /// is positive/exclusive; absence is handled by the engine, limits by persisted
-/// Admin policy. Only create/save write drafts/history/receipts; no provider,
+/// Admin policy. Only create/save/method write drafts/history/receipts; no provider,
 /// visits, adoption, conversion or launch is performed.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
-    if a.pos.get(1).is_some_and(|s|matches!(s.as_str(),"create"|"save")) {return write(a,out);}
+    if a.pos.get(1).is_some_and(|s|matches!(s.as_str(),"create"|"save"|"method")) {return write(a,out);}
     if a.pos.len() < 2 || !a.input.is_empty() || !a.output.is_empty() || a.server || !a.task.is_empty() || a.phase != "delivery" {
         return Err(CliError::Usage);
     }
@@ -51,7 +51,7 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     })
 }
 
-/// Apply create/save via the shared Root writer. Positional action/ID must match
+/// Apply create/save/method via the shared Root writer. Positional action/ID must match
 /// the document exactly (the CLI never invents identity). Read bounded transport,
 /// close before publishing and preserve the known receipt through output/flush
 /// or close failures. No provider or adoption is involved.
@@ -61,7 +61,7 @@ fn write(a:&Arguments,out:&mut dyn Write)->Result<u8,CliError>{
     if a.input.is_empty() || !a.output.is_empty() || a.server || !a.task.is_empty() || a.phase!="delivery" || a.pos.len()!=if kind=="create"{2}else{3} {return Err(CliError::Usage);}
     let raw=if a.input=="-" {swarm_engine::read_command_document(&mut std::io::stdin().lock())}else{swarm_engine::read_command_file(std::path::Path::new(&a.input))}.map_err(CliError::CommandInput)?;
     let request=swarm_engine::decode_preparation_command(&raw).map_err(|e|CliError::Root(Box::new(e)))?;
-    if request.action!=kind || (kind=="save" && request.preparation_id!=a.pos[2]) {return Err(CliError::Usage);}
+    if request.action!=kind || (kind!="create" && request.preparation_id!=a.pos[2]) {return Err(CliError::Usage);}
     let store=RootStore::open(std::path::Path::new(&a.root),true).map_err(|e|CliError::Root(Box::new(e)))?;
     let mut receipt=None;
     let mut causes=Vec::new();

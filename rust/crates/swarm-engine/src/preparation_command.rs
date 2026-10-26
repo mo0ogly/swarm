@@ -1,4 +1,4 @@
-//! Bounded Go-compatible create/save intent; no authority or persistence.
+//! Bounded Go-compatible create/save/method intent; no authority or persistence.
 use crate::model_wire::{Fields, Kind};
 use serde::{Deserialize, Serialize};
 /// Supported draft intention. expected_revision is required/non-null. Action and
@@ -82,7 +82,7 @@ pub(crate) fn validate(
         || r.budget.is_some()
         || r.adopt_brief
         || r.expected_work_revision.is_some()
-        || !empty_decisions(&r.decisions)
+        || r.decisions.is_some()
         || !r.turn_id.is_empty()
         || !r.sha256.is_empty()
         || r.version != 1
@@ -108,6 +108,15 @@ pub(crate) fn validate(
                 && r.work_id.is_empty()
                 && r.title.is_empty()
                 && r.method.is_empty() =>
+        {
+            Ok(())
+        }
+        "method"
+            if key(&r.preparation_id)
+                && r.work_id.is_empty()
+                && r.title.is_empty()
+                && r.document.is_empty()
+                && r.text.is_empty() =>
         {
             Ok(())
         }
@@ -147,6 +156,7 @@ mod tests {
             ",\"expected_revision\":\"0\"",
             ",\"expected_revision\":99999999999999999999",
             ",\"expected_revision\":0,\"source\":{}",
+            ",\"expected_revision\":0,\"decisions\":[]",
             ",\"expected_revision\":0,\"adopt_brief\":true",
             ",\"expected_revision\":0,\"wat\":1",
         ] {

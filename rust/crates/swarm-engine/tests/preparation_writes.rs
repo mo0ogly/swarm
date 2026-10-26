@@ -4,6 +4,35 @@
 use swarm_engine::{RootStore, SystemEnvironment};
 use std::os::unix::fs::DirBuilderExt;
 
+/// An available method is first selected successfully. A receipt-insert fault
+/// must roll back both method/hash and revision, without touching document
+/// history; dropping only the fixture trigger permits the identical intent.
+#[test]
+fn preparation_method_receipt_failure_rolls_back_and_recovers() {
+    let path=std::env::temp_dir().join(format!("swarm-preparation-method-{}-{}",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    std::fs::DirBuilder::new().mode(0o700).create(&path).unwrap();
+    let root=RootStore::initialize(&path,&mut SystemEnvironment).unwrap();
+    let p=root.preparation_command(br#"{"version":1,"action":"create","event_id":"method-create","expected_revision":0,"text":"retained"}"#,&mut SystemEnvironment).unwrap().value;
+    let raw=serde_json::to_vec(&serde_json::json!({"version":1,"action":"method","preparation_id":p.id,"event_id":"method-control","expected_revision":1,"method":"debug"})).unwrap();
+    let current=root.preparation_command(&raw,&mut SystemEnvironment).unwrap().value;
+    assert_eq!(current.method,"debug");assert_eq!(current.revision,2);
+    let db=rusqlite::Connection::open(path.join(".swarm/state.db")).unwrap();
+    let request=serde_json::to_vec(&serde_json::json!({"version":1,"action":"method","preparation_id":p.id,"event_id":"method-fault","expected_revision":2,"method":"apex"})).unwrap();
+    let count=|table:&str|db.query_row(&format!("SELECT count(*) FROM {table}"),[],|row|row.get::<_,i64>(0)).unwrap();
+    let before=(count("preparation_documents"),count("preparation_commands"));
+    db.execute_batch("CREATE TRIGGER preparation_method_fault BEFORE INSERT ON preparation_commands BEGIN SELECT RAISE(ABORT,'PRIVATE_METHOD_FAULT'); END").unwrap();
+    let error=root.preparation_command(&request,&mut SystemEnvironment).err().expect("receipt fault must refuse");
+    assert_eq!(error.code(),"agent-launch-storage");assert!(error.recorded_preparation().is_none());
+    assert_eq!(root.preparation_show(&p.id).unwrap().value,current);
+    assert_eq!((count("preparation_documents"),count("preparation_commands")),before);
+    db.execute_batch("DROP TRIGGER preparation_method_fault").unwrap();
+    let recovered=root.preparation_command(&request,&mut SystemEnvironment).unwrap().value;
+    assert_eq!(recovered.method,"apex");assert_eq!(recovered.revision,3);
+    assert_eq!(recovered.documents,current.documents);
+    assert_eq!((count("preparation_documents"),count("preparation_commands")),(before.0,before.1+1));
+    db.close().unwrap();root.close().unwrap();std::fs::remove_dir_all(path).unwrap();
+}
+
 /// Valid command, failing child-row insert, complete rollback and same-event
 /// recovery. Both history and receipt failures must preserve the original draft,
 /// document rows and event ledger. No provider, execution or approval is granted.

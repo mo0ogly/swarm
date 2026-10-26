@@ -1,4 +1,4 @@
-//! Protected preparation reads and draft create/save; no dialogue or adoption.
+//! Protected preparation reads and draft create/save/method selection; no dialogue or adoption.
 use super::{close, root, HttpServiceError as E, NativeHttpService, RouteBody};
 use http::{Method, Request};
 use serde::Serialize;
@@ -68,7 +68,7 @@ impl NativeHttpService {
 }
 
 impl NativeHttpService {
-    /// Protected POST draft command through the same writer as CLI. Shared
+    /// Protected POST draft creation/save/method command through the same writer as CLI. Shared
     /// transport bounds, session/CSRF and owned Root binding apply before writes.
     /// Close before responding; exact known receipt survives encoding/close and
     /// later owner-observer delivery failures. No provider/adoption is exposed.

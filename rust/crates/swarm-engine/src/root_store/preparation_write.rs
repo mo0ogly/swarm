@@ -1,4 +1,4 @@
-//! Transactional draft creation/save, without plan adoption or agent execution.
+//! Transactional draft creation/save/method selection, without plan adoption or agent execution.
 use super::{
     finished,
     preparation_read::{cause, stored},
@@ -94,6 +94,32 @@ fn apply(
         return Err(E::Refused("preparation-revision-conflict"));
     }
     let previous = p.revision;
+    if r.action == "method" {
+        if !super::preparation_methods::known(method) {
+            return Err(E::Refused("preparation-method-unavailable"));
+        }
+        let observed = super::preparation_methods::catalogue(&root.root, policy.method_max_bytes)?;
+        let selected = observed.value.iter().find(|m| m.id == method)
+            .ok_or(E::Refused("preparation-method-unavailable"))?;
+        let available = selected.available;
+        if available {
+            p.method = selected.id.clone();
+            p.method_hash = selected.sha256.clone();
+        }
+        if !available {
+            // Source diagnostics are causes of this domain refusal, not a
+            // transaction cleanup failure. Preserve siblings without changing
+            // CLI exit5 / HTTP400 into root-cleanup exit2 / HTTP500.
+            let primary = observed.causes.into_iter().fold(
+                E::Refused("preparation-method-unavailable"),
+                |primary, cleanup| E::Cleanup {
+                    primary: Some(Box::new(primary)), cleanup: Box::new(cleanup),
+                },
+            );
+            return Err(cause("preparation-method-unavailable", primary));
+        }
+        causes.extend(observed.causes);
+    }
     let mut document = None;
     if r.action == "save" || !r.text.is_empty() {
         let kind = if r.action == "create" {
@@ -192,14 +218,17 @@ fn apply(
 }
 
 impl RootStore {
-    /// Create/save a draft or replay its immutable event receipt on this opened
+    /// Create/save/select a draft method or replay its immutable event receipt on this opened
     /// Root. Requires writable Root, complete enabled saved v42 policy, bounded
     /// valid request and exact revision. Stable settings and retained physical
     /// Root association guard an immediate transaction. Original rollback/commit,
     /// release and close causes survive. Uncertain commit reports
     /// preparation-commit-uncertain; a late failure after a known receipt carries
     /// preparation-state-preserved. Reread/replay the SAME event; never infer rollback. Unavailable method IO is retained in the observation sidecar; a draft
-    /// remains writable with an empty method hash, without claiming freshness.
+    /// remains writable on create with an empty method hash, without claiming freshness.
+    /// Method selection requires an explicit available method, updates its hash,
+    /// preserves documents/history and clears approval, even when selecting the
+    /// same method. Missing/unsafe sources refuse without mutation.
     /// No provider, mission start, conversion or plan acceptance occurs.
     pub fn preparation_command<W: WorkEnvironment>(
         &self,
@@ -241,7 +270,7 @@ impl RootStore {
                     .values
                     .preparation_read_policy()
                     .map_err(E::Settings)?;
-                let method = if r.method.is_empty() {
+                let method = if r.action == "create" && r.method.is_empty() {
                     policy.default_method.as_str()
                 } else if r.method == "audit_pdca" {
                     "audit-pdca"
