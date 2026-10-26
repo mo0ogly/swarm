@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "id": "paea-example-assets",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-protection-contract/Cargo.toml",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-protection-contract/tests/*.rs",
+    "rust/crates/swarm-identity-contract/Cargo.toml",
+    "rust/crates/swarm-identity-contract/src/*.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/*.rs",
+    "rust/crates/swarm-cli/src/*/*.rs",
+    "rust/crates/swarm-cli/tests/protection.rs",
+    "rust/crates/swarm-cli/tests/protection_receipt.rs",
+    "tests/fixtures/paea/*.json",
+    "schemas/paea/*.json",
+    "tests/paea_contract_schema_test.py",
+    "tools/paea/*.py",
+    "tools/verification/recipe.py",
+    "docs/architecture/PAEA-CONTRACT.md",
+    "docs/en/PAEA-CONTRACT.md",
+    "rust/crates/swarm-cli/tests/protection_receipt_report.rs",
+    "rust/crates/swarm-web/Cargo.toml",
+    "rust/crates/swarm-web/src/*.rs",
+    "rust/crates/swarm-web/src/service/*.rs",
+    "rust/crates/swarm-web/tests/paea.rs",
+    "web/paea.*",
+    "web/trust-native.html",
+    "locales/en.json",
+    "web/i18n*.js",
+    "rust/crates/**/*",
+    "web/*",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    "version_history.json",
+    "tests/paea_payment_schema_test.py",
+    "web/paea-payment.html",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "web/lib/**/*",
+    "tests/paea_comparison_http_schema_test.py",
+    "web/paea-compare.html",
+    "web/paea-examples/v1/*.json",
+    "tests/paea_examples_test.py",
+    "tools/paea/make_examples.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "generated-example-byte-check",
+      "command": [
+        "python3",
+        "tools/paea/make_examples.py",
+        "--check"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "CHECK git-after.json",
+        "CHECK git-document.json",
+        "CHECK git-receipt.json",
+        "CHECK payment-after.json",
+        "CHECK payment-document.json",
+        "CHECK payment-receipt.json",
+        "CHECK payment-registry.json",
+        "CHECK payment-request.json"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "example-shapes-and-page-links",
+      "command": [
+        "python3",
+        "tests/paea_examples_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 2 tests",
+        "OK",
+        "test_all_eight_fictional_files_have_the_declared_data_shape",
+        "test_all_three_disclosures_link_only_exact_versioned_downloads_with_english"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-native-example-assets",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-web",
+        "--test",
+        "paea",
+        "paea_example_assets_are_private_exact_and_semantically_usable",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "paea_example_assets_are_private_exact_and_semantically_usable",
+        "PAEA_EIGHT_PRIVATE_EXAMPLES_USABLE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

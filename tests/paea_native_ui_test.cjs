@@ -4,7 +4,8 @@
  * reply injections are separately named. No provider/live mission mutation.
  * The caller supplies an exact existing binary/hash and a fresh evidence path.
  * No build, retry or watchdog; readiness is observed from the real listener/UI.
- * Default full scope retains 12 presentation cases per view. Explicit encoding
+ * Default full scope retains 12 presentation cases per view and real example
+ * downloads/uploads on all three views in each configuration. Explicit encoding
  * scope exercises one real invoice/BOM journey and exact current PAEA script;
  * it does not qualify receipt/presentation matrices or unrelated changed assets.
  */
@@ -18,7 +19,7 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 assert.equal(sha(fs.readFileSync(binary)),expected);fs.mkdirSync(output);
 const root=path.resolve(output,'root');fs.mkdirSync(root);
 const vectors=JSON.parse(fs.readFileSync('tests/fixtures/paea/contract-v1.json')).vectors;
-const checks=[],errors=[],responses=[],cases=[],paymentCases=[],comparisonCases=[],serverErrors=[];let browser,server,closed,token='',address='',expectRefusal=false,abort,stopping=false;
+const checks=[],errors=[],responses=[],cases=[],paymentCases=[],comparisonCases=[],exampleCases=[],serverErrors=[];let browser,server,closed,token='',address='',expectRefusal=false,abort,stopping=false;
 const observedFailure=new Promise((resolve,reject)=>{abort=reject});
 /** Preserve unexpected browser failures and reject pending DOM waits without a
  * deadline. Expected native 400 refusals remain separately recorded. */
@@ -275,6 +276,52 @@ async function comparisonClientFaults(page,label){
  }
  replacement=null;check('comparison-client-native-recovery',(await submitComparison(page,200))===good);page.off('request',intercept);await page.setRequestInterception(false);
 }
+/** Download the actual private examples, then choose those exact files through
+ * normal controls and run the native check. This owned fixture-only journey
+ * asserts each completed download's bytes, translated keyboard disclosure,
+ * expected data/limits and cleared stale output. No automatic product load,
+ * response substitution, live Root, provider or effect is involved. */
+async function exampleJourney(page,context,label,lang,theme,operation){
+ const routes={'receipt-report':'paea.html','resolve-payment':'paea-payment.html','compare':'paea-compare.html'},tag=label+'-examples-'+operation;
+ await page.goto('http://'+address+'/'+routes[operation]+'?'+new URLSearchParams({lang,theme}),{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
+ check(tag+'-explicit-empty',await page.$eval('#paea-inputs',e=>Array.from(e.querySelectorAll('input[type=file]')).every(f=>f.files.length===0))&&await page.$eval('#paea-download',e=>e.disabled));
+ check(tag+'-collapsed-translated',await page.$eval('#paea-example-help',(e,l)=>!e.open&&e.querySelector('summary').textContent===(l==='en'?'Download fictional examples':'Exemples fictifs à télécharger'),lang));
+ await page.focus('#paea-example-help summary');await page.keyboard.press('Enter');
+ check(tag+'-keyboard-help',await page.$eval('#paea-example-help',(e,l)=>e.open&&e.textContent.includes(l==='en'?'No file is loaded':'Aucun fichier n’est chargé'),lang));
+ const directory=path.resolve(output,tag);fs.mkdirSync(directory);
+ const links=await page.$$eval('#paea-example-help a[download]',els=>els.map(e=>({href:new URL(e.href).pathname,name:e.download})));
+ assert.equal(links.length,operation==='resolve-payment'?2:4);
+ const cdp=await page.createCDPSession();await cdp.send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:directory,browserContextId:context.id,eventsEnabled:true});
+ for(const link of links){
+  assert.equal(link.href,'/paea-examples/v1/'+link.name);assert.equal(path.basename(link.name),link.name);
+  const completed=new Promise((resolve,reject)=>{const listener=e=>{if(e.state==='completed'){cdp.off('Browser.downloadProgress',listener);resolve()}if(e.state==='canceled'){cdp.off('Browser.downloadProgress',listener);reject(Error('example-download-canceled'))}};cdp.on('Browser.downloadProgress',listener)});
+  const selector='#paea-example-help a[download="'+link.name+'"]';
+  if(link===links[0]){await page.focus(selector);check(tag+'-download-keyboard-focus',await page.$eval(selector,e=>document.activeElement===e&&getComputedStyle(e).outlineStyle!=='none'));await page.keyboard.press('Enter')}else await page.click(selector);await completed;
+  check(tag+'-download-'+link.name,fs.readFileSync(path.join(directory,link.name)).equals(fs.readFileSync('web'+link.href)));
+ }
+ await cdp.detach();
+ const colors=await page.$eval('#paea-example-help a',e=>[getComputedStyle(e).color,getComputedStyle(document.body).backgroundColor]);
+ const luminance=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((v,c,i)=>v+c*[.2126,.7152,.0722][i],0),levels=colors.map(luminance);
+ check(tag+'-link-contrast-AA',(Math.max(...levels)+.05)/(Math.min(...levels)+.05)>=4.5);
+ check(tag+'-download-keeps-inputs-empty',await page.$eval('#paea-inputs',e=>Array.from(e.querySelectorAll('input[type=file]')).every(f=>f.files.length===0))&&await page.$eval('#paea-report',e=>e.textContent===''));
+ if(operation==='resolve-payment'){
+  const registry=path.join(directory,'payment-registry.json'),request=path.join(directory,'payment-request.json');await fillPayment(page,registry,request);const raw=await submitPayment(page,200),report=JSON.parse(raw);
+  check(tag+'-native-example-result',report.proposal.action.invoice_id==='debt-17'&&report.registry_sha256===sha(fs.readFileSync(registry))&&report.request_sha256===sha(fs.readFileSync(request))&&report.effect==='not-established');
+ }else for(const prefix of ['payment','git']){
+  const document=path.join(directory,prefix+'-document.json');
+  if(operation==='receipt-report'){
+   const receipt=path.join(directory,prefix+'-receipt.json');await fill(page,document,receipt);await page.$eval('#paea-sink',e=>{e.value='sink-paea-example';e.dispatchEvent(new Event('input',{bubbles:true}))});
+   const report=await submit(page,200);check(tag+'-'+prefix+'-native-example-result',report.document.document_sha256===sha(fs.readFileSync(document))&&report.receipt_sha256===sha(fs.readFileSync(receipt))&&report.proposed_state==='COMMITTED'&&report.effect==='not-established'&&report.receipt_authenticity==='not-established');
+  }else{
+   const after=path.join(directory,prefix+'-after.json');await fillComparison(page,document,after);const report=JSON.parse(await submitComparison(page,200)),c=report.comparison;
+   check(tag+'-'+prefix+'-native-example-result',c.before.document_sha256===sha(fs.readFileSync(document))&&c.after.document_sha256===sha(fs.readFileSync(after))&&c.canonical_content_changed&&!c.intent_changed&&!c.transport_request_changed&&c.approval_validity==='not-established');
+  }
+ }
+ check(tag+'-no-overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.screenshot({path:path.join(directory,'result.png'),fullPage:true});exampleCases.push(tag);
+}
+
 (async()=>{let failed;
  try{await Promise.race([(async()=>{
   await start();check('actual-default-profile-executable',true);
@@ -339,17 +386,18 @@ async function comparisonClientFaults(page,label){
     check(label+'-version-focus-restored',await page.evaluate(()=>document.activeElement.id==='version-open'));
    }
    await paymentCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await paymentClientFaults(page,label);
-   await comparisonCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await comparisonClientFaults(page,label);await context.close();
+   await comparisonCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await comparisonClientFaults(page,label);
+   for(const operation of ['receipt-report','resolve-payment','compare'])await exampleJourney(page,context,label,lang,theme,operation);await context.close();
   }
   if(scope==='payment-encoding'){check('one-native-payment-encoding-case',cases.length===0&&paymentCases.length===1);check('exactly-three-native-encoding-refusals',responses.length===3)}
-  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('all-twelve-comparison-browser-cases',comparisonCases.length===12);check('exactly-sixty-two-native-refusals',responses.length===62)}
+  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('all-twelve-comparison-browser-cases',comparisonCases.length===12);check('exactly-sixty-two-native-refusals',responses.length===62);check('all-thirty-six-example-journeys',exampleCases.length===36)}
   check('no-unexpected-browser-diagnostics',errors.length===0);check('binary-stable',sha(fs.readFileSync(binary))===expected);
  })(),observedFailure]);}catch(e){failed=e;console.error(e.stack)}
  finally{
   try{if(browser)await browser.close()}catch(e){errors.push({kind:'browser-close',message:e.message});failed??=e}
   if(server){stopping=true;server.kill('SIGINT');const stopped=await closed;if(!failed&&stopped.code!==0)failed=Error('owned native fixture did not stop cleanly')}
   fs.writeFileSync(path.join(root,'server.stderr'),Buffer.concat(serverErrors),{mode:0o600});
-  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,comparisonCases,checks,errors,responses,success:!failed},null,2));
+  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,comparisonCases,exampleCases,checks,errors,responses,success:!failed},null,2));
  }
  if(failed)process.exitCode=1;else console.log('PAEA_NATIVE_UI_PASS '+checks.length+' assertions');
 })();

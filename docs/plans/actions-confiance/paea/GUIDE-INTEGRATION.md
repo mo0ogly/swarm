@@ -139,3 +139,11 @@ Le menu Vérifications PAEA donne désormais accès à la résolution de référ
 de facture par registre/demande, via le même résolveur API/CLI. Montant et
 révision exacts, marqueurs non autorisants et export brut ; [preuve et limites](INCREMENT-17.md).
 Cela n’active ni registre protégé ni campagnes de laboratoire dans l’UX.
+
+
+### Essais guidés — incrément 20
+
+Les trois vues proposent des paires de fichiers fictifs versionnés, à télécharger
+puis sélectionner explicitement. L’aide précise le service/état du reçu et les
+résultats attendus ; [preuves et limites](INCREMENT-20.md). Aucune campagne de
+laboratoire, donnée de projet ou protection native n’est déclenchée par le lien.

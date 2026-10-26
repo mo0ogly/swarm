@@ -27,6 +27,16 @@
     <p data-i18n>Retrouver l’objet de dette et ses conditions à partir d’un registre et d’une demande de facture.</p>
     <p id="paea-limits" class="paea-notice" data-i18n>Le registre fourni n’est pas authentifié. Ce contrôle ne donne aucun droit et ne déclenche aucun règlement.</p>
     <details id="paea-format-help"><summary data-i18n>Préparer les fichiers</summary><p data-i18n>Utiliser deux fichiers du même projet. La demande indique le fournisseur, la référence et les versions attendues. Le registre associe les références à une dette stable et fournit le montant entier, la devise et le compte bénéficiaire. Une référence absente, ambiguë ou périmée est refusée.</p></details>
+    <details id="paea-example-help">
+      <summary data-i18n>Exemples fictifs à télécharger</summary>
+      <p data-i18n>Télécharger les fichiers d’un exemple, les sélectionner dans le formulaire, puis lancer la vérification. Aucun fichier n’est chargé et aucune vérification n’est lancée automatiquement.</p>
+      <p data-i18n>Le registre et la demande décrivent le même projet fictif. Le résultat attendu désigne la dette debt-17 ; aucun règlement n’est exécuté.</p>
+      <ul>
+        <li><a href="/paea-examples/v1/payment-registry.json" download="payment-registry.json" data-i18n>Registre fictif des dettes</a></li>
+        <li><a href="/paea-examples/v1/payment-request.json" download="payment-request.json" data-i18n>Demande de facture fictive</a></li>
+      </ul>
+      <p data-i18n>Ces fichiers publics de démonstration ne contiennent aucune donnée de votre projet. Ils ne constituent ni accord authentifié ni preuve d’un effet réel.</p>
+    </details>
     <form id="paea-form" aria-describedby="paea-limits">
       <fieldset id="paea-inputs">
         <legend data-i18n>Documents à résoudre</legend>

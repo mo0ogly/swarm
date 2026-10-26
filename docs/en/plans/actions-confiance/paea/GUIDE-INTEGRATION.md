@@ -128,3 +128,11 @@ PAEA checks now links to invoice-reference resolution using registry/request
 files and the shared API/CLI resolver. Exact amount/revision, non-authority
 markers and raw export; [evidence and limits](INCREMENT-17.md). This activates
 neither a protected registry nor UX laboratory campaigns.
+
+
+### Guided examples — increment 20
+
+All three views provide versioned fictional file pairs to download and explicitly
+select. Help explains receipt sink/state and expected data results; [evidence and
+limits](INCREMENT-20.md). The link triggers no laboratory campaign, project data
+operation or native protection.

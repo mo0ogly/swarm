@@ -13,7 +13,8 @@
     "web/paea-payment.html",
     "tests/fixtures/paea/payment-*.json",
     "web/paea-compare.html",
-    "schemas/paea/comparison-v1.schema.json"
+    "schemas/paea/comparison-v1.schema.json",
+    "web/paea-examples/v1/*.json"
   ],
   "environment": {
     "SWARM_PAEA_NATIVE_SCOPE": "full"
@@ -43,7 +44,9 @@
         "all-twelve-comparison-browser-cases",
         "en-sombre-320-comparison-repository.promote-real-download-exact",
         "comparison-client-rejects-unordered-path",
-        "comparison-client-native-recovery"
+        "comparison-client-native-recovery",
+        "all-thirty-six-example-journeys",
+        "en-sombre-320-examples-compare-git-native-example-result"
       ],
       "required_stderr": []
     },

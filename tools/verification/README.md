@@ -1456,3 +1456,23 @@ limits in both languages. It does not submit business documents on the live
 instance. Candidate qualification, isolated browser proof, actual installation
 and protected approval remain distinct. Run in a fresh evidence directory, then
 use `recipe.py verify`; source inventory alone never proves the executable graph.
+
+
+### PAEA downloadable examples / Exemples téléchargeables (increment 20)
+
+`paea-example-assets.json` runs the exact eight-output generator check, two schema/
+page/translation tests and one named native HTTP asset test. Normal receipt
+admission precedes eight actual private GET controls, missing-session refusal,
+HEAD, wrong-method refusal and exact recovery; Root stays unchanged. Downloaded
+bytes also pass the real common receipt/comparison/invoice resolvers. These are
+fictional v1 vectors, never protected approval or a sink-effect test.
+
+Complete HTTP recipes now collect **eight** tests; historical counts above remain
+attributed to their increments. `paea-native-ux.json` still requires 12 configurations
+per view and 62 expected native refusals; it additionally requires **36 example
+journeys** with real completed downloads of every displayed link, exact source bytes,
+empty inputs until explicit selection, actual successful uploads and no authority.
+`paea-local-delivery.json` now requires **40** read-only assertions and **19**
+protected asset byte sets, with translated example links in all three views.
+No live document submission, automatic form fill, paid call, retry or watchdog.
+Run/verify in fresh evidence; snapshots retain their actual declared inputs.

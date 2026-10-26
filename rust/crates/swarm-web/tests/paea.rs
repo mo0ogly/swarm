@@ -762,3 +762,57 @@ fn paea_comparison_http_refusals_recover_without_root_mutation() {
     assert!(String::from_utf8_lossy(menu.response.body()).contains("href=\"/paea-compare.html\""));
     assert_eq!(snapshot(&fixture.root), before);
 }
+
+
+/// Serve only versioned fictional source assets after normal native admission.
+/// A valid receipt precedes exact GET, denied-session, HEAD and method/recovery
+/// checks; all Root bytes remain unchanged. Then consume downloaded bytes through
+/// the actual shared receipt/comparison/resolver, without authority or effect.
+#[test]
+fn paea_example_assets_are_private_exact_and_semantically_usable() {
+    let fixture = Fixture::new();
+    let baseline = snapshot(&fixture.root);
+    let control = fixture.call(fixture.request("POST", "/api/v1/protection/receipt-report", serde_json::to_vec(&input(0)).unwrap()));
+    assert_eq!(control.response.status(), StatusCode::OK);
+    let mut assets = BTreeMap::new();
+    for (path, bytes) in [
+        ("/paea-examples/v1/git-after.json", include_bytes!("../../../../web/paea-examples/v1/git-after.json").as_slice()),
+        ("/paea-examples/v1/git-document.json", include_bytes!("../../../../web/paea-examples/v1/git-document.json").as_slice()),
+        ("/paea-examples/v1/git-receipt.json", include_bytes!("../../../../web/paea-examples/v1/git-receipt.json").as_slice()),
+        ("/paea-examples/v1/payment-after.json", include_bytes!("../../../../web/paea-examples/v1/payment-after.json").as_slice()),
+        ("/paea-examples/v1/payment-document.json", include_bytes!("../../../../web/paea-examples/v1/payment-document.json").as_slice()),
+        ("/paea-examples/v1/payment-receipt.json", include_bytes!("../../../../web/paea-examples/v1/payment-receipt.json").as_slice()),
+        ("/paea-examples/v1/payment-registry.json", include_bytes!("../../../../web/paea-examples/v1/payment-registry.json").as_slice()),
+        ("/paea-examples/v1/payment-request.json", include_bytes!("../../../../web/paea-examples/v1/payment-request.json").as_slice()),
+    ] {
+        let valid = fixture.call(fixture.request("GET", path, vec![]));
+        assert_eq!(valid.response.status(), StatusCode::OK, "{path}");
+        assert_eq!(valid.response.body(), bytes);
+        assert_eq!(valid.response.headers()["content-type"], "application/json; charset=utf-8");
+        assets.insert(path.rsplit('/').next().unwrap(), bytes);
+        let mut denied = fixture.request("GET", path, vec![]);
+        denied.headers_mut().remove(COOKIE);
+        assert_eq!(fixture.call(denied).response.status(), StatusCode::FORBIDDEN);
+        let head = fixture.call(fixture.request("HEAD", path, vec![]));
+        assert_eq!(head.response.status(), StatusCode::OK);
+        assert!(head.response.body().is_empty());
+        assert!(!fixture.call(fixture.request("POST", path, vec![])).response.status().is_success());
+        assert_eq!(snapshot(&fixture.root), baseline);
+        assert_eq!(fixture.call(fixture.request("GET", path, vec![])).response.body(), bytes);
+    }
+    for prefix in ["payment", "git"] {
+        let document = assets[format!("{prefix}-document.json").as_str()];
+        let receipt = assets[format!("{prefix}-receipt.json").as_str()];
+        let report = swarm_protection_contract::check_receipt_documents(document, receipt, "sink-paea-example", swarm_protection_contract::State::CommitRequested).unwrap();
+        assert_eq!(report.effect, "not-established");
+        let comparison = swarm_protection_contract::compare_documents(document, assets[format!("{prefix}-after.json").as_str()]).unwrap();
+        assert!(comparison.canonical_content_changed);
+        assert!(!comparison.intent_changed);
+        assert!(!comparison.transport_request_changed);
+        assert_eq!(comparison.approval_validity, "not-established");
+    }
+    let payment = swarm_protection_contract::resolve_payment_documents(assets["payment-registry.json"], assets["payment-request.json"]).unwrap();
+    assert_eq!(payment.effect, "not-established");
+    assert_eq!(snapshot(&fixture.root), baseline);
+    println!("PAEA_EIGHT_PRIVATE_EXAMPLES_USABLE");
+}

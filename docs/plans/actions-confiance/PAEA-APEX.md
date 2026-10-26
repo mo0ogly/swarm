@@ -458,3 +458,23 @@ IA3/AC-02/autorités humaines, E2/E3 et acceptation protégée restent ouverts.
 Décision suivante : l'utilisateur autorise le commit de la tranche 19 puis la
 continuation directe par Codex, **sans GLM**. Préserver les prérequis protégés,
 les droits et les budgets ; choisir la prochaine tranche sur l'état réel du plan.
+
+
+### Incrément 20 — exemples prêts à télécharger
+
+[Tranche directe sans GLM](paea/INCREMENT-20.md) : huit fichiers fictifs versionnés,
+aide dans les trois vues et vérifications natives après téléchargement réel.
+Aucune sélection ni exécution automatique ; garanties protégées inchangées.
+
+
+Tranche 20 réalisée sans GLM et installée **dev96** : huit exemples depuis les
+trois aides, 1 743 assertions natives, 36 parcours/120 téléchargements et 40 contrôles
+locaux PASS. Commit19 `f41003488`, pas de commit20 ni push. L’activation ponctuelle
+par le lanceur du candidat normal qualifié conserve la configuration source ; la
+compilation du reviewer parallèle (`Capture::new`, tentative dev97) reste ouverte.
+[Résultats, incident et reprise](paea/INCREMENT-20.md). Aucune assurance protégée ajoutée.
+
+
+L’utilisateur demande ensuite le commit de la tranche20 livrée. Enregistrement
+Git isolé, sans push ni nouvelle livraison ; les résultats dev96 et les limites
+restent ceux du [suivi20](paea/INCREMENT-20.md).

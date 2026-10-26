@@ -5683,5 +5683,21 @@
   "Après — empreinte de l’action": "After — action hash",
   "Avant — identité de l’intention": "Before — intent identity",
   "Après — identité de l’intention": "After — intent identity",
-  "Comparaison structurelle vérifiée. Aucun accord validé.": "Structural comparison checked. No approval validated."
+  "Comparaison structurelle vérifiée. Aucun accord validé.": "Structural comparison checked. No approval validated.",
+  "Exemples fictifs à télécharger": "Download fictional examples",
+  "Télécharger les fichiers d’un exemple, les sélectionner dans le formulaire, puis lancer la vérification. Aucun fichier n’est chargé et aucune vérification n’est lancée automatiquement.": "Download the files for an example, select them in the form, then run the check. No file is loaded and no check is run automatically.",
+  "Pour ces reçus fictifs, saisir sink-paea-example comme service attendu et choisir COMMIT_REQUESTED comme état précédent déclaré.": "For these fictional receipts, enter sink-paea-example as the expected service and choose COMMIT_REQUESTED as the declared previous state.",
+  "Le registre et la demande décrivent le même projet fictif. Le résultat attendu désigne la dette debt-17 ; aucun règlement n’est exécuté.": "The registry and request describe the same fictional project. The expected result identifies debt debt-17; no settlement is executed.",
+  "Comparer les fichiers avant et après du même domaine. Les conditions changent ; l’intention et la clé de tentative restent identiques.": "Compare the before and after files for the same domain. The terms change; the intent and attempt key stay identical.",
+  "Ces fichiers publics de démonstration ne contiennent aucune donnée de votre projet. Ils ne constituent ni accord authentifié ni preuve d’un effet réel.": "These public demonstration files contain no data from your project. They are neither an authenticated approval nor evidence of an actual effect.",
+  "Document de l’action — règlement fictif": "Action document — fictional settlement",
+  "Reçu déclaré — règlement fictif": "Declared receipt — fictional settlement",
+  "Document de l’action — promotion Git": "Action document — Git promotion",
+  "Reçu déclaré — promotion Git": "Declared receipt — Git promotion",
+  "Registre fictif des dettes": "Fictional debt registry",
+  "Demande de facture fictive": "Fictional invoice request",
+  "Action après modification — règlement fictif": "Action after changes — fictional settlement",
+  "Action après modification — promotion Git": "Action after changes — Git promotion",
+  "Action avant modification — règlement fictif": "Action before changes — fictional settlement",
+  "Action avant modification — promotion Git": "Action before changes — Git promotion"
 }

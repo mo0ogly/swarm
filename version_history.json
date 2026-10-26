@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "PAEA : exemples fictifs téléchargeables depuis les trois écrans pour essayer la correspondance de reçu, la résolution de facture et la comparaison d’actions. Sélection et vérification explicites ; aucun accord ni effet réel.",
+        "en": "PAEA: download fictional examples from all three pages to try receipt correspondence, invoice resolution and action comparison. Selection and checks remain explicit; no approval or actual effect."
+      },
+      {
         "fr": "Préparations Rust : enregistrement explicite des réponses aux questions du plan via CLI/API, avec historique et reprise, sans rafraîchir les sources ni conserver un ancien verdict.",
         "en": "Rust preparations: explicit plan-question answers through CLI/API, with history and recovery, without refreshing source fingerprints or retaining an old verdict."
       },

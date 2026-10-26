@@ -515,3 +515,38 @@ trois vues sur un binaire natif identifié, en FR/EN, deux thèmes et trois larg
 Les injections de réponses corrompues côté navigateur restent distinctes des
 réponses réelles du service. Résultats, livraison et limites :
 [incrément 19](../plans/actions-confiance/paea/INCREMENT-19.md).
+
+
+## Essayer les trois écrans avec des exemples — incrément 20
+
+Chaque page propose l’aide repliée **Exemples fictifs à télécharger**. Ouvrir
+l’aide, télécharger les fichiers du même domaine, puis les sélectionner dans le
+formulaire et lancer explicitement la vérification. Télécharger ne remplit aucun
+champ et ne lance aucun contrôle. Les fichiers sont des données fictives fixes,
+sans contenu de projet, accord authentifié ou preuve d’effet réel.
+
+- Correspondance : `payment-document.json` + `payment-receipt.json`, ou
+  `git-document.json` + `git-receipt.json`. Saisir `sink-paea-example` comme
+  identifiant du service attendu et choisir `COMMIT_REQUESTED` comme état précédent
+  déclaré. Le reçu déclare `COMMITTED`, sans démontrer un engagement réel.
+- Résolution : `payment-registry.json` + `payment-request.json`. Résultat attendu :
+  dette `debt-17`, avec les mentions d’authenticité/autorité/effet non établis.
+- Comparaison : document d’action précédent en entrée avant, puis
+  `payment-after.json` ou `git-after.json` du même domaine en entrée après. Les
+  conditions changent ; intention et clé de tentative restent identiques.
+
+Huit routes exactes `/paea-examples/v1/<nom-ci-dessus>` sont compilées dans le
+binaire et gardées par l’admission native comme les pages. GET renvoie les octets
+JSON versionnés, HEAD leur type sans corps ; les fichiers ne sont ni recherchés
+sur disque en production ni produits depuis Root. Aucun chemin libre ou nouveau
+plafond opérateur. Ces exemples restent disponibles seulement via la session
+native ; leur contenu fictif ne constitue pas un secret métier.
+
+`python3 tools/paea/make_examples.py` régénère les fichiers depuis les vecteurs
+nommés et le registre/demande de fixture existants ; `--check` vérifie les huit
+sorties exactes sans écrire. Une erreur IO est visible ; chaque fichier est
+remplacé atomiquement, sans transaction globale entre les huit sorties. Après
+interruption, régénérer puis vérifier avant build. La recette
+`paea-example-assets.json` vérifie génération, schémas/liens et admission native ;
+les téléchargements puis uploads/vérifications réels sont dans `paea-native-ux.json`.
+Les résultats et limites restent séparés dans [l’incrément 20](../plans/actions-confiance/paea/INCREMENT-20.md).

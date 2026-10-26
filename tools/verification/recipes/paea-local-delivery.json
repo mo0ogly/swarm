@@ -11,7 +11,8 @@
     "web/swarm-logo.png",
     "web/trust-native.css",
     "web/paea-payment.html",
-    "web/paea-compare.html"
+    "web/paea-compare.html",
+    "web/paea-examples/v1/*.json"
   ],
   "environment": {},
   "steps": [
@@ -23,14 +24,17 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "LIVE_PAEA_DELIVERY_VERIFIED 34",
+        "LIVE_PAEA_DELIVERY_VERIFIED 40",
         "fr-dialog-current-PAEA-evolutions",
         "en-dialog-current-PAEA-evolutions",
         "no-browser-errors-or-writes",
         "fr-live-payment-menu-and-fields",
         "en-live-payment-limits-no-submission",
         "fr-live-comparison-menu-and-fields",
-        "en-live-comparison-limits-no-submission"
+        "en-live-comparison-limits-no-submission",
+        "fr-live-receipt-example-links",
+        "en-live-comparison-example-links",
+        "en-live-payment-example-links"
       ],
       "required_stderr": []
     },

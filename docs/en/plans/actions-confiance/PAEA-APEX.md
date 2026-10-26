@@ -424,3 +424,24 @@ No commit/push. IA3/AC-02/human authorities, E2/E3 and protected acceptance rema
 Next decision: the user authorizes committing increment 19, then continuing
 directly with Codex, **without GLM**. Preserve protected prerequisites, rights
 and budgets; select the next slice from the plan's actual state.
+
+
+### Increment 20 — ready-to-download examples
+
+[Direct slice without GLM](paea/INCREMENT-20.md): eight versioned fictional files,
+help in all three views and actual native checks after completed downloads.
+No automatic selection/submission; protected assurance unchanged.
+
+
+Increment20 implemented without GLM and installed as **dev96**: eight examples
+from all three help panels, 1,743 native assertions, 36 journeys/120 downloads,
+and 40 live checks PASS.
+Increment19 commit `f41003488`; no increment20 commit/push. Supported one-off
+qualified normal-candidate activation preserves source configuration; concurrent
+reviewer compilation (`Capture::new`, dev97 attempt) remains open. [Results and
+resumption](paea/INCREMENT-20.md). No protected assurance added.
+
+
+The user then requests committing installed increment20. Isolated Git recording,
+without push or another delivery; dev96 results/limits remain in the
+[increment20 record](paea/INCREMENT-20.md).

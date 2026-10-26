@@ -27,6 +27,18 @@
     <p><a href="/paea-payment.html" data-paea-link data-i18n>Résoudre une référence de facture</a></p>
     <p><a href="/paea-compare.html" data-paea-link data-i18n>Comparer deux actions</a></p>
     <p id="paea-limits" class="paea-notice" data-i18n>Contrôle de cohérence des fichiers fournis. Autorisation, authenticité du reçu et effet réel non établis.</p>
+    <details id="paea-example-help">
+      <summary data-i18n>Exemples fictifs à télécharger</summary>
+      <p data-i18n>Télécharger les fichiers d’un exemple, les sélectionner dans le formulaire, puis lancer la vérification. Aucun fichier n’est chargé et aucune vérification n’est lancée automatiquement.</p>
+      <p data-i18n>Pour ces reçus fictifs, saisir sink-paea-example comme service attendu et choisir COMMIT_REQUESTED comme état précédent déclaré.</p>
+      <ul>
+        <li><a href="/paea-examples/v1/payment-document.json" download="payment-document.json" data-i18n>Document de l’action — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/payment-receipt.json" download="payment-receipt.json" data-i18n>Reçu déclaré — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/git-document.json" download="git-document.json" data-i18n>Document de l’action — promotion Git</a></li>
+        <li><a href="/paea-examples/v1/git-receipt.json" download="git-receipt.json" data-i18n>Reçu déclaré — promotion Git</a></li>
+      </ul>
+      <p data-i18n>Ces fichiers publics de démonstration ne contiennent aucune donnée de votre projet. Ils ne constituent ni accord authentifié ni preuve d’un effet réel.</p>
+    </details>
     <form id="paea-form" aria-describedby="paea-limits">
       <fieldset id="paea-inputs">
         <legend data-i18n>Documents à vérifier</legend>

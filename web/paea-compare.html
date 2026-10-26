@@ -27,6 +27,18 @@
     <p data-i18n>Comparer deux documents pour un règlement fictif ou une promotion Git, sans afficher les valeurs des champs.</p>
     <p id="paea-limits" class="paea-notice" data-i18n>Les fichiers fournis ne sont pas authentifiés. Cette comparaison ne valide aucun accord et ne produit aucun effet.</p>
     <details id="paea-format-help"><summary data-i18n>Préparer les fichiers</summary><p data-i18n>Chaque fichier contient une proposition et son contexte. Le résultat indique les champs modifiés sans en afficher les valeurs. Les espaces et l’ordre des clés JSON ne modifient pas le contenu canonique ; les sources restent ordonnées.</p></details>
+    <details id="paea-example-help">
+      <summary data-i18n>Exemples fictifs à télécharger</summary>
+      <p data-i18n>Télécharger les fichiers d’un exemple, les sélectionner dans le formulaire, puis lancer la vérification. Aucun fichier n’est chargé et aucune vérification n’est lancée automatiquement.</p>
+      <p data-i18n>Comparer les fichiers avant et après du même domaine. Les conditions changent ; l’intention et la clé de tentative restent identiques.</p>
+      <ul>
+        <li><a href="/paea-examples/v1/payment-document.json" download="payment-document.json" data-i18n>Action avant modification — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/payment-after.json" download="payment-after.json" data-i18n>Action après modification — règlement fictif</a></li>
+        <li><a href="/paea-examples/v1/git-document.json" download="git-document.json" data-i18n>Action avant modification — promotion Git</a></li>
+        <li><a href="/paea-examples/v1/git-after.json" download="git-after.json" data-i18n>Action après modification — promotion Git</a></li>
+      </ul>
+      <p data-i18n>Ces fichiers publics de démonstration ne contiennent aucune donnée de votre projet. Ils ne constituent ni accord authentifié ni preuve d’un effet réel.</p>
+    </details>
     <form id="paea-form" aria-describedby="paea-limits">
       <fieldset id="paea-inputs">
         <legend data-i18n>Documents à comparer</legend>

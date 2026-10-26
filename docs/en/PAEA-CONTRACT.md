@@ -475,3 +475,35 @@ tests. `paea-native-ux.json` separately qualifies all three views on an identifi
 native binary, FR/EN, both themes and three widths. Browser-only corrupt-response
 injections stay distinct from actual service responses. Results, delivery and
 limits: [increment 19](plans/actions-confiance/paea/INCREMENT-19.md).
+
+
+## Try all three pages with examples — increment 20
+
+Each page has collapsed **Download fictional examples** help. Expand it, download
+the files for one domain, select them in the form and explicitly run the check.
+Downloading neither fills fields nor starts a check. Files are fixed fictional
+data, containing no project content, authenticated approval or actual-effect proof.
+
+- Correspondence: `payment-document.json` + `payment-receipt.json`, or
+  `git-document.json` + `git-receipt.json`. Enter `sink-paea-example` as expected
+  service and select `COMMIT_REQUESTED` as declared previous state. The receipt
+  declares `COMMITTED`, without establishing an actual commitment.
+- Resolution: `payment-registry.json` + `payment-request.json`. Expected result:
+  debt `debt-17`, with authenticity/authority/effect not established.
+- Comparison: the earlier action document as before, then `payment-after.json`
+  or `git-after.json` from that domain as after. Terms change; intent and attempt
+  key remain identical.
+
+Eight exact `/paea-examples/v1/<name-above>` routes are embedded in the executable
+and use the pages' native admission. GET returns versioned JSON bytes, HEAD the
+type without a body. Production does not look up files on disk or produce them
+from Root. No free path or new operator ceiling. These downloads require the
+native session; their fictional content is not a business secret.
+
+`python3 tools/paea/make_examples.py` regenerates them from named contract vectors
+and the existing registry/request fixtures; `--check` compares all eight exact
+outputs without writing. IO failure is visible; replacement is atomic per file,
+not across all eight. After interruption, regenerate and check before building.
+`paea-example-assets.json` checks generation, shapes/links and native admission;
+`paea-native-ux.json` checks completed downloads then actual uploads/checks.
+Results and limits are separate in [increment 20](plans/actions-confiance/paea/INCREMENT-20.md).
