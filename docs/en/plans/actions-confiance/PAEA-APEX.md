@@ -490,3 +490,20 @@ and local report reader. Eight real tests,506nativeassertions,12downloads and
 source configuration preserved; concurrent engine compilation remains open.
 [RETEX/evidence](paea/INCREMENT-23.md). No commit23/push; protected PA-02/03,
 browser campaign execution,E2/E3 and0/17invariants stay open.
+
+
+### Increment 24 — revocation/commit contention
+
+Commit23 `97933d8b7`, 27 files, 108 foreign staged entries preserved.
+[Qualification 24](paea/INCREMENT-24.md): extend T05/T17 to real overlapping
+processes in both fixtures, contention refusal and explicit recovery. Criteria
+and limits retained; no new protection or server installation claimed.
+
+
+Qualification24 verified: four real SQLite/Git contentions with controls, four
+expected early-release assertion failures and public eight-case campaign
+PASS/VERIFIED. Pinned dev109 protection sources match its effective profile;
+dev112 observed separately, without intervention by this slice. Recipe stream
+defects corrected/originals retained, derived inventories completed; unchanged
+browser not replayed. [Review/slice RETEX24](paea/INCREMENT-24.md). Protected
+0/17 invariants, IA3/AC-02, humans, E2/E3 and final programme remain open.

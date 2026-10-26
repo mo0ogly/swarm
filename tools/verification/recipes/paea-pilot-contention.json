@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "paea-pilot-contention",
+  "inputs": [
+    "tools/paea/pilot_lab.py",
+    "tools/paea/pilot_oracle.py",
+    "tests/paea_pilot_lab_test.py",
+    "tests/fixtures/paea/contract-v1.json",
+    "docs/plans/actions-confiance/paea/PILOTE-OPERATIONNEL.md",
+    "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
+    "rust/crates/swarm-protection-contract/src/*.rs",
+    "rust/crates/swarm-cli/src/protection.rs",
+    "tests/fixtures/paea/payment-*.json",
+    "tools/paea/run_pilot.py",
+    "tests/helpers/paea_pilot_contention.py",
+    "tests/paea_pilot_contention_guard_test.py",
+    "tests/paea_lab_runner_test.py",
+    "schemas/paea/laboratory-report-v1.schema.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-pilot-lab.json"
+  ],
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "steps": [
+    {
+      "id": "contention-controls-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_pilot_lab_test.py",
+        "PilotLab.test_t05_t17_ordered_revocation_first_use_and_opposite_order"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "Ran 1 test",
+        "OK",
+        "PAEA_CONTENTION_PASS payment owner=commit explicit-recovery",
+        "PAEA_CONTENTION_PASS payment owner=revoke explicit-recovery",
+        "PAEA_CONTENTION_PASS git owner=commit explicit-recovery",
+        "PAEA_CONTENTION_PASS git owner=revoke explicit-recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "early-release-assertion-guard",
+      "command": [
+        "python3",
+        "tests/paea_pilot_contention_guard_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test_early_release_is_detected_and_workers_are_reaped",
+        "PAEA_CONTENTION_EARLY_RELEASE_DETECTED four assertions, controls and reaped holders",
+        "Ran 1 test",
+        "OK"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-eight-case-campaign-export-and-refusals",
+      "command": [
+        "python3",
+        "tests/paea_lab_runner_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PAEA_LAB_COMMAND_EXPORT_AND_REFUSALS_PASS",
+        "\"tests\": 8",
+        "\"integrity\": \"VERIFIED\""
+      ],
+      "required_stderr": [
+        "test_actual_campaign_export_then_hash_and_existing_output_refusals",
+        "Ran 1 test",
+        "OK"
+      ]
+    }
+  ]
+}

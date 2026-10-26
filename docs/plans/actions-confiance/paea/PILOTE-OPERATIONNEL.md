@@ -177,3 +177,21 @@ en constatant deux effets : la prétention d’unicité est réfutée. Autorité
 même UID, oracles de processus distinct mais auteur commun ;0/17invariants
 protégés, E2/E3 et exécution de campagnes depuis le navigateur restent ouverts.
 [Résultats et limites de la tranche](INCREMENT-23.md).
+
+
+### Concurrence locale — incrément 24
+
+Le contrat de rapport à huit cas reste compatible : le cas T05/T17 existant
+ajoute quatre scénarios de contention (deux domaines × détenteur commit/révocation).
+Helper maintenu `tests/helpers/paea_pilot_contention.py` : barrière IPC après la
+lecture réelle sous transaction, processus pair indépendant, erreur de verrouillage
+conservée, absence d'effet concurrent puis reprise explicite. Aucun retry ajouté.
+Le curseur est entièrement consommé avant la pause ; la contre-épreuve ne peut
+donc pas conserver involontairement un verrou de lecture après commit prématuré.
+Chaque contention a son témoin sans pair utilisant le même worker/barrière.
+Recette ciblée `paea-pilot-contention.json`, recette complète `paea-pilot-lab.json` ;
+les huit IDs de rapport sont inchangés, leurs empreintes distinguent les runs.
+`SWARM_PAEA_CONTENTION_FAULT=early-release` est uniquement une substitution de
+vérification qui doit faire échouer le test ; ne pas l'utiliser pour une campagne
+normale. Les verrous de fixture ne protègent pas contre un auteur du même UID.
+[Résultats, revue et limites](INCREMENT-24.md).

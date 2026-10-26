@@ -11,7 +11,8 @@
     "rust/crates/swarm-protection-contract/src/*.rs",
     "rust/crates/swarm-cli/src/protection.rs",
     "tests/fixtures/paea/payment-*.json",
-    "tools/paea/run_pilot.py"
+    "tools/paea/run_pilot.py",
+    "tests/helpers/paea_pilot_contention.py"
   ],
   "environment": {
     "PYTHONDONTWRITEBYTECODE": "1"
@@ -37,7 +38,11 @@
         "PAEA_GUIDE_03_COUNTEREXAMPLE_RETAINED",
         "PAEA_PILOT_BINARY_STABLE",
         "test_resolved_invoice_aliases_converge_on_one_effect",
-        "PAEA_GUIDE_03_RESOLVED_FIXTURE"
+        "PAEA_GUIDE_03_RESOLVED_FIXTURE",
+        "PAEA_CONTENTION_PASS payment owner=commit explicit-recovery",
+        "PAEA_CONTENTION_PASS payment owner=revoke explicit-recovery",
+        "PAEA_CONTENTION_PASS git owner=commit explicit-recovery",
+        "PAEA_CONTENTION_PASS git owner=revoke explicit-recovery"
       ],
       "required_stderr": []
     }

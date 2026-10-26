@@ -21,7 +21,8 @@
     "docs/en/plans/actions-confiance/paea/OPERATIONAL-PILOT.md",
     "rust/crates/swarm-protection-contract/src/*.rs",
     "rust/crates/swarm-cli/src/protection.rs",
-    "tests/fixtures/paea/payment-*.json"
+    "tests/fixtures/paea/payment-*.json",
+    "tests/helpers/paea_pilot_contention.py"
   ],
   "environment": {
     "PYTHONDONTWRITEBYTECODE": "1"

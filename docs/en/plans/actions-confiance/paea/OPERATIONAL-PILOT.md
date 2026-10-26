@@ -171,3 +171,19 @@ alias test passes by observing two effects: uniqueness is refuted. Simulated
 authority, same UID and separate oracle process with the same author establish no
 protected guarantee.0/17invariants,E2/E3 and browser-triggered execution remain open.
 [Slice results and limits](INCREMENT-23.md).
+
+
+### Local concurrency — increment 24
+
+The existing eight-case report contract remains compatible: T05/T17 adds four
+contention scenarios (two domains × commit/revoke lock owner). Maintained helper
+`tests/helpers/paea_pilot_contention.py` gates the actual authority read inside a
+real transaction, starts a separate peer, retains the lock error, observes no
+competing effect and explicitly recovers. No automatic retry is added. The read
+cursor is fully consumed before pausing, so a premature-commit negative control
+cannot accidentally retain a shared read lock. An unopposed control uses the same
+worker/gate before every contention. Targeted recipe `paea-pilot-contention.json`;
+full recipe `paea-pilot-lab.json`; eight report IDs unchanged, hashes distinguish
+runs. `SWARM_PAEA_CONTENTION_FAULT=early-release` is a verification-only substitution
+that must fail the test, never a normal campaign mode. Fixture locks do not protect
+against a writer sharing the same UID. [Results, review and limits](INCREMENT-24.md).

@@ -1548,3 +1548,42 @@ The earlier422-assertion component run used four explicit workspace browser
 overlays and is not native evidence. Normal build/restart source failures remain
 retained; the tested qualified normal dev109 was installed with the launcher's
 supported one-shot `--binary`, preserving source configuration.
+
+
+### PAEA laboratory contention / Contention laboratoire (increment 24)
+
+`recipes/paea-pilot-contention.json` selects the one named T05/T17 test, including
+ordered cases plus four real process contentions (payment/Git × both lock owners),
+matched unopposed worker controls, raw separate oracles and explicit recovery.
+The full `paea-pilot-lab.json` still runs eight named tests; the public wrapper
+and report v1 remain compatible. Pin `SWARM_PAEA_TEST_BINARY` and its SHA256;
+set fresh `SWARM_PAEA_PILOT_EVIDENCE` (targeted observations) and
+`SWARM_PAEA_LAB_EVIDENCE` (public campaign) paths. The latter must not already
+exist; its parent must exist. All three final steps run explicit commands: named
+contention case, early-release assertion guard, public eight-case export/refusals.
+No global watchdog/retry. Preserve lock failures and never infer applied
+revocation from a failed contender. Explicit test-only early-release substitution
+must fail after the valid control; normal runs must leave that variable unset.
+Same UID, simulated authority and instrumented scheduling; no protected or
+distributed concurrency guarantee. See FR/EN increment 24 for exact results.
+
+La recette ciblée sélectionne T05/T17, quatre contentions réelles, témoins,
+oracles et reprise explicite ; huit tests/rapport v1 conservés dans la recette
+complète. Aucun watchdog, retry, autorité protégée ou preuve distribuée ajouté.
+
+
+Increment24 actual result: final three-step recipe and inner public eight-case
+recipe PASS/VERIFIED. Four process contentions and four intended negative failures
+retained. Two original recipe-contract failures remain: PilotLab reports unittest
+on stdout; LabCommand reports it on stderr; the new guard uses stdout. Inspect
+each actual producer before deriving a manifest, and include every pilot input
+in all caller inventories. Reader/component input lists were updated; their
+unchanged browser paths were not rerun in24. Evidence and FR/EN slice RETEX are in
+`docs/plans/actions-confiance/paea/INCREMENT-24.md`. No engine/UI build or restart
+is attributed to this test-only qualification.
+
+Résultat réel24 : trois étapes et huit tests internes PASS/VERIFIED. Les flux
+réels des trois producteurs sont contrôlés avant dérivation, et le helper rejoint
+chaque inventaire appelant. Définir aussi `SWARM_PAEA_LAB_EVIDENCE` sur un dossier
+neuf pour la commande publique. Les deux échecs originaux restent conservés ;
+aucune qualification navigateur ou installation nouvelle n'est déduite.

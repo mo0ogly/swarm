@@ -190,7 +190,11 @@ class PilotLab(unittest.TestCase):
                 self.assertEqual(self.oracle(root, domain), after)
 
     def test_t05_t17_ordered_revocation_first_use_and_opposite_order(self):
-        """Persisted epoch refuses unused grant after revoke; earlier commitment remains known."""
+        """Persisted epoch and real process contention order revocation/commit in both domains.
+
+        Ordered cases remain; the helper adds matched controls, actual busy errors,
+        unchanged sink observations, explicit recovery and exact durable ordering.
+        Same UID/cooperating writers only; no protected or distributed guarantee."""
         for domain in ('payment', 'git'):
             with self.subTest(domain=domain):
                 self.witness(domain)
@@ -218,6 +222,11 @@ class PilotLab(unittest.TestCase):
                 self.assertEqual(self.commit(reverse, doc).returncode, 2)
                 self.assertEqual(self.oracle(reverse, domain), observed)
                 self.assertEqual(lab.reconcile(reverse, report)['state'], 'RECONCILED_COMMITTED')
+
+        # Extended T05/T17: real overlapping processes, both SQLite lock owners.
+        sys.path.insert(0, str(ROOT / 'tests/helpers'))
+        from paea_pilot_contention import exercise
+        exercise(self)
 
     def test_unavailable_oracle_stays_unknown_then_recovers_without_creation(self):
         """Missing sink is never an empty success; restoration recovers the original effect."""

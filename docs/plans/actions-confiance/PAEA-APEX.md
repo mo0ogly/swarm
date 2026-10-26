@@ -524,3 +524,20 @@ explicite et lecture locale du rapport. Huit tests réels,506assertions natives,
 candidat normal exact,configuration source conservée ; compilation du moteur
 concurrent reste ouverte. [RETEX/preuves](paea/INCREMENT-23.md). Aucun commit23/push ;
 PA-02/03protégés,exécution web de campagnes,E2/E3 et0/17invariants ouverts.
+
+
+### Incrément 24 — contention de révocation/engagement
+
+Commit23 `97933d8b7`, 27 fichiers, 108 entrées préparées étrangères préservées.
+[Qualification 24](paea/INCREMENT-24.md) : étendre T05/T17 aux vrais processus
+concurrents des deux fixtures, refus de contention et reprise explicite. Critères
+et limites conservés ; aucune protection ou installation nouvelle prétendue.
+
+
+Qualification24 vérifiée : quatre contentions réelles SQLite/Git, témoins,
+quatre échecs attendus du verrou libéré trop tôt et campagne publique huit tests
+PASS/VERIFIED. Sources de protection du dev109 exactes au profil effectif ;
+service dev112 observé séparément, sans intervention de cette tranche. Défauts
+de flux des recettes corrigés et originaux conservés ; inventaires dérivés
+complétés, navigateur inchangé/non rejoué. [Revue/RETEX24](paea/INCREMENT-24.md).
+0/17 invariants protégés, IA3/AC-02, humains, E2/E3 et programme final ouverts.
