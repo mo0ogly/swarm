@@ -14,12 +14,14 @@ import rust_native_review_inputs as ordinary
 from rust_native_task_validation import invoke
 
 
-def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context_bytes=None):
+def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context_bytes=None,pending_dependent=False):
     """Run one complete readonly inspection or an explicitly unsupported source.
 
     Existing setup reuse retains actual Root/control originals, not copied state.
     An explicit context_bytes fixture argument is persisted through public quotas;
     None keeps its actual saved value, zero means no additional prompt cap.
+    pending_dependent preplans one dependency-blocked worker for the subsequent
+    publication/copy journey; it is excluded from the control/review cohort.
     Every injected refusal follows a valid applicable witness and restores exact
     bytes/settings. A successful read grants no provider call or verdict.
     """
@@ -30,7 +32,7 @@ def run(binary,profile,out,*,reuse=None,before=False,binary_source=False,context
     else:
         entries={'whole-source.txt':b'Complete extra tracked source for candidate inspection.\n','literal-link':('symlink','../../do-not-read-link-target')}
         if binary_source:entries['binary-input.bin']=b'\xff\xfe\x00Not a text review input'
-        native.managed.worker.subreaper_scope(lambda:native.managed.run(binary,profile,out/'workers',project_subdir='app',controls=native.CONTROLS,source_entries=entries),lambda error:None,native.managed.parent_death.subreaper)
+        native.managed.worker.subreaper_scope(lambda:native.managed.run(binary,profile,out/'workers',project_subdir='app',controls=native.CONTROLS,source_entries=entries,pending_dependent=pending_dependent),lambda error:None,native.managed.parent_death.subreaper)
         birth=json.loads((out/'workers/fixture.json').read_bytes());root=Path(birth['root']);work=birth['work']
     environment=dict(os.environ);environment['CODEX_HOME']=str(root/'codex-home');checks=[]
     # A reused actual Root retains old quota event IDs; each new journey needs

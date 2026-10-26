@@ -404,3 +404,22 @@ flowchart TD
     F -. Unported .-> G[Cumulative proof and cohort projection]
     G -. Unverified .-> H[New worker copy and supervisor loop]
 ```
+
+### S2 — dependent worker after publication, dev121
+
+The real journey reproduced two blockers: an ordinary clone missed the published
+candidate under its native reference, and a dependency refusal could strand a
+final copy before admission. Preparation now fetches the exact OID from the held
+bare repository and checks shared prerequisites before any copy effect. The
+writer retains its complete recheck.
+
+The maintained recipe checks four obligations: published predecessor, actual
+copy HEAD/content, preparation replay/refusal/restoration, and real completion
+with one reservation. Prepublication refusal leaves no copy. Successful original
+stages are explicitly reused rather than claimed as newly executed. No paid
+provider or positive SQL seed. Normal no-fixture profile and identical effective
+inputs bind the recipe to delivery; 14 FR/EN UI checks and three installed CLI
+checks pass. Rustdoc compiles with the workspace graph; its feature profile is
+separate from production qualification. Original failures remain retained.
+Cumulative publication/projections, supervisor integration, S3/S4 and the final
+project RETEX remain open. [Report and increment RETEX](../../../../docs/plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/post-publication-worker-hfzh_8zd/RESULT.md).

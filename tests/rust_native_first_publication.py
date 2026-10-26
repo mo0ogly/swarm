@@ -11,9 +11,11 @@ import rust_native_managed_reviewer as native
 from rust_native_task_validation import invoke
 
 
-def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None):
+def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending_dependent=False):
     """Retain each public attempt and require atomic state, originals and no debit.
 
+    pending_dependent preplans a third worker with an explicit saved fixture
+    budget for a later copy journey; this helper never launches it.
     A genuine passed witness precedes injected faults; faults are restored before
     publication. Replay/collisions and current accepted proof are separate checks.
     Original attempts/failures remain retained and no model is rerun on reuse.
@@ -21,7 +23,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None):
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     fixture=native.inspection.native.fixture
     if reuse is None:
-        native.run(binary,profile,out/'native','pass');reuse=out/'native'
+        native.run(binary,profile,out/'native','pass',pending_dependent=pending_dependent);reuse=out/'native'
     source=json.loads((reuse/'result.json').read_text())
     assert source['status']=='PASS' and source['case']=='pass' and not source['accepted'] and not source['paid_provider']
     root=Path(source['root']);work=source['work'];environment=dict(os.environ,CODEX_HOME=str(root/'codex-home'))
@@ -51,6 +53,17 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None):
     before=shown('before');task=next(t for t in before['tasks'] if t.get('independent_review',{}).get('state')=='passed')
     review=task['independent_review'];request=dict(schema_version=1,event_id='first-publication-'+hashlib.sha256(str(out).encode()).hexdigest(),expected_revision=before['revision'],task_id=task['id'])
     baseline=state();marker=(root/'managed-reviewer-invoked.json').read_bytes()
+    if pending_dependent:
+        dependent=next(t for t in before['tasks'] if t['id']=='dependent')
+        assert dependent['status']=='todo' and dependent['depends']==['task'] and not dependent.get('attempts')
+        refused=call('dependent-before-publication',['agent','prepare',work],dict(schema_version=1,event_id='dependent-before',expected_revision=before['revision'],task_id='dependent',provider='fixture',capture_output=True),False)
+        assert refused['failure']['code']=='managed-worker-prerequisites',refused
+        assert any(reason in refused['failure']['causes'] for reason in ['task-dependency-not-accepted','managed-publication-record-required']),refused
+        storage=Path(before['planning']['repository']['storage'])
+        assert not (storage/'copies/dependent-1').exists()
+        assert not (storage/'native-worker-dependent-before.json').exists()
+        assert shown('dependent-before-unchanged')==before and state()==baseline
+        checks.append('dependent-refuses-before-predecessor-publication-without-mutation')
     if rollback_sdk:
         envelope=out/'rollback-envelope.json';fixture.publish(envelope,request)
         mark=root/'.rust-migration-fixture';created=not mark.exists()

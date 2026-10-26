@@ -3287,3 +3287,15 @@ GLM `glm-5.2` a analysé `release-plan` (29 681 tokens mesurés) : snapshot conv
 CAS Work/préparation, rejeu et readback final à préserver. Analyse conservée,
 implémentation et recette du parcours encore ouvertes, owner Codex ; aucune
 autorisation de départ appliquée. Voir [rapport](PREPARATION-CONVERSION-20261026.md).
+
+## S2 — copie du worker après publication, livrée dev121
+
+Owner Codex, replan/APEX direct. Push antérieur terminé sur la branche courante.
+Deux défauts reproduits/corrigés : candidat absent du clone, copie créée avant
+refus de dépendance. Fetch OID exact + précontrôle commun, admission finale inchangée.
+Recette PASS/VERIFIED, quatre obligations, étapes natives valides réutilisées
+explicitement ; refus/restauration conservés. Rustdoc workspace PASS, profil livré
+normal sans fixture, entrées effectives identiques ;14 contrôles UI FR/EN et trois
+lectures/rejeu/récupération du binaire installé PASS, Works réels conservés.
+Baseline cumulative/projections, boucle superviseur, S3/S4 et RETEX final ouverts.
+Voir [rapport et RETEX](evidence/20261025-scaling-s2-oi9dgo_e/post-publication-worker-hfzh_8zd/RESULT.md).

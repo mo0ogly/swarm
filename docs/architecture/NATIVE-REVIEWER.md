@@ -1167,3 +1167,27 @@ Un reçu SQL canonique et une ligne worker cohérents entre eux ne suffisent pas
 modifier leurs coordonnées ensemble reste refusé. Le contre-exemple conservé
 montrait une empreinte déclarée non rapprochée ; la recette
 `native-managed-publication-current` couvre les altérations et leur restauration.
+
+### Copie après publication native
+
+Le candidat publié peut exister uniquement sous `refs/swarm/native-candidates`.
+Avant checkout, la préparation du worker récupère explicitement son OID depuis
+le descripteur tenu du dépôt géré ; les branches ordinaires du clone ne suffisent
+pas. La politique Git persistée reste celle des autres opérations. Un échec de
+clone/fetch/checkout conserve sa cause et le staging ; aucun retour silencieux
+à la base initiale, publication de branche ou nouvelle acceptation ne suit.
+La recette `native-post-publication-worker` couvre un worker dépendant réel, le
+contenu du prédécesseur, le rejeu de préparation et le refus/restauration d’une
+copie absente. La publication cumulative et ses projections restent distinctes.
+
+```mermaid
+flowchart LR
+    A[Candidat publié canonique] --> B[Fetch exact depuis le bare tenu]
+    B --> C[Checkout dans une copie attribuée]
+    C --> D[Gardes et admission du worker dépendant]
+    D --> E[Exécution et règlement ; aucune acceptation implicite]
+```
+
+La préparation contrôle aussi les prérequis communs avant tout effet de copie.
+Un refus de dépendance ne doit pas laisser une copie finale bloquant la prochaine
+admission ; le writer conserve son recontrôle complet, sans permis mémorisé.

@@ -438,3 +438,23 @@ flowchart TD
     F -. À porter .-> G[Preuve cumulative et projection de cohorte]
     G -. À vérifier .-> H[Nouvelle copie worker et boucle superviseur]
 ```
+
+### S2 — worker dépendant après publication, dev121
+
+Le parcours réel a reproduit deux causes de blocage. Le clone ne transférait pas
+le candidat publié sous une référence native ; un départ demandé avant satisfaction
+des dépendances pouvait aussi laisser une copie finale malgré son refus. La
+préparation récupère désormais l’OID exact depuis le bare tenu et contrôle les
+prérequis communs avant toute copie. Le writer conserve son recontrôle complet.
+
+La recette maintenue vérifie quatre obligations : contenu/HEAD de la copie,
+prédécesseur publié, rejeu/refus/restauration et exécution réelle avec une seule
+réservation. Le refus avant publication préserve aussi l’absence de copie. Le
+parcours réutilise explicitement les originaux valides des étapes déjà terminées ;
+il ne prétend pas les avoir réexécutées. Aucun fournisseur payant ni SQL positif.
+Profil natif sans fixture, mêmes entrées effectives entre recette et livraison ;
+14 contrôles UI FR/EN et trois contrôles CLI du binaire installé passent.
+Rustdoc compile dans le graphe workspace ; ce profil documentaire avec features
+n’est pas la preuve du profil livré. Les refus et erreurs de méthode initiaux
+restent conservés. Publication cumulative/projections, boucle superviseur, S3/S4
+et RETEX final du projet toujours ouverts. [Rapport et RETEX](evidence/20261025-scaling-s2-oi9dgo_e/post-publication-worker-hfzh_8zd/RESULT.md).

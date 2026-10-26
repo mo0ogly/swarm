@@ -24,7 +24,7 @@ from rust_planning_decision import decision
 from rust_mission_report_relay import rows
 
 
-def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=None,source_entries=None):
+def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=None,source_entries=None,pending_dependent=False):
     """Plan under public budgets/fences on a prepared real Git commit, never launch.
 
     Source commit uses the checkout's configured identity. Missing-copy injection
@@ -33,6 +33,8 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
     Optional controls supplies explicit preauthorized fixture controls without
     changing the default handoff contract. Optional return_fixture exposes this same owned Root for a dependent public
     journey; its original default return remains the result alone.
+    pending_dependent adds an explicitly budgeted third task depending on task,
+    through the public planner before workers; it grants no launch or acceptance.
     Reports here prove actual local processes and context receipt, not model or
     agent authenticity, successful delivery, controls, review or acceptance.
     Optional source_entries supplies explicit committed fixture paths with bytes
@@ -66,8 +68,9 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
     f.work=fresh_work(f,'managed-planning-create')
     checks={'req-1':[dict(id='actual-handoff',command=['python3','-c',"from pathlib import Path; assert Path('handoff.md').read_text().strip()"],criteria=[1],inputs=['handoff.md'],justification='Check owned handoff content') ]}
     if controls is not None: checks={'req-1':controls}
-    work=f.ok(['planning','enable',f.work],request(event='managed-planning-enable',max_activations=6,max_tasks=2,repository=dict(path=str(project.relative_to(f.root)),committed_only=True),checks=checks))
-    proposal(f,work,'root',[dict(kind='delegate',id='child',title='Owned child scope',next='Plan the owned requirement',requirements=['req-1'],max_tasks=2,max_activations=3)])
+    task_budget=3 if pending_dependent else 2
+    work=f.ok(['planning','enable',f.work],request(event='managed-planning-enable',max_activations=6,max_tasks=task_budget,repository=dict(path=str(project.relative_to(f.root)),committed_only=True),checks=checks))
+    proposal(f,work,'root',[dict(kind='delegate',id='child',title='Owned child scope',next='Plan the owned requirement',requirements=['req-1'],max_tasks=task_budget,max_activations=3)])
     first=f.ok(['planning','step',f.work]);assert first['run']['decision_applied']
     work=first['run']['work'];assert not work.get('tasks')
     assert any(s['id']=='child' and s['parent']=='root' for s in work['planning']['scopes'])
@@ -87,13 +90,16 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
         assert f.snapshot()==state and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
     finally:bare.with_name('repository.retained').rename(bare)
     passed('managed-missing-copy-refuses-without-spend-or-provider')
-    proposal(f,work,'child',[dict(kind='task',id=task,title='Owned '+task,next='Produce handoff',requirements=['req-1'],deliverable='handoff.md',criteria=['Owned handoff']) for task in ['task','task-2']])
+    operations=[dict(kind='task',id=task,title='Owned '+task,next='Produce handoff',requirements=['req-1'],deliverable='handoff.md',criteria=['Owned handoff']) for task in ['task','task-2']]
+    if pending_dependent:
+        operations.append(dict(kind='task',id='dependent',title='Owned dependent worker',next='Inspect published predecessor',requirements=['req-1'],deliverable='handoff.md',criteria=['Owned handoff'],depends=['task']))
+    proposal(f,work,'child',operations)
     second=f.ok(['planning','step',f.work]);assert second['run']['decision_applied']
     work=second['run']['work'];tasks=work['tasks']
-    assert {t['id'] for t in tasks}=={'task','task-2'}
+    assert {t['id'] for t in tasks}==({'task','task-2','dependent'} if pending_dependent else {'task','task-2'})
     assert all(t['scope_id']=='child' and t['status']=='todo' and not t.get('attempts') for t in tasks)
     assert len(set(f.root.glob('model-received-*.json')))==2 and repository.inventory(source)==original
-    passed('managed-restored-copy-resumes-child-and-creates-two-todo-tasks')
+    passed('managed-restored-copy-resumes-child-and-creates-three-todo-tasks' if pending_dependent else 'managed-restored-copy-resumes-child-and-creates-two-todo-tasks')
     for result in [first,second]:
         actual=rows(f,'SELECT context_json FROM native_planning_claims WHERE claim_id=?',(result['run']['claim_id'],));assert len(actual)==1
         context=json.loads(actual[0][0]);meta=context['repository']
@@ -112,13 +118,13 @@ def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=Non
     before=f.snapshot();money=ledger(f);markers=set(f.root.glob('model-received-*.json'))
     status=f.ok(['mission','status',f.work])
     fixture.publish(out/'managed-status.json',status)
-    assert {t['id'] for t in status['tasks']}=={'task','task-2'}
-    assert all(t['state']=='waiting' and 'aucun conducteur actif' in t['reason'] for t in status['tasks'])
-    assert status['total']==2 and status['running']==0 and status['validated']==0
+    assert {t['id'] for t in status['tasks']}==({'task','task-2','dependent'} if pending_dependent else {'task','task-2'})
+    assert all(t['state']=='waiting' and ('Attend Owned task' == t['reason'] if t['id']=='dependent' else 'aucun conducteur actif' in t['reason']) for t in status['tasks'])
+    assert status['total']==task_budget and status['running']==0 and status['validated']==0
     assert not (Path(work['planning']['repository']['storage'])/'copies').exists()
     assert f.snapshot()==before and ledger(f)==money and set(f.root.glob('model-received-*.json'))==markers
     assert rows(f,'SELECT COUNT(*) FROM agents WHERE work_id=?',(f.work,))==[(0,)]
-    passed('managed-status-two-unstarted-tasks-without-copy-spend-or-worker')
+    passed('managed-status-three-unstarted-tasks-without-copy-spend-or-worker' if pending_dependent else 'managed-status-two-unstarted-tasks-without-copy-spend-or-worker')
     # A distinct owned Work exercises prepermission observation without inference.
     planned_work=f.work;f.work=fresh_work(f,'managed-preview-create')
     enabled=f.ok(['planning','enable',f.work],request(event='managed-preview-enable',repository=dict(path=str(project.relative_to(f.root)),committed_only=True)))

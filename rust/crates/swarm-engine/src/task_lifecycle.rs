@@ -119,6 +119,19 @@ pub(crate) fn check_scoped_accepted_freshness(w: &Work, id: &str, c: &TaskLifecy
     check_freshness(w, id, c, Some(settings))?;
     prerequisites(w, task, c, Some(settings))
 }
+/// Check the existing scoped dependency and requirement-prerequisite contract
+/// before creating a worker copy. Uses actual Work and saved settings, reads
+/// review/gate originals and preserves their causes; no task transition, permit,
+/// reservation or filesystem write follows. Admission must recheck these inputs
+/// in its writer: this observation never grants future execution authority.
+pub(crate) fn check_scoped_worker_prerequisites(w: &Work, task: &Task, c: &TaskLifecycleContext<'_>, settings: &crate::EngineSettingsDocument) -> Result<()> {
+    if w.planning.is_none() { return Err(TaskLifecycleError::HierarchyNotPorted); }
+    prerequisites(w, task, c, Some(settings))?;
+    for dependency in task.depends.as_deref().unwrap_or_default() {
+        check_freshness(w, dependency, c, Some(settings))?;
+    }
+    Ok(())
+}
 /// One traversal of actual gate and dependency evidence. A hierarchy additionally
 /// needs explicit current settings and fresh independent-review bytes. No cache
 /// or permit survives this call; original review/graph/artifact causes propagate.

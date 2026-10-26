@@ -35,11 +35,15 @@ def assert_resources(owned, agents, *, expected_task_status='blocked'):
     facts. Each distinct task must have its explicit expected phase status
     (blocked after completion, submitted after handoff) with one actual attempt,
     each Agent completed, its admission estimate retained and turn released once.
+    An explicitly planned dependent task may remain todo with no attempt; its
+    dependency must be exactly task and its admission is outside this fixture.
     Missing, duplicate or inconsistent rows refuse; database errors propagate.
     """
     work=owned.ok(['work','show',owned.work])['work']
     tasks={task['id']:task for task in work['tasks']}
-    assert set(tasks)=={'task','task-2'}
+    assert set(tasks) in ({'task','task-2'},{'task','task-2','dependent'})
+    if 'dependent' in tasks:
+        assert tasks['dependent']['status']=='todo' and not tasks['dependent'].get('attempts') and tasks['dependent']['depends']==['task']
     assert len({a['id'] for a in agents})==len(agents)
     assert len({a['task_id'] for a in agents})==len(agents)
     for original in agents:
@@ -89,7 +93,7 @@ def report_continuation(owned, agents, output, *, publication_refusal=False, git
         seen=watch_reports(owned,{a['id'] for a in agents},output/'normal')
         assert seen=={a['id'] for a in agents}
     work=assert_resources(owned,agents,expected_task_status='submitted')
-    assert all(t['status']=='submitted' for t in work['tasks'])
+    assert all(t['status']=='submitted' for t in work['tasks'] if t['id'] in {'task','task-2'})
     inbox=work['planning']['inbox']
     for agent in agents:
         handoffs=[x for x in inbox if x['kind']=='handoff' and x['task']==agent['task_id']]
@@ -106,7 +110,7 @@ def report_continuation(owned, agents, output, *, publication_refusal=False, git
         print('PASS managed-auto-retains-raw-source-without-repository-callback',flush=True)
 
 
-def run(binary, profile, out, *, project_subdir="", publication_refusal=False, git_callbacks=False, controls=None,source_entries=None):
+def run(binary, profile, out, *, project_subdir="", publication_refusal=False, git_callbacks=False, controls=None,source_entries=None,pending_dependent=False):
     """Run two authentic server admissions with public pause/reopen/resume barriers.
 
     A Linux subreaper caller owns every cleanup child. Saved child task budget2
@@ -118,11 +122,13 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
     or mission database. Reopening paused state must not admit anything until
     public resume. Failures
     retain original traceback plus independent cleanup errors, with no retry.
+    pending_dependent preplans a third dependent task, never launched here; the
+    explicit fixture task budget grows to three without changing product policy.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     qualified=json.loads(profile.read_bytes())
     assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes())==qualified['sha256']
-    prepared,f=planning.run(binary,profile,out/'planning',return_fixture=True,project_subdir=project_subdir,controls=controls,source_entries=source_entries)
+    prepared,f=planning.run(binary,profile,out/'planning',return_fixture=True,project_subdir=project_subdir,controls=controls,source_entries=source_entries,pending_dependent=pending_dependent)
     f.work=prepared['planned_work'];root=f.root;workspace=None
     current=f.ok(['work','show',f.work])['work']
     f.ok(['budget','apply',f.work],dict(schema_version=1,event_id='managed-auto-budget',expected_revision=current['revision'],budget=dict(limit_usd=10,reserve_per_launch_usd=1,estimate_source='Owned managed automatic fixture',reference_date='2026-10-24')))
@@ -199,7 +205,7 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
             assert waited==supervisor['pid'] and os.WIFEXITED(status) and os.WEXITSTATUS(status)==0
             agents.append(agent);work=assert_resources(f,agents)
             if turn==0:
-                remaining=[t for t in work['tasks'] if t['id']!=agent['task_id']]
+                remaining=[t for t in work['tasks'] if t['id'] in {'task','task-2'} and t['id']!=agent['task_id']]
                 assert len(remaining)==1 and remaining[0]['status']=='todo' and not remaining[0].get('attempts')
             fixture.publish(out/('turn-'+str(turn)+'-completed.json'),dict(agent=agent,work=work))
             connection.close();connection=None
@@ -224,7 +230,7 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
         assert agents[0]['native_mission']['generation']<agents[1]['native_mission']['generation']
         assert agents[0]['native_mission']['parent_profile_sha256']==agents[1]['native_mission']['parent_profile_sha256']
         assert len(f.ok(['mission','status-native',f.work])['agents'])==2
-        assert all(t['status']=='blocked' for t in assert_resources(f,agents)['tasks'])
+        assert all(t['status']=='blocked' for t in assert_resources(f,agents)['tasks'] if t['id'] in {'task','task-2'})
         server=native.Server(binary,root,out,'final-paused',environment=f.environment)
         assert request(server,'GET',path('show'))['paused'] is True
         assert len(f.ok(['mission','status-native',f.work])['agents'])==2

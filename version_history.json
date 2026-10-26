@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Workers après publication native : récupération explicite du candidat publié avant création de la copie dépendante, sans retour silencieux à la base initiale. Les prérequis sont contrôlés avant toute copie pour éviter un blocage après refus.",
+        "en": "Workers after native publication: explicitly fetch the published candidate before preparing its dependent copy, without silently falling back to the initial base. Prerequisites are checked before any copy to prevent a refusal from blocking the next admission."
+      },
+      {
         "fr": "Préparation Rust : créer explicitement un nouveau travail et ses missions verrouillées depuis un plan vérifié, avec revalidation des limites Admin et reçu atomique rejouable ; aucun démarrage ni équipe configurée implicitement.",
         "en": "Rust preparation: explicitly create a new work and its locked tasks from a validated plan, rechecking Admin limits with an atomic replayable receipt; no implicit start or team configuration."
       },

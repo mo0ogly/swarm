@@ -310,6 +310,13 @@ fn workspace(
 /// must still record the SQL row and execute all admission/preflight/settlement
 /// guards. automatic_conductor is borrowed from a real engine fence, not JSON;
 /// public manual requests cannot turn a conducteur label into that capability.
+/// Checks the shared scoped prerequisites before any copy effect; the admission
+/// writer still rechecks the full lifecycle contract. A refused dependency cannot
+/// strand an attributed first-attempt copy before acceptance.
+/// Fetches the exact published candidate OID from the held authoritative bare
+/// repository because normal clone refs exclude native candidate refs. Clone,
+/// fetch and checkout failures preserve their typed causes and failed staging;
+/// no branch/ref publication or implicit fallback to the initial base occurs.
 /// No provider, reservation, retry, acceptance or cleanup deletion occurs.
 pub(crate) fn prepare_worker(
     root: &Path,
@@ -346,6 +353,11 @@ pub(crate) fn prepare_worker(
     {
         return Err(E::Refused("managed-worker-identifier-invalid"));
     }
+    let limits = settings.values.mutation_limits().map_err(|e| E::caused("managed-worker-settings", e))?;
+    let quality = settings.quality_policy_snapshot().map_err(|e| E::caused("managed-worker-settings", e))?;
+    let context = crate::TaskLifecycleContext { root, quality_policy: Some(&quality), task_limits: &limits.task, validation_limits: &limits.policy };
+    crate::task_lifecycle::check_scoped_worker_prerequisites(work, task, &context, settings)
+        .map_err(|e| E::caused("managed-worker-prerequisites", e))?;
     with_storage(root, work, true, |dir| {
         repository(dir, work, settings)?;
         let name = format!("native-worker-{}.json", r.event_id);
@@ -434,8 +446,16 @@ pub(crate) fn prepare_worker(
                                             .ok_or(E::Refused("managed-worker-path-encoding"))?,
                                     ],
                                     settings,
-                                )
-                                .map(|_| ())
+                                )?;
+                                // Native candidates live outside refs/heads: a
+                                // regular clone need not contain the published
+                                // OID. Fetch exactly that object from the held
+                                // authoritative bare descriptor before checkout.
+                                git(&clone, &["fetch", "--no-tags", "--no-write-fetch-head", "--",
+                                    source.to_str().ok_or(E::Refused("managed-worker-path-encoding"))?,
+                                    &repo.candidate_commit], settings)
+                                    .map_err(|e| E::caused("managed-worker-candidate-fetch", e))
+                                    .map(|_| ())
                             },
                         )?;
                         // Only these freshly created owned staging directories are privatized.

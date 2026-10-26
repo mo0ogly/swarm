@@ -1112,3 +1112,27 @@ original. A canonical SQL receipt and matching worker row alone are insufficient
 changing both coordinates still refuses. The retained counterexample exposed an
 unmatched declared binding; `native-managed-publication-current` covers these
 changes and exact restoration.
+
+### Copying after native publication
+
+The published candidate may exist only under `refs/swarm/native-candidates`.
+Before checkout, worker preparation explicitly fetches its OID from the held
+managed bare repository descriptor; the clone's ordinary branches are insufficient.
+The saved Git policy still governs these operations. Clone/fetch/checkout failures
+preserve their cause and staging; there is no silent initial-base fallback, branch
+publication or new acceptance. The `native-post-publication-worker` recipe covers
+a real dependent worker, predecessor content, preparation replay and refusal/
+restoration of a missing copy. Cumulative publication and its projections remain
+separate requirements.
+
+```mermaid
+flowchart LR
+    A[Canonical published candidate] --> B[Exact fetch from held bare repository]
+    B --> C[Checkout in attributed copy]
+    C --> D[Dependent worker guards and admission]
+    D --> E[Execution and settlement ; no implicit acceptance]
+```
+
+Preparation also checks shared prerequisites before any copy effect. A dependency
+refusal must not strand a final copy that blocks the next admission; the writer
+retains its complete recheck, without a cached permit.
