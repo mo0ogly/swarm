@@ -380,7 +380,8 @@ fn run_prepared(store: &mut RootStore, work: &str, r: &Request, canonical: &[u8]
 }
 /// Reconcile original immutable observations without a new process. The publisher
 /// requires actual owner departure and exact source/rows/receipt before applying;
-/// missing/unknown observations remain exclusive, not successful empty recovery.
+/// A missing combined body may be assembled from every exact known slot and
+/// current source; missing/unknown slot observations remain exclusive.
 pub(super) fn reconcile(
     store: &mut RootStore,
     work: &str,
@@ -400,6 +401,6 @@ pub(super) fn reconcile(
     if matches!(j.phase, JobPhase::Recorded | JobPhase::Refused) {
         return publication::replay(store, &j);
     }
-    let (record, hash): (Receipt, String) = journal::read(store, &journal::name("job", &j.id))?;
+    let (record, hash) = super::reconstruction::read(store, &j)?;
     publication::apply(store, &record, &hash, true)
 }

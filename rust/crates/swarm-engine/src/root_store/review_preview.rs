@@ -55,42 +55,63 @@ impl RootStore {
     /// provider/model availability, full context/images and native reviewer job
     /// permission are not established. Typed IO/SQL/codec and cleanup causes remain.
     pub fn preview_task_review(&self, work: &str, raw: &[u8]) -> Result<TaskReviewPreview, E> {
-        self.with_prepared_review(work, raw, |_, prepared| Ok(prepared.preview))
+        self.with_prepared_review(work, raw, |_, prepared, _| Ok(prepared.preview))
     }
 
-    /// Materialize complete original text and current task-only framing without
+    /// Materialize complete original text and current task framing, or the full
+    /// retained managed candidate/cohort inspection projection, without
     /// invoking a provider, reserving a call or accepting a task. Saved Work and
     /// global context limits are required and enforced without truncation.
     /// Missing/stale originals, unsupported image/client-window inputs or limits
     /// refuse without mutation; typed read/codec and cleanup causes are retained.
     /// Returned text is private input data, never authority or an execution lease.
     pub fn materialize_task_review(&self, work: &str, raw: &[u8]) -> Result<TaskReviewInputs, E> {
-        self.with_prepared_review(work, raw, |tx, prepared| {
+        self.with_prepared_review(work, raw, |tx, prepared, candidate| {
             let submitted = task_validation::submission(tx, &prepared.work, &prepared.preview.task_id)
                 .map_err(|e| E::Launch(Box::new(e)))?;
-            inputs::assemble(&self.root, prepared, &submitted)
+            match candidate {
+                Some(candidate) => {
+                    let plan=candidate.candidate().control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
+                    let reports=plan.policies.iter().map(|policy|task_validation::submission(tx,&prepared.work,&policy.task_id)
+                        .map_err(|e|E::Launch(Box::new(e)))).collect::<Result<Vec<_>,E>>()?;
+                    inputs::assemble_managed(&self.root,prepared,candidate,&reports)
+                }
+                None => inputs::assemble(&self.root, prepared, &submitted),
+            }
         })
     }
 
-    /// Keep admission and caller assembly inside one settings/SQL read snapshot.
-    /// Rollback/release failures retain both causes; no writer or process permit.
+    /// Keep source admission and caller assembly inside one settings/SQL read
+    /// snapshot. Managed pin/final refresh run outside those locks; an external
+    /// owner retains descriptors through every read. Rollback/release failures
+    /// retain both causes; no writer, provider reservation or process permit.
     fn with_prepared_review<T>(
         &self,
         work: &str,
         raw: &[u8],
-        consume: impl FnOnce(&rusqlite::Transaction<'_>, PreparedReview) -> Result<T, E>,
+        consume: impl FnOnce(&rusqlite::Transaction<'_>, PreparedReview, Option<&task_validation::ReviewCandidate>) -> Result<T, E>,
     ) -> Result<T, E> {
         let launch = |e| E::Launch(Box::new(e));
         let request = task_validation::decode(raw).map_err(launch)?;
-        let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;
+        // Custody stays outside every snapshot/result wrapper, including failures
+        // during reservation/rollback/assembly and the final outside-lock refresh.
+        let candidate=task_validation::acquire_review_candidate(self,work,&request)?;
         let result = (|| {
+            let reservation = self.directory.reserve(false, false).map_err(E::Storage)?;
+            let result=(||{
             let settings = self.read_settings()?;
             let tx = self.db.unchecked_transaction().map_err(E::Sql)?;
-            let result = self.prepare_review_snapshot(&tx, settings, work, &request)
-                .and_then(|prepared| consume(&tx, prepared));
+            let result = self.prepare_review_snapshot_using(&tx, settings, work, &request,None,candidate.as_ref())
+                .and_then(|prepared| consume(&tx, prepared,candidate.as_ref()));
             finished(result, tx.rollback().map_err(E::Sql))
+            })();
+            finished(result,reservation.close().map_err(E::Storage))
         })();
-        finished(result, reservation.close().map_err(E::Storage))
+        let result=result.and_then(|value|{
+            if let Some(candidate)=&candidate{candidate.refresh(self)?;}
+            Ok(value)
+        });
+        finished(result,candidate.map_or(Ok(()),|candidate|candidate.close()))
     }
 
     /// Reuse the exact native reviewer admission inside a caller-owned snapshot.
@@ -98,6 +119,7 @@ impl RootStore {
     /// this only reads current originals/metadata and grants no process or mutation.
     /// Parsed request still undergoes source/revision/authority checks; failures
     /// retain the same typed provenance, policy and read causes as public previews.
+    #[cfg(test)]
     pub(super) fn prepare_review_snapshot(
         &self,
         tx: &rusqlite::Transaction<'_>,
@@ -123,21 +145,35 @@ impl RootStore {
         request: &task_validation::Request,
         review: Option<&crate::IndependentReview>,
     ) -> Result<PreparedReview, E> {
+        self.prepare_review_snapshot_using(tx,settings,work,request,review,None)
+    }
+    /// Build observations for a readonly managed inspector with actual external
+    /// candidate custody. Native invocation passes None and retains its guard;
+    /// this parameter is never a JSON permission or a relaxed provider admission.
+    /// Caller owns snapshot/settings, final source refresh and explicit custody.
+    fn prepare_review_snapshot_using(
+        &self, tx:&rusqlite::Transaction<'_>,settings:crate::EngineSettingsDocument,
+        work:&str,request:&task_validation::Request,review:Option<&crate::IndependentReview>,
+        candidate:Option<&task_validation::ReviewCandidate>,
+    )->Result<PreparedReview,E>{
         let launch = |e| E::Launch(Box::new(e));
         let current = crate::read_recorded_work(tx, work).map_err(E::Work)?;
         // Full managed cohort/provider context and protected candidate acceptance
         // remain unported. New control admission must not unlock target-only review.
-        if current.planning.as_deref().is_some_and(|p| p.repository.is_some()) {
+        if current.planning.as_deref().is_some_and(|p| p.repository.is_some()) && candidate.is_none() {
             return Err(E::Refused("review-managed-candidate-unported"));
         }
         let recovery = self.review_recovery(tx, &current, &request.task_id, review, &settings)?;
-        let source = match (review, recovery.as_ref()) {
+        let source = if let Some(candidate)=candidate {
+            if review.is_some() || recovery.is_some(){return Err(E::Refused("review-managed-recovery-unported"));}
+            candidate.preview(self,tx,&settings,work,request)
+        }else{match (review, recovery.as_ref()) {
             (None, Some(recovery)) => task_validation::prepare_reviewer_retry_preview(
                 tx, &self.root, &settings, work, request, recovery),
             (Some(review), _) => task_validation::prepare_claimed_review_preview(
                 tx, &self.root, &settings, work, request, review),
             (None, None) => task_validation::prepare_preview(tx, &self.root, &settings, work, request),
-        }.map_err(launch)?;
+        }}.map_err(launch)?;
         task_validation::require_validation_idle(tx, work, &source.task_id)
             .map_err(launch)?;
         let planning = current

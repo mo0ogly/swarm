@@ -1258,3 +1258,46 @@ its1156 historical no-conductor assertions and shared helpers; do not treat thos
 assertions as the current web execution contract. Session JSONL is not exported
 by this server adapter. Paid providers, installation and independent acceptance
 remain outside this isolated inert fixture.
+
+### Complete slot recovery without a combined original
+
+`native-partial-validation.json` runs26 targeted native data tests and actual
+ordinary/managed public fixtures. A valid batch precedes an owned empty-directory
+fault on the future combined receipt. Every slot is waited and durable before
+owner departure. Missing/unknown slots and changed managed source refuse; exact
+restoration allows source-bound reconstruction, reconciliation, terminal replay
+and separate retirement without commands or acceptance. It checks8 ordinary and9
+managed named assertions, exact reconstruction provenance and unchanged command
+witnesses. Uses `SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE`
+for an explicit immutable normal no-fixture binary. No global watchdog, paid
+provider or direct SQL write. `--resume-from` on the helper can reuse an original
+failed pre-fix fixture; the final recipe uses fresh Roots. Incomplete/unknown
+process observations and historical absent origins remain refused, not solved.
+
+La recette couvre la reconstruction d'un global absent à partir de tous les
+créneaux réels, et ses refus/restaurations. L'heure conservée est celle de
+l'assemblage ; aucune sortie de processus ni preuve d'acceptation n'est inventée.
+
+### Managed candidate inspection before native final review
+
+`native-managed-review-inputs.json` runs actual ordinary input/privacy and reviewer
+compatibility journeys, and real
+managed workers/three controls followed by full readonly source inspection.
+Twelve text-source assertions cover complete retained tracked inventory/cohort,
+literal symlink targets, no Root/untracked scan, public persisted cap refusal and
+restoration, changed source/missing report, explicit zero limits and actual native
+review refusal. Four nontext assertions require a valid control/preview before
+UTF8 refusal. No business reviewer is invoked on either managed Root. The separate
+ordinary reviewer uses the existing inert provider, never a paid model.
+Use immutable normal `SWARM_STATUS_CONTRACT_BINARY` / `SWARM_STATUS_CONTRACT_PROFILE`,
+fresh evidence and recipe.py verify. No watchdog, SQL write or acceptance.
+The context explicitly remains inspection-only; final cohort verdict/accepted
+baseline/acceptance/publication are not established.
+
+La recette vérifie une projection complète du candidat et de la cohorte en
+lecture seule, ses plafonds persistés et refus/restaurations. Les liens ne sont
+pas suivis ; le binaire refuse avant appel. Le lancement géré reste protégé.
+
+The targeted Rust input-coherence unit is selected separately with `--lib` and its
+existing successful proof is reused while relevant executable inputs remain
+unchanged; this public-journey recipe does not repeat that compilation.

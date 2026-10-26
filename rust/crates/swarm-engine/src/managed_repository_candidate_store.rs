@@ -1,5 +1,5 @@
 //! Pre-control candidate custody; actual Root permission remains a caller duty.
-use super::super::source::{tracked_sources, TrackedSource};
+use super::super::source::{tracked_sources, review_link, TrackedSource};
 use super::super::controls::ControlPlan;
 use super::super::{candidate::merge_candidate, git, hash, inside, text, LocalDirectory, E};
 use super::{repository, result, with_storage};
@@ -47,6 +47,17 @@ pub(crate) struct ManagedCandidate {
     tracked: BTreeMap<String, TrackedSource>,
 }
 impl ManagedCandidate {
+    /// Enumerate every retained repository-tree entry without IO or filtering.
+    /// Names are relative to the held repository copy, including project prefixes;
+    /// mode and digest describe raw regular bytes or a symlink's target bytes.
+    /// This grants no path access, permission or freshness; actual readers must
+    /// keep the witness and reject changed, unsupported or unreadable content.
+    pub(crate) fn review_entries(&self) -> impl Iterator<Item = (&str, &str, &str)> {
+        self.tracked.iter().map(|(name, source)| {
+            let (mode, sha256) = source.review_identity();
+            (name.as_str(), mode, sha256)
+        })
+    }
     /// Verify the recorded complete checkpoint preimage without filesystem IO.
     /// Requires private schema2, a retained control plan and exact domain digest.
     /// Refuses absent/changed bindings; codec causes remain typed. This proves no

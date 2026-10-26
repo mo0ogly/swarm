@@ -15,14 +15,15 @@
 //! confinement, does not make a stale or replaced path executable or safe to
 //! execute, and grants no Root permission, execution right, policy, retry or
 //! acceptance. Waiting, execution, fresh-source revalidation and native
-//! permissions remain separate parent/caller duties. Nothing here reopens a
-//! path, clears CLOEXEC, implements `Drop`, retries or grants: the checked
+//! permissions remain separate parent/caller duties. Readonly link inspection
+//! opens checked owned parents but never follows a target. Nothing here clears
+//! CLOEXEC, implements `Drop`, retries or grants: the checked
 //! release is [`CandidateWitness::close`], and dropping a witness without it
 //! closes the descriptors through the standard unchecked file close. Every
 //! operation uses the Linux-only `LocalDirectory` APIs, so this module
 //! compiles only under the parent tree's `target_os = "linux"` gate.
 
-use super::{E, LocalDirectory, ManagedCandidate};
+use super::{E, LocalDirectory, ManagedCandidate, review_link};
 use crate::agent_launch_error::finish;
 use std::path::PathBuf;
 
@@ -151,6 +152,20 @@ impl CandidateWitness {
     /// string. No execution permission, fresh-path check or confinement follows.
     pub(crate) fn workspace_path(&self) -> PathBuf {
         self.workspace.process_path()
+    }
+
+    /// Holder-anchored path of the full retained repository copy for readonly
+    /// candidate inspection. Keep this witness through every read; this path
+    /// must never be persisted or used after close. It grants no execution or
+    /// access to the origin repository and is not same-UID confinement.
+    pub(crate) fn repository_path(&self) -> PathBuf {
+        self.copy.process_path()
+    }
+    /// Read only a link target's text through the held repository descriptor.
+    /// No target is followed; checked parent release/IO errors remain typed.
+    /// Caller must verify the retained digest and count the material's bytes.
+    pub(crate) fn review_link(&self, name: &str) -> Result<String, E> {
+        review_link(&self.copy, name)
     }
 
     /// Re-compare the held descriptors' actual identities with the record.

@@ -7,6 +7,14 @@
     },
     "items": [
       {
+        "fr": "Inspection du candidat géré : aperçus de revue en lecture seule, sources Git complètes, cohorte de contrôles et liens littéraux sous limites persistées. Le lancement natif du reviewer final reste protégé.",
+        "en": "Managed-candidate inspection: readonly review previews, complete Git sources, control cohort and literal links under saved limits. Native final reviewer invocation remains guarded."
+      },
+      {
+        "fr": "Reprise des validations : reconstruction du reçu global absent à partir de tous les créneaux originaux vérifiés, sans commande relancée. Sources modifiées, observations manquantes et issues inconnues restent refusées.",
+        "en": "Validation recovery: reconstruct a missing combined receipt from every verified original slot without rerunning commands. Changed sources, missing observations and unknown outcomes remain refused."
+      },
+      {
         "fr": "Préparations : sélection explicite de méthode par CLI/API Rust, empreinte courante, documents conservés et validation du plan retirée ; refus et rejeu atomiques.",
         "en": "Preparations: explicit Rust CLI/API method selection, current fingerprint, preserved documents and withdrawn plan approval; atomic refusals and replay."
       },

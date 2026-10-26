@@ -1,7 +1,7 @@
 //! Explicit abandonment of original observations, never execution or acceptance.
 use super::{
     journal, publication,
-    runtime::{Receipt, TaskValidationOutcome},
+    runtime::TaskValidationOutcome,
     store::{self, JobPhase, StepPhase},
 };
 use crate::{
@@ -22,7 +22,9 @@ struct Retirement {
     at: String,
 }
 /// Retire only the exact original event. Readback/replay never invokes a process;
-/// current source need not still be valid because no result is adopted. A live
+/// an existing complete original needs no current source because no result is
+/// adopted. Rebuilding an absent combined body requires matching current source
+/// and every known slot original. A live
 /// owner or unknown original process outcome remains exclusive. Original receipts
 /// precede atomic terminal rows and Work audit. Every SQL/file/close error keeps
 /// its typed cause; known commit metadata survives saved-settings release failure.
@@ -44,7 +46,7 @@ pub(super) fn run(
     {
         return Err(E::Refused("task-validation-replay-conflict"));
     }
-    let (receipt, hash): (Receipt, String) = journal::read(store, &journal::name("job", &job.id))?;
+    let (receipt, hash) = super::reconstruction::read(store, &job)?;
     let current = publication::original(store, &receipt, &hash, true)?;
     let name = journal::name("retirement", &job.id);
     if current.phase == JobPhase::Refused {

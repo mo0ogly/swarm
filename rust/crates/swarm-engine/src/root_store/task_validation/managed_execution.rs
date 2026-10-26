@@ -38,6 +38,17 @@ impl Session {
     pub fn workspace(&self) -> PathBuf {
         self.witness.workspace_path()
     }
+    /// Borrow the retained complete candidate repository for readonly review.
+    /// Caller must keep this session alive and compare every input with its
+    /// checkpoint digest; no pathname alone proves current custody or authority.
+    pub fn repository(&self) -> PathBuf {
+        self.witness.repository_path()
+    }
+    /// Read a retained link literal without following it; the review materializer
+    /// must compare its exact digest and apply saved context caps before output.
+    pub fn review_link(&self, name: &str) -> Result<String, E> {
+        self.witness.review_link(name).map_err(launch)
+    }
     /// Release all held candidate descriptors, preserving typed close causes.
     /// No permission, source rollback or process-reap assertion follows.
     pub fn close(self) -> Result<(), E> {

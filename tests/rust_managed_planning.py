@@ -24,14 +24,20 @@ from rust_planning_decision import decision
 from rust_mission_report_relay import rows
 
 
-def run(binary,profile,out):
+def run(binary,profile,out,*,return_fixture=False,project_subdir="",controls=None,source_entries=None):
     """Plan under public budgets/fences on a prepared real Git commit, never launch.
 
     Source commit uses the checkout's configured identity. Missing-copy injection
     only renames an owned directory and restores the original before retry. Work,
     financial ledger and provider markers must remain unchanged on refusal.
+    Optional controls supplies explicit preauthorized fixture controls without
+    changing the default handoff contract. Optional return_fixture exposes this same owned Root for a dependent public
+    journey; its original default return remains the result alone.
     Reports here prove actual local processes and context receipt, not model or
     agent authenticity, successful delivery, controls, review or acceptance.
+    Optional source_entries supplies explicit committed fixture paths with bytes
+    or ('symlink', literal_target), before any worker. It never patches a candidate
+    or SQL and refuses escaping source names. None preserves the original tree.
     """
     out.mkdir(parents=True,mode=0o700,exist_ok=False)
     qualified=json.loads(profile.read_bytes());assert qualified['no_fixture_feature'] and fixture.digest(binary.read_bytes())==qualified['sha256']
@@ -40,14 +46,27 @@ def run(binary,profile,out):
     source=f.root/'source';source.mkdir(mode=0o700);repository.git(source,'init','--quiet')
     checkout=Path(__file__).resolve().parents[1]
     name=repository.git(checkout,'config','user.name').decode().strip();email=repository.git(checkout,'config','user.email').decode().strip();assert name and email
-    fixture.publish(source/'tracked.txt',b'Committed planning input\n');repository.git(source,'add','tracked.txt')
+    project=source/project_subdir
+    if project_subdir:project.mkdir(mode=0o700)
+    fixture.publish(project/'tracked.txt',b'Committed planning input\n')
+    names=['tracked.txt']
+    for name,value in (source_entries or {}).items():
+        relative=Path(name)
+        assert not relative.is_absolute() and relative.parts and all(p not in ['..','.git'] for p in relative.parts)
+        path=project/relative;path.parent.mkdir(parents=True,exist_ok=True)
+        if isinstance(value,tuple):
+            assert len(value)==2 and value[0]=='symlink';path.symlink_to(value[1])
+        else:fixture.publish(path,value)
+        names.append(name)
+    repository.git(source,'add','--',*[str((project/name).relative_to(source)) for name in names])
     repository.git(source,'-c','user.name='+name,'-c','user.email='+email,'-c','core.hooksPath=/dev/null','-c','commit.gpgsign=false','commit','--quiet','-m','Owned managed planning fixture')
-    base=repository.git(source,'rev-parse','HEAD').decode().strip();fixture.publish(source/'tracked.txt',b'PRIVATE dirty source excluded\n')
+    base=repository.git(source,'rev-parse','HEAD').decode().strip();fixture.publish(project/'tracked.txt',b'PRIVATE dirty source excluded\n')
     original=repository.inventory(source)
     fixture.publish(f.root/'codex',feedback.PROGRAM.encode());(f.root/'codex').chmod(0o700)
     f.work=fresh_work(f,'managed-planning-create')
     checks={'req-1':[dict(id='actual-handoff',command=['python3','-c',"from pathlib import Path; assert Path('handoff.md').read_text().strip()"],criteria=[1],inputs=['handoff.md'],justification='Check owned handoff content') ]}
-    work=f.ok(['planning','enable',f.work],request(event='managed-planning-enable',max_activations=6,max_tasks=2,repository=dict(path='source',committed_only=True),checks=checks))
+    if controls is not None: checks={'req-1':controls}
+    work=f.ok(['planning','enable',f.work],request(event='managed-planning-enable',max_activations=6,max_tasks=2,repository=dict(path=str(project.relative_to(f.root)),committed_only=True),checks=checks))
     proposal(f,work,'root',[dict(kind='delegate',id='child',title='Owned child scope',next='Plan the owned requirement',requirements=['req-1'],max_tasks=2,max_activations=3)])
     first=f.ok(['planning','step',f.work]);assert first['run']['decision_applied']
     work=first['run']['work'];assert not work.get('tasks')
@@ -78,7 +97,7 @@ def run(binary,profile,out):
     for result in [first,second]:
         actual=rows(f,'SELECT context_json FROM native_planning_claims WHERE claim_id=?',(result['run']['claim_id'],));assert len(actual)==1
         context=json.loads(actual[0][0]);meta=context['repository']
-        assert meta==dict(candidate_commit=base,project_subdir='',operations=['delegate','task'])
+        assert meta==dict(candidate_commit=base,project_subdir=project_subdir,operations=['delegate','task','revise-instructions'])
         assert 'PRIVATE' not in json.dumps(context)
     passed('managed-candidate-capabilities-delivered-without-source-paths')
     before=f.snapshot();money=ledger(f)
@@ -102,7 +121,7 @@ def run(binary,profile,out):
     passed('managed-status-two-unstarted-tasks-without-copy-spend-or-worker')
     # A distinct owned Work exercises prepermission observation without inference.
     planned_work=f.work;f.work=fresh_work(f,'managed-preview-create')
-    enabled=f.ok(['planning','enable',f.work],request(event='managed-preview-enable',repository=dict(path='source',committed_only=True)))
+    enabled=f.ok(['planning','enable',f.work],request(event='managed-preview-enable',repository=dict(path=str(project.relative_to(f.root)),committed_only=True)))
     claimed=f.ok(['planning','claim',f.work],claim_request(enabled,'managed-preview-claim'))
     value=preview_request(claimed,'managed-preview-claim')
     before=f.snapshot();money=ledger(f);markers=set(f.root.glob('model-received-*.json'))
@@ -127,7 +146,7 @@ def run(binary,profile,out):
     passed('managed-unported-decision-refuses-and-acknowledgement-recovers')
     result=dict(status='PASS',assertions=checks_passed,binary_sha256=qualified['sha256'],actual_inert_planners=2,manual_claims_without_inference=1,planned_work=planned_work,worker_started=False,accepted=False,installed=False,global_watchdog=None)
     fixture.publish(out/'result.json',result);print('MANAGED_PLANNING_PASS',flush=True)
-    return result
+    return (result,f) if return_fixture else result
 
 
 def main():

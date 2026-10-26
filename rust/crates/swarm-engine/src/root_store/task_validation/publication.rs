@@ -133,7 +133,7 @@ fn bound_slots(r: &Receipt) -> Result<Option<super::managed_receipt::Binding<'_>
 /// Legacy/ordinary records cannot claim a candidate digest without a preimage;
 /// schema3 binds the complete control plan and candidate digest to the Job.
 /// Reads SQL only; no command, current source freshness or grant is established.
-fn verify_origin(db: &rusqlite::Connection, job: &Job, receipt: &Receipt) -> Result<(), A> {
+pub(super) fn verify_origin(db: &rusqlite::Connection, job: &Job, receipt: &Receipt) -> Result<(), A> {
     match bound_slots(receipt)? {
         Some(binding) => super::source_origin::verify_bound_job_receipt(
             db, job, receipt.source_origin.as_ref(), Some(binding.plan), Some(binding.candidate_sha256.as_str())),

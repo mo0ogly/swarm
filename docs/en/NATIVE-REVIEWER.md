@@ -36,6 +36,90 @@ Both task previews accept `schema_version`, `event_id`, `expected_revision`,
 preview refuses an ongoing review; internal readback permits only the exact review
 attached to its normalized job.
 
+## Native control source mapping
+
+Before public conversion, original readback and replay, the engine verifies
+the complete mapping from stored policy through ordered job slots to observed
+results: receipt versions, count, original job, ordinal, unique identifiers,
+control name and exact arguments. A foreign command result refuses with
+`task-validation-receipt-slot-source-changed`; it cannot become a successful or
+plausible blocked public artifact. Consistent failed and unattempted slots remain
+recordable blocked observations. Missing or unsuccessful results without their
+failed flag refuse, preventing blocked data with no attributed control incident. Success also requires attempted process proof,
+recorded permission and an observed permitted slot, alongside existing wait and
+result checks.
+
+This data check never replaces actual hashes, SQL rows, permissions, identity
+or completion evidence and grants no review or execution authority. The S2
+cumulative preflight is separate: its future controller must map transport keys
+to original tasks/controls and bind the physical candidate and normalized
+policies. That wiring remains guarded and is not implemented here. Preserve
+originals after a mismatch and reconcile through the supported path after
+repairing its cause; never rewrite a receipt to obtain acceptance.
+
+## Source origin of new control jobs
+
+Every new control job records a scalar `native_validation_source_origins` row
+in the same transaction as its job and Work: observed source, normalized-controls
+digest and optional candidate binding. The job digest combines this origin domain
+then existing mission authority. Permissions, publication and review readers
+reuse that calculation. Removing or changing the row cannot reproduce the new
+job digest. This grants neither execution rights nor model authentication.
+
+Private job receipt **version 2** retains `source_origin` and `effective_policy`.
+Readers require both; pure conversion already checks effective policy against
+its digest. The Root reader also verifies the SQL row then the job domain with
+recorded mission authority. Historical private receipts
+**version 1** omit both fields and retain their encoding and legacy base without
+read-time backfill. An incomplete v2 receipt cannot become historical. Public
+JSON keeps its existing schema. Schema/type/hash/missing-origin/content errors
+remain typed refusals; failed writes require caller rollback and never prove
+that no rows were staged. Replay and reconciliation do not start replacement
+controls for incomplete originals.
+
+Candidate binding is **absent on the delivered ordinary path**. The managed S2
+controller stays guarded: physical witnesses, cohort plan, complete review and
+candidate publication still need wiring. Source observations and hashes do not
+confine hostile processes running under the same user.
+
+### Private cumulative receipts: v3 producer and reader
+
+The reader supports a private v3 variant retaining the full candidate, hence
+original/normalized policies per task and every slot. `controls_sha256` binds the
+whole plan; `candidate_binding_sha256` binds the entire checkpoint preimage.
+Readers check those contents, the original SQL row and Job domain, then original
+slots/results. Coherently rewriting JSON with new hashes cannot replace the
+recorded origin.
+
+| Private receipt | Origin | Separate effective policy | Complete candidate |
+| --- | --- | --- | --- |
+| Historical v1 | absent | absent | absent |
+| Ordinary v2 | present, no candidate binding | present | absent |
+| Cumulative v3 | present, with candidate binding | absent, plan in candidate | present |
+
+Mixed combinations and unknown versions refuse, without downgrade or backfill.
+v1/v2 retain their exact bytes; the ordinary producer remains v2. The ordinary
+source reader used by permissions/reviews explicitly requires no candidate
+binding; the managed producer uses a separate source path checking the complete
+preimage, current plan and actual connected Root instance.
+
+**Data fixture example**, not managed execution: accepted task A and current B
+each have a `check` control. Transport keys differ, original names remain and no
+aggregate policy ceiling is added. If A fails and B passes, public controls stay
+B-only but overall state is `blocked`, with A's task/control/transport attributed
+in failures. The private receipt retains both observations. Conversion also
+requires nonempty command arguments without NUL; two matching invalid values
+cannot become proof of execution.
+
+Readers compare normalization shape against only the normalizer's transformations
+(trim, authority removal, positive resolution of an originally zero timeout),
+without loading current limits or inventing historical limits. Actual cohort
+membership and normalization under saved settings still belong at claim time.
+Hashes and DTOs prove no permission, native owner, open descriptors or current
+Git integrity. **Root still refuses managed launch: the cumulative job producer,
+permissions, complete final review and publication remain unwired.** Physical
+custody and planning exist as private components; this reader does not enable them.
+
 ## Originals, policies and capture
 
 The prompt contains the selected task, canonical submitted report, a different
@@ -541,7 +625,7 @@ Native recovery observes either the current error before a new claim, or the imm
 
 173 verified: actual second reviewer, four pre-admission faults refused/restored, new result initially submitted then separate fixture operator acceptance. Already acknowledged incidents on a fresh activation, transport/source failures and changed source remain separate contracts. This binding establishes no semantic actor identity, hostile same-UID protection or OS confinement.
 
-An ordinary decision/claim does not revoke control authority: source_authority tracks enable/pause/resume events, not every display generation. Both SHA values may therefore match for unchanged authority/candidate. The173 public pause/resume control proves the distinct case: new admission digest, original control digest/receipt preserved, actual second verdict followed by separate fixture operator acceptance. This establishes no human authentication. Fixed framing describes recovery as attributed response-method/format guidance, outside criterion evidence and without extra tools or permissions.
+An ordinary decision/claim does not revoke control authority: source_authority tracks enable/pause/resume events, not every display generation. For new origin-backed jobs, the control SHA also binds its job and effective policy and differs from the admission base. Equality remains possible for historical originals without origin. The173 public pause/resume control proves the distinct case: new admission digest, original control digest/receipt preserved, actual second verdict followed by separate fixture operator acceptance. This establishes no human authentication. Fixed framing describes recovery as attributed response-method/format guidance, outside criterion evidence and without extra tools or permissions.
 
 ```mermaid
 sequenceDiagram
@@ -592,3 +676,174 @@ flowchart TD
 176 verified on fixtures: review_recovery adds failure_code and failure_owner built from the same verified private-original classification. These observations explain the cause to the new reviewer; they are neither request inputs, arbitrary error text, authenticated identity nor permission. Eligible classes and admission checks from175 stay unchanged. Normal04 c8810c/274 sources without fixture features and34 tests/Clippy/Rustdoc02. Actual prompts05/07/pending09 assert both exact code/owner pairs; nine faults06/08, including wrong kind and wrong owner with recomputed hash, refuse before claim, restore then succeed. Same history/canonical/controls/report/spending, public cap preserved and no-exec replay. Both fields count toward the existing persisted prompt limit. No new permission profile, identity or installation.
 
 177 verified on fixtures: root judge/continue and renew are separate from independent candidate review. One verdict per cycle, renewal only after continue under saved cycle quota (0 unlimited), no activation/decision/spending reset. Root context carries complete JudgeState/history under the existing context cap and its freshness binds this contract; children receive no root history. New reasons use planning_decision_max_reason_bytes; durable consistency must not reapply an old4000byte policy. Judge end still refuses without native managed-candidate contract. Contract, diagram, policy and evidence: [native global judge](NATIVE-GLOBAL-JUDGE.md). Normal06/47tests/control11/faults12/child13/legacy14; no full conductor or installation claim.
+
+## Explicit native managed-candidate preparation
+
+`swarm-rust task validation-candidate WORK --root ROOT --input request.json --json` uses the same strict request as `validation-preview` (`schema_version`, `event_id`, `expected_revision`, `task_id`). This is explicit Git preparation; `event_id` is correlation and a possible future launch identifier, without creating a Root event. An existing job for that identifier or an active controller refuses before Git: this operation does not replace job reconciliation.
+
+Root rereads the Work, canonical submission, actual completed native producer, latest attempt, authorized policies and report bytes. Policies for the current and already accepted tasks are normalized separately with persisted settings. After checked SQL transaction and settings-reservation releases, the engine verifies the retained result, prepares the single-parent candidate and pins its directories. A second Root observation must match the first, including connected database identity, Work and the complete saved settings document. Any concurrent settings change refuses this preparation, even if irrelevant to future controls; this conservative interval check is not a business stopping policy. Descriptors are explicitly closed on every post-pin outcome.
+
+The public result includes commit, complete candidate digest, producer/attempt and cohort counts, without private paths or commands. `job_created`, `controls_started` and `task_accepted` are `false`. Repeating unchanged preparation reuses the checkpoint and copy; errors may leave retained objects, a ref or files and never imply rollback. No job, permit, control, review, acceptance or Work candidate-pointer change is created. Managed `validation-preview` now inspects an existing candidate without preparing a new stage; `validate` uses the executor below. Final managed review still refuses (`review-managed-candidate-unported`). This CLI stage is not yet an automatic conductor launch or a UX action.
+
+```mermaid
+sequenceDiagram
+    participant CLI as CLI validation-candidate
+    participant Root as Root SQL and settings
+    participant Git as Private Git candidate
+    CLI->>Root: Actual submission, producer and plan
+    Root-->>CLI: Bound observation and locks released
+    CLI->>Git: Verify result, prepare and pin
+    Git-->>CLI: Complete checkpoint and owned witnesses
+    CLI->>Root: Reread identity, Work and settings
+    Root-->>CLI: Match or stale refusal
+    CLI->>CLI: Close witnesses, preserve all causes
+    CLI-->>CLI: Digests and counts, no controls started
+```
+
+The maintained `native-managed-candidate` recipe exercises actual inert local workers, public handoff, preparation and repetition, refusal/recovery and a public settings mutation from Git. The last case verifies Git holds no Root/settings locks and the final observation refuses stale state. It establishes neither OS confinement, executed cumulative commands nor independent acceptance.
+
+## Native managed controls execution
+
+`task validate WORK` prepares or reuses the candidate outside Root transactions and executes the current plus already accepted task cohort. Policies are normalized separately with persisted settings, without an aggregate ceiling. An exact recorded request is checked before any preparation. Active jobs require reconciliation; recorded jobs replay without commands, reopening the candidate or reading the admission frame.
+
+The private schema1 `native-validation-candidate-…receipt` retains the complete preimage before SQL claim. Claim revalidates actual producer, submission, policies, repository and connected Root directory/database instance, then atomically records all slots, candidate/plan origin, any actual owning lease and Work event. A pre-claim failure may retain files or a Git ref without creating permission. Transport IDs stay separate from original control/result names.
+
+The controller retains directory witnesses during its execution call. It refreshes Git/raw tracked sources before each control; supervision polls check declared inputs, held identities and Root authority without Git under locks or on every poll. The helper checks the actual Unix channel, parent/child/group/permission, reads the preimage bound by SQL origin, pins its own directories outside Root locks and revalidates source before exec. Its cwd remains descriptor-anchored through exec. Existing saved deadlines/output/poll/stop settings apply; no global watchdog or attempt ceiling is added. Unknown waits remain failed recovery, never empty success.
+
+Submitted report artifacts stay Root-relative. Inputs are first resolved/hashed inside the candidate project, then referenced by their actual contained Root-relative paths for existing gate/evidence readers. Those references may expose relative stage coordinates, never an absolute host prefix; a same-named Root file cannot replace a candidate input. Private frames remain private. Final complete inspection precedes v3 original/public receipt and atomic job/slots/Work publication. Public controls are target-task-only, but any cohort failure blocks the overall result. Ordinary failed checks still allow following configured controls; source/transport errors leave later slots explicitly unattempted.
+
+After publication refusal with complete observations, `task validation-reconcile` applies originals after actual owner departure without another command or copy. `task validation-retire` explicitly abandons known observations without adopting results or requiring still-fresh source. Primary/close/wait causes and already recorded Work metadata survive output layers. Held descriptors and sequential observations are not OS confinement against a malicious same-UID writer.
+
+Complete independent managed review, whole-cohort context and protected candidate-pointer publication remain unported. Subsupervisor/root supervisor retain business decisions; passing controls is not acceptance. The `native-managed-validation` recipe uses actual inert local workers, an `app` project, real commands, a public-file refusal/public recovery and replay without a candidate. Its public cohort is the current task; it fabricates no accepted predecessor. Multi-task plan/receipt cases remain separate component evidence.
+
+```mermaid
+sequenceDiagram
+    participant O as CLI / conductor
+    participant R as Root SQL and files
+    participant C as Retained candidate
+    participant H as Private helper
+    participant P as Actual control
+    O->>R: Exact recorded request
+    alt Recorded job
+        R-->>O: Original and current Work, no command
+    else New job
+        O->>C: Prepare and pin outside Root locks
+        O->>R: Private preimage then whole-cohort claim
+        loop Every slot
+            O->>C: Complete inspection before control
+            O->>R: Observed identities then permission and actual lease
+            O->>H: Grant byte on private channel
+            H->>C: Pin own directories
+            H->>R: Revalidate instance, source, policy and permission
+            H->>P: Exec from held directory
+            P-->>O: Observed wait and output
+            O->>R: Immutable slot frame
+        end
+        O->>C: Final inspection outside Root locks
+        O->>R: V3 receipt and atomic result publication
+        R-->>O: Pending review or blocked, never accepted
+    end
+    Note over R: Complete final validator still guarded
+```
+
+
+## Reconstructing the combined receipt from slot originals
+
+`task validation-reconcile` and `task validation-retire` can reconstruct a missing
+combined receipt only when **every private slot original already exists**. Recovery
+runs no command. Confirmed original-owner departure, actual Root identity and SQL
+rows, policy and current source must match the recorded origin. Managed candidate
+inspection occurs outside Root locks and explicitly closes its owned witnesses.
+Every slot keeps its canonical body, command, identity and actually observed wait;
+no missing receipt, result, exit or non-invocation is invented.
+
+An existing unreadable, incomplete or malformed combined original refuses; only
+confirmed absence permits reconstruction. Missing historical origin, changed
+source, absent slot or unknown process outcome refuses without result publication.
+This conservative path does not settle partial batches whose observations are
+missing. PID absence alone never releases them.
+
+A private `native-validation-reconstruction-…receipt` preserves the assembled body
+before create-only combined publication. Its event/time are reused after an
+interruption only when the body still exactly matches verified source/slots.
+`finished_at` then describes the assembly observation, not a reconstructed process
+exit time. Command results remain the originals. Publication or retirement then
+rechecks the originals and its own transactional conditions. An error may leave
+either file visible without a SQL result; it proves no rollback. Terminal replay
+keeps its historical path without reconstruction. No task acceptance or automatic
+command retry is added.
+
+```mermaid
+flowchart TD
+    R[Explicit reconcile or retirement] --> G{Readable combined receipt}
+    G -->|Yes| H[Unchanged original path]
+    G -->|Error other than absence| X[Refusal with retained cause]
+    G -->|Confirmed absence| O[Departed owner and SQL origin]
+    O --> C[Current source and candidate verified]
+    C --> S[Every original slot and exact row]
+    S --> Q{Known wait or original noninvocation}
+    Q -->|No or missing observation| X
+    Q -->|Yes| A[Reconstruction original then combined receipt]
+    A --> P[Revalidated publication or retirement]
+    P --> N[No command rerun or acceptance]
+```
+
+
+## Native complete-candidate inspection before final review
+
+After actual passed native managed controls, `task review-preview` observes
+provenance/configuration readonly; `task review-inputs` materializes a retained
+Git-candidate inspection projection. Only an existing candidate is inspected: no
+new stage, job, permit, reviewer call, debit or acceptance. Final verdict context,
+accepted-baseline verification and publication remain unwired. `task review`
+therefore still refuses with `review-managed-candidate-unported`, even after a
+successful preview.
+
+The inspector verifies private v3 receipt, registered native slots and current
+source. Candidate pinning occurs outside Root/settings locks, while descriptors
+remain owned through materialization, final outside-lock reinspection and checked
+close. A procfd path belongs to that holder; it is never a public reusable source
+reference. This does not confine a malicious same-UID writer.
+
+The projection includes every tracked path in the retained candidate repository,
+including project prefixes. It does not scan the Swarm Root, untracked files or
+live Git origin. Complete text bytes must match recorded raw-source hashes.
+Symlinks quote their literal UTF-8 target without reading that target, including
+outside-repository targets. Binary/non-UTF8 content, unsupported mode, missing
+original or source drift refuses without silent omission or truncation.
+
+Canonical reports and criteria of the current/accepted cohort accompany policies
+and results freshly executed in this cumulative job, original result names and
+distinct transport keys. The target receipt is also supplied. The projection
+declares `inspection_only=true`, `native_invocation_supported=false`,
+`native_verdict_supported=false`, `accepted_baseline_verdicts_verified=false`;
+it does not claim historical accepted-verdict verification. Truncated control
+output stays explicitly marked as such, never invented as complete evidence.
+
+Existing settings govern: `review_delivery_files` bounds the full presented Git
+inventory; `review_context_files` counts every material including attributed
+duplicates; `review_source_bytes` counts UTF-8 source bytes, and
+`review_context_bytes` the final prompt including framing/escaping. Global delivery
+read limits also apply to sources. Zero explicitly means no additional bound;
+missing/negative values or exceeded limits refuse. Existing public persisted
+quotas/validation are consumed; no constant or second ceiling is added. Refusal
+and close errors retain causes, never permission.
+
+```mermaid
+sequenceDiagram
+    participant U as Inspection CLI
+    participant R as Root SQL and settings
+    participant C as Retained candidate
+    U->>R: Verify published v3 job and originals
+    R-->>U: Observations then release locks
+    U->>C: Pin existing candidate and raw sources
+    U->>R: Current source and cohort in snapshot
+    U->>C: Complete texts and literal link targets
+    U->>U: Hashes and saved limits without clipping
+    R-->>U: Snapshot and settings closed
+    U->>C: Final reinspection then checked custody release
+    U-->>U: inspection_only projection and digest
+    Note over U,R: No reviewer call or acceptance
+    U->>R: Separate native task review request
+    R-->>U: Refuse until final protocol is wired
+```

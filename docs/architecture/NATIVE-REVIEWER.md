@@ -38,6 +38,95 @@ Les deux aperçus de tâche prennent `schema_version`, `event_id`,
 l’appelant n’est pas une autorité. L’aperçu public refuse une revue déjà en cours ;
 la relecture interne n’autorise que l’exacte revue liée au job normalisé.
 
+## Correspondance des contrôles natifs
+
+Avant conversion publique, lecture de l’original et rejeu, le moteur vérifie
+la correspondance complète entre politique enregistrée, créneaux ordonnés du job
+et résultats observés : versions de reçu, nombre de contrôles, job original,
+ordinal, identifiants uniques, nom du contrôle et arguments exacts. Un résultat
+d’une autre commande refuse avec `task-validation-receipt-slot-source-changed` ;
+il ne devient pas un succès ni un artefact public bloqué plausible. Les échecs
+cohérents et contrôles non tentés restent des observations bloquées conservables.
+Un résultat absent ou infructueux sans indicateur d’échec refuse, pour éviter
+un état bloqué sans incident attribué au contrôle.
+Un succès exige aussi un processus tenté, une permission enregistrée et un
+créneau observé à l’état permis, en plus du wait et des résultats existants.
+
+Ce contrôle de données ne remplace pas les empreintes, lignes SQL, permissions,
+identités et preuves de fin réelles. Il ne crée aucun avis indépendant ou droit.
+Le préflight cumulatif S2 reste distinct : le futur contrôleur devra mapper ses
+clés de transport aux tâches/contrôles d’origine et lier le candidat physique et
+les politiques normalisées. Ce raccordement reste gardé, non réalisé ici.
+Après une incohérence, conserver les originaux et réconcilier par le parcours
+existant après réparation de la cause ; aucune réécriture du reçu pour accepter.
+
+## Origine des nouveaux jobs de contrôle
+
+Chaque nouveau job de contrôle enregistre, dans la même transaction que le job
+et le Work, une ligne scalaire `native_validation_source_origins` : source
+observée, empreinte des contrôles normalisés et liaison éventuelle au candidat.
+L’empreinte du job combine ce domaine d’origine puis l’autorité de mission
+existante. Les permissions, la publication et les lecteurs de revue réutilisent
+ce même calcul. Supprimer ou modifier la ligne ne reconstitue pas l’empreinte
+d’un nouveau job. Il ne s’agit ni d’un droit, ni d’une authentification du modèle.
+
+Le reçu privé de job **version 2** conserve `source_origin` et `effective_policy`.
+Le lecteur exige leur présence ; la conversion pure vérifie déjà la politique
+effective contre son empreinte. Le lecteur Root vérifie aussi la ligne SQL puis
+le domaine du job avec l’autorité enregistrée. Les anciens
+reçus privés **version 1** omettent ces deux champs ; leur encodage et leur base
+historique sont conservés, sans backfill à la lecture. Un reçu v2 incomplet ne
+peut pas devenir un reçu historique. Le JSON public conserve son schéma existant.
+Erreurs de schéma, type, empreinte, origine manquante ou contenu différent restent
+des refus typés ; un échec d’écriture exige le rollback du caller et ne prouve pas
+l’absence de lignes déjà stagées. Rejeu et réconciliation ne créent pas de nouveau
+contrôle pour remplacer un original incomplet.
+
+La liaison de candidat est **absente pour le parcours ordinaire livré**. Le
+contrôleur géré S2 reste gardé : témoins physiques, plan de cohorte, revue complète
+et publication du candidat sont encore à raccorder. Les observateurs de source
+et les empreintes ne confinent pas un processus hostile du même utilisateur.
+
+### Reçus cumulatifs privés : producteur et lecteur v3
+
+Le lecteur accepte une variante privée v3 conservant le candidat complet, donc
+les politiques originales/normalisées de chaque tâche et tous les créneaux.
+`controls_sha256` lie le plan complet ; `candidate_binding_sha256` lie la préimage
+du checkpoint entier. Le lecteur vérifie ces contenus, la ligne SQL originale et
+le domaine du job, puis les créneaux/résultats. Une réécriture cohérente du JSON
+avec de nouvelles empreintes ne remplace pas l’origine enregistrée.
+
+| Reçu privé | Origine | Politique effective séparée | Candidat complet |
+| --- | --- | --- | --- |
+| v1 historique | absente | absente | absent |
+| v2 ordinaire | présente, sans liaison candidat | présente | absent |
+| v3 cumulatif | présente, avec liaison candidat | absente, plan dans le candidat | présent |
+
+Toute combinaison mixte ou version inconnue refuse, sans downgrade ni backfill.
+Les reçus v1/v2 gardent leurs octets et le producteur ordinaire reste v2. Le
+lecteur ordinaire utilisé par les permissions/revues exige explicitement une
+liaison candidat absente ; le producteur géré utilise un parcours source distinct
+qui vérifie la préimage complète, le plan courant et l’instance Root réelle.
+
+Exemple de **fixture de données**, pas d’exécution gérée : tâche A acceptée et B
+courante ont chacune un contrôle `check`. Les clés de transport diffèrent, les
+noms restent conservés et aucun plafond agrégé de politique n’est ajouté. Si A
+échoue et B réussit, les contrôles publics restent ceux de B mais l’état global
+est `blocked`, avec tâche/contrôle/transport de A dans les échecs. Le reçu privé
+conserve les deux observations. La conversion exige aussi des arguments de
+commande non vides et sans NUL ; deux valeurs invalides identiques ne valent
+pas une preuve d’exécution.
+
+Le lecteur compare la forme normalisée aux seules transformations du normaliseur
+(trim, retrait d’autorité, résolution positive d’un délai initialement nul), sans
+recharger des limites actuelles ni les inventer pour l’historique. L’appartenance
+à la cohorte réelle et la normalisation sous les réglages enregistrés doivent
+encore être établies au claim. Les empreintes et DTO ne prouvent ni permission,
+ni propriétaire natif, ni descripteurs ouverts, ni intégrité Git courante.
+**Root refuse encore le lancement géré : producteur du job cumulatif, permissions,
+revue finale complète et publication restent à raccorder.** Les gardes physiques
+et le plan existent en composants privés ; ce lecteur ne les active pas.
+
 ## Originaux, politiques et capture
 
 Le prompt comprend la tâche sélectionnée, le rapport soumis canonique,
@@ -570,7 +659,7 @@ La reprise native observe soit l’erreur courante avant nouveau claim, soit la 
 
 173 vérifié : deuxième reviewer réellement exécuté, quatre fautes avant admission refusées/restaurées, nouveau retour d’abord soumis puis acceptation opérateur séparée de fixture. Incident déjà acquitté dans une nouvelle activation, erreurs de transport/source et source modifiée restent des contrats séparés. Les preuves d’identité sémantique, de résistance même UID et de confinement OS ne résultent pas de cette liaison.
 
-Une décision/claim ordinaire ne révoque pas l’autorité des contrôles : source_authority suit les événements enable/pause/resume, pas toute génération d’affichage. Les deux SHA peuvent donc être égaux pour mêmes autorité/candidat. Le contrôle173 avec pause/resume public prouve le cas distinct : nouvelle empreinte d’admission, ancienne empreinte/receipt de contrôle préservés, vrai deuxième avis puis acceptation opérateur séparée de fixture. Cette distinction ne crée aucune authentification humaine. La guidance fixe décrit la correction comme méthode/format de réponse attribué, hors preuves de critères, sans outil ou permission supplémentaire.
+Une décision/claim ordinaire ne révoque pas l’autorité des contrôles : source_authority suit les événements enable/pause/resume, pas toute génération d’affichage. Sur les nouveaux jobs avec origine, le SHA de contrôle lie aussi le job et sa politique effective ; il se distingue de la base d’admission. L’égalité des deux SHA reste possible pour les anciens originaux sans origine. Le contrôle173 avec pause/resume public prouve le cas distinct : nouvelle empreinte d’admission, ancienne empreinte/receipt de contrôle préservés, vrai deuxième avis puis acceptation opérateur séparée de fixture. Cette distinction ne crée aucune authentification humaine. La guidance fixe décrit la correction comme méthode/format de réponse attribué, hors preuves de critères, sans outil ou permission supplémentaire.
 
 ```mermaid
 sequenceDiagram
@@ -621,3 +710,181 @@ flowchart TD
 176 vérifié sur fixtures : la directive review_recovery ajoute failure_code et failure_owner, construits depuis la même classification de l’original privé vérifié. Ces observations expliquent la cause au nouveau reviewer ; elles ne sont ni entrées de requête, ni texte d’erreur arbitraire, ni identité authentifiée, ni permission. Les classes admises et les vérifications d’admission de175 restent identiques. Normal04 c8810c/274 sources sans fixture et34 tests/Clippy/Rustdoc02. Prompts réels05/07/pending09 vérifient exactement les deux couples code/owner ; neuf fautes06/08, dont mauvaise classe et mauvais rôle avec hash recalculé, refusent avant claim, restauration puis même revue réussie. Même historique/canonique/contrôles/rapport/dépenses, cap public préservé et rejeu sans exec. Les deux champs sont inclus dans la taille du prompt contrôlée par la limite persistée existante. Pas de nouveau profil d’autorisation, identité ou installation.
 
 177 vérifié sur fixtures : les opérations judge/continue et renew racine se séparent des avis indépendants de candidats. Une décision par cycle, renouvellement seulement après continue sous quota de cycles sauvegardé (0 sans plafond), aucun reset d’activations/décisions/dépenses. Le contexte racine porte son JudgeState/historique complet sous le cap de contexte existant et la fraîcheur vérifie aussi ce contrat ; les enfants ne reçoivent pas cet historique. Les motifs nouveaux utilisent planning_decision_max_reason_bytes ; la cohérence durable ne doit pas réappliquer un ancien plafond4000. Judge end reste refusé sans contrat de candidat managed natif. Contrat, schéma, politiques et preuves : [juge global natif](NATIVE-GLOBAL-JUDGE.md). Normal06/47tests/control11/faults12/child13/legacy14 ; pas de port complet du conducteur ni de livraison revendiqué.
+
+## Préparation native explicite du candidat géré
+
+`swarm-rust task validation-candidate WORK --root ROOT --input request.json --json` utilise la même requête stricte que `validation-preview` (`schema_version`, `event_id`, `expected_revision`, `task_id`). Cette opération est une préparation Git explicite ; `event_id` est une corrélation et un éventuel futur identifiant de lancement, sans événement Root créé. Un job déjà associé à cet identifiant ou un contrôleur actif refuse avant Git : cette opération ne remplace pas la réconciliation d’un job.
+
+Root relit le Work, la soumission canonique, le vrai producteur natif terminé, son dernier attempt, les politiques autorisées et les octets du rapport. Le plan courant et celui des tâches déjà acceptées sont normalisés séparément avec les réglages persistés. Après fermeture vérifiée de la transaction et de la réservation des réglages, le moteur vérifie le résultat conservé, prépare le candidat mono-parent et épingle ses répertoires. Une seconde observation Root doit correspondre à la première, y compris identité connectée de la base, Work et document complet des réglages. Toute modification concurrente de ces réglages refuse cette préparation, même si elle serait sans effet sur un futur contrôle ; ce contrôle conservateur concerne cet intervalle, pas une politique d’arrêt métier. Les descripteurs sont explicitement fermés sur toute issue après épinglage.
+
+Le résultat public contient commit, empreinte du candidat complet, producteur/attempt et compteurs du cohort, sans chemins privés ni commandes. `job_created`, `controls_started` et `task_accepted` valent `false`. Répéter une préparation inchangée retrouve le checkpoint et la même copie ; une erreur peut avoir conservé des objets, ref ou fichiers, sans rollback implicite. Aucun job, permis, contrôle, revue, acceptation ni changement du pointeur candidat du Work n’est créé. `validation-preview` inspecte désormais le candidat existant sans nouvelle préparation ; `validate` utilise le lancement géré décrit ci-dessous. La revue finale gérée reste refusée (`review-managed-candidate-unported`). Cette étape CLI n’est pas encore un démarrage automatique par le conducteur ni une action UX.
+
+```mermaid
+sequenceDiagram
+    participant CLI as CLI validation-candidate
+    participant Root as Root SQL et réglages
+    participant Git as Candidat Git privé
+    CLI->>Root: Soumission, producteur et plan réels
+    Root-->>CLI: Observation liée et verrous fermés
+    CLI->>Git: Vérifier résultat, préparer et épingler
+    Git-->>CLI: Checkpoint complet et témoins détenus
+    CLI->>Root: Relecture identité, Work et réglages
+    Root-->>CLI: Correspondance ou refus périmé
+    CLI->>CLI: Fermer les témoins, conserver les causes
+    CLI-->>CLI: Empreintes et compteurs, aucun contrôle lancé
+```
+
+La recette maintenue `native-managed-candidate` exerce de vrais workers locaux inertes, leur handoff public, la préparation et sa répétition, les refus/récupérations et une mutation publique des réglages depuis Git. Ce dernier cas vérifie que Git ne retient pas les verrous Root/réglages et que l’observation finale refuse l’état périmé. Cela ne prouve ni confinement OS, ni commandes cumulatives exécutées, ni acceptation indépendante.
+
+## Exécution native des contrôles gérés
+
+`task validate WORK` prépare ou retrouve le candidat hors des transactions Root et exécute le plan de la tâche courante et de toutes les tâches déjà acceptées. Les politiques sont normalisées séparément avec les réglages persistés ; aucun plafond agrégé n’est créé. Une requête exacte déjà enregistrée est examinée avant toute préparation. Un job actif exige sa réconciliation ; un job enregistré se rejoue sans commande, sans réouvrir le candidat ni relire le cadre d’admission.
+
+Le cadre privé `native-validation-candidate-…receipt` (schéma1) conserve la préimage complète avant le claim SQL. Le claim revalide producteur, soumission, politiques, dépôt, instance connectée du répertoire et de la base Root ; il enregistre atomiquement tous les créneaux, l’origine liée au candidat/plan, l’éventuel bail réel et l’événement du Work. Une erreur avant claim peut conserver des fichiers ou une référence Git, sans créer de permis. Les clés de transport restent distinctes des noms originaux des contrôles/résultats.
+
+Le contrôleur conserve ses témoins de répertoires pendant l’appel d’exécution. Il réinspecte Git et les octets suivis avant chaque contrôle ; les sondes de supervision contrôlent les entrées déclarées, les identités détenues et l’autorité Root sans lancer Git sous verrou ou à chaque sonde. Le helper vérifie le vrai canal Unix, parent/enfant/groupe/permission, relit la préimage liée à l’origine SQL, épingle ses propres répertoires hors des verrous Root et revalide les sources avant exec. Son répertoire courant reste ancré sur ses descripteurs jusqu’à exec. Les délais, sortie, sondes et arrêt utilisent les réglages existants ; aucun watchdog global ou plafond de tentatives n’est ajouté. Une attente inconnue reste un échec de récupération, jamais un succès vide.
+
+Le rapport soumis reste un artefact Root. Les entrées sont d’abord résolues et hachées dans le projet candidat, puis référencées par leur chemin réel relatif à Root pour les lecteurs de gate/preuves existants. Ces références peuvent exposer les coordonnées relatives du stage, jamais le préfixe hôte absolu ; aucune entrée Root homonyme ne remplace un fichier candidat. Les cadres privés restent privés. Une dernière inspection complète précède la publication du reçu v3, du résultat public et de la transaction job/créneaux/Work. Les résultats publics concernent la tâche courante ; tout échec dans la cohorte bloque le résultat global. Les contrôles ordinaires échoués n’empêchent pas les contrôles suivants ; une erreur de source/transport les laisse explicitement non tentés.
+
+Après un refus de publication avec observations complètes, `task validation-reconcile` applique les originaux après départ réel du propriétaire, sans nouvelle commande ni nouvelle copie. `task validation-retire` abandonne explicitement les observations connues sans adopter leur résultat ni exiger une source encore fraîche. Les erreurs primaires, de fermeture, d’attente et les métadonnées Work déjà enregistrées traversent les couches de sortie. La détention des descripteurs et les lectures séquentielles ne constituent pas un confinement OS contre un écrivain malveillant de même UID.
+
+La revue indépendante complète du candidat, son contexte de cohorte et la publication protégée du pointeur candidat restent à porter. Le sous-superviseur/superviseur garde la décision métier ; les contrôles ne valent pas acceptation. La recette `native-managed-validation` utilise de vrais workers locaux inertes, un projet `app`, des commandes réelles, un refus de fichier public puis la récupération publique, et le rejeu sans candidat. La cohorte publique de cette recette est la tâche courante ; elle ne fabrique pas de tâche antérieure acceptée. Les cas multi-tâches de plan/reçu restent des preuves de composants distinctes.
+
+```mermaid
+sequenceDiagram
+    participant O as CLI / conducteur
+    participant R as Root SQL et fichiers
+    participant C as Candidat retenu
+    participant H as Helper prive
+    participant P as Controle reel
+    O->>R: Requete exacte deja enregistree
+    alt Job enregistre
+        R-->>O: Original et Work courant, aucune commande
+    else Nouveau job
+        O->>C: Preparer et epingler hors verrous Root
+        O->>R: Preimage privee puis claim de toute la cohorte
+        loop Chaque creneau
+            O->>C: Inspection complete avant controle
+            O->>R: Identites observees puis permission et bail reel
+            O->>H: Octet de grant sur canal prive
+            H->>C: Epingler ses propres repertoires
+            H->>R: Revalider instance, source, politique et permission
+            H->>P: Exec depuis le repertoire detenu
+            P-->>O: Attente et sortie observees
+            O->>R: Cadre de creneau immuable
+        end
+        O->>C: Inspection finale hors verrous Root
+        O->>R: Recu v3 et publication atomique du resultat
+        R-->>O: En attente de revue ou bloque, jamais accepte
+    end
+    Note over R: Validateur final complet encore garde
+```
+
+
+## Reconstruction du reçu global à partir des créneaux
+
+`task validation-reconcile` et `task validation-retire` peuvent reconstruire un
+reçu global absent lorsque **tous les reçus privés de créneau existent déjà**.
+La reprise ne lance aucune commande. Le propriétaire initial doit être confirmé
+absent ; l’instance Root, les lignes SQL, la politique et la source courantes
+doivent correspondre à l’origine enregistrée. Le candidat géré est réinspecté
+hors des verrous Root et ses témoins sont fermés explicitement. Chaque créneau
+conserve son corps canonique, sa commande, son identité et son wait réellement
+observé ; aucun reçu manquant, résultat, exit ou non-lancement n’est inventé.
+
+La reprise refuse un original global présent mais illisible, incomplet ou de
+forme invalide. Seule son absence confirmée ouvre la reconstruction. Une origine
+historique absente, une source modifiée, un créneau manquant ou une issue de
+processus inconnue refusent sans publication de résultat. Cette récupération
+conservatrice ne règle donc pas les lots partiels dont les observations manquent.
+L’absence d’un PID ne suffit jamais à les libérer.
+
+Un original privé `native-validation-reconstruction-…receipt` conserve le corps
+assemblé avant le reçu global, sans remplacer de fichier. Son événement et son
+horodatage sont réutilisés après une interruption seulement si son contenu reste
+exactement lié aux sources/créneaux vérifiés. `finished_at` décrit alors l’observation
+d’assemblage, pas une heure de sortie de processus reconstruite. Les résultats
+des commandes restent ceux des originaux. La publication ou l’abandon recontrôle
+ensuite les originaux et ses propres conditions transactionnelles. Une erreur
+peut laisser l’un de ces fichiers visibles sans changement SQL ; elle ne prouve
+pas un rollback. Un rejeu terminal conserve son chemin historique sans reconstruction.
+Aucune acceptation de tâche ni reprise automatique de commande n’est ajoutée.
+
+```mermaid
+flowchart TD
+    R[Reconciliation ou abandon explicite] --> G{Recu global lisible}
+    G -->|Oui| H[Parcours original inchange]
+    G -->|Erreur autre que absence| X[Refus et cause conservee]
+    G -->|Absence confirmee| O[Proprietaire absent et origine SQL]
+    O --> C[Source courante et candidat verifies]
+    C --> S[Tous les creneaux originaux et lignes exactes]
+    S --> Q{Wait connu ou non-invocation originale}
+    Q -->|Non ou observation manquante| X
+    Q -->|Oui| A[Original de reconstruction puis recu global]
+    A --> P[Publication ou abandon revalide]
+    P --> N[Aucune commande relancee ni acceptation]
+```
+
+
+## Inspection native du candidat complet avant revue finale
+
+Après de vrais contrôles natifs gérés réussis, `task review-preview` vérifie en
+lecture seule la provenance et la configuration ; `task review-inputs` matérialise
+une projection d'inspection du candidat Git retenu. Ce chemin utilise uniquement
+un candidat existant : aucun nouveau stage, job, permis, appel reviewer, débit ni
+acceptation. Le contexte final de verdict, ses baselines acceptées et sa
+publication restent à porter. `task review` conserve donc explicitement le refus
+`review-managed-candidate-unported`, même après un aperçu réussi.
+
+L'inspecteur vérifie le reçu privé v3, ses créneaux natifs enregistrés et la source
+courante. Il épingle le candidat hors des transactions/verrous de réglages, puis
+conserve ses descripteurs jusqu'à la matérialisation, à la réinspection finale
+hors verrous et à leur fermeture vérifiée. Le chemin procfd appartient à ce
+propriétaire ; il n'est jamais une référence publique ou un chemin réutilisable.
+Aucune protection contre un écrivain malveillant du même UID n'est revendiquée.
+
+La projection contient tous les chemins suivis du dépôt candidat conservé, y
+compris le préfixe du sous-projet ; elle ne scanne ni la racine de travail Swarm,
+ni les fichiers non suivis, ni l'origine Git vivante. Les fichiers texte sont lus
+entièrement et comparés à leurs empreintes brutes enregistrées. Un lien symbolique
+est représenté par sa cible littérale UTF-8, sans lecture de cette cible, même si
+elle sort du dépôt. Contenu binaire/non UTF-8, mode non pris en charge, original
+absent ou source modifiée refusent sans omission silencieuse ni troncature.
+
+Les rapports canoniques et critères de la cohorte courante/acceptée sont joints,
+avec politiques et résultats des contrôles fraîchement exécutés par ce job
+cumulatif, identifiants d'origine et clés de transport distinctes. Le reçu de la
+tâche cible reste présent aussi. La projection déclare `inspection_only=true`,
+`native_invocation_supported=false`, `native_verdict_supported=false` et
+`accepted_baseline_verdicts_verified=false` ; elle ne prétend pas vérifier les
+avis historiques acceptés. Un résultat de contrôle dont la sortie est tronquée
+reste une observation déclarée comme telle, pas une sortie complète inventée.
+
+Les réglages existants sont conservés : `review_delivery_files` borne l'inventaire
+Git complet présenté, `review_context_files` compte tous les matériaux, doublons
+attribués compris ; `review_source_bytes` compte leurs octets UTF-8 et
+`review_context_bytes` le prompt final, framing et échappement compris. Le plafond
+global de lecture de livraison s'applique aussi aux sources. Zéro signifie
+explicitement aucune borne additionnelle ; valeur absente/négative ou dépassement
+refuse. Les quotas publics persistés/réouverts et leurs validations existantes
+sont utilisés ; aucune constante ou deuxième plafond n'est ajouté. Un refus ou
+une erreur de fermeture conserve ses causes et ne vaut jamais permission.
+
+```mermaid
+sequenceDiagram
+    participant U as CLI inspection
+    participant R as Root SQL et reglages
+    participant C as Candidat retenu
+    U->>R: Verifier job v3 et originaux publies
+    R-->>U: Observations puis fermeture des verrous
+    U->>C: Epingle existante et sources brutes
+    U->>R: Source courante et cohorte sous snapshot
+    U->>C: Textes complets et cibles de liens litterales
+    U->>U: Empreintes et limites persistees sans troncature
+    R-->>U: Snapshot et reglages fermes
+    U->>C: Reinspection finale puis fermeture des temoins
+    U-->>U: Projection inspection_only et SHA
+    Note over U,R: Aucun appel reviewer ni acceptation
+    U->>R: Demande native task review distincte
+    R-->>U: Refus tant que protocole final non raccorde
+```

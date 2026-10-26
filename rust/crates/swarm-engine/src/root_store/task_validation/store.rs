@@ -351,6 +351,28 @@ pub(super) fn step(db: &Connection, id: &str) -> Result<(Job, Step), E> {
     valid_step(&s, &j)?;
     Ok((j, s))
 }
+/// Read every actual slot in ordinal order for an unchanged registered job.
+/// No receipt, permit or absence-of-process is inferred; count/order/tuple errors
+/// refuse. Schema/query/finalization causes are preserved, with no hidden cap.
+pub(super) fn ordered_steps(db: &Connection, job: &Job) -> Result<Vec<Step>, E> {
+    let ids = query(db, "SELECT id FROM native_validation_steps WHERE job_id=? ORDER BY ordinal", params![job.id], |rows| {
+        let mut ids = Vec::new();
+        while let Some(row) = rows.next()? { ids.push(row.get::<_, String>(0)?); }
+        Ok(ids)
+    })?;
+    let mut values = Vec::new();
+    for (ordinal,id) in ids.iter().enumerate() {
+        let (actual,slot) = step(db,id)?;
+        if actual != *job || usize::try_from(slot.ordinal).ok() != Some(ordinal) {
+            return Err(E::Refused("task-validation-reconstruction-slot-changed"));
+        }
+        values.push(slot);
+    }
+    if usize::try_from(job.control_count).ok() != Some(values.len()) || values.is_empty() {
+        return Err(E::Refused("task-validation-slot-set-incomplete"));
+    }
+    Ok(values)
+}
 /// Encode one checked row into separate scalar columns. SQL, serialization and
 /// affected-row errors remain explicit; caller owns identity and transaction.
 fn insert(db: &Connection, table: &str, columns: &[&str], v: &impl Serialize) -> Result<(), E> {

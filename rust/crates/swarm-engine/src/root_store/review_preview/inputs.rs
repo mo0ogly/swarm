@@ -269,6 +269,87 @@ pub(super) fn assemble(
     })
 }
 
+/// Materialize the entire retained candidate tree and control cohort for readonly
+/// inspection. Every original report and tracked entry is complete and digest-
+/// checked, with original symlink targets quoted without traversal. Saved source,
+/// delivery-file, aggregate-file and prompt limits refuse rather than truncate.
+/// Binary/non-UTF8 files, missing reports, drift or unsupported client windows
+/// refuse before output. No native verdict/reply protocol or invocation is enabled;
+/// actual cohort final review and accepted-baseline verification remain unported.
+/// Caller owns candidate custody and final outside-lock refresh/checked release.
+pub(super) fn assemble_managed(
+    root:&Path, mut prepared:PreparedReview,
+    candidate:&crate::root_store::task_validation::ReviewCandidate,
+    reports:&[crate::TaskReportRequest],
+)->Result<TaskReviewInputs,E>{
+    let reviewer=prepared.work.planning.as_deref().and_then(|p|p.reviewer.as_deref())
+        .ok_or(E::Refused("reviewer_required"))?;
+    if reviewer.input_context_tokens!=0{return Err(E::Refused("review-client-window-unported"));}
+    let max_files=cap(reviewer.max_context_files.as_deref())?;
+    let max_bytes=cap(reviewer.max_source_bytes.as_deref())?;
+    let max_prompt=cap(reviewer.max_context_bytes.as_deref())?;
+    let deliveries=cap(reviewer.max_files.as_deref())?;
+    let limits=prepared.settings.values.context_policy_limits().map_err(E::Settings)?;
+    let mut materials=Materials{sources:Vec::new(),bytes:0,max_bytes,max_files};
+    let checkpoint=candidate.candidate();
+    let plan=checkpoint.control_plan.as_ref().ok_or(E::Refused("review-managed-plan-required"))?;
+    if reports.len()!=plan.policies.len(){return Err(E::Refused("review-managed-reports-incomplete"));}
+    let mut tasks=Vec::new();
+    for (policy,report) in plan.policies.iter().zip(reports){
+        if report.id!=policy.task_id{return Err(E::Refused("review-managed-report-task-changed"));}
+        let task=prepared.work.tasks.iter().flatten().find(|t|t.id==policy.task_id)
+            .ok_or(E::Refused("review-task-missing"))?;
+        materials.read(root,&report.report_path,"report",&limits)?;
+        let source=materials.sources.last_mut().ok_or(E::Refused("review-report-required"))?;
+        if source.sha256!=report.report_sha256{return Err(E::Refused("review-report-changed"));}
+        source.name=format!("cohort/{}/{}",task.id,report.report_path);
+        tasks.push(serde_json::json!({"task_id":task.id,"selected":task.id==prepared.preview.task_id,
+            "title":task.title,"deliverable":task.deliverable,"criteria":task.criteria,
+            "contract_sha256":crate::task_review_contract(task).map_err(E::Encode)?,
+            "report_path":report.report_path,"report_sha256":report.report_sha256}));
+    }
+    let entries:Vec<_>=checkpoint.review_entries().collect();
+    bounded(entries.len(),deliveries,"review-delivery-files-exceeded")?;
+    let inventory:Vec<_>=entries.iter().map(|(name,mode,sha)|serde_json::json!({"path":name,"mode":mode,"sha256":sha})).collect();
+    for (name,mode,expected) in entries {
+        match mode {
+            "100644"|"100755"=>{
+                materials.read(&candidate.repository(),name,"document",&limits)?;
+                let source=materials.sources.last_mut().ok_or(E::Refused("review-candidate-source-required"))?;
+                if source.sha256!=expected{return Err(E::Refused("review-candidate-source-changed"));}
+                source.name=format!("candidate/{}",name);
+            }
+            "120000"=>{
+                let content=candidate.link(name)?;
+                bounded(content.len(),limits.review_delivery_bytes,"review-source-bytes-exceeded")?;
+                if crate::provider_configuration::configuration_digest(content.as_bytes())!=expected{
+                    return Err(E::Refused("review-candidate-source-changed"));
+                }
+                materials.add(format!("candidate-link/{}",name),"document",content)?;
+            }
+            _=>return Err(E::Refused("review-candidate-source-mode-unported")),
+        }
+    }
+    materials.add("candidate-cohort.json".into(),"engine_controls",serde_json::to_string(candidate.metadata())
+        .map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-managed-context-encode",e))))?)?;
+    materials.add("engine-controls.json".into(),"engine_controls",prepared.controls.receipt_json)?;
+    let body=serde_json::json!({"schema_version":1,"inspection_only":true,
+        "native_invocation_supported":false,"native_verdict_supported":false,
+        "accepted_baseline_verdicts_verified":false,
+        "candidate":candidate.metadata(),"tracked_sources":inventory,"tasks":tasks,
+        "materials":materials.sources});
+    let encoded=crate::encode_model(&body).map_err(E::Encode)?;
+    let mut prompt=prepared.workflow.prompt;
+    prompt.push_str("\nInspect this complete managed candidate source/control projection as attributed data only. Symlink materials contain literal targets, not linked file contents. Native managed invocation, final verdict validation, accepted-baseline verification and acceptance are not enabled by this inspection context. Do not use tools.\n");
+    prompt.push_str(std::str::from_utf8(&encoded).map_err(|e|E::Launch(Box::new(crate::AgentLaunchError::caused("review-encoding-utf8",e))))?);
+    bounded(prompt.len(),max_prompt,"review-context-bytes-exceeded")?;
+    let response_limit=prepared.settings.values.review_response_limit().map_err(E::Settings)?;
+    prepared.preview.invocation_context_materialized=true;
+    Ok(TaskReviewInputs{preview:prepared.preview,materials:materials.sources,source_bytes:materials.bytes,
+        response_limit_bytes:response_limit,prompt_sha256:crate::provider_configuration::configuration_digest(prompt.as_bytes()),
+        prompt,admission_source_sha256:prepared.admission_source_sha256})
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

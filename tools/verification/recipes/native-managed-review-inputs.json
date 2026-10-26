@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "id": "native-managed-review-inputs",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/review_preview.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview/*.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/managed_repository*.rs",
+    "rust/crates/swarm-engine/src/project_context.rs",
+    "rust/crates/swarm-engine/src/context_policy.rs",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "tests/rust_native_managed_review_inputs.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_native_review_inputs.py",
+    "tests/rust_native_review_preview.py",
+    "tests/rust_native_task_validation_failures.py",
+    "tests/rust_native_managed_validation.py",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_managed_planning.py",
+    "tests/rust_native_reviewer.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "ordinary-inputs",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='review-inspection-ordinary-inputs-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_native_review_inputs.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=[]\nsubprocess.run(args,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS'\nprint('INSPECTION_ORDINARY_INPUTS_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INSPECTION_ORDINARY_INPUTS_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "ordinary-reviewer",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='review-inspection-ordinary-reviewer-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_native_reviewer.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE']]\nsubprocess.run(args,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS'\nprint('INSPECTION_ORDINARY_REVIEWER_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INSPECTION_ORDINARY_REVIEWER_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "managed-text",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='review-inspection-managed-text-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_native_managed_review_inputs.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE']]\nargs+=[]\nsubprocess.run(args,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS'\nassert len(r['checks'])==12 and not r['accepted'] and not r['reviewer_started']\nprint('INSPECTION_MANAGED_TEXT_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INSPECTION_MANAGED_TEXT_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "managed-nontext",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='review-inspection-managed-nontext-',dir='.cache')).resolve()/'flow'\nargs=['python3','tests/rust_native_managed_review_inputs.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)]\nargs+=['--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE']]\nargs+=['--binary-source']\nsubprocess.run(args,check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS'\nassert len(r['checks'])==4 and not r['accepted'] and not r['reviewer_started']\nprint('INSPECTION_MANAGED_NONTEXT_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "INSPECTION_MANAGED_NONTEXT_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

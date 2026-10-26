@@ -52,7 +52,7 @@ impl Origin {
     /// prepared source; `controls` any serializable controls document, hashed
     /// over its canonical model encoding; `candidate` optional 64-hex binding
     /// hash (ordinary producer uses `None`; schema3 readers require its full
-    /// candidate preimage, while actual S2 execution hookup remains pending). Errors:
+    /// candidate preimage, used by actual S2 execution and complete-slot recovery). Errors:
     /// `E::Refused` for invalid identifiers or hash shapes, typed serialization
     /// causes preserved otherwise. No defaults are applied.
     pub(super) fn new(

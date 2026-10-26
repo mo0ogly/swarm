@@ -20,6 +20,14 @@ pub(super) struct TrackedSource {
     sha256: String,
     executable: bool,
 }
+impl TrackedSource {
+    /// Return the retained tree mode and raw-byte digest for complete review
+    /// materialization. These are checkpoint data, not current file observations
+    /// or authority. The reader must compare actual bytes and retain custody.
+    pub(super) fn review_identity(&self) -> (&str, &str) {
+        (&self.mode, &self.sha256)
+    }
+}
 
 /// Walk normal tree path components with owned no-follow directory descriptors.
 /// Ordinary source parents may be 0755; no permissions are changed. Explicit
@@ -55,6 +63,18 @@ fn at_parent<T>(
                 .close()
                 .map_err(|e| E::caused("managed-source-parent-close", e)),
         )
+    })
+}
+
+/// Read a tracked link's literal UTF-8 target through owned no-follow parents,
+/// without traversing the target. The caller checks its checkpoint digest and
+/// aggregate context caps. IO/encoding and every parent-close cause survive;
+/// this grants no access to a linked file or protection from same-UID races.
+pub(super) fn review_link(copy: &LocalDirectory, path: &str) -> Result<String, E> {
+    at_parent(copy, path, |leaf| {
+        let target = std::fs::read_link(leaf).map_err(|e| E::caused("managed-review-link-read", e))?;
+        target.into_os_string().into_string()
+            .map_err(|_| E::Refused("managed-review-link-encoding"))
     })
 }
 
