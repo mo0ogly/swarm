@@ -7,6 +7,7 @@ mod live_events;
 mod otel;
 mod login;
 mod native_admin;
+mod native_preparation;
 mod transport;
 pub use transport::{NativeOutcomeObserver, NativeRequestError, NativeServerReport};
 mod observation;

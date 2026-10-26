@@ -8927,3 +8927,40 @@ assuming `bin/swarm.candidate-*` remains present. A moved path does not invalida
 checks already bound to identical bytes: verify the installed process, preserve
 the failure and resume. Binary identity establishes neither independent review
 nor global acceptance.
+
+### Manual preparation page connected to Rust
+
+`/prepare.html` reuses the existing preparation HTML body and design. The server
+embeds only native-journey dependencies and preparation-native.js; the cockpit
+link preserves language/theme. Reads, creation, save, method selection, brief
+adoption, question answers, validation and history use the CLI's shared API/writer.
+AI dialogue, sources, rich editing, templates and conversion remain unavailable
+on this page, with a visible explanation. No mission or agent is launched.
+
+```mermaid
+flowchart LR
+  P[Existing /prepare.html page] --> N[Manual native adapter]
+  N --> A[Session and CSRF protected API]
+  CLI[CLI prepare] --> W[Shared CAS and event writer]
+  A --> W
+  W --> D[(Atomic document, history and receipt)]
+  D --> N
+  N -->|uncertain reply| R[Replay the same event]
+  R --> A
+```
+
+Saving is explicit (button or Ctrl/Cmd+S outside dialogs), without a hidden delay.
+The initial method comes from saved settings through the writer. The displayed document cap comes from effective Admin settings. The writer also
+enforces the saved title cap and revalidates its current policy. No local4000-character answer cap remains. Older installations retain
+read access until required v42 writes/v43 policies are explicitly adopted/enabled
+through Admin; opening this page never silently migrates live settings.
+
+Refresh locks editing until the read finishes. Revision conflicts display base
+and current server text while retaining the local draft; keeping/replacing text
+requires an explicit choice. Incoherent JSON, network errors and uncertain server
+outcomes keep the original event for verification. Answers validate receipt
+identity/revision; historical recording requires explicit reload rather than
+minting repeated stale events. List failure after a confirmed write is reported
+as a read failure; optional metadata cannot block an accessible document. Local
+drafts remain downloadable after refusal. History uses the persisted cursor/page
+policy without a local50-row cutoff. Recipe: preparation-ui-rust.

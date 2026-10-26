@@ -11,6 +11,24 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — interface de préparation manuelle Rust,26 octobre
+Owner Codex ; page existante raccordée : créer/sauver/méthode/adopter/répondre/
+valider/historique, sans dialogue IA, conversion ou lancement implicites.
+Dev108 actif : SHA processus/ressources/profil vérifiés,472entrées effectives.
+Livraisons106/107 et leurs résultats conservés, traduction108 vérifiée séparément.
+105assertions navigateur sur108 : FR/EN, thèmes, mobile, CAS, rejeu, focus, Admin.
+35assertions réponses CLI/API sur105, producteurs inchangés ; portée conservée.
+16contrôles installés +14Version FR/EN +6lecture préparation PASS.
+Réglages41/missions pause50/469 conservés ; activation Admin explicite requise.
+Pas de plafond client périmé, autosave caché ou méthode locale imposée.
+GLM :3réponses SSE complètes,111577tokens déclarés ; revue statique bornée.
+Helper local --stream :13tests/3rejeux, copie Dremio synchronisée et ignorée.
+Preuves originales/contre-exemples conservés, aucune acceptation globale déduite.
+[Rapport/RETEX](PREPARATION-UI-20261026.md),
+[preuves/revue bornée](evidence/20261026-preparation-ui/README.md).
+Suite : conversion sans lancement sous politiques courantes ; Biba/SCALING/PAEA
+préservés, aucun commit/push dans ce lot.
+
 ## Livré localement — réponses au plan,26 octobre ; revue GLM ouverte
 Owner Codex ; dev95 actif,449 entrées qualifiées ; SHA processus = candidat testé.
 answer-questions CLI/API : réponses partielles, liste exacte/CAS/hash, historique et

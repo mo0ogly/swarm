@@ -1398,3 +1398,5 @@ Preparations: `preparation-writes-rust` now includes CLI/API method selection, r
 Preparations add public-plan-validation and atomic-plan-verdict; preparation-plan-upgrade-rust checks missing-v43 refusal, explicit Admin adoption and actual CLI cap consumption.
 
 Plan-question answers: `preparation-answers-rust`; set `SWARM_PREPARATION_WRITES_BINARY` to the qualified normal binary. CLI/API, CAS/hash, provenance, caps, rollback, replay and output recovery.
+
+Manual preparation UI: `preparation-ui-rust`, with `SWARM_PREPARATION_UI_BINARY` pointing to the frozen normal-profile binary. Browser FR/EN, themes, CAS, long answers, history, refusal and recovery.

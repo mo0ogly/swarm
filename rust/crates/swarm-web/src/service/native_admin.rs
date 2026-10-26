@@ -3,7 +3,7 @@ use super::{response, HttpReply, HttpServiceError};
 use http::{header::CONTENT_TYPE, HeaderValue, Method, Request, StatusCode};
 /// Exact private resource paths. Unknown/traversal-shaped paths never become IO.
 pub(super) fn owns(path: &str) -> bool {
-    matches!(path, "/" | "/native-runtime.html") || asset(path).is_some()
+    matches!(path, "/" | "/native-runtime.html" | "/prepare.html") || asset(path).is_some()
 }
 /// Read-only local browser responses may wait on existing slots; API/POST/body
 /// requests cannot use this classification to queue a Root operation.
@@ -14,6 +14,9 @@ pub(super) fn resource<B>(r: &Request<B>) -> bool {
 /// not a public directory, credential-bearing runtime file or external resource.
 fn asset(path: &str) -> Option<(&'static str, &'static [u8])> {
     match path {
+        "/preparation-native.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/preparation-native.js"))),
+        "/prephase-decisions.js" => Some(("application/javascript; charset=utf-8", include_bytes!("../../../../../web/prephase-decisions.js"))),
+        "/prephase.css" => Some(("text/css; charset=utf-8", include_bytes!("../../../../../web/prephase.css"))),
         "/paea.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea.html"))),
         "/paea-payment.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-payment.html"))),
         "/paea-compare.html"=>Some(("text/html; charset=utf-8",include_bytes!("../../../../../web/paea-compare.html"))),
@@ -171,6 +174,8 @@ pub(super) fn reply(r: &Request<Vec<u8>>) -> Result<HttpReply, HttpServiceError>
     }
     let (kind, bytes) = if r.uri().path() == "/" {
         ("text/html; charset=utf-8", cockpit_page(r)?)
+    } else if r.uri().path() == "/prepare.html" {
+        ("text/html; charset=utf-8", super::native_preparation::page(r)?)
     } else if r.uri().path() == "/native-runtime.html" {
         ("text/html; charset=utf-8", page(r)?)
     } else {

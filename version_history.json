@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Préparation manuelle raccordée au Rust : page existante, besoin/brief/plan, méthode, décisions, historique et conflits. Limites Admin effectives, reprise des reçus incertains ; dialogue IA et conversion restent indisponibles.",
+        "en": "Manual preparation connected to Rust: existing page, need/brief/plan, method, decisions, history and conflicts. Effective Admin limits and uncertain-receipt recovery; AI dialogue and conversion remain unavailable."
+      },
+      {
         "fr": "Prépublication gérée : contrôle explicite de l’avis natif, des originaux de contrôle et du candidat courant ; blocages de publication et de baseline affichés, sans acceptation ni nouvel appel.",
         "en": "Managed prepublication: explicit native-opinion, original-control and current-candidate checks; publication and baseline blockers remain visible, without acceptance or another call."
       },

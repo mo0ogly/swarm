@@ -9437,3 +9437,45 @@ privée vérifiée par SHA, jamais supposer que `bin/swarm.candidate-*` reste pr
 Un chemin disparu ne remet pas en cause des tests déjà liés aux mêmes octets ;
 vérifier le processus installé et préserver l’échec avant de reprendre. Cette
 identité ne constitue ni une revue indépendante ni une acceptation globale.
+
+### Page de préparation manuelle raccordée au Rust
+
+`/prepare.html` réutilise le corps HTML et la présentation de préparation existants.
+Le serveur embarque uniquement les dépendances du parcours natif et le contrôleur
+`preparation-native.js`. Le lien du cockpit conserve langue/thème. Les lectures,
+création, sauvegarde, sélection de méthode, adoption du brief, réponses aux questions,
+validation et historique utilisent les mêmes routes et writer que le CLI.
+Le dialogue IA, les sources, l’éditeur enrichi, les modèles et la conversion restent
+indisponibles sur cette page, avec une explication visible ; aucune mission lancée.
+
+```mermaid
+flowchart LR
+  P[Page existante /prepare.html] --> N[Adaptateur natif manuel]
+  N --> A[API protégée session et CSRF]
+  CLI[CLI prepare] --> W[Writer partagé CAS et événement]
+  A --> W
+  W --> D[(Document, historique et reçu atomiques)]
+  D --> N
+  N -->|réponse incertaine| R[Rejouer le même événement]
+  R --> A
+```
+
+L’enregistrement est explicite (bouton ou Ctrl/Cmd+S hors modale), sans délai
+caché. La méthode initiale vient du writer et des réglages persistés. L’interface
+affiche le plafond Admin effectif du document ; le writer applique aussi la limite
+du titre. Le serveur reste
+l’autorité sous sa configuration courante. Aucun plafond local4000 par réponse.
+Une ancienne installation reste en lecture tant que les écritures v42 et les
+politiques v43 requises ne sont pas adoptées/activées explicitement dans Admin.
+Aucun réglage vivant n’est migré silencieusement pour ouvrir la page.
+
+Une lecture d’actualisation verrouille les modifications jusqu’à sa fin. Les
+conflits de révision affichent texte de base et version courante tout en gardant
+le texte local ; conserver/remplacer est un choix explicite. Réponse JSON incohérente,
+échec réseau ou issue serveur incertaine garde l’événement initial pour vérification.
+Les décisions vérifient identité/révision avant d’accepter leur reçu ; un reçu
+historique exige une relecture explicite, sans nouvel événement créé en boucle.
+Les erreurs de liste après une écriture confirmée restent des erreurs de lecture,
+les métadonnées facultatives ne bloquent pas un document accessible. Les brouillons
+peuvent être téléchargés, y compris après un refus. Historique paginé selon la
+limite persistée, jamais un plafond local50. Recette : preparation-ui-rust.
