@@ -17,7 +17,9 @@
     "tests/paea_lab_runner_test.py",
     "schemas/paea/laboratory-report-v1.schema.json",
     "tools/verification/recipe.py",
-    "tools/verification/recipes/paea-pilot-lab.json"
+    "tools/verification/recipes/paea-pilot-lab.json",
+    "tools/paea/lab_evidence.py",
+    "tools/paea/verify_pilot.py"
   ],
   "environment": {
     "PYTHONDONTWRITEBYTECODE": "1"

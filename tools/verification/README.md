@@ -1587,3 +1587,45 @@ réels des trois producteurs sont contrôlés avant dérivation, et le helper re
 chaque inventaire appelant. Définir aussi `SWARM_PAEA_LAB_EVIDENCE` sur un dossier
 neuf pour la commande publique. Les deux échecs originaux restent conservés ;
 aucune qualification navigateur ou installation nouvelle n'est déduite.
+
+
+### PAEA retained evidence / Originaux de laboratoire (increment25)
+
+`recipes/paea-laboratory-evidence.json` first runs the actual public eight-case
+campaign/export/refusals, then eleven named companion-verifier regressions. Set
+the existing pinned `SWARM_PAEA_TEST_BINARY`/`SWARM_PAEA_TEST_BINARY_SHA256`,
+a fresh `SWARM_PAEA_LAB_EVIDENCE` campaign directory, and fresh
+`SWARM_PAEA_LAB_VERIFIER_EVIDENCE` retained fixture directory; parents must exist.
+The public LabCommand unittest summary is stderr, its campaign markers stdout;
+the new verifier test summary is also stderr. No global watchdog/retry/build.
+Keep the produced inventory digest separately, then use
+`python3 tools/paea/verify_pilot.py --campaign DIRECTORY --inventory-sha256 HASH`.
+No evidence argv is executed; originals unchanged, private recipe scratch removed.
+Report v1 unchanged. Missing/changed required raw streams refuse before export;
+exact recipe/observation membership is pinned afterwards. A newly forged bundle
+and new pin still cannot establish author/authority/oracle truth. Historical
+inventory-less proofs remain scoped to their original results.
+
+La recette exécute une vraie campagne puis onze tests nommés : contrôles valides,
+suppression/altération/ajout, liens/FIFO, JSON fermé, pins, erreur de publication
+et de sortie, reprise et contre-exemple d'authenticité. Aucun provider, Root vivant,
+nouvelle politique, compilation ou redémarrage. Les limites/reprise et résultats
+FR/EN figurent dans l'incrément25 ; inventaires dérivés complétés dans le même lot.
+
+
+Increment25 result: final recipe two steps/eleven verifier tests and actual inner
+eight-case campaign PASS/VERIFIED;68CLI checks,1020observation/10recipe files bound
+by197v2call records. Derived single-step24early-release guard PASS/VERIFIED on the
+changed recorder. Missing raw oracle refuses before export. Pre-publication faults
+leave no new report; post-publication IO may leave complete files, so producer
+emits artifact UNKNOWN plus expected inventory hash and a verification action.
+Retained-copy replay checks that consumer, not another actual campaign. Inventory
+membership concerns regular files; no permission/empty-directory/oracle-truth claim.
+Both original reproductions and initial PASS retained. FR/EN results/RETEX25 keep
+the forged-new-pin counterexample and protected authority/E2/E3 limitations.
+
+Résultat25 : deux étapes, onze tests et campagne huit cas PASS/VERIFIED ;68appels
+CLI. Erreur après publication ne signifie pas absence de rapport : UNKNOWN,
+empreinte attendue et vérification du dossier conservé. Garde24requalifiée sur
+l'enregistreur modifié. Aucune authenticité, installation serveur ou acceptation
+protégée déduite ; documents et preuves historiques conservés.

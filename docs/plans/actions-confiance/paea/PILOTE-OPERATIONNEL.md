@@ -195,3 +195,21 @@ les huit IDs de rapport sont inchangés, leurs empreintes distinguent les runs.
 vérification qui doit faire échouer le test ; ne pas l'utiliser pour une campagne
 normale. Les verrous de fixture ne protègent pas contre un auteur du même UID.
 [Résultats, revue et limites](INCREMENT-24.md).
+
+
+### Originaux liés — incrément25
+
+`run_pilot.py` produit aussi `paea-lab-evidence.json` et annonce son SHA256 à
+conserver séparément. Les appels v2 lient chaque entrée/flux original ; une sortie
+d'oracle obligatoire absente refuse l'export avant publication. Rapport v1 inchangé.
+
+```sh
+python3 tools/paea/verify_pilot.py --campaign /DOSSIER/CAMPAGNE --inventory-sha256 EMPREINTE_CONSERVEE
+```
+
+Vérifie rapport, recette et membership/hashes exacts des sous-arbres recipe et
+observations ; liens, FIFO, chemins traversants et mutations refusés. Ne rejoue
+aucun argv. Originaux intacts, copie temporaire privée de recette retirée. Un pin
+ne prouve ni auteur ni vérité de l'oracle ; tout réécrire et fournir un nouveau
+pin reste possible au même UID. Historiques sans inventaire non réécrits ; aucune
+garantie protégée ajoutée. [Contrat, preuves et limites](INCREMENT-25.md).

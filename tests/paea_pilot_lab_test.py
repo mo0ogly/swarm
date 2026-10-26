@@ -42,23 +42,38 @@ class PilotLab(unittest.TestCase):
             raise ValueError('existing-binary-changed-during-run')
         print('PAEA_PILOT_BINARY_STABLE ' + cls.binary_hash, flush=True)
 
-    def run_process(self, command, raw=None, stdout=None):
+    def run_process(self, command, raw=None, stdout=None, files=()):
         """Capture exact argv/input/stdout/stderr/exit without retry or watchdog.
 
         Optional stdout is an explicit fault sink such as /dev/full; its absence
         of captured bytes is recorded rather than replaced with fabricated output.
-        Every numbered file is new. Failure evidence survives an assertion error.
+        Every numbered file is new. File inputs are copied before execution and
+        checked unchanged afterwards; v2 records hash every retained stream/input.
+        Failure evidence survives an assertion error.
         """
         type(self).sequence += 1
         prefix = self.out / ('call-%04d' % self.sequence)
+        file_inputs = [(Path(path), Path(path).read_bytes()) for path in files]
         result = subprocess.run([str(v) for v in command], input=raw,
                                 stdout=stdout if stdout is not None else subprocess.PIPE,
                                 stderr=subprocess.PIPE)
+        artifacts = {}
         for suffix, value in (('input', raw), ('stdout', result.stdout), ('stderr', result.stderr)):
             if value is not None:
-                Path(str(prefix) + '.' + suffix).write_bytes(value)
-        self.calls.append({'id': self.sequence, 'argv': [str(v) for v in command],
-                           'exit': result.returncode, 'stdout_fault': stdout is not None})
+                target = Path(str(prefix) + '.' + suffix)
+                target.write_bytes(value)
+                artifacts[target.name] = hashlib.sha256(value).hexdigest()
+        input_names = []
+        for index, (path, value) in enumerate(file_inputs, 1):
+            target = Path(str(prefix) + '.file-%04d.input' % index)
+            target.write_bytes(value)
+            input_names.append(target.name)
+            artifacts[target.name] = hashlib.sha256(value).hexdigest()
+        self.calls.append({'recording_version': 2, 'id': self.sequence, 'argv': [str(v) for v in command],
+                           'exit': result.returncode, 'stdout_fault': stdout is not None,
+                           'input_supplied': raw is not None, 'input_files': input_names, 'artifacts': artifacts})
+        for path, value in file_inputs:
+            self.assertEqual(path.read_bytes(), value, 'fixture input file changed during subprocess')
         return result
 
     def prepare(self, domain):
@@ -92,7 +107,7 @@ class PilotLab(unittest.TestCase):
         command = [sys.executable, ROOT / 'tools/paea/pilot_lab.py', root, name]
         if fault:
             command.append('--fault-after-effect')
-        return self.run_process(command, stdout=stdout)
+        return self.run_process(command, stdout=stdout, files=(name,))
 
     def oracle(self, root, domain, available=True):
         """Read raw sink state in a separate process; never consult replies/decision logs."""
@@ -326,7 +341,7 @@ class PilotLab(unittest.TestCase):
             right = root / 'request.json'
             left.write_text(json.dumps(registry))
             right.write_text(json.dumps(request))
-            result = self.run_process([self.binary, 'protection', 'resolve-payment', left, right, '--json'])
+            result = self.run_process([self.binary, 'protection', 'resolve-payment', left, right, '--json'], files=(left, right))
             self.assertEqual(result.returncode, 0, result.stderr)
             value = json.loads(result.stdout)
             self.assertEqual(value['registry_sha256'], hashlib.sha256(left.read_bytes()).hexdigest())

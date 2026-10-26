@@ -17,17 +17,20 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from tools.verification.recipe import run_recipe, verify_evidence, publish
 
-# The eight named cases are the maintained recipe's test contract, not a policy cap.
-CASES = (
-    'test_t04_substitution_then_equivalent_json_recovery',
-    'test_t06_t21_crash_new_attempt_exact_marker_and_reconciliation',
-    'test_t05_t17_ordered_revocation_first_use_and_opposite_order',
-    'test_unavailable_oracle_stays_unknown_then_recovers_without_creation',
-    'test_git_stale_and_symbolic_target_refuse_then_recover',
-    'test_output_failure_after_effect_is_unknown_and_reconciles',
-    'test_invoice_alias_is_a_counterexample_without_authoritative_registry',
-    'test_resolved_invoice_aliases_converge_on_one_effect',
-)
+# Keep historical imports of CASES compatible with the v1 report producer.
+from tools.paea.lab_evidence import CASES, INVENTORY, collect
+
+
+class PublicationUnknown(RuntimeError):
+    """Artifact publication failed with potentially complete files; preserve originals.
+
+    The expected inventory digest is known before either exclusive publication.
+    It permits checking retained files after failure, not author authentication.
+    """
+    def __init__(self, inventory_sha256):
+        """Retain the expected digest and a safe static diagnostic; cause is chained."""
+        super().__init__('laboratory-report-publication-uncertain')
+        self.inventory_sha256 = inventory_sha256
 
 
 def digest(raw):
@@ -40,8 +43,12 @@ def export_report(evidence, observations, binary_hash):
 
     Require all eight named tests and nonempty captured calls. Hash the exact
     retained recipe result, source inventory and call index, without leaking local
-    paths into the portable report. Failed/missing/corrupt evidence raises; no
-    report is published. Integrity is local and never establishes independence.
+    paths into the portable report. Invalid evidence refuses before publication.
+    Integrity is local and never establishes independence. Recorded v2 call artifacts
+    must exist with exact hashes before the inventory/report are published. The
+    inventory precedes the report. IO failure may leave an incomplete OR fully
+    published bundle: PublicationUnknown retains its expected digest and cause.
+    A caller must verify retained bytes; no signature or durability is established.
     """
     if not re.fullmatch('[a-f0-9]{64}', binary_hash):
         raise ValueError('laboratory-binary-hash-invalid')
@@ -66,7 +73,15 @@ def export_report(evidence, observations, binary_hash):
         authority='simulated', isolation='same-uid', independent_evaluation='not-established',
         protected_invariants='not-established')
     raw = (json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode()
-    publish(evidence.parent / 'paea-lab-report.json', raw)
+    if observations.resolve() != (evidence.parent / 'observations').resolve():
+        raise ValueError('laboratory-observation-root-mismatch')
+    inventory = collect(evidence.parent, raw)
+    inventory_raw = (json.dumps(inventory, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
+    try:
+        publish(evidence.parent / INVENTORY, inventory_raw)
+        publish(evidence.parent / 'paea-lab-report.json', raw)
+    except OSError as error:
+        raise PublicationUnknown(digest(inventory_raw)) from error
     return value
 
 
@@ -75,7 +90,8 @@ def main():
 
     Output must be a new directory outside live .swarm/.git state and outside the
     source trees. Existing files remain untouched. Partial failures retain their
-    evidence; resume with corrected prerequisites and another fresh directory.
+    evidence. Artifact publication UNKNOWN requires checking the retained bundle
+    with its expected digest; correct prerequisites before a fresh execution.
     Environment changes affect this command and its children only.
     """
     parser = argparse.ArgumentParser(description=__doc__)
@@ -100,8 +116,15 @@ def main():
             raise ValueError('laboratory-binary-changed')
         report = export_report(output / 'recipe', output / 'observations', args.sha256)
         print(json.dumps({'status': 'PASS', 'tests': len(report['tests']), 'report': str(output / 'paea-lab-report.json'),
-                          'integrity': 'VERIFIED', 'protected_invariants': 'not-established'}))
+                          'integrity': 'VERIFIED', 'protected_invariants': 'not-established',
+                          'evidence_inventory': str(output / INVENTORY),
+                          'evidence_inventory_sha256': digest((output / INVENTORY).read_bytes())}))
         return 0
+    except PublicationUnknown as error:
+        print(json.dumps({'status': 'UNKNOWN', 'scope': 'laboratory-report-publication',
+                          'cause': str(error), 'expected_inventory_sha256': error.inventory_sha256,
+                          'next': 'verify-retained-bundle-before-new-execution'}), file=sys.stderr, flush=True)
+        return 2
     except Exception as error:
         print(json.dumps({'status': 'REFUSED', 'cause': str(error), 'type': type(error).__name__}), file=sys.stderr)
         return 2

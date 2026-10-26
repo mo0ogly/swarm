@@ -22,7 +22,9 @@
     "rust/crates/swarm-protection-contract/src/*.rs",
     "rust/crates/swarm-cli/src/protection.rs",
     "tests/fixtures/paea/payment-*.json",
-    "tests/helpers/paea_pilot_contention.py"
+    "tests/helpers/paea_pilot_contention.py",
+    "tools/paea/lab_evidence.py",
+    "tools/paea/verify_pilot.py"
   ],
   "environment": {
     "PYTHONDONTWRITEBYTECODE": "1"

@@ -541,3 +541,21 @@ service dev112 observé séparément, sans intervention de cette tranche. Défau
 de flux des recettes corrigés et originaux conservés ; inventaires dérivés
 complétés, navigateur inchangé/non rejoué. [Revue/RETEX24](paea/INCREMENT-24.md).
 0/17 invariants protégés, IA3/AC-02, humains, E2/E3 et programme final ouverts.
+
+
+### Incrément25 — intégrité des originaux de laboratoire
+
+Commit24 `079635b29`,14 fichiers,108 entrées préparées étrangères conservées.
+[Tranche25](paea/INCREMENT-25.md) : PAEA-EVIDENCE-25 reproduit sur copie (oracle
+supprimé, ancien export encore possible), index v2 et inventaire explicitement
+épinglé avec vérification des originaux. Rapport v1 conservé, aucune authenticité
+ou protection nouvelle déduite. Résultats après recette ; programme ouvert.
+
+
+Tranche25 vérifiée : huit tests d'effets, onze régressions/68appels de vérificateur,
+1020fichiers d'observation et10de recette liés, index197appels v2. Recettes finales
+et garde de contention24 PASS/VERIFIED. Oracle manquant refusé avant export,
+publication incertaine exposée UNKNOWN avec pin attendu et reprise vérifiée.
+Contre-exemple nouveau pin forgé conservé ; autorité simulée/0sur17protégés,
+IA3/AC-02/humains/E2/E3/RETEX global ouverts. [Revue/limites25](paea/INCREMENT-25.md).
+Outillage du checkout, rapport v1/serveur inchangés ; aucun build/install/commit/push.

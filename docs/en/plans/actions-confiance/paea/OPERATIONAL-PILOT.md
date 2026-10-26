@@ -187,3 +187,21 @@ full recipe `paea-pilot-lab.json`; eight report IDs unchanged, hashes distinguis
 runs. `SWARM_PAEA_CONTENTION_FAULT=early-release` is a verification-only substitution
 that must fail the test, never a normal campaign mode. Fixture locks do not protect
 against a writer sharing the same UID. [Results, review and limits](INCREMENT-24.md).
+
+
+### Bound originals — increment25
+
+`run_pilot.py` additionally publishes `paea-lab-evidence.json` and its SHA256 to
+retain separately. V2 calls bind original input/output files; a missing required
+oracle output refuses export before publication. Report v1 stays unchanged.
+
+```sh
+python3 tools/paea/verify_pilot.py --campaign /CAMPAIGN/DIRECTORY --inventory-sha256 RETAINED_HASH
+```
+
+Checks report/recipe and exact recipe/observation tree membership/hashes. Links,
+FIFO, traversal and changes refuse; recorded argv is never executed. Originals
+unchanged, private temporary recipe copy removed. A pin authenticates neither
+author nor truthful oracle; a same-UID writer can rewrite everything and supply
+a new pin. Historical inventory-less campaigns stay unchanged; no additional
+protected guarantee. [Contract, results and limits](INCREMENT-25.md).

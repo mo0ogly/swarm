@@ -7,6 +7,7 @@ no hook, retry, timeout or protected authority is added to the delivered engine.
 """
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 import json
+import hashlib
 import multiprocessing
 from multiprocessing.connection import wait
 import os
@@ -121,7 +122,7 @@ def operation(case, root, doc, kind, pause=True, early_release=False):
     Yield (process, pipe, prefix) after start. Always abort/reap this child on
     assertion failure, without signalling another process. An unfinished gate is
     aborted rather than released, preserving no-effect failure. Original worker
-    output and the observed process exit survive failures. No global timeout.
+    output/document hashes and the observed process exit survive failures. No global timeout.
     """
     case_type = type(case)
     case_type.sequence += 1
@@ -131,7 +132,7 @@ def operation(case, root, doc, kind, pause=True, early_release=False):
     context = multiprocessing.get_context('spawn')
     parent, child = context.Pipe()
     process = context.Process(target=worker, args=(child, root, document, kind, pause, early_release, prefix))
-    entry = {'id': case.sequence, 'fixture_worker': __file__, 'operation': kind,
+    entry = {'recording_version': 2, 'id': case.sequence, 'fixture_worker': __file__, 'operation': kind,
              'document': str(document), 'pause': pause, 'early_release_fault': early_release,
              'events': []}
     case.calls.append(entry)
@@ -154,6 +155,13 @@ def operation(case, root, doc, kind, pause=True, early_release=False):
             parent.close()
             entry['exit'] = process.exitcode
             process.close()
+            entry['artifacts'] = {}
+            for suffix in ('.stdout', '.stderr', '.document.json'):
+                artifact = Path(str(prefix) + suffix)
+                if artifact.is_file():
+                    entry['artifacts'][artifact.name] = hashlib.sha256(artifact.read_bytes()).hexdigest()
+                else:
+                    entry.setdefault('artifact_errors', []).append('missing-' + suffix)
         else:
             parent.close()
 

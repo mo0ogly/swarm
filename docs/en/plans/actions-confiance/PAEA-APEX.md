@@ -507,3 +507,21 @@ dev112 observed separately, without intervention by this slice. Recipe stream
 defects corrected/originals retained, derived inventories completed; unchanged
 browser not replayed. [Review/slice RETEX24](paea/INCREMENT-24.md). Protected
 0/17 invariants, IA3/AC-02, humans, E2/E3 and final programme remain open.
+
+
+### Increment25 — original laboratory evidence integrity
+
+Commit24 `079635b29`,14 files,108 foreign staged paths preserved.
+[Slice25](paea/INCREMENT-25.md): reproduced PAEA-EVIDENCE-25 on a copy (deleted
+oracle, old export still possible); v2 call index and explicitly pinned inventory
+with original-file verification. Keep report v1, no inferred authenticity or new
+protection. Results pending recipe; programme remains open.
+
+
+Slice25 verified: eight effect tests, eleven verifier regressions/68CLI checks,
+1020observation and10recipe files bound,197v2calls. Final recipes and24contention
+guard PASS/VERIFIED. Missing oracle refuses export; publication uncertainty is
+UNKNOWN with expected pin and verified recovery. Forged-new-pin counterexample
+retained; simulated authority/0of17protected, IA3/AC-02/humans/E2/E3/final RETEX
+remain open. [Review/limits25](paea/INCREMENT-25.md). Checkout tooling, report v1
+and server unchanged; no build/install/commit/push.
