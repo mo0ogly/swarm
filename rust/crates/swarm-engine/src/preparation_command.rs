@@ -1,4 +1,4 @@
-//! Bounded Go-compatible create/save/method intent; no authority or persistence.
+//! Bounded Go-compatible create/save/method/adopt-brief intent; no authority or persistence.
 use crate::model_wire::{Fields, Kind};
 use serde::{Deserialize, Serialize};
 /// Supported draft intention. expected_revision is required/non-null. Action and
@@ -70,7 +70,8 @@ pub(crate) fn decode(raw: &[u8]) -> Result<PreparationCommand, crate::WorkError>
     crate::work::decode_mode(raw, shape(), true)
 }
 /// Verify identity, revision and action-specific fields using supplied byte caps.
-/// Null caps mean unlimited; no fallback, truncation, provider call or adoption.
+/// Null caps mean unlimited; no fallback, truncation, provider call or mutation.
+/// Only adopt-brief accepts sha256; its freshness is checked by the writer.
 pub(crate) fn validate(
     r: &PreparationCommand,
     document_cap: Option<usize>,
@@ -84,7 +85,7 @@ pub(crate) fn validate(
         || r.expected_work_revision.is_some()
         || r.decisions.is_some()
         || !r.turn_id.is_empty()
-        || !r.sha256.is_empty()
+        || (r.action != "adopt-brief" && !r.sha256.is_empty())
         || r.version != 1
         || !key(&r.event_id)
         || r.expected_revision.is_none_or(|n| n < 0)
@@ -115,6 +116,16 @@ pub(crate) fn validate(
             if key(&r.preparation_id)
                 && r.work_id.is_empty()
                 && r.title.is_empty()
+                && r.document.is_empty()
+                && r.text.is_empty() =>
+        {
+            Ok(())
+        }
+        "adopt-brief"
+            if key(&r.preparation_id)
+                && r.work_id.is_empty()
+                && r.title.is_empty()
+                && r.method.is_empty()
                 && r.document.is_empty()
                 && r.text.is_empty() =>
         {

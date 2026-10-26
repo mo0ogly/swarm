@@ -1,4 +1,4 @@
-//! Transactional draft creation/save/method selection, without plan adoption or agent execution.
+//! Transactional draft creation/save/method selection and explicit brief adoption, without plan adoption or agent execution.
 use super::{
     finished,
     preparation_read::{cause, stored},
@@ -17,7 +17,9 @@ fn encode(value: &impl serde::Serialize) -> Result<Vec<u8>, E> {
 /// a document. Every staged row is read back before commit; triggers/corruption,
 /// stale CAS and conflicting events refuse the entire transaction. Current
 /// receipts must equal stored content before projection; historical receipts
-/// have no corresponding current-content witness. No adoption or OS confinement.
+/// have no corresponding current-content witness. Brief adoption copies only
+/// the current nonblank document matching the requested hash and need hash. It
+/// appends no history; plan approval and OS confinement are not established.
 fn apply(
     root: &RootStore,
     db: &Connection,
@@ -120,6 +122,21 @@ fn apply(
         }
         causes.extend(observed.causes);
     }
+    if r.action == "adopt-brief" {
+        let documents = p.documents.as_ref();
+        let brief = documents.and_then(|d| d.get("brief"))
+            .ok_or(E::Refused("preparation-stale-document"))?;
+        if crate::text::trim_space(&brief.text).is_empty()
+            || r.sha256.is_empty() || r.sha256 != brief.sha256 {
+            return Err(E::Refused("preparation-stale-document"));
+        }
+        let need_hash = documents.and_then(|d| d.get("besoin"))
+            .map_or("", |d| d.sha256.as_str());
+        if brief.need_hash != need_hash {
+            return Err(E::Refused("preparation-stale-brief"));
+        }
+        p.adopted_brief = Some(Box::new(brief.clone()));
+    }
     let mut document = None;
     if r.action == "save" || !r.text.is_empty() {
         let kind = if r.action == "create" {
@@ -218,7 +235,7 @@ fn apply(
 }
 
 impl RootStore {
-    /// Create/save/select a draft method or replay its immutable event receipt on this opened
+    /// Create/save/select a method/adopt a brief or replay its immutable event receipt on this opened
     /// Root. Requires writable Root, complete enabled saved v42 policy, bounded
     /// valid request and exact revision. Stable settings and retained physical
     /// Root association guard an immediate transaction. Original rollback/commit,
@@ -229,7 +246,11 @@ impl RootStore {
     /// Method selection requires an explicit available method, updates its hash,
     /// preserves documents/history and clears approval, even when selecting the
     /// same method. Missing/unsafe sources refuse without mutation.
-    /// No provider, mission start, conversion or plan acceptance occurs.
+    /// Brief adoption requires its exact hash and unchanged need, copies the
+    /// document without rewriting history and clears any verdict. It attests no
+    /// named human identity. Missing/blank/mismatched brief and changed need
+    /// refuse with stale-document/stale-brief and no mutation; replay precedes
+    /// freshness checks. No provider, mission start, conversion or plan acceptance occurs.
     pub fn preparation_command<W: WorkEnvironment>(
         &self,
         raw: &[u8],

@@ -73,6 +73,22 @@
       "required_stderr": []
     },
     {
+      "id": "public-brief-adoption",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-adoption-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_adoption.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_ADOPTION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_ADOPTION_PASS",
+        "PASS adopt-exact-current-brief",
+        "PASS adopt-http-stale-need",
+        "PASS adopt-output-failure-retains-receipt"
+      ],
+      "required_stderr": []
+    },
+    {
       "id": "historical-preparation-key-contract",
       "command": [
         "python3",
@@ -103,9 +119,10 @@
       "expected_exit": 0,
       "required_stdout": [
         "preparation_child_insert_failure_rolls_back_and_same_event_recovers ... ok",
-        "3 passed; 0 failed;",
+        "4 passed; 0 failed;",
         "preparation_current_receipt_content_must_match_stored_state ... ok",
-        "preparation_method_receipt_failure_rolls_back_and_recovers ... ok"
+        "preparation_method_receipt_failure_rolls_back_and_recovers ... ok",
+        "preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers ... ok"
       ],
       "required_stderr": []
     }

@@ -500,3 +500,31 @@ Admin reste applicable aussi aux rejeux. Une erreur de source conserve sa cause 
 le consommateur reçoit un refus sûr, sans texte privé. Recette permanente
 `preparation-writes-rust`, étape `public-preparation-method`. Ce parcours CLI/API
 ne prouve pas un raccordement de l’éditeur graphique des préparations.
+
+### Adoption explicite du brief en Rust
+
+`prepare adopt-brief ID --root ROOT --input intention.json --json` et le POST
+protégé `/api/v1/preparations/command` partagent le writer. Exemple d’intention :
+`{"version":1,"action":"adopt-brief","preparation_id":"prep-ID","event_id":"adopt-1","expected_revision":3,"sha256":"EMPREINTE_DU_BRIEF_COURANT"}`.
+Récupérer ID, révision et empreinte avec `prepare show ID --root ROOT --json` ;
+ces valeurs d’exemple ne sont pas une intention exécutable sur une préparation réelle.
+
+Un brief absent, vide après suppression des espaces Unicode Go, une empreinte
+vide ou différente refuse `preparation-stale-document` ; un need_hash différent
+du besoin courant refuse `preparation-stale-brief`. CLI : exit2 ; HTTP :409.
+CAS et événement restent les conflits CLI3/HTTP409 habituels. Aucun refus
+n’ajoute de reçu ni ne modifie le stockage. Un événement refusé peut être repris
+après correction à partir d’une nouvelle observation ; un reçu enregistré exige
+au contraire la même intention pour son rejeu. Le rejeu exact précède la nouvelle
+vérification du besoin et reste historique si la préparation a avancé.
+
+Le succès copie le brief exact vers adopted_brief, incrémente la révision et
+retire verdict/plan_ready. Aucun document/historique n’est réécrit ; le plan déjà
+enregistré ne reçoit pas automatiquement le nouveau brief_hash. L’absence de
+besoin reste compatible Go : deux empreintes de besoin absentes sont égales.
+Cela ne prouve pas un cadrage complet. L’interrupteur Admin s’applique aussi
+aux rejeux ; la limite de texte soumis ne rétroagit pas sur un brief déjà stocké.
+L’adoption n’atteste aucune identité humaine nommée et ne valide pas le plan,
+ne réserve pas de budget et ne lance aucune mission. La recette permanente
+preparation-writes-rust contient le parcours public-brief-adoption et sa reprise.
+L’éditeur graphique des préparations et les transitions suivantes restent ouverts.

@@ -1,0 +1,191 @@
+{
+  "kind": "scoped-semantic-review-not-global-qualification",
+  "reviewer": "Codex principal",
+  "entries": [
+    {
+      "path": "rust/crates/swarm-engine/src/preparation_command.rs",
+      "sha256": "03946d8d5165a34398ca7e0b7c5e117b17c06b0cfb44b60471584d07b35eb5cd",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Changed adoption contract: validate only adopt-brief accepts sha256; apply checks nonblank/current hash and need hash, clones Box document; generic revision/verdict/receipt transaction preserved. CLI execute/write and HTTP capability/status changes reviewed. No provider/mission/plan acceptance.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+      "sha256": "daeb6dfe0ffc55cf692c60309ae2db9befb85b9e285faf3c54b66b8f2b479d90",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Changed adoption contract: validate only adopt-brief accepts sha256; apply checks nonblank/current hash and need hash, clones Box document; generic revision/verdict/receipt transaction preserved. CLI execute/write and HTTP capability/status changes reviewed. No provider/mission/plan acceptance.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/preparation.rs",
+      "sha256": "06c848ea5c60920b0bfe42912ff99c0ff47b5a2321d6fc88440a0622495bedb6",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Changed adoption contract: validate only adopt-brief accepts sha256; apply checks nonblank/current hash and need hash, clones Box document; generic revision/verdict/receipt transaction preserved. CLI execute/write and HTTP capability/status changes reviewed. No provider/mission/plan acceptance.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-cli/src/lib.rs",
+      "sha256": "c0c7f506861705a9adde550fadf2116a3ac710b99a7c820bd85724a5aa01a42d",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Changed adoption contract: validate only adopt-brief accepts sha256; apply checks nonblank/current hash and need hash, clones Box document; generic revision/verdict/receipt transaction preserved. CLI execute/write and HTTP capability/status changes reviewed. No provider/mission/plan acceptance.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service/preparations.rs",
+      "sha256": "f0524caeb5437bae5e05fe4ae0f216e378b63be447cfc2bedbbad168f8ecec3d",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Changed adoption contract: validate only adopt-brief accepts sha256; apply checks nonblank/current hash and need hash, clones Box document; generic revision/verdict/receipt transaction preserved. CLI execute/write and HTTP capability/status changes reviewed. No provider/mission/plan acceptance.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-web/src/service.rs",
+      "sha256": "f8c6b8053458dcda00be5afc6f1af4e00e525bbda86c17edb12c99862c7dcbd1",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Changed adoption contract: validate only adopt-brief accepts sha256; apply checks nonblank/current hash and need hash, clones Box document; generic revision/verdict/receipt transaction preserved. CLI execute/write and HTTP capability/status changes reviewed. No provider/mission/plan acceptance.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "tests/rust_preparation_adoption.py",
+      "sha256": "557e1645f13ea6c37ea6e0d9d5160d0a361cf128fa3a089b507824343e57c643",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "Fixture inputs only; document cap0 explicitly set through supported Admin config for witness, then restored. No global watchdog, provider or live Root writes.",
+        "functions": "main/check/save/intent/refused: explicit owned Root, exact named checks and safe fixture SQL only for seeded verdict. Public adapter identity precedes engine schema; invalid ID tested separately through API.",
+        "errors": "Original before/compile/fixture failures retained. CLI refusals assert full SQL dump unchanged; API status/code checked. /dev/full injection follows valid same-cap control and requires known receipt metadata plus replay. Owned server always finished.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "tools/verification/recipes/preparation-writes-rust.json",
+      "sha256": "ed84d32b8e21febc33f97ceb63254dbf2fb5f6950358565e3707f741c8995d87",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "version_history.json",
+      "sha256": "c7b0644aa3008144500dd193f83add34076935f2f5474b631451ea1f29b203fe",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "docs/architecture/RUST-MIGRATION.md",
+      "sha256": "576234cbfc4536d49c1729f54cbbf759b6820a87fbb74985259736e3e7642103",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION.md",
+      "sha256": "b6d9d5ae4d3ae88c2305a8dab265ef47f108c79ca1aac50c0d34c0051ce7de25",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "docs/RUNTIME-RECOVERY.md",
+      "sha256": "b2f64333646d9253148eae0778db12238a0a9addcdbc9194e559d93faa649489",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "docs/en/RUNTIME-RECOVERY.md",
+      "sha256": "3452d7e3e0f4dd1751413b142c5d69145b4d2f719aed0d8f442afa68eab2ce57",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "docs/plans/migration-rust/REPLAYS.md",
+      "sha256": "eed5fa211f4692617715da9306d909b03f29cc3875c7739f37c035e737f063fb",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "docs/en/RUST-MIGRATION-REPLAYS.md",
+      "sha256": "268cebd55653e8f491bea7ae33508ce5c2719a557f28099ec3c8a4ec386112d4",
+      "scope": "brief adoption delta only; concurrent unrelated hunks excluded",
+      "axes": {
+        "policies": "No new operator policy. Existing saved write switch/input caps/retry/root binding reused. Version1, action/hash equality, revisions and HTTP/CLI codes are protocol. Null/unlimited remains existing policy.",
+        "functions": "Documentation/configuration only in this file; recipe adds one public test command and named assertions. No operator defaults are changed.",
+        "errors": "Missing/blank/mismatched brief and stale need refuse before writes; failed requests produce no receipt. CAS/event logic and immutable receipt-first replay unchanged. Actual rollback/commit/close/output errors retain existing cause/recorded_preparation matrix.",
+        "documentation": "Rustdoc, CLI FR/EN help, FR/EN migration/recovery and permanent recipe agree. Named-human validation, graphical editor and plan acceptance remain unestablished."
+      }
+    },
+    {
+      "path": "rust/crates/swarm-engine/tests/preparation_writes.rs",
+      "sha256": "ee8def0d18aa804235b450e908db827cefd88ce7b6a01fbfcbff7f20c36dd5e4",
+      "scope": "new adopt-brief SDK test only",
+      "axes": {
+        "policies": "Owned test IDs, revisions, trigger and fixture verdict are test inputs. No provider, timeout, policy cap or live datastore.",
+        "functions": "preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers: valid actual adoption control, later brief, stored historical verdict, trigger failure, full observation/counters unchanged, trigger removed, identical event succeeds once and replays after reopen.",
+        "errors": "Requires storage error without private trigger text or known committed receipt on rollback; preserves adopted previous brief through full-state equality, revision/verdict/documents and history row counts. No success by exit alone.",
+        "documentation": "GLM-proposed Rustdoc updated for actual positive witness and no plan acceptance. Recipe explicitly requires named test and four SDK cases."
+      }
+    }
+  ],
+  "lexical_candidates": "private lexical-candidates.json; candidates are prompts, not guarantees",
+  "independent_review": "glm-assessment.json: tool-free GLM5.2 static review; Box line fixed using compiler proof; SDK proposal adapted with valid control. No independent runtime acceptance.",
+  "binary_sha256": "ce0247f01d6dc42c99da5d9510ad70bb70e16f71c9430eeeb5fc5b283947fc53",
+  "effective_input_count": 443,
+  "qualified_build": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/local-delivery/rust-yhg96hld",
+  "delivery_binary_sha256": "d98fbaa4aa6f65c0a80bfbb06bc3515f602ed84b774c516a9579c31c07d05446",
+  "delivered_version": "v0.1.1-dev.87",
+  "effective_inputs_match_tested_binary": true,
+  "additional_proof": "profile-reuse.json and installed-journey/result.json"
+}

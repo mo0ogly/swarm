@@ -1,4 +1,4 @@
-//! Protected preparation reads and draft create/save/method selection; no dialogue or adoption.
+//! Protected preparation reads and draft create/save/method selection/brief adoption; no dialogue or plan approval.
 use super::{close, root, HttpServiceError as E, NativeHttpService, RouteBody};
 use http::{Method, Request};
 use serde::Serialize;
@@ -68,10 +68,10 @@ impl NativeHttpService {
 }
 
 impl NativeHttpService {
-    /// Protected POST draft creation/save/method command through the same writer as CLI. Shared
+    /// Protected POST draft creation/save/method/brief-adoption command through the same writer as CLI. Shared
     /// transport bounds, session/CSRF and owned Root binding apply before writes.
     /// Close before responding; exact known receipt survives encoding/close and
-    /// later owner-observer delivery failures. No provider/adoption is exposed.
+    /// later owner-observer delivery failures. No provider or plan approval is exposed.
     pub(super) fn preparation_command(&self,request:&Request<Vec<u8>>)->Result<RouteBody,E>{
         if request.method()!=Method::POST{return Err(E::Method("POST"));}
         if request.uri().query().is_some(){return Err(E::Refused("preparation-query-invalid"));}

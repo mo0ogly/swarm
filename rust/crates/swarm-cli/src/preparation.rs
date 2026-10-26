@@ -1,4 +1,4 @@
-//! Go-compatible preparation reads and draft create/save/method; no dialogue/adoption.
+//! Go-compatible preparation reads and draft create/save/method/adopt-brief; no dialogue or plan approval.
 use crate::{json_bytes, write_output, Arguments, CliError};
 use serde::Serialize;
 use std::io::Write;
@@ -12,15 +12,15 @@ fn bytes<T: Serialize>(read: Result<PreparationReadObservation<T>, RootStoreErro
     causes.append(&mut observation.causes);
     json_bytes(&observation.value).map_err(CliError::Output)
 }
-/// Dispatch create/save/method to the writer or list/methods/show/history to readonly
+/// Dispatch create/save/method/adopt-brief to the writer or list/methods/show/history to readonly
 /// storage, using the historical positional syntax and JSON
-/// envelope. Read operations open Root readonly; create/save/method use the writable
+/// envelope. Read operations open Root readonly; create/save/method/adopt-brief use the writable
 /// path below. Close before publishing and preserve every failure cause. before
 /// is positive/exclusive; absence is handled by the engine, limits by persisted
-/// Admin policy. Only create/save/method write drafts/history/receipts; no provider,
-/// visits, adoption, conversion or launch is performed.
+/// Admin policy. Only create/save/method/adopt-brief write drafts/history/receipts; no provider,
+/// visits, plan approval, conversion or launch is performed.
 pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
-    if a.pos.get(1).is_some_and(|s|matches!(s.as_str(),"create"|"save"|"method")) {return write(a,out);}
+    if a.pos.get(1).is_some_and(|s|matches!(s.as_str(),"create"|"save"|"method"|"adopt-brief")) {return write(a,out);}
     if a.pos.len() < 2 || !a.input.is_empty() || !a.output.is_empty() || a.server || !a.task.is_empty() || a.phase != "delivery" {
         return Err(CliError::Usage);
     }
@@ -51,10 +51,10 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     })
 }
 
-/// Apply create/save/method via the shared Root writer. Positional action/ID must match
+/// Apply create/save/method/adopt-brief via the shared Root writer. Positional action/ID must match
 /// the document exactly (the CLI never invents identity). Read bounded transport,
 /// close before publishing and preserve the known receipt through output/flush
-/// or close failures. No provider or adoption is involved.
+/// or close failures. Only explicit brief adoption is exposed; no provider or plan approval.
 fn write(a:&Arguments,out:&mut dyn Write)->Result<u8,CliError>{
     use swarm_engine::{RootStoreError as E, SystemEnvironment};
     let kind=a.pos[1].as_str();

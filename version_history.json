@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Préparations Rust : adoption explicite du brief par CLI/API protégée, contrôle des empreintes brief/besoin, reçus rejouables et historique conservé ; aucune validation du plan ni mission lancée.",
+        "en": "Rust preparations: explicit brief adoption through CLI/protected API, matching brief/need fingerprints, replayable receipts and preserved history; no plan approval or mission launch."
+      },
+      {
         "fr": "Inspection du candidat géré : aperçus de revue en lecture seule, sources Git complètes, cohorte de contrôles et liens littéraux sous limites persistées. Le lancement natif du reviewer final reste protégé.",
         "en": "Managed-candidate inspection: readonly review previews, complete Git sources, control cohort and literal links under saved limits. Native final reviewer invocation remains guarded."
       },

@@ -11,6 +11,21 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — adoption de brief Rust,26 octobre, GLM5.2
+Owner Codex ; dev87 actif,443 entrées identiques au candidat86 testé.
+CLI/API adopt-brief : brief non vide, hash exact et besoin inchangé ; copie adoptée,
+verdict retiré, documents/historique conservés. Aucun plan accepté ou agent lancé.
+GLM5.2 : revue statique utilisable et test SDK intégré avec témoin avant panne.
+Recette permanente complète :50 écritures,37 méthode,44 adoption,8 identifiants,
+4 SDK ;45 Admin inclus. Intégrité vérifiée,44 adoption rejouées sur87 exact.
+Onze HTTP installés et14 Version FR/EN ; réglages inchangés, missions pause50/469.
+Replans conservés : copie Box corrigée après E0308 ; test d’ID CLI/API séparé.
+[Rapport/RETEX](PREPARATION-ADOPTION-20261026.md),
+[preuves/revue](evidence/20261026-preparation-adoption/README.md).
+Biba/SCALING préservés ; éditeur graphique et acceptation globale ouverts.
+Suite bornée : validation explicite du plan après brief adopté, sans conversion
+implicite ; owner Codex. Aucun commit/push ni fournisseur métier dans ce lot.
+
 ## Livré localement — sélection de méthode préparation,26 octobre, GLM
 Owner Codex ; dev82 actif, processus SHA2a328c56… et441 entrées qualifiées.
 CLI `prepare method ID` / API commune : sources disponibles exigées, CAS/reçu,

@@ -465,3 +465,27 @@ The Admin write switch also applies to replay. Source failures retain their caus
 with safe diagnostics. Permanent recipe: `preparation-writes-rust`, step
 `public-preparation-method`. This CLI/API journey does not establish a connected
 graphical preparation editor.
+
+### Explicit Rust brief adoption
+
+`prepare adopt-brief ID --root ROOT --input intent.json --json` and the protected
+`POST /api/v1/preparations/command` use the shared writer. Example intent:
+`{"version":1,"action":"adopt-brief","preparation_id":"prep-ID","event_id":"adopt-1","expected_revision":3,"sha256":"CURRENT_BRIEF_FINGERPRINT"}`.
+Read ID, revision and hash with `prepare show ID --root ROOT --json`; example
+values are placeholders, not executable intentions for a real preparation.
+
+Absent/Go-Unicode-blank brief or empty/different hash refuses with
+preparation-stale-document; a need_hash differing from the current need refuses
+with preparation-stale-brief (CLI exit2, HTTP409). CAS/event conflicts retain
+CLI3/HTTP409. Refusals change no rows and add no receipt. A refused event may
+recover after correction from a new observation; a recorded receipt instead
+requires the same intention. Exact replay precedes fresh need validation and is
+marked historical after later writes. Success copies the exact adopted_brief,
+increments the revision and clears verdict/plan_ready, without document/history
+writes or freshening an existing plan's brief_hash. As in Go, a missing need
+means empty hashes may match; this does not establish a complete specification.
+The Admin write switch also applies to replay; input-text caps do not retroactively
+limit an already saved brief. Adoption attests no named human identity, approves
+no plan, reserves no budget and launches no mission. Permanent recipe
+preparation-writes-rust includes public-brief-adoption and recovery. Graphical
+preparation editing and subsequent transitions remain open.
