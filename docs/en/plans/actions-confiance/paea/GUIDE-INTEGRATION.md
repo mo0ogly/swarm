@@ -143,3 +143,11 @@ operation or native protection.
 The menu offers Inspect an action: exact terms, declared context, ordered sources,
 i64 values and shared CLI/API report. [Evidence/limits](INCREMENT-21.md): reading
 prepares an approval request without creating an approver, approval or effect.
+
+
+### Supplied approval correspondence — increment22
+
+CLI/API/menu now consume exact supplied content/policy binding data; invalid inputs
+refuse and mismatches yield explicit negative reports. [Evidence/limits](INCREMENT-22.md):
+no authenticated approver,current rights,human attention or protected approval is
+established. IA3/AC02 prerequisites remain open.

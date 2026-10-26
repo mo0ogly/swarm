@@ -1,15 +1,15 @@
 'use strict';
-/** PAEA receipt/debt/comparison/inspection file UI. Inputs stay exact UTF-8 strings, never parsed as
+/** PAEA receipt/debt/comparison/inspection/approval file UI. Inputs stay exact UTF-8 strings, never parsed as
  * JavaScript numbers. No approval, effect, automatic retry or local storage of
  * documents/receipts; one submit sends them to the authenticated local service.
  */
 (() => {
   const $ = id => document.getElementById(id), t = text => globalThis.SwarmI18n?.t(text) || text;
   const operation = document.body.dataset.paeaOperation;
-  if (!['receipt-report','resolve-payment','compare','inspect'].includes(operation)) throw Error('paea-operation-invalid');
-  const payment = operation === 'resolve-payment', inspection = operation === 'inspect';
+  if (!['receipt-report','resolve-payment','compare','inspect','check-approval'].includes(operation)) throw Error('paea-operation-invalid');
+  const payment = operation === 'resolve-payment', inspection = operation === 'inspect', approvalView = operation === 'check-approval';
   const comparison = operation === 'compare', receiptView = operation === 'receipt-report';
-  const emptyMessage = inspection ? 'Sélectionner le document d’action à examiner.' : comparison ? 'Sélectionner les deux documents d’action.' : payment ? 'Sélectionner le registre des dettes et la demande de facture.' : 'Sélectionner les fichiers puis renseigner le service et l’état précédent.';
+  const emptyMessage = approvalView ? 'Sélectionner le document d’action et l’accord fourni.' : inspection ? 'Sélectionner le document d’action à examiner.' : comparison ? 'Sélectionner les deux documents d’action.' : payment ? 'Sélectionner le registre des dettes et la demande de facture.' : 'Sélectionner les fichiers puis renseigner le service et l’état précédent.';
   let csrf = '', busy = false, reportRaw = null;
   const states = new Set(['PROPOSED','ADMITTED','APPROVAL_PENDING','AUTHORIZED','COMMIT_REQUESTED',
     'COMMITTED','DENIED','UNKNOWN','RECONCILED_COMMITTED','RECONCILED_NOT_COMMITTED']);
@@ -193,6 +193,29 @@
     status('success','Contenu structurel vérifié. Aucun accord validé.');
   }
 
+  /** Validate the closed supplied-binding report, fixed mismatch field names and
+   * exact original input hashes. Equality authenticates no approver or accord;
+   * malformed/stale/inconsistent responses refuse before rendering or export. */
+  async function validateApproval(value, document, approval) {
+    const fields=['action_digest','policy_digest'];
+    if(!exact(value,['schema_version','scope','document','approval_sha256','binding_matches','mismatched_fields','authority','approval_authenticity','approval_validity','effect'])||
+      value.schema_version!==1||value.scope!=='offline-data-only'||!exact(value.document,['document_sha256','action_digest','intent_id'])||!Object.values(value.document).every(hash)||!hash(value.approval_sha256)||
+      typeof value.binding_matches!=='boolean'||!Array.isArray(value.mismatched_fields)||!value.mismatched_fields.every((v,i)=>fields.includes(v)&&(i===0||value.mismatched_fields[i-1]<v))||value.binding_matches!==(value.mismatched_fields.length===0)||
+      ['authority','approval_authenticity','approval_validity','effect'].some(k=>value[k]!=='not-established')||
+      value.document.document_sha256!==await digest(document.bytes)||value.approval_sha256!==await digest(approval.bytes))throw Error(t('Rapport invalide ou différent des fichiers fournis.'));
+  }
+  /** Render data correspondence and four exact hashes as text. A valid mismatch
+   * remains downloadable data; neither result creates approval or execution. */
+  function renderApproval(value, raw) {
+    const message=value.binding_matches?'Empreintes correspondantes. Aucun accord validé.':'Empreintes différentes. Aucun accord validé.';
+    $('paea-summary').textContent=t(message);
+    const labels={action_digest:'Empreinte de l’action',policy_digest:'Empreinte de la politique'};
+    for(const [label,text]of [['Champs de liaison différents',value.mismatched_fields.length?value.mismatched_fields.map(k=>t(labels[k])).join(' · '):t('Aucun champ différent')],['Empreinte du document',value.document.document_sha256],['Empreinte de l’accord fourni',value.approval_sha256],['Empreinte de l’action',value.document.action_digest],['Identité de l’intention',value.document.intent_id]]){
+      const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t(label);dd.textContent=text;$('paea-identities').append(dt,dd);
+    }
+    $('paea-report').textContent=raw;reportRaw=raw;$('paea-download').disabled=false;status('success',message);
+  }
+
   /** Render only bounded textual terms from a validated data report. The integer
    * amount is displayed in minor units, without inventing a currency scale. */
   function renderPayment(value, raw) {
@@ -231,8 +254,8 @@
     try {
       const previous = receiptView ? $('paea-state').value : null;
       if (receiptView && !states.has(previous)) throw Error(t('Choisir un état précédent.'));
-      const [document, receipt] = await Promise.all(inspection ? [readFile('paea-document')] : comparison ? [readFile('paea-before'),readFile('paea-after')] : payment ? [readFile('paea-registry'),readFile('paea-request')] : [readFile('paea-document'),readFile('paea-receipt')]);
-      const body = inspection ? {schema_version:1,document:document.text} : comparison ? {schema_version:1,before:document.text,after:receipt.text} : payment ? {schema_version:1,registry:document.text,request:receipt.text} :
+      const [document, receipt] = await Promise.all(approvalView ? [readFile('paea-document'),readFile('paea-approval')] : inspection ? [readFile('paea-document')] : comparison ? [readFile('paea-before'),readFile('paea-after')] : payment ? [readFile('paea-registry'),readFile('paea-request')] : [readFile('paea-document'),readFile('paea-receipt')]);
+      const body = approvalView ? {schema_version:1,document:document.text,approval:receipt.text} : inspection ? {schema_version:1,document:document.text} : comparison ? {schema_version:1,before:document.text,after:receipt.text} : payment ? {schema_version:1,registry:document.text,request:receipt.text} :
         {schema_version:1,document:document.text,receipt:receipt.text,expected_sink:$('paea-sink').value,previous_state:previous};
       const response = await fetch('/api/v1/protection/'+operation, {method:'POST',cache:'no-store',
         headers:{'Content-Type':'application/json','X-Swarm-CSRF':csrf},
@@ -246,7 +269,8 @@
         const code = value?.failure?.code;
         throw Error(t('Vérification refusée') + (typeof code === 'string' && /^[a-z0-9_-]+$/.test(code) ? ' · ' + code : ''));
       }
-      if (inspection) { const content=await validateInspection(value,document); renderInspection(value,raw,content); }
+      if (approvalView) { await validateApproval(value,document,receipt); renderApproval(value,raw); }
+      else if (inspection) { const content=await validateInspection(value,document); renderInspection(value,raw,content); }
       else if (payment) { await validatePayment(value,document,receipt); renderPayment(value,raw); }
       else if (comparison) { await validateComparison(value,document,receipt); renderComparison(value,raw); }
       else { await validate(value,document,receipt,previous); render(value,raw); }
@@ -258,7 +282,7 @@
   function download() {
     if (reportRaw === null || busy) return;
     const url = URL.createObjectURL(new Blob([reportRaw], {type:'application/json'}));
-    const link = document.createElement('a'); link.href = url; link.download = inspection ? 'paea-inspection.json' : comparison ? 'paea-comparison.json' : payment ? 'paea-payment-resolution.json' : 'paea-receipt-report.json';
+    const link = document.createElement('a'); link.href = url; link.download = approvalView ? 'paea-approval-report.json' : inspection ? 'paea-inspection.json' : comparison ? 'paea-comparison.json' : payment ? 'paea-payment-resolution.json' : 'paea-receipt-report.json';
     link.click(); URL.revokeObjectURL(url);
   }
   /** Bootstrap the existing protected native session. Failure keeps submit blocked

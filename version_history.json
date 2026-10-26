@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "PAEA : rapprocher un accord fourni avec le contenu exact de l’action et sa politique, distinguer correspondance, différence et fichier invalide ; exemples fictifs et rapport commun CLI/API, sans authentification ni accord validé. Couleurs du bouton primaire synchronisées entre thèmes pour préserver le contraste.",
+        "en": "PAEA: compare a supplied approval with exact action content and policy, distinguish match, mismatch and invalid input; fictional examples and shared CLI/API report, without authentication or validated approval. Primary-button theme colors switch together to preserve contrast."
+      },
+      {
         "fr": "Préparation manuelle raccordée au Rust : page existante, besoin/brief/plan, méthode, décisions, historique et conflits. Limites Admin effectives, reprise des reçus incertains ; dialogue IA et conversion restent indisponibles.",
         "en": "Manual preparation connected to Rust: existing page, need/brief/plan, method, decisions, history and conflicts. Effective Admin limits and uncertain-receipt recovery; AI dialogue and conversion remain unavailable."
       },

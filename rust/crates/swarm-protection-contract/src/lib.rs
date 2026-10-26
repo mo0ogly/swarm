@@ -8,6 +8,7 @@
 //! Receipt-report output schema v2 does not change the v1 input data contracts.
 #![forbid(unsafe_code)]
 
+mod approval;
 mod canonical;
 mod comparison;
 mod inspection;
@@ -16,6 +17,7 @@ mod receipt;
 mod strict_json;
 mod types;
 
+pub use approval::{check_approval_documents, ApprovalReport};
 pub use canonical::{canonicalize, CanonicalAction};
 pub use comparison::{compare_documents, DocumentComparison, DocumentIdentity};
 pub use inspection::{inspect_document, InspectionReport};

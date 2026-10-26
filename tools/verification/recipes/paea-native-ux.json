@@ -16,7 +16,9 @@
     "schemas/paea/comparison-v1.schema.json",
     "web/paea-examples/v1/*.json",
     "web/paea-inspect.html",
-    "schemas/paea/inspection-v1.schema.json"
+    "schemas/paea/inspection-v1.schema.json",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
   ],
   "environment": {
     "SWARM_PAEA_NATIVE_SCOPE": "full"
@@ -42,12 +44,12 @@
         "payment-registry-bom-native-recovery",
         "payment-request-bom-preserved-and-native-refused",
         "payment-request-bom-native-recovery",
-        "exactly-eighty-seven-native-refusals",
+        "exactly-one-hundred-thirteen-native-refusals",
         "all-twelve-comparison-browser-cases",
         "en-sombre-320-comparison-repository.promote-real-download-exact",
         "comparison-client-rejects-unordered-path",
         "comparison-client-native-recovery",
-        "all-forty-eight-example-journeys",
+        "all-sixty-example-journeys",
         "en-sombre-320-examples-compare-git-native-example-result",
         "all-twelve-inspection-browser-cases",
         "en-sombre-320-inspection-repository.promote-real-download-exact",
@@ -55,7 +57,17 @@
         "inspection-invalid-utf8-never-sent",
         "inspection-bom-preserved-and-native-refused",
         "inspection-client-rejects-revision-float",
-        "inspection-client-native-recovery"
+        "inspection-client-native-recovery",
+        "all-twelve-approval-browser-cases",
+        "en-sombre-320-approval-repository.promote-real-download-exact",
+        "approval-client-rejects-inconsistent-match",
+        "approval-loading-clears-and-blocks",
+        "approval-no-duplicate-gesture",
+        "approval-paea-approval-invalid-utf8-never-sent",
+        "approval-paea-approval-bom-preserved-native-refused",
+        "en-sombre-320-examples-check-approval-git-native-example-result",
+        "en-sombre-1440-approval-theme-etat-all-frames-AA",
+        "en-sombre-1440-approval-theme-sombre-all-frames-AA"
       ],
       "required_stderr": []
     },

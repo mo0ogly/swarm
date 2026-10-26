@@ -5,7 +5,7 @@
  * The caller supplies an exact existing binary/hash and a fresh evidence path.
  * No build, retry or watchdog; readiness is observed from the real listener/UI.
  * Default full scope retains 12 presentation cases per view and real example
- * downloads/uploads on all four views in each configuration. Explicit encoding
+ * downloads/uploads on all five views in each configuration. Explicit encoding
  * scope exercises one real invoice/BOM journey and exact current PAEA script;
  * it does not qualify receipt/presentation matrices or unrelated changed assets.
  */
@@ -19,7 +19,7 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 assert.equal(sha(fs.readFileSync(binary)),expected);fs.mkdirSync(output);
 const root=path.resolve(output,'root');fs.mkdirSync(root);
 const vectors=JSON.parse(fs.readFileSync('tests/fixtures/paea/contract-v1.json')).vectors;
-const checks=[],errors=[],responses=[],cases=[],paymentCases=[],comparisonCases=[],inspectionCases=[],exampleCases=[],serverErrors=[];let browser,server,closed,token='',address='',expectRefusal=false,abort,stopping=false;
+const checks=[],errors=[],responses=[],cases=[],paymentCases=[],comparisonCases=[],inspectionCases=[],approvalCases=[],primaryContrastSamples=[],exampleCases=[],serverErrors=[];let browser,server,closed,token='',address='',expectRefusal=false,abort,stopping=false;
 const observedFailure=new Promise((resolve,reject)=>{abort=reject});
 /** Preserve unexpected browser failures and reject pending DOM waits without a
  * deadline. Expected native 400 refusals remain separately recorded. */
@@ -347,13 +347,93 @@ async function inspectionClientFaults(page,label){
  const bom=path.join(directory,'bom.json');fs.writeFileSync(bom,Buffer.concat([Buffer.from([0xef,0xbb,0xbf]),fs.readFileSync(file)]));await(await page.$('#paea-document')).uploadFile(bom);const request=page.waitForRequest(r=>new URL(r.url()).pathname==='/api/v1/protection/inspect'&&r.method()==='POST');const refused=await submitInspection(page,400);check('inspection-bom-preserved-and-native-refused',JSON.parse((await request).postData()).document.startsWith('\ufeff')&&JSON.parse(refused).failure.code==='protection-document-invalid');await(await page.$('#paea-document')).uploadFile(file);check('inspection-bom-native-recovery',(await submitInspection(page,200))===good);
 }
 
+/** Submit two original files to the real approval correspondence route. A valid
+ * mismatch is200/successful data validation, invalid data400/error. Completion
+ * checks actual response plus idle DOM without watchdog or automatic retry. */
+async function submitApproval(page,status){
+ expectRefusal=status===400;const pending=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.request().method()==='POST');
+ await page.click('#paea-check');const response=await pending;assert.equal(response.status(),status);const raw=await response.text();await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);assert.equal(await page.$eval('#paea-status',e=>e.dataset.state),status===200?'success':'error');expectRefusal=false;return raw;
+}
+/** Observe every animation frame of the primary control’s foreground/background
+ * transition, without a sleep/deadline. Record actual colors/theme; return only
+ * when those CSS transitions end. All measured frames must meet normative AA,
+ * including a real theme toggle. No animation is disabled by the test. */
+async function primaryContrastFrames(page,name){
+ const samples=await page.$eval('#paea-check',e=>new Promise(resolve=>{const rows=[];function frame(){const s=getComputedStyle(e),transitions=e.getAnimations().filter(a=>['color','background-color'].includes(a.transitionProperty));rows.push({color:s.color,background:s.backgroundColor,theme:document.documentElement.dataset.theme,transitions:transitions.length});if(transitions.some(a=>a.playState==='running'))requestAnimationFrame(frame);else resolve(rows)}frame()}));
+ const lum=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((v,c,i)=>v+c*[.2126,.7152,.0722][i],0);
+ for(const row of samples){const values=[lum(row.color),lum(row.background)];row.contrast=(Math.max(...values)+.05)/(Math.min(...values)+.05)}primaryContrastSamples.push({name,samples});return samples;
+}
+/** Compare both domains through menu, two files, actual CLI/API and real download.
+ * Max revisions remain original integer text; match/mismatch/changed attempt and
+ * unverified approver are distinct. Invalid data clears stale export and recovers;
+ * all writes/screenshots stay in the owned native fixture, never a live Root. */
+async function approvalCase(page,context,label,lang,theme){
+ await page.goto('http://'+address+'/paea.html?'+new URLSearchParams({lang,theme}),{waitUntil:'domcontentloaded'});
+ await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.click('a[href^="/paea-approval.html"]')]);await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
+ check(label+'-approval-menu-title',await page.evaluate((l,t)=>location.pathname==='/paea-approval.html'&&document.documentElement.lang===l&&document.documentElement.dataset.theme===t&&document.querySelector('h1').textContent===(l==='en'?'Supplied approval correspondence':'Correspondance d’un accord'),lang,theme));
+ check(label+'-approval-primary-translated',await page.$eval('#paea-check',(e,l)=>e.textContent.trim()===(l==='en'?'Compare approval and action':'Rapprocher l’accord et l’action'),lang));
+ check(label+'-approval-empty-limits',await page.$eval('#paea-inputs',e=>Array.from(e.querySelectorAll('input')).every(f=>f.files.length===0))&&await page.$eval('#paea-limits',(e,l)=>e.textContent.includes(l==='en'?'validates no approval':'ne valide aucun accord'),lang)&&await page.$eval('#paea-download',e=>e.disabled));
+ const embedded=await page.evaluate(async()=>Array.from(new Uint8Array(await(await fetch('/paea-approval.html')).arrayBuffer())));check(label+'-approval-embedded-exact',sha(Buffer.from(embedded))===sha(fs.readFileSync('web/paea-approval.html')));
+ await page.focus('#paea-format-help summary');await page.keyboard.press('Enter');check(label+'-approval-help-keyboard',await page.$eval('#paea-format-help',(e,l)=>e.open&&e.textContent.includes(l==='en'?'revocation':'révocation'),lang));await page.keyboard.press('Enter');
+ const colors=await primaryContrastFrames(page,label+'-initial');check(label+'-approval-primary-contrast-AA',colors.every(s=>s.contrast>=4.5));
+ for(const expectedTheme of [theme==='etat'?'sombre':'etat',theme]){await page.click('#paea-theme');const samples=await primaryContrastFrames(page,label+'-'+expectedTheme);check(label+'-approval-theme-'+expectedTheme+'-all-frames-AA',samples.length>0&&samples.every(s=>s.theme===expectedTheme&&s.contrast>=4.5&&s.transitions===0))}
+ const encode=value=>JSON.stringify(value).replace(/"(mandate_revision|policy_revision)":1([,}])/g,'"$1":9223372036854775807$2');
+ for(const kind of ['payment.settle','repository.promote']){
+  const tag=label+'-approval-'+kind,directory=path.resolve(output,tag);fs.mkdirSync(directory);const vector=vectors.find(v=>v.proposal.action.kind===kind),value=structuredClone({proposal:vector.proposal,context:vector.context});value.context.mandate_revision=1;value.context.policy_revision=1;
+  const file=path.join(directory,'document.json'),approval=path.join(directory,'approval.json'),original=encode(value);fs.writeFileSync(file,original);
+  const canonical=JSON.parse((await command(['protection','canonicalize','--input',file,'--json'],tag+'-canonical',directory)).toString());
+  const binding={schema_version:1,action_digest:canonical.action_digest,policy_digest:value.context.policy_digest,approver_id:'fictional-approver'},signed=JSON.stringify(binding);fs.writeFileSync(approval,signed);
+  await(await page.$('#paea-document')).uploadFile(file);await(await page.$('#paea-approval')).uploadFile(approval);const raw=await submitApproval(page,200),report=JSON.parse(raw);fs.writeFileSync(path.join(directory,'native-report.json'),raw);
+  const cli=(await command(['protection','check-approval',file,approval,'--json'],tag+'-cli',directory)).toString();
+  check(tag+'-exact-cli-api',raw===cli&&report.binding_matches&&report.mismatched_fields.length===0&&report.document.document_sha256===sha(original)&&report.approval_sha256===sha(signed));
+  check(tag+'-no-authenticity-authority-or-effect',['authority','approval_authenticity','approval_validity','effect'].every(k=>report[k]==='not-established')&&await page.$eval('#paea-summary',(e,l)=>e.textContent===(l==='en'?'Hashes match. No approval validated.':'Empreintes correspondantes. Aucun accord validé.'),lang));
+  await page.focus('#paea-check');await page.keyboard.press('Tab');check(tag+'-download-keyboard',await page.evaluate(()=>document.activeElement.id==='paea-download'));
+  const cdp=await page.createCDPSession();await cdp.send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:directory,browserContextId:context.id,eventsEnabled:true});const complete=new Promise((resolve,reject)=>cdp.on('Browser.downloadProgress',e=>{if(e.state==='completed')resolve();if(e.state==='canceled')reject(Error('approval-download-canceled'))}));await page.keyboard.press('Enter');await complete;await cdp.detach();check(tag+'-real-download-exact',fs.readFileSync(path.join(directory,'paea-approval-report.json'),'utf8')===raw);
+  for(const variant of ['policy','terms','attempt','approver']){
+   const changed=structuredClone(value),other=structuredClone(binding);
+   if(variant==='policy')other.policy_digest='f'.repeat(64);
+   if(variant==='terms'){if(kind==='payment.settle')changed.proposal.action.amount_minor='420001';else changed.proposal.action.candidate_oid='e'.repeat(changed.proposal.action.candidate_oid.length)}
+   if(variant==='attempt')changed.proposal.request_id='approval-new-attempt';if(variant==='approver')other.approver_id='unverified-alternative';
+   const doc=path.join(directory,variant+'-document.json'),app=path.join(directory,variant+'-approval.json');fs.writeFileSync(doc,encode(changed));fs.writeFileSync(app,JSON.stringify(other));await(await page.$('#paea-document')).uploadFile(doc);await(await page.$('#paea-approval')).uploadFile(app);
+   check(tag+'-'+variant+'-edit-clears',await page.$eval('#paea-summary',e=>e.textContent==='')&&await page.$eval('#paea-download',e=>e.disabled));
+   const observedRaw=await submitApproval(page,200),r=JSON.parse(observedRaw);const expectedFields=variant==='policy'?['policy_digest']:variant==='terms'?['action_digest']:[];
+   check(tag+'-'+variant+'-explicit-data-result',r.binding_matches===(expectedFields.length===0)&&JSON.stringify(r.mismatched_fields)===JSON.stringify(expectedFields)&&r.approval_validity==='not-established'&&r.approval_authenticity==='not-established'&&await page.$eval('#paea-download',e=>!e.disabled));
+   check(tag+'-'+variant+'-native-cli-parity',observedRaw===(await command(['protection','check-approval',doc,app,'--json'],tag+'-'+variant+'-cli',directory)).toString());
+   if(expectedFields.length)check(tag+'-'+variant+'-visible-negative',await page.$eval('#paea-summary',(e,l)=>e.textContent===(l==='en'?'Hashes differ. No approval validated.':'Empreintes différentes. Aucun accord validé.'),lang));
+  }
+  await(await page.$('#paea-document')).uploadFile(file);await(await page.$('#paea-approval')).uploadFile(approval);check(tag+'-refusal-control',(await submitApproval(page,200))===raw);
+  const invalid=path.join(directory,'invalid.json');fs.writeFileSync(invalid,'APPROVAL_PRIVATE_BROWSER_CANARY');await(await page.$('#paea-approval')).uploadFile(invalid);const refused=JSON.parse(await submitApproval(page,400));
+  check(tag+'-invalid-clears-report-export',refused.failure.code==='protection-document-invalid'&&await page.$eval('#paea-identities',e=>e.children.length===0)&&await page.$eval('#paea-summary',e=>e.textContent==='')&&await page.$eval('#paea-report',e=>e.textContent==='')&&await page.$eval('#paea-download',e=>e.disabled));
+  await(await page.$('#paea-approval')).uploadFile(approval);check(tag+'-native-recovery',(await submitApproval(page,200))===raw);check(tag+'-no-overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(directory,'result.png'),fullPage:true});
+ }
+ approvalCases.push(label);
+}
+/** Browser-only bad responses and loading hold follow actual native controls;
+ * malformed UTF8 never leaves the browser, original BOM is refused by native.
+ * All faults restore actual input/transport, with exact real recovery. */
+async function approvalClientFaults(page,label){
+ const directory=path.resolve(output,label+'-approval-payment.settle'),doc=path.join(directory,'document.json'),app=path.join(directory,'approval.json'),good=fs.readFileSync(path.join(directory,'native-report.json'),'utf8');await(await page.$('#paea-document')).uploadFile(doc);await(await page.$('#paea-approval')).uploadFile(app);
+ let replacement=null,hold=null,posts=0;await page.setRequestInterception(true);const intercept=r=>{if(new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.method()==='POST'){posts++;if(replacement==='hold'){hold=r;return}if(replacement!==null){r.respond({status:200,contentType:'application/json',body:replacement}).catch(e=>browserFailure({kind:'approval-response-injection',message:e.message}));return}}r.continue().catch(e=>browserFailure({kind:'approval-continue',message:e.message}))};page.on('request',intercept);
+ const mutate=fn=>{const r=JSON.parse(good);fn(r);return JSON.stringify(r)};
+ for(const [name,raw]of [['document-hash',mutate(r=>r.document.document_sha256='0'.repeat(64))],['approval-hash',mutate(r=>r.approval_sha256='0'.repeat(64))],['authority',mutate(r=>r.authority='established')],['authenticity',mutate(r=>r.approval_authenticity='established')],['validity',mutate(r=>r.approval_validity='established')],['effect',mutate(r=>r.effect='established')],['extra',mutate(r=>r.extra=true)],['unknown-field',mutate(r=>{r.binding_matches=false;r.mismatched_fields=['unknown']})],['duplicate-field',mutate(r=>{r.binding_matches=false;r.mismatched_fields=['action_digest','action_digest']})],['unordered-fields',mutate(r=>{r.binding_matches=false;r.mismatched_fields=['policy_digest','action_digest']})],['inconsistent-match',mutate(r=>r.binding_matches=false)],['wrong-type',mutate(r=>r.binding_matches='true')],['malformed','{']]){
+  replacement=null;check('approval-client-'+name+'-native-control',(await submitApproval(page,200))===good);replacement=raw;fs.writeFileSync(path.join(directory,'synthetic-'+name+'.json'),raw);const pending=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.request().method()==='POST');await page.click('#paea-check');assert.equal((await pending).status(),200);await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);check('approval-client-rejects-'+name,await page.$eval('#paea-status',e=>e.dataset.state==='error')&&await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-identities',e=>e.children.length===0));
+ }
+ replacement=null;check('approval-client-native-recovery',(await submitApproval(page,200))===good);
+ replacement='hold';const before=posts,requested=page.waitForRequest(r=>new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.method()==='POST');await page.click('#paea-check');await requested;assert(hold);check('approval-loading-clears-and-blocks',await page.$eval('#paea-inputs',e=>e.disabled)&&await page.$eval('#paea-download',e=>e.disabled)&&await page.$eval('#paea-report',e=>e.textContent==='')&&await page.$eval('#paea-status',e=>e.dataset.state==='loading'));await page.$eval('#paea-form',e=>e.requestSubmit());check('approval-no-duplicate-gesture',posts===before+1);
+ replacement=null;const response=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.request().method()==='POST');await hold.continue();hold=null;assert.equal((await response).status(),200);await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);check('approval-loading-native-recovery',await page.$eval('#paea-report',(e,text)=>e.textContent===text,good));page.off('request',intercept);await page.setRequestInterception(false);
+ for(const [id,file]of [['paea-document',doc],['paea-approval',app]]){
+  check('approval-'+id+'-encoding-control',(await submitApproval(page,200))===good);const invalid=path.join(directory,id+'-invalid-utf8.json');fs.writeFileSync(invalid,Buffer.from([0xc3,0x28]));let sends=0;const count=r=>{if(new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.method()==='POST')sends++};page.on('request',count);await(await page.$('#'+id)).uploadFile(invalid);await page.click('#paea-check');await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);check('approval-'+id+'-invalid-utf8-never-sent',sends===0&&await page.$eval('#paea-status',e=>e.dataset.state==='error')&&await page.$eval('#paea-download',e=>e.disabled));page.off('request',count);await(await page.$('#'+id)).uploadFile(file);check('approval-'+id+'-utf8-native-recovery',(await submitApproval(page,200))===good);
+  const bom=path.join(directory,id+'-bom.json');fs.writeFileSync(bom,Buffer.concat([Buffer.from([0xef,0xbb,0xbf]),fs.readFileSync(file)]));await(await page.$('#'+id)).uploadFile(bom);const requested=page.waitForRequest(r=>new URL(r.url()).pathname==='/api/v1/protection/check-approval'&&r.method()==='POST');const denied=await submitApproval(page,400);const field=id==='paea-document'?'document':'approval';check('approval-'+id+'-bom-preserved-native-refused',JSON.parse((await requested).postData())[field].startsWith('\ufeff')&&JSON.parse(denied).failure.code==='protection-document-invalid');await(await page.$('#'+id)).uploadFile(file);check('approval-'+id+'-bom-native-recovery',(await submitApproval(page,200))===good);
+ }
+}
+
 /** Download the actual private examples, then choose those exact files through
  * normal controls and run the native check. This owned fixture-only journey
  * asserts each completed download's bytes, translated keyboard disclosure,
  * expected data/limits and cleared stale output. No automatic product load,
  * response substitution, live Root, provider or effect is involved. */
 async function exampleJourney(page,context,label,lang,theme,operation){
- const routes={'receipt-report':'paea.html','resolve-payment':'paea-payment.html','compare':'paea-compare.html','inspect':'paea-inspect.html'},tag=label+'-examples-'+operation;
+ const routes={'receipt-report':'paea.html','resolve-payment':'paea-payment.html','compare':'paea-compare.html','inspect':'paea-inspect.html','check-approval':'paea-approval.html'},tag=label+'-examples-'+operation;
  await page.goto('http://'+address+'/'+routes[operation]+'?'+new URLSearchParams({lang,theme}),{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!document.getElementById('paea-check').disabled);
  check(tag+'-explicit-empty',await page.$eval('#paea-inputs',e=>Array.from(e.querySelectorAll('input[type=file]')).every(f=>f.files.length===0))&&await page.$eval('#paea-download',e=>e.disabled));
@@ -376,7 +456,9 @@ async function exampleJourney(page,context,label,lang,theme,operation){
  const luminance=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((v,c,i)=>v+c*[.2126,.7152,.0722][i],0),levels=colors.map(luminance);
  check(tag+'-link-contrast-AA',(Math.max(...levels)+.05)/(Math.min(...levels)+.05)>=4.5);
  check(tag+'-download-keeps-inputs-empty',await page.$eval('#paea-inputs',e=>Array.from(e.querySelectorAll('input[type=file]')).every(f=>f.files.length===0))&&await page.$eval('#paea-report',e=>e.textContent===''));
- if(operation==='inspect'){
+ if(operation==='check-approval'){
+  for(const prefix of ['payment','git']){const doc=path.join(directory,prefix+'-document.json'),app=path.join(directory,prefix+'-approval.json');await(await page.$('#paea-document')).uploadFile(doc);await(await page.$('#paea-approval')).uploadFile(app);const r=JSON.parse(await submitApproval(page,200));check(tag+'-'+prefix+'-native-example-result',r.binding_matches&&r.document.document_sha256===sha(fs.readFileSync(doc))&&r.approval_sha256===sha(fs.readFileSync(app))&&r.approval_authenticity==='not-established'&&r.approval_validity==='not-established')}
+ }else if(operation==='inspect'){
   for(const prefix of ['payment','git']){const file=path.join(directory,prefix+'-document.json');await(await page.$('#paea-document')).uploadFile(file);const r=JSON.parse(await submitInspection(page,200));check(tag+'-'+prefix+'-native-example-result',r.document.document_sha256===sha(fs.readFileSync(file))&&r.effect==='not-established'&&r.approval_validity==='not-established')}
  }else if(operation==='resolve-payment'){
   const registry=path.join(directory,'payment-registry.json'),request=path.join(directory,'payment-request.json');await fillPayment(page,registry,request);const raw=await submitPayment(page,200),report=JSON.parse(raw);
@@ -406,8 +488,8 @@ async function exampleJourney(page,context,label,lang,theme,operation){
    await context.setCookie({name:'swarm_session_'+sha(address).slice(0,12),value:token,url:'http://'+address,httpOnly:true,sameSite:'Strict'});
    page.on('pageerror',e=>browserFailure({kind:'pageerror',message:e.message}));
    page.on('requestfailed',r=>browserFailure({kind:'requestfailed',path:new URL(r.url()).pathname}));
-   page.on('response',r=>{if(r.status()>=400){const p=new URL(r.url()).pathname;responses.push({path:p,status:r.status()});if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment','/api/v1/protection/compare','/api/v1/protection/inspect'].includes(p)&&r.status()===400))browserFailure({kind:'http',path:p,status:r.status()})}});
-   page.on('console',m=>{if(m.type()==='error'){const p=m.location().url?new URL(m.location().url).pathname:'';if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment','/api/v1/protection/compare','/api/v1/protection/inspect'].includes(p)&&m.text().includes('400')))browserFailure({kind:'console',message:m.text()})}});
+   page.on('response',r=>{if(r.status()>=400){const p=new URL(r.url()).pathname;responses.push({path:p,status:r.status()});if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment','/api/v1/protection/compare','/api/v1/protection/inspect','/api/v1/protection/check-approval'].includes(p)&&r.status()===400))browserFailure({kind:'http',path:p,status:r.status()})}});
+   page.on('console',m=>{if(m.type()==='error'){const p=m.location().url?new URL(m.location().url).pathname:'';if(!(expectRefusal&&['/api/v1/protection/receipt-report','/api/v1/protection/resolve-payment','/api/v1/protection/compare','/api/v1/protection/inspect','/api/v1/protection/check-approval'].includes(p)&&m.text().includes('400')))browserFailure({kind:'console',message:m.text()})}});
    if(scope==='payment-encoding'){
     await paymentCase(page,context,label,lang,theme);
     const script=await page.evaluate(async()=>{const r=await fetch('/paea.js');if(!r.ok)throw Error('PAEA script unavailable');return Array.from(new Uint8Array(await r.arrayBuffer()))});
@@ -461,17 +543,18 @@ async function exampleJourney(page,context,label,lang,theme,operation){
    await paymentCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await paymentClientFaults(page,label);
    await comparisonCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await comparisonClientFaults(page,label);
    await inspectionCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await inspectionClientFaults(page,label);
-   for(const operation of ['receipt-report','resolve-payment','compare','inspect'])await exampleJourney(page,context,label,lang,theme,operation);await context.close();
+   await approvalCase(page,context,label,lang,theme);if(label==='fr-etat-1440')await approvalClientFaults(page,label);
+   for(const operation of ['receipt-report','resolve-payment','compare','inspect','check-approval'])await exampleJourney(page,context,label,lang,theme,operation);await context.close();
   }
   if(scope==='payment-encoding'){check('one-native-payment-encoding-case',cases.length===0&&paymentCases.length===1);check('exactly-three-native-encoding-refusals',responses.length===3)}
-  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('all-twelve-comparison-browser-cases',comparisonCases.length===12);check('all-twelve-inspection-browser-cases',inspectionCases.length===12);check('exactly-eighty-seven-native-refusals',responses.length===87);check('all-forty-eight-example-journeys',exampleCases.length===48)}
+  else{check('all-twelve-native-browser-cases',cases.length===12);check('all-twelve-payment-browser-cases',paymentCases.length===12);check('all-twelve-comparison-browser-cases',comparisonCases.length===12);check('all-twelve-inspection-browser-cases',inspectionCases.length===12);check('all-twelve-approval-browser-cases',approvalCases.length===12);check('exactly-one-hundred-thirteen-native-refusals',responses.length===113);check('all-sixty-example-journeys',exampleCases.length===60)}
   check('no-unexpected-browser-diagnostics',errors.length===0);check('binary-stable',sha(fs.readFileSync(binary))===expected);
  })(),observedFailure]);}catch(e){failed=e;console.error(e.stack)}
  finally{
   try{if(browser)await browser.close()}catch(e){errors.push({kind:'browser-close',message:e.message});failed??=e}
   if(server){stopping=true;server.kill('SIGINT');const stopped=await closed;if(!failed&&stopped.code!==0)failed=Error('owned native fixture did not stop cleanly')}
   fs.writeFileSync(path.join(root,'server.stderr'),Buffer.concat(serverErrors),{mode:0o600});
-  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,comparisonCases,inspectionCases,exampleCases,checks,errors,responses,success:!failed},null,2));
+  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({scope:'real default-profile binary and embedded native UI, isolated fixture; no protected effect/independent acceptance',test_scope:scope,binary,binary_sha256:expected,cases,paymentCases,comparisonCases,inspectionCases,approvalCases,primaryContrastSamples,exampleCases,checks,errors,responses,success:!failed},null,2));
  }
  if(failed)process.exitCode=1;else console.log('PAEA_NATIVE_UI_PASS '+checks.length+' assertions');
 })();

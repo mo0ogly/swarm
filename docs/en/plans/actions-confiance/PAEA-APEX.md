@@ -460,3 +460,17 @@ native assertions (four views),48 example journeys/144 downloads,87 native refus
 and46 live checks/20 assets PASS. [Slice result and retrospective](paea/INCREMENT-21.md)
 retain initial freshness refusal, dev100/dev101 profiles/hashes and review scope.
 No GLM, commit or push. IA3/AC02/humans, E2/E3 and0/17 protected invariants stay open.
+
+
+User requests commit21 then next. Commit `72e0e32dc`,40 files,108 foreign staged
+entries preserved,no push. [Increment22](paea/INCREMENT-22.md) connects supplied approval
+binding to exact action/policy data,without protected activation.
+
+
+Increment22 installed as **dev107**: **Compare a supplied approval** menu, common
+CLI/API two-file-bound report,explicit match/mismatch/invalid refusal.11namedtests,
+10generationchecks,3,086nativeassertions,60journeys/192downloads,113refusals and
+52livechecks/23assets PASS. Primary1.28:1transitioncontrast reproduced and fixed
+on the shared five-view component;36observations,min9.096:1. [Results/retrospective](paea/INCREMENT-22.md)
+retain failures,recovery,profiles/hashes. No GLM/commit22/push; IA3/AC02/humans,
+E2/E3 and0/17remainopen.

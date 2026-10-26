@@ -3,7 +3,7 @@ use super::{HttpServiceError, RouteBody};
 use http::{header::CONTENT_TYPE, Method, Request};
 use serde::Deserialize;
 use swarm_protection_contract::{
-    check_receipt_documents, compare_documents, inspect_document, resolve_payment_documents, State,
+    check_approval_documents, check_receipt_documents, compare_documents, inspect_document, resolve_payment_documents, State,
 };
 
 /// The JSON envelope transports original UTF-8 strings without parsing their
@@ -46,6 +46,16 @@ struct ComparisonCheck {
 struct InspectionCheck {
     schema_version: u32,
     document: String,
+}
+
+/// Closed transport of two original UTF-8 strings, never server paths, an
+/// authenticated approver or a request to authorize an effect.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ApprovalCheck {
+    schema_version: u32,
+    document: String,
+    approval: String,
 }
 
 /// Check two supplied UTF-8 documents after outer Host/session/CSRF admission.
@@ -126,6 +136,22 @@ pub(super) fn inspect(r: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceErro
         return Err(HttpServiceError::Refused("protection-envelope-version"));
     }
     let report = inspect_document(input.document.as_bytes()).map_err(HttpServiceError::Protection)?;
+    serde_json::to_vec(&report).map(RouteBody::plain).map_err(HttpServiceError::Json)
+}
+
+/// Compare supplied approval-shaped data after native admission and shared
+/// POST/JSON/no-query/transport guards. Return exact shared CLI report bytes;
+/// a valid mismatch is200 with binding_matches=false, not an authorization denial
+/// or parser failure. Strict framing/semantic/encode causes survive safe refusal.
+/// No Root IO, signature/approver/current-policy/expiry check, mutation or effect.
+pub(super) fn check_approval(r: &Request<Vec<u8>>) -> Result<RouteBody, HttpServiceError> {
+    require_json(r)?;
+    let input: ApprovalCheck = serde_json::from_slice(r.body()).map_err(HttpServiceError::Json)?;
+    if input.schema_version != 1 {
+        return Err(HttpServiceError::Refused("protection-envelope-version"));
+    }
+    let report = check_approval_documents(input.document.as_bytes(), input.approval.as_bytes())
+        .map_err(HttpServiceError::Protection)?;
     serde_json::to_vec(&report).map(RouteBody::plain).map_err(HttpServiceError::Json)
 }
 

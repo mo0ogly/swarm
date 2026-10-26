@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate versioned fictional PAEA downloads from retained contract fixtures.
 
-No Root, provider, approval or effect is opened. --check compares all eight exact
+No Root, provider, approval or effect is opened. --check compares all ten exact
 outputs without writing. Generation replaces each source asset atomically; an IO
 failure propagates and leaves that file's previous bytes intact. The output set
 is not a multi-file transaction; run --check after a failed/interrupted generation.
@@ -18,9 +18,9 @@ DESTINATION = ROOT / 'web/paea-examples/v1'
 
 
 def examples():
-    """Return eight deterministic JSON byte sets from named fictional v1 vectors.
+    """Return ten deterministic JSON byte sets from named fictional v1 vectors.
 
-    Existing precomputed identities bind each receipt to its unchanged document;
+    Existing precomputed identities bind each receipt/approval to its unchanged document;
     native receipt/comparison journeys must verify them. Corrected terms preserve
     the business intent and request key. Missing/changed fixture shape raises;
     these unsigned files confer no authority and contain no runtime data.
@@ -34,6 +34,9 @@ def examples():
         vector = matches[0]
         document = copy.deepcopy(dict(proposal=vector['proposal'], context=vector['context']))
         result[prefix + '-document.json'] = document
+        result[prefix + '-approval.json'] = dict(
+            schema_version=1, action_digest=vector['action_digest'],
+            policy_digest=vector['context']['policy_digest'], approver_id='approver-paea-example')
         result[prefix + '-receipt.json'] = dict(
             schema_version=1, action_digest=vector['action_digest'],
             intent_id=vector['intent_id'], sink_id='sink-paea-example',

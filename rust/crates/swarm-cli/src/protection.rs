@@ -5,12 +5,13 @@ use std::{
     path::Path,
 };
 use swarm_protection_contract::{
-    canonicalize, check_receipt_documents, check_receipt_transition, compare_documents, inspect_document,
+    canonicalize, check_approval_documents, check_receipt_documents, check_receipt_transition, compare_documents, inspect_document,
     decode_document, decode_receipt, resolve_payment_documents, State, SCHEMA_VERSION,
 };
 
 /// Read bounded documents through the existing CLI input mechanism and emit
-/// canonical bytes/digests, exact action inspection, a comparison, payment resolution, proposed receipt transition or exact-input report. All
+/// canonical bytes/digests, exact action inspection, supplied approval binding,
+/// a comparison, payment resolution, proposed receipt transition or exact-input report. All
 /// supplied context/receipt/state/sink data remain untrusted, explicitly marked
 /// in output. Reject incompatible runtime/root/server/output options; no Root is opened,
 /// no credential is read and no policy is saved. Input/parse/encode/output/flush
@@ -32,6 +33,9 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
     }
     if a.pos.len() == 4 && a.pos[1] == "resolve-payment" && a.input.is_empty() {
         return resolve_payment(a, out);
+    }
+    if a.pos.len() == 4 && a.pos[1] == "check-approval" && a.input.is_empty() {
+        return check_approval(a, out);
     }
     if a.pos.len() == 4 && a.pos[1] == "compare" && a.input.is_empty() {
         // Two named files avoid ambiguous ownership/framing of a shared stdin.
@@ -79,6 +83,26 @@ pub(super) fn execute(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError
         "authority":"not-established", "scope":"offline-data-only"
     });
     let bytes = serde_json::to_vec(&value)
+        .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;
+    write_output(out, &bytes)?;
+    Ok(0)
+}
+
+/// Compare two named regular files after the common incompatible-option gate.
+/// Shared strict decoding precedes output; a valid mismatch is a negative report
+/// with exit0, not authority. Stdin is refused to avoid ambiguous framing.
+/// Existing bounded file reads, JSON encode, write and flush preserve causes;
+/// sequential reads establish no atomic snapshot. No Root, approval or effect.
+fn check_approval(a: &Arguments, out: &mut dyn Write) -> Result<u8, CliError> {
+    if a.pos[2] == "-" || a.pos[3] == "-" {
+        return Err(CliError::Usage);
+    }
+    let document = swarm_engine::read_command_file(Path::new(&a.pos[2]))
+        .map_err(CliError::CommandInput)?;
+    let approval = swarm_engine::read_command_file(Path::new(&a.pos[3]))
+        .map_err(CliError::CommandInput)?;
+    let report = check_approval_documents(&document, &approval).map_err(CliError::Protection)?;
+    let bytes = serde_json::to_vec(&report)
         .map_err(|e| CliError::Protection(swarm_protection_contract::Error::Json(e)))?;
     write_output(out, &bytes)?;
     Ok(0)

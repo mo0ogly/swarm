@@ -40,29 +40,29 @@ class ExampleLinks(HTMLParser):
 
 class Examples(unittest.TestCase):
     """Check shapes and usable links; native journeys establish semantic consistency."""
-    def test_all_eight_fictional_files_have_the_declared_data_shape(self):
-        """Require closed v1 documents/receipts/registry/request from the actual schemas."""
+    def test_all_ten_fictional_files_have_the_declared_data_shape(self):
+        """Require closed v1 documents/receipts/approvals/registry/request from the actual schemas."""
         contract = json.loads((ROOT / 'schemas/paea/contract-v1.schema.json').read_text())
         payment = json.loads((ROOT / 'schemas/paea/payment-resolution-v1.schema.json').read_text())
         files = sorted((ROOT / 'web/paea-examples/v1').glob('*.json'))
-        self.assertEqual(len(files), 8)
+        self.assertEqual(len(files), 10)
         for file in files:
             value = json.loads(file.read_text())
             if file.name.endswith(('-document.json', '-after.json')):
                 schema = contract
             else:
                 kind = file.stem.split('-')[-1]
-                parent = contract if kind == 'receipt' else payment
+                parent = contract if kind in ['receipt', 'approval'] else payment
                 schema = dict(parent, **{'$ref': '#/$defs/' + kind})
                 # The definitions are the selected root, not the report/document root.
                 schema = {'$schema': parent['$schema'], '$defs': parent['$defs'], '$ref': schema['$ref']}
             Draft202012Validator(schema).validate(value)
 
-    def test_all_four_disclosures_link_only_exact_versioned_downloads_with_english(self):
+    def test_all_five_disclosures_link_only_exact_versioned_downloads_with_english(self):
         """No live data URL, path selection or missing labels in example download help."""
         seen = set()
         translations = json.loads((ROOT / 'locales/en.json').read_text())
-        for page, count in [('paea.html', 4), ('paea-payment.html', 2), ('paea-compare.html', 4), ('paea-inspect.html', 2)]:
+        for page, count in [('paea.html', 4), ('paea-payment.html', 2), ('paea-compare.html', 4), ('paea-inspect.html', 2), ('paea-approval.html', 4)]:
             parser = ExampleLinks()
             parser.feed((ROOT / 'web' / page).read_text())
             self.assertEqual(len(parser.links), count)

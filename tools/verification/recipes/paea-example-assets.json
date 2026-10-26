@@ -51,7 +51,9 @@
     "tools/paea/make_examples.py",
     "web/paea-inspect.html",
     "rust/crates/swarm-cli/tests/protection_inspection.rs",
-    "tests/paea_inspection_schema_test.py"
+    "tests/paea_inspection_schema_test.py",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
@@ -87,8 +89,8 @@
       "required_stdout": [
         "Ran 2 tests",
         "OK",
-        "test_all_eight_fictional_files_have_the_declared_data_shape",
-        "test_all_four_disclosures_link_only_exact_versioned_downloads_with_english"
+        "test_all_ten_fictional_files_have_the_declared_data_shape",
+        "test_all_five_disclosures_link_only_exact_versioned_downloads_with_english"
       ],
       "required_stderr": []
     },

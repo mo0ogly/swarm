@@ -911,3 +911,89 @@ fn paea_inspection_http_refusals_recover_and_preserve_private_assets() {
     assert_eq!(page.response.body(),include_bytes!("../../../../web/paea-inspect.html"));
     assert_eq!(snapshot(&fixture.root),baseline);
 }
+
+/// Both domains match exact pure bytes; a policy mismatch is a valid negative
+/// report200, never authority. Page/two approval assets are private exact bytes;
+/// an existing inspection control precedes the new operation and Root is unchanged.
+#[test]
+fn paea_approval_http_matches_shared_report_and_private_examples_without_root_mutation() {
+    let fixture = Fixture::new(); let baseline = snapshot(&fixture.root);
+    assert_eq!(fixture.call(fixture.request("POST", "/api/v1/protection/inspect", serde_json::to_vec(&json!({"schema_version":1,"document":input(0)["document"]})).unwrap())).response.status(), StatusCode::OK);
+    for prefix in ["payment", "git"] {
+        let directory = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../web/paea-examples/v1");
+        let document = fs::read_to_string(directory.join(format!("{prefix}-document.json"))).unwrap();
+        let original: Value = serde_json::from_slice(&fs::read(directory.join(format!("{prefix}-approval.json"))).unwrap()).unwrap();
+        for mismatch in [false, true] {
+            let mut approval = original.clone(); if mismatch {approval["policy_digest"] = json!("f".repeat(64));}
+            let approval = serde_json::to_string_pretty(&approval).unwrap();
+            let expected = swarm_protection_contract::check_approval_documents(document.as_bytes(), approval.as_bytes()).unwrap();
+            let body = serde_json::to_vec(&json!({"schema_version":1,"document":document,"approval":approval})).unwrap();
+            let reply = fixture.call(fixture.request("POST", "/api/v1/protection/check-approval", body));
+            assert_eq!(reply.response.status(), StatusCode::OK); assert!(reply.failure.is_none());
+            assert_eq!(reply.response.body(), &serde_json::to_vec(&expected).unwrap());
+            assert_eq!(expected.binding_matches, !mismatch); assert_eq!(expected.approval_authenticity, "not-established");
+            assert_eq!(snapshot(&fixture.root), baseline);
+        }
+    }
+    for (path, expected, kind) in [
+        ("/paea-approval.html", include_bytes!("../../../../web/paea-approval.html").as_slice(), "text/html; charset=utf-8"),
+        ("/paea-examples/v1/payment-approval.json", include_bytes!("../../../../web/paea-examples/v1/payment-approval.json").as_slice(), "application/json; charset=utf-8"),
+        ("/paea-examples/v1/git-approval.json", include_bytes!("../../../../web/paea-examples/v1/git-approval.json").as_slice(), "application/json; charset=utf-8"),
+    ] {
+        let control = fixture.call(fixture.request("GET", path, vec![]));
+        assert_eq!(control.response.status(), StatusCode::OK); assert_eq!(control.response.body(), expected);
+        assert_eq!(control.response.headers()["content-type"], kind);
+        let mut missing = fixture.request("GET", path, vec![]); missing.headers_mut().remove(COOKIE);
+        assert_eq!(fixture.call(missing).response.status(), StatusCode::FORBIDDEN);
+        assert_eq!(fixture.call(fixture.request("GET", path, vec![])).response.body(), expected);
+        let head = fixture.call(fixture.request("HEAD", path, vec![]));
+        assert_eq!(head.response.status(), StatusCode::OK); assert!(head.response.body().is_empty());
+        assert_eq!(snapshot(&fixture.root), baseline);
+    }
+}
+
+/// Valid native controls precede admission/closed-envelope/strict-approval faults.
+/// Keep cause chains and safe public diagnostics, reject without report or Root
+/// mutation, then recover exact bytes. No live database, signature or effect used.
+#[test]
+fn paea_approval_http_refusals_keep_causes_and_recover_without_partial_report() {
+    let fixture = Fixture::new(); let baseline = snapshot(&fixture.root); let path = "/api/v1/protection/check-approval";
+    let document = input(0)["document"].as_str().unwrap().to_owned();
+    let approval = std::str::from_utf8(include_bytes!("../../../../web/paea-examples/v1/payment-approval.json")).unwrap();
+    let original = json!({"schema_version":1,"document":document,"approval":approval}); let raw = serde_json::to_vec(&original).unwrap();
+    for fault in ["cookie","csrf","host","origin","method","query","type","version","duplicate","escaped-duplicate","unknown","wrong-type","invalid-document","invalid-approval","approval-version","approval-duplicate","outer-utf8"] {
+        let control = fixture.call(fixture.request("POST", path, raw.clone())); assert_eq!(control.response.status(), StatusCode::OK,"{fault}");
+        let mut request = fixture.request("POST", path, raw.clone());
+        match fault {
+            "cookie" => {request.headers_mut().remove(COOKIE);},
+            "csrf" => {request.headers_mut().remove("x-swarm-csrf");},
+            "host" => {request.headers_mut().insert(HOST,"outside.invalid".parse().unwrap());},
+            "origin" => {request.headers_mut().insert(ORIGIN,"http://outside.invalid".parse().unwrap());},
+            "method" => {*request.method_mut()=http::Method::GET;},
+            "query" => {*request.uri_mut()=format!("{path}?root=APPROVAL_PRIVATE_CANARY").parse().unwrap();},
+            "type" => {request.headers_mut().remove("content-type");},
+            "duplicate"|"escaped-duplicate" => {let key=if fault=="duplicate"{"schema_version"}else{"\\u0073chema_version"};*request.body_mut()=format!("{{\"{key}\":2,{}",&std::str::from_utf8(&raw).unwrap()[1..]).into_bytes();},
+            "outer-utf8" => {*request.body_mut()=vec![0xff];},
+            _ => {
+                let mut changed=original.clone();
+                match fault {
+                    "version" => changed["schema_version"]=json!(2),
+                    "unknown" => changed["APPROVAL_PRIVATE_CANARY"]=json!(true),
+                    "wrong-type" => changed["approval"]=json!({"APPROVAL_PRIVATE_CANARY":true}),
+                    "invalid-document" => changed["document"]=json!("APPROVAL_PRIVATE_CANARY"),
+                    "invalid-approval" => changed["approval"]=json!("APPROVAL_PRIVATE_CANARY"),
+                    "approval-version" => {let mut value:Value=serde_json::from_str(approval).unwrap();value["schema_version"]=json!(2);changed["approval"]=json!(serde_json::to_string(&value).unwrap());},
+                    "approval-duplicate" => changed["approval"]=json!(format!("{{\"\\u0073chema_version\":1,{}",&approval.trim_start()[1..])),
+                    _ => unreachable!(),
+                }
+                *request.body_mut()=serde_json::to_vec(&changed).unwrap();
+            },
+        }
+        let refused=fixture.call(request);let expected=match fault {"cookie"|"csrf"|"host"|"origin"=>StatusCode::FORBIDDEN,"method"=>StatusCode::METHOD_NOT_ALLOWED,_=>StatusCode::BAD_REQUEST};
+        assert_eq!(refused.response.status(),expected,"{fault}");let error=refused.failure.as_ref().unwrap();
+        assert!(!error.to_string().contains("APPROVAL_PRIVATE_CANARY"));assert!(!format!("{error:?}").contains("APPROVAL_PRIVATE_CANARY"));assert!(!String::from_utf8_lossy(refused.response.body()).contains("APPROVAL_PRIVATE_CANARY"));
+        if ["duplicate","escaped-duplicate","unknown","wrong-type","invalid-document","invalid-approval","approval-duplicate","outer-utf8"].contains(&fault){assert!(error.source().is_some(),"{fault}");}
+        assert_eq!(snapshot(&fixture.root),baseline);
+        let recovered=fixture.call(fixture.request("POST",path,raw.clone()));assert_eq!(recovered.response.status(),StatusCode::OK);assert_eq!(recovered.response.body(),control.response.body());
+    }
+}

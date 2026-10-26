@@ -9,7 +9,8 @@ fieldset,section{min-width:0;border:1px solid var(--wattson-ligne);background:va
 label{display:block;margin-block:1rem .4rem}
 input,select{width:100%;min-width:0;padding:.65rem;background:var(--wattson-champ);color:var(--wattson-texte);border:1px solid var(--wattson-ligne);border-radius:.25rem;font:inherit}
 button{min-height:44px;padding:.65rem;font:inherit;border:1px solid var(--wattson-ligne);border-radius:.25rem;background:var(--wattson-carte-appuyee);color:var(--wattson-texte);cursor:pointer}
-.paea-primary{background:var(--wattson-action-fond);color:var(--wattson-action-encre);border-color:var(--wattson-action-bordure);font-weight:600}
+/* Opposite theme foreground/background pairs switch together to keep contrast. */
+.paea-primary{background:var(--wattson-action-fond);color:var(--wattson-action-encre);border-color:var(--wattson-action-bordure);font-weight:600;transition:none}
 button:disabled{opacity:.65;cursor:default}
 :focus-visible{outline:3px solid var(--wattson-accent);outline-offset:3px}
 .paea-notice{padding:.8rem;border-inline-start:4px solid var(--wattson-lien);background:var(--wattson-carte)}

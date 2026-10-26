@@ -494,3 +494,17 @@ ciblés, 2 265 assertions natives (quatre vues),48 parcours exemples/144 téléc
 conservent refus de fraîcheur initial, profils/hashes dev100/dev101 et portée de la
 revue. Sans GLM, commit ou push. IA3/AC-02/humains, E2/E3 et0/17 invariants protégés
 restent ouverts.
+
+
+L’utilisateur demande commit21 puis next. Commit `72e0e32dc`,40 fichiers,108
+entrées préparées d’autrui préservées ; aucun push. [Incrément22](paea/INCREMENT-22.md) :
+rapprochement d’un accord fourni avec action/politique exactes, sans activation protégée.
+
+
+Incrément22 installé en **dev107** : **Rapprocher un accord** dans le menu, rapport
+commun CLI/API lié aux deux fichiers, correspondance/différence/refus explicites.
+11tests nommés,10générations,3 086assertions natives,60parcours/192téléchargements,
+113refus et52contrôles réels/23assets PASS. Contraste primaire transitoire1,28:1
+reproduit puis corrigé sur le composant commun aux cinq vues ;36observations
+minimum9,096:1. [Résultats/RETEX](paea/INCREMENT-22.md) conservent échecs et reprises,
+profils et hashes. Sans GLM/commit22/push. IA3/AC-02/humains,E2/E3 et0/17ouverts.

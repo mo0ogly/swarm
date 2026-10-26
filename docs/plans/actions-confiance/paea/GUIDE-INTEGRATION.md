@@ -154,3 +154,11 @@ laboratoire, donnée de projet ou protection native n’est déclenchée par le 
 Le menu propose Examiner une action : termes, contexte déclaré et sources ordonnées,
 i64 exacts et rapport commun CLI/API. [Preuves/limites](INCREMENT-21.md) : cette
 lecture prépare la demande d’accord, sans créer d’approbateur, d’accord ou d’effet.
+
+
+### Correspondance d’accord — incrément22
+
+Le consommateur du contrat d’accord fourni compare contenu/politique exacts, depuis
+CLI/API/menu, avec refus des entrées invalides et rapport négatif sur différence.
+[Preuves/limites](INCREMENT-22.md) : aucun approbateur authentifié, droit courant,
+attention humaine ou accord protégé établi. Ce raccord ne clôt pas IA3/AC-02.

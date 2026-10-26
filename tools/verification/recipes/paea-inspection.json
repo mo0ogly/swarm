@@ -52,7 +52,9 @@
     "web/paea-inspect.html",
     "rust/crates/swarm-cli/tests/protection_inspection.rs",
     "tests/paea_inspection_schema_test.py",
-    "rust/crates/swarm-protection-contract/tests/inspection.rs"
+    "rust/crates/swarm-protection-contract/tests/inspection.rs",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"

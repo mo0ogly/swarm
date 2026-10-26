@@ -608,3 +608,53 @@ flowchart LR
   Pure --> Report["Hash du document brut + canonique + identités action/intention"]
   Report --> Output["JSON / termes lisibles / téléchargement du rapport"]
 ```
+
+
+## Rapprocher un accord fourni — incrément22
+
+**Vérifications PAEA → Rapprocher un accord** ouvre `/paea-approval.html`.
+Sélectionner le document d’action `{proposal,context}` et un objet d’accord v1
+à quatre champs : `schema_version`, `action_digest`, `policy_digest`, `approver_id`.
+Les aides décrivent la limite et proposent des paires fictives pour les deux
+domaines. Aucun fichier n’est chargé automatiquement.
+
+`check_approval_documents` réutilise `decode_document`, `decode_approval`,
+la canonicalisation v1 et `CanonicalAction::matches_approval`. Commande :
+`protection check-approval ACTION ACCORD --json`, deux fichiers réguliers nommés,
+sans stdin partagé ni option Root/server/output/task/phase incompatible. API :
+`POST /api/v1/protection/check-approval`, enveloppe fermée
+`{schema_version:1,document:String,approval:String}` sous les gardes natifs
+Host/session/origin/CSRF et POST/JSON/sans query/borne technique existants.
+Pas de lecture d’autorité, signature, horloge, stockage, compte ou effet.
+
+Rapport fermé v1 : `schema_version`, `scope:"offline-data-only"`, `document`
+(hashes du fichier, de l’action et de l’intention), `approval_sha256`,
+`binding_matches`, `mismatched_fields`, `authority`, `approval_authenticity`,
+`approval_validity`, `effect`. Les quatre derniers marqueurs restent
+`not-established`. Les noms de champs différents sont uniques et ordonnés parmi
+`action_digest` puis `policy_digest`. Une correspondance exige les deux égalités ;
+un nom d’approbateur changé peut correspondre encore : l’identité n’est pas vérifiée.
+La clé de tentative et le format changent le hash brut sans modifier le canonique.
+
+Une différence est un **rapport de données négatif**, sortie CLI0/HTTP200 avec
+`binding_matches:false`, champs différents et libellé explicite « Aucun accord
+validé ». Ce n’est pas un refus d’autorisation. Une entrée invalide refuse le
+contrôle sans rapport (CLI2/HTTP400), cause typée conservée et diagnostic public
+sûr. Le navigateur vérifie forme fermée, marqueurs, booléen/liste cohérents et
+hashes des deux fichiers originaux avant affichage texte et export exact
+`paea-approval-report.json`. Une modification, erreur ou nouvelle tentative efface
+l’ancien résultat/export ; les fichiers restent sélectionnés. Aucun retry implicite.
+
+Les dix fichiers publics fictifs sont produits par `tools/paea/make_examples.py` ;
+les huit anciens gardent leurs octets. Les deux nouveaux `*-approval.json` sont
+non signés, leur `approver_id` est fictif. Le rapport ne recopie pas ce nom.
+Schémas : `http-approval-check-v1.schema.json`, `approval-report-v1.schema.json`.
+Authenticité, droits actuels, expiration, révocation, séparation des tâches,
+attention humaine et effet restent à établir par PA-02/03/08, jamais par l’égalité.
+[Résultats et limites](../plans/actions-confiance/paea/INCREMENT-22.md).
+
+Les boutons primaires PAEA utilisent les paires sémantiques communes, avec changement
+de couleurs simultané entre thèmes. Leur transition croisée héritée provoquait un
+contraste transitoire1,28:1 ; elle est supprimée sur le composant primaire commun
+aux cinq vues. La recette observe les frames réelles de deux changements de thème,
+sans désactiver les animations dans le test ni introduire d’attente temporelle.

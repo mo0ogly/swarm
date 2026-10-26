@@ -1499,3 +1499,26 @@ supervision stays required; no global watchdog or live business fixture.
 protected asset sets**, including the empty inspection/menu/examples/limits in
 FR/EN and actual Version/notes/commit/dirty/focus. It submits no business document.
 Results remain in increment21, distinct from protected assurance or acceptance.
+
+### PAEA supplied approval correspondence / Correspondance d’accord (increment22)
+
+`paea-approval-check.json` runs2schema,3core,2CLI,2nativeHTTP tests, then10exact
+fictional generation checks and2five-view schema/link tests on frozen declared
+inputs. Original fourteen vectors, max revisions, request/terms/policy/declared
+approver differences, safe strict failures/recovery and unchanged Root are covered.
+A valid mismatch isCLI0/HTTP200 data with no authenticated approval or effect.
+Full native HTTP manifests now name12tests; older proofs retain their original counts.
+
+`paea-native-ux.json`:12configurations per view across5views,60example journeys
+and113actual expected native400 responses (previous87+24approvalJSON+2originalBOM).
+New view tests exact CLI/API/rawdownload,explicit negative reports,unverified
+approver/loading/duplicate-gesture/stale-export behavior. Browser-only response
+faults and local UTF8 failures are separate from actual native refusals.
+`paea-local-delivery.json`:52read-onlylivechecks and23protectedassetsets,Version
+FR/EN/currentnotes/commit/dirty/focus. No business POST or live database fixture.
+No hidden build/retry/global watchdog; control precedes each fault. See increment22
+for actual results, source review, profile/binary identity and remaining criteria.
+The primary-control regression observes every real theme-transition frame (both
+directions) and AA contrast, with no sleep or test-side animation disabling. A
+reproduced1.28:1 intermediate frame required a shared PAEA primary CSS correction;
+the original failed browser run is retained separately from its full replay.

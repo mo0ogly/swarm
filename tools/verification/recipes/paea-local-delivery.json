@@ -14,7 +14,9 @@
     "web/paea-compare.html",
     "web/paea-examples/v1/*.json",
     "web/paea-inspect.html",
-    "schemas/paea/inspection-v1.schema.json"
+    "schemas/paea/inspection-v1.schema.json",
+    "web/paea-approval.html",
+    "schemas/paea/approval-report-v1.schema.json"
   ],
   "environment": {},
   "steps": [
@@ -26,7 +28,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "LIVE_PAEA_DELIVERY_VERIFIED 46",
+        "LIVE_PAEA_DELIVERY_VERIFIED 52",
         "fr-dialog-current-PAEA-evolutions",
         "en-dialog-current-PAEA-evolutions",
         "no-browser-errors-or-writes",
@@ -39,7 +41,10 @@
         "en-live-payment-example-links",
         "en-live-inspection-menu-fields",
         "fr-live-inspection-limits-no-submission",
-        "en-live-inspection-example-links"
+        "en-live-inspection-example-links",
+        "fr-live-approval-menu-fields",
+        "en-live-approval-limits-no-submission",
+        "en-live-approval-example-links"
       ],
       "required_stderr": []
     },
