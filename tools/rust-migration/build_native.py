@@ -3,7 +3,8 @@
 
 Root and Cargo target must be owned and stable. The local launcher uses this builder.
 Git HEAD/status are observations before/after compilation, not atomic source or
-actor authentication. Effective compiler inputs are independently archived by the
+actor authentication. Collector exit/signal and channel hashes survive refusals.
+Effective compiler inputs are independently archived by the
 native profile collector. No retry, network, global timeout, restart or publication.
 """
 from pathlib import Path
@@ -79,6 +80,14 @@ def build(root,out,target,version):
         profile.publish(out/'invocation.json',json.dumps(dict(argv=args,root=str(root),metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),global_watchdog=None),indent=2)+'\n')
         with (out/'collector.stdout').open('xb') as stdout,(out/'collector.stderr').open('xb') as stderr:
             result=subprocess.run(args,env=env,stdin=subprocess.DEVNULL,stdout=stdout,stderr=stderr)
+        # A killed collector can leave empty stderr and no final profile. Keep
+        # its actual exit/signal before refusing; missing output is not success.
+        profile.publish(out/'collector-result.json',json.dumps(dict(
+            returncode=result.returncode,
+            signal=-result.returncode if result.returncode<0 else None,
+            stdout_sha256=profile.digest(out/'collector.stdout'),
+            stderr_sha256=profile.digest(out/'collector.stderr'),
+        ),indent=2)+'\n')
         profile.require(result.returncode==0,'native-build-profile-failed')
         qualified=json.loads((out/'profile/result.json').read_bytes())
         profile.require(qualified['native_build_metadata']==dict(present=True,sha256=hashlib.sha256(raw.encode()).hexdigest()),'native-build-metadata-binding')
