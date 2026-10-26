@@ -8934,8 +8934,8 @@ nor global acceptance.
 embeds only native-journey dependencies and preparation-native.js; the cockpit
 link preserves language/theme. Reads, creation, save, method selection, brief
 adoption, question answers, validation and history use the CLI's shared API/writer.
-AI dialogue, sources, rich editing, templates and conversion remain unavailable
-on this page, with a visible explanation. No mission or agent is launched.
+AI dialogue, sources, rich editing and templates remain unavailable. Standalone
+conversion without start is described below. No agent is launched.
 
 ```mermaid
 flowchart LR
@@ -8964,3 +8964,31 @@ minting repeated stale events. List failure after a confirmed write is reported
 as a read failure; optional metadata cannot block an accessible document. Local
 drafts remain downloadable after refusal. History uses the persisted cursor/page
 policy without a local50-row cutoff. Recipe: preparation-ui-rust.
+
+
+### Locked new-work preparation conversion / conversion sans départ
+
+`prepare create-missions` and the shared HTTP writer materialize standalone
+preparations only. Current saved policies and source/verdict freshness precede
+materialization; existing Work, organization and release/revision are refused.
+
+```mermaid
+sequenceDiagram
+    participant UI as CLI / native preparation UI
+    participant W as Shared preparation writer
+    participant DB as Immediate transaction
+    UI->>W: exact plan hash, revisions, event
+    W->>W: fresh verdict and current saved policies
+    W->>DB: Work + ordered tasks + unreleased locks + event
+    W->>DB: preparation + immutable receipt
+    W->>DB: final readback of all staged rows
+    W->>DB: commit or rollback together
+    W-->>UI: recorded snapshot or explicit uncertain outcome
+    Note over W,DB: No provider, release or agent start
+```
+
+Final readback follows receipt insertion, including trigger side effects. This
+proves the fixture contract, not authenticity of a modified datastore. Event
+replay never rematerializes Work. `preparation-launch-locked` retains the typed
+public refusal instead of the former generic format code. See the bilingual
+runtime guide and permanent `preparation-conversion-rust` recipe.

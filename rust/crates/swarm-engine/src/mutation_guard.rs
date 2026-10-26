@@ -85,7 +85,11 @@ pub enum MutationGuardError {
     },
 }
 impl MutationGuardError {
-    /// Public Go-compatible business classification; diagnostics remain in source().
+    /// Return a safe public classification without IO or state change. Most
+    /// business classes retain Go compatibility; LaunchLocked deliberately emits
+    /// preparation-launch-locked instead of format so CLI/API retain the cause.
+    /// The classification grants neither retry nor start authority; source()
+    /// retains typed underlying errors where available.
     pub fn code(&self) -> &'static str {
         match self {
             Self::Command(e) => e.code(),
@@ -97,6 +101,7 @@ impl MutationGuardError {
                 observed: Some(_), ..
             } => "revision_conflict",
             Self::ActiveAgent => "active_agent",
+            Self::LaunchLocked => "preparation-launch-locked",
             _ => "format",
         }
     }

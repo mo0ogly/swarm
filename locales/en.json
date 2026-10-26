@@ -5800,5 +5800,12 @@
   "Rapport de laboratoire invalide ou incomplet.": "Invalid or incomplete laboratory report.",
   "Lecture du rapport de laboratoire…": "Reading laboratory report…",
   "Sélectionner un rapport de laboratoire.": "Select a laboratory report.",
-  "Huit tests déclarés réussis. Protection et authenticité non établies.": "Eight tests declared passing. Protection and authenticity not established."
+  "Huit tests déclarés réussis. Protection et authenticité non établies.": "Eight tests declared passing. Protection and authenticity not established.",
+  "Préparation manuelle : enregistrez avec le bouton ou Ctrl/Cmd + S. La création de missions reste sans démarrage ; le dialogue IA est indisponible.": "Manual preparation: save with the button or Ctrl/Cmd + S. Creating tasks does not authorize start; AI dialogue is unavailable.",
+  "Plan vérifié. Vous pouvez créer les missions sans autoriser leur démarrage.": "Plan validated. You can create tasks without authorizing their start.",
+  "Conversion vers un travail existant indisponible dans ce parcours.": "Conversion into an existing work is unavailable in this flow.",
+  "Créer les missions ne lance aucun agent.": "Creating tasks does not launch any agent.",
+  "Créer un nouveau travail et ses tâches verrouillées. Aucun agent ne démarre ; l’équipe et l’autorisation de départ restent à configurer.": "Create a new work and its locked tasks. No agent starts; team settings and start authorization remain to be configured.",
+  "Créer sans démarrer": "Create without starting",
+  "Missions enregistrées. Cette opération n’autorise aucun démarrage ; consultez le pilotage pour l’état courant.": "Tasks recorded. This operation authorizes no start; open the cockpit for current state."
 }

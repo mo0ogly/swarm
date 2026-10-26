@@ -571,8 +571,8 @@ intent; serving that page and its other services in Rust remains separate work.
 embeds only native-journey dependencies and preparation-native.js; the cockpit
 link preserves language/theme. Reads, creation, save, method selection, brief
 adoption, question answers, validation and history use the CLI's shared API/writer.
-AI dialogue, sources, rich editing, templates and conversion remain unavailable
-on this page, with a visible explanation. No mission or agent is launched.
+AI dialogue, sources, rich editing and templates remain unavailable. Standalone
+conversion without start is described below. No agent is launched.
 
 ```mermaid
 flowchart LR
@@ -602,3 +602,25 @@ minting repeated stale events. List failure after a confirmed write is reported
 as a read failure; optional metadata cannot block an accessible document. Local
 drafts remain downloadable after refusal. History uses the persisted cursor/page
 policy without a local50-row cutoff. Recipe: preparation-ui-rust.
+
+
+## Create locked tasks without starting — Rust
+
+The native flow exposes **Create tasks**, an explicit review, then **Create
+without starting**. It requires a standalone preparation, an adopted brief and
+current verdict. CLI: `prepare create-missions ID --input FILE --json`; API:
+`POST /api/v1/preparations/command`. The v1 document carries action=create-missions,
+preparation_id, event_id, expected_revision, expected_work_revision=0 and the exact
+plan sha256. Current Admin policies are rechecked even after the verdict.
+
+Work, dependency-ordered tasks, provenance, locks, event and receipt commit
+atomically. No provider is called. Tasks remain todo with launch_held and
+unreleased SQL locks. The cockpit link appears after confirmation. A lost reply
+requires replaying the same event, never a second event. Refusals retain all
+data. The public preparation-launch-locked code now identifies this start refusal.
+
+Existing-work conversion, organization setup, revisions and release-plan remain
+explicitly unavailable here. A click grants neither start authorization nor
+verified human identity. Historical conversions remain observations. The
+preparation-conversion-rust recipe also covers Admin changes and failures injected
+before/after receipt insertion.

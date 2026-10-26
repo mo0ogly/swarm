@@ -623,8 +623,8 @@ Le serveur embarque uniquement les dépendances du parcours natif et le contrôl
 `preparation-native.js`. Le lien du cockpit conserve langue/thème. Les lectures,
 création, sauvegarde, sélection de méthode, adoption du brief, réponses aux questions,
 validation et historique utilisent les mêmes routes et writer que le CLI.
-Le dialogue IA, les sources, l’éditeur enrichi, les modèles et la conversion restent
-indisponibles sur cette page, avec une explication visible ; aucune mission lancée.
+Le dialogue IA, les sources, l’éditeur enrichi et les modèles restent indisponibles.
+La conversion autonome sans départ est décrite ci-dessous ; aucun agent lancé.
 
 ```mermaid
 flowchart LR
@@ -658,3 +658,26 @@ Les erreurs de liste après une écriture confirmée restent des erreurs de lect
 les métadonnées facultatives ne bloquent pas un document accessible. Les brouillons
 peuvent être téléchargés, y compris après un refus. Historique paginé selon la
 limite persistée, jamais un plafond local50. Recette : preparation-ui-rust.
+
+
+## Créer les missions sans démarrage — Rust
+
+Le parcours natif propose **Créer les missions**, puis une revue explicite et
+**Créer sans démarrer**. Il exige une préparation autonome, un brief adopté et
+un verdict courant. CLI : `prepare create-missions ID --input FILE --json` ; API :
+`POST /api/v1/preparations/command`. Le document v1 porte action=create-missions,
+preparation_id, event_id, expected_revision, expected_work_revision=0 et sha256
+exact du plan. Les politiques Admin courantes sont revalidées, même après verdict.
+
+Travail, tâches ordonnées par dépendances, provenance, verrous, événement et reçu
+sont atomiques. Aucun fournisseur n’est appelé. Les tâches restent todo avec
+launch_held et des verrous SQL non libérés. Le pilotage est accessible après
+confirmation. Une réponse perdue exige le rejeu du même événement, jamais un
+second événement. Un refus conserve toutes les données. Le diagnostic public
+preparation-launch-locked identifie désormais ce refus de départ.
+
+Un travail existant, une organisation, une révision ou release-plan restent
+explicitement indisponibles dans ce parcours ; aucune autorisation de départ ni
+identité humaine authentifiée n’est déduite du clic. Les conversions historiques
+restent des observations. La recette `preparation-conversion-rust` couvre aussi
+les modifications Admin et les échecs injectés avant/après l’écriture du reçu.

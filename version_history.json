@@ -7,6 +7,10 @@
     },
     "items": [
       {
+        "fr": "Préparation Rust : créer explicitement un nouveau travail et ses missions verrouillées depuis un plan vérifié, avec revalidation des limites Admin et reçu atomique rejouable ; aucun démarrage ni équipe configurée implicitement.",
+        "en": "Rust preparation: explicitly create a new work and its locked tasks from a validated plan, rechecking Admin limits with an atomic replayable receipt; no implicit start or team configuration."
+      },
+      {
         "fr": "Première publication gérée native : publier le candidat contrôlé et accepter la tâche atomiquement, avec reçu canonique, rejeu sans nouvel appel et refus explicite des baselines cumulatives non portées. Les empreintes et le commit résultat sont rapprochés du candidat contenu dans l’original privé des contrôles.",
         "en": "First native managed publication: atomically publish the checked candidate and accept its task, with a canonical receipt, replay without another call and explicit refusal of unported cumulative baselines. Binding and result commit are matched to the candidate held in the private control original."
       },
@@ -19,8 +23,8 @@
         "en": "PAEA: compare a supplied approval with exact action content and policy, distinguish match, mismatch and invalid input; fictional examples and shared CLI/API report, without authentication or validated approval. Primary-button theme colors switch together to preserve contrast."
       },
       {
-        "fr": "Préparation manuelle raccordée au Rust : page existante, besoin/brief/plan, méthode, décisions, historique et conflits. Limites Admin effectives, reprise des reçus incertains ; dialogue IA et conversion restent indisponibles.",
-        "en": "Manual preparation connected to Rust: existing page, need/brief/plan, method, decisions, history and conflicts. Effective Admin limits and uncertain-receipt recovery; AI dialogue and conversion remain unavailable."
+        "fr": "Préparation manuelle raccordée au Rust : page existante, besoin/brief/plan, méthode, décisions, historique et conflits. Limites Admin effectives, reprise des reçus incertains ; dialogue IA encore indisponible.",
+        "en": "Manual preparation connected to Rust: existing page, need/brief/plan, method, decisions, history and conflicts. Effective Admin limits and uncertain-receipt recovery; AI dialogue still unavailable."
       },
       {
         "fr": "Prépublication gérée : contrôle explicite de l’avis natif, des originaux de contrôle et du candidat courant ; blocages de publication et de baseline affichés, sans acceptation ni nouvel appel.",

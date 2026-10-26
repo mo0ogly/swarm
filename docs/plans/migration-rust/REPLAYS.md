@@ -2000,3 +2000,5 @@ La recette préparations ajoute public-plan-validation et atomic-plan-verdict ; 
 Réponses aux questions du plan : `preparation-answers-rust`, `SWARM_PREPARATION_WRITES_BINARY` = binary normal qualifié ; CLI/API, CAS/hash, provenance, limites, rollback, rejeu et sortie.
 
 Interface manuelle de préparation : `preparation-ui-rust`, variable `SWARM_PREPARATION_UI_BINARY` vers le profil normal figé. Parcours navigateur FR/EN, thèmes, CAS, décisions longues, historique, refus et reprise.
+
+- `preparation-conversion-rust`: new-work CLI/API/UI, unreleased locks, exact replay, fresh Admin policies and rollback after receipt-trigger damage. `SWARM_PREPARATION_UI_BINARY` selects the frozen normal-profile binary; no global watchdog.

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "preparation-conversion-rust",
+  "inputs": [
+    "tests/rust_preparation_conversion.py",
+    "tests/rust_preparation_conversion_ui.cjs",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_native_http_cli.py",
+    "web/preparation-native.js",
+    "web/prepare.html",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/src/root_store/preparation_conversion.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/mutation_guard.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "locked-conversion-journey",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-conversion-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_conversion.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_CONVERSION_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CONVERSION_PASS",
+        "PASS conversion-public-start-refused",
+        "PASS conversion-trigger-schema-refusal",
+        "PASS conversion-replay-no-second-write",
+        "PASS conversion-product-story-contract",
+        "PASS conversion-known-refusal-unlocks",
+        "PASS conversion-unknown-keeps-exact-event",
+        "PASS en-sombre-no-overflow-390"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

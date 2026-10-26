@@ -1,0 +1,74 @@
+{
+  "kind": "Principal semantic review of owned delta; not independent or global qualification",
+  "baseline": "docs/plans/migration-rust/evidence/20261026-preparation-ui/final-inputs.json",
+  "version": "v0.1.1-dev.115",
+  "binary_sha256": "3635bd296a419b7d7c8f5c845a5caa87efea689b028358ec228c43c36d9fae62",
+  "files": {
+    "rust/crates/swarm-engine/src/root_store.rs": "756d8f1f13b4eae45435848de0faaa2cb5903c1bea76f75831219c0dbb6469a9",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs": "d343ed6bb99226ddd37e05cabd014a0c12b6950cc1f4a158af9693662837dd15",
+    "rust/crates/swarm-engine/src/root_store/preparation_conversion.rs": "28b7e273647873ffbc6d9e1a893d9956862350590294fde9ca374ddbbeefb0d8",
+    "rust/crates/swarm-engine/src/preparation_command.rs": "311752d9866046a59c784c9c60f90ca41c2ae3d8d63621c01d9382f7490883d5",
+    "rust/crates/swarm-engine/src/mutation_guard.rs": "eb2126f158140a002e19a5127f70cf02a7dd1a37e80bbf9f392ed065e319c0e3",
+    "rust/crates/swarm-cli/src/preparation.rs": "62318404e17917c72bbfeb17ced868e6354fc666e1bf37a253a6765984631f86",
+    "rust/crates/swarm-cli/src/lib.rs": "ab4ec936704d2a9cc01eff0a90695a481e308b3137c3377d9a4e3310bb2a6e13",
+    "rust/crates/swarm-web/src/service.rs": "e2d4d21f5f4299141005542768db17c0a14e07e240b2a402cd5edc36642be324",
+    "rust/crates/swarm-web/src/service/preparations.rs": "8610971b1825b69d3d277aaf2d9c1a8a3d0b9302d8b5e28cbbc153ec5bd7f262",
+    "web/preparation-native.js": "540dc1f09a921b70b1767d64c2d11940aa38febe3972f74b6609fe293cbe4126",
+    "locales/en.json": "96c7fecf602913f37a3a8346bc46e8c970d9394c2288f2c60a9d69588bed011c",
+    "web/i18n-en.js": "8dd9a0c51a159a08f921ab69842137f69eadf73544aa9534b8d6c9ec1a7ba7d9",
+    "version_history.json": "2b2c2b6657ab08d203c9582bf68788e97a68d44f78eb5ca368523846668f0750",
+    "tests/rust_preparation_conversion.py": "c5d19252ce025efc0f8d2aae7633531fbf982ccf18999a635659af31b23d187c",
+    "tests/rust_preparation_conversion_ui.cjs": "2a39dad16d13c2038453cdc11ce5eb8c7875147ef5422047797c97e239b2b78f",
+    "tools/verification/recipes/preparation-conversion-rust.json": "7b9eb922a9d7dc48501ead9c6e6bf20cbe21d450638abedbc1bfcff22d92c479",
+    "docs/RUNTIME-RECOVERY.md": "95176106cc7d3a05f2f0c6672f7e1b8f2b5fd673022d574842d00827bc104b35",
+    "docs/en/RUNTIME-RECOVERY.md": "6977c4d2fea2c691e625cf99a114506df501c687c9adf61195601938920a9e39",
+    "docs/architecture/RUST-MIGRATION.md": "0a5860d74ad88fbf64f27dd77a32af7dd9bd108541dc6866cc604d5d063a69cc",
+    "docs/en/RUST-MIGRATION.md": "dc3dd0529229dd90e47c2b90f8e9b8d617d09ae89ddfdc2e506940108ad6be7e",
+    "docs/plans/migration-rust/REPLAYS.md": "7e82f72d1943775bd06aea51487cd81e670de97fae00844eaee85d6d53051702",
+    "docs/en/RUST-MIGRATION-REPLAYS.md": "8d04b508f764b79e44ab27bd60bc383ae0610f70d1888ad68d27ac470164c9e6",
+    "docs/plans/migration-rust/PLAN.md": "2233d17ec419ef982a699f1d45652112e2718e5781fc74d6dc09de9c00435292",
+    "docs/plans/migration-rust/PREPARATION-CONVERSION-20261026.md": "0a849a34fd5ad6ff4ee422ee478d4cd211b98c394ae662a612feed6039379779"
+  },
+  "policies": {
+    "state": "reviewed within scope",
+    "detail": "Current saved editing/plan/task/default gate settings are authoritative and reserved. No new operator policy. Work revision1/schema1, unreleased0/held=true, hashed identity formats, Go gate names and work criterion are protocol/domain contracts. Test numbers are fixture inputs. No arbitrary retry/timer/concurrency guard."
+  },
+  "functions": {
+    "state": "reviewed within scope",
+    "inventory": [
+      "ordered",
+      "materialize",
+      "Witness::verify",
+      "preparation_write::apply",
+      "RootStore::preparation_command",
+      "preparation_command::validate",
+      "MutationGuardError::code",
+      "CLI preparation execute/write",
+      "HTTP preparation command/capability metadata",
+      "native controls/paint/mutate/conversion review/confirm",
+      "maintained fixture/assertion helpers"
+    ],
+    "detail": "Rustdoc now explicitly requires caller final Witness verification; public LaunchLocked code documents deliberate exception to prior format classification. Purpose, preconditions, output, failure, effects and limits checked against actual producers/callers."
+  },
+  "errors": {
+    "state": "reviewed within scope",
+    "detail": "Joint transaction and exact readback after receipt; typed SQL/codec/runtime/finalization/rollback/commit/close cause chains retained. Known pre-write conversion refusals unlock; generic IO/JSON/unknown SQL/commit retain immutable event. Historical receipt never rematerializes Work. UI CAS/text remain preserved. Public lock refusal is actionable, not format."
+  },
+  "documentation": {
+    "state": "reviewed within scope",
+    "detail": "FR/EN runtime/architecture/replays, CLI FR/EN help, current local notes, Mermaid transaction, retained failures/GLM classification and RETEX. Explicit unported existing-work/org/release/revision/AI flows. No live Admin activation or human-authentication claim."
+  },
+  "proof_scope": "50 CLI/API +51 browser on113;105 preparation regression on112; normal114 only three Rustdoc deltas from113 and115 has identical477 inputs; retained exact comparisons justify scoped reuse.16 HTTP+14 Version+6 read-only page checks on115. One exact unit Witness test reused on identical suffix. No global/independent/user acceptance.",
+  "resume_delta": {
+    "reason": "helper consumes Linux-only preparation projection; mirror caller cfg",
+    "before": {
+      "rust/crates/swarm-engine/src/root_store.rs": "515c85cf6d9db2a53e222b621299e180e8afc73ddceb51f7016b62eb2123b5ff",
+      "docs/plans/migration-rust/PREPARATION-CONVERSION-20261026.md": "beb1226d9367d5dfda1bd238efd19b41d8addecb3b31144546602a73beeaf021"
+    },
+    "after": {
+      "rust/crates/swarm-engine/src/root_store.rs": "756d8f1f13b4eae45435848de0faaa2cb5903c1bea76f75831219c0dbb6469a9",
+      "docs/plans/migration-rust/PREPARATION-CONVERSION-20261026.md": "0a849a34fd5ad6ff4ee422ee478d4cd211b98c394ae662a612feed6039379779"
+    },
+    "verification": "rustc current target_os=linux; same selected module as115; supported build/restart follows commit. No Windows qualification claim. Historical final-inputs.json/effective115 inventory retained unchanged."
+  }
+}

@@ -9445,8 +9445,8 @@ Le serveur embarque uniquement les dépendances du parcours natif et le contrôl
 `preparation-native.js`. Le lien du cockpit conserve langue/thème. Les lectures,
 création, sauvegarde, sélection de méthode, adoption du brief, réponses aux questions,
 validation et historique utilisent les mêmes routes et writer que le CLI.
-Le dialogue IA, les sources, l’éditeur enrichi, les modèles et la conversion restent
-indisponibles sur cette page, avec une explication visible ; aucune mission lancée.
+Le dialogue IA, les sources, l’éditeur enrichi et les modèles restent indisponibles.
+La conversion autonome sans départ est décrite ci-dessous ; aucun agent lancé.
 
 ```mermaid
 flowchart LR
@@ -9479,3 +9479,33 @@ Les erreurs de liste après une écriture confirmée restent des erreurs de lect
 les métadonnées facultatives ne bloquent pas un document accessible. Les brouillons
 peuvent être téléchargés, y compris après un refus. Historique paginé selon la
 limite persistée, jamais un plafond local50. Recette : preparation-ui-rust.
+
+
+### Conversion vers un nouveau travail sans départ
+
+`prepare create-missions` et le writer HTTP partagé matérialisent uniquement
+les préparations autonomes. Les politiques persistées courantes et la fraîcheur
+des sources/verdict précèdent toute écriture. Travail existant, organisation,
+révision et autorisation de départ restent refusés.
+
+```mermaid
+sequenceDiagram
+    participant UI as CLI / native preparation UI
+    participant W as Shared preparation writer
+    participant DB as Immediate transaction
+    UI->>W: exact plan hash, revisions, event
+    W->>W: fresh verdict and current saved policies
+    W->>DB: Work + ordered tasks + unreleased locks + event
+    W->>DB: preparation + immutable receipt
+    W->>DB: final readback of all staged rows
+    W->>DB: commit or rollback together
+    W-->>UI: recorded snapshot or explicit uncertain outcome
+    Note over W,DB: No provider, release or agent start
+```
+
+La relecture finale suit l’insertion du reçu et couvre les effets de triggers.
+Le Root public refuse les triggers ajoutés ; le test interne les injecte après
+ouverture sans revendiquer une exploitation publique. Le rejeu ne recrée aucun
+travail. `preparation-launch-locked` conserve le refus public typé au lieu du
+code générique format. Le reçu affiché n’atteste pas l’état courant des droits.
+Voir le guide de reprise bilingue et la recette `preparation-conversion-rust`.

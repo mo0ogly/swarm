@@ -11,6 +11,23 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — créer les missions sans départ,26 octobre
+Owner Codex ; reprise après commit50a972330 (108entrées indexées d’autrui préservées).
+CLI/API/UI create-missions : nouveau travail, tâches/gates/provenance, verrous,
+événement et reçu atomiques ; aucun agent lancé. Refus et rejeu exact observés.
+Dev115 actif,477entrées qualifiées ; processus/ressources/Version FR/EN vérifiés.
+50contrôles CLI/API et51assertions navigateur sur113 ;105préparation sur112.
+114 ne change que3Rustdoc (comparaison conservée),115 a les mêmes477entrées :
+réutilisation bornée ;16HTTP +14Version +6lecture sur115, paramètres/missions conservés.
+Un test interne nommé prouve relecture tardive/rollback/reprise ; portée conservée.
+GLM :2réponses SSE complètes,93104tokens déclarés ; alertes qualifiées sur producteurs.
+Correction de l’ordre DFS Go, diagnostic launch-locked et déblocage des refus UI.
+Travail existant/organisation/release/révision restent refusés ; Admin vivant41 conservé.
+[Rapport/RETEX](PREPARATION-CONVERSION-20261026.md),
+[preuves/revue bornée](evidence/20261026-preparation-conversion/README.md).
+Suite owner Codex : autorisation explicite de départ et organisation, jamais implicite.
+Aucun push ; Biba/SCALING/PAEA préservés, qualification globale ouverte.
+
 ## Livré localement — interface de préparation manuelle Rust,26 octobre
 Owner Codex ; page existante raccordée : créer/sauver/méthode/adopter/répondre/
 valider/historique, sans dialogue IA, conversion ou lancement implicites.
@@ -3238,6 +3255,7 @@ domaine du Job. Version1 sans origine conserve ses octets, aucune backfill.
 21 tests ciblés passent ; recette native/legacy/auto-revue et livraison à qualifier.
 Candidat physique et cohorte S2 restent gardés, pas de validation finale prétendue.
 Preuves : evidence/20261025-scaling-s2-oi9dgo_e/native-source-origin/.
+
 
 ## S2 — première publication atomique installée, 26 octobre, v0.1.1-dev.115
 

@@ -3591,4 +3591,6 @@ pub use budget_history::{HistoricalBudgetView, HistoricalBudgetShow, HistoricalB
 
 #[cfg(target_os = "linux")]
 mod preparation_write;
+#[cfg(target_os = "linux")]
+mod preparation_conversion;
 mod preparation_plan;

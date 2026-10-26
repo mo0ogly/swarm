@@ -1,4 +1,4 @@
-//! Transactional draft creation/save/method selection and explicit brief adoption/plan answers, without conversion or agent execution.
+//! Transactional preparation edits and explicit new-work conversion; never agent execution.
 use super::{
     finished,
     preparation_read::{cause, stored},
@@ -19,6 +19,7 @@ struct WriteContext<'a> {
     policy: &'a crate::PreparationReadPolicy,
     settings: &'a crate::EngineSettingsValues,
     at: &'a str,
+    document: &'a crate::EngineSettingsDocument,
 }
 /// Resolve an available capability hash, retaining original safe source causes.
 /// Unknown/unavailable sources refuse before mutation; other catalogue warnings
@@ -42,13 +43,15 @@ fn current_method_hash(root: &RootStore, method: &str, policy: &crate::Preparati
 /// have no corresponding current-content witness. Brief adoption copies only
 /// the current nonblank document matching the requested hash and need hash. It
 /// appends no history. Answers append one plan revision while retaining provenance
-/// and invalidating verdicts; no conversion or OS confinement is established.
-fn apply(
+/// and invalidating verdicts. create-missions delegates new-work materialization
+/// to the same transaction; no start, organization or OS confinement is granted.
+fn apply<W:WorkEnvironment>(
     context: &WriteContext<'_>,
     db: &Connection,
     r: &PreparationCommand,
     method: &str,
     causes: &mut Vec<E>,
+    environment: &mut W,
 ) -> Result<Preparation, E> {
     let root=context.root;let policy=context.policy;let at=context.at;
     let raw = encode(r)?;
@@ -158,6 +161,7 @@ fn apply(
         }
         p.adopted_brief = Some(Box::new(brief.clone()));
     }
+    let materialization=if r.action=="create-missions" {Some(super::preparation_conversion::materialize(root,db,&mut p,r,context.document,at,environment,causes)?)}else{None};
     let mut document = None;
     if r.action == "answer-questions" {
         let original=p.documents.as_ref().and_then(|docs|docs.get("plan"))
@@ -243,9 +247,9 @@ fn apply(
         .checked_add(1)
         .ok_or(E::Refused("preparation-revision-overflow"))?;
     p.updated_at = at.into();
-    if r.action != "validate-plan" { p.verdict = None; }
+    if !matches!(r.action.as_str(),"validate-plan"|"create-missions") { p.verdict = None; }
     p.plan_ready = false;
-    if r.action == "validate-plan" { root.preparation_project(&mut p,policy,causes)?; }
+    if matches!(r.action.as_str(),"validate-plan"|"create-missions") { root.preparation_project(&mut p,policy,causes)?; }
     p.receipt_historical = false;
     let body = encode(&p)?;
     let changed = if r.action == "create" {
@@ -264,8 +268,8 @@ fn apply(
         )
     } else {
         db.execute(
-            "UPDATE preparations SET revision=?1,body=?2 WHERE id=?3 AND revision=?4",
-            params![p.revision, body, id, previous],
+            "UPDATE preparations SET revision=?1,body=?2,work_id=?5 WHERE id=?3 AND revision=?4",
+            params![p.revision, body, id, previous,if p.work_id.is_empty(){None}else{Some(&p.work_id)}],
         )
     }
     .map_err(|e| E::Launch(Box::new(crate::AgentLaunchError::from(e))))?;
@@ -285,11 +289,14 @@ fn apply(
     if receipt != (raw, body) {
         return Err(E::Refused("preparation-receipt-write-mismatch"));
     }
+    if let Some(witness)=materialization {witness.verify(db)?;}
+    if stored(db,&id)?!=p {return Err(E::Refused("preparation-write-readback-mismatch"));}
     Ok(p)
 }
 
 impl RootStore {
-    /// Create/save/select a method/adopt a brief/answer a plan or replay its immutable event receipt on this opened
+    /// Create/edit/adopt/answer a draft, materialize a standalone plan or replay
+    /// its immutable event receipt on this opened
     /// Root. Requires writable Root, complete enabled saved v42 policy, bounded
     /// valid request and exact revision. Stable settings and retained physical
     /// Root association guard an immediate transaction. Original rollback/commit,
@@ -311,7 +318,11 @@ impl RootStore {
     /// Consumed document hashes must match stored text. Mismatches refuse with
     /// preparation-document-digest-mismatch; public save/adopt operations may
     /// replace damaged targets, without implicit repair or datastore authenticity.
-    /// No provider, mission start or conversion occurs.
+    /// create-missions requires expected_work_revision=0, a fresh exact plan and
+    /// no existing work/conversion; materializes tasks under unreleased SQL locks
+    /// in this same transaction. Existing work, organization/revision/release and
+    /// provider/mission start remain unavailable. All failures roll back jointly
+    /// or retain explicit unknown/known publication semantics as described above.
     pub fn preparation_command<W: WorkEnvironment>(
         &self,
         raw: &[u8],
@@ -363,7 +374,7 @@ impl RootStore {
                     Transaction::new_unchecked(db, rusqlite::TransactionBehavior::Immediate)
                         .map_err(|e| E::Launch(Box::new(crate::AgentLaunchError::from(e))))?;
                 tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
-                let changed = apply(&WriteContext{root:self,policy:&read,settings:&settings.values,at:&at}, &tx, &r, method, &mut causes).and_then(|p| {
+                let changed = apply(&WriteContext{root:self,policy:&read,settings:&settings.values,at:&at,document:settings}, &tx, &r, method, &mut causes,environment).and_then(|p| {
                     super::material_path::verify_material_path(self, &binding)?;
                     if !binding.matches(self)? {
                         return Err(E::Refused("preparation-root-instance-changed"));

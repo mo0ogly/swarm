@@ -1400,3 +1400,5 @@ Preparations add public-plan-validation and atomic-plan-verdict; preparation-pla
 Plan-question answers: `preparation-answers-rust`; set `SWARM_PREPARATION_WRITES_BINARY` to the qualified normal binary. CLI/API, CAS/hash, provenance, caps, rollback, replay and output recovery.
 
 Manual preparation UI: `preparation-ui-rust`, with `SWARM_PREPARATION_UI_BINARY` pointing to the frozen normal-profile binary. Browser FR/EN, themes, CAS, long answers, history, refusal and recovery.
+
+- `preparation-conversion-rust`: new-work CLI/API/UI, unreleased locks, exact replay, fresh Admin policies and rollback after receipt-trigger damage. `SWARM_PREPARATION_UI_BINARY` selects the frozen normal-profile binary; no global watchdog.

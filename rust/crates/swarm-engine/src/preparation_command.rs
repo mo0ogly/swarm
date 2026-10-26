@@ -71,7 +71,9 @@ pub(crate) fn decode(raw: &[u8]) -> Result<PreparationCommand, crate::WorkError>
 }
 /// Verify identity, revision and action-specific fields using supplied byte caps.
 /// Null caps mean unlimited; no fallback, truncation, provider call or mutation.
-/// Only adopt-brief/validate-plan accept sha256; its freshness is checked by the writer.
+/// adopt-brief/validate-plan/answer-questions/create-missions bind sha256; the
+/// writer checks freshness. create-missions requires expected_work_revision=0
+/// and supports no existing-work or organization request. No start is granted.
 pub(crate) fn validate(
     r: &PreparationCommand,
     document_cap: Option<usize>,
@@ -82,10 +84,10 @@ pub(crate) fn validate(
         || r.source.is_some()
         || r.budget.is_some()
         || r.adopt_brief
-        || r.expected_work_revision.is_some()
+        || (r.action!="create-missions" && r.expected_work_revision.is_some())
         || (r.action != "answer-questions" && r.decisions.is_some())
         || !r.turn_id.is_empty()
-        || (!matches!(r.action.as_str(), "adopt-brief"|"validate-plan"|"answer-questions") && !r.sha256.is_empty())
+        || (!matches!(r.action.as_str(), "adopt-brief"|"validate-plan"|"answer-questions"|"create-missions") && !r.sha256.is_empty())
         || r.version != 1
         || !key(&r.event_id)
         || r.expected_revision.is_none_or(|n| n < 0)
@@ -132,6 +134,10 @@ pub(crate) fn validate(
         {
             Ok(())
         }
+        "create-missions"
+            if key(&r.preparation_id) && r.expected_work_revision==Some(0)
+                && !r.sha256.is_empty() && r.work_id.is_empty() && r.title.is_empty()
+                && r.method.is_empty() && r.document.is_empty() && r.text.is_empty() => { Ok(()) }
         "adopt-brief" | "validate-plan"
             if key(&r.preparation_id)
                 && r.work_id.is_empty()
