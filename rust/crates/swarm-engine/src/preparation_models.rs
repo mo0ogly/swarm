@@ -43,6 +43,26 @@ pub struct PreparationDocument {
     pub need_hash: String,
 }
 
+/// Check recorded SHA256 against the exact UTF-8 document bytes. This detects
+/// inconsistent stored metadata, not authenticity or confinement of a datastore.
+/// Callers decide absence and repair: saving replacement bytes remains allowed.
+pub(crate) fn document_digest_matches(doc: &PreparationDocument) -> bool {
+    use sha2::{Digest,Sha256};
+    doc.sha256==format!("{:x}",Sha256::digest(doc.text.as_bytes()))
+}
+/// A ready verdict needs coherent current plan/brief and adopted-brief bytes.
+/// A missing need remains the historical Go case; a present need must be coherent.
+/// No mutation occurs and false does not assert the cause or repair anything.
+pub(crate) fn verdict_document_digests_match(p: &Preparation) -> bool {
+    let Some(docs)=p.documents.as_ref() else {return false};
+    let Some(brief)=docs.get("brief") else {return false};
+    let Some(plan)=docs.get("plan") else {return false};
+    let Some(adopted)=p.adopted_brief.as_deref() else {return false};
+    document_digest_matches(brief) && document_digest_matches(plan)
+        && document_digest_matches(adopted)
+        && docs.get("besoin").is_none_or(document_digest_matches)
+}
+
 /// Stored observation of a flattened preparation source reference; not validation or execution authority.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct PreparationSource {

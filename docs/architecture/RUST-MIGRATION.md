@@ -9342,3 +9342,61 @@ L’adoption n’atteste aucune identité humaine nommée et ne valide pas le pl
 ne réserve pas de budget et ne lance aucune mission. La recette permanente
 preparation-writes-rust contient le parcours public-brief-adoption et sa reprise.
 L’éditeur graphique des préparations et les transitions suivantes restent ouverts.
+
+### Validation explicite du plan et paramètres v43
+
+`prepare validate-plan ID --root ROOT --input intention.json --json` et
+`POST /api/v1/preparations/command` utilisent le writer commun. L’intention
+précise version1, action validate-plan, preparation_id, event_id, expected_revision
+et sha256 du document plan courant. Le contrôle exige une méthode disponible à
+l’empreinte courante, un brief adopté toujours lié au besoin et au brief courant,
+puis un plan lié à ce brief et cette méthode. Une empreinte périmée refuse avant
+verdict (CLI2/HTTP409) ; CAS/événement restent CLI3/HTTP409.
+
+Le JSON ActionPlan est strict : version1, objectif, tableaux assumptions/questions,
+questions résolues, tâches worker complètes, références connues sans doublon ni
+cycle. Les graphes sont contrôlés sans récursion. Un produit présent exige modes,
+parcours et stories cohérents ; ks-product exige ce produit. Complexité1–4 avec
+risque pour4, phases/modes/rôle et IDs locaux32/64 octets sont le contrat v1 Go,
+pas des plafonds d’exécution. Une story peut conserver task_ids=[] : aucune
+couverture ou application complète n’est inventée. Les erreurs invalid-plan sont
+CLI2/HTTP400 ; leurs causes statiques n’exposent aucun texte de plan.
+
+Les limites d’exécution utilisent les réglages existants task_max_attempts,
+task_max_tool_calls et task_max_criteria. Quatre limites nouvelles, persistées et
+modifiables dans Admin → Préparations et documents, sont décrites ci-dessous.
+
+| Réglage | Unité/valeur initiale | Effet |
+| --- | --- | --- |
+| preparation_plan_max_bytes | octets/32000 | taille après encodage canonique Go |
+| preparation_plan_max_tasks | nombre/8 | tâches proposées, aucune créée |
+| preparation_plan_max_assumptions | nombre/16 | hypothèses |
+| preparation_plan_max_questions | nombre/16 | questions, toutes résolues |
+
+Null est sans plafond ; zéro impose vide (donc interdit tout plan pour bytes/tasks).
+Les bornes du transport restent distinctes ; aucune ancienne limite Go cachée
+n’est appliquée après une modification de ces valeurs. Une installation ancienne
+reste lisible et ses brouillons modifiables ; validate-plan refuse sans politique
+v43 complète. L’adoption explicite Admin conserve les historiques. Les valeurs
+initiales servent aux nouvelles installations ou à un aperçu explicite, jamais
+à une migration silencieuse d’une base vivante.
+
+Le succès ajoute seulement un verdict (hash plan/brief/méthode, date), une révision
+et un reçu, sans modifier documents/historique. Le rejeu exact précède une nouvelle
+validation et ne réécrit rien ; un reçu historique n’est jamais plan_ready.
+plan_ready conserve la projection Go de fraîcheur des empreintes. Il ne prouve
+pas qu’un ancien verdict a été réexécuté sous des plafonds modifiés ultérieurement.
+Une future conversion devra revalider les politiques courantes ; cette conversion
+n’est pas portée par ce lot. Aucun agent, mission, budget ou identité humaine
+validée ne découle du verdict. Recettes : preparation-writes-rust et
+preparation-plan-upgrade-rust (v42→43, Admin et consommateur CLI).
+
+Intégrité des documents : les empreintes consommées sont recalculées sur le texte
+UTF-8 exact (besoin présent, brief courant, copie adoptée et plan). Une incohérence
+stockée refuse le verdict, l’adoption ou le marquage d’une provenance corrompue
+avec preparation-document-digest-mismatch (CLI2/HTTP500). Une lecture conserve
+les données pour diagnostic mais plan_ready reste faux, sans réécrire les lignes.
+Sauvegarder le document cible correct ou réadopter le brief courant cohérent
+permet la reprise publique ; aucun accès SQL de réparation n’est requis. Cela
+vérifie une cohérence de contenu, pas l’authenticité contre un auteur arbitraire
+de la base. Les anciennes preuves sont conservées ; aucun historique n’est effacé.

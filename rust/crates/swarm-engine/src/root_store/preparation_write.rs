@@ -1,4 +1,4 @@
-//! Transactional draft creation/save/method selection and explicit brief adoption, without plan adoption or agent execution.
+//! Transactional draft creation/save/method selection and explicit brief adoption, without conversion or agent execution.
 use super::{
     finished,
     preparation_read::{cause, stored},
@@ -12,6 +12,28 @@ use sha2::{Digest, Sha256};
 fn encode(value: &impl serde::Serialize) -> Result<Vec<u8>, E> {
     crate::encode_model(value).map_err(|e| cause("preparation-encode", e))
 }
+/// Stable saved configuration and source observations selected by the caller's
+/// settings reservation; this context grants no new Root or execution authority.
+struct WriteContext<'a> {
+    root: &'a RootStore,
+    policy: &'a crate::PreparationReadPolicy,
+    settings: &'a crate::EngineSettingsValues,
+    at: &'a str,
+}
+/// Resolve an available capability hash, retaining original safe source causes.
+/// Unknown/unavailable sources refuse before mutation; other catalogue warnings
+/// remain observation causes. No source path is supplied by an intention.
+fn current_method_hash(root: &RootStore, method: &str, policy: &crate::PreparationReadPolicy, causes: &mut Vec<E>) -> Result<String,E> {
+    let method=if method=="audit_pdca" {"audit-pdca"} else {method};
+    if !super::preparation_methods::known(method) { return Err(E::Refused("preparation-method-unavailable")); }
+    let observed=super::preparation_methods::catalogue(&root.root,policy.method_max_bytes)?;
+    let selected=observed.value.iter().find(|m|m.id==method).ok_or(E::Refused("preparation-method-unavailable"))?;
+    if !selected.available {
+        let primary=observed.causes.into_iter().fold(E::Refused("preparation-method-unavailable"),|primary,cleanup|E::Cleanup{primary:Some(Box::new(primary)),cleanup:Box::new(cleanup)});
+        return Err(cause("preparation-method-unavailable",primary));
+    }
+    let hash=selected.sha256.clone();causes.extend(observed.causes);Ok(hash)
+}
 /// Execute one intent inside the caller's immediate transaction. Receipt replay
 /// compares canonical intent, returns its historical snapshot and never rewrites
 /// a document. Every staged row is read back before commit; triggers/corruption,
@@ -21,14 +43,13 @@ fn encode(value: &impl serde::Serialize) -> Result<Vec<u8>, E> {
 /// the current nonblank document matching the requested hash and need hash. It
 /// appends no history; plan approval and OS confinement are not established.
 fn apply(
-    root: &RootStore,
+    context: &WriteContext<'_>,
     db: &Connection,
     r: &PreparationCommand,
     method: &str,
-    policy: &crate::PreparationReadPolicy,
-    at: &str,
     causes: &mut Vec<E>,
 ) -> Result<Preparation, E> {
+    let root=context.root;let policy=context.policy;let at=context.at;
     let raw = encode(r)?;
     let id = if r.action == "create" {
         format!(
@@ -97,30 +118,25 @@ fn apply(
     }
     let previous = p.revision;
     if r.action == "method" {
-        if !super::preparation_methods::known(method) {
-            return Err(E::Refused("preparation-method-unavailable"));
-        }
-        let observed = super::preparation_methods::catalogue(&root.root, policy.method_max_bytes)?;
-        let selected = observed.value.iter().find(|m| m.id == method)
-            .ok_or(E::Refused("preparation-method-unavailable"))?;
-        let available = selected.available;
-        if available {
-            p.method = selected.id.clone();
-            p.method_hash = selected.sha256.clone();
-        }
-        if !available {
-            // Source diagnostics are causes of this domain refusal, not a
-            // transaction cleanup failure. Preserve siblings without changing
-            // CLI exit5 / HTTP400 into root-cleanup exit2 / HTTP500.
-            let primary = observed.causes.into_iter().fold(
-                E::Refused("preparation-method-unavailable"),
-                |primary, cleanup| E::Cleanup {
-                    primary: Some(Box::new(primary)), cleanup: Box::new(cleanup),
-                },
-            );
-            return Err(cause("preparation-method-unavailable", primary));
-        }
-        causes.extend(observed.causes);
+        p.method_hash=current_method_hash(root,method,policy,causes)?;
+        p.method=method.into();
+    }
+    if r.action == "validate-plan" {
+        let limits=context.settings.preparation_plan_policy().map_err(E::Settings)?;
+        let task=context.settings.mutation_limits().map_err(E::Settings)?.task;
+        let hash=current_method_hash(root,&p.method,policy,causes)?;
+        if hash!=p.method_hash { return Err(E::Refused("preparation-stale-method")); }
+        let docs=p.documents.as_ref();
+        let brief=p.adopted_brief.as_deref().ok_or(E::Refused("preparation-stale-brief"))?;
+        let brief_hash=docs.and_then(|d|d.get("brief")).map_or("",|d|d.sha256.as_str());
+        let need_hash=docs.and_then(|d|d.get("besoin")).map_or("",|d|d.sha256.as_str());
+        if brief.sha256!=brief_hash || brief.need_hash!=need_hash { return Err(E::Refused("preparation-stale-brief")); }
+        let plan=docs.and_then(|d|d.get("plan")).ok_or(E::Refused("preparation-stale-plan"))?;
+        if plan.brief_hash!=brief.sha256 || plan.method_hash!=hash { return Err(E::Refused("preparation-stale-plan")); }
+        if r.sha256.is_empty() || r.sha256!=plan.sha256 { return Err(E::Refused("preparation-stale-document")); }
+        if !crate::preparation_models::verdict_document_digests_match(&p) { return Err(E::Refused("preparation-document-digest-mismatch")); }
+        super::preparation_plan::validate(plan.text.as_bytes(),&p.method,&limits,&task)?;
+        p.verdict=Some(Box::new(crate::PreparationVerdict { plan_hash:plan.sha256.clone(),brief_hash:brief.sha256.clone(),method_hash:hash,at:at.into() }));
     }
     if r.action == "adopt-brief" {
         let documents = p.documents.as_ref();
@@ -135,6 +151,10 @@ fn apply(
         if brief.need_hash != need_hash {
             return Err(E::Refused("preparation-stale-brief"));
         }
+        if !crate::preparation_models::document_digest_matches(brief)
+            || documents.and_then(|d|d.get("besoin")).is_some_and(|d|!crate::preparation_models::document_digest_matches(d)) {
+            return Err(E::Refused("preparation-document-digest-mismatch"));
+        }
         p.adopted_brief = Some(Box::new(brief.clone()));
     }
     let mut document = None;
@@ -144,6 +164,13 @@ fn apply(
         } else {
             &r.document
         };
+        // Verify only provenance consumed by this save. Replacement writes can
+        // repair the damaged target without requiring direct database changes.
+        let source=if kind=="brief" {p.documents.as_ref().and_then(|d|d.get("besoin"))}
+            else if kind=="plan" {p.adopted_brief.as_deref()} else {None};
+        if source.is_some_and(|d|!crate::preparation_models::document_digest_matches(d)) {
+            return Err(E::Refused("preparation-document-digest-mismatch"));
+        }
         let documents = p.documents.get_or_insert_with(Default::default);
         let revision = documents
             .get(kind)
@@ -190,8 +217,9 @@ fn apply(
         .checked_add(1)
         .ok_or(E::Refused("preparation-revision-overflow"))?;
     p.updated_at = at.into();
-    p.verdict = None;
+    if r.action != "validate-plan" { p.verdict = None; }
     p.plan_ready = false;
+    if r.action == "validate-plan" { root.preparation_project(&mut p,policy,causes)?; }
     p.receipt_historical = false;
     let body = encode(&p)?;
     let changed = if r.action == "create" {
@@ -250,7 +278,14 @@ impl RootStore {
     /// document without rewriting history and clears any verdict. It attests no
     /// named human identity. Missing/blank/mismatched brief and changed need
     /// refuse with stale-document/stale-brief and no mutation; replay precedes
-    /// freshness checks. No provider, mission start, conversion or plan acceptance occurs.
+    /// freshness checks. validate-plan requires saved v43 caps, current method/brief/plan hashes and
+    /// a strict answered ActionPlan. It records a structural verdict, not named
+    /// human acceptance or execution permission. Reads project hash freshness;
+    /// later policy changes require new validation before any future conversion.
+    /// Consumed document hashes must match stored text. Mismatches refuse with
+    /// preparation-document-digest-mismatch; public save/adopt operations may
+    /// replace damaged targets, without implicit repair or datastore authenticity.
+    /// No provider, mission start or conversion occurs.
     pub fn preparation_command<W: WorkEnvironment>(
         &self,
         raw: &[u8],
@@ -302,7 +337,7 @@ impl RootStore {
                     Transaction::new_unchecked(db, rusqlite::TransactionBehavior::Immediate)
                         .map_err(|e| E::Launch(Box::new(crate::AgentLaunchError::from(e))))?;
                 tx.set_drop_behavior(rusqlite::DropBehavior::Ignore);
-                let changed = apply(self, &tx, &r, method, &read, &at, &mut causes).and_then(|p| {
+                let changed = apply(&WriteContext{root:self,policy:&read,settings:&settings.values,at:&at}, &tx, &r, method, &mut causes).and_then(|p| {
                     super::material_path::verify_material_path(self, &binding)?;
                     if !binding.matches(self)? {
                         return Err(E::Refused("preparation-root-instance-changed"));

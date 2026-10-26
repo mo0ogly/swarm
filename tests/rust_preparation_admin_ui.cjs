@@ -16,7 +16,8 @@ function check(name,value){assert(value,name);assert(!checks.includes(name));che
   await page.click('.engine-settings-admin [data-action=edit]');await page.waitForSelector('dialog[data-engine-settings][open]');
   await page.click('[data-settings-group=preparations] > summary');
   check(label+'-logical-translated-group',await page.$eval('[data-settings-group=preparations] > summary',(e,expected)=>e.textContent.includes(expected),lang==='en'?'Preparations and documents':'Préparations et documents'));
-  check(label+'-all-seven-persisted-fields',await page.$$eval('[data-settings-group=preparations] [data-setting]',els=>els.length===7&&els.every(e=>!e.hasAttribute('max'))));
+  check(label+'-all-eleven-persisted-fields',await page.$$eval('[data-settings-group=preparations] [data-setting]',els=>els.length===11&&els.every(e=>!e.hasAttribute('max'))));
+  check(label+'-translated-plan-cap',await page.$eval('[data-setting=preparation_plan_max_bytes]',(e,text)=>Array.from(e.labels||[]).some(l=>l.textContent.includes(text)),lang==='en'?'Normalized plan size':'Taille du plan normalisé'));
   check(label+'-method-is-editable-text',await page.$eval('[data-setting=preparation_default_method]',(e,expected)=>e.type==='text'&&e.inputMode!=='numeric'&&!e.hasAttribute('pattern')&&e.value===expected,label==='fr-etat'?'apex':'debug'));
   check(label+'-actual-saved-value',await page.$eval('[data-setting=preparation_list_limit]',(e,value)=>e.value===value,label==='fr-etat'?'2':'1'));
   await page.click('[data-settings-help=preparation_list_limit]');await page.waitForSelector('.engine-settings-help[open]');
@@ -24,14 +25,16 @@ function check(name,value){assert(value,name);assert(!checks.includes(name));che
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.engine-settings-help[open]'));check(label+'-help-focus-restored',await page.$eval('[data-settings-help=preparation_list_limit]',e=>e===document.activeElement));
   await page.click('[data-settings-advice=preparations]');await page.waitForSelector('[data-advice-objective]');await page.type('[data-advice-objective]','Bound preparation reads without losing recorded history.');await page.click('.engine-settings-help[open] .modal-body > button');
   const prompt=await page.$eval('[data-advice-prompt]',e=>e.value),start=prompt.indexOf('\n{');assert(start>=0,'AI context missing');const ai=JSON.parse(prompt.slice(start+1));
-  check(label+'-AI-context-actual-contract',ai.group==='preparations'&&ai.document_schema_version===42&&ai.target_fields.length===7&&ai.target_fields.some(f=>f.name==='preparation_list_limit'&&f.saved===(label==='fr-etat'?'2':'1')));
+  check(label+'-AI-context-actual-contract',ai.group==='preparations'&&ai.document_schema_version===43&&ai.target_fields.length===11&&ai.target_fields.some(f=>f.name==='preparation_list_limit'&&f.saved===(label==='fr-etat'?'2':'1')));
+  check(label+'-plan-caps-in-AI-context',['bytes','tasks','assumptions','questions'].every(name=>ai.target_fields.some(f=>f.name==='preparation_plan_max_'+name)));
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('.engine-settings-help[open]'));
   for(const width of [1440,390]){await page.setViewport({width,height:1000});check(label+'-no-global-overflow-'+width,await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(cfg.output,label+'-preparation-admin-'+width+'.png'),fullPage:true})}
   if(label==='fr-etat'){
+   await page.$eval('[data-setting=preparation_plan_max_tasks]',e=>{e.value='1';e.dispatchEvent(new Event('input',{bubbles:true}))});
    await page.$eval('[data-setting=preparation_default_method]',e=>{e.value='debug';e.dispatchEvent(new Event('input',{bubbles:true}))});
    await page.$eval('[data-setting=preparation_list_limit]',e=>{e.value='1';e.dispatchEvent(new Event('input',{bubbles:true}))});await page.type('[data-setting-reason]','Owned preparation read UI policy witness');
    await page.click('dialog[data-engine-settings] [data-action=confirm]');await state.waitForSettingsState(page,'preview');check('preview-before-publication',await page.$eval('[data-setting-preview]',e=>!e.hidden));await page.click('dialog[data-engine-settings] [data-action=confirm]');await state.waitForSettingsState(page,'saved');
-   await page.click('.engine-settings-admin [data-action=edit]');await page.waitForSelector('dialog[data-engine-settings][open]');check('saved-method-reopened',await page.$eval('[data-setting=preparation_default_method]',e=>e.value==='debug'));check('saved-reopened-value',await page.$eval('[data-setting=preparation_list_limit]',e=>e.value==='1'));
+   await page.click('.engine-settings-admin [data-action=edit]');await page.waitForSelector('dialog[data-engine-settings][open]');check('saved-plan-task-cap-reopened',await page.$eval('[data-setting=preparation_plan_max_tasks]',e=>e.value==='1'));check('saved-method-reopened',await page.$eval('[data-setting=preparation_default_method]',e=>e.value==='debug'));check('saved-reopened-value',await page.$eval('[data-setting=preparation_list_limit]',e=>e.value==='1'));
   }
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('dialog[data-engine-settings]'));await context.close();
  }

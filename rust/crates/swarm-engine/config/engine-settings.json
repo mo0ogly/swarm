@@ -179,5 +179,9 @@
   "preparation_write_enabled": "1",
   "preparation_document_max_bytes": "16000",
   "preparation_title_max_bytes": "240",
-  "preparation_default_method": "apex"
+  "preparation_default_method": "apex",
+  "preparation_plan_max_bytes": "32000",
+  "preparation_plan_max_tasks": "8",
+  "preparation_plan_max_assumptions": "16",
+  "preparation_plan_max_questions": "16"
 }

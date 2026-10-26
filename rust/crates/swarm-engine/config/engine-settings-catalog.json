@@ -1143,6 +1143,38 @@
       "nullable": false,
       "help": "Méthode utilisée lorsque la création ne la précise pas : apex, debug, audit-pdca, ks-feature ou ks-product. Valeur initiale : apex. Aucun appel IA ni autorisation de plan.",
       "introduced_schema_version": 42
+    },
+    {
+      "name": "preparation_plan_max_bytes",
+      "label": "Taille du plan normalisé",
+      "unit": "bytes",
+      "nullable": true,
+      "help": "Plafond en octets du plan après encodage canonique, avant verdict. Null sans plafond ; zéro refuse tout plan. Initial : 32 000.",
+      "introduced_schema_version": 43
+    },
+    {
+      "name": "preparation_plan_max_tasks",
+      "label": "Tâches du plan",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de tâches proposées. Null sans plafond ; zéro refuse les plans non vides. Initial : 8. Aucune tâche créée par la validation.",
+      "introduced_schema_version": 43
+    },
+    {
+      "name": "preparation_plan_max_assumptions",
+      "label": "Hypothèses du plan",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal d’hypothèses. Null sans plafond ; zéro exige une liste vide. Initial : 16.",
+      "introduced_schema_version": 43
+    },
+    {
+      "name": "preparation_plan_max_questions",
+      "label": "Questions du plan",
+      "unit": "count",
+      "nullable": true,
+      "help": "Nombre maximal de questions, toutes avec réponse avant verdict. Null sans plafond ; zéro exige une liste vide. Initial : 16.",
+      "introduced_schema_version": 43
     }
   ]
 }

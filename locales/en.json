@@ -5638,5 +5638,13 @@
   "Empreinte de la demande": "Request hash",
   "Résolution structurelle vérifiée.": "Structural resolution checked.",
   "Préparer les fichiers": "Prepare the files",
-  "Utiliser deux fichiers du même projet. La demande indique le fournisseur, la référence et les versions attendues. Le registre associe les références à une dette stable et fournit le montant entier, la devise et le compte bénéficiaire. Une référence absente, ambiguë ou périmée est refusée.": "Use two files for the same project. The request identifies the supplier, reference and expected versions. The registry maps references to a stable debt and supplies the integer amount, currency and beneficiary account. Missing, ambiguous or stale references are refused."
+  "Utiliser deux fichiers du même projet. La demande indique le fournisseur, la référence et les versions attendues. Le registre associe les références à une dette stable et fournit le montant entier, la devise et le compte bénéficiaire. Une référence absente, ambiguë ou périmée est refusée.": "Use two files for the same project. The request identifies the supplier, reference and expected versions. The registry maps references to a stable debt and supplies the integer amount, currency and beneficiary account. Missing, ambiguous or stale references are refused.",
+  "Taille du plan normalisé": "Normalized plan size",
+  "Tâches du plan": "Plan tasks",
+  "Hypothèses du plan": "Plan assumptions",
+  "Questions du plan": "Plan questions",
+  "Plafond en octets du plan après encodage canonique, avant verdict. Null sans plafond ; zéro refuse tout plan. Initial : 32 000.": "Byte cap for the canonically encoded plan before verdict. Null is unlimited; zero refuses every plan. Initial: 32,000.",
+  "Nombre maximal de tâches proposées. Null sans plafond ; zéro refuse les plans non vides. Initial : 8. Aucune tâche créée par la validation.": "Maximum proposed tasks. Null is unlimited; zero refuses nonempty plans. Initial: 8. Validation creates no tasks.",
+  "Nombre maximal d’hypothèses. Null sans plafond ; zéro exige une liste vide. Initial : 16.": "Maximum assumptions. Null is unlimited; zero requires an empty list. Initial: 16.",
+  "Nombre maximal de questions, toutes avec réponse avant verdict. Null sans plafond ; zéro exige une liste vide. Initial : 16.": "Maximum questions, each answered before verdict. Null is unlimited; zero requires an empty list. Initial: 16."
 }

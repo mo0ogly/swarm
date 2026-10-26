@@ -33,7 +33,9 @@
     "tests/rust_preparation_admin_ui.cjs",
     "tests/rust_preparation_reads.py",
     "version_history.json",
-    "web/i18n-en.js"
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/src/preparation_models.rs",
+    "rust/crates/swarm-engine/src/task_definition.rs"
   ],
   "environment": {},
   "steps": [
@@ -48,7 +50,7 @@
       "required_stdout": [
         "PREPARATION_UPGRADE_PASS",
         "PASS missing-group-refused-without-default",
-        "PASS v42-history-prefix-preserved",
+        "PASS v43-history-prefix-preserved",
         "PASS same-intent-now-writable"
       ],
       "required_stderr": []

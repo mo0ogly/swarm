@@ -1,15 +1,15 @@
 use swarm_engine::{
     EngineSettingsCatalog, EngineSettingsChange, EngineSettingsDocument, SettingCount, SettingUnit,
 };
-/// Catalog v4 covers address/null/effect/transport metadata and all document
-/// policies through schema39, including saved status presentation windows.
+/// Catalog v5 covers address/null/effect/transport metadata and all document
+/// policies through schema42, including saved preparation editing policy.
 /// Metadata covers actual fields/nullability without adopting policy or granting
 /// authority; a preview preserves exact decimal counters.
 #[test]
 fn catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation() {
     let catalog = EngineSettingsCatalog::installation().unwrap();
-    assert_eq!(catalog.schema_version, 4);
-    assert_eq!(catalog.document_schema_version, 39);
+    assert_eq!(catalog.schema_version, 5);
+    assert_eq!(catalog.document_schema_version, 43);
     assert!(
         catalog
             .supported_document_versions
@@ -85,7 +85,7 @@ fn catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_vali
 fn reported_cost_policy_preserves_legacy_absence_null_and_exact_counts() {
     use swarm_engine::{EngineSettingsValues, SettingCap};
     let values = EngineSettingsValues::installation_defaults().unwrap();
-    assert_eq!(values.schema_version(), 39);
+    assert_eq!(values.schema_version(), 43);
     assert_eq!(
         values.mission_dispatch_cost_reserve_percent,
         Some(SettingCap(Some(SettingCount(200))))

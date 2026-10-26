@@ -53,6 +53,18 @@ pub struct EngineSettingsValues {
     /// This affects relay selection, never author authentication or acceptance.
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_count")]
     pub agent_report_clock_skew_seconds: Option<SettingCount>,
+    /// Saved v43 cap for canonical encoded plan bytes; null unlimited, zero empty only.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_plan_max_bytes: Option<SettingCap>,
+    /// Saved v43 cap for nonempty plan task collection; null unlimited, zero empty only.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_plan_max_tasks: Option<SettingCap>,
+    /// Saved v43 cap for plan assumptions; null unlimited, zero empty only.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_plan_max_assumptions: Option<SettingCap>,
+    /// Saved v43 cap for answered plan questions; null unlimited, zero empty only.
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
+    pub preparation_plan_max_questions: Option<SettingCap>,
     /// Recent Agent rows used by status presentation only (v39). Outer absence
     /// is unconfigured; explicit null includes all rows, zero hides all rows.
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_cap")]
@@ -1013,11 +1025,12 @@ impl EngineSettingsValues {
     /// missing groups. Returns a safe typed format/policy error; no IO or state
     /// changes occur, and legacy absence never becomes implicit current defaults.
     /// Validate supplied values, technical representation and complete versioned
-    /// policy groups through v42. Historical absence remains absent; network20
+    /// policy groups through v43. Historical absence remains absent; network20
     /// requires prior groups and never adopts defaults, opens sockets, changes
     /// Work/history or establishes active-server state. Typed validation causes
     /// survive rejection; caller still owes authority and publication freshness.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
+        if self.has_preparation_plan_policy() { self.preparation_plan_policy()?; self.preparation_write_policy()?; self.preparation_read_policy()?; }
         if self.has_preparation_write_policy() { self.preparation_write_policy()?; self.preparation_read_policy()?; }
         if self.preparation_list_limit.is_some() || self.preparation_history_limit.is_some() || self.preparation_method_max_bytes.is_some() {
             self.preparation_read_policy()?;
@@ -1332,6 +1345,17 @@ impl EngineSettingsValues {
             history_limit: read(self.preparation_history_limit)?,
             method_max_bytes: read(self.preparation_method_max_bytes)? })
     }
+    /// Whether any plan-validation cap was declared, preserving legacy absence.
+    fn has_preparation_plan_policy(&self) -> bool {
+        self.preparation_plan_max_bytes.is_some() || self.preparation_plan_max_tasks.is_some()
+            || self.preparation_plan_max_assumptions.is_some() || self.preparation_plan_max_questions.is_some()
+    }
+    /// Require all saved v43 plan caps. Null is unlimited; zero rejects a
+    /// nonempty collection/document. No defaults, IO, adoption or launch here.
+    pub fn preparation_plan_policy(&self) -> Result<PreparationPlanPolicy, EngineSettingsError> {
+        let cap = |v: Option<SettingCap>| v.ok_or_else(||refuse("settings-preparation-plan-not-configured"))?.0.map(|n|size(Some(n))).transpose();
+        Ok(PreparationPlanPolicy { max_bytes: cap(self.preparation_plan_max_bytes)?, max_tasks: cap(self.preparation_plan_max_tasks)?, max_assumptions: cap(self.preparation_plan_max_assumptions)?, max_questions: cap(self.preparation_plan_max_questions)? })
+    }
     /// Whether any v42 editing field was supplied, without adopting defaults.
     fn has_preparation_write_policy(&self) -> bool {
         self.preparation_write_enabled.is_some() || self.preparation_document_max_bytes.is_some() || self.preparation_title_max_bytes.is_some() || self.preparation_default_method.is_some()
@@ -1351,6 +1375,7 @@ impl EngineSettingsValues {
     /// Return the complete declared settings version, preserving historical
     /// absence. This does not adopt defaults, mutate history or grant authority.
     pub fn schema_version(&self) -> i64 {
+        if self.has_preparation_plan_policy() { return 43; }
         if self.has_preparation_write_policy() { return 42; }
         if self.preparation_list_limit.is_some() || self.preparation_history_limit.is_some() || self.preparation_method_max_bytes.is_some() {
             41
@@ -2206,7 +2231,7 @@ fn entry_digest(entry: &EngineSettingsEntry) -> Result<String, EngineSettingsErr
 /// typed validation causes. This reads supplied values only; publication,
 /// preview freshness and actor authority remain caller responsibilities.
 fn validate_change(r: &EngineSettingsChange) -> Result<(), EngineSettingsError> {
-    if !matches!(r.schema_version, 1..=42)
+    if !matches!(r.schema_version, 1..=43)
         || r.schema_version != r.values.schema_version()
         || !swarm_identity_contract::name(r.event_id.as_bytes())
         || r.expected_revision.0 < 0
@@ -2258,7 +2283,7 @@ impl EngineSettingsDocument {
     /// Return typed format/policy errors without adoption, publication or IO.
     /// Logical integrity does not establish authentication or rollback protection.
     pub fn validate(&self) -> Result<(), EngineSettingsError> {
-        if !matches!(self.schema_version, 1..=42) || self.revision.0 < 1 || self.history.is_empty()
+        if !matches!(self.schema_version, 1..=43) || self.revision.0 < 1 || self.history.is_empty()
         {
             return Err(refuse("settings-document-envelope"));
         }
@@ -2381,3 +2406,14 @@ impl EngineSettingsDocument {
 /// Validated saved draft editing policy, independent of execution authority.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PreparationWritePolicy { pub enabled: bool, pub document_max_bytes: Option<usize>, pub title_max_bytes: Option<usize>, pub default_method: String }
+
+/// Saved caps for plan structure, independent of task execution limits and
+/// acceptance. Complete v43 policy is required only for new plan validation;
+/// historical drafts/receipts remain readable without adopting new defaults.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PreparationPlanPolicy {
+    pub max_bytes: Option<usize>,
+    pub max_tasks: Option<usize>,
+    pub max_assumptions: Option<usize>,
+    pub max_questions: Option<usize>,
+}

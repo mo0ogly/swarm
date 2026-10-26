@@ -11,6 +11,22 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## Livré localement — validation de plan Rust,26 octobre, GLM5.2
+Owner Codex ; dev92 actif,446 entrées qualifiées et processus = candidat testé.
+validate-plan CLI/API : fraîcheur méthode/brief/plan, JSON strict, graphes et produit ;
+verdict sans création de mission. Quatre caps Admin v43 et plafonds tâche existants.
+GLM : module pur intégré et revue ; mauvais hash attesté reproduit sur89 puis
+corrigé pour verdict/adoption/provenance sauvegardée/projection, avec reprise publique.
+Recette9étapes PASS :50 écritures,37 méthode,44 adoption,98 plan,29 intégrité,
+8 identifiants,4+1 SDK et2 catalogue ;54 Admin par parcours. Lectures antérieures58.
+Upgrades42→43 (9) et41→43 (6) PASS, intégrités vérifiées ;13 HTTP et14 Version FR/EN.
+Missions pause50/469 et réglages v41 conservés ; adoption explicite Admin requise
+pour utiliser les nouveaux groupes42/43 sur l’instance. Aucun fournisseur métier.
+[Rapport/RETEX](PREPARATION-PLAN-20261026.md),
+[preuves/revue](evidence/20261026-preparation-plan/README.md).
+Aucun commit/push ; Biba/SCALING préservés, éditeur/conversion et qualification
+ globale ouverts. Conversion future : revalider les politiques courantes.
+
 ## Livré localement — adoption de brief Rust,26 octobre, GLM5.2
 Owner Codex ; dev87 actif,443 entrées identiques au candidat86 testé.
 CLI/API adopt-brief : brief non vide, hash exact et besoin inchangé ; copie adoptée,

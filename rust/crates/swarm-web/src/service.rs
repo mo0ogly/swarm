@@ -319,9 +319,9 @@ impl HttpServiceError {
                 "pricing-version-unknown" if *operation == "pricing-quote" => StatusCode::NOT_FOUND,
                 _ if matches!(*operation,"pricing-input" | "pricing-quote-input" | "pricing-quote")
                     && matches!(cause.as_ref(), RootStoreError::Pricing(swarm_engine::PricingError::Decode(_) | swarm_engine::PricingError::Date(_) | swarm_engine::PricingError::Refused(_))) => StatusCode::BAD_REQUEST,
-                "preparation-request-invalid" | "preparation-method-unavailable" => StatusCode::BAD_REQUEST,
+                "preparation-request-invalid" | "preparation-method-unavailable" | "preparation-invalid-plan" => StatusCode::BAD_REQUEST,
                 "preparation-event-conflict" | "preparation-revision-conflict"
-                | "preparation-stale-document" | "preparation-stale-brief" => StatusCode::CONFLICT,
+                | "preparation-stale-document" | "preparation-stale-brief" | "preparation-stale-method" | "preparation-stale-plan" => StatusCode::CONFLICT,
                 "preparation-write-disabled" => StatusCode::FORBIDDEN,
                 "preparation-not-found" | "work-missing" | "unknown_work" | "unknown_task" => StatusCode::NOT_FOUND,
                 "authorization_required" => StatusCode::FORBIDDEN,
@@ -462,10 +462,10 @@ impl DispatchProfile {
     fn capabilities(self) -> serde_json::Value {
         match self {
             Self::Typed => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save","method","adopt-brief"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-in-construction","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
             Self::ObservedHttp1 => {
-                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save","method","adopt-brief"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
+                serde_json::json!({"schema_version":1,"profile":"rust-native-http1-observed","actions":["task"],"trust":{"biba":"strict-with-named-endorsement-v1","scope":"trust-actions-only","simulation":true},"planning":planning::capabilities(),"mission":mission::capabilities(),"settings":["describe","show","preview","apply"],"preparations":["list","methods","show","history","create","save","method","adopt-brief","validate-plan"],"admin_advice_budget":if cfg!(target_os="linux"){vec!["show","preview","apply"]}else{vec![]},"command_input_transport":swarm_engine::CommandInputTransport::current()})
             }
         }
     }

@@ -1994,3 +1994,5 @@ et fixtures privées ne constituent pas une livraison ou une acceptation indépe
 Préparations : la recette `preparation-writes-rust` inclut désormais la sélection de méthode CLI/API, refus sans mutation, conservation historique et reprise du même événement après réparation des seules sources de fixture.
 
 Le parcours `public-brief-adoption` ajoute adoption CLI/API, hash/besoin périmés, reçu historique, défaut sortie et reprise, sans compte fournisseur ni base vivante.
+
+La recette préparations ajoute public-plan-validation et atomic-plan-verdict ; preparation-plan-upgrade-rust vérifie refus sans politique v43, adoption Admin et consommation des valeurs par la CLI.

@@ -109,9 +109,14 @@ impl RootStore {
         }
     }
     /// Project Go plan_ready from stored hashes and observed current method bytes.
-    /// Unavailable methods retain false plus original causes; nothing is accepted.
+    /// Unavailable methods or incoherent recorded document digests retain false
+    /// plus safe original causes. Data remains readable for supported repair;
+    /// this establishes no acceptance, authorship or OS confinement.
     pub(super) fn preparation_project(&self, p: &mut Preparation, policy: &crate::PreparationReadPolicy, causes: &mut Vec<E>) -> Result<(), E> {
         if !needs_method(p) { crate::preparation_models::apply_freshness(p, None); return Ok(()); }
+        if !crate::preparation_models::verdict_document_digests_match(p) {
+            p.plan_ready=false;causes.push(E::Refused("preparation-document-digest-mismatch"));return Ok(());
+        }
         let mut observed = super::preparation_methods::catalogue(&self.root, policy.method_max_bytes)?;
         causes.append(&mut observed.causes);
         let id = if p.method == "audit_pdca" { "audit-pdca" } else { &p.method };

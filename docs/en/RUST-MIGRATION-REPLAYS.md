@@ -1394,3 +1394,5 @@ independent acceptance.
 Preparations: `preparation-writes-rust` now includes CLI/API method selection, refusal without mutation, preserved history and same-event recovery after repairing only fixture sources.
 
 `public-brief-adoption` adds CLI/API adoption, stale brief/need, historical receipt, output failure and recovery, without provider accounts or live datastores.
+
+Preparations add public-plan-validation and atomic-plan-verdict; preparation-plan-upgrade-rust checks missing-v43 refusal, explicit Admin adoption and actual CLI cap consumption.

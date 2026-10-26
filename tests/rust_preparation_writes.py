@@ -28,7 +28,7 @@ def main():
     def save(event,revision,kind,text):
         """Build an explicit versioned intention, never invent an observed revision."""
         return dict(version=1,action='save',preparation_id=pid,event_id=event,expected_revision=revision,document=kind,text=text)
-    d.ok(['init']);policy=d.ok(['engine-settings','show']);check('current-schema42',policy['schema_version']==42)
+    d.ok(['init']);policy=d.ok(['engine-settings','show']);check('current-schema43',policy['schema_version']==43)
     create=dict(version=1,action='create',event_id='create-test',expected_revision=0,title=' Title <b> ',text='é besoin')
     p=d.ok(['prepare','create'],create);pid=p['id'];check('create-real-content',pid=='prep-'+hashlib.sha256(b'create-test').hexdigest()[:24] and p['revision']==1 and p['title']=='Title <b>' and p['method']=='apex' and p['documents']['besoin']['text']=='é besoin' and p['plan_ready'] is False)
     before=d.database();check('replay-create-equal',d.ok(['prepare','create'],create)==p and d.database()==before)

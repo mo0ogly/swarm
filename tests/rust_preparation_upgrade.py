@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Actual historical Rust v41 Root → explicit Admin v42 adoption → new writer.
+"""Actual historical Rust v41 Root → explicit Admin v43 adoption → new writer.
 Requires retained old/new binaries; no live Root, Go process, provider, timeout
 or reset of configuration history. Original CLI/browser channels are retained.
 """
@@ -29,7 +29,7 @@ def main():
         cfg=dict(address=server.address,key=server.key,root=str(d.root),work=work,output=str(out))
         with (out/'browser.stdout').open('xb') as o,(out/'browser.stderr').open('xb') as e:r=subprocess.run(['node','tests/rust_preparation_admin_ui.cjs'],input=json.dumps(cfg).encode(),stdout=o,stderr=e)
         check('explicit-Admin-adoption',r.returncode==0)
-        new=d.ok(['engine-settings','show']);check('v42-history-prefix-preserved',new['schema_version']==42 and new['history'][:len(old['history'])]==old['history'] and len(new['history'])==len(old['history'])+1)
+        new=d.ok(['engine-settings','show']);check('v43-history-prefix-preserved',new['schema_version']==43 and new['history'][:len(old['history'])]==old['history'] and len(new['history'])==len(old['history'])+1)
         result=d.ok(['prepare','create'],intent);check('same-intent-now-writable',result['method']=='debug' and result['revision']==1 and not result['plan_ready'])
     except BaseException as error:primary=error
     finally:native.finish(server,primary)

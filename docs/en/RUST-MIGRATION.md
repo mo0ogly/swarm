@@ -8844,3 +8844,52 @@ limit an already saved brief. Adoption attests no named human identity, approves
 no plan, reserves no budget and launches no mission. Permanent recipe
 preparation-writes-rust includes public-brief-adoption and recovery. Graphical
 preparation editing and subsequent transitions remain open.
+
+### Explicit plan validation and v43 settings
+
+`prepare validate-plan ID --root ROOT --input intent.json --json` and protected
+`POST /api/v1/preparations/command` use the shared writer. The explicit intent
+contains version1, action validate-plan, preparation_id, event_id, expected_revision
+and the current plan sha256. An available current method, current adopted brief
+and need, and a plan bound to that brief/method are required. Stale fingerprints
+refuse CLI2/HTTP409; CAS/event conflicts retain CLI3/HTTP409.
+
+Strict ActionPlan JSON requires version1, objective, assumptions/questions arrays,
+answered decisions, complete worker tasks and known unique acyclic references.
+Graphs use iterative traversal. Optional product structures require coherent
+journeys/stories; ks-product requires a product. Complexity1–4 (risk for4), phases,
+modes, role and local32/64-byte IDs are the Go v1 protocol, not operator execution
+ceilings. Story task_ids=[] remains valid and establishes no planned coverage.
+Invalid plans refuse CLI2/HTTP400 with static causes and no source text leakage.
+
+Existing task_max_attempts, task_max_tool_calls and task_max_criteria provide task
+ceilings. Four saved Admin → Preparations and documents settings are added:
+
+| Setting | Unit/initial value | Effect |
+| --- | --- | --- |
+| preparation_plan_max_bytes | bytes/32000 | canonical Go-encoded plan size |
+| preparation_plan_max_tasks | count/8 | proposed tasks; none created |
+| preparation_plan_max_assumptions | count/16 | assumptions |
+| preparation_plan_max_questions | count/16 | questions, all answered |
+
+Null is unlimited; zero requires empty (thus bytes/tasks zero refuse all plans).
+Transport bounds remain distinct; no hidden Go ceiling survives an explicit cap
+change. Historical Roots remain readable/editable but new validation refuses
+without a complete v43 policy. Explicit Admin adoption preserves history; initial
+values apply to new installations or an explicit preview, never silently to live
+data. Success records only a hash-bound verdict, revision and receipt, without
+document/history edits. Exact replay precedes new validation; historical receipts
+never establish plan_ready. This field retains Go hash freshness, not a claim that
+past verdicts were rerun under subsequently changed caps. Future conversion must
+revalidate current policies; conversion is outside this lot. No agent, mission,
+budget grant or named human acceptance follows. Recipes: preparation-writes-rust
+and preparation-plan-upgrade-rust (v42→43, Admin and actual CLI consumer).
+
+Document integrity: consumed fingerprints are recomputed from exact UTF-8 text
+(present need, current brief, adopted copy and plan). Inconsistent stored data
+refuses verdict/adoption or copying corrupt provenance with
+preparation-document-digest-mismatch (CLI2/HTTP500). Reads retain data for repair
+but never project ready or rewrite rows. Publicly saving coherent replacement
+bytes or readopting the coherent current brief permits recovery without SQL
+repair. This checks content consistency, not authenticity against an arbitrary
+database writer. Historical evidence and recorded versions are never erased.

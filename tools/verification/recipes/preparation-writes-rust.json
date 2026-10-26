@@ -33,7 +33,11 @@
     "tests/rust_preparation_admin_ui.cjs",
     "tests/rust_preparation_reads.py",
     "version_history.json",
-    "web/i18n-en.js"
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/tests/preparation_plan.rs",
+    "rust/crates/swarm-engine/src/task_definition.rs",
+    "rust/crates/swarm-engine/src/preparation_models.rs",
+    "rust/crates/swarm-engine/tests/engine_settings_catalog.rs"
   ],
   "environment": {
     "CARGO_TARGET_DIR": "{root}/.cache/preparation-writes-tests",
@@ -89,6 +93,38 @@
       "required_stderr": []
     },
     {
+      "id": "public-plan-validation",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-plan-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_plan.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_PLAN_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_PLAN_PASS",
+        "PASS plan-records-exact-verdict",
+        "PASS plan-explicit-unlimited-consumed",
+        "PASS plan-http-invalid-safe"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "stored-document-digest-integrity",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-digests-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_plan_integrity.py','--binary',os.environ['SWARM_PREPARATION_WRITES_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_DIGEST_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_PLAN_INTEGRITY_PASS",
+        "PASS plan-corruption-http500-safe",
+        "PASS adopted-public-repair-same-event",
+        "PASS besoin-save-provenance-refused"
+      ],
+      "required_stderr": []
+    },
+    {
       "id": "historical-preparation-key-contract",
       "command": [
         "python3",
@@ -123,6 +159,48 @@
         "preparation_current_receipt_content_must_match_stored_state ... ok",
         "preparation_method_receipt_failure_rolls_back_and_recovers ... ok",
         "preparation_adopt_brief_receipt_failure_rolls_back_and_same_event_recovers ... ok"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "atomic-plan-verdict",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "preparation_plan"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "plan_verdict_receipt_failure_rolls_back_and_replays ... ok",
+        "1 passed; 0 failed;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "settings-catalog-validation",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "engine_settings_catalog"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "catalog_covers_all_actual_values_and_nullable_fields_match_authoritative_validation ... ok",
+        "2 passed; 0 failed;"
       ],
       "required_stderr": []
     }
