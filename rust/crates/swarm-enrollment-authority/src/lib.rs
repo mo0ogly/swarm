@@ -2,6 +2,10 @@
 //! never an engine capability. Callers must independently resolve expectations
 //! and serialize final use with the current protected authority source.
 #![forbid(unsafe_code)]
+/// Linux configuration-control core; transport and protected bootstrap are not
+/// supplied by this module. Current authority is retained through storage use.
+#[cfg(target_os = "linux")]
+pub mod control;
 pub mod publication;
 
 use ed25519_dalek::SigningKey;

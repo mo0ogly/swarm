@@ -2,8 +2,10 @@
 //! Pins and the independent Head must come from trusted bootstrap, never this file.
 //! SQLite serialization is local; signed replies can be stale before final use.
 #![forbid(unsafe_code)]
+mod bound;
 mod reply;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+pub use bound::BoundJournal;
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier as _, VerifyingKey};
 pub use reply::{decode_active_reply, ActiveReply, ACTIVE_REPLY_SCHEMA};
 use rusqlite::{params, Connection, OpenFlags};
@@ -35,16 +37,22 @@ pub enum Error {
     ReplyVersion,
     Canceled,
     Closed,
+    Busy,
     State,
     Sqlite(rusqlite::Error),
     Io(std::io::Error),
     Proof(swarm_enrollment_proof::Error),
+    Close {
+        cause: Box<Error>,
+        close: rusqlite::Error,
+    },
     Rollback {
         cause: Box<Error>,
         rollback: rusqlite::Error,
     },
 }
 impl Error {
+    /// Stable diagnostic category; typed storage/cleanup causes remain available.
     pub fn code(&self) -> &'static str {
         match self {
             Self::Context => "context",
@@ -57,15 +65,19 @@ impl Error {
             Self::ReplyVersion => "reply-version",
             Self::Canceled => "canceled",
             Self::Closed => "closed",
+            Self::Busy => "busy",
             Self::State => "state",
             Self::Sqlite(_) => "sqlite",
             Self::Io(_) => "io",
             Self::Proof(e) => e.code(),
             Self::Rollback { .. } => "rollback",
+            Self::Close { .. } => "close",
         }
     }
+    /// True only for immediate ownership/SQLite contention, never a cleanup failure.
     pub fn is_busy(&self) -> bool {
-        matches!(self,Self::Sqlite(rusqlite::Error::SqliteFailure(e,_)) if matches!(e.code,rusqlite::ErrorCode::DatabaseBusy|rusqlite::ErrorCode::DatabaseLocked))
+        matches!(self, Self::Busy)
+            || matches!(self,Self::Sqlite(rusqlite::Error::SqliteFailure(e,_)) if matches!(e.code,rusqlite::ErrorCode::DatabaseBusy|rusqlite::ErrorCode::DatabaseLocked))
     }
 }
 impl fmt::Display for Error {
@@ -76,6 +88,7 @@ impl fmt::Display for Error {
             Self::Proof(e) => write!(f, "{e}"),
             Self::History(cause) => write!(f, "enrollment state: invalid history: {cause}"),
             Self::Rollback { cause, rollback } => write!(f, "{cause}; rollback failed: {rollback}"),
+            Self::Close { cause, close } => write!(f, "{cause}; close failed: {close}"),
             e => write!(f, "enrollment state: {}", e.code()),
         }
     }
@@ -86,7 +99,9 @@ impl std::error::Error for Error {
             Self::Sqlite(e) => Some(e),
             Self::Io(e) => Some(e),
             Self::Proof(e) => Some(e),
-            Self::Rollback { cause, .. } | Self::History(cause) => Some(cause.as_ref()),
+            Self::Rollback { cause, .. } | Self::Close { cause, .. } | Self::History(cause) => {
+                Some(cause.as_ref())
+            }
             _ => None,
         }
     }
@@ -277,13 +292,20 @@ impl Journal {
                 | OpenFlags::SQLITE_OPEN_CREATE
                 | OpenFlags::SQLITE_OPEN_NO_MUTEX,
         )?;
+        Self::configure(ctx, &c)?;
+        Ok(c)
+    }
+    /// Install this call's cancellation hook and durable SQLite settings. There
+    /// is no waiting/retry policy; callers must explicitly resume after Busy.
+    fn configure(ctx: &Context, c: &Connection) -> Result<(), Error> {
+        ctx.check()?;
         // Remove rusqlite's 5000 ms default. Go's journal has no busy handler/retry.
         c.busy_handler(None)?;
         let token = ctx.clone();
         c.progress_handler(1, Some(move || token.check().is_err()))?;
         c.execute_batch("PRAGMA synchronous=FULL")?;
         ctx.check()?;
-        Ok(c)
+        Ok(())
     }
     fn transaction<T>(
         &self,
@@ -441,7 +463,19 @@ impl Journal {
             return Err(Error::Closed);
         }
         let c = self.connect(ctx)?;
-        self.transaction(ctx, &c, |c| {
+        self.active_on(ctx, &c, expected, id, f)
+    }
+    /// Check signed current state while retaining a write reservation through
+    /// the callback and COMMIT. Callback effects cannot be undone by rollback.
+    fn active_on<T>(
+        &self,
+        ctx: &Context,
+        c: &Connection,
+        expected: &Head,
+        id: &str,
+        f: impl FnOnce(Record) -> Result<T, Error>,
+    ) -> Result<T, Error> {
+        self.transaction(ctx, c, |c| {
             let Loaded {
                 head, mut records, ..
             } = self.load(ctx, c)?;

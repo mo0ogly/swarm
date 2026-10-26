@@ -3,10 +3,11 @@
 17 octobre 2026 — [English](../en/AGENT-IDENTITY-CONTRACT.md).
 Périmètre : noyau IA2.2, canal IA2.3a, source durable IA2.3b, liaison au plan
 IA3a, émission humaine IA3b, reçu IA3c.1 et protocole isolé IA3c.2a. Ces composants
-internes restent non raccordés aux lanceurs.
+internes restent non raccordés aux lanceurs publics. Le raccord privé 03c décrit
+plus bas est vérifié avec un helper de fixture, sans admission d’agent.
 Les défauts de l'[audit IA1](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
 restent ouverts. Il n'existe aucun nouvel endpoint, commande, paramètre Admin,
-bootstrap ou confinement fournisseur livré par ce contrat.
+bootstrap public ou confinement fournisseur livré par ce contrat.
 
 ## Responsabilités et parcours actuel
 
@@ -860,7 +861,9 @@ installations futures, notamment clientes. Leur demande commerciale reste une
 hypothèse utilisateur ; aucun service ni parcours de configuration n’est encore
 livré. Le [plan d’enrôlement](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
 détaille la configuration initiale, le modal Admin et les critères IA3c.2f-01 à -06.
-Le choix n’est plus en attente ; principal humain initial et activation restent ouverts.
+Le choix d’hébergement n’est plus en attente. Le parcours humain retenu est
+précisé ci-dessous ; son implémentation, l’enrôlement effectif et l’activation
+restent ouverts.
 
 Le local conserve noyau et administration hôte dans la base de confiance.
 Le distant vise une séparation face à la compromission de l’hôte Swarm, sous
@@ -878,6 +881,39 @@ les sources agents ou l’export d’un projet ; aucune racine apprise du pair.
 L’option distante sera indiquée comme prévue tant que non implémentée.
 Docker/natif décrit l’installation de Swarm, pas la frontière de son autorité.
 
+### Authentification locale par défaut et réglage UX
+
+Précision utilisateur du 17 octobre 2026 : aucun fournisseur d’identité existant.
+La cible est un **compte humain local personnel par défaut**, proposé par un
+assistant au premier lancement, puis configurable dans Admin. Le fournisseur
+d’entreprise est optionnel. Ce choix d’authentification est indépendant de
+l’hébergement local/distant de l’autorité et du fournisseur du modèle IA.
+Aucun fournisseur externe n’est requis pour démarrer le workflow après
+l’enrôlement local et la vérification de ses prérequis de sécurité.
+
+Le défaut concerne le parcours d’une installation vierge, jamais un compte,
+un mot de passe commun ou une autorisation automatique. Le bootstrap exige une
+preuve d’installation indépendante du premier visiteur et du canal des agents,
+consommée une seule fois. Le compte est vérifié par l’autorité ; un UID, un cookie
+cockpit ou `principal_kind: human` déclaré ne suffit pas. Le principal authentifié
+est de catégorie `human`, avec émetteur propre à l’installation et sujet stable ;
+il ne se confond pas avec la catégorie technique `local` non attestée.
+
+Mode demandé, effectif et preuves sont affichés séparément. Persistance, preview
+sans mutation, contrôle de révision et validation sont communs à setup/API/CLI/Go/UX.
+Une erreur ou perte de configuration ne relance pas l’enrôlement initial. Changer
+de fournisseur exige des droits vérifiés et une liaison explicite des comptes ;
+ni nom ni email ne fusionnent identités ou droits. Récupération et révocation
+préservent l’historique. Les secrets ne sont ni persistés côté navigateur ni
+communiqués au modèle. L’identité doit être contrôlée sur tout le workflow.
+
+**État : décision et critères documentés, assistant et authentification locale
+non implémentés.** Le format de configuration actuel ne contient pas ce réglage.
+Le [contrat d’enrôlement](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
+décrit le graphe cible et les sept critères IA3c.2f-04-UX1 à UX7 ; aucun n’est
+clos par ce texte. Les preuves du stockage et du canal restent réutilisables
+dans leur périmètre ; elles ne prouvent pas ce parcours humain.
+
 La protection de la clé et l’identification du pair ne suffisent pas : l’autorité
 doit contrôler les droits de la demande exacte et son état courant. SO_PEERCRED
 rapporte des credentials de processus, pas un rôle de workflow
@@ -890,7 +926,9 @@ réenrôlement implicite. Le contexte pilote ne dispense d’aucun contrôle.
 
 ```mermaid
 flowchart TD
-  I["Installation initiale<br/>cible, non livrée"] --> C["Choix explicite de l'autorité"]
+  I["Installation initiale<br/>cible, non livrée"] --> C["Hébergement : local par défaut"]
+  I --> H["Compte humain local par défaut<br/>fournisseur d'entreprise optionnel"]
+  H --> V
   A["Modal Admin<br/>cible, non livré"] --> V["Droits, validation commune<br/>révision attendue et preview"]
   C --> V
   V --> S["Configuration protégée persistante<br/>hors sources agents/import"]
@@ -1312,3 +1350,212 @@ chaque `\x00` représente un octet NUL. Le format canonique est celui du codec G
 partagé, pas une promesse que JSON.stringify produit les mêmes octets. Un futur
 client d’un autre langage devra vérifier cet encodage, notamment les échappements,
 ou consommer le codec via l’adaptateur Go. Cette interopérabilité n’est pas prouvée.
+
+## Remise privée IA3c.2f-03c — preuve avant demande métier
+
+Le lanceur interne `runAgentIdentityConfigProcess` exécute une commande neuve de
+l’image courante, épinglée par descripteur avec `pinTrustFixedHelperImage`. Son
+appelant de confiance fournit explicitement arguments, environnement, UID serveur
+attendu et pins publics ; aucune donnée de projet ne choisit le programme ou
+l’autorité. Environnement implicite, ExtraFiles préexistants, commande déjà
+démarrée, Cancel, WaitDelay et PidFD préconfigurés sont refusés. Les autres
+attributs système sont conservés. Ce composant reste sans entrée CLI ni service
+installé ; `acceptAgentIdentityConfigLaunch` est appelé par un helper de test.
+
+Deux socketpairs privées SOCK_SEQPACKET reçoivent PASSCRED/PASSPIDFD avant exec :
+une pour le démarrage, une pour la demande métier. Le parent transmet les FDs 3
+(métier), 4 (démarrage), 5 (pidfd parent indépendant) et 6 (image courante).
+Le parent obtient le pidfd enfant atomiquement par SysProcAttr.PidFD/CLONE_PIDFD ;
+il ne rouvre jamais un numéro de PID enfant. Les tokens pidfs 64 bits et
+UID de chaque message sont comparés aux objets détenus indépendamment des deux
+côtés. Les préconditions Linux du client 03b s’appliquent aussi ici.
+
+Démarrage **version 1**, format canonique strict : schema_version, purpose,
+challenge, pins_digest. Challenge frais de 32 octets, base64url sans padding ;
+pins_digest est SHA-256 hexadécimal minuscule du préfixe
+`swarm-installation-startup-v1\x00pins\x00` suivi des pins JSON canoniques Go.
+Les deux `\x00` désignent des octets NUL. Les trois messages hello, ready et
+release doivent partager challenge et empreinte attendus. L’enfant apprend le
+challenge du parent attribué, mais compare les pins à sa propre source ; le
+parent vérifie ready contre son pidfd enfant et ses propres pins, avant release
+et avant toute demande métier. L’enfant n’admet le canal métier qu’après release
+exacte et attribuée. Le buffer de démarrage est calculé sur le plus long message
+valide de ce format fixe ; ce n’est pas un plafond de contenu métier.
+
+```mermaid
+sequenceDiagram
+  participant L as Lanceur privé de confiance
+  participant H as Helper de l'image courante
+  participant A as Autorité métier indépendante
+  participant W as Configuration et témoin
+  L->>H: Exec image épinglée, canaux privés et pidfd parent
+  Note over L,H: Parent détient le pidfd enfant créé par clone
+  L->>H: Démarrage V1 hello, nonce et digest de pins
+  H->>H: Vérifier processus parent, UID, format et pins propres
+  H-->>L: Démarrage V1 ready lié au hello
+  L->>L: Vérifier processus enfant, UID et ready exact
+  L->>H: Démarrage V1 release exact
+  H->>H: Vérifier release puis admettre le canal métier
+  L->>H: Demande métier V2, challenge distinct et Change exact
+  H->>A: Autoriser cette demande attribuée
+  A->>W: Effet seulement sous autorité maintenue
+  W-->>L: Réponse V2 liée à la demande via le helper
+  L->>L: Valider réponse et recueillir fin de l'enfant
+  Note over L,W: Ready et release ne donnent aucun droit métier
+```
+
+Les copies parent des FDs hérités sont fermées après exec. Le helper vérifie que
+le FD image correspond à son exécutable, adopte les sockets en CLOEXEC et ferme
+les originaux, le canal de démarrage et le pidfd parent. Le client conserve son
+duplicata de pidfd jusqu’à la fin de l’échange ; le lanceur conserve l’original
+jusqu’à la collecte de Wait, puis le ferme et invalide son numéro dans Cmd.
+Annulation : fermeture des canaux possédés, SIGKILL via le seul pidfd enfant et
+collecte de Wait ; aucune recherche de PID, aucun signal de groupe, délai ou retry
+automatique. Les flux standard et le code de l’image restent de confiance : un
+writer fourni par l’appelant qui se bloque peut aussi bloquer la collecte Go.
+
+Succès = réponse métier valide **et** fin de l’enfant à zéro. Un refus métier
+attribué reste un refus, même après ready. Une fin non nulle après réponse de
+mutation valide conserve l’erreur de processus, retourne zéro résultat et
+ErrIndeterminate ; l’historique n’est pas réinitialisé. Après tentative de
+mutation sans réponse valide, les règles 03b s’appliquent. Avant demande métier,
+un échec de démarrage ne prétend pas qu’une mutation a été tentée.
+
+Le [rapport 03c](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
+lie les tests aux sources exactes. La preuve concerne deux processus de fixture
+du même compte. Elle ne démontre ni confidentialité, compte système séparé,
+protection contre ptrace/root ou fuite depuis un bootstrap compromis, ni identité
+humaine, délégation ou admission publique. Le raccord métier reste V2 et le
+stockage V1. EP-07 demeure partiel jusqu’au bootstrap protégé, au confinement et
+à l’activation réelle ; F01–F07 et l’acceptation globale restent ouverts.
+
+Ce helper enfant à usage unique ne remplace pas le cycle d’un service permanent.
+Le pidfd ne donne pas le droit de changer de compte ni de signaler un autre UID.
+Le raccord public doit établir qui peut lancer/superviser le compte séparé :
+bootstrap privilégié protégé ou service/broker authentifié, avec droits et collecte
+vérifiés. Ne pas exécuter le cockpit entier avec des privilèges pour obtenir cette
+propriété ; cette intégration reste à concevoir après désignation de la source
+d’autorité, puis à vérifier dans le parcours réellement retenu.
+
+## Précontrôle du bootstrap IA3c.2f-03d
+
+`swarm identity bootstrap-check EMPREINTE_SHA256 --input /chemin/absolu/bootstrap.json --json`
+effectue un contrôle local en lecture seule, avant toute ouverture de projet.
+`--root`, `--server`, stdin et les opérations d’activation ne sont pas des sources
+de bootstrap acceptées. Le paquet commun `internal/enrollmentbootstrap` fournit
+Encode, Decode et Load ; ses données ne sont pas des capacités d’autorité.
+
+Le manifeste canonique V1 contient schema_version, pins (installation_digest,
+authority_public_key, bootstrap_principal), service_uid, controller_uid,
+configuration_directory et witness_directory. Les pins utilisent la validation
+existante ; humain déclaré et clé publique ne constituent pas une connexion
+humaine ou une approbation. Les deux UID déclarés doivent différer et service_uid
+doit égaler l’UID effectif du processus qui contrôle le fichier. Le contrôle ne
+prouve pas que les agents utilisent réellement controller_uid.
+
+L’empreinte SHA-256 hexadécimale minuscule attendue vient d’un contrôle
+d’installation approuvé et protégé indépendamment. La calculer depuis le fichier
+à accepter, puis la lui faire vérifier, ne prouve pas cette approbation. Le
+fichier est ouvert sans suivre de lien : fichier régulier, propriétaire service,
+mode 0600, un seul lien. Son parent et les répertoires configuration/témoin sont
+ouverts avec le même `enrollmentconfig.OpenPrivateDirectory` que le stockage :
+UID effectif, parcours sans symlink, ancêtres root/service non modifiables par
+groupe/autres (exception sticky root telle que /tmp), répertoire final 0700.
+Les trois chemins doivent être distincts, non imbriqués ; les handles ne doivent
+pas désigner le même inode. Root et les administrateurs hôte restent de confiance.
+
+```mermaid
+flowchart TD
+  P["Empreinte approuvée indépendante"] --> C["Précontrôle avant ouverture projet"]
+  F["Manifeste privé V1 et répertoires existants"] --> C
+  C --> V["Format exact, empreinte, UID et chemins protégés"]
+  V --> O["Observation du stockage à cet instant"]
+  V --> R["Refus explicite sans résultat ni mutation"]
+  O --> N["Humain, confinement et service actif restent non vérifiés"]
+  N -. "raccord futur après preuves" .-> S["Service séparé et contrôle métier indépendant"]
+```
+
+Le résultat expose bootstrap_digest, bootstrap et storage_verified=true ;
+human_authentication_verified, confinement_verified et service_started restent
+false. Il ne crée ni répertoire, lock, clé, compte, journal, session ou service.
+Un refus ne retourne aucun résultat. Les handles sont fermés ; les futurs
+consommateurs doivent revalider les chemins à l’usage, pas réutiliser cette
+observation comme une permission. La configuration mutable et son historique ne
+sont pas ce manifeste ; une migration de racine n’est pas implémentée ici.
+Le service protégé, la source humaine, le confinement et Admin restent ouverts.
+
+
+## Noyau Rust de contrôle courant — incrément PAEA26
+
+`swarm_enrollment_authority::control` compose désormais le journal signé natif
+et `swarm_enrollment_config::store::Coordinator` sous Linux. C'est une API de
+bibliothèque, sans écouteur, session humaine ni consommateur dans le profil
+normal de la CLI. Le précontrôle `bootstrap-check` ne l'active pas. Les anciens
+contrats de transport décrits ci-dessus ne prouvent pas leur portage Rust.
+
+Le démarrage protégé doit fournir indépendamment les clés publiques, le projet,
+les répertoires privés, le propriétaire et `Binding` : enrollment_id, génération,
+principal humain exact, portée de plan et révision de confiance. `Startup` vérifie
+leur cohérence ; il n'authentifie pas son producteur. Ces données ne doivent venir
+ni de la requête, ni du cookie du cockpit, ni d'une simple égalité d'UID.
+
+`BoundJournal` ouvre un journal WAL existant, valide son historique signé et garde
+la connexion réelle. Il ne recrée aucune base et ne rouvre jamais son chemin par
+opération. `NOFOLLOW` protège le dernier composant ; la protection des ancêtres
+et le bootstrap restent des préconditions externes. Un déplacement peut entraîner
+un refus SQLite : il ne faut pas le convertir en réouverture ou succès vide.
+Ce lien à l'objet ouvert ne fournit ni confinement ni protection contre la
+restauration simultanée des données/témoins par leur propriétaire ou root.
+
+Chaque `execute` vérifie la tête courante, l'absence de révocation, le document
+canonique, la génération et le contexte exacts, la validité à l'heure du service
+et une permission signée `effect.execute` dont la ressource vaut exactement
+`enrollment-config/<installation_digest>/<read|preview|create|apply>`.
+Ces quatre discriminants définissent le protocole ; aucun grant par défaut,
+délai, plafond ou politique de reprise n'est introduit. Les grants résident dans
+le journal signé ; aucun nouveau formulaire Admin de politique n'est ajouté.
+Lire et rejouer exigent aussi leur permission. Une délégation n'est pas utilisée.
+
+```mermaid
+sequenceDiagram
+  participant D as Démarrage protégé (à raccorder)
+  participant C as Control Rust
+  participant J as Journal retenu
+  participant W as Configuration + témoin
+  D->>C: Pins et Binding indépendants
+  C->>J: BEGIN IMMEDIATE et contrôle courant
+  J-->>C: Document actif exact
+  C->>W: Lire / prévoir / créer / appliquer
+  Note over C,W: Permission privée limitée au changement exact
+  W-->>C: Résultat ou erreur conservée
+  C->>J: COMMIT (peut échouer après l'effet)
+```
+
+La réservation d'autorité reste tenue jusqu'au retour du stockage et au COMMIT.
+La contention locale refuse immédiatement avec Busy, sans attente ou relance
+cachée. Une révocation obtenue avant l'usage refuse cet usage ; une révocation
+concurrente à un usage réservé refuse puis nécessite une reprise explicite après
+sa fin. Ce contrat ne rend pas l'expiration murale atomique avec les écritures.
+
+`Preview` conserve les fichiers de configuration, `Create` et `Apply` emploient
+le protocole existant configuration/témoin. EventID, base et contenu exacts
+permettent le rejeu sans doublon, après une nouvelle autorisation courante.
+Aucun recover/reset/adopt brut n'est exposé. Un témoin pending exige la reprise
+du même changement autorisé ; `Read` ne le masque pas. Le stockage conserve ses
+causes, les fautes de flush/close et les refus de chemins.
+
+Tout échec d'une invocation mutante reste conservativement UNKNOWN : même un Err
+ne garantit pas l'absence d'effet. Si l'autorité échoue après le stockage,
+`AfterStorage` conserve sa cause et le résultat complet du stockage, succès ou
+échec secondaire. Ne pas réémettre une action différente ; lire sous autorité
+courante et/ou reprendre l'événement exact. Si le grant est révoqué, cette reprise
+exige un contrôleur disposant d'une autorité indépendante valide. `close` refuse
+la contention, ferme explicitement les trois stockages et conserve les erreurs
+secondaires ; Drop seul ne prouve pas cette fermeture.
+
+Recette maintenue : `tools/verification/recipes/paea-control-core.json`.
+[Résultats et limites26](../plans/actions-confiance/paea/INCREMENT-26.md).
+Tests sur stockage réel isolé et hooks réservés aux tests, distincts du build
+normal sans `test-fixtures`. Transport authentifié, identité humaine réelle,
+compte service, confinement, installation de service, PA-03 et acceptation E2/E3
+restent ouverts ; aucune nouvelle garantie globale sur les 17 invariants.

@@ -3,10 +3,11 @@
 17 October 2026 — [Français](../architecture/AGENT-IDENTITY-CONTRACT.md).
 Scope: IA2.2 kernel, IA2.3a channel, IA2.3b durable source, IA3a plan binding,
 IA3b human issuance, IA3c.1 receipts and the isolated IA3c.2a protocol. These
-internal components are **not connected to launchers**.
+internal components are **not connected to public launchers**. The private 03c
+handoff below is verified with a fixture helper, without agent admission.
 The [IA1 findings](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
 remain open. This contract adds no public endpoint, CLI command, Admin setting,
-bootstrap mechanism or provider confinement.
+public bootstrap mechanism or provider confinement.
 
 ## Responsibilities and current flow
 
@@ -815,7 +816,8 @@ including customer deployments. Customer demand remains a user hypothesis;
 neither the service nor its configuration flow is delivered yet. The
 [enrollment plan](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
 details initial setup, the Admin modal and criteria IA3c.2f-01 through -06.
-Hosting is now decided; the initial human principal and activation remain open.
+Hosting is now decided. The selected human flow is specified below; its
+implementation, actual enrollment and activation remain open.
 
 Local mode keeps the host kernel and administration in the trusted computing
 base. Remote mode aims to withstand a compromised Swarm host, subject to separate
@@ -833,6 +835,38 @@ no root learned from the peer. The remote option must be labelled as planned
 until implemented. Docker/native describes Swarm installation, not its authority's
 security boundary.
 
+### Local authentication by default, configurable through the UX
+
+User clarification on 17 October 2026: no existing identity provider is available.
+The target is a **personal local human account by default**, offered by a
+first-run wizard, then configurable in Admin. An enterprise provider is optional.
+This authentication choice is independent of local/remote authority hosting
+and of the AI model provider. Starting a workflow after local enrollment and
+verification of its security prerequisites requires no external identity provider.
+
+The default selects a fresh installation's flow, never a shared account/password
+or automatic authority. Bootstrap requires installation proof independent of
+the first visitor and the agents' channel, consumed once. The authority verifies
+the account; a UID, cockpit cookie or declared `principal_kind: human` is
+insufficient. The authenticated principal has kind `human`, an installation-bound
+issuer and a stable subject; it differs from the unauthenticated technical
+`local` category.
+
+Requested mode, effective mode and evidence are displayed separately. Persistence,
+non-mutating preview, revision checks and validation are shared by setup/API/CLI/Go/UX.
+Configuration errors or loss never restart initial enrollment. Changing providers
+requires verified authority and explicit account binding; matching names/emails
+never merge identities or rights. Recovery and revocation preserve history.
+Secrets are neither persisted in the browser nor supplied to the model. Identity
+must be checked throughout the workflow.
+
+**Status: decision and criteria documented; wizard and local authentication not
+implemented.** The current configuration format has no such setting. The
+[enrollment contract](../plans/actions-confiance/identites-agents-enrolement-IA3c2.md)
+provides the target graph and seven IA3c.2f-04-UX1 through UX7 criteria; this text
+closes none of them. Storage/channel evidence remains reusable within its scope
+and does not establish this human flow.
+
 Protecting the key and identifying a peer are insufficient: the authority must
 check the exact request's rights and current state. SO_PEERCRED reports process
 credentials, not a workflow role
@@ -845,7 +879,9 @@ re-enrollment. Pilot use exempts none of these controls.
 
 ```mermaid
 flowchart TD
-  I["Initial setup<br/>target, not delivered"] --> C["Explicit authority choice"]
+  I["Initial setup<br/>target, not delivered"] --> C["Hosting: local by default"]
+  I --> H["Local human account by default<br/>optional enterprise provider"]
+  H --> V
   A["Admin modal<br/>target, not delivered"] --> V["Rights, shared validation<br/>expected revision and preview"]
   C --> V
   V --> S["Persistent protected configuration<br/>outside agent/import sources"]
@@ -1253,3 +1289,206 @@ each `\x00` represents one NUL byte. Canonical format is defined by the shared G
 codec, without claiming JSON.stringify produces identical bytes. A future client
 in another language must verify this encoding, including escaping, or consume
 the codec through the Go adapter. Such interoperability has not been verified.
+
+## Private handoff IA3c.2f-03c — proof before business content
+
+The internal `runAgentIdentityConfigProcess` launcher consumes a fresh command
+of the current image, pinned by descriptor through `pinTrustFixedHelperImage`.
+Its trusted caller explicitly supplies arguments, environment, expected service
+UID and public pins; project data cannot choose the program or authority.
+Implicit environment, preexisting ExtraFiles, an already started command, Cancel,
+WaitDelay and preconfigured PidFD are rejected. Other system attributes are
+preserved. This component has no CLI entry or installed service;
+`acceptAgentIdentityConfigLaunch` is called by a test helper.
+
+Two private SOCK_SEQPACKET socketpairs enable PASSCRED/PASSPIDFD before exec:
+one for startup and one for business requests. The parent passes FDs 3 (business),
+4 (startup), 5 (independent parent pidfd) and 6 (current image). The child's pidfd
+is returned atomically through SysProcAttr.PidFD/CLONE_PIDFD; the parent never
+reopens a numeric child PID. Each message's 64-bit pidfs token and UID are checked
+against independently held objects on both sides. The Linux prerequisites of
+client 03b apply here too.
+
+Startup **version 1**, strict canonical format: schema_version, purpose,
+challenge, pins_digest. Fresh 32-byte challenge, unpadded base64url; pins_digest
+is lowercase hexadecimal SHA-256 over `swarm-installation-startup-v1\x00pins\x00`
+followed by canonical Go JSON pins. Both `\x00` sequences denote NUL bytes.
+All three messages hello, ready and release must match the challenge and expected
+digest. The child learns the challenge from the attributed parent but compares
+pins against its own source. The parent checks ready against its own child pidfd
+and pins before release and before any business request. The child admits the
+business channel only after an exact, attributed release. The startup buffer is
+derived from the longest valid frame of this fixed format, not a business limit.
+
+```mermaid
+sequenceDiagram
+  participant L as Trusted private launcher
+  participant H as Current image helper
+  participant A as Independent business authority
+  participant W as Configuration and witness
+  L->>H: Exec pinned image, private channels and parent pidfd
+  Note over L,H: Parent holds the clone-created child pidfd
+  L->>H: Startup V1 hello, nonce and pins digest
+  H->>H: Check parent process, UID, format and own pins
+  H-->>L: Startup V1 ready bound to hello
+  L->>L: Check child process, UID and exact ready
+  L->>H: Exact startup V1 release
+  H->>H: Check release then admit business channel
+  L->>H: Business V2 request, distinct challenge and exact Change
+  H->>A: Authorize this attributed request
+  A->>W: Effect only under maintained authority
+  W-->>L: Request-bound V2 reply through helper
+  L->>L: Validate reply and reap child exit
+  Note over L,W: Ready and release grant no business rights
+```
+
+The parent's inherited FD copies close after exec. The helper verifies that its
+image FD matches its executable, adopts sockets with CLOEXEC and closes originals,
+the startup channel and parent pidfd. The client keeps a duplicated pidfd through
+the exchange; the launcher holds the original through Wait, closes it and
+invalidates its number in Cmd. Cancellation closes owned channels, sends SIGKILL
+through this child's pidfd only and reaps Wait: no numeric PID lookup, group
+signal, automatic timer or retry. Standard streams and image code remain trusted:
+a caller-supplied writer that blocks can also block Go's collection.
+
+Success requires both a valid business reply **and** child exit zero. An attributed
+business refusal remains a refusal even after ready. Nonzero exit after a valid
+mutation reply retains the process error, returns no result and ErrIndeterminate;
+history is never reset. The 03b rules apply after a mutation attempt without a
+valid reply. A startup failure before business send does not claim a mutation
+was attempted.
+
+The [03c report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
+binds checks to exact sources. Evidence concerns two fixture processes under the
+same account. It establishes neither confidentiality, a separate system account,
+protection from ptrace/root or a compromised bootstrap leaking descriptors, nor
+human identity, delegation or public admission. Business transport remains V2,
+storage V1. EP-07 remains partial pending protected bootstrap, confinement and
+actual activation; F01–F07 and overall acceptance remain open.
+
+This one-shot child helper does not replace a persistent service lifecycle.
+A pidfd grants neither account-switching rights nor permission to signal another
+UID. Public integration must establish who can launch/supervise the separate
+account: protected privileged bootstrap or an authenticated service/broker, with
+verified rights and collection. Do not run the whole cockpit with privileges to
+obtain this property. Design this integration after designating the authority
+source, then verify the chosen actual flow.
+
+## Bootstrap precheck IA3c.2f-03d
+
+`swarm identity bootstrap-check SHA256_DIGEST --input /absolute/path/bootstrap.json --json`
+performs a read-only local check before opening any project. `--root`, `--server`,
+stdin and activation operations are not accepted bootstrap sources. The shared
+`internal/enrollmentbootstrap` package provides Encode, Decode and Load; its data
+is not an authority capability.
+
+The canonical V1 manifest contains schema_version, pins (installation_digest,
+authority_public_key, bootstrap_principal), service_uid, controller_uid,
+configuration_directory and witness_directory. Pins use existing validation;
+a declared human and public key establish neither human login nor approval.
+The declared UIDs must differ, and service_uid must match the checking process's
+effective UID. This does not prove agents actually use controller_uid.
+
+The expected lowercase hexadecimal SHA-256 digest comes from independently
+approved, protected installation control. Computing it from the file to accept
+and checking against that value does not establish approval. The file is opened
+without following links: regular file, service owner, mode 0600, one link only.
+Its parent and configuration/witness directories use the same
+`enrollmentconfig.OpenPrivateDirectory` boundary as storage: effective UID,
+symlink-free traversal, root/service-owned ancestors without group/other writes
+(root sticky directories such as /tmp excepted), final directory 0700. The three
+paths must be distinct and non-nested; handles must not identify the same inode.
+Root and host administrators remain trusted.
+
+```mermaid
+flowchart TD
+  P["Independent approved digest"] --> C["Precheck before project open"]
+  F["Private V1 manifest and existing directories"] --> C
+  C --> V["Exact format, digest, UID and protected paths"]
+  V --> O["Storage observation at this instant"]
+  V --> R["Explicit refusal without result or mutation"]
+  O --> N["Human, confinement and active service remain unverified"]
+  N -. "future integration after evidence" .-> S["Separate service and independent business control"]
+```
+
+The result exposes bootstrap_digest, bootstrap and storage_verified=true;
+human_authentication_verified, confinement_verified and service_started remain
+false. It creates no directory, lock, key, account, journal, session or service.
+Refusal returns no result. Handles close; future consumers must revalidate paths
+at use rather than treat this observation as permission. Mutable configuration
+and its history are separate from this manifest; root migration is not implemented
+here. The protected service, human source, confinement and Admin remain open.
+
+
+## Rust current-authority control core — PAEA increment26
+
+`swarm_enrollment_authority::control` now composes the native signed journal with
+Linux `swarm_enrollment_config::store::Coordinator`. This is a library API with
+no listener, human session provider or consumer in the normal CLI profile.
+`bootstrap-check` does not activate it. Earlier transport contracts above do not
+prove that their Rust implementation exists.
+
+Protected startup must independently supply public pins, project, private storage
+paths, owner and `Binding`: enrollment ID/generation, exact human principal, plan
+scope and trust revision. `Startup` checks consistency, not its producer's
+identity. Requests, cockpit cookies and matching UIDs cannot establish this trust.
+
+`BoundJournal` opens an existing WAL journal, checks its signed history and keeps
+the actual connection. It neither recreates databases nor reopens their pathname
+per operation. NOFOLLOW covers the final component only; protected ancestors and
+bootstrap remain external prerequisites. A moved database may be refused by
+SQLite; never turn this into a reopen or empty success. Binding to the opened
+object does not provide confinement or resist owner/root restoration of both
+configuration and witness.
+
+Each `execute` checks the actual current head, revocation, canonical document,
+exact generation/context, service-clock validity and an existing signed
+`effect.execute` permission with this exact resource:
+`enrollment-config/<installation_digest>/<read|preview|create|apply>`.
+These four operation discriminators are protocol constants. No implicit grant,
+execution ceiling, delay or retry policy is added. Grants persist in signed
+journal entries; no new Admin execution policy is introduced. Reads and replays
+also require their exact permission. Delegable ceilings are not consumed here.
+
+```mermaid
+sequenceDiagram
+  participant B as Protected startup (integration pending)
+  participant C as Rust Control
+  participant J as Retained journal
+  participant W as Configuration + witness
+  B->>C: Independent pins and Binding
+  C->>J: BEGIN IMMEDIATE and current checks
+  J-->>C: Exact active document
+  C->>W: Read / preview / create / apply
+  Note over C,W: Private permit for the exact change only
+  W-->>C: Retained result or error
+  C->>J: COMMIT (may fail after the effect)
+```
+
+The authority reservation lasts through storage return and authority COMMIT.
+Local contention returns Busy immediately, without hidden waiting/retries. A
+revocation that wins first refuses use; a revoke competing with a reserved use
+is refused and needs explicit resumption after that use. Wall-clock expiry is
+checked before storage; it is not atomic with filesystem writes.
+
+Preview does not publish configuration. Create/apply retain the existing
+two-directory intent protocol. An exact EventID/base/content replay is authorized
+again and creates no duplicate. No raw recover/reset/adopt command is exposed.
+Pending witness state requires the same authorized change; read does not hide it.
+Existing path, flush, close and storage failures keep their original causes.
+
+Every failed mutating invocation conservatively leaves the effect UNKNOWN.
+An Err does not establish absence of publication. If authority fails after
+storage, `AfterStorage` keeps both the authority cause and the complete storage
+result, including a secondary failure. Use authorized readback and/or exact-event
+recovery, never a different replacement action. A revoked grant requires another
+independently authorized controller before recovery. Explicit close refuses
+contention, closes authority/configuration/witness and preserves secondary
+cleanup failures; Drop alone proves no successful close.
+
+Maintained recipe: `tools/verification/recipes/paea-control-core.json`.
+[Increment26 results and limits](plans/actions-confiance/paea/INCREMENT-26.md).
+Real isolated storage tests use explicit test-only hooks, separately from the
+normal build without `test-fixtures`. Authenticated transport, actual human
+identity, service account, confinement, service installation, PA-03 and E2/E3
+acceptance remain open. No additional global invariant is claimed.

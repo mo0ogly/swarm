@@ -559,3 +559,20 @@ publication incertaine exposée UNKNOWN avec pin attendu et reprise vérifiée.
 Contre-exemple nouveau pin forgé conservé ; autorité simulée/0sur17protégés,
 IA3/AC-02/humains/E2/E3/RETEX global ouverts. [Revue/limites25](paea/INCREMENT-25.md).
 Outillage du checkout, rapport v1/serveur inchangés ; aucun build/install/commit/push.
+
+
+### Incrément26 — noyau natif de contrôle courant
+
+Reprise PA-02 en Codex direct, sans GLM. [Tranche26](paea/INCREMENT-26.md) :
+connexion retenue au journal existant, contrôle exact sous réservation jusqu'au
+stockage réel configuration/témoin, refus de révocation et UNKNOWN après effet.
+Noyau de bibliothèque, sans activation du service ni identité humaine déduite.
+Transport/bootstrap protégé, PA-03, E2/E3 et 0/17 invariants globaux restent ouverts.
+
+
+Tranche26 vérifiée :41tests nommés, recette PASS/VERIFIED,17sources locales du
+build normal exactes et quatre crates sans test-fixtures ; Rustdoc PASS. Révocation
+et usage ordonnés, UNKNOWN après effet, double cause et reprise exacte observés.
+[Revue/RETEX26](paea/INCREMENT-26.md). Aucun consommateur dans la CLI normale,
+donc aucun service installé par ce noyau ; transport/bootstrap/authentification
+locale personnelle restent à raccorder. PA-02 partiel,0/17/E2/E3/RETEX global ouverts.

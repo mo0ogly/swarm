@@ -525,3 +525,21 @@ UNKNOWN with expected pin and verified recovery. Forged-new-pin counterexample
 retained; simulated authority/0of17protected, IA3/AC-02/humans/E2/E3/final RETEX
 remain open. [Review/limits25](paea/INCREMENT-25.md). Checkout tooling, report v1
 and server unchanged; no build/install/commit/push.
+
+
+### Increment26 — native current-authority control core
+
+PA-02 resumed directly by Codex without GLM. [Increment26](paea/INCREMENT-26.md):
+retained connection to existing signed authority, exact current checks held
+through real configuration/witness storage, revocation refusals and UNKNOWN
+after possible effect. Library core only; no service activation or inferred
+human identity. Protected transport/bootstrap, PA-03, E2/E3 and 0/17 global
+invariants remain open.
+
+
+Increment26 verified:41named tests, recipe PASS/VERIFIED,17effective local sources
+matched for the normal build and four crates without test-fixtures; Rustdoc PASS.
+Revocation ordering, UNKNOWN after effect, both causes and exact-event recovery
+observed. [Review/RETEX26](paea/INCREMENT-26.md). No normal CLI consumer, hence no
+installed service from this core; protected transport/bootstrap and local personal
+authentication remain unconnected. PA-02 partial;0/17/E2/E3/final RETEX open.
