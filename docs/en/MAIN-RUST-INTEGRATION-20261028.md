@@ -27,3 +27,7 @@ The historical Go acceptance-runner unit test now injects fixture dependencies j
 CI now retains cockpit recipe step channels and targeted browser errors. Work Roots, databases, token-bearing configuration, private transcripts and screenshots are excluded from that artifact. The initial opaque recipe failure is retained; a FAIL summary alone does not establish its cause.
 
 The cockpit recipe expects the19scripts explicitly published by the Rust producer, including the native instruction client. It rejects missing/duplicate/inline/foreign-origin scripts, then compares protected HTTP bytes to versioned inputs (native quotas route maps to native-quotas.js). The permanent recipe and driver inventory include that client. The original inventory refusal is retained; no product action or script is added.
+
+The Version recipe compares the local-change disclosure to the binary’s actual published modified flag instead of assuming a dirty build. After that real witness, explicitly marked client responses check clean/dirty rendering in FR/EN and each theme. Those fixtures never become binary metadata or an observed source comparison. The original clean-build CI failure is retained.
+
+The check targets the Version component’s exact disclosure paragraph, not all historical release-note text, which can legitimately mention uncommitted changes. Clean/dirty variants also cover that vocabulary collision.
