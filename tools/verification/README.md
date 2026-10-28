@@ -1629,3 +1629,60 @@ CLI. Erreur après publication ne signifie pas absence de rapport : UNKNOWN,
 empreinte attendue et vérification du dossier conservé. Garde24requalifiée sur
 l'enregistreur modifié. Aucune authenticité, installation serveur ou acceptation
 protégée déduite ; documents et preuves historiques conservés.
+
+Private Git repository binding: `recipes/paea-private-git-repository.json` requires
+`SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE` pointing at a genuine retained inert
+cumulative project. It is read-only input; disposable service Roots/bare repos
+exercise explicit journal provisioning, immutable declaration/reopen, exact
+resource/candidate/pin/Root rejection, descriptor-preserving rebinding/symlink
+refusal and canonical declaration corruption/recovery, plus strict Rustdoc.
+Six named Rust tests must run (one normal, five explicitly ignored SDK cases).
+No protected effect service, grant, object transfer or ref commitment is proved.
+
+Actual Git writer and format: `recipes/paea-git-writer-format.json` runs three
+selected lib-unit tests (including two explicit ignored SDK cases with newly
+owned SWARM_PAEA_WRITER_FIXTURE from rust_native_first_publication.py). They
+check actual SQLite Write state, independent writer BUSY/recovery, native reads
+in one transaction and storage/OID compatibility. Unit cfg(test) evidence is
+separate from the delivered library. The private-repository integration recipe
+now additionally tests the public format method with normal-library cfg(test)
+false, keeping real SHA1/SHA256 setup and no-intent assertion. No object transfer
+or protected effect authority is proved by these readers.
+
+
+Disk pack protocol: `recipes/paea-git-pack-protocol.json` requires explicit
+`SWARM_PAEA_PACK_CLI` (qualified normal executable), `SWARM_PAEA_PACK_PROFILE`
+(its profile result), `SWARM_PAEA_PACK_FIXTURE` (retained genuine cumulative
+native fixture), and `SWARM_PAEA_PACK_EVIDENCE` (fresh output directory).
+Six named real-Git assertions check disk-streamed export/import, exact commit,
+unchanged references/repeated import, incompatible object format, truncated and
+corrupt packs with valid recovery, and missing-object export refusal. The source
+Work is read again and compared. Actual Git identity, command channels, failed
+file inventories and original packs remain evidence. No watchdog or provider is
+added. This verifies an experimental protocol, not native service transfer,
+current authority, process custody or independent acceptance.
+
+
+Native pack stream: `recipes/paea-native-git-pack.json` runs seven named integration
+cases against the normal engine library: real commit pack export/import/repeat
+without refs, corrupted checksum refusal/recovery, alias rejection before spawn,
+nonempty output preservation/recovery, and missing OID with retained disk errors, and real read-only output IO failure with typed runner/recovery.
+Strict Rustdoc follows. These are synthetic owned Git fixtures, without project
+admission or protected effect. File-stream errors do not imply rollback; outputs
+remain caller-owned, input uses standard File/Stdio drop. Production profile,
+Root capability custody and service acceptance remain separate evidence.
+
+
+Pack sync attribution: `paea-native-git-pack.json` additionally runs one pure
+lib-unit composition case (healthy control, stdout/stderr/both sync errors after
+successful status) and seven normal-library integration cases. The new real
+kernel case uses separate read-only proc sinks, retaining primary process failure
+plus both actual EINVAL sync causes/channel labels through boxed IO traversal,
+then a valid pack recovery. No proc contents are read. Unit cfg(test) evidence
+stays separate from normal integration and production; no successful-run fsync
+syscall injection or complete protected-service transfer is claimed.
+
+The pack recipe also reuses two existing common diagnostic regressions: the
+direct/launch/custom-IO/Root-cleanup wrapper matrix and transparent typed IO source
+with redaction. This extension is justified by the new shared native_error_links
+handler, beyond the pack-specific primary/secondary channel witness.

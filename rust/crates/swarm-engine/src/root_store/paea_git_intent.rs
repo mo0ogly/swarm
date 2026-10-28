@@ -101,7 +101,7 @@ fn schema(db: &Connection) -> Result<bool> {
     }
 }
 /// Read independently provisioned project pin. A first request cannot adopt it.
-fn meta(db: &Connection) -> Result<(String, String)> {
+pub(super) fn meta(db: &Connection) -> Result<(String, String)> {
     if !schema(db)? {
         return Err(PaeaGitIntentError::refused("paea-git-intent-uninitialized"));
     }

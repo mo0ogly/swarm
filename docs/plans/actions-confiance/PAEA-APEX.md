@@ -576,3 +576,323 @@ et usage ordonnés, UNKNOWN après effet, double cause et reprise exacte observ�
 [Revue/RETEX26](paea/INCREMENT-26.md). Aucun consommateur dans la CLI normale,
 donc aucun service installé par ce noyau ; transport/bootstrap/authentification
 locale personnelle restent à raccorder. PA-02 partiel,0/17/E2/E3/RETEX global ouverts.
+
+
+### Incrément27 — bootstrap épinglé et précontrôle natif
+
+Commit26 `cbd6fecd7`,15fichiers,108chemins préparés étrangers préservés.
+[Tranche27](paea/INCREMENT-27.md) : v2 fermé, checkpoint indépendant et vérification
+du vrai enrôlement courant par CLI normale, sans démarrage de service. 42 tests nommés et Rustdoc vérifiés ; installation dev.123 puis observation dev.124,
+profils normaux liés aux SHA servis, deux rejeux CLI et 56 contrôles navigateur ; authentification/transport protégés,
+PA-03, E2/E3 et0/17invariants globaux restent ouverts.
+
+
+### Incrément28 — connaissance du secret personnel
+
+[Tranche28](paea/INCREMENT-28.md) : contrat Argon2id v19 lié au record/contexte
+exact, paramètres explicites, allocation de travail gardée et preuve typée opaque.
+Vérification et intégration en cours ; aucun compte/session/transport créé. Suite
+technique : stockage à bootstrap unique puis service/authentification et UX réelles,
+PA-03/04… ; ne pas transformer le secret connu en consentement ou droit implicite.
+Boucle autonome autorisée ; enrôlement humain réel et rôles E3 restent indépendants.
+
+
+### Incrément29 — consommation unique et compte courant
+
+[Tranche29](paea/INCREMENT-29.md) : lot signé atomique dans le journal retenu,
+révocation bootstrap/création du compte indivisibles, proposition exacte rejouable,
+authentification courante gardée pendant l'usage et résultat conservé après erreur.
+Recette/revue/livraison en cours. Les fixtures ne sont pas un enrôlement réel ;
+le service/transport, réglages Admin et UX, compte séparé et confinement suivent.
+
+
+### Incrément30 — codec exact de reprise personnelle
+
+[Tranche30](paea/INCREMENT-30.md) : export/restore canonique d'un proposal privé,
+vérification par racine indépendante/forme exacte, prévisualisation signée sans
+état courant ni IO, erreurs base64 avec cause conservée.3tests initiaux puis
+3tests renforcés passent ; recette39, revue et livraison à vérifier.29dispose de
+35tests vérifiés, mais livraison28/29 reste ouverte après refus des entrées
+étrangères changeantes. Le prochain coordinateur doit protéger intent/checkpoint
+et fsync/reprise avant d'exposer le service. Humain/confinement/E2/E3 restent ouverts.
+
+
+Qualification30 :39tests nommés/7étapes,6tests du harnais CLI figé,56assertions UI
+en lecture seule et refus du script absent PASS ; profil normal495sources dev128
+installé, dialogue Version FR/EN vérifié. [Détails](paea/INCREMENT-30.md). Limites
+historiques28/29conservées.31fichiers privés suit, puis coordinateur intent/checkpoint.
+PA-02partiel ;0/17invariants globaux ; humain/confinement/E2/E3/PA13restent ouverts.
+
+
+31documents privés : IO commun par descripteurs, phase de publication, erreurs
+de release conservées, CAS exact ; liaison du verrou de l’ancien Store aussi
+examinée. [État31](paea/INCREMENT-31.md).43tests à qualifier ; aucun service activé.
+
+
+31qualifié/installé dev129 :43tests nommés/5étapes,6tests du harnais CLI,56assertions
+UI+refus du script, Rustdoc et profil normal497sources vérifiés. Régression de
+substitution du verrou corrigée localement ; [détails](paea/INCREMENT-31.md).
+Poursuivre [32](paea/INCREMENT-32.md), encore planifié ; humain/service/confinement/E2/E3ouverts.
+
+
+[32](paea/INCREMENT-32.md) implémenté : intent exact protégé avant consommation,
+checkpoint après acquittement, annulation des deux contextes, authentification
+courante tenue après release FS.5premiers tests PASS ; recette31élargie, revue et
+livraison à établir. Aucun endpoint/enrôlement humain ; PA-02partiel et0/17inchangés.
+
+
+32bibliothèque qualifiée :32tests, Rustdoc, diagrammes FR/EN, profil normal499sources.
+Installation OUVERTE après refus d’inventaire candidat concurrent ; dernière version
+vérifiée dev129. [Détails32](paea/INCREMENT-32.md). Poursuivre [33](paea/INCREMENT-33.md)
+indépendamment, livraison/PA-02/E2/E3 et0/17gardés ouverts.
+
+
+[33](paea/INCREMENT-33.md) raccord typé implémenté : compte personnel et mandat
+tenus, principal/installation exacts, résultats après effet conservés. Contre-exemple
+Debug privé corrigé ;14tests+1ciblé double autorité PASS. Recette38tests et livraison
+courante à établir. Aucun service/humain/confinement OS déduit.
+
+
+[34](paea/INCREMENT-34.md) déclaration composite épinglée/chargeur physique partagé
+et ouverture réelle des deux sources implémentés, sans init de compte/listener.
+16bootstrap+4startup vérifiés ; recette59tests/revue/livraison à établir. Cleanup
+partiel conservé ; routage réel/compte OS/confinement/E2/E3encore ouverts.
+
+
+34APIs internes vérifiées/incluses dans dev136 installé :59tests nommés/10étapes,
+Rustdoc courant, profil515sources sans fixture,6tests du harnais CLI,56contrôles
+UI réels+garde. [Détails](paea/INCREMENT-34.md). Livraison32/33complétée par preuve
+additive ; poursuivre35signer protégé/lifecycle, sans listener/humain/confinement
+OS. PA-02partiel,0/17globaux,E2/E3/PA13restentouverts.
+
+
+35ouvert : chargement privé de clé avant lifecycle, sans changement des critères globaux. [Plan35](paea/INCREMENT-35.md).
+
+
+35chargeur privé vérifié/installé dev137 :12 tests nommés, Rustdoc, profil normal
+516 sources, dalek zeroize,6 tests CLI,56 assertions UI+garde. [Preuves35](paea/INCREMENT-35.md). Poursuivre36lifecycle détenu ; aucune acceptation globale/humain/service.
+
+
+36lifecycle personnel détenu ouvert ; [plan36](paea/INCREMENT-36.md), critères globaux inchangés.
+
+
+36lifecycle détenu vérifié/installé v0.1.1-dev.142 :43 tests nommés,
+profil normal519entrées,6 CLI,56 UI+garde et notes FR/EN consolidées.
+[Preuves36](paea/INCREMENT-36.md). Poursuivre37parcours natif personnel ; transport/UX,
+OS/rotation, E2/E3, PA-13 et0/17 invariants globaux restent ouverts.
+
+
+37parcours natif personnel ouvert ; [plan37](paea/INCREMENT-37.md), critères globaux inchangés.
+
+
+37agarde d’options livrée/vérifiée en comportement147,7figés145+garde147+56UI,
+Rustdoc privé. Qualification globale13sources encore ouverte ; [détails37](paea/INCREMENT-37.md). Poursuivre37bCLI personnel ;0/17,E2/E3,PA-13ouverts.
+
+
+37b CLI personnelle livrée/vérifiée154 :32 tests/7 étapes stables,7 parcours natifs du binaire normal et56 UI ; [preuves/limites37](paea/INCREMENT-37.md). Suite38 : provisionnement initial protégé puis transport/UX. PA-02partiel,0/17/E2/E3/PA-13ouverts.
+
+
+38 commencé : matière initiale de provisionnement, séparée de publication/reprise ; [plan38](paea/INCREMENT-38.md). Aucun grant implicite/service/humain.
+
+
+38matière initiale vérifiée/livrée156 :27 tests/4 étapes,1 parcours natif de matière générée et56 UI ; [preuves/limites38](paea/INCREMENT-38.md). Suite39lecture privée effaçable puis publication/reprise. Aucun installateur/service/humain/confinement ;0/17/E2/E3/PA-13ouverts.
+
+
+39lecture privée effaçable commencée, prérequis à la publication des seeds ; [plan39](paea/INCREMENT-39.md). Contrat distinct du read non secret.
+
+
+39lecture privée/précontrôle écritures livrés157 :51cas composés (21réutilisés+30frais),7CLI normaux,56UI ; [preuves/limites39](paea/INCREMENT-39.md). Ancien manifesteFAIL conservé. Suite40publication/reprise ;0/17/E2/E3/PA-13ouverts.
+
+
+40paquet opérateur protégé commencé avant publication de service41 ; [plan40](paea/INCREMENT-40.md). Pin indépendant, aucun head adopté.
+
+
+41durabilité explicite du paquet commencé ; livraison40 ouverte après refus normaux,157 dernier qualifié. [Plan41](paea/INCREMENT-41.md). Publication service42 ensuite,0/17 inchangés.
+
+
+42artefact destiné au service commencé : clé personnelle/événements signés, secrets opérateur exclus ; [plan42](paea/INCREMENT-42.md). Publication43 et livraison actuelle40/41 ouvertes.
+
+
+42 : remise limitée au service et livraison locale **v0.1.1-dev.165** vérifiées (18 bibliothèque,7 CLI,56 navigateur + refus script). Publication43 suivante, 0/17 inchangé. [Plan42](paea/INCREMENT-42.md).
+
+
+43 publication privée des fichiers de service commencée. [Plan43](paea/INCREMENT-43.md).
+
+
+44 raccord CLI public du publieur43 commencé, livraison commune à qualifier. [Plan44](paea/INCREMENT-44.md).
+
+
+43/44livrés localement **dev168** :50tests bibliothèque (supplément6),8parcours CLI/59commandes,7anciens parcours personnels,56contrôles UI + refus script, profil/ELF/assets/Version vérifiés. Aucun compte humain/UID séparé/listener/E2/E3 ni invariant global acquis. [Plan44](paea/INCREMENT-44.md).
+
+
+45 diagnostic Linux effectif commencé ;44livraison168 historique, requalification du lock/catalogue courant après dérive concurrente. [Plan45](paea/INCREMENT-45.md).
+
+Requalification43/44 sur dev174 terminée :50bibliothèque fraîches,8CLI/59commandes,7régressions,56UI+garde, profil561entrées/sans fixture et ELF réel commun vérifiés. Preuves antérieures et refus concurrents conservés. [Détails44](paea/INCREMENT-44.md).45lecture Linux vérifiée ; installation de uidmap attend une authentification administrateur locale. Aucun invariant global ni séparation OS acquis.
+
+46 messages privés et noyau de service personnel commencés, indépendamment des helpers Linux absents ; [plan46](paea/INCREMENT-46.md). Aucun endpoint/UID séparé/humain/global acquis.
+
+46bibliothèque19cas qualifiée ;47liaison publique sans secrets, réponses/causes après effet24cas Rust et Rustdoc PASS, livraison publique encore à raccorder. [Plan47](paea/INCREMENT-47.md).
+
+48 consommateur lié vérifié :29Rust+3schéma/5étapes, canonique/demande/pins/histoire/Change, contre-exemple AfterUse corrigé. [Plan48](paea/INCREMENT-48.md). Suite49 raccord opérateur natif/livraison groupée ; service UID/transport/humain/global toujours ouverts.
+
+46…49 livrés et vérifiés localement **dev175** :39Rust+3schéma,5nouveaux parcours natifs/56commandes,8installation,7personnels,56UI+garde, profil571entrées/sans fixture et même ELF réel. [Preuves49](paea/INCREMENT-49.md). Suite50 canal attribué/client ; helpers UID/admin/humain/E2/E3/PA13 et0sur17 restent ouverts.
+
+50 replan : risque de représentation PID0 dans getter Rustix,4consommateurs identifiés ; contre-exemple3gates175refusées mais errno0, aucun effet. Wrapper brut sûr et diagnostics implémentés, qualification/livraison en cours. [Plan50](paea/INCREMENT-50.md). Retour au canal après cette précondition commune ; globals inchangés.
+
+Incrément 50 livré et vérifié dans **dev180** : 4 tests moteur + 6 CLI, Rustdoc strict, 5 parcours personnels / 56 commandes, 3 témoins + 3 refus PID invisible, 56 contrôles UI et garde de script ; profil normal de 581 entrées et même ELF effectif. [Preuves et limites](paea/INCREMENT-50.md). Retour au canal attribué ; UID, humain, E2/E3, PA-13 et 0/17 globaux restent ouverts.
+
+51 : frontière Linux isolée vérifiée en bibliothèque, neuf cas Rust + deux parcours de fixture, Rustdoc strict et revue ABI/propriété ; aucun consommateur public encore. [Preuves51](paea/INCREMENT-51.md). Reprise 52 : admission/raccordement et livraison groupée ; dev180 demeure la dernière livraison qualifiée par cette tâche, UID/humain/globaux ouverts.
+
+Fondations51–52 livrées/vérifiées dans **dev185** :41Rust +3schéma,2parcours fixture,5opérateur/56commandes,3gates,56UI+garde ; profil587entrées/57propres, nouvelle bibliothèque sans fixture et même ELF effectif. [Preuves52](paea/INCREMENT-52.md). Rôle protégé/paquet exact/précondition UID sont raccordés en bibliothèque ; admission complète/daemon/UID réel/humain/E2/E3/PA13/0sur17 restent ouverts. Suite53 : hypothèse UIDréservée puis retour au raccordement.
+
+Reprise 53 en cours : [UID valides à la définition](paea/INCREMENT-53.md). Tests de contrat qualifiés ; driver, parcours natif et livraison restent à vérifier. Admission du canal et acceptation globale demeurent ouvertes.
+
+Incrément53 vérifié localement dev189 :101Rust ciblés/8Go parents/3schéma,9installation/5opérateur/7personnel+3gardes,3gates,56UI+garde ; [preuves et limites](paea/INCREMENT-53.md). PA-02/0sur17 globaux restent ouverts ; préparation publique protégée puis canal à poursuivre.
+
+[Incrément54](paea/INCREMENT-54.md) installé/vérifié dev192 : précontrôle privé canonique sans génération de matière ;8Rust+3schéma,5nouveaux parcours/84commandes,non-régressions9installation/5opérateur/7personnel+3gardes,2gardes de rôle fixture,56UI+garde et3gates. PA-02/0sur17 restent ouverts ; paquet opérateur public et export de service à poursuivre.
+
+[Incrément55](paea/INCREMENT-55.md) installé/vérifié dev200 : lecture du paquet opérateur, export privé déterministe et reprise épinglée ;6 parcours/154commandes200,56UI+garde,3gates. Non-régressions199 réutilisées sur leurs octets PAEA/CLI inchangés, sans agrégat ELF200. PA-02/0sur17 ouverts ; création initiale protégée puis canal à poursuivre.
+
+[Incrément56](paea/INCREMENT-56.md) commencé : ancrage privé immuable avant génération/publication publiques ; distinguer localisateur déjà protégé et pin indépendant, sans preuve circulaire. Aucun critère global ajouté comme vérifié.
+
+[Incrément56](paea/INCREMENT-56.md) installé/vérifié dev201 : ancre privée immuable et contrôle CLI,5parcours/67commandes,non-régressions6export/5précontrôle/9installation/5appel/7personnel+3gardes,56UI+garde et3gates.37Rust ciblés/16méthodes Python de schéma, jamais pourcentage global. Suite57 : intention durable avant génération puis paquet épinglé/reprise. PA-02 et0sur17 globaux ouverts.
+
+[Incrément57](paea/INCREMENT-57.md) commencé : intention durable avant toute génération, ancre avant paquet, réservations privées existantes et réconciliation sans régénération. Le pin de demande lie ses octets exacts ; aucun service/humain/mandat courant créé.
+
+
+[Incrément57](paea/INCREMENT-57.md) installé/vérifié dev205 : intention durable avant génération, ancre avant paquet et reprise sans régénération ;46Rust ciblés/6méthodes schéma/12permutations,6nouveaux parcours/113commandes,non-régressions et56UI+garde sur le même ELF normal631/64. Remédiation orpheline et remise au domaine service ensuite ; PA-02/0sur17/E2/E3/PA13/RETEX ouverts.
+
+
+[Incrément58](paea/INCREMENT-58.md) en cours : paquet noyau lié à UID retenue et objets namespace attendus avant décodage/dispatch, Reply et cleanup préservés ;49Rust ciblés/3schéma, livraison locale à qualifier. Approbation indépendante du domaine, daemon et deux UID réels ouverts.
+
+
+[Incrément58](paea/INCREMENT-58.md) vérifié localement dev206 puis instance courante207 liée aux mêmes65sources PAEA :51Rust distincts/3schéma ; appel/personnel natifs206 conservés séparément, interface56+garde et peer207 frais ; profil normal636/65. Seul asset runtime-health étranger diffère. Pas de nouveau daemon ni succès métier deux UID ; lancement à moindre privilège et permission ptrace à qualifier ensuite. PA-02/0sur17/E2/E3/PA13/RETEX ouverts.
+
+
+[Incrément59](paea/INCREMENT-59.md) commencé : lier le sujet du paquet à un Child créé indépendamment, sans PID fourni par requête ni adoption du créateur de connexion ; TOUS les contrôles58 restent requis. Pas de daemon/droits ptrace/UID réels acquis.
+
+
+[Incrément59](paea/INCREMENT-59.md) vérifié localement dev208 : ancre Child conditionnelle, TOUS contrôles58 conservés ;27Rust, profil normal637/65,5call/7personal/3paires/56UI+gardes sur le même ELF. Création atomique native suivante ; garde du lanceur/daemon/UID réels/E2/E3/PA13/RETEX/0sur17 ouverts.
+
+
+[Incrément60](paea/INCREMENT-60.md) bibliothèque atomique vérifiée :35Rust distincts,6sources/3pages Rustdoc, CLONE_PIDFD tracé. Livraison en attente : trois profils refusés pour modifications concurrentes de sources partagées ;208 conservée. Reprise après stabilisation du producteur, sans boucle de reconstruction. Consommateur/daemon/UID/humain/E2/E3/RETEX/0sur17 ouverts.
+
+
+[Incrément60](paea/INCREMENT-60.md) bibliothèque atomique livrée/vérifiée v0.1.1-dev.209 :35Rust distincts,6sources/3pages Rustdoc, CLONE_PIDFD tracé, profil normal645/67 et parcours existants sur même ELF. Consommateur/daemon/UID réels/humain/E2/E3/PA13/RETEX/0sur17 ouverts.
+
+
+[Incrément61](paea/INCREMENT-61.md) bibliothèque de réponse en un paquet vérifiée :27Rust distincts (9nouveaux),4sources/4pages Rustdoc ; vrais EPIPE/EMSGSIZE/EAGAIN et reprise. Livraison en attente après refus du profil pour25sources Web concurrentes ;209 conservée. Reprendre avec candidat commun qualifié/68entrées PAEA, sans rebuild en boucle. Daemon/UID/humain/E2/E3/PA13/RETEX/0sur17 ouverts.
+
+
+[Incrément62](paea/INCREMENT-62.md) qualifie localement la permission du parent propriétaire : deux tests Rust, six phases, refus hors userns puis accès dans le userns enfant avec CapEff parent nul. Même UID externe : pas de séparation réelle acquise. Erreur native de fixture conservée, preuve figée et refus de copie altérée. Tests seulement, aucune version62 ;61 attend un candidat stable. PA02/0sur17/E2/E3/PA13/RETEX ouverts.
+
+
+[Incrément61](paea/INCREMENT-61.md) réponse en un paquet livrée/vérifiée v0.1.1-dev.211 :27Rust distincts (9nouveaux),4sources/4pages Rustdoc, EPIPE et SIGPIPE isolé, profil normal650/68, parcours natifs existants et56UI+garde sur même ELF. Composition/daemon/UID réels/humain/E2/E3/PA13/RETEX/0sur17 ouverts.
+
+[Incrément63](paea/INCREMENT-63.md) échange contrôlé unique livré/vérifié **v0.1.1-dev.215** :45Rust distincts/7nouveaux,3sources/4pages Rustdoc, profil normal653/69, parcours CLI existants et56UI+garde sur même ELF. Bibliothèque qualifiée ; daemon/UID réels/humain/confinement/E2/E3/PA13/RETEX/0sur17 ouverts.
+
+[Incrément64](paea/INCREMENT-64.md) diagnosticLinux natif/CLI/API/page livré/vérifié **v0.1.1-dev.216** :10Rust,111composant/60pageinstallée/56Version+gardes,37natifs/52CLI/16HTTP, profilnormal665/81 et mêmeELF. Métadonnées observées seulement, UID/humain/confinement/daemon/E2/E3/PA13/RETEX/0sur17ouverts.
+
+Reprise PA-03 : [décision de raccord des services](paea/PA03-SERVICE-INTEGRATION.md), sources observées et séquence conditionnelle. Analyse seulement ; aucun effet protégé ni livraison supplémentaire établi.
+
+[Incrément65](paea/INCREMENT-65.md) : permission exacte PAEA distincte de Trust, bibliothèque vérifiée et compilée dans **v0.1.1-dev.218**, 8tests PAEA+3Trust+3refus de compilation, Rustdoc strict et56contrôles Version/UX+garde. Profil normal671entrées, même ELF effectif. Aucun service d’effet protégé activé ; PA02/03, 0sur17, E2/E3/PA13/RETEX ouverts.
+
+[Incrément66](paea/INCREMENT-66.md) : noyau de règlement fictif séparé installé/vérifié **v0.1.1-dev.220**,12tests Rust et Rustdoc strict,56contrôles Version/UX+garde ; profil normal677entrées, même ELF effectif. Admission attribuée manquante : séparation activée refusée ; aucune activation de service protégé. PA02/03 partiels,0sur17/E2/E3/PA13/RETEX ouverts.
+
+[Incrément67](paea/INCREMENT-67.md) vérifié/installé **v0.1.1-dev.221** : quatre incohérences de reçu reproduites puis refusées,13Rust+Rustdoc strict,56Version/UX+garde, profil normal677 et mêmeELF. Aucune signature/protection globale déduite ; PA02/03/0sur17/E2/E3/PA13/RETEX ouverts.
+
+[Incrément68](paea/INCREMENT-68.md) : six essais Git réels qualifient prepare/type direct/commit-abort sous verrou, après contre-exemple no-deref. Tests/protocole seulement, pas de nouveau service ni version ;221 conservée. Intention durable, runner natif et réconciliation à intégrer ; PA03/global ouverts.
+
+[Incrément69](paea/INCREMENT-69.md) : primitive Git native en bibliothèque livrée/vérifiée **v0.1.1-dev.222**,8cas natifs/Rustdoc strict,56Version/UX+garde, profil normal678entrées et ELF effectif. Boucle Interrupted après annulation reproduite puis corrigée ; publication réelle sans ACK conservée incertaine. Aucun service Git/admission activé ; PA02/03/0sur17/E2/E3/PA13/RETEX ouverts.
+
+### Incrément70 — intentions Git persistantes
+
+Six tests natifs du journal et neuf cas du protocole Git réel PASS, Rustdoc strict
+inclus ; preuves core04/protocol05 dans `paea/evidence/20261028-git-intent70-tjriu_vr`.
+Provisioning explicite, unicité métier malgré aliases transport/contenu, reprise,
+COMMIT incertain réel, course entre deux connexions et corruption/refus vérifiés.
+Une fixture composée lit le SQL commité avant COMMIT Git, puis conserve l'intention
+originale après ACK perdu et réouverture. Ce n'est ni admission protégée, ni service
+activé, ni réconciliation terminale d'effet. Version223 source-managed installée par candidat préparé exact ; ELF
+7143f8c23550d1e00d4ec89f7fb7bec40ed7a38ca3af209ad2dee704d388592f, PID3128318
+vérifiés. Profil normal679entrées,479communes aux tests04 (notes seules différentes),
+sansfixtures. Version08 :56assertions et garde de script PASS/VERIFIED,25assets
+protégés/notes compilées, FRclair/ENsombre/commit/noncommité/focus vérifiés. Aucun
+consommateur public installé n’appelle encore le journal ou ce parcours Git générique. PA02/03partiels,0/17,
+E2/E3 et RETEX final restent ouverts.
+
+### Incrément71 — candidat natif courant et originaux historiques
+
+Le lecteur commun vérifie désormais chaque original antérieur même lors du rejeu
+de la dernière publication. Contre-exemple public223 conservé : replay acceptait
+un ancien certificat altéré alors que Work show refusait. Tests natifs05 PASS
+(trois tests nommés, six assertions cumulatives et Rustdoc strict ; VERIFIED) sur
+vraie fixture inerte à deux publications. CLI normale08 PASS/VERIFIED : ancien/dernier certificats refusent le rejeu latest,
+restauration/reprise et Work/événements/workers/provider inchangés. Version225
+installée via ELF préparé exact bba13470359ddfb0fecc17b958935ccab77dbc74ec40253c853288acab1aa8f5;
+680entrées normales/480communes aux tests05, notes seules différentes, sansfixtures.
+Version10 :56assertions/25assets protégés/notes compilées, FR/EN et garde de script
+PASS/VERIFIED. [Incrément71](paea/INCREMENT-71.md) · [Continuité71](paea/CONTINUITE-71.md). Aucune autorité PAEA, association
+repository_id, séparation UID ou clôture déduite ; PA02/03partiels,0/17,PA13/RETEX ouverts.
+
+### Incrément72 — association privée du dépôt Git
+
+Une déclaration explicite immuable lie les identités détenues service/projet/
+dépôt bare privé, le pin opérateur du journal et l'empreinte réelle du cadrage
+dépôt. L'id est attribué par le service, jamais un chemin de proposition.
+Cinq tests natifs03 et Rustdoc strict PASS/VERIFIED : NOREPLACE/reprise, candidat
+courant, mauvais contexte, substitution, symlink et corruption canonique/refus/
+restauration. Version229 installée via ELF préparé exact 1e2384be40e0383520204fa86bad0cb56f578316330b44626e4ca2ae4a93285e;681entrées normales/481communes aux tests03, notes seules différentes, sansfixtures. Version06 :56assertions et garde de script PASS/VERIFIED,25assets protégés/notes compilées FR/EN. [Incrément72](paea/INCREMENT-72.md) · [Continuité72](paea/CONTINUITE-72.md). Aucun transfert,
+mandat courant, OLD/type direct, COMMIT Git, daemon protégé ou réconciliation
+finale déduit. PA02/03partiels,0/17 et PA13/RETEX final restent ouverts.
+
+### Incrément73 — writer SQLite réel et format Git
+
+Trois tests unitaires02 et six tests d'intégration03 bibliothèque normale PASS/
+VERIFIED, Rustdoc strict inclus. Le lecteur interne exige main Write réel, refuse
+deferred/read/absence de writer et conserve la transaction de l'appelant, sans
+BEGIN imbriqué, pour le même candidat natif/dépôt. Le format bare privé SHA1/
+SHA256 est contrôlé avant transfert ou intention ; incompatible refuse.
+Version230 installée, ELF préparé exact 0b8cf6947596da380ed2f9ee862ed80597f949b2d3607d2147a787fd0d051287;681entrées normales/481communes avec intégration03, notes seules différentes, sansfixtures. Version06 :56assertions/garde de script PASS/VERIFIED,25assets/notes compilées FR/EN. Helpers de writer toujours sans consommateur normal public d’effet. [Incrément73](paea/INCREMENT-73.md) · [Continuité73](paea/CONTINUITE-73.md). Aucun transfert,
+autorité courante, COMMIT de ref ou réconciliation terminale déduit ; PA02/03
+partiels,0/17,PA13/RETEX final ouverts.
+
+
+### Incrément74 — protocole réel de pack sans changement de ref
+
+Six assertions Git réelles PASS/VERIFIED : export disque du candidat natif71
+relu par CLI230 normale, import et connectivité, répétition sans mouvement de ref,
+format incompatible, packs tronqué/corrompu et reprise valide, OID absent refusé.
+Les écritures partielles après refus restent inventoriées. Expérience de protocole
+uniquement ; transfert natif/service, autorité courante et engagement restent à
+implémenter. Aucun octet produit modifié : pas de reconstruction ou installation
+nouvelle ; preuves230 conservées séparément. [Incrément74](paea/INCREMENT-74.md) ·
+[Continuité74](paea/CONTINUITE-74.md). PA02/03 partiels,0/17,PA13/RETEX ouverts.
+
+
+### Incrément75 — primitive native pack sur disque livrée
+
+Six tests d'intégration Git réels et six régressions association/format natifs
+PASS/VERIFIED, Rustdoc strict inclus. Export/import fixes vers fichiers, aliasage
+et écrasement refusés, effets partiels/erreurs et récupération de processus typés.
+Construction/délai Git partagé identique octet pour octet. Version231 installée,
+ELF préparé exact `ce4750b00da3e8ff7723b51f64b944bf3def76d0f8961eef5415c2e9bee7c387`;682entrées normales/482communes core02,
+aucune différence, profil sansfixtures. Version06 :56assertions/garde de script
+PASS/VERIFIED, assets/notes compilés FR/EN et captures inspectées.
+[Incrément75](paea/INCREMENT-75.md) · [Continuité75](paea/CONTINUITE-75.md).
+Transfert du service protégé/autorité courante/engagement de ref restent ouverts ;
+PA02/03partiels,0/17,PA13/RETEX final ouverts.
+
+
+### Incrément76 — canaux d'erreurs sync pack et primaire conservés
+
+Contre-exemple normal réel FAIL/VERIFIED avant correction ;1test unitaire de
+composition,2régressions de wrappers et7tests d'intégration natifs + Rustdoc strict
+PASS/VERIFIED. Deux
+erreurs sync noyau conservent stdout/stderr sous Box/IO, primaire/processus et
+reprise préservés. Version232 installée, ELF exact `7cb94d74a30343d472f20e94f5786f9cfefff4b02415fb2afaf3f8733a0f52d7`;
+682entrées normales/482communes tests, aucune différence, sansfixtures.
+Version06 :56assertions/garde de script PASS/VERIFIED, assets/notes FR/EN compilés
+et captures inspectées. [Incrément76](paea/INCREMENT-76.md) · [Continuité76](paea/CONTINUITE-76.md).
+Transfert du service protégé/autorité courante/COMMIT de ref restent ouverts ;
+PA02/03partiels,0/17,PA13/RETEX final ouverts.

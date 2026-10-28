@@ -28,7 +28,39 @@ use std::{
 /// Own and reap a fixed internal Git command under the saved per-command policy.
 /// No shell, hooks, fsmonitor, environment Git overrides or optional index writes.
 /// Private raw output stays in typed GitReportError, never public formatting.
-fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<Vec<u8>, E> {
+/// Crate callers owe fixed validated arguments and any descriptor-backed cwd
+/// lifetime; this runner does not grant authority or validate arbitrary Git args.
+pub(crate) fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<Vec<u8>, E> {
+    let (command, deadline) = git_command(root, args, settings)?;
+    let (mut stdout, mut stderr) = (Vec::new(), Vec::new());
+    let run =
+        crate::validation_run::run_owned_command(command, deadline, &mut stdout, Some(&mut stderr));
+    match run {
+        Err(cause) => Err(E::caused(
+            "managed-git-process",
+            crate::GitReportError::Process {
+                cause: Box::new(cause),
+                output: Box::new(crate::GitCommandOutput::from_parts(stdout, stderr)),
+            },
+        )),
+        Ok(run) if run.timed_out || !run.usage.status.success() => Err(E::caused(
+            "managed-git-command",
+            crate::GitReportError::Command {
+                exit_code: run.usage.status.code(),
+                timed_out: run.timed_out,
+                stdout_sha256: hash(&stdout),
+                stderr_sha256: hash(&stderr),
+                output: Box::new(crate::GitCommandOutput::from_parts(stdout, stderr)),
+            },
+        )),
+        Ok(_) => Ok(stdout),
+    }
+}
+/// Build a fixed internal Git command with the saved per-command deadline.
+/// Callers owe validated arguments and retained directory capabilities. This
+/// strips Git overrides/hooks and owns no process, output or business authority.
+/// Invalid settings or unrepresentable deadlines refuse before launch.
+pub(crate) fn git_command(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<(Command, Option<Instant>), E> {
     let timeout = settings
         .values
         .git_command_timeout()
@@ -74,29 +106,7 @@ fn git(root: &Path, args: &[&str], settings: &EngineSettingsDocument) -> Result<
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
         .env("GIT_TERMINAL_PROMPT", "0")
         .env("GIT_OPTIONAL_LOCKS", "0");
-    let (mut stdout, mut stderr) = (Vec::new(), Vec::new());
-    let run =
-        crate::validation_run::run_owned_command(command, deadline, &mut stdout, Some(&mut stderr));
-    match run {
-        Err(cause) => Err(E::caused(
-            "managed-git-process",
-            crate::GitReportError::Process {
-                cause: Box::new(cause),
-                output: Box::new(crate::GitCommandOutput::from_parts(stdout, stderr)),
-            },
-        )),
-        Ok(run) if run.timed_out || !run.usage.status.success() => Err(E::caused(
-            "managed-git-command",
-            crate::GitReportError::Command {
-                exit_code: run.usage.status.code(),
-                timed_out: run.timed_out,
-                stdout_sha256: hash(&stdout),
-                stderr_sha256: hash(&stderr),
-                output: Box::new(crate::GitCommandOutput::from_parts(stdout, stderr)),
-            },
-        )),
-        Ok(_) => Ok(stdout),
-    }
+    Ok((command, deadline))
 }
 /// Exact Go-compatible request/snapshot digest, never an authenticity claim.
 fn hash(bytes: &[u8]) -> String {
