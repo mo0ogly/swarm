@@ -16,8 +16,9 @@ concurrency:
 jobs:
   checks:
     # Namespace-bound identity tests require a runner permitting unprivileged
-    # uid-map fixtures. Keep default security settings; never sudo/sysctl/skip.
-    runs-on: ubuntu-22.04
+    # uid-map fixtures and recent pidfd namespace ioctls. The user authorized
+    # one temporary sysctl on this disposable CI VM only; always restore it.
+    runs-on: ubuntu-24.04
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
     steps:
@@ -26,6 +27,10 @@ jobs:
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.13'
+      - name: Prepare owned namespace test environment
+        run: |
+          sysctl -n kernel.apparmor_restrict_unprivileged_userns > "$RUNNER_TEMP/swarm-userns-before"
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Check owned namespace fixture prerequisite
         run: /usr/bin/unshare --user --map-root-user --mount --pid --fork /bin/true # v4
       - run: rustup toolchain install 1.96.0 --profile minimal && rustup default 1.96.0
@@ -48,6 +53,15 @@ jobs:
       - run: SWARM_STATUS_CONTRACT_BINARY="$PWD/bin/swarm" python3 tools/verification/recipe.py run --recipe tools/verification/recipes/existing-cockpit-rust.json --output .cache/ci-cockpit
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      - name: Restore namespace test environment
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/swarm-userns-before" ]; then
+            saved="$(cat "$RUNNER_TEMP/swarm-userns-before")"
+            case "$saved" in 0|1) ;; *) exit 1 ;; esac
+            sudo sysctl -w "kernel.apparmor_restrict_unprivileged_userns=$saved"
+          fi
+
   install:
     runs-on: ubuntu-latest
     steps:
