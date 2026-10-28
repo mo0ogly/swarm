@@ -1,0 +1,90 @@
+--- README.md before
++++ README.md v4
+@@ -41,8 +41,9 @@
+ 
+ [Lire le MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4) · [Sous-titres SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt) · [Chapitres et sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
+ 
+-[Article Word actualisé](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v3.docx) : mémoire persistante,
+-identité, moteur Rust et contrôle humain, avec cinq vues détaillées et références.
++[Article Word actualisé](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v4.docx) : mémoire persistante,
++identité, moteur Rust et contrôle humain, avec cinq vues détaillées et références
++publiques datées sur la contamination du contexte.
+ Le support vidéo antérieur est plus synthétique ; le contrat de validation humaine
+ est précisé [ci-dessous](#contrôle-humain-et-validation).
+ 
+--- README.en.md before
++++ README.en.md v4
+@@ -41,8 +41,9 @@
+ 
+ [Watch the MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4) · [French SRT captions](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt) · [Chapters and sources, FR](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
+ 
+-[Updated Word article, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v3.docx): persistent memory,
+-identity, the Rust engine and human control, with five detailed views and sources.
++[Updated Word article, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v4.docx): persistent memory,
++identity, the Rust engine and human control, with five detailed views and dated
++public sources on context poisoning.
+ The earlier video is a shorter overview; the human-validation contract is explained
+ [below](#human-control-and-validation).
+ 
+--- docs/communication/linkedin-swarm-identite-memoire-20261023/README.md before
++++ docs/communication/linkedin-swarm-identite-memoire-20261023/README.md v4
+@@ -4,13 +4,14 @@
+ editorial draft, not published. No software behavior or shared contract changed;
+ an English article is not part of this French editorial request.
+ 
+-- **Version Word courante** : [article v3](Swarm_Article2_Identite_Memoire_v3.docx),
+-  révisé depuis la v2 fournie par l’utilisateur dans Downloads. Onze pages : article
+-  A4 et cinq planches complètes en grand format, références cliquables et commentaires
+-  de relecture. [Texte v3](article-v3-fr.md) et [revue liée aux octets](word-v3-review.json).
+-  La v2 utilisateur reste intacte ; les fichiers ci-dessous conservent les étapes
+-  éditoriales précédentes. / **Current Word**: v3, revised from the supplied v2;
+-  eleven visually checked pages, five complete architecture views, original preserved.
++- **Version Word courante** : [article v4](Swarm_Article2_Identite_Memoire_v4.docx),
++  révisé depuis la v3 avec le chapitre demandé sur la mémoire comme composante de
++  l’identité fonctionnelle. Treize pages vérifiées visuellement : texte A4, cinq
++  planches complètes en grand format et 18 références. [Texte v4](article-v4-fr.md),
++  [contrôle des sources](sources-v4-review.json) et [revue liée aux octets](word-v4-review.json).
++  La v2 utilisateur et la [v3 figée](Swarm_Article2_Identite_Memoire_v3.docx) sont
++  conservées. / **Current Word**: French v4, thirteen visually checked pages,
++  five complete views and dated public research, with the original files preserved.
+ - [Article](article-fr.md), avec références publiques.
+ - [Vidéo MP4](Swarm_Supervision_Identite_Memoire.mp4) : présentation animée de
+   deux minutes, 1080p, sous-titres français intégrés, sans voix ni capture du
+@@ -36,6 +37,37 @@
+ seule n’indique jamais une qualification.
+ 
+ Architecture détaillée consolidée après la reprise utilisateur : [FR](../../architecture/OVERVIEW.md), [EN](../../en/ARCHITECTURE.md), [revue de portée](architecture-followup-review.json).
++
++## Introduction et sources de la version 4
++
++La mémoire influence l’identité fonctionnelle et les décisions futures ; elle
++ne crée pas l’identité authentifiée ni les droits de l’agent. Le chapitre relie
++injection indirecte, mauvaise commande conservée, résumé transmis et reprise par
++une autre instance. Les cinq planches actuelles conservent les branches de
++validation humaine. Aucun nouveau contrôle du moteur n’est ajouté par ce Word.
++
++Les repères publics couvrent MINJA, MemoryGraft, les recommandations commerciales
++empoisonnées décrites par Microsoft, les trajectoires simulées de Yazdinejad et
++Karimipour, MemGhost, Emergence World, AgentCorruption, le billet NIST sur
++l’identité et un Internet Draft individuel. Les dates de publication et de
++révision sont distinguées des reprises de presse. Le délai de 46 heures porte
++sur la fin de la campagne simulée, pas une détection attribuée au même agent.
++Le rapport Zenity conserve son durcissement observé en septembre et la réponse
++AWS. Le dépôt dans le Datatracker ne constitue pas une norme IETF.
++
++Une signature protège une origine et une intégrité sous ses hypothèses de
++confiance ; elle ne rend pas un souvenir vrai ou inoffensif. Les idées de détection,
++quarantaine et restauration sont conservées comme pistes à spécifier et éprouver,
++avec propriétaire et condition de reprise dans la revue des sources, sans extension
++ni démarrage implicite d’AC02. Une attribution précise au NIST ou à OWASP doit
++s’appuyer sur le passage primaire concerné, pas sur un titre, un résumé ou un
++hébergement institutionnel. Cette règle de relecture s’applique aux prochaines
++révisions éditoriales ; elle ne modifie aucun contexte natif déjà démarré.
++
++The v4 introduction separates functional identity, authenticated authority and
++memory content. Public findings retain their dates, experimental limits and
++remediation context. Future detection and quarantine mechanisms remain proposals;
++no runtime behavior, Rust qualification or AC02 execution is claimed.
+ 
+ ## Contrôle humain et portée de la version 3
+ 

@@ -1,5 +1,30 @@
 [
   {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
+    "kind": "capture",
+    "sha256": "dece9f329db8a0c3b6cc0e00d1bab85b4c0cbc42c300d038c8993d0dea265880"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
+    "kind": "capture",
+    "sha256": "925a34f46411f78e847f03a2977e4c44d45162a4de2821adc355fa081808b6b6"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
+    "kind": "capture",
+    "sha256": "d29bf44ff459b59d66e5eaa9d7a341a86256593e7674e23def4b5f37748a1c1e"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
+    "kind": "capture",
+    "sha256": "e8de3cf6a5514112acb33898a7a3d24882806fa636f7b6fd82c4cf1438a9236c"
+  },
+  {
+    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
+    "kind": "capture",
+    "sha256": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856"
+  },
+  {
     "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-sombre-mobile.png",
     "kind": "capture",
     "sha256": "afaf6fa6c55c1308241660e3e0222098e7a53df9f0264ea33fc84d3cb82183db"
@@ -1263,35 +1288,5 @@
     "path": "docs/training/casa-pizza/tutoriels/frames/17-apercu-en.png",
     "kind": "doc",
     "sha256": "5c330e33c46de5636fa63f10183a6ef4d7ca5a5d9d53b1058d87a97164bc1ccd"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/17-apercu-fr.png",
-    "kind": "doc",
-    "sha256": "e43a16f07ae7407c0be24fae5cf7ee09dd864ae09ed5a517f1c64aa2ab7e8bd4"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/18-graphe-sombre.png",
-    "kind": "doc",
-    "sha256": "c618dd45ee52a39ca18a8d0361e036ffe00799f4aa5dd8a332d5333efab7709c"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/19-commande-en.png",
-    "kind": "doc",
-    "sha256": "59c352f5bd1eaaa6cfc5685f740c3a74d0269a66cf8e6cf57085ff6986e153cb"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/19-commande-fr.png",
-    "kind": "doc",
-    "sha256": "172c79919cab6cc98ca76cc793e53b375811ccfb6349c2fe9240ee413cf76ed4"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/overview-01.png",
-    "kind": "capture",
-    "sha256": "ff38966ae5036a710935fff988cdb7a5f5ba4508544d5eb10f9de3c09828076a"
-  },
-  {
-    "path": "docs/training/casa-pizza/tutoriels/frames/overview-02.png",
-    "kind": "capture",
-    "sha256": "463322185d7d99a21f08ac526e14571e55e0e58694ac10c7ca7dcbe355fac25f"
   }
 ]

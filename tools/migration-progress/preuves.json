@@ -44,5 +44,32 @@
   ],
   "_portee_R6": "Fixture froide schema37 :50tables et9entrées restaurées924, budget/réglages etnouvelleécriturepublique. NiGo/anciensschémas, niRootactif/autoritéexistante, niR6global.",
   "_native_http_mission": "Extension native mission1170,4lectures/6writers CLI,public1165 sur1156 PASS ; ne compte pas comme route Go historique portée ou conducteur web. Preuve docs/plans/migration-rust/evidence/20261024-eight-waves-1080/decision1170/result.json",
-  "_native_web_conductor": "Native extension1218 locally verified: web-owned consented sessions,13public assertions,44CLI tests,3CLI journeys and6role signal cases. Not historical Go route parity or global acceptance. Proof docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/result.json"
+  "_native_web_conductor": "Native extension1218 locally verified: web-owned consented sessions,13public assertions,44CLI tests,3CLI journeys and6role signal cases. Not historical Go route parity or global acceptance. Proof docs/plans/migration-rust/evidence/20261024-web-conductor1190/decision1218/result.json",
+  "http:/api/v1/activity": [
+    "docs/plans/migration-rust/evidence/20261027-activity-l8z4x8wi/final-recipe200/result.json",
+    "docs/plans/migration-rust/evidence/20261027-activity-l8z4x8wi/actual-work-read200.json",
+    "docs/plans/migration-rust/evidence/20261027-activity-l8z4x8wi/installed200/result.json"
+  ],
+  "_portee_activity": "Observed activity read/pagination/persisted-policy contracts only; native strict invalid query/source behavior documented, not global Go acceptance. Full evidence/RETEX20261027-activity-l8z4x8wi.",
+  "http:/api/v1/logs": [
+    "docs/plans/migration-rust/evidence/20261027-log-query-8i8c635h/final-recipe204-explicit-constructor/result.json",
+    "docs/plans/migration-rust/evidence/20261027-log-query-8i8c635h/actual-log-preflight202.json",
+    "docs/plans/migration-rust/evidence/20261027-log-query-8i8c635h/installed205-csp/result.json"
+  ],
+  "_portee_logs": "Filtered log read and saved four-consumer row settings only; exact decimal cursors, legacy refusal/recovery. Source204→205 differs notes only. No mission execution, global API acceptance or telemetry policy migration.",
+  "http:/api/v1/runtime-health": [
+    "docs/plans/migration-rust/evidence/20261027-runtime-health-x97n_o9u/final-recipe207/result.json",
+    "docs/plans/migration-rust/evidence/20261027-runtime-health-x97n_o9u/actual-preflight207.json",
+    "docs/plans/migration-rust/evidence/20261027-runtime-health-x97n_o9u/installed207/result.json"
+  ],
+  "_portee_runtime_health": "Storage/version observation and shared saved Admin thresholds only; already-bound HTTP bypasses new SQL reads, CLI bootstrap still needs SQL. Not launch authority, database integrity, global migration acceptance or native supervision.",
+  "http:/api/v1/visit": [
+    "docs/plans/migration-rust/evidence/20261027-session-visit-__badx_l/final-recipe211/result.json",
+    "docs/plans/migration-rust/evidence/20261027-session-visit-__badx_l/installed211/result.json"
+  ],
+  "http:/api/v1/visit-state": [
+    "docs/plans/migration-rust/evidence/20261027-session-visit-__badx_l/final-recipe211/result.json",
+    "docs/plans/migration-rust/evidence/20261027-session-visit-__badx_l/installed211/result.json"
+  ],
+  "_portee_session_visit": "Protected consultation bookkeeping only, explicit native fence and readback, isolated failure/repair and actual readonly installation. Auxiliary receipts are not Work/task acceptance, human identity or agent authority. Global migration and foreign mixed review remain open."
 }

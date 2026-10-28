@@ -1402,3 +1402,65 @@ Plan-question answers: `preparation-answers-rust`; set `SWARM_PREPARATION_WRITES
 Manual preparation UI: `preparation-ui-rust`, with `SWARM_PREPARATION_UI_BINARY` pointing to the frozen normal-profile binary. Browser FR/EN, themes, CAS, long answers, history, refusal and recovery.
 
 - `preparation-conversion-rust`: new-work CLI/API/UI, unreleased locks, exact replay, fresh Admin policies and rollback after receipt-trigger damage. `SWARM_PREPARATION_UI_BINARY` selects the frozen normal-profile binary; no global watchdog.
+
+Recipe `preparation-release-rust`: explicit whole-Work authorization after current
+contract review, preparation/Work CAS, lost-response replay and refusal recovery.
+`SWARM_PREPARATION_UI_BINARY` selects an immutable binary; use a fresh evidence
+directory. See the [release lot](../plans/migration-rust/PREPARATION-RELEASE-20261026.md).
+
+`preparation-team-rust` covers initial human/CLI configuration, canonical digest,
+explicit budgets/defaults, refusals without SQL mutation, replay without provider
+sources, separate release and bilingual/themed forms, including keyboard access
+to lower controls at390px. SWARM_PREPARATION_UI_BINARY selects a frozen binary.
+
+Preparation budget: `preparation-budget-rust.json` exercises explicit envelopes, invalid inputs, CAS/receipt replay, FR/EN × both themes, without provider execution. Consumption statement is outside this capability.
+
+`preparation-budget-read-rust.json`: historical reservations/cost coverage, null versus zero, saved warning updates/off, linked Work, corruption/refusal/recovery and the current bilingual modal.
+
+For CLI verification, select the immutable executable from the native build proof and verify its SHA. `deploy/local-build.json.artifact` is a staging path: a supported shared restart can rename it during a fixture run. Its disappearance is an incomplete run, never a product PASS. Retain the original and replay on the unchanged immutable executable.
+
+### Documentary sources and nested decoding — October26
+
+`preparation-sources-rust.json` verifies duplicate/null/alias budget decoding,
+equivalent historical receipts, source discovery/preview/add/remove and explicit
+Admin43→44 adoption. `preparation-sources-regressions-rust.json` covers invalid
+policy, budgets, team and questions. Set `SWARM_PREPARATION_UI_BINARY` and, for
+upgrade, `SWARM_PREPARATION_V43_BINARY` to verified immutable executables. No
+global watchdog or real provider call. Concurrent checkout changes invalidate
+stability: retain that refusal and use a limited verification package with
+archived compiled sources and frozen tests; never attribute current files to an
+old executable. Recipes cover only their declared inputs. Installed source tests
+are read-only against an explicitly selected local instance, checking qualified
+profile/version, served resources and before/after state. Native HTML deliberately
+transforms its template: compare the rendered body and served scripts with the
+compiled renderer contract rather than hashing the raw HTML template.
+
+### Preparation templates —October26
+
+`preparation-templates-rust.json` covers catalogue/projection, the served journey
+with explicit plan saving, Admin44→45 adoption and a translated refusal on v41
+settings. Supply SWARM_PREPARATION_UI_BINARY, SWARM_PREPARATION_V44_BINARY and
+SWARM_PREPARATION_V41_BINARY as retained hash-verified executables. No real model
+call or global watchdog. Complete answers remain a draft without launch rights;
+the historical41 case is distinct from a newly initialized45 Root.
+
+### G9 execution-limit administration delivered178
+
+Admin modal, shared CLI/API Root, explicit CAS repair, optional freshness token, current/history/effective and append-only rollback delivered. Public9/actual Go6 retained on177 after bounded source-impact review; corrected browser4 on178, installation13 and Version14 pass. Original focus recipe failure retained, not relabeled. Static GLM review and actual codec10/Root2 evidence in docs/plans/migration-rust/evidence/20261027-run-limits-admin-ohyyq12v/RESULT-RETEX.md; contract in docs/en/NATIVE-RUN-LIMITS-ADMIN.md. No global API acceptance; next browser-request/graph policies under inspection.
+
+
+Graph policy local189: source-bound final recipe PASS3 (public7, Go6/WIRE13, browser4), installed-process/assets18 and Version14, five existing Works unchanged. Exact24-file compiler delta retains four concurrent preparation files open on four axes; no global conformance. See graph-performance evidence/RESULT-RETEX in the migration plan. Next: exchange read journey and remaining Go APIs; no benchmark or global completion claimed.
+
+
+Historical exchange reader installed194 (G1 cockpit/API, G10 CLI): final2-step recipe PASS/integrity VERIFIED (public Go/native7, browser4). Shared TEXT/BLOB/Go string repair also verified through prior mission-status4 before/after cases. Actual wire HEAD5 tests and4 earlier policy routes. Installed identity/assets/API21 +Version14, five unchanged Works, live content hashed rather than retained. Three concurrent changes remain open across12 review axes; older findings carried, no global conformance or send/ACK acceptance. Next G1 activity, pure pagination5 isolated tests not yet integrated.
+
+
+### G1 activity200
+
+Permanent activity-read-rust recipe3 steps PASS/integrity VERIFIED (public8 including polymorphic review, source-window3, browser4). Component5, Rustdoc/i18n, installed23+Version14; five unchanged Works read before activation. Original198 actual-history failure and200 display-contract repair retained in evidence/20261027-activity-l8z4x8wi. Aggregate qualification remains BLOCKED for concurrent changes/older findings. No provider, native agent, live SQL mutation or global completion.
+
+
+Log queries: permanent `log-query-rust` recipe4steps PASS/VERIFIED; Go/Rust8, legacy3, browser4, cursor10; installed20555 + Version14 checks. See [RETEX](../plans/migration-rust/evidence/20261027-log-query-8i8c635h/RESULT-RETEX.md). Production204→205 only notes; foreign review findings and global migration remain open.
+
+
+Runtime-health: permanent `runtime-health-rust`2steps PASS/VERIFIED (public7/browser4), material2/runtime6. Installed20727+Version14,5Works unchanged; same-inode SQL failure and physical replacement are distinct fixture cases. [RETEX](../plans/migration-rust/evidence/20261027-runtime-health-x97n_o9u/RESULT-RETEX.md). Foreign20review axes and global migration remain open.

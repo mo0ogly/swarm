@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "paea-identity-options",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/tests/identity_control.rs",
+    "tools/verification/recipes/paea-identity-options.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "identity-control-public-options-and-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "7 passed; 0 failed",
+        "identity_cli_closed_options_refuse_default_value_aliases_before_io",
+        "current_control_cli_observes_real_signed_enrollment_fr_en_without_authorizing_or_creating_project"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-worker-parser-nonregression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "mission_worker_entry::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "bootstrap_normalizes_without_inventing_identity_or_authority"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "bootstrap-rejects-incomplete-identity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "cli",
+        "native_bootstrap_cli_rejects_incomplete_identity_without_creating_a_project",
+        "--",
+        "--exact",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "id": "paea-personal-coordinator",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "durable-personal-coordinator",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "personal_coordinator",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "personal_coordinator_actual_process_exit_after_each_durable_phase_recovers_once",
+        "PROCESS_PROBE phase=IntentDurable crash=true exit=Some(73)",
+        "PROCESS_PROBE phase=JournalApplied crash=true exit=Some(73)",
+        "PROCESS_PROBE phase=CheckpointDurable crash=true exit=Some(73)",
+        "personal_coordinator_actual_writer_contention_recovers_and_account_is_held_until_use_finishes",
+        "personal_coordinator_requires_checkpoint_sync_before_business_callback_then_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "personal-credential-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "credentials",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "credential_real_argon2_roundtrip_proves_only_exact_password_record",
+        "credential_independent_pin_context_principal_generation_refuse_before_hashing",
+        "credential_explicit_documented_costs_roundtrip_and_preserve_typed_causes"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "exact-proposal-codec",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal_proposal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "exact_personal_proposal_restores_after_reopen_without_storage_access_then_replays_once",
+        "personal_proposal_valid_witness_under_writer_then_bad_wire_signature_context_and_semantics_refuse"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "one-time-personal-source",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed",
+        "personal_post_usage_cancellation_retains_success_or_failure_outcome_without_relabeling_effect"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "control-core-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "both_authority_and_storage_failures_survive_pending_exact_event_recovery"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

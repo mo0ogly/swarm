@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "mission-seen-rust",
+  "inputs": [
+    "rust/crates/swarm-cli/src/mission.rs",
+    "rust/crates/swarm-cli/src/session_visit.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/session_visit.rs",
+    "rust/crates/swarm-engine/src/root_store/session_visit.rs",
+    "rust/crates/swarm-engine/src/auxiliary_effect.rs",
+    "tests/rust_mission_seen.py",
+    "tests/rust_agent_model_route.py",
+    "docs/architecture/NATIVE-SESSION-VISIT.md",
+    "docs/en/NATIVE-SESSION-VISIT.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-cli",
+      "command": [
+        "python3",
+        "-c",
+        "import os,tempfile,subprocess\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='mission-seen-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_mission_seen.py','--binary',os.environ['SWARM_MISSION_SEEN_BINARY'],'--output',str(p)],check=True)\nprint('MISSION_SEEN_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "MISSION_SEEN_VERIFIED 17"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

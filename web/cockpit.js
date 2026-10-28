@@ -17,7 +17,12 @@ function badge(status){
  const tone=['accepted','completed','acknowledged','verifie'].includes(status)?'success':['failed'].includes(status)?'alert':['stale','blocked','interrupted','waived','submitted','propose'].includes(status)?'attention':['abandoned','ecarte','remplace','todo'].includes(status)?'neutral':'info';
  return node('span',names[status]||status,'badge '+tone);
 }
-function selectOptions(select,options,current){select.replaceChildren();for(const [value,label]of options){const o=node('option',label);o.value=value;select.append(o)}if(options.some(x=>x[0]===current))select.value=current}
+/** Populate native options with DOM-string values. Canonical data-entry fields
+ * mark preserveCurrent so a saved/empty choice absent from this list stays visible
+ * and survives FormData; navigation lists retain their existing initial choice.
+ * This is presentation only: no validation, permission or backend save is inferred.
+ * DOM failures propagate to the owning modal/read error flow. */
+function selectOptions(select,options,current,preserveCurrent=select.dataset.preserveCurrent==='true'){const wanted=current==null?'':String(current);select.replaceChildren();for(const [value,label]of options){const o=node('option',label);o.value=String(value);select.append(o)}if(options.some(x=>String(x[0])===wanted))select.value=wanted;else if(preserveCurrent){const o=node('option',wanted?tr_web_cockpit_js('Valeur enregistrée hors de la liste : ')+wanted:tr_web_cockpit_js('Choisir une valeur'));o.value=wanted;o.dataset.outOfList='true';o.selected=true;select.append(o);select.value=wanted}}
 function button(text,fn){const b=node('button',text);b.type='button';b.addEventListener('click',fn);return b}
 function taskSessionButton(taskID,location){
  const session=PilotGraph.taskSession(snapshot.agents,taskID);if(!session)return null;
@@ -27,7 +32,11 @@ function taskSessionButton(taskID,location){
  b.title=tr_web_cockpit_js('Ouvrir la dernière tentative de cette tâche : ')+session.agent.provider+' · '+session.agent.id;
  return b;
 }
-function field(name,label,value='',options=null,multiline=false,aide=''){const l=node('label',label);const e=node(options?'select':multiline?'textarea':'input');e.name=name;e.id='field-'+name;if(options)selectOptions(e,options,value);else e.value=value;l.htmlFor=e.id;if(aide){const h=node('small',aide,'field-hint');h.id='aide-'+name;e.setAttribute('aria-describedby',h.id);l.append(h)}l.append(e);$('modal-fields').append(l);decorateField(l,e,name);if(multiline&&['instruction','recovery_instruction','next','objective','scope'].includes(name))SwarmTextReader.attach(e);return e}
+/** Create one labeled data-entry control and return its actual element. Selects
+ * preserve saved/empty values through option refreshes; values remain text and
+ * source choices, never backend validity or execution authority. No save occurs;
+ * DOM/help failures propagate and existing modal focus/error handling applies. */
+function field(name,label,value='',options=null,multiline=false,aide=''){const l=node('label',label);const e=node(options?'select':multiline?'textarea':'input');e.name=name;e.id='field-'+name;if(options){e.dataset.preserveCurrent='true';selectOptions(e,options,value)}else e.value=value;l.htmlFor=e.id;if(aide){const h=node('small',aide,'field-hint');h.id='aide-'+name;e.setAttribute('aria-describedby',h.id);l.append(h)}l.append(e);$('modal-fields').append(l);decorateField(l,e,name);if(multiline&&['instruction','recovery_instruction','next','objective','scope'].includes(name))SwarmTextReader.attach(e);return e}
 function openModal(title,description,context={}){returnFocus=document.activeElement;modalContext={workID:work,revision:snapshot?.work.revision,...context};$('modal-title').textContent=title;$('modal-description').textContent=description;$('modal-context').textContent=snapshot?.work.title||'SWARM';$('modal-fields').replaceChildren();$('preview').hidden=true;$('modal-error').hidden=true;$('confirm').hidden=false;$('confirm').disabled=false;$('confirm').textContent=tr_web_cockpit_js('Confirmer');resetModalPresentation(context);$('modal').showModal()}
 function closeModal(){
  $('modal').close();

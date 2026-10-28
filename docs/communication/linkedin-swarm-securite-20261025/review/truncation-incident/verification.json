@@ -1,0 +1,57 @@
+{
+  "status": "PASS_ORIGINAL_CONTENT_AND_VISUAL_REVIEW",
+  "source_sha256": "36e2101c7d07244bd045494e7ad76bf5b6921c17939212ff1d89469b0c2fcda2",
+  "word_sha256": "6313375b89314829c2648fcfe4b92a9b8e71fa23e141bf417c79380584b84747",
+  "original_words": 4081,
+  "article_words": 3278,
+  "accompanying_words": 803,
+  "all_rendered_blocks_equal_to_original": 225,
+  "original_article_headings": 19,
+  "hyperlinks": 5,
+  "rewritten_or_deleted_passages": 0,
+  "render_visual_review": "PASS",
+  "pages_rendered_and_inspected": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "article_pages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "appendix_pages": [
+    10,
+    11
+  ],
+  "increment_review": {
+    "policies": "No runtime policy changed. Markdown syntax, original headings and presentation-only typography reviewed. No editorial shortening allowed.",
+    "functions": "add_inline, add_article, build updated with current contracts; save_atomically and main unchanged.",
+    "errors": "Unsupported input raises before output publication; atomic save preserves prior output until replacement. Fidelity assertion compares against original attachment, including tables and accompanying notes.",
+    "documentation": "FR/EN positioning distinguishes analysis from original; communication README records the failed original-fidelity criterion and corrected source authority.",
+    "historical_proof": "Prior 1355-word delivery and its claimed local checks retained as superseded, not proof of original fidelity."
+  },
+  "current_files_sha256": {
+    "docs/communication/linkedin-swarm-securite-20261025/source-integrale-fr.md": "36e2101c7d07244bd045494e7ad76bf5b6921c17939212ff1d89469b0c2fcda2",
+    "docs/communication/linkedin-swarm-securite-20261025/article-fr.md": "0ae837a94951d43c84632108c3e0eb53c42fec5fe782987ce0be3d8c891aae79",
+    "docs/communication/linkedin-swarm-securite-20261025/accompagnement-original-fr.md": "8dd4162abb7a77ee2cf84c13f985eb7af23e532d3cf85024f3212aa40950fb43",
+    "docs/communication/linkedin-swarm-securite-20261025/build_word.py": "d183b2f400dee062f47c9cadb7a4f32302ca14e602ef9592e80bb2e51e176513",
+    "docs/communication/linkedin-swarm-securite-20261025/README.md": "bbc2be0cfafb58b093a43bc2e5bc7f6dac4bcb7a56a2a0f4ce4f8db61651bacb",
+    "docs/SECURITY-POSITIONING.md": "ad3bb3bfd5c20286e345dd2c44ce5e6073e90469640f7f68d0f04b02846bd21d",
+    "docs/en/SECURITY-POSITIONING.md": "3d1727ffe17a81f4edb7805d49e531703b4cca5820b01496e2ece54c01ca933a"
+  }
+}

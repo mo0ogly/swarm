@@ -1,0 +1,23 @@
+{
+  "command": [
+    "go",
+    "vet",
+    "./internal/engine"
+  ],
+  "exit": 0,
+  "start": "2026-10-17T15:11:36.014098+00:00",
+  "end": "2026-10-17T15:11:39.233516+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 0,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 834,
+  "overlay": null
+}

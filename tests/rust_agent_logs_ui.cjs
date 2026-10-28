@@ -49,14 +49,14 @@ function check(name,value){assert(value,name);assert(!checks.includes(name),'dup
   }
   if(label==='fr-etat'){
    await page.select('#work',cfg.work);await page.waitForFunction(()=>!document.querySelector('#main-content').hasAttribute('aria-busy')&&!document.querySelector('#logs').hasAttribute('aria-busy'));
-   expectedStatus=true;const statusReply=page.waitForResponse(r=>{const u=new URL(r.url());return u.pathname==='/api/v1/mission'&&u.searchParams.get('action')==='status'});
+   const statusReply=page.waitForResponse(r=>{const u=new URL(r.url());return u.pathname==='/api/v1/mission'&&u.searchParams.get('action')==='status'});
    await page.$eval('[data-view="conduite"]',e=>e.click());const r=await statusReply,v=await r.json();await page.waitForFunction(()=>!document.querySelector('#main-content').hasAttribute('aria-busy'));
-   check('leaving-logs-observes-real-status-refusal',r.status()===500&&v.failure.code==='mission-status-terminal-task-branch-unported');
-   check('known-status-gap-not-hidden-as-success',await page.$eval('#connection',e=>e.textContent.includes('Lecture partielle')));expectedStatus=false;
+   check('leaving-logs-observes-completed-status',r.status()===200&&v.validated===0&&v.tasks[0].result.state==='completed_unproven');
+   check('completion-not-validated',v.tasks[0].result.process_state==='completed'&&v.tasks[0].result.validation_state==='not_started');
   }
   await context.close();
  }
- check('logs-no-browser-errors',errors.length===0);check('no-failed-requests',failed.length===0);check('logs-no-HTTP-errors',httpErrors.length===0);check('no-POST',posts.length===0);check('known-status-side-effect-only',expectedStatusFailures.length===1&&expectedStatusFailures[0].path==='/api/v1/mission'&&expectedStatusFailures[0].status===500&&expectedConsoleErrors.length===1&&expectedConsoleErrors[0].includes('500 (Internal Server Error)'));
+ check('logs-no-browser-errors',errors.length===0);check('no-failed-requests',failed.length===0);check('logs-no-HTTP-errors',httpErrors.length===0);check('no-POST',posts.length===0);check('completed-status-no-errors',expectedStatusFailures.length===0&&expectedConsoleErrors.length===0);
  fs.writeFileSync(path.join(cfg.output,'browser-result.json'),JSON.stringify({status:'PASS',checks,errors,httpErrors,failed,posts,expectedStatusFailures,expectedConsoleErrors},null,2));passed=true;console.log('AGENT_LOGS_BROWSER_PASS '+checks.length+' assertions');
  }finally{fs.writeFileSync(path.join(cfg.output,'browser-diagnostics.json'),JSON.stringify({status:passed?'PASS':'FAIL',checks,errors,httpErrors,failed,posts,expectedStatusFailures,expectedConsoleErrors},null,2));if(browser)await browser.close()}
 })().catch(e=>{console.error(e.stack);process.exitCode=1});

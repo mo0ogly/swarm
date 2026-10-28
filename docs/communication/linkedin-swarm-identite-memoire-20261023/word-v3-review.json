@@ -1,0 +1,246 @@
+{
+  "status": "verified_editorial_document_not_runtime_qualification",
+  "date": "2026-10-23",
+  "input": {
+    "path": "/home/fpizzi/Downloads/swarm/Swarm_Article2_Identite_Memoire_v2.docx",
+    "sha256": "3f98e64d3afbe9b6dddd32783a29a07318a57776446bc1581f43915f01104230",
+    "preserved": true,
+    "open_document_lock_detected": true
+  },
+  "output": {
+    "path": "/home/fpizzi/Downloads/swarm/Swarm_Article2_Identite_Memoire_v3.docx",
+    "repository_copy": "/home/fpizzi/Documents/ChatGPT/swarm/docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v3.docx",
+    "sha256": "ddc184e453e7223df60f928eaa782f1f6abe9a5165018926af1ba39b16a29fe4",
+    "bytes": 3095747,
+    "pages": 11,
+    "figures": 5,
+    "comments": 5
+  },
+  "replan": {
+    "observed": "The supplied v2 still contains two simplified figures, a Go memory label, obsolete generation annexes and universal authorization/reception wording.",
+    "alternatives": [
+      "Keep old figures and append five new views, preserving contradictory versions",
+      "Replace superseded figures and annexes while retaining the original v2 and unrelated package parts"
+    ],
+    "decision": "Second option. Five complete high resolution figures rendered from unmodified SVG; original article structure retained with local edits and added requested sections.",
+    "new_finding": "INSTRUCTION-LEARNING documents supervisor additions validated by default, rejectable before reservation. This does not remove human validation of results: ENGINE-ACCEPTANCE and Rust wiring139 explicitly preserve pending_human and prevent downstream release by a controls PASS. Our earlier inference from process supervision to absence of human validation was wrong; user correction retained. Render01 SVG marker corruption diagnosed; use Chrome 2x PNG images instead.",
+    "owner": "Codex editorial scope; product architecture and runtime are not modified",
+    "resumption": "Finalize only after all pages rendered and inspected, five figures verified against source hashes and input unchanged."
+  },
+  "human_control_proof": {
+    "contract": "docs/ENGINE-ACCEPTANCE.md section Contrôles comme preuves d’une revue humaine",
+    "native_contract": "docs/architecture/RUST-MIGRATION.md raccord139 and root_store/task_validation/gate.rs apply",
+    "observed_source": "Human controls remain auxiliary observations; pending_human/human-validation-required is not an acceptance. Independent AI review does not replace the human decision required by policy.",
+    "limit": "Sources and retained qualification documentation inspected. No test or runtime acceptance executed in this editorial task."
+  },
+  "editorial_checks": [
+    "embedded_complete_figure_architecture-overview",
+    "embedded_complete_figure_identity-authority",
+    "embedded_complete_figure_memory-context",
+    "embedded_complete_figure_run-supervision",
+    "embedded_complete_figure_logs-observability",
+    "original_v2_unchanged",
+    "five_complete_images_match_frozen_inputs",
+    "six_sections_article_A4_technical_A2",
+    "five_editorial_comments",
+    "fifteen_original_package_parts_preserved",
+    "sources_and_maturity_distinguished",
+    "human_policy_preserves_human_decision",
+    "instruction_revision_not_confused_with_result_validation",
+    "eleven_rendered_pages_inspected_no_clipping",
+    "pages_2_3_pixel_identical_to_inspected_render03",
+    "editorial_markdown_links_resolve",
+    "editorial_markdown_whitespace_clean"
+  ],
+  "review_axes": {
+    "policies": "No new product execution policy, deadline, budget or approval flow. A4 reference and A2 figure pages are editorial geometry. human/automatic behavior sourced, not invented.",
+    "functions": "No engine/API function changed. One-off document helpers explain input hash checks, preservation, rendering and atomic writes.",
+    "errors": "Original retained; changed input and missing/corrupt figures refuse. Native SVG corruption in render01 retained and corrected by Chrome 2x PNG. A premature attempt to inspect before render03 completed failed without changing the document; inspected only after completion. The editorial Markdown whitespace check found trailing spaces in generated reference paragraphs; the text source was normalized, with no DOCX byte change.",
+    "build": "No runtime build, server restart, provider invocation, AC02 start or deployment. Exact output and packaged renderer bound by hashes."
+  },
+  "semantic_review": [
+    "Opening memory-contamination story explicitly hypothetical; EchoLeak is a disclosed and corrected vulnerability, MINJA an experiment.",
+    "Agent identity components are distinguished from globally integrated protected human identity and service deployment.",
+    "Initial instructions retained; attributed revisions and operator rejection remain possible. No guarantee that the model always obeys.",
+    "Human result validation restored after user correction; process supervision and instruction additions cannot establish absence of human validation.",
+    "Five existing detailed architecture views preserved without node/edge removal; captions explicitly cover human result validation on views1 and4.",
+    "Architecture source language is not used as a memory subsystem name; Rust core stays central.",
+    "Four planned AC02 security views remain distinct from the five architecture plates."
+  ],
+  "capitalization": {
+    "cause": "Editorial reading focused on AI process supervision and default-approved instruction additions, missing the separate human validation policy.",
+    "prevention": "For any acceptance/security description, read ENGINE-ACCEPTANCE plus the current native validation gate, not only the supervisor protocol. Distinguish process control, instruction revision, human result validation and protected human authentication.",
+    "receipt": "This review and the editorial README link are persistent for the next document revision. Embedded Swarm agent contexts were not changed."
+  },
+  "source_inventory_at_finalization": {
+    "docs/ENGINE-ACCEPTANCE.md": "a43377f1f1ffe9f146467f4e63390a1c3cd587629a95256264f74357a7c653cd",
+    "docs/PRODUCT-ARCHITECTURE.md": "f4ec4877422af5279c2a2774651f11a46311f8a6ab61d49f7ee6f6047b635539",
+    "docs/architecture/OVERVIEW.md": "256c585daf0a795cd9f27fa1e15a758b6b81f88cb788aada2394b59e7fe9f5b0",
+    "docs/architecture/AGENT-ENGINE-PROTOCOL.md": "3d47b29e40df99d5a9c775e50e67e2c450b3d145fee7c9e3ab05b4d057fd66b3",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59",
+    "docs/architecture/INSTRUCTION-LEARNING.md": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038",
+    "docs/architecture/RUN-SUPERVISION.md": "7e683f910245320bd7c21061a69e0b45421ba8222ae3cbf94c7ad9b2f99f5a1e",
+    "docs/architecture/REVIEW-EVIDENCE.md": "e6f7cc6b0fb87bbdc5f7664642bdfe871d3e6c69882d97afee5d978bec9194f7",
+    "docs/architecture/RUST-MIGRATION.md": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9",
+    "docs/PROJECT-MEMORY.md": "4684290b43b3df6ebf84c4c99ee804ca24e15019411fc9d7d205c258d4e45b13",
+    "docs/diagrams/CONTRACT-MAP.md": "d4c51c9ce066b33fb55ebcaff835fc4534e2f8005f734ee45cafc5c833551f7d",
+    "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e",
+    "internal/engine/human_validation_evidence_test.go": "32e7ba125b535509d1f209c6055413d087c653ebd421dd085559dc4a7c6be4c1"
+  },
+  "figure_inventory": [
+    {
+      "view": "architecture-overview",
+      "png": ".cache/editorial-swarm-20261023/docx-v3/hires/architecture-overview-fr.png",
+      "png_sha256": "d27086ff57d36ee56c03421e53e7ebd6375492435bce61e2bbd0d13b43fb28cb",
+      "svg": "docs/diagrams/architecture-overview-fr.svg",
+      "svg_sha256": "2ac72e787d4399e6285cdd8abb1bdc3201facb394c7b9106bbd105f989d0750e",
+      "display_width_mm": 376.01,
+      "page_mm": [
+        419.9995833333333,
+        594.0072222222223
+      ],
+      "alt": "Objectif et plan adopté, propriétaire de périmètre, jugement global de cycle, réservations et contexte figé, conducteur, candidat Git, contrôles, revue indépendante et fraîcheur restent reliés. La validation humaine exigée par la politique reste une condition d’acceptation ; le superviseur IA ne peut pas la remplacer par son avis.",
+      "limit": "Qualification native par parcours. En mode human, un PASS de contrôle conserve l’attente de décision humaine. AC02 reste futur."
+    },
+    {
+      "view": "identity-authority",
+      "png": ".cache/editorial-swarm-20261023/docx-v3/hires/identity-authority-fr.png",
+      "png_sha256": "a18d95ec26f382560cd9af39ca97791885bf24922c7cb96b43a068093fdc80ed",
+      "svg": "docs/diagrams/identity-authority-fr.svg",
+      "svg_sha256": "5c7923fd955531525f4cf5ef182aba98b1fda5433b5ac7fdf8271c958eb6a3eb",
+      "display_width_mm": 376.01,
+      "page_mm": [
+        419.9995833333333,
+        594.0072222222223
+      ],
+      "alt": "Source humaine, enrôlement et preuve signée, octrois, instances et permis de publication sont séparés. Le plan courant et le contenu de la demande participent au contrôle. Trust, SQLite et runtime constituent des vérifications distinctes.",
+      "limit": "Noyaux présents et preuves bornées. Le compte humain, le service protégé et le raccord public de toutes les opérations au dernier usage restent ouverts."
+    },
+    {
+      "view": "memory-context",
+      "png": ".cache/editorial-swarm-20261023/docx-v3/hires/memory-context-fr.png",
+      "png_sha256": "4c22be0d7898cce6c4a61189e9c1ebeb7033ee99aa763ebddd675a067a23cc0d",
+      "svg": "docs/diagrams/memory-context-fr.svg",
+      "svg_sha256": "f901eed6b10c92cda2c896926799557d14f6fcdb0fec975844a86b9ab306b73b",
+      "display_width_mm": 417.4,
+      "page_mm": [
+        594.0072222222223,
+        419.9995833333333
+      ],
+      "alt": "Une leçon admise, une révision de consigne, un contexte préparé et une conversation reprise ne sont pas le même objet. La sélection attribuée, les empreintes et les reçus permettent de retrouver la version transmise. Lire, résumer et transmettre restent trois usages distincts.",
+      "limit": "Contexte Rust partiellement porté et droits mémoire globaux ouverts. Un retrait ne purge pas les contextes déjà reçus. Les ajouts de consigne sont validés par défaut puis rejetables avant réservation."
+    },
+    {
+      "view": "run-supervision",
+      "png": ".cache/editorial-swarm-20261023/docx-v3/hires/run-supervision-fr.png",
+      "png_sha256": "cbece187ac3f52c1dada5ef1c71dbbcffc65d4fefbb0a1d1185d4c9f433eaea8",
+      "svg": "docs/diagrams/run-supervision-fr.svg",
+      "svg_sha256": "f39a06116f182ab74653044bb6d6c8eda7070fef9a82c23b3e12baec95be3084",
+      "display_width_mm": 376.01,
+      "page_mm": [
+        419.9995833333333,
+        594.0072222222223
+      ],
+      "alt": "Durée, attente d’outil, silence et échecs restent des observations attribuées. Le superviseur IA propriétaire reçoit le signal et motive sa décision. Le moteur vérifie puis applique ; la confirmation d’arrêt précède la libération. Au stade du résultat, la politique human exige la validation humaine et garde les tâches suivantes bloquées jusque-là.",
+      "limit": "Les preuves sur fixtures ne valent pas conduite native complète. Conduite du processus, revue IA et validation humaine sont distinctes. Continuer ne réinitialise pas les compteurs."
+    },
+    {
+      "view": "logs-observability",
+      "png": ".cache/editorial-swarm-20261023/docx-v3/hires/logs-observability-fr.png",
+      "png_sha256": "7c452826be0095f8a4ec0a7370b219628c114cb79443bbadac2e79e48eadca6f",
+      "svg": "docs/diagrams/logs-observability-fr.svg",
+      "svg_sha256": "90ecd31bed691d9a22b38058ca3f41ef046d83055b257dacf1b140cddd3739b4",
+      "display_width_mm": 550.02,
+      "page_mm": [
+        594.0072222222223,
+        419.9995833333333
+      ],
+      "alt": "Sorties, événements, comptabilité des appels, ressources Linux et télémétrie gardent leurs sources. La consultation, les curseurs et l’export rendent le parcours examinable. Une acceptation demande aussi le candidat, les contrôles, la revue et une vérification de fraîcheur.",
+      "limit": "Surfaces live et OTLP vérifiées localement dans leur périmètre. La timeline de sécurité et la filiation réseau AC02 restent futures."
+    }
+  ],
+  "qa": {
+    "directory": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04",
+    "renderer": "Bundled documents render_docx.py with bundled Python and LibreOffice; Chrome used for offline source SVG rasterization",
+    "dpi": 110,
+    "pages": [
+      {
+        "page": 1,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-1.png",
+        "sha256": "24dd7e69c746f431f2a28cfaae66323071f0a4ec0e96eed5198ee87c58d8b3fd",
+        "visually_inspected": true
+      },
+      {
+        "page": 2,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-2.png",
+        "sha256": "55413792e3d07e100fcf6b2bba6b062f8b87263f5e1cc8be5c58369df3dd3992",
+        "visually_inspected": true
+      },
+      {
+        "page": 3,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-3.png",
+        "sha256": "e4b2c2d2316b1312e22bca6d56d603058536df9bc3823572b65b910ca0b436b1",
+        "visually_inspected": true
+      },
+      {
+        "page": 4,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-4.png",
+        "sha256": "69f1efdde9ac4ba6c0f1445dfad2f3c6ad70edbf22c2b565456be69d97dc6a6a",
+        "visually_inspected": true
+      },
+      {
+        "page": 5,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-5.png",
+        "sha256": "0103553a1c49f27fb8c4c9d68eca223e5ad9f3b8cb1f3862b7094a50d554024d",
+        "visually_inspected": true
+      },
+      {
+        "page": 6,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-6.png",
+        "sha256": "3a67dcd3fc035e77e31245d9fda5787ffc56af247350446c9e04f94ce836f4ce",
+        "visually_inspected": true
+      },
+      {
+        "page": 7,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-7.png",
+        "sha256": "7e729714c22f93780a163bd0d2166d6c3854024bd2f1a3b19715087225a86114",
+        "visually_inspected": true
+      },
+      {
+        "page": 8,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-8.png",
+        "sha256": "663300a2f91e797bbca4f8d4ca70c08049e09380fdd59ed637e90a07a7a7fffb",
+        "visually_inspected": true
+      },
+      {
+        "page": 9,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-9.png",
+        "sha256": "8cf373d6e46d0a03eaa4e74a4eb452d694ef170f4996c0b1ab30c3b6cbaf51a2",
+        "visually_inspected": true
+      },
+      {
+        "page": 10,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-10.png",
+        "sha256": "65132387ee507b1e519d60cd4867dc10079d7ac4c3741a52e60fca135b6d1a48",
+        "visually_inspected": true
+      },
+      {
+        "page": 11,
+        "png": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/docx-v3/render-04/page-11.png",
+        "sha256": "b79e6173a5c31939bf2bced495876dedd6c5fa99b0863af1828b1fd45ac75f21",
+        "visually_inspected": true
+      }
+    ],
+    "preserved_failure": "render-01 native SVG marker corruption; render03 premature image read error described above"
+  },
+  "limits": [
+    "Editorial draft only; no runtime qualification, deployment, new human gate or AC02 implementation",
+    "Word field refresh deferred to opening; render export checked separately",
+    "External sources describe published vulnerability/research; no Swarm compromise asserted"
+  ],
+  "documentation": "French editorial revision only. No change to shared engine contracts, FR/EN diagrams or runtime evolution notes; no delivered software version created.",
+  "editorial_file_inventory": {
+    "README.md": "7fa921882a12237ea6dae81a4c813046abfa61689ee2e67d0052200ec840d9d6",
+    "article-v3-fr.md": "fe14a2a0f9d6011daa6fae8ac0876f6e94b698ad8d23d66ce91b312fe6adeb14"
+  }
+}

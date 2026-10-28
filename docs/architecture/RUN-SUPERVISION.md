@@ -261,3 +261,60 @@ cette migration ; ne jamais utiliser une mission active comme fixture de test.
 Les régressions isolées utilisent un fournisseur simulé et un vrai sous-processus,
 avec décision publique du responsable : elles ne prouvent pas une décision autonome
 par un modèle réel ni la remise en état des partages CIFS du poste.
+
+## Rust : résultat original et enveloppe des appels futurs
+
+Le parcours public `planning run` / `planning reconcile` distingue le démarrage
+d’un nouvel appel de la remise d’un original déjà attendu. Le démarrage et
+l’observation du processus appliquent toujours le tarif de réserve et le plafond
+courants. Un original réussi connu conserve sa réserve historique SQL, finie,
+non négative, estimated et sans usage réglé ; un changement de tarif ne la
+réécrit pas et n’exige pas un nouveau départ pour enregistrer son résultat.
+L’absence, le mauvais propriétaire/scope, le type invalide ou l’état incompatible
+de cette ligne restent des refus, pas un coût nul déduit par défaut.
+
+```mermaid
+flowchart LR
+  A[Original réellement attendu] --> B[Reçu, registre et propriétaire OS vérifiés]
+  B --> C[Réserve historique valide et conservée]
+  C --> D[Lease, sources et actions encore valides]
+  D --> E[Décision enregistrée une fois]
+  P[Budget courant] --> N[Nouveau départ : tarif et plafond courants]
+```
+
+`RunFence` choisit `verified_result` seulement pour un reçu original vérifié.
+Le vérificateur partage toutes les autres vérifications avec l’aperçu vivant :
+mission active, holder/génération/révision, échéance, contexte complet, workflow,
+rapports et contrat du scope. Pause, source périmée ou action interdite ne sont
+pas autorisées par la présence d’une réserve. Le résultat n’accorde aucun exec,
+remboursement ni acceptation de tâche. La ligne SQL autoritaire ne prouve pas
+un prix historique signé indépendant ni une facture fournisseur ; déclarations
+d’usage, identité d’agent authentifiée et confinement OS restent des preuves
+distinctes. Les lignes financières déjà réglées restent non portées par ce garde.
+
+Qualification161 : binaire normal04 e7c023,255sources effectives sans features
+fixture, non installé. Recette renforcée06 PASS : témoin, changement de budget et refus après pause ;
+les trois vrais cadres privés et les observations sont conservés avant PASS.
+Aperçus07, recette native08, cinq gardes financiers10 et Clippy/Rustdoc09 PASS.
+Le corps commun hors prédicat financier est identique (11). Voir le plan Rust et la recette
+`planning-result-budget` pour les preuves finales et limites, sans les assimiler
+à une acceptation globale ou à une identité humaine vérifiée.
+
+### Causes sûres des transactions enregistrées
+
+Le diagnostic natif commun expose les codes statiques de `RecordedChangeError`,
+`RecordedCommandError`, `RecordedWorkError`, `RecordedEventError` et `WorkError`.
+Une collision d’événement reste refusée ; le CLI conserve son code de frontière
+et ajoute `event_conflict` à ses causes. Les branches indépendantes `primary` et
+`cleanup` des finalisations/reprises sont parcourues, même si leurs codes SQL
+sont identiques ; une branche absente n’est pas inventée. Les codes numériques
+SQLite/OS sont conservés, sans sérialiser Display, SQL, chemin ou payload privé.
+
+Cette projection ne donne aucun droit de relance et ne prouve ni rollback ni
+réparation. La transaction et le compteur restent autoritaires. Les types inconnus
+continuent par `source()` ; la liste des types connus ne prouve pas la couverture
+universelle. Les neuf tests `native_diagnostics::tests::` couvrent les conflits,
+les doubles erreurs, les données privées et les erreurs de contexte déjà prises
+en charge ; la recette `native-recorded-diagnostics.json` vérifie aussi le refus
+réel sans mutation suivi du parcours reviewer normal. Qualification du graphe
+figé et installation utilisateur restent distinctes.

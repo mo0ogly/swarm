@@ -34,6 +34,34 @@ class MetadataBinding(unittest.TestCase):
             self.assertEqual(result['signal'],9)
             self.assertEqual(result['stdout_sha256'],result['stderr_sha256'])
             self.assertTrue(json.loads((out/'failure.json').read_text())['candidate_unqualified'])
+    def test_status_path_change_preserves_accurate_build_metadata(self):
+        """A docs/test path change cannot invalidate unchanged HEAD/dirty metadata.
+
+        The collector/process are explicit doubles, not a real compiler proof.
+        A valid candidate flow precedes changed HEAD and dirty-state refusals.
+        Full source/configuration stability remains the real collector's job.
+        """
+        import hashlib,json,tempfile,subprocess
+        from unittest.mock import patch
+        for changed,allowed in [(dict(status_sha256='b'*64),True),(dict(commit='b'*40),False),(dict(modified=False),False)]:
+            with self.subTest(changed=changed),tempfile.TemporaryDirectory() as directory:
+                root=Path(directory);out=root/'proof';binary=root/'fixture-binary';binary.write_bytes(b'inert fixture');before=dict(commit='a'*40,modified=True,status_sha256='a'*64);after={**before,**changed}
+                declared={}
+                def run(argv,**kwargs):
+                    """Publish exactly the collector/metadata channels the caller reads."""
+                    if '--output' in argv:
+                        metadata=kwargs['env']['SWARM_NATIVE_BUILD_METADATA'];declared.update(json.loads(metadata))
+                        profile_out=Path(argv[argv.index('--output')+1]);profile_out.mkdir()
+                        (profile_out/'result.json').write_text(json.dumps(dict(native_build_metadata=dict(present=True,sha256=hashlib.sha256(metadata.encode()).hexdigest()),binary='fixture-binary',sha256=hashlib.sha256(binary.read_bytes()).hexdigest())))
+                        return subprocess.CompletedProcess(argv,0)
+                    actual=declared;return subprocess.CompletedProcess(argv,0,stdout=json.dumps(dict(schema_version=1,binary={**{k:v for k,v in actual.items() if k!='schema_version'},'provenance':'injected'})).encode(),stderr=b'')
+                with patch.object(build,'observe',side_effect=[before,after]),patch.object(build.subprocess,'run',side_effect=run):
+                    if allowed:
+                        result=build.build(root,out,root/'target','devel')
+                        self.assertEqual(result['metadata']['commit'],before['commit']);self.assertTrue(result['metadata']['modified']);self.assertTrue(result['git_metadata_stable']);self.assertFalse(result['git_observations_stable'])
+                    else:
+                        with self.assertRaisesRegex(ValueError,'native-build-git-observation-changed'):build.build(root,out,root/'target','devel')
+                        self.assertTrue(json.loads((out/'failure.json').read_text())['candidate_unqualified'])
     def test_release_label_matches_legacy_prerelease_rules(self):
         """Labels validate syntax, never imply a real tag/release or repository."""
         for value in ['devel','v0.0.0','v1.2.3-dev.0','v1.2.3+build.01']:self.assertTrue(build.release(value),value)

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-json",
+    "./internal/enrollmentbootstrap",
+    "-run",
+    "^TestBootstrapLoadIsReadOnlyAndBindsIndependentDigest$",
+    "-count=1",
+    "-timeout=0"
+  ],
+  "exit": 1,
+  "start": "2026-10-17T16:28:27.341754+00:00",
+  "end": "2026-10-17T16:28:28.344771+00:00",
+  "counts": {
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  },
+  "names": {
+    "pass": [],
+    "fail": [
+      "TestBootstrapLoadIsReadOnlyAndBindsIndependentDigest"
+    ],
+    "skip": []
+  },
+  "changed_inputs": [],
+  "input_count": 848,
+  "overlay": null
+}

@@ -2,6 +2,12 @@
 
 ## Status, scope and decision
 
+This T1 design and its Go inventory are historical. For the current Rust core,
+see [Rust Biba technical architecture](BIBA-RUST.md), its diagrams and the
+distinction between integrated `trust` flows and the cross-cutting Biba target.
+The user’s 26 October 2026 decision retains Biba as the reference integrity rule;
+integration gaps do not imply conformance.
+
 This is the T1 target, not an implementation claim. Billing and the second
 sensitive connector remain deterministic simulations in isolated roots. No real
 payment, third-party account, publication or external deployment is authorized.
@@ -12,6 +18,12 @@ policy, exact approvals and canonical parameters inside the transaction that
 commits the simulated effect. Every sensitive effect crosses an authorized
 connector. An uninventoried direct path is an explicit gap and disables the
 affected action.
+
+The future [AC-02 execution security and menus plan](plans/actions-confiance/securite-execution-apex.md)
+was recorded on 23 October 2026, with Bromure, NVIDIA and Agent Baseline
+Software Factory/YAML references. Lots A0–A7 remain not started; resumption
+requires Rust migration/qualification and an explicit request to start.
+Recording this plan changes no running protection.
 
 ## Inspected foundation and gaps
 

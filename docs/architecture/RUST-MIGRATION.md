@@ -9486,7 +9486,7 @@ limite persistée, jamais un plafond local50. Recette : preparation-ui-rust.
 `prepare create-missions` et le writer HTTP partagé matérialisent uniquement
 les préparations autonomes. Les politiques persistées courantes et la fraîcheur
 des sources/verdict précèdent toute écriture. Travail existant, organisation,
-révision et autorisation de départ restent refusés.
+révision restent refusés par la création ; l’autorisation explicite est décrite ci-dessous.
 
 ```mermaid
 sequenceDiagram
@@ -9509,3 +9509,240 @@ ouverture sans revendiquer une exploitation publique. Le rejeu ne recrée aucun
 travail. `preparation-launch-locked` conserve le refus public typé au lieu du
 code générique format. Le reçu affiché n’atteste pas l’état courant des droits.
 Voir le guide de reprise bilingue et la recette `preparation-conversion-rust`.
+
+
+### Autorisation explicite des missions converties
+
+Après création, « Autoriser le démarrage des missions » ouvre une revue en lecture
+seule du travail courant : titre, révision et contrats actuels des tâches à déplier.
+Les éditions publiques de tâches sont conservées, comme en Go ; le hash du plan
+sélectionne le snapshot converti et ses identifiants, sans prouver que les
+instructions n’ont pas changé. Le brouillon courant n’est jamais appliqué par
+cette autorisation, même s’il a évolué depuis la conversion.
+
+`prepare release-plan ID --root ROOT --input FILE --json` et le writer HTTP
+partagé exigent `version:1`, `action:"release-plan"`, `preparation_id`, `event_id`,
+`expected_revision`, `expected_work_revision` positif et `sha256` du snapshot
+`conversion.plan_hash`. Le parcours initial couvre un Work entièrement constitué
+des tâches converties ; un sous-ensemble, une tâche ajoutée ou des verrous étrangers
+refusent sans publication partielle. Le réglage d’écriture Admin persistant reste
+requis ; aucun nouveau plafond, fallback, budget ou droit implicite n’est ajouté.
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur / CLI
+    participant R as Revue protégée
+    participant W as Writer partagé
+    participant D as Transaction SQLite
+    U->>R: release-review?id=préparation (lecture)
+    R-->>U: préparation et Work courant, révisions distinctes
+    Note over R,U: Lecture séquentielle, pas un snapshot atomique
+    U->>W: release-plan, deux révisions, hash converti, événement
+    W->>D: rejeu du reçu ou double CAS et libération des verrous
+    W->>D: Work, événement, préparation, reçu, relecture finale
+    W-->>U: autorisation enregistrée ou issue explicite
+    Note over W,D: Aucun appel fournisseur ; conducteur existant potentiellement débloqué
+```
+
+Le verdict et les documents restent conservés. L’autonomie, les budgets et les
+historiques ne changent pas. L’opération peut débloquer un conducteur déjà
+configuré ; elle ne prouve ni lancement, ni identité humaine nommée, ni résultat
+accepté. Un refus de révision impose une nouvelle revue. Après une réponse perdue
+ou un commit incertain, rejouer exactement le même événement ; ne pas créer une
+nouvelle intention pour contourner l’incertitude. Le reçu n’est pas l’état courant
+d’exécution. Recette permanente : `preparation-release-rust` ; profil, version et
+preuves de livraison sont conservés dans le plan, pas inférés de la compilation.
+
+
+### Équipe initiale d’une préparation convertie
+
+`prepare configure-team ID --root ROOT --input FILE --json` et le writer HTTP
+partagé configurent explicitement une conversion intacte, non libérée et sans
+Agent ni équipe. L’intention lie révisions préparation/Work, hash du plan converti
+et `organization` : provider, worker_provider, level, workspace, validation=human,
+max_tasks et max_calls positifs. Les fournisseurs CLI doivent exister ; les
+connexions API, dépôts gérés et contrôles automatiques restent hors de ce parcours.
+Le formulaire demande les identifiants, le dossier et les plafonds sans valeurs
+numériques cachées. Le dossier doit rester dans le projet.
+
+Le moteur reconstruit les tâches depuis le snapshot et les defaults de gates
+Admin courants : toute différence/histoire antérieure refuse l’adoption implicite.
+Il projette les critères en exigences req-N, affecte le scope root, enregistre
+les validations humaines, le profil worker et le responsable/vérificateur avec
+digests observés. Les defaults de contexte/source du reviewer viennent d’Admin.
+max_calls alimente explicitement les plafonds décisions/activations/revue ;
+max_tasks couvre au moins les tâches existantes. Aucun compteur n’est remis à zéro
+sur un historique : ce parcours ne configure que des tâches intactes sans Agent.
+
+```mermaid
+sequenceDiagram
+    participant U as Interface / CLI
+    participant W as Writer partagé
+    participant S as Sources CLI et réglages
+    participant D as Transaction immédiate
+    U->>W: configure-team, deux révisions, plan, choix explicites
+    W->>D: rejeu ou contrôle des tâches/verrous/historique
+    W->>S: observer fournisseur, modèle, defaults reviewer, workspace
+    W->>D: Work organisé, événement, préparation et reçu
+    W->>D: relecture finale, commit ou rollback commun
+    W-->>U: équipe enregistrée, tâches toujours verrouillées
+    Note over W,D: Aucun fournisseur exécuté ; release-plan reste séparé
+```
+
+Une observation de sources n’est ni une location jusqu’au lancement, ni une
+identité fournisseur vérifiée. L’acceptation humaine nominative n’est pas déduite
+du clic ou de l’acteur local. L’admission réelle revérifie droits, sources et
+budgets. Un reçu perdu impose le même événement ; le rejeu précède les IO de
+configuration. Recette permanente : `preparation-team-rust`.
+
+## Enveloppe USD de préparation
+
+`prepare budget ID --input FILE` et la modale native enregistrent un `budget`
+explicite dans la commande préparation partagée (version1, event_id, expected_revision).
+Champs : limit_usd, reserve_per_launch_usd, estimate_source, reference_date.
+Zéro signifie illimité ; une limite positive exige une réservation positive,
+une source non vide et une date YYYY-MM-DD réelle. Le moteur remplace acteur/date.
+L’écriture CAS/reçu conserve documents, verdicts, budgets du Work et toutes les
+réservations/historiques. Après réponse perdue, rejouer exactement le même événement ;
+un CAS périmé impose une relecture. Enveloppe invalide : preparation-budget-invalid
+(HTTP400). `prepare budget ID` sans input et GET `/api/v1/preparations/budget?id=ID`
+lisent le même snapshot SQL des réservations, estimations engagées et couvertures
+coûts/jetons. Coût absent reste null ; zéro déclaré reste zéro. Un Work lié expose
+son enveloppe partagée distincte. L’alerte suit le pourcentage Admin persisté
+(null désactive), sans fallback80%. Champs consommés malformés, identités de lignes
+incohérentes, engagements actifs/usage négatifs ou débordés refusent sans mutation.
+La modale affiche ces observations ; les appels IA de préparation restent à porter.
+
+Les gardes Git du build natif comparent HEAD et l’état modifié injectés dans le binaire. Les canaux status avant/après restent conservés et leur stabilité est signalée séparément. Un nouveau chemin documentation/test sans effet compilé ne change pas ces métadonnées. Les contrôles sources/configuration/profil effectifs, métadonnées exécutées et identité finale du lanceur restent requis.
+
+Le lien Admin de préparation ouvre `/native-runtime.html?view=admin` et conserve langue/thème ; les limites par portée du cockpit forment un autre écran. Le client budget valide les champs consommés et refuse une réponse200 malformée avant d’ouvrir la modale. Ses compteurs doivent rester des entiers exactement représentables en JavaScript ; le CLI conserve les compteurs signés64 bits. Cette borne de représentation n’est pas une politique d’exécution.
+
+### État de configuration conservé dans les erreurs CLI ordinaires
+
+Le rapport JSON CLI expose `configuration_may_be_recorded:true` dès que la chaîne d’erreurs typées conserve une publication connue ou visible/incertaine, y compris hors d’une session web : configuration des fournisseurs, politiques, connexions et réglages. Les wrappers de fermeture/sortie ne doivent pas faire disparaître ce fait. Ce champ ne transforme pas l’échec en succès et ne prétend pas qu’un no-op est une nouvelle mutation ; il impose une relecture avant reprise. Son absence ne prouve jamais un rollback. Les causes originales et le code d’échec restent présents. La régression ciblée couvre wrapper de sortie, Root Published et nettoyage ; la recette de connexions vérifie aussi la sauvegarde réelle suivie d’un stdout fermé.
+
+### Apprentissage — échec de COMMIT d'un tour de préparation
+
+Le reproducer `tests/preparation_calls.rs::commit_failure_rolls_back_for_same_root_reuse`
+du package `swarm-engine` injecte une contrainte différée après un témoin valide.
+Le27octobre2026, COMMIT refusait mais la transaction restait ouverte : le même
+Root conservait son verrou, et la reprise échouait avec DatabaseBusy. Le wrapper
+natif de préparation tente maintenant ROLLBACK si SQLite n'est pas en autocommit,
+conserve ensemble cause primaire et échec de cleanup, puis laisse le même Root
+réutilisable. Un échec en autocommit reste une issue inconnue ; il ne prouve
+jamais l'absence de publication. Un writer ajouté doit couvrir cette branche,
+les triggers après dernières écritures et la reprise sur le même handle, pas
+seulement un nouvel open. Preuves et limites dans le suivi des appels IA.
+
+### Consignes projet : métadonnées et origine des fichiers
+
+Le lot profils175 conserve cinq contre-exemples : faux jeton dans le nom ou le
+chemin, alias documentaire vers réglages natifs ou état privé, lien physique vers
+cet état. La version169 les transmettait dans le prompt ;175 les refuse sans
+mutation et reprend après restauration. Un contrôle regex du seul texte ne
+contrôle ni les métadonnées encodées dans le prompt ni l'origine de l'inode.
+Réutiliser le lecteur commun pour anciens profils et prévalidation : vérifier
+nom/chemins, cible canonique, nature documentaire, espaces privés et sur Unix
+liens multiples/ouverture NOFOLLOW de chaque composant. Le profil candidat ne
+remplace jamais temporairement le fichier vivant pour être validé. Les valeurs
+sont des instantanés ; cela ne prouve ni absence de tout secret, ni confinement,
+ni identité. La recette permanente `project-profile-configuration-rust` et les
+cas `rust_project_profile_read.py` restent les gardes des futurs callers.
+Voir [les preuves et limites](../plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).
+
+### Ajout à une cible existante : portée du témoin et de la confirmation
+
+Le lot préparation vers travail existant (27octobre2026) conserve les tâches et
+verrous étrangers dans le témoin de transaction. Compter tous les verrous comme
+s'ils appartenaient au nouveau plan empêchait l'assemblage ; compter seulement
+les nouveaux sans comparer les anciens manquerait leurs altérations tardives.
+Conserver les deux ensembles et vérifier leurs octets/états à la fin. La revue
+UX doit afficher exactement le sous-ensemble que libérera l'autorisation.
+Les preuves de parcours restent distinctes d'une attestation d'identité.
+
+Les recettes héritées doivent vérifier les verbes CLI disponibles, pas un
+préfixe d'aide devenu obsolète après ajout d'autres commandes. Après chaque
+réouverture asynchrone de revue, attendre dialog[open] avant l'action suivante ;
+une attente correcte à la première ouverture ne couvre pas la reprise après
+refus. Préserver les échecs d'assertions obsolètes et réutiliser les steps verts
+seulement pour leurs dépendances inchangées. Voir le suivi
+[du lot](../plans/migration-rust/PREPARATION-EXISTING-WORK-20261027.md).
+
+### PAEA51 : frontière Linux explicitement isolée
+
+Le nouveau crate `swarm-linux-identity-channel` contient une FFI Linux déclarée dans son seul module kernel ; les crates existants gardent forbid(unsafe_code). Les affirmations historiques sans unsafe ne couvrent pas cette nouvelle frontière. Revue de propriété/ABI/erreurs et tests dédiés, sans en déduire une sûreté automatique, une migration globale ou une activation publique. Voir le [contrat courant](AGENT-IDENTITY-CONTRACT.md#frontière-du-canal-personnel--paea51-bibliothèque-sans-listener).
+
+### Révision : reçu cohérent et reprise sur la bonne version
+
+Le lot184 a reproduit un faux succès : après un vrai commit, un JSON200 avec
+id/révision corrects mais digest de conversion faux était accepté. L’interface
+lie maintenant le reçu à la cible, aux IDs, au hash et au marqueur de l’action ;
+une incohérence garde l’événement pour rejeu exact. Une erreur WorkCAS connue
+invalide au contraire la revue : fermer/rouvrir pour une nouvelle intention,
+sans répéter automatiquement une ancienne révision. Les tests distinguent
+JSON syntaxiquement invalide et reçu valide de mauvaise signification.
+
+Comparer le plan initial au nouveau ne révèle pas les éditions manuelles du
+travail ; afficher aussi le contrat actuel. Les métadonnées de récupération
+restent des observations, pas une authentification ni un appel accordé.
+La pause cockpit et l’autorisation du plan sont distinctes, vérifiées par le
+lecteur public après révision/libération. Le banc Go lit un commit retenu et
+compare les DTO réellement reçus ; sa portée n’est pas la parité du store entier.
+Voir [preuves et limites](../plans/migration-rust/PREPARATION-REVISION-20261027.md).
+
+### Sources de profil et inventaire mémoire — pilote201
+
+Le refus global du guide décrit aux jalons précédents est remplacé par le garde
+`project_memory_source::check`, appelé par le lecteur sur le document réellement
+ouvert. L’inventaire partagé `memory_files::managed_paths` garde toutes les
+versions locales du projet, même retirées ; le filtre pur refuse les références
+gérées de l’index. Un guide ordinaire reste utilisable. Le Root lecteur distinct
+conserve puis compare les identités du répertoire et de la connexion SQL ; il
+n’emprunte pas le writer appelant. Les erreurs/fermetures empêchent la publication,
+les contrôles de chemins/secrets/plafonds restent appliqués. Aucun droit mémoire
+ni sélection de version n’est créé, aucune restauration de processus Go établie.
+
+Recette4steps PASS/intégrité VERIFIED :824comparaisons Go/Rust,16CLI/HTTP,52profil,
+35API+48navigateur. Profil natif201 et ressources vivantes vérifiés séparément ;
+aucune acceptation globale/indépendante. Voir le plan PROJECT-MEMORY-SOURCE-20261027
+et REPLAYS pour le seeder de fixture natif, ses limites et les originaux d’échec.
+
+### Échanges Go actifs : récupération explicite (pilote216, 27 octobre)
+
+Le lecteur Rust observe l’historique actif sans heuristique temporelle ni adoption
+du worker. Le stop public partage la transaction Root liée : CAS pending avant
+claim, stopping si superviseur d’origine vivant, interrupted après mort locale
+confirmée ; métadonnées inconnues refusent le règlement terminal. Le JSON privé
+historique est conservé, `_native:null` refuse toute rétrogradation vers legacy.
+Le ledger existant règle uniquement reserved ; estimated est conservé. L’interface
+expose un arrêt manuel même sans autoriser les appels. Aucun signal hérité,
+relancement ou confinement distant établi. Le diagramme, preuves et état courant
+sont dans [le plan](../plans/migration-rust/PREPARATION-LEGACY-ACTIVE-20261027.md).
+
+### Découverte web et réservation Admin — pilote local218
+
+Le conducteur utilise `RootStore::mission_discovery_observation` : document de
+réglages publié atomiquement, historique validé, puis une transaction SQL de
+lecture pour les révisions/consentements/contrôles/lifecycle. Le Root physique est
+vérifié avant/après avec des descripteurs retenus. Il ne réserve pas le verrou
+Admin pour cette observation. Fichier et SQL ne constituent pas une transaction
+commune ; cette vue n’est ni une permission future ni un bail. Les sessions
+réadmettent avec les gardes actuels. Erreurs d’intégrité, de chemin et de fermeture
+restent des refus ; erreurs de session restent traitées selon le contrat existant.
+
+```mermaid
+flowchart LR
+  A[Publication Admin atomique] --> O[Observation réglages validée]
+  D[Snapshot SQL des contrôles] --> O
+  O --> C[Découverte conducteur sans réservation Admin]
+  C --> G[Admission fraîche : Root, droits, bail, budget]
+  G --> S[Session détenue]
+```
+
+État/preuves : [plan dédié](../plans/migration-rust/WEB-DISCOVERY-OBSERVATION-20261027.md).
+
+Un consommateur Linux produit qui emploie un type d’enrôlement déclare sa dépendance dans les dépendances Linux normales ; sa présence en dev-dependencies ne qualifie pas le binaire livré. Le contrôle utilise le profil normal, sans features de fixture.
+
+### Réutilisation locale et preuves de cache
+
+Le lanceur vérifie désormais la qualification conservée avant de réutiliser un candidat inchangé. `_read_prepared` partage les critères de la sélection explicite : profil normal, image, inventaire, archive et métadonnées. Un fichier manquant déclenche une construction fraîche ; une preuve incohérente reste un refus. Ce contrôle ne donne aucun droit de publication et ne rétablit pas une ancienne preuve disparue. Les recettes `local-build-cache-proof.json` et `trust-enrollment-availability-rust.json` conservent les refus/reprises. Les preuves de l’incident Biba du28octobre et la nouvelle construction sont retenues hors cache dans le suivi de cet incrément.

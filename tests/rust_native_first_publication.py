@@ -11,11 +11,14 @@ import rust_native_managed_reviewer as native
 from rust_native_task_validation import invoke
 
 
-def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending_dependent=False):
+def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending_dependent=False,cumulative_fixture=False):
     """Retain each public attempt and require atomic state, originals and no debit.
 
     pending_dependent preplans a third worker with an explicit saved fixture
     budget for a later copy journey; this helper never launches it.
+    cumulative_fixture declares disjoint initial worker outputs and positive
+    controls at birth, enabling a later whole-cohort candidate without rewriting
+    any original result, review or accepted validation policy.
     A genuine passed witness precedes injected faults; faults are restored before
     publication. Replay/collisions and current accepted proof are separate checks.
     Original attempts/failures remain retained and no model is rerun on reuse.
@@ -23,7 +26,7 @@ def run(binary, profile, out, reuse=None, probe=None, rollback_sdk=None, pending
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     fixture=native.inspection.native.fixture
     if reuse is None:
-        native.run(binary,profile,out/'native','pass',pending_dependent=pending_dependent);reuse=out/'native'
+        native.run(binary,profile,out/'native','pass',pending_dependent=pending_dependent,cumulative_fixture=cumulative_fixture);reuse=out/'native'
     source=json.loads((reuse/'result.json').read_text())
     assert source['status']=='PASS' and source['case']=='pass' and not source['accepted'] and not source['paid_provider']
     root=Path(source['root']);work=source['work'];environment=dict(os.environ,CODEX_HOME=str(root/'codex-home'))

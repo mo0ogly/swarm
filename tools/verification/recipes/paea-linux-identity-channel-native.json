@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-identity-channel-native",
+  "inputs": [
+    "tests/paea_identity_channel_native_test.py",
+    "tools/verification/recipes/paea-linux-identity-channel-native.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "visible-witness-then-invisible-message-subject",
+      "command": [
+        "python3",
+        "tests/paea_identity_channel_native_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS connected-visible-subject",
+        "PASS invisible-message-pid-zero",
+        "IDENTITY_CHANNEL_NATIVE_PASS cases=2"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

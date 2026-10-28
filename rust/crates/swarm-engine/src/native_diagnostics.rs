@@ -68,9 +68,26 @@ pub fn native_error_links<'a>(e: &'a (dyn Error + 'static)) -> NativeErrorLinks<
     };
     let mut explicit = false;
     #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::GitPackSyncError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());if let Some(cause)=std::error::Error::source(error){result.children.push(("source",cause));}explicit=true;
+    }
+
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::GitPackError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());result.labels.push(if error.may_have_written{"git-pack-writes-possible"}else{"git-pack-not-started"}.into());
+        result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
+    }
+
+    #[cfg(target_os="linux")]
     if let Some(error)=native_ref::<crate::GitReferenceError>(e,&mut result,&mut explicit){
         result.labels.push(error.code().into());result.labels.push(error.observation.code().into());
         result.children.extend(error.branches().into_iter().map(|cause|("source",cause)));explicit=true;
+    }
+    #[cfg(target_os="linux")]
+    if let Some(error)=native_ref::<crate::PaeaGitRepositoryError>(e,&mut result,&mut explicit){
+        result.labels.push(error.code().into());
+        result.labels.push(if error.known_binding().is_some(){"paea-git-binding-known"}else{"paea-git-binding-not-observed"}.into());
+        result.children.push(("primary",&error.cause));explicit=true;
     }
     #[cfg(target_os="linux")]
     if let Some(error)=native_ref::<crate::PaeaGitIntentError>(e,&mut result,&mut explicit){

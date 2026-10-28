@@ -85,6 +85,10 @@ mod paea_git_intent;
 #[cfg(target_os = "linux")]
 mod managed_git_current;
 #[cfg(target_os = "linux")]
+mod paea_git_repository;
+#[cfg(target_os = "linux")]
+pub use paea_git_repository::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat};
+#[cfg(target_os = "linux")]
 pub use managed_git_current::CurrentManagedGitPublication;
 #[cfg(target_os = "linux")]
 pub use paea_git_intent::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};

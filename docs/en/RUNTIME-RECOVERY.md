@@ -619,8 +619,81 @@ unreleased SQL locks. The cockpit link appears after confirmation. A lost reply
 requires replaying the same event, never a second event. Refusals retain all
 data. The public preparation-launch-locked code now identifies this start refusal.
 
-Existing-work conversion, organization setup, revisions and release-plan remain
-explicitly unavailable here. A click grants neither start authorization nor
+Existing-work conversion, organization setup and revisions remain
+explicitly unavailable in this creation flow. A click grants neither start authorization nor
 verified human identity. Historical conversions remain observations. The
 preparation-conversion-rust recipe also covers Admin changes and failures injected
 before/after receipt insertion.
+
+## Authorize converted tasks — Rust
+
+After creation, open **Authorize mission starts**, examine current work and expand
+task contracts, then confirm. `prepare release-plan ID --root ROOT --input FILE
+--json` requires `conversion.plan_hash`, the displayed preparation/Work revisions
+and a unique event. It atomically releases conversion locks covering the entire
+Work. New drafts are not applied; public task edits are retained and must be
+reviewed. Revision conflicts require reopening the review. Lost responses require
+replaying the same event. The receipt attests recorded authorization, not launch:
+an already configured conductor may subsequently act under its permissions and
+budgets. release-plan calls no provider and resets no autonomy, consumption or
+local mission. The `preparation-release-rust` recipe verifies an isolated Root.
+
+## Configure a human-review CLI team — Rust
+
+After task creation, **Configure the team** opens a review bound to both revisions.
+Enter project provider catalogue IDs (available through `providers config show`),
+a contained directory, a level and explicit task/call limits. **Save the team
+without starting** records configuration and its receipt; tasks remain held.
+`release-plan` is separate. This operation executes no provider.
+
+CLI: `prepare configure-team ID --root ROOT --input FILE --json`. The v1 intent
+contains action=configure-team, preparation_id, event_id, expected_revision,
+expected_work_revision, converted plan sha256 and organization. Organization
+fields are provider, worker_provider, level, workspace, validation=human, max_tasks
+and max_calls; optional model_policy_hash binds the planner policy. API providers,
+automatic controls and managed repositories are outside this first configuration.
+Existing teams/releases/agents or edited tasks require explicit reconciliation;
+history is never implicitly adopted or silently repaired. Current Admin limits
+and defaults remain required and are not replaced by this operation.
+
+Decision/activation/reviewer limits use max_calls; reviewer context uses Admin
+defaults, initially zero consumption on the pristine work. Monetary budgets are
+retained and separate. A local actor is not a named person accepting results.
+After response loss, retain the same event; replay precedes provider reads. Invalid
+provider/workspace selections return HTTP400; stale model policy returns409.
+IO/SQL/close errors remain server errors with causes. Recipe: preparation-team-rust.
+
+## Preparation USD envelope
+
+`prepare budget ID --input FILE` and the native preparation modal save an explicit
+`budget` in the shared preparation command (version1, event_id, expected_revision).
+Fields: limit_usd, reserve_per_launch_usd, estimate_source, reference_date.
+Zero limit means unlimited; a positive limit requires a positive reserve, nonblank
+source and a valid YYYY-MM-DD date. Engine actor/time replace submitted metadata.
+This CAS/receipt operation preserves documents, verdicts, Work budgets and all
+reservations/history. A lost response must replay the exact event; stale CAS needs
+a fresh read. Invalid envelopes return preparation-budget-invalid (HTTP400).
+`prepare budget ID` without input and GET `/api/v1/preparations/budget?id=ID`
+read the same SQL snapshot of reservations, committed estimates, turn coverage and
+reported costs/tokens. Unknown cost stays null; explicit zero stays zero. A linked
+Work exposes its own shared view. Warning uses the saved Admin percentage (null
+disables), without an80% fallback. Reads refuse malformed consumed fields, row
+mismatches, negative/overflowing active commitments or usage, preserving SQL state.
+The modal shows these observations; preparation AI calls remain unsupported.
+
+The preparation Admin link opens `/native-runtime.html?view=admin` and preserves language/theme; the cockpit scope-limit form is a separate surface. The budget client validates consumed fields and refuses malformed200 responses before opening the modal. Browser counters must fit exact JavaScript integer representation; CLI retains signed64-bit counters. This representation limit is not an execution policy.
+
+### Local delivery while shared sources change
+
+A refused profile stays refused. To deliver an earlier already qualified and tested build without recompiling shared files under active editing, explicitly use `./swarm.sh restart --prepared-build SHA256 --no-open` with the reviewed latest qualified record hash. Before stopping the owned instance, the launcher checks the image, fixture-free profile, every archive member and protected version/notes on an isolated server. A newer active version, unknown/altered proof or different hash refuses. The source binary path and data are preserved; later source edits are not claimed installed. Ordinary restart keeps its normal build. On refusal, retain the evidence and select/reverify the exact candidate; never alter its record to manufacture qualification.
+
+### Web conductor and Admin contention
+
+`web-conductor-after-http` can follow an already recorded configuration. Preserve
+the reported revision/event and read back before another change; it does not mean
+rollback. The discovery candidate in [the plan](../plans/migration-rust/WEB-DISCOVERY-OBSERVATION-20261027.md)
+removes the Admin reservation only from conductor observations. Admission, writes
+and other reserved readers retain their saved policy/checks. This does not promise
+success for every concurrent write or automatic recovery from integrity/session
+failures. A present lock file is distinct from a held lock; no lock deletion is
+needed for this correction.

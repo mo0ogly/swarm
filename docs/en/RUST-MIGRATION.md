@@ -8970,7 +8970,7 @@ policy without a local50-row cutoff. Recipe: preparation-ui-rust.
 
 `prepare create-missions` and the shared HTTP writer materialize standalone
 preparations only. Current saved policies and source/verdict freshness precede
-materialization; existing Work, organization and release/revision are refused.
+materialization; existing Work, organization and revision remain refused by creation. Explicit release is described below.
 
 ```mermaid
 sequenceDiagram
@@ -8992,3 +8992,238 @@ proves the fixture contract, not authenticity of a modified datastore. Event
 replay never rematerializes Work. `preparation-launch-locked` retains the typed
 public refusal instead of the former generic format code. See the bilingual
 runtime guide and permanent `preparation-conversion-rust` recipe.
+
+
+### Explicit release of converted tasks
+
+After creation, “Authorize mission start” opens a read-only review of current
+work: title, revision and expandable current task contracts. Public task edits
+are retained, as in Go. The plan hash selects the converted snapshot and task
+IDs; it does not prove unchanged instructions. Release never applies the current
+draft, even when it has evolved since conversion.
+
+`prepare release-plan ID --root ROOT --input FILE --json` and the shared HTTP
+writer require `version:1`, `action:"release-plan"`, `preparation_id`, `event_id`,
+`expected_revision`, a positive `expected_work_revision` and the converted
+`conversion.plan_hash` as `sha256`. This first route covers a Work entirely made
+up of the converted tasks. Partial coverage, added tasks or foreign locks refuse
+without partial publication. The persisted Admin write policy remains required;
+there is no new cap, fallback, budget or implicit permission.
+
+```mermaid
+sequenceDiagram
+    participant U as User / CLI
+    participant R as Protected review
+    participant W as Shared writer
+    participant D as SQLite transaction
+    U->>R: release-review?id=preparation (read)
+    R-->>U: current preparation and Work, separate revisions
+    Note over R,U: Sequential reads, not an atomic snapshot
+    U->>W: release-plan, both revisions, converted hash, event
+    W->>D: receipt replay or dual CAS and lock release
+    W->>D: Work, event, preparation, receipt, final readback
+    W-->>U: recorded authorization or explicit outcome
+    Note over W,D: No provider call; existing conductor may be unblocked
+```
+
+Documents and verdict are retained. Autonomy, budgets and histories are unchanged.
+A configured conductor may become eligible to start; release proves neither
+execution, named-human identity nor accepted results. A revision refusal requires
+a fresh review. After response loss or uncertain commit, replay the exact same
+event, never a new intent to escape uncertainty. A receipt is not current
+execution state. Permanent recipe: `preparation-release-rust`; actual profile,
+version and delivery evidence belong in the plan and cannot be inferred from
+compilation.
+
+
+### Initial team for a converted preparation
+
+`prepare configure-team ID --root ROOT --input FILE --json` and the shared HTTP
+writer explicitly configure a pristine, unreleased conversion without agents or
+existing team. The intent binds preparation/Work revisions, converted plan hash
+and `organization`: provider, worker_provider, level, workspace, validation=human,
+positive max_tasks and max_calls. CLI providers must exist; API connections,
+managed repositories and automatic controls are outside this first route.
+The form requires provider IDs, workspace and budgets without hidden numeric
+defaults. The directory must remain inside the project.
+
+The engine rebuilds tasks from the snapshot and current Admin manual gate
+defaults; drift/history refuses implicit adoption. It maps criteria to req-N
+requirements, assigns the root scope and records human validation, worker profile
+and planner/reviewer source digests. Reviewer context/source defaults come from
+Admin. max_calls explicitly sets decision/activation/reviewer limits; max_tasks
+must cover existing tasks. No historical counter is reset: this route requires
+pristine tasks and no agents.
+
+```mermaid
+sequenceDiagram
+    participant U as UI / CLI
+    participant W as Shared writer
+    participant S as CLI sources and settings
+    participant D as Immediate transaction
+    U->>W: configure-team, both revisions, plan, explicit choices
+    W->>D: replay or check tasks/locks/history
+    W->>S: observe provider, model, reviewer defaults, workspace
+    W->>D: organized Work, event, preparation and receipt
+    W->>D: final readback, joint commit or rollback
+    W-->>U: team recorded, tasks still held
+    Note over W,D: No provider execution; release-plan stays separate
+```
+
+Source observations are neither a lease until launch nor verified provider
+identity. A click/local actor establishes no named-human acceptance. Actual
+admission rechecks permissions, sources and budgets. Lost receipts require the
+same event; replay precedes configuration IO. Recipe: `preparation-team-rust`.
+
+## Preparation USD envelope
+
+`prepare budget ID --input FILE` and the native preparation modal save an explicit
+`budget` in the shared preparation command (version1, event_id, expected_revision).
+Fields: limit_usd, reserve_per_launch_usd, estimate_source, reference_date.
+Zero limit means unlimited; a positive limit requires a positive reserve, nonblank
+source and a valid YYYY-MM-DD date. Engine actor/time replace submitted metadata.
+This CAS/receipt operation preserves documents, verdicts, Work budgets and all
+reservations/history. A lost response must replay the exact event; stale CAS needs
+a fresh read. Invalid envelopes return preparation-budget-invalid (HTTP400).
+`prepare budget ID` without input and GET `/api/v1/preparations/budget?id=ID`
+read the same SQL snapshot of reservations, committed estimates, turn coverage and
+reported costs/tokens. Unknown cost stays null; explicit zero stays zero. A linked
+Work exposes its own shared view. Warning uses the saved Admin percentage (null
+disables), without an80% fallback. Reads refuse malformed consumed fields, row
+mismatches, negative/overflowing active commitments or usage, preserving SQL state.
+The modal shows these observations; preparation AI calls remain unsupported.
+
+Native build Git metadata guards compare HEAD and dirty state, the facts injected into the binary. Full before/after status channels remain evidence; their stability is reported independently. A new unrelated documentation/test path cannot change those metadata facts. Effective source/configuration/profile checks, runtime metadata binding and final launcher identity checks remain required.
+
+The preparation Admin link opens `/native-runtime.html?view=admin` and preserves language/theme; the cockpit scope-limit form is a separate surface. The budget client validates consumed fields and refuses malformed200 responses before opening the modal. Browser counters must fit exact JavaScript integer representation; CLI retains signed64-bit counters. This representation limit is not an execution policy.
+
+### Preserved configuration state in ordinary CLI failures
+
+CLI JSON reports expose `configuration_may_be_recorded:true` whenever typed error traversal retains a known or visible/uncertain publication, including outside web sessions: provider configuration, policies, connections and settings. Close/output wrappers must preserve this fact. The field does not turn failure into success or claim a no-op is a new mutation; reread before recovery. Its absence never proves rollback. Original causes and failure code remain present. The targeted regression covers output wrappers, Root Published and cleanup; the connection recipe also checks actual saving followed by closed stdout.
+
+### Learning — preparation turn COMMIT failure
+
+The `swarm-engine` reproducer
+`tests/preparation_calls.rs::commit_failure_rolls_back_for_same_root_reuse`
+injects a deferred constraint after a valid control. On27October2026 COMMIT
+failed while leaving the transaction open: the same Root kept its write lock,
+and recovery failed with DatabaseBusy. The native preparation wrapper now attempts
+ROLLBACK when SQLite is not in autocommit, retaining primary and cleanup failures
+and allowing reuse of the same Root. Failure in autocommit remains an unknown
+publication outcome. New writers must test this branch, final-write triggers
+and same-handle recovery, not just reopening. See the AI-call migration record
+for retained evidence and limits.
+
+### Project instructions: metadata and file origin
+
+Profile increment175 retains five counterexamples: fake key in name/path,
+document alias to native settings/private state, and hardlink to that state.
+Version169 put them in the prompt;175 refuses without mutation and recovers after
+restoration. Regex on source text alone checks neither prompt metadata nor inode
+origin. Reuse the common reader for existing profiles and candidate validation:
+check names/paths, canonical target, document kind/private namespaces, and on Unix
+multiple links and a NOFOLLOW walk of each component. Never temporarily replace
+the live profile merely to validate a candidate. These are snapshots, not proof
+of every secret's absence, confinement or identity. The maintained
+`project-profile-configuration-rust` recipe and `rust_project_profile_read.py`
+cases guard future callers. See [evidence and limits](../plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).
+
+### G9 execution-limit administration delivered178
+
+Admin modal, shared CLI/API Root, explicit CAS repair, optional freshness token, current/history/effective and append-only rollback delivered. Public9/actual Go6 retained on177 after bounded source-impact review; corrected browser4 on178, installation13 and Version14 pass. Original focus recipe failure retained, not relabeled. Static GLM review and actual codec10/Root2 evidence in docs/plans/migration-rust/evidence/20261027-run-limits-admin-ohyyq12v/RESULT-RETEX.md; contract in docs/en/NATIVE-RUN-LIMITS-ADMIN.md. No global API acceptance; next browser-request/graph policies under inspection.
+
+### Appending to an existing target: witness and confirmation scope
+
+The existing-work preparation increment (27October2026) retains foreign tasks
+and locks in the transaction witness. Treating every lock as part of the new
+plan prevented assembly; checking only new locks without comparing old ones
+would miss late corruption. Preserve both sets and verify their bytes/state
+at the end. The UX review must display exactly the subset the authorization
+will release. Journey evidence remains distinct from identity attestation.
+
+Inherited recipes should check available CLI verbs, not a help prefix made
+obsolete by additional commands. After every asynchronous review reopening,
+wait for dialog[open] before the next action; a correct first-open wait does
+not cover recovery after refusal. Preserve obsolete-assertion failures and reuse
+passing steps only for unchanged dependencies. See the
+[increment record](../plans/migration-rust/PREPARATION-EXISTING-WORK-20261027.md).
+
+### PAEA51: explicitly isolated Linux boundary
+
+New `swarm-linux-identity-channel` contains declared Linux FFI only in its kernel module; existing crates keep forbid(unsafe_code). Historical unsafe-free claims do not cover this new boundary. Dedicated ownership/ABI/error review and tests do not imply automatic safety, global migration qualification or public activation. See the [current contract](AGENT-IDENTITY-CONTRACT.md#personal-channel-boundary--paea51-library-without-a-listener).
+
+### Revision: coherent receipts and recovery on the right version
+
+Increment184 reproduced false success: after an actual commit, a200 JSON with
+correct ID/revision but wrong conversion digest was accepted. The interface now
+binds acknowledgement to target, IDs, hash and action marker; incoherence keeps
+the event for exact replay. A known WorkCAS error instead invalidates the review:
+close/reopen it for a new intention, without automatically repeating a stale
+revision. Tests distinguish invalid JSON syntax from a valid but wrong receipt.
+
+Comparing the original and new plans misses manual work edits; also display the
+current contract. Recovery metadata remains observations, not authentication or
+an extra call grant. Cockpit pause and plan authorization are distinct, checked
+through the public reader after revision/release. The Go oracle reads a retained
+commit and compares actually received DTOs; it does not prove whole-store parity.
+See [evidence and limits](../plans/migration-rust/PREPARATION-REVISION-20261027.md).
+
+
+### G1 activity — local delivery200
+
+Protected paginated activity, explicit cockpit reads and persisted Admin/API/CLI policy verified with actual Go differential and polymorphic review results. Recipe3 steps PASS/integrity VERIFIED: public8/window3/browser4; installed23+Version14, five unchanged Works. Before198 counterexample and real-history500 preserved;200 projects eight consumed display strings rather than applying a command DTO to every producer. Current contract: [Native activity](NATIVE-ACTIVITY.md). Global qualification remains blocked by foreign changes and retained issues. User authorizes autonomous continuation through remaining Go APIs and final RETEX; next /logs and configurable legacy read sizes.
+
+### Profile sources and memory inventory — pilot201
+
+The blanket guide refusal described in earlier milestones is replaced by
+`project_memory_source::check` on the actual opened instruction. Shared
+`memory_files::managed_paths` retains all local project versions including
+withdrawn history; the pure index matcher rejects managed references. Ordinary
+guides remain available. A separate read-only Root retains and compares directory
+and connected-SQL identities without borrowing the caller’s writer. Read/close
+errors prevent publication; existing path, secret and saved-cap checks remain.
+No memory permission/version selection or Go process recovery is established.
+
+Four-step recipe PASS/integrity VERIFIED:824Go/Rust comparisons,16CLI/HTTP,
+52profile,35API+48browser assertions. The normal201 profile and installed resources
+were checked separately, without global or independent acceptance. See
+PROJECT-MEMORY-SOURCE-20261027 and REPLAYS for native fixture seeding, limits and
+original failures.
+
+### Active Go exchanges: explicit recovery (pilot216, October27)
+
+Rust observes active history without time-based heuristics or worker adoption.
+The public stop uses the bound Root transaction: pending CAS before claim,
+stopping for a live original supervisor, interrupted after confirmed local death;
+unknown registration refuses terminal settlement. Historical private JSON survives;
+`_native:null` cannot downgrade to legacy. Only reserved settles; estimated stays
+committed. Manual stop is available without granting model calls. No inherited
+signal, restart or remote confinement is established. Diagram, evidence and current
+state: [plan](../plans/migration-rust/PREPARATION-LEGACY-ACTIVE-20261027.md).
+
+### Web discovery and the Admin reservation — local pilot218
+
+The conductor uses `RootStore::mission_discovery_observation`: an atomically
+published validated settings document and one SQL read transaction for Work
+revisions/consent/controls/lifecycle. Held physical Root descriptors and before/
+after path checks reject replacement. No Admin reservation is taken for this
+observation. File and SQL are not one common transaction; this view is neither
+future permission nor a lease. Sessions keep their fresh admission checks.
+Integrity/path/close errors still refuse; session failures retain existing handling.
+
+```mermaid
+flowchart LR
+  A[Atomic Admin publication] --> O[Validated settings observation]
+  D[SQL controls snapshot] --> O
+  O --> C[Discovery without Admin reservation]
+  C --> G[Fresh Root, rights, lease and budget admission]
+  G --> S[Owned session]
+```
+
+State/evidence: [plan](../plans/migration-rust/WEB-DISCOVERY-OBSERVATION-20261027.md).
+
+A production Linux consumer of an enrollment type declares its dependency in normal Linux dependencies; a dev-dependencies entry does not qualify the delivered binary. Verification uses the normal profile without fixture features.
+
+### Local reuse and cache proof
+
+The launcher now validates retained qualification before reusing an unchanged candidate. `_read_prepared` shares explicit-selection checks for normal profile, image, inventory, archive and metadata. Missing files trigger a fresh build; incoherent proof still refuses. This grants no publication right and cannot recreate vanished historical evidence. The `local-build-cache-proof.json` and `trust-enrollment-availability-rust.json` recipes retain refusal/recovery coverage. The28October Biba incident and fresh build evidence are retained outside the cache in the increment record.

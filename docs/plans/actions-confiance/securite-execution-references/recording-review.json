@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-23T14:09:28.791577+00:00",
+  "result": "PASS for documentary recording only",
+  "base_commit": "553593a2ffa3823d16784a6fedc291eebf390837",
+  "branch": "codex/clear-product-method-names",
+  "checks": {
+    "manifest_hashes_verified": 15,
+    "visual_references": 4,
+    "visual_variants": 8,
+    "local_links_verified": 37,
+    "yaml_controls": 35,
+    "yaml_outcomes": 6,
+    "yaml_boundaries": 4,
+    "yaml_levels": 3,
+    "yaml_duplicate_keys": "none",
+    "requirements_both_languages": 16,
+    "lots_per_language": 8,
+    "lot_state": "not started",
+    "owned_whitespace_and_git_visibility": "PASS"
+  },
+  "review": {
+    "policy": "Documentation/reference bytes only. No operator default, runtime policy, authority or autonomous execution added. A0-A7 explicitly not started. External catalogue/profile proposals are not adopted runtime schemas.",
+    "functions": "No product function created or changed; no function/API/Rustdoc build applies.",
+    "errors": "No runtime error path changed. Plans retain denial, missing evidence, stale revision, recovery and source-loading errors as future acceptance criteria.",
+    "documentation": "FR/EN plans and architecture links plus bilingual after-cutover tracking; runtime version/evolution notes not written for saving future work.",
+    "build": "No build, runtime, provider, test suite or application restart invoked. No software delivery claimed.",
+    "independence": "Same-session documentary review; no independent acceptance or confinement evidence."
+  },
+  "recording_recovery": [
+    {
+      "observation": "GitHub raw click was rejected by the fetch tool.",
+      "action": "Read the canonical raw.githubusercontent.com endpoint; later matched retained article/license bytes to the pinned commit.",
+      "state": "reference acquired; no repeated identical fetch"
+    },
+    {
+      "observation": "Two proposed patches failed context verification before any file was changed.",
+      "cause": "Unused French context, then an assumed English heading.",
+      "action": "Read actual heading; apply language-specific patches against observed context. Both language supplements verified.",
+      "state": "resolved for documentary save"
+    },
+    {
+      "observation": "An initial check compared version_history.json with a stale checkpoint hash and failed.",
+      "cause": "Version notes changed outside this save, with Rust qualification entries observed; writer not attributed.",
+      "action": "Preserve the unrelated file; restrict checks to owned documentary files. No version_history write performed.",
+      "state": "excluded from this increment; no claim of global checkout stability"
+    }
+  ],
+  "limits": [
+    "No AC-02 implementation, conformance audit, sandbox qualification or runtime effect established.",
+    "Original videos are identified by URL/hash but not copied; retained stills are local.",
+    "Existing unrelated migration changes preserved; these checks concern only the listed documentary files.",
+    "Repository links help future readers; running/embedded contexts are not automatically updated."
+  ],
+  "files": [
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-apex.md",
+      "sha256": "07a3b77b0fb8b72a0e51e0074fdb82121491707fc0b4efd5dcd7d7041e6bfafb",
+      "bytes": 34663
+    },
+    {
+      "path": "docs/en/plans/actions-confiance/securite-execution-apex.md",
+      "sha256": "3e9a0634843d9454c1009d56ea4417d26f4b83971c2c59ec1b15483a32dc6f01",
+      "bytes": 30297
+    },
+    {
+      "path": "docs/plans/migration-rust/AFTER-CUTOVER.md",
+      "sha256": "f31791fc6f71b92b1fc9847dfd05dffadb9c9c90f6d1a7ca1dcb059e260acdb1",
+      "bytes": 4559
+    },
+    {
+      "path": "docs/architecture/ACTIONS-CONFIANCE.md",
+      "sha256": "a6aebb54e97a432a0dc970648402e63c00eac3b1afa736d2bd492589ab0b6570",
+      "bytes": 26840
+    },
+    {
+      "path": "docs/en/ACTIONS-CONFIANCE.md",
+      "sha256": "483960455e34bc128fb765cc60da554c368533dca16a9d3f9dd1477f3d9e3a1a",
+      "bytes": 20771
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/README.md",
+      "sha256": "8a5348dc973c2361d562462f15553452be1690a4060fcd9900278ba374c5c1ac",
+      "bytes": 6375
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/LICENSE",
+      "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+      "bytes": 18657
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/boundaries.yaml",
+      "sha256": "2550cfb29fecf178eaf5ad6ae600a085229437faa23611a1aa4c0a1f9ea5c12e",
+      "bytes": 845
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/controls.yaml",
+      "sha256": "06cd3966513c595b7cb455caebc01d9b0c5907f168b7e97ab3b98e1f5c56ae8f",
+      "bytes": 15117
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/levels.yaml",
+      "sha256": "27add603facfe7b3272a786f9634bc55c343f14d38bf406f6c98b6e61baf0dfa",
+      "bytes": 1231
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/software-factory.source.txt",
+      "sha256": "1ff29872bbb029b5b48f448e3a0e91d89be8feb82bf84a14ef6aaa61ad6a1e47",
+      "bytes": 55168
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/upstream-readme.source.txt",
+      "sha256": "fd4b7dfb8fe502ef3822f3d4928c6b381ca6ab910b420c03fb6360ec0e46dfe1",
+      "bytes": 1608
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/agentbaseline/versioning.source.txt",
+      "sha256": "14dc3ce05710b27ed830854d4f558ff7d2313401e51955e664667927855fa699",
+      "bytes": 4261
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/lineage-denied-dark.webp",
+      "sha256": "ff20e154e268386128824ed4462b58e491abc8b0783371a0f5a1aadf1904665c",
+      "bytes": 93904
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/lineage-denied-light.webp",
+      "sha256": "a3b1ce45570b4fb5fdfb490a745403105528761d972d6a30e8beab850ca68d6d",
+      "bytes": 93176
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/manifest.json",
+      "sha256": "44258f893e29675aed4198170fd299a3a20bb038c63aa4bd67ee82c9398df37a",
+      "bytes": 8604
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/sandbox-drawer-blocked-dark.webp",
+      "sha256": "af831175f03071b82d9beeafd2c9ebdf0e3edadd64acc335a26bc45a55a1d23c",
+      "bytes": 32492
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/sandbox-drawer-blocked-light.webp",
+      "sha256": "b8717e08d7ca7d64bdb65c998574f6f84581c2e9863468a10a0f567c14aae3ca",
+      "bytes": 35258
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/sandbox-policy-openshell-dark.webp",
+      "sha256": "5052e651c8e9cd9cb4671b371ae6dd6f4605c37a0dc4650ff2271cae0e147365",
+      "bytes": 140430
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/sandbox-policy-openshell-light.webp",
+      "sha256": "43e5b014294445343d28eb9f9799a2197040a4d3cff67d8a490ae7761d612bde",
+      "bytes": 138220
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/security-timeline-dark.png",
+      "sha256": "63ce7b895b32bbc7627bff62823ced1a39b66f60dd6a64660027733059b17e45",
+      "bytes": 864216
+    },
+    {
+      "path": "docs/plans/actions-confiance/securite-execution-references/security-timeline-light.png",
+      "sha256": "6d8a3522e55ff890ed5ca56c900ad48a721212b987928cffcdc16d8c7e5f2913",
+      "bytes": 808608
+    }
+  ]
+}

@@ -278,3 +278,50 @@ waiting. Historical classification grants no launch permission: managed worker
 launch and settlement still refuse. Maintained recipe: `managed-native-planning.json`,
 including two actual tasks, absent copies/agents, and unchanged Work, spending and
 provider markers. Qualification and limits: [increment1370](../plans/migration-rust/evidence/20261024-managed-status1370/PLAN.md).
+
+## Manual managed worker: first attempt
+
+Manual preparation creates a private candidate copy at
+`<storage>/copies/<task>-1/<project_subdir>`, sharing neither objects nor hardlinks.
+SQL retains the original request; preflight uses the effective workspace. Native
+attribution binds Work/task/Agent coordinates, base commit, request digests and
+workspace/`.git` identity observations. These are local same-UID facts, not
+cryptographic identity, OS confinement or backup rollback protection.
+
+Attribution precedes no-replace publication. SQL refusal retains files for recovery;
+the same event can validate and publish its original staging. Unknown targets
+remain untouched and refuse. Attribution keeps the complete prepared-request digest;
+a contract digest excludes only `expected_revision` to allow a fresh optimistic
+revision after refusal and public budget configuration. SQL guards still verify
+current revision and bind every other field. Contract digest calculation refuses
+noncanonical input; the execution path also strictly rereads original SQL bytes.
+
+Each native permission boundary rechecks original attribution, managed row, physical
+copy, standalone Git, candidate and workspace. A reaped process settles against its
+original completion/kernel facts and attribution/SQL without depending on mutable
+copy content. Cancellation before launch similarly tolerates an unavailable
+workspace. Rows are reread after final writes; primary and close errors survive.
+A known end blocks the task and settles its reservation under existing rules; it
+does not submit, integrate or accept a Git result.
+
+```mermaid
+flowchart TD
+  A[Original request and SQL revision] --> B[Attributed private candidate copy]
+  B --> C[Atomic admission: Agent, task, reservation, managed_attempts]
+  C --> D[Recheck at every permission boundary]
+  D --> E[Worker process]
+  E --> F[Original completion and kernel facts]
+  F --> G[Blocked task, settled reservation, retained copy]
+  C --> H[Queued cancellation: attribution and SQL]
+  H --> I[Blocked task, released estimate, no provider]
+  G -.-> J[Git integration and acceptance still unported]
+```
+
+Only a first manual attempt is enabled. Managed preview, automatic/FIFO launch,
+retry, immutable Git result retention and publication still refuse or remain
+unwired. Historical managed status still covers initial tasks without Agents.
+Legacy Go copies remain unqualified. Maintained recipe: `managed-manual-worker.json`,
+covering normal/subproject paths, prelaunch attribution/copy refusal and recovery,
+Git loss after launch, and cancellation with an unavailable workspace. Local
+verification grants no installation, independent approval or global acceptance:
+[evidence1390](../plans/migration-rust/evidence/20261024-managed-manual1390/PLAN.md).

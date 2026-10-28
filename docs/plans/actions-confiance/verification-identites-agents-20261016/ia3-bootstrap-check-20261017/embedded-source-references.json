@@ -1,0 +1,550 @@
+{
+  ".claude/commands/ks-architect.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-architect.md",
+    "sha256": "66589d8eff58cf04970113eae671253966e4dfe316e672d2d3592feedf375002"
+  },
+  ".claude/commands/ks-design-system.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-design-system.md",
+    "sha256": "13ba13ebd50be79359cb0abf251317ff5de04d2e1b22be044323ca30eef3b95b"
+  },
+  ".claude/commands/ks-design.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-design.md",
+    "sha256": "47ee172540d2095a45e1542bd57a22f9b857fad6859f0e64a1884fa4253e0d07"
+  },
+  ".claude/commands/ks-execute.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-execute.md",
+    "sha256": "5ac16b20e1c57a96a78fd0c4235338c180f0c8ebc1baeec8ff1626fd97af2194"
+  },
+  ".claude/commands/ks-feature.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-feature.md",
+    "sha256": "67a3f5bae56b8c4aabf06c536264fbe26aeaf3b668316e89817afdd22991f03d"
+  },
+  ".claude/commands/ks-help.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-help.md",
+    "sha256": "10d400b0edb4f20d4c32ea30d045ab4f009d9a73fa655d91d42ecf14e86d4620"
+  },
+  ".claude/commands/ks-orchestrator.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-orchestrator.md",
+    "sha256": "5693f8c694711893f765944880b10b6d34c8fcf97ebbf5e70b09b11179a7907a"
+  },
+  ".claude/commands/ks-plan.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-plan.md",
+    "sha256": "f94c0d6cf078b081b7b14d5de36c28df972991bb2da4b2efb34a9a8bbae3e0d9"
+  },
+  ".claude/commands/ks-prd.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-prd.md",
+    "sha256": "c6bb90b1b4f2fd00505f5a35f4d9179927f829efd1046650deff3bd51d321878"
+  },
+  ".claude/commands/ks-research.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-research.md",
+    "sha256": "aade0bcb1e259d8eb3f8bce0ff881e4b80c099e9f073a27966983542d9a3b62a"
+  },
+  ".claude/commands/ks-review.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-review.md",
+    "sha256": "aa0b5a2bd811bfb70e276e3f542ebada667a7ba601b93f93c349e420a9c1f18f"
+  },
+  ".claude/commands/ks-ship.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-ship.md",
+    "sha256": "b04b9f056c5f0c2e97cad8284d0ee0add33bfd6e4d4b777c5b406f62f7b87f8a"
+  },
+  ".claude/commands/ks-status.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-status.md",
+    "sha256": "bf46fe719790f64883b870ac006521959cc0a520fc3ca3491037883c1517084f"
+  },
+  ".claude/commands/ks-stories-review.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-stories-review.md",
+    "sha256": "bda2e32fb9da5f06b30f75c3e88d90d5323cc3a6fd2f706f68bde2881863b862"
+  },
+  ".claude/commands/ks-stories.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/commands/ks-stories.md",
+    "sha256": "e45295f6c143faa3fb4b042dbc7432ebe2b42b00728c8cb052adc1eae65fe5db"
+  },
+  ".claude/skills/apex/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/apex/SKILL.md",
+    "sha256": "5910f2c12111109d67824a5b44a4ad762808b935e4b22447d6177759d00a4dde"
+  },
+  ".claude/skills/audit-pdca/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/audit-pdca/SKILL.md",
+    "sha256": "156028694aff20c19836f8fd63bf38d31f310984d44cce003692112bd769acf5"
+  },
+  ".claude/skills/code-reviewer/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/code-reviewer/SKILL.md",
+    "sha256": "6e2a902c4d8668b4c12ef9760e95d3dc28ebc28ebf8715d3529d500b7bb84344"
+  },
+  ".claude/skills/debug/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/debug/SKILL.md",
+    "sha256": "300c8d642e352cf7f5737f833346d1fcbf6174734c455f46da083d63d72d2536"
+  },
+  ".claude/skills/product-delivery/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/product-delivery/SKILL.md",
+    "sha256": "864bb09eb52c8fc0d70fb68ccce94380098f9813b4be1e14d986e9cfc18fedc5"
+  },
+  ".claude/skills/product-planning/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/product-planning/SKILL.md",
+    "sha256": "90457e484c240ebe04709ebddefdd87c73a64fbdbc9c786fd18fdc9a2555eeaa"
+  },
+  ".claude/skills/product-review/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/product-review/SKILL.md",
+    "sha256": "b7d3493730eac8f3d4082b2e7e1f275e8f6ffa859b388765b6613724c24815f5"
+  },
+  ".claude/skills/replan/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/replan/SKILL.md",
+    "sha256": "49d31a2b45dc975e27dea2c037184742f59b7eebc95879cb82eae53a5e6918a2"
+  },
+  ".claude/skills/retex-analyzer/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/retex-analyzer/SKILL.md",
+    "sha256": "20073fca0e99731f31cfe9fee3ee246dfd5e5e6f4c1ab7c694acdd87b3022b16"
+  },
+  ".claude/skills/spec-audit/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/spec-audit/SKILL.md",
+    "sha256": "743f90f0981ed3e71ce988d6812fbecdf3bb602c88558091566eb00f4152d01f"
+  },
+  ".claude/skills/spec-builder/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/spec-builder/SKILL.md",
+    "sha256": "4fcd62035957ee7f40d5f4368b125962f705bb0457acad572f4fd405bd3844c7"
+  },
+  ".claude/skills/swarm-model-design/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/swarm-model-design/SKILL.md",
+    "sha256": "413b14fc49985a8e5e45bfd7ce49d81e24dc0e47be8edb2e2f155ac1315a04a5"
+  },
+  ".claude/skills/verify-fix/SKILL.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:.claude/skills/verify-fix/SKILL.md",
+    "sha256": "b9973567ae668f505d47058e04d651c61f1f1c3309d9544f6bb0a38be678ba44"
+  },
+  "config/automation.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/automation.json",
+    "sha256": "140b163f68b25d5feb2e6359033c93ba31f5b7bf24d90f14ab909ae1acc6087f"
+  },
+  "config/graph-performance.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/graph-performance.json",
+    "sha256": "ac78157efb1c71102dee3545558e96147cbc6153730ceaf4bf63a514141a1b0f"
+  },
+  "config/preparation-timeout.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/preparation-timeout.json",
+    "sha256": "1191fe682e4023d13e9109a0c6a6cd84eb7c17762567bea1dff46836a856a75a"
+  },
+  "config/provider-wait.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/provider-wait.json",
+    "sha256": "0087893b8cfae0d762d34cbcea302819072a79cc63ad815d0c0c97d9128836b1"
+  },
+  "config/storage-retry.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/storage-retry.json",
+    "sha256": "9d682788e697718df082fdf0f35730ec9b9f551e06f23699e4481de32d817deb"
+  },
+  "config/web-requests.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/web-requests.json",
+    "sha256": "e93688764193124252a11ff96f51e66fbdc4fbe98faa8eca2e0abe76df58754c"
+  },
+  "config/web-session.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:config/web-session.json",
+    "sha256": "44500431a22cfa00776eb0ed7d0e9e0d2acbc03e48a8f53e096f8dd793e81653"
+  },
+  "contracts/assistant-answer.v1.schema.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:contracts/assistant-answer.v1.schema.json",
+    "sha256": "b724b5d137c83ab95cd04df752f81dc80c7444c73b1cd93839cd18d78a4c63c6"
+  },
+  "docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.docx",
+    "sha256": "71d679ec094eacb434f2b9ed4168ea58e6607bf02aa6fa98485e9c4dc7428dae"
+  },
+  "docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf",
+    "sha256": "46215d85e09ca0e5815ccc254ead66ba76325248581d5843020a99262334b8ea"
+  },
+  "docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip",
+    "sha256": "b29008bf3b6c810ab5067b4877386cb1d33ef6949a6eb3360e78cb023fabcd67"
+  },
+  "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.docx",
+    "sha256": "cad02591de8525754842f9ad4fc24ca2a9da399800842eee700da7ed26a2c600"
+  },
+  "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf",
+    "sha256": "4b99de4d97eaa4a023d7237a74610d469fc2760b335c6d941c852806e79ff39a"
+  },
+  "docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip",
+    "sha256": "cd8f95bb91584d154e0b82d209a130f3a552bd6aeb476957e4c3bde39984497f"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/00-besoin-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/00-besoin-en.png",
+    "sha256": "c6617a6424e7c7dd86f16acf6c88413382a44a3ef15058fd4b2e94859a3a1ce2"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/00-besoin-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/00-besoin-fr.png",
+    "sha256": "a03f9f2756f1ea23e7743672cde511f47ec9115a0f35a3dd72dc9c4453a04af9"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/01-catalogue.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/01-catalogue.png",
+    "sha256": "9f12bd3a64aeff93f60b6fd89fbbd8c3ddebf708f8c68e15c5b5035457950b50"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/02-filtre.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/02-filtre.png",
+    "sha256": "65e56a16efb0aada7485a259b69b040fde0bff322ea53538c5209afbd6a3fb6c"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/03-minimum.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/03-minimum.png",
+    "sha256": "aa086130ca188f664cf2c17ab0aa882f90966bf60db73b3dc6eeb9f46ab7aa05"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/04-quantite.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/04-quantite.png",
+    "sha256": "01c3748913d85c7ba911f7447c02d0420f2cf3a38b7df72818b1b3a0880862c5"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/05-confirmee.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/05-confirmee.png",
+    "sha256": "a1ca68e98009cecac1b0e9bac119cdafed108be20069935c01f0689b170bf567"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/06-connexion.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/06-connexion.png",
+    "sha256": "a15ace60eaba995d6ef78c4acec3ec3cb8c1c8eb780196ead6a474a90992f90a"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/07-refus-acces.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/07-refus-acces.png",
+    "sha256": "a807b062779b379c44eecd78667866127e15c1ee41ba8d6e2b6e60578c947eea"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/08-commande-recue.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/08-commande-recue.png",
+    "sha256": "0234fc577cf135fd32cdcc9dc8dd466efd11d327513983b7e007d76738418826"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/09-preparation.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/09-preparation.png",
+    "sha256": "ad76f2691660e7215b9ef69f304de40bd318fcb2b20ba6bcf5d0df8a4dc7c3c7"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/10-suivi-preparation.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/10-suivi-preparation.png",
+    "sha256": "c3160bd85262ab6475cc89549e0ee8321e16a9ca4ed2bea49a7c46c8a731278d"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/11-livraison.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/11-livraison.png",
+    "sha256": "1f8bb1c5d5122a5a3ea43507ccafb7d5c051087ba2b5018fa57d2dfeb52f65e5"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/12-livree.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/12-livree.png",
+    "sha256": "212aa35392d72cf5a947dc2c5d09d62d5739eb6abd3e565de1b6b4864aaa473e"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/13-graphe-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/13-graphe-en.png",
+    "sha256": "94db04df5378bee8db76e31ca5464594e72146abc5a45de6d72fc528f018589a"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/13-graphe-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/13-graphe-fr.png",
+    "sha256": "3a25f9bc07d41a81265f89165963bc010c79eabb405b89d0360402a6763b8e2e"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/14-tache-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/14-tache-en.png",
+    "sha256": "414e318af79bf4ffcc1b62adb93d3c16c1a08c3b0827a2bc3394bb98d4f9e062"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/14-tache-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/14-tache-fr.png",
+    "sha256": "7d11a3a38186e05ded297df771094d75376260ed2b632a113784cf5a2ae0a230"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/15-humaine-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/15-humaine-en.png",
+    "sha256": "6aa24e542d5bde90a4c400f791c763f4efa6c9c66a87945efbc11bcfa135519c"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/15-humaine-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/15-humaine-fr.png",
+    "sha256": "848ce4da4ec12755243413486c8e8f823e6842c3ce4409314bda820f7694fec1"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/16-controle-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/16-controle-en.png",
+    "sha256": "fb7453abd9882aae2574278303a485e01a43940586c4715d8871a9cd34fe56ee"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/16-controle-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/16-controle-fr.png",
+    "sha256": "6b24d96efda31fcca3f394715a17c1854aea0ad164ccf1381502dc3b2d42d846"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/17-apercu-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/17-apercu-en.png",
+    "sha256": "5c330e33c46de5636fa63f10183a6ef4d7ca5a5d9d53b1058d87a97164bc1ccd"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/17-apercu-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/17-apercu-fr.png",
+    "sha256": "e43a16f07ae7407c0be24fae5cf7ee09dd864ae09ed5a517f1c64aa2ab7e8bd4"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/18-graphe-sombre.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/18-graphe-sombre.png",
+    "sha256": "c618dd45ee52a39ca18a8d0361e036ffe00799f4aa5dd8a332d5333efab7709c"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/19-commande-en.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/19-commande-en.png",
+    "sha256": "59c352f5bd1eaaa6cfc5685f740c3a74d0269a66cf8e6cf57085ff6986e153cb"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/19-commande-fr.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/19-commande-fr.png",
+    "sha256": "172c79919cab6cc98ca76cc793e53b375811ccfb6349c2fe9240ee413cf76ed4"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/overview-01.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/overview-01.png",
+    "sha256": "ff38966ae5036a710935fff988cdb7a5f5ba4508544d5eb10f9de3c09828076a"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/overview-02.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/overview-02.png",
+    "sha256": "463322185d7d99a21f08ac526e14571e55e0e58694ac10c7ca7dcbe355fac25f"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/overview-03.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/overview-03.png",
+    "sha256": "48293b6bdd30eaaaab1379428e61d16898d7aeeb75336bbe8bae6226f25d48e0"
+  },
+  "docs/training/casa-pizza/tutoriels/frames/overview-04.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/frames/overview-04.png",
+    "sha256": "ea3ca61d42242eef83d545600bcf3472b05a5d2e13c5b0f56a3470a4d32d7180"
+  },
+  "docs/training/casa-pizza/tutoriels/index.html": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/index.html",
+    "sha256": "54e8d368f8a8e8e608544ed3d7da9302621eef386ce6477bf84db19c552c194c"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-en-poster.jpg",
+    "sha256": "8a1ff80ced9c9fb1ae232d92a26526a6b529e42974aa6bcfc0294522d8d63435"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-en.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-en.gif",
+    "sha256": "c634d78c3a356d8d933306fd32e2cbd1f5dfbd9ae5a437fd635568a0cba37b0a"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4",
+    "sha256": "61ea3a0e8e2049df308886f40a51de13379a310b27538ec1afcc80498bcbbc54"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-en.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-en.txt",
+    "sha256": "c338a24b09e2e1f5b7e6ab788674e26c22261428881da11ec9b9abe1c0c08061"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-en.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-en.vtt",
+    "sha256": "cedefebcc05ce9ca555750400d8972a207e2c35736d286d6b9d8b6303b39ab3e"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-fr-poster.jpg",
+    "sha256": "681e1e81762fdbe56d3c94887c920497701534f6c9a0ac372005adb83cca46fa"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-fr.gif",
+    "sha256": "48521b15a987941e4df56ec0e2168f96224b08c7695a32868cda5baf6c74b508"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4",
+    "sha256": "f884fe92e34b578915f968f31edbe9387ca772932bd3c675bfc728c601d114e8"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-fr.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-fr.txt",
+    "sha256": "477a1ef5fc6f75f014afcb9f9fdf67b0982df17bc79dca58f8107e161a3eb9b2"
+  },
+  "docs/training/casa-pizza/tutoriels/media/01-plan-fr.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/01-plan-fr.vtt",
+    "sha256": "1ba0d1075e3c585aee6754790e2eceedd2f15cade1166a14c8c2db5deb327ba3"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-en-poster.jpg",
+    "sha256": "07943470c61821de67b82a775952a403e6b41ae584112f704cf49fad0720f8bc"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-en.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-en.gif",
+    "sha256": "38dd6cd4736454a06e0c08dc4c6bc811f42958519026cd33420bb99e47155dc0"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4",
+    "sha256": "3d918c2623e74e1c57f90c6611dda24da9d701acbaddc213be31350ef10b2b75"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-en.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-en.txt",
+    "sha256": "d555e8b09d902fe88689c1a0dc234eb42bcdc46f458efbe69db4ba32b743d216"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-en.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-en.vtt",
+    "sha256": "d04d94bf0ff9dcfdc9cc2885d34cdfb62ddddb06f4d6d25cbe907e9c89ae211a"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-fr-poster.jpg",
+    "sha256": "a2fbfd2212f0ac23ffdc8bd96ee95d9f62d843cdd2a169d651813c0f0cbc7d34"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-fr.gif",
+    "sha256": "b63185fdd6429e4a98141aa0ca029855546df0ae3867e725aec16490726559f9"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4",
+    "sha256": "72654ffbae275e5537aafcf49e078966401423fa789f43318e100b8bba4bb910"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-fr.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-fr.txt",
+    "sha256": "0da2bd22faaf185158bba0a39e407d87f19c7bcb0711f0b4b38e926aa60e9e16"
+  },
+  "docs/training/casa-pizza/tutoriels/media/02-controles-fr.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/02-controles-fr.vtt",
+    "sha256": "23ffcdfbe10b48b1d9b88a784c95ca5b54ebcd05514c0bceb7a34c8a8cb9e79d"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-en-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-en-poster.jpg",
+    "sha256": "3937c8dd7731fde56cb77a387295094d2e9f979b49d1a08e249e7e9c3a3b276d"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-en.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-en.gif",
+    "sha256": "3818f1e45328073d4192bd89d41ca2fef600bd0faa6d42092325c1b120357765"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-en.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-en.mp4",
+    "sha256": "e78c580be7f15fe2df6ae5533761ef8f8dc3e56d747d03e9e074a2102c014763"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-en.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-en.txt",
+    "sha256": "b54bf02e6520682b4f0fe8f53c41e6d4ddacb2ffb77245b3a815613d88f1971a"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-en.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-en.vtt",
+    "sha256": "0eec4bbef0bf8d5bab4576ac5a7e2a910ab8dba1b76d34cbf06583f02426733b"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-fr-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-fr-poster.jpg",
+    "sha256": "3a915efa2eb086fda599be57227b16cdaa24e15e1243869810415494f667ba69"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-fr.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-fr.gif",
+    "sha256": "58ead6f7daf1d5eaa8bbbdb0ac5b0b4e2086cb83c8c9890eed1eb261c9543730"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-fr.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-fr.mp4",
+    "sha256": "8fbc6a1c51902c57b5b30e9b551198f114fc045ed76876a17e3d28833eaaad40"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-fr.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-fr.txt",
+    "sha256": "9d7638b744d63c25f420ba1c7bf7afd6c3362b9ba1eb6ce00470002510d3fd75"
+  },
+  "docs/training/casa-pizza/tutoriels/media/03-client-fr.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/03-client-fr.vtt",
+    "sha256": "77bb8f0c0269e91c0808178f5771cca463886822648d1fd9a6a6f281b6707428"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-en-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-en-poster.jpg",
+    "sha256": "1bffe9829d542c795c91f0eda49aedaa02ea503ac7adb6fad0bf6d62c2bb8bd2"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-en.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-en.gif",
+    "sha256": "32b554c57da16fcc864b9944822094e7f8f1bb83ff1e56b414626347cc9af57c"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-en.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-en.mp4",
+    "sha256": "65aa898c262999671287ca47298403e6691e439fd9dc9627a490147966750024"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-en.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-en.txt",
+    "sha256": "fb925ffe30527c4022d542f6fa81f7a2bfbf397be9cfa2cc6315960dfd5c3d79"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-en.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-en.vtt",
+    "sha256": "de352f96df4d7300e65a376ac906203c7d756df550bdce840ba73d6676039953"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr-poster.jpg": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-fr-poster.jpg",
+    "sha256": "60e12d11c1fab36c4819790520bdd90ef474aabbfba4785e23c0c6a33d840e19"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.gif": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.gif",
+    "sha256": "61e39dff269f865f4bc9dc215d2faea52451c7a48e086bbe3db7a97903663cf9"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.mp4",
+    "sha256": "4dfea5ea34cca2b9e87fdfd42ae29a6053900e1db99391eee1ffb7cc558be283"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.txt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.txt",
+    "sha256": "6aeafc8cf91e0e0f31585ad5458d57f47a508c16574ab51bc7bb095717071af1"
+  },
+  "docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.vtt",
+    "sha256": "969f6770c971001c6be2aa8964602d91e47ffffa6662c44983b384ea901246b1"
+  },
+  "docs/training/casa-pizza/tutoriels/media/graph-overview-fr-poster.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/graph-overview-fr-poster.png",
+    "sha256": "bc66367e82f683d50ad32cd151704d1fe7553a0172ad2c5abee76a778afc70db"
+  },
+  "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/graph-overview-fr.mp4",
+    "sha256": "5aef9a0dc13d4aa03c762f4dbf412d17eea85a046d06438ca81c69652a641ecc"
+  },
+  "docs/training/casa-pizza/tutoriels/media/graph-overview-fr.vtt": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/media/graph-overview-fr.vtt",
+    "sha256": "0b8743655c4c43174a0281bccd62828c054b20970dd2f7a0f5d8f0de248e638d"
+  },
+  "docs/training/casa-pizza/tutoriels/player.css": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/player.css",
+    "sha256": "b8ea17e26d43766f3f623cb9f9e8543c1205697ea59f0a5fa7200bdbe80fdfad"
+  },
+  "docs/training/casa-pizza/tutoriels/player.js": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/player.js",
+    "sha256": "e998022f1fe534621cf1c3d84830fd4b8dc09c9cda03db18127eea61ce183666"
+  },
+  "docs/training/casa-pizza/tutoriels/swarm-logo.png": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:docs/training/casa-pizza/tutoriels/swarm-logo.png",
+    "sha256": "d8ad9094dd879b42f213cea10c471696af378679c0634a044b7fe312de7ae9bb"
+  },
+  "locales/en.json": {
+    "snapshot": "extra-embedded-sources/locales/en.json",
+    "sha256": "77c3b4a4e3d6580fd00ff23289cc920b015be4ca2f7731772ac88d6fbc5b3740"
+  },
+  "tools/agent-workflows/CONTRACT.md": {
+    "snapshot": "extra-embedded-sources/tools/agent-workflows/CONTRACT.md",
+    "sha256": "9b69265d137320521c754a52e53063759cfa2b31374461269966491635b36bcf"
+  },
+  "tools/agent-workflows/templates/HANDOFF.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/HANDOFF.md",
+    "sha256": "c84b441c4713cf90b7a09b100d58b01ec53fe4f09eb3378b7ca480051c1d3a65"
+  },
+  "tools/agent-workflows/templates/TRACKING.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/TRACKING.md",
+    "sha256": "16eb84f3960b2eb468ac79bb16fa8e42609aef32d1183f8b14e33693afd09a43"
+  },
+  "tools/agent-workflows/templates/ks/adr.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/adr.md",
+    "sha256": "19032d95e2e3c7bffe8972e4c45c64282080ec5022a5e46744ddaa1d56b9c317"
+  },
+  "tools/agent-workflows/templates/ks/architecture.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/architecture.md",
+    "sha256": "6e61ebea01ea2bc74b65f355d05f9149e3ed05ae1242fe55052ecabbdf8b0182"
+  },
+  "tools/agent-workflows/templates/ks/design-brief.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/design-brief.md",
+    "sha256": "08481cbc7808f19bf11ea033bcccdad34ebefb3e939d6813d96d448d582fbca7"
+  },
+  "tools/agent-workflows/templates/ks/design-screen.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/design-screen.md",
+    "sha256": "d698a90b30dc288c12c9817e1d9d544fbff393d236799369977966f8bac0dcd0"
+  },
+  "tools/agent-workflows/templates/ks/design-system.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/design-system.md",
+    "sha256": "6be4a4b443579d8d522893a5d0af3155a64aa72a16880ee416eea48d4e4d3178"
+  },
+  "tools/agent-workflows/templates/ks/plan.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/plan.md",
+    "sha256": "3cbe7bfd559c98a7a4e47c7f8c4bd5677c41b3a9dc122cf6681fb17d38455e7f"
+  },
+  "tools/agent-workflows/templates/ks/prd.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/prd.md",
+    "sha256": "d4a2a375bf958cddc8d241508f2f859fec52798ced608d2b710e81e728a07372"
+  },
+  "tools/agent-workflows/templates/ks/research.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/research.md",
+    "sha256": "8664d57b8bc38618efd0e70f842e19ad1527ff378efb66feb68668af7ce09048"
+  },
+  "tools/agent-workflows/templates/ks/review-checklist.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/review-checklist.md",
+    "sha256": "576b278bb2e645b117bca04eb8f790e59efbdcc8d54a45dd5430866a365e0975"
+  },
+  "tools/agent-workflows/templates/ks/stories-review-checklist.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/stories-review-checklist.md",
+    "sha256": "e2e9a0adabebb6cd486a8603498544282fce5f103dafdb44149917026665db58"
+  },
+  "tools/agent-workflows/templates/ks/stories.md": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/ks/stories.md",
+    "sha256": "48b12f2e705b2ed7d879e097f2e68e7993679674cfd1d114067980612fb97668"
+  },
+  "tools/agent-workflows/templates/preparations.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:tools/agent-workflows/templates/preparations.json",
+    "sha256": "f6f539567f02773240598a6a1df4e98c13e72081471e2b44c480a86fff97a601"
+  },
+  "version_history.json": {
+    "git": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6:version_history.json",
+    "sha256": "678b4e1599e009205311b82199aeaee625e7aa4b6c4755c12b56907db91fb502"
+  }
+}

@@ -1,0 +1,40 @@
+flowchart TB
+    accTitle: Swarm: deterministic Rust engine, memory and identity
+    accDescr: The deterministic Rust engine swarm-engine is Swarm’s core. A scoped native worker flow connects proposal, launch and observations. Versioned memory is a historical Go foundation; its Rust integration and public authority remain dashed.
+    subgraph NATIVE["NATIVE RUST CORE"]
+        PLAN["Human and supervisor<br/>Objective · proposal · criteria"]
+        ENGINE["DETERMINISTIC RUST ENGINE<br/>swarm-engine · RootStore<br/>State · transitions · permissions · evidence"]
+        AGENT["Worker attempt<br/>Scoped native flow"]
+        FACTS["Activity · report · incident<br/>Facts and uncertainty retained"]
+        PLAN -->|Proposal to check| ENGINE
+        ENGINE -->|Authorized start| AGENT
+        AGENT --> FACTS
+        FACTS -->|Observation and recovery| ENGINE
+    end
+    subgraph MEMORY["GO MEMORY"]
+        RETEX["Verified lessons learned<br/>Sources and conditions"]
+        LESSON[("Experiences and procedures<br/>Versions and explicit selection")]
+        HISTORY["History retained<br/>Withdrawal and received contexts"]
+        RETEX -->|Explicit Go admission| LESSON
+        LESSON --> HISTORY
+    end
+    subgraph IDENTITY["IDENTITY PENDING"]
+        KERNEL["Internal kernel verified locally<br/>Actor · instance · plan · delegation"]
+        TARGET["Protected integration pending<br/>Owner · author · usage rights"]
+        KERNEL -.-> TARGET
+    end
+    ENGINE -.->|Rust admission and selection pending| LESSON
+    LESSON -.->|Rust memory context integration pending| AGENT
+    KERNEL -.->|Public authority integration pending| ENGINE
+    TARGET -.->|Memory usage rights integration pending| LESSON
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef engine fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef memory fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef target fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:1.6px,stroke-dasharray:6 4;
+    class PLAN,AGENT,FACTS,RETEX,HISTORY,KERNEL ordinary;
+    class ENGINE engine;
+    class LESSON memory;
+    class TARGET target;
+    style NATIVE fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style MEMORY fill:#f5f3ec,stroke:#926300,color:#062b49
+    style IDENTITY fill:#f5f3ec,stroke:#926300,color:#062b49,stroke-dasharray:6 4

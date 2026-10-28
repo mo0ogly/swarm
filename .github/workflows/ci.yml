@@ -22,6 +22,10 @@ jobs:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Select Python build runtime
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
       - name: Check owned namespace fixture prerequisite
         run: /usr/bin/unshare --user --map-root-user --mount --pid --fork /bin/true # v4
       - run: rustup toolchain install 1.96.0 --profile minimal && rustup default 1.96.0

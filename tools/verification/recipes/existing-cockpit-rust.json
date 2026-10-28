@@ -75,7 +75,14 @@
     "web/providers.css",
     "web/runtime-health.js",
     "web/swarm-design.css",
-    "web/swarm-shell.js"
+    "web/swarm-shell.js",
+    "tests/rust_status_completion.py",
+    "rust/crates/swarm-engine/src/root_store/mission_status_reports.rs",
+    "rust/crates/swarm-engine/src/mission_status_tasks.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_review.rs",
+    "rust/crates/swarm-engine/src/root_store/mission_status_historical.rs",
+    "tests/rust_status_incomplete.py",
+    "tests/rust_status_incomplete_ui.cjs"
   ],
   "environment": {},
   "steps": [

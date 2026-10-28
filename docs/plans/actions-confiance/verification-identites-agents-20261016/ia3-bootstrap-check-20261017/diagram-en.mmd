@@ -1,0 +1,8 @@
+flowchart TD
+  P["Independent approved digest"] --> C["Precheck before project open"]
+  F["Private V1 manifest and existing directories"] --> C
+  C --> V["Exact format, digest, UID and protected paths"]
+  V --> O["Storage observation at this instant"]
+  V --> R["Explicit refusal without result or mutation"]
+  O --> N["Human, confinement and active service remain unverified"]
+  N -. "future integration after evidence" .-> S["Separate service and independent business control"]

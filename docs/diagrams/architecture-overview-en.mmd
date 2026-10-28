@@ -1,0 +1,82 @@
+flowchart TB
+    accTitle: Swarm internal architecture: engine, responsibilities and evidence
+    accDescr: The deterministic Rust engine connects contracts, identity, policy, reservations, context, checks, review and policy-required human validation. Rust qualification is tracked separately.
+    subgraph G0["INPUTS"]
+        A_INPUT["Human · CLI · API · cockpit"]
+        A_PLAN["Adopted need · requirements<br/>Plan · tasks · dependencies"]
+    end
+    subgraph G1["SUPERVISION"]
+        A_ROOT["Root supervisor<br/>Overall objective · arbitration"]
+        A_SCOPE["Scope supervisors<br/>Assigned scope ownership"]
+        A_CYCLE["Global cycle judge<br/>continue · renew · evidence-bound end"]
+    end
+    subgraph G2["RUST CORE"]
+        A_ENGINE["DETERMINISTIC RUST ENGINE<br/>swarm-engine · RootStore<br/>Contracts · transitions · attribution"]
+        A_ID["Identity · authority · delegation<br/>See view I"]
+        A_POLICY["Persisted policies<br/>Admin · preview · shared validation"]
+        A_SCHEDULE["Eligibility · reservations<br/>Leases · budgets · workspaces"]
+        A_CONTEXT["Context composition<br/>Methods · memory · contract · SHA"]
+    end
+    subgraph G3["PRODUCTION"]
+        A_WORK["Conductor and process supervisor<br/>Attempt · process · provider"]
+        A_DELIVERY["Worker handoff<br/>Git candidate · report · originals"]
+    end
+    subgraph G4["EVIDENCE"]
+        A_GATE["Authorized checks<br/>Commands · inputs · outputs · receipts"]
+        A_REVIEW["Independent AI review<br/>Same candidate · received sources"]
+        A_ACCEPT["Freshness · criteria · validation<br/>Checked acceptance transition"]
+        A_HUMAN["Human validation · human mode<br/>Examine result and evidence<br/>Pending decision blocks downstream work"]
+    end
+    subgraph G5["PERSISTENCE"]
+        A_STATE["Durable project state<br/>Work · tasks · decisions · events"]
+        A_MEMORY["Swarm memory and context<br/>Lessons · dialogue · instructions · view M"]
+        A_LOG["Logs · telemetry · call ledger<br/>Observation and attribution · view L"]
+    end
+    subgraph G6["FUTURE"]
+        A_AC02["AC-02 · future, not started<br/>Confinement · network · secrets"]
+    end
+    A_INPUT --> A_PLAN
+    A_PLAN --> A_ROOT
+    A_ROOT --> A_SCOPE
+    A_ROOT -->|Proposed decisions| A_ENGINE
+    A_ID -->|Authority contract| A_ENGINE
+    A_POLICY --> A_ENGINE
+    A_ENGINE --> A_SCHEDULE
+    A_SCHEDULE --> A_CONTEXT
+    A_MEMORY -->|Sources and usage to check| A_CONTEXT
+    A_CONTEXT --> A_WORK
+    A_WORK --> A_DELIVERY
+    A_DELIVERY --> A_GATE
+    A_GATE --> A_REVIEW
+    A_REVIEW -->|Automatic mode| A_ACCEPT
+    A_ACCEPT --> A_STATE
+    A_ENGINE --> A_STATE
+    A_WORK --> A_LOG
+    A_STATE --> A_LOG
+    A_LOG -->|Attributed facts| A_ENGINE
+    A_REVIEW -->|Defect or missing evidence| A_SCOPE
+    A_ACCEPT -->|Lessons and separate admission| A_MEMORY
+    A_AC02 -.->|Access boundary to implement| A_WORK
+    A_ENGINE <-->|Events / decisions| A_SCOPE
+    A_ENGINE <-->|Cycle state / verdict| A_CYCLE
+    A_REVIEW -->|Human mode| A_HUMAN
+    A_HUMAN -->|Required human decision| A_ACCEPT
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class A_INPUT,A_PLAN,A_WORK,A_DELIVERY,A_REVIEW,A_HUMAN ordinary;
+    class A_ENGINE core;
+    class A_ID,A_POLICY,A_SCHEDULE,A_CONTEXT,A_GATE,A_ACCEPT control;
+    class A_ROOT,A_SCOPE,A_CYCLE supervisor;
+    class A_STATE,A_MEMORY,A_LOG data;
+    class A_AC02 pending;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G4 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G5 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G6 fill:#f5f3ec,stroke:#205e70,color:#062b49

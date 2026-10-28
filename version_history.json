@@ -11,6 +11,14 @@
         "en": "Rust migration integrated into main: Go engine removed, FR/EN installation updated and CI context checks run in Rust. Go evidence is historical."
       },
       {
+        "fr": "PAEA : les erreurs de synchronisation de pack distinguent stdout et stderr tout en conservant la cause et le processus primaire ; reprise vérifiée. Service protégé encore à raccorder.",
+        "en": "PAEA: pack sync errors distinguish stdout and stderr while preserving the cause and primary process; recovery verified. Protected-service integration remains open."
+      },
+      {
+        "fr": "PAEA : primitive native de flux pack Git vers fichiers, sans changement de référence ; aliasage et écrasement refusés, erreurs partielles conservées. Raccordement au service protégé encore ouvert.",
+        "en": "PAEA: native Git pack streaming to files without reference changes; aliasing/overwrite refused and partial errors retained. Protected-service integration remains open."
+      },
+      {
         "fr": "Livraison locale : un candidat inchangé vérifie aussi ses preuves conservées ; preuves absentes entraînent une reconstruction, preuves incohérentes refusent avant arrêt du serveur.",
         "en": "Local delivery: an unchanged candidate also checks retained qualification; missing proof triggers rebuilding, incoherent proof refuses before stopping the server."
       },
@@ -1249,6 +1257,14 @@
       {
         "fr": "PAEA : le lecteur de publication vérifie les originaux de toutes les publications historiques, même lors du rejeu de la plus récente. Le dernier candidat cumulatif est observable sans autorisation implicite ; certificats altérés refusés et restauration vérifiée sur fixture native inerte. Service Git protégé encore à raccorder.",
         "en": "PAEA: the publication reader verifies originals of every historical publication, including replay of the latest one. The latest cumulative candidate can be observed without implied authority; altered certificates refuse and recovery is checked on an inert native fixture. Protected Git service remains unwired."
+      },
+      {
+        "fr": "PAEA : association privée persistée d’un dépôt Git avec identifiant issu des descripteurs réels, déclaration immuable et contrôle du candidat natif courant. Cinq tests vérifient reprise, mauvais contexte, substitution, symlink et corruption. Aucun service de promotion protégé ou engagement Git activé.",
+        "en": "PAEA: persistent private Git repository binding with an ID derived from actual descriptors, immutable declaration and current native candidate inspection. Five tests verify reopen, wrong context, substitution, symlink and corruption. No protected promotion service or Git commitment is activated."
+      },
+      {
+        "fr": "PAEA : inspection du candidat natif réutilisable sous le vrai writer SQLite, sans transaction imbriquée ; contrôle du format Git privé avant transfert/intention. Trois tests unitaires et six tests d’intégration vérifient verrous, reprise, dépôt et incompatibilité SHA1/SHA256. Aucune autorité ou promotion Git protégée activée.",
+        "en": "PAEA: native candidate inspection reusable under the actual SQLite writer without nested transactions; private Git format checked before transfer/intent. Three unit and six integration tests verify locks, recovery, repository and SHA1/SHA256 mismatch. No authority or protected Git promotion activated."
       }
     ]
   },

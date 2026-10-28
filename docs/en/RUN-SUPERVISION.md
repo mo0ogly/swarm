@@ -230,3 +230,55 @@ a private backup without rewriting work, events or consumption. Stop older proce
 before migration and never test against a live mission database. Isolated regression
 uses a provider double, a real subprocess and the owner's public decision; it does
 not establish autonomous real-model judgment or restore the host's CIFS shares.
+
+## Rust: original result versus future-call envelope
+
+Public `planning run` / `planning reconcile` distinguish a new call from returning
+a waited original. Start and live process observation retain current reserve
+tariff/limit checks. A known successful original preserves its finite, nonnegative
+estimated/unobserved SQL reservation; a new tariff neither rewrites it nor forces
+another start to record the result. Missing, foreign work/scope, invalid type or
+incompatible reservation state refuse, never imply zero cost by default.
+
+```mermaid
+flowchart LR
+  A[Actually waited original] --> B[Verified receipt, ledger and OS owner]
+  B --> C[Valid preserved historical reservation]
+  C --> D[Current lease, sources and actions]
+  D --> E[Decision recorded once]
+  P[Current budget] --> N[New start: current tariff and limit]
+```
+
+`RunFence` selects `verified_result` only for a verified original receipt. All
+other verification is shared with live preview: active mission, holder/generation/
+revision/deadline, complete context/workflow/reports and scope contract. A reserve
+does not authorize a paused/stale/forbidden decision. No exec, refund or task
+acceptance is granted. The authoritative SQL row proves no independently signed
+historical price or provider invoice; usage declarations, authenticated agent
+identity and OS confinement remain separate evidence. Settled rows are still
+unsupported by this conservative guard.
+
+161 qualification: normal04 e7c023,255effective sources without fixture features,
+not installed. Strengthened recipe06 passed control, budget change and pause refusal, retaining
+all three actual private frames/observations before PASS. Previews07, native
+recipe08, five financial guards10 and Clippy/Rustdoc09 passed. The common body
+excluding its funding predicate is identical (11). See the Rust plan and `planning-result-budget` recipe for final
+evidence/limits, without implying global acceptance or verified human identity.
+
+### Safe recorded-transaction causes
+
+The common native diagnostic exposes static codes for `RecordedChangeError`,
+`RecordedCommandError`, `RecordedWorkError`, `RecordedEventError` and `WorkError`.
+An event collision remains refused; the CLI preserves its boundary code and adds
+`event_conflict` to its causes. Independent `primary` and `cleanup` finalization/
+recovery branches are traversed even when their SQL codes match; absent branches
+are never invented. Numeric SQLite/OS codes remain, without serializing Display,
+SQL, paths or private payloads.
+
+This projection grants no retry right and proves neither rollback nor repair.
+Transactions and counters remain authoritative. Unknown types continue through
+`source()`; the known-type list proves no universal coverage. The nine
+`native_diagnostics::tests::` cases cover conflicts, double failures, private data
+and previously supported context errors. Recipe `native-recorded-diagnostics.json`
+also verifies an actual refusal without mutation followed by a normal reviewer
+lifecycle. Frozen compiler-graph qualification and user installation are distinct.

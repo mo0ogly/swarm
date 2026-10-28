@@ -1,0 +1,780 @@
+--- a/README.md
++++ b/README.md
+@@ -217,6 +217,12 @@
+ 
+ ## Sécurité et évolutions prévues
+ 
++Le [positionnement et les références de sécurité](docs/SECURITY-POSITIONING.md)
++relient orchestration, autorité, action exacte et reprise. Ils distinguent le
++rôle d’ISO, OWASP, NIST et SPIFFE, les acquis locaux Biba Rust et les protections
++encore à qualifier. Le profil d’assurance proposé PA-01–08 prolonge la matrice
++existante sans revendiquer de certification ou de conformité globale.
++
+ Le [plan AC-02](docs/plans/actions-confiance/securite-execution-apex.md) conserve
+ les contrats de confinement Linux, de médiation réseau et secrets, de traçabilité,
+ de reprise et de menus de sécurité. Ses **quatre références visuelles** sont
+@@ -317,6 +323,7 @@
+ | Prise en main | [Guide utilisateur](GUIDE-UTILISATEUR.md), [installation](INSTALL.md), [formation](docs/training/casa-pizza/README.md) |
+ | Maturité native | [Contrat Rust](docs/architecture/RUST-MIGRATION.md), [plan](docs/plans/migration-rust/PLAN.md), [preuves/rejeux](docs/plans/migration-rust/REPLAYS.md) |
+ | Architecture et conduite | [Deux UX](docs/PRODUCT-ARCHITECTURE.md), [supervision](docs/architecture/RUN-SUPERVISION.md), [communication](docs/AGENT-COMMUNICATION.md) |
++| Sécurité et standards | [Positionnement et profil proposé](docs/SECURITY-POSITIONING.md), [contrôles et limites](docs/actions-confiance-referentiels.md), [Biba Rust](docs/actions-confiance-rust.md) |
+ | Contexte et autorité | [Mémoire](docs/PROJECT-MEMORY.md), [identité](docs/architecture/AGENT-IDENTITY-CONTRACT.md), [actions de confiance](docs/architecture/ACTIONS-CONFIANCE.md) |
+ | Préparation et méthodes | [Catalogue](docs/PREPARATION-TEMPLATES.md), [parcours produit](docs/PRODUCT-WORKFLOW.md), [méthodes](docs/AGENT-METHODS.md), [profil et skills](docs/PROJECT-PROFILE.md) |
+ | Contrôle et reprise | [Budgets](docs/BUDGETS.md), [contrôles métier](docs/ENGINE-BUSINESS-CONTROLS.md), [contrats bloqués](docs/CONTRACT-REVISION.md), [reprise de tentative](docs/ATTEMPT-RECOVERY.md), [stockage](docs/RUNTIME-RECOVERY.md) |
+--- a/README.en.md
++++ b/README.en.md
+@@ -210,6 +210,12 @@
+ 
+ ## Security and planned evolution
+ 
++The [security positioning and references](docs/en/SECURITY-POSITIONING.md) link
++orchestration, authority, exact actions and recovery. They distinguish the roles
++of ISO, OWASP, NIST and SPIFFE, local Rust Biba results and protections still to
++qualify. The proposed PA-01–08 assurance profile extends the existing matrix
++without claiming certification or global compliance.
++
+ The [AC-02 plan](docs/en/plans/actions-confiance/securite-execution-apex.md) retains
+ contracts for Linux confinement, network and secret mediation, lineage, recovery
+ and security menus. Its **four visual references** are the policy editor, blocked
+@@ -307,6 +313,7 @@
+ | Getting started | [User guide](docs/en/USER-GUIDE.md), [installation](docs/en/INSTALL.md), [training](docs/training/casa-pizza/README.md) |
+ | Native maturity | [Rust contract](docs/en/RUST-MIGRATION.md), [plan, FR](docs/plans/migration-rust/PLAN.md), [evidence/replays](docs/en/RUST-MIGRATION-REPLAYS.md) |
+ | Architecture and supervision | [Two UX applications, FR](docs/PRODUCT-ARCHITECTURE.md), [supervision](docs/en/RUN-SUPERVISION.md), [communication](docs/en/AGENT-COMMUNICATION.md) |
++| Security and standards | [Positioning and proposed profile](docs/en/SECURITY-POSITIONING.md), [controls and limits](docs/en/actions-confiance-referentiels.md), [Rust Biba](docs/en/actions-confiance-rust.md) |
+ | Context and authority | [Memory](docs/en/PROJECT-MEMORY.md), [identity](docs/en/AGENT-IDENTITY-CONTRACT.md), [trusted actions](docs/en/ACTIONS-CONFIANCE.md) |
+ | Preparation and methods | [Catalogue](docs/en/PREPARATION-TEMPLATES.md), [product workflow](docs/en/PRODUCT-WORKFLOW.md), [methods](docs/en/AGENT-METHODS.md), [profile and skills](docs/en/PROJECT-PROFILE.md) |
+ | Control and recovery | [Budgets](docs/en/BUDGETS.md), [business controls](docs/en/ENGINE-BUSINESS-CONTROLS.md), [blocked contracts](docs/en/CONTRACT-REVISION.md), [attempt recovery](docs/en/ATTEMPT-RECOVERY.md), [storage](docs/en/RUNTIME-RECOVERY.md) |
+--- a/docs/actions-confiance-referentiels.md
++++ b/docs/actions-confiance-referentiels.md
+@@ -16,6 +16,15 @@
+ `docs/architecture/actions-confiance-controls-reference.json` ; sa copie originale
+ est conservée dans le dossier de vérification R19. Aucun catalogue distant n'est
+ chargé à l'exécution du produit ou du validateur.
++
++## Positionnement et suite proposée
++
++Le [positionnement de sécurité de Swarm](SECURITY-POSITIONING.md) précise le rôle
++des références ISO, OWASP, NIST, SPIFFE et Biba. Son profil PA-01–08 est une
++proposition documentaire pour prolonger cette matrice avec des exigences,
++critères observables, propriétaires et preuves. Il ne modifie ni les statuts R19,
++ni les preuves historiques, ni la baseline non sélectionnée ; aucune compatibilité
++ACS, conformité globale ou protection AC-02 n’en est déduite.
+ 
+ ## Lire et vérifier
+ 
+--- a/docs/en/actions-confiance-referentiels.md
++++ b/docs/en/actions-confiance-referentiels.md
+@@ -14,6 +14,15 @@
+ `docs/architecture/actions-confiance-controls-reference.json`, with its original
+ copy retained in the R19 verification area. No remote catalog is loaded by the
+ product or validator at runtime.
++
++## Positioning and proposed follow-up
++
++The [Swarm security positioning](SECURITY-POSITIONING.md) explains the roles of
++ISO, OWASP, NIST, SPIFFE and Biba references. Its PA-01–08 profile is a documentary
++proposal to extend this matrix with requirements, observable criteria, owners
++and evidence. It changes neither R19 statuses nor historical proofs or the
++unselected baseline; no ACS compatibility, global compliance or AC-02
++protection follows from it.
+ 
+ ## Read and verify
+ 
+--- /dev/null
++++ b/docs/SECURITY-POSITIONING.md
+@@ -0,0 +1,139 @@
++# Positionnement de Swarm et références de sécurité
++
++25 octobre 2026 — [English](en/SECURITY-POSITIONING.md).
++
++## Positionnement produit
++
++**Swarm est un moteur d’orchestration multi-agents à contrôle déterministe. Il
++vise à relier chaque action à une identité, une autorité, un contenu approuvé et
++un résultat vérifiable, avec des mécanismes de supervision et de reprise. Ses
++garanties sont établies par parcours, sur une version et une configuration
++identifiées.**
++
++Le moteur commun organise objectifs, plans, tâches, dépendances, responsabilités,
++contrôles et preuves. Les deux usages visés sont les projets de développement et
++les processus métier ; leur séparation et leur maturité restent décrites dans
++l’[architecture produit](PRODUCT-ARCHITECTURE.md). Le raisonnement des agents
++propose des opérations ; le moteur vérifie les conditions des transitions qu’il
++contrôle. Cette fonction ne démontre pas à elle seule le confinement des outils,
++des processus ou des accès directs aux systèmes externes.
++
++La propriété à rechercher est la continuité entre autorité, décision, engagement
++et reprise : une autorisation doit rester liée à l’action exacte et à l’état
++courant jusqu’au point où son effet peut être engagé. Rust et le déterminisme
++facilitent certaines propriétés d’implémentation ; ils ne prouvent ni la justesse
++des politiques, ni l’absence de défaut, ni la sécurité du déploiement complet.
++
++## Rôle des références existantes
++
++Les références ci-dessous n’ont pas toutes la même nature. Leur citation ne
++démontre aucune conformité de Swarm. Cette cartographie est un positionnement
++documentaire, sans sélection d’une baseline ni évaluation normative exhaustive.
++
++| Référence | Nature et apport | Usage envisagé ou documenté dans Swarm |
++| --- | --- | --- |
++| [ISO/IEC 27001:2022](https://www.iso.org/standard/27001) et [42001:2023](https://www.iso.org/standard/42001) | Exigences de systèmes de management de la sécurité de l’information et de l’IA | Organiser responsabilités, risques, incidents et changements dans l’organisation exploitante ; aucune certification de Swarm revendiquée |
++| [ISO/IEC 23894:2023](https://www.iso.org/standard/77304.html) | Recommandations de gestion des risques IA | Analyser les risques selon l’usage, les données et les conséquences ; aucune évaluation clause par clause réalisée ici |
++| [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) | Catalogue de risques agentiques | Sélectionner les menaces et les scénarios adversariaux ; un catalogue de risques ne constitue pas un protocole complet de qualification |
++| [OWASP Agent Control Standard](https://genai.owasp.org/resource/agent-control-standard-acs/) et [dépôt ACS](https://github.com/GenAI-Security-Project/agent-control-standard) | Spécification de points d’interception et de contrôle à l’exécution | Étudier les correspondances de contrats, puis tester tout sous-ensemble de compatibilité ; aucune compatibilité ACS démontrée par cette page |
++| [NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final) | Architecture Zero Trust | Examiner la séparation entre décision de politique et application aux ressources ; aucune conformité globale déduite |
++| [SPIFFE](https://spiffe.io/docs/latest/spiffe/concepts/) et son implémentation [SPIRE](https://spiffe.io/docs/latest/spire-about/spire-concepts/) | Identités vérifiables de workloads | Référence possible pour l’identité des processus ; aucune intégration SPIFFE/SPIRE annoncée. Authentifier un workload ne définit pas ses droits métier |
++| OIDC et OAuth | Protocoles et mécanismes d’authentification et d’autorisation | Le [contrat cible](architecture/ACTIONS-CONFIANCE.md#identité-mandats-et-approbations) décrit les choix historiques ; le noyau Rust actuel utilise des identités locales. Aucune fédération réelle requalifiée par cette page |
++| [OWASP ASVS 5.0.0](https://asvs.owasp.org/) | Exigences de vérification des applications et services web | Référence proposée pour vérifier API, sessions, permissions et configuration ; aucun niveau ASVS évalué ici |
++| [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) | Catalogue de contrôles de sécurité et de confidentialité | Douze contrôles sélectionnés sont déjà reliés à des preuves contextuelles dans la [matrice R19](actions-confiance-referentiels.md), sans score ni conformité globale |
++| Biba | Modèle de contrôle des flux d’intégrité | Moniteur I0–I3 dans le [noyau Rust des actions de confiance](actions-confiance-rust.md) ; ni preuve de vérité des contenus, ni protection sémantique générale contre l’injection, ni contrôle d’accès Linux |
++
++La page OWASP d’ACS porte la date du 1er septembre 2026. Le README du dépôt
++consulté décrit déjà une couche déterministe avec un recours optionnel à un
++LLM. Swarm doit donc préciser son apport par ses contrats et ses preuves plutôt
++que revendiquer l’invention de cette séparation. Une future comparaison devra
++figer la révision ACS évaluée, les exigences applicables et les essais exécutés.
++
++Le NIST a annoncé son [AI Agent Standards Initiative le 17 février 2026](https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure).
++Son [point du 29 septembre sur l’identité et l’autorisation](https://www.nist.gov/news-events/news/2026/09/comments-software-and-agentic-ai-identity-concept-paper)
++présente des retours et un premier cas d’implémentation DevSecOps ; cela ne
++constitue pas une norme finale de certification agentique. Le Top 10 « 2026 »
++est, lui, daté du 9 décembre 2025 sur la page OWASP : millésime et publication
++sont distincts.
++
++## Frontières de confiance à démontrer
++
++| Fonction | Responsabilité | Preuve attendue |
++| --- | --- | --- |
++| Gardien des règles | Vérifier identité, mandat, politique courante, contenu exact et validations requises | Une décision positive n’est consommable que pour l’opération et l’état autorisés ; une analyse IA ne crée pas de droit |
++| Gardien des clés | Conserver les secrets et délivrer les capacités limitées au consommateur autorisé | L’agent ne peut ni lire les secrets critiques ni obtenir une capacité plus large par une autre voie |
++| Garde-barrières | Appliquer le contrôle au niveau des connecteurs, processus, fichiers et accès réseau concernés | Les chemins directs, descendants et accès alternatifs inventoriés ne permettent pas de contourner le refus |
++
++Ce sont des fonctions d’architecture. Trois modules ayant les mêmes privilèges
++et pouvant modifier mutuellement leurs politiques ou leurs clés ne démontrent
++pas trois frontières indépendantes. Un journal ou une observation eBPF après
++l’effet ne remplace pas une barrière préventive. La démonstration doit déclarer
++son modèle de menace, notamment les limites face au même UID ou à un hôte
++privilégié compromis.
++
++## État documenté au 25 octobre 2026
++
++| Périmètre | État consigné | Limite de la revendication |
++| --- | --- | --- |
++| Actions de confiance Biba Rust | Le [plan BIBA-RUST](plans/migration-rust/PLAN.md#livré-localement--biba-rust-g7-r09t2-25-octobre-paris) consigne la livraison locale du moniteur, des mandats, accords exacts, effets simulés et reprises, avec CLI/API/page et Admin FR/EN | Périmètre `trust-actions` ; aucun paiement, droit externe ou confinement OS réel. Les preuves consignées ne sont pas rejouées par cette analyse documentaire |
++| Identité et autorité des agents | [Contrats et composants internes](architecture/AGENT-IDENTITY-CONTRACT.md), avec limites de raccord explicites | Ne prouve pas l’authentification et l’autorisation de tous les lancements, usages mémoire et outils |
++| Mémoire | [Versions, sources et conditions d’usage](PROJECT-MEMORY.md) ; [reprise Rust FPA02A](plans/migration-rust/FPA02A-MEMOIRE-20261025.md) de références mémoire historiques | Le lot de références ne clôt pas la mémoire permanente versionnée ni tous les droits de lire, résumer et transmettre. Un retrait ne supprime pas les contextes déjà reçus |
++| Confinement général et médiation des secrets | [AC-02 enregistré, non démarré](plans/actions-confiance/securite-execution-apex.md) | La référence OpenShell ou une politique YAML ne prouve aucune protection AC-02 active ; compatibilité et application restent à démontrer |
++| Correspondance de contrôles | [R19 contextualisée](actions-confiance-referentiels.md) : neuf partiels, deux non évalués, un hors périmètre | Sous-ensemble illustratif, sans baseline sélectionnée, certification, conformité globale ni évaluation indépendante |
++
++## Proposition de profil d’assurance de l’exécution agentique
++
++Ce profil est une **proposition documentaire**, pas un nouveau standard adopté,
++une politique active, une qualification réalisée ou une autorisation de démarrer
++AC-02. Il prolonge la matrice existante au lieu de la remplacer. Les identifiants
++PA ci-dessous servent au suivi ; les correspondances externes restent à évaluer.
++
++| Exigence proposée | Critère observable de qualification | Point de départ et propriétaire de la suite |
++| --- | --- | --- |
++| PA-01 Identité et délégation | Chaque action remonte à un principal et un mandat courants ; une délégation ne dépasse pas les droits délégables du parent | Contrat d’identité ; responsable du raccord identité puis intégrateur du déploiement |
++| PA-02 Intégrité et admission | Des données externes ou un champ client ne créent pas de droits ; toute admission crée un objet attribué lié à l’original | Noyau Biba pour son périmètre ; responsable Trust et futurs consommateurs |
++| PA-03 Mémoire gouvernée | Sources, versions et droits d’usage sont conservés ; un retrait bloque les nouveaux usages visés sans réécrire l’historique reçu | Contrats mémoire ; responsable G8 et intégrateur identité/mémoire |
++| PA-04 Contrôle au point d’engagement | Une modification du contenu approuvé ou une révocation antérieure au point de sérialisation empêche l’effet ; une panne du contrôle refuse l’action sensible | Actions simulées et contrats d’effet ; propriétaire du service d’effet et de sa politique |
++| PA-05 Capacités et voies d’accès | L’agent ne récupère pas de secret critique et ne contourne pas le refus par outil, fichier, descendant ou réseau | AC-02 ; responsable du confinement et opérateur de l’environnement, après ses préconditions de démarrage |
++| PA-06 Effets et reprise | Une réponse perdue conserve une issue connue ou inconnue ; réconciliation et idempotence empêchent un second effet pour la même intention | Deux connecteurs simulés ; propriétaire de chaque connecteur réel avant son automatisation |
++| PA-07 Validation humaine | Quand la politique l’exige, un avis IA ne remplace pas la décision humaine authentifiée liée à l’opération exacte ; séparation des rôles vérifiée lorsqu’exigée | Contrats de validation ; responsable identité/approbation et responsable métier |
++| PA-08 Preuves et qualification | Chaque décision et effet observé sont reliés aux entrées, révisions et originaux ; altération et omission sont détectées sous les hypothèses déclarées | Recettes et preuves locales ; responsable de qualification puis évaluateur indépendant mandaté |
++
++Une fiche d’évaluation doit déclarer version et empreinte du binaire, configuration,
++modèle de menace, périmètre, exigence externe/version, applicabilité, mécanisme,
++test nommé, témoin valide, refus, reprise, preuve, limite, propriétaire et état.
++Une unité réussie, une simulation, une intégration réelle et une évaluation
++indépendante conservent des statuts séparés. Un pourcentage moyen ne compense
++pas l’échec d’un invariant requis.
++
++La première séquence proposée est de figer le périmètre et les références, relier
++les acquis vérifiables à R19, puis traiter les raccords et les protections
++manquantes dans leurs plans autorisés. Chaque nouvelle intégration doit exercer
++le contenu modifié après accord, la révocation concurrente, la réponse perdue,
++la panne du contrôle et les chemins de contournement applicables. L’arrêt ou la
++révocation bloque les nouvelles opérations concernées sans prétendre annuler
++un effet déjà engagé. L’absence de preuve laisse le critère ouvert.
++
++## Vocabulaire de communication
++
++| Formulation | Justification nécessaire |
++| --- | --- |
++| Inspiré de | Référence et principe repris explicités |
++| Correspondance documentée | Exigences sélectionnées, contexte, écarts et preuves reliés |
++| Compatible avec un sous-ensemble | Révision fixée, périmètre publié et essais de compatibilité exécutés |
++| Exigences satisfaites sur un périmètre évalué | Critères applicables, configuration et preuves actuelles, échecs et limites déclarés |
++| Certifié | Certification effective, organisme, périmètre et validité vérifiables ; aucune revendiquée pour Swarm ici |
++
++Une signature ne prouve pas la vérité d’une mémoire. Biba ne garantit pas la
++confidentialité, et une identité authentifiée ne vaut pas autorisation métier.
++Le terme « opposable » décrit ici une contrainte technique démontrée dans son
++périmètre, sans présumer d’une valeur juridique des preuves.
++
++Pour les usages critiques, la position proposée est de conditionner l’engagement
++autonome aux garanties requises par le contexte. Ce choix d’ingénierie ne décrit
++pas une interdiction réglementaire générale. L’évaluation réglementaire et
++sectorielle du déploiement appartient à son responsable mandaté.
++
++Le [texte LinkedIn et le Word](communication/linkedin-swarm-securite-20261025/README.md)
++reprennent ce positionnement en français. Cette documentation ne lance aucun
++chantier, ne modifie aucune politique d’exécution et ne requalifie aucun runtime.
+--- /dev/null
++++ b/docs/en/SECURITY-POSITIONING.md
+@@ -0,0 +1,133 @@
++# Swarm positioning and security references
++
++October 25, 2026 — [Français](../SECURITY-POSITIONING.md).
++
++## Product positioning
++
++**Swarm is a multi-agent orchestration engine with deterministic controls. It
++aims to link each action to an identity, authority, approved content and a
++verifiable outcome, with supervision and recovery mechanisms. Its assurances
++are established per workflow, for an identified version and configuration.**
++
++The shared engine organizes objectives, plans, tasks, dependencies, responsibilities,
++checks and evidence. Its intended uses are development projects and business
++processes; their separation and maturity remain defined in the
++[product architecture, FR](../PRODUCT-ARCHITECTURE.md). Agents propose operations;
++the engine checks the conditions of the transitions it controls. That function
++alone does not establish confinement of tools, processes or direct external access.
++
++The desired property is continuity between authority, decision, commitment and
++recovery: authorization must remain bound to the exact action and current state
++until its effect can be committed. Rust and determinism support implementation
++properties; they establish neither correct policies, defect freedom nor security
++of the complete deployment.
++
++## Roles of existing references
++
++These references have different purposes. Citing them establishes no Swarm
++compliance. This is a documentary positioning map, without a selected baseline
++or an exhaustive normative assessment.
++
++| Reference | Nature and contribution | Intended or documented use in Swarm |
++| --- | --- | --- |
++| [ISO/IEC 27001:2022](https://www.iso.org/standard/27001) and [42001:2023](https://www.iso.org/standard/42001) | Requirements for information security and AI management systems | Organize responsibilities, risks, incidents and changes in the operating organization; no Swarm certification claimed |
++| [ISO/IEC 23894:2023](https://www.iso.org/standard/77304.html) | AI risk management guidance | Assess risks by use, data and consequences; no clause-by-clause evaluation performed here |
++| [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) | Agentic risk catalogue | Select threats and adversarial scenarios; a risk catalogue is not a complete qualification protocol |
++| [OWASP Agent Control Standard](https://genai.owasp.org/resource/agent-control-standard-acs/) and [ACS repository](https://github.com/GenAI-Security-Project/agent-control-standard) | Runtime interception and control specification | Study contract mappings, then test any claimed compatibility subset; this page establishes no ACS compatibility |
++| [NIST SP 800-207](https://csrc.nist.gov/pubs/sp/800/207/final) | Zero Trust architecture | Examine separation of policy decisions and resource enforcement; no global compliance inferred |
++| [SPIFFE](https://spiffe.io/docs/latest/spiffe/concepts/) and its [SPIRE implementation](https://spiffe.io/docs/latest/spire-about/spire-concepts/) | Verifiable workload identities | Possible process identity reference; no SPIFFE/SPIRE integration announced. Workload authentication does not define business permissions |
++| OIDC and OAuth | Authentication and authorization protocols and mechanisms | The [target contract](ACTIONS-CONFIANCE.md) describes historical choices; the current Rust core uses local identities. No real federation requalified by this page |
++| [OWASP ASVS 5.0.0](https://asvs.owasp.org/) | Web application and service verification requirements | Proposed reference for APIs, sessions, permissions and configuration; no ASVS level evaluated here |
++| [NIST SP 800-53 Rev. 5](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final) | Security and privacy control catalogue | Twelve selected controls already map to contextual evidence in the [R19 matrix](actions-confiance-referentiels.md), without a score or global compliance |
++| Biba | Integrity flow control model | I0–I3 monitor in the [Rust trusted actions core](actions-confiance-rust.md); neither content truth, general semantic injection protection nor Linux access control |
++
++The OWASP ACS page is dated September 1, 2026. The inspected repository README
++already describes a deterministic layer with optional LLM involvement. Swarm
++must therefore explain its contribution through contracts and evidence rather
++than claim to have invented this separation. A future comparison must pin the
++ACS revision, applicable requirements and executed checks.
++
++NIST announced its [AI Agent Standards Initiative on February 17, 2026](https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure).
++Its [September 29 identity and authorization update](https://www.nist.gov/news-events/news/2026/09/comments-software-and-agentic-ai-identity-concept-paper)
++describes feedback and an initial DevSecOps implementation use case, not a final
++agent certification standard. OWASP dates the “2026” Top 10 page December 9,
++2025: its edition year differs from its publication date.
++
++## Trust boundaries to demonstrate
++
++| Function | Responsibility | Expected evidence |
++| --- | --- | --- |
++| Rules guardian | Check identity, mandate, current policy, exact content and required approvals | A positive decision is consumable only for the authorized operation and state; AI analysis creates no permissions |
++| Keys guardian | Retain secrets and issue capabilities limited to the authorized consumer | An agent can neither read critical secrets nor obtain broader capabilities through another route |
++| Enforcement points | Apply controls at the relevant connectors, processes, files and network accesses | Inventoried direct paths, descendants and alternative accesses cannot bypass a denial |
++
++These are architectural functions. Three modules sharing privileges and able to
++change one another’s policies or keys do not establish three independent
++boundaries. Logs or post-effect eBPF observation do not replace preventive
++enforcement. The demonstration must declare its threat model, including limits
++against the same UID or a compromised privileged host.
++
++## Documented state on October 25, 2026
++
++| Scope | Recorded state | Claim boundary |
++| --- | --- | --- |
++| Rust Biba trusted actions | The [BIBA-RUST plan, FR](../plans/migration-rust/PLAN.md#livré-localement--biba-rust-g7-r09t2-25-octobre-paris) records local delivery of the monitor, mandates, exact approvals, simulated effects and recovery, with CLI/API/page and FR/EN Admin | `trust-actions` scope; no actual payment, external permission or OS confinement. This documentary analysis does not rerun the recorded checks |
++| Agent identity and authority | [Internal contracts and components](AGENT-IDENTITY-CONTRACT.md), with explicit integration gaps | Does not establish authentication and authorization of every launch, memory use and tool |
++| Memory | [Versions, sources and usage conditions](PROJECT-MEMORY.md); [Rust FPA02A recovery, FR](../plans/migration-rust/FPA02A-MEMOIRE-20261025.md) of historical memory references | The reference slice closes neither permanent versioned memory nor all read, summarize and transmit permissions. Withdrawal does not erase received contexts |
++| General confinement and secret mediation | [AC-02 recorded, not started](plans/actions-confiance/securite-execution-apex.md) | OpenShell references or YAML policies establish no active AC-02 protection; compatibility and enforcement remain to be demonstrated |
++| Control mapping | [Contextual R19](actions-confiance-referentiels.md): nine partial, two unassessed, one out of scope | Illustrative subset, without a selected baseline, certification, global compliance or independent evaluation |
++
++## Proposed agentic execution assurance profile
++
++This profile is a **documentary proposal**, not an adopted new standard, active
++policy, completed qualification or authorization to start AC-02. It extends the
++existing matrix rather than replacing it. PA identifiers support tracking;
++external requirement mappings remain to be assessed.
++
++| Proposed requirement | Observable qualification criterion | Starting point and follow-up owner |
++| --- | --- | --- |
++| PA-01 Identity and delegation | Every action traces to a current principal and mandate; delegation cannot exceed the parent’s delegable permissions | Identity contract; identity integration owner, then deployment integrator |
++| PA-02 Integrity and admission | External data and client fields create no permissions; admission creates an attributed object linked to its original | Scoped Biba core; Trust owner and future consumers |
++| PA-03 Governed memory | Sources, versions and usage permissions are retained; withdrawal blocks relevant new uses without rewriting received history | Memory contracts; G8 owner and identity/memory integrator |
++| PA-04 Control at commitment | Changed approved content or revocation before the serialization point prevents the effect; control failure denies the sensitive action | Simulated actions and effect contracts; effect service and policy owner |
++| PA-05 Capabilities and access routes | The agent obtains no critical secret and cannot bypass a denial through a tool, file, descendant or network path | AC-02; confinement owner and environment operator after its starting prerequisites |
++| PA-06 Effects and recovery | A lost response retains a known or unknown outcome; reconciliation and idempotency prevent a second effect for the same intent | Two simulated connectors; owner of each real connector before automation |
++| PA-07 Human validation | When required by policy, AI advice cannot replace authenticated human approval bound to the exact operation; required separation of duties is checked | Validation contracts; identity/approval owner and business owner |
++| PA-08 Evidence and qualification | Decisions and observed effects link to inputs, revisions and originals; tampering and omissions are detected under declared assumptions | Local recipes and evidence; qualification owner, then mandated independent evaluator |
++
++An evaluation record must declare binary version and digest, configuration,
++threat model, scope, external requirement/version, applicability, mechanism,
++named test, valid control, denial, recovery, evidence, limit, owner and state.
++Unit checks, simulation, actual integration and independent assessment retain
++separate statuses. An average percentage cannot offset a failed required invariant.
++
++The proposed sequence is to pin scope and references, link verifiable existing
++work to R19, then address missing integrations and protections through their
++authorized plans. Each integration must exercise applicable changed approvals,
++concurrent revocation, lost responses, control failure and bypass routes. Stop
++or revocation blocks relevant new operations without claiming to undo an
++already committed effect. Missing evidence leaves the criterion open.
++
++## Communication vocabulary
++
++| Wording | Required justification |
++| --- | --- |
++| Inspired by | Explicit reference and reused principle |
++| Documented mapping | Selected requirements, context, gaps and linked evidence |
++| Compatible with a subset | Pinned revision, published scope and executed compatibility checks |
++| Requirements met within an assessed scope | Applicable criteria, configuration and current evidence, with failures and limits declared |
++| Certified | Verifiable actual certification, body, scope and validity; none claimed for Swarm here |
++
++A signature does not establish memory truth. Biba does not guarantee
++confidentiality, and authenticated identity is not business authorization.
++“Enforceable” describes a demonstrated technical constraint within its scope,
++without presuming legal evidentiary value.
++
++For critical uses, the proposed engineering position conditions autonomous
++commitment on context-required assurances. It does not describe a general legal
++ban. Regulatory and sector-specific deployment evaluation belongs to the
++mandated responsible party.
++
++The [French LinkedIn text and Word](../communication/linkedin-swarm-securite-20261025/README.md)
++reuse this positioning. This documentation starts no implementation, changes no
++execution policy and requalifies no runtime.
+--- /dev/null
++++ b/docs/communication/linkedin-swarm-securite-20261025/README.md
+@@ -0,0 +1,87 @@
++# Swarm sécurité et standards pour LinkedIn
++
++25 octobre 2026. Demande utilisateur : intégrer le positionnement dans la
++documentation de Swarm et préparer un Word français à copier dans LinkedIn.
++Livraison éditoriale locale, sans publication.
++
++## Livrables et plan de vérification
++
++- [Documentation de référence FR](../../SECURITY-POSITIONING.md) et [EN](../../en/SECURITY-POSITIONING.md), reliées aux README et aux matrices R19.
++- [Post court](post-fr.txt), prévu pour un collage simple, et [article](article-fr.md), à la première personne de Fabrice Pizzi.
++- [Word](Swarm_Securite_LinkedIn.docx) regroupant le post, l’article et les références publiques cliquables.
++- Générateur maintenu [build_word.py](build_word.py) ; rendu et relecture dans `review/`, avec revue liée aux octets dans `review/review.json` après vérification.
++
++Critères : couverture des références et de leurs statuts ; limites actuelles
++Biba/identité/mémoire/AC-02 explicites ; huit exigences PA présentées comme
++proposition ; parité documentaire FR/EN ; liens locaux vérifiés ; contenu Word
++conforme aux sources ; rendu de toutes les pages inspecté ; diff propre sur
++l’incrément possédé. Le post et l’article sont deux formats éditoriaux du même
++contenu, pas deux qualifications de sécurité.
++
++## Portée et décisions
++
++La page centrale est ajoutée plutôt que de transformer R19 en prétendue
++évaluation globale. R19 et ses preuves historiques restent inchangées dans
++leur portée. Le profil PA-01–08 est proposé, sans nouvelle politique active,
++norme adoptée, baseline sélectionnée ou démarrage implicite d’AC-02.
++
++Les originaux des quatre fichiers préexistants modifiés sont conservés dans
++`review/before/` avec leurs empreintes dans `review/before.json`. Le checkout
++contient des travaux préexistants ; la revue de cet incrément compare ces
++originaux, sans attribuer à cette demande le diff historique de la branche.
++
++Les chemins de l’index et du build ne sont pas supposés : les recherches ont
++constaté l’absence de `docs/index.md`, de `docs/en/index.md` et d’un build.rs web.
++Les liens sont donc ajoutés aux README réels et aux matrices existantes. Le
++chargement des ressources HTTP utilise les sources Rust et ressources web ;
++aucune de celles-ci n’est modifiée par cet incrément documentaire. Aucun build,
++redémarrage, changement de version produit ou note d’évolution logicielle n’est
++nécessaire pour ces fichiers documentaires et éditoriaux non embarqués.
++
++## Découvertes et reprise
++
++| Origine | Valeur et périmètre | Propriétaire et critère observable | État |
++| --- | --- | --- | --- |
++| Texte utilisateur et README ACS | Éviter une revendication de nouveauté sur la séparation déterministe déjà décrite par ACS | Codex éditorial ; attribution explicite et absence de compatibilité annoncée sans essai | Vérifié dans la documentation et les textes éditoriaux |
++| Plan BIBA-RUST du 25 octobre | Présenter les acquis Rust récents sans généralisation à toutes les missions | Codex éditorial ; portée `trust-actions`, simulation et limites conservées | Formulation vérifiée ; preuves runtime consignées, non rejouées ici |
++| R19 existante | Éviter un nouveau catalogue concurrent et un score de conformité trompeur | Responsable de qualification ; prochaine évaluation avec références figées, applicabilité et preuves récentes | Profil documentaire proposé ; évaluation non exécutée |
++| AC-02 enregistré | Rendre visible la frontière entre contrôle de transitions et confinement général | Responsable AC-02 ; reprise après qualification Rust et demande explicite de démarrage | Report historique conservé ; aucun lot lancé |
++
++La qualification future devra relire les sources et l’état effectivement
++installé, figer les références externes, conserver les témoins/refus/reprises
++et obtenir l’évaluation indépendante requise. Ce livrable ne modifie aucun
++contexte agent embarqué ou déjà transmis. La documentation persistante et ses
++liens servent aux prochains lecteurs ; leur lecture par un processus déjà
++démarré n’est pas établie.
++
++English: local French editorial deliverable with bilingual reference documentation.
++No runtime behavior, active policy, product version or historical qualification
++changes. Proposed assurance requirements remain distinct from implementation,
++verification and independent acceptance.
++
++## Reproduction et relecture
++
++Le générateur requiert Python et `python-docx` dans le runtime documentaire
++fourni par Codex. Depuis la racine du dépôt, avec ce Python :
++
++```sh
++python3 docs/communication/linkedin-swarm-securite-20261025/build_word.py
++```
++
++Le rendu utilise `render_docx.py` de la skill documents et le LibreOffice
++headless du même runtime. La vérification structurelle compare tous les
++paragraphes aux sources et contrôle les neuf relations de lien. L’audit
++d’accessibilité est complémentaire à la lecture des images de chaque page ;
++il ne qualifie pas l’accessibilité de LinkedIn ni son comportement au collage.
++Les PDF et PNG de `review/` sont des intermédiaires de contrôle, pas des
++livrables de publication demandés.
++
++Le premier rendu a révélé une bordure bleue héritée du style `Title`. Le
++générateur la retire dans les styles source avant sérialisation. Un paragraphe
++à cheval sur deux pages laissait une ligne isolée ; la conservation des
++paragraphes est maintenant explicite. Les deux DOCX intermédiaires et leurs
++rendus restent conservés, sans remplacer ces preuves par le résultat final.
++Prévention : inspecter le style hérité et les coupures réelles, même si tous
++les liens et contrôles structurels passent. Cette règle est portée par le
++générateur et ce suivi ; aucun changement de méthode globale ou de contexte
++natif embarqué n’est annoncé.
+--- /dev/null
++++ b/docs/communication/linkedin-swarm-securite-20261025/article-fr.md
+@@ -0,0 +1,91 @@
++# Swarm et la sécurité des agents autonomes
++
++La sécurité d’un système agentique demande de vérifier ce que ses agents peuvent réellement faire, avec quelle autorité et dans quelles conditions. C’est le sujet que j’explore avec Swarm, un moteur d’orchestration multi-agents à contrôle déterministe.
++
++Mon objectif est de relier chaque action à une identité, un mandat, un contenu approuvé et un résultat vérifiable. Cette continuité doit être examinée jusqu’à l’engagement de l’effet, puis pendant les reprises après incident. Les garanties se démontrent sur une version, une configuration et un périmètre identifiés.
++
++## Le passage du raisonnement à l’action
++
++Un modèle peut analyser une situation, proposer un plan et choisir des outils. Lorsqu’il accède à des fichiers, des services ou des commandes, une erreur de raisonnement peut entraîner une modification durable. Une consigne erronée conservée dans une mémoire peut ensuite influencer une autre instance.
++
++Swarm organise objectifs, tâches, dépendances, responsabilités, contrôles et preuves. Son architecture sépare les propositions des agents et la vérification des transitions par le moteur. Le contrôle humain intervient selon la politique applicable ; une revue IA favorable ne remplace pas une décision humaine obligatoire.
++
++Cette architecture doit aussi préciser ses frontières. Contrôler une transition Swarm ne prouve pas que tous les accès de l’agent aux systèmes externes sont interceptés. Un outil disposant d’un chemin direct vers une ressource sensible peut conserver un pouvoir que le processus d’orchestration entendait limiter.
++
++## Des standards complémentaires
++
++Les références de sécurité apportent des réponses à des niveaux différents. ISO/IEC 27001 et 42001 définissent des exigences de management pour la sécurité de l’information et l’IA. ISO/IEC 23894 fournit des recommandations de gestion des risques IA. Leur portée concerne notamment l’organisation qui développe ou exploite le système. [1–3]
++
++Le Top 10 agentique de l’OWASP aide à identifier les risques : détournement d’objectif, abus de privilèges, contamination de mémoire ou défaillances en cascade. L’Agent Control Standard décrit les points d’interception et les échanges nécessaires au contrôle à l’exécution. Son dépôt décrit déjà une couche déterministe, avec un recours optionnel à un LLM. [4–5]
++
++Le NIST apporte l’architecture Zero Trust et des catalogues de contrôles. SPIFFE spécifie des identités vérifiables pour les processus et services. L’authentification doit ensuite être reliée aux droits sur les ressources et aux contraintes de l’opération. OWASP ASVS fournit, de son côté, des exigences de vérification pour les applications et services web. [6–9]
++
++Je situe Swarm dans cet ensemble. Son apport recherché est de relier ces préoccupations au déroulement concret d’un travail multi-agents : délégation, validation, changement de contexte, engagement et reprise. Une compatibilité avec un standard doit être définie et testée avant d’être annoncée.
++
++## Les règles les clés et les points de passage
++
++Le gardien des règles vérifie l’identité, le mandat, la politique courante et les validations nécessaires. Une analyse produite par un modèle peut éclairer cette décision ; elle ne doit pas créer seule de nouveaux droits.
++
++Le gardien des clés protège les moyens techniques d’agir. Un agent qui prépare une opération sensible doit recevoir uniquement les capacités nécessaires à son rôle. Les secrets critiques doivent rester détenus par des composants dont les accès sont contrôlés.
++
++Les garde-barrières appliquent les décisions aux connecteurs, aux processus, aux fichiers et au réseau concernés. Ils doivent empêcher les chemins alternatifs accessibles à l’agent de contourner un refus.
++
++Ces fonctions demandent des frontières techniques vérifiées. Trois modules partageant les mêmes privilèges et pouvant modifier leurs clés ou politiques respectives ne démontrent pas une séparation indépendante. De même, observer une opération après son exécution apporte une trace, mais ne démontre pas qu’elle pouvait être empêchée.
++
++## Une approbation doit suivre le contenu exact
++
++Prenons une facture et une proposition de règlement. Le montant, la devise et le bénéficiaire sont approuvés. Un message arrive ensuite avec de nouvelles coordonnées bancaires.
++
++L’opération modifiée doit repasser par les contrôles applicables. L’approbation précédente portait sur un autre contenu. Le service qui engage l’effet doit vérifier une dernière fois l’action exacte, le mandat courant et les validations requises au point de sérialisation prévu par son contrat.
++
++Une panne introduit une autre difficulté. Si le service a exécuté l’opération mais que sa réponse est perdue, une nouvelle tentative peut produire un doublon. La reprise doit conserver l’intention durable, distinguer les issues connues ou inconnues et réconcilier l’état avant une répétition susceptible de créer un second effet.
++
++Un connecteur simulé permet d’éprouver ces mécanismes. Leur application à un service réel exige de vérifier son propre contrat d’idempotence, ses réponses, ses erreurs et ses moyens de réconciliation.
++
++## Une mémoire ne crée aucune autorité
++
++La mémoire rend une expérience réutilisable. Elle doit aussi conserver sa provenance, sa version, ses conditions d’usage et les droits de transmission associés. Une information utile peut devenir dangereuse si elle est reprise hors de son contexte ou transmise au mauvais destinataire.
++
++Une signature peut établir une origine et une intégrité sous ses hypothèses de confiance. Elle ne démontre pas la vérité du contenu. Le modèle Biba encadre les flux d’intégrité ; il ne fournit pas une compréhension sémantique générale des instructions malveillantes et ne garantit pas la confidentialité.
++
++Le retrait d’une mémoire peut empêcher de nouveaux usages contrôlés. Il ne supprime pas rétroactivement les informations déjà transmises à une conversation ou à un fournisseur. La reprise doit tenir compte du contexte effectivement reçu.
++
++## Les garanties actuelles de Swarm
++
++Au 25 octobre 2026, le plan BIBA-RUST consigne la livraison locale du noyau des actions de confiance : moniteur I0–I3, identités locales, mandats, accords exacts, deux effets simulés, idempotence et réconciliation, avec des parcours CLI, API et web.
++
++Cette portée reste explicite. Les effets sont simulés ; le noyau ne soumet pas toutes les missions à Biba et ne constitue pas un confinement Linux. Les contrats d’identité et de mémoire comportent encore des raccordements à qualifier. Le plan AC-02 de confinement général et de médiation réseau et secrets est enregistré, sans démarrage.
++
++Swarm possède également une matrice reliant douze contrôles NIST sélectionnés à des preuves contextuelles locales. Ces correspondances conservent leurs écarts. Elles ne constituent ni un score de conformité, ni une certification, ni une évaluation indépendante du système complet.
++
++## Un profil d’assurance testable
++
++Je propose de prolonger cette matrice par un profil d’assurance de l’exécution agentique. Il permettrait de décrire huit exigences : identité et délégation, intégrité et admission, mémoire gouvernée, contrôle au point d’engagement, capacités et accès, effets et reprise, validation humaine, preuves et qualification.
++
++Pour chaque exigence, l’évaluation doit préciser le périmètre, la référence externe, le mécanisme, un test nommé, les preuves, les limites et le responsable. Les scénarios doivent comprendre un témoin valide, les refus attendus et la reprise après incident.
++
++On doit notamment pouvoir montrer qu’un changement de contenu invalide l’accord précédent, qu’une révocation bloque les nouvelles opérations concernées, qu’une réponse perdue ne duplique pas l’effet et qu’une panne du contrôle ne libère pas l’action sensible. Les voies de contournement doivent être exercées dans le modèle de menace déclaré.
++
++Ce profil reste une proposition documentaire. Il ne crée aucune conformité présumée. Une unité réussie, une simulation, une intégration réelle et une qualification indépendante apportent des preuves différentes.
++
++Pour les actions critiques, je défends une autonomie d’engagement conditionnée aux garanties et aux validations requises par le contexte. Cette position relève de l’ingénierie ; elle ne prétend pas décrire une interdiction réglementaire générale.
++
++Avec Swarm, je cherche à rendre cette exigence concrète : pouvoir examiner qui a autorisé une action, sur quel contenu, sous quelles règles et avec quel effet réellement observé.
++
++Fabrice Pizzi
++
++#Swarm #AgenticAI #AISecurity #Cybersecurity
++
++## Références publiques
++
++1. [ISO IEC 27001 Systèmes de management de la sécurité de l’information](https://www.iso.org/standard/27001)
++2. [ISO IEC 42001 Systèmes de management de l’IA](https://www.iso.org/standard/42001)
++3. [ISO IEC 23894 Gestion des risques IA](https://www.iso.org/standard/77304.html)
++4. [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
++5. [OWASP Agent Control Standard et dépôt de spécification](https://github.com/GenAI-Security-Project/agent-control-standard)
++6. [NIST SP 800 207 Zero Trust Architecture](https://csrc.nist.gov/pubs/sp/800/207/final)
++7. [NIST SP 800 53 Rev 5 Catalogue de contrôles](https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final)
++8. [SPIFFE Concepts et identités de workloads](https://spiffe.io/docs/latest/spiffe/concepts/)
++9. [OWASP Application Security Verification Standard](https://asvs.owasp.org/)
++
++La documentation du dépôt Swarm conserve les limites d’implémentation et les liens vers les preuves locales. Les sources publiques présentent leurs propres mécanismes ; elles n’établissent aucune certification de Swarm.
+--- /dev/null
++++ b/docs/communication/linkedin-swarm-securite-20261025/post-fr.txt
+@@ -0,0 +1,27 @@
++Un agent peut préparer une action pertinente sans avoir l’autorité de l’exécuter.
++
++Cette distinction est au cœur de mon travail sur Swarm, un moteur d’orchestration multi-agents à contrôle déterministe.
++
++L’objectif est de relier chaque action à une identité, un mandat, un contenu approuvé et un résultat vérifiable. Les agents raisonnent et proposent ; les opérations contrôlées par le moteur restent soumises aux règles et validations applicables.
++
++Les standards apportent déjà des réponses complémentaires : ISO pour le management et les risques, OWASP pour les risques agentiques et les contrôles à l’exécution, NIST pour les architectures et catalogues de contrôles, SPIFFE pour l’identité des processus.
++
++L’Agent Control Standard de l’OWASP décrit lui-même une couche déterministe. La question devient celle de son application dans un processus complet.
++
++Une approbation reste-t-elle valable après un changement de bénéficiaire ? Une révocation empêche-t-elle l’action avant son engagement ? Après une réponse perdue, la reprise évite-t-elle un second effet ? L’agent peut-il contourner le contrôle avec un autre outil ?
++
++Ces questions demandent des preuves sur une version, une configuration et un périmètre précis.
++
++Je distingue trois responsabilités : vérifier les règles, protéger les clés et imposer les points de passage vers les effets réels. Leur séparation doit résister aux moyens techniques accessibles à l’agent.
++
++Au 25 octobre 2026, le noyau Biba Rust de Swarm est consigné comme livré localement pour les actions de confiance simulées, avec mandats, accords exacts et mécanismes de reprise. Le raccord global de l’identité et de la mémoire reste à qualifier ; le confinement général prévu par AC-02 n’est pas démarré.
++
++Swarm ne revendique aucune certification de sécurité agentique. Je propose de prolonger sa matrice de contrôles par un profil d’assurance : une exigence explicite, un test nommé, une preuve et une limite déclarée pour chaque garantie recherchée.
++
++Pour les actions critiques, je défends une autonomie d’engagement conditionnée à ces garanties et aux validations requises par le contexte.
++
++Quelles preuves exigez-vous avant de laisser un agent engager une action irréversible ?
++
++Fabrice Pizzi
++
++#Swarm #AgenticAI #AISecurity #Cybersecurity
+--- /dev/null
++++ b/docs/communication/linkedin-swarm-securite-20261025/build_word.py
+@@ -0,0 +1,203 @@
++"""Build the French LinkedIn DOCX from adjacent UTF-8 editorial sources.
++
++Run with the bundled document Python runtime and python-docx. The builder reads
++post-fr.txt and article-fr.md, supports only their documented prose/heading/link
++subset, performs no network access and atomically replaces its sole DOCX output.
++Rendering and visual approval are separate steps; this program proves neither.
++"""
++
++from __future__ import annotations
++
++import argparse
++import io
++import os
++from pathlib import Path
++import re
++import tempfile
++from zipfile import ZipFile
++
++from docx import Document
++from docx.oxml import OxmlElement
++from docx.oxml.ns import qn
++from docx.opc.constants import RELATIONSHIP_TYPE
++from docx.shared import Cm, Pt, RGBColor
++
++
++def add_inline(paragraph, text: str) -> None:
++    """Append prose with Markdown links or bold text to a DOCX paragraph.
++
++Only HTTPS references and non-nested bold spans are supported. Other text is
++literal. Invalid link schemes raise ValueError before the output is written;
++links create external DOCX relationships but are never fetched by this builder.
++"""
++    tokens = re.compile(r"(\[[^\]]+\]\([^\s)]+\)|\*\*[^*]+\*\*)")
++    for token in tokens.split(text):
++        if not token:
++            continue
++        if token.startswith("[") and "](" in token:
++            match = re.fullmatch(r"\[([^\]]+)\]\(([^\s)]+)\)", token)
++            if match is None:
++                raise ValueError("Malformed editorial hyperlink")
++            label, url = match.groups()
++            if not url.startswith("https://"):
++                raise ValueError("Only HTTPS references are accepted")
++            relationship = paragraph.part.relate_to(
++                url, RELATIONSHIP_TYPE.HYPERLINK, is_external=True
++            )
++            hyperlink = OxmlElement("w:hyperlink")
++            hyperlink.set(qn("r:id"), relationship)
++            run = OxmlElement("w:r")
++            properties = OxmlElement("w:rPr")
++            color = OxmlElement("w:color")
++            color.set(qn("w:val"), "24588A")
++            underline = OxmlElement("w:u")
++            underline.set(qn("w:val"), "single")
++            properties.extend([color, underline])
++            run.append(properties)
++            value = OxmlElement("w:t")
++            value.text = label
++            run.append(value)
++            hyperlink.append(run)
++            paragraph._p.append(hyperlink)
++        elif token.startswith("**") and token.endswith("**"):
++            paragraph.add_run(token[2:-2]).bold = True
++        else:
++            paragraph.add_run(token)
++
++
++def add_article(document, source: str) -> None:
++    """Append the supported article Markdown without omitting source paragraphs.
++
++Input accepts H1/H2 headings, ordinary paragraphs and numbered reference lines.
++Each reference receives a separate paragraph. Tables, fenced code and HTML are
++rejected with ValueError rather than silently dropped. Mutates the in-memory
++document only; unsupported structure leaves an existing output untouched.
++"""
++    for block in source.strip().split("\n\n"):
++        block = block.strip()
++        if not block:
++            continue
++        if block.startswith(("```", "|", "<")):
++            raise ValueError("Unsupported article structure")
++        if block.startswith("# "):
++            document.add_paragraph(block[2:], "Title")
++            continue
++        if block.startswith("## "):
++            paragraph = document.add_paragraph(block[3:], "Heading 1")
++            if block == "## Références publiques":
++                paragraph.paragraph_format.page_break_before = True
++            continue
++        lines = block.splitlines()
++        if all(re.match(r"^\d+\. ", line) for line in lines):
++            for line in lines:
++                add_inline(document.add_paragraph(style="Reference"), line)
++        else:
++            add_inline(document.add_paragraph(), " ".join(lines))
++
++
++def save_atomically(document, output: Path) -> None:
++    """Save a checked DOCX through a sibling temporary file and atomic replace.
++
++The destination directory must exist. Serialization, ZIP validation, fsync and
++replacement errors propagate with their original causes. Before replacement an
++existing output remains intact; a failed temporary file is retained for diagnosis.
++A directory fsync failure after replacement means publication may have occurred.
++"""
++    stream = io.BytesIO()
++    document.save(stream)
++    payload = stream.getvalue()
++    with ZipFile(io.BytesIO(payload)) as archive:
++        bad_member = archive.testzip()
++        if bad_member is not None:
++            raise ValueError("DOCX contains an invalid ZIP member: " + bad_member)
++        if "word/document.xml" not in archive.namelist():
++            raise ValueError("DOCX is missing its document body")
++    descriptor, temporary = tempfile.mkstemp(
++        prefix="." + output.stem + "-", suffix=".docx", dir=output.parent
++    )
++    with os.fdopen(descriptor, "wb") as handle:
++        handle.write(payload)
++        handle.flush()
++        os.fsync(handle.fileno())
++    if Path(temporary).read_bytes() != payload:
++        raise OSError("Temporary DOCX verification failed")
++    os.replace(temporary, output)
++    directory = os.open(output.parent, os.O_RDONLY | os.O_DIRECTORY)
++    try:
++        os.fsync(directory)
++    finally:
++        os.close(directory)
++
++
++def build(source_dir: Path, output: Path) -> None:
++    """Create the short post and full article as an editable French Word file.
++
++Sources must exist as UTF-8. Uses A4 pages, black native Word headings and
++editable paragraphs; no images, tables, active content or credentials are added.
++Reading, parsing and atomic save errors propagate. No render approval is implied.
++"""
++    post = (source_dir / "post-fr.txt").read_text(encoding="utf-8")
++    article = (source_dir / "article-fr.md").read_text(encoding="utf-8")
++    document = Document()
++    # The bundled default template carries a blue Title paragraph border.
++    # Remove paragraph borders at their source so inherited formatting cannot
++    # reintroduce a decorative rule in Word or the headless renderer.
++    for border in list(document.styles.element.xpath(".//w:pBdr")):
++        border.getparent().remove(border)
++    section = document.sections[0]
++    section.page_width, section.page_height = Cm(21), Cm(29.7)
++    section.top_margin = section.bottom_margin = Cm(1.9)
++    section.left_margin = section.right_margin = Cm(2.1)
++    for name in ("Normal", "Title", "Subtitle", "Heading 1", "Heading 2"):
++        style = document.styles[name]
++        style.font.name = "Calibri"
++        style.font.color.rgb = RGBColor(0, 0, 0)
++        style.paragraph_format.widow_control = True
++    normal = document.styles["Normal"]
++    normal.font.size = Pt(11)
++    normal.paragraph_format.line_spacing = 1.13
++    normal.paragraph_format.space_after = Pt(7)
++    normal.paragraph_format.keep_together = True
++    title = document.styles["Title"]
++    title.font.size = Pt(24)
++    title.font.bold = True
++    title.paragraph_format.space_after = Pt(16)
++    title.paragraph_format.keep_with_next = True
++    heading = document.styles["Heading 1"]
++    heading.font.size = Pt(14)
++    heading.font.bold = True
++    heading.paragraph_format.space_before = Pt(14)
++    heading.paragraph_format.space_after = Pt(7)
++    heading.paragraph_format.keep_with_next = True
++    reference = document.styles.add_style("Reference", 1)
++    reference.base_style = normal
++    reference.font.size = Pt(10)
++    reference.paragraph_format.space_after = Pt(10)
++    language = OxmlElement("w:lang")
++    language.set(qn("w:val"), "fr-FR")
++    normal.element.get_or_add_rPr().append(language)
++    document.core_properties.title = "Swarm et la sécurité des agents autonomes"
++    document.core_properties.subject = "Positionnement et références de sécurité"
++    document.core_properties.author = "Fabrice Pizzi"
++    document.core_properties.keywords = "Swarm, sécurité agentique, LinkedIn"
++    document.add_paragraph("Publication LinkedIn", "Title")
++    for block in post.strip().split("\n\n"):
++        document.add_paragraph(block)
++    document.add_page_break()
++    add_article(document, article)
++    save_atomically(document, output)
++    print(f"Created {output.name}; short post: {len(post.strip())} characters")
++
++
++def main() -> None:
++    """Parse local source/output paths and build one DOCX, propagating failures."""
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--source-dir", type=Path, default=Path(__file__).parent)
++    parser.add_argument("--output", type=Path)
++    args = parser.parse_args()
++    output = args.output or args.source_dir / "Swarm_Securite_LinkedIn.docx"
++    build(args.source_dir, output)
++
++
++if __name__ == "__main__":
++    main()

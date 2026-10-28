@@ -1136,3 +1136,108 @@ flowchart LR
 Preparation also checks shared prerequisites before any copy effect. A dependency
 refusal must not strand a final copy that blocks the next admission; the writer
 retains its complete recheck, without a cached permit.
+
+### Accepted native baseline before the next candidate
+
+`task baseline-preview WORK --input FILE` takes the strict native envelope
+`schema_version`, `event_id`, `expected_revision`, `task_id`. The event identifier
+is request syntax only, never persisted. Each accepted task is matched to its
+canonical publication, private/public originals, Git report and current saved
+control/review/prerequisite policy. Output contains identifiers/digests, current
+commit and revisions only. An empty initial baseline has `baseline_present=false`
+and `baseline_verified=false`; missing/corrupt evidence is an error, never a
+successful empty baseline. Work and settings are rechecked after inspection.
+
+Candidate preparation and native control observations consume the same reader
+before creation/claim. Invalid historical proof therefore blocks the next
+candidate or job. Exact restoration allows reuse of the original evidence without
+resetting attempts, reservations or consumption. Reads may run Git under its saved
+command deadline policy. This CLI/Root slice adds no operator setting or web/HTTP action.
+
+`publication_authorized`, `provider_started`, `task_accepted` stay false: this
+baseline concerns the previously published candidate. New controls and review
+must cover every criterion of the next cohort. Cumulative projections and
+publication remain explicitly outside this slice.
+
+```mermaid
+flowchart TD
+    A[Accepted tasks on published candidate] --> B[Canonical publication and originals]
+    B --> C[Current Git reports, policies and freshness]
+    C --> D[baseline-preview : verified data, no grant]
+    C --> E[Next candidate and job preparation]
+    E --> F[New controls and whole-cohort opinion]
+    F -. Still to port .-> G[Cumulative projections and publication]
+    B -->|Invalid evidence| H[Refuse before candidate or job ; restore originals]
+```
+
+
+### Native cumulative publication — next migration contract
+
+This section updates the initial frontier above; its recipe and delivery are
+tracked in the cumulative S2 plan. Native SQL v1 stays strictly initial with
+unchanged bytes. A cumulative v2 receipt binds its predecessor event and digest,
+the worker's original base and the new candidate's parent separately. For example,
+worker B started at C0 can supply a result merged onto C1 to form C2. The worker
+conditional update uses C0; the candidate uses C1. No old review is reassigned to C2.
+
+The iterative reader matches every integrated row to its canonical event, checks
+candidate/revision lineage, preserves exact earlier accepted tasks and requires
+one new task per publication. The terminal pointer and accepted set must match
+the actual Work. Root readers additionally verify native originals, real worker
+provenance, Git reports and whole-cohort controls/review on the latest candidate.
+Intact history alone never replaces that latest proof. No hidden chain cutoff
+or new stop policy is added. Original and cleanup causes remain retained.
+Publication and worker settlement remain one SQL transaction; replay starts no
+call/debit and never implies global business completion.
+
+```mermaid
+flowchart TD
+    A[Workers A and B started at C0] --> B[Initial publication C1: receipt v1]
+    B --> C[Candidate C2: parent C1, worker B result from C0]
+    C --> D[Fresh controls and review of all tasks]
+    D --> E[Atomic v2 publication: predecessor link and worker base C0]
+    E --> F[Earlier tasks and originals preserved]
+    F --> G[Current read: chain plus latest cohort proof]
+    G -. S3 to port .-> H[Explicit supervisor business completion]
+```
+
+
+### Verified and installed cumulative publication — dev128
+
+The contract above now runs locally: native publications C1 then C2, second
+worker's original C0 base retained, six controls and current review of both tasks.
+The first task/review is not rewritten. Both receipts replay after C2; a third
+worker receives an actual C2 copy with both reports. Required review capacity is
+explicitly changed through preview/apply/reopen, preserving consumption2 while
+setting capacity3; the engine never automatically raises that quota. Supervisor
+completion S3 remains open; publication does not finish the business objective.
+
+The birth recipe is `native-cumulative-publication`; maintained recovery recipe
+`native-cumulative-publication-readback` binds retained stages9 publication/2
+policy/4 worker and five current public observations. Both initially failed
+recipes stay FAIL (fixture schema, then quota); successful stages are explicitly
+reused. Four SQL faults use the TEMP SDK, separate from the public no-fixture
+profile. Installed128 passes public readback and14 FR/EN Version checks, preserving
+real Works. Originals produced in125 are verified by128, without claiming whole
+build equivalence. See the cumulative S2 report in the migration plan.
+
+Historical reads never reassign an old review to the latest candidate: each old
+Task retains its custody and the latest whole-cohort review/controls cover the
+terminal pointer. Plans are renormalized under current saved settings; an unused
+default does not invalidate an explicit control, while an actually exceeded limit
+refuses. These tests establish no cross-call proof cache, same-UID confinement or
+atomic filesystem snapshot.
+
+### Historical cumulative publication integrity
+
+The shared `managed_publication::writer::current` reader checks native originals
+for **every** earlier publication even when the caller requests the latest task.
+SQL chaining and the latest cohort opinion cannot replace those originals.
+An altered earlier certificate, control, worker result or report therefore also
+refuses exact replay of the latest publication, retaining causes without another
+provider call, event or acceptance. Work follows the retained chain under existing
+persisted Git policies; no new history cap or global deadline is introduced.
+See `tools/verification/recipes/paea-current-managed-git-publication.json` and
+`tests/paea_historical_publication_test.py` for the actual inert cumulative control,
+corruption/refusal and restoration checks. This establishes no human identity,
+current PAEA authority or protected Git effect.

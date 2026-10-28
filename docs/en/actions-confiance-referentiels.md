@@ -15,6 +15,15 @@ The official OSCAL5.2.0 catalog is pinned by revision and SHA-256 in
 copy retained in the R19 verification area. No remote catalog is loaded by the
 product or validator at runtime.
 
+## Positioning and proposed follow-up
+
+The [Swarm security positioning](SECURITY-POSITIONING.md) explains the roles of
+ISO, OWASP, NIST, SPIFFE and Biba references. Its PA-01–08 profile is a documentary
+proposal to extend this matrix with requirements, observable criteria, owners
+and evidence. It changes neither R19 statuses nor historical proofs or the
+unselected baseline; no ACS compatibility, global compliance or AC-02
+protection follows from it.
+
 ## Read and verify
 
 The **Controls and limits** card explicitly loads `web/trust-controls.json`.

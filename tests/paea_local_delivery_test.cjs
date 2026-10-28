@@ -6,6 +6,9 @@
  * SWARM_PAEA_LIVE_EVIDENCE. No global watchdog or implicit restart. Safe failures
  * propagate; unexpected network/console/page failures abort pending DOM waits
  * through an event-driven rejection, with no polling or arbitrary deadline.
+ * Optional SWARM_PAEA_LIVE_SOURCE_INVENTORY + SWARM_PAEA_LIVE_NOTES bind
+ * assets/notes to a retained qualified build instead of later workspace edits.
+ * Both must be supplied together; notes bytes must match that inventory.
  * The recipe retains diagnostics, and the browser is closed in finally.
  * Verifies current FR/EN notes, all five data views, the laboratory reader and twenty-five asset byte sets;
  * empty comparison/invoice fields are checked without submitting any live data.
@@ -14,8 +17,9 @@
  */
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),puppeteer=require('puppeteer');
 const fault=process.argv.length===3&&process.argv[2]==='--fault-version-script';assert(process.argv.length===2||fault);
-const cfg=JSON.parse(fs.readFileSync(process.env.SWARM_PAEA_LIVE_STATUS,'utf8')),out=process.env.SWARM_PAEA_LIVE_EVIDENCE+(fault?'-fault-script':''),root=process.cwd(),notes=JSON.parse(fs.readFileSync(path.join(root,'version_history.json'),'utf8')).local_changes;fs.mkdirSync(out);
+const cfg=JSON.parse(fs.readFileSync(process.env.SWARM_PAEA_LIVE_STATUS,'utf8')),out=process.env.SWARM_PAEA_LIVE_EVIDENCE+(fault?'-fault-script':''),root=process.cwd();assert(Boolean(process.env.SWARM_PAEA_LIVE_SOURCE_INVENTORY)===Boolean(process.env.SWARM_PAEA_LIVE_NOTES));const compiledInputs=process.env.SWARM_PAEA_LIVE_SOURCE_INVENTORY?JSON.parse(fs.readFileSync(process.env.SWARM_PAEA_LIVE_SOURCE_INVENTORY)):null,notesRaw=fs.readFileSync(process.env.SWARM_PAEA_LIVE_NOTES||path.join(root,'version_history.json')),notes=JSON.parse(notesRaw).local_changes;fs.mkdirSync(out);
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex'),url=new URL(cfg.url),address=url.host,checks=[],errors=[];
+if(compiledInputs)assert.equal(sha(notesRaw),compiledInputs['version_history.json']);
 assert(url.protocol==='http:'&&url.hostname==='127.0.0.1'&&url.port);assert.equal(sha(fs.readFileSync('/proc/'+cfg.pid+'/exe')),cfg.binary_sha256);
 const key=path.join(cfg.root,'.swarm','web-session-'+sha(address).slice(0,16)),fd=fs.openSync(key,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW);let token,browser;
 try{const info=fs.fstatSync(fd);assert(info.isFile()&&info.uid===process.getuid()&&(info.mode&0o077)===0);token=fs.readFileSync(fd,'utf8').trim()}finally{fs.closeSync(fd)}
@@ -37,7 +41,7 @@ try{await Promise.race([(async()=>{
   await page.waitForFunction(()=>['empty','error'].includes(document.getElementById('paea-status')?.dataset.state));check(lang+'-live-session-ready',await page.$eval('#paea-check',e=>!e.disabled));
   check(lang+'-live-receipt-example-links',await page.$eval('#paea-example-help',(e,data)=>!e.open&&e.querySelectorAll('a[download]').length===data.count&&e.querySelector('summary').textContent===(data.lang==='en'?'Download fictional examples':'Exemples fictifs à télécharger'),{lang,count:4}));
   const assets=await page.evaluate(async()=>{const data={};for(const p of ['/paea.html','/paea-payment.html','/paea-compare.html','/paea-inspect.html','/paea-approval.html','/paea-lab.html','/paea-lab.js','/paea.js','/paea.css','/i18n-en.js','/i18n.js','/swarm-design.css','/wattson_themes.css','/swarm-logo.png','/trust-native.css','/paea-examples/v1/git-after.json','/paea-examples/v1/git-document.json','/paea-examples/v1/git-receipt.json','/paea-examples/v1/payment-after.json','/paea-examples/v1/payment-document.json','/paea-examples/v1/payment-receipt.json','/paea-examples/v1/payment-registry.json','/paea-examples/v1/payment-request.json','/paea-examples/v1/payment-approval.json','/paea-examples/v1/git-approval.json']){const r=await fetch(p);if(!r.ok)throw Error('asset refused');data[p]=Array.from(new Uint8Array(await r.arrayBuffer()))}return data});
-  check(lang+'-live-protected-asset-bytes',Object.entries(assets).every(([p,bytes])=>sha(Buffer.from(bytes))===sha(fs.readFileSync(path.join(root,'web',p==='/trust-native.css'?'trust-native.css':p.slice(1))))));
+  check(lang+'-live-protected-asset-bytes',Object.entries(assets).every(([p,bytes])=>{const expected=compiledInputs?compiledInputs['web/'+p.slice(1)]:sha(fs.readFileSync(path.join(root,'web',p.slice(1))));return /^[a-f0-9]{64}$/.test(expected||'')&&sha(Buffer.from(bytes))===expected}));
   const version=await page.evaluate(async()=>{const r=await fetch('/api/v1/native-version');if(!r.ok)throw Error('version refused');return r.json()});check(lang+'-live-version-identity',version.binary.version===cfg.binary.version&&version.binary.commit===cfg.binary.commit&&version.binary.modified===cfg.binary.modified);check(lang+'-current-evolution-notes',require('node:util').isDeepStrictEqual(version.history.local_changes,notes));
   await Promise.all([page.waitForNavigation({waitUntil:'domcontentloaded'}),page.click('a[href^="/paea-lab.html"]')]);await page.waitForFunction(()=>!document.getElementById('lab-read').disabled);
   check(lang+'-live-laboratory-menu-and-command',new URL(page.url()).pathname==='/paea-lab.html'&&await page.$eval('#lab-command',e=>e.textContent.includes('tools/paea/run_pilot.py')));
@@ -74,6 +78,6 @@ try{await Promise.race([(async()=>{
   await page.evaluate(()=>{globalThis.versionClosed=new Promise(resolve=>document.getElementById('version-dialog').addEventListener('close',resolve,{once:true}))});await page.keyboard.press('Escape');await page.evaluate(()=>globalThis.versionClosed);check(lang+'-live-dialog-focus',await page.evaluate(()=>document.activeElement.id==='version-open'));await context.close();
  }
  check('managed-process-stable',sha(fs.readFileSync('/proc/'+cfg.pid+'/exe'))===cfg.binary_sha256);check('no-browser-errors-or-writes',errors.length===0);
- })(),observedFailure]);}catch(e){failure=e;console.error(e.stack)}finally{try{if(browser)await browser.close()}catch(e){errors.push('browser-close:'+e.message);failure??=e}fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({scope:'read-only live native assets and Version dialog; no mission database used as fixture',version:cfg.binary,pid:cfg.pid,binary_sha256:cfg.binary_sha256,checks,errors,success:!failure},null,2))}
+ })(),observedFailure]);}catch(e){failure=e;console.error(e.stack)}finally{try{if(browser)await browser.close()}catch(e){errors.push('browser-close:'+e.message);failure??=e}fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({scope:'read-only live native assets and Version dialog; no mission database used as fixture',version:cfg.binary,pid:cfg.pid,binary_sha256:cfg.binary_sha256,source_basis:compiledInputs?'retained-qualified-input-inventory':'current-workspace',notes_sha256:sha(notesRaw),checks,errors,success:!failure},null,2))}
  if(failure)process.exitCode=1;else console.log('LIVE_PAEA_DELIVERY_VERIFIED '+checks.length);
 })();

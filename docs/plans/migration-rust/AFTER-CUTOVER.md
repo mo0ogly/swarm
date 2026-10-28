@@ -131,3 +131,9 @@ ni contourner la liaison au Root pour masquer un diagnostic manquant.
   hypothèses de modèle contredisent les codecs réels ; conserver arbitrage et
   source avant intégration. Réduire les tâches/paquets futurs selon contrat,
   pas augmenter seulement le budget. Économie Codex non mesurée.
+
+-1220, avis candidate-independent-review : unwind de shutdown Future dans le
+  helper privé conductor::serve. Hypothèse d'amélioration, pas défaut public
+  reproduit ; owner API/G3. Valeur attendue : conserver les causes de fermeture
+  en unwind. Reprise après reproducteur lié au vrai appelant, distinct d'observer
+  panic déjà protégé ; aucune garantie de fermeture contrôlée en panic ajoutée.

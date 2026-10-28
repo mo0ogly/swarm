@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "budget-history-rust",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/budget_history.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/budget_history.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "tests/rust_budget_history.py",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/architecture/RUST-MIGRATION.md",
+    "docs/en/RUST-MIGRATION.md",
+    "version_history.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "public-historical-budget",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='budget-history-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_budget_history.py','--binary',os.environ['SWARM_BUDGET_HISTORY_BINARY'],'--output',str(p)],check=True)\nprint('BUDGET_HISTORY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS budget-history-show-envelope",
+        "PASS budget-history-preview-no-mutation",
+        "PASS budget-history-warning-consumed-40",
+        "PASS budget-history-invalid-usage-recovery",
+        "BUDGET_HISTORY_EVIDENCE"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

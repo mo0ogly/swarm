@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scope": "inspected-source-only-not-build-or-acceptance",
+  "recorded_at": "2026-10-27T15:36:08.961681+00:00",
+  "sources": {
+    "rust/crates/swarm-enrollment-authority/src/authenticated_control.rs": "21392d4a4a05aa3b2339df8b1cd19ed71c72f9dcff6aba87fe940f59bec14419",
+    "rust/crates/swarm-enrollment-authority/src/control/trust_action.rs": "97090f3672195e1f37da6623c8141a5a56fc867cff1da0c2aaa5466b29910696",
+    "rust/crates/swarm-engine/src/root_store/trust_enrollment.rs": "8b669151b41f27eee4f7093f6078f54551adf4ff4bb31136d3e8ff9e170f7798",
+    "rust/crates/swarm-engine/src/trust/authentication.rs": "53510a556f1faa530c30a3ccba05455edee98180460f235270394ecaaee3d0f1",
+    "rust/crates/swarm-engine/src/trust/operations.rs": "9ff37a1f20a653f3dd5e30731891e6b2c1f2dde146b7884ae6891c1b87b9754d",
+    "rust/crates/swarm-protection-contract/src/canonical.rs": "5e9bad76b65a7fdbbd2a3966fdebbba59480d80c2e2337498ac5d0bd2a9092f0"
+  },
+  "review": {
+    "policies": "No executable policy changed; new service policies and bounds remain undecided.",
+    "functions": "No executable function changed; contracts described from inspected producers and consumers.",
+    "errors": "Existing nested action/authority/personal after-use results identified; future service traversal remains unimplemented."
+  }
+}

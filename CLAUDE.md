@@ -21,6 +21,9 @@ that tests were actually collected. Do not repeatedly run the full Go suite.
 Use isolated fixtures; never use a live mission database. Freeze tested sources
 during a run and invalidate evidence when relevant inputs change.
 
+Apply the function-docstring requirement in AGENTS.md to every new or modified
+public/nontrivial function: contract, errors, effects and limits, in the same change.
+
 Deliver the code, applicable FR/EN documentation and recipe proving the observable
 result, then the agreed RETEX. Distinguish implementation, local verification,
 independent review, native acceptance and installation. Mermaid must describe
@@ -38,10 +41,25 @@ history, consumption, unrelated work and other processes. Use applicable session
 authority for commit/push/deploy/cleanup; never add `Co-Authored-By` lines or invent
 authorship. These instructions grant no extra rights or paid calls.
 
+User decision (24 October 2026): verified authorized development is built,
+installed and activated locally by default, including starting/restarting only
+the identified project service, without another permission request. Verify the
+actual running binary/version, FR/EN notes and affected flow. Follow AGENTS.md's
+local-delivery rule; a compiled candidate is not installed. This grants no commit,
+push, publication, external deployment or interference with others' processes.
+
 For the current Cursor engine evolution, the user's choice is **direct Codex-only
 development** in `/home/fpizzi/Documents/ChatGPT/swarm`. Keep the native mission
 paused; do not start Claude, agents or Swarm orchestration as a consequence of
 reading this file. Any later change of execution mode needs user authorization.
+
+## Permanent verification tool
+
+Apply **Permanent verification recipes — Claude and Codex** in `AGENTS.md`.
+The permanent entry point is `tools/verification/recipe.py`; retain maintained
+recipes in `tools/verification/recipes/`, with test sources and fresh evidence.
+Read `tools/verification/README.md` before running or verifying a recipe.
+Cache-only scripts and a green exit alone do not establish a reproducible result.
 
 ## Available project methods and role boundaries
 

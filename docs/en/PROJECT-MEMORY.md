@@ -1,5 +1,30 @@
 # Project memory
 
+## Rust port — historical references, FPA-02a
+
+The Rust consumer of `Work.memory` recovery paths is verified and locally
+installed in dev65; see the [FPA-02a report](plans/migration-rust/FPA02A-MEMORY-20261025.md).
+`checkpoint` retains these paths in SQLite; `agent preview` and `agent prepare`
+include them as JSON data in the prompt and retain them in `context.paths`.
+Native execution rechecks availability and project containment before process
+permissions. File contents are not injected automatically: these are references
+to consult. Contents may change; this journey does not establish byte freshness.
+
+The guard reads the complete coherent Work inventory; a failed scan never becomes
+a partial catalogue. Lessons associated with a local version stay protected from
+legacy references after withdrawal too, including existing physical aliases.
+Missing/outside/managed files and unreadable inventories refuse with their cause
+retained, before the provider starts. After correction, a still-queued intention
+can be rechecked through the same public operation. The existing persisted
+context-byte policy also counts these references.
+
+CLI and protected HTTP Work reads retain the same paths. This tranche does not
+port the versioned-memory catalogue/mutations, summaries, conversation restoration
+or future M20 usage rights; their guards remain active. The sections below describe
+the historical Go contract, not evidence of Rust integration. See the
+[migration plan](../plans/migration-rust/PLAN.md) and permanent `memory-files-rust`
+recipe for current state and evidence.
+
 Project memory retains an experience or procedure from a verified RETEX. The
 local operator explicitly selects a version for a future worker task. Stored
 content changes neither engine methods nor permissions, budgets, criteria or
@@ -28,8 +53,41 @@ by `Store.get/list` and common mutation/replay reads. Row rejection precedes
 their callbacks and leaves no business event; valid replay retains current
 state without repeating the action. See the [Work row contract](WORK-ROW-CONTRACT.md)
 and [M28 report](../plans/deepagents-integration/RESULTATS-MEMOIRE-24.md).
-Other explicit SQL readers and error propagation in all their callers have not
-been declared audited. Usage rights remain open.
+Summary sources and the explicit readers outside identity inventoried in M29
+also use this check, including before export, launch, conversion and recovery.
+Rejection creates no usable packet or durable business effect; see the
+[M29 report](../plans/deepagents-integration/RESULTATS-MEMOIRE-25.md).
+Error propagation in all callers still needs qualification, so MEM-P1 remains
+open. Usage rights remain open.
+
+Memory inside trashed Work returns with its validated snapshot: exactly one
+consistent Work, dependent rows within its scope, and confirmation bound to exact
+bytes. Rejection preserves trash; valid older snapshots may omit empty optional
+tables. See the [restore contract](WORK-ROW-CONTRACT.md#dynamic-snapshots-and-restoration)
+and [M30 results](../plans/deepagents-integration/RESULTATS-MEMOIRE-26.md).
+This check does not supply the still-open usage rights.
+
+The conductor also reports inventory errors through diagnostics for already
+owned leases and stderr, without presenting failure as successful reconciliation.
+A targeted watch does not read unrelated envelopes; the global path still
+requires the complete inventory. Error/recovery transitions remain in the journal.
+See [conductor recovery](RUNTIME-RECOVERY.md#conductor-read-failures) and
+[M31 evidence](../plans/deepagents-integration/RESULTATS-MEMOIRE-27.md).
+Other read propagation and usage rights remain open.
+
+The six structured-call freshness checks also reread this Work and preserve
+read errors through the runner; a post-reply check prevents fast replies from
+bypassing rereading. Started-call consumption stays historical. See
+[freshness during a call](RUNTIME-RECOVERY.md#freshness-during-review-or-planning)
+and [M32](../plans/deepagents-integration/RESULTATS-MEMOIRE-28.md). Remaining
+fallback views and M20 usage rights stay open.
+
+Remaining pause-state consumers no longer turn an unreadable value into false:
+operations refuse, snapshots propagate the error, and partial context attributes
+missing data without advertising an available departure. See
+[pause states](RUNTIME-RECOVERY.md#unreadable-pause-in-operations-and-views) and
+[M33](../plans/deepagents-integration/RESULTATS-MEMOIRE-29.md). Joined reads and
+other linked envelopes still need qualification; M20 usage rights remain open.
 
 ```mermaid
 flowchart LR

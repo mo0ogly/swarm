@@ -1,0 +1,496 @@
+--- before/INSTALL.md
++++ after/INSTALL.md
+@@ -58,6 +58,21 @@
+ l’installateur ; ses fixtures utilisent le même compte. L’humain initial, le
+ compte dédié, le confinement et le parcours Admin restent à fournir. Aucun secret
+ ou cookie de session n’est transmis par ce protocole de démarrage.
++
++Le code fournit maintenant un précontrôle de bootstrap, sans ouvrir de projet :
++
++```sh
++swarm identity bootstrap-check EMPREINTE_APPROUVEE --input /chemin/absolu/bootstrap.json --json
++```
++
++Lancer ce contrôle sous l’UID prévu du service, sur des objets déjà provisionnés
++par un parcours autorisé. L’empreinte attendue doit venir d’une approbation
++indépendante ; la calculer depuis le fichier à accepter ne constitue pas cette
++approbation. Le manifeste V1 et ses répertoires privés sont décrits dans le
++contrat d’identité. Cette commande ne crée aucun compte/service/lock et ne valide
++pas l’humain déclaré : storage_verified est séparé des trois états false
++human_authentication_verified, confinement_verified et service_started. Le
++bootstrap humain réel et le provisionnement du compte restent à raccorder.
+ 
+ ## Formation embarquée et identité visuelle
+ 
+@@ -476,6 +491,24 @@
+ docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
+ ```
+ 
++Le numéro n’est pas incrémenté automatiquement à chaque modification ou
++compilation : `SWARM_VERSION` fixe une version explicite, sinon le build prend
++le tag SemVer exact de HEAD ou `devel`. Pour identifier une livraison locale de
++l’IHM, une préversion explicite peut être construite avant l’arrêt du serveur :
++
++```sh
++SWARM_VERSION=v0.1.1-ui.1 sh ./build.sh bin/swarm-ui-v0.1.1-ui.1
++./swarm.sh restart --root /chemin/du/projet --address 127.0.0.1:38433 --binary "$PWD/bin/swarm-ui-v0.1.1-ui.1"
++```
++
++Adapter l’adresse à l’instance gérée et vérifier les agents avant l’arrêt.
++Avec `--binary`, le lanceur réutilise le binaire préparé sans le reconstruire.
++`configure` avec les mêmes options mémorise ce choix pour les prochains démarrages.
++Chaque livraison locale numérotée doit choisir une nouvelle préversion, puis
++contrôler le numéro dans **Version et nouveautés** après redémarrage. Une
++préversion locale ne déclare ni tag ni release GitHub et n’est pas ajoutée à
++l’historique des releases publiées.
++
+ Une release explicite exige une version SemVer, un SHA de 40 caractères, un état
+ modifié connu et une date UTC ; `SOURCE_DATE_EPOCH` permet un build reproductible.
+ Le build Docker accepte les arguments `SWARM_VERSION`, `SWARM_COMMIT`,
+@@ -486,8 +519,9 @@
+ fenêtre distingue le **binaire lancé** des **sources locales** : un `*` sur le
+ résumé décrit le binaire modifié au build, tandis que l’état sale du checkout est
+ une donnée source séparée. La comparaison ne fait aucune requête réseau. La liste
+-embarquée est actuellement vide faute de release déclarée et l’interface le dit
+-explicitement ; le lien GitHub donne accès à l’historique complet des commits.
++embarquée vient de `version_history.json` et ne contient que les releases
++explicitement déclarées ; si elle est vide, l’interface le dit. Le lien GitHub
++donne accès à l’historique complet des commits.
+ Échap ferme la fenêtre et rend le focus au bouton.
+ 
+ ![Cockpit français, thème État](docs/screenshots/version-history/cockpit-fr-etat.png)
+--- before/docs/en/INSTALL.md
++++ after/docs/en/INSTALL.md
+@@ -58,6 +58,21 @@
+ and Admin flow remain to be supplied. No secret or session cookie is transmitted
+ by this startup protocol.
+ 
++Source now provides a bootstrap precheck without opening a project:
++
++```sh
++swarm identity bootstrap-check APPROVED_DIGEST --input /absolute/path/bootstrap.json --json
++```
++
++Run under the intended service UID, against objects already provisioned through
++an authorized flow. The expected digest must come from independent approval;
++computing it from the file to accept is not that approval. The identity contract
++describes the V1 manifest and private directories. This command creates no
++account/service/lock and does not authenticate the declared human: storage_verified
++is separate from human_authentication_verified, confinement_verified and
++service_started, all false. Actual human bootstrap and account provisioning
++remain to be connected.
++
+ ## Included training resources and branding
+ 
+ After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.
+@@ -395,6 +410,23 @@
+ docker compose --env-file deploy/install.env run --rm --no-deps swarm --json version
+ ```
+ 
++The number does not increment automatically on each edit or build.
++`SWARM_VERSION` supplies an explicit version; otherwise the build uses the exact
++SemVer tag at HEAD or `devel`. A local UI delivery can be identified with an
++explicit prerelease, built before stopping the managed server:
++
++```sh
++SWARM_VERSION=v0.1.1-ui.1 sh ./build.sh bin/swarm-ui-v0.1.1-ui.1
++./swarm.sh restart --root /path/to/project --address 127.0.0.1:38433 --binary "$PWD/bin/swarm-ui-v0.1.1-ui.1"
++```
++
++Use the managed instance's actual address and check agents before stopping it.
++With `--binary`, the launcher uses the prepared binary without rebuilding it.
++`configure` with the same options persists this selection for future starts.
++Choose a new prerelease for each numbered local delivery, then check **Version
++and what's new** after restart. A local prerelease creates no Git tag or GitHub
++release and is not added to the published-release history.
++
+ An explicit release requires a SemVer version, a 40-character SHA, a known
+ modified state and a UTC date; `SOURCE_DATE_EPOCH` supports reproducible builds.
+ The Docker build accepts `SWARM_VERSION`, `SWARM_COMMIT`, `SWARM_MODIFIED` and
+@@ -405,8 +437,9 @@
+ dialog keeps the **running binary** separate from **local sources**: `*` in the
+ summary describes the binary at build time, while local checkout dirtiness is a
+ separate source fact. Comparison makes no network request. The embedded release
+-list is currently empty because no release is declared; the UI says so and links
+-to the complete GitHub commit history. Escape closes the dialog and restores
++list comes from `version_history.json` and contains explicitly declared releases;
++the UI says when it is empty and links to the complete GitHub commit history.
++Escape closes the dialog and restores
+ focus to its trigger.
+ 
+ ![English cockpit, State theme](../screenshots/version-history/cockpit-en-etat.png)
+--- before/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -1399,3 +1399,50 @@
+ vérifiés. Ne pas exécuter le cockpit entier avec des privilèges pour obtenir cette
+ propriété ; cette intégration reste à concevoir après désignation de la source
+ d’autorité, puis à vérifier dans le parcours réellement retenu.
++
++## Précontrôle du bootstrap IA3c.2f-03d
++
++`swarm identity bootstrap-check EMPREINTE_SHA256 --input /chemin/absolu/bootstrap.json --json`
++effectue un contrôle local en lecture seule, avant toute ouverture de projet.
++`--root`, `--server`, stdin et les opérations d’activation ne sont pas des sources
++de bootstrap acceptées. Le paquet commun `internal/enrollmentbootstrap` fournit
++Encode, Decode et Load ; ses données ne sont pas des capacités d’autorité.
++
++Le manifeste canonique V1 contient schema_version, pins (installation_digest,
++authority_public_key, bootstrap_principal), service_uid, controller_uid,
++configuration_directory et witness_directory. Les pins utilisent la validation
++existante ; humain déclaré et clé publique ne constituent pas une connexion
++humaine ou une approbation. Les deux UID déclarés doivent différer et service_uid
++doit égaler l’UID effectif du processus qui contrôle le fichier. Le contrôle ne
++prouve pas que les agents utilisent réellement controller_uid.
++
++L’empreinte SHA-256 hexadécimale minuscule attendue vient d’un contrôle
++d’installation approuvé et protégé indépendamment. La calculer depuis le fichier
++à accepter, puis la lui faire vérifier, ne prouve pas cette approbation. Le
++fichier est ouvert sans suivre de lien : fichier régulier, propriétaire service,
++mode 0600, un seul lien. Son parent et les répertoires configuration/témoin sont
++ouverts avec le même `enrollmentconfig.OpenPrivateDirectory` que le stockage :
++UID effectif, parcours sans symlink, ancêtres root/service non modifiables par
++groupe/autres (exception sticky root telle que /tmp), répertoire final 0700.
++Les trois chemins doivent être distincts, non imbriqués ; les handles ne doivent
++pas désigner le même inode. Root et les administrateurs hôte restent de confiance.
++
++```mermaid
++flowchart TD
++  P["Empreinte approuvée indépendante"] --> C["Précontrôle avant ouverture projet"]
++  F["Manifeste privé V1 et répertoires existants"] --> C
++  C --> V["Format exact, empreinte, UID et chemins protégés"]
++  V --> O["Observation du stockage à cet instant"]
++  V --> R["Refus explicite sans résultat ni mutation"]
++  O --> N["Humain, confinement et service actif restent non vérifiés"]
++  N -. "raccord futur après preuves" .-> S["Service séparé et contrôle métier indépendant"]
++```
++
++Le résultat expose bootstrap_digest, bootstrap et storage_verified=true ;
++human_authentication_verified, confinement_verified et service_started restent
++false. Il ne crée ni répertoire, lock, clé, compte, journal, session ou service.
++Un refus ne retourne aucun résultat. Les handles sont fermés ; les futurs
++consommateurs doivent revalider les chemins à l’usage, pas réutiliser cette
++observation comme une permission. La configuration mutable et son historique ne
++sont pas ce manifeste ; une migration de racine n’est pas implémentée ici.
++Le service protégé, la source humaine, le confinement et Admin restent ouverts.
+--- before/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ after/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -1338,3 +1338,48 @@
+ verified rights and collection. Do not run the whole cockpit with privileges to
+ obtain this property. Design this integration after designating the authority
+ source, then verify the chosen actual flow.
++
++## Bootstrap precheck IA3c.2f-03d
++
++`swarm identity bootstrap-check SHA256_DIGEST --input /absolute/path/bootstrap.json --json`
++performs a read-only local check before opening any project. `--root`, `--server`,
++stdin and activation operations are not accepted bootstrap sources. The shared
++`internal/enrollmentbootstrap` package provides Encode, Decode and Load; its data
++is not an authority capability.
++
++The canonical V1 manifest contains schema_version, pins (installation_digest,
++authority_public_key, bootstrap_principal), service_uid, controller_uid,
++configuration_directory and witness_directory. Pins use existing validation;
++a declared human and public key establish neither human login nor approval.
++The declared UIDs must differ, and service_uid must match the checking process's
++effective UID. This does not prove agents actually use controller_uid.
++
++The expected lowercase hexadecimal SHA-256 digest comes from independently
++approved, protected installation control. Computing it from the file to accept
++and checking against that value does not establish approval. The file is opened
++without following links: regular file, service owner, mode 0600, one link only.
++Its parent and configuration/witness directories use the same
++`enrollmentconfig.OpenPrivateDirectory` boundary as storage: effective UID,
++symlink-free traversal, root/service-owned ancestors without group/other writes
++(root sticky directories such as /tmp excepted), final directory 0700. The three
++paths must be distinct and non-nested; handles must not identify the same inode.
++Root and host administrators remain trusted.
++
++```mermaid
++flowchart TD
++  P["Independent approved digest"] --> C["Precheck before project open"]
++  F["Private V1 manifest and existing directories"] --> C
++  C --> V["Exact format, digest, UID and protected paths"]
++  V --> O["Storage observation at this instant"]
++  V --> R["Explicit refusal without result or mutation"]
++  O --> N["Human, confinement and active service remain unverified"]
++  N -. "future integration after evidence" .-> S["Separate service and independent business control"]
++```
++
++The result exposes bootstrap_digest, bootstrap and storage_verified=true;
++human_authentication_verified, confinement_verified and service_started remain
++false. It creates no directory, lock, key, account, journal, session or service.
++Refusal returns no result. Handles close; future consumers must revalidate paths
++at use rather than treat this observation as permission. Mutable configuration
++and its history are separate from this manifest; root migration is not implemented
++here. The protected service, human source, confinement and Admin remain open.
+--- before/docs/plans/actions-confiance/identites-agents-replan.md
++++ after/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -1992,3 +1992,164 @@
+ exclus du diff et des archives possédés ; aucun source Go pertinent n’a changé.
+ L’auto-inspection corrige aussi une phrase FR : le pidfd enfant est reçu par le
+ parent, comme le montrent le code, le schéma et le texte EN. Source Go inchangé.
++
++## IA3c.2f-03d — précontrôle public du bootstrap protégé
++
++Reprise autorisée par « donc on fais ca ». Le dépôt a évolué sur les chantiers
++mémoire/UX depuis 03c ; ses preuves restent historiques, les ajouts lanceur sont
++inchangés. Préserver toutes ces modifications. Le principal humain initial et sa
++source n’ont pas été fournis ; question précise sur le fournisseur existant
++envoyée à l’utilisateur. Ne pas inventer issuer/subject, clé ou identité humaine.
++
++Comparer activation directe depuis le cockpit et précontrôle indépendant de
++l’installation : retenir le précontrôle en lecture seule. Il prépare une entrée
++réelle pour setup/service sans donner à un fichier le pouvoir de s’autoriser.
++Manifeste canonique version 1 : pins publics, UID service et contrôleur distincts,
++répertoires configuration/témoin. Empreinte attendue transmise indépendamment ;
++elle ne doit jamais être apprise du fichier qu’elle contrôle. Le chargement est
++exécuté sous l’UID du service, refuse symlinks/liens multiples/modes non privés,
++vérifie les trois répertoires distincts et non imbriqués sans créer de lock.
++Une validation de ce format ne prouve pas l’authentification humaine ou la
++protection du lanceur ; les états non vérifiés restent explicites.
++
++Fichiers possédés annoncés : internal/enrollmentconfig/store_linux.go (extraction
++du parcours de chemin existant) et nouveau path_linux.go ; paquet nouveau
++internal/enrollmentbootstrap (format, chargeur et tests) ; internal/engine/main.go
++(routage avant ouverture projet), nouveaux agent_identity_bootstrap_linux.go et
++son test. Commande publique : swarm identity bootstrap-check EMPREINTE --input
++/chemin/absolu/bootstrap.json. Aucun service, compte, clé ou configuration métier
++créé par cette commande. Bibliothèque commune réutilisable par setup/API/Admin.
++Docs FR/EN, installation, cible et note scientifique dans le même incrément.
++
++Critères : contre-exemples fichier/canon/digest/UID/alias, résultat nul sur refus,
++zéro fichier créé, ancien contrôle de chemin inchangé, CLI réelle sans projet ni
++authentification promue. Tests avant code ; Go -timeout=0, suivi de progression,
++race sur stockage/chargeur et lanceur, contrôle méthodes et compilation. Le
++rejeu du paquet config est justifié par l’extraction de sa frontière commune.
++Capturer les sources effectives et changements simultanés ; une mutation invalide
++la preuve, ne pas la masquer. Preuves dans ia3-bootstrap-check-20261017.
++
++Anomalie de méthode en lecture : noms supposés main_test.go, trust_store.go et
++agent_identity_issuer.go absents. Recherche corrigée avec rg --files avant lecture
++des producteurs ; aucun défaut produit ou test PASS déduit de ces commandes.
++Conserver les sorties originales de ces refus dans le rapport de tranche.
++
++### Résultat 03d — précontrôle public vérifié, source humaine en attente
++
++141 noms bootstrap/config (35 + 106) et 118 moteur (117 précédents + CLI) passent
++en normal et race-04, zéro FAIL/SKIP ; vet/build PASS. 848 entrées Go/modules
++stables pendant ces lots, sans overlay. La frontière de chemins du stockage est
++extraite sans assouplissement, les 106 gardes config sont rejouées à cause de
++cette dépendance commune. Les deux sources Go existantes modifiées et cinq
++ajouts sont archivés ; les travaux mémoire/UX sont conservés.
++
++Le binaire de fixture exécute la vraie CLI : contrôle valide, mauvais pin refusé,
++témoin valide dans des namespaces privés puis alias réel config/témoin par bind
++mount refusé. Aucun projet, lock, état métier, compte ou service créé. UID 0 dans
++ce namespace est l’utilisateur hôte non privilégié mappé, pas un accès root hôte.
++Les trois états humain/confinement/service restent false. Le contrôleur commun
++des méthodes passe avec cinq noms ; schémas FR/EN rendus et inspectés.
++
++Contre-exemples de méthode conservés : 02 compte un FAIL et 139 PASS, donc lot
++FAIL ; le diagnostic 03 confirme le parent temporaire 0775 interdit. Nos fixtures
++manquaient Chmod(0700), comme le pratiquent déjà les fixtures de stockage.
++Correction des fixtures seulement ; le produit n’est pas affaibli. Chaque cas
++négatif de chargement commence désormais par un Load valide de référence,
++évitant que l’échec d’un parent masque toutes les autres injections. Le test CLI
++s’exécute depuis un répertoire isolé. Le collecteur 01 a échoué avant tout Go
++(variable name écrasée par la boucle d’archivage) : script original conservé,
++variable distincte et label neuf ; ne pas compter ce lancement comme test exécuté.
++
++| Découverte | Origine, valeur et périmètre | État / propriétaire / critère restant |
++| --- | --- | --- |
++| I2f03d-01 | Ouvrir le coordinateur pour un simple précontrôle créerait un lock ; séparer observation et mutation | Helper de chemin commun et CLI sans Store réalisés/vérifiés ; Codex ; conserver le même contrat pour setup/API/Admin |
++| I2f03d-02 | Fixture parent 0775 : des cas négatifs PASS peuvent partager une précondition invalide et ne pas tester leur défaut propre | Reproduit, corrigé et vérifié avec témoin valide avant chaque injection ; Codex ; capitalisé dans contrat, tests, rapport et note scientifique |
++| I2f03d-03 | Lire tout le fichier avant comparaison d’empreinte peut allouer un gros fichier non approuvé ; origine : inspection statique de Load | Hypothèse de durcissement avant raccord service, non mesurée ; Codex ; comparer empreinte en flux puis lecture liée aux mêmes octets, sans plafond métier caché, si un consommateur exposé doit lire des entrées non approuvées |
++
++Coordination : demande de stabilisation reçue du chantier mémoire M32 pendant sa
++qualification finale ; aucune réponse intersession envoyée, comme demandé.
++Nos sept sources Go et les paquets communs sont stables après les lots 04 ;
++plus aucune modification Go prévue pour terminer cette documentation. Toute
++correction réellement nécessaire devra annoncer ses fichiers et un nouveau
++point stable. La demande reçue n’est pas une preuve de qualification M32.
++
++Le [rapport 03d](verification-identites-agents-20261016/ia3-bootstrap-check-20261017/RAPPORT-IA3c2f03d.md)
++conserve recette et limites. Le précontrôle ne résout ni l’approbation indépendante
++du manifeste, ni l’authentification du principal déclaré. La question précise
++« fournisseur existant et URL d’émetteur, ou aucun » est en attente de réponse.
++Cette valeur est nécessaire pour choisir et raccorder le parcours humain réel ;
++ne pas inventer un issuer/subject ni promouvoir le compte/cookie courant. Après
++cette désignation : source humaine et contrôle métier, provisionnement/service
++séparé, preuve de confinement, admission/révocation publiques puis setup/Admin.
++Pas de compte, clé ou service d’autorité créé pour contourner ce préalable.
++F01–F07, EP-01/04/05/07, IA3–IA5 et RETEX global restent ouverts.
++
++La qualification vérifie aussi deux contrôles d’aide existants : le routage
++partagé main.go a changé et l’aide doit rester utilisable sans projet, sans
++mutation de contexte métier. Ce sélecteur borné ne modifie aucun source Go.
++Le chantier M32 confirme ensuite par message entrant avoir reçu le point public
++de stabilité et lancé sa qualification sans substitution Go ; c’est un reçu de
++coordination, pas sa fin ou son acceptation.
++
++### Replan de preuve 03d — ressources réellement embarquées
++
++La coordination M32 mentionne ses assets figés ; l’inspection de resources.go à
++la racine et go list -json . montre 274 ressources go:embed, absentes du collecteur
++limité à internal/cmd. Les 848 entrées de 04 ne suffisaient donc pas à lier le
++binaire complet. Garder ces preuves et leur limite, ne pas les présenter comme
++qualification de tous les inputs. Les sources Go sont toujours inchangées.
++
++I2f03d-04, propriétaire Codex : collecteur corrigé pour inclure source racine,
++ressources et évolution de la liste EmbedFiles. 137 assets web sont figés dans
++une fixture readonly logique et l’overlay ne substitue aucun Go. Autres ressources
++hashées et conservées/référencées pour reconstruction. Source primaire du Go local
++vérifiée : embed.Files utilise fsys.Actual, donc applique l’overlay aux ressources.
++
++Le lot final 05 passe : 141 noms bootstrap/config et 118 moteur en normal/race,
++vet/build, CLI du nouveau binaire et alias de bind mount réels, contrôleur méthodes
++cinq noms et deux gardes d’aide. 1 123 entrées effectives stables. Les empreintes
++des sources Go coïncident avec 04 ; aucune modification du chantier identité ne
++perturbe la qualification M32. Aucune acceptation UI ou service réel déduite.
++La capitalisation dans une consigne embarquée commune attend sa fin confirmée,
++afin de préserver cette entrée ; la recette corrigée et ce plan sont persistants
++dès maintenant. L’activation reste suspendue au choix de source humaine demandé.
++
++### Capitalisation après la clôture de la fenêtre M32
++
++Un message entrant confirme la fin de qualification M32 et la stabilité des sept
++sources Go communes. Sa fenêtre est close ; aucune preuve M32 n’est modifiée.
++Les deux leçons sont maintenant conservées dans la consigne personnelle
++/home/fpizzi/.codex/AGENTS.md, les méthodes FR/EN et le contrat commun embarqué.
++Le contexte AGENTS actualisé reçu ensuite contient effectivement ces clauses.
++Les processus déjà démarrés ne reçoivent pas cette mise à jour automatiquement.
++
++Le premier ajout au contrat fait échouer le contrôleur : planner 32034 et
++subplanner 32037 octets, contre la borne existante 32000. Original conservé dans
++CONTRACT-before-frame-fix.md et workflow-learning-06.stderr. Aucun plafond relevé,
++aucune troncature : reformulation du paragraphe de preuve, mêmes exigences et deux
++leçons incluses, 63 octets de moins. workflow-learning-07 passe avec cinq noms.
++Cette anomalie créée par notre amélioration est traitée avant le besoin initial.
++
++La nouvelle donnée embarquée justifie la qualification du moteur et du binaire
++avec ce contrat final : mêmes 118 noms identité, plus les gardes existantes de
++framing, transmission au processus worker de fixture et réouverture, et aide.
++Ce provider est un script local de test, aucun Claude ou modèle réel. Les 141
++noms des bibliothèques config/bootstrap restent réutilisés de 05 après contrôle
++de leurs dépendances locales effectives, qui n’importent pas resources. Pas de
++suite config répétée pour une modification de texte hors de son graphe.
++
++Lot final 07 : 126 noms moteur (118 identité, 5 framing, 1 transmission/réouverture,
++2 aide) PASS normal/race, aucun FAIL/SKIP ; vet/build et CLI réelle/alias PASS.
++141 noms de bibliothèque 05 réutilisés : graphe local et test vérifié, quinze
++entrées inchangées, resources non importé. 1 123 entrées effectives liées au
++binaire fixture-07. Le test worker vérifie le préfixe complet transmis au script
++local et conservé après réouverture, sans fichier local hostile ni acceptation
++implicite de tâche. Les deux leçons atteignent ainsi le consommateur de fixture,
++pas seulement un fichier. Aucun modèle réel ou processus existant mis à jour.
++
++I2f03d-05 : les corps de méthodes frôlent la borne moteur 32000 ; cette borne
++exclut l’en-tête de métadonnées. Les cadres retournés mesurés sont 32196/32202
++(planner/subplanner) et 31355/18794 (worker/reviewer). Ce n’est pas une mesure des
++limites fournisseurs. Propriétaire Codex, suivi de cadrage/méthodes : justifier
++la borne et réduire les répétitions à contrat constant avant un nouvel ajout
++qui l’excéderait ; aucun relèvement arbitraire ou nouvelle politique ici.
+--- before/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ after/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -30,6 +30,14 @@
+ Le service protégé réel exige encore la source indépendante des pins et du
+ principal humain, les chemins protégés et le confinement. Le choix humain initial
+ et l’autorisation d’installer le compte/service appartiennent à l’opérateur.
++
++Le précontrôle public 03d ajoute `swarm identity bootstrap-check` avant ouverture
++de projet : manifeste V1 exact, empreinte attendue indépendante, UID service
++effectif et répertoires privés distincts sans mutation. Il réutilise le parcours
++de chemins du stockage. Les UID sont une déclaration de frontière, pas une
++preuve de confinement ; le principal reste déclaré, pas authentifié. Ce contrôle
++ne crée aucun compte/service/lock, ne modifie pas la configuration métier et ne
++constitue pas son activation. Le service et sa source humaine restent à raccorder.
+ 
+ ## Besoin et état observé
+ 
+--- before/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
++++ after/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+@@ -685,3 +685,27 @@
+ suffisent pas si le bootstrap ou le compte sont compromis. Cette séparation des
+ preuves aide à construire le protocole expérimental de thèse ; elle n’établit
+ aucune nouveauté scientifique ou supériorité sur les travaux et produits cités.
++
++### IA3c.2f-03d — ne pas promouvoir une déclaration de bootstrap en autorité
++
++Le précontrôle public sépare maintenant manifeste déclaré, empreinte approuvée
++indépendamment et propriétés de stockage observées. Il expose explicitement que
++l’humain, le confinement et l’activation restent non vérifiés. Un UID distinct
++ou un fichier privé ne remplace donc pas la preuve humaine. Le contrôle de chemins
++est partagé avec le stockage, sans ouverture de coordinateur qui créerait un lock.
++
++La première expérience a refusé un témoin supposé valide : son parent temporaire
++était 0775, donc le refus était correct. Cette précondition invalide masquait
++aussi les autres défauts injectés. La recette est renforcée par un témoin valide
++avant chaque injection ; la fixture est protégée, aucune garde produit n’est
++assouplie. Cette correction de notre protocole expérimental ne prouve ni un
++service déployé ni une nouveauté scientifique.
++
++Une seconde limite de preuve est découverte à l’aide de la coordination mémoire :
++le compilateur embarque aussi la source racine et des assets, pas seulement les
++fichiers Go des répertoires du moteur. Le collecteur est corrigé et le candidat
++requalifié avec ces entrées, des assets web figés et aucune substitution Go.
++Les anciens résultats et leur couverture incomplète restent conservés. La preuve
++de comportement, la stabilité des sources et la reconstruction de l’image sont
++trois vérifications distinctes ; leur correction ne prouve pas l’originalité du
++protocole d’identité ni une activation réelle de l’autorité humaine.
+--- before/tools/agent-workflows/CONTRACT.md
++++ after/tools/agent-workflows/CONTRACT.md
+@@ -30,9 +30,9 @@
+ edit `.swarm` databases, fabricate reviews, alter proofs or accept outside public
+ operations. Respect owned workspaces; parallel writes need supported isolation
+ and ownership. Delegation needs authorization and capacity. Do not delete locks,
+-stop others or change shared files to force progress. Managed checks and review
+-must cover the same candidate; changed code, methods or relevant inputs invalidate
+-old evidence. Record commit SHA and dirty diff for uncommitted work.
++stop others or change shared files to force progress. Managed checks/review bind one candidate. Changed code/methods/inputs invalidate
++evidence. Record SHA and dirty diff; Go inputs include root/package code, embeds
++and effective overlays.
+ 
+ Retain Cursor January 14, 2026, https://cursor.com/blog/scaling-agents and February
+ 5, 2026, https://cursor.com/blog/self-driving-codebases. Audit JAN-1..JAN-7 and
+@@ -110,6 +110,7 @@
+ | --- | --- | --- | --- | --- | --- |
+ 
+ Results: PASS, FAIL, PARTIAL, NOT TESTED, NOT APPLICABLE (reason required).
++Establish a valid control before each fault injection.
+ Test normal, invalid, failure, recovery and promised persistence/concurrency;
+ assert behavior, beyond labels/HTTP 200. Retain command, executor, revision,
+ start/end, exit, original stdout/stderr, hashes and output limits. Distinguish
+--- before/docs/AGENT-METHODS.md
++++ after/docs/AGENT-METHODS.md
+@@ -15,6 +15,14 @@
+ les leçons vérifiées. Une anomalie déclenche `replan`. Un report conserve son
+ propriétaire et sa condition de reprise. Ce contrat de méthode ne prouve pas une
+ amélioration autonome du moteur installé et n’accorde aucun droit supplémentaire.
++
++Les preuves de compilation Go couvrent le code des paquets, y compris à la racine,
++les ressources go:embed et les octets effectivement substitués par un overlay.
++Une liste de dossiers supposée ne suffit pas. Avant chaque injection de défaut,
++établir un témoin valide avec les mêmes préconditions : un refus commun ne prouve
++pas la couverture de tous les défauts. Ces règles sont aussi dans le contrat
++embarqué ; reconstruire le binaire pour les futures tentatives, sans changer les
++preuves historiques ou les processus déjà démarrés.
+ 
+ ## Catalogue lisible
+ 
+--- before/docs/en/AGENT-METHODS.md
++++ after/docs/en/AGENT-METHODS.md
+@@ -15,6 +15,14 @@
+ triggers `replan`. Deferred work keeps its owner and resumption condition. This
+ method contract proves no autonomous improvement of the installed engine and
+ grants no additional authority.
++
++Go build evidence covers package code, including module-root files, go:embed
++resources and the bytes actually substituted through overlays. An assumed list
++of directories is insufficient. Establish a valid control with the same
++prerequisites before each fault injection: one common rejection does not prove
++coverage of every defect. These rules are also embedded in the shared contract;
++rebuild for future attempts without changing historical evidence or already
++running processes.
+ 
+ ## Plain-language catalogue
+ 

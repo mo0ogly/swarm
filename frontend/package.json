@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node build.mjs && node build-terminal.mjs",
-    "build:terminal": "node build-terminal.mjs"
+    "build": "node build.mjs && node build-terminal.mjs && node build-live-terminal.mjs",
+    "build:terminal": "node build-terminal.mjs",
+    "build:live-terminal": "node build-live-terminal.mjs"
   },
   "dependencies": {
     "@xterm/addon-fit": "0.11.0",

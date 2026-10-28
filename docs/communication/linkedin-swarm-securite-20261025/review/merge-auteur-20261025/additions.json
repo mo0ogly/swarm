@@ -1,0 +1,45 @@
+{
+  "strategy": "Additive merge; every latest-author block retained verbatim and in order.",
+  "original_blocks_preserved": 160,
+  "original_words": 2493,
+  "merged_words": 3859,
+  "additions": [
+    {
+      "id": "standards",
+      "anchor": "Ces travaux montrent que le problème est identifié et que les réponses techniques progressent.",
+      "added_words": 218
+    },
+    {
+      "id": "financial-example",
+      "anchor": "**L'important n'est pas le nombre de services. C'est l'impossibilité de contourner les fonctions de contrôle.**",
+      "added_words": 227
+    },
+    {
+      "id": "memory-revocation",
+      "anchor": "**Il ne doit pas modifier seul les règles qui gouvernent les conséquences de ce raisonnement.**",
+      "added_words": 87
+    },
+    {
+      "id": "assurance-level-status",
+      "anchor": "Elle distingue plusieurs niveaux d'assurance proportionnés aux conséquences possibles.",
+      "added_words": 34
+    },
+    {
+      "id": "eight-requirements",
+      "anchor": "Les garanties d'autorité et d'exécution doivent rester indépendantes de ces évolutions.",
+      "added_words": 445
+    },
+    {
+      "id": "swarm-maturity",
+      "anchor": "Swarm est toutefois un projet en évolution.",
+      "added_words": 161
+    },
+    {
+      "id": "qualification",
+      "anchor": "Les mesures devront porter sur les effets indésirables réellement observés, les blocages injustifiés, les coûts, la latence et la capacité à reprendre correctement après incident.",
+      "added_words": 127
+    }
+  ],
+  "reference_links_added": 10,
+  "original_references_preserved": 11
+}

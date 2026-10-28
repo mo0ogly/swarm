@@ -288,6 +288,10 @@ pub use validation_run::{
     run_validation_control, ValidationRun, ValidationRunCleanup, ValidationRunError,
 };
 #[cfg(target_os = "linux")]
+mod git_pack;
+#[cfg(target_os = "linux")]
+pub use git_pack::{run_git_pack, GitPackError, GitPackOperation, GitPackRun, GitPackOutput, GitPackSyncError};
+#[cfg(target_os = "linux")]
 mod git_reference_transaction;
 #[cfg(target_os = "linux")]
 pub use git_reference_transaction::{run_git_reference_transaction, GitReferenceDecision, GitReferenceObservation, GitReferenceRun, GitReferenceError};
@@ -327,6 +331,8 @@ pub use root_store::{RootBinding, TrustEnrollmentRequest};
 pub use root_store::TrustEnrollmentCallError;
 #[cfg(target_os = "linux")]
 pub use root_store::CurrentManagedGitPublication;
+#[cfg(target_os = "linux")]
+pub use root_store::{PaeaGitRepository,PaeaGitRepositoryBinding,PaeaGitRepositoryError, PaeaGitObjectFormat};
 #[cfg(target_os = "linux")]
 pub use root_store::{PaeaGitIntent,PaeaGitIntentReservation,PaeaGitIntentObservation,PaeaGitIntentError};
 #[cfg(target_os = "linux")]

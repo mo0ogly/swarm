@@ -1,5 +1,35 @@
 [
   {
+    "path": "docs/training/casa-pizza/tutoriels/frames/17-apercu-fr.png",
+    "kind": "doc",
+    "sha256": "e43a16f07ae7407c0be24fae5cf7ee09dd864ae09ed5a517f1c64aa2ab7e8bd4"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/18-graphe-sombre.png",
+    "kind": "doc",
+    "sha256": "c618dd45ee52a39ca18a8d0361e036ffe00799f4aa5dd8a332d5333efab7709c"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/19-commande-en.png",
+    "kind": "doc",
+    "sha256": "59c352f5bd1eaaa6cfc5685f740c3a74d0269a66cf8e6cf57085ff6986e153cb"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/19-commande-fr.png",
+    "kind": "doc",
+    "sha256": "172c79919cab6cc98ca76cc793e53b375811ccfb6349c2fe9240ee413cf76ed4"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/overview-01.png",
+    "kind": "capture",
+    "sha256": "ff38966ae5036a710935fff988cdb7a5f5ba4508544d5eb10f9de3c09828076a"
+  },
+  {
+    "path": "docs/training/casa-pizza/tutoriels/frames/overview-02.png",
+    "kind": "capture",
+    "sha256": "463322185d7d99a21f08ac526e14571e55e0e58694ac10c7ca7dcbe355fac25f"
+  },
+  {
     "path": "docs/training/casa-pizza/tutoriels/frames/overview-03.png",
     "kind": "capture",
     "sha256": "48293b6bdd30eaaaab1379428e61d16898d7aeeb75336bbe8bae6226f25d48e0"
@@ -355,6 +385,16 @@
     "sha256": "cddd3ac48c73a36c70f2b82fffaed7a293c6438356e2957e3b89ccb8edc30808"
   },
   {
+    "path": "internal/engine/agent_identity_bootstrap_linux.go",
+    "kind": "source",
+    "sha256": "a5ff02b2adddbd7ef57e4d8257e182ef56f78e1402d9d15539ea2c0ab6c5ba5d"
+  },
+  {
+    "path": "internal/engine/agent_identity_bootstrap_linux_test.go",
+    "kind": "test",
+    "sha256": "ecc8751605910a7bf3ad7db74f0386ed5ff07956bba48ccfcbefda92494b2872"
+  },
+  {
     "path": "internal/engine/agent_identity_channel_linux.go",
     "kind": "source",
     "sha256": "3528f0eed5ce77171d4e5506c387f50936314b8f24296c566e16c7045f2a91e3"
@@ -373,6 +413,16 @@
     "path": "internal/engine/agent_identity_config_client_linux_test.go",
     "kind": "test",
     "sha256": "41e1b74e978aca76b28d8e027cb8ec9ed97d8b5cb7d33ebf08e2df93e4f3ffcc"
+  },
+  {
+    "path": "internal/engine/agent_identity_config_launch_linux.go",
+    "kind": "source",
+    "sha256": "cffbe96c46131660b40502f43bb5ff6e16521890396aca09488abecdf9c5032b"
+  },
+  {
+    "path": "internal/engine/agent_identity_config_launch_linux_test.go",
+    "kind": "test",
+    "sha256": "b1fb39b86108d30fc0bd303e5557a4920c5bf5d4b1bd5767f6bdfdbe2633b1a5"
   },
   {
     "path": "internal/engine/agent_identity_config_service_linux.go",
@@ -562,7 +612,7 @@
   {
     "path": "internal/engine/agents_store.go",
     "kind": "source",
-    "sha256": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21"
+    "sha256": "e1f550005f9549d4acd8ba38ad03c7359ab9efdc51353de73103adf17666284a"
   },
   {
     "path": "internal/engine/agents_test.go",
@@ -602,7 +652,7 @@
   {
     "path": "internal/engine/archive.go",
     "kind": "source",
-    "sha256": "7affca0bbc15f4878497696ba7b0fdffe0d5ac440008ea2dd6f5d6c4225b63da"
+    "sha256": "a29a36d01925427ca66088b5500850ab485beb330f22637dc74dd0de88d7fc94"
   },
   {
     "path": "internal/engine/assist_action.go",
@@ -732,7 +782,7 @@
   {
     "path": "internal/engine/automation_cli.go",
     "kind": "source",
-    "sha256": "626e3541009aa324bd59a36dfaf19dcddaf6abb2835f304140e4492683e5a8de"
+    "sha256": "8f17cf176cbb1b5577e6017235b352aa63324f1f9af29b827eefae7e15289613"
   },
   {
     "path": "internal/engine/automation_cli_test.go",
@@ -757,7 +807,7 @@
   {
     "path": "internal/engine/automation_requests.go",
     "kind": "source",
-    "sha256": "aa5791030237443cf5ff5f30d1575f82166c0a54a4664067407901e56a0f619f"
+    "sha256": "afe97c1dac6bdbe64bd338c1b38a299397dff29fffe2d1c0b1fecb4587775d42"
   },
   {
     "path": "internal/engine/automation_requests_test.go",
@@ -772,7 +822,7 @@
   {
     "path": "internal/engine/automation_schedule.go",
     "kind": "source",
-    "sha256": "02a7890cd57787d1df659f66c4e626d7b276cab15b19f0a673bb729d73e0eacf"
+    "sha256": "41f665321cc8495623225b8ef657ed527503a949e74deefd38cbf15fa4b6bda9"
   },
   {
     "path": "internal/engine/automation_schedule_lifecycle_test.go",
@@ -897,7 +947,7 @@
   {
     "path": "internal/engine/console_dialog.go",
     "kind": "source",
-    "sha256": "1c3741d829440edba725aad5cffc42c2689b6c5b50d32a663360b267158956f5"
+    "sha256": "02d2b498742c504a6a73248a392f21a9f3a01ffa81b6eeff1143b616e0df94e8"
   },
   {
     "path": "internal/engine/console_dialog_render.go",
@@ -997,7 +1047,7 @@
   {
     "path": "internal/engine/dashboard.go",
     "kind": "source",
-    "sha256": "349967066bd38d58c34d6ed01274a11f50d171a14baab1b4267e33a388332c70"
+    "sha256": "6e34594941029accf290bd2c66be1ec77a8634499368bbcfde74bc195c149d39"
   },
   {
     "path": "internal/engine/dependency_proof_signal.go",
@@ -1242,7 +1292,7 @@
   {
     "path": "internal/engine/graph_draft.go",
     "kind": "source",
-    "sha256": "a5446281e2ee1b8ddf927d54befdb84e7d2e396e343ebf053a5469a7cbe64eac"
+    "sha256": "035e3db7a345038c4fbae01009da7c07a95e2cfd183fa0fa58793518a15d8539"
   },
   {
     "path": "internal/engine/graph_draft_cli.go",
@@ -1367,7 +1417,7 @@
   {
     "path": "internal/engine/independent_review_runtime.go",
     "kind": "source",
-    "sha256": "00caf03bec8cabb0b66996279ce112525b6dca156d9f162b6fda789d9720569b"
+    "sha256": "72dce66445841a804c5950f4fc45c2c23ec1fa4094041cb685fc5659cce7fe95"
   },
   {
     "path": "internal/engine/independent_review_test.go",
@@ -1383,60 +1433,5 @@
     "path": "internal/engine/independent_validation_evidence_test.go",
     "kind": "test",
     "sha256": "1bb6599627f2d3c1d2e3efa32ef2ad01fe3a8504dcf8bae8fe6c2c13fae424c2"
-  },
-  {
-    "path": "internal/engine/infrastructure_supervision_test.go",
-    "kind": "test",
-    "sha256": "1f6bbd72a46a31479925fc82a60750756d27319fefe4f48039b89607949a9761"
-  },
-  {
-    "path": "internal/engine/instruction_revision.go",
-    "kind": "source",
-    "sha256": "8fb06af1125ed0785f282e77be4607e81e4a76e32f1a1ee36a4863cb6efc8615"
-  },
-  {
-    "path": "internal/engine/instruction_revision_operator_test.go",
-    "kind": "test",
-    "sha256": "595d052c1e8a425463220e98af2674f4e213eb2db6c9c2a72d9f0560c6d6c747"
-  },
-  {
-    "path": "internal/engine/instruction_revision_test.go",
-    "kind": "test",
-    "sha256": "e6a3c4d1869b2c8fdb235d5d111912f3b07a266e24f35df9f96cfa86b0b7bc08"
-  },
-  {
-    "path": "internal/engine/interruption_record.go",
-    "kind": "source",
-    "sha256": "82c0a0d33be3e7dfaa9d4024417d7480fb292a04fbd10adbf7dba6a0b1529dd6"
-  },
-  {
-    "path": "internal/engine/interruption_record_test.go",
-    "kind": "test",
-    "sha256": "1d26114d75c84f4f77de98fbc491ac9c78c34fc04b374e9b2a4dc3b8e1f01b0f"
-  },
-  {
-    "path": "internal/engine/interruptions_test.go",
-    "kind": "test",
-    "sha256": "254b2306b66e75241e9725d911510372617adf1e7b3c8703a34cd0ba6fbdaedd"
-  },
-  {
-    "path": "internal/engine/kernel_attempt_source_linux.go",
-    "kind": "source",
-    "sha256": "365abeb3695768ba20af61b6c6667be023eab69058d036be5c9bf0bcf3d0d7ad"
-  },
-  {
-    "path": "internal/engine/kernel_attempt_source_linux_test.go",
-    "kind": "test",
-    "sha256": "ddfe774d3653af5097cae74f5d68af244449ec93c3c80325ac3a8fdbb22471df"
-  },
-  {
-    "path": "internal/engine/kernel_backend_linux_amd64.go",
-    "kind": "source",
-    "sha256": "0a77d0f2555a450c48f131863ab24a1cee6ccd568c993419062c5ea86e21efaf"
-  },
-  {
-    "path": "internal/engine/kernel_backend_linux_amd64_test.go",
-    "kind": "test",
-    "sha256": "f7be30522e95f519f7873f4e4a8208246a833d52b953c773957ab42f01455d56"
   }
 ]

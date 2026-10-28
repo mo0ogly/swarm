@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "id": "paea-exact-effect-authority",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "tools/verification/recipe.py",
+    "schemas/paea/personal-service-response-v1.schema.json",
+    "tests/paea_service_response_schema_test.py",
+    "rust/crates/swarm-linux-identity-channel/**/*",
+    "tools/verification/recipes/paea-exact-effect-authority.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "paea-current-account-exact-namespace",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "paea_action",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "paea_permission_is_separate_exact_and_rejects_invalid_digests",
+        "paea_exact_current_grant_refuses_neighbors_then_recovers",
+        "paea_and_trust_permissions_never_substitute_each_other",
+        "paea_keeps_callback_failure_and_password_refusal",
+        "paea_after_use_cancellation_retains_known_action",
+        "paea_holds_authority_then_refuses_revoked_use",
+        "paea_stale_head_refuses_and_current_head_recovers",
+        "paea_after_use_cancellation_retains_callback_failure"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "existing-trust-action-gate-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "authenticated_startup",
+        "authenticated_trust_action_",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "authenticated_trust_action_uses_current_principal_and_exact_grant",
+        "authenticated_trust_action_retains_outcome_after_cancellation",
+        "authenticated_trust_action_holds_and_rechecks_revocation"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "paea-capability-type-and-lifetime-refusals",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--doc",
+        "paea_action::Identity",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "3 passed; 0 failed",
+        "control::paea_action::Identity"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "authority-rustdoc-contracts",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Generated"
+      ]
+    }
+  ]
+}

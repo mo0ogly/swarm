@@ -676,8 +676,88 @@ confirmation. Une réponse perdue exige le rejeu du même événement, jamais un
 second événement. Un refus conserve toutes les données. Le diagnostic public
 preparation-launch-locked identifie désormais ce refus de départ.
 
-Un travail existant, une organisation, une révision ou release-plan restent
-explicitement indisponibles dans ce parcours ; aucune autorisation de départ ni
+Un travail existant, une organisation ou une révision restent
+explicitement indisponibles dans ce parcours de création ; aucune autorisation de départ ni
 identité humaine authentifiée n’est déduite du clic. Les conversions historiques
 restent des observations. La recette `preparation-conversion-rust` couvre aussi
 les modifications Admin et les échecs injectés avant/après l’écriture du reçu.
+
+## Autoriser les tâches converties — Rust
+
+Après création, ouvrir **Autoriser le démarrage des missions**, examiner le travail
+courant et déplier les contrats de tâches, puis confirmer. La commande
+`prepare release-plan ID --root ROOT --input FILE --json` exige le hash
+`conversion.plan_hash`, les révisions préparation/Work affichées et un événement
+unique. Elle libère atomiquement les verrous de la conversion couvrant tout le
+Work. Un nouveau brouillon n'est pas appliqué ; une édition publique des tâches
+est conservée et doit être revue. Le refus de révision exige de rouvrir la revue.
+Une réponse perdue exige le rejeu du même événement. Le reçu atteste une
+autorisation enregistrée, pas un lancement : un conducteur déjà configuré peut
+ensuite agir sous ses droits et budgets. Aucun fournisseur n'est appelé par
+release-plan ; aucune autonomie, consommation ni mission locale n'est réinitialisée.
+La recette `preparation-release-rust` vérifie ce parcours sur un Root isolé.
+
+## Configurer une équipe CLI en revue humaine — Rust
+
+Après création des tâches, **Configurer l’équipe** ouvre une revue liée aux deux
+révisions. Saisir les identifiants du catalogue fournisseur du projet (consultable
+avec `providers config show`), un dossier contenu dans le projet, un niveau et les
+plafonds explicites de tâches/appels. **Enregistrer l’équipe sans démarrer** crée
+la configuration et son reçu ; les tâches restent verrouillées. La libération
+reste l’action séparée `release-plan`. Aucun fournisseur n’est exécuté ici.
+
+CLI : `prepare configure-team ID --root ROOT --input FILE --json`. Intention v1 :
+action=configure-team, preparation_id, event_id, expected_revision,
+expected_work_revision, sha256 du plan converti et organization. Champs de cette
+dernière : provider, worker_provider, level, workspace, validation=human, max_tasks,
+max_calls ; model_policy_hash facultatif lie la politique du responsable. Les
+fournisseurs API, contrôles automatiques et dépôts gérés ne sont pas pris en
+charge par cette première configuration. Un travail déjà organisé ou libéré,
+un Agent existant et des tâches modifiées imposent une réconciliation explicite ;
+aucune adoption d’historique ni réparation silencieuse. Les limites/defaults Admin
+courants restent requis ; cette opération ne les remplace pas.
+
+Les limites décisions/activations/reviewer reprennent max_calls ; le contexte de
+revue reprend les defaults Admin, avec consommation initiale nulle sur ce travail
+intact. Les budgets monétaires existants sont conservés et restent distincts.
+L’acteur local n’atteste pas l’identité d’une personne acceptant un résultat.
+Après réponse perdue, garder le même événement ; son reçu se rejoue avant les
+lectures fournisseur. Un mauvais fournisseur/workspace donne HTTP400 ; une
+politique de modèle périmée HTTP409 ; les IO/SQL/fermetures restent des erreurs
+serveur avec leurs causes. Recette : `preparation-team-rust`.
+
+## Enveloppe USD de préparation
+
+`prepare budget ID --input FILE` et la modale native enregistrent un `budget`
+explicite dans la commande préparation partagée (version1, event_id, expected_revision).
+Champs : limit_usd, reserve_per_launch_usd, estimate_source, reference_date.
+Zéro signifie illimité ; une limite positive exige une réservation positive,
+une source non vide et une date YYYY-MM-DD réelle. Le moteur remplace acteur/date.
+L’écriture CAS/reçu conserve documents, verdicts, budgets du Work et toutes les
+réservations/historiques. Après réponse perdue, rejouer exactement le même événement ;
+un CAS périmé impose une relecture. Enveloppe invalide : preparation-budget-invalid
+(HTTP400). `prepare budget ID` sans input et GET `/api/v1/preparations/budget?id=ID`
+lisent le même snapshot SQL des réservations, estimations engagées et couvertures
+coûts/jetons. Coût absent reste null ; zéro déclaré reste zéro. Un Work lié expose
+son enveloppe partagée distincte. L’alerte suit le pourcentage Admin persisté
+(null désactive), sans fallback80%. Champs consommés malformés, identités de lignes
+incohérentes, engagements actifs/usage négatifs ou débordés refusent sans mutation.
+La modale affiche ces observations ; les appels IA de préparation restent à porter.
+
+Le lien Admin de préparation ouvre `/native-runtime.html?view=admin` et conserve langue/thème ; les limites par portée du cockpit forment un autre écran. Le client budget valide les champs consommés et refuse une réponse200 malformée avant d’ouvrir la modale. Ses compteurs doivent rester des entiers exactement représentables en JavaScript ; le CLI conserve les compteurs signés64 bits. Cette borne de représentation n’est pas une politique d’exécution.
+
+### Livraison locale sous modifications concurrentes
+
+Un profil refusé reste refusé. Pour livrer une construction antérieure déjà qualifiée et testée sans compiler de nouveau des fichiers partagés en cours d’édition, utiliser explicitement `./swarm.sh restart --prepared-build SHA256 --no-open` avec l’empreinte du dernier record qualifié examiné. Le lanceur vérifie l’image, le profil sans fixtures, tous les membres de l’archive et la version/les notes sur un serveur isolé avant d’arrêter l’instance possédée. Un candidat actif plus récent, une preuve inconnue/altérée ou une autre empreinte refuse. Le chemin binaire source et les données sont conservés ; les sources plus récentes ne sont pas déclarées installées. Le redémarrage sans option garde son build normal. En cas de refus, conserver la preuve et choisir/revérifier le candidat exact ; ne pas retoucher le record pour fabriquer une qualification.
+
+### Conducteur web et contention Admin
+
+Le refus `web-conductor-after-http` peut suivre une configuration déjà enregistrée.
+Conserver la révision et l’événement indiqués, relire avant tout autre changement ;
+ce refus ne signifie pas rollback. Le candidat de découverte décrit dans
+[le plan](plans/migration-rust/WEB-DISCOVERY-OBSERVATION-20261027.md) retire la
+réservation Admin des seules observations du conducteur. Les admissions, écritures
+et autres lecteurs réservés gardent leurs contrôles et leur politique sauvegardée.
+Cela ne promet pas le succès de toute écriture concurrente ni une reprise automatique
+après erreur d’intégrité ou de session. Ne pas confondre fichier de verrou présent
+et verrou détenu ; aucune suppression de verrou n’est nécessaire à cette correction.

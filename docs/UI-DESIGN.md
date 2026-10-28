@@ -181,6 +181,17 @@ rassurant pour raccourcir le texte.
 
 ## Vérification et limites
 
+Mesurer le contraste sur les couleurs finales : attendre la fin des animations
+CSS effectives du contrôle (`getAnimations()`, puis les promesses `animation.finished`), puis vérifier repos,
+survol et focus clavier. Une couleur intermédiaire pendant un changement de thème
+peut masquer une paire finale illisible. Utiliser les paires sémantiques d’action
+pour fond/encre/bordure, sans mélanger accent et encre du rail. Pour un dialogue,
+`open=false` précède l’événement `close` : vérifier la fermeture et le focus final
+après cet événement, sans sleep arbitraire. La recette source
+`tools/verification/recipes/trust-primary-ux.json` couvre ces témoins sur Actions
+de confiance et PAEA ; ses doubles lecture/aperçu ne prouvent pas le service natif.
+[Preuves et limites](plans/actions-confiance/paea/INCREMENT-13.md).
+
 Le rapport de cette refonte est `docs/reports/ui-redesign-20261010.md`.
 La recette `tests/design_system_ui.cjs` couvre l’accès aux destinations, les
 accordéons, les deux langues/thèmes, le responsive et les erreurs navigateur.
@@ -261,3 +272,7 @@ vues, dont l'identité, peuvent consommer cette API ; vérifier chaque intégrat
 sans dupliquer les icônes. Le catalogue de démonstration reste hors application.
 Sans données attestées, montrer identité/droits inconnus. Ni cachet, ni nom,
 ni version active ne constitue une signature ou une autorisation.
+
+Le cockpit natif de lecture du24octobre et ses limites sont décrits dans
+[Rust — parcours UX](architecture/RUST-MIGRATION.md#cockpit-natif--parcours-ux-du24octobre2026)
+et [en anglais](en/RUST-MIGRATION.md#native-cockpit--ux-journey24october2026).

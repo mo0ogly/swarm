@@ -1,0 +1,20 @@
+# The four security boundaries, numbered as the paper's figures number them.
+# Source: software-factory.md, "The four security boundaries" — each `name` and
+# `covers` is the section's own heading, split at the colon. Change the paper
+# first, then this file.
+boundaries:
+  - name: Sandbox
+    covers: where its code runs
+  - name: Network
+    covers: which systems and operations it can reach
+  - name: Supply chain
+    covers: which components and sources it can use
+  - name: Identity and access
+    covers: who the agent acts for and what it may do
+
+# The paper's figure of the boundaries at work. The page draws its own under
+# the list (partial sf-architecture.html), uncaptioned; bin/check-copy holds
+# this number and caption to the paper's.
+figure:
+  n: 2
+  caption: The agent proposes, policy authorizes, and infrastructure enforces

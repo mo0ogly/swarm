@@ -2,6 +2,7 @@
 """Historical agent-log HTTP/UX journey on an owned public-CLI fixture.
 One inert local executable emits230frames to exercise captured-receipt escaping.
 These are not230lifecycle log rows; HTTP compares actual retained CLI pages.
+Also verifies ordinary completed status over real CLI/HTTP report observations.
 No SQL fixture writes; production history is never used. No global watchdog.
 """
 import argparse,hashlib,json,signal,subprocess,threading,os,http.client,sqlite3
@@ -69,6 +70,8 @@ def main():
             finally:connection.close()
         check('read-after-refusals',server.request(base+'0',observe=False)==pages['0'])
         transcript=rust_agent_transcript_http.verify(server,owned.work,other,csrf)
+        import rust_status_completion
+        rust_status_completion.verify(server,owned,check)
         config=dict(transcript=transcript,address=server.address,key=server.key,root=str(owned.root),output=str(out),work=owned.work,other=other,first=pages['-1'],latest=pages['0'])
         with (out/'browser.stdout').open('xb') as stdout,(out/'browser.stderr').open('xb') as stderr:
             result=subprocess.run(['node','tests/rust_agent_logs_ui.cjs'],input=json.dumps(config).encode(),stdout=stdout,stderr=stderr)
@@ -76,6 +79,9 @@ def main():
         check('Work-events-unchanged',owned.ok(['work','show',owned.work])==before)
         after_agent=owned.ok(['agent','show','session']);check('agent-record-unchanged',stored_agent()==agent_bytes and all(after_agent[k]==agent_before[k] for k in ['agent','desired','observed_status']))
         check('budget-unchanged',server.request('/api/v1/work-budget?work='+owned.work,observe=False)==budget)
+        import rust_status_incomplete
+        rust_status_incomplete.verify(server,owned,check)
+        rust_status_incomplete.verify_abandoned(server,owned,check)
         fixture.publish(out/'http-result.json',dict(status='PASS',checks=checks,binary_sha256=hashlib.sha256(binary.read_bytes()).hexdigest(),global_watchdog=None,scope='Owned CLI fixture, one inert process; no real provider'))
         print('AGENT_LOGS_HTTP_UI_PASS '+str(len(checks))+' HTTP assertions',flush=True)
     except BaseException as e:primary=e

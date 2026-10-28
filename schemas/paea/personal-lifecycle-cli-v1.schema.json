@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:swarm:paea:personal-lifecycle-cli:v1",
+  "title": "Personal lifecycle CLI observation v1",
+  "description": "Data only, no human/session/grant/confinement proof. A failed operation or output may retain acknowledged journal/publication. Never infer no effect or retry authority. Startup/input failures have no stdout observation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol",
+    "operation",
+    "operation_result",
+    "intent_publication",
+    "journal",
+    "checkpoint_publication",
+    "sequence",
+    "close",
+    "human_presence_verified",
+    "service_started",
+    "confinement_verified"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "protocol": {
+      "const": "swarm-personal-lifecycle-cli-v1"
+    },
+    "operation": {
+      "enum": [
+        "personal-init",
+        "personal-enroll",
+        "personal-recover"
+      ]
+    },
+    "operation_result": {
+      "enum": [
+        "completed",
+        "failed"
+      ]
+    },
+    "intent_publication": {
+      "enum": [
+        "not_attempted",
+        "unknown",
+        "visible",
+        "durable",
+        "not_reported"
+      ]
+    },
+    "journal": {
+      "enum": [
+        "not_attempted",
+        "unknown",
+        "acknowledged",
+        "observed",
+        "current_verified"
+      ]
+    },
+    "checkpoint_publication": {
+      "enum": [
+        "not_attempted",
+        "unknown",
+        "visible",
+        "durable"
+      ]
+    },
+    "sequence": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "close": {
+      "enum": [
+        "closed",
+        "failed"
+      ]
+    },
+    "human_presence_verified": {
+      "const": false
+    },
+    "service_started": {
+      "const": false
+    },
+    "confinement_verified": {
+      "const": false
+    }
+  }
+}

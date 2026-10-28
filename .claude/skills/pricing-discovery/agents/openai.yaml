@@ -1,0 +1,4 @@
+interface:
+  display_name: "Découverte des tarifs"
+  short_description: "Préparer des tarifs sourcés sans prix implicite"
+  default_prompt: "Utilise $pricing-discovery pour vérifier les tarifs officiels des modèles concernés et préparer une proposition versionnée pour Swarm."

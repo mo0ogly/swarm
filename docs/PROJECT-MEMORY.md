@@ -1,5 +1,31 @@
 # Mémoire du projet
 
+## Portage Rust — références historiques, FPA-02a
+
+Le consommateur Rust des pièces `Work.memory` est vérifié et installé localement
+en dev65 ; voir le [rapport FPA-02a](plans/migration-rust/FPA02A-MEMOIRE-20261025.md).
+`checkpoint` conserve ces chemins dans SQLite ; `agent preview` puis
+`agent prepare` les affichent comme données JSON dans le contexte et les
+conservent dans `context.paths`. Le lancement natif recontrôle leur disponibilité
+et leur appartenance au projet avant les permissions d'exécution. Les fichiers
+ne sont pas injectés automatiquement dans le prompt : ce sont des références à
+consulter. Leur contenu peut changer ; ce parcours ne prouve pas sa fraîcheur.
+
+Le garde lit toutes les enveloppes Work cohérentes, sans catalogue partiel après
+erreur. Une leçon rattachée à une version locale reste protégée contre une lecture
+héritée, y compris après retrait ; les alias physiques existants sont refusés.
+Fichier manquant, sortie du projet, source gérée ou inventaire illisible : refus
+explicite avec cause conservée, sans lancement du fournisseur. Après correction,
+le même départ encore en file peut être revérifié par l'opération publique.
+Le plafond de contexte persistant existant compte aussi les références.
+
+La CLI et les lectures HTTP protégées des Works conservent les mêmes chemins.
+Ce lot ne porte pas le catalogue/mutations de mémoire versionnée, les résumés,
+la reprise de conversation ou les droits futurs M20. Leurs gardes restent actifs.
+Les sections suivantes décrivent le contrat historique Go ; leur présence ne
+prouve pas leur raccord Rust. Voir le [plan de migration](plans/migration-rust/PLAN.md)
+et la recette permanente `memory-files-rust` pour l'état et les preuves.
+
 La mémoire de projet conserve une expérience ou une procédure issue d’un RETEX
 vérifié, puis permet à l’opérateur local de sélectionner sa version pour une
 tâche exécutante future. Elle ne modifie ni les méthodes du moteur, ni les
@@ -30,8 +56,42 @@ de rejeu communes. Un refus de ligne précède leurs callbacks et ne laisse pas
 d'événement métier ; un rejeu valide conserve l'état courant sans répéter l'action.
 Voir le [contrat des lignes Work](architecture/WORK-ROW-CONTRACT.md) et le
 [rapport M28](plans/deepagents-integration/RESULTATS-MEMOIRE-24.md).
-Les autres lecteurs SQL explicites et la propagation d'erreur de tous leurs
-appelants ne sont pas déclarés audités. Les droits d'usage restent ouverts.
+Les sources extractives et les lecteurs explicites hors identité recensés en
+M29 passent également par ce contrôle, notamment avant export, lancement,
+conversion et reprise. Les refus ne créent aucun paquet ou effet métier durable ;
+voir le [rapport M29](plans/deepagents-integration/RESULTATS-MEMOIRE-25.md).
+La propagation d'erreur de tous les appelants reste à qualifier : MEM-P1 n'est
+pas clôturé. Les droits d'usage restent ouverts.
+
+La mémoire contenue dans un Work passé en corbeille revient avec sa capture
+validée : un seul Work cohérent, lignes liées dans son périmètre et confirmation
+liée aux octets exacts. Un refus conserve la corbeille ; les anciennes captures
+valides sans tables optionnelles vides restent lisibles. Voir le
+[contrat de restauration](architecture/WORK-ROW-CONTRACT.md#captures-dynamiques-et-restauration)
+et les [résultats M30](plans/deepagents-integration/RESULTATS-MEMOIRE-26.md).
+Ce contrôle ne crée pas les droits d'usage encore ouverts.
+
+Le conducteur remonte aussi les erreurs d’inventaire au diagnostic des baux déjà
+possédés et à stderr, sans transformer l’échec en réconciliation réussie. Son
+watch ciblé ne lit pas les enveloppes étrangères ; le parcours global exige
+l’inventaire complet. Les transitions erreur/reprise restent dans le journal
+sans effacer l’historique. Voir [la reprise du conducteur](RUNTIME-RECOVERY.md#lecture-impossible-par-le-conducteur)
+et les [preuves M31](plans/deepagents-integration/RESULTATS-MEMOIRE-27.md).
+Cela ne ferme pas les autres propagations de lecture ni les droits d’usage.
+
+Les six contrôles de fraîcheur des appels structurés relisent aussi ce Work et
+conservent une erreur de lecture jusqu’au lanceur ; un contrôle après réponse
+empêche une réponse rapide d’éviter la relecture. La consommation d’un appel
+commencé reste historique. Voir [la fraîcheur pendant l’appel](RUNTIME-RECOVERY.md#fraîcheur-pendant-une-revue-ou-une-planification)
+et [M32](plans/deepagents-integration/RESULTATS-MEMOIRE-28.md). Cela ne ferme ni
+les vues de repli restantes, ni les droits d’usage M20.
+
+Les consommateurs restants de l’état de pause ne transforment plus une lecture
+illisible en false : les opérations refusent, les snapshots propagent l’erreur,
+et le contexte partiel attribue la donnée manquante sans annoncer un départ
+possible. Voir [les états de pause](RUNTIME-RECOVERY.md#pause-illisible-dans-les-opérations-et-les-vues)
+et [M33](plans/deepagents-integration/RESULTATS-MEMOIRE-29.md). Les lectures jointes
+et autres enveloppes restent à qualifier ; les droits M20 restent ouverts.
 
 ```mermaid
 flowchart LR

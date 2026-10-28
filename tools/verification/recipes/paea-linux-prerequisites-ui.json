@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-prerequisites-ui",
+  "inputs": [
+    "tests/paea_linux_ui_recipe.py",
+    "tests/paea_linux_ui_test.cjs",
+    "web/paea-linux.html",
+    "web/paea-linux.js",
+    "web/paea.css",
+    "web/i18n-en.js",
+    "web/i18n.js",
+    "web/swarm-design.css",
+    "web/wattson_themes.css",
+    "web/swarm-logo.png",
+    "locales/en.json",
+    "schemas/paea/linux-prerequisites-v2.schema.json",
+    "package.json",
+    "package-lock.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-prerequisites-ui.json"
+  ],
+  "environment": {
+    "SWARM_PAEA_PREREQ_UI_PARENT": "{root}/docs/plans/actions-confiance/paea/evidence"
+  },
+  "steps": [
+    {
+      "id": "workspace-browser-and-script-integrity-refusals",
+      "command": [
+        "python3",
+        "tests/paea_linux_ui_recipe.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "UI_PREREQUISITES_PASS checks=111 cases=8",
+        "UI_STARTUP_SCRIPT_REFUSAL_PASS",
+        "UI_INTEGRITY_GUARDS_PASS controls=3 refusals=3",
+        "UI_COMPONENT_RECIPE_PASS checks=111 cases=8"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

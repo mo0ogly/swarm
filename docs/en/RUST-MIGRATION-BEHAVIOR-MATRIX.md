@@ -1,5 +1,21 @@
 # Migration matrix: entry points and first behavior slices
 
+## Current-source correction —27 October2026
+
+The196 tables below are historical inventories. Their absence labels are not
+current migration status. Source reinspection confirms these routed entries;
+routing alone does not establish Go parity or global acceptance.
+
+| Entry | Current source | Evidence / remaining |
+|---|---|---|
+| `agent logs` | agent.rs → agent_logs.rs | Historical rows/output implemented; see permanent agent log recipes. |
+| `budget show`, `budget preview` | lib.rs → budget_history.rs | Historical producer connected; see budget history recipe. |
+| `mission watch` | mission.rs → mission_watch.rs | Native incremental conductor connected; simultaneous role planning remains explicitly deferred in its source. |
+| `mission status`, `changes`, `spending` | mission.rs → mission_status.rs | Historical aggregate under its producer guards; no inference from native-only observations. |
+| `planning history` | lib.rs → planning_history.rs | Recorded decisions reader; no historical execution authority. |
+| `mission seen` | mission.rs → session_visit.rs | Delivered219 through existing visit writer,17public assertions and installed20/Version14/page11; bounded evidence in MISSION-SEEN-20261027. |
+| `agent list`, `agent history` | agent.rs refuses | Actual missing CLI contracts. Go list is a composite cockpit snapshot, not `list_agents`; history reads inert imported Bundle.Cockpit. |
+
 ## Update196 — integrated parallel work
 
 [Matrice intégrée](../plans/migration-rust/evidence/20261022-parallel-196/matrix-integrated.json). **83 CLI operations across10 families are now detailed**, alongside137 public entries; these overlapping levels are not additive.93 HTTP paths have clauses/consumers/gaps and27 retained Go originals, versus7 hashed route sources in194. No global percentage or accepted global parity.
@@ -378,3 +394,7 @@ reviewer reproducer. That scenario remains unexecuted under tool block115.
 intentions before dispatch; it is not yet qualified. These results neither advance
 baseline199 nor close global work from test counts. Source profiles65/124 remain
 distinct.
+
+### Preparation budgets, 26 October2026
+
+Native envelope CLI/API/modal installed125; historical read CLI without input and GET `/api/v1/preparations/budget` implemented in the following increment, qualification retained in [report](../plans/migration-rust/PREPARATION-BUDGET-READ-20261026.md). This supersedes the old absent-entry row only within this exact scope: no preparation AI call or global parity claim.

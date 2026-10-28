@@ -246,3 +246,31 @@ each exchange freezes both values. Existing calls retain their original deadline
 Manual cancellation and absence of automatic retry remain in force. Worker and
 review deadlines are separate settings. Restart with the corrected binary to use
 these controls.
+
+### Sources in manual Rust preparation
+
+Sources opens file discovery and excerpt preview. Enter both inclusive line
+indices explicitly, read, then attach: the server reopens the file and compares
+the full-file digest before recording it. Stored excerpts remain readable after
+the file changes/disappears; removal remains available under restrictive policy.
+Adding/removing invalidates brief adoption and the verdict while preserving
+documents for reconsideration. These operations never start a model call.
+
+The Admin link opens documentary settings under Preparations and documents,
+with help and AI context for all twelve parameters. Truncated results are visible;
+read refusal never becomes a successful empty list. Numeric limits may be null
+(unlimited) or zero according to their documented contract. Older installations
+must explicitly adopt the new settings.
+
+### AI history in Rust preparation
+
+The existing conversation view displays retained turns, provenance and freshness.
+Proposals remain readable without sending, stopping or implicitly adopting them;
+private prompts stay excluded. An active turn keeps an explicit refusal until
+its supervisor is ported. Reading ends no call and releases no reservation.
+See the [reference](REFERENCE.md#preparation-conversation-history--rust).
+
+Local pilot: text API dialogue with cancellation and explicit proposal
+comparison, installed and verified; see the preparation AI calls migration record.
+Historical reading remains available when call policy is unconfigured. The form
+must not interpret absence as a default or permission to transmit documents.

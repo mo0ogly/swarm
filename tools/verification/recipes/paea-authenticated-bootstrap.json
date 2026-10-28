@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "id": "paea-authenticated-bootstrap",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "v3-protected-declaration",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "authenticated",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "authenticated_loader_read_stat_close_causes_remain_and_valid_recovery_creates_no_locks"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "owned-directory-identity",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--lib",
+        "loader::tests::distinct_root_real_owned_descriptor_alias_refuses_after_distinct_control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "distinct_root_real_owned_descriptor_alias_refuses_after_distinct_control"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "v2-protected-declaration-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "control",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "control_roundtrip_load_and_legacy_schema_stay_distinct_without_locks"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "v1-protected-declaration-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-bootstrap",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "bootstrap",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "5 passed; 0 failed"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

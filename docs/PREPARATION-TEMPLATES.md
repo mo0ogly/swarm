@@ -49,11 +49,9 @@ la sauvegarde de modèles personnalisés ne sont pas encore proposés.
 
 ## Configurer une équipe après la création des tâches
 
-En CLI, une préparation dont les tâches restent verrouillées peut recevoir son organisation par `prepare create-missions ID --input requete.json`. La demande conserve le plan courant, ses identifiants et ses preuves ; elle ajoute `organization` au contrat existant avec `version`, `action`, un `event_id` unique, `expected_revision`, `preparation_id`, `sha256` et `expected_work_revision`. Relire la préparation et le travail avant de construire cette demande.
+Rust crée d’abord un nouveau travail verrouillé avec `prepare create-missions ID --input requete.json`. Pour cette conversion initiale intacte, `prepare configure-team ID --input requete.json` enregistre ensuite organization : fournisseurs CLI configurés, workspace contenu et validation humaine. La requête version1 porte action, event_id unique, expected_revision, preparation_id, sha256 du plan et expected_work_revision. Relire préparation et travail avant de la construire.
 
-Le moteur exige un plan validé et frais, un travail conforme à son brief sans profil préexistant, des tâches inchangées et aucune tentative antérieure. Il refuse une organisation invalide, un verrou absent ou une adoption implicite d’historique sans mutation partielle. Une configuration déjà appliquée ne peut pas être remplacée par cette opération ; utiliser les opérations de configuration dédiées. Le rejeu ne vaut que pour le même event_id ; une nouvelle création sans organisation, une révision identique ou un départ déjà autorisé sont refusés explicitement. Le rejeu du même event_id restitue le reçu ; une nouvelle demande de configuration est refusée, même avec la même organisation.
-
-`create-missions` conserve le départ verrouillé. Une première configuration avec `authorize-plan` peut aussi autoriser le départ ; pour une équipe déjà configurée, utiliser `release-plan`. Ces opérations ne lancent pas de fournisseur : le départ réel reste soumis au profil, aux contrôles, aux budgets, à la revue et à `mission start`.
+Le moteur exige plan frais, travail conforme, tâches inchangées, absence de profil et de tentative antérieure. La configuration garde les verrous et préserve les historiques ; son événement exact se rejoue, une nouvelle configuration d’équipe existante refuse. `release-plan` autorise séparément les seules tâches converties au CAS relu. Aucun de ces appels ne lance synchroniquement un fournisseur ; les contrôles d’admission restent applicables. Configuration automatique, conversion vers un travail existant et ancienne commande authorize-plan restent des surfaces à porter.
 
 ## Préparation guidée et équipe proposée
 
@@ -102,7 +100,7 @@ Exemple de réponses partielles (aucune écriture ni appel IA) :
 
 Les identifiants attendus sont `objective`, `audience`, `scope`, `exclusions`,
 `constraints`, `acceptance`, `verification`, `recovery`. Les autres clés sont
-refusées. Une réponse est limitée à 1 000 octets UTF-8. La sortie contient le
+refusées. La limite initiale est de 1 000 octets UTF-8 par réponse ; la valeur enregistrée dans Admin s’applique, null enlève cette borne. La sortie contient le
 brouillon rendu, `missing` (identifiants des réponses manquantes), `answered`,
 `total`, `need_complete`, `proposed_team`, `recommended_method` et
 `launch_authorized`. Un sujet retourne aussi `intervention`. Les réponses
@@ -177,7 +175,7 @@ l’intégration, la revue puis la livraison préparée.
 Dans le dialogue du modèle, choisir l’incrément, inspecter les tâches et leurs
 critères, puis compléter les réponses. **Télécharger le plan adapté** retourne
 un `ActionPlan` v1 ; **Utiliser ce parcours**, puis enregistrer la nouvelle
-préparation, conserve le besoin et insère le plan dans son éditeur. Le brief reste
+préparation, conserve le besoin et prépare un plan local dans son éditeur. Enregistrer ce plan explicitement. Le brief reste
 à rédiger et adopter ; les décisions ouvertes doivent être résolues avant de
 vérifier le plan et créer les missions. Les réponses ne sont jamais interprétées
 comme des commandes de contrôle ou une autorisation de publication.
@@ -198,3 +196,25 @@ reprises sont présentés séparément des dépendances : leur traitement utilis
 opérations existantes de correction et révision, sans introduire un ordonnanceur
 conditionnel. Les politiques exécutables de contrôle restent à autoriser pour
 le dépôt et le candidat réels.
+
+## Raccordement Rust natif
+
+Le catalogue et les vérifications de réponses utilisent les contrats Rust partagés
+CLI/API. `prepare template-check --input réponses.json` reçoit template_id,
+language (fr par défaut ou en), answers (objet ID→texte), et éventuellement
+intervention/increment. Les anciens ID ks-* restent lisibles par alias.
+Aucune vérification ne modifie une préparation ni n’autorise un lancement.
+Les graphes existants sont contrôlés avec les politiques de plan/tâches courantes ;
+les questions ouvertes restent permises dans le brouillon et empêchent sa validation
+finale tant qu’elles ne sont pas résolues.
+
+La modale conserve le questionnaire et le graphe. Utiliser le parcours remplit
+uniquement un besoin local sans remplacer un texte existant. Après création,
+le plan adapté est placé dans l’éditeur comme modification **non enregistrée** :
+Enregistrer le conserve ; adopter le brief et vérifier le plan restent explicites.
+Les tailles de réponse avant retrait des espaces et de brouillon (besoin avant/après
+graphe, plan projeté) viennent de deux réglages Admin, groupe45. Valeurs initiales
+1 000 et 16 000 octets ; null enlève une borne, zéro refuse le non-vide.
+Les anciens journaux doivent adopter explicitement ces valeurs. Le composant ne
+pose aucun second maxlength. Les propositions d’équipe restent des rôles éditoriaux.
+Livraison locale vérifiée : v0.1.1-dev.138. Les anciennes installations conservent leurs politiques jusqu’à une adoption explicite dans Admin.

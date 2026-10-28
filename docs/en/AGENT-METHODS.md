@@ -2,7 +2,7 @@
 
 [Français](../AGENT-METHODS.md) · [User guide](USER-GUIDE.md)
 
-This repository includes **twelve methods** for specifying, implementing, reviewing
+This repository includes **thirteen methods** for specifying, implementing, reviewing
 and improving Swarm: guided change workflow, examination and improvement,
 specification writing and examination, code review, diagnosis, verification,
 replanning and lessons learned. They use explicit criteria, traceable decisions
@@ -15,6 +15,16 @@ verify the effect, then reassess the need and retain verified lessons. Any anoma
 triggers `replan`. Deferred work keeps its owner and resumption condition. This
 method contract proves no autonomous improvement of the installed engine and
 grants no additional authority.
+
+Go build evidence covers package code, including module-root files, go:embed
+resources and the bytes actually substituted through overlays. An assumed list
+of directories is insufficient. Establish a valid control with the same
+prerequisites before each fault injection: one common rejection does not prove
+coverage of every defect. These rules are also embedded in the shared contract;
+rebuild for future attempts without changing historical evidence or already
+running processes.
+
+For the Rust migration, [APEX](../../.claude/skills/apex/SKILL.md) includes the method adopted on 22 October 2026: strict contracts and a differential bench, journey-based rewrites, vertical lots, risk-based evidence, deferred hardening, a short plan, owned files and early R6/R7 preparation. Writes retain a single cutover; an earlier read-only service awaits explicit confirmation. This persistent instruction does not update already running contexts. All eight points remain in the conditional APEX reference `references/rust-migration.md`: load it for migration work without enlarging every native role body. Tool-free preparation must receive this reference explicitly.
 
 ## Plain-language catalogue
 
@@ -35,6 +45,7 @@ Open Codex or Claude **in this repository**, then invoke a method:
 | Analyze, plan and deliver a bounded change | `$apex` | `/apex` |
 | Audit with reproducible evidence | `$audit-pdca` | `/audit-pdca` |
 | Specify a need and testable requirements | `$spec-builder` | `/spec-builder` |
+| Discover official model prices and applicability | `$pricing-discovery` | `/pricing-discovery` |
 | Find gaps in a plan | `$spec-audit` | `/spec-audit` |
 | Review code and implementation risks | `$code-reviewer` | `/code-reviewer` |
 | Diagnose a defect before a scoped fix | `$debug` | `/debug` |
@@ -99,6 +110,28 @@ methods and configuration. When no update applies, retain the reason in existing
 tracking. Keep FR/EN versions and diagrams aligned; their presence proves neither
 effect nor acceptance.
 
+The shared personal rules imported by `~/.claude/CLAUDE.md` and repository rules
+also require current docstrings/Rustdoc/Go comments for new or modified public or
+nontrivial functions: purpose, inputs/preconditions, outputs, errors, effects and
+limits. Check links and executable examples. Persistent files frame later contexts
+that read them; this update does not replace an already running Claude process's
+context or the engine's embedded instructions. The embedded contract is unchanged.
+
+Throughout the migration, each increment also retains a review of hardcoded
+policies, documented contracts and error paths, bound to the reviewed file hashes.
+Automated searches produce candidates; semantic review separates test data,
+invariants, technical bounds and operator policies. Trace each policy from its
+persisted configuration to the real consumer and Admin setting. Check affected
+FR/EN pages, diagrams, evolution notes and examples, or explicitly justify why
+no change is needed. Unverified findings stay open; a scanner or comment alone
+cannot establish compliance. Revisit affected earlier increments after a finding
+without modifying their historical evidence.
+
+The migration qualification collector also requires an explicit previous baseline
+and a fresh four-axis review; missing coverage or open findings refuse increment
+qualification. Earlier findings remain in the plan until resolved before global
+acceptance.
+
 For new attempts, the engine includes role-specific methods in the context sent
 to the provider. This does not depend on native skill discovery in Codex or Claude.
 
@@ -138,19 +171,18 @@ symbolic links must restore them before use. Edit the canonical source, then run
 
 ```sh
 python3 tools/agent-workflows/check.py
-go test ./internal/engine -run 'TestRepositoryPreparation|TestPreparationMethodCatalogue|TestPreparationDialogueLateProposalAndMethodDrift' -count=1 -timeout=0
 git diff --check
 ```
 
-The checker validates links and sources, then runs the actual
-TestAgentWorkflowRolesAreBounded test. It requires JSON run/pass events and
-package completion, rejects empty selectors, skip, fail and invalid formats, and
-prints the observed test/subtest count. Its global watchdog is explicitly
-disabled (-timeout 0): observe progress and diagnose abnormal lack of progress;
-this does not establish a product timing target. Its own guards can be checked
-with `python3 -m unittest discover -s tools/agent-workflows -p test_check.py -v`
-(controlled Go-output doubles, no model). A successful checker proves neither
-deployment nor mission acceptance.
+The checker validates links/sources then runs Rust `agent_workflow` integrations.
+Nine named tests are required, including planner/subplanner/worker/reviewer role
+witnesses over actual engine-built contexts. Empty collection, missing roles,
+ignored/failed tests and incoherent counts refuse. Original failure statuses and
+both channels survive; no global watchdog is added. Cargo uses the caller's
+cache/environment under offline/locked dependencies. Python guards run with
+`python3 -m unittest discover -s tools/agent-workflows -p test_check.py -v`
+(controlled Rust-output doubles, no model); these doubles establish neither
+actual native execution nor independent acceptance.
 
 Changing a method or the shared contract changes its fingerprint. Existing
 preparations must apply the new version and repeat validation; earlier evidence
@@ -291,3 +323,63 @@ false. Splitting a batch may help diagnosis but does not justify the bound.
 Preserve original failures and their source/binary binding. The
 [IA3c.1 replan](../plans/actions-confiance/verification-identites-agents-20261016/ia3-issuance-receipt-20261017/RAPPORT-IA3c1.md)
 retains the user objection, unsupported deadline and its removal.
+
+### Native context evidence
+
+`python3 tools/agent-workflows/check.py --evidence NEW_DIRECTORY` uses permanent
+recipe `tools/verification/recipes/agent-workflows-native.json`. It retains
+declared Rust sources/embedded texts, commands, original channels and hashes in
+a fresh archive. This alone establishes neither a hermetic dependency graph nor
+a production profile, identity, model compliance, installation or acceptance.
+Inputs are compared before/after and existing proofs are never replaced.
+
+Old Go/delta proofs remain historical. `--evidence-baseline` explicitly refuses:
+a Go baseline cannot qualify Rust. Omit it for a full native archive. Historical
+Go retention tools are no longer executed by this checker. Without --evidence,
+actual tests are displayed but no source archive is retained.
+
+### Historical Go107 evidence
+
+107 locally qualified:4Python retention/replay tests and29Rust consumers
+(24admission+5workflow cases) PASS. After an actual body-size regression, exact
+sizes are31970/31973/31970/18605bytes with saved32000cap unchanged.5real Go tests/
+subtests PASS on1163project sources plus1generated test-main, retained archives/
+original JSON and stable before/after inputs. A second run reuses the base with
+zero new files.274previously missing inputs are now covered without rewriting
+historical evidence. Isolated normal-dev binary has no fixture/test-util;
+2actual HTTP flows PASS, no installation. Unsupported GOFLAGS/overlays refuse
+this profile; external C/system hermeticity and independent review are unproven.
+Original parent-only false coverage and failures retained in107/result.json.
+This evidence correction does not complete migration. Next: hierarchical
+organization/reviewer guard, configuration/slots/consent and managed actor/gate
+before automatic conduction. R6/R7 and RETEX remain open.
+
+Native verification138: the current Root integration profile requires Linux and
+the project's Rust toolchain. Evidence mode also runs eight Python guards since141,
+including an owned Python child producing an actual SIGTERM status; this does
+not prove Cargo cancellation. The signed original status remains diagnostic and
+the CLI follows POSIX128+signal. Compilation failures retain their original code.
+No temporal ceiling is introduced.
+
+141: the broad native recipe no longer requires the tiny Go module used by the
+historical archive tool. Its three tests remain in legacy-go-source-archive.json
+(Go required; not executed by the native target). Public role-checker routing
+migrated to an owned Cargo shim/Go trap, separate from nine actual Rust tests.
+Embedded guidance now points to native evidence; rebuild future contexts while
+preserving already issued prompts/processes. The change adds8bytes to the
+31970-byte worker body under the unchanged saved32000cap; actual post-build
+measurement is still required.
+
+## Local installation by default — user decision, 24 October 2026
+
+Verified authorized development is built, installed and activated in the relevant
+local instance by default, without another permission request. This includes
+starting/restarting only the identified project service through the supported
+delivery path, preserving data, missions and others' processes. Verify the actual
+running executable, version, French/English notes and affected flow before
+claiming installation. A passing test or compiled candidate is not installed.
+Missing/refused delivery wiring triggers replan and corrective work within scope;
+retain the evidence and concrete resumption condition. This grants no commit,
+push, publication or external/production deployment authority.
+
+Before changing embedded instructions, measure per-role body bytes with `python3 tools/agent-workflows/check_workflow_size.py` before compilation, then verify actual Rust contexts with `python3 tools/agent-workflows/check.py`. Fitting the limit proves neither receipt nor compliance. Preserve the operator policy: remove repetition without losing obligations; insufficient capacity needs diagnosis. Increment1438 showed that an instruction change can break roles while the web service still responds.

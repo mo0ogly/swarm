@@ -1,0 +1,4 @@
+{
+  "/usr/local/go/src/syscall/exec_linux.go": "78b4e3924e57b184e257c2e44965e9ccdd2ee4b3fa3cb0823b16ccd9bed2b99a",
+  "/usr/local/go/src/os/pidfd_linux.go": "604693bc2f83db22fc919da1db743c0ef909fcfba24d8728879cc59e90d61054"
+}

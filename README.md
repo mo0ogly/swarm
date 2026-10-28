@@ -4,412 +4,367 @@
 
 **Moteur Rust.** La CLI et le serveur local utilisent Rust. Les sources sont dans [rust/](rust/). La parité des capacités et l’acceptation globale restent ouvertes ; les descriptions historiques ci-dessous ne constituent pas une qualification Rust. Voir le [contrat Biba](docs/architecture/BIBA-GOUVERNANCE-RUST.md) et le [plan actif](docs/plans/migration-rust/PLAN.md).
 
-
 [English](README.en.md) · Français
 
-### Donner un objectif à une équipe d’agents IA. Comprendre qui fait quoi. Vérifier ce qui est livré.
+### Donner un objectif à une équipe d’agents IA. Comprendre qui agit. Vérifier ce qui est livré.
 
-Swarm est un outil local de gestion de workflows agentiques, avec une **interface web en français et en anglais** et une **interface en ligne de commande**. Il relie la préparation du besoin, la répartition des tâches, l’exécution et l’examen des résultats dans une mission persistante.
+Swarm est un **cockpit local et une CLI pour organiser des workflows agentiques**.
+Il relie le besoin, la planification, les agents, les contrôles et les résultats
+à une mission persistante. Son interface est disponible en français et en anglais.
+Son cœur est un **moteur déterministe en Rust** qui porte l’état et les
+transitions autorisées des missions. Les règles et autorisations viennent de
+l’humain ; le moteur fait respecter les validations exigées par la politique.
+En mode `human`, des contrôles réussis ne remplacent pas la décision humaine.
 
-**Pourquoi Swarm ?** Quand plusieurs agents travaillent sur un projet, quelqu’un doit encore transmettre les consignes, gérer les dépendances, retrouver les rapports et décider si le résultat est réellement utilisable. Swarm organise ces passages de relais pour réduire cette coordination manuelle et rendre les blocages visibles.
+Quand plusieurs agents travaillent sur un projet, il reste à transmettre les
+consignes, gérer les dépendances, comprendre les blocages et examiner les preuves.
+Swarm rend ces passages de relais visibles, avec des responsabilités et des
+limites explicites. **Un processus terminé, un rapport présent et un résultat
+accepté sont trois états distincts.**
 
-[Commencer](#démarrer-en-local) · [Captures](#voir-le-parcours) · [Mémoire et identité](#mémoire-et-identité) · [Organisation des agents](#qui-fait-quoi) · [Documentation](#documentation) · [Licence](#licence)
+**État au 24 octobre 2026 : migration Rust en cours.** Des parcours CLI et des
+surfaces web ciblés sont vérifiés. La CLI et le serveur locaux exécutent Rust ;
+la couverture fonctionnelle complète et l’acceptation finale restent ouvertes. Les capacités historiques Go ne
+constituent pas une promesse de parité Rust. Voir l’[état natif](docs/architecture/RUST-MIGRATION.md),
+le [plan actif](docs/plans/migration-rust/PLAN.md) et les [preuves et rejeux](docs/plans/migration-rust/REPLAYS.md).
 
-## Voir le graphe dès le départ
+[Vidéos](#vidéos) · [Capacités et maturité](#capacités-et-maturité) · [Architecture](#architecture) · [Contrôle humain](#contrôle-humain-et-validation) · [Identité](#identité-et-autorité) · [Mémoire](#mémoire-et-contexte) · [Supervision](#supervision-et-reprise) · [Journaux](#journaux-direct-et-traçabilité) · [Démarrer](#démarrer) · [Documentation](#documentation) · [Licence](#licence)
 
-[![Voir le graphe dès le départ](docs/screenshots/graph-linkedin/Swarm_graphe_apercu_FR_V2.gif)](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4)
+## Vidéos
 
-Lire les dépendances, explorer les branches, comprendre un blocage et définir les contrôles. Cette démonstration d’environ une minute montre les interactions réelles dans un plan pédagogique, avec des explications en français ; aucun agent n’est lancé et le contrôle montré reste un exemple non enregistré.
+### Identité mémoire et contrôle humain — 1 min 40
 
-[Voir la vidéo MP4](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4) · [Image fixe](docs/screenshots/graph-tour/graph-tour-fr.png). GitHub affiche l’aperçu GIF animé ; la vidéo s’ouvre depuis le lien.
+[![Film Swarm : moteur Rust, mémoire, identité et validation humaine](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/apercu.png)](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4)
 
-## Release v0.1.0
+Un film en motion design : une mauvaise consigne conservée puis transmise, le
+moteur déterministe Rust, les droits, la validation humaine et la supervision.
+**Français, 1080p, musique instrumentale originale, sans voix.** Les textes sont
+intégrés ; des sous-titres FR et EN sont également fournis. Les raccords encore
+ouverts et le plan AC02 non démarré restent explicites. Ce film illustre
+l’architecture ; il ne constitue pas une capture de l’application.
 
-La [première release expérimentale](https://github.com/mo0ogly/swarm/releases/tag/v0.1.0) ajoute l’édition des dépendances avec prévisualisation, les programmes durables et l’administration de leurs paramètres. Le moteur conserve les autorisations, budgets, contrôles et revues indépendantes.
+[Lire le MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Architecture_Film_v2.mp4) · [SRT français](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.fr.srt) · [English SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/Swarm_Architecture_Film_v2.en.srt) · [Chapitres et sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video-v2/README.md) · [Ancienne vidéo](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
 
-Voir les [notes de version](docs/releases/v0.1.0.md), le [guide des programmes](docs/AUTOMATION-PROGRAMS.md) et la [reprise des contrats bloqués](docs/CONTRACT-REVISION.md). Les quotas des sessions externes aux fournisseurs ne sont pas observés automatiquement.
+[Article Word v6](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v6.docx) : introduction sur la contamination du contexte,
+18 références, cinq vues techniques complètes intégrées aux sections de l’article
+et accès au film. Le moteur Rust
+et la validation humaine restent au centre de l’architecture.
 
-[Prérequis métier et reprise des contrôles](docs/ENGINE-BUSINESS-CONTROLS.md)
+### Explorer le graphe — environ 1 minute
 
-## Première utilisation
+[![Démonstration du graphe Swarm](docs/screenshots/graph-linkedin/Swarm_graphe_apercu_FR_V2.gif)](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4)
 
-1. **Installer et ouvrir** : suivre [l’installation](INSTALL.md) ; en développement natif, `./swarm.sh start` ouvre automatiquement le cockpit.
-2. **Connecter une IA** : ouvrir « IA et connexions » et choisir les fournisseurs disponibles dans votre environnement.
-3. **Préparer le besoin** : préciser le résultat attendu, le périmètre et les critères ; relire le plan proposé.
-4. **Autoriser et lancer** : vérifier les rôles, les espaces et les limites. L’adoption d’un plan ne lance pas à elle seule les agents.
-5. **Suivre et examiner** : ouvrir le graphe puis le détail d’une tâche. Un processus terminé n’est pas encore un résultat validé.
+Interactions réelles dans un plan pédagogique : dépendances, branches, blocages
+et aperçu des contrôles. Explications en français ; aucun agent fournisseur lancé
+et aucun contrôle enregistré. Cette capture historique ne qualifie pas le portage Rust.
 
-→ [Guide illustré : les étapes, les boutons et les blocages](GUIDE-UTILISATEUR.md)
+[Lire le MP4](docs/screenshots/graph-linkedin/Swarm_graphe_LinkedIn_FR_V2.mp4) · [Image fixe](docs/screenshots/graph-tour/graph-tour-fr.png)
 
-### Formation pratique Casa Pizza
+### Casa Pizza — quatre tutoriels en français et en anglais
 
 Ouvrez **Aide du cockpit → Formation Casa Pizza** pour accéder à quatre tutoriels vidéo sous-titrés, leurs aperçus GIF, les transcriptions et un **guide PDF de 38 pages**. Les ressources suivent la langue du cockpit ; changer de langue dans le lecteur actualise les vidéos, légendes, liens PDF et kit. Le lecteur fonctionne aussi hors ligne depuis le kit, sans service externe ni appel IA.
 
-- [PDF français](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf) · [Kit français](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip)
-- [English PDF](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf) · [English kit](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip)
-- [Contenu de l’atelier et limites](docs/training/casa-pizza/README.md)
+| Module | Durée | Vidéo FR | Vidéo EN |
+| --- | ---: | --- | --- |
+| Besoin et graphe | 24 s | [MP4](docs/training/casa-pizza/tutoriels/media/01-plan-fr.mp4) | [MP4](docs/training/casa-pizza/tutoriels/media/01-plan-en.mp4) |
+| Contrôles Swarm | 24 s | [MP4](docs/training/casa-pizza/tutoriels/media/02-controles-fr.mp4) | [MP4](docs/training/casa-pizza/tutoriels/media/02-controles-en.mp4) |
+| Commande client | 30 s | [MP4](docs/training/casa-pizza/tutoriels/media/03-client-fr.mp4) | [MP4](docs/training/casa-pizza/tutoriels/media/03-client-en.mp4) |
+| Restaurant et suivi | 42 s | [MP4](docs/training/casa-pizza/tutoriels/media/04-restaurant-fr.mp4) | [MP4](docs/training/casa-pizza/tutoriels/media/04-restaurant-en.mp4) |
 
-Les vidéos sont des séquences de captures réelles légendées, plutôt que des enregistrements continus. L’application de référence passe onze tests et reste en français dans les deux kits. Les sources Word sont conservées pour l’édition. Le logo Swarm apparaît dans le cockpit, la préparation et le lecteur ; sa favicon identifie les onglets du navigateur.
+Séquences de captures réelles légendées, sans audio, réalisées les 9–10 octobre
+2026. Le plan pédagogique reste non exécuté ; la commande fictive est avancée
+manuellement. Les contenus de l’application de référence restent en français.
+Le kit contient le lecteur hors ligne, les transcriptions et les exercices corrigés.
 
-Pour démarrer avec une structure, utilisez « Choisir un modèle de mission » dans la préparation : [catalogue de parcours guidés partagé entre web et CLI](docs/PREPARATION-TEMPLATES.md).
+[Guide PDF FR](docs/training/casa-pizza/Formation_Swarm_Casa_Pizza.pdf) · [Kit FR](docs/training/casa-pizza/Kit_Formation_Swarm_Casa_Pizza.zip) · [Guide PDF EN](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_EN.pdf) · [Kit EN](docs/training/casa-pizza/Swarm_Casa_Pizza_Training_Kit_EN.zip) · [Méthode et limites](docs/training/casa-pizza/tutoriels/README.md)
 
-Swarm reste expérimental. Consultez les [essais réalisés et leurs limites](docs/COMMUNITY-QUALIFICATION.md) avant de lui confier une mission importante.
+GitHub affiche les images et le GIF ; ouvrir les liens MP4 pour lire les vidéos.
 
-## Ce que vous pouvez faire
+## Capacités et maturité
 
-| Votre besoin | Ce que propose Swarm | Pourquoi c’est utile |
+| Besoin | Fondations Swarm | État du portage Rust |
 | --- | --- | --- |
-| Transformer une idée en travail réalisable | Rédiger le besoin, dialoguer avec une IA, adopter un brief et vérifier un plan | Définir le résultat attendu avant de lancer les agents |
-| Répartir une mission | Responsables de périmètre, tâches et dépendances explicites | Savoir qui porte chaque partie du travail |
-| Faire avancer plusieurs tâches | Départs autorisés, suivi des espaces de travail et reprise des tâches devenues prêtes | Éviter de relancer chaque étape à la main |
-| Comprendre ce qui se passe | Graphe avec flèches, rôles, états, journal de l’agent et rapports | Retrouver l’action en cours et la cause d’un arrêt |
-| Contrôler la livraison | Revue indépendante, contrôles configurés et suivi de la fraîcheur des preuves | Distinguer un agent qui a fini d’un résultat réellement accepté |
-| Reprendre plus tard | État local persistant, historique et commandes CLI | Conserver le contexte entre deux sessions |
-| Réutiliser une expérience | Leçons et procédures vérifiées, versionnées et sélectionnées explicitement | Transmettre les acquis utiles avec leur provenance et leurs conditions |
-| Choisir ses IA | Fournisseurs d’agents installés et connexions à des modèles API compatibles | Affecter des capacités adaptées à la préparation, à l’exécution et à la revue |
+| Préparer le travail | Besoin, brief, modèles, tâches et dépendances | Composants natifs ; parcours global de préparation à qualifier |
+| Organiser et superviser | Planificateur, responsables de périmètre, exécutants, revue indépendante | Lancement/suivi d’un worker, reprise en attente et planification → worker vérifiés sur fixtures CLI ; autres rôles et parcours web ouverts |
+| Comprendre l’activité | Graphe, tentatives, rapports, télémétrie et causes d’attente | Lectures et console live ciblées vérifiées ; cockpit complet ouvert |
+| Encadrer les départs et la livraison | Dépendances, réservations, budgets, contrôles et fraîcheur des preuves | Contrats portés par incréments ; qualification globale ouverte |
+| Valider les résultats | Politique `human` ou `automatic`, contrôles préautorisés et décision humaine lorsqu’elle est requise | Contrôleur natif : `pending_human` conservé en mode `human`, sans acceptation par un PASS ; qualification locale bornée, identité humaine protégée globale distincte |
+| Transmettre l’expérience | RETEX vérifié, mémoire versionnée et sélection explicite | Parcours projet/mémoire Rust G8 ouvert ; contexte natif partiellement porté |
+| Encadrer l’autorité | Acteur, instance, plan, octrois, délégation et révocation | Composants internes ; raccord public global et approbation humaine protégée ouverts |
+| Confiner les agents et leurs accès réseau | Plan AC-02 : fichiers/processus, réseau/secrets, traçabilité et menus de sécurité | **Plan enregistré, non démarré** ; reprise après migration/qualification Rust et demande explicite |
 
-## Mémoire et identité
+Les preuves locales établissent leur périmètre déclaré. Elles ne démontrent ni
+l’autonomie de toute une équipe, ni la compatibilité de tous les fournisseurs,
+ni l’acceptation globale de la migration. Le [plan actif](docs/plans/migration-rust/PLAN.md)
+conserve les critères encore ouverts.
 
-Un workflow agentique gagne en continuité quand l’expérience se transmet, et en
-maîtrise quand les autorisations sont explicites. Swarm relie ces deux dimensions
-à son **moteur déterministe** : les agents proposent et réalisent, le moteur
-applique les règles et conserve l’historique des décisions.
+## Architecture
 
-**Mémoire du projet — disponible dans les sources actuelles.** Une expérience ou
-une procédure issue d’un retour d’expérience vérifié peut être admise, versionnée,
-puis sélectionnée explicitement pour une tâche future. Le contexte transmis garde
-la leçon, ses conditions d’usage et ses références sources. Remplacement et retrait
-préservent les anciennes versions et les contextes déjà reçus. Cela permet de
-réutiliser un acquis vérifié et de comprendre pourquoi il a été transmis, sans
-accorder de permissions supplémentaires à l’agent.
+Le **moteur déterministe Rust (`swarm-engine`, `RootStore`, `WorkEngine`)** relie
+l’état de mission, les contrats, les décisions, les réservations et les preuves.
+Les superviseurs proposent et arbitrent ; le moteur vérifie puis applique les
+opérations autorisées. Les agents exécutants produisent les candidats et leurs
+originaux ; contrôles, revue indépendante et jugement global gardent leurs rôles.
 
-**Identité et autorité des agents — intégration en cours.** Le noyau interne
-vérifie l’acteur, son instance, le plan concerné, les permissions et leur chaîne
-de délégation, avec expiration et révocation. L’objectif est de refuser un agent
-usurpé et la création d’un nouvel agent sans autorisation, même par un agent
-légitime. Le raccord aux lanceurs, aux usages mémoire et à une approbation humaine
-protégée reste à terminer ; ces protections ne sont pas encore garanties sur tous
-les parcours publics. L’attribution attestée du propriétaire et de l’auteur, ainsi
-que les droits d’usage de la mémoire, font partie de ce travail restant.
+[![Architecture interne Swarm : moteur, responsabilités et preuves](docs/diagrams/architecture-overview-fr.svg)](docs/diagrams/architecture-overview-fr.svg)
 
-**L’apport pour la gestion des workflows :** conserver les apprentissages entre
-missions, rendre les transmissions examinables et encadrer progressivement qui
-peut agir ou déléguer. Les modèles définissent le parcours ; la mémoire transmet
-l’expérience ; l’identité et les autorisations délimitent les actions attendues.
-Cette démarche sert les missions de développement et la
-[cible des processus métier](docs/PRODUCT-ARCHITECTURE.md), où continuité,
-responsabilités et validations humaines doivent rester explicites.
+[SVG en grand](docs/diagrams/architecture-overview-fr.svg) · [PNG](docs/diagrams/architecture-overview-fr.png) · [Source Mermaid](docs/diagrams/architecture-overview-fr.mmd)
 
-Exemple : une procédure de vérification admise après une mission peut être
-sélectionnée pour la suivante avec sa provenance. Son contenu ne donne pas à
-l’agent le droit de créer un exécutant ou d’approuver une action métier.
+Ces cinq vues décrivent l’architecture des **contrats internes Swarm**. Un bloc
+fonctionnel ne désigne pas nécessairement une crate ou un service. La maturité
+Rust est renseignée séparément dans l’[architecture détaillée](docs/architecture/OVERVIEW.md),
+avec une [correspondance composants → sections sources](docs/diagrams/CONTRACT-MAP.md).
+Un trait plein décrit une relation du contrat ; il ne certifie pas son déploiement.
 
-Voir la [mémoire du projet](docs/PROJECT-MEMORY.md), le
-[contrat d’identité et ses limites](docs/architecture/AGENT-IDENTITY-CONTRACT.md)
-et le [plan d’intégration mémoire](docs/plans/deepagents-integration/PLAN.md).
+## Contrôle humain et validation
 
-## Du besoin au résultat
+Le contrôle humain fait partie du contrat de sécurité du moteur déterministe.
+L’utilisateur définit l’objectif, le périmètre, les droits et la politique de
+validation. Les superviseurs IA conduisent le travail dans ce cadre.
 
-Exemple : **« Ajouter une recherche au catalogue, utilisable au clavier. »** Vous précisez les attentes, vérifiez le plan et autorisez l’exécution. Les agents réalisent les tâches ; les étapes dépendantes attendent leurs prérequis. Les résultats sont examinés avant que la mission puisse être considérée comme terminée.
+- En mode **`human`**, les contrôles préautorisés apportent des preuves. Un succès
+  laisse le résultat en attente de décision humaine et ne libère pas les tâches
+  suivantes. Un avis IA favorable ne remplace pas cette décision.
+- En mode **`automatic`**, les contrôles et la revue indépendante prévus restent
+  exigés ; le moteur vérifie le même candidat, les critères et la fraîcheur avant
+  l’acceptation. Le producteur ne s’accepte pas lui-même.
 
-```mermaid
-flowchart LR
-    B["1 · Exprimer le besoin<br/>Objectif et contraintes"] --> P["2 · Préparer le plan<br/>Tâches et critères"]
-    P --> A["3 · Autoriser<br/>IA, espaces et limites"]
-    A --> E["4 · Exécuter<br/>Agents et dépendances"]
-    E --> V{"5 · Vérifier<br/>Critères satisfaits ?"}
-    V -->|Oui| L["6 · Livrer<br/>Résultats acceptés"]
-    V -->|Correction nécessaire| C["Corriger ou demander<br/>une décision explicite"]
-    C --> E
-    classDef preparation fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px;
-    classDef execution fill:#EDE9FE,stroke:#7C3AED,color:#2E1065,stroke-width:2px;
-    classDef controle fill:#FEF3C7,stroke:#D97706,color:#451A03,stroke-width:2px;
-    classDef resultat fill:#DCFCE7,stroke:#16A34A,color:#052E16,stroke-width:2px;
-    class B,P,A preparation;
-    class E execution;
-    class V,C controle;
-    class L resultat;
-```
+Les contrôles natifs distinguent `pending_human` et `pending_review`. Leurs preuves
+locales ne certifient pas encore le parcours complet d’authentification humaine
+protégée. La conduite d’un processus, la revue IA et la validation humaine sont
+des responsabilités distinctes.
 
-L’enchaînement dépend des autorisations, des prérequis et des preuves disponibles. Une correction n’est pas une boucle infinie : les limites configurées peuvent arrêter la tentative et demander une intervention.
+[Contrat de validation humaine](docs/ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) · [État Rust139](docs/architecture/RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification).
 
-## Qui fait quoi
+## Identité et autorité
 
-**Un Swarm organisé ne se résume pas à plusieurs exécutants.** La planification, la réalisation et la vérification sont des responsabilités distinctes.
+[![Identité Swarm : source d’autorité, registre et usage exact](docs/diagrams/identity-authority-fr.svg)](docs/diagrams/identity-authority-fr.svg)
 
-```mermaid
-flowchart TB
-    H["Vous<br/>Besoin, autorisations et arbitrages"] --> O["Orchestrateur IA<br/>Planifie et suit les exigences"]
-    O --> S["Responsable de périmètre<br/>Décompose une partie de la mission"]
-    O --> W1["Exécutant A<br/>Réalise une tâche"]
-    S --> W2["Exécutant B<br/>Réalise une autre tâche"]
-    W1 --> R["Vérificateur indépendant<br/>Examine les rapports"]
-    W2 --> R
-    R --> M["Moteur Swarm<br/>Contrôles, preuves et règles d’acceptation"]
-    M --> D["Résultat accepté<br/>Les dépendances peuvent avancer"]
-    R -.->|Écart à traiter| O
-    M -.->|Décision humaine requise| H
-    classDef humain fill:#F1F5F9,stroke:#475569,color:#0F172A,stroke-width:2px;
-    classDef plan fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px;
-    classDef travail fill:#EDE9FE,stroke:#7C3AED,color:#2E1065,stroke-width:2px;
-    classDef revue fill:#FEF3C7,stroke:#D97706,color:#451A03,stroke-width:2px;
-    classDef moteur fill:#CCFBF1,stroke:#0D9488,color:#134E4A,stroke-width:2px;
-    classDef fini fill:#DCFCE7,stroke:#16A34A,color:#052E16,stroke-width:2px;
-    class H humain;
-    class O,S plan;
-    class W1,W2 travail;
-    class R revue;
-    class M moteur;
-    class D fini;
-```
+[SVG en grand](docs/diagrams/identity-authority-fr.svg) · [PNG](docs/diagrams/identity-authority-fr.png) · [Source Mermaid](docs/diagrams/identity-authority-fr.mmd)
 
-Ce schéma décrit l’organisation disponible avec planification hiérarchique et revue indépendante configurées. Les missions historiques ou manuelles ne possèdent pas nécessairement tous ces rôles.
+L’initiateur authentifié, le principal, l’agent logique, son instance, le
+propriétaire du périmètre et l’auteur d’un contenu sont des notions distinctes.
+Le contrat relie source humaine, enrôlement, plan courant, octrois et délégation,
+instantanés du registre, tête Trust et demande exacte. L’accord doit rester lié
+aux mêmes octets et à l’état courant jusqu’à l’admission ou l’usage.
 
-- **L’orchestrateur** conserve l’objectif et organise le travail. Des responsables peuvent prendre en charge des sous-périmètres.
-- **Les exécutants** utilisent les outils de leur fournisseur pour travailler dans les espaces autorisés.
-- **Le vérificateur indépendant** examine les rapports dans une session distincte, sans outils de modification. Son avis ne constitue pas, à lui seul, une preuve que des tests ont été exécutés.
-- **Le moteur local** applique les règles de départ, les dépendances, les limites et les conditions d’acceptation configurées. Il est distinct de l’orchestrateur IA.
-- **Vous** fixez les limites et intervenez lorsque l’autorisation ou les éléments disponibles ne permettent pas de continuer.
+La vue conserve aussi configuration/témoin, canal local contrôlé, expiration,
+révocation et autorité de préparation avant plan. Les raccords encore ouverts
+sont identifiés ; une signature ou un cookie ne devient pas un droit métier.
+Une signature établit une origine sous ses hypothèses de confiance ; elle ne
+prouve ni la vérité ni l’innocuité du contenu.
+[Contrat d’identité](docs/architecture/AGENT-IDENTITY-CONTRACT.md).
 
-## Voir le parcours
+## Mémoire et contexte
 
-Captures de l’application réelle du **1er octobre 2026**, sur une mission de huit tâches clôturée avec des décisions humaines. Elles montrent les résultats et l’organisation réellement configurée, pas une démonstration d’autonomie sans intervention.
+[![Mémoire Swarm : connaissances, contexte et reprise de conversation](docs/diagrams/memory-context-fr.svg)](docs/diagrams/memory-context-fr.svg)
 
-### 1. Comprendre l’état et la prochaine action
+[SVG en grand](docs/diagrams/memory-context-fr.svg) · [PNG](docs/diagrams/memory-context-fr.png) · [Source Mermaid](docs/diagrams/memory-context-fr.mmd)
 
-Le résumé indique ce qui se passe, qui agit et la prochaine étape. Ici, les huit résultats sont validés sur leurs preuves actuelles ; les livrables et les avis restent consultables.
+La **mémoire Swarm** comprend plusieurs circuits : connaissances de projet
+versionnées issues de RETEX, contexte préparé puis réellement composé, historique
+de la tâche, sélections extractives, révisions de consigne et frontières de dialogue.
+Les versions, conditions, sources, empreintes, réceptions et reprises restent
+attribuées. Le retrait ne réécrit pas les contextes déjà transmis. Un souvenir ne crée aucun droit :
+la mémoire informe le raisonnement, les contrats établissent l’autorité.
 
-![Mission réelle : 8/8 résultats validés et responsabilité racine clôturée](docs/screenshots/mission-complete-fr.png)
+Une mauvaise instruction conservée en mémoire peut revenir dans une autre
+instance. La provenance, l’admission et les conditions de réutilisation doivent
+donc rester examinables ; une mémoire ne crée ni droit ni autorisation nouvelle.
+La consigne initiale est conservée, avec des révisions attribuées. Les ajouts du
+superviseur sont validés par défaut et rejetables avant réservation ; une tentative
+déjà réservée ne reçoit pas de réécriture silencieuse. Ce parcours est distinct
+de la validation humaine du résultat.
 
-### 2. Voir qui décide, qui réalise et qui vérifie
+Les droits de lire, résumer et transmettre portent sur une source et un
+destinataire exacts. La reprise d’une conversation demande une décision explicite,
+un précontrôle et une nouvelle tentative ; une frontière non confirmée impose
+d’examiner les effets. Le statut du portage de ces circuits figure dans la matrice
+technique, sans changer le nom ni la place de la mémoire dans l’architecture.
+[Mémoire](docs/PROJECT-MEMORY.md) · [Droits d’usage](docs/plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md) · [Consignes révisées](docs/architecture/INSTRUCTION-LEARNING.md).
 
-L’orchestrateur apparaît à gauche, les huit tâches au centre et le vérificateur indépendant à droite. Les **traits pleins** vont du prérequis vers la tâche qui en dépend ; les **pointillés** montrent les responsabilités et les remises au vérificateur.
+## Supervision et reprise
 
-![Graphe actuel avec orchestrateur, exécutants, vérificateur et flèches](docs/screenshots/mission-graph-current-fr.png)
+[![Supervision Swarm : observation, décision, application et reprise](docs/diagrams/run-supervision-fr.svg)](docs/diagrams/run-supervision-fr.svg)
 
-[Ouvrir le graphe en grand](docs/screenshots/mission-graph-current-fr.png)
+[SVG en grand](docs/diagrams/run-supervision-fr.svg) · [PNG](docs/diagrams/run-supervision-fr.png) · [Source Mermaid](docs/diagrams/run-supervision-fr.mmd)
 
-L’orientation horizontale ou verticale, la vue détaillée, les filtres et le repli des branches changent l’affichage sans supprimer les tâches. « Pourquoi cette tâche attend ? » explique les prérequis ; « Où vont les appels et les coûts ? » distingue les consommations observées.
+Durée, attente d’outil, silence et incidents alimentent `run_observation`, attribué
+à la mission, la tâche, la tentative et son propriétaire. Racine et sous-superviseur
+reçoivent leurs événements ; ils diagnostiquent et proposent `planning decide`.
+Le moteur contrôle droits, bail, génération, révision, événement reçu et budgets.
 
-### 3. Préparer et examiner avant de lancer
+`continue-run` conserve le processus et ses compteurs ; `stop-run` demande l’arrêt,
+puis attend sa confirmation réelle. Les observations de production, les limites
+d’inférence structurée et le jugement global de cycle restent distincts. Les
+incidents reviennent au propriétaire jusqu’à l’effet vérifié et la reprise du besoin.
+La décision de continuer ou d’arrêter un processus ne remplace pas la validation
+du résultat : en mode `human`, celle-ci attend toujours la décision humaine requise.
+[Supervision](docs/architecture/RUN-SUPERVISION.md) · [Protocole IA/moteur](docs/architecture/AGENT-ENGINE-PROTOCOL.md) · [Cycles](docs/architecture/JUDGMENT-CYCLES.md).
 
-La préparation transforme le besoin en critères, tâches et dépendances. Les méthodes ci-dessous aident à cadrer ce travail. L’adoption du plan ne démarre pas les agents à elle seule : vous vérifiez les rôles, les connexions, les espaces et les limites avant d’autoriser le départ.
+## Journaux, direct et traçabilité
 
-Voir le [guide illustré de préparation et d’utilisation](GUIDE-UTILISATEUR.md) et les [captures de l’installation](INSTALL.md).
+[![Observabilité Swarm : logs, direct, télémétrie et preuves](docs/diagrams/logs-observability-fr.svg)](docs/diagrams/logs-observability-fr.svg)
 
-## Une autonomie encadrée
+[SVG en grand](docs/diagrams/logs-observability-fr.svg) · [PNG](docs/diagrams/logs-observability-fr.png) · [Source Mermaid](docs/diagrams/logs-observability-fr.mmd)
 
-Swarm vise à réduire les interventions répétitives en conservant des règles explicites. **Processus terminé, rapport présent et résultat accepté sont trois informations différentes.**
+Les logs de tentative, le terminal, l’activité moteur, les décisions, le registre
+d’appels, les ressources Linux et la télémétrie OTLP conservent leurs provenances.
+La console **Suivi → Journaux**, les vues directes et les exports utilisent les
+opérations publiques avec leurs filtres, curseurs et limites. Elles restent en
+lecture seule ; le direct SSE possède un repli explicite en interrogation.
 
-| Situation | Lecture attendue |
-| --- | --- |
-| Un agent travaille | Une tentative est en cours ; son journal permet de suivre l’activité reçue |
-| Un agent s’arrête | Le processus est terminé ou interrompu ; le résultat doit encore être examiné |
-| Un rapport est présent | Il existe un livrable à lire ; sa présence ne garantit pas sa complétude |
-| Un résultat est accepté | Les conditions d’acceptation applicables ont été satisfaites |
-| Une tâche attend | Une dépendance, un espace ou une autre condition empêche son départ |
+Les originaux et les empreintes servent à reconstruire **objectif → décision →
+tentative → candidat → contrôle → revue → validation humaine si requise → acceptation**. Un log coloré, un appel
+réservé ou un coût absent ne devient ni preuve d’exécution, ni facture, ni succès.
+[Console](docs/architecture/LOG-CONSOLE.md) · [Traçabilité](docs/architecture/TRACEABILITY.md) · [Registre](docs/architecture/CALL-ACCOUNTING.md) · [Direct natif](docs/architecture/RUST-MIGRATION.md#observation-en-direct-des-agents--live-ux-01-lecture-seule).
 
-La mission peut reprendre les tâches devenues prêtes lorsqu’elle est active et autorisée. Elle peut aussi se mettre en attente : droits insuffisants, outil indisponible, contrôle en échec ou décision humaine nécessaire. Swarm ne garantit ni une autonomie sans intervention ni la justesse de toute réponse IA.
+## Sécurité et évolutions prévues
 
-## Installation rapide avec Docker
+Le [positionnement et les références de sécurité](docs/SECURITY-POSITIONING.md)
+relient orchestration, autorité, action exacte et reprise. Ils distinguent le
+rôle d’ISO, OWASP, NIST et SPIFFE, les acquis locaux Biba Rust et les protections
+encore à qualifier. Le profil d’assurance proposé PA-01–08 prolonge la matrice
+existante sans revendiquer de certification ou de conformité globale.
 
-Sur Linux, avec Docker Engine et Docker Compose v2 installés :
+Le [plan AC-02](docs/plans/actions-confiance/securite-execution-apex.md) conserve
+les contrats de confinement Linux, de médiation réseau et secrets, de traçabilité,
+de reprise et de menus de sécurité. Ses **quatre références visuelles** sont
+l’éditeur de politique, le panneau des refus, la chaîne d’une connexion et la
+chronologie de sécurité. Aucun lot AC-02 n’est lancé.
+
+Les références ont des rôles distincts : [NVIDIA OpenShell v0.1.5](https://docs.nvidia.com/openshell/v0.1.5/how-it-works/policies/schema)
+pour le sous-ensemble de politique visé ; [Bromure](https://bromure.io/en/blog/openshell-policies-and-network-lineage)
+pour les parcours de sécurité ; [Agent Baseline Software Factory](https://github.com/agentbaseline/agentbaseline/blob/d842a1bb34a42e9d7c0d54a1b12ead9e0e59e283/software-factory/software-factory.md)
+pour les frontières et les contrôles. Les catalogues YAML d’Agent Baseline ne
+sont pas des politiques de confinement exécutables. Les citer ne certifie pas Swarm.
+Voir aussi l’[architecture cible des actions de confiance](docs/architecture/ACTIONS-CONFIANCE.md).
+
+## Voir l’interface
+
+### Console live Rust — fixture du 22 octobre 2026
+
+![Console live native : activité et consommation déclarée sur fixture](docs/publications/20261022-console-live/images/dashboard.png)
+
+Capture réelle de `swarm-rust` sur une racine de fixture : agents, alertes et
+consommation déclarée. Vérifications locales ciblées ; revue indépendante et
+acceptation globale ouvertes. [Présentation et provenance](docs/publications/20261022-console-live/README.md).
+
+### Cockpit historique Go
+
+Captures historiques du **1er octobre 2026** : mission de huit tâches clôturée
+avec décisions humaines. Elles illustrent le cockpit Go, sans prouver la parité
+Rust ou une autonomie sans intervention.
+
+![Mission réelle : huit résultats validés et responsabilité racine clôturée](docs/screenshots/mission-complete-fr.png)
+
+![Graphe : orchestrateur, exécutants, vérificateur et dépendances](docs/screenshots/mission-graph-current-fr.png)
+
+[Ouvrir le graphe en grand](docs/screenshots/mission-graph-current-fr.png) · [Guide illustré](GUIDE-UTILISATEUR.md)
+
+## Démarrer
+
+### Application locale Rust
+
+Prérequis : Linux, Git, Bash, Python 3, Rust/Cargo (toolchain validée : 1.96.0) et un compilateur C pour SQLite embarqué. Récupérez les dépendances verrouillées une fois, puis utilisez le lanceur pris en charge :
 
 ```sh
-git clone https://github.com/mo0ogly/swarm.git
-cd swarm
-mkdir -p "$HOME/projets/mon-projet"
-./install.sh --project "$HOME/projets/mon-projet"
-```
-
-Ouvrez le lien de session affiché. Le projet et les missions persistent sur votre machine. L’image contient Swarm et les outils de base ; les fournisseurs IA s’installent et s’authentifient séparément.
-
-**[Guide d’installation complet](INSTALL.md)** : Docker, agents, CLI, sauvegarde, mise à jour et installation native avec `install.sh --mode native`.
-
-## Démarrer en local
-
-**Périmètre actuellement testé : Linux, Rust/Cargo et Python 3.** Git et Make sont utilisés ci-dessous. Les ressources web sont embarquées dans le binaire ; Node.js n’est pas requis pour simplement le construire et le lancer.
-
-```sh
-git clone https://github.com/mo0ogly/swarm.git
-cd swarm
-# Choisissez le projet sur lequel les agents travailleront.
+cargo fetch --locked --manifest-path rust/Cargo.toml
+./swarm.sh build
 ./swarm.sh start --root /chemin/du/projet
-# Même adresse et mêmes missions après remplacement de l'instance.
-./swarm.sh restart --root /chemin/du/projet
-./swarm.sh status --root /chemin/du/projet
+./swarm.sh status
 ```
 
-Le lanceur construit le binaire et ouvre la session locale automatiquement. L’adresse reste **http://127.0.0.1:18792/** ; `./swarm.sh open` reconnecte le navigateur sans copier de lien privé. Python 3 et `xdg-open` sont nécessaires au lanceur (`--no-open` pour un serveur sans navigateur). Utilisez le même `--root` pour chaque commande ; les réglages et limites sont décrits dans le [guide d’installation](INSTALL.md#lanceur-local-stable).
+`./swarm` lance le Rust installé dans `bin/swarm`. Les commandes non portées refusent explicitement ; elles n’appellent jamais Go. Docker compile les sources Rust avec les dépendances verrouillées ; voir [l’installation](INSTALL.md).
 
-1. Ouvrez **IA et connexions** pour vérifier les fournisseurs et les modèles disponibles.
-2. Préparez le besoin, adoptez le brief et vérifiez le plan.
-3. Choisissez les agents, les espaces de travail et les conditions d’acceptation.
-4. Autorisez le lancement, puis suivez le graphe et les résultats à examiner.
+### Développement Rust
 
-Les agents externes doivent être installés et authentifiés séparément. Ce dépôt fournit douze [méthodes de travail](docs/AGENT-METHODS.md), dont la planification, l’examen et l’amélioration, le diagnostic, la revue et le RETEX. Les cinq méthodes de préparation fonctionnent dans un projet vide grâce au pack embarqué ; les personnalisations locales restent contrôlées. Consultez aussi les [limites de migration](docs/migration/README.md).
-
-### Et en ligne de commande ?
-
-Le CLI travaille sur le même état local que le web. Il permet notamment de retrouver une mission, lire son état et inspecter sa planification.
+Le moteur natif est en cours de construction pour Linux. Depuis la racine :
 
 ```sh
-./bin/swarm --root /chemin/du/projet work list
-./bin/swarm --root /chemin/du/projet work show IDENTIFIANT
-./bin/swarm --root /chemin/du/projet planning show IDENTIFIANT
-./bin/swarm --root /chemin/du/projet --json work list
+cargo build --manifest-path rust/Cargo.toml --locked -p swarm-cli
 ```
 
-Les commandes de mutation utilisent des contrats explicites décrits dans la [référence technique](REFERENCE.md). Les parcours web et CLI ne sont pas identiques : par exemple, le test interactif d’une connexion API est disponible dans le web.
+Le paquet `swarm-cli` produit **`swarm-rust`**. Consulter l’[aide native](rust/crates/swarm-cli/src/lib.rs)
+et le [contrat de migration](docs/architecture/RUST-MIGRATION.md) avant de choisir
+un parcours. Utiliser une racine de fixture isolée pour les essais ; ce build ne
+réalise ni installation du service ni migration des missions existantes.
 
-### Vérifier la version réellement lancée
+### Installation et usage historiques
 
-Ces trois formes lisent l’identité embarquée dans le binaire et fonctionnent sans
-projet initialisé ni base SQLite :
+La [release expérimentale v0.1.0](https://github.com/mo0ogly/swarm/releases/tag/v0.1.0)
+et les guides [Docker/natif](INSTALL.md), [utilisateur](GUIDE-UTILISATEUR.md) et
+[CLI](REFERENCE.md) documentent l’édition historique. `install.sh` (natif ou Docker), `build.sh`, `swarm.sh` et la CI construisent exclusivement Rust. Go n’est ni un prérequis ni un repli. L’installation courante figure dans [INSTALL](INSTALL.md) ; voir aussi le
+[lanceur local natif](docs/architecture/NATIVE-LOCAL-LAUNCHER.md).
 
-```sh
-swarm version
-swarm --version
-swarm --json version
-```
+Dans cette édition, préparer un besoin et adopter un plan ne lance pas les agents.
+Vérifier les rôles, les connexions, les espaces et les limites avant d’autoriser
+l’exécution. Les programmes d’agents et leurs authentifications s’installent
+séparément. Les [notes v0.1.0](docs/releases/v0.1.0.md) décrivent la release ;
+l’identité du binaire lancé et **Version et nouveautés** permettent de distinguer
+binaire, commit et sources locales. Une recompilation ne remplace pas un processus
+serveur déjà en cours.
 
-`devel` signifie qu’aucun tag de release vérifié n’a été injecté. `unknown` ou
-`null` signifie que la métadonnée correspondante n’est pas disponible ; ce n’est
-ni une release ni un contrôle réussi. Le JSON sépare l’identité du **binaire** de
-l’état éventuel des **sources locales** présenté par le web. Après recompilation
-ou installation, redémarrez le serveur : un processus déjà lancé continue
-d’utiliser son ancien binaire.
+## Données et limites
 
-Dans le cockpit et dans la préparation, **Version et nouveautés** ouvre la même
-fenêtre bilingue. Elle affiche le binaire lancé, compare séparément les sources
-locales, puis liste l’historique embarqué. Aucune release n’étant déclarée à ce
-jour, l’historique reste vide plutôt que d’inventer un numéro ou une date.
+Les missions et leur historique sont conservés sous `.swarm/` dans le projet,
+notamment dans SQLite. Les fournisseurs externes reçoivent le contexte des appels
+qui leur sont confiés : **local ne signifie pas que tous les modèles s’exécutent
+sur votre machine**. Les secrets et liens de session doivent rester privés.
+Les clés API de l’édition historique sont stockées localement avec permissions
+restrictives, sans chiffrement au repos.
 
-![Version et nouveautés dans le cockpit, français, thème État](docs/screenshots/version-history/cockpit-fr-etat.png)
-
-[Voir les captures FR/EN, État/sombre et les états dégradés](docs/screenshots/version-history/manifest.json).
-
-## Comment Swarm utilise les modèles
-
-| Capacité | Fournisseur adapté |
-| --- | --- |
-| Préparer un brief, proposer un plan, examiner un rapport | Agent compatible ou connexion API configurée |
-| Lire et modifier des fichiers, lancer des outils | Agent installé disposant de ces outils |
-| Appliquer les règles, conserver l’état, vérifier les dépendances | Moteur Swarm local ; ce n’est pas un modèle IA |
-
-Les connexions personnalisées utilisent un service compatible avec **`POST /chat/completions`**. Elles ne donnent pas automatiquement au modèle des outils pour modifier le projet. La compatibilité avec un fournisseur doit être testée ; une adresse et un nom de modèle ne suffisent pas à la garantir.
-
-## Où vont les données ?
-
-Les missions et leur historique sont conservés dans le dossier `.swarm/` du projet, notamment dans une base SQLite. Les fournisseurs externes reçoivent le contexte nécessaire aux appels qui leur sont confiés : **local ne signifie pas que les modèles tournent tous sur votre machine**.
-
-Les clés des connexions API sont enregistrées localement dans `.swarm/ai-connections.json`, avec des permissions de fichier `0600`. Elles ne sont pas chiffrées au repos. Le dossier `.swarm/` et les secrets ne doivent pas être publiés dans Git.
+Les réservations d’espace peuvent sérialiser des tâches. Une consommation non
+rapportée reste inconnue ; les quotas des sessions externes ne sont pas observés
+automatiquement. Fermer le cockpit n’arrête pas les agents. Une destination ou
+une méthode HTTP autorisée ne garantit pas à elle seule l’absence d’exfiltration
+ou d’effet métier indésirable.
 
 ## Documentation
 
-**Commencer ici : [Guide utilisateur — du besoin au résultat](GUIDE-UTILISATEUR.md)**
+| Sujet | Référence |
+| --- | --- |
+| Prise en main | [Guide utilisateur](GUIDE-UTILISATEUR.md), [installation](INSTALL.md), [formation](docs/training/casa-pizza/README.md) |
+| Maturité native | [Contrat Rust](docs/architecture/RUST-MIGRATION.md), [plan](docs/plans/migration-rust/PLAN.md), [preuves/rejeux](docs/plans/migration-rust/REPLAYS.md) |
+| Architecture et conduite | [Deux UX](docs/PRODUCT-ARCHITECTURE.md), [supervision](docs/architecture/RUN-SUPERVISION.md), [communication](docs/AGENT-COMMUNICATION.md) |
+| Sécurité et standards | [Positionnement et profil proposé](docs/SECURITY-POSITIONING.md), [contrôles et limites](docs/actions-confiance-referentiels.md), [Biba Rust](docs/actions-confiance-rust.md) |
+| Contexte et autorité | [Mémoire](docs/PROJECT-MEMORY.md), [identité](docs/architecture/AGENT-IDENTITY-CONTRACT.md), [actions de confiance](docs/architecture/ACTIONS-CONFIANCE.md) |
+| Préparation et méthodes | [Catalogue](docs/PREPARATION-TEMPLATES.md), [parcours produit](docs/PRODUCT-WORKFLOW.md), [méthodes](docs/AGENT-METHODS.md), [profil et skills](docs/PROJECT-PROFILE.md) |
+| Contrôle et reprise | [Budgets](docs/BUDGETS.md), [contrôles métier](docs/ENGINE-BUSINESS-CONTROLS.md), [contrats bloqués](docs/CONTRACT-REVISION.md), [reprise de tentative](docs/ATTEMPT-RECOVERY.md), [stockage](docs/RUNTIME-RECOVERY.md) |
+| Automatisation et API | [Programmes durables](docs/AUTOMATION-PROGRAMS.md), [référence CLI](REFERENCE.md), [préparation](PREPARATION-UX.md), [workflows](WORKFLOWS.md) |
+| Évolutions prévues | [File des projets APEX](docs/plans/FILE-APEX.md), [AC-02 enregistré](docs/plans/actions-confiance/securite-execution-apex.md), [suivi après bascule](docs/plans/migration-rust/AFTER-CUTOVER.md) |
 
-- [Installation Docker et native](INSTALL.md)
-- [Autoriser une reprise et transmettre les sources au vérificateur](docs/ATTEMPT-RECOVERY.md)
-- [Diagnostic du stockage et tentatives épuisées](docs/RUNTIME-RECOVERY.md)
-- [Méthodes : besoin, spécification, planification, audit, diagnostic et vérification](docs/AGENT-METHODS.md)
-- [Mémoire du projet : expériences, procédures et versions sélectionnées](docs/PROJECT-MEMORY.md)
-- [Identité des agents : autorité, délégation et intégration restante](docs/architecture/AGENT-IDENTITY-CONTRACT.md)
+Les méthodes fournissent une démarche ; elles n’accordent aucun droit d’exécution.
+Leurs sources canoniques sont dans [`.claude/skills/`](.claude/skills/), leurs
+commandes de préparation dans [`.claude/commands/`](.claude/commands/).
 
-- [Référence technique complète et contrats CLI](REFERENCE.md)
-- [Cockpit : lancement, pilotage et supervision](COCKPIT.md)
-- [Préparation et révision des missions](PREPARATION-UX.md)
-- [Workflows et points de reprise](WORKFLOWS.md)
-- [Extraction vers le dépôt autonome et limites connues](docs/migration/README.md)
-- [Licence et historique de licence](docs/LICENSING.md)
+## Dépôt et vérification
 
+- `rust/crates/swarm-engine` : moteur natif ; `swarm-cli` : CLI ; `swarm-web` : service HTTP.
+- `web/`, `frontend/`, `locales/` : interface et traductions ; `tests/` : parcours publics et navigateur.
+- `tools/verification/` : [recettes permanentes et conservation des preuves](tools/verification/README.md).
+- `docs/` et `docs/en/` : contrats, guides, plans, diagrammes et médias.
 
-Les fichiers des méthodes sont versionnés dans [`.claude/skills/`](.claude/skills/)
-et les commandes de préparation dans [`.claude/commands/`](.claude/commands/).
-[Recette pour une installation neuve](docs/FRESH-INSTALL.md).
-
-## Structure du dépôt
-
-La CLI et le serveur Rust sont dans `rust/crates/swarm-cli`, le moteur dans
-`rust/crates/swarm-engine`, le web dans `rust/crates/swarm-web`, `web` et
-`frontend`, les guides dans `docs`. Les sources Go historiques ne font plus partie
-de la distribution. Voir la [carte du dépôt](docs/REPOSITORY-STRUCTURE.md), dont
-les [guides de formation pizza](docs/training/casa-pizza/README.md).
-
-## Développer et vérifier
-
-Node.js 22 et npm sont nécessaires pour les tests frontend et la reconstruction des ressources web.
-
-```sh
-PUPPETEER_SKIP_DOWNLOAD=true npm ci
-make test
-make smoke
-make frontend
-make build
-CHROME_BIN=/usr/bin/google-chrome npm run test:connections
-
-# Captures reproductibles, projet temporaire, aucun appel IA.
-CHROME_BIN=/usr/bin/google-chrome node scripts/readme-screenshots.cjs
-```
-
-Les captures nécessitent Chrome ou Chromium installé et Python 3 pour le scénario d’organisation simulée. Les tests ciblés ne constituent pas une certification de tous les fournisseurs ni de toutes les situations d’exécution.
+Choisir les vérifications selon le contrat modifié et le profil réellement livré.
+Les tests de fixtures, le build de production, la revue indépendante et
+l’acceptation sont des preuves distinctes. `make test`, `make smoke`, `make test-process` et `make test-install` utilisent les vérifications Rust actuelles ; leur succès ne prouve pas toute la migration. Voir [contribution](CONTRIBUTING.md) et les
+[limites de qualification](docs/COMMUNITY-QUALIFICATION.md).
 
 ## Licence
 
-**Code source disponible pour les usages permis par la [PolyForm Noncommercial 1.0.0](LICENSE).** Cette licence permet des usages non commerciaux, la modification et la redistribution dans les conditions qu’elle définit ; elle prévoit aussi des dispositions pour certaines organisations. Le texte intégral fait foi.
+Code source disponible sous [PolyForm Noncommercial 1.0.0](LICENSE), selon ses
+conditions. Les usages commerciaux non couverts nécessitent une autorisation
+distincte ; le projet n’est pas présenté comme « open source » au sens de l’OSI.
+Les versions déjà publiées sous Apache 2.0 et les composants tiers conservent
+leurs droits : [précisions](docs/LICENSING.md), [notices tierces](THIRD_PARTY_NOTICES.md).
+Pour un signalement sensible, consulter [SECURITY.md](SECURITY.md).
 
-La restriction commerciale signifie que ce projet n’est pas présenté comme « open source » au sens de la [définition de l’Open Source Initiative](https://opensource.org/osd). Pour un usage commercial non couvert, une autorisation distincte des titulaires des droits est nécessaire.
+### Installer un candidat Rust déjà qualifié
 
-**Les versions déjà publiées sous Apache 2.0 conservent cette licence.** Le changement ne retire pas les droits accordés sur ces versions. Les bibliothèques tierces conservent également leurs propres licences : voir [les notices](THIRD_PARTY_NOTICES.md) et [les précisions de licence](docs/LICENSING.md).
-## Communication et méthodes
+Après `./swarm.sh build` et vérification du candidat, `./swarm.sh restart --prepared-build SHA256 --no-open` installe précisément le dernier candidat qualifié dont l’empreinte complète est fournie. Remplacer `SHA256` par `binary_sha256` du record `deploy/local-build.json` examiné. Le profil sans fixtures, l’archive compilée, les notes FR/EN et le binaire sont revérifiés avant arrêt du serveur géré. Une empreinte différente, une preuve altérée ou une régression de version refuse avant arrêt. Les modifications de sources ultérieures restent en attente et leur nombre est annoncé. Le chemin source reste géré ; `restart` sans cette option conserve sa reconstruction normale. Cette opération locale ne publie ni commit ni release.
 
-Les méthodes donnent une démarche commune aux agents, avec des critères et des preuves. Elles ne remplacent pas les règles exécutables du moteur.
+Le compteur du mode préparé porte sur les entrées compilées connues de ce candidat, sans inventorier tous les nouveaux fichiers du checkout. Les outils de livraison sont des fichiers Python du dépôt ; leurs évolutions peuvent précéder la prochaine compilation des notes embarquées.
 
-| Besoin | Méthode |
-| --- | --- |
-| Passer du besoin à une évolution vérifiée | Parcours guidé — préparer une évolution |
-| Examiner un système et corriger les constats autorisés | Examiner et améliorer |
-| Définir le résultat attendu et les critères | Construire la spécification |
-| Détecter les contradictions et omissions avant lancement | Examiner la spécification |
-| Rechercher les défauts concrets d’une implémentation | Examiner le code |
-| Reproduire un problème et trouver sa cause | Diagnostiquer et corriger |
-| Rejouer le parcours après correction | Vérifier la correction |
-| Reprendre un plan bloqué en conservant son historique | Replanifier |
-| Analyser les résultats et prioriser les améliorations | Retour d’expérience |
+PAEA : contrôle d’ancre privée existante avec `identity checkpoint-check PIN_DEMANDE --input ANCRE_PRIVEE_ABSOLUE --json` ; [contrat et limites](docs/plans/actions-confiance/paea/INCREMENT-56.md). Le localisateur doit déjà être protégé par l’appelant ; aucun paquet/matière/service créé.
 
-Les méthodes disponibles dans le **catalogue de préparation** sont décrites dans le [guide des méthodes](docs/AGENT-METHODS.md) ; toutes les méthodes ne sont pas des boutons web. La construction et l’examen de spécification couvrent l’expression du besoin et l’analyse du plan. Voir aussi le [circuit des rapports, preuves et décisions](docs/AGENT-COMMUNICATION.md).
-
-### Budgets
-
-[Budgets et coûts IA — web et CLI](docs/BUDGETS.md) · [English guide](docs/en/BUDGETS.md).
-
-## Contribuer et signaler un problème
-
-Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les contrôles et les pull requests,
-[SECURITY.md](SECURITY.md) pour les signalements sensibles.
-
-### Reconnaître une mission clôturée
-
-Le cockpit distingue un agent terminé d’un résultat validé. Une mission clôturée
-annonce tous ses résultats validés sur les preuves actuelles et la responsabilité
-racine clôturée. Les livrables, avis et coûts restent consultables.
-
-![Mission clôturée dans le cockpit](docs/screenshots/mission-complete-fr.png)
-
-*Recette réelle à 8/8, avec interventions humaines. Voir le [guide utilisateur](GUIDE-UTILISATEUR.md#lire-les-compteurs-et-reconnaître-la-fin) et les [reprises du moteur](docs/ENGINE-RECOVERY.md).*
-
-### Consignes du projet
-
-Transmettez les règles du dépôt à chaque rôle avec un profil de projet explicite. [Configuration et limites](docs/PROJECT-PROFILE.md).
-
-Dans **Lancer / Relancer → Skills pour cette tâche**, sélectionnez les méthodes
-du projet pour un exécutant. Le choix est conservé avec la tentative, sans
-activer automatiquement les scripts ou changer les permissions. Le CLI propose
-`swarm skills list`. [Guide de sélection](docs/PROJECT-PROFILE.md#skills-sélectionnés-pour-une-action).
-
-Le [parcours de création d’application](docs/PRODUCT-WORKFLOW.md) détaille les méthodes migrées, la conception, les gates et la navigation application → parcours → story → tâches.
-
-
-### Attente SQLite configurable
-
-Dans **Administration → Attente du stockage SQLite**, consulter ou régler les reprises, le délai entre reprises et le délai SQLite par tentative. La CLI expose les mêmes valeurs persistées via `swarm storage-retry show` et `swarm storage-retry apply --input configuration.json`. Ces paramètres ne relancent ni fournisseur ni agent. Voir [le guide de reprise SQLite](docs/SQLITE-CONTENTION-RECOVERY.md).
+PAEA : `identity initial-create PIN_DEMANDE DOSSIER_OPERATEUR ANCRE_PRIVEE --input DEMANDE_PRIVEE --json` prépare un paquet privé dormant ; `initial-reconcile` relit le même emplacement sans régénération. [Contrat et limites57](docs/plans/actions-confiance/paea/INCREMENT-57.md), aucun compte/service/humain admis.

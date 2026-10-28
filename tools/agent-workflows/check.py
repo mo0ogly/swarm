@@ -12,7 +12,7 @@ import sys
 SKILLS = (
     "apex", "audit-pdca", "spec-builder", "spec-audit", "code-reviewer",
     "verify-fix", "replan", "retex-analyzer", "debug",
-    "product-planning", "product-delivery", "product-review",
+    "product-planning", "product-delivery", "product-review", "pricing-discovery",
 )
 ROOT = Path(__file__).resolve().parents[2]
 

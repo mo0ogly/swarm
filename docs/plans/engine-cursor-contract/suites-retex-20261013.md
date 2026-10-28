@@ -1,5 +1,17 @@
 # Suites du RETEX — reprise autorisée le 13 octobre 2026
 
+## Raccord documentaire APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-2--rapprochement-des-suivis-antérieurs-24-octobre-2026)
+et [EN](../../en/APEX-QUEUE.md#wave-2--reconciling-earlier-tracking-october-24-2026)
+conserve QW1–QW3 comme suites vérifiées dans leurs campagnes historiques,
+conformément au [RETEX des suites](RETEX-suites-20261013.md). Elles ne deviennent
+pas trois travaux non faits. Codex racine possède la remise des contrats et
+preuves pertinentes à la qualification Rust ; les entrées modifiées demandent
+leurs propres preuves. Ce rapprochement ne rejoue aucune campagne, ne réactive
+pas la mission historique et ne transforme pas les mesures ponctuelles QW3 en
+gain universel ou endurance.
+
 L'utilisateur demande de poursuivre les trois propositions du RETEX. Base propre : `b61694264cbeaf0d72cea8e55201c1fd1f7aaed1`. Développement direct Codex, sans Claude ; recettes natives uniquement dans des racines isolées. La mission historique reste en pause. Les autorisations de commit/push et de livraison restent applicables ; aucun reset de consommation ni modification de base native.
 
 | ID | Livrable / propriétaire | Vérification de fin |

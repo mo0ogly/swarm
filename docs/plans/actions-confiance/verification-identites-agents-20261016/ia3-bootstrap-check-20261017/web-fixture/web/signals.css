@@ -1,0 +1,15 @@
+/* Semantic pairs come from Swarm's shared theme tokens. */
+.swarm-signal{display:inline-flex;align-items:center;gap:.45rem;max-width:100%;padding:.3rem .55rem;border:1px solid currentColor;border-radius:.35rem;vertical-align:middle;line-height:1.35;font-size:.875rem;overflow-wrap:anywhere}
+.swarm-signal__icon{flex:none;width:1.2rem;height:1.2rem}
+.swarm-signal--neutral{color:var(--wattson-texte-discret);background:var(--wattson-carte)}
+.swarm-signal--info{color:var(--wattson-info-encre);background:var(--wattson-info-fond)}
+.swarm-signal--success{color:var(--wattson-succes-encre);background:var(--wattson-succes-fond)}
+.swarm-signal--warning{color:var(--wattson-attention-encre);background:var(--wattson-attention-fond)}
+.swarm-signal--danger{color:var(--wattson-alerte-encre);background:var(--wattson-alerte-fond)}
+.swarm-context-seal{display:flex;align-items:center;gap:1.2rem;border-top:1px dashed var(--wattson-ligne);padding:1.25rem 0 .3rem;margin-top:1.5rem;color:var(--wattson-texte)}
+.swarm-context-seal__wax{flex:none;width:6.5rem;height:6.5rem;color:var(--wattson-accent-encre);filter:drop-shadow(0 2px 1px var(--wattson-carte-creuse))}
+.swarm-context-seal__content{min-width:0}
+.swarm-context-seal__title{font-family:Georgia,serif;font-size:1.25rem;color:var(--wattson-titre);margin:0 0 .6rem}
+.swarm-context-seal__signals{display:flex;flex-wrap:wrap;gap:.45rem}
+.swarm-context-seal__attribution,.swarm-context-seal__reference{font-size:.85rem;line-height:1.5;overflow-wrap:anywhere;margin:.65rem 0 0;color:var(--wattson-texte-discret)}
+@media(max-width:480px){.swarm-context-seal{align-items:flex-start;gap:.5rem}.swarm-context-seal__wax{width:4.1rem;height:4.1rem}.swarm-context-seal__signals{gap:.4rem}.swarm-signal{padding:.25rem .4rem}}

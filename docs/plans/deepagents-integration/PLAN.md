@@ -27,6 +27,153 @@ sélection explicite pour un exécutant, transmission, remplacement et retrait.
 Les volets de reprise complète et de résumé restent au plan ; ce lot ne les
 déclare pas réalisés.
 
+## Suite en cinq étapes — 17 octobre 2026
+
+Demande utilisateur : « on fait un plan sur 5 etapes ». Méthodes : `replan` et
+`spec-builder`. Cette feuille de route organise les suites de M20 et M24–M28,
+sans renuméroter les lots ni modifier leurs preuves historiques. Responsable
+du chantier mémoire : Codex. Le chantier identité conserve son périmètre ;
+l'utilisateur décide de l'autorité humaine initiale et des activations système.
+
+**État initial : aucune des cinq étapes de cette suite n'est clôturée.** Les
+fonctions déjà vérifiées restent acquises dans leur périmètre : expériences et
+procédures versionnées, sélection/transmission explicites, remplacement/retrait,
+reprise de conversation et sélection extractive. Leur existence ne prouve pas
+la conformité des droits publics M20-U01–U10.
+
+| Étape | Résultat attendu | Dépendances et état réel |
+| --- | --- | --- |
+| MEM-P1 — Fiabiliser toutes les lectures concernées | Inventaire qualifié des accès SQL directs et de la propagation d'erreur ; corrections générales des défauts reproduits | En cours : M29 raccorde 14 lecteurs et corrige terminal/automation ; M30 valide les captures et lie leur confirmation aux octets exacts. M31 traite les diagnostics du conducteur, M32 les six callbacks de fraîcheur et M33 les lecteurs simples de pause ; replis, lectures jointes et enveloppes liées restent à qualifier |
+| MEM-P2 — Attribuer propriétaire et auteur | Contrat persistant, opérations versionnées et migration sans attribution inventée | Après qualification P1 ; modèle et migration à réaliser. Préparation possible en fixtures ; attribution réelle dépend de la sortie d’autorité protégée IA3, pas de la clôture entière IA5 |
+| MEM-P3 — Préparer le contrôle des usages | Consommateur fermé liant sources, demandeur, destinataire et droits distincts de lecture/résumé/transmission | Réutilise M24/M25 et P2 ; raccord à réaliser, sortie protégée IA3 et autorité avant plan requises. Aucune activation publique avant P4 |
+| MEM-P4 — Protéger la transmission jusqu'à réception | Décision courante appliquée au contenu exact, révocation et pannes gérées, réception attribuée | Dépend de P2/P3 et de la sortie protégée IA3 ; engagement et raccord public à réaliser. Ce résultat alimente IA4, sans attendre MEM-P5 ou toute IA5 |
+| MEM-P5 — Qualifier et clôturer le lot | Recette CLI/API/UI complète, matrice M20, documentation FR/EN et RETEX final | Après P1–P4 ; qualification de bout en bout et revue requise non réalisées |
+
+Clarification du 23 octobre, suite « next » : le
+[contrat de remise partagé](../actions-confiance/securite-execution-apex.md#9-dépendances-et-livrables-partagés-précisés)
+nomme IA3 → usages M20/P2–P4 → raccord IA4. Mémoire réalise le consommateur des
+sources et usages ; Identité fournit l’autorité protégée et raccorde l’interface
+de ses droits. L’intégration racine conserve un propriétaire et une preuve par
+frontière. Les critères M20-U01…U10 et P1–P5 restent requis ; aucune étape ou
+activation publique n’est déclarée réalisée par cette clarification.
+
+### MEM-P1 — Fiabiliser les lectures
+
+- **Travail :** repartir de `evidence/m28-20261017/callers-current.json`, puis
+  examiner producteurs, validations et appelants des SQL directs restants.
+  Prioriser les sources mémoire et les lectures avant publication/effet ;
+  distinguer les requêtes de métadonnées des lecteurs de corps déjà contrôlés.
+- **Livrable :** matrice chemin → contrôle existant → refus propagé → preuve,
+  avec corrections et gardes de régression pour chaque défaut confirmé.
+- **Fin observable :** une ligne incohérente n'est ni publiée ni convertie en
+  succès vide ; causes conservées, absence de mutation et retour au cas valide
+  vérifiés pour toutes les voies du périmètre convenu. Une voie requise non
+  auditée maintient l'étape partielle, avec propriétaire et condition de reprise.
+- **Périmètre :** mémoire/Store et ses consommateurs ; les fichiers du chantier
+  identité restent à son propriétaire. Origine : suite M28, MEM-R04/MEM-R05.
+
+### MEM-P2 — Attribuer propriétaire et auteur
+
+- **Travail :** spécifier puis réaliser les données persistées et les opérations
+  nécessaires à la responsabilité du cadrage, à l'auteur attesté et à leur
+  historique. L'autorité de gestion et les droits d'usage restent distincts.
+  Définir les contrats API/CLI/UI avant leur implémentation, sans inventer des
+  champs ou routes déjà disponibles.
+- **Livrable :** schéma et migration documentés, opérations versionnées avec
+  contrôles de révision, tests de sauvegarde/réouverture/import et états inconnus
+  visibles dans l'interface et ses cachets.
+- **Fin observable :** aucun nom ou auteur fourni par un agent ne remplace
+  l'acteur attesté. Les anciennes données restent inconnues sans preuve ; une
+  attribution ultérieure est un événement autorisé distinct. Révocation et
+  remplacement ne réécrivent pas l'auteur historique. Couvre M20-U01/U02.
+
+### MEM-P3 — Préparer le contrôle des usages
+
+- **Travail :** réutiliser `memory_usage_binding.go` et
+  `memory_usage_decision.go`, puis construire le consommateur fermé sur les
+  sources effectivement résolues et le cadre d'identité protégé. Recenser aussi
+  les copies indirectes : cadrage, brief, assistant, historique, RETEX, import,
+  résumé et contexte transmis.
+- **Livrable :** contrats du consommateur et des futurs raccords, tests internes
+  d'autorisation/refus, de destinataire substitué, de contenu modifié et de
+  préparation avant plan. L'absence d'autorité donne un refus expliqué.
+- **Fin observable :** lire, résumer et transmettre exigent leurs droits propres ;
+  le destinataire doit pouvoir recevoir les sources exactes. Un refus interdit
+  tout paquet partiel utilisable. Le cadrage sans plan ne reçoit aucun permis
+  implicite. Couvre M20-U03/U04/U05/U07/U09.
+- **Porte de sécurité :** vérifier ces raccords en environnement isolé ; ne pas
+  exposer les textes sur un nouveau parcours public avant l'engagement P4.
+  Aucun drapeau caché ou accord simulé ne contourne cette dépendance.
+
+### MEM-P4 — Protéger la transmission jusqu'à réception
+
+- **Travail :** relier demande → décision → application → réception au contenu
+  exact, à la tâche et à l'instance réellement affectée. Recontrôler autorité,
+  expiration, révocation et fraîcheur au point d'engagement. Respecter l'ordre
+  de verrous établi et éviter toute réentrée SQL depuis un callback runtime.
+- **Livrable :** engagement durable, raccord des opérations publiques Go/API/CLI
+  concernées et de leur UI, diagnostics de refus et recettes de concurrence,
+  annulation, panne et reprise idempotente.
+- **Fin observable :** une modification ou révocation pendant l'attente bloque
+  l'usage périmé ; une panne ne fabrique ni succès, ni nouvelle réception, ni
+  consommation remise à zéro. La preuve identifie ce que le bon agent a reçu ;
+  un journal seul ne suffit pas. Couvre M20-U05/U06/U08/U10.
+- **Dépendance identité :** le lanceur privé IA3c.2f-03c est décrit comme vérifié
+  localement par son chantier ; cela ne livre pas le bootstrap humain, le compte
+  distinct, le confinement ou l'autorité avant plan. La source vérifiable du
+  principal humain et les activations système restent une décision opérateur.
+  Préparer les travaux indépendants en attendant, sans écrire les sources de
+  l'autre chantier ni déduire une autorité du cookie cockpit ou du compte courant.
+
+### MEM-P5 — Qualifier et clôturer
+
+- **Travail :** vérifier le cycle complet sur fixtures isolées par les parcours
+  CLI/API/UI pris en charge : admission, sélection, lecture/résumé/transmission,
+  remplacement, retrait, import ancien, révocation et reprise après panne.
+  Couvrir FR/EN, thèmes et états utiles lorsqu'une UI est modifiée.
+- **Livrable :** matrice M20-U01–U10 avec reçus originaux et empreintes, rapport
+  des écarts résiduels, documentation opérationnelle FR/EN et RETEX final.
+- **Fin observable :** chaque critère requis possède une preuve actuelle ou
+  reste explicitement ouvert, auquel cas l'étape n'est pas clôturée. La revue
+  indépendante requise est distinguée de
+  l'auto-revue ; fixtures, fournisseur réel et binaire en cours sont séparés.
+  La documentation ne remplace pas l'acceptation ni le déploiement.
+  Les raccords publics sont exercés en fixtures pendant P4/P5 ; leur mise en
+  service réelle attend cette qualification et l'autorité opérateur applicable.
+
+### Règles de suivi de ces cinq étapes
+
+Pour chaque étape : préciser l'incrément, réaliser dans ses droits, vérifier les
+effets et les refus, actualiser la documentation concernée dans le même
+incrément, conserver les apprentissages puis réexaminer la suite. Une étape peut
+nécessiter plusieurs itérations. Les états sont **à préparer**, **en cours**,
+**en attente d'une dépendance**, **vérifié localement**, puis **clôturé avec les
+preuves requises** ; aucun pourcentage n'est déduit du nombre de tests.
+
+Deux stratégies sont distinguées : activer progressivement des droits publics
+avant de protéger leur effet, ou construire le contrôle puis n'activer qu'après
+P4. Retenir la seconde pour préserver la cohérence jusqu'à réception. Les
+préparations indépendantes de P2/P3 peuvent avancer pendant le chantier identité ;
+les portes d'activation restent obligatoires. Les améliorations découvertes
+gardent origine, valeur, propriétaire, critère, état et condition de reprise.
+
+La vérification choisit les tests réellement concernés, dont concurrence/race
+si nécessaire ; elle réutilise les résultats aux entrées pertinentes inchangées.
+Sans borne justifiée, watchdog global désactivé et avancement observé. Aucun
+nouveau budget, appel fournisseur réel, agent natif, compte système, déploiement
+ou suivi récurrent n'est autorisé par la seule rédaction de ce plan.
+
+Le résumé progressif automatique et les usages hiérarchiques restent conservés
+pour une phase ultérieure à cadrer ; ils ne sont pas ajoutés implicitement aux
+cinq étapes. Références : [contrat des usages](CONTRAT-USAGES-MEMOIRE.md),
+[résultats M28](RESULTATS-MEMOIRE-24.md),
+[point de reprise identité](../actions-confiance/identites-agents-replan.md).
+Ce changement est uniquement documentaire : aucun contrat applicatif ou schéma
+persisté ne change, donc pas de test applicatif ni de page opérationnelle FR/EN
+à modifier pour cette planification. Les incréments futurs conservent leur
+obligation de documentation et de vérification. Ce n'est pas un plan adopté
+ou exécuté par le moteur Swarm.
+
 ## Point de reprise
 
 | Lot | État | Preuve et prochaine action |
@@ -60,6 +207,11 @@ déclare pas réalisés.
 | M26 Reçu extractif au départ | Correction vérifiée localement dans le parcours existant | Reçu altéré/supprimé et fausse observation préparée reproduits puis refusés avant fournisseur. Demande confirmée, octets reconstruits, contexte et métadonnées contrôlés ; échec d’écriture sans fausse estampille. 81 noms du parcours final PASS et 33 sous race, 92 gardes source/usages réutilisées. Docs FR/EN et RETEX : `RESULTATS-MEMOIRE-22.md`. Identité et engagement atomique restent ouverts ; serveur non redémarré. |
 | M27 Lignes source de mémoire versionnée | Correction vérifiée localement dans les trois voies mémoire | ID/schéma/révision/UTF-8 incohérents reproduits puis refusés par le lecteur partagé ; catalogue CLI/API sans succès partiel, guide en flux et transactions conservés. 30 tests principaux et 33 sous-cas PASS, 21 noms sous race ; statique/compilation, archives de fixture, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-23.md`. Lecteurs globaux du Store et conformité identité restent ouverts. |
 | M28 Lecteurs généraux et mutations communes | Correction vérifiée localement sur le contrat partagé | Noyau Work extrait puis utilisé par get/list, mutation/rejeu et wrappers mémoire ; refus avant callbacks sans succès partiel. 56 noms PASS normal, 32 sous race et une garde de version de stockage, avec recouvrement ; vet/compilation, inventaire corrigé, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-24.md`. Autres SQL directs, propagation dans chaque appelant et critères publics M20 restent ouverts. |
+| M29 MEM-P1, lecteurs explicites et erreurs masquées | Incrément vérifié localement ; étape P1 toujours en cours | 14 sites de corps hors identité raccordés au noyau ; 32 contre-exemples précis conservés avant correction, 136 noms normaux et 61 sous race avec recouvrement, CLI réelle export/refus/import et handlers HTTP, vet/build. Documentation FR/EN, matrice et RETEX : `RESULTATS-MEMOIRE-25.md`. Reprendre la propagation dans les boucles/callbacks et les captures dynamiques ; ni identité protégée ni droits M20 livrés. |
+| M30 MEM-P1, captures et restauration | Incrément vérifié localement ; P1 reste ouvert | Capture cohérente avec Work/métadonnées, périmètre des 38 tables, empreinte exacte dans aperçu/reçu et recontrôle transactionnel. 21 cas précis reproduits avant correction, dont deux diagnostics privés ; 131 noms normaux et 38 sous race avec recouvrement, CLI réelle et HTTP/rejeu/réouverture, vet/build, docs FR/EN et RETEX dans `RESULTATS-MEMOIRE-26.md`. Reprendre diagnostics de supervision, callbacks et enveloppes liées ; M20 inchangé. |
+| M31 MEM-P1, erreurs du conducteur | Incrément vérifié localement ; P1 reste ouvert | Causes propagées, diagnostic et traces atomiques des seuls baux détenus, watch ciblé isolé, aucune fausse réconciliation ou réactivation par contrôle. 8 cas précis rouges, 112 noms normaux et 23 sous race avec recouvrement ; vraie CLI/watch, HTTP, vet/build, FR/EN et RETEX dans `RESULTATS-MEMOIRE-27.md`. Callbacks de fraîcheur, replis et enveloppes liées restent ouverts ; M20 inchangé. |
+| M32 MEM-P1, callbacks de fraîcheur | Incrément vérifié localement ; P1 reste ouvert | Six chemins avec cause, contrôle avant/poll/après réponse, refus sans contrôle, lot remplacé sans panic et pause illisible sans exposer sa valeur. Quatre cas rouges précis ; 187 noms normaux et 23 sous race avec recouvrement, CLI Go/handler HTTP, vet/build, entrées stables après coordination identité et fixture UI explicite. FR/EN, schémas et RETEX : `RESULTATS-MEMOIRE-28.md`. Autres pauses/replis/enveloppes et M20 restent ouverts. |
+| M33 MEM-P1, pause illisible et consommateurs | Incrément vérifié localement ; P1 reste ouvert | 19 appels booléens et sept gardes directes raccordés dans 21 modules ; cause sûre et vues/contexte sans faux non-pausé. 16 noms rouges conservés ; 163 normaux, 20 sous race avec recouvrement, quatre contrôles de notes, vet/build et entrées stables. CLI/HTTP locaux, FR/EN, schémas et RETEX : `RESULTATS-MEMOIRE-29.md`. Lectures jointes/replis/enveloppes et M20 restent ouverts. |
 
 **Point de reprise au 16 octobre :** les quatre appels M6 et leurs résultats
 mixtes sont conservés, sans renotation. M7 prépare puis, après accord « oui »,
@@ -321,6 +473,20 @@ lecteurs SQL ni une preuve d'identité. Contrats FR/EN, revue locale et RETEX :
 Le service identité est désormais écrit dans le checkout partagé, sans
 déploiement attesté par ce lot. Les critères M20-U01–U10, l'attribution
 persistée, l'autorité avant plan et l'engagement courant restent ouverts.
+
+Complément documentaire « schema », 17 octobre : les README FR/EN intègrent
+un schéma workflow/mémoire/identité avec sources Mermaid et exports SVG/PNG
+dans `docs/diagrams/`. Traits pleins pour le parcours disponible, pointillés
+pour les raccords identité restants ; aucune conformité publique M20 fermée.
+Propriétaire : Codex, documentation. Quatre exports rendus puis inspectés,
+138 liens locaux vérifiés ; topologie identique (huit nœuds, neuf liaisons,
+dont trois de raccord restant), titres/descriptions accessibles et absence
+d'HTML embarqué vérifiés. Les premiers rendus trop larges, le chevauchement
+anglais, les fonds de libellés transparents et le réglage HTML insuffisant
+sont conservés avec leur correction dans
+`evidence/readme-schema-20261017/verification.json` et les originaux associés.
+Recette FR/EN dans `docs/diagrams/README.md`. Aucun code moteur, binaire en
+cours ou contexte d'agent modifié ; rendu GitHub distant non vérifié.
 
 Suite conservée après M28 : instruire les SQL directs restants et leurs appels
 à partir de `callers-current.json`, en priorisant les sources mémoire et les

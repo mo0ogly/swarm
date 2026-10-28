@@ -1,5 +1,15 @@
 # R20 — observation eBPF, reprise du 16 octobre 2026
 
+## Repère de reprise — 24 octobre 2026
+
+La [décision ultérieure de report](qualification-globale-replan.md#décision-utilisateur-du16octobre--revue-autorisée-ebpf-reporté)
+reste applicable. La [file APEX FR](../FILE-APEX.md) et
+[EN](../../en/APEX-QUEUE.md) conserve R20 non qualifié : demande ultérieure et
+environnement BPF explicitement autorisé avant essai. Les états « en cours »
+ci-dessous sont historiques ; aucune sonde n’est relancée ici. Codex possède la
+recette, l’opérateur l’autorisation d’environnement. AC-02/A5 inventorie les
+preuves pertinentes ; sa clôture éventuelle ne vaut pas qualification R20.
+
 Codex propriétaire ; programme Actions de confiance maintenu jusqu'au RETEX.
 Aucun collecteur réel n'est établi par le scan ciblé des producteurs Go : lire les
 composants d'attribution/processus et le contrat avant de conclure sur tout le dépôt.

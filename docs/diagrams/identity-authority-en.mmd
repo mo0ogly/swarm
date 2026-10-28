@@ -1,0 +1,73 @@
+flowchart TB
+    accTitle: Swarm identity: authority source, registry and exact use
+    accDescr: Human identity, principal, instance, grants, registry, Trust checkpoint and exact request remain distinct. Internal transport/protocol components are separate from unfinished public integrations.
+    subgraph G0["ORIGIN"]
+        I_HUMAN["Protected human source · target<br/>Personal local account / optional enterprise"]
+        I_PINS["Independent bootstrap<br/>Installation · pinned key · principal"]
+        I_PREPLAN["Preparation authority before a plan<br/>Explicit requirement still open"]
+    end
+    subgraph G1["ENROLLMENT"]
+        I_ENROLL["Request challenge · nonce<br/>Ed25519 signed response"]
+        I_JOURNAL["Signed enrollment journal<br/>Head · independent pins · revocation<br/>Signature ≠ truth of content"]
+        I_AUTH["Current human authority<br/>Issuer · subject · scope · rights · dates"]
+    end
+    subgraph G2["CONFIGURATION"]
+        I_CONFIG["Protected configuration and witness<br/>pending · committed · recover"]
+        I_CHANNEL["Checked internal local channel<br/>Pinned image · UID · pidfd · handshake"]
+    end
+    subgraph G3["REGISTRY"]
+        I_PLAN["Current plan contract<br/>Project · generation · digest"]
+        I_PERMIT["Private publication permit<br/>Exact snapshot · event · roots"]
+        I_REGISTRY["SQLite identity registry<br/>Snapshots · grants · instances<br/>Publications and chained receipts"]
+        I_HEAD["Independent Trust head<br/>Intent · COMMIT · checkpoint"]
+    end
+    subgraph G4["DECISION"]
+        I_ACTOR["Principal and actor<br/>Logical agent · execution instance"]
+        I_GRANT["Grants and delegation<br/>Exact rights · expiry · revocation"]
+        I_REQUEST["Exact canonical request<br/>Operation · resource · content · destination"]
+        I_ENGINE["DETERMINISTIC RUST ENGINE<br/>Current checks · scope · revisions<br/>Trust → SQLite → runtime ordering"]
+    end
+    subgraph G5["EFFECT"]
+        I_RECEIPT["Decision bound to exact bytes<br/>Allow or refuse · no implicit authority"]
+        I_COMMIT["Commit at final use<br/>Admission / launch · integration pending"]
+        I_OPS["agent.create · tool.invoke · effect.execute<br/>memory.read / summarize / transmit"]
+        I_PROOF["Request → decision → application<br/>Reception and effect to prove"]
+    end
+    I_PINS --> I_ENROLL
+    I_HUMAN -.->|Effective source to integrate| I_AUTH
+    I_ENROLL -->|Authenticated bytes| I_JOURNAL
+    I_JOURNAL -->|Freshness and revocation to check| I_AUTH
+    I_CHANNEL -->|Internal configuration channel| I_CONFIG
+    I_CONFIG -->|Configured pins and state| I_ENROLL
+    I_AUTH --> I_PERMIT
+    I_PLAN --> I_PERMIT
+    I_PERMIT --> I_REGISTRY
+    I_REGISTRY -->|Recoverable publication| I_HEAD
+    I_HEAD -->|Current checkpoint required| I_ENGINE
+    I_ACTOR --> I_ENGINE
+    I_GRANT --> I_ENGINE
+    I_PLAN --> I_ENGINE
+    I_REQUEST --> I_ENGINE
+    I_ENGINE --> I_RECEIPT
+    I_RECEIPT -.->|Consumer integration pending| I_COMMIT
+    I_COMMIT -.->|Same content and current state| I_OPS
+    I_OPS --> I_PROOF
+    I_PREPLAN -.->|No implicit authority without a plan| I_ENGINE
+    I_REGISTRY -->|Current snapshot| I_ENGINE
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class I_ACTOR,I_REQUEST,I_OPS ordinary;
+    class I_ENGINE core;
+    class I_PINS,I_ENROLL,I_AUTH,I_CHANNEL,I_PERMIT,I_GRANT,I_RECEIPT control;
+    class I_JOURNAL,I_CONFIG,I_PLAN,I_REGISTRY,I_HEAD,I_PROOF data;
+    class I_HUMAN,I_COMMIT,I_PREPLAN pending;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G4 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G5 fill:#f5f3ec,stroke:#205e70,color:#062b49

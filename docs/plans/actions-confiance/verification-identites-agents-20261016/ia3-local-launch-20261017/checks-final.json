@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-17T15:13:55.857200+00:00",
+  "initial_head": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6",
+  "current_head": "f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6",
+  "input_count": 834,
+  "overlay": null,
+  "reference_unchanged": 41,
+  "source_additions": [
+    "internal/engine/agent_identity_config_launch_linux.go",
+    "internal/engine/agent_identity_config_launch_linux_test.go"
+  ],
+  "source_archive_verified": true,
+  "docs_archive_verified": true,
+  "gofmt": true,
+  "diff_check": true,
+  "new_links": true,
+  "whitespace": true,
+  "diagrams_visually_inspected": [
+    "fr",
+    "en"
+  ],
+  "diagram_hashes": {
+    "fr": "260d12f61a21e7a3cfe19e82f1dcf64aa34fc7eb645d716b509135ce4de19874",
+    "en": "31518cf55dcce37eb15229e86368bad4a52fc0129abe5760850ff52f603751a8"
+  },
+  "diagram_source_matches": {
+    "fr": true,
+    "en": true
+  },
+  "config_reuse": {
+    "count": 12,
+    "changed": [],
+    "reused_normal": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/normal-config-01-run.json",
+    "reused_race": "docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-client-20261017/race-config-01-run.json"
+  },
+  "binary": {
+    "path": "/tmp/swarm-identity-config-launch-03c-fixture-03",
+    "sha256": "a7afe4e292cc55bffba5041a16f1bea71c89c5cbdf3e4cf9706d1f01fef4b588",
+    "deployed": false
+  },
+  "report_sha256": "81f51803055db690bc3630c12f9775a240222e873ff214530dc9f9c0397c43f5",
+  "independent_review": false,
+  "public_activation": false,
+  "external_unowned_directory": "docs/diagrams",
+  "external_changed_paths": [
+    "README.en.md",
+    "README.md",
+    "docs/plans/deepagents-integration/PLAN.md",
+    "docs/diagrams/",
+    "docs/plans/deepagents-integration/evidence/readme-schema-20261017/"
+  ]
+}

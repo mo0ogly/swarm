@@ -355,7 +355,7 @@ This increment is verified locally: **dev.101** activated through the supported 
 
 `task publication-preview` verifies the original native opinion, original controls and the currently retained candidate cohort without writes or provider calls. Atomic publication and accepted-baseline blockers stay explicit; a verified observation never means `publication_ready`. The Go integration contract confirms that status-only acceptance would leave the previous candidate pointer consumed by new worker copies: GLM's status-only proposal was rejected. Acceptance remains open and its guard stays in place. Sources, original dev101 refusal, maintained recipe, review and delivery are tracked in `evidence/20261025-scaling-s2-oi9dgo_e/native-review-accept-e1j5v2ic/`.
 
-Observed dev106 delivery: passed and changes-requested native originals inspected on the actual serving executable; no provider, debit or Work change. Twelve favorable-flow cases and four complementary assertions pass; original and complementary recipe integrity verified separately. The actual blocked-task refusal was reproduced and corrected only for `RecordedOpinion` observation. Fourteen FR/EN UI assertions, protected assets, default profile without fixtures and exact Works preservation since dev101 verified. Focused GLM review found no confirmed defect in supplied boundaries; no task acceptance or global S2 conformance. [Report/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-review-accept-e1j5v2ic/RESULT.md).
+Observed dev106 delivery: passed and changes-requested native originals inspected on the actual serving executable; no provider, debit or Work change. Twelve favorable-flow cases and four complementary assertions pass; original and complementary recipe integrity verified separately. The actual blocked-task refusal was reproduced and corrected only for `RecordedOpinion` observation. Fourteen FR/EN UI assertions, protected assets, default profile without fixtures and exact Works preservation since dev101 verified. Focused GLM review found no confirmed defect in supplied boundaries; no task acceptance or global S2 conformance. [Report/RETEX](../../../../docs/plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-review-accept-e1j5v2ic/RESULT.md).
 
 Current instance rechecked after another local delivery: **dev107**, identical Rust bytes for this increment, qualified profile, two public branches and14 FR/EN UI assertions verified again. Dev106 evidence remains historical and intact; see `activation2/` in the report.
 
@@ -423,3 +423,92 @@ checks pass. Rustdoc compiles with the workspace graph; its feature profile is
 separate from production qualification. Original failures remain retained.
 Cumulative publication/projections, supervisor integration, S3/S4 and the final
 project RETEX remain open. [Report and increment RETEX](../../../../docs/plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/post-publication-worker-hfzh_8zd/RESULT.md).
+
+
+### S2 — verified native baseline before the next candidate, dev124
+
+`task baseline-preview` rereads canonical publications, native originals, Git
+reports and current policies for every accepted task. The same guard precedes
+candidate and job preparation. An initial empty baseline explicitly reports
+absent/unverified; corrupt evidence refuses rather than succeeding empty or
+starting a provider. This CLI/Root observation adds no HTTP route, publication
+authority or business completion.
+
+Maintained recipes pass nine accepted-baseline cases and two initial-empty/
+ordinary-Work cases, with VERIFIED integrity. The second candidate actually runs
+six controls and a whole-cohort review of both tasks; the old accepted task stays
+unchanged. Five installed public checks and 14 FR/EN Version UI assertions pass.
+The normal no-fixture profile has 122 compiler artifacts with matching effective
+features/profiles and identical affected engine bytes; three unrelated delivery
+source differences are retained explicitly. Real Works remain unchanged. Rustdoc
+compiles. Static GLM review is separate from execution evidence; its final state
+is retained in the report, never inferred from stream fragments.
+
+Observed on actual independent worker results: the second worker started at C0, while its
+candidate parent is already C1. The next cumulative writer must distinguish
+original worker base from current candidate parent in the receipt, SQL conditional
+update and historical reader. No proposed field is claimed as implemented.
+Next criterion: publish C2 from worker C0 onto C1, keep both workers and their
+originals readable, refuse a tampered base without mutation and recover after
+exact restoration. Owner Codex S2. The cumulative guard stays until this contract,
+its projections and recipe are implemented. Supervisor integration, S3/S4, other
+Go APIs and the final project RETEX remain open.
+[Report and increment RETEX](../../../../docs/plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-baseline-4h9t3go0/RESULT.md).
+
+```mermaid
+flowchart LR
+    C0[Base C0] --> W1[Worker A]
+    C0 --> W2[Independent worker B]
+    W1 --> C1[Verified publication C1]
+    C1 --> B[Verified canonical baseline]
+    W2 --> N[Candidate C2]
+    B --> N
+    N --> V[Six controls and review of both tasks]
+    V --> G[Cumulative publication still refused]
+    G -. Contract to port .-> P[Receipt separates worker base C0 and parent C1]
+```
+
+
+### S2 — verified cumulative chain, historical workers and next copy, dev128
+
+The v2 cumulative receipt separates worker base C0 from candidate parent C1, binds
+its predecessor and publishes C2 atomically. The reader verifies lineage and the
+latest whole cohort without replacing older Tasks/reviews. Nine publication, two
+policy, four next-worker and five readback obligations pass; failed earlier
+recipes stay retained, with no repeated successful provider calls. Four SQL faults
+pass through the TEMP SDK, distinct from production. Missing future capacity is
+raised through quota preview/apply/reopen, keeping2 consumed calls at2; the actual
+next copy contains C2 and both reports.
+
+Installed dev128 is verified: public readback of125 originals, normal no-fixture
+profile,14 FR/EN Version checks and preserved real Works. Three owned Rust deltas
+are comments only; twenty other changed inputs belong to parallel deliveries,
+without asserting whole-build identity. Two complete static GLM reviews found no
+demonstrated defect within their assignments; an intervening call failed ENOSPC
+with unknown provider outcome/usage, followed by healthy tmpfs recovery and atomic
+retention. Packet limits and external SQL-corruption hypotheses remain explicit;
+no confinement or AI autonomy is inferred.
+[Report and increment RETEX](../../../../docs/plans/migration-rust/evidence/20261025-scaling-s2-oi9dgo_e/native-cumulative-xgydfgxg/RESULT.md).
+
+S2b supervisor-decision to native publication integration remains open, together
+with S3 explicit completion, S4 measurements/RETEX and other Go APIs. Route migration must read actual aggregates: Go `/api/v1/task` includes
+evidence, reports, gates, review and actions, so returning just a Task would miss
+its contract. Go sources are currently Git-ignored: required inventories inspect
+real files rather than default `rg --files` output alone. Lexical route counts
+never prove behavioral coverage.
+
+The recipe runs both workers sequentially (`for turn in range(2)`, first wait/
+settlement before the second). A common C0 base proves independent results, not
+simultaneous execution. S4 must still verify real overlap, including publication
+while another worker is running.
+
+```mermaid
+flowchart TD
+    A[C0: two independent results] --> B[C1: initial receipt retained]
+    B --> C[C2: fresh two-task review and six controls]
+    C --> D[V2 receipt: separate C0 base and C1 parent]
+    D --> E[Both historical workers remain readable]
+    E --> F[Actual next worker copy at C2]
+    F -. To port .-> G[Explicit global S3 supervisor decision]
+    G -. To verify .-> H[S4 measurements and final RETEX]
+```

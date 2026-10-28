@@ -1,0 +1,453 @@
+diff --git a/INSTALL.md b/INSTALL.md
+index decc223..c3cb788 100644
+--- a/INSTALL.md
++++ b/INSTALL.md
+@@ -52,6 +52,13 @@ crée toujours aucun service système ni réglage Admin. La configuration sur di
+ reste au schéma 1 ; aucune réinitialisation d’historique n’est nécessaire. Voir
+ le contrat d’identité pour les préconditions Linux et les limites de transport.
+ 
++La remise privée du canal est maintenant testable avec deux processus locaux :
++le lanceur épingle l’image, vérifie un démarrage attribué avant la demande métier
++et recueille la fin de son enfant. Ce helper interne ne lance aucun service via
++l’installateur ; ses fixtures utilisent le même compte. L’humain initial, le
++compte dédié, le confinement et le parcours Admin restent à fournir. Aucun secret
++ou cookie de session n’est transmis par ce protocole de démarrage.
++
+ ## Formation embarquée et identité visuelle
+ 
+ Une fois le cockpit ouvert, choisissez **Aide du cockpit → Formation Casa Pizza**. Le lecteur propose vidéos, aperçus GIF, transcriptions, PDF de 38 pages et kit hors ligne téléchargeable. La langue choisie dans le cockpit sélectionne les ressources françaises ou anglaises ; le sélecteur du lecteur actualise tous les liens. Les fichiers Word restent les sources éditables.
+diff --git a/docs/architecture/AGENT-IDENTITY-CONTRACT.md b/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+index 344e3a4..8ce781d 100644
+--- a/docs/architecture/AGENT-IDENTITY-CONTRACT.md
++++ b/docs/architecture/AGENT-IDENTITY-CONTRACT.md
+@@ -3,10 +3,11 @@
+ 17 octobre 2026 — [English](../en/AGENT-IDENTITY-CONTRACT.md).
+ Périmètre : noyau IA2.2, canal IA2.3a, source durable IA2.3b, liaison au plan
+ IA3a, émission humaine IA3b, reçu IA3c.1 et protocole isolé IA3c.2a. Ces composants
+-internes restent non raccordés aux lanceurs.
++internes restent non raccordés aux lanceurs publics. Le raccord privé 03c décrit
++plus bas est vérifié avec un helper de fixture, sans admission d’agent.
+ Les défauts de l'[audit IA1](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+ restent ouverts. Il n'existe aucun nouvel endpoint, commande, paramètre Admin,
+-bootstrap ou confinement fournisseur livré par ce contrat.
++bootstrap public ou confinement fournisseur livré par ce contrat.
+ 
+ ## Responsabilités et parcours actuel
+ 
+@@ -1312,3 +1313,89 @@ chaque `\x00` représente un octet NUL. Le format canonique est celui du codec G
+ partagé, pas une promesse que JSON.stringify produit les mêmes octets. Un futur
+ client d’un autre langage devra vérifier cet encodage, notamment les échappements,
+ ou consommer le codec via l’adaptateur Go. Cette interopérabilité n’est pas prouvée.
++
++## Remise privée IA3c.2f-03c — preuve avant demande métier
++
++Le lanceur interne `runAgentIdentityConfigProcess` exécute une commande neuve de
++l’image courante, épinglée par descripteur avec `pinTrustFixedHelperImage`. Son
++appelant de confiance fournit explicitement arguments, environnement, UID serveur
++attendu et pins publics ; aucune donnée de projet ne choisit le programme ou
++l’autorité. Environnement implicite, ExtraFiles préexistants, commande déjà
++démarrée, Cancel, WaitDelay et PidFD préconfigurés sont refusés. Les autres
++attributs système sont conservés. Ce composant reste sans entrée CLI ni service
++installé ; `acceptAgentIdentityConfigLaunch` est appelé par un helper de test.
++
++Deux socketpairs privées SOCK_SEQPACKET reçoivent PASSCRED/PASSPIDFD avant exec :
++une pour le démarrage, une pour la demande métier. Le parent transmet les FDs 3
++(métier), 4 (démarrage), 5 (pidfd parent indépendant) et 6 (image courante).
++Le parent obtient le pidfd enfant atomiquement par SysProcAttr.PidFD/CLONE_PIDFD ;
++il ne rouvre jamais un numéro de PID enfant. Les tokens pidfs 64 bits et
++UID de chaque message sont comparés aux objets détenus indépendamment des deux
++côtés. Les préconditions Linux du client 03b s’appliquent aussi ici.
++
++Démarrage **version 1**, format canonique strict : schema_version, purpose,
++challenge, pins_digest. Challenge frais de 32 octets, base64url sans padding ;
++pins_digest est SHA-256 hexadécimal minuscule du préfixe
++`swarm-installation-startup-v1\x00pins\x00` suivi des pins JSON canoniques Go.
++Les deux `\x00` désignent des octets NUL. Les trois messages hello, ready et
++release doivent partager challenge et empreinte attendus. L’enfant apprend le
++challenge du parent attribué, mais compare les pins à sa propre source ; le
++parent vérifie ready contre son pidfd enfant et ses propres pins, avant release
++et avant toute demande métier. L’enfant n’admet le canal métier qu’après release
++exacte et attribuée. Le buffer de démarrage est calculé sur le plus long message
++valide de ce format fixe ; ce n’est pas un plafond de contenu métier.
++
++```mermaid
++sequenceDiagram
++  participant L as Lanceur privé de confiance
++  participant H as Helper de l'image courante
++  participant A as Autorité métier indépendante
++  participant W as Configuration et témoin
++  L->>H: Exec image épinglée, canaux privés et pidfd parent
++  Note over L,H: Parent détient le pidfd enfant créé par clone
++  L->>H: Démarrage V1 hello, nonce et digest de pins
++  H->>H: Vérifier processus parent, UID, format et pins propres
++  H-->>L: Démarrage V1 ready lié au hello
++  L->>L: Vérifier processus enfant, UID et ready exact
++  L->>H: Démarrage V1 release exact
++  H->>H: Vérifier release puis admettre le canal métier
++  L->>H: Demande métier V2, challenge distinct et Change exact
++  H->>A: Autoriser cette demande attribuée
++  A->>W: Effet seulement sous autorité maintenue
++  W-->>L: Réponse V2 liée à la demande via le helper
++  L->>L: Valider réponse et recueillir fin de l'enfant
++  Note over L,W: Ready et release ne donnent aucun droit métier
++```
++
++Les copies parent des FDs hérités sont fermées après exec. Le helper vérifie que
++le FD image correspond à son exécutable, adopte les sockets en CLOEXEC et ferme
++les originaux, le canal de démarrage et le pidfd parent. Le client conserve son
++duplicata de pidfd jusqu’à la fin de l’échange ; le lanceur conserve l’original
++jusqu’à la collecte de Wait, puis le ferme et invalide son numéro dans Cmd.
++Annulation : fermeture des canaux possédés, SIGKILL via le seul pidfd enfant et
++collecte de Wait ; aucune recherche de PID, aucun signal de groupe, délai ou retry
++automatique. Les flux standard et le code de l’image restent de confiance : un
++writer fourni par l’appelant qui se bloque peut aussi bloquer la collecte Go.
++
++Succès = réponse métier valide **et** fin de l’enfant à zéro. Un refus métier
++attribué reste un refus, même après ready. Une fin non nulle après réponse de
++mutation valide conserve l’erreur de processus, retourne zéro résultat et
++ErrIndeterminate ; l’historique n’est pas réinitialisé. Après tentative de
++mutation sans réponse valide, les règles 03b s’appliquent. Avant demande métier,
++un échec de démarrage ne prétend pas qu’une mutation a été tentée.
++
++Le [rapport 03c](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
++lie les tests aux sources exactes. La preuve concerne deux processus de fixture
++du même compte. Elle ne démontre ni confidentialité, compte système séparé,
++protection contre ptrace/root ou fuite depuis un bootstrap compromis, ni identité
++humaine, délégation ou admission publique. Le raccord métier reste V2 et le
++stockage V1. EP-07 demeure partiel jusqu’au bootstrap protégé, au confinement et
++à l’activation réelle ; F01–F07 et l’acceptation globale restent ouverts.
++
++Ce helper enfant à usage unique ne remplace pas le cycle d’un service permanent.
++Le pidfd ne donne pas le droit de changer de compte ni de signaler un autre UID.
++Le raccord public doit établir qui peut lancer/superviser le compte séparé :
++bootstrap privilégié protégé ou service/broker authentifié, avec droits et collecte
++vérifiés. Ne pas exécuter le cockpit entier avec des privilèges pour obtenir cette
++propriété ; cette intégration reste à concevoir après désignation de la source
++d’autorité, puis à vérifier dans le parcours réellement retenu.
+diff --git a/docs/en/AGENT-IDENTITY-CONTRACT.md b/docs/en/AGENT-IDENTITY-CONTRACT.md
+index 776e63e..a01037e 100644
+--- a/docs/en/AGENT-IDENTITY-CONTRACT.md
++++ b/docs/en/AGENT-IDENTITY-CONTRACT.md
+@@ -3,10 +3,11 @@
+ 17 October 2026 — [Français](../architecture/AGENT-IDENTITY-CONTRACT.md).
+ Scope: IA2.2 kernel, IA2.3a channel, IA2.3b durable source, IA3a plan binding,
+ IA3b human issuance, IA3c.1 receipts and the isolated IA3c.2a protocol. These
+-internal components are **not connected to launchers**.
++internal components are **not connected to public launchers**. The private 03c
++handoff below is verified with a fixture helper, without agent admission.
+ The [IA1 findings](../plans/actions-confiance/verification-identites-agents-20261016/RAPPORT-IA1.md)
+ remain open. This contract adds no public endpoint, CLI command, Admin setting,
+-bootstrap mechanism or provider confinement.
++public bootstrap mechanism or provider confinement.
+ 
+ ## Responsibilities and current flow
+ 
+@@ -1253,3 +1254,87 @@ each `\x00` represents one NUL byte. Canonical format is defined by the shared G
+ codec, without claiming JSON.stringify produces identical bytes. A future client
+ in another language must verify this encoding, including escaping, or consume
+ the codec through the Go adapter. Such interoperability has not been verified.
++
++## Private handoff IA3c.2f-03c — proof before business content
++
++The internal `runAgentIdentityConfigProcess` launcher consumes a fresh command
++of the current image, pinned by descriptor through `pinTrustFixedHelperImage`.
++Its trusted caller explicitly supplies arguments, environment, expected service
++UID and public pins; project data cannot choose the program or authority.
++Implicit environment, preexisting ExtraFiles, an already started command, Cancel,
++WaitDelay and preconfigured PidFD are rejected. Other system attributes are
++preserved. This component has no CLI entry or installed service;
++`acceptAgentIdentityConfigLaunch` is called by a test helper.
++
++Two private SOCK_SEQPACKET socketpairs enable PASSCRED/PASSPIDFD before exec:
++one for startup and one for business requests. The parent passes FDs 3 (business),
++4 (startup), 5 (independent parent pidfd) and 6 (current image). The child's pidfd
++is returned atomically through SysProcAttr.PidFD/CLONE_PIDFD; the parent never
++reopens a numeric child PID. Each message's 64-bit pidfs token and UID are checked
++against independently held objects on both sides. The Linux prerequisites of
++client 03b apply here too.
++
++Startup **version 1**, strict canonical format: schema_version, purpose,
++challenge, pins_digest. Fresh 32-byte challenge, unpadded base64url; pins_digest
++is lowercase hexadecimal SHA-256 over `swarm-installation-startup-v1\x00pins\x00`
++followed by canonical Go JSON pins. Both `\x00` sequences denote NUL bytes.
++All three messages hello, ready and release must match the challenge and expected
++digest. The child learns the challenge from the attributed parent but compares
++pins against its own source. The parent checks ready against its own child pidfd
++and pins before release and before any business request. The child admits the
++business channel only after an exact, attributed release. The startup buffer is
++derived from the longest valid frame of this fixed format, not a business limit.
++
++```mermaid
++sequenceDiagram
++  participant L as Trusted private launcher
++  participant H as Current image helper
++  participant A as Independent business authority
++  participant W as Configuration and witness
++  L->>H: Exec pinned image, private channels and parent pidfd
++  Note over L,H: Parent holds the clone-created child pidfd
++  L->>H: Startup V1 hello, nonce and pins digest
++  H->>H: Check parent process, UID, format and own pins
++  H-->>L: Startup V1 ready bound to hello
++  L->>L: Check child process, UID and exact ready
++  L->>H: Exact startup V1 release
++  H->>H: Check release then admit business channel
++  L->>H: Business V2 request, distinct challenge and exact Change
++  H->>A: Authorize this attributed request
++  A->>W: Effect only under maintained authority
++  W-->>L: Request-bound V2 reply through helper
++  L->>L: Validate reply and reap child exit
++  Note over L,W: Ready and release grant no business rights
++```
++
++The parent's inherited FD copies close after exec. The helper verifies that its
++image FD matches its executable, adopts sockets with CLOEXEC and closes originals,
++the startup channel and parent pidfd. The client keeps a duplicated pidfd through
++the exchange; the launcher holds the original through Wait, closes it and
++invalidates its number in Cmd. Cancellation closes owned channels, sends SIGKILL
++through this child's pidfd only and reaps Wait: no numeric PID lookup, group
++signal, automatic timer or retry. Standard streams and image code remain trusted:
++a caller-supplied writer that blocks can also block Go's collection.
++
++Success requires both a valid business reply **and** child exit zero. An attributed
++business refusal remains a refusal even after ready. Nonzero exit after a valid
++mutation reply retains the process error, returns no result and ErrIndeterminate;
++history is never reset. The 03b rules apply after a mutation attempt without a
++valid reply. A startup failure before business send does not claim a mutation
++was attempted.
++
++The [03c report](../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
++binds checks to exact sources. Evidence concerns two fixture processes under the
++same account. It establishes neither confidentiality, a separate system account,
++protection from ptrace/root or a compromised bootstrap leaking descriptors, nor
++human identity, delegation or public admission. Business transport remains V2,
++storage V1. EP-07 remains partial pending protected bootstrap, confinement and
++actual activation; F01–F07 and overall acceptance remain open.
++
++This one-shot child helper does not replace a persistent service lifecycle.
++A pidfd grants neither account-switching rights nor permission to signal another
++UID. Public integration must establish who can launch/supervise the separate
++account: protected privileged bootstrap or an authenticated service/broker, with
++verified rights and collection. Do not run the whole cockpit with privileges to
++obtain this property. Design this integration after designating the authority
++source, then verify the chosen actual flow.
+diff --git a/docs/en/INSTALL.md b/docs/en/INSTALL.md
+index 37b6d57..b61bd1e 100644
+--- a/docs/en/INSTALL.md
++++ b/docs/en/INSTALL.md
+@@ -51,6 +51,13 @@ system service or Admin setting. On-disk configuration retains schema 1; no
+ history reset is required. See the identity contract for Linux prerequisites and
+ transport limits.
+ 
++Private channel handoff can now be tested with two local processes: the launcher
++pins the image, verifies attributed startup before the business request and
++reaps its child. This internal helper starts no service through the installer;
++its fixtures share one account. The initial human, dedicated account, confinement
++and Admin flow remain to be supplied. No secret or session cookie is transmitted
++by this startup protocol.
++
+ ## Included training resources and branding
+ 
+ After opening the cockpit, choose **Cockpit help → Casa Pizza training**. The reader provides videos, GIF previews, transcripts, a 38-page PDF and a downloadable offline kit. The selected cockpit language chooses French or English resources; the reader language control updates every resource link. Word files remain editable sources.
+diff --git a/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md b/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+index 09fd87d..80d5933 100644
+--- a/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
++++ b/docs/plans/actions-confiance/identites-agents-enrolement-IA3c2.md
+@@ -3,13 +3,34 @@
+ 17 octobre 2026 — protocole d’authenticité IA3c.2a, journal IA3c.2b, schéma
+ d’autorité IA3c.2c, demande complète IA3c.2d, lecture versionnée IA3c.2e
+ et noyau de configuration IA3c.2f-02a/02b vérifiés en fixtures ; adaptateur
+-interne IA3c.2f-03a vérifié en fixtures ; client IA3c.2f-03b vérifié en fixtures ;
+-service protégé,
++interne IA3c.2f-03a vérifié en fixtures ; client IA3c.2f-03b et remise privée
++IA3c.2f-03c vérifiés en fixtures ; service protégé,
+ bootstrap et consommateur moteur
+ **non réalisés**. Frontière adoptée le 17 octobre : service local isolé pour
+ développement/pilote ; autorité distante prévue pour une évolution. Principal
+ humain initial et activation encore ouverts.
+ 
++## IA3c.2f-03c — remise avant contenu et collecte du processus
++
++Le lanceur privé de l’image courante utilise deux socketpairs et un pidfd enfant
++obtenu atomiquement lors du clone. Un canal de démarrage V1 hello/ready/release
++compare challenge, empreinte des pins, processus noyau et UID avant la demande
++métier V2 ; le helper vérifie aussi son parent à partir du pidfd hérité. La
++demande exacte reste soumise au contrôle d’autorité indépendant du service.
++L’environnement doit être explicite ; les copies héritées sont fermées, les
++sockets adoptés CLOEXEC et l’enfant recueilli sur toutes les issues lancées.
++Annulation signalée au seul enfant via pidfd, sans délai ou retry ajouté.
++
++Un retour valide suivi d’une fin non nulle ne vaut pas succès ; pour une mutation,
++l’erreur originale et l’incertitude sont conservées sans effacer l’état durable.
++La reprise exacte reste autorisée à nouveau et ne duplique pas l’historique.
++Voir le [rapport 03c](verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
++et les schémas FR/EN du contrat. Ce raccord interne ne crée aucune commande
++publique, compte ou source humaine : I2f03b-05 progresse en fixtures seulement.
++Le service protégé réel exige encore la source indépendante des pins et du
++principal humain, les chemins protégés et le confinement. Le choix humain initial
++et l’autorisation d’installer le compte/service appartiennent à l’opérateur.
++
+ ## Besoin et état observé
+ 
+ IA3b reçoit encore un objet privé d’autorité fourni par son appelant. Sa référence
+diff --git a/docs/plans/actions-confiance/identites-agents-replan.md b/docs/plans/actions-confiance/identites-agents-replan.md
+index 06246ff..87ebd96 100644
+--- a/docs/plans/actions-confiance/identites-agents-replan.md
++++ b/docs/plans/actions-confiance/identites-agents-replan.md
+@@ -1871,3 +1871,124 @@ pour EMSGSIZE/retry ; le transfert d’historique arbitraire reste ouvert (I2f03
+ Le retour authentifié après envoi ne prouve pas la remise privée avant envoi :
+ conserver I2f03b-05 et EP-07 avant toute activation publique. Service système,
+ humain initial, confinement, Admin et admission/révocation réelles restent ouverts.
++
++
++## IA3c.2f-03c — remise privée du canal et cycle du processus
++
++Reprise replan/APEX : checkout propre sur codex/clear-product-method-names,
++HEAD f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6 ; les tranches précédentes ont
++été intégrées depuis les preuves conservées. 03b vérifie le retour après envoi,
++mais I2f03b-05 attend encore la remise au serveur avant demande métier.
++Comparer endpoint par chemin, nouvelle couche réseau et remise privée des FDs
++avec preuve séparée de démarrage : retenir la dernière pour la cible locale.
++Aucune création de compte ni déploiement, aucun fournisseur ou processus tiers.
++
++Deux ajouts possédés par Codex : agent_identity_config_launch_linux.go et son test,
++dans internal/engine ; anciennes sources inchangées. Réutiliser le pinning de
++l’image courante (trust_fixed_image_linux.go), le canal IA2 et le client/service
++03b. Nouvelle commande interne de lancement Go seulement ; pas de nouvelle
++branche CLI ou service système sans source humaine indépendante. Le parent
++crée deux socketpairs privées configurées avant exec : métier et démarrage.
++Trois phases démarrage version 1, purpose explicite hello/ready/release, challenge
++32 octets et digest de pins publics ; aucune demande, principal ou session dans
++ce canal. Ready et Release ne donnent aucune autorité métier.
++
++L’image courante est épinglée par FD. Pidfd enfant obtenu atomiquement par
++SysProcAttr.PidFD / CLONE_PIDFD, inspecté dans le Go 1.24.3 local ; refus si absent,
++jamais PidfdOpen sur un numéro de PID enfant. Pidfd du parent transmis indépendamment
++au helper ; comparaison noyau/UID des deux côtés avant libération du canal métier.
++Le child ne lit la demande métier qu’après Release exacte, puis applique toujours
++son contrôle d’autorité et la coordination protégée. Les FDs reçus sont adoptés,
++fermés ou CLOEXEC avant service ; les copies parent sont fermées après exec.
++
++Le lanceur consomme une commande neuve de l’image courante, sans ExtraFiles ni
++annulation/WaitDelay préconfigurés ; environnement explicite, attributs système
++préservés sauf sa réservation PidFD. Pas de shell, de chemin choisi par projet,
++de délai, retry, compte implicite ou relance. Annulation/échec ferme ses canaux,
++signale uniquement son enfant via pidfd et recueille Wait ; jamais un autre
++processus ou groupe. Succès exige réponse métier valide et fin de l’enfant à zéro.
++Une panne après mutation reste une issue incertaine avec résultat nul, sans reset.
++
++Critères avant code : échange/effet persistant entre deux processus, auth encore
++requise après ready, pins/UID/nonce/purpose incorrects refusés avant effet, erreur
++exec/fin précoce, annulation avant exec et après entrée dans l’autorité via barrière
++observée, enfant non nul après réponse, pas de secret d’environnement hérité,
++FDs adoptés/fermés et doubles démarrages refusés. Pas de timeout global Go/enfant.
++Rejouer les 77 noms moteur et les nouveaux tests process, race ciblée, vet/build ;
++réutiliser les 106 config uniquement sur douze entrées propres identiques.
++Manifestes de toutes les sources Go/modules, pas d’overlay préventif : le checkout
++est propre ; toute mutation pendant compilation invalide la preuve et impose
++son propre diagnostic. Docs FR/EN, schémas, installation, cible et note scientifique
++au même incrément. Preuves dans ia3-local-launch-20261017.
++
++### Résultat IA3c.2f-03c — canal remis avant contenu, processus recueilli
++
++Lanceur privé et helper Go ajoutés, sans modification des 41 sources/modules de
++référence. Démarrage V1 distinct, image épinglée et pidfd enfant obtenu au clone ;
++aucun contenu métier envoyé avant ready exact du processus attendu. Le helper
++vérifie parent et release avant d’admettre le canal. Métier V2 et stockage V1
++inchangés. Annulation par fermeture et signal au seul pidfd enfant ; Wait recueilli,
++copies héritées fermées et numéro du pidfd consommé invalidé dans Cmd.
++
++117 noms moteur PASS normal/race-02 (77 précédents + 40 nouveaux), zéro FAIL/SKIP,
++vet/build PASS, 834 entrées stables, sans overlay. Les 106 noms config
++normal/race-01 de 03b restent réutilisables : douze entrées propres comparées,
++aucune différence. Aucun échec comportemental observé dans le candidat 03c ; ne
++pas inventer une phase rouge pour un nouveau contrat. La première version a
++39 noms nouveaux PASS normal/race-01 ; la finale ajoute le refus d’un autre objet
++processus sous le même UID et contrôle fermeture/invalidation des FDs. Les
++sources des deux versions sont archivées. Pas de répétition de suite globale.
++
++Un dernier contrôle ajoute dans le helper l’observation des originaux hérités
++3–6 avant autorité : fermés ou, si numéro réutilisé par Go, remplaçant CLOEXEC.
++Le lot final 03 passe avec les mêmes 117 noms normal/race, vet/build et 834 entrées
++stables. Cette modification du test justifie le rejeu ciblé ; le code produit
++reste identique au lot 02. Les deux résultats et leurs archives sont préservés.
++
++Docs FR/EN et installation, cible et note scientifique actualisées. Les schémas
++FR/EN sont rendus et inspectés. Le rapport conserve recette, manifeste et limites :
++[IA3c.2f-03c](verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md).
++Un répertoire docs/diagrams apparu pendant ce travail est extérieur au périmètre
++annoncé ; il est préservé. Aucun processus tiers, compte, mission ou binaire déployé
++modifié ; aucune revue indépendante ou acceptation globale revendiquée.
++
++| Découverte | Origine, valeur et périmètre | État, propriétaire et reprise observable |
++| --- | --- | --- |
++| I2f03c-01 / I2f03b-05 | Vérifier le retour après envoi ne prouve pas la remise avant contenu ; protéger le raccord local privé | Réalisé/vérifié en fixtures par Codex ; EP-07 reste partiel tant que compte, confinement et bootstrap réel ne protègent pas les FDs |
++| I2f03c-02 | Une réponse valide suivie d’un échec de processus ne remplit pas le contrat de lancement ; conserver effet durable et incertitude | Réalisé/vérifié : erreur originale, zéro résultat, reprise exacte sans doublon ; Codex ; reprendre cette garde au raccord public |
++| I2f03c-03 | Cmd peut conserver le numéro d’un pidfd fermé ; éviter une réutilisation ultérieure accidentelle | Invalidation à -1 réalisée/vérifiée, copies héritées fermées ; Codex ; aucune garantie déduite pour des FDs divulgués par un bootstrap compromis |
++| I2f03c-04 | Wait collecte aussi les goroutines de flux Go ; un writer arbitraire peut bloquer malgré la fin du processus | Limite documentée, non simulée comme résultat vérifié ; Codex pour le raccord public : définir les propriétaires/contrats de flux et observer leur collecte avant activation, sans timeout de commodité |
++
++Pour I2f03c-04, comparer fichiers OS explicites et collecteur de copie possédé,
++annulable et vérifié : retenir les fichiers OS pour le futur helper public à
++usage unique, collecteur seulement si un besoin de capture l’exige. Choix conservé
++pour ce raccord encore inexistant ; ne pas annoncer l’effet comme déjà réalisé.
++
++Réexamen du besoin initial : ce composant ne désigne pas l’humain ni n’installe
++l’autorité. Le principal humain initial, sa source vérifiable et la protection du
++bootstrap relèvent encore d’une décision opérateur ; la création/activation d’un
++compte et service système exige cette décision et son autorisation. Le code peut
++ensuite recevoir pins/UID depuis cette source, vérifier confinement et appliquer
++les parcours publics Go/API/CLI/Admin. Ne pas utiliser un cookie cockpit, le compte
++actuel ou le premier appelant pour contourner la précondition. F01–F07, IDA,
++EP-01/04/05/07, IA3–IA5 et RETEX global demeurent ouverts.
++
++Précision I2f03c-01/EP-07 : le helper à usage unique ne résout pas le cycle du
++service permanent ni les droits de changement de compte/signal à un autre UID.
++Le pidfd n’accorde pas ces droits. Comparer bootstrap privilégié protégé et broker
++authentifié avant le raccord public, à partir de la source d’autorité désignée ;
++ne pas rendre tout le cockpit privilégié. Propriétaires Codex/opérateur ; critère
++observable : lancement/supervision du compte séparé avec droits réellement
++vérifiés dans le parcours retenu. État : contrainte conservée, intégration non faite.
++
++Un patch documentaire groupé a été refusé sur un contexte de ligne erroné, sans
++modification partielle (hashes comparés). Le contexte exact a été relu avant le
++patch corrigé ; preuve originale dans doc-patch-incident.json du lot 03c. La
++reprise ne change aucun source Go ; seuls les contrôles documentaires et leurs
++archives sont reconstruits, sans répétition des tests moteur inchangés.
++
++À la vérification finale, README.md/README.en.md et le suivi/preuves
++deepagents-integration ont aussi évolué hors du périmètre 03c. Ils sont préservés,
++exclus du diff et des archives possédés ; aucun source Go pertinent n’a changé.
++L’auto-inspection corrige aussi une phrase FR : le pidfd enfant est reçu par le
++parent, comme le montrent le code, le schéma et le texte EN. Source Go inchangé.
+diff --git a/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md b/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+index 29ea685..76d5b35 100644
+--- a/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
++++ b/docs/publications/20261005-cursor-moteur/article-scientifique/identites-autorite-cycle-vie.md
+@@ -660,3 +660,28 @@ d’un échange unique et ferme lui-même sur toute issue. Un second contre-exem
+ refuse la cause disque inventée pour une indisponibilité générale. Ces défauts
+ du candidat et leurs gardes sont distingués de la valeur scientifique supposée :
+ ils vérifient notre méthode et ce raccord, pas une propriété globale du moteur.
++
++### IA3c.2f-03c — contrôler la remise avant le contenu
++
++Le [raccord de lancement privé](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
++ajoute une expérience entre processus réels : image courante épinglée, pidfd
++enfant retourné atomiquement par clone, canal de démarrage distinct du contenu
++métier et preuve du parent depuis un descripteur hérité. Hello/ready/release
++lient les objets processus, UID, challenge frais et empreinte des pins propres
++à chaque côté. Ready ne fournit aucune autorisation de création ou de mutation.
++Le contrôleur métier indépendant reste nécessaire après cette étape.
++
++L’expérience sépare désormais trois observations : destinataire établi avant
++contenu dans ce raccord privé, résultat lié à la demande, et fin de l’enfant
++effectivement recueillie. Une réponse de mutation valide suivie d’un échec du
++processus conserve l’incertitude et l’état durable ; le retry exact sans doublon
++est une observation distincte. Les annulations partent de barrières observées,
++sans délai arbitraire utilisé pour simuler une panne. Un test supplémentaire
++refuse un message d’un autre processus sous le même UID.
++
++La portée reste locale : helpers du même compte et contrôleur de fixture. Ni
++confinement réel, ni humain authentifié, ni intégration d’un fournisseur ou de
++tous les nœuds du workflow ne sont démontrés. Le pidfd et l’image épinglée ne
++suffisent pas si le bootstrap ou le compte sont compromis. Cette séparation des
++preuves aide à construire le protocole expérimental de thèse ; elle n’établit
++aucune nouveauté scientifique ou supériorité sur les travaux et produits cités.

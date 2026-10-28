@@ -291,3 +291,54 @@ permission de lancement : le lancement et le règlement managed restent refusés
 Recette maintenue : `managed-native-planning.json`, incluant deux tâches réelles,
 l’absence de copies/agents et la stabilité du Work, des dépenses et des marqueurs.
 Qualification et limites : [lot1370](../plans/migration-rust/evidence/20261024-managed-status1370/PLAN.md).
+
+## Worker managed manuel : première tentative
+
+La préparation manuelle crée une copie privée du candidat dans
+`<storage>/copies/<task>-1/<project_subdir>`, sans partage d’objets ni hardlinks.
+La demande originale reste dans SQL ; le préflight utilise le workspace effectif.
+L’attribution native contient coordonnées Work/tâche/Agent, commit de base,
+digests de demande et observations d’identité du workspace et de `.git`.
+Ce sont des preuves locales sous le même UID, pas une identité cryptographique,
+un confinement système ni une protection contre rollback de sauvegarde.
+
+Le manifeste précède le renommage no-replace. Un refus SQL laisse les fichiers
+pour reprise ; le même événement peut valider puis publier son staging original.
+Une cible inconnue est conservée et refusée. La preuve conserve le digest complet
+de la demande préparée ; un digest de contrat exclut seulement `expected_revision`
+pour permettre une nouvelle révision optimiste après refus et configuration
+publique du budget. La révision courante reste vérifiée par les gardes SQL ;
+les autres champs restent liés. Le calcul du digest de contrat refuse les octets
+non canoniques ; le chemin d’exécution relit aussi la forme SQL originale stricte.
+
+Avant chaque permission native, le moteur relit attribution et ligne managed,
+vérifie la copie physique, le Git autonome, le candidat et le workspace. La fin
+d’un processus récolté vérifie originale de fin/kernel et attribution/SQL sans
+dépendre du contenu mutable de sa copie. L’annulation sans départ fonctionne
+également si le workspace est indisponible. Les lignes sont relues après les
+derniers writers ; erreurs et échecs de fermeture restent conservés. Une fin
+connue bloque la tâche et règle la réservation suivant les règles existantes ;
+elle ne soumet ni n’intègre ni n’accepte un résultat Git.
+
+```mermaid
+flowchart TD
+  A[Demande originale et révision SQL] --> B[Copie privée attribuée du candidat]
+  B --> C[Admission atomique : Agent, tâche, réservation, managed_attempts]
+  C --> D[Revalidation à chaque frontière de permission]
+  D --> E[Processus worker]
+  E --> F[Originale de fin et faits kernel]
+  F --> G[Tâche bloquée, réservation réglée, copie conservée]
+  C --> H[Annulation queued : attribution et SQL]
+  H --> I[Tâche bloquée, réserve libérée, aucun provider]
+  G -.-> J[Intégration et acceptation encore non portées]
+```
+
+La branche est limitée à une première tentative manuelle. Preview managed,
+départ automatique/FIFO, retry, résultat Git immuable et publication restent
+refusés ou non raccordés ; le statut historique managed reste limité aux tâches
+initiales sans Agent. Les copies historiques Go restent à qualifier.
+Recette permanente : `managed-manual-worker.json` (cas normal puis sous-projet,
+refus d’attribution/copie avant départ, reprise, perte de Git après départ et
+annulation avec workspace manquant). Vérification locale sans installation,
+revue indépendante ou acceptation globale :
+[preuves1390](../plans/migration-rust/evidence/20261024-managed-manual1390/PLAN.md).

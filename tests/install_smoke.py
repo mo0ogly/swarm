@@ -1,7 +1,7 @@
 """Native installer and real Compose lifecycle, isolated project, no model calls.
 
 Run: TMPDIR=/dev/shm python3 tests/install_smoke.py
-Requires Go, Docker Engine on this host, Compose v2. Builds the Docker image.
+Requires Rust/Cargo, a C compiler, Python 3, Docker Engine on this host, Compose v2. Builds the Docker image.
 The installer writes deploy/install.env; refuse if an existing configuration exists.
 """
 import http.cookiejar
@@ -55,7 +55,7 @@ try:
     with socket.socket() as sock:
         sock.bind(('127.0.0.1', 0))
         port = sock.getsockname()[1]
-    run(['./install.sh', '--project', str(project), '--agent-home', str(agent_home), '--port', str(port)], timeout=900)
+    run(['./install.sh', '--project', str(project), '--agent-home', str(agent_home), '--port', str(port)])
     assert config.stat().st_mode & 0o777 == 0o600
     logs = run(compose + ['logs', '--no-color', 'swarm'])
     url = re.search(r'http://127\.0\.0\.1:\d+/session/[a-z0-9-]+', logs)[0]
