@@ -1,5 +1,18 @@
 # Qualification globale — préparation T8
 
+## Repère de lecture — 24 octobre 2026
+
+Ce document est chronologique : son dernier
+[verdict du 16 octobre](#16octobre0729utc--verdict-et-clôture-du-périmètre-convenu)
+et le [RETEX](RETEX-actions-confiance-20261016.md) conservent la clôture du
+périmètre convenu, avec R20 reporté par l’utilisateur. Le premier état ouvert
+ci-dessous n’annule pas cette clôture historique. La
+[file APEX FR](../FILE-APEX.md#vague-2--rapprochement-des-suivis-antérieurs-24-octobre-2026)
+et [EN](../../en/APEX-QUEUE.md#wave-2--reconciling-earlier-tracking-october-24-2026)
+distingue cette preuve, les raccords Identité encore ouverts et la reprise R20.
+Codex racine possède ce rapprochement documentaire ; aucun verdict historique
+ne qualifie le candidat Rust actuel ni les fonctions IA3–IA5.
+
 État au 16 octobre 2026. La collecte eBPF réelle reste une exigence ouverte ;
 le diagnostic indisponible ne la remplace pas. Aucun verdict global, revue
 indépendante ou RETEX final n'est déclaré. Les preuves sont attribuées à leurs

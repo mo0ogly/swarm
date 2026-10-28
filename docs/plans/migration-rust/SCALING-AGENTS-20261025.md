@@ -458,3 +458,94 @@ Rustdoc compile dans le graphe workspace ; ce profil documentaire avec features
 n’est pas la preuve du profil livré. Les refus et erreurs de méthode initiaux
 restent conservés. Publication cumulative/projections, boucle superviseur, S3/S4
 et RETEX final du projet toujours ouverts. [Rapport et RETEX](evidence/20261025-scaling-s2-oi9dgo_e/post-publication-worker-hfzh_8zd/RESULT.md).
+
+
+### S2 — baseline native vérifiée avant le candidat suivant, dev124
+
+`task baseline-preview` relit les publications canoniques, originaux natifs,
+rapports Git et politiques courantes de toutes les tâches acceptées. Le même
+contrôle précède la préparation du candidat et du job. Une baseline initiale vide
+est explicitement absente/non vérifiée ; une preuve corrompue refuse sans succès
+vide ni appel fournisseur. Observation CLI/Root, sans nouvelle route HTTP et sans
+autorisation de publication ou de fin métier.
+
+Les recettes maintenues passent neuf cas sur la baseline acceptée et deux sur
+l'absence initiale/le Work ordinaire ; intégrités VERIFIED. Le second candidat est
+réellement contrôlé sur six créneaux puis revu sur les deux tâches ; l'ancienne
+tâche acceptée reste inchangée. Cinq contrôles publics du binaire installé et
+14 assertions Version FR/EN passent. Profil normal sans fixtures, graphe effectif
+122 artefacts aux mêmes features/profils, octets du moteur concerné identiques ;
+trois différences de sources de livraison étrangères à cette tranche sont
+conservées explicitement. Les travaux réels restent inchangés. Rustdoc compile.
+La revue statique GLM reste distincte de ces preuves d'exécution ; son état final
+est conservé dans le rapport, sans déduire d'avis de fragments de flux.
+
+Découverte vérifiée sur les deux résultats indépendants : le second est né de C0,
+alors que le parent de son candidat est déjà C1. Le prochain writer cumulatif doit
+séparer base originale du worker et parent du candidat dans le reçu, la mise à
+jour conditionnelle SQL et le lecteur historique. Aucun champ cible n'est
+présenté comme déjà implémenté. Critère suivant : publier C2 issu du worker C0
+sur C1, conserver lisibles les deux workers et leurs originaux, refuser une base
+altérée sans mutation puis reprendre après restauration exacte. Owner Codex S2.
+La garde cumulative reste active jusqu'à ce contrat, ses projections et sa recette.
+Boucle superviseur, S3/S4, autres API Go et RETEX final restent ouverts.
+[Rapport et RETEX de l'incrément](evidence/20261025-scaling-s2-oi9dgo_e/native-baseline-4h9t3go0/RESULT.md).
+
+```mermaid
+flowchart LR
+    C0[Base C0] --> W1[Worker A]
+    C0 --> W2[Worker B indépendant]
+    W1 --> C1[Publication C1 vérifiée]
+    C1 --> B[Baseline canonique vérifiée]
+    W2 --> N[Candidat C2]
+    B --> N
+    N --> V[Six contrôles et revue des deux tâches]
+    V --> G[Publication cumulative encore refusée]
+    G -. Contrat à porter .-> P[Reçu séparant base worker C0 et parent C1]
+```
+
+
+### S2 — chaîne cumulative, anciens workers et copie suivante vérifiés, dev128
+
+Le reçu cumulatif v2 sépare base worker C0 et parent candidat C1, lie le reçu
+précédent et publie C2 atomiquement. Le lecteur vérifie la lignée et la dernière
+cohorte sans remplacer les anciens Tasks/avis. Neuf obligations de publication,
+deux de réglages, quatre du worker suivant et cinq de readback passent ; les
+recettes antérieures échouées restent conservées, sans refaire les appels réussis.
+Quatre pannes SQL passent via le SDK TEMP distinct du profil public. Une capacité
+future manquante est augmentée par quotas preview/apply/reopen,2 appels consommés
+restent2 ; la vraie copie suivante contient C2 et les deux rapports.
+
+Dev128 installé vérifié : readback public sur les originaux125, profil normal sans
+fixture,14 Version FR/EN et Works réels conservés. Trois deltas Rust propres entre
+les deux builds sont seulement documentaires ; vingt autres entrées appartiennent
+aux lots parallèles, sans prétendre à une identité complète des builds. Deux
+revues statiques GLM complètes sans défaut démontré dans leurs sujets ; un appel
+intermédiaire a échoué ENOSPC, issue/consommation inconnues, puis reprise sur tmpfs
+sain et conservation atomique. Les limites des paquets et hypothèses d'altération
+SQL externe restent explicites ; pas de confinement ou d'autonomie d'IA déduits.
+[Rapport et RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-cumulative-xgydfgxg/RESULT.md).
+
+Le raccord S2b décision du superviseur→publication native reste ouvert, en plus
+de S3 fin explicite, S4 mesures/RETEX et des autres API Go.
+La recherche des routes doit lire les vrais agrégats : `/api/v1/task` Go renvoie
+aussi preuves, rapports, gates, revue et actions ; retourner uniquement une Task
+ne porterait pas ce contrat. Les sources Go sont actuellement ignorées par Git :
+les inventaires nécessaires utilisent les fichiers réels, pas les seuls résultats
+par défaut de `rg --files`. Aucun compte lexical de routes ne prouve une couverture.
+
+La recette orchestre les deux workers séquentiellement (`for turn in range(2)`,
+attente/règlement du premier avant le second). Une base C0 commune démontre des
+résultats indépendants, pas leur exécution simultanée. S4 doit encore vérifier le
+chevauchement réel, notamment publication pendant qu’un autre worker travaille.
+
+```mermaid
+flowchart TD
+    A[C0 : deux résultats indépendants] --> B[C1 : reçu initial conservé]
+    B --> C[C2 : revue fraîche des deux tâches et six contrôles]
+    C --> D[Reçu v2 : base C0 et parent C1 distincts]
+    D --> E[Deux anciens workers toujours lisibles]
+    E --> F[Copie réelle du worker suivant à C2]
+    F -. À porter .-> G[Décision globale explicite S3]
+    G -. À vérifier .-> H[Mesures S4 et RETEX final]
+```

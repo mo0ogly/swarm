@@ -1,5 +1,11 @@
 # Deux interfaces pour le moteur Swarm
 
+[Vue technique du moteur et état Go/Rust](architecture/OVERVIEW.md) · [English technical overview](en/ARCHITECTURE.md).
+
+Cette page conserve la décision produit des deux UX. Les mentions de catalogue
+et de parcours déjà implémentés ci-dessous décrivent le socle historique Go ;
+leur parité Rust reste soumise au [plan de migration](plans/migration-rust/PLAN.md).
+
 Décision produit et architecture adoptée avec l’utilisateur le 10 octobre 2026.
 Swarm reste un produit autonome : Wattson est entièrement séparé et ne fait pas
 partie de cette évolution.

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "manifest_status": "UI_REDESIGN_SOURCE_SNAPSHOT_NOT_INDEPENDENT_ACCEPTANCE",
   "base_commit": "06481f15e677285b789cfb81ba8e02e351bfdc27",
-  "candidate_id": "06481f15e677285b789cfb81ba8e02e351bfdc27+sha256:29961752f0bffef4c9313c1fbc6764ff0158a26d481ee7581548097deb3ba499",
-  "candidate_digest": "29961752f0bffef4c9313c1fbc6764ff0158a26d481ee7581548097deb3ba499",
+  "candidate_id": "06481f15e677285b789cfb81ba8e02e351bfdc27+sha256:2ab5d26d8b62919e054761821a554ed78a13a6d7f6e289a5a07cb296a1bdd75b",
+  "candidate_digest": "2ab5d26d8b62919e054761821a554ed78a13a6d7f6e289a5a07cb296a1bdd75b",
   "coverage_digest": "10155b4f69c55665a7e1830b4654d905c4b62892a56b196e41375c62568353a2",
   "historical_manifest": "docs/training-delivery-source-manifest.json",
   "requirements": [
@@ -173,6 +173,36 @@
   ],
   "inputs": [
     {
+      "path": ".agents/skills/product-delivery/SKILL.md",
+      "kind": "source",
+      "sha256": "864bb09eb52c8fc0d70fb68ccce94380098f9813b4be1e14d986e9cfc18fedc5"
+    },
+    {
+      "path": ".agents/skills/product-delivery/agents/openai.yaml",
+      "kind": "source",
+      "sha256": "69667332179dd4a2e51fd1530e23332b66c00b1d249b2bede9626ad4db6f7626"
+    },
+    {
+      "path": ".agents/skills/product-planning/SKILL.md",
+      "kind": "source",
+      "sha256": "90457e484c240ebe04709ebddefdd87c73a64fbdbc9c786fd18fdc9a2555eeaa"
+    },
+    {
+      "path": ".agents/skills/product-planning/agents/openai.yaml",
+      "kind": "source",
+      "sha256": "61c260fe43de24133ecc34a8ed3aea2e096601a22666aa603dc0ee7dd77fa853"
+    },
+    {
+      "path": ".agents/skills/product-review/SKILL.md",
+      "kind": "source",
+      "sha256": "b7d3493730eac8f3d4082b2e7e1f275e8f6ffa859b388765b6613724c24815f5"
+    },
+    {
+      "path": ".agents/skills/product-review/agents/openai.yaml",
+      "kind": "source",
+      "sha256": "89505ced3ad0a690094186957af92c51d06356e1b5aaf61c0cc886b503c4d401"
+    },
+    {
       "path": ".claude/commands/ks-architect.md",
       "kind": "source",
       "sha256": "66589d8eff58cf04970113eae671253966e4dfe316e672d2d3592feedf375002"
@@ -315,7 +345,7 @@
     {
       "path": "INSTALL.md",
       "kind": "doc",
-      "sha256": "b8a2b3d47a684155c5188f521f313cec63602486405feee8a4b9edb969f2eb3f"
+      "sha256": "a12bb2b6ea903f93ed5e5ed85bfe09fc4768bbcad6b9b480d56dd0ce3a04be4e"
     },
     {
       "path": "PREPARATION-UX.md",
@@ -325,12 +355,12 @@
     {
       "path": "README.en.md",
       "kind": "doc",
-      "sha256": "8fa4a6cf0960c7962244ddfe004910e91b36466b18101cb89d12ae2a04082e7b"
+      "sha256": "3c5337bdf93eb4e217de4ce0df72cd12b2f38fdf8092f76c529de12a25709c3c"
     },
     {
       "path": "README.md",
       "kind": "doc",
-      "sha256": "968ad9d2b3424c18854c9046326a0f2e8532d9912ee2d0733228b5399ab55ec9"
+      "sha256": "f7cfbbdfca6c671dd3944142debd94771a97407e10976bc2c3e3705ce7dd914b"
     },
     {
       "path": "build.sh",
@@ -375,7 +405,7 @@
     {
       "path": "docs/AGENT-METHODS.md",
       "kind": "doc",
-      "sha256": "a8ec2c257bad319267cba202abae9b7fb2cf6fd16f2a781f9ab1b94b4e6641dd"
+      "sha256": "2f81d1f55e574415bd25620ab3eaa8f0e9768ce34e68af8cf91418708d167f0b"
     },
     {
       "path": "docs/B01.md",
@@ -490,7 +520,7 @@
     {
       "path": "docs/en/AGENT-METHODS.md",
       "kind": "doc",
-      "sha256": "fabea125ca2c2e7dd98c99cd989afa0ae5f9c991b43d79305bcec59be1c4cecd"
+      "sha256": "256c2603c3eae4965c5859a301606b8af4545ef6f8375e8f07d6e3563d9e715f"
     },
     {
       "path": "docs/en/CONTRACT-REVISION.md",
@@ -515,7 +545,7 @@
     {
       "path": "docs/en/INSTALL.md",
       "kind": "doc",
-      "sha256": "c7b2f31ed38b10bb656cadb93685a537e7cbe04b275d7c250669d3ba2571247e"
+      "sha256": "f815f3db216cd1914ce13bdec3566d7ea8ffc94242544f0b1da183337758a8bc"
     },
     {
       "path": "docs/en/LOG-CONSOLE.md",
@@ -2820,7 +2850,7 @@
     {
       "path": "internal/engine/agents_store.go",
       "kind": "source",
-      "sha256": "6d0a96e05f6e155377ed8d9287c40f0b475c7a62b13542f81655888cb7204f21"
+      "sha256": "e1f550005f9549d4acd8ba38ad03c7359ab9efdc51353de73103adf17666284a"
     },
     {
       "path": "internal/engine/agents_test.go",
@@ -2855,7 +2885,7 @@
     {
       "path": "internal/engine/archive.go",
       "kind": "source",
-      "sha256": "7affca0bbc15f4878497696ba7b0fdffe0d5ac440008ea2dd6f5d6c4225b63da"
+      "sha256": "a29a36d01925427ca66088b5500850ab485beb330f22637dc74dd0de88d7fc94"
     },
     {
       "path": "internal/engine/assist_action.go",
@@ -2985,7 +3015,7 @@
     {
       "path": "internal/engine/automation_cli.go",
       "kind": "source",
-      "sha256": "626e3541009aa324bd59a36dfaf19dcddaf6abb2835f304140e4492683e5a8de"
+      "sha256": "8f17cf176cbb1b5577e6017235b352aa63324f1f9af29b827eefae7e15289613"
     },
     {
       "path": "internal/engine/automation_cli_test.go",
@@ -3010,7 +3040,7 @@
     {
       "path": "internal/engine/automation_requests.go",
       "kind": "source",
-      "sha256": "aa5791030237443cf5ff5f30d1575f82166c0a54a4664067407901e56a0f619f"
+      "sha256": "afe97c1dac6bdbe64bd338c1b38a299397dff29fffe2d1c0b1fecb4587775d42"
     },
     {
       "path": "internal/engine/automation_requests_test.go",
@@ -3025,7 +3055,7 @@
     {
       "path": "internal/engine/automation_schedule.go",
       "kind": "source",
-      "sha256": "02a7890cd57787d1df659f66c4e626d7b276cab15b19f0a673bb729d73e0eacf"
+      "sha256": "41f665321cc8495623225b8ef657ed527503a949e74deefd38cbf15fa4b6bda9"
     },
     {
       "path": "internal/engine/automation_schedule_lifecycle_test.go",
@@ -3150,7 +3180,7 @@
     {
       "path": "internal/engine/console_dialog.go",
       "kind": "source",
-      "sha256": "1c3741d829440edba725aad5cffc42c2689b6c5b50d32a663360b267158956f5"
+      "sha256": "02d2b498742c504a6a73248a392f21a9f3a01ffa81b6eeff1143b616e0df94e8"
     },
     {
       "path": "internal/engine/console_dialog_render.go",
@@ -3215,7 +3245,7 @@
     {
       "path": "internal/engine/dashboard.go",
       "kind": "source",
-      "sha256": "349967066bd38d58c34d6ed01274a11f50d171a14baab1b4267e33a388332c70"
+      "sha256": "6e34594941029accf290bd2c66be1ec77a8634499368bbcfde74bc195c149d39"
     },
     {
       "path": "internal/engine/dependency_proof_signal.go",
@@ -3395,7 +3425,7 @@
     {
       "path": "internal/engine/graph_draft.go",
       "kind": "source",
-      "sha256": "a5446281e2ee1b8ddf927d54befdb84e7d2e396e343ebf053a5469a7cbe64eac"
+      "sha256": "035e3db7a345038c4fbae01009da7c07a95e2cfd183fa0fa58793518a15d8539"
     },
     {
       "path": "internal/engine/graph_draft_cli.go",
@@ -3520,7 +3550,7 @@
     {
       "path": "internal/engine/independent_review_runtime.go",
       "kind": "source",
-      "sha256": "00caf03bec8cabb0b66996279ce112525b6dca156d9f162b6fda789d9720569b"
+      "sha256": "72dce66445841a804c5950f4fc45c2c23ec1fa4094041cb685fc5659cce7fe95"
     },
     {
       "path": "internal/engine/independent_review_test.go",
@@ -3560,7 +3590,7 @@
     {
       "path": "internal/engine/lifecycle.go",
       "kind": "source",
-      "sha256": "4937f7c7bb07cc30913ced91eb369117ba43743d663f758e79a0259efec4e96b"
+      "sha256": "a54975cd4bbff02f82b08ed64434550e94018862fa4a1c76fbc9fa4ca007a31b"
     },
     {
       "path": "internal/engine/lifecycle_test.go",
@@ -3590,7 +3620,7 @@
     {
       "path": "internal/engine/main.go",
       "kind": "source",
-      "sha256": "648dff6e6e19516dd1b03b35ab817015b825bf40d056c05dcdbdedd84bf95151"
+      "sha256": "6b4a4f19081725a6210c7830898b7818351e8559ad8a1c1b436c9d88e45433c9"
     },
     {
       "path": "internal/engine/managed_checkpoint_recovery_test.go",
@@ -3710,12 +3740,12 @@
     {
       "path": "internal/engine/managed_review.go",
       "kind": "source",
-      "sha256": "8ddcf421fd0c93e0fb453252604e28cf0dd79c3aaee80514d0714574c537b06e"
+      "sha256": "9f21630185c1523a0327d94eb736393490d1368fa23eae4eef959b708cec29d2"
     },
     {
       "path": "internal/engine/managed_review_batch_runtime.go",
       "kind": "source",
-      "sha256": "393ad0b0c5c7e22e1506aa158df7687b868c5a2d989153ed9f4c610eed0317a5"
+      "sha256": "6cbc13f2b2767de153a81f93fd096c98349c2045cee36085a9d029c103ce2299"
     },
     {
       "path": "internal/engine/managed_review_batch_runtime_test.go",
@@ -3785,7 +3815,7 @@
     {
       "path": "internal/engine/managed_review_diagnostic.go",
       "kind": "source",
-      "sha256": "6b6d4ce00b93178bcf0533dd543821774b6d8bea880601fdd085b872e018df14"
+      "sha256": "9b13c89642539eab7ca81ce54cee90cb4e5ebc69e0b43c5c2450eaa5a2319669"
     },
     {
       "path": "internal/engine/managed_review_diagnostic_test.go",
@@ -3805,7 +3835,7 @@
     {
       "path": "internal/engine/managed_review_fragment_begin.go",
       "kind": "source",
-      "sha256": "10dfb1db39ae5a2277267bcf990329903a5d2a96e5a8092a502fb61ec4d3e70c"
+      "sha256": "89c00633023b69552aff04ecf03fb9a658cf62a2a66daf205a74ee5ad7b26646"
     },
     {
       "path": "internal/engine/managed_review_fragment_begin_test.go",
@@ -3875,7 +3905,7 @@
     {
       "path": "internal/engine/managed_review_fragment_final_store.go",
       "kind": "source",
-      "sha256": "884e3f8079f5cae4f711cec41654be553b2055ab5445defa646e837dfb559656"
+      "sha256": "85b30ebb89b2162bb4a219ca97f32e0645d2723549d0cf567dcda03674028ccb"
     },
     {
       "path": "internal/engine/managed_review_fragment_final_store_test.go",
@@ -4030,7 +4060,7 @@
     {
       "path": "internal/engine/managed_review_fragment_runtime.go",
       "kind": "source",
-      "sha256": "79ff18007efc5110e1cc4218be52ee30986b7187f315904082eea77582d0069b"
+      "sha256": "2f50c53221ad0dc83fe537bb9b13a09b0e1c4279b377a97b6602e58f750ff048"
     },
     {
       "path": "internal/engine/managed_review_fragment_runtime_test.go",
@@ -4055,7 +4085,7 @@
     {
       "path": "internal/engine/managed_review_fragment_store.go",
       "kind": "source",
-      "sha256": "c6f155b4435aa222d3c4fe3d5b08ee2c107705d7fd1ed094db4b93e55c06b691"
+      "sha256": "c561116865ff7ff3b514e9ec328b9e5b609ca164e0eee614cd5921873b02151b"
     },
     {
       "path": "internal/engine/managed_review_fragment_store_test.go",
@@ -4225,7 +4255,7 @@
     {
       "path": "internal/engine/mission.go",
       "kind": "source",
-      "sha256": "dacdf7fe36ce15ff76e2cbcc6e5075dae89afeff3c89bfda753213a3e1e8fe01"
+      "sha256": "d85d11d8f121199bec4e9cef6d199f035937033216ee9e1a29c8442fb2b424ab"
     },
     {
       "path": "internal/engine/mission_cli.go",
@@ -4295,7 +4325,7 @@
     {
       "path": "internal/engine/mission_supervision.go",
       "kind": "source",
-      "sha256": "a078550f9d75ce86e570ef87600a7d345f87f66862939233bda61aa45baed952"
+      "sha256": "fa663f9fff071f72c5a59be2d8f59334bfb4a6f2c35f6266c6785f5c78754c47"
     },
     {
       "path": "internal/engine/mission_supervision_test.go",
@@ -4325,7 +4355,7 @@
     {
       "path": "internal/engine/organization.go",
       "kind": "source",
-      "sha256": "b1bda71fbf5f9caff756e9e236cd068412f450555ea45e8207316b45fcc8e701"
+      "sha256": "600b40117531ce6e53b17057402c3be9e42e8d90914961410e4addcacaad57ce"
     },
     {
       "path": "internal/engine/organization_fixture_test.go",
@@ -4390,7 +4420,7 @@
     {
       "path": "internal/engine/planning.go",
       "kind": "source",
-      "sha256": "7c556f7bd17f968489c07ba41c10b70f8ccea40419e18f50e6e1d296567d9f29"
+      "sha256": "a0e508c1dfef64383383ed9e3fa3a8482e8fd6682f39735c815e2ac71de95b0e"
     },
     {
       "path": "internal/engine/planning_api.go",
@@ -4445,7 +4475,7 @@
     {
       "path": "internal/engine/planning_runner.go",
       "kind": "source",
-      "sha256": "cecd337116f456050c27029fd6ec540088fa76643372732b22cde35b5fd1a4fb"
+      "sha256": "b2ef3a4caabb014c5dda9e98a753160461bfa5bba994afde560e5efd93d43a9c"
     },
     {
       "path": "internal/engine/planning_schema.go",
@@ -4545,7 +4575,7 @@
     {
       "path": "internal/engine/prephase_conversion.go",
       "kind": "source",
-      "sha256": "2129488a6c22418cd404dc21042305b255c9b5821062885f0b534c0290040112"
+      "sha256": "5b31f3eaa8bf769b724cc5433c2303246612e64243ff56ccb16a728b68035b3b"
     },
     {
       "path": "internal/engine/prephase_conversion_test.go",
@@ -5215,7 +5245,7 @@
     {
       "path": "internal/engine/worker_recovery_focus.go",
       "kind": "source",
-      "sha256": "48ac8c6d90e421512c8459fed8b6936de5806e6bd6fab2a19860e69779a2c595"
+      "sha256": "44fb0c98d19e1252258f55b88fb41a4727f5853e6b640ad8d4d3d072c4edb703"
     },
     {
       "path": "internal/engine/workspace_busy.go",
@@ -6123,5 +6153,5 @@
       "sha256": "0055edad2bcfa30d65b63eee8c522cd53d6953353f0a98f34024c364a08f0a59"
     }
   ],
-  "limits": "Current integrity snapshot of inherited paths and UI redesign files. Preexisting user edits are observed inputs, not claimed authorship. Historical R01-R18 evidence remains pending requalification. UI checks are recorded separately in docs/reports/ui-redesign-20261010.md. Commit packaging uses the exact Git index; unrelated working-tree edits and unstaged new paths are excluded."
+  "limits": "Current integrity snapshot of inherited paths and UI redesign files. Preexisting user edits are observed inputs, not claimed authorship. Historical R01-R18 evidence remains pending requalification. UI checks are recorded separately in docs/reports/ui-redesign-20261010.md."
 }

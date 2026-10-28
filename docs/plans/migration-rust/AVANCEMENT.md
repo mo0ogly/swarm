@@ -1,5 +1,7 @@
 # Avancement de la migration Go → Rust — 2026-10-24 11:11
 
+> **Instantané historique, non représentatif de l’état actuel.** Relecture du24octobre1454 : ce document contient des états devenus faux (watch/installation) et des comptes de présence qui ne mesurent pas la charge restante. Consulter la [situation actuelle du plan](PLAN.md#situation-actuelle--24-octobre-correction-de-pilotage1454). Les tableaux suivants sont conservés pour leur provenance ; leur régénération doit être requalifiée avant réutilisation de taux ou de délais.
+
 Généré par `tools/migration-progress/avancement.py` (relancer après chaque lot ; `--record` ajoute un point d'historique). Comptes **par élément, non pondérés par l'effort**. Niveaux cumulés : un élément « vérifié » compte aussi comme « existe ».
 
 | Surface | Total Go | Existe en Rust | dont vérifié (preuve PASS citée) | Parité acceptée | Partiel (équivalent renommé) |

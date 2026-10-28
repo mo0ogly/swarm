@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant L as Trusted private launcher
+  participant H as Current image helper
+  participant A as Independent business authority
+  participant W as Configuration and witness
+  L->>H: Exec pinned image, private channels and parent pidfd
+  Note over L,H: Parent holds the clone-created child pidfd
+  L->>H: Startup V1 hello, nonce and pins digest
+  H->>H: Check parent process, UID, format and own pins
+  H-->>L: Startup V1 ready bound to hello
+  L->>L: Check child process, UID and exact ready
+  L->>H: Exact startup V1 release
+  H->>H: Check release then admit business channel
+  L->>H: Business V2 request, distinct challenge and exact Change
+  H->>A: Authorize this attributed request
+  A->>W: Effect only under maintained authority
+  W-->>L: Request-bound V2 reply through helper
+  L->>L: Validate reply and reap child exit
+  Note over L,W: Ready and release grant no business rights

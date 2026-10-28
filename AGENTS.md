@@ -28,6 +28,32 @@ owner and an observable outcome; act within the authorized scope and preserve
 concrete resumption conditions for anything deferred. A documented improvement
 is not a verified effect and creates no extra authority or budget.
 
+## Contrôle continu : politiques, documentation et erreurs
+
+À chaque incrément de migration ou de développement, conserver une revue explicite
+liée aux octets des fichiers réellement modifiés, sur trois axes :
+- Politiques codées en dur : examiner constantes, valeurs littérales, defaults,
+  fallbacks, booléens, tentatives, délais et conditions d'arrêt. Distinguer entrée
+  de test, invariant de protocole, limite technique et choix opérateur ; justifier
+  la catégorie. Pour un choix opérateur, tracer source persistée → validation →
+  Admin/API/CLI → consommateur réel, avec témoin, modification et reprise.
+- Documentation des fonctions : inventorier les fonctions publiques/non triviales
+  créées ou modifiées, vérifier le contrat dans leurs docstrings/Rustdoc/commentaires
+  et les documents concernés ; compiler la documentation quand pertinent. La simple
+  présence d'un commentaire ou une compilation verte ne prouve pas sa justesse.
+- Erreurs : suivre chaque issue d'échec nouvelle/modifiée jusqu'au consommateur,
+  vérifier cause conservée, diagnostic sûr, état avant/après, sortie/flush,
+  annulation et reprise pertinentes. Chercher aussi erreurs ignorées et fallbacks
+  qui pourraient transformer un refus en succès vide.
+
+Utiliser des recherches automatiques pour produire des candidats, puis une revue
+sémantique avec preuves ; aucun scanner ne garantit l'absence de défaut. Un élément
+non examiné, une exception non justifiée ou un contrôle requis en échec reste ouvert
+et interdit de déclarer ce contrat conforme. Refaire la revue lorsqu'un fichier ou
+son contrat consommé change ; conserver la portée exacte des preuves réutilisées.
+Vérifier aussi les lots antérieurs concernés par une découverte, sans réécrire leur
+historique. Cette règle s'applique à toute la migration, pas seulement au dernier lot.
+
 ## Common quality standard — Codex and Claude
 
 These rules apply to both assistants. They adapt the development discipline in
@@ -73,10 +99,19 @@ roles take precedence; a method never grants tools, delegation or deployment rig
   permissions, freshness, paths and output rendering. Use parameterized SQL and
   existing escaping/path-containment helpers; cover malicious inputs when relevant.
   Never turn a denied or malformed operation into a successful empty result.
+  A service retaining project authority must bind operations to the opened
+  datastore instance, with an owned descriptor where inode reuse matters;
+  a pathname or common UID alone is insufficient. This is not OS confinement.
 - Handle errors explicitly, preserving their cause and safe actionable context.
   Keep secrets, session tokens and private runtime data out of logs and reports.
   Never disable checks, modify a live mission database or reset consumption to
   manufacture success. Use supported public operations for runtime changes.
+  Carry observed effects through every release/render/close/output layer:
+  distinguish known recorded/replayed state, visible uncertain publication and
+  unknown outcomes. An Err alone never proves no change. Verify each consumer.
+  Reuse and test the established wrapper matrix when adding error traversal;
+  source() alone can skip an IO custom error, and secondary cleanup causes matter.
+  See Rust migration90's retained counterexamples and current error contracts.
 - Keep modules cohesive and changes reviewable. Plan a structural extraction by
   responsibility and dependency before splitting; preserve its public behavior.
   Do not expand the task into unrelated cleanup or create a forest of source copies.
@@ -118,6 +153,16 @@ business cutoff. Verify saving, reopening and use by the actual consumer.
 - Assert meaningful content and state changes, not merely file existence, HTTP
   200, process exit or absence of exceptions. Cover the no-op/empty/wrong-key case,
   rejection without mutation, recovery and persistence where relevant.
+- Bind results to actual build profiles, feature unification, dependencies,
+  environment, arguments and exercised binaries. An all-features workspace may
+  contain fixture code and never establishes the delivered profile. Keep fixture
+  and production binaries separate; verify matching build hashes and the public
+  flow on the intended profile. Before running a derived recipe, inspect its final
+  docstring, commands, counts and promised evidence for inherited stale claims.
+  For a UI served by an executable, verify actual protected HTTP asset bytes
+  against the effective compiler inventory and the current engine catalogue.
+  A workspace component test calling a CLI does not prove embedded resources,
+  translations or the interface served by that binary.
 - Verify that the selected tests actually ran: named tests and counts from verbose
   or structured output. Zero collected tests, `[no tests to run]`, interrupted runs
   and failed prerequisites never constitute PASS. Do not edit tested sources during
@@ -136,6 +181,12 @@ Every modification includes its relevant documentation in the same increment,
 without waiting for a reminder: code, configuration, methods and instructions.
 If no documentation change is needed, retain the concrete reason in the existing
 tracking record. Preserve actual behavior, evidence, limits and remaining work.
+
+New or modified public/nontrivial functions include current docstrings, Rustdoc
+or Go documentation comments in the same increment. Describe purpose, inputs and
+preconditions, outputs, errors, side effects and material limits, including any
+unverified authority or evidence. Explain the contract without restating the code;
+update stale comments and check documentation links/executable examples.
 
 A feature or behavioral fix includes implementation, targeted regression checks,
 current contract documentation and a recipe verifying the observable result,
@@ -196,7 +247,29 @@ and what's new** dialog: number, evolution notes, actual Git commit link and
 uncommitted-change disclosure. Keep local deliveries distinct from published
 releases; never invent a commit/tag or publish automatically. An external
 prebuilt binary selected with `--binary` stays external and is not rebuilt.
-The rule does not authorize a restart, commit, push or publication by itself.
+Pour sélectionner exactement le dernier candidat source déjà qualifié et vérifié,
+`./swarm.sh restart --prepared-build SHA256 --no-open` conserve le chemin géré et
+revérifie image, profil, archive et métadonnées avant arrêt. Fournir l’empreinte
+complète du record examiné ; un autre candidat préparé ou une régression de version
+refuse. `start` avec cette option reste idempotent seulement pour la même image
+active. Les sources plus récentes restent en attente, jamais déclarées installées.
+Le redémarrage sans option garde sa reconstruction normale. Cette sélection ne
+qualifie aucun build refusé et ne crée aucune autorisation de publication.
+
+## Installation locale par défaut — décision utilisateur du 24 octobre 2026
+
+Pour un développement autorisé, toute avancée vérifiée doit être construite,
+installée et activée dans l’instance locale concernée par défaut, sans nouvelle
+demande d’accord. Cette autorisation couvre le démarrage ou redémarrage du seul
+service local identifié comme appartenant au projet. Utiliser le chemin de
+livraison pris en charge ; préserver données, missions, travaux et processus
+d’autrui. Vérifier l’identité du binaire réellement exécuté, la version, les
+évolutions FR/EN et le parcours affecté avant d’annoncer « installé ».
+Un test réussi ou un candidat compilé ne constitue pas une installation.
+Si le raccordement de livraison manque ou refuse, appliquer replan et le traiter
+dans le périmètre autorisé ; conserver le défaut, sa preuve et sa condition de
+reprise sans prétendre que le produit est installé. Cette préférence ne vaut pas
+autorisation de commit, push, publication ou déploiement externe/production.
 
 ## Methods
 
@@ -208,6 +281,7 @@ Project skills are in `.agents/skills/`. They link to the canonical files under
 | Deliver a bounded change, from analysis through verification | `apex` |
 | Audit a system and optionally correct confirmed findings | `audit-pdca` |
 | Turn a need into requirements and a dependency-aware plan | `spec-builder` |
+| Discover sourced model prices for a versioned catalogue | `pricing-discovery` |
 | Find contradictions or omissions before executing a plan | `spec-audit` |
 | Review an implementation for actionable defects | `code-reviewer` |
 | Diagnose a failure before a scoped correction | `debug` |
@@ -261,8 +335,38 @@ relevant mobile widths. Inspect console errors, failed requests, overflow and
 actual interaction results. A token scan or screenshot alone is insufficient;
 state explicitly when visual or browser verification is unavailable.
 
+## Permanent verification recipes — Claude and Codex
+
+Swarm has a permanent verification tool: `tools/verification/recipe.py`.
+Keep reusable recipe manifests under `tools/verification/recipes/` and their
+regression code/fixtures in repository sources; `.cache/` must never be the sole
+copy of a newly maintained recipe. Update the applicable recipe with its changed
+contract and documentation. Use explicit named assertions, refusal and recovery
+cases; a zero-test run or exit status alone does not establish success.
+
+Run into a fresh evidence directory, preserving original failures, argv, declared
+inputs, profiles and stdout/stderr. Verify retained evidence with the tool's
+`verify` command; never overwrite past results to manufacture a replay. Its
+source inventory covers declared inputs only: compiler graphs, effective features,
+production binary identity and independent acceptance need their own checks.
+See `tools/verification/README.md` and `docs/plans/migration-rust/REPLAYS.md`.
+This rule/tool grants no execution, provider, live-state or deployment authority.
+Repository rules reach Claude through `CLAUDE.md`; they do not automatically
+update embedded native agent contexts or already running sessions.
+
+When chaining dependent local steps, stop after a failed prerequisite (for example
+an edit script) before compiling or testing. Preserve partial edits and diagnose
+the failed stage; a shell continuing after an edit error is not a new precondition
+for rerunning the same behavioral failure. Read actual source boundaries rather
+than assuming punctuation preserved by a formatter.
+
 ## Repository checks
 
+- For a targeted Rust unit regression, use `cargo test -p PACKAGE --lib MODULE::TEST`
+  (with the actual manifest path). For an integration regression, name its
+  `--test TARGET`. A name filter alone also compiles/launches unrelated integration
+  targets; their zero-test results are not evidence. Reuse passing unchanged
+  results; do not repeat compilation merely to replace an earlier broad command.
 - Select verification from the changed contract and its affected dependencies.
   For Go engine changes, run the relevant targeted `go test` cases, including
   failure and recovery variants, plus appropriate static checks and compilation.
@@ -274,13 +378,33 @@ state explicitly when visual or browser verification is unavailable.
   behavior changes. Do not treat an interrupted or failed full suite as passing.
 - Frontend: use the scripts in `package.json` and the applicable browser recipes
   under `tests/`. `go test` does not execute those browser recipes.
+- Before changing embedded workflow instructions, measure role sizes with
+  `python3 tools/agent-workflows/check_workflow_size.py` before Cargo, then run
+  the real Rust workflow check. Preserve the configured body policy and full
+  obligations; remove repetition rather than raising caps to hide growth.
 - Configuration: `python3 tools/agent-workflows/check.py`.
+  For retained proof, add --evidence with a fresh project-local directory and
+  optionally --evidence-baseline with a verified directory, to capture actual Go
+  root/package sources and embeds, raw named tests and before/after stability.
+  Default checks do not establish complete Go source retention.
 - All changes: `git diff --check` and inspect the final diff.
 - Never use a running mission's database as a test fixture. Build/test against an
   isolated temporary root. A build does not prove the running server uses it.
 
 Inspect the current checkout and installed capabilities before running commands.
 Do not assume a particular absolute directory, port, provider, model or quota.
+
+### Rust migration qualification reviews
+
+Read the current migration plan before choosing the baseline. Shared qualification
+collectors require `SWARM_MIGRATION_REVIEW_BASELINE` pointing to the previous exact
+input inventory and a fresh `source-review.json` in the new evidence output before
+closure. Review policies, functions, errors and documentation against current
+source/proof hashes; missing/stale/open declarations refuse qualification. Read
+`tools/rust-migration/review_increment.py` and FR/EN migration architecture for the
+format and limits. A changed baseline must not hide an unresolved finding: carry
+historical issues in the plan and reexamine affected earlier lots. Increment review
+and functional tests do not establish global conformance or independent acceptance.
 
 ## Direct development workspace
 

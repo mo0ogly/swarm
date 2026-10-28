@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Private operator anchor readonly report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol",
+    "operation",
+    "request_pin",
+    "package_pin",
+    "read_validation",
+    "read_durability",
+    "anchor_decoded",
+    "locator_trust_verified",
+    "current_authority_verified",
+    "human_authentication_verified",
+    "separate_os_uid_verified",
+    "operator_package_read",
+    "material_generated",
+    "service_installed"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "protocol": {
+      "const": "swarm-operator-anchor-cli-v1"
+    },
+    "operation": {
+      "const": "checkpoint-check"
+    },
+    "request_pin": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "package_pin": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "read_validation": {
+      "const": "bytes_read"
+    },
+    "read_durability": {
+      "const": "directory_acknowledged"
+    },
+    "anchor_decoded": {
+      "const": true
+    },
+    "locator_trust_verified": {
+      "const": false
+    },
+    "current_authority_verified": {
+      "const": false
+    },
+    "human_authentication_verified": {
+      "const": false
+    },
+    "separate_os_uid_verified": {
+      "const": false
+    },
+    "operator_package_read": {
+      "const": false
+    },
+    "material_generated": {
+      "const": false
+    },
+    "service_installed": {
+      "const": false
+    }
+  }
+}

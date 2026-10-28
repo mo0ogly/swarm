@@ -2002,3 +2002,208 @@ Réponses aux questions du plan : `preparation-answers-rust`, `SWARM_PREPARATION
 Interface manuelle de préparation : `preparation-ui-rust`, variable `SWARM_PREPARATION_UI_BINARY` vers le profil normal figé. Parcours navigateur FR/EN, thèmes, CAS, décisions longues, historique, refus et reprise.
 
 - `preparation-conversion-rust`: new-work CLI/API/UI, unreleased locks, exact replay, fresh Admin policies and rollback after receipt-trigger damage. `SWARM_PREPARATION_UI_BINARY` selects the frozen normal-profile binary; no global watchdog.
+
+Recette `preparation-release-rust` : autorisation explicite whole-Work après revue
+des contrats actuels, CAS préparation/Work, rejeu après réponse perdue et reprise
+des refus. `SWARM_PREPARATION_UI_BINARY` sélectionne un binaire figé ; nouveau
+dossier de preuve obligatoire. Voir [lot release](PREPARATION-RELEASE-20261026.md).
+
+`preparation-team-rust` couvre la configuration initiale humaine/CLI, empreinte
+canonique, budgets/defaults explicites, refus sans mutation SQL, rejeu sans source
+fournisseur, libération séparée et formulaire FR/EN × thèmes, avec accès clavier
+aux champs inférieurs à390px. SWARM_PREPARATION_UI_BINARY désigne un binaire figé.
+
+Budget préparation : `preparation-budget-rust.json` vérifie enveloppes explicites, invalides, CAS/rejeu et FR/EN × deux thèmes, sans exécution fournisseur. Le relevé de consommation reste hors capacité.
+
+`preparation-budget-read-rust.json` : réservations/coûts historiques, null≠zéro, modification/désactivation alerte Admin, Work lié, corruption/refus/reprise et modale bilingue actuelle.
+
+Pour les recettes CLI, choisir l’exécutable immuable du reçu de construction natif et vérifier son SHA. `deploy/local-build.json.artifact` est un chemin de staging : un restart partagé pris en charge peut le renommer pendant une recette. Sa disparition signifie exécution incomplète, jamais PASS produit. Conserver l’original et rejouer sur l’exécutable immuable inchangé.
+
+### Sources documentaires et décodage imbriqué — 26 octobre
+
+`tools/verification/recipes/preparation-sources-rust.json` couvre doublons/null/
+alias des budgets, anciens reçus équivalents, aperçu/listing/attachement/retrait
+et adoption explicite Admin43→44. `preparation-sources-regressions-rust.json`
+couvre politiques invalides, budgets, équipe et questions. Fournir
+`SWARM_PREPARATION_UI_BINARY` et, pour l’upgrade, `SWARM_PREPARATION_V43_BINARY`
+(ancien binaire43 conservé), chemins immuables vérifiés. Pas de watchdog global.
+Les fixtures ne lancent aucun vrai fournisseur. Le checkout partagé peut invalider
+la stabilité : conserver le refus ; exécuter sur un paquet de vérification limité
+avec sources compilées archivées et tests figés, jamais en attribuant les fichiers
+actuels à un ancien binaire. La recette ne qualifie que ses entrées déclarées.
+Les tests `rust_installed_preparation_sources.py`/`_ui.cjs` observent uniquement
+l’instance locale explicitement sélectionnée, le profil qualifié, la version FR/EN,
+les assets et l’état avant/après ; aucun POST métier. Le HTML natif est une
+transformation contrôlée du template : comparer son body rendu et les scripts
+servis au contrat du renderer compilé, pas le hash du fichier HTML brut.
+Preuves et limites : [rapport Sources](PREPARATION-SOURCES-20261026.md).
+
+### Modèles de préparation —26 octobre
+
+Recette `preparation-templates-rust.json` : catalogue/projection, interface et
+sauvegarde explicite, adoption Admin44→45 et refus traduit sur journal41.
+Fournir SWARM_PREPARATION_UI_BINARY, SWARM_PREPARATION_V44_BINARY et
+SWARM_PREPARATION_V41_BINARY, empreintes des binaires conservés et vérifiés.
+Pas d’appel modèle réel ni de watchdog global. Une réponse complète reste un
+brouillon sans autorisation. Le cas41 est distinct de la Root nouvelle45.
+[Rapport et limites](PREPARATION-TEMPLATES-20261026.md).
+
+### Statut des consignes projet —26 octobre
+
+`project-profile-read-rust.json` utilise `SWARM_PROJECT_PROFILE_BINARY`, chemin
+d’un binaire immuable qualifié. CLI/API readonly, metadata sans ouverture des
+settings Claude, caps, refus/reprise, secrets, garde mémoire non porté501 ;
+interface FR/EN×thèmes et lecture mobile des empreintes. Le test de permissions
+nécessite un utilisateur non root et refuse de compter un contrôle non exécuté.
+Pas de watchdog global ni appel fournisseur. `failure.reason` est un identifiant
+statique sûr ; les causes HTTP internes restent cachées. Une cause CLI/typée ne
+prouve pas sa publication HTTP : vérifier la réponse du transport réel.
+Le mode `--project-profile` du vérificateur installé contrôle uniquement les
+métadonnées réelles et la modale, sans créer ou modifier de profil.
+[Preuves, installation et limites](PROJECT-PROFILE-READ-20261026.md).
+
+### Revue des conversions CLI/API —26 octobre
+
+`preparation-release-review-rust.json` utilise SWARM_PREPARATION_UI_BINARY.
+La lecture n’autorise aucun départ ;17 assertions de lecture/cause/reprise puis
+recette de libération existante (52 moteur/42 navigateur). Les erreurs composées
+conservent root-cleanup et leurs causes ; ne pas aplatir le contrat pour satisfaire
+une assertion. Sur la Root réelle, `--release-review` du vérificateur installé
+compare la CLI et l’API sur une conversion existante, sans changement de données.
+[Rapport et limites](PREPARATION-RELEASE-REVIEW-20261026.md).
+
+### Historique IA de préparation —26 octobre
+
+`preparation-dialogue-history-rust.json` : SWARM_PREPARATION_UI_BINARY immuable,
+35 lectures/refus/reprises,45 navigateur et105 préparation manuelle. Aucun
+fournisseur réel, kill/finish à15s ou watchdog global. Les cas200 avec objets
+optionnels false/0/chaîne vide doivent refuser, pas devenir une absence. La
+recette installée `--dialogue` utilise une préparation existante par URL publique,
+sans sélection synthétique ignorée par isTrusted, et conserve les issues réelles.
+[Rapport, refus initiaux, installation et RETEX](PREPARATION-DIALOGUE-HISTORY-20261026.md).
+
+### Test manuel de connexion API Rust
+
+Recettes : api-connection-probe-rust.json (10groupes), api-connection-probe-go-parity-rust.json (5comparaisons), api-connection-probe-admin-rust.json (4surfaces). SWARM_STATUS_CONTRACT_BINARY désigne un binaire normal qualifié ; SWARM_GO_REFERENCE_RESULT le result.json Go qualifié pour le comparatif. Chaque run exige un nouveau dossier puis recipe.py verify. Aucun compte réel/watchdog global ; fixtures HTTP locales possédées. Garder refus/reprise, profil et sources. Une recette ne prouve pas l’installation : processus/ressources/notes/Version ont une preuve séparée. Portée historique : evidence/20261027-api-connection-probe-r6eeepeu.
+
+## G9 limites d’exécution178
+
+Recette permanente tools/verification/recipes/run-limits-admin-rust.json (public9/Go6/Admin4), sélection navigateur indépendante run-limits-admin-browser-rust.json. SWARM_STATUS_CONTRACT_BINARY désigne le binaire figé, SWARM_GO_REFERENCE_BINARY le Go qualifié ; aucun compte ni délai global. Historique : final-recipe177 a ses étapes public/Go PASS, groupe FAIL focus conservé ; focus-recipe178 PASS/intégrité VERIFIED après correction. Revue de réutilisation et profil effectif dans evidence/20261027-run-limits-admin-ohyyq12v/RESULT-RETEX.md ; ce lot ne qualifie pas toutes les API. Installation réelle13 +Version14 dans activation-after.
+
+## Préparation : profils, cible existante et révision184
+
+Recettes permanentes project-profile-configuration-rust.json,
+preparation-existing-work-rust.json et preparation-revision-rust.json.
+SWARM_PREPARATION_UI_BINARY doit désigner un ELF normal immuable qualifié.
+La dernière vérifie révision/accusés, puis les anciens parcours d’ajout, création,
+libération, revue et équipe. Les modèles restent fictifs, aucun watchdog global.
+Le différentiel de changes lit le commit Go0e9b514 via git show et nécessite
+Go local uniquement pour cet oracle de développement ; il n’installe pas Go
+dans le produit. Référence absente, compilateur indisponible ou entrée inconnue
+refuse explicitement. La source et le harness généré restent dans la preuve.
+Les8 tests Rust filtrés,21 dommages/5 reprises du témoin, l’identité du profil
+et les26 contrôles d’installation sont des preuves distinctes ; ne pas déduire
+l’une de l’autre. Voir PREPARATION-REVISION-20261027.md pour les limites exactes
+du run7steps183 et du comparatif séparé, sans le réécrire rétroactivement.
+
+
+### G10 attentes navigateur et reçus partagés — 27 octobre2026
+
+Native-runtime installé187 : API/CLI8, taille3, Go6/16cas ; reçus partagés12parcours FR/EN/thèmes et Unicode2 +navigateur4. Processus/ressources/lectures18 et Version14, cinq travaux inchangés. Les collectes initiales FAIL restent conservées. [RETEX](evidence/20261027-web-request-policy-jnok5wvr/RESULT-RETEX.md). Hors native-runtime et conformité globale restent ouverts ; suite autorisée : graph-performance puis autres API Go, sans attente utilisateur.
+
+
+### G10 graphes livré189 — 27 octobre2026
+
+Recette3steps PASS/intégrité VERIFIED : API/CLI7, Go6/WIRE13, navigateur4 ; codec5 et Rustdoc/i18n ciblés. Installation18+Version14, cinq travaux inchangés. Dialogue Admin profils p95/samples sans plafond caché ; contrat FR/EN NATIVE-GRAPH-PERFORMANCE. Revue effective24fichiers, quatre sources préparation concurrentes/16axes ouverts : aucune conformité globale déclarée. Originaux FAIL et [RETEX](evidence/20261027-graph-performance-lh7z80oy/RESULT-RETEX.md) conservés. Suite autonome : liste d’échanges puis autres API ; benchmark Go et clôture globale encore ouverts.
+
+## Préparation CLI et livraison locale préparée —27 octobre2026
+
+`preparation-cli-rust.json` couvre Claude/Codex factices et l’API existante, avec parcours navigateur FR/EN×deux thèmes. Le décodeur refuse déclarations d’outils, erreurs et sorties incomplètes ; aucune preuve de confinement réel des fournisseurs externes. Livraison192 : étape CLI26+48, étape API34+48 reprise après refus Lock original conservé ; réglages du serveur actif modifiés par le parcours Admin HTTP, sans retry. `prepared-local-delivery-rust.json` couvre sélection SHA/profil/archive/métadonnées, refus/témoin/reprise et lifecycle réel isolé. L’option --prepared-build sélectionne seulement un build qualifié, ne qualifie pas une preuve refusée et ne publie rien. Voir PREPARATION-CLI-20261027.md et son dossier evidence/20261027-preparation-cli.
+
+
+### G1 échanges historiques / G10 CLI exchange — installé194
+
+/exchanges?work +exchange list WORK +lecture explicite cockpit : recette2steps PASS/intégrité VERIFIED (Go/Rust7 groupes et navigateur4 FR/EN×thèmes320/1440). BLOB/TEXT/UTF réparés dans le lecteur partagé après reproduction191 ; ancien statut de mission4 cas avant/après vérifiés, sans mutation. HEAD :5 tests TCP du témoin et4 parcours politiques189, corps réel et pas masquage client. Installation21+Version14, cinq travaux inchangés ; nouveaux rapports réels limités aux empreintes. Revue effective17fichiers,3 changements concurrents/12axes ouverts et anciennes issues conservées ; aucun achèvement global, envoi/ACK ou acceptation autonome. Contrat FR/EN NATIVE-AGENT-EXCHANGES, Mermaid final ; [RETEX](evidence/20261027-exchanges-hq2js3us/RESULT-RETEX.md). Suite sans relance : fil d’activité G1 ; composant pur de pagination GLM5 tests isolés, non enregistré et pas encore une API.
+
+### Garde des sources mémoire de profil
+
+`project-memory-source-rust.json` compare824 références au fragment Go conservé,
+puis teste le CLI/HTTP/profil et le fournisseur API factice. Déclarer
+`SWARM_PROJECT_MEMORY_BINARY` (candidat normal qualifié) et
+`SWARM_PROJECT_MEMORY_SEEDER` (exemple Rust `memory_source_fixture` compilé séparément).
+Les recettes d’appels de préparation/profils utilisent aussi ce seeder pour leurs
+seuls enregistrements mémoire synthétiques. Il conserve les triggers et la vraie
+projection d’identité, valide le Work, limite la mutation à mémoire/RETEX et compare sa révision avant écriture.
+Ne pas enregistrer une imitation de l’UDF dans Python ni supprimer les triggers.
+
+Construire le seeder dans un target de vérification identifié :
+
+```sh
+cargo build --manifest-path rust/Cargo.toml -p swarm-engine --example memory_source_fixture
+```
+
+Il n’est jamais installé comme CLI. Choisir les profils explicitement et garder sa
+provenance distincte du binaire produit ; la recette ne remplace pas la qualification
+du profil natif ni l’acceptation indépendante. Les oracles Go sont générés dans la
+preuve depuis Git ; ils ne réintroduisent pas Go dans l’application livrée.
+
+
+### G1 activité200
+
+Recette permanente `activity-read-rust` :3 étapes PASS/intégrité VERIFIED (public8 incluant charge de revue polymorphe, fenêtre3, navigateur4). Composant5, Rustdoc/i18n, installation23+Version14 ; cinq Works inchangés, lecture réelle avant activation. Originaux FAIL198 et réparation200 conservés dans evidence/20261027-activity-l8z4x8wi ; revues globales BLOCKED sur changements concurrents/anciennes issues. Aucun fournisseur, agent natif, mutation SQL réelle ou achèvement global.
+
+
+Log queries: recipe `log-query-rust`, final-recipe204-explicit-constructor PASS/VERIFIED; installed205-csp55 + Version14; exact compiler source reuse204→205 (notes only). See evidence/20261027-log-query-8i8c635h/RESULT-RETEX.md. Local fixtures and installed reads, no native mission acceptance.
+
+
+Runtime-health: permanent `runtime-health-rust`2steps PASS/VERIFIED (public7/browser4), material2/runtime6. Installed20727+Version14,5Works unchanged; same-inode SQL failure and physical replacement are distinct fixture cases. [RETEX](evidence/20261027-runtime-health-x97n_o9u/RESULT-RETEX.md). Foreign20review axes and global migration remain open.
+
+### Arrêt historique actif
+
+`preparation-legacy-active-rust.json` utilise `SWARM_LEGACY_ACTIVE_BINARY` pour
+un candidat normal sans fixtures et `SWARM_PROJECT_MEMORY_SEEDER` pour la seule
+injection mémoire du test API réutilisé (exemple décrit ci-dessus). Les anciens
+tours sont synthétiques, le superviseur vivant est un enfant inerte détenu ;
+aucun exécutable Go ni fournisseur réel lancé. Refus501 initial conservé, historique
+actif consultable et arrêt explicite testés sans activer les appels. Le parcours
+`send` actif rejoue seulement l’observation, sans dispatch. Coût distant et arrêt de descendants
+hérités ne sont pas établis par cette recette.
+
+Le lot216 ajoute aussi `SWARM_SCHEMA_LEGACY_BINARY` (journal46) et
+`SWARM_SCHEMA_BROKEN_BINARY` (reproducteur froid47) à cette recette. Les images
+exactes, profils et env sont retenus dans les preuves du lot. Ces deux programmes
+ne servent qu’aux Roots temporaires de recette, jamais à un retour arrière du
+service réel. Le contrôle public de journal compte11assertions, y compris reprise
+d’une initialisation partielle et absence d’adoption au simple read. Les révisions
+SettingCount sont des chaînes décimales, pas des nombres JS/Python implicites.
+
+## Découverte web sous réservation Admin —218
+
+Recette `tools/verification/recipes/web-mission-discovery-rust.json` :
+`SWARM_DISCOVERY_TEST_ELF` et son SHA complet `SWARM_DISCOVERY_TEST_SHA`
+sélectionnent l’ELF intégration retenu, distinct du binaire de production
+`SWARM_WEB_DISCOVERY_BINARY`. Aucun watchdog global.3tests d’intégration et
+5assertions publiques ; témoin216 GAP_OBSERVED3 avec arrêt réel Lock/errno11.
+Profil normal218, recette2steps PASS/intégrité VERIFIED. Preuves, originaux et
+revue dans `evidence/20261027-web-discovery-observation/`.
+
+Complément `preparation-cli-journal-boundary-rust.json` :
+`SWARM_LEGACY_ACTIVE_BINARY` courant et `SWARM_PREPARATION_OLD_BINARY`192 ;
+le wrapper retire ce dernier de l’environnement du scénario47. Celui-ci passe
+CLI29/browser60 ; ancien journal46 CLI30. Les erreurs de précondition et la
+publication atomique du témoin sont conservées. Le binaire ancien n’accède jamais
+au Root vivant. Ces recettes n’appellent pas de fournisseur métier et ne prouvent
+pas une autorisation actuelle à partir d’un historique.
+
+## Consultation CLI historique —219
+
+Recette `tools/verification/recipes/mission-seen-rust.json`,
+`SWARM_MISSION_SEEN_BINARY` = image qualifiée exacte.1step/17assertions PASS et
+intégrité VERIFIED : témoin visit mark/show, Visit JSON historique, textes FR/EN,
+révision courante, huit refus sans mutation, erreur de sortie avec effet enregistré
+et relecture, état métier/réglages conservés. Aucun watchdog global du lanceur,
+aucun fournisseur ou Root vivant en fixture. Témoin218 GAP3 et image diagnostique
+non installable conservés. Profil normal219 et contrôle vivant20+Version14+page11
+dans `evidence/20261027-mission-seen/`, avec journal des cinq constructions refusées.
+Les ressources effectives et la provenance/dirty sont contrôlées ; aucun résultat
+de fixture ne constitue une acceptation globale des chantiers partagés.

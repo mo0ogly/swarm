@@ -1,5 +1,13 @@
 # T5 — diagnostic du contrôle final
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) reprend la section finale « Clôture
+publique vérifiée », distincte des contrôles précédents interrompus et de
+l’ancienne mission budgets 5/6. Les durées et bornes historiques de ce fichier
+ne créent aucune politique ou délai de recette pour Rust. Codex racine conserve
+les originaux et la proposition de gouvernance ; aucun contrôle n’est rejoué.
+
 Observation du 4 octobre 2026, 17:47 UTC. Attribution : supervision du contrôle moteur.
 
 Le reçu public `.swarm/validation/w-a03028dc0d3f69d1f52f0ee6/plan-a03028dc0d-T5/a-2c484d614151b6e78cc327d2-receipt-a911d8bba34061d3a7641af5.json` conserve un échec : délai de 300 secondes dépassé, code -1, du 17:41:55.876 UTC au 17:46:55.879 UTC. La seule sortie capturée est le lancement de `go test ./... -count=1`. La recette Python capturait les sorties de Go jusqu’à sa fin ; ce reçu ne permet donc pas d’identifier le test lent ou bloqué. Vet, configuration, diff, build et navigateur ne sont pas démontrés par ce contrôle interrompu.

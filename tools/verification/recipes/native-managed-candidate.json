@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "id": "native-managed-candidate",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/managed_repository*.rs",
+    "rust/crates/swarm-engine/src/task_report.rs",
+    "rust/crates/swarm-engine/src/validation_policy.rs",
+    "rust/crates/swarm-cli/src/task_validation.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_managed*.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_mission*.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_native_http*.py",
+    "tests/rust_planning*.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_managed_planning.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-source-and-receipt-contracts",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::task_validation::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test result: ok. 26 passed; 0 failed;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "ordinary-native-controls-still-execute-and-replay",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile,json\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='candidate-ordinary-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_task_validation.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and r['actual_control'] and r['replay_without_execution'] and not r['task_accepted']\nimport sys\nsys.path.insert(0,str(Path('tests').resolve()))\nfrom rust_native_task_validation import invoke\nroot=Path(r['root']);request=json.loads((p/'validation.input.json').read_text());argv=json.loads((p/'validation.command.json').read_text())['argv'];work=argv[3]\ncode,wire=invoke(Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']),root,p,'candidate-on-claimed-job',['task','validation-candidate',work],request)\nassert code!=0 and 'task-validation-candidate-job-already-claimed' in json.dumps(wire),wire\nprint('ORDINARY_NATIVE_CONTROLS_PRESERVED '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "ORDINARY_NATIVE_CONTROLS_PRESERVED"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "managed-native-candidate-and-stale-preparation",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile,json\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='candidate-native-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_managed_candidate.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--subproject','--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and r['actual_native_producer'] and r['subproject'] and not r['controls_started'] and not r['accepted']\nassert len(r['assertions'])==8\nprint('NATIVE_MANAGED_CANDIDATE_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_MANAGED_CANDIDATE_PASS",
+        "public-settings-mutation-during-git-succeeds-and-stale-preparation-refuses"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

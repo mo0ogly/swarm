@@ -2,6 +2,12 @@
 
 ## Statut, portée et décision
 
+Ce cadrage T1 et son inventaire Go sont historiques. Pour le noyau Rust actuel,
+voir [Biba Rust — architecture technique](BIBA-RUST.md), ses schémas et la
+distinction entre parcours `trust` raccordé et cible Biba transversale.
+La décision utilisateur du 26 octobre 2026 conserve Biba comme règle d’intégrité
+de référence ; les écarts de raccordement ne sont pas une conformité implicite.
+
 Ce document définit la cible de T1. Il ne prétend pas que les services métier,
 OIDC, Biba, les connecteurs ou le collecteur eBPF sont déjà implémentés. Le
 pilote reste une **facturation simulée** dans une racine isolée : aucun paiement,
@@ -13,6 +19,12 @@ métier revalide l’identité, le mandat, la politique, les approbations et les
 paramètres exacts dans la transaction qui engage l’effet simulé. Le connecteur
 est un passage obligatoire. Toute voie directe non inventoriée reste un écart et
 désactive l’action sensible concernée.
+
+Le plan futur [AC-02 — sécurité d’exécution et menus](../plans/actions-confiance/securite-execution-apex.md)
+est enregistré le 23 octobre 2026, avec les références Bromure, NVIDIA et
+Agent Baseline Software Factory/YAML. Ses lots A0–A7 restent non démarrés :
+reprise après migration/qualification Rust et demande explicite de démarrage.
+Cet enregistrement ne modifie aucune protection en cours d’exécution.
 
 ## Socle inspecté et écarts
 

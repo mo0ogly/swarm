@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "id": "paea-service-call-library",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tests/fixtures/paea_provisioning_request.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-personal-service-core.json",
+    "schemas/paea/personal-service-response-v1.schema.json",
+    "tests/paea_service_response_schema_test.py",
+    "rust/crates/swarm-cli/**/*",
+    "rust/crates/swarm-engine/Cargo.toml",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "tools/verification/recipes/paea-service-call-library.json",
+    "tests/paea_service_call_cli_test.py",
+    "tests/paea_service_installation_cli_test.py",
+    "tests/fixtures/paea_personal_tty.py",
+    "schemas/paea/service-installation-cli-v1.schema.json",
+    "tools/verification/recipes/paea-service-call-cli-native.json",
+    "rust/crates/swarm-linux-identity-channel/**/*"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "native-operator-dispatch-output-close",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "identity_service_call::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "service_call_close_failure_is_distinct_from_completed_operation_and_output"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "shared-secret-reader-regressions",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--lib",
+        "personal_secret_frame::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "4 passed; 0 failed",
+        "personal_frame_existing_transport_bound_stops_after_sentinel"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "request-codec-and-real-service-core",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--test",
+        "personal_service",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "21 passed; 0 failed",
+        "personal_service_packet_exact_binary_and_borrowed_secret_redaction",
+        "personal_service_core_real_cold_enrollment_control_and_reopen",
+        "personal_service_core_startup_refusal_preserves_cause_then_valid_open",
+        "personal_service_public_binding_excludes_secrets_and_includes_exact_action",
+        "personal_service_response_actual_refusals_keep_original_failure_after_send",
+        "personal_service_response_nested_known_result_and_output_failure_branches",
+        "personal_service_response_encoding_refusal_keeps_reply_before_any_output",
+        "personal_service_consumer_refuses_dropped_known_after_use_result",
+        "personal_service_consumer_actual_all_operations_preview_and_replay",
+        "personal_service_consumer_history_pins_and_neighbor_action_refuse",
+        "personal_service_consumer_personal_phase_verdict_and_sequence_coherence",
+        "personal_service_retains_pinned_controller_role_across_refusal_and_reopen",
+        "personal_service_request_decodes_exact_guarded_kernel_packet_without_copy",
+        "personal_service_kernel_subject_wrong_controller_refuses_without_business_change"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "fixture-only-real-pending-to-normal-core-recovery",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "personal_service",
+        "personal_service_core_exact_pending_recovery_after_actual_durable_phases",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "1 passed; 0 failed",
+        "personal_service_core_exact_pending_recovery_after_actual_durable_phases"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "existing-lifecycle-startup-error-and-close-contract",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "authenticated_startup",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "10 passed; 0 failed",
+        "personal_lifecycle_consuming_close_keeps_actual_error_and_known_effect_on_reopen"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "private-current-service-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    },
+    {
+      "id": "response-frame-schema-and-explicit-semantic-limits",
+      "command": [
+        "python3",
+        "tests/paea_service_response_schema_test.py",
+        "-v"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK",
+        "test_failure_verdict_layers_and_exclusive_result_shape"
+      ]
+    },
+    {
+      "id": "current-cli-private-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished"
+      ]
+    }
+  ]
+}

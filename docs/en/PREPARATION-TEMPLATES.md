@@ -46,11 +46,9 @@ saving custom templates are not yet available.
 
 ## Configure a team after creating tasks
 
-In the CLI, a preparation whose tasks remain launch-held can receive its organisation through `prepare create-missions ID --input request.json`. The request preserves the current plan, task identities and evidence, and adds `organization` to the existing contract with `version`, `action`, a unique `event_id`, `expected_revision`, `preparation_id`, `sha256` and `expected_work_revision`. Read the preparation and work again before constructing this request.
+Rust first creates a new locked work with `prepare create-missions ID --input request.json`. For this pristine initial conversion, `prepare configure-team ID --input request.json` then records organization: configured CLI providers, contained workspace and human validation. The version1 request carries action, unique event_id, expected_revision, preparation_id, plan sha256 and expected_work_revision. Reread preparation and work before constructing it.
 
-The engine requires a fresh validated plan, a work definition matching its brief without a pre-existing launch profile, unchanged tasks and no prior attempt. Invalid organisation, missing locks and implicit historical adoption are rejected without partial mutation. This operation cannot replace an organisation already applied; use the dedicated configuration operations. Replay applies only to the same event_id; a new creation without an organisation, an identical revision or an already authorised release is explicitly rejected. Replaying the same event_id returns its receipt; a new configuration request is rejected, even with the same organisation.
-
-`create-missions` keeps launch locks. A first configuration through `authorize-plan` can also release them; for an already configured team, use `release-plan`. These operations start no provider: actual launch still requires the profile, controls, budgets, review and `mission start`.
+The engine requires a fresh plan, matching work, unchanged tasks, no launch profile and no prior attempt. Configuration retains locks/history; the exact event replays while a new configuration of an existing team refuses. `release-plan` separately authorizes only converted tasks at the reread CAS. None of these calls starts a provider synchronously; admission checks still apply. Automatic configuration, conversion into an existing work and the old authorize-plan command remain migration surfaces.
 
 ## Guided preparation and proposed team
 
@@ -95,7 +93,7 @@ Partial answer example (no write or AI call):
 
 Accepted answer IDs: `objective`, `audience`, `scope`, `exclusions`,
 `constraints`, `acceptance`, `verification`, `recovery`. Unknown keys are
-rejected. Each answer is limited to 1,000 UTF-8 bytes. The output contains the
+rejected. The initial limit is 1,000 UTF-8 bytes per answer; the saved Admin value applies and null removes this cap. The output contains the
 rendered draft, `missing` answer IDs, `answered`, `total`, `need_complete`,
 `proposed_team`, `recommended_method` and `launch_authorized`. A subject also
 returns `intervention`. Blank answers or answers containing
@@ -167,7 +165,7 @@ and backend tasks converge into integration, review and prepared delivery.
 Select an increment, inspect its tasks and checks, and complete the answers.
 **Download the adapted plan** returns the public `ActionPlan` v1 contract.
 **Use this journey**, then save the new preparation, preserves the need and inserts
-the plan into its editor. Draft and adopt the brief, resolve open decisions, then
+an unsaved local plan into its editor. Explicitly save that plan. Draft and adopt the brief, resolve open decisions, then
 validate the plan before converting it to missions. Answers never authorize
 check commands or publication.
 
@@ -180,3 +178,22 @@ Automatic synchronization across missions is not provided. Recovery descriptions
 use existing corrections and plan revisions, rather than a conditional scheduler.
 Executable validation policies still require authorization for the actual repository
 and candidate.
+
+## Native Rust integration
+
+Catalogue and answer checks share Rust CLI/API contracts.
+`prepare template-check --input answers.json` accepts template_id, language
+(default fr, or en), answers (ID→text object) and optional intervention/increment.
+Historical ks-* IDs remain readable aliases. Checks mutate no preparation and
+grant no launch authority. Existing graphs use current plan/task policies;
+open questions remain permitted in drafts but must be resolved for final validation.
+
+The modal reuses the questionnaire and graph. Using a journey fills a local need
+without replacing existing text. After creation the adapted plan is placed in
+the editor as an **unsaved** modification: Save retains it, while brief adoption
+and plan validation remain explicit. Two Admin settings (group45) control answer
+bytes before trimming and draft bytes (need before/after graph, projected plan).
+Initial values are 1,000 and 16,000 bytes; null removes a cap and zero rejects
+nonempty values. Older journals require explicit adoption. The component adds
+no second maxlength; proposed teams remain editorial roles.
+Verified local delivery: v0.1.1-dev.138. Older installations retain their policies until explicit Admin adoption.

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "id": "preparation-legacy-replay-rust",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_monitor.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_proposal.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_methods.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/src/engine_settings/preparation_calls.rs",
+    "rust/crates/swarm-engine/src/engine_settings_catalog.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json",
+    "rust/crates/swarm-engine/config/engine-settings-catalog.json",
+    "rust/crates/swarm-engine/src/financial_budget.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/preparation_turn.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/Cargo.toml",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-cli/src/preparation_worker.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "web/preparation-native.js",
+    "web/preparation-native-dialogue.js",
+    "web/prephase-dialogue.js",
+    "web/prepare.html",
+    "web/i18n-en.js",
+    "locales/en.json",
+    "tests/rust_preparation_calls.py",
+    "tests/rust_preparation_calls_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "docs/plans/migration-rust/PREPARATION-AI-CALLS-20261026.md",
+    "REFERENCE.md",
+    "docs/en/REFERENCE.md",
+    "PREPARATION-UX.md",
+    "docs/en/PREPARATION-UX.md",
+    "rust/crates/swarm-api-client/Cargo.toml",
+    "rust/crates/swarm-api-client/src/lib.rs",
+    "rust/crates/swarm-api-client/src/strict_json.rs",
+    "rust/crates/swarm-engine/tests/preparation_calls.rs",
+    "rust/crates/swarm-web/src/service/project_profile.rs",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_preparation_legacy_replay.py",
+    "docs/plans/migration-rust/PREPARATION-LEGACY-REPLAY-20261027.md",
+    "tests/rust_project_memory_source.py",
+    "rust/crates/swarm-engine/examples/memory_source_fixture.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs"
+  ],
+  "environment": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_TARGET_DIR": ".cache/rust-native-version846-target",
+    "SWARM_PREPARATION_DISABLED": "0"
+  },
+  "steps": [
+    {
+      "id": "public-legacy-replay",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-legacy-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_legacy_replay.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_LEGACY_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_LEGACY_REPLAY_PASS 33",
+        "PASS legacy-terminal-cli-http-equal",
+        "PASS legacy-active-conflict-pending-reserved",
+        "PASS legacy-active-no-write-or-budget-stopping-estimated",
+        "PASS legacy-replay-no-provider-launched",
+        "PASS new-unsupported-level-still-refused"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "public-cli-http-browser",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-calls-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_calls.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p),'--browser'],check=True)\nprint('PREPARATION_CALLS_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CALLS_PASS 34",
+        "PREPARATION_CALLS_BROWSER_PASS 48",
+        "PASS exact-replay-no-second-contact",
+        "PASS work-refusal-no-turn-or-prep-debit",
+        "PASS owned-worker-crash-settled",
+        "PASS crash-does-not-refund-attempt",
+        "PASS stale-capability-refuses",
+        "PASS explicit-refresh-uses-current-capability",
+        "PASS malformed-send-keeps-pending-intent",
+        "PASS malformed-send-replays-exact-event",
+        "PASS memory-guard-safe-no-contact",
+        "PASS project-context-public-recovery",
+        "PASS plan-proposal-counts-and-no-model-decision",
+        "PASS plan-keeps-only-known-operator-answer",
+        "PASS plan-proposal-no-mission-launch"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "retained-root-faults",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--test",
+        "preparation_calls",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "running 6 tests",
+        "test result: ok. 6 passed; 0 failed",
+        "test commit_failure_rolls_back_for_same_root_reuse ... ok",
+        "test physical_root_switch_refuses_and_owned_restore_recovers ... ok",
+        "test last_write_witness_refuses_turn_and_budget_drift ... ok",
+        "test changed_source_and_policy_refuse_before_contact ... ok",
+        "test legacy_terminal_replay_without_native_authority ... ok",
+        "test legacy_active_replay_remains_explicitly_unported ... ok"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

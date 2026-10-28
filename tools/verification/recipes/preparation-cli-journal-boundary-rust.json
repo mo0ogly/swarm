@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "preparation-cli-journal-boundary-rust",
+  "inputs": [
+    "tests/rust_preparation_cli_calls.py",
+    "tests/rust_preparation_calls.py",
+    "tests/rust_preparation_calls_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_preparation_plan.py",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_cli.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call.rs",
+    "rust/crates/swarm-engine/src/preparation_cli_output.rs",
+    "rust/crates/swarm-engine/src/agent_launch_preflight.rs",
+    "rust/crates/swarm-engine/src/native_provider_exec.rs",
+    "rust/crates/swarm-engine/src/validation_run.rs",
+    "rust/crates/swarm-cli/src/preparation_worker.rs",
+    "web/preparation-native-dialogue.js",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/agent_provider_facts.rs",
+    "rust/crates/swarm-engine/src/model_wire.rs",
+    "rust/crates/swarm-engine/src/provider_model_route.rs",
+    "rust/crates/swarm-engine/src/assistant_provider.rs",
+    "rust/crates/swarm-engine/src/agent_execution_gate.rs",
+    "rust/crates/swarm-engine/src/native_diagnostics.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_budget.rs",
+    "tests/rust_project_memory_source.py",
+    "rust/crates/swarm-engine/examples/memory_source_fixture.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_call_legacy.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-engine/src/engine_settings.rs",
+    "rust/crates/swarm-engine/config/engine-settings.json"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "current47",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='legacy-active-cli-'+'current47',dir='.cache')).resolve()/'journey'\nextra=['--browser']\nextra=[os.environ['SWARM_PREPARATION_OLD_BINARY'] if v=='__OLDER__' else v for v in extra]\nchild_env=dict(os.environ);child_env.pop('SWARM_PREPARATION_OLD_BINARY',None)\nsubprocess.run(['python3','tests/rust_preparation_cli_calls.py','--binary',os.environ['SWARM_LEGACY_ACTIVE_BINARY'],'--output',str(p)]+extra,env=child_env,check=True)\nprint('LEGACY_ACTIVE_CLI_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CLI_PASS 29",
+        "PREPARATION_CALLS_BROWSER_PASS 60"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "legacy46",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='legacy-active-cli-'+'legacy46',dir='.cache')).resolve()/'journey'\nextra=['--older-binary', '__OLDER__']\nextra=[os.environ['SWARM_PREPARATION_OLD_BINARY'] if v=='__OLDER__' else v for v in extra]\nchild_env=dict(os.environ);child_env.pop('SWARM_PREPARATION_OLD_BINARY',None)\nsubprocess.run(['python3','tests/rust_preparation_cli_calls.py','--binary',os.environ['SWARM_LEGACY_ACTIVE_BINARY'],'--output',str(p)]+extra,env=child_env,check=True)\nprint('LEGACY_ACTIVE_CLI_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CLI_PASS 30",
+        "PASS older-v1-replay-still-readable",
+        "PASS older-v2-replay-refuses-without-change"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

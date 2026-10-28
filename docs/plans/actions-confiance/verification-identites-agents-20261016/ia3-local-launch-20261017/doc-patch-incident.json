@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-17T15:13:13.773002+00:00",
+  "owner": "Codex",
+  "original_error": "apply_patch verification failed: Failed to find expected lines in /home/fpizzi/Documents/ChatGPT/swarm/docs/plans/actions-confiance/identites-agents-replan.md:\nautorisé ou le premier appelant pour contourner la précondition.",
+  "cause": "Contexte de patch documentaire erroné, sans lecture du paragraphe exact",
+  "unchanged_after_rejection": true,
+  "new_precondition": "Paragraphes actuels relus ; patch de reprise fondé sur ces lignes",
+  "scope": "Documentation uniquement, aucun test ou code produit affecté",
+  "prevention": "Relire le contexte exact avant un patch groupé ; vérifier le résultat puis reconstruire les preuves documentaires",
+  "state": "diagnostiqué ; reprise immédiate ci-après",
+  "resolution": {
+    "state": "appliquée et relue",
+    "at": "2026-10-17T15:13:30.424783+00:00",
+    "observable": "Précision de permissions présente en FR/EN et dans plan/rapport ; preuves finales à reconstruire",
+    "files": {
+      "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "c7be3cbf369de61e971437a77c95094e0bd5246867c4b8379db81942e52a1f6b",
+      "docs/en/AGENT-IDENTITY-CONTRACT.md": "1b59af269914943e049d33ccce246d8152ce48a8c70600159008821704297527",
+      "docs/plans/actions-confiance/identites-agents-replan.md": "1cbe3d354a1148fc4f46e073b7b3202500349f2e22d219bc12f538f5f7de4acc"
+    }
+  },
+  "final_verification": {
+    "state": "vérifié",
+    "at": "2026-10-17T15:14:39.495156+00:00",
+    "checks": "checks-final.json",
+    "sha256": "ca05d61ca0636c080ea56165e4540ed656d15f508c0a5456e58a87aa503f8c13"
+  }
+}

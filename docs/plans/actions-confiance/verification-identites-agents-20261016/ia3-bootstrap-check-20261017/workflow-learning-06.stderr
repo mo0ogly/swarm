@@ -1,0 +1,28 @@
+{"Time":"2026-10-17T18:49:37.114708379+02:00","Action":"start","Package":"swarm.local/companion/internal/engine"}
+{"Time":"2026-10-17T18:49:37.150629361+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded"}
+{"Time":"2026-10-17T18:49:37.150701927+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded","Output":"=== RUN   TestAgentWorkflowRolesAreBounded\n"}
+{"Time":"2026-10-17T18:49:37.150780634+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner"}
+{"Time":"2026-10-17T18:49:37.150786475+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/planner\n"}
+{"Time":"2026-10-17T18:49:37.151296898+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Output":"    agent_workflow_test.go:32: cadrage des méthodes supérieur à 32000 octets : 32034 octets mesurés ; aucun envoi tronqué\n"}
+{"Time":"2026-10-17T18:49:37.151339447+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Output":"--- FAIL: TestAgentWorkflowRolesAreBounded/planner (0.00s)\n"}
+{"Time":"2026-10-17T18:49:37.151345899+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/planner","Elapsed":0}
+{"Time":"2026-10-17T18:49:37.151356639+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner"}
+{"Time":"2026-10-17T18:49:37.151360276+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/subplanner\n"}
+{"Time":"2026-10-17T18:49:37.153237832+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Output":"    agent_workflow_test.go:32: cadrage des méthodes supérieur à 32000 octets : 32037 octets mesurés ; aucun envoi tronqué\n"}
+{"Time":"2026-10-17T18:49:37.15334962+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Output":"--- FAIL: TestAgentWorkflowRolesAreBounded/subplanner (0.00s)\n"}
+{"Time":"2026-10-17T18:49:37.153356624+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/subplanner","Elapsed":0}
+{"Time":"2026-10-17T18:49:37.153364558+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker"}
+{"Time":"2026-10-17T18:49:37.153369447+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/worker\n"}
+{"Time":"2026-10-17T18:49:37.154540865+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Output":"    agent_workflow_test.go:44: worker workflow: 31418 bytes\n"}
+{"Time":"2026-10-17T18:49:37.154619952+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Output":"--- PASS: TestAgentWorkflowRolesAreBounded/worker (0.00s)\n"}
+{"Time":"2026-10-17T18:49:37.154710401+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/worker","Elapsed":0}
+{"Time":"2026-10-17T18:49:37.154722434+02:00","Action":"run","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer"}
+{"Time":"2026-10-17T18:49:37.154727523+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Output":"=== RUN   TestAgentWorkflowRolesAreBounded/reviewer\n"}
+{"Time":"2026-10-17T18:49:37.155331691+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Output":"    agent_workflow_test.go:44: reviewer workflow: 18857 bytes\n"}
+{"Time":"2026-10-17T18:49:37.155372257+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Output":"--- PASS: TestAgentWorkflowRolesAreBounded/reviewer (0.00s)\n"}
+{"Time":"2026-10-17T18:49:37.15537899+02:00","Action":"pass","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded/reviewer","Elapsed":0}
+{"Time":"2026-10-17T18:49:37.155386624+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded","Output":"--- FAIL: TestAgentWorkflowRolesAreBounded (0.00s)\n"}
+{"Time":"2026-10-17T18:49:37.155392575+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Test":"TestAgentWorkflowRolesAreBounded","Elapsed":0}
+{"Time":"2026-10-17T18:49:37.155741797+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\n"}
+{"Time":"2026-10-17T18:49:37.16522257+02:00","Action":"output","Package":"swarm.local/companion/internal/engine","Output":"FAIL\tswarm.local/companion/internal/engine\t0.050s\n"}
+{"Time":"2026-10-17T18:49:37.166116629+02:00","Action":"fail","Package":"swarm.local/companion/internal/engine","Elapsed":0.051}

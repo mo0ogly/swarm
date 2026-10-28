@@ -1,0 +1,65 @@
+flowchart TB
+    accTitle: Observabilité Swarm : logs, direct, télémétrie et preuves
+    accDescr: Les sorties agent, événements du moteur, incidents, décisions, registre d’appels, mesures système et OTLP gardent leurs sources. Les vues sont en lecture seule ; l’export de données ne constitue pas une preuve d’acceptation.
+    subgraph G0["SOURCES"]
+        L_AGENT["Sorties de tentative<br/>agent_logs · terminal_events"]
+        L_ENGINE["MOTEUR DÉTERMINISTE RUST<br/>Activités · décisions · incidents<br/>Mission · tâche · tentative · révision"]
+        L_CALLS["Registre des appels<br/>Réservé ≠ envoyé ≠ facturé<br/>Usage connu / inconnu"]
+        L_PROC["Mesures Linux /proc<br/>Hôte · PID · starttime vérifiés"]
+    end
+    subgraph G1["TÉLÉMÉTRIE"]
+        L_OTLP["OTLP HTTP JSON<br/>Jeton exportateur lié à l’agent actif"]
+        L_NORMAL["Normaliser et attribuer<br/>Champs permis · rejets comptés"]
+        L_TELEMETRY["telemetry.db séparée<br/>Digest de jeton · séries · dédoublonnage"]
+    end
+    subgraph G2["PROJECTIONS"]
+        L_ORIGINAL["État et originaux conservés<br/>Curseurs · séquences · empreintes"]
+        L_API["API publique authentifiée<br/>Mission · source · filtres · pagination"]
+        L_PUSH["Direct SSE par empreinte<br/>Reprise / refus · repli interrogation"]
+    end
+    subgraph G3["CONSULTATION"]
+        L_CONSOLE["Suivi → Journaux<br/>Monaco lecture seule · repli texte<br/>Recherche serveur / page distinguée"]
+        L_LIVE["Agents en direct et harnais<br/>Activité · limites · contexte · usage"]
+        L_EXPORT["Export de la réponse originale<br/>Filtres et limites conservés"]
+    end
+    subgraph G4["PREUVES"]
+        L_CHAIN["Chaîne de preuve reconstructible<br/>Objectif → décision → tentative<br/>Candidat → contrôle → revue"]
+        L_ACCEPT["Acceptation contrôlée séparément<br/>Même candidat · droits · fraîcheur<br/>Validation humaine si mode human"]
+    end
+    subgraph G5["SUITE"]
+        L_SECURITY["AC-02 · futur non démarré<br/>Filiation réseau et timeline sécurité"]
+    end
+    L_AGENT --> L_ORIGINAL
+    L_ENGINE --> L_ORIGINAL
+    L_CALLS --> L_ORIGINAL
+    L_OTLP --> L_NORMAL
+    L_NORMAL --> L_TELEMETRY
+    L_ORIGINAL --> L_API
+    L_TELEMETRY --> L_API
+    L_PROC --> L_API
+    L_API --> L_CONSOLE
+    L_API --> L_PUSH
+    L_PUSH --> L_LIVE
+    L_API --> L_LIVE
+    L_CONSOLE --> L_EXPORT
+    L_ORIGINAL -->|Originaux attribués| L_CHAIN
+    L_ENGINE -->|Décisions et reçus| L_CHAIN
+    L_CHAIN --> L_ACCEPT
+    L_SECURITY -.->|Extension à réaliser| L_CHAIN
+    classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+    classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+    classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+    classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+    classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+    class L_AGENT,L_PROC,L_CONSOLE,L_LIVE,L_EXPORT ordinary;
+    class L_ENGINE core;
+    class L_OTLP,L_NORMAL,L_API,L_PUSH,L_ACCEPT control;
+    class L_CALLS,L_TELEMETRY,L_ORIGINAL,L_CHAIN data;
+    class L_SECURITY pending;
+    style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G1 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G2 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G3 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G4 fill:#f5f3ec,stroke:#205e70,color:#062b49
+    style G5 fill:#f5f3ec,stroke:#205e70,color:#062b49

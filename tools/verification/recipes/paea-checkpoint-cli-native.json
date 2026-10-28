@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "paea-checkpoint-cli-native",
+  "inputs": [
+    "tests/paea_checkpoint_cli_test.py",
+    "schemas/paea/operator-anchor-cli-v1.schema.json",
+    "tools/verification/recipes/paea-checkpoint-cli-native.json",
+    "tools/verification/recipe.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "actual-default-trusted-anchor-read-refusal-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_checkpoint_cli_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS fr-en-read-and-help",
+        "PASS request-binding-canonical-refusal-and-recovery",
+        "PASS private-metadata-and-name-refusal-and-recovery",
+        "PASS closed-flags-before-io",
+        "PASS stdout-enospc-keeps-known-read",
+        "CHECKPOINT_NATIVE_PASS cases=5"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+flowchart TD
+  S["Installation vierge : assistant<br/>cible non livrée"] --> L["Compte humain local présélectionné"]
+  S --> O["Fournisseur d'entreprise optionnel"]
+  L --> B["Bootstrap autorisé et compte vérifié"]
+  O --> B
+  B --> C["Configuration persistante et révisée<br/>autorité locale du pilote"]
+  C --> V["Identité et droits courants<br/>confinement vérifié"]
+  V --> W["Exécution du workflow<br/>identité suivie sur tout le parcours"]
+  A["Admin : modification autorisée"] --> C
+  V --> E["Prérequis manquant : refus visible<br/>action de résolution, aucun secours permissif"]

@@ -1,5 +1,7 @@
 # Trusted actions — T2 pilot
 
+**Rust port:** the local core has its own [contract and verification recipe](actions-confiance-rust.md). This page retains the historical Go pilot; its advanced features and remote client are not implicitly available in Rust. Historical evidence does not qualify the new binary.
+
 This pilot protects a **strictly simulated** settlement with a versioned mandate, exact approval and strict Biba variant. It contacts no bank, deploys nothing, and is neither proof of a real effect nor engine acceptance.
 
 ## Public contract

@@ -3,12 +3,41 @@
 17 octobre 2026 — protocole d’authenticité IA3c.2a, journal IA3c.2b, schéma
 d’autorité IA3c.2c, demande complète IA3c.2d, lecture versionnée IA3c.2e
 et noyau de configuration IA3c.2f-02a/02b vérifiés en fixtures ; adaptateur
-interne IA3c.2f-03a vérifié en fixtures ; client IA3c.2f-03b vérifié en fixtures ;
-service protégé,
+interne IA3c.2f-03a vérifié en fixtures ; client IA3c.2f-03b et remise privée
+IA3c.2f-03c vérifiés en fixtures ; service protégé,
 bootstrap et consommateur moteur
 **non réalisés**. Frontière adoptée le 17 octobre : service local isolé pour
 développement/pilote ; autorité distante prévue pour une évolution. Principal
 humain initial et activation encore ouverts.
+
+## IA3c.2f-03c — remise avant contenu et collecte du processus
+
+Le lanceur privé de l’image courante utilise deux socketpairs et un pidfd enfant
+obtenu atomiquement lors du clone. Un canal de démarrage V1 hello/ready/release
+compare challenge, empreinte des pins, processus noyau et UID avant la demande
+métier V2 ; le helper vérifie aussi son parent à partir du pidfd hérité. La
+demande exacte reste soumise au contrôle d’autorité indépendant du service.
+L’environnement doit être explicite ; les copies héritées sont fermées, les
+sockets adoptés CLOEXEC et l’enfant recueilli sur toutes les issues lancées.
+Annulation signalée au seul enfant via pidfd, sans délai ou retry ajouté.
+
+Un retour valide suivi d’une fin non nulle ne vaut pas succès ; pour une mutation,
+l’erreur originale et l’incertitude sont conservées sans effacer l’état durable.
+La reprise exacte reste autorisée à nouveau et ne duplique pas l’historique.
+Voir le [rapport 03c](verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
+et les schémas FR/EN du contrat. Ce raccord interne ne crée aucune commande
+publique, compte ou source humaine : I2f03b-05 progresse en fixtures seulement.
+Le service protégé réel exige encore la source indépendante des pins et du
+principal humain, les chemins protégés et le confinement. Le choix humain initial
+et l’autorisation d’installer le compte/service appartiennent à l’opérateur.
+
+Le précontrôle public 03d ajoute `swarm identity bootstrap-check` avant ouverture
+de projet : manifeste V1 exact, empreinte attendue indépendante, UID service
+effectif et répertoires privés distincts sans mutation. Il réutilise le parcours
+de chemins du stockage. Les UID sont une déclaration de frontière, pas une
+preuve de confinement ; le principal reste déclaré, pas authentifié. Ce contrôle
+ne crée aucun compte/service/lock, ne modifie pas la configuration métier et ne
+constitue pas son activation. Le service et sa source humaine restent à raccorder.
 
 ## Besoin et état observé
 
@@ -112,10 +141,14 @@ du principal initial, configuration protégée, service vérifié et autorité d
 déploiement restent des préconditions d’activation. Le contexte pilote n’autorise
 aucune dérogation aux contrôles d’identité, de délégation ou de révocation.
 
-Le principal humain initial (issuer, sujet externe et liaison locale) doit être
-désigné explicitement avant enrôlement réel. Le nom du compte local ou d’un rôle
-ne le remplace pas. L’absence de ce choix ne bloque pas les tests du format,
-mais bloque toute activation que ces tests ne pourraient pas autoriser.
+Le principal humain initial doit être enrôlé explicitement avant activation réelle.
+Précision utilisateur du 17 octobre : aucun fournisseur d’identité disponible ;
+le parcours par défaut crée un compte humain local personnel, configurable dans
+l’UX initiale puis Admin. Un fournisseur externe devient une option, pas un
+prérequis. L’autorité locale produit alors son émetteur propre à l’installation
+et un sujet stable après vérification du compte. Un nom de compte système, un
+rôle ou un champ `human` ne remplace pas cette vérification. Le compte humain
+local authentifié est distinct de la catégorie technique `local` non attestée.
 
 ## Installation initiale et UX Admin — contrat cible IA3c.2f
 
@@ -138,7 +171,7 @@ ne prouve pas l’isolation des agents ni l’autorisation de leurs demandes.
 | --- | --- | --- |
 | Mode et canal de l’autorité | Configuration d’installation protégée et révisée, hors projet importable ; chemin local explicite ou origine distante validée selon l’adaptateur | Local pilote ou distant ; capacité non livrée signalée et refusée, jamais convertie en accès direct au journal |
 | Racine publique, contexte et témoin | Épinglage approuvé indépendamment de la réponse ; projet et checkpoints explicitement liés ; clé privée détenue par le service | Empreinte et portée affichables ; aucun secret dans le navigateur, l’environnement fournisseur ou les exports de projet |
-| Principal humain initial | Issuer, sujet externe et liaison locale désignés explicitement ; preuve d’autorité de bootstrap | Aucun premier appelant, UID, localhost, rôle Admin ou cookie cockpit transformé implicitement en autorité humaine |
+| Authentification humaine et principal initial | Compte humain local par défaut ; fournisseur d’entreprise optionnel. Émetteur et sujet stables produits après enrôlement vérifié ; bootstrap autorisé indépendant | Assistant initial et modal Admin ; aucun premier appelant, UID, localhost, rôle Admin ou cookie cockpit transformé implicitement en autorité humaine |
 | Configuration souhaitée et effective | Même validation dans setup, API, CLI et modal Admin ; révision attendue et état réel lu au service | Prévisualisation sans mutation, refus des écritures périmées, sauvegarde/réouverture et erreurs visibles ; sauvegarder ne marque pas « protégé » |
 | Changement de mode ou de racine | Opération autorisée conservant preuves, consommation, réservations et continuité des checkpoints ; revalidation avant usage | Effets et prérequis montrés avant application ; aucun effacement/réenrôlement implicite, aucune clé apprise automatiquement du pair |
 
@@ -148,6 +181,67 @@ Il affiche mode demandé/effectif, état de vérification et prochaine action ut
 Les détails techniques restent dans une aide explicite ; le choix, ses effets et
 les causes de refus restent visibles. FR/EN, thèmes et navigation clavier doivent
 être vérifiés. Aucun écran n’est modifié dans cette tranche documentaire.
+
+### Démarrage sans fournisseur externe — décision UX adoptée
+
+Deux réglages distincts sont présentés : **Authentification humaine** (« Compte
+local », présélectionné ; « Fournisseur d’entreprise », optionnel) et
+**Hébergement de l’autorité** (local pour le pilote ; distant signalé comme
+prévu tant que non livré). Changer l’un ne modifie pas automatiquement l’autre.
+Le fournisseur de modèle IA reste une configuration distincte.
+
+Au premier lancement d’une installation vierge, l’assistant propose le compte
+local personnel et guide sa création et la vérification du bootstrap. Aucun
+compte ou mot de passe partagé n’est préinstallé. Le premier visiteur ne devient
+pas administrateur : l’amorçage doit être lié à une preuve d’installation remise
+hors du canal accessible aux agents, puis consommée une seule fois. Le secret
+personnel est saisi uniquement dans le parcours de l’autorité ; il n’est ni
+conservé dans le navigateur ni remis au modèle. Stockage dérivé du mot de passe,
+protection des sessions et réauthentification des opérations sensibles restent
+à implémenter et à vérifier, avec une bibliothèque éprouvée. Aucune politique
+de durée ou de tentatives arbitraire n’est fixée par cette décision.
+
+L’absence de fournisseur externe ne doit donc pas empêcher la préparation d’un
+modèle de workflow ni son démarrage après cet enrôlement local. L’exécution
+protégée exige toujours identité, droits, état courant et confinement vérifiés.
+L’assistant affiche le prérequis manquant et son action de résolution ; il ne
+présente jamais un démarrage sans ces contrôles comme une exécution protégée.
+Une erreur de lecture, une configuration invalide ou une installation déjà
+enrôlée ne déclenche jamais de retour automatique au mode initial.
+
+Admin doit afficher le mode demandé, le mode effectif et les vérifications
+manquantes. La configuration est persistante et révisée ; setup, API, CLI et
+UX partagent validation et refus. Prévisualiser ne crée ni compte ni droit.
+Un changement de fournisseur nécessite l’autorité déjà vérifiée, une liaison
+explicite des comptes et la revalidation des sessions ; ni nom ni adresse email
+communs ne fusionnent les identités ou leurs droits. L’historique est conservé.
+La révocation et la récupération d’un compte local ne réouvrent pas le bootstrap.
+
+```mermaid
+flowchart TD
+  S["Installation vierge : assistant<br/>cible non livrée"] --> L["Compte humain local présélectionné"]
+  S --> O["Fournisseur d'entreprise optionnel"]
+  L --> B["Bootstrap autorisé et compte vérifié"]
+  O --> B
+  B --> C["Configuration persistante et révisée<br/>autorité locale du pilote"]
+  C --> V["Identité et droits courants<br/>confinement vérifié"]
+  V --> W["Exécution du workflow<br/>identité suivie sur tout le parcours"]
+  A["Admin : modification autorisée"] --> C
+  V --> E["Prérequis manquant : refus visible<br/>action de résolution, aucun secours permissif"]
+```
+
+Critères IA3c.2f-04-UX1 à UX7, propriétaire Codex : (1) parcours neuf sans IdP
+externe, défaut local visible et vérification avant lancement ; (2) amorçage
+concurrent, rejoué ou présenté par un agent refusé sans création de droit ;
+(3) sauvegarde, réouverture et redémarrage conservant valeurs et historique ;
+(4) défaut appliqué uniquement à une installation vierge, jamais après erreur
+ou perte de configuration ; (5) preview sans mutation, refus d’écriture périmée
+et parité API/CLI/Go/UX ; (6) migration/révocation/récupération sans usurpation
+par nom/email, sans réactivation implicite ni perte de filiation ; (7) FR/EN,
+thèmes, clavier, erreurs et parcours public complet jusqu’au workflow.
+Ces critères sont définis, non exécutés. Le schéma de configuration actuel ne
+contient pas encore ce choix d’authentification : ne pas y injecter un défaut
+silencieux ou réinterpréter ses anciens pins. Le raccord produit reste ouvert.
 
 La configuration de l’autorité ne peut pas se créer ses propres droits : son
 initialisation passe par le bootstrap autorisé et ses modifications par des
@@ -165,7 +259,9 @@ local → distant est une migration explicite avec historique conservé et preuv
 
 ```mermaid
 flowchart TD
-  I["Installation initiale<br/>cible, non livrée"] --> C["Choix explicite de l'autorité"]
+  I["Installation initiale<br/>cible, non livrée"] --> C["Hébergement : local par défaut"]
+  I --> H["Compte humain local par défaut<br/>fournisseur d'entreprise optionnel"]
+  H --> V
   A["Modal Admin<br/>cible, non livré"] --> V["Droits, validation commune<br/>révision attendue et preview"]
   C --> V
   V --> S["Configuration protégée persistante<br/>hors sources agents/import"]

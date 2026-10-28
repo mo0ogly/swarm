@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-17T16:27:27.694491+00:00",
+  "owner": "Codex",
+  "incidents": [
+    {
+      "kind": "patch-context",
+      "error": "apply_patch verification failed: Failed to find expected lines in internal/enrollmentconfig/store_linux.go",
+      "cause": "Une ligne vide supposée avant la création du Store était absente ; hashes des deux producteurs inchangés",
+      "recovery": "Contexte réel relu ; extraction bornée par symboles et hash initial, sans écrasement tiers"
+    },
+    {
+      "kind": "collector-before-go",
+      "error": "FileNotFoundError: internal/engine/agent_identity_bootstrap_linux_test.go.jsonl",
+      "cause": "La boucle d’archivage réutilisait le nom du lot comme nom de chemin",
+      "go_executed": false,
+      "recovery": "Variable path_name distincte, script original conservé, syntaxe vérifiée, reprise avec label neuf 02"
+    },
+    {
+      "kind": "incomplete-build-inputs",
+      "cause": "Collecteur limité à internal/cmd et modules : resources.go racine et ses 274 ressources embarquées non manifestés",
+      "origin": "Coordination M32 sur ses assets figés, puis inspection du producteur resources.go et go list -json .",
+      "original_proofs": "Lots 04 conservés ; preuve de comportement et stabilité Go, couverture incomplète des entrées du binaire",
+      "correction": "Collecteur suit root GoFiles et EmbedFiles ; overlay de 137 assets web seulement, aucune source Go substituée ; nouveaux lots 05",
+      "state": "qualification en cours, sources Go inchangées",
+      "resolution": {
+        "state": "verified",
+        "runs": "05 puis 07 avec contrat capitalisé",
+        "inputs": 1123,
+        "embedded": 274,
+        "web_overlay": 137,
+        "go_overlay": 0
+      }
+    },
+    {
+      "kind": "document-update-assertion",
+      "error": "AssertionError: `*-engine-04-run.json`",
+      "cause": "Référence de ligne supposée absente du rapport ; aucune écriture de rapport avant assertion",
+      "recovery": "Table actuelle relue, patch sur ses lignes exactes ; aucun source Go affecté"
+    }
+  ],
+  "fixture_recovery": {
+    "original": "normal-packages-02.jsonl",
+    "diagnostic": "diagnostic-path-03.jsonl",
+    "cause": "Parent T.TempDir mode 0775",
+    "correction": "Chmod(0700) des fixtures et témoin Load valide avant chaque injection ; code produit inchangé",
+    "verified": "normal/race-packages-04"
+  },
+  "capitalization": {
+    "at": "2026-10-17T17:02:35.594092+00:00",
+    "M32_window": "closed by received message",
+    "personal_context_reception": "updated AGENTS block observed",
+    "frame_failure": "workflow-learning-06-derived.json",
+    "correction": "same requirements compacted; -63 bytes; engine bound unchanged",
+    "verified": "workflow-learning-07 and normal/race-engine-07",
+    "receiver": "full prefix received by local worker fixture and retained after reopen",
+    "real_provider": false
+  }
+}

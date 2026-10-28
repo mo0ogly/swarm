@@ -22,3 +22,32 @@ avec le contexte local complet ; aucune équivalence globale au tree Git déduit
 PA02/03 partiels,0/17 ; service protégé, autorité courante/COMMIT de ref,
 réconciliation, UID/humain/approbations indépendantes et PA13/RETEX final ouverts.
 Reprise technique : CONTINUITE-76.md, garde de source détenue et fichiers privés.
+
+
+## Extension autorisée — tous les changements du projet
+
+Après le premier commit PAEA, l’utilisateur demande explicitement « non commit
+tout ». Inventaire : environ31Go/162000fichiers non suivis, dont caches et ELF
+supérieurs à100Mio. Décision suivante explicite : « Les garder localement et
+publier tout le projet ». Toutes les autres évolutions, documents, médias, tests,
+configurations et106suppressions préparées sont donc inclus, sans restriction
+au propriétaire de la session. Aucune preuve locale n’est supprimée par ce choix.
+
+Les règles Git ignore des nouveaux arbres evidence/private de docs et des caches
+Rust target conservent ces données localement ; les rapports déjà suivis restent
+suivis. Sources de recettes pérennes hors de ces arbres. Quelques blancs finaux
+observés dans les sources/docs courantes sont normalisés, sans changement de
+contrat ; originaux et empreintes conservés dans le dossier local de publication.
+Les patches historiques conservent leurs espaces de contexte, les articles et la
+licence de référence gardent leurs octets : diagnostics whitespace archivaux
+explicitement séparés des sources actives. Le commit ne vaut pas qualification
+fonctionnelle globale des travaux concomitants ni reconstruction du binaire232.
+
+Contrôle du lot global : le collecteur de publication repère49nouveaux
+instantanés bruts Go/conteneurs imbriqués hors des dossiers evidence. Ils n'étaient
+pas dans HEAD ; leur ajout à l'index est retiré, leurs octets restent sur disque
+et les règles ignore empêchent une republication accidentelle. Le rapport initial
+REVIEW_REQUIRED est conservé ; nouvelle vérification sur le vrai index corrigé.
+Une ligne vide indentée dans le helper santé est normalisée (aucun jeton Python
+modifié) après le premier check ; sources actives et archives historiques restent
+distinguées. Aucune exception de donnée historique ne vaut succès du check global.

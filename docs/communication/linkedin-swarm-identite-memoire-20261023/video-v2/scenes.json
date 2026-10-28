@@ -1,0 +1,455 @@
+{
+  "title": "Swarm identité mémoire et contrôle humain",
+  "version": 2,
+  "duration": 100,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "language": "fr",
+  "audio": "Original procedural instrumental, no voice. No external samples or imitated artist.",
+  "scope": "Motion design explicatif ; aucun écran produit simulé comme une capture réelle. Architecture contractuelle et maturité native distinctes.",
+  "palette_source": "docs/UI-DESIGN.md",
+  "scenes": [
+    {
+      "id": "hook",
+      "start": 0,
+      "duration": 10,
+      "kicker": "LA CONTINUITÉ A UN RISQUE",
+      "title": [
+        "Une erreur peut survivre",
+        "à la session."
+      ],
+      "subtitle": "Une mémoire influence les décisions futures.",
+      "captions": [
+        {
+          "fr": "Une mauvaise commande peut devenir un souvenir.",
+          "en": "A bad command can become a memory."
+        },
+        {
+          "fr": "Puis revenir dans le contexte d’une autre instance.",
+          "en": "Then return in another instance’s context."
+        },
+        {
+          "fr": "Comment conserver la continuité sans hériter aveuglément de l’erreur ?",
+          "en": "How do we retain continuity without blindly inheriting the error?"
+        }
+      ],
+      "source_refs": [
+        "article-v4-fr.md",
+        "sources-v4-review.json"
+      ]
+    },
+    {
+      "id": "memory",
+      "start": 10,
+      "duration": 12,
+      "kicker": "01  MÉMOIRE",
+      "title": [
+        "Ce qui est retenu",
+        "peut être retransmis."
+      ],
+      "subtitle": "Lire, résumer et transmettre sont trois usages distincts.",
+      "captions": [
+        {
+          "fr": "Un résumé peut transporter une instruction injectée ou une conclusion erronée.",
+          "en": "A summary can carry an injected instruction or a mistaken conclusion."
+        },
+        {
+          "fr": "Une nouvelle instance doit retrouver les sources, la version et les conditions d’usage.",
+          "en": "A new instance needs the sources, version and conditions of use."
+        },
+        {
+          "fr": "Retirer une leçon ne réécrit pas les contextes déjà reçus.",
+          "en": "Withdrawing a lesson does not rewrite contexts already received."
+        }
+      ],
+      "source_refs": [
+        "M_VERSION",
+        "M_RIGHTS",
+        "M_PROVIDER",
+        "M_REPLACE"
+      ]
+    },
+    {
+      "id": "identity",
+      "start": 22,
+      "duration": 12,
+      "kicker": "02  IDENTITÉ",
+      "title": [
+        "Relier chaque agent",
+        "à une autorité précise."
+      ],
+      "subtitle": "Un contenu authentique peut rester erroné.",
+      "captions": [
+        {
+          "fr": "L’humain ou le service mandant, l’agent logique et l’instance sont distincts.",
+          "en": "The human or service principal, logical agent and instance are distinct."
+        },
+        {
+          "fr": "Le droit porte sur une opération, une ressource et une portée précises.",
+          "en": "Authority binds an exact operation, resource and scope."
+        },
+        {
+          "fr": "Une signature atteste une origine sous ses conditions de confiance ; elle ne prouve pas la vérité.",
+          "en": "A signature attests origin under its trust assumptions; it does not prove truth."
+        }
+      ],
+      "source_refs": [
+        "I_HUMAN",
+        "I_ACTOR",
+        "I_REQUEST",
+        "I_GRANT",
+        "I_JOURNAL"
+      ]
+    },
+    {
+      "id": "rust",
+      "start": 34,
+      "duration": 12,
+      "kicker": "03  MOTEUR DÉTERMINISTE",
+      "title": [
+        "Les agents proposent.",
+        "Le moteur contrôle."
+      ],
+      "subtitle": "Le cœur de Swarm est en Rust.",
+      "captions": [
+        {
+          "fr": "Le moteur relie le plan, les droits, les réservations, les budgets et les preuves.",
+          "en": "The engine connects the plan, permissions, reservations, budgets and evidence."
+        },
+        {
+          "fr": "Il vérifie les préconditions avant d’appliquer la transition autorisée.",
+          "en": "It checks preconditions before applying an authorized transition."
+        },
+        {
+          "fr": "Ces contrôles déterministes ne rendent pas le raisonnement du modèle déterministe.",
+          "en": "These deterministic checks do not make model reasoning deterministic."
+        }
+      ],
+      "source_refs": [
+        "A_ENGINE",
+        "A_SCHEDULE",
+        "A_POLICY",
+        "A_CONTEXT"
+      ]
+    },
+    {
+      "id": "human",
+      "start": 46,
+      "duration": 12,
+      "kicker": "04  VALIDATION HUMAINE",
+      "title": [
+        "En mode human,",
+        "un PASS ne suffit pas."
+      ],
+      "subtitle": "Le résultat attend la décision humaine requise.",
+      "captions": [
+        {
+          "fr": "Les contrôles produisent des preuves ; la revue IA examine le candidat.",
+          "en": "Checks produce evidence; AI review examines the candidate."
+        },
+        {
+          "fr": "La validation humaine exigée par la politique conserve son propre rôle.",
+          "en": "Policy-required human validation retains its own role."
+        },
+        {
+          "fr": "Un test vert ou un avis IA favorable ne libère pas les tâches suivantes.",
+          "en": "A passing test or favorable AI review does not release downstream tasks."
+        }
+      ],
+      "source_refs": [
+        "A_GATE",
+        "A_REVIEW",
+        "A_HUMAN",
+        "S_HUMAN",
+        "S_ACCEPT"
+      ]
+    },
+    {
+      "id": "supervision",
+      "start": 58,
+      "duration": 12,
+      "kicker": "05  SUPERVISION",
+      "title": [
+        "Décider, appliquer,",
+        "puis constater l’effet."
+      ],
+      "subtitle": "Le superviseur arbitre. Le moteur applique dans les droits.",
+      "captions": [
+        {
+          "fr": "Un incident reste lié à sa tâche, à son agent et à sa tentative.",
+          "en": "An incident remains linked to its task, agent and attempt."
+        },
+        {
+          "fr": "Le superviseur de périmètre décide ; la racine arbitre les questions transversales.",
+          "en": "The scope supervisor decides; the root handles cross-scope issues."
+        },
+        {
+          "fr": "La reprise demande un effet observé, pas seulement une annonce de correction.",
+          "en": "Recovery needs an observed effect, not just a claim of repair."
+        }
+      ],
+      "source_refs": [
+        "S_OBSERVE",
+        "S_SCOPE",
+        "S_ROOT",
+        "S_ENGINE",
+        "S_EFFECT"
+      ]
+    },
+    {
+      "id": "logs",
+      "start": 70,
+      "duration": 10,
+      "kicker": "06  TRACES ET PREUVES",
+      "title": [
+        "Pouvoir reconstruire",
+        "chaque décision."
+      ],
+      "subtitle": "Contexte reçu, décision et effet sont des preuves différentes.",
+      "captions": [
+        {
+          "fr": "Les sorties d’agents, événements et mesures conservent leurs sources.",
+          "en": "Agent outputs, events and measurements retain their sources."
+        },
+        {
+          "fr": "Le candidat, les contrôles et la fraîcheur des preuves restent liés.",
+          "en": "The candidate, checks and evidence freshness remain connected."
+        },
+        {
+          "fr": "Afficher un événement ne vaut pas acceptation du résultat.",
+          "en": "Displaying an event is not acceptance of the result."
+        }
+      ],
+      "source_refs": [
+        "L_ENGINE",
+        "L_ORIGINAL",
+        "L_CHAIN",
+        "L_ACCEPT"
+      ]
+    },
+    {
+      "id": "future",
+      "start": 80,
+      "duration": 10,
+      "kicker": "07  ACTIONS DE CONFIANCE",
+      "title": [
+        "Rendre les protections",
+        "examinables."
+      ],
+      "subtitle": "AC02 est enregistré et non démarré.",
+      "captions": [
+        {
+          "fr": "Le plan futur prévoit fichiers et processus Linux, réseau et usage encadré des secrets.",
+          "en": "The future plan covers Linux files and processes, networking and scoped secret use."
+        },
+        {
+          "fr": "Quatre vues prévues : politique, refus, chaîne d’une connexion et timeline.",
+          "en": "Four planned views: policy, denials, connection lineage and timeline."
+        },
+        {
+          "fr": "La reprise dépend de la qualification Rust puis d’une décision explicite.",
+          "en": "Starting depends on Rust qualification and an explicit decision."
+        }
+      ],
+      "source_refs": [
+        "A_AC02",
+        "L_SECURITY",
+        "docs/plans/actions-confiance/securite-execution-apex.md"
+      ]
+    },
+    {
+      "id": "closing",
+      "start": 90,
+      "duration": 10,
+      "kicker": "SWARM",
+      "title": [
+        "Relier l’agent",
+        "à ses actes."
+      ],
+      "subtitle": "Identité   ·   Mémoire   ·   Rust   ·   Contrôle humain",
+      "captions": [
+        {
+          "fr": "L’architecture complète tient en cinq vues détaillées, conservées dans le Word et les README.",
+          "en": "The complete architecture is retained in five detailed views in Word and the READMEs."
+        },
+        {
+          "fr": "Les parcours Rust sont qualifiés progressivement ; les raccords ouverts restent indiqués.",
+          "en": "Rust journeys are qualified progressively; open integrations remain identified."
+        },
+        {
+          "fr": "Sources publiques, limites et références sont reliées au document.",
+          "en": "Public sources, limits and references are linked in the document."
+        }
+      ],
+      "source_refs": [
+        "docs/diagrams/CONTRACT-MAP.md",
+        "sources-v4-review.json"
+      ]
+    }
+  ],
+  "cues": [
+    {
+      "start": 0.0,
+      "end": 3.3333333333333335,
+      "fr": "Une mauvaise commande peut devenir un souvenir.",
+      "en": "A bad command can become a memory."
+    },
+    {
+      "start": 3.3333333333333335,
+      "end": 6.666666666666667,
+      "fr": "Puis revenir dans le contexte d’une autre instance.",
+      "en": "Then return in another instance’s context."
+    },
+    {
+      "start": 6.666666666666667,
+      "end": 10.0,
+      "fr": "Comment conserver la continuité sans hériter aveuglément de l’erreur ?",
+      "en": "How do we retain continuity without blindly inheriting the error?"
+    },
+    {
+      "start": 10.0,
+      "end": 14.0,
+      "fr": "Un résumé peut transporter une instruction injectée ou une conclusion erronée.",
+      "en": "A summary can carry an injected instruction or a mistaken conclusion."
+    },
+    {
+      "start": 14.0,
+      "end": 18.0,
+      "fr": "Une nouvelle instance doit retrouver les sources, la version et les conditions d’usage.",
+      "en": "A new instance needs the sources, version and conditions of use."
+    },
+    {
+      "start": 18.0,
+      "end": 22.0,
+      "fr": "Retirer une leçon ne réécrit pas les contextes déjà reçus.",
+      "en": "Withdrawing a lesson does not rewrite contexts already received."
+    },
+    {
+      "start": 22.0,
+      "end": 26.0,
+      "fr": "L’humain ou le service mandant, l’agent logique et l’instance sont distincts.",
+      "en": "The human or service principal, logical agent and instance are distinct."
+    },
+    {
+      "start": 26.0,
+      "end": 30.0,
+      "fr": "Le droit porte sur une opération, une ressource et une portée précises.",
+      "en": "Authority binds an exact operation, resource and scope."
+    },
+    {
+      "start": 30.0,
+      "end": 34.0,
+      "fr": "Une signature atteste une origine sous ses conditions de confiance ; elle ne prouve pas la vérité.",
+      "en": "A signature attests origin under its trust assumptions; it does not prove truth."
+    },
+    {
+      "start": 34.0,
+      "end": 38.0,
+      "fr": "Le moteur relie le plan, les droits, les réservations, les budgets et les preuves.",
+      "en": "The engine connects the plan, permissions, reservations, budgets and evidence."
+    },
+    {
+      "start": 38.0,
+      "end": 42.0,
+      "fr": "Il vérifie les préconditions avant d’appliquer la transition autorisée.",
+      "en": "It checks preconditions before applying an authorized transition."
+    },
+    {
+      "start": 42.0,
+      "end": 46.0,
+      "fr": "Ces contrôles déterministes ne rendent pas le raisonnement du modèle déterministe.",
+      "en": "These deterministic checks do not make model reasoning deterministic."
+    },
+    {
+      "start": 46.0,
+      "end": 50.0,
+      "fr": "Les contrôles produisent des preuves ; la revue IA examine le candidat.",
+      "en": "Checks produce evidence; AI review examines the candidate."
+    },
+    {
+      "start": 50.0,
+      "end": 54.0,
+      "fr": "La validation humaine exigée par la politique conserve son propre rôle.",
+      "en": "Policy-required human validation retains its own role."
+    },
+    {
+      "start": 54.0,
+      "end": 58.0,
+      "fr": "Un test vert ou un avis IA favorable ne libère pas les tâches suivantes.",
+      "en": "A passing test or favorable AI review does not release downstream tasks."
+    },
+    {
+      "start": 58.0,
+      "end": 62.0,
+      "fr": "Un incident reste lié à sa tâche, à son agent et à sa tentative.",
+      "en": "An incident remains linked to its task, agent and attempt."
+    },
+    {
+      "start": 62.0,
+      "end": 66.0,
+      "fr": "Le superviseur de périmètre décide ; la racine arbitre les questions transversales.",
+      "en": "The scope supervisor decides; the root handles cross-scope issues."
+    },
+    {
+      "start": 66.0,
+      "end": 70.0,
+      "fr": "La reprise demande un effet observé, pas seulement une annonce de correction.",
+      "en": "Recovery needs an observed effect, not just a claim of repair."
+    },
+    {
+      "start": 70.0,
+      "end": 73.33333333333333,
+      "fr": "Les sorties d’agents, événements et mesures conservent leurs sources.",
+      "en": "Agent outputs, events and measurements retain their sources."
+    },
+    {
+      "start": 73.33333333333333,
+      "end": 76.66666666666667,
+      "fr": "Le candidat, les contrôles et la fraîcheur des preuves restent liés.",
+      "en": "The candidate, checks and evidence freshness remain connected."
+    },
+    {
+      "start": 76.66666666666667,
+      "end": 80.0,
+      "fr": "Afficher un événement ne vaut pas acceptation du résultat.",
+      "en": "Displaying an event is not acceptance of the result."
+    },
+    {
+      "start": 80.0,
+      "end": 83.33333333333333,
+      "fr": "Le plan futur prévoit fichiers et processus Linux, réseau et usage encadré des secrets.",
+      "en": "The future plan covers Linux files and processes, networking and scoped secret use."
+    },
+    {
+      "start": 83.33333333333333,
+      "end": 86.66666666666667,
+      "fr": "Quatre vues prévues : politique, refus, chaîne d’une connexion et timeline.",
+      "en": "Four planned views: policy, denials, connection lineage and timeline."
+    },
+    {
+      "start": 86.66666666666667,
+      "end": 90.0,
+      "fr": "La reprise dépend de la qualification Rust puis d’une décision explicite.",
+      "en": "Starting depends on Rust qualification and an explicit decision."
+    },
+    {
+      "start": 90.0,
+      "end": 93.33333333333333,
+      "fr": "L’architecture complète tient en cinq vues détaillées, conservées dans le Word et les README.",
+      "en": "The complete architecture is retained in five detailed views in Word and the READMEs."
+    },
+    {
+      "start": 93.33333333333333,
+      "end": 96.66666666666667,
+      "fr": "Les parcours Rust sont qualifiés progressivement ; les raccords ouverts restent indiqués.",
+      "en": "Rust journeys are qualified progressively; open integrations remain identified."
+    },
+    {
+      "start": 96.66666666666667,
+      "end": 100.0,
+      "fr": "Sources publiques, limites et références sont reliées au document.",
+      "en": "Public sources, limits and references are linked in the document."
+    }
+  ]
+}

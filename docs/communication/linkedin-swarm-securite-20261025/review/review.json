@@ -1,0 +1,111 @@
+{
+  "scope": "documentation and French LinkedIn DOCX only",
+  "status": "VERIFIED_LOCAL_EDITORIAL_DELIVERY",
+  "date_paris": "2026-10-25",
+  "owned_files_sha256": {
+    "README.md": "c2329b4004d053769dc3aa2d8173fe79a3f1127d786d318303eeebd0df9d87d8",
+    "README.en.md": "afdcc39b866fa368f32fd28627173e18509c3ee0215a8483d60b98db1af585ab",
+    "docs/actions-confiance-referentiels.md": "f7074ac03d982e4328bae2fef1d723badcf898b4fc1e6d5d08705e946252b826",
+    "docs/en/actions-confiance-referentiels.md": "6c33eeca75b6d579c61b9b5fc838c69eea35f206af500a631d98713b021c9c1f",
+    "docs/SECURITY-POSITIONING.md": "6e8ec5273e1bdcc05420e373bc3257efb86c136fb7412d179c6c4c38fb425543",
+    "docs/en/SECURITY-POSITIONING.md": "8b5b70dad14c6bfa4182eea1e18d712d80f32b993e1c1d08c68ee4384e902879",
+    "docs/communication/linkedin-swarm-securite-20261025/README.md": "5e5827700a9c0e5c3a8694ac23951ceeb03a178e5f2d1509e8ccf64f1c8cf22f",
+    "docs/communication/linkedin-swarm-securite-20261025/article-fr.md": "ef1fa9e804b6758b94c506fbca5eab16a565c3e3bc76a4f04a5a2886fd667100",
+    "docs/communication/linkedin-swarm-securite-20261025/post-fr.txt": "a7720304a3a57511ca6bc5ee2a2dd22786b1c92ef2e8ca742045a18cbf2e9313",
+    "docs/communication/linkedin-swarm-securite-20261025/build_word.py": "0fe0954cba958c028f2c58ff1fb5e87f40d4967abd27b3e4b30dc1145fd72040",
+    "docs/communication/linkedin-swarm-securite-20261025/Swarm_Securite_LinkedIn.docx": "69f21845cf8477371aa961d18aa4fdf295f5c2eed5ff69ff75be3a47e1d08ed9"
+  },
+  "reference_sources_sha256": {
+    "docs/plans/migration-rust/PLAN.md": "9f82cfe7529f322cff62bbf618eb41041c3e3f15fd75b7139fa3bb9428067378",
+    "docs/architecture/AGENT-IDENTITY-CONTRACT.md": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59",
+    "docs/PROJECT-MEMORY.md": "a2cd094e4509f177b13c29cdf6306728e1db85030baf33748141a819f8922c67",
+    "docs/plans/migration-rust/FPA02A-MEMOIRE-20261025.md": "59848219b584846a2cafbd7d04f75c330f5301cd714a3e03748f834b4c0d80bb",
+    "docs/plans/actions-confiance/securite-execution-apex.md": "27df4d4d69882d2fbb647db7420b73093c09ef8d2211b6181f33bc31888a4dae",
+    "docs/actions-confiance-rust.md": "2d6d4aed3bb5018e9e48bdee5cf2ee8d421fc4a630c99357ffe8e6fe69ee4542",
+    "rust/crates/swarm-engine/src/biba.rs": "bd923188264230c9ac1219a520753143278ece7d0117736b702046afa784352c",
+    "tools/swarm_local.py": "374c58f34dc46a19ca8656159417fe6e5b23113f81e636944c3f0ab239f726a0"
+  },
+  "checks": {
+    "new_local_links": 40,
+    "missing_links": [],
+    "source_paragraphs_exact": 65,
+    "word_hyperlinks": 9,
+    "short_post_characters": 2275,
+    "article_words_including_sources": 1355,
+    "word_pages_rendered_and_visually_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "final_render": "render-final",
+    "functions_with_contract_docstrings": [
+      "add_inline",
+      "add_article",
+      "save_atomically",
+      "build",
+      "main"
+    ],
+    "fr_en_profile_ids": "PA-01..PA-08",
+    "whitespace": "PASS"
+  },
+  "review": {
+    "hardcoded_policies": {
+      "status": "REVIEWED",
+      "technical_presentation": [
+        "A4 size, margins, typography, spacing and keeping paragraphs together are editorial layout choices",
+        "HTTPS link subset and Markdown rejection are local builder format validation",
+        "PA identifiers, Biba levels and dated source descriptions change no product policies"
+      ],
+      "operator_policy_added": false,
+      "reference_version_pin_required_before_future_compatibility_claim": true
+    },
+    "function_documentation": {
+      "status": "REVIEWED",
+      "functions": [
+        "add_inline",
+        "add_article",
+        "save_atomically",
+        "build",
+        "main"
+      ],
+      "contract": "Purpose, inputs, outputs, local mutations, errors, atomic publication limits and lack of render approval documented"
+    },
+    "errors": {
+      "status": "REVIEWED",
+      "source_or_parsing_failure": "Propagates before output publication",
+      "save_failure": "Existing output retained until atomic replacement; sibling temporary retained on failure",
+      "directory_fsync_failure": "May follow visible replacement; inspect outcome before retry",
+      "visual_findings": "Title border and isolated paragraph ending reproduced, preserved and corrected; final five pages inspected",
+      "search_exit_one": "No matching compiled-resource reference was the expected empty search result; not a failed content assertion"
+    },
+    "documentation": {
+      "status": "REVIEWED",
+      "bilingual": true,
+      "runtime_claims": "Recorded source-scoped evidence, not rerun or independent qualification",
+      "previous_R19_statuses_preserved": true,
+      "no_new_confinement_or_certification_claim": true
+    }
+  },
+  "scope_limits": {
+    "runtime_tests_rerun": false,
+    "independent_review": false,
+    "runtime_changed": false,
+    "installed_new_binary": false,
+    "product_version_changed": false,
+    "published_to_linkedin": false,
+    "ac02_started": false
+  },
+  "retrospective": {
+    "cause": "Inherited Word Title border and pagination survived structural checks",
+    "verified_prevention": "Builder strips paragraph borders and retains paragraphs; final render shows correction",
+    "transmission": "Persisted builder and communication README; no native agent context changed"
+  },
+  "retained_intermediates": [
+    "first-render.docx",
+    "second-render.docx",
+    "render-v1",
+    "render-v2"
+  ]
+}

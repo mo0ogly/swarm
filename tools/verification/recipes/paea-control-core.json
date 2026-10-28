@@ -103,7 +103,7 @@
       ],
       "expected_exit": 0,
       "required_stdout": [
-        "9 passed; 0 failed",
+        "16 passed; 0 failed",
         "revocation_and_close_contend_during_real_storage_then_explicit_revoke_wins",
         "authority_failure_after_publication_is_unknown_preserves_result_and_exact_replay",
         "every_operation_requires_its_exact_signed_permission_including_replay_and_read"

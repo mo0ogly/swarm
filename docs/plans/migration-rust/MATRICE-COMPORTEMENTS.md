@@ -1,5 +1,7 @@
 # Matrice de migration : entrées et premiers comportements
 
+> **Instantané historique, non représentatif de l’état actuel.** Relecture du24octobre1454 : ce document contient des états devenus faux (watch/installation) et des comptes de présence qui ne mesurent pas la charge restante. Consulter la [situation actuelle du plan](PLAN.md#situation-actuelle--24-octobre-correction-de-pilotage1454). Les tableaux suivants sont conservés pour leur provenance ; leur régénération doit être requalifiée avant réutilisation de taux ou de délais.
+
 ## Actualisation196 — travaux parallèles intégrés
 
 [Matrice intégrée](evidence/20261022-parallel-196/matrix-integrated.json). **83 opérations CLI sur10 familles sont désormais détaillées**, en plus des137 entrées publiques ; ces niveaux se recouvrent. Les93 chemins HTTP ont leurs clauses/consommateurs/écarts et27 originaux Go conservés, contre7 sources de routes empreintées dans194. Aucun pourcentage global ni parité globale acceptée.
@@ -380,3 +382,38 @@ non exécuté et bloqué par l'outil115. `continuation-plan120.md` est adopté e
 implémentation pour observer les intentions avant dispatch ; pas encore qualifié.
 Ces résultats n'avancent pas la baseline199 et ne clôturent aucun lot global par
 simple décompte de tests. Les sources/profils65 et124 restent distincts.
+
+
+## Audit Biba Rust du 24 octobre 2026 — R09/T2 ouvert
+
+Le service Rust installé dev.50 ne porte pas le pilote Biba : huit commandes
+`trust` en FR/EN refusent `command_not_ported` (sortie2, Root de fixture absent).
+Après témoin HTTP authentifié200, les API trust-actions/trust-evidence et la page
+trust-actions répondent404.22observations,531entrées Rust/manifests/lock stables ;
+aucune compilation, mutation métier, mission ou nouvelle délégation.
+[Preuve, périmètre et critères de reprise](evidence/20261024-biba-audit/AUDIT.md).
+Les anciens reçus Go ne constituent pas une qualification Rust. Le moniteur par
+action, les niveaux dérivés, admission/mandats/accords/effets et leur suite de refus
+restent à porter et vérifier avant de fermer R09/T2. Propriétaire : Codex racine,
+migration Rust. Audit disponible, implémentation non réalisée par cette revue.
+Les pages T2 FR/EN signalent maintenant leur statut historique ; fichiers Rust,
+profils, politiques et service inchangés. Aucun rebuild/restart requis pour ces
+seuls documents non consommés par les embeds Rust inspectés.
+
+The installed Rust Biba pilot is not ported. Authenticated public probes confirm
+missing routes, rather than a session denial. Historical Go evidence is retained
+but does not qualify Rust. The linked audit preserves resumption criteria;
+this review changes documentation only and grants no extra execution authority.
+
+### BIBA-RUST local, 25 octobre 2026
+Le noyau R09/T2 est installé v0.1.1-dev.53 : moniteur et parcours local
+CLI/API/Admin/actions, deux effets simulés, preuves compatibles exécutées dans
+les deux sens. 58 tests Rust,56 assertions publiques,52 navigateur ; aucune
+acceptation globale ou extension automatique aux autres missions. Contrat
+[FR](../../actions-confiance-rust.md) / [EN](../../en/actions-confiance-rust.md),
+[preuve](evidence/20261024-biba-rust/delivery.json), [RETEX](evidence/20261024-biba-rust/RETEX.md).
+L’audit antérieur reste exact pour son ancien binaire et n’est pas réécrit.
+
+### Budgets préparation,26 octobre2026
+
+Enveloppe CLI/API/modale installée125 ; lecture historique CLI sans input et GET `/api/v1/preparations/budget` implémentée dans l’incrément suivant, qualification conservée dans [rapport](PREPARATION-BUDGET-READ-20261026.md). Ce delta remplace la ligne ancienne d’entrée absente dans ce périmètre précis : aucun appel IA préparation ni parité globale déduite.

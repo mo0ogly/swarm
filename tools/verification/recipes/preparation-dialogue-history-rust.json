@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "preparation-dialogue-history-rust",
+  "inputs": [
+    "tests/rust_preparation_dialogue.py",
+    "tests/rust_preparation_dialogue_browser.py",
+    "tests/rust_preparation_dialogue_ui.cjs",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_native_http_cli.py",
+    "rust/crates/swarm-engine/src/preparation_turn.rs",
+    "rust/crates/swarm-engine/src/preparation_models.rs",
+    "rust/crates/swarm-engine/src/models.rs",
+    "rust/crates/swarm-engine/src/model_wire.rs",
+    "rust/crates/swarm-engine/src/work.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_read.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_dialogue.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_methods.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "rust/crates/swarm-engine/src/lib.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/service/preparations.rs",
+    "rust/crates/swarm-web/src/service/native_admin.rs",
+    "web/preparation-native.js",
+    "web/prephase-dialogue.js",
+    "web/preparation-native-dialogue.js",
+    "web/prepare.html",
+    "web/prephase.css",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "tests/rust_preparation_ui.py",
+    "tests/rust_preparation_ui.cjs",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_preparation_plan.py",
+    "web/prephase-decisions.js",
+    "web/cockpit-native.js",
+    "rust/crates/swarm-web/src/service/native_preparation.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "core",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-dialogue-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_dialogue.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_DIALOGUE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "DIALOGUE_PASS 35"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "browser",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-dialogue-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_dialogue_browser.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_DIALOGUE_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "DIALOGUE_BROWSER_PASS 45"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "native-preparation-browser",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='preparation-ui-replay-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_ui.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('PREPARATION_UI_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_UI_PASS",
+        "PASS modal-shortcut-no-document-write",
+        "PASS refresh-no-unsaved-loss",
+        "PASS cas-explicit-local-recovery",
+        "PASS malformed-answer-replays-exact-event",
+        "PASS lost-save-no-second-write",
+        "PASS optional-metadata-keeps-document",
+        "PASS fr-etat-history-more-locks-during-read",
+        "PASS en-sombre-no-overflow-390"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "paea-personal-cli-native",
+  "inputs": [
+    "tests/paea_personal_native_driver.py",
+    "rust/crates/swarm-cli/tests/identity_personal.rs",
+    "tests/fixtures/paea_personal_tty.py",
+    "tests/fixtures/paea_personal_report_schema.py",
+    "schemas/paea/personal-lifecycle-cli-v1.schema.json",
+    "tools/verification/recipes/paea-personal-cli-native.json",
+    "tools/verification/recipe.py",
+    "tests/paea_personal_driver_binding_test.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "byte-bound-driver-and-actual-normal-personal-children",
+      "command": [
+        "python3",
+        "tests/paea_personal_native_driver.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PERSONAL_NATIVE_DRIVER_PASS tests=7",
+        "PASS personal_native_cold_enrollment_exact_once_and_recovery_fr_en",
+        "PASS personal_native_terminal_refuses_without_echo_or_bootstrap_use",
+        "PASS personal_native_observation_reports_match_closed_schema"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "refuse-wrong-normal-driver-and-maintained-source-before-child",
+      "command": [
+        "python3",
+        "tests/paea_personal_driver_binding_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS binding-refusal-normal",
+        "PASS binding-refusal-sha256",
+        "PASS binding-refusal-test_source_sha256",
+        "PERSONAL_DRIVER_BINDING_PASS cases=3"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Temporary CODEX_HOME used for the probe (never the user's ~/.codex).
+# Exporter settings were passed with `-c` in the final runs, see README.md.
+model = "fake-model"
+model_provider = "fake"
+[model_providers.fake]
+name = "fake"
+base_url = "http://127.0.0.1:47311/v1"
+wire_api = "responses"
+env_key = "FAKE_KEY"
+request_max_retries = 0
+stream_max_retries = 0

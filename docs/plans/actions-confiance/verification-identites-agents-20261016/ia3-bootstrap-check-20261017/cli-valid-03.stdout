@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "bootstrap_digest": "6f2889b4a3f6bbd7da0dd378584659a24715884754204cf224d594fb5413a40d",
+  "bootstrap": {
+    "schema_version": 1,
+    "pins": {
+      "installation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "authority_public_key": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc",
+      "bootstrap_principal": {
+        "principal_id": "operator",
+        "principal_kind": "human",
+        "issuer": "https://issuer.example",
+        "subject": "fixture-human"
+      }
+    },
+    "service_uid": 1001,
+    "controller_uid": 4294966294,
+    "configuration_directory": "/tmp/swarm-bootstrap-cli-x53nigq5/config",
+    "witness_directory": "/tmp/swarm-bootstrap-cli-x53nigq5/witness"
+  },
+  "storage_verified": true,
+  "human_authentication_verified": false,
+  "confinement_verified": false,
+  "service_started": false
+}

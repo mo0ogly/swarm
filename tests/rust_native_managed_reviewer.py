@@ -33,18 +33,19 @@ print(json.dumps(dict(type='turn.completed',usage=dict(input_tokens=7,output_tok
 '''
 
 
-def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dependent=False):
+def run(binary,profile,out,case='pass',reuse=None,before_binary=None,pending_dependent=False,cumulative_fixture=False):
     """Run one owned native lifecycle; preserve original refusal before recovery.
 
     Optional reuse names actual retained setup/control originals, never copied
     state. Old-binary refusal is tested before changing the inert program.
     pending_dependent is declared at fixture birth, never injected into retained
-    state. All
+    state. cumulative_fixture declares disjoint two-worker outputs and positive
+    control fixtures before their initial authorization. All
     faults follow valid original inputs; mutable fixture bytes are restored in
     finally. Native opinion publication never accepts a task or settles billing.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False);fixture=inspection.native.fixture
-    inspection.run(binary,profile,out/'inspection',reuse=reuse,context_bytes=0,pending_dependent=pending_dependent)
+    inspection.run(binary,profile,out/'inspection',reuse=reuse,context_bytes=0,pending_dependent=pending_dependent,cumulative_fixture=cumulative_fixture)
     setup=json.loads((out/'inspection/setup.json').read_bytes());root=Path(setup['root']);work=setup['work']
     environment=dict(os.environ,CODEX_HOME=str(root/'codex-home'));checks=[]
     def call(label,args,value=None,success=True,exe=binary):

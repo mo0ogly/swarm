@@ -110,7 +110,7 @@ def report_continuation(owned, agents, output, *, publication_refusal=False, git
         print('PASS managed-auto-retains-raw-source-without-repository-callback',flush=True)
 
 
-def run(binary, profile, out, *, project_subdir="", publication_refusal=False, git_callbacks=False, controls=None,source_entries=None,pending_dependent=False):
+def run(binary, profile, out, *, project_subdir="", publication_refusal=False, git_callbacks=False, controls=None,source_entries=None,pending_dependent=False,disjoint_results=False):
     """Run two authentic server admissions with public pause/reopen/resume barriers.
 
     A Linux subreaper caller owns every cleanup child. Saved child task budget2
@@ -124,6 +124,8 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
     retain original traceback plus independent cleanup errors, with no retry.
     pending_dependent preplans a third dependent task, never launched here; the
     explicit fixture task budget grows to three without changing product policy.
+    disjoint_results gives each inert worker its own output/release filenames at
+    birth, preserving actual immutable outputs for conflict-free cumulative tests.
     """
     out.mkdir(mode=0o700,parents=True,exist_ok=False)
     qualified=json.loads(profile.read_bytes())
@@ -147,7 +149,7 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
     print('PASS managed-auto-public-origin-label-refuses-without-authority',flush=True)
     fixture.publish(out/'fixture.json',dict(root=str(root),work=f.work,paid_provider=False,private_sql_writes=False))
     listener=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
-    server=connection=supervisor=None;fds=[];agents=[];checks=[];errors=[];primary=None;reaped=True;nonce=None
+    server=connection=supervisor=None;fds=[];agents=[];checks=[];errors=[];primary=None;reaped=True;nonce=None;release_name="release-worker.json"
     path=lambda action:'/api/v1/mission?'+urlencode(dict(work=f.work,action=action))
     def passed(name):
         """Emit and retain each actual assertion, not an exit-only success."""
@@ -156,7 +158,12 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
         listener.bind(str(root/'watch-provider.sock'));os.chmod(root/'watch-provider.sock',0o600);listener.listen(1)
         for turn in range(2):
             nonce=fixture.digest((str(root)+':'+str(turn)).encode())
-            fixture.publish(root/'codex',worker.provider_program(nonce).replace("control.connect('../watch-provider.sock')","control.connect("+repr(str(root/'watch-provider.sock'))+")").encode());(root/'codex').chmod(0o700)
+            program=worker.provider_program(nonce)
+            handoff_name='handoff.md';release_name='release-worker.json'
+            if disjoint_results:
+                handoff_name='handoff-'+str(turn)+'.md';release_name='release-worker-'+str(turn)+'.json'
+                program=program.replace('model-received.json','model-received-'+str(turn)+'.json').replace('handoff.md',handoff_name).replace('release-worker.json',release_name)
+            fixture.publish(root/'codex',program.replace("control.connect('../watch-provider.sock')","control.connect("+repr(str(root/'watch-provider.sock'))+")").encode());(root/'codex').chmod(0o700)
             server=native.Server(binary,root,out,'turn-'+str(turn),environment=f.environment)
             identity=worker.observation(server.process.pid);server_fd=worker.attach(identity);fds.append(server_fd)
             csrf=server.request('/api/v1/native-session')['csrf_token']
@@ -199,7 +206,7 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
             server.stop();native.finish(server,None);server=None
             assert worker.observation(supervisor['pid'])['ppid']==os.getpid()
             assert worker.supervision(f)['stopped_at']!=''
-            fixture.publish(workspace/'release-worker.json',dict(nonce=nonce,release=True))
+            fixture.publish(workspace/release_name,dict(nonce=nonce,release=True))
             select.select([supervisor_fd],[],[])
             waited,status=os.waitpid(supervisor['pid'],0);reaped=True
             assert waited==supervisor['pid'] and os.WIFEXITED(status) and os.WEXITSTATUS(status)==0
@@ -210,7 +217,7 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
             fixture.publish(out/('turn-'+str(turn)+'-completed.json'),dict(agent=agent,work=work))
             connection.close();connection=None
             # Each managed task owns a different copy; keep all producer originals.
-            assert (workspace/'handoff.md').is_file() and (workspace/'release-worker.json').is_file()
+            assert (workspace/handoff_name).is_file() and (workspace/release_name).is_file()
             if turn==0:
                 manifest=storage/('native-worker-'+agent['id']+'.json');original=manifest.read_bytes()
                 before=f.snapshot();invalid=json.loads(original);invalid['untrusted_extra']=True
@@ -246,7 +253,7 @@ def run(binary, profile, out, *, project_subdir="", publication_refusal=False, g
     finally:
         if server is not None:worker.retain_failure(errors,lambda:native.finish(server,None))
         if primary is not None:
-            release=workspace/'release-worker.json' if workspace is not None else None
+            release=workspace/release_name if workspace is not None else None
             if nonce is not None and release is not None and not release.exists():worker.retain_failure(errors,lambda:fixture.publish(release,dict(nonce=nonce,release=True)))
             if supervisor is not None and not reaped:worker.retain_failure(errors,lambda:public.reap_cleanup_helper(supervisor))
             worker.retain_failure(errors,lambda:public.cleanup_owned_children(binary,root,out))

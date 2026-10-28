@@ -59,7 +59,8 @@ go.work.sum
 
 # Local Go-source reference artifacts (including recovery history).
 # Originals/hashes are retained locally; do not publish by accidental re-add.
-# Go-free evidence remains eligible; check go_publication_inventory.py before publication.
+# Reviewed Go-free reports remain eligible; raw snapshots below stay local.
+# Check go_publication_inventory.py before publication.
 /docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-contract-kernel-20261017/owned-changes.patch
 /docs/plans/actions-confiance/verification-identites-agents-20261016/ia2-durable-authority-20261017/owned-changes.patch
 /docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-config-witness-20261017/before-error-context-fix.tar.gz
@@ -183,3 +184,61 @@ go.work.sum
 
 # Personal internal GLM agent skill (local only)
 /.claude/skills/skynet-agents
+
+# User decision 2026-10-28: publish the whole project, retain the 31 GB of raw
+# qualification evidence, private fixture roots and generated build caches locally.
+# Existing tracked reports remain tracked; maintained recipes live in tools/tests.
+/docs/**/evidence/
+/docs/**/private/
+**/target/
+
+# Additional local legacy-source/nested proof snapshots found by publication scan.
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/before.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/build-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/build-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/build-07-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/candidate-01-go-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/diagnostic-path-03-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/final-source.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-engine-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-engine-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-engine-07-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-packages-01-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-packages-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-packages-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/normal-packages-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/public-cli-01-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/public-cli-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/public-cli-03-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/race-engine-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/race-engine-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/race-engine-07-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/race-packages-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/race-packages-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/shared-help-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/shared-help-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/source.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/vet-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/vet-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/vet-07-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/workflow-04-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/workflow-05-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/workflow-learning-06-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-bootstrap-check-20261017/workflow-learning-07-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/before-doc-precision-evidence.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/before-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/build-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/build-03-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/final-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/normal-engine-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/normal-engine-03-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/normal-launch-01-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/race-engine-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/race-engine-03-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/race-launch-01-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/source.diff
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/toolchain-contract.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/vet-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/vet-03-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/workflow-02-launch-sources.tar.gz
+/docs/plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/workflow-03-launch-sources.tar.gz

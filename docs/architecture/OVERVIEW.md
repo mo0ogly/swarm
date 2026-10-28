@@ -1,5 +1,11 @@
 # Architecture interne de Swarm
 
+Historique de planification : [contrat de lecture natif](NATIVE-PLANNING-HISTORY.md), sans exécution des décisions.
+
+La consultation locale dispose de son [contrat natif API/CLI](NATIVE-SESSION-VISIT.md),
+avec reçu auxiliaire distinct et reprise, et les [erreurs JSON API](NATIVE-HTTP-ERRORS.md)
+distinguent entrée invalide et échec de réponse. Les preuves et limites restent dans le plan de migration.
+
 [English](../en/ARCHITECTURE.md) · [README](../../README.md) · [Sources des schémas](../diagrams/CONTRACT-MAP.md)
 
 

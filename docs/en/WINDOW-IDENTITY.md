@@ -29,6 +29,16 @@ Long informational dialogs start at the title. `SwarmShell.focusWindowStart(dial
 focuses the labelled title programmatically and resets the dialog scroll position.
 Forms keep native input focus. Escape and close actions restore the opener focus.
 
+Verify final contrast after actual control CSS animations complete
+(`getAnimations()` and each `animation.finished` promise), then check normal, hover and keyboard-focus states.
+A theme transition's intermediate color can hide an unreadable final pair.
+Primary controls use the shared action background/foreground/border together.
+Dialog `open=false` precedes the `close` event; check restored focus after that
+event, without an arbitrary sleep. The source recipe
+`tools/verification/recipes/trust-primary-ux.json` covers these controls on Trusted
+actions and PAEA, with read/preview doubles rather than native-service proof.
+See the [evidence and limits](plans/actions-confiance/paea/INCREMENT-13.md).
+
 Run `node tests/window_identity_ui.cjs BINARY EVIDENCE_DIRECTORY` and the existing
 design recipe for complete states, forms and interaction checks. The focused
 recipe checks FR/EN, both themes, desktop and mobile widths. It opens static

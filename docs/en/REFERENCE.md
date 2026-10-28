@@ -1,5 +1,8 @@
 # Swarm technical reference
 
+> Historical Go contract reference. The active CLI is Rust, with no Go fallback. Commands and Go build examples below are retained historical material and are not current installation instructions. Use [installation](INSTALL.md), native help and the active migration plan for availability.
+
+
 [Overview](../../README.en.md) · [User guide](USER-GUIDE.md) ·
 [Installation](INSTALL.md) · [Preparation and revision](PREPARATION-UX.md)
 
@@ -278,7 +281,13 @@ Preview takes `schema_version`, `expected_revision`, `action` and, for `purge`,
 Source files, reports and evidence files are never deleted. Operations reject
 active agents, intents, reservations, preparation exchanges, conductors or checks
 and recheck under lock. Receipts make resubmission idempotent. Restore conflicts
-leave the whole mission in trash. The web uses the same engine. Deletion also
+leave the whole mission in trash. Trash preview and receipt include
+`snapshot_sha256`; the token binds exact snapshot bytes, checked again before
+writing. Inconsistent Work, foreign dependent rows or replaced content are
+refused without partial restore or trash loss. Obtain a fresh preview after any
+change. Matching identity/revision attests neither authorship nor usage rights;
+see the [snapshot contract](WORK-ROW-CONTRACT.md#dynamic-snapshots-and-restoration).
+The web uses the same engine. Deletion also
 requires typing the exact mission name; merely opening or closing a preview has
 no effect.
 
@@ -338,3 +347,317 @@ npm run test:connections
 Browser recipes use isolated projects. The distributed binary does not require
 Python; some test recipes and user-configured agent checks do. Historical design
 notes describe particular experiments and are not substitutes for current tests.
+
+### Evaluation result statuses
+
+The evaluator accepts exactly one of five statuses: `PASS`, `FAIL`, `PARTIEL`,
+`NON TESTÉ`, `NON APPLICABLE`. Combinations (`FAIL|PARTIEL`), unknown values or
+surrounding spaces are rejected before any decision. A critical failure cannot
+be disguised as a combination to avoid its blocker. Count, evidence and reason
+rules still apply to each valid status. The fix requires the normal delivery
+path and does not automatically replace an already running binary.
+
+Evaluation weights must yield a finite aggregate in the numeric representation
+used. Overflow causes explicit refusal, without a new business ceiling on
+weights. If needed, rescale weights while preserving their proportions and
+prepare the scoring evidence again. A failed JSON result write also returns
+an error, even if the computed evaluation was favorable.
+
+Required plan controls use the same exact JSON keys as score calculation:
+`checks`, `id`, `gate`, `mandatory`. Case variants cannot satisfy different
+controls from those actually evaluated. Presence alone proves neither results,
+artifact freshness nor authority to accept the task.
+
+The repair is verified through the public gate CLI on isolated fixtures; active
+service deployment remains a separate operation.
+
+A running task cannot be closed without its recorded current attempt.
+Inconsistent state rejects with `attempt_state_invalid`, without inventing
+an attempt or clearing history. Repair must establish the missing evidence;
+another retry does not replace it.
+
+### Documentary sources — Rust engine
+
+`prepare files ID [SCOPE [QUERY]]` observes admitted names;
+`prepare source ID PATH START END` captures UTF-8 inclusive lines starting at1,
+with SHA-256 over the full file. Protected GET `/api/v1/preparations/files`
+(`id,scope,q`) and `/source` (`id,path,start,end`) share this reader; unknown or
+repeated query keys refuse. `prepare source-add ID --input REQUEST` and
+`source-remove` use the version1 writer with event_id, expected_revision and
+`source:{path,start_line,end_line,sha256}` (removal only needs path). The writer
+rereads and compares the digest, stores the timestamped excerpt and invalidates
+brief adoption/verdict/plan readiness. Documents, Work and commitments remain.
+An exact receipt replays without reopening the file. Removal needs neither the
+file nor available source policy. The Sources dialog uses these operations
+without model execution.
+
+Admin exposes twelve `preparation_source_*`/`preparation_sources_*` settings:
+file/excerpt/total/path/query bytes, lines, source count, directory/file/visit
+limits, extensions and excluded components. Settings group44 is complete or
+absent; older installations never silently adopt it. Numeric null means
+unlimited; zero blocks the corresponding volume. Empty extension lists admit
+no format; empty exclusions add no component exclusion. The initial `private`
+exclusion protects known private proof directories, without universal private
+data detection. Visit/result caps bound neither time nor memory: directory
+entries are enumerated and sorted before applying them.
+
+Known private paths, traversal, symlinks, special files, NUL, invalid UTF-8 and
+secret-shaped full-file content refuse. Descriptor checks bind .swarm and the
+database; this is neither OS confinement nor an atomic snapshot of concurrent
+file edits. Preview grants no execution authority. Malformed nested JSON objects
+return `preparation-request-invalid`; a decoded monetarily invalid budget returns
+`preparation-budget-invalid`. Duplicate/alias/null projection starts at initial
+Go-compatible decoding, preserving finite limits.
+
+### Project-instruction status — Rust
+
+`project-profile show` and `project-profile check` observe current metadata for
+preparation/planner/subplanner/worker/reviewer. Protected GET/HEAD
+`/api/v1/project-profile` returns the same status without query/body. The shared
+context reader enforces saved policies, recognizable-secret refusals and the
+existing memory guard. Role reads are sequential: they establish neither atomic
+filesystem consistency, agent receipt/authentication nor future authorization.
+
+Detection of three known Claude paths checks only contained regular-file metadata;
+native settings contents are never opened/imported. Missing/nonregular/outside
+paths are excluded; other errors stay errors rather than empty success. The
+preparation page reuses the metadata dialog. Profile catalogue/selection/apply
+remain migration work. For this read, refusals expose a safe static identifier in failure.reason while
+internal causes remain hidden. The interface displays that identifier as text;
+control decisions still use stable codes without parsing message wording.
+
+A canonical source under `.claude/field-guide` still refuses with HTTP501 and
+`versioned-memory-source-guard-not-ported` until its versioned guard is ported.
+The status reader does not bypass this limitation.
+
+`prepare release-review ID` reads the same `{preparation, work}` object as GET
+`/api/v1/preparations/release-review?id=ID`. Two sequential observations are not
+an atomic snapshot: a later release must bind both revisions again. Work carries
+current task contracts, including edits since conversion. This read changes
+neither departure locks nor budgets.
+
+### Preparation conversation history — Rust
+
+`prepare dialogue ID` and GET/HEAD `/api/v1/preparations/dialogue?id=ID` read
+all retained turns in SQL insertion order. Row status is authoritative; invalid
+identity/type/causes refuse. used_in_brief/used_in_plan and stale are recalculated
+from current documents and observed method bytes. The private prompt cannot be
+serialized by this readonly DTO.
+
+Reading kills/finishes no process and changes no reservation. A pending/running/
+stopping turn explicitly refuses501 until its supervisor is ported. Completed
+history is readable as text in the existing conversation view; send/stop/use
+proposal remain unavailable. No polling, inherited20-turn cap or15s deadline is
+introduced. Future calls and policies require their own saved contract.
+
+### Rust preparation AI calls — local pilot
+
+The text API adapter, Admin v46 policy and Rust worker are installed in the local
+pilot; evidence and limits are in [the dedicated record](../plans/migration-rust/PREPARATION-AI-CALLS-20261026.md).
+Historical installations never enable calls implicitly. CLI-provider adapters and
+Work API agent execution remain explicitly unported.
+
+The native text flow exposes `prepare capabilities`, `prepare send ID --input
+JSON`, `prepare stop ID --input JSON`, `prepare dialogue ID` and
+`prepare use-proposal ID --input JSON`, with `--root ROOT --json`. Matching
+protected routes under `/api/v1/` are GET/HEAD `preparations/capabilities`, GET/HEAD
+`preparations/dialogue?id=ID`, POST `preparations/send`, POST `preparations/stop`
+and POST `preparations/command` for `use-proposal`.
+
+Admin v46 is complete or absent; historical installations never adopt it
+implicitly. Initial values: enabled0;8000 message bytes,96000 context bytes,
+20 turns,1048576 response bytes;300s timeout/600s maximum;200ms observation and
+2000ms refresh; `json` transport;100 HTTP/1 headers and16384 HTTP/2 header bytes
+(`u32` representation). All are persisted, validated and editable in Admin.
+The four caps accept `null` as unlimited and0 to deny nonempty content/a turn.
+Timeout0 requires maximum0 to remove the deadline; intervals stay positive.
+Unrepresentable local-clock durations refuse without fallback. SSE uses saved
+`agent_provider_event_max_bytes` per event and bounds assembled content; JSON
+bounds the entire response body.
+
+Only active configured text API connections are offered. The configured model
+is sent verbatim; its display proves neither backend nor provider account.
+No redirect, retry, fallback model or tool. Received text must be complete JSON;
+SSE reasoning and private prompts are never published. History/data are retained.
+Reservations become `estimated` before possible contact and are never refunded
+automatically after error, stop, missing usage or worker death. Token counts are
+provider declarations; no price or zero cost is invented.
+
+Any change to the settings journal, provider catalogues, selected method or
+project instructions invalidates an active call without relaunch; remote billing
+may already have occurred. Attached excerpts remain snapshots. Deployment switch
+`SWARM_PREPARATION_DISABLED=1` takes precedence. A living server reconciles its
+owned worker's death. After CLI exit, an orphan requires explicit `stop` recovery,
+without signalling a raw PID. Different host/boot/namespace refuses. Observations
+establish neither agent authentication nor OS confinement.
+
+Explicit comparison precedes `use-proposal` with event identity and CAS; version
+history and `source_turn` are preserved. Brief adoption remains explicit, and a
+plan still needs validation. This flow starts no mission. CLI provider adapters,
+legacy active turns and Work API agents remain outside this first integration.
+Versioned-memory sources retain their501 guard and static reason; removing it
+is not a recovery mode.
+
+Delivered historical compatibility: an exact completed Go turn can be
+replayed without native-worker metadata, provider contact or mutation. Parent and
+request hash still bind the record; another message conflicts. Legacy active
+turns remain explicitly unported (CLI and HTTP501). New calls still accept only
+empty/auto levels. See the historical replay migration record.
+
+### Rust project profile selection — local pilot
+
+`project-profile show|check|list` reads observations and suggestions;
+`preview|apply --input JSON` takes `{profile, expected_sha256}` and
+`select ID --input JSON` takes `{expected_sha256}`. Use `--root ROOT --json`;
+otherwise a localized heading precedes the complete document. Protected catalogue
+GET/HEAD is `/api/v1/project-profile/catalog`; POST
+`project-profile/preview|apply|select` uses shared session/CSRF and transport bounds.
+POST select takes `{id, expected_sha256}`.
+
+Profiles reference files and roles, never native permissions. Preview creates no
+temporary live profile, call or agent. It validates all five roles under saved
+Admin `project_profile_max_*`, `project_context_max_bytes` and
+`project_worker_context_max_bytes`. `null` remains unlimited and0 refuses nonempty
+content; the form adds no second ceiling. Hashes are observations, not approval
+of future contents: applying reads sources again.
+
+Apply compares the current SHA then atomically publishes `swarm.project.json`
+using Go-compatible JSON plus newline. An absent configuration uses NOREPLACE.
+Cooperating Root writers share an exclusive reservation; external editors are
+not confined. Late failures retain `configuration_may_be_recorded`: read and
+compare, never assume rollback. The catalogue may report `active_error` with
+an invalid active JSON profile's SHA for explicit repair, without calling it valid.
+
+Recognizable secrets are checked in names, paths and text. Actual `.swarm`/`.git`
+targets and aliases to non-Markdown/text files refuse; on Unix, multiple hardlinks
+and component redirection during open refuse. Evidence concerns Linux, not absence
+of every secret, OS confinement or agent attestation. Versioned memory retains
+its501 guard. The form keeps draft/original SHA on failure; refreshing never
+silently rebases it. Installation selects no live configuration. See the
+[migration record](../plans/migration-rust/PROJECT-PROFILE-SELECT-20261027.md).
+
+### Rust preparation into an existing work — local pilot
+
+A preparation created with an explicit `work_id` can materialize its validated
+plan into that work. Read-only `prepare release-review ID` and GET
+`/api/v1/preparations/release-review?id=ID` return current preparation and work;
+reread both revisions after a conflict. The historical route name grants no
+departure authority.
+
+`prepare create-missions ID --input JSON` and the shared POST require the plan
+SHA, `expected_revision` and `expected_work_revision`:0 creates a work, a current
+positive revision appends to the associated target. The form shows its title and
+revision before confirmation. Old tasks, plans, budgets, configuration and
+attempts remain; only new deterministic task IDs, gates, provenance and held
+locks are appended. A collision refuses; no old task is replaced.
+
+Tasks, locks, event and receipt share one transaction and final readback,
+including other preparations' unchanged locks. CAS refusals do not write.
+Uncertain commit or late-output failures retain existing uncertain/recorded
+diagnostics: reread or replay the exact same event. `release-plan` requires a
+separate confirmation and current revision; it releases only this conversion's
+tasks and preserves other tasks/locks. It may unpause an already configured
+conductor, without changing autonomy/budget or synchronously calling a provider.
+Initial team setup keeps its pristine contract; existing configured works use
+the supported public operations, never implicit organization adoption from a plan.
+No new timeout, ceiling or permission is introduced. Locally delivered in179; evidence and limits in the [record](../plans/migration-rust/PREPARATION-EXISTING-WORK-20261027.md).
+
+### Revising a materialized Rust plan — local pilot184
+
+After saving and validating a new plan, `prepare release-review ID` and GET
+`/api/v1/preparations/release-review?id=ID` add `revision` only when its hash
+differs from the conversion. It contains `plan_hash`, `spec` and ordered `changes`
+(Go wire labels: added, modified, kept, retired with history or dependent needing
+verification). The view compares the original plan, current work contract and
+new contract, exposing manual edits. Preparation, work and settings are sequential
+observations, not an atomic snapshot or approval of future contents.
+
+`prepare revise-missions ID --root ROOT --input JSON --json` or the shared POST
+`/api/v1/preparations/command` requires `version:1`, `action:revise-missions`,
+`preparation_id`, `event_id`, `expected_revision`, positive `expected_work_revision`
+and the new document `sha256`. The engine revalidates under current saved Admin
+policies and checks both revisions. Active agents, active/unresolved native
+reviews and held decisions block; reconcile through their supported public
+operations, never by deleting history.
+
+Revision preserves attempts, versions, prior reviews, plans and consumption. It
+archives impacted tasks' current reviews and invalidates results, including
+external dependents. Retired tasks stay `abandoned`; live dependencies on a
+retired task refuse. Changed control meaning, delegated branches or lost
+requirements require explicit reauthorization/reconfiguration. A recovery's
+stored limit remains when the authored ceiling is unchanged; an explicit plan
+reduction applies. This grants no permission, reservation or extra call.
+
+Work body, locks, pause, event and receipt share one transaction and final
+readback, including retained retired/foreign locks. New-plan tasks are held and
+cockpit/planning paused. `release-plan` remains explicit; it does not clear the
+revision's cockpit pause. Mission resumption uses its separate public control.
+Creating or releasing a plan attests neither execution nor acceptance.
+
+A Work conflict invalidates the review: close and reopen it for a new intention.
+An incoherent200 receipt instead keeps the original event pending for reread or
+replay; never invent another event after an unknown outcome. Late errors retain
+known/uncertain publication markers. See the
+[record and limits](../plans/migration-rust/PREPARATION-REVISION-20261027.md).
+
+### Preparation: Rust CLI adapters (pilot192)
+
+Preparation dialogue can offer configured absolute Claude/Codex executables with a saved model route and the Admin grant for unverified provider context. Custom/harness adapters and required probes remain refused. Individual route unavailability appears in `unavailable_providers` without hiding available API providers; read/decode errors remain failures.
+
+The worker owns its child behind a private channel. Sealed stdin carries the prompt in a private temporary directory with the allowed environment. Existing Admin settings supply deadlines, observation cadence and output limits; a saved zero deadline remains unlimited. Replies require a terminal event, successful process exit and the dialogue JSON contract. Tool restrictions are requested from the provider; their external effectiveness is not certified.
+
+Stopping does not undo remote costs. Attempted reservations stay estimated after failure/cancellation; missing/invalid consumption stays unknown. Documents are never adopted automatically. Changes to settings, configuration, executable, allowed environment or route invalidate the previous confirmation. Active historical Go turns are not adopted.
+
+Known structured Claude/Codex tool call/result declarations also interrupt the CLI stream: a later final answer cannot erase them. This certifies neither unseen events nor absence or rollback of external effects.
+
+### Explicit CLI levels — pilot195
+
+The `simple`, `standard`, `exigeant` levels appear in preparation CLI capabilities with their model, policy and digest, subject to saved announcements and restrictions. Automatic mode keeps its configured route; if denied, a human must choose an allowed explicit mode. No neighboring model is substituted. APIs keep their fixed model and refuse an explicit level. Manual reservations are neither pricing nor invoices.
+
+Explicit sends retain their level in private v2 metadata; API/automatic turns keep v1. An old worker refuses v2 before contact. Terminal receipts and budgets remain retained; finish/interrupt turns using a compatible version before downgrading. A pending event keeps its original payload after capability withdrawal, allowing known-state replay without an implicit new launch.
+
+### Profile sources and versioned memory — pilot201
+
+The context reader checks the physical path of the opened instruction. Within `.claude/field-guide`, local lessons referenced by memory versions and references to them in `index.md` are refused, including after withdrawal. Ordinary guides with no managed reference remain available. Imported and foreign-project versions do not declare local ownership; this rule neither admits nor selects a memory version.
+
+A separate read-only bound Root supplies the coherent Work inventory without borrowing the caller’s writer. Retained directory/database association is checked again. Inventory and close errors prevent context publication instead of becoming an empty list. Existing multiple-link, private-alias and containment refusals still apply. These observations freeze no filesystem and establish no agent permission.
+
+```mermaid
+flowchart LR
+ A[Opened instruction document] --> B[Physical path and bounded text]
+ B --> C{Local guide?}
+ C -- no --> G[Other context checks]
+ C -- yes --> D[Read-only bound Root and coherent Work inventory]
+ D --> E[Local versions and historical references]
+ E --> F{Managed source?}
+ F -- yes --> R[Refuse without publication]
+ F -- no --> G
+ D -- error --> R
+```
+
+### Explicit recovery of an active historical Go exchange (pilot216)
+
+History also observes `pending`, `running` and `stopping` exchanges without adopting
+their processes or applying the former15s automatic termination heuristic.
+`prepare stop ID --input FILE --json` and `POST /api/v1/preparations/stop` accept
+`{ "preparation_id": "ID", "turn_id": "TURN" }`. The interface exposes
+“Request or check stop” even when model calls remain disabled. Pending is fenced
+by SQL CAS before claim. For an observed live original supervisor, only `stopping` is recorded; receipt
+by that process is not established. Refresh or explicitly stop again after it ends
+to settle the turn. Missing/foreign
+identity or uncertain process observation refuses terminal settlement. No inherited
+signal or restart. Only `reserved` is released; `estimated` remains committed.
+An absent/corrupt ledger refuses and rolls back. Provider descendants can survive;
+remote termination or absence of cost is not established. Exact send replay of
+an active historical event returns its recorded state without dispatch, another reservation or worker adoption.
+Evidence/delivery: [plan](../plans/migration-rust/PREPARATION-LEGACY-ACTIVE-20261027.md).
+
+Journal format47 is accepted for initialization and changes under the same
+history-chain checks. Reading format46 adopts no value; upgrading to47 still
+requires explicit preview/apply. Unknown future versions refuse. The format bound
+is a protocol invariant, not a budget increase or automatic settings adoption.
+
+Rust `mission seen WORK --root ROOT [--json]` connects the historical consultation
+bookmark to the `visit mark` writer. Historical Visit JSON or FR/EN text; no
+`--input` document. Output failure can follow a recorded write: read back with
+`visit show WORK`. See NATIVE-SESSION-VISIT.md.

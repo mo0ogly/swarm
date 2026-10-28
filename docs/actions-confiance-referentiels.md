@@ -17,6 +17,15 @@ Le catalogue OSCAL officiel 5.2.0 est figé par révision et SHA-256 dans
 est conservée dans le dossier de vérification R19. Aucun catalogue distant n'est
 chargé à l'exécution du produit ou du validateur.
 
+## Positionnement et suite proposée
+
+Le [positionnement de sécurité de Swarm](SECURITY-POSITIONING.md) précise le rôle
+des références ISO, OWASP, NIST, SPIFFE et Biba. Son profil PA-01–08 est une
+proposition documentaire pour prolonger cette matrice avec des exigences,
+critères observables, propriétaires et preuves. Il ne modifie ni les statuts R19,
+ni les preuves historiques, ni la baseline non sélectionnée ; aucune compatibilité
+ACS, conformité globale ou protection AC-02 n’en est déduite.
+
 ## Lire et vérifier
 
 La carte **Contrôles et limites**, dans Actions de confiance, charge explicitement

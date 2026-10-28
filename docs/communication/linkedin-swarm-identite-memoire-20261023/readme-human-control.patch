@@ -1,0 +1,954 @@
+--- before/README.en.md
++++ README.en.md
+@@ -10,7 +10,9 @@
+ It connects requirements, planning, agents, checks and results to a persistent
+ mission. Its interface is available in French and English.
+ Its core is a **deterministic engine written in Rust** that owns mission state
+-and authorized transitions.
++and authorized transitions. Humans define rules and authority; the engine
++enforces the validation required by policy. In `human` mode, successful checks
++do not replace the human decision.
+ 
+ When several agents work on a project, someone still has to pass instructions,
+ manage dependencies, understand blockers and examine evidence. Swarm makes these
+@@ -23,7 +25,7 @@
+ establish Rust parity. See [native status](docs/en/RUST-MIGRATION.md), the
+ [active plan](docs/plans/migration-rust/PLAN.md) and [evidence and replays](docs/en/RUST-MIGRATION-REPLAYS.md).
+ 
+-[Videos](#videos) · [Capabilities and maturity](#capabilities-and-maturity) · [Architecture](#architecture) · [Identity](#identity-and-authority) · [Memory](#memory-and-context) · [Supervision](#supervision-and-recovery) · [Logs](#logs-live-views-and-traceability) · [Getting started](#getting-started) · [Documentation](#documentation) · [License](#license)
++[Videos](#videos) · [Capabilities and maturity](#capabilities-and-maturity) · [Architecture](#architecture) · [Human control](#human-control-and-validation) · [Identity](#identity-and-authority) · [Memory](#memory-and-context) · [Supervision](#supervision-and-recovery) · [Logs](#logs-live-views-and-traceability) · [Getting started](#getting-started) · [Documentation](#documentation) · [License](#license)
+ 
+ ## Videos
+ 
+@@ -38,6 +40,11 @@
+ available yet.
+ 
+ [Watch the MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4) · [French SRT captions](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt) · [Chapters and sources, FR](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
++
++[Updated Word article, in French](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v3.docx): persistent memory,
++identity, the Rust engine and human control, with five detailed views and sources.
++The earlier video is a shorter overview; the human-validation contract is explained
++[below](#human-control-and-validation).
+ 
+ ### Explore the graph — about 1 minute
+ 
+@@ -75,6 +82,7 @@
+ | Organize and supervise | Planner, scope owners, workers, independent review | Worker launch/watch, queued restart and planning → worker verified on CLI fixtures; other roles and web journeys remain open |
+ | Understand activity | Graph, attempts, reports, telemetry and waiting reasons | Selected read flows and live console verified; full cockpit remains open |
+ | Control starts and delivery | Dependencies, reservations, budgets, checks and evidence freshness | Contracts ported incrementally; global qualification remains open |
++| Validate results | `human` or `automatic` policy, preauthorized checks and a human decision when required | Native controller preserves `pending_human` in `human` mode; a PASS does not accept. Scoped local qualification is separate from protected human identity |
+ | Carry experience forward | Verified lessons learned, versioned memory and explicit selection | Rust G8 project/memory journey remains open; native context partially ported |
+ | Bound authority | Actor, instance, plan, grants, delegation and revocation | Internal components; global public integration and protected human approval remain open |
+ | Confine agents and network access | AC-02 plan: files/processes, network/secrets, lineage and security menus | **Plan saved, not started**; resume after Rust migration/qualification and an explicit start request |
+@@ -101,6 +109,25 @@
+ [component → source-section map](docs/diagrams/CONTRACT-MAP.md). A solid arrow
+ represents a contract relationship; it does not certify deployment.
+ 
++## Human control and validation
++
++Human control is part of the deterministic engine’s security contract. The user
++defines the objective, scope, rights and validation policy. AI supervisors direct
++the work within that authority.
++
++- In **`human`** mode, preauthorized checks provide evidence. Success leaves the
++  result awaiting a human decision and does not release downstream tasks. A
++  favorable AI review does not replace that decision.
++- In **`automatic`** mode, required checks and independent review still apply;
++  the engine checks the same candidate, criteria and freshness before acceptance.
++  The producer does not accept its own work.
++
++Native controls distinguish `pending_human` from `pending_review`. Their local
++evidence does not establish the complete protected human-authentication journey.
++Process supervision, AI review and human result validation are separate roles.
++
++[Human-validation contract](docs/en/ENGINE-ACCEPTANCE.md#checks-as-evidence-for-human-review) · [Rust139 status](docs/en/RUST-MIGRATION.md#ordinary-tasks-and-human-validation--wiring139-under-qualification).
++
+ ## Identity and authority
+ 
+ [![Swarm identity: authority source, registry and exact use](docs/diagrams/identity-authority-en.svg)](docs/diagrams/identity-authority-en.svg)
+@@ -130,6 +157,13 @@
+ digests, reception and recovery remain attributable. Withdrawal never rewrites
+ context already delivered.
+ 
++A mistaken instruction stored in memory can return in another instance.
++Provenance, admission and reuse conditions must remain examinable; memory creates
++no new right or authorization. The initial instruction is retained alongside
++attributed revisions. Supervisor additions are approved by default and rejectable
++before reservation; an already reserved attempt is not silently rewritten. This
++path is separate from human validation of the result.
++
+ Read, summarize and transmit rights bind an exact source and recipient. Conversation
+ recovery requires an explicit decision, preflight and new attempt; an unconfirmed
+ boundary requires examining effects. Porting status belongs to the technical matrix,
+@@ -150,7 +184,9 @@
+ `continue-run` retains the process and counters; `stop-run` requests termination
+ and then requires actual confirmation. Production observations, structured-inference
+ limits and global cycle judgment remain separate. Incidents return to their owner
+-until the effect is verified and the original objective resumes.
++until the effect is verified and the original objective resumes. A decision to
++continue or stop a process does not replace result validation: `human` mode still
++requires the human decision.
+ [Supervision](docs/en/RUN-SUPERVISION.md) · [AI/engine protocol](docs/en/AGENT-ENGINE-PROTOCOL.md) · [Cycles](docs/en/JUDGMENT-CYCLES.md).
+ 
+ ## Logs, live views and traceability
+@@ -165,7 +201,7 @@
+ They remain read-only; live SSE has an explicit polling fallback.
+ 
+ Originals and digests reconstruct **objective → decision → attempt → candidate →
+-check → review → acceptance**. Colored logs, reserved calls or missing cost become
++check → review → human validation when required → acceptance**. Colored logs, reserved calls or missing cost become
+ neither execution evidence, an invoice nor success.
+ [Console](docs/en/LOG-CONSOLE.md) · [Traceability](docs/en/TRACEABILITY.md) · [Call ledger](docs/en/CALL-ACCOUNTING.md) · [Native live contract](docs/en/RUST-MIGRATION.md).
+ 
+--- before/README.md
++++ README.md
+@@ -10,7 +10,9 @@
+ Il relie le besoin, la planification, les agents, les contrôles et les résultats
+ à une mission persistante. Son interface est disponible en français et en anglais.
+ Son cœur est un **moteur déterministe en Rust** qui porte l’état et les
+-transitions autorisées des missions.
++transitions autorisées des missions. Les règles et autorisations viennent de
++l’humain ; le moteur fait respecter les validations exigées par la politique.
++En mode `human`, des contrôles réussis ne remplacent pas la décision humaine.
+ 
+ Quand plusieurs agents travaillent sur un projet, il reste à transmettre les
+ consignes, gérer les dépendances, comprendre les blocages et examiner les preuves.
+@@ -24,7 +26,7 @@
+ constituent pas une promesse de parité Rust. Voir l’[état natif](docs/architecture/RUST-MIGRATION.md),
+ le [plan actif](docs/plans/migration-rust/PLAN.md) et les [preuves et rejeux](docs/plans/migration-rust/REPLAYS.md).
+ 
+-[Vidéos](#vidéos) · [Capacités et maturité](#capacités-et-maturité) · [Architecture](#architecture) · [Identité](#identité-et-autorité) · [Mémoire](#mémoire-et-contexte) · [Supervision](#supervision-et-reprise) · [Journaux](#journaux-direct-et-traçabilité) · [Démarrer](#démarrer) · [Documentation](#documentation) · [Licence](#licence)
++[Vidéos](#vidéos) · [Capacités et maturité](#capacités-et-maturité) · [Architecture](#architecture) · [Contrôle humain](#contrôle-humain-et-validation) · [Identité](#identité-et-autorité) · [Mémoire](#mémoire-et-contexte) · [Supervision](#supervision-et-reprise) · [Journaux](#journaux-direct-et-traçabilité) · [Démarrer](#démarrer) · [Documentation](#documentation) · [Licence](#licence)
+ 
+ ## Vidéos
+ 
+@@ -38,6 +40,11 @@
+ les preuves Rust ciblées et le chantier AC-02 prévu ; il ne filme pas l’application.
+ 
+ [Lire le MP4](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.mp4) · [Sous-titres SRT](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Supervision_Identite_Memoire.srt) · [Chapitres et sources](docs/communication/linkedin-swarm-identite-memoire-20261023/video/README.md)
++
++[Article Word actualisé](docs/communication/linkedin-swarm-identite-memoire-20261023/Swarm_Article2_Identite_Memoire_v3.docx) : mémoire persistante,
++identité, moteur Rust et contrôle humain, avec cinq vues détaillées et références.
++Le support vidéo antérieur est plus synthétique ; le contrat de validation humaine
++est précisé [ci-dessous](#contrôle-humain-et-validation).
+ 
+ ### Explorer le graphe — environ 1 minute
+ 
+@@ -75,6 +82,7 @@
+ | Organiser et superviser | Planificateur, responsables de périmètre, exécutants, revue indépendante | Lancement/suivi d’un worker, reprise en attente et planification → worker vérifiés sur fixtures CLI ; autres rôles et parcours web ouverts |
+ | Comprendre l’activité | Graphe, tentatives, rapports, télémétrie et causes d’attente | Lectures et console live ciblées vérifiées ; cockpit complet ouvert |
+ | Encadrer les départs et la livraison | Dépendances, réservations, budgets, contrôles et fraîcheur des preuves | Contrats portés par incréments ; qualification globale ouverte |
++| Valider les résultats | Politique `human` ou `automatic`, contrôles préautorisés et décision humaine lorsqu’elle est requise | Contrôleur natif : `pending_human` conservé en mode `human`, sans acceptation par un PASS ; qualification locale bornée, identité humaine protégée globale distincte |
+ | Transmettre l’expérience | RETEX vérifié, mémoire versionnée et sélection explicite | Parcours projet/mémoire Rust G8 ouvert ; contexte natif partiellement porté |
+ | Encadrer l’autorité | Acteur, instance, plan, octrois, délégation et révocation | Composants internes ; raccord public global et approbation humaine protégée ouverts |
+ | Confiner les agents et leurs accès réseau | Plan AC-02 : fichiers/processus, réseau/secrets, traçabilité et menus de sécurité | **Plan enregistré, non démarré** ; reprise après migration/qualification Rust et demande explicite |
+@@ -102,6 +110,26 @@
+ avec une [correspondance composants → sections sources](docs/diagrams/CONTRACT-MAP.md).
+ Un trait plein décrit une relation du contrat ; il ne certifie pas son déploiement.
+ 
++## Contrôle humain et validation
++
++Le contrôle humain fait partie du contrat de sécurité du moteur déterministe.
++L’utilisateur définit l’objectif, le périmètre, les droits et la politique de
++validation. Les superviseurs IA conduisent le travail dans ce cadre.
++
++- En mode **`human`**, les contrôles préautorisés apportent des preuves. Un succès
++  laisse le résultat en attente de décision humaine et ne libère pas les tâches
++  suivantes. Un avis IA favorable ne remplace pas cette décision.
++- En mode **`automatic`**, les contrôles et la revue indépendante prévus restent
++  exigés ; le moteur vérifie le même candidat, les critères et la fraîcheur avant
++  l’acceptation. Le producteur ne s’accepte pas lui-même.
++
++Les contrôles natifs distinguent `pending_human` et `pending_review`. Leurs preuves
++locales ne certifient pas encore le parcours complet d’authentification humaine
++protégée. La conduite d’un processus, la revue IA et la validation humaine sont
++des responsabilités distinctes.
++
++[Contrat de validation humaine](docs/ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) · [État Rust139](docs/architecture/RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification).
++
+ ## Identité et autorité
+ 
+ [![Identité Swarm : source d’autorité, registre et usage exact](docs/diagrams/identity-authority-fr.svg)](docs/diagrams/identity-authority-fr.svg)
+@@ -130,6 +158,14 @@
+ de la tâche, sélections extractives, révisions de consigne et frontières de dialogue.
+ Les versions, conditions, sources, empreintes, réceptions et reprises restent
+ attribuées. Le retrait ne réécrit pas les contextes déjà transmis.
++
++Une mauvaise instruction conservée en mémoire peut revenir dans une autre
++instance. La provenance, l’admission et les conditions de réutilisation doivent
++donc rester examinables ; une mémoire ne crée ni droit ni autorisation nouvelle.
++La consigne initiale est conservée, avec des révisions attribuées. Les ajouts du
++superviseur sont validés par défaut et rejetables avant réservation ; une tentative
++déjà réservée ne reçoit pas de réécriture silencieuse. Ce parcours est distinct
++de la validation humaine du résultat.
+ 
+ Les droits de lire, résumer et transmettre portent sur une source et un
+ destinataire exacts. La reprise d’une conversation demande une décision explicite,
+@@ -153,6 +189,8 @@
+ puis attend sa confirmation réelle. Les observations de production, les limites
+ d’inférence structurée et le jugement global de cycle restent distincts. Les
+ incidents reviennent au propriétaire jusqu’à l’effet vérifié et la reprise du besoin.
++La décision de continuer ou d’arrêter un processus ne remplace pas la validation
++du résultat : en mode `human`, celle-ci attend toujours la décision humaine requise.
+ [Supervision](docs/architecture/RUN-SUPERVISION.md) · [Protocole IA/moteur](docs/architecture/AGENT-ENGINE-PROTOCOL.md) · [Cycles](docs/architecture/JUDGMENT-CYCLES.md).
+ 
+ ## Journaux, direct et traçabilité
+@@ -168,7 +206,7 @@
+ lecture seule ; le direct SSE possède un repli explicite en interrogation.
+ 
+ Les originaux et les empreintes servent à reconstruire **objectif → décision →
+-tentative → candidat → contrôle → revue → acceptation**. Un log coloré, un appel
++tentative → candidat → contrôle → revue → validation humaine si requise → acceptation**. Un log coloré, un appel
+ réservé ou un coût absent ne devient ni preuve d’exécution, ni facture, ni succès.
+ [Console](docs/architecture/LOG-CONSOLE.md) · [Traçabilité](docs/architecture/TRACEABILITY.md) · [Registre](docs/architecture/CALL-ACCOUNTING.md) · [Direct natif](docs/architecture/RUST-MIGRATION.md#observation-en-direct-des-agents--live-ux-01-lecture-seule).
+ 
+--- before/docs/architecture/OVERVIEW.md
++++ docs/architecture/OVERVIEW.md
+@@ -28,6 +28,24 @@
+ les contrôles autorisés, prépare les pièces réellement reçues par la revue puis
+ revérifie droits, critères et fraîcheur avant la transition d’acceptation.
+ Une anomalie retourne au propriétaire ; elle ne devient pas un succès vide.
++
++### Validation humaine et politique du résultat
++
++Les règles et autorisations viennent des responsables humains. Une politique
++`human` peut contenir des contrôles préautorisés : leur succès produit des preuves,
++conserve l’attente de décision humaine et ne libère pas l’aval. La revue IA
++indépendante ne tient pas lieu de cette décision. Le mode `automatic` conserve
++ses contrôles et sa revue ; l’acceptation exige toujours les preuves applicables,
++le même candidat, les critères et la fraîcheur.
++
++Le contrôleur natif conserve `pending_human` et `human-validation-required`, avec
++les gates et checks manuels ; il ne fabrique pas de gate qualité à partir du seul
++PASS des commandes. Ce contrat de validation reste distinct de l’authentification
++humaine protégée et du raccord global de l’identité, encore ouverts.
++
++Sources : [validation humaine](../ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine),
++[raccord139](RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification),
++[contrôleur natif](../../rust/crates/swarm-engine/src/root_store/task_validation/gate.rs).
+ 
+ Sources : [protocole IA/moteur](AGENT-ENGINE-PROTOCOL.md), [preuves de revue](REVIEW-EVIDENCE.md),
+ [traçabilité](TRACEABILITY.md), [cycles](JUDGMENT-CYCLES.md).
+@@ -76,7 +94,10 @@
+ départ. Un reçu préparé ne prouve pas la réception par le fournisseur. Une fin
+ incertaine exige réconciliation avant rejeu. Retirer une mémoire n’efface ni
+ anciens prompts ni consommations ; importer une mémoire ne crée pas son admission
+-locale. La qualification native de ces circuits est suivie dans la matrice
++locale. La base de consigne initiale reste conservée ; les ajouts attribués du
++superviseur sont validés par défaut et rejetables avant réservation. Cela ne
++remplace aucune décision humaine exigée pour le résultat. La qualification
++native de ces circuits est suivie dans la matrice
+ de maturité.
+ 
+ Sources : [mémoire de projet et dialogue](../PROJECT-MEMORY.md),
+@@ -105,6 +126,8 @@
+ La boucle est **incident reçu → diagnostic du propriétaire → décision autorisée →
+ application → effet constaté → reprise / revue / apprentissage**. Une correction
+ qui échoue revient dans cette boucle ; documenter l’incident ne la termine pas.
++La conduite du processus et l’acceptation du candidat sont distinctes : en mode
++`human`, les contrôles et la revue ne remplacent pas la validation humaine requise.
+ 
+ Sources : [conduite](RUN-SUPERVISION.md), [protocole](AGENT-ENGINE-PROTOCOL.md),
+ [vitalité des appels](PROVIDER-LIVENESS.md), [apprentissage](INSTRUCTION-LEARNING.md).
+@@ -123,7 +146,7 @@
+ | Ressources Linux | Hôte, PID et starttime vérifiés avant mesure ; identité non vérifiable et donnée absente restent explicites |
+ | OTLP JSON | Jeton lié à l’agent actif, normalisation, rejets et séries attribués ; `telemetry.db` séparée, pas de prompt/réponse stocké par cette normalisation |
+ | Console et direct | Monaco en lecture seule avec repli texte ; filtres de serveur/page distingués ; SSE par empreinte et interrogation de repli explicite |
+-| Export / acceptation | Réponse originale de l’API avec périmètre/limites ; la preuve d’acceptation exige les originaux, candidat, contrôles, revue et fraîcheur |
++| Export / acceptation | Réponse originale de l’API avec périmètre/limites ; la preuve d’acceptation exige les originaux, candidat, contrôles, revue, validation humaine si requise et fraîcheur |
+ 
+ La consultation ne décide ni conduite ni acceptation. La chaîne doit rester
+ reconstructible : objectif, décision, propriétaire, tâche, tentative, candidat,
+@@ -183,6 +206,7 @@
+ | --- | --- |
+ | Moteur | `WorkEngine` et `RootStore` existent dans `swarm-engine` ; qualification par parcours, pas bascule globale |
+ | Supervision | Worker, reprise et planner → worker vérifiés sur fixtures CLI ; couverture des rôles, revue/validation et web encore ouverte |
++| Validation des résultats | Mode `human` et attente humaine préservés par le contrôleur natif ; preuves locales du raccord139 ; parcours global et authentification protégée restent distincts |
+ | Identité | Noyaux et protocoles d’enrôlement/configuration présents ; source humaine, service installé et dernier usage public restent à qualifier |
+ | Mémoire / contexte | Composition de contexte natif partiellement portée ; le guide mémoire géré est refusé tant que sa garde n’est pas portée ; parcours G8 complet et droits M20 ouverts |
+ | Journaux / télémétrie | Surfaces natives live et OTLP vérifiées localement ; cela n’établit pas la parité de toutes les consoles et de tous les consommateurs |
+--- before/docs/communication/linkedin-swarm-identite-memoire-20261023/README.md
++++ docs/communication/linkedin-swarm-identite-memoire-20261023/README.md
+@@ -70,6 +70,17 @@
+ does not replace the required human decision. No runtime qualification or AC02
+ execution is claimed by this French document edit.
+ 
++## Mise à jour des README et schémas après la version 3
++
++Les [README FR](../../../README.md) et [EN](../../../README.en.md), les vues
++techniques et les exports Mermaid/SVG/PNG explicitent maintenant le contrôle
++humain prévu par la politique `human`. Les cinq familles et tous les composants
++antérieurs sont conservés. La [revue liée aux octets](readme-human-control-review.json)
++distingue contrôles de documentation et qualification du moteur. La version Word3
++reste un livrable figé avec ses propres empreintes, sans remplacement de ses
++preuves historiques. / The entry points and current diagram exports now explicitly
++retain policy-required human validation; Word v3 remains a frozen editorial artifact.
++
+ ## Base factuelle et portée des affirmations
+ 
+ | Sujet | Sources locales inspectées | Ce que le brouillon peut affirmer | Limite |
+--- before/docs/diagrams/CONTRACT-MAP.md
++++ docs/diagrams/CONTRACT-MAP.md
+@@ -23,6 +23,8 @@
+ | `A_MEMORY` | [Utilisation](../PROJECT-MEMORY.md#utilisation) |
+ | `A_LOG` | [Console des journaux](../architecture/LOG-CONSOLE.md#console-des-journaux) |
+ | `A_AC02` | [AC-02 — Plan APEX consolidé avec spécification des menus de sécurité](../plans/actions-confiance/securite-execution-apex.md#ac-02--plan-apex-consolidé-avec-spécification-des-menus-de-sécurité) |
++| `A_HUMAN` | [Contrôles comme preuves d’une revue humaine](../ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) |
++| Limite Rust / Rust status | [Tâches ordinaires et validation humaine — raccord139 en qualification](../architecture/RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification) |
+ 
+ ## Identité Swarm : source d’autorité, registre et usage exact / Swarm identity: authority source, registry and exact use
+ 
+@@ -54,10 +56,12 @@
+ | `M_ATTRIB` | [Attribution, propriété et permission](../plans/deepagents-integration/CONTRAT-USAGES-MEMOIRE.md#attribution-propriété-et-permission) |
+ | `M_EXTRACT`, `M_CHECK` | [Sélection extractive pour un lancement explicite](../PROJECT-MEMORY.md#sélection-extractive-pour-un-lancement-explicite) |
+ | `M_HISTORY`, `M_METHODS`, `M_MANIFEST`, `M_PROVIDER` | [Contexte préparé et contexte de départ](../PROJECT-MEMORY.md#contexte-préparé-et-contexte-de-départ) |
+-| `M_INSTRUCT` | [Historique et transmission](../architecture/INSTRUCTION-LEARNING.md#historique-et-transmission) |
++| `M_INSTRUCT` | [Amélioration récursive des consignes](../architecture/INSTRUCTION-LEARNING.md#amélioration-récursive-des-consignes) |
+ | `M_BOUNDARY` | [État durable aux frontières du dialogue](../PROJECT-MEMORY.md#état-durable-aux-frontières-du-dialogue) |
+ | `M_RECOVERY`, `M_RESUME` | [Reprise explicite d'une conversation arrêtée](../PROJECT-MEMORY.md#reprise-explicite-dune-conversation-arrêtée) |
+ | `M_RECONCILE` | [Fin confirmée d’un tour de dialogue](../PROJECT-MEMORY.md#fin-confirmée-dun-tour-de-dialogue) |
++
++Complément `M_INSTRUCT` : [historique et transmission](../architecture/INSTRUCTION-LEARNING.md#historique-et-transmission).
+ 
+ ## Supervision Swarm : observation, décision, application et reprise / Swarm supervision: observation, decision, application and recovery
+ 
+@@ -74,6 +78,10 @@
+ | `S_LEARN` | [Historique et transmission](../architecture/INSTRUCTION-LEARNING.md#historique-et-transmission) |
+ | `S_CALL` | [Configuration persistée et opérations publiques](../architecture/PROVIDER-LIVENESS.md#configuration-persistée-et-opérations-publiques) |
+ | `S_JUDGE` | [Fin et refus](../architecture/JUDGMENT-CYCLES.md#fin-et-refus) |
++| `S_HUMAN`, `S_ACCEPT` | [Contrôles comme preuves d’une revue humaine](../ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) |
++| Limite Rust / Rust status | [Tâches ordinaires et validation humaine — raccord139 en qualification](../architecture/RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification) |
++
++Complément `S_ACCEPT` : [preuves et candidat courant](../architecture/REVIEW-EVIDENCE.md#comportement-global-du-moteur).
+ 
+ ## Observabilité Swarm : logs, direct, télémétrie et preuves / Swarm observability: logs, live views, telemetry and evidence
+ 
+@@ -86,8 +94,11 @@
+ | `L_CALLS` | [Contrat et provenance](../architecture/CALL-ACCOUNTING.md#contrat-et-provenance) |
+ | `L_OTLP`, `L_NORMAL`, `L_TELEMETRY` | [Télémétrie fournisseur — LIVE-UX-03, incrément E2E-1 (local, vérifié)](../architecture/RUST-MIGRATION.md#télémétrie-fournisseur--live-ux-03-incrément-e2e-1-local-vérifié) |
+ | `L_ORIGINAL`, `L_API`, `L_CONSOLE`, `L_EXPORT` | [Console des journaux](../architecture/LOG-CONSOLE.md#console-des-journaux) |
+-| `L_ACCEPT` | [Comportement global du moteur](../architecture/REVIEW-EVIDENCE.md#comportement-global-du-moteur) |
++| `L_ACCEPT` | [Contrôles comme preuves d’une revue humaine](../ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) |
+ | `L_SECURITY` | [AC-02 — Plan APEX consolidé avec spécification des menus de sécurité](../plans/actions-confiance/securite-execution-apex.md#ac-02--plan-apex-consolidé-avec-spécification-des-menus-de-sécurité) |
++| Limite Rust / Rust status | [Tâches ordinaires et validation humaine — raccord139 en qualification](../architecture/RUST-MIGRATION.md#tâches-ordinaires-et-validation-humaine--raccord139-en-qualification) |
++
++Complément `L_ACCEPT` : [preuves et candidat courant](../architecture/REVIEW-EVIDENCE.md#comportement-global-du-moteur).
+ 
+ ## Contrôles sémantiques / Semantic review
+ 
+@@ -98,6 +109,7 @@
+ - Réception, frontière de tour, effets incertains, nouvelle tentative et même conversation restent visibles dans la reprise. / Reception, turn boundaries, uncertain effects, new attempt and same conversation remain visible in recovery.
+ - run_observation, boîte du propriétaire, événement reçu, décision attribuée, bail/révision/budgets et confirmation d’arrêt sont conservés. / run_observation, owner inbox, received event, attributed decision, lease/revision/budgets and stop confirmation remain explicit.
+ - Journaux, direct, OTLP, mesures Linux et registre d’appels ne sont ni fusionnés en une vérité unique ni confondus avec une acceptation. / Logs, live views, OTLP, Linux metrics and call records retain their sources and do not become acceptance.
++- Validation humaine du résultat, revue IA et révision des consignes restent distinctes : en mode `human`, ni un PASS ni un avis IA ne remplacent la décision humaine ; la source humaine protégée est un raccord séparé. / Human result validation, AI review and instruction revision remain separate; in `human` mode, neither PASS nor AI review replaces the human decision; protected human identity is separate.
+ - Candidat, originaux, contrôles, revue, jugement global et acceptation conservent leurs frontières ; AC-02 reste futur et non démarré. / Candidate, originals, checks, review, global judgment and acceptance retain their boundaries; AC-02 remains future and not started.
+ 
+ Cette relecture est celle de Codex dans la même session. Elle ne constitue pas une revue indépendante ni une qualification du moteur. / This is same-session Codex review, not independent review or engine qualification.
+--- before/docs/diagrams/README.md
++++ docs/diagrams/README.md
+@@ -13,17 +13,34 @@
+ 
+ | Vue / View | Français | English | Contenu / Contents |
+ | --- | --- | --- | --- |
+-| Architecture interne Swarm : moteur, responsabilités et preuves / Swarm internal architecture: engine, responsibilities and evidence | [SVG](architecture-overview-fr.svg) · [PNG](architecture-overview-fr.png) · [Mermaid](architecture-overview-fr.mmd) | [SVG](architecture-overview-en.svg) · [PNG](architecture-overview-en.png) · [Mermaid](architecture-overview-en.mmd) | Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, exécution, contrôles, revue et événements durables. Cette vue décrit les contrats internes ; la qualification Rust est suivie séparément. |
++| Architecture interne Swarm : moteur, responsabilités et preuves / Swarm internal architecture: engine, responsibilities and evidence | [SVG](architecture-overview-fr.svg) · [PNG](architecture-overview-fr.png) · [Mermaid](architecture-overview-fr.mmd) | [SVG](architecture-overview-en.svg) · [PNG](architecture-overview-en.png) · [Mermaid](architecture-overview-en.mmd) | Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, contrôles, revue et validation humaine selon la politique. La qualification Rust est suivie séparément. |
+ | Identité Swarm : source d’autorité, registre et usage exact / Swarm identity: authority source, registry and exact use | [SVG](identity-authority-fr.svg) · [PNG](identity-authority-fr.png) · [Mermaid](identity-authority-fr.mmd) | [SVG](identity-authority-en.svg) · [PNG](identity-authority-en.png) · [Mermaid](identity-authority-en.mmd) | Identité humaine, principal, instance, octrois, registre, checkpoint Trust et demande exacte restent distincts. Les transports et protocoles internes sont séparés des raccords publics non achevés. |
+ | Mémoire Swarm : connaissances, contexte et reprise de conversation / Swarm memory: knowledge, context and conversation recovery | [SVG](memory-context-fr.svg) · [PNG](memory-context-fr.png) · [Mermaid](memory-context-fr.mmd) | [SVG](memory-context-en.svg) · [PNG](memory-context-en.png) · [Mermaid](memory-context-en.mmd) | La mémoire de projet, les révisions de consigne, les références extractives, le contexte préparé/final et les frontières de dialogue sont des objets distincts. Les droits d’usage portent sur les sources et destinataires exacts. |
+-| Supervision Swarm : observation, décision, application et reprise / Swarm supervision: observation, decision, application and recovery | [SVG](run-supervision-fr.svg) · [PNG](run-supervision-fr.png) · [Mermaid](run-supervision-fr.mmd) | [SVG](run-supervision-en.svg) · [PNG](run-supervision-en.png) · [Mermaid](run-supervision-en.mmd) | Les observations de processus sont remises au propriétaire de périmètre. Le moteur vérifie révisions, baux, événements reçus et budgets avant d’appliquer continue-run ou stop-run et de confirmer les effets. |
++| Supervision Swarm : observation, décision, application et reprise / Swarm supervision: observation, decision, application and recovery | [SVG](run-supervision-fr.svg) · [PNG](run-supervision-fr.png) · [Mermaid](run-supervision-fr.mmd) | [SVG](run-supervision-en.svg) · [PNG](run-supervision-en.png) · [Mermaid](run-supervision-en.mmd) | Les observations sont remises au superviseur IA propriétaire. Le moteur contrôle puis applique la conduite ; l’acceptation du résultat conserve la validation humaine requise par la politique. |
+ | Observabilité Swarm : logs, direct, télémétrie et preuves / Swarm observability: logs, live views, telemetry and evidence | [SVG](logs-observability-fr.svg) · [PNG](logs-observability-fr.png) · [Mermaid](logs-observability-fr.mmd) | [SVG](logs-observability-en.svg) · [PNG](logs-observability-en.png) · [Mermaid](logs-observability-en.mmd) | Les sorties agent, événements du moteur, incidents, décisions, registre d’appels, mesures système et OTLP gardent leurs sources. Les vues sont en lecture seule ; l’export de données ne constitue pas une preuve d’acceptation. |
++
++## Validation humaine / Human validation
++
++L’architecture et la supervision montrent la branche `human` : résultat et preuves
++à examiner, attente humaine sans déblocage aval, puis contrôles d’acceptation.
++La branche `automatic` conserve ses contrôles et sa revue IA. Les logs rappellent
++la validation humaine si requise ; les révisions de consigne gardent leur parcours
++distinct, avec ajouts actifs par défaut et rejet avant réservation.
++
++Architecture and supervision show the `human` branch: examine the result and
++evidence, preserve the pending human decision without releasing downstream work,
++then enforce acceptance guards. `automatic` retains its checks and AI review.
++Logs retain policy-required human validation; instruction revisions remain a
++separate path, active by default and rejectable before reservation.
++
++[Contrat FR](../ENGINE-ACCEPTANCE.md#contrôles-comme-preuves-dune-revue-humaine) · [EN contract](../en/ENGINE-ACCEPTANCE.md#checks-as-evidence-for-human-review).
+ 
+ ## Provenance et lecture / Provenance and interpretation
+ 
+ - [Correspondance de tous les composants avec les sections internes / Complete node-to-source map](CONTRACT-MAP.md).
+ - [Catalogue FR/EN, sources, empreintes, nœuds et échanges / FR/EN source, hash, node and edge catalogue](architecture-contracts.json).
+ - [Relecture de la reconstruction / Reconstruction review](../communication/linkedin-swarm-identite-memoire-20261023/internal-architecture-review.json).
++- [Correction du contrôle humain et vérifications courantes / Human-control correction and current checks](../communication/linkedin-swarm-identite-memoire-20261023/readme-human-control-review.json).
+ 
+ Les traits pleins décrivent les échanges du contrat. Les pointillés signalent un
+ raccord expressément ouvert ou futur. Aucun trait ni couleur ne prouve un
+--- before/docs/diagrams/architecture-contracts.json
++++ docs/diagrams/architecture-contracts.json
+@@ -203,14 +203,14 @@
+       "section": "Observation en direct des agents — LIVE-UX-01 (lecture seule)",
+       "line": 181,
+       "anchor": "observation-en-direct-des-agents--live-ux-01-lecture-seule",
+-      "sha256": "70a815cb93fc4c2f274a957bee4ac591d5be8ecb45cab2ec14538109bb8a8bfd"
++      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+     },
+     "otel": {
+       "path": "docs/architecture/RUST-MIGRATION.md",
+       "section": "Télémétrie fournisseur — LIVE-UX-03, incrément E2E-1 (local, vérifié)",
+       "line": 248,
+       "anchor": "télémétrie-fournisseur--live-ux-03-incrément-e2e-1-local-vérifié",
+-      "sha256": "70a815cb93fc4c2f274a957bee4ac591d5be8ecb45cab2ec14538109bb8a8bfd"
++      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
+     },
+     "liveness": {
+       "path": "docs/architecture/PROVIDER-LIVENESS.md",
+@@ -245,7 +245,28 @@
+       "section": "Pilotage par parcours",
+       "line": 39,
+       "anchor": "pilotage-par-parcours",
+-      "sha256": "a93344ff8b75a4e34dd00559b8b368d1acf9ec3e520cd76fc820860f5a8899a9"
++      "sha256": "9df7f33d40ff725aaf8e0de85e1b8b8657a5f683793bcdbb152fff9e55f5224c"
++    },
++    "humanvalidation": {
++      "path": "docs/ENGINE-ACCEPTANCE.md",
++      "section": "Contrôles comme preuves d’une revue humaine",
++      "line": 41,
++      "anchor": "contrôles-comme-preuves-dune-revue-humaine",
++      "sha256": "a43377f1f1ffe9f146467f4e63390a1c3cd587629a95256264f74357a7c653cd"
++    },
++    "nativevalidation": {
++      "path": "docs/architecture/RUST-MIGRATION.md",
++      "section": "Tâches ordinaires et validation humaine — raccord139 en qualification",
++      "line": 7515,
++      "anchor": "tâches-ordinaires-et-validation-humaine--raccord139-en-qualification",
++      "sha256": "d6db59a7e81787e4bbd082ddfcb6c3531af76ce8e8fdf22de0b9193d5caa3cd9"
++    },
++    "learnrules": {
++      "path": "docs/architecture/INSTRUCTION-LEARNING.md",
++      "section": "Amélioration récursive des consignes",
++      "line": 1,
++      "anchor": "amélioration-récursive-des-consignes",
++      "sha256": "6d3cc6c487c3624b887beb5fe7e0cd8aec60818d8e1584f260c2464c8ed66038"
+     }
+   },
+   "views": [
+@@ -256,8 +277,8 @@
+         "en": "Swarm internal architecture: engine, responsibilities and evidence"
+       },
+       "descriptions": {
+-        "fr": "Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, exécution, contrôles, revue et événements durables. Cette vue décrit les contrats internes ; la qualification Rust est suivie séparément.",
+-        "en": "The deterministic Rust engine connects contracts, identity, policies, reservations, contexts, execution, checks, review and durable events. This view describes internal contracts; Rust qualification is tracked separately."
++        "fr": "Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, contrôles, revue et validation humaine selon la politique. La qualification Rust est suivie séparément.",
++        "en": "The deterministic Rust engine connects contracts, identity, policy, reservations, context, checks, review and policy-required human validation. Rust qualification is tracked separately."
+       },
+       "nodes": [
+         {
+@@ -406,8 +427,8 @@
+         {
+           "id": "A_REVIEW",
+           "labels": {
+-            "fr": "Revue indépendante\nMême candidat · sources reçues",
+-            "en": "Independent review\nSame candidate · received sources"
++            "fr": "Revue IA indépendante\nMême candidat · sources reçues",
++            "en": "Independent AI review\nSame candidate · received sources"
+           },
+           "source": "review",
+           "group": "PREUVES / EVIDENCE",
+@@ -468,6 +489,17 @@
+           "group": "SUITE / FUTURE",
+           "kind": "pending",
+           "shape": "rect"
++        },
++        {
++          "id": "A_HUMAN",
++          "labels": {
++            "fr": "Validation humaine · mode human\nRésultat et preuves à examiner\nEn attente : aval bloqué",
++            "en": "Human validation · human mode\nExamine result and evidence\nPending decision blocks downstream work"
++          },
++          "source": "humanvalidation",
++          "group": "PREUVES / EVIDENCE",
++          "kind": "ordinary",
++          "shape": "rect"
+         }
+       ],
+       "edges": [
+@@ -592,8 +624,8 @@
+           "from": "A_REVIEW",
+           "to": "A_ACCEPT",
+           "labels": {
+-            "fr": "",
+-            "en": ""
++            "fr": "Mode automatic",
++            "en": "Automatic mode"
+           },
+           "pending": false
+         },
+@@ -688,6 +720,24 @@
+           },
+           "pending": false,
+           "bidirectional": true
++        },
++        {
++          "from": "A_REVIEW",
++          "to": "A_HUMAN",
++          "labels": {
++            "fr": "Mode human",
++            "en": "Human mode"
++          },
++          "pending": false
++        },
++        {
++          "from": "A_HUMAN",
++          "to": "A_ACCEPT",
++          "labels": {
++            "fr": "Décision humaine requise",
++            "en": "Required human decision"
++          },
++          "pending": false
+         }
+       ]
+     },
+@@ -1228,13 +1278,16 @@
+         {
+           "id": "M_INSTRUCT",
+           "labels": {
+-            "fr": "Révisions de consigne\nrevise-instructions · rejet avant réservation",
+-            "en": "Instruction revisions\nrevise-instructions · reject before reservation"
+-          },
+-          "source": "learn",
++            "fr": "Révisions de consigne attribuées\nrevise-instructions · base conservée\nAjouts actifs par défaut\nRejet avant réservation",
++            "en": "Attributed instruction revisions\nrevise-instructions · retained base\nAdditions active by default\nReject before reservation"
++          },
++          "source": "learnrules",
+           "group": "CONTEXTE / CONTEXT",
+           "kind": "ordinary",
+-          "shape": "rect"
++          "shape": "rect",
++          "additional_sources": [
++            "learn"
++          ]
+         },
+         {
+           "id": "M_METHODS",
+@@ -1535,8 +1588,8 @@
+         "en": "Swarm supervision: observation, decision, application and recovery"
+       },
+       "descriptions": {
+-        "fr": "Les observations de processus sont remises au propriétaire de périmètre. Le moteur vérifie révisions, baux, événements reçus et budgets avant d’appliquer continue-run ou stop-run et de confirmer les effets.",
+-        "en": "Process observations reach the scope owner. The engine checks revisions, leases, received events and budgets before applying continue-run or stop-run and confirming effects."
++        "fr": "Les observations sont remises au superviseur IA propriétaire. Le moteur contrôle puis applique la conduite ; l’acceptation du résultat conserve la validation humaine requise par la politique.",
++        "en": "Observations reach the owning AI supervisor. The engine checks and applies process decisions; result acceptance retains policy-required human validation."
+       },
+       "nodes": [
+         {
+@@ -1696,8 +1749,8 @@
+         {
+           "id": "S_REVIEW",
+           "labels": {
+-            "fr": "Contrôles et revue du candidat\nAcceptation selon preuves fraîches",
+-            "en": "Candidate checks and review\nAcceptance requires fresh evidence"
++            "fr": "Contrôles et revue IA du candidat\nPreuves fraîches · politique requise",
++            "en": "Candidate checks and AI review\nFresh evidence · required policy"
+           },
+           "source": "review",
+           "group": "REPRISE / RECOVERY",
+@@ -1747,6 +1800,31 @@
+           "group": "POLITIQUES / POLICIES",
+           "kind": "supervisor",
+           "shape": "rect"
++        },
++        {
++          "id": "S_HUMAN",
++          "labels": {
++            "fr": "Validation humaine · mode human\nUn PASS ne libère pas l’aval",
++            "en": "Human validation · human mode\nA PASS does not release downstream work"
++          },
++          "source": "humanvalidation",
++          "group": "REPRISE / RECOVERY",
++          "kind": "ordinary",
++          "shape": "rect"
++        },
++        {
++          "id": "S_ACCEPT",
++          "labels": {
++            "fr": "Acceptation contrôlée du résultat\nCritères · fraîcheur · décisions requises",
++            "en": "Checked result acceptance\nCriteria · freshness · required decisions"
++          },
++          "source": "humanvalidation",
++          "group": "REPRISE / RECOVERY",
++          "kind": "control",
++          "shape": "rect",
++          "additional_sources": [
++            "review"
++          ]
+         }
+       ],
+       "edges": [
+@@ -1954,6 +2032,33 @@
+           "labels": {
+             "fr": "Limites et réservation d’appel",
+             "en": "Call limits and reservation"
++          },
++          "pending": false
++        },
++        {
++          "from": "S_REVIEW",
++          "to": "S_HUMAN",
++          "labels": {
++            "fr": "Mode human",
++            "en": "Human mode"
++          },
++          "pending": false
++        },
++        {
++          "from": "S_REVIEW",
++          "to": "S_ACCEPT",
++          "labels": {
++            "fr": "Mode automatic",
++            "en": "Automatic mode"
++          },
++          "pending": false
++        },
++        {
++          "from": "S_HUMAN",
++          "to": "S_ACCEPT",
++          "labels": {
++            "fr": "Décision humaine requise",
++            "en": "Required human decision"
+           },
+           "pending": false
+         }
+@@ -2127,13 +2232,16 @@
+         {
+           "id": "L_ACCEPT",
+           "labels": {
+-            "fr": "Acceptation contrôlée séparément\nMême candidat · droits · fraîcheur",
+-            "en": "Separately checked acceptance\nSame candidate · rights · freshness"
+-          },
+-          "source": "review",
++            "fr": "Acceptation contrôlée séparément\nMême candidat · droits · fraîcheur\nValidation humaine si mode human",
++            "en": "Separately checked acceptance\nSame candidate · rights · freshness\nHuman validation in human mode"
++          },
++          "source": "humanvalidation",
+           "group": "PREUVES / EVIDENCE",
+           "kind": "control",
+-          "shape": "rect"
++          "shape": "rect",
++          "additional_sources": [
++            "review"
++          ]
+         },
+         {
+           "id": "L_SECURITY",
+@@ -2317,7 +2425,7 @@
+     },
+     {
+       "path": "rust/crates/swarm-engine/src/work_engine.rs",
+-      "sha256": "ea0b2f1bcf77e830c520c60e3de80c0de218d3f7b73d195a4deb455ef953a0ad",
++      "sha256": "e9190ac30bfa591a984adcf0cc22429d4daf5e03ec3fd83043ebd30e85034555",
+       "observed_symbol_or_contract": "pub struct WorkEngine"
+     },
+     {
+@@ -2329,6 +2437,11 @@
+       "path": "rust/crates/swarm-web/src/service/live.rs",
+       "sha256": "49dfa788d769177d4a876e86a96f0a9f3eb2de0a5b6bbbdcb6460e0e6fa73c6d",
+       "observed_symbol_or_contract": null
++    },
++    {
++      "path": "rust/crates/swarm-engine/src/root_store/task_validation/gate.rs",
++      "sha256": "dae6dc543cd5bf835dbc1e954172b90255f210e5605b79d0b05c9877b171de9e",
++      "observed_symbol_or_contract": "Human apply preserves manual gates/checks and human-validation-required; it does not accept the task."
+     }
+   ]
+ }
+--- before/docs/diagrams/architecture-overview-en.mmd
++++ docs/diagrams/architecture-overview-en.mmd
+@@ -1,6 +1,6 @@
+ flowchart TB
+     accTitle: Swarm internal architecture: engine, responsibilities and evidence
+-    accDescr: The deterministic Rust engine connects contracts, identity, policies, reservations, contexts, execution, checks, review and durable events. This view describes internal contracts; Rust qualification is tracked separately.
++    accDescr: The deterministic Rust engine connects contracts, identity, policy, reservations, context, checks, review and policy-required human validation. Rust qualification is tracked separately.
+     subgraph G0["INPUTS"]
+         A_INPUT["Human · CLI · API · cockpit"]
+         A_PLAN["Adopted need · requirements<br/>Plan · tasks · dependencies"]
+@@ -23,8 +23,9 @@
+     end
+     subgraph G4["EVIDENCE"]
+         A_GATE["Authorized checks<br/>Commands · inputs · outputs · receipts"]
+-        A_REVIEW["Independent review<br/>Same candidate · received sources"]
++        A_REVIEW["Independent AI review<br/>Same candidate · received sources"]
+         A_ACCEPT["Freshness · criteria · validation<br/>Checked acceptance transition"]
++        A_HUMAN["Human validation · human mode<br/>Examine result and evidence<br/>Pending decision blocks downstream work"]
+     end
+     subgraph G5["PERSISTENCE"]
+         A_STATE["Durable project state<br/>Work · tasks · decisions · events"]
+@@ -47,7 +48,7 @@
+     A_WORK --> A_DELIVERY
+     A_DELIVERY --> A_GATE
+     A_GATE --> A_REVIEW
+-    A_REVIEW --> A_ACCEPT
++    A_REVIEW -->|Automatic mode| A_ACCEPT
+     A_ACCEPT --> A_STATE
+     A_ENGINE --> A_STATE
+     A_WORK --> A_LOG
+@@ -58,13 +59,15 @@
+     A_AC02 -.->|Access boundary to implement| A_WORK
+     A_ENGINE <-->|Events / decisions| A_SCOPE
+     A_ENGINE <-->|Cycle state / verdict| A_CYCLE
++    A_REVIEW -->|Human mode| A_HUMAN
++    A_HUMAN -->|Required human decision| A_ACCEPT
+     classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+     classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+     classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+     classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+     classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+-    class A_INPUT,A_PLAN,A_WORK,A_DELIVERY,A_REVIEW ordinary;
++    class A_INPUT,A_PLAN,A_WORK,A_DELIVERY,A_REVIEW,A_HUMAN ordinary;
+     class A_ENGINE core;
+     class A_ID,A_POLICY,A_SCHEDULE,A_CONTEXT,A_GATE,A_ACCEPT control;
+     class A_ROOT,A_SCOPE,A_CYCLE supervisor;
+--- before/docs/diagrams/architecture-overview-fr.mmd
++++ docs/diagrams/architecture-overview-fr.mmd
+@@ -1,6 +1,6 @@
+ flowchart TB
+     accTitle: Architecture interne Swarm : moteur, responsabilités et preuves
+-    accDescr: Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, exécution, contrôles, revue et événements durables. Cette vue décrit les contrats internes ; la qualification Rust est suivie séparément.
++    accDescr: Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, contrôles, revue et validation humaine selon la politique. La qualification Rust est suivie séparément.
+     subgraph G0["ENTRÉES"]
+         A_INPUT["Humain · CLI · API · cockpit"]
+         A_PLAN["Besoin adopté · exigences<br/>Plan · tâches · dépendances"]
+@@ -23,8 +23,9 @@
+     end
+     subgraph G4["PREUVES"]
+         A_GATE["Contrôles autorisés<br/>Commandes · entrées · sorties · reçus"]
+-        A_REVIEW["Revue indépendante<br/>Même candidat · sources reçues"]
++        A_REVIEW["Revue IA indépendante<br/>Même candidat · sources reçues"]
+         A_ACCEPT["Fraîcheur · critères · validations<br/>Transition d’acceptation contrôlée"]
++        A_HUMAN["Validation humaine · mode human<br/>Résultat et preuves à examiner<br/>En attente : aval bloqué"]
+     end
+     subgraph G5["PERSISTANCE"]
+         A_STATE["État durable du projet<br/>Work · tâches · décisions · événements"]
+@@ -47,7 +48,7 @@
+     A_WORK --> A_DELIVERY
+     A_DELIVERY --> A_GATE
+     A_GATE --> A_REVIEW
+-    A_REVIEW --> A_ACCEPT
++    A_REVIEW -->|Mode automatic| A_ACCEPT
+     A_ACCEPT --> A_STATE
+     A_ENGINE --> A_STATE
+     A_WORK --> A_LOG
+@@ -58,13 +59,15 @@
+     A_AC02 -.->|Frontière d’accès à réaliser| A_WORK
+     A_ENGINE <-->|Événements / décisions| A_SCOPE
+     A_ENGINE <-->|État / verdict de cycle| A_CYCLE
++    A_REVIEW -->|Mode human| A_HUMAN
++    A_HUMAN -->|Décision humaine requise| A_ACCEPT
+     classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+     classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+     classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+     classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+     classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+-    class A_INPUT,A_PLAN,A_WORK,A_DELIVERY,A_REVIEW ordinary;
++    class A_INPUT,A_PLAN,A_WORK,A_DELIVERY,A_REVIEW,A_HUMAN ordinary;
+     class A_ENGINE core;
+     class A_ID,A_POLICY,A_SCHEDULE,A_CONTEXT,A_GATE,A_ACCEPT control;
+     class A_ROOT,A_SCOPE,A_CYCLE supervisor;
+--- before/docs/diagrams/logs-observability-en.mmd
++++ docs/diagrams/logs-observability-en.mmd
+@@ -24,7 +24,7 @@
+     end
+     subgraph G4["EVIDENCE"]
+         L_CHAIN["Reconstructible evidence chain<br/>Objective → decision → attempt<br/>Candidate → check → review"]
+-        L_ACCEPT["Separately checked acceptance<br/>Same candidate · rights · freshness"]
++        L_ACCEPT["Separately checked acceptance<br/>Same candidate · rights · freshness<br/>Human validation in human mode"]
+     end
+     subgraph G5["FUTURE"]
+         L_SECURITY["AC-02 · future, not started<br/>Network lineage and security timeline"]
+--- before/docs/diagrams/logs-observability-fr.mmd
++++ docs/diagrams/logs-observability-fr.mmd
+@@ -24,7 +24,7 @@
+     end
+     subgraph G4["PREUVES"]
+         L_CHAIN["Chaîne de preuve reconstructible<br/>Objectif → décision → tentative<br/>Candidat → contrôle → revue"]
+-        L_ACCEPT["Acceptation contrôlée séparément<br/>Même candidat · droits · fraîcheur"]
++        L_ACCEPT["Acceptation contrôlée séparément<br/>Même candidat · droits · fraîcheur<br/>Validation humaine si mode human"]
+     end
+     subgraph G5["SUITE"]
+         L_SECURITY["AC-02 · futur non démarré<br/>Filiation réseau et timeline sécurité"]
+--- before/docs/diagrams/memory-context-en.mmd
++++ docs/diagrams/memory-context-en.mmd
+@@ -15,7 +15,7 @@
+     subgraph G2["CONTEXT"]
+         M_EXTRACT["Confirmed extractive selection<br/>Rebuilt quotations · context_hash"]
+         M_HISTORY["Same-task history<br/>Attributed activity · excerpts and omissions"]
+-        M_INSTRUCT["Instruction revisions<br/>revise-instructions · reject before reservation"]
++        M_INSTRUCT["Attributed instruction revisions<br/>revise-instructions · retained base<br/>Additions active by default<br/>Reject before reservation"]
+         M_METHODS["Instructions and task contract<br/>Selected methods · references"]
+         M_ENGINE["DETERMINISTIC RUST ENGINE<br/>Resolve sources and usage<br/>Compose and check the prompt"]
+         M_MANIFEST["prepared_context and final context<br/>Text · bytes · SHA · received sources"]
+--- before/docs/diagrams/memory-context-fr.mmd
++++ docs/diagrams/memory-context-fr.mmd
+@@ -15,7 +15,7 @@
+     subgraph G2["CONTEXTE"]
+         M_EXTRACT["Sélection extractive confirmée<br/>Citations reconstruites · context_hash"]
+         M_HISTORY["Historique de la même tâche<br/>Activités attribuées · extraits et omissions"]
+-        M_INSTRUCT["Révisions de consigne<br/>revise-instructions · rejet avant réservation"]
++        M_INSTRUCT["Révisions de consigne attribuées<br/>revise-instructions · base conservée<br/>Ajouts actifs par défaut<br/>Rejet avant réservation"]
+         M_METHODS["Consignes et contrat de tâche<br/>Méthodes sélectionnées · références"]
+         M_ENGINE["MOTEUR DÉTERMINISTE RUST<br/>Résoudre sources et usages<br/>Composer puis contrôler le prompt"]
+         M_MANIFEST["prepared_context et context final<br/>Texte · octets · SHA · sources reçues"]
+--- before/docs/diagrams/run-supervision-en.mmd
++++ docs/diagrams/run-supervision-en.mmd
+@@ -1,6 +1,6 @@
+ flowchart TB
+     accTitle: Swarm supervision: observation, decision, application and recovery
+-    accDescr: Process observations reach the scope owner. The engine checks revisions, leases, received events and budgets before applying continue-run or stop-run and confirming effects.
++    accDescr: Observations reach the owning AI supervisor. The engine checks and applies process decisions; result acceptance retains policy-required human validation.
+     subgraph G0["OBSERVATION"]
+         S_WORKER["Running attempt<br/>Tools · output · errors · process"]
+         S_OBSERVE["Deterministic observation<br/>Duration · tool wait · silence<br/>Infrastructure · errors and counters"]
+@@ -22,8 +22,10 @@
+     end
+     subgraph G3["RECOVERY"]
+         S_EFFECT["Observe effect and result<br/>Incident / correction / handoff"]
+-        S_REVIEW["Candidate checks and review<br/>Acceptance requires fresh evidence"]
++        S_REVIEW["Candidate checks and AI review<br/>Fresh evidence · required policy"]
+         S_LEARN["Revise future instructions<br/>Attribution · reception · lessons learned"]
++        S_HUMAN["Human validation · human mode<br/>A PASS does not release downstream work"]
++        S_ACCEPT["Checked result acceptance<br/>Criteria · freshness · required decisions"]
+     end
+     subgraph G4["POLICIES"]
+         S_POLICY["Saved policies and Admin<br/>Observation thresholds ≠ budgets"]
+@@ -53,15 +55,18 @@
+     S_ROOT --> S_JUDGE
+     S_JUDGE -->|Separate global operation| S_ENGINE
+     S_CALL -->|Call limits and reservation| S_ENGINE
++    S_REVIEW -->|Human mode| S_HUMAN
++    S_REVIEW -->|Automatic mode| S_ACCEPT
++    S_HUMAN -->|Required human decision| S_ACCEPT
+     classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+     classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+     classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+     classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+     classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+-    class S_WORKER,S_WAIT,S_DECIDE,S_EFFECT,S_REVIEW,S_LEARN ordinary;
++    class S_WORKER,S_WAIT,S_DECIDE,S_EFFECT,S_REVIEW,S_LEARN,S_HUMAN ordinary;
+     class S_ENGINE core;
+-    class S_OBSERVE,S_CONTINUE,S_STOP,S_END,S_POLICY,S_CALL control;
++    class S_OBSERVE,S_CONTINUE,S_STOP,S_END,S_POLICY,S_CALL,S_ACCEPT control;
+     class S_SCOPE,S_ROOT,S_JUDGE supervisor;
+     class S_EVENT,S_INBOX,S_RECORD data;
+     style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+--- before/docs/diagrams/run-supervision-fr.mmd
++++ docs/diagrams/run-supervision-fr.mmd
+@@ -1,6 +1,6 @@
+ flowchart TB
+     accTitle: Supervision Swarm : observation, décision, application et reprise
+-    accDescr: Les observations de processus sont remises au propriétaire de périmètre. Le moteur vérifie révisions, baux, événements reçus et budgets avant d’appliquer continue-run ou stop-run et de confirmer les effets.
++    accDescr: Les observations sont remises au superviseur IA propriétaire. Le moteur contrôle puis applique la conduite ; l’acceptation du résultat conserve la validation humaine requise par la politique.
+     subgraph G0["OBSERVATION"]
+         S_WORKER["Tentative en cours<br/>Outils · sorties · erreurs · processus"]
+         S_OBSERVE["Observation déterministe<br/>Durée · attente outil · silence<br/>Infrastructure · erreurs et compteurs"]
+@@ -22,8 +22,10 @@
+     end
+     subgraph G3["REPRISE"]
+         S_EFFECT["Effet et résultat à constater<br/>Incident / correction / remise"]
+-        S_REVIEW["Contrôles et revue du candidat<br/>Acceptation selon preuves fraîches"]
++        S_REVIEW["Contrôles et revue IA du candidat<br/>Preuves fraîches · politique requise"]
+         S_LEARN["Réviser les consignes futures<br/>Attribution · réception · RETEX"]
++        S_HUMAN["Validation humaine · mode human<br/>Un PASS ne libère pas l’aval"]
++        S_ACCEPT["Acceptation contrôlée du résultat<br/>Critères · fraîcheur · décisions requises"]
+     end
+     subgraph G4["POLITIQUES"]
+         S_POLICY["Politiques sauvegardées et Admin<br/>Seuils d’observation ≠ budgets"]
+@@ -53,15 +55,18 @@
+     S_ROOT --> S_JUDGE
+     S_JUDGE -->|Opération globale séparée| S_ENGINE
+     S_CALL -->|Limites et réservation d’appel| S_ENGINE
++    S_REVIEW -->|Mode human| S_HUMAN
++    S_REVIEW -->|Mode automatic| S_ACCEPT
++    S_HUMAN -->|Décision humaine requise| S_ACCEPT
+     classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+     classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef control fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:2px;
+     classDef supervisor fill:#205e70,stroke:#205e70,color:#fffefa,stroke-width:2px;
+     classDef data fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+     classDef pending fill:#f5f3ec,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+-    class S_WORKER,S_WAIT,S_DECIDE,S_EFFECT,S_REVIEW,S_LEARN ordinary;
++    class S_WORKER,S_WAIT,S_DECIDE,S_EFFECT,S_REVIEW,S_LEARN,S_HUMAN ordinary;
+     class S_ENGINE core;
+-    class S_OBSERVE,S_CONTINUE,S_STOP,S_END,S_POLICY,S_CALL control;
++    class S_OBSERVE,S_CONTINUE,S_STOP,S_END,S_POLICY,S_CALL,S_ACCEPT control;
+     class S_SCOPE,S_ROOT,S_JUDGE supervisor;
+     class S_EVENT,S_INBOX,S_RECORD data;
+     style G0 fill:#f5f3ec,stroke:#205e70,color:#062b49
+--- before/docs/en/ARCHITECTURE.md
++++ docs/en/ARCHITECTURE.md
+@@ -28,6 +28,24 @@
+ checks, prepares sources actually received by review, then rechecks rights, criteria
+ and freshness before acceptance. An anomaly returns to its owner rather than becoming
+ an empty success.
++
++### Human validation and result policy
++
++Human owners define rules and authority. A `human` policy may contain
++preauthorized checks: success provides evidence, preserves the pending human
++decision and does not release downstream work. Independent AI review does not
++replace that decision. The `automatic` mode retains its checks and review;
++acceptance still requires applicable evidence, the same candidate, criteria and
++freshness.
++
++The native controller preserves `pending_human`, `human-validation-required` and
++manual gates/checks; it does not synthesize a quality gate from command PASS alone.
++This validation contract remains separate from protected human authentication
++and global identity integration, which are still open.
++
++Sources: [human validation](ENGINE-ACCEPTANCE.md#checks-as-evidence-for-human-review),
++[wiring139](RUST-MIGRATION.md#ordinary-tasks-and-human-validation--wiring139-under-qualification),
++[native controller](../../rust/crates/swarm-engine/src/root_store/task_validation/gate.rs).
+ 
+ Sources: [AI/engine protocol](AGENT-ENGINE-PROTOCOL.md), [review evidence](REVIEW-EVIDENCE.md),
+ [traceability](TRACEABILITY.md), [cycles](JUDGMENT-CYCLES.md).
+@@ -75,7 +93,10 @@
+ Composition rechecks sources and capacity, then records context before launch.
+ A prepared receipt does not prove provider reception. Uncertain completion requires
+ reconciliation before replay. Withdrawal erases neither old prompts nor consumption;
+-import creates no local admission. Native qualification of these paths is tracked
++import creates no local admission. The initial instruction is retained;
++attributed supervisor additions are approved by default and rejectable before
++reservation. This does not replace any human decision required for the result.
++Native qualification of these paths is tracked
+ in the maturity matrix.
+ 
+ Sources: [project memory and dialogue](PROJECT-MEMORY.md),
+@@ -102,7 +123,9 @@
+ 
+ The loop is **incident received → owner diagnosis → authorized decision →
+ application → observed effect → recovery / review / learning**. A failed correction
+-returns to that loop; documenting an incident does not complete it.
++returns to that loop; documenting an incident does not complete it. Process
++supervision and candidate acceptance are separate: in `human` mode, checks and
++review do not replace the required human validation.
+ 
+ Sources: [process supervision](RUN-SUPERVISION.md), [protocol](AGENT-ENGINE-PROTOCOL.md),
+ [call liveness](PROVIDER-LIVENESS.md), [instruction learning](INSTRUCTION-LEARNING.md).
+@@ -121,7 +144,7 @@
+ | Linux resources | Host, PID and starttime checked before measurement; unverifiable identity and absent data remain explicit |
+ | OTLP JSON | Active-agent-bound token, normalization, attributed rejections/series; separate `telemetry.db`; this normalizer stores no prompt/response |
+ | Console and live views | Read-only Monaco with text fallback; server/page filtering distinct; fingerprint SSE and explicit polling fallback |
+-| Export / acceptance | Original API response with scope/limitations; acceptance evidence requires originals, candidate, checks, review and freshness |
++| Export / acceptance | Original API response with scope/limitations; acceptance evidence requires originals, candidate, checks, review, human validation when required and freshness |
+ 
+ Read views decide neither process control nor acceptance. The chain must remain
+ reconstructible: objective, decision, owner, task, attempt, candidate, execution,
+@@ -181,6 +204,7 @@
+ | --- | --- |
+ | Engine | `WorkEngine` and `RootStore` exist in `swarm-engine`; qualification is per journey, not a global cutover |
+ | Supervision | Worker, restart and planner → worker verified on CLI fixtures; complete role, review/validation and web coverage remain open |
++| Result validation | Native controller preserves `human` mode and the pending human decision; local wiring139 evidence; global journey and protected authentication remain separate |
+ | Identity | Enrollment/configuration kernels and protocols exist; human source, installed service and final public use remain to qualify |
+ | Memory / context | Native context composition partially ported; managed field-guide memory is refused until its guard is ported; complete G8 and M20 usage enforcement remain open |
+ | Logs / telemetry | Native live and OTLP surfaces locally verified; this does not establish parity for every console and consumer |

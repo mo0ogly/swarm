@@ -5,6 +5,24 @@
 
 ## Current capability
 
+The [PAEA plan](plans/actions-confiance/PAEA-APEX.md) retains delivered versions,
+evidence and limits for every increment. The **Version and what's new** dialog
+and actual process hash establish the local identity to verify.
+[Increments60](plans/actions-confiance/paea/INCREMENT-60.md) and
+[61](plans/actions-confiance/paea/INCREMENT-61.md) describe atomic process/pidfd
+creation and canonical single-packet response: library-verified and locally
+delivered alongside existing native journeys. They establish no protected daemon
+or complete peer admission.
+
+Private preparation, operator-package creation/recovery and service export are
+tracked in increments54–57. They create no OS account, human identity or current
+business mandate. Actual account separation, confinement, protected effect services
+and end-to-end acceptance remain open; PA02 is partial and the17global invariants
+are not established. See [Linux prerequisites](PAEA-LINUX-PREREQUISITES.md) for APIs
+and remaining conditions. Historical evidence below retains its dated scope.
+
+## Historical increment15 evidence
+
 On October 26, 2026, the user authorizes compilation and push, lifting the earlier
 restriction. Eight PAEA Rust targets (45 tests) and five schema tests pass,
 including native HTTP. Browser verification exercises the real executable and

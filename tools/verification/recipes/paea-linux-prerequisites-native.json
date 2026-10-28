@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "paea-linux-prerequisites-native",
+  "inputs": [
+    "tests/paea_linux_native_recipe.py",
+    "tests/paea_linux_native_test.py",
+    "schemas/paea/linux-prerequisites-v2.schema.json",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-linux-prerequisites-native.json"
+  ],
+  "environment": {
+    "SWARM_PAEA_PREREQ_NATIVE_PARENT": "{root}/docs/plans/actions-confiance/paea/evidence"
+  },
+  "steps": [
+    {
+      "id": "qualified-default-cli-http-portable-proof",
+      "command": [
+        "python3",
+        "tests/paea_linux_native_recipe.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "NATIVE_RECEIPT_SHA256=",
+        "NATIVE_QUALIFIED_RECIPE_PASS checks=37 commands=52 http=16"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

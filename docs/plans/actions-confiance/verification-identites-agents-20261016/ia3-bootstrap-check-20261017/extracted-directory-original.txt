@@ -1,0 +1,30 @@
+	if uint32(os.Geteuid()) != owner || !filepath.IsAbs(path) || filepath.Clean(path) != path || path == "/" || strings.IndexByte(path, 0) >= 0 {
+		return nil, ErrPath
+	}
+	fd, err := unix.Open("/", unix.O_RDONLY|unix.O_DIRECTORY|unix.O_CLOEXEC, 0)
+	if err != nil {
+		return nil, pathError(err)
+	}
+	parts := strings.Split(strings.TrimPrefix(path, "/"), "/")
+	for i, component := range parts {
+		next, openErr := unix.Openat(fd, component, unix.O_RDONLY|unix.O_DIRECTORY|unix.O_CLOEXEC|unix.O_NOFOLLOW, 0)
+		closeErr := unix.Close(fd)
+		if openErr != nil {
+			return nil, pathError(errors.Join(openErr, closeErr))
+		}
+		fd = next
+		var st unix.Stat_t
+		if err = unix.Fstat(fd, &st); err == nil {
+			if i == len(parts)-1 {
+				if st.Uid != owner || st.Mode&07777 != 0700 {
+					err = ErrPath
+				}
+			} else if st.Uid != 0 && st.Uid != owner || st.Mode&0022 != 0 && !(st.Uid == 0 && st.Mode&unix.S_ISVTX != 0) {
+				err = ErrPath
+			}
+		}
+		if err != nil || closeErr != nil {
+			return nil, pathError(errors.Join(err, closeErr, unix.Close(fd)))
+		}
+	}
+	s := &Store{dir: os.NewFile(uintptr(fd), "installation-config-directory"), owner: owner, pins: pins, authorize: authorize}

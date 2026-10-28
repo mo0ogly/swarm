@@ -20,6 +20,19 @@ autorité distante prévue via configuration initiale et UX Admin. Voir IA3c.2f
 en fin de plan ; choix adopté, service et écrans non livrés. Les mentions plus
 anciennes de frontière à choisir conservent leur état historique.
 
+Précision utilisateur du 17 octobre : aucun fournisseur d’identité disponible.
+Le parcours doit fonctionner avec une authentification humaine locale par défaut,
+configurable depuis l’UX initiale puis Admin, sans fournisseur externe imposé.
+Voir la reprise IA3c.2f-04 ci-dessous : décision adoptée, assistant et gestion
+des comptes encore à réaliser ; aucune activation ni identité humaine vérifiée
+déduite de cette décision.
+
+Décision ultérieure du 17 octobre : migration complète Go → Rust avec une seule
+bascule finale. Le [plan de migration](../migration-rust/PLAN.md) conserve cette
+décision et les preuves des ports de données et du protocole d’authenticité. Les critères d’identité et
+le compte humain local configurable restent requis ; la migration de langage
+ne les clôt pas. Le moteur Go actuel demeure la référence utilisable.
+
 ## Besoin et périmètre
 
 Demande utilisateur : empêcher un attaquant de créer un agent présenté comme
@@ -1871,3 +1884,383 @@ pour EMSGSIZE/retry ; le transfert d’historique arbitraire reste ouvert (I2f03
 Le retour authentifié après envoi ne prouve pas la remise privée avant envoi :
 conserver I2f03b-05 et EP-07 avant toute activation publique. Service système,
 humain initial, confinement, Admin et admission/révocation réelles restent ouverts.
+
+
+## IA3c.2f-03c — remise privée du canal et cycle du processus
+
+Reprise replan/APEX : checkout propre sur codex/clear-product-method-names,
+HEAD f32b9f8fa6e99f75845f57872a7f8a56a0ef9dc6 ; les tranches précédentes ont
+été intégrées depuis les preuves conservées. 03b vérifie le retour après envoi,
+mais I2f03b-05 attend encore la remise au serveur avant demande métier.
+Comparer endpoint par chemin, nouvelle couche réseau et remise privée des FDs
+avec preuve séparée de démarrage : retenir la dernière pour la cible locale.
+Aucune création de compte ni déploiement, aucun fournisseur ou processus tiers.
+
+Deux ajouts possédés par Codex : agent_identity_config_launch_linux.go et son test,
+dans internal/engine ; anciennes sources inchangées. Réutiliser le pinning de
+l’image courante (trust_fixed_image_linux.go), le canal IA2 et le client/service
+03b. Nouvelle commande interne de lancement Go seulement ; pas de nouvelle
+branche CLI ou service système sans source humaine indépendante. Le parent
+crée deux socketpairs privées configurées avant exec : métier et démarrage.
+Trois phases démarrage version 1, purpose explicite hello/ready/release, challenge
+32 octets et digest de pins publics ; aucune demande, principal ou session dans
+ce canal. Ready et Release ne donnent aucune autorité métier.
+
+L’image courante est épinglée par FD. Pidfd enfant obtenu atomiquement par
+SysProcAttr.PidFD / CLONE_PIDFD, inspecté dans le Go 1.24.3 local ; refus si absent,
+jamais PidfdOpen sur un numéro de PID enfant. Pidfd du parent transmis indépendamment
+au helper ; comparaison noyau/UID des deux côtés avant libération du canal métier.
+Le child ne lit la demande métier qu’après Release exacte, puis applique toujours
+son contrôle d’autorité et la coordination protégée. Les FDs reçus sont adoptés,
+fermés ou CLOEXEC avant service ; les copies parent sont fermées après exec.
+
+Le lanceur consomme une commande neuve de l’image courante, sans ExtraFiles ni
+annulation/WaitDelay préconfigurés ; environnement explicite, attributs système
+préservés sauf sa réservation PidFD. Pas de shell, de chemin choisi par projet,
+de délai, retry, compte implicite ou relance. Annulation/échec ferme ses canaux,
+signale uniquement son enfant via pidfd et recueille Wait ; jamais un autre
+processus ou groupe. Succès exige réponse métier valide et fin de l’enfant à zéro.
+Une panne après mutation reste une issue incertaine avec résultat nul, sans reset.
+
+Critères avant code : échange/effet persistant entre deux processus, auth encore
+requise après ready, pins/UID/nonce/purpose incorrects refusés avant effet, erreur
+exec/fin précoce, annulation avant exec et après entrée dans l’autorité via barrière
+observée, enfant non nul après réponse, pas de secret d’environnement hérité,
+FDs adoptés/fermés et doubles démarrages refusés. Pas de timeout global Go/enfant.
+Rejouer les 77 noms moteur et les nouveaux tests process, race ciblée, vet/build ;
+réutiliser les 106 config uniquement sur douze entrées propres identiques.
+Manifestes de toutes les sources Go/modules, pas d’overlay préventif : le checkout
+est propre ; toute mutation pendant compilation invalide la preuve et impose
+son propre diagnostic. Docs FR/EN, schémas, installation, cible et note scientifique
+au même incrément. Preuves dans ia3-local-launch-20261017.
+
+### Résultat IA3c.2f-03c — canal remis avant contenu, processus recueilli
+
+Lanceur privé et helper Go ajoutés, sans modification des 41 sources/modules de
+référence. Démarrage V1 distinct, image épinglée et pidfd enfant obtenu au clone ;
+aucun contenu métier envoyé avant ready exact du processus attendu. Le helper
+vérifie parent et release avant d’admettre le canal. Métier V2 et stockage V1
+inchangés. Annulation par fermeture et signal au seul pidfd enfant ; Wait recueilli,
+copies héritées fermées et numéro du pidfd consommé invalidé dans Cmd.
+
+117 noms moteur PASS normal/race-02 (77 précédents + 40 nouveaux), zéro FAIL/SKIP,
+vet/build PASS, 834 entrées stables, sans overlay. Les 106 noms config
+normal/race-01 de 03b restent réutilisables : douze entrées propres comparées,
+aucune différence. Aucun échec comportemental observé dans le candidat 03c ; ne
+pas inventer une phase rouge pour un nouveau contrat. La première version a
+39 noms nouveaux PASS normal/race-01 ; la finale ajoute le refus d’un autre objet
+processus sous le même UID et contrôle fermeture/invalidation des FDs. Les
+sources des deux versions sont archivées. Pas de répétition de suite globale.
+
+Un dernier contrôle ajoute dans le helper l’observation des originaux hérités
+3–6 avant autorité : fermés ou, si numéro réutilisé par Go, remplaçant CLOEXEC.
+Le lot final 03 passe avec les mêmes 117 noms normal/race, vet/build et 834 entrées
+stables. Cette modification du test justifie le rejeu ciblé ; le code produit
+reste identique au lot 02. Les deux résultats et leurs archives sont préservés.
+
+Docs FR/EN et installation, cible et note scientifique actualisées. Les schémas
+FR/EN sont rendus et inspectés. Le rapport conserve recette, manifeste et limites :
+[IA3c.2f-03c](verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md).
+Un répertoire docs/diagrams apparu pendant ce travail est extérieur au périmètre
+annoncé ; il est préservé. Aucun processus tiers, compte, mission ou binaire déployé
+modifié ; aucune revue indépendante ou acceptation globale revendiquée.
+
+| Découverte | Origine, valeur et périmètre | État, propriétaire et reprise observable |
+| --- | --- | --- |
+| I2f03c-01 / I2f03b-05 | Vérifier le retour après envoi ne prouve pas la remise avant contenu ; protéger le raccord local privé | Réalisé/vérifié en fixtures par Codex ; EP-07 reste partiel tant que compte, confinement et bootstrap réel ne protègent pas les FDs |
+| I2f03c-02 | Une réponse valide suivie d’un échec de processus ne remplit pas le contrat de lancement ; conserver effet durable et incertitude | Réalisé/vérifié : erreur originale, zéro résultat, reprise exacte sans doublon ; Codex ; reprendre cette garde au raccord public |
+| I2f03c-03 | Cmd peut conserver le numéro d’un pidfd fermé ; éviter une réutilisation ultérieure accidentelle | Invalidation à -1 réalisée/vérifiée, copies héritées fermées ; Codex ; aucune garantie déduite pour des FDs divulgués par un bootstrap compromis |
+| I2f03c-04 | Wait collecte aussi les goroutines de flux Go ; un writer arbitraire peut bloquer malgré la fin du processus | Limite documentée, non simulée comme résultat vérifié ; Codex pour le raccord public : définir les propriétaires/contrats de flux et observer leur collecte avant activation, sans timeout de commodité |
+
+Pour I2f03c-04, comparer fichiers OS explicites et collecteur de copie possédé,
+annulable et vérifié : retenir les fichiers OS pour le futur helper public à
+usage unique, collecteur seulement si un besoin de capture l’exige. Choix conservé
+pour ce raccord encore inexistant ; ne pas annoncer l’effet comme déjà réalisé.
+
+Réexamen du besoin initial : ce composant ne désigne pas l’humain ni n’installe
+l’autorité. Le principal humain initial, sa source vérifiable et la protection du
+bootstrap relèvent encore d’une décision opérateur ; la création/activation d’un
+compte et service système exige cette décision et son autorisation. Le code peut
+ensuite recevoir pins/UID depuis cette source, vérifier confinement et appliquer
+les parcours publics Go/API/CLI/Admin. Ne pas utiliser un cookie cockpit, le compte
+actuel ou le premier appelant pour contourner la précondition. F01–F07, IDA,
+EP-01/04/05/07, IA3–IA5 et RETEX global demeurent ouverts.
+
+Précision I2f03c-01/EP-07 : le helper à usage unique ne résout pas le cycle du
+service permanent ni les droits de changement de compte/signal à un autre UID.
+Le pidfd n’accorde pas ces droits. Comparer bootstrap privilégié protégé et broker
+authentifié avant le raccord public, à partir de la source d’autorité désignée ;
+ne pas rendre tout le cockpit privilégié. Propriétaires Codex/opérateur ; critère
+observable : lancement/supervision du compte séparé avec droits réellement
+vérifiés dans le parcours retenu. État : contrainte conservée, intégration non faite.
+
+Un patch documentaire groupé a été refusé sur un contexte de ligne erroné, sans
+modification partielle (hashes comparés). Le contexte exact a été relu avant le
+patch corrigé ; preuve originale dans doc-patch-incident.json du lot 03c. La
+reprise ne change aucun source Go ; seuls les contrôles documentaires et leurs
+archives sont reconstruits, sans répétition des tests moteur inchangés.
+
+À la vérification finale, README.md/README.en.md et le suivi/preuves
+deepagents-integration ont aussi évolué hors du périmètre 03c. Ils sont préservés,
+exclus du diff et des archives possédés ; aucun source Go pertinent n’a changé.
+L’auto-inspection corrige aussi une phrase FR : le pidfd enfant est reçu par le
+parent, comme le montrent le code, le schéma et le texte EN. Source Go inchangé.
+
+## IA3c.2f-03d — précontrôle public du bootstrap protégé
+
+Reprise autorisée par « donc on fais ca ». Le dépôt a évolué sur les chantiers
+mémoire/UX depuis 03c ; ses preuves restent historiques, les ajouts lanceur sont
+inchangés. Préserver toutes ces modifications. Le principal humain initial et sa
+source n’ont pas été fournis ; question précise sur le fournisseur existant
+envoyée à l’utilisateur. Ne pas inventer issuer/subject, clé ou identité humaine.
+
+Comparer activation directe depuis le cockpit et précontrôle indépendant de
+l’installation : retenir le précontrôle en lecture seule. Il prépare une entrée
+réelle pour setup/service sans donner à un fichier le pouvoir de s’autoriser.
+Manifeste canonique version 1 : pins publics, UID service et contrôleur distincts,
+répertoires configuration/témoin. Empreinte attendue transmise indépendamment ;
+elle ne doit jamais être apprise du fichier qu’elle contrôle. Le chargement est
+exécuté sous l’UID du service, refuse symlinks/liens multiples/modes non privés,
+vérifie les trois répertoires distincts et non imbriqués sans créer de lock.
+Une validation de ce format ne prouve pas l’authentification humaine ou la
+protection du lanceur ; les états non vérifiés restent explicites.
+
+Fichiers possédés annoncés : internal/enrollmentconfig/store_linux.go (extraction
+du parcours de chemin existant) et nouveau path_linux.go ; paquet nouveau
+internal/enrollmentbootstrap (format, chargeur et tests) ; internal/engine/main.go
+(routage avant ouverture projet), nouveaux agent_identity_bootstrap_linux.go et
+son test. Commande publique : swarm identity bootstrap-check EMPREINTE --input
+/chemin/absolu/bootstrap.json. Aucun service, compte, clé ou configuration métier
+créé par cette commande. Bibliothèque commune réutilisable par setup/API/Admin.
+Docs FR/EN, installation, cible et note scientifique dans le même incrément.
+
+Critères : contre-exemples fichier/canon/digest/UID/alias, résultat nul sur refus,
+zéro fichier créé, ancien contrôle de chemin inchangé, CLI réelle sans projet ni
+authentification promue. Tests avant code ; Go -timeout=0, suivi de progression,
+race sur stockage/chargeur et lanceur, contrôle méthodes et compilation. Le
+rejeu du paquet config est justifié par l’extraction de sa frontière commune.
+Capturer les sources effectives et changements simultanés ; une mutation invalide
+la preuve, ne pas la masquer. Preuves dans ia3-bootstrap-check-20261017.
+
+Anomalie de méthode en lecture : noms supposés main_test.go, trust_store.go et
+agent_identity_issuer.go absents. Recherche corrigée avec rg --files avant lecture
+des producteurs ; aucun défaut produit ou test PASS déduit de ces commandes.
+Conserver les sorties originales de ces refus dans le rapport de tranche.
+
+### Résultat 03d — précontrôle public vérifié, source humaine en attente
+
+141 noms bootstrap/config (35 + 106) et 118 moteur (117 précédents + CLI) passent
+en normal et race-04, zéro FAIL/SKIP ; vet/build PASS. 848 entrées Go/modules
+stables pendant ces lots, sans overlay. La frontière de chemins du stockage est
+extraite sans assouplissement, les 106 gardes config sont rejouées à cause de
+cette dépendance commune. Les deux sources Go existantes modifiées et cinq
+ajouts sont archivés ; les travaux mémoire/UX sont conservés.
+
+Le binaire de fixture exécute la vraie CLI : contrôle valide, mauvais pin refusé,
+témoin valide dans des namespaces privés puis alias réel config/témoin par bind
+mount refusé. Aucun projet, lock, état métier, compte ou service créé. UID 0 dans
+ce namespace est l’utilisateur hôte non privilégié mappé, pas un accès root hôte.
+Les trois états humain/confinement/service restent false. Le contrôleur commun
+des méthodes passe avec cinq noms ; schémas FR/EN rendus et inspectés.
+
+Contre-exemples de méthode conservés : 02 compte un FAIL et 139 PASS, donc lot
+FAIL ; le diagnostic 03 confirme le parent temporaire 0775 interdit. Nos fixtures
+manquaient Chmod(0700), comme le pratiquent déjà les fixtures de stockage.
+Correction des fixtures seulement ; le produit n’est pas affaibli. Chaque cas
+négatif de chargement commence désormais par un Load valide de référence,
+évitant que l’échec d’un parent masque toutes les autres injections. Le test CLI
+s’exécute depuis un répertoire isolé. Le collecteur 01 a échoué avant tout Go
+(variable name écrasée par la boucle d’archivage) : script original conservé,
+variable distincte et label neuf ; ne pas compter ce lancement comme test exécuté.
+
+| Découverte | Origine, valeur et périmètre | État / propriétaire / critère restant |
+| --- | --- | --- |
+| I2f03d-01 | Ouvrir le coordinateur pour un simple précontrôle créerait un lock ; séparer observation et mutation | Helper de chemin commun et CLI sans Store réalisés/vérifiés ; Codex ; conserver le même contrat pour setup/API/Admin |
+| I2f03d-02 | Fixture parent 0775 : des cas négatifs PASS peuvent partager une précondition invalide et ne pas tester leur défaut propre | Reproduit, corrigé et vérifié avec témoin valide avant chaque injection ; Codex ; capitalisé dans contrat, tests, rapport et note scientifique |
+| I2f03d-03 | Lire tout le fichier avant comparaison d’empreinte peut allouer un gros fichier non approuvé ; origine : inspection statique de Load | Hypothèse de durcissement avant raccord service, non mesurée ; Codex ; comparer empreinte en flux puis lecture liée aux mêmes octets, sans plafond métier caché, si un consommateur exposé doit lire des entrées non approuvées |
+
+Coordination : demande de stabilisation reçue du chantier mémoire M32 pendant sa
+qualification finale ; aucune réponse intersession envoyée, comme demandé.
+Nos sept sources Go et les paquets communs sont stables après les lots 04 ;
+plus aucune modification Go prévue pour terminer cette documentation. Toute
+correction réellement nécessaire devra annoncer ses fichiers et un nouveau
+point stable. La demande reçue n’est pas une preuve de qualification M32.
+
+Le [rapport 03d](verification-identites-agents-20261016/ia3-bootstrap-check-20261017/RAPPORT-IA3c2f03d.md)
+conserve recette et limites. Le précontrôle ne résout ni l’approbation indépendante
+du manifeste, ni l’authentification du principal déclaré. La question précise
+« fournisseur existant et URL d’émetteur, ou aucun » est en attente de réponse.
+Cette valeur est nécessaire pour choisir et raccorder le parcours humain réel ;
+ne pas inventer un issuer/subject ni promouvoir le compte/cookie courant. Après
+cette désignation : source humaine et contrôle métier, provisionnement/service
+séparé, preuve de confinement, admission/révocation publiques puis setup/Admin.
+Pas de compte, clé ou service d’autorité créé pour contourner ce préalable.
+F01–F07, EP-01/04/05/07, IA3–IA5 et RETEX global restent ouverts.
+
+La qualification vérifie aussi deux contrôles d’aide existants : le routage
+partagé main.go a changé et l’aide doit rester utilisable sans projet, sans
+mutation de contexte métier. Ce sélecteur borné ne modifie aucun source Go.
+Le chantier M32 confirme ensuite par message entrant avoir reçu le point public
+de stabilité et lancé sa qualification sans substitution Go ; c’est un reçu de
+coordination, pas sa fin ou son acceptation.
+
+### Replan de preuve 03d — ressources réellement embarquées
+
+La coordination M32 mentionne ses assets figés ; l’inspection de resources.go à
+la racine et go list -json . montre 274 ressources go:embed, absentes du collecteur
+limité à internal/cmd. Les 848 entrées de 04 ne suffisaient donc pas à lier le
+binaire complet. Garder ces preuves et leur limite, ne pas les présenter comme
+qualification de tous les inputs. Les sources Go sont toujours inchangées.
+
+I2f03d-04, propriétaire Codex : collecteur corrigé pour inclure source racine,
+ressources et évolution de la liste EmbedFiles. 137 assets web sont figés dans
+une fixture readonly logique et l’overlay ne substitue aucun Go. Autres ressources
+hashées et conservées/référencées pour reconstruction. Source primaire du Go local
+vérifiée : embed.Files utilise fsys.Actual, donc applique l’overlay aux ressources.
+
+Le lot final 05 passe : 141 noms bootstrap/config et 118 moteur en normal/race,
+vet/build, CLI du nouveau binaire et alias de bind mount réels, contrôleur méthodes
+cinq noms et deux gardes d’aide. 1 123 entrées effectives stables. Les empreintes
+des sources Go coïncident avec 04 ; aucune modification du chantier identité ne
+perturbe la qualification M32. Aucune acceptation UI ou service réel déduite.
+La capitalisation dans une consigne embarquée commune attend sa fin confirmée,
+afin de préserver cette entrée ; la recette corrigée et ce plan sont persistants
+dès maintenant. L’activation reste suspendue au choix de source humaine demandé.
+
+### Capitalisation après la clôture de la fenêtre M32
+
+Un message entrant confirme la fin de qualification M32 et la stabilité des sept
+sources Go communes. Sa fenêtre est close ; aucune preuve M32 n’est modifiée.
+Les deux leçons sont maintenant conservées dans la consigne personnelle
+/home/fpizzi/.codex/AGENTS.md, les méthodes FR/EN et le contrat commun embarqué.
+Le contexte AGENTS actualisé reçu ensuite contient effectivement ces clauses.
+Les processus déjà démarrés ne reçoivent pas cette mise à jour automatiquement.
+
+Le premier ajout au contrat fait échouer le contrôleur : planner 32034 et
+subplanner 32037 octets, contre la borne existante 32000. Original conservé dans
+CONTRACT-before-frame-fix.md et workflow-learning-06.stderr. Aucun plafond relevé,
+aucune troncature : reformulation du paragraphe de preuve, mêmes exigences et deux
+leçons incluses, 63 octets de moins. workflow-learning-07 passe avec cinq noms.
+Cette anomalie créée par notre amélioration est traitée avant le besoin initial.
+
+La nouvelle donnée embarquée justifie la qualification du moteur et du binaire
+avec ce contrat final : mêmes 118 noms identité, plus les gardes existantes de
+framing, transmission au processus worker de fixture et réouverture, et aide.
+Ce provider est un script local de test, aucun Claude ou modèle réel. Les 141
+noms des bibliothèques config/bootstrap restent réutilisés de 05 après contrôle
+de leurs dépendances locales effectives, qui n’importent pas resources. Pas de
+suite config répétée pour une modification de texte hors de son graphe.
+
+Lot final 07 : 126 noms moteur (118 identité, 5 framing, 1 transmission/réouverture,
+2 aide) PASS normal/race, aucun FAIL/SKIP ; vet/build et CLI réelle/alias PASS.
+141 noms de bibliothèque 05 réutilisés : graphe local et test vérifié, quinze
+entrées inchangées, resources non importé. 1 123 entrées effectives liées au
+binaire fixture-07. Le test worker vérifie le préfixe complet transmis au script
+local et conservé après réouverture, sans fichier local hostile ni acceptation
+implicite de tâche. Les deux leçons atteignent ainsi le consommateur de fixture,
+pas seulement un fichier. Aucun modèle réel ou processus existant mis à jour.
+
+I2f03d-05 : les corps de méthodes frôlent la borne moteur 32000 ; cette borne
+exclut l’en-tête de métadonnées. Les cadres retournés mesurés sont 32196/32202
+(planner/subplanner) et 31355/18794 (worker/reviewer). Ce n’est pas une mesure des
+limites fournisseurs. Propriétaire Codex, suivi de cadrage/méthodes : justifier
+la borne et réduire les répétitions à contrat constant avant un nouvel ajout
+qui l’excéderait ; aucun relèvement arbitraire ou nouvelle politique ici.
+
+## Replan IA3c.2f-04 — défaut local et configuration UX, 17 octobre
+
+Précondition changée : l’utilisateur répond « aucun » pour le fournisseur
+d’identité, puis exige une configuration depuis l’UX et un choix par défaut
+permettant de lancer le modèle. La question précédente n’est plus en attente.
+L’exigence d’un fournisseur humain externe était une hypothèse trop restrictive,
+pas une contrainte du contrat générique identitycontract.Principal. Son code
+valide les données ; il n’implémente aucune authentification locale humaine.
+
+Décision de réalisation retenue : assistant de premier lancement avec compte
+humain local personnel présélectionné, puis réglage Admin ; fournisseur
+d’entreprise optionnel. Hébergement local/distant et fournisseur IA restent
+deux autres choix. Pas de mot de passe commun ou de premier appelant autorisé
+automatiquement. Le défaut sélectionne un parcours, pas des droits. L’exécution
+protégée attend toujours l’enrôlement et les frontières vérifiées, avec une
+résolution guidée, sans exiger une infrastructure d’identité externe.
+
+| Voie comparée | Valeur, risque et conséquence | Décision et état |
+| --- | --- | --- |
+| Compte humain local personnel | Sans IdP externe ; stockage des secrets dérivés, sessions, récupération et anti-abus deviennent une responsabilité du produit. Un mot de passe ne prouve pas une présence humaine physique et reste exposé au phishing. L’administration hôte reste dans la base de confiance du pilote. | Défaut retenu pour le parcours initial ; mécanisme et UX non implémentés |
+| Passkey/WebAuthn locale | Candidat pour renforcer l’authentification ; dépend d’un client/authentificateur compatible et d’un contexte sécurisé. Enrôlement initial et récupération restent nécessaires. | Amélioration conservée, pas un prérequis matériel ajouté au démarrage ; qualification avant activation |
+| Fournisseur d’entreprise | Gestion fédérée et politiques centrales ; nécessite une infrastructure absente ici et une liaison de comptes vérifiée. | Option configurable, aucun fournisseur imposé au pilote |
+
+Sources primaires consultées le 17 octobre : [OWASP Authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html),
+[OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+et [W3C WebAuthn](https://www.w3.org/TR/webauthn-3/). Elles motivent la protection
+des secrets et sessions et la qualification du renforcement ; elles ne prouvent
+pas notre implémentation. L’algorithme de dérivation et ses paramètres seront
+choisis avec une bibliothèque éprouvée, mesurés et exposés selon le contrat
+produit ; aucune limite arbitraire de test ou nouvelle politique cachée ici.
+
+Périmètre de cet incrément : les sept pages annoncées (plan, contrat cible,
+contrats FR/EN, installation FR/EN, note scientifique). Aucune source moteur,
+ressource embarquée ou interface modifiée. HEAD observé à la reprise :
+06481f15e677285b789cfb81ba8e02e351bfdc27, branche codex/clear-product-method-names ;
+travaux sales et changement de HEAD partagé conservés. Le message entrant du
+chantier mémoire annonce M33 sur paused/prepareLaunch dans agents_store.go ;
+ces blocs restent intacts, aucune réponse interconversation non autorisée.
+
+Suite rattachée aux lots existants, sans nouvelle mission : IA3c.2f-03 conserve
+la frontière/service et le contrôle humain réels ; IA3c.2f-04 inclut désormais
+l’assistant et les critères UX1–UX7 du contrat cible ; -05 raccorde l’admission
+publique et -06 reste la migration distante. Codex possède la réalisation et
+ses preuves. Le choix de source humaine est résolu ; l’identité personnelle,
+son authentification, le service séparé et le confinement restent à établir par
+le parcours. Il n’est plus nécessaire d’attendre une URL d’IdP externe pour
+préparer ou implémenter ce parcours. F01–F07, IDA et RETEX global restent ouverts.
+
+Améliorations conservées : I2f04-01, origine exigence UX utilisateur et hypothèse
+d’IdP imposé, valeur démarrage autonome du pilote, périmètre setup/Admin ;
+compte local par défaut décidé et spécifié, effet non implémenté. I2f04-02,
+origine séparation entre défaut et récupération, valeur empêcher une reprise
+de contrôle après perte de fichier ; propriétaire Codex service/setup, critère
+UX4 (configuration absente après enrôlement ≠ installation vierge), spécifié
+non vérifié. I2f04-03, origine comparaison WebAuthn, valeur renforcer l’identité
+humaine, propriétaire Codex authentification ; différé jusqu’à qualification
+client/authentificateur/récupération, sans bloquer le parcours local par défaut.
+
+Vérification documentaire : sept sections présentes, 22 liens locaux du
+périmètre relu résolus, même topologie du schéma FR/EN, trois diagrammes rendus
+et inspectés visuellement, git diff --check PASS. Le suivi et les contrats
+persistants transmettent le choix aux prochaines reprises ; aucun contexte
+embarqué ni processus existant n’est mis à jour par ces pages. La comparaison
+avec l’archive 03d inclut aussi des changements d’installation/version et de
+contrat commun d’autres travaux : ils sont préservés, non attribués à ce lot.
+Preuves et contrôleur reproductible dans
+[ia3-default-ux-20261017](verification-identites-agents-20261016/ia3-default-ux-20261017/).
+Les critères comportementaux UX1–UX7 restent NOT TESTED : aucun test Go ou
+browser inventé pour cette décision documentaire, aucun compte/service créé,
+aucun workflow réellement lancé et aucune acceptation sécurité déduite.
+
+## Relecture de cohérence Identité et AC-02 — 23 octobre 2026
+
+Le [rapport croisé](securite-execution-apex.md#8-cohérence-croisée-avec-le-plan-identité-et-la-file-apex)
+conserve AC02-RV-05/06 : distinguer parité G7, livraison fonctionnelle Identité et
+extension AC-02 ; nommer la sortie IA3 consommée par M20, puis le raccord mémoire
+attendu par IA4. Deux ambiguïtés documentaires à clarifier par l’intégration
+racine et les propriétaires, pas des cycles effectifs ou des défauts runtime
+démontrés. Les décisions et preuves historiques ci-dessus restent conservées ;
+aucune protection requise, autorité ou condition d’activation n’est assouplie.
+
+## Dépendances de reprise précisées — 23 octobre 2026
+
+La suite « next » précise le [contrat de remise commun](securite-execution-apex.md#9-dépendances-et-livrables-partagés-précisés).
+IA3 fournit l’autorité protégée nécessaire aux usages réels de M20/P2–P4 ; IA4
+consomme le raccord mémoire et ne réimplémente pas son contrôle. IA5 conserve
+ses critères après IA3/IA4 ; sa clôture entière n’est pas un préalable à M20.
+Le chantier mémoire possède les sources, versions, attribution et usages liés ;
+Identité possède l’autorité, sa protection et l’interface de ses droits.
+L’intégration racine attribue chaque frontière et relie les preuves partagées.
+
+La qualification de parité G7 et la clôture fonctionnelle IA1–IA5 sont distinctes.
+Toute protection requise par le parcours Identité reste exigée avant activation,
+y compris EP-07/F07 ; elle n’attend pas uniquement le futur AC-02. L’inventaire
+de migration doit conserver garantie, preuve et refus pour chaque parcours.
+Ces précisions ferment l’ambiguïté documentaire AC02-RV-05/06, sans fermer F01–F07,
+EP, IDA ni les critères comportementaux encore non vérifiés. Aucun code lancé.

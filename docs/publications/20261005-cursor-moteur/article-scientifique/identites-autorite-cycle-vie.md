@@ -660,3 +660,80 @@ d’un échange unique et ferme lui-même sur toute issue. Un second contre-exem
 refuse la cause disque inventée pour une indisponibilité générale. Ces défauts
 du candidat et leurs gardes sont distingués de la valeur scientifique supposée :
 ils vérifient notre méthode et ce raccord, pas une propriété globale du moteur.
+
+### IA3c.2f-03c — contrôler la remise avant le contenu
+
+Le [raccord de lancement privé](../../../plans/actions-confiance/verification-identites-agents-20261016/ia3-local-launch-20261017/RAPPORT-IA3c2f03c.md)
+ajoute une expérience entre processus réels : image courante épinglée, pidfd
+enfant retourné atomiquement par clone, canal de démarrage distinct du contenu
+métier et preuve du parent depuis un descripteur hérité. Hello/ready/release
+lient les objets processus, UID, challenge frais et empreinte des pins propres
+à chaque côté. Ready ne fournit aucune autorisation de création ou de mutation.
+Le contrôleur métier indépendant reste nécessaire après cette étape.
+
+L’expérience sépare désormais trois observations : destinataire établi avant
+contenu dans ce raccord privé, résultat lié à la demande, et fin de l’enfant
+effectivement recueillie. Une réponse de mutation valide suivie d’un échec du
+processus conserve l’incertitude et l’état durable ; le retry exact sans doublon
+est une observation distincte. Les annulations partent de barrières observées,
+sans délai arbitraire utilisé pour simuler une panne. Un test supplémentaire
+refuse un message d’un autre processus sous le même UID.
+
+La portée reste locale : helpers du même compte et contrôleur de fixture. Ni
+confinement réel, ni humain authentifié, ni intégration d’un fournisseur ou de
+tous les nœuds du workflow ne sont démontrés. Le pidfd et l’image épinglée ne
+suffisent pas si le bootstrap ou le compte sont compromis. Cette séparation des
+preuves aide à construire le protocole expérimental de thèse ; elle n’établit
+aucune nouveauté scientifique ou supériorité sur les travaux et produits cités.
+
+### IA3c.2f-03d — ne pas promouvoir une déclaration de bootstrap en autorité
+
+Le précontrôle public sépare maintenant manifeste déclaré, empreinte approuvée
+indépendamment et propriétés de stockage observées. Il expose explicitement que
+l’humain, le confinement et l’activation restent non vérifiés. Un UID distinct
+ou un fichier privé ne remplace donc pas la preuve humaine. Le contrôle de chemins
+est partagé avec le stockage, sans ouverture de coordinateur qui créerait un lock.
+
+La première expérience a refusé un témoin supposé valide : son parent temporaire
+était 0775, donc le refus était correct. Cette précondition invalide masquait
+aussi les autres défauts injectés. La recette est renforcée par un témoin valide
+avant chaque injection ; la fixture est protégée, aucune garde produit n’est
+assouplie. Cette correction de notre protocole expérimental ne prouve ni un
+service déployé ni une nouveauté scientifique.
+
+Une seconde limite de preuve est découverte à l’aide de la coordination mémoire :
+le compilateur embarque aussi la source racine et des assets, pas seulement les
+fichiers Go des répertoires du moteur. Le collecteur est corrigé et le candidat
+requalifié avec ces entrées, des assets web figés et aucune substitution Go.
+Les anciens résultats et leur couverture incomplète restent conservés. La preuve
+de comportement, la stabilité des sources et la reconstruction de l’image sont
+trois vérifications distinctes ; leur correction ne prouve pas l’originalité du
+protocole d’identité ni une activation réelle de l’autorité humaine.
+
+### Parcours local par défaut — exigence produit, pas preuve d’identité
+
+Le 17 octobre, l’utilisateur précise qu’aucun fournisseur d’identité n’est
+disponible et demande un défaut configurable depuis l’UX pour lancer le modèle.
+Le parcours retenu propose un compte humain local personnel à l’initialisation,
+puis sa gestion dans Admin ; la fédération d’entreprise devient optionnelle.
+La préférence de connexion et l’hébergement local/distant de l’autorité sont
+indépendants. Le défaut ne constitue ni un compte commun ni une autorisation.
+
+Le protocole expérimental devra comparer installation vierge, installation
+enrôlée dont la configuration disparaît, tentative de premier visiteur, rejeu
+du bootstrap, migration de fournisseur et récupération de compte. L’exécution
+du workflow doit conserver attribution, autorisation et révocation à chaque
+étape. Le compte local doit être vérifié par l’autorité protégée ; une donnée
+`human`, un UID ou un cookie ne prouve pas ce lien. Authentifier un compte
+n’établit pas à soi seul l’identité civile ou la présence physique de son humain.
+
+[OWASP Authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+guide les contrôles de session, réauthentification et liaison fédérée ;
+[OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
+guide le stockage dérivé. [WebAuthn du W3C](https://www.w3.org/TR/webauthn-3/)
+est une piste de renforcement à qualifier, pas une contribution nouvelle de
+Swarm. Le choix local est une décision d’utilisabilité sous la menace pilote ;
+aucune efficacité, résistance aux attaques ou nouveauté scientifique n’est
+démontrée par sa documentation. Les sept critères UX1–UX7 sont définis dans le
+[contrat cible](../../../plans/actions-confiance/identites-agents-enrolement-IA3c2.md),
+sans exécution ni résultat expérimental nouveau.

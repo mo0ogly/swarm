@@ -1,0 +1,18 @@
+850: 	// Prepare Go embed config if needed.
+851: 	// Unlike the import config, it's okay for the embed config to be empty.
+852: 	var embedcfg []byte
+853: 	if len(p.Internal.Embed) > 0 {
+854: 		var embed struct {
+855: 			Patterns map[string][]string
+856: 			Files    map[string]string
+857: 		}
+858: 		embed.Patterns = p.Internal.Embed
+859: 		embed.Files = make(map[string]string)
+860: 		for _, file := range p.EmbedFiles {
+861: 			embed.Files[file] = fsys.Actual(filepath.Join(p.Dir, file))
+862: 		}
+863: 		js, err := json.MarshalIndent(&embed, "", "\t")
+864: 		if err != nil {
+865: 			return fmt.Errorf("marshal embedcfg: %v", err)
+866: 		}
+867: 		embedcfg = js

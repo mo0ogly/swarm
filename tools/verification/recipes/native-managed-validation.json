@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "native-managed-validation",
+  "inputs": [
+    "rust/crates/swarm-engine/src/root_store/task_validation.rs",
+    "rust/crates/swarm-engine/src/root_store/task_validation/*.rs",
+    "rust/crates/swarm-engine/src/root_store/review_preview.rs",
+    "rust/crates/swarm-engine/src/managed_repository*.rs",
+    "rust/crates/swarm-engine/src/validation_run.rs",
+    "rust/crates/swarm-engine/src/validation_policy.rs",
+    "docs/architecture/NATIVE-REVIEWER.md",
+    "docs/en/NATIVE-REVIEWER.md",
+    "tests/rust_agent_model_route.py",
+    "tests/rust_managed_auto_worker.py",
+    "tests/rust_managed_planning.py",
+    "tests/rust_managed_repository_bootstrap.py",
+    "tests/rust_managed_result_recovery.py",
+    "tests/rust_manual_mission.py",
+    "tests/rust_mission_report_relay.py",
+    "tests/rust_mission_task_order.py",
+    "tests/rust_mission_watch_planning.py",
+    "tests/rust_mission_watch_public.py",
+    "tests/rust_mission_watch_worker.py",
+    "tests/rust_native_http_cli.py",
+    "tests/rust_native_http_mission.py",
+    "tests/rust_native_managed_candidate.py",
+    "tests/rust_native_managed_validation.py",
+    "tests/rust_native_parent_death.py",
+    "tests/rust_native_task_validation.py",
+    "tests/rust_planning_activation.py",
+    "tests/rust_planning_bootstrap.py",
+    "tests/rust_planning_budget.py",
+    "tests/rust_planning_call_inputs.py",
+    "tests/rust_planning_call_preview.py",
+    "tests/rust_planning_decision.py",
+    "tests/rust_planning_failure_recovery.py",
+    "tests/rust_planning_native_run.py",
+    "tests/rust_planning_rejection_recovery.py",
+    "tests/rust_planning_worker_public_flow.py",
+    "tests/rust_workspace_fifo_completion.py",
+    "tests/rust_native_validation_origin.py",
+    "tests/rust_native_task_validation_failures.py"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-validation-data-contracts",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "root_store::task_validation::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "test result: ok. 26 passed; 0 failed;"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "ordinary-native-origin-recovery-review",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,json,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='managed-ordinary-',dir='.cache')).resolve()\nfor label,script,extra in [('origin','tests/rust_native_validation_origin.py',[]),('failures','tests/rust_native_task_validation_failures.py',[])]:\n subprocess.run(['python3',script,'--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--output',str(p/label),*extra],check=True);assert json.loads((p/label/'result.json').read_text())['status']=='PASS'\nprint('MANAGED_ORDINARY_COMPATIBILITY_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "MANAGED_ORDINARY_COMPATIBILITY_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "actual-managed-controls-and-original-recovery",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,json,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='managed-native-',dir='.cache')).resolve()/'flow'\nsubprocess.run(['python3','tests/rust_native_managed_validation.py','--binary',os.environ['SWARM_STATUS_CONTRACT_BINARY'],'--profile',os.environ['SWARM_STATUS_CONTRACT_PROFILE'],'--subproject','--output',str(p)],check=True)\nr=json.loads((p/'result.json').read_text());assert r['status']=='PASS' and r['actual_managed_controls'] and r['recorded_jobs']==3 and r['controls_per_job']==3 and r['retired_jobs']==1 and r['actual_borrowed_lease'] and r['recovery_without_execution'] and r['replay_without_candidate'] and not r['accepted']\nprint('ACTUAL_MANAGED_CONTROLS_RECIPE_PASS '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "ACTUAL_MANAGED_CONTROLS_RECIPE_PASS",
+        "automatic-leased-failed-command-is-retained-and-later-control-executes-without-acceptance"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

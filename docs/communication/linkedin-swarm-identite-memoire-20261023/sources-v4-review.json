@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-23",
+  "request": {
+    "path": "/home/fpizzi/.codex/attachments/e4b30214-4912-44f2-b9a5-de6a544c12fc/Pasted text.txt",
+    "sha256": "7354a7c1c0f6476714ed32ceefbce405a297173a5e63c48a472aa63c7ab649a3"
+  },
+  "owner": "Codex editorial",
+  "claims": [
+    {
+      "id": "ED4-01",
+      "input": "La mémoire constitue une identité et devient une source d’autorité",
+      "decision": "Thèse conservée pour l’identité fonctionnelle ; l’autorité authentifiée et les permissions restent des contrats séparés. Une mémoire ne crée pas un droit.",
+      "status": "integrated",
+      "source": "Contrats internes Swarm et distinction analytique explicitement formulée"
+    },
+    {
+      "id": "ED4-02",
+      "input": "Le NIST dit qu’un souvenir empoisonné se propage entre collaborateurs, délégation et consensus",
+      "decision": "Attribution précise non établie dans les sources primaires consultées. La propagation est illustrée par Emergence World ; aucune recommandation normative NIST inventée.",
+      "status": "qualified-no-attribution",
+      "sources": [
+        "https://arxiv.org/html/2609.17320v1",
+        "https://csrc.nist.gov/csrc/media/presentations/2026/agentic-ai-emerging-threats,-mitigations,-and-cha/1.3-agentic_ai-sotiropoulos.pdf"
+      ],
+      "limit": "Une présentation hébergée par NIST ne devient pas automatiquement une recommandation NIST."
+    },
+    {
+      "id": "ED4-03",
+      "input": "OWASP lie toutes les écritures à identité, temps, schéma, tenant et cryptographie",
+      "decision": "ASI03 et ASI06 vérifiés ; la formulation exacte complète fournie ne dispose pas ici d’un passage primaire retenu. Le Word formule des exigences de conception, sans les attribuer mot pour mot à OWASP.",
+      "status": "qualified",
+      "sources": [
+        "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+        "https://genai.owasp.org/2026/05/13/memory-is-a-feature-it-is-also-an-attack-surface/"
+      ],
+      "limit": "Le lien de téléchargement OWASP a échoué dans le navigateur de recherche. Le contenu exact du PDF non récupéré ne sert pas à établir cette attribution."
+    },
+    {
+      "id": "ED4-04",
+      "input": "Juin 2026 MemoryGraft et MINJA",
+      "decision": "MINJA initial 5 mars 2025, version 5 le 12 février 2026 ; MemoryGraft initial 18 décembre 2025. Conditions expérimentales explicites.",
+      "status": "corrected",
+      "sources": [
+        "https://arxiv.org/abs/2503.03704v5",
+        "https://arxiv.org/abs/2512.16962v1"
+      ]
+    },
+    {
+      "id": "ED4-05",
+      "input": "Juillet 2026 MemGhost",
+      "decision": "Dépôt initial du 6 juillet 2026 confirmé. Prépublication, benchmark de bout en bout sur configurations précises. Pas de taux généralisé à tous les produits.",
+      "status": "verified-and-scoped",
+      "sources": [
+        "https://arxiv.org/abs/2607.05189v1"
+      ]
+    },
+    {
+      "id": "ED4-06",
+      "input": "Août 2026 AI Recommendation Poisoning",
+      "decision": "Publication Microsoft du 10 février 2026. Tentatives observées ; efficacité variable et atténuations. Ne pas transformer chaque tentative en écriture réussie.",
+      "status": "corrected",
+      "sources": [
+        "https://www.microsoft.com/en-us/security/blog/2026/02/10/ai-recommendation-poisoning/"
+      ]
+    },
+    {
+      "id": "ED4-07",
+      "input": "Septembre 2026 IEEE Access 2 614 trajectoires",
+      "decision": "Étude identifiée, auteurs Yazdinejad et Karimipour, DOI 10.1109/ACCESS.2026.3693560, IEEE Access 14 pages 76200–76221. Version d’auteur indexée en mai 2026, vulgarisation en septembre. Word distingue année de publication et métadonnée de la version consultée.",
+      "status": "verified-author-copy-date-qualified",
+      "sources": [
+        "https://www.researchgate.net/publication/404886610_Temporal_Dynamics_of_Memory_Poisoning_in_Web3-Style_LLM_Agents"
+      ],
+      "limit": "2 614 trajectoires synthétiques et structurées, environnement abstrait, aucune transaction Web3 ni incidence mesurée en production. DOI inaccessible via outil ; métadonnées éditeur détaillées non établies directement."
+    },
+    {
+      "id": "ED4-08",
+      "input": "Emergence World agit sur phishing 46 heures après détection",
+      "decision": "Dépôt du 15 septembre 2026. Passage 6.1.1 : un autre agent retrouve un ancien lien environ 46 heures après fin de campagne ; service déjà remplacé par réponse sûre. Ne pas confondre agent ayant reconnu le leurre, agent retrouvant le lien, ni détection et fin de campagne.",
+      "status": "corrected",
+      "sources": [
+        "https://arxiv.org/html/2609.17320v1"
+      ],
+      "limit": "Simulation instrumentée, pas fréquence réelle, pas preuve de compromis Swarm."
+    },
+    {
+      "id": "ED4-09",
+      "input": "AgentCorruption octobre 2026",
+      "decision": "Zenity 8 octobre 2026 confirmé. Chaîne de recherche et portée même compte/région. Durcissement du rôle par défaut observé 29 septembre conservé. Réponse AWS et principe du moindre privilège exposés.",
+      "status": "verified-and-scoped",
+      "sources": [
+        "https://labs.zenity.io/post/agentcorruption-how-a-single-prompt-collapsed-the-entire-cloud-security-model",
+        "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/security-credentials-management.html"
+      ],
+      "limit": "Ne pas présenter tous les comptes, toutes les régions ou tous les déploiements actuels comme compromis."
+    },
+    {
+      "id": "ED4-10",
+      "input": "Draft IETF benchmark mémoire",
+      "decision": "Version 02 du 17 octobre 2026, Internet Draft individuel sans endorsement ni statut formel dans le processus IETF. Intégrité au repos distincte de la vérité et de l’injection sémantique.",
+      "status": "verified-and-scoped",
+      "sources": [
+        "https://datatracker.ietf.org/doc/draft-khandelwal-bmwg-agent-memory-integrity/02/"
+      ]
+    },
+    {
+      "id": "ED4-11",
+      "input": "NIST recommande identités agent et credentials dynamiques OAuth SPIFFE JWT X509",
+      "decision": "Billet NIST du 27 août 2026 identifié. Agents avec identifiants/permissions propres, délégation liée au mandant et credentials limités en portée et audience. Statut billet de réflexion, pas nouvelle certification.",
+      "status": "verified-and-scoped",
+      "sources": [
+        "https://www.nist.gov/blogs/cybersecurity-insights/back-future-why-agentic-ai-needs-strong-identity-foundation"
+      ]
+    },
+    {
+      "id": "ED4-12",
+      "input": "Signer ou sceller rend la mémoire digne de confiance",
+      "decision": "Corrigé : sous hypothèses de clés, confiance et ancrage, intégrité/origine vérifiables ne prouvent ni vérité ni innocuité. Rejeu et rollback demandent leurs contrôles.",
+      "status": "integrated",
+      "sources": [
+        "https://datatracker.ietf.org/doc/draft-khandelwal-bmwg-agent-memory-integrity/02/"
+      ]
+    },
+    {
+      "id": "ED4-13",
+      "input": "Vérifier toute lecture/écriture, détecter injection/secrets, quarantaine et restauration",
+      "decision": "Conservé comme piste à spécifier et éprouver. Aucun détecteur universel, contrôle complet des accès mémoire ou quarantaine déclaré disponible dans Swarm. Pas d’implémentation ni extension implicite du plan AC02.",
+      "status": "retained-future-idea",
+      "owner": "Utilisateur pour cadrage et décision de reprise ; Codex pour conservation éditoriale",
+      "expected_value": "Limiter contamination et permettre une reprise attribuée",
+      "observable_criterion": "Un plan ultérieur devra vérifier admission/relecture/transmission, refus sans mutation, cas bénin témoin, pertes/contournements et restauration avec limites des copies déjà reçues.",
+      "resume_when": "Qualification des dépendances Rust et décision explicite de cadrer cette extension ; budgets et droits existants préservés."
+    },
+    {
+      "id": "ED4-14",
+      "input": "Auto-infection multi-agents",
+      "decision": "Terme traduit en contamination et auto-renforcement du contexte ; pas malware autorépliquant, pas modification spontanée des poids, pas incident Swarm inventé.",
+      "status": "integrated"
+    }
+  ],
+  "status": "source decisions retained; final layout verification tracked separately",
+  "sources_accessed": "2026-10-23",
+  "authority": "Éditer le Word et ses références ; aucune exécution du plan sécurité."
+}

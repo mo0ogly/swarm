@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/tmp/swarm-identity-bootstrap-03d-fixture-07",
+    "identity",
+    "bootstrap-check",
+    "6f2889b4a3f6bbd7da0dd378584659a24715884754204cf224d594fb5413a40d",
+    "--input",
+    "/tmp/swarm-bootstrap-cli-x53nigq5/bootstrap/host.json",
+    "--json"
+  ],
+  "exit": 0,
+  "expected": 0,
+  "start": "2026-10-17T16:57:24.667241+00:00",
+  "end": "2026-10-17T16:57:24.701245+00:00",
+  "binary_sha256": "5a46c9335cfb37deb1d7c464b7f27431a769afe648854b46894c77e7883fb76b"
+}

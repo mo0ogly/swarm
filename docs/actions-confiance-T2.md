@@ -1,5 +1,7 @@
 # Actions de confiance — pilote T2
 
+**Portage Rust :** le noyau local dispose de son [contrat et de sa recette propres](actions-confiance-rust.md). Cette page conserve le pilote Go historique, dont les fonctions avancées et le client distant ne sont pas implicitement disponibles en Rust. Les preuves historiques ne qualifient pas le nouveau binaire.
+
 Ce pilote protège un règlement **strictement simulé** par un mandat versionné, une approbation exacte et une variante stricte de Biba. Il ne contacte aucune banque, ne déploie rien et ne constitue ni une preuve d’exécution réelle ni une acceptation du moteur.
 
 ## Contrat public

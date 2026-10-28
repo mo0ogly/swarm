@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://swarm.local/schemas/paea/operator-package-cli-v1.schema.json",
+  "title": "Operator package and service-only artifact observations",
+  "description": "Local data/FS facts only. UID match does not authenticate a human/account. Publication is this operation, not absence of an existing file. Installation/authority claims remain unverified by this command. Overall output delivery also requires process success.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "protocol": {
+      "const": "swarm-operator-package-cli-v1"
+    },
+    "operation": {
+      "enum": [
+        "operator-check",
+        "service-export",
+        "service-export-reconcile"
+      ]
+    },
+    "operation_result": {
+      "enum": [
+        "completed",
+        "failed"
+      ]
+    },
+    "operator_package_pin": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "service_artifact_pin": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
+    },
+    "controller_uid_matches_operator": {
+      "const": true
+    },
+    "source_read": {
+      "const": "decoded"
+    },
+    "source_durability": {
+      "const": "directory_acknowledged"
+    },
+    "publication": {
+      "enum": [
+        "not_attempted",
+        "unknown",
+        "visible",
+        "durable"
+      ]
+    },
+    "output_validation": {
+      "enum": [
+        "not_attempted",
+        "read_unknown",
+        "bytes_read",
+        "pin_matched"
+      ]
+    },
+    "output_durability": {
+      "enum": [
+        "not_acknowledged",
+        "file_acknowledged",
+        "directory_acknowledged"
+      ]
+    },
+    "human_authentication_verified": {
+      "const": false
+    },
+    "current_authority_verified": {
+      "const": false
+    },
+    "service_installed": {
+      "const": false
+    },
+    "service_started": {
+      "const": false
+    },
+    "separate_os_uid_verified": {
+      "const": false
+    },
+    "confinement_verified": {
+      "const": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "protocol",
+    "operation",
+    "operation_result",
+    "operator_package_pin",
+    "service_artifact_pin",
+    "controller_uid_matches_operator",
+    "source_read",
+    "source_durability",
+    "publication",
+    "output_validation",
+    "output_durability",
+    "human_authentication_verified",
+    "current_authority_verified",
+    "service_installed",
+    "service_started",
+    "separate_os_uid_verified",
+    "confinement_verified"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "operator-check"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "publication": {
+            "const": "not_attempted"
+          },
+          "output_validation": {
+            "const": "not_attempted"
+          },
+          "output_durability": {
+            "const": "not_acknowledged"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "service-export"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "output_validation": {
+            "const": "not_attempted"
+          },
+          "output_durability": {
+            "const": "not_acknowledged"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "operation_result": {
+                  "const": "completed"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "publication": {
+                  "const": "durable"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "service-export-reconcile"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "publication": {
+            "const": "not_attempted"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "operation_result": {
+                  "const": "completed"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "output_validation": {
+                  "const": "pin_matched"
+                },
+                "output_durability": {
+                  "const": "directory_acknowledged"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

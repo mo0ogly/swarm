@@ -1,5 +1,35 @@
 [
   {
+    "path": ".agents/skills/product-delivery/SKILL.md",
+    "kind": "source",
+    "sha256": "864bb09eb52c8fc0d70fb68ccce94380098f9813b4be1e14d986e9cfc18fedc5"
+  },
+  {
+    "path": ".agents/skills/product-delivery/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "69667332179dd4a2e51fd1530e23332b66c00b1d249b2bede9626ad4db6f7626"
+  },
+  {
+    "path": ".agents/skills/product-planning/SKILL.md",
+    "kind": "source",
+    "sha256": "90457e484c240ebe04709ebddefdd87c73a64fbdbc9c786fd18fdc9a2555eeaa"
+  },
+  {
+    "path": ".agents/skills/product-planning/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "61c260fe43de24133ecc34a8ed3aea2e096601a22666aa603dc0ee7dd77fa853"
+  },
+  {
+    "path": ".agents/skills/product-review/SKILL.md",
+    "kind": "source",
+    "sha256": "b7d3493730eac8f3d4082b2e7e1f275e8f6ffa859b388765b6613724c24815f5"
+  },
+  {
+    "path": ".agents/skills/product-review/agents/openai.yaml",
+    "kind": "source",
+    "sha256": "89505ced3ad0a690094186957af92c51d06356e1b5aaf61c0cc886b503c4d401"
+  },
+  {
     "path": ".claude/commands/ks-architect.md",
     "kind": "source",
     "sha256": "66589d8eff58cf04970113eae671253966e4dfe316e672d2d3592feedf375002"
@@ -187,7 +217,7 @@
   {
     "path": "INSTALL.md",
     "kind": "doc",
-    "sha256": "b8a2b3d47a684155c5188f521f313cec63602486405feee8a4b9edb969f2eb3f"
+    "sha256": "a12bb2b6ea903f93ed5e5ed85bfe09fc4768bbcad6b9b480d56dd0ce3a04be4e"
   },
   {
     "path": "PREPARATION-UX.md",
@@ -197,12 +227,12 @@
   {
     "path": "README.en.md",
     "kind": "doc",
-    "sha256": "8fa4a6cf0960c7962244ddfe004910e91b36466b18101cb89d12ae2a04082e7b"
+    "sha256": "3c5337bdf93eb4e217de4ce0df72cd12b2f38fdf8092f76c529de12a25709c3c"
   },
   {
     "path": "README.md",
     "kind": "doc",
-    "sha256": "968ad9d2b3424c18854c9046326a0f2e8532d9912ee2d0733228b5399ab55ec9"
+    "sha256": "f7cfbbdfca6c671dd3944142debd94771a97407e10976bc2c3e3705ce7dd914b"
   },
   {
     "path": "build.sh",
@@ -277,7 +307,7 @@
   {
     "path": "docs/AGENT-METHODS.md",
     "kind": "doc",
-    "sha256": "a8ec2c257bad319267cba202abae9b7fb2cf6fd16f2a781f9ab1b94b4e6641dd"
+    "sha256": "2f81d1f55e574415bd25620ab3eaa8f0e9768ce34e68af8cf91418708d167f0b"
   },
   {
     "path": "docs/B01.md",
@@ -447,7 +477,7 @@
   {
     "path": "docs/architecture/AGENT-IDENTITY-CONTRACT.md",
     "kind": "doc",
-    "sha256": "eddd6d9539718ed3bed8856c2797a2b1b18a4a957be895c970dd282bfd1f4ff7"
+    "sha256": "c5ea6f2f6a474fe198d81dbc8a42bb1cfe437e977e4ae03a4a7a11fd2fa92d59"
   },
   {
     "path": "docs/architecture/AGENT-PARALLELISM.md",
@@ -547,7 +577,7 @@
   {
     "path": "docs/architecture/WORK-ROW-CONTRACT.md",
     "kind": "doc",
-    "sha256": "1b8782096305f4b98d49bbe69e304e6a2ec9793e1a947ebba02b7c0f17cf228a"
+    "sha256": "dc3e8bc977926972b77517045ee0a3ed7a5c573327f903253f9ed29a4271ad08"
   },
   {
     "path": "docs/architecture/actions-confiance-controls-reference.json",
@@ -572,12 +602,12 @@
   {
     "path": "docs/en/AGENT-IDENTITY-CONTRACT.md",
     "kind": "doc",
-    "sha256": "831966da4978373c6f5fc8d3530e9ff7d15ced312ddc7808d616621193c25e7b"
+    "sha256": "d3556e9a3084bb320ea5f30df2ee552d3a4f3abb0f857e0f19cd50cda519405f"
   },
   {
     "path": "docs/en/AGENT-METHODS.md",
     "kind": "doc",
-    "sha256": "fabea125ca2c2e7dd98c99cd989afa0ae5f9c991b43d79305bcec59be1c4cecd"
+    "sha256": "256c2603c3eae4965c5859a301606b8af4545ef6f8375e8f07d6e3563d9e715f"
   },
   {
     "path": "docs/en/AGENT-PARALLELISM.md",
@@ -597,7 +627,7 @@
   {
     "path": "docs/en/AUTOMATION.md",
     "kind": "doc",
-    "sha256": "cfa10e246c3cd95497a36ab4dc0d9150b2e5c11cdacc0fb34888224b86da140c"
+    "sha256": "feb3fae654ec351b993a5e80aa169bef2e4fb742c2f75432161eca1d4f6a1579"
   },
   {
     "path": "docs/en/AUTORECURSIVE-RECOVERY.md",
@@ -707,7 +737,7 @@
   {
     "path": "docs/en/INSTALL.md",
     "kind": "doc",
-    "sha256": "c7b2f31ed38b10bb656cadb93685a537e7cbe04b275d7c250669d3ba2571247e"
+    "sha256": "f815f3db216cd1914ce13bdec3566d7ea8ffc94242544f0b1da183337758a8bc"
   },
   {
     "path": "docs/en/INSTRUCTION-LEARNING.md",
@@ -752,7 +782,7 @@
   {
     "path": "docs/en/PROJECT-MEMORY.md",
     "kind": "doc",
-    "sha256": "549e00ce60473852daf15b6eecad906a3d4c5a2bc396f0b5f4f57985c18da914"
+    "sha256": "811045e7c6d1d2454591b724cbe20cb9f7b4df429f1b7d0f7cdcd42b9c4b51f0"
   },
   {
     "path": "docs/en/PROJECT-PROFILE.md",
@@ -777,7 +807,7 @@
   {
     "path": "docs/en/REFERENCE.md",
     "kind": "doc",
-    "sha256": "f6a0036cbb80bd4a769c3983146e9ca0fa6ceb31f106a349cd0420ef929e732f"
+    "sha256": "2ae02d13ae06d782d2f0302134ec0eb27a470c761e6a3c3a69c556f6c21ce0b6"
   },
   {
     "path": "docs/en/REPOSITORY-STRUCTURE.md",
@@ -817,7 +847,7 @@
   {
     "path": "docs/en/RUNTIME-RECOVERY.md",
     "kind": "doc",
-    "sha256": "fd62b17a3f1bc2bc6269354bdcfdd5da07b7060cda0a90be1d739576f01584aa"
+    "sha256": "2c890cbcd0ede2e435b66ce08f478614022ff524486e9624e20241a2bd9bdbe2"
   },
   {
     "path": "docs/en/SEMANTIC-SIGNALS.md",
@@ -852,7 +882,7 @@
   {
     "path": "docs/en/WORK-ROW-CONTRACT.md",
     "kind": "doc",
-    "sha256": "13b936919238c4f17d18a55d168c591c72d6c1c74f1287f7d0d5a85d4925b7e9"
+    "sha256": "55671b72be1d1848bfb50dc7848b70957c7904d15f915c5b700882c6c33b4936"
   },
   {
     "path": "docs/en/actions-confiance-T2.md",
@@ -1463,30 +1493,5 @@
     "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat-mobile.png",
     "kind": "capture",
     "sha256": "5c730f45ca45c58d3e7814e8cea6f456e82b9423a9186f5f4ef421da28ac7bd7"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-etat.png",
-    "kind": "capture",
-    "sha256": "dece9f329db8a0c3b6cc0e00d1bab85b4c0cbc42c300d038c8993d0dea265880"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre-mobile.png",
-    "kind": "capture",
-    "sha256": "925a34f46411f78e847f03a2977e4c44d45162a4de2821adc355fa081808b6b6"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-en-sombre.png",
-    "kind": "capture",
-    "sha256": "d29bf44ff459b59d66e5eaa9d7a341a86256593e7674e23def4b5f37748a1c1e"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat-mobile.png",
-    "kind": "capture",
-    "sha256": "e8de3cf6a5514112acb33898a7a3d24882806fa636f7b6fd82c4cf1438a9236c"
-  },
-  {
-    "path": "docs/screenshots/preparation-subjects-20261010/subject-fr-etat.png",
-    "kind": "capture",
-    "sha256": "761807ac16eeba60c01ae9bcd3997e7fd29ba49c47a1c294e8f5f157641c8856"
   }
 ]

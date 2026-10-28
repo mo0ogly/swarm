@@ -1,0 +1,36 @@
+<section id="flux" data-transition="fade" style="background:#F6F4EE;color:#14213D;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<h2 style="font-size:72px;font-weight:600">Du lancement au harnais</h2>
+<div style="display:flex;align-items:center">
+<div style="width:280px;background:#FBFBF8;border:2px solid #D9D4C7;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2A78D6">1 · moteur</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2">Lancement worker</h3>
+<p style="font-size:24px;color:#4A5568;line-height:1.4">Jeton par tentative et variables OTEL, après toutes les gardes.</p>
+</div>
+<x-connector style="width:64px;color:#14213D;border-width:3px" head="end"></x-connector>
+<div style="width:280px;background:#FBFBF8;border:2px solid #D9D4C7;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2A78D6">2 · fournisseur</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2">Claude Code</h3>
+<p style="font-size:24px;color:#4A5568;line-height:1.4">Exporte ses événements en OTLP/JSON.</p>
+</div>
+<x-connector style="width:64px;color:#14213D;border-width:3px" head="end"></x-connector>
+<div style="width:280px;background:#FBFBF8;border:2px solid #E8A33D;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2A78D6">3 · /api/otel/v1</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2">swarm-web</h3>
+<p style="font-size:24px;color:#4A5568;line-height:1.4">Bearer vérifié, agent encore actif.</p>
+</div>
+<x-connector style="width:64px;color:#14213D;border-width:3px" head="end"></x-connector>
+<div style="width:280px;background:#FBFBF8;border:2px solid #D9D4C7;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2A78D6">4 · .swarm</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2">telemetry.db</h3>
+<p style="font-size:24px;color:#4A5568;line-height:1.4">Base séparée, liste blanche, idempotente.</p>
+</div>
+<x-connector style="width:64px;color:#14213D;border-width:3px" head="end"></x-connector>
+<div style="width:280px;background:#FBFBF8;border:2px solid #D9D4C7;border-radius:16px;padding:32px;display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#2A78D6">5 · SSE</p>
+<h3 style="font-size:32px;font-weight:600;line-height:1.2">Harnais</h3>
+<p style="font-size:24px;color:#4A5568;line-height:1.4">Arrivée poussée aux fenêtres ouvertes.</p>
+</div>
+</div>
+<p style="font-size:32px;color:#4A5568;line-height:1.4">Le serveur web publie son adresse dans <span style="color:#14213D">telemetry-endpoint.json</span> ; sans serveur vivant, aucune variable n'est injectée.</p>
+<aside>Le jeton n’autorise que l’écriture de télémétrie pour cette tentative. La fin, l’arrêt ou l’abandon de l’agent le révoque implicitement, même après un redémarrage.</aside>
+</section>

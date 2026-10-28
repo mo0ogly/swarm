@@ -1,0 +1,9 @@
+{
+  "error": "enrollment bootstrap: protected service-owned storage required",
+  "failure": {
+    "code": "command_failed",
+    "message": "enrollment bootstrap: protected service-owned storage required",
+    "retryable": false
+  },
+  "schema_version": 1
+}

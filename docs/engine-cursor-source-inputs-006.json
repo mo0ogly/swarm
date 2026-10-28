@@ -1,5 +1,115 @@
 [
   {
+    "path": "internal/engine/work_picker.go",
+    "kind": "source",
+    "sha256": "1c8b1e708b068efcb2f61438958e55a7fe1626d90d9354b5d997438d86161d51"
+  },
+  {
+    "path": "internal/engine/work_picker_test.go",
+    "kind": "test",
+    "sha256": "fc616abc4287cc45150121db5d284f3681dc6a05875ae42ee4a8ef1f718738f7"
+  },
+  {
+    "path": "internal/engine/work_row.go",
+    "kind": "source",
+    "sha256": "cddccbaf0874e523fd3f26e4dd27d06abcb6f5fffc3366cb62594b9b02458b13"
+  },
+  {
+    "path": "internal/engine/work_row_consumers_test.go",
+    "kind": "test",
+    "sha256": "b9e2345b46a391ee6108bf3bed90e38589d5418858838b4d2d29b3497d3dde45"
+  },
+  {
+    "path": "internal/engine/work_row_propagation_test.go",
+    "kind": "test",
+    "sha256": "1985f8b72098699b777d27f2c8c3f2357dd9e448e1a3c543b15bbfe5e72cbdd1"
+  },
+  {
+    "path": "internal/engine/work_row_test.go",
+    "kind": "test",
+    "sha256": "6dd9636772a2528ecf346cbaedb626ef3dbaa5a08d300851d6228e5882a452c2"
+  },
+  {
+    "path": "internal/engine/worker_context.go",
+    "kind": "source",
+    "sha256": "972a8be5eb8bfc19ede1300f19e0843c4499e2e2a5b2c90e2250075f15a84857"
+  },
+  {
+    "path": "internal/engine/worker_context_test.go",
+    "kind": "test",
+    "sha256": "e6852287fd4c342033ffaf454c02a29977cd75bd59b39f8e11f89c1cfdfca432"
+  },
+  {
+    "path": "internal/engine/worker_recovery_context.go",
+    "kind": "source",
+    "sha256": "fd617429c9b77d12d28e72345a187b9c527fa52d82ce5d75cd55763a6e4a15df"
+  },
+  {
+    "path": "internal/engine/worker_recovery_context_test.go",
+    "kind": "test",
+    "sha256": "058aaf6a42352d18a098a9c00aa7ebf6957d8759402a81a075a55ad1858a5c94"
+  },
+  {
+    "path": "internal/engine/worker_recovery_focus.go",
+    "kind": "source",
+    "sha256": "44fb0c98d19e1252258f55b88fb41a4727f5853e6b640ad8d4d3d072c4edb703"
+  },
+  {
+    "path": "internal/engine/worker_recovery_projection.go",
+    "kind": "source",
+    "sha256": "eb07beaafd4a541d5976d4d0b6f2d79e6288e4b5770f8d299c17c13e71bd7a53"
+  },
+  {
+    "path": "internal/engine/worker_recovery_projection_test.go",
+    "kind": "test",
+    "sha256": "2084eb25efd8b42e01f845840aab601c9af8164294a26750553e0b9ee51e2c00"
+  },
+  {
+    "path": "internal/engine/workspace_busy.go",
+    "kind": "source",
+    "sha256": "33b5e090a1eb4e4c48ed9a0347de56ac4739943809d3c85d90e36f607d027539"
+  },
+  {
+    "path": "internal/engine/workspace_busy_test.go",
+    "kind": "test",
+    "sha256": "9381ec011c0dc36ffb23f8450c963ac8f416028598c79efe96fba06005e5f76f"
+  },
+  {
+    "path": "internal/engine/workspace_coordination.go",
+    "kind": "source",
+    "sha256": "41f7e10a8873c340a7d61e055b7b8e41f42b68d1fbaa943d8cfddeb30785862a"
+  },
+  {
+    "path": "internal/engine/workspace_coordination_host_test.go",
+    "kind": "test",
+    "sha256": "2e31712edff01dace62c32383e1ea7ed9c23a355d36330e3e25c4b1451de2cb3"
+  },
+  {
+    "path": "internal/engine/workspace_coordination_test.go",
+    "kind": "test",
+    "sha256": "9cb049d87fc1ec77d708a34cd7deaa50e2cd3fdef590c9ac615d5df1aa83fa5a"
+  },
+  {
+    "path": "locales/en.json",
+    "kind": "source",
+    "sha256": "abafab69a65a42595fb53a08e49d6f32293488af7b991c78cf93e6815316a531"
+  },
+  {
+    "path": "locales/trust-actions-en.json",
+    "kind": "source",
+    "sha256": "eba1c42e13b08256458813feadc295ce51e17d39abe0ed25281c6689e63563a2"
+  },
+  {
+    "path": "package.json",
+    "kind": "harness",
+    "sha256": "60e930209b781418e3d5b6e1bdeaec9a0389a6e3e0b0f0d2ebdb345dcfba19fc"
+  },
+  {
+    "path": "resources.go",
+    "kind": "source",
+    "sha256": "b5c75f94ab0176cb200e4717e9a818178b72111a48c7dadb7602ceb18416af13"
+  },
+  {
     "path": "scripts/i18n/build.cjs",
     "kind": "harness",
     "sha256": "868b3ffd89ec3232ad045e1b97ceb5ef2f6dab770a3a74f8a1f416bbefa64f19"
@@ -467,7 +577,7 @@
   {
     "path": "tools/agent-workflows/CONTRACT.md",
     "kind": "doc",
-    "sha256": "407e82d5150d2770d7ebbb5913c96434f57fb3c728fc19109887a3ac2f4220e7"
+    "sha256": "62ad8f1f81c6aaf2a4e355434516741e6f01b5de798684e47273a02aa02ae644"
   },
   {
     "path": "tools/agent-workflows/check.py",

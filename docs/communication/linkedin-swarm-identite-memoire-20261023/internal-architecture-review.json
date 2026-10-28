@@ -1,0 +1,869 @@
+{
+  "status": "verified_documentation",
+  "date": "2026-10-23",
+  "objective": "Rebuild faithful Swarm internal architecture documentation with Rust engine, identity, memory/context, supervision, logs/telemetry and evidence boundaries.",
+  "owner": "Root Codex; documentation only",
+  "head_at_review": "553593a2ffa3823d16784a6fedc291eebf390837",
+  "replan": {
+    "original_defect": "Two reduced diagrams and a generic crate map omitted essential internal contracts. Go memory labeling conflated architecture with historical implementation evidence. Earlier corrections restored engine visibility without restoring the missing identity, memory, supervision and observability mechanisms.",
+    "options": [
+      "Keep patching labels in the same reduced views.",
+      "Reconstruct separate contract views from named internal sections and retain a component/source map plus a separate maturity matrix."
+    ],
+    "decision": "Reconstruction: five bilingual views, with a source-mapped catalogue and current status kept separate.",
+    "original_gap_reproducer": {
+      "run_observation": {
+        "present_in_previous_active_diagrams": false,
+        "present_in_current_active_diagrams": true
+      },
+      "Trust": {
+        "present_in_previous_active_diagrams": false,
+        "present_in_current_active_diagrams": true
+      },
+      "prepared_context": {
+        "present_in_previous_active_diagrams": false,
+        "present_in_current_active_diagrams": true
+      },
+      "telemetry.db": {
+        "present_in_previous_active_diagrams": false,
+        "present_in_current_active_diagrams": true
+      },
+      "agent_logs": {
+        "present_in_previous_active_diagrams": false,
+        "present_in_current_active_diagrams": true
+      }
+    },
+    "reproducer_scope": "Previous active Mermaid files only, not the full original Swarm documentation. Marker absence supports the observed presentation gap; markers alone do not establish semantic fidelity.",
+    "recovery": "Read the relevant sections of identity, memory/dialogue, supervision, logs, traceability, calls, liveness, review evidence and current native status before redrawing."
+  },
+  "preserved_baseline": {
+    "directory": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/internal-architecture-before",
+    "files": {
+      "README.md": {
+        "sha256": "b1301b214ddabedd6587528740652376b8c836df0dd6e91f7bbca9ad98a98f41",
+        "bytes": 18334
+      },
+      "README.en.md": {
+        "sha256": "377c44bbd29128b670ccd381799a09c5ec1ee4aaa15aa9f0e6026079277b7c02",
+        "bytes": 16971
+      },
+      "docs/architecture/OVERVIEW.md": {
+        "sha256": "238cca9c0c2516c33ad741275f801f18d45589653b0acd9b8c10fdb574bd6441",
+        "bytes": 11833
+      },
+      "docs/en/ARCHITECTURE.md": {
+        "sha256": "c08047d2aab4f06bc63728a24749c274b027de617986973f3ef6a63c42c3a4fd",
+        "bytes": 10692
+      },
+      "docs/diagrams/architecture-overview-fr.svg": {
+        "sha256": "dda148cd02ab650a3d06bcd89bc8ec68686c33c9eecefec7978175a5123055d2",
+        "bytes": 38382
+      },
+      "docs/diagrams/mermaid-config.json": {
+        "sha256": "c0c2f4004458e3537547181e466bb145f354c7ad60f14eb44d5a7c7a45312549",
+        "bytes": 687
+      },
+      "docs/diagrams/architecture-overview-en.png": {
+        "sha256": "4617e7f7ee9ec75ec5a5f740a42a1781f9617e7dedeabef77a0fa7b62231d2eb",
+        "bytes": 102452
+      },
+      "docs/diagrams/memory-identity-fr.png": {
+        "sha256": "e9c40bc59a0128afe643486892de2c1139fb53d908e27e9cc2bddd7240e4a989",
+        "bytes": 133833
+      },
+      "docs/diagrams/architecture-overview-fr.mmd": {
+        "sha256": "11c3bcd111cc191d810bdef717c29be18e76abff81a4b453e177a9b04fc85094",
+        "bytes": 1881
+      },
+      "docs/diagrams/architecture-overview-en.svg": {
+        "sha256": "94563d9b606d28735aa35906f606467f0bff301a61f808afb3a48861ea4f2c66",
+        "bytes": 38107
+      },
+      "docs/diagrams/memory-identity-en.svg": {
+        "sha256": "39129c384fba14c77dce1820d40bb6e846dd5678813d5bb969d0f9926cbe8f2d",
+        "bytes": 40639
+      },
+      "docs/diagrams/README.md": {
+        "sha256": "64e0a2477e6b60498435d87166b781eecdee36ef0fd308a541fc93dc5284dff7",
+        "bytes": 5541
+      },
+      "docs/diagrams/memory-identity-fr.svg": {
+        "sha256": "4c733b83191804cf89b2b6da726715ee5e267bf3af5843d7075462188cc55779",
+        "bytes": 40768
+      },
+      "docs/diagrams/memory-identity-en.mmd": {
+        "sha256": "b853ca2174c74f865e552a6862d26a9bac9f9cfc718e33e8b90739147a3ebca9",
+        "bytes": 2408
+      },
+      "docs/diagrams/architecture-overview-fr.png": {
+        "sha256": "6c8e7a6e318583fba4561af7c3be025b36a38cd9d0d8adbfeefdb38c688a2935",
+        "bytes": 102081
+      },
+      "docs/diagrams/memory-identity-en.png": {
+        "sha256": "22b2421a1391653abcf24893f35c33c91907251855aabb7298757efd97d78f64",
+        "bytes": 139686
+      },
+      "docs/diagrams/architecture-overview-en.mmd": {
+        "sha256": "25f95a21ef990f12b7fe8cf92f591b5c1102e4f6f210c1f446025d82fd0baf8b",
+        "bytes": 1799
+      },
+      "docs/diagrams/memory-identity-fr.mmd": {
+        "sha256": "018a49ddc73c1ce1a0958c02d4709503c852f1aa7e2759ed195d539a586932d2",
+        "bytes": 2456
+      }
+    }
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "127edfc7674050d24da763aa15185ee0eed878417356109c971fc09f6010b900",
+      "bytes": 20481
+    },
+    {
+      "path": "README.en.md",
+      "sha256": "7b1f96526acf5a59ce855dc961dc56467188f3a73b17808cc61b022bcde405ec",
+      "bytes": 18825
+    },
+    {
+      "path": "docs/architecture/OVERVIEW.md",
+      "sha256": "256c585daf0a795cd9f27fa1e15a758b6b81f88cb788aada2394b59e7fe9f5b0",
+      "bytes": 15402
+    },
+    {
+      "path": "docs/en/ARCHITECTURE.md",
+      "sha256": "61b1120239ba0ea2f6c24e57d75a561b94f71f59ba3095876907831ae284f2a2",
+      "bytes": 14133
+    },
+    {
+      "path": "docs/diagrams/README.md",
+      "sha256": "e03df3dddefc8b6f27ce9805685497c0f57186b7faccf917d81a79315fdfec52",
+      "bytes": 7226
+    },
+    {
+      "path": "docs/diagrams/CONTRACT-MAP.md",
+      "sha256": "d4c51c9ce066b33fb55ebcaff835fc4534e2f8005f734ee45cafc5c833551f7d",
+      "bytes": 12363
+    },
+    {
+      "path": "docs/diagrams/architecture-contracts.json",
+      "sha256": "c6c3a7eb1872a105d1fca578a36796a7356d1c276647a0d22007fc7bbf177264",
+      "bytes": 72960
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.mmd",
+      "sha256": "a13856ec0a8f49df8ccf0b660e07f4f20901eccc262aee9682101df6d659d5e7",
+      "bytes": 4218
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.svg",
+      "sha256": "2ac72e787d4399e6285cdd8abb1bdc3201facb394c7b9106bbd105f989d0750e",
+      "bytes": 82794
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-fr.png",
+      "sha256": "9607c0615ff0a86eb5f06176bb450cdd2c925e85591815512b1ec42b499ecc6a",
+      "bytes": 246683
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.mmd",
+      "sha256": "5b579f44051a6a8b46714b21eb4a0978309fcc1522576ed6888811ffe7072027",
+      "bytes": 4112
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.svg",
+      "sha256": "a1324258606b528a5d3d14255cc254d31e10f9cb74bb1e41429222e56e94a5b7",
+      "bytes": 82035
+    },
+    {
+      "path": "docs/diagrams/architecture-overview-en.png",
+      "sha256": "36cc2c88e537ed48162d7c3a86b6afcb1c5aa5cbe9d18193b7e3bec989e12237",
+      "bytes": 250849
+    },
+    {
+      "path": "docs/diagrams/identity-authority-fr.mmd",
+      "sha256": "e923542db6af0337c3e36db7b24c0c7c0d066728d990d5dfca33bf49184b18ac",
+      "bytes": 4428
+    },
+    {
+      "path": "docs/diagrams/identity-authority-fr.svg",
+      "sha256": "5c7923fd955531525f4cf5ef182aba98b1fda5433b5ac7fdf8271c958eb6a3eb",
+      "bytes": 76501
+    },
+    {
+      "path": "docs/diagrams/identity-authority-fr.png",
+      "sha256": "fdc10935f17ce9bf52d19535412a21fa9e4b13386d8a13c666dbb65585f920d7",
+      "bytes": 261109
+    },
+    {
+      "path": "docs/diagrams/identity-authority-en.mmd",
+      "sha256": "590b292191a6580eeee03f752faedb634f3e80c3cd80293db2c017535999fe60",
+      "bytes": 4311
+    },
+    {
+      "path": "docs/diagrams/identity-authority-en.svg",
+      "sha256": "d2cbdcf8dcec243da8042d3f4d6e69e990951dcd54dcc940d14d5bba7a50d326",
+      "bytes": 76445
+    },
+    {
+      "path": "docs/diagrams/identity-authority-en.png",
+      "sha256": "3bd22ad50a282728d097043078e3d4914f632c101968efa6c9e08d0f88156236",
+      "bytes": 270022
+    },
+    {
+      "path": "docs/diagrams/memory-context-fr.mmd",
+      "sha256": "209b01e2a735542f6c17443d548dffcdbc8ff435908102f1bfbd47903fed55e5",
+      "bytes": 4100
+    },
+    {
+      "path": "docs/diagrams/memory-context-fr.svg",
+      "sha256": "f901eed6b10c92cda2c896926799557d14f6fcdb0fec975844a86b9ab306b73b",
+      "bytes": 67352
+    },
+    {
+      "path": "docs/diagrams/memory-context-fr.png",
+      "sha256": "83497533dd85f9b3f3d25bdc025d2710d518b4d1cd932140668d3bb21541fb0f",
+      "bytes": 199628
+    },
+    {
+      "path": "docs/diagrams/memory-context-en.mmd",
+      "sha256": "16ab652938aab45409556fb1136d1a0ddb408a67a429f5995e83a424f8861831",
+      "bytes": 3880
+    },
+    {
+      "path": "docs/diagrams/memory-context-en.svg",
+      "sha256": "01ca763bc3da71d3f86553588c68c163a0a71af3463a64c689acfa958f380b24",
+      "bytes": 65999
+    },
+    {
+      "path": "docs/diagrams/memory-context-en.png",
+      "sha256": "3da15a4b518aea7f9354d4b950427f62898929919556a6f2a2e54fcd78891935",
+      "bytes": 209156
+    },
+    {
+      "path": "docs/diagrams/run-supervision-fr.mmd",
+      "sha256": "af8f1aaad766c16483259922a5125bbd377ff600f7eb23e22e0e2fac2c154fea",
+      "bytes": 4063
+    },
+    {
+      "path": "docs/diagrams/run-supervision-fr.svg",
+      "sha256": "f39a06116f182ab74653044bb6d6c8eda7070fef9a82c23b3e12baec95be3084",
+      "bytes": 71784
+    },
+    {
+      "path": "docs/diagrams/run-supervision-fr.png",
+      "sha256": "917dfb6488ed1ea32b5f88efdc745a36a0a7bbcc9bd88d32e694345449e3bb1b",
+      "bytes": 230280
+    },
+    {
+      "path": "docs/diagrams/run-supervision-en.mmd",
+      "sha256": "561901aecae169667c9a7ace476223e42d6c1bab5686a0c3089d7f1ffebac411",
+      "bytes": 3854
+    },
+    {
+      "path": "docs/diagrams/run-supervision-en.svg",
+      "sha256": "51c172dd53b64992f0da88fc19d41e7523dbd717ebacf58e4a8a9920664ebc33",
+      "bytes": 70637
+    },
+    {
+      "path": "docs/diagrams/run-supervision-en.png",
+      "sha256": "0209cd9362a4f23967a42a802409a29ce3909b465536cc5afd1106b708e0d982",
+      "bytes": 229032
+    },
+    {
+      "path": "docs/diagrams/logs-observability-fr.mmd",
+      "sha256": "19daecc4e273fb1260dad001a5a9e9fdb03157e1e113af8e67788a42969191e0",
+      "bytes": 3666
+    },
+    {
+      "path": "docs/diagrams/logs-observability-fr.svg",
+      "sha256": "90ecd31bed691d9a22b38058ca3f41ef046d83055b257dacf1b140cddd3739b4",
+      "bytes": 60569
+    },
+    {
+      "path": "docs/diagrams/logs-observability-fr.png",
+      "sha256": "d04b8ebc5fc2bb7bbf70d9f64a069126da2175ca1ace2ee4ae09b8e84b621777",
+      "bytes": 181685
+    },
+    {
+      "path": "docs/diagrams/logs-observability-en.mmd",
+      "sha256": "45927b4a1f8565e7632a9cd268969fdfac0dacd24f2f13276b237d8fb9ac30da",
+      "bytes": 3538
+    },
+    {
+      "path": "docs/diagrams/logs-observability-en.svg",
+      "sha256": "15915ce5a6ddf1d771cb4ae3f144ac5dca2e6d4714ddaa9b4dc2bd5a1bb80882",
+      "bytes": 60198
+    },
+    {
+      "path": "docs/diagrams/logs-observability-en.png",
+      "sha256": "2e3a51eed52755dc322ef2c5968cd875592bb5d2f0bc781a2116eca798bd512a",
+      "bytes": 175785
+    }
+  ],
+  "owned_text_patch": {
+    "path": "docs/communication/linkedin-swarm-identite-memoire-20261023/internal-architecture.patch",
+    "sha256": "89df0bc22a8717578e1fd33ce76e8eaf718b77e4de13648f0d0edd7a180cfb71",
+    "bytes": 210656
+  },
+  "source_catalogue": {
+    "path": "docs/diagrams/architecture-contracts.json",
+    "sha256": "c6c3a7eb1872a105d1fca578a36796a7356d1c276647a0d22007fc7bbf177264",
+    "bytes": 72960
+  },
+  "coverage_map": {
+    "path": "docs/diagrams/CONTRACT-MAP.md",
+    "sha256": "d4c51c9ce066b33fb55ebcaff835fc4534e2f8005f734ee45cafc5c833551f7d",
+    "bytes": 12363
+  },
+  "source_sections": 35,
+  "mapped_nodes": 93,
+  "contract_edges": 106,
+  "semantic_review": [
+    {
+      "view": "architecture-overview",
+      "nodes": 19,
+      "edges": 24,
+      "critical_objects": [
+        "A_ENGINE",
+        "A_ROOT",
+        "A_SCOPE",
+        "A_CYCLE",
+        "A_STATE",
+        "A_SCHEDULE",
+        "A_CONTEXT",
+        "A_GATE",
+        "A_REVIEW",
+        "A_ACCEPT"
+      ],
+      "source_map_and_language_parity": "PASS",
+      "semantic_review": "Same-session reading of the mapped internal contract sections; functional architecture kept distinct from native delivery."
+    },
+    {
+      "view": "identity-authority",
+      "nodes": 20,
+      "edges": 21,
+      "critical_objects": [
+        "I_HUMAN",
+        "I_PINS",
+        "I_ENROLL",
+        "I_JOURNAL",
+        "I_AUTH",
+        "I_CONFIG",
+        "I_CHANNEL",
+        "I_PLAN",
+        "I_PERMIT",
+        "I_REGISTRY",
+        "I_HEAD",
+        "I_ACTOR",
+        "I_GRANT",
+        "I_REQUEST",
+        "I_RECEIPT",
+        "I_COMMIT",
+        "I_PREPLAN"
+      ],
+      "source_map_and_language_parity": "PASS",
+      "semantic_review": "Same-session reading of the mapped internal contract sections; functional architecture kept distinct from native delivery."
+    },
+    {
+      "view": "memory-context",
+      "nodes": 19,
+      "edges": 21,
+      "critical_objects": [
+        "M_RETEX",
+        "M_ADMIT",
+        "M_VERSION",
+        "M_SELECT",
+        "M_REPLACE",
+        "M_RIGHTS",
+        "M_ATTRIB",
+        "M_EXTRACT",
+        "M_HISTORY",
+        "M_INSTRUCT",
+        "M_METHODS",
+        "M_MANIFEST",
+        "M_CHECK",
+        "M_BOUNDARY",
+        "M_RECOVERY",
+        "M_RECONCILE",
+        "M_RESUME"
+      ],
+      "source_map_and_language_parity": "PASS",
+      "semantic_review": "Same-session reading of the mapped internal contract sections; functional architecture kept distinct from native delivery."
+    },
+    {
+      "view": "run-supervision",
+      "nodes": 19,
+      "edges": 23,
+      "critical_objects": [
+        "S_EVENT",
+        "S_INBOX",
+        "S_SCOPE",
+        "S_ROOT",
+        "S_WAIT",
+        "S_DECIDE",
+        "S_ENGINE",
+        "S_RECORD",
+        "S_CONTINUE",
+        "S_STOP",
+        "S_END",
+        "S_EFFECT",
+        "S_POLICY",
+        "S_CALL",
+        "S_JUDGE"
+      ],
+      "source_map_and_language_parity": "PASS",
+      "semantic_review": "Same-session reading of the mapped internal contract sections; functional architecture kept distinct from native delivery."
+    },
+    {
+      "view": "logs-observability",
+      "nodes": 16,
+      "edges": 17,
+      "critical_objects": [
+        "L_AGENT",
+        "L_ENGINE",
+        "L_CALLS",
+        "L_PROC",
+        "L_OTLP",
+        "L_NORMAL",
+        "L_TELEMETRY",
+        "L_ORIGINAL",
+        "L_API",
+        "L_PUSH",
+        "L_CONSOLE",
+        "L_LIVE",
+        "L_EXPORT",
+        "L_CHAIN",
+        "L_ACCEPT"
+      ],
+      "source_map_and_language_parity": "PASS",
+      "semantic_review": "Same-session reading of the mapped internal contract sections; functional architecture kept distinct from native delivery."
+    }
+  ],
+  "semantic_boundaries": [
+    "Human source, principal, logical agent, execution instance, owner and author remain distinct.",
+    "Signed enrollment payload, current human authority, exact publication permit, SQLite registry and independent Trust checkpoint are separate.",
+    "Configuration/witness and their private transport are separate from public agent admission; before-plan authority remains explicit and open.",
+    "Memory includes versioned knowledge, received/prepared context, task history, extractive choices, instruction revisions, dialogue boundary and explicit recovery.",
+    "read/summarize/transmit require exact sources and recipient; final public enforcement is not declared complete.",
+    "Owner inboxes and actual input_events bind run observations and decisions; leases, generation, revision, attempt and budgets remain checked.",
+    "continue-run retains counters; stop-run requires actual termination confirmation. Structured inference guards and cycle judgment remain separate.",
+    "Logs, terminal, events, OTLP, Linux metrics and call records retain provenance; console and exports remain read-only.",
+    "Candidate checks, independent review, global cycle judgment and acceptance remain distinct; evidence freshness is retained.",
+    "Architecture diagrams do not classify memory as a Go subsystem; native maturity and historical proof language remain in a separate matrix."
+  ],
+  "visual_recovery": [
+    {
+      "observed": "First identity layout had excessive diagonal whitespace and preparation authority grouped with effects.",
+      "action": "Moved preparation authority to the origin group, matching its source role; current SVG/PNG retain native dimensions.",
+      "retained_first_layout": "/home/fpizzi/Documents/ChatGPT/swarm/.cache/editorial-swarm-20261023/internal-architecture-identity-layout-01"
+    },
+    {
+      "observed": "Opposite overview edge labels overlapped; registry fan-out crossed decision objects.",
+      "action": "Represented the same two-way contracts with one bidirectional labeled connection; registry supplies the current snapshot directly to decision checks while actor/grant objects remain explicit.",
+      "verification": "Final overview and identity PNG inspected; all views parsed and all required node IDs/source references retained."
+    }
+  ],
+  "source_refresh_after_concurrent_edit": {
+    "cause": "Concurrent migration documentation update detected by full-source hash check.",
+    "reread": [
+      {
+        "path": "docs/architecture/RUST-MIGRATION.md",
+        "lines": [
+          181,
+          309
+        ],
+        "observed_section_sha256": "864e3a265eada75cf76ee14d1f4151edb851ed55fc2dacae948c5b01095a212d"
+      },
+      {
+        "path": "docs/plans/migration-rust/PLAN.md",
+        "lines": [
+          39,
+          63
+        ],
+        "observed_section_sha256": "36cd4f9ee3cfb5169c103675a1c1c3053783f9266dd21f3251351a4ede11bed7"
+      }
+    ],
+    "decision": "Live/OTLP contracts and G1/G3/G7/G8/G11 status still support the diagrams and maturity matrix; refresh provenance hashes only.",
+    "diagram_views_unchanged": true,
+    "reused_evidence_scope": "Mermaid sources, SVG/PNG, Markdown text and link anchors unchanged; rendering/link evidence remains applicable."
+  },
+  "verification": {
+    "renders": {
+      "mermaid": "11.12.0",
+      "results": [
+        {
+          "name": "architecture-overview-fr",
+          "title": "Architecture interne Swarm : moteur, responsabilités et preuves",
+          "description": "Le moteur déterministe Rust relie contrats, identité, politiques, réservations, contextes, exécution, contrôles, revue et événements durables. Cette vue décrit les contrats internes ; la qualification Rust est suivie séparément.",
+          "nodes": 19,
+          "edges": 24,
+          "viewBox": "-2 -15 2337.59033203125 2028.800048828125"
+        },
+        {
+          "name": "architecture-overview-en",
+          "title": "Swarm internal architecture: engine, responsibilities and evidence",
+          "description": "The deterministic Rust engine connects contracts, identity, policies, reservations, contexts, execution, checks, review and durable events. This view describes internal contracts; Rust qualification is tracked separately.",
+          "nodes": 19,
+          "edges": 24,
+          "viewBox": "-2 -15 2351.1484375 2048.60009765625"
+        },
+        {
+          "name": "identity-authority-fr",
+          "title": "Identité Swarm : source d’autorité, registre et usage exact",
+          "description": "Identité humaine, principal, instance, octrois, registre, checkpoint Trust et demande exacte restent distincts. Les transports et protocoles internes sont séparés des raccords publics non achevés.",
+          "nodes": 20,
+          "edges": 21,
+          "viewBox": "0 -15 2200.06640625 2274.800048828125"
+        },
+        {
+          "name": "identity-authority-en",
+          "title": "Swarm identity: authority source, registry and exact use",
+          "description": "Human identity, principal, instance, grants, registry, Trust checkpoint and exact request remain distinct. Internal transport/protocol components are separate from unfinished public integrations.",
+          "nodes": 20,
+          "edges": 21,
+          "viewBox": "0 -15 2145.515625 2294.60009765625"
+        },
+        {
+          "name": "memory-context-fr",
+          "title": "Mémoire Swarm : connaissances, contexte et reprise de conversation",
+          "description": "La mémoire de projet, les révisions de consigne, les références extractives, le contexte préparé/final et les frontières de dialogue sont des objets distincts. Les droits d’usage portent sur les sources et destinataires exacts.",
+          "nodes": 19,
+          "edges": 21,
+          "viewBox": "0 -15 2538.5234375 1909.39990234375"
+        },
+        {
+          "name": "memory-context-en",
+          "title": "Swarm memory: knowledge, context and conversation recovery",
+          "description": "Project memory, instruction revisions, extractive references, prepared/final context and dialogue boundaries are distinct objects. Usage rights bind exact sources and recipients.",
+          "nodes": 19,
+          "edges": 21,
+          "viewBox": "0 -15 2488.06640625 1929.199951171875"
+        },
+        {
+          "name": "run-supervision-fr",
+          "title": "Supervision Swarm : observation, décision, application et reprise",
+          "description": "Les observations de processus sont remises au propriétaire de périmètre. Le moteur vérifie révisions, baux, événements reçus et budgets avant d’appliquer continue-run ou stop-run et de confirmer les effets.",
+          "nodes": 19,
+          "edges": 23,
+          "viewBox": "0 -15 2125.359375 1990.800048828125"
+        },
+        {
+          "name": "run-supervision-en",
+          "title": "Swarm supervision: observation, decision, application and recovery",
+          "description": "Process observations reach the scope owner. The engine checks revisions, leases, received events and budgets before applying continue-run or stop-run and confirming effects.",
+          "nodes": 19,
+          "edges": 23,
+          "viewBox": "0 -15 2047.515625 1931.4000244140625"
+        },
+        {
+          "name": "logs-observability-fr",
+          "title": "Observabilité Swarm : logs, direct, télémétrie et preuves",
+          "description": "Les sorties agent, événements du moteur, incidents, décisions, registre d’appels, mesures système et OTLP gardent leurs sources. Les vues sont en lecture seule ; l’export de données ne constitue pas une preuve d’acceptation.",
+          "nodes": 16,
+          "edges": 17,
+          "viewBox": "0 -15 2470.0078125 1022"
+        },
+        {
+          "name": "logs-observability-en",
+          "title": "Swarm observability: logs, live views, telemetry and evidence",
+          "description": "Agent output, engine events, incidents, decisions, call ledger, system measurements and OTLP retain their sources. Views are read-only; data export is not acceptance evidence.",
+          "nodes": 16,
+          "edges": 17,
+          "viewBox": "0 -15 2443.640625 1002.199951171875"
+        }
+      ]
+    },
+    "geometry": {
+      "reports": [
+        {
+          "name": "architecture-overview-fr",
+          "nodes": 19,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "architecture-overview-en",
+          "nodes": 19,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "identity-authority-fr",
+          "nodes": 20,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "identity-authority-en",
+          "nodes": 20,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "memory-context-fr",
+          "nodes": 19,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "memory-context-en",
+          "nodes": 19,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "run-supervision-fr",
+          "nodes": 19,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "run-supervision-en",
+          "nodes": 19,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "logs-observability-fr",
+          "nodes": 16,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        },
+        {
+          "name": "logs-observability-en",
+          "nodes": 16,
+          "clippedLabels": [],
+          "clusterNodeOverlaps": []
+        }
+      ]
+    },
+    "markdown": {
+      "scope": "Documentation only; local GitHub-like rendering, no application execution",
+      "checks": [
+        {
+          "file": "README.md",
+          "links": 129,
+          "localLinks": 125,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "README.en.md",
+          "links": 129,
+          "localLinks": 125,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "links": 63,
+          "localLinks": 63,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "links": 63,
+          "localLinks": 63,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/diagrams/README.md",
+          "links": 36,
+          "localLinks": 36,
+          "allLocalTargetsAndMarkdownFragments": true
+        },
+        {
+          "file": "docs/diagrams/CONTRACT-MAP.md",
+          "links": 71,
+          "localLinks": 71,
+          "allLocalTargetsAndMarkdownFragments": true
+        }
+      ],
+      "previews": [
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "README.en.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 11,
+          "diagramCount": 0
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/architecture/OVERVIEW.md",
+          "lang": "fr",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "light",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "desktop",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        },
+        {
+          "file": "docs/en/ARCHITECTURE.md",
+          "lang": "en",
+          "theme": "dark",
+          "layout": "mobile",
+          "overflow": false,
+          "images": true,
+          "imageCount": 5,
+          "diagramCount": 1
+        }
+      ]
+    },
+    "diff_check": {
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "all_modified_markdown_mermaid_json_whitespace": "PASS",
+    "source_hashes_unchanged_since_catalogue_capture": true,
+    "visual_inspection": "French detailed PNG views inspected, including revised final overview/identity; English five-view contact sheet and detailed identity inspected. Shared object IDs/edges and translated labels reviewed from the catalogue. Geometry checked on all ten SVGs.",
+    "preview_scope": "Local GitHub-like Markdown rendering only; not hosted GitHub or Swarm application behavior."
+  },
+  "review_axes": {
+    "policies": "No execution policy, timeout, budget or retention setting changed. Render dimensions/colors are documentation presentation inputs; no numeric product policy added.",
+    "functions": "No maintained public/nontrivial function changed. Documentation and source catalogue describe the system; helper scripts were temporary tooling outside product sources.",
+    "errors": "Original content gap retained; geometry/layout issues corrected without changing engine behavior or fabricating runtime evidence.",
+    "effective_build": "No build/profile qualification, application tests, provider execution or server replacement. Native source observations are limited to named components/module contracts, not a full implementation audit."
+  },
+  "documentation_transmission": "Both READMEs, French/English architecture pages, active diagram catalogue, source crosswalk and diagram README updated together. Old memory-identity exports and historical review receipts remain preserved and explicitly superseded in current entries.",
+  "version_history": "Unchanged: documentation-only delivery, no new running application version or installed behavior.",
+  "limits": [
+    "Coverage is the stated set of internal architecture contracts, not certification that every sentence of all Swarm documents is represented.",
+    "Same-session semantic review; no independent reviewer or user acceptance claimed.",
+    "Rust journey qualification remains partial and tracked in its existing plan; architecture diagrams grant no authority.",
+    "AC-02 A0-A7 remains saved and not started.",
+    "No application code, live mission state, active native context, build, restart, provider call, commit, push or publication changed.",
+    "Existing Word/video editorial snapshots were not re-encoded by this architecture documentation reconstruction."
+  ]
+}

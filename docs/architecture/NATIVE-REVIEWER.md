@@ -1191,3 +1191,115 @@ flowchart LR
 La préparation contrôle aussi les prérequis communs avant tout effet de copie.
 Un refus de dépendance ne doit pas laisser une copie finale bloquant la prochaine
 admission ; le writer conserve son recontrôle complet, sans permis mémorisé.
+
+### Baseline native acceptée avant le candidat suivant
+
+`task baseline-preview WORK --input FILE` utilise l’enveloppe native stricte
+`schema_version`, `event_id`, `expected_revision`, `task_id`. L’événement est une
+syntaxe de requête, sans écriture. Le résultat rapproche chaque tâche acceptée
+de sa publication canonique, de ses originaux privés/publics, du rapport Git et
+de la fraîcheur des contrôles/revues/prérequis selon les paramètres persistés.
+Il expose seulement identifiants et empreintes, le candidat courant et les
+révisions. Une baseline initiale vide a `baseline_present=false` et
+`baseline_verified=false` ; une preuve manquante ou altérée est une erreur,
+jamais une baseline vide réussie. Work et paramètres sont recontrôlés après lecture.
+
+La préparation de candidat et les observations de contrôles natifs consomment
+le même lecteur avant création/claim. Une preuve ancienne invalide empêche donc
+le prochain candidat ou job. Après restauration exacte, les mêmes originaux
+restent réutilisables ; aucune tentative, réservation ou consommation n’est remise
+à zéro. Les lectures peuvent exécuter Git sous sa politique de délai persistée.
+Cette CLI/Root n’ajoute ni réglage opérateur, ni bouton web/API HTTP.
+
+`publication_authorized`, `provider_started`, `task_accepted` restent faux :
+la baseline concerne le candidat publié antérieur. Une nouvelle cohorte doit
+contrôler/revoir tous ses critères sur le candidat suivant. Projections et
+publication cumulative restent explicitement non portées par cette tranche.
+
+```mermaid
+flowchart TD
+    A[Tâches acceptées au candidat publié] --> B[Publication canonique et originaux]
+    B --> C[Rapports Git, politiques et fraîcheur actuelles]
+    C --> D[baseline-preview : données vérifiées, aucun droit]
+    C --> E[Préparation du candidat et du job suivants]
+    E --> F[Nouveaux contrôles et avis de toute la cohorte]
+    F -. À porter séparément .-> G[Projections et publication cumulative]
+    B -->|Preuve invalide| H[Refus avant candidat ou job ; restauration requise]
+```
+
+
+### Publication cumulative native — contrat du portage suivant
+
+Cette section actualise la frontière initiale décrite ci-dessus ; sa recette et
+sa livraison sont suivies dans le plan S2 cumulatif. Le reçu SQL natif v1 reste
+strictement initial, octets inchangés. Un reçu v2 cumulatif lie la publication
+précédente par événement et empreinte, la base originale du worker et le parent
+du nouveau candidat séparément. Par exemple, le worker B né de C0 peut produire
+un résultat intégré sur C1 pour former C2. La mise à jour conditionnelle du worker
+utilise C0 ; le candidat utilise C1. Aucun ancien avis n'est réaffecté à C2.
+
+Le lecteur itératif rapproche chaque ligne intégrée de son événement canonique,
+vérifie la chaîne de candidats/révisions, conserve exactement les anciennes tâches
+acceptées et exige une nouvelle tâche par publication. Le pointeur terminal et
+l'ensemble accepté doivent correspondre au Work actuel. Les lecteurs Root ajoutent
+les originaux natifs et la provenance réelle du worker, les rapports Git et la
+revue/les contrôles de toute la cohorte sur le dernier candidat. Un historique
+intact seul ne remplace pas cette dernière preuve ; aucun seuil caché de chaîne
+ni nouvelle politique d'arrêt n'est ajouté. Causes et échecs de fermeture restent
+conservés. Publication et règlement worker restent une seule transaction SQL ;
+rejeu n'entraîne aucun appel/débit, et ne signifie pas fin du travail métier.
+
+```mermaid
+flowchart TD
+    A[Worker A et B partis de C0] --> B[Publication initiale C1 : reçu v1]
+    B --> C[Candidat C2 : parent C1, résultat worker B de C0]
+    C --> D[Contrôles et revue fraîche de toutes les tâches]
+    D --> E[Publication v2 atomique : précédent lié et worker base C0]
+    E --> F[Anciennes tâches et originaux préservés]
+    F --> G[Lecture actuelle : chaîne plus dernière preuve de cohorte]
+    G -. S3 à porter .-> H[Fin métier explicite du superviseur]
+```
+
+
+### Publication cumulative vérifiée et installée — dev128
+
+Le contrat ci-dessus est maintenant exécuté en local : deux publications natives
+C1 puis C2, base originale du deuxième worker C0 préservée, six contrôles et revue
+courante des deux tâches. La première tâche/son avis ne sont pas réécrits. Les
+rejeux des deux reçus restent lisibles après C2 ; un troisième worker reçoit une
+vraie copie à C2 avec les deux rapports. La hausse nécessaire du quota de revue
+est explicite via preview/apply/reopen, consommation2 préservée pour capacité3,
+pas une hausse automatique du moteur. Les règles de fin du superviseur S3 restent
+ouvertes ; la publication n'achève pas le besoin métier.
+
+La recette de naissance est `native-cumulative-publication` ; son parcours de
+reprise maintenu `native-cumulative-publication-readback` vérifie les étapes
+retenues9 publication/2 réglages/4 worker et cinq observations publiques actuelles.
+Deux recettes initiales échouées restent FAIL (schéma de fixture puis quota),
+leurs étapes réussies sont explicitement réutilisées. Les quatre pannes SQL sont
+testées par le SDK TEMP distinct du profil public sans fixture. Le binaire
+installé128 passe le readback et14 contrôles Version FR/EN, sans changer les Works
+réels. Les originaux créés en125 sont vérifiés par128 ; pas d'équivalence globale
+de deux builds déduite. Voir le rapport S2 cumulatif dans le plan de migration.
+
+Les lectures historiques ne réaffectent pas l'ancien avis au dernier candidat :
+chaque ancien Task garde sa custody, et la dernière revue/les contrôles complets
+portent sur le pointeur terminal. Les plans sont renormalisés sous les réglages
+courants ; un défaut non utilisé ne suffit pas à invalider un contrôle explicite,
+une limite réellement dépassée refuse. Pas de cache de preuve survivant à l'appel,
+confinement même UID ou photographie atomique du filesystem établis par ces tests.
+
+### Intégrité des publications historiques cumulatives
+
+Le lecteur commun `managed_publication::writer::current` vérifie les originaux
+natifs de **chaque** publication antérieure, même si l'appelant demande la tâche
+la plus récente. Le chaînage SQL et la dernière revue de cohorte ne remplacent
+pas ces preuves. Un ancien certificat, contrôle, résultat worker ou rapport
+altéré refuse donc aussi le rejeu exact de la dernière publication. Le refus
+conserve les causes et n'ouvre ni nouvel appel, ni événement, ni réacceptation.
+La charge suit la chaîne conservée sous les politiques Git persistées existantes ;
+aucune limite de taille ou échéance globale nouvelle n'est ajoutée.
+Voir `tools/verification/recipes/paea-current-managed-git-publication.json` et
+`tests/paea_historical_publication_test.py` pour le témoin cumulatif inerte,
+les corruptions/refus et les restaurations. Cela n'atteste pas un acteur humain,
+une autorisation PAEA courante ou un effet Git protégé.

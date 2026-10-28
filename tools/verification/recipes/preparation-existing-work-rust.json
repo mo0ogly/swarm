@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "id": "preparation-existing-work-rust",
+  "inputs": [
+    "tests/rust_preparation_conversion.py",
+    "tests/rust_preparation_conversion_ui.cjs",
+    "tests/rust_preparation_reads.py",
+    "tests/rust_preparation_plan.py",
+    "tests/rust_native_http_cli.py",
+    "web/preparation-native.js",
+    "web/prepare.html",
+    "locales/en.json",
+    "web/i18n-en.js",
+    "rust/crates/swarm-engine/src/root_store/preparation_conversion.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_write.rs",
+    "rust/crates/swarm-engine/src/preparation_command.rs",
+    "rust/crates/swarm-engine/src/mutation_guard.rs",
+    "rust/crates/swarm-cli/src/preparation.rs",
+    "rust/crates/swarm-web/src/service.rs",
+    "tests/rust_agent_model_route.py",
+    "rust/crates/swarm-cli/src/lib.rs",
+    "rust/crates/swarm-engine/src/root_store.rs",
+    "tests/rust_preparation_existing_work.py",
+    "tests/rust_preparation_release.py",
+    "tests/rust_preparation_release_review.py",
+    "tests/rust_preparation_team.py",
+    "rust/crates/swarm-engine/src/root_store/preparation_release.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_release_review.rs",
+    "rust/crates/swarm-engine/src/root_store/preparation_organization.rs",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "tests/rust_preparation_release_ui.cjs",
+    "tests/rust_preparation_team_ui.cjs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "existing-work",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='existing-work-existing-work-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_existing_work.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('EXISTING_WORK_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "EXISTING_WORK_PASS ",
+        "PASS existing-release-subset-only",
+        "PASS existing-task-collision-no-write",
+        "PREPARATION_CONVERSION_BROWSER_PASS ",
+        "PASS existing-subset-release-browser",
+        "PREPARATION_RELEASE_BROWSER_PASS "
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "new-work",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='existing-work-new-work-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_conversion.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('EXISTING_WORK_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_CONVERSION_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "release",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='existing-work-release-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_release.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('EXISTING_WORK_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_RELEASE_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "release-review",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='existing-work-release-review-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_release_review.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('EXISTING_WORK_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "RELEASE_REVIEW_PASS"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "team",
+      "command": [
+        "python3",
+        "-c",
+        "import os,subprocess,tempfile\nfrom pathlib import Path\np=Path(tempfile.mkdtemp(prefix='existing-work-team-',dir='.cache')).resolve()/'journey'\nsubprocess.run(['python3','tests/rust_preparation_team.py','--binary',os.environ['SWARM_PREPARATION_UI_BINARY'],'--output',str(p)],check=True)\nprint('EXISTING_WORK_EVIDENCE '+str(p))"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PREPARATION_TEAM_PASS"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

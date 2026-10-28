@@ -1,5 +1,13 @@
 # Accueil Projets et développement
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](../FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) relie ce plan d’accueil aux parcours
+Projets/préparation du socle Rust, sans adopter une nouvelle priorité. Codex
+racine conserve la cartographie entre exigences et capacités actuelles : ce plan
+ne suffit pas à établir leur livraison actuelle. Modèles de cadrage et graphes
+exécutables restent distincts ; aucun modèle ni parcours n’est créé par ce renvoi.
+
 Demande utilisateur du10octobre2026 : première UX développement, bilingue, inspirée du principe d’orientation de l’image fournie mais avec une composition propre à Swarm. Wattson et UX métier hors périmètre.
 
 Livrer une page autonome projects.html, réutilisant les jetons/logo/i18n et les API publiques existantes. Composition : masthead horizontal, intention guidée avec trois besoins, parcours illustré jusqu’aux preuves, missions existantes filtrables, formation/contextes secondaires. Aucun chiffre inventé, aucun appel IA sur accueil, aucune mutation automatique. Les entrées mènent à la préparation réelle, aux modèles existants, au cockpit et à la formation. Préremplissage de besoin seulement dans une nouvelle préparation sans id ; aucun brouillon existant écrasé.

@@ -1259,6 +1259,139 @@ assertions as the current web execution contract. Session JSONL is not exported
 by this server adapter. Paid providers, installation and independent acceptance
 remain outside this isolated inert fixture.
 
+
+## Managed immutable-result recovery / Reprise du résultat géré
+
+`recipes/managed-result-recovery.json` exécute cinq tests du collecteur/injecteur,
+puis un témoin public valide avant le refus sur un Root isolé équivalent, projet
+en sous-répertoire. Fournir `SWARM_STATUS_CONTRACT_BINARY` et
+`SWARM_STATUS_CONTRACT_PROFILE` pour le même profil natif qualifié. La ref Git
+doit survivre au refus ; la reprise retrouve le même commit et rapport avec la
+copie du worker déplacée, sans nouveau worker ni publication/acceptation du candidat.
+Un répertoire vide possédé remplace le futur chemin du rapport : ce refus de
+forme ne prouve pas ENOSPC ou une panne pendant l'écriture atomique.
+
+`recipes/managed-result-recovery.json` runs five collector/fault-device tests,
+then a valid public control before the refusal on an equivalent isolated Root
+with a subproject. Supply `SWARM_STATUS_CONTRACT_BINARY` and
+`SWARM_STATUS_CONTRACT_PROFILE` for the same qualified native profile. The Git ref
+must survive; recovery reuses the same commit/report with the worker copy parked,
+without another worker, candidate publication or acceptance. An owned empty
+directory occupies the future report path; this is not an ENOSPC or mid-write test.
+
+Apprentissage commun : ne jamais attendre la fin d'un processus pour vider un
+`stderr=PIPE` pendant qu'on lit son stdout. Diriger les diagnostics dans un fichier
+de preuve dès le lancement, ou drainer simultanément les deux canaux. Conserver
+les octets stdout avant décodage et la fin de flux ; préserver aussi une erreur de
+restauration avec l'erreur initiale. Les régressions utilisent des diagnostics
+non bloquants pour reproduire la contre-pression sans watchdog arbitraire.
+
+Shared lesson: never defer draining `stderr=PIPE` until process exit while reading
+stdout. Stream diagnostics into an evidence file from launch, or drain both
+channels concurrently. Retain stdout bytes before decoding and the remaining tail;
+keep restoration errors alongside the original failure. Nonblocking diagnostic
+fixtures reproduce backpressure without an arbitrary watchdog.
+
+### Managed Git snapshot / instantané Git géré
+
+`managed-git-snapshot.json` runs a normal native Root control before a subproject
+journey with an effective local Git clean filter. An executable fixture outside
+the copy first proves the callback can run. A future tracked-source fixture mtime
+forces racy-index rehashing during write-tree without changing report freshness.
+This timestamp is not a verification deadline. Retention must preserve exact report
+bytes and owner handoffs without invoking it, publishing a candidate, accepting a
+task or launching an extra actor. Use the normal-profile binary and qualification
+in `SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE`. Outputs retain
+the isolated Roots and process/financial assertions. This does not establish the
+unfinished S2 candidate/reviewer integration or same-UID OS confinement.
+
+La recette vérifie un témoin natif normal puis un filtre local effectif sur un
+sous-projet, avec témoin du programme exécutable. Elle exige remise exacte sans
+callback, acteur supplémentaire, publication ni acceptation. Profil normal et
+binaire sont identifiés ; les Roots et assertions de ressources restent conservés.
+Le composant S2 et le confinement OS ne sont pas qualifiés par cette recette.
+
+`managed-candidate-custody.json` exercises the affected private managed-repository tests with
+actual Git: cumulative-policy preflight, canonical ref recovery, index-hidden raw changes, executable clean
+and textconv witnesses, refusal and byte restoration. No global watchdog;
+`--lib` bounds collection. This is data-custody proof, not native control
+admission, final review or publication.
+
+`native-receipt-binding.json` checks the exact policy/slot/result mapping with
+eight targeted Rust data tests, then uses the supplied normal native binary for
+real control execution, failure/reconciliation and output-loss replay. It starts
+only isolated local fixtures, with no global watchdog or paid provider. A data
+fixture is not a native grant; these checks do not establish S2 cumulative-job
+wiring, independent final review or task acceptance.
+
+`native-source-origin.json` binds the changed native ledger/receipt contracts
+to 26 targeted native Rust tests, 27 candidate custody dependency tests, a real new v2 job with missing-row refusal/restoration,
+retained real v1 and prior-producer v2 originals replay, existing reconciliation cases, and automatic
+watch controls followed by the native reviewer. Supply a verified normal binary
+and profile through `SWARM_STATUS_CONTRACT_BINARY` / `SWARM_STATUS_CONTRACT_PROFILE`,
+and an actual old public fixture directory containing `validate.command.json`,
+`validate.input.json` and `validate.stdout` via `SWARM_ORIGIN_LEGACY_EVIDENCE`.
+Supply the earlier actual v2 origin fixture through `SWARM_ORIGIN_PRIOR_V2_EVIDENCE` too. Its original frame, witness, SQL origin and terminal Job remain unchanged on replay.
+These fixtures must retain their isolated Roots and originals; no fabricated legacy
+SQL or receipt is a substitute. The Python fault injector's only direct SQL write removes/restores
+one origin row after its real controller exited, strictly for refusal proof.
+No live Root, global watchdog, paid provider, S2 candidate or acceptance is implied.
+
+The earlier cumulative v3 reader increment provides data support: the source-bound recipe checks target-only projection, whole-cohort failure, strict versions/preimages and SQL rejection of resealed partial data. Actual managed admission/permissions are now checked separately by `native-managed-validation`; final review and acceptance remain unported. Ordinary new producers stay v2; successful prior-original replay does not backfill v3.
+
+### Native managed candidate preparation
+
+`native-managed-candidate.json` runs 26 targeted native source/receipt tests, an actual ordinary worker → controls → exact replay flow, and actual managed workers → immutable handoff → explicit candidate preparation in a project subdirectory. It checks checkpoint/stage reuse, unchanged Work/jobs, invalid requests, changed candidate source, read-only managed preview and the preserved final-review guard, public settings mutation during Git and exact-original recovery. Set `SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE` to the same immutable normal no-fixture build. The helper's optional `--before-binary` retains an actual prior executable counterexample; the maintained recipe has eight named managed assertions without that optional case. No global test watchdog, SQL writes, paid provider, acceptance or installation claim is introduced. Run in a fresh evidence directory and verify retained evidence with recipe.py verify.
+
+Dependent managed-worker recipes must use the existing `subreaper_scope` with checked restoration and carry the owned fixture `CODEX_HOME` into continuation/helper invocations. Read public wire representations before constructing injections: `SettingCount` values are decimal strings. The candidate helper retains a static local-import SHA256 closure and its exact normal binary/profile; its optional `--workers-evidence` reuses a real PASS worker setup bound to that binary without copying or rewriting runtime state.
+
+
+### Native managed control execution
+
+`native-managed-validation.json` runs 26 targeted native data tests, actual ordinary
+source-origin/refusal/recovery compatibility, and real managed workers followed
+by native controls in a candidate subproject. Three controls per job exercise
+original-policy mapping, pinned cwd, private v3/full candidate, committed slots,
+actual permissions and waited children. An actual `mission watch` lease runs an
+intentionally failing second command and still executes the third. Publication
+refusal follows a valid held-control witness; public reconciliation reuses original
+observations without commands. Terminal replay works with candidate/admission
+frame parked; retirement abandons rather than succeeding. SQL observations are
+read-only. No global watchdog, paid provider, accepted-state seeding or independent
+acceptance is introduced. Use the immutable normal binary/profile through
+`SWARM_STATUS_CONTRACT_BINARY` and `SWARM_STATUS_CONTRACT_PROFILE`. Explicit legacy
+v1/v2 public fixtures belong to `native-source-origin`; this recipe does not claim
+their fresh replay. A current-task native cohort is distinct from multi-task
+component proof: managed final review/acceptance and candidate publication remain
+open. Run fresh and retain `recipe.py verify` output.
+
+La recette couvre le vrai job géré, le bail automatique, les refus et reprises
+sans réexécution, avec trois contrôles par job. Elle conserve les contrôles
+ordinaires, sans acceptation fabriquée ni requête payante. Les politiques
+sauvegardées restent autoritaires ; aucun plafond agrégé ni watchdog n'est ajouté.
+Le validateur final complet et la publication du candidat restent ouverts.
+
+
+### Gate numeric decoding — retained GLM counterexample check
+
+`gate-nonnegative.json` runs the real CLI against an isolated Root with the
+explicit normal binary/profile. Sixteen named assertions cover methods2/3,
+valid pass, legitimate quality failure, negative penalty/cap/FAIL count refusal,
+valid zero penalties and restored valid input. Proof file and saved settings
+remain unchanged. This guards an existing decoder invariant, not a new operator
+policy: `gate_json::Document::number` already rejects nonfinite/negative numbers.
+A review of the caller alone had hypothesized acceptance; actual dev78 CLI and
+the decoder body refute it. No production correction, threshold, retry, global
+watchdog or rebuild is needed for this test-only addition. PASS is local evidence,
+not task acceptance. Future review packets must include numeric/parser accessor
+bodies before attributing missing validation to a thin consumer.
+
+La recette conserve le contre-exemple à l'hypothèse GLM : les nombres négatifs
+refusent déjà dans le décodeur commun, tandis que zéro reste valide pour les
+pénalités. Seize assertions CLI sur les deux méthodes, sans modification du
+produit ni des réglages ; aucune correction fictive n'est annoncée.
+
+
 ### Complete slot recovery without a combined original
 
 `native-partial-validation.json` runs26 targeted native data tests and actual
@@ -1353,45 +1486,6 @@ The old component recipe remains a labelled HTTP double; its cockpit navigation
 expectation now matches the independently verified increment-15 change. Native
 UI and local-delivery proofs remain distinct from component tests and protection.
 
-### PAEA GLM follow-up / Suite de revue GLM (increment 18)
-
-`paea-glm-regressions.json` selects two exact named Rust integration tests:
-canary/type and divergent/escaped duplicate envelope fields on both protected
-PAEA routes, then i64 overflow and original BOM refusal on registry/request.
-Valid controls precede each mutation, safe Display/Debug/HTTP bodies retain the
-original typed cause, recovery returns exact previous data and Root bytes stay
-unchanged. This checks existing behavior; no product fix or authority is implied.
-The complete HTTP recipes now require five tests; the registry target has seven.
-The full browser recipe requires 12 cases per view and 38 real expected refusals
-(including the two BOM cases); prior increment results retain their old counts.
-
-`paea-invoice-encoding.json` explicitly selects `payment-encoding` in the same
-maintained native browser test. Supply `SWARM_PAEA_TEST_BINARY`, its observed
-`SWARM_PAEA_TEST_BINARY_SHA256`, and a fresh `SWARM_PAEA_UI_EVIDENCE`. It starts
-an isolated Root with that existing normal-profile binary, checks the embedded
-PAEA script against current exact bytes, exercises one actual menu/download
-journey, then proves both uploaded BOMs survive transport and receive native
-refusals followed by recovery. It does not qualify all receipt/presentation
-cases or unrelated asset changes. The ordinary full recipe explicitly selects
-`full`; a caller's encoding selection cannot turn it into a partial pass.
-No live POST, build, provider call, retry or global watchdog is added.
-
-La revue GLM propose ; Codex reproduit ou réfute. Ces recettes conservent les
-contre-épreuves, les causes typées et les reprises. La recette d’encodage observe
-les octets reçus par l’API réelle du Root isolé ; elle ne remplace pas la matrice
-complète FR/EN/thèmes/tailles. Les évolutions de tests/documentation ne changent
-aucun octet produit et ne justifient pas de réinstaller des travaux étrangers.
-
-The four broad Rust PAEA manifests now declare command-document, contract/fixture
-families and nested `web/lib` assets referenced by current literal includes.
-`snapshot.py` preflight refuses missing inputs before copying/Cargo; its lexical
-check is conservative and is not effective build/profile qualification. Earlier
-proofs keep their original inventories; use a fresh snapshot when shared version
-notes change during a recipe.
-
-Les inventaires des quatre recettes Rust PAEA sont complétés sans réécrire les
-preuves antérieures. Le précontrôle et l’instantané figé réparent la méthode de
-vérification ; ils ne prouvent ni installation ni conformité globale.
 
 ### Complete managed citation protocol (readonly)
 
@@ -1424,11 +1518,51 @@ before choosing its minimum; a decoded quote length alone is insufficient.
 Engine metadata remains in full materials/receipt, outside implementation-source
 originals. Seven targeted protocol tests and the metadata regression run separately.
 
+### PAEA GLM follow-up / Suite de revue GLM (increment 18)
+
+`paea-glm-regressions.json` selects two exact named Rust integration tests:
+canary/type and divergent/escaped duplicate envelope fields on both protected
+PAEA routes, then i64 overflow and original BOM refusal on registry/request.
+Valid controls precede each mutation, safe Display/Debug/HTTP bodies retain the
+original typed cause, recovery returns exact previous data and Root bytes stay
+unchanged. This checks existing behavior; no product fix or authority is implied.
+The complete HTTP recipes now require five tests; the registry target has seven.
+The full browser recipe requires 12 cases per view and 38 real expected refusals
+(including the two BOM cases); prior increment results retain their old counts.
+
+`paea-invoice-encoding.json` explicitly selects `payment-encoding` in the same
+maintained native browser test. Supply `SWARM_PAEA_TEST_BINARY`, its observed
+`SWARM_PAEA_TEST_BINARY_SHA256`, and a fresh `SWARM_PAEA_UI_EVIDENCE`. It starts
+an isolated Root with that existing normal-profile binary, checks the embedded
+PAEA script against current exact bytes, exercises one actual menu/download
+journey, then proves both uploaded BOMs survive transport and receive native
+refusals followed by recovery. It does not qualify all receipt/presentation
+cases or unrelated asset changes. The ordinary full recipe explicitly selects
+`full`; a caller's encoding selection cannot turn it into a partial pass.
+No live POST, build, provider call, retry or global watchdog is added.
+
+La revue GLM propose ; Codex reproduit ou réfute. Ces recettes conservent les
+contre-épreuves, les causes typées et les reprises. La recette d’encodage observe
+les octets reçus par l’API réelle du Root isolé ; elle ne remplace pas la matrice
+complète FR/EN/thèmes/tailles. Les évolutions de tests/documentation ne changent
+aucun octet produit et ne justifient pas de réinstaller des travaux étrangers.
+
 The managed protocol helper requires Python `jsonschema` for the explicitly
 structural schema checks (tested with the version retained in the increment's
 verification-environment.json). It is a verification dependency only, with no
 new runtime/provider dependency. Rust parser tests remain the authority for the
 actual byte, unique-cohort and quote-membership contract.
+
+The four broad Rust PAEA manifests now declare command-document, contract/fixture
+families and nested `web/lib` assets referenced by current literal includes.
+`snapshot.py` preflight refuses missing inputs before copying/Cargo; its lexical
+check is conservative and is not effective build/profile qualification. Earlier
+proofs keep their original inventories; use a fresh snapshot when shared version
+notes change during a recipe.
+
+Les inventaires des quatre recettes Rust PAEA sont complétés sans réécrire les
+preuves antérieures. Le précontrôle et l’instantané figé réparent la méthode de
+vérification ; ils ne prouvent ni installation ni conformité globale.
 
 
 ### PAEA comparison UI / Comparaison depuis le menu (increment 19)
@@ -1477,6 +1611,7 @@ protected asset byte sets, with translated example links in all three views.
 No live document submission, automatic form fill, paid call, retry or watchdog.
 Run/verify in fresh evidence; snapshots retain their actual declared inputs.
 
+
 ### PAEA exact action inspection / Inspection exacte (increment21)
 
 `paea-inspection.json` selects two schema tests, three pure core tests, two public
@@ -1500,6 +1635,7 @@ protected asset sets**, including the empty inspection/menu/examples/limits in
 FR/EN and actual Version/notes/commit/dirty/focus. It submits no business document.
 Results remain in increment21, distinct from protected assurance or acceptance.
 
+
 ### PAEA supplied approval correspondence / Correspondance d’accord (increment22)
 
 `paea-approval-check.json` runs2schema,3core,2CLI,2nativeHTTP tests, then10exact
@@ -1522,6 +1658,7 @@ The primary-control regression observes every real theme-transition frame (both
 directions) and AA contrast, with no sleep or test-side animation disabling. A
 reproduced1.28:1 intermediate frame required a shared PAEA primary CSS correction;
 the original failed browser run is retained separately from its full replay.
+
 
 ### PAEA laboratory report reader / Lecteur laboratoire (increment23)
 
@@ -1629,6 +1766,475 @@ CLI. Erreur après publication ne signifie pas absence de rapport : UNKNOWN,
 empreinte attendue et vérification du dossier conservé. Garde24requalifiée sur
 l'enregistreur modifié. Aucune authenticité, installation serveur ou acceptation
 protégée déduite ; documents et preuves historiques conservés.
+
+
+### PAEA private installation CLI / Installation privée (43–44)
+
+`recipes/paea-service-installation-cli-library.json` runs50named cases/6steps:
+6CLI input/output/wrapper units,14real root-publisher cases,6service-artifact,
+5initial-material,10startup and9coordinator. It explicitly records its own
+`CARGO_TARGET_DIR=.cache/paea-verification-target`, DEV/TEST_DEBUG=0 and
+INCREMENTAL=0. These are compiler verification settings, not product policy;
+assertions/debug assertions/features are not disabled. Test-fixtures remains a
+separate profile from the default delivered CLI. After test-only Rustdoc comments,
+a six-case supplement qualifies the new bytes;44unchanged authority cases retain
+their original declared source/profile scope. Do not relabel old full evidence.
+
+`recipes/paea-service-installation-cli-native.json` is the maintained template for
+nine Python public journeys (since53). Derive a fresh manifest declaring the immutable
+default binary, complete guarded build profile/archive, fixture-helper ELF and its
+source/hash metadata, and the actual environment values:
+`SWARM_PAEA_SERVICE_BINARY`, `SWARM_PAEA_SERVICE_BINARY_SHA256`,
+`SWARM_PAEA_SERVICE_FIXTURE_HELPER`, `SWARM_PAEA_SERVICE_EVIDENCE` (fresh output).
+The runner does not retain inherited environment, so copying only shell exports
+is insufficient provenance. Run/verify the derived manifest. The helper is
+`swarm-enrollment-authority` example `service_installation_fixture`, compiled with
+its required test-fixtures feature, frozen before use. It never writes a business
+seed. Four real helper process73 exits followed by default-CLI resume/reconciliation
+are distinct from crashing the normal binary itself. Historical44 eight-case evidence performed
+59child commands, including existing37personal lifecycle, bad input/signature,
+forbidden flags before IO, existing destination and real stdout `/dev/full`.
+
+An ENOSPC compilation executes zero tests.44preserved that failure, froze the
+helper and existing proof ELFs, hashed/retired only the unused owned old Cargo
+target, then measured recovery before using the explicit smaller debug profile.
+Old recipes keep their historical environment; for another large CLI replay,
+derive/retain the chosen compiler profile explicitly rather than silently inheriting
+an old full-debug cache or changing production targets. Never delete retained
+proofs, source, live data, active compiler outputs or another owner's cache.
+
+La recette bibliothèque sépare les50tests et le profil test-fixtures du vrai binaire
+sans fixture. Le modèle natif doit être dérivé avec ses chemins, empreintes,
+profils et variables effectives déclarés ; huit cas/59commandes observés, pas une
+acceptation humaine/OS/E2/E3. Les sorties73 concernent le producteur de fixture,
+puis la reprise par la CLI normale. L'échec de compilationENOSPC initial conserve
+son statut ; caches PAEA régénérables uniquement nettoyés après inventaire/empreintes
+et préservation des artefacts. Le service personnel, les UID séparées et les
+critères globaux restent ouverts. Voir les incréments43/44 pour preuves et limites.
+
+
+### PAEA Linux prerequisite observation (45)
+
+`recipes/paea-linux-prerequisites.json` runs5reader/metadata/publication tests then
+actual current-namespace observation. Exit0 means collection, not protected launch.
+The maintained tool executes no namespace/sudo/package/account/service command.
+45retains separate actual ephemeral unshare/bwrap counterexamples and noninteractive
+sudo refusal; no fallback grants authority. FR/ENhost guide records the bounded
+administrator uidmap step and all still-unverified launch properties. This is a
+repository verification tool, absent from the delivered Rust compiler inventory;
+no new server/endpoint/interface or production installation is claimed.
+
+
+### PAEA46 — guarded requests and personal service core
+
+`recipes/paea-personal-service-core.json` checks8normal-profile packet/core cases,
+1fixture-only actual pending-phase recovery case,10existing startup/lifecycle
+cases and private Rustdoc with warnings denied. Explicit debug0/nonincremental
+verification profile; no global watchdog. Default core tests and fixture hook
+production are separate commands; no all-features production qualification.
+The codec holds no listener or peer capability. Tests use actual isolated
+installation, borrowed NUL/LF secrets, canonical Change refusals, wrong target
+before initialization, wrong password/no configuration, pending intent recovery
+and protected reopen. Typed nested outcomes are preserved, not flattened into
+business success. This does not prove actual OS identities, channel admission,
+physical recovery after advanced state, public UX, E2/E3 or human enrollment.
+
+
+PAEA47 extends the same `paea-personal-service-core.json` recipe:13default-authority
+cases +1fixture-only pending case +10startup cases =24named Rust cases, then
+private Rustdoc. Earlier46receipts remain19historical cases; no relabelling.
+Public-request digest excludes proof/password. Responses preserve actual personal
+phases and known configuration data after explicitly synthetic nested failures;
+write/partial-write/flush and unrepresentable synthetic timestamp errors retain
+full original Reply. The JSON schema covers frame shape, not complete View history
+or channel/request admission; configuration validators and a bound client remain
+required. Dev-dependency fixture features are not a production-profile proof.
+
+
+PAEA48 extends the same core recipe to18default-authority cases +1pending fixture
+case +10startup cases =29Rust cases, plus3frame-schema cases and private Rustdoc.
+The bound consumer adds canonical frame/request binding, operation/failure/phase
+coherence and authoritative configuration-history/pins/exact-Change checks.
+A sole AfterUse cannot lose its known inner result. Original canonical semantic
+counterexample FAIL retained before the general correction; an earlier negative
+serialized through generic JSON incorrectly exercised field-order rejection and
+is retained as an invalid verification attempt. Semantic mutations now reencode
+typed Observation. Raw Deserialize is untrusted data; only consumer decode creates
+BoundResponse, still no sender/freshness/current-authority or OS proof. Public
+adapter/default production binary and admitted transport remain separate.
+
+
+### PAEA49 — actual native operator call
+
+`paea-service-call-library.json` adds6adapter and4shared secret-reader regressions
+to29core/startup cases:39Rust+3Python schema cases,8steps including private CLI and
+authority Rustdoc-Dwarnings. Test graph devdependency fixtures remain distinct
+from normal production. `paea-service-call-cli-native.json` is an explicit-env
+native template: bind SWARM_PAEA_SERVICE_BINARY/_SHA256/_FIXTURE_HELPER/_EVIDENCE,
+declare exact ELF/helper/profile/current inputs in a derived fresh manifest.
+It runs5normal-CLI journeys: all7operations, preview/no-save/exact replay,
+pin/frame/options/PTY before startup, password/key-mode refusal/recovery, actual
+stdoutENOSPC after new configuration with exact no-duplicate read/replay, FR/ENhelp.
+The installation driver is now importable without running its8cases; fresh direct
+execution still runs them all. New helper prepare-control explicitly grants4fixture
+permissions, older modes unchanged; frozen44helper/evidence unchanged. Native call
+driver executes actual declared helper Python source bytes rather than relying
+on imported pyc; no secret stdin logged. No daemon/peer/UID/human/E2/E3 proof.
+
+
+### PAEA50 — raw-safe Linux connection credentials
+
+`paea-linux-peer-credentials-library.json`:4focused engine tests (actual connected,
+rawPID0/unconnected, real ENOTSOCK/recovery and safe customIO diagnostics),6operator
+error-retention regressions and private engine Rustdoc-Dwarnings. All actual engine
+sources retained; no test watchdog. The first engine libtest build is substantially
+larger than its filtered test execution, so follow actual compiler progress.
+`paea-linux-peer-credentials-native.json` requires explicit normal ELF/hash/fresh
+SWARM_PAEA_PEER_BINARY/_SHA256/_EVIDENCE.3real private gates each have a same-profile
+connected valid-peer/invalid-grant witness before invisible-creatorPID0 refusal.
+Ephemeral unprivileged user/PID/mount namespace only; immediate parent visible,
+Root stays absent, no grant accepted/provider/host policy/account change. Old175
+counterexample refused without effect but reported errno0, not successful exploit.
+New source preserves actual read errno versus invalid metadata. SO_PEERCRED is
+not per-message attribution; personal channel/SCM_PIDFD/OS/human/E2/E3 remain open.
+Dedicated ignored reviewer SDK recipes keep their explicit fresh Root prerequisites;
+compiling the cfgtest consumer is not their functional acceptance.
+
+`paea-linux-peer-credentials-rustdoc.json` is the maintained strict documentation supplement. When executable code is unchanged, retained named behavioural passes may be reused with a byte-bound comment-only comparison; the original failed aggregate recipe stays FAIL. Verify the supplement only after runner completion.
+
+`paea-linux-identity-channel.json` runs nine named Rust integration cases and
+strict private Rustdoc for the explicit Linux FFI crate. The supplemental recipe
+builds only its declared `test-fixtures` example. Bind/freeze its actual compiler
+artifact before deriving `paea-linux-identity-channel-native.json` with explicit
+SWARM_PAEA_CHANNEL_PROBE/_SHA256/_EVIDENCE and binary/metadata inputs. The native
+fixture configures before releasing a visible subject, then refuses a PID0 subject
+in an ephemeral self-mapped user/PID/mount namespace. Both assert FD accounting.
+Neither recipe grants admission, starts a daemon or qualifies the normal server.
+Original failed aggregates stay FAIL; reuse unchanged tests only with exact
+byte/source comparisons and a current independently completed supplement.
+
+PAEA52 adds three default-authority cases: pinned controller role across refuse/
+initialize/reopen, an exact borrowed kernel Zeroizing packet, and wrong-controller
+kernel subject refusal with unchanged checkpoint. Current core recipe expects
+21default +1pending-fixture +10startup =32Rust cases,3schema cases and Rustdoc.
+Service-call library template consequently expects42Rust+3schema cases. Historical
+47/48/49 counts above retain their original scope. The separate Linux channel recipe
+covers9Rust cases. UID/namespace observations do not admit a peer or activate a daemon.
+
+### PAEA UID representation and current personal driver (53)
+
+`recipes/paea-linux-uid-contract.json` covers the shared Go/Rust raw UID
+representation, canonical bootstrap consumers and provisioning before entropy:
+29 named Rust tests, eight top-level Go tests plus subcases, strict private
+Rustdoc. `u32::MAX` is a Linux invalid marker, never an operator ceiling; UID0
+data are not an OS account/authority witness. Existing invalid declarations
+refuse without private-state migration. Current installation-native adds a
+ninth journey: valid decode witness before either reserved-role fault, no
+target/stage effect, original input restoration and normal install recovery.
+Retain actual command counts from its receipt rather than rewriting old results.
+
+`recipes/paea-personal-cli-native.json` is a derivable template, requiring
+`SWARM_PAEA_PERSONAL_BINARY`, `_BINARY_SHA256`, `_DRIVER_META`, `_EVIDENCE`.
+The metadata contains `binary`, `sha256`, `test_source_sha256` for a freshly
+frozen driver built from the maintained `identity_personal.rs`. Declare these
+ELFs/metadata and the normal compiler inventory in the derived recipe. The
+wrapper refuses mismatched bytes before launching; it requires all seven
+actual named tests and retains stdout/stderr/argv without logging stdin. A
+fixture-linked driver is never qualified as the production binary. New fixture
+source bytes require new metadata/driver; historical37/49 proofs stay immutable.
+
+Les modèles courants personal-cli/initial-provisioning utilisent explicitement
+le cache PAEA conservé, debug0/incremental0, distinct du profil livré. La recette
+UID conserve témoins/refus/reprise et l’absence d’entropie. Le neuvième parcours
+natif vérifie les deux rôles réservés ; le wrapper personnel lie son driver à
+la source maintenue avant les sept tests. Aucun humain, compte distinct ou
+daemon n’est établi par ces fixtures ; les anciens reçus restent inchangés.
+
+The current personal-native template also runs three byte-binding guards after
+the positive journey: wrong normal ELF, wrong driver hash and stale maintained
+source metadata. Each first checks matching original bytes, requires the static
+refusal before any output directory/child and rechecks unchanged originals.
+Ces trois refus de liaison ne constituent pas une authentification humaine.
+
+### PAEA protected provisioning request preflight (54)
+
+`recipes/paea-provisioning-request-check.json`: five public CLI data/FS/flags/
+output journeys, three private read/release/close/custom-IO tests (explicit
+test-fixtures), three schema tests and strict private CLI Rustdoc. Current
+fixture-only example provisioning_request_fixture uses the real canonical
+producer and no entropy; its separate manifest requires test-fixtures. Freeze
+the actual helper ELF and source metadata before native use.
+
+`recipes/paea-provisioning-request-cli-native.json` derives with explicit
+SWARM_PAEA_PROVISIONING_BINARY, _BINARY_SHA256, _FIXTURE_HELPER,
+_FIXTURE_SHA256, _EVIDENCE. Declare both ELFs and full normal profile/source
+archive plus helper metadata in the derived recipe. Five actual normal journeys
+cover FR/EN/help, pinned canonical/UID refusal, permissions/links, forbidden
+flags before IO and stdout /dev/full followed by recovery. Python first verifies
+the Rust-generated canonical roundtrip before mutations; wrong-key/empty JSON
+is never success. All fixtures are private /tmp roots; no live DB, provider,
+watchdog or authority. A completed preflight generates no material or service.
+
+Le précontrôle natif ne crée aucun secret, mandat ou service. La lecture privée
+acquitte seulement le FS local ; refus, causes de fermeture et validation connue
+après erreur de sortie restent séparés. La génération/publication du paquet et
+la séparation réelle des UID demeurent ouvertes. Conserver les échecs originaux
+et vérifier l’intégrité des nouvelles preuves ; un profil fixture n’est pas livré.
+
+### PAEA fixture role/source preflight (54)
+
+The installation, service-call and provisioning native templates first run
+`tests/paea_fixture_binding_check.py` for their explicit semantic fixture role.
+In addition to their documented env, require SWARM_PAEA_SERVICE_FIXTURE_META
+or SWARM_PAEA_PROVISIONING_FIXTURE_META, respectively. Derive with the actual
+frozen metadata and ELF declared as inputs; current metadata binds the maintained
+example through test_source_sha256 (legacy source_inventory is checked when
+present). Require the selected ELF path/hash and expected example source bytes
+before any fixture runs. A correct hash alone does not identify the fixture ABI.
+
+`recipes/paea-fixture-role-bindings.json` uses both namespaces and metadata/ELFs
+declared by its derived recipe. Valid same-role witnesses precede swapping the
+service/provisioning fixture, static source-mismatch refusal and recovery. The
+verifier runs no fixture. This is local fixture provenance, never production
+authentication, signed provenance, confinement or a business permission.
+
+Les trois modèles natifs exigent maintenant les métadonnées explicites du helper
+et vérifient rôle, source maintenue et octets avant lancement. Deux échanges
+volontaires refusent après témoin valide, puis la liaison correcte fonctionne.
+Les anciennes preuves conservent leur script et leur portée historiques ; ne
+les réécrire ni les présenter comme ayant exécuté cette nouvelle garde.
+
+### PAEA operator package/handoff CLI (55)
+
+`recipes/paea-operator-package-cli-library.json` binds six public Rust journeys,
+six private package/target/nonce/IO-cause tests with explicit test-fixtures, three
+closed-report schema checks and private CLI/authority Rustdoc. Data reflection
+via Prepared::request never authenticates a caller. Default profile remains
+separate from fixture builds.
+
+The operator_package_fixture example requires test-fixtures and intentionally
+writes synthetic business/personal seeds/proof only in its own private /tmp
+operator vault. This differs from service and request-only helpers. Freeze the
+actual ELF and bind source/hash metadata; the fixture gate has explicit operator
+role/SWARM_PAEA_OPERATOR_FIXTURE_META and _FIXTURE_HELPER. No fixture script
+is an operator package generator for a real identity.
+
+The role regression takes explicit role arguments: current two-role template
+selects service provisioning and checks both swaps; a derived three-role recipe
+selects service provisioning operator and checks all six ordered swaps. Each
+valid witness precedes refusal and recovery; no helper executes in this guard.
+
+Ces commandes observent un paquet déjà épinglé puis créent/réconcilient le seul
+artefact privé de service. Elles ne régénèrent aucune clé/preuve et n’installent aucun
+service et ne prouvent pas un humain. Le pin de sortie vient de la source
+protégée ; toutes phases connues et causes indépendantes doivent être retenues.
+La génération/publication du paquet initial sous contrôle du pin reste ouverte.
+
+The publication helper still uses temporary-name entropy. A valid-before-fault
+regression verifies refusal before publication, then exact same-material retry;
+this is distinct from key/proof generation. Original misleading wording and the
+correction are retained in increment55 evidence, with no claim of zero OS randomness.
+
+Operator55 uses `paea-operator-package-core.json` (five FS/cleanup/nonce cases,
+three schema cases and strict kernel Rustdoc) and
+`paea-operator-package-cli-library.json` (six public CLI cases, the same five
+kernel cases, one CLI wrapper case, schema and strict CLI/kernel Rustdoc).
+`paea-operator-package-cli-native.json` requires the explicit `operator` fixture
+role bound to its source/ELF before six actual default-binary journeys. No
+initial-package generation, human, real UID separation or service admission is
+established. These are required local checks, not independent acceptance.
+
+Incrément56 : `paea-trusted-anchor-read.json` vérifie5nouveaux lecteurs privés,
+4cas épinglés et8substitutions FD, puis Rustdoc ; `paea-operator-anchor-core.json`
+vérifie9cas d’ancre immuable/fermetures,3schéma et Rustdoc ;
+`paea-checkpoint-cli.json` vérifie6CLI+3schéma/Rustdoc.
+`paea-checkpoint-cli-native.json` utilise seulement l’ELF normal lié par SHA,
+un dossier de preuves neuf et des métadonnées de pins synthétiques sous/tmp ;
+5parcours réels, aucun helper ou paquet/clé/proof/service créé.
+`paea-exact-digest-schemas.json` conserve5contre-exemples de newline final,
+leurs témoins et9tests complets de trois schémas. Cela ne prouve pas E2/E3.
+
+Increment56 explicitly distinguishes a caller-protected anchor locator from an
+independent expected package digest: trusted durable reads never claim PinMatched
+or locator trust. Exact64hex bounds are protocol representation, not policy.
+Current native CLI acceptance and default-profile delivery remain required.
+
+Incrément57 : `paea-initial-creation-core.json` conserve8parcours publics et
+7cas privés de compteurs/pannes/cleanup ; `paea-initial-creation-cli.json`
+couvre6parcours de création/relecture et erreurs de sortie.
+`paea-initial-creation-cli-native.json` exige un ELF normal identifié et le
+helper `initial_request` (préfixe `SWARM_PAEA_INITIAL_REQUEST_`) distinct du
+helper `provisioning`, car celui-ci décrit l’UID actuel côté service. Le nouveau
+helper ne génère aucune clé/proof/paquet : le binaire normal réalise cette étape.
+Vérifier son rôle/source/empreinte avant6parcours natifs ; permutations des
+quatre rôles :12refus, avec témoins valides/reprises, sans exécuter les helpers.
+L’intention durable interdit toute régénération implicite après résultat incertain.
+Les seuls fichiers factices `EXISTING` sont supprimés pour restaurer la fixture ;
+une intention orpheline réelle du parcours reste conservée/refusée.
+
+Increment57 keeps source/library tests, normal-profile delivery and actual native
+acceptance distinct. Pin durability precedes package publication under retained
+reservations; late cleanup keeps its refusal AND pinned private material. A local
+anchor writer differs from a read anchor whose decoded pin is withheld on close
+failure. Orphan-intent operator remediation remains open, not an empty success.
+
+
+Incrément58 / Increment58 : `paea-controller-packet.json` nomme la comparaison
+publique des domaines retenus, substitution privée des deux objets, quatre cas
+privés ordre/décodage/Reply/cleanup et refus public Service mauvais UID avec
+état réel inchangé. Les callbacks positifs sont synthétiques ; aucune réussite
+métier sous deux UID ni panne OS réelle de close n’en est déduite. Positive
+callbacks are synthetic; cleanup aggregation uses a real typed syscall cause
+as test data, not a real failing close. Expected-anchor approval stays external.
+
+Le vérificateur Rustdoc partagé dérive maintenant ses compteurs des listes réelles ; six/six pour57, trois/quatre pour58. Shared Rustdoc counters now reflect actual declared sources/pages; archived historical output remains unchanged.
+
+
+Incrément59 / Increment59 : `paea-spawned-controller.json` couvre deux parcours
+réels Child/pidfd/sender/reprise/fin, un objet nonpidfs privé après témoin, huit
+cas composés (six antérieurs+deux nouveaux) et une route Service réelle UID avant
+ancre expirée. Rustdoc strict/exact4sources/6pages. Positive dispatcher callbacks
+remain synthetic; actual child/process binding is not launch approval, atomic
+spawn, separate-UID business success or daemon activation. No new JSON/Admin
+policy: non-serializable capability and technical poll-zero/type/width invariants.
+
+
+### PAEA native prerequisite recipes
+
+`paea-linux-prerequisites-core.json` uses a dedicated Cargo target for the small
+read-only Linux observer. `paea-linux-prerequisites-ui.json` allocates a fresh
+private output under explicit `SWARM_PAEA_PREREQ_UI_PARENT`; stdout anchors its
+receipt. Verify nested outputs with `tests/paea_linux_ui_recipe.py --verify-sha HASH`
+and `SWARM_PAEA_PREREQ_UI_EVIDENCE=PRINTED_DIRECTORY`, in addition to recipe verify.
+Its HTTP double and script/integrity refusals are not a native backend proof.
+
+`paea-linux-prerequisites-native.json` requires explicit source-managed frozen
+`SWARM_PAEA_PREREQ_BINARY`, `SWARM_PAEA_PREREQ_SHA256`, `SWARM_PAEA_PREREQ_BUILD`.
+The collector allocates under `SWARM_PAEA_PREREQ_NATIVE_PARENT`, retains binary/
+qualified-profile inputs in an inner recipe and anchors safe top-level outputs.
+Verify that inner recipe and `tests/paea_linux_native_recipe.py --verify-sha HASH`
+with `SWARM_PAEA_PREREQ_NATIVE_EVIDENCE=PRINTED_DIRECTORY`. Private session material
+and fixture Root/cwd are not public receipt artifacts. All four protection claims
+remain false. A failed profile is refused before starting the fixture.
+
+For concurrent development, one frozen **effective compiler-input capsule** may
+verify a qualified candidate's exact sources without a second development checkout.
+Do not edit its production inputs or install its test executable. Retain hashes of
+separate canonical test overlays and any Cargo layout-only entry files; inspect
+actual target/features to prove unused examples/scaffolds did not execute. Recipe
+source stability and native candidate/profile proof stay separate. A partial
+source archive alone is not a complete compiler graph. Preserve original failures,
+including successful steps of failed recipes, and never relabel them all PASS.
+
+The live Version helper optionally accepts paired `SWARM_PAEA_LIVE_SOURCE_INVENTORY`
+and `SWARM_PAEA_LIVE_NOTES`: notes must hash to the retained qualified inventory,
+and protected served assets must match its exact hashes. Default workspace mode
+remains available. State which compiled snapshot was installed and which later
+workspace edits are pending. This changes neither adoption nor execution rights,
+embedded agent contexts, independent review or global assurance.
+
+### Autorité exacte PAEA / Exact PAEA authority
+
+`recipes/paea-exact-effect-authority.json` vérifie 8cas PAEA sous compte courant
+et droit signé, 3régressions Trust du noyau commun, 3refus de compilation de la
+capacité et Rustdoc strict. Fixtures privées seulement, sans watchdog global.
+Le namespace distinct n’installe ni service d’effet ni séparation Linux.
+
+The same recipe checks 8PAEA current-account/signed-grant cases, 3Trust shared-gate
+regressions, 3capability compile refusals and strict Rustdoc. Isolated fixtures,
+no global watchdog; no effect-service or Linux separation acceptance implied.
+
+### Grand livre séparé PAEA / Separate PAEA settlement ledger
+
+`recipes/paea-separated-settlement.json` : témoin courant puis12tests distincts
+et Rustdoc strict, fixtures privées et deux RootStore physiques. Pas de watchdog.
+Le profil positif configure explicitement require_separation=false ; les contrôles
+activés refusent sans admission attribuée. La qualification66 conserve la capsule
+immuable, sources, ELF test, profil normal et installation séparément.
+
+The same recipe runs a valid control,12distinct tests and strict Rustdoc against
+isolated two-store fixtures. Positive reference policy explicitly disables required
+separation; enabled separation fails closed pending attributed admission. Local
+kernel evidence never establishes OS custody, human enrollment or independent
+acceptance. Preserve a failed source-stability result; requalify immutable inputs
+without editing historical results. See PAEA increment66 for exact delivery scope.
+
+PAEA67: the separate settlement recipe now runs13distinct tests. A valid stored
+effect precedes each of four metadata faults (enrollment/time/project/policy),
+then exact bytes restore historical replay. Before-fix failure and after-fix
+PASS are retained separately; consistency does not authenticate a receipt.
+PAEA67 :13tests, quatre altérations isolées puis restauration exacte ; aucune
+authentification du reçu ou acceptation globale déduite de ces contrôles.
+
+### Références Git PAEA / PAEA Git reference primitives
+
+`recipes/paea-git-reference-transaction.json` runs6named Git2.51 fixture cases:
+direct publication/abort, symbolic rejection, wrongOLD, competing writers,
+decision error/recovery and the retained unsafe no-deref counterexample.
+It records actual Git path/version/SHA and source stability. No global watchdog,
+real mission, live checkout mutation, PAEA admission or native service implied.
+Six cas Git réels, témoin avant fautes et reprise ; protocole seulement. Voir
+`docs/architecture/PAEA-GIT-TRANSACTION.md` et l'incrément68 pour les limites,
+le runner natif, l'intention durable et la réconciliation encore à intégrer.
+
+### Protocole Git natif PAEA / Native PAEA Git protocol
+
+`recipes/paea-native-git-reference-transaction.json` runs a valid native control,
+8distinct named Rust cases and strict Rustdoc without a global watchdog. Real Git
+covers direct CAS/abort/staleOLD/symbolic/competingwriters, typed decision errors,
+preflight/cancellation under prepare, actual deadline expiry and commit followed
+by fixture-only SIGKILL before ACK. Exact Git binary path/version/SHA are retained.
+Eight Box/IO/Root/secondary-cleanup wrappers preserve abort/requested observations.
+The one-second supplied deadline is an expiry fault with a same-duration valid
+control, not a suite cap or product default. Runtime removes no Git lockfile;
+fixture-only cleanup after pinned inode and confirmed reap is not service recovery.
+
+Reusable lesson from69/core03: a stateful Write sink must never return retriable
+Interrupted after consuming an ACK. write_all can replay bytes indefinitely,
+bypass the process observer and grow capture memory. Preserve the original IO
+cause behind a nonretryable error. The real cancellation case fails before this
+fix and finishes afterwards; original hung ELF/process proof is retained. Related
+existing sinks were semantically reviewed, not globally certified.
+
+La recette couvre8cas natifs distincts/Rustdoc strict ; ni admission, ni daemon,
+ni confinement, ni effet serveur public n'en sont déduits. La bibliothèque est
+livrée dans222, avec preuves de profil et d'interface séparées. Garder l'état
+incertain après COMMIT et réconcilier avant nouvelle tentative. Un sink Write
+ayant consommé un ACK ne doit pas renvoyer Interrupted rejouable : conserver sa
+cause dans une erreur nonrejouable. Voir les preuves originales et limites69.
+
+Git durable intent kernel: `recipes/paea-native-git-intent.json` exercises explicit
+provisioning, business-key uniqueness independent of transport/content, restart,
+refusal, real SQL COMMIT uncertainty and corrupted-record recovery, plus strict
+Rustdoc. This is not an installed protected publication service or effect proof.
+
+Latest native managed Git publication: `recipes/paea-current-managed-git-publication.json`.
+Requires an explicit newly owned inert cumulative fixture via
+`SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE`; the retained result must be PASS,
+cumulative and unpaid with a real birth record. The recipe runs both the ordinary
+Work refusal and explicitly ignored positive SDK test, then strict Rustdoc. No
+service authority or effect publication is granted by this read.
+
+### Biba : transport d’une intention enrôlée
+
+`trust-enrollment-transport-rust.json` exécute le contrôle de présentation des décisions, puis quatre cibles Rust explicites (HTTP3, erreurs4, CLI2, Root3). Le serveur de fixture de la CLI exerce le navigateur réel dans huit contextes FR/EN, clair/sombre et1440/390px. Les empreintes déclarées sont comparées avant/après ; elles ne remplacent pas le profil effectif du compilateur ni la preuve de livraison. Aucun `test-fixtures`, watchdog global, fournisseur réel ou nouvelle permission opérateur. Les identités et mots de passe sont factices et circulent par stdin privé.
+
+Le runner permanent se lance avec `python3 tools/verification/recipe.py run --recipe tools/verification/recipes/trust-enrollment-transport-rust.json --output PREUVE_NEUVE`, puis `verify` sur cette preuve. Son adapter crée un enfant neuf sous `test-results`, sans écraser une tentative passée. Le contrôle DOM/API doublé des messages est distingué du navigateur réel et ne prouve aucune authentification. Un résultat vert ne constitue pas une acceptation indépendante ni l’activation d’une source utilisateur.
+
+Historical native publication through the normal public CLI:
+`recipes/paea-historical-publication-cli.json` uses explicit
+`SWARM_PAEA_MANAGED_GIT_BINARY`, `SWARM_PAEA_MANAGED_GIT_PROFILE`,
+`SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE` and a fresh
+`SWARM_PAEA_HISTORICAL_PUBLICATION_EVIDENCE`. No binary/fixture path is inferred.
+The normal profile/ELF and actual cumulative birth are required; it verifies
+old/latest certificate refusal on latest replay, restoration, and unchanged
+Work/event/worker/provider state. This does not verify a protected Git ref effect.
+
+### Disponibilité Admin Biba
+
+`trust-enrollment-availability-rust.json` vérifie les gardes JS de disponibilité et de résultat, puis le parcours public de gouvernance sur une racine de fixture avec navigateur réel. Le manifeste normal cible `bin/swarm` ; pour vérifier un candidat avant installation, conserver une copie concrète dont seul cet argument pointe sur l’artefact examiné. L’adapter `tests/rust_trust_availability.py --binary IMAGE --output-parent DOSSIER` crée un enfant neuf et retient l’image, les sources et sorties. Le profil effectif et l’installation restent des preuves séparées. Aucun fournisseur, watchdog global ou retry automatique.
+
+Une assertion placée dans un callback dont le produit capture les exceptions peut être absorbée comme erreur d’action. Stocker l’observation puis l’asserter après le callback. Les traces busy-before et busy-discriminated-before du dossier Biba20261028 conservent ce contre-exemple de méthode ; un test vert avant cette distinction n’établit pas la garde busy.
 
 Private Git repository binding: `recipes/paea-private-git-repository.json` requires
 `SWARM_PAEA_CURRENT_PUBLICATION_FIXTURE` pointing at a genuine retained inert

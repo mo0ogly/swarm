@@ -1,5 +1,13 @@
 # Installation neuve et méthodes de préparation
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve la chronologie des méthodes et
+de leur contexte transmis, y compris le suivi du 16 octobre. Codex racine doit
+contrôler le chargement effectif des méthodes dans le candidat concerné avant
+réutilisation d’une preuve ; la présence des fichiers ne suffit pas. Aucun
+contexte embarqué, agent déjà démarré, installation ou méthode n’est modifié ici.
+
 Le clone GitHub `main` à `7cbec49` a été installé en mode natif dans un second
 dossier, avec un projet vide séparé. `prepare methods` retourne quatre méthodes
 indisponibles ; APEX annonce « Méthode hors périmètre ». Le chargement dans

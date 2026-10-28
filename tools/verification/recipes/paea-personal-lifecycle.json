@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "id": "paea-personal-lifecycle",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/swarm-enrollment-authority/**/*",
+    "rust/crates/swarm-enrollment-bootstrap/**/*",
+    "rust/crates/swarm-enrollment-config/**/*",
+    "rust/crates/swarm-enrollment-proof/**/*",
+    "rust/crates/swarm-enrollment-state/**/*",
+    "rust/crates/swarm-identity-contract/**/*",
+    "rust/crates/swarm-wire-json/**/*",
+    "tools/verification/recipe.py",
+    "tools/verification/recipes/paea-personal-lifecycle.json"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-contract-target"
+  },
+  "steps": [
+    {
+      "id": "two-source-authenticated-startup",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "authenticated_startup",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "10 passed; 0 failed",
+        "authenticated_startup_primary_business_refusal_and_actual_personal_close_fault_both_survive",
+        "authenticated_startup_pinned_real_sources_execute_once_and_reopen",
+        "personal_lifecycle_cold_enrollment_exactly_once_and_reopen_execute",
+        "personal_lifecycle_exact_pending_recovers_after_each_durable_phase",
+        "personal_lifecycle_consuming_close_keeps_actual_error_and_known_effect_on_reopen"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "protected-signer-private-files",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "protected_signer::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "8 passed; 0 failed",
+        "protected_signer_actual_partial_read_preserves_eof_and_recovers",
+        "protected_signer_read_stat_both_close_causes_and_recovery"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "durable-personal-coordinator",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--features",
+        "test-fixtures",
+        "--test",
+        "personal_coordinator",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "9 passed; 0 failed",
+        "personal_coordinator_actual_process_exit_after_each_durable_phase_recovers_once",
+        "PROCESS_PROBE phase=IntentDurable crash=true exit=Some(73)",
+        "PROCESS_PROBE phase=JournalApplied crash=true exit=Some(73)",
+        "PROCESS_PROBE phase=CheckpointDurable crash=true exit=Some(73)",
+        "personal_coordinator_actual_writer_contention_recovers_and_account_is_held_until_use_finishes",
+        "personal_coordinator_requires_checkpoint_sync_before_business_callback_then_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "control-core-regression",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "-p",
+        "swarm-enrollment-authority",
+        "--lib",
+        "control::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "16 passed; 0 failed",
+        "both_authority_and_storage_failures_survive_pending_exact_event_recovery",
+        "authenticated_composition_holds_both_real_authorities_through_one_effect",
+        "authenticated_composition_posteffect_errors_keep_inner_storage_and_outer_outcome",
+        "error_debug_keeps_private_after_storage_response_structured_and_redacts_text",
+        "authenticated_composition_close_keeps_both_independent_failures_and_recovers_idempotently"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

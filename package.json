@@ -37,7 +37,10 @@
     "test:call-ledger-ui": "node tests/call_ledger_ui.cjs",
     "test:retex-contract": "python3 tests/retex_campaign_contract_test.py",
     "test:review-policies": "node tests/review_file_policy_ui.cjs",
-    "build:processes": "node scripts/processes/build.cjs"
+    "build:processes": "node scripts/processes/build.cjs",
+    "test:rust-engine-settings-admin": "node tests/rust_engine_settings_admin_ui.cjs",
+    "test:admin-budget-ui-unit": "node tests/admin_budget_ui_test.cjs",
+    "test:admin-budget-native": "python3 tests/rust_native_login_browser.py --scenario admin-budget"
   },
   "devDependencies": {
     "puppeteer": "24.37.1"

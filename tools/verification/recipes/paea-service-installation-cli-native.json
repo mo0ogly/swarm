@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "paea-service-installation-cli-native",
+  "inputs": [
+    "tests/paea_service_installation_cli_test.py",
+    "schemas/paea/service-installation-cli-v1.schema.json",
+    "tools/verification/recipes/paea-service-installation-cli-native.json",
+    "tools/verification/recipe.py",
+    "tests/paea_fixture_binding_check.py"
+  ],
+  "steps": [
+    {
+      "id": "verify-frozen-fixture-role-source-and-bytes",
+      "command": [
+        "python3",
+        "tests/paea_fixture_binding_check.py",
+        "service"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "FIXTURE_BINDING_PASS role=service"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "real-default-cli-installation-and-recovery",
+      "command": [
+        "python3",
+        "tests/paea_service_installation_cli_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS cold-lifecycle",
+        "PASS input-refusals-and-recovery",
+        "PASS closed-options-before-io",
+        "PASS existing-destination",
+        "PASS actual-fixture-exit73-normal-resume",
+        "PASS stdout-enospc-known-effect",
+        "PASS normal-signature-refusal",
+        "PASS fr-en-public-help",
+        "SERVICE_INSTALLATION_NATIVE_PASS cases=9",
+        "PASS reserved-uid-definition-and-recovery"
+      ],
+      "required_stderr": []
+    }
+  ],
+  "environment": {}
+}

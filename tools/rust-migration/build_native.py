@@ -61,7 +61,9 @@ def build(root,out,target,version):
     """Freeze a qualified default-profile candidate and verify consumed metadata.
 
     Explicit version is only a label. Actual Git/date facts cannot be overridden
-    by ambient metadata. A failed build/probe/stability check retains evidence and
+    by ambient metadata. HEAD and dirty state must remain stable; the full Git
+    status channels are retained and their stability reported separately. The
+    collector still binds every effective compiler input. A failed check retains evidence and
     leaves an uninstalled, unqualified candidate; no rollback is inferred. Output
     must be fresh and target exclusive. Only the immutable frozen executable is
     exercised. Runtime env forgery is a fixture, not an injected build declaration.
@@ -101,8 +103,12 @@ def build(root,out,target,version):
         actual=json.loads(reply.stdout);expected={key:value for key,value in metadata.items() if key!='schema_version'};expected['provenance']='injected'
         profile.require(actual['schema_version']==1 and actual['binary']==expected,'native-build-consumed-metadata-mismatch')
         profile.require(not any(cold.iterdir()),'native-build-cold-root-mutated')
-        after=observe(root,out,'after');profile.require(before==after,'native-build-git-observation-changed')
-        proof=dict(status='VERIFIED_NATIVE_CANDIDATE',binary=str(binary),sha256=qualified['sha256'],metadata=metadata,metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),git_observations_stable=True,profile=str(out/'profile/result.json'),runtime_forgery_ignored=True,cold_root_not_created=True,installed=False,published=False,global_watchdog=None)
+        after=observe(root,out,'after')
+        # Only HEAD/dirty are injected metadata. Full status channels remain
+        # evidence; unrelated docs/test paths do not invalidate their accuracy.
+        # The collector independently refuses changed effective compiler inputs.
+        profile.require(all(before[key]==after[key] for key in ('commit','modified')),'native-build-git-observation-changed')
+        proof=dict(status='VERIFIED_NATIVE_CANDIDATE',binary=str(binary),sha256=qualified['sha256'],metadata=metadata,metadata_sha256=hashlib.sha256(raw.encode()).hexdigest(),git_observations_stable=before==after,git_metadata_stable=True,profile=str(out/'profile/result.json'),runtime_forgery_ignored=True,cold_root_not_created=True,installed=False,published=False,global_watchdog=None)
         profile.publish(out/'result.json',json.dumps(proof,indent=2)+'\n');return proof
     except BaseException as error:
         try:profile.publish(out/'failure.json',json.dumps(dict(status='FAIL',type=type(error).__name__,candidate_unqualified=True,installed=False))+'\n')

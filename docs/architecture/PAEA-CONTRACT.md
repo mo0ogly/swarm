@@ -5,6 +5,25 @@
 
 ## Capacité actuelle
 
+Le [plan PAEA](../plans/actions-confiance/PAEA-APEX.md) conserve les versions
+livrées, preuves et limites de chaque incrément. Le dialogue **Version et nouveautés**
+et l'empreinte du processus exécuté établissent l'identité locale à contrôler.
+Les [incréments60](../plans/actions-confiance/paea/INCREMENT-60.md) et
+[61](../plans/actions-confiance/paea/INCREMENT-61.md) décrivent la création atomique
+processus/pidfd et la réponse canonique en un paquet, vérifiées en bibliothèque et
+livrées localement avec leurs parcours natifs existants. Ces preuves n'établissent
+ni un daemon protégé ni son admission complète.
+
+La préparation privée, la création/reprise du paquet opérateur et l'export de
+service sont suivis dans les incréments54 à57. Ils ne créent ni compte OS,
+identité humaine ou mandat courant. Séparation réelle des comptes, confinement,
+services d'effet protégés et acceptation de bout en bout restent ouverts ; PA02
+est partiel et les17invariants globaux ne sont pas acquis. Voir les
+[prérequis Linux](PAEA-LINUX-PREREQUISITES.md) pour les API et conditions restantes.
+Les preuves historiques ci-dessous conservent leur portée datée.
+
+## Preuves historiques de la tranche15
+
 Le 26 octobre 2026, l’utilisateur autorise compilation et push, levant la consigne
 précédente. Les huit cibles Rust PAEA (45 tests) et les cinq tests de schéma passent,
 y compris la route HTTP native. Le navigateur exerce le véritable exécutable et

@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "id": "paea-initial-creation-cli",
+  "inputs": [
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    ".cargo/config.toml",
+    "rust/crates/**/*",
+    "web/*",
+    "web/lib/**/*",
+    "web/paea-examples/v1/*.json",
+    "frontend/engine-settings/*",
+    "tools/agent-workflows/**/*",
+    ".claude/skills/**/*",
+    ".claude/commands/*.md",
+    "contracts/*.json",
+    "internal/engine/testdata/*.json",
+    "tests/fixtures/*.json",
+    "version_history.json",
+    "tools/verification/recipe.py",
+    "rust/crates/swarm-cli/tests/identity_control.rs",
+    "tools/verification/recipes/paea-identity-options.json",
+    "tests/fixtures/paea_personal_tty.py",
+    "tests/fixtures/paea_personal_report_schema.py",
+    "schemas/paea/personal-lifecycle-cli-v1.schema.json",
+    "tools/verification/recipes/paea-personal-cli.json",
+    "tests/paea_personal_native_driver.py",
+    "tools/verification/recipes/paea-personal-cli-native.json",
+    "rust/crates/swarm-cli/tests/identity_provisioning.rs",
+    "schemas/paea/operator-package-cli-v1.schema.json",
+    "tests/paea_operator_package_schema_test.py",
+    "tools/verification/recipes/paea-operator-package-cli-library.json",
+    "rust/crates/swarm-cli/tests/identity_checkpoint.rs",
+    "schemas/paea/operator-anchor-cli-v1.schema.json",
+    "tests/paea_operator_anchor_cli_schema_test.py",
+    "tools/verification/recipes/paea-checkpoint-cli.json",
+    "rust/crates/swarm-cli/tests/identity_initial.rs",
+    "tools/verification/recipes/paea-initial-creation-cli.json",
+    "schemas/paea/initial-creation-cli-v1.schema.json",
+    "tests/paea_initial_creation_schema_test.py",
+    "tests/paea_initial_rustdoc_test.py"
+  ],
+  "environment": {
+    "CARGO_TARGET_DIR": "{root}/.cache/paea-verification-target",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "RUSTDOCFLAGS": "-D warnings"
+  },
+  "steps": [
+    {
+      "id": "initial-create-reconcile-private-source-and-late-output",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-cli",
+        "--test",
+        "identity_initial",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "6 passed; 0 failed",
+        "initial_cli_create_reconcile_exact_fr_en",
+        "initial_cli_existing_slot_refuses_without_overwrite",
+        "initial_cli_request_pin_canonical_and_uid_refuse_before_targets",
+        "initial_cli_private_metadata_and_alias_refuse_then_recover",
+        "initial_cli_closed_flags_refuse_before_source_or_target_io",
+        "initial_cli_output_failure_keeps_package_and_reconcile_recovers"
+      ],
+      "required_stderr": []
+    },
+    {
+      "id": "closed-initial-create-and-read-report-schema",
+      "command": [
+        "python3",
+        "tests/paea_initial_creation_schema_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Ran 3 tests",
+        "OK"
+      ]
+    },
+    {
+      "id": "private-initial-core-and-cli-rustdoc",
+      "command": [
+        "cargo",
+        "doc",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--offline",
+        "--locked",
+        "-p",
+        "swarm-enrollment-authority",
+        "-p",
+        "swarm-cli",
+        "--no-deps",
+        "--document-private-items"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [],
+      "required_stderr": [
+        "Finished",
+        "Generated"
+      ]
+    },
+    {
+      "id": "current-exact-doc-source-and-function-contracts",
+      "command": [
+        "python3",
+        "tests/paea_initial_rustdoc_test.py"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "SOURCE_BOUND_RUSTDOC_PASS sources=6 pages=6"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

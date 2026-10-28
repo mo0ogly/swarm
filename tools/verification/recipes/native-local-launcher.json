@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "native-local-launcher",
+  "inputs": [
+    "swarm.sh",
+    "build.sh",
+    "tools/swarm_local.py",
+    "tools/swarm_version.py",
+    "tools/rust-migration/build_native.py",
+    "tools/verification/verify_native_profile.py",
+    "rust/crates/swarm-web/src/service.rs",
+    "rust/crates/swarm-web/src/access.rs",
+    "rust/crates/swarm-web/src/service/login.rs",
+    "rust/crates/swarm-web/src/service/listener.rs",
+    "rust/crates/swarm-cli/src/native_web.rs",
+    "rust/crates/swarm-cli/src/native_web/conductor.rs",
+    "version_history.json",
+    "tests/test_native_launcher.py",
+    "tests/test_swarm_version.py",
+    "tests/test_swarm_local.py",
+    "docs/architecture/NATIVE-LOCAL-LAUNCHER.md",
+    "docs/en/NATIVE-LOCAL-LAUNCHER.md"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "native-lifecycle-and-protected-version",
+      "command": [
+        "python3",
+        "-c",
+        "import os,json,hashlib,unittest\nfrom pathlib import Path\np=json.loads(Path(os.environ['SWARM_STATUS_CONTRACT_PROFILE']).read_text())\nb=Path(os.environ['SWARM_STATUS_CONTRACT_BINARY']).resolve()\nif hashlib.sha256(b.read_bytes()).hexdigest()!=p['sha256']:raise ValueError('native-recipe-binary-mismatch')\nos.environ['SWARM_TEST_BINARY']=str(b)\nsuite=unittest.TestSuite(unittest.defaultTestLoader.discover('tests',pattern=name) for name in ['test_native_launcher.py','test_swarm_version.py','test_swarm_local.py'])\nresult=unittest.TextTestRunner(verbosity=2).run(suite)\nif result.testsRun!=16 or not result.wasSuccessful() or result.skipped:raise SystemExit('native-recipe-incomplete')\nprint('PASS native-launcher-16-named-tests '+p['sha256'])\n"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "PASS native-launcher-16-named-tests"
+      ],
+      "required_stderr": [
+        "Ran 16 tests",
+        "OK"
+      ]
+    }
+  ]
+}

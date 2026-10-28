@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "managed-candidate-custody",
+  "inputs": [
+    "rust/crates/swarm-engine/src/managed_repository_candidate_store.rs",
+    "rust/crates/swarm-engine/src/managed_repository_source.rs",
+    "rust/crates/swarm-engine/src/managed_repository_candidate.rs",
+    "rust/crates/swarm-engine/src/managed_repository.rs",
+    "rust/crates/swarm-engine/src/local_storage.rs",
+    "docs/architecture/CURSOR-ENGINE-CONTRACT.md",
+    "docs/en/CURSOR-ENGINE-CONTRACT.md",
+    "rust/crates/swarm-engine/src/managed_repository_controls.rs",
+    "rust/crates/swarm-engine/src/managed_repository_candidate_witness.rs",
+    "rust/crates/swarm-engine/src/managed_repository_worker.rs",
+    "rust/crates/swarm-engine/src/agent_launch_error.rs"
+  ],
+  "environment": {},
+  "steps": [
+    {
+      "id": "real-git-checkpoint-custody",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "-p",
+        "swarm-engine",
+        "--lib",
+        "managed_repository::",
+        "--",
+        "--nocapture"
+      ],
+      "expected_exit": 0,
+      "required_stdout": [
+        "managed_candidate_raw_sources_refuse_index_hidden_changes_and_recover ... ok",
+        "managed_candidate_source_check_does_not_execute_textconv_or_hide_mutation ... ok",
+        "managed_candidate_checkpoint_reuses_exact_ref_after_missing_final_file_and_refuses_source_drift ... ok",
+        "test result: ok. 27 passed; 0 failed;",
+        "managed_candidate_refuses_uncontrolled_cohort_before_creating_candidate ... ok",
+        "managed_controls_preserve_cohort_and_per_task_limits_without_aggregate_cap ... ok",
+        "managed_controls_effective_default_changes_plan_without_changing_business_digest ... ok",
+        "managed_candidate_freezes_effective_controls_and_recovers_original ... ok",
+        "managed_candidate_control_original_refuses_corruption_and_unbound_history ... ok",
+        "managed_candidate_binding_covers_full_physical_and_control_preimage ... ok",
+        "managed_candidate_witness_keeps_workspace_alive_without_holding_git_lane ... ok",
+        "managed_candidate_witness_rejects_replaced_path_without_reexecution ... ok",
+        "managed_candidate_witness_partial_acquisition_closes_owned_duplicates ... ok",
+        "managed_candidate_witness_helper_keeps_self_descriptors_through_exec ... ok",
+        "WITNESS_PARTIAL_DUPLICATE_CLEANUP_PASS",
+        "HELPER_SELF_EXEC_OK"
+      ],
+      "required_stderr": []
+    }
+  ]
+}

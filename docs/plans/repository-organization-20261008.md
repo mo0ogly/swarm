@@ -1,5 +1,14 @@
 # Réorganisation du dépôt Swarm — 8 octobre 2026
 
+## Repère APEX — 24 octobre 2026
+
+La [file APEX FR](FILE-APEX.md#vague-3--autres-suivis-historiques-24-octobre-2026) et [EN](../en/APEX-QUEUE.md#wave-3--other-historical-tracking-october-24-2026) conserve cette organisation et ses
+contrôles historiques. La racine de travail actuelle reste le checkout canonique
+`/home/fpizzi/Documents/ChatGPT/swarm` ; les chemins et branches cités ensuite
+appartiennent au constat daté. Codex racine compare les exigences aux sources
+actuelles avant toute évolution. Aucun déplacement, suppression ou duplication
+de checkout ni aucune nouvelle preuve navigateur ne découle de ce renvoi.
+
 ## Demande et état constaté
 
 Le dépôt concerné est `/home/fpizzi/workspace/swarm`, branche `feat/billing-bench`,

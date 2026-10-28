@@ -1,0 +1,466 @@
+--- before/README.md
++++ after/README.md
+@@ -9,6 +9,8 @@
+ Swarm est un **cockpit local et une CLI pour organiser des workflows agentiques**.
+ Il relie le besoin, la planification, les agents, les contrôles et les résultats
+ à une mission persistante. Son interface est disponible en français et en anglais.
++Son cœur est un **moteur déterministe en Rust** qui porte l’état et les
++transitions autorisées des missions.
+ 
+ Quand plusieurs agents travaillent sur un projet, il reste à transmettre les
+ consignes, gérer les dépendances, comprendre les blocages et examiner les preuves.
+@@ -86,15 +88,17 @@
+ 
+ [![Architecture logique Swarm et intégrations restantes](docs/diagrams/architecture-overview-fr.svg)](docs/diagrams/architecture-overview-fr.svg)
+ 
+-Le schéma présente les responsabilités communes ; leur intégration Rust reste en
+-cours. Les pointillés identifient les raccords d’identité et le confinement futur.
++**Le cœur de Swarm est son moteur déterministe Rust, `swarm-engine`.** Il porte
++l’état durable, les transitions et les contrôles qui encadrent les agents IA.
++Les parcours se raccordent et se qualifient progressivement autour de ce moteur ;
++les pointillés identifient les raccords d’identité et le confinement futur.
+ Les flèches décrivent des échanges logiques, pas des permissions déjà garanties.
+ [Ouvrir le schéma en grand](docs/diagrams/architecture-overview-fr.svg) · [Source Mermaid](docs/diagrams/architecture-overview-fr.mmd) · [Architecture technique détaillée](docs/architecture/OVERVIEW.md).
+ 
+ - **L’humain** fixe l’objectif, les limites et les décisions qui lui appartiennent.
+ - **Le superviseur racine** porte le besoin global. Les responsables de périmètre
+   conduisent leur partie ; les exécutants produisent des livrables et des preuves.
+-- **Le moteur déterministe** conserve l’état, observe et remet les incidents,
++- **Le moteur déterministe Rust** conserve l’état, observe et remet les incidents,
+   vérifie les préconditions et applique les décisions autorisées. L’appréciation
+   métier et la clôture appartiennent au superviseur, avec les contrôles requis.
+ - **Le vérificateur indépendant** examine le candidat dans une session distincte.
+@@ -116,7 +120,10 @@
+ 
+ ## Mémoire et identité
+ 
+-[![Mémoire historique Go et raccords d’identité restants](docs/diagrams/memory-identity-fr.svg)](docs/diagrams/memory-identity-fr.svg)
++[![Moteur déterministe Rust au cœur de Swarm, mémoire et identité](docs/diagrams/memory-identity-fr.svg)](docs/diagrams/memory-identity-fr.svg)
++
++Le schéma garde le moteur Rust au centre. Le bloc Go désigne uniquement le socle
++historique de mémoire ; ses liaisons pointillées vers Rust restent à raccorder.
+ 
+ **La mémoire transmet du contexte, jamais des droits.** Une expérience ou une
+ procédure issue d’un RETEX vérifié peut être admise, versionnée et sélectionnée
+--- before/README.en.md
++++ after/README.en.md
+@@ -9,6 +9,8 @@
+ Swarm is a **local cockpit and CLI for organizing agentic workflows**.
+ It connects requirements, planning, agents, checks and results to a persistent
+ mission. Its interface is available in French and English.
++Its core is a **deterministic engine written in Rust** that owns mission state
++and authorized transitions.
+ 
+ When several agents work on a project, someone still has to pass instructions,
+ manage dependencies, understand blockers and examine evidence. Swarm makes these
+@@ -85,15 +87,17 @@
+ 
+ [![Swarm logical architecture and pending integrations](docs/diagrams/architecture-overview-en.svg)](docs/diagrams/architecture-overview-en.svg)
+ 
+-The diagram presents shared responsibilities; Rust integration is in progress.
+-Dashed links identify pending identity integration and future confinement.
++**Swarm’s core is its deterministic Rust engine, `swarm-engine`.** It owns
++durable state, transitions and the checks governing AI agents. Journeys are
++progressively connected and qualified around this engine; dashed links identify
++pending identity integration and future confinement.
+ Arrows represent logical exchanges, not permissions already guaranteed.
+ [Open the diagram at full size](docs/diagrams/architecture-overview-en.svg) · [Mermaid source](docs/diagrams/architecture-overview-en.mmd) · [Detailed technical architecture](docs/en/ARCHITECTURE.md).
+ 
+ - **The human** sets the objective, limits and decisions within their authority.
+ - **The root supervisor** owns the overall objective. Scope owners guide their
+   part; workers produce deliverables and evidence.
+-- **The deterministic engine** retains state, observes and routes incidents,
++- **The deterministic Rust engine** retains state, observes and routes incidents,
+   checks preconditions and applies authorized decisions. Business judgment and
+   completion belong to the supervisor, subject to required checks.
+ - **The independent reviewer** examines the candidate in a separate session.
+@@ -115,7 +119,10 @@
+ 
+ ## Memory and identity
+ 
+-[![Historical Go memory and pending identity integration](docs/diagrams/memory-identity-en.svg)](docs/diagrams/memory-identity-en.svg)
++[![Deterministic Rust engine at Swarm’s core, memory and identity](docs/diagrams/memory-identity-en.svg)](docs/diagrams/memory-identity-en.svg)
++
++The diagram keeps the Rust engine central. The Go block refers only to the
++historical memory foundation; its dashed Rust integrations remain pending.
+ 
+ **Memory carries context, never authority.** An experience or procedure from
+ verified lessons learned can be admitted, versioned and explicitly selected for
+--- before/docs/architecture/OVERVIEW.md
++++ after/docs/architecture/OVERVIEW.md
+@@ -11,6 +11,11 @@
+ 
+ ## Responsabilités et frontières
+ 
++**Le moteur déterministe Rust (`swarm-engine`) est le cœur de Swarm.**
++Il porte l’état, les transitions, l’ordonnancement et les contrôles du produit.
++L’intégration incomplète de certains parcours concerne leur raccord et leur
++qualification ; elle ne change pas cette responsabilité architecturale.
++
+ [![Architecture logique, raccords d’identité et confinement futur](../diagrams/architecture-overview-fr.svg)](../diagrams/architecture-overview-fr.svg)
+ 
+ [Ouvrir en grand](../diagrams/architecture-overview-fr.svg) · [Source Mermaid](../diagrams/architecture-overview-fr.mmd)
+@@ -19,7 +24,7 @@
+ | --- | --- | --- |
+ | Humain | Objectif, autorisations, limites et arbitrages qui lui appartiennent | Une adoption ne vaut pas départ ; une identité locale ne vaut pas identité humaine attestée |
+ | Supervision IA | Planifier, décomposer, apprécier l’avancement, décider des suites | Le superviseur racine porte le besoin global ; un responsable de périmètre ne décide pas hors de sa portée |
+-| Moteur déterministe | État durable, observations, dépendances, réservations, budgets et application des décisions autorisées | Le moteur contrôle le contrat ; le texte d’un agent ne crée pas un droit |
++| Moteur déterministe Rust | État durable, observations, dépendances, réservations, budgets et application des décisions autorisées | Le moteur contrôle le contrat ; le texte d’un agent ne crée pas un droit |
+ | Exécution | Lancer et suivre les tentatives et les outils fournisseurs | Fin de processus, remise de rapport et acceptation restent distinctes |
+ | Vérification | Contrôles, fraîcheur des preuves et revue du candidat | Revue indépendante d’un candidat et jugement global d’un cycle sont deux contrats |
+ | Contexte | Instructions, exigences, références et versions mémoire sélectionnées | Le contexte reçu conserve sa provenance ; il ne confère aucune autorité |
+@@ -39,7 +44,7 @@
+ ```mermaid
+ flowchart TB
+     CLI["swarm-cli<br/>Binaire swarm-rust"] --> WEB["swarm-web<br/>Frontière HTTP native"]
+-    CLI --> ENGINE["swarm-engine<br/>RootStore et contrats métier"]
++    CLI --> ENGINE["MOTEUR DÉTERMINISTE RUST<br/>swarm-engine · RootStore"]
+     WEB --> ENGINE
+     CLI --> BOOT["swarm-enrollment-<br/>bootstrap<br/>Observation d’installation"]
+     ENGINE --> ID["swarm-identity-contract<br/>Validation de données"]
+@@ -83,7 +88,7 @@
+ ```mermaid
+ sequenceDiagram
+     participant S as Superviseur
+-    participant E as Moteur / RootStore
++    participant E as Moteur Rust / RootStore
+     participant D as État durable
+     participant W as Tentative fournisseur
+     participant V as Contrôles / revue
+@@ -128,7 +133,7 @@
+ avec l’autorité métier finale. Le [contrat d’identité](AGENT-IDENTITY-CONTRACT.md)
+ conserve les raccords publics et la source humaine protégée encore ouverts.
+ 
+-[![Mémoire historique Go et intégration d’identité restante](../diagrams/memory-identity-fr.svg)](../diagrams/memory-identity-fr.svg)
++[![Moteur déterministe Rust, mémoire et identité](../diagrams/memory-identity-fr.svg)](../diagrams/memory-identity-fr.svg)
+ 
+ La mémoire suit **RETEX vérifié → admission → version → sélection explicite →
+ contexte reçu** dans le socle historique Go. Les versions, sources, conditions
+--- before/docs/en/ARCHITECTURE.md
++++ after/docs/en/ARCHITECTURE.md
+@@ -11,6 +11,11 @@
+ 
+ ## Responsibilities and boundaries
+ 
++**The deterministic Rust engine (`swarm-engine`) is Swarm’s core.**
++It owns product state, transitions, scheduling and checks. Incomplete journeys
++require integration and qualification; they do not change this architectural
++responsibility.
++
+ [![Logical architecture, pending identity integration and future confinement](../diagrams/architecture-overview-en.svg)](../diagrams/architecture-overview-en.svg)
+ 
+ [Open at full size](../diagrams/architecture-overview-en.svg) · [Mermaid source](../diagrams/architecture-overview-en.mmd)
+@@ -19,7 +24,7 @@
+ | --- | --- | --- |
+ | Human | Objective, permissions, limits and decisions within their authority | Adoption does not start execution; a local identity does not attest a human identity |
+ | AI supervision | Plan, decompose, assess progress and decide next steps | The root supervisor owns the overall objective; scope owners stay within their scope |
+-| Deterministic engine | Durable state, observations, dependencies, reservations, budgets and authorized application | The engine checks the contract; agent prose creates no authority |
++| Deterministic Rust engine | Durable state, observations, dependencies, reservations, budgets and authorized application | The engine checks the contract; agent prose creates no authority |
+ | Execution | Launch and monitor attempts and provider tools | Process completion, report delivery and acceptance remain distinct |
+ | Verification | Checks, evidence freshness and candidate review | Independent candidate review and global cycle judgment are separate contracts |
+ | Context | Instructions, requirements, references and selected memory versions | Received context retains provenance; it grants no authority |
+@@ -38,7 +43,7 @@
+ ```mermaid
+ flowchart TB
+     CLI["swarm-cli<br/>swarm-rust binary"] --> WEB["swarm-web<br/>Native HTTP boundary"]
+-    CLI --> ENGINE["swarm-engine<br/>RootStore and business contracts"]
++    CLI --> ENGINE["DETERMINISTIC RUST ENGINE<br/>swarm-engine · RootStore"]
+     WEB --> ENGINE
+     CLI --> BOOT["swarm-enrollment-<br/>bootstrap<br/>Installation observation"]
+     ENGINE --> ID["swarm-identity-contract<br/>Data validation"]
+@@ -82,7 +87,7 @@
+ ```mermaid
+ sequenceDiagram
+     participant S as Supervisor
+-    participant E as Engine / RootStore
++    participant E as Rust engine / RootStore
+     participant D as Durable state
+     participant W as Provider attempt
+     participant V as Checks / review
+@@ -125,7 +130,7 @@
+ must remain distinct from final business authority. The [identity contract](AGENT-IDENTITY-CONTRACT.md)
+ retains outstanding public integration and protected human-authority requirements.
+ 
+-[![Historical Go memory and pending identity integration](../diagrams/memory-identity-en.svg)](../diagrams/memory-identity-en.svg)
++[![Deterministic Rust engine, memory and identity](../diagrams/memory-identity-en.svg)](../diagrams/memory-identity-en.svg)
+ 
+ Memory follows **verified lessons learned → admission → version → explicit
+ selection → received context** in the historical Go foundation. Versions,
+--- before/docs/diagrams/README.md
++++ after/docs/diagrams/README.md
+@@ -4,8 +4,8 @@
+ 
+ | Famille | Sources | Sens |
+ | --- | --- | --- |
+-| Architecture logique | `architecture-overview-fr.mmd`, `architecture-overview-en.mmd` | Responsabilités humaines, supervision, opérations publiques, moteur, fournisseurs, revue et état local |
+-| Mémoire et identité | `memory-identity-fr.mmd`, `memory-identity-en.mmd` | Socle historique Go de mémoire versionnée, admission et sélection explicites ; raccords d’identité restants |
++| Architecture logique | `architecture-overview-fr.mmd`, `architecture-overview-en.mmd` | Moteur déterministe Rust central, supervision, opérations publiques, fournisseurs, revue et état local |
++| Mémoire et identité | `memory-identity-fr.mmd`, `memory-identity-en.mmd` | Moteur déterministe Rust central ; mémoire historique Go et ses raccords natifs restants ; identité |
+ 
+ Chaque source possède un export SVG et PNG du même nom. Les `.mmd` sont les
+ sources modifiables. La palette reprend [UI-DESIGN](../UI-DESIGN.md) ; le fond
+@@ -15,24 +15,28 @@
+ 
+ ## Portée et maturité
+ 
+-L’architecture décrit des échanges logiques et les responsabilités communes,
+-sans prétendre qualifier leur raccord global Rust. Le moteur observe, vérifie
+-et applique les décisions autorisées ; le superviseur porte le jugement métier.
+-Une revue ne constitue pas, à elle seule, une acceptation. Les pointillés et
+-libellés indiquent le raccord d’identité restant et le **plan AC-02 non démarré**.
++Les deux schémas montrent explicitement le **MOTEUR DÉTERMINISTE RUST**
++(`swarm-engine`) dans le bloc principal bleu marine, avec bordure dorée. Il porte
++l’état, les transitions et les contrôles. La migration et la qualification en
++cours ne doivent jamais masquer ce cœur architectural.
+ 
+-Le parcours plein de mémoire décrit le cas réussi historique Go : modèle et
+-décision humaine, contrôles du moteur, exécution, résultat accepté/RETEX vérifié,
+-admission puis sélection explicites. Il ne décrit pas les branches d’erreur.
+-La mémoire fournit du contexte, jamais une autorisation supplémentaire. Le noyau
+-d’identité vérifié localement ne constitue pas une protection publique déjà
+-raccordée ; propriétaire, auteur, droits d’usage et approbation humaine protégée
+-restent à intégrer. La qualification Rust du parcours mémoire reste ouverte.
++Les vues décrivent des échanges logiques ; elles ne déclarent pas tous les
++parcours qualifiés. Le superviseur porte les décisions métier, le moteur vérifie
++et applique dans le contrat autorisé. L’identité publique et AC-02 restent des
++raccords explicitement signalés ; **AC-02 n’est pas démarré**.
++
++Dans le schéma mémoire, seul le groupe mémoire est historique Go : RETEX vérifié,
++admission, versions, sélection et conservation. Les liaisons admission/sélection
++Rust, contexte mémoire Rust et droits d’usage restent pointillées. Le parcours
++worker natif central est ciblé ; il ne représente pas toute l’équipe qualifiée.
++La mémoire fournit du contexte, jamais des droits supplémentaires.
+ 
+ Sources : [migration Rust](../architecture/RUST-MIGRATION.md),
+ [supervision](../architecture/RUN-SUPERVISION.md), [mémoire](../PROJECT-MEMORY.md),
+ [identité](../architecture/AGENT-IDENTITY-CONTRACT.md),
+ [AC-02](../plans/actions-confiance/securite-execution-apex.md).
++
++Revue de la correction / correction review : [visibilité du cœur Rust](../communication/linkedin-swarm-identite-memoire-20261023/rust-core-visibility-review.json).
+ 
+ ## Régénération
+ 
+@@ -67,14 +71,18 @@
+ explicit light background, accessible title/description and local fonts keep
+ exports readable in light and dark readers. No embedded HTML is used.
+ 
+-The architecture shows shared responsibilities, not globally qualified Rust
+-integration. Supervisors make business decisions; the engine observes, checks
+-and applies authorized decisions. Review alone is not acceptance. Dashed links
+-and labels identify pending identity integration and **AC-02, saved but not started**.
++Both diagrams explicitly show the **DETERMINISTIC RUST ENGINE** (`swarm-engine`)
++as their primary navy block with a gold border. It owns state, transitions and
++checks. Partial migration/qualification must never obscure this architectural core.
+ 
+-The memory diagram depicts the successful historical Go flow, with explicit
+-admission and selection. Memory grants no authority; Rust memory qualification
+-and protected usage rights remain open. Error branches are not shown.
++The views show logical exchanges, not qualification of every journey. The
++supervisor makes business decisions; the engine checks and applies authorized
++operations. Public identity integration remains pending; **AC-02 is not started**.
++
++Only the memory group represents the historical Go foundation. Rust memory
++admission/selection, context and usage-right integrations remain dashed. The
++central native worker flow is scoped; it does not establish qualification of a
++whole team. Memory supplies context, never authority.
+ 
+ Sources: [Rust migration](../en/RUST-MIGRATION.md),
+ [supervision](../en/RUN-SUPERVISION.md), [memory](../en/PROJECT-MEMORY.md),
+--- before/docs/diagrams/architecture-overview-fr.mmd
++++ after/docs/diagrams/architecture-overview-fr.mmd
+@@ -1,12 +1,13 @@
+ flowchart TB
+-    accTitle: Swarm : architecture logique et intégrations restantes
+-    accDescr: Le cockpit et la CLI utilisent les opérations publiques. Le superviseur décide, le moteur vérifie et applique, les agents produisent, la revue examine. Le moteur persiste l’état. Le portage Rust est partiel ; identité publique et confinement AC-02 restent à raccorder.
++    accTitle: Swarm : moteur déterministe Rust au cœur de l’architecture
++    accDescr: Le cockpit et la CLI utilisent les opérations publiques. Le superviseur décide, le moteur déterministe Rust swarm-engine vérifie et applique, les agents produisent, la revue examine. Le moteur persiste l’état. Le portage Rust est partiel ; identité publique et confinement AC-02 restent à raccorder.
+     UI["Humain · cockpit web FR/EN · CLI"] --> API["Opérations publiques
+ Consultation · aperçu · décisions"]
+     API --> SUP["Superviseur racine et de périmètre
+ Planifier · arbitrer · juger l’avancement"]
+-    SUP -->|Décision proposée| ENGINE["Moteur déterministe
+-Droits · dépendances · budgets · preuves"]
++    SUP -->|Décision proposée| ENGINE["MOTEUR DÉTERMINISTE RUST
++swarm-engine · cœur de Swarm
++État · transitions · droits · preuves"]
+     API --> ENGINE
+     ENGINE -->|Départ autorisé| WORK["Agents et outils fournisseurs
+ Contexte choisi · livrables"]
+@@ -22,7 +23,7 @@
+     SEC["AC-02 · PLAN NON DÉMARRÉ
+ Confinement · réseau · secrets · traçabilité"] -.-> WORK
+     classDef ui fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+-    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
++    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef ordinary fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:1.6px;
+     classDef future fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+     class UI ui;
+--- before/docs/diagrams/architecture-overview-en.mmd
++++ after/docs/diagrams/architecture-overview-en.mmd
+@@ -1,12 +1,13 @@
+ flowchart TB
+-    accTitle: Swarm: logical architecture and pending integrations
+-    accDescr: The cockpit and CLI use public operations. The supervisor decides, the engine checks and applies, agents produce, and review examines. The engine persists state. Rust porting is partial; public identity integration and AC-02 confinement remain pending.
++    accTitle: Swarm: deterministic Rust engine at the architecture core
++    accDescr: The cockpit and CLI use public operations. The supervisor decides, the deterministic Rust engine swarm-engine checks and applies, agents produce, and review examines. The engine persists state. Rust porting is partial; public identity integration and AC-02 confinement remain pending.
+     UI["Human · FR/EN web cockpit · CLI"] --> API["Public operations
+ Read · preview · decisions"]
+     API --> SUP["Root and scope supervisors
+ Plan · arbitrate · judge progress"]
+-    SUP -->|Proposed decision| ENGINE["Deterministic engine
+-Permissions · dependencies · budgets · evidence"]
++    SUP -->|Proposed decision| ENGINE["DETERMINISTIC RUST ENGINE
++swarm-engine · Swarm core
++State · transitions · permissions · evidence"]
+     API --> ENGINE
+     ENGINE -->|Authorized start| WORK["Provider agents and tools
+ Selected context · deliverables"]
+@@ -22,7 +23,7 @@
+     SEC["AC-02 · PLAN NOT STARTED
+ Confinement · network · secrets · lineage"] -.-> WORK
+     classDef ui fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:2px;
+-    classDef core fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
++    classDef core fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef ordinary fill:#f5f3ec,stroke:#205e70,color:#243d4a,stroke-width:1.6px;
+     classDef future fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px,stroke-dasharray:6 4;
+     class UI ui;
+--- before/docs/diagrams/memory-identity-fr.mmd
++++ after/docs/diagrams/memory-identity-fr.mmd
+@@ -1,41 +1,40 @@
+ flowchart TB
+-    accTitle: Swarm : fondations Go, mémoire et identité
+-    accDescr: Le workflow et la mémoire versionnée décrivent le socle historique Go. Le portage Rust est en cours. Les liaisons en pointillés représentent le raccord identité restant : lanceurs, propriété, auteur, droits mémoire et approbation humaine.
+-    subgraph WORKFLOW["WORKFLOW · SOCLE GO"]
+-        PLAN["Humain + modèle<br/>Objectif · étapes · critères"]
+-        ENGINE["MOTEUR DÉTERMINISTE<br/>Règles · dépendances · limites"]
+-        AGENT["Agent exécutant<br/>Contexte choisi · périmètre autorisé"]
+-        REVIEW["Contrôles et revue<br/>Résultat accepté · RETEX vérifié"]
+-        PLAN -->|Plan autorisé| ENGINE
++    accTitle: Swarm : moteur déterministe Rust, mémoire et identité
++    accDescr: Le moteur déterministe Rust swarm-engine est le cœur de Swarm. Un parcours worker natif ciblé relie proposition, départ et observations. La mémoire versionnée est un socle historique Go ; ses raccords Rust et l’autorité publique sont encore en pointillés.
++    subgraph NATIVE["CŒUR NATIF RUST"]
++        PLAN["Humain et superviseur<br/>Objectif · proposition · critères"]
++        ENGINE["MOTEUR DÉTERMINISTE RUST<br/>swarm-engine · RootStore<br/>État · transitions · droits · preuves"]
++        AGENT["Tentative worker<br/>Parcours natif ciblé"]
++        FACTS["Activité · rapport · incident<br/>Faits et incertitudes conservés"]
++        PLAN -->|Proposition à vérifier| ENGINE
+         ENGINE -->|Départ autorisé| AGENT
+-        AGENT -->|Livrable et preuves| REVIEW
++        AGENT --> FACTS
++        FACTS -->|Observation et reprise| ENGINE
+     end
+-
+-    subgraph MEMORY["MÉMOIRE · SOCLE GO"]
+-        LESSON[("Expériences et procédures<br/>Versions · conditions · sources")]
+-        HISTORY["Histoire conservée<br/>Remplacement · retrait<br/>Contextes reçus préservés"]
++    subgraph MEMORY["MÉMOIRE GO"]
++        RETEX["RETEX vérifié<br/>Sources et conditions"]
++        LESSON[("Expériences et procédures<br/>Versions et sélection explicite")]
++        HISTORY["Historique conservé<br/>Retrait et contextes déjà reçus"]
++        RETEX -->|Admission explicite Go| LESSON
+         LESSON --> HISTORY
+     end
+-
+-    subgraph IDENTITY["IDENTITÉ EN COURS"]
+-        KERNEL["Noyau interne vérifié localement<br/>Acteur · instance · plan<br/>Droits · délégation · révocation"]
+-        TARGET["Cible du raccord protégé<br/>Propriétaire · auteur · droits d’usage<br/>Approbation humaine"]
+-        KERNEL -.->|Raccord restant| TARGET
++    subgraph IDENTITY["IDENTITÉ À INTÉGRER"]
++        KERNEL["Noyau interne vérifié localement<br/>Acteur · instance · plan · délégation"]
++        TARGET["Raccord protégé restant<br/>Propriétaire · auteur · droits d’usage"]
++        KERNEL -.-> TARGET
+     end
+-
+-    REVIEW -->|Admission explicite| LESSON
+-    LESSON -->|Sélection pour une tâche future| AGENT
+-    KERNEL -.->|Raccord lanceurs restant| ENGINE
+-    TARGET -.->|Raccord mémoire restant| LESSON
+-
++    ENGINE -.->|Admission et sélection Rust à raccorder| LESSON
++    LESSON -.->|Contexte mémoire Rust à raccorder| AGENT
++    KERNEL -.->|Autorité publique à raccorder| ENGINE
++    TARGET -.->|Droits mémoire à raccorder| LESSON
+     classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+-    classDef engine fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
++    classDef engine fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef memory fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+     classDef target fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:1.6px,stroke-dasharray:6 4;
+-    class PLAN,AGENT,REVIEW,HISTORY,KERNEL ordinary;
++    class PLAN,AGENT,FACTS,RETEX,HISTORY,KERNEL ordinary;
+     class ENGINE engine;
+     class LESSON memory;
+     class TARGET target;
+-    style WORKFLOW fill:#f5f3ec,stroke:#205e70,color:#062b49
++    style NATIVE fill:#f5f3ec,stroke:#205e70,color:#062b49
+     style MEMORY fill:#f5f3ec,stroke:#926300,color:#062b49
+     style IDENTITY fill:#f5f3ec,stroke:#926300,color:#062b49,stroke-dasharray:6 4
+--- before/docs/diagrams/memory-identity-en.mmd
++++ after/docs/diagrams/memory-identity-en.mmd
+@@ -1,41 +1,40 @@
+ flowchart TB
+-    accTitle: Swarm: Go foundations, memory and identity
+-    accDescr: Workflow and versioned memory describe the historical Go foundation. Rust porting is in progress. Dashed links represent pending identity integration: launchers, ownership, authorship, memory rights and human approval.
+-    subgraph WORKFLOW["WORKFLOW · GO FOUNDATION"]
+-        PLAN["Human + template<br/>Objective · steps · criteria"]
+-        ENGINE["DETERMINISTIC ENGINE<br/>Rules · dependencies · limits"]
+-        AGENT["Worker agent<br/>Selected context · authorized scope"]
+-        REVIEW["Checks and review<br/>Accepted result · verified lessons learned"]
+-        PLAN -->|Authorized plan| ENGINE
++    accTitle: Swarm: deterministic Rust engine, memory and identity
++    accDescr: The deterministic Rust engine swarm-engine is Swarm’s core. A scoped native worker flow connects proposal, launch and observations. Versioned memory is a historical Go foundation; its Rust integration and public authority remain dashed.
++    subgraph NATIVE["NATIVE RUST CORE"]
++        PLAN["Human and supervisor<br/>Objective · proposal · criteria"]
++        ENGINE["DETERMINISTIC RUST ENGINE<br/>swarm-engine · RootStore<br/>State · transitions · permissions · evidence"]
++        AGENT["Worker attempt<br/>Scoped native flow"]
++        FACTS["Activity · report · incident<br/>Facts and uncertainty retained"]
++        PLAN -->|Proposal to check| ENGINE
+         ENGINE -->|Authorized start| AGENT
+-        AGENT -->|Deliverable and evidence| REVIEW
++        AGENT --> FACTS
++        FACTS -->|Observation and recovery| ENGINE
+     end
+-
+-    subgraph MEMORY["MEMORY · GO FOUNDATION"]
+-        LESSON[("Experiences and procedures<br/>Versions · conditions · sources")]
+-        HISTORY["History retained<br/>Replacement · withdrawal<br/>Delivered contexts preserved"]
++    subgraph MEMORY["GO MEMORY"]
++        RETEX["Verified lessons learned<br/>Sources and conditions"]
++        LESSON[("Experiences and procedures<br/>Versions and explicit selection")]
++        HISTORY["History retained<br/>Withdrawal and received contexts"]
++        RETEX -->|Explicit Go admission| LESSON
+         LESSON --> HISTORY
+     end
+-
+-    subgraph IDENTITY["IDENTITY IN PROGRESS"]
+-        KERNEL["Internal kernel verified locally<br/>Actor · instance · plan<br/>Rights · delegation · revocation"]
+-        TARGET["Protected integration target<br/>Owner · author · usage rights<br/>Human approval"]
+-        KERNEL -.->|Integration pending| TARGET
++    subgraph IDENTITY["IDENTITY PENDING"]
++        KERNEL["Internal kernel verified locally<br/>Actor · instance · plan · delegation"]
++        TARGET["Protected integration pending<br/>Owner · author · usage rights"]
++        KERNEL -.-> TARGET
+     end
+-
+-    REVIEW -->|Explicit admission| LESSON
+-    LESSON -->|Selection for a future task| AGENT
+-    KERNEL -.->|Launcher integration pending| ENGINE
+-    TARGET -.->|Memory integration pending| LESSON
+-
++    ENGINE -.->|Rust admission and selection pending| LESSON
++    LESSON -.->|Rust memory context integration pending| AGENT
++    KERNEL -.->|Public authority integration pending| ENGINE
++    TARGET -.->|Memory usage rights integration pending| LESSON
+     classDef ordinary fill:#fffefa,stroke:#205e70,color:#062b49,stroke-width:1.6px;
+-    classDef engine fill:#062b49,stroke:#062b49,color:#fffefa,stroke-width:2px;
++    classDef engine fill:#062b49,stroke:#926300,color:#fffefa,stroke-width:3px;
+     classDef memory fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:2px;
+     classDef target fill:#fffefa,stroke:#926300,color:#243d4a,stroke-width:1.6px,stroke-dasharray:6 4;
+-    class PLAN,AGENT,REVIEW,HISTORY,KERNEL ordinary;
++    class PLAN,AGENT,FACTS,RETEX,HISTORY,KERNEL ordinary;
+     class ENGINE engine;
+     class LESSON memory;
+     class TARGET target;
+-    style WORKFLOW fill:#f5f3ec,stroke:#205e70,color:#062b49
++    style NATIVE fill:#f5f3ec,stroke:#205e70,color:#062b49
+     style MEMORY fill:#f5f3ec,stroke:#926300,color:#062b49
+     style IDENTITY fill:#f5f3ec,stroke:#926300,color:#062b49,stroke-dasharray:6 4

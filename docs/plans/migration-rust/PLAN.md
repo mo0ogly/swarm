@@ -11,6 +11,67 @@ le seul service local géré après vérification, en préservant données/missi
 Délégations GLM/SKYNET autorisées dans le cadre borné de cette migration.
 Aucun commit/push, publication, déploiement externe ou appel fournisseur métier implicite.
 
+## État courant consolidé —27 octobre, préparation et découverte web218, consultation CLI219
+
+Ce tableau prime sur les états historiques ci-dessous. Vérification locale bornée,
+pas d’acceptation indépendante ni de migration globale déclarée terminée.
+
+| Parcours préparation livré en Rust | Preuve courante |
+|---|---|
+| Documents, adoption, questions, verdict et historique | PREPARATION-UI / ADOPTION / ANSWERS / PLAN-20261026 |
+| Création de missions verrouillées | PREPARATION-CONVERSION-20261026 |
+| Équipe initiale et autorisation séparée de départ | PREPARATION-TEAM / RELEASE-20261026 |
+| Enveloppe et lecture des coûts/réservations | PREPARATION-BUDGET / BUDGET-READ-20261026 |
+| Sources, aperçu, attachement/retrait et réglages Admin | PREPARATION-SOURCES-20261026 |
+| Modèles existants, questionnaire et graphe brouillon | PREPARATION-TEMPLATES-20261026 |
+| Consignes projet readonly CLI/API/dialogue | PROJECT-PROFILE-READ-20261026 |
+| Revue de conversion partagée CLI/API et contrats actuels | PREPARATION-RELEASE-REVIEW-20261026 |
+| Historique IA readonly, prompts privés exclus | PREPARATION-DIALOGUE-HISTORY-20261026 |
+| Appels API texte JSON/SSE, budget, arrêt et usage explicite | PREPARATION-AI-CALLS-20261026 (pilote168) |
+| Historique Go actif/terminal, replay exact et arrêt explicite sans adoption | PREPARATION-LEGACY-ACTIVE-20261027 (216) ; assertion ledger169/216initiale remplacée par la vraie table et témoins |
+| Profils : catalogue/aperçu/application, garde des sources privées | PROJECT-PROFILE-SELECT-20261027 (176) |
+| Ajout de missions au travail existant et libération ciblée | PREPARATION-EXISTING-WORK-20261027 (179) |
+| Comparaison/révision de plan, pause, reçus et reprise | PREPARATION-REVISION-20261027 (184) |
+| Fournisseurs CLI Claude/Codex, arrêt, flux/erreurs/outils déclarés, reprise | PREPARATION-CLI-20261027 (192) |
+| Niveaux CLI explicites et absence de repli automatique | PREPARATION-CLI-LEVELS-20261027 (195) |
+| Guides ordinaires et garde des sources mémoire locales, même retirées | PROJECT-MEMORY-SOURCE-20261027 (201) |
+
+Dernière preuve d’installation :219 (SHA3e2d23ae...), après218/216/201/195/192 ;
+source, notes et ressources embarquées vérifiées, paramètres et cinq travaux
+conservés. Régression préparation4steps PASS/intégrité VERIFIED :11bootstrap47,
+24arrêt,33replay,35API et40+48navigateur. Contrôle installé20+Version14+page11.
+Le conflit réel Admin qui arrêtait le conducteur est reproduit sur216 ; observation
+de découverte séparée des réservations d’admission vérifiée sur218 :3intégration
+et5contrôles publics. CLI :29+60navigateur sur journal47,30sur journal46 avec
+ancien worker. Recettes dédiées PASS/intégrité VERIFIED. Voir
+[le lot et ses limites](WEB-DISCOVERY-OBSERVATION-20261027.md).
+Lire le journal historique46 n’adopte pas47 ; le Root vivant conserve son schéma41.
+Les sources plus récentes que l’archive218 restent en attente ; les preuves
+présentes n’acceptent pas les chantiers S2/identité/Biba/tiers.
+Le défaut réel de bootstrap47 est reproduit, corrigé et vérifié avec recovery public.
+
+Suite autonome : qualifier la prochaine frontière Go restante, préserver les
+fichiers tiers et distinguer commentaires historiques des refus encore atteignables.
+Lot livré : [mission seen](MISSION-SEEN-20261027.md), writer visit existant.
+Témoin218 GAP3 ; candidat219 qualifié, recette17PASS/intégrité VERIFIED ;
+installation SHA3e2d23ae…, contrôle20+Version14+page11 et cinq travaux conservés.
+Dépendance Linux de test utilisée en production déclarée, doublon retiré, graphe
+complet locked validé. Cinq refus antérieurs conservés ; autres chantiers non acceptés.
+La matrice196 reçoit une correction datée des entrées déjà raccordées ; aucun
+pourcentage global ni dénominateur de conformité inventé.
+La planification simultanée de rôles dans mission_watch reste un candidat identifié,
+à examiner dans ses producteurs/consommateurs avant toute modification.
+Migration globale et incident Admin concurrent restent ouverts, sans pourcentage
+ni dénominateur global inventé.
+Dernier lot préparation installé et preuves : [dialogues historiques](PREPARATION-LEGACY-ACTIVE-20261027.md).
+
+
+
+## Historique des livraisons — versions et limites à leur date
+
+Les sections qui suivent conservent leurs observations originales. Une mention
+« reste à porter » ancienne n’annule pas une livraison ultérieure du tableau.
+
 ## Livré localement — créer les missions sans départ,26 octobre
 Owner Codex ; reprise après commit50a972330 (108entrées indexées d’autrui préservées).
 CLI/API/UI create-missions : nouveau travail, tâches/gates/provenance, verrous,
@@ -172,6 +233,79 @@ réelle vérifiée. Revues GLM statiques bornées, aucune acceptation globale fa
 Fichiers de tranche libérés ; préserver Trust/Biba, budget/insights et leurs preuves.
 Suite : FPA-01/02 mémoire et autres écarts ; gardes mémoire conservés avant portage
 du consommateur protégé. AC-02 futur et droits M20 non démarrés ; migration ouverte.
+
+## BIBA APEX — corrections livrées, 27 octobre 2026
+
+Utilisateur : poursuivre les corrections, méthode APEX ; Biba reste la référence.
+Risque A, propriétaire Codex ; [plan/preuves](evidence/20261027-biba-apex/PLAN.md),
+[revue liée aux octets](evidence/20261027-biba-apex/REVIEW.md).
+A04 : retour/rejeu médiatisés, accusé borné I3 sans contenu I2 ; effet unique.
+A02 : Admin HTTP exige I3/admin courant après bootstrap, retrait/rejeu couverts.
+A03 : formes/doublons refusés, politiques non portées gelées, compatibilité null
+fédérée et placeholder Go zéro explicitée. Deux revues GLM, sans acceptation globale.
+Dev203 : recette permanente PASS vérifiée,30 tests nommés,63 CLI/API,57 navigateur.
+Dev204 : écart source documentaire borné et exemple fixture-only hors profil ;
+profil livré631 entrées sans test-fixtures ;62 CLI/API rejouées sur image installée.
+Installé PID1212176, SHA f36e6927f654f6a36780954a99482fe849811ca0ab3f653fd75f51c2f566911b ;
+ressources protégées exactes et14 Version FR/EN, Rustdoc et6 Mermaid vérifiés.
+[RETEX de tranche](evidence/20261027-biba-apex/RETEX.md), originaux conservés.
+A01 reste ouvert : [reprise et dépendances](evidence/20261027-biba-apex/A01-NEXT.md).
+Aucune qualification transverse agents/mémoire/fichiers, isolation OS ou migration globale.
+
+## Audit Biba et architecture — 26 octobre 2026
+
+Défaut prioritaire BIBA-A04 reproduit : I3/effect reçoit un refus `read-object`
+sur une action I2, mais `commit` et `reconcile` renvoient cette même action.
+Aucun second effet. Le garde d’invocation n’établit pas le droit de lecture de
+la réponse ; même le noyau `trust` ne qualifie pas tous ses flux Biba.
+Propriétaire Codex ; suite : médiation commune des retours métier/replays ou
+accusés bornés sous procédure de confiance explicite, sans effacer un effet
+engagé quand sa restitution refuse. Preuve `read-monitor-bypass.json` dans l’audit.
+
+Décision utilisateur : Biba reste la règle d’intégrité de référence ; audit et
+documentation technique/Mermaid FR/EN demandés, sans correction applicative.
+Le noyau `trust` est raccordé en CLI/API/UI ; les lancements ordinaires de
+missions/fournisseurs restent hors de ce moniteur. Écart transversal ouvert,
+propriétaire Codex, reprise par inventaire puis raccordements explicitement
+vérifiés, sans présenter la cible comme déjà livrée.
+
+Validation avancée incomplète reproduite en fixture : `oidc.Enabled:true` est
+accepté et n’active pas l’autorité attendue ; `oidc.clients` non-tableau et un
+sous-champ inconnu de politique inactive sont acceptés. Activation canonique
+`enabled:true` refusée sans mutation : la garde reconnue n’est pas contournée.
+Propriétaire Codex ; correction proposée : validation exhaustive et commune des
+extensions, refus des champs inconnus/types invalides avant publication.
+
+Frontière opérateur reproduite : la session native exigée pour l’API métier
+permet aussi `config-apply` sans I3 courant. Cookie/CSRF valides + jeton I1 :
+mandat refusé, reconfiguration de la même identité en I3 acceptée, mandat ensuite
+accepté avec le même jeton. C’est l’autorité opérateur prévue actuellement,
+pas un accès anonyme ; l’isolation d’un client I1 délégué reste non établie.
+Propriétaire Codex ; reprise : séparer l’admission opérateur de l’identité
+métier ou exiger une autorité I3 courante aux opérations Admin après bootstrap,
+avec témoins de refus/reprise sur toutes les voies publiques.
+
+Preuves bornées : 8 tests du moniteur (48 combinaisons), parcours protégé sur
+binaire installé épinglé et 52 assertions navigateur ; résultats détaillés dans
+[l’audit](evidence/20261026-biba-integration-audit/PLAN.md). Compilation de la
+série d’intégration interrompue par ENOSPC, exit101 : aucun PASS revendiqué.
+Le compilateur a libéré ses temporaires ; aucun cache partagé supprimé, aucune
+relance inchangée. Des entrées partagées ont changé pendant la compilation :
+ne pas confondre tests source, binaire audité et workspace concurrent.
+
+Après nettoyage utilisateur, reprise du seul lot avec 4,7 Gio mesurés. Le
+contre-exemple BIBA-A04 est entretemps confirmé en HTTP (403 puis 200/200) et
+dans une nouvelle fixture par `probe-read-return.py`. Compilation supplémentaire
+annulée sous pression mémoire/I/O observée, après vérification de son identité :
+exit -2, aucun test d’intégration exécuté, aucun PASS ajouté. Deux entrées
+partagées ont changé durant cette reprise ; originaux et condition de reprise
+conservés. Aucun processus de fixture ou compilateur possédé laissé actif.
+
+[Architecture technique et trois schémas](../../architecture/BIBA-RUST.md),
+[English](../../en/BIBA-RUST.md), six rendus Mermaid validés ; guides opérateur
+et cadrage historique reliés. Aucun code produit, politique réelle ou service
+modifié ; aucune installation applicative nécessaire pour ces fichiers Markdown
+non embarqués. L’historique BIBA-RUST ci-dessous reste inchangé.
 
 ## Livré localement — BIBA-RUST (G7, R09/T2), 25 octobre Paris
 Demande utilisateur : implémenter Biba Rust, GLM SKYNET autorisés sans outils.
@@ -3288,6 +3422,20 @@ CAS Work/préparation, rejeu et readback final à préserver. Analyse conservée
 implémentation et recette du parcours encore ouvertes, owner Codex ; aucune
 autorisation de départ appliquée. Voir [rapport](PREPARATION-CONVERSION-20261026.md).
 
+## Préparation — autorisation explicite release-plan (en cours)
+
+Owner Codex, APEX/replan ; GLM ciblé après intégration. Risque A, Root isolé.
+Parcours : revoir les tâches actuelles puis autoriser le snapshot converti, CLI/API/UI.
+Décision : conserver la sémantique Go, pas de refus caché sur une édition publique
+des tâches ; la revue expose le Work courant et la confirmation lie sa révision.
+Périmètre initial : conversion couvrant toutes les tâches du Work, sans organisation
+ni révision de missions. Aucun appel fournisseur synchrone ni changement d'autonomie.
+Gardes : CAS préparation/Work, snapshot, verrou exact, reçu rejouable, readback final.
+Fichiers réservés : preparation_release.rs (nouveau), preparation_conversion/write,
+preparation_command, adaptateurs CLI/service/preparations, preparation-native.js,
+traductions et notes FR/EN ; ajouts partagés seulement. Recette release permanente.
+Clôture : parcours/refus/reprise, revue GLM, profil livré, installation réelle.
+
 ## S2 — copie du worker après publication, livrée dev121
 
 Owner Codex, replan/APEX direct. Push antérieur terminé sur la branche courante.
@@ -3299,3 +3447,663 @@ normal sans fixture, entrées effectives identiques ;14 contrôles UI FR/EN et t
 lectures/rejeu/récupération du binaire installé PASS, Works réels conservés.
 Baseline cumulative/projections, boucle superviseur, S3/S4 et RETEX final ouverts.
 Voir [rapport et RETEX](evidence/20261025-scaling-s2-oi9dgo_e/post-publication-worker-hfzh_8zd/RESULT.md).
+
+Préparation release-plan livré dev121 :52 CLI/API +42 navigateur sur le binaire
+actif, dont rollback du premier lock si le second refuse et reprise même événement.
+Non-régression conversion50+51, Witness1, intégrité des recettes VERIFIED.
+Profil normal478 entrées sans fixtures ;36 contrôles livraison réels, réglages
+et six champs d'état des missions conservés. GLM ciblé : aucun défaut démontré
+dans release/Witness ; premier appel interrompu sans avis, consommation inconnue.
+Docs FR/EN et notes locales actualisées. Source du lot non committée, aucun push.
+Suite : organisation et conversion/révision partielles, dialogue IA, qualification
+globale et RETEX final ; aucune clôture globale de migration déduite.
+[Rapport/RETEX](PREPARATION-RELEASE-20261026.md) ; preuves20261026-preparation-release.
+
+## S2 — baseline native vérifiée et installée dev124
+
+Owner Codex ; lecture CLI/Root et gardes consommées avant candidat/job, sans
+publication cumulative implicite. Recettes9+2 cas PASS/VERIFIED, six contrôles et
+revue réelle des deux tâches ; ancienne tâche acceptée intacte. Cinq vérifications
+publiques installées,14 Version FR/EN, identité/profil normal et Works vérifiés.
+Rustdoc PASS ; revue GLM reçue sans défaut démontré, erreur de lecture du dernier
+snapshot explicitement écartée ; limites du paquet conservées. Sources figées.
+Découverte retenue : worker parallèle né C0, parent candidat C1 ; séparer ces bases
+dans le futur reçu/writer/lecteur historique. Refus cumulatif conservé, owner S2.
+Suite : publication/projections cumulatives puis superviseur, S3/S4, API restantes
+et RETEX final. Voir [rapport](evidence/20261025-scaling-s2-oi9dgo_e/native-baseline-4h9t3go0/RESULT.md).
+
+## Préparation — configuration explicite d'équipe (en cours)
+
+Owner Codex, APEX/replan, proposition GLM bornée ; risque A, Root isolé.
+Parcours : préparation convertie verrouillée → équipe en revue humaine → reçu,
+puis autorisation séparée existante. planning.enable refuse déjà les tâches :
+porter l'assemblage atomique plutôt que chaîner des écritures partielles.
+Scope initial : fournisseurs CLI configurés, workspace contenu, budgets explicites ;
+contrôles automatiques, dépôts gérés et édition d'une équipe existante hors lot.
+Gardes : plan frais, double CAS, tâches d'origine intactes, aucun Agent, locks0,
+rejeu avant IO fournisseur, données/reçu/événement relus avant commit.
+Fichiers : preparation_organization (nouveau), constructeur conversion extrait,
+writer/commande, adaptateurs CLI/API, préparation native, traductions/docs/notes.
+Critère : config persistée, refus/reprise, aucun fournisseur lancé ni lock libéré ;
+recette CLI/API/UI FR/EN, profil normal et activation locale vérifiés.
+
+
+## Autorisation de continuité — API Go restantes, 26 octobre
+
+L'utilisateur demande explicitement de poursuivre sans ses relances jusqu'à la
+fin des API Go à migrer. Owner Codex ; GLM interne autorisé pour contributions
+bornées, missions natives suspendues préservées. Poursuivre par parcours publics
+cohérents, preuves de refus/reprise, documentation FR/EN et installation locale
+vérifiée ; pas de commit/push externe implicite. Ne pas déduire la complétude d'un
+compte de routes ni du seul démarrage Rust. Consolider les producteurs/consommateurs
+réels et les gardes non portées, préserver les lots parallèles préparation/identité.
+Priorité actuelle S2 cumulative, puis arbitrage des dépendances/API restantes dans
+le plan existant et qualification finale/RETEX ; toute découverte reste tracée.
+
+## Préparation équipe — livraison vérifiée dev124
+
+38 assertions CLI/API et54 navigateur passent, plus rollback/reprise Witness.
+Configuration humaine CLI persistée, tâches toujours verrouillées ; libération séparée.
+Valeur Admin modifiée/restaurée en fixture et snapshots vérifiés. Installation :
+16 contrôles HTTP/processus +14 Version FR/EN +6 lectures préparation.
+Rapport : [équipe](PREPARATION-TEAM-20261026.md). Suite indépendante : inventorier
+les opérations préparation encore refusées et raccorder le prochain parcours ;
+S2 cumulatif/identité restent à leurs propriétaires. Aucune clôture globale.
+
+## Préparation budget — incrément en cours
+
+Owner Codex, proposition GLM bornée, risque données/budget. Porter le choix
+explicite de l’enveloppe via prepare budget / commande HTTP / modale existante.
+Réutiliser validation financière ; CAS/reçu atomique ; acteur/date moteur.
+Aucune modification des réservations, consommation, Work ou départs.
+Zéro signifie illimité ; aucune valeur initiale inventée. Afficher honnêtement
+l’absence du lecteur consommation dans ce premier raccord, sans coût zéro fictif.
+Fichiers : commande/writer préparation, CLI/help/capacité, UI/traductions, recette
+et documents FR/EN. Gardes : invalides, CAS, conflit/rejeu, perte de réponse,
+préservation historique et reprise. Livraison locale par profil normal.
+
+
+## S2 — publication cumulative native vérifiée, installée dev128
+
+Owner Codex, APEX/replan ; reçu v1 intact/v2 lié, base worker C0 et parent C1
+séparés, anciens Tasks/avis conservés et cohorte courante vérifiée sur C2.
+Publication9/réglages2/worker suivant4 + readback5 passent, recettes FAIL originales
+conservées. Quatre rollbacks via SDK TEMP distinct du profil public ; quota futur
+2→3 par API, consommation2 intacte, vraie copie C2 avec les deux rapports.
+Dev128 : profil normal, readback sur originaux125,14 Version FR/EN et Works réels
+conservés ; deltas de builds explicités. Revues GLM chaîne et writer reçues sans
+défaut démontré ; ENOSPC intermédiaire conservé/repris sur stockage sain.
+Documentation FR/EN, revue quatre axes et RETEX du lot ; aucune clôture globale.
+Suite sans relance : raccord S2b décision du superviseur→publication native,
+S3 fin globale/S4 mesures, et complétude des API Go par vrais parcours.
+[Rapport/RETEX](evidence/20261025-scaling-s2-oi9dgo_e/native-cumulative-xgydfgxg/RESULT.md).
+
+## Préparation relevé budget — en cours
+
+Owner Codex, contribution GLM bornée.125 enveloppe réellement installée ;27+46
+recette,5 writer et36 installation PASS, preuves conservées. Suite :
+prepare budget sans input / GET budget / modale consommation depuis le même
+snapshot SQL. Réservé et engagé séparés, coût absent≠zéro, couverture/tokens,
+budget Work distinct, alerte Admin persistée sans80% implicite.
+Refuser erreurs/rangs/identités ou nombres invalides ; aucun reset/launch/write.
+Fichiers : nouveau preparation_budget, visibilité view Work, Rootread/exports,
+adaptateurs CLI/API/UI, recette/docs FR/EN/notes. Corriger aussi Rustdoc CLI
+héritée qui excluait à tort l’organisation. Profil et livraison à requalifier.
+
+Replan relevé UI : lien Admin préparation vers ancien cockpit ; entrée réelle
+/native-runtime.html. Lien et recette corrigés, langue/thème conservés.
+DTO budget{} accepté en127 reproduit ; validation consommateur et refus/reprise
+ajoutés, compteurs JS exacts (représentation, pas plafond opérateur).
+
+## Préparation relevé budget — installé128
+
+Binaire eb8ee30… :28 lecteur +27 enveloppe +47 navigateur,22 aide Admin et37
+contrôles réels installation PASS. CLI/API/modale, seuil Admin, coûts inconnus/
+zéro, corruption/reprise, lien réel Admin et DTO manquant couverts. Recettes
+VERIFIED. Chemin staging déplacé : reprise sur SHA immuable, échec original gardé.
+Source/Rustdoc CLI ancienne corrigée ; aucun commit/push ni clôture migration.
+[Rapport](PREPARATION-BUDGET-READ-20261026.md). Prochaine tranche : sélection et
+attachement d’extraits de fichiers, politiques existantes Go rendues explicites
+dans Admin, sans toucher aux chantiers identité/S2/BIBA.
+
+## Préparation sources — tranche verticale en cours
+
+Owner Codex ; proposition capture GLM bornée. Lecture/aperçu de fichiers du
+projet, attachement/retrait CAS/reçu et invalidation explicite adoption/verdict ;
+CLI/API/dialogue de sources réutilisé, sans appel fournisseur. Projet ouvert
+lié au vrai datastore, puis parcours par descripteurs sans liens/FIFO.
+Politiques Go (tailles, lignes, nombres, recherche) et listes formats/dossiers
+rendues persistantes dans Admin, nouveau groupe settings44 (actuel43).
+Aucune adoption silencieuse sur installation ancienne ; defaults explicites init.
+Fichiers : settings/catalog/defaults, Cargo regex/lock, nouveau capture/catalogue,
+writer/command/Rootreads, CLI/API/UI/traductions/docs/recettes.
+Preuves : témoin source, périmètre/secret/binaire/symlink, digest obsolète,
+limites modifiées/reouvertes et consommées, rejeu/retrait/reprise, interface réelle.
+Regex1.13.1 vérifié sur docs.rs ; dépendance nouvelle explicitement annoncée.
+
+Sources, replan prioritaire : objets Raw budget/organisation/décisions avant
+projection Go perdaient ordre des doublons/alias/null ; budget10 puis null
+pouvait devenir illimité0. Reproducteur public128 conservé. Métadonnées
+structurées au premier décodage, comparaison sémantique des anciens reçus sans
+réécrire leurs octets. Format imbriqué invalide → request-invalid ; validation
+monétaire → budget-invalid. Requalifier budgets/équipe/questions concernés.
+Proposition capture GLM examinée : RootInstance.directory est .swarm, pas
+projet ; contrôle mal placé corrigé avant intégration. SHA artisanal écarté
+pour sha2 existant ; conversions et allocations réexaminées.
+
+
+## G6 — API des politiques fournisseurs (en cours)
+
+Owner Codex, APEX/replan, risque A ; producteurs CLI Rust déjà présents, raccord
+HTTP Go /api/v1/providers/policies encore absent. GET/HEAD digest+politiques d'une
+même source, POST preview/apply via décodeur et writer commun, aucun secret/exec.
+Réservés : provider_policy_import/store, nouveau service/provider_policies.rs,
+exports lib et route/capabilité service.rs additifs, tests/recette/docs FR-EN/notes.
+Témoin CLI puis refusHTTP128 avant changement ; parité/reprise, preview courant
+d'agent consommant le choix sans lancement, revue/profil/installation/RETEX.
+Pas de copie des plafonds Go32/65536 ni de second validateur. Admin fournisseur
+complet/connexions, raccord S2b et S3/S4 restent ouverts au programme global.
+Preuves : docs/plans/migration-rust/evidence/20261026-provider-policy-http-n50bryp0/PLAN.md.
+
+G6 replan livraison : profil130 normal qualifié/recette HTTP8 PASS ; installation
+refusée par garde candidate large sur test Rust inutilisé. Réserver
+`tools/swarm_version.py`, nouveau test de course isolé et docs lanceur FR/EN.
+Conserver garde des entrées effectives, métadonnées/outils/notes et cache large ;
+contre-exemple avant correction, puis livraison réelle obligatoire.
+
+## G6 — politiques et résolution CLI installées136
+
+Owner Codex ; politiques8/résolution6/compatibilité travail5 PASS sur le binaire
+installé, intégrité VERIFIED. Défaut namespace133 reproduit puis lecteur commun
+admission/lecture ; contrôle defaults automatiques conservé, aucune donnée
+fournisseur sensible exposée, aucun lancement réel. Profil/ressources/Works/14
+Version FR-EN vérifiés ; vrai Root politiques/résolution CLI200. Rustdoc et docs
+FR/EN, revue4axes liée aux octets et RETEX du lot. La branche API de résolution
+reste501 ; Admin/connexions/test/assistance et S2b/S3/S4 restent ouverts.
+Suite autonome : Admin fournisseurs puis connexions et autres API Go.
+[Rapport](evidence/20261026-provider-model-http-spswojw1/RESULT.md).
+
+## Préparation sources — livraison vérifiée dev133
+
+Sources CLI/API/dialogue raccordées ; douze politiques persistées Admin44,
+ancien journal43 non migré silencieusement. Correctif réel de budget fini perdu
+par doublon/null imbriqué ; reçus anciens équivalents rejoués sans réécriture.
+49 moteur/API,49 navigateur,31 Admin,6 wire ; régressions politiques/budget/équipe/
+questions et test Unicode nommé PASS ; recettes PASS/VERIFIED, profil normal508
+entrées. Installation14+14+6 contrôles, réglages et missions conservés.
+Preuves privées/manifeste et replans de concurrence/rendu/copie conservés ;
+[rapport et RETEX](PREPARATION-SOURCES-20261026.md). Aucune clôture globale.
+Suite indépendante : catalogue et validation des modèles de préparation, puis
+parcours IA et conversions restantes ; préserver S2/identité concurrents.
+
+## Préparation modèles — tranche verticale en cours
+
+Owner Codex ; réutiliser catalogue JSON/graphes/questionnaire existants sans
+modifier les modèles métier. Skill swarm-model-design pour leurs contrats ;
+GLM interne borné propose le helper pur de vérification/projection, sans outils.
+Porter lecture et vérification CLI/API puis raccorder la modale existante ;
+les réponses ne sont ni adoption, ni équipe, ni budget, ni autorisation.
+Limiter réponses/brouillon par politiques Admin explicites ; réutiliser les
+contrôles de plan/tâches et le cadrage de rôle compilé. Sources réservées :
+nouveaux modules preparation_templates/check, settings/catalog/defaults,
+Root/CLI/API/UI additifs, traductions/docs/recettes ; catalogue métier inchangé.
+Preuves : catalogue et graphe actuels, réponses FR/EN manquantes/remplies/invalides,
+projection stable isolée sans mutations, caps Admin/reprise, interface et livraison.
+
+## G6 — inventaire Admin fournisseurs (en cours)
+
+Owner Codex, risque A ; GET/HEAD providers/admin depuis source CLI courante,
+digest/politiques sauvegardées/options réellement déclarées/métadonnées commande.
+Aucun modèle fournisseur inventé ni appel ; statut helper sans preuve d’isolation.
+Réservés nouveaux provider_administration/provider_admin, helper model_options,
+exports/module Root/routes/capacités additifs, fixture/recette/docs FR-EN/notes.
+Causes partielles conservées jusqu’au consommateur, corruption explicite.
+Admin complet natif/assist/connexions restent ouverts ; livraison précédente136
+vérifiée. [Plan](evidence/20261026-provider-admin-http-bilbjd1r/PLAN.md).
+
+## Préparation modèles — livraison vérifiée dev138
+
+Catalogue10 modèles conservé, questionnaire/graphe raccordés, caps Admin45.
+Besoin créé avec sa méthode ; plan adapté local à enregistrer explicitement,
+aucune adoption/autorisation implicite.30 CLI/API,41 UI,31 Admin et22 UI historique41
+PASS ; recette4 étapes PASS/VERIFIED ; Source136 réutilisée dans sa portée exacte.
+Profil normal517 entrées ;19+14+9 contrôles réels, missions/réglages conservés.
+Cache incrémental projet12,4Go repris sous verrou/inventaire, autres répertoires
+préservés ; build/install post-nettoyage vérifiés.
+[Rapport/RETEX](PREPARATION-TEMPLATES-20261026.md), preuves20261026-preparation-templates.
+Suite : lecture des consignes projet, puis sélection/dialogue IA/conversions ;
+améliorer le rendu des causes génériques, ownerCodex, sans perdre les réponses.
+Aucune clôture globale ; aucun commit/push.
+
+## Profil projet — lecture effective en cours
+
+OwnerCodex ; GLM propose une projection metadata de statut, revue avant usage.
+Porter project-profile show/check, GET protégé et dialogue existant de consignes.
+Réutiliser le vrai lecteur Rust de contexte et ses politiques/erreurs ; aucune
+lecture des contenus settings Claude, sélection, agent, budget ou mission modifiés.
+Modules réservés project_profile_read / CLI project_profile / service project_profile,
+Root/lib/service additifs, project-profile.js et préparation native, docs/recette.
+Preuves : absence/profil5rôles, metadata sans lecture, caps/erreurs/reprise,
+CLI/API et UI FR/EN/themes, profil normal et installation ; garde mémoire intacte.
+Sélection/catalogue de profils et dialogue IA restent des suites distinctes.
+
+Admin replan consommateur : selectOptions remplaçait un choix enregistré absent
+par la première option. Corriger le contrat commun des champs de formulaire
+(cockpit.js/locale générée), préserver valeurs et soumission, rendu FR/EN/thèmes/
+320-1440/clavier et octets réellement servis ; aucun changement de politique.
+
+## G6 — Admin cinq groupes vérifiés, formulaire historique48
+
+Inventaire Admin5 production143 PASS, avec causes originales et contrôle HEAD brut ajouté.
+GLM247.583s/61947jetons déclarés : pas de défaut bloquant dans son contexte statique ;
+limites tracées. Formulaire historique48 et import/édition4 parcours PASS ;
+**cockpit.js/providers.js ne sont pas embarqués dans Rust** : recette servie404
+conservée, raccord UX natif ouvert (pas de livraison UI prétendue). Docs FR/EN,
+Mermaid2 rendus. Build143 initial refusé sur dérive sources partagées, reprise
+stable143 qualifiée ;144 en cours après clarification Rustdoc/notes.
+Sources et preuves : [plan](evidence/20261026-provider-admin-http-bilbjd1r/PLAN.md).
+Suite : activer/vérifier Admin puis connexions API ; S2b/S3/S4 restent ouverts.
+
+## G6 — Admin installé et vérifié144
+
+GET/HEAD Admin5 groupes dont HEAD brut et causes/reprises PASS sur SHA303254955218a69a5bceac200d7f3580c08f1c9d82c2b0fb657c6e7ee55215a2.
+Profil normal et exécutable actif concordent ; travaux inchangés,14 Version UI
+FR/EN, lecture réelle Admin, ressources protégées, Rustdoc et intégrité recettes
+vérifiés. [Résultat/RETEX](evidence/20261026-provider-admin-http-bilbjd1r/RESULT.md).
+Formulaires historiques48 + import4 restent des preuves composant ; aucune UX
+fournisseur native prétendue. Continuité vers les connexions API autorisées.
+
+## G6 — lecture des connexions API en cours
+
+Owner Codex, GET/HEAD redigé depuis projecteur hérité strict partagé ; empreinte
+réelle, absence/null distincts, présence de clé seule, identité carte/ligne.
+3 gardes namespace PASS ; témoin public144 route404 conservé. Premier build146
+refusé pour changement concurrent project-profile.js, candidat suivant normal
+c97cce8… qualifié sans features fixture et octets possédés concordants.
+Recette1 échec CSRF manquant surPUT avant route, corrigée sans relâcher garde ;
+recette2 couvre borne persistée/HEAD brut/null ligne, en cours. GLM statique sans
+défaut fonctionnel démontré, limites séparées. Aucun appel réel ni écriture de
+connexion autorisé par cette lecture ; POST/test/UX/exécutionAPI restent ouverts.
+[Plan](evidence/20261026-api-connections-fg4zsgyd/PLAN.md).
+
+## Consignes projet —lecture installée147 ; continuité revue de conversion
+
+OwnerCodex, helper GLM21733 jetons déclarés : statut5rôles, metadata seulement,
+CLI/API et dialogue existant raccordés.37 CLI/API147+40 UI146 PASS ;15 entrées
+compilées identiques146→147 ;17 installation+14 Version+9 page PASS. Recette146
+PASS/VERIFIED ; réglages41 et missions pausées conservés.
+[Rapport/RETEX](PROJECT-PROFILE-READ-20261026.md), preuves20261026-project-profile-read.
+Échec historique causes HTTP : attente du test corrigée, causes internes masquées,
+motif statique public vérifié. Garde mémoire501 maintenu, owner chantier mémoire ;
+reprendre son intégration quand le contrat versionné est disponible. Aucun contournement.
+Sélection/application profil et diagnostic fin modèles restent ouverts.
+Suite autonome avec GLM : extraire lecture release-review Root/CLI/API, conserver
+les deux révisions et les causes, aucune mutation/autorisation ; fichiers réservés
+preparation_release_review.rs, CLI préparation, service préparations, exports additifs,
+documentation et recette. Aucun commit/push, aucune clôture globale.
+
+## G6 — inventaire connexions API installé147
+
+Lecture GET/HEAD protégée installée147, SHA981222cdd5fd51515d192b7dcf865070f7af3aa432c0ef698afb8e71a64fd454.
+4 groupes HTTP (dont borne persistée/HEAD brut),3 gardes namespace,14 Version
+UI FR/EN, travaux inchangés, lecture réelle sans clés, profil normal/Rustdoc/
+intégrité et revue4axes vérifiés. GLM statique sans défaut démontré, sans
+acceptation globale. [Résultat/RETEX](evidence/20261026-api-connections-fg4zsgyd/RESULT.md).
+POST/enregistrement/test/exécution API et UX native restent ouverts ; suite autonome.
+
+Revue conversion : GLM31262 jetons, proposition reçue et corrigée (sidecar
+perdu sur refus). Root/CLI/API raccordés, baselineCLI1461 refus sans écriture.
+[Plan et critères](PREPARATION-RELEASE-REVIEW-20261026.md) ; qualification en cours.
+
+Coordination compilation revue conversion : Cargo.lock actualisé hors ligne,
+seul lien http du manifeste partagé ajouté ; Kind::Int inexistant corrigé Int64
+dans provider_connection_change.rs (version:i64), original et erreurs conservés.
+Aucune validation métier du writer concurrent prétendue ; build commun à refaire.
+
+## Revue convertie partagée livrée149
+
+OwnerCodex ; aide GLM31262 jetons. Nouveau lecteur Root/CLI/API, JSON inchangé
+pour le dialogue existant, contrats/revisions courants et causes sur refus.
+17 lecteur+52 libération+42 navigateur PASS/VERIFIED sur149 ;17 installation,
+14 Version et6 page, CLI/API réelles identiques ; réglages41/missions préservés.
+[Rapport/RETEX](PREPARATION-RELEASE-REVIEW-20261026.md), preuves20261026-preparation-release-review.
+Proposition sidecar corrigée avant intégration ; attentes400/code simple du test
+corrigées aux réponses réelles409/root-cleanup sans changement produit.
+Compilation reprise après lock http et Kind::Int64 partagés, preuves conservées.
+Suite sans relance : historique des échanges de préparation, sans porter
+implicitement le kill/finish temporel de la lecture Go. Aucun commit/push.
+
+## Échanges IA — historique en cours
+
+GLM modèle de tour reçu20682 jetons ; ownerCodex vérifie codec/prompt/Rustdoc.
+CLI/API et rendu conversation historique, sans appel ni mutation ; actif501
+jusqu’au superviseur porté, aucune heuristique Go15s copiée. Source/modules
+réservés et critères dans [plan](PREPARATION-DIALOGUE-HISTORY-20261026.md).
+
+## G6 — enregistrement connexions API : candidat153 vérifié
+
+Owner Codex, POST aperçu/application et CLI connections show/preview/apply
+partagent le Root. Jeton sources CLI/API+réglages+instance base/répertoire,
+verrou providers.lock, snapshot privé exact et publication atomique ; pas
+d’appel fournisseur.9 groupes publics PASS sur151 puis153,4 lecture PASS153,
+clé9000octets et33connexions sous politique persistée, refus400/409/500
+précis, reprise clé stockée invalide, erreurs stdout avec état JSON conservé.
+Régression globale rapport CLI :1échec avant/1PASS après, sortie/Published/cleanup.
+Deux avis GLM statiques349.944s/71629 puis134.494s/26824 jetons déclarés ;
+aucune exécution attribuée. Originaux source en dérive150 et erreurs conservés.
+Rustdoc/Mermaid/activation en cours ; aucun achèvement global des API prétendu.
+[Plan](evidence/20261026-api-connections-write-bijctxtn/PLAN.md).
+Après livraison : reproduire le marqueur no-op des anciens producteurs, puis
+porter le test HTTP des connexions. Catalogue snapshots proposé, différé
+après parité Go, aucune suppression automatique de preuves ou de clés.
+
+## Historique IA livré153 ; suite vers les appels
+
+GLM20682 jetons, modèle proposé et corrigé par ownerCodex. Recette152 :35 CLI/API,
+45 navigateur,105 manuel PASS/VERIFIED ;25 entrées compilées identiques153 livré.
+18 installation+14 Version+8 page PASS, historique réel CLI/API et URL ; réglages41
+et missions préservés. [Rapport/RETEX](PREPARATION-DIALOGUE-HISTORY-20261026.md),
+preuves20261026-preparation-dialogue-history. Refus de build/recette et correction
+falsy conservés, aucun résultat incomplet requalifié PASS.
+Suite autonome : assembler envoi→réservation→fournisseur→réponse→arrêt/reprise,
+avec le transport et les autorisations existants, sans multiplier les lecteurs
+isolés. Actif501 reste ouvert jusqu’à son conducteur réel. Aucun commit/push.
+
+## G6 — connexions API enregistrement installé154
+
+POST aperçu/application et CLI communs installés154, SHA341dcdfb6e4294c62b5186e89d9771dd5bdd69bef1c59389b221ef36f73e9dc9.
+9groupes publics PASS sur le vrai binaire installé, lecture4 PASS153,
+intégrité,14 Version UI FR/EN, travaux inchangés et aperçu réel sans écriture
+(empreinte physique source inchangée) vérifiés. Rapport CLI typé1avantFAIL/1aprèsPASS ;
+clés effectives retenues validées avec refus500 et retrait explicite observés.
+Rustdoc/Mermaid conditionnels/revues4axes et GLM statiques conservés.
+[Résultat/RETEX](evidence/20261026-api-connections-write-bijctxtn/RESULT.md).
+Pas de parité globale Go ni d’injection récente de tous les défauts FS prétendues.
+Suite autonome : preuve no-op anciens producteurs, test HTTP connexions, API restantes.
+
+## Appels IA — lot vertical engagé
+
+Contexte/budget/worker/réponse/arrêt/utilisation réunis dans un seul lot.
+GLM budget35043 jetons déclarés, réponse reçue ; corriger avant intégration
+les hypothèses GoFloat Deref, chemin financier et SQL planning_estimates fictif
+contre les producteurs réels (planning_calls/estimate/state!=released).
+[Périmètre, fichiers réservés et critères](PREPARATION-AI-CALLS-20261026.md).
+Transport API texte seulement ; ne pas confondre cet appel direct sans outils avec
+une création d'agent Work ou l'activation des bridges API d'autres domaines.
+Édition initiale de ce plan refusée SyntaxError avant toute écriture ; littéraux
+corrigés et publication atomique utilisée, aucun build dépendant lancé sur échec.
+
+## G6 — applications sans changement, état confirmé157
+
+Hypothèse anciens consommateurs reproduite sur154 :2 CLI stdout fermés sans
+marqueur JSON et1 observation HTTP false.3 prédicats corrigés, source/snapshots/
+travaux inchangés ;3 PASS et intégrité vérifiée surle vrai binaire157 activé.
+Profil normal,14 Version UI FR/EN, sources/proofs4axes et Rustdoc vérifiés.
+[Résultat/RETEX](evidence/20261026-configuration-noop-92rbor29/RESULT.md).
+Suite : attente fournisseurs puis test HTTP connexions ; aucune parité globale Go.
+
+## G6 — attente fournisseurs : noyau et Admin installés160, reprise de relecture en cours
+
+Autorisation API Go restantes conservée. Source compatible provider-wait.json,
+historique original, défauts versionnés, aperçu lié aux octets/settings/instance,
+verrou réel, sauvegarde privée et publication atomique partagés API/CLI.
+Sept groupes initiaux et quatre parcours navigateur FR/EN × thèmes/320/1440
+passent ; recettes permanentes intègres. Installation160 vérifiée12 assertions
+processus/ressources/Root/Works et14 Version UI ; documentation Rust compilée.
+La suite ciblée étendue passe11 groupes, incluant plafond enregistré, verrou,
+reprise et redémarrage HTTP privé. Aucun fournisseur ni Work exécuté.
+
+Revue GLM complète489.411s,106891tokens déclarés, pas d'exécution indépendante :
+défaut affichage confirmation perdu après relecture échouée reproduit sur160,
+correctif préparé avec relecture explicite ; recette finale et activation à faire.
+Autre hypothèse de perte CLI refutée par le consommateur typé générique réel,
+conservé dans la collation. Motif utilisateur traduit corrigé et vérifié.
+Deux sources de préparation ont changé durant un build : qualification refuse,
+preuves conservées ; nouvelle compilation sur entrées modifiées, sans protection
+retirée. Pas d'acceptation globale des changements concurrents ni des API restantes.
+
+Preuves : evidence/20261026-provider-wait-d2mixh5s.
+Suite : terminer la reprise UI puis test HTTP des connexions en réutilisant le
+client API natif apparu dans le checkout, après lecture de son contrat ; aucun
+copier-coller de timeout120 ni appel à un compte réel. Les85 routes Go repérées
+lexicalement restent des candidats à examiner, jamais un pourcentage de parité.
+
+## G6 — attente compatible et Admin installées163
+
+Le lot provider-wait est livré :12 groupes API/CLI +4 parcours navigateur
+FR/EN/thèmes/clavier/contrastes/320px passent. Confirmation d’enregistrement
+conservée après panne de relecture ; reprise explicite vérifiée. Profil normal,
+ressources effectives,12 observations d’installation et14 Version UI vérifiés.
+Comparaison162→163 : seul preparation-native-dialogue.js diffère dans l’inventaire
+effectif ; sources/consommateurs d’attente inchangés, preuves ciblées réutilisées.
+Rustdoc public corrigé et compilé. Historique des refus de build/tests conservé.
+Rapport et RETEX : evidence/20261026-provider-wait-d2mixh5s/RESULT.md.
+Ce lot ne prouve pas un consommateur natif d’appel API : suite autonome immédiate
+/api/v1/providers/connections/test, plan evidence/20261027-api-connection-probe-r6eeepeu.
+Ni clôture globale des API, ni S2b/S3/S4, ni commit/push implicite.
+
+## G6 — différentiel Go exécuté : correction de lecture historique
+
+Référence Go isolée compilée sans suite de tests ni fournisseur,728 entrées
+production/embeds conservées. Témoin défauts Go/Rust égal ; change:null historique
+accepté par Go mais refusé sur163, sans mutation. Cause : validation native
+supplémentaire des métadonnées anciennes. Correction conserve les contrôles Go
+de lecture et la validation des nouvelles demandes/rejeu du premier événement.
+Candidat167 :11 cas différentiels,12 contrôles publics d’attente et9 régressions
+d’enregistrement PASS. Revue GLM ciblée active ; notes FR/EN et installation
+finale à terminer. Historique163 reste une preuve native bornée, pas une parité
+Go globale. Preuves : evidence/20261027-api-connection-probe-r6eeepeu.
+Suite inchangée : réseau du test de connexion, annulation locale et conservation
+de l’effet distant possible dans la console/erreurs. Aucun appel de compte réel.
+
+### Reprise autonome API — attente historique livrée, test HTTP en cours
+
+Version locale169 : correction de lecture historique vérifiée par Go/Rust13, attente native12, connexions écriture9 ; installation réelle12 et dialogue Version14 (`20261027-api-connection-probe-r6eeepeu/activation-final`). Le test HTTP de connexion est en implémentation ; aucun résultat réseau ni achèvement global annoncé. Premier build refusé par le verrou Cargo après raccordement du client partagé : cause conservée, mise à jour minimale hors réseau puis compilation avant toute recette. Proposition GLM G9 conservée (280,195s ;70 852 tokens déclarés), non intégrée/non exécutée.
+
+### API connexion manuelle — livraison locale174 et suite G9
+
+POST test et Admin portés :10groupes HTTP,5comparaisons Go,4surfaces navigateur,3tests de pont/résultat et1sortie CLI ; recettes/integrités vérifiées. Binaire/profil, ressources et Version FR/EN observés sur174, état métier conservé. Transport vivant41 non adopté automatiquement :501 explicite avant contact. Différences spécifiques aux profils projet173→174 relues ; aucune acceptation de ce chantier tiers ici.
+
+Contrat FR/EN NATIVE-API-CONNECTION-PROBE, schémas à la fin. Revue4axes30fichiers, erreurs originales, Go de référence, artefacts et RETEX : evidence/20261027-api-connection-probe-r6eeepeu/RESULT-RETEX.md. Ni Go global, ni API agents, ni TLS/HTTP2 réels, ni R6/R7 clos. Suite Codex sans relance : G9 limites d’exécution (codec GLM à vérifier), puis API restantes, documentation/installation/RETEX final.
+
+### G9 — limites d’exécution : candidat177, vérification et revue en cours
+
+Owner Codex, suite autonome API autorisée. Admin modal FR/EN, API et CLI partagent SQL courant/historique, aperçu, CAS explicite Go, token optionnel de fraîcheur, replay courant et retour append-only. Aucun plafond historique Go recopié ; politique persistée consommée,100→refus101, sans plafond→10001 effective, resserrement et reprise vérifiés. Public9/Go6/navigateur4 PASS, deux gardes Root nommées PASS (réparation JSON et rollback après insertion ignorée). Documentation FR/EN avec Mermaid. Preuves : evidence/20261027-run-limits-admin-ohyyq12v/PLAN.md. Revue GLM et qualification/livraison courantes encore ouvertes ; ni global API ni migration acceptées. Suite sans relance après livraison : inventaire sémantique des familles restantes et prochain parcours.
+
+### G9 livré178 — suite autonome des API
+
+Limites d’exécution Admin/API/CLI installées, processus et ressources vérifiés13 +dialogue Version14 ; cinq travaux inchangés. Public9/Go6 sur177 réutilisés après revue de la différence effective, navigateur4 corrigé sur178 et intégrité vérifiée ; collecteur initial FAIL focus conservé, jamais rebaptisé PASS. Codec10/Root2 effectivement exécutés. Revue GLM113639tokens statique sans défaut confirmé, hypothèses vérifiées sur les vrais consommateurs. Contrat FR/EN NATIVE-RUN-LIMITS-ADMIN, schémas à la fin ; evidence/20261027-run-limits-admin-ohyyq12v/RESULT-RETEX.md. Prochaine unité : politiques requêtes navigateur et graphes (producteurs Go à lire, capacités natives à vérifier), puis autres familles ; aucun pourcentage ni achèvement global implicite.
+
+
+### G10 attentes navigateur et reçus partagés — 27 octobre2026
+
+Native-runtime installé187 : API/CLI8, taille3, Go6/16cas ; reçus partagés12parcours FR/EN/thèmes et Unicode2 +navigateur4. Processus/ressources/lectures18 et Version14, cinq travaux inchangés. Les collectes initiales FAIL restent conservées. [RETEX](evidence/20261027-web-request-policy-jnok5wvr/RESULT-RETEX.md). Hors native-runtime et conformité globale restent ouverts ; suite autorisée : graph-performance puis autres API Go, sans attente utilisateur.
+
+
+### G10 graph-performance — parcours en qualification
+
+API Go /graph-performance (3 routes), CLI run-limits performance et dialogue Admin : producteurs Rust raccordés, codec5 exécutés PASS ; build de production en cours. Source Go et témoin natif404 conservés. Choix opérateur persistés et profils éditables, borne partagée documentée ; aucune mesure automatique ni gain de rendu prétendu. Contrats FR/EN NATIVE-GRAPH-PERFORMANCE et Mermaid. Différentiel/public/navigateur/installation et revue GLM restent à vérifier : evidence/20261027-graph-performance-lh7z80oy. Les autres modifications concurrentes ne sont pas acceptées par ce lot.
+
+
+### G10 graphes livré189 — 27 octobre2026
+
+Recette3steps PASS/intégrité VERIFIED : API/CLI7, Go6/WIRE13, navigateur4 ; codec5 et Rustdoc/i18n ciblés. Installation18+Version14, cinq travaux inchangés. Dialogue Admin profils p95/samples sans plafond caché ; contrat FR/EN NATIVE-GRAPH-PERFORMANCE. Revue effective24fichiers, quatre sources préparation concurrentes/16axes ouverts : aucune conformité globale déclarée. Originaux FAIL et [RETEX](evidence/20261027-graph-performance-lh7z80oy/RESULT-RETEX.md) conservés. Suite autonome : liste d’échanges puis autres API ; benchmark Go et clôture globale encore ouverts.
+
+
+### Reprise API : classification et contrôles communs
+
+Selon CHEMIN-CRITIQUE-SPEC, graph-performance relève de G4 ; web-requests de G10 ; /exchanges lecture de G1 et CLI exchange de G10. G11 reste les pages. Les anciens libellés provisoires G10graphes/NextG11 ne ferment aucun groupe. HEAD : HTTPResponse masque les corps ; garde TCP réelle vérifiée sur les quatre parcours politiques189 après GET valide. Source des pièces : divergence TEXT/BLOB Go/Rust reproduite191 ; correction du lecteur partagé et normalisation Go en attente de recette. Échanges en lecture : fixture/revue et preuves conservées dans evidence/20261027-exchanges-hq2js3us ; aucun envoi/ACK, aucune clôture globale.
+
+
+### G1 échanges historiques / G10 CLI exchange — installé194
+
+/exchanges?work +exchange list WORK +lecture explicite cockpit : recette2steps PASS/intégrité VERIFIED (Go/Rust7 groupes et navigateur4 FR/EN×thèmes320/1440). BLOB/TEXT/UTF réparés dans le lecteur partagé après reproduction191 ; ancien statut de mission4 cas avant/après vérifiés, sans mutation. HEAD :5 tests TCP du témoin et4 parcours politiques189, corps réel et pas masquage client. Installation21+Version14, cinq travaux inchangés ; nouveaux rapports réels limités aux empreintes. Revue effective17fichiers,3 changements concurrents/12axes ouverts et anciennes issues conservées ; aucun achèvement global, envoi/ACK ou acceptation autonome. Contrat FR/EN NATIVE-AGENT-EXCHANGES, Mermaid final ; [RETEX](evidence/20261027-exchanges-hq2js3us/RESULT-RETEX.md). Suite sans relance : fil d’activité G1 ; composant pur de pagination GLM5 tests isolés, non enregistré et pas encore une API.
+
+
+### Préparation CLI : niveaux explicites livrés195
+
+Choix simple/standard/exigeant sous règles enregistrées, capacité par mode, métadonnées privéesv2 jusqu’au helper ; auto/APIv1 conservés, ancien worker refusev2 avant contact. Recette2steps PASS/intégrité VERIFIED :31CLI+60UI,35API+48UI ; installation21+Version14+page11, SHA7521faf4…, état métier conservé. Refus500 Admin intermittent encore ouvert, aucune cause/correction inventée. Détails et originaux PREPARATION-CLI-LEVELS-20261027.md, evidence/20261027-preparation-cli-levels. Suite autonome : garde des sources mémoire versionnées, puis reprise Go-active sûre ; aucun achèvement global.
+
+
+### G1 activité — installé200 et reprise autonome de toutes les API Go
+
+Parcours activity/API/CLI/cockpit et réglages persistants Admin : recette3 étapes PASS/intégrité VERIFIED (Go/Rust8, fenêtre3, navigateur4), composant5, Rustdoc/i18n. Installation23+Version14, cinq travaux inchangés et lecture réelle avant activation. Actualisation198 avait échoué sur review.managed.result : critères structurés pris à tort pour Request ; défaut reproduit puis corrigé au contrat des huit champs affichés, type affiché invalide toujours refusé. Originaux conservés. Revues figées19835fichiers/44axes ouverts puis2004fichiers/12axes ouverts concurrents ; aucune conformité globale ni clôture de groupe. [RETEX](evidence/20261027-activity-l8z4x8wi/RESULT-RETEX.md), contrats FR/EN NATIVE-ACTIVITY/Mermaid. Autorisation utilisateur : continuer sans relance jusqu’à la fin des API Go restantes et RETEX global ; pas de nouvel accord commit/push. Suite G1 /logs, politiques100/200 des anciens lecteurs et terminal partagé à rendre persistantes/éditables, puis APIs restantes.
+
+
+### Sources projet : garde mémoire versionnée livré201
+
+Guides ordinaires admis ; leçons locales versionnées (même retirées), références d’index et alias physiques refusés avant contexte. Root lecteur distinct avec identités répertoire/DB, erreurs non effacées. Recette4steps PASS/intégrité VERIFIED :824différentielGo/Rust,16publicmémoire,52profil,35API+48UI ;13unitaires et installation21+Version14+page11. Fixture Rust mémoire bornée, vraie UDF identité conservée ; originaux FAIL retenus. Contrat FR/EN et schémas actualisés, plan PROJECT-MEMORY-SOURCE-20261027 et evidence/20261027-project-memory-source. Suite autonome : historique Go actif, arrêt/reprise sûrs sans autorité de signal déduite d’un PID, revue GLM en cours ; migration globale et incident Admin concurrent non clos.
+
+
+### G1 journaux — qualification202, pas encore installé
+
+API8, compatibilité schéma15 sans adoption3, composants10, historique2 et activité8 PASS. Navigateur4 FR/EN×thèmes : réglages enregistrés/reouverts, filtres explicites, curseur9007199254740993 conservé dans l’URL, rendu texte et erreur client gardant les lignes. Défauts de recette conservés : navigation avant relecture Admin terminée, puis attente acceptant le statut initial avant requête ; synchronisation sur focus restauré et résultat final corrige le témoin, sans prétendre corriger le moteur. Ancien échec Go conductor avait exécuté le seul programme local factice ; préparation historique exige désormais annulation publique vérifiée avant serveur. Originaux et no-provider des reprises conservés. Contraste, recette permanente, revue des octets et installation encore ouverts ; propriétaire Codex, suite autonome. Preuves evidence/20261027-log-query-8i8c635h.
+
+
+### G1 journaux installé205 — livraison effective et RETEX
+
+Recette4steps PASS/intégrité VERIFIED : Go/Rust8, ancien schéma15/3, navigateur4avec contraste/curseur exact et JS10. Texte/live10, historique2, activité8, Rustdoc/i18n. Installation55+Version14,30agents API/CLI égaux, cinq travaux inchangés. Livraison concurrente204/205 observée, pas de redémarrage supplémentaire ;204→205 seules notes, sources journaux inchangées depuis202. Originaux des défauts de méthode et refus de sélection conservés ; nouveau helper annule publiquement la fixture historique avant serveur Go. Générateur de fixture explicite conservé/empreinté après disparition des rlib du cache. Revues archivées47fichiers/132axes ouverts puis12/48, sans somme unique ni conformité globale. [RETEX](evidence/20261027-log-query-8i8c635h/RESULT-RETEX.md), contrats FR/EN et Mermaid actualisés. Suite autonome : G1 runtime-health, snapshot, agent-detail, task/report et events/visit selon producteurs réels ; limites de télémétrie/cadences encore ouvertes.
+
+
+### G1 runtime-health — reprise APEX après journaux205
+
+Raccorder le producteur runtime Rust existant sans dépendre de nouvelles lectures SQL dans le serveur déjà lié ; conserver les descripteurs RootBinding, vérifier association physique avant/après et mêmes réglages persistés. Alternative handler RootStore::open écartée car masque les incidents SQLite. Changements additifs annoncés : root_store/material_path et exports, service/routes, cockpit explicite et CLI, contrats FR/EN/Mermaid. Plan/critères RH1–RH6 : docs/plans/migration-rust/evidence/20261027-runtime-health-x97n_o9u/PLAN.md. Pas encore implémenté ni livré ; incidents et qualification globale ouverts.
+
+
+### G1 runtime-health — installé207 et RETEX
+
+API/CLI de diagnostic et lecture explicite cockpit, mêmes seuils persistants Admin. Recette2steps PASS/intégrité VERIFIED : Go/Rust7 +navigateur4avec contraste/sauvegarde réelle ; matériel2/runtime6/Rustdoc/i18n. Installation27+Version14 et cinq travaux inchangés. Serveur lié reste lisible sans SQL, changement de base physique refuse, aucun droit de lancement/fin métier déduit. UI206 mauvais noms JSON reproduits/corrigés en207, première qualification206 refusée sur source identité concurrente ; originaux conservés. Revue22fichiers couverte/20axes étrangers ouverts, revue GLM statique et limites. [RETEX](evidence/20261027-runtime-health-x97n_o9u/RESULT-RETEX.md), contrats FR/EN et Mermaid. Suite autonome autres API G1. RH-UX-1 conservé : libellés conviviaux des volumes/compteurs exacts groupés, propriétaire Codex, après lot API G1 et avant RETEX final, non réalisé.
+
+
+### G1 visite de consultation — cadrage suivant207
+
+POST /visit et reprise publique CLI/cockpit : écriture de session_visits, pas validation métier. Les marqueurs d’effet actuels ne couvrent pas ce domaine ; ne pas le faire passer pour Work/config/agent. Choix borné : effet auxiliaire typé recorded/uncertain, même graphe d’erreurs jusqu’aux sorties/observateurs, SQL IMMEDIATE et CAS natif facultatif ; corps historique vide conserve la sémantique Go. Plan S1–S4 : docs/plans/migration-rust/evidence/20261027-session-visit-__badx_l/PLAN.md. Édits partagés annoncés ici, contrôles des consommateurs avant modification ; pas encore implémenté ni livré.
+
+### G1 consultation et erreurs JSON — installé211, reprise autonome
+
+API POST /visit, extension GET/HEAD visit-state, CLI visit show/mark et action
+explicite cockpit ; reçu auxiliaire distinct, fraîcheur SQL et relecture après
+erreur. Révision négative stockée : défaut200 reproduit sur210, refus moteur et
+réparation publique vérifiés sur211. Famille JSON réponse500 séparée des entrées400
+sur58sites/25fichiers, régression avant/après conservée.
+
+Recette permanente3steps PASS/intégrité VERIFIED : public10groupes, navigateur4
+FR/EN×thèmes avec contraste/mobile et JS16. Root2, SQL4, auxiliaire3, diagnostics18,
+lib Web42 et enveloppes3 ; Rustdoc/i18n. Installation31+Version14,20ressources
+comparées à l'archive effective, CLI/HTTP readonly égaux et cinq travaux inchangés.
+Candidat211 concurrent qualifié réutilisé après égalité exacte de35sources
+compilées de notre périmètre ; nos constructions refusées restent des refus.
+Aucun commit/push ni appel métier/provider ou modification privée du Root réel.
+
+Revue effective207→211 :84fichiers, couverture PASS,156axes étrangers/mixtes
+restent ouverts ; aucune conformité globale. Contrats FR/EN NATIVE-SESSION-VISIT
+et NATIVE-HTTP-ERRORS, Mermaid et index architecture actualisés.
+RETEX : [consultation](evidence/20261027-session-visit-__badx_l/RESULT-RETEX.md).
+Suite autorisée sans relance : autres API Go ; agent-detail dépend de la frontière
+de dialogue, tâche/rapport exigent attribution réelle et politique d'affichage
+persistée/Admin/API/CLI. BLD-FREEZE-1 étudié sans implémentation ; RH-UX-1/RH-UX-2
+gardés avant RETEX final. La migration globale reste active.
+
+### Biba gouvernance APEX — G01–G04, UX Admin incluse
+
+Reprise explicite utilisateur du27octobre : appliquer la gouvernance, l'audit et
+les preuves dans Rust, UX comprise. État candidat, pas acceptation globale.
+[Plan et originaux](evidence/20261027-biba-governance-apex/PLAN.md) : rôle/principal,
+audit-access, Ed25519 mémoire et checkpoints séparés, interface Admin FR/EN.
+Dix tests de gouvernance passent après contre-exemples de revue conservés ;
+recette publique et livraison finale à confirmer. Aucun fournisseur réel ou
+confinement général inféré de ce périmètre ; les lots transversaux restent ouverts.
+
+Contrôle final : git diff --check global signale deux fins de fichier étrangères
+(DELIVERY-PREPARATIONS-20261025.md et task_validation/managed_receipt.rs), originaux
+conservés dans le lot consultation/global-diff-check.stdout. Le contrôle du
+périmètre consultation/erreurs/documents passe. Ne pas annoncer le dépôt global
+propre ; préserver les octets des incréments concurrents pendant leurs preuves.
+Propriétaires de ces fichiers : corriger les lignes terminales lors de leur gel,
+puis recontrôler le diff global ; réception/décision de cet autre propriétaire
+non prouvées. Documentation finale : état installé/index/liens clarifiés après
+recette, sans changement d'entrée exécutable ; empreintes et raison de réutilisation
+dans documentation-finalization.json. Les nouvelles conversations retrouvent le
+lot via ce plan et les index architecture ; aucun contexte d'agent déjà démarré
+n'a été modifié.
+
+Biba G05 réouvert après rappel utilisateur de la couche identité existante :
+[constat lié aux sources](evidence/20261027-biba-governance-apex/identity-integration-audit.json).
+Le candidat vérifie le parcours Trust local, pas le raccord à l'enrôlement signé.
+Ne pas créer une seconde base de comptes ni réutiliser une permission de
+configuration d'enrôlement comme autorité financière. Intégration globale non
+qualifiée ; installation de cet incrément suspendue durant cette reprise.
+
+
+### G1 — Historique de planification installé215, traduction en reprise
+
+Besoin API Go restantes actif ; aucune clôture globale. Root, CLI planning history,
+GET/HEAD planning-history et lecture explicite cockpit sont installés215 :
+[preuves et plan](evidence/20261027-planning-history-_tjfqnt2/PLAN.md).
+Recette publique5groupes et navigateur4 FR/EN/thèmes passent ; lecture réelle
+HTTP/CLI identique, Version14 et30 assertions de livraison, cinq Works inchangés.
+Fixture synthétique non appliquée : dépendances vides vs absentes, haut entier,
+UTF brut et surrogates invalides, refus total puis reprise ; aucune identité,
+approbbation ou exécution provider prouvée. Contrôle visuel a détecté deux
+libellés anglais manquants, originaux conservés, correction et nouveau test en
+qualification216 ; ne pas réutiliser215 comme preuve de tous les libellés.
+Suite entamée : inventaire lifecycle/missions, source Go lifecycleMissions,
+fixtures de métadonnées archivées/corbeille sans prétendre à leur restauration.
+
+### Reprise autonome — échanges Go actifs
+
+Plan PREPARATION-LEGACY-ACTIVE-20261027 : observation historique et arrêt public
+sans adopter un worker Go, CAS/ledger conservés. Deux unités Rust et i18n PASS ;
+contrôles CLI/HTTP diagnostiques passent sur image216 non qualifiée. Build216
+refusé (sept entrées concurrentes changées) conservé, seconde construction après
+inventaire de fin resté stable. Recette/installation non encore acquises ; aucun
+commit/push. Mémoire201 : conservation finalisée21archives/10Roots/3hardlinks,
+revue quatre axes liée aux sources201, originaux et refus conservés.
+
+
+### G1 — Inventaire du cycle de vie en qualification
+
+Reprise autonome des API Go restantes, autorisée explicitement sans relances.
+Route GET/HEAD lifecycle/missions, CLI lifecycle list et volet explicite FR/EN
+raccordés ; [plan, témoins Go et revue](evidence/20261027-lifecycle-inventory-m4dpqdyo/PLAN.md).
+Contrôle Rust CLI/Web et i18n passent. Métadonnées synthétiques archivées/corbeille
+non appliquées, aucun fichier de récupération authentifié. Comparaison publique,
+navigateur, sources exactes et installation restent en qualification.
+Revue GLM bornée7612tokens : deux hypothèses sur les conversions numériques
+réfutées par code Go standard et oracle conservé, pas de modification aveugle.
+Le refus d'enregistrer216 vient d'un fichier de confiance changé après qualification,
+preuve originale conservée ; ancien serveur215 intact. Traductions et inventaire
+regroupés au prochain build, aucun contournement du contrôle d'entrées compilées.
+
+### Biba G05.2 — 27 octobre : consommateur natif et livraison217
+
+Le consommateur RootStore retient l’identité commune courante et la permission
+exacte de l’action, sans token de repli. Mappings, preuves et refus métier sont
+vérifiés en fixtures. Admin FR/EN montre la frontière HTTP encore non raccordée.
+Le candidat217 SHAa330c3f0171a0ab8b757824cbbab3b7e70a1b65a57cae883cf779b3deac7ca10
+est installé, avec27CLI/API et42navigateur sur cet exact binaire, plus lecture
+installée sans POST. Les détails/profils/counters non additionnables et originaux
+restent dans evidence/20261027-biba-governance-apex/PLAN.md et RETEX-G05.2.md.
+La garde partagée a ensuite été extraite côté PAEA ; son profil normal a été
+retesté, sans présenter ces nouveaux octets comme déjà livrés par217.
+G05.3 (startup/transport identité commune réel), décision de source/pin et
+acceptation globale demeurent ouverts. Aucun compte, pin ou revue indépendante
+fabriqué. Les statuts de l’ancien programme Go restent historiques.
+
+Contrôle runtime suivant :218, livraison concurrente SHAe4b1b5adeb3a83073367656de85cc8c9c677096f83d1615ef2dd2d42fa89eb41,
+conserve les seize entrées Biba/garde courantes vérifiées contre son archive.
+Lecture protégée des assets et Version14/panneau34assertions sans POST réussie.
+Voir evidence/20261027-biba-governance-apex/biba-identity-verification.json.
+217 n’est donc plus présenté comme la version courante. G05.3 demeure ouvert.
+
+### G05.3 livré localement — 28 octobre 2026
+
+Le raccord d’une intention enrôlée préparée est installé en v0.1.1-dev.225, SHA bba13470359ddfb0fecc17b958935ccab77dbc74ec40253c853288acab1aa8f5. Processus, profil de production sans fixture et ressources réellement servies vérifiés. Douze tests Rust (quatre exécutions3/4/2/3),57 assertions navigateur réel,14 Version et34 panneau installé ; unités distinctes. État public Biba identique avant/après redémarrage. Auto-revue, aucune acceptation indépendante/globale.
+
+Reçus : http-enrollment-verification.json et RETEX-G05.3.md dans ce dossier. Recette permanente trust-enrollment-transport-rust.json et son verify passent. La revue finale224→225 reste distincte du baseline218 et n’efface pas les anciens incidents. Le contrôle d’espacement global garde deux réserves hors Biba ; périmètre propre vert.
+
+Le serveur normal garde la source enrôlée absente. Activation utilisateur sous déclaration protégée/pin indépendant/provisionnement séparé reste à fournir par l’opérateur ; pas de nouveau compte ou droit inventé. Les travaux de qualification globale différés ne sont pas réactivés. Documentation FR/EN/Mermaid courante mise à jour ; les derniers ajouts ici sont suivi/RETEX hors ressources embarquées, aucun nouveau binaire requis pour leur publication locale.
+
+### Reprise GLM — disponibilité Admin et cache, version228
+
+Livraison locale vérifiée du28octobre : disponibilité du bouton enrôlé réparée,9casJS/27public/44navigateur sur image228, cycle de livraison et15testsPython passent. Panne de preuves de cache prise en charge par validation commune et reconstruction fraîche ; aucune preuve historique inventée. Image/profil/versionFR/EN et état public inchangé vérifiés. Dossier availability-20261028/verification.json, RETEX.md, source-review228 et delivery-tool-review. Les57 contrôles liés sur227 sont réutilisés sous comparaison exacte des entrées Rust/UI, pas réannoncés sur228. Activation réelle toujours distincte ; pas acceptation globale.
